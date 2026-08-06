@@ -28573,6 +28573,7 @@ readyanim=troll_ready
 resizeh=134
 resizev=134
 vislevel=hide
+category=troll_sguard
 
 [troll_sguard2]
 name=Guard
@@ -28592,6 +28593,7 @@ readyanim=troll_ready
 resizeh=128
 resizev=128
 vislevel=hide
+category=troll_sguard
 
 [troll_sguard3]
 name=Guard
@@ -28612,6 +28614,7 @@ readyanim=troll_ready
 resizeh=139
 resizev=139
 vislevel=hide
+category=troll_sguard
 
 [troll_sguard4]
 name=Guard
@@ -28631,6 +28634,7 @@ readyanim=troll_ready
 resizeh=134
 resizev=134
 vislevel=hide
+category=troll_sguard
 
 [troll_sguard5]
 name=Guard
@@ -28650,6 +28654,7 @@ readyanim=troll_ready
 resizeh=134
 resizev=134
 vislevel=hide
+category=troll_sguard
 
 [troll_sguard6]
 name=Guard
@@ -28667,6 +28672,7 @@ readyanim=troll_ready
 resizeh=125
 resizev=125
 vislevel=hide
+category=troll_sguard
 
 [troll_sguard7]
 name=Guard
@@ -28686,6 +28692,7 @@ readyanim=troll_ready
 resizeh=134
 resizev=134
 vislevel=hide
+category=troll_sguard
 
 [troll_sguard8]
 name=Guard
@@ -28705,6 +28712,7 @@ readyanim=troll_ready
 resizeh=134
 resizev=134
 vislevel=hide
+category=troll_sguard
 
 [eadgar_storeroom_guard]
 name=Guard

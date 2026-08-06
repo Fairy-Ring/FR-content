@@ -43,6 +43,7 @@
 ^tbwt_complete = 6
 ^horror_complete = 10
 ^mortton_quest_complete = 85
+^eadgar_complete = 110
 ^biohazard_complete = 16
 ^desertrescue_complete = 30
 ^regicide_complete = 15
@@ -109,6 +110,7 @@
 ^tbwt_questpoints = 2
 ^horror_questpoints = 2
 ^mortton_questpoints = 3
+^eadgar_questpoints = 1
 ^ikov_questpoints = 1
 ^biohazard_questpoints = 3
 ^sheepherder_questpoints = 4
