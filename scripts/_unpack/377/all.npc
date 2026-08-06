@@ -30191,6 +30191,30 @@ readyanim=shadeshadow_ready
 walkanim=shadeshadow_walk
 op2=Attack
 vislevel=40
+category=shade
+wanderrange=30
+maxrange=60
+moverestrict=blocked+normal
+respawnrate=35
+hitpoints=38
+attack=45
+strength=30
+defence=26
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones1
+param=undead,^true
+huntmode=shades
+timer=1
+param=next_npc_type,shade_level1
+huntrange=3
 
 [shade_level1]
 name=Loar Shade
@@ -30205,6 +30229,28 @@ readyanim=shade_ready
 op2=Attack
 alwaysontop=yes
 vislevel=40
+category=shade
+wanderrange=30
+maxrange=60
+moverestrict=blocked+normal
+respawnrate=35
+hitpoints=38
+attack=45
+strength=30
+defence=26
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones1
+param=undead,^true
+param=shadeshadow,shadeshadow_level1
+timer=1
 
 [shade_heaven]
 name=Shade Spirit
@@ -30219,6 +30265,10 @@ recol3d=32767
 vislevel=hide
 walkanim=shade_heaven
 readyanim=shade_heaven
+category=shade
+defaultmode=none
+wanderrange=0
+moverestrict=nomove
 
 [shadeshadow_level2]
 name=Phrin Shadow
@@ -30230,6 +30280,30 @@ readyanim=shadeshadow_ready
 walkanim=shadeshadow_walk
 op2=Attack
 vislevel=60
+category=shade
+wanderrange=5
+maxrange=11
+moverestrict=blocked+normal
+respawnrate=50
+hitpoints=56
+attack=64
+strength=47
+defence=42
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones2
+param=undead,^true
+huntmode=shades
+timer=1
+param=next_npc_type,shade_level2
+huntrange=3
 
 [shade_level2]
 name=Phrin Shade
@@ -30244,6 +30318,28 @@ readyanim=shade_ready
 op2=Attack
 alwaysontop=yes
 vislevel=60
+category=shade
+wanderrange=5
+maxrange=11
+moverestrict=blocked+normal
+respawnrate=50
+hitpoints=56
+attack=64
+strength=47
+defence=42
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones2
+param=undead,^true
+param=shadeshadow,shadeshadow_level2
+timer=1
 
 [shadeshadow_level3]
 name=Riyl Shadow
@@ -30255,6 +30351,30 @@ readyanim=shadeshadow_ready
 walkanim=shadeshadow_walk
 op2=Attack
 vislevel=80
+category=shade
+wanderrange=5
+maxrange=11
+moverestrict=blocked+normal
+respawnrate=50
+hitpoints=76
+attack=88
+strength=55
+defence=60
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones3
+param=undead,^true
+huntmode=shades
+timer=1
+param=next_npc_type,shade_level3
+huntrange=3
 
 [shade_level3]
 name=Riyl Shade
@@ -30269,6 +30389,28 @@ readyanim=shade_ready
 op2=Attack
 alwaysontop=yes
 vislevel=80
+category=shade
+wanderrange=5
+maxrange=11
+moverestrict=blocked+normal
+respawnrate=50
+hitpoints=76
+attack=88
+strength=55
+defence=60
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones3
+param=undead,^true
+param=shadeshadow,shadeshadow_level3
+timer=1
 
 [shadeshadow_level4]
 name=Asyn Shadow
@@ -30280,6 +30422,30 @@ readyanim=shadeshadow_ready
 walkanim=shadeshadow_walk
 op2=Attack
 vislevel=100
+category=shade
+wanderrange=7
+maxrange=11
+moverestrict=blocked+normal
+respawnrate=50
+hitpoints=90
+attack=102
+strength=84
+defence=70
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones4
+param=undead,^true
+huntmode=shades
+timer=1
+param=next_npc_type,shade_level4
+huntrange=3
 
 [shade_level4]
 name=Asyn Shade
@@ -30294,6 +30460,28 @@ readyanim=shade_ready
 op2=Attack
 alwaysontop=yes
 vislevel=100
+category=shade
+wanderrange=7
+maxrange=11
+moverestrict=blocked+normal
+respawnrate=50
+hitpoints=90
+attack=102
+strength=84
+defence=70
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones4
+param=undead,^true
+param=shadeshadow,shadeshadow_level4
+timer=1
 
 [shadeshadow_level5]
 name=Fiyr Shadow
@@ -30303,6 +30491,30 @@ readyanim=shadeshadow_ready
 walkanim=shadeshadow_walk
 op2=Attack
 vislevel=120
+category=shade
+wanderrange=7
+maxrange=11
+moverestrict=blocked+normal
+respawnrate=50
+hitpoints=110
+attack=120
+strength=100
+defence=85
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones5
+param=undead,^true
+huntmode=shades
+timer=1
+param=next_npc_type,shade_level5
+huntrange=3
 
 [shade_level5]
 name=Fiyr Shade
@@ -30315,6 +30527,28 @@ readyanim=shade_ready
 op2=Attack
 alwaysontop=yes
 vislevel=120
+category=shade
+wanderrange=7
+maxrange=11
+moverestrict=blocked+normal
+respawnrate=50
+hitpoints=110
+attack=120
+strength=100
+defence=85
+magic=0
+ranged=0
+param=damagetype,^crush_style
+param=attack_anim,shade_attack
+param=defend_anim,shade_block
+param=death_anim,shade_sink
+param=attack_sound,shade_attack
+param=defend_sound,shade_hit
+param=death_sound,shade_death
+param=death_drop,shade_bones5
+param=undead,^true
+param=shadeshadow,shadeshadow_level5
+timer=1
 
 [ulsquire_shauncy_afflicted]
 name=Afflicted(Ulsquire)
@@ -30445,6 +30679,7 @@ walkanim=human_walk_f
 readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_farmer
+category=mort_afflicted
 
 [mort_woman]
 name=Mort'ton Local
@@ -30466,6 +30701,7 @@ walkanim=human_walk_f
 readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_warrior
+category=mort_afflicted
 
 [mort_afflicted_man]
 name=Afflicted
@@ -30495,6 +30731,7 @@ op1=Talk-to
 op2=Attack
 vislevel=37
 head1=obj_pickpocket_guide_farmer
+category=mort_afflicted
 
 [mort_afflicted_woman]
 name=Afflicted
@@ -30523,6 +30760,7 @@ op1=Talk-to
 op2=Attack
 vislevel=34
 head1=obj_pickpocket_guide_warrior
+category=mort_afflicted
 
 [mort_man2]
 name=Mort'ton local
@@ -30546,6 +30784,7 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_medium_head
+category=mort_afflicted
 
 [mort_woman2]
 name=Mort'ton local
@@ -30567,6 +30806,7 @@ walkanim=human_walk_f
 readyanim=human_ready
 op1=Talk-to
 head1=idk_woman_hair_pigtails_head
+category=mort_afflicted
 
 [mort_afflicted_man2]
 name=Afflicted
@@ -30597,6 +30837,7 @@ op2=Attack
 vislevel=32
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_medium_head
+category=mort_afflicted
 
 [mort_afflicted_woman2]
 name=Afflicted
@@ -30625,6 +30866,7 @@ op1=Talk-to
 op2=Attack
 vislevel=30
 head1=idk_woman_hair_pigtails_head
+category=mort_afflicted
 
 [armourmaking_wizard]
 name=Wizard
@@ -32599,6 +32841,7 @@ readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=92
 param=slayer_category,^slayer_dagannoth
+category=dagganoth
 
 [horror_dagannoth_medium_darker]
 name=Dagannoth
@@ -32620,6 +32863,7 @@ readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=92
 param=slayer_category,^slayer_dagannoth
+category=dagganoth
 
 [horror_dagannoth_medium_lighter]
 name=Dagannoth
@@ -32641,6 +32885,7 @@ readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=92
 param=slayer_category,^slayer_dagannoth
+category=dagganoth
 
 [horror_dagannoth_jr1]
 name=Dagannoth
@@ -32722,6 +32967,7 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 param=slayer_category,^slayer_dagannoth
+category=dagannoth_mother
 
 [horror_dagganoth_aira]
 name=Dagannoth mother

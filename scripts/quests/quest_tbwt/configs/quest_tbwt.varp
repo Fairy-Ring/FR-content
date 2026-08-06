@@ -1,0 +1,17 @@
+// [tbwt_main] already defined in _unpack/377/all.varp (377 cache) — do not duplicate
+
+[tbwt_tiadeche]
+scope=perm
+transmit=yes
+
+[tbwt_tinsay]
+scope=perm
+
+[tbwt_tamayu]
+scope=perm
+
+[tbwt_lubufu]
+scope=perm
+
+[tbwt_flags]
+scope=perm

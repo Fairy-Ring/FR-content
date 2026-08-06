@@ -1,0 +1,19 @@
+// Forward-port from LC Server content `scripts/_test/scripts/cheats/cheat_item.rs2`
+// Local-dev item seeding. Harnesses call `~item` / `~bankitem` when engine give is awkward.
+// Prefer engine `::give` from Playwright when available (no p_finduid busy-guard).
+
+[debugproc,item](namedobj $obj, int $count)
+if ($count < 1) {
+    $count = 1;
+}
+if (p_finduid(uid) = true) {
+    inv_add(inv, $obj, $count);
+}
+
+[debugproc,bankitem](namedobj $obj, int $count)
+if ($count < 1) {
+    $count = 1;
+}
+if (p_finduid(uid) = true) {
+    inv_add(bank, $obj, $count);
+}

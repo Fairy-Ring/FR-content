@@ -566,35 +566,34 @@ switch_coord (loc_coord) {
     case default : @unhandled_stairs(loc_coord);
 }
 
+// Horror from the Deep — lighthouse spiral (from 274 quest_horror)
 [oploc1,horror_lighthouse_spiralstairs_base]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+p_arrivedelay;
+p_teleport(movecoord(loc_coord, -1, 1, 1));
 
 [oploc1,horror_lighthouse_spiralstairs_middle]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
+def_int $option = ~p_choice2("Climb Up.", 1, "Climb Down.", 2);
+if ($option = 1) {
+    if(%horrorquest >= ^horror_repaired_lighthouse & %horrorquest < ^horror_complete) p_teleport(2_39_56_9_57);
+    else p_teleport(movecoord(loc_coord, -1, 1, 1));
+} else if ($option = 2) {
+    if(%horrorquest >= ^horror_repaired_lighthouse & %horrorquest < ^horror_complete) p_teleport(1_38_71_10_58);
+    else p_teleport(movecoord(loc_coord, 0, -1, 2));
 }
 
 [oploc2,horror_lighthouse_spiralstairs_middle]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+p_arrivedelay;
+if(%horrorquest >= ^horror_repaired_lighthouse & %horrorquest < ^horror_complete) p_teleport(2_39_56_9_57);
+else p_teleport(movecoord(loc_coord, -1, 1, 1));
 
 [oploc3,horror_lighthouse_spiralstairs_middle]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+p_arrivedelay;
+p_teleport(movecoord(loc_coord, 0, -1, 2));
 
 [oploc1,horror_lighthouse_spiralstairs_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+p_arrivedelay;
+if(%horrorquest >= ^horror_repaired_lighthouse & %horrorquest < ^horror_complete) p_teleport(1_38_71_10_58);
+else p_teleport(movecoord(loc_coord, 0, -1, 1));
 
 [oploc1,board_game_stairs_top]
 p_arrivedelay;

@@ -18,7 +18,8 @@ if (%crate_bananas = 0 & %crate_rum = 0) {
 }
 
 [oplocu,bananacrate]
-if (last_useitem ! banana & last_useitem ! karamja_rum) {
+// TBWT banana-rum: recognised but rejected (port 289 — not valid Luthas smuggling)
+if (last_useitem ! banana & last_useitem ! karamja_rum & last_useitem ! tbwt_sliced_banana_in_karamja_rum) {
     ~displaymessage(^dm_default);
     return;
 }
@@ -32,6 +33,9 @@ if (last_useitem = banana) {
     @banana_crate_pack_banana;
 } else if (last_useitem = karamja_rum) {
     @banana_crate_pack_rum;
+} else if (last_useitem = tbwt_sliced_banana_in_karamja_rum) {
+    // Exact 289 mes (not pack_rum)
+    mes("Pirate's don't usually take sliced banana with their Karamjan rum.");
 }
 
 [label,banana_crate_pack_banana]

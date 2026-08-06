@@ -28,6 +28,10 @@ switch_component ($component) {
         if_openmain(questscroll_itgronigen);
     case questlist:fluffs ://Gertrude's Cat: Updates QP before quest scroll is queued & uses custom quest scroll
         if_openmain(questscroll_fluffs);
+    case questlist:tbwt : // Tai Bwo Wannai Trio (custom scroll) — port 289
+        if_settext(questscroll_tbwt:com_3, $questmessage);
+        if_settext(questscroll_tbwt:com_8, tostring($questpoints));
+        if_openmain(questscroll_tbwt);
     case questlist:seaslug, questlist:itwatchtower ://Seaslug & Watchtower: Updates QP before quest scroll is queued
         if_settext(questscroll:com_3, $questmessage);
         if_settext(questscroll:com_9, tostring($questpoints));
@@ -246,6 +250,15 @@ if (%troll_love = ^troll_love_complete) {
 if (%golem_a = ^golem_complete) {
     $questpoints = add($questpoints, ^golem_questpoints);
 }
+if (%tbwt_main = ^tbwt_complete) {
+    $questpoints = add($questpoints, ^tbwt_questpoints);
+}
+if (%horrorquest = ^horror_complete) {
+    $questpoints = add($questpoints, ^horror_questpoints);
+}
+if (%morttonquest = ^mortton_quest_complete) {
+    $questpoints = add($questpoints, ^mortton_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -295,6 +308,9 @@ if (%phoenixgang > ^phoenixgang_not_started & %blackarmgang ! ^blackarmgang_comp
 ~send_quest_progress_colour(questlist:itgronigen, %itgronigen, ^itgronigen_complete);
 ~send_quest_progress_colour(questlist:arena, %arenaquest, ^arena_complete);
 ~send_quest_progress_colour(questlist:junglepotion, %junglepotion, ^junglepotion_complete);
+~send_quest_progress_colour(questlist:tbwt, %tbwt_main, ^tbwt_complete);
+~send_quest_progress_colour(questlist:horror, %horrorquest, ^horror_complete);
+~send_quest_progress_colour(questlist:mortton, %morttonquest, ^mortton_quest_complete);
 ~send_quest_progress_colour(questlist:ikov, %ikov, ^ikov_completed_armadyl);
 ~send_quest_progress_colour(questlist:biohazard, %biohazard, ^biohazard_complete);
 ~send_quest_progress_colour(questlist:sheepherder, %sheepherderquest, ^sheepherder_complete);

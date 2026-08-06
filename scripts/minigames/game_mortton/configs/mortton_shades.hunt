@@ -1,0 +1,11 @@
+[shades]
+type=player
+check_vis=off
+check_nottoostrong=outside_wilderness
+check_notcombat=%lastcombat
+check_notcombat_self=%npc_lastcombat
+check_notbusy=off
+// 274 used extracheck_var=%morttonmulti,&16 (bit ^shadeattack) — 377 packer rejects bit-and form.
+// Shades still gated in scripts via %morttonmulti bits where needed.
+find_keephunting=off
+find_newmode=opplayer2

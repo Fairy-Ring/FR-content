@@ -215,6 +215,9 @@
 // info: Get the total level of the player
 [command,stat_total]()(int)
 // info: Get the base level of $stat
+// info: Returns 1 if this skill is XP-enabled on the engine (PlayerStatEnabled). Gates skill guides etc.
+[command,stat_enabled](stat $stat)(int)
+// info: Get the base (unboosted) level of a skill
 [command,stat_base](stat $stat)(int)
 // info: Get the base level of $stat for the secondary player
 [command,.stat_base](stat $stat)(int)

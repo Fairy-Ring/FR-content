@@ -177,6 +177,19 @@ if (npc_type = count_draynor) {
     }
 }
 
+// Horror from the Deep — only the assigned player may attack jr4 / mother forms
+if(npc_type = horror_dagannoth_jr4 | npc_category = dagannoth_mother) {
+    if (%npc_aggressive_player ! uid) {
+        mes("It's not after you...");
+        return (false);
+    }
+    if(npc_category = dagannoth_mother) {
+        if (~check_protect_prayer(^ranged_style) = false) {
+            npc_setmode(applayer2);
+        }
+    }
+}
+
 if (npc_hasop(2) = true) {
     return (true);
 }

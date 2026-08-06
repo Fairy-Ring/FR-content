@@ -29890,6 +29890,7 @@ desc=Looks like a pile of ancient rubble.
 model=templewall_base
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_1]
 name=Temple wall
@@ -29898,6 +29899,7 @@ model=templewall1
 anim=temple_build1
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_2]
 name=Temple wall
@@ -29906,6 +29908,7 @@ model=templewall1
 anim=temple_build2
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_3]
 name=Temple wall
@@ -29914,6 +29917,7 @@ model=templewall1
 anim=temple_build3
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_4]
 name=Temple wall
@@ -29922,6 +29926,7 @@ model=templewall1
 anim=temple_build4
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_5]
 name=Temple wall
@@ -29930,6 +29935,7 @@ model=templewall1
 anim=temple_build5
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_6]
 name=Temple wall
@@ -29938,6 +29944,7 @@ model=templewall1
 anim=temple_build6
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_7]
 name=Temple wall
@@ -29946,6 +29953,7 @@ model=templewall1
 anim=temple_build7
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_8]
 name=Temple wall
@@ -29954,6 +29962,7 @@ model=templewall1
 anim=temple_build8
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_9]
 name=Temple wall
@@ -29962,6 +29971,7 @@ model=templewall1
 anim=temple_build9
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewall_10]
 name=Temple wall
@@ -29970,6 +29980,7 @@ model=templewall1
 anim=temple_build10
 op1=Reinforce
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_base]
 name=Broken Wall
@@ -29977,6 +29988,7 @@ desc=The broken wall of a desecrated temple.
 model=templewallcorner_base
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_1]
 name=Temple wall
@@ -29985,6 +29997,7 @@ model=templewallcorner1
 anim=temple_build1
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_2]
 name=Temple wall
@@ -29993,6 +30006,7 @@ model=templewallcorner1
 anim=temple_build2
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_3]
 name=Temple wall
@@ -30001,6 +30015,7 @@ model=templewallcorner1
 anim=temple_build3
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_4]
 name=Temple wall
@@ -30009,6 +30024,7 @@ model=templewallcorner1
 anim=temple_build4
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_5]
 name=Temple wall
@@ -30017,6 +30033,7 @@ model=templewallcorner1
 anim=temple_build5
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_6]
 name=Temple wall
@@ -30025,6 +30042,7 @@ model=templewallcorner1
 anim=temple_build6
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_7]
 name=Temple wall
@@ -30033,6 +30051,7 @@ model=templewallcorner1
 anim=temple_build7
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_8]
 name=Temple wall
@@ -30041,6 +30060,7 @@ model=templewallcorner1
 anim=temple_build8
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_9]
 name=Temple wall
@@ -30049,6 +30069,7 @@ model=templewallcorner1
 anim=temple_build9
 op1=Repair
 op3=hidden
+category=flamtaer_wall
 
 [templewallcorner_10]
 name=Temple wall
@@ -30057,6 +30078,7 @@ model=templewallcorner1
 anim=temple_build10
 op1=Reinforce
 op3=hidden
+category=flamtaer_wall
 
 [templefire_altar]
 name=Flaming Fire altar
@@ -30093,6 +30115,7 @@ desc=A place to cremate the dead. Needs a body.
 model=temple_pyre
 anim=temple_pyre_nobones
 length=3
+category=flamtaer_pyre_logs
 
 [temple_pyre_oak]
 name=Funeral Pyre
@@ -30100,6 +30123,7 @@ desc=A place to cremate the dead. Needs a body.
 model=temple_pyre
 anim=temple_pyre_nobones
 length=3
+category=flamtaer_pyre_logs
 
 [temple_pyre_willow]
 name=Funeral Pyre
@@ -30107,6 +30131,7 @@ desc=A place to cremate the dead. Needs a body.
 model=temple_pyre
 anim=temple_pyre_nobones
 length=3
+category=flamtaer_pyre_logs
 
 [temple_pyre_maple]
 name=Funeral Pyre
@@ -30114,6 +30139,7 @@ desc=A place to cremate the dead. Needs a body.
 model=temple_pyre
 anim=temple_pyre_nobones
 length=3
+category=flamtaer_pyre_logs
 
 [temple_pyre_yew]
 name=Funeral Pyre
@@ -30121,6 +30147,7 @@ desc=A place to cremate the dead. Needs a body.
 model=temple_pyre
 anim=temple_pyre_nobones
 length=3
+category=flamtaer_pyre_logs
 
 [temple_pyre_magic]
 name=Funeral Pyre
@@ -30128,6 +30155,7 @@ desc=A place to cremate the dead. Needs a body.
 model=temple_pyre
 anim=temple_pyre_nobones
 length=3
+category=flamtaer_pyre_logs
 
 [temple_pyre_bones_logs]
 name=Funeral Pyre
@@ -30136,6 +30164,7 @@ model=temple_pyre
 length=3
 op1=Light
 op4=Hidden
+category=flamtaer_pyre_bones
 
 [temple_pyre_bones_oak]
 name=Funeral Pyre
@@ -30144,6 +30173,7 @@ model=temple_pyre
 length=3
 op1=Light
 op4=Hidden
+category=flamtaer_pyre_bones
 
 [temple_pyre_bones_willow]
 name=Funeral Pyre
@@ -30152,6 +30182,7 @@ model=temple_pyre
 length=3
 op1=Light
 op4=Hidden
+category=flamtaer_pyre_bones
 
 [temple_pyre_bones_maple]
 name=Funeral Pyre
@@ -30160,6 +30191,7 @@ model=temple_pyre
 length=3
 op1=Light
 op4=Hidden
+category=flamtaer_pyre_bones
 
 [temple_pyre_bones_yew]
 name=Funeral Pyre
@@ -30168,6 +30200,7 @@ model=temple_pyre
 length=3
 op1=Light
 op4=Hidden
+category=flamtaer_pyre_bones
 
 [temple_pyre_bones_magic]
 name=Funeral Pyre
@@ -30176,6 +30209,7 @@ model=temple_pyre
 length=3
 op1=Light
 op4=Hidden
+category=flamtaer_pyre_bones
 
 [shadelair_bronzedoor]
 name=Solid bronze door
@@ -56113,6 +56147,7 @@ recol2s=11556
 recol2d=12548
 anim=temple_pyre_nobones
 length=3
+category=flamtaer_pyre_logs
 
 [temple_pyre_mahogany]
 name=Funeral Pyre
@@ -56124,6 +56159,7 @@ recol2s=11556
 recol2d=20968
 anim=temple_pyre_nobones
 length=3
+category=flamtaer_pyre_logs
 
 [temple_pyre_bones_teak]
 name=Funeral Pyre
@@ -56136,6 +56172,7 @@ recol2d=12548
 length=3
 op1=Light
 op4=Hidden
+category=flamtaer_pyre_bones
 
 [temple_pyre_bones_mahogany]
 name=Funeral Pyre
@@ -56148,6 +56185,7 @@ recol2d=20968
 length=3
 op1=Light
 op4=Hidden
+category=flamtaer_pyre_bones
 
 [tai_bwo_jungle_vegetation_easy_1]
 name=Light Jungle

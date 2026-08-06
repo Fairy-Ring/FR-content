@@ -45,6 +45,12 @@ switch_int(%tutorial) {
 ~set_tutorial_progress;
 
 [label,newbie_mining_instructor_before_smelting]
+// Recovery: smelted via furnace_side (category path) yields a bar without %tutorial advance.
+if (inv_total(inv, bronze_bar) > 0) {
+    %tutorial = ^newbie_mining_instructor_after_smelt_bronze_bar;
+    ~set_tutorial_progress;
+    @newbie_mining_instructor_after_smelting;
+}
 ~chatnpc("<p,neutral>Now that you have some ore, you should smelt it into a bronze bar. You can use the furnace over there to do so.");
 ~newbie_mining_instructor_replace_items;
 

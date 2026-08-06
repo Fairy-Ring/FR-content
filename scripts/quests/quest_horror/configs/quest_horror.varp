@@ -1,0 +1,5 @@
+// [deephorror] already defined in _unpack/377/all.varp — do not duplicate
+// pack/varp.pack renames 350=godbook_multi (was varp_350 placeholder)
+
+[godbook_multi]
+scope=perm

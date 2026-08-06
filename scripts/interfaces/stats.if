@@ -1116,7 +1116,7 @@ width=25
 height=25
 graphic=staticons,8
 
-[com_68]
+[attack]
 type=text
 x=0
 y=2
@@ -1128,7 +1128,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Combat @whi@guide
 
-[com_69]
+[hitpoints]
 type=text
 x=64
 y=2
@@ -1140,7 +1140,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Combat @whi@guide
 
-[com_70]
+[mining]
 type=text
 x=128
 y=2
@@ -1152,7 +1152,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Mining @whi@guide
 
-[com_71]
+[strength]
 type=text
 x=0
 y=33
@@ -1164,7 +1164,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Combat @whi@guide
 
-[com_72]
+[agility]
 type=text
 x=64
 y=33
@@ -1176,7 +1176,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Agility @whi@guide
 
-[com_73]
+[smithing]
 type=text
 x=128
 y=33
@@ -1188,7 +1188,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Smithing @whi@guide
 
-[com_74]
+[defence]
 type=text
 x=0
 y=64
@@ -1200,7 +1200,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Combat @whi@guide
 
-[com_75]
+[herblore]
 type=text
 x=64
 y=64
@@ -1212,7 +1212,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Herblore @whi@guide
 
-[com_76]
+[fishing]
 type=text
 x=128
 y=64
@@ -1224,7 +1224,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Fishing @whi@guide
 
-[com_77]
+[ranged]
 type=text
 x=0
 y=95
@@ -1236,7 +1236,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Ranged @whi@guide
 
-[com_78]
+[thieving]
 type=text
 x=64
 y=95
@@ -1248,7 +1248,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Thieving @whi@guide
 
-[com_79]
+[cooking]
 type=text
 x=128
 y=95
@@ -1260,7 +1260,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Cooking @whi@guide
 
-[com_80]
+[prayer]
 type=text
 x=0
 y=126
@@ -1272,7 +1272,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Prayer @whi@guide
 
-[com_81]
+[crafting]
 type=text
 x=64
 y=126
@@ -1284,7 +1284,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Crafting @whi@guide
 
-[com_82]
+[firemaking]
 type=text
 x=128
 y=126
@@ -1296,7 +1296,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Firemaking @whi@guide
 
-[com_83]
+[magic]
 type=text
 x=0
 y=157
@@ -1308,7 +1308,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Magic @whi@guide
 
-[com_84]
+[fletching]
 type=text
 x=64
 y=157
@@ -1320,7 +1320,7 @@ font=p12_full
 shadowed=yes
 option=View @or1@Fletching @whi@guide
 
-[com_85]
+[woodcutting]
 type=text
 x=128
 y=157
@@ -2710,7 +2710,7 @@ shadowed=yes
 text=%1
 colour=0xFFFF00
 
-[com_240]
+[runecrafting]
 type=text
 x=0
 y=188
@@ -2856,7 +2856,7 @@ shadowed=yes
 text=%1
 colour=0xFFFF00
 
-[com_244]
+[slayer]
 type=text
 x=64
 y=188
@@ -2935,7 +2935,7 @@ shadowed=yes
 text=%1
 colour=0xFFFF00
 
-[com_266]
+[farming]
 type=text
 x=128
 y=188

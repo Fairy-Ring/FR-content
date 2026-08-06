@@ -5949,6 +5949,8 @@ model=obj_unicorn_horn_dust
 2dyan=1892
 2dxan=264
 weight=2oz
+param=brew_potion_struct,mort_serum3_tarrominvial
+param=brew_potion_struct_secondary,ashesvial
 
 [cert_ashes]
 certlink=ashes
@@ -19261,6 +19263,7 @@ model=obj_halberd
 2dyan=400
 2dxan=224
 weight=10lb
+category=weapon_polearm
 
 [cert_halberd]
 certlink=halberd
@@ -36916,6 +36919,7 @@ womanwear=obj_bronze_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=7lb
+category=weapon_polearm
 
 [cert_bronze_halberd]
 certlink=bronze_halberd
@@ -36938,6 +36942,7 @@ womanwear=obj_bronze_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=7lb
+category=weapon_polearm
 
 [cert_iron_halberd]
 certlink=iron_halberd
@@ -36958,6 +36963,7 @@ womanwear=obj_bronze_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=7lb
+category=weapon_polearm
 
 [cert_steel_halberd]
 certlink=steel_halberd
@@ -36980,6 +36986,7 @@ womanwear=obj_bronze_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=7lb
+category=weapon_polearm
 
 [cert_black_halberd]
 certlink=black_halberd
@@ -37002,6 +37009,7 @@ womanwear=obj_bronze_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=6lb
+category=weapon_polearm
 
 [cert_mithril_halberd]
 certlink=mithril_halberd
@@ -37024,6 +37032,7 @@ womanwear=obj_bronze_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=8lb
+category=weapon_polearm
 
 [cert_adamant_halberd]
 certlink=adamant_halberd
@@ -37046,6 +37055,7 @@ womanwear=obj_bronze_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=7lb
+category=weapon_polearm
 
 [cert_rune_halberd]
 certlink=rune_halberd
@@ -37068,6 +37078,7 @@ womanwear=obj_dragon_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=7lb
+category=weapon_polearm
 
 [cert_dragon_halberd]
 certlink=dragon_halberd
@@ -39068,6 +39079,7 @@ model=obj_mcannonremains
 2dxan=320
 members=yes
 weight=3lb
+category=shade_bones
 
 [cert_shade_bones1]
 certlink=shade_bones1
@@ -39086,6 +39098,7 @@ model=obj_mcannonremains
 2dxan=320
 members=yes
 weight=3lb
+category=shade_bones
 
 [cert_shade_bones2]
 certlink=shade_bones2
@@ -39104,6 +39117,7 @@ model=obj_mcannonremains
 2dxan=320
 members=yes
 weight=3lb
+category=shade_bones
 
 [cert_shade_bones3]
 certlink=shade_bones3
@@ -39122,6 +39136,7 @@ model=obj_mcannonremains
 2dxan=320
 members=yes
 weight=3lb
+category=shade_bones
 
 [cert_shade_bones4]
 certlink=shade_bones4
@@ -39140,6 +39155,7 @@ model=obj_mcannonremains
 2dxan=320
 members=yes
 weight=3lb
+category=shade_bones
 
 [cert_shade_bones5]
 certlink=shade_bones5
@@ -39178,6 +39194,8 @@ members=yes
 iop4=Empty
 weight=35g
 category=mort_serum
+param=next_obj_stage,mort_serum3
+param=dose_count,4
 
 [cert_mort_serum4]
 certlink=mort_serum4
@@ -39198,6 +39216,8 @@ members=yes
 iop4=Empty
 weight=30g
 category=mort_serum
+param=next_obj_stage,mort_serum2
+param=dose_count,3
 
 [cert_mort_serum3]
 certlink=mort_serum3
@@ -39218,6 +39238,8 @@ members=yes
 iop4=Empty
 weight=25g
 category=mort_serum
+param=next_obj_stage,mort_serum1
+param=dose_count,2
 
 [cert_mort_serum2]
 certlink=mort_serum2
@@ -39238,6 +39260,8 @@ members=yes
 iop4=Empty
 weight=20g
 category=mort_serum
+param=next_obj_stage,vial_empty
+param=dose_count,1
 
 [cert_mort_serum1]
 certlink=mort_serum1
@@ -39502,6 +39526,7 @@ model=obj_logs
 2dxan=120
 members=yes
 weight=3lb
+category=pyre_logs
 
 [cert_logs_pyre]
 certlink=logs_pyre
@@ -39524,6 +39549,7 @@ model=obj_logs
 2dxan=120
 members=yes
 weight=4lb
+category=pyre_logs
 
 [cert_oak_logs_pyre]
 certlink=oak_logs_pyre
@@ -39546,6 +39572,7 @@ model=obj_logs
 2dxan=120
 members=yes
 weight=3lb
+category=pyre_logs
 
 [cert_willow_logs_pyre]
 certlink=willow_logs_pyre
@@ -39568,6 +39595,7 @@ model=obj_logs
 2dxan=120
 members=yes
 weight=3lb
+category=pyre_logs
 
 [cert_maple_logs_pyre]
 certlink=maple_logs_pyre
@@ -39591,6 +39619,7 @@ model=obj_logs
 ambient=15
 members=yes
 weight=3lb
+category=pyre_logs
 
 [cert_yew_logs_pyre]
 certlink=yew_logs_pyre
@@ -39614,6 +39643,7 @@ model=obj_logs
 2dxan=120
 members=yes
 weight=3lb
+category=pyre_logs
 
 [cert_magic_logs_pyre]
 certlink=magic_logs_pyre
@@ -39640,6 +39670,7 @@ model=obj_shadekey_bronze_bloodred
 cost=81
 members=yes
 weight=10g
+category=shadekey_bronze
 
 [shadekey_bronze_brown]
 name=Bronze key brown
@@ -39662,6 +39693,7 @@ model=obj_shadekey_bronze_bloodred
 cost=82
 members=yes
 weight=10g
+category=shadekey_bronze
 
 [shadekey_bronze_crimson]
 name=Bronze key crimson
@@ -39684,6 +39716,7 @@ model=obj_shadekey_bronze_bloodred
 cost=83
 members=yes
 weight=10g
+category=shadekey_bronze
 
 [shadekey_bronze_black]
 name=Bronze key black
@@ -39706,6 +39739,7 @@ model=obj_shadekey_bronze_bloodred
 cost=84
 members=yes
 weight=10g
+category=shadekey_bronze
 
 [shadekey_bronze_purple]
 name=Bronze key purple
@@ -39728,6 +39762,7 @@ model=obj_shadekey_bronze_bloodred
 cost=85
 members=yes
 weight=10g
+category=shadekey_bronze
 
 [shadekey_steel_bloodred]
 name=Steel key red
@@ -39750,6 +39785,7 @@ model=obj_shadekey_bronze_bloodred
 cost=86
 members=yes
 weight=10g
+category=shadekey_steel
 
 [shadekey_steel_brown]
 name=Steel key brown
@@ -39772,6 +39808,7 @@ model=obj_shadekey_bronze_bloodred
 cost=87
 members=yes
 weight=10g
+category=shadekey_steel
 
 [shadekey_steel_crimson]
 name=Steel key crimson
@@ -39794,6 +39831,7 @@ model=obj_shadekey_bronze_bloodred
 cost=88
 members=yes
 weight=10g
+category=shadekey_steel
 
 [shadekey_steel_black]
 name=Steel key black
@@ -39816,6 +39854,7 @@ model=obj_shadekey_bronze_bloodred
 cost=89
 members=yes
 weight=10g
+category=shadekey_steel
 
 [shadekey_steel_purple]
 name=Steel key purple
@@ -39838,6 +39877,7 @@ model=obj_shadekey_bronze_bloodred
 cost=90
 members=yes
 weight=10g
+category=shadekey_steel
 
 [shadekey_black_bloodred]
 name=Black key red
@@ -39860,6 +39900,7 @@ model=obj_shadekey_bronze_bloodred
 cost=91
 members=yes
 weight=10g
+category=shadekey_black
 
 [shadekey_black_brown]
 name=Black key brown
@@ -39882,6 +39923,7 @@ model=obj_shadekey_bronze_bloodred
 cost=92
 members=yes
 weight=10g
+category=shadekey_black
 
 [shadekey_black_crimson]
 name=Black key crimson
@@ -39904,6 +39946,7 @@ model=obj_shadekey_bronze_bloodred
 cost=93
 members=yes
 weight=10g
+category=shadekey_black
 
 [shadekey_black_black]
 name=Black key black
@@ -39926,6 +39969,7 @@ model=obj_shadekey_bronze_bloodred
 cost=94
 members=yes
 weight=10g
+category=shadekey_black
 
 [shadekey_black_purple]
 name=Black key purple
@@ -39948,6 +39992,7 @@ model=obj_shadekey_bronze_bloodred
 cost=95
 members=yes
 weight=10g
+category=shadekey_black
 
 [shadekey_silver_bloodred]
 name=Silver key red
@@ -39970,6 +40015,7 @@ model=obj_shadekey_bronze_bloodred
 cost=96
 members=yes
 weight=10g
+category=shadekey_silver
 
 [shadekey_silver_brown]
 name=Silver key brown
@@ -39992,6 +40038,7 @@ model=obj_shadekey_bronze_bloodred
 cost=97
 members=yes
 weight=10g
+category=shadekey_silver
 
 [shadekey_silver_crimson]
 name=Silver key crimson
@@ -40014,6 +40061,7 @@ model=obj_shadekey_bronze_bloodred
 cost=98
 members=yes
 weight=10g
+category=shadekey_silver
 
 [shadekey_silver_black]
 name=Silver key black
@@ -40036,6 +40084,7 @@ model=obj_shadekey_bronze_bloodred
 cost=99
 members=yes
 weight=10g
+category=shadekey_silver
 
 [shadekey_silver_purple]
 name=Silver key purple
@@ -40058,6 +40107,7 @@ model=obj_shadekey_bronze_bloodred
 cost=100
 members=yes
 weight=10g
+category=shadekey_silver
 
 [fine_cloth]
 name=Fine cloth
@@ -77946,6 +77996,7 @@ womanwear=obj_bronze_halberd_manwear,6
 wearpos=righthand
 wearpos2=lefthand
 weight=7lb
+category=weapon_polearm
 
 [cert_white_halberd]
 certlink=white_halberd

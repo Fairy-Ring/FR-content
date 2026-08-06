@@ -1,0 +1,9 @@
+// morttonquest / morttonmulti / temple_*_p already in _unpack/377/all.varp
+// pack renames: 341=mortton_current_shade, 342=temple_sanctity (were varp_341/342)
+
+[mortton_current_shade]
+protect=no
+type=obj
+
+[temple_sanctity]
+protect=no

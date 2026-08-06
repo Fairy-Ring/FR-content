@@ -40,6 +40,9 @@
 ^hazeelcult_complete = 9
 ^itgronigen_complete = 7
 ^junglepotion_complete = 12
+^tbwt_complete = 6
+^horror_complete = 10
+^mortton_quest_complete = 85
 ^biohazard_complete = 16
 ^desertrescue_complete = 30
 ^regicide_complete = 15
@@ -103,6 +106,9 @@
 ^itgronigen_questpoints = 2
 ^arena_questpoints = 2
 ^junglepotion_questpoints = 1
+^tbwt_questpoints = 2
+^horror_questpoints = 2
+^mortton_questpoints = 3
 ^ikov_questpoints = 1
 ^biohazard_questpoints = 3
 ^sheepherder_questpoints = 4

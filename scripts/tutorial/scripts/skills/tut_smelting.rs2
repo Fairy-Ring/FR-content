@@ -1,4 +1,23 @@
+// newbiefurnace (3044) is the real tutorial furnace. furnace_side (2785) sits one
+// tile east on m48_148 and also named "Furnace" + category=smithing_furnace — if only
+// the category [oplocu,_smithing_furnace] runs, the player gets a bar without
+// advancing %tutorial (sticky stuck on "Smelting."). Bind both locs to tut path.
+
 [oplocu,newbiefurnace]
+@tut_furnace_useitem;
+
+[oplocu,furnace_side]
+// Type trigger beats [oplocu,_smithing_furnace] — handle island + mainland.
+if (~in_tutorial_island(coord) = true) {
+    @tut_furnace_useitem;
+}
+// Mainland: same ore→bar path as category furnace (label in skill_smithing/smelting.rs2)
+if (oc_category(last_useitem) = category_91) {
+    @smelt_ore(last_useitem);
+}
+~displaymessage(^dm_default);
+
+[label,tut_furnace_useitem]
 if (%tutorial < ^newbie_mining_instructor_before_smelt_bronze_bar) {
     ~mesbox("This is a furnace for smelting metal.|You'll learn how to use it soon.");
     return;
