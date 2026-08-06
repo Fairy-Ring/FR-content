@@ -147,8 +147,13 @@ if(npc_find(coord, viking_hallifred, 5, 0) = true) {
 p_arrivedelay;
 ~climb_ladder(0_41_57_25_13, true);
 p_delay(0);
-if(npc_find(coord, viking_hallifred, 5, 0) = true) {
+// Vote is earned by finishing the maze, not by Swensen standing in range.
+// (npc_find was gating the queue — if he wandered mid-maze the trial soft-locked.)
+// Dialog still requires him nearby; progress guard prevents double-count.
+if(~get_viking_swensen_progress = ^swensen_started) {
     queue(complete_swensen_trial, 0, 0);
+}
+if(npc_find(coord, viking_hallifred, 8, 0) = true) {
     ~chatnpc("<p,neutral>Outerlander! You have finished my maze! I am genuinely impressed!");
     ~chatplayer("<p,quiz>So does that mean I can rely on your vote at the council of elders to allow me into your village?");
     ~chatnpc("<p,happy>Of course outerlander! I am nothing if not a man of my word!");
@@ -156,6 +161,9 @@ if(npc_find(coord, viking_hallifred, 5, 0) = true) {
 }
 
 [queue,complete_swensen_trial]
+if(~get_viking_swensen_progress = ^swensen_complete) {
+    return;
+}
 %viking = add(%viking, 1);
 ~set_viking_swensen_progress(^swensen_complete);
 
