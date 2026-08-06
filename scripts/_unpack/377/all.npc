@@ -31238,6 +31238,25 @@ readyanim=human_ready
 op2=Attack
 ambient=80
 vislevel=69
+// Combat from LC Content quest_viking (274) — 377 unpack was visual-only (one-hit paper tiger).
+wanderrange=5
+maxrange=20
+hitpoints=60
+attack=60
+strength=60
+defence=60
+param=stabdefence,100
+param=slashdefence,100
+param=crushdefence,100
+param=magicdefence,500
+param=rangedefence,500
+param=damagetype,^crush_style
+param=attack_anim,human_sword_slash
+param=defend_anim,human_sword_def
+param=attack_sound,unarmed_punch
+param=defend_sound,ghost_hit
+// multi-style combat outside multiway (274; param ported 2026-08-06)
+param=npc_forcemulti,^true
 
 [viking_draugen_safe]
 name=Butterfly
@@ -31551,6 +31570,22 @@ readyanim=human_staffready
 op2=Attack
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
+// Combat from LC Content 274 quest_viking — unpack was visual-only.
+wanderrange=5
+maxrange=20
+hitpoints=30
+attack=20
+strength=20
+defence=20
+param=stabdefence,20
+param=slashdefence,20
+param=crushdefence,20
+param=magicdefence,20
+param=rangedefence,20
+param=damagetype,^slash_style
+param=attack_anim,human_sword_slash
+param=defend_anim,human_sword_def
+param=attack_sound,staff_stab
 
 [viking_enemy2]
 name=Koschei the deathless
@@ -31581,6 +31616,21 @@ readyanim=human_staffready
 op2=Attack
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
+wanderrange=5
+maxrange=20
+hitpoints=50
+attack=40
+strength=40
+defence=40
+param=stabdefence,40
+param=slashdefence,40
+param=crushdefence,40
+param=magicdefence,40
+param=rangedefence,40
+param=damagetype,^slash_style
+param=attack_anim,human_sword_slash
+param=defend_anim,human_sword_def
+param=attack_sound,staff_stab
 
 [viking_enemy3]
 name=Koschei the deathless
@@ -31611,6 +31661,21 @@ readyanim=human_staffready
 op2=Attack
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
+wanderrange=5
+maxrange=20
+hitpoints=70
+attack=60
+strength=60
+defence=60
+param=stabdefence,60
+param=slashdefence,60
+param=crushdefence,60
+param=magicdefence,60
+param=rangedefence,60
+param=damagetype,^slash_style
+param=attack_anim,human_sword_slash
+param=defend_anim,human_sword_def
+param=attack_sound,staff_stab
 
 [viking_enemy4]
 name=Koschei the deathless
@@ -31641,6 +31706,18 @@ readyanim=human_staffready
 op2=Attack
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
+wanderrange=5
+maxrange=20
+// Final form — authentic paper-high combat (274); leave when HP low / climb ladder.
+hitpoints=255
+attack=255
+strength=5
+defence=255
+param=attackrate,1
+param=damagetype,^slash_style
+param=attack_anim,human_sword_slash
+param=defend_anim,human_sword_def
+param=attack_sound,staff_stab
 
 [viking_brundt_child]
 name=Brundt the Chieftain

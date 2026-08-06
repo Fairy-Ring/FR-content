@@ -183,3 +183,9 @@ default=0
 [sa_energy]
 type=int
 default=1000
+
+// NPC forces multi-style combat rules even outside multiway maps (Draugen, …).
+// Ported from 274 combat.param; used as nc_param(npc_type, npc_forcemulti).
+[npc_forcemulti]
+type=int
+default=0
