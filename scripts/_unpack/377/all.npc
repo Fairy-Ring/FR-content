@@ -31953,6 +31953,7 @@ head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
 
 [viking_sailor]
+category=viking_citizen
 name=Sailor
 desc=He's strong to the finish, because he eats cabbage.
 model1=npc_sigbert_the_adventurer
@@ -31982,6 +31983,7 @@ head1=obj_castlewars_cloak_saradomin_manhead
 head2=idk_man_jaw_split_head
 
 [viking_man]
+category=viking_citizen
 name=Agnar
 desc=One of Rellekka's many citizens.
 model1=npc_1278
@@ -32016,6 +32018,7 @@ head2=idk_man_jaw_split_head
 head3=obj_pickpocket_guide_fremennik_citizen
 
 [viking_man2]
+category=viking_citizen
 name=Freidir
 desc=One of Rellekka's many citizens.
 model1=idk_man_hair_wildspikes
@@ -32046,6 +32049,7 @@ head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
 
 [viking_man3]
+category=viking_citizen
 name=Borrokar
 desc=One of Rellekka's many citizens.
 model1=npc_1278
@@ -32079,6 +32083,7 @@ head2=idk_man_jaw_split_head
 head3=obj_pickpocket_guide_fremennik_citizen
 
 [viking_man4]
+category=viking_citizen
 name=Lanzig
 desc=One of Rellekka's many citizens.
 model1=npc_sigbert_the_adventurer
@@ -32113,6 +32118,7 @@ head1=obj_castlewars_cloak_saradomin_manhead
 head2=idk_man_jaw_split_head
 
 [viking_man5]
+category=viking_citizen
 name=Pontak
 desc=One of Rellekka's many citizens.
 model1=npc_1278
@@ -32147,6 +32153,7 @@ head2=idk_man_jaw_split_head
 head3=obj_pickpocket_guide_fremennik_citizen
 
 [viking_woman]
+category=viking_citizen
 name=Freygerd
 desc=One of Rellekka's many citizens.
 model1=idk_woman_hair_dreadlocks
@@ -32175,6 +32182,7 @@ vislevel=48
 head1=idk_woman_hair_dreadlocks_head
 
 [viking_woman2]
+category=viking_citizen
 name=Lensa
 desc=One of Rellekka's many citizens.
 model1=idk_woman_hair_wildspikes
@@ -32203,6 +32211,7 @@ vislevel=48
 head1=idk_woman_hair_wildspikes_head
 
 [viking_woman3]
+category=viking_citizen
 name=Jennella
 desc=One of Rellekka's many citizens.
 model1=idk_woman_hair_long
@@ -32233,6 +32242,7 @@ head1=obj_pickpocket_guide_warrior
 head2=npc_lady_pirate_headi2
 
 [viking_woman4]
+category=viking_citizen
 name=Sassilik
 desc=One of Rellekka's many citizens.
 model1=idk_woman_hair_wildspikes
@@ -32259,6 +32269,7 @@ vislevel=48
 head1=idk_woman_hair_wildspikes_head
 
 [viking_woman_indoors]
+category=viking_citizen
 name=Inga
 desc=One of Rellekka's many citizens.
 model1=idk_woman_hair_bun

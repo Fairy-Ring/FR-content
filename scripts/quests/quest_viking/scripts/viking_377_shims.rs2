@@ -1,0 +1,8 @@
+// 377 engine has midi_jingle(midi, length); 274 used ~music_jingle(midi).
+[proc,music_jingle](midi $jingle)
+midi_jingle($jingle, 80);
+
+// 274 setidkcolour — 377 engine exposes setidkit(idkit, colour) only.
+// Boot colour changes via makeover use different paths; no-op colour write if unset.
+// Prefer setidkit when kit is boots slot colour constant is still valid as int.
+// Clothing trial: approximate with setidkit if available.

@@ -154,3 +154,10 @@ if (testbit(%thieving_stall_timer, ^gem_stall_index) = ^true) {
 
 [queue,stolen_from_stall_gem]
 %thieving_stall_timer = clearbit(%thieving_stall_timer, ^gem_stall_index);
+
+// Fremennik Trials — Rellekka stalls (from 274)
+[queue,stolen_from_stall_vikingfur]
+// timer holder
+
+[queue,stolen_from_stall_vikingfish]
+// timer holder
