@@ -47,6 +47,9 @@
 ^biohazard_complete = 16
 ^desertrescue_complete = 30
 ^regicide_complete = 15
+^regicide_questpoints = 3
+^routequest_complete = 105
+^routequest_questpoints = 2
 ^viking_complete = 10
 ^viking_questpoints = 3
 ^mm_complete = 10

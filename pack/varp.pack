@@ -388,7 +388,7 @@
 387=routequest
 388=routequestmulti
 389=varp_389
-390=varp_390
+390=routequest_myreque_bits
 391=trawler_water_overlay
 392=castlewars_flag_clock
 393=karam_dungeon_varbit
@@ -738,3 +738,4 @@
 737=eadgar_chickens
 738=varp_348
 739=varp_349
+740=varp_390

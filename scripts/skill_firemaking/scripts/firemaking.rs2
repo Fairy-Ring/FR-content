@@ -13,6 +13,9 @@ if (last_useitem = tinderbox) {
 [opheldu,tinderbox]
 if (last_useitem = newbielogs) {
     @tut_light_logs_inv(last_useslot);
+} else if(last_useitem = viking_firecracker) {
+    // Fremennik Trials — Strange object (also opheldu on firecracker in viking_reveller)
+    @viking_light_firecracker;
 } else if(oc_param(last_useitem, unlit_arrow) = ^true) { // might not work on every fire?
     @light_firearrow(last_useitem);
 } else switch_category(oc_category(last_useitem)) {

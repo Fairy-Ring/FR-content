@@ -265,6 +265,12 @@ if (%eadgar_quest = ^eadgar_complete) {
 if (%viking = ^viking_complete) {
     $questpoints = add($questpoints, ^viking_questpoints);
 }
+if (%regicide_quest = ^regicide_complete) {
+    $questpoints = add($questpoints, ^regicide_questpoints);
+}
+if (%routequest = ^routequest_complete) {
+    $questpoints = add($questpoints, ^routequest_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -319,6 +325,8 @@ if (%phoenixgang > ^phoenixgang_not_started & %blackarmgang ! ^blackarmgang_comp
 ~send_quest_progress_colour(questlist:mortton, %morttonquest, ^mortton_quest_complete);
 ~send_quest_progress_colour(questlist:eadgar, %eadgar_quest, ^eadgar_complete);
 ~send_quest_progress_colour(questlist:viking, %viking, ^viking_complete);
+~send_quest_progress_colour(questlist:regicide, %regicide_quest, ^regicide_complete);
+~send_quest_progress_colour(questlist:routequest, %routequest, ^routequest_complete);
 ~send_quest_progress_colour(questlist:ikov, %ikov, ^ikov_completed_armadyl);
 ~send_quest_progress_colour(questlist:biohazard, %biohazard, ^biohazard_complete);
 ~send_quest_progress_colour(questlist:sheepherder, %sheepherderquest, ^sheepherder_complete);
