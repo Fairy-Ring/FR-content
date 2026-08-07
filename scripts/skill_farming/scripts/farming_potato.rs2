@@ -50,13 +50,23 @@ switch_loc (loc_type) {
 // Rake — OPLOCU rake on weed stages (no op1=Rake on loc defs)
 // ---------------------------------------------------------------------------
 
-[oplocu,veg_patch_weeds_3]
-[oplocu,veg_patch_weeds_2]
-[oplocu,veg_patch_weeds_1]
-[oplocu,veg_patch_weeds_3_mory]
-[oplocu,veg_patch_weeds_2_mory]
-[oplocu,veg_patch_weeds_1_mory]
-@farming_rake_use;
+// One trigger header per type — multi-header-then-@label only binds the last (plant worked as single header).
+[oplocu,veg_patch_weeds_3] @farming_rake_use;
+[oplocu,veg_patch_weeds_2] @farming_rake_use;
+[oplocu,veg_patch_weeds_1] @farming_rake_use;
+[oplocu,veg_patch_weeds_3_mory] @farming_rake_use;
+[oplocu,veg_patch_weeds_2_mory] @farming_rake_use;
+[oplocu,veg_patch_weeds_1_mory] @farming_rake_use;
+
+// Parent fallback if multi resolve falls through
+[oplocu,farming_veg_patch_1] @farming_parent_use;
+[oplocu,farming_veg_patch_2] @farming_parent_use;
+[oplocu,farming_veg_patch_3] @farming_parent_use;
+[oplocu,farming_veg_patch_4] @farming_parent_use;
+[oplocu,farming_veg_patch_5] @farming_parent_use;
+[oplocu,farming_veg_patch_6] @farming_parent_use;
+[oplocu,farming_veg_patch_7] @farming_parent_use;
+[oplocu,farming_veg_patch_8] @farming_parent_use;
 
 [label,farming_rake_use]
 if (last_useitem ! rake) {
@@ -69,8 +79,21 @@ if (~farming_veg_is_parent = false) {
 }
 ~farming_rake_step;
 
+[label,farming_parent_use]
+if (last_useitem = rake) {
+    ~farming_rake_step;
+    return;
+}
+if (last_useitem = potato_seed | last_useitem = potato_seed_2 | last_useitem = potato_seed_3 | last_useitem = potato_seed_4 | last_useitem = potato_seed_5) {
+    @farming_plant_use;
+    return;
+}
+~displaymessage(^dm_default);
+
 [proc,farming_rake_step]
 def_int $stage = ~farming_veg_stage;
+// Always announce so smoke can see the trigger fired even if stage write fails.
+mes("You use the rake on the allotment.");
 if ($stage > ^farming_veg_weeds_1) {
     // Already weeded or planted — not a rake target (wrong stage ops usually).
     mes("This allotment does not need weeding.");
@@ -78,12 +101,14 @@ if ($stage > ^farming_veg_weeds_1) {
 }
 // One rake use clears one weed band: 0→1→2→3 (weeded).
 ~farming_veg_set_stage(add($stage, 1));
-p_delay(1);
-if (~farming_veg_stage = ^farming_veg_weeded) {
+// Read back via same proc (parent loc still active)
+def_int $after = ~farming_veg_stage;
+if ($after = ^farming_veg_weeded) {
     mes("You clear the weeds from the allotment.");
 } else {
     mes("You rake the weeds from the allotment.");
 }
+// Avoid p_delay before stage write was the old order; no delay required for F1 smoke.
 
 // ---------------------------------------------------------------------------
 // Plant — OPLOCU potato_seed (+ stack graphic types) on weeded patch
