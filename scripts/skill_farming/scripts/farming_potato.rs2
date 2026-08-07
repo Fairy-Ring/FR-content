@@ -1,0 +1,227 @@
+// Farming F1 — potato on farming_veg_patch_* (allotment).
+// Greenfield: no 274/289 script port. Growth ticks + XP are CANDIDATE (deviations).
+// F1 scope: rake weeds → plant 3 potato seeds (dibber) → softtimer growth → harvest.
+// No watering requirement, disease, compost, farmer pay, or multi-life yield math.
+
+// ---------------------------------------------------------------------------
+// Patch stage via parent multivarbit (varbit_708…715)
+// Map loc is always parent (farming_veg_patch_N); ops resolve via multiloc.
+// ---------------------------------------------------------------------------
+
+[proc,farming_veg_stage]()(int)
+switch_loc (loc_type) {
+    case farming_veg_patch_1 : return(%varbit_708);
+    case farming_veg_patch_2 : return(%varbit_709);
+    case farming_veg_patch_3 : return(%varbit_710);
+    case farming_veg_patch_4 : return(%varbit_711);
+    case farming_veg_patch_5 : return(%varbit_712);
+    case farming_veg_patch_6 : return(%varbit_713);
+    case farming_veg_patch_7 : return(%varbit_714);
+    case farming_veg_patch_8 : return(%varbit_715);
+    case default : return(0);
+}
+
+[proc,farming_veg_set_stage](int $stage)
+switch_loc (loc_type) {
+    case farming_veg_patch_1 : %varbit_708 = $stage;
+    case farming_veg_patch_2 : %varbit_709 = $stage;
+    case farming_veg_patch_3 : %varbit_710 = $stage;
+    case farming_veg_patch_4 : %varbit_711 = $stage;
+    case farming_veg_patch_5 : %varbit_712 = $stage;
+    case farming_veg_patch_6 : %varbit_713 = $stage;
+    case farming_veg_patch_7 : %varbit_714 = $stage;
+    case farming_veg_patch_8 : %varbit_715 = $stage;
+}
+
+[proc,farming_veg_is_parent]()(boolean)
+switch_loc (loc_type) {
+    case farming_veg_patch_1 : return(true);
+    case farming_veg_patch_2 : return(true);
+    case farming_veg_patch_3 : return(true);
+    case farming_veg_patch_4 : return(true);
+    case farming_veg_patch_5 : return(true);
+    case farming_veg_patch_6 : return(true);
+    case farming_veg_patch_7 : return(true);
+    case farming_veg_patch_8 : return(true);
+    case default : return(false);
+}
+
+// ---------------------------------------------------------------------------
+// Rake — OPLOCU rake on weed stages (no op1=Rake on loc defs)
+// ---------------------------------------------------------------------------
+
+[oplocu,veg_patch_weeds_3]
+[oplocu,veg_patch_weeds_2]
+[oplocu,veg_patch_weeds_1]
+[oplocu,veg_patch_weeds_3_mory]
+[oplocu,veg_patch_weeds_2_mory]
+[oplocu,veg_patch_weeds_1_mory]
+@farming_rake_use;
+
+[label,farming_rake_use]
+if (last_useitem ! rake) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~farming_veg_is_parent = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~farming_rake_step;
+
+[proc,farming_rake_step]
+def_int $stage = ~farming_veg_stage;
+if ($stage > ^farming_veg_weeds_1) {
+    // Already weeded or planted — not a rake target (wrong stage ops usually).
+    mes("This allotment does not need weeding.");
+    return;
+}
+// One rake use clears one weed band: 0→1→2→3 (weeded).
+~farming_veg_set_stage(add($stage, 1));
+p_delay(1);
+if (~farming_veg_stage = ^farming_veg_weeded) {
+    mes("You clear the weeds from the allotment.");
+} else {
+    mes("You rake the weeds from the allotment.");
+}
+
+// ---------------------------------------------------------------------------
+// Plant — OPLOCU potato_seed (+ stack graphic types) on weeded patch
+// ---------------------------------------------------------------------------
+
+[oplocu,veg_patch_weeded]
+@farming_plant_use;
+
+[label,farming_plant_use]
+if (~farming_veg_is_parent = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~farming_veg_stage ! ^farming_veg_weeded) {
+    ~displaymessage(^dm_farming_patch_weeding);
+    return;
+}
+// Only potato seeds in F1; other seeds → default "nothing interesting"
+if (last_useitem ! potato_seed & last_useitem ! potato_seed_2 & last_useitem ! potato_seed_3 & last_useitem ! potato_seed_4 & last_useitem ! potato_seed_5) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, dibber) < 1) {
+    ~displaymessage(^dm_farming_dibber);
+    return;
+}
+if (inv_total(inv, potato_seed) < ^farming_allotment_seed_count) {
+    mes("You need three potato seeds to plant this allotment.");
+    return;
+}
+if (stat_base(farming) < 1) {
+    // Level 1 crop; base should already be 1 when skill enabled.
+    mes("You need a Farming level of 1 to plant potatoes.");
+    return;
+}
+inv_del(inv, potato_seed, ^farming_allotment_seed_count);
+~farming_veg_set_stage(^farming_potato_seed);
+// CANDIDATE plant XP (community); see deviations.
+stat_advance(farming, ^farming_potato_plant_xp);
+mes("You plant three potato seeds in the allotment.");
+// Start growth timer (CANDIDATE interval). softtimer cannot touch player varbits
+// in this compiler (p_active_player); hard timer matches wine ferment pattern.
+cleartimer(farming_potato_grow);
+settimer(farming_potato_grow, ^farming_potato_stage_ticks);
+
+// ---------------------------------------------------------------------------
+// Growth timer — advances all patches in potato growth band one step.
+// F1: single timer; multi-patch same tick is OK for smoke scale.
+// ---------------------------------------------------------------------------
+
+[timer,farming_potato_grow]
+def_boolean $any_growing = false;
+if (%varbit_708 >= ^farming_potato_seed & %varbit_708 < ^farming_potato_fullygrown) {
+    %varbit_708 = add(%varbit_708, 1);
+    if (%varbit_708 < ^farming_potato_fullygrown) $any_growing = true;
+}
+if (%varbit_709 >= ^farming_potato_seed & %varbit_709 < ^farming_potato_fullygrown) {
+    %varbit_709 = add(%varbit_709, 1);
+    if (%varbit_709 < ^farming_potato_fullygrown) $any_growing = true;
+}
+if (%varbit_710 >= ^farming_potato_seed & %varbit_710 < ^farming_potato_fullygrown) {
+    %varbit_710 = add(%varbit_710, 1);
+    if (%varbit_710 < ^farming_potato_fullygrown) $any_growing = true;
+}
+if (%varbit_711 >= ^farming_potato_seed & %varbit_711 < ^farming_potato_fullygrown) {
+    %varbit_711 = add(%varbit_711, 1);
+    if (%varbit_711 < ^farming_potato_fullygrown) $any_growing = true;
+}
+if (%varbit_712 >= ^farming_potato_seed & %varbit_712 < ^farming_potato_fullygrown) {
+    %varbit_712 = add(%varbit_712, 1);
+    if (%varbit_712 < ^farming_potato_fullygrown) $any_growing = true;
+}
+if (%varbit_713 >= ^farming_potato_seed & %varbit_713 < ^farming_potato_fullygrown) {
+    %varbit_713 = add(%varbit_713, 1);
+    if (%varbit_713 < ^farming_potato_fullygrown) $any_growing = true;
+}
+if (%varbit_714 >= ^farming_potato_seed & %varbit_714 < ^farming_potato_fullygrown) {
+    %varbit_714 = add(%varbit_714, 1);
+    if (%varbit_714 < ^farming_potato_fullygrown) $any_growing = true;
+}
+if (%varbit_715 >= ^farming_potato_seed & %varbit_715 < ^farming_potato_fullygrown) {
+    %varbit_715 = add(%varbit_715, 1);
+    if (%varbit_715 < ^farming_potato_fullygrown) $any_growing = true;
+}
+if ($any_growing = true) {
+    settimer(farming_potato_grow, ^farming_potato_stage_ticks);
+} else {
+    cleartimer(farming_potato_grow);
+}
+
+// ---------------------------------------------------------------------------
+// Harvest — OPLOC1 Harvest on potato_fullygrown
+// F1: one potato per click; clear to weeded (multi-life 10–12 not fully modeled).
+// ---------------------------------------------------------------------------
+
+[oploc1,potato_fullygrown]
+@farming_potato_harvest;
+
+[label,farming_potato_harvest]
+if (~farming_veg_is_parent = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~farming_veg_stage;
+if ($stage < ^farming_potato_fullygrown | $stage > 12) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+// Spade required? OPEN research — prefer check (displaymessage exists).
+if (inv_total(inv, spade) < 1) {
+    ~displaymessage(^dm_farming_spade);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, potato, 1);
+// CANDIDATE harvest XP (community).
+stat_advance(farming, ^farming_potato_harvest_xp);
+// F1: clear patch to weeded after one harvest (lives/yield band open).
+~farming_veg_set_stage(^farming_veg_weeded);
+mes("You harvest a potato from the allotment.");
+
+// ---------------------------------------------------------------------------
+// Fail paths — wrong tool on patch stages
+// ---------------------------------------------------------------------------
+
+[oplocu,potato_seed]
+[oplocu,potato_1]
+[oplocu,potato_2]
+[oplocu,potato_3]
+[oplocu,potato_fullygrown]
+@farming_potato_wrong_use;
+
+[label,farming_potato_wrong_use]
+if (last_useitem = rake) {
+    ~displaymessage(^dm_farming_patch_planted);
+    return;
+}
+~displaymessage(^dm_default);

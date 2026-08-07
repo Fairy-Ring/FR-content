@@ -1,0 +1,26 @@
+// Farming F1 constants — potato allotment only.
+// Growth minutes / XP: CANDIDATE (OSRS+Tip.it-aligned), not period-hard.
+// See docs/research/farming-377-f1-potato-map-audit.md §6A + docs/research/deviations.md
+
+// --- multiloc stages (farming_veg_patch_* shared table) ---
+^farming_veg_weeds_3 = 0
+^farming_veg_weeds_2 = 1
+^farming_veg_weeds_1 = 2
+^farming_veg_weeded = 3
+^farming_potato_seed = 6
+^farming_potato_1 = 7
+^farming_potato_2 = 8
+^farming_potato_3 = 9
+^farming_potato_fullygrown = 10
+
+// Seeds per allotment plant (period guides)
+^farming_allotment_seed_count = 3
+
+// XP tenths (1 XP = 10 tenths). CANDIDATE community: plant 8 / harvest 9.
+^farming_potato_plant_xp = 80
+^farming_potato_harvest_xp = 90
+
+// Softtimer interval per growth stage advance (seed→1→2→3→fullygrown = 4 fires).
+// CANDIDATE: 10 minutes at 0.6s tick = 1000 ticks. NOT period-primary.
+// Smoke may soft-setvarbit instead of waiting; label soft.
+^farming_potato_stage_ticks = 1000
