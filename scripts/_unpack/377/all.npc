@@ -36760,6 +36760,20 @@ resizeh=256
 resizev=256
 op2=Attack
 vislevel=97
+// Combat from LC Content origin/289 quest_routequest.npc (visual-only unpack had no stats — same class of bug as viking_draugen).
+wanderrange=10
+attack=70
+defence=100
+strength=110
+hitpoints=55
+param=damagetype,^crush_style
+param=attack_anim,skeleton_hound_attack
+param=defend_anim,skeleton_hound_block
+param=death_anim,skeleton_hound_death
+param=attack_sound,skeletal_hellhound_attack
+param=defend_sound,skeletal_hellhound_hit
+param=death_sound,skeletal_hellhound_death
+param=death_drop,big_bones
 
 [canafis_stranger]
 name=Stranger
