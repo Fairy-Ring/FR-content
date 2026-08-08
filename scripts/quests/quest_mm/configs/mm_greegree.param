@@ -1,0 +1,9 @@
+// MM greegree sounds — from 289 quest_mm.param (era Dec 2004)
+
+[transform_sound]
+type=synth
+default=human_into_monkey
+
+[revert_sound]
+type=synth
+default=monkey_into_human

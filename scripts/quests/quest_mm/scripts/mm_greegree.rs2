@@ -1,0 +1,68 @@
+// Monkey greegree vertical slice — ported from LC 289 quest_mm (era Dec 2004).
+// Hold greegree in greegree zones → equip → transmogrify; leave zone → force unequip.
+// Full MM quest not required for this slice.
+
+// Zones from 289 quest_mm.rs2 ~mm_greegree_zone (Ape Atoll + crash island + Ardougne zoo strip)
+[proc,mm_greegree_zone](coord $coord)(boolean)
+if (inzone(0_42_42_0_0, 2_43_43_63_63, $coord) = true | inzone(0_42_142_0_0, 0_43_142_63_63, $coord) = true | inzone(0_40_51_32_1, 0_41_51_15_23, $coord) = true | inzone(0_41_71_0_0, 0_41_71_63_63, $coord) = true | inzone(0_43_143_0_0, 0_43_143_63_63, $coord) = true) {
+    return(true);
+}
+return(false);
+
+[proc,mm_wearing_greegree]()(boolean)
+if (inv_totalcat(worn, mm_greegree) > 0) {
+    return(true);
+}
+return(false);
+
+// Called from player ~update_all after equip (289 appearance.rs2 hook)
+[proc,mm_greegree_transmogrify](obj $obj)
+if ($obj = null) return;
+if (oc_category($obj) = mm_greegree) {
+    p_transmogrify(oc_param($obj, next_npc_type));
+    p_animprotect(^true);
+    if_settab(null, ^tab_magic);
+    sound_synth(oc_param($obj, transform_sound), 0, 0);
+    settimer(mm_greegree_timer, 1);
+}
+
+[opheld2,_mm_greegree]
+if (~mm_greegree_zone(coord) = ^false) {
+    mes("You attempt to use the Monkey Greegree but nothing happens.");
+    return;
+}
+if (add(%lastcombat, 10) > map_clock) {
+    mes("You cannot use this whilst in combat.");
+    return;
+}
+~equip(last_slot);
+
+[timer,mm_greegree_timer]
+if (~mm_greegree_zone(coord) = ^false) {
+    ~force_unequip_greegree;
+    cleartimer(mm_greegree_timer);
+}
+
+[queue,force_unequip_greegree]
+~force_unequip_greegree;
+
+[proc,force_unequip_greegree]
+def_obj $obj = inv_getobj(worn, ^wearpos_rhand);
+def_int $count = inv_getnum(worn, ^wearpos_rhand);
+if ($obj = null | oc_category($obj) ! mm_greegree) return;
+def_int $overflow = inv_itemspace2(inv, $obj, $count, inv_size(inv));
+if (inv_freespace(inv) = 0) {
+    inv_dropslot(worn, coord, ^wearpos_rhand, 300);
+} else {
+    inv_moveitem(worn, inv, $obj, sub($count, $overflow));
+}
+// Clear transmog (289 unequip_effect greegree branch)
+p_transmogrify(null);
+cleartimer(mm_greegree_timer);
+p_animprotect(^false);
+spotanim_pl(windwave_impact, 124, 0);
+sound_synth(oc_param($obj, revert_sound), 0, 0);
+if_settab(magic, ^tab_magic);
+~update_all($obj);
+p_stopaction;
+~mesbox("The Monkey Greegree wrenches itself from your hand as its power begins to fade...");

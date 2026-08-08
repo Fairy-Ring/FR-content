@@ -1,0 +1,114 @@
+// Monkey greegrees — 377 pack IDs + 289 behavioural params (category, bas, transmog).
+// Models: 377 unpack names (obj_mm_monkey_talisman). Vertical slice: all greegrees defined;
+// smoke uses mm_monkey_greegree_for_normal_monkey.
+
+[mm_monkey_talisman]
+name=Monkey talisman
+desc=A magical talisman in the shape of a monkey head.
+members=yes
+cost=1000
+model=obj_mm_monkey_talisman
+2dyof=13
+2dzoom=750
+2dyan=4
+2dxan=456
+iop2=Hold
+weight=3oz
+wearpos=righthand
+tradeable=no
+
+[mm_monkey_greegree_for_normal_monkey]
+name=Monkey greegree
+desc=A magical talisman in the shape of a Karamjan monkey head.
+recol1s=17969
+recol1d=9409
+recol2s=32767
+recol2d=15749
+recol3s=0
+recol3d=30753
+members=yes
+cost=500
+model=obj_mm_monkey_talisman
+2dyof=13
+2dzoom=750
+2dyan=4
+2dxan=456
+iop2=Hold
+weight=3oz
+wearpos=righthand
+category=mm_greegree
+tradeable=no
+param=ready_baseanim,monkey_ready
+param=turnonspot_baseanim,monkey_walk
+param=walk_f_baseanim,monkey_walk
+param=walk_b_baseanim,monkey_walk
+param=walk_l_baseanim,monkey_walk
+param=walk_r_baseanim,monkey_walk
+param=running_baseanim,m_monkey_run
+param=next_npc_type,mm_transmogrification_normal_monkey
+param=transform_sound,human_into_monkey
+param=revert_sound,monkey_into_human
+
+[mm_monkey_greegree_for_small_ninja_monkey]
+name=Monkey greegree
+desc=A magical talisman in the shape of a small ninja monkey head.
+recol1s=17969
+recol1d=5285
+recol2s=32767
+recol2d=15749
+recol3s=0
+recol3d=30753
+members=yes
+cost=3000
+model=obj_mm_monkey_talisman
+2dyof=13
+2dzoom=750
+2dyan=4
+2dxan=456
+iop2=Hold
+weight=3oz
+wearpos=righthand
+category=mm_greegree
+tradeable=no
+param=ready_baseanim,m_monkey_ready
+param=turnonspot_baseanim,m_monkey_walk
+param=walk_f_baseanim,m_monkey_walk
+param=walk_b_baseanim,m_monkey_walk
+param=walk_l_baseanim,m_monkey_walk
+param=walk_r_baseanim,m_monkey_walk
+param=running_baseanim,m_monkey_run
+param=next_npc_type,mm_transmogrification_small_ninja_monkey
+param=transform_sound,human_into_smallmonkey
+param=revert_sound,smallmonkey_into_human
+
+[mm_monkey_greegree_for_medium_ninja_monkey]
+name=Monkey greegree
+desc=A magical talisman in the shape of a medium ninja monkey head.
+recol1s=17969
+recol1d=5285
+recol2s=32767
+recol2d=15749
+recol3s=0
+recol3d=30753
+members=yes
+cost=6000
+model=obj_mm_monkey_talisman
+2dyof=13
+2dzoom=750
+2dyan=4
+2dxan=456
+iop2=Hold
+weight=3oz
+wearpos=righthand
+category=mm_greegree
+tradeable=no
+param=ready_baseanim,m_monkey_ready
+param=turnonspot_baseanim,m_monkey_walk
+param=walk_f_baseanim,m_monkey_walk
+param=walk_b_baseanim,m_monkey_walk
+param=walk_l_baseanim,m_monkey_walk
+param=walk_r_baseanim,m_monkey_walk
+param=running_baseanim,m_monkey_run
+param=next_npc_type,mm_transmogrification_medium_ninja_monkey
+param=transform_sound,human_into_smallmonkey
+param=revert_sound,smallmonkey_into_human

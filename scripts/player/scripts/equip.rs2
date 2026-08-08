@@ -108,6 +108,15 @@ if (p_finduid(uid) = true) {
 if ($obj = castlewars_saradomin_banner | $obj = castlewars_zamorak_banner) {
     ~castlewars_flag_drop(inv, $obj);
 }
+// MM greegree — 289 unequip_effect branch (clear monkey form)
+if (oc_category($obj) = mm_greegree) {
+    p_transmogrify(null);
+    cleartimer(mm_greegree_timer);
+    p_animprotect(^false);
+    spotanim_pl(windwave_impact, 124, 0);
+    sound_synth(oc_param($obj, revert_sound), 0, 0);
+    if_settab(magic, ^tab_magic);
+}
 ~runecraft_unset_no_tally($obj);
 
 // used for duel arena, no weapon/no armour

@@ -1,6 +1,4 @@
-// Stub until Monkey Madness greegree system is ported (289 had full MM).
-[proc,mm_wearing_greegree]()(boolean)
-return(false);
+// ~mm_wearing_greegree lives in quest_mm/scripts/mm_greegree.rs2 (F1 greegree slice)
 
 [opnpc2,monkey]
 if (~mm_wearing_greegree = true) {
