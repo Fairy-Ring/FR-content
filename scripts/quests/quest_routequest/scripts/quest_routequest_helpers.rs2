@@ -1,0 +1,8 @@
+// Shared Myreque helpers — from 289 quest_routequest.rs2 (era-checked weapons list).
+
+[proc,routequest_has_weapons]()(boolean)
+if(inv_total(inv, steel_longsword) < 1 | inv_total(inv, steel_sword) < 2 | inv_total(inv, steel_dagger) < 1
+    | inv_total(inv, steel_mace) < 1 | inv_total(inv, steel_warhammer) < 1) {
+    return (false);
+}
+return (true);
