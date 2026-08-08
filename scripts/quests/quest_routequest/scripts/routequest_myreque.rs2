@@ -613,9 +613,3 @@ queue(skeleton_hellhound_defeat, 0, 0);
 if(%routequest = ^routequest_ambush) {
     %routequest = ^routequest_saved_myreque;
 }
-// --- 377 residual: ambush cutscene not ported yet (route_cutscene.rs2) ---
-// Weapons handoff sets stage 70 then jumps here. Keep stage; soft-block playable intro ≤65.
-[label,route_attempt_enter_cutscene](int $override)
-// Same busy line as full rooms in 289 cutscene — honest residual, not invent quest text.
-~chatnpc("<p,neutral>I'm sorry my friend, but an issue needs my urgent attention. Please come and chat with me again in a short while though and we'll talk in detail about a suitable payment.");
-return;
