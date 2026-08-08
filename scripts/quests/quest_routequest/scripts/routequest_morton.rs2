@@ -41,11 +41,7 @@ switch_int(~p_choice2("Yes, I'll pay ten gold.", 1, "No, I won't use the boat.",
         ~chatplayer("<p,neutral>No, I won't use the boat.");
 }
 
-// Hollows → Mort'ton return (full hollow script later). Stub so oploc1 rowboat packs.
-[label,route_rowboat_hollows]
-mes("You head back toward Mort'ton.");
-p_teleport(0_55_51_18_20); // near Cyreg n55_51 ~3522,3284
-~mesbox("You arrive near Mort'ton.");
+// Hollows → Mort'ton return lives in routequest_hollow.rs2 [label,route_rowboat_hollows]
 
 [label,travel_to_hollow]
 // DEV: full boat IF (swamp_boatjourney) not packed on 377 yet — tele-only path.
