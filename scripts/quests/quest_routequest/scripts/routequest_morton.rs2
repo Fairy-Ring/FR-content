@@ -1,4 +1,24 @@
-[oploc1,route_rowboat]
+// 377 map at Mort'ton uses route_rowboat_mortton (6969), not route_rowboat (5051).
+// One @label per header (multi-header only binds last — farming rake lesson).
+[oploc1,route_rowboat] @board_swamp_boaty_from_mortton;
+[oploc1,route_rowboat_mortton] @board_swamp_boaty_from_mortton;
+
+// op2 = "Board ( Pay 10 )" — skip pay multi when repaired
+[oploc2,route_rowboat_mortton]
+if(%routequest < ^routequest_boatman_repaired) {
+    if (npc_find(coord, route_cyreg_paddlehorn, 10, 1) = true) ~chatnpc("<p,angry>Hey, hands off my boat!");
+    return;
+}
+if(inv_total(inv, coins) < 10) {
+    if (npc_find(coord, route_cyreg_paddlehorn, 10, 1) = true) {
+        ~chatnpc_specific("Cyreg Paddlehorn", route_cyreg_paddlehorn, "<p,neutral>Sorry my friend. You don't seem to have the funds for the trip. It will cost you 10 gold.");
+    }
+    return;
+}
+inv_del(inv, coins, 10);
+@travel_to_hollow;
+
+[label,board_swamp_boaty_from_mortton]
 if(inzone(0_54_52_0_0, 0_54_52_63_63, loc_coord) = true) {
     @route_rowboat_hollows; // 2 seperate locs after april 2005
 }
@@ -12,6 +32,7 @@ switch_int(~p_choice2("Yes, I'll pay ten gold.", 1, "No, I won't use the boat.",
     case 1 :
         ~chatplayer("<p,neutral>Yes, I'll pay ten gold.");
         if(inv_total(inv, coins) >= 10) {
+            inv_del(inv, coins, 10);
             @travel_to_hollow;
         } else {
             ~chatnpc_specific("Cyreg Paddlehorn", route_cyreg_paddlehorn, "<p,neutral>Sorry, but you don't have that much. No money, no boat!");
@@ -19,17 +40,6 @@ switch_int(~p_choice2("Yes, I'll pay ten gold.", 1, "No, I won't use the boat.",
     case 2 :
         ~chatplayer("<p,neutral>No, I won't use the boat.");
 }
-
-// [oploc2,route_rowboat_mortton] later 2005
-// if(%routequest < ^routequest_boatman_repaired) {
-//     ~chatnpc_specific("Cyreg Paddlehorn", route_cyreg_paddlehorn, "<p,angry>Hey, hands off my boat!");
-//     return;
-// }
-// if(inv_total(inv, coins) < 10) {
-//     ~chatnpc_specific("Cyreg Paddlehorn", route_cyreg_paddlehorn, "<p,neutral>Sorry my friend. You don't seem to have the funds for the trip. It will cost you 10 gold.");
-//     return;
-// }
-// @travel_to_hollow;
 
 // Hollows → Mort'ton return (full hollow script later). Stub so oploc1 rowboat packs.
 [label,route_rowboat_hollows]
