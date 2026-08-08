@@ -19,11 +19,12 @@ return(false);
 [proc,mm_greegree_transmogrify](obj $obj)
 if ($obj = null) return;
 if (oc_category($obj) = mm_greegree) {
+    // Timer first — p_transmogrify / if_settab / synth must not skip zone leave check
+    settimer(mm_greegree_timer, 1);
     p_transmogrify(oc_param($obj, next_npc_type));
     p_animprotect(^true);
     if_settab(null, ^tab_magic);
     sound_synth(oc_param($obj, transform_sound), 0, 0);
-    settimer(mm_greegree_timer, 1);
 }
 
 [opheld2,_mm_greegree]
@@ -36,10 +37,16 @@ if (add(%lastcombat, 10) > map_clock) {
     return;
 }
 ~equip(last_slot);
+// Belt: equip path always re-arms zone timer even if update_all hook missed
+def_obj $held = inv_getobj(worn, ^wearpos_rhand);
+if ($held ! null & oc_category($held) = mm_greegree) {
+    settimer(mm_greegree_timer, 1);
+}
 
 [timer,mm_greegree_timer]
 if (~mm_greegree_zone(coord) = ^false) {
-    ~force_unequip_greegree;
+    // Delay 0 + dummy arg (queue,int,int); body ignores arg
+    queue(force_unequip_greegree, 0, 0);
     cleartimer(mm_greegree_timer);
 }
 
@@ -49,7 +56,13 @@ if (~mm_greegree_zone(coord) = ^false) {
 [proc,force_unequip_greegree]
 def_obj $obj = inv_getobj(worn, ^wearpos_rhand);
 def_int $count = inv_getnum(worn, ^wearpos_rhand);
-if ($obj = null | oc_category($obj) ! mm_greegree) return;
+if ($obj = null | oc_category($obj) ! mm_greegree) {
+    // Still clear monkey form if rhand already empty but transmog stuck
+    p_transmogrify(null);
+    cleartimer(mm_greegree_timer);
+    p_animprotect(^false);
+    return;
+}
 def_int $overflow = inv_itemspace2(inv, $obj, $count, inv_size(inv));
 if (inv_freespace(inv) = 0) {
     inv_dropslot(worn, coord, ^wearpos_rhand, 300);

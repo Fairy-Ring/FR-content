@@ -109,7 +109,8 @@ if ($obj = castlewars_saradomin_banner | $obj = castlewars_zamorak_banner) {
     ~castlewars_flag_drop(inv, $obj);
 }
 // MM greegree — 289 unequip_effect branch (clear monkey form)
-if (oc_category($obj) = mm_greegree) {
+// $obj is often null when equipping into an empty rhand — never oc_category(null)
+if ($obj ! null & oc_category($obj) = mm_greegree) {
     p_transmogrify(null);
     cleartimer(mm_greegree_timer);
     p_animprotect(^false);
