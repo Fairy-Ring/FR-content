@@ -29891,6 +29891,8 @@ model=templewall_base
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_1
+param=temple_wall_level,0
 
 [templewall_1]
 name=Temple wall
@@ -29900,6 +29902,9 @@ anim=temple_build1
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_2
+param=prev_loc_stage,templewall_base
+param=temple_wall_level,1
 
 [templewall_2]
 name=Temple wall
@@ -29909,6 +29914,9 @@ anim=temple_build2
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_3
+param=prev_loc_stage,templewall_1
+param=temple_wall_level,2
 
 [templewall_3]
 name=Temple wall
@@ -29918,6 +29926,9 @@ anim=temple_build3
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_4
+param=prev_loc_stage,templewall_2
+param=temple_wall_level,3
 
 [templewall_4]
 name=Temple wall
@@ -29927,6 +29938,9 @@ anim=temple_build4
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_5
+param=prev_loc_stage,templewall_3
+param=temple_wall_level,4
 
 [templewall_5]
 name=Temple wall
@@ -29936,6 +29950,9 @@ anim=temple_build5
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_6
+param=prev_loc_stage,templewall_4
+param=temple_wall_level,5
 
 [templewall_6]
 name=Temple wall
@@ -29945,6 +29962,9 @@ anim=temple_build6
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_7
+param=prev_loc_stage,templewall_5
+param=temple_wall_level,6
 
 [templewall_7]
 name=Temple wall
@@ -29954,6 +29974,9 @@ anim=temple_build7
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_8
+param=prev_loc_stage,templewall_6
+param=temple_wall_level,7
 
 [templewall_8]
 name=Temple wall
@@ -29963,6 +29986,9 @@ anim=temple_build8
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_9
+param=prev_loc_stage,templewall_7
+param=temple_wall_level,8
 
 [templewall_9]
 name=Temple wall
@@ -29972,6 +29998,9 @@ anim=temple_build9
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewall_10
+param=prev_loc_stage,templewall_8
+param=temple_wall_level,9
 
 [templewall_10]
 name=Temple wall
@@ -29981,6 +30010,8 @@ anim=temple_build10
 op1=Reinforce
 op3=hidden
 category=flamtaer_wall
+param=temple_wall_level,10
+param=prev_loc_stage,templewall_9
 
 [templewallcorner_base]
 name=Broken Wall
@@ -29989,6 +30020,8 @@ model=templewallcorner_base
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_1
+param=temple_wall_level,0
 
 [templewallcorner_1]
 name=Temple wall
@@ -29998,6 +30031,9 @@ anim=temple_build1
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_2
+param=prev_loc_stage,templewallcorner_base
+param=temple_wall_level,1
 
 [templewallcorner_2]
 name=Temple wall
@@ -30007,6 +30043,9 @@ anim=temple_build2
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_3
+param=prev_loc_stage,templewallcorner_1
+param=temple_wall_level,2
 
 [templewallcorner_3]
 name=Temple wall
@@ -30016,6 +30055,9 @@ anim=temple_build3
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_4
+param=prev_loc_stage,templewallcorner_2
+param=temple_wall_level,3
 
 [templewallcorner_4]
 name=Temple wall
@@ -30025,6 +30067,9 @@ anim=temple_build4
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_5
+param=prev_loc_stage,templewallcorner_3
+param=temple_wall_level,4
 
 [templewallcorner_5]
 name=Temple wall
@@ -30034,6 +30079,9 @@ anim=temple_build5
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_6
+param=prev_loc_stage,templewallcorner_4
+param=temple_wall_level,5
 
 [templewallcorner_6]
 name=Temple wall
@@ -30043,6 +30091,9 @@ anim=temple_build6
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_7
+param=prev_loc_stage,templewallcorner_5
+param=temple_wall_level,6
 
 [templewallcorner_7]
 name=Temple wall
@@ -30052,6 +30103,9 @@ anim=temple_build7
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_8
+param=prev_loc_stage,templewallcorner_6
+param=temple_wall_level,7
 
 [templewallcorner_8]
 name=Temple wall
@@ -30061,6 +30115,9 @@ anim=temple_build8
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_9
+param=prev_loc_stage,templewallcorner_7
+param=temple_wall_level,8
 
 [templewallcorner_9]
 name=Temple wall
@@ -30070,6 +30127,9 @@ anim=temple_build9
 op1=Repair
 op3=hidden
 category=flamtaer_wall
+param=next_loc_stage,templewallcorner_10
+param=prev_loc_stage,templewallcorner_8
+param=temple_wall_level,9
 
 [templewallcorner_10]
 name=Temple wall
@@ -30079,6 +30139,8 @@ anim=temple_build10
 op1=Reinforce
 op3=hidden
 category=flamtaer_wall
+param=prev_loc_stage,templewallcorner_9
+param=temple_wall_level,10
 
 [templefire_altar]
 name=Flaming Fire altar
@@ -30116,6 +30178,7 @@ model=temple_pyre
 anim=temple_pyre_nobones
 length=3
 category=flamtaer_pyre_logs
+param=next_loc_stage,temple_pyre_bones_logs
 
 [temple_pyre_oak]
 name=Funeral Pyre
@@ -30124,6 +30187,7 @@ model=temple_pyre
 anim=temple_pyre_nobones
 length=3
 category=flamtaer_pyre_logs
+param=next_loc_stage,temple_pyre_bones_oak
 
 [temple_pyre_willow]
 name=Funeral Pyre
@@ -30132,6 +30196,7 @@ model=temple_pyre
 anim=temple_pyre_nobones
 length=3
 category=flamtaer_pyre_logs
+param=next_loc_stage,temple_pyre_bones_willow
 
 [temple_pyre_maple]
 name=Funeral Pyre
@@ -30140,6 +30205,7 @@ model=temple_pyre
 anim=temple_pyre_nobones
 length=3
 category=flamtaer_pyre_logs
+param=next_loc_stage,temple_pyre_bones_maple
 
 [temple_pyre_yew]
 name=Funeral Pyre
@@ -30148,6 +30214,7 @@ model=temple_pyre
 anim=temple_pyre_nobones
 length=3
 category=flamtaer_pyre_logs
+param=next_loc_stage,temple_pyre_bones_yew
 
 [temple_pyre_magic]
 name=Funeral Pyre
@@ -30156,6 +30223,7 @@ model=temple_pyre
 anim=temple_pyre_nobones
 length=3
 category=flamtaer_pyre_logs
+param=next_loc_stage,temple_pyre_bones_magic
 
 [temple_pyre_bones_logs]
 name=Funeral Pyre
@@ -30165,6 +30233,7 @@ length=3
 op1=Light
 op4=Hidden
 category=flamtaer_pyre_bones
+param=funeral_pyre_struct,pyre_logs
 
 [temple_pyre_bones_oak]
 name=Funeral Pyre
@@ -30174,6 +30243,7 @@ length=3
 op1=Light
 op4=Hidden
 category=flamtaer_pyre_bones
+param=funeral_pyre_struct,pyre_oak_logs
 
 [temple_pyre_bones_willow]
 name=Funeral Pyre
@@ -30183,6 +30253,7 @@ length=3
 op1=Light
 op4=Hidden
 category=flamtaer_pyre_bones
+param=funeral_pyre_struct,pyre_willow_logs
 
 [temple_pyre_bones_maple]
 name=Funeral Pyre
@@ -30192,6 +30263,7 @@ length=3
 op1=Light
 op4=Hidden
 category=flamtaer_pyre_bones
+param=funeral_pyre_struct,pyre_maple_logs
 
 [temple_pyre_bones_yew]
 name=Funeral Pyre
@@ -30201,6 +30273,7 @@ length=3
 op1=Light
 op4=Hidden
 category=flamtaer_pyre_bones
+param=funeral_pyre_struct,pyre_yew_logs
 
 [temple_pyre_bones_magic]
 name=Funeral Pyre
@@ -30210,6 +30283,7 @@ length=3
 op1=Light
 op4=Hidden
 category=flamtaer_pyre_bones
+param=funeral_pyre_struct,pyre_magic_logs
 
 [shadelair_bronzedoor]
 name=Solid bronze door

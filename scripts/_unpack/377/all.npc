@@ -30641,6 +30641,8 @@ op1=Talk-to
 alwaysontop=yes
 head1=idk_man_hair_cropped_head
 head2=idk_man_jaw_short_head
+timer=4
+
 
 [razmire_keelgan]
 name=Razmire Keelgan
@@ -30665,6 +30667,8 @@ op4=Trade-Builders-Store
 alwaysontop=yes
 head1=idk_man_hair_cropped_head
 head2=idk_man_jaw_short_head
+timer=4
+
 
 [mort_man]
 name=Mort'ton Local

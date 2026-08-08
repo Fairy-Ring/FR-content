@@ -1,9 +1,29 @@
 // logs
+// OPHELDU lookup matches target category_22 before use-category sacred_oil
+// (see engine OpHeldUHandler). 274 cut_logs default routes sacred oil → pyre logs
+// (Server content skill_fletching/cut_logs.rs2 + game_mortton create_sacred_logs).
 [opheldu,_category_22]
 switch_obj(last_useitem) {
     case knife : @fletch_log(last_item);
     case tinderbox : @light_logs_inv(last_slot);
-    case default : ~displaymessage(^dm_default);
+    case default :
+        // oil on logs (use = sacred oil, target = logs)
+        if (oc_category(last_useitem) = sacred_oil & last_item ! achey_tree_logs) {
+            if (%morttonquest < ^mortton_created_sacred_oil) {
+                mes("This sacred oil doesn't seem fresh. You should make your own.");
+                return;
+            }
+            @create_sacred_logs(last_item, last_slot, last_useitem, last_useslot);
+        // logs on oil (reverse order)
+        } else if (oc_category(last_item) = sacred_oil & last_useitem ! achey_tree_logs) {
+            if (%morttonquest < ^mortton_created_sacred_oil) {
+                mes("This sacred oil doesn't seem fresh. You should make your own.");
+                return;
+            }
+            @create_sacred_logs(last_useitem, last_useslot, last_item, last_slot);
+        } else {
+            ~displaymessage(^dm_default);
+        }
 }
 
 [label,fletch_log](obj $log)

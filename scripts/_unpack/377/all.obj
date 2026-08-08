@@ -39080,6 +39080,8 @@ model=obj_mcannonremains
 members=yes
 weight=3lb
 category=shade_bones
+param=pyre_shade_exp,250
+param=shades_struct,loar_shades
 
 [cert_shade_bones1]
 certlink=shade_bones1
@@ -39099,6 +39101,8 @@ model=obj_mcannonremains
 members=yes
 weight=3lb
 category=shade_bones
+param=pyre_shade_exp,375
+param=shades_struct,phrin_shades
 
 [cert_shade_bones2]
 certlink=shade_bones2
@@ -39118,6 +39122,8 @@ model=obj_mcannonremains
 members=yes
 weight=3lb
 category=shade_bones
+param=pyre_shade_exp,525
+param=shades_struct,riyl_shades
 
 [cert_shade_bones3]
 certlink=shade_bones3
@@ -39137,6 +39143,8 @@ model=obj_mcannonremains
 members=yes
 weight=3lb
 category=shade_bones
+param=pyre_shade_exp,700
+param=shades_struct,asyn_shades
 
 [cert_shade_bones4]
 certlink=shade_bones4
@@ -39156,6 +39164,8 @@ model=obj_mcannonremains
 members=yes
 weight=3lb
 category=shade_bones
+param=pyre_shade_exp,900
+param=shades_struct,fiyr_shades
 
 [cert_shade_bones5]
 certlink=shade_bones5
@@ -39196,6 +39206,7 @@ weight=35g
 category=mort_serum
 param=next_obj_stage,mort_serum3
 param=dose_count,4
+param=next_obj_stage_temple,mort_serum_perm4
 
 [cert_mort_serum4]
 certlink=mort_serum4
@@ -39218,6 +39229,7 @@ weight=30g
 category=mort_serum
 param=next_obj_stage,mort_serum2
 param=dose_count,3
+param=next_obj_stage_temple,mort_serum_perm3
 
 [cert_mort_serum3]
 certlink=mort_serum3
@@ -39240,6 +39252,7 @@ weight=25g
 category=mort_serum
 param=next_obj_stage,mort_serum1
 param=dose_count,2
+param=next_obj_stage_temple,mort_serum_perm2
 
 [cert_mort_serum2]
 certlink=mort_serum2
@@ -39262,6 +39275,7 @@ weight=20g
 category=mort_serum
 param=next_obj_stage,vial_empty
 param=dose_count,1
+param=next_obj_stage_temple,mort_serum_perm1
 
 [cert_mort_serum1]
 certlink=mort_serum1
@@ -39282,6 +39296,8 @@ members=yes
 iop4=Empty
 weight=35g
 category=mort_serum_perm
+param=next_obj_stage,mort_serum_perm3
+param=dose_count,4
 
 [mort_serum_perm3]
 name=Serum 207(p) (3)
@@ -39298,6 +39314,8 @@ members=yes
 iop4=Empty
 weight=30g
 category=mort_serum_perm
+param=next_obj_stage,mort_serum_perm2
+param=dose_count,3
 
 [mort_serum_perm2]
 name=Serum 207(p) (2)
@@ -39314,6 +39332,8 @@ members=yes
 iop4=Empty
 weight=25g
 category=mort_serum_perm
+param=next_obj_stage,mort_serum_perm1
+param=dose_count,2
 
 [mort_serum_perm1]
 name=Serum 207(p) (1)
@@ -39330,6 +39350,8 @@ members=yes
 iop4=Empty
 weight=20g
 category=mort_serum_perm
+param=next_obj_stage,vial_empty
+param=dose_count,1
 
 [limestonebrick]
 name=Limestone brick
@@ -39364,6 +39386,8 @@ members=yes
 iop4=Empty
 weight=35g
 category=olive_oil
+param=next_obj_stage,sacred_oil4
+param=dose_count,4
 
 [cert_oliveoil4]
 certlink=oliveoil4
@@ -39384,6 +39408,8 @@ members=yes
 iop4=Empty
 weight=30g
 category=olive_oil
+param=next_obj_stage,sacred_oil3
+param=dose_count,3
 
 [cert_oliveoil3]
 certlink=oliveoil3
@@ -39404,6 +39430,8 @@ members=yes
 iop4=Empty
 weight=25g
 category=olive_oil
+param=next_obj_stage,sacred_oil2
+param=dose_count,2
 
 [cert_oliveoil2]
 certlink=oliveoil2
@@ -39424,6 +39452,8 @@ members=yes
 iop4=Empty
 weight=20g
 category=olive_oil
+param=next_obj_stage,sacred_oil1
+param=dose_count,1
 
 [cert_oliveoil1]
 certlink=oliveoil1
@@ -39444,6 +39474,8 @@ members=yes
 iop4=Empty
 weight=35g
 category=sacred_oil
+param=next_obj_stage,sacred_oil3
+param=dose_count,4
 
 [cert_sacred_oil4]
 certlink=sacred_oil4
@@ -39464,6 +39496,8 @@ members=yes
 iop4=Empty
 weight=30g
 category=sacred_oil
+param=next_obj_stage,sacred_oil2
+param=dose_count,3
 
 [cert_sacred_oil3]
 certlink=sacred_oil3
@@ -39484,6 +39518,8 @@ members=yes
 iop4=Empty
 weight=25g
 category=sacred_oil
+param=next_obj_stage,sacred_oil1
+param=dose_count,2
 
 [cert_sacred_oil2]
 certlink=sacred_oil2
@@ -39504,6 +39540,8 @@ members=yes
 iop4=Empty
 weight=20g
 category=sacred_oil
+param=next_obj_stage,vial_empty
+param=dose_count,1
 
 [cert_sacred_oil1]
 certlink=sacred_oil1
@@ -39527,6 +39565,7 @@ model=obj_logs
 members=yes
 weight=3lb
 category=pyre_logs
+param=funeral_pyre_struct,pyre_logs
 
 [cert_logs_pyre]
 certlink=logs_pyre
@@ -39550,6 +39589,7 @@ model=obj_logs
 members=yes
 weight=4lb
 category=pyre_logs
+param=funeral_pyre_struct,pyre_oak_logs
 
 [cert_oak_logs_pyre]
 certlink=oak_logs_pyre
@@ -39573,6 +39613,7 @@ model=obj_logs
 members=yes
 weight=3lb
 category=pyre_logs
+param=funeral_pyre_struct,pyre_willow_logs
 
 [cert_willow_logs_pyre]
 certlink=willow_logs_pyre
@@ -39596,6 +39637,7 @@ model=obj_logs
 members=yes
 weight=3lb
 category=pyre_logs
+param=funeral_pyre_struct,pyre_maple_logs
 
 [cert_maple_logs_pyre]
 certlink=maple_logs_pyre
@@ -39620,6 +39662,7 @@ ambient=15
 members=yes
 weight=3lb
 category=pyre_logs
+param=funeral_pyre_struct,pyre_yew_logs
 
 [cert_yew_logs_pyre]
 certlink=yew_logs_pyre
@@ -39644,6 +39687,7 @@ model=obj_logs
 members=yes
 weight=3lb
 category=pyre_logs
+param=funeral_pyre_struct,pyre_magic_logs
 
 [cert_magic_logs_pyre]
 certlink=magic_logs_pyre
