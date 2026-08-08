@@ -1,0 +1,11 @@
+// Ported footprints config from LC Server 274 quest_regicide.loc (2026-08-08).
+// Pack id 3941 was loc_3941 (no ops). Symbol renamed in loc.pack.
+
+[regicide_old_camp_footprints]
+name=Tracks
+desc=Tracks in the soil.
+model=loc_3941
+hillskew=yes
+shadow=no
+op1=Follow
+blockwalk=no

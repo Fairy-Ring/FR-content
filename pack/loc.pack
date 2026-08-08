@@ -3939,7 +3939,7 @@
 3938=regicide_cross_over2
 3939=regicide_cross_over3
 3940=regicide_rabbit_hutch
-3941=loc_3941
+3941=regicide_old_camp_footprints
 3942=regicide_hollowlog
 3943=regicide_hollowlogsmaller
 3944=overpass_gate_right
@@ -14972,3 +14972,4 @@
 14971=loc_14971
 14972=loc_14972
 14973=loc_14973
+14974=loc_3941

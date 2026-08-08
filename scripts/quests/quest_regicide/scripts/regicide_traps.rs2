@@ -1,0 +1,303 @@
+// Trap fail/pass + footprints — sliced from LC Server 274 quest_regicide.rs2 L31–317 (2026-08-08).
+// Not full bomb/dense-forest path. Zones: regicide_zones.rs2.
+
+[oploc1,regicide_trap_woodspring]
+if(stat_random(agility, 30, 155) = false) {
+    weakqueue*(regicide_move_trap_woodspring, 0)(loc_type, loc_coord, coord);
+    return;
+}
+p_delay(0);
+switch_int(loc_angle) {
+    case ^loc_east :
+        if (coordx(coord) <= coordx(loc_coord)) {
+            ~forcemove(movecoord(loc_coord, 2, 0, 0));
+        } else {
+            p_teleport(loc_coord);
+            p_delay(0);
+            p_teleport(movecoord(coord, -1, 0, 0));
+            p_delay(0);
+        }
+    case ^loc_west :
+        if (coordx(coord) > coordx(loc_coord)) {
+            ~forcemove(movecoord(loc_coord, -1, 0, 0));
+        } else {
+            if(coordx(loc_coord) ! coordx(coord)) ~forcemove(loc_coord);
+            p_teleport(movecoord(loc_coord, 2, 0, 0));
+            p_delay(0);
+            p_teleport(movecoord(coord, 1, 0, 0));
+            p_delay(0);
+        }
+    case ^loc_north :
+        if (coordz(coord) <= coordz(loc_coord)) {
+            ~forcemove(movecoord(loc_coord, 0, 0, 3));
+        } else {
+            ~forcemove(movecoord(loc_coord, 0, 0, 2));
+            p_teleport(loc_coord);
+            p_delay(0);
+            p_teleport(movecoord(coord, 0, 0, -1));
+            p_delay(0);
+        }
+    case ^loc_south :
+        if (coordz(coord) > coordz(loc_coord)) {
+            ~forcemove(movecoord(loc_coord, 0, 0, -1));
+        } else {
+            p_teleport(movecoord(loc_coord, 0, 0, 1));
+            p_delay(0);
+            p_teleport(movecoord(coord, 0, 0, 2));
+            p_delay(0);
+        }
+}
+mes("You manage to skillfully pass the trap.");
+
+[queue,regicide_move_trap_woodspring](loc $loc_type, coord $loc_coord, coord $coord)
+if(loc_find($loc_coord, $loc_type) = true & coord = $coord) {
+    switch_int(loc_angle) {
+        case ^loc_east :
+            if (coordx(coord) <= coordx(loc_coord)) {
+                p_walk(loc_coord);
+            } else {
+                p_walk(movecoord(loc_coord, 1, 0, 0));
+            }
+        case ^loc_west :
+            if (coordx(movecoord(coord, -1, 0, 0)) <= coordx(loc_coord)) {
+                p_walk(movecoord(loc_coord, 1, 0, 0));
+            } else {
+                p_walk(movecoord(loc_coord, 2, 0, 0));
+            }
+        case ^loc_north :
+            if (coordz(coord) <= coordz(loc_coord)) {
+                p_walk(loc_coord);
+            } else {
+                p_walk(movecoord(loc_coord, 0, 0, 1));
+            }
+        case ^loc_south :
+            if (coordz(coord) > coordz(loc_coord)) {
+                p_walk(movecoord(loc_coord, 0, 0, 2));
+            } else {
+                p_walk(movecoord(loc_coord, 0, 0, 1));
+            }
+    }
+}
+
+[label,regicide_fail_trap_woodspring]
+def_coord $dest;
+def_int $dir;
+switch_int(loc_angle) {
+    case ^loc_east :
+        $dest = movecoord(loc_coord, -1, 0, 0);
+        $dir = ^exact_east;
+    case ^loc_west :
+        $dest = movecoord(loc_coord, 3, 0, 0);
+        $dir = ^exact_west;
+    case ^loc_north :
+        $dest = movecoord(loc_coord, 0, 0, -1);
+        $dir = ^exact_north;
+    case ^loc_south :
+        $dest = movecoord(loc_coord, 0, 0, 3);
+        $dir = ^exact_south;
+}
+if_close;
+if(p_finduid(uid) = true) {
+    p_stopaction;
+    loc_anim(woodspring);
+    mes("You set off the trap as you pass.");
+    sound_synth(springtrap, 1, 0);
+    ~agility_exactmove(human_stumble_back, 10, 0, coord, $dest, 10, 56, $dir, false);
+    ~damage_self(8);
+}
+
+[oploc1,regicide_trap_tripwire]
+def_int $dx = 0;
+def_int $dz = 0;
+def_int $dir;
+switch_int(loc_angle) {
+    case ^loc_east, ^loc_west :
+        if(coordz(coord) > coordz(loc_coord)) {
+            $dz = -1;
+            $dir = ^exact_south;
+        } else {
+            $dz = 1;
+            $dir = ^exact_north;
+        }
+    case ^loc_north, ^loc_south :
+        if(coordx(coord) > coordx(loc_coord)) {
+            $dx = -1;
+            $dir = ^exact_west;
+        } else {
+            $dx = 1;
+            $dir = ^exact_east;
+        }
+}
+p_delay(0);
+p_teleport(movecoord(coord, $dx, 0, $dz));
+p_delay(1);
+~agility_exactmove(regicide_stepover, 0, 0, coord, movecoord(coord, $dx, 0, $dz), 0, 30, $dir, false);
+if(stat_random(agility, 30, 155) = false) {
+    mes("You snag the trip wire as you step over it.");
+    ~regicide_tripwire_trigger;
+} else {
+    mes("You successfully step over the tripwire.");
+}
+p_teleport(movecoord(coord, $dx, 0, $dz));
+p_delay(3);
+
+[label,regicide_walk_tripwire]
+p_stopaction;
+~regicide_tripwire_trigger;
+switch_int(loc_angle) {
+    case ^loc_east, ^loc_west :
+        if(coordz(coord) > coordz(loc_coord)) {
+            p_teleport(movecoord(coord, 0, 0, -2));
+        } else {
+            p_teleport(movecoord(coord, 0, 0, 2));
+        }
+    case ^loc_north, ^loc_south :
+        if(coordx(coord) > coordx(loc_coord)) {
+            p_teleport(movecoord(coord, -2, 0, 0));
+        } else {
+            p_teleport(movecoord(coord, 2, 0, 0));
+        }
+}
+p_delay(0);
+
+[proc,regicide_tripwire_trigger]
+def_coord $trap1;
+def_coord $trap2;
+def_coord $trap3;
+def_coord $trap4;
+switch_int(loc_angle) {
+    case ^loc_east, ^loc_west :
+        $trap1 = movecoord(loc_coord, -1, 0, -1);
+        $trap2 = movecoord(loc_coord, 1, 0, -1);
+        $trap3 = movecoord(loc_coord, -1, 0, 2);
+        $trap4 = movecoord(loc_coord, 1, 0, 2);
+    case ^loc_north, ^loc_south :
+        $trap1 = movecoord(loc_coord, -1, 0, 1);
+        $trap2 = movecoord(loc_coord, -1, 0, -1);
+        $trap3 = movecoord(loc_coord, 2, 0, 1);
+        $trap4 = movecoord(loc_coord, 2, 0, -1);
+}
+queue(poison_player, 0, 10);
+if(.loc_find($trap1, regicide_trap_arrowtrip) = true) {
+    loc_anim(arrowtrip);
+    ~coord_projectile(.loc_coord, coord, iron_arrow_travel, 4, 35, 0, 45, 40, 0, 0);
+}
+if(.loc_find($trap2, regicide_trap_arrowtrip) = true) {
+    loc_anim(arrowtrip);
+    ~coord_projectile(.loc_coord, coord, iron_arrow_travel, 4, 35, 0, 45, 40, 0, 0);
+}
+if(.loc_find($trap3, regicide_trap_arrowtrip) = true) {
+    loc_anim(arrowtrip);
+    ~coord_projectile(.loc_coord, coord, iron_arrow_travel, 4, 35, 0, 45, 40, 0, 0);
+}
+if(.loc_find($trap4, regicide_trap_arrowtrip) = true) {
+    loc_anim(arrowtrip);
+    ~coord_projectile(.loc_coord, coord, iron_arrow_travel, 4, 35, 0, 45, 40, 0, 0);
+}
+sound_synth(tripwire_with_arrows, 1, 0);
+queue(damage_player, 0, 5);
+queue(damage_player, 0, 5);
+
+[oploc1,regicide_pitfall_corner]
+p_delay(0);
+loc_findallzone(loc_coord);
+while (loc_findnext = true) {
+    if (distance(coord, loc_coord) = 1 & loc_type = regicide_pitfall_side){
+        @regicide_jump_pitfall;
+    }
+}
+
+[oploc1,regicide_pitfall_side] @regicide_jump_pitfall;
+
+[label,regicide_jump_pitfall]
+def_coord $start;
+def_int $dx;
+def_int $dz;
+def_int $dir;
+switch_int(loc_angle) {
+    case ^loc_north, ^loc_south :
+        if(coordz(coord) > coordz(loc_coord)) {
+            $start = movecoord(loc_coord, 0, 0, 1);
+            $dz = -1;
+            $dir = ^exact_south;
+        } else {
+            $start = movecoord(loc_coord, 0, 0, -1);
+            $dz = 1;
+            $dir = ^exact_north;
+        }
+    case ^loc_west, ^loc_east :
+        if(coordx(coord) > coordx(loc_coord)) {
+            $start = movecoord(loc_coord, 1, 0, 0);
+            $dx = -1;
+            $dir = ^exact_west;
+        } else {
+            $start = movecoord(loc_coord, -1, 0, 0);
+            $dx = 1;
+            $dir = ^exact_east;
+        }
+}
+def_coord $dest = movecoord(loc_coord, multiply(3,$dx), 0, multiply(3,$dz));
+if(map_blocked($start) = true | map_blocked($dest) = true) {
+    return;
+}
+if(coord ! $start) {
+    p_teleport($start);
+    p_delay(1);
+}
+sound_synth(jump_no_land, 1, 20);
+if(stat_random(agility, 160, 300) = false) {
+    mes("... you slip and fall.");
+    ~agility_exactmove(agilityarena_dive_player, 20, 1, coord, movecoord(loc_coord, multiply(1,$dx), 0, multiply(1,$dz)), 30, 49, $dir, false);
+    @regicide_pitfall_falldown;
+}
+~agility_exactmove(agilityarena_dive_player, 20, 1, coord, $dest, 30, 49, $dir, false);
+mes("... you manage to cross safely.");
+
+[label,regicide_pitfall_falldown]
+mes("You fall onto the spikes.");
+// unlike the upass trap I'm pretty sure these were always relative to player coord
+if(inzone(0_35_49_33_37, 0_35_49_35_37, coord) = true) {
+    p_teleport(movecoord(0_36_150_32_56, random(1), 0, 0));
+} else if(inzone(0_35_49_33_38, 0_35_49_35_38, coord) = true) {
+    p_teleport(movecoord(0_36_150_32_56, random(1), 0, random(1)));
+} else if(inzone(0_35_49_33_39, 0_35_49_35_39, coord) = true) {
+    p_teleport(movecoord(0_36_150_32_56, random(1), 0, 1));
+} else if(inzone(0_35_50_26_2, 0_35_50_28_2, coord) = true) {
+    p_teleport(movecoord(0_36_150_50_56, random(1), 0, 0));
+} else if(inzone(0_35_50_26_3, 0_35_50_28_3, coord) = true) {
+    p_teleport(movecoord(0_36_150_50_56, random(1), 0, random(1)));
+} else if(inzone(0_35_50_26_4, 0_35_50_28_4, coord) = true) {
+    p_teleport(movecoord(0_36_150_50_56, random(1), 0, 1));
+} else if(inzone(0_35_50_36_61, 0_35_50_36_63, coord) = true) {
+    p_teleport(movecoord(0_36_150_50_43, 0, 0, random(1)));
+} else if(inzone(0_35_50_37_61, 0_35_50_37_63, coord) = true) {
+    p_teleport(movecoord(0_36_150_50_43, random(1), 0, random(1)));
+} else if(inzone(0_35_50_38_61, 0_35_50_38_63, coord) = true) {
+    p_teleport(movecoord(0_36_150_50_43, 1, 0, random(1)));
+} else if(inzone(0_34_50_32_2, 0_34_50_34_2, coord) = true) {
+    p_teleport(movecoord(0_36_150_9_56, random(1), 0, 0));
+} else if(inzone(0_34_50_32_3, 0_34_50_34_3, coord) = true) {
+    p_teleport(movecoord(0_36_150_9_56, random(1), 0, random(1)));
+} else if(inzone(0_34_50_32_4, 0_34_50_34_4, coord) = true) {
+    p_teleport(movecoord(0_36_150_9_56, random(1), 0, 1));
+}
+
+anim(human_death, 0);
+p_delay(1);
+anim(null, 0);
+say("Ouch!");
+~damage_self(15); // always 15
+
+
+// Footprints (stage 6→7)
+[oploc1,regicide_old_camp_footprints]
+if(%regicide_quest = ^regicide_defeated_guard) {
+    mes("I know where those tracks lead.");
+} else if(%regicide_quest = ^regicide_spoken_tracker2) {
+    mes("The tracks lead through the dense wood, you can follow them now.");
+} else if(%regicide_quest = ^regicide_shown_pendant) {
+    %regicide_quest = ^regicide_found_footprints;
+    mes("You try to follow the foot prints but they lead into impassable woodland.");
+} else if (%regicide_quest < ^regicide_shown_pendant) {
+    mes("You are unable to make anything of the markings.");
+}

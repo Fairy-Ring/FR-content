@@ -228,15 +228,41 @@ sound_synth(cupboard_close, 0, 0);
 p_delay(0);
 loc_change(eadgar_kitchen_drawers, 300);
 
+// Eadgar complete residual: key search + storeroom unlock — 274 quest_eadgar.rs2 logic
+// re-merged here (377 ownership on quest_troll to avoid dup headers). Research: eadgar-complete-gate-377.md
 [oploc2,eadgar_kitchen_drawers_open]
 p_arrivedelay;
 mes("You search the drawers...");
 p_delay(0);
-mes("You don't find anything.");
+if(%eadgar_quest = ^eadgar_got_burnt_meat & inv_total(inv, eadgar_troll_storeroom_key) = 0 & inv_total(bank, eadgar_troll_storeroom_key) = 0) {
+    if(inv_freespace(inv) > 0) {
+        mes("You open the fake bottom of the drawer and find the storeroom key.");
+        inv_add(inv, eadgar_troll_storeroom_key, 1);
+    } else {
+        mes("You open the fake bottom of the drawer and see a key, but don't have space to take it.");
+    }
+} else {
+    mes("You don't find anything.");
+}
 
 [oploc1,eadgar_storeroomdoor]
-mes("You need to find the right key to open this door.");
+if(coord = 0_44_157_53_37) {
+    @eadgar_storeroom_open;
+} else {
+    if(%eadgar_quest >= ^eadgar_unlocked_storeroom) {
+        @eadgar_storeroom_open;
+    } else if(inv_total(inv, eadgar_troll_storeroom_key) > 0 & %eadgar_quest = ^eadgar_got_burnt_meat) {
+        %eadgar_quest = ^eadgar_unlocked_storeroom;
+        mes("You unlock the door.");
+        inv_del(inv, eadgar_troll_storeroom_key, 1);
+        @eadgar_storeroom_open;
+    } else {
+        mes("You need to find the right key to open this door.");
+    }
+}
 
+[label,eadgar_storeroom_open]
+~open_and_close_door2(eadgar_storeroomdoor_open, ~check_axis(coord, loc_coord, loc_angle), door_open);
 [oploc1,troll_stronghold_prison_door_closed]
 if(inv_total(inv, troll_key_prison) = 0 & %troll_quest < ^troll_entered_prison) {
     mes("You need a key.");
