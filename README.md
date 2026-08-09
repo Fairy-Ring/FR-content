@@ -33,15 +33,15 @@ Development of this fork **uses AI tools and coding agents** (research, thrash, 
 
 Jagex assets that appear in content distributions remain **Jagex IP**. They are **not** covered by MIT. Upstream Lost City includes them for historical preservation; redistributors must follow their own counsel and upstream notices.
 
-## Launch-together
+## Companion repos
 
-Intended to go **public with** the matching engine, client-ts, and workspace repos under the **Fairy Ring** brand (`FR-content` / `FR-engine` / `FR-client-ts` / `fairy-ring-workspace`). Visibility flips only on operator call — **not** a content-complete claim.
+Public under **Fairy Ring** (separate remotes; **not** a content-complete claim):
 
-| Companion | Role |
-|-----------|------|
-| **Workspace** | Process, research, harness toys, residual bar docs |
-| **Engine** | Server / protocol / pack tools |
-| **Client-TS** | Pure 1:1 Java 377 → TypeScript browser client |
+| Repo | Role |
+|------|------|
+| [fairy-ring-workspace](https://github.com/Fairy-Ring/fairy-ring-workspace) | Process, harness toys, residual bar docs |
+| [FR-engine](https://github.com/Fairy-Ring/FR-engine) | Server / protocol / pack tools |
+| [FR-client-ts](https://github.com/Fairy-Ring/FR-client-ts) | Pure 1:1 Java 377 → TypeScript browser client |
 
 ## Run
 
@@ -79,4 +79,4 @@ We do **not** claim this tree **is** authentic, original, or complete. Work is o
 - Lost City forum / ethos (upstream): https://lostcity.rs/  
 
 **Never push experiment work to `LostCityRS/*` without explicit permission.**  
-Private backup remote (operator): `private` → `acfrazier/FR-content`.
+Push remote (operator): `private` → [Fairy-Ring/FR-content](https://github.com/Fairy-Ring/FR-content).
