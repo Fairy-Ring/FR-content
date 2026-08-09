@@ -1,10 +1,10 @@
-# rs2-r377 — Content
+# Fairy Ring — Content
 
 **Period game content** (RuneScript configs, scripts, maps, interfaces) for **RuneScape revision 377** (~2 May 2006).
 
 | | |
 |--|--|
-| **Public name** | **rs2-r377** (content tree) |
+| **Public brand** | **Fairy Ring** (content tree) |
 | **Branch** | `rs2-r377` |
 | **Upstream lineage** | [LostCityRS/Content](https://github.com/LostCityRS/Content) **`377-wip`** @ `7d7719693100cc45ff187c12139e5b63b3ab21df` |
 | **Provenance** | [PROVENANCE.md](PROVENANCE.md) — full SHA pin + history note |
