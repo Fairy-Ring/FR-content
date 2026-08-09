@@ -62,6 +62,11 @@ cd engine && npm start   # packs content, serves world
 
 Isolation ports and pack policy for the experiment live in the **workspace** (not assumed identical to Lost City defaults).
 
+
+## Completeness disclaimer
+
+We do **not** claim this tree **is** authentic, original, or complete. Work is ongoing under an accuracy bar; humans and agents make mistakes. **Good-faith contributions from all** are welcome and will not be dismissed without clear rationale (see companion workspace `CONTRIBUTING.md`).
+
 ## License
 
 - **Source layout / scripts in this repo:** [MIT](LICENSE) (as upstream).  
