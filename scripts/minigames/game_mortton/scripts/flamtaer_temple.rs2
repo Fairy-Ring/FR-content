@@ -130,7 +130,11 @@ if(%current_temple_build < 17000) {
 
 if(%temple_sanctity_p < 100) {
     %temple_sanctity = add(%temple_sanctity,$resource_amount);
+    // Keep % display + light gate in sync. Drain timer also recomputes _p; without this,
+    // raw sanctity rises while sanctity_p stays stale → HUD "can light" confusion vs gate.
+    %temple_sanctity_p = min(100, divide(%temple_sanctity, 30));
 }
+queue(update_flamtaer_overlay, 0, 0);
 
 //1 exp per 2 resources spent
 stat_advance(crafting, divide(multiply($resource_amount,10),2));
@@ -292,7 +296,9 @@ if (oc_category(last_useitem) = olive_oil) {
     def_int $slot = last_useslot;
     def_int $doses = oc_param($obj, dose_count);
     def_int $sanc_drain = divide(multiply(multiply(9, $doses), 30), 10);
-    %temple_sanctity = sub(%temple_sanctity, $sanc_drain);
+    %temple_sanctity = max(0, sub(%temple_sanctity, $sanc_drain));
+    %temple_sanctity_p = min(100, divide(%temple_sanctity, 30));
+    queue(update_flamtaer_overlay, 0, 0);
 
     inv_setslot(inv, $slot, oc_param($obj, next_obj_stage), 1);
     sound_synth(oil_pour, 1, 0);
@@ -317,7 +323,9 @@ if (oc_category(last_useitem) = olive_oil) {
     def_int $slot = last_useslot;
     def_int $doses = oc_param($obj, dose_count);
 
-    %temple_sanctity = sub(%temple_sanctity, 600);
+    %temple_sanctity = max(0, sub(%temple_sanctity, 600));
+    %temple_sanctity_p = min(100, divide(%temple_sanctity, 30));
+    queue(update_flamtaer_overlay, 0, 0);
 
     inv_setslot(inv, $slot, oc_param($obj, next_obj_stage_temple), 1);
     sound_synth(oil_pour, 1, 0);
