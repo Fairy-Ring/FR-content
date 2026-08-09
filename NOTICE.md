@@ -8,7 +8,12 @@ Not a complete license for Jagex assets.
 **rs2-r377 Content** is an independent preservation / engineering fork of
 [LostCityRS/Content](https://github.com/LostCityRS/Content).
 
-It is a **derivation** of open Lost City work: we use and extend that tree under its license, with our own residual process and branding.
+```text
+LostCityRS/Content@7d7719693100cc45ff187c12139e5b63b3ab21df  (branch 377-wip)
+```
+
+It is a **derivation** of open Lost City work: we use and extend that tree under its license, with our own residual process and branding.  
+**Pinned details + verify commands:** [PROVENANCE.md](PROVENANCE.md).
 
 **Not affiliated with, endorsed by, or representative of** Lost City / LostCityRS, rs2b2t / N64Jive (unless they adopt material), or Jagex Ltd.
 

@@ -6,7 +6,8 @@
 |--|--|
 | **Public name** | **rs2-r377** (content tree) |
 | **Branch** | `rs2-r377` |
-| **Upstream lineage** | [LostCityRS/Content](https://github.com/LostCityRS/Content) |
+| **Upstream lineage** | [LostCityRS/Content](https://github.com/LostCityRS/Content) **`377-wip`** @ `7d7719693100cc45ff187c12139e5b63b3ab21df` |
+| **Provenance** | [PROVENANCE.md](PROVENANCE.md) — full SHA pin + history note |
 | **Companion workspace** | [rs2-r377 workspace](https://github.com/acfrazier/LC-rs2-r377-workspace) (docs, harness, process) |
 
 ## Derived from Lost City — not Lost City
