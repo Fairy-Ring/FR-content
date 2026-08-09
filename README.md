@@ -14,7 +14,7 @@
 
 This repository is a **derivation** of open **Lost City / LostCityRS Content** work and related community ports. We build on those trees under their licenses, with our own residual bar and process.
 
-**Derivation does not mean official.** This is **not** affiliated with, endorsed by, or representative of Lost City / LostCityRS, rs2b2t / N64Jive (unless they adopt material), or Jagex Ltd.
+**Derivation does not mean official.** This is **not** official Lost City / LostCityRS and is **not** endorsed by Jagex Ltd. rs2b0t/rs2b2t patterns may be used as tools; this fork is not their product layer.
 
 Do **not** present this repo as “Lost City,” “LC Content,” or official LostCityRS.  
 See [NOTICE.md](NOTICE.md) and the workspace Decision 009 (branding & attribution).
