@@ -8,7 +8,7 @@
 | **Branch** | `rs2-r377` |
 | **Upstream lineage** | [LostCityRS/Content](https://github.com/LostCityRS/Content) **`377-wip`** @ `7d7719693100cc45ff187c12139e5b63b3ab21df` |
 | **Provenance** | [PROVENANCE.md](PROVENANCE.md) — full SHA pin + history note |
-| **Companion workspace** | [rs2-r377 workspace](https://github.com/acfrazier/LC-rs2-r377-workspace) (docs, harness, process) |
+| **Companion workspace** | [Fairy Ring workspace](https://github.com/acfrazier/fairy-ring-workspace) (docs, harness, process) |
 
 ## Derived from Lost City — not Lost City
 
@@ -35,7 +35,7 @@ Jagex assets that appear in content distributions remain **Jagex IP**. They are 
 
 ## Launch-together
 
-Intended to go **public with** the matching engine, client-ts, and workspace repos under the **rs2-r377** brand (GitHub names may still use a legacy `LC-rs2-*` identifier until rename at flip). Visibility flips only on operator call — **not** a content-complete claim.
+Intended to go **public with** the matching engine, client-ts, and workspace repos under the **Fairy Ring** brand (`FR-content` / `FR-engine` / `FR-client-ts` / `fairy-ring-workspace`). Visibility flips only on operator call — **not** a content-complete claim.
 
 | Companion | Role |
 |-----------|------|
@@ -79,4 +79,4 @@ We do **not** claim this tree **is** authentic, original, or complete. Work is o
 - Lost City forum / ethos (upstream): https://lostcity.rs/  
 
 **Never push experiment work to `LostCityRS/*` without explicit permission.**  
-Private backup remote (operator): `private` → `acfrazier/LC-rs2-r377-content` (rename target: `rs2-r377-content` at public flip).
+Private backup remote (operator): `private` → `acfrazier/FR-content`.
