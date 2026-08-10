@@ -1,0 +1,107 @@
+// MM Zooknock — tunnel intro + disguise mission (289 mm_zooknock talk path).
+// Map spawn: mm_zooknock_aa. Item hand-in (opnpcu) + ch3 cutscene residual.
+
+[opnpc1,mm_zooknock_aa]
+switch_int(%mm_zooknock) {
+    case ^zooknock_need_items, ^zooknock_made_talisman :
+        ~chatnpcnoturn("<p,neutral>Bring me the materials for the monkey amulet and the monkey talisman.");
+        ~chatnpcnoturn("<p,neutral>Amulet: gold bar, monkey amulet mould, and something related to monkey speech.");
+        ~chatnpcnoturn("<p,neutral>Talisman: authentic magical monkey talisman and monkey remains.");
+        ~mesbox("Item hand-in residual — use items on Zooknock when that path is ported.");
+    case ^zooknock_told_mission : @mm_zooknock_p5;
+    case ^zooknock_learned_story :
+        if(%mm_garkor < ^garkor_speak_zooknock) {
+            ~chatplayer("<p,quiz>How goes the tunneling work?");
+            ~chatnpcnoturn("<p,neutral>Slow, as ever. Can't you tell?");
+            return;
+        }
+        ~chatplayer("<p,quiz>Zooknock?");
+        ~chatnpcnoturn("<p,quiz>Yes?");
+        ~chatplayer("<p,neutral>I have been sent by your Sergeant. He believes that the best way to rescue the rest of your squad with the minimum of casualties is to have an insider - a monkey working for us.");
+        ~chatnpcnoturn("<p,neutral>Finally. He wants me to turn you into a monkey.");
+        @mm_zooknock_p4;
+    case ^zooknock_told_story : @mm_zooknock_p3;
+    case ^zooknock_found :
+        ~chatplayer("<p,quiz>How did you get here?");
+        @mm_zooknock_p2;
+    case ^mm_not_started :
+        ~chatplayer("<p,quiz>Hello?");
+        ~chatnpcnoturn("<p,confused>A human ... here? What business have you on Ape Atoll?");
+        ~chatplayer("<p,neutral>I am on a mission for King Narnode Shareen of the Gnomes.");
+        ~chatplayer("<p,neutral>I have been sent to investigate the whereabouts of the 10th squad of his Royal Guard, which went missing during a recent mission to Karamja.");
+        ~chatnpcnoturn("<p,neutral>Well you've found us - what's left of us, that is.");
+        ~chatnpcnoturn("<p,neutral>I am Zooknock, the 10th squad mage. These are Bunkwicket and Waymottin, two of our finest sappers. I assume you will want to know how we got here?");
+        %mm_zooknock = ^zooknock_found;
+        ~chatplayer("<p,neutral>Of course.");
+        @mm_zooknock_p2;
+}
+
+[label,mm_zooknock_p5]
+~chatplayer("<p,angry>Right. What do I have to do?");
+~chatnpcnoturn("<p,neutral>There will be two aspects to your transformation. We must first arrange it so that you are able to understand and communicate with the monkeys.");
+~chatnpcnoturn("<p,neutral>We must also transform your body so that you may pass amongst them unnoticed.");
+~chatnpcnoturn("<p,neutral>So that the effects of my spells are not permanent, I will invest their power into magical items which you must find. You can then use them at your will.");
+~chatplayer("<p,quiz>What kind of items?");
+~chatnpcnoturn("<p,neutral>For the spells to take full effect, they will have to be in some way related to the monkeys.");
+~chatnpcnoturn("<p,neutral>I suggest that I invest the ability to communicate with the monkeys in an authentic monkey amulet.");
+~chatnpcnoturn("<p,neutral>Similarly, the transformation spell should be stored in a monkey talisman of some kind.");
+%mm_zooknock = ^zooknock_need_items;
+%mm_zooknock_player_is_collecting_for_amulet = ^true;
+%mm_zooknock_player_is_collecting_for_talisman = ^true;
+~chatnpcnoturn("<p,neutral>Return when you have the materials. Speak to me again if you forget what is needed.");
+
+[label,mm_zooknock_p4]
+~chatplayer("<p,neutral>Actually, it was more along the lines of a disguise...");
+~chatnpcnoturn("<p,neutral>I think you misunderstand, human. Do you know why you were sent here?");
+~chatplayer("<p,angry>King Narnode Shareen asked me to...");
+~chatnpcnoturn("<p,neutral>Indeed. However, King Narnode Shareen is still in contact with Garkor! You were sent here because Garkor specifically asked Narnode for you!");
+~chatplayer("<p,angry>Why wasn't I told?");
+~chatnpcnoturn("<p,neutral>Before you arrived on this island, that information would have endangered both yourself and the mission.");
+~chatplayer("<p,angry>But why a human? Why me?");
+%mm_zooknock = ^zooknock_told_mission;
+~chatnpcnoturn("<p,neutral>Garkor had long decided that we need a monkey insider. I have the necessary magic to perform the shapeshifting spell, but we needed a human to transform.");
+~chatplayer("<p,angry>Why don't you just transform a gnome?");
+~chatnpcnoturn("<p,neutral>It has been tried in the past, but the results were far from ... satisfactory. Although we, like you, are related to the monkeys, the link is too weak for a successful transformation. That is why we need you.");
+@mm_zooknock_p5;
+
+[label,mm_zooknock_p2]
+~chatnpcnoturn("<p,quiz>Your story first, human. What possessed you to travel to this forsaken island?");
+~chatplayer("<p,neutral>I am currently in the service of your King. I was the human who exposed Glough's warfaring plans and defeated his demon.");
+~chatplayer("<p,neutral>As far as I understand, the 10th squad were sent to oversee the decomission of Glough's shipyard in east Karamja.");
+~chatplayer("<p,neutral>Rumour has it you were blown off course. The King worried as to your fate, and sent me to investigate.");
+~chatnpcnoturn("<p,confused>You were sent alone?");
+~chatplayer("<p,neutral>No, I have been accompanied by Flight Commander Waydar. We flew south on a special type of glider and landed on a small island to our east.");
+~chatnpcnoturn("<p,neutral>The so called Crash Island. We left there one of our number, Lumdo, to guard our gliders until our return.");
+~chatplayer("<p,neutral>Yes, we have met. He ferried me across to the atoll.");
+~chatnpcnoturn("<p,angry>He did!? He was explicitly ordered to guard the gliders! How did this happen? Who is guarding the gliders now?");
+~chatplayer("<p,neutral>Waydar ordered him to leave his post. He is guarding the gliders himself.");
+%mm_zooknock = ^zooknock_told_story;
+~chatnpcnoturn("<p,quiz>Flight Commander Waydar you said? For some reason that name is familiar...");
+@mm_zooknock_p3;
+
+[label,mm_zooknock_p3]
+~chatplayer("<p,quiz>So why are you here?");
+~chatnpcnoturn("<p,neutral>The rumours are correct. We were indeed blown off course. Fortunately, we managed to find a small island to steer our gliders towards, else we surely would have drowned.");
+~chatplayer("<p,neutral>Then you gathered enough wood to fashion two boats. Your Sergeant and the rest of the 10th squad took the larger boat to this island, leaving Lumdo to guard the gliders and the other boat...");
+~chatnpcnoturn("<p,quiz>Correct. I assume Lumdo told you this?");
+~chatplayer("<p,quiz>Yes. What happened when you landed here?");
+~chatnpcnoturn("<p,neutral>We split up into several small groups to search the island for potential gnome glider launch sites. Whilst we knew the island to be inhabited, we did not expect its occupants to be quite so ... militant.");
+~chatplayer("<p,neutral>...");
+~chatnpcnoturn("<p,angry>Monkeys. Lots of monkeys. They are unlike any other type of monkey we've come across. A far cry from the usual wild variety, these were armed with high quality weaponry and uncanny tactical ability.");
+~chatnpcnoturn("<p,neutral>We were overwhelmed in numbers. Some of us managed to escape, but the rest were taken captive.");
+~chatplayer("<p,quiz>Who survived?");
+~chatnpcnoturn("<p,neutral>Myself, the Sergeant, Bunkwicket and Waymottin here. Karam, our assassin, probably managed to escape - he usually does.");
+~chatplayer("<p,quiz>And of the rest?");
+~chatnpcnoturn("<p,neutral>Lumo, Bunkdo and Carado were captured, as I said. We believe they are being held in the jail. We are working on a way to release them. I have sensed there lies a cavern to the north.");
+~chatnpcnoturn("<p,neutral>We are attempting to tunnel to this northern cavern and then move upwards from there.");
+~chatplayer("<p,quiz>Why don't you just go overground?");
+~chatnpcnoturn("<p,neutral>We have considered this, but every entrance seems to be excessively guarded.");
+%mm_zooknock = ^zooknock_learned_story;
+if(%mm_garkor < ^garkor_speak_zooknock) {
+    ~chatplayer("<p,neutral>I'll be back later.");
+    return;
+}
+~chatplayer("<p,neutral>I see.");
+~chatplayer("<p,neutral>I have spoken to your Sergeant. He believes that the best way to rescue the rest of your squad with the minimum of casualties is to have an insider - a monkey working for us.");
+~chatnpc("<p,neutral>Aha. He wants me to turn you into a monkey.");
+@mm_zooknock_p4;

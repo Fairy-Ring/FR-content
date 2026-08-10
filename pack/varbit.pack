@@ -2138,3 +2138,10 @@
 2137=varbit_130
 2138=varbit_131
 2139=varbit_132
+2140=mm_zooknock_has_gold_bar
+2141=mm_zooknock_has_amulet_mould
+2142=mm_zooknock_has_dentures
+2143=mm_zooknock_has_magical_talisman
+2144=mm_zooknock_has_monkey_relic
+2145=mm_zooknock_player_is_collecting_for_amulet
+2146=mm_zooknock_player_is_collecting_for_talisman

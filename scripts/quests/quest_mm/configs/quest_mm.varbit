@@ -1,5 +1,6 @@
-// Hangar reinit flags on mm_flags (289 quest_mm.varbit).
-// Pack IDs: 131=mm_hangar_cutscene_flag, 132=mm_hangar_puzzle_complete
+// MM flags on mm_flags (289 quest_mm.varbit layout).
+// Hangar: 131=mm_hangar_cutscene_flag, 132=mm_hangar_puzzle_complete
+// Zooknock collection bits 7–13 match 289 (pack assigns free IDs).
 
 [mm_hangar_cutscene_flag]
 basevar=mm_flags
@@ -10,3 +11,38 @@ endbit=3
 basevar=mm_flags
 startbit=4
 endbit=4
+
+[mm_zooknock_has_gold_bar]
+basevar=mm_flags
+startbit=7
+endbit=7
+
+[mm_zooknock_has_amulet_mould]
+basevar=mm_flags
+startbit=8
+endbit=8
+
+[mm_zooknock_has_dentures]
+basevar=mm_flags
+startbit=9
+endbit=9
+
+[mm_zooknock_has_magical_talisman]
+basevar=mm_flags
+startbit=10
+endbit=10
+
+[mm_zooknock_has_monkey_relic]
+basevar=mm_flags
+startbit=11
+endbit=11
+
+[mm_zooknock_player_is_collecting_for_amulet]
+basevar=mm_flags
+startbit=12
+endbit=12
+
+[mm_zooknock_player_is_collecting_for_talisman]
+basevar=mm_flags
+startbit=13
+endbit=13
