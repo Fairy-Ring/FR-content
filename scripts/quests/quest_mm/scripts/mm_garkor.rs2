@@ -18,12 +18,30 @@ switch_int(%mm_garkor) {
         ~chatnpc("<p,neutral>I need you now to seek audience with Awowogei. Claim you are an envoy from the monkeys of Karamja and are seeking an alliance.");
         ~chatnpc("<p,neutral>You must win his trust if we are to succeed.");
     case ^garkor_need_correct_disguise :
-        ~mesbox("Return when you look like a Karamjan monkey (greegree residual).");
+        if(~mm_wearing_greegree = true) {
+            if(inv_total(worn, mm_monkey_greegree_for_normal_monkey) = 0) {
+                ~chatnpc("<p,neutral>You don't look very much like a Karamjan monkey to me. It definitely will not fool Awowogei.");
+                return;
+            }
+            ~chatnpc("<p,neutral>Well done - you look just like a Karamjan monkey.");
+            @mm_garkor_p4;
+        }
+        ~chatnpc("<p,neutral>I said come back when you look like a Karamjan monkey. You still look like a human to me...");
     case ^garkor_speak_zooknock :
         if(~mm_wearing_greegree = true) {
             ~chatnpc("<p,neutral>My my, Zooknock has outdone himself this time. You do look very much like a monkey you know.");
             ~chatplayer("<p,neutral>I know.");
-            ~mesbox("Further disguise / Awowogei residual is not ready yet.");
+            if(inv_total(worn, mm_monkey_greegree_for_normal_monkey) = 0) {
+                ~chatnpc("<p,neutral>However, you look like the wrong sort of monkey. My plan requires that you look like one of the monkeys of mainland Karamja.");
+                ~chatplayer("<p,quiz>What exactly is your plan?");
+                ~chatnpc("<p,neutral>When the time comes, you are to pretend you are an envoy from the monkeys of Karamja and that you are seeking an alliance.");
+                ~chatplayer("<p,quiz>How do you know this will work?");
+                %mm_garkor = ^garkor_need_correct_disguise;
+                ~chatnpc("<p,neutral>As I said, I've been listening to Awowogei for some time now. Come back when you look like one of the Karamjan monkeys.");
+                return;
+            }
+            ~chatnpc("<p,neutral>And by happy coincidence you appear to be just the right sort of monkey.");
+            @mm_garkor_p4;
             return;
         }
         ~chatnpc("<p,quiz>Have you spoken to Zooknock about the monkey disguise yet?");
@@ -76,3 +94,9 @@ switch_int(%mm_garkor) {
 ~chatnpc("<p,neutral>Go and see my squad mage, Zooknock. Tell him I have asked you to be 'disguised' as a monkey so that you may infiltrate the village. As you will see, he is something of an expert on the subject.");
 ~chatplayer("<p,shock>I can't even communicate with the monkeys!");
 ~chatnpc("<p,angry>Just go and find my squad mage, human.");
+
+// After correct Karamjan greegree (289 mm_garkor_p4). Awowogei / ch4 residual.
+[label,mm_garkor_p4]
+if(%mm_garkor < ^garkor_seek_alliance) %mm_garkor = ^garkor_seek_alliance;
+~chatnpc("<p,neutral>I need you now to seek audience with Awowogei. Claim you are an envoy from the monkeys of Karamja and are seeking an alliance.");
+~chatnpc("<p,neutral>You must win his trust if we are to succeed.");

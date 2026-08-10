@@ -283,7 +283,10 @@ sound_synth(superheat_all, 0, 0);
 spotanim_npc(windwave_impact, 80, 0);
 inv_add(inv, $talisman, 1);
 if(%mm_zooknock_player_is_collecting_for_talisman = ^true) %mm_zooknock_player_is_collecting_for_talisman = ^false;
-// ch3 cutscene residual (sets made_talisman in full 289) — skip until ported
+// Full 289 queues mm_ch3_cutscene which ends with made_talisman + mm_completed_ch2.
+// Thin residual: stage write only (no cutscene NPCs / inter_199 map).
+if(%mm_zooknock < ^zooknock_made_talisman) %mm_zooknock = ^zooknock_made_talisman;
+if(%mm_main < ^mm_completed_ch2) %mm_main = ^mm_completed_ch2;
 ~objbox($talisman, "Zooknock hands you back the talisman. It seems to glow slightly.", 250, 0, 0);
 ~chatnpc("<p,neutral>I am afraid I have not been able to fully invest my powers in that talisman. You may use it, but it will continue to draw its energy directly from me.");
 ~chatnpc("<p,neutral>The range at which I will be able to sustain it is limited. I cannot ensure it will be effective off the atoll.");
