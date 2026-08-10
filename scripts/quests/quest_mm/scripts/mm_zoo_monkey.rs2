@@ -1,0 +1,99 @@
+// MM Ardougne zoo captive — thin port from 289 mm_zoo_monkey.
+// Product: Talk zoo monkey (amulet) → inv mm_monkey_in_backpack.
+// Residual: banana trail clue, poke flavour spam, full jungle free-release zones.
+
+[opnpc1,mm_zoo_monkey]
+if(inv_total(inv, mm_monkey_in_backpack) > 0) {
+    ~objbox(mm_monkey_in_backpack, "You cannot fit another monkey in your backpack.", 250, 0, 0);
+    return;
+}
+~chatplayer("<p,neutral>Hello there, little monkey.");
+if(inv_total(worn, mm_amulet_of_monkey_speak) = 0) {
+    ~mm_monkeyspeak;
+    ~mesbox("You cannot understand what it is saying.");
+    return;
+}
+if(~mm_wearing_greegree = false) {
+    ~chatnpc("<p,quiz>Hello there! I've never met a talking human!");
+} else {
+    ~chatnpc("<p,quiz>Hello there!");
+}
+~chatplayer("<p,quiz>How would you like to get out of here?");
+~chatnpc("<p,neutral>Escape!? It's all I ever think about!");
+~chatplayer("<p,neutral>That's convenient. When would you like to leave?");
+~chatnpc("<p,neutral>Where will you be taking me?");
+~chatplayer("<p,shifty>Erm ... to the happy, sunny jungle of Karamja...");
+~chatnpc("<p,neutral>Wowee! I was born there you know!");
+~chatplayer("<p,neutral>That's nice. Are you ready to go?");
+~chatnpc("<p,quiz>Yes. Actually, can I bring some of my friends?");
+~chatplayer("<p,angry>No, I only have space for one.");
+~chatnpc("<p,neutral>Pleeeeease?");
+~chatplayer("<p,angry>No!");
+~chatnpc("<p,neutral>Pretty pleeeeease?");
+~chatplayer("<p,angry>No!!");
+~chatnpc("<p,neutral>Pretty please with a banana on top?");
+~chatplayer("<p,neutral>Look, I already said no. If you want to come then jump into my backpack.");
+~chatnpc("<p,neutral>Ook!");
+sound_synth(ooks, 0, 0);
+inv_add(inv, mm_monkey_in_backpack, 1);
+// 289 sets monkey_backpack_timer for chatter; residual flavour
+
+// Freed form (after drop or throne release) — re-bag if still owned
+[opnpc1,mm_freed_zoo_monkey]
+if(inv_total(inv, mm_monkey_in_backpack) > 0) {
+    ~objbox(mm_monkey_in_backpack, "You cannot fit another monkey in your backpack.", 250, 0, 0);
+    return;
+}
+~chatplayer("<p,neutral>Hello there, monkey.");
+if(inv_total(worn, mm_amulet_of_monkey_speak) = 0) {
+    ~mm_monkeyspeak;
+    ~mesbox("You cannot understand what it is saying.");
+    return;
+}
+if(%npc_attacking_uid ! uid) {
+    ~chatnpc("<p,quiz>Go away! I don't know you!");
+    return;
+}
+~chatnpc("<p,quiz>Are we there yet??");
+~chatplayer("<p,neutral>Not quite yet ... you should get back in my backpack now.");
+npc_del;
+inv_add(inv, mm_monkey_in_backpack, 1);
+sound_synth(ooks, 0, 0);
+
+// ---- shared monkeyspeak (289 quest_mm thin) ----
+[proc,monkeyspeak_text]()(string)
+def_string $dialogue = "";
+def_int $word_count = 0;
+def_int $roll = 0;
+while($word_count < 8) {
+    $roll = random(8);
+    if($roll = 0) {
+        $dialogue = append($dialogue, "Ah Ah! ");
+        $word_count = add($word_count, 2);
+    } else if($roll = 1) {
+        $dialogue = append($dialogue, "Ah Uh Ah! ");
+        $word_count = add($word_count, 3);
+    } else if($roll = 2) {
+        $dialogue = append($dialogue, "Ah! ");
+        $word_count = add($word_count, 1);
+    } else if($roll = 3) {
+        $dialogue = append($dialogue, "Ook Ah Ook! ");
+        $word_count = add($word_count, 3);
+    } else if($roll = 4) {
+        $dialogue = append($dialogue, "Ook Ah Uh! ");
+        $word_count = add($word_count, 3);
+    } else if($roll = 5) {
+        $dialogue = append($dialogue, "Ook Ook! ");
+        $word_count = add($word_count, 2);
+    } else if($roll = 6) {
+        $dialogue = append($dialogue, "Ook! ");
+        $word_count = add($word_count, 1);
+    } else if($roll = 7) {
+        $dialogue = append($dialogue, "Ook. ");
+        $word_count = add($word_count, 1);
+    }
+}
+return ($dialogue);
+
+[proc,mm_monkeyspeak]
+~chatnpc("<p,neutral><~monkeyspeak_text>");
