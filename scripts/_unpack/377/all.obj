@@ -47409,6 +47409,8 @@ members=yes
 2dyan=220
 2dxan=208
 wearpos=hat
+param=magicattack,15
+param=magicdefence,15
 weight=1lb
 
 [cert_mystic_hat]
@@ -47430,6 +47432,8 @@ members=yes
 2dyan=176
 2dxan=376
 wearpos=torso
+param=magicattack,20
+param=magicdefence,20
 wearpos2=arms
 weight=6lb
 
@@ -47452,6 +47456,8 @@ members=yes
 2dyan=2024
 2dxan=408
 wearpos=legs
+param=magicattack,15
+param=magicdefence,15
 weight=4lb
 
 [cert_mystic_robe_bottom]
@@ -47471,6 +47477,8 @@ members=yes
 2dzoom=830
 2dxan=536
 wearpos=hands
+param=magicattack,10
+param=magicdefence,10
 weight=1lb
 
 [cert_mystic_gloves]
@@ -47491,6 +47499,8 @@ members=yes
 2dyan=1988
 2dxan=188
 wearpos=feet
+param=magicattack,5
+param=magicdefence,5
 weight=1lb
 
 [cert_mystic_boots]

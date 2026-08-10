@@ -405,8 +405,11 @@ param=death_drop,ashes
 huntrange=3
 huntmode=cowardly
 
-// MM Jungle Demon — was visual-only (vislevel only) → 1hp paper tiger.
-// Combat block from 289 quest_mm.npc; model/recol stay 377 unpack names.
+// MM Jungle Demon — combat from 289 quest_mm.npc; model/recol stay 377 unpack names.
+// Do NOT copy black_demon huntrange/huntmode: hunt.pack id for cowardly is 80 but
+// loaded HuntType.count is 77 (cowardly packs as type id 3). huntmode=80 → HuntType.get(80)
+// is null → Npc.turn() throws every tick and the demon never sticks in the scene.
+// 289 mm_demon has no huntmode/huntrange — keep that shape.
 [mm_demon]
 name=Jungle Demon
 desc=It's a large green Greater Jungle Demon. An aura of magic emanates from its hide.
@@ -455,8 +458,6 @@ param=defend_sound,black_demon_hit
 param=death_sound,black_demon_death
 param=death_drop,ashes
 param=demonbane_vulnerable,yes
-huntrange=3
-huntmode=cowardly
 
 [npc_1516]
 name=Demon

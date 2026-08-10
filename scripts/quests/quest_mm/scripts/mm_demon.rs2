@@ -40,11 +40,25 @@ p_delay(1);
 cam_reset;
 midi_song("showdown");
 // 289 shape: map_findsquare + lineofwalk (not a missing constant).
+// Arena is **L1** (1_42_143_*). Map-static m42_143 NPCs are L0 warehouse spiders only —
+// 10th squad + demon are scripted on the player plane, not jm2 static.
 // Era: Jagex did not guarantee size-3 free squares — spawn can fail or land badly
 // (“no size checks… unable to walk”). Do not invent open-tile hardcodes as “bugfix.”
 // Soft thrash may soft-tele an open stand if product softlocks.
+// Thin residual vs 289: squad AI/timers residual; spawn list matches 289 cast (stand-in).
 npc_add(map_findsquare(coord, 1, 5, ^map_findsquare_lineofwalk), mm_garkor_final_battle, 2000);
 %npc_aggressive_player = uid;
+npc_add(map_findsquare(coord, 1, 5, ^map_findsquare_lineofwalk), mm_lumo_final_battle, 2000);
+%npc_aggressive_player = uid;
+npc_add(map_findsquare(coord, 1, 5, ^map_findsquare_lineofwalk), mm_bunkdo_final_battle, 2000);
+%npc_aggressive_player = uid;
+npc_add(map_findsquare(coord, 1, 5, ^map_findsquare_lineofwalk), mm_carado_final_battle, 2000);
+%npc_aggressive_player = uid;
+npc_add(map_findsquare(coord, 1, 5, ^map_findsquare_lineofwalk), mm_karam_final_battle, 2000);
+%npc_aggressive_player = uid;
+npc_add(map_findsquare(coord, 1, 5, ^map_findsquare_lineofwalk), mm_zooknock_final_battle, 2000);
+%npc_aggressive_player = uid;
+// Demon last (289 queue_spawn order); size=3, no size checks in findsquare.
 npc_add(map_findsquare(coord, 5, 10, ^map_findsquare_lineofwalk), mm_demon, 2000);
 %npc_lastcombat = sub(^max_32bit_int, 8);
 %npc_aggressive_player = uid;
@@ -69,3 +83,41 @@ if(npc_findhero = ^true) {
 %mm_main = ^mm_defeated_demon;
 hint_stop;
 mes("You have defeated the jungle demon!");
+
+
+// ---- 289 cleanup residual (not engine death wipe) ----
+// After finduid, `coord` is the **player**. Despawn fight NPCs when:
+//  - owner logged out (finduid false), or
+//  - owner left L1 arena (death tele → Lumbridge, etc.)
+// Without these timers, thrash re-wears pile demons/squad (duration 2000).
+[proc,mm_finalbattle_cleanup]
+if (finduid(%npc_aggressive_player) = false) {
+    npc_del;
+    return;
+}
+if (inzone(1_42_143_0_0, 1_42_143_63_63, coord) = false) {
+    npc_del;
+}
+
+[ai_timer,mm_demon] ~mm_finalbattle_cleanup;
+[ai_timer,mm_garkor_final_battle] ~mm_finalbattle_cleanup;
+[ai_timer,mm_lumo_final_battle] ~mm_finalbattle_cleanup;
+[ai_timer,mm_bunkdo_final_battle] ~mm_finalbattle_cleanup;
+[ai_timer,mm_carado_final_battle] ~mm_finalbattle_cleanup;
+[ai_timer,mm_karam_final_battle] ~mm_finalbattle_cleanup;
+[ai_timer,mm_zooknock_final_battle] ~mm_finalbattle_cleanup;
+
+// Only your demon (289)
+[opnpc2,mm_demon]
+if (%npc_aggressive_player ! uid) {
+    mes("That is not your enemy!");
+    return;
+}
+@player_combat_start;
+
+[apnpc2,mm_demon]
+if (%npc_aggressive_player ! uid) {
+    mes("That is not your enemy!");
+    return;
+}
+@player_combat_start_ap;

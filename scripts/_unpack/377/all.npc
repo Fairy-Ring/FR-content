@@ -34861,6 +34861,7 @@ head1=npc_commander_montai_head
 
 [mm_garkor_final_battle]
 name=Garkor
+timer=9
 desc=A large and weathered looking Gnome veteran.
 model1=npc_leprechaun
 model2=npc_1411
@@ -34895,6 +34896,7 @@ head1=obj_pickpocket_guide_gnome
 
 [mm_lumo_final_battle]
 name=Lumo
+timer=9
 desc=A seasoned looking Gnome foot soldier.
 model1=npc_gnomeballer
 model2=npc_1414
@@ -34928,6 +34930,7 @@ head1=obj_pickpocket_guide_gnome
 
 [mm_bunkdo_final_battle]
 name=Bunkdo
+timer=9
 desc=A seasoned looking Gnome foot soldier.
 model1=npc_gnomeballer
 model2=npc_1414
@@ -34959,6 +34962,7 @@ head1=obj_pickpocket_guide_gnome
 
 [mm_carado_final_battle]
 name=Carado
+timer=9
 desc=A seasoned looking Gnome foot soldier.
 model1=npc_gnomeballer
 model2=npc_1418
@@ -35002,6 +35006,7 @@ head1=npc_1420_head
 
 [mm_karam_final_battle]
 name=Karam
+timer=9
 desc=All you see is a glimmer of light and the suggestion of shadow.
 model1=npc_1420
 model2=npc_1420i2
@@ -35077,6 +35082,7 @@ head1=npc_1425_head
 
 [mm_zooknock_final_battle]
 name=Zooknock
+timer=9
 desc=A wizened little Gnome dressed in brightly coloured clothes.
 model1=npc_leprechaun
 model2=npc_leprechauni3

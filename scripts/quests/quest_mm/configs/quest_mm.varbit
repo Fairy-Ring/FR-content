@@ -52,3 +52,9 @@ endbit=13
 basevar=mm_misc
 startbit=12
 endbit=16
+
+// Awowogei mission (289 quest_mm.varbit on mm_monkeys).
+[mm_awowogei]
+basevar=mm_monkeys
+startbit=2
+endbit=4
