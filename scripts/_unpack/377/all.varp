@@ -1469,6 +1469,7 @@ scope=perm
 
 [mm_cutscene_coord]
 scope=perm
+type=coord
 
 [mm_guards_cooldown]
 scope=perm

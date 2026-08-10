@@ -80,6 +80,8 @@ if (%tutorial < ^tutorial_complete & ~in_tutorial_island(coord) = true) {
 ~castlewars_login;
 // MM hangar reinit: finish cutscene if logout mid-viewing platform
 ~mm_hangar_login;
+// MM ch2: force atoll if logout mid shipyard cutscene map
+~mm_login;
 // Regicide start: spawn King's messenger timer if UP complete and quest not started
 ~start_king_messenger_timer;
 

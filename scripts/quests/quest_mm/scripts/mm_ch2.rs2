@@ -1,0 +1,174 @@
+// MM chapter 2 cutscene slice — extracted from 289 quest_mm.rs2.
+// IF: 377 uses scroll (not inter_199). Fade stubbed (delay+tele).
+// NPC remap: mm_cutscene_foreman / mm_cutscene_caranock (not mm_*_cutscene).
+
+[proc,mm_login]
+// ch2 cutscene map: force arrive atoll if logout mid-cutscene.
+if(inzone(0_40_71_0_0, 0_40_71_63_63, coord) = true) {
+    if(%mm_main < ^mm_arrived_atoll) {
+        p_teleport(0_43_42_49_19);
+        if_settab(magic, ^tab_magic);
+        cam_reset;
+        %mm_main = ^mm_arrived_atoll;
+        %mm_lumdo = ^lumdo_travelled;
+    }
+}
+
+[label,mm_ch2]
+~music_jingle("new chapter");
+sound_synth(ooks, 0, 0);
+if_settext(scroll:com_2, "Monkey Madness: Chapter 2");
+if_settext(scroll:com_3, "");
+if_settext(scroll:com_4, "In which our <text_gender("hero", "heroine")> finds <text_gender("him", "her")>self engaging in");
+if_settext(scroll:com_5, "severe quantities of monkey business.");
+if_settext(scroll:com_6, "");
+if_settext(scroll:com_7, "");
+if_settext(scroll:com_8, "");
+if_settext(scroll:com_9, "");
+if_settext(scroll:com_10, "");
+if_settext(scroll:com_11, "");
+if_settext(scroll:com_12, "");
+if_settext(scroll:com_13, "");
+if_openmain(scroll);
+
+[label,mm_ch2_cutscene]
+if_close;
+p_delay(0);
+%mm_cutscene_coord = coord;
+~music_jingle("meanwhile");
+// Meanwhile card on scroll (not inter_199)
+if_settext(scroll:com_2, "Meanwhile, far away in Karamja...");
+if_settext(scroll:com_3, "");
+if_settext(scroll:com_4, "");
+if_settext(scroll:com_5, "");
+if_settext(scroll:com_6, "");
+if_settext(scroll:com_7, "");
+if_settext(scroll:com_8, "");
+if_settext(scroll:com_9, "");
+if_settext(scroll:com_10, "");
+if_settext(scroll:com_11, "");
+if_settext(scroll:com_12, "");
+if_settext(scroll:com_13, "");
+if_openmain(scroll);
+p_delay(4);
+if_close;
+// 377 pack names (289: mm_foreman_cutscene / mm_caranock_cutscene)
+if(npc_findexact(0_40_71_43_38, mm_cutscene_foreman) = true & .npc_findexact(0_40_71_43_36, mm_cutscene_caranock) = true) {
+    p_teleport(0_40_71_36_37);
+    .npc_facesquare(movecoord(.npc_coord, 0, 0, 2));
+    npc_facesquare(movecoord(npc_coord, 0, 0, -2));
+    p_delay(0);
+    %mm_cutscene_part = 0;
+    walktrigger(mm_ch2_walktrigger);
+    ~music_setvar(8, 20);
+    if_settext(music:com_177, "Suspicious");
+    midi_song("suspicious");
+    cam_moveto(0_40_71_39_37, 400, 232, 232);
+    cam_lookat(0_40_71_49_37, 160, 232, 232);
+    if_settab(null, ^tab_magic);
+    @mm_ch2_cutscene_dialogue;
+}
+// 289 had no else: missing NPCs soft-locked. Durable stage write + land.
+@mm_ch2_arrive_atoll;
+
+[label,mm_ch2_arrive_atoll]
+if_settab(magic, ^tab_magic);
+cam_reset;
+%mm_cutscene_part = 0;
+if(%mm_main < ^mm_arrived_atoll) {
+    p_teleport(0_43_42_49_19);
+    %mm_main = ^mm_arrived_atoll;
+    %mm_lumdo = ^lumdo_travelled;
+}
+@mm_ch2;
+
+[walktrigger,mm_ch2_walktrigger]
+if(%mm_main >= ^mm_arrived_atoll) {
+    return;
+}
+if(inzone(0_40_71_0_0, 0_40_71_63_63, coord) = false) {
+    @mm_ch2_arrive_atoll;
+}
+p_stopaction;
+walktrigger(mm_ch2_walktrigger);
+queue(mm_ch2_cutscene_queue, 0, 0);
+
+[queue,mm_ch2_cutscene_queue]
+if(inzone(0_40_71_0_0, 0_40_71_63_63, coord) = false) {
+    return;
+}
+%mm_cutscene_part = add(%mm_cutscene_part, 1);
+@mm_ch2_cutscene_dialogue;
+
+[label,mm_ch2_cutscene_dialogue]
+if(npc_findexact(0_40_71_43_38, mm_cutscene_foreman) = false | .npc_findexact(0_40_71_43_36, mm_cutscene_caranock) = false) {
+    @mm_ch2_arrive_atoll;
+}
+if(%mm_cutscene_part = 0) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~chatnpcnoturn("<p,shifty>The workers are getting restless, Caranock.");
+}
+if(%mm_cutscene_part = 1) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~.chatnpc("<p,shifty>I know...");
+}
+if(%mm_cutscene_part = 2) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~chatnpc("<p,shifty>All this talk of Glough being replaced doesn't bode well for ... how shall I put this ... their morale.");
+}
+if(%mm_cutscene_part = 3) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~.chatnpc("<p,angry>Look, I know.");
+}
+if(%mm_cutscene_part = 4) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~chatnpc("<p,angry>Those are all men with children to feed. Famished families. Worried wives. All of us rely on this shipyard.");
+}
+if(%mm_cutscene_part = 5) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~chatnpc("<p,angry>If something isn't done soon, there'll be revolt. And I won't be able to stop it.");
+}
+if(%mm_cutscene_part = 6) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~.chatnpc("<p,angry>Stop worrying. I'm working on something -");
+}
+if(%mm_cutscene_part = 7) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~chatnpc("<p,angry>What something? You're always working on something. All we ever hear is bad news.");
+}
+if(%mm_cutscene_part = 8) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~chatnpc("<p,angry>First, Glough disappears. Then news of a missing squad of the Royal Guard in our area. And what about that human sent by the King?");
+}
+if(%mm_cutscene_part = 9) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~.chatnpc("<p,angry>The human means nothing. If it becomes too much trouble, I will simply have it ... removed. In the meantime, let it continue to search for that blasted 10th squad.");
+}
+if(%mm_cutscene_part = 10) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~chatnpc("<p,neutral>I am still worried. What am I meant to tell the men?");
+}
+if(%mm_cutscene_part = 11) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~.chatnpc("<p,angry>Stop worrying. I'm working on something - Glough left a few of his agents in the Gnome airforce.");
+}
+if(%mm_cutscene_part = 12) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~.chatnpc("<p,neutral>For now, tell your men to continue work on the battleships. Give me some time.");
+}
+if(%mm_cutscene_part = 13) {
+    %mm_cutscene_part = add(%mm_cutscene_part, 1);
+    ~chatnpc("<p,neutral>I hope you're right, Caranock, for your sake. My sake. For all of our sakes...");
+}
+if(%mm_cutscene_part > 13) {
+    if_close;
+    p_delay(4);
+    %mm_cutscene_part = 0;
+    if_settab(magic, ^tab_magic);
+    cam_reset;
+    p_teleport(0_43_42_49_19);
+    %mm_main = ^mm_arrived_atoll;
+    %mm_lumdo = ^lumdo_travelled;
+    p_delay(2);
+    @mm_ch2;
+}
