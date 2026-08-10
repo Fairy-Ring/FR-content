@@ -38,6 +38,13 @@
 [opheld2,rune_full_helm_gold] @levelrequire_defence(40, last_slot);
 [opheld2,rune_kiteshield_gold] @levelrequire_defence(40, last_slot);
 
+// Gilded (hard clue) — same gates as gold trim / plain rune plate
+[opheld2,rune_platebody_goldplate] @levelrequire_dragon_slayer_quest_defence(40, last_slot);
+[opheld2,rune_platelegs_goldplate] @levelrequire_defence(40, last_slot);
+[opheld2,rune_full_helm_goldplate] @levelrequire_defence(40, last_slot);
+[opheld2,rune_kiteshield_goldplate] @levelrequire_defence(40, last_slot);
+[opheld2,rune_plateskirt_goldplate] @levelrequire_defence(40, last_slot);
+
 [opheld2,rune_heraldic_kiteshield1] @levelrequire_defence(40, last_slot);
 [opheld2,rune_heraldic_kiteshield2] @levelrequire_defence(40, last_slot);
 [opheld2,rune_heraldic_kiteshield3] @levelrequire_defence(40, last_slot);

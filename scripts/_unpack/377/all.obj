@@ -40282,7 +40282,14 @@ manwear=obj_black_plateskirt_trim_manwear,0
 womanwear=obj_black_plateskirt_trim_womanwear,0
 wearpos=legs
 weight=20lb
-
+category=armour_legs
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,51
+param=slashdefence,49
+param=crushdefence,47
+param=magicdefence,-4
+param=rangedefence,49
 [rune_plateskirt_trim]
 name=Rune plateskirt (t)
 desc=Rune plateskirt with trim.
@@ -40305,7 +40312,14 @@ manwear=obj_black_plateskirt_trim_manwear,0
 womanwear=obj_black_plateskirt_trim_womanwear,0
 wearpos=legs
 weight=20lb
-
+category=armour_legs
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,51
+param=slashdefence,49
+param=crushdefence,47
+param=magicdefence,-4
+param=rangedefence,49
 [rune_plateskirt_zamorak]
 name=Zamorak plateskirt
 desc=Rune plateskirt in the colours of Zamorak.
@@ -40328,8 +40342,15 @@ manwear=obj_black_plateskirt_trim_manwear,0
 womanwear=obj_black_plateskirt_trim_womanwear,0
 wearpos=legs
 weight=20lb
+category=armour_legs
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,51
+param=slashdefence,49
+param=crushdefence,47
+param=magicdefence,-4
+param=rangedefence,49
 param=zamorakitem,^true
-
 [rune_plateskirt_saradomin]
 name=Saradomin skirt
 desc=Rune plateskirt in the colours of Saradomin.
@@ -40352,8 +40373,15 @@ manwear=obj_black_plateskirt_trim_manwear,0
 womanwear=obj_black_plateskirt_trim_womanwear,0
 wearpos=legs
 weight=20lb
+category=armour_legs
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,51
+param=slashdefence,49
+param=crushdefence,47
+param=magicdefence,-4
+param=rangedefence,49
 param=saradominitem,^true
-
 [rune_plateskirt_guthix]
 name=Guthix plateskirt
 desc=Rune plateskirt in the colours of Guthix.
@@ -40376,8 +40404,15 @@ manwear=obj_black_plateskirt_trim_manwear,0
 womanwear=obj_black_plateskirt_trim_womanwear,0
 wearpos=legs
 weight=20lb
+category=armour_legs
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,51
+param=slashdefence,49
+param=crushdefence,47
+param=magicdefence,-4
+param=rangedefence,49
 param=guthixitem,^true
-
 [rune_platebody_goldplate]
 name=Gilded platebody
 desc=Rune platebody with gold plate.
@@ -40402,7 +40437,14 @@ members=yes
 wearpos=torso
 wearpos2=arms
 weight=22lb
-
+category=armour_body
+param=magicattack,-30
+param=rangeattack,-10
+param=stabdefence,82
+param=slashdefence,80
+param=crushdefence,72
+param=magicdefence,-6
+param=rangedefence,80
 [cert_rune_platebody_goldplate]
 certlink=rune_platebody_goldplate
 certtemplate=template_for_cert
@@ -40427,7 +40469,14 @@ womanwear=obj_iron_platelegs_womanwear,0
 members=yes
 wearpos=legs
 weight=20lb
-
+category=armour_legs
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,51
+param=slashdefence,49
+param=crushdefence,47
+param=magicdefence,-4
+param=rangedefence,49
 [cert_rune_platelegs_goldplate]
 certlink=rune_platelegs_goldplate
 certtemplate=template_for_cert
@@ -40455,7 +40504,14 @@ womanwear=obj_black_plateskirt_trim_womanwear,0
 members=yes
 wearpos=legs
 weight=20lb
-
+category=armour_legs
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,51
+param=slashdefence,49
+param=crushdefence,47
+param=magicdefence,-4
+param=rangedefence,49
 [rune_full_helm_goldplate]
 name=Gilded full helm
 desc=Rune full helm with gold plate.
@@ -40480,7 +40536,14 @@ wearpos=hat
 wearpos2=head
 wearpos3=jaw
 weight=6lb
-
+category=armour_helmet
+param=magicattack,-6
+param=rangeattack,-2
+param=stabdefence,30
+param=slashdefence,32
+param=crushdefence,27
+param=magicdefence,-1
+param=rangedefence,30
 [cert_rune_full_helm_goldplate]
 certlink=rune_full_helm_goldplate
 certtemplate=template_for_cert
@@ -40507,7 +40570,15 @@ womanwear=obj_bronze_kiteshield_manwear,6
 members=yes
 wearpos=lefthand
 weight=12lb
-
+category=armour_shield
+param=magicattack,-8
+param=rangeattack,-2
+param=stabdefence,44
+param=slashdefence,48
+param=crushdefence,46
+param=magicdefence,-1
+param=rangedefence,46
+param=defend_anim,human_shield_defence
 [cert_rune_kiteshield_goldplate]
 certlink=rune_kiteshield_goldplate
 certtemplate=template_for_cert
