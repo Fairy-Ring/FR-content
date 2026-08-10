@@ -1,0 +1,111 @@
+// Dense forest Enter — Isafdar / Tyras camp cross-overs (category regicide_cross_over on 274).
+// Ported from LC Server 274 quest_regicide.rs2 [oploc1,_regicide_cross_over] (soft-pass 9→10).
+// 377 unpack locs lack category — explicit oploc1 per type.
+// Stage 9→10 write only on regicide_cross_over2_tyras_camp after defeated_guard.
+
+[oploc1,regicide_cross_over1] @regicide_dense_enter;
+[oploc1,regicide_cross_over2] @regicide_dense_enter;
+[oploc1,regicide_cross_over3] @regicide_dense_enter;
+[oploc1,regicide_cross_over1_tyras_camp] @regicide_dense_enter;
+[oploc1,regicide_cross_over2_tyras_camp] @regicide_dense_enter;
+
+[label,regicide_dense_enter]
+if(%regicide_quest < ^regicide_spoken_tracker2) {
+    mes("You can see no way to get past this.");
+    return;
+}
+if(loc_type = regicide_cross_over2_tyras_camp) {
+    if(%regicide_quest < ^regicide_defeated_guard) {
+        if(npc_find(coord, regicide_tyras_camp_guard, 7, 0) = true & add(%npc_lastcombat, 8) <= map_clock) {
+            @regicide_camp_guard_attack;
+        }
+        npc_add(coord, regicide_tyras_camp_guard, 500);
+        @regicide_camp_guard_attack;
+    }
+}
+if(stat(agility) < 56) {
+    mes("You need to be level 56 agility to pass this.");
+    return;
+}
+def_coord $dest;
+def_coord $start;
+def_int $dir;
+def_seq $seq;
+def_coord $lb;
+def_coord $ub;
+def_synth $synth;
+def_int $synth_delay = 0;
+switch_loc (loc_type) {
+    case regicide_cross_over1, regicide_cross_over1_tyras_camp :
+        $seq = human_walk_style;
+        $synth = forest_lowwall;
+        $synth_delay = 30;
+    case regicide_cross_over2, regicide_cross_over2_tyras_camp :
+        $seq = human_doublepipesqueeze;
+        $synth = forest_doublesqueeze;
+        $synth_delay = 30;
+    case regicide_cross_over3 :
+        $seq = regicide_tightfit;
+        $synth = forest_sidesqueeze;
+        $synth_delay = 40;
+}
+switch_int(loc_angle) {
+    case ^loc_north, ^loc_south :
+        if(coordx(coord) < coordx(loc_coord)) {
+            $start = movecoord(loc_coord, -1, 0, 1);
+            $dest = movecoord(loc_coord, 2, 0, 1);
+            $dir = ^exact_east;
+        } else {
+            $start = movecoord(loc_coord, 2, 0, 1);
+            $dest = movecoord(loc_coord, -1, 0, 1);
+            $dir = ^exact_west;
+        }
+        $lb = movecoord($start, 0, 0, -1);
+        $ub = movecoord($dest, 0, 0, 1);
+    case ^loc_east, ^loc_west :
+        if(coordz(coord) < coordz(loc_coord)) {
+            $start = movecoord(loc_coord, 1, 0, -1);
+            $dest = movecoord(loc_coord, 1, 0, 2);
+            $dir = ^exact_north;
+        } else {
+            $start = movecoord(loc_coord, 1, 0, 2);
+            $dest = movecoord(loc_coord, 1, 0, -1);
+            $dir = ^exact_south;
+        }
+        $lb = movecoord(loc_coord, 0, 0, -1);
+        $ub = movecoord(loc_coord, 2, 0, 2);
+}
+if(distance(coord, $start) > 1) {
+    return;
+}
+anim($seq, 30);
+sound_synth($synth, 1, $synth_delay);
+p_locmerge(30, 94, $lb, $ub);
+p_exactmove($start, $dest, 30, 94, $dir);
+p_delay(3);
+if(coord = 0_34_49_55_13 & %regicide_quest = ^regicide_spoken_tracker2) {
+    ~spawn_tyras_guard;
+}
+if(loc_type = regicide_cross_over2_tyras_camp) {
+    if(%regicide_quest = ^regicide_defeated_guard) {
+        %regicide_quest = ^regicide_entered_camp;
+    }
+}
+if(loc_type = regicide_cross_over3) {
+    if(testbit(%regicide_bits, ^regicide_given_rabbit) = ^true & inzone(0_34_49_0_0, 0_34_49_63_63, coord) = true) {
+        %regicide_bits = clearbit(%regicide_bits, ^regicide_given_rabbit);
+    }
+}
+
+[label,regicide_camp_guard_attack]
+~chatnpc("<p,neutral>I remember you! You're the one who's working with them wicked elves. I will make you pay for that mistake.");
+~npc_retaliate(0);
+
+[proc,spawn_tyras_guard]
+if(testbit(%regicide_bits, ^regicide_seen_guard) = ^true) {
+    return;
+}
+%regicide_bits = setbit(%regicide_bits, ^regicide_seen_guard);
+npc_add(map_findsquare(0_34_49_52_10, 0, 1, ^vis_lineofwalk), regicide_old_camp_guard, 500);
+npc_say("I see you making nice with that elf, traitor!");
+~npc_retaliate(0);
