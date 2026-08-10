@@ -10233,3 +10233,8 @@ basevar=misc_varbit_3
 startbit=29
 endbit=29
 
+[mm_foreman]
+basevar=mm_misc
+startbit=0
+endbit=1
+

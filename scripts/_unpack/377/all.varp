@@ -1454,3 +1454,21 @@ scope=perm
 transmit=yes
 
 [varp_724]
+
+[mm_misc]
+scope=perm
+
+[mm_flags]
+scope=perm
+
+[mm_monkeys]
+scope=perm
+
+[mm_cutscene_part]
+scope=perm
+
+[mm_cutscene_coord]
+scope=perm
+
+[mm_guards_cooldown]
+scope=perm
