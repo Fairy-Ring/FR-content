@@ -69,11 +69,11 @@
 68=boardgames_rankedgame
 69=varbit_69
 70=varbit_70
-71=varbit_71
+71=misc_restotal
 72=misc_approval
 73=misc_affection
 74=misc_coffers
-75=varbit_75
+75=misc_acceptedtomarry
 76=misc_toldking
 77=misc_grantedaudience
 78=misc_visited
@@ -96,7 +96,7 @@
 95=misc_s2_give
 96=misc_s1_emote
 97=misc_s3_emote
-98=varbit_98
+98=misc_finish_gender
 99=varbit_99
 100=varbit_100
 101=varbit_101
@@ -2132,3 +2132,6 @@
 2131=eadgar_pete_dialog_1
 2132=eadgar_scarecrow_items
 2133=eadgar_pete_dialog_2
+2134=varbit_71
+2135=varbit_75
+2136=varbit_98

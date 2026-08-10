@@ -1,0 +1,8 @@
+// Stubs so advisor post-complete branches compile. Full Managing UI = follow-on unit.
+// Do not claim kingdom management is product-complete.
+
+[proc,open_manage_miscellania_interface]
+mes("Managing Miscellania is not available yet.");
+
+[proc,manage_misc_resource_generation]()(string)
+return ("Your subjects have not collected any resources.");

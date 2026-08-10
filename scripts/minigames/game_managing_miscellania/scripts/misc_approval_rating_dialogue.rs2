@@ -1,0 +1,4 @@
+// Thin: approval % string for Throne quest dialogue (289). Full rating labels later.
+
+[proc,misc_approval_percentage]()(string)
+return (tostring(divide(multiply(%misc_approval, 100), 127)));

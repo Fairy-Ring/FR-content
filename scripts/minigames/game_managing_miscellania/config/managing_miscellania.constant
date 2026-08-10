@@ -1,0 +1,12 @@
+// Thin slice for Throne of Miscellania quest compile (289 managing_miscellania.constant).
+// Full kingdom daily/UI = separate follow-on unit (port-mg-managing-misc).
+
+^MISCELLANIA_INTERVAL = 1440
+
+^MISC_APPROVAL_100_PERCENT = 127
+^MISC_APPROVAL_75_PERCENT = 96
+^MISC_APPROVAL_50_PERCENT = 64
+^MISC_APPROVAL_25_PERCENT = 32
+
+^miscellania_lower_bound = 0_39_60_0_0
+^miscellania_upper_bound = 0_40_60_22_63

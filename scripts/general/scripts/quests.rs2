@@ -181,6 +181,9 @@ if (%hazeelcultquest = ^hazeelcult_complete) {
 if (%heroquest = ^hero_complete) {
     $questpoints = add($questpoints, ^hero_questpoints); 
 }
+if (%misc_quest = ^misc_complete) {
+    $questpoints = add($questpoints, ^misc_questpoints);
+}
 if (%itgronigen >= ^itgronigen_complete) { // varp is incremented for getting wine post quest
     $questpoints = add($questpoints, ^itgronigen_questpoints); 
 }
@@ -327,6 +330,7 @@ if (%phoenixgang > ^phoenixgang_not_started & %blackarmgang ! ^blackarmgang_comp
 ~send_quest_progress_colour(questlist:viking, %viking, ^viking_complete);
 ~send_quest_progress_colour(questlist:regicide, %regicide_quest, ^regicide_complete);
 ~send_quest_progress_colour(questlist:routequest, %routequest, ^routequest_complete);
+~send_quest_progress_colour(questlist:misc, %misc_quest, ^misc_complete);
 ~send_quest_progress_colour(questlist:ikov, %ikov, ^ikov_completed_armadyl);
 ~send_quest_progress_colour(questlist:biohazard, %biohazard, ^biohazard_complete);
 ~send_quest_progress_colour(questlist:sheepherder, %sheepherderquest, ^sheepherder_complete);

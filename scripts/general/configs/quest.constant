@@ -52,6 +52,8 @@
 ^routequest_questpoints = 2
 ^viking_complete = 10
 ^viking_questpoints = 3
+^misc_complete = 100
+^misc_questpoints = 1
 ^mm_complete = 10
 ^recruitmentdrive_complete = 2
 ^deserttreasure_complete = 15
