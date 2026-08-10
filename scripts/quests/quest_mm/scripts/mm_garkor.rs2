@@ -1,5 +1,6 @@
-// MM Garkor — Ape Atoll intro (289 mm_garkor first path).
-// Map spawn is mm_garkor_aa (pack 1411 @ m43_43). Later disguise/ch4 residual.
+// MM Garkor — Ape Atoll intro + post-Awowogei ch4 thin (289 mm_garkor).
+// Map spawn is mm_garkor_aa (pack 1411 @ m43_43).
+// Residual: full ch4 Waydar/Caranock cutscene map; final battle / sigil wear.
 
 // 377 map spawn name is mm_garkor_aa (289 script type was mm_garkor).
 [opnpc1,mm_garkor_aa]
@@ -11,12 +12,41 @@ if(%mm_main >= ^mm_defeated_demon) {
 }
 switch_int(%mm_garkor) {
     case ^garkor_joined_10th_squad :
-        ~mesbox("The final battle residual is not ready yet.");
+        // 289 multi; thin: remind to wear sigil when ready
+        if(inv_total(inv, mm_sigil) = 0 & inv_total(worn, mm_sigil) = 0) {
+            ~chatplayer("<p,shifty>I've lost the sigil...");
+            ~chatnpc("<p,neutral>For all your power, your kind are exceptionally foolish. You must seek out Waymottin and ask him to make a replica. I have no spares. (replica residual)");
+            return;
+        }
+        ~chatplayer("<p,quiz>What should I do now?");
+        ~chatnpc("<p,neutral>Collect your thoughts and belongings and then wear our squad sigil. Hurry, human, we do not wish to enter this fight without you.");
     case ^garkor_learned_plan :
-        ~mesbox("The sigil residual is not ready yet.");
+        // After thin ch4 — product sigil hand-out (289)
+        ~chatplayer("<p,neutral>What shall we do?");
+        ~chatnpc("<p,neutral>Zooknock and I have come up with a plan.");
+        ~chatplayer("<p,quiz>What kind of a plan?");
+        ~chatnpc("<p,neutral>I hope you were listening closely. The teleportation spell that was provided will teleport ALL of the 10th squad, no matter where we may be.");
+        ~chatnpc("<p,neutral>In effect, the spell will break Lumo, Bunkdo and Carado out of the jail for us.");
+        ~chatplayer("<p,neutral>But you will be teleported straight into whatever trap they have prepared!");
+        ~chatnpc("<p,neutral>Indeed. This is where you come in. Do not forget that we are the 10th squad of the Royal Guard, and that we are more than capable of holding our own.");
+        ~chatnpc("<p,neutral>With your assistance, we should be able to defeat whatever is thrown at us.");
+        ~chatplayer("<p,quiz>But how will I join you?");
+        ~chatnpc("<p,neutral>Simple. We fool the teleportation spell that you are in fact a member of our squad.");
+        ~chatplayer("<p,quiz>What?");
+        ~chatnpc("<p,neutral>Zooknock knows Glough's grasp of magic well. He believes the spell is linked to the sigils that all of our squad carry.");
+        ~chatnpc("<p,neutral>It is these sigils that identify us as a member of the squad.");
+        %mm_garkor = ^garkor_joined_10th_squad;
+        inv_add(inv, mm_sigil, 1);
+        ~objbox(mm_sigil, "Garkor hands you some kind of medallion.", 250, 0, 0);
+        ~chatnpc("<p,neutral>Welcome to the 10th squad, <displayname()>.");
+        ~chatplayer("<p,quiz>What is it?");
+        ~chatnpc("<p,neutral>It is a replica Waymottin has made of our squad sigils. If you wear that when the spell is cast, you will be summoned along with the rest of us.");
+        ~chatnpc("<p,neutral>You should prepare. Collect your thoughts and belongings and then wear the sigil. Hurry, human, we do not wish to enter this fight without you.");
+        ~chatplayer("<p,neutral>All I have to do is wear this sigil?");
+        ~chatnpc("<p,neutral>Yes - but do not do so until you are ready.");
     case ^garkor_seek_alliance :
-        ~chatnpc("<p,neutral>I need you now to seek audience with Awowogei. Claim you are an envoy from the monkeys of Karamja and are seeking an alliance.");
-        ~chatnpc("<p,neutral>You must win his trust if we are to succeed.");
+        // 289: always re-enter p4 (awo complete → ch4 path)
+        @mm_garkor_p4;
     case ^garkor_need_correct_disguise :
         if(~mm_wearing_greegree = true) {
             if(inv_total(worn, mm_monkey_greegree_for_normal_monkey) = 0) {
@@ -95,8 +125,41 @@ switch_int(%mm_garkor) {
 ~chatplayer("<p,shock>I can't even communicate with the monkeys!");
 ~chatnpc("<p,angry>Just go and find my squad mage, human.");
 
-// After correct Karamjan greegree (289 mm_garkor_p4). Awowogei / ch4 residual.
+// After correct Karamjan greegree (289 mm_garkor_p4).
+// Full 289: @mm_ch4_cutscene (Waydar/Caranock map) → completed_ch3 + learned_plan + ch4 card.
+// Thin: stage write + scroll chapter card; cutscene map residual.
 [label,mm_garkor_p4]
 if(%mm_garkor < ^garkor_seek_alliance) %mm_garkor = ^garkor_seek_alliance;
+if(%mm_awowogei = ^awowogei_complete_mission) {
+    ~chatnpc("<p,neutral>Well done on winning Awowogei's trust. I overheard everything from here.");
+    ~chatnpc("<p,neutral>However, your efforts may be in vain...");
+    ~chatplayer("<p,neutral>What do you mean?");
+    ~chatnpc("<p,neutral>Progress in the caves has been slow. Whilst you were in Ardougne, Bunkwicket and Waymottin overheard a slightly disturbing conversation.");
+    ~chatplayer("<p,neutral>Who was speaking? What was said?");
+    ~chatnpc("<p,neutral>Listen closely whilst I narrate the details...");
+    // Thin ch4: no cutscene map (289 residual). Stage write + chapter card.
+    if(%mm_main < ^mm_completed_ch3) %mm_main = ^mm_completed_ch3;
+    %mm_garkor = ^garkor_learned_plan;
+    @mm_ch4_thin;
+    return;
+}
 ~chatnpc("<p,neutral>I need you now to seek audience with Awowogei. Claim you are an envoy from the monkeys of Karamja and are seeking an alliance.");
 ~chatnpc("<p,neutral>You must win his trust if we are to succeed.");
+
+// Chapter 4 card (289 mm_ch4 / inter_199 → 377 scroll like ch2)
+[label,mm_ch4_thin]
+~music_jingle("new chapter");
+sound_synth(ooks, 0, 0);
+if_settext(scroll:com_2, "Monkey Madness: Chapter 4");
+if_settext(scroll:com_3, "");
+if_settext(scroll:com_4, "The Final Battle");
+if_settext(scroll:com_5, "");
+if_settext(scroll:com_6, "");
+if_settext(scroll:com_7, "");
+if_settext(scroll:com_8, "");
+if_settext(scroll:com_9, "");
+if_settext(scroll:com_10, "");
+if_settext(scroll:com_11, "");
+if_settext(scroll:com_12, "");
+if_settext(scroll:com_13, "");
+if_openmain(scroll);
