@@ -1,0 +1,111 @@
+// Regicide bomb delivery — catapult only (274 quest_regicide.rs2).
+// Soft mid ≥12: rabbit bit + fused barrel on catapult → %regicide_quest = killed_tyras (12).
+// spawn_tyras_guard stays in regicide_dense_forest.rs2 — do not duplicate.
+
+[oplocu,regicide_catapult]
+if(%regicide_quest >= ^regicide_killed_tyras) {
+    mes("I think I've done enough damage with that.");
+    return;
+}
+if(testbit(%regicide_bits, ^regicide_given_rabbit) = ^false) {
+    if(npc_find(coord, regicide_tyras_lazy_guard, 8, 0) = true) ~chatnpc("<p,neutral>Oi! Don't mess with that.");
+    return;
+}
+if(last_useitem = regicide_barrel_lid_fused) {
+    if(%regicide_quest ! ^regicide_spoken_iorwerth2) {
+        return;
+    }
+    if(%regicide_catapult_used = ^true) {
+        mes("The catapult is being used"); // complete guess
+        return;
+    }
+    %regicide_catapult_used = ^true;
+    p_delay(0);
+    ~forcewalk2(0_34_49_11_49);
+    facesquare(movecoord(coord, 0, 0, 1));
+    p_delay(1);
+    anim(regicide_catapultwind, 0);
+    loc_anim(winddown_catapult);
+    sound_synth(catapult_winch, 1, 0);
+    if(loc_find(0_34_49_10_47, regicide_catapult_left) = true) {
+        loc_anim(wind_catapult);
+    }
+    p_delay(1);
+    ~forcewalk2(0_34_49_9_52);
+    facesquare(movecoord(coord, 0, 0, -1));
+    p_delay(0);
+    anim(human_pickupfloor, 0);
+    inv_del(inv, regicide_barrel_lid_fused, 1);
+    loc_anim(unlitbarrel);
+    ~forcewalk2(0_34_49_7_49);
+    p_delay(0);
+    anim(regicide_catapault_trigger, 0);
+    if(loc_find(0_34_49_8_47, regicide_catapult_right) = true) {
+        loc_anim(trigger_catapult);
+    }
+    loc_anim(fire_catapult);
+    sound_synth(catapult_fire, 1, 0);
+    ~coord_projectile(0_34_49_9_49, 0_34_49_10_6, regicide_barrelflight, 138, 75, 50, 30, 170, 0, 0);
+    %regicide_catapult_used = ^false;
+    p_delay(4);
+    anim(regicide_player_vanish, 0);
+    p_teleport(0_36_71_10_6);
+    p_delay(0);
+    spotanim_map(regicide_barrelflight_exploding, 0_36_71_10_6, 194, 100);
+    sound_synth(barrel_incoming, 1, 35);
+    ~coord_projectile(0_36_71_10_18, 0_36_71_10_7, regicide_barrelflight, 112, 100, 10, 30, 90, 0, 0);
+    p_delay(2);
+    anim(regicide_player_vanish, 0);
+    loc_add(0_36_71_13_6, regicide_tent_human_fire, 0, wall_straight, 10);
+    loc_add(0_36_71_8_7, regicide_tent_human_fire, 2, wall_diagonal, 10);
+    loc_add(0_36_71_8_5, regicide_tent_human_fire, 1, wall_diagonal, 10);
+    loc_add(0_36_71_12_5, regicide_tent_human_fire, 0, wall_diagonal, 10);
+    loc_add(0_36_71_12_7, regicide_tent_human_fire, 3, wall_diagonal, 10);
+
+    loc_add(0_36_71_9_4, regicide_tent_human_fire, 1, wall_straight, 10);
+    loc_add(0_36_71_10_4, regicide_tent_human_fire, 1, wall_straight, 10);
+    loc_add(0_36_71_11_4, regicide_tent_human_fire, 1, wall_straight, 10);
+
+    loc_add(0_36_71_8_4, regicide_tent_human_fire, 1, wall_diagonalcorner, 10);
+    loc_add(0_36_71_12_4, regicide_tent_human_fire, 0, wall_diagonalcorner, 10);
+    loc_add(0_36_71_13_5, regicide_tent_human_fire, 0, wall_diagonalcorner, 10);
+    loc_add(0_36_71_13_7, regicide_tent_human_fire, 3, wall_diagonalcorner, 10);
+
+    loc_add(0_36_71_9_5, flamming_tent_roof, 1, centrepiece_straight, 10);
+    loc_add(0_36_71_10_5, flamming_tent_roof, 1, centrepiece_straight, 10);
+    loc_add(0_36_71_11_5, flamming_tent_roof, 1, centrepiece_straight, 10);
+
+    loc_add(0_36_71_9_7, flamming_tent_roof, 3, centrepiece_straight, 10);
+    loc_add(0_36_71_10_7, flamming_tent_roof, 3, centrepiece_straight, 10);
+    loc_add(0_36_71_11_7, flamming_tent_roof, 3, centrepiece_straight, 10);
+
+    loc_add(0_36_71_8_6, flamming_tent_roof, 2, centrepiece_straight, 10);
+    loc_add(0_36_71_12_6, flamming_tent_roof,  0, centrepiece_straight, 10);
+    loc_add(0_36_71_9_6, regicide_tentroof_stump, 0, centrepiece_straight, 10);
+    loc_add(0_36_71_11_6, regicide_tentroof_stump, 3, centrepiece_straight, 10);
+
+    if(loc_find(0_36_71_10_6, regicide_tentroof_high_centre) = true) loc_del(10);
+    if(loc_find(0_36_71_8_4, regicide_propbarrel) = true) loc_anim(propbarrel_exploding);
+    if(loc_find(0_36_71_13_7, regicide_propbarrel) = true) loc_anim(propbarrel_exploding);
+
+    loc_add(0_36_71_10_8, regicide_tent_human_fire, 3, wall_straight, 10);
+    loc_add(0_36_71_9_8, regicide_tent_human_fire, 3, wall_straight, 10);
+    loc_add(0_36_71_11_8, regicide_tent_human_fire, 3, wall_straight, 10);
+
+    loc_add(0_36_71_8_8, regicide_tent_human_fire, 2, wall_diagonalcorner, 10);
+    loc_add(0_36_71_12_8, regicide_tent_human_fire, 3, wall_diagonalcorner, 10);
+
+    loc_add(0_36_71_7_6, regicide_tent_human_fire, 2, wall_straight, 10);
+    loc_add(0_36_71_7_5, regicide_tent_human_fire, 1, wall_diagonalcorner, 10);
+    loc_add(0_36_71_7_7, regicide_tent_human_fire, 2, wall_diagonalcorner, 10);
+    sound_synth(bigfire, 1, 0);
+    p_delay(7);
+    anim(regicide_player_vanish, 0);
+    p_teleport(0_34_49_7_49);
+    %regicide_quest = ^regicide_killed_tyras;
+    p_delay(3);
+    anim(null, 0);
+    return;
+}
+mes("I don't want to use that for ammo.");
+

@@ -37096,7 +37096,7 @@ model=obj_recommendedletter
 cost=1
 iop1=Read
 weight=2oz
-
+tradeable=no
 [regicide_iorwerth_message]
 name=Iorwerths message
 desc=A letter for King Lathas from Lord Iorwerth.
@@ -37110,7 +37110,7 @@ members=yes
 cost=1
 iop1=Read
 weight=2oz
-
+tradeable=no
 [regicide_crystal_pendant]
 name=Crystal pendant
 desc=Lord Iorwerth's crystal pendant.
@@ -37127,7 +37127,7 @@ manwear=obj_glarials_amulet_waterfall_quest_manwear,0
 womanwear=obj_glarials_amulet_waterfall_quest_womanwear,0
 weight=5g
 wearpos=front
-
+tradeable=no
 [regicide_sulphar]
 name=Sulphur
 desc=A piece of sulphur formation.
@@ -37139,7 +37139,9 @@ model=obj_regicide_sulphar
 2dxan=196
 members=yes
 weight=10g
-
+tradeable=no
+param=grindable_ingredient_refined,regicide_sulphar_dust
+param=grindable_ingredient_message,You grind the sulphur to dust
 [cert_regicide_sulphar]
 certlink=regicide_sulphar
 certtemplate=template_for_cert
@@ -37173,7 +37175,7 @@ model=obj_limestone
 2dxan=220
 members=yes
 weight=5lb
-
+tradeable=no
 [regicide_quicklime_dust]
 name=Pot of quicklime
 desc=A pot of ground quicklime.
@@ -37188,7 +37190,7 @@ model=obj_pot_flour
 2dxan=368
 members=yes
 weight=1lb
-
+tradeable=no
 [regicide_sulphar_dust]
 name=Ground sulphur
 desc=A pile of ground sulphur.
@@ -37202,7 +37204,7 @@ model=obj_unicorn_horn_dust
 2dxan=264
 members=yes
 weight=2oz
-
+tradeable=no
 [regicide_barrel_empty]
 name=Barrel
 desc=An empty barrel.
@@ -37214,7 +37216,7 @@ model=obj_regicide_barrel_empty
 2dxan=152
 members=yes
 weight=10kg
-
+tradeable=no
 [cert_regicide_barrel_empty]
 certlink=regicide_barrel_empty
 certtemplate=template_for_cert
@@ -37230,7 +37232,7 @@ model=obj_regicide_barrel_lid
 2dxan=152
 members=yes
 weight=32kg
-
+tradeable=no
 [regicide_barrel_lid_fused]
 name=Barrel bomb
 desc=A fused barrel full of fire oil.
@@ -37242,7 +37244,7 @@ model=obj_regicide_barrel_lid
 2dxan=152
 members=yes
 weight=32kg
-
+tradeable=no
 [regicide_barrel_tar]
 name=Barrel of coal-tar
 desc=A barrel full of coal-tar.
@@ -37254,7 +37256,7 @@ model=obj_regicide_barrel_tar
 2dxan=152
 members=yes
 weight=32kg
-
+tradeable=no
 [regicide_barrel_naphtha]
 name=Barrel of naphtha
 desc=A barrel full of naphtha.
@@ -37266,7 +37268,7 @@ model=obj_regicide_barrel_naphtha
 2dxan=152
 members=yes
 weight=32kg
-
+tradeable=no
 [regicide_barrel_naphtha_sulphar_mix]
 name=Naphtha mix
 desc=A barrel full of naphtha and sulphur.
@@ -37280,7 +37282,7 @@ model=obj_regicide_barrel_naphtha
 2dxan=152
 members=yes
 weight=32kg
-
+tradeable=no
 [regicide_barrel_naphtha_quicklime_mix]
 name=Naphtha mix
 desc=A barrel full of naphtha and quicklime.
@@ -37294,7 +37296,7 @@ model=obj_regicide_barrel_naphtha
 2dxan=152
 members=yes
 weight=32kg
-
+tradeable=no
 [regicide_cloth]
 name=Cloth
 desc=A bolt of cloth.
@@ -37307,7 +37309,7 @@ model=obj_childs_blanket
 2dxan=368
 members=yes
 weight=12oz
-
+tradeable=no
 [cert_regicide_cloth]
 certlink=regicide_cloth
 certtemplate=template_for_cert
@@ -37324,7 +37326,7 @@ model=obj_raw_rabbit
 cost=20
 members=yes
 weight=6oz
-
+category=cooking_generic
 [cert_raw_rabbit]
 certlink=raw_rabbit
 certtemplate=template_for_cert
@@ -37346,7 +37348,7 @@ model=obj_enchanted_beef
 2dxan=308
 members=yes
 weight=5oz
-
+category=category_5
 [cert_cooked_rabbit]
 certlink=cooked_rabbit
 certtemplate=template_for_cert
@@ -37366,7 +37368,7 @@ model=obj_digsitebook
 members=yes
 iop1=Read
 weight=8oz
-
+tradeable=no
 [regicide_alchemy_symbol1]
 name=Symbol1
 desc=An alchemy symbol
@@ -37376,7 +37378,7 @@ model=obj_regicide_alchemy_symbol1
 2dzoom=1890
 2dxan=496
 weight=1g
-
+tradeable=no
 [cert_regicide_alchemy_symbol1]
 certlink=regicide_alchemy_symbol1
 certtemplate=template_for_cert
@@ -37390,7 +37392,7 @@ model=obj_regicide_alchemy_symbol2
 2dzoom=1890
 2dxan=496
 weight=1g
-
+tradeable=no
 [cert_regicide_alchemy_symbol2]
 certlink=regicide_alchemy_symbol2
 certtemplate=template_for_cert
@@ -37404,7 +37406,7 @@ model=obj_regicide_alchemy_symbol3
 2dzoom=1890
 2dxan=496
 weight=1g
-
+tradeable=no
 [cert_regicide_alchemy_symbol3]
 certlink=regicide_alchemy_symbol3
 certtemplate=template_for_cert
@@ -37418,7 +37420,7 @@ model=obj_regicide_alchemy_symbol4
 2dzoom=1890
 2dxan=496
 weight=1g
-
+tradeable=no
 [cert_regicide_alchemy_symbol4]
 certlink=regicide_alchemy_symbol4
 certtemplate=template_for_cert

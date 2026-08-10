@@ -28662,7 +28662,7 @@ sharelight=yes
 forcedecor=yes
 active=yes
 op1=Cross
-
+category=regicide_logbalance
 [regicide_logbalance2_start]
 name=Log balance
 desc=I can balance on this log.
@@ -28674,7 +28674,7 @@ sharelight=yes
 forcedecor=yes
 active=yes
 op1=Cross
-
+category=regicide_logbalance
 [regicide_logbalance3_start]
 name=Log balance
 desc=I can balance on this log.
@@ -28686,7 +28686,7 @@ sharelight=yes
 forcedecor=yes
 active=yes
 op1=Cross
-
+category=regicide_logbalance
 [regicide_blue_grass1]
 model=regicide_grass1
 recol1s=11712
@@ -28724,7 +28724,7 @@ model=regicide_cross_over1
 width=3
 length=2
 op1=Enter
-
+category=regicide_cross_over
 [regicide_cross_over2]
 name=Dense forest
 desc=It looks as if the grass here has been flattened.
@@ -28732,7 +28732,7 @@ model=regicide_cross_over2
 width=3
 length=2
 op1=Enter
-
+category=regicide_cross_over
 [regicide_cross_over3]
 name=Dense forest
 desc=You notice the leaf litter here has been disturbed.
@@ -28740,7 +28740,7 @@ model=regicide_cross_over3
 width=3
 length=2
 op1=Enter
-
+category=regicide_cross_over
 [regicide_rabbit_hutch]
 model=caveentrance5
 recol1s=25295
@@ -28942,21 +28942,21 @@ desc=A yellow crystal structure.
 model=regicide_sulphar1
 hillskew=yes
 op1=Take
-
+category=regicide_sulphar
 [regicide_sulphar2]
 name=Sulphur
 desc=A yellow crystal structure.
 model=regicide_sulphar2
 hillskew=yes
 op1=Take
-
+category=regicide_sulphar
 [regicide_sulphar3]
 name=Sulphur
 desc=A yellow crystal structure.
 model=regicide_sulphar3
 hillskew=yes
 op1=Take
-
+category=regicide_sulphar
 [regicide_sulphar_vent]
 model=regicide_sulphar_vent
 active=no
@@ -29279,7 +29279,7 @@ model=regicide_cross_over2
 width=3
 length=2
 op1=Enter
-
+category=regicide_cross_over
 [regicide_cross_over1_tyras_camp]
 name=Dense forest
 desc=There are some broken twigs here.
@@ -29287,7 +29287,7 @@ model=regicide_cross_over1
 width=3
 length=2
 op1=Enter
-
+category=regicide_cross_over
 [flamming_tent_roof]
 name=Tent roof
 desc=A tent roof.
@@ -95347,4 +95347,13 @@ length=2
 hillskew=yes
 op1=Take-from
 
+
+[regicide_old_camp_footprints]
+name=Tracks
+desc=Tracks in the soil.
+model=loc_3941
+hillskew=yes
+shadow=no
+op1=Follow
+blockwalk=no
 

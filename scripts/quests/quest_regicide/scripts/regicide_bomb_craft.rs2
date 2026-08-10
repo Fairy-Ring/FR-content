@@ -1,0 +1,170 @@
+// Regicide bomb material craft (274 quest_regicide.rs2 slice).
+// Still/naphtha: later fractionalizing_still port; soft give naphtha OK for mid smoke.
+
+[opheldu,regicide_sulphar]
+~attempt_grind_ingredient(last_useslot, last_slot);
+
+[oploc1,regicide_sulphar1]
+[oploc1,regicide_sulphar2]
+[oploc1,regicide_sulphar3]
+inv_add(inv, regicide_sulphar, 1);
+mes("You break off a piece of the formation.");
+
+[oploc1,regicide_tar_collection]
+mes("I need something to hold the coal tar.");
+
+[oplocu,regicide_tar_collection]
+if(last_useitem = regicide_barrel_empty) {
+    inv_del(inv, regicide_barrel_empty, 1);
+    inv_add(inv, regicide_barrel_tar, 1);
+    anim(human_pickupfloor, 0);
+    mes("You fill the barrel with tar.");
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,regicide_heat_quicklime]
+p_arrivedelay;
+if(%regicide_quest < ^regicide_spoken_iorwerth2) {
+    // typo intentional
+    ~objbox(limestone, "I see no reason put this in the furnace.", 250, 0, 0);
+    return;
+}
+// https://youtu.be/wwJXlduVaxE?si=jDQIFE4TMqyDFFvO&t=513
+mes("You put the lime stone in the furnace.");
+anim(human_furnace, 0);
+sound_synth(furnace, 1, 0);
+p_delay(3);
+inv_del(inv, limestone, 1);
+inv_add(inv, regicide_quicklime, 1);
+anim(human_furnace, 0);
+sound_synth(sizzle, 1, 0);
+if(inv_totalcat(worn, armour_hands) > 0) {
+    mes("You retrieve a block of quicklime.");
+    return;
+}
+mes("You feel the quicklime corroding your skin.");
+~damage_self(8);
+
+[oplocu,regicide_loom]
+if(last_useitem = ball_of_wool) {
+    if(stat(crafting) < 10) {
+        ~mesbox("You need level 10 Crafting to make that."); // osrs
+        return;
+    }
+    if(inv_total(inv, ball_of_wool) < 4) {
+        ~mesbox("You don't have enough of that item to weave it into anything at this loom."); // OSRS, almost certainly wrong for pre-farming/weakqueue loom
+        return;
+    }
+    p_arrivedelay;
+    anim(regicide_useloom, 0);
+    sound_synth(loom, 1, 0);
+    p_delay(2);
+    mes("You weave the balls of wool into a strip of cloth.");
+    inv_del(inv, ball_of_wool, 4);
+    inv_add(inv, regicide_cloth, 1);
+    return;
+}
+~displaymessage(^dm_default);
+
+[oplocu,regicide_furnace]
+// limestone → quicklime: use [label,regicide_heat_quicklime] via furnace use path later
+if(last_useitem = limestone) {
+    @regicide_heat_quicklime;
+}
+~displaymessage(^dm_default);
+
+[opheldu,regicide_quicklime]
+if(last_useitem = pestle_and_mortar) {
+    inv_del(inv, regicide_quicklime, 1);
+    anim(human_herbing_grind, 0);
+    sound_synth(grind, 1, 0);
+    if(inv_total(inv, pot_empty) = 0) {
+        mes("You burn yourself on the caustic dust before spilling it on the ground.");
+        mes("Maybe you need something to store it in.");
+        ~damage_self(5);
+        return;
+    }
+    mes("You grind the quicklime to dust and store it in a pot."); // osrs sends this first before the fail mes, rs3 doesn't, not sure which is right
+    inv_del(inv, pot_empty, 1);
+    inv_add(inv, regicide_quicklime_dust, 1);
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,regicide_barrel_tar]
+mes("I don't want to contaminate the coal tar."); // no item check
+
+[opheldu,regicide_barrel_naphtha]
+if(last_useitem = regicide_quicklime | last_useitem = regicide_sulphar) {
+    mes("I think I should powder this first.");
+    return;
+}
+if(last_useitem = regicide_quicklime_dust) {
+    mes("You mix the quicklime dust into the naphtha.");
+    inv_del(inv, regicide_quicklime_dust, 1);
+    inv_del(inv, regicide_barrel_naphtha, 1);
+    inv_add(inv, regicide_barrel_naphtha_quicklime_mix, 1);
+    return;
+}
+if(last_useitem = regicide_sulphar_dust) {
+    mes("You mix the sulphur dust into the naphtha.");
+    inv_del(inv, regicide_sulphar_dust, 1);
+    inv_del(inv, regicide_barrel_naphtha, 1);
+    inv_add(inv, regicide_barrel_naphtha_sulphar_mix, 1);
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,regicide_barrel_naphtha_quicklime_mix]
+if(last_useitem = regicide_quicklime | last_useitem = regicide_sulphar) {
+    mes("I think I should powder this first.");
+    return;
+}
+if(last_useitem = regicide_quicklime_dust) {
+    mes("There is quicklime mixed into the naphtha already.");
+    return;
+}
+if(last_useitem = regicide_sulphar_dust) {
+    mes("You mix the sulphur dust into the naphtha and seal the barrel.");
+    mes("Now you just need to make a fuse for it.");
+    inv_del(inv, regicide_sulphar_dust, 1);
+    inv_del(inv, regicide_barrel_naphtha_quicklime_mix, 1);
+    inv_add(inv, regicide_barrel_lid, 1);
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,regicide_barrel_naphtha_sulphar_mix]
+if(last_useitem = regicide_quicklime | last_useitem = regicide_sulphar) {
+    mes("I think I should powder this first.");
+    return;
+}
+if(last_useitem = regicide_quicklime_dust) {
+    mes("You mix the quicklime dust into the naphtha and seal the barrel.");
+    mes("Now you just need to make a fuse for it.");
+    inv_del(inv, regicide_quicklime_dust, 1);
+    inv_del(inv, regicide_barrel_naphtha_sulphar_mix, 1);
+    inv_add(inv, regicide_barrel_lid, 1);
+    return;
+}
+if(last_useitem = regicide_sulphar_dust) {
+    mes("There is sulphur mixed into the naphtha already.");
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,regicide_barrel_lid]
+if(last_useitem = ball_of_wool) { // yes, this interaction only works one way
+    mes("The wool is too thin to fit well, maybe if I weave a load of it together it will work.");
+    return;
+}
+if(last_useitem = regicide_cloth) {
+    mes("You stuff cloth through a hole in the barrel to make a fuse.");
+    inv_del(inv, regicide_cloth, 1);
+    inv_del(inv, regicide_barrel_lid, 1);
+    inv_add(inv, regicide_barrel_lid_fused, 1);
+    return;
+}
+~displaymessage(^dm_default);
+

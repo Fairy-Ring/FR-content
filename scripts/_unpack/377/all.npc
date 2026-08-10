@@ -1540,7 +1540,6 @@ param=death_anim,duck_death
 param=attack_sound,quack
 param=defend_sound,duck_hit
 param=death_sound,duck_death
-param=death_drop,null
 param=slayer_category,^slayer_bird
 category=duck
 
@@ -1577,7 +1576,6 @@ param=death_anim,duck_death
 param=attack_sound,quack
 param=defend_sound,duck_hit
 param=death_sound,duck_death
-param=death_drop,null
 param=slayer_category,^slayer_bird
 category=duck
 
@@ -1616,7 +1614,6 @@ param=death_anim,duck_death
 param=attack_sound,quack
 param=defend_sound,duck_hit
 param=death_sound,duck_death
-param=death_drop,null
 param=slayer_category,^slayer_bird
 category=duckling
 huntmode=duck_hunt
@@ -1653,7 +1650,6 @@ param=death_anim,rat_death
 param=attack_sound,rat_attack
 param=defend_sound,rat_hit
 param=death_sound,rat_death
-param=death_drop,null
 param=slayer_category,^slayer_rat
 
 [oomlie_bird]
@@ -1723,8 +1719,6 @@ vislevel=1
 param=attack_anim,dryhad_attack
 param=defend_anim,dryhad_block
 param=death_anim,dryhad_death
-param=attack_sound,null
-param=defend_sound,null
 param=death_sound,null
 
 [fairy]
@@ -1766,7 +1760,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 huntmode=cowardly
 huntrange=1
 
@@ -1798,7 +1791,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 huntmode=cowardly
 huntrange=1
 
@@ -1826,7 +1818,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 huntmode=cowardly
 huntrange=1
 
@@ -1855,7 +1846,6 @@ param=death_anim,spider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 param=slayer_category,^slayer_spider
 
 [jungle_spider]
@@ -1888,7 +1878,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 param=slayer_category,^slayer_spider
 huntmode=cowardly
 huntrange=1
@@ -1922,7 +1911,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 param=slayer_category,^slayer_spider
 huntmode=cowardly
 huntrange=1
@@ -1955,7 +1943,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 param=slayer_category,^slayer_spider
 huntmode=cowardly
 huntrange=1
@@ -2494,7 +2481,6 @@ param=death_anim,golem_death
 param=attack_sound,golem_attack
 param=defend_sound,golem_hit
 param=death_sound,golem_death
-param=death_drop,null
 
 [giantrat]
 name=Giant rat
@@ -2924,7 +2910,6 @@ param=death_anim,ghost_death
 param=attack_sound,ghost_attack
 param=defend_sound,ghost_hit
 param=death_sound,ghost_death
-param=death_drop,null
 param=undead,^true
 param=slayer_category,^slayer_ghost
 huntmode=cowardly
@@ -2957,7 +2942,6 @@ param=death_anim,ghost_death
 param=attack_sound,ghost_attack
 param=defend_sound,ghost_hit
 param=death_sound,ghost_death
-param=death_drop,null
 param=undead,^true
 param=slayer_category,^slayer_ghost
 
@@ -3044,7 +3028,6 @@ param=damagetype,^stab_style
 param=attack_anim,scorpion_attack
 param=defend_anim,scorpion_parry
 param=death_anim,scorpion_death
-param=death_drop,null
 param=slayer_category,^slayer_scorpion
 huntmode=cowardly
 huntrange=2
@@ -3076,7 +3059,6 @@ param=damagetype,^stab_style
 param=attack_anim,scorpion_attack
 param=defend_anim,scorpion_parry
 param=death_anim,scorpion_death
-param=death_drop,null
 param=poison_severity,15
 param=slayer_category,^slayer_scorpion
 huntmode=cowardly
@@ -3106,7 +3088,6 @@ param=damagetype,^stab_style
 param=attack_anim,smallscorpion_attack
 param=defend_anim,smallscorpion_block
 param=death_anim,smallscorpion_death
-param=death_drop,null
 param=slayer_category,^slayer_scorpion
 huntmode=cowardly
 huntrange=1
@@ -3714,7 +3695,6 @@ param=damagetype,^crush_style
 param=attack_sound,otherworld_attack
 param=defend_sound,otherworld_hit
 param=death_sound,otherworld_death
-param=death_drop,null
 
 [magicaxe]
 name=Magic axe
@@ -3916,7 +3896,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 param=slayer_category,^slayer_spider
 param=poison_severity,27
 huntmode=cowardly
@@ -4203,7 +4182,6 @@ param=death_anim,scorpion_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 huntmode=cowardly
 huntrange=2
 
@@ -4401,7 +4379,6 @@ param=stabdefence,30
 param=slashdefence,8
 param=crushdefence,45
 param=damagetype,^stab_style
-param=attack_sound,null
 huntmode=aggressive_melee
 huntrange=1
 
@@ -7093,7 +7070,6 @@ param=death_anim,ghost_death
 param=attack_sound,ghost_attack
 param=defend_sound,ghost_hit
 param=death_sound,ghost_death
-param=death_drop,null
 param=undead,^true
 
 [sir_lancelot]
@@ -8077,7 +8053,6 @@ param=death_anim,scorpion_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 huntmode=aggressive_melee
 huntrange=2
 
@@ -8333,7 +8308,6 @@ param=crushdefence,35
 param=magicdefence,-7
 param=rangedefence,35
 param=damagetype,^crush_style
-param=defend_anim,null
 param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
@@ -11429,7 +11403,6 @@ param=defend_anim,human_sword_def
 param=attack_sound,stabsword_slash
 param=defend_sound,brassclash
 param=death_sound,swordclash2
-param=death_drop,null
 
 [sanfew]
 name=Sanfew
@@ -12383,7 +12356,6 @@ param=death_anim,ghost_death
 param=attack_sound,ghost_attack
 param=defend_sound,ghost_hit
 param=death_sound,ghost_death
-param=death_drop,null
 param=undead,^true
 param=slayer_category,^slayer_ghost
 
@@ -12427,7 +12399,6 @@ param=death_anim,smallscorpion_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 
 [mosol_rei]
 name=Mosol Rei
@@ -12570,7 +12541,6 @@ param=defend_sound,zombie_hit
 param=death_sound,zombie_death
 param=slayer_category,^slayer_skeleton
 param=undead,^true
-param=death_drop,null
 category=undead_one
 huntmode=cowardly
 huntrange=1
@@ -12611,7 +12581,6 @@ param=attack_sound,zombie_attack
 param=defend_sound,zombie_hit
 param=death_sound,zombie_death
 param=undead,^true
-param=death_drop,null
 category=undead_one
 huntmode=cowardly
 huntrange=1
@@ -12677,7 +12646,6 @@ param=attack_sound,zombie_attack
 param=defend_sound,zombie_hit
 param=death_sound,zombie_death
 param=undead,^true
-param=death_drop,null
 
 [zq_mainzombie2]
 name=Nazastarool
@@ -12711,7 +12679,6 @@ param=attack_sound,zombie_attack
 param=defend_sound,zombie_hit
 param=death_sound,zombie_death
 param=undead,^true
-param=death_drop,null
 
 [zq_mainzombie3]
 name=Nazastarool
@@ -12738,7 +12705,6 @@ param=attack_sound,ghost_attack
 param=defend_sound,ghost_hit
 param=death_sound,ghost_death
 param=undead,^true
-param=death_drop,null
 
 [brimhavencartdriver]
 name=Hajedy
@@ -17052,7 +17018,6 @@ param=death_anim,ghost_death
 param=attack_sound,ghost_attack
 param=defend_sound,ghost_hit
 param=death_sound,ghost_death
-param=death_drop,null
 
 [cave_monk]
 name=Cave monk
@@ -19287,7 +19252,6 @@ param=death_anim,ghost_death
 param=attack_sound,ghost_attack
 param=defend_sound,ghost_hit
 param=death_sound,ghost_death
-param=death_drop,null
 param=undead,^true
 param=slayer_category,^slayer_ghost
 huntmode=cowardly
@@ -23250,7 +23214,6 @@ param=death_anim,skavid_death
 param=attack_sound,unarmed_punch
 param=defend_sound,imp_hit
 param=death_sound,imp_death
-param=death_drop,null
 category=witches_experiment
 
 [shapeshifterspider]
@@ -23276,7 +23239,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 category=witches_experiment
 
 [shapeshifterbear]
@@ -23305,7 +23267,6 @@ param=death_anim,bear_death
 param=attack_sound,bear_attack
 param=defend_sound,bear_hit
 param=death_sound,bear_death
-param=death_drop,null
 category=witches_experiment
 
 [shapeshifterwolf]
@@ -23333,7 +23294,6 @@ param=death_anim,dog_death
 param=attack_sound,wolf_attack
 param=defend_sound,wolf_hit
 param=death_sound,wolf_death
-param=death_drop,null
 category=witches_experiment
 
 [witchrat]
@@ -23533,7 +23493,6 @@ hitpoints=3
 attack=15
 defence=20
 strength=10
-param=death_drop,null
 category=kolodion
 
 [kologre]
@@ -23572,7 +23531,6 @@ param=spawn_anim,giant_teleport_reverse
 param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
-param=death_drop,null
 category=kolodion
 
 [kolspider]
@@ -23603,7 +23561,6 @@ param=spawn_anim,giantspider_teleport_reverse
 param=attack_sound,kilrag_attack
 param=defend_sound,kilrag_hit
 param=death_sound,kilrag_death
-param=death_drop,null
 category=kolodion
 
 [kolethereal]
@@ -23649,7 +23606,6 @@ param=spawn_anim,human_castteleport_reverse
 param=attack_sound,otherworld_attack
 param=defend_sound,otherworld_hit
 param=death_sound,otherworld_death
-param=death_drop,null
 category=kolodion
 
 [zamorak_mage]
@@ -24454,7 +24410,6 @@ param=death_anim,skeleton_trans_death
 param=attack_sound,skeleton_attack
 param=defend_sound,skelly_hit
 param=death_sound,skeleton_death
-param=death_drop,null
 huntmode=aggressive_melee
 huntrange=1
 
@@ -24497,7 +24452,6 @@ param=death_anim,skeleton_trans_death
 param=attack_sound,skeleton_attack
 param=defend_sound,skelly_hit
 param=death_sound,skeleton_death
-param=death_drop,null
 huntmode=aggressive_melee
 huntrange=1
 
@@ -24541,7 +24495,6 @@ param=death_anim,skeleton_trans_death
 param=attack_sound,skeleton_attack
 param=defend_sound,skelly_hit
 param=death_sound,skeleton_death
-param=death_drop,null
 huntmode=aggressive_melee
 huntrange=1
 
@@ -24574,7 +24527,6 @@ defence=167
 param=undead,^true
 param=death_anim,ghost_death
 param=death_sound,ghost_death
-param=death_drop,null
 
 [newbie_cook_instructor]
 name=Master Chef
@@ -25559,7 +25511,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 huntmode=cowardly
 huntrange=1
 
@@ -26081,7 +26032,6 @@ param=death_anim,giantspider_death
 param=attack_sound,kilrag_attack
 param=defend_sound,kilrag_hit
 param=death_sound,kilrag_death
-param=death_drop,null
 huntrange=5
 huntmode=cowardly
 
@@ -26204,7 +26154,6 @@ param=death_anim,spider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 param=slayer_category,^slayer_spider
 
 [non_combat_bat]
@@ -26219,7 +26168,6 @@ minimap=no
 wanderrange=8
 param=death_anim,bat_death
 param=death_sound,bat_death
-param=death_drop,null
 
 [seaslug]
 name=Sea slug
@@ -26318,7 +26266,6 @@ param=death_anim,giantspider_death
 param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
-param=death_drop,null
 param=slayer_category,^slayer_spider
 huntmode=cowardly
 huntrange=1
@@ -29149,7 +29096,9 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_woodelf
-
+defaultmode=none
+wanderrange=0
+moverestrict=nomove
 [regicide_darkelf]
 name=Elf warrior
 desc=He looks pretty handy with that bow.
@@ -29162,7 +29111,30 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_staffready
 op2=Attack
 vislevel=90
-
+wanderrange=5
+maxrange=7
+attackrange=8
+respawnrate=60
+hitpoints=105
+attack=10
+strength=80
+defence=10
+ranged=80
+param=rangebonus,8
+param=stabdefence,50
+param=slashdefence,50
+param=crushdefence,50
+param=magicdefence,50
+param=rangedefence,70
+param=damagetype,^stab_style
+param=attack_anim,human_bow
+param=defend_anim,human_spear_block
+param=defend_sound,crystal_armour_1
+param=death_sound,elf_death
+param=rangeattack_sound,crystal_bow2
+param=proj_launch,sp_attack_glow_arrow_launch
+param=proj_travel,sp_attack_glow_arrow_travel
+category=elf_warrior
 [regicide_darkelf2]
 name=Elf warrior
 desc=I don't wanna be at the wrong end of that pike.
@@ -29175,7 +29147,27 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_staffready
 op2=Attack
 vislevel=108
-
+wanderrange=5
+maxrange=7
+attackrange=2
+respawnrate=60
+hitpoints=105
+attack=95
+strength=95
+defence=80
+ranged=0
+param=stabdefence,50
+param=slashdefence,70
+param=crushdefence,70
+param=magicdefence,60
+param=rangedefence,50
+param=damagetype,^stab_style
+param=attack_anim,human_spear_spike
+param=defend_anim,human_spear_block
+param=attack_sound,crystal_polearm
+param=defend_sound,crystal_armour_2
+param=death_sound,elf_death
+category=elf_warrior
 [prif_city_guard]
 name=Elven city guard
 desc=An elven city guard.
@@ -29204,7 +29196,8 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_woodelf
 head2=npc_1186_head
-
+defaultmode=none
+hitpoints=51
 [regicide_evil_elf1]
 name=Essyllt
 desc=An elven war band leader.
@@ -29284,7 +29277,25 @@ resizeh=164
 resizev=164
 op2=Attack
 vislevel=2
-
+wanderrange=5
+maxrange=7
+respawnrate=50
+hitpoints=5
+category=rabbit
+param=attackbonus,-47
+param=strengthbonus,-42
+param=stabdefence,-42
+param=slashdefence,-42
+param=crushdefence,-42
+param=magicdefence,-42
+param=rangedefence,-42
+param=damagetype,^crush_style
+param=attack_anim,rabbit_attack
+param=defend_anim,rabbit_block
+param=death_anim,rabbit_death
+param=attack_sound,rabbit_attack
+param=defend_sound,rabbit_hit
+param=death_sound,rabbit_death
 [regicide_bunny1]
 name=Rabbit
 desc=A cute bunny rabbit.
@@ -29297,7 +29308,25 @@ resizeh=100
 resizev=100
 op2=Attack
 vislevel=2
-
+wanderrange=5
+maxrange=7
+respawnrate=50
+hitpoints=5
+category=rabbit
+param=attackbonus,-47
+param=strengthbonus,-42
+param=stabdefence,-42
+param=slashdefence,-42
+param=crushdefence,-42
+param=magicdefence,-42
+param=rangedefence,-42
+param=damagetype,^crush_style
+param=attack_anim,rabbit_attack
+param=defend_anim,rabbit_block
+param=death_anim,rabbit_death
+param=attack_sound,rabbit_attack
+param=defend_sound,rabbit_hit
+param=death_sound,rabbit_death
 [regicide_bunny2]
 name=Rabbit
 desc=A cute bunny rabbit.
@@ -29310,7 +29339,25 @@ resizeh=110
 resizev=110
 op2=Attack
 vislevel=2
-
+wanderrange=5
+maxrange=7
+respawnrate=50
+hitpoints=5
+category=rabbit
+param=attackbonus,-47
+param=strengthbonus,-42
+param=stabdefence,-42
+param=slashdefence,-42
+param=crushdefence,-42
+param=magicdefence,-42
+param=rangedefence,-42
+param=damagetype,^crush_style
+param=attack_anim,rabbit_attack
+param=defend_anim,rabbit_block
+param=death_anim,rabbit_death
+param=attack_sound,rabbit_attack
+param=defend_sound,rabbit_hit
+param=death_sound,rabbit_death
 [regicide_darkbear]
 name=Grizzly bear
 desc=Eek! A big bear!
@@ -29323,7 +29370,22 @@ readyanim=bear_ready
 op2=Attack
 vislevel=42
 param=slayer_category,^slayer_bear
-
+wanderrange=12
+maxrange=14
+respawnrate=100
+hitpoints=35
+attack=40
+strength=36
+defence=35
+param=damagetype,^slash_style
+param=attack_anim,bear_attack
+param=defend_anim,bear_block
+param=death_anim,bear_death
+param=attack_sound,bear_attack
+param=defend_sound,bear_hit
+param=death_sound,bear_death
+huntmode=cowardly
+category=bear
 [regicide_darkbear_cub1]
 name=Grizzly bear cub
 desc=Eek! A bear cub!
@@ -29338,7 +29400,22 @@ resizeh=70
 resizev=70
 vislevel=33
 param=slayer_category,^slayer_bear
-
+wanderrange=12
+maxrange=14
+respawnrate=100
+hitpoints=35
+attack=30
+strength=26
+defence=25
+param=damagetype,^slash_style
+param=attack_anim,bear_attack
+param=defend_anim,bear_block
+param=death_anim,bear_death
+param=attack_sound,bear_attack
+param=defend_sound,bear_hit
+param=death_sound,bear_death
+huntmode=cowardly
+category=bear
 [regicide_darkbear_cub2]
 name=Grizzly bear cub
 desc=Eek! A bear cub!
@@ -29353,7 +29430,22 @@ resizeh=80
 resizev=80
 vislevel=36
 param=slayer_category,^slayer_bear
-
+wanderrange=12
+maxrange=14
+respawnrate=100
+hitpoints=35
+attack=32
+strength=32
+defence=28
+param=damagetype,^slash_style
+param=attack_anim,bear_attack
+param=defend_anim,bear_block
+param=death_anim,bear_death
+param=attack_sound,bear_attack
+param=defend_sound,bear_hit
+param=death_sound,bear_death
+huntmode=cowardly
+category=bear
 [direwolf]
 name=Dire Wolf
 desc=What big teeth you have.
@@ -29369,7 +29461,22 @@ resizeh=170
 resizev=130
 op2=Attack
 vislevel=88
-
+wanderrange=20
+maxrange=22
+respawnrate=180
+hitpoints=85
+attack=75
+strength=75
+defence=75
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
+param=attack_sound,wolf_attack
+param=defend_sound,wolf_hit
+param=death_sound,wolf_death
+huntmode=aggressive_melee
+huntrange=10
 [regicide_old_camp_tracker]
 name=Elf Tracker
 desc=An elf tracker.
@@ -29390,7 +29497,9 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_woodelf
-
+defaultmode=none
+wanderrange=0
+moverestrict=nomove
 [regicide_old_camp_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -29438,8 +29547,7 @@ param=attack_anim,human_sword_slash
 param=defend_anim,human_spear_block
 category=tyras_guard
 param=death_drop,bones
-
-
+param=attack_sound,scythe_slash
 [regicide_arandar_gate_guard]
 name=Elf warrior
 desc=He looks pretty handy with that bow.
@@ -29467,7 +29575,7 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=npc_1202_head
-
+wanderrange=0
 [regicide_tyras_camp_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -29516,8 +29624,9 @@ param=attack_anim,human_sword_slash
 param=defend_anim,human_spear_block
 category=tyras_guard
 param=death_drop,bones
-
-
+attackrange=2
+respawnrate=100
+param=attack_sound,scythe_slash
 [regicide_tyras_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -29566,8 +29675,9 @@ param=attack_anim,human_sword_slash
 param=defend_anim,human_spear_block
 category=tyras_guard
 param=death_drop,bones
-
-
+attackrange=2
+respawnrate=100
+param=attack_sound,scythe_slash
 [regicide_tyras_lazy_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -29596,7 +29706,7 @@ readyanim=human_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_leather_cowl_manhead2
-
+wanderrange=3
 [regicide_tyras_camp_tent_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -29625,7 +29735,9 @@ readyanim=human_staffready
 op1=Talk-to
 vislevel=hide
 head1=npc_1200_head
-
+defaultmode=none
+wanderrange=0
+moverestrict=nomove
 [regicide_general_hining]
 name=General Hining
 desc=Leader of King Tyras's men.
@@ -29656,7 +29768,7 @@ op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_farmer
 head2=idk_man_jaw_moustache_head
-
+wanderrange=5
 [regicidegeneralshopkeeper]
 name=Quartermaster
 desc=Responsible for the food and equipment of the troops.
@@ -29685,7 +29797,14 @@ readyanim=human_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_man
-
+wanderrange=1
+moverestrict=indoors
+category=shop_keeper
+param=owned_shop,regicide_general_shop
+param=shop_sell_multiplier,1300
+param=shop_buy_multiplier,400
+param=shop_delta,30
+param=shop_title,Quatermaster's Stores
 [caveguide6]
 name=Koftik
 desc=The cave guide.
@@ -29703,7 +29822,7 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_castlewars_cloak_saradomin_manhead
 head2=idk_man_jaw_goatee_head
-
+wanderrange=5
 [regicide_kings_messenger]
 name=Kings messenger
 desc=One of King Lathas' messengers.
@@ -29735,7 +29854,7 @@ resizev=142
 minimap=no
 ambient=70
 contrast=70
-
+wanderrange=5
 [regicide_willothewisp2]
 name=Will o' the wisp
 desc=Mysterious swamp lights...
@@ -29748,7 +29867,7 @@ readyanim=willowthewisp
 minimap=no
 ambient=70
 contrast=70
-
+wanderrange=5
 [eadgar_druid_washing]
 name=Tegid
 desc=He's washing his clothes in the lake.

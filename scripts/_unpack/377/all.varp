@@ -398,6 +398,7 @@ scope=perm
 
 [temp]
 scope=temp
+protect=no
 
 [if1]
 transmit=yes
@@ -507,9 +508,11 @@ transmit=yes
 [regicide_bits]
 
 [regicide_still_total]
+protect=no
 transmit=yes
 
 [regicide_still_settings]
+protect=no
 transmit=yes
 
 [varp_332]

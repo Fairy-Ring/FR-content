@@ -1,0 +1,71 @@
+// Arianwyn intercept ≥14 + sealed Iorwerth message open.
+// Ported from 274 quest_regicide.rs2 (queue arianwyn_dialogue / zone / opheld1 / scroll).
+// Message letter UI: 274 inter_102 → 377 pack `scroll` (no inter_102 on rev 377).
+
+// this is how the dialogue works on RS3 and seems to be how it used to work
+// on osrs
+[queue,arianwyn_dialogue](int $val)
+if($val > 15) {
+    return;
+}
+p_walk(coord);
+queue(arianwyn_dialogue, 0, add($val, 1));
+if(npc_find(coord, regicide_good_elf3, 5, 0) = false) {
+    npc_add(map_findsquare(coord, 1, 3, ^vis_lineofsight), regicide_good_elf3, 300); // 3 mins rs3
+}
+if(npc_find(coord, regicide_good_elf3, 5, 0) = true) {
+    if($val = 0) ~chatnpc("<p,neutral>Are you the human by the name <displayname()>?");
+    if($val = 1) ~chatplayer("<p,neutral>Yes, that's me?!?");
+    if($val = 2) ~chatnpc("<p,happy>Thank Seren, maybe all is not yet lost.");
+    if($val = 3) ~chatplayer("<p,confused>What do you mean?");
+    if($val = 4) ~chatnpc("<p,neutral>It was you that murdered King Tyras, do not bother to deny it, I was watching.");
+    if($val = 5) ~chatnpc("<p,neutral>There is much to explain and little time. You carry a message from Lord Iorwerth do you not.");
+    if($val = 6) ~chatplayer("<p,neutral>Well you seem to know everything else so I'll not lie. Yes.");
+    if($val = 7) ~chatnpc("<p,neutral>Good, we understand each other well. Now hand it here and find the truth of who your real employer is.");
+    if($val = 8) ~objbox(regicide_iorwerth_message, "You show the message to the elf, he moves his lips silently and the seal on the message is parted.", 250, 0, 0);
+    if($val = 9) {
+        ~regicide_iowerth_message_scroll;
+        p_pausebutton;
+    }
+    if($val = 10) ~chatplayer("<p,neutral>I had no idea!");
+    if($val = 11) ~chatnpc("<p,neutral>There is still a chance to stop this. But we must be careful, or they will push their plans forward and act before we're ready.");
+    if($val = 12) ~chatnpc("<p,neutral>Give the message to King Lathas, He will not see my little spell. Act like nothing unusual happened. You're going to be our man on the inside.");
+    if($val = 13) ~chatplayer("<p,neutral>You want me to spy?!? OK what's in it for me?");
+    if($val = 14) ~chatnpc("<p,neutral>How can I put this... This isn't a struggle for land or title. It is a war for life, all life. If the gate to Zamoraks world is opened we all die.");
+    if($val = 15) {
+        %regicide_quest = ^regicide_spoken_arianwyn;
+        ~chatnpc("<p,neutral>Deliver your message, act normal. We'll be in touch.");
+    }
+}
+
+// Path back toward Lathas (east Ardougne) — world ~2584,3296
+[zone,0_40_51_24_32]
+if(%regicide_quest = ^regicide_reported_iorwerth & inv_total(inv, regicide_iorwerth_message) > 0) {
+    p_stopaction;
+    queue(arianwyn_dialogue, 0, 0);
+}
+
+[opheld1,regicide_iorwerth_message]
+if(%regicide_quest > ^regicide_reported_iorwerth) {
+    ~regicide_iowerth_message_scroll;
+    return;
+}
+mes("You try to open the message...");
+mes("The seal on the scroll is unbreakable.");
+
+[proc,regicide_iowerth_message_scroll]
+// https://web.archive.org/web/20061231211932im_/http://www.runeweb.net/fireball/Regicide%20Images/Regicide27.PNG
+// 274 used inter_102; 377 uses pack `scroll` (same letter layout as golem/nulodion notes).
+if_settext(scroll:com_2, "Your Majesty King Lathas");
+if_settext(scroll:com_3, "");
+if_settext(scroll:com_4, "Your man did well. The path is now open");
+if_settext(scroll:com_5, "for the dark lord to enter this realm.");
+if_settext(scroll:com_6, "You will yet live to see Camelot crushed");
+if_settext(scroll:com_7, "under foot.");
+if_settext(scroll:com_8, "");
+if_settext(scroll:com_9, "Warmaster Iorwerth");
+if_settext(scroll:com_10, "");
+if_settext(scroll:com_11, "");
+if_settext(scroll:com_12, "");
+if_settext(scroll:com_13, "");
+if_openmain(scroll);
