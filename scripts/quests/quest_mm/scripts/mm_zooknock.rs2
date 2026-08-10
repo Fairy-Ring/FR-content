@@ -1,13 +1,20 @@
-// MM Zooknock — tunnel intro + disguise mission (289 mm_zooknock talk path).
-// Map spawn: mm_zooknock_aa. Item hand-in (opnpcu) + ch3 cutscene residual.
+// MM Zooknock — tunnel intro + material hand-in (289 mm_zooknock).
+// Map spawn: mm_zooknock_aa. ch3 cutscene residual after greegree.
 
 [opnpc1,mm_zooknock_aa]
 switch_int(%mm_zooknock) {
     case ^zooknock_need_items, ^zooknock_made_talisman :
-        ~chatnpcnoturn("<p,neutral>Bring me the materials for the monkey amulet and the monkey talisman.");
-        ~chatnpcnoturn("<p,neutral>Amulet: gold bar, monkey amulet mould, and something related to monkey speech.");
-        ~chatnpcnoturn("<p,neutral>Talisman: authentic magical monkey talisman and monkey remains.");
-        ~mesbox("Item hand-in residual — use items on Zooknock when that path is ported.");
+        if(%mm_zooknock_player_is_collecting_for_amulet = ^false & %mm_zooknock_player_is_collecting_for_talisman = ^true) {
+            ~chatnpcnoturn("<p,neutral>Use the monkey talisman and monkey remains on me for the greegree.");
+        } else if(%mm_zooknock_player_is_collecting_for_amulet = ^false & %mm_zooknock_player_is_collecting_for_talisman = ^false) {
+            ~chatnpcnoturn("<p,neutral>You have what you need from me for now. Speak to Garkor when ready.");
+        } else if(%mm_zooknock_player_is_collecting_for_amulet = ^true & %mm_zooknock_player_is_collecting_for_talisman = ^false) {
+            ~chatnpcnoturn("<p,neutral>Use gold bar, monkey amulet mould, and monkey dentures on me for the amulet.");
+        } else {
+            ~chatnpcnoturn("<p,neutral>Bring materials and use them on me.");
+            ~chatnpcnoturn("<p,neutral>Amulet: gold bar, monkey amulet mould, monkey dentures.");
+            ~chatnpcnoturn("<p,neutral>Talisman: monkey talisman and monkey remains.");
+        }
     case ^zooknock_told_mission : @mm_zooknock_p5;
     case ^zooknock_learned_story :
         if(%mm_garkor < ^garkor_speak_zooknock) {
@@ -105,3 +112,179 @@ if(%mm_garkor < ^garkor_speak_zooknock) {
 ~chatplayer("<p,neutral>I have spoken to your Sergeant. He believes that the best way to rescue the rest of your squad with the minimum of casualties is to have an insider - a monkey working for us.");
 ~chatnpc("<p,neutral>Aha. He wants me to turn you into a monkey.");
 @mm_zooknock_p4;
+
+// ——— hand-in (use item on Zooknock) ———
+
+[proc,zooknock_handed_item_line]
+switch_int(random(4)) {
+    case 0 : ~chatnpc("<p,neutral>Nicely done.");
+    case 1 : ~chatnpc("<p,neutral>Well done, human.");
+    case 2 : ~chatnpc("<p,neutral>Good work.");
+    case default : ~chatnpc("<p,neutral>Excellent.");
+}
+
+[opnpcu,mm_zooknock_aa]
+if(%mm_zooknock < ^zooknock_need_items) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_obj $last_useitem = last_useitem;
+switch_obj(last_useitem) {
+    case mm_monkey_dentures :
+        if(%mm_zooknock_player_is_collecting_for_amulet = ^false) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+        if(%mm_zooknock_has_dentures = ^true) {
+            ~chatnpc("<p,neutral>You have already given me some dentures.");
+        } else {
+            %mm_zooknock_has_dentures = ^true;
+            inv_del(inv, mm_monkey_dentures, 1);
+            ~objbox(mm_monkey_dentures, "You hand Zooknock the magical monkey dentures.", 250, 0, divide(^objbox_height, 2));
+            ~zooknock_handed_item_line;
+        }
+        ~mm_zooknock_amulet_check;
+    case gold_bar :
+        if(%mm_zooknock_player_is_collecting_for_amulet = ^false) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+        if(%mm_zooknock_has_gold_bar = ^true) {
+            ~chatnpc("<p,neutral>You have already given me a gold bar.");
+        } else {
+            %mm_zooknock_has_gold_bar = ^true;
+            inv_del(inv, gold_bar, 1);
+            ~objbox(gold_bar, "You hand Zooknock the gold bar.", 250, 0, 0);
+            ~zooknock_handed_item_line;
+        }
+        ~mm_zooknock_amulet_check;
+    case mm_monkey_amulet_mould :
+        if(%mm_zooknock_player_is_collecting_for_amulet = ^false) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+        if(%mm_zooknock_has_amulet_mould = ^true) {
+            ~chatnpc("<p,neutral>You have already given me the amulet mould.");
+        } else {
+            %mm_zooknock_has_amulet_mould = ^true;
+            inv_del(inv, mm_monkey_amulet_mould, 1);
+            ~objbox(mm_monkey_amulet_mould, "You hand Zooknock the monkey amulet mould.", 250, 0, divide(^objbox_height, 2));
+            ~zooknock_handed_item_line;
+        }
+        ~mm_zooknock_amulet_check;
+    case mm_small_ninja_monkey_bones, mm_medium_ninja_monkey_bones, mm_normal_gorilla_monkey_bones, mm_bearded_gorilla_monkey_bones, mm_normal_monkey_bones, mm_small_zombie_monkey_bones, mm_large_zombie_monkey_bones :
+        if(%mm_zooknock_player_is_collecting_for_talisman = ^false) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+        if(%mm_zooknock_has_monkey_relic = ^true) {
+            ~chatnpc("<p,quiz>You have already given me some monkey remains. Would you like me to use these instead?");
+            switch_int(~p_choice2("Yes", 1, "No", 2)) {
+                case 1 :
+                    ~chatplayer("<p,neutral>Yes.");
+                    %mm_zooknock_has_monkey_relic = ^true;
+                    %mm_zooknock_monkey_relic = oc_param($last_useitem, mm_bones_type);
+                    inv_del(inv, $last_useitem, 1);
+                    ~objbox($last_useitem, "You hand Zooknock the monkey remains.", 250, 0, 0);
+                case 2 :
+                    ~chatplayer("<p,neutral>Actually, no.");
+            }
+            ~mm_zooknock_talisman_check;
+        } else {
+            %mm_zooknock_has_monkey_relic = ^true;
+            %mm_zooknock_monkey_relic = oc_param($last_useitem, mm_bones_type);
+            inv_del(inv, $last_useitem, 1);
+            ~objbox(last_useitem, "You hand Zooknock the monkey remains.", 250, 0, 0);
+            ~zooknock_handed_item_line;
+            ~mm_zooknock_talisman_check;
+        }
+    case mm_monkey_talisman :
+        if(%mm_zooknock_player_is_collecting_for_talisman = ^false) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+        if(%mm_zooknock_has_magical_talisman = ^true) {
+            ~chatnpc("<p,neutral>You have already given me a monkey talisman.");
+        } else {
+            %mm_zooknock_has_magical_talisman = ^true;
+            inv_del(inv, last_useitem, 1);
+            ~objbox(last_useitem, "You hand Zooknock the monkey talisman.", 250, 0, 0);
+            ~zooknock_handed_item_line;
+        }
+        ~mm_zooknock_talisman_check;
+    case mm_monkey_greegree_for_small_ninja_monkey, mm_monkey_greegree_for_medium_ninja_monkey, mm_monkey_greegree_for_normal_gorilla, mm_monkey_greegree_for_bearded_gorilla,
+         mm_monkey_greegree_for_ancient_monkey_skull, mm_monkey_greegree_for_small_zombie_monkey, mm_monkey_greegree_for_large_zombie_monkey, mm_monkey_greegree_for_normal_monkey :
+        if(%mm_zooknock_player_is_collecting_for_talisman = ^false) {
+            ~displaymessage(^dm_default);
+            return;
+        }
+        ~chatnpc("<p,neutral>I have already empowered that talisman.");
+    case default : ~displaymessage(^dm_default);
+}
+
+[proc,mm_zooknock_amulet_check]
+if(%mm_zooknock_has_gold_bar = ^false & %mm_zooknock_has_amulet_mould = ^false &
+    %mm_zooknock_has_dentures = ^false) {
+    ~chatnpc("<p,neutral>We need a gold bar, a monkey amulet mould and something to do monkey speech.");
+    return;
+}
+def_string $text = "<p,neutral>We still need ";
+def_int $multiple = ^false;
+if(%mm_zooknock_has_gold_bar = ^false) {
+    $multiple = ^true;
+    $text = append($text, "the gold bar");
+}
+if(%mm_zooknock_has_amulet_mould = ^false) {
+    if($multiple = ^true) $text = append($text, " and ");
+    $multiple = ^true;
+    $text = append($text, "the monkey amulet mould");
+}
+if(%mm_zooknock_has_dentures = ^false) {
+    if($multiple = ^true) $text = append($text, " and ");
+    $multiple = ^true;
+    $text = append($text, "something to do with monkey speech");
+}
+if($multiple = ^false) {
+    ~chatnpcnoturn("<p,neutral>Now listen closely, human. I will cast a spell to enchant this gold bar with the power contained in these monkey dentures.");
+    ~chatnpcnoturn("<p,neutral>You must then smith the gold using the monkey amulet mould. However, unless you do this in a place of religious significance to the monkeys, the spirits contained within will likely depart.");
+    ~chatplayer("<p,quiz>Where do I find a place of religious significance to monkeys?");
+    ~chatnpcnoturn("<p,neutral>Somewhere in the village. It ought to be obvious. Now give me a moment.");
+    if_close;
+    p_delay(4);
+    sound_synth(superheat_all, 0, 0);
+    spotanim_npc(windwave_impact, 80, 0);
+    inv_add(inv, mm_enchanted_gold_bar, 1);
+    inv_add(inv, mm_monkey_amulet_mould, 1);
+    if(%mm_zooknock_player_is_collecting_for_amulet = ^true) %mm_zooknock_player_is_collecting_for_amulet = ^false;
+    ~doubleobjbox(mm_enchanted_gold_bar, mm_monkey_amulet_mould, "Zooknock hands you back the gold bar and the monkey amulet mould.", 200);
+    return;
+}
+$text = append($text, ".");
+~chatnpc($text);
+
+[proc,mm_zooknock_talisman_check]
+if(%mm_zooknock_has_magical_talisman = ^false & %mm_zooknock_has_monkey_relic = ^false) {
+    ~chatnpc("<p,neutral>We need some kind of monkey remains as well as an authentic magical monkey talisman.");
+    return;
+}
+if(%mm_zooknock_has_monkey_relic = ^false) {
+    ~chatnpc("<p,neutral>We still need some kind of monkey remains.");
+    return;
+}
+if(%mm_zooknock_has_magical_talisman = ^false) {
+    ~chatnpc("<p,neutral>We still need an authentic magical monkey talisman.");
+    return;
+}
+~chatnpc("<p,neutral>Bear with me human: I must now cast an extremely powerful spell. It is not often we are successful in investing shapeshifting powers within objects.");
+if_close;
+p_delay(4);
+def_namedobj $talisman = enum(int, namedobj, mm_bones_mapping, %mm_zooknock_monkey_relic);
+sound_synth(superheat_all, 0, 0);
+spotanim_npc(windwave_impact, 80, 0);
+inv_add(inv, $talisman, 1);
+if(%mm_zooknock_player_is_collecting_for_talisman = ^true) %mm_zooknock_player_is_collecting_for_talisman = ^false;
+// ch3 cutscene residual (sets made_talisman in full 289) — skip until ported
+~objbox($talisman, "Zooknock hands you back the talisman. It seems to glow slightly.", 250, 0, 0);
+~chatnpc("<p,neutral>I am afraid I have not been able to fully invest my powers in that talisman. You may use it, but it will continue to draw its energy directly from me.");
+~chatnpc("<p,neutral>The range at which I will be able to sustain it is limited. I cannot ensure it will be effective off the atoll.");
+~chatnpc("<p,neutral>Furthermore, you will not be able to attack whilst using this, so be careful. Perhaps when I refine my spells I could look into making this possible.");

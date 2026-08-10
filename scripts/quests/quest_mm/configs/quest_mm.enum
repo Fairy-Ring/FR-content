@@ -1,0 +1,11 @@
+[mm_bones_mapping]
+inputtype=int
+outputtype=namedobj
+val=1,mm_monkey_greegree_for_small_ninja_monkey
+val=2,mm_monkey_greegree_for_medium_ninja_monkey
+val=3,mm_monkey_greegree_for_normal_gorilla
+val=4,mm_monkey_greegree_for_bearded_gorilla
+val=5,mm_monkey_greegree_for_normal_monkey
+val=6,mm_monkey_greegree_for_small_zombie_monkey
+val=7,mm_monkey_greegree_for_large_zombie_monkey
+val=8,mm_monkey_greegree_for_ancient_monkey_skull

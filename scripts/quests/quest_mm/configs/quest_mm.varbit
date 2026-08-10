@@ -46,3 +46,9 @@ endbit=12
 basevar=mm_flags
 startbit=13
 endbit=13
+
+// Bones → greegree type (int 1–8). mm_misc bits 12–16 free of mm_foreman (0–1).
+[mm_zooknock_monkey_relic]
+basevar=mm_misc
+startbit=12
+endbit=16
