@@ -77,6 +77,11 @@ if(%morttonquest = ^mortton_ulsquire_temple) {
     %morttonquest = ^mortton_rebuild_temple;
 }
 
+// Recompute repaired_p *before* altar fix (overlay queue is next-tick).
+// Soft-entry / shade-break left broken altar with walls already full → thrash
+// reinforced forever while repaired_p stayed stale until after this check.
+~recalc_temple_repaired_p;
+
 if(%temple_repaired_p = 100) {
     if (%morttonquest = ^mortton_rebuild_temple) {
         mes("You are now allowed to light the holy fire altar.");
@@ -237,12 +242,9 @@ if(stat_random(firemaking, 100, 250) = false) {
     stat_advance(firemaking, 1600);
 }
 
-[queue,update_flamtaer_overlay]
-%temple_resources_p = divide(%temple_resources, 150);
-%temple_sanctity_p = divide(%temple_sanctity, 30);
-
+// Shared by overlay queue + try_build (altar un-break needs same-tick truth)
+[proc,recalc_temple_repaired_p]
 def_int $num_of_walls_fully_repaired = 0;
-
 loc_findallzone(^mortton_temple_altar_coord);
 while (loc_findnext = true) {
     if(loc_type = templewallcorner_10 | loc_type = templewall_10) {
@@ -254,6 +256,11 @@ if($num_of_walls_fully_repaired > 0) {
 } else {
     %temple_repaired_p = min(25,divide(%current_temple_build, 150));
 }
+
+[queue,update_flamtaer_overlay]
+%temple_resources_p = divide(%temple_resources, 150);
+%temple_sanctity_p = divide(%temple_sanctity, 30);
+~recalc_temple_repaired_p;
 
 [label,mortton_temple_not_enough_resources]
 //TODO: Find source, guess from osrs but no timber beams or flamtaer bag in mes
