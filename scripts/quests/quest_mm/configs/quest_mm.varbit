@@ -1,0 +1,12 @@
+// Hangar reinit flags on mm_flags (289 quest_mm.varbit).
+// Pack IDs: 131=mm_hangar_cutscene_flag, 132=mm_hangar_puzzle_complete
+
+[mm_hangar_cutscene_flag]
+basevar=mm_flags
+startbit=3
+endbit=3
+
+[mm_hangar_puzzle_complete]
+basevar=mm_flags
+startbit=4
+endbit=4

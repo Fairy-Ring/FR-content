@@ -1,0 +1,56 @@
+// Thin MM Waydar — hangar talk + fly stubs.
+// Full crash-island / Lumdo / ch2 cutscene residual (289 mm_waydar.rs2).
+
+[opnpc1,mm_waydar]
+// Crash Island zone (m45_42) — residual dialogue until island rail
+if(inzone(0_45_42_0_0, 0_45_42_63_63, npc_coord) = true) {
+    ~chatnpc("<p,neutral>We appear to have landed. Speak to me again when the island rail is ready.");
+    return;
+}
+if(%mm_daero = ^daero_complete) {
+    if(%mm_main < ^mm_arrived_atoll) {
+        ~chatnpc("<p,shifty>You should stock up well on food before our journey. I can carry only enough provisions for myself.");
+        ~chatnpc("<p,shifty>I'd be careful of the local fauna too - I've heard the bite is far worse than any noise they make.");
+        ~chatnpc("<p,quiz>Do you wish to fly right now?");
+    } else {
+        ~chatnpc("<p,quiz>Shall we return to Crash Island?");
+    }
+    switch_int(~p_choice2("Yes", 1, "No", 2)) {
+        case 1 :
+            ~chatplayer("<p,neutral>Yes, let's go.");
+            ~chatnpc("<p,neutral>As you wish.");
+            @waydar_fly_crash_island;
+        case 2 :
+            ~chatplayer("<p,neutral>Not yet. I'll be back later.");
+    }
+} else if(%mm_daero = ^daero_reinit_complete) {
+    ~chatnpc("<p,angry>Well done on breaking the code. You should speak to the High Tree Guardian.");
+} else if(%mm_daero = ^daero_started_reinit) {
+    switch_int(~p_choice4("What are military gliders?", 1, "Why are the gliders folded against the wall?", 2, "When will reinitialisation be completed?", 3, "Where is the reinitialisation code?", 4)) {
+        case 1 :
+            ~chatplayer("<p,quiz>What are military gliders?");
+            ~chatnpc("<p,neutral>As Daero said, they are a prototype for a new version of glider. They are reinforced yet are built out of lighter materials. They can fly much faster and for longer.");
+        case 2 :
+            ~chatplayer("<p,quiz>Why are the gliders folded against the wall?");
+            ~chatnpc("<p,neutral>It is the most compact way to store them. Unfortunately, they will remain like that until they are powered. We can only fully power the hangar when reinitialisation has been completed.");
+        case 3 :
+            ~chatplayer("<p,quiz>When will reinitialisation be completed?");
+            ~chatnpc("<p,neutral>I cannot be sure. It is a difficult code; it may happen the next instant - then again it may not.");
+            ~chatnpc("<p,neutral>You could even have a go at solving the code yourself.");
+        case 4 :
+            ~chatplayer("<p,quiz>Where is the reinitialisation code?");
+            ~chatnpc("<p,neutral>The code must be entered at the red control panel just by the wall over there.");
+    }
+} else {
+    ~chatnpc("<p,neutral>Sorry, I am not authorised to talk to you.");
+}
+
+[label,waydar_fly_crash_island]
+// Product tele + glidermap IF (same pattern as gnome glider)
+if_openmain(glidermap);
+%pilot_journey = 8;
+p_delay(3);
+p_teleport(0_45_42_13_37);
+%pilot_journey = -1;
+if_close;
+// stage write residual when ch2 starts — greegree/atoll rail owns mm_main advance

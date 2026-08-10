@@ -129,8 +129,8 @@
 128=mm_karam
 129=mm_lumo
 130=mm_foreman
-131=varbit_131
-132=varbit_132
+131=mm_hangar_cutscene_flag
+132=mm_hangar_puzzle_complete
 133=varbit_133
 134=varbit_134
 135=misc_cooked
@@ -2136,3 +2136,5 @@
 2135=varbit_75
 2136=varbit_98
 2137=varbit_130
+2138=varbit_131
+2139=varbit_132

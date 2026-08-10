@@ -1,0 +1,34 @@
+// Hangar control panel / crate / bunker tele (from 289 quest_mm.rs2).
+// Full slide puzzle: mm_puzzle.rs2.
+
+[oploc1,bunker_controlpanal]
+if(%mm_daero > ^daero_started_reinit) ~mesbox("You have already completed reinitialisation.");
+else if(%mm_daero = ^daero_started_reinit) @mm_open_puzzle;
+else ~mesbox("You do not know what you are doing.");
+
+[oploc1,mm_reinitialisation_crate]
+mes("You search the crate.");
+p_delay(2);
+// https://web.archive.org/web/20060910110938im_/http://www.runeweb.net/Roth/monkey-maddness3.PNG
+if(inv_freespace(inv) = 0) {
+    ~objbox(mm_reinitialisation_hint, "This crate is full of...  spare controls!|You don't have space to take any.", 250, 0, 0);
+    return;
+}
+~objbox(mm_reinitialisation_hint, "This crate is full of ...  spare controls!", 250, 0, 0);
+def_int $op = ~p_choice2_header("Yes", 1, "No", 2, "Do you wish to take one?");
+if($op = 2) return;
+inv_add(inv, mm_reinitialisation_hint, 1);
+
+[oploc1,bunker_teleport] @mm_bunker_teleport;
+[oploc1,bunker_teleport_floor] @mm_bunker_teleport;
+[oploc1,bunker_teleport_corner] @mm_bunker_teleport;
+
+// 377: no shared ~fade_out/~fade_in
+[label,mm_bunker_teleport]
+anim(human_castteleport, 0);
+spotanim_pl(teleport_casting, 92, 0);
+sound_synth(teleport_all, 0, 0);
+p_delay(3);
+p_teleport(0_37_54_25_10);
+p_delay(0);
+anim(null, 0);
