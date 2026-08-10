@@ -23,8 +23,9 @@ if_settext(scroll:com_12, "");
 if_settext(scroll:com_13, "");
 if_openmain(scroll);
 
-// Stub until full MM complete path ports.
+// Soft-rail complete (Narnode reward path). Training programme residual.
 [queue,mm_quest_complete]
 %mm_main = ^mm_complete;
 session_log(^log_adventure, "Quest complete: Monkey Madness");
-~send_quest_complete(questlist:mm, mm_gnome_royal_seal, 250, ^mm_questpoints, "You have completed the\\nMonkey Madness Quest!", "3 Quest Points");
+queue(mm_complete_dialogue, 0, 0);
+~send_quest_complete(questlist:mm, mm_monkey_in_backpack, 250, ^mm_questpoints, "You have completed the\\nMonkey Madness Quest!", "3 Quest Points");

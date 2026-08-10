@@ -1,0 +1,71 @@
+// MM final battle thin — wear 10th squad sigil → tele arena → jungle demon.
+// Residual: full gnome squad AI, camera pan, multi-player spawn corners, trapdoors.
+// Era note: players typically magic the demon (d scim is a *reward* for MM complete).
+
+// Wear (iop2) — save last_slot before any ~proc (corrupts pointer).
+[opheld2,mm_sigil]
+def_int $slot = last_slot;
+if(%mm_main >= ^mm_defeated_demon) {
+    mes("The sigil doesn't activate as you have already helped the");
+    mes("10th squad defeat the demon.");
+    return;
+}
+// Arena mapsquare m42_143 all levels
+if(inzone(0_42_143_0_0, 2_42_143_63_63, coord) = true) {
+    mes("You are already helping the 10th squad defeat the demon!");
+    return;
+}
+// Only while ready for final fight (joined 10th after thin ch4)
+if(%mm_garkor < ^garkor_joined_10th_squad | %mm_main < ^mm_completed_ch3) {
+    mes("The sigil doesn't activate yet.");
+    return;
+}
+if (~wilderness_level(coord) > 0) {
+    mes("You cannot teleport out of the wilderness using the sigil.");
+    return;
+}
+if (~pre_tele_checks(coord) = false) {
+    return;
+}
+~equip($slot);
+mes("The 10th squad sigil begins to shake violently!");
+// Thin: fixed SW stand (289 multi-corner residual)
+%mm_cutscene_coord = 1_42_143_14_21;
+p_delay(1);
+// No ~fade_* on 377 thin tree
+anim(human_castteleport, 0);
+sound_synth(teleport_all, 1, 0);
+p_delay(1);
+~p_telejump_safe(%mm_cutscene_coord);
+cam_reset;
+midi_song("showdown");
+// 289 shape: map_findsquare + lineofwalk (not a missing constant).
+// Era: Jagex did not guarantee size-3 free squares — spawn can fail or land badly
+// (“no size checks… unable to walk”). Do not invent open-tile hardcodes as “bugfix.”
+// Soft thrash may soft-tele an open stand if product softlocks.
+npc_add(map_findsquare(coord, 1, 5, ^map_findsquare_lineofwalk), mm_garkor_final_battle, 2000);
+%npc_aggressive_player = uid;
+npc_add(map_findsquare(coord, 5, 10, ^map_findsquare_lineofwalk), mm_demon, 2000);
+%npc_lastcombat = sub(^max_32bit_int, 8);
+%npc_aggressive_player = uid;
+npc_setmode(applayer2);
+hint_npc;
+~chatnpc_specific(nc_name(mm_garkor_final_battle), mm_garkor_final_battle, "<p,neutral>Ready yourself, human: the final battle begins!");
+
+
+// Product kill → stage write (289 ai_queue3 → queue_defeat_jungledemon)
+// Attack: default combat or magic cast (no d scim — that requires MM complete).
+[ai_queue3,mm_demon]
+gosub(npc_death);
+if(npc_findhero = ^true) {
+    obj_add(npc_coord, ashes, 1, ^lootdrop_duration);
+    if(%mm_main = ^mm_completed_ch3) {
+        queue(queue_defeat_jungledemon, 0, 0);
+    }
+}
+
+[queue,queue_defeat_jungledemon]
+~music_jingle("mission over");
+%mm_main = ^mm_defeated_demon;
+hint_stop;
+mes("You have defeated the jungle demon!");

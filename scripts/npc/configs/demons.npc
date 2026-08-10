@@ -405,9 +405,11 @@ param=death_drop,ashes
 huntrange=3
 huntmode=cowardly
 
+// MM Jungle Demon — was visual-only (vislevel only) → 1hp paper tiger.
+// Combat block from 289 quest_mm.npc; model/recol stay 377 unpack names.
 [mm_demon]
 name=Jungle Demon
-desc=A Greater Jungle Demon. A magical aura emanates from its hide.
+desc=It's a large green Greater Jungle Demon. An aura of magic emanates from its hide.
 model1=npc_greater_demon
 recol1s=11264
 recol1d=7460
@@ -429,6 +431,32 @@ resizev=140
 turnspeed=16
 op2=Attack
 vislevel=195
+wanderrange=10
+maxrange=50
+attack=170
+defence=170
+strength=170
+hitpoints=170
+magic=170
+attackrange=10
+timer=9
+param=attackrate,6
+param=attackbonus,50
+param=strengthbonus,50
+param=slashdefence,50
+param=magicdefence,50
+param=damagetype,^slash_style
+param=magicattack_anim,demon_casting
+param=attack_anim,demon_attack
+param=defend_anim,demon_block
+param=death_anim,demon_death
+param=attack_sound,black_demon_attack
+param=defend_sound,black_demon_hit
+param=death_sound,black_demon_death
+param=death_drop,ashes
+param=demonbane_vulnerable,yes
+huntrange=3
+huntmode=cowardly
 
 [npc_1516]
 name=Demon
