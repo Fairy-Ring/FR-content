@@ -1,0 +1,30 @@
+// Thin MM start slice: chapter card + complete queue stub.
+// Full quest_mm.rs2 (login cutscene rescues, ch2–4) = later unit.
+//
+// IF remap (rev IDs change): 289 `inter_199` = message-scroll chapter card.
+// 377 pack `inter_199` is a different IF (trade/graphics grid) — do NOT open it.
+// Use 377 `scroll` (same letter layout as regicide/golem notes) for chapter text.
+
+[label,mm_ch1]
+~music_jingle("new chapter");
+sound_synth(ooks, 0, 0);
+// 289 wrote inter_199:com_4 title + com_7/8 body; map onto 377 scroll text rows.
+if_settext(scroll:com_2, "Monkey Madness: Chapter 1");
+if_settext(scroll:com_3, "");
+if_settext(scroll:com_4, "In which our <text_gender("hero", "heroine")> finds <text_gender("him", "her")>self drawn back into");
+if_settext(scroll:com_5, "Glough's web of deception and deceit.");
+if_settext(scroll:com_6, "");
+if_settext(scroll:com_7, "");
+if_settext(scroll:com_8, "");
+if_settext(scroll:com_9, "");
+if_settext(scroll:com_10, "");
+if_settext(scroll:com_11, "");
+if_settext(scroll:com_12, "");
+if_settext(scroll:com_13, "");
+if_openmain(scroll);
+
+// Stub until full MM complete path ports.
+[queue,mm_quest_complete]
+%mm_main = ^mm_complete;
+session_log(^log_adventure, "Quest complete: Monkey Madness");
+~send_quest_complete(questlist:mm, mm_gnome_royal_seal, 250, ^mm_questpoints, "You have completed the\\nMonkey Madness Quest!", "3 Quest Points");
