@@ -1,0 +1,36 @@
+// Monkey speak amulet smith — 289 quest_mm.rs2 (firewall + string).
+// Religious smith: use enchanted bar on Ape Atoll temple wall of flame.
+
+[oplocu,mm_iban_firewall_straight] @opu_mm_firewall;
+[oplocu,mm_iban_firewall_diagonal] @opu_mm_firewall;
+
+[label,opu_mm_firewall]
+def_int $slot = last_useslot;
+if(last_useitem = mm_enchanted_gold_bar) {
+    if(inv_total(inv, mm_monkey_amulet_mould) = 0) {
+        ~mesbox("You do not have anything suitable for smithing an enchanted gold bar.");
+        return;
+    }
+    anim(human_furnace, 0);
+    sound_synth(furnace, 0, 0);
+    inv_delslot(inv, $slot);
+    p_delay(2);
+    mes("You smith the enchanted gold into an amulet.");
+    inv_setslot(inv, $slot, mm_amulet_of_monkey_speak_without_string, 1);
+    stat_advance(crafting, 2000);
+    return;
+}
+~displaymessage(^dm_default);
+
+// Unstrung M'speak + ball of wool (289 mm_string_amulet). Not crafting jewelry struct.
+// Bind both directions without stealing [opheldu,ball_of_wool] from stringing.rs2.
+[opheldu,mm_amulet_of_monkey_speak_without_string]
+if(last_useitem = ball_of_wool) {
+    inv_del(inv, mm_amulet_of_monkey_speak_without_string, 1);
+    inv_del(inv, ball_of_wool, 1);
+    inv_add(inv, mm_amulet_of_monkey_speak, 1);
+    stat_advance(crafting, 40);
+    mes("You put some string on your amulet. It makes a slight 'Ook' sound.");
+    return;
+}
+~displaymessage(^dm_default);

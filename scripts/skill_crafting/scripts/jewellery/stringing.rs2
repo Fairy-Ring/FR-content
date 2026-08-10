@@ -8,6 +8,14 @@ switch_obj (last_useitem)
             return;
         }
         @string_amulet(last_useslot);
+    // MM monkey speak unstrung — not crafting jewelry struct (quest_mm mm_string_amulet)
+    case mm_amulet_of_monkey_speak_without_string :
+        inv_del(inv, mm_amulet_of_monkey_speak_without_string, 1);
+        inv_del(inv, ball_of_wool, 1);
+        inv_add(inv, mm_amulet_of_monkey_speak, 1);
+        stat_advance(crafting, 40);
+        mes("You put some string on your amulet. It makes a slight 'Ook' sound.");
+        return;
 }
 ~displaymessage(^dm_default);
 
