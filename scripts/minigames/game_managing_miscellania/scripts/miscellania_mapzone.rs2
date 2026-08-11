@@ -1,0 +1,10 @@
+// First visit seed + daily tick (M1/M2). Full coffer/resource daily = M3 when managing_miscellania.rs2 lands.
+// Source: 289 miscellania_mapzone — TEMP mes stripped (Decision authenticity).
+[mapzone,0_39_60]
+// We store a time in minutes when it last updated, %varp_360, first set when first visiting Miscellania
+if (%varp_360 = 0) {
+    %varp_360 = date_minutes;
+    %misc_approval = ^MISC_APPROVAL_25_PERCENT; // Start at 25%
+}
+~manage_misc_daily_update;
+@music_playbyregion(coord);

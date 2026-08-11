@@ -137,6 +137,8 @@ if (random($chance) = ^true) {
     if(inzone(^crest_perfect_mine_lower_bound, ^crest_perfect_mine_upper_bound, coord) = true) {
         $output = perfect_gold_ore;
     }
+    // Managing Miscellania: give ore to Magnus → approval (289 mining.rs2)
+    if (~magnus_intercept_ore("You manage to mine some <db_getfield($data, mining_table:ore_name, 0)>.", db_getfield($data, mining_table:rock_exp, 0)) = true) { return; }
     inv_add(inv, $output, 1);
     stat_advance(mining, db_getfield($data, mining_table:rock_exp, 0));
     mes("You manage to mine some <db_getfield($data, mining_table:ore_name, 0)>.");
@@ -174,6 +176,8 @@ if (random($chance) = ^true) {
     loc_change(loc_param(next_loc_stage_mining), $respawn);
     sound_synth(mine, 0, 0);
     anim(null, 0);
+    // Managing Miscellania intercept (289 mining get_ore_fast)
+    if (~magnus_intercept_ore("You manage to mine some <db_getfield($data, mining_table:ore_name, 0)>.", db_getfield($data, mining_table:rock_exp, 0)) = true) { return; }
     inv_add(inv, db_getfield($data, mining_table:rock_output, 0), 1);
     stat_advance(mining, db_getfield($data, mining_table:rock_exp, 0));
     mes("You manage to mine some <db_getfield($data, mining_table:ore_name, 0)>.");

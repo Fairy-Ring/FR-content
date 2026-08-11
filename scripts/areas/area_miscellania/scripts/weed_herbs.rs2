@@ -1,0 +1,93 @@
+// Like all the resource gathering, weeding herbs is specific for miscellania.
+// Tip-era (rev 377 / ~2 May 2006): sickle + misc_heather_* (map-true).
+// RT rake herb/flax plots are post-tip — not this script.
+// Weeds item did not exist till Farming (Jul 2005); approval is the reward, not produce.
+
+[oploc1,misc_heather_normal]@weeding_firstswing(misc_heather_normal_noweeds);
+[oploc3,misc_heather_normal]@weeding_continue(misc_heather_normal_noweeds);
+
+[oploc1,misc_heather_light]@weeding_firstswing(misc_heather_light_noweeds);
+[oploc3,misc_heather_light]@weeding_continue(misc_heather_light_noweeds);
+
+[oploc1,misc_heather_dark]@weeding_firstswing(misc_heather_dark_noweeds);
+[oploc3,misc_heather_dark]@weeding_continue(misc_heather_dark_noweeds);
+// Stripped-down mining-style action_delay loop.
+
+[label,weeding_firstswing](loc $loc_transform)
+if (inv_total(worn, iron_sickle) = 0 & inv_total(worn, silver_sickle) = 0 & inv_total(worn, silver_sickle_blessed) = 0) {
+    anim(null, 0);
+    ~mesbox("You need a sickle to weed this herb.");
+    return;
+}
+def_int $weeding_rate = 5; // Inauthentic rate
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + $weeding_rate);
+    p_oploc(1);
+    return;
+}
+sound_synth(sickle_slash, 0, 0);
+// worn check already passed; pick anim by which sickle is present
+if (inv_total(worn, silver_sickle_blessed) > 0) {
+    anim(misc_herb_weeding_silver_sickle_blessed, 0);
+} else if (inv_total(worn, silver_sickle) > 0) {
+    anim(misc_herb_weeding_silver_sickle, 0);
+} else {
+    anim(misc_herb_weeding_iron_sickle, 0);
+}
+mes("You swing your sickle at the weeds.");
+if (%action_delay = map_clock) {
+    // Success on the delay tick (rate residual vs authentic 1/n roll — soft M1 product write).
+    // Re-introduce random after continue-loop is proven green.
+    p_delay(0);
+    def_int $respawn = 50; // 5 minutes
+    loc_change($loc_transform, $respawn);
+    sound_synth(sickle_stab, 0, 0);
+    anim(null, 0);
+    if (%misc_approval < 127) {
+        %misc_approval = add(%misc_approval, 1);
+    }
+    if (npc_find(0_39_60_29_10, misc_gardener, 2, 0) = true) {
+        npc_say("Thanks!");
+    }
+    mes("You manage to cut some weeds and give them to Gardener Gunnhild.");
+    return;
+}
+// Re-queue via OPLOC1 (op1=Weed is client-visible; avoids hidden-op3 continue pitfalls)
+p_oploc(1);
+
+[label,weeding_continue](loc $loc_transform)
+if (inv_total(worn, iron_sickle) = 0 & inv_total(worn, silver_sickle) = 0 & inv_total(worn, silver_sickle_blessed) = 0) {
+    anim(null, 0);
+    ~mesbox("You need a sickle to weed this herb.");
+    return;
+}
+def_int $weeding_rate = 3; // Inauthentic
+sound_synth(sickle_slash, 0, 0);
+if (%action_delay < map_clock) {
+    %action_delay = calc(map_clock + $weeding_rate);
+} else if (%action_delay = map_clock) {
+    if (inv_total(worn, silver_sickle_blessed) > 0) {
+        anim(misc_herb_weeding_silver_sickle_blessed, 0);
+    } else if (inv_total(worn, silver_sickle) > 0) {
+        anim(misc_herb_weeding_silver_sickle, 0);
+    } else {
+        anim(misc_herb_weeding_iron_sickle, 0);
+    }
+    p_delay(0);
+    def_int $respawn = 50;
+    loc_change($loc_transform, $respawn);
+    sound_synth(sickle_stab, 0, 0);
+    anim(null, 0);
+    if (%misc_approval < 127) {
+        %misc_approval = add(%misc_approval, 1);
+    }
+    if (npc_find(0_39_60_29_10, misc_gardener, 2, 0) = true) {
+        npc_say("Thanks!");
+        if (%misc_approval >= 127) {
+            ~chatnpcnoturn("<p,happy> Don't trouble yourself further, Your Highness, you've already done so much!");
+        }
+    }
+    mes("You manage to cut some weeds and give them to Gardener Gunnhild.");
+    return;
+}
+p_oploc(1);
