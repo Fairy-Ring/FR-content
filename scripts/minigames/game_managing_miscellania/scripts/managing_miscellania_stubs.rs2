@@ -1,13 +1,5 @@
-// Stubs so advisor post-complete branches compile. Full Managing UI = M4–M5.
-// Daily/resource math = M3 (full managing_miscellania.rs2). M1 labour is area_miscellania.
-// Do not claim kingdom management is product-complete.
+// UI open only until M4–M5 ports misc_both_manage.if.
+// Daily/resource: managing_miscellania_daily.rs2 (M3).
 
 [proc,open_manage_miscellania_interface]
 mes("Managing Miscellania is not available yet.");
-
-[proc,manage_misc_resource_generation]()(string)
-return ("Your subjects have not collected any resources.");
-
-// M1/M2: mapzone calls this. No coffer drain / resource gen until M3.
-[proc,manage_misc_daily_update]
-return;

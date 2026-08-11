@@ -1,0 +1,168 @@
+// M3: daily coffer/resource math + collect dump (289 managing_miscellania.rs2).
+// No IF / if_button (M4–M5). Open stays stubbed in managing_miscellania_stubs.rs2.
+// Last-update clock on 377 is %varp_360 (289 names it misc_last_update).
+// Pin: origin/289 @ 979e925fb — Throne-era 50k coffer cap, ×975/1000 approval decay (not RT).
+
+[proc,manage_misc_daily_update]
+def_int $currenttime = date_minutes;
+def_int $misc_last_update = %varp_360;
+def_int $CofferTotal = %misc_coffers;
+def_int $Approval = %misc_approval;
+def_int $ResourcePts = %misc_restotal;
+
+// Cap catch-up at 30 days so one long absence does not thrash the loop forever.
+if (calc($currenttime - $misc_last_update) > calc(^MISCELLANIA_INTERVAL * 30)) {
+    $misc_last_update = calc($currenttime - ^MISCELLANIA_INTERVAL * 30);
+}
+
+while (calc($currenttime - $misc_last_update) >= ^MISCELLANIA_INTERVAL) {
+    if ($CofferTotal > 0) {
+        // 10% of coffers + 5, max 50_000/day (Throne-era; RT 75k refused for tip)
+        def_int $ReductionAmt = calc(5 + ($CofferTotal / 10));
+        if ($ReductionAmt > 50000) {
+            $ReductionAmt = 50000;
+        }
+        if (calc($CofferTotal - $ReductionAmt) < 0) {
+            $ReductionAmt = $CofferTotal;
+        }
+        $CofferTotal = calc($CofferTotal - $ReductionAmt);
+
+        def_int $WorkerEffectiveness = calc($ReductionAmt * 100 / 8333);
+        $ResourcePts = calc($ResourcePts + (($WorkerEffectiveness / 100) * $Approval));
+        if ($ResourcePts > 262143) {
+            $ResourcePts = 262143;
+        }
+    }
+
+    // ~2.5%/day toward floor (Throne); RT 1%/day refused
+    $Approval = calc($Approval * 975 / 1000);
+    $misc_last_update = calc($misc_last_update + ^MISCELLANIA_INTERVAL);
+}
+
+%misc_coffers = $CofferTotal;
+%misc_approval = $Approval;
+%varp_360 = $misc_last_update;
+%misc_restotal = $ResourcePts;
+
+// Collect: convert restotal × worker points → noted resources into inv (bank UI residual).
+// Called from Advisor Ghrim "Yes, please" after How is the Kingdom faring?
+[proc,manage_misc_resource_generation]()(string)
+def_int $ResourcePts = %misc_restotal;
+
+def_int $wood_qty = calc(100 * $ResourcePts * %misc_points_wood / 2048);
+if ($wood_qty > 0) {
+    inv_add(inv, cert_maple_logs, $wood_qty);
+}
+
+def_int $coal_qty = calc(60 * $ResourcePts * %misc_points_mine / 2048);
+if ($coal_qty > 0) {
+    inv_add(inv, cert_coal, $coal_qty);
+}
+
+def_int $fish_qty = calc(100 * $ResourcePts * %misc_points_fish / 2048);
+if ($fish_qty > 0) {
+    if (%misc_cooked = 1) {
+        inv_add(inv, cert_tuna, calc($fish_qty / 2));
+        inv_add(inv, cert_swordfish, calc($fish_qty * 3 / 20));
+    } else {
+        inv_add(inv, cert_raw_tuna, calc($fish_qty / 2));
+        inv_add(inv, cert_raw_swordfish, calc($fish_qty * 3 / 20));
+    }
+}
+
+def_obj $rolled_herb = null;
+def_int $rolled_qty = 0;
+def_int $guam_count = 0;
+def_int $marentill_count = 0;
+def_int $tarromin_count = 0;
+def_int $harralander_count = 0;
+def_int $ranarr_count = 0;
+def_int $irit_count = 0;
+def_int $avantoe_count = 0;
+def_int $kwuarm_count = 0;
+def_int $cadantine_count = 0;
+def_int $lantadyme_count = 0;
+def_int $dwarf_weed_count = 0;
+def_int $herb_qty = calc(5 * $ResourcePts * %misc_points_herb / 2048);
+def_int $herb_count = $herb_qty;
+while ($herb_count > 0) {
+    $rolled_herb, $rolled_qty = ~randomherb();
+    switch_obj ($rolled_herb) {
+        case unidentified_guam : $guam_count = calc($guam_count + $rolled_qty);
+        case unidentified_marentill : $marentill_count = calc($marentill_count + $rolled_qty);
+        case unidentified_tarromin : $tarromin_count = calc($tarromin_count + $rolled_qty);
+        case unidentified_harralander : $harralander_count = calc($harralander_count + $rolled_qty);
+        case unidentified_ranarr : $ranarr_count = calc($ranarr_count + $rolled_qty);
+        case unidentified_irit : $irit_count = calc($irit_count + $rolled_qty);
+        case unidentified_avantoe : $avantoe_count = calc($avantoe_count + $rolled_qty);
+        case unidentified_kwuarm : $kwuarm_count = calc($kwuarm_count + $rolled_qty);
+        case unidentified_cadantine : $cadantine_count = calc($cadantine_count + $rolled_qty);
+        case unidentified_lantadyme : $lantadyme_count = calc($lantadyme_count + $rolled_qty);
+        case unidentified_dwarf_weed : $dwarf_weed_count = calc($dwarf_weed_count + $rolled_qty);
+    }
+    $herb_count = sub($herb_count, 1);
+}
+if ($guam_count > 0) {
+    inv_add(inv, cert_guam_leaf, $guam_count);
+}
+if ($marentill_count > 0) {
+    inv_add(inv, cert_marentill, $marentill_count);
+}
+if ($tarromin_count > 0) {
+    inv_add(inv, cert_tarromin, $tarromin_count);
+}
+if ($harralander_count > 0) {
+    inv_add(inv, cert_harralander, $harralander_count);
+}
+if ($ranarr_count > 0) {
+    inv_add(inv, cert_ranarr_weed, $ranarr_count);
+}
+if ($irit_count > 0) {
+    inv_add(inv, cert_irit_leaf, $irit_count);
+}
+if ($avantoe_count > 0) {
+    inv_add(inv, cert_avantoe, $avantoe_count);
+}
+if ($kwuarm_count > 0) {
+    inv_add(inv, cert_kwuarm, $kwuarm_count);
+}
+if ($cadantine_count > 0) {
+    inv_add(inv, cert_cadantine, $cadantine_count);
+}
+if ($lantadyme_count > 0) {
+    inv_add(inv, cert_lantadyme, $lantadyme_count);
+}
+if ($dwarf_weed_count > 0) {
+    inv_add(inv, cert_dwarf_weed, $dwarf_weed_count);
+}
+
+%misc_restotal = 0;
+
+def_string $resourceStr = "";
+if ($wood_qty > 0) {
+    $resourceStr = "<$resourceStr> <tostring($wood_qty)> Maple Logs|";
+}
+if ($coal_qty > 0) {
+    $resourceStr = "<$resourceStr> <tostring($coal_qty)> Coal|";
+}
+if (calc($fish_qty / 2) > 0) {
+    if (%misc_cooked = 1) {
+        $resourceStr = "<$resourceStr> <tostring(calc($fish_qty / 2))> Tuna|";
+    } else {
+        $resourceStr = "<$resourceStr> <tostring(calc($fish_qty / 2))> Raw Tuna|";
+    }
+}
+if (calc($fish_qty * 3 / 20) > 0) {
+    if (%misc_cooked = 1) {
+        $resourceStr = "<$resourceStr> <tostring(calc($fish_qty * 3 / 20))> Swordfish|";
+    } else {
+        $resourceStr = "<$resourceStr> <tostring(calc($fish_qty * 3 / 20))> Raw Swordfish|";
+    }
+}
+if ($herb_qty > 0) {
+    $resourceStr = "<$resourceStr> <tostring($herb_qty)> Herbs|";
+}
+if (string_length($resourceStr) = 0) {
+    $resourceStr = "No Resources|";
+}
+return ($resourceStr);
