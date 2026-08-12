@@ -35458,6 +35458,8 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 param=death_drop,mm_medium_ninja_monkey_bones
+huntmode=aa_aggressive_melee
+huntrange=10
 
 [mm_awowogei_cutscene]
 name=Awowogei
@@ -35608,6 +35610,8 @@ param=rangeattack_sound,arrowlaunch2
 param=proj_launch,iron_arrow_launch
 param=proj_height,24
 param=proj_travel,iron_arrow_travel
+huntmode=aa_aggressive_ranged
+huntrange=6
 
 [mm_ravine_archer]
 name=Monkey Archer
@@ -35638,6 +35642,8 @@ param=rangeattack_sound,arrowlaunch2
 param=proj_launch,iron_arrow_launch
 param=proj_height,24
 param=proj_travel,iron_arrow_travel
+huntmode=aa_aggressive_ranged
+huntrange=15
 
 [mm_posted_archer]
 name=Monkey Archer
@@ -35670,6 +35676,8 @@ param=rangeattack_sound,arrowlaunch2
 param=proj_launch,iron_arrow_launch
 param=proj_height,24
 param=proj_travel,iron_arrow_travel
+huntmode=aa_aggressive_ranged
+huntrange=6
 
 [mm_religious_guard]
 name=Monkey Guard
@@ -35697,6 +35705,8 @@ param=attack_sound,gorilla_attack
 param=defend_sound,gorilla_hit
 param=death_sound,gorilla_death
 param=death_drop,mm_normal_gorilla_monkey_bones
+huntmode=aa_aggressive_melee
+huntrange=5
 
 [mm_religious_trapdoor_guard]
 name=Monkey Guard
@@ -35724,6 +35734,8 @@ param=attack_sound,gorilla_attack
 param=defend_sound,gorilla_hit
 param=death_sound,gorilla_death
 param=death_drop,mm_bearded_gorilla_monkey_bones
+huntmode=aa_aggressive_melee
+huntrange=2
 
 [mm_elder_guard_1]
 name=Elder Guard
@@ -35802,6 +35814,8 @@ param=defend_sound,zombie_monkey_hit
 param=death_sound,zombie_monkey_death
 param=death_drop,mm_large_zombie_monkey_bones
 param=undead,^true
+huntmode=aa_aggressive_melee
+huntrange=5
 
 [mm_zombie_monkey_large_guard]
 name=Monkey Zombie
@@ -35836,6 +35850,8 @@ param=defend_sound,zombie_monkey_hit
 param=death_sound,zombie_monkey_death
 param=death_drop,mm_large_zombie_monkey_bones
 param=undead,^true
+huntmode=aa_aggressive_melee
+huntrange=2
 
 [mm_zombie_monkey_small]
 name=Monkey Zombie
@@ -35868,6 +35884,8 @@ param=defend_sound,zombie_monkey_hit
 param=death_sound,zombie_monkey_death
 param=death_drop,mm_small_zombie_monkey_bones
 param=undead,^true
+huntmode=aa_aggressive_melee
+huntrange=2
 
 [mm_bonzara]
 name=Bonzara

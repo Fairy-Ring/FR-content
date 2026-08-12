@@ -1,0 +1,33 @@
+// 289 quest_mm.hunt — greegree-aware Ape Atoll hunt.
+// check_invcat needs engine HuntConfig code 18 (289).
+
+[aa_aggressive_melee]
+type=player
+check_vis=lineofsight
+check_nottoostrong=off
+check_notcombat=%lastcombat
+check_notcombat_self=%npc_lastcombat
+check_invcat=worn,mm_greegree,<1
+check_notbusy=off
+find_keephunting=off
+find_newmode=opplayer2
+
+[aa_aggressive_ranged]
+type=player
+check_vis=lineofsight
+check_nottoostrong=off
+check_notcombat=%lastcombat
+check_notcombat_self=%npc_lastcombat
+check_invcat=worn,mm_greegree,<1
+check_notbusy=off
+find_keephunting=off
+find_newmode=applayer2
+
+[mm_guard]
+type=player
+check_vis=lineofsight
+check_nottoostrong=off
+check_notbusy=off
+check_afk=off
+find_keephunting=on
+find_newmode=applayer2
