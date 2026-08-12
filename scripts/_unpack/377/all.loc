@@ -8261,6 +8261,7 @@ model=ice_throne
 width=2
 length=3
 
+blockrange=no
 [chair_dark]
 name=Chair
 desc=The ideal thing to sit on.
@@ -24827,6 +24828,7 @@ recol1d=19014
 width=2
 blockrange=no
 
+anim=roast
 [chompybird_spitroast_cooked]
 name=Ogre spit-roast
 desc=Useful for ogre dinners.
@@ -24836,6 +24838,7 @@ recol1d=14690
 width=2
 blockrange=no
 
+anim=roast
 [chompybird_spitroast_ruined]
 name=Ogre spit-roast
 desc=Useful for ogre dinners.
@@ -24845,6 +24848,7 @@ recol1d=6273
 width=2
 blockrange=no
 
+anim=roast
 [chompybird_spitroast_empty]
 name=Ogre spit-roast
 desc=Useful for ogre dinners.
@@ -24852,6 +24856,7 @@ model=chompybird_spitroast_empty
 width=2
 blockrange=no
 
+anim=spit_fire
 [chompybird_rockbench]
 name=Ogre bench
 desc=An ogre bench, useful for taking all that weight off their legs.
@@ -24912,6 +24917,7 @@ recol1d=22098
 width=2
 blockrange=no
 
+anim=roast
 [chompybird_spitroast_chicken_c]
 name=Ogre spit-roast
 desc=Useful for ogre dinners.
@@ -24921,6 +24927,7 @@ recol1d=13472
 width=2
 blockrange=no
 
+anim=roast
 [cavewall_top_mudtogrey]
 model=cavewall_top_lightdark
 recol1s=2114
@@ -39827,6 +39834,9 @@ anim=embers
 width=2
 length=2
 
+blockrange=no
+blockwalk=no
+category=cooking_fire
 [fire_5632]
 name=Fire
 desc=Glowing embers.
@@ -70080,6 +70090,8 @@ model=loc_10652
 width=5
 length=5
 
+category=tree
+param=ent,macro_ent_tree1
 [evergreen_10653]
 name=Evergreen.
 desc=A decorated tree.
@@ -94857,6 +94869,7 @@ model=100_dave_stove
 length=2
 forceapproach=east
 
+category=cooking_oven
 [table_14920]
 name=Table
 desc=A basic wooden table, suitable for casual meals.

@@ -29,6 +29,16 @@ head1=obj_pickpocket_guide_farmer
 maxrange=50
 moverestrict=outdoors
 defaultmode=patrol
+patrol1=0_50_50_7_33,0
+patrol10=0_50_50_2_32,0
+patrol2=0_50_50_11_30,0
+patrol3=0_50_50_19_30,0
+patrol4=0_50_50_19_22,10
+patrol5=0_50_50_21_22,0
+patrol6=0_50_50_21_12,0
+patrol7=0_50_50_18_9,0
+patrol8=0_50_50_14_5,0
+patrol9=0_50_50_2_5,0
 [man]
 name=Man
 desc=One of RuneScape's many citizens.
@@ -2391,6 +2401,7 @@ param=slayer_category,^slayer_bat
 huntmode=cowardly
 huntrange=2
 
+members=yes
 [deathwing]
 name=Death wing
 desc=A shadowy, barely visible flying entity from some evil place.
@@ -3890,6 +3901,7 @@ huntmode=cowardly
 huntrange=2
 param=death_sound,cow_death
 param=retreat,7
+members=yes
 [poisonspider]
 name=Poison spider
 desc=I think this spider has been genetically modified.
@@ -3922,6 +3934,7 @@ param=poison_severity,27
 huntmode=cowardly
 huntrange=1
 param=death_drop,null
+members=yes
 [mammoth]
 name=Mammoth
 desc=A woolly elephantine monster.
@@ -4404,6 +4417,7 @@ huntmode=aggressive_melee
 huntrange=1
 defaultmode=none
 param=attack_sound,null
+blockwalk=all
 [nasty_tree]
 name=Tree
 desc=Its bark is worse than its swipe.
@@ -4430,6 +4444,7 @@ param=attack_sound,nasty_tree_attack
 huntmode=aggressive_melee
 huntrange=1
 defaultmode=none
+blockwalk=all
 [butterfly]
 name=Butterfly
 desc=These look much better in the wild.
@@ -5475,6 +5490,7 @@ param=attack_sound,hacksword_stab
 huntmode=cowardly
 huntrange=3
 
+members=yes
 [rogue]
 name=Rogue
 desc=Rogueish.
@@ -6684,6 +6700,7 @@ param=defend_anim,giant_block
 param=death_anim,giant_death
 param=defend_sound,swordclash4
 
+blockwalk=all
 [entrana_monk]
 name=Monk
 desc=A holy man.
@@ -8223,6 +8240,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,steel2
 category=guardian_of_armadyl
 
+blockwalk=all
 [ikov_guardianfemale]
 name=Guardian of Armadyl
 desc=A guard who has devoted their life to Armadyl.
@@ -8274,6 +8292,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,steel2
 category=guardian_of_armadyl
 
+blockwalk=all
 [ikov_winelda]
 name=Winelda
 desc=A witch.
@@ -8355,6 +8374,7 @@ param=defend_sound,giant_hit
 param=death_sound,giant_death
 magic=62
 param=defend_anim,null
+blockwalk=all
 [cook]
 name=Cook
 desc=The head cook of Lumbridge castle.
@@ -11149,6 +11169,8 @@ wanderrange=3
 maxrange=40
 timer=25
 defaultmode=wander
+patrol1=0_42_52_38_21,6
+patrol2=0_42_52_43_21,6
 [legends_guild_guard2]
 name=Legends Guard
 desc=A Legends Guild Guard, he protects the entrance to the Legends Guild.
@@ -11185,6 +11207,8 @@ wanderrange=3
 maxrange=40
 timer=25
 defaultmode=wander
+patrol1=0_42_52_38_20,6
+patrol2=0_42_52_43_20,6
 [radimus_erkle]
 name=Radimus Erkle
 desc=Radimus is the Grand Vizier of the Legends Guild.
@@ -11856,6 +11880,8 @@ wanderrange=7
 maxrange=7
 timer=5
 defaultmode=patrol
+patrol1=^trawler_start_patrol1
+patrol2=^trawler_start_patrol2
 [murphy_halfsunk]
 name=Murphy
 desc=Salty old sea dog.
@@ -11892,6 +11918,8 @@ wanderrange=7
 maxrange=7
 timer=5
 defaultmode=patrol
+patrol1=^trawler_flood_patrol1
+patrol2=^trawler_flood_patrol2
 [murphy_sunk]
 name=Murphy
 desc=Salty old sea dog.
@@ -12564,6 +12592,8 @@ op1=Talk-to
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_goatee_head
 defaultmode=patrol
+patrol1=0_45_46_0_5,1
+patrol2=0_45_46_0_10,1
 [zadimus_ghost]
 name=Spirit of Zadimus
 desc=An unquiet soul.
@@ -16422,6 +16452,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_red_withball]
 name=Gnome baller
 desc=A professional gnome baller.
@@ -16463,6 +16494,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_red_tackled2]
 name=Gnome baller
 desc=A professional gnome baller.
@@ -16483,6 +16515,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_orange]
 name=Gnome baller
 desc=A professional gnome baller.
@@ -16506,6 +16539,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_orange_withball]
 name=Gnome baller
 desc=A professional gnome baller.
@@ -16547,6 +16581,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_orange_tackled2]
 name=Gnome baller
 desc=A professional gnome baller.
@@ -16567,6 +16602,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_yellow]
 name=Gnome baller
 desc=A professional gnome baller.
@@ -16590,6 +16626,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_yellow_withball]
 name=Gnome baller
 desc=A professional gnome baller.
@@ -16631,6 +16668,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_yellow_tackled2]
 name=Gnome baller
 desc=A professional gnome baller.
@@ -16651,6 +16689,7 @@ param=death_sound,gnome_death
 huntrange=1
 huntmode=gnomeball_tackler
 
+attackrange=1
 [gnomeballer_green]
 name=Gnome winger
 desc=A professional gnome baller.
@@ -17708,6 +17747,7 @@ param=proj_travel,iron_arrow_travel
 ranged=40
 param=defend_sound,null
 param=death_sound,null
+attackrange=10
 [ranging_guild_doorman]
 name=Ranging Guild Doorman
 desc=The keeper of the gates to the ranging guild.
@@ -17976,6 +18016,7 @@ huntrange=11
 ranged=20
 param=defend_sound,null
 param=death_sound,null
+attackrange=11
 [guild_towerarcher2]
 name=Tower Archer
 desc=Defender of the east tower.
@@ -18016,6 +18057,7 @@ huntrange=11
 ranged=40
 param=defend_sound,null
 param=death_sound,null
+attackrange=11
 [guild_towerarcher3]
 name=Tower Archer
 desc=Defender of the south tower.
@@ -18056,6 +18098,7 @@ huntrange=11
 ranged=60
 param=defend_sound,null
 param=death_sound,null
+attackrange=11
 [guild_towerarcher4]
 name=Tower Archer
 desc=Defender of the west tower.
@@ -18096,6 +18139,7 @@ huntrange=11
 ranged=80
 param=defend_sound,null
 param=death_sound,null
+attackrange=11
 [ranging_guild_tribal_salesman]
 name=Tribal Weapon Salesman
 desc=Supplier of authentic throwing weapons.
@@ -19705,6 +19749,7 @@ head1=npc_gertrudescat_head
 param=attack_anim,cat_attack
 param=death_anim,cat_death
 
+members=yes
 [lostkitten]
 name=Kitten
 desc=It looks lost.
@@ -19740,6 +19785,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [kittenpet_light]
 name=Kitten
 desc=A friendly little pet.
@@ -19769,6 +19815,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [kittenpet_brown]
 name=Kitten
 desc=A friendly little pet.
@@ -19798,6 +19845,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [kittenpet_black]
 name=Kitten
 desc=A friendly little pet.
@@ -19827,6 +19875,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [kittenpet_browngrey]
 name=Kitten
 desc=A friendly little pet.
@@ -19854,6 +19903,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [kittenpet_bluegrey]
 name=Kitten
 desc=A friendly little pet.
@@ -19880,6 +19930,7 @@ param=cat_next_id,growncat_bluegrey
 op5=Chase vermin
 wanderrange=30000
 timer=1
+blockwalk=none
 [kittens_mew]
 name=Crate
 desc=Can I hear kittens?
@@ -19890,6 +19941,8 @@ minimap=no
 wanderrange=0
 moverestrict=nomove
 timer=25
+blockwalk=all
+members=yes
 [growncat]
 name=Cat
 desc=A fully grown feline.
@@ -19912,6 +19965,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [growncat_light]
 name=Cat
 desc=A fully grown feline.
@@ -19940,6 +19994,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [growncat_brown]
 name=Cat
 desc=A fully grown feline.
@@ -19968,6 +20023,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [growncat_black]
 name=Cat
 desc=A fully grown feline.
@@ -19996,6 +20052,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [growncat_browngrey]
 name=Cat
 desc=A fully grown feline.
@@ -20022,6 +20079,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [growncat_bluegrey]
 name=Cat
 desc=A fully grown feline.
@@ -20048,6 +20106,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [overgrowncat]
 name=Overgrown cat
 desc=A friendly not-so little pet.
@@ -20069,6 +20128,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [overgrowncat_light]
 name=Overgrown cat
 desc=A friendly not-so little pet.
@@ -20096,6 +20156,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [overgrowncat_brown]
 name=Overgrown cat
 desc=A friendly not-so little pet.
@@ -20123,6 +20184,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [overgrowncat_black]
 name=Overgrown cat
 desc=A friendly not-so little pet.
@@ -20150,6 +20212,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [overgrowncat_browngrey]
 name=Overgrown cat
 desc=A friendly not-so little pet.
@@ -20175,6 +20238,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [overgrowncat_bluegrey]
 name=Overgrown cat
 desc=A friendly not-so little pet.
@@ -20200,6 +20264,7 @@ op5=Chase vermin
 wanderrange=30000
 maxrange=30000
 timer=1
+blockwalk=none
 [gertrude]
 name=Gertrude
 desc=A busy housewife.
@@ -20228,6 +20293,7 @@ alwaysontop=yes
 head1=obj_pickpocket_guide_warrior
 param=death_sound,female_death
 wanderrange=0
+members=yes
 [shilop]
 name=Shilop
 desc=One of Gertrude's sons.
@@ -20250,6 +20316,7 @@ head1=npc_hudon_waterfall_quest_head
 wanderrange=2
 param=death_anim,midget_death
 
+members=yes
 [philop]
 name=Philop
 desc=One of Gertrude's sons.
@@ -20268,6 +20335,7 @@ head1=npc_hudon_waterfall_quest_head
 moverestrict=indoors
 param=death_anim,midget_death
 wanderrange=0
+members=yes
 [wilough]
 name=Wilough
 desc=One of Gertrude's sons.
@@ -20286,6 +20354,7 @@ head1=npc_hudon_waterfall_quest_head
 wanderrange=2
 param=death_anim,midget_death
 
+members=yes
 [kanel]
 name=Kanel
 desc=One of Gertrude's sons.
@@ -20304,6 +20373,7 @@ head1=npc_hudon_waterfall_quest_head
 moverestrict=indoors
 param=death_anim,midget_death
 wanderrange=0
+members=yes
 [wantcat1]
 name=Civilian
 desc=A citizen of Ardougne.
@@ -24803,6 +24873,7 @@ minimap=no
 wanderrange=0
 maxrange=10
 defaultmode=none
+blockwalk=all
 [echned_zekin]
 name=Echned Zekin
 desc=A spirit of the underworld.
@@ -26039,6 +26110,7 @@ wanderrange=0
 moverestrict=nomove
 maxrange=10
 defaultmode=none
+blockwalk=all
 [unicorn_upass]
 name=Unicorn
 desc=The animal is caged here.
@@ -28610,6 +28682,7 @@ huntmode=aggressive_ranged
 huntrange=8
 ranged=60
 magic=0
+attackrange=8
 [troll_thrower2]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -28652,6 +28725,7 @@ huntmode=aggressive_ranged
 huntrange=8
 ranged=60
 magic=0
+attackrange=8
 [troll_thrower3]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -28694,6 +28768,7 @@ huntmode=aggressive_ranged
 huntrange=8
 ranged=60
 magic=0
+attackrange=8
 [troll_thrower4]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -28736,6 +28811,7 @@ huntmode=aggressive_ranged
 huntrange=8
 ranged=60
 magic=0
+attackrange=8
 [troll_thrower5]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -28778,6 +28854,7 @@ huntmode=aggressive_ranged
 huntrange=8
 ranged=60
 magic=0
+attackrange=8
 [troll_cook]
 name=Cook
 desc=Human is his speciality.
@@ -28964,6 +29041,11 @@ wanderrange=50
 maxrange=50
 timer=1
 defaultmode=patrol
+blockwalk=none
+patrol1=0_44_157_34_44,0
+patrol2=0_44_157_43_44,0
+patrol3=0_44_157_43_41,0
+patrol4=0_44_157_34_41,0
 [troll_sguard2]
 name=Guard
 desc=He's guarding the storeroom.
@@ -28987,6 +29069,11 @@ wanderrange=50
 maxrange=50
 timer=1
 defaultmode=patrol
+blockwalk=none
+patrol1=0_44_157_34_41,0
+patrol2=0_44_157_34_38,0
+patrol3=0_44_157_39_38,0
+patrol4=0_44_157_39_41,0
 [troll_sguard3]
 name=Guard
 desc=He's guarding the storeroom.
@@ -29011,6 +29098,11 @@ wanderrange=0
 maxrange=50
 timer=1
 defaultmode=patrol
+blockwalk=none
+patrol1=0_44_157_39_41,0
+patrol2=0_44_157_39_38,0
+patrol3=0_44_157_43_38,0
+patrol4=0_44_157_43_41,0
 [troll_sguard4]
 name=Guard
 desc=He's guarding the storeroom.
@@ -29034,6 +29126,13 @@ wanderrange=0
 maxrange=50
 timer=1
 defaultmode=patrol
+blockwalk=none
+patrol1=0_44_157_34_38,0
+patrol2=0_44_157_38_38,0
+patrol3=0_44_157_38_34,0
+patrol4=0_44_157_36_34,0
+patrol5=0_44_157_36_30,0
+patrol6=0_44_157_34_30,0
 [troll_sguard5]
 name=Guard
 desc=He's guarding the storeroom.
@@ -29057,6 +29156,14 @@ wanderrange=0
 maxrange=50
 timer=1
 defaultmode=patrol
+blockwalk=none
+patrol1=0_44_157_45_32,0
+patrol2=0_44_157_47_32,0
+patrol3=0_44_157_44_29,0
+patrol4=0_44_157_45_29,0
+patrol5=0_44_157_48_32,0
+patrol6=0_44_157_48_37,0
+patrol7=0_44_157_45_37,0
 [troll_sguard6]
 name=Guard
 desc=He's guarding the storeroom.
@@ -29078,6 +29185,15 @@ wanderrange=0
 maxrange=50
 timer=1
 defaultmode=patrol
+blockwalk=none
+patrol1=0_44_157_39_34,0
+patrol2=0_44_157_36_34,0
+patrol3=0_44_157_36_30,0
+patrol4=0_44_157_34_30,0
+patrol5=0_44_157_34_27,0
+patrol6=0_44_157_37_27,0
+patrol7=0_44_157_37_29,0
+patrol8=0_44_157_39_29,0
 [troll_sguard7]
 name=Guard
 desc=He's guarding the storeroom.
@@ -29101,6 +29217,11 @@ wanderrange=0
 maxrange=50
 timer=1
 defaultmode=patrol
+blockwalk=none
+patrol1=0_44_157_42_28,0
+patrol2=0_44_157_42_34,0
+patrol3=0_44_157_39_34,0
+patrol4=0_44_157_39_28,0
 [troll_sguard8]
 name=Guard
 desc=He's guarding the storeroom.
@@ -29124,6 +29245,14 @@ wanderrange=0
 maxrange=50
 timer=1
 defaultmode=patrol
+blockwalk=none
+patrol1=0_44_157_48_37,0
+patrol2=0_44_157_48_32,0
+patrol3=0_44_157_45_29,0
+patrol4=0_44_157_44_29,0
+patrol5=0_44_157_47_32,0
+patrol6=0_44_157_45_32,0
+patrol7=0_44_157_45_37,0
 [eadgar_storeroom_guard]
 name=Guard
 desc=He's guarding the goutweed.
@@ -29147,6 +29276,7 @@ maxrange=0
 timer=10
 moverestrict=nomove
 defaultmode=none
+blockwalk=all
 [eadgar_troll_chief_cook]
 name=Burntmeat
 desc=Human is his speciality.
@@ -30809,6 +30939,7 @@ param=magicdefence,10
 param=damagetype,^crush_style
 param=attack_anim,deadtree_attack
 param=attack_sound,nasty_tree_attack
+blockwalk=all
 [mmsnailround_swamp]
 name=Myre Blamish Snail
 desc=A marsh coloured blamish snail, these types are said to spit acid.
@@ -30853,6 +30984,7 @@ param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellround_swamp
 maxrange=22
+attackrange=3
 [mmsnailround_red+black]
 name=Blood Blamish Snail
 desc=A blood coloured blamish snail, these types are said to spit acid.
@@ -30897,6 +31029,7 @@ param=defend_sound,snail_hit
 param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellround_red+black
+attackrange=3
 [mmsnailround_yellow]
 name=Ochre Blamish Snail
 desc=A muddy coloured blamish snail, these types are said to spit acid.
@@ -30941,6 +31074,7 @@ param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellround_yellow
 maxrange=17
+attackrange=3
 [mmsnailround_blue]
 name=Bruise Blamish Snail
 desc=A bruise blue coloured blamish snail, these types are said to spit acid.
@@ -30985,6 +31119,7 @@ param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellround_blue
 maxrange=52
+attackrange=3
 [mmsnailround_orange]
 name=Bark Blamish Snail
 desc=A branch bark coloured blamish snail, these types are said to spit acid.
@@ -31029,6 +31164,7 @@ param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellround_orange
 maxrange=32
+attackrange=3
 [mmsnailpoint_swamp]
 name=Myre Blamish Snail
 desc=A marsh coloured blamish snail, these types are said to spit acid.
@@ -31071,6 +31207,7 @@ param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellpoint_swamp
 maxrange=12
+attackrange=3
 [mmsnailpoint_red+black]
 name=Blood Blamish Snail
 desc=A blood coloured blamish snail, these types are said to spit acid.
@@ -31113,6 +31250,7 @@ param=defend_sound,snail_hit
 param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellpoint_red+black
+attackrange=3
 [mmsnailpoint_yellow]
 name=Ochre Blamish Snail
 desc=A muddy coloured blamish snail, these types are said to spit acid.
@@ -31155,6 +31293,7 @@ param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellpoint_yellow
 maxrange=27
+attackrange=3
 [mmsnailpoint_blue]
 name=Bruise Blamish Snail
 desc=A bruise blue coloured blamish snail, these types are said to spit acid.
@@ -31197,6 +31336,7 @@ param=death_sound,snail_death
 param=rangeattack_sound,snail_spit
 param=death_drop,shellpoint_blue
 maxrange=37
+attackrange=3
 [0_54_53_slimey_eel]
 name=Fishing spot
 desc=I can see 'things' swimming in the water.
@@ -31213,6 +31353,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_slimey_eel_east_enum
 [0_53_53_slimey_eel]
 name=Fishing spot
 desc=I can see 'things' swimming in the water.
@@ -31229,6 +31370,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_slimey_eel_west_enum
 [0_53_51_slimey_eel]
 name=Fishing spot
 desc=I can see 'things' swimming in the water.
@@ -31245,6 +31387,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_slimey_eel_south_enum
 [bedabin_fighter]
 name=Bedabin Nomad Fighter
 desc=A bedabin nomad fighter - a sandy swordsman.
@@ -31415,6 +31558,7 @@ timer=1
 param=next_npc_type,shade_level2
 huntrange=3
 
+blockwalk=none
 [shade_level2]
 name=Phrin Shade
 desc=The shadowy remains of a long departed soul.
@@ -31486,6 +31630,7 @@ timer=1
 param=next_npc_type,shade_level3
 huntrange=3
 
+blockwalk=none
 [shade_level3]
 name=Riyl Shade
 desc=The shadowy remains of a long departed soul.
@@ -31557,6 +31702,7 @@ timer=1
 param=next_npc_type,shade_level4
 huntrange=3
 
+blockwalk=none
 [shade_level4]
 name=Asyn Shade
 desc=The shadowy remains of a long departed soul.
@@ -31626,6 +31772,7 @@ timer=1
 param=next_npc_type,shade_level5
 huntrange=3
 
+blockwalk=none
 [shade_level5]
 name=Fiyr Shade
 desc=The shadowy remains of a long departed soul.
@@ -31801,6 +31948,7 @@ op1=Talk-to
 head1=obj_pickpocket_guide_farmer
 category=mort_afflicted
 
+alwaysontop=yes
 [mort_woman]
 name=Mort'ton Local
 desc=A local villager of Mort'ton.
@@ -31823,6 +31971,7 @@ op1=Talk-to
 head1=obj_pickpocket_guide_warrior
 category=mort_afflicted
 
+alwaysontop=yes
 [mort_afflicted_man]
 name=Afflicted
 desc=A local villager of Mort'ton.
@@ -31932,6 +32081,7 @@ head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_medium_head
 category=mort_afflicted
 op2=Attack
+alwaysontop=yes
 [mort_woman2]
 name=Mort'ton local
 desc=A local villager of Mort'ton.
@@ -31954,6 +32104,7 @@ op1=Talk-to
 head1=idk_woman_hair_pigtails_head
 category=mort_afflicted
 op2=Attack
+alwaysontop=yes
 [mort_afflicted_man2]
 name=Afflicted
 desc=A local villager of Mort'ton.
@@ -32103,6 +32254,7 @@ param=defend_sound,null
 param=death_sound,null
 param=npc_forcemulti,^true
 maxrange=5
+attackrange=5
 [horror_rockcrab]
 name=Rock Crab
 desc=No one likes crabs...
@@ -32147,6 +32299,7 @@ param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
 maxrange=9
+attackrange=1
 [horror_rockcrab_small]
 name=Rock Crab
 desc=No one likes crabs...
@@ -32195,6 +32348,7 @@ param=attack_sound,insect_attack
 param=defend_sound,insect_hit
 param=death_sound,insect_death
 maxrange=9
+attackrange=1
 [viking_olaf]
 name=Olaf the Bard
 desc=A Fremennik bard.
@@ -34547,6 +34701,7 @@ param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
 param=rangeattack_sound,dagganoth_spines
 param=proj_travel,horror_spines_travel
+attackrange=4
 [horror_dagganoth_jr_darker]
 name=Dagannoth
 desc=A horror from the ocean depths...
@@ -34584,6 +34739,7 @@ param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
 param=rangeattack_sound,dagganoth_spines
 param=proj_travel,horror_spines_travel
+attackrange=4
 [horror_dagganoth_jr_lighter]
 name=Dagannoth
 desc=A horror from the ocean depths...
@@ -34621,6 +34777,7 @@ param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
 param=rangeattack_sound,dagganoth_spines
 param=proj_travel,horror_spines_travel
+attackrange=4
 [horror_dagannoth_medium]
 name=Dagannoth
 desc=A horror from the ocean depths...
@@ -34918,6 +35075,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [horror_dagganoth_airb]
 name=Dagannoth mother
 desc=A horror from the ocean depths...
@@ -34957,6 +35115,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [horror_dagganoth_airc]
 name=Dagannoth mother
 desc=A horror from the ocean depths...
@@ -34996,6 +35155,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [horror_dagganoth_air]
 name=Dagannoth mother
 desc=A horror from the ocean depths...
@@ -35036,6 +35196,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [horror_dagganoth_water]
 name=Dagannoth mother
 desc=A horror from the ocean depths...
@@ -35076,6 +35237,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [horror_dagganoth_fire]
 name=Dagannoth mother
 desc=A horror from the ocean depths...
@@ -35116,6 +35278,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [horror_dagganoth_earth]
 name=Dagannoth mother
 desc=A horror from the ocean depths...
@@ -35156,6 +35319,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [horror_dagganoth_ranged]
 name=Dagannoth mother
 desc=A horror from the ocean depths...
@@ -35196,6 +35360,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [horror_dagganoth_melee]
 name=Dagannoth mother
 desc=A horror from the ocean depths...
@@ -35236,6 +35401,7 @@ param=death_anim,horror_dagannoth_death
 param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
+attackrange=10
 [boardgames_barmaid]
 name=Sam
 desc=Pretty barmaid.
@@ -36996,6 +37162,7 @@ vislevel=hide
 head1=npc_commander_montai_head
 wanderrange=10
 maxrange=40
+blockwalk=none
 [mm_lumo_aa]
 name=Lumo
 desc=A seasoned looking Gnome foot soldier.
@@ -37033,6 +37200,7 @@ vislevel=hide
 head1=obj_pickpocket_guide_gnome
 wanderrange=10
 maxrange=40
+blockwalk=none
 [mm_bunkdo_aa]
 name=Bunkdo
 desc=A seasoned looking Gnome foot soldier.
@@ -37066,6 +37234,7 @@ vislevel=hide
 head1=obj_pickpocket_guide_gnome
 wanderrange=10
 maxrange=40
+blockwalk=none
 [mm_carado_aa]
 name=Carado
 desc=A seasoned looking Gnome foot soldier.
@@ -37099,6 +37268,8 @@ vislevel=hide
 head1=obj_pickpocket_guide_gnome
 wanderrange=10
 maxrange=40
+attackrange=5
+blockwalk=none
 [mm_lumdo]
 name=Lumdo
 desc=A seasoned looking Gnome foot soldier.
@@ -37140,6 +37311,7 @@ vislevel=hide
 head1=npc_1420_head
 wanderrange=10
 maxrange=40
+blockwalk=none
 [mm_karam_aa2]
 name=Karam
 desc=All you see is a glimmer of light and the suggestion of shadow.
@@ -37226,6 +37398,8 @@ vislevel=hide
 head1=npc_1425_head
 wanderrange=10
 maxrange=40
+attackrange=5
+blockwalk=none
 [mm_caranock]
 name=G.L.O. Caranock
 desc=An official looking Gnome with small beady eyes.
@@ -37276,6 +37450,7 @@ maxrange=10
 timer=1
 huntmode=mm_guard
 huntrange=10
+attackrange=10
 [mm_salenab]
 name=Salenab
 desc=It's Salenab the monkey.
@@ -37303,6 +37478,8 @@ wanderrange=2
 moverestrict=indoors
 timer=2
 param=next_npc_type,mm_aberab
+attackrange=1
+blockwalk=all
 [mm_aberab]
 name=Aberab
 desc=A huge brutish gorilla. He looks like a jail guard.
@@ -37322,6 +37499,8 @@ wanderrange=2
 moverestrict=indoors
 timer=2
 param=next_npc_type,mm_trefaji
+attackrange=1
+blockwalk=all
 [mm_solihib]
 name=Solihib
 desc=The food merchant of Ape Atoll.
@@ -37537,6 +37716,7 @@ param=death_anim,m_monkey_death
 param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
+blockwalk=none
 [mm_oipuis]
 name=Oipuis
 desc=A large ninja monkey wielding two scimitars.
@@ -37565,6 +37745,7 @@ param=death_anim,m_monkey_death
 param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
+blockwalk=none
 [mm_uyoro]
 name=Uyoro
 desc=A large ninja monkey wielding two scimitars.
@@ -37593,6 +37774,7 @@ param=death_anim,m_monkey_death
 param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
+blockwalk=none
 [mm_ouhai]
 name=Ouhai
 desc=A large ninja monkey wielding two scimitars.
@@ -37621,6 +37803,7 @@ param=death_anim,m_monkey_death
 param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
+blockwalk=none
 [mm_uodai]
 name=Uodai
 desc=A large ninja monkey wielding two scimitars.
@@ -37650,6 +37833,7 @@ param=death_sound,monkey_death
 param=death_drop,mm_medium_ninja_monkey_bones
 wanderrange=5
 maxrange=100
+blockwalk=none
 [mm_padulah]
 name=Padulah
 desc=A scimitar wielding ninja monkey. He looks like he is guarding something.
@@ -37682,6 +37866,18 @@ wanderrange=2
 maxrange=7
 respawnrate=100
 defaultmode=patrol
+patrol1=0_43_43_9_33,15
+patrol10=0_43_43_5_36,15
+patrol11=0_43_43_6_36,15
+patrol12=0_43_43_7_35,0
+patrol2=0_43_43_9_32,15
+patrol3=0_43_43_8_31,0
+patrol4=0_43_43_6_29,15
+patrol5=0_43_43_5_29,15
+patrol6=0_43_43_4_30,0
+patrol7=0_43_43_2_32,15
+patrol8=0_43_43_2_33,15
+patrol9=0_43_43_2_34,15
 [mm_awowogei_cutscene]
 name=Awowogei
 desc=A rather dapper little monkey.
@@ -37781,6 +37977,14 @@ vislevel=hide
 head1=npc_1437_head
 timer=2
 defaultmode=patrol
+patrol1=0_42_43_54_42,15
+patrol2=0_42_43_55_40,30
+patrol3=0_42_43_55_35,5
+patrol4=0_42_43_53_34,5
+patrol5=0_42_43_49_34,5
+patrol6=0_42_43_48_40,5
+patrol7=0_42_43_45_40,15
+patrol8=0_42_43_49_42,15
 [mm_monkey_guard]
 name=Monkey Guard
 desc=A scimitar wielding ninja monkey.
@@ -37977,6 +38181,7 @@ huntrange=2
 wanderrange=1
 maxrange=2
 respawnrate=25
+blockwalk=all
 [mm_elder_guard_1]
 name=Elder Guard
 desc=A huge brutish gorilla stands here, blocking the way.
@@ -37995,6 +38200,8 @@ huntmode=mm_guard
 moverestrict=nomove
 defaultmode=none
 param=damagetype,^crush_style
+attackrange=1
+blockwalk=all
 [mm_elder_guard_2]
 name=Elder Guard
 desc=A huge brutish gorilla stands here, blocking the way.
@@ -38013,6 +38220,8 @@ huntmode=mm_guard
 moverestrict=nomove
 defaultmode=none
 param=damagetype,^crush_style
+attackrange=1
+blockwalk=all
 [mm_zoo_monkey]
 name=Monkey
 desc=This monkey seems like it might want to talk!
@@ -38248,6 +38457,7 @@ param=defend_sound,skelly_hit
 param=death_sound,skeleton_death
 param=death_drop,mm_skeleton_bones
 param=undead,^true
+attackrange=15
 [mm_warehouse_spider]
 name=Spider
 desc=It's an extremely small brown spider. Probably very poisonous.
@@ -38280,6 +38490,7 @@ param=defend_sound,insect_hit
 param=death_sound,insect_death
 param=death_drop,null
 param=poison_severity,7
+blockwalk=none
 [mm_cutscene_spider]
 name=Spider
 desc=It's an extremely small and probably poisonous brown spider.
@@ -39061,6 +39272,7 @@ turnspeed=1024
 vislevel=hide
 moverestrict=nomove
 defaultmode=none
+blockwalk=all
 [saradominist_zealot]
 name=Zealot
 desc=His robes prominently display the star of Saradomin.
@@ -39300,6 +39512,7 @@ wanderrange=0
 maxrange=0
 moverestrict=nomove
 defaultmode=none
+blockwalk=all
 [hauntedmine_boss_key]
 name=Innocent looking key
 desc=A shiny key sitting quietly on a crate.
@@ -39324,6 +39537,7 @@ alwaysontop=yes
 turnspeed=1024
 moverestrict=nomove
 defaultmode=none
+blockwalk=all
 [hauntedmine_cart1]
 name=Mine cart
 desc=Big, metal, and wheeled.
@@ -39333,6 +39547,7 @@ alwaysontop=yes
 turnspeed=1024
 maxrange=19
 moverestrict=nomove
+blockwalk=all
 [hauntedmine_cart2]
 name=Mine cart
 desc=Big, metal, and wheeled.
@@ -39342,6 +39557,7 @@ alwaysontop=yes
 turnspeed=1024
 maxrange=15
 moverestrict=nomove
+blockwalk=all
 [hauntedmine_cart3]
 name=Mine cart
 desc=Big, metal, and wheeled.
@@ -39351,6 +39567,7 @@ alwaysontop=yes
 turnspeed=1024
 maxrange=15
 moverestrict=nomove
+blockwalk=all
 [hauntedmine_cart4]
 name=Mine cart
 desc=Big, metal, and wheeled.
@@ -39360,6 +39577,7 @@ alwaysontop=yes
 turnspeed=1024
 maxrange=8
 moverestrict=nomove
+blockwalk=all
 [hauntedmine_suprise_ghost]
 name=Ghost
 desc=Eeek! A ghost!
