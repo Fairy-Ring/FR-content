@@ -1038,7 +1038,8 @@ op1=Chop-down
 op3=hidden
 mapscene=5
 param=ent,macro_ent_jungle_tree1
-
+category=tree
+param=next_loc_stage,mm_bush_kharazi_jungle_tree1_stump
 [mm_bush_kharazi_jungle_tree1_stump]
 name=Jungle Tree Stump
 desc=This was a fairly tall tree with sparse foliage.
@@ -1054,7 +1055,8 @@ op3=hidden
 width=2
 length=2
 mapscene=5
-
+category=tree
+param=next_loc_stage,mm_bush_kharazi_jungle_tree2_stump
 [mm_bush_kharazi_jungle_tree2_stump]
 name=Jungle Tree Stump
 desc=This was a fairly tall tree with sparse foliage.

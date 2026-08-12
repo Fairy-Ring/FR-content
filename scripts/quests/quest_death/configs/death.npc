@@ -26,7 +26,7 @@ op1=Talk-to
 vislevel=hide
 head1=npc_sir_kay_head
 moverestrict=indoors
-
+wanderrange=2
 [death_ig_sergeant_drilling]
 name=Sergeant
 desc=Sergeant of the Imperial Guard.
@@ -59,7 +59,8 @@ head1=npc_sir_kay_head
 defaultmode=none
 moverestrict=nomove
 timer=5
-
+wanderrange=0
+maxrange=0
 [death_ig_sergeant_training]
 name=Sergeant
 desc=Sergeant of the Imperial Guard.
@@ -91,7 +92,8 @@ vislevel=hide
 head1=npc_sir_kay_head
 timer=5
 moverestrict=outdoors
-
+wanderrange=2
+maxrange=4
 [death_ig_solider_drilling]
 name=Soldier
 desc=A soldier of the Imperial Guard.
@@ -121,7 +123,8 @@ vislevel=hide
 head1=npc_sir_kay_head
 defaultmode=none
 moverestrict=nomove
-
+wanderrange=0
+maxrange=0
 [death_ig_solider_training]
 name=Soldier
 desc=A soldier of the Imperial Guard.
@@ -152,7 +155,8 @@ head1=npc_sir_kay_head
 defaultmode=none
 moverestrict=nomove
 timer=5
-
+wanderrange=0
+maxrange=0
 [death_ig_solider_wander]
 name=Soldier
 desc=A soldier of the Imperial Guard.
@@ -199,7 +203,8 @@ maxrange=8
 param=attack_sound,null
 param=defend_sound,null
 param=death_sound,null
-
+wanderrange=5
+param=defend_anim,human_unarmedblock
 [death_ig_solider_sitting1]
 name=Soldier
 desc=A soldier of the Imperial Guard.
@@ -229,7 +234,8 @@ head1=obj_pickpocket_guide_farmer
 defaultmode=none
 moverestrict=nomove
 timer=10
-
+wanderrange=0
+maxrange=0
 [death_ig_solider_sitting2]
 name=Soldier
 desc=A soldier of the Imperial Guard.
@@ -259,7 +265,8 @@ head1=obj_pickpocket_guide_farmer
 defaultmode=none
 moverestrict=nomove
 timer=10
-
+wanderrange=0
+maxrange=0
 [death_ig_solider_sitting3]
 name=Soldier
 desc=A soldier of the Imperial Guard.
@@ -289,7 +296,8 @@ head1=obj_pickpocket_guide_farmer
 defaultmode=none
 moverestrict=nomove
 timer=10
-
+wanderrange=0
+maxrange=0
 [death_ig_solider_wounded]
 name=Soldier
 desc=A soldier of the Imperial Guard.
@@ -319,7 +327,8 @@ head1=obj_pickpocket_guide_farmer
 defaultmode=none
 moverestrict=nomove
 timer=10
-
+wanderrange=0
+maxrange=0
 [death_saba]
 name=Saba
 desc=A dishevelled and irritable hermit.
@@ -377,7 +386,8 @@ vislevel=hide
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_pointy_head
 head3=npc_1071_head
-
+wanderrange=5
+maxrange=7
 [death_cook]
 name=Eadburg
 desc=The Burthorpe Castle cook.
@@ -418,7 +428,8 @@ param=rangedefence,-12
 param=damagetype,^crush_style
 param=defend_sound,female_hit
 param=death_sound,female_death
-
+wanderrange=5
+maxrange=7
 [death_archer1]
 name=Archer
 desc=A Burthorpe Castle archer.
@@ -464,7 +475,7 @@ param=attack_anim,human_bow
 param=rangeattack_sound,arrowlaunch2
 param=proj_launch,iron_arrow_launch
 param=proj_travel,iron_arrow_travel
-
+param=rangebonus,8
 [death_archer2]
 name=Archer
 desc=A Burthorpe Castle archer.
@@ -512,7 +523,7 @@ param=attack_anim,human_bow
 param=rangeattack_sound,arrowlaunch2
 param=proj_launch,iron_arrow_launch
 param=proj_travel,iron_arrow_travel
-
+param=rangebonus,8
 [death_archer_trapped]
 name=Archer
 desc=A Burthorpe Castle archer.
@@ -560,7 +571,7 @@ param=attack_anim,human_bow
 param=rangeattack_sound,arrowlaunch2
 param=proj_launch,iron_arrow_launch
 param=proj_travel,iron_arrow_travel
-
+param=rangebonus,8
 [death_guard1]
 name=Guard
 desc=A Burthorpe Castle guard.
@@ -607,7 +618,8 @@ param=attack_anim,human_blunt_pound
 param=defend_anim,human_blunt_def
 param=attack_sound,warhammer_crush
 category=death_guard
-
+ranged=0
+param=defend_anim,human_blunt_block
 [death_guard2]
 name=Guard
 desc=A Burthorpe Castle guard.
@@ -656,7 +668,8 @@ param=attack_anim,human_blunt_pound
 param=defend_anim,human_blunt_def
 param=attack_sound,warhammer_crush
 category=death_guard
-
+ranged=0
+param=defend_anim,human_blunt_block
 [death_guard_equiproom]
 name=Harold
 desc=An off-duty Burthorpe Castle guard.
@@ -676,7 +689,8 @@ resizev=128
 op1=Talk-to
 vislevel=hide
 head1=obj_khazard_helmet_manhead
-
+wanderrange=1
+maxrange=2
 [death_barman]
 name=Tostig
 desc=Barman of the Toad and Chicken.
@@ -710,7 +724,8 @@ param=shop_sell_multiplier,1000
 param=shop_buy_multiplier,0
 param=shop_delta,10
 param=shop_title,The Toad and Chicken
-
+wanderrange=1
+maxrange=2
 [death_headservant]
 name=Eohric
 desc=Head servant for Prince Anlaf.
@@ -736,7 +751,8 @@ resizev=128
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_man
-
+wanderrange=5
+maxrange=7
 [death_servant1]
 name=Servant
 desc=A servant for Prince Anlaf.
@@ -774,7 +790,9 @@ param=crushdefence,-12
 param=magicdefence,-12
 param=rangedefence,-12
 param=damagetype,^crush_style
-
+wanderrange=5
+maxrange=7
+moverestrict=indoors
 [death_smithy]
 name=Dunstan
 desc=Smithy for Burthorpe.
@@ -801,7 +819,8 @@ vislevel=hide
 head1=idk_man_hair_long_head
 head2=idk_man_jaw_split_head
 moverestrict=indoors
-
+wanderrange=0
+maxrange=7
 [death_shopkeeper]
 name=Wistan
 desc=Shopkeeper for Burthorpe.
@@ -834,7 +853,8 @@ param=shop_buy_multiplier,400
 param=shop_delta,30
 param=shop_title,Burthorpe Supplies
 moverestrict=indoors
-
+wanderrange=5
+maxrange=7
 [death_man_outdoors1]
 name=Breoca
 desc=A citizen of Burthorpe.
@@ -867,7 +887,9 @@ param=crushdefence,-12
 param=magicdefence,-12
 param=rangedefence,-12
 param=damagetype,^crush_style
-
+wanderrange=1
+maxrange=2
+moverestrict=outdoors
 [death_man_outdoors2]
 name=Ocga
 desc=A citizen of Burthorpe.
@@ -901,7 +923,9 @@ param=crushdefence,-12
 param=magicdefence,-12
 param=rangedefence,-12
 param=damagetype,^crush_style
-
+moverestrict=outdoors
+wanderrange=5
+maxrange=7
 [man4]
 name=Man
 desc=One of RuneScape's many citizens.
@@ -962,7 +986,9 @@ param=crushdefence,-12
 param=magicdefence,-12
 param=rangedefence,-12
 param=damagetype,^crush_style
-
+moverestrict=indoors
+wanderrange=5
+maxrange=7
 [death_woman_outdoors1]
 name=Hygd
 desc=A citizen of Burthorpe.
@@ -996,7 +1022,9 @@ param=rangedefence,-12
 param=damagetype,^crush_style
 param=defend_sound,female_hit
 param=death_sound,female_death
-
+moverestrict=outdoors
+wanderrange=5
+maxrange=7
 [death_woman_outdoors2]
 name=Ceolburg
 desc=A citizen of Burthorpe.
@@ -1031,7 +1059,9 @@ param=rangedefence,-12
 param=damagetype,^crush_style
 param=defend_sound,female_hit
 param=death_sound,female_death
-
+moverestrict=outdoors
+wanderrange=5
+maxrange=7
 [death_woman_indoors1]
 name=Hild
 desc=Pretty young woman with an air of mystery around her.
@@ -1070,7 +1100,10 @@ param=rangedefence,-12
 param=damagetype,^crush_style
 param=defend_sound,female_hit
 param=death_sound,female_death
-
+op2=Attack
+moverestrict=indoors
+wanderrange=5
+maxrange=7
 [death_woman_indoors2]
 name=Bob
 desc=The Jagex cat.
@@ -1139,7 +1172,10 @@ param=attack_anim,human_dhsword_chop
 param=defend_anim,human_sword_def
 param=attack_sound,2H_crush
 param=defend_sound,blade3
-
+param=attack_sound,2H_stab
+param=defend_sound,steel_mail
+wanderrange=5
+maxrange=7
 [death_mountain_goat]
 name=Billy
 desc=Billy is a baahd goat.
@@ -1155,7 +1191,7 @@ walkanim=sheep_walk
 readyanim=sheep_ready
 resizeh=100
 resizev=100
-
+wanderrange=5
 [mountain_goat2]
 name=Mountain Goat
 desc=This beast doesn't need climbing boots.
@@ -1169,3 +1205,4 @@ recol2d=19025
 vislevel=hide
 walkanim=sheep_walk
 readyanim=sheep_ready
+wanderrange=2

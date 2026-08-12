@@ -8,7 +8,7 @@ multiloc=0,airtemple_ruined_old
 multiloc=1,airtemple_ruined_new
 category=rc_ruins
 param=rune_type,^air
-
+param=rune_type,1
 [air_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -19,7 +19,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^air
-
+param=rune_type,1
 [airtemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -30,7 +30,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^air
-
+param=rune_type,1
 [mindtemple_ruined]
 active=yes
 width=3
@@ -41,7 +41,7 @@ multiloc=0,mindtemple_ruined_old
 multiloc=1,mindtemple_ruined_new
 category=rc_ruins
 param=rune_type,^mind
-
+param=rune_type,2
 [mind_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -52,7 +52,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^mind
-
+param=rune_type,2
 [mindtemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -63,7 +63,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^mind
-
+param=rune_type,2
 [watertemple_ruined]
 active=yes
 width=3
@@ -74,7 +74,7 @@ multiloc=0,watertemple_ruined_old
 multiloc=1,watertemple_ruined_new
 category=rc_ruins
 param=rune_type,^water
-
+param=rune_type,3
 [water_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -85,7 +85,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^water
-
+param=rune_type,3
 [watertemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -98,7 +98,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^water
-
+param=rune_type,3
 [earthtemple_ruined]
 active=yes
 width=3
@@ -109,7 +109,7 @@ multiloc=0,earthtemple_ruined_old
 multiloc=1,earthtemple_ruined_new
 category=rc_ruins
 param=rune_type,^earth
-
+param=rune_type,4
 [earth_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -120,7 +120,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^earth
-
+param=rune_type,4
 [earthtemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -131,7 +131,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^earth
-
+param=rune_type,4
 [firetemple_ruined]
 active=yes
 width=3
@@ -142,7 +142,7 @@ multiloc=0,firetemple_ruined_old
 multiloc=1,firetemple_ruined_new
 category=rc_ruins
 param=rune_type,^fire
-
+param=rune_type,5
 [fire_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -153,7 +153,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^fire
-
+param=rune_type,5
 [firetemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -166,7 +166,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^fire
-
+param=rune_type,5
 [bodytemple_ruined]
 active=yes
 width=3
@@ -177,7 +177,7 @@ multiloc=0,bodytemple_ruined_old
 multiloc=1,bodytemple_ruined_new
 category=rc_ruins
 param=rune_type,^body
-
+param=rune_type,6
 [body_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -188,7 +188,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^body
-
+param=rune_type,6
 [bodytemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -201,7 +201,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^body
-
+param=rune_type,6
 [cosmictemple_ruined]
 active=yes
 width=3
@@ -212,7 +212,7 @@ multiloc=0,cosmictemple_ruined_old
 multiloc=1,cosmictemple_ruined_new
 category=rc_ruins
 param=rune_type,^cosmic
-
+param=rune_type,7
 [cosmic_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -223,7 +223,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^cosmic
-
+param=rune_type,7
 [cosmictemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -234,7 +234,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^cosmic
-
+param=rune_type,7
 [lawtemple_ruined]
 active=yes
 width=3
@@ -245,7 +245,7 @@ multiloc=0,lawtemple_ruined_old
 multiloc=1,lawtemple_ruined_new
 category=rc_ruins
 param=rune_type,^law
-
+param=rune_type,10
 [law_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -256,7 +256,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^law
-
+param=rune_type,10
 [lawtemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -267,7 +267,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^law
-
+param=rune_type,10
 [naturetemple_ruined]
 active=yes
 width=3
@@ -278,7 +278,7 @@ multiloc=0,naturetemple_ruined_old
 multiloc=1,naturetemple_ruined_new
 category=rc_ruins
 param=rune_type,^nature
-
+param=rune_type,9
 [nature_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -289,7 +289,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^nature
-
+param=rune_type,9
 [naturetemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -300,7 +300,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^nature
-
+param=rune_type,9
 [chaostemple_ruined]
 active=yes
 width=3
@@ -311,7 +311,7 @@ multiloc=0,chaostemple_ruined_old
 multiloc=1,chaostemple_ruined_new
 category=rc_ruins
 param=rune_type,^chaos
-
+param=rune_type,8
 [chaos_altar]
 name=Altar
 desc=A mysterious power emanates from this shrine.
@@ -322,7 +322,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^chaos
-
+param=rune_type,8
 [chaostemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -333,7 +333,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^chaos
-
+param=rune_type,8
 [deathtemple_ruined]
 active=yes
 width=3
@@ -355,7 +355,7 @@ op1=Craft-rune
 anim=rune_altar
 category=rc_altar
 param=rune_type,^death
-
+param=rune_type,11
 [deathtemple_exit_portal]
 name=Portal
 desc=A portal from this mystical place.
@@ -366,7 +366,7 @@ ambient=100
 contrast=100
 category=rc_exit_portal
 param=rune_type,^death
-
+param=rune_type,11
 [soultemple_ruined]
 active=yes
 width=3

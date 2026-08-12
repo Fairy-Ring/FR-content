@@ -224,7 +224,7 @@ param=defend_sound,black_demon_hit
 param=death_sound,black_demon_death
 param=demonbane_vulnerable,yes
 param=death_drop,ashes
-
+timer=100
 [delrith_weakened]
 name=Weakened Delrith
 desc=The demon doesn't look so strong now.
@@ -241,7 +241,8 @@ wanderrange=0
 moverestrict=nomove
 param=death_anim,demon_portalend
 param=death_sound,black_demon_death
-
+timer=100
+defaultmode=none
 [koldemon]
 name=Kolodion
 desc=He's a shape shifter.
@@ -276,7 +277,7 @@ param=death_sound,black_demon_death
 param=death_drop,null
 param=slayer_category,^slayer_blackdemon
 category=kolodion
-
+magic=80
 [nezikchened]
 name=Nezikchened
 desc=An ancient powerful demon of the underworld.
@@ -311,7 +312,8 @@ param=death_sound,demon_death
 param=death_drop,null
 huntmode=nezikchened
 huntrange=5
-
+ranged=160
+magic=160
 [othainian]
 name=Othainian
 desc=One of the Guardians of Iban.

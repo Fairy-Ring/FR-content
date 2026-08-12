@@ -32,7 +32,8 @@ maxrange=7
 huntmode=elvarg_hunt
 huntrange=7
 attackrange=1
-
+wanderrange=32
+magic=70
 [king_dragon]
 name=King black dragon
 desc=The biggest, meanest dragon around.
@@ -79,7 +80,7 @@ param=death_drop,dragon_bones
 param=slayer_category,^slayer_blackdragon
 huntrange=20
 huntmode=cowardly
-
+magic=240
 [green_dragon]
 name=Green dragon
 desc=Must be related to Elvarg.
@@ -116,7 +117,7 @@ param=slayer_category,^slayer_greendragon
 huntmode=cowardly
 huntrange=4
 attackrange=1
-
+magic=68
 [red_dragon]
 name=Red dragon
 desc=A big powerful dragon.
@@ -190,7 +191,7 @@ param=slayer_category,^slayer_blackdragon
 huntmode=cowardly
 huntrange=4
 attackrange=1
-
+magic=100
 [blue_dragon]
 name=Blue dragon
 desc=A mother dragon.
@@ -320,7 +321,25 @@ walkanim=bdrag_walk
 readyanim=bdrag_ready
 op2=Attack
 vislevel=65
-
+wanderrange=4
+attack=55
+defence=55
+strength=55
+hitpoints=65
+huntmode=cowardly
+param=stabdefence,30
+param=slashdefence,50
+param=crushdefence,50
+param=magicdefence,40
+param=rangedefence,30
+param=damagetype,^slash_style
+param=attack_anim,bdrag_attack
+param=defend_anim,bdrag_block
+param=death_anim,bdrag_death
+param=attack_sound,babydragon_attack
+param=defend_sound,babydragon_hit
+param=death_sound,babydragon_death
+param=death_drop,babydragon_bones
 [bronze_dragon]
 name=Bronze dragon
 desc=Its scales seem to be made of bronze.
@@ -360,7 +379,9 @@ param=slayer_category,^slayer_bronzedragon
 attackrange=5
 huntmode=ranged
 huntrange=3
-
+wanderrange=5
+maxrange=20
+param=attack_anim,dragon_head_attack
 [iron_dragon]
 name=Iron dragon
 desc=Its scales seem to be made of iron.
@@ -400,7 +421,9 @@ param=slayer_category,^slayer_irondragon
 attackrange=5
 huntmode=ranged
 huntrange=3
-
+wanderrange=5
+maxrange=20
+param=attack_anim,dragon_head_attack
 [steel_dragon]
 name=Steel dragon
 desc=Its scales seem to be made of steel.
@@ -439,7 +462,10 @@ param=slayer_category,^slayer_steeldragon
 attackrange=5
 huntmode=ranged
 huntrange=3
-
+wanderrange=5
+maxrange=20
+hitpoints=210
+param=attack_anim,dragon_head_attack
 [chickenquest_baby_black_dragon]
 name=Baby black dragon
 desc=Young but still dangerous.

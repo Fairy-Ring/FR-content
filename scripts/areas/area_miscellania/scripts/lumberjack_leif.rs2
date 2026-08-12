@@ -32,7 +32,7 @@ if (inzone(^miscellania_lower_bound, ^miscellania_upper_bound, coord) = true) {
             ~chatnpcnoturn("<p,happy> Don't trouble yourself further, Your Highness, you've already done so much!");
         }
     }
-    stat_advance(mining, $exp);
+    stat_advance(woodcutting, $exp);
     mes("<substring($fishing_mes, 0, sub(string_length($fishing_mes), 1))> and give it to Lumberjack Leif.");
     return (true);
 }

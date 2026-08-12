@@ -29,7 +29,8 @@ attack=20
 strength=10
 defence=15
 // https://raw.githubusercontent.com/Joshua-F/osrs-dumps/refs/heads/master/config/dump.npc npc_7746
-
+wanderrange=0
+maxrange=0
 [wizard_grayzag]
 name=Wizard Grayzag
 desc=Master of imps.

@@ -44,7 +44,13 @@ param=defend_sound,troll_champion_hit
 param=defend_sound,troll_champion_death
 huntrange=1
 param=death_drop,big_bones
-
+category=troll_general
+wanderrange=3
+maxrange=5
+huntmode=cowardly
+param=damagetype,^slash_style
+param=defend_sound,troll_hit
+param=death_sound,troll_death
 [death_troll_leuitanant]
 name=Stick
 desc=A big, bad troll.
@@ -88,7 +94,12 @@ param=defend_sound,troll_champion_hit
 param=defend_sound,troll_champion_death
 huntrange=1
 param=death_drop,big_bones
-
+category=troll_general
+wanderrange=3
+maxrange=5
+huntmode=cowardly
+param=defend_sound,troll_hit
+param=death_sound,troll_death
 [death_troll_guard1]
 name=Pee Hat
 desc=A nasty looking troll.
@@ -134,7 +145,13 @@ param=defend_sound,troll_champion_hit
 param=defend_sound,troll_champion_death
 huntrange=1
 param=death_drop,big_bones
-
+category=troll_general
+wanderrange=0
+maxrange=5
+huntmode=cowardly
+param=attack_sound,troll_guard_attack
+param=defend_sound,troll_hit
+param=death_sound,troll_death
 [death_troll_guard2]
 name=Kraka
 desc=A nasty looking troll.
@@ -179,7 +196,13 @@ param=defend_sound,troll_champion_hit
 param=defend_sound,troll_champion_death
 huntrange=1
 param=death_drop,big_bones
-
+category=troll_general
+wanderrange=0
+maxrange=5
+huntmode=cowardly
+param=attack_sound,troll_guard_attack
+param=defend_sound,troll_hit
+param=death_sound,troll_death
 [death_troll_cook1]
 name=Dung
 desc=Human is his speciality.
@@ -200,7 +223,9 @@ size=2
 resizeh=145
 resizev=145
 vislevel=hide
-
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 [death_troll_cook2]
 name=Ash
 desc=Human is his speciality.
@@ -221,7 +246,9 @@ size=2
 resizeh=132
 resizev=132
 vislevel=hide
-
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 [death_troll_thrower1]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -264,7 +291,7 @@ huntmode=aggressive_ranged
 huntrange=8
 category=troll_thrower
 param=death_drop,big_bones
-
+magic=0
 [death_troll_thrower2]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -307,7 +334,7 @@ huntmode=aggressive_ranged
 huntrange=8
 category=troll_thrower
 param=death_drop,big_bones
-
+magic=0
 [death_troll_thrower3]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -350,7 +377,7 @@ huntmode=aggressive_ranged
 huntrange=8
 category=troll_thrower
 param=death_drop,big_bones
-
+magic=0
 [death_troll_thrower4]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -393,7 +420,7 @@ huntmode=aggressive_ranged
 huntrange=8
 category=troll_thrower
 param=death_drop,big_bones
-
+magic=0
 [death_troll_thrower5]
 name=Thrower Troll
 desc=Small for a troll but mean, ugly and throws rocks.
@@ -436,7 +463,7 @@ huntmode=aggressive_ranged
 huntrange=8
 category=troll_thrower
 param=death_drop,big_bones
-
+magic=0
 [death_troll_melee1]
 name=Mountain Troll
 desc=Small for a troll but mean and ugly.
@@ -478,7 +505,11 @@ param=death_sound,troll_death
 huntrange=1
 category=mountain_troll
 param=death_drop,big_bones
-
+wanderrange=5
+maxrange=7
+huntmode=cowardly
+param=crushdefence,10
+param=attack_sound,troll_guard_attack
 [death_troll_melee2]
 name=Mountain Troll
 desc=Small for a troll but mean and ugly.
@@ -520,7 +551,11 @@ param=death_sound,troll_death
 huntrange=1
 category=mountain_troll
 param=death_drop,big_bones
-
+wanderrange=5
+maxrange=7
+huntmode=cowardly
+param=crushdefence,10
+param=attack_sound,troll_guard_attack
 [death_troll_melee3]
 name=Mountain Troll
 desc=Small for a troll but mean and ugly.
@@ -563,7 +598,11 @@ param=death_sound,troll_death
 huntrange=1
 category=mountain_troll
 param=death_drop,big_bones
-
+wanderrange=5
+maxrange=7
+huntmode=cowardly
+param=crushdefence,10
+param=attack_sound,troll_guard_attack
 [death_troll_melee4]
 name=Mountain Troll
 desc=Small for a troll but mean and ugly.
@@ -605,7 +644,11 @@ param=death_sound,troll_death
 huntrange=1
 category=mountain_troll
 param=death_drop,big_bones
-
+wanderrange=5
+maxrange=7
+huntmode=cowardly
+param=crushdefence,10
+param=attack_sound,troll_guard_attack
 [death_troll_melee5]
 name=Mountain Troll
 desc=Small for a troll but mean and ugly.
@@ -648,7 +691,11 @@ param=death_sound,troll_death
 huntrange=1
 category=mountain_troll
 param=death_drop,big_bones
-
+wanderrange=5
+maxrange=7
+huntmode=cowardly
+param=crushdefence,10
+param=attack_sound,troll_guard_attack
 [death_troll_melee6]
 name=Mountain Troll
 desc=Small for a troll but mean and ugly.
@@ -688,7 +735,11 @@ param=death_sound,troll_death
 huntrange=1
 category=mountain_troll
 param=death_drop,big_bones
-
+wanderrange=5
+maxrange=7
+huntmode=cowardly
+param=crushdefence,10
+param=attack_sound,troll_guard_attack
 [death_troll_melee7]
 name=Mountain Troll
 desc=Small for a troll but mean and ugly.
@@ -730,3 +781,8 @@ param=death_sound,troll_death
 huntrange=1
 category=mountain_troll
 param=death_drop,big_bones
+wanderrange=5
+maxrange=7
+huntmode=cowardly
+param=crushdefence,10
+param=attack_sound,troll_guard_attack

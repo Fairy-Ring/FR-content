@@ -1117,63 +1117,63 @@ multivar=ernestdoor_1to2
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [2to3]
 active=yes
 multivar=ernestdoor_2to3
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [4to5]
 active=yes
 multivar=ernestdoor_4to5
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [5to6]
 active=yes
 multivar=ernestdoor_5to6
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [8to9]
 active=yes
 multivar=ernestdoor_8to9
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [2to5]
 active=yes
 multivar=ernestdoor_2to5
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [3to6]
 active=yes
 multivar=ernestdoor_3to6
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [4to7]
 active=yes
 multivar=ernestdoor_4to7
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [5to8]
 active=yes
 multivar=ernestdoor_5to8
 multiloc=0,ernest_doorclosed
 multiloc=1,ernest_doorajar
 category=haunted_door
-
+op1=Open
 [levera]
 active=yes
 multivar=ernestlever_a
@@ -1181,7 +1181,8 @@ multiloc=0,levera_up
 multiloc=1,levera_down
 category=haunted_lever
 param=lever_index,0
-
+op1=Pull
+op2=Inspect
 [leverb]
 active=yes
 multivar=ernestlever_b
@@ -1189,7 +1190,8 @@ multiloc=0,leverb_up
 multiloc=1,leverb_down
 category=haunted_lever
 param=lever_index,1
-
+op1=Pull
+op2=Inspect
 [leverc]
 active=yes
 multivar=ernestlever_c
@@ -1197,7 +1199,8 @@ multiloc=0,leverc_up
 multiloc=1,leverc_down
 category=haunted_lever
 param=lever_index,2
-
+op1=Pull
+op2=Inspect
 [leverd]
 active=yes
 multivar=ernestlever_d
@@ -1205,7 +1208,8 @@ multiloc=0,leverd_up
 multiloc=1,leverd_down
 category=haunted_lever
 param=lever_index,3
-
+op1=Pull
+op2=Inspect
 [levere]
 active=yes
 multivar=ernestlever_e
@@ -1213,7 +1217,8 @@ multiloc=0,levere_up
 multiloc=1,levere_down
 category=haunted_lever
 param=lever_index,4
-
+op1=Pull
+op2=Inspect
 [leverf]
 active=yes
 multivar=ernestlever_f
@@ -1221,7 +1226,8 @@ multiloc=0,leverf_up
 multiloc=1,leverf_down
 category=haunted_lever
 param=lever_index,5
-
+op1=Pull
+op2=Inspect
 [hauntedcompostheap]
 name=Compost heap
 desc=Smelly.
@@ -6144,7 +6150,7 @@ recol2d=15685
 blockrange=no
 raiseobject=no
 op1=Open
-
+param=next_loc_stage,tbwt_bamboo_door_inactive
 [tbwt_bamboo_door_inactive]
 model=tbwt_bamboo_door
 recol1s=20968
@@ -12415,7 +12421,7 @@ multiloc=27,millbase_flour
 multiloc=28,millbase_flour
 multiloc=29,millbase_flour
 multiloc=30,millbase_flour
-
+op1=Empty
 [millbase_flour]
 name=Flour bin
 desc=I'll need an empty pot so I can collect my flour.
@@ -29562,7 +29568,8 @@ recol2d=14797
 op1=Mine
 op2=Prospect
 op3=hidden
-
+category=mining_rock_normal
+param=next_loc_stage_mining,loc_4028
 [loc_4028]
 name=Pile of Rock
 desc=A pile of lime rock.
@@ -29574,7 +29581,8 @@ recol2d=14797
 op1=Mine
 op2=Prospect
 op3=hidden
-
+category=mining_rock_normal
+param=next_loc_stage_mining,loc_4029
 [loc_4029]
 name=Pile of Rock
 desc=A pile of lime rock.
@@ -29589,7 +29597,8 @@ op3=hidden
 resizex=96
 resizey=96
 resizez=96
-
+category=mining_rock_normal
+param=next_loc_stage_mining,loc_4030
 [loc_4030]
 name=Pile of Rock
 desc=A pile of lime rock.
@@ -29603,7 +29612,8 @@ op2=Prospect
 resizex=64
 resizey=64
 resizez=64
-
+category=mining_rock_normal
+param=mining_rock_empty,1
 [shantay_pass_henge_doorway]
 name=Shantay pass
 desc=Looks like a stone doorway to me.
@@ -29848,7 +29858,7 @@ recol6s=31
 recol6d=8526
 length=2
 blockrange=no
-
+category=watersource
 [shades_experimenttable]
 name=Smashed table
 desc=This table has seen better days.
@@ -30662,7 +30672,8 @@ recol1d=12580
 active=yes
 op1=Close
 blockrange=no
-
+category=gate_main_open
+param=next_loc_stage,loc_3197
 [loc_4140]
 name=Gate
 desc=Entrance to the Duel Arena.
@@ -30673,7 +30684,8 @@ active=yes
 op1=Close
 mirror=yes
 blockrange=no
-
+category=gate_outer_open
+param=next_loc_stage,loc_3198
 [vt_mazeportal_1]
 name=Portal
 desc=A portal from this mystical place.
@@ -30805,7 +30817,8 @@ name=Iron ladder
 desc=I could climb this if I wanted.
 model=horror_ladder_down
 sharelight=yes
-
+active=yes
+op1=Climb
 [horror_ladder_top]
 name=Iron ladder
 desc=I could climb this if I wanted.
@@ -32765,14 +32778,16 @@ desc=The door is closed.
 model=viking_bard_backstage_door
 resizey=105
 op1=Open
-
+category=door_closed
+param=next_loc_stage,misc_viking_abode_door_low_open
 [misc_viking_abode_door_low_open]
 name=Door
 desc=The door is open.
 model=viking_bard_backstage_door
 resizey=105
 op1=Close
-
+category=door_opened
+param=next_loc_stage,misc_viking_abode_door_low
 [misc_viking_abode_longhall_low]
 model=viking_longhall_wall
 resizey=105
@@ -34304,7 +34319,7 @@ desc=A dirty little swamp boat.
 model=route_rowboat
 width=3
 length=3
-
+op1=Board
 [thrttavernbasementfalsewall]
 name=Wall
 desc=If it had paint on it, you'd probably watch it dry.
@@ -71883,7 +71898,10 @@ name=Trawler net
 desc=Smells like fish.
 model=hollow_tree_big
 sharelight=yes
-
+op1=Chop down
+op3=hidden
+category=tree
+param=next_loc_stage,hollow_tree_stump_big
 [willow_tree3]
 name=Trawler net
 desc=Smells like fish.
@@ -71919,7 +71937,8 @@ name=Trawler net
 desc=Smells like fish.
 model=coal_truck
 sharelight=yes
-
+active=yes
+op1=Remove-coal
 [pier_edge_mirror]
 model=pier_edge
 sharelight=yes

@@ -48,7 +48,7 @@ param=running_baseanim,m_monkey_run
 param=next_npc_type,mm_transmogrification_normal_monkey
 param=transform_sound,human_into_monkey
 param=revert_sound,monkey_into_human
-
+param=running_baseanim,m_normalmonkey_run
 [mm_monkey_greegree_for_small_ninja_monkey]
 name=Monkey greegree
 desc=A magical talisman in the shape of a small ninja monkey head.

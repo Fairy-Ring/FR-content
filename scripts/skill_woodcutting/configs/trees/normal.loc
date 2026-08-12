@@ -27,7 +27,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,treestump2_light
 //param=ent,macro_ent_tree1
-
+param=ent,macro_ent_tree1
 [tree2]
 name=Tree
 desc=A commonly found tree.
@@ -42,7 +42,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,treestump2
 param=ent,macro_ent_tree3
-
+param=ent,macro_ent_tree1
 [tree3]
 name=Tree
 desc=A commonly found tree.
@@ -58,7 +58,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,treestump2_small
 //param=ent,macro_ent_tree1
-
+param=ent,macro_ent_tree1
 [lighttree2]
 name=Tree
 desc=A healthy young tree.
@@ -73,7 +73,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,treestump2_light
 //param=ent,macro_ent_tree1
-
+param=ent,macro_ent_tree1
 [deadtree1]
 name=Dead tree
 desc=This tree has long been dead.
@@ -100,7 +100,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,deadtree1_large_stump
 //param=ent,macro_ent_dead_tree1
-
+param=ent,macro_ent_dead_tree1
 [deadtree4]
 name=Dead tree
 desc=This tree has long been dead.
@@ -116,7 +116,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,treestump2_small
 //param=ent,macro_ent_dead_tree1
-
+param=ent,macro_ent_dead_tree1
 [lightdeadtree1]
 name=Dead tree
 desc=An old weather beaten tree.
@@ -133,7 +133,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,deadtree1_light_stump
 param=ent,macro_ent_dead_tree2
-
+param=ent,macro_ent_dead_tree1
 [deadtree2]
 name=Dead tree
 desc=It's only useful for firewood now.
@@ -148,7 +148,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,deadtree2_stump
 param=ent,macro_ent_dead_tree3
-
+param=ent,macro_ent_dead_tree2
 [deadtree2_dark]
 name=Dead tree
 desc=It's only useful for firewood now.
@@ -163,7 +163,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,deadtree2_stump_dark
 param=ent,macro_ent_dead_tree6
-
+param=ent,macro_ent_dead_tree2
 [deadtree3]
 name=Dead tree
 desc=It's only useful for firewood now.
@@ -176,7 +176,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,deadtree3_stump
 param=ent,macro_ent_dead_tree7
-
+param=ent,macro_ent_dead_tree1
 [deadtree2_snowy]
 name=Dead tree
 desc=It's only useful for firewood now.
@@ -189,7 +189,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,deadtree2_stump_dark
 param=ent,macro_ent_dead_tree8
-
+param=ent,macro_ent_dead_tree2
 [loc_1315]
 name=Evergreen
 desc=A hardy evergreen tree.
@@ -234,7 +234,7 @@ mapscene=1
 category=tree
 param=next_loc_stage,evergreen_large_stump
 //param=ent,macro_ent_tree2
-
+param=ent,macro_ent_tree2
 [evergreen_snowy_large]
 name=Evergreen
 desc=This would make good firewood.
@@ -249,7 +249,7 @@ mapscene=1
 category=tree
 param=next_loc_stage,evergreen_large_stump
 //param=ent,macro_ent_tree2
-
+param=ent,macro_ent_tree2
 [snowtree1]
 name=Tree
 desc=It's thick with snow.
@@ -262,7 +262,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,evergreen_large_stump
 param=ent,macro_ent_tree4
-
+param=ent,macro_ent_tree2
 [snowtree2]
 name=Tree
 desc=It's thick with snow.
@@ -275,7 +275,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,evergreen_large_stump
 //param=ent,macro_ent_tree2
-
+param=ent,macro_ent_tree2
 [snowtree3]
 name=Tree
 desc=It's thick with snow.
@@ -288,7 +288,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,evergreen_large_stump
 //param=ent,macro_ent_tree2
-
+param=ent,macro_ent_tree2
 [deadtree2_swamp]
 name=Dead tree
 desc=It's only useful for firewood now.
@@ -303,7 +303,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,deadtree2_stump_swamp
 param=ent,macro_ent_dead_tree4
-
+param=ent,macro_ent_dead_tree2
 [deadtree6]
 name=Dead tree
 desc=This tree has long been dead.
@@ -316,7 +316,7 @@ op3=hidden
 category=tree
 param=next_loc_stage,deadtree6_stump
 param=ent,macro_ent_dead_tree10
-
+param=ent,macro_ent_dead_tree2
 [regicide_tree_large]
 name=Tree
 desc=A tree.

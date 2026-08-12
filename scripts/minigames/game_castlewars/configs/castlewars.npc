@@ -32,7 +32,9 @@ head1=idk_man_hair_cropped_head
 head2=npc_councillor_halgrive_head
 head3=idk_man_jaw_long_head
 timer=5
-
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 [castlewars_sheep]
 name=Sheep
 desc=White and fluffy.
@@ -99,7 +101,7 @@ hitpoints=50
 param=next_npc_type,castlewars_barricade_burning_saradomin
 param=defend_anim,null
 param=defend_sound,null
-
+maxrange=1
 [castlewars_barricade_burning_saradomin]
 name=Barricade
 desc=A spiky barricade.
@@ -122,7 +124,7 @@ hitpoints=50
 param=next_npc_type,castlewars_barricade_saradomin
 param=defend_anim,null
 param=defend_sound,null
-
+maxrange=1
 [castlewars_barricade_zamorak]
 name=Barricade
 desc=A spiky barricade.
@@ -139,7 +141,7 @@ hitpoints=50
 param=next_npc_type,castlewars_barricade_burning_zamorak
 param=defend_anim,null
 param=defend_sound,null
-
+maxrange=1
 [castlewars_barricade_burning_zamorak]
 name=Barricade
 desc=A spiky barricade.
@@ -162,3 +164,4 @@ hitpoints=50
 param=next_npc_type,castlewars_barricade_zamorak
 param=defend_anim,null
 param=defend_sound,null
+maxrange=1
