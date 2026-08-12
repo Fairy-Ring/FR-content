@@ -3,6 +3,7 @@ mes("Welcome to RuneScape.");
 cam_reset;
 
 %musicplay = 1; // set to auto on login
+%currentsong = null;
 if (%option_brightness = 0) {
     // sane defaults for game controls
     %option_brightness = 2;

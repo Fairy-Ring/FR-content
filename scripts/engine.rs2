@@ -337,6 +337,8 @@
 [command,.text_gender](string $male_text, string $female_text)(string)
 // info: Play a song
 [command,midi_song](midi $song)
+// info: Server-side SMF length in ticks (LC command; 274 Midi.getTickLength)
+[command,midi_length](midi $track)(int)
 // info: Play a jingle (advancing levels, completing quests, ...)
 [command,midi_jingle](midi $jingle, int $length)
 // info: Play a jingle for the secondary player (advancing levels, completing quests, ...)
