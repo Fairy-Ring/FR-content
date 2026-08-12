@@ -355,6 +355,8 @@ width=2
 length=2
 op1=Search
 mapscene=5
+category=banana_tree
+param=next_loc_stage,mm_bananatreefour
 
 [mm_bananatreefour]
 name=Banana Tree
@@ -370,6 +372,8 @@ width=2
 length=2
 op1=Search
 mapscene=5
+category=banana_tree
+param=next_loc_stage,mm_bananatreethree
 
 [mm_bananatreethree]
 name=Banana Tree
@@ -385,6 +389,8 @@ width=2
 length=2
 op1=Search
 mapscene=5
+category=banana_tree
+param=next_loc_stage,mm_bananatreetwo
 
 [mm_bananatreetwo]
 name=Banana Tree
@@ -400,6 +406,8 @@ width=2
 length=2
 op1=Search
 mapscene=5
+category=banana_tree
+param=next_loc_stage,mm_bananatreeone
 
 [mm_bananatreeone]
 name=Banana Tree
@@ -415,6 +423,8 @@ width=2
 length=2
 op1=Search
 mapscene=5
+category=banana_tree
+param=next_loc_stage,mm_bananatreeempty
 
 [mm_bananatreeempty]
 name=Banana Tree

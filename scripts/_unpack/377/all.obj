@@ -47224,6 +47224,7 @@ model=obj_mm_ancient_monkey_skull
 2dyan=136
 2dxan=96
 weight=500g
+param=mm_bones_type,8
 
 [mm_sigil]
 name=10th squad sigil
