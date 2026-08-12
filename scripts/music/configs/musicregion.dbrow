@@ -322,6 +322,12 @@ data=mapsquare,0_39_58_0_0
 data=name,The Desolate Isle
 data=musicdata,music_The_Desolate_Isle
 
+[musicregion_39_60]
+table=musicregion
+data=mapsquare,0_39_60_0_0
+data=name,Miscellania
+data=musicdata,music_Miscellania
+
 [musicregion_40_46]
 table=musicregion
 data=mapsquare,0_40_46_0_0
