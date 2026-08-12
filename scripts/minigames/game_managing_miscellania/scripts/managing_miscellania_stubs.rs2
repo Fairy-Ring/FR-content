@@ -1,5 +1,9 @@
-// UI open only until M4–M5 ports misc_both_manage.if.
-// Daily/resource: managing_miscellania_daily.rs2 (M3).
+// M4: real open. Daily/resource: managing_miscellania_daily.rs2.
+// if_button sliders/coffers: managing_miscellania_ui.rs2.
+// Pack root 19159 (289 used 10984 — occupied on 377). See deviations.md.
 
 [proc,open_manage_miscellania_interface]
-mes("Managing Miscellania is not available yet.");
+if_openmain(misc_both_manage);
+%if1 = calc(10 - %misc_points_mine - %misc_points_wood - %misc_points_herb - %misc_points_fish);
+%if2 = 0;
+if_settext(misc_both_manage:com_87, tostring(%misc_coffers));
