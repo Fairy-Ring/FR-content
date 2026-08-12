@@ -33919,6 +33919,10 @@ size=2
 vislevel=hide
 op1=Talk-to
 head1=npc_1373_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+timer=4
 
 [misc_ulby_doorguard]
 name=Guard
@@ -33981,6 +33985,10 @@ vislevel=hide
 op1=Talk-to
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_long_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+timer=25
 
 [misc_smithy]
 name=Derrik
@@ -34587,6 +34595,9 @@ readyanim=misc_human_woodcutting_steel_axe
 op1=Talk-to
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_split_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [misc_miner]
 name=Miner Magnus
@@ -34617,6 +34628,9 @@ readyanim=poh_smash_magic_tablet_spell
 op1=Talk-to
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_moustache_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [misc_fisherman]
 name=Fisherman Frodi
@@ -34649,6 +34663,9 @@ readyanim=misc_fish_onspot
 op1=Talk-to
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [misc_gardener]
 name=Gardener Gunnhild
@@ -34678,6 +34695,8 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=misc_herb_weeding_npc_loop
 op1=Talk-to
 head1=obj_pickpocket_guide_warrior
+wanderrange=0
+moverestrict=nomove
 
 [0_40_60_rarefish]
 name=Fishing spot

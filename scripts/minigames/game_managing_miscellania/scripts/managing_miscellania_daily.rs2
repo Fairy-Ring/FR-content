@@ -1,11 +1,11 @@
 // M3: daily coffer/resource math + collect dump (289 managing_miscellania.rs2).
 // No IF / if_button (M4–M5). Open stays stubbed in managing_miscellania_stubs.rs2.
-// Last-update clock on 377 is %varp_360 (289 names it misc_last_update).
+// Last-update clock is %misc_last_update (pack id 360; 289 same name).
 // Pin: origin/289 @ 979e925fb — Throne-era 50k coffer cap, ×975/1000 approval decay (not RT).
 
 [proc,manage_misc_daily_update]
 def_int $currenttime = date_minutes;
-def_int $misc_last_update = %varp_360;
+def_int $misc_last_update = %misc_last_update;
 def_int $CofferTotal = %misc_coffers;
 def_int $Approval = %misc_approval;
 def_int $ResourcePts = %misc_restotal;
@@ -41,7 +41,7 @@ while (calc($currenttime - $misc_last_update) >= ^MISCELLANIA_INTERVAL) {
 
 %misc_coffers = $CofferTotal;
 %misc_approval = $Approval;
-%varp_360 = $misc_last_update;
+%misc_last_update = $misc_last_update;
 %misc_restotal = $ResourcePts;
 
 // Collect: convert restotal × worker points → noted resources into inv (bank UI residual).

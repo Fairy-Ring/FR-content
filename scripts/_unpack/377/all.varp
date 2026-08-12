@@ -582,7 +582,8 @@ transmit=yes
 
 [misc_quest]
 
-[varp_360]
+[misc_last_update]
+scope=perm
 
 [misc_varbit_1]
 
