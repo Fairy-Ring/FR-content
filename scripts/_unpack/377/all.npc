@@ -31515,6 +31515,12 @@ op1=Talk-to
 op3=Trade
 head1=obj_castlewars_cloak_saradomin_manhead
 head2=idk_man_jaw_long_head
+category=shop_keeper
+param=owned_shop,viking_general_store
+param=shop_sell_multiplier,1300
+param=shop_buy_multiplier,500
+param=shop_delta,30
+param=shop_title,Sigmund the Merchant
 
 [viking_hallifred]
 name=Swensen the Navigator
@@ -32126,6 +32132,12 @@ op1=Talk to
 op3=Trade
 head1=obj_pickpocket_guide_warrior
 head2=npc_lady_pirate_headi2
+category=shop_keeper
+param=owned_shop,viking_bar
+param=shop_sell_multiplier,1300
+param=shop_buy_multiplier,700
+param=shop_delta,30
+param=shop_title,Rellekka Longhall Bar
 
 [viking_clothing_shopkeeper]
 name=Yrsa
@@ -32158,6 +32170,12 @@ op3=Trade
 head1=idk_woman_hair_bun_head
 wanderrange=5
 moverestrict=indoors
+category=shop_keeper
+param=owned_shop,viking_clothes_shop
+param=shop_sell_multiplier,1300
+param=shop_buy_multiplier,700
+param=shop_delta,30
+param=shop_title,Yrsa's Accountrements
 
 [viking_fisherman1]
 name=Fisherman
@@ -32220,6 +32238,12 @@ op3=Trade
 vislevel=hide
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
+category=shop_keeper
+param=owned_shop,viking_weapons_shop
+param=shop_sell_multiplier,1300
+param=shop_buy_multiplier,700
+param=shop_delta,30
+param=shop_title,Skulgrimen's Battle Gear
 
 [viking_sailor]
 category=viking_citizen
@@ -32600,6 +32624,12 @@ op1=Talk-to
 op3=Trade
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_split_head
+category=shop_keeper
+param=owned_shop,viking_fishmonger
+param=shop_sell_multiplier,1300
+param=shop_buy_multiplier,700
+param=shop_delta,30
+param=shop_title,Fremennik Fish Monger
 
 [viking_fur_monger]
 name=Fur trader
@@ -32631,6 +32661,12 @@ op1=Talk-to
 op3=Trade
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
+category=shop_keeper
+param=owned_shop,viking_furshop
+param=shop_sell_multiplier,1200
+param=shop_buy_multiplier,950
+param=shop_delta,20
+param=shop_title,Fremennik Fur Trader
 
 [viking_guard]
 name=Market Guard
