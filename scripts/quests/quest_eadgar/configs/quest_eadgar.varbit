@@ -8,7 +8,7 @@ basevar=eadgar_bits
 startbit=1
 endbit=3
 
-// bits 4-7: unnamed on 274 as varbit_8 — 377 unpack already has [varbit_8] on varp_336;
+// bits 4-7: unnamed on 274 as bits_8_varp336_bits_4_7 — 377 unpack already has [bits_8_varp336_bits_4_7] on varp336_bits;
 // do not redeclare. Named bits use eadgar_bits (pack 735).
 
 [eadgar_pete_dialog_2]

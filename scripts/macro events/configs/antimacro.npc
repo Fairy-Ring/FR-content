@@ -3385,7 +3385,7 @@ readyanim=seq_1697
 vislevel=hide
 op1=Chop down
 op3=hidden
-param=ent_tree_loc,loc_5551
+param=ent_tree_loc,scenery_5551
 
 [macro_ent_willow3]
 name=Willow
@@ -3399,7 +3399,7 @@ readyanim=seq_1699
 vislevel=hide
 op1=Chop down
 op3=hidden
-param=ent_tree_loc,loc_5553
+param=ent_tree_loc,scenery_5553
 
 [macro_ent_oak]
 name=Oak
@@ -3441,7 +3441,7 @@ readyanim=seq_1703
 vislevel=hide
 op1=Chop down
 op3=hidden
-param=ent_tree_loc,loc_1315
+param=ent_tree_loc,scenery_1315
 
 [macro_ent_evergreen2]
 name=Evergreen
@@ -3453,7 +3453,7 @@ readyanim=seq_1705
 vislevel=hide
 op1=Chop down
 op3=hidden
-param=ent_tree_loc,loc_1316
+param=ent_tree_loc,scenery_1316
 
 [macro_ent_evergreen3]
 name=Evergreen
@@ -3556,7 +3556,7 @@ op3=hidden
 wanderrange=0
 moverestrict=nomove
 category=macro_event_ent
-param=ent_tree_loc,loc_2289
+param=ent_tree_loc,scenery_2289
 
 [macro_ent_hollow2]
 name=Hollow tree
@@ -3575,7 +3575,7 @@ op3=hidden
 wanderrange=0
 moverestrict=nomove
 category=macro_event_ent
-param=ent_tree_loc,loc_4060
+param=ent_tree_loc,scenery_4060
 
 [macro_ent_jungle_tree1]
 name=Jungle Tree

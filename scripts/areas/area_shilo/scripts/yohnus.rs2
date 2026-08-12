@@ -17,7 +17,7 @@ switch_int(~p_choice2("Use Furnace - 20 Gold", 1, "No thanks!", 2)) {
         if_close;
         p_delay(0);
         ~forcemove(0_44_46_40_19);
-        if(loc_find(coord, loc_2266) = true) {
+        if(loc_find(coord, blacksmiths_door) = true) {
             def_int $x;
             def_int $z;
             def_coord $loc_coord = loc_coord;
@@ -35,7 +35,7 @@ switch_int(~p_choice2("Use Furnace - 20 Gold", 1, "No thanks!", 2)) {
         ~chatnpc("<p,neutral>Very well Bwana, have a nice day.");
 }
 
-[oploc1,loc_2266]
+[oploc1,blacksmiths_door]
 def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
 if($entering = false) {
     ~open_and_close_door2(desertdoor_inactive, ~check_axis(coord, loc_coord, loc_angle), door_open);

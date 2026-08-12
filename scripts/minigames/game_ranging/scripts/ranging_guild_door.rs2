@@ -1,4 +1,4 @@
-[oploc1,loc_2514]
+[oploc1,guild_door]
 if(coordx(coord) > coordx(loc_coord) | coordz(coord) < coordz(loc_coord)) {
     sound_synth(door_open, 0, 0); // gate_open 
     ~forcemove(movecoord(loc_coord, 1, 0, -1));

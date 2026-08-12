@@ -128,7 +128,7 @@ length=3
 op1=Climb-down
 active=yes
 
-[loc_1722]
+[scenery_1722]
 name=Staircase
 desc=I can climb these stairs.
 model=ikov_darkstairs
@@ -139,7 +139,7 @@ forceapproach=south
 sharelight=yes
 mapscene=7
 
-[loc_1723]
+[scenery_1723]
 name=Staircase
 desc=They go down.
 model=ikov_darkstairstop
@@ -150,7 +150,7 @@ forceapproach=north
 sharelight=yes
 mapscene=7
 
-[loc_1724]
+[scenery_1724]
 name=Staircase
 desc=I can climb down these stairs.
 model=ikov_darkstairsdown
@@ -161,7 +161,7 @@ forceapproach=north
 sharelight=yes
 mapscene=7
 
-[loc_1725]
+[scenery_1725]
 name=Staircase
 desc=I can climb up this.
 model=loc_1725
@@ -172,7 +172,7 @@ sharelight=yes
 forceapproach=south
 mapscene=7
 
-[loc_1726]
+[scenery_1726]
 name=Staircase
 desc=I can climb down this.
 model=loc_1726
@@ -183,7 +183,7 @@ sharelight=yes
 forceapproach=north
 mapscene=7
 
-[loc_1727]
+[scenery_1727]
 name=Staircase
 desc=I can climb down this.
 model=loc_1727
@@ -193,7 +193,7 @@ op1=Climb-down
 forceapproach=north
 mapscene=7
 
-[loc_1728]
+[scenery_1728]
 name=Staircase
 desc=I can climb down this.
 model=loc_1727
@@ -203,7 +203,7 @@ op1=Climb-down
 forceapproach=north
 mapscene=7
 
-[loc_1729]
+[scenery_1729]
 name=Staircase
 desc=I can climb this.
 model=ikov_darkstairs
@@ -213,7 +213,7 @@ op1=Climb-up
 forceapproach=south
 mapscene=7
 
-[loc_1730]
+[scenery_1730]
 name=Staircase
 desc=Dare I go up?
 model=loc_1730
@@ -223,7 +223,7 @@ op1=Walk-up
 forceapproach=south
 mapscene=7
 
-[loc_1731]
+[scenery_1731]
 name=Staircase
 desc=These stairs look spooky!
 model=loc_1731
@@ -233,7 +233,7 @@ op1=Walk-down
 forceapproach=north
 mapscene=7
 
-[loc_1732]
+[scenery_1732]
 name=Staircase
 desc=These stairs look spooky!
 model=loc_1732
@@ -243,7 +243,7 @@ op1=Climb-down
 forceapproach=north
 mapscene=7
 
-[loc_1733]
+[scenery_1733]
 name=Staircase
 desc=I can use these stairs to climb down.
 model=ikov_darkstairsdown
@@ -253,7 +253,7 @@ op1=Climb-down
 forceapproach=north
 mapscene=7
 
-[loc_1734]
+[scenery_1734]
 name=Staircase
 desc=I can climb these stairs.
 model=ikov_darkstairs
@@ -263,14 +263,14 @@ op1=Climb-up
 forceapproach=south
 mapscene=7
 
-[loc_1735]
+[scenery_1735]
 name=Staircase
 desc=A rickety old staircase.
 model=loc_1735
 length=3
 mapscene=7
 
-[loc_1736]
+[scenery_1736]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_1736
@@ -280,7 +280,7 @@ sharelight=yes
 forceapproach=west
 mapscene=7
 
-[loc_1737]
+[scenery_1737]
 name=Staircase
 desc=I can climb up these stairs.
 model=loc_1737
@@ -290,7 +290,7 @@ sharelight=yes
 forceapproach=north
 mapscene=7
 
-[loc_1738]
+[scenery_1738]
 name=Staircase
 desc=I can climb up these stairs.
 model=loc_1738
@@ -299,7 +299,7 @@ length=2
 op1=Climb-up
 mapscene=7
 
-[loc_1739]
+[scenery_1739]
 name=Staircase
 desc=I can climb up or go down these stairs.
 model=loc_1738
@@ -310,7 +310,7 @@ op2=Climb-up
 op3=Climb-down
 mapscene=7
 
-[loc_1740]
+[scenery_1740]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_1740
@@ -318,7 +318,7 @@ op1=Climb-down
 forceapproach=east
 mapscene=7
 
-[loc_1741]
+[scenery_1741]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_1741
@@ -327,7 +327,7 @@ length=2
 op1=Climb-down
 mapscene=7
 
-[loc_1742]
+[scenery_1742]
 name=Staircase
 desc=I can climb up these stairs.
 model=loc_1738
@@ -338,7 +338,7 @@ length=2
 op1=Climb-up
 mapscene=7
 
-[loc_1743]
+[scenery_1743]
 name=Staircase
 desc=I can climb up or go down these stairs.
 model=loc_1738
@@ -351,7 +351,7 @@ op2=Climb-up
 op3=Climb-down
 mapscene=7
 
-[loc_1744]
+[scenery_1744]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_1740
@@ -361,7 +361,7 @@ op1=Climb-down
 forceapproach=east
 mapscene=7
 
-[loc_1745]
+[scenery_1745]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_1741
@@ -372,7 +372,7 @@ length=2
 op1=Climb-down
 mapscene=7
 
-[loc_2316]
+[scenery_2316]
 name=Staircase
 desc=I can climb up these stairs.
 model=ikov_darkstairs
@@ -627,7 +627,7 @@ mapscene=7
 sharelight=yes
 mirror=yes
 
-[loc_4493]
+[scenery_4493]
 name=Staircase
 desc=I can climb these stairs.
 model=loc_4493
@@ -638,7 +638,7 @@ forceapproach=south
 sharelight=yes
 mapscene=7
 
-[loc_4494]
+[scenery_4494]
 name=Staircase
 desc=They go down.
 model=loc_4494
@@ -649,7 +649,7 @@ forceapproach=north
 sharelight=yes
 mapscene=7
 
-[loc_4495]
+[scenery_4495]
 name=Staircase
 desc=I can climb these stairs.
 model=loc_4493
@@ -660,7 +660,7 @@ forceapproach=south
 sharelight=yes
 mapscene=7
 
-[loc_4496]
+[scenery_4496]
 name=Staircase
 desc=They go down.
 model=loc_4494
@@ -671,7 +671,7 @@ forceapproach=north
 sharelight=yes
 mapscene=7
 
-[loc_4497]
+[scenery_4497]
 name=Staircase
 desc=I can climb these stairs.
 model=loc_4493
@@ -682,7 +682,7 @@ forceapproach=south
 sharelight=yes
 mapscene=7
 
-[loc_4498]
+[scenery_4498]
 name=Staircase
 desc=They go down.
 model=loc_4494
@@ -923,7 +923,7 @@ width=4
 length=3
 op1=Walk-up
 
-[loc_5094]
+[scenery_5094]
 name=Stairs
 desc=These stairs seem to have been hewn out of the rock itself.
 model=loc_5094
@@ -932,7 +932,7 @@ width=4
 length=3
 op1=Walk-up
 
-[loc_5095]
+[scenery_5095]
 name=Stairs
 desc=These stairs seem to have been hewn out of the rock itself.
 model=loc_5095
@@ -940,7 +940,7 @@ sharelight=yes
 width=4
 length=3
 
-[loc_5096]
+[scenery_5096]
 name=Stairs
 desc=These stairs seem to have been hewn out of the rock itself.
 model=loc_5096
@@ -949,7 +949,7 @@ width=4
 length=3
 op1=Walk-down
 
-[loc_5097]
+[scenery_5097]
 name=Stairs
 desc=These stairs seem to have been hewn out of the rock itself.
 model=loc_5094
@@ -958,7 +958,7 @@ width=4
 length=3
 op1=Walk-up
 
-[loc_5098]
+[scenery_5098]
 name=Stairs
 desc=These stairs seem to have been hewn out of the rock itself.
 model=loc_5096
@@ -1401,7 +1401,7 @@ op1=Climb-up
 mapscene=7
 forceapproach=south
 
-[loc_7056]
+[scenery_7056]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_7056
@@ -1411,7 +1411,7 @@ sharelight=yes
 forceapproach=south
 mapscene=7
 
-[loc_7057]
+[scenery_7057]
 name=Staircase
 desc=I can climb up these stairs.
 model=loc_7057
@@ -1445,7 +1445,7 @@ forceapproach=south
 op1=Climb-up
 
 
-[loc_9470]
+[scenery_9470]
 name=Staircase
 desc=I can climb these stairs.
 model=loc_9470
@@ -1456,7 +1456,7 @@ forceapproach=south
 sharelight=yes
 mapscene=7
 
-[loc_9471]
+[scenery_9471]
 name=Staircase
 desc=They go down.
 model=loc_9471
@@ -1783,7 +1783,7 @@ forceapproach=south
 mapscene=7
 ambient=20
 
-[loc_11724]
+[scenery_11724]
 name=Staircase
 desc=I can climb up these stairs.
 model=loc_11724
@@ -1792,7 +1792,7 @@ op1=Climb-up
 forceapproach=north
 mapscene=7
 
-[loc_11725]
+[scenery_11725]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_11725
@@ -1802,7 +1802,7 @@ sharelight=yes
 forceapproach=west
 mapscene=7
 
-[loc_11729]
+[scenery_11729]
 name=Staircase
 desc=I can climb up these stairs.
 model=loc_11729
@@ -1815,7 +1815,7 @@ ambient=20
 contrast=15
 resizey=157
 
-[loc_11731]
+[scenery_11731]
 name=Staircase
 desc=I can climb down these stairs.
 model=sarim_spiralstairstop
@@ -1826,7 +1826,7 @@ ambient=20
 contrast=15
 resizey=152
 
-[loc_11732]
+[scenery_11732]
 name=Staircase
 desc=I can climb up these stairs.
 model=loc_11729
@@ -1839,7 +1839,7 @@ ambient=20
 contrast=15
 resizey=152
 
-[loc_11733]
+[scenery_11733]
 name=Staircase
 desc=I can climb down these stairs.
 model=sarim_spiralstairstop
@@ -1849,7 +1849,7 @@ mapscene=7
 ambient=20
 contrast=15
 
-[loc_11734]
+[scenery_11734]
 name=Staircase
 desc=I can climb these stairs.
 model=loc_9470
@@ -1871,7 +1871,7 @@ mapscene=7
 ambient=10
 resizey=162
 
-[loc_11735]
+[scenery_11735]
 name=Staircase
 desc=They go down.
 model=loc_9471
@@ -1893,7 +1893,7 @@ mapscene=7
 ambient=10
 resizey=162
 
-[loc_11736]
+[scenery_11736]
 name=Staircase
 desc=I can climb these stairs.
 model=loc_9470
@@ -1914,7 +1914,7 @@ forceapproach=south
 mapscene=7
 ambient=10
 
-[loc_11737]
+[scenery_11737]
 name=Staircase
 desc=They go down.
 model=loc_9471
@@ -2099,7 +2099,7 @@ mapscene=7
 op5=Remove
 op4=Remove-room
 
-[loc_13504]
+[scenery_13504]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_13504
@@ -2124,7 +2124,7 @@ mapscene=7
 op5=Remove
 op4=Remove-room
 
-[loc_13506]
+[scenery_13506]
 name=Staircase
 desc=I can climb down these stairs.
 model=loc_13506

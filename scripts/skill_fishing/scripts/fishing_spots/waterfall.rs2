@@ -1,6 +1,6 @@
 // im guessing these loc fishing spots didnt have fishing spot random events?
 
-[oploc1,loc_2027]
+[oploc1,fishing_spot_2027]
 // check level
 if (stat(fishing) < 20) {
     anim(null, 0);
@@ -28,7 +28,7 @@ if (%action_delay = calc(map_clock + 2)) {
 }
 p_oploc(3);
 
-[oploc3,loc_2027]
+[oploc3,fishing_spot_2027]
 // check level
 if (stat(fishing) < 20) {
     anim(null, 0);
@@ -58,7 +58,7 @@ if (%action_delay < map_clock) {
 p_oploc(3);
 
 
-[oploc2,loc_2027]
+[oploc2,fishing_spot_2027]
 // check level
 if (stat(fishing) < 25) {
     anim(null, 0);
@@ -86,7 +86,7 @@ if (%action_delay = calc(map_clock + 2)) {
 }
 p_oploc(4);
 
-[oploc4,loc_2027]
+[oploc4,fishing_spot_2027]
 // check level
 if (stat(fishing) < 25) {
     anim(null, 0);
@@ -116,7 +116,7 @@ if (%action_delay < map_clock) {
 }
 p_oploc(4);
 
-[oplocu,loc_2027]
+[oplocu,fishing_spot_2027]
 switch_obj(last_useitem) {
     case fishing_rod : p_oploc(2);
     case fly_fishing_rod : p_oploc(1);

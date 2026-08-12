@@ -2843,7 +2843,7 @@ blockwalk=no
 width=2
 length=2
 
-[loc_13371]
+[scenery_13371]
 name=Hellhound
 desc=Good doggie...
 model=loc_13371
@@ -3199,7 +3199,7 @@ length=2
 op1=Activate
 op5=Remove
 
-[loc_13405]
+[scenery_13405]
 name=Portal
 desc=Use this to leave the house.
 model=loc_13405
@@ -3211,7 +3211,7 @@ anim=poh_portal
 op1=Enter
 op2=Lock
 
-[loc_13406]
+[scenery_13406]
 name=Rock
 desc=Rocky!
 model=loc_13406
@@ -3220,7 +3220,7 @@ length=2
 blockrange=no
 op5=Remove
 
-[loc_13407]
+[scenery_13407]
 name=Pond
 desc=A home for tiny fish and frogs.
 model=loc_13407
@@ -3230,7 +3230,7 @@ length=2
 blockrange=no
 op5=Remove
 
-[loc_13408]
+[scenery_13408]
 name=Statue
 desc=What a naughty little imp!
 model=loc_13408
@@ -3242,7 +3242,7 @@ blockrange=no
 op5=Remove
 anim=poh_posh_garden_centrepiece4water
 
-[loc_13409]
+[scenery_13409]
 name=Dungeon entrance
 desc=What horrors lurk below?
 model=loc_13409
@@ -3252,7 +3252,7 @@ blockrange=no
 op5=Remove
 op1=Enter
 
-[loc_13410]
+[scenery_13410]
 model=loc_13410
 recol1s=21140
 recol1d=11712
@@ -3262,7 +3262,7 @@ recol3s=10570
 recol3d=10659
 active=no
 
-[loc_13411]
+[scenery_13411]
 name=Tree
 desc=One of the most common trees in RuneScape.
 model=loc_13411
@@ -3274,7 +3274,7 @@ resizex=85
 resizey=85
 resizez=85
 
-[loc_13412]
+[scenery_13412]
 name=Tree
 desc=One of the most common trees in RuneScape.
 model=loc_13412
@@ -3286,7 +3286,7 @@ resizex=85
 resizey=85
 resizez=85
 
-[loc_13413]
+[scenery_13413]
 name=Oak tree
 desc=A beautiful oak tree.
 model=loc_13413
@@ -3298,7 +3298,7 @@ resizex=85
 resizey=85
 resizez=85
 
-[loc_13414]
+[scenery_13414]
 name=Willow tree
 desc=A lovely addition to the garden.
 model=loc_13414
@@ -3310,7 +3310,7 @@ resizex=85
 resizey=85
 resizez=85
 
-[loc_13415]
+[scenery_13415]
 name=Maple tree
 desc=A lovely addition to the garden.
 model=loc_13415
@@ -3322,7 +3322,7 @@ resizex=85
 resizey=85
 resizez=85
 
-[loc_13416]
+[scenery_13416]
 name=Yew tree
 desc=A lovely addition to the garden.
 model=loc_13416
@@ -3334,7 +3334,7 @@ resizex=85
 resizey=85
 resizez=85
 
-[loc_13417]
+[scenery_13417]
 name=Magic tree
 desc=The tree shimmers with a magical force.
 model=loc_13417
@@ -3342,7 +3342,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13418]
+[scenery_13418]
 name=Tree
 desc=A lovely addition to the garden.
 model=loc_13411
@@ -3354,7 +3354,7 @@ resizey=75
 resizez=75
 op5=Remove
 
-[loc_13419]
+[scenery_13419]
 name=Tree
 desc=A lovely addition to the garden.
 model=loc_13412
@@ -3366,7 +3366,7 @@ resizey=75
 resizez=75
 op5=Remove
 
-[loc_13420]
+[scenery_13420]
 name=Oak Tree
 desc=A lovely addition to the garden.
 model=loc_13413
@@ -3378,7 +3378,7 @@ resizey=75
 resizez=75
 op5=Remove
 
-[loc_13421]
+[scenery_13421]
 name=Willow Tree
 desc=A lovely addition to the garden.
 model=loc_13414
@@ -3390,7 +3390,7 @@ resizey=75
 resizez=75
 op5=Remove
 
-[loc_13422]
+[scenery_13422]
 name=Yew tree
 desc=A lovely addition to the garden.
 model=loc_13416
@@ -3402,7 +3402,7 @@ resizey=75
 resizez=75
 op5=Remove
 
-[loc_13423]
+[scenery_13423]
 name=Mapletree
 desc=A lovely addition to the garden.
 model=loc_13415
@@ -3414,7 +3414,7 @@ resizey=75
 resizez=75
 op5=Remove
 
-[loc_13424]
+[scenery_13424]
 name=Magic tree
 desc=A fully grown Willow tree.
 model=loc_13417
@@ -3425,7 +3425,7 @@ resizex=118
 resizey=118
 resizez=118
 
-[loc_13425]
+[scenery_13425]
 name=Fern
 desc=A plant.
 model=loc_13425
@@ -3433,7 +3433,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13426]
+[scenery_13426]
 name=Bush
 desc=A plant.
 model=loc_13426
@@ -3441,7 +3441,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13427]
+[scenery_13427]
 name=Tall Plant
 desc=A plant.
 model=loc_13427
@@ -3449,7 +3449,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13428]
+[scenery_13428]
 name=Short Plant
 desc=A plant.
 model=loc_13428
@@ -3457,7 +3457,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13429]
+[scenery_13429]
 name=Large Leaf Plant
 desc=A plant.
 model=loc_13429
@@ -3465,7 +3465,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13430]
+[scenery_13430]
 name=Big Large Leaf Plant
 desc=A plant.
 model=loc_13430
@@ -3473,43 +3473,43 @@ width=2
 length=2
 op5=Remove
 
-[loc_13431]
+[scenery_13431]
 name=Plant
 desc=A plant.
 model=loc_13431
 op5=Remove
 
-[loc_13432]
+[scenery_13432]
 name=Fern
 desc=A plant.
 model=loc_13432
 op5=Remove
 
-[loc_13433]
+[scenery_13433]
 name=Fern
 desc=A plant.
 model=loc_13433
 op5=Remove
 
-[loc_13434]
+[scenery_13434]
 name=Dock Leaf
 desc=A plant.
 model=loc_13434
 op5=Remove
 
-[loc_13435]
+[scenery_13435]
 name=Thistle
 desc=A plant.
 model=loc_13435
 op5=Remove
 
-[loc_13436]
+[scenery_13436]
 name=Reeds
 desc=A plant.
 model=loc_13436
 op5=Remove
 
-[loc_13437]
+[scenery_13437]
 name=Orange flower
 desc=A little orange flower.
 model=loc_13437
@@ -3517,7 +3517,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13438]
+[scenery_13438]
 name=Daffodils
 desc=Lonely as a cloud.
 model=loc_13438
@@ -3525,7 +3525,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13439]
+[scenery_13439]
 name=Bluebells
 desc=The bluebells are coming!
 model=loc_13439
@@ -3533,7 +3533,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13440]
+[scenery_13440]
 name=Orange flower
 desc=A little orange flower.
 model=loc_13440
@@ -3541,7 +3541,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13441]
+[scenery_13441]
 name=Daffodils
 desc=Lonely as a cloud.
 model=loc_13441
@@ -3549,7 +3549,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13442]
+[scenery_13442]
 name=Bluebells
 desc=The bluebells are coming!
 model=loc_13442
@@ -3557,7 +3557,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13443]
+[scenery_13443]
 name=Sunflower
 desc=A great big sunny flower.
 model=loc_13443
@@ -3565,7 +3565,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13444]
+[scenery_13444]
 name=Marigolds
 desc=Lovely flowers.
 model=loc_13444
@@ -3573,7 +3573,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13445]
+[scenery_13445]
 name=Roses
 desc=They smell lovely.
 model=loc_13445
@@ -3581,7 +3581,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13446]
+[scenery_13446]
 name=Sunflowers
 desc=Great big sunny flowers.
 model=loc_13446
@@ -3589,7 +3589,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13447]
+[scenery_13447]
 name=Marigolds
 desc=Lovely flowers.
 model=loc_13447
@@ -3597,7 +3597,7 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13448]
+[scenery_13448]
 name=Roses
 desc=They smell lovely.
 model=loc_13448
@@ -3605,98 +3605,98 @@ blockrange=no
 op5=Remove
 blockwalk=no
 
-[loc_13449]
+[scenery_13449]
 name=Boundary stones
 desc=They mark a square.
 model=loc_13449
 blockrange=no
 op5=Remove
 
-[loc_13450]
+[scenery_13450]
 name=Wooden fence
 desc=Would probably not stop a charging rhinoceros.
 model=loc_13450
 blockrange=no
 op5=Remove
 
-[loc_13451]
+[scenery_13451]
 name=Stone wall
 desc=Very rural.
 model=loc_13451
 blockrange=no
 op5=Remove
 
-[loc_13452]
+[scenery_13452]
 name=Iron railings
 desc=A little bleak.
 model=loc_13452
 blockrange=no
 op5=Remove
 
-[loc_13453]
+[scenery_13453]
 name=Picket fence
 desc=Marks the boundary of the garden.
 model=loc_13453
 blockrange=no
 op5=Remove
 
-[loc_13454]
+[scenery_13454]
 name=Garden fence
 desc=Just like in Varrock palace!
 model=loc_13454
 blockrange=no
 op5=Remove
 
-[loc_13455]
+[scenery_13455]
 name=Marble wall
 desc=Very posh!
 model=loc_13455
 blockrange=no
 op5=Remove
 
-[loc_13456]
+[scenery_13456]
 name=Hedge
 desc=Like a living wall.
 model=loc_13456
 blockrange=no
 op5=Remove
 
-[loc_13457]
+[scenery_13457]
 name=Hedge
 desc=Like a living wall.
 model=loc_13457
 blockrange=no
 op5=Remove
 
-[loc_13458]
+[scenery_13458]
 name=Hedge
 desc=Like a living wall.
 model=loc_13458
 blockrange=no
 op5=Remove
 
-[loc_13459]
+[scenery_13459]
 name=Hedge
 desc=Like a living wall.
 model=loc_13459
 blockrange=no
 op5=Remove
 
-[loc_13460]
+[scenery_13460]
 name=Hedge
 desc=Like a living wall.
 model=loc_13460
 blockrange=no
 op5=Remove
 
-[loc_13461]
+[scenery_13461]
 name=Hedge
 desc=Like a living wall.
 model=loc_13461
 blockrange=no
 op5=Remove
 
-[loc_13462]
+[scenery_13462]
 name=Hedge
 desc=Like a living wall.
 model=loc_13462
@@ -3704,7 +3704,7 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13463]
+[scenery_13463]
 name=Hedge
 desc=Like a living wall.
 model=loc_13463
@@ -3712,7 +3712,7 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13464]
+[scenery_13464]
 name=Hedge
 desc=Like a living wall.
 model=loc_13464
@@ -3720,28 +3720,28 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13465]
+[scenery_13465]
 name=Hedge
 desc=Like a living wall.
 model=loc_13465
 blockrange=no
 op5=Remove
 
-[loc_13466]
+[scenery_13466]
 name=Hedge
 desc=Like a living wall.
 model=loc_13465
 blockrange=no
 op5=Remove
 
-[loc_13467]
+[scenery_13467]
 name=Hedge
 desc=Like a living wall.
 model=loc_13465
 blockrange=no
 op5=Remove
 
-[loc_13468]
+[scenery_13468]
 name=Hedge
 desc=Like a living wall.
 model=loc_13468
@@ -3749,7 +3749,7 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13469]
+[scenery_13469]
 name=Hedge
 desc=Like a living wall.
 model=loc_13469
@@ -3757,7 +3757,7 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13470]
+[scenery_13470]
 name=Hedge
 desc=Like a living wall.
 model=loc_13470
@@ -3765,7 +3765,7 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13471]
+[scenery_13471]
 name=Hedge
 desc=Like a living wall.
 model=loc_13471
@@ -3773,7 +3773,7 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13472]
+[scenery_13472]
 name=Hedge
 desc=Like a living wall.
 model=loc_13471
@@ -3781,7 +3781,7 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13473]
+[scenery_13473]
 name=Hedge
 desc=Like a living wall.
 model=loc_13471
@@ -3789,7 +3789,7 @@ blockrange=no
 ambient=20
 op5=Remove
 
-[loc_13474]
+[scenery_13474]
 name=Hedge
 desc=Like a living wall.
 model=loc_13474
@@ -3797,7 +3797,7 @@ blockrange=no
 contrast=20
 op5=Remove
 
-[loc_13475]
+[scenery_13475]
 name=Hedge
 desc=Like a living wall.
 model=loc_13475
@@ -3805,7 +3805,7 @@ blockrange=no
 contrast=20
 op5=Remove
 
-[loc_13476]
+[scenery_13476]
 name=Hedge
 desc=Like a living wall.
 model=loc_13476
@@ -3813,7 +3813,7 @@ blockrange=no
 contrast=20
 op5=Remove
 
-[loc_13477]
+[scenery_13477]
 name=Gazebo
 desc=Run for it! It's a gazebo!
 model=loc_13477
@@ -3822,7 +3822,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13478]
+[scenery_13478]
 name=Small fountain
 desc=Like a tiny private waterfall.
 model=loc_13478
@@ -3830,7 +3830,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13479]
+[scenery_13479]
 name=Large fountain
 desc=A sculpture of flowing water.
 model=loc_13479
@@ -3838,7 +3838,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13480]
+[scenery_13480]
 name=Ornamental fountain
 desc=Two little fishes forever spew water into the pond.
 model=loc_13480
@@ -3847,7 +3847,7 @@ width=2
 length=2
 op5=Remove
 
-[loc_13481]
+[scenery_13481]
 name=Crawling hand
 desc=A trophy of a mighty slayer!
 model=loc_13481
@@ -3857,7 +3857,7 @@ ambient=25
 op1=Talk-to
 forceapproach=south
 
-[loc_13482]
+[scenery_13482]
 name=Cockatrice head
 desc=A trophy of a mighty slayer!
 model=vm_digsite_finds_tablet
@@ -3867,7 +3867,7 @@ ambient=25
 op1=Talk-to
 forceapproach=south
 
-[loc_13483]
+[scenery_13483]
 name=Basilisk head
 desc=A trophy of a mighty slayer!
 model=vm_digsite_finds_coin_senntisten
@@ -3877,7 +3877,7 @@ ambient=25
 op1=Talk-to
 forceapproach=south
 
-[loc_13484]
+[scenery_13484]
 name=Kurask head
 desc=A trophy of a mighty slayer!
 model=loc_12235
@@ -3887,7 +3887,7 @@ ambient=25
 op1=Talk-to
 forceapproach=south
 
-[loc_13485]
+[scenery_13485]
 name=Abyssal demon head
 desc=A trophy of a mighty slayer!
 model=loc_13485
@@ -3897,7 +3897,7 @@ ambient=25
 op1=Talk-to
 forceapproach=south
 
-[loc_13486]
+[scenery_13486]
 name=KBD heads
 desc=A trophy of a mighty dragon-slayer!
 model=loc_13486
@@ -3909,7 +3909,7 @@ ambient=25
 op1=Talk-to
 forceapproach=south
 
-[loc_13487]
+[scenery_13487]
 name=KQ head
 desc=A trophy of a mighty kalphite slayer!
 model=loc_13487
@@ -3919,7 +3919,7 @@ ambient=25
 op1=Talk-to
 forceapproach=south
 
-[loc_13488]
+[scenery_13488]
 name=Mounted sea bass
 desc=A trophy of a master fisher.
 model=loc_12236
@@ -3928,7 +3928,7 @@ contrast=25
 ambient=25
 blockwalk=no
 
-[loc_13489]
+[scenery_13489]
 name=Mounted swordfish
 desc=A trophy of a master fisher.
 model=loc_12237
@@ -3937,7 +3937,7 @@ contrast=25
 ambient=25
 blockwalk=no
 
-[loc_13490]
+[scenery_13490]
 name=Mounted shark
 desc=A trophy of a master fisher.
 model=loc_13490
@@ -4692,7 +4692,7 @@ op5=Remove
 op1=Sleep-in
 active=yes
 
-[loc_13581]
+[scenery_13581]
 name=Chair
 desc=It's not the best chair but you think it would take your weight.
 model=loc_13581
@@ -4701,7 +4701,7 @@ op1=Sit-on
 op5=Remove
 forceapproach=south
 
-[loc_13582]
+[scenery_13582]
 name=Chair
 desc=The ideal thing to sit on.
 model=loc_13582
@@ -4710,7 +4710,7 @@ op1=Sit-on
 op5=Remove
 forceapproach=south
 
-[loc_13583]
+[scenery_13583]
 name=Chair
 desc=A comfortable seat.
 model=qip_sheep_shearer_rocking_chair
@@ -4719,7 +4719,7 @@ op1=Sit-on
 op5=Remove
 forceapproach=south
 
-[loc_13584]
+[scenery_13584]
 name=Chair
 desc=A comfortable seat.
 model=loc_13584
@@ -4728,7 +4728,7 @@ op1=Sit-on
 op5=Remove
 forceapproach=south
 
-[loc_13585]
+[scenery_13585]
 name=Chair
 desc=A comfortable seat.
 model=loc_13585
@@ -4737,7 +4737,7 @@ op1=Sit-on
 op5=Remove
 forceapproach=south
 
-[loc_13586]
+[scenery_13586]
 name=Chair
 desc=A comfortable seat.
 model=loc_13586
@@ -4746,7 +4746,7 @@ op1=Sit-on
 op5=Remove
 forceapproach=south
 
-[loc_13587]
+[scenery_13587]
 name=Chair
 desc=A comfortable seat.
 model=loc_13587
@@ -4755,7 +4755,7 @@ op1=Sit-on
 op5=Remove
 forceapproach=south
 
-[loc_13588]
+[scenery_13588]
 name=Rug
 desc=It's an ugly rug, but better than a bare floor.
 model=loc_11750
@@ -4763,7 +4763,7 @@ active=yes
 blockwalk=no
 op5=Remove
 
-[loc_13589]
+[scenery_13589]
 name=Rug
 desc=It's an ugly rug, but better than a bare floor.
 model=loc_11751
@@ -4771,7 +4771,7 @@ active=yes
 blockwalk=no
 op5=Remove
 
-[loc_13590]
+[scenery_13590]
 name=Rug
 desc=It's an ugly rug, but better than a bare floor.
 model=loc_11752
@@ -4779,7 +4779,7 @@ active=yes
 op5=Remove
 blockwalk=no
 
-[loc_13591]
+[scenery_13591]
 name=Rug
 desc=The handkerchief of giants!
 model=loc_13591
@@ -4787,7 +4787,7 @@ active=yes
 blockwalk=no
 op5=Remove
 
-[loc_13592]
+[scenery_13592]
 name=Rug
 desc=The handkerchief of giants!
 model=loc_13592
@@ -4795,7 +4795,7 @@ active=yes
 blockwalk=no
 op5=Remove
 
-[loc_13593]
+[scenery_13593]
 name=Rug
 desc=The handkerchief of giants!
 model=loc_13593
@@ -4803,7 +4803,7 @@ active=yes
 op5=Remove
 blockwalk=no
 
-[loc_13594]
+[scenery_13594]
 name=Rug
 desc=An opulent rug woven with gold leaf.
 model=loc_13594
@@ -4811,7 +4811,7 @@ active=yes
 blockwalk=no
 op5=Remove
 
-[loc_13595]
+[scenery_13595]
 name=Rug
 desc=An opulent rug woven with gold leaf.
 model=loc_13595
@@ -4819,7 +4819,7 @@ active=yes
 blockwalk=no
 op5=Remove
 
-[loc_13596]
+[scenery_13596]
 name=Rug
 desc=An opulent rug woven with gold leaf.
 model=loc_13596
@@ -4827,7 +4827,7 @@ active=yes
 op5=Remove
 blockwalk=no
 
-[loc_13597]
+[scenery_13597]
 name=Bookcase
 desc=A good source of books!
 model=loc_13597
@@ -4835,7 +4835,7 @@ op1=Search
 forceapproach=east
 op5=Remove
 
-[loc_13598]
+[scenery_13598]
 name=Bookcase
 desc=A good source of books!
 model=loc_13598
@@ -4843,7 +4843,7 @@ op1=Search
 forceapproach=east
 op5=Remove
 
-[loc_13599]
+[scenery_13599]
 name=Bookcase
 desc=A good source of books!
 model=loc_13599
@@ -4851,7 +4851,7 @@ op1=Search
 forceapproach=east
 op5=Remove
 
-[loc_13600]
+[scenery_13600]
 name=Scroll rack
 desc=A good source of scrolls!
 model=loc_13600
@@ -4860,7 +4860,7 @@ op1=Search
 forceapproach=east
 op5=Remove
 
-[loc_13601]
+[scenery_13601]
 name=Scroll rack
 desc=A good source of scrolls!
 model=loc_13601
@@ -4869,7 +4869,7 @@ op1=Search
 forceapproach=east
 op5=Remove
 
-[loc_13602]
+[scenery_13602]
 name=Scroll rack
 desc=A good source of scrolls!
 model=loc_13602
@@ -4878,7 +4878,7 @@ op1=Search
 forceapproach=east
 op5=Remove
 
-[loc_13603]
+[scenery_13603]
 name=Curtains
 desc=The curtain is open.
 model=loc_13603
@@ -4888,7 +4888,7 @@ blockrange=no
 raiseobject=no
 op5=Remove
 
-[loc_13604]
+[scenery_13604]
 name=Curtains
 desc=The curtain is open.
 model=loc_13604
@@ -4898,7 +4898,7 @@ blockrange=no
 raiseobject=no
 op5=Remove
 
-[loc_13605]
+[scenery_13605]
 name=Curtains
 desc=The curtain is open.
 model=loc_13605
@@ -4908,28 +4908,28 @@ blockrange=no
 raiseobject=no
 op5=Remove
 
-[loc_13606]
+[scenery_13606]
 name=Wall decoration
 desc=???
 model=loc_13606
 active=yes
 op5=Remove
 
-[loc_13607]
+[scenery_13607]
 name=Wall decoration
 desc=???
 model=loc_13607
 active=yes
 op5=Remove
 
-[loc_13608]
+[scenery_13608]
 name=Wall decoration
 desc=Your house logo in mahogany.
 model=loc_13608
 active=yes
 op5=Remove
 
-[loc_13609]
+[scenery_13609]
 name=Clay fireplace
 desc=You can light a fire here.
 model=loc_13609
@@ -4938,7 +4938,7 @@ op1=Light
 op5=Remove
 forceapproach=east
 
-[loc_13610]
+[scenery_13610]
 name=Clay fireplace
 desc=A fire burns cosily in the grate.
 model=loc_13609
@@ -4948,7 +4948,7 @@ anim=fireplace
 anim=fire_effect
 forceapproach=east
 
-[loc_13611]
+[scenery_13611]
 name=Limestone fireplace
 desc=You can light a fire here.
 model=loc_13611
@@ -4957,7 +4957,7 @@ op1=Light
 op5=Remove
 forceapproach=east
 
-[loc_13612]
+[scenery_13612]
 name=Limestone fireplace
 desc=A fire burns cosily in the grate.
 model=loc_13611
@@ -4967,7 +4967,7 @@ anim=fireplace
 anim=fire_effect
 forceapproach=east
 
-[loc_13613]
+[scenery_13613]
 name=Marble fireplace
 desc=You can light a fire here.
 model=loc_13613
@@ -4976,7 +4976,7 @@ op1=Light
 op5=Remove
 forceapproach=east
 
-[loc_13614]
+[scenery_13614]
 name=Marble fireplace
 desc=A fire burns cosily in the grate.
 model=loc_13613
@@ -5877,7 +5877,7 @@ model=poh_throne3
 recol1s=15360
 recol1d=30655
 
-[loc_13699]
+[scenery_13699]
 name=Tools
 desc=Hammer, chisel, saw and shears.
 model=loc_13699
@@ -5887,7 +5887,7 @@ op5=Remove
 ambient=25
 contrast=25
 
-[loc_13700]
+[scenery_13700]
 name=Tools
 desc=Bucket, spade, tinderbox and knife.
 model=loc_13700
@@ -5897,7 +5897,7 @@ op5=Remove
 ambient=25
 contrast=25
 
-[loc_13701]
+[scenery_13701]
 name=Tools
 desc=Needle, apron and glassblowing pipe.
 model=loc_13701
@@ -5907,7 +5907,7 @@ op5=Remove
 ambient=25
 contrast=25
 
-[loc_13702]
+[scenery_13702]
 name=Tools
 desc=A selection of jewellery moulds.
 model=loc_13702
@@ -5917,7 +5917,7 @@ op5=Remove
 ambient=25
 contrast=25
 
-[loc_13703]
+[scenery_13703]
 name=Tools
 desc=Farming tools.
 model=loc_13703
@@ -5926,7 +5926,7 @@ op5=Remove
 ambient=25
 contrast=25
 
-[loc_13704]
+[scenery_13704]
 name=Workbench
 desc=You can make furniture here.
 model=loc_10673i2
@@ -5935,7 +5935,7 @@ op1=Work-at
 op5=Remove
 forceapproach=south
 
-[loc_13705]
+[scenery_13705]
 name=Workbench
 desc=You can make furniture here.
 model=loc_10676
@@ -5944,7 +5944,7 @@ op1=Work-at
 op5=Remove
 forceapproach=south
 
-[loc_13706]
+[scenery_13706]
 name=Workbench
 desc=You can make furniture here.
 model=loc_13706
@@ -5954,7 +5954,7 @@ op5=Remove
 op4=Upgrade
 forceapproach=south
 
-[loc_13707]
+[scenery_13707]
 name=Workbench
 desc=You can make furniture here.
 model=loc_13706
@@ -5965,7 +5965,7 @@ op5=Remove
 op4=Upgrade
 forceapproach=south
 
-[loc_13708]
+[scenery_13708]
 name=Workbench
 desc=You can make furniture here.
 model=loc_13706
@@ -5976,7 +5976,7 @@ op1=Work-at
 op5=Remove
 forceapproach=south
 
-[loc_13709]
+[scenery_13709]
 name=Clockmaker's bench
 desc=You can do delicate crafting here.
 model=loc_13709
@@ -5986,7 +5986,7 @@ op5=Remove
 op4=Upgrade
 forceapproach=south
 
-[loc_13710]
+[scenery_13710]
 name=Clockmaker's bench
 desc=You can do delicate crafting here.
 model=loc_13709
@@ -5997,7 +5997,7 @@ op5=Remove
 op4=Upgrade
 forceapproach=south
 
-[loc_13711]
+[scenery_13711]
 name=Clockmaker's bench
 desc=You can do delicate crafting here.
 model=loc_13709
@@ -6009,7 +6009,7 @@ op5=Remove
 op4=Upgrade
 forceapproach=south
 
-[loc_13712]
+[scenery_13712]
 name=Clockmaker's bench
 desc=You can do delicate crafting here.
 model=loc_13712
@@ -6021,7 +6021,7 @@ op1=Craft
 op5=Remove
 forceapproach=south
 
-[loc_13713]
+[scenery_13713]
 name=Repair bench
 desc=You can repair broken staffs and arrows here.
 model=loc_13713
@@ -6029,7 +6029,7 @@ width=2
 op5=Remove
 forceapproach=south
 
-[loc_13714]
+[scenery_13714]
 name=Whetstone
 desc=You can sharpen rusty swords here.
 model=devious_whetstone
@@ -6039,7 +6039,7 @@ width=2
 op5=Remove
 forceapproach=south
 
-[loc_13715]
+[scenery_13715]
 name=Armour repair stand
 desc=You can repair armour here.
 model=loc_13715
@@ -6047,7 +6047,7 @@ width=2
 op5=Remove
 forceapproach=south
 
-[loc_13716]
+[scenery_13716]
 name=Helmet pluming stand
 desc=You can add a plume to your helmet here.
 model=loc_13716
@@ -6056,7 +6056,7 @@ op5=Remove
 forceapproach=south
 op1=Make-helmet
 
-[loc_13717]
+[scenery_13717]
 name=Painting stand
 desc=You can paint your logo onto your heraldic shield here.
 model=loc_13717
@@ -6065,7 +6065,7 @@ op5=Remove
 forceapproach=south
 op1=Use
 
-[loc_13718]
+[scenery_13718]
 name=Banner making stand
 desc=You can make a banner with your logo on here.
 model=loc_13718
@@ -6074,12 +6074,12 @@ op5=Remove
 forceapproach=south
 op1=Use
 
-[loc_13719]
+[scenery_13719]
 name=Stool
 desc=A wooden stool.
 model=vc_bar_stool
 
-[loc_13720]
+[scenery_13720]
 name=Stool
 desc=An oak stool.
 model=loc_13720

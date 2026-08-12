@@ -36735,7 +36735,7 @@ defaultmode=none
 timer=1
 category=rarefish
 param=whirlpool,macro_whirlpool_rarefish
-[npc_1400]
+[gull]
 name=Gull
 desc=A sea bird.
 model1=spot_biopigeon_launch
@@ -36950,7 +36950,7 @@ op1=Talk-to
 vislevel=hide
 head1=npc_gnomepilot_head
 
-[npc_1410]
+[waydar]
 name=Waydar
 desc=Waydar is some kind of flight officer.
 model1=npc_leprechaun
@@ -38632,7 +38632,7 @@ resizeh=140
 resizev=140
 vislevel=1
 
-[npc_1493]
+[monkey_1493]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1435
@@ -38641,7 +38641,7 @@ walkanim=m_monkey_walk
 readyanim=m_monkey_ready
 vislevel=1
 
-[npc_1494]
+[monkey_1494]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1435
@@ -38659,7 +38659,7 @@ resizeh=190
 resizev=190
 vislevel=1
 
-[npc_1495]
+[monkey_1495]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1435
@@ -38675,7 +38675,7 @@ walkanim=m_zombie_walk
 readyanim=m_monkey_ready
 vislevel=1
 
-[npc_1496]
+[monkey_1496]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1437
@@ -38686,7 +38686,7 @@ resizeh=160
 resizev=160
 vislevel=1
 
-[npc_1497]
+[monkey_1497]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1429
@@ -38699,7 +38699,7 @@ resizeh=140
 resizev=180
 vislevel=1
 
-[npc_1498]
+[monkey_1498]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1429
@@ -38711,7 +38711,7 @@ resizeh=130
 resizev=180
 vislevel=1
 
-[npc_1499]
+[monkey_1499]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1435
@@ -38723,7 +38723,7 @@ resizeh=180
 resizev=180
 vislevel=1
 
-[npc_1500]
+[monkey_1500]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1434
@@ -38734,7 +38734,7 @@ resizeh=180
 resizev=180
 vislevel=1
 
-[npc_1501]
+[monkey_1501]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1452
@@ -38745,7 +38745,7 @@ resizeh=100
 resizev=100
 vislevel=1
 
-[npc_1502]
+[monkey_1502]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1441
@@ -38758,7 +38758,7 @@ resizeh=180
 resizev=180
 vislevel=35
 
-[npc_1503]
+[monkey_1503]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1441
@@ -38771,7 +38771,7 @@ resizeh=180
 resizev=180
 vislevel=61
 
-[npc_1504]
+[monkey_1504]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1441
@@ -38784,7 +38784,7 @@ resizeh=180
 resizev=180
 vislevel=35
 
-[npc_1505]
+[monkey_1505]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1431
@@ -38795,7 +38795,7 @@ walkanim=m_gorilla_walk
 op2=Attack
 vislevel=35
 
-[npc_1506]
+[monkey_1506]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1431
@@ -38808,7 +38808,7 @@ resizeh=160
 resizev=160
 vislevel=35
 
-[npc_1507]
+[monkey_1507]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1431
@@ -38821,7 +38821,7 @@ resizeh=160
 resizev=160
 vislevel=35
 
-[npc_1508]
+[monkey_1508]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1438
@@ -38837,7 +38837,7 @@ resizeh=180
 resizev=180
 vislevel=35
 
-[npc_1509]
+[monkey_1509]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1459
@@ -38850,7 +38850,7 @@ resizeh=130
 resizev=130
 vislevel=35
 
-[npc_1510]
+[monkey_1510]
 name=Monkey
 desc=It's a monkey.
 model1=npc_1439
@@ -38862,7 +38862,7 @@ resizeh=180
 resizev=180
 vislevel=1
 
-[npc_1511]
+[gnome_1511]
 name=Gnome
 desc=It's a gnome.
 model1=npc_1420
@@ -38873,7 +38873,7 @@ walkanim=midget_walk
 readyanim=m_assassin_ready
 vislevel=9
 
-[npc_1512]
+[gnome_1512]
 name=Gnome
 desc=It's a gnome.
 model1=npc_leprechaun
@@ -38887,7 +38887,7 @@ walkanim=midget_walk
 readyanim=m_sapper_wallwipe
 vislevel=1
 
-[npc_1513]
+[gnome_1513]
 name=Gnome
 desc=It's a gnome.
 model1=npc_leprechaun
@@ -38905,7 +38905,7 @@ walkanim=midget_walk
 readyanim=m_mage_attack
 vislevel=1
 
-[npc_1514]
+[ape]
 name=Ape
 desc=It's an ape.
 model1=npc_1448
@@ -38914,7 +38914,7 @@ walkanim=m_monkey_walk
 readyanim=m_monkey_ready
 vislevel=1
 
-[npc_1515]
+[skeleton]
 name=Skeleton
 desc=Could do with gaining a few pounds.
 model1=poh_skeleton_8
@@ -38925,7 +38925,7 @@ resizeh=110
 resizev=40
 vislevel=18
 
-[npc_1517]
+[gnome_1517]
 name=Gnome
 desc=It's a gnome.
 model1=npc_gnomeballer
@@ -38942,7 +38942,7 @@ readyanim=midget_ready
 vislevel=1
 head1=obj_pickpocket_guide_gnome
 
-[npc_1518]
+[gnome_1518]
 name=Gnome
 desc=It's a gnome.
 model1=npc_gnomeballer
@@ -38957,7 +38957,7 @@ readyanim=midget_ready
 vislevel=1
 head1=obj_pickpocket_guide_gnome
 
-[npc_1519]
+[gnome_1519]
 name=Gnome
 desc=It's a gnome.
 model1=npc_gnomeballer
@@ -38972,7 +38972,7 @@ readyanim=midget_ready
 vislevel=1
 head1=obj_pickpocket_guide_gnome
 
-[npc_1520]
+[gnome_1520]
 name=Gnome
 desc=It's a gnome.
 model1=npc_gnomeballer
@@ -38987,7 +38987,7 @@ readyanim=midget_ready
 vislevel=1
 head1=obj_pickpocket_guide_gnome
 
-[npc_1521]
+[bird]
 name=Bird
 desc=A tropical bird.
 model1=spot_biopigeon_launch
@@ -39002,7 +39002,7 @@ resizeh=110
 resizev=110
 vislevel=1
 
-[npc_1522]
+[bird_1522]
 name=Bird
 desc=A tropical bird.
 model1=spot_biopigeon_launch
@@ -39017,7 +39017,7 @@ resizeh=90
 resizev=90
 vislevel=1
 
-[npc_1523]
+[king_scorpion]
 name=King Scorpion
 desc=That's poisonous.
 model1=npc_scorpion
@@ -39031,7 +39031,7 @@ resizeh=70
 resizev=70
 vislevel=1
 
-[npc_1524]
+[jungle_spider_1524]
 name=Jungle spider
 desc=Arachnoid.
 model1=poh_giantspider_8
@@ -39043,7 +39043,7 @@ walkanim=giantspider_walk
 readyanim=giantspider_ready
 vislevel=1
 
-[npc_1525]
+[weird_snake]
 name=Weird snake.
 desc=Slightly more spherical than most snakes.
 model1=obj_tomato
@@ -43220,7 +43220,7 @@ param=shop_buy_multiplier,600
 param=shop_delta,20
 param=shop_title,Brian's Archery Supplies.
 
-[npc_1861]
+[npcid_1861]
 model1=trollrescue_blankmodel_8
 active=no
 vislevel=1
@@ -52072,7 +52072,7 @@ param=shop_buy_multiplier,700
 param=shop_delta,1
 param=shop_title,Alice's Farming shop.
 
-[npc_2309]
+[npcid_2309]
 name=
 desc=
 model1=npc_2309
@@ -52424,7 +52424,7 @@ op1=Talk-to
 head1=npc_drunk1_head
 head2=idk_man_jaw_long_head
 
-[npc_2328]
+[gardener]
 name=Gardener
 desc=Perhaps this gardener might look after your crops for you.
 model1=npc_2328
@@ -55973,7 +55973,7 @@ alwaysontop=yes
 head1=npc_duel_crowdfemale1_head
 head2=obj_pickpocket_guide_warrior
 
-[npc_2550]
+[dwarven_miner]
 name=Dwarven Miner
 desc=He carries a heavy load.
 model1=npc_mcannonguard
@@ -55998,7 +55998,7 @@ vislevel=hide
 vislevel=hide
 head1=npc_mcannonguard_head
 
-[npc_2551]
+[dwarven_miner_2551]
 name=Dwarven Miner
 desc=He carries a heavy load.
 model1=npc_dwarf_normal
@@ -56021,7 +56021,7 @@ vislevel=hide
 vislevel=hide
 head1=npc_lawgof2_head
 
-[npc_2552]
+[dwarven_miner_2552]
 name=Dwarven Miner
 desc=He carries a heavy load.
 model1=npc_upassdwarf3
@@ -57620,7 +57620,7 @@ param=shop_buy_multiplier,150
 param=shop_delta,20
 param=shop_title,TzHaar-Hur-Tel's Equipment Store.
 
-[npc_2621]
+[tzhaar_hur_koz]
 name=TzHaar-Hur-Koz
 desc=Wonder what it's making.
 model1=npc_2591
@@ -62701,7 +62701,7 @@ walkanim=squidy_walk
 readyanim=squidy_ready
 vislevel=1
 
-[npc_2861]
+[karamthulhu]
 name=Karamthulhu
 desc=I will call him Squiddy; and he shall be my Squiddy, and he shall be mine.
 model1=npc_2860
@@ -67289,21 +67289,21 @@ op1=Talk-to
 head1=npc_3088_head
 head2=npc_3088_headi2
 
-[npc_3089]
+[npcid_3089]
 name=
 desc=
 model1=npc_2309
 minimap=no
 vislevel=hide
 
-[npc_3090]
+[npcid_3090]
 name=
 desc=
 model1=npc_2309
 minimap=no
 vislevel=hide
 
-[npc_3091]
+[npcid_3091]
 name=
 desc=
 model1=npc_2309
@@ -68357,7 +68357,7 @@ walkanim=skeleton_walk
 readyanim=skeleton_ready
 vislevel=1
 
-[npc_3152]
+[npcid_3152]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 vislevel=1
 multivar=enakh_akthanakos_form
@@ -81398,7 +81398,7 @@ alwaysontop=yes
 op1=Talk-to
 head1=npc_3628_head
 
-[npc_3803]
+[npcid_3803]
 model1=npc_2309
 active=no
 vislevel=1
@@ -81581,7 +81581,7 @@ op1=Talk-to
 vislevel=hide
 head1=npc_gnomepilot_head
 
-[npc_3813]
+[captain_wimto]
 name=Captain Wimto
 desc=Jolly good show!
 model1=npc_gnomepilot

@@ -161,7 +161,7 @@ raiseobject=no
 category=door_opened
 param=next_loc_stage,farmdoor
 
-[loc_11707]
+[scenery_11707]
 name=Door
 desc=The door is closed.
 model=door
@@ -182,9 +182,9 @@ op1=Open
 raiseobject=no
 ambient=20
 category=door_closed
-param=next_loc_stage,loc_11708
+param=next_loc_stage,scenery_11708
 
-[loc_11708]
+[scenery_11708]
 name=Door
 desc=The door is open.
 model=door
@@ -205,9 +205,9 @@ op1=Close
 raiseobject=no
 ambient=20
 category=door_opened
-param=next_loc_stage,loc_11707
+param=next_loc_stage,scenery_11707
 
-[loc_11709]
+[scenery_11709]
 name=Door
 desc=The door is closed.
 model=door
@@ -229,9 +229,9 @@ raiseobject=no
 ambient=20
 mirror=yes
 category=door_closed
-param=next_loc_stage,loc_11710
+param=next_loc_stage,scenery_11710
 
-[loc_11710]
+[scenery_11710]
 name=Door
 desc=The door is open.
 model=door
@@ -253,9 +253,9 @@ raiseobject=no
 ambient=20
 mirror=yes
 category=door_opened
-param=next_loc_stage,loc_11709
+param=next_loc_stage,scenery_11709
 
-[loc_11711]
+[scenery_11711]
 name=Door
 desc=The door is closed.
 model=door
@@ -277,9 +277,9 @@ raiseobject=no
 ambient=20
 resizey=152
 category=door_closed
-param=next_loc_stage,loc_11712
+param=next_loc_stage,scenery_11712
 
-[loc_11712]
+[scenery_11712]
 name=Door
 desc=The door is open.
 model=door
@@ -301,7 +301,7 @@ raiseobject=no
 ambient=20
 resizey=156
 category=door_opened
-param=next_loc_stage,loc_11711
+param=next_loc_stage,scenery_11711
 
 [fai_wiztower_poor_door]
 name=Door

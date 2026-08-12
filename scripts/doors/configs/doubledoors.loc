@@ -1,4 +1,4 @@
-[loc_1506]
+[scenery_1506]
 name=Large door
 desc=A sturdy wooden door.
 model=loc_1506
@@ -7,9 +7,9 @@ op1=Open
 mirror=yes
 raiseobject=no
 category=door_right_closed
-param=next_loc_stage,loc_1507
+param=next_loc_stage,scenery_1507
 
-[loc_1507]
+[scenery_1507]
 name=Large door
 desc=A sturdy wooden door.
 model=loc_1507
@@ -18,9 +18,9 @@ op1=Close
 mirror=yes
 raiseobject=no
 category=door_right_opened
-param=next_loc_stage,loc_1506
+param=next_loc_stage,scenery_1506
 
-[loc_1508]
+[scenery_1508]
 name=Large door
 desc=A sturdy wooden door.
 model=loc_1506
@@ -38,7 +38,7 @@ active=yes
 op1=Close
 raiseobject=no
 category=door_left_opened
-param=next_loc_stage,loc_1508
+param=next_loc_stage,scenery_1508
 
 [openbankdoor_l]
 name=Large door
@@ -126,7 +126,7 @@ category=door_left_opened
 param=next_loc_stage,elfdooropen
 param=close_sound,grate_close
 
-[loc_1596]
+[scenery_1596]
 name=Gate
 desc=A wrought iron gate.
 model=ikov_mendedleverdoorl
@@ -138,7 +138,7 @@ category=door_left_closed
 param=next_loc_stage,fencegate_r
 param=open_sound,grate_open
 
-[loc_1597]
+[scenery_1597]
 name=Gate
 desc=A wrought iron gate.
 model=ikov_mendedleverdoorl
@@ -148,7 +148,7 @@ active=yes
 blockrange=no
 raiseobject=no
 category=door_right_closed
-param=next_loc_stage,loc_1561
+param=next_loc_stage,scenery_1561
 param=open_sound,grate_open
 
 [fencegate_r]
@@ -159,10 +159,10 @@ op1=Close
 active=yes
 raiseobject=no
 category=door_left_opened
-param=next_loc_stage,loc_1557
+param=next_loc_stage,scenery_1557
 param=close_sound,grate_close
 
-[loc_1561]
+[scenery_1561]
 name=Gate
 desc=A wrought iron gate.
 model=ikov_mendedleverdoorl
@@ -174,7 +174,7 @@ category=door_right_opened
 param=next_loc_stage,fencegate_l
 param=close_sound,grate_close
 
-[loc_1557]
+[scenery_1557]
 name=Gate
 desc=A wrought iron gate.
 model=ikov_mendedleverdoorl
@@ -196,7 +196,7 @@ active=yes
 blockrange=no
 raiseobject=no
 category=door_right_closed
-param=next_loc_stage,loc_1561
+param=next_loc_stage,scenery_1561
 param=open_sound,grate_open
 
 [inaclefayeunopenabledoorl]

@@ -78,7 +78,7 @@ sound_synth(squeeze_in, 0, 0);
 stat_advance(agility, 75);
 ~update_gnome_varp(7);
 
-[oploc1,loc_154]
+[oploc1,obstacle_pipe]
 if(coordz(coord) > coordz(loc_coord)) {
     mes("You can't enter the pipe from this side.");
     return;

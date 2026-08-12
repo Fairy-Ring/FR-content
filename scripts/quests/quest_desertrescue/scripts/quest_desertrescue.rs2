@@ -284,7 +284,7 @@ if(last_useitem = thcelldoorkey) {
 }
 ~displaymessage(^dm_default);
 
-[oploc2,loc_2679]
+[oploc2,captain_siads_desk]
 mes("You search the captains desk while he's not looking...");
 def_boolean $found = false;
 if(inv_total(inv, thcelldoorkey) = 0) {
@@ -351,11 +351,11 @@ inv_add(inv, thcaptplans, 1);
 %desertrescue_map_mechanisms = setbit(%desertrescue_map_mechanisms, ^desertrescue_sailing);
 ~mesbox("You notice several books on the subject of sailing.");
 
-[oploc1,loc_2682]
+[oploc1,mine_cart]
 ~mesbox("A sturdy looking cart for carrying barrels of rocks out of the mining camp.");
 ~mesbox("The cart driver seems to be busy inspecting the cart for defects.");
 
-[oploc2,loc_2682]
+[oploc2,mine_cart]
 if(testbit(%desertrescue_map_mechanisms, ^desertrescue_ready_rescue) = ^true) {
     ~mesbox("There is space on the cart for you get on, would you like to try?");
     switch_int(~p_choice3("Yes, I'll get on.", 1, "No, I've got other plans.", 2, "Attract mine cart drivers attention.", 3)) {
@@ -389,7 +389,7 @@ if(inv_total(inv, thanainabarrel) > 0) {
 mes("You search the mine cart.");
 mes("This looks like a mine cart which takes barrels out of the encampment to Al Kharid.");
 
-[oplocu,loc_2682]
+[oplocu,mine_cart]
 if(last_useitem = thanainabarrel) {
     if(%desertrescue = ^desertrescue_retrieved_ana_liftbarrel) %desertrescue = ^desertrescue_ana_on_mining_cart;
     %desertrescue_map_mechanisms = setbit(%desertrescue_map_mechanisms, ^desertrescue_ana_mining_cart);

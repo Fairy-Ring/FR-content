@@ -4,33 +4,33 @@
 // No watering requirement, disease, compost, farmer pay, or multi-life yield math.
 
 // ---------------------------------------------------------------------------
-// Patch stage via parent multivarbit (varbit_708…715)
+// Patch stage via parent multivarbit (farming_allotment_varp_1_0_7…715)
 // Map loc is always parent (farming_veg_patch_N); ops resolve via multiloc.
 // ---------------------------------------------------------------------------
 
 [proc,farming_veg_stage]()(int)
 switch_loc (loc_type) {
-    case farming_veg_patch_1 : return(%varbit_708);
-    case farming_veg_patch_2 : return(%varbit_709);
-    case farming_veg_patch_3 : return(%varbit_710);
-    case farming_veg_patch_4 : return(%varbit_711);
-    case farming_veg_patch_5 : return(%varbit_712);
-    case farming_veg_patch_6 : return(%varbit_713);
-    case farming_veg_patch_7 : return(%varbit_714);
-    case farming_veg_patch_8 : return(%varbit_715);
+    case farming_veg_patch_1 : return(%farming_allotment_varp_1_0_7);
+    case farming_veg_patch_2 : return(%farming_allotment_varp_1_8_15);
+    case farming_veg_patch_3 : return(%farming_allotment_varp_1_16_23);
+    case farming_veg_patch_4 : return(%farming_allotment_varp_1_24_31);
+    case farming_veg_patch_5 : return(%farming_allotment_varp_2_0_7);
+    case farming_veg_patch_6 : return(%farming_allotment_varp_2_8_15);
+    case farming_veg_patch_7 : return(%farming_allotment_varp_2_16_23);
+    case farming_veg_patch_8 : return(%farming_allotment_varp_2_24_31);
     case default : return(0);
 }
 
 [proc,farming_veg_set_stage](int $stage)
 switch_loc (loc_type) {
-    case farming_veg_patch_1 : %varbit_708 = $stage;
-    case farming_veg_patch_2 : %varbit_709 = $stage;
-    case farming_veg_patch_3 : %varbit_710 = $stage;
-    case farming_veg_patch_4 : %varbit_711 = $stage;
-    case farming_veg_patch_5 : %varbit_712 = $stage;
-    case farming_veg_patch_6 : %varbit_713 = $stage;
-    case farming_veg_patch_7 : %varbit_714 = $stage;
-    case farming_veg_patch_8 : %varbit_715 = $stage;
+    case farming_veg_patch_1 : %farming_allotment_varp_1_0_7 = $stage;
+    case farming_veg_patch_2 : %farming_allotment_varp_1_8_15 = $stage;
+    case farming_veg_patch_3 : %farming_allotment_varp_1_16_23 = $stage;
+    case farming_veg_patch_4 : %farming_allotment_varp_1_24_31 = $stage;
+    case farming_veg_patch_5 : %farming_allotment_varp_2_0_7 = $stage;
+    case farming_veg_patch_6 : %farming_allotment_varp_2_8_15 = $stage;
+    case farming_veg_patch_7 : %farming_allotment_varp_2_16_23 = $stage;
+    case farming_veg_patch_8 : %farming_allotment_varp_2_24_31 = $stage;
 }
 
 [proc,farming_veg_is_parent]()(boolean)
@@ -161,37 +161,37 @@ settimer(farming_potato_grow, ^farming_potato_stage_ticks);
 
 [timer,farming_potato_grow]
 def_boolean $any_growing = false;
-if (%varbit_708 >= ^farming_potato_seed & %varbit_708 < ^farming_potato_fullygrown) {
-    %varbit_708 = add(%varbit_708, 1);
-    if (%varbit_708 < ^farming_potato_fullygrown) $any_growing = true;
+if (%farming_allotment_varp_1_0_7 >= ^farming_potato_seed & %farming_allotment_varp_1_0_7 < ^farming_potato_fullygrown) {
+    %farming_allotment_varp_1_0_7 = add(%farming_allotment_varp_1_0_7, 1);
+    if (%farming_allotment_varp_1_0_7 < ^farming_potato_fullygrown) $any_growing = true;
 }
-if (%varbit_709 >= ^farming_potato_seed & %varbit_709 < ^farming_potato_fullygrown) {
-    %varbit_709 = add(%varbit_709, 1);
-    if (%varbit_709 < ^farming_potato_fullygrown) $any_growing = true;
+if (%farming_allotment_varp_1_8_15 >= ^farming_potato_seed & %farming_allotment_varp_1_8_15 < ^farming_potato_fullygrown) {
+    %farming_allotment_varp_1_8_15 = add(%farming_allotment_varp_1_8_15, 1);
+    if (%farming_allotment_varp_1_8_15 < ^farming_potato_fullygrown) $any_growing = true;
 }
-if (%varbit_710 >= ^farming_potato_seed & %varbit_710 < ^farming_potato_fullygrown) {
-    %varbit_710 = add(%varbit_710, 1);
-    if (%varbit_710 < ^farming_potato_fullygrown) $any_growing = true;
+if (%farming_allotment_varp_1_16_23 >= ^farming_potato_seed & %farming_allotment_varp_1_16_23 < ^farming_potato_fullygrown) {
+    %farming_allotment_varp_1_16_23 = add(%farming_allotment_varp_1_16_23, 1);
+    if (%farming_allotment_varp_1_16_23 < ^farming_potato_fullygrown) $any_growing = true;
 }
-if (%varbit_711 >= ^farming_potato_seed & %varbit_711 < ^farming_potato_fullygrown) {
-    %varbit_711 = add(%varbit_711, 1);
-    if (%varbit_711 < ^farming_potato_fullygrown) $any_growing = true;
+if (%farming_allotment_varp_1_24_31 >= ^farming_potato_seed & %farming_allotment_varp_1_24_31 < ^farming_potato_fullygrown) {
+    %farming_allotment_varp_1_24_31 = add(%farming_allotment_varp_1_24_31, 1);
+    if (%farming_allotment_varp_1_24_31 < ^farming_potato_fullygrown) $any_growing = true;
 }
-if (%varbit_712 >= ^farming_potato_seed & %varbit_712 < ^farming_potato_fullygrown) {
-    %varbit_712 = add(%varbit_712, 1);
-    if (%varbit_712 < ^farming_potato_fullygrown) $any_growing = true;
+if (%farming_allotment_varp_2_0_7 >= ^farming_potato_seed & %farming_allotment_varp_2_0_7 < ^farming_potato_fullygrown) {
+    %farming_allotment_varp_2_0_7 = add(%farming_allotment_varp_2_0_7, 1);
+    if (%farming_allotment_varp_2_0_7 < ^farming_potato_fullygrown) $any_growing = true;
 }
-if (%varbit_713 >= ^farming_potato_seed & %varbit_713 < ^farming_potato_fullygrown) {
-    %varbit_713 = add(%varbit_713, 1);
-    if (%varbit_713 < ^farming_potato_fullygrown) $any_growing = true;
+if (%farming_allotment_varp_2_8_15 >= ^farming_potato_seed & %farming_allotment_varp_2_8_15 < ^farming_potato_fullygrown) {
+    %farming_allotment_varp_2_8_15 = add(%farming_allotment_varp_2_8_15, 1);
+    if (%farming_allotment_varp_2_8_15 < ^farming_potato_fullygrown) $any_growing = true;
 }
-if (%varbit_714 >= ^farming_potato_seed & %varbit_714 < ^farming_potato_fullygrown) {
-    %varbit_714 = add(%varbit_714, 1);
-    if (%varbit_714 < ^farming_potato_fullygrown) $any_growing = true;
+if (%farming_allotment_varp_2_16_23 >= ^farming_potato_seed & %farming_allotment_varp_2_16_23 < ^farming_potato_fullygrown) {
+    %farming_allotment_varp_2_16_23 = add(%farming_allotment_varp_2_16_23, 1);
+    if (%farming_allotment_varp_2_16_23 < ^farming_potato_fullygrown) $any_growing = true;
 }
-if (%varbit_715 >= ^farming_potato_seed & %varbit_715 < ^farming_potato_fullygrown) {
-    %varbit_715 = add(%varbit_715, 1);
-    if (%varbit_715 < ^farming_potato_fullygrown) $any_growing = true;
+if (%farming_allotment_varp_2_24_31 >= ^farming_potato_seed & %farming_allotment_varp_2_24_31 < ^farming_potato_fullygrown) {
+    %farming_allotment_varp_2_24_31 = add(%farming_allotment_varp_2_24_31, 1);
+    if (%farming_allotment_varp_2_24_31 < ^farming_potato_fullygrown) $any_growing = true;
 }
 if ($any_growing = true) {
     settimer(farming_potato_grow, ^farming_potato_stage_ticks);

@@ -1,4 +1,4 @@
-[oploc1,loc_2417]
+[oploc1,closed_chest]
 ~open_chest(partyroom_chestopen);
 
 [oploc2,partyroom_chestopen]
@@ -14,7 +14,7 @@ inv_stoptransmit(party_drop_chest:playerinv);
 ~moveallinv(partyroom_tempinv, inv);
 
 [oploc3,partyroom_chestopen]
-~close_chest(loc_2417);
+~close_chest(closed_chest);
 
 [inv_button1,party_drop_chest:playerinv] @withdraw_partychest(last_slot, 1);
 [inv_button2,party_drop_chest:playerinv] @withdraw_partychest(last_slot, 5);

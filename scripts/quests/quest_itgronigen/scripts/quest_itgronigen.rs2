@@ -13,11 +13,11 @@ if(%itgronigen = ^itgronigen_not_started) {
     mes("You climb down the ladder.");
 }
 
-[oploc1,loc_2188]
+[oploc1,ladder_2188]
 p_arrivedelay;
 ~climb_ladder(0_38_49_12_56, true);
 
-[oploc1,loc_2189]
+[oploc1,ladder_2189]
 p_arrivedelay;
 ~climb_ladder(0_38_49_8_29, true);
 
@@ -29,33 +29,33 @@ p_arrivedelay;
 mes("You open the chest.");
 ~open_chest(opendungeonchest);
 
-[oploc1,loc_2192] 
+[oploc1,chest] 
 mes("You open the chest.");
-~open_chest(loc_2195);
+~open_chest(chest_2195);
 
-[oploc1,loc_2193] 
+[oploc1,chest_2193] 
 mes("You open the chest.");
-~open_chest(loc_2196);
+~open_chest(chest_2196);
 
-[oploc1,loc_2197] 
+[oploc1,chest_2197] 
 mes("You open the chest.");
-~open_chest(loc_2198);
+~open_chest(chest_2198);
 
 [oploc1,opendungeonchest] 
 mes("You close the chest.");
 ~close_chest(shutdungeonchest);
 
-[oploc1,loc_2195] 
+[oploc1,chest_2195] 
 mes("You close the chest.");
-~close_chest(loc_2192);
+~close_chest(chest);
 
-[oploc1,loc_2196] 
+[oploc1,chest_2196] 
 mes("You close the chest.");
-~close_chest(loc_2193);
+~close_chest(chest_2193);
 
-[oploc1,loc_2198]
+[oploc1,chest_2198]
 mes("You close the chest.");
-~close_chest(loc_2197);
+~close_chest(chest_2197);
 
 [oploc2,opendungeonchest]
 mes("You search the chest.");
@@ -67,22 +67,22 @@ queue(poison_player, 0, 15);
 // Temp note: dur does not need updated
 loc_change(shutdungeonchest, 300);
 
-[oploc2,loc_2195]
+[oploc2,chest_2195]
 mes("You search the chest.");
 mes("The chest contains some antipoison.");
 // Temp note: dur does not need updated
-loc_change(loc_2192, 300);
+loc_change(chest, 300);
 if(inv_freespace(inv) = 0) {
     mes("But you don't have space to carry it.");
     return;
 }
 inv_add(inv, 1doseantipoison, 1);
 
-[oploc2,loc_2196]
+[oploc2,chest_2196]
 mes("You search the chest.");
 mes("The chest contains nothing.");
 
-[oploc2,loc_2198]
+[oploc2,chest_2198]
 if(~obj_gettotal(keep_key) > 0) {
     mes("You already have a keep key.");
     mes("Another one will be of no use.");
@@ -94,7 +94,7 @@ if(inv_freespace(inv) = 0) {
 }
 ~objbox(keep_key, "You find a keep key.", 250, 0, 0);
 // Temp note: dur does not need updated
-loc_change(loc_2197, 300);
+loc_change(chest_2197, 300);
 inv_add(inv, keep_key, 1);
 
 [oplocu,_observatory_dungeon_gate] 
@@ -131,8 +131,8 @@ while(loc_findnext = true) {
             loc_del(3);
             if(loc_type = keepgate_closed) {
                 // Temp note: dur updated
-                loc_add(movecoord($central_coord, -1, 0, 1), loc_1562, 0, loc_shape, 3);
-                loc_add(movecoord($central_coord, 0, 0, 1), loc_1563, 2, loc_shape, 3);
+                loc_add(movecoord($central_coord, -1, 0, 1), ikov_mendedleverdoorl_1562, 0, loc_shape, 3);
+                loc_add(movecoord($central_coord, 0, 0, 1), ikov_mendedleverdoorl_1563, 2, loc_shape, 3);
             }
             // Temp note: dur updated
             loc_add($central_coord, inviswall, $orig_angle, loc_shape, 3);
@@ -161,7 +161,7 @@ switch_int(%itgronigen) {
     case default : mes("It seems the telescope is not operational at the moment.");
 }
 
-[oploc1,loc_2212]
+[oploc1,sack]
 // RSC messages, OSRS checks bank here
 if(~obj_gettotal(lens_mould) > 0) {
     mes("You already have this lens mould.");

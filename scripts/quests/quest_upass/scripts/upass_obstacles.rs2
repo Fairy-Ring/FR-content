@@ -78,13 +78,13 @@ stat_advance(agility, 30);
 sound_synth(squeeze_in, 0, 0);
 sound_synth(grate_close, 0, 0);
 
-[oplocu,loc_2275]
-if(last_useitem = rope & loc_find(0_38_151_28_35, loc_2276) = true) {
+[oplocu,rock_2275]
+if(last_useitem = rope & loc_find(0_38_151_28_35, rock_2276) = true) {
     @upass_rock_ropeswing;
 }
 ~displaymessage(^dm_default);
 
-[oplocu,loc_2276]
+[oplocu,rock_2276]
 if(last_useitem = rope) {
     @upass_rock_ropeswing;
 }
@@ -107,7 +107,7 @@ anim(human_throwrope_up, 0);
 p_delay(0);
 inv_del(inv, rope, 1);
 // Temp note: dur updated
-loc_change(loc_2273, 5);
+loc_change(rope_swing, 5);
 p_delay(0);
 // https://youtu.be/zGVrFETj96E?si=-LiJOUm_2GMCx7VU&t=144, might need more data
 if(stat_random(agility, 100, 410) = false) {
@@ -127,7 +127,7 @@ mes("The rope gets tangled in some stalagmites.");
 p_delay(1);
 mes("You've lost your rope.");
 
-[oploc1,loc_2274]
+[oploc1,rope_swing_2274]
 def_coord $start_pos = movecoord(loc_coord, 4, 0, 0);
 def_int $delay = distance(coord, $start_pos);
 if(coordx(coord) < coordx(movecoord($start_pos, -1, 0, 0))) {

@@ -1,4 +1,4 @@
-[loc_2289]
+[scenery_2289]
 name=Hollow tree
 desc=It's hollow...
 model=loc_2289
@@ -14,7 +14,7 @@ category=tree
 param=next_loc_stage,hollow_tree_stump
 param=ent,macro_ent_hollow1
 
-[loc_4060]
+[scenery_4060]
 name=Hollow tree
 desc=It's hollow...
 model=loc_4060

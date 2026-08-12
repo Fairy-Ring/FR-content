@@ -190,7 +190,7 @@ category=tree
 param=next_loc_stage,deadtree2_stump_dark
 param=ent,macro_ent_dead_tree8
 param=ent,macro_ent_dead_tree2
-[loc_1315]
+[scenery_1315]
 name=Evergreen
 desc=A hardy evergreen tree.
 model=loc_1315
@@ -205,7 +205,7 @@ category=tree
 param=next_loc_stage,treestump2
 param=ent,macro_ent_evergreen1
 
-[loc_1316]
+[scenery_1316]
 name=Evergreen
 desc=A hardy evergreen tree.
 model=loc_1316

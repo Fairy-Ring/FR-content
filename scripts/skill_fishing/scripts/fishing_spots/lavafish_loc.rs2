@@ -1,24 +1,24 @@
-[oploc1,loc_2630] @attempt_fish_lava_eel_loc;
-[oploc3,loc_2630] @fish_lava_eel_loc;
-[oplocu,loc_2630] @oil_rod_fishing_use_item_loc;
+[oploc1,fishing_spot_2630] @attempt_fish_lava_eel_loc;
+[oploc3,fishing_spot_2630] @fish_lava_eel_loc;
+[oplocu,fishing_spot_2630] @oil_rod_fishing_use_item_loc;
 [oploc1,wild_ladder_middle_inactive] @attempt_fish_lava_eel_loc;
 [oplocu,wild_ladder_middle_inactive] @oil_rod_fishing_use_item_loc;
 
-[aploc1,loc_2630]
+[aploc1,fishing_spot_2630]
 if (distance(loc_coord, coord) > 1) {
     p_aprange(1);
     return;
 }
 @attempt_fish_lava_eel_loc;
 
-[aploc3,loc_2630]
+[aploc3,fishing_spot_2630]
 if (distance(loc_coord, coord) > 1) {
     p_aprange(1);
     return;
 }
 @fish_lava_eel_loc;
 
-[aplocu,loc_2630]
+[aplocu,fishing_spot_2630]
 if (distance(loc_coord, coord) > 1) {
     p_aprange(1);
     return;

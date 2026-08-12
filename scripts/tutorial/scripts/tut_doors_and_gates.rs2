@@ -138,8 +138,8 @@ while(loc_findnext = true) {
             loc_del(3);
             if(loc_type = newbiedoor4l) {
                 // Temp note: dur updated
-                loc_add(movecoord($central_coord, 1, 0, 0), loc_1562, 1, loc_shape, 3);
-                loc_add(movecoord($central_coord, 1, 0, -1), loc_1563, 3, loc_shape, 3);
+                loc_add(movecoord($central_coord, 1, 0, 0), ikov_mendedleverdoorl_1562, 1, loc_shape, 3);
+                loc_add(movecoord($central_coord, 1, 0, -1), ikov_mendedleverdoorl_1563, 3, loc_shape, 3);
             }
             // Temp note: dur updated
             loc_add($central_coord, inviswall, $orig_angle, loc_shape, 3);
@@ -188,8 +188,8 @@ while(loc_findnext = true) {
         loc_del(3);
         if(loc_type = newbiedoor5_l) {
             // Temp note: dur updated
-            loc_add(movecoord($central_coord, -1, 0, 0), loc_1562, 3, loc_shape, 3);
-            loc_add(movecoord($central_coord, -1, 0, 1), loc_1563, 1, loc_shape, 3);
+            loc_add(movecoord($central_coord, -1, 0, 0), ikov_mendedleverdoorl_1562, 3, loc_shape, 3);
+            loc_add(movecoord($central_coord, -1, 0, 1), ikov_mendedleverdoorl_1563, 1, loc_shape, 3);
         }
         // Temp note: dur updated
         loc_add($central_coord, inviswall, $orig_angle, loc_shape, 3);

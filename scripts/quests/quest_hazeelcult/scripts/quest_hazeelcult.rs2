@@ -69,11 +69,11 @@ if(loc_type = sewervalve3) {
 }
 ~mesbox("You turn the large metal valve to the right. Beneath your feet you can hear the sudden sound of rushing water from the sewer.");
 
-[oploc1,loc_2854]
+[oploc1,wall]
 if(%hazeelcultquest >= ^hazeelcult_finished_side_task & %hazeelcultquest < ^hazeelcult_complete & %hazeelcult_side = ^hazeelcult_evilside) {
     mes("There is something odd about the wall here.");
     mes("You find a secret passageway.");
-    ~open_and_close_door2(loc_2855, ~check_axis(coord, loc_coord, loc_angle), door_open);
+    ~open_and_close_door2(timberwall_2855, ~check_axis(coord, loc_coord, loc_angle), door_open);
     return;
 }
 mes("You can hear there is a hollow behind this wall."); // from rs3
@@ -123,10 +123,10 @@ if(%hazeelcultquest = ^hazeelcult_given_armour_or_scroll & %hazeelcult_side = ^h
 }
 ~mesbox("You search the cupboard thoroughly but find nothing of interest.");
 
-[oploc1,loc_2856]
+[oploc1,chest_2856]
 mes("This chest is locked shut.");
 
-[oplocu,loc_2856]
+[oplocu,chest_2856]
 if(last_useitem = carnilleanchestkey) {
     mes("You unlock the chest.");
     ~open_chest(carnilleanopenchest);
@@ -145,7 +145,7 @@ if(%hazeelcultquest = ^hazeelcult_finished_side_task & %hazeelcult_side = ^hazee
     %hazeelcultquest = ^hazeelcult_given_armour_or_scroll;
 }
 
-[oploc2,carnilleanopenchest] ~close_chest(loc_2856);
+[oploc2,carnilleanopenchest] ~close_chest(chest_2856);
 
 [oploc1,carnilleancrate]
 if(inv_total(inv, carnilleanchestkey) > 0) {

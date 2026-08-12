@@ -461,7 +461,7 @@ param=death_sound,black_demon_death
 param=death_drop,ashes
 param=demonbane_vulnerable,yes
 
-[npc_1516]
+[npcid_1516]
 name=Demon
 desc=Demonic.
 model1=npc_greater_demon

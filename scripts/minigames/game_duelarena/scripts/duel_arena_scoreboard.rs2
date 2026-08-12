@@ -1,4 +1,4 @@
-[oploc1,loc_3192]
+[oploc1,scoreboard]
 if_settext(duel_scoreboard:duel1, %duel1);
 if_settext(duel_scoreboard:duel2, %duel2);
 if_settext(duel_scoreboard:duel3, %duel3);

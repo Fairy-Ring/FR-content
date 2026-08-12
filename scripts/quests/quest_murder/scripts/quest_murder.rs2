@@ -1,4 +1,4 @@
-[oploc2,loc_2650]
+[oploc2,sinclair_family_compost_heap]
 if(%murderquest ! ^murder_started) {
     mes("I need the guards' permission to do that.");
     return;
@@ -49,7 +49,7 @@ if(%murder_poisonproof_progress >= ^poisonproof_spoken_murderer) {
 }
 mes("It's the drains from the kitchen.");
 
-[oploc2,loc_2653]
+[oploc2,spiders_nest]
 if(%murderquest ! ^murder_started) {
     mes("I need the guards' permission to do that.");
     return;
@@ -225,7 +225,7 @@ if(%murderquest ! ^murder_started) {
 }
 ~mesbox("As you approach the gate the Guard Dog starts barking loudly at you. There is no way an intruder could have committed the murder. It must have been someone the dog knew to get past it quietly.");
 
-[oploc2,loc_2666]
+[oploc2,smashed_window]
 p_arrivedelay;
 // after quest completion, osrs sends the mes "A slightly broken window. Could be easily shattered.", this was probably added with
 // kings ransom since the break op doesn't exist until then (and the mes doesn't exist in RSC)

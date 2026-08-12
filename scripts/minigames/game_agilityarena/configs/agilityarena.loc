@@ -272,7 +272,7 @@ blockwalk=no
 forcedecor=yes
 active=yes
 
-[loc_3577]
+[scenery_3577]
 name=Plank
 desc=Walk the plank! Ya land lubber!
 model=loc_3577

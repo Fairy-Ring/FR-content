@@ -89,8 +89,8 @@ while(loc_findnext = true) {
             loc_del(3);
             if(loc_type = zqshilogateclosedl) {
                 // Temp note: dur updated
-                loc_add(movecoord($central_coord, -1, 0, 0), loc_1562, 3, loc_shape, 3);
-                loc_add(movecoord($central_coord, -1, 0, 1), loc_1563, 1, loc_shape, 3);
+                loc_add(movecoord($central_coord, -1, 0, 0), ikov_mendedleverdoorl_1562, 3, loc_shape, 3);
+                loc_add(movecoord($central_coord, -1, 0, 1), ikov_mendedleverdoorl_1563, 1, loc_shape, 3);
             }
             // Temp note: dur updated
             loc_add($central_coord, inviswall, $orig_angle, loc_shape, 3);
@@ -146,7 +146,7 @@ if(loc_find(0_45_48_37_18, zq_doorblock_jungle1) = true & .loc_find(0_45_48_36_1
 longqueue(hide_rashiliyia_doors, 50, ^accelerate, 0);
 
 [queue,hide_rashiliyia_doors]
-if((loc_find(0_45_48_37_18, hillsideclosedl) = true & .loc_find(0_45_48_36_18, hillsideclosedr) = true) | (loc_find(0_45_48_37_18, loc_2238) = true & .loc_find(0_45_48_36_18, loc_2239) = true)) {
+if((loc_find(0_45_48_37_18, hillsideclosedl) = true & .loc_find(0_45_48_36_18, hillsideclosedr) = true) | (loc_find(0_45_48_37_18, hillside_entrance) = true & .loc_find(0_45_48_36_18, hillside_entrance_2239) = true)) {
     loc_change(zq_doorblock_jungle1, ^max_32bit_int);
     .loc_change(zq_doorblock_jungle2, ^max_32bit_int);
     if(distance(.loc_coord, coord) <= 2 | distance(loc_coord, coord) <= 2) mes("The trees spring back into place and hide the doors again.");
@@ -179,7 +179,7 @@ if(last_useitem = zqbonekey) {
 
 [label,enter_rash_tomb]
 if(%zombiequeen < ^zombiequeen_unlocked_rashliyia_tomb) {
-    if(loc_find(0_45_48_37_18, loc_2238) = true & .loc_find(0_45_48_36_18, loc_2239) = true) {
+    if(loc_find(0_45_48_37_18, hillside_entrance) = true & .loc_find(0_45_48_36_18, hillside_entrance_2239) = true) {
         loc_change(zq_doorblock_jungle1, ^max_32bit_int);
         .loc_change(zq_doorblock_jungle2, ^max_32bit_int);
         mes("The trees spring back into place and hide the doors again.");
@@ -192,8 +192,8 @@ p_teleport(0_45_148_49_53);
 ~mesbox("The doors close behind you with the sound of crunching bone.|Before you stretches a winding tunnel blocked by an ancient gate.");
 
 [label,open_rash_tombdoor]
-if(loc_find(0_45_48_37_18, hillsideclosedl) = true) loc_change(loc_2238, ^max_32bit_int);
-if(loc_find(0_45_48_36_18, hillsideclosedr) = true) loc_change(loc_2239, ^max_32bit_int);
+if(loc_find(0_45_48_37_18, hillsideclosedl) = true) loc_change(hillside_entrance, ^max_32bit_int);
+if(loc_find(0_45_48_36_18, hillsideclosedr) = true) loc_change(hillside_entrance_2239, ^max_32bit_int);
 mes("A shimmering light dances over the doors, before you can blink, the doors");
 mes("creak open.");
 queue(rash_queue, 6, 0); // 6t, it is a queue
@@ -267,8 +267,8 @@ while(loc_findnext = true) {
             loc_del(3);
             if(loc_type = zombiequeengateclosedl) {
                 // Temp note: dur updated
-                loc_add(movecoord($central_coord, 0, 0, 1), loc_1562, 0, loc_shape, 3);
-                loc_add(movecoord($central_coord, 1, 0, 1), loc_1563, 2, loc_shape, 3); 
+                loc_add(movecoord($central_coord, 0, 0, 1), ikov_mendedleverdoorl_1562, 0, loc_shape, 3);
+                loc_add(movecoord($central_coord, 1, 0, 1), ikov_mendedleverdoorl_1563, 2, loc_shape, 3); 
             }
             // Temp note: dur updated
             loc_add($central_coord, inviswall, $orig_angle, loc_shape, 3);

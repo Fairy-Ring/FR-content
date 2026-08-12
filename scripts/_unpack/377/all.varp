@@ -81,7 +81,7 @@ protect=no
 
 [action_delay]
 
-[varp_59]
+[varp59_unused]
 
 [goblinquest]
 scope=perm
@@ -237,9 +237,9 @@ scope=perm
 
 [itdigsitemulti]
 
-[varp_136]
+[varp136_unused]
 
-[varp_137]
+[varp137_unused]
 
 [thieving_stall_timer]
 scope=perm
@@ -282,15 +282,15 @@ clientcode=7
 [marketthief]
 transmit=yes
 
-[varp_189]
+[varp189_unused]
 
-[varp_190]
+[varp190_unused]
 
-[varp_191]
+[varp191_unused]
 
-[varp_196]
+[varp196_unused]
 
-[varp_199]
+[varp199_unused]
 
 [hopper_full]
 
@@ -314,7 +314,7 @@ scope=perm
 [gnomeball_owedball]
 scope=perm
 
-[varp_216]
+[varp216_unused]
 
 [pk_prey1]
 protect=no
@@ -326,9 +326,9 @@ type=player_uid
 
 [death]
 
-[varp_220]
+[varp220_unused]
 
-[varp_221]
+[varp221_unused]
 
 [gnome_cocktail_bits1]
 
@@ -346,41 +346,41 @@ type=player_uid
 
 [gnome_crunchies_bits2]
 
-[varp_235]
+[varp235_unused]
 
-[varp_236]
+[varp236_unused]
 
-[varp_237]
+[varp237_unused]
 
-[varp_238]
+[varp238_unused]
 
-[varp_239]
+[varp239_unused]
 
-[varp_240]
+[varp240_unused]
 
-[varp_241]
+[varp241_unused]
 
-[varp_242]
+[varp242_unused]
 
 [loc4]
 
-[varp_244]
+[varp244_unused]
 
-[varp_245]
+[varp245_unused]
 
-[varp_246]
+[varp246_unused]
 
-[varp_247]
+[varp247_unused]
 
-[varp_248]
+[varp248_unused]
 
-[varp_249]
+[varp249_unused]
 
-[varp_250]
+[varp250_unused]
 
-[varp_251]
+[varp251_unused]
 
-[varp_252]
+[varp252_unused]
 
 [gnome_course_progress]
 scope=perm
@@ -431,7 +431,7 @@ scope=perm
 [zamomage]
 scope=perm
 
-[varp_271]
+[varp271_unused]
 
 [magearena_charge]
 scope=perm
@@ -439,18 +439,18 @@ scope=perm
 [dragonresist]
 scope=perm
 
-[varp_278]
+[varp278_unused]
 
 [awarded_points]
 
-[varp_280]
+[varp280_unused]
 
 [tutorial]
 scope=perm
 
-[varp_283]
+[varp283_unused]
 
-[varp_289]
+[varp289_unused]
 
 [ring_of_recoil]
 scope=perm
@@ -460,7 +460,7 @@ scope=perm
 
 [trail_status]
 
-[varp_296]
+[varp747_unused]
 
 [elemental_workshop_bits]
 scope=perm
@@ -477,31 +477,31 @@ transmit=yes
 transmit=yes
 clientcode=9
 
-[varp_310]
+[varp310_unused]
 
-[varp_312]
+[rune_pouch_type_2_basevar]
 
 [emote_access]
 transmit=yes
 
-[varp_319]
+[varp319_unused]
 
 [tbwt_main]
 transmit=yes
 
-[varp_321]
+[varp321_unused]
 
-[varp_322]
+[varp322_unused]
 
-[varp_323]
+[varp323_unused]
 
-[varp_324]
+[varp324_unused]
 
-[varp_325]
+[varp325_unused]
 
-[varp_326]
+[varp326_unused]
 
-[varp_327]
+[varp327_unused]
 
 [regicide_quest]
 
@@ -515,27 +515,27 @@ transmit=yes
 protect=no
 transmit=yes
 
-[varp_332]
+[weakqueue_map_clock]
 
-[varp_333]
+[varp730_unused]
 
-[varp_334]
+[varp731_unused]
 
 [eadgar_quest]
 
-[varp_336]
+[varp336_bits]
 
-[varp_337]
+[varp337_unused]
 
-[varp_338]
+[varp338_unused]
 
 [morttonquest]
 
 [morttonmulti]
 
-[varp_341]
+[varp733_unused]
 
-[varp_342]
+[varp734_unused]
 
 [temple_repaired_p]
 transmit=yes
@@ -548,11 +548,11 @@ transmit=yes
 
 [viking]
 
-[varp_348]
+[varp738_unused]
 
-[varp_349]
+[varp739_unused]
 
-[varp_350]
+[varp732_bits]
 
 [deephorror]
 
@@ -576,9 +576,9 @@ transmit=yes
 protect=no
 transmit=yes
 
-[varp_357]
+[boardgames_varbit3]
 
-[varp_358]
+[boardgames_varbit4]
 
 [misc_quest]
 
@@ -593,27 +593,27 @@ transmit=yes
 [misc_varbit_3]
 transmit=yes
 
-[varp_364]
+[varp364_unused]
 
 [mm_main]
 
-[varp_366]
+[varp741_unused]
 
-[varp_367]
+[varp742_unused]
 
-[varp_368]
+[varp743_unused]
 
-[varp_369]
+[varp369_unused]
 
-[varp_370]
+[varp370_unused]
 
-[varp_371]
+[varp744_bits]
 
 [mm_gnomes]
 
-[varp_373]
+[varp745_bits]
 
-[varp_374]
+[varp746_bits]
 
 [armourhitsound]
 
@@ -643,17 +643,17 @@ scope=perm
 [hauntedmine_bits]
 transmit=yes
 
-[varp_384]
+[xmas_yoyo_unlocked]
 
-[varp_386]
+[wearing_sled]
 
 [routequest]
 
 [routequestmulti]
 
-[varp_389]
+[varp389_unused]
 
-[varp_390]
+[varp740_unused]
 
 [trawler_water_overlay]
 transmit=yes
@@ -663,11 +663,11 @@ transmit=yes
 [karam_dungeon_varbit]
 scope=perm
 
-[varp_396]
+[varp396_bits]
 
-[varp_397]
+[varp397_unused]
 
-[varp_398]
+[varp398_unused]
 
 [fenk_quest]
 transmit=yes
@@ -675,7 +675,7 @@ transmit=yes
 [fenk_flags]
 transmit=yes
 
-[varp_401]
+[varp401_unused]
 
 [roving_elves_quest]
 scope=perm
@@ -683,27 +683,27 @@ scope=perm
 [roving_elves_bits]
 scope=perm
 
-[varp_404]
+[varp404_unused]
 
-[varp_405]
+[varp405_unused]
 
 [tutorial_progress_overlay]
 transmit=yes
 
-[varp_407]
+[varp407_unused]
 
 [ahoy_varbits_1]
 transmit=yes
 
-[varp_409]
+[varp409_bits]
 
-[varp_410]
+[varp410_unused]
 
-[varp_411]
+[varp411_unused]
 
-[varp_412]
+[varp412_bits]
 
-[varp_413]
+[varp413_bits]
 transmit=yes
 
 [roving_update_ilfeen_chant]
@@ -713,27 +713,27 @@ transmit=yes
 [onesmallfavourmulti]
 transmit=yes
 
-[varp_418]
+[varp418_unused]
 
-[varp_419]
+[varp419_unused]
 
-[varp_420]
+[varp420_unused]
 
-[varp_421]
+[varp421_unused]
 
-[varp_422]
+[varp422_unused]
 
 [mdaughter_var]
 transmit=yes
 
-[varp_424]
+[varp424_unused]
 
 [goblin_caves]
 transmit=yes
 
-[varp_426]
+[varp426_unused]
 
-[varp_428]
+[varp428_unused]
 
 [easter_2005]
 
@@ -741,19 +741,19 @@ transmit=yes
 
 [easter_2005_last_giver]
 
-[varp_432]
+[varp432_unused]
 
 [dwarfrock_main]
 transmit=yes
 
-[varp_434]
+[varp434_unused]
 
 [main_feud_var]
 transmit=yes
 
 [feud_var_multi]
 
-[varp_438]
+[varp438_unused]
 
 [alternate_spells]
 
@@ -769,7 +769,7 @@ transmit=yes
 [ics_little_multi]
 transmit=yes
 
-[varp_444]
+[varp444_unused]
 
 [main_ics_var]
 
@@ -777,14 +777,14 @@ transmit=yes
 
 [follower_npc]
 
-[varp_448]
+[varp448_unused]
 
 [tog_minigame]
 transmit=yes
 
-[varp_450]
+[varp450_unused]
 
-[varp_451]
+[varp451_unused]
 
 [barrows]
 transmit=yes
@@ -799,63 +799,63 @@ transmit=yes
 
 [disease]
 
-[varp_457]
+[varp457_bits]
 
-[varp_458]
+[varp458_bits]
 
-[varp_459]
+[varp459_bits]
 
-[varp_460]
+[varp460_bits]
 
-[varp_461]
+[varp461_bits]
 
-[varp_462]
+[varp462_bits]
 
-[varp_463]
+[varp463_unused]
 
 [lost_tribe]
 transmit=yes
 
 [cutscene_var]
 
-[varp_467]
+[varp467_bits]
 
-[varp_468]
+[varp468_bits]
 
-[varp_469]
+[varp469_unused]
 
 [keldagrim_temp_var]
 
-[varp_471]
+[varp471_unused]
 
-[varp_472]
+[varp472_bits]
 
-[varp_473]
+[varp473_unused]
 
-[varp_474]
+[varp474_bits]
 
-[varp_475]
+[varp475_bits]
 
-[varp_476]
+[varp476_unused]
 
 [keldagrim_train_var]
 
-[varp_478]
+[varp478_unused]
 
-[varp_479]
+[varp479_unused]
 
-[varp_480]
+[varp480_unused]
 
-[varp_481]
+[varp481_unused]
 
 [giantdwarf_main]
 transmit=yes
 
-[varp_483]
+[varp483_bits]
 
-[varp_484]
+[varp484_unused]
 
-[varp_485]
+[varp485_unused]
 
 [abyssal_pouches1]
 scope=perm
@@ -883,9 +883,9 @@ transmit=yes
 [roguesden_puzzle]
 transmit=yes
 
-[varp_494]
+[varp494_unused]
 
-[varp_495]
+[varp495_bits]
 
 [recruitmentdrive]
 transmit=yes
@@ -899,9 +899,9 @@ transmit=yes
 [magic_carpet_var]
 transmit=yes
 
-[varp_500]
+[varp500_unused]
 
-[varp_501]
+[varp501_bits]
 transmit=yes
 
 [farming_tree_varp]
@@ -939,25 +939,25 @@ scope=perm
 [farming_varp_9]
 transmit=yes
 
-[varp_511]
+[varp511_bits]
 transmit=yes
 scope=perm
 
-[varp_512]
+[cactus_compost_varbit_basevar]
 transmit=yes
 scope=perm
 
-[varp_513]
+[varp513_bits]
 scope=perm
 
-[varp_514]
+[spirit_tree_sarim_compost_varbit_basevar]
 scope=perm
 
-[varp_515]
+[varp515_bits]
 transmit=yes
 scope=perm
 
-[varp_516]
+[varp516_bits]
 transmit=yes
 scope=perm
 
@@ -966,7 +966,7 @@ scope=perm
 [mourning_quest_bits]
 transmit=yes
 
-[varp_519]
+[varp519_unused]
 
 [dagganoth_area_project]
 transmit=yes
@@ -974,9 +974,9 @@ transmit=yes
 [forget_main_var]
 transmit=yes
 
-[varp_522]
+[varp522_unused]
 
-[varp_523]
+[varp523_unused]
 
 [forget_puzzle_var]
 transmit=yes
@@ -984,17 +984,17 @@ transmit=yes
 [forget_puzzle_var2]
 transmit=yes
 
-[varp_526]
+[varp526_unused]
 
-[varp_527]
+[varp527_unused]
 
-[varp_528]
+[varp528_bits]
 
 [farming_state_temp_3]
 
-[varp_530]
+[varp530_bits]
 
-[varp_532]
+[varp532_unused]
 
 [tai_bwo_cleanup]
 
@@ -1004,25 +1004,25 @@ transmit=yes
 [tbw_cleanup_temp]
 transmit=yes
 
-[varp_536]
+[varp536_bits]
 
-[varp_537]
+[varp537_bits]
 
-[varp_538]
+[varp538_unused]
 
-[varp_539]
+[varp539_unused]
 
 [roguetrader_var]
 transmit=yes
 
 [rogue_suduku1]
 
-[varp_542]
+[varp542_bits]
 
 [blast_furnace_readings]
 transmit=yes
 
-[varp_544]
+[varp544_unused]
 
 [blast_furnace_1]
 transmit=yes
@@ -1054,15 +1054,15 @@ transmit=yes
 [garden_varp_2]
 transmit=yes
 
-[varp_555]
+[varp555_bits]
 
-[varp_556]
+[varp556_unused]
 
-[varp_557]
+[varp557_unused]
 
-[varp_558]
+[varp558_unused]
 
-[varp_559]
+[varp559_unused]
 
 [tzhaar_fightpit_remaining]
 transmit=yes
@@ -1070,24 +1070,24 @@ transmit=yes
 [tzhaar_temp]
 transmit=yes
 
-[varp_562]
+[varp562_bits]
 
-[varp_563]
+[varp563_bits]
 
-[varp_564]
+[varp564_unused]
 
-[varp_565]
+[varp565_unused]
 
-[varp_566]
+[varp566_bits]
 
-[varp_567]
+[varp567_unused]
 
 [twocats_varbit]
 transmit=yes
 
-[varp_569]
+[varp569_bits]
 
-[varp_570]
+[varp570_unused]
 
 [quest_wanted]
 transmit=yes
@@ -1095,17 +1095,17 @@ transmit=yes
 [quest_wanted2]
 transmit=yes
 
-[varp_573]
+[varp573_unused]
 
 [mourning_quest_part2]
 
-[varp_575]
+[varp575_bits]
 
-[varp_576]
+[varp576_bits]
 
-[varp_577]
+[varp577_bits]
 
-[varp_578]
+[varp578_bits]
 
 [mourning_quest_light_doors]
 transmit=yes
@@ -1149,14 +1149,14 @@ transmit=yes
 [mourning_quest_beam_cross2]
 transmit=yes
 
-[varp_593]
+[varp593_bits]
 
 [mourning_part2_basevar2]
 transmit=yes
 
-[varp_595]
+[varp595_unused]
 
-[varp_596]
+[varp596_unused]
 
 [rimmington_extras_var]
 transmit=yes
@@ -1172,19 +1172,19 @@ transmit=yes
 [agrith_quest_varp]
 transmit=yes
 
-[varp_603]
+[varp603_unused]
 
 [makinghistory]
 transmit=yes
 
-[varp_605]
+[varp605_bits]
 
-[varp_606]
+[varp606_unused]
 
 [main_ratcatch_var]
 transmit=yes
 
-[varp_608]
+[varp608_unused]
 
 [ratcatch_var_multi]
 transmit=yes
@@ -1195,11 +1195,11 @@ transmit=yes
 [ratcatch_var_temp2]
 transmit=yes
 
-[varp_612]
+[varp612_bits]
 
-[varp_613]
+[varp613_unused]
 
-[varp_614]
+[varp614_unused]
 
 [farming_tools]
 transmit=yes
@@ -1211,14 +1211,14 @@ transmit=yes
 [champions_defeated]
 transmit=yes
 
-[varp_618]
+[spectator_toplevel_enabled_basevar]
 
-[varp_619]
+[varp619_unused]
 
-[varp_620]
+[varp620_unused]
 transmit=yes
 
-[varp_621]
+[varp621_unused]
 transmit=yes
 
 [devious_base]
@@ -1227,39 +1227,39 @@ transmit=yes
 [win05_var]
 transmit=yes
 
-[varp_624]
+[varp624_bits]
 
-[varp_625]
+[varp625_bits]
 
-[varp_626]
+[varp626_bits]
 
-[varp_627]
+[varp627_bits]
 
-[varp_628]
+[varp628_bits]
 
 [magictraining6]
 
-[varp_630]
+[varp630_unused]
 
-[varp_631]
+[varp631_bits]
 
-[varp_632]
+[varp632_bits]
 
-[varp_633]
+[varp633_bits]
 
-[varp_634]
+[varp634_bits]
 
 [handsand]
 
 [handsand_transmit]
 transmit=yes
 
-[varp_637]
+[varp637_bits]
 
 [swansong_temp]
 transmit=yes
 
-[varp_639]
+[varp639_bits]
 
 [agility_pyramid]
 transmit=yes
@@ -1291,15 +1291,15 @@ scope=perm
 transmit=yes
 scope=perm
 
-[varp_650]
+[varp650_unused]
 
-[varp_651]
+[varp651_unused]
 
-[varp_652]
+[varp652_unused]
 
-[varp_653]
+[varp653_unused]
 
-[varp_654]
+[varp654_unused]
 
 [fever_quest]
 
@@ -1312,14 +1312,14 @@ transmit=yes
 [fever_storage_var]
 transmit=yes
 
-[varp_659]
+[varp659_unused]
 
-[varp_660]
+[varp660_unused]
 
 [slayer_killerwatt_var]
 transmit=yes
 
-[varp_663]
+[varp663_bits]
 
 [spitfire_coord]
 
@@ -1331,14 +1331,14 @@ transmit=yes
 [ernestdoors]
 transmit=yes
 
-[varp_669]
+[varp669_unused]
 
-[varp_670]
+[varp670_unused]
 
 [fairytale_multi]
 transmit=yes
 
-[varp_672]
+[varp672_bits]
 
 [romeo_juliet_multi]
 
@@ -1348,9 +1348,9 @@ transmit=yes
 [canoeing_menu]
 transmit=yes
 
-[varp_676]
+[varp676_bits]
 
-[varp_677]
+[varp677_bits]
 
 [100intro]
 transmit=yes
@@ -1367,7 +1367,7 @@ scope=perm
 [hundred_dwarf]
 scope=perm
 
-[varp_682]
+[varp682_unused]
 
 [100_pirate_quest]
 scope=perm
@@ -1379,19 +1379,19 @@ scope=perm
 [hundred_ilm_var_1]
 transmit=yes
 
-[varp_686]
+[varp686_unused]
 
-[varp_687]
+[varp687_unused]
 
-[varp_688]
+[varp688_unused]
 
-[varp_689]
+[varp689_unused]
 
-[varp_691]
+[varp691_unused]
 
-[varp_692]
+[varp692_unused]
 
-[varp_693]
+[varp693_unused]
 
 [cornflour]
 
@@ -1401,11 +1401,11 @@ transmit=yes
 [templetrek_main_var]
 transmit=yes
 
-[varp_701]
+[varp701_unused]
 
 [templetrek_temp_var]
 
-[varp_703]
+[mcannon_world_basevar]
 
 [myreque_2_main_var]
 transmit=yes
@@ -1415,9 +1415,9 @@ transmit=yes
 
 [myreque2_extravar]
 
-[varp_707]
+[varp707_unused]
 
-[varp_708]
+[varp708_bits]
 
 [soulbane]
 transmit=yes
@@ -1429,32 +1429,32 @@ transmit=yes
 
 [soulbane_unprotected2]
 
-[varp_713]
+[varp713_unused]
 
 [rag_quest]
 scope=perm
 
-[varp_715]
+[varp715_unused]
 
 [rag_bone_2]
 transmit=yes
 
-[varp_717]
+[varp717_unused]
 
 [pest_instance]
 
-[varp_719]
+[varp719_bits]
 transmit=yes
 
 [abyssal_pouches2]
 scope=perm
 
-[varp_722]
+[varp722_bits]
 
 [swansong_quest]
 transmit=yes
 
-[varp_724]
+[varp724_unused]
 
 [mm_misc]
 scope=perm

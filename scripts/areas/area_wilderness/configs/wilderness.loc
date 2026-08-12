@@ -180,14 +180,14 @@ active=no
 hillskew=yes
 blockrange=no
 
-[loc_14395]
+[scenery_14395]
 model=loc_14395
 sharelight=yes
 active=no
 ambient=20
 contrast=15
 
-[loc_14396]
+[scenery_14396]
 model=loc_14396
 recol1s=15492
 recol1d=24309
@@ -197,7 +197,7 @@ sharelight=yes
 ambient=20
 contrast=15
 
-[loc_14397]
+[scenery_14397]
 model=loc_14396
 recol1s=15492
 recol1d=24309
@@ -208,7 +208,7 @@ ambient=20
 contrast=15
 mirror=yes
 
-[loc_14398]
+[scenery_14398]
 model=loc_14398
 recol1s=15492
 recol1d=24309
@@ -218,7 +218,7 @@ sharelight=yes
 ambient=20
 contrast=15
 
-[loc_14399]
+[scenery_14399]
 model=loc_14399
 recol1s=15492
 recol1d=24309
@@ -228,7 +228,7 @@ sharelight=yes
 ambient=20
 contrast=15
 
-[loc_1440]
+[scenery_14400]
 model=tzhaar_eeg2
 recol1s=15492
 recol1d=24309
@@ -238,7 +238,7 @@ ambient=20
 contrast=15
 offsety=-96
 
-[loc_14401]
+[scenery_14401]
 model=tzhaar_eeg2
 recol1s=15492
 recol1d=24309
@@ -248,7 +248,7 @@ ambient=20
 contrast=15
 offsety=-8
 
-[loc_14402]
+[scenery_14402]
 model=loc_14402
 active=no
 ambient=20
@@ -256,7 +256,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14403]
+[scenery_14403]
 model=loc_14403
 active=no
 ambient=20
@@ -264,7 +264,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14404]
+[scenery_14404]
 model=loc_14403
 active=no
 ambient=20
@@ -273,7 +273,7 @@ mirror=yes
 wallwidth=32
 occlude=yes
 
-[loc_14405]
+[scenery_14405]
 model=loc_14403
 active=no
 ambient=20
@@ -281,7 +281,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14406]
+[scenery_14406]
 model=loc_14403
 active=no
 ambient=20
@@ -289,7 +289,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14407]
+[scenery_14407]
 model=loc_14407
 active=no
 ambient=20
@@ -297,7 +297,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14408]
+[scenery_14408]
 model=tzhaar_cave_wall8
 recol1s=21072
 recol1d=24275
@@ -313,7 +313,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14409]
+[scenery_14409]
 model=loc_14409
 active=no
 ambient=20
@@ -321,7 +321,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14410]
+[scenery_14410]
 model=loc_14410
 active=no
 ambient=20
@@ -329,7 +329,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14411]
+[scenery_14411]
 model=loc_14411
 active=no
 ambient=20
@@ -337,7 +337,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14412]
+[scenery_14412]
 model=loc_14412
 recol1s=21072
 recol1d=24275
@@ -351,7 +351,7 @@ active=no
 ambient=20
 contrast=15
 
-[loc_14413]
+[scenery_14413]
 model=loc_14413
 active=no
 ambient=20
@@ -359,7 +359,7 @@ contrast=15
 wallwidth=32
 occlude=yes
 
-[loc_14414]
+[scenery_14414]
 model=loc_14414
 active=no
 ambient=20

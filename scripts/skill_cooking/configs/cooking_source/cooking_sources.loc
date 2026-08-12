@@ -1,4 +1,4 @@
-[loc_2728]
+[scenery_2728]
 name=Range
 desc=Ideal for cooking on.
 model=loc_2728
@@ -6,32 +6,32 @@ length=2
 forceapproach=east
 category=cooking_oven
 
-[loc_2729]
+[scenery_2729]
 name=Range
 desc=Ideal for cooking on.
 model=loc_2728
 category=cooking_oven
 
-[loc_2730]
+[scenery_2730]
 name=Range
 desc=Ideal for cooking on.
 model=loc_2728
 category=cooking_oven
 
-[loc_2731]
+[scenery_2731]
 name=Range
 desc=Ideal for cooking on.
 model=loc_2728
 category=cooking_oven
 
-[loc_2724]
+[scenery_2724]
 name=Fireplace
 desc=A fire burns brightly here.
 model=loc_2724
 anim=fireplace
 category=cooking_fire
 
-[loc_2725]
+[scenery_2725]
 name=Fireplace
 desc=A grand old fireplace.
 model=loc_2725
@@ -39,7 +39,7 @@ length=3
 anim=grandfireplace
 category=cooking_fire
 
-[loc_2726]
+[scenery_2726]
 name=Fireplace
 desc=A grand old fireplace.
 model=loc_2725
@@ -49,14 +49,14 @@ length=3
 anim=grandfireplace
 category=cooking_fire
 
-[loc_2727]
+[scenery_2727]
 name=Cooking pot
 desc=Something is cooking nicely here.
 model=loc_2727
 anim=fireplace
 category=cooking_fire
 
-[loc_2732]
+[scenery_2732]
 name=Fire
 desc=Hot!
 model=loc_2732

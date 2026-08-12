@@ -10,7 +10,7 @@ if(stat(agility) < 5) {
 }
 @climb_barbarian_crumblingwall;
 
-[oploc1,loc_2298]
+[oploc1,climbing_rocks]
 if(stat(agility) < 5) {
     ~mesbox("You need an Agility level of 5 to climb the wall.");
     return;
@@ -20,7 +20,7 @@ stat_advance(agility, 250);
 sound_synth(climb_wall, 0, 0);
 mes("You climb over the wall.");
 
-[oploc1,loc_2296]
+[oploc1,log_balance]
 if(stat(agility) < 20) {
     ~mesbox("You need an Agility level of 20 to balance on this log.");
     return;
@@ -43,7 +43,7 @@ stat_advance(agility, 85);
 // https://youtu.be/Fr0ZhqD6KKM?si=NUQInNCAp1j_PJhp&t=164
 mes("...You make it safely to the other side.");
 
-[oploc1,loc_2332]
+[oploc1,a_wooden_log]
 p_arrivedelay;
 def_int $x_dist = -2;
 def_coord $turn_coord = 0_45_47_27_47;
@@ -115,7 +115,7 @@ if($dist > 3) {
     mes("You cannot do that from here.");
     return;
 }
-if(loc_type ! loc_2323 & stat(agility) < 10) { 
+if(loc_type ! ropeswing_2323 & stat(agility) < 10) { 
     // dont check the inner brimhaven or ogre island swing to prevent getting softlocked
     mes("You need an agility level of 10 to attempt to swing on this vine.");
     return;
@@ -130,7 +130,7 @@ if(~get_island_rope_var >= map_clock) {
 }
 ~set_island_rope_var(calc(map_clock + 4));
 if($dist > 0) {
-    if(loc_type = loc_2323) {
+    if(loc_type = ropeswing_2323) {
         if (%option_run = ^player_run_off) {
             p_delay(sub($dist, 1));
         } else {
@@ -273,14 +273,14 @@ mes("You manage to make the jump.");
 [oploc1,qip_sheep_shearer_fullstyle]
 ~climb_stile;
 
-[oploc1,loc_9299]
+[oploc1,fence]
 if(stat(agility) < 29) { 
     mes("You need an agility level of 29 to attempt to climb through this broken fence.");
     return;
 }
 ~climb_fence;
 
-[oploc1,loc_9309]
+[oploc1,underwall_tunnel]
 if(stat(agility) < 26) { 
     mes("You need an agility level of 26 to attempt to climb under this wall.");
     return;
@@ -291,7 +291,7 @@ p_delay(0);
 ~agility_exactmove(null, 20, 0, coord, $end_coord, 45, 70, ^exact_north, false);
 p_teleport($end_coord);
 
-[oploc1,loc_9310]
+[oploc1,underwall_tunnel_9310]
 if(stat(agility) < 26) { 
     mes("You need an agility level of 26 to attempt to climb under this wall.");
     return;
@@ -302,7 +302,7 @@ p_delay(0);
 ~agility_exactmove(null, 20, 0, coord, $end_coord, 45, 70, ^exact_south, false);
 p_teleport($end_coord);
 
-[oploc1,loc_9311]
+[oploc1,underwall_tunnel_9311]
 if(stat(agility) < 21) { 
     mes("You need an agility level of 21 to attempt to climb under this wall.");
     return;
@@ -313,7 +313,7 @@ p_delay(0);
 ~agility_exactmove(null, 20, 0, coord, $end_coord, 45, 70, ^exact_east, false);
 p_teleport($end_coord);
 
-[oploc1,loc_9312]
+[oploc1,underwall_tunnel_9312]
 if(stat(agility) < 21) { 
     mes("You need an agility level of 21 to attempt to climb under this wall.");
     return;

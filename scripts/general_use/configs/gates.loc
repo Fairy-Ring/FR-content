@@ -1,4 +1,4 @@
-[loc_1551]
+[scenery_1551]
 name=Gate
 desc=A wooden gate.
 model=plaguesheep_gatel
@@ -7,9 +7,9 @@ active=yes
 blockrange=no
 raiseobject=no
 category=gate_main_closed
-param=next_loc_stage,loc_1552
+param=next_loc_stage,scenery_1552
 
-[loc_1552]
+[scenery_1552]
 name=Gate
 desc=A wooden gate.
 model=plaguesheep_gatel
@@ -17,9 +17,9 @@ op1=Close
 active=yes
 raiseobject=no
 category=gate_main_open
-param=next_loc_stage,loc_1551
+param=next_loc_stage,scenery_1551
 
-[loc_1553]
+[scenery_1553]
 name=Gate
 desc=A wooden gate.
 model=plaguesheep_gatel
@@ -29,9 +29,9 @@ active=yes
 blockrange=no
 raiseobject=no
 category=gate_outer_closed
-param=next_loc_stage,loc_1556
+param=next_loc_stage,scenery_1556
 
-[loc_1556]
+[scenery_1556]
 name=Gate
 desc=A wooden gate.
 model=plaguesheep_gatel
@@ -40,7 +40,7 @@ op1=Close
 active=yes
 raiseobject=no
 category=gate_outer_open
-param=next_loc_stage,loc_1553
+param=next_loc_stage,scenery_1553
 
 [death_fencegate_l]
 name=Gate

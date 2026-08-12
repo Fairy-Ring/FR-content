@@ -49,7 +49,7 @@ def_coord $dest = $loc_coord;
 if ($entering = true) {
     $dest = movecoord($loc_coord, $x, 0, $z);
 }
-if($next_loc = loc_1563) {
+if($next_loc = ikov_mendedleverdoorl_1563) {
     $next_angle = calc(loc_angle + 1);
 }
 p_teleport($dest);

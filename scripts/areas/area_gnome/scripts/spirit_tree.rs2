@@ -46,7 +46,7 @@ switch_int(~p_choice3("Battlefield of Khazard.", 1, "Forest north of Varrock.", 
 }
 @spirit_tree_tele($end_pos);
  
-[oploc1,loc_1317] // young tree
+[oploc1,spirit_tree] // young tree
 if(%treequest ! ^tree_complete) {
     ~mesbox("The tree doesn't feel like talking.");
     return;

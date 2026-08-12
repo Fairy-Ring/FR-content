@@ -51,7 +51,7 @@ npc_facesquare(0_42_54_41_14);
 npc_delay(0);
 npc_anim(human_openchest, 0);
 npc_delay(0);
-if(loc_find(0_42_54_41_14, loc_2417) = true) {
+if(loc_find(0_42_54_41_14, closed_chest) = true) {
     loc_change(partyroom_chestopen, 500);
     npc_delay(1);
 }

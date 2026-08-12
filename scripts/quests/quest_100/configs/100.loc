@@ -203,25 +203,25 @@ width=5
 anim=poh_portal
 op1=Use
 
-[loc_12261]
+[scenery_12261]
 active=yes
 multivar=hundred_dave_trapdoor
-multiloc=0,loc_12262
-multiloc=1,loc_12263
+multiloc=0,scenery_12262
+multiloc=1,scenery_12263
 
-[loc_12262]
+[scenery_12262]
 name=Trapdoor
 desc=It probably leads to some sort of cellar.
 model=loc_12262
 op1=Open
 
-[loc_12263]
+[scenery_12263]
 name=Trapdoor
 desc=What mysteries lie below?
 model=loc_12263
 op1=Go-down
 
-[loc_12264]
+[scenery_12264]
 name=Ladder
 desc=An oak ladder.
 model=loc_12264

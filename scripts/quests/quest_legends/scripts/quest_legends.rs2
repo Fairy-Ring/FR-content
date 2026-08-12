@@ -545,7 +545,7 @@ if (stat_random(mining, 90, 255) = true) {
     if(coordz(coord) < coordz(loc_coord)) {
         $move = 2;
     }
-    loc_change(loc_446, 6);
+    loc_change(stones, 6);
     p_teleport(loc_coord);
     p_delay(2);
     p_teleport(movecoord(coord, 0, 0, $move));

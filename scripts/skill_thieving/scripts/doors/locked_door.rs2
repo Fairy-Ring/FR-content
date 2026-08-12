@@ -1,7 +1,7 @@
-[oploc1,loc_2550]
+[oploc1,door_2550]
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
-[oploc1,loc_2551]
+[oploc1,door_2551]
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
 [oploc1,east_ardy_sewer_gate_north] 
@@ -10,28 +10,28 @@
 [oploc1,east_ardy_sewer_gate_south] 
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
-[oploc1,loc_2554]
+[oploc1,door_2554]
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
-[oploc1,loc_2555]
+[oploc1,door_2555]
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
-[oploc1,loc_2556]
+[oploc1,door_2556]
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
-[oploc1,loc_2557]
+[oploc1,door_2557]
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
-[oploc1,loc_2558]
+[oploc1,door_2558]
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
-[oploc1,loc_2559]
+[oploc1,door_2559]
 ~attempt_open_locked_door(loc_type, ~check_axis_locactive(coord));
 
-[oploc2,loc_2550]
+[oploc2,door_2550]
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
-[oploc2,loc_2551]
+[oploc2,door_2551]
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
 [oploc2,east_ardy_sewer_gate_north] 
@@ -40,39 +40,39 @@
 [oploc2,east_ardy_sewer_gate_south] 
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
-[oploc2,loc_2554]
+[oploc2,door_2554]
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
-[oploc2,loc_2555]
+[oploc2,door_2555]
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
-[oploc2,loc_2556]
+[oploc2,door_2556]
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
-[oploc2,loc_2557]
+[oploc2,door_2557]
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
-[oplocu,loc_2557]
+[oplocu,door_2557]
 if(last_useitem = lockpick) {
     ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
     return;
 }
 ~displaymessage(^dm_default);
 
-[oploc2,loc_2558]
+[oploc2,door_2558]
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
-[oplocu,loc_2558]
+[oplocu,door_2558]
 if(last_useitem = lockpick) {
     ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
     return;
 }
 ~displaymessage(^dm_default);
 
-[oploc2,loc_2559]
+[oploc2,door_2559]
 ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
 
-[oplocu,loc_2559]
+[oplocu,door_2559]
 if(last_useitem = lockpick) {
     ~pick_locked_door(loc_type, loc_coord, ~check_axis_locactive(coord));
     return;

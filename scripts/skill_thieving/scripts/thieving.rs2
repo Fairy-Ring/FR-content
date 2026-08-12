@@ -125,14 +125,14 @@ anim(human_openchest, 0);
 def_int $experience = db_getfield($data, trapped_chest:experience, 0);
 stat_advance(thieving, $experience);
 def_int $respawn_ticks = ~scale_by_playercount(db_getfield($data, trapped_chest:respawn_ticks, 0));
-loc_change(loc_2574, 4); //opened chest
+loc_change(arena_guard_chest_open_2574, 4); //opened chest
 p_delay(2);
 if (db_getfieldcount($data, trapped_chest:tele_coord) > 0) {
     mes("Suddenly a second magical trap triggers.");
     sound_synth(lever, 0, 0);
     p_teleport(db_getfield($data, trapped_chest:tele_coord, 0));
 }
-loc_change(loc_2572, $respawn_ticks); //looted chest
+loc_change(chest_2572, $respawn_ticks); //looted chest
 
 
 [proc,pick_pocket_check_for_reward](dbrow $data)

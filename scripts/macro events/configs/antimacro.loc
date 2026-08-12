@@ -87,7 +87,7 @@ desc=A stone pillar that looks like Saradomin.
 model=loc_11367
 model2=loc_11385
 
-[loc_11386]
+[scenery_11386]
 name=Decorative Pillar
 desc=A stone pillar that looks like Guthix.
 model=loc_11366
@@ -104,7 +104,7 @@ desc=A stone pillar that looks like Guthix.
 model=loc_11366
 model2=loc_11385
 
-[loc_11389]
+[scenery_11389]
 name=Decorative Pillar
 desc=A stone pillar that looks like Zamorak.
 model=loc_11365
@@ -121,7 +121,7 @@ desc=A stone pillar that looks like Zamorak.
 model=loc_11365
 model2=loc_11385
 
-[loc_11392]
+[scenery_11392]
 name=Decorative Pillar
 desc=A stone pillar that looks like Bob the Cat.
 model=loc_11364
@@ -672,30 +672,30 @@ forceapproach=north
 anim=smokepuff
 blockrange=no
 
-[loc_10068]
+[scenery_10068]
 multivar=macro_drilldemon_post_1
-multiloc=0,loc_10075
-multiloc=1,loc_10072
-multiloc=2,loc_10073
-multiloc=3,loc_10074
+multiloc=0,scenery_10075
+multiloc=1,scenery_10072
+multiloc=2,scenery_10073
+multiloc=3,scenery_10074
 
-[loc_10069]
+[scenery_10069]
 multivar=macro_drilldemon_post_2
-multiloc=0,loc_10075
-multiloc=1,loc_10072
-multiloc=2,loc_10073
-multiloc=3,loc_10074
+multiloc=0,scenery_10075
+multiloc=1,scenery_10072
+multiloc=2,scenery_10073
+multiloc=3,scenery_10074
 
-[loc_10070]
+[scenery_10070]
 multivar=macro_drilldemon_post_3
-multiloc=0,loc_10075
-multiloc=1,loc_10072
-multiloc=2,loc_10073
-multiloc=3,loc_10074
+multiloc=0,scenery_10075
+multiloc=1,scenery_10072
+multiloc=2,scenery_10073
+multiloc=3,scenery_10074
 
-[loc_10071]
+[scenery_10071]
 multivar=macro_drilldemon_post_4
-multiloc=0,loc_10075
-multiloc=1,loc_10072
-multiloc=2,loc_10073
-multiloc=3,loc_10074
+multiloc=0,scenery_10075
+multiloc=1,scenery_10072
+multiloc=2,scenery_10073
+multiloc=3,scenery_10074

@@ -103,17 +103,17 @@ mes("You find treasure inside!");
 anim(human_openchest, 0);
 stat_advance(thieving, $experience);
 ~trapped_chest_check_for_reward($data);
-loc_change(loc_2574, 4); //opened chest
+loc_change(arena_guard_chest_open_2574, 4); //opened chest
 p_delay(2);
-loc_change(loc_2572, $respawn_ticks); //looted chest
+loc_change(chest_2572, $respawn_ticks); //looted chest
 
-[oploc1,loc_2572]
+[oploc1,chest_2572]
 mes("It looks like this chest has already been looted.");
 
-[oploc2,loc_2572]
+[oploc2,chest_2572]
 mes("It looks like this chest has already been looted.");
 
-[oplocu,loc_2572]
+[oplocu,chest_2572]
 if (last_useitem = lockpick) {
     p_oploc(2);
 } else {
