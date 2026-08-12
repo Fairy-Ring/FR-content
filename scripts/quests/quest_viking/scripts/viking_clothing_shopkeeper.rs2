@@ -102,7 +102,7 @@ if (%if1 = 0) {
 }
 if_close;
 def_int $color = calc(%if1 - 1);
-// TODO 377 engine lacks setidkcolour — boots colour visual deferred
+setidkcolour(^idk_colour_boots, $color);
 buildappearance(worn);
 inv_del(inv, coins, 500);
 def_int $rand = random(4);

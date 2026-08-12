@@ -459,8 +459,22 @@ if(inv_total(inv, eadgar_fake_man) > 0) { // bank is not checked here
 // kitchen drawers + storeroomdoor: owned by quest_troll on 377 (avoid dup)
 
 [ai_timer,_troll_sguard]
-// 377-wip: no npc_destination in content engine.rs2 yet — hunt adjacent only
-huntall(npc_coord, 1, 0);
+// 274 official (Ash): hunt tile + 1 along walk dest, then +2 if still walking.
+if(npc_coord ! npc_destination) %npc_int = ~coord_direction(npc_coord, npc_destination);
+
+huntall(npc_coord, 0, 0);
+while (huntnext = true) {
+    ~troll_guard_attack;
+}
+
+huntall(~movecoord_indirection(npc_coord, %npc_int, 1), 0, 0);
+while (huntnext = true) {
+    ~troll_guard_attack;
+}
+
+if(npc_coord = npc_destination) return;
+
+huntall(~movecoord_indirection(npc_coord, %npc_int, 2), 0, 0);
 while (huntnext = true) {
     ~troll_guard_attack;
 }

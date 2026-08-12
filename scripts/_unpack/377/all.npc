@@ -32156,6 +32156,8 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 head1=idk_woman_hair_bun_head
+wanderrange=5
+moverestrict=indoors
 
 [viking_fisherman1]
 name=Fisherman
@@ -32186,6 +32188,10 @@ op1=Talk-to
 vislevel=hide
 head1=obj_castlewars_cloak_saradomin_manhead
 head2=idk_man_jaw_split_head
+defaultmode=none
+wanderrange=0
+moverestrict=nomove
+timer=30
 
 [viking_weapons_salesman]
 name=Skulgrimen
