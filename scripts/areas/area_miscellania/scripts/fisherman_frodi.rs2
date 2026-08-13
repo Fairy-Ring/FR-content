@@ -21,7 +21,7 @@ if (%misc_quest = ^misc_complete) {
 }
 
 // This is to intercept fishing in miscellania
-[proc,frodi_intercept_fish](string $fishing_mes)(boolean)
+[proc,frodi_intercept_fish](string $fishing_mes, int $exp)(boolean)
 if (inzone(^miscellania_lower_bound, ^miscellania_upper_bound, coord) = true) {
     if (%misc_approval < 127) { %misc_approval = add(%misc_approval, 1); }
     if (npc_find(0_40_60_16_12, misc_fisherman, 2, 0) = true) { 
@@ -30,6 +30,8 @@ if (inzone(^miscellania_lower_bound, ^miscellania_upper_bound, coord) = true) {
             ~chatnpcnoturn("<p,happy> Don't trouble yourself further, Your Highness, you've already done so much!");
         }
     }
+    // Same as Leif/Magnus: award the gather productexp (289 Frodi never did).
+    stat_advance(fishing, $exp);
     mes("<substring($fishing_mes, 0, sub(string_length($fishing_mes), 1))> and give it to Fisherman Frodi.");
     return (true);
 }
