@@ -17,7 +17,7 @@
 [label,jackie_tickets]
 ~chatplayer("<p,neutral>I'd like to trade in my tickets, please.");
 ~chatnpc("<p,neutral>Aye, ye be on the right tack.");
-if_openmain(inter_177);
+if_openmain(agilityarena_trade);
 
 [label,jackie_potions]
 ~chatplayer("<p,neutral>What potions do these new herbs make?");
@@ -31,31 +31,31 @@ if_openmain(inter_177);
 ~chatplayer("<p,neutral>See you later.");
 
 [opnpc3,agilityarena_tickettrader]
-if_openmain(inter_177);
+if_openmain(agilityarena_trade);
 
-[if_button,inter_177:com_94] @agilityarena_buy_xp(1, 2400);
-[if_button,inter_177:com_95] @agilityarena_buy_xp(1, 2400);
+[if_button,agilityarena_trade:com_94] @agilityarena_buy_xp(1, 2400);
+[if_button,agilityarena_trade:com_95] @agilityarena_buy_xp(1, 2400);
 
-[if_button,inter_177:com_96] @agilityarena_buy_xp(10, 24800);
-[if_button,inter_177:com_102] @agilityarena_buy_xp(10, 24800);
+[if_button,agilityarena_trade:com_96] @agilityarena_buy_xp(10, 24800);
+[if_button,agilityarena_trade:com_102] @agilityarena_buy_xp(10, 24800);
 
-[if_button,inter_177:com_97] @agilityarena_buy_xp(25, 65000);
-[if_button,inter_177:com_103] @agilityarena_buy_xp(25, 65000);
+[if_button,agilityarena_trade:com_97] @agilityarena_buy_xp(25, 65000);
+[if_button,agilityarena_trade:com_103] @agilityarena_buy_xp(25, 65000);
 
-[if_button,inter_177:com_98] @agilityarena_buy_xp(100, 280000);
-[if_button,inter_177:com_104] @agilityarena_buy_xp(100, 280000);
+[if_button,agilityarena_trade:com_98] @agilityarena_buy_xp(100, 280000);
+[if_button,agilityarena_trade:com_104] @agilityarena_buy_xp(100, 280000);
 
-[if_button,inter_177:com_99] @agilityarena_buy_xp(1000, 3200000);
-[if_button,inter_177:com_105] @agilityarena_buy_xp(1000, 3200000);
+[if_button,agilityarena_trade:com_99] @agilityarena_buy_xp(1000, 3200000);
+[if_button,agilityarena_trade:com_105] @agilityarena_buy_xp(1000, 3200000);
 
-[if_button,inter_177:com_89] @agilityarena_buy_item(3, toadflax);
-[if_button,inter_177:com_91] @agilityarena_buy_item(3, toadflax);
+[if_button,agilityarena_trade:com_89] @agilityarena_buy_item(3, toadflax);
+[if_button,agilityarena_trade:com_91] @agilityarena_buy_item(3, toadflax);
 
-[if_button,inter_177:com_100] @agilityarena_buy_item(10, snapdragon);
-[if_button,inter_177:com_101] @agilityarena_buy_item(10, snapdragon);
+[if_button,agilityarena_trade:com_100] @agilityarena_buy_item(10, snapdragon);
+[if_button,agilityarena_trade:com_101] @agilityarena_buy_item(10, snapdragon);
 
-[if_button,inter_177:com_88] @agilityarena_buy_item(800, piratehook);
-[if_button,inter_177:com_92] @agilityarena_buy_item(800, piratehook);
+[if_button,agilityarena_trade:com_88] @agilityarena_buy_item(800, piratehook);
+[if_button,agilityarena_trade:com_92] @agilityarena_buy_item(800, piratehook);
 
 [label,agilityarena_buy_xp](int $cost, int $xp)
 if(inv_total(inv, agilityarena_ticket) < $cost) {

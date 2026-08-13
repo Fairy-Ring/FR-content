@@ -10,11 +10,11 @@ if (inv_total(inv, castlewars_catapult_rock) < 1) {
 %castlewars_catapultx = 0;
 %castlewars_catapultz = 0;
 ~castlewars_catapult_set_marker;
-if_setobject(inter_216:com_147, castlewars_no0, 100);
-if_setobject(inter_216:com_148, castlewars_no0, 100);
-if_setobject(inter_216:com_149, castlewars_no0, 100);
-if_setobject(inter_216:com_150, castlewars_no0, 100);
-if_openmain(inter_216);
+if_setobject(castlewars_catapult:com_147, castlewars_no0, 100);
+if_setobject(castlewars_catapult:com_148, castlewars_no0, 100);
+if_setobject(castlewars_catapult:com_149, castlewars_no0, 100);
+if_setobject(castlewars_catapult:com_150, castlewars_no0, 100);
+if_openmain(castlewars_catapult);
 
 [proc,castlewars_repair_catapult](int $team)
 if (inv_total(inv, castlewars_toolkit) < 1) {
@@ -130,45 +130,45 @@ if (last_useitem ! castlewars_toolkit) {
 
 
 
-[if_button,inter_216:com_151] // z north
+[if_button,castlewars_catapult:com_151] // z north
 if (%castlewars_team = ^castlewars_team_saradomin) ~castlewars_catapult_add_z(1);
 else ~castlewars_catapult_add_z(-1);
 
-[if_button,inter_216:com_152] // z south
+[if_button,castlewars_catapult:com_152] // z south
 if (%castlewars_team = ^castlewars_team_saradomin) ~castlewars_catapult_add_z(-1);
 else ~castlewars_catapult_add_z(1);
 
-[if_button,inter_216:com_153] // x east
+[if_button,castlewars_catapult:com_153] // x east
 if (%castlewars_team = ^castlewars_team_saradomin) ~castlewars_catapult_add_x(-1);
 else ~castlewars_catapult_add_x(1);
 
-[if_button,inter_216:com_154] // x west
+[if_button,castlewars_catapult:com_154] // x west
 if (%castlewars_team = ^castlewars_team_saradomin) ~castlewars_catapult_add_x(1);
 else ~castlewars_catapult_add_x(-1);
 
 [proc,castlewars_catapult_add_z](int $int)
 %castlewars_catapultz = min(max(add(%castlewars_catapultz, $int), -30), 30);
-if_setobject(inter_216:com_147, enum(int, obj, castlewars_catapult_obj, divide(abs(%castlewars_catapultz), 10)), 100);
-if_setobject(inter_216:com_148, enum(int, obj, castlewars_catapult_obj, modulo(abs(%castlewars_catapultz), 10)), 100);
+if_setobject(castlewars_catapult:com_147, enum(int, obj, castlewars_catapult_obj, divide(abs(%castlewars_catapultz), 10)), 100);
+if_setobject(castlewars_catapult:com_148, enum(int, obj, castlewars_catapult_obj, modulo(abs(%castlewars_catapultz), 10)), 100);
 ~castlewars_catapult_set_marker;
 
 [proc,castlewars_catapult_add_x](int $int)
 %castlewars_catapultx = min(max(add(%castlewars_catapultx, $int), -30), 30);
-if_setobject(inter_216:com_149, enum(int, obj, castlewars_catapult_obj, divide(abs(%castlewars_catapultx), 10)), 100);
-if_setobject(inter_216:com_150, enum(int, obj, castlewars_catapult_obj, modulo(abs(%castlewars_catapultx), 10)), 100);
+if_setobject(castlewars_catapult:com_149, enum(int, obj, castlewars_catapult_obj, divide(abs(%castlewars_catapultx), 10)), 100);
+if_setobject(castlewars_catapult:com_150, enum(int, obj, castlewars_catapult_obj, modulo(abs(%castlewars_catapultx), 10)), 100);
 ~castlewars_catapult_set_marker;
 
 [proc,castlewars_catapult_set_marker]
 def_int $x = multiply(%castlewars_catapultx, 2);
 def_int $z = multiply(%castlewars_catapultz, 2);
-if (%castlewars_team = ^castlewars_team_saradomin) if_setposition(inter_216:com_162, sub(^castlewars_saradomin_catapult_default_x, $x), sub(^castlewars_saradomin_catapult_default_z, $z));
-else if_setposition(inter_216:com_162, add(^castlewars_zamorak_catapult_default_x, $x), add(^castlewars_zamorak_catapult_default_z, $z));
+if (%castlewars_team = ^castlewars_team_saradomin) if_setposition(castlewars_catapult:com_162, sub(^castlewars_saradomin_catapult_default_x, $x), sub(^castlewars_saradomin_catapult_default_z, $z));
+else if_setposition(castlewars_catapult:com_162, add(^castlewars_zamorak_catapult_default_x, $x), add(^castlewars_zamorak_catapult_default_z, $z));
 
 [proc,castlewars_catapult_fire_coord]()(coord)
 if (%castlewars_team = ^castlewars_team_saradomin) return(movecoord(^castlewars_saradomin_catapult_fire_coord, %castlewars_catapultx, 0, %castlewars_catapultz));
 else return(movecoord(^castlewars_zamorak_catapult_fire_coord, %castlewars_catapultx, 0, %castlewars_catapultz));
 
-[if_button,inter_216:com_159] // fire !
+[if_button,castlewars_catapult:com_159] // fire !
 if_close;
 if (%castlewars_team = ^castlewars_team_saradomin) {
     if (loc_find(^castlewars_saradomin_catapult_coord, castlewars_catapult_saradomin) = false) {

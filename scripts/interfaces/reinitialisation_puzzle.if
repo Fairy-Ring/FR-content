@@ -1,5 +1,5 @@
 // MM hangar reinit slide puzzle (289 scripts/interfaces/reinitialisation_puzzle.if).
-// 377 IF IDs free after shoestore (pack 19153+); models registered in model.pack.
+// Cache ids 11126–11131 (leftover join). Free-ID 19153 unused. Models registered in model.pack.
 
 [com_0]
 type=layer

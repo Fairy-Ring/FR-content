@@ -1,18 +1,18 @@
 [label,castlewars_ticket_exchange]
 inv_transmit(inv, inter_269:com_0);
-inv_transmit(castlewars_trade_tickets, inter_219:com_90);
-inv_transmit(castlewars_trade_coins, inter_219:com_91);
-if_openmain_side(inter_219, inter_269);
+inv_transmit(castlewars_trade_tickets, castlewars_trade:com_90);
+inv_transmit(castlewars_trade_coins, castlewars_trade:com_91);
+if_openmain_side(castlewars_trade, inter_269);
 
-[if_close,inter_219]
+[if_close,castlewars_trade]
 inv_stoptransmit(inter_269:com_0);
-inv_stoptransmit(inter_219:com_90);
-inv_stoptransmit(inter_219:com_91);
+inv_stoptransmit(castlewars_trade:com_90);
+inv_stoptransmit(castlewars_trade:com_91);
 
 // https://youtu.be/ikUHSTz0YyQ
 // https://youtu.be/BlH7c7FBAUQ
 // https://youtu.be/cxwsDEjkl8M
-[inv_button1,inter_219:com_90]
+[inv_button1,castlewars_trade:com_90]
 def_obj $item = inv_getobj(castlewars_trade_tickets, last_slot);
 def_string $item_name = oc_name($item);
 def_int $item_value = enum(obj, int, castlewars_ticket_exchange, $item);
@@ -20,7 +20,7 @@ mes("The <lowercase($item_name)> costs <tostring($item_value)> tickets.");
 
 
 // buy value
-[inv_button1,inter_219:com_91]
+[inv_button1,castlewars_trade:com_91]
 def_obj $item = inv_getobj(castlewars_trade_coins, last_slot);
 def_string $item_name = oc_name($item);
 def_int $item_value = oc_cost($item);
@@ -70,7 +70,7 @@ inv_moveitem_uncert(inv, castlewars_trade_tickets, $item, 1);
 inv_add(inv, castlewars_ticket, $item_value);
 
 // buy
-[inv_button2,inter_219:com_90]
+[inv_button2,castlewars_trade:com_90]
 def_obj $item = oc_uncert(inv_getobj(castlewars_trade_tickets, last_slot));
 def_int $item_value = enum(obj, int, castlewars_ticket_exchange, $item);
 def_int $tickets = inv_total(inv, castlewars_ticket);
@@ -90,7 +90,7 @@ if ($item_value ! $tickets & inv_freespace(inv) = 0) { // none of the items are 
 inv_del(inv, castlewars_ticket, $item_value);
 inv_moveitem_uncert(castlewars_trade_tickets, inv, $item, 1);
 
-[inv_button2,inter_219:com_91]
+[inv_button2,castlewars_trade:com_91]
 def_obj $item = oc_uncert(inv_getobj(castlewars_trade_coins, last_slot));
 def_int $item_value = oc_cost($item);
 def_int $coins = inv_total(inv, coins);

@@ -141,6 +141,7 @@ return(false);
 [proc,bank_find_obj_unbankable](obj $obj)(boolean)
 switch_obj ($obj) {
     case macro_genilamp : return(true); // cant bank xp lamps
+    case bloated_toad : return(true); // 289 unbankable — no new param id
     case default : return(false);
 }
 

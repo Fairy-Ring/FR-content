@@ -12,6 +12,8 @@
 ^farming_potato_2 = 8
 ^farming_potato_3 = 9
 ^farming_potato_fullygrown = 10
+// Last harvest-band index (loc repeats fullygrown at 10, 11, 12).
+^farming_potato_harvest_last = 12
 
 // Seeds per allotment plant (period guides)
 ^farming_allotment_seed_count = 3

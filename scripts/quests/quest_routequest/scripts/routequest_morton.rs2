@@ -44,10 +44,25 @@ switch_int(~p_choice2("Yes, I'll pay ten gold.", 1, "No, I won't use the boat.",
 // Hollows → Mort'ton return lives in routequest_hollow.rs2 [label,route_rowboat_hollows]
 
 [label,travel_to_hollow]
-// DEV: full boat IF (swamp_boatjourney) not packed on 377 yet — tele-only path.
-// Authentic IF+anim when interfaces land (port research § boat IFs).
-if_close;
+if_settab(null, 0);
+if_settab(null, 1);
+if_settab(null, 2);
+if_settab(null, 3);
+if_settab(null, 4);
+if_settab(null, 5);
+if_settab(null, 6);
+if_settab(null, 10);
+if_settab(null, 11);
+if_settab(null, 12);
+if_settab(null, 13);
+minimap_toggle(2);
+if_openmain(swamp_boatjourney); // [7924]
+if_setanim(swamp_boatjourney:shipmodel, swamp_boatjourney);
+p_delay(13);
 p_teleport(0_54_52_42_52);
+if_close;
+~initalltabs;
+minimap_toggle(0);
 %routequest = ^routequest_entered_hollowed;
 ~mesbox("You arrive at the hollows."); // not a typo
 

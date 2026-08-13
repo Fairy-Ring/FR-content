@@ -1,12 +1,12 @@
-[inv_button1,inter_95:com_62] @bank_deposit(last_slot, 1);
-[inv_button2,inter_95:com_62] @bank_deposit(last_slot, 5);
-[inv_button3,inter_95:com_62] @bank_deposit(last_slot, 10);
-[inv_button4,inter_95:com_62] @bank_deposit(last_slot, ^max_32bit_int);
-[inv_button5,inter_95:com_62] @bank_deposit(last_slot, null);
-[inv_buttond,inter_95:com_62] inv_movetoslot(inv, inv, last_slot, last_targetslot);
+[inv_button1,bank_deposit_box:com_62] @bank_deposit(last_slot, 1);
+[inv_button2,bank_deposit_box:com_62] @bank_deposit(last_slot, 5);
+[inv_button3,bank_deposit_box:com_62] @bank_deposit(last_slot, 10);
+[inv_button4,bank_deposit_box:com_62] @bank_deposit(last_slot, ^max_32bit_int);
+[inv_button5,bank_deposit_box:com_62] @bank_deposit(last_slot, null);
+[inv_buttond,bank_deposit_box:com_62] inv_movetoslot(inv, inv, last_slot, last_targetslot);
 
-[if_close,inter_95]
-inv_stoptransmit(inter_95:com_62);
+[if_close,bank_deposit_box]
+inv_stoptransmit(bank_deposit_box:com_62);
 inv_transmit(inv, inventory:inv);
 inv_transmit(worn, wornitems:worn);
 
@@ -15,8 +15,8 @@ if_settab(wornitems, ^tab_wornitems);
 
 // https://youtu.be/HxwZF7ZBGos?si=HfkHOPtJ0vjTEfTW&t=66
 [oploc1,bank_deposit_box]
-if_openmain(inter_95);
+if_openmain(bank_deposit_box);
 // hide inv and worn
 if_settab(null, 3);
 if_settab(null, 4);
-inv_transmit(inv, inter_95:com_62);
+inv_transmit(inv, bank_deposit_box:com_62);

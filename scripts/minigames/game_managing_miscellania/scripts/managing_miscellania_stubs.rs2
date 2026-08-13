@@ -1,6 +1,6 @@
 // M4: real open. Daily/resource: managing_miscellania_daily.rs2.
 // if_button sliders/coffers: managing_miscellania_ui.rs2.
-// Pack root 19159 (289 used 10984 — occupied on 377). See deviations.md.
+// Pack root 10984 (289 same-id leftover join). Free-ID 19159 unused. See deviations.md.
 
 [proc,open_manage_miscellania_interface]
 if_openmain(misc_both_manage);

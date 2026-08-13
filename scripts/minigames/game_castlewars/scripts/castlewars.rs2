@@ -216,14 +216,14 @@ return(false);
 
 [proc,castlewars_mapzone]
 if (~in_castlewars_waitingroom(coord) = true) {
-    if_openoverlay(inter_221);
+    if_openoverlay(castlewars_waitingroom);
     settimer(castlewars_timer, 5);
     return;
 }
 if (%castlewars_team = ^castlewars_team_saradomin) {
-    if_openoverlay(inter_215);
+    if_openoverlay(castlewars_status_overlay_saradomin);
 } else {
-    if_openoverlay(inter_218);
+    if_openoverlay(castlewars_status_overlay_zamorak);
 }
 set_player_op("Attack", 2, ^true);
 set_player_op("Take-from", 5, ^false);

@@ -43,7 +43,7 @@ if(last_useitem = beer | last_useitem = wizards_mind_bomb | last_useitem = asgar
 }
 ~displaymessage(^dm_default);
 
-[if_button,inter_156:com_28]
+[if_button,death_dice:com_28]
 @player_roll;
 
 [proc,get_death_coins_if]()(int)
@@ -74,50 +74,50 @@ if(~death_get_bet = 1) {
 %death_bits = clearbit(%death_bits, ^death_goldclaimed);
 ~death_set_haroldroll(0);
 ~death_set_playerroll(0);
-if_settext(inter_156:com_33, "Harold rolls...");
-if_setanim(inter_156:com_2, dice_idle);
-if_setanim(inter_156:com_1, dice_idle);
-if_setanim(inter_156:com_3, dice_idle);
-if_setanim(inter_156:com_4, dice_idle);
-if_settext(inter_156:com_6, displayname());
-if_settext(inter_156:com_31, tostring($entered_value));
-if_settext(inter_156:com_32, tostring($entered_value));
-if_openmain(inter_156);
+if_settext(death_dice:com_33, "Harold rolls...");
+if_setanim(death_dice:com_2, dice_idle);
+if_setanim(death_dice:com_1, dice_idle);
+if_setanim(death_dice:com_3, dice_idle);
+if_setanim(death_dice:com_4, dice_idle);
+if_settext(death_dice:com_6, displayname());
+if_settext(death_dice:com_31, tostring($entered_value));
+if_settext(death_dice:com_32, tostring($entered_value));
+if_openmain(death_dice);
 p_delay(2);
 def_int $harold_roll1 = ~random_range(1, 6);
-if_setanim(inter_156:com_2, enum(int, seq, death_dice_anim, $harold_roll1));
+if_setanim(death_dice:com_2, enum(int, seq, death_dice_anim, $harold_roll1));
 sound_synth(dice_shake, 0, 0);
 p_delay(2);
 def_int $harold_roll2 = ~random_range(1, 6);
-if_setanim(inter_156:com_1, enum(int, seq, death_dice_anim, $harold_roll2));
+if_setanim(death_dice:com_1, enum(int, seq, death_dice_anim, $harold_roll2));
 sound_synth(dice_shake, 0, 0);
 ~death_set_haroldroll(add($harold_roll1, $harold_roll2));
 p_delay(2);
 queue(haroldgamble_end, 0, 0);
-if_sethide(inter_156:com_27, false);
-if_settext(inter_156:com_33, "Your roll...");
+if_sethide(death_dice:com_27, false);
+if_settext(death_dice:com_33, "Your roll...");
 
 [label,player_roll]
-if_sethide(inter_156:com_27, true);
+if_sethide(death_dice:com_27, true);
 def_int $player_roll1 = ~random_range(1, 6);
-if_setanim(inter_156:com_3, enum(int, seq, death_dice_anim, $player_roll1));
+if_setanim(death_dice:com_3, enum(int, seq, death_dice_anim, $player_roll1));
 sound_synth(dice_shake, 0, 0);
 p_delay(2);
 def_int $player_roll2 = ~random_range(1, 6);
-if_setanim(inter_156:com_4, enum(int, seq, death_dice_anim, $player_roll2));
+if_setanim(death_dice:com_4, enum(int, seq, death_dice_anim, $player_roll2));
 sound_synth(dice_shake, 0, 0);
 ~death_set_playerroll(add($player_roll1, $player_roll2));
 p_delay(2);
 %death_bits = setbit(%death_bits, ^death_goldclaimed);
 ~dice_winnings;
 if(~death_get_playerroll > ~death_get_haroldroll) {
-    if_settext(inter_156:com_33, "You win!");
+    if_settext(death_dice:com_33, "You win!");
     midi_jingle("dice win", ^dice_win_jingle_millis);
 } else {
-    if_settext(inter_156:com_33, "You lose!");
+    if_settext(death_dice:com_33, "You lose!");
     midi_jingle("dice lose", ^dice_lose_jingle_millis);
 }
-if_sethide(inter_156:com_29, false);
+if_sethide(death_dice:com_29, false);
 p_pausebutton;
 if_close;
 

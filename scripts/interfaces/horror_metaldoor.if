@@ -29,7 +29,7 @@ model=com_i317
 zoom=304
 yan=1536
 
-[com_3]
+[horror_fire]
 type=model
 x=90
 y=153
@@ -39,7 +39,7 @@ model=com_i318
 zoom=381
 xan=512
 
-[com_4]
+[horror_air]
 type=model
 x=158
 y=29
@@ -49,7 +49,7 @@ model=com_i319
 zoom=437
 xan=512
 
-[com_5]
+[horror_earth]
 type=model
 x=320
 y=28
@@ -59,7 +59,7 @@ model=com_i320
 zoom=412
 xan=512
 
-[com_6]
+[horror_water]
 type=model
 x=388
 y=156
@@ -69,7 +69,7 @@ model=com_i321
 zoom=380
 xan=512
 
-[com_7]
+[horror_ranging]
 type=model
 x=319
 y=272
@@ -80,7 +80,7 @@ zoom=426
 xan=489
 yan=1986
 
-[com_8]
+[horror_melee]
 type=model
 x=161
 y=269

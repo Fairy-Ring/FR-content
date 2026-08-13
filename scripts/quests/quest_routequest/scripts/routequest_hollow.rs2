@@ -28,16 +28,25 @@ if(%routequest < ^routequest_entered_underground) {
 [oploc1,freedomfighterentrancel]
 ~open_freedomfighter_entrance(loc_coord, false);
 
+// 377 map split after Apr 2005: hollows loc is route_rowboat_hollows (6970), not route_rowboat.
+[oploc1,route_rowboat_hollows] @route_rowboat_hollows;
+
 [label,route_rowboat_hollows]
 if(%routequest < ^routequest_entered_hollowed) {
     // RS3
     mes("You don't think it's a good idea to use a boat without permission.");
     return;
 }
-// DEV: swamp_boatjourney IF still inter_230 — tele-only until rename (see myreque-swamp-boatjourney-if-377.md)
-if_close;
+minimap_toggle(2);
+// modal closing if you get attacked (by a ghast) is authentic
+// theres no fade here either
+if_openmain(swamp_boatjourney); // [7924]
+if_setanim(swamp_boatjourney:shipmodel, swamp_boatjourney_back);
+p_delay(13);
 p_teleport(0_55_51_2_20);
-~mesbox("You arrive near Mort'ton.");
+if_close;
+minimap_toggle(0);
+// [7938]
 
 [oploc1,harmless_dead_palm_mid]
 if(loc_angle = ^loc_north) { 

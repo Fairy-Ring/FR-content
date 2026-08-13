@@ -99,6 +99,12 @@ if ($stage > ^farming_veg_weeds_1) {
     mes("This allotment does not need weeding.");
     return;
 }
+// Packed obj `weeds` (6055). One handful per rake step — compost later.
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, weeds, 1);
 // One rake use clears one weed band: 0→1→2→3 (weeded).
 ~farming_veg_set_stage(add($stage, 1));
 // Read back via same proc (parent loc still active)
@@ -201,7 +207,7 @@ if ($any_growing = true) {
 
 // ---------------------------------------------------------------------------
 // Harvest — OPLOC1 Harvest on potato_fullygrown
-// F1: one potato per click; clear to weeded (multi-life 10–12 not fully modeled).
+// Loc band 10, 11, 12 (same fullygrown type). Not OSRS StatRandom.
 // ---------------------------------------------------------------------------
 
 [oploc1,potato_fullygrown]
@@ -213,7 +219,7 @@ if (~farming_veg_is_parent = false) {
     return;
 }
 def_int $stage = ~farming_veg_stage;
-if ($stage < ^farming_potato_fullygrown | $stage > 12) {
+if ($stage < ^farming_potato_fullygrown | $stage > ^farming_potato_harvest_last) {
     ~displaymessage(^dm_farming_patch_no_crops);
     return;
 }
@@ -229,8 +235,11 @@ if (inv_freespace(inv) < 1) {
 inv_add(inv, potato, 1);
 // CANDIDATE harvest XP (community).
 stat_advance(farming, ^farming_potato_harvest_xp);
-// F1: clear patch to weeded after one harvest (lives/yield band open).
-~farming_veg_set_stage(^farming_veg_weeded);
+if ($stage < ^farming_potato_harvest_last) {
+    ~farming_veg_set_stage(add($stage, 1));
+} else {
+    ~farming_veg_set_stage(^farming_veg_weeded);
+}
 mes("You harvest a potato from the allotment.");
 
 // ---------------------------------------------------------------------------

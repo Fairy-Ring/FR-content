@@ -15,7 +15,7 @@ if(gettimer(agilityarena_pillar) < 1) {
     %agilityarena_varbit = clearbit(%agilityarena_varbit, ^agilityarena_eligible_tickets);
     %agilityarena_varbit = clearbit(%agilityarena_varbit, ^agilityarena_first_pillar_tagged);
     %agilityarena_varbit = clearbit(%agilityarena_varbit, ^agilityarena_pillar_tagged);
-    if_openoverlay(inter_176);
+    if_openoverlay(agilityarena_overlay);
     settimer(agilityarena_pillar, sub(%agilityarena_next_pillar_time, map_clock));
     hint_stop();
     hint_coord(^hint_center, ~get_pillar_coord, 60);

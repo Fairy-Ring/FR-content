@@ -1,4 +1,4 @@
-// Fractionalizing still (274 port). UI IF pack name is inter_110 (id 4919) on 377.
+// Fractionalizing still (274 port). UI IF pack name is regicide_still (id 4919) on 377.
 // 274 named it regicide_still — same com layout. Varp names stay regicide_still_*.
 
 [oploc1,regicide_fractionalizing_still]
@@ -10,7 +10,7 @@ if(last_useitem = regicide_barrel_tar) {
 }
 mes("You don't want to damage the still.");
 
-[if_close,inter_110]
+[if_close,regicide_still]
 clearsofttimer(still_progress);
 if(%regicide_still_total >= 26) {
     // this order is right :)
@@ -19,9 +19,9 @@ if(%regicide_still_total >= 26) {
     %regicide_still_total = 0;
 }
 
-[if_button,inter_110:com_89] if_close;
+[if_button,regicide_still:com_89] if_close;
 
-[if_button,inter_110:com_129]
+[if_button,regicide_still:com_129]
 if(testbit(%regicide_still_settings, 27) = ^true) {
     %regicide_still_settings = clearbit(%regicide_still_settings, 27);
     %regicide_still_settings = setbit(%regicide_still_settings, 26);
@@ -31,7 +31,7 @@ if(testbit(%regicide_still_settings, 27) = ^true) {
 }
 sound_synth(valveturn, 1, 0);
 
-[if_button,inter_110:com_130]
+[if_button,regicide_still:com_130]
 if(testbit(%regicide_still_settings, 26) = ^true) {
     %regicide_still_settings = clearbit(%regicide_still_settings, 26);
     %regicide_still_settings = setbit(%regicide_still_settings, 27);
@@ -43,7 +43,7 @@ if(testbit(%regicide_still_settings, 26) = ^true) {
 }
 sound_synth(valveturn, 1, 0);
 
-[if_button,inter_110:com_131]
+[if_button,regicide_still:com_131]
 if(testbit(%regicide_still_settings, 30) = ^true) {
     %regicide_still_settings = clearbit(%regicide_still_settings, 30);
     %regicide_still_settings = setbit(%regicide_still_settings, 29);
@@ -53,7 +53,7 @@ if(testbit(%regicide_still_settings, 30) = ^true) {
 }
 sound_synth(valveturn, 1, 0);
 
-[if_button,inter_110:com_132]
+[if_button,regicide_still:com_132]
 if(testbit(%regicide_still_settings, 29) = ^true) {
     %regicide_still_settings = clearbit(%regicide_still_settings, 29);
     %regicide_still_settings = setbit(%regicide_still_settings, 30);
@@ -63,7 +63,7 @@ if(testbit(%regicide_still_settings, 29) = ^true) {
 }
 sound_synth(valveturn, 1, 0);
 
-[if_button,inter_110:com_120]
+[if_button,regicide_still:com_120]
 if(inv_total(inv, coal) = 0) {
     return;
 }
@@ -189,7 +189,7 @@ if(%temp > 0) %temp = max(0, sub(%temp,add(5, multiply(6, $idx))));
 mes("You add the coal tar to the still.");
 inv_del(inv, regicide_barrel_tar, 1);
 inv_add(inv, regicide_barrel_empty, 1);
-if_openmain(inter_110);
+if_openmain(regicide_still);
 softtimer(still_progress, 2);
 // still total doesnt reset
 %temp = 0;
