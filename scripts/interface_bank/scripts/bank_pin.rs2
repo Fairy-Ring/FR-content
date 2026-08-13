@@ -4,3 +4,8 @@ sound_synth(PIN_pending, 0, 0);
 if_settext(bankpin_settings:com_113, "Customers are reminded that they should NEVER tell anyone their Bank PINs or passwords, nor should they ever enter their PINs on any website form.");
 if_settext(bankpin_settings:com_175, "No PIN set");
 if_settext(bankpin_settings:com_177, "7 Days");
+
+// 377 leftover inter_169 keypad — name from leftover title + bankpin_* family.
+// PIN is 19 Sep 2005: do not hunt 289.
+[if_button,bankpin_settings:com_147]
+if_openmain(bankpin);

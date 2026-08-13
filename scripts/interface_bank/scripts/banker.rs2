@@ -18,6 +18,10 @@ if (npc_range(coord) > 2) {
 }
 @openbank;
 
+// In-range click is OP, not AP. 274/289 are AP-only — adjacent Talk was a no-op.
+[opnpc1,_bank_teller] @talk_to_banker;
+[opnpc3,_bank_teller] @openbank;
+
 [label,talk_to_banker]
 ~chatnpcrange("<p,quiz>Good day, how may I help you?");
 
