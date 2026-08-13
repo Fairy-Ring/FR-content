@@ -1,0 +1,78 @@
+// Desert Treasure — Exam Centre etchings handoff (archaeological_expert 619).
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Desert Treasure Talking to Terry
+// minus topic-split first-visit / Desert Treasure I / RS3 gender / Varrock Dig Site.
+// Hunt 289? no. Called from quest_itexam arcaeological_expert.rs2 prefix only.
+// Display stays Archaeological expert (not Terry Balando).
+// Stage 1→2 take etchings. Stage 2→3 grant translation. Stage 3 nag / lost-replace.
+// No Read IF / Don't-read / Partners / diamonds / Ancient Magicks.
+
+[label,dt_terry_handoff]
+if (%deserttreasure = 1) {
+    @dt_terry_stage1;
+}
+if (%deserttreasure = 2) {
+    @dt_terry_stage2;
+}
+if (%deserttreasure = 3) {
+    @dt_terry_stage3;
+}
+return;
+
+[label,dt_terry_stage1]
+~chatplayer("<p,quiz>Hello, are you Terry Balando?");
+~chatnpc("<p,quiz>That's right, who wants to know...?");
+~chatnpc("<p,happy>Ah yes, I recognise you! You're the fellow who found that strange artefact about Zaros for the museum, aren't you? What can I do for you now?");
+if (inv_total(inv, four_diamonds_etchings) < 1) {
+    @dt_terry_no_etchings;
+}
+@dt_terry_take_etchings;
+
+[label,dt_terry_no_etchings]
+~chatplayer("<p,sad>I had some etchings to deliver to you, but I don't have them on me...");
+~chatnpc("<p,confused>Then... you better go get them for me?");
+return;
+
+[label,dt_terry_take_etchings]
+~chatplayer("<p,neutral>That's right. I was in the desert down by the Bedabin Camp, and I found an archaeologist who asked me to deliver this to you.");
+~chatnpc("<p,shock>You spoke to the legendary Asgarnia Smith??? Quickly, let me see what he had to give you! He is always at the forefront of archaeological breakthroughs!");
+inv_del(inv, four_diamonds_etchings, inv_total(inv, four_diamonds_etchings));
+~chatplayer("<p,quiz>So what does the inscription say? Anything interesting?");
+~chatnpc("<p,happy>This... this is fascinating! These cuneiforms seem to predate even the settlement we are excavating here... Yes, yes, this is most interesting indeed!");
+~chatplayer("<p,quiz>Can you translate it for me?");
+~chatnpc("<p,neutral>Well, I am not familiar with this particular language, but the similarities inherent in the pictographs seem to show a prevalent trend towards a syllabary consistent with the phonemes we have discovered in this excavation!");
+~chatplayer("<p,confused>Um... So, can you translate it for me or not?");
+~chatnpc("<p,neutral>Well, unfortunately this is the only example of this particular language I have ever seen, but I might be able to make a rough translation, of sorts...");
+~chatnpc("<p,neutral>It might be slightly obscure on the finer details, but it should be good enough to understand the rough meaning of what was originally written. Please, just wait a moment, I will write up what I can");
+~chatnpc("<p,neutral>translate into a journal for you. Then you can take it back to Asgarnia, I think he will be extremely interested in the translation!");
+%deserttreasure = 2;
+return;
+
+[label,dt_terry_stage2]
+if (inv_itemspace(inv, four_diamonds_translation_primer, 1, inv_size(inv)) = false) {
+    return;
+}
+~chatnpc("<p,happy>There you go, that book contains the sum of my translating ability. If you would be so kind as to take that back to Asgarnia, I think it will reassure him that he is on the");
+~chatnpc("<p,happy>right track for a find of great archaeological importance");
+inv_add(inv, four_diamonds_translation_primer, 1);
+%deserttreasure = 3;
+~chatplayer("<p,shock>Wow! You write really quickly don't you?");
+~chatnpc("<p,happy>What can I say? It's a skill I picked up through my many years of taking field notes!");
+return;
+
+[label,dt_terry_stage3]
+if (inv_total(inv, four_diamonds_translation_primer) < 1) {
+    @dt_terry_lost_translation;
+}
+~chatnpc("<p,quiz>Hello again. Was that translation any use to Asgarnia?");
+~chatplayer("<p,sad>I, uh, kind of didn't take it to him yet...");
+~chatnpc("<p,confused>Whyever not? You're the strangest delivery boy I've ever met!");
+return;
+
+[label,dt_terry_lost_translation]
+if (inv_itemspace(inv, four_diamonds_translation_primer, 1, inv_size(inv)) = false) {
+    return;
+}
+~chatplayer("<p,sad>I lost that translation you gave me...");
+~chatnpc("<p,neutral>Oh, no matter, I mostly remember what it said anyway! Here you go!");
+inv_add(inv, four_diamonds_translation_primer, 1);
+return;

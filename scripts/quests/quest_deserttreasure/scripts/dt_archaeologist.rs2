@@ -5,8 +5,15 @@
 // Accept: %deserttreasure 0→1 + four_diamonds_etchings. No Terry / diamonds / AM.
 
 [opnpc1,fourdiamonds_indiana]
-if (%deserttreasure > 0) {
+if (%deserttreasure = 1) {
     @dt_arch_started;
+}
+if (%deserttreasure = 2) {
+    @dt_arch_wait_translation;
+}
+if (%deserttreasure > 2) {
+    // Don't-read / Partners is the next unit. Do not re-grant etchings.
+    return;
 }
 @dt_arch_hello;
 
@@ -86,4 +93,16 @@ if (inv_total(inv, four_diamonds_etchings) < 1) {
 ~chatplayer("<p,sad>Um... yeah... about that... I kind of didn't go and speak to him yet...");
 ~chatnpc("<p,angry>Well what are you waiting for? A written invitation? All I want you to do is take those etchings up to the digsite for me!");
 ~chatplayer("<p,neutral>Okay, I'll do that then.");
+return;
+
+[label,dt_arch_wait_translation]
+// CANDIDATE-RS3 gap-fill: OSRS dump omitted the wait-at-Exam-Centre state.
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,quiz>So what did Terry Balando say about those etchings? Did he give you a translation for me?");
+~chatplayer("<p,neutral>He said he could translate it and that I should wait around for a translation.");
+~chatnpc("<p,quiz>And did you?");
+~chatplayer("<p,sad>No, I got bored waiting so came back here.");
+~chatnpc("<p,confused>...");
+~chatnpc("<p,neutral>I see.");
+~chatnpc("<p,angry>Well could you go and get me that translation? It could be vital!");
 return;
