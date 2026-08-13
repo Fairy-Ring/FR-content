@@ -1,0 +1,41 @@
+// Leftover inter_272 goblin-tribe book. leftover obj lost_tribe_book.
+// CANDIDATE page order from leftover text flow (tradition → archaeology →
+// twelve tribes → symbol plates). Leftover arrows com_18 next / com_19 back.
+
+[opheld1,lost_tribe_book]
+%book_page = 0;
+if_openmain(inter_272);
+@leftover_goblin_book_show;
+
+[if_button,inter_272:com_18]
+if (%book_page < 5) {
+    %book_page = add(%book_page, 1);
+}
+@leftover_goblin_book_show;
+
+[if_button,inter_272:com_19]
+if (%book_page > 0) {
+    %book_page = sub(%book_page, 1);
+}
+@leftover_goblin_book_show;
+
+[label,leftover_goblin_book_show]
+if_sethide(inter_272:com_41, true);
+if_sethide(inter_272:com_45, true);
+if_sethide(inter_272:com_49, true);
+if_sethide(inter_272:com_15, true);
+if_sethide(inter_272:com_16, true);
+if_sethide(inter_272:com_36, true);
+if (%book_page = 0) {
+    if_sethide(inter_272:com_41, false);
+} else if (%book_page = 1) {
+    if_sethide(inter_272:com_45, false);
+} else if (%book_page = 2) {
+    if_sethide(inter_272:com_49, false);
+} else if (%book_page = 3) {
+    if_sethide(inter_272:com_15, false);
+} else if (%book_page = 4) {
+    if_sethide(inter_272:com_16, false);
+} else {
+    if_sethide(inter_272:com_36, false);
+}

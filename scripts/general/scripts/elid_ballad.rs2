@@ -1,6 +1,44 @@
-// Leftover inter_327 title The Ballad of Jareesh.
-// leftover obj elid_ballad desc=The Ballad of Jareesh. Leftover text stays on the IF.
-// Do not invent Elid chat. leftover-if-titles parks this as a named book (no slug).
+// Leftover inter_327 The Ballad of Jareesh. Leftover pages com_2–com_5.
+// Leftover next com_6 / back com_7. Page order = leftover hide layers (CANDIDATE).
 
 [opheld1,elid_ballad]
+%book_page = 0;
 if_openmain(inter_327);
+@leftover_ballad_show;
+
+[if_button,inter_327:com_6]
+if (%book_page < 3) {
+    %book_page = add(%book_page, 1);
+}
+@leftover_ballad_show;
+
+[if_button,inter_327:com_7]
+if (%book_page > 0) {
+    %book_page = sub(%book_page, 1);
+}
+@leftover_ballad_show;
+
+[label,leftover_ballad_show]
+if_sethide(inter_327:com_2, true);
+if_sethide(inter_327:com_3, true);
+if_sethide(inter_327:com_4, true);
+if_sethide(inter_327:com_5, true);
+if (%book_page = 0) {
+    if_sethide(inter_327:com_2, false);
+} else if (%book_page = 1) {
+    if_sethide(inter_327:com_3, false);
+} else if (%book_page = 2) {
+    if_sethide(inter_327:com_4, false);
+} else {
+    if_sethide(inter_327:com_5, false);
+}
+if (%book_page = 0) {
+    if_sethide(inter_327:com_52, true);
+} else {
+    if_sethide(inter_327:com_52, false);
+}
+if (%book_page = 3) {
+    if_sethide(inter_327:com_53, true);
+} else {
+    if_sethide(inter_327:com_53, false);
+}
