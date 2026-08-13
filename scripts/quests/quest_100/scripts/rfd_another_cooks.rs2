@@ -91,7 +91,156 @@ inv_add(inv, coins, 100);
 return;
 
 [label,rfd_another_cooks_pointer]
-// Thin Déjà vu first two lines only. Fetch / ash-on-blast / hand-in later.
+if (%hundred_main_quest_var >= 2) {
+    @rfd_another_cooks_feast_nag;
+}
+// CANDIDATE Déjà vu. Keep the first two shipped lines.
 ~chatplayer("<p,quiz>About those ingredients you wanted for the banquet...");
 ~chatnpc("<p,quiz>Did you bring them? Remember, I need an eye of newt, a glass of greenman's ale, a rotten tomato, and a 'Dirty Blast'!");
+def_int $newt = 0;
+def_int $ale = 0;
+def_int $tom = 0;
+def_int $blast = 0;
+if (inv_total(inv, eye_of_newt) > 0) {
+    $newt = 1;
+}
+if (inv_total(inv, greenmans_ale) > 0) {
+    $ale = 1;
+}
+if (inv_total(inv, rotten_tomato) > 0) {
+    $tom = 1;
+}
+if (inv_total(inv, hundred_fruit_blast) > 0) {
+    $blast = 1;
+}
+def_int $have = calc($newt + $ale + $tom + $blast);
+if ($have = 4) {
+    @rfd_another_cooks_handin;
+}
+if ($have = 0) {
+    ~chatplayer("<p,sad>Erm... Sorry, I don't have any of that with me...");
+    ~chatnpc("<p,angry>Well come back when you have all of them! And hurry! It is a VERY important meeting!");
+    @rfd_another_cooks_where;
+}
+if ($have = 3) {
+    @rfd_another_cooks_missing_one;
+}
+~chatplayer("<p,sad>Weeelll... I have some of that stuff with me, but not all of it...");
+~chatnpc("<p,neutral>Come back and see me when you've got everything I need!");
+@rfd_another_cooks_where;
+
+[label,rfd_another_cooks_missing_one]
+if (inv_total(inv, eye_of_newt) < 1) {
+    ~chatplayer("<p,neutral>I've got a 'Dirty Blast', a Greenman's ale and a rotten tomato, I just need to get the eye of newt!");
+} else if (inv_total(inv, rotten_tomato) < 1) {
+    ~chatplayer("<p,neutral>I've got the 'Dirty Blast', a Greenman's ale and the eye of newt, I just have to find myself a rotten tomato...");
+} else if (inv_total(inv, greenmans_ale) < 1) {
+    ~chatplayer("<p,neutral>I managed to find a 'Dirty Blast', a rotten tomato and an eye of newt, but I didn't manage to get a hold of a Greenman's ale yet...");
+} else {
+    ~chatplayer("<p,neutral>I've got you a Greenman's ale, the rotten tomato and the eye of newt, but haven't had any luck on the 'Dirty Blast' yet...");
+}
+~chatnpc("<p,neutral>Come back and see me when you've got everything I need!");
+@rfd_another_cooks_where;
+
+[label,rfd_another_cooks_where]
+def_int $ask = ~p_choice5("Okay then.", 1, "Where do I get an eye of newt?", 2, "Where do I get a rotten tomato?", 3, "Where do I get a greenman's ale?", 4, "Where do I get a 'Dirty Blast'?", 5);
+if ($ask = 1) {
+    ~chatplayer("<p,neutral>Okay then. I'll get on it.");
+    return;
+}
+if ($ask = 2) {
+    @rfd_another_cooks_where_newt;
+}
+if ($ask = 3) {
+    @rfd_another_cooks_where_tomato;
+}
+if ($ask = 4) {
+    @rfd_another_cooks_where_ale;
+}
+@rfd_another_cooks_where_blast;
+
+[label,rfd_another_cooks_where_newt]
+~chatplayer("<p,quiz>Where would I find an eye of newt?");
+~chatnpc("<p,quiz>I don't know. A newt's face?");
+~chatplayer("<p,neutral>Thank you so much for that help.");
+~chatnpc("<p,neutral>Ah, I don't know where they get them, they usually have them at herblore and magic shops.");
+@rfd_another_cooks_where;
+
+[label,rfd_another_cooks_where_tomato]
+~chatplayer("<p,quiz>Where would I find a rotten tomato?");
+~chatnpc("<p,neutral>I'm not entirely sure, but I hear they're sold for public spectacles.");
+~chatplayer("<p,quiz>Public spectacles?");
+~chatnpc("<p,neutral>Yeah. Pre-arranged combats, caught thieves on show, that sort of thing.");
+@rfd_another_cooks_where;
+
+[label,rfd_another_cooks_where_ale]
+~chatplayer("<p,quiz>Where would I find a greenman's ale?");
+~chatnpc("<p,neutral>Well, as the official sponsored drink of Castle Wars it might be worth looking around there.");
+@rfd_another_cooks_where;
+
+[label,rfd_another_cooks_where_blast]
+~chatnpc("<p,quiz>Do you know how to make a Fruit Blast?");
+def_int $know = ~p_choice2("Yes", 1, "No", 2);
+if ($know = 1) {
+    ~chatplayer("<p,quiz>A Fruit Blast? Sure, like they sell at Blurberry's Bar, right?");
+    ~chatnpc("<p,neutral>Ah, so you've heard of it then? But for this recipe I'd need a fresh one; you can't just buy me one from a shop or from your friends.");
+    ~chatnpc("<p,neutral>Well, a 'Dirty Blast' is a freshly made Fruit Blast, but then for some reason you add ash at the end!");
+    ~chatplayer("<p,quiz>Freshly made? Why did you specify that?");
+    ~chatnpc("<p,neutral>Apparently the ash reacts with the freshly squeezed juice in the glass. It means you can't just buy one Blurberry made earlier, you'll have to make it yourself.");
+    ~chatplayer("<p,neutral>Oh. Well, it shouldn't take that long.");
+    ~chatnpc("<p,happy>That's the spirit!");
+    @rfd_another_cooks_where;
+}
+~chatplayer("<p,confused>A Fruit Blast? Can't say I've ever heard of it...");
+~chatnpc("<p,neutral>Ah, well, they're a popular Gnomic delicacy served at the Blurberry bar. But for this recipe I'd need a fresh one; you can't just buy me one from a shop or from your friends.");
+~chatnpc("<p,neutral>Basically, what you do is juice a pineapple, an orange and a lemon, then put them all into a cocktail shaker.");
+~chatnpc("<p,neutral>Pour that into a glass, then top with a slice of lemon.");
+~chatplayer("<p,quiz>Okaaaay... So what's a 'Dirty Blast'?");
+~chatnpc("<p,neutral>Well, apparently after you have done the above then by adding ashes you create a unique new drink.");
+~chatplayer("<p,sad>Sounds horrible..");
+~chatnpc("<p,neutral>I agree, but it's what the recipe specifically needs.");
+~chatnpc("<p,neutral>Bear in mind it will only work with very fresh ingredients, so you will have to make your own cocktail, not rely on one of the pre made ones Blurberry sells.");
+@rfd_another_cooks_where;
+
+[label,rfd_another_cooks_handin]
+~chatplayer("<p,happy>You will be happy to know... I have all of that with me!");
+inv_del(inv, eye_of_newt, 1);
+inv_del(inv, greenmans_ale, 1);
+inv_del(inv, rotten_tomato, 1);
+inv_del(inv, hundred_fruit_blast, 1);
+%hundred_main_quest_var = 2;
+~chatnpc("<p,happy>You absolutely MUST go through into the dining room just there and see the feast I have prepared.");
+~chatnpc("<p,shock>I simply won't take no for an answer!");
+return;
+
+[label,rfd_another_cooks_feast_nag]
+~chatplayer("<p,quiz>How's that banquet going?");
+~chatnpc("<p,angry>Why haven't you gone and looked at the feast I have prepared yet? Trust me, it will be a sight the likes of which you will never see again!");
+~chatplayer("<p,sad>I don't know... I'm just... quite busy, I guess...");
+~chatnpc("<p,angry>No, honestly, you MUST go in there!");
+~chatnpc("<p,shock>GO IN THERE!");
+return;
+
+// Ashes on a fresh fruit blast only after Another Cook's start. Not premade.
+[opheldu,ashes]
+if (last_useitem = fruit_blast & %hundred_main_quest_var >= 1) {
+    @rfd_make_dirty_blast;
+}
+~displaymessage(^dm_default);
+
+[opheldu,fruit_blast]
+if (last_useitem = ashes & %hundred_main_quest_var >= 1) {
+    @rfd_make_dirty_blast;
+}
+~displaymessage(^dm_default);
+
+[label,rfd_make_dirty_blast]
+~chatplayer("<p,confused>That looks disgusting, but it's what the cook asked for...");
+inv_del(inv, ashes, 1);
+inv_del(inv, fruit_blast, 1);
+inv_add(inv, hundred_fruit_blast, 1);
+return;
+
+[opheld1,hundred_fruit_blast]
+~chatplayer("<p,shock>No thanks, that looks DISGUSTING! I won't drink that!");
 return;
