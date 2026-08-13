@@ -1,0 +1,97 @@
+// Recipe for Disaster — Another Cook's start. CANDIDATE last-resort 2007-base
+// (OSRS Transcript:Another Cook's Quest minus overlay / RS3 Overview).
+// Hunt 289? no. Called from cook.rs2 after Cook's Assistant complete.
+// Accept: %hundred_main_quest_var 0→1 + 100 coins. No leftover 18436. No feast.
+
+[label,rfd_another_cooks_start]
+~chatplayer("<p,quiz>Do you have any other quests for me? That last one of yours was so much fun, I was hoping you would!");
+~chatnpc("<p,sad>Ooooh dear, I might have, but it's all very embarrassing...");
+~chatplayer("<p,quiz>Embarrassing? How do you mean?");
+~chatnpc("<p,confused>Weeellll... You know I told you that it was the Duke's birthday?");
+~chatplayer("<p,neutral>Yup, that's why I had to go and collect you things to make a cake with wasn't it?");
+~chatnpc("<p,sad>Yeeeesssss... Weeeelllll...");
+~chatnpc("<p,shock>It isn't. I don't even know when his birthday is!");
+def_int $feel = ~p_choice2("Angry! It makes me angry!", 1, "I don't really care to be honest.", 2);
+if ($feel = 1) {
+    ~chatplayer("<p,angry>GRRRR! Why did you have me running around finding ingredients for you then?!?!");
+} else {
+    ~chatplayer("<p,neutral>So you lied to me to get me to do you a favour?");
+    ~chatplayer("<p,neutral>Fair enough, you're not the first, but why lie? You could have just asked me, I'd have been happy to help.");
+}
+~chatnpc("<p,sad>I needed to test you and see if I could trust you...");
+~chatnpc("<p,sad>I am in a terrible pickle, and I desperately need somebody trustworthy to help me out!");
+def_int $help = ~p_choice3("What seems to be the problem?", 1, "No thanks, I don't want to help.", 2, "How do you still have a job?", 3);
+if ($help = 2) {
+    ~chatplayer("<p,neutral>You know... Thinking about it...");
+    ~chatplayer("<p,neutral>I just can't be bothered to help you out. You'll have to find some other adventurer to do your little quest for you.");
+    ~chatnpc("<p,sad>I guess I don't have anything more to say to you then.");
+    ~chatplayer("<p,neutral>I guess you don't.");
+    return;
+} else if ($help = 3) {
+    ~chatplayer("<p,quiz>I'm curious... How exactly do you still have a job?");
+    ~chatnpc("<p,confused>I'm sorry? How do you mean?");
+    ~chatplayer("<p,neutral>It's just surprising that you would still have employment as head cook of Lumbridge castle, given how obviously bad at your job you are.");
+    ~chatnpc("<p,shock>WHAT?");
+    ~chatplayer("<p,neutral>Well, things you would expect every kitchen to have... Eggs, milk, flour... You know... But you don't.");
+    ~chatplayer("<p,angry>And what is worse, you don't even go off and get them yourself, you expect people like me to run around after you!");
+    ~chatnpc("<p,sad>I know I'm such a failure... I bring shame to my honourable ancestor, and now I need help again...");
+    ~chatplayer("<p,quiz>Help again?");
+    ~chatplayer("<p,quiz>You need help AGAIN? Well, what seems to be the problem?");
+} else {
+    ~chatplayer("<p,quiz>You need help AGAIN? Well, what seems to be the problem?");
+}
+@rfd_another_cooks_pitch;
+
+[label,rfd_another_cooks_pitch]
+~chatnpc("<p,neutral>Well, you're obviously trustworthy, I guess I could tell you...");
+~chatplayer("<p,happy>Please do. The suffering of others always seems to turn out very profitable for me.");
+~chatnpc("<p,sad>Well... It's like this...");
+~chatnpc("<p,quiz>Did you ever hear of Franizzard Van Lumbcook?");
+~chatplayer("<p,confused>Erm... Can't say I have.");
+~chatplayer("<p,neutral>And with a name like that, I'm sure I would remember.");
+~chatnpc("<p,happy>Well, he was a great chef, and also my ancestor.");
+~chatnpc("<p,neutral>One hundred years ago there was a very important meeting held here in Lumbridge Castle, and he cooked a banquet for the meeting, which was so stupendously amazing that he was offered a job for life, along with all of his descendants.");
+~chatplayer("<p,neutral>So you have your job because a hundred years ago your ancestor was a very good cook.");
+~chatplayer("<p,quiz>I don't see how that's much of a problem for you...");
+~chatplayer("<p,happy>In fact I would say you are a VERY LUCKY man indeed. Frankly, I'd have fired you by now if you worked for me.");
+~chatnpc("<p,sad>Oooooh no.... You don't understand...");
+~chatnpc("<p,shock>This big important secret meeting that Franizzard cooked for is held here in Lumbridge castle every 10 years, and tonight will be the tenth anniversary of it!");
+~chatplayer("<p,quiz>Still not seeing the problem...");
+~chatnpc("<p,sad>Well, I have always felt like a failure as a cook, and that my job here is down to the skills of my ancestor.");
+~chatnpc("<p,happy>I want to prove to the world that I am a great cook too!");
+~chatnpc("<p,sad>But to do that... (sigh) No, it just won't work...");
+~chatplayer("<p,angry>What won't? Come on man, pull yourself together and speak to me!");
+~chatnpc("<p,sad>(sniff) Weeeeelll... I thought that I would recreate the meal Franizzard cooked all of those years ago, the one that impressed everybody so much... There's just this small problem though...");
+~chatplayer("<p,quiz>Let me take a wild guess: You have the recipe but you don't have any of the ingredients, and OBVIOUSLY you can't just go and get them yourself?");
+~chatnpc("<p,shock>Yes! However did you know?");
+~chatplayer("<p,neutral>Call it a hunch.");
+~chatplayer("<p,quiz>Okay, tell me what you're after and then I'll decide if I want to help you or not.");
+~chatnpc("<p,neutral>Well, they are common enough ingredients, although I must admit the recipe I am following is very strange indeed...");
+~chatnpc("<p,happy>I will pay you upfront for any expenses you may incur while obtaining them, and of course you may keep the change for being so helpful to me.");
+~chatnpc("<p,sad>Please can you help me? The feast is scheduled to start very soon, and I simply cannot leave!");
+def_int $yes = ~p_choice2("Yes", 1, "No", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,neutral>To be honest... I just can't be bothered.");
+    ~chatplayer("<p,sad>Sorry about that.");
+    ~chatnpc("<p,sad>Oh nooooo... What am I going to do now?");
+    ~chatplayer("<p,neutral>Dunno. Maybe I'll change my mind and come back later and help you.");
+    ~chatnpc("<p,sad>Oooohhh... I really hope you do...");
+    return;
+}
+~chatplayer("<p,happy>I would love to help you! What do I have to do?");
+~chatnpc("<p,neutral>Well, I have an incredibly important banquet that I have to prepare for, and I am using an ancient cookbook to recreate the meal my famous ancestor made a hundred years ago.");
+~chatnpc("<p,sad>Most of the ingredients I was able to obtain fairly easily, but there were some... oddities... that I have been unable to lay my hands on.");
+~chatplayer("<p,quiz>Like what?");
+~chatnpc("<p,neutral>I need the following ingredients as soon as possible!");
+~chatnpc("<p,neutral>One Eye Of Newt|A freshly made 'Dirty Blast'|A rotten tomato|And a glass of greenman's ale.");
+~chatnpc("<p,happy>I have given you 100 coins to cover any expenses you may incur, feel free to keep the change.");
+~chatplayer("<p,happy>I'll go look for those for you then!");
+inv_add(inv, coins, 100);
+%hundred_main_quest_var = 1;
+return;
+
+[label,rfd_another_cooks_pointer]
+// Thin Déjà vu first two lines only. Fetch / ash-on-blast / hand-in later.
+~chatplayer("<p,quiz>About those ingredients you wanted for the banquet...");
+~chatnpc("<p,quiz>Did you bring them? Remember, I need an eye of newt, a glass of greenman's ale, a rotten tomato, and a 'Dirty Blast'!");
+return;
