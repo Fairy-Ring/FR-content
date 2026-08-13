@@ -98,6 +98,18 @@ def_int $deposit = sub($amount, $overflow);
 if ($deposit > 0) {
     session_log(^log_moderator, "Deposited <oc_debugname($obj)> x<tostring($deposit)> into bank");
     inv_moveitem_uncert($inv, bank, $obj, $deposit);
+    // 274 unequip_effect after worn deposit. 377 split: update_all + on_unequip
+    // (Peer H1: worn emptied, appearance/bonuses stayed). Do not invent engine ban.
+    if ($inv = worn) {
+        if ($obj = elemental_shield) {
+            sound_synth(shield_appear, 0, 0);
+        }
+        if (oc_param($obj, specwep) = ^true) {
+            %sa_attack = ^false;
+        }
+        ~update_all($obj);
+        ~on_unequip($obj);
+    }
 }
 
 [proc,bank_check_nobreak](obj $obj)(boolean)
