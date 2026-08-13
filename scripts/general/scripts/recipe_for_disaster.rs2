@@ -1,0 +1,5 @@
+// Leftover recipe_for_disaster 18436. Questlist hundred_main.
+// Leftover 8 guest names stay on the IF. Do not invent journal fills.
+
+[if_button,questlist:hundred_main]
+if_openmain(recipe_for_disaster);
