@@ -56519,6 +56519,7 @@ op1=Repair
 op3=Hidden
 op4=Hidden
 active=yes
+param=next_loc_stage,village_fence_fixed1
 
 [village_fence_fixed1]
 name=Partial fence
@@ -56530,6 +56531,7 @@ op4=Hidden
 active=yes
 blockrange=no
 hillskew=yes
+param=next_loc_stage,village_fence_fixed2
 
 [village_fence_fixed2]
 name=Short fence
@@ -56541,6 +56543,7 @@ op4=Hidden
 active=yes
 blockrange=no
 hillskew=yes
+param=next_loc_stage,village_fence_fixed3
 
 [village_fence_fixed3]
 name=Medium fence
@@ -56552,6 +56555,7 @@ op4=Hidden
 active=yes
 blockrange=no
 hillskew=yes
+param=next_loc_stage,village_fence_fixedcomplete
 
 [village_fence_fixedcomplete]
 name=Village fence

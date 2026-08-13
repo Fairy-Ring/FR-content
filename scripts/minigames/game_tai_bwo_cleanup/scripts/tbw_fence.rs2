@@ -1,0 +1,31 @@
+// Leftover village_fence_* Repair. Official Update:Tai Bwo Wannai Clean-Up 9 Aug 2005.
+// Hunt 289? no. Leftover loc chain only. No spar cost / favour / Reinforce fill.
+
+[oploc1,village_fence_rotten]
+@tbw_repair_fence;
+
+[oploc1,village_fence_fixed1]
+@tbw_repair_fence;
+
+[oploc1,village_fence_fixed2]
+@tbw_repair_fence;
+
+[oploc1,village_fence_fixed3]
+@tbw_repair_fence;
+
+[oploc1,village_fence_fixedcomplete]
+p_arrivedelay;
+
+[label,tbw_repair_fence]
+p_arrivedelay;
+anim(tbw_cleanup_player_fixfence_start, 0);
+p_delay(2);
+anim(tbw_cleanup_player_fixfence_mid, 0);
+p_delay(2);
+def_loc $next = loc_param(next_loc_stage);
+if ($next = null) {
+    anim(null, 0);
+    return;
+}
+loc_change($next, ^tbw_fence_hold);
+anim(tbw_cleanup_player_fixfence_end, 0);
