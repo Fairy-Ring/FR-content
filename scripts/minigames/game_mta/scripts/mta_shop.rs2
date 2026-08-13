@@ -1,0 +1,12 @@
+// Leftover magic_training_arena_shop 15944.
+// Official Update: Mage Training Arena 4 Jan 2006. Hunt 289? no.
+// Rewards Guardian leftover op4=Trade-with. Stock is packed 727
+// magictraining_inventory 347 (377 obj names only). Dummy 99999 footers stay.
+// Buy / four Pizazz totals later. Do not invent Infinity enchant.
+
+[opnpc4,magictraining_guard_rewards]
+inv_transmit(magictraining_inventory, magic_training_arena_shop:com_3);
+if_openmain(magic_training_arena_shop);
+
+[if_close,magic_training_arena_shop]
+inv_stoptransmit(magic_training_arena_shop:com_3);
