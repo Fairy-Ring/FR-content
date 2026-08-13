@@ -1,0 +1,12 @@
+// ToG leftover tunnels. Official Update: Earthquake Rocks Lumbridge 4 May 2005.
+// Hunt 289? no. Pair only. Dest next to the other mouth — not tears U, not HUD.
+
+[oploc1,tog_cave_up]
+p_arrivedelay;
+// Next to tog_cave_down 3225,9539 L0 (3x3) — south stand.
+p_teleport(0_50_149_25_2);
+
+[oploc1,tog_cave_down]
+p_arrivedelay;
+// Next to tog_cave_up 3218,9533 L2 (3x3) — south stand.
+p_teleport(2_50_148_18_60);
