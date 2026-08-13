@@ -1,0 +1,17 @@
+// Leftover king_roalds_garden 14606. Read obj garden_list 6479.
+// lj1–lj11 from Sal's queenlist2.png (Wayback 20051108024301).
+// Official Garden Update is silent. Do not invent Ellamaria chat.
+
+[opheld1,garden_list]
+if_settext(king_roalds_garden:com_2, "Delphiniums (see Elstan near Falador)");
+if_settext(king_roalds_garden:com_3, "Pink orchids (see Lyra near Port Phasmatys)");
+if_settext(king_roalds_garden:com_4, "Yellow orchids (see Lyra near Port Phasmatys)");
+if_settext(king_roalds_garden:com_5, "Snowdrops (see Kragen near Ardougne)");
+if_settext(king_roalds_garden:com_6, "Burthorpe Vine (see Bernald in Burthorpe)");
+if_settext(king_roalds_garden:com_7, "White rosebush (go to Edgeville Monastery)");
+if_settext(king_roalds_garden:com_8, "Pink rosebush (go to Edgeville Monastery)");
+if_settext(king_roalds_garden:com_9, "Red rosebush (go to Edgeville Monastery)");
+if_settext(king_roalds_garden:com_10, "A White Tree (see Dantaera in Catherby).");
+if_settext(king_roalds_garden:com_11, "A statue of Saradomin from Falador.");
+if_settext(king_roalds_garden:com_12, "A statue of a king from outside Lumbridge Castle.");
+if_openmain(king_roalds_garden);
