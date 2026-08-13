@@ -96,6 +96,7 @@ switch_int (%fluffs) {
                     inv_del(inv, coins, 100);
                     ~mesbox("Gertrude gives you another kitten.");
                     ~gertrude_give_cat;
+                    return;
                 case 2 :
                     ~chatplayer("<p,neutral>No thanks, I've paid that boy enough already.");
             }
@@ -133,7 +134,10 @@ if (inv_totalcat(inv, kitten) = 0 | inv_totalcat(bank, kitten) = 0 | inv_totalca
     inv_add(pickcatinv, kittenobject_browngrey, 1);
     inv_add(pickcatinv, kittenobject_bluegrey, 1);
     inv_transmit(pickcatinv, pick_a_kitten:com_0);
-    if_openmain(pick_a_kitten);
+    // Leftover is a thin strip (title y=3, inv y=39). Chat slot, not main viewport.
+    // Engine auto-closes chat when the script finishes unless paused (skillmulti pattern).
+    if_openchat(pick_a_kitten);
+    p_pausebutton;
 }
 
 [if_close,pick_a_kitten]
