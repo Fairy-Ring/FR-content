@@ -176,6 +176,11 @@ if (%tutorial = 2) {
 ~set_tutorial_progress;
 
 [proc,set_tutorial_progress]
+// Leftover tutorial_island_progress (8680): 20 equal bars, title "% Done".
+// Overlay varp is not %tutorial (OSRS 281 is the state varp). Reconstruction:
+// bar N lights when overlay > N, so overlay 1 = 0% and 21 = 100%.
+// Scale 0..670 (magic finished) across those 20 segments. Do not replace tutorial_text.
+~tutorial_progress_overlay;
 switch_int(%tutorial) {
     // Runescape Guide's House
     case ^newbie_basics_instructor_start,
@@ -293,11 +298,25 @@ if (stat_base($skill) >= 3) {
 }
 stat_advance($skill, $xp);
 
+[proc,tutorial_progress_overlay]
+if (%tutorial >= ^tutorial_complete) {
+    %tutorial_progress_overlay = 0;
+    if_openoverlay(null);
+    return;
+}
+def_int $bar = add(1, divide(multiply(%tutorial, 20), 670));
+if ($bar > 21) {
+    $bar = 21;
+}
+%tutorial_progress_overlay = $bar;
+if_openoverlay(tutorial_island_progress);
+
 [label,tutorial_complete]
 tut_close();
 if_close;
-
 %tutorial = ^tutorial_complete;
+%tutorial_progress_overlay = 0;
+if_openoverlay(null);
 p_telejump(0_50_50_22_22);
 
 inv_clear(inv);

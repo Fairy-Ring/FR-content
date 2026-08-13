@@ -94,8 +94,8 @@ switch_int (%fluffs) {
                     ~chatnpc("<p,happy>Okay then, here you go.");
                     ~chatplayer("<p,happy>Thanks.");
                     inv_del(inv, coins, 100);
-                    ~gertrude_give_cat;
                     ~mesbox("Gertrude gives you another kitten.");
+                    ~gertrude_give_cat;
                 case 2 :
                     ~chatplayer("<p,neutral>No thanks, I've paid that boy enough already.");
             }
@@ -120,19 +120,29 @@ if($option = 1) {
     ~chatnpc("<p,sad>Well, okay then. I'll have to find someone else.");
 }
 
+// Leftover pick_a_kitten (14664): 6-slot inv, option1=Pick. Pack inv 320=pickcatinv
+// already exists (size 6). 289 / this file used random(6) — leftover IF is the 377 surface.
+// Do not bolt Ratcatchers. Do not open name_your_cat.
 [proc,gertrude_give_cat]
 if (inv_totalcat(inv, kitten) = 0 | inv_totalcat(bank, kitten) = 0 | inv_totalcat(inv, cat) = 0 | inv_totalcat(bank, cat) = 0 | npc_finduid(%follower_uid) = false | %follower_obj ! null & oc_category(%follower_obj) ! kitten | %follower_obj ! null & oc_category(%follower_obj) ! cat) {
-    def_npc $cat;
-    switch_int (random(6)) {
-        case 0 : $cat = kittenpet1;
-        case 1 : $cat = kittenpet_light;
-        case 2 : $cat = kittenpet_brown;
-        case 3 : $cat = kittenpet_black;
-        case 4 : $cat = kittenpet_browngrey;
-        case 5 : $cat = kittenpet_bluegrey;
-    }
-    %cat_growth = 0;
-    ~cat_spawn($cat);
-    p_delay(1);
-    npc_say("Meeow!");
+    inv_clear(pickcatinv);
+    inv_add(pickcatinv, kittenobject, 1);
+    inv_add(pickcatinv, kittenobject_light, 1);
+    inv_add(pickcatinv, kittenobject_brown, 1);
+    inv_add(pickcatinv, kittenobject_black, 1);
+    inv_add(pickcatinv, kittenobject_browngrey, 1);
+    inv_add(pickcatinv, kittenobject_bluegrey, 1);
+    inv_transmit(pickcatinv, pick_a_kitten:com_0);
+    if_openmain(pick_a_kitten);
 }
+
+[if_close,pick_a_kitten]
+inv_stoptransmit(pick_a_kitten:com_0);
+
+[inv_button1,pick_a_kitten:com_0]
+def_obj $obj = inv_getobj(pickcatinv, last_slot);
+if ($obj = null) return;
+if (oc_category($obj) ! kitten) return;
+if_close;
+%cat_growth = 0;
+~cat_spawn(oc_param($obj, follower_id));
