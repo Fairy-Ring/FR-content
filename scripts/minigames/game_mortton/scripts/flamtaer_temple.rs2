@@ -80,6 +80,11 @@ if(%morttonquest = ^mortton_ulsquire_temple) {
 // Recompute repaired_p *before* altar fix (overlay queue is next-tick).
 // Soft-entry / shade-break left broken altar with walls already full → thrash
 // reinforced forever while repaired_p stayed stale until after this check.
+// loc_findallzone inside recalc replaces active loc — restore the wall we
+// are building or loc_param(next_loc_stage) is null and loc_change never fires
+// (703c6181c regression vs Aug 8 mtnskdlhaz).
+def_coord $build_coord = loc_coord;
+def_loc $build_loc = loc_type;
 ~recalc_temple_repaired_p;
 
 if(%temple_repaired_p = 100) {
@@ -144,20 +149,22 @@ queue(update_flamtaer_overlay, 0, 0);
 //1 exp per 2 resources spent
 stat_advance(crafting, divide(multiply($resource_amount,10),2));
 
-def_int $current_wall_state = loc_param(temple_wall_level);
-//todo: Find better breakpoints
-if(loc_param(next_loc_stage) ! null) {
-    switch_int($current_wall_state) {
-        case 0 : if(%current_temple_build > 300) loc_change(loc_param(next_loc_stage), 9000);
-        case 1 : if(%current_temple_build > 700) loc_change(loc_param(next_loc_stage), 9000);
-        case 2 : if(%current_temple_build > 1100) loc_change(loc_param(next_loc_stage), 9000);
-        case 3 : if(%current_temple_build > 1500) loc_change(loc_param(next_loc_stage), 9000);
-        case 4 : if(%current_temple_build > 1900) loc_change(loc_param(next_loc_stage), 9000);
-        case 5 : if(%current_temple_build > 2300) loc_change(loc_param(next_loc_stage), 9000);
-        case 6 : if(%current_temple_build > 2700) loc_change(loc_param(next_loc_stage), 9000);
-        case 7 : if(%current_temple_build > 3100) loc_change(loc_param(next_loc_stage), 9000);
-        case 8 : if(%current_temple_build > 3500) loc_change(loc_param(next_loc_stage), 9000);
-        case 9 : if(%current_temple_build > 3900) loc_change(loc_param(next_loc_stage), 9000);
+if (loc_find($build_coord, $build_loc) = true) {
+    def_int $current_wall_state = loc_param(temple_wall_level);
+    //todo: Find better breakpoints
+    if(loc_param(next_loc_stage) ! null) {
+        switch_int($current_wall_state) {
+            case 0 : if(%current_temple_build > 300) loc_change(loc_param(next_loc_stage), 9000);
+            case 1 : if(%current_temple_build > 700) loc_change(loc_param(next_loc_stage), 9000);
+            case 2 : if(%current_temple_build > 1100) loc_change(loc_param(next_loc_stage), 9000);
+            case 3 : if(%current_temple_build > 1500) loc_change(loc_param(next_loc_stage), 9000);
+            case 4 : if(%current_temple_build > 1900) loc_change(loc_param(next_loc_stage), 9000);
+            case 5 : if(%current_temple_build > 2300) loc_change(loc_param(next_loc_stage), 9000);
+            case 6 : if(%current_temple_build > 2700) loc_change(loc_param(next_loc_stage), 9000);
+            case 7 : if(%current_temple_build > 3100) loc_change(loc_param(next_loc_stage), 9000);
+            case 8 : if(%current_temple_build > 3500) loc_change(loc_param(next_loc_stage), 9000);
+            case 9 : if(%current_temple_build > 3900) loc_change(loc_param(next_loc_stage), 9000);
+        }
     }
 }
 
