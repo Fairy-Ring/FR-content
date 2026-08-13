@@ -1,0 +1,88 @@
+// A Fairy Tale Part I start-gate — Martin the Master Gardener (3299) @ 3078,3258.
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Fairytale I minus Skillcape /
+// overlay / toast / FT2 / RS3 Overview. Hunt 289? no.
+// Accept: %fairy_farmers_quest 0→1 only. NEVER 10 (opens Zanaris wall + guard).
+// Keep [opnpc3] pickpocket. Do not open leftover fairy_queen_symptoms.
+
+[opnpc1,martin_the_master_farmer]
+if (%fairy_farmers_quest > 0) {
+    @ft1_martin_started;
+}
+@ft1_martin_start;
+
+[label,ft1_martin_start]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,sad>I can't chat now, I have too many things to worry about.");
+@ft1_martin_options;
+
+[label,ft1_martin_options]
+def_int $opt = ~p_choice3("Anything I can help with?", 1, "Oh dear. I hope you can sort them out by yourself.", 2, "What is the banner for?", 3);
+if ($opt = 2) {
+    ~chatplayer("<p,sad>Oh dear. I hope you can sort them out by yourself.");
+    ~chatnpc("<p,sad>I'm not sure I can, but I guess I have to try.");
+    return;
+} else if ($opt = 3) {
+    @ft1_martin_banner;
+}
+~chatplayer("<p,quiz>Anything I can help with?");
+@ft1_martin_pitch;
+
+[label,ft1_martin_banner]
+~chatplayer("<p,quiz>What is the banner for?");
+~chatnpc("<p,neutral>That banner is the emblem of the Group of Advanced Gardeners. We're a loosely affiliated group of gardeners that are united in our concern for declining vegetable production.");
+~chatplayer("<p,confused>Err, of course you are.");
+~chatnpc("<p,quiz>Say, you're a brave adventurer, would you be interested in trying to get to the root of our woes? There would be a cash reward if you could help us.");
+def_int $help = ~p_choice2("Of course I'll help.", 1, "Sorry, I have better things to do.", 2);
+if ($help = 2) {
+    ~chatplayer("<p,neutral>Sorry, I have better things to do.");
+    ~chatnpc("<p,sad>Oh. Oh dear. Oh well, if there's nothing I can do to make you change your mind...");
+    ~chatplayer("<p,neutral>No, nothing. My mind is made up.");
+    ~chatnpc("<p,neutral>Well come back and chat to me if you change it.");
+    return;
+}
+~chatplayer("<p,happy>Of course I'll help.");
+~chatnpc("<p,happy>I'm so glad to hear that.");
+~chatplayer("<p,quiz>You don't look it.");
+~chatnpc("<p,confused>Sorry, what was that?");
+~chatplayer("<p,neutral>Oh, nothing. Don't worry about it.");
+@ft1_martin_pitch_body;
+
+[label,ft1_martin_pitch]
+~chatnpc("<p,sad>I certainly could do with some help.");
+~chatplayer("<p,quiz>So tell me about your problems.");
+@ft1_martin_pitch_body;
+
+[label,ft1_martin_pitch_body]
+~chatnpc("<p,neutral>It all seemed to start about a month ago. I grow roses, you know?");
+~chatplayer("<p,confused>Um, you seem to be getting side-tracked already.");
+~chatnpc("<p,confused>What? Oh sorry.");
+~chatnpc("<p,neutral>As I was saying about a month ago I noticed that the yield on my prize rose bushes had dropped slightly. I immediately suspected Crown Gall, a disease that can be fatal to a Mister Lincoln.");
+~chatplayer("<p,quiz>You're not making much sense. Who's Mister Lincoln?");
+~chatnpc("<p,neutral>Sorry, Mister Lincoln's are the variety of roses that I specialise in. None of the plants showed any other symptoms of disease though. Then I noticed a reduced yield occurring in most of my other crops too.");
+~chatnpc("<p,sad>I spoke to other gardeners that I know, and they had all noticed similar problems.");
+~chatnpc("<p,sad>Vegetable patches are growing fewer vegetables, bushes are producing fewer berries and everything that is planted seems to be more prone to disease!");
+if (stat_base(farming) > 1) {
+    ~chatnpc("<p,quiz>You've done some farming, haven't you noticed a decrease in the amount of produce you are getting lately?");
+} else {
+    ~chatnpc("<p,neutral>If you were more interested in turning your hand to farming, you would have noticed it too.");
+}
+def_int $go = ~p_choice2("Yes", 1, "No", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>This doesn't sound like something I can help with. Good luck.");
+    return;
+}
+@ft1_martin_accept;
+
+[label,ft1_martin_accept]
+~chatplayer("<p,quiz>So what do you want me to do?");
+~chatnpc("<p,neutral>I'd like you to find out what is causing this terrible problem and to try and rectify whatever the problem is.");
+~chatplayer("<p,quiz>Do you have any ideas where I should start?");
+~chatnpc("<p,neutral>If I were you I would start by speaking to some of the other gardeners.");
+%fairy_farmers_quest = 1;
+return;
+
+[label,ft1_martin_started]
+~chatnpc("<p,quiz>Have you spoken to any other members of the Gardening Group yet?");
+~chatplayer("<p,sad>No, I haven't had a chance yet.");
+~chatnpc("<p,sad>Well please hurry, otherwise I won't be able to make enough produce to feed my 13 children soon.");
+return;
