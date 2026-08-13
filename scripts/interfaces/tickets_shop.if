@@ -726,7 +726,7 @@ text=Close Window
 colour=0x808080
 overcolour=0xFFFFFF
 
-[com_90]
+[inv]
 type=inv
 x=76
 y=65
