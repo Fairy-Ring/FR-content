@@ -75989,6 +75989,7 @@ recol2d=11458
 active=yes
 op1=Open
 raiseobject=no
+param=next_loc_stage,elfdooropen_reverse
 
 [boardgames_runesquares_door_experienced]
 name=Door
@@ -76001,6 +76002,7 @@ recol2d=11458
 active=yes
 op1=Open
 raiseobject=no
+param=next_loc_stage,elfdooropen_reverse
 
 [boardgames_runeversi_ladderup_experienced]
 name=Ladder

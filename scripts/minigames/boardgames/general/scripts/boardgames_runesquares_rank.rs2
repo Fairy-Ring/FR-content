@@ -1,0 +1,39 @@
+// Leftover runesquares_rank 16570. Official Games Room 24 Nov 2004.
+// Hunt 289? no leftover slug. Mirror draughts zone HUD — no board play.
+
+[oploc1,boardgames_runesquares_ladderup_experienced]
+if (%boardgames_runesquares_rank < 1500) {
+    mes("You need a Runesquares rank of at least 1500 to climb this ladder.");
+    return;
+}
+~climb_ladder(movecoord(coord, 0, 1, 0), true);
+
+[oploc1,boardgames_runesquares_ladderdown_experienced]
+~climb_ladder(movecoord(coord, 0, -1, 0), false);
+
+[oploc1,boardgames_runesquares_door_experienced]
+if (%boardgames_runesquares_rank < 1500 & coordz(coord) > coordz(loc_coord)) {
+    mes("You need a Runesquares rank of at least 1500 to pass through this door.");
+    return;
+}
+~open_and_close_door(loc_param(next_loc_stage), ~check_axis(coord, loc_coord, loc_angle), false);
+
+[zone,0_34_77_8_16]
+if_openoverlay(runesquares_rank);
+set_skill_level(%boardgames_runesquares_rank);
+~update_bas;
+
+[zoneexit,0_34_77_8_16]
+if_openoverlay(null);
+set_skill_level(0);
+~update_bas;
+
+[zone,1_34_77_8_16]
+if_openoverlay(runesquares_rank);
+set_skill_level(%boardgames_runesquares_rank);
+~update_bas;
+
+[zoneexit,1_34_77_8_16]
+if_openoverlay(null);
+set_skill_level(0);
+~update_bas;

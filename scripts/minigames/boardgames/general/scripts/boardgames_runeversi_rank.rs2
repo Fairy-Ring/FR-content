@@ -1,0 +1,39 @@
+// Leftover runeversi_rank 17188. Official Games Room 24 Nov 2004.
+// Hunt 289? no leftover slug. Mirror runelink zone HUD — no board play.
+
+[oploc1,boardgames_runeversi_ladderup_experienced]
+if (%boardgames_runeversi_rank < 1500) {
+    mes("You need a Runeversi rank of at least 1500 to climb this ladder.");
+    return;
+}
+~climb_ladder(movecoord(coord, 0, 1, 0), true);
+
+[oploc1,boardgames_runeversi_ladderdown_experienced]
+~climb_ladder(movecoord(coord, 0, -1, 0), false);
+
+[oploc1,boardgames_runeversi_door_experienced]
+if (%boardgames_runeversi_rank < 1500 & coordz(coord) > coordz(loc_coord)) {
+    mes("You need a Runeversi rank of at least 1500 to pass through this door.");
+    return;
+}
+~open_and_close_door(loc_param(next_loc_stage), ~check_axis(coord, loc_coord, loc_angle), false);
+
+[zone,0_34_77_48_16]
+if_openoverlay(runeversi_rank);
+set_skill_level(%boardgames_runeversi_rank);
+~update_bas;
+
+[zoneexit,0_34_77_48_16]
+if_openoverlay(null);
+set_skill_level(0);
+~update_bas;
+
+[zone,1_34_77_48_16]
+if_openoverlay(runeversi_rank);
+set_skill_level(%boardgames_runeversi_rank);
+~update_bas;
+
+[zoneexit,1_34_77_48_16]
+if_openoverlay(null);
+set_skill_level(0);
+~update_bas;

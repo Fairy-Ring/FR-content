@@ -10,6 +10,12 @@
 ^runelinks_room_start_coord = 0_34_77_40_8
 ^runelinks_room_end_coord = 0_34_77_47_15
 
+// CANDIDATE 8x8 from jm2 ladder+door (games-room-rank-first-slice-377.md §3.3).
+^runesquares_room_start_coord = 0_34_77_8_16
+^runesquares_room_end_coord = 0_34_77_15_23
+^runeversi_room_start_coord = 0_34_77_48_16
+^runeversi_room_end_coord = 0_34_77_55_23
+
 ^boardgames_win = 1
 ^boardgames_loss = 2
 ^boardgames_draw = 3
