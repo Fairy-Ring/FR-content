@@ -7,8 +7,22 @@
 ~bankpin_tick_pending;
 if_openmain(bankpin_settings);
 sound_synth(PIN_pending, 0, 0);
-if_settext(bankpin_settings:com_113, "Customers are reminded that they should NEVER tell anyone their Bank PINs or passwords, nor should they ever enter their PINs on any website form.");
+~bankpin_messages;
 ~bankpin_refresh_settings;
+
+[proc,bankpin_messages]
+// Messages column is leftover com_113–123 (147×14 each). One long line paints through the IF.
+if_settext(bankpin_settings:com_113, "Customers are reminded");
+if_settext(bankpin_settings:com_114, "that they should NEVER");
+if_settext(bankpin_settings:com_115, "tell anyone their Bank");
+if_settext(bankpin_settings:com_116, "PINs or passwords, nor");
+if_settext(bankpin_settings:com_117, "should they ever enter");
+if_settext(bankpin_settings:com_118, "their PINs on any");
+if_settext(bankpin_settings:com_119, "website form.");
+if_settext(bankpin_settings:com_120, "");
+if_settext(bankpin_settings:com_121, "");
+if_settext(bankpin_settings:com_122, "");
+if_settext(bankpin_settings:com_123, "");
 
 [proc,bankpin_tick_pending]
 if (%bankpin_delay ! 3 & %bankpin_delay ! 7) {
@@ -30,39 +44,45 @@ if ($left < 1) {
 return(add(divide(sub($left, 1), ^bankpin_day_minutes), 1));
 
 [proc,bankpin_refresh_settings]
+// Confirm overlay is leftover-hidden (com_237) but Yes/No texts are *root* comps — always painted unless cleared.
+if_sethide(bankpin_settings:com_237, true);
+if_sethide(bankpin_settings:com_242, true);
+if_sethide(bankpin_settings:com_247, true);
+if_settext(bankpin_settings:com_242, "");
+if_settext(bankpin_settings:com_247, "");
 if_settext(bankpin_settings:com_177, "<tostring(%bankpin_delay)> Days");
 if (%bankpin_state = ^bankpin_state_none) {
     if_settext(bankpin_settings:com_175, "No PIN set");
-    if_sethide(bankpin_settings:com_147, false);
-    if_sethide(bankpin_settings:com_148, false);
-    if_sethide(bankpin_settings:com_149, true);
-    if_sethide(bankpin_settings:com_150, true);
-    if_sethide(bankpin_settings:com_151, true);
-    if_sethide(bankpin_settings:com_152, true);
+    if_settext(bankpin_settings:com_147, "Set a PIN");
+    if_settext(bankpin_settings:com_148, "Change your recovery delay");
+    if_settext(bankpin_settings:com_149, "");
+    if_settext(bankpin_settings:com_150, "");
+    if_settext(bankpin_settings:com_151, "");
+    if_settext(bankpin_settings:com_152, "");
 } else if (%bankpin_state = ^bankpin_state_pending) {
     if_settext(bankpin_settings:com_175, "PIN requested (<tostring(~bankpin_days_left)> days)");
-    if_sethide(bankpin_settings:com_147, true);
-    if_sethide(bankpin_settings:com_148, true);
-    if_sethide(bankpin_settings:com_149, true);
-    if_sethide(bankpin_settings:com_150, true);
-    if_sethide(bankpin_settings:com_151, true);
-    if_sethide(bankpin_settings:com_152, false);
+    if_settext(bankpin_settings:com_147, "");
+    if_settext(bankpin_settings:com_148, "");
+    if_settext(bankpin_settings:com_149, "");
+    if_settext(bankpin_settings:com_150, "");
+    if_settext(bankpin_settings:com_151, "");
+    if_settext(bankpin_settings:com_152, "Cancel the PIN that's pending");
 } else if (%bankpin_state = ^bankpin_state_recover) {
     if_settext(bankpin_settings:com_175, "PIN recovery (<tostring(~bankpin_days_left)> days)");
-    if_sethide(bankpin_settings:com_147, true);
-    if_sethide(bankpin_settings:com_148, true);
-    if_sethide(bankpin_settings:com_149, true);
-    if_sethide(bankpin_settings:com_150, true);
-    if_sethide(bankpin_settings:com_151, true);
-    if_sethide(bankpin_settings:com_152, false);
+    if_settext(bankpin_settings:com_147, "");
+    if_settext(bankpin_settings:com_148, "");
+    if_settext(bankpin_settings:com_149, "");
+    if_settext(bankpin_settings:com_150, "");
+    if_settext(bankpin_settings:com_151, "");
+    if_settext(bankpin_settings:com_152, "Cancel the PIN that's pending");
 } else {
     if_settext(bankpin_settings:com_175, "PIN set");
-    if_sethide(bankpin_settings:com_147, true);
-    if_sethide(bankpin_settings:com_148, true);
-    if_sethide(bankpin_settings:com_149, false);
-    if_sethide(bankpin_settings:com_150, false);
-    if_sethide(bankpin_settings:com_151, false);
-    if_sethide(bankpin_settings:com_152, true);
+    if_settext(bankpin_settings:com_147, "");
+    if_settext(bankpin_settings:com_148, "");
+    if_settext(bankpin_settings:com_149, "Change your PIN");
+    if_settext(bankpin_settings:com_150, "Delete your PIN");
+    if_settext(bankpin_settings:com_151, "Change your recovery delay");
+    if_settext(bankpin_settings:com_152, "");
 }
 
 [if_button,bankpin_settings:com_147]
@@ -170,6 +190,36 @@ switch_int($slot) {
     case 9 : return(bankpin:com_119);
 }
 
+// Leftover text comps sit at the pad's bottom-left (looks broken).
+// Period: digits live in the red boxes (GameFAQs / leftover 64×64 pads).
+[proc,bankpin_pad_x](int $slot)(int)
+switch_int($slot) {
+    case 0 : return(33);
+    case 1 : return(127);
+    case 2 : return(221);
+    case 3 : return(305);
+    case 4 : return(33);
+    case 5 : return(127);
+    case 6 : return(221);
+    case 7 : return(33);
+    case 8 : return(127);
+    case 9 : return(221);
+}
+
+[proc,bankpin_pad_y](int $slot)(int)
+switch_int($slot) {
+    case 0 : return(103);
+    case 1 : return(103);
+    case 2 : return(103);
+    case 3 : return(103);
+    case 4 : return(175);
+    case 5 : return(175);
+    case 6 : return(175);
+    case 7 : return(247);
+    case 8 : return(247);
+    case 9 : return(247);
+}
+
 [proc,bankpin_shuffle_digits]
 def_int $used = 0;
 def_int $n = 0;
@@ -182,6 +232,9 @@ while ($n < 10 & $tries < 80) {
     if (testbit($used, $d) = ^false) {
         $used = setbit($used, $d);
         if_settext(~bankpin_digit_com($n), "<tostring($d)>");
+        // IF_SETPOSITION is an *offset* from packed childX/Y (377 field710/741).
+        // Leftover glyph sits at the pad footer; nudge it up into the 64×64 box.
+        if_setposition(~bankpin_digit_com($n), random(28), sub(0, add(10, random(26))));
         if ($n < 5) {
             $lo = add($lo, multiply($d, ~bankpin_pow10($n)));
         } else {
