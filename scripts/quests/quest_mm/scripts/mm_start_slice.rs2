@@ -28,4 +28,5 @@ if_openmain(scroll);
 %mm_main = ^mm_complete;
 session_log(^log_adventure, "Quest complete: Monkey Madness");
 queue(mm_complete_dialogue, 0, 0);
-~send_quest_complete(questlist:mm, mm_monkey_in_backpack, 250, ^mm_questpoints, "You have completed the\\nMonkey Madness Quest!", "3 Quest Points");
+// 289 5-arg title. Narnode reward is coins+diamonds (mm_narnode_reward). Daero training XP is post-complete.
+~send_quest_complete(questlist:mm, mm_monkey_in_backpack, 250, ^mm_questpoints, "You have completed the\\nMonkey Madness Quest!", "10,000 coins|3 diamonds");

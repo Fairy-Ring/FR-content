@@ -174,7 +174,8 @@ if (%misc_quest = 90) {
     %misc_quest = ^misc_complete;
     %misc_coffers = 10000; // Start with 10k in coffers.
     session_log(^log_adventure, "Quest complete: Throne of Miscellania");
-    ~send_quest_complete(questlist:misc, misc_giant_pen, 250, ^misc_questpoints, "You have completed the\\nThrone of Miscellania Quest!", "1 Quest Point|Kingdom management unlocked");
+    // com_9 already prints 1 QP. Complete sets coffers 10k + Ghrim manage.
+    ~send_quest_complete(questlist:misc, misc_giant_pen, 250, ^misc_questpoints, "You have completed the\\nThrone of Miscellania Quest!", "Kingdom management unlocked");
 }
 
 [label,king_vargas_quest_stage_100]
