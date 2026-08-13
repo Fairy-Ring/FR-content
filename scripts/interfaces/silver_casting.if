@@ -746,6 +746,7 @@ option3=Make 10
 [com_92]
 layer=com_90
 type=text
+buttontype=normal
 x=11
 y=37
 width=65
@@ -809,6 +810,7 @@ option3=Make 10
 [com_99]
 layer=com_97
 type=text
+buttontype=normal
 x=15
 y=38
 width=51
@@ -872,6 +874,7 @@ option3=Make 10
 [com_106]
 layer=com_104
 type=text
+buttontype=normal
 x=26
 y=37
 width=32
@@ -935,6 +938,7 @@ option3=Make 10
 [com_113]
 layer=com_111
 type=text
+buttontype=normal
 x=16
 y=34
 width=52
@@ -998,6 +1002,7 @@ option3=Make 10
 [com_120]
 layer=com_118
 type=text
+buttontype=normal
 x=26
 y=37
 width=29
@@ -1061,6 +1066,7 @@ option3=Make 10
 [com_128]
 layer=com_125
 type=text
+buttontype=normal
 x=10
 y=38
 width=49
@@ -1124,6 +1130,7 @@ option3=Make 10
 [com_135]
 layer=com_133
 type=text
+buttontype=normal
 x=4
 y=43
 width=78
