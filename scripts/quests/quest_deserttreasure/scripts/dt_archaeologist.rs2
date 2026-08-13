@@ -11,8 +11,17 @@ if (%deserttreasure = 1) {
 if (%deserttreasure = 2) {
     @dt_arch_wait_translation;
 }
-if (%deserttreasure > 2) {
-    // Don't-read / Partners is the next unit. Do not re-grant etchings.
+if (%deserttreasure = 3) {
+    @dt_arch_return;
+}
+if (%deserttreasure = 4) {
+    @dt_arch_partners;
+}
+if (%deserttreasure = 5) {
+    @dt_arch_south_nag;
+}
+if (%deserttreasure > 5) {
+    // Bartender / diamonds later. Do not re-grant etchings or restart.
     return;
 }
 @dt_arch_hello;
@@ -105,4 +114,90 @@ return;
 ~chatnpc("<p,confused>...");
 ~chatnpc("<p,neutral>I see.");
 ~chatnpc("<p,angry>Well could you go and get me that translation? It could be vital!");
+return;
+
+// CANDIDATE last-resort 2007-base: OSRS after receiving / after delivering / after agreeing
+// minus I overlay / display rename / gender / Overview / 4 Mar 2019 skip-collapse.
+// Don't-read 3→4. Partners Yes 4→5. Read book = option only (no IF invent).
+// No bartender / Eblis / diamonds / AM. Display stays Archaeologist.
+
+[label,dt_arch_return]
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,quiz>So what did Terry Balando say about those etchings? Did he give you a translation for me?");
+if (inv_total(inv, four_diamonds_translation_primer) < 1) {
+    ~chatplayer("<p,sad>Yeah, he did. But I don't have it with me.");
+    ~chatnpc("<p,confused>...");
+    ~chatnpc("<p,neutral>I see.");
+    ~chatnpc("<p,angry>Well could you go and get me that translation? It could be vital!");
+    return;
+}
+~chatplayer("<p,happy>Yeah, he did. I have it here in this book.");
+~chatnpc("<p,quiz>Did you take a read of this? It will do you good to understand how this profession works. Here, have a read.");
+def_int $read = ~p_choice2("Read book", 1, "Don't read book", 2);
+if ($read = 1) {
+    // Leftover Translation IF is stay-closed (0 leftover join). Book stays. No write.
+    return;
+}
+~chatplayer("<p,neutral>Yeah, I did. Kind of boring really.");
+inv_del(inv, four_diamonds_translation_primer, 1);
+~chatnpc("<p,happy>Excellent. Just give me a moment to read this, and talk to me again in a second.");
+%deserttreasure = 4;
+return;
+
+[label,dt_arch_partners]
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,neutral>Hmmm. Interesting. It seems to me like there's some kind of treasure hidden out in the desert.");
+~chatnpc("<p,quiz>So what do you say? Fancy being a treasure hunter like me?");
+~chatplayer("<p,confused>Uh... don't you mean archaeologist?");
+~chatnpc("<p,confused>Yeeees... An archaeologist...");
+~chatnpc("<p,neutral>It's all this hot sun getting to me I think.");
+~chatnpc("<p,neutral>Well anyway, let's just assume there is a treasure hidden in the desert somewhere, and let's just say for the sake of argument that maybe if I found a big stash of gold and treasure I wouldn't necessarily just hand it");
+~chatnpc("<p,neutral>all over to the Museum of Varrock.");
+~chatnpc("<p,neutral>Let's also say, purely hypothetically, that if there were such a big stash of treasure and someone were to help me find it, then that hypothetical person might be entitled to, oh, let's say a purely for the sake of");
+~chatnpc("<p,neutral>argument thirty percent split...");
+~chatplayer("<p,quiz>Fifty percent.");
+~chatnpc("<p,happy>That's right!");
+~chatnpc("<p,happy>A purely for the sake of argument fifty-fifty split on this hypothetical treasure, should it exist...");
+~chatnpc("<p,quiz>Do you see where I'm going with this?");
+~chatplayer("<p,neutral>You want me to help you find some treasure for a fifty percent share, as long as I don't tell anybody, and your reputation as an esteemed archaeologist with the Museum of Varrock remains intact, and nobody");
+~chatplayer("<p,neutral>discovers you're actually just a treasure hunter?");
+~chatnpc("<p,sad>Uh... yes, but the way you said it makes it sound like I'm doing something wrong...");
+~chatnpc("<p,quiz>So what do you say? Partners?");
+@dt_arch_partners_ask;
+
+[label,dt_arch_partners_ask]
+def_int $help = ~p_choice2("Help him", 1, "Don't help him", 2);
+if ($help = 1) {
+    @dt_arch_partners_yes;
+}
+~chatplayer("<p,angry>This all sounds very immoral, and I don't want any part of your seedy little schemes.");
+~chatnpc("<p,sad>Aw, c'mon, cut me a break here man! Look, nobody is really getting hurt, right? This treasure is either going to lie around in some underground ruin, or lie around in some museum for");
+~chatnpc("<p,sad>people to look at!");
+~chatnpc("<p,quiz>It makes sense for the people to go to all the risk to get a little payback for it, right? Besides, anything of real historical value we can hand over to the museum - we'll just keep the cash for");
+~chatnpc("<p,quiz>ourselves!");
+~chatnpc("<p,quiz>C'mon... what do you say? Partners?");
+def_int $help2 = ~p_choice2("Help him", 1, "Don't help him", 2);
+if ($help2 = 1) {
+    @dt_arch_partners_yes;
+}
+~chatplayer("<p,angry>I don't trust anything about your little scheme, including you! I want nothing to do with this!");
+~chatnpc("<p,neutral>Eh, you'll come running back when you realize just how much money we could be talking here.");
+~chatnpc("<p,neutral>I'll see you again when you come crawling back, begging to be cut in on the deal.");
+return;
+
+[label,dt_arch_partners_yes]
+~chatplayer("<p,neutral>Well... I guess nobody is really going to lose out on anything, and we don't even know if there is any treasure...");
+~chatplayer("<p,happy>Aw, go on then. Count me in.");
+~chatnpc("<p,happy>Good lad! Well, if we split up we'll be able to find treasure quicker.");
+~chatnpc("<p,neutral>I'll continue searching around here in this Bedabin Camp, you head due South to the Bandit Village. If either of us find anything, we'll come find each other and say what, okay?");
+~chatnpc("<p,neutral>You head due South, see what you can find out about this tablet.");
+%deserttreasure = 5;
+return;
+
+[label,dt_arch_south_nag]
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,quiz>Hello again. You find any signs of that treasure yet?");
+~chatplayer("<p,sad>Not yet...");
+~chatnpc("<p,neutral>Well, head south to that bandit camp. I bet if there's anything out here, they'll know about it.");
+~chatnpc("<p,angry>Don't let on it might be valuable though! Those thieves will steal it as soon as look at you!");
 return;
