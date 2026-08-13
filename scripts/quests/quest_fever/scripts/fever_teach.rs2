@@ -1,0 +1,128 @@
+// Cabin Fever inn start — Bill Teach (fever_teach 3155) @ 3679,3495.
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Cabin Fever (pre-Feb 2022 /
+// Eldevidian) minus later Changes (2022 req overlay, 2015 Travel, 2025 Sailing /
+// Pandemonium, Trouble Brewing 4 Jul 2006, RS3 Overview). Hunt 289? no.
+// This slice: inn Talk-to + refuse + accept %fever_quest 0→1. No gangplank / ship.
+
+[opnpc1,fever_teach]
+if (%fever_quest > 0) {
+    @fever_teach_in_progress;
+}
+@fever_teach_start;
+
+[label,fever_teach_start]
+~chatnpc("<p,confused>Mumblelandlubbermumblemumble...");
+~chatplayer("<p,happy>Hello!");
+~chatnpc("<p,angry>What right have ye to be so happy, landlubber?");
+~chatplayer("<p,neutral>Well it is quite a nice day.");
+~chatnpc("<p,neutral>Aye, that it is.");
+~chatnpc("<p,sad>Will ye forgive an old sailor his temper <text_gender("lad", "lass")>? I'm in dire straits indeed.");
+~chatplayer("<p,quiz>What's the problem? I may be able to help.");
+~chatnpc("<p,sad>I dunno, <text_gender("lad", "lass")>, I need a pirate to help me with my problem, but none will sail with me.");
+~chatnpc("<p,quiz>Well, ye look like ye might have the right stuff, tell me would ye like te be a pirate?");
+def_int $pirate = ~p_choice2("Yes, I've always wanted to be a pirate!", 1, "No thanks, it sounds quite dangerous.", 2);
+if ($pirate = 2) {
+    @fever_teach_early_refuse;
+}
+~chatplayer("<p,happy>Yes, I've always wanted to be a pirate!");
+~chatplayer("<p,happy>A life on the open waves, swinging on the rigging, walking the plank...");
+~chatplayer("<p,happy>I'd love to be a pirate!");
+~chatnpc("<p,neutral>Well I dunno... it takes more grit than most have te be a pirate.");
+@fever_teach_agility_check;
+
+[label,fever_teach_agility_check]
+~chatnpc("<p,quiz>Tell me, be ye as agile as a cat on a hot tin roof?");
+if (stat(agility) < 42) {
+    ~chatplayer("<p,sad>Not in as many words, no...");
+    @fever_teach_skill_fail;
+}
+~chatplayer("<p,happy>Well, I am quite agile...");
+@fever_teach_craft_smith_check;
+
+[label,fever_teach_craft_smith_check]
+~chatnpc("<p,quiz>Be ye a smith and craftsman of great renown?");
+if (stat(crafting) < 45 | stat(smithing) < 50) {
+    ~chatplayer("<p,sad>Well, not exactly.");
+    @fever_teach_skill_fail;
+}
+~chatplayer("<p,happy>Arr! That I be!");
+@fever_teach_ranged_check;
+
+[label,fever_teach_ranged_check]
+~chatnpc("<p,quiz>Be ye the kind of keen-eyed archer that can hit an albatross at one hundred paces?");
+if (stat(ranged) < 40) {
+    ~chatplayer("<p,sad>Well, I wouldn't say 100 paces as such...");
+    @fever_teach_skill_fail;
+}
+~chatplayer("<p,happy>Aye! Ye point me te the Albatross and I'll bring it down Cap'n!");
+@fever_teach_pirate_services;
+
+[label,fever_teach_pirate_services]
+// Pirate’s Treasure is the only authentic 377 writer. Rum Deal %deal_quest has
+// no complete surface — do not fake it from this script.
+~chatnpc("<p,quiz>Have ye rendered great services to pirates in the past?");
+if (%hunt < ^hunt_complete) {
+    ~chatplayer("<p,neutral>Not yet, but I was going to!");
+    @fever_teach_skill_fail;
+}
+~chatplayer("<p,happy>Arr! I be the least land-lubberin' landlubber that ye ever did see!");
+~chatplayer("<p,happy>Fire another broadside Mr Bosun!");
+@fever_teach_after_checks;
+
+[label,fever_teach_skill_fail]
+~chatnpc("<p,sad>Then no, <text_gender("lad", "lass")>, ye can't help with my problem.");
+return;
+
+[label,fever_teach_after_checks]
+~chatnpc("<p,confused>Well <text_gender("lad", "lass")>, I don't think ye could pirate yer way out of a chest full of piracy.");
+~chatplayer("<p,sad>Awww...");
+~chatnpc("<p,happy>But since nobody else will risk the trip ye'll do!");
+~chatnpc("<p,neutral>Well <text_gender("lad", "lass")>, I be Bill Teach, the Captain of the Adventurous, one of the finest ships ever to sail these waters.");
+~chatnpc("<p,neutral>I'm in port doin' some legitimate tradin' before headin' back to Mos Le'Harmless.");
+~chatplayer("<p,quiz>Mos Le'Harmless? Where is that?");
+~chatnpc("<p,neutral>It's a pirate stronghold off the southern coast of Morytania.");
+~chatnpc("<p,neutral>Been in existence for years it has, the best place for pirates to relax with the exception of Brimhaven.");
+~chatnpc("<p,neutral>Would be THE best, but we don't have their fancy Agility Arena.");
+~chatplayer("<p,quiz>Will it be OK for me to go there if I am not a pirate?");
+~chatnpc("<p,happy>Of course <text_gender("lad", "lass")>, once we make landfall ye'll have worked as a sailor on a pirate vessel, which is one of the easiest ways to become a true pirate.");
+~chatnpc("<p,sad>This brings me back to the reason I'm stuck here of course, and the reason I need your help.");
+~chatnpc("<p,angry>Last night I got into a war o' words with another Cap'n, and he has vowed to sink my ship and put all of my crew to the sword.");
+~chatplayer("<p,shock>How horrible! How did your crew react?");
+~chatnpc("<p,sad>By desertin'.");
+~chatplayer("<p,quiz>All of them?");
+~chatnpc("<p,sad>Every last one!");
+~chatnpc("<p,neutral>The second I leave port I'll come under attack. I think I'll be able te make it if I have another person helpin' out, but I wouldn't stand a chance by me self.");
+~chatnpc("<p,quiz>Ye said ye would help me out <text_gender("lad", "lass")>, will ye stand by yer word?");
+def_string $word_yes = text_gender("Yes, I am a man of my word.", "Yes, I am a woman of my word.");
+def_int $stand = ~p_choice2($word_yes, 1, "No, if it's so dangerous your crew left, count me out.", 2);
+if ($stand = 2) {
+    @fever_teach_word_refuse;
+}
+@fever_teach_accept;
+
+[label,fever_teach_accept]
+~chatplayer("<p,happy><text_gender("Yes, I am a man of my word.", "Yes, I am a woman of my word.")>");
+~chatnpc("<p,happy>Arr! Ye struck me as a <text_gender("man", "woman")> of integrity!");
+~chatnpc("<p,neutral>My ship is the Adventurous, and she's at the east dock.");
+~chatplayer("<p,happy>You won't...err...I mean ye'll not regret it Cap'n!");
+~chatnpc("<p,happy>I'm sure I won't.");
+%fever_quest = 1;
+return;
+
+[label,fever_teach_early_refuse]
+~chatplayer("<p,neutral>No thanks, it sounds quite dangerous.");
+~chatnpc("<p,neutral>Aye, that it be. Come back when yer liver ain't so lily-like, <text_gender("lad", "lass")>.");
+return;
+
+[label,fever_teach_word_refuse]
+~chatplayer("<p,sad>No, if it's so dangerous your crew left, count me out.");
+~chatnpc("<p,neutral>Well, that doesn't surprise me much.");
+~chatnpc("<p,neutral>On yer way <text_gender("lad", "lass")>, leave me be.");
+return;
+
+[label,fever_teach_in_progress]
+~chatnpc("<p,angry>Let me finish my drink, landlubber!");
+~chatnpc("<p,neutral>If ye ain't up te scratch as a pirate I may not get another one.");
+~chatplayer("<p,happy>Aye aye Cap'n!");
+~chatnpc("<p,confused>Just remember, <text_gender("he", "she")>'s all ye could get, Bill, and maybe ye'll get through it...");
+return;
