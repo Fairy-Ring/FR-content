@@ -1,0 +1,101 @@
+// Rum Deal start-gate — Pirate Pete (deal_pete 2825) @ 3680,3537.
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Rum Deal + Pirate Pete
+// minus later chrome (skill-warning toast, RS3 Overview, RfD, Mos Le’ lift, TB).
+// Hunt 289? no. New quest_deal/ — never write into quest_fever.
+// This slice: Talk-to + refuse + keep-money accept %deal_quest 0→1.
+// STOP after "What diversion?" — no knock-out tele, no island.
+
+[opnpc1,deal_pete]
+if (%deal_quest > 0) {
+    @deal_pete_started;
+}
+@deal_pete_start;
+
+[label,deal_pete_start]
+~chatplayer("<p,happy>Hello there!");
+~chatnpc("<p,neutral>Mornin'.");
+// Period kbase 13 Feb 2006 lists Farming 40 / Fishing 50 / Prayer 47 /
+// Crafting 42 / Slayer 42. Same spoken refuse for all (NPC transcript).
+// Zogre is listed on the kbase box — no Zogre-specific sentence this slice.
+if (stat(farming) < 40 | stat(fishing) < 50 | stat(prayer) < 47 | stat(crafting) < 42 | stat(slayer) < 42) {
+    @deal_pete_lacking;
+}
+@deal_pete_pitch;
+
+[label,deal_pete_lacking]
+~chatplayer("<p,quiz>Got any quests?");
+~chatnpc("<p,neutral>I may have a quest, but you don't look like you'd be able to handle the kind of monsters I have problems with.");
+return;
+
+[label,deal_pete_pitch]
+~chatnpc("<p,quiz>Hey...you're an adventurer, right?");
+~chatplayer("<p,happy>Yes I am!");
+~chatplayer("<p,quiz>Got any quests for me?");
+~chatnpc("<p,happy>Yeah, I do, as a matter of fact!");
+~chatnpc("<p,neutral>(Ahem.)");
+~chatnpc("<p,sad>I am a poor, dispossessed nobleman, forced by circumstance to lurk in the middle of nowhere, soliciting help from passers-by.");
+~chatnpc("<p,sad>You see, my fiendish half-brother has seized my estates and forced me into exile.");
+~chatnpc("<p,sad>The simple lemon farmers suffer under his tyrannous yoke, and only a brave adventurer can lift his iron boot from the neck of the poor.");
+~chatnpc("<p,neutral>To reclaim my lands I will need to have my family sword returned to me so that I may present it as proof of my rulership.");
+~chatnpc("<p,quiz>Will you help me find my family sword?");
+def_int $help = ~p_choice2("Yes", 1, "No", 2);
+if ($help = 2) {
+    @deal_pete_heroic_refuse;
+}
+@deal_pete_barrelor;
+
+[label,deal_pete_barrelor]
+~chatplayer("<p,happy>Yes! Your uncorroborated sob story has touched my heart. When do we set off?");
+~chatnpc("<p,happy>You'll help! Wonderful!");
+~chatnpc("<p,sad>But, alas, my half brother has a powerful ally, the mighty demon...");
+~chatnpc("<p,confused>Err...");
+~chatnpc("<p,confused>Err...Barrelor!");
+~chatnpc("<p,shock>Yes, the mighty, fearsome, tall, deadly, oaken, round demon Barrelor the Destroyer.");
+~chatplayer("<p,quiz>Barrelor?");
+~chatnpc("<p,angry>That's what I said!");
+~chatnpc("<p,neutral>Barrelor is an awesome opponent, and to reclaim my family sword you will need to defeat him, for he guards it within the deadly Trapped Pit of Barrelor.");
+~chatnpc("<p,quiz>Wanna give it a shot?");
+def_int $shot = ~p_choice2("Of course, I fear no demon!", 1, "Not a chance, this sounds too dangerous.", 2);
+if ($shot = 2) {
+    ~chatplayer("<p,sad>Not a chance, this sounds too dangerous.");
+    @deal_pete_heroic_refuse_body;
+}
+@deal_pete_money;
+
+[label,deal_pete_money]
+~chatplayer("<p,happy>Of course, I fear no demon!");
+~chatnpc("<p,happy>Atta <text_gender("boy", "girl")>!");
+~chatnpc("<p,sad>When I am reinstated in my rightful place, I will not be a very wealthy man, as my half-brother has squandered my family fortune.");
+~chatnpc("<p,sad>However, I will gladly give you every bent penny of what is left, and starve in the gutter with my many, many adorable children, if you say you will help me.");
+def_int $cash = ~p_choice2("Nonsense! Keep the money!", 1, "Great, I'll take the cash in used coins please.", 2);
+if ($cash = 2) {
+    @deal_pete_cash_refuse;
+}
+@deal_pete_accept;
+
+[label,deal_pete_accept]
+~chatplayer("<p,happy>Nonsense! Keep the money! I will dispose of this evil half-brother of yours and leave you what little money is left to feed your family.");
+~chatnpc("<p,happy>Wonderful! Just pick up your diversion and we'll leave!");
+~chatplayer("<p,quiz>What diversion?");
+%deal_quest = 1;
+return;
+
+[label,deal_pete_heroic_refuse]
+~chatplayer("<p,neutral>No, I don't think I'll help you out this time.");
+@deal_pete_heroic_refuse_body;
+
+[label,deal_pete_heroic_refuse_body]
+~chatnpc("<p,neutral>Look, I think I'll wait here for someone a little more... you know...");
+~chatnpc("<p,neutral>...heroic.");
+return;
+
+[label,deal_pete_cash_refuse]
+~chatplayer("<p,happy>Great, I'll take the cash in used coins please.");
+~chatnpc("<p,confused>Er...");
+@deal_pete_heroic_refuse_body;
+
+[label,deal_pete_started]
+// Slice stop: no knock-out / island tele. Repeat the cap line only.
+~chatnpc("<p,happy>Wonderful! Just pick up your diversion and we'll leave!");
+~chatplayer("<p,quiz>What diversion?");
+return;
