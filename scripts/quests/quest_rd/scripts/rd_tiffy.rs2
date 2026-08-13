@@ -1,0 +1,127 @@
+// Recruitment Drive start-gate — Sir Tiffy Cashien (rd_teleporter_guy 2290).
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Recruitment Drive minus later Changes
+// (Wanted! / Proselyte / post-2006 rank QoL). Official Update:Recruitment Drive 27 Jun 2005
+// names Amik; cache start surface is Tiffy @ 2997,3373. Hunt 289? no.
+// This slice: Talk-to + refuse + accept start bits only. No instance tele. No puzzles.
+
+[opnpc1,rd_teleporter_guy]
+if (%rd_main >= ^recruitmentdrive_complete) {
+    @rd_tiffy_complete;
+} else if (%rd_main > 0) {
+    @rd_tiffy_in_progress;
+}
+@rd_tiffy_start;
+
+[label,rd_tiffy_start]
+// Era deps: BKF + Druidic Ritual (wave3 / 2007-base reqs). Soft smoke may pre-set these.
+if (%spy < ^blackknight_complete | %druidquest < ^druid_complete) {
+    @rd_tiffy_park_chat;
+}
+@rd_tiffy_testing_intro;
+
+[label,rd_tiffy_park_chat]
+// Transcript: "Talking to Sir Tiffy Cashien before starting the quest"
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,happy>What ho, sirrah. Spiffing day for a walk in the park, what?");
+~chatplayer("<p,quiz>...spiffing?");
+~chatnpc("<p,happy>Absolutely, top-hole! Well, can't stay and chat all day, dontchaknow!|Ta-ta for now!");
+~chatplayer("<p,confused>Erm... goodbye.");
+return;
+
+[label,rd_tiffy_testing_intro]
+// Tiffy-first CANDIDATE: treat dep-complete as Amik-sent (Amik RD branch is a later unit).
+~chatplayer("<p,quiz>Sir Amik Varze sent me to meet you here for some sort of testing...?");
+~chatnpc("<p,happy>Ah, <displayname>! Amik told me all about you, dontchaknow!|Spiffing job you did with the old Black Knights there, absolutely first class.");
+~chatplayer("<p,confused>...thanks, I think.");
+~chatnpc("<p,happy>Well, a top-notch fellow like yourself is just the right sort we've been seeking for our organisation.");
+@rd_tiffy_ready_menu;
+
+[label,rd_tiffy_ready_menu]
+def_int $choice = ~p_choice4("Testing...?", 1, "Organisation...?", 2, "Yes, let's go!", 3, "No, I've changed my mind.", 4);
+if ($choice = 1) {
+    @rd_tiffy_testing;
+} else if ($choice = 2) {
+    @rd_tiffy_organisation;
+} else if ($choice = 3) {
+    @rd_tiffy_accept;
+}
+@rd_tiffy_refuse;
+
+[label,rd_tiffy_testing]
+~chatplayer("<p,quiz>...testing? What exactly do you mean by testing?");
+~chatnpc("<p,shock>Jolly bad show! Varze was supposed to have informed you about all this before sending you here!");
+~chatnpc("<p,neutral>Well, not your fault I suppose, what? Anywho, our organisation is looking for a certain specific type of person to join.");
+~chatplayer("<p,quiz>So... You want me to go kill some monster or something for you?");
+~chatnpc("<p,neutral>Not at all, old bean. There's plenty of warriors around should we require dumb muscle.");
+~chatnpc("<p,neutral>That's really not the kind of thing our organisation is after, what?");
+~chatplayer("<p,angry>So you want me to go and fetch you some kind of common item,|and then take it for delivery somewhere on the other side of the country?");
+~chatplayer("<p,angry>Because I really hate doing that!");
+~chatnpc("<p,laugh>Haw haw haw What a dull thing to ask of someone, what?");
+~chatnpc("<p,happy>I know what you mean though, I did my fair share of running errands when I was a young adventurer, myself!");
+~chatplayer("<p,quiz>So what exactly will this test consist of?");
+~chatnpc("<p,neutral>Can't let just any old riff-raff in, what? The mindless thugs and bully boys are best left in the White Knights or the Guards, we look for the top-shelf brains to join us.");
+~chatplayer("<p,quiz>So you want to test my brains? Will it hurt?");
+~chatnpc("<p,laugh>Haw Haw Haw That's a good one!");
+~chatnpc("<p,happy>Not in the slightest... Well, maybe a bit, but we all have to make sacrifices occasionally, what?");
+~chatplayer("<p,quiz>What do you want me to do then?");
+~chatnpc("<p,neutral>It's a test of wits, what? I'll take you to our secret training grounds, and you will have to pass through a series of five separate intelligence tests to prove you're our sort of adventurer.");
+~chatnpc("<p,neutral>Standard puzzle room rules will apply.");
+~chatplayer("<p,confused>Erm... what are 'standard puzzle room rules' exactly?");
+~chatnpc("<p,quiz>Never done this sort of thing before, what?");
+~chatnpc("<p,neutral>The simple rules are: No items or equipment to be brought with you.|Each room is a self contained puzzle. You may quit at any time.");
+~chatnpc("<p,neutral>Of course, if you quit a room, then all your progress up to that point will be cleared, and you'll have to start again from scratch.");
+~chatnpc("<p,happy>Our organisation manages to filter all the top-notch adventurers this way.|So, are you ready to go?");
+@rd_tiffy_ready_menu;
+
+[label,rd_tiffy_organisation]
+~chatplayer("<p,quiz>This organisation you keep mentioning... Perhaps you could tell me a little about it?");
+~chatnpc("<p,shock>Oh, that Amik! Jolly bad form, did he not tell you anything that he was supposed to?");
+~chatplayer("<p,sad>No... He didn't really tell me anything except to come here and meet you...");
+~chatnpc("<p,happy>Well now old sport, let me give you the heads up and the low down, what?");
+~chatnpc("<p,neutral>I represent the Temple Knights. We are the premier order of Knights in Asgarnia, if not the world.|Saradomin himself personally founded our order centuries ago, and we answer only to him.");
+~chatnpc("<p,neutral>Only the very best of the best are permitted to join, and the powers we command are formidable indeed.");
+~chatnpc("<p,happy>You might say that we are the front line of defence for the entire kingdom!");
+~chatplayer("<p,quiz>So what's the difference between you and the White Knights?");
+~chatnpc("<p,happy>Well, in simple terms, we're better! Any fool with a sword can manage to get into the White Knights, which is mostly the reason they are so very, very incompetent, what?");
+~chatnpc("<p,neutral>The Temple Knights on the other hand have to be smarter, stronger, better than all others.|We are the elite. No man controls us for our orders come directly from Saradomin himself!");
+~chatplayer("<p,happy>Cool, you mean I get to meet Saradomin?");
+~chatnpc("<p,confused>Well, uh, not exactly... Sir Vey Lance, our head of operations, is the only one of our order who has ever personally met Saradomin, but everything he tells us to do is done with Saradomin's implicit permission.");
+~chatnpc("<p,happy>It's not every job where you have more authority than the king, now is it?");
+~chatplayer("<p,shock>Wait... You can order the King around?!?!");
+~chatnpc("<p,neutral>Well, not me personally, I'm only in the recruitment side of things dontchaknow, but the higher ranking members of the organisation have almost absolute power over this kingdom.");
+~chatnpc("<p,neutral>Plus a few others, so I hear....");
+~chatnpc("<p,happy>Anyway, this is why we keep our organisation shrouded in secrecy, and why we demand such rigorous testing for all potential recruits.|Speaking of which, are you ready to begin your testing?");
+@rd_tiffy_ready_menu;
+
+[label,rd_tiffy_accept]
+~chatplayer("<p,happy>Yeah, this sounds right up my street. Let's go!");
+%rd_spoke_to_tiffy = 1;
+%rd_main = 1;
+// Slice stop: no empty-inv check, no "Here we go" tele. Portal / grounds = later unit.
+~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
+return;
+
+[label,rd_tiffy_refuse]
+~chatplayer("<p,confused>Well... I don't know... This doesn't really sound like my kind of thing...");
+~chatplayer("<p,neutral>To be honest, I'd rather go kill stuff for loot than use my mind to work things out...");
+~chatnpc("<p,neutral>Well, it takes all sorts to make the world spin, what? Maybe you'll find a nice job with the Guards sometime.");
+~chatnpc("<p,sad>Sad though, your intelligence file seemed quite promising.|Should you change your mind, you come back and let me know, what?");
+return;
+
+[label,rd_tiffy_in_progress]
+~chatnpc("<p,happy>Ah, what ho! Back for another go at the old testing, what?");
+def_int $again = ~p_choice2("Yes, let's go!", 1, "No, I've changed my mind.", 2);
+if ($again = 1) {
+    ~chatplayer("<p,happy>Yeah, this sounds right up my street. Let's go!");
+    // Still no tele this slice.
+    ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
+} else {
+    @rd_tiffy_refuse;
+}
+return;
+
+[label,rd_tiffy_complete]
+// No Wanted! branch until RD complete surface is real (not soft setvar 2).
+~chatplayer("<p,happy>Hello.");
+~chatnpc("<p,happy>What ho, <displayname>! Spiffing to see you again, what?");
+return;
