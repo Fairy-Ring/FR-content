@@ -1,0 +1,89 @@
+// Desert Treasure start-gate — Archaeologist (fourdiamonds_indiana 1918) @ 3178,3043.
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Desert Treasure minus DT2 rename /
+// Desert Treasure I overlay / skill toast / RS3 Overview. Hunt 289? no.
+// Display stays Archaeologist (not Asgarnia Smith). Spoken name only in Who-are-you.
+// Accept: %deserttreasure 0→1 + four_diamonds_etchings. No Terry / diamonds / AM.
+
+[opnpc1,fourdiamonds_indiana]
+if (%deserttreasure > 0) {
+    @dt_arch_started;
+}
+@dt_arch_hello;
+
+[label,dt_arch_hello]
+~chatplayer("<p,neutral>Hello there.");
+// Period kbase six quests. OSRS dump: silent ignore if missing (no spoken fail).
+if (~itexam_progress() < ^itexam_complete | %desertrescue < ^desertrescue_complete | (%ikov < ^ikov_completed_armadyl & %ikov < ^ikov_completed_lucien) | %priestperil < ^priestperil_complete | %waterfall_quest < ^waterfall_complete | %troll_quest < ^troll_complete) {
+    mes("He seems to be lost in his own thoughts...");
+    return;
+}
+~chatnpc("<p,quiz>Howdy stranger. What brings you out to these parts?");
+@dt_arch_menu;
+
+[label,dt_arch_menu]
+def_int $opt = ~p_choice4("What are you doing here?", 1, "Do you have any quests?", 2, "Who are you?", 3, "Nothing really.", 4);
+if ($opt = 1) {
+    @dt_arch_doing;
+} else if ($opt = 2) {
+    @dt_arch_quests;
+} else if ($opt = 3) {
+    @dt_arch_who;
+}
+~chatplayer("<p,neutral>Nothing really. I'm just wandering around for no good reason.");
+~chatnpc("<p,neutral>Uh-huh. Well, if you'll excuse me, I have a lot more work to do before I can bed down for the night.");
+return;
+
+[label,dt_arch_doing]
+~chatplayer("<p,quiz>Nothing much - What are you doing here? It doesn't seem like there's much to do out here in the desert!");
+~chatnpc("<p,neutral>Well, that's where you'd be wrong. I work for the Archaeological Society of Varrock, and have been excavating around here recently.");
+~chatnpc("<p,quiz>Was there something you specifically wanted?");
+@dt_arch_menu;
+
+[label,dt_arch_who]
+~chatplayer("<p,quiz>Who are you, anyway?");
+~chatnpc("<p,shock>You don't recognise me??? I am the world famous Asgarnia Smith, Archaeologist extraordinaire!");
+~chatnpc("<p,happy>I am the one who discovered the long forgotten Temple of Ikov! The one who unearthed the strange trap filled arena in Brimhaven!");
+~chatnpc("<p,happy>I'm the leading archaeological expert of our time! I was voted archaeologist of the year four years running by the Varrock Herald! Are you REALLY sure you've never heard of me?");
+~chatplayer("<p,neutral>No, I really haven't.");
+~chatnpc("<p,confused>Well then, I'm confused. Why did you come over and speak to me if you don't know who I am? What do you want?");
+@dt_arch_menu;
+
+[label,dt_arch_quests]
+~chatplayer("<p,quiz>Do you have any quests? Call it a hunch, but you look like the type of man who might...");
+~chatnpc("<p,neutral>Well, it's funny you should say that. I'm not sure if I would really call it a quest as such, but I found this ancient stone tablet in one of my excavations, and it would really help me out if you could go and take it back to the digsite for me and get it examined.");
+~chatnpc("<p,neutral>It's very old, and I don't recognise any of the inscriptions on it.");
+def_int $yes = ~p_choice2("Yes", 1, "No", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,neutral>No thanks. Playing delivery boy doesn't really sound much like fun to me.");
+    ~chatnpc("<p,neutral>Well, okay. Can't say as I blame you for thinking that. I'll go take it there myself later I guess.");
+    return;
+}
+@dt_arch_accept;
+
+[label,dt_arch_accept]
+if (inv_itemspace(inv, four_diamonds_etchings, 1, inv_size(inv)) = false) {
+    ~chatnpc("<p,neutral>Well, you're going to have to clear some junk out of your inventory before I hand this over.");
+    return;
+}
+~chatplayer("<p,happy>Sure, I was heading that way anyway. Any particular person at the digsite you want me to talk to?");
+~chatnpc("<p,neutral>His name's Terry Balando. Give it to nobody but him. I'm sorry, I can't entrust you with the actual tablet I found, it is far too valuable to give away, but I took these etchings - they should be enough for him to make a preliminary translation on.");
+~chatnpc("<p,happy>Come back and let me know what he says, I would hate to waste my time excavating anything that isn't worth my time as a world famous archaeologist!");
+inv_add(inv, four_diamonds_etchings, 1);
+%deserttreasure = 1;
+return;
+
+[label,dt_arch_started]
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,quiz>So what did Terry Balando say about those etchings? Did he give you a translation for me?");
+if (inv_total(inv, four_diamonds_etchings) < 1) {
+    ~chatplayer("<p,sad>Um... yeah... about that... I kind of lost those etchings you gave me...");
+    ~chatnpc("<p,shock>Well how in the world did you do that? (sigh) Okay, I'll make another set, but try not to lose these ones this time!");
+    if (inv_itemspace(inv, four_diamonds_etchings, 1, inv_size(inv)) = true) {
+        inv_add(inv, four_diamonds_etchings, 1);
+    }
+    return;
+}
+~chatplayer("<p,sad>Um... yeah... about that... I kind of didn't go and speak to him yet...");
+~chatnpc("<p,angry>Well what are you waiting for? A written invitation? All I want you to do is take those etchings up to the digsite for me!");
+~chatplayer("<p,neutral>Okay, I'll do that then.");
+return;
