@@ -1,5 +1,17 @@
 [oplocu,spinning_wheel]
-switch_obj (last_useitem) 
+@spinning_wheel_use;
+
+// 274: category _spinning_wheel + Rellekka gate. 377 has no free spinning_wheel category id
+// (92 is priestperil_monument). Bind the Rellekka loc explicitly; keep 377 unpack models.
+[oplocu,viking_spinningwheel]
+if (%viking < ^viking_complete) {
+    mes("Only Fremenniks may use this spinning wheel.");
+    return;
+}
+@spinning_wheel_use;
+
+[label,spinning_wheel_use]
+switch_obj (last_useitem)
 {
     case wool : @craft_spinning(last_useitem);
     case flax :
@@ -8,8 +20,23 @@ switch_obj (last_useitem)
             return;
         }
         @craft_spinning(last_useitem);
+    // 274: delay path, not weakqueue (not until after 2007). May 2006 = p_delay.
+    case viking_golden_fleece :
+        if (map_members = ^false) {
+            mes(^mes_members_feature);
+            return;
+        }
+        anim(human_spinningwheel, 0);
+        loc_anim(spinningwheel);
+        sound_synth(spinning, 1, 0);
+        inv_del(inv, viking_golden_fleece, 1);
+        inv_add(inv, viking_golden_wool, 1);
+        mes("You spin the fleece into some golden string.");
+        stat_advance(crafting, 25);
+        p_delay(2);
     case ball_of_wool : ~objbox(ball_of_wool, "You have already spun this wool.", 250, 0, divide(^objbox_height, 2));
     case bow_string : ~objbox(bow_string, "You have already spun this bow string.", 250, 0, divide(^objbox_height, 2));
+    case viking_golden_wool : ~objbox(viking_golden_wool, "You have already spun this wool.", 250, 0, divide(^objbox_height, 2));
     case default : ~displaymessage(^dm_default);
 };
 
