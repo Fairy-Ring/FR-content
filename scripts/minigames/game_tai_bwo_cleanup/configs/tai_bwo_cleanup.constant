@@ -9,3 +9,5 @@
 ^tbw_hack_xp_med = 550
 ^tbw_hack_xp_dense = 800
 ^tbw_jungle_respawn = 200
+// CANDIDATE last-resort (Tip.it cleanup page + 2007-base): 10 sticks per item.
+^tbw_parcel_fee = 10

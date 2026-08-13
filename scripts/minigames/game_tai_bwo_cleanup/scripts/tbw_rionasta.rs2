@@ -1,0 +1,75 @@
+// Leftover tai_bwo_wannai_parcel_service 14187.
+// Rionasta Talk-to only (no Trade). News 9 Aug 2005 names a postal system.
+// CANDIDATE: leftover IF is that surface; leftover 7x4 shows the backpack.
+// Pack fee 10 village_trade_sticks / item (Tip.it + 2007-base). Send-parcel
+// right-click is 31 Jul 2006 — OOS. Hunt 289? no.
+
+[opnpc1,tbwcu_rionasta] @tbw_open_parcel;
+[opnpc1,tbwcu_rionasta_nosticks] @tbw_open_parcel;
+
+[label,tbw_open_parcel]
+inv_transmit(inv, tai_bwo_wannai_parcel_service:com_2);
+if_openmain(tai_bwo_wannai_parcel_service);
+
+[if_close,tai_bwo_wannai_parcel_service]
+inv_stoptransmit(tai_bwo_wannai_parcel_service:com_2);
+
+[inv_button1,tai_bwo_wannai_parcel_service:com_2] @tbw_parcel_value(last_slot);
+[inv_button2,tai_bwo_wannai_parcel_service:com_2] @tbw_parcel_pack(last_slot, 1);
+[inv_button3,tai_bwo_wannai_parcel_service:com_2] @tbw_parcel_pack(last_slot, 5);
+[inv_button4,tai_bwo_wannai_parcel_service:com_2] @tbw_parcel_pack(last_slot, ^max_32bit_int);
+[inv_button5,tai_bwo_wannai_parcel_service:com_2] @tbw_parcel_pack(last_slot, null);
+
+[proc,tbw_parcel_blocked](obj $item)(boolean)
+if ($item = coins | $item = village_trade_sticks) {
+    mes("You can't pack that.");
+    return (true);
+}
+if (~bank_check_nobreak($item) = true) {
+    return (true);
+}
+return (false);
+
+[label,tbw_parcel_value](int $slot)
+def_obj $item = inv_getobj(inv, $slot);
+if ($item = null) {
+    return;
+}
+if (~tbw_parcel_blocked($item) = true) {
+    return;
+}
+def_int $n = inv_total(inv, $item);
+def_int $fee = multiply($n, ^tbw_parcel_fee);
+def_string $name = oc_name($item);
+mes("<$name>: packing all <tostring($n)> would cost <tostring($fee)> trading sticks.");
+
+[label,tbw_parcel_pack](int $slot, int $requested_number)
+def_obj $item = inv_getobj(inv, $slot);
+if ($item = null) {
+    return;
+}
+if (~tbw_parcel_blocked($item) = true) {
+    return;
+}
+if ($requested_number <= 0) {
+    p_countdialog;
+    if (last_int <= 0) {
+        return;
+    }
+    $requested_number = last_int;
+}
+def_int $have = inv_total(inv, $item);
+def_int $n = $requested_number;
+if ($n > $have) {
+    $n = $have;
+}
+if ($n < 1) {
+    return;
+}
+def_int $fee = multiply($n, ^tbw_parcel_fee);
+if (inv_total(inv, village_trade_sticks) < $fee) {
+    mes("You need <tostring($fee)> trading sticks to pack that.");
+    return;
+}
+inv_del(inv, village_trade_sticks, $fee);
+~bank_deposit_request(inv, $item, $n, $slot);

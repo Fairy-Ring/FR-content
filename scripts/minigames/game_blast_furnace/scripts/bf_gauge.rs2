@@ -1,0 +1,7 @@
+// Leftover blast_furnace_temp_gauge 14594.
+// Unpack loc blast_furnace_gauge 9089 op1=Read. Official Update 23 Aug 2005.
+// First mid-gate: leftover chrome only. Hunt 289? no.
+
+[oploc1,blast_furnace_gauge]
+p_arrivedelay;
+if_openmain(blast_furnace_temp_gauge);
