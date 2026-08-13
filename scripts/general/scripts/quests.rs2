@@ -41,15 +41,15 @@ switch_component ($component) {
     case default ://All other quests
         ~update_questpoints;
         split_init($rewardtext, 200, 5, q8_full);
-        if_settext(inter_238:com_3, $questmessage);
-        if_settext(inter_238:com_9, "<~pluralise($questpoints, "Quest Point")>");
-        if_settext(inter_238:com_10, split_get(0, 0));
-        if_settext(inter_238:com_11, split_get(0, 1));
-        if_settext(inter_238:com_12, split_get(0, 2));
-        if_settext(inter_238:com_13, split_get(0, 3));
-        if_settext(inter_238:com_14, split_get(0, 4));
-        if_setobject(inter_238:com_4, $obj, $objscale);
-        if_openmain(inter_238);
+        if_settext(questscroll_death:com_3, $questmessage);
+        if_settext(questscroll_death:com_9, "<~pluralise($questpoints, "Quest Point")>");
+        if_settext(questscroll_death:com_10, split_get(0, 0));
+        if_settext(questscroll_death:com_11, split_get(0, 1));
+        if_settext(questscroll_death:com_12, split_get(0, 2));
+        if_settext(questscroll_death:com_13, split_get(0, 3));
+        if_settext(questscroll_death:com_14, split_get(0, 4));
+        if_setobject(questscroll_death:com_4, $obj, $objscale);
+        if_openmain(questscroll_death);
 }
 // Update Quest Tab color
 if_setcolour($component, ^green_rgb);

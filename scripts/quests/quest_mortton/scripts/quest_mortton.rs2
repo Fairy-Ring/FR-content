@@ -66,7 +66,7 @@ stat_advance(crafting,20000);
 stat_advance(herblore,20000);
 session_log(^log_adventure, "Quest complete: Shades of Mort'ton");
 //https://i.imgur.com/wgfP5rK.png
-// Title = 274. 6th arg = inter_238 lines (com_10–14); com_9 already prints QP.
+// Title = 274. 6th arg = questscroll_death 12140 lines (com_10–14); com_9 already prints QP.
 ~send_quest_complete(questlist:mortton, shadekey_silver_purple, 250, ^mortton_questpoints, "'Shades of Mort'ton' Quest Complete!", "2,000 Crafting XP|2,000 Herblore XP");
 
 [label,craft_limestonebrick]

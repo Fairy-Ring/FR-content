@@ -1,11 +1,11 @@
 [label,castlewars_ticket_exchange]
-inv_transmit(inv, inter_269:com_0);
+inv_transmit(inv, castlewars_trade_side:inv);
 inv_transmit(castlewars_trade_tickets, castlewars_trade:com_90);
 inv_transmit(castlewars_trade_coins, castlewars_trade:com_91);
-if_openmain_side(castlewars_trade, inter_269);
+if_openmain_side(castlewars_trade, castlewars_trade_side);
 
 [if_close,castlewars_trade]
-inv_stoptransmit(inter_269:com_0);
+inv_stoptransmit(castlewars_trade_side:inv);
 inv_stoptransmit(castlewars_trade:com_90);
 inv_stoptransmit(castlewars_trade:com_91);
 
@@ -27,7 +27,7 @@ def_int $item_value = oc_cost($item);
 mes("<$item_name>: currently costs <tostring($item_value)>gp."); // todo: confirm
 
 // sell value
-[inv_button1,inter_269:com_0]
+[inv_button1,castlewars_trade_side:inv]
 def_obj $item = oc_uncert(inv_getobj(inv, last_slot));
 def_string $item_name = oc_name($item);
 if ($item = castlewars_manual) {
@@ -42,7 +42,7 @@ if ($item_value = null) {
 mes("The <lowercase($item_name)> sells for <tostring($item_value)> tickets."); // https://youtu.be/oqwXfZX_x_M?t=496
 
 // sell
-[inv_button2,inter_269:com_0]
+[inv_button2,castlewars_trade_side:inv]
 def_obj $item = oc_uncert(inv_getobj(inv, last_slot));
 if ($item = castlewars_manual) {
     if(inv_itemspace(castlewars_trade_coins, $item, 1, inv_size(castlewars_trade_coins)) = false) {

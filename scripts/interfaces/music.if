@@ -6375,7 +6375,7 @@ shadowed=yes
 text=Playing:
 colour=0xFFFF00
 
-[com_180]
+[auto]
 type=graphic
 x=66
 y=7
@@ -6387,7 +6387,7 @@ script1=eq,1
 graphic=miscgraphics2,0
 activegraphic=miscgraphics2,1
 
-[com_181]
+[manual]
 type=graphic
 x=105
 y=7
@@ -6432,7 +6432,7 @@ shadowed=yes
 text=Player
 colour=0x0FF999
 
-[com_251]
+[loop]
 type=graphic
 x=144
 y=7

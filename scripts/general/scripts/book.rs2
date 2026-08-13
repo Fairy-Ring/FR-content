@@ -65,28 +65,28 @@ while ($page < $pagetotal) {
 }
 
 [proc,book_page](string $title, int $page)
-if_settext(book:com_88, split_get($page, 0));
-if_settext(book:com_89, split_get($page, 1));
-if_settext(book:com_90, split_get($page, 2));
-if_settext(book:com_91, split_get($page, 3));
-if_settext(book:com_92, split_get($page, 4));
-if_settext(book:com_93, split_get($page, 5));
-if_settext(book:com_94, split_get($page, 6));
-if_settext(book:com_95, split_get($page, 7));
-if_settext(book:com_96, split_get($page, 8));
-if_settext(book:com_97, split_get($page, 9));
-if_settext(book:com_98, split_get($page, 10));
-if_settext(book:com_99, split_get($page, 11));
-if_settext(book:com_100, split_get($page, 12));
-if_settext(book:com_101, split_get($page, 13));
-if_settext(book:com_102, split_get($page, 14));
-if_settext(book:com_103, split_get($page, 15));
-if_settext(book:com_104, split_get($page, 16));
-if_settext(book:com_105, split_get($page, 17));
-if_settext(book:com_106, split_get($page, 18));
-if_settext(book:com_107, split_get($page, 19));
-if_settext(book:com_108, split_get($page, 20));
-if_settext(book:com_109, split_get($page, 21));
+if_settext(book:page_left_text_1, split_get($page, 0));
+if_settext(book:page_left_text_2, split_get($page, 1));
+if_settext(book:page_left_text_3, split_get($page, 2));
+if_settext(book:page_left_text_4, split_get($page, 3));
+if_settext(book:page_left_text_5, split_get($page, 4));
+if_settext(book:page_left_text_6, split_get($page, 5));
+if_settext(book:page_left_text_7, split_get($page, 6));
+if_settext(book:page_left_text_8, split_get($page, 7));
+if_settext(book:page_left_text_9, split_get($page, 8));
+if_settext(book:page_left_text_10, split_get($page, 9));
+if_settext(book:page_left_text_11, split_get($page, 10));
+if_settext(book:page_right_text_1, split_get($page, 11));
+if_settext(book:page_right_text_2, split_get($page, 12));
+if_settext(book:page_right_text_3, split_get($page, 13));
+if_settext(book:page_right_text_4, split_get($page, 14));
+if_settext(book:page_right_text_5, split_get($page, 15));
+if_settext(book:page_right_text_6, split_get($page, 16));
+if_settext(book:page_right_text_7, split_get($page, 17));
+if_settext(book:page_right_text_8, split_get($page, 18));
+if_settext(book:page_right_text_9, split_get($page, 19));
+if_settext(book:page_right_text_10, split_get($page, 20));
+if_settext(book:page_right_text_11, split_get($page, 21));
 if_settext(book:book_title, $title);
 if_settext(book:com_110, ""); // Set page number to blank (left side) - Not used until way past 377
 if_settext(book:com_111, ""); // Set page number to blank (right side) - Not used until way past 377
@@ -101,15 +101,15 @@ if (%book_page > $max_page) {
 }
 
 if (%book_page = $min_page) {
-    if_sethide(book:com_85, true);
+    if_sethide(book:page_left_button, true);
 } else {
-    if_sethide(book:com_85, false);
+    if_sethide(book:page_left_button, false);
 }
 
 if (%book_page = $max_page) {
-    if_sethide(book:com_87, true);
+    if_sethide(book:page_right_button, true);
 } else {
-    if_sethide(book:com_87, false);
+    if_sethide(book:page_right_button, false);
 }
 
 //if_settext(book:com_110, "<tostring(add(multiply(%book_page, 2), 1))>"); // Update page number display (left side) - Not used until way past 377

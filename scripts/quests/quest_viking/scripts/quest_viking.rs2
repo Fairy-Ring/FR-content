@@ -145,7 +145,7 @@ stat_advance(thieving, 28124);
 %viking = ^viking_complete;
 session_log(^log_adventure, "Quest complete: The Fremennik Trials");
 queue(fremennik_name, 0, 0);
-// Title "Fremmenik" is 274 (keep). 6th arg is 377 inter_238 reward lines (com_10–14);
+// Title "Fremmenik" is 274 (keep). 6th arg is 377 questscroll_death (12140) reward lines (com_10–14);
 // do not pass "3 Quest Points" — com_9 already pluralises ^viking_questpoints.
 // XP lines match the ten stat_advance(28124) above (tenths = 2,812.4).
 ~send_quest_complete(questlist:viking, viking_helmet, 150, ^viking_questpoints, "You have completed the\\nTrials of the Fremmenik Quest!", "2,812.4 XP in each of ten skills|Access to Fremennik shops|A Fremennik name");

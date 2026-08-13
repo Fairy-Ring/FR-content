@@ -1,11 +1,11 @@
-[if_button,music:com_180]
+[if_button,music:auto]
 %musicplay = 1;
 @music_playbyregion(coord);
 
-[if_button,music:com_181]
+[if_button,music:manual]
 %musicplay = 0;
 
-[if_button,music:com_251]
+[if_button,music:loop]
 if (%musicloop = 0) {
     %musicloop = 1;
     // July 2006 mes (274); LOOP button + musicloop varp are on the 377 IF/pack

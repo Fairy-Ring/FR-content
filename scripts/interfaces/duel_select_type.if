@@ -1414,7 +1414,7 @@ graphic=miscgraphics,10
 activegraphic=miscgraphics,11
 option=Toggle option
 
-[com_157]
+[flower_power_text]
 type=text
 x=52
 y=275
