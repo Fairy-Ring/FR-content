@@ -1,0 +1,134 @@
+// Mountain Daughter start-gate — Hamal the Chieftain (mdaughter_hamal 1807) @ 2811,3673.
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Mountain Daughter (Hamal's Daughter)
+// minus RS3 Overview / Agility overlay / option collapse. Hunt 289? no.
+// Accept: %mdaughter_quest_var 0→1 only. No Ragnar / pool / rockslide / Kendal.
+
+[opnpc1,mdaughter_hamal]
+if (%mdaughter_quest_var > 0) {
+    @mdaughter_hamal_progress;
+}
+@mdaughter_hamal_start;
+
+[label,mdaughter_hamal_start]
+~chatnpc("<p,neutral>Greetings, outerlander, I am Hamal. I am the chieftain of this tribe.");
+if (%viking >= ^viking_complete) {
+    ~chatplayer("<p,neutral>And my name is <~get_viking_name>, honourable chieftain.");
+} else {
+    ~chatplayer("<p,neutral>And my name is <displayname>, honourable chieftain.");
+}
+~chatnpc("<p,happy>Ah, an outerlander with manners.");
+~chatnpc("<p,quiz>So tell me what you want from us.");
+if (%viking >= ^viking_complete) {
+    def_int $open3 = ~p_choice3("Why is everyone so hostile?", 1, "I'm looking for a quest!", 2, "Actually, I'm a Fremennik.", 3);
+    if ($open3 = 3) {
+        @mdaughter_hamal_fremennik;
+    } else if ($open3 = 2) {
+        @mdaughter_hamal_quest_joke;
+    }
+    @mdaughter_hamal_hostile;
+}
+def_int $open2 = ~p_choice2("Why is everyone so hostile?", 1, "I'm looking for a quest!", 2);
+if ($open2 = 2) {
+    @mdaughter_hamal_quest_joke;
+}
+@mdaughter_hamal_hostile;
+
+[label,mdaughter_hamal_hostile]
+~chatplayer("<p,quiz>Why is everyone being so hostile to me?");
+~chatnpc("<p,neutral>We are a solitary group, outerlander, and have little experience or interest in outside contact.");
+~chatnpc("<p,neutral>It is also our custom not to talk to outerlanders without my sanction. And I see no reason to sanction it for you.");
+def_int $camp = ~p_choice2("So what are you doing up here?", 1, "Oh, I'll stop talking to you then.", 2);
+if ($camp = 2) {
+    ~chatplayer("<p,neutral>Oh, I'll stop talking to you then.");
+    ~chatnpc("<p,neutral>As you wish, outerlander.");
+    return;
+}
+@mdaughter_hamal_camp_story;
+
+[label,mdaughter_hamal_camp_story]
+~chatplayer("<p,quiz>So what are you lot all doing up here in the mountains?");
+~chatnpc("<p,neutral>We left Rellekka because we wanted to live closer to nature. We feel that the people of Rellekka have grown complacent and rely too much on their tools rather than their skill. And while they share our view on the sanctity of the runestones, they still employ and actively use magic.");
+~chatnpc("<p,angry>Their Seer is an affront to the gods!");
+if (%viking >= ^viking_complete) {
+    ~chatplayer("<p,happy>And you haven't even seen what he did to his house!");
+    ~chatnpc("<p,quiz>What?");
+}
+~chatnpc("<p,neutral>Anyway.");
+~chatnpc("<p,neutral>We do not recognise the council of Rellekka and want nothing more to do with them. We live on rock and stone now, pure and hard.");
+~chatnpc("<p,neutral>We move on to another part of the mountain slope when the rough land cannot sustain us anymore.");
+~chatnpc("<p,sad>That said, we have tarried at this location for too long and should be moving on.");
+~chatplayer("<p,quiz>So why are you still here?");
+~chatnpc("<p,neutral>For one thing, this side of the mountain is mostly free from the menace of the trolls and the delvings of the deformed dwarves.");
+~chatplayer("<p,quiz>And?");
+~chatnpc("<p,sad>Well, you see...");
+~chatnpc("<p,sad>My daughter has gone missing. We have been looking for her and cannot go on without her.");
+@mdaughter_hamal_offer;
+
+[label,mdaughter_hamal_offer]
+def_int $offer = ~p_choice3("I will search for her!", 1, "I'm sorry to hear that.", 2, "Maybe the trolls got her?", 3);
+if ($offer = 2) {
+    ~chatplayer("<p,sad>I'm sorry to hear that.");
+    ~chatnpc("<p,angry>We do not need your sympathy, outerlander.");
+    return;
+} else if ($offer = 3) {
+    ~chatplayer("<p,quiz>Maybe the trolls got her?");
+    ~chatnpc("<p,angry>Do not say such things in jest, outerlander.");
+    ~chatnpc("<p,neutral>Besides, stealth and kidnapping is not their way.");
+    def_int $after = ~p_choice2("I will search for her!", 1, "Forget it then, you can figure it out on your own.", 2);
+    if ($after = 2) {
+        ~chatplayer("<p,neutral>Forget it then, you can figure it out on your own.");
+        return;
+    }
+}
+@mdaughter_hamal_accept;
+
+[label,mdaughter_hamal_accept]
+~chatplayer("<p,happy>A damsel in distress! I will search for her!");
+if (%viking >= ^viking_complete) {
+    ~chatnpc("<p,laugh>Haha, you have spirit, <~get_viking_name>.");
+} else {
+    ~chatnpc("<p,laugh>Haha, you have spirit, <displayname>.");
+}
+~chatnpc("<p,neutral>But we do not employ outerlanders.");
+~chatplayer("<p,happy>You don't need to employ me! Just let me look for her.");
+~chatnpc("<p,confused>Hmmm.");
+~chatnpc("<p,happy>That seems acceptable to me. Very well, I will allow you to look for her.");
+~chatnpc("<p,neutral>I will instruct my people to let you roam about the area freely, and give limited consent to them to talk to you.");
+~chatplayer("<p,happy>Great! I'll be back with her soon. Just wait here.");
+~chatnpc("<p,neutral>Oh, I'll be waiting here alright.");
+%mdaughter_quest_var = 1;
+return;
+
+[label,mdaughter_hamal_quest_joke]
+~chatplayer("<p,quiz>I'm looking for a quest! Do you have any for me?");
+~chatnpc("<p,neutral>We do not employ outerlanders.");
+~chatplayer("<p,quiz>Okay, I know the drill, where do I sign up for the trials to join your tribe?");
+~chatnpc("<p,angry>And we certainly don't let them join us!");
+return;
+
+[label,mdaughter_hamal_fremennik]
+~chatplayer("<p,happy>Actually, I'm a Fremennik, not an outerlander.");
+~chatnpc("<p,neutral>We are not Fremennik, outerlander.");
+~chatplayer("<p,quiz>But you look like Fremennik!");
+~chatnpc("<p,neutral>And you do not look like a Fremennik, but still claim to be one.");
+~chatnpc("<p,neutral>But I will not deceive you. We were part of the Fremennik once, but left the village of Rellekka long ago.");
+def_int $more = ~p_choice2("So what are you doing up here?", 1, "That's fascinating, but I'm afraid I have other things to do at the moment.", 2);
+if ($more = 2) {
+    ~chatplayer("<p,neutral>That's fascinating, but I'm afraid I have other things to do at the moment.");
+    return;
+}
+@mdaughter_hamal_camp_story;
+
+[label,mdaughter_hamal_progress]
+def_int $look = ~p_choice2("Any idea on where I should start looking?", 1, "What does your daughter look like?", 2);
+if ($look = 1) {
+    ~chatplayer("<p,quiz>Uhm... any idea on where I should start looking for your daughter?");
+    ~chatnpc("<p,neutral>There is a large pool of water beyond the camp. She used to go there often, it was her favourite spot.");
+    ~chatnpc("<p,neutral>Ragnar, her fiance, is probably there as well. I will give him my permission to talk to you.");
+} else {
+    ~chatplayer("<p,quiz>What does your daughter look like?");
+    ~chatnpc("<p,neutral>She is the fairest maiden of all our tribe, and I daresay of all the northern lands. She has flowing black hair, and when last we saw her, she was wearing a brown dress.");
+    ~chatnpc("<p,neutral>Perhaps you should speak to the man she is to marry, tribesman Ragnar. He can probably tell you more.");
+    ~chatnpc("<p,neutral>You can find him out by the pool beyond the camp, where my daughter used to go so often.");
+}
+return;
