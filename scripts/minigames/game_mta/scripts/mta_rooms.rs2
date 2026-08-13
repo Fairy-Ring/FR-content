@@ -1,0 +1,28 @@
+// Leftover pizazz_* HUDs. Official Update: Mage Training Arena 4 Jan 2006.
+// Hunt 289? no. Dummy leftover 9999/999 stay chrome. Hat / Magic floors later.
+// Dest tiles: next to leftover Exit Teleport on that room map (CANDIDATE).
+
+[oploc1,telekinetic_teleport]
+p_arrivedelay;
+p_teleport(0_52_151_8_54);
+if_openoverlay(pizazz_telekinetic);
+
+[oploc1,enchanters_teleport]
+p_arrivedelay;
+p_teleport(0_52_150_36_50);
+if_openoverlay(pizazz_enchantment);
+
+[oploc1,alchemists_teleport]
+p_arrivedelay;
+p_teleport(2_52_150_35_24);
+if_openoverlay(pizazz_alchemy);
+
+[oploc1,graveyard_teleport]
+p_arrivedelay;
+p_teleport(1_52_150_35_41);
+if_openoverlay(pizazz_graveyard);
+
+[oploc1,exit_teleport]
+p_arrivedelay;
+if_openoverlay(null);
+p_teleport(0_52_51_35_50);
