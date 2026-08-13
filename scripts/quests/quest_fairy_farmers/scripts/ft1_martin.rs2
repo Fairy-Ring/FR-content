@@ -5,8 +5,23 @@
 // Keep [opnpc3] pickpocket. Do not open leftover fairy_queen_symptoms.
 
 [opnpc1,martin_the_master_farmer]
-if (%fairy_farmers_quest > 0) {
+if (%fairy_farmers_quest = 1) {
     @ft1_martin_started;
+}
+if (%fairy_farmers_quest = 2) {
+    @ft1_martin_report1;
+}
+if (%fairy_farmers_quest = 3) {
+    @ft1_martin_report2;
+}
+if (%fairy_farmers_quest = 4) {
+    @ft1_martin_report3;
+}
+if (%fairy_farmers_quest = 5) {
+    @ft1_martin_report4;
+}
+if (%fairy_farmers_quest >= 6) {
+    @ft1_martin_report5;
 }
 @ft1_martin_start;
 
@@ -85,4 +100,40 @@ return;
 ~chatnpc("<p,quiz>Have you spoken to any other members of the Gardening Group yet?");
 ~chatplayer("<p,sad>No, I haven't had a chance yet.");
 ~chatnpc("<p,sad>Well please hurry, otherwise I won't be able to make enough produce to feed my 13 children soon.");
+return;
+
+[label,ft1_martin_report1]
+~chatplayer("<p,neutral>I've spoken to one of your members and they reckon that it's the lack of rain that we've had recently.");
+~chatnpc("<p,neutral>I'm afraid that can't be the problem. It never rains on the farming patches. That's why we have to water the crops.");
+~chatplayer("<p,confused>Oh, yeah. I hadn't thought of that.");
+~chatnpc("<p,neutral>Go chat to some other group members. Maybe somebody has a different idea.");
+return;
+
+[label,ft1_martin_report2]
+~chatplayer("<p,angry>Insects! You need to get rid of the insects! They're eating the crops.");
+~chatnpc("<p,neutral>Good idea, but I spray my crops with insecticide every week. No, that's not the problem.");
+return;
+
+[label,ft1_martin_report3]
+~chatplayer("<p,angry>One of your members is implying that the gardeners' problems are all caused by adventurers using the plots. I would like to point out that these plots are communal property and that we have as much right as anyone to grow plants here!");
+~chatnpc("<p,shock>All right! All right! You're absolutely right! I never said there was a problem with anybody using my plots. Besides, we get part of our income from watching crops for adventurers. I'm afraid that our problem is something totally different.");
+return;
+
+[label,ft1_martin_report4]
+~chatplayer("<p,neutral>Apparently, the seasons are all mixed up. Late summers and early winters. I don't know what I can do to solve that problem, though.");
+~chatnpc("<p,neutral>Yes, I've noticed that the seasons seem to be slightly confused, but that hasn't been a big enough change to affect the crops so badly. I'm afraid you should try a different branch of investigation to get to the root of our problems.");
+~chatplayer("<p,happy>Ha ha!");
+~chatnpc("<p,angry>What are you laughing at? These are serious problems!");
+~chatplayer("<p,neutral>You're absolutely right. Don't worry, I'll find out what the problem is.");
+return;
+
+[label,ft1_martin_report5]
+~chatnpc("<p,quiz>Hello again, <displayname()>. How are you getting on with solving the Gardening Group's problems?");
+~chatplayer("<p,sad>To be honest I'm worried about the sort of person you let join your organisation.");
+~chatnpc("<p,quiz>Why is that?");
+~chatplayer("<p,neutral>I've heard theories ranging from climate change to fairies from your members.");
+~chatnpc("<p,quiz>Hmm, that's an interesting idea. Now that I think about it that does make some sense. Yes, maybe you should talk to a fairy about it.");
+~chatplayer("<p,quiz>O-kay! You're the boss, any idea which flower I should look under to find a fairy?");
+~chatnpc("<p,neutral>No, sorry, but I did hear that there were some adventurers with a similar problem in the swamps near Lumbridge. Just don't mention my name if you talk to them, they're trying to keep it a secret, but everybody actually knows what they're up to.");
+~chatplayer("<p,neutral>Yes, I've spoken to them before.");
 return;

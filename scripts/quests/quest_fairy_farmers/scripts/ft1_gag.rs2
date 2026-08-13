@@ -1,0 +1,114 @@
+// A Fairy Tale Part I — GAG patch-gardener chase after Martin accept.
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Fairytale I gardeners
+// minus Skillcape / overlay / FT2 / look-after tables. Hunt 289? no.
+// Theories are ordinal (rain / insects / adventurers / seasons / fairies),
+// not bound to Elstan/Taria/…. Any five distinct placed gardeners count.
+// Writes %fairy_farmers_quest 1→2→3→4→5→6 only. NEVER 10.
+// Distinctness: %npc_int=1 on that gardener instance (CANDIDATE; lost on respawn).
+// No Farming look-after / Garden branch / symptoms / Nuff / Godfather / Tanglefoot.
+
+[opnpc1,elstan] @ft1_gag_talk;
+[opnpc1,dantaera] @ft1_gag_talk;
+[opnpc1,kragen] @ft1_gag_talk;
+[opnpc1,lyra] @ft1_gag_talk;
+[opnpc1,francis] @ft1_gag_talk;
+[opnpc1,farming_gardener_fruit_3] @ft1_gag_talk;
+[opnpc1,farming_gardener_fruit_4] @ft1_gag_talk;
+[opnpc1,farming_gardener_hops_1] @ft1_gag_talk;
+[opnpc1,farming_gardener_hops_3] @ft1_gag_talk;
+[opnpc1,farming_gardener_hops_4] @ft1_gag_talk;
+[opnpc1,farming_gardener_bush_1] @ft1_gag_talk;
+[opnpc1,farming_gardener_bush_2] @ft1_gag_talk;
+[opnpc1,farming_gardener_bush_3] @ft1_gag_talk;
+[opnpc1,farming_gardener_bush_4] @ft1_gag_talk;
+[opnpc1,farming_gardener_tree_1] @ft1_gag_talk;
+[opnpc1,farming_gardener_tree_2] @ft1_gag_talk;
+[opnpc1,farming_gardener_tree_3] @ft1_gag_talk;
+[opnpc1,farming_gardener_tree_4] @ft1_gag_talk;
+[opnpc1,farming_gardener_fruit_1] @ft1_gag_talk;
+[opnpc1,farming_gardener_fruit_2] @ft1_gag_talk;
+
+[label,ft1_gag_talk]
+def_int $opt = ~p_choice2("Are you a member of the Group of Advanced Gardeners?", 1, "I'll come back another time.", 2);
+if ($opt = 2) {
+    ~chatplayer("<p,neutral>I'll come back another time.");
+    return;
+}
+~chatplayer("<p,quiz>Are you a member of the Group of Advanced Gardeners?");
+~chatnpc("<p,quiz>Why, yes I am. Why do you ask?");
+if (%fairy_farmers_quest < 1) {
+    return;
+}
+~chatplayer("<p,neutral>Martin has asked me to investigate why all the crops are failing.");
+if (%npc_int = 1) {
+    ~chatnpc("<p,neutral>I've already told you everything I suspect.");
+    return;
+}
+if (%fairy_farmers_quest >= 6) {
+    ~chatnpc("<p,angry>I don't think the crops ARE failing, now leave me alone, I have work to do.");
+    return;
+}
+if (%fairy_farmers_quest = 1) {
+    @ft1_gag_rain;
+}
+if (%fairy_farmers_quest = 2) {
+    @ft1_gag_insects;
+}
+if (%fairy_farmers_quest = 3) {
+    @ft1_gag_adventurers;
+}
+if (%fairy_farmers_quest = 4) {
+    @ft1_gag_seasons;
+}
+@ft1_gag_fairies;
+
+[label,ft1_gag_rain]
+~chatnpc("<p,neutral>Ah, Martin sent you, why didn't you say so? I personally think that our problems are all down to the fact that we haven't had enough rain of late. It's plain to see - just look at the levels of the rivers.");
+~chatnpc("<p,quiz>We need more rain. I don't suppose you can do anything about that?");
+~chatplayer("<p,sad>No, I'm afraid not.");
+~chatnpc("<p,neutral>Well there you go then. Until you find out how to make it rain you're going to have a hard time solving our problems.");
+%npc_int = 1;
+%fairy_farmers_quest = 2;
+return;
+
+[label,ft1_gag_insects]
+~chatnpc("<p,angry>Insects! That's what you can tell him! Insects! Stop the insects from eating so many of our crops and we'd get maximum yield, I tell you!");
+%npc_int = 1;
+%fairy_farmers_quest = 3;
+return;
+
+[label,ft1_gag_adventurers]
+~chatnpc("<p,angry>How can you ask such a thing? It's obvious! It's all you adventurers. Every time I get a crop planted, some adventurer comes along and digs it up and plants crops of their own, as if they owned my farming patch!");
+~chatnpc("<p,angry>It's really annoying! You should speak to your friends about their rude behaviour!");
+~chatplayer("<p,shock>But...but...they're not my friends! I've never even spoken to most of them!");
+~chatnpc("<p,angry>Don't give me that! You're an adventurer, they're all adventurers. I bet you have some sort of secret guild and you gather there and say things like 'let's annoy the gardeners this week', don't you?");
+~chatplayer("<p,confused>No, I mean yes. There is a heroes guild, but ...!");
+~chatnpc("<p,shock>Aha, so you admit it then! You should be ashamed of yourselves!");
+~chatplayer("<p,sad>Oh, I give up!");
+%npc_int = 1;
+%fairy_farmers_quest = 4;
+return;
+
+[label,ft1_gag_seasons]
+~chatnpc("<p,neutral>Well obviously it's the seasons. They all seem to be out-of-wack these days. Summer comes earlier and earlier each year, but then it simply rushes by!");
+~chatnpc("<p,neutral>If you find out what is upsetting the seasons you'll find out what is causing the harvest to fail.");
+~chatplayer("<p,quiz>I don't suppose you have any ideas about what could cause the seasons to be mixed up?");
+~chatnpc("<p,sad>No, sorry, but find that out and you'll get to the root of our problems.");
+%npc_int = 1;
+%fairy_farmers_quest = 5;
+return;
+
+[label,ft1_gag_fairies]
+~chatnpc("<p,quiz>Well I can tell by the look on your face that I'm not the first person you've asked. Why don't you tell me what you've heard from other members of the group so far?");
+~chatplayer("<p,neutral>Why not? They all seem to be a bunch of loonies anyway.");
+~chatplayer("<p,neutral>I've been told that it's the lack of rain, plagues of insects and recently I was told that the entire order of seasons is confused!");
+~chatnpc("<p,quiz>Did you ever consider that all those theories might be correct?");
+~chatplayer("<p,confused>But they're all different, how could they all be correct?");
+~chatnpc("<p,happy>I'll let you into a little secret that'll explain it all to you. In a word - fairies!");
+~chatplayer("<p,shock>Oh no! Not another crack-pot theory!");
+~chatnpc("<p,angry>I'm serious!");
+~chatnpc("<p,neutral>Think it through. There are fairies who control everything natural from the weather to the seasons.");
+~chatplayer("<p,neutral>Right, well thanks for your input. I'll think over what you said.");
+%npc_int = 1;
+%fairy_farmers_quest = 6;
+return;
