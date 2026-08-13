@@ -1,0 +1,6 @@
+// Leftover inter_327 title The Ballad of Jareesh.
+// leftover obj elid_ballad desc=The Ballad of Jareesh. Leftover text stays on the IF.
+// Do not invent Elid chat. leftover-if-titles parks this as a named book (no slug).
+
+[opheld1,elid_ballad]
+if_openmain(inter_327);
