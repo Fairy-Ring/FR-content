@@ -16,6 +16,18 @@ if(%bankinsert = 1) {
 [if_close,bank_main] @closebank;
 
 [label,openbank]
+if (%tutorial >= ^tutorial_complete) {
+    ~bankpin_tick_pending;
+    if (%bankpin_state = ^bankpin_state_active & %bankpin_session = 0) {
+        %bankpin_mode = ^bankpin_mode_unlock;
+        @open_bankpin_keypad;
+        return;
+    }
+    if (%bankpin_state = ^bankpin_state_recover) {
+        mes("You cannot take items from your bank until your PIN recovery delay has passed.");
+        return;
+    }
+}
 %bankcert = 0;
 ~reorganize_inv(bank);
 inv_transmit(inv, bank_side:inv);

@@ -78,6 +78,8 @@ if (%tutorial < ^tutorial_complete & ~in_tutorial_island(coord) = true) {
     @start_tutorial;
 }
 
+%bankpin_session = 0;
+~bankpin_tick_pending;
 ~castlewars_login;
 // MM hangar reinit: finish cutscene if logout mid-viewing platform
 ~mm_hangar_login;
@@ -94,8 +96,15 @@ if (map_live = true) {
     if_openfull(inter_353, welcome_screen);
     if_settext(inter_353:com_1,"Did you know, all the weapon stats are listed on our new");
     if_settext(inter_353:com_2,"Knowledge Base?");
-    // todo: Set if player has pin? 
-    if_settext(welcome_screen:com_19,"You do not have a Bank PIN. Please visit a bank\\nif you would like one.");
+    if (%bankpin_state = ^bankpin_state_none) {
+        if_settext(welcome_screen:com_19,"You do not have a Bank PIN. Please visit a bank\\nif you would like one.");
+    } else if (%bankpin_state = ^bankpin_state_pending) {
+        if_settext(welcome_screen:com_19,"You have requested a Bank PIN. It will become active\\nin <tostring(~bankpin_days_left)> days.");
+    } else if (%bankpin_state = ^bankpin_state_recover) {
+        if_settext(welcome_screen:com_19,"Your Bank PIN is being recovered. You cannot take\\nitems from your bank for <tostring(~bankpin_days_left)> days.");
+    } else {
+        if_settext(welcome_screen:com_19,"You have a Bank PIN. Please enter it at a bank if you\\nneed to take items.");
+    }
     last_login_info;
 }
 

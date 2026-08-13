@@ -1,11 +1,300 @@
+// Bank PIN — best-effort from leftover bankpin / bankpin_settings +
+// Update: Security feature - Bank PIN (19 Sep 2005).
+// No Jagex server source. 7-day activate; recovery delay 3/7; once per login.
+// Keypad shuffle after each digit: GameFAQs Oct 2006.
+
 [label,open_bank_pin_setting]
+~bankpin_tick_pending;
 if_openmain(bankpin_settings);
 sound_synth(PIN_pending, 0, 0);
 if_settext(bankpin_settings:com_113, "Customers are reminded that they should NEVER tell anyone their Bank PINs or passwords, nor should they ever enter their PINs on any website form.");
-if_settext(bankpin_settings:com_175, "No PIN set");
-if_settext(bankpin_settings:com_177, "7 Days");
+~bankpin_refresh_settings;
 
-// 377 leftover inter_169 keypad — name from leftover title + bankpin_* family.
-// PIN is 19 Sep 2005: do not hunt 289.
+[proc,bankpin_tick_pending]
+if (%bankpin_delay ! 3 & %bankpin_delay ! 7) {
+    %bankpin_delay = 7;
+}
+if (%bankpin_state = ^bankpin_state_pending & date_minutes >= %bankpin_ready) {
+    %bankpin_state = ^bankpin_state_active;
+}
+if (%bankpin_state = ^bankpin_state_recover & date_minutes >= %bankpin_ready) {
+    %bankpin_state = ^bankpin_state_none;
+    %bankpin_value = 0;
+}
+
+[proc,bankpin_days_left]()(int)
+def_int $left = sub(%bankpin_ready, date_minutes);
+if ($left < 1) {
+    return(0);
+}
+return(add(divide(sub($left, 1), ^bankpin_day_minutes), 1));
+
+[proc,bankpin_refresh_settings]
+if_settext(bankpin_settings:com_177, "<tostring(%bankpin_delay)> Days");
+if (%bankpin_state = ^bankpin_state_none) {
+    if_settext(bankpin_settings:com_175, "No PIN set");
+    if_sethide(bankpin_settings:com_147, false);
+    if_sethide(bankpin_settings:com_148, false);
+    if_sethide(bankpin_settings:com_149, true);
+    if_sethide(bankpin_settings:com_150, true);
+    if_sethide(bankpin_settings:com_151, true);
+    if_sethide(bankpin_settings:com_152, true);
+} else if (%bankpin_state = ^bankpin_state_pending) {
+    if_settext(bankpin_settings:com_175, "PIN requested (<tostring(~bankpin_days_left)> days)");
+    if_sethide(bankpin_settings:com_147, true);
+    if_sethide(bankpin_settings:com_148, true);
+    if_sethide(bankpin_settings:com_149, true);
+    if_sethide(bankpin_settings:com_150, true);
+    if_sethide(bankpin_settings:com_151, true);
+    if_sethide(bankpin_settings:com_152, false);
+} else if (%bankpin_state = ^bankpin_state_recover) {
+    if_settext(bankpin_settings:com_175, "PIN recovery (<tostring(~bankpin_days_left)> days)");
+    if_sethide(bankpin_settings:com_147, true);
+    if_sethide(bankpin_settings:com_148, true);
+    if_sethide(bankpin_settings:com_149, true);
+    if_sethide(bankpin_settings:com_150, true);
+    if_sethide(bankpin_settings:com_151, true);
+    if_sethide(bankpin_settings:com_152, false);
+} else {
+    if_settext(bankpin_settings:com_175, "PIN set");
+    if_sethide(bankpin_settings:com_147, true);
+    if_sethide(bankpin_settings:com_148, true);
+    if_sethide(bankpin_settings:com_149, false);
+    if_sethide(bankpin_settings:com_150, false);
+    if_sethide(bankpin_settings:com_151, false);
+    if_sethide(bankpin_settings:com_152, true);
+}
+
 [if_button,bankpin_settings:com_147]
+if (%bankpin_state ! ^bankpin_state_none) {
+    return;
+}
+%bankpin_mode = ^bankpin_mode_set;
+@open_bankpin_keypad;
+
+[if_button,bankpin_settings:com_148]
+~bankpin_toggle_delay;
+
+[if_button,bankpin_settings:com_151]
+~bankpin_toggle_delay;
+
+[proc,bankpin_toggle_delay]
+if (%bankpin_delay = 3) {
+    %bankpin_delay = 7;
+} else {
+    %bankpin_delay = 3;
+}
+~bankpin_refresh_settings;
+
+[if_button,bankpin_settings:com_149]
+if (%bankpin_state ! ^bankpin_state_active) {
+    return;
+}
+%bankpin_mode = ^bankpin_mode_unlock_set;
+@open_bankpin_keypad;
+
+[if_button,bankpin_settings:com_150]
+if (%bankpin_state ! ^bankpin_state_active) {
+    return;
+}
+%bankpin_mode = ^bankpin_mode_delete;
+@open_bankpin_keypad;
+
+[if_button,bankpin_settings:com_152]
+if (%bankpin_state = ^bankpin_state_pending) {
+    %bankpin_state = ^bankpin_state_none;
+    %bankpin_value = 0;
+} else if (%bankpin_state = ^bankpin_state_recover) {
+    %bankpin_state = ^bankpin_state_active;
+}
+~bankpin_refresh_settings;
+
+[if_button,bankpin_settings:com_111]
+if_close;
+
+[label,open_bankpin_keypad]
+%bankpin_buf = 0;
+%bankpin_len = 0;
 if_openmain(bankpin);
+sound_synth(PIN_pending, 0, 0);
+~bankpin_paint_keypad;
+
+[proc,bankpin_paint_keypad]
+if_settext(bankpin:com_140, "?");
+if_settext(bankpin:com_141, "?");
+if_settext(bankpin:com_142, "?");
+if_settext(bankpin:com_143, "?");
+if (%bankpin_state = ^bankpin_state_recover) {
+    if_settext(bankpin:com_150, "YOUR PIN WILL BE DELETED IN <tostring(~bankpin_days_left)> DAYS");
+} else {
+    if_settext(bankpin:com_150, "");
+}
+if (%bankpin_mode = ^bankpin_mode_confirm) {
+    if_settext(bankpin:com_147, "Please confirm your PIN using the buttons below.");
+} else {
+    if_settext(bankpin:com_147, "Please enter your FOUR DIGIT PIN using the buttons below.");
+}
+if_settext(bankpin:com_151, "Click the 1st digit...");
+~bankpin_shuffle_digits;
+
+[proc,bankpin_nth](int $n)(string)
+switch_int($n) {
+    case 1 : return("1st");
+    case 2 : return("2nd");
+    case 3 : return("3rd");
+    case 4 : return("4th");
+}
+return("Nth");
+
+[proc,bankpin_pow10](int $n)(int)
+switch_int($n) {
+    case 0 : return(1);
+    case 1 : return(10);
+    case 2 : return(100);
+    case 3 : return(1000);
+    case 4 : return(10000);
+}
+return(1);
+
+[proc,bankpin_digit_com](int $slot)(component)
+switch_int($slot) {
+    case 0 : return(bankpin:com_110);
+    case 1 : return(bankpin:com_111);
+    case 2 : return(bankpin:com_112);
+    case 3 : return(bankpin:com_113);
+    case 4 : return(bankpin:com_114);
+    case 5 : return(bankpin:com_115);
+    case 6 : return(bankpin:com_116);
+    case 7 : return(bankpin:com_117);
+    case 8 : return(bankpin:com_118);
+    case 9 : return(bankpin:com_119);
+}
+
+[proc,bankpin_shuffle_digits]
+def_int $used = 0;
+def_int $n = 0;
+def_int $tries = 0;
+def_int $lo = 0;
+def_int $hi = 0;
+while ($n < 10 & $tries < 80) {
+    $tries = add($tries, 1);
+    def_int $d = random(10);
+    if (testbit($used, $d) = ^false) {
+        $used = setbit($used, $d);
+        if_settext(~bankpin_digit_com($n), "<tostring($d)>");
+        if ($n < 5) {
+            $lo = add($lo, multiply($d, ~bankpin_pow10($n)));
+        } else {
+            $hi = add($hi, multiply($d, ~bankpin_pow10(sub($n, 5))));
+        }
+        $n = add($n, 1);
+    }
+}
+%bankpin_map_lo = $lo;
+%bankpin_map_hi = $hi;
+
+[proc,bankpin_map_digit](int $slot)(int)
+if ($slot < 5) {
+    return(modulo(divide(%bankpin_map_lo, ~bankpin_pow10($slot)), 10));
+}
+return(modulo(divide(%bankpin_map_hi, ~bankpin_pow10(sub($slot, 5))), 10));
+
+[proc,bankpin_star](int $len)
+if ($len > 0) {
+    if_settext(bankpin:com_140, "*");
+}
+if ($len > 1) {
+    if_settext(bankpin:com_141, "*");
+}
+if ($len > 2) {
+    if_settext(bankpin:com_142, "*");
+}
+if ($len > 3) {
+    if_settext(bankpin:com_143, "*");
+}
+
+[label,bankpin_press](int $slot)
+def_int $d = ~bankpin_map_digit($slot);
+sound_synth(PIN_beep, 0, 0);
+%bankpin_buf = add(multiply(%bankpin_buf, 10), $d);
+%bankpin_len = add(%bankpin_len, 1);
+~bankpin_star(%bankpin_len);
+if (%bankpin_len < 4) {
+    if_settext(bankpin:com_151, "Click the <~bankpin_nth(add(%bankpin_len, 1))> digit...");
+    ~bankpin_shuffle_digits;
+    return;
+}
+@bankpin_commit;
+
+[if_button,bankpin:com_100] @bankpin_press(0);
+[if_button,bankpin:com_101] @bankpin_press(1);
+[if_button,bankpin:com_102] @bankpin_press(2);
+[if_button,bankpin:com_103] @bankpin_press(3);
+[if_button,bankpin:com_104] @bankpin_press(4);
+[if_button,bankpin:com_105] @bankpin_press(5);
+[if_button,bankpin:com_106] @bankpin_press(6);
+[if_button,bankpin:com_107] @bankpin_press(7);
+[if_button,bankpin:com_108] @bankpin_press(8);
+[if_button,bankpin:com_109] @bankpin_press(9);
+
+[label,bankpin_commit]
+if (%bankpin_mode = ^bankpin_mode_set) {
+    %bankpin_pending = %bankpin_buf;
+    %bankpin_mode = ^bankpin_mode_confirm;
+    @open_bankpin_keypad;
+} else if (%bankpin_mode = ^bankpin_mode_confirm) {
+    if (%bankpin_buf = %bankpin_pending) {
+        %bankpin_value = %bankpin_buf;
+        %bankpin_state = ^bankpin_state_pending;
+        %bankpin_ready = add(date_minutes, multiply(^bankpin_activate_days, ^bankpin_day_minutes));
+        %bankpin_session = 0;
+        mes("Your Bank PIN will become active in 7 days.");
+        if_close;
+    } else {
+        mes("Those numbers do not match.");
+        %bankpin_mode = ^bankpin_mode_set;
+        @open_bankpin_keypad;
+    }
+} else if (%bankpin_mode = ^bankpin_mode_unlock | %bankpin_mode = ^bankpin_mode_unlock_set) {
+    if (%bankpin_state = ^bankpin_state_active & %bankpin_buf = %bankpin_value) {
+        %bankpin_session = 1;
+        if (%bankpin_mode = ^bankpin_mode_unlock_set) {
+            %bankpin_mode = ^bankpin_mode_set;
+            @open_bankpin_keypad;
+            return;
+        }
+        if_close;
+        @openbank;
+    } else {
+        mes("The PIN you entered is incorrect.");
+        sound_synth(PIN_cancel, 0, 0);
+        @open_bankpin_keypad;
+    }
+} else if (%bankpin_mode = ^bankpin_mode_delete) {
+    if (%bankpin_state = ^bankpin_state_active & %bankpin_buf = %bankpin_value) {
+        %bankpin_state = ^bankpin_state_recover;
+        %bankpin_ready = add(date_minutes, multiply(%bankpin_delay, ^bankpin_day_minutes));
+        %bankpin_session = 0;
+        mes("Your Bank PIN will be deleted in <tostring(%bankpin_delay)> days.");
+        if_close;
+    } else {
+        mes("The PIN you entered is incorrect.");
+        sound_synth(PIN_cancel, 0, 0);
+        @open_bankpin_keypad;
+    }
+}
+
+[if_button,bankpin:com_148]
+if (%bankpin_mode = ^bankpin_mode_unlock | %bankpin_mode = ^bankpin_mode_unlock_set | %bankpin_mode = ^bankpin_mode_delete) {
+    if (%bankpin_state = ^bankpin_state_active) {
+        %bankpin_state = ^bankpin_state_recover;
+        %bankpin_ready = add(date_minutes, multiply(%bankpin_delay, ^bankpin_day_minutes));
+        %bankpin_session = 0;
+        mes("Your Bank PIN will be deleted in <tostring(%bankpin_delay)> days.");
+    }
+}
+if_close;
+
+[if_button,bankpin:com_149]
+sound_synth(PIN_cancel, 0, 0);
+if_close;

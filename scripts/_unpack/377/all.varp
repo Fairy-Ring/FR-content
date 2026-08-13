@@ -525,9 +525,11 @@ transmit=yes
 
 [varp336_bits]
 
-[varp337_unused]
+[bankpin_map_lo]
+scope=perm
 
-[varp338_unused]
+[bankpin_map_hi]
+scope=perm
 
 [morttonquest]
 
@@ -593,7 +595,8 @@ transmit=yes
 [misc_varbit_3]
 transmit=yes
 
-[varp364_unused]
+[bankpin_value]
+scope=perm
 
 [mm_main]
 
@@ -603,9 +606,11 @@ transmit=yes
 
 [varp743_unused]
 
-[varp369_unused]
+[bankpin_state]
+scope=perm
 
-[varp370_unused]
+[bankpin_ready]
+scope=perm
 
 [varp744_bits]
 
@@ -665,9 +670,11 @@ scope=perm
 
 [varp396_bits]
 
-[varp397_unused]
+[bankpin_delay]
+scope=perm
 
-[varp398_unused]
+[bankpin_buf]
+scope=perm
 
 [fenk_quest]
 transmit=yes
@@ -675,7 +682,8 @@ transmit=yes
 [fenk_flags]
 transmit=yes
 
-[varp401_unused]
+[bankpin_len]
+scope=perm
 
 [roving_elves_quest]
 scope=perm
@@ -683,14 +691,17 @@ scope=perm
 [roving_elves_bits]
 scope=perm
 
-[varp404_unused]
+[bankpin_mode]
+scope=perm
 
-[varp405_unused]
+[bankpin_pending]
+scope=perm
 
 [tutorial_progress_overlay]
 transmit=yes
 
-[varp407_unused]
+[bankpin_session]
+scope=perm
 
 [ahoy_varbits_1]
 transmit=yes

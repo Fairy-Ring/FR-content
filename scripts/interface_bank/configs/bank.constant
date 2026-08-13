@@ -1,2 +1,17 @@
 ^bank_total_slots = 352
 ^bank_free_slots = 60
+
+^bankpin_state_none = 0
+^bankpin_state_pending = 1
+^bankpin_state_active = 2
+^bankpin_state_recover = 3
+
+^bankpin_mode_set = 0
+^bankpin_mode_confirm = 1
+^bankpin_mode_unlock = 2
+^bankpin_mode_delete = 3
+^bankpin_mode_unlock_set = 4
+
+^bankpin_day_minutes = 1440
+^bankpin_activate_days = 7
+
