@@ -1,0 +1,11 @@
+// Leftover blast_furnace_bar_stock 14458.
+// Official Update 23 Aug 2005. Hunt 289? no.
+// Cooled dispenser Take + bars Retrieve. Do not give bars / coal / XP.
+
+[oploc1,blast_furnace_ore_dispenser_cooled]
+p_arrivedelay;
+if_openmain(blast_furnace_bar_stock);
+
+[oploc1,blast_furnace_bars]
+p_arrivedelay;
+if_openmain(blast_furnace_bar_stock);
