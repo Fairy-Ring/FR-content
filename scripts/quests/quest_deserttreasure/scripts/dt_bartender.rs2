@@ -1,0 +1,69 @@
+// Desert Treasure — Bandit Camp bartender (fourdiamonds_bartender 1921) @ 3159,2981.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to the bartender
+// minus Ask about Desert Treasure I overlay / RS3 / display rename.
+// Hunt 289? no. Display stays Bartender.
+// Buy Bandit's brew 650 coins. Stage 5→6 on first buy while Partners-yes.
+// After drink: four-diamonds rumor 6→7. No Eblis / mirrors / AM.
+// Trade op3 unhooked (no owned_shop on unpack).
+
+[opnpc1,fourdiamonds_bartender]
+if (%deserttreasure >= 6) {
+    @dt_bart_after_drink;
+}
+@dt_bart_buy_gate;
+
+[label,dt_bart_buy_gate]
+~chatnpc("<p,angry>If you're not buying anything, I have nothing to say to you.");
+def_int $opt = ~p_choice2("Buy a drink", 1, "Nothing thanks.", 2);
+if ($opt = 2) {
+    ~chatnpc("<p,angry>Get out of my bar then! We don't like your sort round here!");
+    return;
+}
+if (inv_total(inv, coins) < 650) {
+    ~chatnpc("<p,angry>You ain't got the 650 coins it costs to buy it, and I'm glad 'cos I didn't want to serve you anyway.");
+    return;
+}
+~chatnpc("<p,quiz>What's that? You wanna buy a beer? It'll cost ya 650 coins.");
+def_int $beer = ~p_choice2("Buy a beer", 1, "Don't buy anything", 2);
+if ($beer = 2) {
+    ~chatnpc("<p,angry>Get out of my bar then! We don't like your sort round here!");
+    return;
+}
+if (inv_itemspace(inv, bandit_brew, 1, inv_size(inv)) = false) {
+    return;
+}
+inv_del(inv, coins, 650);
+inv_add(inv, bandit_brew, 1);
+~chatnpc("<p,angry>There you go. Now get out, we don't like your sort around here.");
+if (%deserttreasure = 5) {
+    %deserttreasure = 6;
+}
+return;
+
+[label,dt_bart_after_drink]
+~chatnpc("<p,angry>You've had your drink, now get out of here. I have nothing to say to the-");
+~chatplayer("<p,shock>No, Wait! Look, I'm here on an archaeological expedition for the Museum of Varrock.");
+~chatplayer("<p,neutral>I am only here looking for artefacts...");
+~chatnpc("<p,quiz>Oh really? Our inheritance is only sand and death. What do you expect to find out here in this desert forsaken by the gods?");
+def_int $ask = ~p_choice3("I heard about treasure...", 1, "I heard about four diamonds...", 2, "I heard about a fortress...", 3);
+if ($ask = 1) {
+    ~chatplayer("<p,quiz>As I understand it there's some kind of hidden treasure in these parts...");
+    ~chatnpc("<p,angry>Look around pal. Does it looks like there's any treasure near here?");
+    ~chatnpc("<p,angry>If I were you I'd get lost before someone takes a dislike to your face and removes it for you.");
+    return;
+}
+if ($ask = 3) {
+    ~chatplayer("<p,quiz>Certain things have led me to believe there may be some kind of ruined fortress around here...");
+    ~chatnpc("<p,neutral>Doubt it. What in the world would someone need to guard against in the middle of this desert?");
+    ~chatnpc("<p,angry>A bad attack of sand? I think you're on the wrong track, mister so-called archaeologist.");
+    return;
+}
+~chatplayer("<p,quiz>I heard a rumour about four diamonds or crystals...");
+~chatnpc("<p,shock>The four diamonds of Azzanadra??? How came you to know of this?");
+~chatplayer("<p,quiz>You've heard of them then?");
+~chatnpc("<p,neutral>It's just a fairy tale for children. Maybe one of the village elders might know more, but it's not really something I care about.");
+~chatnpc("<p,angry>Now get out of here, your sort isn't welcome in my bar.");
+if (%deserttreasure = 6) {
+    %deserttreasure = 7;
+}
+return;
