@@ -1,0 +1,12 @@
+// Leftover void_knights_training 18691.
+// Official Pest 18 Apr 2006; 24 Apr “just combat xp”. Hunt 289? no.
+// Void kit / in-game HUD 6 Jun 2006 is OOS. Cancel is leftover client close.
+// Confirm / skill spend later. Dummy leftover Points CS1 stays.
+
+[opnpc3,pest_voidknight_1] @pest_open_training;
+[opnpc3,pest_voidknight_2] @pest_open_training;
+[opnpc3,pest_voidknight_3] @pest_open_training;
+[opnpc3,pest_voidknight_4] @pest_open_training;
+
+[label,pest_open_training]
+if_openmain(void_knights_training);

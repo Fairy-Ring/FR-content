@@ -1,0 +1,5 @@
+// Leftover mourning_deathalter 6028. Read obj mourning_deathalter_list 6648.
+// Leftover “List of needed items:” + 50 debug slugs stay. Do not invent MEP2 fills.
+
+[opheld1,mourning_deathalter_list]
+if_openmain(mourning_deathalter);
