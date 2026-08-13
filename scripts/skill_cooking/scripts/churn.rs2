@@ -1,0 +1,39 @@
+// Leftover dairy churn (24 Oct 2005). Locs dairy_churn / dairy_churn_10094.
+// Chat leftover churn 15336 — do not steal skillmulti. No XP (period rate unknown).
+// CS1 leftover: cream gt,20 · butter gt,37 · cheese gt,47.
+
+[oploc1,dairy_churn]
+@open_dairy_churn;
+
+[oploc1,dairy_churn_10094]
+@open_dairy_churn;
+
+[label,open_dairy_churn]
+if (inv_total(inv, bucket_milk) < 1) {
+    mes("You need a bucket of milk to use the churn.");
+    return;
+}
+if_openchat(churn);
+if_setresumebuttons(churn:com_5, churn:com_6, churn:com_7, null, null);
+p_pausebutton;
+switch_component(last_com) {
+    case churn:com_5 : @churn_product(pot_of_cream, 21, "cream");
+    case churn:com_6 : @churn_product(pot_of_butter, 38, "butter");
+    case churn:com_7 : @churn_product(cheese, 48, "cheese");
+    case default : return;
+}
+
+[label,churn_product](namedobj $out, int $level, string $name)
+if_close;
+if (stat(cooking) < $level) {
+    mes("You need a Cooking level of <tostring($level)> to churn <$name>.");
+    return;
+}
+if (inv_total(inv, bucket_milk) < 1) {
+    mes("You need a bucket of milk to use the churn.");
+    return;
+}
+inv_del(inv, bucket_milk, 1);
+inv_add(inv, bucket_empty, 1);
+inv_add(inv, $out, 1);
+mes("You churn the milk into <$name>.");

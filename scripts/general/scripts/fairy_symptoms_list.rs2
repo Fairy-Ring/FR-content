@@ -1,0 +1,5 @@
+// Leftover fairy_queen_symptoms 18164. Read obj fairy_symptoms_list 7411.
+// Leftover list text stays on the IF. Do not invent FT1 chat.
+
+[opheld1,fairy_symptoms_list]
+if_openmain(fairy_queen_symptoms);
