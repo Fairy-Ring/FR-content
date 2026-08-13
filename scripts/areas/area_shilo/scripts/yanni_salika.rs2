@@ -1,8 +1,114 @@
+// Shop path is live Shilo antiques (RuneHQ city-guide). OSF favour branch is
+// CANDIDATE last-resort 2007-base (Transcript:One Small Favour minus ~Feb 2022
+// overlay / RS3 Overview / hatchet). Hunt 289? no. Accept %onesmallfavour 0→1.
+// STOP: no forester splice, no leftover remove_this_key 12346, no lamps.
+
 [opnpc1,shiloantiques]
 ~chatplayer("<p,neutral>Hello there!");
+if (%onesmallfavour > 0) {
+    @yanni_osf_progress_menu;
+}
+@yanni_osf_start_menu;
+
+[label,yanni_osf_start_menu]
+~chatnpc("<p,happy>Greetings Bwana! My name is Yanni and I buy and sell antiques.");
+def_int $start = ~p_choice4("Tell me about this antiques business.", 1, "Is there anything else interesting to do around here?", 2, "Do you have any interesting items for sale?", 3, "Hmm, sorry, not interested.", 4);
+if ($start = 1) {
+    ~chatplayer("<p,quiz>Tell me about this antiques business.");
+    @yanni_antiques_quote;
+} else if ($start = 2) {
+    @yanni_osf_offer;
+} else if ($start = 3) {
+    @yanni_items_for_sale;
+}
+~chatplayer("<p,neutral>Hmm, sorry, not interested.");
+~chatnpc("<p,neutral>Fair enough, come back if you change your mind.");
+return;
+
+[label,yanni_osf_offer]
+~chatplayer("<p,quiz>Is there anything else interesting to do around here?");
+~chatnpc("<p,quiz>You sound a bit bored of Shilo Village...what's wrong?");
+~chatplayer("<p,neutral>Nothing, I was just wondering if there was anything else to do?");
+~chatnpc("<p,neutral>Well, if you're bored, you could do me a small favour and nip to see the jungle forester. I need a piece of red mahogany to resurface an antique wardrobe.");
+@yanni_osf_fiveway;
+
+[label,yanni_osf_fiveway]
+def_int $fav = ~p_choice5("You want me to do you a favour?", 1, "An adventurer of my calibre, isn't that overkill.", 2, "What are you going to give me if I do it?", 3, "Nah thanks, I've got bigger fish to fry.", 4, "Ok, see you in a tick!", 5);
+if ($fav = 1) {
+    ~chatplayer("<p,quiz>You want me to do you a favour?");
+    ~chatnpc("<p,neutral>Well, if you've got nothing better to do...I mean, you looked bored.");
+    @yanni_osf_fiveway;
+} else if ($fav = 2) {
+    ~chatplayer("<p,happy>An adventurer of my calibre, isn't that overkill.");
+    ~chatnpc("<p,shock>Coooiii! Sorry your most amazingness, didn't realise you were too above it all to do someone a favour!");
+    @yanni_osf_fiveway;
+} else if ($fav = 3) {
+    ~chatplayer("<p,quiz>What are you going to give me if I do it?");
+    ~chatnpc("<p,angry>Give you? I don't think you heard me...I asked for a favour! It means that I'll 'owe you one' when you need something doing. That's what a favour is!");
+    @yanni_osf_fiveway;
+} else if ($fav = 4) {
+    ~chatplayer("<p,neutral>Nah thanks, I've got bigger fish to fry.");
+    ~chatnpc("<p,neutral>Fair enough! Hope it all goes well...but, you know, you looked bored so I just thought I'd suggest it.");
+    return;
+}
+@yanni_osf_accept;
+
+[label,yanni_osf_accept]
+~chatplayer("<p,happy>Ok, see you in a tick!");
+~chatnpc("<p,happy>Great, nice of you to do it for me.");
+%onesmallfavour = 1;
+def_int $go = ~p_choice2("I'll get going then!", 1, "Where do I meet this jungle forester?", 2);
+if ($go = 2) {
+    ~chatplayer("<p,quiz>Where do I meet this jungle forester?");
+    ~chatnpc("<p,neutral>Oh, sorry, I thought you knew the area. You'll find a jungle forester in between the southern edge of Shilo Village and the Kharazi Jungle.");
+    ~chatnpc("<p,neutral>They're always trying to find ways into that place.");
+    ~chatnpc("<p,neutral>I hear that some old timer from the Legends Guild keeps sending new recruits down there..only Zamorak knows why.");
+    return;
+}
+~chatplayer("<p,happy>I'll get going then!");
+~chatnpc("<p,happy>That'd be helpful!");
+return;
+
+[label,yanni_osf_progress_menu]
+~chatnpc("<p,happy>Greetings Bwana! My name is Yanni and I buy and sell antiques.");
+def_int $prog = ~p_choice3("Tell me about this antiques business.", 1, "What was I supposed to do again?", 2, "Do you have any interesting items for sale?", 3);
+if ($prog = 1) {
+    ~chatplayer("<p,quiz>Tell me about this antiques business.");
+    @yanni_antiques_quote;
+} else if ($prog = 2) {
+    @yanni_osf_reminder;
+}
+@yanni_items_for_sale;
+
+[label,yanni_osf_reminder]
+~chatnpc("<p,quiz>What do you mean?");
+def_int $rem = ~p_choice4("I've forgotten what to do, can you remind me?", 1, "This is taking longer than I expected!", 2, "Is there an easier way of getting this exotic wood?", 3, "Ok, thanks.", 4);
+if ($rem = 1) {
+    ~chatplayer("<p,confused>I've forgotten what to do, can you remind me?");
+    ~chatnpc("<p,neutral>Tsk....It's only a little job bwana, I ask you to do me one small favour! Go to the jungle forester and get me a piece of red mahogany. It can't be that difficult can it?");
+} else if ($rem = 2) {
+    ~chatplayer("<p,sad>This is taking longer than I expected!");
+    ~chatnpc("<p,angry>You're telling me bwana, I was supposed to have this wardrobe finished before now! Hurry it up will you, I don't have all day!");
+} else if ($rem = 3) {
+    ~chatplayer("<p,quiz>Is there an easier way of getting this exotic wood?");
+    ~chatnpc("<p,angry>Huh! You make it sound like a major undertaking! I should have just done it myself!");
+    ~chatplayer("<p,sad>Everyone is asking me to do them favours now! It seems like I've opened the floodgates!");
+    ~chatnpc("<p,quiz>Well, can't you just do my favour and forget about theirs?");
+} else {
+    ~chatplayer("<p,neutral>Ok, thanks.");
+}
+return;
+
+[label,yanni_items_for_sale]
+// CANDIDATE: OSRS sale-restock of Beads is later / incomplete on the transcript.
+// Do not invent stock. Keep opnpcu sells.
+~chatplayer("<p,quiz>Do you have any interesting items for sale?");
+~chatnpc("<p,neutral>Sorry, <text_gender("Sir", "Madam")>, I have nothing that you need.");
+return;
+
+[label,yanni_antiques_quote]
 // https://web.archive.org/web/20050204071450im_/http://www.runehq.com//images/cityguides/shilo9.jpg
-~chatnpc("<p,neutral>Greetings Bwana!|My name is Yanni and I buy and sell antiques|and other interesting items.|If you have any interesting items that you might");
-~chatnpc("<p,neutral>want to sell me, please let me see them and I'll|offer you a fair price.");
+~chatnpc("<p,neutral>I buy antiques and other interesting items.|If you have any interesting items that you might want to sell me, please let me see them and I'll offer you a fair price.");
 ~chatnpc("<p,neutral>Would you like me to have a look at your items|and give you a quote?");
 switch_int(~p_choice2("Yes please!", 1, "Maybe some other time?", 2)) {
     case 1 :
@@ -48,6 +154,7 @@ switch_int(~p_choice2("Yes please!", 1, "Maybe some other time?", 2)) {
         ~chatplayer("<p,neutral>Maybe some other time?");
         ~chatnpc("<p,neutral>Sure thing.|Have a nice day Bwana.");
 }
+return;
 
 [opnpcu,shiloantiques]
 switch_obj(last_useitem) {
