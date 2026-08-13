@@ -1,0 +1,62 @@
+// Light / Medium / Dense Jungle leftover op4=Hack.
+// CANDIDATE WC floors + XP tenths from last-resort 2007-base Jungle pages.
+// 1–4 leftover names are the same "Light/Medium/Dense Jungle" (visual variants);
+// next_loc_stage goes to the leftover chopped loc (_5).
+
+[oploc4,tai_bwo_jungle_vegetation_easy_1] @tbw_hack_jungle(^tbw_hack_level_light, ^tbw_hack_xp_light, thatching_spar_light);
+[oploc4,tai_bwo_jungle_vegetation_easy_2] @tbw_hack_jungle(^tbw_hack_level_light, ^tbw_hack_xp_light, thatching_spar_light);
+[oploc4,tai_bwo_jungle_vegetation_easy_3] @tbw_hack_jungle(^tbw_hack_level_light, ^tbw_hack_xp_light, thatching_spar_light);
+[oploc4,tai_bwo_jungle_vegetation_easy_4] @tbw_hack_jungle(^tbw_hack_level_light, ^tbw_hack_xp_light, thatching_spar_light);
+[oploc4,tai_bwo_jungle_vegetation_med_1] @tbw_hack_jungle(^tbw_hack_level_med, ^tbw_hack_xp_med, thatching_spar_med);
+[oploc4,tai_bwo_jungle_vegetation_med_2] @tbw_hack_jungle(^tbw_hack_level_med, ^tbw_hack_xp_med, thatching_spar_med);
+[oploc4,tai_bwo_jungle_vegetation_med_3] @tbw_hack_jungle(^tbw_hack_level_med, ^tbw_hack_xp_med, thatching_spar_med);
+[oploc4,tai_bwo_jungle_vegetation_med_4] @tbw_hack_jungle(^tbw_hack_level_med, ^tbw_hack_xp_med, thatching_spar_med);
+[oploc4,tai_bwo_jungle_vegetation_hard_1] @tbw_hack_jungle(^tbw_hack_level_dense, ^tbw_hack_xp_dense, thatching_spar_dense);
+[oploc4,tai_bwo_jungle_vegetation_hard_2] @tbw_hack_jungle(^tbw_hack_level_dense, ^tbw_hack_xp_dense, thatching_spar_dense);
+[oploc4,tai_bwo_jungle_vegetation_hard_3] @tbw_hack_jungle(^tbw_hack_level_dense, ^tbw_hack_xp_dense, thatching_spar_dense);
+[oploc4,tai_bwo_jungle_vegetation_hard_4] @tbw_hack_jungle(^tbw_hack_level_dense, ^tbw_hack_xp_dense, thatching_spar_dense);
+
+[proc,tbw_has_machete]()(boolean)
+if (inv_total(inv, machette) > 0 | inv_total(inv, machette_opal) > 0 | inv_total(inv, machette_jade) > 0 | inv_total(inv, machette_redtopaz) > 0) {
+    return (true);
+}
+if (inv_total(worn, machette) > 0 | inv_total(worn, machette_opal) > 0 | inv_total(worn, machette_jade) > 0 | inv_total(worn, machette_redtopaz) > 0) {
+    return (true);
+}
+return (false);
+
+[proc,tbw_add_favour](int $amt)
+def_int $next = add(%favour_percentage, $amt);
+if ($next > ^tbw_favour_cap) {
+    $next = ^tbw_favour_cap;
+}
+%favour_percentage = $next;
+
+[label,tbw_hack_jungle](int $level, int $xp, namedobj $spar)
+p_arrivedelay;
+if (~tbw_has_machete = false) {
+    mes("You need a machete to hack away at this jungle.");
+    return;
+}
+if (stat(woodcutting) < $level) {
+    mes("You need a Woodcutting level of <tostring($level)> to hack this jungle.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+anim(tbw_cleanup_player_hack, 0);
+mes("You swing your machete at the jungle.");
+p_delay(2);
+def_loc $next = loc_param(next_loc_stage);
+if ($next = null) {
+    anim(null, 0);
+    return;
+}
+loc_change($next, ^tbw_jungle_respawn);
+inv_add(inv, $spar, 1);
+stat_advance(woodcutting, $xp);
+~tbw_add_favour(^tbw_favour_hack);
+anim(tbw_cleanup_player_hack_success, 0);
+mes("You hack away some of the jungle.");

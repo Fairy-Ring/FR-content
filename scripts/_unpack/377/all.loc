@@ -56300,6 +56300,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_easy_5
 [tai_bwo_jungle_vegetation_easy_2]
 name=Light Jungle
 desc=This has broad leaves.
@@ -56310,6 +56311,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_easy_5
 [tai_bwo_jungle_vegetation_easy_3]
 name=Light Jungle
 desc=This has broad leaves.
@@ -56320,6 +56322,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_easy_5
 [tai_bwo_jungle_vegetation_easy_4]
 name=Light Jungle
 desc=This has broad leaves.
@@ -56330,6 +56333,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_easy_5
 [tai_bwo_jungle_vegetation_easy_5]
 name=Light Jungle
 desc=This has been chopped away.
@@ -56355,6 +56359,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_med_5
 [tai_bwo_jungle_vegetation_med_2]
 name=Medium Jungle
 desc=This has broad leaves.
@@ -56371,6 +56376,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_med_5
 [tai_bwo_jungle_vegetation_med_3]
 name=Medium Jungle
 desc=This has broad leaves.
@@ -56387,6 +56393,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_med_5
 [tai_bwo_jungle_vegetation_med_4]
 name=Medium Jungle
 desc=This has broad leaves.
@@ -56403,6 +56410,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_med_5
 [tai_bwo_jungle_vegetation_med_5]
 name=Medium Jungle
 desc=This has been chopped away.
@@ -56434,6 +56442,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_hard_5
 [tai_bwo_jungle_vegetation_hard_2]
 name=Dense Jungle
 desc=This has broad leaves.
@@ -56450,6 +56459,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_hard_5
 [tai_bwo_jungle_vegetation_hard_3]
 name=Dense Jungle
 desc=This has broad leaves.
@@ -56466,6 +56476,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_hard_5
 [tai_bwo_jungle_vegetation_hard_4]
 name=Dense Jungle
 desc=This has broad leaves.
@@ -56482,6 +56493,7 @@ op4=Hack
 mapscene=5
 anim=tbw_cleanup_bush_shake
 
+param=next_loc_stage,tai_bwo_jungle_vegetation_hard_5
 [tai_bwo_jungle_vegetation_hard_5]
 name=Dense Jungle
 desc=This has been chopped away.

@@ -1,0 +1,54 @@
+// Tai Bwo Wannai Cleanup — first product slice (CANDIDATE).
+// Leftover Favour HUD 14206 + Gabooty leftover inv names + jungle loc ops.
+// Official Update:Tai Bwo Wannai Clean-Up 9 Aug 2005. Hunt 289? no.
+// Trio quest_tbwt/ is a different surface — do not steal.
+
+[proc,tbw_in_village]()(boolean)
+if (inzone(0_43_47_0_0, 0_44_48_63_63, coord) = true) {
+    return (true);
+}
+return (false);
+
+[proc,tbw_cleanup_show_villagers]
+if (%villagers_visible = 1) {
+    return;
+}
+// Multi keys are 1–7 only (no key 0). Default chat_*=0 hides every villager.
+// CANDIDATE: first visit shows the "with sticks" concrete (key 1).
+%chat_sharimika = 1;
+%chat_mamma = 1;
+%chat_layleen = 1;
+%chat_karaday = 1;
+%chat_safta = 1;
+%chat_gabooty = 1;
+%chat_fanellaman = 1;
+%chat_jag = 1;
+%chat_murc = 1;
+%chat_rion = 1;
+%villagers_visible = 1;
+
+[proc,tbw_cleanup_enter]
+~tbw_cleanup_show_villagers;
+if (%tbw_overlayopen = 0) {
+    if_openoverlay(tai_bwo_favour);
+    %tbw_overlayopen = 1;
+}
+
+[proc,tbw_cleanup_try_exit]
+if (~tbw_in_village = true) {
+    return;
+}
+if (%tbw_overlayopen = 1) {
+    if_openoverlay(null);
+    %tbw_overlayopen = 0;
+}
+
+[proc,tbw_cleanup_login]
+if (~tbw_in_village = true) {
+    ~tbw_cleanup_enter;
+}
+
+[mapzoneexit,0_43_47] ~tbw_cleanup_try_exit;
+[mapzoneexit,0_43_48] ~tbw_cleanup_try_exit;
+[mapzoneexit,0_44_47] ~tbw_cleanup_try_exit;
+[mapzoneexit,0_44_48] ~tbw_cleanup_try_exit;

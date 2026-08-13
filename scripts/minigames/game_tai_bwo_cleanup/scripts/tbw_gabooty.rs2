@@ -1,0 +1,14 @@
+// Gabooty leftover ops Trade-Co-op / Trade-Drinks. Bind concrete, not the multi.
+// Shop chrome is shop_template (not leftover parcel — that is Rionasta).
+// Currency is village_trade_sticks via shop.rs2 CANDIDATE branch.
+
+[opnpc3,tbwcu_gabooty] @tbw_gabooty_coop;
+[opnpc3,tbwcu_gabooty_nosticks] @tbw_gabooty_coop;
+[opnpc4,tbwcu_gabooty] @tbw_gabooty_drinks;
+[opnpc4,tbwcu_gabooty_nosticks] @tbw_gabooty_drinks;
+
+[label,tbw_gabooty_coop]
+~openshop(tai_bwo_wannai_cooperative, 100, 70, 10, "Gabooty's Tai Bwo Wannai Cooperative");
+
+[label,tbw_gabooty_drinks]
+~openshop(tai_bwo_wannai_drinksies, 100, 70, 10, "Gabooty's Tai Bwo Wannai Drinksies");

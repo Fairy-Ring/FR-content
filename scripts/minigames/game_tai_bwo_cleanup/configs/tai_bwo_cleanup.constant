@@ -1,0 +1,11 @@
+// CANDIDATE last-resort 2007-base (OSRS wiki Light/Medium/Dense Jungle) + leftover CS1 %1 %.
+// Favour leftover varbit is 10 bits (0–1023); leftover HUD prints "%1 %". Store 0–100.
+^tbw_favour_cap = 100
+^tbw_favour_hack = 1
+^tbw_hack_level_light = 10
+^tbw_hack_level_med = 20
+^tbw_hack_level_dense = 35
+^tbw_hack_xp_light = 320
+^tbw_hack_xp_med = 550
+^tbw_hack_xp_dense = 800
+^tbw_jungle_respawn = 200
