@@ -63155,6 +63155,7 @@ desc=Ideal for cooking on.
 model=rimmington_poor_range
 length=2
 forceapproach=east
+category=cooking_oven
 
 [rimmington_poor_range_chimney]
 name=Range chimney

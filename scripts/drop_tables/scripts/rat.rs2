@@ -1,4 +1,10 @@
 [ai_queue3,rat]
+@hetty_rat_tail;
+
+[ai_queue3,rat_indoors]
+@hetty_rat_tail;
+
+[label,hetty_rat_tail]
 gosub(npc_death);
 if (npc_findhero = ^false) {
     return;
