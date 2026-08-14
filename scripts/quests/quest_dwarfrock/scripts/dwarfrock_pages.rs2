@@ -1,0 +1,23 @@
+// Between a Rock — Mine cart Search after Rolad. Dwarven Mine.
+// CANDIDATE last-resort 2007-base (OSRS Transcript cart page)
+// minus spawn rate / which-cart invent / dest. Hunt 289? no.
+// Stay dwarfrock_quest 10. Never 110. Cite bar-pages-leftover-377.md.
+
+[oploc1,dwarfrock_book_cart]
+if (%dwarfrock_quest < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%dwarfrock_quest = 110) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, dwarf_rock_page2) > 0 | inv_total(inv, dwarf_rock_pagex2) > 0 | inv_total(inv, dwarf_rock_pagex3) > 0) {
+    return;
+}
+if (inv_itemspace(inv, dwarf_rock_page2, 1, inv_size(inv)) = false) {
+    return;
+}
+inv_add(inv, dwarf_rock_page2, 1);
+mes("At the bottom of the cart you find a missing page of Rolad's book!");
+return;
