@@ -1,0 +1,84 @@
+// One Small Favour — Gnormadium after Rantz 19→20.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Gnormadium).
+// Lights ask only. No dest / Feldip / lights flip / gem / comfy / 12346.
+// Hunt 289? no. Cite osf-gnormadium-after-rantz-377.md.
+
+[opnpc1,gnormadium_avlafrim]
+if (%onesmallfavour < 20) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatnpc("<p,happy>Hello! Don't get in the way around here, we've got a lot of work to do!");
+if (%onesmallfavour >= 21) {
+    @osf_gnorm_menu_after;
+}
+@osf_gnorm_menu_before;
+
+[label,osf_gnorm_menu_before]
+def_int $op = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything that I can do?", 3, "Rantz said I should help you finish this project.", 4, "Okay, thanks.", 5);
+if ($op = 1) {
+    ~chatplayer("<p,quiz>Hello there, what are you working on?");
+    ~chatnpc("<p,happy>Well, it's quite exciting... we're extending the glider network to include the Feldip Hills so that people can come and look at these curious ogres.");
+    ~chatnpc("<p,neutral>They are impressive creatures aren't they - quite mystified they are by the technology we gnomes have invented.");
+    @osf_gnorm_menu_before;
+}
+if ($op = 2) {
+    ~chatplayer("<p,quiz>What are you working on?");
+    ~chatnpc("<p,happy>Well, people will be able to visit this area, once construction has finished, by using the most advanced network of glider routes in the whole of Gielinor... in fact, the only network of glider routes!");
+    @osf_gnorm_menu_before;
+}
+if ($op = 3) {
+    ~chatplayer("<p,quiz>Is there anything that I can do?");
+    ~chatnpc("<p,neutral>Not really, I'm afraid, it's probably all far too technical for someone like you.");
+    @osf_gnorm_menu_before;
+}
+if ($op = 4) {
+    @osf_gnorm_rantz;
+}
+~chatplayer("<p,neutral>Okay, thanks.");
+return;
+
+[label,osf_gnorm_menu_after]
+def_int $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything that I can do?", 3, "What was it you wanted me to do again?", 4, "Okay, thanks.", 5);
+if ($again = 1) {
+    ~chatplayer("<p,quiz>Hello there, what are you working on?");
+    ~chatnpc("<p,happy>Well, it's quite exciting... we're extending the glider network to include the Feldip Hills so that people can come and look at these curious ogres.");
+    ~chatnpc("<p,neutral>They are impressive creatures aren't they - quite mystified they are by the technology we gnomes have invented.");
+    @osf_gnorm_menu_after;
+}
+if ($again = 2) {
+    ~chatplayer("<p,quiz>What are you working on?");
+    ~chatnpc("<p,happy>Well, people will be able to visit this area, once construction has finished, by using the most advanced network of glider routes in the whole of Gielinor... in fact, the only network of glider routes!");
+    @osf_gnorm_menu_after;
+}
+if ($again = 3) {
+    ~chatplayer("<p,quiz>Is there anything that I can do?");
+    ~chatnpc("<p,neutral>Not really, I'm afraid, it's probably all far too technical for someone like you.");
+    @osf_gnorm_menu_after;
+}
+if ($again = 4) {
+    ~chatplayer("<p,quiz>What was it you wanted me to do again?");
+    ~chatnpc("<p,neutral>Go and take a look at those landing lights and see if you can get them to work, would you? They've been as dull as an ogre conversation since we started working here.");
+    ~chatnpc("<p,neutral>Come back and tell me if you actually manage to get them fixed.");
+    return;
+}
+~chatplayer("<p,neutral>Okay, thanks.");
+return;
+
+[label,osf_gnorm_rantz]
+~chatplayer("<p,neutral>Rantz said I should help you finish this project.");
+~chatnpc("<p,shock>Rantz? *gulp* Well, that would be nice actually! We are having some problems with getting the landing lights to work... do you think you could take a look at them?");
+~chatnpc("<p,neutral>I expect that it's far too complex for you, but hey, you may be able to do something!");
+def_int $yes = ~p_choice2("Yes, I'll take a look at them.", 1, "Sorry, but I've got other things to attend to.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,sad>Sorry, but I've got other things to attend to.");
+    ~chatnpc("<p,neutral>Yes, I expected it might be a bit too complex for you. We Gnomes lead the way with technical things like this - world leaders, you might say.");
+    return;
+}
+~chatplayer("<p,happy>Yes, I'll take a look at them.");
+~chatnpc("<p,neutral>Ok then, just pop over and let me know if you're not sure what you're doing... I'm sure I'll just have to fix it myself anyway. If you need any materials, just pop over.");
+~chatplayer("<p,neutral>We'll see!");
+if (%onesmallfavour = 20) {
+    %onesmallfavour = 21;
+}
+return;
