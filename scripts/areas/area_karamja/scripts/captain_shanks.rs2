@@ -4,6 +4,9 @@ if(%zombiequeen < ^zombiequeen_complete) {
     return;
 }
 ~chatnpc("<p,happy>Hello there shipmate! I sail to Khazard Port and to Port Sarim. Where are you bound?");
+if (%onesmallfavour >= 2) {
+    @osf_shanks_favour;
+}
 if(inv_total(inv, shiloshipticket) = 0) {
     def_int $price = ~random_range(26, 45);
     ~chatnpc("<p,happy>I see you don't have a ticket for the ship, my colleague normally only sells them in Shilo village. But I could sell you one for a small additional charge. Shall we say <tostring($price)> gold pieces"); // no period
@@ -26,6 +29,31 @@ if(inv_total(inv, shiloshipticket) = 0) {
     return;
 }
 @multi3_header("Khazard Port please.", shanks_khazard, "Port Sarim please.", shanks_sarim, "Nowhere just at the moment thanks.", shanks_nowhere, "Captain Shanks asks, 'Where are you bound?'");
+
+[label,osf_shanks_favour]
+if (%onesmallfavour >= 3) {
+    def_int $again = ~p_choice2("Actually I have a favour to ask.", 1, "Hmm, I'm interested in a boat trip.", 2);
+    if ($again = 1) {
+        ~chatplayer("<p,neutral>Actually I have a favour to ask.");
+        ~chatnpc("<p,angry>I've said no already...now move along...I have a tight ship to run.");
+    }
+    return;
+}
+def_int $ask = ~p_choice2("Actually I have a favour to ask.", 1, "Hmm, I'm interested in a boat trip.", 2);
+if ($ask = 2) {
+    return;
+}
+~chatplayer("<p,neutral>Actually I have a favour to ask.");
+~chatnpc("<p,quiz>A favour you say...hmmm. What is it?");
+~chatplayer("<p,neutral>I have an axe from the jungle forester, I wonder if you could nip into Brian's Axes in Port Sarim and get it sharpened for the jungle forester.");
+~chatnpc("<p,angry>Darned cheek! I have a tight ship to run, my friend, and I'll thank you to not take advantage of my good generosity. I have a far superior solution to your problem.");
+~chatnpc("<p,neutral>Take a ride with me to Port Sarim and take the axe to Brian yourself!");
+~chatplayer("<p,sad>But...I was only meant to do a small favour for Yanni Salika...I don't want to go to Port Sarim!");
+~chatnpc("<p,happy>Well...the choice is yours! Do like me and never do favours...you'll find yourself in a lot less bother I can assure you!");
+if (%onesmallfavour = 2) {
+    %onesmallfavour = 3;
+}
+return;
 
 [label,shanks_khazard]
 ~chatplayer("<p,happy>Khazard Port please.");
