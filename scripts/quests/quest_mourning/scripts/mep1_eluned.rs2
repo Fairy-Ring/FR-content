@@ -1,0 +1,48 @@
+// MEP1 access — roving Eluned (roving_female_woodelf 1679) @ 2289,3145.
+// CANDIDATE last-resort pre-SoE dump: RS3 Transcript 18 Aug 2013 / 2 May 2018
+// minus Quest Overview glue / 8-charge / Essyllt / SoE / dest / camp crystal.
+// Period camp first-talk Still missing. VERIFIED crystal line is Lletya after fade.
+// Hunt 289? no. Do not splice Islwyn / 1202 / 2372. Do not write 518 / 574.
+// Accept: %mourning_quest 0→1 then "Well, let us go then." return — no dest.
+// Cite mep1-eluned-period-media-377.md §4 / §6.
+
+[opnpc1,roving_female_woodelf]
+if (%mourning_quest >= 1) {
+    @mep1_eluned_go;
+}
+@mep1_eluned_hello;
+
+[label,mep1_eluned_hello]
+~chatplayer("<p,happy>Hi there.");
+~chatnpc("<p,happy>Hi... I hear you finished consecrating Glarial's tomb. Well done.");
+~chatplayer("<p,neutral>It was a worthy deed.");
+~chatnpc("<p,quiz>Oh... I have been asked to inform you, Arianwyn requests a meeting with you in Lletya.");
+~chatplayer("<p,confused>Lletya?? I know nothing of this place.");
+~chatnpc("<p,neutral>I will take you there if you like.");
+def_int $go = ~p_choice2("Yes, I should go see him now.", 1, "I have a few things to do right now.", 2);
+if ($go = 2) {
+    @mep1_eluned_refuse;
+}
+~chatplayer("<p,happy>Yes, I should go see him now.");
+if (%mourning_quest = 0) {
+    %mourning_quest = 1;
+}
+~chatnpc("<p,happy>Well, let us go then.");
+// Dest UNKNOWN — skip fade / crystal / Lletya stand.
+return;
+
+[label,mep1_eluned_refuse]
+~chatplayer("<p,shifty>I have a few things to do right now.");
+~chatnpc("<p,neutral>Sure thing, but he will not wait long.");
+return;
+
+[label,mep1_eluned_go]
+~chatplayer("<p,happy>Hello again.");
+~chatnpc("<p,quiz>Hello again... Arianwyn is requesting a meeting with you in Lletya. Do you want to go there now?");
+def_int $again = ~p_choice2("Yes, I should go see him now.", 1, "I have a few things to do right now.", 2);
+if ($again = 2) {
+    @mep1_eluned_refuse;
+}
+~chatplayer("<p,happy>Yes, I should go see him now.");
+~chatnpc("<p,happy>Well, let us go then.");
+return;
