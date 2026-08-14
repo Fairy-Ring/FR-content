@@ -1,0 +1,31 @@
+// One Small Favour — Use potlid on pot_empty → favour_airtight_pot 4436.
+// CANDIDATE last-resort 2007-base (Tip.it 2007 §23 J + RuneHQ Use-lid).
+// Gate ≥ 35 after potlid teach. No dest / Open / 4442 / 12346.
+// Cite osf-tassie-airtight-377.md.
+
+[opheldu,potlid]
+if (last_useitem = pot_empty) {
+    @osf_lid_on_pot;
+}
+~displaymessage(^dm_default);
+
+[opheldu,pot_empty]
+if (last_useitem = potlid) {
+    @osf_lid_on_pot;
+}
+~displaymessage(^dm_default);
+
+[label,osf_lid_on_pot]
+if (%onesmallfavour < 35) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, potlid) < 1 | inv_total(inv, pot_empty) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, potlid, 1);
+inv_del(inv, pot_empty, 1);
+inv_add(inv, favour_airtight_pot, 1);
+mes("You put the lid on the pot.");
+return;
