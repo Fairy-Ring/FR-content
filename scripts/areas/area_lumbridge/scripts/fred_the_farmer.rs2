@@ -209,24 +209,17 @@ if(inv_total(inv, ball_of_wool) > 0) {
 ~chatnpc("<p,shock>Have you been out in the sun too long?");
 
 [label,fred_give_wool]
-if_close;
-def_int $balls_left = calc(21 - %sheep);
-def_int $balls = min(inv_total(inv, ball_of_wool), $balls_left);
-inv_del(inv, ball_of_wool, $balls);
-
-%sheep = calc(%sheep + $balls);
-if(%sheep = calc(^sheep_last_wool) & inv_total(inv, ball_of_wool) > 0) {
-    @fred_end_giving_wool;
+// 274: one ball per loop until last_wool, leftover ball hits end. 377-wip
+// bulk min(inv, 21-%sheep) made 20-from-start land on 21 with 0 leftover — complete impossible.
+if (inv_total(inv, ball_of_wool) > 0 & %sheep ! ^sheep_last_wool) {
+    if_close;
+    inv_del(inv, ball_of_wool, 1);
+    mes("You give Fred a ball of wool.");
+    %sheep = calc(%sheep + 1);
+    p_delay(1);
+    @fred_give_wool;
 }
-
-// 225 dialog, 2009 RS2 is the same except for a mesbox that says "You give Fred X balls of wool" when <20 are handed in: https://youtu.be/bSV7wJuFxfA?t=471
-// Other 2009 sources don't have this dialog when all 20 are handed in at once, so perhaps this means it was also there in 377
-// No way to tell as hardly anybody doing the quest on video ever hands in less than 20 balls of wool
-// However this mesbox is also present in OSRS transcript https://oldschool.runescape.wiki/w/Transcript:Sheep_Shearer#Handing_in_any_balls_of_wool
-~mesbox("You give Fred <~text_plural($balls, "ball", "balls")> of wool"); // no period
-~chatplayer("<p,happy>That's all I've got so far.");
-~chatnpc("<p,neutral>I need more before I can pay you."); // should probably specify the number here, 2009 source does
-~chatplayer("<p,neutral>Ok, I'll work on it.");
+@fred_end_giving_wool;
 
 [label,fred_end_giving_wool]
 if(%sheep = calc(^sheep_last_wool) & inv_total(inv, ball_of_wool) > 0) {
