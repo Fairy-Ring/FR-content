@@ -42499,6 +42499,14 @@ hitpoints=40
 attack=40
 strength=40
 defence=35
+param=attackrate,5
+param=damagetype,^stab_style
+param=attack_anim,dwarf_attack
+param=defend_anim,dwarf_block
+param=death_anim,dwarf_death
+param=attack_sound,baxe_crush
+param=defend_sound,dwarf_hit
+param=death_sound,dwarf_death
 head1=npc_1795_head
 
 [favour_gangster_dwarf_2]
@@ -42525,6 +42533,14 @@ hitpoints=25
 attack=80
 strength=30
 defence=25
+param=attackrate,5
+param=damagetype,^stab_style
+param=attack_anim,dwarf_attack
+param=defend_anim,dwarf_block
+param=death_anim,dwarf_death
+param=attack_sound,baxe_crush
+param=defend_sound,dwarf_hit
+param=death_sound,dwarf_death
 head1=npc_lawgof2_head
 
 [favour_gangster_dwarf_3]
@@ -42553,6 +42569,14 @@ hitpoints=25
 attack=30
 strength=60
 defence=57
+param=attackrate,5
+param=damagetype,^stab_style
+param=attack_anim,dwarf_attack
+param=defend_anim,dwarf_block
+param=death_anim,dwarf_death
+param=attack_sound,baxe_crush
+param=defend_sound,dwarf_hit
+param=death_sound,dwarf_death
 head1=npc_upassdwarf3_head
 
 [favour_phantuwti_farsight]

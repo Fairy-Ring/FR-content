@@ -8,6 +8,12 @@ if (%onesmallfavour < 10) {
     ~displaymessage(^dm_default);
     return;
 }
+// Return leftover after Hammerspike bargain 33→34. Teach potlid.
+// No clay / 4436 / 4438 / 4440 this hop. Cite osf-tassie-potlid-377.md.
+if (%onesmallfavour >= 34) {
+    @osf_tassie_potlid;
+    return;
+}
 if (%onesmallfavour >= 11) {
     ~chatplayer("<p,neutral>Hey there...I'm back...");
     ~chatnpc("<p,quiz>So I see. What's the problem? Did you sort out Hammerspike?");
@@ -42,5 +48,25 @@ if ($yes = 2) {
 ~chatnpc("<p,neutral>He's in the dwarven mines somewhere, not sure exactly where though.");
 if (%onesmallfavour = 10) {
     %onesmallfavour = 11;
+}
+return;
+
+[label,osf_tassie_potlid]
+// CANDIDATE last-resort 2007-base (Tip.it 2007 §23 J + Transcript
+// Heading back Tassie). No inv_add clay / potlid this leftover. Hunt 289? no.
+if (%onesmallfavour >= 35) {
+    ~chatplayer("<p,quiz>How do I make the pot lid?");
+    ~chatnpc("<p,neutral>Ok then, just use the clay on the wheel over there!");
+    return;
+}
+~chatplayer("<p,happy>Hey there, Hammerspike won't be bothering you anymore!");
+~chatnpc("<p,happy>Really! Fantastic! Oh, I'm so grateful! Thanks so much! How ever can I repay you?");
+~chatplayer("<p,neutral>Well you could make me an airtight pot!");
+~chatnpc("<p,happy>I'll do better than that! I'll show you how to make an airtight pot!");
+~chatnpc("<p,neutral>Now, while pots are quite easy to make, lids are a bit different.");
+~chatnpc("<p,neutral>They have to be quite precise to fit the pot exactly, which is why you have to be quite experienced to make them.");
+~chatnpc("<p,neutral>Ok then, just use it on the wheel over there!");
+if (%onesmallfavour = 34) {
+    %onesmallfavour = 35;
 }
 return;
