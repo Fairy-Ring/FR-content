@@ -1,5 +1,16 @@
 [opnpc1,aggie]
 ~chatnpc("<p,happy>What can I help you with?");
+if (%onesmallfavour >= 4) {
+    def_int $osf = 0;
+    if (%onesmallfavour >= 5) {
+        $osf = ~p_choice2("What am I supposed to be doing?", 1, "Something else.", 2);
+    } else {
+        $osf = ~p_choice2("Could I ask you about being a character witness?", 1, "Something else.", 2);
+    }
+    if ($osf = 1) {
+        @osf_aggie_witness;
+    }
+}
 def_int $option;
 if(%princequest >= ^prince_spoken_osman & %princequest < ^prince_saved) {
     $option = ~p_choice5("Could you think of a way to make skin paste?", 5, "What could you make for me?", 1, "Cool, do you turn people into frogs?", 2, "You mad old witch, you can't help me.", 3, "Can you make dyes for me please?", 4);
@@ -33,6 +44,37 @@ if($option = 1) {
         ~chatnpc("<p,neutral>Well dearie, you need a base for the paste.|That's a mix of ash, flour and water.|Then you need redberries to colour it as you want.|Bring me those four items and I will make you some.");
     }
 }
+
+[label,osf_aggie_witness]
+if (%onesmallfavour >= 5) {
+    ~chatplayer("<p,quiz>What am I supposed to be doing?");
+    ~chatnpc("<p,sad>Well, I had hoped that you would go and look for 'Jimmy the Chisel'...but it looks like you've had other 'more important' things to do!");
+    ~chatnpc("<p,neutral>I suggest that you check out that ruined building to the east, you know, the one with all the spiders in it!");
+    return;
+}
+~chatplayer("<p,quiz>Could I ask you about being a character witness?");
+~chatnpc("<p,sad>Not at the minute I'm afraid...I'm really worried! My new apprentice 'Jimmy the Chisel' has gone missing!");
+def_int $w = ~p_choice2("Let me guess, you're going to ask me to do you a favour?", 1, "Ok, thanks.", 2);
+if ($w = 2) {
+    ~chatplayer("<p,neutral>Okay, thanks.");
+    return;
+}
+~chatplayer("<p,quiz>Let me guess, you're going to ask me to do you a favour?");
+~chatnpc("<p,sad>Would you my dear, it would only be a small favour...one small favour, that's all I ask.");
+~chatplayer("<p,neutral>Hmm, I seem to have heard that one before. Go on then, what do you want me to do?");
+~chatnpc("<p,neutral>Could you go on and check out that abandoned building and see if there's anything odd going on. Just check to see if there's any sign of young Jimmy.");
+def_int $yes = ~p_choice2("Oh, Ok, I'll see if I can find Jimmy.", 1, "No way...I've had enough of doing favours for people.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>No way...I've had enough of doing favours for people.");
+    ~chatnpc("<p,angry>Why you big meanie! He could be dead for all you know!");
+    return;
+}
+~chatplayer("<p,happy>Oh, Ok, I'll see if I can find Jimmy.");
+~chatnpc("<p,happy>Oh, thanks ever so much...I do appreciate it! Good Luck!");
+if (%onesmallfavour = 4) {
+    %onesmallfavour = 5;
+}
+return;
 
 [opnpcu,aggie]
 switch_obj(last_useitem) {
