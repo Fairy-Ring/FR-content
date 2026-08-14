@@ -3,6 +3,22 @@ if(%rjquest = ^romeojuliet_spoken_father) {
     @apothecary_lawrence_sent;
 } else if(%rjquest = ^romeojuliet_spoken_apothecary) {
     @apothecary_make_cadaver;
+} else if (%onesmallfavour >= 9) {
+    // One Small Favour leftover after Horvik 8→9. Keep potions.
+    // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Apothecary).
+    // No dest / Tassie product / 12346. Hunt 289? no.
+    ~chatnpc("<p,neutral>I am the Apothecary.");
+    ~chatnpc("<p,neutral>I have potions to brew.|Do you need anything specific?");
+    def_int $osf = 0;
+    if (%onesmallfavour >= 10) {
+        $osf = ~p_choice2("What about the breathing salts?", 1, "Something else.", 2);
+    } else {
+        $osf = ~p_choice2("Horvik is ill, I need breathing salts and herbal tincture.", 1, "Something else.", 2);
+    }
+    if ($osf = 1) {
+        @osf_apothecary_tincture;
+    }
+    @apothecary_standard;
 } else {
     // referncing https://www.youtube.com/watch?v=-tUhc9naLbo for start and str potion option
     @apothecary_standard;
@@ -80,3 +96,52 @@ if(inv_total(inv, cadavaberries) > 0) {
 ~chatnpc("<p,neutral>You will have to find them while I get the rest ready.");
 ~chatnpc("<p,neutral>Bring them here when you have them.|But be careful. They are nasty.");
 %rjquest = ^romeojuliet_spoken_apothecary;
+
+[label,osf_apothecary_tincture]
+if (%onesmallfavour >= 10) {
+    ~chatplayer("<p,quiz>What about the breathing salts?");
+    ~chatnpc("<p,sad>I smashed the pot which held them, remember?");
+    ~chatplayer("<p,quiz>Oh yes...where am I going to get a new pot?");
+    ~chatnpc("<p,neutral>You could try Tassie Slipcast over at the Barbarian Village. She's a potter there and may be able to make one. But mind, it has to be air tight.");
+    return;
+}
+~chatplayer("<p,neutral>Horvik is ill, I need breathing salts and herbal tincture.");
+~chatnpc("<p,happy>No problem!");
+if (inv_total(inv, favour_herbal_tincture) < 1) {
+    if (inv_freespace(inv) < 1) {
+        ~mesbox("You don't have enough inventory space.");
+        return;
+    }
+    ~mesbox("The Apothecary shows you the herbal tincture.");
+    inv_add(inv, favour_herbal_tincture, 1);
+}
+~chatnpc("<p,happy>There you do! There's your herbal tincture!");
+~chatplayer("<p,happy>Wow, that was surprisingly easy! Fantastic, thanks very much.");
+~chatnpc("<p,happy>No problem, pleased to help.");
+~chatplayer("<p,quiz>Oh...but...what about the breathing salts...");
+~chatnpc("<p,confused>Oh, yes, breathing salts...erm, just let me look around. I'm sure I have some around here somewhere.");
+~chatplayer("<p,neutral>Ok...");
+~chatnpc("<p,happy>Yep, here they are....");
+~mesbox("The Apothecary gets out a jar of breathing salts.");
+~chatnpc("<p,shock>Oh blimey...I've dropped the pot and smashed it!");
+~chatplayer("<p,neutral>That's ok, just hand over the breathing salts.");
+~chatnpc("<p,sad>Oh no, you don't understand. They're ruined. They're supposed to be kept in an airtight container and this was my last one.");
+~chatnpc("<p,sad>I can't order any more in until I have a new airtight container. And they were a top selling item as well.");
+~chatplayer("<p,sad>I just knew this wasn't going to be easy! So you can't get any more breathing salts?");
+~chatnpc("<p,neutral>No, I can..I can order plenty, but they'll lose their effectiveness. I need an airtight pot to keep them in.");
+~chatplayer("<p,quiz>Where would you get one of those from?");
+~chatnpc("<p,neutral>I've no idea really, this pot was a family heirloom. I guess you'd have to get a new one made?");
+~chatplayer("<p,quiz>Where could I do that?");
+~chatnpc("<p,neutral>You could try Tassie Slipcast over at the Barbarian Village. She's a potter there and may be able to make one. But mind, it has to be air tight.");
+def_int $yes = ~p_choice2("I guess I can go to the Barbarian Village.", 1, "Oh, no way am I going to the Barbarian Village.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>Oh, no way am I going to the Barbarian Village.");
+    ~chatnpc("<p,neutral>I understand...they're all barbarians over there.");
+    return;
+}
+~chatplayer("<p,happy>I guess I can go to the Barbarian Village.");
+~chatnpc("<p,happy>Wonderful, I'd really appreciate it!");
+if (%onesmallfavour = 9) {
+    %onesmallfavour = 10;
+}
+return;

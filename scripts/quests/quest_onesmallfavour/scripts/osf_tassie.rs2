@@ -1,0 +1,46 @@
+// One Small Favour — Tassie after Apothecary 9→10.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Tassie).
+// No dest / potlid / clay grant / 12346. Hunt 289? no.
+// Cite osf-tassie-slipcast-377.md.
+
+[opnpc1,favour_tassie_slipcast]
+if (%onesmallfavour < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavour >= 11) {
+    ~chatplayer("<p,neutral>Hey there...I'm back...");
+    ~chatnpc("<p,quiz>So I see. What's the problem? Did you sort out Hammerspike?");
+    ~chatplayer("<p,quiz>Not exactly, can you tell me what I'm supposed to do again?");
+    ~chatnpc("<p,neutral>Go talk to Hammerspike in the Dwarven mines and see if you can get him to leave me alone...I won't be able to make you the airtight pot else.");
+    return;
+}
+~chatplayer("<p,happy>Hey there...I need an airtight pot just as soon as you can make one!");
+~chatnpc("<p,shock>I beg your pardon!");
+~chatplayer("<p,neutral>It's a matter of some urgency that I have an airtight container as soon as possible!");
+~chatnpc("<p,angry>Who on earth do you think you are coming in here demanding an airtight pot...Can't you see that I have my own worries to think about?");
+~chatplayer("<p,sad>Oh, sorry, I didn't think...what's the problem?");
+~chatnpc("<p,sad>Well, if you must know, I'm working all the hours that Saradomin sends, I have to in order to make enough money to pay that loan shark Hammerspike!");
+~chatplayer("<p,quiz>Loan shark? Hammerspike? What are you talking about?");
+~chatnpc("<p,sad>I took over this abandoned pottery place with a loan from Hammerspike. He's demanding payment and I can barely just make the interest payments.");
+~chatnpc("<p,sad>I'm working as hard as I can but I'll never pay the loan off at this rate!");
+~chatplayer("<p,neutral>But I need an airtight pot...to store breathing salts in.");
+~chatnpc("<p,neutral>Well, that may be, but I have a rush order for a top paying customer that's going to keep Hammerspike off my back for a bit.");
+~chatnpc("<p,neutral>If you really want that pot, you're going to have to deal with Hammerspike in the dwarven mines!");
+def_int $yes = ~p_choice2("Ok, I'll deal with Hammerspike!", 1, "No, sorry, no more blooming favours for anyone!", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>No, sorry, no more blooming favours for anyone!");
+    ~chatnpc("<p,sad>Oh, well that's a real shame, I was hoping you could have sorted out that Hammerspike for me once and for all!");
+    return;
+}
+~chatplayer("<p,happy>Ok, I'll deal with Hammerspike!");
+~chatnpc("<p,shock>Really, you will?");
+~chatplayer("<p,neutral>Yes, I'll go and have a chat with him, perhaps we can sort something out.");
+~chatnpc("<p,sad>Well, that would be really great...I just hope he doesn't grind you into flour to make his bread, he's one of the most ruthless gangsters in the area.");
+~chatnpc("<p,sad>Beware, his guards are incredibly loyal, they'll slit their own throats to protect him!");
+~chatplayer("<p,neutral>That's not a pretty picture you're painting, but don't worry, I'll be careful. Now, where do I find this Hammerspike?");
+~chatnpc("<p,neutral>He's in the dwarven mines somewhere, not sure exactly where though.");
+if (%onesmallfavour = 10) {
+    %onesmallfavour = 11;
+}
+return;
