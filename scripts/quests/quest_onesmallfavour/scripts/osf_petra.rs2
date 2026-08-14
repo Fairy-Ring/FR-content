@@ -1,0 +1,23 @@
+// One Small Favour — sculpture Look/Search after Phantuwti 15→16.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Petra).
+// No dest / Petra spawn / Cromperty Talk-to / 12346. Hunt 289? no.
+// Cite osf-petra-after-phantuwti-377.md.
+
+[oploc1,favour_lady_in_wall]
+if (%onesmallfavour < 16) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~mesbox("It looks like a very well carved statue of a young girl.|The expression is incredibly life-like.");
+return;
+
+[oploc5,favour_lady_in_wall]
+if (%onesmallfavour < 16) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~mesbox("You search the life-like sculpture and see what looks like a message sticking out of the girl's belt. It reads,|'...problems report to Wizard Cromp...|..rently in residence in East Ardoug...'");
+if (%onesmallfavour = 16) {
+    %onesmallfavour = 17;
+}
+return;
