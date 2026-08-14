@@ -1,0 +1,47 @@
+// One Small Favour — Phantuwti after Arhein 14→15.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Phantuwti).
+// No dest / weather grant / Petra Search / 12346. Hunt 289? no.
+// Cite osf-phantuwti-after-arhein-377.md. Do not bind [opnpc1,seer].
+
+[opnpc1,favour_phantuwti_farsight]
+if (%onesmallfavour < 15) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavour >= 16) {
+    ~chatplayer("<p,quiz>What did you need me to do again?");
+    ~chatnpc("<p,neutral>I need you to start checking nearby caves looking for our missing Petra. The caves are probably home to some creature or creatures. Check around the vicinity.");
+    ~chatnpc("<p,neutral>The impressions are coming from a south westerly direction. Don't go further east than you are already, no further south than Ardougne and no further west than the combat training camp.");
+    return;
+}
+~chatplayer("<p,quiz>Hi, can you give me a weather forecast?");
+~chatnpc("<p,neutral>Hmm, somehow I knew you were going to ask me that...strange...life is so predictable when you have the power of foresight.");
+~chatplayer("<p,happy>Great! So I can assume you've been really pro-active and compiled an up-to-date one for me?");
+~chatnpc("<p,sad>Alas my presumptuous friend, the power of foresight and the impulse to act is quite similar to the interplay between intelligence and wisdom.");
+~chatnpc("<p,neutral>One might have intelligence enough to realise that cakes are bad for us, but we may not have the wisdom to stop cramming that delicious-looking fatty cream cake into our salivating mouth.");
+~chatplayer("<p,quiz>So, in your case, you have the power of foresight, but you're too lazy to act on it?");
+~chatnpc("<p,sad>Not exactly lazy...but unable. My abilities and concern have been focused on the fate of a local girl whose association with a certain wizard has landed her between a rock and hard place.");
+def_int $help = ~p_choice2("What can I do to help?", 1, "I'm sorry but I can't help.", 2);
+if ($help = 2) {
+    ~chatplayer("<p,sad>I'm sorry but I can't help.");
+    ~chatnpc("<p,sad>Well, that's a bit of a shame, I have to say...we all miss our Petra!");
+    return;
+}
+~chatplayer("<p,quiz>What can I do to help?");
+~chatnpc("<p,neutral>Do you think you could do me a small favour? Check around the vicinity. The impressions are coming from a south westerly direction.");
+~chatnpc("<p,neutral>Don't go further east than you are already, no further south than Ardougne and no further west than the combat training camp.");
+~chatplayer("<p,quiz>So, let me get this right. You want me to start poking my nose into a lot of caves where some creatures might be?");
+~chatplayer("<p,angry>Risking my neck for some tomboy who thinks she's got what it takes to be a real adventurer?");
+~chatnpc("<p,sad>Well, I wouldn't have put it quite that way...");
+def_int $yes = ~p_choice2("Yes, Ok, I'll do it.", 1, "No, sorry, I can't do it right now. Or maybe ever!", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>No, sorry, I can't do it right now. Or maybe ever!");
+    ~chatnpc("<p,sad>I knew you wouldn't help...oh well, perhaps someday you'll surprise me.");
+    return;
+}
+~chatplayer("<p,happy>Yes, Ok, I'll do it.");
+~chatnpc("<p,happy>Great! I just knew you'd agree to help!");
+if (%onesmallfavour = 15) {
+    %onesmallfavour = 16;
+}
+return;
