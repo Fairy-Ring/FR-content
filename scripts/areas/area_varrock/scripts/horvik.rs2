@@ -1,4 +1,28 @@
 [opnpc1,horvik_the_armourer]
+// One Small Favour leftover after Seth 7→8. Keep shop.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Horvik).
+// No dest / Tassie / cages grant / 12346. Cite osf-horvik-after-seth-377.md.
+if (%onesmallfavour >= 8) {
+    ~chatnpc("<p,happy>Hello, do you need any help?");
+    def_int $osf = 0;
+    if (%onesmallfavour >= 9) {
+        $osf = ~p_choice3("What was I supposed to be doing?", 1, "No thanks. I'm just looking around.", 2, "Do you want to trade?", 3);
+    } else {
+        $osf = ~p_choice3("Hi, I need to talk to you about chicken cages!", 1, "No thanks. I'm just looking around.", 2, "Do you want to trade?", 3);
+    }
+    if ($osf = 1) {
+        @osf_horvik_cages;
+    } else if ($osf = 2) {
+        ~chatplayer("<p,happy>No thanks. I'm just looking around.");
+        ~chatnpc("<p,happy>Well, come and see me if you're ever in need of armour!");
+        return;
+    } else if ($osf = 3) {
+        ~chatplayer("<p,quiz>Do you want to trade?");
+        ~chatnpc("<p,happy>Yes, I have a fine selection of armour.");
+        ~openshop_activenpc;
+        return;
+    }
+}
 ~chatnpc("<p,happy>Hello, do you need any help?");
 def_int $option = ~p_choice2("No thanks. I'm just looking around.", 1, "Do you want to trade?", 2);
 if($option = 1) {
@@ -9,3 +33,42 @@ if($option = 1) {
     ~chatnpc("<p,happy>Yes, I have a fine selection of armour.");
     ~openshop_activenpc;
 }
+
+[label,osf_horvik_cages]
+if (%onesmallfavour >= 9) {
+    ~chatplayer("<p,quiz>What was I supposed to be doing?");
+    ~chatnpc("<p,sad>Please can you get me some medicine? I need herbal tincture and a pot of breathing salts. Also, get me five or so of those pigeon cages that they have over in Ardougne so that I can convert them into chicken cages.");
+    return;
+}
+~chatplayer("<p,neutral>Hi, I need to talk to you about chicken cages! Seth Groats has asked me to come and see you!");
+~chatnpc("<p,neutral>Hmm, Seth eh! He's a good friend, but he still owes me three steel bars for a plough I fixed. I'm sorry but I need to have that paid off first before I can do any more work for him.");
+if (inv_total(inv, steel_bar) < 3) {
+    ~chatplayer("<p,sad>But I don't have three steel bars at the moment!");
+    ~chatnpc("<p,sad>I'm sorry to be so harsh, but I have to ensure the debt is paid before I do any more work for Seth.");
+    return;
+}
+~chatplayer("<p,neutral>Ok, well I have three steel bars here, you can have these.");
+~chatnpc("<p,happy>Ok then! Great...tell me a little more about these chicken cages...");
+~chatnpc("<p,sad>Cough Cough Cough!");
+~chatplayer("<p,quiz>Oh dear, you don't sound too well?");
+~chatnpc("<p,sad>No, I'm not actually, I'm quite ill!");
+~chatplayer("<p,neutral>Well that's a shame because I really need your help to make some chicken cages!");
+~chatnpc("<p,sad>I'm sorry, but the most I can manage today is simple trading...however, if I was to get some medicine say, I could be persuaded to do you a small favour!");
+~chatplayer("<p,quiz>Oh I see, you need me to do you a favour?");
+~chatnpc("<p,neutral>Well, just one small favour...and then I'll do you a small favour.");
+def_int $yes = ~p_choice2("Ok, I guess one good turn deserves another.", 1, "Oh, no not another favour...I just can't do another one!", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,sad>Oh, no not another favour...I just can't do another one!");
+    ~chatnpc("<p,sad>Well, I'm sorry about that...but I just can't work when I'm feeling so ill.");
+    return;
+}
+inv_del(inv, steel_bar, 3);
+~chatplayer("<p,happy>Ok, I guess one good turn deserves another.");
+~chatnpc("<p,happy>Well that's jolly decent of you my friend. I need some medicine, could you get me some herbal tincture and breathing salts, that should solve my ailments!");
+~chatplayer("<p,neutral>Well, hopefully, I'll be right back, but you never know, it might take longer!");
+~chatnpc("<p,neutral>That's great! However, I must warn you, it'll be a lot easier for me to simply adjust some existing pigeon cages. If you could get me five or so of those, that would help a lot.");
+~chatnpc("<p,neutral>But first things first, bring me the medicine!");
+if (%onesmallfavour = 8) {
+    %onesmallfavour = 9;
+}
+return;
