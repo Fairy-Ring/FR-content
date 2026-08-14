@@ -11781,6 +11781,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=obj_pickpocket_guide_man
 head2=obj_bluewizhat_manhead
 hitpoints=14
@@ -12031,6 +12032,7 @@ model1=npc_leprechaun
 model2=npc_gnomeshopkeeper
 model3=npc_gnomeshopkeeperi2
 vislevel=hide
+moverestrict=indoors
 walkanim=midget_walk
 readyanim=midget_ready
 op1=Talk-to
@@ -13089,6 +13091,7 @@ recol1d=20804
 recol2s=2340
 recol2d=14724
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -13120,6 +13123,7 @@ recol2d=20804
 recol3s=2340
 recol3d=15648
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -13705,6 +13709,7 @@ recol1d=15727
 recol2s=30613
 recol2d=25953
 vislevel=hide
+moverestrict=indoors
 walkanim=fairy_walk
 readyanim=fairy_ready
 op1=Talk-to
@@ -13728,6 +13733,7 @@ recol1d=15727
 recol2s=30613
 recol2d=25953
 vislevel=hide
+moverestrict=indoors
 walkanim=fairy_walk
 readyanim=fairy_ready
 op1=Talk-to
@@ -13892,6 +13898,7 @@ recol3d=4226
 recol4s=14724
 recol4d=4484
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -14438,6 +14445,7 @@ recol5d=19795
 recol6s=8354
 recol6d=5125
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -14714,6 +14722,7 @@ recol1d=3044
 recol2s=30613
 recol2d=3615
 vislevel=hide
+moverestrict=indoors
 walkanim=fairy_walk
 readyanim=fairy_ready
 op1=Talk-to
@@ -14762,6 +14771,7 @@ recol2d=4226
 recol3s=14724
 recol3d=4226
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -14815,6 +14825,7 @@ recol4d=24075
 recol5s=13600
 recol5d=15159
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -14927,6 +14938,7 @@ recol2d=32767
 recol3s=14724
 recol3d=22093
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -14965,6 +14977,7 @@ recol4d=18660
 recol5s=24075
 recol5d=19878
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -14993,6 +15006,7 @@ model7=obj_ikov_bootsoflightness_manwear
 recol1s=14724
 recol1d=19777
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -15187,6 +15201,7 @@ model6=npc_dwarf_normali6
 recol1s=15426
 recol1d=8354
 vislevel=hide
+moverestrict=indoors
 walkanim=dwarf_walk
 readyanim=dwarf_ready
 op1=Talk-to
@@ -15291,6 +15306,7 @@ recol2d=15426
 recol3s=15855
 recol3d=6476
 vislevel=hide
+moverestrict=indoors
 walkanim=dwarf_walk
 readyanim=dwarf_ready
 op1=Talk-to
@@ -15644,6 +15660,7 @@ recol5d=20934
 recol6s=32735
 recol6d=463
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -15713,6 +15730,7 @@ recol3d=234
 recol4s=8456
 recol4d=32767
 vislevel=hide
+moverestrict=indoors
 walkanim=dwarf_walk
 readyanim=dwarf_ready
 op1=Talk-to
@@ -15907,6 +15925,7 @@ walkanim=midget_walk
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=npc_gnomeshopkeeper_head
 wanderrange=2
 category=shop_keeper
@@ -15939,6 +15958,7 @@ walkanim=midget_walk
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=npc_gnomebanker_head
 category=shop_keeper
 param=owned_shop,gnomeshop_rometti
@@ -15964,6 +15984,7 @@ walkanim=midget_walk
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=obj_pickpocket_guide_gnome
 param=death_anim,midget_death
 param=death_sound,gnome_death
@@ -15993,6 +16014,7 @@ walkanim=midget_walk
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=npc_gnomeshopkeeper_head
 category=shop_keeper
 param=owned_shop,gnomeshop_heck
@@ -17861,6 +17883,7 @@ recol4d=10240
 recol5s=14724
 recol5d=10240
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -17888,6 +17911,7 @@ model8=obj_viking_cloak_green_manwear
 recol1s=14724
 recol1d=2340
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -18173,6 +18197,7 @@ recol1d=9410
 recol2s=14801
 recol2d=9410
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -20641,6 +20666,7 @@ recol3d=29596
 recol4s=2340
 recol4d=15773
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -20785,6 +20811,7 @@ recol5d=20934
 recol6s=6273
 recol6d=16705
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -21829,6 +21856,7 @@ recol5d=32767
 recol6s=24075
 recol6d=14596
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -22314,6 +22342,7 @@ model1=npc_leprechaun
 model2=npc_gnomebanker
 model3=npc_leprechauni3
 vislevel=hide
+moverestrict=indoors
 walkanim=midget_walk
 readyanim=midget_ready
 op1=Talk-to
@@ -22357,6 +22386,7 @@ recol2d=9513
 recol3s=13728
 recol3d=3171
 vislevel=hide
+moverestrict=indoors
 walkanim=midget_walk
 readyanim=midget_ready
 op1=Talk-to
@@ -22853,6 +22883,7 @@ op1=Talk-to
 op2=Attack
 op3=Trade
 vislevel=70
+moverestrict=indoors
 head1=npc_ogre_chieftan_head
 wanderrange=2
 maxrange=4
@@ -22888,6 +22919,7 @@ op1=Talk-to
 op2=Attack
 op3=Trade
 vislevel=70
+moverestrict=indoors
 head1=npc_ogre_chieftan_head
 wanderrange=2
 maxrange=4
@@ -24649,6 +24681,7 @@ recol5d=32767
 recol6s=15855
 recol6d=32767
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -24689,6 +24722,7 @@ recol5d=32767
 recol6s=8384
 recol6d=32767
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -25768,6 +25802,7 @@ recol5d=8355
 recol6s=9473
 recol6d=6144
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -29405,6 +29440,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=npc_macro_geni_head
 head2=obj_headband_red_manhead
 category=shop_keeper
@@ -29526,6 +29562,7 @@ readyanim=human_staffready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=npc_macro_geni_head
 head2=obj_headband_red_manhead
 category=shop_keeper
@@ -30722,6 +30759,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=4
+hitpoints=7
+attack=1
+strength=1
+defence=7
 head1=npc_drunk1_head
 head2=idk_man_jaw_goatee_head
 
@@ -32729,6 +32770,7 @@ recol3d=12582
 recol4s=7329
 recol4d=10468
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -33355,6 +33397,7 @@ recol3d=24075
 recol4s=2340
 recol4d=15622
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk to
@@ -33465,6 +33508,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
 category=shop_keeper
@@ -33954,6 +33998,7 @@ recol5d=6369
 recol6s=15649
 recol6d=9445
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 vislevel=hide
@@ -33991,6 +34036,7 @@ recol4d=23014
 recol5s=7329
 recol5d=9379
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 vislevel=hide
@@ -34579,6 +34625,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_pointy_head
 head3=npc_zoo_keeper_head
@@ -35443,6 +35490,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=idk_woman_hair_medium_head
 category=shop_keeper
 param=owned_shop,death_pub
@@ -35472,6 +35520,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=obj_pickpocket_guide_warrior
 category=shop_keeper
 param=owned_shop,death_pub
@@ -36172,6 +36221,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=1
+hitpoints=1
+attack=1
+strength=1
+defence=1
 head1=obj_pickpocket_guide_fremennik_citizen
 head2=idk_man_jaw_long_head
 param=attackrate,4
@@ -36211,6 +36264,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=1
+hitpoints=1
+attack=1
+strength=1
+defence=1
 head1=obj_pickpocket_guide_fremennik_citizen
 head2=idk_man_jaw_long_head
 param=attackrate,4
@@ -36251,6 +36308,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=1
+hitpoints=1
+attack=1
+strength=1
+defence=1
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_split_head
 head3=npc_1071_head
@@ -36290,6 +36351,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=1
+hitpoints=1
+attack=1
+strength=1
+defence=1
 head1=obj_castlewars_cloak_saradomin_womanhead
 param=attackrate,4
 param=damagetype,^crush_style
@@ -36326,6 +36391,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=1
+hitpoints=1
+attack=1
+strength=1
+defence=1
 head1=idk_woman_hair_medium_head
 head2=npc_woman2_head
 param=attackrate,4
@@ -40947,6 +41016,10 @@ readyanim=homolupus_ready
 op2=Attack
 alwaysontop=yes
 vislevel=51
+hitpoints=40
+attack=40
+strength=50
+defence=50
 
 [fenk_experiment_2]
 name=Experiment
@@ -40957,6 +41030,10 @@ readyanim=waa_homo_arachnus_ready
 walkanim=waa_homo_arachnus_walk
 op2=Attack
 vislevel=25
+hitpoints=100
+attack=1
+strength=1
+defence=30
 
 [fenk_experiment_3]
 name=Experiment
@@ -40966,6 +41043,10 @@ readyanim=waa_ovinocanus_ready
 walkanim=waa_ovinocanus_walk
 op2=Attack
 vislevel=25
+hitpoints=100
+attack=1
+strength=1
+defence=30
 
 [roving_female_woodelf]
 name=Eluned
@@ -41021,6 +41102,10 @@ op2=Attack
 resizeh=160
 resizev=160
 vislevel=84
+hitpoints=120
+attack=60
+strength=60
+defence=60
 
 [roving_golrie]
 name=Golrie
@@ -41194,6 +41279,10 @@ walkanim=cow_walk
 readyanim=cow_just_ready
 op2=Attack
 vislevel=2
+hitpoints=8
+attack=1
+strength=1
+defence=1
 param=slayer_category,^slayer_cow
 
 [ahoy_undead_chicken]
@@ -41214,6 +41303,10 @@ walkanim=chicken_walk
 readyanim=chicken_ready
 op2=Attack
 vislevel=1
+hitpoints=3
+attack=1
+strength=1
+defence=1
 param=slayer_category,^slayer_bird
 
 [giant_lobster]
@@ -41225,6 +41318,10 @@ walkanim=scorpion_walk
 readyanim=scorpion_ready
 op2=Attack
 vislevel=32
+hitpoints=32
+attack=18
+strength=26
+defence=40
 
 [ahoy_robin]
 name=Robin
@@ -41345,6 +41442,10 @@ ambient=12
 contrast=12
 op2=Attack
 vislevel=59
+hitpoints=51
+attack=52
+strength=62
+defence=38
 head1=npc_1686_head
 param=slayer_category,^slayer_ghost
 
@@ -41597,6 +41698,10 @@ op2=Attack
 resizev=134
 resizeh=134
 vislevel=12
+hitpoints=15
+attack=8
+strength=12
+defence=8
 head1=obj_pickpocket_guide_mham
 
 [favour_guard_male_bearded]
@@ -41629,6 +41734,10 @@ op2=Attack
 resizev=134
 resizeh=134
 vislevel=18
+hitpoints=20
+attack=14
+strength=18
+defence=12
 head1=obj_pickpocket_guide_mham
 head2=idk_man_jaw_short_head
 
@@ -41662,6 +41771,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=22
+hitpoints=30
+attack=16
+strength=20
+defence=12
 head1=obj_pickpocket_guide_mham
 head2=idk_man_jaw_long_head
 
@@ -42081,6 +42194,10 @@ op2=Attack
 resizeh=100
 resizev=100
 vislevel=2
+hitpoints=6
+attack=1
+strength=1
+defence=1
 
 [cow3]
 name=Cow
@@ -42136,6 +42253,10 @@ op2=Attack
 resizeh=100
 resizev=100
 vislevel=2
+hitpoints=6
+attack=1
+strength=1
+defence=1
 
 [roving_update_female_woodelf]
 name=Ilfeen
@@ -42856,6 +42977,10 @@ size=2
 readyanim=bearsuit_ready
 walkanim=bearsuit_walk
 vislevel=70
+hitpoints=50
+attack=65
+strength=65
+defence=60
 op1=Talk-to
 op2=Attack
 head1=npc_1812_head
@@ -42869,6 +42994,10 @@ size=2
 readyanim=bearsuit_ready
 walkanim=bearsuit_walk
 vislevel=70
+hitpoints=50
+attack=65
+strength=65
+defence=60
 op2=Attack
 head1=npc_1812_head
 
@@ -42888,6 +43017,10 @@ resizev=120
 op1=Talk-to
 op2=Attack
 vislevel=31
+hitpoints=30
+attack=25
+strength=30
+defence=25
 head1=idk_man_hair_long_head
 head2=idk_man_jaw_long_head
 
@@ -42907,6 +43040,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=31
+hitpoints=30
+attack=25
+strength=30
+defence=25
 head1=idk_man_hair_dreadlocks_head
 head2=idk_man_jaw_long_head
 
@@ -42922,6 +43059,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=31
+hitpoints=30
+attack=25
+strength=30
+defence=25
 head1=obj_pickpocket_guide_warrior
 
 [mdaughter_camp_female2]
@@ -42938,6 +43079,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=31
+hitpoints=30
+attack=25
+strength=30
+defence=25
 head1=idk_woman_hair_dreadlocks_head
 
 [mdaughter_camp_female3]
@@ -42958,6 +43103,10 @@ resizev=100
 op1=Talk-to
 op2=Attack
 vislevel=25
+hitpoints=25
+attack=20
+strength=25
+defence=20
 head1=npc_1818_head
 
 [mdaughter_goat]
@@ -43018,6 +43167,10 @@ readyanim=wall_beast_combat_ready
 op2=Attack
 turnspeed=0
 vislevel=49
+hitpoints=105
+attack=30
+strength=30
+defence=16
 
 [giant_frog]
 name=Giant frog
@@ -43028,6 +43181,10 @@ walkanim=giant_frog_walk
 op2=Attack
 size=2
 vislevel=99
+hitpoints=100
+attack=100
+strength=80
+defence=65
 
 [medium_frog]
 name=Big frog
@@ -43039,6 +43196,10 @@ walkanim=giant_frog_walk
 readyanim=giant_frog_ready
 op2=Attack
 vislevel=24
+hitpoints=25
+attack=25
+strength=20
+defence=15
 
 [little_frog]
 name=Frog
@@ -43410,6 +43571,10 @@ recol1d=13899
 walkanim=rock_avatar_walk
 readyanim=rock_avatar_ready
 vislevel=125
+hitpoints=100
+attack=110
+strength=100
+defence=95
 resizeh=115
 resizev=115
 op2=Attack
@@ -43425,6 +43590,10 @@ recol1d=27430
 walkanim=rock_avatar_walk
 readyanim=rock_avatar_ready
 vislevel=75
+hitpoints=70
+attack=70
+strength=65
+defence=50
 resizeh=100
 resizev=100
 op2=Attack
@@ -43451,6 +43620,10 @@ recol1d=13899
 walkanim=rock_avatar_walk
 readyanim=rock_avatar_ready
 vislevel=125
+hitpoints=100
+attack=10
+strength=100
+defence=120
 resizeh=115
 resizev=115
 op2=Attack
@@ -43466,6 +43639,10 @@ recol1d=27430
 walkanim=rock_avatar_walk
 readyanim=rock_avatar_ready
 vislevel=75
+hitpoints=70
+attack=10
+strength=40
+defence=75
 resizeh=100
 resizev=100
 op2=Attack
@@ -43492,6 +43669,10 @@ recol1d=13899
 walkanim=rock_avatar_walk
 readyanim=rock_avatar_ready
 vislevel=125
+hitpoints=100
+attack=10
+strength=90
+defence=120
 resizeh=115
 resizev=115
 op2=Attack
@@ -43507,6 +43688,10 @@ recol1d=27430
 walkanim=rock_avatar_walk
 readyanim=rock_avatar_ready
 vislevel=75
+hitpoints=70
+attack=10
+strength=50
+defence=75
 resizeh=100
 resizev=100
 op2=Attack
@@ -43548,6 +43733,7 @@ recol5d=9410
 recol6s=6464
 recol6d=12544
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -43846,6 +44032,10 @@ readyanim=snake_ready
 op2=Attack
 alwaysontop=yes
 vislevel=5
+hitpoints=6
+attack=4
+strength=5
+defence=3
 
 [feud_charmers_snake]
 name=Snake
@@ -43920,6 +44110,10 @@ op1=Talk-to
 op2=Attack
 op3=Pickpocket
 vislevel=56
+hitpoints=30
+attack=59
+strength=70
+defence=30
 head1=idk_man_jaw_moustache_head
 head2=npc_1862_head
 head3=obj_pickpocket_guide_man
@@ -43946,6 +44140,10 @@ op3=Pickpocket
 op4=Lure
 op5=Knock-Out
 vislevel=56
+hitpoints=30
+attack=59
+strength=70
+defence=30
 head1=idk_man_jaw_moustache_head
 head2=npc_1862_head
 head3=obj_pickpocket_guide_man
@@ -43981,6 +44179,10 @@ op1=Talk-to
 op2=Attack
 op3=Pickpocket
 vislevel=41
+hitpoints=30
+attack=40
+strength=50
+defence=20
 head1=npc_1862_headi2
 head2=npc_1862_head
 head3=obj_pickpocket_guide_man
@@ -44009,6 +44211,10 @@ op3=Pickpocket
 op4=Lure
 op5=Knock-Out
 vislevel=41
+hitpoints=30
+attack=40
+strength=50
+defence=20
 head1=npc_1862_headi2
 head2=npc_1862_head
 head3=obj_pickpocket_guide_man
@@ -44034,6 +44240,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 alwaysontop=yes
 vislevel=70
+hitpoints=50
+attack=59
+strength=80
+defence=50
 head1=idk_man_jaw_moustache_head
 head2=npc_1862_head
 head3=obj_pickpocket_guide_man
@@ -44393,6 +44603,10 @@ recol3d=18855
 op1=Talk-to
 op2=Attack
 vislevel=55
+hitpoints=60
+attack=60
+strength=50
+defence=20
 head1=npc_1901_head
 head2=obj_pickpocket_guide_man
 head3=idk_man_jaw_pointy_head
@@ -44422,6 +44636,10 @@ op3=Pickpocket
 op4=Lure
 op5=Knock-Out
 vislevel=55
+hitpoints=60
+attack=60
+strength=50
+defence=20
 head1=npc_1901_head
 head2=obj_pickpocket_guide_man
 head3=idk_man_jaw_pointy_head
@@ -44448,6 +44666,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 alwaysontop=yes
 vislevel=75
+hitpoints=75
+attack=85
+strength=50
+defence=50
 head1=npc_1901_head
 head2=obj_pickpocket_guide_man
 head3=idk_man_jaw_pointy_head
@@ -44476,6 +44698,10 @@ walkanim=human_transwalk_f
 readyanim=human_transready
 op2=Attack
 vislevel=154
+hitpoints=130
+attack=190
+strength=80
+defence=135
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_medium_head
 
@@ -44503,6 +44729,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=139
+hitpoints=200
+attack=99
+strength=99
+defence=99
 head1=npc_1914_head
 
 [blooddiamond_vampirewarrior_unkillable]
@@ -44529,6 +44759,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=139
+hitpoints=200
+attack=99
+strength=99
+defence=99
 head1=npc_1914_head
 
 [malak]
@@ -44651,6 +44885,10 @@ readyanim=human_ready
 readyanim=human_ready
 op2=Attack
 vislevel=95
+hitpoints=80
+attack=90
+strength=80
+defence=80
 head1=npc_pirate1_head
 head2=npc_1919_head
 
@@ -44826,6 +45064,10 @@ op3=Pickpocket
 op2=Attack
 op1=Talk-to
 vislevel=74
+hitpoints=65
+attack=65
+strength=65
+defence=65
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
 head3=npc_gem_trader_head
@@ -44985,6 +45227,10 @@ op3=Pickpocket
 op2=Attack
 op1=Talk-to
 vislevel=57
+hitpoints=50
+attack=50
+strength=50
+defence=50
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
 head3=npc_gem_trader_head
@@ -45083,6 +45329,10 @@ resizeh=134
 resizev=134
 op2=Attack
 vislevel=124
+hitpoints=80
+attack=140
+strength=120
+defence=80
 
 [trollrescue_icetroll_melee2]
 name=Ice Troll
@@ -45103,6 +45353,10 @@ resizeh=128
 resizev=128
 op2=Attack
 vislevel=123
+hitpoints=80
+attack=120
+strength=120
+defence=100
 
 [trollrescue_icetroll_melee3]
 name=Ice Troll
@@ -45122,6 +45376,10 @@ resizeh=139
 resizev=139
 op2=Attack
 vislevel=120
+hitpoints=100
+attack=100
+strength=100
+defence=120
 
 [trollrescue_icetroll_melee4]
 name=Ice Troll
@@ -45142,6 +45400,10 @@ resizeh=134
 resizev=134
 op2=Attack
 vislevel=121
+hitpoints=90
+attack=110
+strength=110
+defence=110
 
 [trollrescue_icetroll_melee5]
 name=Ice Troll
@@ -45161,6 +45423,10 @@ resizeh=138
 resizev=138
 op2=Attack
 vislevel=120
+hitpoints=100
+attack=100
+strength=100
+defence=120
 
 [trollrescue_icetroll_melee6]
 name=Ice Troll
@@ -45181,6 +45447,10 @@ resizeh=125
 resizev=125
 op2=Attack
 vislevel=120
+hitpoints=100
+attack=100
+strength=100
+defence=120
 
 [trollrescue_icetroll_melee7]
 name=Ice Troll
@@ -45199,6 +45469,10 @@ resizeh=134
 resizev=134
 op2=Attack
 vislevel=121
+hitpoints=90
+attack=110
+strength=110
+defence=110
 
 [troll_block_1]
 turnspeed=0
@@ -45305,6 +45579,10 @@ walkanim=dog_walk
 readyanim=dog_ready
 op2=Attack
 vislevel=132
+hitpoints=70
+attack=150
+strength=150
+defence=70
 
 [ice_wolf_2]
 name=Ice wolf
@@ -45321,6 +45599,10 @@ op2=Attack
 resizev=110
 resizeh=110
 vislevel=132
+hitpoints=70
+attack=150
+strength=150
+defence=70
 
 [ice_wolf_3]
 name=Ice wolf
@@ -45337,6 +45619,10 @@ op2=Attack
 resizev=150
 resizeh=150
 vislevel=132
+hitpoints=70
+attack=150
+strength=150
+defence=70
 
 [ice_wolf_4]
 name=Ice wolf
@@ -45353,6 +45639,10 @@ op2=Attack
 resizev=160
 resizeh=160
 vislevel=132
+hitpoints=70
+attack=150
+strength=150
+defence=70
 
 [ice_wolf_5]
 name=Ice wolf
@@ -45369,6 +45659,10 @@ op2=Attack
 resizev=140
 resizeh=145
 vislevel=132
+hitpoints=70
+attack=150
+strength=150
+defence=70
 
 [ice_wolf_6]
 name=Ice wolf
@@ -45385,6 +45679,10 @@ op2=Attack
 resizev=140
 resizeh=145
 vislevel=132
+hitpoints=70
+attack=150
+strength=150
+defence=70
 
 [desert_treasure_invisible_npc]
 model1=trollrescue_blankmodel_8
@@ -45454,6 +45752,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 
 [deserttreasure_mummy_3]
 name=Mummy
@@ -45473,6 +45775,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 
 [deserttreasure_mummy_4]
 name=Mummy
@@ -45492,6 +45798,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 
 [deserttreasure_mummy_5]
 name=Mummy
@@ -45511,6 +45821,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 
 [deserttreasure_mummy_2_on_fire]
 name=Mummy
@@ -45533,6 +45847,10 @@ op2=Attack
 ambient=60
 contrast=60
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 
 [deserttreasure_mummy_3_on_fire]
 name=Mummy
@@ -45555,6 +45873,10 @@ op2=Attack
 ambient=60
 contrast=60
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 
 [deserttreasure_mummy_4_on_fire]
 name=Mummy
@@ -45577,6 +45899,10 @@ op2=Attack
 ambient=60
 contrast=60
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 
 [deserttreasure_mummy_5_on_fire]
 name=Mummy
@@ -45599,6 +45925,10 @@ op2=Attack
 ambient=60
 contrast=60
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 
 [scarab_swarm]
 name=Scarabs
@@ -45608,6 +45938,10 @@ walkanim=scarab_swarming
 readyanim=scarab_ready
 op2=Attack
 vislevel=92
+hitpoints=25
+attack=255
+strength=2
+defence=10
 
 [azzanadra]
 walkanim=ghost_walk
@@ -45655,6 +45989,7 @@ recol5d=4224
 recol6s=7298
 recol6d=4224
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -45686,6 +46021,10 @@ resizev=190
 resizeh=190
 op2=Attack
 vislevel=80
+hitpoints=70
+attack=70
+strength=70
+defence=70
 
 [fd_damis_normal]
 name=Damis
@@ -45711,6 +46050,10 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=103
+hitpoints=90
+attack=90
+strength=90
+defence=90
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_short_head
 
@@ -45738,6 +46081,10 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=174
+hitpoints=200
+attack=160
+strength=100
+defence=160
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
 
@@ -45755,6 +46102,10 @@ walkanim=dog_walk
 readyanim=dog_ready
 op2=Attack
 vislevel=63
+hitpoints=62
+attack=53
+strength=54
+defence=54
 param=slayer_category,^slayer_dog
 
 [firediamond_firewarrior]
@@ -45769,6 +46120,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=167
+hitpoints=130
+attack=190
+strength=120
+defence=135
 
 [ics_little_worker1]
 name=Slave
@@ -46146,6 +46501,10 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=91
+hitpoints=90
+attack=90
+strength=90
+defence=40
 head1=npc_1991_head
 head2=idk_man_jaw_short_head
 head3=obj_roguetrader_menaphite_hat_manhead
@@ -46173,6 +46532,10 @@ walkanim=croc_walk
 readyanim=croc_ready
 op2=Attack
 vislevel=63
+hitpoints=62
+attack=53
+strength=54
+defence=54
 param=slayer_category,^slayer_crocodile
 
 [ics_little_jackal]
@@ -46183,6 +46546,10 @@ walkanim=dog_walk
 readyanim=dog_ready
 op2=Attack
 vislevel=21
+hitpoints=27
+attack=17
+strength=18
+defence=15
 param=slayer_category,^slayer_dog
 
 [ics_little_locust]
@@ -46193,6 +46560,10 @@ walkanim=locust_walk
 readyanim=locust_ready
 op2=Attack
 vislevel=18
+hitpoints=27
+attack=17
+strength=18
+defence=1
 
 [ics_little_vulture]
 name=Vulture
@@ -46201,6 +46572,10 @@ model1=npc_1996
 size=2
 op2=Attack
 vislevel=31
+hitpoints=10
+attack=40
+strength=40
+defence=10
 
 [ics_little_plague_frog]
 name=Plague Frog
@@ -46214,6 +46589,10 @@ walkanim=chompy_toad_walk
 readyanim=chompy_toad_ready
 op2=Attack
 vislevel=11
+hitpoints=10
+attack=18
+strength=10
+defence=1
 
 [ics_little_plague_cow1]
 name=Plagued Cow
@@ -46402,6 +46781,10 @@ resizev=140
 op2=Attack
 alwaysontop=yes
 vislevel=81
+hitpoints=75
+attack=80
+strength=83
+defence=40
 
 [ics_little_apmeken]
 name=Apmeken
@@ -46430,6 +46813,10 @@ resizeh=140
 resizev=140
 op2=Attack
 vislevel=75
+hitpoints=70
+attack=30
+strength=40
+defence=60
 alwaysontop=yes
 
 [ics_little_scabaras]
@@ -46459,6 +46846,10 @@ resizeh=140
 resizev=140
 op2=Attack
 vislevel=75
+hitpoints=50
+attack=70
+strength=70
+defence=66
 alwaysontop=yes
 
 [ics_little_crondis]
@@ -46490,6 +46881,10 @@ resizeh=140
 resizev=140
 op2=Attack
 vislevel=75
+hitpoints=60
+attack=80
+strength=70
+defence=35
 alwaysontop=yes
 
 [ics_little_ic]
@@ -46576,6 +46971,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=84
+hitpoints=90
+attack=90
+strength=30
+defence=90
 
 [ics_little_mummy_2]
 name=Mummy
@@ -46595,6 +46994,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=84
+hitpoints=90
+attack=90
+strength=30
+defence=90
 
 [ics_little_mummy_3]
 name=Mummy
@@ -46614,6 +47017,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=84
+hitpoints=90
+attack=90
+strength=30
+defence=90
 
 [ics_little_mummy_4]
 name=Mummy
@@ -46633,6 +47040,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=84
+hitpoints=90
+attack=90
+strength=30
+defence=90
 
 [ics_little_mummy_5]
 name=Mummy
@@ -46652,6 +47063,10 @@ walkanim=deserttreasure_mummy_walk
 readyanim=deserttreasure_mummy_ready
 op2=Attack
 vislevel=84
+hitpoints=90
+attack=90
+strength=30
+defence=90
 
 [multi_vanstrom_stranger_entity]
 turnspeed=0
@@ -46728,6 +47143,10 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=98
+hitpoints=100
+attack=1
+strength=1
+defence=100
 
 [barrows_dharok]
 name=Dharok the Wretched
@@ -46745,6 +47164,10 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=115
+hitpoints=100
+attack=100
+strength=100
+defence=100
 
 [barrows_guthan]
 name=Guthan the Infested
@@ -46762,6 +47185,10 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=115
+hitpoints=100
+attack=100
+strength=100
+defence=100
 
 [barrows_karil]
 name=Karil the Tainted
@@ -46774,6 +47201,10 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=98
+hitpoints=100
+attack=1
+strength=1
+defence=100
 
 [barrows_torag]
 name=Torag the Corrupted
@@ -46791,6 +47222,10 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=115
+hitpoints=100
+attack=100
+strength=100
+defence=100
 
 [barrows_verac]
 name=Verac the Defiled
@@ -46845,6 +47280,10 @@ walkanim=bloodworm_walk
 readyanim=bloodworm_ready
 op2=Attack
 vislevel=52
+hitpoints=45
+attack=80
+strength=20
+defence=35
 
 [barrows_rat]
 name=Crypt rat
@@ -46859,6 +47298,10 @@ readyanim=rat_ready
 op2=Attack
 minimap=no
 vislevel=43
+hitpoints=35
+attack=70
+strength=20
+defence=20
 param=slayer_category,^slayer_rat
 
 [barrows_giantrat]
@@ -46880,6 +47323,10 @@ walkanim=giantrat_walk
 readyanim=giantrat_ready
 op2=Attack
 vislevel=76
+hitpoints=70
+attack=80
+strength=50
+defence=65
 param=slayer_category,^slayer_rat
 
 [barrows_spider]
@@ -46891,6 +47338,10 @@ recol1d=9541
 walkanim=spider_walk
 op2=Attack
 vislevel=56
+hitpoints=60
+attack=45
+strength=47
+defence=45
 
 [barrows_giantspider]
 name=Giant crypt spider
@@ -46906,6 +47357,10 @@ walkanim=giantspider_walk
 readyanim=giantspider_ready
 op2=Attack
 vislevel=79
+hitpoints=80
+attack=65
+strength=67
+defence=65
 
 [barrows_skeleton_unarmed]
 name=Skeleton
@@ -46920,6 +47375,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=77
+hitpoints=51
+attack=72
+strength=72
+defence=72
 
 [barrows_skeleton_armed]
 name=Skeleton
@@ -46939,6 +47398,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=77
+hitpoints=51
+attack=72
+strength=72
+defence=72
 
 [zogre_ogre_shaman]
 name=Grish
@@ -47030,6 +47493,10 @@ resizeh=135
 resizev=135
 op2=Attack
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_2]
 name=Zogre
@@ -47051,6 +47518,10 @@ readyanim=ogre_ready
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_3]
 name=Zogre
@@ -47072,6 +47543,10 @@ readyanim=ogre_ready
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_4]
 name=Zogre
@@ -47093,6 +47568,10 @@ readyanim=ogre_ready
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_5]
 name=Zogre
@@ -47114,6 +47593,10 @@ readyanim=ogre_ready
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_6]
 name=Zogre
@@ -47135,6 +47618,10 @@ readyanim=ogre_ready
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_skele_dance]
 name=Skogre
@@ -47147,6 +47634,10 @@ resizev=120
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_dance_1]
 name=Zogre
@@ -47168,6 +47659,10 @@ readyanim=ogre_dance
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_dance_2]
 name=Zogre
@@ -47189,6 +47684,10 @@ walkanim=zombie_ogre_walk
 readyanim=ogre_dance
 op2=Attack
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_dance_3]
 name=Zogre
@@ -47210,6 +47709,10 @@ readyanim=ogre_dance
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_dance_4]
 name=Zogre
@@ -47231,6 +47734,10 @@ readyanim=ogre_dance
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_drummer1]
 name=Zogre
@@ -47252,6 +47759,10 @@ readyanim=ogre_drum
 size=2
 op2=Attack
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_drummer2]
 name=Skogre
@@ -47273,6 +47784,10 @@ readyanim=ogre_drum
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_skele]
 name=Skogre
@@ -47285,6 +47800,10 @@ readyanim=ogre_ready
 op2=Attack
 size=2
 vislevel=44
+hitpoints=71
+attack=20
+strength=36
+defence=35
 
 [zogre_human_brentle_vahn]
 name=Zombie
@@ -47297,6 +47816,10 @@ readyanim=zombie_ready
 op1=Talk-to
 op2=Attack
 vislevel=39
+hitpoints=50
+attack=30
+strength=30
+defence=30
 
 [zogre_human_zavistic_rarve]
 name=Zavistic Rarve
@@ -47353,6 +47876,10 @@ readyanim=ogre_ready
 size=3
 op2=Attack
 vislevel=111
+hitpoints=100
+attack=100
+strength=120
+defence=60
 
 [zogre_sithik_man]
 name=Sithik Ints
@@ -48632,6 +49159,10 @@ readyanim=dwarf_ready
 op1=Talk-to
 op2=Attack
 vislevel=48
+hitpoints=40
+attack=40
+strength=45
+defence=45
 head1=npc_mcannonguard_head
 head2=npc_mcannonguard_headi2
 param=slayer_category,^slayer_dwarf
@@ -48661,6 +49192,10 @@ readyanim=dwarf_ready
 op1=Talk-to
 op2=Attack
 vislevel=48
+hitpoints=40
+attack=40
+strength=45
+defence=45
 head1=npc_lawgof2_head
 head2=npc_mcannonguard_headi2
 param=slayer_category,^slayer_dwarf
@@ -48688,6 +49223,10 @@ readyanim=dwarf_ready
 op1=Talk-to
 op2=Attack
 vislevel=48
+hitpoints=40
+attack=40
+strength=45
+defence=45
 head1=npc_2094_head
 head2=npc_mcannonguard_headi2
 param=slayer_category,^slayer_dwarf
@@ -48715,6 +49254,10 @@ readyanim=dwarf_ready
 op1=Talk-to
 op2=Attack
 vislevel=48
+hitpoints=40
+attack=40
+strength=45
+defence=45
 head1=npc_mcannonguard_head
 head2=npc_mcannonguard_headi2
 param=slayer_category,^slayer_dwarf
@@ -48741,6 +49284,10 @@ readyanim=dwarf_ready
 op1=Talk-to
 op2=Attack
 vislevel=66
+hitpoints=50
+attack=60
+strength=60
+defence=60
 head1=npc_2134_head
 param=slayer_category,^slayer_dwarf
 
@@ -48766,6 +49313,10 @@ readyanim=dwarf_ready
 op1=Talk-to
 op2=Attack
 vislevel=66
+hitpoints=50
+attack=60
+strength=60
+defence=60
 head1=npc_2134_head
 param=slayer_category,^slayer_dwarf
 
@@ -48794,6 +49345,10 @@ readyanim=dwarf_ready
 op1=Talk-to
 op2=Attack
 vislevel=66
+hitpoints=50
+attack=60
+strength=60
+defence=60
 head1=npc_2134_head
 param=slayer_category,^slayer_dwarf
 
@@ -51010,6 +51565,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=idk_woman_hair_medium_head
 head2=npc_lady_pirate_headi2
 category=shop_keeper
@@ -51104,6 +51660,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=20
+hitpoints=22
+attack=17
+strength=18
+defence=13
 
 [lumbridge_guide2_man]
 name=Gee
@@ -51297,6 +51857,10 @@ walkanim=midget_walk
 readyanim=midget_ready
 op2=Attack
 vislevel=3
+hitpoints=3
+attack=1
+strength=1
+defence=1
 head1=npc_commander_montai_head
 
 [battlefield_d_skingnomeknight]
@@ -51317,6 +51881,10 @@ walkanim=midget_walk
 readyanim=midget_ready
 op2=Attack
 vislevel=3
+hitpoints=3
+attack=1
+strength=1
+defence=1
 head1=npc_commander_montai_head
 
 [battlefield_gnome_troop]
@@ -51331,6 +51899,10 @@ walkanim=midget_walk
 readyanim=midget_ready
 op2=Attack
 vislevel=3
+hitpoints=3
+attack=1
+strength=1
+defence=1
 head1=obj_pickpocket_guide_gnome
 
 [battlefield_darkskinned_gnome_archer]
@@ -51362,6 +51934,10 @@ walkanim=midget_walk
 readyanim=midget_ready
 op2=Attack
 vislevel=3
+hitpoints=3
+attack=1
+strength=1
+defence=1
 head1=obj_pickpocket_guide_gnome
 
 [battlefield_terrorbird_mountedspear]
@@ -51710,6 +52286,7 @@ recol3d=5251
 recol4s=5312
 recol4d=3137
 vislevel=hide
+moverestrict=indoors
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
@@ -51885,6 +52462,10 @@ readyanim=human_ready
 op1=Talk-to
 op2=Attack
 vislevel=20
+hitpoints=20
+attack=0
+strength=0
+defence=0
 head1=obj_pickpocket_guide_guard
 
 [rd_observer_room_4]
@@ -52335,6 +52916,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=idk_woman_hair_bun_head
 category=shop_keeper
 param=owned_shop,farming_shop_1
@@ -52367,6 +52949,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=idk_woman_hair_dreadlocks_head
 category=shop_keeper
 param=owned_shop,farming_shop_2
@@ -52400,6 +52983,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=obj_pickpocket_guide_farmer
 category=shop_keeper
 param=owned_shop,farming_shop_3
@@ -52431,6 +53015,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=idk_woman_hair_medium_head
 category=shop_keeper
 param=owned_shop,farming_shop_4
@@ -52459,6 +53044,10 @@ walkanim=cow_walk
 readyanim=cow_just_ready
 op2=Attack
 vislevel=2
+hitpoints=6
+attack=1
+strength=1
+defence=1
 
 [sheepdog]
 name=Sheepdog
@@ -53914,6 +54503,10 @@ walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halbe
 readyanim=human_staffready
 op2=Attack
 vislevel=108
+hitpoints=19
+attack=8
+strength=8
+defence=8
 head1=obj_gasmask_manhead
 
 [mourner_hideout_gnome_guard]
@@ -54906,6 +55499,10 @@ readyanim=ogre_ready
 op1=Talk-to
 op2=Attack
 vislevel=1
+hitpoints=1
+attack=1
+strength=1
+defence=1
 head1=npc_ogre_chieftan_head
 
 [viking_dagganoth_cave_ferryman_rellekka]
@@ -55241,6 +55838,10 @@ walkanim=horror_crab_walk
 readyanim=horror_crab_ready
 op2=Attack
 vislevel=137
+hitpoints=180
+attack=50
+strength=80
+defence=200
 
 [giant_rockcrab_hidden]
 name=Boulder
@@ -55265,6 +55866,10 @@ resizeh=60
 resizev=60
 op2=Attack
 vislevel=42
+hitpoints=35
+attack=50
+strength=35
+defence=25
 param=slayer_category,^slayer_dagannoth
 
 [dungeon_dagganoth_mainroom]
@@ -55285,6 +55890,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=90
+hitpoints=95
+attack=76
+strength=78
+defence=65
 param=slayer_category,^slayer_dagannoth
 
 [dungeon_dagganoth_lighter]
@@ -55305,6 +55914,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=88
+hitpoints=85
+attack=10
+strength=10
+defence=75
 param=slayer_category,^slayer_dagannoth
 
 [dungeon_dagganoth_magic_monster]
@@ -55317,6 +55930,10 @@ resizeh=110
 resizev=110
 op2=Attack
 vislevel=98
+hitpoints=120
+attack=1
+strength=1
+defence=80
 
 [agilityarena_non_combat_bat]
 name=Giant bat
@@ -55393,6 +56010,10 @@ walkanim=snake_walk
 readyanim=snake_ready
 op2=Attack
 vislevel=35
+hitpoints=25
+attack=25
+strength=25
+defence=50
 
 [tbwcu_snakejungle_appear]
 name=Bush Snake
@@ -55403,6 +56024,10 @@ readyanim=snake_ready
 op2=Attack
 turnspeed=1024
 vislevel=35
+hitpoints=25
+attack=25
+strength=25
+defence=50
 
 [tbwcu_jungle_spider]
 name=Jungle spider
@@ -55445,6 +56070,10 @@ walkanim=tbw_mosquito_walk
 readyanim=tbw_mosquito_ready
 op2=Attack
 vislevel=13
+hitpoints=3
+attack=5
+strength=1
+defence=45
 
 [tbwcu_mosquito_swarm3]
 name=Mosquito swarm
@@ -55454,6 +56083,10 @@ walkanim=tbw_mosquito_walk
 readyanim=tbw_mosquito_ready
 op2=Attack
 vislevel=17
+hitpoints=9
+attack=10
+strength=1
+defence=45
 
 [tbwcu_mosquito_swarm5]
 name=Mosquito swarm
@@ -55463,6 +56096,10 @@ walkanim=tbw_mosquito_walk
 readyanim=tbw_mosquito_ready
 op2=Attack
 vislevel=20
+hitpoints=15
+attack=15
+strength=1
+defence=45
 
 [tbwcu_tribesman_instant]
 name=Tribesman
@@ -55565,6 +56202,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=tbw_broodoo_dance
 op2=Attack
 vislevel=60
+hitpoints=100
+attack=0
+strength=0
+defence=26
 head1=npc_macro_geni_head
 
 [tbwcu_broodoo_disease_instant]
@@ -55620,6 +56261,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=tbw_broodoo_dance
 op2=Attack
 vislevel=60
+hitpoints=100
+attack=0
+strength=0
+defence=26
 head1=npc_macro_geni_head
 
 [tbwcu_broodoo_combat_instant]
@@ -55659,6 +56304,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=tbw_broodoo_dance
 op2=Attack
 vislevel=60
+hitpoints=100
+attack=0
+strength=0
+defence=26
 
 [tbwcu_sharimika_multinpc]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -56790,6 +57439,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=20
+hitpoints=22
+attack=17
+strength=18
+defence=13
 
 [wom_olivia]
 name=Olivia
@@ -57267,6 +57920,10 @@ ambient=10
 resizeh=128
 resizev=128
 vislevel=103
+hitpoints=100
+attack=80
+strength=80
+defence=80
 head1=npc_2591_head
 
 [tzhaar_mej2]
@@ -57289,6 +57946,10 @@ ambient=10
 resizeh=132
 resizev=128
 vislevel=103
+hitpoints=100
+attack=80
+strength=80
+defence=80
 head1=npc_2591_head
 
 [tzhaar_mej3]
@@ -57311,6 +57972,10 @@ ambient=10
 resizeh=120
 resizev=128
 vislevel=103
+hitpoints=100
+attack=80
+strength=80
+defence=80
 head1=npc_2591_head
 
 [tzhaar_mej4]
@@ -57332,6 +57997,10 @@ ambient=10
 resizeh=120
 resizev=115
 vislevel=103
+hitpoints=100
+attack=80
+strength=80
+defence=80
 head1=npc_2591_head
 
 [tzhaar_mej5]
@@ -57354,6 +58023,10 @@ ambient=10
 resizeh=125
 resizev=132
 vislevel=103
+hitpoints=100
+attack=80
+strength=80
+defence=80
 head1=npc_2591_head
 
 [tzhaar_mej6]
@@ -57375,6 +58048,10 @@ ambient=10
 resizeh=128
 resizev=115
 vislevel=103
+hitpoints=100
+attack=80
+strength=80
+defence=80
 head1=npc_2591_head
 
 [tzhaar_mej7]
@@ -57397,6 +58074,10 @@ ambient=10
 resizeh=120
 resizev=128
 vislevel=103
+hitpoints=100
+attack=80
+strength=80
+defence=80
 head1=npc_2591_head
 
 [tzhaar_hur1]
@@ -57418,6 +58099,10 @@ ambient=10
 resizeh=120
 resizev=120
 vislevel=74
+hitpoints=80
+attack=60
+strength=60
+defence=60
 head1=npc_2591_head
 
 [tzhaar_hur2]
@@ -57439,6 +58124,10 @@ ambient=10
 resizeh=118
 resizev=118
 vislevel=74
+hitpoints=80
+attack=60
+strength=60
+defence=60
 head1=npc_2591_head
 
 [tzhaar_hur3]
@@ -57462,6 +58151,10 @@ resizev=110
 resizeh=128
 resizev=135
 vislevel=74
+hitpoints=80
+attack=60
+strength=60
+defence=60
 head1=npc_2591_head
 
 [tzhaar_hur4]
@@ -57483,6 +58176,10 @@ ambient=10
 resizeh=115
 resizev=115
 vislevel=74
+hitpoints=80
+attack=60
+strength=60
+defence=60
 head1=npc_2591_head
 
 [tzhaar_hur5]
@@ -57504,6 +58201,10 @@ ambient=10
 resizeh=122
 resizev=122
 vislevel=74
+hitpoints=80
+attack=60
+strength=60
+defence=60
 head1=npc_2591_head
 
 [tzhaar_hur6]
@@ -57525,6 +58226,10 @@ ambient=10
 resizeh=110
 resizev=110
 vislevel=74
+hitpoints=80
+attack=60
+strength=60
+defence=60
 head1=npc_2591_head
 
 [tzhaar_xil1]
@@ -58030,6 +58735,7 @@ recol1d=15424
 recol2s=8291
 recol2d=13708
 vislevel=hide
+moverestrict=indoors
 op1=Talk-to
 op3=Trade
 walkanim=thzaar_walk
@@ -58080,6 +58786,7 @@ recol1d=15360
 recol2s=8291
 recol2d=15755
 vislevel=hide
+moverestrict=indoors
 op1=Talk-to
 op3=Trade
 walkanim=thzaar_walk
@@ -58108,6 +58815,7 @@ recol1d=30753
 recol2s=8291
 recol2d=17441
 vislevel=hide
+moverestrict=indoors
 op1=Talk-to
 op3=Trade
 walkanim=thzaar_staff_walk
@@ -58186,6 +58894,10 @@ readyanim=firebat_ready
 ambient=60
 contrast=60
 vislevel=22
+hitpoints=10
+attack=20
+strength=30
+defence=15
 
 [tzhaar_fightpit_swarm_1b]
 name=Tz-Kih
@@ -58197,6 +58909,10 @@ readyanim=firebat_ready
 ambient=60
 contrast=60
 vislevel=22
+hitpoints=10
+attack=20
+strength=30
+defence=15
 
 [tzhaar_fightpit_swarm_2a]
 name=Tz-Kek
@@ -58209,6 +58925,10 @@ walkanim=lavabeast_walk
 ambient=40
 contrast=40
 vislevel=45
+hitpoints=20
+attack=40
+strength=60
+defence=30
 
 [tzhaar_fightpit_swarm_2b]
 name=Tz-Kek
@@ -58233,6 +58953,10 @@ resizev=160
 ambient=40
 contrast=40
 vislevel=45
+hitpoints=20
+attack=40
+strength=60
+defence=30
 
 [tzhaar_fightpit_swarm_3a]
 name=Tok-Xil
@@ -58248,6 +58972,10 @@ readyanim=magmaquris_ready
 ambient=60
 contrast=60
 vislevel=90
+hitpoints=40
+attack=80
+strength=120
+defence=60
 
 [tzhaar_fightpit_swarm_3b]
 name=Tok-Xil
@@ -58269,6 +58997,10 @@ readyanim=magmaquris_ready
 ambient=60
 contrast=60
 vislevel=90
+hitpoints=40
+attack=80
+strength=120
+defence=60
 
 [wom_original]
 name=Wise Old Man
@@ -59284,6 +60016,10 @@ op1=Talk-to
 op2=Attack
 op3=Pickpocket
 vislevel=2
+hitpoints=7
+attack=1
+strength=1
+defence=1
 head1=idk_man_hair_cropped_head
 head2=idk_man_jaw_moustache_head
 
@@ -59311,6 +60047,10 @@ op1=Talk-to
 op2=Attack
 op3=Pickpocket
 vislevel=2
+hitpoints=7
+attack=1
+strength=1
+defence=1
 head1=obj_pickpocket_guide_warrior
 
 [rimmington_hobgoblin_unarmed_1]
@@ -59569,6 +60309,10 @@ walkanim=chicken_walk
 readyanim=chicken_ready
 op2=Attack
 vislevel=2
+hitpoints=6
+attack=1
+strength=1
+defence=1
 
 [sarim_seagull_pier_big]
 name=Seagull
@@ -59581,6 +60325,10 @@ resizev=170
 ambient=30
 op2=Attack
 vislevel=3
+hitpoints=10
+attack=1
+strength=1
+defence=1
 
 [jail_pirate]
 name=Pirate
@@ -60698,6 +61446,10 @@ readyanim=firebat_ready
 ambient=60
 contrast=60
 vislevel=22
+hitpoints=10
+attack=20
+strength=30
+defence=15
 
 [tzhaar_fightcave_swarm_1b]
 name=Tz-Kih
@@ -60709,6 +61461,10 @@ readyanim=firebat_ready
 ambient=60
 contrast=60
 vislevel=22
+hitpoints=10
+attack=20
+strength=30
+defence=15
 
 [tzhaar_fightcave_swarm_2a]
 name=Tz-Kek
@@ -60733,6 +61489,10 @@ resizev=160
 ambient=40
 contrast=40
 vislevel=45
+hitpoints=20
+attack=40
+strength=60
+defence=30
 
 [tzhaar_fightcave_swarm_2b]
 name=Tz-Kek
@@ -60757,6 +61517,10 @@ resizev=160
 ambient=40
 contrast=40
 vislevel=45
+hitpoints=20
+attack=40
+strength=60
+defence=30
 
 [tzhaar_fightcave_swarm_2spawn]
 name=Tz-Kek
@@ -60770,6 +61534,10 @@ resizev=80
 ambient=40
 contrast=40
 vislevel=22
+hitpoints=10
+attack=20
+strength=30
+defence=15
 
 [tzhaar_fightcave_swarm_3a]
 name=Tok-Xil
@@ -60785,6 +61553,10 @@ readyanim=magmaquris_ready
 ambient=60
 contrast=60
 vislevel=90
+hitpoints=40
+attack=80
+strength=120
+defence=60
 
 [tzhaar_fightcave_swarm_3b]
 name=Tok-Xil
@@ -60806,6 +61578,10 @@ readyanim=magmaquris_ready
 ambient=60
 contrast=60
 vislevel=90
+hitpoints=40
+attack=80
+strength=120
+defence=60
 
 [tzhaar_fightcave_swarm_4a]
 name=Yt-MejKot
@@ -60822,6 +61598,10 @@ contrast=30
 resizeh=140
 resizev=140
 vislevel=180
+hitpoints=80
+attack=160
+strength=240
+defence=120
 
 [tzhaar_fightcave_swarm_4b]
 name=Yt-MejKot
@@ -60840,6 +61620,10 @@ contrast=30
 resizeh=140
 resizev=140
 vislevel=180
+hitpoints=80
+attack=160
+strength=240
+defence=120
 
 [tzhaar_fightcave_swarm_5a]
 name=Ket-Zek
@@ -60854,6 +61638,10 @@ walkanim=igniferum_walk
 readyanim=igniferum_ready
 ambient=40
 vislevel=360
+hitpoints=160
+attack=320
+strength=480
+defence=240
 
 [tzhaar_fightcave_swarm_5b]
 name=Ket-Zek
@@ -60880,6 +61668,10 @@ walkanim=igniferum_walk
 readyanim=igniferum_ready
 ambient=40
 vislevel=360
+hitpoints=160
+attack=320
+strength=480
+defence=240
 
 [tzhaar_fightcave_swarm_boss]
 name=TzTok-Jad
@@ -60891,6 +61683,10 @@ walkanim=lordmagmus_walk
 readyanim=lordmagmus_ready
 ambient=60
 vislevel=702
+hitpoints=250
+attack=640
+strength=960
+defence=480
 
 [tzhaar_fightcave_swarm_boss_cleric]
 name=Yt-HurKot
@@ -60908,6 +61704,10 @@ contrast=30
 resizeh=35
 resizev=35
 vislevel=108
+hitpoints=60
+attack=140
+strength=100
+defence=60
 
 [wanted_solus]
 name=Solus Dellagar
@@ -61391,6 +62191,10 @@ readyanim=human_ready
 alwaysontop=yes
 op2=Attack
 vislevel=32
+hitpoints=42
+attack=0
+strength=0
+defence=0
 
 [wanted_black_knight_attackable_base_config]
 name=Black Knight
@@ -61505,6 +62309,10 @@ walkanim=shadow_walk
 readyanim=shadow_ready
 op2=Attack
 vislevel=73
+hitpoints=15
+attack=90
+strength=120
+defence=5
 
 [mourning_dark_beast]
 name=Dark Beast
@@ -61525,6 +62333,10 @@ op2=Attack
 resizeh=165
 resizev=165
 vislevel=182
+hitpoints=220
+attack=140
+strength=160
+defence=120
 param=slayer_category,^slayer_darkbeast
 
 [mourner_hideout_slave_guard]
@@ -62521,6 +63333,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=57
+hitpoints=52
+attack=49
+strength=50
+defence=50
 head1=obj_pickpocket_guide_man
 head2=npc_master_fisher_head
 head3=idk_man_jaw_goatee_head
@@ -62554,6 +63370,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=57
+hitpoints=52
+attack=49
+strength=50
+defence=50
 head1=idk_man_hair_cropped_head
 head2=npc_master_fisher_head
 head3=idk_man_jaw_medium_head
@@ -62587,6 +63407,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=57
+hitpoints=52
+attack=49
+strength=50
+defence=50
 head1=idk_man_hair_cropped_head
 head2=npc_master_fisher_head
 head3=idk_man_jaw_long_head
@@ -62619,6 +63443,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=57
+hitpoints=52
+attack=49
+strength=50
+defence=50
 head1=npc_drunk1_head
 head2=npc_master_fisher_head
 head3=idk_man_jaw_moustache_head
@@ -62650,6 +63478,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=57
+hitpoints=52
+attack=49
+strength=50
+defence=50
 head1=idk_man_hair_long_head
 head2=npc_1688_head
 
@@ -62681,6 +63513,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=57
+hitpoints=52
+attack=49
+strength=50
+defence=50
 head1=obj_pickpocket_guide_farmer
 head2=npc_1688_head
 
@@ -62714,6 +63550,10 @@ op1=Talk-to
 op2=Attack
 op3=Intimidate
 vislevel=55
+hitpoints=50
+attack=45
+strength=50
+defence=50
 head1=obj_pickpocket_guide_man
 head2=npc_master_fisher_head
 head3=idk_man_jaw_goatee_head
@@ -62749,6 +63589,10 @@ op1=Talk-to
 op2=Attack
 op3=Intimidate
 vislevel=55
+hitpoints=50
+attack=45
+strength=50
+defence=50
 head1=idk_man_hair_cropped_head
 head2=npc_master_fisher_head
 head3=idk_man_jaw_medium_head
@@ -62784,6 +63628,10 @@ op1=Talk-to
 op2=Attack
 op3=Intimidate
 vislevel=55
+hitpoints=50
+attack=45
+strength=50
+defence=50
 head1=idk_man_hair_cropped_head
 head2=npc_master_fisher_head
 head3=idk_man_jaw_long_head
@@ -62818,6 +63666,10 @@ op1=Talk-to
 op2=Attack
 op3=Intimidate
 vislevel=55
+hitpoints=50
+attack=45
+strength=50
+defence=50
 head1=npc_drunk1_head
 head2=npc_master_fisher_head
 head3=idk_man_jaw_moustache_head
@@ -62851,6 +63703,10 @@ op1=Talk-to
 op2=Attack
 op3=Intimidate
 vislevel=55
+hitpoints=50
+attack=45
+strength=50
+defence=50
 head1=idk_man_hair_long_head
 head2=npc_1688_head
 
@@ -62884,6 +63740,10 @@ op1=Talk-to
 op2=Attack
 op3=Intimidate
 vislevel=55
+hitpoints=50
+attack=45
+strength=50
+defence=50
 head1=obj_pickpocket_guide_farmer
 head2=npc_1688_head
 
@@ -62896,6 +63756,10 @@ walkanim=spirit_walk
 readyanim=spirit_ready
 op2=Attack
 vislevel=150
+hitpoints=90
+attack=170
+strength=146
+defence=100
 
 [deal_fever_spiders1]
 name=Fever Spider
@@ -62908,6 +63772,10 @@ walkanim=giantspider_walk
 readyanim=giantspider_ready
 op2=Attack
 vislevel=49
+hitpoints=40
+attack=60
+strength=30
+defence=40
 
 [deal_brewer_1]
 name=Brewer
@@ -63636,6 +64504,10 @@ resizeh=60
 resizev=60
 op2=Attack
 vislevel=70
+hitpoints=100
+attack=50
+strength=50
+defence=50
 
 [dagcave_ranged_boss]
 name=Dagannoth Supreme
@@ -63643,6 +64515,10 @@ desc=The dagannoth king responsible for the death of the Bukalla.
 model1=npc_2881
 model2=npc_2881i2
 vislevel=303
+hitpoints=255
+attack=255
+strength=255
+defence=128
 size=3
 walkanim=dagannoth_meganoth_walk
 readyanim=dagannoth_meganoth_ready
@@ -63668,6 +64544,10 @@ recol3d=6374
 recol4s=7430
 recol4d=7431
 vislevel=303
+hitpoints=255
+attack=255
+strength=255
+defence=255
 size=3
 resizeh=175
 resizev=180
@@ -63691,6 +64571,10 @@ recol3d=10567
 recol4s=16646
 recol4d=13508
 vislevel=303
+hitpoints=255
+attack=255
+strength=255
+defence=255
 size=3
 resizeh=220
 resizev=190
@@ -63711,6 +64595,10 @@ resizeh=110
 resizev=110
 op2=Attack
 vislevel=98
+hitpoints=120
+attack=1
+strength=1
+defence=80
 
 [giant_rockcrab_deeper]
 name=Giant Rock Crab
@@ -63724,6 +64612,10 @@ walkanim=horror_crab_walk
 readyanim=horror_crab_ready
 op2=Attack
 vislevel=137
+hitpoints=180
+attack=50
+strength=80
+defence=200
 
 [giant_rockcrab_hidden_deeper]
 name=Boulder
@@ -63756,6 +64648,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=88
+hitpoints=85
+attack=10
+strength=10
+defence=75
 param=slayer_category,^slayer_dagannoth
 
 [dungeon_dagganoth_mainroom_deeper]
@@ -63776,6 +64672,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=90
+hitpoints=95
+attack=76
+strength=78
+defence=65
 param=slayer_category,^slayer_dagannoth
 
 [dagannoth_rock_lobster_2x2]
@@ -63792,6 +64692,10 @@ walkanim=dagannoth_rock_lobster_walk
 readyanim=dagannoth_rock_lobster_ready
 op2=Attack
 vislevel=127
+hitpoints=150
+attack=100
+strength=100
+defence=100
 
 [dagannoth_rock_lobster_2x2_loc]
 name=Rock
@@ -63828,6 +64732,10 @@ walkanim=dagannoth_water_creature_walk
 readyanim=dagannoth_water_creature_ready
 op2=Attack
 vislevel=76
+hitpoints=100
+attack=10
+strength=10
+defence=10
 
 [dagannoth_water_creature_1x1_invisible2]
 name=Suspicious water
@@ -63848,6 +64756,10 @@ walkanim=dagannoth_water_creature_walk
 readyanim=dagannoth_water_creature_ready
 op2=Attack
 vislevel=76
+hitpoints=100
+attack=10
+strength=10
+defence=10
 
 [dagannoth_water_creature_1x1_invisible3]
 name=Suspicious water
@@ -63868,6 +64780,10 @@ walkanim=dagannoth_water_creature_walk
 readyanim=dagannoth_water_creature_ready
 op2=Attack
 vislevel=76
+hitpoints=100
+attack=10
+strength=10
+defence=10
 
 [agrith_reen_alkharid]
 walkanim=walk_walkingstick,human_walk_b,human_walk_l,human_walk_r
@@ -66408,6 +67324,10 @@ op2=Attack
 alwaysontop=yes
 alwaysontop=yes
 vislevel=75
+hitpoints=80
+attack=80
+strength=30
+defence=80
 
 [elid_golem_white]
 name=White golem
@@ -66435,6 +67355,10 @@ op2=Attack
 alwaysontop=yes
 alwaysontop=yes
 vislevel=75
+hitpoints=80
+attack=80
+strength=30
+defence=80
 
 [elid_golem_grey]
 name=Grey golem
@@ -66462,6 +67386,10 @@ op2=Attack
 alwaysontop=yes
 alwaysontop=yes
 vislevel=75
+hitpoints=80
+attack=80
+strength=30
+defence=80
 
 [elid_ghaslor]
 name=Ghaslor the Elder
@@ -66834,6 +67762,10 @@ walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halbe
 readyanim=human_staffready
 op2=Attack
 vislevel=21
+hitpoints=22
+attack=19
+strength=18
+defence=14
 head1=obj_roguetrader_menaphite_hat_manhead
 head2=idk_man_jaw_short_head
 
@@ -66865,6 +67797,10 @@ walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halbe
 readyanim=human_staffready
 op2=Attack
 vislevel=21
+hitpoints=22
+attack=19
+strength=18
+defence=14
 head1=obj_roguetrader_menaphite_hat_manhead
 head2=idk_man_jaw_short_head
 
@@ -66896,6 +67832,10 @@ walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halbe
 readyanim=human_staffready
 op2=Attack
 vislevel=21
+hitpoints=22
+attack=19
+strength=18
+defence=14
 head1=obj_roguetrader_menaphite_hat_manhead
 head2=idk_man_jaw_short_head
 
@@ -67167,6 +68107,10 @@ readyanim=earthwarrior_ready
 walkanim=earthwarrior_walk_f,earthwarrior_walk_b,earthwarrior_walk_l,earthwarrior_walk_r
 op2=Attack
 vislevel=102
+hitpoints=108
+attack=84
+strength=84
+defence=84
 wanderrange=0
 moverestrict=nomove
 
@@ -67179,6 +68123,10 @@ readyanim=champions_giant_ready
 walkanim=champions_giant_walk
 op2=Attack
 vislevel=56
+hitpoints=70
+attack=36
+strength=44
+defence=52
 
 [champions_ghoul]
 name=Ghoul Champion
@@ -67203,6 +68151,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=ghoul_ready
 op2=Attack
 vislevel=85
+hitpoints=100
+attack=0
+strength=0
+defence=0
 
 [champions_goblin]
 name=Goblin Champion
@@ -67214,6 +68166,10 @@ walkanim=goblin_walk_spear
 readyanim=champions_goblin_ready
 op2=Attack
 vislevel=24
+hitpoints=32
+attack=1
+strength=1
+defence=14
 
 [champions_hobgoblin]
 name=Hobgoblin Champion
@@ -67226,6 +68182,10 @@ walkanim=hobgoblin_walk
 readyanim=champions_hobgoblin_ready
 op2=Attack
 vislevel=56
+hitpoints=58
+attack=44
+strength=48
+defence=48
 
 [champions_imp]
 name=Imp Champion
@@ -67235,6 +68195,10 @@ walkanim=imp_walk
 readyanim=champions_imp_ready
 op2=Attack
 vislevel=14
+hitpoints=40
+attack=5
+strength=5
+defence=5
 
 [champions_jogre]
 name=Jogre Champion
@@ -67247,6 +68211,10 @@ walkanim=champions_jogre_walk
 readyanim=champions_jogre_ready
 op2=Attack
 vislevel=107
+hitpoints=120
+attack=86
+strength=86
+defence=86
 
 [champions_skeleton]
 name=Skeleton Champion
@@ -67259,6 +68227,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=wanted_ranger_ready
 op2=Attack
 vislevel=40
+hitpoints=58
+attack=1
+strength=1
+defence=34
 
 [champions_zombie]
 name=Zombies Champion
@@ -67270,6 +68242,10 @@ walkanim=champions_zombie_walk
 readyanim=champions_zombie_ready
 op2=Attack
 vislevel=51
+hitpoints=60
+attack=38
+strength=42
+defence=42
 
 [champions_human]
 name=Leon D'Cour
@@ -67300,6 +68276,10 @@ readyanim=human_dh_weapon_ready
 walkanim=human_dh_weapon_walk,human_dh_weapon_walk,human_dh_weapon_walk,human_dh_weapon_walk
 op2=Attack
 vislevel=141
+hitpoints=123
+attack=123
+strength=123
+defence=123
 head1=npc_chemist_head
 head2=idk_man_jaw_long_head
 
@@ -67321,6 +68301,10 @@ recol5s=0
 recol5d=9581
 size=3
 vislevel=140
+hitpoints=200
+attack=125
+strength=116
+defence=120
 walkanim=wyvern_skeleton_walk
 readyanim=wyvern_skeleton_ready
 op2=Attack
@@ -67343,6 +68327,10 @@ recol5s=0
 recol5d=9581
 size=3
 vislevel=140
+hitpoints=200
+attack=125
+strength=116
+defence=120
 walkanim=wyvern_skeleton_walk
 readyanim=wyvern_skeleton_ready
 op2=Attack
@@ -67365,6 +68353,10 @@ recol5s=0
 recol5d=9581
 size=3
 vislevel=140
+hitpoints=200
+attack=125
+strength=116
+defence=120
 walkanim=wyvern_skeleton_walk
 readyanim=wyvern_skeleton_ready
 op2=Attack
@@ -67387,6 +68379,10 @@ recol5s=0
 recol5d=9581
 size=3
 vislevel=140
+hitpoints=200
+attack=125
+strength=116
+defence=120
 walkanim=wyvern_skeleton_walk
 readyanim=wyvern_skeleton_ready
 op2=Attack
@@ -67403,6 +68399,10 @@ walkanim=giant_walk
 readyanim=giant_ready
 op2=Attack
 vislevel=53
+hitpoints=70
+attack=40
+strength=40
+defence=40
 param=slayer_category,^slayer_icegiant
 
 [icewarrior_low_wanderrange]
@@ -70174,6 +71174,10 @@ walkanim=chaoselemental_walk
 readyanim=chaoselemental_ready
 op2=Attack
 vislevel=305
+hitpoints=250
+attack=270
+strength=270
+defence=270
 
 [slayer_killerwatt]
 name=Killerwatt
@@ -70184,6 +71188,10 @@ readyanim=killerwatt_biped_ready
 turnspeed=900
 op2=Attack
 vislevel=55
+hitpoints=51
+attack=50
+strength=50
+defence=40
 
 [slayer_killerwatt_ball]
 name=Killerwatt
@@ -70192,6 +71200,10 @@ model1=npc_3202
 walkanim=killerwatt_ball_ready
 readyanim=killerwatt_ball_ready
 vislevel=55
+hitpoints=51
+attack=50
+strength=50
+defence=40
 turnspeed=900
 op2=Attack
 
@@ -70483,6 +71495,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=11
+hitpoints=18
+attack=8
+strength=8
+defence=8
 
 [fai_falador_dwarf_normal2]
 name=Dwarf
@@ -70507,6 +71523,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=11
+hitpoints=18
+attack=8
+strength=8
+defence=8
 
 [fai_falador_dwarf_normal3]
 name=Dwarf
@@ -71166,6 +72186,10 @@ op1=Talk-to
 op2=Attack
 op3=Pickpocket
 vislevel=2
+hitpoints=7
+attack=1
+strength=1
+defence=1
 head1=obj_castlewars_cloak_saradomin_manhead
 
 [falador_doric_area_man3]
@@ -71193,6 +72217,10 @@ op1=Talk-to
 op2=Attack
 op3=Pickpocket
 vislevel=2
+hitpoints=7
+attack=1
+strength=1
+defence=1
 head1=obj_pickpocket_guide_farmer
 head2=idk_man_jaw_goatee_head
 
@@ -71218,6 +72246,10 @@ op1=Talk-to
 op2=Attack
 op3=Pickpocket
 vislevel=2
+hitpoints=7
+attack=1
+strength=1
+defence=1
 head1=npc_clivet_hazeel_cultist_head
 
 [falador_doric_area_guard]
@@ -71244,6 +72276,10 @@ op1=Talk-to
 op2=Attack
 op3=Pickpocket
 vislevel=19
+hitpoints=22
+attack=15
+strength=15
+defence=16
 head1=obj_pickpocket_guide_guard
 head2=idk_man_jaw_moustache_head
 
@@ -71269,6 +72305,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=23
+hitpoints=25
+attack=20
+strength=10
+defence=20
 
 [fai_dark_wizard_old_2]
 name=Dark wizard
@@ -71292,6 +72332,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=22
+hitpoints=25
+attack=20
+strength=10
+defence=15
 
 [fai_dark_wizard_young_1]
 name=Dark wizard
@@ -71315,6 +72359,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=11
+hitpoints=15
+attack=5
+strength=5
+defence=10
 
 [fai_dark_wizard_young_2]
 name=Dark wizard
@@ -71338,6 +72386,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=11
+hitpoints=15
+attack=5
+strength=5
+defence=10
 
 [fai_barbarian_1]
 name=Barbarian
@@ -72210,6 +73262,10 @@ readyanim=human_staffready
 op2=Attack
 op1=Talk-to
 vislevel=9
+hitpoints=20
+attack=6
+strength=7
+defence=3
 head1=obj_pickpocket_guide_warrior
 head2=npc_woman2_head
 
@@ -72228,6 +73284,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=11
+hitpoints=18
+attack=8
+strength=8
+defence=8
 head1=npc_lawgof2_head
 
 [fai_dwarf_worker_02]
@@ -72249,6 +73309,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=11
+hitpoints=18
+attack=8
+strength=8
+defence=8
 head1=npc_mcannonguard_head
 
 [fai_dwarf_worker_03]
@@ -72270,6 +73334,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=11
+hitpoints=18
+attack=8
+strength=8
+defence=8
 head1=npc_upassdwarf3_head
 
 [fai_dwarf_worker_04]
@@ -72285,6 +73353,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=11
+hitpoints=18
+attack=8
+strength=8
+defence=8
 head1=npc_2094_head
 
 [fai_dwarf_worker_05]
@@ -72331,6 +73403,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=11
+hitpoints=18
+attack=8
+strength=8
+defence=8
 head1=npc_lawgof2_head
 
 [fai_dwarf_worker_07]
@@ -72355,6 +73431,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=11
+hitpoints=18
+attack=8
+strength=8
+defence=8
 head1=npc_lawgof2_head
 
 [fai_dwarf_worker_08]
@@ -72382,6 +73462,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=7
+hitpoints=10
+attack=6
+strength=6
+defence=6
 head1=npc_lawgof2_head
 
 [fai_black_guard_01]
@@ -72406,6 +73490,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=25
+hitpoints=30
+attack=20
+strength=20
+defence=20
 head1=npc_mcannonguard_head
 head2=npc_mcannonguard_headi2
 
@@ -72433,6 +73521,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=25
+hitpoints=30
+attack=20
+strength=20
+defence=20
 head1=npc_mcannonguard_head
 head2=npc_mcannonguard_headi2
 
@@ -72458,6 +73550,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=25
+hitpoints=30
+attack=20
+strength=20
+defence=20
 head1=npc_mcannonguard_head
 head2=npc_mcannonguard_headi2
 
@@ -72483,6 +73579,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=25
+hitpoints=30
+attack=20
+strength=20
+defence=20
 head1=npc_mcannonguard_head
 head2=npc_mcannonguard_headi2
 
@@ -73077,6 +74177,10 @@ op2=Attack
 walkanim=tanglefoot_walk
 readyanim=tanglefoot_ready
 vislevel=111
+hitpoints=102
+attack=97
+strength=97
+defence=91
 head1=npc_3313_head
 
 [fairy_queen_multi]
@@ -73140,6 +74244,10 @@ readyanim=tanglefoot_ready
 resizeh=80
 resizev=50
 vislevel=45
+hitpoints=40
+attack=40
+strength=38
+defence=40
 head1=npc_3313_head
 
 [fairy_tanglefoot_sml2]
@@ -73160,6 +74268,10 @@ readyanim=tanglefoot_ready
 resizeh=70
 resizev=80
 vislevel=45
+hitpoints=40
+attack=40
+strength=38
+defence=40
 head1=npc_3313_head
 
 [fairy_mindslayer_guard]
@@ -73563,6 +74675,10 @@ resizeh=118
 resizev=118
 alwaysontop=yes
 vislevel=230
+hitpoints=200
+attack=200
+strength=200
+defence=200
 
 [mole_baby_01]
 name=Baby Mole
@@ -73685,6 +74801,10 @@ op3=Hidden
 ambient=10
 contrast=10
 vislevel=74
+hitpoints=65
+attack=65
+strength=65
+defence=65
 
 [slayer_mutated_zygomite_adult]
 name=Zygomite
@@ -73701,6 +74821,10 @@ op3=Hidden
 ambient=10
 contrast=10
 vislevel=86
+hitpoints=65
+attack=65
+strength=65
+defence=65
 
 [white_knight_yellow_plumes_f]
 name=White Knight
@@ -73728,6 +74852,10 @@ walkanim=human_dh_weapon_walk,human_dh_weapon_walk,human_dh_weapon_walk,human_dh
 readyanim=human_dh_weapon_ready
 op2=Attack
 vislevel=38
+hitpoints=52
+attack=30
+strength=29
+defence=25
 
 [white_knight_green_plumes_f]
 name=White Knight
@@ -73755,6 +74883,10 @@ walkanim=human_dh_weapon_walk,human_dh_weapon_walk,human_dh_weapon_walk,human_dh
 readyanim=human_dh_weapon_ready
 op2=Attack
 vislevel=39
+hitpoints=52
+attack=32
+strength=29
+defence=27
 
 [white_knight_blue_plumes_f]
 name=White Knight
@@ -73782,6 +74914,10 @@ walkanim=human_dh_weapon_walk,human_dh_weapon_walk,human_dh_weapon_walk,human_dh
 readyanim=human_dh_weapon_ready
 op2=Attack
 vislevel=42
+hitpoints=55
+attack=32
+strength=35
+defence=27
 
 [hundred_varze]
 name=Sir Amik Varze
@@ -73871,6 +75007,10 @@ readyanim=roosterready
 op2=Attack
 alwaysontop=yes
 vislevel=159
+hitpoints=120
+attack=1
+strength=1
+defence=126
 
 [chickenquest_fairy_dragon]
 name=K'klik
@@ -74756,6 +75896,10 @@ resizeh=256
 resizev=256
 op2=Attack
 vislevel=23
+hitpoints=19
+attack=19
+strength=20
+defence=26
 
 [hundred_pirate_giant_mudskipper]
 name=Mudskipper
@@ -74766,6 +75910,10 @@ walkanim=mudskipper_walk
 readyanim=mudskipper_ready
 op2=Attack
 vislevel=30
+hitpoints=20
+attack=29
+strength=29
+defence=26
 
 [hundred_pirate_giant_mudskipper_2]
 name=Mudskipper
@@ -74779,6 +75927,10 @@ resizeh=256
 resizev=256
 op2=Attack
 vislevel=31
+hitpoints=20
+attack=30
+strength=30
+defence=29
 
 [hundred_pirate_giant_crab]
 name=Crab
@@ -74788,6 +75940,10 @@ walkanim=crab_walk
 readyanim=crab_ready
 op2=Attack
 vislevel=21
+hitpoints=18
+attack=17
+strength=17
+defence=22
 
 [100_pirate_fish_fantail]
 name=Fish
@@ -75774,6 +76930,10 @@ readyanim=royal_sea_snake_ready
 walkanim=royal_sea_snake_walk_baby
 op2=Attack
 vislevel=84
+hitpoints=120
+attack=60
+strength=60
+defence=60
 
 [hundred_culinaromancer_book5]
 name=Culinaromancer
@@ -75994,6 +77154,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=75
+hitpoints=150
+attack=10
+strength=100
+defence=10
 head1=obj_chefs_hat_manhead
 head2=obj_pickpocket_guide_man
 head3=npc_master_fisher_head
@@ -76041,6 +77205,10 @@ walkanim=agrith_nana_walk
 readyanim=agrith_nana_ready
 op2=Attack
 vislevel=146
+hitpoints=200
+attack=83
+strength=150
+defence=82
 
 [hundred_minion2]
 name=Flambeed
@@ -76055,6 +77223,10 @@ walkanim=rock_walk
 readyanim=rock_ready
 op2=Attack
 vislevel=149
+hitpoints=210
+attack=120
+strength=120
+defence=75
 
 [hundred_minion3]
 name=Karamel
@@ -76067,6 +77239,10 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=136
+hitpoints=250
+attack=1
+strength=1
+defence=100
 
 [hundred_minion4]
 name=Dessourt
@@ -76076,6 +77252,10 @@ walkanim=dessourt_walk
 readyanim=dessourt_ready
 op2=Attack
 vislevel=121
+hitpoints=130
+attack=99
+strength=99
+defence=99
 
 [hundred_minion5_air]
 name=Gelatinnoth Mother
@@ -76088,6 +77268,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=130
+hitpoints=240
+attack=78
+strength=78
+defence=81
 
 [hundred_minion5_melee]
 name=Gelatinnoth Mother
@@ -76100,6 +77284,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=130
+hitpoints=240
+attack=78
+strength=78
+defence=81
 
 [hundred_minion5_water]
 name=Gelatinnoth Mother
@@ -76112,6 +77300,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=130
+hitpoints=240
+attack=78
+strength=78
+defence=81
 
 [hundred_minion5_fire]
 name=Gelatinnoth Mother
@@ -76122,6 +77314,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=130
+hitpoints=240
+attack=78
+strength=78
+defence=81
 
 [hundred_minion5_ranged]
 name=Gelatinnoth Mother
@@ -76134,6 +77330,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=130
+hitpoints=240
+attack=78
+strength=78
+defence=81
 
 [hundred_minion5_earth]
 name=Gelatinnoth Mother
@@ -76146,6 +77346,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=130
+hitpoints=240
+attack=78
+strength=78
+defence=81
 
 [overgrowncat_hell]
 name=Overgrown hellcat
@@ -76412,6 +77616,10 @@ resizev=144
 walkanim=barrow_dharok_walk
 readyanim=barrow_dharok_ready
 vislevel=35
+hitpoints=20
+attack=20
+strength=20
+defence=70
 head1=npc_drunk1_head
 head2=idk_man_jaw_short_head
 
@@ -76455,6 +77663,10 @@ resizev=140
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 vislevel=50
+hitpoints=60
+attack=50
+strength=37
+defence=30
 head1=npc_3514_head
 
 [burgh_vampire_juve_2_attackable]
@@ -76481,6 +77693,10 @@ resizev=140
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 vislevel=54
+hitpoints=85
+attack=40
+strength=40
+defence=30
 head1=npc_3514_head
 
 [burgh_vampire_juve_1]
@@ -76500,6 +77716,10 @@ resizev=140
 op2=Attack
 ambient=-25
 vislevel=54
+hitpoints=85
+attack=40
+strength=40
+defence=30
 head1=npc_3514_head
 
 [burgh_vampire_juve_2]
@@ -76519,6 +77739,10 @@ resizev=130
 op2=Attack
 ambient=-25
 vislevel=54
+hitpoints=85
+attack=40
+strength=40
+defence=30
 head1=npc_3514_head
 
 [burgh_vampire_juve_3]
@@ -76546,6 +77770,10 @@ resizev=147
 op2=Attack
 ambient=-25
 vislevel=54
+hitpoints=85
+attack=40
+strength=40
+defence=30
 head1=npc_3514_head
 
 [burgh_vampire_juve_4]
@@ -76573,6 +77801,10 @@ resizev=136
 op2=Attack
 ambient=-25
 vislevel=54
+hitpoints=85
+attack=40
+strength=40
+defence=30
 head1=npc_3514_head
 
 [burgh_vampire_juve_angry]
@@ -76693,6 +77925,10 @@ resizeh=142
 resizev=142
 op2=Attack
 vislevel=45
+hitpoints=60
+attack=40
+strength=30
+defence=30
 
 [burgh_vampire_juvenile_2]
 name=Vampyre Juvenile
@@ -76722,6 +77958,10 @@ resizeh=142
 resizev=142
 op2=Attack
 vislevel=45
+hitpoints=60
+attack=40
+strength=30
+defence=30
 
 [burgh_vampire_juvenile_3]
 name=Vampyre Juvenile
@@ -76749,6 +77989,10 @@ resizeh=142
 resizev=142
 op2=Attack
 vislevel=45
+hitpoints=60
+attack=40
+strength=30
+defence=30
 
 [burgh_vampire_juvenile_held]
 name=Vampyre Juvenile
@@ -76776,6 +78020,10 @@ resizev=142
 op2=Attack
 turnspeed=0
 vislevel=45
+hitpoints=60
+attack=40
+strength=30
+defence=30
 
 [burgh_ivan_strom_temple_ambush]
 name=Ivan Strom
@@ -76858,6 +78106,10 @@ ambient=-25
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 vislevel=75
+hitpoints=110
+attack=70
+strength=50
+defence=35
 head1=npc_3514_head
 
 [burgh_ivan_temple_vampire_juve_2]
@@ -76885,6 +78137,10 @@ ambient=-25
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 vislevel=50
+hitpoints=60
+attack=50
+strength=37
+defence=30
 head1=npc_3514_head
 
 [burgh_rescue_veliaf_hurtz_talk]
@@ -78082,6 +79338,10 @@ walkanim=hobgoblin_walk
 readyanim=hobgoblin_ready
 op2=Attack
 vislevel=54
+hitpoints=62
+attack=45
+strength=43
+defence=43
 
 [poh_troll]
 name=Troll
@@ -78094,6 +79354,10 @@ walkanim=troll_walk
 readyanim=troll_ready
 op2=Attack
 vislevel=91
+hitpoints=120
+attack=50
+strength=100
+defence=50
 
 [poh_giantspider]
 name=Huge Spider
@@ -78111,6 +79375,10 @@ walkanim=giantspider_walk
 readyanim=giantspider_ready
 op2=Attack
 vislevel=81
+hitpoints=90
+attack=59
+strength=70
+defence=69
 
 [poh_hellhound]
 name=Hellhound
@@ -78184,6 +79452,10 @@ walkanim=horror_dagannoth_walk
 readyanim=horror_dagannoth_ready
 op2=Attack
 vislevel=135
+hitpoints=142
+attack=114
+strength=117
+defence=98
 
 [poh_tok_xil]
 name=Tok-Xil
@@ -78200,6 +79472,10 @@ readyanim=magmaquris_ready
 ambient=60
 contrast=60
 vislevel=90
+hitpoints=40
+attack=80
+strength=120
+defence=60
 
 [poh_oub_monster1]
 name=Rocnar
@@ -78210,6 +79486,10 @@ walkanim=oub_monster1_walk
 readyanim=oub_monster1_ready
 op2=Attack
 vislevel=97
+hitpoints=100
+attack=80
+strength=80
+defence=80
 
 [poh_toy_soldier]
 name=Toy Soldier
@@ -78270,6 +79550,10 @@ ambient=10
 readyanim=royal_sea_snake_ready
 walkanim=royal_sea_snake_walk_baby,royal_sea_snake_walk_baby,royal_sea_snake_walk_baby,royal_sea_snake_walk_baby
 vislevel=80
+hitpoints=120
+attack=50
+strength=50
+defence=70
 
 [templetrek_snake_2]
 name=Swamp snake
@@ -78296,6 +79580,10 @@ ambient=10
 readyanim=royal_sea_snake_ready
 walkanim=royal_sea_snake_walk_baby,royal_sea_snake_walk_baby,royal_sea_snake_walk_baby,royal_sea_snake_walk_baby
 vislevel=109
+hitpoints=125
+attack=70
+strength=110
+defence=80
 
 [templetrek_snake_3]
 name=Swamp snake
@@ -78322,6 +79610,10 @@ ambient=10
 readyanim=royal_sea_snake_ready
 walkanim=royal_sea_snake_walk_baby,royal_sea_snake_walk_baby,royal_sea_snake_walk_baby,royal_sea_snake_walk_baby
 vislevel=139
+hitpoints=130
+attack=90
+strength=170
+defence=90
 
 [templetrek_snake_dead]
 name=Swamp snake
@@ -78463,6 +79755,10 @@ size=2
 walkanim=ghast_walk
 readyanim=ghast_ready
 vislevel=79
+hitpoints=45
+attack=22
+strength=22
+defence=18
 
 [templetrek_ghast_vis_2]
 name=Ghast
@@ -78485,6 +79781,10 @@ size=2
 walkanim=ghast_walk
 readyanim=ghast_ready
 vislevel=109
+hitpoints=45
+attack=22
+strength=22
+defence=18
 
 [templetrek_ghast_vis_3]
 name=Ghast
@@ -78507,6 +79807,10 @@ size=2
 walkanim=ghast_walk
 readyanim=ghast_ready
 vislevel=139
+hitpoints=45
+attack=22
+strength=22
+defence=18
 
 [templetrek_giantsnail_1]
 name=Giant snail
@@ -78520,6 +79824,10 @@ walkanim=templetrek_giant_snail_walk
 readyanim=templetrek_giant_snail_ready
 ambient=15
 vislevel=80
+hitpoints=125
+attack=30
+strength=30
+defence=60
 
 [templetrek_giantsnail_2]
 name=Giant snail
@@ -78545,6 +79853,10 @@ walkanim=templetrek_giant_snail_walk
 readyanim=templetrek_giant_snail_ready
 ambient=15
 vislevel=109
+hitpoints=150
+attack=30
+strength=30
+defence=75
 
 [templetrek_giantsnail_3]
 name=Giant snail
@@ -78570,6 +79882,10 @@ walkanim=templetrek_giant_snail_walk
 readyanim=templetrek_giant_snail_ready
 ambient=15
 vislevel=139
+hitpoints=160
+attack=30
+strength=30
+defence=86
 
 [templetrek_shade_1]
 name=Riyl shadow
@@ -78606,6 +79922,10 @@ alwaysontop=yes
 walkanim=shade_walk
 readyanim=shade_ready
 vislevel=110
+hitpoints=94
+attack=110
+strength=96
+defence=80
 
 [templetrek_shade_3]
 name=Shade
@@ -78619,6 +79939,10 @@ op2=Attack
 walkanim=shade_walk
 readyanim=shade_ready
 vislevel=140
+hitpoints=115
+attack=130
+strength=136
+defence=100
 
 [templetrek_tentacle_arm]
 name=Tentacle
@@ -78637,6 +79961,10 @@ walkanim=tentacle_monster_ready
 readyanim=tentacle_monster_ready
 ambient=15
 vislevel=99
+hitpoints=75
+attack=115
+strength=76
+defence=75
 
 [templetrek_tentacle_head]
 name=Head
@@ -78655,6 +79983,10 @@ walkanim=templetrek_tentacle_head_ready
 readyanim=templetrek_tentacle_head_ready
 ambient=15
 vislevel=140
+hitpoints=150
+attack=73
+strength=186
+defence=75
 
 [templetrek_tentacle_head_spawning]
 name=Head
@@ -78673,6 +80005,10 @@ walkanim=templetrek_tentacle_head_spawning
 readyanim=templetrek_tentacle_head_spawning
 ambient=15
 vislevel=140
+hitpoints=150
+attack=73
+strength=186
+defence=75
 
 [templetrek_tentacle_arm_spawning]
 name=Tentacle
@@ -78691,6 +80027,10 @@ walkanim=templetrek_tentacle_spawning
 readyanim=templetrek_tentacle_spawning
 ambient=15
 vislevel=136
+hitpoints=75
+attack=115
+strength=76
+defence=75
 
 [templetrek_zombie]
 name=Zombie
@@ -78719,6 +80059,10 @@ resizev=123
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 vislevel=23
+hitpoints=20
+attack=20
+strength=20
+defence=20
 
 [templetrek_multi_child_hard]
 walkanim=midget_walk
@@ -79186,6 +80530,10 @@ recol5s=0
 recol5d=32767
 size=2
 vislevel=45
+hitpoints=50
+attack=0
+strength=0
+defence=0
 walkanim=unicorn_walk
 readyanim=unicorn_ready
 ambient=25
@@ -79210,6 +80558,10 @@ recol5s=18465
 recol5d=32767
 size=2
 vislevel=45
+hitpoints=50
+attack=0
+strength=0
+defence=0
 walkanim=giantrat_walk
 readyanim=giantrat_ready
 op2=Attack
@@ -79236,6 +80588,10 @@ recol4d=30918
 recol5s=18465
 recol5d=32767
 vislevel=45
+hitpoints=50
+attack=0
+strength=0
+defence=0
 walkanim=goblin_walk
 readyanim=goblin_ready
 op2=Attack
@@ -79253,6 +80609,10 @@ op2=Attack
 ambient=60
 contrast=60
 vislevel=42
+hitpoints=25
+attack=39
+strength=41
+defence=40
 
 [soulbane_confu_creeper]
 name=Confusion beast
@@ -79265,6 +80625,10 @@ walkanim=confwalk
 readyanim=confready
 op2=Attack
 vislevel=43
+hitpoints=28
+attack=42
+strength=41
+defence=40
 
 [soulbane_confu_creeper_fake1]
 name=Confusion beast
@@ -79277,6 +80641,10 @@ walkanim=confwalk
 readyanim=confready
 op2=Attack
 vislevel=43
+hitpoints=28
+attack=42
+strength=41
+defence=40
 
 [soulbane_confu_creeper_fake2]
 name=Confusion beast
@@ -79289,6 +80657,10 @@ walkanim=confwalk
 readyanim=confready
 op2=Attack
 vislevel=43
+hitpoints=28
+attack=42
+strength=41
+defence=40
 
 [soulbane_confu_creeper_fake3]
 name=Confusion beast
@@ -79301,6 +80673,10 @@ walkanim=confwalk
 readyanim=confready
 op2=Attack
 vislevel=43
+hitpoints=28
+attack=42
+strength=41
+defence=40
 
 [soulbane_confu_creeper_fake4]
 name=Confusion beast
@@ -79313,6 +80689,10 @@ walkanim=confwalk
 readyanim=confready
 op2=Attack
 vislevel=43
+hitpoints=28
+attack=42
+strength=41
+defence=40
 
 [soulbane_hope_monst3]
 name=Hopeless creature
@@ -79323,6 +80703,10 @@ walkanim=lesswalk
 readyanim=lessready
 op2=Attack
 vislevel=40
+hitpoints=25
+attack=38
+strength=36
+defence=39
 
 [soulbane_hope_monst2]
 name=Hopeless creature
@@ -79335,6 +80719,10 @@ walkanim=lesswalk
 readyanim=lessready
 op2=Attack
 vislevel=40
+hitpoints=25
+attack=38
+strength=36
+defence=39
 
 [soulbane_hope_monst1]
 name=Hopeless creature
@@ -79347,6 +80735,10 @@ walkanim=lesswalk
 readyanim=lessready
 op2=Attack
 vislevel=40
+hitpoints=25
+attack=38
+strength=36
+defence=39
 
 [soulbane_final_tolna1]
 name=Tolna
@@ -79357,6 +80749,10 @@ walkanim=neckready
 readyanim=neckready
 op2=Attack
 vislevel=46
+hitpoints=37
+attack=42
+strength=41
+defence=40
 
 [soulbane_final_tolna2]
 name=Tolna
@@ -79367,6 +80763,10 @@ walkanim=neckready
 readyanim=neckready
 op2=Attack
 vislevel=46
+hitpoints=37
+attack=42
+strength=41
+defence=40
 
 [soulbane_final_tolna3]
 name=Tolna
@@ -79377,6 +80777,10 @@ walkanim=neckready
 readyanim=neckready
 op2=Attack
 vislevel=46
+hitpoints=37
+attack=42
+strength=41
+defence=40
 
 [soulbane_unicorn]
 name=Angry unicorn
@@ -79400,6 +80804,10 @@ walkanim=unicorn_walk
 readyanim=unicorn_ready
 op2=Attack
 vislevel=47
+hitpoints=50
+attack=38
+strength=41
+defence=38
 
 [soulbane_rat]
 name=Angry giant rat
@@ -79423,6 +80831,10 @@ walkanim=giantrat_walk
 readyanim=giantrat_ready
 op2=Attack
 vislevel=47
+hitpoints=50
+attack=38
+strength=41
+defence=38
 
 [soulbane_goblin]
 name=Angry goblin
@@ -79449,6 +80861,10 @@ walkanim=goblin_walk
 readyanim=goblin_ready
 op2=Attack
 vislevel=47
+hitpoints=50
+attack=38
+strength=41
+defence=38
 
 [soulbane_bear]
 name=Angry bear
@@ -79472,6 +80888,10 @@ walkanim=bear_walk
 readyanim=bear_ready
 op2=Attack
 vislevel=47
+hitpoints=50
+attack=38
+strength=41
+defence=38
 
 [soulbane_fear_beast]
 name=Fear reaper
@@ -79482,6 +80902,10 @@ walkanim=fear_walk
 readyanim=fear_ready
 op2=Attack
 vislevel=55
+hitpoints=57
+attack=45
+strength=48
+defence=45
 
 [soulbane_conf_beast]
 name=Confusion beast
@@ -79494,6 +80918,10 @@ walkanim=confwalk
 readyanim=confready
 op2=Attack
 vislevel=63
+hitpoints=64
+attack=52
+strength=55
+defence=52
 
 [soulbane_less_beast3]
 name=Hopeless creature
@@ -79504,6 +80932,10 @@ walkanim=lesswalk
 readyanim=lessready
 op2=Attack
 vislevel=71
+hitpoints=71
+attack=59
+strength=62
+defence=59
 
 [soulbane_less_beast2]
 name=Hopeless beast
@@ -79582,6 +81014,7 @@ readyanim=human_ready
 op1=Talk-to
 op3=Trade
 vislevel=hide
+moverestrict=indoors
 head1=npc_3671_head
 head2=npc_3671_headi2
 head3=npc_doctor_orbon_head
@@ -79596,6 +81029,10 @@ walkanim=sheep_walk
 readyanim=sheep_ready
 op2=Attack
 vislevel=2
+hitpoints=8
+attack=1
+strength=1
+defence=1
 
 [ramunsheered]
 name=Ram
@@ -79606,6 +81043,10 @@ walkanim=sheep_walk
 readyanim=sheep_ready
 op2=Attack
 vislevel=2
+hitpoints=8
+attack=1
+strength=1
+defence=1
 
 [talking_sack]
 name=Bones
@@ -79624,6 +81065,10 @@ op2=Attack
 readyanim=vulture_ground_ready
 walkanim=vulture_walk
 vislevel=31
+hitpoints=10
+attack=40
+strength=40
+defence=10
 
 [rag_vulture_flying]
 name=Vulture
@@ -79634,6 +81079,10 @@ readyanim=vulture_fly
 walkanim=vulture_fly
 op2=Attack
 vislevel=31
+hitpoints=10
+attack=40
+strength=40
+defence=10
 
 [sinister_stranger0]
 name=Sinister Stranger
@@ -80926,6 +82375,10 @@ op2=Attack
 walkanim=spinner_walk
 readyanim=spinner_ready
 vislevel=55
+hitpoints=53
+attack=22
+strength=22
+defence=68
 
 [pest_spinner_3]
 name=Spinner
@@ -80947,6 +82400,10 @@ op2=Attack
 walkanim=spinner_walk
 readyanim=spinner_ready
 vislevel=74
+hitpoints=73
+attack=27
+strength=27
+defence=93
 
 [pest_spinner_4]
 name=Spinner
@@ -80968,6 +82425,10 @@ op2=Attack
 walkanim=spinner_walk
 readyanim=spinner_ready
 vislevel=92
+hitpoints=101
+attack=32
+strength=32
+defence=118
 
 [pest_spinner_5]
 name=Spinner
@@ -82088,6 +83549,10 @@ contrast=15
 turnspeed=15
 op2=Attack
 vislevel=92
+hitpoints=120
+attack=30
+strength=100
+defence=80
 
 [pilot_al_kharid]
 name=Captain Dalbur
@@ -82209,6 +83674,10 @@ walkanim=midget_walk
 readyanim=midget_ready
 op2=Attack
 vislevel=5
+hitpoints=10
+attack=1
+strength=1
+defence=1
 head1=obj_pickpocket_guide_gnome
 
 [gnome_driver]
@@ -82224,6 +83693,10 @@ walkanim=midget_walk
 readyanim=midget_ready
 op2=Attack
 vislevel=5
+hitpoints=10
+attack=3
+strength=5
+defence=3
 head1=npc_commander_montai_head
 
 [gnome_mage]
@@ -82238,6 +83711,10 @@ walkanim=midget_walk
 readyanim=midget_ready
 op2=Attack
 vislevel=5
+hitpoints=10
+attack=3
+strength=1
+defence=1
 head1=npc_1425_head
 
 [gnome_tortoise_commander]
@@ -82288,6 +83765,10 @@ resizeh=115
 resizev=120
 op2=Attack
 vislevel=79
+hitpoints=100
+attack=15
+strength=90
+defence=80
 
 [wom_multi]
 readyanim=human_ready
@@ -82736,6 +84217,10 @@ op2=Attack
 resizeh=128
 resizev=128
 vislevel=79
+hitpoints=100
+attack=60
+strength=60
+defence=60
 
 [swan_troll_fishing_1]
 name=Sea troll
@@ -82753,6 +84238,10 @@ op2=Attack
 resizeh=128
 resizev=128
 vislevel=65
+hitpoints=80
+attack=50
+strength=50
+defence=50
 
 [swan_troll_fishing_2]
 name=Sea troll
@@ -82770,6 +84259,10 @@ op2=Attack
 resizeh=128
 resizev=128
 vislevel=87
+hitpoints=80
+attack=75
+strength=75
+defence=75
 
 [swan_troll_fishing_3]
 name=Sea troll
@@ -82784,6 +84277,10 @@ op2=Attack
 resizeh=128
 resizev=128
 vislevel=101
+hitpoints=80
+attack=90
+strength=90
+defence=90
 
 [swan_skeleton_battle]
 name=Skeleton Mage
@@ -82841,6 +84338,10 @@ desc=The mother of all sea trolls!
 model1=npc_3847
 size=5
 vislevel=170
+hitpoints=200
+attack=100
+strength=70
+defence=100
 readyanim=swan_queen_ready
 op2=Attack
 
@@ -82919,3 +84420,7 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=83
+hitpoints=80
+attack=10
+strength=10
+defence=60
