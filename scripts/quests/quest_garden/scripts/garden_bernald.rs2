@@ -1,0 +1,22 @@
+// Garden of Tranquillity — Bernald first Talk-to. No vine op. No 988 write.
+// CANDIDATE last-resort 2007-base (OSRS Talking to Bernald minus Charm /
+// stronger-cure / Alain / RS3 Taverley). Hunt 289? no.
+// Cite garden-bernald-talk-product-377.md.
+
+[opnpc1,bernald]
+if (%garden_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatnpc("<p,quiz>Do you know anything about grapevine diseases?");
+~chatplayer("<p,neutral>I might - what's the problem?");
+~chatnpc("<p,sad>You see those grapevines over there?");
+~chatplayer("<p,neutral>Yes. They don't look too happy at the moment.");
+~chatnpc("<p,sad>They've come down with some strange disease that I've never encountered before. I've tried everything with them, but nothing seems to work. If it carries on like this I will lose all this year's crops.");
+~chatplayer("<p,neutral>I could probably help you with that, but I'd need something in return.");
+~chatnpc("<p,happy>Anything, you just need to ask!");
+~chatplayer("<p,quiz>Well, I'd like a supply of Burthorpe Vine seeds.");
+~chatnpc("<p,sad>I'm afraid I can't do that.");
+~chatplayer("<p,angry>I thought you said anything!");
+~chatnpc("<p,sad>I'm afraid that is the one thing I cannot give you. Burthorpe Vine has been bred over many years and many past generations of my family. I could never give away something so special.");
+return;
