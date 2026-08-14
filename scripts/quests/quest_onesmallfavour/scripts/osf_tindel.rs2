@@ -1,10 +1,21 @@
-// One Small Favour — Tindel after Cromperty 17→18.
+// One Small Favour — Tindel after Cromperty 17→18 + oxide grant after Rantz 22→23.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Tindel).
-// Stodgy grant 4425. No dest / oxide 4427 / Sword give / Ring-bell / 12346.
-// Hunt 289? no. Cite osf-tindel-after-cromperty-377.md.
+// First-write stodgy 4425 18→19 KEEP. Return: inv_del 4426 + inv_add 4427, 23→24.
+// No dest / 4428 / Sword give / Ring-bell / 12346 / 200gp rematch (later leftover).
+// Hunt 289? no. Cite osf-tindel-oxide-grant-377.md + osf-tindel-comfy-return-377.md.
 
 [opnpc1,tindel_marchant]
 if (%onesmallfavour < 18) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavour >= 23) {
+    if (inv_total(inv, favour_matress_comfy) > 0) {
+        @osf_tindel_oxide;
+    }
+    if (inv_total(inv, favour_iron_oxide) > 0 | %onesmallfavour >= 24) {
+        @osf_tindel_oxide_reminder;
+    }
     ~displaymessage(^dm_default);
     return;
 }
@@ -84,4 +95,31 @@ inv_add(inv, favour_matress_stodgy, 1);
 if (%onesmallfavour = 18) {
     %onesmallfavour = 19;
 }
+return;
+
+[label,osf_tindel_oxide]
+~chatnpc("<p,happy>Hello there! Welcome to my special antiques boutique.");
+def_int $have = ~p_choice2("I have the mattress.", 1, "Something else.", 2);
+if ($have = 2) {
+    return;
+}
+~chatplayer("<p,happy>I have the mattress!");
+~chatnpc("<p,happy>Great! Let's have a look then.");
+inv_del(inv, favour_matress_comfy, 1);
+inv_add(inv, favour_iron_oxide, 1);
+~mesbox("You hand Tindel the comfy mattress. Tindel gives you the iron oxide.");
+~chatnpc("<p,happy>Great! Here's the iron oxide I promised you!");
+if (%onesmallfavour = 23) {
+    %onesmallfavour = 24;
+}
+return;
+
+[label,osf_tindel_oxide_reminder]
+~chatnpc("<p,happy>Hello there! Welcome to my special antiques boutique.");
+def_int $now = ~p_choice2("What should I do now?", 1, "Something else.", 2);
+if ($now = 2) {
+    return;
+}
+~chatplayer("<p,quiz>What should I do now?");
+~chatnpc("<p,quiz>Didn't you need to take that bottle of rust to someone?");
 return;
