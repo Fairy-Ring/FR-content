@@ -1,0 +1,85 @@
+// Desert Treasure — village Eblis shopping-list take.
+// [opnpcu,fd_elder_village] only. Do not rewrite [opnpc1].
+// CANDIDATE last-resort 2007-base: OSRS Giving Eblis ingredients minus
+// RS3 dump-all / remaining-count / [sir/madam]. Hunt 289? no.
+// Gate %deserttreasure = 8. Increment fd_* only. Never write 10 / 15 here.
+// Cite dt-eblis-ingredient-take-377.md.
+
+[opnpcu,fd_elder_village]
+if (%deserttreasure ! 8) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_obj $used = last_useitem;
+if ($used = magic_logs | $used = cert_magic_logs) {
+    if (%fd_magiclog >= 12) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, $used, 1);
+    %fd_magiclog = calc(%fd_magiclog + 1);
+    mes("You hand over a magic log.");
+    return;
+}
+if ($used = steel_bar | $used = cert_steel_bar) {
+    if (%fd_steelbar >= 6) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, $used, 1);
+    %fd_steelbar = calc(%fd_steelbar + 1);
+    mes("You hand over a steel bar.");
+    return;
+}
+if ($used = molten_glass | $used = cert_molten_glass) {
+    if (%fd_glass >= 6) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, $used, 1);
+    %fd_glass = calc(%fd_glass + 1);
+    mes("You hand over some molten glass.");
+    return;
+}
+if ($used = bones) {
+    if (%fd_bones = 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, bones, 1);
+    %fd_bones = 1;
+    ~chatnpc("<p,happy>Thank you, those are enough bones.");
+    return;
+}
+if ($used = ashes) {
+    if (%fd_ash = 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, ashes, 1);
+    %fd_ash = 1;
+    ~chatnpc("<p,happy>Thank you, that is enough ash.");
+    return;
+}
+if ($used = charcoal) {
+    if (%fd_charcoal = 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, charcoal, 1);
+    %fd_charcoal = 1;
+    ~chatnpc("<p,happy>Thank you, that is enough charcoal.");
+    return;
+}
+if ($used = bloodrune) {
+    if (%fd_bloodrune = 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, bloodrune, 1);
+    %fd_bloodrune = 1;
+    ~chatnpc("<p,happy>Thank you, that blood rune should be sufficient.");
+    return;
+}
+~displaymessage(^dm_default);
+return;

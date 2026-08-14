@@ -1,0 +1,87 @@
+// Making History start — Jorral (makinghistory_jorral 2932) @ 2437,3347.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Starting off minus
+// master-clue / Overview / req toast / cutscene dest.
+// Hunt 289? no. No Lathas splice. Accept: %makinghistory_prog 0→1 only.
+// Cite making-history-first-product-slice-377.md §4.
+
+[opnpc1,makinghistory_jorral]
+if (%makinghistory_prog >= 1) {
+    @mh_jorral_started;
+}
+@mh_jorral_hello;
+
+[label,mh_jorral_hello]
+~chatplayer("<p,happy>Hi there.");
+~chatnpc("<p,shock>All is lost!");
+~chatplayer("<p,confused>Sorry?");
+~chatnpc("<p,sad>Just look around you! This great building will soon be in ruin.");
+~chatplayer("<p,quiz>Great building?");
+~chatnpc("<p,happy>Of course! This building has a history spanning generations!");
+~chatplayer("<p,quiz>Ah, I see, a great history. But why will it be in ruin?");
+~chatnpc("<p,angry>It's to be ripped apart to make way for King Lathas' new alchemists' lab.");
+~chatplayer("<p,quiz>Does the king not respect the outpost's GREAT history?");
+~chatnpc("<p,sad>Well, actually nobody knows what the history is. But there must be something.");
+~chatnpc("<p,quiz>Wait a minute. You could help me!");
+~chatplayer("<p,confused>Me?");
+~chatnpc("<p,happy>Yes! Uncover the history of this building to convince King Lathas to leave it alone. Do you want to know more?");
+def_int $more = ~p_choice2("Tell me more.", 1, "I don't care about some dusty building.", 2);
+if ($more = 2) {
+    @mh_jorral_refuse;
+}
+~chatplayer("<p,quiz>Tell me more.");
+// Cutscene dest UNKNOWN — skip narration, keep museum pitch.
+~chatnpc("<p,happy>If all goes well, I hope to be able to turn it into a museum as a monument to the area's history. What do you think?");
+def_int $yes = ~p_choice2("OK, I will make a stand for history!", 1, "I don't care about some dusty building.", 2);
+if ($yes = 2) {
+    @mh_jorral_refuse;
+}
+~chatplayer("<p,happy>OK, I will make a stand for history!");
+~chatnpc("<p,happy>Oh thank you so much, you really are my saviour!");
+if (%makinghistory_prog = 0) {
+    %makinghistory_prog = 1;
+}
+~chatplayer("<p,quiz>But where should I start?");
+@mh_jorral_need;
+
+[label,mh_jorral_refuse]
+~chatplayer("<p,shifty>I don't care about some dusty building.");
+~chatnpc("<p,shock>It's doomed. DOOMED!");
+return;
+
+[label,mh_jorral_started]
+~chatplayer("<p,happy>Hi there.");
+~chatnpc("<p,quiz>How's it going?");
+@mh_jorral_need;
+
+[label,mh_jorral_need]
+~chatnpc("<p,neutral>There are three people that may be able to help:");
+def_int $w = ~p_choice4("A trader in Ardougne", 1, "A ghost in Port Phasmatys", 2, "A warrior in Rellekka", 3, "Got to go, bye!", 4);
+if ($w = 4) {
+    ~chatplayer("<p,neutral>Got to go, bye!");
+    return;
+}
+if ($w = 1) {
+    ~chatplayer("<p,quiz>A trader in Ardougne");
+    ~chatnpc("<p,neutral>There is a silver trader in East Ardougne called Erin, who I believe can help.");
+    ~chatplayer("<p,quiz>In what way can he help?");
+    ~chatnpc("<p,neutral>His Great Grandfather lived in this outpost according to the records. He must know something!");
+    ~chatplayer("<p,neutral>OK, I'll see what he has to say.");
+    return;
+}
+if ($w = 2) {
+    ~chatplayer("<p,quiz>A ghost in Port Phasmatys");
+    ~chatnpc("<p,sad>I've been told that there's a ghost far off in Port Phasmatys that moans of losing his life to this place.");
+    ~chatplayer("<p,quiz>Sounds ominous. Does he have a name?");
+    ~chatnpc("<p,neutral>He does indeed. It's Droalak.");
+    ~chatplayer("<p,neutral>I'll track him down.");
+    ~chatnpc("<p,neutral>It might not be so simple! You'll need an amulet of ghostspeak to talk to him!");
+    ~chatplayer("<p,happy>I've conversed with the dead before, that shouldn't be too much of a problem.");
+    return;
+}
+~chatplayer("<p,quiz>A warrior in Rellekka");
+~chatnpc("<p,neutral>Up near the mountains, in Rellekka is a warrior called Dron whom I have spoken to in the past. He is always on the lookout for information that can improve his fighting and commanding skills.");
+~chatplayer("<p,quiz>And how's he related to this outpost?");
+~chatnpc("<p,neutral>He isn't directly, but he's studied many wars, and as this used to be an outpost it should have been involved in some war.");
+~chatplayer("<p,neutral>That sounds simple enough.");
+~chatnpc("<p,neutral>He isn't the easiest person to talk to, so you may need to speak to his brother, Blanin, first.");
+return;
