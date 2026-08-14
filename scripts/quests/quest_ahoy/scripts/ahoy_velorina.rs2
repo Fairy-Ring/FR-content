@@ -1,13 +1,20 @@
 // Ghosts Ahoy start — Velorina (ahoy_velorina 1683) @ 3678,3510.
 // CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Velorina
 // minus Overview overlay. Hunt 289? no. No Necrovarus / ectophial / stairs.
-// Accept: %ahoy_questvar 0→1 only. Cite ghosts-ahoy-velorina-product-notes-377.md.
+// Accept: %ahoy_questvar 0→1. After Necro refuse (>=2): another-way
+// briefing 2→3. No dest / crone / ectophial. Cite nettle-tea leftover.
 
 [opnpc1,ahoy_velorina]
 if (inv_total(worn, amulet_of_ghostspeak) = 0) {
     ~chatnpc("<p,shock>Woooo wooo wooooo woooo");
     ~mesbox("You cannot understand the ghost.");
     return;
+}
+if (%ahoy_questvar >= 3) {
+    @ahoy_velorina_after_necro_nag;
+}
+if (%ahoy_questvar >= 2) {
+    @ahoy_velorina_after_necro;
 }
 if (%ahoy_questvar >= 1) {
     @ahoy_velorina_started;
@@ -74,4 +81,26 @@ return;
 ~chatnpc("<p,neutral>I sense that you have not yet spoken to Necrovarus.");
 ~chatplayer("<p,neutral>No, I was just getting to that.");
 ~chatnpc("<p,neutral>Well, I suppose we do have all the time in the world...");
+return;
+
+[label,ahoy_velorina_after_necro]
+~chatplayer("<p,sad>I'm sorry, but Necrovarus will not let you go.");
+~chatnpc("<p,sad>I feared as much. His spirit is a thing of fire and wrath.");
+~chatplayer("<p,quiz>You spoke of another way.");
+~chatnpc("<p,neutral>It is only a small chance. During the building of the Ectofuntus one of Necrovarus's disciples spoke out against him. It is such a long time ago I cannot remember her name, although I knew her as a friend.");
+~chatnpc("<p,neutral>She fled before the Ectofuntus took control over us, but being a disciple of Necrovarus she would have been privy to many of his darkest secrets. She may know of a way to aid us without Necrovarus.");
+if (%ahoy_questvar = 2) {
+    %ahoy_questvar = 3;
+}
+@ahoy_velorina_after_necro_nag;
+
+[label,ahoy_velorina_after_necro_nag]
+def_int $q = ~p_choice2("Do you know where this woman can be found?", 1, "If it was such a long time ago, won't she be dead already?", 2);
+if ($q = 2) {
+    ~chatplayer("<p,quiz>If it was such a long time ago, won't she be dead already?");
+    ~chatnpc("<p,sad>She was a friend of mine. Had she died, I would have felt her spirit pass over to the next world, though I may not follow.");
+    return;
+}
+~chatplayer("<p,quiz>Do you know where this woman can be found?");
+~chatnpc("<p,neutral>I have a vision of a small wooden shack, the land it was built on the unholy soil of Morytania. I sense the sea is very close, and that there are looms castles to the west and the east.");
 return;

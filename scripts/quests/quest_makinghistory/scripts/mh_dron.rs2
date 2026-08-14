@@ -1,0 +1,190 @@
+// Making History mid — Dron / Blanin warrior track (after licensed Jorral).
+// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Dron / Blanin
+// minus Overview / Jorral receive / last-person wrap. Hunt 289? no.
+// Bounce writes warr_prog 0→1. Quiz pass 1→2. Oral only — no obj.
+// Cite making-history-dron-first-slice-377.md.
+
+[opnpc1,makinghistory_dron]
+if (%makinghistory_prog < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%makinghistory_warr_prog >= 2) {
+    ~chatnpc("<p,angry>BE GONE!");
+    return;
+}
+if (%makinghistory_warr_prog >= 1) {
+    @mh_dron_quiz;
+}
+@mh_dron_open;
+
+[label,mh_dron_open]
+~chatplayer("<p,neutral>Excuse me.");
+~chatnpc("<p,angry>Look, I don't have time for weaklings, if you want conversation, talk to my brother Blanin!");
+if (%makinghistory_warr_prog = 0) {
+    %makinghistory_warr_prog = 1;
+}
+return;
+
+[opnpc1,makinghistory_blanin]
+if (%makinghistory_prog < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatplayer("<p,quiz>Hello there. Are you the brother of Dron?");
+~chatnpc("<p,quiz>That I am. Why? Has he killed one of your family?");
+~chatplayer("<p,confused>Not that I know of...");
+~chatnpc("<p,happy>Oh good, how can I help you?");
+~chatplayer("<p,neutral>Well I'd like to talk to your brother Dron about the outpost North of Ardougne.");
+~chatnpc("<p,neutral>I'm afraid he's not easy to talk to, so it's good that you came to see me. You'll need to remember a few things when talking to him.");
+~chatplayer("<p,quiz>Like?");
+~chatnpc("<p,neutral>You must be firm with him and don't mention that I sent you. In case he asks, he wields an iron mace in battle, eats rats for breakfast, kittens for lunch and bunnies for tea!");
+~chatnpc("<p,neutral>His favorite drink is red spider blood, he's 36 years, 8 months and 21 days old, studies famous battles of the Fourth and Fifth ages, lives on the North East side of town and his, erm... pet cat is called Fluffy.");
+~chatplayer("<p,confused>O..K....");
+~chatnpc("<p,neutral>I know this sounds strange but Dron won't talk to anyone unless they know him well - he's a secretive guy.");
+return;
+
+[label,mh_dron_quiz]
+~chatplayer("<p,neutral>I need to talk to you.");
+~chatnpc("<p,quiz>Why should I?");
+def_int $why = ~p_choice3("Erm, sorry I don't mean to cause offence.", 1, "Please don't hurt me.", 2, "I'm after important answers.", 3);
+if ($why ! 3) {
+    if ($why = 1) {
+        ~chatplayer("<p,sad>Erm, sorry I don't mean to cause offence.");
+    } else {
+        ~chatplayer("<p,shock>Please don't hurt me.");
+    }
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>I'm after important answers.");
+~chatnpc("<p,quiz>But how do you know me?");
+def_int $know = ~p_choice2("I just talked to your brother.", 1, "Why, you're the famous warrior Dron!", 2);
+if ($know = 1) {
+    ~chatplayer("<p,neutral>I just talked to your brother.");
+    ~chatnpc("<p,angry>Don't talk of my brother. He's not on my good side at the moment.");
+    return;
+}
+~chatplayer("<p,happy>Why, you're the famous warrior Dron!");
+~chatnpc("<p,quiz>If so, what weapon do I use?");
+def_int $wep = ~p_choice3("An iron axe", 1, "An iron mace", 2, "A steel mace", 3);
+if ($wep ! 2) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>An iron mace.");
+~chatnpc("<p,quiz>When do I like to eat rats?");
+def_int $rats = ~p_choice3("Breakfast", 1, "Tea", 2, "Lunch", 3);
+if ($rats ! 1) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>Breakfast.");
+~chatnpc("<p,quiz>When are kittens best devoured?");
+def_int $kit = ~p_choice3("Tea", 1, "Lunch", 2, "Puppies", 3);
+if ($kit ! 2) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>Lunch.");
+~chatnpc("<p,quiz>What do I usually eat for tea?");
+def_int $tea = ~p_choice3("Bunnies", 1, "Kittens", 2, "Puppies", 3);
+if ($tea = 2) {
+    ~chatplayer("<p,neutral>Kittens.");
+    ~chatnpc("<p,shock>Eww. Gross. You have some strange tastes.");
+    ~chatplayer("<p,angry>You can't lecture ME on eating habits.");
+    return;
+}
+if ($tea ! 1) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>Bunnies.");
+~chatnpc("<p,quiz>What colour spider blood tastes the best?");
+def_int $col = ~p_choice3("Green", 1, "Red", 2, "Blue", 3);
+if ($col ! 2) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>Red.");
+~chatnpc("<p,quiz>How many years old am I?");
+def_int $yr = ~p_choice2("38", 1, "36", 2);
+if ($yr ! 2) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>36");
+~chatnpc("<p,quiz>and months?");
+def_int $mo = ~p_choice3("8", 1, "21", 2, "5", 3);
+if ($mo ! 1) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>8");
+~chatnpc("<p,quiz>What are the most interesting ages for battles?");
+def_int $age = ~p_choice3("Fourth", 1, "Third and Fourth", 2, "Fifth and Fourth", 3);
+if ($age ! 3) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>Fifth and Fourth.");
+~chatnpc("<p,quiz>And my house is situated where?");
+def_int $house = ~p_choice3("North side of the town", 1, "North West side of town", 2, "North East side of town", 3);
+if ($house ! 3) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>North East side of town.");
+~chatnpc("<p,quiz>What is my brother's name?");
+def_int $bro = ~p_choice3("Blanin", 1, "Dave", 2, "Blanon", 3);
+if ($bro = 2) {
+    ~chatplayer("<p,neutral>Dave.");
+    ~chatnpc("<p,quiz>Dev?");
+    ~chatplayer("<p,neutral>No. D-A-V-E");
+    ~chatnpc("<p,neutral>What a strange name. Unlike my brothers!");
+    return;
+}
+if ($bro ! 1) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,neutral>Blanin.");
+~chatnpc("<p,quiz>And my pet cat is called?");
+def_int $cat = ~p_choice2("Fluffy", 1, "Snowy", 2);
+if ($cat ! 1) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,happy>Fluffy.");
+~chatnpc("<p,quiz>What's 5 plus 7?");
+def_int $sum = ~p_choice2("12, but what does that have to do with anything?", 1, "14", 2);
+if ($sum ! 1) {
+    @mh_dron_wrong;
+}
+~chatplayer("<p,quiz>12, but what does that have to do with anything?");
+~chatnpc("<p,angry>Everything! Besides, it's 13!");
+~chatplayer("<p,neutral>Er, I think you'll find it's 12.");
+~chatnpc("<p,neutral>....");
+~chatnpc("<p,neutral>..........");
+~chatnpc("<p,neutral>Very well, you seem to know me quite well, I'll answer your questions best I can.");
+~chatplayer("<p,happy>Phew!");
+~chatnpc("<p,quiz>Well what are they then?");
+~chatplayer("<p,neutral>I'm trying to find out the history of the outpost near Ardougne. I was hoping you could help me.");
+~chatnpc("<p,neutral>Let me see. Ah yes, I remember reading of a battle that took place at the outpost many years ago.");
+~chatnpc("<p,neutral>Two ex-friends led forces in a small battle that ended with them pitted against each other at the top of the outpost as the sole survivors because of their superior strength.");
+~chatplayer("<p,quiz>Ex-friends?");
+~chatnpc("<p,neutral>They were once friends but a difference in their beliefs meant they fell out.");
+~chatnpc("<p,neutral>One chose to follow the god Zamorak, whilst the other chose Saradomin.");
+~chatnpc("<p,neutral>But finding themselves in this extreme situation at the top of the outpost caused them to see the errors of their ways, like the waste of life, the lost friendship and the wasted time.");
+~chatnpc("<p,neutral>They both then decided to unite under Guthix.");
+~chatplayer("<p,happy>Ah, I like happy endings.");
+~chatnpc("<p,shifty>You would.");
+~chatplayer("<p,happy>Thank you, I can report this back to Jorral now.");
+~chatnpc("<p,quiz>Anything else?");
+~chatplayer("<p,quiz>Well, I was wondering how you get the blood stains out of your clothes?");
+~chatnpc("<p,angry>BE GONE!");
+if (%makinghistory_warr_prog < 2) {
+    %makinghistory_warr_prog = 2;
+}
+return;
+
+[label,mh_dron_wrong]
+def_int $r = random(4);
+if ($r = 0) {
+    ~chatnpc("<p,angry>Don't waste my time!");
+} else if ($r = 1) {
+    ~chatnpc("<p,angry>You know nothing!");
+} else if ($r = 2) {
+    ~chatnpc("<p,angry>Leave me alone!");
+} else {
+    ~chatnpc("<p,angry>Wrong, wrong, wrong!");
+}
+return;
