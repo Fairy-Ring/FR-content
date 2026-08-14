@@ -1,0 +1,35 @@
+// Between a Rock — Rolad first Talk-to after Engineer. Ice Mountain.
+// CANDIDATE last-resort 2007-base (OSRS Transcript: Rolad the scholar)
+// minus pages give / dest / schematic leftover. Hunt 289? no.
+// Stay dwarfrock_quest 10. Never 110. Cite bar-rolad-next-377.md.
+
+[opnpc1,dwarfrock_rolad]
+if (%dwarfrock_quest < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%dwarfrock_quest = 110) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatplayer("<p,quiz>Excuse me... would you happen to be Rolad the scholar?");
+~chatnpc("<p,quiz>Why, yes, I think so... who's asking?");
+~chatplayer("<p,neutral><displayname()>, and I've come to ask you about a rock.");
+~chatnpc("<p,neutral>You're awfully tall for a dwarf, you know, <displayname()>. And a rock you say? I suppose I know a fair bit about rocks, yes.");
+~chatplayer("<p,neutral>It's this rock that Dondakan is trying to break open. You know Dondakan, right?");
+~chatnpc("<p,neutral>Oh, old Dondakan, sure I know him. And I know his rock too. It's that unbreakable one, isn't it?");
+~chatplayer("<p,quiz>Yes, that's the one. What can you tell me about it?");
+~chatnpc("<p,neutral>Well, as a matter of fact, I picked up an interesting book on one of my travels, from a quite out of the way dwarven outpost.");
+~chatnpc("<p,neutral>I'm not entirely sure, but it seems to describe this very rock, and how it came to be placed in that cavern.");
+~chatnpc("<p,neutral>I tore out the most interesting pages for more detailed perusal. Let me get them for you.");
+~chatnpc("<p,sad>Oh dear...");
+~chatplayer("<p,quiz>What's wrong?");
+~chatnpc("<p,sad>I seem to have misplaced the pages... a pity, I had wanted to study them some more. Oh well...");
+~chatplayer("<p,shock>What? No! I need that book!");
+~chatnpc("<p,neutral>Oh, well, if it's that important to you, perhaps you can go and look for the pages? There should be three of them.");
+~chatplayer("<p,quiz>Where should I start looking?");
+~chatnpc("<p,neutral>I probably lost them in the mines below. I don't have them up here in any case.");
+~chatplayer("<p,quiz>What, in the mining guild?");
+~chatnpc("<p,neutral>No no, I never go there, I'm not a member you know. But I sometimes go down to the regular mines to study the conditions of the working dwarf.");
+~chatplayer("<p,happy>Okay, thanks, I'll go and look for the pages then.");
+return;

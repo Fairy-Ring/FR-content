@@ -1,0 +1,18 @@
+// MEP1 HQ Head mourner first Talk-to after Arianwyn. No dest. Stay 1.
+// CANDIDATE last-resort pre-SoE dump (RS3 Talking to the Head Mourner
+// minus Essyllt / letter consume / kit / dest). Hunt 289? no.
+// Display Head mourner. Never rename 2372. Cite mep1-head-mourner-2372-377.md.
+
+[opnpc1,mourner_hideout_head_mourner]
+if (%mourning_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatplayer("<p,neutral>Hello, I'm...");
+~chatnpc("<p,quiz>Ah... I take it you are one of the new recruits?");
+~chatplayer("<p,neutral>Well I'm...");
+~chatnpc("<p,angry>Come on, let us have a look at your paper work then.");
+~chatplayer("<p,sad>Erm... I seem to have misplaced it.");
+~chatnpc("<p,angry>GET OUT! Return to Prifddinas in shame.");
+~chatnpc("<p,angry>If the Death Guard see fit to re-issue you with a letter of recommendation then maybe we will find a use for you.");
+return;
