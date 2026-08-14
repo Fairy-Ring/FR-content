@@ -109,20 +109,39 @@ if(%grandtree = ^grandtree_complete) {
 }
 
 [opnpc1,pilot_white_wolf]
-// One Small Favour leftover after Sanfew 12→13. Keep gnome air / glidermap.
-// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Bleemadge).
-// No dest / Feldip / 12346. Hunt 289? no.
+// One Small Favour leftover after Sanfew 12→13 + unwind after Arhein 30.
+// Keep gnome air / glidermap / tea 13→14. CANDIDATE last-resort heading-back
+// Bleemadge minus Chat about Gliders / topic / Feldip dest. No dest / 12346.
+// Hunt 289? no.
 if (%onesmallfavour >= 13) {
     def_int $osf = 0;
-    if (%onesmallfavour >= 14) {
+    if (%onesmallfavour >= 31) {
         $osf = ~p_choice2("What am I supposed to be doing again?", 1, "Something else.", 2);
+        if ($osf = 1) {
+            @osf_bleemadge_unwind_rem;
+            return;
+        }
+    } else if (%onesmallfavour >= 30) {
+        $osf = ~p_choice2("Hey there, did you get your T.R.A.S.H?", 1, "Something else.", 2);
+        if ($osf = 1) {
+            @osf_bleemadge_unwind;
+            return;
+        }
+    } else if (%onesmallfavour >= 14) {
+        $osf = ~p_choice2("What am I supposed to be doing again?", 1, "Something else.", 2);
+        if ($osf = 1) {
+            @osf_bleemadge_tea;
+        }
     } else if (inv_total(inv, cup_guthix_rest_4) > 0 | inv_total(inv, cup_guthix_rest_3) > 0 | inv_total(inv, cup_guthix_rest_2) > 0 | inv_total(inv, cup_guthix_rest_1) > 0) {
         $osf = ~p_choice2("I have a special tea here for you from Sanfew!", 1, "Something else.", 2);
+        if ($osf = 1) {
+            @osf_bleemadge_tea;
+        }
     } else {
         $osf = ~p_choice2("Sanfew asked me to come and talk to you.", 1, "Something else.", 2);
-    }
-    if ($osf = 1) {
-        @osf_bleemadge_tea;
+        if ($osf = 1) {
+            @osf_bleemadge_tea;
+        }
     }
 }
 if(%grandtree = ^grandtree_complete) {
@@ -245,4 +264,23 @@ if ($yes = 2) {
 if (%onesmallfavour = 13) {
     %onesmallfavour = 14;
 }
+return;
+
+// CANDIDATE last-resort heading-back minus Changes. Write 30→31.
+// Split to 377 chat pages. Wiki "this associates" is [sic] — CANDIDATE his.
+// Spoken ogre area is flavor, not dest. No hawser / 4435 / Feldip.
+[label,osf_bleemadge_unwind]
+~chatplayer("<p,quiz>Hey there, did you get your T.R.A.S.H?");
+~chatplayer("<p,neutral>Arhein said that he'd send one of his associates up with it.");
+~chatnpc("<p,happy>Oh, yes, thanks...I've already installed it. I should go like the wind now!");
+~chatnpc("<p,happy>Tell Sanfew, that yakking old druid, I'll be happy to take him to the ogre area now...and yourself of course if you should like to go.");
+~chatplayer("<p,happy>Ok then...thanks I will!");
+if (%onesmallfavour = 30) {
+    %onesmallfavour = 31;
+}
+return;
+
+[label,osf_bleemadge_unwind_rem]
+~chatplayer("<p,quiz>What am I supposed to be doing again?");
+~chatnpc("<p,neutral>Tell Sanfew, that yakking old druid, I'll be happy to take him to the ogre area now.");
 return;
