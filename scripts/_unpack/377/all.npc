@@ -42457,6 +42457,7 @@ readyanim=human_ready
 op1=Talk-to
 head1=idk_woman_hair_short_head
 head2=npc_lady_pirate_headi2
+moverestrict=indoors
 
 [favour_hammerspike_stoutbeard]
 name=Hammerspike Stoutbeard
@@ -42605,6 +42606,7 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_farmer
 head2=idk_man_jaw_goatee_head
+moverestrict=indoors
 
 [tindel_marchant]
 name=Tindel Marchant
