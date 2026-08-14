@@ -53,6 +53,15 @@ return;
 // (prefer no extra write). Guards / leftover-IF Attack = later leftover.
 // Hunt 289? no.
 if (%onesmallfavour >= 33) {
+    def_npc_uid $ham = npc_uid;
+    def_boolean $alive = ~osf_hammerspike_gang_alive;
+    if (npc_finduid($ham) = false) {
+        return;
+    }
+    if ($alive = false) {
+        @osf_hammerspike_bargain;
+        return;
+    }
     ~chatnpc("<p,angry>My men are going to deal with you!");
     @osf_hammerspike_set_guards;
     return;
@@ -67,6 +76,18 @@ if (%onesmallfavour = 32) {
 }
 return;
 
+[proc,osf_hammerspike_gang_alive]()(boolean)
+if (npc_find(coord, favour_gangster_dwarf, 8, 0) = true) {
+    return(true);
+}
+if (npc_find(coord, favour_gangster_dwarf_2, 8, 0) = true) {
+    return(true);
+}
+if (npc_find(coord, favour_gangster_dwarf_3, 8, 0) = true) {
+    return(true);
+}
+return(false);
+
 [label,osf_hammerspike_set_guards]
 // CANDIDATE last-resort 2007-base (Tip.it 2007 §23 set his guards /
 // Transcript men attack). Not leftover-IF Attack. Find range 8 = live
@@ -80,5 +101,21 @@ if (npc_find(coord, favour_gangster_dwarf_2, 8, 0) = true) {
 }
 if (npc_find(coord, favour_gangster_dwarf_3, 8, 0) = true) {
     npc_setmode(opplayer2);
+}
+return;
+
+[label,osf_hammerspike_bargain]
+// CANDIDATE last-resort 2007-base (Transcript after defeating his men).
+// Stay 33 — leftover extra write UNKNOWN, prefer none. Tassie potlid
+// leftover gates on >= this return write. Hunt 289? no.
+if (%onesmallfavour >= 34) {
+    ~chatnpc("<p,shifty>Ok then, fair enough....I'll leave her alone...but I'm going to deal with you personally one of these days!");
+    return;
+}
+~chatnpc("<p,shifty>Well...sure if you're not full of surprises then...I guess I'll have to either hire more men to try and kill you or forget Tassie's loan.");
+~chatplayer("<p,neutral>Ok, you promise me that you won't bother Tassie anymore and I'll leave you alone.");
+~chatnpc("<p,shifty>Ok then, fair enough....I'll leave her alone...but I'm going to deal with you personally one of these days!");
+if (%onesmallfavour = 33) {
+    %onesmallfavour = 34;
 }
 return;
