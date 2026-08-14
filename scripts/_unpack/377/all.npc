@@ -24874,6 +24874,7 @@ wanderrange=0
 maxrange=10
 defaultmode=none
 blockwalk=all
+moverestrict=nomove
 [echned_zekin]
 name=Echned Zekin
 desc=A spirit of the underworld.
@@ -32300,6 +32301,8 @@ param=defend_sound,insect_hit
 param=death_sound,insect_death
 maxrange=9
 attackrange=1
+moverestrict=nomove
+defaultmode=none
 [horror_rockcrab_small]
 name=Rock Crab
 desc=No one likes crabs...
@@ -32349,6 +32352,8 @@ param=defend_sound,insect_hit
 param=death_sound,insect_death
 maxrange=9
 attackrange=1
+moverestrict=nomove
+defaultmode=none
 [viking_olaf]
 name=Olaf the Bard
 desc=A Fremennik bard.
@@ -37117,6 +37122,9 @@ op1=Net
 op3=Harpoon
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [mm_daero]
 name=Daero
@@ -42626,6 +42634,9 @@ readyanim=rock_hybernate
 walkanim=rock_hybernate
 resizev=40
 resizeh=40
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [slagilith_birth]
 name=Slagilith
@@ -42637,6 +42648,9 @@ size=2
 readyanim=rock_birth
 resizev=45
 resizeh=45
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [mdaughter_rockslide_guard]
 name=Guard
@@ -47392,6 +47406,9 @@ op1=Net
 op3=Bait
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [0_50_149_cavefish]
 name=Fishing spot
@@ -47405,6 +47422,9 @@ op1=Net
 op3=Bait
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [lost_tribe_sigmund]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -51316,6 +51336,9 @@ vislevel=hide
 turnspeed=0
 size=2
 op1=Kick
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [wom_bed_active]
 name=Thing under the bed
@@ -55053,6 +55076,9 @@ resizev=100
 turnspeed=0
 vislevel=hide
 minimap=no
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [dungeon_dagganoth_egg2]
 name=Egg
@@ -55065,6 +55091,9 @@ resizev=100
 turnspeed=0
 vislevel=hide
 minimap=no
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [dungeon_dagganoth_egg3]
 name=Egg
@@ -55075,6 +55104,9 @@ resizev=100
 turnspeed=0
 vislevel=hide
 minimap=no
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [giant_rockcrab]
 name=Giant Rock Crab
@@ -55098,6 +55130,9 @@ size=2
 resizeh=250
 resizev=250
 turnspeed=0
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [dagganoth_critter]
 name=Dagannoth spawn
@@ -58004,6 +58039,9 @@ desc=Stoney!
 model1=rock1_8
 minimap=no
 vislevel=1
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [tzhaar_fightpit_swarm_1a]
 name=Tz-Kih
@@ -62950,6 +62988,9 @@ minimap=no
 op1=Fish
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [deal_karamthulhu]
 name=Karamthulhu
@@ -63514,6 +63555,9 @@ size=2
 resizeh=250
 resizev=250
 turnspeed=0
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [dungeon_dagganoth_lighter_deeper]
 name=Dagannoth
@@ -63582,6 +63626,9 @@ contrast=15
 ambient=15
 turnspeed=0
 minimap=no
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [dagannoth_water_creature_1x1_invisible]
 name=Suspicious water
@@ -66036,6 +66083,9 @@ op1=Lure
 op3=Bait
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [magic_carpet_seller8]
 name=Rug Merchant
@@ -73201,6 +73251,9 @@ ambient=10
 turnspeed=0
 minimap=no
 vislevel=hide
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [canoeing_scenery_2]
 name=Trees
@@ -73212,6 +73265,9 @@ ambient=10
 turnspeed=0
 minimap=no
 vislevel=hide
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [canoeing_cavemouth]
 name=Cavemouth
@@ -73223,6 +73279,9 @@ ambient=10
 turnspeed=0
 minimap=no
 vislevel=hide
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [canoeing_bullrush]
 name=Bullrush
@@ -73233,6 +73292,9 @@ ambient=10
 turnspeed=0
 minimap=no
 vislevel=hide
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [canoeing_bullrush_leaf]
 name=Bullrush
@@ -73243,6 +73305,9 @@ ambient=10
 turnspeed=0
 minimap=no
 vislevel=hide
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [canoeing_cave_scenery_1]
 name=Cave Scenery
@@ -73254,6 +73319,9 @@ ambient=5
 turnspeed=0
 minimap=no
 vislevel=hide
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [canoeing_cave_scenery_2]
 name=Cave Scenery
@@ -73265,6 +73333,9 @@ ambient=5
 turnspeed=0
 minimap=no
 vislevel=hide
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [canoeing_cave_scenery_3]
 name=Cave Scenery
@@ -73276,6 +73347,9 @@ ambient=5
 turnspeed=0
 minimap=no
 vislevel=hide
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [mole_giant]
 name=Giant Mole
@@ -73371,6 +73445,9 @@ turnspeed=900
 op1=Pick
 op3=Hidden
 vislevel=74
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [slayer_mutated_zygomite_adult_capt]
 name=Fungi
@@ -73385,6 +73462,9 @@ turnspeed=900
 op1=Pick
 op3=Hidden
 vislevel=86
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [slayer_mutated_zygomite_adolescent]
 name=Zygomite
@@ -73579,6 +73659,9 @@ op1=Inspect
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_goatee_head
 head3=obj_headband_red_manhead
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [chickenquest_evil_chicken]
 name=Evil Chicken
@@ -73659,6 +73742,7 @@ head2=npc_2906_head
 head3=idk_man_jaw_pointy_head
 wanderrange=0
 moverestrict=nomove
+defaultmode=none
 
 [hundred_dave_mum]
 name=Doris
@@ -73797,6 +73881,9 @@ head1=obj_chefs_hat_manhead
 head2=obj_pickpocket_guide_man
 head3=npc_master_fisher_head
 head4=npc_1901_headi2
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [100_osman]
 name=Osman
@@ -74258,6 +74345,7 @@ vislevel=hide
 head1=npc_general_wartface_head
 wanderrange=0
 moverestrict=nomove
+defaultmode=none
 
 [hundred_goblin_2_frozen]
 turnspeed=0
@@ -74288,6 +74376,9 @@ alwaysontop=yes
 op1=Inspect
 vislevel=hide
 head1=npc_general_bentnoze_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [goblin_cook]
 name=Goblin Cook
@@ -74340,6 +74431,9 @@ readyanim=100_goblin_on_wall
 turnspeed=1024
 vislevel=hide
 head1=npc_3414_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [hundred_pirate]
 name=Pirate Pete
@@ -74408,6 +74502,9 @@ readyanim=100_pirate_froze
 op1=Inspect
 turnspeed=0
 alwaysontop=yes
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [100_pirate_mogre_guard]
 name=Mogre Guard
@@ -74943,6 +75040,9 @@ op1=Inspect
 vislevel=hide
 head1=idk_man_hair_long_head
 head2=idk_man_jaw_long_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [100guide_twocats_unferth_bald]
 name=? ? ? ?
@@ -75233,6 +75333,9 @@ op1=Talk-to
 op1=Inspect
 vislevel=hide
 head1=npc_ogre_chieftan_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [hundred_ogre]
 name=Skrach Uglogwee
@@ -75418,6 +75521,9 @@ vislevel=hide
 op1=Inspect
 vislevel=hide
 head1=npc_1448_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [hundred_ilm_mizaru]
 name=Mizaru
@@ -77590,6 +77696,9 @@ op1=Net
 op3=Harpoon
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [0_55_49_memberfish]
 name=Fishing spot
@@ -77603,6 +77712,9 @@ op1=Net
 op3=Harpoon
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [templetrek_vampire_1]
 name=Juvinate
@@ -81673,6 +81785,9 @@ op1=Cage
 op3=Harpoon
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [postie_pete]
 name=Postie Pete
@@ -82508,6 +82623,9 @@ op1=Harpoon
 op3=Net
 op4=hidden
 op5=hidden
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [swan_macro_whirpool]
 name=Fishing spot
@@ -82522,6 +82640,9 @@ op3=Net
 op4=hidden
 op5=hidden
 alwaysontop=yes
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [swan_skeleton_unattackable]
 name=Skeleton Mage
