@@ -1,0 +1,10 @@
+// A Fairy Tale Part I — Fairy Nuff (3303) clinic Talk-to after Martin #5 / GAG=6.
+// CANDIDATE last-resort 2007-base: OSRS Transcript:Fairytale I first Nuff line only
+// (minus Godfather-send / Tanglefoot / leftover-list award / FT2 / RS3 Overview).
+// Hunt 289? no. 0 stage write. NEVER 10. Do not flip fairy_*_check.
+// Do not inv_add fairy_symptoms_list or if_open leftover 18164.
+// Cite: docs/research/fairy-tale-i-nuff-first-slice-377.md §5.1 / §8.
+
+[opnpc1,fairy_nuff]
+~chatnpc("<p,neutral>Sorry, I'm very busy and can't chat. If you want to know something go and talk to the Godfather.");
+return;
