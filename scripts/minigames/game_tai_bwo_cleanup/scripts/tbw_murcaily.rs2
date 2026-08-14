@@ -1,0 +1,29 @@
+// Tai Bwo Wannai Cleanup — Murcaily first Talk-to. Bind concretes, not the multi.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:Murcaily minus diary free-enter
+// 5 Mar 2015 / My Arm / grove dest / stick-award tables). Hunt 289? no.
+// No dest / Quick-Pay / favour % invent. Cite tai-bwo-murcaily-next-377.md.
+
+[opnpc1,tbwcu_murcaily]
+@tbw_murcaily_talk;
+
+[opnpc1,tbwcu_murcaily_nosticks]
+@tbw_murcaily_talk;
+
+[label,tbw_murcaily_talk]
+~chatnpc("<p,happy>Hello there...thanks for helping out Trufitus commune with the gods Bwana. We've been able to return to the village thanks to your help.");
+switch_int(~p_choice3("What do you do here?", 1, "Is there anything interesting to do here?", 2, "Ok, thanks.", 3)) {
+    case 1 :
+        ~chatplayer("<p,quiz>What do you do here?");
+        ~chatnpc("<p,neutral>Well, I tend the hardwood grove nearby, you can enter if you like and harvest some of the very fine hardwood that grows within.");
+        ~chatnpc("<p,neutral>Apart from that I'm a simple Tai Bwo Wannai villager...I like to try and find out what's going on in the mainland and the rest of the known world.");
+        return;
+    case 2 :
+        ~chatplayer("<p,quiz>Is there anything interesting to do here?");
+        ~chatnpc("<p,neutral>Well Bwana, if you're stuck for something to do, you could always do a bit of handymanship about the village and cut away the jungle that lies here about.");
+        ~chatnpc("<p,neutral>If you's is good with da machete Bwana, you's can get's some thatching spars and put them to use repairing the run-down village fence.");
+        return;
+    case 3 :
+        ~chatplayer("<p,neutral>Ok, thanks.");
+        return;
+}
+return;
