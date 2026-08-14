@@ -109,6 +109,22 @@ if(%grandtree = ^grandtree_complete) {
 }
 
 [opnpc1,pilot_white_wolf]
+// One Small Favour leftover after Sanfew 12→13. Keep gnome air / glidermap.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Bleemadge).
+// No dest / Feldip / 12346. Hunt 289? no.
+if (%onesmallfavour >= 13) {
+    def_int $osf = 0;
+    if (%onesmallfavour >= 14) {
+        $osf = ~p_choice2("What am I supposed to be doing again?", 1, "Something else.", 2);
+    } else if (inv_total(inv, cup_guthix_rest_4) > 0 | inv_total(inv, cup_guthix_rest_3) > 0 | inv_total(inv, cup_guthix_rest_2) > 0 | inv_total(inv, cup_guthix_rest_1) > 0) {
+        $osf = ~p_choice2("I have a special tea here for you from Sanfew!", 1, "Something else.", 2);
+    } else {
+        $osf = ~p_choice2("Sanfew asked me to come and talk to you.", 1, "Something else.", 2);
+    }
+    if ($osf = 1) {
+        @osf_bleemadge_tea;
+    }
+}
 if(%grandtree = ^grandtree_complete) {
     @multi2("Can you take me on the glider?", return_grand_tree, "I'll leave you to it.", gnome_pilot_leave);
 } else {
@@ -178,3 +194,55 @@ if(%grandtree = ^grandtree_complete) {
 [label,gnome_pilot_creative]
 ~chatplayer("<p,quiz>What happened here?");
 ~chatnpc("<p,shifty>Call it 'creative landing'.");
+
+[label,osf_bleemadge_tea]
+if (%onesmallfavour >= 14) {
+    ~chatplayer("<p,quiz>What am I supposed to be doing again?");
+    ~chatnpc("<p,neutral>Go to Arhein in Catherby and get some T.R.A.S.H! That's a short name for Triple Redundant Aero Super Hawser and then bring it back to me! I mean, it's not difficult is it?");
+    return;
+}
+if (inv_total(inv, cup_guthix_rest_4) < 1 & inv_total(inv, cup_guthix_rest_3) < 1 & inv_total(inv, cup_guthix_rest_2) < 1 & inv_total(inv, cup_guthix_rest_1) < 1) {
+    ~chatplayer("<p,neutral>Sanfew asked me to come and talk to you.");
+    ~chatnpc("<p,sad>Brrr, blimey it's cold up here! Wish I had something nice to drink to chase away these chills!");
+    return;
+}
+~chatplayer("<p,happy>I have a special tea here for you from Sanfew!");
+~chatnpc("<p,happy>Ohhh! Many thanks! Brrr, blimey it's cold up here!");
+if (inv_total(inv, cup_guthix_rest_4) > 0) {
+    inv_del(inv, cup_guthix_rest_4, 1);
+} else if (inv_total(inv, cup_guthix_rest_3) > 0) {
+    inv_del(inv, cup_guthix_rest_3, 1);
+} else if (inv_total(inv, cup_guthix_rest_2) > 0) {
+    inv_del(inv, cup_guthix_rest_2, 1);
+} else {
+    inv_del(inv, cup_guthix_rest_1, 1);
+}
+~mesbox("You hand over the cup of herbal tea.");
+~chatnpc("<p,happy>Blimey, it was certainly jolly decent of that old stick Sanfew to get you to make me a cup of herbal tea. Wow! It really does chase away the chills!");
+~chatplayer("<p,neutral>Yes, he's quite considerate that way...you know, thinking of people. In fact, he was thinking that you may be able to help him with another little 'helping' situation that involves ogres.");
+~chatnpc("<p,shock>Ogres!");
+~chatnpc("<p,neutral>Hmmm, well I guess they're just like overgrown gnomes when you think about it!");
+~chatplayer("<p,neutral>More like 'super-over-grown-gnomes' if you ask me! Or 'overgrown humans'!");
+~chatnpc("<p,happy>Quite! Anyway, go on! What was Sanfew after?");
+~chatplayer("<p,neutral>Sanfew wants to bring the word of Guthix to those ogres, though I've no idea if ogres have the mental ability to grasp druidic concepts.");
+~chatnpc("<p,neutral>Yes, quite, but who amongst us does? I know I'm often confused by that beardy bunch of yakking druids.");
+~chatplayer("<p,neutral>Well, he wants to know if he can organise a glider ride down there.");
+~chatnpc("<p,neutral>Hmm, interesting! I know that the elders want to extend the network of glider routes, and I did hear that the Feldip Hills were being considered. I don't know why it hasn't opened up yet though.");
+~chatnpc("<p,neutral>If I'm going to transport that yakking druid down to the ogres I'll want to make it in record time so I'll need some lighter kit.");
+~chatplayer("<p,neutral>Ok, good luck with that.");
+~chatnpc("<p,neutral>There's a chap called Arhein in Catherby and I've heard that his special interest in ships has helped him to produce lightweight but strengthened ropes. I'm in need of some T.R.A.S.H.! And I need you to get it for me.");
+~chatplayer("<p,shock>TRASH? What the demonikin are you talking about? Why do I have to get it?");
+~chatnpc("<p,happy>I'm talking about the next generation of lightweight ropes. Triple Redundant Aero Super Hawser...T.R.A.S.H.! I'll transport your yakking druid if you can get me some T.R.A.S.H!");
+~chatnpc("<p,neutral>And you have to get it because I have to stay here with this glider. Is it a deal?");
+def_int $yes = ~p_choice2("Ok, I'll go and get you some T.R.A.S.H.", 1, "No, sorry, I can't do it right now.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,sad>No, sorry, I can't do it right now.");
+    ~chatnpc("<p,sad>Well, that's a bit of a shame...I was looking forward to upgrading my glider!");
+    return;
+}
+~chatplayer("<p,happy>Ok, I'll go and get you some T.R.A.S.H.");
+~chatnpc("<p,happy>Wonderful my friend, wonderful!");
+if (%onesmallfavour = 13) {
+    %onesmallfavour = 14;
+}
+return;
