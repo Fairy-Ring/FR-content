@@ -1,0 +1,28 @@
+// Between a Rock — Dwarven Engineer first Talk-to after Dondakan 0→10.
+// CANDIDATE last-resort 2007-base (OSRS Transcript minus Overview / dest).
+// Stay dwarfrock_quest 10. Never 110. No dest / schematic give.
+// Cite bar-engineer-first-talk-377.md.
+
+[opnpc1,dwarfrock_engineer1]
+if (%dwarfrock_quest < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%dwarfrock_quest = 110) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatplayer("<p,quiz>Do you know anything about this rock in the mines?");
+~chatnpc("<p,quiz>Now what rock would that be, exactly?");
+~chatplayer("<p,neutral>The big rock in the mines to the south, with an old dwarf standing beside it..?");
+~chatnpc("<p,neutral>Ah, Don's rock, right?");
+~chatplayer("<p,quiz>Er, yes, I think so. Do you know what it's made of?");
+~chatnpc("<p,neutral>No, no one knows. No one here, anyway. The only one I can think of is Rolad, a renowned scholar. He was part of Dondakan's team once, many years ago.");
+~chatplayer("<p,quiz>So where can I find this Rolad?");
+~chatnpc("<p,neutral>He left to explore the world. Learning by experience, or so he said. Me, I prefer a cold stout at home, but it takes all sorts.");
+~chatnpc("<p,neutral>I think he's currently with the Black Guard at Ice Mountain.");
+~chatplayer("<p,happy>Great, thanks a lot!");
+if (%dwarfrock_met_engineer = 0) {
+    %dwarfrock_met_engineer = 1;
+}
+return;
