@@ -39,7 +39,13 @@ if ($op = 4) {
 return;
 
 [label,osf_gnorm_menu_after]
-def_int $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything that I can do?", 3, "What was it you wanted me to do again?", 4, "Okay, thanks.", 5);
+// CANDIDATE p_choice5 slot swap: 0 chisel → sale; else reminder. Cite osf-gnormadium-chisel-377.md.
+def_int $again = 0;
+if (inv_total(inv, chisel) = 0) {
+    $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything that I can do?", 3, "I need a chisel to fix these crystals.", 4, "Okay, thanks.", 5);
+} else {
+    $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything that I can do?", 3, "What was it you wanted me to do again?", 4, "Okay, thanks.", 5);
+}
 if ($again = 1) {
     ~chatplayer("<p,quiz>Hello there, what are you working on?");
     ~chatnpc("<p,happy>Well, it's quite exciting... we're extending the glider network to include the Feldip Hills so that people can come and look at these curious ogres.");
@@ -57,6 +63,9 @@ if ($again = 3) {
     @osf_gnorm_menu_after;
 }
 if ($again = 4) {
+    if (inv_total(inv, chisel) = 0) {
+        @osf_gnorm_chisel;
+    }
     ~chatplayer("<p,quiz>What was it you wanted me to do again?");
     ~chatnpc("<p,neutral>Go and take a look at those landing lights and see if you can get them to work, would you? They've been as dull as an ogre conversation since we started working here.");
     ~chatnpc("<p,neutral>Come back and tell me if you actually manage to get them fixed.");
@@ -81,4 +90,29 @@ if ($yes = 2) {
 if (%onesmallfavour = 20) {
     %onesmallfavour = 21;
 }
+return;
+
+[label,osf_gnorm_chisel]
+~chatplayer("<p,quiz>I need a chisel to fix these crystals.");
+~chatnpc("<p,neutral>Okay, I can sell you one for 10 coins.");
+if (inv_total(inv, coins) < 10) {
+    ~chatplayer("<p,sad>But I don't have 10 coins.");
+    ~chatnpc("<p,neutral>So I can't sell you one then!");
+    return;
+}
+def_int $buy = ~p_choice2("Okay, I'll buy a chisel for 10 coins.", 1, "No, I won't buy the chisel.", 2);
+if ($buy = 2) {
+    ~chatplayer("<p,neutral>No, I won't buy the chisel.");
+    ~chatnpc("<p,neutral>Fair enough, come back if you change your mind.");
+    return;
+}
+~chatplayer("<p,happy>Okay, I'll buy a chisel for 10 coins.");
+if (inv_itemspace(inv, chisel, 1, inv_size(inv)) = false) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_del(inv, coins, 10);
+inv_add(inv, chisel, 1);
+~mesbox("You pay ten coins for the chisel.");
+~chatnpc("<p,happy>Okay, many thanks for your custom.");
 return;
