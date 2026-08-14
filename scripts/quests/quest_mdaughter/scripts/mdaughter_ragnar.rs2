@@ -1,0 +1,48 @@
+// Mountain Daughter — Ragnar (1808) first Talk-to after Hamal=1.
+// CANDIDATE last-resort 2007-base: OSRS Transcript post-accept minus
+// Overview / Agility overlay / necklace / Listen-to. Pre-start refuse
+// is RS3 gap-fill (OSRS dump silent). Hunt 289? no. Prefer 0 write.
+// Do not rewrite Hamal. No pool / Kendal / invent stage 2.
+// Cite: docs/research/mountain-daughter-ragnar-first-slice-377.md §4.
+
+[opnpc1,mdaughter_ragnar]
+if (%mdaughter_quest_var >= 1) {
+    @md_ragnar_started;
+}
+@md_ragnar_refuse;
+
+[label,md_ragnar_refuse]
+~chatplayer("<p,quiz>You don't look so well, is everything alright?");
+~chatnpc("<p,angry>No, outerlander. Now go away.");
+return;
+
+[label,md_ragnar_started]
+~chatnpc("<p,sad>So, you are the outerlander whom Hamal said would look for Asleif.");
+~chatplayer("<p,confused>Who?");
+~chatnpc("<p,shock>You don't even know her name!");
+~chatnpc("<p,sad>I am sorry outerlander, I have not spoken with your kind for a long time and I'm not feeling so well. You see, I was set to marry Asleif, the most beautiful woman ever to grace this world.");
+def_int $opt = ~p_choice2("Do you have any idea where she might be?", 1, "What do you mean, my kind?", 2);
+if ($opt = 2) {
+    @md_ragnar_kind;
+}
+~chatplayer("<p,quiz>Do you have any idea where she might be?");
+~chatnpc("<p,sad>She used to come here every day, you know, whenever our camp was set up in the vicinity. She would come to sing, her voice reflecting on the mountains and falling into the pool like sparkling silver. Sometimes I think I can hear her singing, but when I follow the sound around the pool I just end up here again.");
+~chatplayer("<p,quiz>So... do you have any idea where she might be now?");
+~chatnpc("<p,sad>We were supposed to meet here, at the tree by the pool. I think if I wait long enough maybe she will show up again.");
+~chatplayer("<p,quiz>But... you don't actually have any idea where she is right at the moment?");
+~chatnpc("<p,angry>If I knew I wouldn't be standing here, would I?");
+return;
+
+[label,md_ragnar_kind]
+if (%viking >= ^viking_complete) {
+    ~chatplayer("<p,quiz>What do you mean, my kind? I'm a Fremennik you know.");
+    ~chatnpc("<p,neutral>Yet you still use magic, I assume, and have little actual knowledge of the earth and the rock that you stand on every day.");
+    ~chatplayer("<p,neutral>I suppose...");
+    ~chatnpc("<p,angry>Then you are an ignorant, an insult to the gods... and an outerlander.");
+    ~chatplayer("<p,neutral>Okay, okay, you made your point!");
+    return;
+}
+~chatplayer("<p,quiz>What do you mean, my kind?");
+~chatnpc("<p,neutral>You outerlanders with your fancy armour and your runestones and all your convenient little tools.");
+~chatplayer("<p,neutral>Oh, that kind...");
+return;
