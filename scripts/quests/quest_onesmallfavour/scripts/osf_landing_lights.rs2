@@ -1,0 +1,150 @@
+// One Small Favour — landing lights after Gnormadium 20→21.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour lights).
+// Search take/place only. No dest / Feldip / all_lights_fixed / gem XP / 12346.
+// Hunt 289? no. Cite osf-landing-lights-377.md.
+// Bit↔tile map UNKNOWN — CANDIDATE leftover table order, not proven.
+
+[oploc1,favour_landinglight_broken]
+@osf_light_look;
+
+[oploc1,osf_multi_landinglight_sapphire_1]
+@osf_light_look;
+
+[oploc1,osf_multi_landinglight_opal_1]
+@osf_light_look;
+
+[oploc1,osf_multi_landinglight_redtopaz_1]
+@osf_light_look;
+
+[oploc1,osf_multi_landinglight_jade_1]
+@osf_light_look;
+
+[oploc5,favour_landinglight_broken]
+@osf_light_search;
+
+[oploc5,osf_multi_landinglight_sapphire_1]
+@osf_light_search;
+
+[oploc5,osf_multi_landinglight_opal_1]
+@osf_light_search;
+
+[oploc5,osf_multi_landinglight_redtopaz_1]
+@osf_light_search;
+
+[oploc5,osf_multi_landinglight_jade_1]
+@osf_light_search;
+
+[label,osf_light_look]
+if (%onesmallfavour < 21) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~displaymessage(^dm_default);
+return;
+
+[label,osf_light_search]
+if (%onesmallfavour < 21) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $slot = ~osf_light_slot;
+if ($slot = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~osf_light_bit($slot) = 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_namedobj $cut = ~osf_light_cut;
+if (inv_total(inv, $cut) > 0) {
+    inv_del(inv, $cut, 1);
+    ~osf_light_set($slot);
+    ~mesbox("You place the <lowercase(oc_name($cut))> in the landing light. It seems to look right.");
+    def_int $n = ~osf_light_count;
+    if ($n = 8) {
+        ~mesbox("You've fixed all the landing lights!");
+    } else if ($n = 1) {
+        ~mesbox("You've fixed one landing light so far...");
+    } else {
+        ~mesbox("You've fixed <tostring($n)> landing lights so far...");
+    }
+    return;
+}
+def_namedobj $uncut = ~osf_light_uncut;
+if (inv_itemspace(inv, $uncut, 1, inv_size(inv)) = false) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, $uncut, 1);
+~mesbox("You find an <lowercase(oc_name($uncut))> in the landing light.");
+return;
+
+[proc,osf_light_slot]()(int)
+if (loc_coord = 0_39_46_49_25) return(1);
+if (loc_coord = 0_39_46_49_30) return(2);
+if (loc_coord = 0_39_46_52_25) return(3);
+if (loc_coord = 0_39_46_52_30) return(4);
+if (loc_coord = 0_39_46_55_25) return(5);
+if (loc_coord = 0_39_46_55_30) return(6);
+if (loc_coord = 0_39_46_58_25) return(7);
+if (loc_coord = 0_39_46_58_30) return(8);
+return(0);
+
+[proc,osf_light_uncut]()(namedobj)
+if (loc_coord = 0_39_46_49_25 | loc_coord = 0_39_46_49_30 | loc_type = osf_multi_landinglight_sapphire_1) {
+    return(uncut_sapphire);
+}
+if (loc_coord = 0_39_46_52_25 | loc_coord = 0_39_46_52_30 | loc_type = osf_multi_landinglight_opal_1) {
+    return(uncut_opal);
+}
+if (loc_coord = 0_39_46_55_25 | loc_coord = 0_39_46_55_30 | loc_type = osf_multi_landinglight_redtopaz_1) {
+    return(uncut_red_topaz);
+}
+return(uncut_jade);
+
+[proc,osf_light_cut]()(namedobj)
+if (loc_coord = 0_39_46_49_25 | loc_coord = 0_39_46_49_30 | loc_type = osf_multi_landinglight_sapphire_1) {
+    return(sapphire);
+}
+if (loc_coord = 0_39_46_52_25 | loc_coord = 0_39_46_52_30 | loc_type = osf_multi_landinglight_opal_1) {
+    return(opal);
+}
+if (loc_coord = 0_39_46_55_25 | loc_coord = 0_39_46_55_30 | loc_type = osf_multi_landinglight_redtopaz_1) {
+    return(red_topaz);
+}
+return(jade);
+
+[proc,osf_light_bit](int $slot)(int)
+if ($slot = 1) return(%onesmallfavourmulti_1_1);
+if ($slot = 2) return(%onesmallfavourmulti_2_2);
+if ($slot = 3) return(%onesmallfavourmulti_3_3);
+if ($slot = 4) return(%onesmallfavourmulti_4_4);
+if ($slot = 5) return(%onesmallfavourmulti_5_5);
+if ($slot = 6) return(%onesmallfavourmulti_6_6);
+if ($slot = 7) return(%onesmallfavourmulti_7_7);
+if ($slot = 8) return(%onesmallfavourmulti_8_8);
+return(0);
+
+[proc,osf_light_set](int $slot)
+if ($slot = 1) %onesmallfavourmulti_1_1 = 1;
+if ($slot = 2) %onesmallfavourmulti_2_2 = 1;
+if ($slot = 3) %onesmallfavourmulti_3_3 = 1;
+if ($slot = 4) %onesmallfavourmulti_4_4 = 1;
+if ($slot = 5) %onesmallfavourmulti_5_5 = 1;
+if ($slot = 6) %onesmallfavourmulti_6_6 = 1;
+if ($slot = 7) %onesmallfavourmulti_7_7 = 1;
+if ($slot = 8) %onesmallfavourmulti_8_8 = 1;
+return;
+
+[proc,osf_light_count]()(int)
+def_int $n = 0;
+if (%onesmallfavourmulti_1_1 = 1) $n = calc($n + 1);
+if (%onesmallfavourmulti_2_2 = 1) $n = calc($n + 1);
+if (%onesmallfavourmulti_3_3 = 1) $n = calc($n + 1);
+if (%onesmallfavourmulti_4_4 = 1) $n = calc($n + 1);
+if (%onesmallfavourmulti_5_5 = 1) $n = calc($n + 1);
+if (%onesmallfavourmulti_6_6 = 1) $n = calc($n + 1);
+if (%onesmallfavourmulti_7_7 = 1) $n = calc($n + 1);
+if (%onesmallfavourmulti_8_8 = 1) $n = calc($n + 1);
+return($n);
