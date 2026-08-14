@@ -1,0 +1,31 @@
+// Between a Rock — gold ore/bar Use-on Dondakan after after-book.
+// CANDIDATE last-resort 2007-base (OSRS Using gold ore/bar).
+// No consume / gold CB give / Fire / dest. Hunt 289? no.
+// Stay dwarfrock_quest 10. Never 110. Cite bar-dondakan-after-book-377.md.
+
+[opnpcu,dwarfrock_dondakan]
+if (%dwarfrock_quest < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%dwarfrock_quest = 110) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = gold_ore | last_useitem = gold_bar) {
+    @dwarfrock_dondakan_show_gold;
+}
+if (last_useitem = perfect_gold_bar) {
+    ~chatnpc("<p,angry>Perfect gold? That's much too valuable to be used to make cannonballs!");
+    return;
+}
+~chatnpc("<p,quiz>What am I supposed to do with that?");
+return;
+
+[label,dwarfrock_dondakan_show_gold]
+~chatnpc("<p,laugh>Haha, you want me to make a golden cannonball?");
+~chatnpc("<p,quiz>You know that apart from being heavy it's also very soft, don't you? It'd be a pointless waste!");
+~chatplayer("<p,neutral>Well... the book does say that there's gold inside the rock, so I thought perhaps gold can damage it as well.");
+~chatnpc("<p,neutral>Hmm, I suppose you have a point there.");
+~chatnpc("<p,neutral>Tell you what, if you make a golden cannonball and give it to me, I'll fire it at the rock.");
+return;
