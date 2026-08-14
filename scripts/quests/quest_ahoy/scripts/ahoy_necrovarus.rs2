@@ -1,0 +1,38 @@
+// Ghosts Ahoy mid — Necrovarus refuse after licensed Velorina.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Necrovarus
+// minus Overview / robes / petition later. Hunt 289? no.
+// Prerequisite: %ahoy_questvar >= 1. First refuse writes 1→2 CANDIDATE
+// (room 0–15; Ak-Haranu multi is 4–8). Never 15. No dest / ectophial /
+// Velorina return / crone / tea. Cite ghosts-ahoy-nettle-tea-first-slice-377.md.
+
+[opnpc1,ahoy_necrovarus]
+if (%ahoy_questvar < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    ~chatnpc("<p,shock>Woooo wooo wooooo woooo");
+    ~mesbox("You cannot understand the ghost.");
+    return;
+}
+if (%ahoy_questvar >= 2) {
+    @ahoy_necro_again;
+}
+@ahoy_necro_first;
+
+[label,ahoy_necro_first]
+~chatplayer("<p,neutral>I must speak with you on behalf of Velorina.");
+~chatnpc("<p,angry>You dare to speak that name in this place?????");
+~chatplayer("<p,neutral>She wants to pass-");
+~chatnpc("<p,angry>Silence!! Or I will incinerate the flesh from your bones!!!");
+~chatplayer("<p,neutral>But she-");
+~chatnpc("<p,angry>Get out of my sight!! Or I promise you that you will regret your insolence for the rest of eternity!!!");
+if (%ahoy_questvar = 1) {
+    %ahoy_questvar = 2;
+}
+return;
+
+[label,ahoy_necro_again]
+~chatplayer("<p,sad>Please, listen to me-");
+~chatnpc("<p,angry>No - listen to me. Go from this place and do not return, or I will remove your head.");
+return;

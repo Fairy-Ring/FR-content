@@ -1,0 +1,130 @@
+// Making History mid — Droalak / Melina / outpost scroll.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Droalak /
+// Melina / Droalak again minus wiki Droklak typo / post-quest fade /
+// Jorral receive. Hunt 289? no. Prerequisite: licensed Jorral
+// %makinghistory_prog >= 1. Cite making-history-droalak-first-slice-377.md.
+// ghost_prog CANDIDATE 0→1 first accept · 1→2 Melina fade · 2→3 scroll.
+// Never write makinghistory_prog / droalak_pres / Erin / Dron / 15.
+
+[opnpc1,makinghistory_droalak]
+if (%makinghistory_prog < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    ~chatnpc("<p,neutral>wooo wooo");
+    return;
+}
+if (%makinghistory_melina_pres = 1) {
+    @mh_droalak_after_melina;
+}
+if (%makinghistory_ghost_prog >= 1) {
+    @mh_droalak_remind;
+}
+@mh_droalak_first;
+
+[label,mh_droalak_first]
+~chatplayer("<p,quiz>Hello. Are you Droalak?");
+~chatnpc("<p,shock>Wow. I haven't spoken to the living for... for... I don't remember how long.");
+~chatplayer("<p,quiz>So your name IS Droalak?");
+~chatnpc("<p,neutral>Sorry, yes I am he.");
+~chatplayer("<p,quiz>Great. Do you know anything about the outpost North of Ardougne?");
+~chatnpc("<p,sad>I don't really like to talk about it, but I died there.");
+~chatplayer("<p,sad>Oh dear.");
+~chatnpc("<p,neutral>I do have a scroll which might interest you that describes the timeline of the outpost. But first I wonder if I could ask you to tie up a problem?");
+~chatplayer("<p,quiz>Like what?");
+~chatnpc("<p,sad>Well, I left to go to the outpost against the wishes of my wife. I promised I would return to her, but obviously I did not as I died there. She's a ghost nearby, but won't listen to my apologies.");
+~chatplayer("<p,quiz>You want me to patch things up?");
+~chatnpc("<p,quiz>Yes, how'd you guess?");
+~chatplayer("<p,happy>Call it 'traveller's intuition'.");
+~chatnpc("<p,neutral>OK, well perhaps you could give her a strung sapphire amulet, because this is what I gave her the day I left. Her name is Melina by the way.");
+~chatplayer("<p,happy>No problem.");
+if (%makinghistory_ghost_prog = 0) {
+    %makinghistory_ghost_prog = 1;
+}
+return;
+
+[label,mh_droalak_remind]
+if (inv_total(inv, unstrung_sapphire_amulet) > 0) {
+    ~chatplayer("<p,happy>I have a sapphire amulet!");
+    ~chatnpc("<p,angry>I said it needed to be a STRUNG sapphire amulet - best get some string!");
+    return;
+}
+if (inv_total(inv, strung_sapphire_amulet) > 0) {
+    ~chatplayer("<p,happy>I have a sapphire amulet!");
+    ~chatnpc("<p,happy>Good work. Just give it to Melina, who's wandering somewhere nearby.");
+    return;
+}
+~chatplayer("<p,quiz>What do you want me to do again?");
+~chatnpc("<p,neutral>Make a strung sapphire amulet and give it to Melina!");
+~chatplayer("<p,neutral>Ok. Ok.");
+return;
+
+[label,mh_droalak_after_melina]
+if (inv_total(inv, makinghistory_scroll1) > 0) {
+    ~chatnpc("<p,neutral>Take that scroll to Jorral in the outpost.");
+    return;
+}
+if (%makinghistory_ghost_prog >= 3) {
+    ~chatplayer("<p,sad>Thanks for the scroll, but I seem to have lost it.");
+    ~chatnpc("<p,happy>It's a good job I stuck around then isn't it! Have another copy.");
+    @mh_droalak_give_scroll;
+}
+~chatplayer("<p,neutral>I've given her the amulet. She was very pleased and said she just wanted to know you still cared.");
+~chatnpc("<p,happy>Excellent! I am so glad she believes me. I can finally rest in peace.");
+~chatplayer("<p,quiz>Could I have that scroll you mentioned first?");
+~chatnpc("<p,happy>Of course. Let me know if it was of any use and then I can be forever free.");
+if (%makinghistory_ghost_prog < 3) {
+    %makinghistory_ghost_prog = 3;
+}
+@mh_droalak_give_scroll;
+
+[label,mh_droalak_give_scroll]
+if (inv_freespace(inv) < 1) {
+    obj_add(coord, makinghistory_scroll1, 1, 200);
+} else {
+    inv_add(inv, makinghistory_scroll1, 1);
+}
+~chatplayer("<p,happy>Thank you.");
+return;
+
+[opnpc1,makinghistory_melina]
+if (%makinghistory_prog < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    ~chatnpc("<p,neutral>wooo wooo");
+    return;
+}
+if (%makinghistory_melina_pres = 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, strung_sapphire_amulet) > 0) {
+    @mh_melina_amulet;
+}
+~chatplayer("<p,neutral>Hi.");
+~chatnpc("<p,sad>Oh why did he leave me? Did he truly love me?");
+~chatplayer("<p,confused>Erm. I think you're talking about Droalak. I believe he did love you and he's very sorry for leaving you!");
+~chatnpc("<p,sad>You're giving me empty words. That is all.");
+return;
+
+[label,mh_melina_amulet]
+~chatplayer("<p,quiz>If you don't mind me asking, are you Melina?");
+~chatnpc("<p,quiz>That I am. What's it to you?");
+~chatplayer("<p,neutral>I've been talking to Droalak. I believe he left you but never returned.");
+~chatnpc("<p,sad>He did. I suppose he has asked you to tell me he's sorry. What an empty gesture!");
+~chatplayer("<p,neutral>Well actually he told me to give you this amulet.");
+~chatnpc("<p,shock>A sapphire amulet! He remembers! It's just like the one he gave me before he left.");
+~chatplayer("<p,neutral>I honestly believe he's sorry.");
+~chatnpc("<p,happy>I'm so glad. Please, tell him I forgive him!");
+~chatplayer("<p,happy>I will.");
+~chatnpc("<p,happy>At last I feel complete. Fare well.");
+~chatplayer("<p,neutral>Goodbye.");
+inv_del(inv, strung_sapphire_amulet, 1);
+%makinghistory_melina_pres = 1;
+if (%makinghistory_ghost_prog < 2) {
+    %makinghistory_ghost_prog = 2;
+}
+return;
