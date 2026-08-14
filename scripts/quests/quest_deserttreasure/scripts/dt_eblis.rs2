@@ -3,8 +3,8 @@
 // minus Desert Treasure I overlay / [sir/madam] / Overview / lodestone / take-items.
 // Hunt 289? no. Display stays Eblis. Bind the child, not fourdiamonds_elder.
 // Leave-us <5. Museum 5–6. Diamonds+list at 7. Yes-I-will-go 7→8.
-// Never 10 (mirrors overlap). Never 15. No inv_del / fd_* bits / mirrors.
-// Cite: docs/research/desert-treasure-eblis-first-slice-377.md §6 / §8.
+// Full fd_* Talk-to Excellent 8→10. Village =10 East nag. Never 15.
+// No inv_del / fd_mirror_present / Look-into. Cite take leftover §5.
 
 [opnpc1,fd_elder_village]
 if (%deserttreasure < 5) {
@@ -12,6 +12,9 @@ if (%deserttreasure < 5) {
 }
 if (%deserttreasure = 8) {
     @dt_eblis_nag;
+}
+if (%deserttreasure = 10) {
+    @dt_eblis_east;
 }
 if (%deserttreasure = 7) {
     @dt_eblis_museum;
@@ -29,9 +32,25 @@ return;
 return;
 
 [label,dt_eblis_nag]
+if (%fd_magiclog >= 12 & %fd_steelbar >= 6 & %fd_glass >= 6 & %fd_bones = 1 & %fd_ash = 1 & %fd_charcoal = 1 & %fd_bloodrune = 1) {
+    @dt_eblis_excellent;
+}
 ~chatnpc("<p,neutral>Before I can complete the spell I will still need the following items;");
 ~chatnpc("<p,neutral>12 magic logs 6 steel bars 6 molten glass");
 ~chatnpc("<p,neutral>1 bones, 1 ashes, 1 charcoal and 1 blood rune");
+return;
+
+[label,dt_eblis_excellent]
+~chatnpc("<p,happy>Excellent! Those are all the ingredients I need to create the scrying glasses.");
+~chatnpc("<p,neutral>I will find a suitable spot in the desert to the East of here, and set them up. When you are ready to begin your search, please come and find me there, I will show you how to utilise the");
+~chatnpc("<p,neutral>mirrors to find the diamonds.");
+if (%deserttreasure = 8) {
+    %deserttreasure = 10;
+}
+return;
+
+[label,dt_eblis_east]
+~chatnpc("<p,neutral>Meet me again in the desert East of here, I will use these ingredients to create a scrying glass for you.");
 return;
 
 [label,dt_eblis_museum]
