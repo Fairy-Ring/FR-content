@@ -1,0 +1,91 @@
+// Garden of Tranquillity start — Ellamaria (queen_ellamaria 2581) @ 3228,3477.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Starting off minus
+// Overview / req toast. Hunt 289? no. No king_roald splice.
+// Accept: %garden_quest 0→1 + garden_list. No farmer / trolley / statue.
+// Cite garden-tranquillity-first-product-slice-377.md §5.
+
+[opnpc1,queen_ellamaria]
+if (%garden_quest >= 1) {
+    @garden_ellamaria_started;
+}
+@garden_ellamaria_pitch;
+
+[label,garden_ellamaria_pitch]
+~chatplayer("<p,quiz>What's going on here? I see a lot of farming patches with nothing growing in them.");
+~chatnpc("<p,neutral>No, one has just had them installed. One has had the most marvellous idea to bring renewed happiness to one's own dearest husband.");
+~chatplayer("<p,confused>One? I'm not sure I understand you-");
+~chatnpc("<p,angry>Oh dear - the common classes, oh how they fill one with intolerable levels of exasperation, I swear to be most true.");
+~chatplayer("<p,shifty>Ri-ight ... if you say so, my lady. I'll be off then, if you don't mind-");
+~chatnpc("<p,angry>Yes, be off with you, before I call the guards.");
+~chatplayer("<p,sad>No problem, sorry to have bothered you.");
+~chatnpc("<p,shock>Peasant - WAIT!!!");
+~chatplayer("<p,quiz>Are you speaking to me?");
+~chatnpc("<p,angry>Who else would I be speaking to, you funny little fool? Of course you.");
+~chatplayer("<p,shifty>Well for a moment there I thought there was a dog around here somewhere...");
+~chatnpc("<p,neutral>Oh yes, sarcasm - how amusing. No, no, peasant - I have a question to ask of you, and you are required to answer.");
+~chatplayer("<p,neutral>Well, seeing as you put it so nicely...");
+~chatnpc("<p,quiz>Do you know of anyone who might have some degree of horticultural experience?");
+~chatnpc("<p,happy>Oh, marvellous! Peasant, I hereby order you to assist me with a little project I have planned.");
+~chatplayer("<p,neutral>You'll have to ask me nicely first.");
+~chatnpc("<p,sad>Oh, what I have to deal with these days - to think this is what being a Queen has become. Very well then: would you ... good sir help me with a little project of mine?");
+def_int $yes = ~p_choice2("Yes.", 1, "No.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>I'd rather jump off the docks at Port Sarim.");
+    ~chatnpc("<p,neutral>Well don't allow one to delay you - it is probably the most constructive thing you could do with your life, to be honest.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    ~chatnpc("<p,sad>Oh dear, what a pathetic creature you are. One would give you a list, but you do not appear to have room enough to carry it.");
+    return;
+}
+inv_add(inv, garden_list, 1);
+if (%garden_quest = 0) {
+    %garden_quest = 1;
+}
+~chatplayer("<p,happy>I would be happy to help someone who is so in touch with the people.");
+~chatnpc("<p,neutral>Ah, more sarcasm - wonderful. Well, it is nice to have a master of the fine art of gardening to assist me; in the absence of any such person, I gladly accept your service.");
+~chatplayer("<p,quiz>I'm not sure if that's a compliment or not. Anyway, what would you like me to do, and what do I get out of it?");
+~chatnpc("<p,neutral>To answer your first question, you have noticed the new farming patches that we have had installed around us. We wish to grow many varied and exotic plants in them, to bring happiness back to my husband.");
+~chatplayer("<p,quiz>King Roald?");
+~chatnpc("<p,angry>The very same, and that's 'His Most Royal Majesty' to you. Now we come to the plants that one wishes you to grow in these patches. I would tell you all at once, but I fear that your small mind would not cope.");
+~chatplayer("<p,shifty>Thanks, I'm sure. So tell me Queeny, how do I know which plants I am to get for you?");
+~chatnpc("<p,neutral>I have given you a list of the items that I need in each patch. One is sure that you will know how to use the list with each patch to find out what needs to go in each one. There is one more thing, though.");
+~chatplayer("<p,neutral>One listens with bated breath...");
+~chatnpc("<p,neutral>Obtaining the seeds may prove difficult if you go about it by hacking and slashing everything that moves. No, to gather these items you will need to employ a finer tactic; the art of persuasion.");
+~chatnpc("<p,neutral>You must go at once and converse with the wise old man who is said to dwell in Draynor Village; he may guide you in mastering this delicate and sophisticated ability.");
+return;
+
+[label,garden_ellamaria_started]
+def_int $s = ~p_choice3("Can I have another list?", 1, "What I am supposed to be getting again?", 2, "Will these patches need much in the way of watering?", 3);
+if ($s = 3) {
+    ~chatplayer("<p,quiz>Will these patches need much in the way of watering?");
+    ~chatnpc("<p,neutral>Well, you are supposed to be the gardener here, but I would say not. One had the soil imported from an extremely fertile area at great cost - watering should not be necessary one would have thought.");
+    return;
+}
+if ($s = 1) {
+    ~chatplayer("<p,quiz>Can I have another list?");
+    if (inv_total(inv, garden_list) > 0) {
+        ~chatnpc("<p,angry>Haven't you got that list I gave you?");
+        return;
+    }
+    if (inv_freespace(inv) < 1) {
+        ~chatnpc("<p,sad>Oh dear, what a pathetic creature you are. One would give you another list, but you do not appear to have room enough to carry it.");
+        return;
+    }
+    inv_add(inv, garden_list, 1);
+    ~chatnpc("<p,neutral>Take better care with this one.");
+    return;
+}
+~chatplayer("<p,quiz>What I am supposed to be getting again?");
+~chatnpc("<p,quiz>Haven't you got that list I gave you?");
+if (inv_total(inv, garden_list) > 0) {
+    return;
+}
+~chatplayer("<p,sad>Err ... no ... I seem to have lost it.");
+if (inv_freespace(inv) < 1) {
+    ~chatnpc("<p,sad>Oh dear, what a pathetic creature you are. One would give you another list, but you do not appear to have room enough to carry it.");
+    return;
+}
+inv_add(inv, garden_list, 1);
+~chatnpc("<p,sad>Oh dear, what a pathetic creature you are. Here, have another one.");
+return;

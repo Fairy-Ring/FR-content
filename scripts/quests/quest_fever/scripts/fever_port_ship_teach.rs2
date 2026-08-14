@@ -1,0 +1,27 @@
+// Cabin Fever east-dock Teach (fever_port_ship_teach 3157) @ 1, 3713, 3497.
+// CANDIDATE last-resort 2007-base: Eldevidian / pre-2022 ship block minus
+// Travel / Sailing / kid / TB. Hunt 289? no. Do not rewrite inn fever_teach.
+// 0 write. Let's go speaks then return — no m28_75 dest. Cite
+// cabin-fever-east-dock-teach-377.md §4.
+
+[opnpc1,fever_port_ship_teach]
+if (%fever_quest < 1) {
+    return;
+}
+@fever_port_ye_came;
+
+[label,fever_port_ye_came]
+~chatnpc("<p,shock>Ye came!");
+~chatplayer("<p,quiz>You seem rather surprised.");
+~chatnpc("<p,neutral>Well, I had the feelin' ye might have run off when ye realised how much of a task ye had ahead of ye.");
+~chatplayer("<p,happy>Don't ye worry about me, Cap'n! I'm the scurviest, throat-cuttinest pirate to ever walk the mainplank! Arr!");
+~chatnpc("<p,happy>Aye, I should have remembered ye was eager.");
+~chatnpc("<p,quiz>Ye all ready to go <text_gender("lad", "lass")>?");
+def_int $go = ~p_choice2("Let's go Cap'n!", 1, "Can I just go grab something?", 2);
+if ($go = 1) {
+    ~chatplayer("<p,happy>Let's go Cap'n!");
+    return;
+}
+~chatplayer("<p,neutral>Can I just go grab something?");
+~chatnpc("<p,neutral>Aye <text_gender("lad", "lass")>, take yer time, I'm not goin' anywhere without ye.");
+return;

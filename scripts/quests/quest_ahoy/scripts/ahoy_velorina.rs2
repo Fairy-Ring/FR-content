@@ -1,0 +1,77 @@
+// Ghosts Ahoy start — Velorina (ahoy_velorina 1683) @ 3678,3510.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Velorina
+// minus Overview overlay. Hunt 289? no. No Necrovarus / ectophial / stairs.
+// Accept: %ahoy_questvar 0→1 only. Cite ghosts-ahoy-velorina-product-notes-377.md.
+
+[opnpc1,ahoy_velorina]
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    ~chatnpc("<p,shock>Woooo wooo wooooo woooo");
+    ~mesbox("You cannot understand the ghost.");
+    return;
+}
+if (%ahoy_questvar >= 1) {
+    @ahoy_velorina_started;
+}
+@ahoy_velorina_pity;
+
+[label,ahoy_velorina_pity]
+~chatnpc("<p,sad>Take pity on me, please - eternity stretches out before me and I am helpless in its grasp.");
+def_int $p = ~p_choice2("Why, what is the matter?", 1, "Sorry, I'm scared of ghosts.", 2);
+if ($p = 2) {
+    ~chatplayer("<p,shock>Leave me alone - I'm scared of ghosts!!!");
+    return;
+}
+~chatplayer("<p,quiz>Why, what is the matter?");
+~chatnpc("<p,sad>Oh, I'm sorry - I was just wailing out loud. I didn't mean to scare you.");
+~chatplayer("<p,neutral>No, that's okay - it takes more than a ghost to scare me. What is wrong?");
+~chatnpc("<p,quiz>Do you know the history of our town?");
+def_int $h = ~p_choice2("Yes, I do. It is a very sad story.", 1, "No - could you tell me?", 2);
+if ($h = 2) {
+    @ahoy_velorina_history;
+}
+~chatplayer("<p,sad>Yes, I do. It is a very sad story.");
+@ahoy_velorina_ask_help;
+
+[label,ahoy_velorina_history]
+~chatplayer("<p,quiz>No - could you tell me?");
+~chatnpc("<p,quiz>Do you know why ghosts exist?");
+~chatplayer("<p,neutral>A ghost is a soul left in limbo, unable to pass over to the next world; they might have something left to do in this world that torments them, or they might just have died in a state of confusion.");
+~chatnpc("<p,neutral>Yes, that is normally the case. But here in Port Phasmatys, we of this town once chose freely to become ghosts!");
+~chatplayer("<p,shock>Why on earth would you do such a thing?");
+~chatnpc("<p,neutral>It is a long story. Many years ago, this was a thriving port, a trading centre to the eastern lands of Gielinor. We became rich on the profits made from the traders that came across the eastern seas.");
+~chatnpc("<p,happy>We were very happy... until Lord Drakan noticed us.");
+~chatnpc("<p,sad>He sent unholy creatures to demand that a blood-tithe be paid to the Lord Vampyre, as is required from all in the domain of Morytania. We had no choice but to agree to his demands.");
+~chatnpc("<p,sad>As the years went by, our numbers dwindled and many spoke of abandoning the town for safer lands. Then, Necrovarus came to us.");
+~chatnpc("<p,neutral>He came from the eastern lands, but of more than that, little is known. Some say he was once a mage, some say a priest. Either way, he was in possession of knowledge totally unknown to even the most learned among us.");
+~chatnpc("<p,neutral>Necrovarus told us that he had been brought by a vision he'd had of an underground source of power. He inspired us to delve beneath the town, promising us the power to repel the vampyres.");
+~chatnpc("<p,neutral>Deep underneath Phasmatys, we found a pool of green slime that Necrovarus called ectoplasm. He showed us how to build the Ectofuntus, which would turn the ectoplasm into the power he had promised us.");
+~chatnpc("<p,sad>Indeed, this Ectopower did repel the vampyres; they would not enter Phasmatys once the Ectofuntus began working. But little did we know that we had exchanged one evil for yet another - Ectopower.");
+~chatnpc("<p,sad>Little by little, we began to lose any desire for food or water, and our desire for the Ectopower grew until it dominated our thoughts entirely. Our bodies shrivelled and, one by one, we died.");
+~chatnpc("<p,sad>The Ectofuntus and the power it emanates keeps us here as ghosts - some, like myself, content to remain in this world; some becoming tortured souls who we do not allow to pass our gates.");
+~chatnpc("<p,angry>We would be able to pass over into the next world but Necrovarus has used his power to create a psychic barrier, preventing us.");
+~chatnpc("<p,sad>We must remain here for all eternity, even unto the very end of the world.");
+~chatplayer("<p,sad>That's a very sad story.");
+@ahoy_velorina_ask_help;
+
+[label,ahoy_velorina_ask_help]
+~chatnpc("<p,quiz>Would you help us obtain our release into the next world?");
+def_int $y = ~p_choice2("Yes, of course I will. Tell me what you want me to do.", 1, "I'm sorry, but it isn't really my problem.", 2);
+if ($y = 2) {
+    ~chatplayer("<p,sad>I'm sorry, but it isn't really my problem.");
+    ~chatnpc("<p,sad>No, you're right - it's our own fault. If you do change your mind though, please come back and help us. We will be here ... forever.");
+    return;
+}
+~chatplayer("<p,happy>Yes, of course I will. Tell me what you want me to do.");
+~chatnpc("<p,happy>Oh, thank you!");
+~chatnpc("<p,neutral>Necrovarus will not listen to those of us who are already dead. He might rethink his position if someone with a mortal soul pleaded our cause.");
+~chatnpc("<p,neutral>If he declines, there may yet be another way.");
+if (%ahoy_questvar = 0) {
+    %ahoy_questvar = 1;
+}
+return;
+
+[label,ahoy_velorina_started]
+~chatnpc("<p,neutral>I sense that you have not yet spoken to Necrovarus.");
+~chatplayer("<p,neutral>No, I was just getting to that.");
+~chatnpc("<p,neutral>Well, I suppose we do have all the time in the world...");
+return;
