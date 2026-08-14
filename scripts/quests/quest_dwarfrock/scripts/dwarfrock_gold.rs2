@@ -1,7 +1,6 @@
-// Between a Rock — gold ore/bar Use-on Dondakan after after-book.
-// CANDIDATE last-resort 2007-base (OSRS Using gold ore/bar).
-// No consume / gold CB give / Fire / dest. Hunt 289? no.
-// Stay dwarfrock_quest 10. Never 110. Cite bar-dondakan-after-book-377.md.
+// Between a Rock — gold Use-on + furnace gold CB. No Fire / dest / 110.
+// CANDIDATE last-resort 2007-base (OSRS Going for the gold). Hunt 289? no.
+// One [opnpcu,dwarfrock_dondakan]. Cite bar-gold-cannonball-stop-377.md.
 
 [opnpcu,dwarfrock_dondakan]
 if (%dwarfrock_quest < 10) {
@@ -12,20 +11,73 @@ if (%dwarfrock_quest = 110) {
     ~displaymessage(^dm_default);
     return;
 }
-if (last_useitem = gold_ore | last_useitem = gold_bar) {
-    @dwarfrock_dondakan_show_gold;
+switch_obj (last_useitem) {
+    case gold_ore, gold_bar : @dwarfrock_dondakan_show_gold;
+    case perfect_gold_ore, perfect_gold_bar : @dwarfrock_dondakan_perfect_gold;
+    case dwarf_rock_cannonball_gold : @dwarfrock_dondakan_give_gold_cb;
+    case copper_ore, tin_ore, iron_ore, silver_ore, mithril_ore, adamantite_ore, runite_ore, coal, bronze_bar, iron_bar, steel_bar, silver_bar, mithril_bar, adamantite_bar, runite_bar : @dwarfrock_dondakan_tried_metal;
+    case default :
+        ~chatnpc("<p,quiz>What am I supposed to do with that?");
+        return;
 }
-if (last_useitem = perfect_gold_bar) {
-    ~chatnpc("<p,angry>Perfect gold? That's much too valuable to be used to make cannonballs!");
-    return;
-}
-~chatnpc("<p,quiz>What am I supposed to do with that?");
-return;
 
 [label,dwarfrock_dondakan_show_gold]
+if (%dwarfrock_gold_cannonball = 1) {
+    ~chatnpc("<p,neutral>Yes, you already showed me that. But I'm not going to waste my own gold on it, make a cannonball and bring it to me.");
+    return;
+}
 ~chatnpc("<p,laugh>Haha, you want me to make a golden cannonball?");
 ~chatnpc("<p,quiz>You know that apart from being heavy it's also very soft, don't you? It'd be a pointless waste!");
 ~chatplayer("<p,neutral>Well... the book does say that there's gold inside the rock, so I thought perhaps gold can damage it as well.");
 ~chatnpc("<p,neutral>Hmm, I suppose you have a point there.");
 ~chatnpc("<p,neutral>Tell you what, if you make a golden cannonball and give it to me, I'll fire it at the rock.");
+%dwarfrock_gold_cannonball = 1;
+return;
+
+[label,dwarfrock_dondakan_perfect_gold]
+~chatnpc("<p,angry>Perfect gold? That's much too valuable to be used to make cannonballs!");
+return;
+
+[label,dwarfrock_dondakan_tried_metal]
+~chatnpc("<p,neutral>Tried that, didn't work.");
+return;
+
+[label,dwarfrock_dondakan_give_gold_cb]
+~chatplayer("<p,happy>I have that golden cannonball you asked me to make.");
+~chatnpc("<p,shock>That... that... that's an amazing looking cannonball!");
+~chatnpc("<p,quiz>Are you sure you want me to fire it at the rock? It's going to make a nasty dent in it. In the cannonball that is.");
+def_int $fire = ~p_choice2("Yes, I'm sure this will crack open the rock.", 1, "No, I'd rather sell it for a huge profit.", 2);
+if ($fire = 1) {
+    ~chatplayer("<p,happy>Yes, I'm sure this will crack open the rock.");
+    return;
+}
+~chatplayer("<p,neutral>No, on second thought, I'd rather sell it for a huge profit.");
+~chatnpc("<p,neutral>Nice idea, <displayname()>, but no one will buy a golden cannonball!");
+~chatnpc("<p,neutral>It looks nice, but it's not much use as a projectile.");
+return;
+
+[label,dwarfrock_offer_gold_cb]
+def_int $make = ~p_choice2("Yes.", 1, "No.", 2);
+if ($make = 2) {
+    @craft_gold_interface;
+}
+if (map_members = ^false) {
+    mes("You need to be on a members' world to make cannonballs.");
+    return;
+}
+if (stat(smithing) < 35) {
+    mes("You need a Smithing level of 35 to make cannonballs.");
+    return;
+}
+if (inv_total(inv, ammo_mould) < 1 | inv_total(inv, gold_bar) < 1) {
+    @craft_gold_interface;
+}
+mes("You heat the gold bar");
+mes("...You heat the gold bar to a liquid state...");
+mes("...You pour it into your cannonball mould...");
+mes("...You then leave it to cool for a short while.");
+mes("You make one beautiful golden cannonball.");
+inv_del(inv, gold_bar, 1);
+inv_add(inv, dwarf_rock_cannonball_gold, 1);
+stat_advance(smithing, 375);
 return;

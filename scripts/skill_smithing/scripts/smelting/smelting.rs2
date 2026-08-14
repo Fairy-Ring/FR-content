@@ -1,7 +1,13 @@
 [oplocu,_smithing_furnace]
 switch_obj (last_useitem)
 {
-    case gold_bar, perfect_gold_bar : @craft_gold_interface;
+    case gold_bar, perfect_gold_bar :
+        // BAR leftover: gold_bar + mould + bit 9 → golden CB ask. Jewelry otherwise.
+        // Never a second [oplocu,_smithing_furnace]. perfect_gold_bar stays jewelry.
+        if (last_useitem = gold_bar & %dwarfrock_quest >= 10 & %dwarfrock_gold_cannonball = 1 & inv_total(inv, ammo_mould) > 0) {
+            @dwarfrock_offer_gold_cb;
+        }
+        @craft_gold_interface;
     case silver_bar : @craft_silver;
     case steel_bar : @smelt_cannonballs;
     case bucket_sand, soda_ash : @smelt_glass;
