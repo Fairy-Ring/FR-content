@@ -1,6 +1,7 @@
 [opheldu,bowl_water]
 switch_obj (last_useitem)
 {
+    case nettles_picked : @ahoy_mix_nettlewater;
     case pot_flour : @dough_interface(last_item);
     case clay : @make_softclay(bowl_water);
     case bucket_empty, jug_empty : @water_fill(last_useslot, last_slot);

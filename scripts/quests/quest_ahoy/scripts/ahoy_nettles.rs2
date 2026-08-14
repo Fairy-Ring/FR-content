@@ -1,0 +1,36 @@
+// Ghosts Ahoy — Pick nettles. Stay ahoy_questvar 3.
+// CANDIDATE gloves = any worn wearpos_hands. Bare-hand sting ≤2 HP, 0 inv.
+// No invented pick mes. Hunt 289? no. Cite ahoy-nettle-pick-377.md.
+
+[oploc1,nettles]
+@ahoy_pick_nettles;
+
+[oploc1,nettles1]
+@ahoy_pick_nettles;
+
+[oploc1,nettles2]
+@ahoy_pick_nettles;
+
+[oploc1,nettles3]
+@ahoy_pick_nettles;
+
+[oploc1,nettles4]
+@ahoy_pick_nettles;
+
+[oploc1,nettles5]
+@ahoy_pick_nettles;
+
+[oploc1,nettles6]
+@ahoy_pick_nettles;
+
+[label,ahoy_pick_nettles]
+if (inv_getobj(worn, ^wearpos_hands) = null) {
+    ~damage_self(2);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, nettles_picked, 1);
+return;

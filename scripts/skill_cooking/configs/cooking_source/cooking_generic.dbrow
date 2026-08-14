@@ -607,3 +607,18 @@ data=levelrequired,0
 data=experience,0
 data=successchance,1,1
 data=successmessage,"You heat the bones, but they don't look any different."
+
+// Ghosts Ahoy nettle tea. CANDIDATE 2007-base minus Changes (ahoy-nettle-mix-cook-377.md).
+// 52 XP → table 520. Burn → bowl_empty (no burnt_nettletea obj). No dest. No porcelain.
+[cooking_generic_bowl_nettlewater]
+table=cooking_generic
+data=uncooked,bowl_nettlewater
+data=cooked,bowl_nettletea
+data=burnt,bowl_empty
+data=levelrequired,20
+data=experience,520
+data=successchance,78,412
+data=successchance_range,78,412
+data=successmessage,You boil the water and make nettle tea.
+data=burnmessage,You accidentally burn the nettle-water.
+

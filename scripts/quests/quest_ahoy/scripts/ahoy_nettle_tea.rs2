@@ -1,0 +1,23 @@
+// Ghosts Ahoy — mix nettles_picked + bowl_water → bowl_nettlewater.
+// Cook is cooking_generic row (bowl_nettlewater → bowl_nettletea).
+// Stay ahoy_questvar 3. No porcelain / milk / dest / ectophial.
+// Mix mes CANDIDATE 2007-base. Hunt 289? no.
+// Cite ahoy-nettle-mix-cook-377.md.
+
+[opheldu,nettles_picked]
+if (last_useitem = bowl_water) {
+    @ahoy_mix_nettlewater;
+}
+~displaymessage(^dm_default);
+
+[label,ahoy_mix_nettlewater]
+if (inv_total(inv, nettles_picked) < 1 | inv_total(inv, bowl_water) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// CANDIDATE last-resort 2007-base minus Changes. Period quote UNKNOWN.
+mes("You place the nettles into the bowl of water.");
+inv_del(inv, nettles_picked, 1);
+inv_del(inv, bowl_water, 1);
+inv_add(inv, bowl_nettlewater, 1);
+return;
