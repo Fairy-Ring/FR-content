@@ -1,0 +1,57 @@
+// Enakhra's Lament start-gate — Lazim (enakh_lazim 3147) @ 3191,2926.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Starting out minus
+// Overview / toast / Camulet / temple. Hunt 289? no.
+// Accept: %enakh_quest 0→1 only. Never 10. No sandstone hand-in / statue.
+// Bind the child, not the multi parent. Cite enakhra-start-talk-377.md §4.
+
+[opnpc1,enakh_lazim]
+if (%enakh_quest >= 1) {
+    @enakh_lazim_started;
+}
+@enakh_lazim_pitch;
+
+[label,enakh_lazim_pitch]
+~chatnpc("<p,quiz>Ah, an adventurer. Could you spare some of your time to help me?");
+~chatplayer("<p,quiz>Why, what's the matter?");
+~chatnpc("<p,sad>It's a sorry tale. I was once an accomplished sculptor, you see.");
+~chatnpc("<p,neutral>I made statues for the kings, queens and rulers of Gielinor. But then there was the accident...");
+~chatnpc("<p,sad>After that, I could never hold a chisel again.");
+~chatnpc("<p,neutral>But I have been struck by my muse while travelling the desert, and want nothing more than to build a statue in this area.");
+~chatnpc("<p,neutral>The desert's plain and full of sand, and needs more decoration.");
+~chatplayer("<p,quiz>So, what would you need my help with?");
+~chatnpc("<p,neutral>As I said, I can't hold a chisel, but I can guide you in crafting the statue for me.");
+~chatnpc("<p,neutral>I'd need you to quarry the stone for it, as well.");
+~chatnpc("<p,quiz>Well, will you help me with my art?");
+def_int $help = ~p_choice2("Of course!", 1, "I don't know, that sounds like a lot of work.", 2);
+if ($help = 2) {
+    ~chatplayer("<p,sad>I don't know, that sounds like a lot of work.");
+    ~chatnpc("<p,neutral>All true art requires work.");
+    return;
+}
+~chatplayer("<p,happy>Of course!");
+~chatplayer("<p,neutral>You'll have to explain it to me as you go along, but count me in.");
+~chatnpc("<p,happy>Excellent.");
+if (%enakh_quest = 0) {
+    %enakh_quest = 1;
+}
+@enakh_lazim_brief;
+
+[label,enakh_lazim_started]
+@enakh_lazim_brief;
+
+[label,enakh_lazim_brief]
+~chatplayer("<p,quiz>What should I be doing to make your statue?");
+~chatnpc("<p,neutral>There is a stone quarry nearby; I require several blocks of sandstone in order to make the statue.");
+~chatnpc("<p,neutral>Each of these blocks should be around... well, let's say thirty two kilograms for the first one.");
+~chatplayer("<p,shock>I can't mine a block that big!");
+~chatnpc("<p,neutral>Well, then, bring me enough smaller blocks to make thirty two kilograms, and I will deal with it.");
+def_int $w = ~p_choice2("So, how much do different blocks of sandstone weigh?", 1, "Okay, I'll get on with it.", 2);
+if ($w = 1) {
+    ~chatplayer("<p,quiz>So, how much do different blocks of sandstone weigh?");
+    ~chatnpc("<p,neutral>From what the last adventurer told me, there are tiny blocks that weigh 1 kg, small blocks that weigh 2 kg, and medium-sized blocks that weigh 5 kg.");
+    ~chatnpc("<p,neutral>There are also large blocks that weigh 10 kg, but I doubt a weedy adventurer like you could even carry one, let alone mine one cleanly.");
+    ~chatnpc("<p,neutral>Apparently, the more skilled you are at mining, the larger the blocks you can chip off the rock.");
+    return;
+}
+~chatplayer("<p,neutral>Okay, I'll get on with it.");
+return;
