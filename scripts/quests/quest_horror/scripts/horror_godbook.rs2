@@ -312,6 +312,31 @@ if(%horror_balancepage1 = ^true & %horror_balancepage2 = ^true & %horror_balance
     mes("You can now use it to bless unblessed holy symbols!");
 }
 
+// Check on unfinished books — 31 Jan 2005 news. Report 274 page bits only.
+// CANDIDATE mes (news has no wording). Do not Check complete books.
+[opheld3,unfinished_saradominbook]
+~horror_check_pages(%horror_holypage1, %horror_holypage2, %horror_holypage3, %horror_holypage4);
+return;
+
+[opheld3,unfinished_zamorakbook]
+~horror_check_pages(%horror_unholypage1, %horror_unholypage2, %horror_unholypage3, %horror_unholypage4);
+return;
+
+[opheld3,unfinished_guthixbook]
+~horror_check_pages(%horror_balancepage1, %horror_balancepage2, %horror_balancepage3, %horror_balancepage4);
+return;
+
+[proc,horror_check_pages](int $p1, int $p2, int $p3, int $p4)
+if ($p1 = ^false & $p2 = ^false & $p3 = ^false & $p4 = ^false) {
+    mes("This book has no pages added yet.");
+    return;
+}
+if ($p1 = ^true) mes("Torn page 1 has been added.");
+if ($p2 = ^true) mes("Torn page 2 has been added.");
+if ($p3 = ^true) mes("Torn page 3 has been added.");
+if ($p4 = ^true) mes("Torn page 4 has been added.");
+return;
+
 [opheld3,saradominbook_complete]
 if(%sa_energy < 250) {
     // https://i.imgur.com/onxUvRr.png

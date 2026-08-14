@@ -51,7 +51,16 @@ return;
 [label,mh_jorral_started]
 ~chatplayer("<p,happy>Hi there.");
 ~chatnpc("<p,quiz>How's it going?");
+if (inv_total(inv, makinghistory_scroll1) > 0 & %makinghistory_ghost_prog >= 3) {
+    @mh_jorral_scroll;
+}
 @mh_jorral_need;
+
+[label,mh_jorral_scroll]
+~chatplayer("<p,neutral>I have been in contact with the ghost you suggested, and I've recovered this:");
+~mesbox("Jorral skims over the contents of the scroll.");
+~chatnpc("<p,happy>Very interesting. So there was a great battle at the outpost. Then one of the survivors became king, and the other started the market place. Good work.");
+return;
 
 [label,mh_jorral_need]
 ~chatnpc("<p,neutral>There are three people that may be able to help:");
