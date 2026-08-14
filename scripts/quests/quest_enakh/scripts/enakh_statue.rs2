@@ -1,0 +1,44 @@
+// Enakhra statue craft — chisel 32 kg lump → base, place on Flat ground.
+// Period 23 Jan: Use chisel → base and legs; place on flat ground beside him.
+// Gametext CANDIDATE. Do not bind [opheldu,chisel] (live gems).
+// Statue 0→1 only (first headless). No 20 kg / slim / head / Camulet / 10.
+// Cite enakhra-sandstone-period-media-377.md §2.
+
+[opheldu,enakh_sandstone_huge_base+legs]
+if (last_useitem ! chisel & last_useitem ! enakh_chisel) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%enakh_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, enakh_sandstone_huge_base+legs) < 1) {
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You need some inventory space to do that.");
+    return;
+}
+inv_del(inv, enakh_sandstone_huge_base+legs, 1);
+inv_add(inv, enakh_sandstone_crafted_base+legs, 1);
+mes("You chisel the sandstone into a statue base.");
+return;
+
+[oplocu,enakh_building_area]
+if (last_useitem ! enakh_sandstone_crafted_base+legs) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%enakh_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%enakh_statue_multivar ! 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, enakh_sandstone_crafted_base+legs, 1);
+%enakh_statue_multivar = 1;
+mes("You place the base on the flat ground.");
+return;
