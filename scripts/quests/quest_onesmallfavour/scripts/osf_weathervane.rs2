@@ -1,0 +1,83 @@
+// One Small Favour — Seers weathervane Look / rusted Search / hammer / part grant.
+// CANDIDATE last-resort 2007-base minus Changes (OSRS Transcript:One Small Favour
+// Weather vane). Cite osf-weather-vane-look-next-377.md +
+// osf-weather-vane-search-next-377.md + osf-weather-vane-hammer-next-377.md +
+// osf-weather-vane-parts-377.md. Bind broken child 5809 only, not multi 5811.
+// Gate %onesmallfavour >= 28 (PREFIX roof-send). No dest / 12346 / 4435 /
+// weathervanefixed / bits 253–255. Hunt 289? no.
+// Loosen persist: packed unused %onesmallfavourmulti_9_9 (UNKNOWN leftover
+// candidate — not unnamed bits 17/19/23/24/27/28). Grant-done: _10_10.
+
+[oploc1,favour_weathervane_broken]
+if (%onesmallfavour < 28 | %weathervanefixed = 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~mesbox("It looks pretty broken!");
+return;
+
+[oploc5,favour_weathervane_broken]
+if (%onesmallfavour < 28 | %weathervanefixed = 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavourmulti_10_10 = 1) {
+    ~mesbox("You can find nothing interesting here, all the parts seem to be missing.");
+    return;
+}
+if (%onesmallfavourmulti_9_9 = 0) {
+    ~mesbox("You search the weather vane... you find that the ornament is broken, as are the directionals and the rotating bar. You think you may be able to repair them if you can get them off. They look pretty rusted on, it might take quite a powerful force to loosen them.");
+    return;
+}
+if (inv_freespace(inv) < 3) {
+    ~mesbox("You see that there are three parts which you could replace, but you don't have enough inventory space to store them all.");
+    return;
+}
+// CANDIDATE Transcript § Searching after loosening — three click-to-continue pages.
+~mesbox("You find a broken ornament...");
+~mesbox("broken directionals...");
+~mesbox("and a broken rotating pillar.");
+inv_add(inv, favour_ornament_broken, 1);
+inv_add(inv, favour_directionals_broken, 1);
+inv_add(inv, favour_pillar_broken, 1);
+%onesmallfavourmulti_10_10 = 1;
+return;
+
+[oplocu,favour_weathervane_broken]
+if (last_useitem ! hammer) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavour < 28 | %weathervanefixed = 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+mes("You give the structure a good solid whack...");
+%onesmallfavourmulti_9_9 = 1;
+return;
+
+[label,osf_vane_anvil]
+if (%onesmallfavour < 28) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = favour_ornament_broken) {
+    inv_del(inv, favour_ornament_broken, 1);
+    inv_add(inv, favour_ornament_fixed, 1);
+    mes("You fix the ornament.");
+    return;
+}
+if (last_useitem = favour_directionals_broken) {
+    inv_del(inv, favour_directionals_broken, 1);
+    inv_add(inv, favour_directionals_fixed, 1);
+    mes("You fix the directionals.");
+    return;
+}
+if (last_useitem = favour_pillar_broken) {
+    inv_del(inv, favour_pillar_broken, 1);
+    inv_add(inv, favour_pillar_fixed, 1);
+    mes("You fix the Weathervane Pillar.");
+    return;
+}
+~displaymessage(^dm_default);
+return;
