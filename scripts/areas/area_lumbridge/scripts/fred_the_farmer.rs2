@@ -1,4 +1,19 @@
 [opnpc1,fred_the_farmer]
+// One Small Favour leftover after Johanhus 5→6. Keep shearer.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Fred).
+// No dest / cages / Seth / 12346. Cite osf-fred-after-johanhus-377.md.
+if (%onesmallfavour >= 6) {
+    ~chatnpc("<p,angry>What are you doing on my land?");
+    def_int $osf = 0;
+    if (%onesmallfavour >= 7) {
+        $osf = ~p_choice2("What did you suggest I do again?", 1, "Something else.", 2);
+    } else {
+        $osf = ~p_choice2("I need to talk to you about Jimmy.", 1, "Something else.", 2);
+    }
+    if ($osf = 1) {
+        @osf_fred_jimmy;
+    }
+}
 if(%sheep = ^sheep_not_started) { 
     @fred_start;
 } else if(%sheep >= ^sheep_started & %sheep <= ^sheep_last_wool) {
@@ -229,3 +244,27 @@ if(%sheep = calc(^sheep_last_wool) & inv_total(inv, ball_of_wool) > 0) {
 // 225 dialog, 2025 OSRS still matches
 ~chatnpc("<p,angry>What are you doing on my land?");
 @multi2("I'm looking for something to kill.", fred_something_to_kill, "I'm lost.", fred_im_lost);
+
+[label,osf_fred_jimmy]
+if (%onesmallfavour >= 7) {
+    ~chatplayer("<p,quiz>What did you suggest I do again?");
+    ~chatnpc("<p,neutral>Have you been to Seth Groats yet? He's over at the other farm on the way to Varrock!");
+    ~chatplayer("<p,neutral>Ok, I'll go and see him then.");
+    return;
+}
+~chatplayer("<p,neutral>I need to talk to you about Jimmy.");
+~chatnpc("<p,sad>What's the problem with Jimmy?");
+~chatplayer("<p,neutral>He's being kept prisoner by a bunch of fanatics and I need to organise a delivery of a month's supply of chickens to secure his release.");
+~chatnpc("<p,sad>Oh dear, oh dear, this is terrible. Terrible!");
+~chatplayer("<p,neutral>Yes, it's pretty bad...but keep calm, I'm going to help.");
+~chatnpc("<p,confused>I've no idea what to do!");
+~chatplayer("<p,quiz>None at all?");
+~chatnpc("<p,neutral>Well, no actually. I'm just a farmer. I've no idea how to deal with fanatics!");
+~chatplayer("<p,quiz>Well, can't you just give me some chickens?");
+~chatnpc("<p,sad>Normally I'd say yes, but I just don't have enough for a month's supply.");
+~chatplayer("<p,quiz>Well, do you know someone who does have a month's supply?");
+~chatnpc("<p,neutral>Seth does, Seth Groats. He's another farmer over yonder at the other farm. Over the river and on the way to Varrock, he has loads of chickens.");
+if (%onesmallfavour = 6) {
+    %onesmallfavour = 7;
+}
+return;

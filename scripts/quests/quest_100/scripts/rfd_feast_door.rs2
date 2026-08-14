@@ -1,0 +1,7 @@
+// Recipe for Disaster — kitchen feast door Open. Dest UNKNOWN.
+// Refuse-only when hundred_main_quest_var < 2. No p_tele. No portal 4.
+// Hunt 289? no. Cite rfd-feast-door-op-377.md.
+
+[oploc1,hundred_lumbridge_door]
+~displaymessage(^dm_default);
+return;

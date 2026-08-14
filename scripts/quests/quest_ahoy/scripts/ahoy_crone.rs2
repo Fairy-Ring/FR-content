@@ -10,7 +10,13 @@ if (%ahoy_questvar < 3) {
     return;
 }
 // Porcelain give leftover (ahoy-porcelain-cup-next-377.md). Milk / enlightenment STOP.
-if (inv_total(inv, bowl_nettletea_milky) > 0 | inv_total(inv, chinacup_of_nettletea) > 0 | inv_total(inv, chinacup_of_nettletea_milky) > 0) {
+if (inv_total(inv, chinacup_of_nettletea) > 0) {
+    // CANDIDATE last-resort 2007-base (OSRS crone unmilked porcelain). Stay 3.
+    ~chatplayer("<p,happy>Here's a lovely cup of tea for you, in your own special cup.");
+    ~chatnpc("<p,sad>Oh no, it hasn't got milk in it. I only drink tea with milk, I'm afraid.");
+    return;
+}
+if (inv_total(inv, bowl_nettletea_milky) > 0 | inv_total(inv, chinacup_of_nettletea_milky) > 0) {
     ~displaymessage(^dm_default);
     return;
 }

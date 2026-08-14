@@ -1,0 +1,40 @@
+// One Small Favour — Seth Groats after Fred 6→7.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Seth).
+// No dest / cages consume / Horvik this file / 12346. Hunt 289? no.
+
+[opnpc1,favour_seth_groats]
+if (%onesmallfavour < 7) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavour >= 8) {
+    ~chatplayer("<p,quiz>What am I meant to be doing again?");
+    ~chatnpc("<p,neutral>You need to get three bars of steel and take them to Horvik in Varrock, ask him if he can make some chicken cages so that we can transport these chickens to those fanatics and release poor Jimmy.");
+    ~chatplayer("<p,neutral>Ah yes...I remember now.");
+    return;
+}
+~chatnpc("<p,angry>Hello there stranger, what's the meaning of this intrusion? A farmer's hovel is his castle!");
+~chatplayer("<p,neutral>Sorry for the intrusion, but this is quite urgent. Jimmy the Chisel is being held by fanatics. They won't release him until they get a month's supply of chickens.");
+~chatplayer("<p,neutral>I've already talked to Fred but he says he doesn't have a month's supply of chickens. Is there any way that you could help?");
+~chatnpc("<p,neutral>A month's supply eh! Well, I was going to take them to market and just concentrate on the cows, but I reckon that little Jimmy's neck is worth a few scrawny chickens, don't you?");
+~chatplayer("<p,neutral>That's exactly what I said...");
+~chatnpc("<p,neutral>Well, Ok then. We need to get this organised. First off, we need to get some proper cages to get them chickens transported. I've never normally transported chickens in such large quantities before.");
+~chatplayer("<p,quiz>What do you propose?");
+~chatnpc("<p,neutral>We'll need to get some proper cages, but I have nothing like that here. You'll have to go and see my friend Horvik in Varrock. He's a pretty well known metal-smith and he's done me a few favours in the past.");
+~chatnpc("<p,neutral>I'm afraid that I'll have to ask a small favour of you as well, my friend.");
+~chatplayer("<p,quiz>I had a feeling you might!");
+~chatnpc("<p,neutral>Could you get three bars of steel and take them to Horvik, that's what I owe him for a previous job that he did for me.");
+def_int $yes = ~p_choice2("Oh, ok! I guess it's not that much further to Varrock!", 1, "No way, I'm fed up with this wild goose chase!", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>No way, I'm fed up with this wild goose chase!");
+    ~chatnpc("<p,sad>I understand...");
+    ~chatnpc("<p,sad>Poor old Jimmy, locked in that cage...");
+    ~chatnpc("<p,sad>Forever!");
+    return;
+}
+~chatplayer("<p,happy>Oh, ok! I guess it's not that much further to Varrock!");
+~chatnpc("<p,happy>Many thanks! Remember, you need to take him three steel bars.");
+if (%onesmallfavour = 7) {
+    %onesmallfavour = 8;
+}
+return;

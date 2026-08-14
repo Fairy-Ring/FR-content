@@ -1,0 +1,39 @@
+// One Small Favour — Johanhus after Aggie 4→5. HAM hideout.
+// CANDIDATE last-resort 2007-base (OSRS Asking Johanhus about Jimmy).
+// No dest / trapdoor / 12346 / lamps. Hunt 289? no.
+// Cite osf-johanhus-later-377.md.
+
+[opnpc1,favour_johanhus_ulsbrecht]
+if (%onesmallfavour < 5) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatnpc("<p,happy>Welcome to our organisation...ours is a fight for humanity in all its shapes and forms...and to rid mankind of the monsters that exist in our world.");
+~chatplayer("<p,neutral>I'm looking for Jimmy the Chisel.");
+~chatnpc("<p,neutral>Ah yes, he'll be joining our ranks very soon, I feel. He's still quite young and strong, but he will see the error of his ways before too long.");
+~chatplayer("<p,quiz>Huh, it sounds like you're forcing him to join you");
+~chatnpc("<p,neutral>Not at all...he just needs some time to think about things...we've given him all the time he needs in the cage back there.");
+~chatplayer("<p,neutral>Well, I have to return him to his employer, she's very worried about him, so if you could just hand him over...I'll be getting out of your way.");
+~chatnpc("<p,neutral>I'm afraid I can't do that...he has value to us...he's related to a farmer named Fred who lives near here. We need to arrange some things with this 'Brother Fred' so that my people down here can eat.");
+def_int $f = ~p_choice2("And I suppose you need me to do you a favour?", 1, "Ok, thanks.", 2);
+if ($f = 2) {
+    ~chatplayer("<p,neutral>Okay, thanks.");
+    return;
+}
+~chatplayer("<p,quiz>And I suppose you need me to do you a favour?");
+~chatnpc("<p,neutral>Well, actually, now that you mention it...it would be a real help to us if you could organise some chickens in exchange for young Jimmy's release.");
+~chatplayer("<p,quiz>Ok, just exactly what is it that you want me to do?");
+~chatnpc("<p,neutral>Go to Brother Fred the farmer and tell him that we have young Brother Jimmy. Tell him that we're not going to let him free until he agrees to send us a month's supply of chickens.");
+def_int $yes = ~p_choice2("Ok, Jimmy has to be worth more than a few scrawny chickens!", 1, "No way...go do your own dirty work!", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>No way...go do your own dirty work!");
+    ~chatnpc("<p,sad>Now, now, I'm a little disappointed in you! Can't you see that this is merely a business transaction?");
+    ~chatnpc("<p,neutral>Come back and see me when you change your mind!");
+    return;
+}
+~chatplayer("<p,happy>Ok, Jimmy has to be worth more than a few scrawny chickens!");
+~chatnpc("<p,happy>That's exactly right! Do this for us and we'll let Brother Jimmy go!");
+if (%onesmallfavour = 5) {
+    %onesmallfavour = 6;
+}
+return;
