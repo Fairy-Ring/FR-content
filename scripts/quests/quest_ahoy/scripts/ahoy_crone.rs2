@@ -1,0 +1,22 @@
+// Ghosts Ahoy mid — Old crone first Talk-To after licensed Velorina return.
+// CANDIDATE last-resort 2007-base: OSRS Talking to the Old crone minus
+// porcelain / milk / enchant / Netty / Overview. Hunt 289? no.
+// Stay %ahoy_questvar 3. No dest / ectophial / tea cook.
+// Cite ahoy-crone-first-slice-377.md.
+
+[opnpc1,ahoy_crone]
+if (%ahoy_questvar < 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, bowl_nettletea) > 0 | inv_total(inv, bowl_nettletea_milky) > 0 | inv_total(inv, chinacup_of_nettletea) > 0 | inv_total(inv, chinacup_of_nettletea_milky) > 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatplayer("<p,quiz>Were you once a disciple of Necrovarus in the Temple of Phasmatys, old woman?");
+~chatnpc("<p,sad>I don't remember; I am so old and my memory goes back only so far...");
+~chatplayer("<p,quiz>Is there anything that can help to refresh your memory?");
+~chatnpc("<p,neutral>Yes, I would love a nice hot cup of nettle tea.");
+~chatplayer("<p,quiz>Do you know where I can find nettles around here?");
+~chatnpc("<p,neutral>I believe they grow wild in the Haunted Forest.");
+return;
