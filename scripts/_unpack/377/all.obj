@@ -53759,6 +53759,7 @@ cost=10
 2dxan=136
 members=yes
 weight=7oz
+param=crafting_pottery_struct,potlid_unfired
 
 [cert_potlid_unfired]
 certlink=potlid_unfired

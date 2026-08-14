@@ -1,15 +1,15 @@
 // One Small Favour — Tassie after Apothecary 9→10.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Tassie).
-// No dest / potlid / clay grant / 12346. Hunt 289? no.
-// Cite osf-tassie-slipcast-377.md.
+// No dest / 4436 / 12346. Hunt 289? no.
+// Cite osf-tassie-slipcast-377.md · osf-tassie-clay-377.md.
 
 [opnpc1,favour_tassie_slipcast]
 if (%onesmallfavour < 10) {
     ~displaymessage(^dm_default);
     return;
 }
-// Return leftover after Hammerspike bargain 33→34. Teach potlid.
-// No clay / 4436 / 4438 / 4440 this hop. Cite osf-tassie-potlid-377.md.
+// Return leftover after Hammerspike bargain 33→34. Teach potlid + clay grant.
+// No 4436 / 4438 / 4440 grant. Cite osf-tassie-potlid-377.md · osf-tassie-clay-377.md.
 if (%onesmallfavour >= 34) {
     @osf_tassie_potlid;
     return;
@@ -53,7 +53,8 @@ return;
 
 [label,osf_tassie_potlid]
 // CANDIDATE last-resort 2007-base (Tip.it 2007 §23 J + Transcript
-// Heading back Tassie). No inv_add clay / potlid this leftover. Hunt 289? no.
+// Heading back Tassie). Clay GRANT = 1× softclay 1761 (wheel takes it;
+// leftover 434 vs 1761 UNKNOWN). No 4436/4438/4440 grant. Hunt 289? no.
 if (%onesmallfavour >= 35) {
     ~chatplayer("<p,quiz>How do I make the pot lid?");
     ~chatnpc("<p,neutral>Ok then, just use the clay on the wheel over there!");
@@ -65,7 +66,13 @@ if (%onesmallfavour >= 35) {
 ~chatnpc("<p,happy>I'll do better than that! I'll show you how to make an airtight pot!");
 ~chatnpc("<p,neutral>Now, while pots are quite easy to make, lids are a bit different.");
 ~chatnpc("<p,neutral>They have to be quite precise to fit the pot exactly, which is why you have to be quite experienced to make them.");
+~chatnpc("<p,neutral>First of all, you'll need some clay...here's some I have spare!");
+if (inv_total(inv, clay) < 1 & inv_total(inv, softclay) < 1) {
+    inv_add(inv, softclay, 1);
+    mes("Tassie gives you some clay!");
+}
 ~chatnpc("<p,neutral>Ok then, just use it on the wheel over there!");
+mes("Tassie shows you how to make pot lids.");
 if (%onesmallfavour = 34) {
     %onesmallfavour = 35;
 }

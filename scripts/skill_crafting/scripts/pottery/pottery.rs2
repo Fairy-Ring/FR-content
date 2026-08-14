@@ -16,6 +16,12 @@ switch_obj (last_useitem)
 switch_obj ($item)
 {
     case bowl_unfired, piedish_unfired, pot_unfired : @fire_pottery(last_useslot);
+    case potlid_unfired :
+        // OSF potlid craft after teach 35. Cite osf-tassie-clay-377.md.
+        if (%onesmallfavour >= 35) {
+            @fire_pottery(last_useslot);
+        }
+        ~displaymessage(^dm_default);
     case default : ~displaymessage(^dm_default);
 };
 
@@ -42,7 +48,22 @@ inv_add(inv, softclay, 1);
 p_delay(1); // 2 ticks
 mes("You now have some soft workable clay.");
 
-[label,craft_pottery_interface] 
+[label,craft_pottery_interface]
+// After OSF potlid teach: leftover IF multiobj4 is 289-only / 377 commented.
+// CANDIDATE p_choice4 join. Keep ~multiobj3 below the gate.
+if (%onesmallfavour >= 35) {
+    def_int $pick = ~p_choice4_header("Pot", 1, "Pie dish", 2, "Bowl", 3, "Pot lid", 4, "What would you like to make?");
+    if ($pick = 1) {
+        @craft_pottery(pot_unfired);
+    } else if ($pick = 2) {
+        @craft_pottery(piedish_unfired);
+    } else if ($pick = 3) {
+        @craft_pottery(bowl_unfired);
+    } else {
+        @craft_pottery(potlid_unfired);
+    }
+    return;
+}
 def_namedobj $choice = ~multiobj3(
     "What would you like to make?", 
     pot_unfired, 0, 2, 185, "Pot", 0, 0, 
@@ -60,7 +81,13 @@ if ($choice = null) {
 // Before sep 2004, it was likely just a p_delay()
 [label,craft_pottery](namedobj $item)
 if_close;
-def_struct $struct = oc_param($item, crafting_pottery_struct);
+// potlid_unfired unpack omits crafting_pottery_struct until next obj pack.
+def_struct $struct;
+if ($item = potlid_unfired) {
+    $struct = potlid_unfired;
+} else {
+    $struct = oc_param($item, crafting_pottery_struct);
+}
 def_string $name = lowercase(oc_name($item));
 // Check level
 def_int $level = struct_param($struct, levelrequire);
@@ -80,7 +107,12 @@ mes("You make the clay into a <substring($name, 8, string_length($name))>.");
 // No level req for some reason (does have a success chance though)
 [label,fire_pottery](int $last)
 def_obj $last_obj = inv_getobj(inv, $last);
-def_struct $struct = oc_param($last_obj, crafting_pottery_struct);
+def_struct $struct;
+if ($last_obj = potlid_unfired) {
+    $struct = potlid_unfired;
+} else {
+    $struct = oc_param($last_obj, crafting_pottery_struct);
+}
 mes("You put the <oc_name(struct_param($struct, product))> in the oven.");
 sound_synth(furnace, 0, 0);
 anim(human_furnace, 0);
