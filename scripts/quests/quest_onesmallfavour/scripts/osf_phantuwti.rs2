@@ -1,12 +1,18 @@
-// One Small Favour — Phantuwti after Arhein 14→15.
-// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Phantuwti).
-// No dest / weather grant / Petra Search / 12346. Hunt 289? no.
-// Cite osf-phantuwti-after-arhein-377.md. Do not bind [opnpc1,seer].
+// One Small Favour — Phantuwti after Arhein 14→15 + PREFIX after free Petra 27.
+// First-talk CANDIDATE last-resort 2007-base. After-petra PREFIX same donor
+// Transcript:One Small Favour After freeing Petra minus Do you have any quests /
+// place / do-here / topic / vane-first. Cite osf-phantuwti-after-arhein-377.md
+// + osf-phantuwti-after-petra-377.md. Do not bind [opnpc1,seer].
+// No dest / 12346 / lamps / vane oploc / inv_add 4435. Hunt 289? no.
 
 [opnpc1,favour_phantuwti_farsight]
 if (%onesmallfavour < 15) {
     ~displaymessage(^dm_default);
     return;
+}
+// After free-Petra leftover (26→27). Insert above >=16 so cave reminder does not steal.
+if (%onesmallfavour >= 27) {
+    @osf_phantuwti_after_petra;
 }
 if (%onesmallfavour >= 16) {
     ~chatplayer("<p,quiz>What did you need me to do again?");
@@ -43,5 +49,50 @@ if ($yes = 2) {
 ~chatnpc("<p,happy>Great! I just knew you'd agree to help!");
 if (%onesmallfavour = 15) {
     %onesmallfavour = 16;
+}
+return;
+
+// CANDIDATE last-resort After freeing Petra minus Changes. Write 27→28 only on roof-send.
+[label,osf_phantuwti_after_petra]
+if (%onesmallfavour >= 28) {
+    ~chatplayer("<p,quiz>Ok, show me where this weather vane is...I want to look at it.");
+    ~chatnpc("<p,neutral>Ok, ok, it's up on the roof...");
+    return;
+}
+~chatplayer("<p,quiz>I've released Petra, she should have returned.");
+~chatnpc("<p,happy>Hi there, yes she has actually! Well done, you're a true hero!");
+~chatplayer("<p,quiz>So, can I have the weather report now please?");
+~chatnpc("<p,sad>I wish I could but it's just been so difficult to get a clear image of the future at the moment. You know...we're all so relieved that Petra has returned and all that.");
+def_int $why = ~p_choice2("Why can't you get a clear picture?", 1, "Listen you...just give me the blooming weather report!", 2);
+if ($why = 2) {
+    ~chatplayer("<p,angry>Listen you...just give me the blooming weather report!");
+    ~chatnpc("<p,sad>Er...no. I can't, I told you, I can't get a clear picture. Nope, sorry, the conditions are just not quite right.");
+    return;
+}
+~chatplayer("<p,quiz>Why can't you get a clear picture?");
+~chatnpc("<p,neutral>Well, it's complicated, the special Seers tools that help us predict the weather are not aligned properly...");
+def_int $tools = ~p_choice2("Which special Seers tools do you mean?", 1, "You're just a fake...you can't predict the weather!", 2);
+if ($tools = 2) {
+    ~chatplayer("<p,angry>You're just a fake...you can't predict the weather!");
+    ~chatnpc("<p,angry>Why...how dare you...I've never been so insulted in my life.");
+    ~chatplayer("<p,neutral>You should get out more!");
+    return;
+}
+~chatplayer("<p,quiz>Which special Seers tools do you mean?");
+~chatnpc("<p,neutral>Well, we use a special combination of items which are used to gauge current weather movements and we're able to predict future weather patterns from these. Of course, it's strongly linked to the Seers' foresight ability.");
+~chatplayer("<p,quiz>What do you mean, 'special combination of items'?");
+~chatnpc("<p,neutral>Well, let me think now...There's a copper eye, a rotating thing, and some pointy direction thingies. It's all highly scientific - and of course mystical - in a very magical 'foresight' sort of way.");
+~chatplayer("<p,quiz>You're talking about a weather vane aren't you?");
+~chatnpc("<p,confused>Er...maybe...I may be talking about that...");
+~chatplayer("<p,angry>You can't predict the weather because your weather vane is broken...that's it isn't it? Holy Saradomin breath....you can't even predict the weather, you need a weather vane!");
+~chatnpc("<p,sad>Erm, well....err....");
+~chatplayer("<p,quiz>Ok, show me where this weather vane is...I want to look at it.");
+~chatnpc("<p,quiz>What for?");
+~chatplayer("<p,happy>I may be able to fix it and then you can give me a weather report...come on, let's go!");
+~chatnpc("<p,sad>Oh, very well..but you'll need to be a specialist to fix this weather vane, it was made by some of the most experienced....");
+~chatplayer("<p,angry>Just show me it!");
+~chatnpc("<p,neutral>Ok, ok, it's up on the roof...");
+if (%onesmallfavour = 27) {
+    %onesmallfavour = 28;
 }
 return;
