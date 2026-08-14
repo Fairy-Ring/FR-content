@@ -1,0 +1,87 @@
+// One Small Favour — Tindel after Cromperty 17→18.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Tindel).
+// Stodgy grant 4425. No dest / oxide 4427 / Sword give / Ring-bell / 12346.
+// Hunt 289? no. Cite osf-tindel-after-cromperty-377.md.
+
+[opnpc1,tindel_marchant]
+if (%onesmallfavour < 18) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavour >= 19) {
+    if (inv_total(inv, favour_matress_stodgy) > 0 | inv_total(inv, favour_matress_comfy) > 0) {
+        @osf_tindel_reminder;
+    }
+    @osf_tindel_lost;
+}
+~chatnpc("<p,happy>Hello there! Welcome to my special antiques boutique.");
+~chatplayer("<p,quiz>Wizard Cromperty sent me to get some iron oxide. Do you have some?");
+~chatnpc("<p,neutral>As a matter of fact, I do! However, it's the last in stock and I'm not likely to get more for a while so it's highly prized amongst the wizards at the moment.");
+~chatnpc("<p,neutral>It's not easy to get so much rust together, even if I do come across it more often than most people with cleaning these rusty swords up!");
+~chatplayer("<p,quiz>Rust? What do you mean? How much does it cost?");
+~chatnpc("<p,neutral>Yes, iron oxide is more commonly referred to as rust. As for a price, hmmm...well...let me think now...I could give it to you for the price of...");
+~chatnpc("<p,happy>One small favour!");
+~chatplayer("<p,angry>Groan!!!");
+~chatnpc("<p,neutral>I need a nice mattress to sleep on! I haven't had a decent night's sleep in an ice-age...could you take this stodgy mattress down to Rantz in the ogre area and ask him to fill it with prime chompy bird feathers please?");
+~chatplayer("<p,quiz>So, let me get this straight.");
+~chatplayer("<p,angry>You want me to traipse ALL the way down past the ogre city with some flea infested mattress, to some hermit ogre, who can't shoot a chompy bird to save his life, so that you'll give me a pot of rust?");
+~chatnpc("<p,sad>Well, er, I wouldn't have said it quite that way...");
+def_int $yes = ~p_choice2("Okay, I'll do it!", 1, "Sorry, I just don't want to do it.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,sad>Sorry, I just don't want to do it.");
+    ~chatnpc("<p,sad>Well, that's a shame, but come back and see me if you change your mind.");
+    return;
+}
+~chatplayer("<p,happy>Okay, I'll do it!");
+~chatnpc("<p,happy>Great, many thanks indeed! Here's the mattress!");
+@osf_tindel_grant;
+
+[label,osf_tindel_reminder]
+~chatnpc("<p,happy>Hello there! Welcome to my special antiques boutique.");
+~chatplayer("<p,quiz>What did you want me to do again?");
+~chatnpc("<p,neutral>You need to take that stodgy mattress I gave you to Rantz and ask him to fill it with feathers! Then, bring it back to me and I'll give you some iron oxide.");
+~chatplayer("<p,neutral>Oh, okay then!");
+return;
+
+[label,osf_tindel_lost]
+~chatnpc("<p,happy>Hello there! Welcome to my special antiques boutique.");
+~chatplayer("<p,sad>Erm, I've lost the mattress... do you have another one I can get refilled?");
+~chatnpc("<p,neutral>Yes, but I had to pay for this myself so you'd better pay me for losing my last one...it cost 100 gold!");
+def_int $pay = ~p_choice2("Okay, here's 100 coins for another mattress...", 1, "I'm not paying you 100 coins for that stinky mattress.", 2);
+if ($pay = 2) {
+    ~chatplayer("<p,angry>I'm not paying you 100 coins for that stinky mattress.");
+    ~chatnpc("<p,angry>Well, don't expect your iron oxide any time soon then!");
+    ~chatplayer("<p,neutral>Okay, then I won't.");
+    ~chatnpc("<p,angry>Good!");
+    ~chatplayer("<p,angry>Great!");
+    ~chatnpc("<p,angry>Get out!");
+    ~chatplayer("<p,angry>GLADLY!");
+    ~chatnpc("<p,angry>Grrrr!");
+    return;
+}
+~chatplayer("<p,neutral>Okay, here's 100 coins for another mattress...");
+if (inv_total(inv, coins) < 100) {
+    mes("You don't have enough coins.");
+    return;
+}
+if (inv_itemspace(inv, favour_matress_stodgy, 1, inv_size(inv)) = false) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_del(inv, coins, 100);
+inv_add(inv, favour_matress_stodgy, 1);
+~chatnpc("<p,happy>Okay, thanks a lot, here's the mattress!");
+~mesbox("Tindel gives you a new, old mattress!");
+return;
+
+[label,osf_tindel_grant]
+if (inv_itemspace(inv, favour_matress_stodgy, 1, inv_size(inv)) = false) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, favour_matress_stodgy, 1);
+~mesbox("Tindel gives you a worn out, very poor-looking mattress.");
+if (%onesmallfavour = 18) {
+    %onesmallfavour = 19;
+}
+return;
