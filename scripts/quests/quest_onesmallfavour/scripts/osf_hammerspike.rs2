@@ -48,11 +48,12 @@ if (%onesmallfavour = 11) {
 return;
 
 [label,osf_hammerspike_return]
-// CANDIDATE last-resort 2007-base (Tip.it 2007 §23 first talk + Transcript
-// heading-back minus OSRS one-talk collapse / "My men"). Hunt 289? no.
+// CANDIDATE last-resort 2007-base (Tip.it 2007 §23 two-talk).
+// First talk = news + changed mind (32→33). Second talk = My men, stay 33
+// (prefer no extra write). Guards / leftover-IF Attack = later leftover.
+// Hunt 289? no.
 if (%onesmallfavour >= 33) {
-    ~chatnpc("<p,happy>Ha, ha ha ha! How funny is that! I've gone and changed my mind now!");
-    ~chatnpc("<p,shifty>I've decided that I make a far better gangster than I ever would a druid!");
+    ~chatnpc("<p,angry>My men are going to deal with you!");
     return;
 }
 ~chatnpc("<p,happy>Oh, it's you! Back are you then?");
