@@ -1,0 +1,45 @@
+// CANDIDATE 377 leftover empty rocks.
+// 274 pattern: copperrock1 (rock1 + recol) → plainrock1 (rock1, no recol, mining_rock_empty=1).
+// 97xx / 11xxx leftover ores use loc_4027 / loc_4028 / loc_2110.
+// #385 pointed those at limestone pile_of_rock* or old plainrock1 — wrong mesh / not empty.
+// These three are not in cache 657. Same model, no ore recol, empty flag.
+// Do not steal the limestone pile_of_rock chain.
+
+[rocks_empty_4027]
+name=Rocks
+desc=A rocky outcrop.
+model=loc_4027
+op1=Mine
+op2=Prospect
+op3=hidden
+mapscene=12
+blockrange=no
+ambient=10
+category=mining_rock_normal
+param=mining_rock_empty,1
+
+[rocks_empty_4028]
+name=Rocks
+desc=A rocky outcrop.
+model=loc_4028
+op1=Mine
+op2=Prospect
+op3=hidden
+mapscene=12
+blockrange=no
+ambient=10
+category=mining_rock_normal
+param=mining_rock_empty,1
+
+[rocks_empty_2110]
+name=Rocks
+desc=A rocky outcrop.
+model=loc_2110
+op1=Mine
+op2=Prospect
+op3=hidden
+mapscene=12
+blockrange=no
+ambient=10
+category=mining_rock_normal
+param=mining_rock_empty,1

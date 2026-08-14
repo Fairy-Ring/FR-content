@@ -63407,7 +63407,7 @@ mapscene=24
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_9709]
 name=Rocks
@@ -63424,7 +63424,7 @@ mapscene=25
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock_4028
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_9710]
 name=Rocks
@@ -63441,8 +63441,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_9711]
 name=Rocks
@@ -63459,7 +63458,7 @@ mapscene=24
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_9712]
 name=Rocks
@@ -63475,6 +63474,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_9713]
 name=Rocks
@@ -63491,8 +63491,7 @@ mapscene=25
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_9714]
 name=Rocks
@@ -63509,7 +63508,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_9715]
 name=Rocks
@@ -63526,7 +63525,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock_4028
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_9716]
 name=Rocks
@@ -63543,8 +63542,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_9717]
 name=Rocks
@@ -63561,7 +63559,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_9718]
 name=Rocks
@@ -63578,7 +63576,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock_4028
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_9719]
 name=Rocks
@@ -63595,8 +63593,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_9720]
 name=Rocks
@@ -63613,7 +63610,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_9721]
 name=Rocks
@@ -63629,6 +63626,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_9722]
 name=Rocks
@@ -63645,8 +63643,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_9723]
 name=Rocks
@@ -75779,7 +75776,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11184]
 name=Rocks
@@ -75796,7 +75793,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock_4028
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11185]
 name=Rocks
@@ -75813,8 +75810,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11186]
 name=Rocks
@@ -75831,7 +75827,7 @@ mapscene=24
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11187]
 name=Rocks
@@ -75848,7 +75844,7 @@ mapscene=25
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock_4028
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11188]
 name=Rocks
@@ -75865,8 +75861,7 @@ mapscene=12
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11189]
 name=Rocks
@@ -75882,6 +75877,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11190]
 name=Rocks
@@ -75897,6 +75893,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11191]
 name=Rocks
@@ -75912,6 +75909,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11192]
 name=Rocks
@@ -78229,6 +78227,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11553]
 name=Rocks
@@ -78244,6 +78243,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11554]
 name=Rocks
@@ -78259,6 +78259,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11555]
 name=Rocks
@@ -78274,6 +78275,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11556]
 name=Rocks
@@ -78289,6 +78291,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11557]
 name=Rocks
@@ -78304,6 +78307,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [fai_barbarian_abode_wall]
 model=viking_abode_wall
@@ -82573,7 +82577,7 @@ mapscene=24
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11931]
 name=Rocks
@@ -82590,7 +82594,7 @@ mapscene=25
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock_4028
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11932]
 name=Rocks
@@ -82607,8 +82611,7 @@ mapscene=25
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11933]
 name=Rocks
@@ -82625,7 +82628,7 @@ mapscene=24
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11934]
 name=Rocks
@@ -82642,7 +82645,7 @@ mapscene=25
 blockrange=no
 ambient=10
 category=mining_rock_normal
-param=next_loc_stage_mining,pile_of_rock_4028
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11935]
 name=Rocks
@@ -82659,8 +82662,7 @@ mapscene=25
 blockrange=no
 ambient=10
 category=mining_rock_normal
-//TODO this is wrong but it doesn't accept loc_2110
-param=next_loc_stage_mining,plainrock1
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11936]
 name=Rocks
@@ -82676,6 +82678,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11937]
 name=Rocks
@@ -82691,6 +82694,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11938]
 name=Rocks
@@ -82706,6 +82710,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11939]
 name=Rocks
@@ -82721,6 +82726,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11940]
 name=Rocks
@@ -82736,6 +82742,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11941]
 name=Rocks
@@ -82751,6 +82758,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11942]
 name=Rocks
@@ -82766,6 +82774,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11943]
 name=Rocks
@@ -82781,6 +82790,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11944]
 name=Rocks
@@ -82796,6 +82806,7 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11945]
 name=Rocks
@@ -82811,6 +82822,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11946]
 name=Rocks
@@ -82826,6 +82838,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11947]
 name=Rocks
@@ -82841,6 +82854,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11948]
 name=Rocks
@@ -82856,6 +82870,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11949]
 name=Rocks
@@ -82871,6 +82886,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11950]
 name=Rocks
@@ -82886,6 +82902,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11951]
 name=Rocks
@@ -82901,6 +82918,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11952]
 name=Rocks
@@ -82916,6 +82934,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11953]
 name=Rocks
@@ -82931,6 +82950,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11954]
 name=Rocks
@@ -82946,6 +82966,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11955]
 name=Rocks
@@ -82961,6 +82982,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11956]
 name=Rocks
@@ -82976,6 +82998,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11957]
 name=Rocks
@@ -82991,6 +83014,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11958]
 name=Rocks
@@ -83006,6 +83030,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11959]
 name=Rocks
@@ -83021,6 +83046,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11960]
 name=Rocks
@@ -83036,6 +83062,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11961]
 name=Rocks
@@ -83051,6 +83078,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11962]
 name=Rocks
@@ -83066,6 +83094,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [rocks_11963]
 name=Rocks
@@ -83081,6 +83110,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4027
 
 [rocks_11964]
 name=Rocks
@@ -83096,6 +83126,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_4028
 
 [rocks_11965]
 name=Rocks
@@ -83111,6 +83142,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
+param=next_loc_stage_mining,rocks_empty_2110
 
 [tzhaar_eeg2]
 model=tzhaar_eeg2
