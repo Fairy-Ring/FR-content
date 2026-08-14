@@ -1,9 +1,23 @@
 [opnpc1,ardounge_wizard]
 ~chatnpc("<p,neutral>Hello there.|My name is Cromperty.|I am a Wizard, and an inventor.");
-// One Small Favour leftover after Petra Search 16→17. Keep inventor / essence.
+// One Small Favour leftover after Petra Search 16→17 + oxide hand-in after Tindel 23→24.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Cromperty).
-// No dest / oxide grant / 12346. Hunt 289? no.
-if (%onesmallfavour >= 17) {
+// Keep inventor / essence / girl-in-rock 17→18. No dest / Read / Slagilith / 12346.
+// Hunt 289? no. Cite osf-cromperty-oxide-return-377.md + osf-cromperty-oxide-handin-377.md.
+if (%onesmallfavour >= 24) {
+    def_int $osf = 0;
+    if (inv_total(inv, favour_iron_oxide) > 0) {
+        $osf = ~p_choice2("I have that iron oxide you asked for!", 1, "Something else.", 2);
+        if ($osf = 1) {
+            @osf_cromperty_oxide;
+        }
+    } else if (inv_total(inv, favour_animate_rock) > 0) {
+        $osf = ~p_choice2("What should I do now?", 1, "Something else.", 2);
+        if ($osf = 1) {
+            @osf_cromperty_scroll_reminder;
+        }
+    }
+} else if (%onesmallfavour >= 17) {
     def_int $osf = 0;
     if (%onesmallfavour >= 18) {
         $osf = ~p_choice2("What did you want me to do again?", 1, "Something else.", 2);
@@ -125,4 +139,22 @@ if ($yes = 2) {
 if (%onesmallfavour = 17) {
     %onesmallfavour = 18;
 }
+return;
+
+[label,osf_cromperty_oxide]
+~chatplayer("<p,happy>I have that iron oxide you asked for!");
+~chatnpc("<p,happy>Great! Just what I needed! Now I need to give you a spell scroll to help bring Petra back again.");
+inv_del(inv, favour_iron_oxide, 1);
+~mesbox("Cromperty takes the iron oxide and starts preparing a spell.");
+inv_add(inv, favour_animate_rock, 1);
+~mesbox("After some time, he comes back and gives you an animate rock spell.");
+~chatnpc("<p,happy>Just cast this in the room, it should have her out of that rock in a jiffy! Good luck with your exploits...now, where was I with that wranklin severance device...");
+if (%onesmallfavour = 24) {
+    %onesmallfavour = 25;
+}
+return;
+
+[label,osf_cromperty_scroll_reminder]
+~chatplayer("<p,quiz>What should I do now?");
+~chatnpc("<p,quiz>Well, I thought you were going to use that spell I gave you to free Petra from the rock face?");
 return;
