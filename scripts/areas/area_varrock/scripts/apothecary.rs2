@@ -7,6 +7,15 @@ if(%rjquest = ^romeojuliet_spoken_father) {
     // One Small Favour leftover after Horvik 8→9. Keep potions.
     // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Apothecary).
     // No dest / Tassie product / 12346. Hunt 289? no.
+    // Salts PREFIX after airtight 4436 (osf-apothecary-salts-return-377.md).
+    if (%onesmallfavour >= 35 & inv_total(inv, favour_airtight_pot) > 0) {
+        @osf_apothecary_salts;
+        return;
+    }
+    if (%onesmallfavour >= 36) {
+        @osf_apothecary_salts_after;
+        return;
+    }
     ~chatnpc("<p,neutral>I am the Apothecary.");
     ~chatnpc("<p,neutral>I have potions to brew.|Do you need anything specific?");
     def_int $osf = 0;
@@ -96,6 +105,63 @@ if(inv_total(inv, cadavaberries) > 0) {
 ~chatnpc("<p,neutral>You will have to find them while I get the rest ready.");
 ~chatnpc("<p,neutral>Bring them here when you have them.|But be careful. They are nasty.");
 %rjquest = ^romeojuliet_spoken_apothecary;
+
+[label,osf_apothecary_salts]
+// CANDIDATE last-resort 2007-base (Tip.it 2007 §23 + Transcript
+// Heading back With the airtight pot). No dest / Open / Horvik medicine.
+~chatplayer("<p,happy>Hey there! I have an airtight pot for you!");
+~chatnpc("<p,happy>Wonderful, let me see!");
+~mesbox("You show the Apothecary the airtight pot.");
+~chatnpc("<p,happy>Huzzah! Ok, let me get some breathing salts into this thing for you!");
+~mesbox("The Apothecary busily fills the airtight pot and then quickly seals the lid.");
+if (inv_total(inv, favour_airtight_pot) < 1) {
+    return;
+}
+inv_del(inv, favour_airtight_pot, 1);
+inv_add(inv, favour_breathing_salts, 1);
+~chatnpc("<p,happy>That's great! Many thanks friend...here's your breathing salts!");
+if (%onesmallfavour = 35) {
+    %onesmallfavour = 36;
+}
+return;
+
+[label,osf_apothecary_salts_after]
+// Reminder / lost-salts. 0 extra varp. Cite salts leftover 1b/1c.
+~chatnpc("<p,neutral>I am the Apothecary.");
+~chatnpc("<p,neutral>I have potions to brew.|Do you need anything specific?");
+if (inv_total(inv, favour_breathing_salts) > 0) {
+    def_int $now = ~p_choice2("What should I do now?", 1, "Something else.", 2);
+    if ($now = 1) {
+        ~chatplayer("<p,quiz>What should I do now?");
+        ~chatnpc("<p,neutral>You mentioned something about Horvik, weren't you supposed to take those breathing salts and that herbal tincture to him?");
+        return;
+    }
+    @apothecary_standard;
+    return;
+}
+def_int $lost = ~p_choice2("I've lost the breathing salts you gave me, can I have some more please?", 1, "Something else.", 2);
+if ($lost = 2) {
+    @apothecary_standard;
+    return;
+}
+~chatplayer("<p,sad>I've lost the breathing salts you gave me, can I have some more please?");
+if (inv_total(inv, favour_airtight_pot) < 1) {
+    ~chatnpc("<p,neutral>I'll need another airtight pot first.");
+    return;
+}
+if (inv_total(inv, coins) < 200) {
+    ~chatnpc("<p,neutral>I'll need 200 gold coins as well as another airtight pot.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    ~mesbox("You don't have enough inventory space.");
+    return;
+}
+inv_del(inv, favour_airtight_pot, 1);
+inv_del(inv, coins, 200);
+inv_add(inv, favour_breathing_salts, 1);
+~chatnpc("<p,happy>Here's another pot of breathing salts.");
+return;
 
 [label,osf_apothecary_tincture]
 if (%onesmallfavour >= 10) {

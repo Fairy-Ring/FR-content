@@ -1,7 +1,23 @@
 // One Small Favour — Use potlid on pot_empty → favour_airtight_pot 4436.
 // CANDIDATE last-resort 2007-base (Tip.it 2007 §23 J + RuneHQ Use-lid).
-// Gate ≥ 35 after potlid teach. No dest / Open / 4442 / 12346.
+// Open 4436 = reverse (osf-airtight-open-377.md). No dest / 4442 / 12346.
 // Cite osf-tassie-airtight-377.md.
+
+[opheld1,favour_airtight_pot]
+// Packed iop1=Open. CANDIDATE reverse of Use-lid. 0 extra varp.
+if (inv_total(inv, favour_airtight_pot) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    ~mesbox("You don't have enough inventory space.");
+    return;
+}
+inv_del(inv, favour_airtight_pot, 1);
+inv_add(inv, potlid, 1);
+inv_add(inv, pot_empty, 1);
+mes("You open the pot.");
+return;
 
 [opheldu,potlid]
 if (last_useitem = pot_empty) {
