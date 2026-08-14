@@ -1,0 +1,15 @@
+// Ghosts Ahoy — Ghost captain_1 first Talk-To. Dest UNKNOWN.
+// CANDIDATE last-resort 2007-base (OSRS Talking to the Ghost captain
+// minus 500 unlimited 16 Mar 2017 / Charos / dest). Hunt 289? no.
+// Stay ahoy_questvar 3. No p_tele / gangplank / Teach.
+// Cite ahoy-ghost-captain-first-slice-377.md.
+
+[opnpc1,ahoy_ghost_captain_1]
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    ~chatnpc("<p,shock>Woooo wooo wooooo woooo");
+    ~mesbox("You cannot understand the ghost.");
+    return;
+}
+~chatnpc("<p,neutral>I can take you to Dragontooth Island. The return trip will cost 25 ecto-tokens.");
+~chatplayer("<p,neutral>I'll come back later.");
+return;
