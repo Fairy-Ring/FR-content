@@ -1,10 +1,72 @@
 [opnpc1,brian]
-def_int $option = ~p_choice2("So, are you selling something?", 1, "'Ello.", 2);
-if($option = 1) {
+def_int $option = 0;
+if (%onesmallfavour >= 4) {
+    $option = ~p_choice3("So, are you selling something?", 1, "'Ello.", 2, "What did you want me to do again?", 3);
+} else if (%onesmallfavour >= 3) {
+    $option = ~p_choice3("So, are you selling something?", 1, "'Ello.", 2, "Do you sharpen axes?", 3);
+} else {
+    $option = ~p_choice2("So, are you selling something?", 1, "'Ello.", 2);
+}
+if ($option = 1) {
     ~chatplayer("<p,neutral>So, are you selling something?");
     ~chatnpc("<p,neutral>Yep, take a look at these great axes!");
     ~openshop_activenpc;
-} else if($option = 2) {
+} else if ($option = 2) {
     ~chatplayer("<p,neutral>'Ello.");
     ~chatnpc("<p,neutral>'Ello!");
+} else if ($option = 3) {
+    @osf_brian_sharpen;
 }
+
+[label,osf_brian_sharpen]
+if (%onesmallfavour >= 4) {
+    ~chatplayer("<p,quiz>What did you want me to do again?");
+    ~chatnpc("<p,neutral>Go talk to Aggie and ask her if she'll be a character witness for my friend before he finds himself in jail with less than savoury people...or worse, he runs off to the wilderness!");
+    ~chatplayer("<p,sad>Oh, right, yes, sorry, I forgot..");
+    ~chatnpc("<p,neutral>So it seems!");
+    return;
+}
+~chatplayer("<p,quiz>Do you sharpen axes?");
+if (inv_total(inv, favour_jungleforesteraxe_blunt) < 1) {
+    ~chatnpc("<p,neutral>You don't have any blunt axes on you!");
+    ~chatplayer("<p,shock>You know what! You're absolutely right! I must have dropped it or left it somewhere.");
+    ~chatnpc("<p,neutral>Well, come back if you need any help with it, we may be able to work something out.");
+    return;
+}
+~chatnpc("<p,sad>You know what, normally I do...but...");
+def_int $c = ~p_choice3("But... what?", 1, "Look, can you sharpen this cursed axe or what?", 2, "Ok, thanks.", 3);
+if ($c = 3) {
+    ~chatplayer("<p,neutral>Okay, thanks.");
+    return;
+}
+if ($c = 1) {
+    ~chatplayer("<p,quiz>But... what?");
+    ~chatnpc("<p,sad>But I'm a bit preoccupied at the moment. I'm worried that my friend is going to spend the rest of the year behind bars!");
+    ~chatplayer("<p,neutral>It sounds serious!");
+    ~chatnpc("<p,sad>Yeah, it is, but it shouldn't be. It was only a harmless pub brawl but he got caught up in it and they just jailed everyone.");
+    ~chatnpc("<p,sad>Except he says he's going to run away to the wilderness if he's found guilty and you know what blood-hungry scum inhabit those realms.");
+    $c = ~p_choice2("Look, can you sharpen this cursed axe or what?", 2, "Ok, thanks.", 3);
+    if ($c = 3) {
+        ~chatplayer("<p,neutral>Okay, thanks.");
+        return;
+    }
+}
+~chatplayer("<p,angry>Look, can you sharpen this cursed axe or what?");
+~chatnpc("<p,sad>Well, I'd like to. I really would, but I wouldn't be able to concentrate while worrying about my friend so much. I tell you what. If you could do me just one small favour, I promise to help you!");
+~chatplayer("<p,quiz>Oh, so you want a favour doing as well?");
+~chatnpc("<p,neutral>Well, yes, if you wouldn't mind? Aggie the witch is a family friend and she's a pillar of the local community.");
+~chatnpc("<p,neutral>I know you wouldn't think it would you! Could you ask her if she'll act as a character witness for my friend?");
+~chatplayer("<p,shock>What?");
+~chatnpc("<p,happy>Oh, please. It would mean such a lot to me! Just ask Aggie if she'll be a character witness for my friend. She only lives in Draynor Village. It'll only take you a few minutes!");
+def_int $yes = ~p_choice2("Ok, ok, I'll do it! I'll go and see Aggie.", 1, "Ok, thanks.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,neutral>Okay, thanks.");
+    return;
+}
+~chatplayer("<p,happy>Ok, ok, I'll do it! I'll go and see Aggie.");
+inv_del(inv, favour_jungleforesteraxe_blunt, 1);
+~chatnpc("<p,happy>Oh, great, that would be really helpful! Here, give me the axe for safe keeping and I'll get it sharpened as soon as she agrees to help.");
+if (%onesmallfavour = 3) {
+    %onesmallfavour = 4;
+}
+return;
