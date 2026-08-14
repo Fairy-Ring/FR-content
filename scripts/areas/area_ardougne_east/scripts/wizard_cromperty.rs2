@@ -1,5 +1,19 @@
 [opnpc1,ardounge_wizard]
 ~chatnpc("<p,neutral>Hello there.|My name is Cromperty.|I am a Wizard, and an inventor.");
+// One Small Favour leftover after Petra Search 16→17. Keep inventor / essence.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Cromperty).
+// No dest / oxide grant / 12346. Hunt 289? no.
+if (%onesmallfavour >= 17) {
+    def_int $osf = 0;
+    if (%onesmallfavour >= 18) {
+        $osf = ~p_choice2("What did you want me to do again?", 1, "Something else.", 2);
+    } else {
+        $osf = ~p_choice2("I need to talk to you about a girl stuck in some rock!", 1, "Something else.", 2);
+    }
+    if ($osf = 1) {
+        @osf_cromperty_rock;
+    }
+}
 if(%runemysteries = ^runemysteries_complete) {
 @multi3("Two jobs? That's got to be tough.", cromperty_two_jobs, "So what have you invented?", cromperty_what_invented, "Can you teleport me to the Rune Essence?", cromperty_ess);
 } else {
@@ -79,3 +93,36 @@ if (%totemquest >= ^totem_crate_delivered) {
     }
 }
 p_telejump($coord);
+
+[label,osf_cromperty_rock]
+if (%onesmallfavour >= 18) {
+    ~chatplayer("<p,quiz>What did you want me to do again?");
+    ~chatnpc("<p,neutral>Go to Port Khazard and get me some iron oxide from Tindel Marchant.");
+    return;
+}
+~chatplayer("<p,neutral>I need to talk to you about a girl stuck in some rock!");
+~chatnpc("<p,shock>Eh!");
+~chatnpc("<p,shock>What? I have no clue what you're talking about! Now, please excuse me! I need to get back to my experiments!");
+~chatplayer("<p,angry>Hey! Not so fast! I've seen a young girl encased in rock, a note in her belt led me to you.");
+~chatnpc("<p,sad>Oh dear, it's such a bother getting them back out of the rock walls and I do loathe the trip to Port Khazard for the components.");
+~chatplayer("<p,shock>What the demonikin are you talking about?");
+~chatnpc("<p,neutral>Well, it's not the first time someone's been teleported into a rock face, just the slightest miscalculation and bang...they're in the wall!");
+~chatnpc("<p,neutral>It's fairly straightforward to cast a spell and fish them out again - but it requires a spell component from a chap in Port Khazard.");
+~chatnpc("<p,quiz>I don't suppose you could do me a small favour could you?");
+~chatnpc("<p,happy>Just one small favour? Pop along to Port Khazard and get some iron oxide, it's a component of the spell.");
+def_int $yes = ~p_choice2("Oh! Ok, one more 'small favour' isn't going to kill me...I hope!", 1, "No way am I going to Port Khazard for you!", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>No way am I going to Port Khazard for you!");
+    ~chatnpc("<p,sad>Oh dear, what a shame...I just don't have time to deal with this now...she's safe where she is for now, and I'm sure I'll get to it sooner or later.");
+    return;
+}
+~chatplayer("<p,happy>Oh! Ok, one more 'small favour' isn't going to kill me...I hope!");
+~chatnpc("<p,happy>Waaahaaay! Great! I'd never suspect you'd be so helpful!");
+~chatnpc("<p,neutral>You need to talk to a chap called Tindel Marchant in Port Khazard, he's sort of like an antiques dealer.");
+~chatnpc("<p,happy>Well, off you go then! A journey of a thousand miles starts with the first step and all that!");
+~chatplayer("<p,shock>What? Are you saying I have to travel a thousand miles?");
+~chatnpc("<p,neutral>Of course not...you silly...just...you know...the sooner you start the sooner you can get back...that's all I was saying.");
+if (%onesmallfavour = 17) {
+    %onesmallfavour = 18;
+}
+return;
