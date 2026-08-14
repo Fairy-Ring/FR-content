@@ -1,10 +1,15 @@
 // One Small Favour — animate-rock Read + Use-on-sculpture after grant 24→25.
 // Packed iop1=Read. Use is oplocu lastuse 4428. Same CANDIDATE misfire body.
-// After misfire: birth 1804 → Attack 1802. No dest / free Petra / extra varp / 12346.
-// Hunt 289? no. Cite osf-cromperty-scroll-read-377.md + osf-animate-rock-377.md
-// + osf-slagilith-fight-377.md.
+// After misfire: birth 1804 → Attack 1802. Kill leftover 25→26.
+// Second Read at 26 = free Petra leftover (CANDIDATE 2007-base minus Changes).
+// Use at >25 stays default — do not invent both firing. No dest / 12346 / lamps.
+// Hunt 289? no. Cite osf-animate-rock-377.md + osf-slagilith-fight-377.md
+// + osf-petra-free-377.md.
 
 [opheld1,favour_animate_rock]
+if (%onesmallfavour >= 26) {
+    @osf_free_petra;
+}
 @osf_animate_rock_cast;
 
 [oplocu,favour_lady_in_wall]
@@ -44,4 +49,52 @@ npc_add($spawn, slagilith_birth, 1000);
 sound_synth(slagilith_appear, 0, 0);
 p_delay(3);
 npc_changetype(slagilith, 1000);
+return;
+
+// Second Read after kill 25→26. Inv 4428 kept (consume UNKNOWN — do not invent inv_del).
+[label,osf_free_petra]
+if (inzone(0_40_153_58_39, 0_40_153_61_47, coord) = false) {
+    mes("The spell doesn't seem to be working here.");
+    return;
+}
+if (npc_find(coord, slagilith, 8, 0) = true | npc_find(coord, slagilith_birth, 8, 0) = true) {
+    mes("You're a little too busy fighting to cast that right now.");
+    return;
+}
+if (%onesmallfavour > 26) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatplayer("<p,happy>Um nahi listic durooo-rah!");
+def_coord $petra = map_findsquare(0_40_153_61_43, 1, 2, ^map_findsquare_lineofwalk);
+npc_add($petra, favour_petra, 1000);
+p_delay(1);
+if (npc_find(coord, favour_petra, 8, 0) = false) {
+    return;
+}
+~osf_petra_free_chat;
+return;
+
+[opnpc1,favour_petra]
+if (%onesmallfavour < 26) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~osf_petra_free_chat;
+return;
+
+[proc,osf_petra_free_chat]
+~chatnpc("<p,happy>Oh thank goodness you released me...how long have I been stuck in that gloomy wall?");
+~chatplayer("<p,neutral>Oh, not so long...I don't think...");
+~chatplayer("<p,confused>I mean...that is... I'm not so sure...at all...in fact.");
+~chatnpc("<p,happy>Well, at least I'm ok...thanks to you! Last time I get involved with that Cromperty lunatic...in fact I have some words to say to that man!");
+~chatplayer("<p,neutral>Well actually, I think that some of the people at the Seers Village are worried about you. That's how I came to find you here, Phantuwti sent me.");
+~chatnpc("<p,neutral>Oh, right, yes, well I guess I'd better go back there and let them all know that I'm safe then..Ok, thanks...I'll be off now and once again thanks for your help.");
+~chatplayer("<p,happy>No problem...I'll probably see you back at the Seers Village.");
+if (%onesmallfavour = 26) {
+    %onesmallfavour = 27;
+}
+if (npc_find(coord, favour_petra, 8, 0) = true) {
+    npc_del;
+}
 return;
