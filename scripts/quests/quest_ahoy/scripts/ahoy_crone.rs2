@@ -9,9 +9,17 @@ if (%ahoy_questvar < 3) {
     ~displaymessage(^dm_default);
     return;
 }
-if (inv_total(inv, bowl_nettletea) > 0 | inv_total(inv, bowl_nettletea_milky) > 0 | inv_total(inv, chinacup_of_nettletea) > 0 | inv_total(inv, chinacup_of_nettletea_milky) > 0) {
+// Porcelain give leftover (ahoy-porcelain-cup-next-377.md). Milk / enlightenment STOP.
+if (inv_total(inv, bowl_nettletea_milky) > 0 | inv_total(inv, chinacup_of_nettletea) > 0 | inv_total(inv, chinacup_of_nettletea_milky) > 0) {
     ~displaymessage(^dm_default);
     return;
+}
+if (inv_total(inv, chinacup_empty) > 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, bowl_nettletea) > 0) {
+    @ahoy_crone_give_cup;
 }
 ~chatplayer("<p,quiz>Were you once a disciple of Necrovarus in the Temple of Phasmatys, old woman?");
 ~chatnpc("<p,sad>I don't remember; I am so old and my memory goes back only so far...");

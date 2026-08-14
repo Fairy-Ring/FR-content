@@ -1,0 +1,40 @@
+// Ghosts Ahoy — crone gives porcelain cup; pour bowl tea into it.
+// CANDIDATE last-resort 2007-base minus milk / dest / ectophial / pour mes.
+// Stay ahoy_questvar 3. Hunt 289? no.
+// Cite ahoy-porcelain-cup-next-377.md.
+
+[label,ahoy_crone_give_cup]
+~chatplayer("<p,happy>Here's some tea for you, like you asked.");
+~chatnpc("<p,angry>Yes, but it's not in my special cup! I only ever drink from my special cup!!");
+~chatplayer("<p,quiz>I see. Can I have this special cup, then?");
+mes("The old crone gives you her special cup.");
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, chinacup_empty, 1);
+return;
+
+[opheldu,chinacup_empty]
+if (last_useitem = bowl_nettletea) {
+    @ahoy_pour_nettletea_cup;
+}
+~displaymessage(^dm_default);
+
+[opheldu,bowl_nettletea]
+if (last_useitem = chinacup_empty) {
+    @ahoy_pour_nettletea_cup;
+}
+~displaymessage(^dm_default);
+
+[label,ahoy_pour_nettletea_cup]
+if (inv_total(inv, bowl_nettletea) < 1 | inv_total(inv, chinacup_empty) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// No invented pour mes. Leftover bowl CANDIDATE. 0 XP. Stay 3.
+inv_del(inv, bowl_nettletea, 1);
+inv_del(inv, chinacup_empty, 1);
+inv_add(inv, bowl_empty, 1);
+inv_add(inv, chinacup_of_nettletea, 1);
+return;
