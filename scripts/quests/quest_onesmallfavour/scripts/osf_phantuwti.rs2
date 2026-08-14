@@ -1,16 +1,21 @@
-// One Small Favour — Phantuwti after Arhein 14→15 + PREFIX after free Petra 27.
-// First-talk CANDIDATE last-resort 2007-base. After-petra PREFIX same donor
-// Transcript:One Small Favour After freeing Petra minus Do you have any quests /
-// place / do-here / topic / vane-first. Cite osf-phantuwti-after-arhein-377.md
-// + osf-phantuwti-after-petra-377.md. Do not bind [opnpc1,seer].
-// No dest / 12346 / lamps / vane oploc / inv_add 4435. Hunt 289? no.
+// One Small Favour — Phantuwti after Arhein 14→15 + PREFIX after free Petra 27
+// + vane last-part grant 4435. First-talk / unwind KEEP. Grant CANDIDATE
+// last-resort I've fixed minus quests/place/topic. Cite
+// osf-weather-report-grant-377.md + osf-phantuwti-mid-repair-377.md.
+// Do not bind [opnpc1,seer]. No dest / 12346 / lamps. Hunt 289? no.
 
 [opnpc1,favour_phantuwti_farsight]
 if (%onesmallfavour < 15) {
     ~displaymessage(^dm_default);
     return;
 }
-// After free-Petra leftover (26→27). Insert above >=16 so cave reminder does not steal.
+// Grant / mid-repair / unwind above >=16 so cave reminder does not steal.
+if (%onesmallfavour >= 28 & %weathervanefixed = 1) {
+    @osf_phantuwti_vane_grant;
+}
+if (%onesmallfavour >= 28 & %onesmallfavourmulti_10_10 = 1 & %weathervanefixed = 0) {
+    @osf_phantuwti_mid_repair;
+}
 if (%onesmallfavour >= 27) {
     @osf_phantuwti_after_petra;
 }
@@ -95,4 +100,34 @@ if ($tools = 2) {
 if (%onesmallfavour = 27) {
     %onesmallfavour = 28;
 }
+return;
+
+// CANDIDATE last-resort mid-repair minus Changes. Stay 28. No 4435.
+[label,osf_phantuwti_mid_repair]
+~chatplayer("<p,happy>Hey, I'm fixing the weather vane!");
+~chatnpc("<p,happy>Fantastic, come and let me know when you've finished.");
+return;
+
+// CANDIDATE last-resort I've fixed minus Changes. Grant 4435. Write 28→29.
+[label,osf_phantuwti_vane_grant]
+if (%onesmallfavour >= 29) {
+    if (inv_total(inv, favour_weather_report) < 1) {
+        ~chatplayer("<p,sad>I've lost the weather report.");
+        ~chatnpc("<p,neutral>Well, I knew you were going to say that! Here you go...have another one!");
+        inv_add(inv, favour_weather_report, 1);
+        ~chatplayer("<p,happy>Thanks!");
+        return;
+    }
+    ~chatplayer("<p,quiz>Hi again, what should I do now?");
+    ~chatnpc("<p,neutral>I've no clue my friend, you mentioned something about Arhein, but your plans might have changed in the meantime.");
+    return;
+}
+~chatplayer("<p,happy>I've fixed the weather vane!");
+~chatnpc("<p,happy>Oh, thanks so much...you can't believe how helpful it is to get accurate predictions on the weather...we Seers are almost blind without it.");
+mes("Phantuwti starts compiling a weather report for you.");
+inv_add(inv, favour_weather_report, 1);
+if (%onesmallfavour = 28) {
+    %onesmallfavour = 29;
+}
+~chatnpc("<p,happy>There you go...a weather report as asked for...I hope it helps you!");
 return;

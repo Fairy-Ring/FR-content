@@ -99,25 +99,27 @@ if (%onesmallfavour < 28) {
     ~displaymessage(^dm_default);
     return;
 }
+// Snapshot before p_delay — delay corrupts last_useitem.
+def_obj $used = last_useitem;
 // No unique OSF player seq. Live adjacent [oplocu,anvil] pair.
-if (last_useitem = favour_ornament_broken | last_useitem = favour_directionals_broken | last_useitem = favour_pillar_broken) {
+if ($used = favour_ornament_broken | $used = favour_directionals_broken | $used = favour_pillar_broken) {
     anim(human_smithing, 0);
     sound_synth(anvil_4, 0, 0);
     p_delay(2);
 }
-if (last_useitem = favour_ornament_broken) {
+if ($used = favour_ornament_broken) {
     inv_del(inv, favour_ornament_broken, 1);
     inv_add(inv, favour_ornament_fixed, 1);
     mes("You fix the ornament.");
     return;
 }
-if (last_useitem = favour_directionals_broken) {
+if ($used = favour_directionals_broken) {
     inv_del(inv, favour_directionals_broken, 1);
     inv_add(inv, favour_directionals_fixed, 1);
     mes("You fix the directionals.");
     return;
 }
-if (last_useitem = favour_pillar_broken) {
+if ($used = favour_pillar_broken) {
     inv_del(inv, favour_pillar_broken, 1);
     inv_add(inv, favour_pillar_fixed, 1);
     mes("You fix the Weathervane Pillar.");
