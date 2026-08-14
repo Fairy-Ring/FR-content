@@ -1,12 +1,9 @@
-// One Small Favour — Seers weathervane Look / rusted Search / hammer / part grant.
-// CANDIDATE last-resort 2007-base minus Changes (OSRS Transcript:One Small Favour
-// Weather vane). Cite osf-weather-vane-look-next-377.md +
-// osf-weather-vane-search-next-377.md + osf-weather-vane-hammer-next-377.md +
-// osf-weather-vane-parts-377.md. Bind broken child 5809 only, not multi 5811.
-// Gate %onesmallfavour >= 28 (PREFIX roof-send). No dest / 12346 / 4435 /
-// weathervanefixed / bits 253–255. Hunt 289? no.
-// Loosen persist: packed unused %onesmallfavourmulti_9_9 (UNKNOWN leftover
-// candidate — not unnamed bits 17/19/23/24/27/28). Grant-done: _10_10.
+// One Small Favour — Seers weathervane Look / rusted Search / hammer / part grant
+// / anvil swap / Use-fixed / last-part. CANDIDATE last-resort 2007-base minus
+// Changes (OSRS Transcript:One Small Favour Weather vane). Bind broken child
+// 5809 only. Gate %onesmallfavour >= 28. No dest / 12346 / 4435. Hunt 289? no.
+// Loosen _9_9 · grant-done _10_10. Place bits ornamentfixed / directionalsfixed
+// / rotatingpillarfixed. Last part weathervanefixed. Stay 28.
 
 [oploc1,favour_weathervane_broken]
 if (%onesmallfavour < 28 | %weathervanefixed = 1) {
@@ -44,22 +41,69 @@ inv_add(inv, favour_pillar_broken, 1);
 return;
 
 [oplocu,favour_weathervane_broken]
-if (last_useitem ! hammer) {
-    ~displaymessage(^dm_default);
-    return;
-}
 if (%onesmallfavour < 28 | %weathervanefixed = 1) {
     ~displaymessage(^dm_default);
     return;
 }
-mes("You give the structure a good solid whack...");
-%onesmallfavourmulti_9_9 = 1;
+if (last_useitem = hammer) {
+    mes("You give the structure a good solid whack...");
+    %onesmallfavourmulti_9_9 = 1;
+    return;
+}
+if (last_useitem = favour_ornament_fixed | last_useitem = favour_directionals_fixed | last_useitem = favour_pillar_fixed) {
+    @osf_vane_place;
+}
+~displaymessage(^dm_default);
+return;
+
+[label,osf_vane_place]
+if (last_useitem = favour_ornament_fixed) {
+    if (%ornamentfixed = 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, favour_ornament_fixed, 1);
+    %ornamentfixed = 1;
+    mes("You fix the ornament into the weather vane.");
+} else if (last_useitem = favour_directionals_fixed) {
+    if (%directionalsfixed = 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, favour_directionals_fixed, 1);
+    %directionalsfixed = 1;
+    mes("You fix the directionals into the weather vane.");
+} else if (last_useitem = favour_pillar_fixed) {
+    if (%rotatingpillarfixed = 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, favour_pillar_fixed, 1);
+    %rotatingpillarfixed = 1;
+    mes("You fix the Weathervane Pillar into the weather vane.");
+} else {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%ornamentfixed = 1 & %directionalsfixed = 1 & %rotatingpillarfixed = 1) {
+    %weathervanefixed = 1;
+    // Packed synth 911 — leftover CANDIDATE last-part. Not a player seq.
+    sound_synth(fix_weathervane, 0, 0);
+    ~mesbox("You fix the last part of the weather vane into place.");
+    ~mesbox("The weather vane seems to be totally repaired.");
+}
 return;
 
 [label,osf_vane_anvil]
 if (%onesmallfavour < 28) {
     ~displaymessage(^dm_default);
     return;
+}
+// No unique OSF player seq. Live adjacent [oplocu,anvil] pair.
+if (last_useitem = favour_ornament_broken | last_useitem = favour_directionals_broken | last_useitem = favour_pillar_broken) {
+    anim(human_smithing, 0);
+    sound_synth(anvil_4, 0, 0);
+    p_delay(2);
 }
 if (last_useitem = favour_ornament_broken) {
     inv_del(inv, favour_ornament_broken, 1);
