@@ -1,11 +1,14 @@
 // Enakhra sandstone take — [opnpcu,enakh_lazim] only. Do not rewrite Talk-to.
-// Period process VERIFIED 23 Jan: he holds 1/2/5/10 kg to exact 32, returns one lump.
-// Spoken hand-in Still missing. Carry field stores kg (CANDIDATE 0–32 in room 0–127).
-// Never 10 / Camulet / statue / chisel / dest. Hunt 289? no.
+// Period 23 Jan: hold 1/2/5/10 to exact 32 then exact 20. Carry stores kg (CANDIDATE).
+// Statue 0 = 32 kg base lump. Statue 1 = 20 kg body lump. Never 10 / Camulet / dest.
 // Cite enakhra-sandstone-period-media-377.md §2.
 
 [opnpcu,enakh_lazim]
 if (%enakh_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%enakh_statue_multivar >= 2) {
     ~displaymessage(^dm_default);
     return;
 }
@@ -23,22 +26,31 @@ if ($used = enakh_sandstone_tiny | $used = cert_enakh_sandstone_tiny) {
     ~displaymessage(^dm_default);
     return;
 }
-if (calc(%enakh_lazim_carrying_stone + $kg) > 32) {
+def_int $need = 32;
+if (%enakh_statue_multivar = 1) {
+    $need = 20;
+}
+if (calc(%enakh_lazim_carrying_stone + $kg) > $need) {
     ~chatnpc("<p,neutral>That's more than I need for this part. Bring me a smaller block.");
     return;
 }
-if (calc(%enakh_lazim_carrying_stone + $kg) = 32 & inv_freespace(inv) < 1) {
+if (calc(%enakh_lazim_carrying_stone + $kg) = $need & inv_freespace(inv) < 1) {
     ~chatnpc("<p,sad>You do not have room for the finished block.");
     return;
 }
 inv_del(inv, $used, 1);
 %enakh_lazim_carrying_stone = calc(%enakh_lazim_carrying_stone + $kg);
 mes("You give Lazim the sandstone.");
-if (%enakh_lazim_carrying_stone < 32) {
+if (%enakh_lazim_carrying_stone < $need) {
     ~chatnpc("<p,neutral>I will hold that for you.");
     return;
 }
 %enakh_lazim_carrying_stone = 0;
+if ($need = 20) {
+    inv_add(inv, enakh_sandstone_huge_body, 1);
+    ~chatnpc("<p,happy>That's enough sandstone for the body.");
+    return;
+}
 inv_add(inv, enakh_sandstone_huge_base+legs, 1);
 ~chatnpc("<p,happy>That's enough sandstone for the base.");
 return;
