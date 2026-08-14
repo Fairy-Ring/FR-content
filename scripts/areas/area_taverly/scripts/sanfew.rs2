@@ -8,13 +8,22 @@ if(%druidquest = ^druid_spoken_sanfew) {
 // No dest / tea craft / 12346. Hunt 289? no.
 if (%onesmallfavour >= 12) {
     def_int $osf = 0;
-    if (%onesmallfavour >= 13) {
+    if (%onesmallfavour >= 31) {
+        $osf = ~p_choice2("Hi there, the Gnome Pilot has agreed to take you to see the ogres!", 1, "Something else.", 2);
+        if ($osf = 1) {
+            @osf_sanfew_unwind;
+            return;
+        }
+    } else if (%onesmallfavour >= 13) {
         $osf = ~p_choice2("A dwarf I know wants to become an initiate.", 1, "Something else.", 2);
+        if ($osf = 1) {
+            @osf_sanfew_initiate;
+        }
     } else {
         $osf = ~p_choice2("Are you taking any new initiates?", 1, "Something else.", 2);
-    }
-    if ($osf = 1) {
-        @osf_sanfew_initiate;
+        if ($osf = 1) {
+            @osf_sanfew_initiate;
+        }
     }
 }
 if(%eadgar_quest = ^eadgar_unlocked_storeroom & inv_total(inv, eadgar_goutweed_herb) > 0) { //this should fire AFTER "What can I do for you young 'un?"
@@ -239,5 +248,20 @@ if ($yes = 2) {
 ~chatplayer("<p,neutral>Ok, I think I understand.");
 if (%onesmallfavour = 12) {
     %onesmallfavour = 13;
+}
+return;
+
+// CANDIDATE last-resort heading-back Sanfew minus Changes. Write 31→32.
+// Hide first-prefix initiate. No dest / tea / 12346 / Hammerspike Attack.
+[label,osf_sanfew_unwind]
+~chatplayer("<p,happy>Hi there, the Gnome Pilot has agreed to take you to see the ogres!");
+if (%onesmallfavour >= 32) {
+    ~chatnpc("<p,neutral>Please tell that dwarf that he's welcome to come here and train to be an initiate.");
+    return;
+}
+~chatnpc("<p,happy>What's that? He's agreed to take me...well that's wonderful! Many thanks.");
+~chatnpc("<p,neutral>Please tell that dwarf that he's welcome to come here and train to be an initiate.");
+if (%onesmallfavour = 31) {
+    %onesmallfavour = 32;
 }
 return;

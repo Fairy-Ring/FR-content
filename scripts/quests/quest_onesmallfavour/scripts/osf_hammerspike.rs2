@@ -8,6 +8,13 @@ if (%onesmallfavour < 11) {
     ~displaymessage(^dm_default);
     return;
 }
+// Return leftover after Sanfew unwind 31→32. Tip.it 2007 two-talk:
+// first talk = initiate news + changed mind (this hop). Second talk /
+// leftover-IF Attack / after-kill = later. Cite osf-hammerspike-return-377.md.
+if (%onesmallfavour >= 32) {
+    @osf_hammerspike_return;
+    return;
+}
 if (%onesmallfavour >= 12) {
     ~chatnpc("<p,angry>And what's wrong now?");
     ~chatplayer("<p,quiz>What was it that I was supposed to do for you?");
@@ -37,5 +44,23 @@ if ($yes = 2) {
 ~chatnpc("<p,happy>Good...I mean great! Come back when Sanfew has agreed to take me as an initiate!");
 if (%onesmallfavour = 11) {
     %onesmallfavour = 12;
+}
+return;
+
+[label,osf_hammerspike_return]
+// CANDIDATE last-resort 2007-base (Tip.it 2007 §23 first talk + Transcript
+// heading-back minus OSRS one-talk collapse / "My men"). Hunt 289? no.
+if (%onesmallfavour >= 33) {
+    ~chatnpc("<p,happy>Ha, ha ha ha! How funny is that! I've gone and changed my mind now!");
+    ~chatnpc("<p,shifty>I've decided that I make a far better gangster than I ever would a druid!");
+    return;
+}
+~chatnpc("<p,happy>Oh, it's you! Back are you then?");
+~chatplayer("<p,happy>Yep and with good news...your life is about to change for the better.");
+~chatplayer("<p,happy>I've persuaded Sanfew to take you in as an initiate!");
+~chatnpc("<p,happy>Ha, ha ha ha! How funny is that! I've gone and changed my mind now!");
+~chatnpc("<p,shifty>I've decided that I make a far better gangster than I ever would a druid!");
+if (%onesmallfavour = 32) {
+    %onesmallfavour = 33;
 }
 return;
