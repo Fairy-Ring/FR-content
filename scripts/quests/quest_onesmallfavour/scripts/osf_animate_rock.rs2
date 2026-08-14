@@ -1,0 +1,20 @@
+// One Small Favour — animate-rock scroll Read after Cromperty oxide-return 24→25.
+// Packed iop1=Read. CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour
+// Using the animate rock scroll minus Changes). No dest / Slagilith / free Petra / 12346.
+// Hunt 289? no. Cite osf-cromperty-scroll-read-377.md.
+
+[opheld1,favour_animate_rock]
+if (%onesmallfavour < 25) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// Sculpture alcove: loc 5808 @ 0_40_153_61_43 (2621, 9835). Stand west 2620, 9835.
+// inzone is the carved room only — not Cannon landing 2620, 9797.
+if (inzone(0_40_153_58_39, 0_40_153_61_47, coord) = false) {
+    mes("The spell doesn't seem to be working here.");
+    return;
+}
+~chatplayer("<p,happy>Um nahi listic durooo-rah!");
+~chatplayer("<p,shock>Whoooah! That was a bit of a misfire.");
+~chatplayer("<p,shock>And this doesn't look good!");
+return;
