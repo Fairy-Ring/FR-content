@@ -3,7 +3,22 @@ if(inv_total(inv, trail_clue_easy_simple025) = 1) {
     @trail_arhein;
 }
 ~chatnpc("<p,happy>Hello! Would you like to trade?");
-def_int $option = ~p_choice3("Yes.", 1, "No thank you.", 2, "Is that your ship?", 3);
+// One Small Favour leftover after Bleemadge 13→14. Keep shop / ship / trail.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Arhein).
+// No dest / weather grant / 12346. Hunt 289? no.
+def_int $option = 0;
+if (%onesmallfavour >= 14) {
+    if (%onesmallfavour >= 15) {
+        $option = ~p_choice4("Yes.", 1, "No thank you.", 2, "Is that your ship?", 3, "What did you want me to do again?", 4);
+    } else {
+        $option = ~p_choice4("Yes.", 1, "No thank you.", 2, "Is that your ship?", 3, "I need to talk T.R.A.S.H. to you.", 4);
+    }
+    if ($option = 4) {
+        @osf_arhein_trash;
+    }
+} else {
+    $option = ~p_choice3("Yes.", 1, "No thank you.", 2, "Is that your ship?", 3);
+}
 if($option = 1) {
     ~chatplayer("<p,neutral>Sure.");
     ~openshop_activenpc;
@@ -52,3 +67,34 @@ switch_int(~p_choice2("Can you drop me off on the way down please?", 1, "Aren't 
 // https://www.youtube.com/watch?v=oLqbhQX1HpM
 ~chatnpc("<p,happy>Well done, matey!");
 ~progress_clue_easy(trail_clue_easy_simple025, "Arhein has given you another clue scroll!");
+
+[label,osf_arhein_trash]
+if (%onesmallfavour >= 15) {
+    ~chatplayer("<p,quiz>What did you want me to do again?");
+    ~chatnpc("<p,neutral>I just need you to pop along to Seers Village and ask those philosophers of foresight for a weather report. I believe a new seer there called Phantuwti can help you.");
+    return;
+}
+~chatplayer("<p,neutral>I need to talk T.R.A.S.H. to you.");
+~chatnpc("<p,quiz>Oh yes, well it won't be the first time...but just so I'm sure can you explain what you mean?");
+~chatplayer("<p,neutral>Yes, of course. There's a Gnome on White Wolf mountain who needs some T.R.A.S.H...for his glider...do you have some?");
+~chatnpc("<p,neutral>Well, I've done a lot of research into Triple Redundant Aero Super Hawsers and it seems to have paid off, but answer me this one question. Why are you asking me this rather than the Gnome?");
+~chatplayer("<p,neutral>Well, I'm sort of doing him a favour.");
+~chatnpc("<p,quiz>Hmm, really, is that so? Well, I do have some Triple Redundant Aero Super Hawser and I'll let you have some if you do me just one small favour.");
+~chatplayer("<p,angry>How totally unpredictable!");
+~chatnpc("<p,happy>No, this is a really quick thing and shouldn't take you longer than a few minutes.");
+~chatplayer("<p,sad>Yeah, I've heard that before! Go on...tell me anyway.");
+~chatnpc("<p,neutral>I'm funding a rather expensive trade run to Brimhaven soon and I want to be sure that the weather isn't going to change and cause my ships any trouble.");
+~chatnpc("<p,neutral>The last thing I need is a load of goods going straight to the bottom of the ocean.");
+~chatplayer("<p,neutral>Well, I can understand that.");
+~chatnpc("<p,neutral>I just need you to pop along to Seers Village and ask those philosophers of foresight for a weather report. I believe a new seer there called Phantuwti can help you.");
+def_int $yes = ~p_choice2("Yes, Ok, I'll do it!", 1, "No way...I've had enough of this wild goose chase.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>No way...I've had enough of this wild goose chase.");
+    return;
+}
+~chatplayer("<p,happy>Yes, Ok, I'll do it!");
+~chatnpc("<p,happy>That's great, many thanks.");
+if (%onesmallfavour = 14) {
+    %onesmallfavour = 15;
+}
+return;
