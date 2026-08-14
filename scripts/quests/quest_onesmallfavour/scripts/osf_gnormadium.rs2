@@ -39,9 +39,13 @@ if ($op = 4) {
 return;
 
 [label,osf_gnorm_menu_after]
-// CANDIDATE p_choice5 slot swap: 0 chisel → sale; else reminder. Cite osf-gnormadium-chisel-377.md.
+// CANDIDATE p_choice5 slot swap. Cite osf-gnormadium-chisel-377.md / osf-gnormadium-fixed-lights-377.md.
 def_int $again = 0;
-if (inv_total(inv, chisel) = 0) {
+if (%all_lights_fixed = 1) {
+    $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything I can do?", 3, "Do you need any more help from me?", 4, "Okay, thanks.", 5);
+} else if (~osf_light_count = 8) {
+    $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything that I can do?", 3, "I've fixed all the lights!", 4, "Okay, thanks.", 5);
+} else if (inv_total(inv, chisel) = 0) {
     $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything that I can do?", 3, "I need a chisel to fix these crystals.", 4, "Okay, thanks.", 5);
 } else {
     $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything that I can do?", 3, "What was it you wanted me to do again?", 4, "Okay, thanks.", 5);
@@ -58,11 +62,22 @@ if ($again = 2) {
     @osf_gnorm_menu_after;
 }
 if ($again = 3) {
+    if (%all_lights_fixed = 1) {
+        ~chatplayer("<p,quiz>Is there anything I can do?");
+        ~chatnpc("<p,happy>No thanks, you've helped enough by fixing those lights!");
+        @osf_gnorm_menu_after;
+    }
     ~chatplayer("<p,quiz>Is there anything that I can do?");
     ~chatnpc("<p,neutral>Not really, I'm afraid, it's probably all far too technical for someone like you.");
     @osf_gnorm_menu_after;
 }
 if ($again = 4) {
+    if (%all_lights_fixed = 1) {
+        @osf_gnorm_after_fix;
+    }
+    if (~osf_light_count = 8) {
+        @osf_gnorm_fixed;
+    }
     if (inv_total(inv, chisel) = 0) {
         @osf_gnorm_chisel;
     }
@@ -115,4 +130,21 @@ inv_del(inv, coins, 10);
 inv_add(inv, chisel, 1);
 ~mesbox("You pay ten coins for the chisel.");
 ~chatnpc("<p,happy>Okay, many thanks for your custom.");
+return;
+
+[label,osf_gnorm_fixed]
+~chatplayer("<p,happy>I've fixed all the lights!");
+~chatnpc("<p,quiz>Hmm. That seems a tad unlikely to me, but let's flick the switch here and see, shall we?!");
+%all_lights_fixed = 1;
+if (%onesmallfavour = 21) {
+    %onesmallfavour = 22;
+}
+~chatnpc("<p,shock>I don't believe it - you fixed it! Well done, well done... We can pack up now and leave these ogres in peace.");
+~chatplayer("<p,happy>I know one ogre who'll be very pleased about that!");
+return;
+
+[label,osf_gnorm_after_fix]
+~chatplayer("<p,quiz>Do you need any more help from me?");
+~chatnpc("<p,happy>No, it's all great now that you've fixed the landing lights... I must admit, I was surprised you managed to pull that off.");
+~chatnpc("<p,quiz>Are you sure you don't have any gnomish ancestors? Your insight into technical things is quite amazing for a human!");
 return;
