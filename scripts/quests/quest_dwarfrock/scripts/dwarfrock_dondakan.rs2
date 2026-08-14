@@ -1,0 +1,135 @@
+// Between a Rock… start-gate — Dondakan the Dwarf (dwarfrock_dondakan 1837).
+// CANDIDATE last-resort 2007-base: OSRS Transcript minus Overview / overlay.
+// Hunt 289? no. Bind the child, not the multi parent.
+// Accept: %dwarfrock_quest 0→1 only. Pointer may set dwarfrock_lookingforinfo.
+// Never schematic / gold CB / inside / complete. Cite between-a-rock-start-talk-377.md §4.
+
+[opnpc1,dwarfrock_dondakan]
+if (%dwarfrock_quest >= 10) {
+    @dwarfrock_dondakan_started;
+}
+@dwarfrock_dondakan_hello;
+
+[label,dwarfrock_dondakan_hello]
+~chatplayer("<p,happy>Hello!");
+~chatnpc("<p,quiz>What?");
+~chatplayer("<p,neutral>I said hello!");
+~chatnpc("<p,happy>Hello!");
+@dwarfrock_dondakan_menu;
+
+[label,dwarfrock_dondakan_menu]
+def_int $m = ~p_choice4("Who are you?", 1, "Why are you firing a cannon at a wall?", 2, "Bit noisy here, isn't it?", 3, "Goodbye!", 4);
+if ($m = 1) {
+    @dwarfrock_dondakan_who;
+}
+if ($m = 2) {
+    @dwarfrock_dondakan_cannon;
+}
+if ($m = 3) {
+    @dwarfrock_dondakan_noisy;
+}
+~chatplayer("<p,neutral>Goodbye!");
+return;
+
+[label,dwarfrock_dondakan_who]
+~chatplayer("<p,quiz>Who are you?");
+~chatnpc("<p,happy>Why, I'm Dondakan, of course!");
+@dwarfrock_dondakan_menu;
+
+[label,dwarfrock_dondakan_noisy]
+~chatplayer("<p,quiz>Bit noisy here, isn't it?");
+~chatnpc("<p,confused>Cozy? No, not really, it's damp and cold!");
+~chatplayer("<p,angry>No! I said it's noisy!");
+~chatnpc("<p,angry>Then stop shouting!");
+@dwarfrock_dondakan_menu;
+
+[label,dwarfrock_dondakan_cannon]
+~chatplayer("<p,quiz>Why are you firing a cannon at a wall?");
+~chatnpc("<p,shifty>I can't tell you!");
+~chatplayer("<p,quiz>Why not?");
+if (%fishingcompo < ^fishingcompo_complete) {
+    @dwarfrock_dondakan_need_fc;
+}
+if (%mcannon < ^mcannon_complete) {
+    @dwarfrock_dondakan_need_cannon;
+}
+@dwarfrock_dondakan_pitch;
+
+[label,dwarfrock_dondakan_need_fc]
+~chatnpc("<p,shifty>You're a human! This is a dwarven thing!");
+~chatplayer("<p,quiz>Isn't there anything I can do that will make you tell me?");
+~chatnpc("<p,neutral>Perhaps if you were to help some of my fellow dwarves...");
+~chatnpc("<p,neutral>I hear there is a fishing competition that a few of my distant kinsmen are keen on winning, for instance.");
+~chatplayer("<p,confused>A fishing competition? What are dwarves doing in a fishing competition?");
+~chatnpc("<p,laugh>They're not in it! They can't fish if their lives depended on it!");
+~chatnpc("<p,neutral>That's where you come in! Run along now!");
+@dwarfrock_dondakan_menu;
+
+[label,dwarfrock_dondakan_need_cannon]
+~chatnpc("<p,neutral>Well... you are the Fishing Champion... but I still can't really speak about this.");
+~chatnpc("<p,shifty>The cannon is a top-secret dwarven project, you know.");
+~chatplayer("<p,quiz>Doesn't look very secret to me, standing out there in the open.");
+~chatnpc("<p,angry>Being cheeky eh?");
+~chatnpc("<p,neutral>Maybe you should speak to Lawgof, the Commander of the Black Guard in Kandarin.");
+@dwarfrock_dondakan_menu;
+
+[label,dwarfrock_dondakan_pitch]
+~chatnpc("<p,angry>It's not a wall! It's a rock!");
+~chatplayer("<p,quiz>What's the difference?");
+~chatnpc("<p,happy>It's a very special rock!");
+~chatplayer("<p,confused>I still don't quite follow...");
+~chatnpc("<p,angry>Oh, for Guthix' sake, it's perfectly simple! See, that rock over there, it's impenetrable!");
+~chatplayer("<p,quiz>Have you tried taking a pickaxe to it?");
+~chatnpc("<p,neutral>Of course I have, I'm holding this rune pickaxe, aren't I? We've been trying to mine through it for years!");
+~chatplayer("<p,quiz>We? I don't see anyone else.");
+~chatnpc("<p,sad>Well, I'm the only one left... all the others gave up. Said it wasn't worth their while anymore. Wouldn't have a good return profit on their time investment.");
+~chatnpc("<p,neutral>At first we thought there might be a huge treasure behind the rock, you see.");
+~chatplayer("<p,quiz>Isn't there?");
+~chatnpc("<p,sad>Until we had a look further down the stream, around the rock... no, there's no treasure there, just a dead end.");
+~chatplayer("<p,quiz>Okay... so why were you trying to get through the rock again?");
+~chatnpc("<p,happy>Because obviously there are vast deposits of minerals inside the rock! And if not, I want to harness the extreme hardness of the rock itself!");
+~chatnpc("<p,sad>The only problem is that I have run out of ideas on how to do it.");
+~chatnpc("<p,quiz>Perhaps a young adventurer like you is willing to help out an old dwarf like me? Want to find out what's inside the rock?");
+def_int $yes = ~p_choice2("Sure, sounds interesting!", 1, "No thanks, I do enough mining on my own.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,neutral>No thanks, I do enough mining on my own.");
+    ~chatnpc("<p,angry>Suit yourself, I don't need any help from a human anyway!");
+    return;
+}
+~chatplayer("<p,happy>Sure, sounds interesting!");
+~chatnpc("<p,happy>Welcome aboard then!");
+// Multi table is 0/10/20…/110. Index 1–9 is 65535 — writing 1 hides him.
+if (%dwarfrock_quest = 0) {
+    %dwarfrock_quest = 10;
+}
+return;
+
+[label,dwarfrock_dondakan_started]
+def_int $s = ~p_choice3("Any idea on what's inside the rock?", 1, "What did you need me to do?", 2, "I'll be back later.", 3);
+if ($s = 3) {
+    ~chatplayer("<p,neutral>I'll be back later.");
+    return;
+}
+if ($s = 1) {
+    ~chatplayer("<p,quiz>Any idea on what's inside the rock?");
+} else {
+    ~chatplayer("<p,quiz>What did you need me to do?");
+}
+~chatnpc("<p,happy>No, but that's where you come in!");
+~chatplayer("<p,quiz>How so?");
+~chatnpc("<p,neutral>I want you to find out some more information on the rock.");
+~chatplayer("<p,quiz>Now where would I do that?");
+~chatnpc("<p,confused>I don't know! Wish I knew!");
+~chatnpc("<p,neutral>But we have to get some better understanding of what this thing actually is. Maybe then we can find a way to break it open.");
+~chatplayer("<p,quiz>And what are you going to do while I go running across half of Gielinor, I'll wager?");
+~chatnpc("<p,happy>I'll guard my cannon and fire more cannonballs at it, of course! Wish I had your job, mine's a tough one!");
+~chatplayer("<p,quiz>Want to trade places?");
+~chatnpc("<p,sad>My legs are too old and worn to do much running around anymore, I'm afraid.");
+~chatnpc("<p,happy>Well, off you go now! Start running, start talking!");
+~chatplayer("<p,confused>But I still don't know where!");
+~chatnpc("<p,angry>Oh, why so difficult?");
+~chatnpc("<p,neutral>Look, try the city, further down the stream here. There's bound to be someone there who knows something. If you still can't find anyone, go to the librarian, he knows a lot.");
+if (%dwarfrock_lookingforinfo = 0) {
+    %dwarfrock_lookingforinfo = 1;
+}
+return;

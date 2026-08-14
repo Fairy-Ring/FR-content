@@ -1,0 +1,20 @@
+// Ratcatchers stage-0 refuse — Phingspet 2947 / Grimesquit 2946.
+// CANDIDATE last-resort 2007-base: OSRS Historical Before starting
+// (oldid 12562212 / 12562214) minus 2024 'Ello rewrite.
+// Hunt 289? no. Same Grimesquit-first block on both Talk-to.
+// 0 write. No Gertrude bolt. No inter_322. Cite ratcatchers-phingspet-first-slice-377.md §5.
+
+[opnpc1,vc_phingspet]
+@ratcatch_sisters_refuse;
+
+[opnpc1,vc_grimesquit]
+@ratcatch_sisters_refuse;
+
+[label,ratcatch_sisters_refuse]
+~chatnpc_specific("Grimesquit", vc_grimesquit, "<p,quiz>What's you want?");
+~chatnpc_specific("Phingspet", vc_phingspet, "<p,quiz>Ya what's zey want?");
+~chatnpc_specific("Grimesquit", vc_grimesquit, "<p,confused>I don't know it's why I is asking 'em.");
+~chatnpc_specific("Phingspet", vc_phingspet, "<p,neutral>Why do we care what zey wants let's get back to rat splattin'.");
+~chatnpc_specific("Grimesquit", vc_grimesquit, "<p,happy>Ya good plan.");
+~chatplayer("<p,confused>Em... Ahemm.. Excuse me?");
+return;

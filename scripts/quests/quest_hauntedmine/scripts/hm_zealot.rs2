@@ -1,0 +1,150 @@
+// Haunted Mine start-gate — Zealot (saradominist_zealot 1528) @ 3444,3258.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Starting out minus overlay.
+// Hunt 289? no. Keep unpack Pickpocket (no [opnpc3] this unit).
+// Accept: %hauntedmine 0→1 only. No key grant. No hauntedmine_bits.
+// Cite haunted-mine-start-talk-377.md §4.
+
+[opnpc1,saradominist_zealot]
+if (%hauntedmine >= 1) {
+    @hm_zealot_started;
+}
+@hm_zealot_hello;
+
+[label,hm_zealot_hello]
+~chatplayer("<p,happy>Hello there.");
+~chatnpc("<p,neutral>State thy allegiance stranger.");
+def_int $a = ~p_choice4("I follow the path of Saradomin.", 1, "I serve only Zamorak.", 2, "My beliefs are in accord with the teachings of Guthix.", 3, "I have no particular allegiance.", 4);
+if ($a = 2) {
+    @hm_zealot_zamorak;
+}
+if ($a = 3) {
+    @hm_zealot_guthix;
+}
+if ($a = 4) {
+    @hm_zealot_none;
+}
+@hm_zealot_saradomin;
+
+[label,hm_zealot_saradomin]
+~chatplayer("<p,neutral>I follow the path of Saradomin. Strength through wisdom.");
+~chatnpc("<p,happy>Ah, a wise choice my friend. But if you truly follow Saradomin, what brings you to these evil lands?");
+def_int $s = ~p_choice3("I come seeking challenges and quests.", 1, "Ok I lied.", 2, "I could ask the same of you.", 3);
+if ($s = 2) {
+    ~chatplayer("<p,shifty>Ok I lied, I don't support Saradomin. I'm only here for dastardly evil purposes.");
+    ~chatnpc("<p,angry>Then leave me, I have no time to listen to your poisonous tongue.");
+    return;
+}
+if ($s = 3) {
+    ~chatplayer("<p,quiz>I could ask the same of you.");
+    ~chatnpc("<p,happy>Saradomin has granted you wisdom. The evil creatures of this land are cunning and you are right to question anyone's purpose here.");
+    ~chatnpc("<p,neutral>I am upon a quest. One that will allow Saradomin to be glorified even in these dark lands.");
+    @hm_zealot_pitch;
+}
+~chatplayer("<p,neutral>I come seeking challenges and quests.");
+@hm_zealot_pitch;
+
+[label,hm_zealot_zamorak]
+~chatplayer("<p,angry>I serve only Zamorak. Strength through chaos.");
+~chatnpc("<p,angry>Then begone. Normally I would strike you down in an instant, but for now I have no time. I am on a quest of the utmost importance.");
+def_int $z = ~p_choice2("What is this quest of which you speak?", 1, "Fine, I didn't want to talk to you either.", 2);
+if ($z = 1) {
+    ~chatplayer("<p,quiz>What is this quest of which you speak?");
+    ~chatnpc("<p,angry>It is no concern of yours, but rest assured it will help in crushing you and those others who serve your vile master.");
+    ~chatplayer("<p,shifty>I doubt that.");
+    ~chatnpc("<p,neutral>I would expect nothing less of you, misguided as you already are.");
+    return;
+}
+~chatplayer("<p,angry>Fine, I didn't want to talk to you either.");
+~chatnpc("<p,angry>Fear not fiend, even though I may leave you be, you shall not escape justice at the hands of the righteous.");
+return;
+
+[label,hm_zealot_guthix]
+~chatplayer("<p,neutral>My beliefs are in accord with the teachings of Guthix. Balance is power.");
+~chatnpc("<p,confused>A wishy washy set of beliefs. You should follow Saradomin and find a real purpose in your life.");
+def_int $g = ~p_choice2("And what sort of purpose would that be?", 1, "I can make my own choices.", 2);
+if ($g = 2) {
+    ~chatplayer("<p,angry>I can make my own choices, who are you to dispute them?");
+    ~chatnpc("<p,neutral>I look only to help those who are misguided.");
+    return;
+}
+~chatplayer("<p,quiz>And what sort of purpose would that be?");
+~chatnpc("<p,happy>To further the glory of Saradomin of course.");
+~chatnpc("<p,neutral>Take myself, I am upon a quest that will allow Saradomin to be glorified even in these dark lands.");
+@hm_zealot_pitch;
+
+[label,hm_zealot_none]
+~chatplayer("<p,neutral>I have no particular allegiance.");
+~chatnpc("<p,sad>Then your life is without reason or direction. I would talk to you further on the matter, but for now my attentions must be elsewhere.");
+def_int $n = ~p_choice2("Then I shall leave you to your business.", 1, "Why, what are you doing?", 2);
+if ($n = 1) {
+    ~chatplayer("<p,neutral>Then I shall leave you to your business.");
+    ~chatnpc("<p,neutral>I shall pray that Saradomin grants you the wisdom to see through your folly.");
+    return;
+}
+~chatplayer("<p,quiz>Why, what are you doing?");
+~chatnpc("<p,neutral>I am upon a quest. One that will allow Saradomin to be glorified even in these dark lands.");
+@hm_zealot_pitch;
+
+[label,hm_zealot_pitch]
+def_int $p = ~p_choice2("What quest is that then?", 1, "I hope it goes well. Goodbye.", 2);
+if ($p = 2) {
+    ~chatplayer("<p,neutral>I hope it goes well. Goodbye.");
+    ~chatnpc("<p,happy>Goodbye, and may Saradomin give you strength through wisdom.");
+    return;
+}
+~chatplayer("<p,quiz>What quest is that then?");
+@hm_zealot_history;
+
+[label,hm_zealot_history]
+~chatnpc("<p,neutral>Well, below the very ground you stand upon lies an intricate network of tunnels that make up the abandoned Mort Ridge mines. These mines used to be a valuable resource to the inhabitants of Morytania.");
+~chatnpc("<p,neutral>As with many things, this changed when Misthalin was finally able to push the minions of Morytania back, and Saradomin himself blessed the river Salve.");
+~chatnpc("<p,neutral>The mines are also the site where the legendary artefact, the salve amulet, was thought to have been carved from the crystals that grow in the lower levels of the mine.");
+~chatnpc("<p,neutral>These crystals are thought to be formed by the blessed water of the river Salve as it percolates through the rocks to the lower levels of the mine.");
+~chatnpc("<p,neutral>It is not known what happened to the salve amulet, but it is generally believed that by encapsulating within it some of the goodness of Saradomin himself, it afforded the bearer power over evil.");
+~chatnpc("<p,neutral>Saradomin has entrusted me alone with the task of regaining access to the mines, whatever the dangers.");
+~chatplayer("<p,quiz>How can an abandoned mine be dangerous?");
+~chatnpc("<p,sad>Because the mines are said to be haunted. The crystals and the ridge used to be protected by Zamorak's mage, Treus Dayth.");
+~chatnpc("<p,neutral>Dayth failed and fell during an incursion by Saradominists, who then made it into the mines and were able to remove a shard of crystal.");
+~chatnpc("<p,angry>Zamorak, furious at his mage, condemned Dayth's soul indefinitely to an existence of turmoil in the mines. Dayth's soul is bound to prevent the crystals from ever being reached again.");
+~chatnpc("<p,sad>Further, Zamorak's then ruler upon the land ordered the slaughter of anyone within the mines and that the mines be sealed.");
+if (%hauntedmine = 0) {
+    %hauntedmine = 1;
+}
+@hm_zealot_after_history;
+
+[label,hm_zealot_after_history]
+def_int $h = ~p_choice2("Is there any other way into the mines?", 1, "I must be going now.", 2);
+if ($h = 2) {
+    ~chatplayer("<p,neutral>I must be going now, good luck on your quest.");
+    ~chatnpc("<p,happy>You should believe not in luck, but in the protection of Saradomin. Farewell.");
+    return;
+}
+@hm_zealot_other_way;
+
+[label,hm_zealot_started]
+~chatplayer("<p,happy>Hello there.");
+~chatnpc("<p,neutral>Hello again. I'm afraid I'm rather preoccupied. What was it you wanted?");
+def_int $r = ~p_choice3("Can you explain the history of these mines again?", 1, "Is there any other way into the mines?", 2, "I must be going now.", 3);
+if ($r = 3) {
+    ~chatplayer("<p,neutral>I must be going now, good luck on your quest.");
+    ~chatnpc("<p,happy>You should believe not in luck, but in the protection of Saradomin. Farewell.");
+    return;
+}
+if ($r = 1) {
+    @hm_zealot_history;
+}
+@hm_zealot_other_way;
+
+[label,hm_zealot_other_way]
+~chatplayer("<p,quiz>Is there any other way into the mines?");
+~chatnpc("<p,neutral>Indeed I have found hope that this may be so. By making discreet inquiries I have been led to believe that a second entrance may exist into the mines.");
+~chatnpc("<p,neutral>Further, I have come into possession of a key that will apparently afford entrance to the lower levels of the mines once inside.");
+def_int $k = ~p_choice2("Where is the second entrance to the mines?", 1, "Can I borrow your key?", 2);
+if ($k = 1) {
+    ~chatplayer("<p,quiz>Where is the second entrance to the mines?");
+    ~chatnpc("<p,sad>Of this I am not yet sure. From what I have been able to gather, it was not originally built for humans to enter by. Where it may be, I am still endeavoring to find out.");
+    return;
+}
+~chatplayer("<p,quiz>Can I borrow your key?");
+~chatnpc("<p,shifty>I am afraid my task can be entrusted to nobody else. Saradomin has asked me alone to do this. I cannot take the slightest risk of losing this key. The stakes are too high.");
+return;
