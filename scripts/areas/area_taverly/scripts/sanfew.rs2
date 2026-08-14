@@ -3,6 +3,20 @@ if(%druidquest = ^druid_spoken_sanfew) {
     @druid_sanfew_give_ingredients;
 }
 ~chatnpc("<p,quiz>What can I do for you young 'un?");
+// One Small Favour leftover after Hammerspike 11→12. Keep Eadgar / Druidic.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Sanfew).
+// No dest / tea craft / 12346. Hunt 289? no.
+if (%onesmallfavour >= 12) {
+    def_int $osf = 0;
+    if (%onesmallfavour >= 13) {
+        $osf = ~p_choice2("A dwarf I know wants to become an initiate.", 1, "Something else.", 2);
+    } else {
+        $osf = ~p_choice2("Are you taking any new initiates?", 1, "Something else.", 2);
+    }
+    if ($osf = 1) {
+        @osf_sanfew_initiate;
+    }
+}
 if(%eadgar_quest = ^eadgar_unlocked_storeroom & inv_total(inv, eadgar_goutweed_herb) > 0) { //this should fire AFTER "What can I do for you young 'un?"
     @sanfew_complete_eadgar;
 } else if(%eadgar_quest >= ^eadgar_started & %eadgar_quest <= ^eadgar_unlocked_storeroom) {
@@ -179,3 +193,51 @@ if(inv_total(inv, eadgar_goutweed_herb) > 0) {
     ~chatplayer("<p,quiz>Did you say you needed more goutweed?");
     ~chatnpc("<p,neutral>I don't need any more goutweed for the ritual, but it's still quite difficult for me to get. If you ever come across some, bring it to me; I'll exchange it for some other herbs.");
 }
+
+[label,osf_sanfew_initiate]
+if (%onesmallfavour >= 13) {
+    ~chatplayer("<p,quiz>A dwarf I know wants to become an initiate.");
+    ~chatnpc("<p,neutral>You need to heat some water up in a bowl, then pour it into an empty teacup. Add 1 harralander, 2 guam and 1 marrentill...it'll warm that poor fellow up a treat!");
+    ~chatnpc("<p,neutral>We call it 'Guthix's rest'. Take it to the gnome up on White Wolf mountain, and organise that trip with the gnome pilot.");
+    return;
+}
+~chatplayer("<p,quiz>Are you taking any new initiates?");
+~chatnpc("<p,quiz>Hmmm, are you considering yourself?");
+def_int $dwarf = ~p_choice2("A dwarf I know wants to become an initiate.", 1, "Ok, thanks.", 2);
+if ($dwarf = 2) {
+    ~chatplayer("<p,neutral>Okay, thanks.");
+    return;
+}
+~chatplayer("<p,neutral>A dwarf I know wants to become an initiate.");
+~chatnpc("<p,neutral>Oh yes? Well, that's interesting. Let me think for a moment. Hmmm... yes, actually, I don't mind taking him on, so long as you can do me just one small favour. Well, two actually.");
+~chatplayer("<p,shock>Not you as well?");
+~chatnpc("<p,angry>Stop interrupting me. I haven't told you about these favours!");
+~chatnpc("<p,neutral>There's a poor little gnome up on White Wolf mountain. I wondered if you could take him a warming herbal brew. I have the recipe here!");
+~chatplayer("<p,neutral>Well, that seems simple enough.");
+~chatnpc("<p,neutral>In addition...");
+~chatnpc("<p,neutral>I've long wished to take a trip down to see those ogres to the south of Yanille, and bring the word of Guthix to them. I was hoping you might organise this trip with the gnome pilot up there on White Wolf mountain.");
+~chatplayer("<p,shock>Are you mad?");
+~chatnpc("<p,neutral>Well, perhaps a bit... but it's never stopped you doing things for me before.");
+~chatplayer("<p,sad>I've been asked to do a lot of favours recently.");
+~chatnpc("<p,neutral>Well, that's the life of an adventurer. Is it a deal, or not?");
+def_int $yes = ~p_choice2("Yep, it's a deal.", 1, "Nope, it's not a deal!", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,angry>Nope, it's not a deal!");
+    ~chatnpc("<p,sad>Well, that's a shame. I was looking forward to visiting the ogres... Perhaps someday I will.");
+    return;
+}
+~chatplayer("<p,happy>Yep, it's a deal. Tell me the recipe for this herbal tea.");
+~chatnpc("<p,neutral>Ok, you need to heat some water up in a bowl, then pour it into an empty teacup. Add 1 harralander, 2 guam and 1 marrentill...it'll warm that poor fellow up a treat!");
+~chatplayer("<p,happy>Mmm, sounds delicious! What's it called?");
+~chatnpc("<p,happy>We call it 'Guthix's rest'.");
+~chatplayer("<p,quiz>Can I drink it?");
+~chatnpc("<p,neutral>If you want!");
+~chatplayer("<p,happy>Great! And thanks.");
+~chatnpc("<p,neutral>But you'll have to make another one for the gnome.");
+~chatplayer("<p,quiz>But I can drink it though.");
+~chatnpc("<p,neutral>Yes, but you'll have to make another one for the gnome.");
+~chatplayer("<p,neutral>Ok, I think I understand.");
+if (%onesmallfavour = 12) {
+    %onesmallfavour = 13;
+}
+return;
