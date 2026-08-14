@@ -1,9 +1,19 @@
-// One Small Favour — animate-rock scroll Read after Cromperty oxide-return 24→25.
-// Packed iop1=Read. CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour
-// Using the animate rock scroll minus Changes). No dest / Slagilith / free Petra / 12346.
-// Hunt 289? no. Cite osf-cromperty-scroll-read-377.md.
+// One Small Favour — animate-rock Read + Use-on-sculpture after grant 24→25.
+// Packed iop1=Read. Use is oplocu lastuse 4428. Same CANDIDATE misfire body.
+// No dest / Slagilith / free Petra / extra varp / 12346.
+// Hunt 289? no. Cite osf-cromperty-scroll-read-377.md + osf-animate-rock-377.md.
 
 [opheld1,favour_animate_rock]
+@osf_animate_rock_cast;
+
+[oplocu,favour_lady_in_wall]
+if (last_useitem ! favour_animate_rock) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@osf_animate_rock_cast;
+
+[label,osf_animate_rock_cast]
 if (%onesmallfavour < 25) {
     ~displaymessage(^dm_default);
     return;
