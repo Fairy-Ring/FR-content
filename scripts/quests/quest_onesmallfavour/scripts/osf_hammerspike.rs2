@@ -54,6 +54,7 @@ return;
 // Hunt 289? no.
 if (%onesmallfavour >= 33) {
     ~chatnpc("<p,angry>My men are going to deal with you!");
+    @osf_hammerspike_set_guards;
     return;
 }
 ~chatnpc("<p,happy>Oh, it's you! Back are you then?");
@@ -63,5 +64,21 @@ if (%onesmallfavour >= 33) {
 ~chatnpc("<p,shifty>I've decided that I make a far better gangster than I ever would a druid!");
 if (%onesmallfavour = 32) {
     %onesmallfavour = 33;
+}
+return;
+
+[label,osf_hammerspike_set_guards]
+// CANDIDATE last-resort 2007-base (Tip.it 2007 §23 set his guards /
+// Transcript men attack). Not leftover-IF Attack. Find range 8 = live
+// arena/foreman pattern (gang is packed 3–4 tiles N). Hunt 289? no.
+if_close;
+if (npc_find(coord, favour_gangster_dwarf, 8, 0) = true) {
+    npc_setmode(opplayer2);
+}
+if (npc_find(coord, favour_gangster_dwarf_2, 8, 0) = true) {
+    npc_setmode(opplayer2);
+}
+if (npc_find(coord, favour_gangster_dwarf_3, 8, 0) = true) {
+    npc_setmode(opplayer2);
 }
 return;

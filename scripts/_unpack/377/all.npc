@@ -42495,6 +42495,10 @@ op2=Attack
 resizev=129
 resizeh=142
 vislevel=44
+hitpoints=40
+attack=40
+strength=40
+defence=35
 head1=npc_1795_head
 
 [favour_gangster_dwarf_2]
@@ -42517,6 +42521,10 @@ op2=Attack
 resizev=125
 resizeh=135
 vislevel=48
+hitpoints=25
+attack=80
+strength=30
+defence=25
 head1=npc_lawgof2_head
 
 [favour_gangster_dwarf_3]
@@ -42541,6 +42549,10 @@ op2=Attack
 resizev=128
 resizeh=140
 vislevel=49
+hitpoints=25
+attack=30
+strength=60
+defence=57
 head1=npc_upassdwarf3_head
 
 [favour_phantuwti_farsight]
