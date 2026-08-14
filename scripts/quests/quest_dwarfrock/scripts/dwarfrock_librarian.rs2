@@ -1,0 +1,25 @@
+// Between a Rock — Keldagrim Librarian first Talk-to after Dondakan 0→10.
+// CANDIDATE last-resort 2007-base (OSRS Transcript: Knowledge of rocks)
+// minus library-tour leftover. Hunt 289? no.
+// Stay dwarfrock_quest 10. Never 110. No dest. Cite bar-engineer-first-talk-377.md.
+
+[opnpc1,dwarf_city_librarian]
+if (%dwarfrock_quest < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%dwarfrock_quest = 110) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatnpc("<p,happy>Welcome to the Keldagrim library, human traveller!");
+~chatplayer("<p,quiz>What do you know about impenetrable rocks?");
+~chatnpc("<p,quiz>You're confusing me, what rock exactly are you talking about?");
+~chatplayer("<p,neutral>The big one in the mines south of the city. Dondakan's big rock.");
+~chatnpc("<p,neutral>I see, I see.");
+~chatnpc("<p,sad>But I don't know much about that rock, I'm afraid. It's baffled us for many generations.");
+~chatnpc("<p,neutral>There is a dwarf in the mechanics shop, though, who I believe has some connections with a certain scholar.");
+~chatplayer("<p,quiz>Where can I find him exactly?");
+~chatnpc("<p,neutral>Go south to the palace, the shop is called Wemund's Wrench Warehouse. He should be working there somewhere.");
+~chatplayer("<p,happy>Thanks!");
+return;
