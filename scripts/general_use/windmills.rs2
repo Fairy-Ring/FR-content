@@ -28,6 +28,11 @@ if (last_useitem = pot_empty) {
 [oploc1,millbase]
 if(%millcheck_multi = 1 & %flour > 0) @millbase_take;
 
+// 274 binds Empty on the flour face too. 377 multi shows millbase_flour;
+// clicking it is [oploc1,millbase_flour], not millbase.
+[oploc1,millbase_flour]
+@millbase_take;
+
 [oplocu,millbase_flour]
 if (last_useitem = pot_empty) {
     @millbase_take;
