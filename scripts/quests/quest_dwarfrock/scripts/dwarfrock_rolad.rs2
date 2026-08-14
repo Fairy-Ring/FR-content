@@ -1,7 +1,8 @@
-// Between a Rock — Rolad first Talk-to after Engineer. Ice Mountain.
-// CANDIDATE last-resort 2007-base (OSRS Transcript: Rolad the scholar)
-// minus pages give / dest / schematic leftover. Hunt 289? no.
-// Stay dwarfrock_quest 10. Never 110. Cite bar-rolad-next-377.md.
+// Between a Rock — Rolad first Talk-to + pages return. Ice Mountain.
+// CANDIDATE last-resort 2007-base (OSRS Transcript: Rolad the scholar /
+// Talking to Rolad again). Hunt 289? no.
+// Stay dwarfrock_quest 10. Never 110. Cite bar-rolad-next-377.md +
+// bar-pages-leftover-377.md.
 
 [opnpc1,dwarfrock_rolad]
 if (%dwarfrock_quest < 10) {
@@ -11,6 +12,31 @@ if (%dwarfrock_quest < 10) {
 if (%dwarfrock_quest = 110) {
     ~displaymessage(^dm_default);
     return;
+}
+if (inv_total(inv, dwarf_rock_book) > 0) {
+    @bar_rolad_has_book;
+}
+def_int $pages = 0;
+if (inv_total(inv, dwarf_rock_page1) > 0) {
+    $pages = calc($pages + 1);
+}
+if (inv_total(inv, dwarf_rock_page2) > 0) {
+    $pages = calc($pages + 1);
+}
+if (inv_total(inv, dwarf_rock_page3) > 0) {
+    $pages = calc($pages + 1);
+}
+if (inv_total(inv, dwarf_rock_pagex2) > 0) {
+    $pages = calc($pages + 2);
+}
+if (inv_total(inv, dwarf_rock_pagex3) > 0) {
+    $pages = calc($pages + 3);
+}
+if ($pages >= 3) {
+    @bar_rolad_pages_return;
+}
+if ($pages > 0) {
+    @bar_rolad_pages_progress;
 }
 ~chatplayer("<p,quiz>Excuse me... would you happen to be Rolad the scholar?");
 ~chatnpc("<p,quiz>Why, yes, I think so... who's asking?");
@@ -32,4 +58,54 @@ if (%dwarfrock_quest = 110) {
 ~chatplayer("<p,quiz>What, in the mining guild?");
 ~chatnpc("<p,neutral>No no, I never go there, I'm not a member you know. But I sometimes go down to the regular mines to study the conditions of the working dwarf.");
 ~chatplayer("<p,happy>Okay, thanks, I'll go and look for the pages then.");
+return;
+
+[label,bar_rolad_has_book]
+~chatplayer("<p,happy>Thanks again for that book, I really appreciate it.");
+~chatnpc("<p,quiz>Oh yes, have you read it yet?");
+~chatplayer("<p,neutral>No, not yet, but I will.");
+return;
+
+[label,bar_rolad_pages_progress]
+~chatnpc("<p,quiz>How are you getting on with finding those missing pages?");
+if (inv_total(inv, dwarf_rock_pagex2) > 0 | (inv_total(inv, dwarf_rock_page1) > 0 & inv_total(inv, dwarf_rock_page2) > 0) | (inv_total(inv, dwarf_rock_page1) > 0 & inv_total(inv, dwarf_rock_page3) > 0) | (inv_total(inv, dwarf_rock_page2) > 0 & inv_total(inv, dwarf_rock_page3) > 0)) {
+    ~chatplayer("<p,happy>I found two of the pages! But I haven't found the last one yet.");
+    ~chatnpc("<p,happy>Marvelous! I'm sure it's only a matter of time before you find the final page!");
+    return;
+}
+~chatplayer("<p,neutral>Well, I found the first page, but I still have two to go.");
+~chatnpc("<p,happy>That's splendid, keep going and you'll find them all, I'm sure!");
+return;
+
+[label,bar_rolad_pages_return]
+~chatnpc("<p,quiz>How are you getting on with finding those missing pages?");
+~chatplayer("<p,happy>Look, I found all of your missing pages!");
+~chatnpc("<p,quiz>Missing pages...?");
+~chatplayer("<p,neutral>Yes, the missing pages of that book we were talking about earlier?");
+~chatnpc("<p,neutral>Oh yes, quite right... let me see them, please, and I'll put the book back together for you.");
+if (inv_total(inv, dwarf_rock_pagex3) > 0) {
+    inv_del(inv, dwarf_rock_pagex3, 1);
+} else {
+    if (inv_total(inv, dwarf_rock_pagex2) > 0) {
+        inv_del(inv, dwarf_rock_pagex2, 1);
+    }
+    if (inv_total(inv, dwarf_rock_page1) > 0) {
+        inv_del(inv, dwarf_rock_page1, 1);
+    }
+    if (inv_total(inv, dwarf_rock_page2) > 0) {
+        inv_del(inv, dwarf_rock_page2, 1);
+    }
+    if (inv_total(inv, dwarf_rock_page3) > 0) {
+        inv_del(inv, dwarf_rock_page3, 1);
+    }
+}
+inv_add(inv, dwarf_rock_book, 1);
+~chatnpc("<p,neutral>There you go... You will give it back when you've finished with it, won't you? I'd really like to study it in more detail some time.");
+def_int $opt = ~p_choice2("Of course.", 1, "Of course. (lie)", 2);
+if ($opt = 2) {
+    ~chatplayer("<p,neutral>Of course... when I've finished with it I'll give it back to you, sure...");
+} else {
+    ~chatplayer("<p,happy>Of course, I'd be happy to!");
+}
+~chatnpc("<p,happy>Splendid, now, there's a good dwarf!");
 return;
