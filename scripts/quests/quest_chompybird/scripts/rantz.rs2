@@ -19,6 +19,21 @@ if(%chompybird >= ^chompybird_rantz_gave_player_bow & ~obj_gettotal(ogre_bow) = 
             ~chatplayer("<p,neutral>No thanks...");
     }
 }
+// One Small Favour leftover after Tindel 18→19. Keep Chompy / hats / Use-on.
+// CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Rantz).
+// No dest / comfy 4426 / lights / 12346. Hunt 289? no.
+// Cite osf-rantz-after-tindel-377.md.
+if (%onesmallfavour >= 19) {
+    def_int $osf = 0;
+    if (%onesmallfavour >= 20) {
+        $osf = ~p_choice2("What did you want me to do again?", 1, "Something else.", 2);
+    } else {
+        $osf = ~p_choice2("I need to talk to you about a mattress.", 1, "Something else.", 2);
+    }
+    if ($osf = 1) {
+        @osf_rantz_mattress;
+    }
+}
 @rantz_main_dialogue;
 
 [label,rantz_main_dialogue]
@@ -791,3 +806,28 @@ if(.npc_finduid(%rantz_attacking_chompy) = true) {
         npc_say("Grrr...de'ese arrows are rubbish.");
     }
 }
+
+[label,osf_rantz_mattress]
+if (%onesmallfavour >= 20) {
+    ~chatplayer("<p,quiz>What did you want me to do again?");
+    ~chatnpc("<p,neutral>Yous creature, go see little guy and help wiv da man flapper 'come-down-place'...den Rantz helps yous creature wiv da fluffsies sack.");
+    return;
+}
+~chatplayer("<p,neutral>I need to talk to you about a mattress!");
+~chatnpc("<p,angry>You's creature shuvs flapper sack in rantz face, making rantz very upset");
+~chatplayer("<p,quiz>Can you fill this mattress with feathers?");
+~chatnpc("<p,sad>Der's no flappers to get cos da little guy scares dem away wiv his banging. He's making da man flapper 'come-down-place' and it's takin' ages and ages.");
+~chatnpc("<p,sad>Da chompies don't come no more since he's banging all da time.");
+~chatplayer("<p,quiz>What can I do about that?");
+~chatnpc("<p,neutral>You's can help da little guy, he's over der near da ogre city...he's stuck wiv sumfing, making da man flapper 'come-down-place'. Me's not doin' no chompy hunting wiv dat noise going on.");
+def_int $yes = ~p_choice2("Ok, I'll see what I can do.", 1, "Ok, thanks.", 2);
+if ($yes = 2) {
+    ~chatplayer("<p,neutral>Okay, thanks.");
+    return;
+}
+~chatplayer("<p,happy>Ok, I'll see what I can do.");
+~chatnpc("<p,happy>Dat would be da good find...den me's help wiv da flufsies sack.");
+if (%onesmallfavour = 19) {
+    %onesmallfavour = 20;
+}
+return;
