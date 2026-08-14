@@ -1,0 +1,161 @@
+// Desert Treasure — village Eblis (fd_elder_village 1923) after bartender rumor.
+// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Eblis
+// minus Desert Treasure I overlay / [sir/madam] / Overview / lodestone / take-items.
+// Hunt 289? no. Display stays Eblis. Bind the child, not fourdiamonds_elder.
+// Leave-us <5. Museum 5–6. Diamonds+list at 7. Yes-I-will-go 7→8.
+// Never 10 (mirrors overlap). Never 15. No inv_del / fd_* bits / mirrors.
+// Cite: docs/research/desert-treasure-eblis-first-slice-377.md §6 / §8.
+
+[opnpc1,fd_elder_village]
+if (%deserttreasure < 5) {
+    @dt_eblis_leave;
+}
+if (%deserttreasure = 8) {
+    @dt_eblis_nag;
+}
+if (%deserttreasure = 7) {
+    @dt_eblis_museum;
+}
+if (%deserttreasure = 5) {
+    @dt_eblis_museum;
+}
+if (%deserttreasure = 6) {
+    @dt_eblis_museum;
+}
+return;
+
+[label,dt_eblis_leave]
+~chatnpc("<p,angry>Leave us to our fate. We care nothing for the world that betrayed us, or those that come from it.");
+return;
+
+[label,dt_eblis_nag]
+~chatnpc("<p,neutral>Before I can complete the spell I will still need the following items;");
+~chatnpc("<p,neutral>12 magic logs 6 steel bars 6 molten glass");
+~chatnpc("<p,neutral>1 bones, 1 ashes, 1 charcoal and 1 blood rune");
+return;
+
+[label,dt_eblis_museum]
+~chatplayer("<p,neutral>Hello. I represent the Museum of Varrock, and I have reason to believe there may be some kinds of artefacts of historical significance in the nearby area...");
+~chatnpc("<p,angry>Ah yes. The only time people care about our existence is when they think they have something to gain from us.");
+~chatnpc("<p,angry>I have nothing to say to you. You and your kind are not welcome here.");
+~chatplayer("<p,quiz>Please, if I can just have a few minutes of your time to ask some questions...?");
+~chatnpc("<p,sad>(sigh) I suppose I can spare you that. What do you wish to know about?");
+if (%deserttreasure = 7) {
+    def_int $seven = ~p_choice5("Why is this village so hostile?", 1, "Do you know anything about treasure near here?", 2, "Do you know anything about a fortress near here?", 3, "Did you ever hear of the Diamonds of Azzanadra?", 4, "Nothing thanks.", 5);
+    if ($seven = 1) {
+        @dt_eblis_hostiles;
+    } else if ($seven = 2) {
+        @dt_eblis_treasure;
+    } else if ($seven = 3) {
+        @dt_eblis_fortress;
+    } else if ($seven = 4) {
+        @dt_eblis_diamonds;
+    }
+    @dt_eblis_nothing;
+}
+def_int $opt = ~p_choice4("Why is this village so hostile?", 1, "Do you know anything about treasure near here?", 2, "Do you know anything about a fortress near here?", 3, "Nothing thanks.", 4);
+if ($opt = 1) {
+    @dt_eblis_hostiles;
+} else if ($opt = 2) {
+    @dt_eblis_treasure;
+} else if ($opt = 3) {
+    @dt_eblis_fortress;
+}
+@dt_eblis_nothing;
+
+[label,dt_eblis_nothing]
+~chatplayer("<p,neutral>Actually, there was nothing I really wanted to ask you about.");
+~chatnpc("<p,angry>Yes, it is exactly like your sort to waste my time in such a way.");
+return;
+
+[label,dt_eblis_treasure]
+~chatplayer("<p,quiz>I was wondering if you knew anything about some treasure somewhere around here?");
+~chatplayer("<p,neutral>I have some evidence that there might be some kind of treasure hidden very close to this village...");
+~chatnpc("<p,sad>If I knew of any treasure I would not choose to spend my life in this gods-forsaken desert.");
+return;
+
+[label,dt_eblis_fortress]
+~chatplayer("<p,quiz>Do you know anything about some kind of fortress nearby? I have reason to believe there is, or at least used to be, some kind of fortress very close to here...");
+~chatnpc("<p,neutral>Nobody would build anything in this wasteland unless they were forced to, to survive.");
+~chatnpc("<p,neutral>I know of no fortress, I know of no reason why anyone would ever bother doing anything out here in the desert.");
+return;
+
+[label,dt_eblis_hostiles]
+~chatplayer("<p,quiz>Why are all of the people here so hostile? You would think I was asking you for money instead of just for answers to a few questions...");
+~chatnpc("<p,sad>It is a long story, and I doubt you have much interest in hearing it. Your sort never are, you just take what you can of ours, and then abandon us once more to the desert.");
+def_int $story = ~p_choice2("No, I want to hear this story.", 1, "I don't care about your story.", 2);
+if ($story = 2) {
+    @dt_eblis_hostiles_refuse;
+}
+~chatplayer("<p,neutral>Actually, I'd be quite interested to hear what it is you have to say to excuse the attitude everybody in this village seems to have.");
+~chatnpc("<p,neutral>Ah, it all begun many generations ago, when our ancestors were the proud rulers of these lands...");
+~chatnpc("<p,neutral>My ancestors lived far to the North of here, and our lands stretched from the sea in the East to the river Lum, and the mountain of ice. From coast to coast, North to South, our domain was absolute.");
+~chatnpc("<p,neutral>Our god was kind to us, and blessed us with prosperity and happiness, and in return we were merciless to his enemies wherever we found them.");
+~chatnpc("<p,angry>Then came the betrayal.");
+~chatnpc("<p,sad>Our god was banished, leaving us helpless to our fates.");
+~chatnpc("<p,sad>Without his protection, we were forced to fend for ourselves once more, against the enemies that sought to destroy us through their petty jealousies.");
+~chatnpc("<p,angry>But we did not succumb without fighting! The spiteful Saradomin and pathetic Zamorak warred with each other, but the hatred they had for each other was as nothing to the hatred they held towards us!");
+~chatnpc("<p,sad>With each battle they waged, we lost more and more land, unable to fight on all fronts, and were pushed further and further South into this gods-forsaken desert.");
+~chatnpc("<p,sad>Our greatest hero, Azzanadra, was finally trapped in a strange stone structure to the South of here, and bound within by terrible powers...");
+~chatnpc("<p,angry>And with that our lands, our homes, our very lives were stolen from us! Too weak to reclaim what was rightfully ours, we made our homes here, knowing that someday Azzanadra will return with his magnificent power, and bring us back to our former glory...");
+~chatplayer("<p,quiz>So you're upset because of something that happened hundreds of years ago?");
+~chatplayer("<p,neutral>Seems to me like maybe you should find some closure, and let the past go...");
+~chatnpc("<p,angry>The insults heaped upon my race will never be forgotten, will never be forgiven and will never again be overlooked.");
+~chatnpc("<p,angry>Someday, a harsh wind will blow upon this land, uncovering the wrongs of the past, and we will get back what is rightfully ours. Until such a day we will bide our time here, and will always be ready with our blades for our righteous vengeance.");
+return;
+
+[label,dt_eblis_hostiles_refuse]
+~chatplayer("<p,angry>I don't really care what your story is to be honest, there is no excuse for such rudeness or hostility.");
+~chatplayer("<p,confused>I have done nothing wrong to you, but everybody here treats me like I have committed some great crime against the village.");
+~chatnpc("<p,angry>That is because, from our point of view, you have.");
+~chatplayer("<p,shock>What? Just because I entered your village?");
+~chatnpc("<p,angry>You have no right to be here! You have no right to the life you have, for it was taken at our expense!");
+~chatplayer("<p,neutral>Whatever... No wonder all you loonies live out here in the desert by yourselves.");
+return;
+
+[label,dt_eblis_diamonds]
+~chatplayer("<p,quiz>So tell me... Did you ever hear of something called the Diamonds of Azzanadra?");
+~chatnpc("<p,shock>This is the treasure which you seek???");
+~chatnpc("<p,happy>Please accept my apologies noble sir! I thought you were but some opportunistic thief, looking to steal what heritage we have left! Now I see that you are in fact a brave adventurer, looking to restore our glories back upon us!");
+~chatplayer("<p,confused>Uh... yeah... So anyway, you have heard of them?");
+~chatnpc("<p,happy>Heard of them? Of course I have heard of them! They are the legacy of the great Mahjarrat hero, Azzanadra!");
+~chatplayer("<p,quiz>So... do you have any idea where they might be? I have a feeling they will be very valuable.");
+~chatplayer("<p,neutral>Uh, valuable as historical artefacts I mean, obviously.");
+~chatnpc("<p,neutral>They were stolen by warriors of the false god Zamorak generations ago. When you find the warriors, you will find the diamonds.");
+~chatnpc("<p,neutral>I suspect they will not willingly part with such objects of power however.");
+~chatnpc("<p,shock>Beware too, for these warriors are very powerful; they have taken the powers of the diamonds into themselves!");
+~chatplayer("<p,quiz>How do you mean?");
+~chatnpc("<p,neutral>Each diamond has an elemental quality...");
+~chatnpc("<p,neutral>There is the Diamond of Blood, the Diamond of Ice, the Diamond of Smoke and the Diamond of Shadow.");
+~chatnpc("<p,neutral>You should expect the warriors to have taken some aspect of these diamonds as their own...");
+~chatplayer("<p,quiz>Do you have any idea how I could track down these warriors somehow, then?");
+~chatnpc("<p,neutral>There is an ancient spell I know of that may spy upon such power... But it will require a few ingredients for it to work.");
+~chatnpc("<p,neutral>Should you be willing to get these ingredients for me, I will be able to locate the rough area where each of these warriors has taken refuge. The spell is imprecise, but it should help you get on the right track in your search.");
+~chatnpc("<p,quiz>Is your desire for our freedom strong enough? Will you gather the ingredients for this spell for me?");
+def_int $yn = ~p_choice2("Yes", 1, "No", 2);
+if ($yn = 2) {
+    ~chatplayer("<p,neutral>Actually I don't feel like going on a shopping trip for you right now.");
+    ~chatnpc("<p,sad>As you wish. I should have known not to get my hopes up that our long cursed life may soon be at an end...");
+    return;
+}
+@dt_eblis_list;
+
+[label,dt_eblis_list]
+~chatplayer("<p,neutral>Sure, what do you need?");
+~chatnpc("<p,neutral>For this spell, I will need to make some scrying glasses. I will need enough so that we can view the realm in its entirety.");
+~chatnpc("<p,neutral>When enchanted, the scrying glass will be able to let us view any area that has been influenced by the presence of the Diamonds of Azzanadra.");
+~chatplayer("<p,quiz>Okay, but what exactly do you need for this spell?");
+~chatnpc("<p,neutral>Well, six scrying glasses should be sufficient. For each scrying glass, I will need two magic logs, a steel bar and some molten glass. This makes a total of 12 magic logs, 6 pieces of molten glass, and 6 steel bars.");
+~chatnpc("<p,neutral>In addition, for the actual spell to enchant the glasses, I will require one set of normal bones, some ash, some charcoal and a single blood rune.");
+~chatnpc("<p,quiz>Do you understand me, adventurer?");
+~chatplayer("<p,quiz>Quick question; what kind of bones do you need?");
+~chatnpc("<p,neutral>Standard bones. Other types of bones are of no use to me in this spell.");
+def_int $go = ~p_choice2("Yes, I will go get those for you.", 1, "No, please repeat those ingredients.", 2);
+if ($go = 2) {
+    @dt_eblis_list;
+}
+~chatplayer("<p,neutral>It's a slightly odd collection of ingredients, but I shouldn't have too much trouble getting those for you.");
+if (%deserttreasure = 7) {
+    %deserttreasure = 8;
+}
+return;
