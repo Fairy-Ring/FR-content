@@ -5,6 +5,9 @@
 // Never schematic / gold CB / inside / complete. Cite between-a-rock-start-talk-377.md §4.
 
 [opnpc1,dwarfrock_dondakan]
+if (%dwarfrock_quest >= 10 & inv_total(inv, dwarf_rock_book) > 0) {
+    @dwarfrock_dondakan_after_book;
+}
 if (%dwarfrock_quest >= 10) {
     @dwarfrock_dondakan_started;
 }
@@ -133,3 +136,66 @@ if (%dwarfrock_lookingforinfo = 0) {
     %dwarfrock_lookingforinfo = 1;
 }
 return;
+
+[label,dwarfrock_dondakan_after_book]
+~chatplayer("<p,happy>Rolad gave me a book that was quite interesting to read! I think I know what's inside it!");
+~chatnpc("<p,shock>What? What? Tell me!");
+~chatplayer("<p,neutral>Ehm, well... a demonic spirit for one...");
+~chatnpc("<p,shock>A what?");
+~chatplayer("<p,neutral>A demonic spirit! And apparently the inside of the rock is lined with gold!");
+~chatnpc("<p,happy>Gold? Did you say gold?");
+~chatplayer("<p,neutral>Yes... and a de-");
+~chatnpc("<p,happy>Gold! I knew it! I struck gold! I'm set for life!");
+~chatnpc("<p,sad>What's left of it anyway...");
+~chatnpc("<p,quiz>Now tell me, how do I break open the rock?");
+~chatplayer("<p,sad>Sorry, the book doesn't say... it doesn't seem to be particularly concerned with actually breaking open the rock. You see, the demonic spirit is being kept inside it.");
+~chatnpc("<p,neutral>Yes yes, I heard you the first time.");
+~chatnpc("<p,sad>Well, we're not very much closer to a solution then, are we?");
+@dwarfrock_dondakan_after_menu;
+
+[label,dwarfrock_dondakan_after_menu]
+def_int $a = ~p_choice3("What have you tried so far?", 1, "Maybe we need to set up another cannon?", 2, "I'll be back later.", 3);
+if ($a = 3) {
+    ~chatplayer("<p,neutral>I'll be back later.");
+    return;
+}
+if ($a = 2) {
+    ~chatplayer("<p,quiz>Maybe we should set up another cannon?");
+    ~chatnpc("<p,quiz>Another cannon? How will that help?");
+    ~chatnpc("<p,neutral>No, no, what we need is a different material of cannonballs. The hardest, toughest you can find.");
+    ~chatplayer("<p,quiz>How do you mean, that I can find? What are you doing then?");
+    ~chatnpc("<p,neutral>I'm guarding the cannon. Won't do us much good if it were stolen, would it?");
+    @dwarfrock_dondakan_after_menu;
+}
+~chatplayer("<p,quiz>What have you tried so far?");
+~chatnpc("<p,neutral>Well, let's see...");
+~chatnpc("<p,neutral>At one time, we had a hundred dwarves in here, all picking away at the rock. Didn't do a thing.");
+~chatnpc("<p,neutral>Then there was the time when we set fire to this whole section of the cave. What a smell that made!");
+~chatplayer("<p,quiz>Any effect?");
+~chatnpc("<p,neutral>Apart from coating the rock with soot? Not really, no.");
+~chatnpc("<p,neutral>I was able to borrow a cannon from the Black Guard, my son was able to pull some strings you know.");
+~chatnpc("<p,sad>Of course, steel cannonballs didn't make a dent. But then ol' Donnie had a clever idea.");
+~chatplayer("<p,quiz>Oh really?");
+~chatnpc("<p,happy>I made this adamantite cannonball, you see! Cost me quite a pile of coins too!");
+~chatplayer("<p,happy>Wow! That must have made quite an impact!");
+~chatnpc("<p,sad>Well, yes, it did... when it bounced back onto the ground it did.");
+def_int $b = ~p_choice2("What else did you try?", 1, "I'm tired of these stories.", 2);
+if ($b = 2) {
+    ~chatplayer("<p,neutral>I'm tired of these stories.");
+    ~chatnpc("<p,sad>Go on then... leave an old dwarf to his work.");
+    return;
+}
+~chatplayer("<p,quiz>What else did you try?");
+~chatnpc("<p,happy>Well, then I had an even more clever idea!");
+~chatnpc("<p,neutral>I put an even bigger pile of coins together to get some rune cannonballs! Good idea, right?");
+~chatplayer("<p,happy>Yeah, great!");
+~chatnpc("<p,angry>No, it wasn't. Didn't do anything! Nothing at all!");
+~chatnpc("<p,neutral>Latest thing I've tried are these boots.");
+~chatplayer("<p,quiz>Nice boots... but what about them?");
+~chatnpc("<p,neutral>They're made out of granite! I don't have enough money left to make granite cannonballs though.");
+~chatnpc("<p,sad>Even granite doesn't do anything to it!");
+~chatplayer("<p,quiz>And now I have to come up with a material that will affect it somehow?");
+~chatnpc("<p,happy>You got it!");
+~chatplayer("<p,confused>Some kind of new material that no one has ever found before but which I am supposed to accidentally stumble upon, perhaps?");
+~chatnpc("<p,neutral>Don't be silly, I'm sure there must be some known material that will affect it.");
+@dwarfrock_dondakan_after_menu;
