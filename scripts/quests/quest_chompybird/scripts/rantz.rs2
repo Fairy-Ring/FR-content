@@ -25,12 +25,21 @@ if(%chompybird >= ^chompybird_rantz_gave_player_bow & ~obj_gettotal(ogre_bow) = 
 // Cite osf-rantz-after-tindel-377.md.
 if (%onesmallfavour >= 19) {
     def_int $osf = 0;
-    if (%onesmallfavour >= 20) {
+    if (%onesmallfavour >= 22) {
+        if (inv_total(inv, favour_matress_comfy) > 0) {
+            $osf = ~p_choice2("Hello again, what should I do now?", 1, "Something else.", 2);
+        } else {
+            $osf = ~p_choice2("Ok, I've helped that Gnome, he shouldn't bother you anymore.", 1, "Something else.", 2);
+        }
+    } else if (%onesmallfavour >= 20) {
         $osf = ~p_choice2("What did you want me to do again?", 1, "Something else.", 2);
     } else {
         $osf = ~p_choice2("I need to talk to you about a mattress.", 1, "Something else.", 2);
     }
     if ($osf = 1) {
+        if (%onesmallfavour >= 22) {
+            @osf_rantz_comfy;
+        }
         @osf_rantz_mattress;
     }
 }
@@ -829,5 +838,31 @@ if ($yes = 2) {
 ~chatnpc("<p,happy>Dat would be da good find...den me's help wiv da flufsies sack.");
 if (%onesmallfavour = 19) {
     %onesmallfavour = 20;
+}
+return;
+
+[label,osf_rantz_comfy]
+if (inv_total(inv, favour_matress_comfy) > 0) {
+    ~chatplayer("<p,quiz>Hello again, what should I do now?");
+    ~chatnpc("<p,neutral>Yous do somefing wiv da fluffsies sack...Rantz not care...!");
+    return;
+}
+~chatplayer("<p,happy>Ok, I've helped that Gnome, he shouldn't bother you anymore.");
+~chatnpc("<p,happy>Yous creature dun a gud fing...Rantz give yous creature da fluffsies sack now...");
+if (inv_total(inv, favour_matress_stodgy) < 1) {
+    ~chatplayer("<p,sad>But I don't have the stodgy mattress anymore...I'll have to get another one.");
+    return;
+}
+if (inv_itemspace(inv, favour_matress_comfy, 1, inv_size(inv)) = false) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_del(inv, favour_matress_stodgy, 1);
+inv_add(inv, favour_matress_comfy, 1);
+~mesbox("Rantz gives you a filled comfy mattress.");
+~chatnpc("<p,happy>De're yous goes creature...da fluffsies sack is full now.");
+~chatplayer("<p,happy>Great, I think Tindel will get a good night's rest on this.");
+if (%onesmallfavour = 22) {
+    %onesmallfavour = 23;
 }
 return;
