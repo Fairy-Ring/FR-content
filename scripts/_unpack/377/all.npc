@@ -11376,6 +11376,10 @@ walkanim=giantrat_walk
 readyanim=giantrat_ready
 op2=Attack
 vislevel=3
+hitpoints=5
+attack=2
+strength=3
+defence=2
 
 [jailguard_two_patrol]
 name=Jail guard
@@ -11403,6 +11407,10 @@ resizev=120
 resizeh=120
 vislevel=26
 head1=obj_pickpocket_guide_man
+hitpoints=32
+attack=19
+strength=23
+defence=21
 
 [jailguard_three_patrol]
 name=Jail guard
@@ -11428,6 +11436,10 @@ resizev=130
 resizeh=130
 vislevel=26
 head1=idk_man_hair_long_head
+hitpoints=32
+attack=19
+strength=23
+defence=21
 
 [jailguard_four_patrol]
 name=Jail guard
@@ -11453,6 +11465,10 @@ op1=Talk-to
 op2=Attack
 vislevel=26
 head1=obj_leather_cowl_manhead2
+hitpoints=32
+attack=19
+strength=23
+defence=21
 
 [seagull_draynor1]
 name=Gull
@@ -36961,6 +36977,10 @@ readyanim=bird_ready
 op2=Attack
 vislevel=hide
 minimap=no
+hitpoints=32
+attack=22
+strength=22
+defence=17
 
 [misc_chicken]
 name=Chicken
@@ -41891,6 +41911,10 @@ op3=Pickpocket
 op2=Attack
 vislevel=7
 head1=obj_pickpocket_guide_man
+hitpoints=12
+attack=3
+strength=4
+defence=8
 
 [farmer3]
 name=Farmer
@@ -41913,6 +41937,10 @@ op3=Pickpocket
 op2=Attack
 vislevel=7
 head1=obj_pickpocket_guide_man
+hitpoints=12
+attack=3
+strength=4
+defence=8
 
 [farmer_farming]
 name=Farmer
@@ -42622,6 +42650,9 @@ op2=Attack
 resizev=50
 resizeh=50
 vislevel=92
+hitpoints=60
+param=damagetype,^crush_style
+param=attack_anim,rock_attack
 
 [slagilith_hybernate]
 name=Rock pile
@@ -51191,6 +51222,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=19
+hitpoints=22
+attack=17
+strength=18
+defence=12
 
 [battlefield_khazard_troop_spearmen]
 name=Khazard trooper
@@ -51209,6 +51244,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_staffready
 op2=Attack
 vislevel=19
+hitpoints=22
+attack=17
+strength=18
+defence=12
 
 [battlefield_gnomeknight]
 name=Gnome troop
@@ -51273,6 +51312,7 @@ readyanim=midget_ready
 op2=Attack
 vislevel=1
 head1=obj_pickpocket_guide_gnome
+hitpoints=3
 
 [battlefield_gnome_archer]
 name=Gnome
@@ -51295,6 +51335,10 @@ walkanim=terrorbird_mounted_walk
 readyanim=terrorbird_mounted_ready
 op2=Attack
 vislevel=49
+hitpoints=55
+attack=40
+strength=40
+defence=40
 
 [wise_old_man]
 name=Wise Old Man
@@ -51376,6 +51420,10 @@ readyanim=human_ready
 op3=Pickpocket
 op2=Attack
 vislevel=62
+hitpoints=57
+attack=54
+strength=54
+defence=54
 
 [rcu_zammy_mage1]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -52411,6 +52459,7 @@ resizeh=140
 resizev=140
 ambient=15
 vislevel=1
+hitpoints=3
 
 [farm_chicken_dark_brown]
 name=Chicken
@@ -52431,6 +52480,7 @@ resizeh=140
 resizev=140
 ambient=15
 vislevel=1
+hitpoints=3
 
 [farm_chicken_tan]
 name=Chicken
@@ -52451,6 +52501,7 @@ resizeh=140
 resizev=140
 ambient=15
 vislevel=1
+hitpoints=3
 
 [farm_pig_1]
 name=Pig
@@ -53276,6 +53327,10 @@ readyanim=human_staffready
 op2=Attack
 vislevel=11
 head1=obj_gasmask_manhead
+hitpoints=19
+attack=8
+strength=8
+defence=8
 
 [mourning_overpass_mourner2]
 name=Mourner
@@ -53302,6 +53357,10 @@ readyanim=human_staffready
 op2=Attack
 vislevel=11
 head1=obj_gasmask_manhead
+hitpoints=19
+attack=8
+strength=8
+defence=8
 
 [mourning_overpass_mourner3]
 name=Mourner
@@ -53328,6 +53387,10 @@ readyanim=human_staffready
 op2=Attack
 vislevel=11
 head1=obj_gasmask_manhead
+hitpoints=19
+attack=8
+strength=8
+defence=8
 
 [mourning_stores_man]
 name=Eudav
@@ -53499,6 +53562,11 @@ resizev=120
 op2=Attack
 vislevel=108
 head1=obj_pickpocket_guide_woodelf
+hitpoints=105
+attack=95
+strength=95
+defence=80
+ranged=0
 
 [mourning_guard_melee2]
 name=Elf warrior
@@ -53520,6 +53588,11 @@ resizeh=127
 resizev=120
 op2=Attack
 vislevel=108
+hitpoints=105
+attack=95
+strength=95
+defence=80
+ranged=0
 
 [mourning_guard_range]
 name=Elf warrior
@@ -53542,6 +53615,11 @@ resizev=120
 op2=Attack
 vislevel=90
 head1=npc_2354_head
+hitpoints=105
+attack=10
+strength=80
+defence=10
+ranged=80
 
 [mourning_guard_range2]
 name=Elf warrior
@@ -53562,6 +53640,11 @@ readyanim=human_ready
 resizev=125
 op2=Attack
 vislevel=90
+hitpoints=105
+attack=10
+strength=80
+defence=10
+ranged=80
 
 [mourning_town_elf_1]
 name=Goreu
@@ -55294,6 +55377,10 @@ readyanim=giantspider_ready
 minimap=no
 op2=Attack
 vislevel=44
+hitpoints=50
+attack=35
+strength=37
+defence=35
 
 [tbwcu_spider_appear]
 name=Jungle Spider
@@ -55307,6 +55394,10 @@ minimap=no
 op2=Attack
 turnspeed=1024
 vislevel=44
+hitpoints=50
+attack=35
+strength=37
+defence=35
 
 [tbwcu_mosquito_single]
 name=Large mosquito
@@ -55378,6 +55469,10 @@ readyanim=human_staffready
 op2=Attack
 vislevel=32
 head1=npc_macro_geni_head
+hitpoints=39
+attack=23
+strength=27
+defence=26
 
 [tbwcu_broodoo_poison_instant]
 name=Broodoo victim
@@ -59015,6 +59110,10 @@ op2=Attack
 vislevel=16
 head1=obj_pickpocket_guide_man
 head2=obj_highwaymanmask_manhead
+hitpoints=17
+attack=14
+strength=13
+defence=12
 
 [man4_for_musa_point]
 name=Man
@@ -59039,6 +59138,7 @@ op3=Pickpocket
 op1=Talk-to
 vislevel=2
 head1=obj_pickpocket_guide_man
+hitpoints=7
 
 [makeover_mage_female]
 name=Make-over mage
@@ -59098,6 +59198,10 @@ op2=Attack
 vislevel=5
 head1=obj_castlewars_cloak_saradomin_manhead
 head2=obj_highwaymanmask_manhead
+hitpoints=13
+attack=2
+strength=2
+defence=2
 
 [rat_indoors]
 name=Rat
@@ -59112,6 +59216,7 @@ minimap=no
 resizeh=133
 resizev=134
 vislevel=1
+hitpoints=2
 
 [rimmington_hengel]
 name=Hengel
@@ -59469,6 +59574,10 @@ op2=Attack
 vislevel=23
 head1=npc_pirate1_head
 head2=obj_eye_patch_manhead
+hitpoints=20
+attack=20
+strength=20
+defence=20
 
 [jail_thief]
 name=Thief
@@ -59492,6 +59601,10 @@ readyanim=prisoner_ready_crying
 op2=Attack
 vislevel=16
 head1=obj_pickpocket_guide_man
+hitpoints=17
+attack=14
+strength=13
+defence=12
 
 [jail_mugger]
 name=Mugger
@@ -59516,6 +59629,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=prisoner_ready_angry
 op2=Attack
 vislevel=6
+hitpoints=8
+attack=5
+strength=5
+defence=5
 
 [jail_black_knight]
 name=Black Knight
@@ -59540,6 +59657,10 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=33
+hitpoints=42
+attack=25
+strength=25
+defence=25
 
 [jail_guard_1]
 name=Guard
@@ -59567,6 +59688,10 @@ readyanim=human_ready
 op2=Attack
 op3=Pickpocket
 vislevel=21
+hitpoints=22
+attack=19
+strength=18
+defence=14
 
 [jail_guard_2]
 name=Guard
@@ -59593,6 +59718,10 @@ readyanim=human_ready
 op2=Attack
 op3=Pickpocket
 vislevel=21
+hitpoints=22
+attack=19
+strength=18
+defence=14
 
 [jail_guard_3]
 name=Guard
@@ -59621,6 +59750,10 @@ readyanim=human_ready
 op2=Attack
 op3=Pickpocket
 vislevel=21
+hitpoints=22
+attack=19
+strength=18
+defence=14
 
 [jail_guard_4]
 name=Guard
@@ -59650,6 +59783,10 @@ readyanim=human_ready
 op2=Attack
 op3=Pickpocket
 vislevel=21
+hitpoints=22
+attack=19
+strength=18
+defence=14
 
 [jail_guard_5]
 name=Guard
@@ -59679,6 +59816,10 @@ readyanim=human_ready
 op2=Attack
 op3=Pickpocket
 vislevel=21
+hitpoints=22
+attack=19
+strength=18
+defence=14
 
 [jail_guard_sleeping]
 name=Guard
@@ -67253,6 +67394,10 @@ readyanim=human_transready
 op2=Attack
 vislevel=57
 param=slayer_category,^slayer_icewarrior
+hitpoints=59
+attack=47
+strength=47
+defence=47
 
 [devious_monk_hooded]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -70342,6 +70487,10 @@ walkanim=dwarf_walk
 readyanim=dwarf_ready
 op2=Attack
 vislevel=10
+hitpoints=16
+attack=8
+strength=6
+defence=9
 
 [falador_man1]
 name=Drunken man
@@ -72116,6 +72265,10 @@ readyanim=dwarf_ready
 op2=Attack
 vislevel=10
 head1=npc_macro_dwarf_head
+hitpoints=16
+attack=8
+strength=6
+defence=9
 
 [fai_dwarf_worker_06]
 name=Dwarf
@@ -72543,6 +72696,11 @@ op2=Attack
 vislevel=25
 head1=npc_hetty_head
 head2=npc_2676_head
+hitpoints=10
+attack=25
+strength=25
+defence=25
+magic=30
 
 [draynor_possesed_chair]
 model1=npc_3293
@@ -72818,6 +72976,7 @@ op2=Attack
 vislevel=2
 head1=npc_3309_head
 param=slayer_category,^slayer_cow
+hitpoints=8
 
 [fairy_sheep]
 name=Sheep
@@ -77840,6 +77999,10 @@ readyanim=skeleton_ready
 walkanim=skeleton_walk
 op2=Attack
 vislevel=22
+hitpoints=29
+attack=15
+strength=18
+defence=17
 
 [poh_guarddog]
 name=Guard dog
@@ -77858,6 +78021,10 @@ walkanim=dog_walk
 readyanim=dog_ready
 op2=Attack
 vislevel=44
+hitpoints=49
+attack=35
+strength=36
+defence=37
 
 [poh_hobgoblin]
 name=Hobgoblin
@@ -77917,6 +78084,10 @@ walkanim=hell_walk
 readyanim=hell_ready
 op2=Attack
 vislevel=122
+hitpoints=116
+attack=105
+strength=104
+defence=102
 
 [poh_ogre]
 name=Ogre
@@ -77931,6 +78102,10 @@ walkanim=ogre_walk
 readyanim=ogre_ready
 op2=Attack
 vislevel=53
+hitpoints=60
+attack=43
+strength=43
+defence=43
 
 [poh_kalphite_soldier]
 name=Kalphite Soldier
@@ -77948,6 +78123,10 @@ resizeh=172
 resizev=172
 op2=Attack
 vislevel=85
+hitpoints=90
+attack=70
+strength=70
+defence=70
 
 [poh_dagganoth]
 name=Dagannoth
@@ -78368,6 +78547,12 @@ op2=Attack
 walkanim=shade_walk
 readyanim=shade_ready
 vislevel=80
+hitpoints=76
+attack=88
+strength=55
+defence=60
+ranged=0
+magic=0
 
 [templetrek_shade_2]
 name=Asyn shadow
@@ -82396,6 +82581,11 @@ readyanim=kalphite_ready
 op2=Attack
 headicon=6
 vislevel=333
+hitpoints=255
+attack=300
+strength=300
+defence=300
+magic=150
 
 [swan_kalphite_2]
 name=Kalphite Queen
@@ -82409,6 +82599,11 @@ resizev=256
 op2=Attack
 headicon=0
 vislevel=333
+hitpoints=255
+attack=300
+strength=300
+defence=300
+magic=150
 
 [swan_drunkendwarf]
 name=Drunken Dwarf

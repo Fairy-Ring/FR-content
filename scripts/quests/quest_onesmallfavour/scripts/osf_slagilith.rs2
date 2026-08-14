@@ -1,0 +1,13 @@
+// One Small Favour — Slagilith death after spawn leftover.
+// CANDIDATE next int 25→26. No dest / drops / 1801 / combat-stat invent.
+// Unpack combat is visual-only; engine default stats. Hunt 289? no.
+// Cite osf-slagilith-fight-377.md.
+
+[ai_queue3,slagilith]
+gosub(npc_death);
+if (p_finduid(%npc_aggressive_player) = true) {
+    if (%onesmallfavour = 25) {
+        %onesmallfavour = 26;
+    }
+}
+return;

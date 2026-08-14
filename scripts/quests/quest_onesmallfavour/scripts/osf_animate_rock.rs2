@@ -29,6 +29,11 @@ if (npc_find(coord, slagilith, 8, 0) = true | npc_find(coord, slagilith_birth, 8
     mes("You're a little too busy fighting to cast that right now.");
     return;
 }
+// Kill leftover writes 25→26. Re-Read at ≥26 is free-Petra leftover — not this misfire.
+if (%onesmallfavour > 25) {
+    ~displaymessage(^dm_default);
+    return;
+}
 ~chatplayer("<p,happy>Um nahi listic durooo-rah!");
 ~chatplayer("<p,shock>Whoooah! That was a bit of a misfire.");
 ~chatplayer("<p,shock>And this doesn't look good!");
