@@ -1,0 +1,16 @@
+// Between a Rock — first Read of Dwarven lore after Rolad pages return.
+// CANDIDATE last-resort after-read mes. Book body / IF 837 chrome later.
+// Never 12082 / 4574 / dest / 110. Hunt 289? no.
+// Stay dwarfrock_quest 10. Cite bar-book-read-377.md.
+
+[opheld1,dwarf_rock_book]
+if (%dwarfrock_quest < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%dwarfrock_quest = 110) {
+    ~displaymessage(^dm_default);
+    return;
+}
+mes("That certainly was an interesting read! You now have enough info for Dondakan.");
+return;
