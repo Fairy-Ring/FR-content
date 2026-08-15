@@ -1,7 +1,8 @@
-// OSF leftover — Check-keys on steel key ring (cite osf-key-ring-check-keys-377.md).
-// Packed iop1=Check-keys. Do not open leftover 12346. Do not invent empty-ring
-// mes / slot map / key list. Key-store writer ABSENT — 0 keys stored. Award /
-// Rub leftovers cite, do not rewrite.
+// OSF leftover — Check-keys + Use-key on steel key ring.
+// Cite osf-key-ring-check-keys-377.md + osf-key-ring-use-377.md.
+// Store: %favour_key_ring on pack 418 (274-shaped: same debugname as obj
+// ring_of_forging / ring_of_recoil). Do not open leftover 12346. Do not dest.
+// Do not invent Arrav which-key / shortcut / 13-key table / toolbelt.
 
 [opheld1,favour_key_ring]
 if (inv_total(inv, favour_key_ring) < 1) {
@@ -10,3 +11,41 @@ if (inv_total(inv, favour_key_ring) < 1) {
 }
 // Inspect only. Empty display UNKNOWN — do not invent mesbox / if_open*.
 return;
+
+[opheldu,favour_key_ring]
+if (inv_total(inv, favour_key_ring) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_obj $key = last_useitem;
+def_int $bit = ~osf_key_ring_store_bit($key);
+if ($bit = -1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (testbit(%favour_key_ring, $bit) = 1) {
+    return;
+}
+if (inv_total(inv, $key) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_string $name = oc_name($key);
+%favour_key_ring = setbit(%favour_key_ring, $bit);
+inv_del(inv, $key, 1);
+// CANDIDATE last-resort add mes (OSRS minus Changes). Exact period string UNKNOWN.
+mes("You add the <$name> to your key ring.");
+
+[proc,osf_key_ring_store_bit](obj $key)(int)
+// CANDIDATE Tip.it 2007-09-16 minus shortcut 23 Oct 2006 minus Arrav (UNKNOWN which).
+if ($key = elid_key) return(0);
+if ($key = edgevilledungeonkey) return(1);
+if ($key = elemental_workshop_key) return(2);
+if ($key = hauntedmine_reward_key) return(3);
+if ($key = dusty_key) return(4);
+if ($key = makinghistory_key) return(5);
+if ($key = melzarkey) return(6);
+if ($key = metal_key) return(7);
+if ($key = ikov_shinykey) return(8);
+if ($key = thgoodminekey) return(9);
+return(-1);

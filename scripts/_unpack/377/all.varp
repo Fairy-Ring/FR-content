@@ -724,7 +724,8 @@ transmit=yes
 [onesmallfavourmulti]
 transmit=yes
 
-[varp418_unused]
+[favour_key_ring]
+scope=perm
 
 [varp419_unused]
 
