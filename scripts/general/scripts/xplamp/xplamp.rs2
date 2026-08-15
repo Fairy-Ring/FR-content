@@ -1,4 +1,5 @@
 [opheld1,macro_genilamp]
+cleartimer(osf_lamp_picker);
 %xplamp = ^xplamp_none;
 if_openmain(xplamp);
 
@@ -24,7 +25,13 @@ if_openmain(xplamp);
 [if_button,xplamp:slayer] @xplamp_select(slayer);
 [if_button,xplamp:farming] @xplamp_select(farming);
 
+[if_close,xplamp]
+cleartimer(osf_lamp_picker);
+
 [if_button,xplamp:confirm]
+if (gettimer(osf_lamp_picker) > 0) {
+    @osf_reward_lamp_confirm;
+}
 switch_int (%xplamp) {
     case ^xplamp_none :
         mes("You need to choose which skill you wish to be advanced.");

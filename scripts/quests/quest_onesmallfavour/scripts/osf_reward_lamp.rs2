@@ -1,0 +1,67 @@
+// OSF leftover — Antique lamp Rub (cite osf-reward-lamps-rub-377.md).
+// Distinct [opheld1,thosf_reward_lamp]. Reuse packed xplamp 2808 chrome.
+// Do not join genie inv_del / level x 10. leftover 12346 / dest / Check-keys STOP.
+
+[opheld1,thosf_reward_lamp]
+if (inv_total(inv, thosf_reward_lamp) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+%xplamp = ^xplamp_none;
+settimer(osf_lamp_picker, 1000);
+if_openmain(xplamp);
+
+[timer,osf_lamp_picker]
+// Session flag only. gettimer > 0 means this IF was opened from 4447.
+return;
+
+[label,osf_reward_lamp_confirm]
+if (inv_total(inv, thosf_reward_lamp) < 1) {
+    cleartimer(osf_lamp_picker);
+    if_close;
+    return;
+}
+if (%xplamp = ^xplamp_none) {
+    mes("You need to choose which skill you wish to be advanced.");
+    return;
+}
+def_stat $stat = ~osf_reward_lamp_stat;
+if (stat_base($stat) < 31) {
+    // Floor-fail mes UNKNOWN — do not invent. Over 30 = 31+.
+    return;
+}
+cleartimer(osf_lamp_picker);
+if_close;
+inv_del(inv, thosf_reward_lamp, 1);
+if (%reward_lamps_used < 2) {
+    %reward_lamps_used = add(%reward_lamps_used, 1);
+}
+stat_advance($stat, 100000);
+%xplamp = ^xplamp_none;
+return;
+
+[proc,osf_reward_lamp_stat]()(stat)
+switch_int (%xplamp) {
+    case ^xplamp_attack : return(attack);
+    case ^xplamp_strength : return(strength);
+    case ^xplamp_ranged : return(ranged);
+    case ^xplamp_magic : return(magic);
+    case ^xplamp_defence : return(defence);
+    case ^xplamp_hitpoints : return(hitpoints);
+    case ^xplamp_prayer : return(prayer);
+    case ^xplamp_agility : return(agility);
+    case ^xplamp_herblore : return(herblore);
+    case ^xplamp_thieving : return(thieving);
+    case ^xplamp_crafting : return(crafting);
+    case ^xplamp_runecraft : return(runecraft);
+    case ^xplamp_mining : return(mining);
+    case ^xplamp_smithing : return(smithing);
+    case ^xplamp_fishing : return(fishing);
+    case ^xplamp_cooking : return(cooking);
+    case ^xplamp_firemaking : return(firemaking);
+    case ^xplamp_woodcutting : return(woodcutting);
+    case ^xplamp_fletching : return(fletching);
+    case ^xplamp_slayer : return(slayer);
+    case ^xplamp_farming : return(farming);
+}
+return(attack);

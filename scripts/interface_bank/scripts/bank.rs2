@@ -153,6 +153,7 @@ return(false);
 [proc,bank_find_obj_unbankable](obj $obj)(boolean)
 switch_obj ($obj) {
     case macro_genilamp : return(true); // cant bank xp lamps
+    case thosf_reward_lamp : return(true); // OSF leftover Tip.it 2007 cannot bank; mes is live unbankable chrome
     case bloated_toad : return(true); // 289 unbankable — no new param id
     case default : return(false);
 }
