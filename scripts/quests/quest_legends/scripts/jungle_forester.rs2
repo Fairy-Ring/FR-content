@@ -55,7 +55,8 @@ if(%legendsquest < ^legends_got_bullroarer) %legendsquest = ^legends_got_bullroa
 
 [label,jungle_forester_start]
 // OSF return leftover after Brian 4444 (cite osf-forester-mahogany-return-377.md).
-// Prefix only. Keep civilisation + Legends. First hop PARKED. No dest / 12346 / lamps.
+// First hop mahogany-ask (cite one-small-favour-jungle-forester-377.md).
+// Prefix only. Keep civilisation + Legends. No dest.
 ~chatnpc("<p,neutral>Hello friend. You're a long way from civilisation!");
 if (%onesmallfavour >= 41) {
     if (%onesmallfavour < 42) {
@@ -67,8 +68,125 @@ if (%onesmallfavour >= 41) {
     } else {
         @osf_forester_lost_menu;
     }
+} else if (%onesmallfavour >= 1) {
+    if (inv_total(inv, favour_jungleforesteraxe_blunt) >= 1) {
+        @osf_forester_hop_have_menu;
+    }
+    if (%onesmallfavour < 2) {
+        @osf_forester_hop_ask_menu;
+    }
+    if (%onesmallfavour = 2) {
+        @osf_forester_hop_lost_menu;
+    }
 }
 @jungle_forester_legends_menu;
+
+[label,osf_forester_hop_ask_menu]
+// CANDIDATE last-resort 2007-base minus Lumbridge / hatchet / diary. Cite hop leftover.
+if (%legendsquest > ^legends_not_started) {
+    @multi4("I need to talk to you about red mahogany.", osf_forester_hop_mahogany,
+            "How do I get into the Kharazi Jungle?", jungle_forester_how,
+            "What do you do here?", jungle_forester_what,
+            "Have you seen any natives in the jungle?", jungle_forester_natives);
+}
+@multi4("I need to talk to you about red mahogany.", osf_forester_hop_mahogany,
+        "What do you do here?", jungle_forester_what,
+        "How do I get into the Kharazi Jungle?", jungle_forester_how,
+        "Who are you?", jungle_forester_who);
+
+[label,osf_forester_hop_have_menu]
+if (%legendsquest > ^legends_not_started) {
+    @multi4("What did you want me to do again?", osf_forester_hop_reminder,
+            "How do I get into the Kharazi Jungle?", jungle_forester_how,
+            "What do you do here?", jungle_forester_what,
+            "Have you seen any natives in the jungle?", jungle_forester_natives);
+}
+@multi4("What did you want me to do again?", osf_forester_hop_reminder,
+        "What do you do here?", jungle_forester_what,
+        "How do I get into the Kharazi Jungle?", jungle_forester_how,
+        "Who are you?", jungle_forester_who);
+
+[label,osf_forester_hop_lost_menu]
+if (%legendsquest > ^legends_not_started) {
+    @multi4("I've lost your unsharpened axe, I need a new one.", osf_forester_hop_lost,
+            "How do I get into the Kharazi Jungle?", jungle_forester_how,
+            "What do you do here?", jungle_forester_what,
+            "Have you seen any natives in the jungle?", jungle_forester_natives);
+}
+@multi4("I've lost your unsharpened axe, I need a new one.", osf_forester_hop_lost,
+        "What do you do here?", jungle_forester_what,
+        "How do I get into the Kharazi Jungle?", jungle_forester_how,
+        "Who are you?", jungle_forester_who);
+
+[label,osf_forester_hop_mahogany]
+~chatplayer("<p,neutral>I need to talk to you about red mahogany.");
+~chatnpc("<p,neutral>Oh, yes, well I can get you a piece but I need my axe sharpening... Do me a small favour would you? Take it to Captain Shanks for me.");
+@osf_forester_hop_offer_menu;
+
+[label,osf_forester_hop_offer_menu]
+@multi4("Okay, I'll take your axe to get it sharpened.", osf_forester_hop_accept,
+        "Why should I take it to Captain Shanks?", osf_forester_hop_why,
+        "Where is Captain Shanks?", osf_forester_hop_where,
+        "Okay, thanks.", osf_forester_hop_refuse);
+
+[label,osf_forester_hop_why]
+~chatplayer("<p,quiz>Why should I take it to Captain Shanks?");
+~chatnpc("<p,neutral>He's the Captain of the 'Lady of the Waves', he goes to Port Sarim quite often. Could you ask the Captain to drop the axe in at Brian's Axes the next time he's in Port Sarim? I'm sure he won't mind!");
+@osf_forester_hop_offer_menu;
+
+[label,osf_forester_hop_where]
+~chatplayer("<p,quiz>Where is Captain Shanks?");
+~chatnpc("<p,neutral>Wow, you're really not from around here are you? The Captain is to the west of here, follow the northern edge of the Kharazi Jungle, he's usually on board his ship!");
+@osf_forester_hop_offer_menu;
+
+[label,osf_forester_hop_refuse]
+~chatplayer("<p,neutral>Okay, thanks.");
+return;
+
+[label,osf_forester_hop_accept]
+~chatplayer("<p,neutral>Okay, I'll take your axe to get it sharpened.");
+~objbox(favour_jungleforesteraxe_blunt, "The Jungle Forester hands you the blunt axe.", 250, 0, 0);
+inv_add(inv, favour_jungleforesteraxe_blunt, 1);
+~chatnpc("<p,happy>Great, here you go! If you could ask the Captain to pop it into Brian's Axes for resharpening when he's next in Port Sarim, that would be really helpful.");
+if (%onesmallfavour = 1) {
+    %onesmallfavour = 2;
+}
+return;
+
+[label,osf_forester_hop_reminder]
+~chatplayer("<p,quiz>What did you want me to do again?");
+~chatnpc("<p,neutral>I gave you my blunt axe to give to Captain Shanks. I was hoping that he would be able to pop it into Brian's Axes in Port Sarim to get it sharpened. I do hope nothing bad has happened to my axe, I am very partial to it!");
+~chatplayer("<p,neutral>Oh, yes... okay! No, I'm sure that nothing bad has happened to it. I mean, you gave it to me, I'm really dependable!");
+@osf_forester_hop_reminder_menu;
+
+[label,osf_forester_hop_reminder_menu]
+@multi4("What am I supposed to do again?", osf_forester_hop_reminder_what,
+        "Who is it that I'm supposed to meet?", osf_forester_hop_reminder_who,
+        "Do you really actually need that axe?", osf_forester_hop_reminder_need,
+        "Okay, thanks.", osf_forester_hop_refuse);
+
+[label,osf_forester_hop_reminder_what]
+~chatplayer("<p,quiz>What am I supposed to do again?");
+~chatnpc("<p,neutral>Take the blunt axe to Captain Shanks and ask him to take it to Brian's Axes.");
+@osf_forester_hop_reminder_menu;
+
+[label,osf_forester_hop_reminder_who]
+~chatplayer("<p,quiz>Who is it that I'm supposed to meet?");
+~chatnpc("<p,neutral>You're supposed to take the axe to Captain Shanks and ask him to take it Brian's Axes in Port Sarim. I'm sure he won't mind.");
+@osf_forester_hop_reminder_menu;
+
+[label,osf_forester_hop_reminder_need]
+~chatplayer("<p,quiz>Do you really actually need that axe?");
+~chatnpc("<p,neutral>Well, yes, actually. It's my favourite! I've been training with that axe since I started my profession as a jungle forester.");
+@osf_forester_hop_reminder_menu;
+
+[label,osf_forester_hop_lost]
+~chatplayer("<p,sad>I've lost your unsharpened axe, I need a new one.");
+~chatnpc("<p,neutral>I know. Another jungle forester found it and returned it to me. Here, take it again and this time don't lose it!");
+~chatplayer("<p,neutral>Okay, I promise to be more careful.");
+inv_add(inv, favour_jungleforesteraxe_blunt, 1);
+~objbox(favour_jungleforesteraxe_blunt, "The Jungle Forester hands you the blunt axe.", 250, 0, 0);
+return;
 
 [label,jungle_forester_legends_menu]
 if (%legendsquest > ^legends_not_started) {
