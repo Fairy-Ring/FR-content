@@ -68127,6 +68127,9 @@ hitpoints=70
 attack=36
 strength=44
 defence=52
+param=attack_anim,champions_giant_attack_vertical
+param=defend_anim,champions_giant_defend
+param=death_anim,champions_giant_death
 
 [champions_ghoul]
 name=Ghoul Champion

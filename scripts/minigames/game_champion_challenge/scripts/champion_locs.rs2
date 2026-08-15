@@ -45,6 +45,10 @@ if (inv_total(inv, champions_challenge_zombie) > 0) {
     @champions_spawn_zombie;
     return;
 }
+if (inv_total(inv, champions_challenge_giant) > 0) {
+    @champions_spawn_giant;
+    return;
+}
 @champions_spawn_imp;
 
 [oploc1,champions_arenaladder]
