@@ -68189,6 +68189,7 @@ hitpoints=58
 attack=44
 strength=48
 defence=48
+param=attack_anim,champions_hobgoblin_spear
 
 [champions_imp]
 name=Imp Champion

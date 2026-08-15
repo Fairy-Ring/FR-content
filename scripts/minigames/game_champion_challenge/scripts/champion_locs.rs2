@@ -49,6 +49,10 @@ if (inv_total(inv, champions_challenge_giant) > 0) {
     @champions_spawn_giant;
     return;
 }
+if (inv_total(inv, champions_challenge_hobgoblin) > 0) {
+    @champions_spawn_hobgoblin;
+    return;
+}
 @champions_spawn_imp;
 
 [oploc1,champions_arenaladder]
