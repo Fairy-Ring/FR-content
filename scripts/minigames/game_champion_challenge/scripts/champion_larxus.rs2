@@ -1,0 +1,79 @@
+// Champions’ Challenge leftover — Larxus Talk-to + Use-scroll.
+// Lines CANDIDATE last-resort 2007-base minus Changes
+// (OSRS Transcript:Larxus). Do not open leftover 15831 / 2804.
+
+[opnpc1,champions_doorman]
+if (%champions_defeated_imp = 1 & inv_total(inv, champions_challenge_imp) > 0) {
+    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
+    inv_del(inv, champions_challenge_imp, 1);
+    return;
+}
+if (~champions_statue_is_open = true) {
+    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
+    return;
+}
+if (inv_total(inv, champions_challenge_imp) > 0) {
+    def_int $c = ~p_choice3("I was given a challenge, what now?", 1, "What is this place?", 2, "Nothing thanks.", 3);
+    if ($c = 1) {
+        ~chatnpc("<p,neutral>Hand it to me, and we'll get you started.");
+        return;
+    }
+    if ($c = 2) {
+        @champions_larxus_place;
+        return;
+    }
+    ~chatplayer("<p,neutral>Nothing thanks.");
+    return;
+}
+def_int $p = ~p_choice2("What is this place?", 1, "Nothing thanks.", 2);
+if ($p = 1) {
+    @champions_larxus_place;
+    return;
+}
+~chatplayer("<p,neutral>Nothing thanks.");
+
+[label,champions_larxus_place]
+~chatnpc("<p,neutral>This is the champions' arena. The champions of various races use it to duel those they deem worthy of the honour. If you find a challenge scroll in your travels, bring it here to face your challenger.");
+
+[opnpcu,champions_doorman]
+def_obj $used = last_useitem;
+if ($used = champions_challenge_imp) {
+    @champions_accept_imp;
+    return;
+}
+~chatnpc("<p,neutral>That's great, now go show who's interested.");
+
+[label,champions_accept_imp]
+if (%champions_defeated_imp = 1) {
+    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
+    if (inv_total(inv, champions_challenge_imp) > 0) {
+        inv_del(inv, champions_challenge_imp, 1);
+    }
+    return;
+}
+if (~champions_statue_is_open = true) {
+    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
+    return;
+}
+~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're not allowed to use any Special Attacks. Do you still want to proceed?");
+def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>No thanks, I'll pass.");
+    return;
+}
+~champions_open_statue;
+~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
+
+[proc,champions_statue_is_open]()(boolean)
+if (loc_find(^champions_statue, champions_statue_trap_open) = true) return(true);
+if (loc_find(^champions_statue_l1, champions_statue_trap_open) = true) return(true);
+return(false);
+
+[proc,champions_open_statue]
+if (loc_find(^champions_statue, champions_statue_trap) = true) {
+    loc_change(champions_statue_trap_open, 1000);
+    return;
+}
+if (loc_find(^champions_statue_l1, champions_statue_trap) = true) {
+    loc_change(champions_statue_trap_open, 1000);
+}

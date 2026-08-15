@@ -1,0 +1,7 @@
+// Champions’ Challenge leftover coords. jm2 m49_152 / m49_52.
+// Pit centroid CANDIDATE from leftover pit locs (local ~32,30).
+^champions_statue = 0_49_152_48_30
+^champions_statue_l1 = 1_49_152_48_30
+^champions_imp_spawn = 0_49_152_32_30
+^champions_gallery_stand = 0_49_152_50_30
+^champions_imp_xp = 1600
