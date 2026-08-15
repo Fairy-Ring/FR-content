@@ -1,0 +1,35 @@
+// Earth Warrior Champion leftover fight after Larxus accept.
+// Combat stats VERIFIED unpack all.npc (vislevel=102 hitpoints=108 attack=84 strength=84 defence=84 wanderrange=0 moverestrict=nomove).
+// XP CANDIDATE 2007-base minus Changes (432/432). Banner varbit 1452.
+// Do not open leftover 15831 / 2804.
+
+[label,champions_spawn_earthwarrior]
+if (npc_find(^champions_imp_spawn, champions_earthwarrior, 8, 0) = true) {
+    return;
+}
+npc_add(map_findsquare(^champions_imp_spawn, 0, 2, ^map_findsquare_lineofwalk), champions_earthwarrior, 1000);
+
+[ai_queue3,champions_earthwarrior]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+if (p_finduid(uid) = true) {
+    @champions_earthwarrior_victory;
+    return;
+}
+queue(queue_champions_earthwarrior_victory, 0, 0);
+
+[queue,queue_champions_earthwarrior_victory]
+@champions_earthwarrior_victory;
+
+[label,champions_earthwarrior_victory]
+%champions_defeated_earthwarrior = 1;
+if (inv_total(inv, champions_challenge_earthwarrior) > 0) {
+    inv_del(inv, champions_challenge_earthwarrior, 1);
+}
+// Leftover 15831 parchment stays closed. Leftover title lines as mes only.
+mes("Well done, you defeated the Champion!");
+mes("You are awarded: 432 Slayer Xp, 432 Hitpoint Xp.");
+stat_advance(slayer, ^champions_earthwarrior_xp);
+stat_advance(hitpoints, ^champions_earthwarrior_xp);

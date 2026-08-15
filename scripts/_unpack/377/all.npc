@@ -68113,6 +68113,9 @@ strength=84
 defence=84
 wanderrange=0
 moverestrict=nomove
+param=attack_anim,earthwarrior_chop
+param=defend_anim,earthwarrior_def
+param=death_anim,earthwarrior_death
 
 [champions_giant]
 name=Giant Champion
