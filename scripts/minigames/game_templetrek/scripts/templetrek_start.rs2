@@ -1,0 +1,16 @@
+// Temple Trekking — Talk-to a Burgh escort opens the route map (choose_a_route 341).
+// All six escort concretes (children of multis 3623–3633 on m54_50) open it:
+// 2007-base "speaking to one of the NPCs standing nearby" in Burgh de Rott.
+// Chrome-only: no route dests / evade math / instance rooms / tokens / In Aid gate.
+// Visibility (templetrek_main_var bit 0) is a harness toy, not set here.
+// Cite residual-if-341-trek-start-377.md + temple-trekking-first-product-slice-377.md.
+
+[opnpc1,templetrek_child_hard] @templetrek_start_open;
+[opnpc1,templetrek_oldman_hard] @templetrek_start_open;
+[opnpc1,templetrek_woman_med] @templetrek_start_open;
+[opnpc1,templetrek_man_med] @templetrek_start_open;
+[opnpc1,templetrek_retired_soldier_easy] @templetrek_start_open;
+[opnpc1,templetrek_retired_man_easy] @templetrek_start_open;
+
+[label,templetrek_start_open]
+if_openmain(choose_a_route);
