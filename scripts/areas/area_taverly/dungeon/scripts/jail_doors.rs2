@@ -9,8 +9,21 @@ if(last_useitem = jail_key) {
 [oplocu,deepdungeondoor]
 if(last_useitem = dusty_key) {
     @unlock_taverley_jaildoor(true);
-} 
+}
+if(last_useitem = favour_key_ring) {
+    if(~osf_key_ring_has(dusty_key) = true) {
+        @unlock_taverley_from_ring;
+    }
+}
 ~displaymessage(^dm_default);
+
+[label,unlock_taverley_from_ring]
+// OSF leftover Use-on-door. Cite osf-key-ring-door-377.md.
+// Do not rewrite dusty_key path. Do not open leftover 12346. Do not dest.
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+// CANDIDATE last-resort (OSRS minus Changes). Exact period string UNKNOWN.
+mes("You use your keyring to unlock the door.");
+~open_and_close_door2(ctratgatea, $entering, grate_open);
 
 [oploc1,ctratgatea] // Might be used somewhere else?
 switch_coord(loc_coord) {

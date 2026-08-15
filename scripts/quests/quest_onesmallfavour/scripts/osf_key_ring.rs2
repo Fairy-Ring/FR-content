@@ -49,3 +49,11 @@ if ($key = metal_key) return(7);
 if ($key = ikov_shinykey) return(8);
 if ($key = thgoodminekey) return(9);
 return(-1);
+
+[proc,osf_key_ring_has](obj $key)(boolean)
+// Held ring + stored bit. Banked ring does not unlock. Cite osf-key-ring-door-377.md.
+if (inv_total(inv, favour_key_ring) < 1) return(false);
+def_int $bit = ~osf_key_ring_store_bit($key);
+if ($bit = -1) return(false);
+if (testbit(%favour_key_ring, $bit) = 1) return(true);
+return(false);
