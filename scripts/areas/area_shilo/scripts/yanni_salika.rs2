@@ -4,8 +4,9 @@
 // Mahogany-return leftover (cite osf-yanni-mahogany-return-377.md): prefix only
 // when >= 42 + inv 4445. Consume 4445. 42→43.
 // Key ring award leftover (cite osf-key-ring-award-377.md): inv_add 4446 once
-// on the same rant. 43→44. Name-only 4447. No dest / leftover 12346 /
-// Check-keys / lamps grant / shop rewrite.
+// on the same rant. 43→44.
+// Lamps leftover (cite osf-reward-lamps-377.md): inv_add 4447 twice (to 2).
+// 44→45. No dest / leftover 12346 / Check-keys / Rub / shop rewrite.
 
 [opnpc1,shiloantiques]
 ~chatplayer("<p,neutral>Hello there!");
@@ -106,7 +107,7 @@ if ($mh = 1) {
 
 [label,yanni_osf_mahogany_return]
 // CANDIDATE Returning to Yanni with the red mahogany minus Quest complete /
-// toolbelt / topic / 2022 overlay. Grant 4446 once. Name-only two lamps.
+// toolbelt / topic / 2022 overlay. Grant 4446 once. Grant two 4447. No Rub.
 ~chatplayer("<p,happy>Here's the red mahogany you asked for.");
 ~chatnpc("<p,happy>Well, that's absolutely wonderful my friend! Many thanks!");
 ~chatplayer("<p,quiz>What, that's it?");
@@ -135,6 +136,13 @@ if (inv_total(inv, favour_key_ring) < 1) {
 }
 if (%onesmallfavour = 43) {
     %onesmallfavour = 44;
+}
+def_int $lamps = inv_total(inv, thosf_reward_lamp);
+if ($lamps < 2) {
+    inv_add(inv, thosf_reward_lamp, sub(2, $lamps));
+}
+if (%onesmallfavour = 44) {
+    %onesmallfavour = 45;
 }
 return;
 
