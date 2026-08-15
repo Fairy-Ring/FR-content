@@ -54,17 +54,112 @@ if(%legendsquest < ^legends_got_bullroarer) %legendsquest = ^legends_got_bullroa
 ~chatnpc("<p,sad>Very well friend, I understand, I must be on my way as well.|@blu@-- The Jungle Forester seems a bit annoyed... and wanders off. --");
 
 [label,jungle_forester_start]
+// OSF return leftover after Brian 4444 (cite osf-forester-mahogany-return-377.md).
+// Prefix only. Keep civilisation + Legends. First hop PARKED. No dest / 12346 / lamps.
 ~chatnpc("<p,neutral>Hello friend. You're a long way from civilisation!");
+if (%onesmallfavour >= 41) {
+    if (%onesmallfavour < 42) {
+        if (inv_total(inv, favour_jungleforesteraxe_sharp) >= 1) {
+            @osf_forester_grant_menu;
+        }
+    } else if (inv_total(inv, favour_mahogany_log) >= 1) {
+        @osf_forester_thanks_menu;
+    } else {
+        @osf_forester_lost_menu;
+    }
+}
+@jungle_forester_legends_menu;
+
+[label,jungle_forester_legends_menu]
 if (%legendsquest > ^legends_not_started) {
     @multi3("How do I get into the Kharazi Jungle?", jungle_forester_how,
             "What do you do here?", jungle_forester_what,
             "Have you seen any natives in the jungle?", jungle_forester_natives);
 }
-else {
-    @multi3("What do you do here?", jungle_forester_what,
+@multi3("What do you do here?", jungle_forester_what,
+    "How do I get into the Kharazi Jungle?", jungle_forester_how,
+    "Who are you?", jungle_forester_who);
+
+[label,osf_forester_grant_menu]
+if (%legendsquest > ^legends_not_started) {
+    @multi4("Good news, I have your sharpened axe!", osf_forester_grant,
+            "How do I get into the Kharazi Jungle?", jungle_forester_how,
+            "What do you do here?", jungle_forester_what,
+            "Have you seen any natives in the jungle?", jungle_forester_natives);
+}
+@multi4("Good news, I have your sharpened axe!", osf_forester_grant,
+        "What do you do here?", jungle_forester_what,
         "How do I get into the Kharazi Jungle?", jungle_forester_how,
         "Who are you?", jungle_forester_who);
+
+[label,osf_forester_thanks_menu]
+if (%legendsquest > ^legends_not_started) {
+    @multi4("Hi again, thanks for the red mahogany.", osf_forester_thanks,
+            "How do I get into the Kharazi Jungle?", jungle_forester_how,
+            "What do you do here?", jungle_forester_what,
+            "Have you seen any natives in the jungle?", jungle_forester_natives);
 }
+@multi4("Hi again, thanks for the red mahogany.", osf_forester_thanks,
+        "What do you do here?", jungle_forester_what,
+        "How do I get into the Kharazi Jungle?", jungle_forester_how,
+        "Who are you?", jungle_forester_who);
+
+[label,osf_forester_lost_menu]
+if (%legendsquest > ^legends_not_started) {
+    @multi4("I've lost that red mahogany you gave me!", osf_forester_lost,
+            "How do I get into the Kharazi Jungle?", jungle_forester_how,
+            "What do you do here?", jungle_forester_what,
+            "Have you seen any natives in the jungle?", jungle_forester_natives);
+}
+@multi4("I've lost that red mahogany you gave me!", osf_forester_lost,
+        "What do you do here?", jungle_forester_what,
+        "How do I get into the Kharazi Jungle?", jungle_forester_how,
+        "Who are you?", jungle_forester_who);
+
+[label,osf_forester_grant]
+// CANDIDATE heading-back minus Lumbridge / hatchet / diary / topic. 41→42.
+~chatplayer("<p,happy>Good news, I have your sharpened axe!");
+~chatnpc("<p,happy>Ah, great!");
+~chatplayer("<p,neutral>Yep, here it is... at long last!");
+~chatnpc("<p,neutral>Yeah, you've been a while... I mean, I could have just gone and done it myself! It probably wouldn't have taken so long.");
+~chatplayer("<p,angry>Why you ungrateful...");
+~chatnpc("<p,neutral>Hang on a minute... there's no need to get so angry. Here's that red mahogany you wanted.");
+~objbox(favour_mahogany_log, "The jungle forester shows you the red mahogany log.", 250, 0, 0);
+inv_del(inv, favour_jungleforesteraxe_sharp, 1);
+inv_add(inv, favour_mahogany_log, 1);
+~chatnpc("<p,neutral>Okay, thanks for getting my axe sharpened for me!");
+if (%onesmallfavour = 41) {
+    %onesmallfavour = 42;
+}
+return;
+
+[label,osf_forester_thanks]
+// CANDIDATE leftover reminder. Name-only Yanni. No extra write. No dest.
+~chatplayer("<p,happy>Hi again, thanks for the red mahogany.");
+~chatnpc("<p,happy>No problem, one good turn deserves another as far as I'm concerned!");
+return;
+
+[label,osf_forester_lost]
+// CANDIDATE 200gp rematch. Refuse / poor = no grant. No extra write.
+~chatplayer("<p,sad>I've lost that red mahogany you gave me!");
+~chatnpc("<p,neutral>Well, I can get you another piece but you're going to have to pay for my time... 200 coins I'll want.");
+if (inv_total(inv, coins) < 200) {
+    ~chatplayer("<p,sad>But I don't have 200 gold coins!");
+    ~chatnpc("<p,sad>Sorry friend, I know you did me a small favour, but I have to earn a crust too!");
+    return;
+}
+def_int $pay = ~p_choice2("Okay, here's 200 coins for some red mahogany.", 1, "I won't pay you 200 coins for a piece of wood!", 2);
+if ($pay = 2) {
+    ~chatplayer("<p,angry>I won't pay you 200 coins for a piece of wood!");
+    ~chatnpc("<p,neutral>Well, suit yourself, I can always find other customers.");
+    return;
+}
+~chatplayer("<p,neutral>Okay, here's 200 coins for some red mahogany.");
+inv_del(inv, coins, 200);
+inv_add(inv, favour_mahogany_log, 1);
+~objbox(favour_mahogany_log, "The jungle forester gives you a red mahogany log.", 250, 0, 0);
+~chatnpc("<p,happy>Many thanks my friend!");
+return;
 
 [label,jungle_forester_natives]
 ~chatplayer("<p,neutral>Have you seen any natives in the jungle?");
