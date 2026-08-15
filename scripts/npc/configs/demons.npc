@@ -504,6 +504,8 @@ walkanim=demon_walk
 readyanim=champions_lesserdemon_ready
 op2=Attack
 vislevel=162
+param=attack_anim,champions_lesserdemon_slash
+param=attack_sound,demon_champion_attack
 
 [poh_demon]
 name=Demon

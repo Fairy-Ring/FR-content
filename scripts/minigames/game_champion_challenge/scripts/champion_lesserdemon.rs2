@@ -1,0 +1,37 @@
+// Lesser Demon Champion leftover fight after Larxus accept.
+// 377 pack has NO combat stats for this NPC (unpack all.npc absent; product
+// demons.npc overlay = name/vislevel 162 only) — engine defaults 1/1/1/1,
+// so the fight is attackable/killable at the honest 377 state.
+// XP CANDIDATE 2007-base minus Changes (592/592). Banner varbit 1459.
+// Do not open leftover 15831 / 2804.
+
+[label,champions_spawn_lesserdemon]
+if (npc_find(^champions_imp_spawn, champions_lesserdemon, 8, 0) = true) {
+    return;
+}
+npc_add(map_findsquare(^champions_imp_spawn, 0, 2, ^map_findsquare_lineofwalk), champions_lesserdemon, 1000);
+
+[ai_queue3,champions_lesserdemon]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+if (p_finduid(uid) = true) {
+    @champions_lesserdemon_victory;
+    return;
+}
+queue(queue_champions_lesserdemon_victory, 0, 0);
+
+[queue,queue_champions_lesserdemon_victory]
+@champions_lesserdemon_victory;
+
+[label,champions_lesserdemon_victory]
+%champions_defeated_lesserdemon = 1;
+if (inv_total(inv, champions_challenge_lesserdemon) > 0) {
+    inv_del(inv, champions_challenge_lesserdemon, 1);
+}
+// Leftover 15831 parchment stays closed. Leftover title lines as mes only.
+mes("Well done, you defeated the Champion!");
+mes("You are awarded: 592 Slayer Xp, 592 Hitpoint Xp.");
+stat_advance(slayer, ^champions_lesserdemon_xp);
+stat_advance(hitpoints, ^champions_lesserdemon_xp);

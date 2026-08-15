@@ -65,6 +65,10 @@ if (inv_total(inv, champions_challenge_jogre) > 0) {
     @champions_spawn_jogre;
     return;
 }
+if (inv_total(inv, champions_challenge_lesserdemon) > 0) {
+    @champions_spawn_lesserdemon;
+    return;
+}
 @champions_spawn_imp;
 
 [oploc1,champions_arenaladder]
