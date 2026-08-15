@@ -5,7 +5,8 @@
 [oploc1,miningcampgateclosedr] ~open_desertcamp_gate(^right);
 
 [oplocu,miningcampgateclosedl] 
-if(last_useitem = metal_key) {
+def_obj $use_l = last_useitem;
+if($use_l = metal_key) {
     // this is to replicate osrs behaviour where you get nothing interesting happens after opening gate to leave w/key
     // this could just be a rework bug
     def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
@@ -15,16 +16,31 @@ if(last_useitem = metal_key) {
     }
     ~open_desertcamp_gate(^left);
 }
+if($use_l = favour_key_ring) {
+    if(~osf_key_ring_has(metal_key) = true) {
+        mes("You use your keyring to unlock the door.");
+        ~open_desertcamp_gate(^left);
+        return;
+    }
+}
 ~displaymessage(^dm_default);
 
 [oplocu,miningcampgateclosedr]
-if(last_useitem = metal_key) {
-    def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
-    if($entering = true) {
+def_obj $use_r = last_useitem;
+if($use_r = metal_key) {
+    def_boolean $entering_r = ~check_axis(coord, loc_coord, loc_angle);
+    if($entering_r = true) {
         ~open_desertcamp_gate(^right);
         return;
     }
     ~open_desertcamp_gate(^right);
+}
+if($use_r = favour_key_ring) {
+    if(~osf_key_ring_has(metal_key) = true) {
+        mes("You use your keyring to unlock the door.");
+        ~open_desertcamp_gate(^right);
+        return;
+    }
 }
 ~displaymessage(^dm_default);
 
@@ -871,6 +887,13 @@ if(last_useitem = thgoodminekey) {
     mes("You use the wrought iron key on gates.");
     ~open_and_close_double_door2(~check_axis(coord, loc_coord, loc_angle), $side, grate_open);
     return;
+}
+if(last_useitem = favour_key_ring) {
+    if(~osf_key_ring_has(thgoodminekey) = true) {
+        mes("You use your keyring to unlock the door.");
+        ~open_and_close_double_door2(~check_axis(coord, loc_coord, loc_angle), $side, grate_open);
+        return;
+    }
 }
 ~displaymessage(^dm_default);
 

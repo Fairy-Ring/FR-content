@@ -235,4 +235,11 @@ if(last_useitem = ikov_shinykey) {
     ~open_and_close_door2(desertdoor_inactive, ~check_axis_locactive(coord), door_open);
     return;
 }
+if(last_useitem = favour_key_ring) {
+    if(~osf_key_ring_has(ikov_shinykey) = true) {
+        mes("You use your keyring to unlock the door.");
+        ~open_and_close_door2(desertdoor_inactive, ~check_axis_locactive(coord), door_open);
+        return;
+    }
+}
 ~displaymessage(^dm_default);

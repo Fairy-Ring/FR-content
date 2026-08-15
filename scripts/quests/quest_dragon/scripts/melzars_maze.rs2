@@ -13,6 +13,13 @@ mes("The door is securely locked.");
 [oplocu,melzardoor] // https://youtu.be/tmPf68hogzw?t=54
  if (last_useitem = melzarkey) {
     ~open_and_close_door(poordoor, ~check_axis_locactive(coord), false);
+} else if (last_useitem = favour_key_ring) {
+    if (~osf_key_ring_has(melzarkey) = true) {
+        mes("You use your keyring to unlock the door.");
+        ~open_and_close_door(poordoor, ~check_axis_locactive(coord), false);
+    } else {
+        ~displaymessage(^dm_default);
+    }
 } else {
     ~displaymessage(^dm_default);
 }

@@ -30,6 +30,13 @@ if(last_useitem = elemental_workshop_key) {
     ~open_and_close_double_door2(~check_axis_locactive(coord), $side, coffin_open);
     return;
 }
+if(last_useitem = favour_key_ring) {
+    if(~osf_key_ring_has(elemental_workshop_key) = true) {
+        mes("You use your keyring to unlock the door.");
+        ~open_and_close_double_door2(~check_axis_locactive(coord), $side, coffin_open);
+        return;
+    }
+}
 sound_synth(locked, 0, 0);
 mes("You can't unlock the door with that.");
 
