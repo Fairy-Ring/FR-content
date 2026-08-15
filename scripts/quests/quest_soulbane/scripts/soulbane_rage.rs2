@@ -1,0 +1,14 @@
+// Soul's Bane — Enter the roped rift -> rage room 3013,5243 L0, overlay
+// rage_level 15100 ("Rage level." + ten dummy pips). Chrome-only: no Launa
+// start-talk, no rack Take-from, no Angry-* combat, no XP, no journal 15098.
+// Rope-on (soulbane_riftrope_pres) is a harness toy; the empty rift 13967 is
+// not bound (2007-base "You can't just jump down there").
+// Cite residual-if-15100-room-dest-377.md + residual-if-rage-level-377.md.
+
+[oploc1,soulbane_falloff2_rope] @soulbane_rage_enter;
+[oploc1,soulbane_falloff2_rope_multi] @soulbane_rage_enter;
+
+[label,soulbane_rage_enter]
+p_arrivedelay;
+p_teleport(0_47_81_5_59); // 3013,5243 L0 — collision walkable E of rack 3012,5243
+if_openoverlay(rage_level);
