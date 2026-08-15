@@ -1,0 +1,36 @@
+// Zombie Champion leftover fight after Larxus accept.
+// Combat stats VERIFIED unpack all.npc (size=2 vislevel=51 hitpoints=60 attack=38 strength=42 defence=42).
+// XP CANDIDATE 2007-base minus Changes (240/240). Banner varbit 1461.
+// No-Magic is Larxus chat (CANDIDATE). Engine has no combat lock — ship fight anyway.
+// Do not open leftover 15831 / 2804.
+
+[label,champions_spawn_zombie]
+if (npc_find(^champions_imp_spawn, champions_zombie, 8, 0) = true) {
+    return;
+}
+npc_add(map_findsquare(^champions_imp_spawn, 0, 2, ^map_findsquare_lineofwalk), champions_zombie, 1000);
+
+[ai_queue3,champions_zombie]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+if (p_finduid(uid) = true) {
+    @champions_zombie_victory;
+    return;
+}
+queue(queue_champions_zombie_victory, 0, 0);
+
+[queue,queue_champions_zombie_victory]
+@champions_zombie_victory;
+
+[label,champions_zombie_victory]
+%champions_defeated_zombie = 1;
+if (inv_total(inv, champions_challenge_zombie) > 0) {
+    inv_del(inv, champions_challenge_zombie, 1);
+}
+// Leftover 15831 parchment stays closed. Leftover title lines as mes only.
+mes("Well done, you defeated the Champion!");
+mes("You are awarded: 240 Slayer Xp, 240 Hitpoint Xp.");
+stat_advance(slayer, ^champions_zombie_xp);
+stat_advance(hitpoints, ^champions_zombie_xp);
