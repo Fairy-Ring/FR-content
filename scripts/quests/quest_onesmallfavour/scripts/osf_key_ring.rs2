@@ -1,0 +1,12 @@
+// OSF leftover — Check-keys on steel key ring (cite osf-key-ring-check-keys-377.md).
+// Packed iop1=Check-keys. Do not open leftover 12346. Do not invent empty-ring
+// mes / slot map / key list. Key-store writer ABSENT — 0 keys stored. Award /
+// Rub leftovers cite, do not rewrite.
+
+[opheld1,favour_key_ring]
+if (inv_total(inv, favour_key_ring) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// Inspect only. Empty display UNKNOWN — do not invent mesbox / if_open*.
+return;
