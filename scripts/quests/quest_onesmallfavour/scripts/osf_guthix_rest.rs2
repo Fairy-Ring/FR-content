@@ -1,0 +1,41 @@
+// One Small Favour — Guthix rest heat: Use bowl of water (1921) on a packed
+// range/fire -> bowl of hot water (4456). CANDIDATE mes "You heat the water."
+// (2007-base minus Changes). No %onesmallfavour write. No XP. No dest / 12346.
+// Cite osf-guthix-rest-brew-impl-377.md + osf-guthix-rest-brew-377.md.
+// Use-on-loc is loc-bound (engine OpLocU), so heat binds the packed cooking
+// loc types and forwards every other item to live cooking.rs2.
+
+[oplocu,scenery_2728] @osf_bowl_heat_oven;
+[oplocu,scenery_2729] @osf_bowl_heat_oven;
+[oplocu,scenery_2730] @osf_bowl_heat_oven;
+[oplocu,scenery_2731] @osf_bowl_heat_oven;
+
+[oplocu,scenery_2724] @osf_bowl_heat_fire;
+[oplocu,scenery_2725] @osf_bowl_heat_fire;
+[oplocu,scenery_2726] @osf_bowl_heat_fire;
+[oplocu,scenery_2727] @osf_bowl_heat_fire;
+[oplocu,scenery_2732] @osf_bowl_heat_fire;
+
+[label,osf_bowl_heat_oven]
+if (last_useitem = bowl_water) {
+    @osf_heat_bowl_water(human_potterywheel);
+    return;
+}
+@attempt_cook_item(last_useitem);
+
+[label,osf_bowl_heat_fire]
+if (last_useitem = bowl_water) {
+    @osf_heat_bowl_water(human_firecooking);
+    return;
+}
+if (oc_param(last_useitem, unlit_arrow) = ^true) {
+    @light_firearrow(last_useitem);
+    return;
+}
+@attempt_cook_item(last_useitem);
+
+[label,osf_heat_bowl_water](seq $anim)
+anim($anim, 0);
+inv_del(inv, bowl_water, 1);
+inv_add(inv, bowl_hot_water, 1);
+mes("You heat the water.");
