@@ -67,6 +67,10 @@ if(map_members = ^true & ~trail_hasclue_inv = true) {
         }
     }
 }
+// Barrows — Dig on a mound falls into the crypt (barrows_dig.rs2).
+if (~barrows_dig() = true) {
+    return;
+}
 ~displaymessage(^dm_default);
 
 
