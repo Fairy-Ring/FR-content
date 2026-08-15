@@ -1,0 +1,36 @@
+// Goblin Champion leftover fight after Larxus accept.
+// Combat stats VERIFIED unpack all.npc (vislevel=24 hitpoints=32 attack=1 strength=1 defence=14).
+// XP CANDIDATE 2007-base minus Changes (128/128). Banner varbit 1455.
+// Magic-only is Larxus chat (CANDIDATE). Engine has no spec-style combat lock — ship fight anyway.
+// Do not open leftover 15831 / 2804.
+
+[label,champions_spawn_goblin]
+if (npc_find(^champions_imp_spawn, champions_goblin, 8, 0) = true) {
+    return;
+}
+npc_add(map_findsquare(^champions_imp_spawn, 0, 2, ^map_findsquare_lineofwalk), champions_goblin, 1000);
+
+[ai_queue3,champions_goblin]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+if (p_finduid(uid) = true) {
+    @champions_goblin_victory;
+    return;
+}
+queue(queue_champions_goblin_victory, 0, 0);
+
+[queue,queue_champions_goblin_victory]
+@champions_goblin_victory;
+
+[label,champions_goblin_victory]
+%champions_defeated_goblin = 1;
+if (inv_total(inv, champions_challenge_goblin) > 0) {
+    inv_del(inv, champions_challenge_goblin, 1);
+}
+// Leftover 15831 parchment stays closed. Leftover title lines as mes only.
+mes("Well done, you defeated the Champion!");
+mes("You are awarded: 128 Slayer Xp, 128 Hitpoint Xp.");
+stat_advance(slayer, ^champions_goblin_xp);
+stat_advance(hitpoints, ^champions_goblin_xp);

@@ -41,6 +41,10 @@ if ($used = champions_challenge_imp) {
     @champions_accept_imp;
     return;
 }
+if ($used = champions_challenge_goblin) {
+    @champions_accept_goblin;
+    return;
+}
 ~chatnpc("<p,neutral>That's great, now go show who's interested.");
 
 [label,champions_accept_imp]
@@ -56,6 +60,27 @@ if (~champions_statue_is_open = true) {
     return;
 }
 ~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're not allowed to use any Special Attacks. Do you still want to proceed?");
+def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>No thanks, I'll pass.");
+    return;
+}
+~champions_open_statue;
+~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
+
+[label,champions_accept_goblin]
+if (%champions_defeated_goblin = 1) {
+    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
+    if (inv_total(inv, champions_challenge_goblin) > 0) {
+        inv_del(inv, champions_challenge_goblin, 1);
+    }
+    return;
+}
+if (~champions_statue_is_open = true) {
+    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
+    return;
+}
+~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're only allowed to use Magic attacks, no Melee or Ranged. Do you still want to proceed?");
 def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
 if ($go = 2) {
     ~chatplayer("<p,neutral>No thanks, I'll pass.");

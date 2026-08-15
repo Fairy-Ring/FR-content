@@ -33,6 +33,10 @@ mes("You climb down through the trapdoor...");
 anim(human_pickupfloor, 0);
 p_delay(0);
 p_telejump(^champions_imp_spawn);
+if (inv_total(inv, champions_challenge_goblin) > 0) {
+    @champions_spawn_goblin;
+    return;
+}
 @champions_spawn_imp;
 
 [oploc1,champions_arenaladder]
