@@ -1,7 +1,11 @@
 // Shop path is live Shilo antiques (RuneHQ city-guide). OSF favour branch is
 // CANDIDATE last-resort 2007-base (Transcript:One Small Favour minus ~Feb 2022
 // overlay / RS3 Overview / hatchet). Hunt 289? no. Accept %onesmallfavour 0→1.
-// STOP: no forester splice, no leftover remove_this_key 12346, no lamps.
+// Mahogany-return leftover (cite osf-yanni-mahogany-return-377.md): prefix only
+// when >= 42 + inv 4445. Consume 4445. 42→43.
+// Key ring award leftover (cite osf-key-ring-award-377.md): inv_add 4446 once
+// on the same rant. 43→44. Name-only 4447. No dest / leftover 12346 /
+// Check-keys / lamps grant / shop rewrite.
 
 [opnpc1,shiloantiques]
 ~chatplayer("<p,neutral>Hello there!");
@@ -71,6 +75,13 @@ return;
 
 [label,yanni_osf_progress_menu]
 ~chatnpc("<p,happy>Greetings Bwana! My name is Yanni and I buy and sell antiques.");
+if (%onesmallfavour >= 42) {
+    if (%onesmallfavour < 43) {
+        if (inv_total(inv, favour_mahogany_log) >= 1) {
+            @yanni_osf_mahogany_menu;
+        }
+    }
+}
 def_int $prog = ~p_choice3("Tell me about this antiques business.", 1, "What was I supposed to do again?", 2, "Do you have any interesting items for sale?", 3);
 if ($prog = 1) {
     ~chatplayer("<p,quiz>Tell me about this antiques business.");
@@ -79,6 +90,53 @@ if ($prog = 1) {
     @yanni_osf_reminder;
 }
 @yanni_items_for_sale;
+
+[label,yanni_osf_mahogany_menu]
+// Prefix only. Keep shop / reminder / sale. Exact index vs live 3-way = UNKNOWN.
+def_int $mh = ~p_choice4("Here's the red mahogany you asked for.", 1, "Tell me about this antiques business.", 2, "What was I supposed to do again?", 3, "Do you have any interesting items for sale?", 4);
+if ($mh = 1) {
+    @yanni_osf_mahogany_return;
+} else if ($mh = 2) {
+    ~chatplayer("<p,quiz>Tell me about this antiques business.");
+    @yanni_antiques_quote;
+} else if ($mh = 3) {
+    @yanni_osf_reminder;
+}
+@yanni_items_for_sale;
+
+[label,yanni_osf_mahogany_return]
+// CANDIDATE Returning to Yanni with the red mahogany minus Quest complete /
+// toolbelt / topic / 2022 overlay. Grant 4446 once. Name-only two lamps.
+~chatplayer("<p,happy>Here's the red mahogany you asked for.");
+~chatnpc("<p,happy>Well, that's absolutely wonderful my friend! Many thanks!");
+~chatplayer("<p,quiz>What, that's it?");
+~chatnpc("<p,quiz>Well...what were you expecting? I mean, it took you so long I could have gone and got it myself!");
+~chatplayer("<p,angry>What! I've traipsed halfway around Gielinor...");
+~chatplayer("<p,angry>I've negociated with fanatics, dwarven gangsters and arrogant gnomes.");
+~chatplayer("<p,angry>I've fixed ancient weather vanes and gnomish landing lights and fought supernatural rock monsters...");
+~chatplayer("<p,angry>I've filled stodgy mattresses with feathers, made pot lids to help cure an ailing metal-smith...and that's all the thanks I get? 'Thanks!'");
+~chatnpc("<p,neutral>Well, you didn't have to go to so much trouble...");
+~chatplayer("<p,angry>Raarrrhhhh!");
+~chatnpc("<p,neutral>Look, I can see that you're quite upset about this...so here, have this.");
+~objbox(favour_key_ring, "Yanni shows you a small metallic ring.", 250, 0, 0);
+~chatplayer("<p,quiz>What is it?");
+~chatnpc("<p,neutral>It's a key ring, you can store some of your most valuable keys on it...helps to keep things organised!");
+~chatplayer("<p,quiz>A key ring? That's it?");
+~chatnpc("<p,neutral>Well, I only asked you to do me one small favour...");
+~chatplayer("<p,sad>Groan! Yeah, so did everyone else!");
+~chatnpc("<p,neutral>Oh....ok, I guess I could offer you these lamps...I'm not sure what they're worth, but you can have them.");
+~objbox(thosf_reward_lamp, "Yanni offers you two unusual looking lamps.", 250, 0, 0);
+inv_del(inv, favour_mahogany_log, 1);
+if (%onesmallfavour = 42) {
+    %onesmallfavour = 43;
+}
+if (inv_total(inv, favour_key_ring) < 1) {
+    inv_add(inv, favour_key_ring, 1);
+}
+if (%onesmallfavour = 43) {
+    %onesmallfavour = 44;
+}
+return;
 
 [label,yanni_osf_reminder]
 ~chatnpc("<p,quiz>What do you mean?");
