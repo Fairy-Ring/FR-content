@@ -1,0 +1,17 @@
+// Ratcatchers — Talk-to Felkrash (2951, 2977,9639 L0) after Ratcatchers
+// progress opens the cat naming chrome (name_your_cat 15192): six letter-wheel
+// slots + arrows + ENTER + Close. Gate: main_ratcatch_var >= 1 (past the
+// shipped stage-0 sisters refuse). Complete-stage ladder is unproven
+// (ratcatch research: "no invent stage ladder"), so the gate is a labeled
+// toy: harness `::setvar main_ratcatch_var 1`. No wily/lazy check, no cat_name
+// varp, no pick_a_kitten 14664, no Gertrude bolt, no alphabet wiring (free-wheel
+// CANDIDATE, later). Cite residual-if-15192-prior-unit-377.md +
+// residual-if-name-your-cat-377.md.
+
+[opnpc1,vc_felkrash_the_bard] @name_your_cat_open;
+
+[label,name_your_cat_open]
+if (%main_ratcatch_var < 1) {
+    return;
+}
+if_openmain(name_your_cat);
