@@ -1,11 +1,16 @@
 // One Small Favour — Johanhus after Aggie 4→5. HAM hideout.
 // CANDIDATE last-resort 2007-base (OSRS Asking Johanhus about Jimmy).
-// No dest / trapdoor / 12346 / lamps. Hunt 289? no.
-// Cite osf-johanhus-later-377.md.
+// Return after Seth 37→38: spoken release of Jimmy the Chisel.
+// No dest / trapdoor / empty-cage / Aggie unwind / 12346 / lamps. Hunt 289? no.
+// Cite osf-johanhus-later-377.md · osf-johanhus-jimmy-release-377.md.
 
 [opnpc1,favour_johanhus_ulsbrecht]
 if (%onesmallfavour < 5) {
     ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavour >= 38) {
+    @osf_johanhus_release;
     return;
 }
 ~chatnpc("<p,happy>Welcome to our organisation...ours is a fight for humanity in all its shapes and forms...and to rid mankind of the monsters that exist in our world.");
@@ -35,5 +40,34 @@ if ($yes = 2) {
 ~chatnpc("<p,happy>That's exactly right! Do this for us and we'll let Brother Jimmy go!");
 if (%onesmallfavour = 5) {
     %onesmallfavour = 6;
+}
+return;
+
+[label,osf_johanhus_release]
+// After Seth cages leftover 37→38. Spoken release only. Jimmy cage leftover stays caged.
+// CANDIDATE Transcript heading-back minus Changes. Name-only employer / Aggie.
+if (%onesmallfavour >= 39) {
+    ~chatnpc("<p,neutral>I've released Brother Jimmy. Tell his employer that he'll be there shortly.");
+    return;
+}
+~chatnpc("<p,happy>Welcome to our organisation...ours is a fight for humanity in all its shapes and forms...and to rid mankind of the monsters that exist in our world.");
+def_int $rel = ~p_choice2("You're in luck, I've managed to swing that chicken deal for you.", 1, "Ok, thanks.", 2);
+if ($rel = 2) {
+    ~chatplayer("<p,neutral>Okay, thanks.");
+    return;
+}
+~chatplayer("<p,happy>You're in luck, I've managed to swing that chicken deal for you.");
+~chatnpc("<p,neutral>Hmmm. Congratulations on your achievement, your help will ensure the success of our venture and we can surely take our efforts forwards. Tell me, won't you consider joining our calling?");
+~chatplayer("<p,neutral>Thanks for the offer, but I'm sort of in the middle of something currently.");
+~chatnpc("<p,neutral>Right...well please consider it an open offer...Ok then...thanks and goodbye.");
+~chatplayer("<p,angry>Hold on! Aren't you forgetting something?");
+~chatnpc("<p,quiz>What? Sorry? Please calm down!");
+~chatplayer("<p,angry>You said that you would release Jimmy! Are you going to keep to your word or am I going to have to get angry?");
+~chatnpc("<p,sad>Oh my dear friend...please...there's no need to get so upset...of course we're going to release Jimmy. Oh dear, you do take things a bit seriously don't you?");
+~chatplayer("<p,neutral>Good...I have things to do and I've had enough of people messing me about.");
+~chatnpc("<p,neutral>Ok, I understand...please don't worry. I'll release Brother Jimmy now! Tell his employer that he'll be there shortly.");
+~chatplayer("<p,neutral>Very well...but if you're lying, I'll be back and I won't be happy!");
+if (%onesmallfavour = 38) {
+    %onesmallfavour = 39;
 }
 return;
