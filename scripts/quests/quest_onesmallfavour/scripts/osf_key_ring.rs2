@@ -1,16 +1,14 @@
-// OSF leftover — Check-keys + Use-key on steel key ring.
-// Cite osf-key-ring-check-keys-377.md + osf-key-ring-use-377.md.
-// Store: %favour_key_ring on pack 418 (274-shaped: same debugname as obj
-// ring_of_forging / ring_of_recoil). Do not open leftover 12346. Do not dest.
-// Do not invent Arrav which-key / shortcut / 13-key table / toolbelt.
+// OSF leftover — Check-keys opens leftover remove_this_key 12346.
+// Use-key stores on %favour_key_ring pack 418. Use-on-door reads bits 0–9.
+// Selected key lives in bits 16–19 of the same varp (15 = none).
+// Do not dest. Do not invent Arrav which-key / shortcut / 13-key table / toolbelt.
 
 [opheld1,favour_key_ring]
 if (inv_total(inv, favour_key_ring) < 1) {
     ~displaymessage(^dm_default);
     return;
 }
-// Inspect only. Empty display UNKNOWN — do not invent mesbox / if_open*.
-return;
+~osf_key_ring_open;
 
 [opheldu,favour_key_ring]
 if (inv_total(inv, favour_key_ring) < 1) {
@@ -30,11 +28,11 @@ if (inv_total(inv, $key) < 1) {
     ~displaymessage(^dm_default);
     return;
 }
-def_string $name = oc_name($key);
+def_string $addname = oc_name($key);
 %favour_key_ring = setbit(%favour_key_ring, $bit);
 inv_del(inv, $key, 1);
 // CANDIDATE last-resort add mes (OSRS minus Changes). Exact period string UNKNOWN.
-mes("You add the <$name> to your key ring.");
+mes("You add the <$addname> to your key ring.");
 
 [proc,osf_key_ring_store_bit](obj $key)(int)
 // CANDIDATE Tip.it 2007-09-16 minus shortcut 23 Oct 2006 minus Arrav (UNKNOWN which).
@@ -50,10 +48,142 @@ if ($key = ikov_shinykey) return(8);
 if ($key = thgoodminekey) return(9);
 return(-1);
 
+[proc,osf_key_ring_obj](int $bit)(namedobj)
+if ($bit = 0) return(elid_key);
+if ($bit = 1) return(edgevilledungeonkey);
+if ($bit = 2) return(elemental_workshop_key);
+if ($bit = 3) return(hauntedmine_reward_key);
+if ($bit = 4) return(dusty_key);
+if ($bit = 5) return(makinghistory_key);
+if ($bit = 6) return(melzarkey);
+if ($bit = 7) return(metal_key);
+if ($bit = 8) return(ikov_shinykey);
+if ($bit = 9) return(thgoodminekey);
+return(null);
+
 [proc,osf_key_ring_has](obj $key)(boolean)
-// Held ring + stored bit. Banked ring does not unlock. Cite osf-key-ring-door-377.md.
 if (inv_total(inv, favour_key_ring) < 1) return(false);
-def_int $bit = ~osf_key_ring_store_bit($key);
-if ($bit = -1) return(false);
-if (testbit(%favour_key_ring, $bit) = 1) return(true);
+def_int $hasbit = ~osf_key_ring_store_bit($key);
+if ($hasbit = -1) return(false);
+if (testbit(%favour_key_ring, $hasbit) = 1) return(true);
 return(false);
+
+[proc,osf_key_ring_first_stored]()(int)
+def_int $b = 0;
+while ($b < 10) {
+    if (testbit(%favour_key_ring, $b) = 1) return($b);
+    $b = add($b, 1);
+}
+return(15);
+
+[proc,osf_key_ring_stored_at](int $index)(namedobj)
+def_int $seen = 0;
+def_int $b = 0;
+while ($b < 10) {
+    if (testbit(%favour_key_ring, $b) = 1) {
+        if ($seen = $index) return(~osf_key_ring_obj($b));
+        $seen = add($seen, 1);
+    }
+    $b = add($b, 1);
+}
+return(null);
+
+[proc,osf_key_ring_sel]()(int)
+return(getbit_range(%favour_key_ring, 16, 19));
+
+[proc,osf_key_ring_setsel](int $bit)
+%favour_key_ring = setbit_range_toint(%favour_key_ring, $bit, 16, 19);
+
+[proc,osf_key_ring_paint_slot](component $com, int $zoom, int $index)
+def_namedobj $slotkey = ~osf_key_ring_stored_at($index);
+if ($slotkey = null) {
+    if_sethide($com, true);
+    return;
+}
+if_sethide($com, false);
+if_setobject($com, $slotkey, $zoom);
+
+[proc,osf_key_ring_paint]
+// Leftover dummy slots (unique positions). com_4 is stacked on com_2 — hide.
+if_sethide(remove_this_key:com_4, true);
+~osf_key_ring_paint_slot(remove_this_key:com_2, 238, 0);
+~osf_key_ring_paint_slot(remove_this_key:com_5, 308, 1);
+~osf_key_ring_paint_slot(remove_this_key:com_6, 441, 2);
+~osf_key_ring_paint_slot(remove_this_key:com_7, 616, 3);
+~osf_key_ring_paint_slot(remove_this_key:com_8, 700, 4);
+~osf_key_ring_paint_slot(remove_this_key:com_9, 700, 5);
+def_int $sel = ~osf_key_ring_sel;
+if ($sel > 9 | testbit(%favour_key_ring, $sel) = 0) {
+    $sel = ~osf_key_ring_first_stored;
+    ~osf_key_ring_setsel($sel);
+}
+if_settext(remove_this_key:com_11, "Steel key ring");
+def_string $list = "";
+def_int $b = 0;
+while ($b < 10) {
+    if (testbit(%favour_key_ring, $b) = 1) {
+        def_namedobj $listed = ~osf_key_ring_obj($b);
+        if (string_length($list) = 0) {
+            $list = oc_name($listed);
+        } else {
+            $list = append($list, ", ");
+            $list = append($list, oc_name($listed));
+        }
+    }
+    $b = add($b, 1);
+}
+if (string_length($list) = 0) {
+    // CANDIDATE empty line. Exact period string UNKNOWN.
+    if_settext(remove_this_key:com_12, "You have no keys on your key ring.");
+    if_settext(remove_this_key:com_18, "");
+} else {
+    if_settext(remove_this_key:com_12, $list);
+    if ($sel < 10) {
+        if_settext(remove_this_key:com_18, oc_name(~osf_key_ring_obj($sel)));
+    } else {
+        if_settext(remove_this_key:com_18, "");
+    }
+}
+
+[proc,osf_key_ring_open]
+~osf_key_ring_paint;
+if_openmain(remove_this_key);
+
+[proc,osf_key_ring_click_slot](int $index)
+def_namedobj $clicked = ~osf_key_ring_stored_at($index);
+if ($clicked = null) return;
+~osf_key_ring_setsel(~osf_key_ring_store_bit($clicked));
+~osf_key_ring_paint;
+
+[proc,osf_key_ring_remove]
+if (inv_total(inv, favour_key_ring) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $sel = ~osf_key_ring_sel;
+if ($sel > 9 | testbit(%favour_key_ring, $sel) = 0) {
+    $sel = ~osf_key_ring_first_stored;
+}
+if ($sel > 9) return;
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+def_namedobj $removed = ~osf_key_ring_obj($sel);
+if ($removed = null) return;
+def_string $remname = oc_name($removed);
+%favour_key_ring = clearbit(%favour_key_ring, $sel);
+inv_add(inv, $removed, 1);
+// CANDIDATE last-resort remove mes (OSRS minus Changes). Exact period string UNKNOWN.
+mes("You remove the <$remname> from your key ring.");
+~osf_key_ring_setsel(~osf_key_ring_first_stored);
+~osf_key_ring_paint;
+
+[if_button,remove_this_key:com_2] ~osf_key_ring_click_slot(0);
+[if_button,remove_this_key:com_5] ~osf_key_ring_click_slot(1);
+[if_button,remove_this_key:com_6] ~osf_key_ring_click_slot(2);
+[if_button,remove_this_key:com_7] ~osf_key_ring_click_slot(3);
+[if_button,remove_this_key:com_8] ~osf_key_ring_click_slot(4);
+[if_button,remove_this_key:com_9] ~osf_key_ring_click_slot(5);
+[if_button,remove_this_key:com_17] ~osf_key_ring_remove;
+[if_button,remove_this_key:com_20] ~osf_key_ring_remove;
