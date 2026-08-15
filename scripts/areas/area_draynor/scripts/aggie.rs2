@@ -1,6 +1,17 @@
 [opnpc1,aggie]
 ~chatnpc("<p,happy>What can I help you with?");
-if (%onesmallfavour >= 4) {
+// After Johanhus 38→39. Cite osf-aggie-jimmy-return-377.md. Keep 4→5 / ≥5 search below 39.
+if (%onesmallfavour >= 39) {
+    def_int $ret = 0;
+    if (%onesmallfavour >= 40) {
+        $ret = ~p_choice2("What should I do now?", 1, "Something else.", 2);
+    } else {
+        $ret = ~p_choice2("Good news! Jimmy has been released!", 1, "Something else.", 2);
+    }
+    if ($ret = 1) {
+        @osf_aggie_jimmy_return;
+    }
+} else if (%onesmallfavour >= 4) {
     def_int $osf = 0;
     if (%onesmallfavour >= 5) {
         $osf = ~p_choice2("What am I supposed to be doing?", 1, "Something else.", 2);
@@ -73,6 +84,21 @@ if ($yes = 2) {
 ~chatnpc("<p,happy>Oh, thanks ever so much...I do appreciate it! Good Luck!");
 if (%onesmallfavour = 4) {
     %onesmallfavour = 5;
+}
+return;
+
+[label,osf_aggie_jimmy_return]
+// After Johanhus release Jimmy the Chisel. Name-only Brian. No 4444 / dest.
+// CANDIDATE Transcript heading-back minus Changes.
+if (%onesmallfavour >= 40) {
+    ~chatplayer("<p,quiz>What should I do now?");
+    ~chatnpc("<p,happy>I'll happily be a character witness for Brian now! Please let him know that I'll help his friend however I can.");
+    return;
+}
+~chatplayer("<p,happy>Good news! Jimmy has been released! Those fanatical HAM people said they'd let him go!");
+~chatnpc("<p,happy>Yes! He's just returned! I'll happily be a character witness for Brian now! Please let him know that I'll help his friend however I can.");
+if (%onesmallfavour = 39) {
+    %onesmallfavour = 40;
 }
 return;
 
