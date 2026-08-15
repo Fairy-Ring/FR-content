@@ -61,6 +61,10 @@ if (inv_total(inv, champions_challenge_earthwarrior) > 0) {
     @champions_spawn_earthwarrior;
     return;
 }
+if (inv_total(inv, champions_challenge_jogre) > 0) {
+    @champions_spawn_jogre;
+    return;
+}
 @champions_spawn_imp;
 
 [oploc1,champions_arenaladder]
