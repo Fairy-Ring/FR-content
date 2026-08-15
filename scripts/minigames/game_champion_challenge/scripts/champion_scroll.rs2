@@ -1,0 +1,21 @@
+// Champions’ Challenge leftover — Champion scroll Read.
+// Cite champions-scroll-377.md. Leftover desc= only.
+// Do not open leftover 15831 (victory) or 2804 (Fight Pit HUD).
+// Do not invent dest / XP / Larxus.
+
+[opheld1,champions_challenge_earthwarrior] @read_champion_scroll;
+[opheld1,champions_challenge_ghoul] @read_champion_scroll;
+[opheld1,champions_challenge_giant] @read_champion_scroll;
+[opheld1,champions_challenge_goblin] @read_champion_scroll;
+[opheld1,champions_challenge_hobgoblin] @read_champion_scroll;
+[opheld1,champions_challenge_imp] @read_champion_scroll;
+[opheld1,champions_challenge_jogre] @read_champion_scroll;
+[opheld1,champions_challenge_lesserdemon] @read_champion_scroll;
+[opheld1,champions_challenge_skeleton] @read_champion_scroll;
+[opheld1,champions_challenge_zombie] @read_champion_scroll;
+[opheld1,champions_challenge_human] @read_champion_scroll;
+
+[label,read_champion_scroll]
+// CANDIDATE surface: leftover unpack desc. Exact period letter UI UNKNOWN.
+// 0 leftover challenge-letter IF. Do not invent a second parchment.
+mes(oc_desc(last_item));
