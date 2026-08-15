@@ -1,10 +1,15 @@
 // One Small Favour — Seth Groats after Fred 6→7.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Seth).
-// No dest / cages consume / Horvik this file / 12346. Hunt 289? no.
+// Return consume after Horvik 36→37. No dest / Jimmy release / 12346.
+// Cite osf-seth-groats-after-fred-377.md · osf-seth-cages-return-377.md.
 
 [opnpc1,favour_seth_groats]
 if (%onesmallfavour < 7) {
     ~displaymessage(^dm_default);
+    return;
+}
+if (%onesmallfavour >= 37) {
+    @osf_seth_cages_return;
     return;
 }
 if (%onesmallfavour >= 8) {
@@ -37,4 +42,29 @@ if ($yes = 2) {
 if (%onesmallfavour = 7) {
     %onesmallfavour = 8;
 }
+return;
+
+[label,osf_seth_cages_return]
+// After Horvik 5×4443. Hide stale steel reminder. Cite leftover 1a–1d.
+if (%onesmallfavour >= 38) {
+    ~chatnpc("<p,happy>Thanks for getting us those chicken cages...you can go and talk to those fanatics now and get Jimmy released.");
+    return;
+}
+~chatnpc("<p,quiz>How are those chicken cages coming along?");
+if (inv_total(inv, favour_chicken_cage) >= 5) {
+    ~chatplayer("<p,happy>Here they are! I've got all five!");
+    ~mesbox("You show Seth the chicken cages.");
+    inv_del(inv, favour_chicken_cage, 5);
+    ~chatnpc("<p,happy>Well that's great! Well done! You can go and talk to those fanatics now and tell them that they'll get their chickens and they can let little Jimmy the Chisel go!");
+    if (%onesmallfavour = 37) {
+        %onesmallfavour = 38;
+    }
+    return;
+}
+if (inv_total(inv, favour_chicken_cage) > 0) {
+    ~chatplayer("<p,neutral>I have some chicken cages!");
+    ~chatnpc("<p,neutral>Well, I need at least five! Come back when you've got that many!");
+    return;
+}
+~chatplayer("<p,sad>Sorry, but I don't have any yet.");
 return;
