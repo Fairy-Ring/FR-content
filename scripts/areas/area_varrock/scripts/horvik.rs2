@@ -5,7 +5,9 @@
 if (%onesmallfavour >= 8) {
     ~chatnpc("<p,happy>Hello, do you need any help?");
     def_int $osf = 0;
-    if (%onesmallfavour >= 9) {
+    if (%onesmallfavour >= 36 & inv_total(inv, favour_herbal_tincture) > 0 & inv_total(inv, favour_breathing_salts) > 0 & inv_total(inv, pigeoncage) >= 5) {
+        $osf = ~p_choice3("I have the five pigeon cages you asked for!", 1, "No thanks. I'm just looking around.", 2, "Do you want to trade?", 3);
+    } else if (%onesmallfavour >= 9) {
         $osf = ~p_choice3("What was I supposed to be doing?", 1, "No thanks. I'm just looking around.", 2, "Do you want to trade?", 3);
     } else {
         $osf = ~p_choice3("Hi, I need to talk to you about chicken cages!", 1, "No thanks. I'm just looking around.", 2, "Do you want to trade?", 3);
@@ -35,6 +37,23 @@ if($option = 1) {
 }
 
 [label,osf_horvik_cages]
+// Return leftover after salts 35→36. Cite osf-horvik-cages-return-377.md.
+if (%onesmallfavour >= 36) {
+    if (inv_total(inv, favour_chicken_cage) > 0) {
+        ~chatplayer("<p,quiz>What was I supposed to be doing?");
+        ~chatnpc("<p,neutral>Take those chicken cages back to Seth Groats. He asked for them in the first place!");
+        return;
+    }
+    if (inv_total(inv, favour_herbal_tincture) > 0 & inv_total(inv, favour_breathing_salts) > 0 & inv_total(inv, pigeoncage) >= 5) {
+        @osf_horvik_convert;
+        return;
+    }
+    if (inv_total(inv, favour_herbal_tincture) > 0 & inv_total(inv, favour_breathing_salts) > 0) {
+        ~chatplayer("<p,happy>I have the tincture and the breathing salts.");
+        ~chatnpc("<p,happy>Wonderful! I just need the pigeon cages now. Five or so of those they have over in Ardougne.");
+        return;
+    }
+}
 if (%onesmallfavour >= 9) {
     ~chatplayer("<p,quiz>What was I supposed to be doing?");
     ~chatnpc("<p,sad>Please can you get me some medicine? I need herbal tincture and a pot of breathing salts. Also, get me five or so of those pigeon cages that they have over in Ardougne so that I can convert them into chicken cages.");
@@ -70,5 +89,20 @@ inv_del(inv, steel_bar, 3);
 ~chatnpc("<p,neutral>But first things first, bring me the medicine!");
 if (%onesmallfavour = 8) {
     %onesmallfavour = 9;
+}
+return;
+
+[label,osf_horvik_convert]
+// CANDIDATE last-resort 2007-base (Tip.it 2007 §23 + Transcript
+// I have the five pigeon cages). One write on 4443 grant. No dest / Seth / 12346.
+~chatplayer("<p,happy>I have the five pigeon cages you asked for!");
+~chatnpc("<p,happy>Great stuff...let's have them here then!");
+inv_del(inv, favour_herbal_tincture, 1);
+inv_del(inv, favour_breathing_salts, 1);
+inv_del(inv, pigeoncage, 5);
+inv_add(inv, favour_chicken_cage, 5);
+~chatnpc("<p,happy>There you go then! There's your chicken cages!");
+if (%onesmallfavour = 36) {
+    %onesmallfavour = 37;
 }
 return;
