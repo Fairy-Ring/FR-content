@@ -1,0 +1,23 @@
+// A Tail of Two Cats — Unferth (Burthorpe) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:A Tail of Two Cats minus overlay/catspeak chrome).
+// Cat follower needed: with cat -> first write %twocats_quest 0 -> 1.
+// No cat following -> "Hello, do you have a cat?" no write. No dest.
+// Review: Yes echoes the player line the plan names. Cat gate matches Gertrude.
+// Cite red-19-start-impl-377.md §9.
+
+[opnpc1,twocats_unferth_bald]
+if (%follower_obj ! null & oc_category(%follower_obj) = kitten | %follower_obj ! null & oc_category(%follower_obj) = cat | %follower_obj ! null & oc_category(%follower_obj) = overgrown) {
+    ~chatnpc("<p,neutral>Hello, I see you have a cat.");
+    ~chatnpc("<p,neutral>I do! His name is Bob but I can't find him!");
+    def_int $go = ~p_choice2("Tell you what. I'll help you!", 1, "Goodbye.", 2);
+    if ($go = 2) {
+        ~chatplayer("<p,neutral>Goodbye.");
+        return;
+    }
+    ~chatplayer("<p,happy>Tell you what. I'll help you!");
+    ~chatnpc("<p,neutral>Would you? Oh that would be so great!");
+    %twocats_quest = 1;
+} else {
+    ~chatnpc("<p,neutral>Hello, do you have a cat?");
+    ~chatnpc("<p,neutral>Oh, hmm.");
+}
