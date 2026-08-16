@@ -1,0 +1,24 @@
+// One Small Favour — Guthix rest Drink (finished cups 4417/4419/4421/4423).
+// CANDIDATE next-dose chain 4417->4419->4421->4423->cup_empty 1980 (drink
+// leftover; pack has 0 next_obj_stage and 0 category=potion). Named effect:
+// Drink 4419 -> 4421; last sip 4423 -> 1980. No mes (UNKNOWN — do not invent,
+// do not steal cup_of_tea say). No-gate, no varp, no dest, no heal / energy /
+// poison numbers (EXHAUSTED). Do not touch [opheld1,cup_of_tea] / tea_effect /
+// osf_guthix_rest.rs2 / Empty iop4 this hop.
+// Cite osf-guthix-rest-drink-377.md.
+
+[opheld1,cup_guthix_rest_4]
+inv_del(inv, cup_guthix_rest_4, 1);
+inv_add(inv, cup_guthix_rest_3, 1);
+
+[opheld1,cup_guthix_rest_3]
+inv_del(inv, cup_guthix_rest_3, 1);
+inv_add(inv, cup_guthix_rest_2, 1);
+
+[opheld1,cup_guthix_rest_2]
+inv_del(inv, cup_guthix_rest_2, 1);
+inv_add(inv, cup_guthix_rest_1, 1);
+
+[opheld1,cup_guthix_rest_1]
+inv_del(inv, cup_guthix_rest_1, 1);
+inv_add(inv, cup_empty, 1);
