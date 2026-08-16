@@ -1,12 +1,24 @@
 // Ghosts Ahoy — Ectophial Empty -> Ectofuntus temple floor 3658,3517 L0.
 // CANDIDATE dest (dest-uncited-pass-next-377.md); 3658,3518 / 3659,3518 are
 // blocked temple floor — not dest. Empty -> inv becomes ectophial_empty 4252
-// (binary full/empty, period Tip.it 30 Apr 2006); manual refill at the
-// Ectofuntus is a later unit. anim CANDIDATE (seq 878 ahoy_ecto_teleport).
-// No write. Cite ahoy-ectophial-charges-period-377.md.
+// (binary full/empty, period Tip.it 30 Apr 2006). anim CANDIDATE (seq 878
+// ahoy_ecto_teleport). No write. Cite ahoy-ectophial-charges-period-377.md.
+// Refill: use ectophial_empty 4252 on ahoy_ectofunctus 5282 @ 3658,3518 ->
+// back to ectophial 4251 (period refill at the Ectofuntus; no auto-walk /
+// never-empty / uninterruptible — all SUBTRACT). No dest, no Worship touch.
 
 [opheld1,ectophial]
 inv_del(inv, ectophial, 1);
 inv_add(inv, ectophial_empty, 1);
 anim(ahoy_ecto_teleport, 0);
 p_telejump(0_57_54_10_61); // ectophial 3658,3517 L0
+
+[oplocu,ahoy_ectofunctus]
+def_obj $used = last_useitem;
+if ($used ! ectophial_empty) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, ectophial_empty, 1);
+inv_add(inv, ectophial, 1);
+anim(ectophial_pour_slime_cover, 0);
