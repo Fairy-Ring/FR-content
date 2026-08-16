@@ -1,0 +1,18 @@
+// Dwarf Cannon — Fire the cannon with a gold shot -> Arzinian gold mine.
+// Gate %dwarfrock_quest >= 10 + %dwarfrock_gold_cannonball = 1. Dest CANDIDATE
+// 2306,4952 L0 (walkable next to gold vein 5991 @ 2305,4952 L0). Stay 10 —
+// never 110. CANDIDATE lines (2007-base minus Changes).
+// Cite spine-17-remaining-impl-377.md §4 + dest-from-our-maps-remaining-377.md.
+
+[oploc1,dwarf_rock_multicannon1]
+if (%dwarfrock_quest < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%dwarfrock_gold_cannonball = 0) {
+    mes("The cannon isn't loaded with a gold shot.");
+    return;
+}
+mes("You fire the cannon.");
+mes("The golden cannonball slams into the rock.");
+p_telejump(0_36_77_2_24); // 2306,4952 L0 — walkable next to gold vein 5991
