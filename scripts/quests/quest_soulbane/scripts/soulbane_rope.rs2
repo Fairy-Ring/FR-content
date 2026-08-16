@@ -1,0 +1,23 @@
+// A Soul's Bane — Use rope on the climb-down rift (parent 13968 @ 3310,3452).
+// CANDIDATE attach mes (dump Transcript does not quote it). Consume rope,
+// write %soulbane_riftrope_pres 1 so multi child soulbane_falloff2_rope shows.
+// No dest — Enter dest 3013,5243 L0 already shipped in soulbane_rage.rs2
+// (PASS sbragsuuf0on). Do not bind empty falloff1 (13967). Do not open 15100.
+// Cite crawl/soulbane-changes-377.md + residual-if-15100-room-dest-377.md.
+
+[oplocu,soulbane_falloff2] @soulbane_rope_attach;
+[oplocu,soulbane_falloff2_rope_multi] @soulbane_rope_attach;
+
+[label,soulbane_rope_attach]
+def_obj $used = last_useitem;
+if ($used ! rope) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%soulbane_riftrope_pres = 1) {
+    mes("The rope is already attached to the rift.");
+    return;
+}
+inv_del(inv, rope, 1);
+%soulbane_riftrope_pres = 1;
+mes("You attach the rope to the rift.");
