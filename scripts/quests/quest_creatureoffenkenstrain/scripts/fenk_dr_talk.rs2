@@ -1,0 +1,49 @@
+// Creature of Fenkenstrain — Dr Fenkenstrain courtyard interview Talk-to.
+// CANDIDATE 2007-base lines (OSRS Transcript:Creature of Fenkenstrain minus
+// the 2020 signpost-start overlay). Period menus VERIFIED (RuneVillage
+// screenshots 14 Feb 2006 / 5 May 2006): Q1 Braindead, Q2 Grave-digging ->
+// hired. Bind concrete fenk_fenkenstrain_model 1670 (multi 1668 keys 0-7 ->
+// 1670; key 8 = tower Dr 1669). %fenk_quest 0 -> 1 CANDIDATE (multi keeps the
+// ground Dr visible). No dest, no Charos, no ^dm_default pre-start.
+// Cite red-19-start-impl-377.md §2.
+
+[opnpc1,fenk_fenkenstrain_model]
+~chatnpc("<p,neutral>Have you come to apply for the job?");
+def_int $apply = ~p_choice2("Yes.", 1, "No.", 2);
+if ($apply = 2) {
+    ~chatplayer("<p,neutral>No.");
+    return;
+}
+~chatplayer("<p,neutral>Yes, if it pays well.");
+~chatnpc("<p,neutral>I'll have to ask you some questions first.");
+~chatplayer("<p,neutral>Okay...");
+~chatnpc("<p,neutral>How would you describe yourself in one word?");
+def_int $desc = ~p_choice4("Stunning.", 1, "Awe-inspiring.", 2, "Breathtaking.", 3, "Braindead.", 4);
+if ($desc = 4) {
+    ~chatnpc("<p,neutral>Mmmm, I see.");
+    ~chatnpc("<p,neutral>Just one more question. What would you say is your greatest skill?");
+    def_int $skill = ~p_choice4("Combat.", 1, "Magic.", 2, "Cooking.", 3, "Grave-digging.", 4);
+    if ($skill = 4) {
+        ~chatnpc("<p,neutral>Mmmm, I see.");
+        ~chatnpc("<p,happy>Looks like you're just the <text_gender("man", "woman")> for the job! Welcome aboard!");
+        ~chatplayer("<p,neutral>Is there anything you'd like me to do for you, sir?");
+        ~chatnpc("<p,neutral>Yes, there is. You're highly skilled at grave-digging, yes?");
+        ~chatplayer("<p,neutral>Err...yes, that's what I said.");
+        ~chatnpc("<p,neutral>Excellent. Now listen carefully.");
+        ~chatnpc("<p,neutral>I need you to find some...stuff...for me.");
+        ~chatplayer("<p,neutral>Stuff?");
+        ~chatnpc("<p,neutral>That's what I said...stuff.");
+        ~chatplayer("<p,neutral>What kind of stuff?");
+        ~chatnpc("<p,neutral>Well...dead stuff.");
+        ~chatplayer("<p,neutral>Go on...");
+        ~chatnpc("<p,neutral>I need you to get me enough dead body parts for me to stitch together a complete body, which I plan to bring to life.");
+        ~chatplayer("<p,neutral>Right...okay...if you insist.");
+        %fenk_quest = 1;
+        return;
+    }
+    ~chatnpc("<p,neutral>Mmmm, I see.");
+    ~chatnpc("<p,neutral>I'm sorry, but I don't think you have the aptitude for this position.");
+    return;
+}
+~chatnpc("<p,neutral>Mmmm, I see.");
+~chatnpc("<p,neutral>I'm sorry, but I don't think you have the aptitude for this position.");
