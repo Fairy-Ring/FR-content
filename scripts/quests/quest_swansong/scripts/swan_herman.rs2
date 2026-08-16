@@ -1,0 +1,71 @@
+// Swan Song — Herman Caranos (colony gate) start Talk-to.
+// CANDIDATE last-resort 2007-base (Transcript:Swan Song Starting out minus
+// Overview / toast / AKQ / Love Story). First write %swansong 0 -> 5
+// (pack-safe: 1-4 hide Herman). Chat + write only — no dest, no WOM file.
+// Cite red-19-start-impl-377.md §18 · swan-song-start-talk-377.md §4.
+
+[opnpc1,swan_herman]
+if (%swansong >= 5) {
+    ~chatnpc("<p,neutral>Please, the Colony needs that expert adventurer.");
+    return;
+}
+~chatplayer("<p,happy>Hello. Lovely day, isn't it?");
+~chatnpc("<p,confused>Lovely? Oh - er - if you say so. But please excuse me, I really don't have time to chat about the weather.");
+def_int $leave = ~p_choice2("What's the rush?", 1, "I'll leave you to it, then.", 2);
+if ($leave = 2) {
+    @swan_herman_leave;
+}
+~chatplayer("<p,quiz>What's the rush?");
+~chatnpc("<p,shock>Trolls! They're attacking my fishing Colony!");
+~chatplayer("<p,shock>Gosh, I didn't know there were any trolls around here.");
+~chatnpc("<p,neutral>These are a sort of sea-dwelling troll. They feed on the monkfish that live in this part of the sea, but just recently they've started invading my Colony!");
+$leave = ~p_choice2("Do you need any help?", 1, "I'll leave you to it, then.", 2);
+if ($leave = 2) {
+    @swan_herman_leave;
+}
+~chatplayer("<p,quiz>Do you need any help?");
+~chatnpc("<p,neutral>Well yes, I do. I've done some research about this, and I think our best hope is to get hold of an experienced adventurer.");
+~chatnpc("<p,neutral>In all the legends I've read, brave adventurers have no trouble vanquishing whatever monsters are menacing the helpless settlement.");
+@swan_herman_adventurer_menu;
+
+[label,swan_herman_adventurer_menu]
+def_int $pick = ~p_choice3("You've been... reading stories about adventurers?", 1, "I'm a brave adventurer! Can I try?", 2, "I'll leave you to it, then.", 3);
+if ($pick = 3) {
+    @swan_herman_leave;
+}
+if ($pick = 1) {
+    ~chatplayer("<p,quiz>You've been... reading stories about adventurers?");
+    ~chatnpc("<p,neutral>Yes, I've done my research very carefully. I've always made important decisions based on careful analysis of whatever documents are available to me on the topic. For example, I chose this site for my Fishing Colony because");
+    ~chatnpc("<p,neutral>records show this part of the sea to be a prime site for catching monkfish. I don't just fumble along like an amateur!");
+    ~chatplayer("<p,neutral>... fair enough, I suppose! Anyway, you think you need an adventurer?");
+    ~chatnpc("<p,neutral>Yes, that's right. A brave adventurer with plenty of experience in this sort of work.");
+    @swan_herman_adventurer_menu;
+}
+~chatplayer("<p,happy>I'm a brave adventurer! Can I try?");
+~chatnpc("<p,confused>You? I hadn't thought of that... let's have a look at you...");
+~update_questpoints;
+if (%qp < 101) {
+    ~chatnpc("<p,sad>No, I'm sorry, but you simply do not have enough experience. I've got a LOT at stake here, and I can't afford to have an amateur getting in the way.");
+    return;
+}
+~chatnpc("<p,neutral>Hmmm... You're not what I'm looking for, but... <tostring(%qp)> Quest Points is really rather a lot...");
+~chatnpc("<p,happy>Ok, the Piscatoris Fishing Colony gratefully accepts your offer of help. When the Colony is safe you shall be handsomely rewarded.");
+%swansong = 5;
+~chatplayer("<p,happy>Oh goody, I love rewards! Now, how can I help?");
+~chatnpc("<p,neutral>Well, as qualified as you undoubtedly are, I believe we're going to need a truly expert adventurer if the Colony is to stand a chance.");
+if (%legendsquest = ^legends_complete) {
+    ~chatplayer("<p,happy>Expert adventurer? I'll have you know I'm in the Guild of Legends!");
+} else {
+    ~chatplayer("<p,happy>Expert adventurer? I'll wager I've had more adventures than you've had pickled gherkins!");
+}
+~chatnpc("<p,neutral>If you could just stop blowing your own trumpet for a minute...");
+~chatplayer("<p,confused>...");
+~chatnpc("<p,happy>Excellent! Now, in far-away Misthalin there lives one of the greatest adventurers of all time.");
+~chatplayer("<p,confused>... this better be good...");
+~chatnpc("<p,neutral>His name is lost in the mists of time, but you shouldn't have much trouble finding the Wise Old Man of Draynor Village.");
+return;
+
+[label,swan_herman_leave]
+~chatplayer("<p,neutral>I'll leave you to it, then.");
+~chatnpc("<p,neutral>Fine, fine.");
+return;

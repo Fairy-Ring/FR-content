@@ -121,7 +121,9 @@ if ($again = 1) {
 return;
 
 [label,rd_tiffy_complete]
-// No Wanted! branch until RD complete surface is real (not soft setvar 2).
+if (%wanted_main = 0) {
+    @wanted_tiffy_start;
+}
 ~chatplayer("<p,happy>Hello.");
 ~chatnpc("<p,happy>What ho, <displayname>! Spiffing to see you again, what?");
 return;

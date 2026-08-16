@@ -1,0 +1,19 @@
+// Wanted! — Sir Tiffy later-case after RD complete.
+// Jumped from existing [label,rd_tiffy_complete]. No second [opnpc1].
+// CANDIDATE lines (Transcript:Wanted! Starting off minus 18 Feb 2016 Solus).
+// First write %wanted_main 0 -> 1. Chat + write only — no Amik, no Solus.
+// Cite red-19-start-impl-377.md §10.
+// Smoke that uses setvar rd_main 2 is a toy, not real RD complete.
+
+[label,wanted_tiffy_start]
+~chatnpc("<p,happy>What ho, sirrah. Jolly good show on the old training grounds thingy, what?");
+~chatplayer("<p,quiz>So Tiffy, now that I'm a Temple Knight Initiate do you have any jobs for me to do?");
+~chatnpc("<p,neutral>Well, it's like this: Although you have performed a mission on behalf of the White Knights, you were never actually working for them.");
+def_int $go = ~p_choice2("Yes I'm interested.", 1, "No, I'm bored now.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>No, I'm bored now.");
+    return;
+}
+~chatplayer("<p,happy>Yes I'm interested.");
+%wanted_main = 1;
+return;
