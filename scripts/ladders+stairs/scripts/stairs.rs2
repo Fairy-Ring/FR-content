@@ -852,34 +852,24 @@ switch_coord (loc_coord) {
 p_telejump(0_55_51_45_25); // 3565,3289 L0 — Ahrim peak / Dig stand
 
 [oploc1,barrows_stairs_dharok]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+// Climb-up returns to the Dharok peak 3575,3298 L0 (remesure §4).
+p_telejump(0_55_51_55_34); // 3575,3298 L0 — Dharok peak / Dig stand
 
 [oploc1,barrows_stairs_guthan]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+// Climb-up returns to the Guthan peak 3577,3283 L0 (remesure §4).
+p_telejump(0_55_51_57_19); // 3577,3283 L0 — Guthan peak / Dig stand
 
 [oploc1,barrows_stairs_karil]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+// Climb-up returns to the Karil peak 3566,3276 L0 (remesure §4).
+p_telejump(0_55_51_46_12); // 3566,3276 L0 — Karil peak / Dig stand
 
 [oploc1,barrows_stairs_torag]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+// Climb-up returns to the Torag peak 3553,3283 L0 (remesure §4).
+p_telejump(0_55_51_33_19); // 3553,3283 L0 — Torag peak / Dig stand
 
 [oploc1,barrows_stairs_verac]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+// Climb-up returns to the Verac peak 3557,3298 L0 (remesure §4).
+p_telejump(0_55_51_37_34); // 3557,3298 L0 — Verac peak / Dig stand
 
 [oploc1,ogre_stairs_down]
 // arrive delay?
