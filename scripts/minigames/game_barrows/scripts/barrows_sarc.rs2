@@ -1,0 +1,11 @@
+// Barrows — Search Ahrim's sarcophagus spawns Ahrim the Blighted in the crypt.
+// Combat VERIFIED unpack all.npc (vislevel=98 hitpoints=100 attack=1 strength=1 defence=100).
+// Spawn on a walkable floor tile next to the sarc (map_findsquare lineofwalk).
+// No prayer drain / 4535 write (stays closed until unit 24) / Faithful Servants
+// / set-effect procs. Cite xl-minigames-remaining-impl-377.md C.4 (unit 21).
+
+[oploc1,barrow_ahrim_sarcophagus]
+if (npc_find(3_55_151_35_34, barrows_ahrim, 8, 0) = true) {
+    return;
+}
+npc_add(map_findsquare(3_55_151_35_34, 0, 2, ^map_findsquare_lineofwalk), barrows_ahrim, 1000);
