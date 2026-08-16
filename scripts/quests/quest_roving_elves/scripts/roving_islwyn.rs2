@@ -1,0 +1,19 @@
+// Roving Elves — Islwyn start Talk-to (after Tyras killed).
+// CANDIDATE lines (OSRS Transcript:Roving Elves minus overlay / Eyes-of-Glouphrie
+// / SoE). First write %roving_elves_quest 0 -> 1 (no bit table). Do not open
+// Eluned from this file. No dest / QP / bow. Questlist stays red.
+// Cite red-19-start-impl-377.md §1.
+
+[opnpc1,roving_islwyn]
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,neutral>You, you're the human that killed Tyras. Arianwyn told us about you.");
+~chatnpc("<p,angry>Why should we? All you human do is take and destroy with no care for others.");
+~chatnpc("<p,neutral>Very well human, we will take you to Arianwyn. But first, there is something you must do.");
+def_int $go = ~p_choice2("Deal, what do I need to do?", 1, "I'd rather not.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>I'd rather not.");
+    ~chatnpc("<p,neutral>If you wish to see Arianwyn, this is the only way.");
+    return;
+}
+~chatplayer("<p,happy>Deal, what do I need to do?");
+%roving_elves_quest = 1;
