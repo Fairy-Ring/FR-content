@@ -1,0 +1,28 @@
+// Shadow of the Storm — Father Badden (Uzer) Talk-to after Reen start.
+// CANDIDATE lines (OSRS Transcript:Shadow of the Storm minus overlay / [them]).
+// Flip %agrith_badden_uzer vis if hidden, then chat. Stay %agrith_quest 10 —
+// no 10->20. No dest (walk only), no kiln, no Golem SotS later-case.
+// Cite crawl/agrith-changes-377.md.
+
+[opnpc1,agrith_badden]
+if (%agrith_quest < 10) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%agrith_badden_uzer < 1) {
+    %agrith_badden_uzer = 1;
+}
+~chatnpc("<p,neutral>What brings you to this godsforsaken desert?");
+def_int $go = ~p_choice2("Reen sent me.", 1, "Just passing through.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Just passing through.");
+    ~chatnpc("<p,neutral>Oh dear. I was hoping <displayname> would arrive.");
+    return;
+}
+~chatplayer("<p,neutral>Reen sent me.");
+if (inv_total(inv, silverlight) > 0) {
+    ~chatnpc("<p,happy>Saradomin be praised! And you have Silverlight! You're willing to help us, then?");
+} else {
+    ~chatnpc("<p,neutral>Saradomin be praised!");
+    ~chatnpc("<p,neutral>But you will need Silverlight for this task. You should go back and get it.");
+}

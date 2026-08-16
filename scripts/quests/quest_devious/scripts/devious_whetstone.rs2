@@ -1,0 +1,22 @@
+// Devious Minds — Doric's Whetstone Use (mithril 2h -> slender blade).
+// CANDIDATE lines (OSRS Transcript:Devious Minds minus overlay).
+// Use mithril 2h on the whetstone, confirm, consume -> devious_slenderblade.
+// Chat + inv trade only — no Entrana dest, no %devious_monk=1, no multi 3074.
+// Cite crawl/devious-changes-377.md.
+
+[oplocu,devious_whetstone]
+if (last_useitem ! mithril_2h_sword) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatnpc_specific("Doric", doric, "<p,quiz>Grind down the blade of your mithril two-handed sword?");
+def_int $go = ~p_choice2("Yes", 1, "No", 2);
+if ($go = 2) {
+    return;
+}
+if (inv_total(inv, mithril_2h_sword) < 1) {
+    return;
+}
+inv_del(inv, mithril_2h_sword, 1);
+inv_add(inv, devious_slenderblade, 1);
+mes("You grind the blade until it's slender and flexible.");

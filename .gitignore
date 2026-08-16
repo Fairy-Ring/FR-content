@@ -1,8 +1,9 @@
 .DS_Store
 
-# Dual-agent heartbeat + e2e drafts (copy worktree only — never commit)
+# Dual-agent heartbeat + drafts (copy worktree only — never commit)
 .impl-status.md
 .e2e/
+.smokes/
 
 # since these are generated for the server only, we don't have to share them
 pack/script.pack

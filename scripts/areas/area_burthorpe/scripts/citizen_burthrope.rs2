@@ -1,4 +1,7 @@
 [opnpc1,_citizen_burthorpe]
+@citizen_burthorpe_talk;
+
+[label,citizen_burthorpe_talk]
 ~chatplayer("<p,neutral>Hi!");
 if(%death_equiproom = ^death_complete) {
     @citizen_burthorpe_postquest;

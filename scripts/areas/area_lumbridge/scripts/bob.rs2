@@ -1,6 +1,41 @@
 [opnpc1,bob]
 // This line isn't in OSRS (or launch? based on https://youtu.be/UJ94TeagEfE?si=MEO3k-HBgsEuKE2D&t=48), but exists in RSC
 // although RSC also wouldn't have the option for axe repairs
+// Lost Tribe later-case: Bob cellar witness after Sigmund start (stage >= 1).
+// CANDIDATE lines (Transcript:The Lost Tribe). First witness writes 1 -> 2
+// (varbit 532 THE_LOST_TRIBE_PROGRESS: 1 = ask town, 2 = tell Duke). Walk only,
+// no dest. Cite crawl/lost_tribe-changes-377.md.
+if (%lost_tribe_quest >= 1) {
+    ~chatnpc("<p,quiz>Hello. How can I help you?");
+    def_int $lt = ~p_choice4("Do you know what happened in the castle cellar?", 1, "Give me a quest!", 2, "Have you anything to sell?", 3, "Can you repair my items for me?", 4);
+    if ($lt = 1) {
+        if (%lost_tribe_quest = 1) {
+            ~chatplayer("<p,neutral>Do you know what happened in the castle cellar?");
+            ~chatnpc("<p,neutral>Last night I was in the kitchen and I heard a noise from the cellar. I opened the trapdoor and saw a creature dart into a hole in the wall.");
+            ~chatnpc("<p,neutral>It looked a bit like a goblin, but it had big bulging eyes. It wasn't wearing armour, but it had this odd helmet with a light on it.");
+            ~chatnpc("<p,neutral>The tunnel was too dark for me to follow it, so I went to tell the Duke. But when we went down to the cellar the hole had been blocked up, and no one believes me.");
+            ~chatplayer("<p,neutral>I believe you.");
+            ~chatnpc("<p,neutral>Thank you, <displayname>! If you can convince the Duke I'm telling the truth then we can get to the bottom of this mystery.");
+            %lost_tribe_quest = 2;
+        } else {
+            ~chatplayer("<p,neutral>Do you know what happened in the castle cellar?");
+            ~chatnpc("<p,neutral>I told you about the creature I saw. You should go and tell the Duke.");
+        }
+        return;
+    }
+    if ($lt = 3) {
+        ~chatplayer("<p,quiz>Have you anything to sell?");
+        ~chatnpc("<p,happy>Yes! I buy and sell axes! Take your pick (or axe)!");
+        ~openshop_activenpc;
+    } else if ($lt = 4) {
+        ~chatplayer("<p,sad>Can you repair my items for me?");
+        ~chatnpc("<p,shock>Of course I'll repair it, though the materials may cost you. Just hand me the item and I'll have a look.");
+    } else if ($lt = 2) {
+        ~chatplayer("<p,happy>Give me a quest!");
+        ~chatnpc("<p,angry>Get yer own!");
+    }
+    return;
+}
 ~chatnpc("<p,quiz>Hello. How can I help you?"); 
 def_int $option = ~p_choice3("Give me a quest!", 1, "Have you anything to sell?", 2, "Can you repair my items for me?", 3);
 if($option = 1) {

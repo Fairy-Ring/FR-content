@@ -2,17 +2,18 @@
 // CANDIDATE lines (OSRS Transcript:Shadow of the Storm minus overlay).
 // First write %agrith_quest 0 -> 10 (pack-safe: 1-9 hide Reen). Chat + write
 // only — no Uzer dest, no kiln, no RfD Dave.
-// Review: <hn> is not a name token here — use <displayname>.
 // Cite red-19-start-impl-377.md §11.
 
 [opnpc1,agrith_reen]
-~chatnpc("<p,neutral>Excuse me, I'm looking for <displayname>. I have an urgent job for him.");
+~chatnpc("<p,neutral>Excuse me, I'm looking for <hn>. I have an urgent job for him.");
 def_int $go = ~p_choice2("That's me!", 1, "I'll let you know if I see him.", 2);
 if ($go = 2) {
     ~chatplayer("<p,neutral>I'll let you know if I see him.");
     return;
 }
-~chatplayer("<p,neutral>That's me!");
 ~chatnpc("<p,happy>Thank Saradomin I found you!");
 ~chatnpc("<p,neutral>There is an urgent task that only you can do - and only with Silverlight!");
 %agrith_quest = 10;
+// Badden multi 2901 is hidden at 0 and only [opnpc1,agrith_badden] writes the
+// vis bit — flip here so the Uzer Talk-to can fire at stage 10.
+%agrith_badden_uzer = 1;

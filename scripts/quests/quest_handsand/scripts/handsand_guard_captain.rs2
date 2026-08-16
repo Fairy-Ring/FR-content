@@ -1,0 +1,41 @@
+// The Hand in the Sand — Guard Captain (Ye Olde Dragon Inn, Yanille): beer + sandy hand.
+// CANDIDATE lines (OSRS Transcript:The Hand in the Sand minus overlay / POH portal).
+// Post-start: give beer, report Bert, hand exchange -> beer-soaked hand. %handsand_quest 1 -> 2.
+// Reclaim path when the beer-soaked hand is lost. No pub dest, no guild bell, no sandpit.
+// Cite crawl/handsand-changes-377.md.
+
+[opnpc1,handsand_guard_captain]
+if (%handsand_quest < 1) {
+    ~chatnpc("<p,neutral>Need more beer...");
+    return;
+}
+if (%handsand_quest >= 2) {
+    if (inv_total(inv, handsand_beerhand) < 1) {
+        // lost the beer-soaked hand — the captain fished it back out of his beer
+        ~chatplayer("<p,neutral>Hello Sir!");
+        ~chatnpc("<p,neutral>Go 'way! This pint'sh nearly finished! Unlessh you got more that ish....? Wizards, s'all the wizard's fault...prob'ly that Zavistic one, he'sh the worsht!");
+        ~chatnpc("<p,neutral>E're, you left this 'and in me beer!");
+        inv_add(inv, handsand_beerhand, 1);
+        mes("The Guard Captain fished the hand out of his beer and hands it to you.");
+        return;
+    }
+}
+if (inv_total(inv, beer) < 1) {
+    ~chatnpc("<p,neutral>Need more beer...");
+    return;
+}
+~chatplayer("<p,neutral>Sir? I have some more beer for you...");
+inv_del(inv, beer, 1);
+~objbox(beer, "You give the beer to the Guard Captain who takes a large gulp.", 250, 0, divide(^objbox_height, 2));
+~chatnpc("<p,neutral>Ahh... jus' wha' I need, now, wha' did you wanna know?");
+~chatplayer("<p,neutral>I've come to report that Bert, the sandman, found a hand in the sand pit.");
+~chatnpc("<p,neutral>Lucky for him, means he can get even more work done.");
+~chatplayer("<p,neutral>But aren't you going to find out who it ... belonged to?");
+if (inv_total(inv, handsand_sandyhand) >= 1) {
+    inv_del(inv, handsand_sandyhand, 1);
+    inv_add(inv, handsand_beerhand, 1);
+    ~objbox(handsand_beerhand, "You hand the... hand... to the Guard Captain,|he fumbles with it, drops it in his beer,|fishes it out and hands it back.", 250, 0, divide(^objbox_height, 2));
+    %handsand_quest = 2;
+}
+~chatnpc("<p,neutral>Oops, No 'arm done. S'prob'ly a wizard, i's always the wizards fault, go ask them, jus' ring the bell outshide the guild and talk to the first pointy hatted ninny you shee!");
+~chatplayer("<p,neutral>Err... ok, I'll go ring the bell and talk to a wizard then.");

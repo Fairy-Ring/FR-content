@@ -1,0 +1,28 @@
+// Spirits of the Elid — Ghaslor the Elder (Nardah) Talk-to after Mayor start.
+// CANDIDATE lines (OSRS Transcript:Spirits of the Elid minus overlay).
+// Gate %elidquest >= 1. Curse path gives the Ballad of Jareesh (elid_ballad).
+// Chat + inv_add only — do not retouch elid_ballad.rs2, no fountain dest.
+// Cite crawl/elid-changes-377.md.
+
+[opnpc1,elid_ghaslor]
+if (%elidquest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatnpc("<p,neutral>Good day to you young man.");
+def_int $go = ~p_choice2("I am trying to find out the cause of this town's curse.", 1, "How are things?", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>How are things?");
+    ~chatnpc("<p,neutral>Lousy, young people have no respect for their elders, there's too many confusing newfangled magic carpets and snake charmers around these days and now we don't even have any water.");
+    return;
+}
+~chatplayer("<p,neutral>I am trying to find out the cause of this town's curse.");
+~chatnpc("<p,neutral>Oh that's something which no one but the gods and the river spirits seem to know.");
+~chatnpc("<p,neutral>Here I have something around here somewhere which may be of interest to you.");
+~chatnpc("<p,neutral>Aha yes here it is, the ballad of Jareesh. This tells of a previous quest to try and find the spirits.");
+if (inv_total(inv, elid_ballad) >= 1) {
+    ~chatplayer("<p,neutral>Thank you very much for your help.");
+    return;
+}
+inv_add(inv, elid_ballad, 1);
+~chatplayer("<p,neutral>Thank you very much for your help.");

@@ -1,0 +1,106 @@
+// Two Cats — Hild (Burthorpe house) Talk-to after quest start.
+// CANDIDATE lines (Transcript:A Tail of Two Cats + Transcript:Hild minus overlay).
+// Pre-start / not-started: existing Death Plateau citizen tree (do not ^dm_default).
+// First-meet + return-before-enchant + amulet(e) already in inv/worn.
+// Chat + inv trade only — no dest, no _citizen_burthorpe header, no L1 loc 1090.
+// Cite crawl/twocats-changes-377.md · Transcript:Hild.
+
+[opnpc1,death_woman_indoors1]
+if (%twocats_quest < 1) {
+    @citizen_burthorpe_talk;
+}
+if (inv_total(inv, twocats_amuletofcatspeak) >= 1 | inv_total(worn, twocats_amuletofcatspeak) >= 1) {
+    @twocats_hild_have_enchanted;
+}
+@twocats_hild_find_bob;
+
+[label,twocats_hild_find_bob]
+~chatnpc("<p,neutral>Greetings Adventurer, why have you come to me in my abode?");
+~chatplayer("<p,neutral>Greetings Hild, I am trying to find Unferth's cat...");
+if (~twocats_hild_follower = ^true) {
+    if (~twocats_hild_catspeak_worn = ^true) {
+        ~twocats_hild_cat("<p,neutral>Unferth's cat? Pfft! Unferth is Bob's human!");
+        ~chatplayer("<p,confused>What are you talking about?");
+        ~chatnpc("<p,neutral>Your cat speaks some truth, it is humans that misinterpret their relationship with cats.");
+        ~chatplayer("<p,shock>You understand what my cat is saying?!");
+        ~chatnpc("<p,neutral>Indeed.");
+        ~chatplayer("<p,confused>Er...");
+        ~twocats_hild_cat("<p,neutral>Bob didn't come home this week.");
+        ~chatnpc("<p,neutral>Hmm. This is not like Bob, I wonder what could be the problem?");
+        ~twocats_hild_cat("<p,neutral>I don't think there is a problem, Bob is probably chasing females again!");
+        ~chatplayer("<p,angry>Hello? I'm still here!");
+    } else {
+        ~twocats_hild_cat("<p,neutral>Meow.");
+        ~chatplayer("<p,confused>Hmm... My cat is trying to say something but I'm not wearing the Amulet of Catspeak.");
+        ~chatnpc("<p,neutral>Hmm. This is not like Bob, I wonder what could be the problem?");
+    }
+} else {
+    ~chatnpc("<p,neutral>Hmm. This is not like Bob, I wonder what could be the problem?");
+}
+~chatnpc("<p,neutral>I am sorry <displayname>, I will help Unferth find Bob, he has been a friend of mine for many years.");
+if (~twocats_hild_follower = ^true & ~twocats_hild_catspeak_worn = ^true) {
+    ~chatplayer("<p,happy>Ah... good! He could be anywhere though!");
+}
+~chatnpc("<p,neutral>I see you have an Amulet of Catspeak. If you open the amulet up, you will see contained inside is a mechanism. If this is enchanted correctly it can be used to locate a cat, in our case Bob. If you bring me five death runes then I will be able to perform the enchantment for you.");
+@twocats_hild_enchant_offer;
+
+[label,twocats_hild_have_enchanted]
+~chatnpc("<p,neutral>Using the enchanted amulet is easy; open up the amulet and you'll see a cat's face. Use the whiskers to rotate the cat's nose. When the nose points in the direction Bob is in, the eyes will light up and the mouth will open. If you are very close to Bob then the eyes and mouth will animate no matter which way the nose is pointing. That's all there is to it, good luck!");
+~chatplayer("<p,happy>Thanks!");
+
+[label,twocats_hild_enchant_offer]
+if (inv_total(inv, deathrune) < 5 & inv_total(worn, deathrune) < 5) {
+    ~chatplayer("<p,neutral>I don't have the death runes.");
+    ~chatnpc("<p,neutral>Come back to me when you have them.");
+    return;
+}
+if (~twocats_hild_catspeak_held = ^false) {
+    ~chatplayer("<p,neutral>I have the runes but don't have the amulet on me.");
+    ~chatnpc("<p,neutral>Bring me the amulet and I will enchant it for you.");
+    return;
+}
+~chatplayer("<p,neutral>I have the death runes with me now.");
+~chatnpc("<p,neutral>Good. Give me the amulet so that I may perform the enchantment.");
+inv_del(inv, deathrune, 5);
+if (inv_total(worn, ics_little_amulet_of_catspeak) >= 1) {
+    inv_del(worn, ics_little_amulet_of_catspeak, 1);
+} else {
+    inv_del(inv, ics_little_amulet_of_catspeak, 1);
+}
+inv_add(inv, twocats_amuletofcatspeak, 1);
+~chatnpc("<p,neutral>Using the enchanted amulet is easy; open up the amulet and you'll see a cat's face. Use the whiskers to rotate the cat's nose. When the nose points in the direction Bob is in, the eyes will light up and the mouth will open. If you are very close to Bob then the eyes and mouth will animate no matter which way the nose is pointing. That's all there is to it, good luck!");
+~chatplayer("<p,happy>Thanks!");
+
+[proc,twocats_hild_follower]()(int)
+if (%follower_obj ! null & oc_category(%follower_obj) = kitten) {
+    return(^true);
+}
+if (%follower_obj ! null & oc_category(%follower_obj) = cat) {
+    return(^true);
+}
+if (%follower_obj ! null & oc_category(%follower_obj) = overgrown) {
+    return(^true);
+}
+return(^false);
+
+[proc,twocats_hild_catspeak_worn]()(int)
+if (inv_total(worn, ics_little_amulet_of_catspeak) >= 1 | inv_total(worn, twocats_amuletofcatspeak) >= 1) {
+    return(^true);
+}
+return(^false);
+
+[proc,twocats_hild_catspeak_held]()(int)
+if (inv_total(inv, ics_little_amulet_of_catspeak) >= 1 | inv_total(worn, ics_little_amulet_of_catspeak) >= 1) {
+    return(^true);
+}
+return(^false);
+
+[proc,twocats_hild_cat](string $line)
+def_npc_uid $hild = npc_uid;
+if (npc_finduid(%follower_uid) = false) {
+    return;
+}
+~chatnpc_specific(nc_name(npc_type), npc_type, $line);
+if (npc_finduid($hild) = false) {
+    return;
+}
