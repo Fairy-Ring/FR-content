@@ -3,8 +3,8 @@
 // minus Desert Treasure I overlay / [sir/madam] / Overview / lodestone / take-items.
 // Hunt 289? no. Display stays Eblis. Bind the child, not fourdiamonds_elder.
 // Leave-us <5. Museum 5–6. Diamonds+list at 7. Yes-I-will-go 7→8.
-// Full fd_* Talk-to Excellent 8→10. Village =10 East nag. Never 15.
-// No inv_del / fd_mirror_present / Look-into. Cite take leftover §5.
+// Full fd_* Talk-to Excellent 8→10 + CANDIDATE %fd_mirror_present = 1.
+// Village =10 East nag. Never 15. Look-into is dt_mirrors.rs2 (chat, no dest).
 
 [opnpc1,fd_elder_village]
 if (%deserttreasure < 5) {
@@ -47,6 +47,7 @@ return;
 if (%deserttreasure = 8) {
     %deserttreasure = 10;
 }
+%fd_mirror_present = 1; // CANDIDATE present-bit — Eblis sets up the mirrors (dt-mirrors-look-into-next-377.md)
 return;
 
 [label,dt_eblis_east]

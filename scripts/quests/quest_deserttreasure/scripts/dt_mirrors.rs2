@@ -1,0 +1,22 @@
+// Desert Treasure — Look-into the six mystical mirrors after Eblis sets them
+// up (%fd_mirror_present = 1). Chat only — no dest, no rotate_mirror 6084,
+// no warriors / Ancient Magicks, no %deserttreasure write (stays 10).
+// CANDIDATE lines (2007-base minus Changes). Cite spine-17-remaining-impl-377.md
+// §2 + dt-mirrors-look-into-next-377.md.
+
+[oploc1,fd_mirror1] @dt_mirror_look;
+[oploc1,fd_mirror2] @dt_mirror_look;
+[oploc1,fd_mirror3] @dt_mirror_look;
+[oploc1,fd_mirror4] @dt_mirror_look;
+[oploc1,fd_mirror5] @dt_mirror_look;
+[oploc1,fd_mirror6] @dt_mirror_look;
+[oploc1,sword_mirror1] @dt_mirror_look;
+[oploc1,sword_mirror2] @dt_mirror_look;
+[oploc1,sword_mirror3] @dt_mirror_look;
+[oploc1,sword_mirror4] @dt_mirror_look;
+[oploc1,sword_mirror5] @dt_mirror_look;
+[oploc1,sword_mirror6] @dt_mirror_look;
+
+[label,dt_mirror_look]
+mes("You gaze into the mirror…");
+mes("The image is unclear.");
