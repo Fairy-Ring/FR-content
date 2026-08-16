@@ -1,0 +1,21 @@
+// In Aid of the Myreque — Veliaf Hurtz (hideout) start later-case label.
+// Jumped from the existing [opnpc1,route_veliaf_hurtz] once
+// %routequest >= ^routequest_complete (live header ends at saved_myreque).
+// CANDIDATE lines (OSRS Transcript:In Aid of the Myreque minus overlay).
+// First write %myreque_2_quest 0 -> 1. Chat + write only — no Burgh dest,
+// no Florin bind, no Temple Trekking, no Rod dest. No %routequest rewrite.
+// Cite red-19-start-impl-377.md §15.
+
+[label,myreque2_veliaf_start]
+~chatnpc("<p,neutral>You're back. Any luck in Canifis?");
+~chatplayer("<p,neutral>I went back to the place where I first met Vanstrom. He was gone though.");
+~chatnpc("<p,neutral>Anyway, now that you're back, there was something I was hoping you'd help us with.");
+def_int $go = ~p_choice2("What do you need?", 1, "Sorry. I'm not interested.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Sorry. I'm not interested.");
+    ~chatnpc("<p,neutral>Very well. You know where we are if you change your mind.");
+    return;
+}
+~chatplayer("<p,neutral>What do you need?");
+~chatnpc("<p,neutral>Now that our base of operations is no longer safe, we're going to need to relocate before the vyrewatch descend on us.");
+%myreque_2_quest = 1;

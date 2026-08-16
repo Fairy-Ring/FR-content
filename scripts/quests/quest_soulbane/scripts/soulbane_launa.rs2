@@ -1,0 +1,21 @@
+// A Soul's Bane — Launa (rift) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:A Soul's Bane minus overlay).
+// First write %soulbane_prog 0 -> 1. Chat + write only — no rift dest
+// (rope-on enter is the other residual file), no overlay 15100, no XP.
+// Cite red-19-start-impl-377.md §16.
+
+[opnpc1,soulbane_launa]
+~chatplayer("<p,neutral>Hi there.");
+~chatnpc("<p,neutral>Hello.");
+~chatplayer("<p,neutral>What's this big hole in the ground all about?");
+~chatnpc("<p,neutral>I'm waiting to see my son Tolna.");
+def_int $go = ~p_choice2("Would you like me to go down to look for your husband and son?", 1, "Surely by now they'd both be dead?", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Surely by now they'd both be dead?");
+    ~chatnpc("<p,angry>Get away from me!");
+    return;
+}
+~chatplayer("<p,neutral>Would you like me to go down to look for your husband and son?");
+~chatnpc("<p,happy>You would do that? Oh thank you so much!");
+~chatnpc("<p,neutral>You can use a rope to get into the rift, just attach it at the edge.");
+%soulbane_prog = 1;

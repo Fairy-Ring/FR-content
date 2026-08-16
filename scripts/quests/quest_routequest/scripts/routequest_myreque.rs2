@@ -470,6 +470,8 @@ if(%routequest < ^routequest_introduced_veliaf) {
     ~chatnpc("<p,neutral>That is for your conscience to bear, but now perhaps you can understand why we fight for our freedom?");
     ~chatplayer("<p,neutral>Yes, I think I understand now.");
     @route_veliaf_multi;
+} else if(%routequest >= ^routequest_complete) {
+    @myreque2_veliaf_start;
 }
 
 [label,route_veliaf_intro_multi]

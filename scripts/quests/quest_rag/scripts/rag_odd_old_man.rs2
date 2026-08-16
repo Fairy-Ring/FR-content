@@ -1,0 +1,18 @@
+// Rag and Bone Man — Odd Old Man (Silvarea/East Varrock dig site) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:Rag and Bone Man I minus "I" / overlay).
+// First write %rag_quest 0 -> 1. Chat + write only — bone list / Fortunato
+// vinegar = later. No II wishlist, no pot-boiler dest, no wine-shop dest.
+// Cite red-19-start-impl-377.md §17.
+
+[opnpc1,rag_odd_old_man]
+~chatnpc("<p,neutral>Can I help you with something?");
+~chatplayer("<p,neutral>Well, err...who are you, and what are all these bones doing here?");
+~chatnpc("<p,neutral>I'm an archaeologist. I work with the museum.");
+~chatnpc("<p,neutral>Will you help me out by grabbing some?");
+def_int $go = ~p_choice2("Yes. I'll give you a hand.", 1, "Well, never mind me young man...", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Well, never mind me young man...");
+    return;
+}
+~chatplayer("<p,neutral>Yes. I'll give you a hand.");
+%rag_quest = 1;
