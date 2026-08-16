@@ -98,3 +98,30 @@ if (%enakh_statue_multivar ! 2) {
 %enakh_statue_multivar = 3;
 mes("You chisel the statue a bit slimmer.");
 return;
+
+// Head place — Use one of the four stone heads on the headless statue.
+// Keys 4-7 = lazim / zamorak / icthlarin / camel (statue multi multiloc).
+// Visual only: no crack / bighole / %enakh_quest write / Camulet / dest.
+// CANDIDATE line (2007-base minus Changes). Cite spine-17-remaining-impl-377.md
+// §5 + enakh-head-place-next-377.md.
+
+[oplocu,enakh_statue_stage_3]
+if (last_useitem = enakh_statue_head_lazim) { @enakh_place_head(4); return; }
+if (last_useitem = enakh_statue_head_zamorak) { @enakh_place_head(5); return; }
+if (last_useitem = enakh_statue_head_icthlarin) { @enakh_place_head(6); return; }
+if (last_useitem = enakh_statue_head_camel) { @enakh_place_head(7); return; }
+~displaymessage(^dm_default);
+
+[label,enakh_place_head](int $stage)
+if (%enakh_quest < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (%enakh_statue_multivar ! 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, last_useitem, 1);
+%enakh_statue_multivar = $stage;
+mes("You place the stone head on the statue.");
+return;
