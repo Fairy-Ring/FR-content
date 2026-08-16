@@ -1,0 +1,19 @@
+// Devious Minds — hooded Monk (Paterdomus) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:Devious Minds minus overlay / skill-toast).
+// First write %devious_main 0 -> 1. Chat + write only — no Entrana dest,
+// no orb, no Tiffy splice. Never write %devious_monk (1 = dead monk).
+// Review: Yes ~chatplayer. Bind visable 3075, not multi 3074.
+// Cite red-19-start-impl-377.md §13.
+
+[opnpc1,devious_monk_hooded_visable]
+~chatnpc("<p,neutral>Good day to you, adventurer.");
+~chatplayer("<p,neutral>And to you. What brings you all the way out here?");
+~chatnpc("<p,neutral>I am on my return journey from the dark lands of Morytania.");
+~chatnpc("<p,neutral>Before you depart, adventurer, I was wondering if you might be interested in helping me with something?");
+def_int $go = ~p_choice2("Of course. What do you need?", 1, "Sorry, but I'm busy right now.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Sorry, but I'm busy right now.");
+    return;
+}
+~chatplayer("<p,neutral>Of course. What do you need?");
+%devious_main = 1;

@@ -1,0 +1,19 @@
+// The Hand in the Sand — Bert (Yanille) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:The Hand in the Sand minus overlay / POH portal).
+// First write %handsand_quest 0 -> 1, give sandy hand (pack names obj).
+// Chat + inv_add + write only — no pub dest, no guild bell, no sandpit dest.
+// Cite red-19-start-impl-377.md §14.
+
+[opnpc1,handsand_bert]
+~chatnpc("<p,neutral>Eeee, wha' shall I do! I'll mos' certainly lose tha job...");
+~chatplayer("<p,neutral>Lose your job? What's wrong, why?");
+~chatnpc("<p,neutral>I w-w-work... over yon sand pit... and weeell... I found... this... hand!");
+def_int $go = ~p_choice2("Sure, I'll give you a hand.", 1, "I want no part in this!", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>I want no part in this!");
+    return;
+}
+~chatplayer("<p,neutral>Sure, I'll give you a hand.");
+~chatnpc("<p,neutral>..... Nae, ye can 'ave the 'and as h'evidence.");
+inv_add(inv, handsand_sandyhand, 1);
+%handsand_quest = 1;
