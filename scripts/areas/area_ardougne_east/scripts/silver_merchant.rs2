@@ -3,6 +3,15 @@ if (getqueue(stolen_from_stall_silver) > 0) {
     npc_say("You stole from me. Talk to me when you've considered your actions!");
     return;
 }
+// Making History — Erin residual prefix before the shop menu (pack-hole:
+// no Erin NPC row; CANDIDATE lines 2007-base minus Changes). Stay prog 1.
+if (%makinghistory_prog >= 1 & %makinghistory_trader_prog = 0) {
+    ~chatnpc("<p,neutral>My great grandfather lived in that outpost. He left me a strange key.");
+    ~chatnpc("<p,neutral>You can borrow it, if you like.");
+    inv_add(inv, makinghistory_key, 1);
+    %makinghistory_trader_prog = 1;
+    mes("You receive an enchanted key.");
+}
 ~chatnpc("<p,happy>Silver! Silver!|Best prices for buying and selling in all Kandarin!");
 
 def_int $option = ~p_choice2("Yes please.", 1, "No thank you.", 2);
