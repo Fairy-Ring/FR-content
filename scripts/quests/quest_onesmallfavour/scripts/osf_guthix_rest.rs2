@@ -1,9 +1,9 @@
-// One Small Favour — Guthix rest heat: Use bowl of water (1921) on a packed
-// range/fire -> bowl of hot water (4456). CANDIDATE mes "You heat the water."
-// (2007-base minus Changes). No %onesmallfavour write. No XP. No dest / 12346.
-// Cite osf-guthix-rest-brew-impl-377.md + osf-guthix-rest-brew-377.md.
-// Use-on-loc is loc-bound (engine OpLocU), so heat binds the packed cooking
-// loc types and forwards every other item to live cooking.rs2.
+// One Small Favour — Guthix rest brew: heat + pour (spine hops 1).
+// Heat: bowl of water (1921) on a packed range/fire -> bowl of hot water
+// (4456). Pour: bowl_hot_water (4456) into cup_empty (1980) -> cup_hot_water
+// (4460) + bowl_empty (1923), gated at %onesmallfavour >= 13. CANDIDATE mes
+// lines (2007-base minus Changes). No varp write, no XP, no dest / 12346.
+// Cite spine-17-remaining-impl-377.md + osf-guthix-rest-brew-impl-377.md.
 
 [oplocu,scenery_2728] @osf_bowl_heat_oven;
 [oplocu,scenery_2729] @osf_bowl_heat_oven;
@@ -15,6 +15,20 @@
 [oplocu,scenery_2726] @osf_bowl_heat_fire;
 [oplocu,scenery_2727] @osf_bowl_heat_fire;
 [oplocu,scenery_2732] @osf_bowl_heat_fire;
+
+[opheldu,bowl_hot_water]
+if (last_useitem = cup_empty) {
+    @osf_pour_hot_water;
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,cup_empty]
+if (last_useitem = bowl_hot_water) {
+    @osf_pour_hot_water;
+    return;
+}
+~displaymessage(^dm_default);
 
 [label,osf_bowl_heat_oven]
 if (last_useitem = bowl_water) {
@@ -39,3 +53,14 @@ anim($anim, 0);
 inv_del(inv, bowl_water, 1);
 inv_add(inv, bowl_hot_water, 1);
 mes("You heat the water.");
+
+[label,osf_pour_hot_water]
+if (%onesmallfavour < 13) {
+    mes("You have no idea what effect this would have.");
+    return;
+}
+mes("You pour the hot water into the cup.");
+inv_del(inv, bowl_hot_water, 1);
+inv_del(inv, cup_empty, 1);
+inv_add(inv, cup_hot_water, 1);
+inv_add(inv, bowl_empty, 1);
