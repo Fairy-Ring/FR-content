@@ -1,15 +1,22 @@
-// Mountain Daughter — boulder Push refuse. Dest UNKNOWN — no p_tele.
+// Mountain Daughter — boulder Push refuse + rope abseil dest.
 // CANDIDATE last-resort 2007-base: OSRS Boulder (Mountain Camp) loc page.
-// Hunt 289? no. No stage write. No rope climb dest.
-// Cite md-cliff-boulder-push-377.md.
+// Hunt 289? no. No stage write. Abseil: generic rope 954 on the boulder ->
+// p_telejump(0_43_57_14_15) = 2766,3663 L0 (dest-uncited row 9); lip
+// 2766,3664 blocked — not dest. No pool dest (Listen 5855 unplaced).
+// Cite md-cliff-boulder-push-377.md + dest-uncited-pass-next-377.md.
 
 [oploc3,mdaughter_cliff_boulder]
 mes("The boulder is far too heavy to ever be moved, there's no point in even trying.");
 return;
 
 [oplocu,mdaughter_cliff_boulder]
-if (last_useitem = woodplank) {
+def_obj $used = last_useitem;
+if ($used = woodplank) {
     mes("Nice try, but the boulder still isn't going to budge.");
+    return;
+}
+if ($used = rope) {
+    p_telejump(0_43_57_14_15); // MD abseil 2766,3663 L0 — lip 2766,3664 blocked
     return;
 }
 ~displaymessage(^dm_default);
