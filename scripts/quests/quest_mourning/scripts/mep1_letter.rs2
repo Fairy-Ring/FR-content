@@ -1,0 +1,8 @@
+// Mourning's End I — Read the mourner's message (letter) opens a mesbox.
+// CANDIDATE lines (2007-base minus Changes). Stay %mourning_quest 1. No
+// dest / Prif / leftover book 6073-6079 / Dig Site 683. Consume is a later
+// residual. Cite spine-17-remaining-impl-377.md §8 + mep1-letter-read-377.md.
+
+[opheld1,mourning_mourner_message]
+~mesbox("The letter is a recommendation to the Death Guard. It asks the Head mourner to admit the bearer as a new recruit.");
+mes("You fold the letter away.");
