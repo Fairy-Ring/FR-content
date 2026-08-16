@@ -1,12 +1,10 @@
-// Dwarf Cannon — Go-through cave tunnel -> Arzinian mine 2780,10161 L0.
-// Gate %dwarfrock_quest >= 10 (mine phase; start 10, complete 110). Dest
-// CANDIDATE 2780,10161 L0 — first walkable W of the tunnel loc 5973
-// @ 2781,10161. Never dest onto the loc; never the demon 2367,4960 L3.
+// Dwarf Cannon — Go-through cave tunnel -> ferryman cave 2838,10124 L0.
+// The tunnel is the commute to Dondakan / the quest start — no %dwarfrock_quest
+// gate (drop 10). Dest CANDIDATE 2838,10124 L0 (walkable N of dest loc 5998
+// dwarf_cave_entrance @ 2838,10123; ferryman 1843 nearby). The L0 / L1
+// statue-hall dests were retracted (same hall). Never Arzinian 2306,4952 /
+// demon L3 (those are Fire).
 // Cite dest-uncited-pass-next-377.md + dest-from-our-maps-remaining-377.md.
 
 [oploc1,dwarf_cavewall_tunnel]
-if (%dwarfrock_quest < 10) {
-    ~displaymessage(^dm_default);
-    return;
-}
-p_telejump(0_43_158_28_49); // 2780,10161 L0 — walkable W of 2781,10161
+p_telejump(0_44_158_22_12); // 2838,10124 L0 — ferryman cave, N of 5998
