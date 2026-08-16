@@ -1,0 +1,7 @@
+// Haunted Mine — Check the points panel opens the controls IF.
+// Chrome only: no cart dest / Climb-over 4918 / key 4078 / lever bits.
+// Stay zealot 1. 0 [if_button] writers (Close is client-side).
+// Cite spine-17-remaining-impl-377.md §15 + hm-cart-dest-hole-377.md.
+
+[oploc1,hauntedmine_points_info]
+if_openmain(hauntedmine_controls);
