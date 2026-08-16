@@ -1,8 +1,9 @@
-// Ghosts Ahoy — Ghost captain_1 first Talk-To. Dest UNKNOWN.
+// Ghosts Ahoy — Ghost captain_1 Talk-To + pay-25 ferry to Dragontooth Island.
 // CANDIDATE last-resort 2007-base (OSRS Talking to the Ghost captain
 // minus 500 unlimited 16 Mar 2017 / Charos / dest). Hunt 289? no.
-// Stay ahoy_questvar 3. No p_tele / gangplank / Teach.
-// Cite ahoy-ghost-captain-first-slice-377.md.
+// Stay ahoy_questvar 3. Pay 25 ectotoken -> land 3793,3560 L0 (next to island
+// captain 3792,3560, not rowboat 3791,3561). No write.
+// Cite ahoy-ghost-captain-first-slice-377.md + dest-uncited-pass-next-377.md.
 
 [opnpc1,ahoy_ghost_captain_1]
 if (inv_total(worn, amulet_of_ghostspeak) = 0) {
@@ -11,5 +12,16 @@ if (inv_total(worn, amulet_of_ghostspeak) = 0) {
     return;
 }
 ~chatnpc("<p,neutral>I can take you to Dragontooth Island. The return trip will cost 25 ecto-tokens.");
-~chatplayer("<p,neutral>I'll come back later.");
-return;
+if (inv_total(inv, ectotoken) < 25) {
+    ~chatplayer("<p,neutral>I'll come back later.");
+    return;
+}
+def_int $trip = ~p_choice2("Okay, here's 25 ecto-tokens. Let's go.", 1, "I'll come back later.", 2);
+if ($trip = 2) {
+    ~chatplayer("<p,neutral>I'll come back later.");
+    return;
+}
+~chatplayer("<p,neutral>Okay, here's 25 ecto-tokens. Let's go.");
+inv_del(inv, ectotoken, 25);
+mes("After a long boat trip you arrive at Dragontooth Island.");
+p_telejump(0_59_55_17_40); // Ahoy island 3793,3560 L0 — next to island captain, not rowboat
