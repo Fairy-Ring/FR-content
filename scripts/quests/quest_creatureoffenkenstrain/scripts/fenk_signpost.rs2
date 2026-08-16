@@ -1,0 +1,11 @@
+// Creature of Fenkenstrain — Read the signpost to start.
+// CANDIDATE note (2007-base minus the 2020 journal-start Change). First write
+// %fenk_read_signpost 0 -> 1 (fenk_flags bit 23). Do NOT write %fenk_quest on
+// Read. No dest / Dr chat / Charos. Cite red-19-start-impl-377.md §2.
+
+[oploc1,fenk_signpost]
+mes("The signpost has a note pinned onto it. The note says:");
+mes("'----Braindead Butler Wanted----");
+mes("Gravedigging skills essential - Hunchback advantageous");
+mes("See Dr Fenkenstrain at the castle NE of Canifis'");
+%fenk_read_signpost = 1;
