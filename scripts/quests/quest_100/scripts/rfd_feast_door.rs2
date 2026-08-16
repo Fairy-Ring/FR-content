@@ -1,7 +1,11 @@
-// Recipe for Disaster — kitchen feast door Open. Dest UNKNOWN.
-// Refuse-only when hundred_main_quest_var < 2. No p_tele. No portal 4.
-// Hunt 289? no. Cite rfd-feast-door-op-377.md.
+// Recipe for Disaster — kitchen feast door Open.
+// var < 2: refuse. var >= 2: dest-cite banquet floor 1861,5317 L0.
+// No portal 4. No leftover 18436. No Inspect. Hunt 289? no.
+// Cite rfd-kitchen-open-dest-next-377.md + dest-cite-index.
 
 [oploc1,hundred_lumbridge_door]
-~displaymessage(^dm_default);
-return;
+if (%hundred_main_quest_var < 2) {
+    ~displaymessage(^dm_default);
+    return;
+}
+p_telejump(0_29_83_5_5);
