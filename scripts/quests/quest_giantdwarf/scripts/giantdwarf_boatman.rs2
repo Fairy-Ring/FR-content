@@ -3,8 +3,8 @@
 // Travel — verbatim block in giantdwarf-boatman-cutscene-377.md; the extract
 // was never in .wiki). Fresh 0: start talk (<displayname>, ferryman line),
 // Deal + ready-Yes (~p_choice2, not overlay), write 1 on ready-Yes, then
-// [proc,giantdwarf_intro_cutscene]: mesbox history + cam_* on city floor,
-// crash talk + cam_shake + %giantdwarf_statue_invis = 1, dock guards (Halt!
+// [proc,giantdwarf_intro_cutscene]: tele + cam first (palace floor), then
+// mesbox history, statue cam + crash talk + cam_shake + %giantdwarf_statue_invis = 1, dock guards (Halt!
 // on 2231), HQ dest, then Veldaban "Identify yourself" via ~chatnpc_specific
 // (NOT Forget's [opnpc1,dwarf_city_black_guard_leader] — already bound) and
 // Yes help -> %giantdwarf_quest = 2 + %giantdwarf_veldaban_introduced = 1.
@@ -49,13 +49,7 @@ if ($ready = 2) {
 [proc,giantdwarf_intro_cutscene]()
 if_close;
 p_delay(0);
-// palace card / history — dump on-screen text (no red-letter IF in pack)
-~mesbox("Five hundred years have passed since the rule of King Alvis,|saviour of Keldagrim, victim of his own inventions.|He founded the Consortium: the gathering of mining companies|that were to serve the monarchy. But eventually the monarchy came|to serve the Consortium.|By the time of his death, the monarchy was all but abolished.|Now the Kings in Keldagrim are but a distant memory...|with the only statue of King Alvis to remind people of the|old days. The dark days.");
-p_delay(0);
-~mesbox("Rise of the Red Axe Part 1");
-p_delay(0);
-~mesbox("The Giant Dwarf");
-// palace cam — walkable west city floor
+// tele + cam FIRST so the history plays on the city floor, not the mines
 minimap_toggle(2);
 if_settab(null, 0);
 if_settab(null, 1);
@@ -66,14 +60,24 @@ if_settab(null, 5);
 if_settab(null, 6);
 if_settab(null, 11);
 if_settab(null, 12);
-p_telejump(0_44_159_22_24); // 2838,10200 L0 — walkable west city
-p_delay(1);
-cam_moveto(0_44_159_22_24, 1000, 100, 232);
-cam_lookat(0_44_159_28_20, 50, 100, 232);
-// statue cam — from the walkable bank tile; statue 2878,10177 is look-only
-p_telejump(0_44_159_45_14); // 2861,10190 L0 — walkable bank
-p_delay(1);
-cam_lookat(0_44_159_62_1, 50, 3, 10);
+// palace cam — palace street, next to door loc 6114 @ 2862,10199 (outdoor)
+p_telejump(0_44_159_48_24); // 2864,10200 L0 — street, not the west pub
+p_delay(3);
+~music_playbycoord(coord); // west = Land of the Dwarves
+cam_moveto(0_44_159_48_24, 500, 2, 2);
+cam_lookat(0_44_159_46_23, 250, 2, 2); // palace facade / door, not Barman/shelves
+// palace card / history — dump on-screen text (no red-letter IF in pack)
+~mesbox("Five hundred years have passed since the rule of King Alvis,|saviour of Keldagrim, victim of his own inventions.|He founded the Consortium: the gathering of mining companies|that were to serve the monarchy. But eventually the monarchy came|to serve the Consortium.|By the time of his death, the monarchy was all but abolished.|Now the Kings in Keldagrim are but a distant memory...|with the only statue of King Alvis to remind people of the|old days. The dark days.");
+p_delay(0);
+~mesbox("Rise of the Red Axe Part 1");
+p_delay(0);
+~mesbox("The Giant Dwarf");
+// statue cam — outdoor street stand, statue 2878,10177 is look-only
+p_telejump(0_44_159_50_6); // 2866,10182 L0 — outdoor, not the house
+p_delay(3);
+~music_playbycoord(coord); // west = Land of the Dwarves
+cam_moveto(0_44_159_50_6, 400, 2, 2);
+cam_lookat(0_44_159_62_1, 250, 2, 2); // statue 7042 @ 2878,10177 in frame for the crash
 // crash talk — boatman speaker + player
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!");
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
@@ -84,11 +88,12 @@ cam_lookat(0_44_159_62_1, 50, 3, 10);
 // crash effect
 cam_shake(3, 0, 20, 2);
 %giantdwarf_statue_invis = 1;
-p_delay(2);
+p_delay(3);
 // dock — cutscene berserkers appear, then the arrest
 %giantdwarf_cutscene_guard_visible = 1;
 p_telejump(0_45_159_9_49); // 2889,10225 L0 — dock stand next to both berserkers
-p_delay(2);
+p_delay(3);
+~music_playbycoord(coord); // east = Tale of Keldagrim
 ~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,angry>Halt! By order of the Black Guard, you are under arrest!");
 ~chatplayer("<p,shock>What?? I didn't do anything! It wasn't me!");
 ~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,neutral>Come with us, human! Commander Veldaban wants a word with you!");
@@ -98,7 +103,7 @@ minimap_toggle(0);
 ~initalltabs;
 %giantdwarf_cutscene_guard_visible = 0;
 p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
-p_delay(2);
+p_delay(3);
 // Veldaban "Identify yourself" — chatnpc_specific, not Forget's op
 ~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Identify yourself, human!");
 ~chatplayer("<p,neutral>I err, I'm <displayname>. I was told I was under arrest. I had a little accident on the way in here.");

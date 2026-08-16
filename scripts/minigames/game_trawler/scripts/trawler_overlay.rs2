@@ -55,6 +55,7 @@ if_settext(trawler_overlay:com_29, "10 mins");
 
 [label,trawler_mapzone]
 if_openoverlay(trawler_overlay);
+@music_playbyregion(coord);
 
 [label,trawler_mapzoneexit]
 if_openoverlay(null);

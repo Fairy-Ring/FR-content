@@ -90,8 +90,8 @@ if ($unlock ! null) {
 if_settext(music:com_177, db_getfield($song, music:name, 0));
 ~music_play(db_getfield($song, music:track, 0));
 
-[label,music_playbyregion](coord $coord)
-// first, search for the song linked to this mapsquare
+// proc form for cutscenes (cannot @label from inside a proc)
+[proc,music_playbycoord](coord $coord)
 def_int $map_x = calc(coordx($coord) / 64 * 64);
 def_int $map_z = calc(coordz($coord) / 64 * 64);
 
@@ -101,7 +101,6 @@ if ($region = null) {
     return;
 }
 
-// now that we have the region, we can grab info on the song
 def_dbrow $song = db_getfield($region, musicregion:musicdata, 0);
 def_int $unlock;
 def_int $bit;
@@ -117,6 +116,9 @@ if (%musicplay ! 0) {
     if_settext(music:com_177, db_getfield($song, music:name, 0));
     ~music_play(db_getfield($song, music:track, 0));
 }
+
+[label,music_playbyregion](coord $coord)
+~music_playbycoord($coord);
 
 [label,music_playbyregionplane](coord $coord)
 // same as playbyregion, but takes coordy into account
