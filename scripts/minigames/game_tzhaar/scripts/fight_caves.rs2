@@ -1,0 +1,10 @@
+// Fight Caves — first code: Mej-Jal Talk-to and cave-entrance Enter are
+// explicit no-ops. Talk-to UNKNOWN (news silent); Enter refuse-or-no-op until
+// dest-from-maps remesure. 9357 @ 2412,5118 occupancy is NOT dest (EXHAUSTED).
+// 2804 stays closed. Cite xl-minigames-remaining-impl-377.md D.2 (unit 26).
+
+[opnpc1,tzhaar_fightcave_master]
+return;
+
+[oploc1,cave_entrance_9356]
+return;
