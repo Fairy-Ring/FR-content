@@ -2,17 +2,16 @@
 // CANDIDATE dest 3557,9703 L3 (`3_55_151_37_39`): west of stairs 6702 at
 // 3558,9703 L3 (blocked). Dig zone = 2x3 rect 3565,3288..3566,3290 L0
 // (h85 plateau), stand 3565,3289 L0 (not the Old Man at 3565,3288).
-// kill_count 4535 stays closed; no Search / NPC spawn / drain / chest.
+// Crypt entry opens the kill_count 4535 overlay (unit 24); stay-surface Dig
+// does not. No Search / NPC spawn / drain / chest.
 // Called from spade.rs2 before the default "nothing interesting" mes.
-// Cite barrows-crypt-dest-377.md + dest-from-our-maps-377.md.
+// Cite barrows-crypt-dest-377.md + barrows-mound-dig-first-slice-377.md.
 
 [proc,barrows_dig]()(boolean)
-if (coord = 0_55_51_45_24) {
-    return (false);
-}
 if (inzone(0_55_51_45_24, 0_55_51_46_26, coord) = true) {
     p_delay(1);
     p_telejump(3_55_151_37_39);
+    if_openoverlay(kill_count);
     return (true);
 }
 return (false);
