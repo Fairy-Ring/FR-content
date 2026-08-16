@@ -1,0 +1,20 @@
+// Forgettable Tale... — Commander Veldaban (Black Guard HQ) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:Forgettable Tale... minus cutscene chrome).
+// First write %forget_quest 0 -> 1. Chat + write only — no cutscene dest /
+// drunk-house land, no Rohak bind, no Alvis leftover.
+// Review: <hn> is not a name token here — use <displayname>.
+// Cite red-19-start-impl-377.md §8.
+
+[opnpc1,dwarf_city_black_guard_leader]
+~chatnpc("<p,neutral><displayname>! Have you heard?");
+~chatnpc("<p,neutral>It's the Red Axe!");
+~chatnpc("<p,neutral>They've left the city!");
+~chatplayer("<p,neutral>Very interested!");
+def_int $go = ~p_choice2("Sounds like just the job for me!", 1, "Some other time, perhaps.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Some other time, perhaps.");
+    return;
+}
+~chatplayer("<p,happy>Sounds like just the job for me!");
+~chatnpc("<p,neutral>Excellent, good luck to you in your quest! May Guthix protect you!");
+%forget_quest = 1;
