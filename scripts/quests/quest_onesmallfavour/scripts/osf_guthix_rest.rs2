@@ -1,9 +1,11 @@
-// One Small Favour — Guthix rest brew: heat + pour (spine hops 1).
+// One Small Favour — Guthix rest brew: heat + pour + mix (spine hops 1–2).
 // Heat: bowl of water (1921) on a packed range/fire -> bowl of hot water
 // (4456). Pour: bowl_hot_water (4456) into cup_empty (1980) -> cup_hot_water
-// (4460) + bowl_empty (1923), gated at %onesmallfavour >= 13. CANDIDATE mes
-// lines (2007-base minus Changes). No varp write, no XP, no dest / 12346.
-// Cite spine-17-remaining-impl-377.md + osf-guthix-rest-brew-impl-377.md.
+// (4460) + bowl_empty (1923), gated at %onesmallfavour >= 13. Mix: cup_hot_water
+// (4460) + 1 harralander (255) + 2 guam (249) + 1 marentill (251) via the pack
+// favour_cup_* graph -> cup_guthix_rest_3 (4419); wrong herb -> favour_herbtea_ruined
+// (4462). CANDIDATE mes lines (2007-base minus Changes). No varp write, no XP,
+// no dest / 12346. Cite spine-17-remaining-impl-377.md + osf-guthix-rest-brew-377.md.
 
 [oplocu,scenery_2728] @osf_bowl_heat_oven;
 [oplocu,scenery_2729] @osf_bowl_heat_oven;
@@ -29,6 +31,18 @@ if (last_useitem = bowl_hot_water) {
     return;
 }
 ~displaymessage(^dm_default);
+
+[opheldu,cup_hot_water] @osf_mix_hot_water;
+[opheldu,favour_cup_harralander] @osf_mix_harralander;
+[opheldu,favour_cup_guam] @osf_mix_guam;
+[opheldu,favour_cup_marrentill] @osf_mix_marrentill;
+[opheldu,favour_cup_harralander_marrentill] @osf_mix_harralander_marrentill;
+[opheldu,favour_cup_harralander_guam] @osf_mix_harralander_guam;
+[opheldu,favour_cup_guam_guam] @osf_mix_guam_guam;
+[opheldu,favour_cup_guam_marrentill] @osf_mix_guam_marrentill;
+[opheldu,favour_cup_harralander_marrentill_guam] @osf_mix_harralander_marrentill_guam;
+[opheldu,favour_cup_guam_guam_marrentill] @osf_mix_guam_guam_marrentill;
+[opheldu,favour_cup_guam_guam_harralander] @osf_mix_guam_guam_harralander;
 
 [label,osf_bowl_heat_oven]
 if (last_useitem = bowl_water) {
@@ -64,3 +78,96 @@ inv_del(inv, bowl_hot_water, 1);
 inv_del(inv, cup_empty, 1);
 inv_add(inv, cup_hot_water, 1);
 inv_add(inv, bowl_empty, 1);
+
+// Mix graph — cup state + herb -> next packed favour cup, or finish / ruin.
+[label,osf_mix_hot_water]
+if (last_useitem = harralander) { @osf_mix_step(cup_hot_water, favour_cup_harralander, last_useitem); return; }
+if (last_useitem = guam_leaf) { @osf_mix_step(cup_hot_water, favour_cup_guam, last_useitem); return; }
+if (last_useitem = marentill) { @osf_mix_step(cup_hot_water, favour_cup_marrentill, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_harralander]
+if (last_useitem = marentill) { @osf_mix_step(favour_cup_harralander, favour_cup_harralander_marrentill, last_useitem); return; }
+if (last_useitem = guam_leaf) { @osf_mix_step(favour_cup_harralander, favour_cup_harralander_guam, last_useitem); return; }
+if (last_useitem = harralander) { @osf_mix_ruin(favour_cup_harralander, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_guam]
+if (last_useitem = guam_leaf) { @osf_mix_step(favour_cup_guam, favour_cup_guam_guam, last_useitem); return; }
+if (last_useitem = marentill) { @osf_mix_step(favour_cup_guam, favour_cup_guam_marrentill, last_useitem); return; }
+if (last_useitem = harralander) { @osf_mix_step(favour_cup_guam, favour_cup_harralander_guam, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_marrentill]
+if (last_useitem = harralander) { @osf_mix_step(favour_cup_marrentill, favour_cup_harralander_marrentill, last_useitem); return; }
+if (last_useitem = guam_leaf) { @osf_mix_step(favour_cup_marrentill, favour_cup_guam_marrentill, last_useitem); return; }
+if (last_useitem = marentill) { @osf_mix_ruin(favour_cup_marrentill, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_harralander_marrentill]
+if (last_useitem = guam_leaf) { @osf_mix_step(favour_cup_harralander_marrentill, favour_cup_harralander_marrentill_guam, last_useitem); return; }
+if (last_useitem = harralander | last_useitem = marentill) { @osf_mix_ruin(favour_cup_harralander_marrentill, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_harralander_guam]
+if (last_useitem = guam_leaf) { @osf_mix_step(favour_cup_harralander_guam, favour_cup_guam_guam_harralander, last_useitem); return; }
+if (last_useitem = marentill) { @osf_mix_step(favour_cup_harralander_guam, favour_cup_harralander_marrentill_guam, last_useitem); return; }
+if (last_useitem = harralander) { @osf_mix_ruin(favour_cup_harralander_guam, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_guam_guam]
+if (last_useitem = harralander) { @osf_mix_step(favour_cup_guam_guam, favour_cup_guam_guam_harralander, last_useitem); return; }
+if (last_useitem = marentill) { @osf_mix_step(favour_cup_guam_guam, favour_cup_guam_guam_marrentill, last_useitem); return; }
+if (last_useitem = guam_leaf) { @osf_mix_ruin(favour_cup_guam_guam, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_guam_marrentill]
+if (last_useitem = harralander) { @osf_mix_step(favour_cup_guam_marrentill, favour_cup_harralander_marrentill_guam, last_useitem); return; }
+if (last_useitem = guam_leaf) { @osf_mix_step(favour_cup_guam_marrentill, favour_cup_guam_guam_marrentill, last_useitem); return; }
+if (last_useitem = marentill) { @osf_mix_ruin(favour_cup_guam_marrentill, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_harralander_marrentill_guam]
+if (last_useitem = guam_leaf) { @osf_mix_finish(favour_cup_harralander_marrentill_guam, last_useitem); return; }
+if (last_useitem = harralander | last_useitem = marentill) { @osf_mix_ruin(favour_cup_harralander_marrentill_guam, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_guam_guam_marrentill]
+if (last_useitem = harralander) { @osf_mix_finish(favour_cup_guam_guam_marrentill, last_useitem); return; }
+if (last_useitem = guam_leaf | last_useitem = marentill) { @osf_mix_ruin(favour_cup_guam_guam_marrentill, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_guam_guam_harralander]
+if (last_useitem = marentill) { @osf_mix_finish(favour_cup_guam_guam_harralander, last_useitem); return; }
+if (last_useitem = harralander | last_useitem = guam_leaf) { @osf_mix_ruin(favour_cup_guam_guam_harralander, last_useitem); return; }
+~displaymessage(^dm_default);
+
+[label,osf_mix_step](namedobj $from, namedobj $to, obj $herb)
+if (%onesmallfavour < 13) {
+    mes("You have no idea what effect this would have.");
+    return;
+}
+mes("You add the herb to the cup.");
+inv_del(inv, $from, 1);
+inv_del(inv, $herb, 1);
+inv_add(inv, $to, 1);
+
+[label,osf_mix_finish](namedobj $from, obj $herb)
+if (%onesmallfavour < 13) {
+    mes("You have no idea what effect this would have.");
+    return;
+}
+mes("You make a cup of Guthix rest.");
+inv_del(inv, $from, 1);
+inv_del(inv, $herb, 1);
+inv_add(inv, cup_guthix_rest_3, 1);
+
+[label,osf_mix_ruin](namedobj $from, obj $herb)
+if (%onesmallfavour < 13) {
+    mes("You have no idea what effect this would have.");
+    return;
+}
+mes("You ruin the herb tea.");
+inv_del(inv, $from, 1);
+inv_del(inv, $herb, 1);
+inv_add(inv, favour_herbtea_ruined, 1);
