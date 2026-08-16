@@ -63,40 +63,44 @@ if_settab(null, 5);
 if_settab(null, 6);
 if_settab(null, 11);
 if_settab(null, 12);
+// fade before the first tele — no live player in the establishing shot
+if_openoverlay(fade_to_black);
 // palace cam — plaza west of the palace door (2864,10200 is inside; door 6114 faces west)
 p_telejump(0_44_159_40_23); // 2856,10199 L0 — plaza
-p_delay(3);
+p_delay(2);
 ~music_playbycoord(coord); // west = Land of the Dwarves
 cam_moveto(0_44_159_28_10, 650, 0, 100); // 2844,10186 — pull back/south, hops out
 cam_lookat(0_44_159_54_24, 400, 0, 100); // 2870,10200 — palace building mass, head-on
+p_delay(2);
+if_openoverlay(null);
 // palace card / history — packed inter_235 red-letter overlay, not a mesbox
 if_openoverlay(inter_235);
 if_sethide(inter_235:com_0, false);
-p_delay(2);
+p_delay(1);
 if_sethide(inter_235:com_1, false);
-p_delay(2);
+p_delay(1);
 if_sethide(inter_235:com_2, false);
-p_delay(2);
+p_delay(1);
 if_sethide(inter_235:com_3, false);
-p_delay(2);
+p_delay(1);
 if_sethide(inter_235:com_4, false);
-p_delay(2);
+p_delay(1);
 if_sethide(inter_235:com_5, false);
-p_delay(2);
+p_delay(1);
 if_sethide(inter_235:com_6, false);
-p_delay(2);
+p_delay(1);
 if_sethide(inter_235:com_7, false);
-p_delay(2);
+p_delay(1);
 if_sethide(inter_235:com_8, false);
-p_delay(4); // hold so the full card is readable before closing
+p_delay(3); // hold so the full card is readable before closing
 if_openoverlay(null);
 // no title mesboxes — Rise of the Red Axe / The Giant Dwarf are not in the 377 pack
 // statue cam — outdoor street stand, statue 2878,10177 is look-only
 p_telejump(0_44_159_50_6); // 2866,10182 L0 — outdoor, not the house
 p_delay(3);
 ~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_52_4, 420, 0, 100); // 2868,10180 — pull back so whole giant is in frame
-cam_lookat(0_44_159_62_1, 320, 0, 100); // statue 7042 @ 2878,10177 in frame for the crash
+cam_moveto(0_44_159_48_2, 480, 0, 100); // 2864,10178 — pull further back/higher lookat
+cam_lookat(0_44_159_62_1, 380, 0, 100); // statue 7042 @ 2878,10177 full giant in frame
 // crash talk — boatman speaker + player
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!");
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
