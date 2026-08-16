@@ -1,0 +1,19 @@
+// Cabin Fever — gangplank Cross dests. Stay fever_quest 1. No write 2.
+// Locs sit L1; L1 tele is midair (same as Pest plank). Player dest is L0
+// dest-side occupancy + walkable: ship fever_shipfloor 3713,3496 and pier
+// 3709,3496. Do not bind Mos Le' harmless 11211/11212. Hunt 289? no.
+// Cite dest-from-our-maps + Pest Cross midair remesure.
+
+[oploc1,fever_gangplank]
+if (%fever_quest < 1) {
+    mes("I don't think that whoever owns this ship will be happy with me wandering all over it.");
+    return;
+}
+p_telejump(0_58_54_1_40); // 3713,3496 L0 — ship floor 11264
+
+[oploc1,fever_gangplank_exit]
+if (%fever_quest < 1) {
+    mes("I don't think that whoever owns this ship will be happy with me wandering all over it.");
+    return;
+}
+p_telejump(0_57_54_61_40); // 3709,3496 L0 — pier next to planks
