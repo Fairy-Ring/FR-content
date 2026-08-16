@@ -17,6 +17,8 @@
 if (%giantdwarf_quest >= 1) {
     ~chatnpc("<p,neutral>There she is! All aboard for Keldagrim!");
     p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
+    p_delay(2);
+    ~music_playbycoord(coord);
     return;
 }
 ~chatnpc("<p,neutral>Ho there, human!");
@@ -64,8 +66,8 @@ if_settab(null, 12);
 p_telejump(0_44_159_48_24); // 2864,10200 L0 — street, not the west pub
 p_delay(3);
 ~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_48_24, 500, 2, 2);
-cam_lookat(0_44_159_46_23, 250, 2, 2); // palace facade / door, not Barman/shelves
+cam_moveto(0_44_159_48_24, 800, 2, 2);
+cam_lookat(0_44_159_46_23, 400, 2, 2); // palace facade / door, not Barman/shelves
 // palace card / history — dump on-screen text (no red-letter IF in pack)
 ~mesbox("Five hundred years have passed since the rule of King Alvis,|saviour of Keldagrim, victim of his own inventions.|He founded the Consortium: the gathering of mining companies|that were to serve the monarchy. But eventually the monarchy came|to serve the Consortium.|By the time of his death, the monarchy was all but abolished.|Now the Kings in Keldagrim are but a distant memory...|with the only statue of King Alvis to remind people of the|old days. The dark days.");
 p_delay(0);
@@ -76,8 +78,8 @@ p_delay(0);
 p_telejump(0_44_159_50_6); // 2866,10182 L0 — outdoor, not the house
 p_delay(3);
 ~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_50_6, 400, 2, 2);
-cam_lookat(0_44_159_62_1, 250, 2, 2); // statue 7042 @ 2878,10177 in frame for the crash
+cam_moveto(0_44_159_50_6, 800, 2, 2);
+cam_lookat(0_44_159_62_1, 400, 2, 2); // statue 7042 @ 2878,10177 in frame for the crash
 // crash talk — boatman speaker + player
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!");
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
@@ -104,6 +106,7 @@ minimap_toggle(0);
 %giantdwarf_cutscene_guard_visible = 0;
 p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
 p_delay(3);
+~music_playbycoord(coord); // HQ = west Land
 // Veldaban "Identify yourself" — chatnpc_specific, not Forget's op
 ~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Identify yourself, human!");
 ~chatplayer("<p,neutral>I err, I'm <displayname>. I was told I was under arrest. I had a little accident on the way in here.");
