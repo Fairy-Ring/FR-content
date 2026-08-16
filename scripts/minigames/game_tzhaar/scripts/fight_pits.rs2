@@ -1,0 +1,10 @@
+// Fight Pits — first code: Talk-to the pit master and Look-into the viewing
+// orb are explicit no-ops. Bodies UNKNOWN (news silent) — do not invent lines.
+// 2804 (current_champion) / 3209 (stop_viewing logout) stay closed; the logout
+// tab stays logout (no if_settab). Cite xl-minigames-remaining-impl-377.md D.1.
+
+[opnpc1,tzhaar_fightpit_master]
+return;
+
+[oploc1,viewing_orb]
+return;
