@@ -1,0 +1,20 @@
+// The Lost Tribe — Sigmund (castle) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:The Lost Tribe minus overlay).
+// First write %lost_tribe_quest 0 -> 1. Chat + write only — no cellar dest,
+// no pickpocket loot, do not retouch lost_tribe_book.rs2 (already residual).
+// Review: Yes echoes the player line the plan names.
+// Cite red-19-start-impl-377.md §7.
+
+[opnpc1,lost_tribe_sigmund_there]
+~chatnpc("<p,neutral>Can I help you?");
+~chatplayer("<p,neutral>Do you have any quests for me?");
+~chatnpc("<p,neutral>There was recently some damage to the castle cellar.");
+~chatnpc("<p,neutral>Part of the wall has collapsed.");
+def_int $go = ~p_choice2("So what do you need me to do?", 1, "Sorry, I'm not interested.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Sorry, I'm not interested.");
+    return;
+}
+~chatplayer("<p,quiz>So what do you need me to do?");
+~chatnpc("<p,neutral>You should ask people around the town about it.");
+%lost_tribe_quest = 1;
