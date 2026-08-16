@@ -1,0 +1,7 @@
+// Ghosts Ahoy — Ectophial Empty -> Ectofuntus temple floor 3658,3517 L0.
+// CANDIDATE dest (dest-uncited-pass-next-377.md); 3658,3518 / 3659,3518 are
+// blocked temple floor — not dest. Phial refills on teleport: no item swap
+// (empty variant 4252 has no ops; Ectofuntus loc has no refill op). No write.
+
+[opheld1,ectophial]
+p_telejump(0_57_54_10_61); // ectophial 3658,3517 L0
