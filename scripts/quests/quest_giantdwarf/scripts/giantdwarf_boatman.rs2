@@ -67,8 +67,8 @@ if_settab(null, 12);
 p_telejump(0_44_159_40_23); // 2856,10199 L0 — plaza
 p_delay(3);
 ~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_32_14, 600, 0, 100); // 2848,10190 — snap, rate 0
-cam_lookat(0_44_159_54_24, 400, 0, 100); // 2870,10200 — palace building mass
+cam_moveto(0_44_159_28_10, 650, 0, 100); // 2844,10186 — pull back/south, hops out
+cam_lookat(0_44_159_54_24, 400, 0, 100); // 2870,10200 — palace building mass, head-on
 // palace card / history — packed inter_235 red-letter overlay, not a mesbox
 if_openoverlay(inter_235);
 if_sethide(inter_235:com_0, false);
@@ -88,15 +88,15 @@ p_delay(2);
 if_sethide(inter_235:com_7, false);
 p_delay(2);
 if_sethide(inter_235:com_8, false);
-p_delay(2);
+p_delay(4); // hold so the full card is readable before closing
 if_openoverlay(null);
 // no title mesboxes — Rise of the Red Axe / The Giant Dwarf are not in the 377 pack
 // statue cam — outdoor street stand, statue 2878,10177 is look-only
 p_telejump(0_44_159_50_6); // 2866,10182 L0 — outdoor, not the house
 p_delay(3);
 ~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_56_2, 350, 0, 100); // 2872,10178 — snap, rate 0
-cam_lookat(0_44_159_62_1, 280, 0, 100); // statue 7042 @ 2878,10177 in frame for the crash
+cam_moveto(0_44_159_52_4, 420, 0, 100); // 2868,10180 — pull back so whole giant is in frame
+cam_lookat(0_44_159_62_1, 320, 0, 100); // statue 7042 @ 2878,10177 in frame for the crash
 // crash talk — boatman speaker + player
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!");
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
@@ -109,25 +109,27 @@ cam_shake(3, 0, 20, 2);
 %giantdwarf_statue_invis = 1;
 p_delay(2);
 if_openmain(inter_234);
-p_delay(3);
+p_delay(7); // hold so the crash map is readable
 if_close;
 // dock — cutscene berserkers appear, then the arrest
 %giantdwarf_cutscene_guard_visible = 1;
 p_telejump(0_45_159_9_49); // 2889,10225 L0 — dock stand next to both berserkers
 p_delay(3);
 ~music_playbycoord(coord); // east = Tale of Keldagrim (intro-end unlock via proc)
-cam_moveto(0_45_159_7_45, 250, 0, 100); // 2887,10221 — snap, rate 0
-cam_lookat(0_45_159_10_49, 150, 0, 100); // 2890,10225 — guards in frame
+cam_moveto(0_45_159_5_49, 380, 0, 100); // 2885,10225 — raise + back, planks out
+cam_lookat(0_45_159_10_49, 220, 0, 100); // 2890,10225 — guards 2231 in frame
 ~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,angry>Halt! By order of the Black Guard, you are under arrest!");
 ~chatplayer("<p,shock>What?? I didn't do anything! It wasn't me!");
 ~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,neutral>Come with us, human! Commander Veldaban wants a word with you!");
-// HQ — restore view + tabs, hide guards, land E of Veldaban
+// HQ — fade to black, land E of Veldaban (no live 3D pop)
+if_openoverlay(fade_to_black);
+%giantdwarf_cutscene_guard_visible = 0;
+p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
 cam_reset();
 minimap_toggle(0);
 ~initalltabs;
-%giantdwarf_cutscene_guard_visible = 0;
-p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
-p_delay(3);
+p_delay(2);
+if_openoverlay(null);
 ~music_playbycoord(coord); // HQ = west, back to Land
 // Veldaban "Identify yourself" — chatnpc_specific, not Forget's op
 ~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Identify yourself, human!");
