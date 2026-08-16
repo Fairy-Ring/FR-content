@@ -1,0 +1,19 @@
+// Icthlarin's Little Helper — Wanderer (redheadlady) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:Icthlarin's Little Helper minus overlay).
+// First write %ics_little_var 0 -> 1. Yes without kit only; hypnosis dest
+// later. No dest / rock / Sophanem / inter_97. Gertrude's Cat is not a hard
+// start gate this slice. Cite red-19-start-impl-377.md §4.
+
+[opnpc1,ics_little_redheadlady]
+~chatplayer("<p,neutral>Good day, wanderer.");
+~chatnpc("<p,neutral>Hello to you too, adventurer.");
+~chatnpc("<p,angry>Aghhh get that cat away from me.");
+~chatnpc("<p,neutral>Get me a full waterskin and a tinderbox.");
+def_int $go = ~p_choice2("Okay, I'll get you your supplies.", 1, "Sorry, I've got other things to do.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Sorry, I've got other things to do.");
+    ~chatnpc("<p,angry>Fool! Only I can give you the knowledge on the secret passageway!");
+    return;
+}
+~chatplayer("<p,happy>Okay, I'll get you your supplies.");
+%ics_little_var = 1;
