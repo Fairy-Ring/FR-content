@@ -1,0 +1,23 @@
+// Ghosts Ahoy — add milk to the refused nettle tea: bucket_milk (1927) on
+// chinacup_of_nettletea (4245) -> chinacup_of_nettletea_milky (4246) +
+// bucket_empty (1925). Milk-on-tea also cases in cakes.rs2 (keep cake default).
+// CANDIDATE mes (2007-base minus Changes). Stay %ahoy_questvar 3 — no write,
+// no dest / ectophial / enlightenment.
+// Cite spine-17-remaining-impl-377.md §3 + ahoy-crone-milk-use-next-377.md.
+
+[opheldu,chinacup_of_nettletea]
+if (last_useitem = bucket_milk) {
+    @ahoy_add_milk;
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,chinacup_of_nettletea_milky]
+~displaymessage(^dm_default);
+
+[label,ahoy_add_milk]
+mes("You add some milk to the tea.");
+inv_del(inv, bucket_milk, 1);
+inv_del(inv, chinacup_of_nettletea, 1);
+inv_add(inv, chinacup_of_nettletea_milky, 1);
+inv_add(inv, bucket_empty, 1);
