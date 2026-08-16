@@ -1,0 +1,26 @@
+// Zogre Flesh Eaters — Grish (ogre shaman) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:Zogre Flesh Eaters minus overlay toast).
+// First write %zogre 0 -> 1. Chat + write only — no inv_add food/pots
+// (later unit), no dungeon dest / Relicym / quest_zombiequeen.
+// Review: Yes is two choices (plan: Ok, I'll check things out →
+// Yes, I'm really sure!). Clone wrote 1 after the first pick only.
+// Cite red-19-start-impl-377.md §5.
+
+[opnpc1,zogre_ogre_shaman]
+~chatplayer("<p,neutral>Hello there, what's going on here?");
+~chatnpc("<p,confused>Hey yous creature...wha's you's doing here?");
+~chatnpc("<p,neutral>Da zogries comin wiv da sickies...");
+~chatplayer("<p,quiz>Can I help in any way?");
+def_int $go = ~p_choice2("Ok, I'll check things out.", 1, "Hmm, sorry, it sounds a bit too dangerous.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>Hmm, sorry, it sounds a bit too dangerous.");
+    return;
+}
+~chatplayer("<p,neutral>Ok, I'll check things out.");
+def_int $sure = ~p_choice2("Yes, I'm really sure!", 1, "Hmm, sorry, it sounds a bit too dangerous.", 2);
+if ($sure = 2) {
+    ~chatplayer("<p,neutral>Hmm, sorry, it sounds a bit too dangerous.");
+    return;
+}
+~chatplayer("<p,happy>Yes, I'm really sure!");
+%zogre = 1;
