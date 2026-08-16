@@ -1,0 +1,12 @@
+// Recipe for Disaster — Inspect frozen Pirate Pete after feast dest.
+// Stay hundred_main_quest_var 2. No portal 4. No leftover 18436.
+// CANDIDATE mes (2007-base minus Changes). Hunt 289? no.
+// Cite spine-17-remaining-impl-377.md §12 + rfd-pirate-pete-inspect-377.md.
+
+[oploc1,hundred_pirate_base]
+if (%hundred_main_quest_var < 2) {
+    ~displaymessage(^dm_default);
+    return;
+}
+mes("You inspect Pirate Pete.");
+mes("You'll need to free him.");
