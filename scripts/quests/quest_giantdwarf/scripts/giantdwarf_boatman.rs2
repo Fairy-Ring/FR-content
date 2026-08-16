@@ -1,0 +1,21 @@
+// Giant Dwarf — Dwarven Boatman (mines) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:The Giant Dwarf minus ferryman/cutscene chrome).
+// First write %giantdwarf_quest 0 -> 1. Chat + write only — no city dest,
+// no Alvis book / statue dest / Consortium (later units).
+// Review: Yes echoes the player line the plan names, then Boatman Excellent.
+// Cite red-19-start-impl-377.md §6.
+
+[opnpc1,dwarf_city_boatman_mines_prequest]
+~chatnpc("<p,neutral>Ho there, human!");
+~chatnpc("<p,neutral>Want to take a ride with me?");
+~chatnpc("<p,neutral>I'm going to Keldagrim, my home!");
+~chatnpc("<p,neutral>For a human like you, I can do it for free!");
+def_int $go = ~p_choice2("That's a deal!", 1, "I prefer the mines to the city.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>I prefer the mines to the city.");
+    ~chatnpc("<p,neutral>Well, suit yourself then!");
+    return;
+}
+~chatplayer("<p,happy>That's a deal!");
+~chatnpc("<p,neutral>Excellent! I'm just waiting for my ship to arrive and then we can go.");
+%giantdwarf_quest = 1;
