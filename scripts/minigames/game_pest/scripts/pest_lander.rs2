@@ -1,9 +1,8 @@
 // Pest Control — Cross the gangplank onto the waiting lander craft.
-// Dest CANDIDATE 2658,2639 L1 (plank tile, walkable); stand 2657,2639 L1.
-// Waiting craft only — not m41_40. No %pest_instance / bits_2086 write.
+// Loc 14315 is jm2 L1 but LINK_BELOW stores it at L0. Player dest is the
+// craft floor (occupancy + walkable), not the L1 plank tile (midair).
+// Stand 2657,2639 L0. Dest 2660,2640 L0. Not m41_40. No %pest_instance.
 // Cite xl-minigames-remaining-impl-377.md B.1.
 
 [oploc1,pest_lander_gangplank]
-// No p_arrivedelay: loc is L1 in jm2 but the client scene stores it on L0,
-// so the walk-to never completes. Dest is the walkable plank tile.
-p_telejump(1_41_41_34_15); // 2658,2639 L1 — plank (waiting craft)
+p_telejump(0_41_41_36_16); // 2660,2640 L0 — waiting-craft deck
