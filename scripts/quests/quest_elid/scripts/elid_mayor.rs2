@@ -1,0 +1,20 @@
+// Spirits of the Elid — Awusah the Mayor (Nardah) start Talk-to.
+// CANDIDATE lines (OSRS Transcript:Spirits of the Elid minus overlay/fairy-ring).
+// First write %elidquest 0 -> 1. Chat + write only — no river dest,
+// no ancestral-key dest, do not retouch elid_ballad.rs2 (already residual).
+// Review: Yes uses ~chatplayer (same as Agrith / Two Cats).
+// Cite red-19-start-impl-377.md §12.
+
+[opnpc1,elid_mayor]
+~chatnpc("<p,neutral>Many salutations to you. What brings you to our little town?");
+~chatplayer("<p,neutral>I am an adventurer in search of quests.");
+~chatnpc("<p,neutral>Our town seems to have come under a curse");
+~chatnpc("<p,neutral>Well first of all our fountain, which has served us for many years, suddenly dried up.");
+def_int $go = ~p_choice2("Ok I will have a look around and see what I can do.", 1, "I'm sorry to hear of your plight, but I must be going.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>I'm sorry to hear of your plight, but I must be going.");
+    return;
+}
+~chatplayer("<p,neutral>Ok I will have a look around and see what I can do.");
+~chatnpc("<p,neutral>Good luck to you.");
+%elidquest = 1;
