@@ -1,14 +1,30 @@
-// Giant Dwarf — Dwarven Boatman (mines) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:The Giant Dwarf minus ferryman/cutscene chrome).
-// First write %giantdwarf_quest 0 -> 1. Chat + write only — no city dest,
-// no Alvis book / statue dest / Consortium (later units).
-// Review: Yes echoes the player line the plan names, then Boatman Excellent.
-// Cite red-19-start-impl-377.md §6.
+// Giant Dwarf — Dwarven Boatman (mines) Talk-to + period intro cutscene.
+// Dump lines (Transcript:The Giant Dwarf Starting off minus overlay / Skip /
+// Travel — verbatim block in giantdwarf-boatman-cutscene-377.md; the extract
+// was never in .wiki). Fresh 0: start talk (<displayname>, ferryman line),
+// Deal + ready-Yes (~p_choice2, not overlay), write 1 on ready-Yes, then
+// [proc,giantdwarf_intro_cutscene]: mesbox history + cam_* on city floor,
+// crash talk + cam_shake + %giantdwarf_statue_invis = 1, dock guards (Halt!
+// on 2231), HQ dest, then Veldaban "Identify yourself" via ~chatnpc_specific
+// (NOT Forget's [opnpc1,dwarf_city_black_guard_leader] — already bound) and
+// Yes help -> %giantdwarf_quest = 2 + %giantdwarf_veldaban_introduced = 1.
+// BAR cross-talk three-way (110 complete / >= 10 started / else). Re-talk
+// >= 1: stub + dest, no second crash. 0 new ops. Never dest the statue
+// 2878,10177 / L1-L2 / Veldaban tile / 16 Consortium rooms. No && / ||.
+// Cite giantdwarf-boatman-cutscene-377.md + crawl giantdwarf-changes-377.md.
 
 [opnpc1,dwarf_city_boatman_mines_prequest]
+if (%giantdwarf_quest >= 1) {
+    ~chatnpc("<p,neutral>There she is! All aboard for Keldagrim!");
+    p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
+    return;
+}
 ~chatnpc("<p,neutral>Ho there, human!");
-~chatnpc("<p,neutral>Want to take a ride with me?");
-~chatnpc("<p,neutral>I'm going to Keldagrim, my home!");
+~chatplayer("<p,neutral><displayname>");
+~chatnpc("<p,neutral>Ho there, <displayname>! Want to take a ride with me?");
+~chatplayer("<p,neutral>Where are you going? Across the river?");
+~chatnpc("<p,neutral>No no, that's what the ferryman is for! I'm going to Keldagrim, my home!");
+~chatplayer("<p,neutral>How much will that cost me then?");
 ~chatnpc("<p,neutral>For a human like you, I can do it for free!");
 def_int $go = ~p_choice2("That's a deal!", 1, "I prefer the mines to the city.", 2);
 if ($go = 2) {
@@ -18,4 +34,108 @@ if ($go = 2) {
 }
 ~chatplayer("<p,happy>That's a deal!");
 ~chatnpc("<p,neutral>Excellent! I'm just waiting for my ship to arrive and then we can go.");
+~chatnpc("<p,quiz>Mind, this trip could take a few minutes! Are you sure you're ready to go as well?");
+def_int $ready = ~p_choice2("Yes, I'm ready and don't mind it taking a few minutes.", 1, "No, I don't have time right now, I'll be back later.", 2);
+if ($ready = 2) {
+    ~chatplayer("<p,neutral>No, I don't have time right now, I'll be back later.");
+    ~chatnpc("<p,neutral>Sure, sure! Come back when you need to!");
+    return;
+}
+~chatplayer("<p,happy>Yes, I'm ready and don't mind it taking a few minutes.");
+~chatnpc("<p,happy>Well, let's not waste any more time then!");
 %giantdwarf_quest = 1;
+~giantdwarf_intro_cutscene;
+
+[proc,giantdwarf_intro_cutscene]()
+if_close;
+p_delay(0);
+// palace card / history — dump on-screen text (no red-letter IF in pack)
+~mesbox("Five hundred years have passed since the rule of King Alvis,|saviour of Keldagrim, victim of his own inventions.|He founded the Consortium: the gathering of mining companies|that were to serve the monarchy. But eventually the monarchy came|to serve the Consortium.|By the time of his death, the monarchy was all but abolished.|Now the Kings in Keldagrim are but a distant memory...|with the only statue of King Alvis to remind people of the|old days. The dark days.");
+p_delay(0);
+~mesbox("Rise of the Red Axe Part 1");
+p_delay(0);
+~mesbox("The Giant Dwarf");
+// palace cam — walkable west city floor
+minimap_toggle(2);
+if_settab(null, 0);
+if_settab(null, 1);
+if_settab(null, 2);
+if_settab(null, 3);
+if_settab(null, 4);
+if_settab(null, 5);
+if_settab(null, 6);
+if_settab(null, 11);
+if_settab(null, 12);
+p_telejump(0_44_159_22_24); // 2838,10200 L0 — walkable west city
+p_delay(1);
+cam_moveto(0_44_159_22_24, 1000, 100, 232);
+cam_lookat(0_44_159_28_20, 50, 100, 232);
+// statue cam — from the walkable bank tile; statue 2878,10177 is look-only
+p_telejump(0_44_159_45_14); // 2861,10190 L0 — walkable bank
+p_delay(1);
+cam_lookat(0_44_159_62_1, 50, 3, 10);
+// crash talk — boatman speaker + player
+~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!");
+~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
+~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,happy>That's right!");
+~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,angry>Er, hold on! There's something wrong!");
+~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,shock>Aaargh!");
+~chatplayer("<p,shock>Aaargh!");
+// crash effect
+cam_shake(3, 0, 20, 2);
+%giantdwarf_statue_invis = 1;
+p_delay(2);
+// dock — cutscene berserkers appear, then the arrest
+%giantdwarf_cutscene_guard_visible = 1;
+p_telejump(0_45_159_9_49); // 2889,10225 L0 — dock stand next to both berserkers
+p_delay(2);
+~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,angry>Halt! By order of the Black Guard, you are under arrest!");
+~chatplayer("<p,shock>What?? I didn't do anything! It wasn't me!");
+~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,neutral>Come with us, human! Commander Veldaban wants a word with you!");
+// HQ — restore view + tabs, hide guards, land E of Veldaban
+cam_reset();
+minimap_toggle(0);
+~initalltabs;
+%giantdwarf_cutscene_guard_visible = 0;
+p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
+p_delay(2);
+// Veldaban "Identify yourself" — chatnpc_specific, not Forget's op
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Identify yourself, human!");
+~chatplayer("<p,neutral>I err, I'm <displayname>. I was told I was under arrest. I had a little accident on the way in here.");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Ah, so you're the one who knocked over the statue of our glorious king!");
+~chatplayer("<p,neutral>I suppose so... I mean, I didn't do it on purpose or anything...");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Ah, don't worry about it!");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>We haven't been ruled by a king for many a year... that statue was long overdue for replacement anyway. You're not under arrest, I merely wanted to talk to you.");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>But let me introduce myself. I am Veldaban, son of Dondakan. I am the Commander of the Black Guard in Keldagrim.");
+if (%dwarfrock_quest = 110) {
+    ~chatplayer("<p,neutral>Dondakan, you say?");
+    ~chatplayer("<p,neutral>I helped your father in the mines south of the city.");
+    ~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,happy>Ah, so you are the one! I heard you banished a demon by defeating its avatar, most impressive.");
+} else if (%dwarfrock_quest >= 10) {
+    ~chatplayer("<p,neutral>Dondakan, you say?");
+    ~chatplayer("<p,neutral>I'm helping your father in the mines south of the city.");
+    ~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Ah, he is forever trying to break open that rock of his, until his death I sometimes think.");
+    ~chatplayer("<p,neutral>So you don't think it's possible?");
+    ~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Perhaps, human, perhaps... but if even our multicannon does not dent it, what chance is there really?");
+} else {
+    ~chatplayer("<p,neutral>Well, ehm... nice to meet you, Veldaban.");
+}
+// task + choice
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Now listen carefully. I have a task for you.");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>I want you to go and see the local sculptor and help him build a new statue.");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,quiz>Will you do this for us?");
+def_int $help = ~p_choice2("Yes, I will do this.", 1, "No, I can't be bothered.", 2);
+if ($help = 2) {
+    ~chatplayer("<p,neutral>No, I can't be bothered.");
+    ~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,angry>You destroy our statue and you cannot be bothered to help rebuild it? By Guthix, you are rude... even for a human!");
+    return;
+}
+~chatplayer("<p,happy>Yes, I will do this.");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,happy>You are a good human, <displayname>.");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Now, I need you to go to Blasidar, he is a sculptor who lives in Keldagrim-East.");
+~chatplayer("<p,neutral>To be honest I'm not much of a sculptor myself.");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>Oh, don't worry! I just need you to help him out while he rebuilds the statue.");
+~chatnpc_specific("Commander Veldaban", dwarf_city_black_guard_leader, "<p,neutral>I'm sure there are many tasks that he needs doing.");
+~chatplayer("<p,neutral>I'll see what I can do.");
+%giantdwarf_veldaban_introduced = 1;
+%giantdwarf_quest = 2;
