@@ -1,0 +1,19 @@
+// The Feud — Ali Morrisane start Talk-to.
+// CANDIDATE lines (OSRS Transcript:The Feud minus overlay / combat-40 toast
+// / Rogue Trader shop). First write %feud_var 0 -> 1. Do not open Ali's
+// Discount Wares. No dest / Pollnivneach / stair dest.
+// Cite red-19-start-impl-377.md §3.
+
+[opnpc1,feud_ali_m]
+~chatnpc("<p,neutral>Good day and welcome back to Al Kharid.");
+~chatnpc("<p,neutral>My name is Ali Morrisane - the greatest salesman in the world.");
+~chatnpc("<p,neutral>A nephew of mine lives not too far from here in a little town called Pollnivneach.");
+def_int $go = ~p_choice2("I'll find your nephew.", 1, "I'm too busy to help.", 2);
+if ($go = 2) {
+    ~chatplayer("<p,neutral>I'm too busy to help.");
+    ~chatnpc("<p,neutral>No problem my friend, perhaps another time.");
+    return;
+}
+~chatplayer("<p,happy>I'll find your nephew.");
+~chatnpc("<p,neutral>Tell him his uncle Ali M needs his help up in Al Kharid.");
+%feud_var = 1;
