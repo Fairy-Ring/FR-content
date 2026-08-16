@@ -1,17 +1,42 @@
-// Barrows — Dig on a mound falls into the crypt (Ahrim row).
-// CANDIDATE dest 3557,9703 L3 (`3_55_151_37_39`): west of stairs 6702 at
-// 3558,9703 L3 (blocked). Dig zone = 2x3 rect 3565,3288..3566,3290 L0
-// (h85 plateau), stand 3565,3289 L0 (not the Old Man at 3565,3288).
-// Crypt entry opens the kill_count 4535 overlay (unit 24); stay-surface Dig
-// does not. No Search / NPC spawn / drain / chest.
-// Called from spade.rs2 before the default "nothing interesting" mes.
-// Cite barrows-crypt-dest-377.md + barrows-mound-dig-first-slice-377.md.
+// Barrows — Dig on a mound falls into that brother's crypt.
+// Ahrim dest 3557,9703 L3 (west of stairs 6702). Other five dests dest-cite
+// CANDIDATE next to blocked stairs (unit 20). Dig triggers = anchors peak
+// cells (one cell each; no six-mound inzone / radius). Crypt entry opens the
+// kill_count 4535 overlay (unit 24 dummy already shipped); stay-surface Dig
+// does not. No Search / NPC spawn / drain / chest. Called from spade.rs2
+// before the default mes.
+// Cite barrows-other-5-next-product-unit-377.md + barrows-crypt-dest-377.md.
+// Review: dest helper is a proc (~) so ~barrows_dig() can return true.
+// Clone used @label (jump); that would skip the boolean return to spade.rs2.
 
 [proc,barrows_dig]()(boolean)
 if (inzone(0_55_51_45_24, 0_55_51_46_26, coord) = true) {
-    p_delay(1);
-    p_telejump(3_55_151_37_39);
-    if_openoverlay(kill_count);
+    ~barrows_dig_dest(3_55_151_37_39); // Ahrim 3557,9703 L3
+    return (true);
+}
+if (inzone(0_55_51_55_34, 0_55_51_55_34, coord) = true) {
+    ~barrows_dig_dest(3_55_151_36_54); // Dharok 3556,9718 L3
+    return (true);
+}
+if (inzone(0_55_51_57_19, 0_55_51_57_19, coord) = true) {
+    ~barrows_dig_dest(3_55_151_15_41); // Guthan 3535,9705 L3
+    return (true);
+}
+if (inzone(0_55_51_46_12, 0_55_51_46_12, coord) = true) {
+    ~barrows_dig_dest(3_55_151_27_21); // Karil 3547,9685 L3
+    return (true);
+}
+if (inzone(0_55_51_33_19, 0_55_51_33_19, coord) = true) {
+    ~barrows_dig_dest(3_55_151_45_20); // Torag 3565,9684 L3
+    return (true);
+}
+if (inzone(0_55_51_37_34, 0_55_51_37_34, coord) = true) {
+    ~barrows_dig_dest(3_55_151_57_39); // Verac 3577,9703 L3
     return (true);
 }
 return (false);
+
+[proc,barrows_dig_dest](coord $dest)
+p_delay(1);
+p_telejump($dest);
+if_openoverlay(kill_count);
