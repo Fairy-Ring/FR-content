@@ -8,6 +8,13 @@ if (%mourning_quest < 1) {
     ~displaymessage(^dm_default);
     return;
 }
+if (%mourning_quest >= 9) {
+    // MEP1 complete = varp 517 = OSRS MOURNING'S_END_PART_I_PROGRESS,
+    // terminal stage 9 (Chisel 8->9). 377 unpack places mourning_quest at
+    // varp 517 (between varp516_bits / varp519_unused). Cite mep2-start-complete-gate-377.md.
+    @mourning2_arianwyn_start;
+    return;
+}
 ~chatnpc("<p,happy>Good day <displayname()>, I have been hoping to see you. It has come to my attention that there are large numbers of those you know as 'Mourners' crossing the mountain pass through Arandar.");
 ~chatplayer("<p,quiz>Mourners? Here in Tirannwn? But why?");
 ~chatnpc("<p,neutral>Why? It is quite simple really and it is hardly a big secret. Those you know as Mourners are in fact Elves from the city.");
