@@ -4,9 +4,35 @@
 // Period camp first-talk Still missing. VERIFIED crystal line is Lletya after fade.
 // Hunt 289? no. Do not splice Islwyn / 1202 / 2372. Do not write 518 / 574.
 // Accept: %mourning_quest 0→1 then "Well, let us go then." return — no dest.
-// Cite mep1-eluned-period-media-377.md §4 / §6.
+// Roving Elves later-case (inline — no new ops / labels): Consecrating the
+// Tomb first briefing when %roving_elves_quest = 1 and %mourning_quest < 1
+// (seed from old tomb SE of Baxtorian Falls, defeat a guardian, return) —
+// write 1→2 CANDIDATE (not complete). At >= 2 and mourning < 1: again-talk
+// "any luck finding the consecration seed?" (no inv). MEP1 branches preserved.
+// Cite mep1-eluned-period-media-377.md §4 / §6 + red-19-start-impl-377.md §1.
 
 [opnpc1,roving_female_woodelf]
+if (%roving_elves_quest = 1) {
+    if (%mourning_quest < 1) {
+        ~chatplayer("<p,neutral>Hey there, Islwyn said you might be able to help me. He told me you'd know how to consecrate ground for an elven burrial. I need to consecrate Glarial's new resting place.");
+        ~chatnpc("<p,neutral>That I do... It is also elvish tradition to plant a specially enchanted crystal seed at the graves of our ancestors. The seed will create guardians to protect the area. Unfortunately the crystal seed must be tuned to the person it's protecting... a new seed won't do. But you should be able to recover the seed from her old tomb. I'm not very familiar with the lands to the east so I couldn't tell you where her old tomb is I'm afraid.");
+        ~chatplayer("<p,neutral>That's okay, I've been there before. It's just south east of Baxtorian Falls.");
+        ~chatnpc("<p,neutral>Excellent. Now, the tomb's guardians will be protecting the seed, you'll need to defeat one of them to get it. Once you have it, return to me and I will re-enchant it.");
+        ~chatplayer("<p,neutral>Okay, I'll be back as soon as I have it.");
+        %roving_elves_quest = 2;
+        return;
+    }
+}
+if (%roving_elves_quest >= 2) {
+    if (%mourning_quest < 1) {
+        // no seed yet — reminder (later rows add the seed / enchant stages)
+        ~chatnpc("<p,neutral>Hello, any luck finding the consecration seed?");
+        ~chatplayer("<p,neutral>No not yet.");
+        ~chatnpc("<p,neutral>You should be able to find it in her old resting place, I think you said it was south east of Baxtorian Falls. You'll need to defeat one of the old tomb's guardians to obtain it. Bring it to me as soon as you find it, then I can re-enchant it.");
+        ~chatplayer("<p,neutral>Okay, I'll see what I can do.");
+        return;
+    }
+}
 if (%mourning_quest >= 1) {
     @mep1_eluned_go;
 }
