@@ -1,0 +1,23 @@
+// Tears of Guthix — Juna (hidey bush) Talk-to after 43 QP (CANDIDATE gate).
+// Opener + accept lines (2007-base minus Changes). Bowl instruction only;
+// mine 4703 / chisel 4704 are later. No dest (cave pair shipped in
+// tog_caves.rs2). HUD water_collected 3279 stays closed.
+// Cite spine-17-remaining-impl-377.md §17 + tog-juna-talk-2007base-377.md.
+
+[oploc1,hidey_unbuilt_bush_easy]
+if (%qp < 43) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// Loc Talk-to has no npc pointer. Header "Juna" via dummy chathead only
+// (dummy is not the click — 0 ops). Cite tog-juna-talk-2007base §3.1.
+~chatnpc_specific("Juna", tog_juna_dummy, "<p,neutral>Tell me... a story...");
+def_int $c = ~p_choice2("Okay.", 1, "Not now.", 2);
+if ($c = 2) {
+    ~chatplayer("<p,neutral>Not now.");
+    return;
+}
+~chatplayer("<p,neutral>You tell me a story.");
+~chatnpc_specific("Juna", tog_juna_dummy, "<p,neutral>Your stories have entertained me. I will let you into the cave for a short time.");
+~chatnpc_specific("Juna", tog_juna_dummy, "<p,neutral>But first you will need to make a bowl in which to collect the tears.");
+~chatnpc_specific("Juna", tog_juna_dummy, "<p,neutral>Mine some stone from that cave, make it into a bowl, and bring it to me.");
