@@ -846,10 +846,10 @@ switch_coord (loc_coord) {
 }
 
 [oploc1,barrows_stairs_ahrim]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+// Ahrim crypt stairs — Climb-up returns to the peak 3565,3289 L0
+// (inverse of the Dig dest, barrows_dig.rs2). 4535 stays closed.
+// Cite barrows-next-product-unit-377.md (unit 19).
+p_telejump(0_55_51_45_25); // 3565,3289 L0 — Ahrim peak / Dig stand
 
 [oploc1,barrows_stairs_dharok]
 // arrive delay?
