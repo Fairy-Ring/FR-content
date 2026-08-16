@@ -1,8 +1,9 @@
 // Cabin Fever east-dock Teach (fever_port_ship_teach 3157) @ 1, 3713, 3497.
 // CANDIDATE last-resort 2007-base: Eldevidian / pre-2022 ship block minus
 // Travel / Sailing / kid / TB. Hunt 289? no. Do not rewrite inn fever_teach.
-// 0 write. Let's go speaks then return — no m28_75 dest. Cite
-// cabin-fever-east-dock-teach-377.md §4.
+// 0 write. Let's go -> p_telejump dest 1814,4836 L0 (battle floor, m28_75).
+// Teach spawn is L1 same x,z — not dest. No gangplank on m28_75. Cite
+// cabin-fever-east-dock-teach-377.md §4 + dest-uncited-pass-next-377.md.
 
 [opnpc1,fever_port_ship_teach]
 if (%fever_quest < 1) {
@@ -20,6 +21,7 @@ if (%fever_quest < 1) {
 def_int $go = ~p_choice2("Let's go Cap'n!", 1, "Can I just go grab something?", 2);
 if ($go = 1) {
     ~chatplayer("<p,happy>Let's go Cap'n!");
+    p_telejump(0_28_75_22_36); // CF Let's-go dest 1814,4836 L0 battle floor — Teach spawn L1 is not dest
     return;
 }
 ~chatplayer("<p,neutral>Can I just go grab something?");
