@@ -12,6 +12,9 @@
 // Count = %feud_talk_villager (pack varbit 343, bits 16-17 of main_feud_var,
 // 0-3) — research doc §5.1 "Pickpocket count CANDIDATE 0-3". No dest /
 // p_tele / 28 / blackjack. %feud_var stays 1. No && / ||.
+// First-pick loot CANDIDATE (OSRS Villager table; dump silent on the amount):
+// 5 coins + 80 thieving XP. Script-only — pickpocket.dbrow has no
+// feud_villager_* row, so the skill proc is not callable without a dbrow.
 // Cite feud-operator-blackjack-377.md §5.1 §7.4 · osrs-wiki-changes-crawl-377.md.
 
 [opnpc3,feud_villager_1_1]
@@ -76,5 +79,7 @@ if (%feud_talk_villager >= 1) {
     return;
 }
 mes("You pick the villager's pocket.");
+inv_add(inv, coins, 5); // CANDIDATE loot — OSRS Villager table (no dbrow skill proc)
+stat_advance(thieving, 80); // CANDIDATE xp — OSRS Villager table (man row 80 = 8.0)
 %feud_talk_villager = 1;
 return;
