@@ -1,0 +1,77 @@
+// Swan Song — Draynor Wise Old Man later-case (rune fetch).
+// CANDIDATE 2007-base (Transcript:Swan Song ==Talking to the Wise Old Man==
+// minus Overview / toast / AKQ / Love Story). %swansong 5 -> 30 on hand-over.
+// Pack-safe: Draynor wom_multi (3820) shows wise_old_man (2253) at
+// 0/5/10/15/20/190/200 and HIDES at 30; colony swan_multioutside (3832)
+// shows wom_cutscene_2 (2567) at 30+. Re-talk "You asked me to get some
+// runes." flag = %swansong_temp bit 8 (pack varbits use bits 0-7 only:
+// ambush 0-2, colony 3-4, temp_5_7 5-7).
+// Chat + write only — no dest, no p_tele, no Herman rewrite, no default sage
+// chatter below 5. Yawn emote has no quest-chat caller (only the controls
+// button), so the "... yawn..." line stays and the emote is skipped.
+// Cite swansong-changes-377.md · Transcript_Swan_Song.wikitext.
+
+[opnpc1,wise_old_man]
+if (%swansong < 5) {
+    return;
+}
+if (%swansong >= 30) {
+    return;
+}
+~chatnpc("<p,neutral>Greetings, <displayname>.");
+if (getbit_range(%swansong_temp, 8, 8) = 1) {
+    @swan_wom_runes_again;
+}
+~chatplayer("<p,neutral>You used to be a famous adventurer, didn't you?");
+~chatnpc("<p,happy>Heh heh! Yes, I suppose you could say that. But that was all quite a long time ago. I haven't been on what you'd call a 'quest' for a while.");
+~chatplayer("<p,quiz>Does that mean you'd be interested if someone asked for your help?");
+~chatnpc("<p,quiz>Oh? What exactly had you in mind?");
+~chatplayer("<p,neutral>Herman Caranos of the Piscatoris Fishing Colony thinks he needs you to save his colony from a tribe of attacking sea trolls.");
+~chatnpc("<p,neutral>Hmmm... so I haven't been forgotten... and the world once again is calling for my aid...");
+~chatplayer("<p,neutral>Well, it's just one man who smells of fish, not exactly the whole world...");
+~chatnpc("<p,neutral>... yet this could be the opportunity I've been waiting for...");
+~chatplayer("<p,neutral>... yawn...");
+~chatnpc("<p,neutral>... but I'm a lot older than I used to be, do I still have the strength? Should I retire now, or can I do just one more quest?");
+~chatplayer("<p,neutral>If you're not feeling up to it, I'll leave you alone.");
+~chatnpc("<p,happy>Yes, I'll do it! This can be my final adventure, my last great quest. Saving this colony shall be my swan song.");
+~chatplayer("<p,quiz>Swan song?");
+~chatnpc("<p,neutral>Legend tells us that a swan, before it dies, sings a song of outstanding beauty as a fitting conclusion to its graceful life. This adventure will be my swan song.");
+~chatplayer("<p,neutral>You're going to sing a song and then snuff it? Maybe I should tell Herman you've flipped...");
+~chatnpc("<p,angry>No, you ignoramus! I shall bring my adventuring days to a dramatic close by saving this colony!");
+~chatplayer("<p,happy>Great. So long as you're not going to sing.");
+~chatnpc("<p,neutral>Yes, that's right, I'm not going to sing. Anyway, I shall need some supplies from you.");
+~chatplayer("<p,quiz>Oh yes? What do you want?");
+~chatnpc("<p,neutral>I'm rather short of runes. If you could fetch me 5 Blood runes, 10 Lava runes and 10 Mist runes, I'll be able to set off.");
+if (inv_total(inv, bloodrune) >= 5 & inv_total(inv, lavarune) >= 10 & inv_total(inv, mistrune) >= 10) {
+    ~chatplayer("<p,happy>I just happen to have those with me!");
+    ~chatnpc("<p,happy>Gosh, you're very efficient!");
+    ~chatplayer("<p,neutral>Sometimes I amaze even myself.");
+    ~chatnpc("<p,neutral>Ok, hand 'em over.");
+    ~chatplayer("<p,neutral>Here you go...");
+    inv_del(inv, bloodrune, 5);
+    inv_del(inv, lavarune, 10);
+    inv_del(inv, mistrune, 10);
+    ~chatnpc("<p,neutral>Excellent. I'll see you outside the Colony. Don't forget to arm yourself - it could be dangerous!");
+    %swansong = 30;
+    return;
+}
+~chatplayer("<p,neutral>Right, 5 Blood runes, 10 Lava runes and 10 Mist runes.");
+%swansong_temp = setbit_range(%swansong_temp, 8, 8); // re-talk: "You asked me to get some runes."
+return;
+
+[label,swan_wom_runes_again]
+~chatplayer("<p,neutral>You asked me to get some runes.");
+if (inv_total(inv, bloodrune) >= 5 & inv_total(inv, lavarune) >= 10 & inv_total(inv, mistrune) >= 10) {
+    ~chatnpc("<p,neutral>Okay, hand 'em over.");
+    ~chatplayer("<p,neutral>Here you go...");
+    inv_del(inv, bloodrune, 5);
+    inv_del(inv, lavarune, 10);
+    inv_del(inv, mistrune, 10);
+    ~chatnpc("<p,neutral>Excellent. I'll see you outside the Colony. Don't forget to arm yourself - it could be dangerous!");
+    %swansong = 30;
+    return;
+}
+~chatnpc("<p,neutral>I'm guessing you haven't got them all, have you?");
+~chatplayer("<p,neutral>No, not yet.");
+~chatnpc("<p,neutral>Well, do get a move on! I need 5 Blood runes, 10 Lava runes and 10 Mist runes, otherwise I'll be no use in a fight.");
+return;
