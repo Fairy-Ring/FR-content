@@ -1,22 +1,31 @@
-// The Feud — Ali the Operator Talk-to, chat only. Two trees:
-// (a) join a gang (shipped, PASS feudosxtiyip) and (b) after the first
+// The Feud — Ali the Operator Talk-to, chat only. Three trees:
+// (a) join a gang (shipped, PASS feudosxtiyip), (b) after the first
 // pickpocket, the progress advice tree (dump § Picking another pocket:
 // "How is the pickpocketing going? Need a hand?" -> "Yeah, I could do with a
 // bit of advice." -> distraction hint, then the help sub-menu; "Nah, no
-// problems here..." goes straight to the flavour menu — no extra Yes line).
+// problems here..." goes straight to the flavour menu — no extra Yes line),
+// and (c) after the second pickpocket, the oak blackjack tree (dump §
+// Pickpocketing part three / Talking to Ali the Operator: "Having problems?"
+// -> "Yeah, I could do with a bit of advice." -> distraction failing ->
+// award blackjack_oak 4599; full-inv decline / already-has branches).
 // CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
-// another pocket minus the 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND
-// %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 else return. Progress
-// tree when %feud_talk_villager >= 1; else the join tree.
-// No state write — %feud_var stays 1, %feud_talk_villager stays 1, no 28
-// (28 = blackjack seller vis, not complete). Urchin / oak blackjack are
-// later hops. No dest / p_tele. No && / ||.
-// Cite feud-operator-blackjack-377.md §7.4 · osrs-wiki-changes-crawl-377.md.
+// another pocket / Pickpocketing part three minus the 27 Apr 2022 lore
+// pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
+// %feud_var_comp_gangs = 3 else return. Oak tree when %feud_talk_villager
+// >= 2; progress when >= 1; else the join tree.
+// No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (oak
+// keeps count 2), no 28 (28 = blackjack seller vis, not complete). No
+// %feud_npc_multi (lure/KO vis is the next hop). No willow. No dest /
+// p_tele. No && / ||.
+// Cite feud-operator-blackjack-377.md §7.4 §7.5 · osrs-wiki-changes-crawl-377.md.
 
 [opnpc1,feud_egyptian_minder]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager >= 2) {
+    @feud_operator_oak;
+}
 if (%feud_talk_villager >= 1) {
     @feud_operator_progress;
 }
@@ -86,3 +95,29 @@ if ($t = 2) {
 ~chatplayer("<p,neutral>So I noticed. Well, he has an uncle called Ali Morrisane, a market vendor in Al Kharid. That's all I really know about him.");
 ~chatnpc("<p,neutral>Say no more. I know just the Ali you mean - that little snake robbed me too! If we work together perhaps we can catch him and teach him a lesson.");
 @feud_operator_help;
+
+[label,feud_operator_oak]
+~chatnpc("<p,quiz>Having problems?");
+def_int $o = ~p_choice2("Yeah, I could do with a bit of advice.", 1, "Nah, no problems here. I want to ask you about something else.", 2);
+if ($o = 1) {
+    ~chatplayer("<p,neutral>Yeah, I could do with a bit of advice.");
+    ~chatnpc("<p,neutral>The distraction tactic isn't working any more?");
+    ~chatplayer("<p,neutral>No, they seem to have figured that one out already.");
+    ~chatnpc("<p,neutral>It is a small town, news spreads fast. Perhaps using a spot of cunning and a bit of brute force might work better.");
+    if (inv_freespace(inv) < 1) {
+        ~chatnpc("<p,neutral>Here, take this, it might help.");
+        mes("Ali the Operator motions as if to give you a Blackjack but you");
+        mes("decline, as you have no room in your inventory.");
+        return;
+    }
+    if (inv_total(inv, blackjack_oak) >= 1 | inv_total(worn, blackjack_oak) >= 1) {
+        ~chatnpc("<p,neutral>I've already given you a Blackjack, try using it.");
+        return;
+    }
+    inv_add(inv, blackjack_oak, 1);
+    mes("Ali The Operator hands you a Blackjack made out of oak.");
+    return;
+}
+~chatplayer("<p,neutral>No problems here. I actually wanted to ask you about something else.");
+~chatplayer("<p,neutral>Yes I'd like to ask you about something else.");
+@feud_operator_flavour;
