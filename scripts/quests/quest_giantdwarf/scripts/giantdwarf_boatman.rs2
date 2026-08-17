@@ -4,9 +4,12 @@
 // was never in .wiki). Fresh 0: start talk (<displayname>, ferryman line),
 // Deal + ready-Yes (~p_choice2, not overlay), write 1 on ready-Yes, then
 // [proc,giantdwarf_intro_cutscene]: tele + cam first (palace 2841,10183), then
-// inter_235 red-letter history overlay, statue cam + crash talk + cam_shake +
-// %giantdwarf_statue_invis = 1 + inter_234 crash map, dock guards (Halt!
-// on 2231), HQ dest, then Veldaban "Identify yourself" via ~chatnpc_specific
+// inter_260 q8 title + inter_235 sliding-window history (2014 t011-t032: lines
+// add one at a time, oldest drops), statue cam + force-timed crash talk (hide
+// continue before if_openchat, 1/2/3/4-line IFs, per-line delays) + cam_shake +
+// %giantdwarf_statue_invis = 1 + inter_234 crash map, explosion on the Both
+// card, dock guards (Halt! overhead via npc_say, then arrest chat), HQ dest,
+// then Veldaban "Identify yourself" via ~chatnpc_specific
 // (NOT Forget's [opnpc1,dwarf_city_black_guard_leader] — already bound) and
 // Yes help -> %giantdwarf_quest = 2 + %giantdwarf_veldaban_introduced = 1.
 // BAR cross-talk three-way (110 complete / >= 10 started / else). Re-talk
@@ -83,33 +86,43 @@ if_settext(inter_260:com_0, "KELDAGRIM");
 if_settext(inter_260:com_1, "Grand Capital of the Dwarven realm");
 p_delay(4);
 if_openoverlay(null);
-// 2:35-3:00 — history in stanzas on inter_235 (b12, packed Alvis lines),
-// SAME palace-down cam (~8 ticks each, ~4 gap)
+p_delay(1); // t010 — title off one beat, history starts t011
+// 2:35-3:00 — history stanzas on inter_235 (b12, packed Alvis lines).
+// 2014 t011-t032: lines ADD one at a time, then the OLDEST drops (slide).
+// Never more than 4 up. p_delay(1) ≈ 0.5s frame step.
 if_openoverlay(inter_235);
-if_sethide(inter_235:com_0, false); // Five hundred years... (Alvis)
-if_sethide(inter_235:com_1, false); // saviour of Keldagrim...
-p_delay(8);
-p_delay(4); // stanza gap
-if_sethide(inter_235:com_2, false); // Founder of the Consortium...
-if_sethide(inter_235:com_3, false); // that were to serve the monarchy...
-if_sethide(inter_235:com_4, false); // to serve the Consortium.
-p_delay(8);
-p_delay(4); // stanza gap
-if_sethide(inter_235:com_5, false); // By the time of his death...
-if_sethide(inter_235:com_6, false); // By now, the Kings of Keldagrim...
-if_sethide(inter_235:com_7, false); // with only the statue...
-if_sethide(inter_235:com_8, false); // old days.
-p_delay(8);
-// 3:05 — history gone, still palace-down
-if_sethide(inter_235:com_0, true);
-if_sethide(inter_235:com_1, true);
-if_sethide(inter_235:com_2, true);
-if_sethide(inter_235:com_3, true);
+if_sethide(inter_235:com_0, false); // t011 — "Five hundred years..."
+p_delay(1);
+if_sethide(inter_235:com_1, false); // t012-t014 — +"saviour of Keldagrim..."
+p_delay(3);
+if_sethide(inter_235:com_0, true); // t015 — com_1 only
+p_delay(1);
+if_sethide(inter_235:com_1, true); // t016 — "Founder of the Consortium..."
+if_sethide(inter_235:com_2, false);
+p_delay(1);
+if_sethide(inter_235:com_3, false); // t017 — +"...serve the monarchy..."
+p_delay(1);
+if_sethide(inter_235:com_4, false); // t018-t020 — +"to serve the Consortium."
+p_delay(3);
+if_sethide(inter_235:com_2, true); // t021 — com_3+4
+p_delay(1);
+if_sethide(inter_235:com_3, true); // t022 — none
 if_sethide(inter_235:com_4, true);
-if_sethide(inter_235:com_5, true);
-if_sethide(inter_235:com_6, true);
+p_delay(1);
+if_sethide(inter_235:com_5, false); // t023 — "By the time of his death..."
+p_delay(1);
+if_sethide(inter_235:com_6, false); // t024 — +"By now, the Kings..."
+p_delay(1);
+if_sethide(inter_235:com_7, false); // t025 — +"with only the statue..."
+p_delay(1);
+if_sethide(inter_235:com_8, false); // t026-t029 — +"old days." (4 up)
+p_delay(4);
+if_sethide(inter_235:com_5, true); // t030 — com_6-8
+p_delay(1);
+if_sethide(inter_235:com_6, true); // t031 — com_8 only
 if_sethide(inter_235:com_7, true);
-if_sethide(inter_235:com_8, true);
+p_delay(1);
+if_sethide(inter_235:com_8, true); // t032 — none
 p_delay(2);
 if_openoverlay(null); // 235 closed — aerials need overlay null
 // 3:10-3:20 — aerials. hei 900/850 = square roof lids (sx4a7s6 air01).
@@ -157,42 +170,29 @@ if_settext(inter_260:com_1, "Dwarf");
 p_delay(8);
 if_openoverlay(null);
 // 3:47 — map first, no chat. Boat at the river-mouth. Overlay (not main —
-// openChatModal IfClose's main; overlay survives the chat slot).
+// openChatModal IfClose's main; overlay survives the chat slot). Statue stays
+// WHOLE while the boat creeps (2014 t080-t105); the explode anim lands on the
+// Both card below, not here.
 if_openoverlay(inter_234);
-if_setanim(inter_234:com_3, mini_statue_explodes); // packed seq; delay1=275 then explode
 %giantdwarf_statue_invis = 1;
 cam_shake(3, 0, 20, 2);
 p_delay(2);
 // 3:50-4:00 — crash talk ON the map (chat box under overlay 234). Boat creeps.
-// SoupRS 2014 force-times these — no "Click here to continue" / p_pausebutton.
+// 2014 t076-t102: ALL lines force-timed — no "Click here to continue" in any
+// frame; durations track text length (4.5s / 2.0s / 3.0s). Hide continue
+// BEFORE if_openchat; handle 1/2/3-line IFs.
 split_init("<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!", 380, 4, q8_full);
-~chatnpc_page("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 0);
-if_sethide(npcchat1:com_3, true); // 1-line IFs: npcchat1:com_3 / chat1:com_3
-if_sethide(npcchat2:com_4, true); // 2-line IFs: npcchat2:com_4 / chat2:com_4
-p_delay(8);
-if_close; // chat only — overlay 234 stays
+~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 7); // t076-t083 ≈ 4.0s
 split_init("<p,happy>Amazing! And we're going to go straight past it?", 380, 4, q8_full);
-~chatplayer_page(0);
-if_sethide(chat1:com_3, true);
-if_sethide(chat2:com_4, true);
-p_delay(8);
-if_close;
+~giantdwarf_timed_playerchat(8); // t084-t092 ≈ 4.5s
 split_init("<p,happy>That's right!", 380, 4, q8_full);
-~chatnpc_page("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 0);
-if_sethide(npcchat1:com_3, true);
-if_sethide(npcchat2:com_4, true);
-p_delay(8);
-if_close;
+~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 3); // t093-t096 ≈ 2.0s
 split_init("<p,angry>Er, hold on! There's something wrong!", 380, 4, q8_full);
-~chatnpc_page("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 0);
-if_sethide(npcchat1:com_3, true);
-if_sethide(npcchat2:com_4, true);
-p_delay(8);
-if_close;
-// delay1=275 is a HOLD on the mouth pose. Chat may reset the IF anim, so
-// wait the hold out AFTER the last page (14 ticks ≈ 8.4s > 5.5s).
+~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 5); // t097-t102 ≈ 3.0s
+// 2014: hold-on ends t102, Argh opens t103 (~1 tick). Explosion lands ON the
+// Both card (t103 Argh, t110 statue explodes). delay1=275 hold plays on it.
+p_delay(1);
 if_setanim(inter_234:com_3, mini_statue_explodes);
-p_delay(14);
 // 4:04 — Both/Argh at impact, on that map. Do NOT close 234. Heads must talk.
 split_init("<p,shock>Argh!", 380, 4, q8_full);
 if_setplayerhead(inter_274:com_0);
@@ -213,25 +213,19 @@ p_delay(3);
 ~music_playbycoord(coord); // east = Tale of Keldagrim (intro-end unlock via proc)
 cam_moveto(0_45_159_5_49, 380, 0, 100); // 2885,10225 — raise + back, planks out
 cam_lookat(0_45_159_10_49, 220, 0, 100); // 2890,10225 — guards 2231 in frame
-// 4:10-4:25 — dock 3D, high cam, two 2231 + player. Force-timed like the map.
+// 4:10-4:25 — dock 3D, high cam, two 2231 + player. 2014 t120-t122: the
+// guards are at their posts and "Halt!" floats ABOVE them (npc_say overhead),
+// THEN the arrest chat (t123). Force-timed like the map.
+if (npc_find(0_45_159_10_49, dwarf_city_berserker_cutscene, 3, 0) = true) {
+    npc_say("Halt!");
+}
+p_delay(2); // overhead holds ~1.5s, then the chat line
 split_init("<p,angry>Halt! By order of the Black Guard, you are under arrest!", 380, 4, q8_full);
-~chatnpc_page("Black Guard Berserker", dwarf_city_berserker_cutscene, 0);
-if_sethide(npcchat1:com_3, true);
-if_sethide(npcchat2:com_4, true);
-p_delay(8);
-if_close;
+~giantdwarf_timed_npcchat("Black Guard Berserker", dwarf_city_berserker_cutscene, 8); // t123-t131 ≈ 4.5s
 split_init("<p,shock>What?? I didn't do anything! It wasn't me!", 380, 4, q8_full);
-~chatplayer_page(0);
-if_sethide(chat1:com_3, true);
-if_sethide(chat2:com_4, true);
-p_delay(8);
-if_close;
+~giantdwarf_timed_playerchat(8); // t132-t140 ≈ 4.5s
 split_init("<p,neutral>Come with us, human! Commander Veldaban wants a word with you!", 380, 4, q8_full);
-~chatnpc_page("Black Guard Berserker", dwarf_city_berserker_cutscene, 0);
-if_sethide(npcchat1:com_3, true);
-if_sethide(npcchat2:com_4, true);
-p_delay(8);
-if_close;
+~giantdwarf_timed_npcchat("Black Guard Berserker", dwarf_city_berserker_cutscene, 8); // t141+ ≈ 5s
 // HQ — fade covers the dock BEFORE tele/reset (no warp into HQ)
 if_openoverlay(fade_to_black);
 p_delay(2); // dock is black first
@@ -283,3 +277,85 @@ if ($help = 2) {
 ~chatplayer("<p,neutral>I'll see what I can do.");
 %giantdwarf_veldaban_introduced = 1;
 %giantdwarf_quest = 2;
+
+// Hide continue BEFORE if_openchat. ~chatnpc_page then hide left npcchat3:com_5
+// up on the 3-line Look line, so continue showed and the rest never played.
+[proc,giantdwarf_timed_npcchat](string $npc_name, npc $npc, int $delay)
+def_int $lines = split_linecount(0);
+if ($lines = 1) {
+    if_setnpchead(npcchat1:com_0, $npc);
+    if_setanim(npcchat1:com_0, split_getanim(0));
+    if_settext(npcchat1:com_1, $npc_name);
+    if_settext(npcchat1:com_2, split_get(0, 0));
+    if_sethide(npcchat1:com_3, true);
+    if_openchat(npcchat1);
+} else if ($lines = 2) {
+    if_setnpchead(npcchat2:com_0, $npc);
+    if_setanim(npcchat2:com_0, split_getanim(0));
+    if_settext(npcchat2:com_1, $npc_name);
+    if_settext(npcchat2:com_2, split_get(0, 0));
+    if_settext(npcchat2:com_3, split_get(0, 1));
+    if_sethide(npcchat2:com_4, true);
+    if_openchat(npcchat2);
+} else if ($lines = 3) {
+    if_setnpchead(npcchat3:com_0, $npc);
+    if_setanim(npcchat3:com_0, split_getanim(0));
+    if_settext(npcchat3:com_1, $npc_name);
+    if_settext(npcchat3:com_2, split_get(0, 0));
+    if_settext(npcchat3:com_3, split_get(0, 1));
+    if_settext(npcchat3:com_4, split_get(0, 2));
+    if_sethide(npcchat3:com_5, true);
+    if_openchat(npcchat3);
+} else if ($lines = 4) {
+    if_setnpchead(npcchat4:com_0, $npc);
+    if_setanim(npcchat4:com_0, split_getanim(0));
+    if_settext(npcchat4:com_1, $npc_name);
+    if_settext(npcchat4:com_2, split_get(0, 0));
+    if_settext(npcchat4:com_3, split_get(0, 1));
+    if_settext(npcchat4:com_4, split_get(0, 2));
+    if_settext(npcchat4:com_5, split_get(0, 3));
+    if_sethide(npcchat4:com_6, true);
+    if_openchat(npcchat4);
+}
+p_delay($delay);
+if_close;
+
+[proc,giantdwarf_timed_playerchat](int $delay)
+def_int $lines = split_linecount(0);
+if ($lines = 1) {
+    if_setplayerhead(chat1:com_0);
+    if_setanim(chat1:com_0, split_getanim(0));
+    if_settext(chat1:com_1, displayname);
+    if_settext(chat1:com_2, split_get(0, 0));
+    if_sethide(chat1:com_3, true);
+    if_openchat(chat1);
+} else if ($lines = 2) {
+    if_setplayerhead(chat2:com_0);
+    if_setanim(chat2:com_0, split_getanim(0));
+    if_settext(chat2:com_1, displayname);
+    if_settext(chat2:com_2, split_get(0, 0));
+    if_settext(chat2:com_3, split_get(0, 1));
+    if_sethide(chat2:com_4, true);
+    if_openchat(chat2);
+} else if ($lines = 3) {
+    if_setplayerhead(chat3:com_0);
+    if_setanim(chat3:com_0, split_getanim(0));
+    if_settext(chat3:com_1, displayname);
+    if_settext(chat3:com_2, split_get(0, 0));
+    if_settext(chat3:com_3, split_get(0, 1));
+    if_settext(chat3:com_4, split_get(0, 2));
+    if_sethide(chat3:com_5, true);
+    if_openchat(chat3);
+} else if ($lines = 4) {
+    if_setplayerhead(chat4:com_0);
+    if_setanim(chat4:com_0, split_getanim(0));
+    if_settext(chat4:com_1, displayname);
+    if_settext(chat4:com_2, split_get(0, 0));
+    if_settext(chat4:com_3, split_get(0, 1));
+    if_settext(chat4:com_4, split_get(0, 2));
+    if_settext(chat4:com_5, split_get(0, 3));
+    if_sethide(chat4:com_6, true);
+    if_openchat(chat4);
+}
+p_delay($delay);
+if_close;
