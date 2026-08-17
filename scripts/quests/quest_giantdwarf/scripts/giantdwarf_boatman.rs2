@@ -3,7 +3,7 @@
 // Travel — verbatim block in giantdwarf-boatman-cutscene-377.md; the extract
 // was never in .wiki). Fresh 0: start talk (<displayname>, ferryman line),
 // Deal + ready-Yes (~p_choice2, not overlay), write 1 on ready-Yes, then
-// [proc,giantdwarf_intro_cutscene]: tele + cam first (plaza 2856,10199), then
+// [proc,giantdwarf_intro_cutscene]: tele + cam first (palace 2841,10183), then
 // inter_235 red-letter history overlay, statue cam + crash talk + cam_shake +
 // %giantdwarf_statue_invis = 1 + inter_234 crash map, dock guards (Halt!
 // on 2231), HQ dest, then Veldaban "Identify yourself" via ~chatnpc_specific
@@ -63,58 +63,121 @@ if_settab(null, 5);
 if_settab(null, 6);
 if_settab(null, 11);
 if_settab(null, 12);
-// fade before the first tele — no live player in the establishing shot
+// fade BEFORE any tele — opaque first, then tele behind the cam
 if_openoverlay(fade_to_black);
-// palace cam — plaza west of the palace door (2864,10200 is inside; door 6114 faces west)
-p_telejump(0_44_159_40_23); // 2856,10199 L0 — plaza
 p_delay(2);
+// palace-down — player + cam INSIDE on a walkable tile so RemoveRoof fires
+p_telejump(0_44_159_52_22); // 2868,10198 L0 — indoor palace tile, under the roof (probe)
 ~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_28_10, 650, 0, 100); // 2844,10186 — pull back/south, hops out
-cam_lookat(0_44_159_54_24, 400, 0, 100); // 2870,10200 — palace building mass, head-on
-p_delay(2);
+cam_moveto(0_44_159_52_22, 900, 0, 100); // 2868,10198 — cam XZ over RemoveRoof
+cam_lookat(0_44_159_52_24, 300, 0, 100); // 2868,10200 — down into the palace hall
+p_delay(1);
 if_openoverlay(null);
-// palace card / history — packed inter_235 red-letter overlay, not a mesbox
+// 2:30 — KELDAGRIM q8 title on inter_260 (top-only). NOT inter_235.
+if_openoverlay(inter_260);
+if_setcolour(inter_260:com_0, ^red_rgb);
+if_setcolour(inter_260:com_1, ^red_rgb);
+if_settext(inter_260:com_0, "KELDAGRIM");
+if_settext(inter_260:com_1, "Grand Capital of the Dwarven realm");
+p_delay(4);
+if_openoverlay(null);
+// 2:35-3:00 — history in stanzas on inter_235 (b12, packed Alvis lines),
+// SAME palace-down cam (~8 ticks each, ~4 gap)
 if_openoverlay(inter_235);
-if_sethide(inter_235:com_0, false);
+if_sethide(inter_235:com_0, false); // Five hundred years... (Alvis)
+if_sethide(inter_235:com_1, false); // saviour of Keldagrim...
+p_delay(8);
+p_delay(4); // stanza gap
+if_sethide(inter_235:com_2, false); // Founder of the Consortium...
+if_sethide(inter_235:com_3, false); // that were to serve the monarchy...
+if_sethide(inter_235:com_4, false); // to serve the Consortium.
+p_delay(8);
+p_delay(4); // stanza gap
+if_sethide(inter_235:com_5, false); // By the time of his death...
+if_sethide(inter_235:com_6, false); // By now, the Kings of Keldagrim...
+if_sethide(inter_235:com_7, false); // with only the statue...
+if_sethide(inter_235:com_8, false); // old days.
+p_delay(8);
+// 3:05 — history gone, still palace-down
+if_sethide(inter_235:com_0, true);
+if_sethide(inter_235:com_1, true);
+if_sethide(inter_235:com_2, true);
+if_sethide(inter_235:com_3, true);
+if_sethide(inter_235:com_4, true);
+if_sethide(inter_235:com_5, true);
+if_sethide(inter_235:com_6, true);
+if_sethide(inter_235:com_7, true);
+if_sethide(inter_235:com_8, true);
+p_delay(2);
+if_openoverlay(null); // 235 closed — aerials need overlay null
+// 3:10-3:20 — aerial snaps over the city, no text
+p_telejump(0_44_159_40_18); // 2856,10194 behind the west aerial
+~music_playbycoord(coord);
+cam_moveto(0_44_159_24_24, 900, 0, 100); // 2840,10200 — west city aerial
+cam_lookat(0_44_159_18_18, 350, 0, 100); // 2834,10194
+p_delay(5);
+p_telejump(0_44_159_46_4); // 2862,10180 — behind the Kelda aerial
+~music_playbycoord(coord);
+cam_moveto(0_44_159_48_2, 850, 0, 100); // 2864,10178 — over the Kelda west
+cam_lookat(0_44_159_62_1, 300, 0, 100); // 2878,10177 — river mouth / statue
+p_delay(5);
+p_telejump(0_44_159_40_18); // 2856,10194 behind the bridge aerial
+~music_playbycoord(coord);
+cam_moveto(0_44_159_44_14, 850, 0, 100); // 2860,10190 — bridge/palace approach
+cam_lookat(0_44_159_52_24, 300, 0, 100); // 2868,10200
+p_delay(6);
+// 3:25-3:33 — down the Kelda, water fills the view. Red Axe title (q8 top)
+p_telejump(0_44_159_46_4); // 2862,10180 L0 — walkable, west of cam (probe)
+~music_playbycoord(coord);
+cam_moveto(0_44_159_52_2, 350, 0, 100); // 2868,10178 — water level
+cam_lookat(0_44_159_62_1, 250, 0, 100); // 2878,10177 — along the river
 p_delay(1);
-if_sethide(inter_235:com_1, false);
-p_delay(1);
-if_sethide(inter_235:com_2, false);
-p_delay(1);
-if_sethide(inter_235:com_3, false);
-p_delay(1);
-if_sethide(inter_235:com_4, false);
-p_delay(1);
-if_sethide(inter_235:com_5, false);
-p_delay(1);
-if_sethide(inter_235:com_6, false);
-p_delay(1);
-if_sethide(inter_235:com_7, false);
-p_delay(1);
-if_sethide(inter_235:com_8, false);
-p_delay(3); // hold so the full card is readable before closing
+if_openoverlay(inter_260);
+if_setcolour(inter_260:com_0, ^red_rgb);
+if_setcolour(inter_260:com_1, ^red_rgb);
+if_settext(inter_260:com_0, "Rise of the Red Axe");
+if_settext(inter_260:com_1, "Part 1");
+p_delay(14);
 if_openoverlay(null);
-// no title mesboxes — Rise of the Red Axe / The Giant Dwarf are not in the 377 pack
-// statue cam — outdoor street stand, statue 2878,10177 is look-only
-p_telejump(0_44_159_50_6); // 2866,10182 L0 — outdoor, not the house
-p_delay(3);
-~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_48_2, 480, 0, 100); // 2864,10178 — pull further back/higher lookat
-cam_lookat(0_44_159_62_1, 380, 0, 100); // statue 7042 @ 2878,10177 full giant in frame
-// crash talk — boatman speaker + player
+// 3:35 — 7042 from the water, looking UP (thighs-head + axe), title off
+cam_moveto(0_44_159_62_4, 350, 0, 100); // 2878,10180 — river south of the statue
+cam_lookat(0_44_159_62_1, 700, 0, 100); // 2878,10177 — look up at the head
+p_delay(2);
+// 3:40-3:45 — pull back to full 7042, title on the water (q8 top)
+cam_moveto(0_44_159_60_5, 500, 0, 100); // 2876,10181 — pulled back
+cam_lookat(0_44_159_62_1, 400, 0, 100); // 2878,10177 — full body
+if_openoverlay(inter_260);
+if_setcolour(inter_260:com_0, ^red_rgb);
+if_setcolour(inter_260:com_1, ^red_rgb);
+if_settext(inter_260:com_0, "The Giant");
+if_settext(inter_260:com_1, "Dwarf");
+p_delay(8);
+if_openoverlay(null);
+// 3:47 — map first, no chat. Boat at the river-mouth. Overlay (not main —
+// openChatModal IfClose's main; overlay survives the chat slot).
+if_openoverlay(inter_234);
+if_setanim(inter_234:com_3, mini_statue_explodes); // packed seq; delay1=275 then explode
+%giantdwarf_statue_invis = 1;
+cam_shake(3, 0, 20, 2);
+p_delay(2);
+// 3:50-4:00 — crash talk ON the map (chat box under overlay 234). Boat creeps.
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!");
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,happy>That's right!");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,angry>Er, hold on! There's something wrong!");
-~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,shock>Aaargh!");
-~chatplayer("<p,shock>Aaargh!");
-// crash effect — packed map inter_234 (River Kelda + statue + mini boat), then dock
-cam_shake(3, 0, 20, 2);
-%giantdwarf_statue_invis = 1;
+// 4:04 — Both/Argh at impact, on that map. Do NOT close 234. Heads must talk.
+split_init("<p,shock>Argh!", 380, 4, q8_full);
+if_setplayerhead(inter_274:com_0);
+if_setanim(inter_274:com_0, split_getanim(0));
+if_setnpchead(inter_274:com_3, dwarf_city_boatman_mines_prequest);
+if_setanim(inter_274:com_3, split_getanim(0));
+if_openchat(inter_274); // packed *Both* / *Argh!*
+p_delay(5);
+if_close; // chat only; overlay 234 stays
+// 4:07 — map, rubble, no chat
 p_delay(2);
-if_openmain(inter_234);
-p_delay(7); // hold so the crash map is readable
-if_close;
+if_close; // close overlay 234
+if_openoverlay(null);
 // dock — cutscene berserkers appear, then the arrest
 %giantdwarf_cutscene_guard_visible = 1;
 p_telejump(0_45_159_9_49); // 2889,10225 L0 — dock stand next to both berserkers
@@ -125,8 +188,9 @@ cam_lookat(0_45_159_10_49, 220, 0, 100); // 2890,10225 — guards 2231 in frame
 ~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,angry>Halt! By order of the Black Guard, you are under arrest!");
 ~chatplayer("<p,shock>What?? I didn't do anything! It wasn't me!");
 ~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,neutral>Come with us, human! Commander Veldaban wants a word with you!");
-// HQ — fade to black, land E of Veldaban (no live 3D pop)
+// HQ — fade covers the dock BEFORE tele/reset (no warp into HQ)
 if_openoverlay(fade_to_black);
+p_delay(2); // dock is black first
 %giantdwarf_cutscene_guard_visible = 0;
 p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
 cam_reset();
