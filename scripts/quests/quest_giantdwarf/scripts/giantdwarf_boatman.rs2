@@ -164,10 +164,31 @@ if_setanim(inter_234:com_3, mini_statue_explodes); // packed seq; delay1=275 the
 cam_shake(3, 0, 20, 2);
 p_delay(2);
 // 3:50-4:00 — crash talk ON the map (chat box under overlay 234). Boat creeps.
-~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!");
-~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
-~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,happy>That's right!");
-~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,angry>Er, hold on! There's something wrong!");
+// SoupRS 2014 force-times these — no "Click here to continue" / p_pausebutton.
+split_init("<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!", 380, 4, q8_full);
+~chatnpc_page("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 0);
+if_sethide(npcchat1:com_3, true); // 1-line IFs: npcchat1:com_3 / chat1:com_3
+if_sethide(npcchat2:com_4, true); // 2-line IFs: npcchat2:com_4 / chat2:com_4
+p_delay(8);
+if_close; // chat only — overlay 234 stays
+split_init("<p,happy>Amazing! And we're going to go straight past it?", 380, 4, q8_full);
+~chatplayer_page(0);
+if_sethide(chat1:com_3, true);
+if_sethide(chat2:com_4, true);
+p_delay(8);
+if_close;
+split_init("<p,happy>That's right!", 380, 4, q8_full);
+~chatnpc_page("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 0);
+if_sethide(npcchat1:com_3, true);
+if_sethide(npcchat2:com_4, true);
+p_delay(8);
+if_close;
+split_init("<p,angry>Er, hold on! There's something wrong!", 380, 4, q8_full);
+~chatnpc_page("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 0);
+if_sethide(npcchat1:com_3, true);
+if_sethide(npcchat2:com_4, true);
+p_delay(8);
+if_close;
 // delay1=275 is a HOLD on the mouth pose. Chat may reset the IF anim, so
 // wait the hold out AFTER the last page (14 ticks ≈ 8.4s > 5.5s).
 if_setanim(inter_234:com_3, mini_statue_explodes);
@@ -192,9 +213,25 @@ p_delay(3);
 ~music_playbycoord(coord); // east = Tale of Keldagrim (intro-end unlock via proc)
 cam_moveto(0_45_159_5_49, 380, 0, 100); // 2885,10225 — raise + back, planks out
 cam_lookat(0_45_159_10_49, 220, 0, 100); // 2890,10225 — guards 2231 in frame
-~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,angry>Halt! By order of the Black Guard, you are under arrest!");
-~chatplayer("<p,shock>What?? I didn't do anything! It wasn't me!");
-~chatnpc_specific("Black Guard Berserker", dwarf_city_berserker_cutscene, "<p,neutral>Come with us, human! Commander Veldaban wants a word with you!");
+// 4:10-4:25 — dock 3D, high cam, two 2231 + player. Force-timed like the map.
+split_init("<p,angry>Halt! By order of the Black Guard, you are under arrest!", 380, 4, q8_full);
+~chatnpc_page("Black Guard Berserker", dwarf_city_berserker_cutscene, 0);
+if_sethide(npcchat1:com_3, true);
+if_sethide(npcchat2:com_4, true);
+p_delay(8);
+if_close;
+split_init("<p,shock>What?? I didn't do anything! It wasn't me!", 380, 4, q8_full);
+~chatplayer_page(0);
+if_sethide(chat1:com_3, true);
+if_sethide(chat2:com_4, true);
+p_delay(8);
+if_close;
+split_init("<p,neutral>Come with us, human! Commander Veldaban wants a word with you!", 380, 4, q8_full);
+~chatnpc_page("Black Guard Berserker", dwarf_city_berserker_cutscene, 0);
+if_sethide(npcchat1:com_3, true);
+if_sethide(npcchat2:com_4, true);
+p_delay(8);
+if_close;
 // HQ — fade covers the dock BEFORE tele/reset (no warp into HQ)
 if_openoverlay(fade_to_black);
 p_delay(2); // dock is black first
