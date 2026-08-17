@@ -35,7 +35,8 @@ if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
 if (%feud_talk_villager < 1) { return; }
 if (%feud_var_urchin >= 1) {
-    @feud_urchin_paydeny;
+    ~feud_urchin_paydeny;
+    return;
 }
 def_npc_uid $urchin = npc_uid;
 ~chatplayer("<p,neutral>Hey kid, come here!");
@@ -71,7 +72,7 @@ if (npc_finduid($u) = false) { return; }
 %feud_var_urchin = 1;
 %feud_distracted = 1;
 
-[label,feud_urchin_paydeny]
+[proc,feud_urchin_paydeny]
 ~chatplayer("<p,neutral>Hey there!");
 ~chatnpc("<p,happy>Did you see the way I distracted that guy? Man, I'm one smooth operator!");
 ~chatplayer("<p,neutral>You did good, kid.");
