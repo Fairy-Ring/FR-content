@@ -42,6 +42,7 @@ if ($join = 2) {
 ~chatnpc("<p,neutral>Can I help you with anything else?");
 def_int $h = ~p_choice2("Yes I'd like to ask you about something else.", 1, "No thanks.", 2);
 if ($h = 2) {
+    ~chatplayer("<p,neutral>No thanks.");
     return;
 }
 ~chatplayer("<p,neutral>Yes I'd like to ask you about something else.");
