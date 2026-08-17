@@ -18,9 +18,15 @@
 // npc_find switches the current-NPC context to the found villager, so the
 // urchin's uid is saved before the cascade (def_npc_uid) and restored in the
 // distract proc (npc_finduid) before the urchin ~chatnpc lines.
-// %feud_var stays 1. %feud_talk_villager stays 1. No 28. No
-// %feud_ali_money / %feud_urchin_again (pay/deny is the NEXT hop). No dest /
-// p_tele. No pickpocket rewrite. No count 2. No blackjack. No && / ||.
+// %feud_var stays 1. %feud_talk_villager stays 1. No 28. No dest /
+// p_tele. No pickpocket rewrite. No count 3. No blackjack. No && / ||.
+// Pay/deny after the distract (dump § Pickpocketing part three / Talking to
+// a Street urchin, first time after the distraction): "Did you see the way I
+// distracted that guy?..." -> "So where's my money?" -> pay 10 (inv_del coins
+// 10 + %feud_ali_money 1 CANDIDATE) or deny (no write, %feud_ali_money stays
+// 0). The pay branch's trailing "Well do you need any other information
+// then?" info menu is the generic urchin info tree (later hop). Deny-again /
+// second distract (%feud_urchin_again) is the NEXT hop — do not write it.
 // Cite feud-operator-blackjack-377.md §7.4 · anchors-pollniv.md · crawl first row.
 
 [opnpc1,feud_street_urchin]
@@ -28,6 +34,9 @@ if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
 if (%feud_talk_villager < 1) { return; }
+if (%feud_var_urchin >= 1) {
+    @feud_urchin_paydeny;
+}
 def_npc_uid $urchin = npc_uid;
 ~chatplayer("<p,neutral>Hey kid, come here!");
 ~chatnpc("<p,quiz>What do you want?");
@@ -61,3 +70,27 @@ if (npc_finduid($u) = false) { return; }
 ~chatnpc_specific("Villager", feud_villager_1_1, "<p,neutral>Excuse me?");
 %feud_var_urchin = 1;
 %feud_distracted = 1;
+
+[label,feud_urchin_paydeny]
+~chatplayer("<p,neutral>Hey there!");
+~chatnpc("<p,happy>Did you see the way I distracted that guy? Man, I'm one smooth operator!");
+~chatplayer("<p,neutral>You did good, kid.");
+~chatnpc("<p,quiz>So where's my money?");
+def_int $m = ~p_choice2("What money?", 1, "Here you go, thanks.", 2);
+if ($m = 1) {
+    ~chatplayer("<p,neutral>What money?");
+    ~chatnpc("<p,angry>Don't play stupid with me, I'm better at it. Where's my money?");
+    ~chatplayer("<p,neutral>Oh, that money! I don't think you deserve it!");
+    ~chatnpc("<p,angry>Liar, thief!");
+    ~chatplayer("<p,neutral>How observant of you!");
+    ~chatnpc("<p,angry>Give me my money!");
+    ~chatplayer("<p,angry>Make me!");
+    ~chatnpc("<p,angry>You'll be sorry!");
+    return;
+}
+~chatplayer("<p,neutral>Here you go, thanks.");
+inv_del(inv, coins, 10);
+%feud_ali_money = 1;
+~chatnpc("<p,neutral>Thanks sir, I didn't think you would hold up your side of the deal. There's not much honour amongst thieves, you know.");
+~chatnpc("<p,quiz>Well do you need any other information then?");
+return;
