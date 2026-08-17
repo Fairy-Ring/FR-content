@@ -63,17 +63,16 @@ if_settab(null, 5);
 if_settab(null, 6);
 if_settab(null, 11);
 if_settab(null, 12);
-// fade BEFORE any tele — opaque first, then tele behind the cam
+// fade BEFORE any tele — opaque first. Shop floor is L0; Consortium is L1.
 if_openoverlay(fade_to_black);
+p_delay(3);
+// L1 balcony above the stall — 0_44_159_50_21 L0 is the clothes shop
+p_telejump(1_44_159_50_21); // 2866,10197 L1
+~music_playbycoord(coord);
+// hei < 800 + L1 RemoveRoof. Look north into the L1 halls, not down into L0 shops.
+cam_moveto(1_44_159_52_20, 620, 0, 100); // 2868,10196 L1 south
+cam_lookat(1_44_159_52_32, 200, 0, 100); // 2868,10208 L1
 p_delay(2);
-// palace-down — player indoor; cam SOUTH of the halls, HIGH, look NORTH/DOWN
-p_telejump(0_44_159_50_21); // 2866,10197 L0 — probed walkable dest
-~music_playbycoord(coord); // west = Land of the Dwarves
-// hei MUST be < 800: getTopLevelCutscene is (heightmap - camY) >= 800 → roofs ON.
-// camY = heightmap - hei, so hei 900 always shows the lid. 620 + RemoveRoof = roofs off.
-cam_moveto(0_44_159_52_22, 620, 0, 100); // 2868,10198 indoor
-cam_lookat(0_44_159_52_32, 200, 0, 100); // 2868,10208 deep halls
-p_delay(1);
 if_openoverlay(null);
 // 2:30 — KELDAGRIM q8 title on inter_260 (top-only). NOT inter_235.
 if_openoverlay(inter_260);
