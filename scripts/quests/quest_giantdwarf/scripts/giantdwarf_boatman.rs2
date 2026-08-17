@@ -66,12 +66,12 @@ if_settab(null, 12);
 // fade BEFORE any tele — opaque first. Shop floor is L0; Consortium is L1.
 if_openoverlay(fade_to_black);
 p_delay(3);
-// L1 south of the halls. Dest UNDER the cam so the player is not in the
-// rooms (sx4a7s6 p07: purple human mid-frame). Lookat the floor centre,
-// not the Pewter cubicle.
-p_telejump(1_44_159_56_12); // 2872,10188 L1 — under the cam
+// 10184 = lid (sx5j57j). 10186 = interiors + south colonnade in the
+// near plane (sx5n288). Dest WEST of the cam so the player is not on
+// the carpet (red shirt at the bottom of p07).
+p_telejump(1_44_159_44_10); // 2860,10186 L1 — west of the cam
 ~music_playbycoord(coord);
-cam_moveto(1_44_159_56_12, 720, 0, 100); // 2872,10188 L1 south
+cam_moveto(1_44_159_56_10, 720, 0, 100); // 2872,10186 L1 south edge
 cam_lookat(1_44_159_58_30, 80, 0, 100); // 2874,10206 L1 centre halls
 p_delay(2);
 if_openoverlay(null);
@@ -129,15 +129,13 @@ p_telejump(0_44_159_40_18); // 2856,10194 behind the bridge aerial
 cam_moveto(0_44_159_44_14, 620, 0, 100); // 2860,10190
 cam_lookat(0_44_159_56_6, 160, 0, 100); // 2872,10182 — river, not the palace lid
 p_delay(6);
-// 3:25-3:33 — YT canal. Look WEST from 2864,10176 is a wall (sx4a7s6 ra*).
-// Same tile looking EAST already showed Kelda water (7042). Low, along
-// the river at 7042 so water fills the view.
+// 3:25-3:33 — look-west from 2864,10178 is the cave (sx5j57j).
+// 2864,10176 look-east has water + a bank wedge. Sit 4 tiles further
+// east on that same z so the bank is behind the cam.
 p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable (probe)
 ~music_playbycoord(coord);
-// hei 240 from this tile is underground / a blob (sx4f2my ra*).
-// 680/200 is the working 7042 water shot — sit lower than that, not in the dirt.
-cam_moveto(0_44_159_48_0, 480, 0, 100); // 2864,10176 — on the water
-cam_lookat(0_44_159_62_1, 160, 0, 100); // 2878,10177 — east along the Kelda
+cam_moveto(0_44_159_52_0, 520, 0, 100); // 2868,10176 — over the water
+cam_lookat(0_44_159_62_1, 140, 0, 100); // 2878,10177 — east along the Kelda
 p_delay(1);
 if_openoverlay(inter_260);
 if_setcolour(inter_260:com_0, ^red_rgb);
