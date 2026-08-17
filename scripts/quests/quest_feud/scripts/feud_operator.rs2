@@ -1,0 +1,63 @@
+// The Feud — Ali the Operator (join a gang) Talk-to, chat only.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang minus the
+// 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
+// %feud_var_comp_gangs = 3 (both receipts handed over) else return.
+// Full verbatim join tree: join-yes / not-yet / "Can I help you with anything
+// else?" sub-menu (yourself / other people / I'm looking for Ali). No state
+// write — %feud_var stays 1, no 28 (28 = blackjack seller vis, not complete).
+// Pickpocket / urchin / oak blackjack are later hops. No dest / p_tele.
+// Cite feud-operator-blackjack-377.md · osrs-wiki-changes-crawl-377.md feud row.
+
+[opnpc1,feud_egyptian_minder]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+~chatnpc("<p,neutral>You seem to be a man of action. We could do with more people like you to sort those despicable bandits out.");
+~chatplayer("<p,neutral>Yeah, those pesky bandits!");
+~chatnpc("<p,quiz>So will you join us in our fight to wipe them out?");
+def_int $join = ~p_choice2("Yes, of course, those bandits should be taught a lesson.", 1, "Perhaps later, I'm quite busy at the moment.", 2);
+if ($join = 2) {
+    @feud_operator_notyet;
+}
+~chatplayer("<p,happy>Yes, of course, those pesky bandits should be taught a lesson.");
+~chatnpc("<p,happy>Good choice my friend, together we will crush them.");
+~chatplayer("<p,quiz>So when do we start?");
+~chatnpc("<p,neutral>Slow down, slow down. First you must prove yourself capable and trustworthy.");
+~chatplayer("<p,quiz>How will I manage that?");
+~chatnpc("<p,neutral>Don't worry about that, I'll just set you a few jobs to do.");
+~chatnpc("<p,neutral>As you might have gathered we have a less-than- sparkling reputation around here.");
+~chatnpc("<p,neutral>So I want you to foster this reputation and grow it.");
+~chatplayer("<p,quiz>What exactly does that mean?");
+~chatnpc("<p,neutral>It means that I want you to go out into the town and pickpocket three villagers, then report back to me.");
+~chatnpc("<p,neutral>If you have any problems don't be afraid to ask for some advice.");
+~chatplayer("<p,neutral>Oh right, thanks.");
+@feud_operator_help;
+
+[label,feud_operator_notyet]
+~chatplayer("<p,neutral>Perhaps later, I'm quite busy at the moment.");
+~chatnpc("<p,neutral>Tell me when you are ready. This deed should not be undertaken lightly.");
+@feud_operator_help;
+
+[label,feud_operator_help]
+~chatnpc("<p,neutral>Can I help you with anything else?");
+def_int $h = ~p_choice2("Yes I'd like to ask you about something else.", 1, "No thanks.", 2);
+if ($h = 2) {
+    return;
+}
+~chatplayer("<p,neutral>Yes I'd like to ask you about something else.");
+def_int $t = ~p_choice3("Tell me about yourself.", 1, "Tell me about the other people in the town.", 2, "I'm looking for Ali.", 3);
+if ($t = 1) {
+    ~chatplayer("<p,neutral>Tell me about yourself.");
+    ~chatnpc("<p,neutral>That information is available on a need to know basis and right now, you don't need to know.");
+    @feud_operator_help;
+}
+if ($t = 2) {
+    ~chatplayer("<p,neutral>Tell me about the other people in the town.");
+    ~chatnpc("<p,neutral>Sheep, ready for the slau... hang on. I shouldn't be telling you that. Just forget I said anything.");
+    @feud_operator_help;
+}
+~chatplayer("<p,neutral>I'm looking for Ali.");
+~chatnpc("<p,quiz>Can you be a bit more specific? Everyone here is called Ali.");
+~chatplayer("<p,neutral>So I noticed. Well, he has an uncle called Ali Morrisane, a market vendor in Al Kharid. That's all I really know about him.");
+~chatnpc("<p,neutral>Say no more. I know just the Ali you mean - that little snake robbed me too! If we work together perhaps we can catch him and teach him a lesson.");
+@feud_operator_help;
