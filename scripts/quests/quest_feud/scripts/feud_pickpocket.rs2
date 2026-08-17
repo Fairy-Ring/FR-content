@@ -5,10 +5,11 @@
 // picks fail as the plain thieving skill (walk: "always fail unless spoken
 // with Ali the Operator").
 // Walk is NOT three identical successes: the 1st pick works (count 0->1);
-// any further plain pick is refused (dump *I know your tricks, thief.* /
-// *You won't get my purse.* + 2 hit; stun skipped — no opcode). The urchin
-// distract and blackjack lure+KO (count 2 and 3) are later hops — never
-// write 2 or 3 here.
+// the 2nd pick works ONLY while the street urchin is distracting a villager
+// (%feud_distracted = 1, count 1->2, then distracted clears — CANDIDATE);
+// any other pick at count >= 1 is refused (dump *I know your tricks, thief.*
+// / *You won't get my purse.* + 2 hit; stun skipped — no opcode). Count 3
+// is the oak-blackjack lure+KO hop — never write 3 here.
 // Count = %feud_talk_villager (pack varbit 343, bits 16-17 of main_feud_var,
 // 0-3) — research doc §5.1 "Pickpocket count CANDIDATE 0-3". No dest /
 // p_tele / 28 / blackjack. %feud_var stays 1. No && / ||.
@@ -72,6 +73,14 @@ if (%feud_var_comp_gangs ! 3) { return; }
 @feud_villager_pick;
 
 [label,feud_villager_pick]
+if (%feud_talk_villager = 1 & %feud_distracted = 1) {
+    mes("You pick the villager's pocket.");
+    inv_add(inv, coins, 5); // CANDIDATE loot — OSRS Villager table (no dbrow skill proc)
+    stat_advance(thieving, 80); // CANDIDATE xp — OSRS Villager table (man row 80 = 8.0)
+    %feud_talk_villager = 2;
+    %feud_distracted = 0; // CANDIDATE — third pick must refuse until the blackjack hop
+    return;
+}
 if (%feud_talk_villager >= 1) {
     ~chatnpc("<p,angry>I know your tricks, thief.");
     ~chatnpc("<p,angry>You won't get my purse.");
