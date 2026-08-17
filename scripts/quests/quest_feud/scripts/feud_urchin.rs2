@@ -1,0 +1,63 @@
+// The Feud — Street urchin hire + distract (chat + flag). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Picking another pocket /
+// Talking to a Street urchin, minus the 27 Apr 2022 lore pass). Gate:
+// %feud_var >= 1 AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 AND
+// %feud_talk_villager >= 1 (joined + first pick done) else return.
+// Hire chat is dump verbatim (Hey kid -> easy money -> 10 gold coins ->
+// That's it!). Then an any-villager-in-range check via npc_find on the
+// WORLD multi type (feud_villager_multi_2 then _3 then _1; the vis
+// feud_villager_*_* are client-only faces — NPC_FIND will not match them).
+// Range 10 CANDIDATE (period scripts use 10-15). Villager in range ->
+// "Okay, I see them. Here I go!" / "Hey you, camel features! Come here." /
+// Villager "Excuse me?" and write %feud_var_urchin = 1 + %feud_distracted =
+// 1 (CANDIDATE). No villager -> "Listen, you're crazy. I can't see anyone to
+// distract." and NO flag write. %feud_closest_villager (1-3 CANDIDATE, the
+// multi group found; order 2/3/1 mirrors proximity from the urchin's primary
+// face 3352,2958 — group 2 @ 3355,2957 ~4, group 3 @ 3349,2954 ~4.5, group
+// 1 @ 3355,2949 ~10).
+// npc_find switches the current-NPC context to the found villager, so the
+// urchin's uid is saved before the cascade (def_npc_uid) and restored in the
+// distract proc (npc_finduid) before the urchin ~chatnpc lines.
+// %feud_var stays 1. %feud_talk_villager stays 1. No 28. No
+// %feud_ali_money / %feud_urchin_again (pay/deny is the NEXT hop). No dest /
+// p_tele. No pickpocket rewrite. No count 2. No blackjack. No && / ||.
+// Cite feud-operator-blackjack-377.md §7.4 · anchors-pollniv.md · crawl first row.
+
+[opnpc1,feud_street_urchin]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager < 1) { return; }
+def_npc_uid $urchin = npc_uid;
+~chatplayer("<p,neutral>Hey kid, come here!");
+~chatnpc("<p,quiz>What do you want?");
+~chatplayer("<p,quiz>I need a little help, do you want to make some easy money?");
+~chatnpc("<p,neutral>That depends.");
+~chatplayer("<p,neutral>Do you see that villager over there? If you could distract him for a bit I'll give you 10 gold coins.");
+~chatnpc("<p,quiz>Is that it?");
+~chatplayer("<p,neutral>That's it!");
+if (npc_find(coord, feud_villager_multi_2, 10, 0) = true) {
+    %feud_closest_villager = 2;
+    ~feud_urchin_do_distract($urchin);
+    return;
+}
+if (npc_find(coord, feud_villager_multi_3, 10, 0) = true) {
+    %feud_closest_villager = 3;
+    ~feud_urchin_do_distract($urchin);
+    return;
+}
+if (npc_find(coord, feud_villager_multi_1, 10, 0) = true) {
+    %feud_closest_villager = 1;
+    ~feud_urchin_do_distract($urchin);
+    return;
+}
+~chatnpc("<p,neutral>Listen, you're crazy. I can't see anyone to distract.");
+return;
+
+[proc,feud_urchin_do_distract](npc_uid $u)
+if (npc_finduid($u) = false) { return; }
+~chatnpc("<p,neutral>Okay, I see them. Here I go!");
+~chatnpc("<p,neutral>Hey you, camel features! Come here.");
+~chatnpc_specific("Villager", feud_villager_1_1, "<p,neutral>Excuse me?");
+%feud_var_urchin = 1;
+%feud_distracted = 1;
