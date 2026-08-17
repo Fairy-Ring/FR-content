@@ -66,14 +66,13 @@ if_settab(null, 12);
 // fade BEFORE any tele — opaque first. Shop floor is L0; Consortium is L1.
 if_openoverlay(fade_to_black);
 p_delay(3);
-// L1 balcony above the stall — 0_44_159_50_21 L0 is the clothes shop
-p_telejump(1_44_159_50_21); // 2866,10197 L1
+// L1 south of the halls. Dest UNDER the cam so the player is not in the
+// rooms (sx4a7s6 p07: purple human mid-frame). Lookat the floor centre,
+// not the Pewter cubicle.
+p_telejump(1_44_159_56_12); // 2872,10188 L1 — under the cam
 ~music_playbycoord(coord);
-// YT 2:30 — high south looking DOWN across the L1 halls. hei 720/look 80
-// = Fight Arena cage-down. hei < 800. 2872,10192 = south doors (6100) /
-// building centre, not the Pewter cubicle at 2868,10196.
-cam_moveto(1_44_159_56_16, 720, 0, 100); // 2872,10192 L1 south doors
-cam_lookat(1_44_159_56_36, 80, 0, 100); // 2872,10212 L1 floor, north halls
+cam_moveto(1_44_159_56_12, 720, 0, 100); // 2872,10188 L1 south
+cam_lookat(1_44_159_58_30, 80, 0, 100); // 2874,10206 L1 centre halls
 p_delay(2);
 if_openoverlay(null);
 // 2:30 — KELDAGRIM q8 title on inter_260 (top-only). NOT inter_235.
@@ -113,29 +112,32 @@ if_sethide(inter_235:com_7, true);
 if_sethide(inter_235:com_8, true);
 p_delay(2);
 if_openoverlay(null); // 235 closed — aerials need overlay null
-// 3:10-3:20 — aerial snaps over the city, no text
+// 3:10-3:20 — aerials. hei 900/850 = square roof lids (sx4a7s6 air01).
+// hei < 800; look at streets / river, not down onto a rooftop.
 p_telejump(0_44_159_40_18); // 2856,10194 behind the west aerial
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_24_24, 900, 0, 100); // 2840,10200 — west city aerial
-cam_lookat(0_44_159_18_18, 350, 0, 100); // 2834,10194
+cam_moveto(0_44_159_24_20, 620, 0, 100); // 2840,10196 — west, under the lid
+cam_lookat(0_44_159_16_28, 180, 0, 100); // 2832,10204 — street / furnace, not the tiles
 p_delay(5);
 p_telejump(0_44_159_46_4); // 2862,10180 — behind the Kelda aerial
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_48_2, 850, 0, 100); // 2864,10178 — over the Kelda west
-cam_lookat(0_44_159_62_1, 300, 0, 100); // 2878,10177 — river mouth / statue
+cam_moveto(0_44_159_48_2, 620, 0, 100); // 2864,10178 — Kelda, hei < 800
+cam_lookat(0_44_159_62_1, 220, 0, 100); // 2878,10177 — river mouth / statue
 p_delay(5);
 p_telejump(0_44_159_40_18); // 2856,10194 behind the bridge aerial
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_44_14, 850, 0, 100); // 2860,10190 — bridge/palace approach
-cam_lookat(0_44_159_52_24, 300, 0, 100); // 2868,10200
+cam_moveto(0_44_159_44_14, 620, 0, 100); // 2860,10190
+cam_lookat(0_44_159_56_6, 160, 0, 100); // 2872,10182 — river, not the palace lid
 p_delay(6);
-// 3:25-3:33 — down the Kelda, water fills the view. Red Axe title (q8 top).
-// 2856,10178 = west-bank wall. 2874,10177 look-west = cave mouth (kw0g0).
-// Water is 3 tiles south of the proven bank stand; look EAST at 7042.
+// 3:25-3:33 — YT canal. Look WEST from 2864,10176 is a wall (sx4a7s6 ra*).
+// Same tile looking EAST already showed Kelda water (7042). Low, along
+// the river at 7042 so water fills the view.
 p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable (probe)
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_46_1, 300, 0, 100); // 2862,10177 — Kelda next to the stand
-cam_lookat(0_44_159_62_1, 80, 0, 100); // 2878,10177 — east along the water
+// hei 240 from this tile is underground / a blob (sx4f2my ra*).
+// 680/200 is the working 7042 water shot — sit lower than that, not in the dirt.
+cam_moveto(0_44_159_48_0, 480, 0, 100); // 2864,10176 — on the water
+cam_lookat(0_44_159_62_1, 160, 0, 100); // 2878,10177 — east along the Kelda
 p_delay(1);
 if_openoverlay(inter_260);
 if_setcolour(inter_260:com_0, ^red_rgb);
@@ -144,15 +146,11 @@ if_settext(inter_260:com_0, "Rise of the Red Axe");
 if_settext(inter_260:com_1, "Part 1");
 p_delay(14);
 if_openoverlay(null);
-// 3:35 — 7042 from the water, looking UP (thighs-head + axe), title off
-// 2878,10180 is north of the plinth (legs crop). Close SW over water.
-cam_moveto(0_44_159_60_0, 220, 0, 100); // 2876,10176 — water SW of 7042
-cam_lookat(0_44_159_62_1, 620, 0, 100); // 2878,10177 — look up at the head
-p_delay(2);
-// 3:40-3:45 — pull back to full 7042 over the water (YT 03-45). 2878,10172
-// is the mine-tunnel mouth, not the south aerial.
+// 3:35-3:45 — full 7042 over the water. The look-up at 2876,10176 h220
+// was a solid cyan fill (sx4a7s6 w01). Skip it; the SW pull already works.
 cam_moveto(0_44_159_48_0, 680, 0, 100); // 2864,10176 — pulled SW, high
 cam_lookat(0_44_159_62_1, 200, 0, 100); // 2878,10177 — full body
+p_delay(2);
 if_openoverlay(inter_260);
 if_setcolour(inter_260:com_0, ^red_rgb);
 if_setcolour(inter_260:com_1, ^red_rgb);
@@ -172,9 +170,10 @@ p_delay(2);
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,happy>That's right!");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,angry>Er, hold on! There's something wrong!");
-// mini_statue_explodes delay1=275 (~5.5s). Harness clicks chat in ~1 tick
-// so 2+3 was still the mouth. Hold the map until the boat is on the plinth.
-p_delay(8);
+// delay1=275 is a HOLD on the mouth pose. Chat may reset the IF anim, so
+// wait the hold out AFTER the last page (14 ticks ≈ 8.4s > 5.5s).
+if_setanim(inter_234:com_3, mini_statue_explodes);
+p_delay(14);
 // 4:04 — Both/Argh at impact, on that map. Do NOT close 234. Heads must talk.
 split_init("<p,shock>Argh!", 380, 4, q8_full);
 if_setplayerhead(inter_274:com_0);
