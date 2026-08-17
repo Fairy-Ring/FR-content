@@ -1,0 +1,80 @@
+// The Feud — first villager Pickpocket (op3) + dump refuse after.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Picking another pocket /
+// walk 1st villager). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
+// %feud_var_comp_gangs = 3 (joined the gang) else return — pre-Operator
+// picks fail as the plain thieving skill (walk: "always fail unless spoken
+// with Ali the Operator").
+// Walk is NOT three identical successes: the 1st pick works (count 0->1);
+// any further plain pick is refused (dump *I know your tricks, thief.* /
+// *You won't get my purse.* + 2 hit; stun skipped — no opcode). The urchin
+// distract and blackjack lure+KO (count 2 and 3) are later hops — never
+// write 2 or 3 here.
+// Count = %feud_talk_villager (pack varbit 343, bits 16-17 of main_feud_var,
+// 0-3) — research doc §5.1 "Pickpocket count CANDIDATE 0-3". No dest /
+// p_tele / 28 / blackjack. %feud_var stays 1. No && / ||.
+// Cite feud-operator-blackjack-377.md §5.1 §7.4 · osrs-wiki-changes-crawl-377.md.
+
+[opnpc3,feud_villager_1_1]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[opnpc3,feud_villager_1_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[opnpc3,feud_villager_1_3]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[opnpc3,feud_villager_2_1]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[opnpc3,feud_villager_2_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[opnpc3,feud_villager_2_3]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[opnpc3,feud_villager_3_1]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[opnpc3,feud_villager_3_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[opnpc3,feud_villager_3_3]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+@feud_villager_pick;
+
+[label,feud_villager_pick]
+if (%feud_talk_villager >= 1) {
+    ~chatnpc("<p,angry>I know your tricks, thief.");
+    ~chatnpc("<p,angry>You won't get my purse.");
+    ~damage_self(2); // dump: villager hits the player for 2 damage. Stun skipped (no opcode).
+    return;
+}
+mes("You pick the villager's pocket.");
+%feud_talk_villager = 1;
+return;
