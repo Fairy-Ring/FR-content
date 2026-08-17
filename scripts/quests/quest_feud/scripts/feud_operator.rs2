@@ -119,5 +119,4 @@ if ($o = 1) {
     return;
 }
 ~chatplayer("<p,neutral>No problems here. I actually wanted to ask you about something else.");
-~chatplayer("<p,neutral>Yes I'd like to ask you about something else.");
-@feud_operator_flavour;
+@feud_operator_help;
