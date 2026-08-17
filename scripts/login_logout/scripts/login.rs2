@@ -93,6 +93,9 @@ if (%tutorial < ^tutorial_complete & ~in_tutorial_island(coord) = true) {
 ~update_all(inv_getobj(worn, ^wearpos_rhand));
 cam_reset;
 queue(follower_login, 0, 0);
+// Same gate as LC origin/377-wip login.rs2. map_live = NODE_PRODUCTION.
+// Isolation is false → this block does not run (test/test title login 2026-08-17).
+// They open inter_353 + inter_313; we join 313 as welcome_screen (Decision 013).
 if (map_live = true) {
     if_openfull(inter_353, welcome_screen);
     if_settext(inter_353:com_1,"Did you know, all the weapon stats are listed on our new");
