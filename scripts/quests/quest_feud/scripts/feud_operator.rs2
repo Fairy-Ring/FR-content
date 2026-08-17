@@ -1,17 +1,25 @@
-// The Feud — Ali the Operator (join a gang) Talk-to, chat only.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang minus the
-// 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
-// %feud_var_comp_gangs = 3 (both receipts handed over) else return.
-// Full verbatim join tree: join-yes / not-yet / "Can I help you with anything
-// else?" sub-menu (yourself / other people / I'm looking for Ali). No state
-// write — %feud_var stays 1, no 28 (28 = blackjack seller vis, not complete).
-// Pickpocket / urchin / oak blackjack are later hops. No dest / p_tele.
-// Cite feud-operator-blackjack-377.md · osrs-wiki-changes-crawl-377.md feud row.
+// The Feud — Ali the Operator Talk-to, chat only. Two trees:
+// (a) join a gang (shipped, PASS feudosxtiyip) and (b) after the first
+// pickpocket, the progress advice tree (dump § Picking another pocket:
+// "How is the pickpocketing going? Need a hand?" -> "Yeah, I could do with a
+// bit of advice." -> distraction hint, then the help sub-menu; "Nah, no
+// problems here..." goes straight to the flavour menu — no extra Yes line).
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
+// another pocket minus the 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND
+// %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 else return. Progress
+// tree when %feud_talk_villager >= 1; else the join tree.
+// No state write — %feud_var stays 1, %feud_talk_villager stays 1, no 28
+// (28 = blackjack seller vis, not complete). Urchin / oak blackjack are
+// later hops. No dest / p_tele. No && / ||.
+// Cite feud-operator-blackjack-377.md §7.4 · osrs-wiki-changes-crawl-377.md.
 
 [opnpc1,feud_egyptian_minder]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager >= 1) {
+    @feud_operator_progress;
+}
 ~chatnpc("<p,neutral>You seem to be a man of action. We could do with more people like you to sort those despicable bandits out.");
 ~chatplayer("<p,neutral>Yeah, those pesky bandits!");
 ~chatnpc("<p,quiz>So will you join us in our fight to wipe them out?");
@@ -33,6 +41,19 @@ if ($join = 2) {
 ~chatplayer("<p,neutral>Oh right, thanks.");
 @feud_operator_help;
 
+[label,feud_operator_progress]
+~chatnpc("<p,quiz>How is the pickpocketing going? Need a hand?");
+def_int $pp = ~p_choice2("Yeah, I could do with a bit of advice.", 1, "Nah, no problems here. I want to ask you about something else.", 2);
+if ($pp = 1) {
+    ~chatplayer("<p,neutral>Yeah, I could do with a bit of advice.");
+    ~chatnpc("<p,neutral>If you can't achieve your goal directly, try adding another element into the equation, like a distraction.");
+    ~chatnpc("<p,quiz>Do you know what I mean?");
+    ~chatplayer("<p,neutral>I think so.");
+    @feud_operator_help;
+}
+~chatplayer("<p,neutral>Nah no problems here. I actually wanted to ask you about something else.");
+@feud_operator_help;
+
 [label,feud_operator_notyet]
 ~chatplayer("<p,neutral>Perhaps later, I'm quite busy at the moment.");
 ~chatnpc("<p,neutral>Tell me when you are ready. This deed should not be undertaken lightly.");
@@ -46,6 +67,9 @@ if ($h = 2) {
     return;
 }
 ~chatplayer("<p,neutral>Yes I'd like to ask you about something else.");
+@feud_operator_flavour;
+
+[label,feud_operator_flavour]
 def_int $t = ~p_choice3("Tell me about yourself.", 1, "Tell me about the other people in the town.", 2, "I'm looking for Ali.", 3);
 if ($t = 1) {
     ~chatplayer("<p,neutral>Tell me about yourself.");
