@@ -1,34 +1,93 @@
-// The Feud — Asking the gangs (chat only).
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Asking the gangs minus the
-// 27 Apr 2022 lore pass). Gate: %feud_var >= 1 (Ali M start) AND
-// %feud_var_drink >= 3 (three beers, Drunken Ali hop) else return.
-// Concrete Talk-to faces only — the town bandits are multis
-// (feud_arabian_guard_multi / feud_arabian_guard2_multi); bind the visible
-// VARIANTS (feud_arabian_guard1_1/1_2/2_1/2_2, all display "Bandit"), the
-// coward (feud_arabian_guard_coward "Cowardly Bandit"), and the Menaphite
-// thug (feud_egyptian_doorman_1/2 "Menaphite Thug" via its multi). Do NOT
-// bind a multi base. No dest / p_tele / receipts / 28. No && / ||.
+// The Feud — Asking the gangs + camel-receipt hand-over (chat + inv).
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Asking the gangs / Now we
+// have camels minus the 27 Apr 2022 lore pass). Gate: %feud_var >= 1 (Ali M
+// start) AND %feud_var_drink >= 3 (three beers, Drunken Ali hop) else return.
+// With a feud_camel_receipt (4603) in inv, hand one per gang; leftover
+// %feud_var_comp_gangs bits 2-3 of feud_var_multi is 1 thug + 2 bandit = 3
+// both. Else the shipped ask-chat. Already-given (this gang's flag) does
+// not consume another receipt. Concrete Talk-to faces only — bind the
+// visible VARIANTS (feud_arabian_guard1_1/1_2/2_1/2_2 "Bandit"), the
+// coward (feud_arabian_guard_coward), and the Menaphite thug
+// (feud_egyptian_doorman_1/2). Do NOT bind a multi base. No dest / p_tele
+// / Operator 1902 / 28. No && / ||.
 // Cite osrs-wiki-changes-crawl-377.md feud row · Transcript:The Feud.
 
 [opnpc1,feud_arabian_guard1_1]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs = 3) {
+    @feud_bandit_after;
+}
+if (%feud_var_comp_gangs = 2) {
+    @feud_bandit_talk;
+}
+if (inv_total(inv, feud_camel_receipt) >= 1) {
+    @feud_bandit_give;
+}
 @feud_bandit_talk;
 
 [opnpc1,feud_arabian_guard1_2]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs = 3) {
+    @feud_bandit_after;
+}
+if (%feud_var_comp_gangs = 2) {
+    @feud_bandit_talk;
+}
+if (inv_total(inv, feud_camel_receipt) >= 1) {
+    @feud_bandit_give;
+}
 @feud_bandit_talk;
 
 [opnpc1,feud_arabian_guard2_1]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs = 3) {
+    @feud_bandit_after;
+}
+if (%feud_var_comp_gangs = 2) {
+    @feud_bandit_talk;
+}
+if (inv_total(inv, feud_camel_receipt) >= 1) {
+    @feud_bandit_give;
+}
 @feud_bandit_talk;
 
 [opnpc1,feud_arabian_guard2_2]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs = 3) {
+    @feud_bandit_after;
+}
+if (%feud_var_comp_gangs = 2) {
+    @feud_bandit_talk;
+}
+if (inv_total(inv, feud_camel_receipt) >= 1) {
+    @feud_bandit_give;
+}
 @feud_bandit_talk;
+
+[label,feud_bandit_give]
+~chatplayer("<p,neutral>Good news, the Menaphites have agreed to give you a camel in order to restore peace.");
+mes("You hand the guard a sales receipt for the camel.");
+inv_del(inv, feud_camel_receipt, 1);
+if (%feud_var_comp_gangs = 0) {
+    %feud_var_comp_gangs = 2;
+} else {
+    %feud_var_comp_gangs = 3;
+}
+~chatnpc("<p,neutral>What's this? A mere promise of a camel? From a discount camel store? I knew those Menaphites were cowards. Tell them that we have changed our minds and demand 10 full-price camels in return for our mercy.");
+~chatplayer("<p,neutral>Oh no... why do I bother?");
+~chatplayer("<p,neutral>The camel approach doesn't seem to be working. Perhaps I should be more direct and try to join one of the gangs.");
+return;
+
+[label,feud_bandit_after]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>Good day adventurer. Have you come with the Menaphite peace offering?");
+~chatplayer("<p,neutral>Umm... no. Not yet. Actually I've come to ask about something else.");
+~chatnpc("<p,neutral>We can talk once you bring back the Menaphites' full peace offering.");
+return;
 
 [label,feud_bandit_talk]
 ~chatplayer("<p,neutral>Hello.");
@@ -46,7 +105,28 @@ return;
 [opnpc1,feud_arabian_guard_coward]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs = 2) {
+    @feud_coward_talk;
+}
+if (%feud_var_comp_gangs = 3) {
+    @feud_coward_talk;
+}
+if (inv_total(inv, feud_camel_receipt) >= 1) {
+    @feud_coward_give;
+}
 @feud_coward_talk;
+
+[label,feud_coward_give]
+~chatplayer("<p,neutral>Good news, the Menaphites have agreed to give you a camel in order to restore peace.");
+inv_del(inv, feud_camel_receipt, 1);
+if (%feud_var_comp_gangs = 0) {
+    %feud_var_comp_gangs = 2;
+} else {
+    %feud_var_comp_gangs = 3;
+}
+~chatnpc("<p,neutral>Really? I knew they were cowards. Tell them that we have changed our minds and demand 10 camels in return for our mercy.");
+~chatplayer("<p,neutral>Ahhh why do I bother!");
+return;
 
 [label,feud_coward_talk]
 ~chatplayer("<p,neutral>Hello.");
@@ -64,12 +144,50 @@ return;
 [opnpc1,feud_egyptian_doorman_1]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs = 3) {
+    @feud_thug_after;
+}
+if (%feud_var_comp_gangs = 1) {
+    @feud_thug_talk;
+}
+if (inv_total(inv, feud_camel_receipt) >= 1) {
+    @feud_thug_give;
+}
 @feud_thug_talk;
 
 [opnpc1,feud_egyptian_doorman_2]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs = 3) {
+    @feud_thug_after;
+}
+if (%feud_var_comp_gangs = 1) {
+    @feud_thug_talk;
+}
+if (inv_total(inv, feud_camel_receipt) >= 1) {
+    @feud_thug_give;
+}
 @feud_thug_talk;
+
+[label,feud_thug_give]
+~chatplayer("<p,neutral>Good news, the bandits have agreed to give you a camel in order to restore peace.");
+mes("You hand the doorman a sales receipt for the camel.");
+inv_del(inv, feud_camel_receipt, 1);
+if (%feud_var_comp_gangs = 0) {
+    %feud_var_comp_gangs = 1;
+} else {
+    %feud_var_comp_gangs = 3;
+}
+~chatnpc("<p,neutral>A mere receipt? For a discount camel? I knew those bandits were cheap! Tell them that we have changed our minds and demand 10 camels in return for our mercy.");
+~chatplayer("<p,neutral>Oh no... why do I bother?");
+return;
+
+[label,feud_thug_after]
+~chatnpc("<p,neutral>Greetings Adventurer, Ali wants to have a word with you.");
+~chatplayer("<p,quiz>Really? Which one?");
+~chatnpc("<p,neutral>Ali, our Chief of Operations. He should be somewhere nearby the tent.");
+~chatplayer("<p,neutral>Thanks.");
+return;
 
 [label,feud_thug_talk]
 ~chatplayer("<p,neutral>Hello.");
