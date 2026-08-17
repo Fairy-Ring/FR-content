@@ -69,8 +69,10 @@ p_delay(2);
 // palace-down — player indoor; cam SOUTH of the halls, HIGH, look NORTH/DOWN
 p_telejump(0_44_159_50_21); // 2866,10197 L0 — probed walkable dest
 ~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_52_20, 900, 0, 100); // 2868,10196 — south balcony (unwalkable OK)
-cam_lookat(0_44_159_52_32, 200, 0, 100); // 2868,10208 — deep into the halls, NOT +2 tiles
+// hei MUST be < 800: getTopLevelCutscene is (heightmap - camY) >= 800 → roofs ON.
+// camY = heightmap - hei, so hei 900 always shows the lid. 620 + RemoveRoof = roofs off.
+cam_moveto(0_44_159_52_22, 620, 0, 100); // 2868,10198 indoor
+cam_lookat(0_44_159_52_32, 200, 0, 100); // 2868,10208 deep halls
 p_delay(1);
 if_openoverlay(null);
 // 2:30 — KELDAGRIM q8 title on inter_260 (top-only). NOT inter_235.
@@ -165,7 +167,7 @@ p_delay(2);
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,happy>That's right!");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,angry>Er, hold on! There's something wrong!");
-p_delay(10); // hold 234 longer — boat reaches the plinth, seq delay1=275 passes
+p_delay(3); // ~4:00 -> 4:04, not 10
 // 4:04 — Both/Argh at impact, on that map. Do NOT close 234. Heads must talk.
 split_init("<p,shock>Argh!", 380, 4, q8_full);
 if_setplayerhead(inter_274:com_0);
@@ -173,7 +175,7 @@ if_setanim(inter_274:com_0, split_getanim(0));
 if_setnpchead(inter_274:com_3, dwarf_city_boatman_mines_prequest);
 if_setanim(inter_274:com_3, split_getanim(0));
 if_openchat(inter_274); // packed *Both* / *Argh!*
-p_delay(5);
+p_delay(8); // explode ON this card
 if_close; // chat only; overlay 234 stays
 // 4:07 — map, rubble, no chat
 p_delay(2);
