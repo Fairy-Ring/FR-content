@@ -3,8 +3,10 @@
 // Travel — verbatim block in giantdwarf-boatman-cutscene-377.md; the extract
 // was never in .wiki). Fresh 0: start talk (<displayname>, ferryman line),
 // Deal + ready-Yes (~p_choice2, not overlay), write 1 on ready-Yes, then
-// [proc,giantdwarf_intro_cutscene]: tele + cam first (palace 2841,10183), then
-// inter_235 red-letter history overlay, statue cam + crash talk + cam_shake +
+// [proc,giantdwarf_intro_cutscene]: tele + cam first (palace stairs
+// 2863,10188 L1, roof-on cam 2872,10184), then inter_260 titles + inter_235
+// history, packed steamer cam (m44_158 hull, no loc_add), Red Axe look-east
+// + plinth look-down, statue crash talk + cam_shake +
 // %giantdwarf_statue_invis = 1 + inter_234 crash map, dock guards (Halt!
 // on 2231), HQ dest, then Veldaban "Identify yourself" via ~chatnpc_specific
 // (NOT Forget's [opnpc1,dwarf_city_black_guard_leader] — already bound) and
@@ -63,17 +65,16 @@ if_settab(null, 5);
 if_settab(null, 6);
 if_settab(null, 11);
 if_settab(null, 12);
-// fade BEFORE any tele — opaque first. Shop floor is L0; Consortium is L1.
+// fade BEFORE any tele — opaque first, then tele behind the cam
 if_openoverlay(fade_to_black);
-p_delay(3);
-// 10184 = lid (sx5j57j). 10186 = interiors + south colonnade in the
-// near plane (sx5n288). Dest WEST of the cam so the player is not on
-// the carpet (red shirt at the bottom of p07).
-p_telejump(1_44_159_44_10); // 2860,10186 L1 — west of the cam
-~music_playbycoord(coord);
-cam_moveto(1_44_159_56_10, 720, 0, 100); // 2872,10186 L1 south edge
-cam_lookat(1_44_159_58_30, 80, 0, 100); // 2874,10206 L1 centre halls
 p_delay(2);
+// palace — 2014 roof ON. Dest stairs (Climb-up 6088), cam SOUTH of the facade,
+// no RemoveRoof, LOW hei so we look THROUGH the colonnade, not onto 6126.
+p_telejump(1_44_159_47_12); // 2863,10188 L1 — 6088 wide stairs (opener dest)
+~music_playbycoord(coord); // west = Land of the Dwarves
+cam_moveto(1_44_159_56_8, 280, 0, 100); // 2872,10184 — f1, roof stays on
+cam_lookat(1_44_159_56_24, 40, 0, 100); // 2872,10200 — into the hall, NOT down onto 6126
+p_delay(1);
 if_openoverlay(null);
 // 2:30 — KELDAGRIM q8 title on inter_260 (top-only). NOT inter_235.
 if_openoverlay(inter_260);
@@ -111,31 +112,20 @@ if_sethide(inter_235:com_6, true);
 if_sethide(inter_235:com_7, true);
 if_sethide(inter_235:com_8, true);
 p_delay(2);
-if_openoverlay(null); // 235 closed — aerials need overlay null
-// 3:10-3:20 — aerials. hei 900/850 = square roof lids (sx4a7s6 air01).
-// hei < 800; look at streets / river, not down onto a rooftop.
-p_telejump(0_44_159_40_18); // 2856,10194 behind the west aerial
+if_openoverlay(null); // 235 closed — steamer beat needs overlay null
+// 3:10-3:20 — steamer already on the LIVE river (hull 2873-2875, 10138-10147
+// m44_158). Do NOT loc_add. Cam it, south of the boat, mid hull.
+p_telejump(0_44_158_50_21); // 2866,10133 L0 — walkable, south-west of hull (2866,10132 blocked)
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_24_20, 620, 0, 100); // 2840,10196 — west, under the lid
-cam_lookat(0_44_159_16_28, 180, 0, 100); // 2832,10204 — street / furnace, not the tiles
-p_delay(5);
-p_telejump(0_44_159_46_4); // 2862,10180 — behind the Kelda aerial
-~music_playbycoord(coord);
-cam_moveto(0_44_159_48_2, 620, 0, 100); // 2864,10178 — Kelda, hei < 800
-cam_lookat(0_44_159_62_1, 220, 0, 100); // 2878,10177 — river mouth / statue
-p_delay(5);
-p_telejump(0_44_159_40_18); // 2856,10194 behind the bridge aerial
-~music_playbycoord(coord);
-cam_moveto(0_44_159_44_14, 620, 0, 100); // 2860,10190
-cam_lookat(0_44_159_56_6, 160, 0, 100); // 2872,10182 — river, not the palace lid
+cam_moveto(0_44_158_58_20, 400, 0, 100); // 2874,10132 — south of the boat
+cam_lookat(0_44_158_58_32, 80, 0, 100); // 2874,10144 — mid hull
 p_delay(6);
-// 3:25-3:33 — look-west from 2864,10178 is the cave (sx5j57j).
-// 2864,10176 look-east has water + a bank wedge. Sit 4 tiles further
-// east on that same z so the bank is behind the cam.
+// 3:25-3:33 — Red Axe on the long water. Look EAST along o86 toward the statue,
+// not west (cave). Title (q8 top).
 p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable (probe)
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_52_0, 520, 0, 100); // 2868,10176 — over the water
-cam_lookat(0_44_159_62_1, 140, 0, 100); // 2878,10177 — east along the Kelda
+cam_moveto(0_44_159_56_4, 350, 0, 100); // 2872,10180 — east band, over o86
+cam_lookat(0_44_159_62_1, 40, 0, 100); // 2878,10177 — east along the Kelda
 p_delay(1);
 if_openoverlay(inter_260);
 if_setcolour(inter_260:com_0, ^red_rgb);
@@ -144,11 +134,14 @@ if_settext(inter_260:com_0, "Rise of the Red Axe");
 if_settext(inter_260:com_1, "Part 1");
 p_delay(14);
 if_openoverlay(null);
-// 3:35-3:45 — full 7042 over the water. The look-up at 2876,10176 h220
-// was a solid cyan fill (sx4a7s6 w01). Skip it; the SW pull already works.
-cam_moveto(0_44_159_48_0, 680, 0, 100); // 2864,10176 — pulled SW, high
-cam_lookat(0_44_159_62_1, 200, 0, 100); // 2878,10177 — full body
+// 3:35 — 7042 from the water, looking UP (thighs-head + axe), title off
+cam_moveto(0_44_159_62_4, 350, 0, 100); // 2878,10180 — river south of the statue
+cam_lookat(0_44_159_62_1, 700, 0, 100); // 2878,10177 — look up at the head
 p_delay(2);
+// 3:40-3:45 — THE GIANT DWARF: look DOWN at the plinth (2014 busted-apart),
+// hei < 800. Over water, not the west bank.
+cam_moveto(0_44_159_60_2, 620, 0, 100); // 2876,10178 — over water
+cam_lookat(0_44_159_62_1, 20, 0, 100); // 2878,10177 — look DOWN at the plinth
 if_openoverlay(inter_260);
 if_setcolour(inter_260:com_0, ^red_rgb);
 if_setcolour(inter_260:com_1, ^red_rgb);
@@ -168,10 +161,7 @@ p_delay(2);
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,happy>That's right!");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,angry>Er, hold on! There's something wrong!");
-// delay1=275 is a HOLD on the mouth pose. Chat may reset the IF anim, so
-// wait the hold out AFTER the last page (14 ticks ≈ 8.4s > 5.5s).
-if_setanim(inter_234:com_3, mini_statue_explodes);
-p_delay(14);
+p_delay(3); // ~4:00 -> 4:04, not 10
 // 4:04 — Both/Argh at impact, on that map. Do NOT close 234. Heads must talk.
 split_init("<p,shock>Argh!", 380, 4, q8_full);
 if_setplayerhead(inter_274:com_0);
