@@ -1,0 +1,92 @@
+// The Feud — Asking the gangs (chat only).
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Asking the gangs minus the
+// 27 Apr 2022 lore pass). Gate: %feud_var >= 1 (Ali M start) AND
+// %feud_var_drink >= 3 (three beers, Drunken Ali hop) else return.
+// Concrete Talk-to faces only — the town bandits are multis
+// (feud_arabian_guard_multi / feud_arabian_guard2_multi); bind the visible
+// VARIANTS (feud_arabian_guard1_1/1_2/2_1/2_2, all display "Bandit"), the
+// coward (feud_arabian_guard_coward "Cowardly Bandit"), and the Menaphite
+// thug (feud_egyptian_doorman_1/2 "Menaphite Thug" via its multi). Do NOT
+// bind a multi base. No dest / p_tele / receipts / 28. No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md feud row · Transcript:The Feud.
+
+[opnpc1,feud_arabian_guard1_1]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+@feud_bandit_talk;
+
+[opnpc1,feud_arabian_guard1_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+@feud_bandit_talk;
+
+[opnpc1,feud_arabian_guard2_1]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+@feud_bandit_talk;
+
+[opnpc1,feud_arabian_guard2_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+@feud_bandit_talk;
+
+[label,feud_bandit_talk]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>What do you want?");
+~chatplayer("<p,neutral>I am trying to get to the bottom of this feud between you and the Menaphites.");
+~chatnpc("<p,neutral>What's it to you?");
+~chatplayer("<p,neutral>I'm just trying to understand why thieves of your repute would stoop to their level.");
+~chatnpc("<p,neutral>Well, if memory serves me correctly, I think the hostilities began when they robbed one of our camels. A heinous crime.");
+~chatplayer("<p,neutral>So if they offered a camel back as a gesture of goodwill, would you and the rest of the bandits cease your hostilities?");
+~chatnpc("<p,neutral>Those Menaphites would never do that. They have no sense of honour.");
+~chatplayer("<p,neutral>But if they did?");
+~chatnpc("<p,neutral>I suppose so.");
+return;
+
+[opnpc1,feud_arabian_guard_coward]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+@feud_coward_talk;
+
+[label,feud_coward_talk]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>What do you want?");
+~chatplayer("<p,neutral>I am trying to figure out the feud that exists between you and the Menaphites.");
+~chatnpc("<p,neutral>What's it to you?");
+~chatplayer("<p,neutral>Nothing much, I'm trying to understand why thieves of your repute would stoop to the level of the Menaphites.");
+~chatnpc("<p,neutral>Well if memory serves me correctly. I think my granddad mentioned that they robbed one of our camels. A heinous crime.");
+~chatplayer("<p,neutral>So if they offered a camel as a gesture of goodwill would you and the rest of the bandits cease your hostilities?");
+~chatnpc("<p,neutral>Those Menaphites would never do that. They have no sense of honour.");
+~chatplayer("<p,neutral>But if they did?");
+~chatnpc("<p,neutral>I suppose so.");
+return;
+
+[opnpc1,feud_egyptian_doorman_1]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+@feud_thug_talk;
+
+[opnpc1,feud_egyptian_doorman_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+@feud_thug_talk;
+
+[label,feud_thug_talk]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>What do you want?");
+~chatplayer("<p,neutral>I am trying to figure out the feud that exists between you and the Bandits.");
+~chatnpc("<p,neutral>Not much to figure out there, the problem is those thieving bandits.");
+~chatplayer("<p,neutral>In what way?");
+~chatnpc("<p,neutral>They are always stealing, starting fights and disrupting the lives of the townsfolk.");
+~chatplayer("<p,neutral>Word has it that the Menaphites are also involved in unsavoury behaviour.");
+~chatnpc("<p,neutral>Well, we also steal, start fights, and disrupt lives - but we do it with class! And the bandits definitely started it.");
+~chatplayer("<p,neutral>How did 'they' start it?");
+~chatnpc("<p,neutral>I can scarcely remember, it's been so long.");
+~chatplayer("<p,neutral>Go on try.");
+~chatnpc("<p,neutral>I think our leader once mentioned that they robbed one of our camels. A heinous crime around these parts.");
+~chatplayer("<p,neutral>So if they offered a camel as a gesture of goodwill would you agree to cease hostilities?");
+~chatnpc("<p,neutral>Those bandits would never agree to that. They couldn't afford even the mangiest excuse for a camel, never mind the desert traversing, four legged beauty that we would demand.");
+~chatplayer("<p,neutral>But if they did?");
+~chatnpc("<p,neutral>Well, I suppose so.");
+~chatplayer("<p,neutral>Maybe if I got both gangs a camel, I could use the mutual good will to find out what happened to Ali's nephew.");
+return;
