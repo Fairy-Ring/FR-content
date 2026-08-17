@@ -1,0 +1,31 @@
+// Swan Song — colony gate Wise Old Man (wom_cutscene_2) Talk-to, chat only.
+// CANDIDATE 2007-base (Transcript:Swan Song ==Returning to the colony== minus
+// tunnel dest / trolls — later hops). swan_multioutside (3832) @ 2345,3648 L0
+// shows wom_cutscene_2 (2567) at 30/40/50/55. No stage write — do not
+// rewrite 30. Re-talk "Just hop into the tunnel..." flag = %swansong_temp
+// bit 9 (bit 8 = Draynor runes-asked; pack varbits use bits 0-7 only:
+// ambush 0-2, colony 3-4, temp_5_7 5-7).
+// Chat only — no p_tele, no trolls. Cite swansong-changes-377.md.
+
+[opnpc1,wom_cutscene_2]
+if (%swansong < 30) {
+    return;
+}
+if (getbit_range(%swansong_temp, 9, 9) = 1) {
+    ~chatnpc("<p,neutral>Just hop into the tunnel when you're ready.");
+    return;
+}
+~chatnpc("<p,happy>Hello again, <displayname>! I must thank you for persuading me to come - I feel quite invigorated in the sea breeze!");
+~chatplayer("<p,neutral>Oh - er - good. Well, Herman must be inside the Colony now, so we should probably go in.");
+~chatnpc("<p,quiz>Are you sure you're ready? I can hear creatures moving around in the trees, and we might have to do some fighting soon.");
+def_int $ready = ~p_choice2("I'm ready to fight.", 1, "I should go and get ready first.", 2);
+if ($ready = 1) {
+    ~chatplayer("<p,happy>I'm ready to fight.");
+    ~chatnpc("<p,happy>Excellent. I think this little tunnel will lead us there...");
+    %swansong_temp = setbit_range(%swansong_temp, 9, 9); // re-talk: "Just hop into the tunnel..."
+    return;
+}
+~chatplayer("<p,neutral>I should go and get ready first.");
+~chatnpc("<p,neutral>Yes, better safe than sorry! We can go through this little tunnel when you're ready.");
+%swansong_temp = setbit_range(%swansong_temp, 9, 9);
+return;
