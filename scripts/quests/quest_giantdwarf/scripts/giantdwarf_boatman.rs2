@@ -66,11 +66,11 @@ if_settab(null, 12);
 // fade BEFORE any tele — opaque first, then tele behind the cam
 if_openoverlay(fade_to_black);
 p_delay(2);
-// palace-down — player + cam INSIDE on a walkable tile so RemoveRoof fires
-p_telejump(0_44_159_52_22); // 2868,10198 L0 — indoor palace tile, under the roof (probe)
+// palace-down — player indoor; cam SOUTH of the halls, HIGH, look NORTH/DOWN
+p_telejump(0_44_159_50_21); // 2866,10197 L0 — probed walkable dest
 ~music_playbycoord(coord); // west = Land of the Dwarves
-cam_moveto(0_44_159_52_22, 900, 0, 100); // 2868,10198 — cam XZ over RemoveRoof
-cam_lookat(0_44_159_52_24, 300, 0, 100); // 2868,10200 — down into the palace hall
+cam_moveto(0_44_159_52_20, 900, 0, 100); // 2868,10196 — south balcony (unwalkable OK)
+cam_lookat(0_44_159_52_32, 200, 0, 100); // 2868,10208 — deep into the halls, NOT +2 tiles
 p_delay(1);
 if_openoverlay(null);
 // 2:30 — KELDAGRIM q8 title on inter_260 (top-only). NOT inter_235.
@@ -127,10 +127,10 @@ cam_moveto(0_44_159_44_14, 850, 0, 100); // 2860,10190 — bridge/palace approac
 cam_lookat(0_44_159_52_24, 300, 0, 100); // 2868,10200
 p_delay(6);
 // 3:25-3:33 — down the Kelda, water fills the view. Red Axe title (q8 top)
-p_telejump(0_44_159_46_4); // 2862,10180 L0 — walkable, west of cam (probe)
+p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable (probe)
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_52_2, 350, 0, 100); // 2868,10178 — water level
-cam_lookat(0_44_159_62_1, 250, 0, 100); // 2878,10177 — along the river
+cam_moveto(0_44_159_40_2, 250, 0, 100); // 2856,10178 — WEST over the river (unwalkable OK)
+cam_lookat(0_44_159_62_1, 180, 0, 100); // 2878,10177 — along the Kelda
 p_delay(1);
 if_openoverlay(inter_260);
 if_setcolour(inter_260:com_0, ^red_rgb);
@@ -143,9 +143,9 @@ if_openoverlay(null);
 cam_moveto(0_44_159_62_4, 350, 0, 100); // 2878,10180 — river south of the statue
 cam_lookat(0_44_159_62_1, 700, 0, 100); // 2878,10177 — look up at the head
 p_delay(2);
-// 3:40-3:45 — pull back to full 7042, title on the water (q8 top)
-cam_moveto(0_44_159_60_5, 500, 0, 100); // 2876,10181 — pulled back
-cam_lookat(0_44_159_62_1, 400, 0, 100); // 2878,10177 — full body
+// 3:40-3:45 — pull back to full 7042, from the SOUTH over the water (q8 top)
+cam_moveto(0_44_158_62_60, 550, 0, 100); // 2878,10172 — south of statue, 0_44_158 (unwalkable OK)
+cam_lookat(0_44_159_62_1, 350, 0, 100); // 2878,10177 — full body
 if_openoverlay(inter_260);
 if_setcolour(inter_260:com_0, ^red_rgb);
 if_setcolour(inter_260:com_1, ^red_rgb);
@@ -165,6 +165,7 @@ p_delay(2);
 ~chatplayer("<p,happy>Amazing! And we're going to go straight past it?");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,happy>That's right!");
 ~chatnpc_specific("Dwarven Boatman", dwarf_city_boatman_mines_prequest, "<p,angry>Er, hold on! There's something wrong!");
+p_delay(10); // hold 234 longer — boat reaches the plinth, seq delay1=275 passes
 // 4:04 — Both/Argh at impact, on that map. Do NOT close 234. Heads must talk.
 split_init("<p,shock>Argh!", 380, 4, q8_full);
 if_setplayerhead(inter_274:com_0);
