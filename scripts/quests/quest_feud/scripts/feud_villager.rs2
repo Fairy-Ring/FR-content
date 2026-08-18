@@ -1,0 +1,86 @@
+// The Feud — Villager after the Menaphite Leader is gone (§19.7). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud §19.7 Talking to a Villager,
+// minus the 27 Apr 2022 lore pass — §19.7 carries no BCS lines). World NPC
+// multi bases feud_villager_multi_1/2/3 (1887/1891/1895, e.g. 3355,2949
+// m52_46); vis faces feud_villager_1_1.._3_3 (1888-1890 / 1892-1894 /
+// 1896-1898) "Villager" op1=Talk-to while %feud_npc_multi 0/1/2 — bind the
+// nine vis names, NOT the multi bases. Stand 3354,2949 W of the multi_1 pin
+// 3355,2949. Not on the NPC.
+// Gate: %feud_var_menaboss >= 1 (Tough Guy killed, §18.5 PASS feudtsy35b22 —
+// Leader gone, menaboss flag) else return. §19.7 verbatim, chat only:
+// Hello. -> "You! You're the one that just made everything worse for us poor
+// villagers!" -> "What?! I just single-handedly took apart one of the gangs
+// that was ruining your town!" -> "You adventurers! You never think, you
+// just act." -> "You've created a vacuum" -> "Our elderly mayor, or the
+// leader of the bandits?" -> "Oops. Sorry, I was just trying to help." ->
+// "the two gangs pretty much cancelled each other out" -> "the Bandits reign
+// unopposed!" -> "this adventuring lark is a lot more complicated" -> "fix
+// this mess you created!" then ~p_choice2 — exactly two options, no extra
+// Yes: "What do you mean by fix the mess I created?" -> "Do I have to spell
+// it out to you?" / "Would you please?" / "Just run the bandits out of
+// town. Incidentally, I spotted their leader to the north-west just a few
+// minutes ago." · "Ok I'll get to it." -> spoken "Okay, I'll get to it."
+// Chat only — no var writes. Do NOT write %feud_talk_villager (343 is the
+// pick-count leftover) and do NOT write %feud_bandit_boss_vis (338) this hop
+// (Bandit Leader §20 later). No stage write / no 28 / no dest / p_tele.
+// No && / ||.
+// Cite copy-agent-opener-377.md · feud-varbit-map-377.md §5 §7 · Transcript:The Feud.
+
+[opnpc1,feud_villager_1_1]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[opnpc1,feud_villager_1_2]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[opnpc1,feud_villager_1_3]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[opnpc1,feud_villager_2_1]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[opnpc1,feud_villager_2_2]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[opnpc1,feud_villager_2_3]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[opnpc1,feud_villager_3_1]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[opnpc1,feud_villager_3_2]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[opnpc1,feud_villager_3_3]
+if (%feud_var_menaboss < 1) { return; }
+@feud_villager_celebrate;
+
+[label,feud_villager_celebrate]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,angry>You! You're the one that just made everything worse for us poor villagers!");
+~chatplayer("<p,angry>What?! I just single-handedly took apart one of the gangs that was ruining your town!");
+~chatnpc("<p,neutral>You adventurers! You never think, you just act. You think that by killing a powerful bad person, Gielinor will become a better place.");
+~chatnpc("<p,neutral>It's not that simple, things never are. You've created a vacuum, and now all that power will go to whoever's strong enough to take it.");
+~chatnpc("<p,quiz>Who do you think is stronger? Our elderly mayor, or the leader of the bandits?");
+~chatplayer("<p,neutral>Oops. Sorry, I was just trying to help. So are things really that much worse?");
+~chatnpc("<p,neutral>Yes. Before your intervention the two gangs pretty much cancelled each other out. They spent most of their energy trying to kill each other.");
+~chatnpc("<p,neutral>Now that the balance is lost, the Bandits reign unopposed! They no longer have to deal with the Menaphites and heap misery upon misery on us. You must finish the job that you have started.");
+~chatplayer("<p,neutral>You know, this adventuring lark is a lot more complicated than I thought!");
+~chatnpc("<p,neutral>If you're prepared to change something you must also be prepared to deal with the consequences! Now hurry up and fix this mess you created!");
+def_int $fix = ~p_choice2("What do you mean by fix the mess I created?", 1, "Ok I'll get to it.", 2);
+if ($fix = 1) {
+    ~chatplayer("<p,neutral>What do you mean by fix the mess I created?");
+    ~chatnpc("<p,quiz>Do I have to spell it out to you?");
+    ~chatplayer("<p,neutral>Would you please?");
+    ~chatnpc("<p,neutral>Just run the bandits out of town. Incidentally, I spotted their leader to the north-west just a few minutes ago.");
+    return;
+}
+~chatplayer("<p,neutral>Okay, I'll get to it.");
+return;
