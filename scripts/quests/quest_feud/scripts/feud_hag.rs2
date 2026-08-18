@@ -1,17 +1,25 @@
-// The Feud — Hag first talk (snake venom request). New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Talking to Ali the Hag,
-// dump §15.3). NPC feud_hag 1871 @ 3346,2987 L0, display Ali the Hag.
+// The Feud — Hag first talk (snake venom request) + no-snake re-talk. New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Talking to Ali the Hag /
+// Talking to Ali the Hag again, dump §15.3 + §15.4). NPC feud_hag 1871 @
+// 3346,2987 L0, display Ali the Hag.
 // Gate: %feud_found_trait >= 1 (traitor report) else return — the dump has
-// no pre-tree here. Tree verbatim: "Good day, Hag." / "Blockhead" / "remove
-// someone" / 'Traitorous Ali', please -> pickled aubergines -> "bring me
-// some snake venom" through "...that snake charmer's pet worm, it's about
-// as dangerous as a rubber knife." No state write (dump writes none — no
-// hag_list / witchbothered). Stage/count stay. No 28. No dest / p_tele.
-// Snake charm is LATER. No && / ||.
+// no pre-tree here. First tree verbatim: "Good day, Hag." / "Blockhead" /
+// "remove someone" / 'Traitorous Ali', please -> pickled aubergines ->
+// "bring me some snake venom" through "...that snake charmer's pet worm,
+// it's about as dangerous as a rubber knife." First tree ends with
+// %feud_var_witchbothered = 1 (CANDIDATE — picked over %feud_hag_list).
+// Re-talk when witchbothered >= 1 and no basket_with_snake held (dump
+// §15.4): "Have you got a snake yet?" / "No, I'm still working on that." /
+// "Well don't bother me again until you do!" (with the snake held, the
+// §15.5 "I have the snake..." tree is LATER). Stage/count stay. No 28. No
+// dest / p_tele. Snake charm is LATER. No && / ||.
 // Cite feud-config-unit-first-377.md · osrs-wiki-changes-crawl-377.md.
 
 [opnpc1,feud_hag]
 if (%feud_found_trait < 1) { return; }
+if (%feud_var_witchbothered >= 1 & inv_total(inv, basket_with_snake) < 1) {
+    @feud_hag_no_snake;
+}
 ~chatplayer("<p,neutral>Good day, Hag.");
 ~chatnpc("<p,neutral>Good day to you too, Blockhead.");
 ~chatnpc("<p,neutral>Now what do you want? A hex? A spot potion? Power, beauty, eternal youth, etcetera?");
@@ -29,4 +37,13 @@ if (%feud_found_trait < 1) { return; }
 ~chatnpc("<p,neutral>From a snake perhaps?");
 ~chatplayer("<p,neutral>What I meant was how do I extract the poison from the snake?");
 ~chatnpc("<p,neutral>Sheesh! You'd make a terrible hag. Just bring me a snake with teeth in its head - and don't even think of giving me that snake charmer's pet worm, it's about as dangerous as a rubber knife.");
+%feud_var_witchbothered = 1; // CANDIDATE — first talk done; opens the §15.4 re-talk
+return;
+
+[label,feud_hag_no_snake]
+~chatplayer("<p,neutral>Good day, Hag.");
+~chatnpc("<p,neutral>Good day to you too, Blockhead.");
+~chatnpc("<p,neutral>Have you got a snake yet?");
+~chatplayer("<p,neutral>No, I'm still working on that.");
+~chatnpc("<p,neutral>Well don't bother me again until you do!");
 return;
