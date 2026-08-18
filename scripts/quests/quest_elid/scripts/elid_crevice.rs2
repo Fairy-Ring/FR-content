@@ -1,0 +1,13 @@
+// Spirits of the Elid — crevice dest pair (surface <-> genie floor).
+// CANDIDATE dest-side (research elid-dest-from-maps-377.md §2): Climb-down
+// elid_crevice_clickzone 10416 (name Crevice) -> 3373,9304 L0
+// (0_52_145_45_24); Climb elid_climbing_rope 10434 (name Rope) -> 3372,2904
+// L0 (0_52_45_44_24). Packed ops. No consume, no mes (dump silent). Stay
+// %elidquest. No dest onto locs / genie 3022 tile / fountain.
+// Cite elid-dest-from-maps-377.md · pack/loc.pack 10416 / 10434.
+
+[oploc1,elid_crevice_clickzone]
+p_telejump(0_52_145_45_24); // CANDIDATE dest-side 3373,9304 L0
+
+[oploc1,elid_climbing_rope]
+p_telejump(0_52_45_44_24); // CANDIDATE dest-side 3372,2904 L0

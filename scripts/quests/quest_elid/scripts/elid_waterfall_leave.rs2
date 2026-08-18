@@ -1,0 +1,9 @@
+// Spirits of the Elid — waterfall cave Leave dest (cave -> surface).
+// CANDIDATE dest-side (research elid-dest-from-maps-377.md §1): 3369,3131 L0
+// = 0_52_48_41_59, surface next-to root 6382. Packed op1=Leave on
+// elid_underground_exit 10417 (name Cave exit). No consume, no mes (dump
+// silent). Stay %elidquest. No dest onto root loc / wiki pin.
+// Cite elid-dest-from-maps-377.md · pack/loc.pack 10417.
+
+[oploc1,elid_underground_exit]
+p_telejump(0_52_48_41_59); // CANDIDATE dest-side 3369,3131 L0
