@@ -1,0 +1,27 @@
+// The Feud — Cactus Hide-behind (stake-out). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Hiding behind the Cactus,
+// dump §11.2). Loc feud_cactus_row 6277 @ 3363,2967 L0, op1=Hide-behind.
+// Dump: not wearing leather gloves -> "I need something to cover my hands
+// before I stake out the house. I might leave fingerprints."; not wearing
+// the desert disguise -> "I need something to disguise my head before I
+// stake out the house. Somebody might spot me."; otherwise player "I better
+// be careful, this cactus is prickly!" + mes "The coast is clear, nobody's
+// home." Dump lines only — stage/count stay, no mayor invis / safe write
+// (later hops), no 28, no dest / p_tele. No && / ||.
+// Cite feud-config-unit-first-377.md §3 · first-slice loc stands ·
+// osrs-wiki-changes-crawl-377.md.
+
+[oploc1,feud_cactus_row]
+if (inv_total(worn, leather_gloves) < 1) {
+    mes("I need something to cover my hands before I stake out the house.");
+    mes("I might leave fingerprints.");
+    return;
+}
+if (inv_total(worn, feud_desert_disguise) < 1) {
+    mes("I need something to disguise my head before I stake out the house.");
+    mes("Somebody might spot me.");
+    return;
+}
+~chatplayer("<p,neutral>I better be careful, this cactus is prickly!");
+mes("The coast is clear, nobody's home.");
+return;
