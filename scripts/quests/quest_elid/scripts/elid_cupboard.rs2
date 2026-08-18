@@ -1,0 +1,30 @@
+// Spirits of the Elid — shrine north-western cupboard Open + Search. New file.
+// CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Searching the
+// north-western cupboard, dump §1.4). Loc elid_cupboard_closed 10382 @
+// 3420,2927 L0 (m53_45 0 28 47, name Cupboard, forceapproach=south,
+// op1=Open) -> loc_change elid_cupboard_open, duration 300 (cupboards.rs2
+// pattern). Search (op2) elid_cupboard_open: tbox torn robe top
+// (elid_robetop_torn 6788) + torn bottoms (elid_robebottoms_torn 6789) via
+// ~objbox (dump tbox). Already-has: give the missing piece; both held ->
+// empty mes (CANDIDATE — dump silent). Stay %elidquest 1. No dest. No sewn
+// robes (elid_robetop / elid_robebottoms) this hop. No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+
+[oploc1,elid_cupboard_closed]
+loc_change(elid_cupboard_open, 300);
+return;
+
+[oploc2,elid_cupboard_open]
+if (inv_total(inv, elid_robetop_torn) >= 1 & inv_total(inv, elid_robebottoms_torn) >= 1) {
+    mes("The cupboard is empty."); // CANDIDATE — dump silent on already-has
+    return;
+}
+if (inv_total(inv, elid_robetop_torn) < 1) {
+    ~objbox(elid_robetop_torn, "You find a torn robe top.", 250, 0, divide(^objbox_height, 2));
+    inv_add(inv, elid_robetop_torn, 1);
+}
+if (inv_total(inv, elid_robebottoms_torn) < 1) {
+    ~objbox(elid_robebottoms_torn, "You find some torn robe bottoms.", 250, 0, divide(^objbox_height, 2));
+    inv_add(inv, elid_robebottoms_torn, 1);
+}
+return;
