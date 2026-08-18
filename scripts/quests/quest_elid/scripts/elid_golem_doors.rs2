@@ -1,0 +1,61 @@
+// Spirits of the Elid — golem doors (white / black / grey).
+// Official day 5 Dec 2005. CANDIDATE 2007-base (research
+// elid-golem-doors-leftover-377.md — 0 dump lines; wiki walk only). Doors
+// 10420 @ 3365,9542 · 10419 @ 3372,9556 · 10421 @ 3374,9547 (name Door,
+// op1=Open, walkable on loc). Bit 0 (elid_whitegolem 12 / _blackgolem 11 /
+// _greygolem 13, basevar elid_main): spawn matching golem at the door
+// (elid_golem_white 3027 / _black 3026 / _grey 3028, 0 jm2 pins) +
+// npc_setmode(opplayer2). Bit 1: dest room side (CANDIDATE):
+// white 0_52_149_37_5 3365,9541 L0 · black 0_52_149_45_20 3373,9556 L0 ·
+// grey 0_52_149_47_11 3375,9547 L0. Death writer same commit: ai_queue3 ->
+// gosub(npc_death) + p_finduid(%npc_aggressive_player)-guarded bit write
+// (npc_findhero alone does not arm the player pointer for a varbit write —
+// Feud fix). Stay %elidquest 1. No robe door retouch. No channel leftover.
+// No style % invent. No && / ||.
+// Cite elid-golem-doors-leftover-377.md · elid-dest-from-maps-377.md ·
+// _unpack/377/all.varbit.
+
+[oploc1,elid_whitegolem_door]
+if (%elid_whitegolem < 1) {
+    npc_add(loc_coord, elid_golem_white, 500); // CANDIDATE duration — arena uses 500
+    npc_setmode(opplayer2);
+    return;
+}
+p_telejump(0_52_149_37_5); // CANDIDATE room dest 3365,9541 L0
+
+[oploc1,elid_blackgolem_door]
+if (%elid_blackgolem < 1) {
+    npc_add(loc_coord, elid_golem_black, 500); // CANDIDATE duration — arena uses 500
+    npc_setmode(opplayer2);
+    return;
+}
+p_telejump(0_52_149_45_20); // CANDIDATE room dest 3373,9556 L0
+
+[oploc1,elid_greygolem_door]
+if (%elid_greygolem < 1) {
+    npc_add(loc_coord, elid_golem_grey, 500); // CANDIDATE duration — arena uses 500
+    npc_setmode(opplayer2);
+    return;
+}
+p_telejump(0_52_149_47_11); // CANDIDATE room dest 3375,9547 L0
+
+[ai_queue3,elid_golem_white]
+gosub(npc_death);
+if (p_finduid(%npc_aggressive_player) = true) {
+    %elid_whitegolem = 1;
+}
+return;
+
+[ai_queue3,elid_golem_black]
+gosub(npc_death);
+if (p_finduid(%npc_aggressive_player) = true) {
+    %elid_blackgolem = 1;
+}
+return;
+
+[ai_queue3,elid_golem_grey]
+gosub(npc_death);
+if (p_finduid(%npc_aggressive_player) = true) {
+    %elid_greygolem = 1;
+}
+return;
