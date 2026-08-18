@@ -8,15 +8,18 @@
 // the 2nd pick works ONLY while the street urchin is distracting a villager
 // (%feud_distracted = 1, count 1->2, then distracted clears — CANDIDATE);
 // any other pick at count >= 1 is refused (dump *I know your tricks, thief.*
-// / *You won't get my purse.* + 2 hit; stun skipped — no opcode). Count 3
-// is the oak-blackjack lure+KO hop — never write 3 here.
+// / *You won't get my purse.* + 2 hit; stun skipped — no opcode). The 3rd
+// pick works ONLY after the oak KO (count = 2 & %feud_npc_multi = 2, count
+// 2->3). The refuse branch also stages the villager vis flips (CANDIDATE —
+// engine rejects op4/op5 at lower vis): count >= 2 with the oak held ->
+// %feud_npc_multi 0->1 (Lure) then 1->2 (KO) on repeated refusals.
 // Count = %feud_talk_villager (pack varbit 343, bits 16-17 of main_feud_var,
 // 0-3) — research doc §5.1 "Pickpocket count CANDIDATE 0-3". No dest /
 // p_tele / 28 / blackjack. %feud_var stays 1. No && / ||.
 // First-pick loot CANDIDATE (OSRS Villager table; dump silent on the amount):
 // 5 coins + 80 thieving XP. Script-only — pickpocket.dbrow has no
 // feud_villager_* row, so the skill proc is not callable without a dbrow.
-// Cite feud-operator-blackjack-377.md §5.1 §7.4 · osrs-wiki-changes-crawl-377.md.
+// Cite feud-operator-blackjack-377.md §5.1 §7.4 §7.5 · osrs-wiki-changes-crawl-377.md.
 
 [opnpc3,feud_villager_1_1]
 if (%feud_var < 1) { return; }
@@ -73,12 +76,19 @@ if (%feud_var_comp_gangs ! 3) { return; }
 @feud_villager_pick;
 
 [label,feud_villager_pick]
+if (%feud_talk_villager = 2 & %feud_npc_multi = 2) {
+    mes("You pick the villager's pocket.");
+    inv_add(inv, coins, 5); // CANDIDATE loot — OSRS Villager table (no dbrow skill proc)
+    stat_advance(thieving, 80); // CANDIDATE xp — OSRS Villager table (man row 80 = 8.0)
+    %feud_talk_villager = 3;
+    return;
+}
 if (%feud_talk_villager = 1 & %feud_distracted = 1) {
     mes("You pick the villager's pocket.");
     inv_add(inv, coins, 5); // CANDIDATE loot — OSRS Villager table (no dbrow skill proc)
     stat_advance(thieving, 80); // CANDIDATE xp — OSRS Villager table (man row 80 = 8.0)
     %feud_talk_villager = 2;
-    %feud_distracted = 0; // CANDIDATE — third pick must refuse until the blackjack hop
+    %feud_distracted = 0; // CANDIDATE — 3rd pick needs the oak KO vis (count = 2 & npc_multi = 2)
     return;
 }
 if (%feud_talk_villager >= 1) {
