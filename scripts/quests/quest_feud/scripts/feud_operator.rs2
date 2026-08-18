@@ -28,16 +28,26 @@
 // still working, the deed-wait tree (dump §15.1 Planning a murder / Talking
 // to Ali the Operator: "Is the deed done?" -> "I'm still working on it." ->
 // "Well don't waste time talking to me. Get on with it."; gate
-// %feud_found_trait 1 CANDIDATE).
+// %feud_found_trait 1 CANDIDATE), and (i) after the Menaphite Leader is
+// gone, the ruin tree (dump §19.6 Celebrating your victory / Talking to Ali
+// the Operator: "Why did you have to go and ruin everything? We had a
+// beautiful future ahead of us, the town would have been ours!" ->
+// ~p_choice3 -> "Maybe I wanted to make it MY town!" / "Evil megalomaniacs
+// set on destruction should be opposed." / "I'm sorry, I didn't mean to
+// upset you. Can we still be friends?" -> each close verbatim then return;
+// gate %feud_var_menaboss 1 CANDIDATE, dispatched FIRST after the gates,
+// before jewels/deed/traitor).
 // CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
 // another pocket / Pickpocketing part three / Welcome to the Menaphites /
-// Now you've stolen the jewels / Talking to Ali the Operator again minus the
-// 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
-// %feud_var_comp_gangs = 3 else return. Jewels tree when the player holds
-// feud_mayors_jewels; deed report when %feud_var_drink_found >= 1; deed-wait
-// when %feud_found_trait >= 1; traitor report when %feud_given_jewels >= 1;
-// report when %feud_talk_villager >= 3; oak when >= 2; progress when >= 1;
-// else the join tree.
+// Now you've stolen the jewels / Talking to Ali the Operator again /
+// Celebrating your victory minus the 27 Apr 2022 lore pass). Gate:
+// %feud_var >= 1 AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 else
+// return. Ruin when %feud_var_menaboss >= 1 (dispatched first). Jewels tree
+// when the player holds feud_mayors_jewels; deed report when
+// %feud_var_drink_found >= 1; deed-wait when %feud_found_trait >= 1;
+// traitor report when %feud_given_jewels >= 1; report when
+// %feud_talk_villager >= 3; oak when >= 2; progress when >= 1; else the
+// join tree.
 // No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (report
 // keeps count 3), no 28 (28 = blackjack seller vis, not complete). No
 // %feud_npc_multi (lure/KO vis already shipped in the pickpocket file). No
@@ -48,6 +58,9 @@
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var_menaboss >= 1) {
+    @feud_operator_ruin;
+}
 if (inv_total(inv, feud_mayors_jewels) >= 1) {
     @feud_operator_jewels;
 }
@@ -222,4 +235,23 @@ return;
 ~chatnpc("<p,quiz>Is the deed done?");
 ~chatplayer("<p,neutral>I'm still working on it.");
 ~chatnpc("<p,neutral>Well don't waste time talking to me. Get on with it.");
+return;
+
+[label,feud_operator_ruin]
+~chatnpc("<p,neutral>Why did you have to go and ruin everything? We had a beautiful future ahead of us, the town would have been ours!");
+def_int $r = ~p_choice3("Maybe I wanted to make it MY town!", 1, "Evil megalomaniacs set on destruction should be opposed.", 2, "I'm sorry, I didn't mean to upset you. Can we still be friends?", 3);
+if ($r = 1) {
+    ~chatplayer("<p,neutral>Maybe I wanted to make it MY town!");
+    ~chatnpc("<p,neutral>I see. I knew the hunger for power would get to you eventually.");
+    return;
+}
+if ($r = 2) {
+    ~chatplayer("<p,neutral>Evil megalomaniacs set on destruction should be opposed.");
+    ~chatnpc("<p,neutral>Really? I thought you were meant to follow those types blindly, with unquestioning loyalty.");
+    ~chatplayer("<p,neutral>Look, Gielinor is full of power mad evil-doers. I'm sure another will come along soon enough.");
+    ~chatnpc("<p,neutral>No... it just wouldn't be the same. I think I'll just wallow in self pity for a while.");
+    return;
+}
+~chatplayer("<p,neutral>I'm sorry, I didn't mean to upset you. Can we still be friends?");
+~chatnpc("<p,neutral>No, I think I'll just wallow in self pity for a while.");
 return;
