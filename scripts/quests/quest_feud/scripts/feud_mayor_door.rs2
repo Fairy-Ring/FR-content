@@ -1,0 +1,33 @@
+// The Feud — Mayor-house door keys Use. New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Using the keys on the
+// Mayor's house door, dump §12.2). Use feud_mayors_house_keys (4589, *Keys*)
+// on the closed mayor-house doors (feud_closed_door_left 6238 / _right 6240,
+// both named Door, op1=Open) -> mes *You hear a satisfying click as the door
+// unlocks.* + %feud_var_mayorsdoor 0->1 (CANDIDATE) + loc_change to the
+// matching open face (feud_open_door_left 6239 / _right 6241, CANDIDATE
+// duration 500 — door stays open for the villa). Keys stay. Wrong item ->
+// ~displaymessage(^dm_default). Snapshot last_useitem before nested calls.
+// Stage/count stay. No 28. No dest / p_tele. No [oploc1] Open this hop
+// (dump is Use keys). No Search / safe / jewels (later hops). No && / ||.
+// Cite feud-config-unit-first-377.md §5 · first-slice loc stands ·
+// osrs-wiki-changes-crawl-377.md.
+
+[oplocu,feud_closed_door_left]
+def_obj $used = last_useitem;
+if ($used = feud_mayors_house_keys) {
+    mes("You hear a satisfying click as the door unlocks.");
+    %feud_var_mayorsdoor = 1;
+    loc_change(feud_open_door_left, 500); // CANDIDATE duration
+    return;
+}
+~displaymessage(^dm_default);
+
+[oplocu,feud_closed_door_right]
+def_obj $used = last_useitem;
+if ($used = feud_mayors_house_keys) {
+    mes("You hear a satisfying click as the door unlocks.");
+    %feud_var_mayorsdoor = 1;
+    loc_change(feud_open_door_right, 500); // CANDIDATE duration
+    return;
+}
+~displaymessage(^dm_default);
