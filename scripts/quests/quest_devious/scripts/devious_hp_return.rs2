@@ -1,0 +1,18 @@
+// Devious Minds — High Priest after dead monk (Returning).
+// Official day 19 Dec 2005. CANDIDATE 2007-base (OSRS Transcript:Devious
+// Minds § Returning to the High Priest of Entrana, local dump spine-2;
+// linear, 0 opts). Dispatch from high_priest_of_entrana.rs2
+// [opnpc1,high_priest_of_entrana] when %devious_monk = 1 (monk bit FIRST,
+// before the altar Surprise). Chat only, verbatim. Stay %devious_main 1 +
+// altar 1 + monk 1. No dest, no Tiffy splice, no %devious_monk write.
+// No && / ||.
+// Cite devious-hp-return-leftover-377.md · Transcript:Devious Minds.
+
+[label,devious_high_priest_return]
+~chatnpc("<p,neutral>Many greetings. Welcome to our fair island.");
+~chatnpc("<p,neutral>Have you found our relic yet?");
+~chatplayer("<p,neutral>Not yet, I went back to where that monk was but all I found was a dead body.");
+~chatnpc("<p,shock>What?");
+~chatplayer("<p,neutral>Yeah it looked like he'd been killed by magic, I'm not sure it was the same person either...");
+~chatnpc("<p,neutral>This is not good, that relic was part of an ancient artefact which was said to have awesome power. You must report to Sir Tiffy in Falador, he must be informed.");
+return;

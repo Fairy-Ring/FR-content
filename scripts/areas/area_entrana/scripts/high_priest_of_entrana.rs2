@@ -1,4 +1,8 @@
 [opnpc1,high_priest_of_entrana]
+if (%devious_monk >= 1) {
+    @devious_high_priest_return; // Devious Minds after dead monk (quest_devious) — monk bit first
+    return;
+}
 if (%devious_altar >= 1) {
     @devious_high_priest_surprise; // Devious Minds after altar (quest_devious)
     return;
