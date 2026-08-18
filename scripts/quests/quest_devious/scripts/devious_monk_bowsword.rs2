@@ -11,6 +11,8 @@
 
 [label,devious_monk_bowsword]
 ~chatnpc("<p,neutral>Have you brought the weapon for me?");
+@devious_monk_bowsword_menu; // labels do not fall through
+
 [label,devious_monk_bowsword_menu]
 def_int $b = ~p_choice3("Yep, got it right here for you.", 1, "Can you teach me how to use it?", 2, "Not yet, sorry.", 3);
 if ($b = 1) {
