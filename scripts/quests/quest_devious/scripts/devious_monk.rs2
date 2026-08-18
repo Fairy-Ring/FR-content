@@ -6,6 +6,10 @@
 // Cite red-19-start-impl-377.md §13.
 
 [opnpc1,devious_monk_hooded_visable]
+if (inv_total(inv, devious_bowsword) >= 1) {
+    @devious_monk_bowsword; // bow-sword handover (devious_monk_bowsword.rs2)
+    return;
+}
 ~chatnpc("<p,neutral>Good day to you, adventurer.");
 ~chatplayer("<p,neutral>And to you. What brings you all the way out here?");
 ~chatnpc("<p,neutral>I am on my return journey from the dark lands of Morytania.");

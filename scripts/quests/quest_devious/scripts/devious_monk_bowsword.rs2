@@ -1,0 +1,41 @@
+// Devious Minds — hooded Monk bow-sword handover (talk + inv trade).
+// Official day 19 Dec 2005. CANDIDATE 2007-base (OSRS Transcript:Devious
+// Minds § Bringing the Monk the Bow-sword, local dump spine-2; Colossal
+// pouch sentence SUBTRACT — post-377 / GotR). Dispatch from devious_monk.rs2
+// [opnpc1,devious_monk_hooded_visable] when inv devious_bowsword 6818 >= 1.
+// Dump tree verbatim: greeting + 3 opts (yes / teach / not-yet);
+// teach-child Not yet = dump tmissing -> CANDIDATE main-menu loop. Yes:
+// consume 6818 + devious_glowingorb 6821 (name Orb). Stay %devious_main 1.
+// No dest. No %devious_monk. No && / ||.
+// Cite devious-monk-bowsword-leftover-377.md · Transcript:Devious Minds.
+
+[label,devious_monk_bowsword]
+~chatnpc("<p,neutral>Have you brought the weapon for me?");
+[label,devious_monk_bowsword_menu]
+def_int $b = ~p_choice3("Yep, got it right here for you.", 1, "Can you teach me how to use it?", 2, "Not yet, sorry.", 3);
+if ($b = 1) {
+    @devious_monk_bowsword_yes;
+}
+if ($b = 2) {
+    ~chatplayer("<p,neutral>Can you teach me how to use it?");
+    ~chatnpc("<p,neutral>It's a foreign design, maybe later one of our warriors will show you how it's used. Speaking of which, may I have it please?");
+    def_int $bt = ~p_choice2("Yep, got it right here for you.", 1, "Not yet, sorry.", 2);
+    if ($bt = 1) {
+        @devious_monk_bowsword_yes;
+    }
+    @devious_monk_bowsword_menu; // teach-child Not yet = dump tmissing CANDIDATE
+}
+@devious_monk_bowsword_menu; // top-level Not yet, sorry. = tact above
+
+[label,devious_monk_bowsword_yes]
+~chatplayer("<p,neutral>Yep, got it right here for you.");
+~chatnpc("<p,neutral>Ah excellent, this won't be forgotten. You've been a great help, though I wonder if you could do me one final favour.");
+~chatplayer("<p,neutral>Wait... this sounds familiar...");
+~chatnpc("<p,neutral>What are you talking about? I just need you to make a delivery to Entrana for me. There's a special ceremony, which unfortunately I can't attend, and I wanted to give them a gift to mark the occasion.");
+~chatplayer("<p,neutral>Ok, let's do this then, pass me the present.");
+~chatnpc("<p,neutral>Not so fast, it's supposed to be a surprise so you'll need to sneak it onto the island. I hear there's some kind of 'other realm' or some such which you've got access to...");
+~chatplayer("<p,neutral>You mean the Abyss?");
+~chatnpc("<p,neutral>Yes that's the one. Now take this orb and put it in one of the large pouches from there, don't want it getting damaged.");
+inv_del(inv, devious_bowsword, 1);
+inv_add(inv, devious_glowingorb, 1);
+return;
