@@ -17,9 +17,12 @@
 // our quest to defeat the thralls of Tumeken and reclaim our birthright?"
 // -> "Sorry, I have this irrational hatred for megalomaniac, despotic
 // zealots! Prepare to meet your maker, you big jerk!" -> "Fool! You'll
-// never get to me. Guards protect me." then return. No stage write — no
-// 28. Do not npc_add Tough Guy 1906, do not npc_setmode, no dest / p_tele.
-// Fight / teleport away is later.
+// never get to me. Guards protect me." then spawn the Tough Guy fight:
+// npc_add(npc_coord, feud_menap_toughguy 1906, 500 CANDIDATE duration) +
+// npc_setmode(opplayer2). No stage write — no 28. Death [ai_queue3,feud_menap_toughguy]
+// dumps §18.5 verbatim (Leader threat + Ali's-nephew retort + villagers-reward hope)
+// then %feud_boss_vis = 0 (Leader gone — dump teleport, not dest / p_tele) and
+// %feud_var_menaboss = 1 (CANDIDATE leftover flag).
 // Cite copy-agent-opener-377.md · feud-config-unit-first-377.md ·
 // feud-varbit-map-377.md.
 
@@ -39,4 +42,17 @@ if (%feud_var_drink_found < 1) { return; }
 ~chatnpc("<p,quiz>Will you join us in our quest to defeat the thralls of Tumeken and reclaim our birthright?");
 ~chatplayer("<p,angry>Sorry, I have this irrational hatred for megalomaniac, despotic zealots! Prepare to meet your maker, you big jerk!");
 ~chatnpc("<p,angry>Fool! You'll never get to me. Guards protect me.");
+npc_add(npc_coord, feud_menap_toughguy, 500); // CANDIDATE duration — arena uses 500
+npc_setmode(opplayer2);
+return;
+
+[ai_queue3,feud_menap_toughguy]
+gosub(npc_death);
+if (p_finduid(%npc_aggressive_player) = true) {
+    ~chatnpc_specific("Menaphite Leader", feud_menap_boss_vis, "<p,angry>You haven't seen the last of me!");
+    ~chatplayer("<p,neutral>No doubt I haven't seen the last of you... but what about Ali's nephew?");
+    ~chatplayer("<p,neutral>Maybe the villagers will feel more talkative now that I've rid them of these evil Menaphites. Who knows, they might even give me a reward!");
+    %feud_boss_vis = 0; // CANDIDATE — Leader gone (dump teleport). Not dest.
+    %feud_var_menaboss = 1; // CANDIDATE leftover flag
+}
 return;
