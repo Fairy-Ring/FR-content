@@ -1,0 +1,115 @@
+// Spirits of the Elid — genie Talk-to (crevice).
+// Official day 5 Dec 2005. CANDIDATE 2007-base (OSRS Transcript:Spirits of
+// the Elid § Talking to the Genie, local dump spine-next, period voice).
+// NPC elid_genie 3022 (name Genie) @ 3371,9320 L0 (m52_145 0 43 40).
+// Greeting + 4 top opts verbatim: statue (deal / not-sure sub-menu with
+// 4-option deal menu) · wish (scary sub-menu) · dark (pleasant sub-menu) ·
+// looking. Cross-jumps (statue/wish/dark) re-enter the branch labels;
+// previous = the calling sub-menu. Again-after-deal + Sole Use = later hop.
+// Chat only. Stay %elidquest 1. No dest. No lake door retouch. No fountain.
+// No && / ||.
+// Cite elid-genie-talk-leftover-377.md · Transcript:Spirits of the Elid
+// (Talking to the Genie).
+
+[opnpc1,elid_genie] @elid_genie_talk;
+
+[label,elid_genie_talk]
+~chatnpc("<p,neutral>I am a mighty and powerful genie. Why do you come here? Speak now or I'll have to think of something exceedingly nasty to do to you.");
+[label,elid_genie_menu]
+def_int $g = ~p_choice4("I'm after a statue that was thrown down here.", 1, "You're a genie, grant me a wish.", 2, "Why are you sitting here in the dark?", 3, "I'm just looking around.", 4);
+if ($g = 1) {
+    @elid_genie_statue;
+}
+if ($g = 2) {
+    @elid_genie_wish;
+}
+if ($g = 3) {
+    @elid_genie_dark;
+}
+~chatplayer("<p,neutral>I'm just looking around.");
+~chatnpc("<p,neutral>I don't know about that. I can't have just anybody traipsing in here. I have a reputation to keep you see.");
+~chatnpc("<p,neutral>Actually I'll tell you what, you can hang around here for a bit, but be sure to spread the word about what a terrifying experience you had when you ran into... The crevice genie of Nardah!");
+~chatplayer("<p,neutral>...Ok I think I can manage that.");
+return;
+
+[label,elid_genie_statue]
+~chatplayer("<p,neutral>I'm after a statue that was thrown down here.");
+~chatnpc("<p,neutral>Ahh yes someone did drop a statue on my head recently. Very nice workmanship, looks quite old and valuable too. I'm surprised someone threw it away!");
+~chatnpc("<p,neutral>I have accepted it as a gift as they clearly respect my terrible powers. They seek to keep me at bay by giving me valuables.");
+[label,elid_genie_statue_menu]
+def_int $gs = ~p_choice2("Maybe I can make a deal for it?", 1, "I'm not sure they know you're down here.", 2);
+if ($gs = 1) {
+    @elid_genie_deal;
+}
+~chatplayer("<p,neutral>I'm not sure they know you're down here.");
+~chatnpc("<p,neutral>Silence cur! They fear and respect me and that's an end to it.");
+~chatplayer("<p,neutral>Maybe I can make a deal for the statuette?");
+@elid_genie_deal;
+
+[label,elid_genie_deal]
+~chatplayer("<p,neutral>Maybe I can make a deal for the statuette?");
+~chatnpc("<p,neutral>Hmm a deal eh? I think we can come to some sort of arrangement. I'll give you the valuable statuette in return for, let me think ....");
+~chatnpc("<p,neutral>How about I give you the statue in exchange for the sole of the mayor of Nardah?");
+[label,elid_genie_deal_menu]
+def_int $gd = ~p_choice4("Isn't that a little harsh?", 1, "How am I meant to remove someone's soul?", 2, "Ok I agree to the deal.", 3, "No way am I agreeing to that.", 4);
+if ($gd = 1) {
+    ~chatplayer("<p,neutral>Isn't that a little harsh?");
+    ~chatnpc("<p,neutral>I wouldn't have said so. It seems a perfectly reasonable thing to request to me. I can think of many things a lot worse I could have asked for.");
+    @elid_genie_deal_menu;
+}
+if ($gd = 2) {
+    ~chatplayer("<p,neutral>How am I meant to remove someone's soul?");
+    ~chatnpc("<p,neutral>Oh that's easy. In my experience soles are very easy to remove with just a knife.");
+    @elid_genie_deal_menu;
+}
+if ($gd = 3) {
+    ~chatplayer("<p,neutral>Ok I agree to the deal.");
+    return;
+}
+~chatplayer("<p,neutral>No way am I agreeing to that.");
+~chatnpc("<p,neutral>Ah well it's your loss. No sole, then no statuette.");
+return;
+
+[label,elid_genie_wish]
+~chatplayer("<p,neutral>You're a genie, grant me a wish.");
+~chatnpc("<p,neutral>Not all genies are goody two shoes who go round granting wishes. It's something that my pathetic brother does to make people like him, but that's not my style.");
+~chatnpc("<p,neutral>I like to think of myself more as an evil and scary sort of genie, who people talk about in hushed and fearful tones.");
+[label,elid_genie_wish_menu]
+def_int $gw = ~p_choice4("Well you seem quite scary.", 1, "I'm after a statue that was thrown down here.", 2, "Why are you sitting here in the dark.", 3, "Well I must be off now.", 4);
+if ($gw = 1) {
+    ~chatplayer("<p,neutral>Well you seem quite scary.");
+    ~chatnpc("<p,neutral>Why thank you, I put a lot of effort into my terrifyingness.");
+    ~chatnpc("<p,neutral>Wait! Did you say quite scary? I'll have you know I am VERY scary!");
+    ~chatplayer("<p,neutral>Erm yes that's what I meant.");
+    @elid_genie_wish_menu;
+}
+if ($gw = 2) {
+    @elid_genie_statue;
+}
+if ($gw = 3) {
+    @elid_genie_dark;
+}
+~chatplayer("<p,neutral>Well I must be off now.");
+~chatnpc("<p,neutral>Yes, run. Ruuuun in fear of.. The crevice genie of Nardah! Muhahaha!");
+return;
+
+[label,elid_genie_dark]
+~chatplayer("<p,neutral>Why are you sitting here in the dark?");
+~chatnpc("<p,neutral>Two reasons really. Firstly, I can see in the dark, so light or dark makes little difference to me.");
+~chatnpc("<p,neutral>Lastly, I gather it's normal for powerful terrifying creatures to lurk around in dark caves, so I found this one to lurk in myself, nice isn't it?");
+[label,elid_genie_dark_menu]
+def_int $gd2 = ~p_choice4("Very pleasant, the snakes are a nice touch.", 1, "I'm after a statue that was thrown down here.", 2, "You're a genie, grant me a wish.", 3, "Well I must be off now.", 4);
+if ($gd2 = 1) {
+    ~chatplayer("<p,neutral>Very pleasant, the snakes are a nice touch.");
+    ~chatnpc("<p,neutral>Why do I get the sense that I'm not being taken seriously here? Please try to remember I am very dangerous and not to be trifled with.");
+    @elid_genie_dark_menu;
+}
+if ($gd2 = 2) {
+    @elid_genie_statue;
+}
+if ($gd2 = 3) {
+    @elid_genie_wish;
+}
+~chatplayer("<p,neutral>Well I must be off now.");
+~chatnpc("<p,neutral>Yes, run. Ruuuun in fear of.. The crevice genie of Nardah! Muhahaha!");
+return;
