@@ -1,0 +1,14 @@
+// The Feud — Mayor's Landscape picture Search (dump mes only). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Searching the Mayor's
+// Landscape, dump §12.6 first line only). Loc feud_mayors_picture 6276 @
+// 3374,2974 L1, name Landscape, op1=Search. Mes (split <80):
+// "On the wall hangs a rather nondescript picture." /
+// "On closer inspection you notice that it's covering something: a safe."
+// NO safe IF / combo / jewels this hop (no leftover IF bind — later). No
+// if_open*. Stage/count stay. No 28. No dest / p_tele. No && / ||.
+// Cite feud-config-unit-first-377.md §5 · osrs-wiki-changes-crawl-377.md.
+
+[oploc1,feud_mayors_picture]
+mes("On the wall hangs a rather nondescript picture.");
+mes("On closer inspection you notice that it's covering something: a safe.");
+return;
