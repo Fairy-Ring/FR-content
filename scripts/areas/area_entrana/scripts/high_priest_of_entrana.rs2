@@ -1,4 +1,8 @@
 [opnpc1,high_priest_of_entrana]
+if (%devious_altar >= 1) {
+    @devious_high_priest_surprise; // Devious Minds after altar (quest_devious)
+    return;
+}
 ~chatnpc("<p,happy>Many greetings. Welcome to our fair island.");
 if(%grail < ^grail_finding_percival & %grail >= ^grail_spoken_merlin) {
     ~chatplayer("<p,neutral>Hello, I am in search of the Holy Grail.");

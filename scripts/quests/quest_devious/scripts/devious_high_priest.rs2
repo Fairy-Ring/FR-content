@@ -1,0 +1,18 @@
+// Devious Minds — High Priest after altar (The Surprise).
+// Official day 19 Dec 2005. CANDIDATE 2007-base (OSRS Transcript:Devious
+// Minds § The Surprise, local dump spine-2; linear, 0 opts). Dispatch from
+// high_priest_of_entrana.rs2 [opnpc1,high_priest_of_entrana] when
+// %devious_altar = 1. Chat only, verbatim. Stay %devious_main 1 + altar 1.
+// No dest, no cutscene, no altar 2, no %devious_monk, no 1->2.
+// No && / ||.
+// Cite devious-high-priest-leftover-377.md · Transcript:Devious Minds.
+
+[label,devious_high_priest_surprise]
+~chatnpc("<p,neutral>Someone just stole our relic, this is a disaster! Adventurer, you must find the fool who put that teleport beacon on the altar.");
+~chatplayer("<p,neutral>Uh... yeah, about that...");
+~chatnpc("<p,neutral>What are you trying to say?");
+~chatplayer("<p,neutral>I put it there...");
+~chatnpc("<p,neutral>Well at least you're honest about it, but where did you get it from?");
+~chatplayer("<p,neutral>It was supposed to be a gift from a monk near the river Salve.");
+~chatnpc("<p,neutral>Those orbs are volatile, they use some very old magic, no worshipper of Saradomin would dare touch one. You must return to this monk and find out more, but be wary.");
+return;
