@@ -67898,6 +67898,12 @@ op1=Talk-to
 op3=Trade
 head1=npc_3031_head
 head2=idk_man_jaw_short_head
+category=shop_keeper
+param=owned_shop,chociceshopnardah
+param=shop_sell_multiplier,1000
+param=shop_buy_multiplier,600
+param=shop_delta,10
+param=shop_title,Rok's Chocs Box.
 
 [elid_banker]
 name=Nardah Banker

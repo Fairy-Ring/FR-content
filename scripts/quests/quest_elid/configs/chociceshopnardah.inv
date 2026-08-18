@@ -1,0 +1,12 @@
+// Rokuh leftover shop — 2007-base _unpack/727/all.inv [chociceshopnardah]
+// verbatim (no 377 shop stock; pack inv id 345 already named). Shop IF prices
+// come from oc_cost via ~calc_shop_value; the 3rd stock field is the Talk-to
+// dialogue price (50 / 20, shipped in elid_rokuh.rs2).
+[chociceshopnardah]
+scope=shared
+size=40
+restock=yes
+stackall=yes
+allstock=no
+stock1=elid_choc_ice,30,50
+stock2=chocolate_bar,25,20
