@@ -1,0 +1,33 @@
+// The Feud — Bandit Leader after the Menaphites are gone (§20.2). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud §20.2 Talking to the Bandit
+// Leader; no 27 Apr 2022 BCS lines). NPC multi base feud_bandit_boss 1877
+// @ 3353,3002 L0; vis face feud_bandit_boss_vis 1878 "Bandit Leader"
+// op1=Talk-to while %feud_bandit_boss_vis 1 (OpNpcHandler resolves the
+// multi vis — bind the vis name, not the multi base). Stand 3352,3002 W of
+// the pin. Not on the NPC.
+// Gate: %feud_var_menaboss >= 1 (Tough Guy killed, §18.5 PASS feudtsy35b22 —
+// Leader gone, menaboss flag) else return. §20.2 verbatim, chat only:
+// "Come here my friend, so I may embrace you..." -> "Don't jump to
+10→// conclusions, I didn't do it for you." -> "Regardless, I am still very
+// grateful. Now I have the town at my mercy." -> "That's what I'm here to
+// talk to you about." -> "Do you want a reward? A fee? I will not begrudge
+// you that." -> "No, I'm here to give you an ultimatum..." -> "How the worm
+// has turned..." -> "Pollnivneach is mine..." -> "Start packing your bags!"
+// then return. No stage write — no 28. No champion spawn this hop
+// (feud_bandit_toughguy 1885 is the later fight). No var writes, no
+// %feud_var_banditboss (323). No dest / p_tele. No && / ||.
+// Cite copy-agent-opener-377.md · feud-varbit-map-377.md §5 §7 ·
+// Transcript:The Feud.
+
+[opnpc1,feud_bandit_boss_vis]
+if (%feud_var_menaboss < 1) { return; }
+~chatnpc("<p,neutral>Come here my friend, so I may embrace you. You have done us a great turn by disposing of those Menaphites.");
+~chatplayer("<p,neutral>Don't jump to conclusions, I didn't do it for you.");
+~chatnpc("<p,neutral>Regardless, I am still very grateful. Now I have the town at my mercy.");
+~chatplayer("<p,neutral>That's what I'm here to talk to you about.");
+~chatnpc("<p,neutral>Do you want a reward? A fee? I will not begrudge you that.");
+~chatplayer("<p,neutral>No, I'm here to give you an ultimatum: either leave the town of your own free will or I will make you.");
+~chatnpc("<p,neutral>How the worm has turned. This no-name adventurer who was robbing, looting and poisoning not too long ago is now taking the moral high ground! Or are you trying to keep the whole town for yourself?");
+~chatnpc("<p,neutral>Pollnivneach is mine. You won't run me out without a fight. If you want us gone, you must defeat our strongest warrior in battle.");
+~chatplayer("<p,neutral>Start packing your bags!");
+return;
