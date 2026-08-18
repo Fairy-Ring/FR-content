@@ -1,7 +1,8 @@
-// The Feud — Hag first talk (snake venom request) + no-snake re-talk. New file.
+// The Feud — Hag first talk (snake venom request) + no-snake re-talk +
+// snake-basket handover. New file.
 // CANDIDATE 2007-base (OSRS Transcript:The Feud § Talking to Ali the Hag /
-// Talking to Ali the Hag again, dump §15.3 + §15.4). NPC feud_hag 1871 @
-// 3346,2987 L0, display Ali the Hag.
+// Talking to Ali the Hag again / with a Snake basket full, dump §15.3 +
+// §15.4 + §15.6). NPC feud_hag 1871 @ 3346,2987 L0, display Ali the Hag.
 // Gate: %feud_found_trait >= 1 (traitor report) else return — the dump has
 // no pre-tree here. First tree verbatim: "Good day, Hag." / "Blockhead" /
 // "remove someone" / 'Traitorous Ali', please -> pickled aubergines ->
@@ -10,13 +11,19 @@
 // %feud_var_witchbothered = 1 (CANDIDATE — picked over %feud_hag_list).
 // Re-talk when witchbothered >= 1 and no basket_with_snake held (dump
 // §15.4): "Have you got a snake yet?" / "No, I'm still working on that." /
-// "Well don't bother me again until you do!" (with the snake held, the
-// §15.5 "I have the snake..." tree is LATER). Stage/count stay. No 28. No
-// dest / p_tele. Snake charm is LATER. No && / ||.
+// "Well don't bother me again until you do!" Have-snake when witchbothered
+// >= 1 and basket_with_snake 4607 held (dump §15.6): verbatim through
+// "Oops! I almost forgot!" + mes "You hand the basket with the charmed
+// snake over to the old hag." + inv_del basket_with_snake 4607. Stage/count
+// stay. No 28. No dest / p_tele. Dung / §15.7 / §15.8 are LATER. No
+// && / ||.
 // Cite feud-config-unit-first-377.md · osrs-wiki-changes-crawl-377.md.
 
 [opnpc1,feud_hag]
 if (%feud_found_trait < 1) { return; }
+if (%feud_var_witchbothered >= 1 & inv_total(inv, basket_with_snake) >= 1) {
+    @feud_hag_have_snake;
+}
 if (%feud_var_witchbothered >= 1 & inv_total(inv, basket_with_snake) < 1) {
     @feud_hag_no_snake;
 }
@@ -46,4 +53,21 @@ return;
 ~chatnpc("<p,neutral>Have you got a snake yet?");
 ~chatplayer("<p,neutral>No, I'm still working on that.");
 ~chatnpc("<p,neutral>Well don't bother me again until you do!");
+return;
+
+[label,feud_hag_have_snake]
+~chatplayer("<p,neutral>Good day, Hag.");
+~chatnpc("<p,neutral>Good day to you too, Blockhead.");
+~chatplayer("<p,neutral>I have the snake. What else do you need?");
+~chatnpc("<p,neutral>Ah yes, that snake will do nicely. Hello, you wriggly little cutie!");
+~chatnpc("<p,neutral>Who's a vindictive little beast? You are! You are!");
+~chatplayer("<p,neutral>Erm, yes. Do you need anything else?");
+~chatnpc("<p,neutral>Now that I have the toxin I need something to hide its trace. Fresh camel dung should do the job.");
+~chatplayer("<p,neutral>What? That's disgusting.");
+~chatnpc("<p,neutral>Do you want the poison or not?");
+~chatplayer("<p,neutral>Fine, fine, I'll get some camel dung.");
+~chatnpc("<p,neutral>And make that fresh camel dung! Nice and stinky. Now hand over that venomous little darling before it takes a bite out of you.");
+~chatplayer("<p,neutral>Oops! I almost forgot!");
+mes("You hand the basket with the charmed snake over to the old hag.");
+inv_del(inv, basket_with_snake, 1);
 return;
