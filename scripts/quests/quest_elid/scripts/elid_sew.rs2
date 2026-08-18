@@ -1,0 +1,44 @@
+// Spirits of the Elid — torn-robe sew (needle + thread). New file.
+// CANDIDATE 2007-base — the dump has NO sew lines (cupboard § only); the
+// walkthrough says Use the needle on the torn robes. Use needle 1733 on
+// elid_robetop_torn 6788 -> elid_robetop 6786; on elid_robebottoms_torn
+// 6789 -> elid_robebottoms 6787. Need thread 1734 in inv (1 per piece
+// CANDIDATE — the quest uses 1-2 thread; NOT the leather %thread_used
+// 5-reel). No thread -> leather-style ~objbox(thread, ...) CANDIDATE.
+// Player anim leftover seq elid_robetop_crafting / elid_robebottoms_crafting.
+// CANDIDATE mes "You sew the torn robe." (dump silent; no Crafting-level
+// invent). Stay %elidquest 1. No dest. No waterfall / key / Wear hop.
+// Costume needle SUBTRACT. No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Spirits of the Elid walk.
+
+[opheldu,elid_robetop_torn]
+def_obj $used = last_useitem;
+if ($used = needle) {
+    if (inv_total(inv, thread) < 1) {
+        ~objbox(thread, "You need some thread to sew the torn robes.", 250, 0, divide(^objbox_height, 2));
+        return;
+    }
+    inv_del(inv, elid_robetop_torn, 1);
+    inv_del(inv, thread, 1);
+    inv_add(inv, elid_robetop, 1);
+    anim(elid_robetop_crafting, 0);
+    mes("You sew the torn robe."); // CANDIDATE — dump silent on the sew
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,elid_robebottoms_torn]
+def_obj $used = last_useitem;
+if ($used = needle) {
+    if (inv_total(inv, thread) < 1) {
+        ~objbox(thread, "You need some thread to sew the torn robes.", 250, 0, divide(^objbox_height, 2));
+        return;
+    }
+    inv_del(inv, elid_robebottoms_torn, 1);
+    inv_del(inv, thread, 1);
+    inv_add(inv, elid_robebottoms, 1);
+    anim(elid_robebottoms_crafting, 0);
+    mes("You sew the torn robe."); // CANDIDATE — dump silent on the sew
+    return;
+}
+~displaymessage(^dm_default);
