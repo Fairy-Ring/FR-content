@@ -1,0 +1,29 @@
+// Spirits of the Elid — Habibah/Meskhenet/Zahra curse Talk-to. New file.
+// CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Habibah,
+// Meskhenet, and Zahra, dump §2.6). Three NPCs, one shared label:
+// elid_villager4 Habibah 3034 @ 3410,2929 L1 (m53_45 1 18 49) ·
+// elid_villager5 Meskhenet 3035 @ 3427,2900 L0 (0 35 20) ·
+// elid_villager6 Zahra 3036 @ 3448,2898 L0 (0 56 18). All wander.
+// Shared linear dump verbatim: "Hi, I am trying to find the cause of the
+// curse on your town." / "Ah I see. Awusah has enlisted your help?" / "Yes
+// he has." / "Well, I really don't know why it might have happened. Maybe
+// Ghaslor has some ideas. He's very wise and old and is the town's
+// archivist. He lives in the northeast corner of town." The after-Nirrie /
+// Hallak statuette tree is LATER. Stay %elidquest 1. No dest. No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+
+[opnpc1,elid_villager4]
+@elid_women_talk;
+
+[opnpc1,elid_villager5]
+@elid_women_talk;
+
+[opnpc1,elid_villager6]
+@elid_women_talk;
+
+[label,elid_women_talk]
+~chatplayer("<p,neutral>Hi, I am trying to find the cause of the curse on your town.");
+~chatnpc("<p,neutral>Ah I see. Awusah has enlisted your help?");
+~chatplayer("<p,neutral>Yes he has.");
+~chatnpc("<p,neutral>Well, I really don't know why it might have happened. Maybe Ghaslor has some ideas. He's very wise and old and is the town's archivist. He lives in the northeast corner of town.");
+return;
