@@ -1,0 +1,29 @@
+// The Feud — Desert disguise combine (Use Karidian headpiece + Fake beard).
+// New file. Dump has NO combine dialogue (silent item Use — the walk says to
+// make a disguise for the mayor-villa stake-out). opheldu binds BOTH
+// directions (Use headpiece on beard and Use beard on headpiece) — snapshot
+// last_useitem before any nested call (kept for the pattern). Consume both
+// parts + inv_add feud_desert_disguise (4611, iop2=Wear). Ungated — the
+// parts are quest-context only. Stage/count stay. No 28. No dest / p_tele.
+// Do NOT invent the parts' obtain (smoke soft give = toy). No shop IF.
+// No && / ||.
+// Cite feud-config-unit-first-377.md §3 · first-slice objs ·
+// osrs-wiki-changes-crawl-377.md.
+
+[opheldu,feud_karidian_fakebeard]
+def_obj $used = last_useitem;
+if ($used = feud_karidian_turban) {
+    @feud_make_disguise;
+}
+
+[opheldu,feud_karidian_turban]
+def_obj $used = last_useitem;
+if ($used = feud_karidian_fakebeard) {
+    @feud_make_disguise;
+}
+
+[label,feud_make_disguise]
+inv_del(inv, feud_karidian_turban, 1);
+inv_del(inv, feud_karidian_fakebeard, 1);
+inv_add(inv, feud_desert_disguise, 1);
+return;
