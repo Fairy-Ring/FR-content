@@ -1,0 +1,48 @@
+// Spirits of the Elid — water channels (thieving / mining / ranged).
+// Official day 5 Dec 2005. CANDIDATE 2007-base (research
+// elid-water-channels-leftover-377.md — 0 dump lines; wiki walk only).
+// Clear elid_water_channel_spiketrap 10407 (op1=Clear) ->
+// %elid_thievingchannel 15 = 1. Clear elid_water_channel_blocked_rocks
+// 10405 (op1=Clear) -> %elid_miningchannel 14 = 1. Shoot elid_ranging_target
+// _multinpc 3049 (world pin, multivar=elid_rangingchannel, vis face 3047
+// name Target, op2=Shoot) — opnpc2 + apnpc2 pair on both -> @elid_ranging_shoot
+// (combat AP eats Shoot) — fires the leftover (UPass / ranging-guild shape):
+// worn rhand bow (weapon_bow cat) + worn quiver ammo, consume 1, anim
+// human_bow + ~coord_projectile, then %elid_rangingchannel 16 = 1. No miss
+// % (dump silent). Done faces / water multilocs flip on the bits (no
+// loc_change). Stay %elidquest 1. No dest. No golem-door retouch. No
+// tool/level % invent. No && / ||.
+// Cite elid-water-channels-leftover-377.md · _unpack/377/all.varbit.
+
+[oploc1,elid_water_channel_spiketrap]
+%elid_thievingchannel = 1;
+
+[oploc1,elid_water_channel_blocked_rocks]
+%elid_miningchannel = 1;
+
+[opnpc2,elid_ranging_target] @elid_ranging_shoot;
+[opnpc2,elid_ranging_target_multinpc] @elid_ranging_shoot;
+[apnpc2,elid_ranging_target] @elid_ranging_shoot;
+[apnpc2,elid_ranging_target_multinpc] @elid_ranging_shoot;
+
+[label,elid_ranging_shoot]
+def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
+def_obj $worn_ammo = inv_getobj(worn, ^wearpos_quiver);
+if ($weapon = null) {
+    mes("You'll need to equip a bow before you can fire arrows at the target."); // CANDIDATE
+    return;
+}
+if ($worn_ammo = null) {
+    mes("You need something to fire at the target."); // CANDIDATE
+    return;
+}
+def_category $weapon_cat = oc_category($weapon);
+if ($weapon_cat ! weapon_bow) {
+    mes("You'll need to equip a bow before you can fire arrows at the target."); // CANDIDATE
+    return;
+}
+inv_del(worn, $worn_ammo, 1);
+mes("You fire your arrow at the target..."); // CANDIDATE
+anim(human_bow, 0);
+~coord_projectile(coord, npc_coord, oc_param($worn_ammo, proj_travel), 40, 36, 41, 15, 5, 11, 5); // opnpc2 ctx: loc_coord invalid
+%elid_rangingchannel = 1;
