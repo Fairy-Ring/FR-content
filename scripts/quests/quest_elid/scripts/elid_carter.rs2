@@ -1,0 +1,24 @@
+// Spirits of the Elid — Ali the Carter curse Talk-to. New file.
+// CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Ali the Carter,
+// dump §2.1). NPC ali_the_carter 3030 @ 3421,2914 L0 (m53_45 0 29 34,
+// display Ali the Carter). Greeting verbatim. The quest option "That's
+// extortionate! Why so much?" tree verbatim (cheapest -> curse -> exploiting
+// -> true Pollnivneachian spirit). The two non-quest options (Ok, I'll buy
+// some! / I think I'll give it a miss.) are the dump's shop path — LATER hop
+// (silent return here; no shop / waterskin take this hop). Stay %elidquest
+// 1. No dest. No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+
+[opnpc1,ali_the_carter]
+~chatnpc("<p,neutral>Water, water get your fresh water here, 1000 coins a waterskin, a bargain in these difficult times.");
+def_int $c = ~p_choice3("That's extortionate! Why so much?", 1, "Ok, I'll buy some!", 2, "I think I'll give it a miss.", 3);
+if ($c = 1) {
+    ~chatplayer("<p,neutral>That's extortionate! Why so much?");
+    ~chatnpc("<p,neutral>Well it's the cheapest water you'll find in this town.");
+    ~chatplayer("<p,quiz>Would you happen to know anything about the curse?");
+    ~chatnpc("<p,neutral>Yes the people round here can't seem to get the water themselves. It's an ideal business opportunity for one such as myself.");
+    ~chatplayer("<p,neutral>It does seem to be slightly exploiting their unfortunate situation.");
+    ~chatnpc("<p,neutral>I don't see it like that. Without me they'd be in even more of a mess. I'm doing them a favour and in true Pollnivneachian spirit making a profit along the way.");
+    return;
+}
+return; // buy / miss = shop path, LATER hop
