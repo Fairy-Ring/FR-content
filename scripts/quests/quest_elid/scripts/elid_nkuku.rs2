@@ -1,0 +1,13 @@
+// Spirits of the Elid — Nkuku curse Talk-to. New file.
+// CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Nkuku, dump
+// §2.4). NPC elid_villager2 3032 @ 3415,2938 L0 (m53_45 0 23 58, display
+// Nkuku; he wanders). Linear dump verbatim (2 lines): "Hi, I am trying to
+// find the cause of the curse on your town." / "It's terrible isn't it.
+// Surely it is because we let the holy Saradominist priest die." No menu.
+// Stay %elidquest 1. No dest. No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+
+[opnpc1,elid_villager2]
+~chatplayer("<p,neutral>Hi, I am trying to find the cause of the curse on your town.");
+~chatnpc("<p,neutral>It's terrible isn't it. Surely it is because we let the holy Saradominist priest die.");
+return;
