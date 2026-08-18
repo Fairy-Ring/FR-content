@@ -84,7 +84,11 @@ if (%feud_talk_villager = 1 & %feud_distracted = 1) {
 if (%feud_talk_villager >= 1) {
     if (%feud_talk_villager >= 2) {
         if (inv_total(inv, blackjack_oak) >= 1 | inv_total(worn, blackjack_oak) >= 1) {
-            %feud_npc_multi = 1; // CANDIDATE — opens Lure (vis 1) after the oak award; engine rejects op4 at vis 0
+            if (%feud_npc_multi >= 1) {
+                %feud_npc_multi = 2; // CANDIDATE — opens KO (vis 2); same flip pattern as Lure (0->1)
+            } else {
+                %feud_npc_multi = 1; // CANDIDATE — opens Lure (vis 1) after the oak award; engine rejects op4/op5 at lower vis
+            }
         }
     }
     ~chatnpc("<p,angry>I know your tricks, thief.");

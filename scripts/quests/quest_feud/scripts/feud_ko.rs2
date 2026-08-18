@@ -1,0 +1,46 @@
+// The Feud — Villager Knock-Out (op5, vis 2). New file.
+// CANDIDATE 2007-base (dump §9.3 lure-then-KO walk; the dump has NO KO
+// dialogue lines — CANDIDATE mes only, no invent dest). Gate: %feud_var >= 1
+// AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 AND
+// %feud_talk_villager >= 2 AND the oak blackjack (4599) in inv or worn AND
+// %feud_npc_multi >= 1 else return. op5=Knock-Out exists only on the
+// concrete vis _3 faces (feud_villager_1_3/2_3/3_3 — NOT the multi bases
+// 1887/1891/1895); the world NPC is the multi and the vis child is resolved
+// by %feud_npc_multi (0 -> _1, 1 -> _2, 2 -> _3). The flip 1->2 happens on
+// the pickpocket refuse at count >= 2 with the oak held (feud_pickpocket.rs2
+// — the engine rejects op5 while vis 1, same as Lure); this file writes it
+// idempotently too. Count stays 2. %feud_var stays 1. No 28. The
+// pick-after-KO (count 3) is the NEXT hop. No dest / p_tele. No && / ||.
+// Cite feud-operator-blackjack-377.md §7.5 · osrs-wiki-changes-crawl-377.md.
+
+[opnpc5,feud_villager_1_3]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager < 2) { return; }
+if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
+if (%feud_npc_multi < 1) { return; }
+@feud_villager_ko;
+
+[opnpc5,feud_villager_2_3]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager < 2) { return; }
+if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
+if (%feud_npc_multi < 1) { return; }
+@feud_villager_ko;
+
+[opnpc5,feud_villager_3_3]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager < 2) { return; }
+if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
+if (%feud_npc_multi < 1) { return; }
+@feud_villager_ko;
+
+[label,feud_villager_ko]
+mes("You knock the villager out."); // CANDIDATE mes — dump is silent on KO lines
+%feud_npc_multi = 2;
+return;
