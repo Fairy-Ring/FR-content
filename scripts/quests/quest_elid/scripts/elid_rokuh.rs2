@@ -8,9 +8,9 @@
 // [chociceshopnardah] stock1=elid_choc_ice,30,50; already-has-choc-ice ->
 // chocolate bar price 20 CANDIDATE same shop stock2=chocolate_bar,25,20
 // (greeting leftover chocolate; no chocolate menu line in any dump). No
-// coins -> CANDIDATE mes. No thanks = dump-silent return CANDIDATE. Melting
-// option 3 verbatim (magic ice box). op3=Trade shop IF later. Stay
-// %elidquest 1. No dest. No && / ||.
+// coins -> CANDIDATE mes. No thanks = player line verbatim. Melting
+// option 3 verbatim (magic ice box). op3=Trade shop IF later (no 377 shop
+// IF — 727 only). Stay %elidquest 1. No dest. No && / ||.
 // Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the
 // Elid · Transcript:Rokuh · _unpack/727/all.inv [chociceshopnardah].
 
@@ -48,4 +48,8 @@ if ($r = 3) {
     ~chatnpc("<p,neutral>powerful ice magic which keeps it cold all the time. I had never seen any ice magic before, it's clearly very rare and powerful, so I felt I had to buy it.");
     return;
 }
-return; // no-thanks = silent CANDIDATE; op3 Trade shop IF = LATER
+if ($r = 2) {
+    ~chatplayer("<p,neutral>No thanks, I'm not interested.");
+    return;
+}
+return; // all options handled; op3 Trade shop IF = LATER
