@@ -19,14 +19,21 @@
 // re-talk when hag_list >= 1 and no feud_camel_pooh_bucket and no
 // feud_camel_poison_pooh_bucket held (dump §15.7): "Do you have the camel
 // dung yet?" / "No, I'm still working on that." / "Well don't come back
-// until you have it!" Stage/count stay. No 28. No dest / p_tele. §15.8
-// with dung is LATER. No && / ||.
+// until you have it!" Have-dung when hag_list >= 1 and feud_camel_pooh_bucket
+// 4601 held (dump §15.8): verbatim through "Got it. Thanks again!" + mes
+// "You hand over your bucket of fresh camel dung and receive a vial of
+// poison in return." + inv_del feud_camel_pooh_bucket 4601, then
+// inv_add poison_from_hag 4604. Stage/count stay. No 28. No dest / p_tele.
+// Table poison Use (§16.2) is later. No && / ||.
 // Cite feud-config-unit-first-377.md · osrs-wiki-changes-crawl-377.md.
 
 [opnpc1,feud_hag]
 if (%feud_found_trait < 1) { return; }
 if (%feud_var_witchbothered >= 1 & inv_total(inv, basket_with_snake) >= 1) {
     @feud_hag_have_snake;
+}
+if (%feud_hag_list >= 1 & inv_total(inv, feud_camel_pooh_bucket) >= 1) {
+    @feud_hag_have_dung;
 }
 if (%feud_hag_list >= 1 & inv_total(inv, feud_camel_pooh_bucket) < 1 & inv_total(inv, feud_camel_poison_pooh_bucket) < 1) {
     @feud_hag_no_dung;
@@ -86,4 +93,21 @@ return;
 ~chatnpc("<p,neutral>Do you have the camel dung yet?");
 ~chatplayer("<p,neutral>No, I'm still working on that.");
 ~chatnpc("<p,neutral>Well don't come back until you have it!");
+return;
+
+[label,feud_hag_have_dung]
+~chatplayer("<p,neutral>Good day, Hag.");
+~chatnpc("<p,neutral>Good day to you too, Blockhead.");
+~chatnpc("<p,neutral>Here's your poison!");
+~chatplayer("<p,neutral>Wow, that was quick!");
+~chatnpc("<p,neutral>Actually I already had it brewing. I just needed the ingredients for another batch.");
+~chatnpc("<p,neutral>You wouldn't believe the demand. It's been murder!");
+~chatplayer("<p,neutral>That's not even remotely funny.");
+~chatnpc("<p,neutral>Sorry, I've been dying to say that for ages.");
+~chatplayer("<p,neutral>Just stop. Thanks for the poison and good day to you.");
+~chatnpc("<p,neutral>Wait! Just remember, this poison isn't designed to be used on a weapon. In fact it's not a contact poison at all. You'll have to do more than just smear it on a blade!");
+~chatplayer("<p,neutral>Got it. Thanks again!");
+mes("You hand over your bucket of fresh camel dung and receive a vial of poison in return.");
+inv_del(inv, feud_camel_pooh_bucket, 1);
+inv_add(inv, poison_from_hag, 1);
 return;
