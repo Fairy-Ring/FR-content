@@ -1,0 +1,27 @@
+// Spirits of the Elid — genie sole trade (use sole on genie).
+// Official day 5 Dec 2005. CANDIDATE 2007-base (OSRS Transcript:Spirits of
+// the Elid § Returning to the genie with the mayor's "sole"; research
+// elid-genie-sole-trade-377.md). Use elid_sole 6791 on elid_genie 3022
+// ([opnpcu] + [apnpcu] -> shared label, barmaid pattern) -> dump tree
+// verbatim + tbox "You trade the sole for the statuette." + consume sole +
+// elid_statuette 6785. Wrong item -> ~displaymessage(^dm_default).
+// Stay %elidquest 1. No dest. No fountain. No && / ||.
+// Cite elid-genie-sole-trade-377.md · Transcript:Spirits of the Elid.
+
+[opnpcu,elid_genie] @elid_genie_sole_trade;
+[apnpcu,elid_genie] @elid_genie_sole_trade;
+
+[label,elid_genie_sole_trade]
+if (last_useitem ! elid_sole) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~chatnpc("<p,neutral>Do you have the sole of Awusah, so that we can make our trade?");
+~chatplayer("<p,neutral>Yes I have it here.");
+~chatnpc("<p,neutral>Ah excellent, here's the statuette then.");
+~mesbox("You trade the sole for the statuette."); // CANDIDATE dump tbox
+inv_del(inv, elid_sole, 1);
+inv_add(inv, elid_statuette, 1);
+~chatplayer("<p,neutral>So um, why do you need part of Awusah's footwear anyway? I hope you're not going to do some nasty magic on his feet or something.");
+~chatnpc("<p,neutral>I hadn't thought of that. I just read that a lot of the most powerful beings are collecting soles these days. I haven't really got many yet though. You provided me with an opportunity to expand my collection.");
+return;
