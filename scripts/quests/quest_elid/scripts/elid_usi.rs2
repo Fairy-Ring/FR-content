@@ -1,0 +1,12 @@
+// Spirits of the Elid — Usi curse Talk-to. New file.
+// CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Usi, dump
+// §2.5). NPC elid_villager1 3031 @ 3439,2891 L0 (m53_45 0 47 11, display
+// Usi; he wanders). Linear dump verbatim (2 lines): "Hi, I am trying to find
+// the cause of the curse on your town." / "Well I think that's what everyone
+// wants to know." No menu. Stay %elidquest 1. No dest. No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+
+[opnpc1,elid_villager1]
+~chatplayer("<p,neutral>Hi, I am trying to find the cause of the curse on your town.");
+~chatnpc("<p,neutral>Well I think that's what everyone wants to know.");
+return;
