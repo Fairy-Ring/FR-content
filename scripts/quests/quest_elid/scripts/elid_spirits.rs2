@@ -1,0 +1,227 @@
+// Spirits of the Elid — waterfall spirits Talk-to (Nirrie / Tirrie / Hallak).
+// Shared tree. CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid
+// The Waterfall / Nirrie, local dump spine-next, period voice). Speakers:
+// elid_waterspirit 3023 = Nirrie · elid_waterspirit_sitting 3024 = Tirrie ·
+// elid_waterspirit_male 3025 = Hallak (unpack names). Greeting + 5 top opts
+// verbatim; nested selects (Give Nardah recursion, emissary + Nardarine
+// story, What manner) verbatim; previous = main menu (simplification).
+// Chat only. Stay %elidquest 1. No dest. No golem doors. No statue.
+// No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the
+// Elid (The Waterfall) · _unpack/377/all.npc 3023-3025.
+
+[opnpc1,elid_waterspirit] @elid_spirits_talk;
+[opnpc1,elid_waterspirit_sitting] @elid_spirits_talk;
+[opnpc1,elid_waterspirit_male] @elid_spirits_talk;
+
+[label,elid_spirits_talk]
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>What brings thee to our domain? It has been a long time since");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>we have seen any of your kind. Thou art not even");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>one of the desert peoples!");
+[label,elid_spirits_menu]
+def_int $s = ~p_choice5("Wow how do you finish each others sentences like that?", 1, "Give Nardah its water back!", 2, "Yes, it wasn't so easy getting in here.", 3, "I come as an emissary from the people of Nardah.", 4, "What manner of beings are you?", 5);
+if ($s = 1) {
+    @elid_spirits_gestalt;
+}
+if ($s = 2) {
+    @elid_spirits_water;
+}
+if ($s = 3) {
+    @elid_spirits_wasnt;
+}
+if ($s = 4) {
+    @elid_spirits_emissary;
+}
+if ($s = 5) {
+    @elid_spirits_manner;
+}
+return;
+
+[label,elid_spirits_gestalt]
+~chatplayer("<p,neutral>Wow how do you finish each others sentences like that?");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>We are a gestalt entity. We each have our own body, but our minds");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>are united and we all think as one. Well except when Hallak doth leaveth");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>the toilet seat up.");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>That's the way it's meant to be!");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>Ok we're a mostly gestalt entity. We each have own body, but");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>our minds are united, except for some little parts which aren't. We mostly");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>think as one.");
+~chatplayer("<p,neutral>That doesn't really have the same ring to it.");
+@elid_spirits_menu;
+
+[label,elid_spirits_wasnt]
+~chatplayer("<p,neutral>Yes, it wasn't so easy getting in here. Why have you made it so tough? You must really not like guests.");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>We are powerful spirits with direct contact to the great goddess Elidinis, we do not need to be bothered by the trifles of");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>each and every human. This way only those of much resource and intellect, may gain audience with us.");
+@elid_spirits_menu;
+
+[label,elid_spirits_water]
+~chatplayer("<p,neutral>Give Nardah its water back!");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>This little one doth come blundering into our abode making demands, with no thought for");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>diplomacy or decorum.");
+[label,elid_spirits_water_menu]
+def_int $w = ~p_choice3("I come as an emissary from the people of Nardah", 1, "Who are you calling little?", 2, "Just tell me what it takes to get Nardah some water.", 3);
+if ($w = 1) {
+    @elid_spirits_emissary;
+}
+if ($w = 2) {
+    ~chatplayer("<p,neutral>Who are you calling little?");
+    ~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>You are little in power compared to us.");
+    @elid_spirits_water_menu;
+}
+if ($w = 3) {
+    ~chatplayer("<p,neutral>Just tell me what it takes to get Nardah some water.");
+    ~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>Thou shouldst calm down, getting worked up like that will not help thee.");
+    @elid_spirits_water_menu2;
+}
+return;
+
+[label,elid_spirits_water_menu2]
+def_int $w2 = ~p_choice3("I come as an emissary from the people of Nardah", 1, "Tell me what I need and I'll leave.", 2, "I haven't time for this nonsense.", 3);
+if ($w2 = 1) {
+    @elid_spirits_emissary;
+}
+if ($w2 = 2) {
+    ~chatplayer("<p,neutral>Tell me what I need and I'll leave.");
+    ~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>Well maybe we're not that desperate for thee to leave.");
+    @elid_spirits_water_menu3;
+}
+if ($w2 = 3) {
+    @elid_spirits_nonsense;
+}
+return;
+
+[label,elid_spirits_water_menu3]
+def_int $w3 = ~p_choice3("I come as an emissary from the people of Nardah", 1, "Look you don't want me to get annoyed.", 2, "I haven't time for this nonsense.", 3);
+if ($w3 = 1) {
+    @elid_spirits_emissary;
+}
+if ($w3 = 2) {
+    ~chatplayer("<p,neutral>Look you don't want me to get annoyed.");
+    ~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>That's a shame because thou art annoyed already.");
+    @elid_spirits_water_menu4;
+}
+if ($w3 = 3) {
+    @elid_spirits_nonsense;
+}
+return;
+
+[label,elid_spirits_water_menu4]
+def_int $w4 = ~p_choice2("I come as an emissary from the people of Nardah", 1, "I haven't time for this nonsense.", 2);
+if ($w4 = 1) {
+    @elid_spirits_emissary;
+}
+if ($w4 = 2) {
+    @elid_spirits_nonsense;
+}
+return;
+
+[label,elid_spirits_nonsense]
+~chatplayer("<p,neutral>I haven't time for this nonsense.");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>Well we know ye mortals are always in a rush with");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>your very busy little lives. We'd better let thee get on. We");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>enjoyed thy visit.");
+return;
+
+[label,elid_spirits_emissary]
+~chatplayer("<p,neutral>I come as an emissary from the people of Nardah. Their fountain has dried up and water they bring from the river dries up. What advice can you give on this matter?");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>How unusual, that the one who would come unto us on this issue isn't even from Nardah. Yes, it was indeed we");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>who have withheld their water from them.");
+~chatplayer("<p,neutral>Was this due to the death of the Saradominist priest as the towns people think?");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>No that also was our doing!");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>He did not respect our ways and the ways of the desert! He did not respect the ways of Elidinis!");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>He came preaching the ways of Saradomin. Which is all well and good, but he also did turneth them from the path of the desert gods, especially Elidinis. Elidinis is happy to share the worship of followers, indeed Elidinis");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>was allied with Saradomin many ages past. Saradominist mages even gave us those golems you met as a diplomatic gesture, so you can see we have been on good terms. However this is an outrage.");
+[label,elid_spirits_emissary_menu]
+def_int $e = ~p_choice3("Is there anything they can do to get their fountain working again?", 1, "Hey you've stopped finishing each others sentences.", 2, "Don't many other towns not follow Elidinis though? Why pick on Nardah specifically?", 3);
+if ($e = 1) {
+    @elid_spirits_emissary_answer;
+}
+if ($e = 2) {
+    ~chatplayer("<p,neutral>Hey you've stopped finishing each others sentences!");
+    ~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>That seems to be something which happens when we get emotional");
+    ~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>We are");
+    ~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>calmer now though.");
+    @elid_spirits_emissary_menu;
+}
+if ($e = 3) {
+    ~chatplayer("<p,neutral>Don't many other towns not follow Elidinis though? Why pick on Nardah specifically?");
+    ~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>This is the truth, but there is more to the story than that. The answers");
+    ~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>lie in the story of Nardarine. Wouldst thou likest to hear the telling of this tale? It is not a short one.");
+    @elid_spirits_story_menu;
+}
+return;
+
+[label,elid_spirits_story_menu]
+def_int $st = ~p_choice2("Yes I would like to hear this story.", 1, "Is there anything they can do to get their fountain working again?", 2);
+if ($st = 1) {
+    @elid_spirits_story;
+}
+if ($st = 2) {
+    @elid_spirits_emissary_answer;
+}
+return;
+
+[label,elid_spirits_story]
+~chatplayer("<p,neutral>Yes I would like to hear this story.");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>Nardarine came from a town towards the north side of the desert which does not exist today. This was in the third age in the time thou callest");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>the God Wars. Her town was once controlled by Saradomin, but there was a great battle there between Saradominist and Zamorakian forces which pretty much levelled the town");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>to the ground. Most of the human citizens perished. Nardarine had the wisdom to escape into the desert before the fighting got really serious and thus survived. However she found herself wandering lost and alone in");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>the desert. She prayed to Saradomin for help, but Saradomin was too concerned with the loss of a strategic outpost to worry about the fate of one small human. Nardarine had wandered towards the realm of");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>the Menaphite God Pantheon. Elidinis heard the prayers of Nardarine, she took pity on the wandering human and came unto her with water. 'Oh great goddess' exclaimed Nardarine 'I wish not to be involved more in");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>the wars of the gods for they have caused me so much hardship already, I wish only for a quiet life somewhere'. Elidinis replied 'I will grant this unto thee on the condition that thou swearest to forever pay fealty and");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>homage to me and I grant this also unto thine descendents as long as they too will pay an oath of fealty and homage to me'. Nardarine said 'If you would grant me a safe home, with a");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>supply of food and water, then I would surely do this for it is more than any other God would seem to do for me'. Then Elidinis made");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>a spring of water appear at Nardarines feet and brought stone from below the sand so that she");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>might have something to build with. She called forth camels which have many uses and taste good in kebabs. She then provided Nardarine with a statuette in her image to worship. Nardarine built up her home. Over");
+~chatnpc_specific("Hallak", elid_waterspirit_male, "<p,neutral>time more refugees from the God Wars found Nardarine's home. Nardarine let them stay with her as long as they did make the same oath as her. Hence the town of Nardah was born and Nardarine lived the rest");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>of her days in the peacefulness that she craved. The oath was passed down the generations for many ages, but now seemeth to be forgotten. Now maybe thou canst see why we are not best pleased.");
+~chatplayer("<p,neutral>That does make some sense.");
+~chatplayer("<p,neutral>Is there anything they can do to get their fountain working again?");
+@elid_spirits_emissary_answer;
+
+[label,elid_spirits_emissary_answer]
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>I do not know. The Saradominist priest persuaded the people of Nardah to throw away a statuette of Elidinis which was in the temple. As long as they do not have that image of Elidinis to pray to, then we must consider");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>them turned away from her and the curse shalt stand.");
+~chatplayer("<p,neutral>Well that's all very interesting, I wonder what the people of Nardah will think of this.");
+return;
+
+[label,elid_spirits_manner]
+~chatplayer("<p,neutral>What manner of beings are you?");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>We are the spirits of the river Elid, many ages ago we used to be mindless wandering spirits, with little mind or purpose, we were here even in the first age. Then great Elidinis came to the desert and bound us to her");
+~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>river, we've");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>become one with the river and over the centuries become full of the power of Elidinis that was in her river. We are now her trusted guardians of the Elid, we can control the river and anything which happens");
+~chatnpc_specific("Tirrie", elid_waterspirit_sitting, "<p,neutral>near the river we know about.");
+[label,elid_spirits_manner_menu]
+def_int $mn = ~p_choice5("Wow how do you finish each others sentences like that?", 1, "Give Nardah its water back!", 2, "Yes, it wasn't so easy getting in here.", 3, "I come as an emissary from the people of Nardah.", 4, "Tell me more of Elidinis.", 5);
+if ($mn = 1) {
+    @elid_spirits_gestalt;
+}
+if ($mn = 2) {
+    @elid_spirits_water;
+}
+if ($mn = 3) {
+    @elid_spirits_wasnt;
+}
+if ($mn = 4) {
+    @elid_spirits_emissary;
+}
+if ($mn = 5) {
+    ~chatplayer("<p,neutral>Tell me more of Elidinis.");
+    ~chatnpc_specific("Nirrie", elid_waterspirit, "<p,neutral>Elidinis is one of a group of gods, known as the Menaphite Pantheon. She is the wife of their leader Tumeken. She is the Menaphite goddess of growth and fertility, and goddess of the river.");
+    @elid_spirits_tellmore_menu;
+}
+return;
+
+[label,elid_spirits_tellmore_menu]
+def_int $tm = ~p_choice3("Wow how do you finish each others sentences like that?", 1, "Give Nardah its water back!", 2, "I come as an emissary from the people of Nardah.", 3);
+if ($tm = 1) {
+    @elid_spirits_gestalt;
+}
+if ($tm = 2) {
+    @elid_spirits_water;
+}
+if ($tm = 3) {
+    @elid_spirits_emissary;
+}
+return;
