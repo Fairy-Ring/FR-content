@@ -16,6 +16,10 @@
 // §19.4 celebrate: %feud_var_menaboss >= 1 dispatches first on the bandit
 // binds too — "Welcome! Your actions surprise me." ... "So will you run the
 // rest of them out of town now?" / "I don't know." Chat only, then return.
+// §19.5 celebrate: %feud_var_menaboss >= 1 also dispatches first on the
+// coward bind (feud_arabian_guard_coward 1886) — "Welcome. Our leader would
+// be pleased to congratulate you on your disposal of the Menaphites who
+// plagued this town." Chat only, then return.
 // No dest / p_tele / Operator 1902 / 28. No && / ||.
 // Cite osrs-wiki-changes-crawl-377.md feud row · Transcript:The Feud.
 
@@ -134,6 +138,9 @@ return;
 [opnpc1,feud_arabian_guard_coward]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_menaboss >= 1) {
+    @feud_coward_celebrate;
+}
 if (%feud_var_comp_gangs = 2) {
     @feud_coward_talk;
 }
@@ -155,6 +162,11 @@ if (%feud_var_comp_gangs = 0) {
 }
 ~chatnpc("<p,neutral>Really? I knew they were cowards. Tell them that we have changed our minds and demand 10 camels in return for our mercy.");
 ~chatplayer("<p,neutral>Ahhh why do I bother!");
+return;
+
+[label,feud_coward_celebrate]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>Welcome. Our leader would be pleased to congratulate you on your disposal of the Menaphites who plagued this town.");
 return;
 
 [label,feud_coward_talk]
