@@ -14,15 +14,22 @@
 // "Well don't bother me again until you do!" Have-snake when witchbothered
 // >= 1 and basket_with_snake 4607 held (dump §15.6): verbatim through
 // "Oops! I almost forgot!" + mes "You hand the basket with the charmed
-// snake over to the old hag." + inv_del basket_with_snake 4607. Stage/count
-// stay. No 28. No dest / p_tele. Dung / §15.7 / §15.8 are LATER. No
-// && / ||.
+// snake over to the old hag." + inv_del basket_with_snake 4607, then
+// %feud_hag_list = 1 (CANDIDATE — ingredients / snake delivered). No-dung
+// re-talk when hag_list >= 1 and no feud_camel_pooh_bucket and no
+// feud_camel_poison_pooh_bucket held (dump §15.7): "Do you have the camel
+// dung yet?" / "No, I'm still working on that." / "Well don't come back
+// until you have it!" Stage/count stay. No 28. No dest / p_tele. §15.8
+// with dung is LATER. No && / ||.
 // Cite feud-config-unit-first-377.md · osrs-wiki-changes-crawl-377.md.
 
 [opnpc1,feud_hag]
 if (%feud_found_trait < 1) { return; }
 if (%feud_var_witchbothered >= 1 & inv_total(inv, basket_with_snake) >= 1) {
     @feud_hag_have_snake;
+}
+if (%feud_hag_list >= 1 & inv_total(inv, feud_camel_pooh_bucket) < 1 & inv_total(inv, feud_camel_poison_pooh_bucket) < 1) {
+    @feud_hag_no_dung;
 }
 if (%feud_var_witchbothered >= 1 & inv_total(inv, basket_with_snake) < 1) {
     @feud_hag_no_snake;
@@ -70,4 +77,13 @@ return;
 ~chatplayer("<p,neutral>Oops! I almost forgot!");
 mes("You hand the basket with the charmed snake over to the old hag.");
 inv_del(inv, basket_with_snake, 1);
+%feud_hag_list = 1; // CANDIDATE — snake delivered; opens the §15.7 dung-wait re-talk
+return;
+
+[label,feud_hag_no_dung]
+~chatplayer("<p,neutral>Good day, Hag.");
+~chatnpc("<p,neutral>Good day to you too, Blockhead.");
+~chatnpc("<p,neutral>Do you have the camel dung yet?");
+~chatplayer("<p,neutral>No, I'm still working on that.");
+~chatnpc("<p,neutral>Well don't come back until you have it!");
 return;
