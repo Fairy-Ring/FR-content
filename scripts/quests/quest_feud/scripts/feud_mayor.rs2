@@ -1,0 +1,23 @@
+// The Feud — Ali the Mayor after the Menaphite Leader is gone (§19.3). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud §19.3 Talking to Ali the Mayor,
+// minus the 27 Apr 2022 lore pass). World NPC multi feud_mayor 1869 @
+// 3360,2970 L0 (m52_46 0 32 26); vis face feud_mayor_geom 1870 "Ali the
+// Mayor" op1=Talk-to while %feud_mayor_invis 0 (multinpc=0,feud_mayor_geom —
+// bind the vis name, not the multi base). Stand 3361,2970 E. Not on the NPC.
+// Gate: %feud_var_menaboss >= 1 (Tough Guy killed, §18.5 PASS feudtsy35b22 —
+// Leader gone, menaboss flag) else return. §19.3 verbatim, chat only. No
+// stage write / no 28 / no dest / p_tele. No && / ||. The early
+// welcome-to-Pollnivneach tree (§2.2) is NOT written this hop — later.
+// Cite copy-agent-opener-377.md · anchors-pollniv.md · feud-config-unit-first-377.md.
+
+[opnpc1,feud_mayor_geom]
+if (%feud_var_menaboss < 1) { return; }
+~chatnpc("<p,neutral>I don't know what we did to deserve your presence here, but I for one am filled with regret.");
+~chatplayer("<p,angry>Well that's some show of gratitude! Can't I even get a 'thank you' for ridding your town of one of the gangs?");
+~chatnpc("<p,quiz>Do you understand the concept of consequences?");
+~chatplayer("<p,quiz>Er, I think so?");
+~chatnpc("<p,neutral>Well, the consequences of your little piece of butchery are that the town is now even worse off. The bandits no longer have to waste time and energy fighting with the Menaphites and can direct all their attention");
+~chatnpc("<p,neutral>towards making us miserable. So for your efforts I thank you, but I wish no-one had asked for your help.");
+~chatplayer("<p,neutral>I'll set this town right before I leave, I promise.");
+~chatnpc("<p,shock>Why do I wish that you hadn't said that? Your heavyhanded tactics scare me.");
+return;
