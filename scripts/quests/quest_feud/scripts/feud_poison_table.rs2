@@ -1,0 +1,26 @@
+// The Feud — Use Hag's poison on the beer table (dump §16.2). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Using the Hag's poison
+// on the table, dump §16.2 — one mes: "You poison the drink."). Loc
+// feud_poison_beer_table 6246 @ 3356,2957 L0 (m52_46; op1=Take-beer is
+// LATER, not this hop). [oplocu] fires when a held item is used on the
+// table; only poison_from_hag 4604 proceeds. Success: mes "You poison
+// the drink." + inv_del poison_from_hag 4604 ×1 + %feud_var_drink_found
+// = 1 (CANDIDATE leftover name — drink poisoned). Already poisoned
+// (drink_found >= 1): silent return (dump §16.2 has no second-use line).
+// Stage/count stay. No 28. No dest / p_tele. Operator "Is the deed
+// done?" §17.2 is LATER. Fossil Island barman line is SUBTRACT.
+// No && / ||.
+// Cite feud-first-slice-377.md.
+
+[oplocu,feud_poison_beer_table]
+if (%feud_var_drink_found >= 1) {
+    return;
+}
+def_obj $used = last_useitem;
+if ($used ! poison_from_hag) {
+    return;
+}
+mes("You poison the drink.");
+inv_del(inv, poison_from_hag, 1);
+%feud_var_drink_found = 1; // CANDIDATE leftover name — drink poisoned
+return;
