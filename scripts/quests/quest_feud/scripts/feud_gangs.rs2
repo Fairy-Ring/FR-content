@@ -8,8 +8,9 @@
 // not consume another receipt. Concrete Talk-to faces only — bind the
 // visible VARIANTS (feud_arabian_guard1_1/1_2/2_1/2_2 "Bandit"), the
 // coward (feud_arabian_guard_coward), and the Menaphite thug
-// (feud_egyptian_doorman_1/2). Do NOT bind a multi base. No dest / p_tele
-// / Operator 1902 / 28. No && / ||.
+// (feud_egyptian_doorman_1/2). Do NOT bind a multi base. Traitor talk (dump
+// §14.2) dispatches on %feud_given_jewels >= 1 (jewels handoff hop) — the
+// thug names Traitorous Ali. No dest / p_tele / Operator 1902 / 28. No && / ||.
 // Cite osrs-wiki-changes-crawl-377.md feud row · Transcript:The Feud.
 
 [opnpc1,feud_arabian_guard1_1]
@@ -144,6 +145,9 @@ return;
 [opnpc1,feud_egyptian_doorman_1]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_given_jewels >= 1) {
+    @feud_thug_traitor;
+}
 if (%feud_var_comp_gangs = 3) {
     @feud_thug_after;
 }
@@ -158,6 +162,9 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 [opnpc1,feud_egyptian_doorman_2]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_given_jewels >= 1) {
+    @feud_thug_traitor;
+}
 if (%feud_var_comp_gangs = 3) {
     @feud_thug_after;
 }
@@ -207,4 +214,21 @@ return;
 ~chatplayer("<p,neutral>But if they did?");
 ~chatnpc("<p,neutral>Well, I suppose so.");
 ~chatplayer("<p,neutral>Maybe if I got both gangs a camel, I could use the mutual good will to find out what happened to Ali's nephew.");
+return;
+
+[label,feud_thug_traitor]
+~chatplayer("<p,neutral>I was wondering if you could help me?");
+~chatnpc("<p,neutral>Tell me what your problem is and I'll see what I can do.");
+~chatplayer("<p,neutral>I've heard there's a traitor among the Menaphites. What do you know about it?");
+~chatnpc("<p,neutral>It wasn't me, I swear!");
+~chatplayer("<p,neutral>Really? So what do you know?");
+~chatnpc("<p,neutral>I just can't believe one of my friends could be a traitor.");
+~chatnpc("<p,neutral>Well, I suppose there is Traitorous Ali.");
+~chatplayer("<p,quiz>'Traitorous Ali'?");
+~chatnpc("<p,neutral>Oh yes. The most untrustworthy, backstabbing little rat to scamper across Tumeken's fair desert. He'd sell his own mother to slavers if he hadn't already betrayed her and had her locked up for the last job he pulled.");
+~chatplayer("<p,neutral>I suppose the name is a bit of a giveaway.");
+~chatplayer("<p,neutral>That was a little too simple, are you sure it was him?");
+~chatnpc("<p,neutral>Positive, he was turned by the offer of a set of waterproofs and a ride on a camel.");
+~chatplayer("<p,neutral>I see he drives a hard bargain.");
+~chatnpc("<p,neutral>Well what can I say? We don't call him 'Ali of the Good Decisions', do we?");
 return;
