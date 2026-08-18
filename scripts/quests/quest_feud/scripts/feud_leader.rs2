@@ -1,0 +1,42 @@
+// The Feud — Menaphite Leader first talk, chat only. New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud §18.2 Talking to the
+// Menaphite Leader, minus the 27 Apr 2022 Beneath Cursed Sands lore pass:
+// Osmumten / Mehhar / Devourer branch is SUBTRACT). NPC feud_menap_boss
+// 1899 @ 3334,2956 L0; vis face feud_menap_boss_vis 1901 "Menaphite
+// Leader" while %feud_boss_vis 1 (OpNpcHandler resolves the multi vis —
+// bind the vis name, not the multi base). Gate: %feud_var_drink_found >= 1
+// (deed reported to Ali the Operator, §17.2 PASS feudosy2dkie) else return.
+// Tree verbatim: "Ali the Operator said you wanted to see me." ->
+// "That's right. I have kept a close eye on your progress. I'm impressed."
+// -> plans for the bandits -> "World domination! First Pollnivneach, then
+// Al Kharid, then the whole of the desert!" -> "What?" -> "You do
+// understand who we are, don't you?" -> "Actually I thought you were a
+// ragtag band of good-for- nothing thieves..." -> "Silence! We are the
+// descendants of assassins..." -> "For centuries we have wandered the
+// desert, rebuilding the empire we were promised!" -> "Will you join us in
+// our quest to defeat the thralls of Tumeken and reclaim our birthright?"
+// -> "Sorry, I have this irrational hatred for megalomaniac, despotic
+// zealots! Prepare to meet your maker, you big jerk!" -> "Fool! You'll
+// never get to me. Guards protect me." then return. No stage write — no
+// 28. Do not npc_add Tough Guy 1906, do not npc_setmode, no dest / p_tele.
+// Fight / teleport away is later.
+// Cite copy-agent-opener-377.md · feud-config-unit-first-377.md ·
+// feud-varbit-map-377.md.
+
+[opnpc1,feud_menap_boss_vis]
+if (%feud_var_drink_found < 1) { return; }
+~chatplayer("<p,neutral>Ali the Operator said you wanted to see me.");
+~chatnpc("<p,neutral>That's right. I have kept a close eye on your progress. I'm impressed.");
+~chatplayer("<p,neutral>So what are your plans for the bandits?");
+~chatnpc("<p,neutral>The bandits? A mere nuisance, insignificant to my overall goal.");
+~chatplayer("<p,neutral>Wait, if you're not warring with the bandits, what are you planning?");
+~chatnpc("<p,happy>World domination! First Pollnivneach, then Al Kharid, then the whole of the desert!");
+~chatplayer("<p,shock>What?");
+~chatnpc("<p,quiz>You do understand who we are, don't you?");
+~chatplayer("<p,neutral>Actually I thought you were a ragtag band of good-for- nothing thieves sucking the life out of this innocent town.");
+~chatnpc("<p,angry>Silence! We are the descendants of assassins, the heirs of the revolutionaries who defeated the corrupt pharaoh and his brood!");
+~chatnpc("<p,neutral>For centuries we have wandered the desert, rebuilding the empire we were promised!");
+~chatnpc("<p,quiz>Will you join us in our quest to defeat the thralls of Tumeken and reclaim our birthright?");
+~chatplayer("<p,angry>Sorry, I have this irrational hatred for megalomaniac, despotic zealots! Prepare to meet your maker, you big jerk!");
+~chatnpc("<p,angry>Fool! You'll never get to me. Guards protect me.");
+return;
