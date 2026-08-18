@@ -10,12 +10,19 @@
 // award blackjack_oak 4599; full-inv decline / already-has branches), and
 // (d) after the third pickpocket, the report tree (dump § Welcome to the
 // Menaphites: "Well done! You have finished your first trial." -> burglary
-// briefing -> award feud_mayors_house_keys 4589; full-inv branch).
+// briefing -> award feud_mayors_house_keys 4589; full-inv branch), and
+// (e) after the mayor-villa jewels, the jewels handoff tree (dump § Now
+// you've stolen the jewels / Talking to Ali the Operator: "I've completed
+// your task." -> crack that safe / hints lying around -> "Now give me the
+// jewels." -> mes hand-over, inv_del 4590, %feud_given_jewels 1 CANDIDATE ->
+// traitor briefing through "Well then get to it.").
 // CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
-// another pocket / Pickpocketing part three / Welcome to the Menaphites minus
-// the 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3
-// AND %feud_var_comp_gangs = 3 else return. Report when %feud_talk_villager
-// >= 3; oak when >= 2; progress when >= 1; else the join tree.
+// another pocket / Pickpocketing part three / Welcome to the Menaphites /
+// Now you've stolen the jewels minus the 27 Apr 2022 lore pass). Gate:
+// %feud_var >= 1 AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 else
+// return. Jewels tree when the player holds feud_mayors_jewels; report when
+// %feud_talk_villager >= 3; oak when >= 2; progress when >= 1; else the
+// join tree.
 // No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (report
 // keeps count 3), no 28 (28 = blackjack seller vis, not complete). No
 // %feud_npc_multi (lure/KO vis already shipped in the pickpocket file). No
@@ -26,6 +33,9 @@
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
+if (inv_total(inv, feud_mayors_jewels) >= 1) {
+    @feud_operator_jewels;
+}
 if (%feud_talk_villager >= 3) {
     @feud_operator_report;
 }
@@ -122,6 +132,23 @@ inv_add(inv, feud_mayors_house_keys, 1);
 mes("Ali the Operator hands you a set of keys.");
 ~chatplayer("<p,quiz>Anything else?");
 ~chatnpc("<p,neutral>No! Now get going.");
+return;
+
+[label,feud_operator_jewels]
+~chatplayer("<p,neutral>I've completed your task.");
+~chatnpc("<p,neutral>Impressive, I didn't expect you to crack that safe so quickly. Did you have help?");
+~chatplayer("<p,neutral>Of course not, although the mayor did leave a number of hints lying around.");
+~chatnpc("<p,neutral>That man is a fool. Now give me the jewels.");
+mes("You hand Ali the Operator the jewels.");
+inv_del(inv, feud_mayors_jewels, 1);
+%feud_given_jewels = 1; // CANDIDATE
+~chatnpc("<p,neutral>Now, your final task is one of the upmost importance. It has come to my attention that there is a traitor in our midst.");
+~chatplayer("<p,quiz>Oh really?");
+~chatnpc("<p,neutral>Yes, and I want you to root them out.");
+~chatplayer("<p,quiz>Why me?");
+~chatnpc("<p,neutral>Because I feel like I can trust you. You don't have the emotional baggage that comes with playing the villain your entire life.");
+~chatplayer("<p,neutral>Aw! You can count on me to find the traitor.");
+~chatnpc("<p,neutral>Well then get to it.");
 return;
 
 [label,feud_operator_oak]
