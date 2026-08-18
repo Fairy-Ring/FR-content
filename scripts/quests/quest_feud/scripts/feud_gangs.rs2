@@ -13,12 +13,18 @@
 // thug names Traitorous Ali. §19.1 avenge: %feud_var_menaboss >= 1 (Tough Guy
 // kill hop) dumps the avenge tree first — "You treacherous jackal!" ... "I
 // will avenge my master!" then npc_setmode(opplayer2) (the thug attacks).
+// §19.4 celebrate: %feud_var_menaboss >= 1 dispatches first on the bandit
+// binds too — "Welcome! Your actions surprise me." ... "So will you run the
+// rest of them out of town now?" / "I don't know." Chat only, then return.
 // No dest / p_tele / Operator 1902 / 28. No && / ||.
 // Cite osrs-wiki-changes-crawl-377.md feud row · Transcript:The Feud.
 
 [opnpc1,feud_arabian_guard1_1]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_menaboss >= 1) {
+    @feud_bandit_celebrate;
+}
 if (%feud_var_comp_gangs = 3) {
     @feud_bandit_after;
 }
@@ -33,6 +39,9 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 [opnpc1,feud_arabian_guard1_2]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_menaboss >= 1) {
+    @feud_bandit_celebrate;
+}
 if (%feud_var_comp_gangs = 3) {
     @feud_bandit_after;
 }
@@ -47,6 +56,9 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 [opnpc1,feud_arabian_guard2_1]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_menaboss >= 1) {
+    @feud_bandit_celebrate;
+}
 if (%feud_var_comp_gangs = 3) {
     @feud_bandit_after;
 }
@@ -61,6 +73,9 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 [opnpc1,feud_arabian_guard2_2]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
+if (%feud_var_menaboss >= 1) {
+    @feud_bandit_celebrate;
+}
 if (%feud_var_comp_gangs = 3) {
     @feud_bandit_after;
 }
@@ -91,6 +106,16 @@ return;
 ~chatnpc("<p,neutral>Good day adventurer. Have you come with the Menaphite peace offering?");
 ~chatplayer("<p,neutral>Umm... no. Not yet. Actually I've come to ask about something else.");
 ~chatnpc("<p,neutral>We can talk once you bring back the Menaphites' full peace offering.");
+return;
+
+[label,feud_bandit_celebrate]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>Welcome! Your actions surprise me.");
+~chatplayer("<p,neutral>What do you mean?");
+~chatnpc("<p,neutral>It was brilliant the way you got rid of the Menaphite leader.");
+~chatplayer("<p,neutral>Er... yes. Thank you.");
+~chatnpc("<p,neutral>So will you run the rest of them out of town now?");
+~chatplayer("<p,neutral>I don't know.");
 return;
 
 [label,feud_bandit_talk]
