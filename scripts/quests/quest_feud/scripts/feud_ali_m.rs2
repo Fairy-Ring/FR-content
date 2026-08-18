@@ -1,10 +1,20 @@
-// The Feud — Ali Morrisane start Talk-to.
-// CANDIDATE lines (OSRS Transcript:The Feud minus overlay / combat-40 toast
-// / Rogue Trader shop). First write %feud_var 0 -> 1. Do not open Ali's
-// Discount Wares. No dest / Pollnivneach / stair dest.
+// The Feud — Ali Morrisane start Talk-to + report (§22.5).
+// Start: CANDIDATE lines (OSRS Transcript:The Feud minus overlay / combat-40
+// toast / Rogue Trader shop). First write %feud_var 0 -> 1. Do not open
+// Ali's Discount Wares. No dest / Pollnivneach / stair dest.
 // Cite red-19-start-impl-377.md §3.
+// Report: once the Bandit champion is dead (%feud_var_banditboss 1, §20.4
+// PASS d478d3333 — CANDIDATE leftover flag) the start tree is skipped and
+// §22.5 Talking to Ali Morrisane plays verbatim — nephew the salesman /
+// proud of young Baba / 500 coins (inv_add + ~objbox, dump tbox; %feud_ali_money
+// 1 CANDIDATE leftover 331 — Ali paid the reward) / parallels + tourism
+// reveal / greatest salesman / wares offer (~p_choice2; both options return
+// — do NOT open the shop). No 28 / dest / p_tele. Quest-complete vis later.
 
 [opnpc1,feud_ali_m]
+if (%feud_var_banditboss >= 1) {
+    @feud_ali_m_report;
+}
 ~chatnpc("<p,neutral>Good day and welcome back to Al Kharid.");
 ~chatnpc("<p,neutral>My name is Ali Morrisane - the greatest salesman in the world.");
 ~chatnpc("<p,neutral>A nephew of mine lives not too far from here in a little town called Pollnivneach.");
@@ -17,3 +27,34 @@ if ($go = 2) {
 ~chatplayer("<p,happy>I'll find your nephew.");
 ~chatnpc("<p,neutral>Tell him his uncle Ali M needs his help up in Al Kharid.");
 %feud_var = 1;
+
+[label,feud_ali_m_report]
+~chatnpc("<p,neutral>Hello again my friend. I have heard nothing from my troublesome nephew. Have you any news of his whereabouts?");
+~chatplayer("<p,neutral>Indeed I do. I was able to eventually learn of his fortunes, although it was a little bit more challenging than I originally thought.");
+~chatnpc("<p,neutral>Well then please, tell me what has become of him. Nothing bad I hope.");
+~chatplayer("<p,neutral>I was able to discover that he is quite the salesman. Perhaps too good. He has roughly forty people working under him.");
+~chatplayer("<p,neutral>Unfortunately a number of people didn't approve of his sales techniques and as a result he is in hiding.");
+~chatnpc("<p,happy>You make an old man very happy. I'm so proud of young Baba.");
+~chatplayer("<p,neutral>But he's considered a thief!");
+~chatnpc("<p,neutral>Yes, by people with too much money and not enough sense. All willingly parted with their money and received what they purchased.");
+~chatnpc("<p,neutral>Well, it seems I still am in need of an assistant...");
+~chatnpc("<p,neutral>..but take the reward anyway.");
+inv_add(inv, coins, 500);
+~objbox(coins, "Ali Morrisane gives you 500 coins.", 250, 0, 0);
+%feud_ali_money = 1;
+~chatplayer("<p,neutral>I've just been thinking Ali, there seems to be a few parallels between yourself and your nephew. Both of you are unscrupulous salesmen, both of you come from the same town and both of you no longer trade there.");
+~chatplayer("<p,neutral>Were you sent into exile too?");
+~chatnpc("<p,neutral>I have my reasons.");
+~chatplayer("<p,neutral>No, now hang on, this seems to me like one of the strangest quests I have ever been involved with. I do not believe that a businessman like you would not know of a competitor, particularly a competitor as talented as");
+~chatplayer("<p,neutral>your nephew.");
+~chatplayer("<p,neutral>So what was your motive to get me to visit Pollnivneach? Was it concern for the towns people? Hmm. I don't think so, I'd say you would probably sell your grandmother if you could get a good price for");
+~chatplayer("<p,neutral>her. What was the reason?");
+~chatnpc("<p,neutral>My my, you surprise me, you're not as dumb as you look.");
+~chatplayer("<p,neutral>Surely you didn't do all this to sell me a fake beard and headpiece.");
+~chatnpc("<p,neutral>Ah, once again you underestimate me. I sold you far more than that.");
+~chatplayer("<p,neutral>Really? Well I did buy some other odds and ends off you.... no hang on! I get it now, you're in league with Ali the Camel seller, the Kebab seller and the mayor aren't you.");
+~chatnpc("<p,neutral>I like the word 'tourism'. Did you not enjoy your stay in Pollnivneach? Was there not action, intrigue and fun to be had, and did you not notice all the other tourists there too?");
+~chatplayer("<p,neutral>I must apologise for ever doubting you. You really are the greatest salesman in all of Gielinor.");
+~chatnpc("<p,quiz>Now that we both agree on that, may I show you my wares?");
+~p_choice2("No, I'm really too busy.", 1, "Okay.", 2);
+return;
