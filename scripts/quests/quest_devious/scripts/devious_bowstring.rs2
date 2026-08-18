@@ -1,0 +1,23 @@
+// Devious Minds — bow-string on slender blade (inv Use).
+// Official day 19 Dec 2005. CANDIDATE 2007-base (research
+// devious-bowstring-leftover-377.md — mes CANDIDATE from dump walk *attach
+// a bow string*; 0 dump mes; not fletch stringing). Use bow_string 1777 on
+// devious_slenderblade 6817 (name Slender blade) -> consume both +
+// devious_bowsword 6818 (name Bow-sword). Reverse Use (blade on string)
+// prefixed in bows.rs2 [opheldu,bow_string] case devious_slenderblade ->
+// @devious_bowstring. Stay %devious_main 1. No dest. No %devious_monk.
+// No && / ||.
+// Cite devious-bowstring-leftover-377.md · _unpack/377/all.obj.
+
+[opheldu,devious_slenderblade]
+if (last_useitem ! bow_string) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@devious_bowstring;
+
+[label,devious_bowstring]
+inv_del(inv, bow_string, 1);
+inv_del(inv, devious_slenderblade, 1);
+mes("You attach a bow string to the slender blade."); // CANDIDATE dump walk
+inv_add(inv, devious_bowsword, 1);
