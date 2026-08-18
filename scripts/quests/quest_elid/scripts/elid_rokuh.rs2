@@ -1,0 +1,20 @@
+// Spirits of the Elid — Rokuh curse Talk-to. New file.
+// CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Rokuh, dump
+// §2.2). NPC elid_choc_ice_seller 3045 @ 3430,2914 L0 (m53_45 0 38 34,
+// display Rokuh). Greeting verbatim. The quest option "I am trying to find
+// out the cause of this town's curse." tree verbatim. The three non-quest
+// options (Cool I'd like to buy some. / No thanks, I'm not interested. /
+// How do you stop your icy snacks melting?) are the dump's trade/shop path —
+// LATER hop (silent return here; no Trade / shop this hop). Stay %elidquest
+// 1. No dest. No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+
+[opnpc1,elid_choc_ice_seller]
+~chatnpc("<p,neutral>Come one, come all, buy my amazing choc ice invention here! Chocolate on the outside. Iced cream on the inside. Oh I also have some chocolate left over from making choc ices which I'm selling too.");
+def_int $r = ~p_choice4("Cool I'd like to buy some.", 1, "No thanks, I'm not interested.", 2, "How do you stop your icy snacks melting?", 3, "I am trying to find out the cause of this town's curse.", 4);
+if ($r = 4) {
+    ~chatplayer("<p,neutral>I am trying to find out the cause of this town's curse.");
+    ~chatnpc("<p,neutral>I really have no idea. It's most regrettable. Fortunately my innovation with my choc ice invention is helping people stay at least slightly cool.");
+    return;
+}
+return; // trade/shop path = LATER hop
