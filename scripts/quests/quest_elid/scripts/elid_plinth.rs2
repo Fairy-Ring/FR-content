@@ -1,0 +1,20 @@
+// Spirits of the Elid — plinth place (statuette on plinth = quest done).
+// Official day 5 Dec 2005. CANDIDATE 2007-base (research
+// elid-plinth-place-377.md — %elidquest 60 = elid_statuette_placed face,
+// pack-cited via multivar). Use elid_statuette 6785 on elid_statuette_base
+// 10438 (name Statuette Plinth @ 3426,2930) / multi 10389 (multivar
+// elidquest, multiloc 0 -> base) -> consume 6785 + %elidquest = 60. Wrong
+// item -> ~displaymessage(^dm_default). No dest. No fountain Look invent.
+// No && / ||.
+// Cite elid-plinth-place-377.md · _unpack/377/all.loc 10389/10438.
+
+[oplocu,elid_statuette_base] @elid_plinth_place;
+[oplocu,elid_statuette_multiloc] @elid_plinth_place;
+
+[label,elid_plinth_place]
+if (last_useitem ! elid_statuette) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, elid_statuette, 1);
+%elidquest = 60;
