@@ -1,0 +1,33 @@
+// Spirits of the Elid — robe+key door Open (ancestral key + Robe of elidinis).
+// Official day 5 Dec 2005 — before golem doors. CANDIDATE 2007-base (dump §
+// *Attempting to open the door without the robes of Elidinis equipped*; dest
+// research elid-robe-door-leftover-377.md / elid-dest-from-maps-377.md §3).
+// Doors elid_underground_robe_door 10427 @ 3353,9544 + _mirror 10429 @
+// 3354,9544 (both name Door, op1=Open). No key = silent return (dump silent,
+// no invented "The door is locked."). Key + robes not worn = dump tbox +
+// forgotten line, no dest. Key + robes worn (elid_robetop 6786 +
+// elid_robebottoms 6787, both name Robe of elidinis) + inv elid_key 6792 =
+// dest other side: coordz(coord) <= coordz(loc_coord) -> north
+// 0_52_149_25_9 3353,9545 L0, else south 0_52_149_25_7 3353,9543 L0
+// (CANDIDATE). Key not consumed. Stay %elidquest 1. No loc_change. No lake
+// door. No golem doors. No ballad gate. No && / ||.
+// Cite elid-robe-door-leftover-377.md · elid-dest-from-maps-377.md ·
+// Transcript:Spirits of the Elid.
+
+[oploc1,elid_underground_robe_door] @elid_robe_door_open;
+[oploc1,elid_underground_robe_door_mirror] @elid_robe_door_open;
+
+[label,elid_robe_door_open]
+if (inv_total(inv, elid_key) < 1) {
+    return;
+}
+if (inv_total(worn, elid_robetop) < 1 | inv_total(worn, elid_robebottoms) < 1) {
+    ~mesbox("The ancestral key seems to fit the lock perfectly, but for some reason the doors still won't open.");
+    ~chatplayer("<p,neutral>That's odd. I wonder what I can have forgotten.");
+    return;
+}
+if (coordz(coord) <= coordz(loc_coord)) {
+    p_telejump(0_52_149_25_9); // CANDIDATE north dest-side 3353,9545 L0
+    return;
+}
+p_telejump(0_52_149_25_7); // CANDIDATE south dest-side 3353,9543 L0
