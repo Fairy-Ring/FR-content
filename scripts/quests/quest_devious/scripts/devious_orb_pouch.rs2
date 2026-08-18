@@ -1,0 +1,29 @@
+// Devious Minds — orb into large pouch (inv Use).
+// Official day 19 Dec 2005. CANDIDATE 2007-base (research
+// devious-orb-pouch-leftover-377.md — 0 dump Use mes; mes CANDIDATE from
+// dump walk *hide the orb*). Use devious_glowingorb 6821 (Orb) on
+// rcu_pouch_large 5512 (Large pouch) or the reverse -> devious_glowingpouch
+// 6819 (name Large pouch). Consume 6821 + 5512. Stay %devious_main 1.
+// No degrade 5513, no Colossal, no RC Fill/Empty/Check rewrite, no dest,
+// no %devious_monk, no 1->2. No && / ||.
+// Cite devious-orb-pouch-leftover-377.md · _unpack/377/all.obj.
+
+[opheldu,rcu_pouch_large]
+if (last_useitem ! devious_glowingorb) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@devious_orb_pouch;
+
+[opheldu,devious_glowingorb]
+if (last_useitem ! rcu_pouch_large) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@devious_orb_pouch;
+
+[label,devious_orb_pouch]
+inv_del(inv, devious_glowingorb, 1);
+inv_del(inv, rcu_pouch_large, 1);
+mes("You hide the orb in the large pouch."); // CANDIDATE dump walk
+inv_add(inv, devious_glowingpouch, 1);
