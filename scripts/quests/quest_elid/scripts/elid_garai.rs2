@@ -1,0 +1,18 @@
+// Spirits of the Elid — Garai curse Talk-to. New file.
+// CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Garai, dump
+// §2.3). NPC elid_villager3 3033 @ 3436,2901 L0 (m53_45 0 44 21, display
+// Garai; he wanders). Linear dump verbatim: "Hi, I am trying to find the
+// cause of the curse on your town." / "What curse is that?" / fountain+river
+// dry / "Ohh that's because of a curse? I didn't think of that." / any ideas
+// / "Absolutely none." No menu. Stay %elidquest 1. No dest.
+// No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+
+[opnpc1,elid_villager3]
+~chatplayer("<p,neutral>Hi, I am trying to find the cause of the curse on your town.");
+~chatnpc("<p,quiz>What curse is that?");
+~chatplayer("<p,neutral>Don't you know? The curse that has stopped your fountain working and made all the water dry up when you bring it back from the river?");
+~chatnpc("<p,neutral>Ohh that's because of a curse? I didn't think of that.");
+~chatplayer("<p,quiz>So any ideas about the cause of the curse?");
+~chatnpc("<p,neutral>Absolutely none.");
+return;
