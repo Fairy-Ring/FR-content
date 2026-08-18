@@ -121,6 +121,13 @@ if ($again = 1) {
 return;
 
 [label,rd_tiffy_complete]
+if (%devious_monk >= 1) {
+    @devious_tiffy_report; // Devious Minds wrap (quest_devious) — before Wanted
+    return;
+}
+@rd_tiffy_after;
+
+[label,rd_tiffy_after]
 if (%wanted_main = 0) {
     @wanted_tiffy_start;
 }
