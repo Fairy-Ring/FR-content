@@ -7,10 +7,25 @@
 // Gate: %feud_var_menaboss >= 1 (Tough Guy killed, §18.5 PASS feudtsy35b22 —
 // Leader gone, menaboss flag) else return. §19.3 verbatim, chat only. No
 // stage write / no 28 / no dest / p_tele. No && / ||. The early
-// welcome-to-Pollnivneach tree (§2.2) is NOT written this hop — later.
+// welcome-to-Pollnivneach tree (§2.2) is NOT written.
+// §21.5 Finishing up (Bandit champion dead, §20.4 PASS d478d3333):
+// %feud_var_banditboss >= 1 dispatches @feud_mayor_nephew BEFORE the
+// celebrate — "My thanks, adventurer. Your methods and motives may be
+// questionable, but none can argue that you have delivered our little town
+// from the wicked gangs who plagued it. I think things will change around
+// here, now" / "that our problems are at a manageable size." / the nephew
+// story ("greatest salesman", "a little too good", "angered the Menaphites
+// and the bandits") / "smuggled him out" / "treasure trove" /
+// "wholeheartedly apologise" / player "I think I may be able to help with
+// one other thing... Ali the Operator." / "Now, how would a passing
+// adventurer know where to find my missing jewels?" / "Er, let's just put
+// it down to adventurer's intuition." Chat only, then return. No var writes.
 // Cite copy-agent-opener-377.md · anchors-pollniv.md · feud-config-unit-first-377.md.
 
 [opnpc1,feud_mayor_geom]
+if (%feud_var_banditboss >= 1) {
+    @feud_mayor_nephew;
+}
 if (%feud_var_menaboss < 1) { return; }
 ~chatnpc("<p,neutral>I don't know what we did to deserve your presence here, but I for one am filled with regret.");
 ~chatplayer("<p,angry>Well that's some show of gratitude! Can't I even get a 'thank you' for ridding your town of one of the gangs?");
@@ -20,4 +35,20 @@ if (%feud_var_menaboss < 1) { return; }
 ~chatnpc("<p,neutral>towards making us miserable. So for your efforts I thank you, but I wish no-one had asked for your help.");
 ~chatplayer("<p,neutral>I'll set this town right before I leave, I promise.");
 ~chatnpc("<p,shock>Why do I wish that you hadn't said that? Your heavyhanded tactics scare me.");
+return;
+
+[label,feud_mayor_nephew]
+~chatnpc("<p,neutral>My thanks, adventurer. Your methods and motives may be questionable, but none can argue that you have delivered our little town from the wicked gangs who plagued it. I think things will change around here, now");
+~chatnpc("<p,neutral>that our problems are at a manageable size.");
+~chatnpc("<p,neutral>The least that I can do for you is answer your questions about the whereabouts of Ali Morrisane's nephew. He always was a mischievous young man, full of harebrained schemes.");
+~chatnpc("<p,neutral>He dreamed of being the greatest salesman in all of Gielinor! Unfortunately, he was a little too good.");
+~chatnpc("<p,neutral>He angered a number of people by coercing them into buying things they didn't really want. Completely within the law, of course, but the law could only protect young Ali for so long.");
+~chatnpc("<p,neutral>Once he angered the Menaphites and the bandits, I knew I could no longer protect him.");
+~chatnpc("<p,neutral>Under cover of darkness I smuggled him out of the town, and he's been gone ever since.");
+~chatnpc("<p,neutral>I can assure you, however, that he is safe and well - and now that you have effectively ended the threat posed by the gangs, he can continue his business elsewhere. Last I heard he planned to open some kind");
+~chatnpc("<p,neutral>of trade network with forty of his friends. A 'treasure trove', he claims. I'll believe it when I see it.");
+~chatnpc("<p,neutral>I hope that helps you in your quest. If you speak to Ali Morrisane, do tell him that I wholeheartedly apologise for the way he - er, his family - has been treated.");
+~chatplayer("<p,neutral>I think I may be able to help with one other thing. I heard that your house was burgled recently. If you're interested in recovering the goods, you ought to have a word with Ali the Operator.");
+~chatnpc("<p,quiz>Now, how would a passing adventurer know where to find my missing jewels?");
+~chatplayer("<p,neutral>Er, let's just put it down to adventurer's intuition.");
 return;
