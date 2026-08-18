@@ -1,0 +1,23 @@
+// The Feud — Mayor's Study desk Search (note). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Searching the Mayor's
+// Study desk, dump §12.4). Loc feud_mayors_desk 6275 @ 3367,2966 L0, name
+// Study desk, width 2, op1=Search. Dump: mes *You find an interesting note
+// on the desk.* then full-inv -> *You don't have enough room in your
+// inventory to take it.* else inv_add(feud_nos_note 4598, *Note* · *A list
+// of 5 numbers.*). Already-has: dump silent — CANDIDATE refuse mes only.
+// Do NOT Read the note this hop (iop1=Read later). Bed / picture / safe are
+// later hops. Stage/count stay. No 28. No dest / p_tele. No && / ||.
+// Cite feud-config-unit-first-377.md §3 §5 · osrs-wiki-changes-crawl-377.md.
+
+[oploc1,feud_mayors_desk]
+if (inv_total(inv, feud_nos_note) >= 1) {
+    mes("You've already found the note."); // CANDIDATE — dump silent on already-has
+    return;
+}
+mes("You find an interesting note on the desk.");
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough room in your inventory to take it.");
+    return;
+}
+inv_add(inv, feud_nos_note, 1);
+return;
