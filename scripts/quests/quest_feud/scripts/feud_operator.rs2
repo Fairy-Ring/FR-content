@@ -19,15 +19,25 @@
 // names Traitorous Ali, the traitor report tree (dump § Talking to Ali the
 // Operator again: "I have discovered the identity of the traitor. It was..."
 // / "Traitorous Ali!" -> sandpit and an umbrella -> "Find him and then kill
-// him" -> help menu; %feud_found_trait 1 CANDIDATE).
+// him" -> help menu; %feud_found_trait 1 CANDIDATE), and (g) after the
+// drink is poisoned, the deed report tree (dump §17.2 Reporting the deed /
+// Talking to Ali the Operator: "Is the deed done?" -> "Almost, his drink is
+// poisoned. As soon as he gets back, he'll be done for." -> "Excellent work!
+// Now, go speak with our boss." -> "He wants to discuss the future direction
+// of the gang."; gate %feud_var_drink_found 1 CANDIDATE), and (h) while
+// still working, the deed-wait tree (dump §15.1 Planning a murder / Talking
+// to Ali the Operator: "Is the deed done?" -> "I'm still working on it." ->
+// "Well don't waste time talking to me. Get on with it."; gate
+// %feud_found_trait 1 CANDIDATE).
 // CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
 // another pocket / Pickpocketing part three / Welcome to the Menaphites /
 // Now you've stolen the jewels / Talking to Ali the Operator again minus the
 // 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
 // %feud_var_comp_gangs = 3 else return. Jewels tree when the player holds
-// feud_mayors_jewels; traitor report when %feud_given_jewels >= 1; report
-// when %feud_talk_villager >= 3; oak when >= 2; progress when >= 1; else
-// the join tree.
+// feud_mayors_jewels; deed report when %feud_var_drink_found >= 1; deed-wait
+// when %feud_found_trait >= 1; traitor report when %feud_given_jewels >= 1;
+// report when %feud_talk_villager >= 3; oak when >= 2; progress when >= 1;
+// else the join tree.
 // No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (report
 // keeps count 3), no 28 (28 = blackjack seller vis, not complete). No
 // %feud_npc_multi (lure/KO vis already shipped in the pickpocket file). No
@@ -40,6 +50,12 @@ if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
 if (inv_total(inv, feud_mayors_jewels) >= 1) {
     @feud_operator_jewels;
+}
+if (%feud_var_drink_found >= 1) {
+    @feud_operator_deed;
+}
+if (%feud_found_trait >= 1) {
+    @feud_operator_deed_wait;
 }
 if (%feud_given_jewels >= 1) {
     @feud_operator_traitor;
@@ -194,3 +210,16 @@ if ($o = 1) {
 }
 ~chatplayer("<p,neutral>No problems here. I actually wanted to ask you about something else.");
 @feud_operator_help;
+
+[label,feud_operator_deed]
+~chatnpc("<p,quiz>Is the deed done?");
+~chatplayer("<p,neutral>Almost, his drink is poisoned. As soon as he gets back, he'll be done for.");
+~chatnpc("<p,neutral>Excellent work! Now, go speak with our boss.");
+~chatnpc("<p,neutral>He wants to discuss the future direction of the gang.");
+return;
+
+[label,feud_operator_deed_wait]
+~chatnpc("<p,quiz>Is the deed done?");
+~chatplayer("<p,neutral>I'm still working on it.");
+~chatnpc("<p,neutral>Well don't waste time talking to me. Get on with it.");
+return;
