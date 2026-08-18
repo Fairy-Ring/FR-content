@@ -20,6 +20,15 @@
 // it out to you?" / "Would you please?" / "Just run the bandits out of
 // town. Incidentally, I spotted their leader to the north-west just a few
 // minutes ago." · "Ok I'll get to it." -> spoken "Okay, I'll get to it."
+// §21.4 Finishing up (Bandit champion dead, §20.4 PASS d478d3333):
+// %feud_var_banditboss >= 1 dispatches @feud_villager_after BEFORE the
+// celebrate — "Now are you satisfied?" -> "Oh, it's you again!" -> "I have
+// delivered you from two evil tyrants. Where's my thank you?" -> "Thank you?
+// For what? You come into our town. You rob, mug, burgle and kill and then
+// expect respect and gratitude? Look, if it's praise and thanks you're
+// looking for, talk to the mayor." -> "I wonder why I bother sometimes! This
+// place has been nothing but trouble and I still haven't found Ali's
+// nephew." Chat only, then return. Mayor nephew reveal is later (§21.5).
 // Chat only — no var writes. Do NOT write %feud_talk_villager (343 is the
 // pick-count leftover) and do NOT write %feud_bandit_boss_vis (338) this hop
 // (Bandit Leader §20 later). No stage write / no 28 / no dest / p_tele.
@@ -27,38 +36,65 @@
 // Cite copy-agent-opener-377.md · feud-varbit-map-377.md §5 §7 · Transcript:The Feud.
 
 [opnpc1,feud_villager_1_1]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
 [opnpc1,feud_villager_1_2]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
 [opnpc1,feud_villager_1_3]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
 [opnpc1,feud_villager_2_1]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
 [opnpc1,feud_villager_2_2]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
 [opnpc1,feud_villager_2_3]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
 [opnpc1,feud_villager_3_1]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
 [opnpc1,feud_villager_3_2]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
 [opnpc1,feud_villager_3_3]
+if (%feud_var_banditboss >= 1) {
+    @feud_villager_after;
+}
 if (%feud_var_menaboss < 1) { return; }
 @feud_villager_celebrate;
 
@@ -83,4 +119,12 @@ if ($fix = 1) {
     return;
 }
 ~chatplayer("<p,neutral>Okay, I'll get to it.");
+return;
+
+[label,feud_villager_after]
+~chatplayer("<p,neutral>Now are you satisfied?");
+~chatnpc("<p,neutral>Oh, it's you again!");
+~chatplayer("<p,neutral>I have delivered you from two evil tyrants. Where's my thank you?");
+~chatnpc("<p,neutral>Thank you? For what? You come into our town. You rob, mug, burgle and kill and then expect respect and gratitude? Look, if it's praise and thanks you're looking for, talk to the mayor.");
+~chatplayer("<p,neutral>I wonder why I bother sometimes! This place has been nothing but trouble and I still haven't found Ali's nephew.");
 return;
