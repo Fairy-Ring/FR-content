@@ -1,28 +1,34 @@
-// The Feud — Ali the Operator Talk-to, chat only. Three trees:
+// The Feud — Ali the Operator Talk-to, chat only. Four trees:
 // (a) join a gang (shipped, PASS feudosxtiyip), (b) after the first
 // pickpocket, the progress advice tree (dump § Picking another pocket:
 // "How is the pickpocketing going? Need a hand?" -> "Yeah, I could do with a
 // bit of advice." -> distraction hint, then the help sub-menu; "Nah, no
 // problems here..." goes straight to the flavour menu — no extra Yes line),
-// and (c) after the second pickpocket, the oak blackjack tree (dump §
+// (c) after the second pickpocket, the oak blackjack tree (dump §
 // Pickpocketing part three / Talking to Ali the Operator: "Having problems?"
 // -> "Yeah, I could do with a bit of advice." -> distraction failing ->
-// award blackjack_oak 4599; full-inv decline / already-has branches).
+// award blackjack_oak 4599; full-inv decline / already-has branches), and
+// (d) after the third pickpocket, the report tree (dump § Welcome to the
+// Menaphites: "Well done! You have finished your first trial." -> burglary
+// briefing -> award feud_mayors_house_keys 4589; full-inv branch).
 // CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
-// another pocket / Pickpocketing part three minus the 27 Apr 2022 lore
-// pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
-// %feud_var_comp_gangs = 3 else return. Oak tree when %feud_talk_villager
-// >= 2; progress when >= 1; else the join tree.
-// No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (oak
-// keeps count 2), no 28 (28 = blackjack seller vis, not complete). No
-// %feud_npc_multi (lure/KO vis is the next hop). No willow. No dest /
-// p_tele. No && / ||.
-// Cite feud-operator-blackjack-377.md §7.4 §7.5 · osrs-wiki-changes-crawl-377.md.
+// another pocket / Pickpocketing part three / Welcome to the Menaphites minus
+// the 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3
+// AND %feud_var_comp_gangs = 3 else return. Report when %feud_talk_villager
+// >= 3; oak when >= 2; progress when >= 1; else the join tree.
+// No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (report
+// keeps count 3), no 28 (28 = blackjack seller vis, not complete). No
+// %feud_npc_multi (lure/KO vis already shipped in the pickpocket file). No
+// willow. No dest / p_tele. No && / ||.
+// Cite feud-operator-blackjack-377.md §7.4 §7.5 §7.6 · osrs-wiki-changes-crawl-377.md.
 
 [opnpc1,feud_egyptian_minder]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager >= 3) {
+    @feud_operator_report;
+}
 if (%feud_talk_villager >= 2) {
     @feud_operator_oak;
 }
@@ -95,6 +101,28 @@ if ($t = 2) {
 ~chatplayer("<p,neutral>So I noticed. Well, he has an uncle called Ali Morrisane, a market vendor in Al Kharid. That's all I really know about him.");
 ~chatnpc("<p,neutral>Say no more. I know just the Ali you mean - that little snake robbed me too! If we work together perhaps we can catch him and teach him a lesson.");
 @feud_operator_help;
+
+[label,feud_operator_report]
+~chatnpc("<p,neutral>Well done! You have finished your first trial.");
+~chatplayer("<p,quiz>First trial?");
+~chatnpc("<p,neutral>You didn't think we'd hire you off the back of a couple of pick-pocketings, did you?");
+~chatplayer("<p,neutral>Ah, of course not.");
+~chatnpc("<p,neutral>Good! Now, the next thing you have to do is a spot of burglary.");
+~chatnpc("<p,neutral>The only place worth pilfering around here is the mayor's villa.");
+~chatnpc("<p,neutral>I want you to retrieve his wife's jewels.");
+~chatplayer("<p,quiz>Got any advice?");
+~chatnpc("<p,neutral>Well I think that a disguise would be a good start. After that I would stake out the place to make sure he's not in.");
+~chatnpc("<p,neutral>You'll need a key to the front door, too.");
+if (inv_freespace(inv) < 1) {
+    ~chatplayer("<p,neutral>I can't carry anything else.");
+    ~chatnpc("<p,neutral>Well then come back to me again when you are ready. Don't be too long.");
+    return;
+}
+inv_add(inv, feud_mayors_house_keys, 1);
+mes("Ali the Operator hands you a set of keys.");
+~chatplayer("<p,quiz>Anything else?");
+~chatnpc("<p,neutral>No! Now get going.");
+return;
 
 [label,feud_operator_oak]
 ~chatnpc("<p,quiz>Having problems?");
