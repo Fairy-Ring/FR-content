@@ -13,9 +13,13 @@
 // talk to you about." -> "Do you want a reward? A fee? I will not begrudge
 // you that." -> "No, I'm here to give you an ultimatum..." -> "How the worm
 // has turned..." -> "Pollnivneach is mine..." -> "Start packing your bags!"
-// then return. No stage write — no 28. No champion spawn this hop
-// (feud_bandit_toughguy 1885 is the later fight). No var writes, no
-// %feud_var_banditboss (323). No dest / p_tele. No && / ||.
+// then the champion spawn: npc_add(npc_coord, feud_bandit_toughguy 1885,
+// 500 CANDIDATE duration) + npc_setmode(opplayer2). No stage write — no 28.
+// [ai_queue3,feud_bandit_toughguy] gosub(npc_death) dumps §20.4 verbatim
+// (defeated your champion / work for you / Ali? Which Ali? / You've been
+// had! / precious townspeople) then %feud_var_banditboss = 1 (varp 323,
+// CANDIDATE leftover flag). Leader stays — no vis write, no dest / p_tele.
+// No && / ||.
 // Cite copy-agent-opener-377.md · feud-varbit-map-377.md §5 §7 ·
 // Transcript:The Feud.
 
@@ -30,4 +34,22 @@ if (%feud_var_menaboss < 1) { return; }
 ~chatnpc("<p,neutral>How the worm has turned. This no-name adventurer who was robbing, looting and poisoning not too long ago is now taking the moral high ground! Or are you trying to keep the whole town for yourself?");
 ~chatnpc("<p,neutral>Pollnivneach is mine. You won't run me out without a fight. If you want us gone, you must defeat our strongest warrior in battle.");
 ~chatplayer("<p,neutral>Start packing your bags!");
+npc_add(npc_coord, feud_bandit_toughguy, 500); // CANDIDATE duration — arena uses 500
+npc_setmode(opplayer2);
+return;
+
+[ai_queue3,feud_bandit_toughguy]
+gosub(npc_death);
+if (p_finduid(%npc_aggressive_player) = true) {
+    ~chatplayer("<p,neutral>I have defeated your champion, now get out of town.");
+    ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,neutral>Adventurer... I have underestimated you. Perhaps we can come to an agreement. How about I work for you? Think of the riches you would make.");
+    ~chatplayer("<p,angry>Don't try my patience. Tell me where Ali is, and then get out of here?");
+    ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,quiz>Ali? Which Ali?");
+    ~chatplayer("<p,angry>Ali Morrisane's nephew! I know you gangs had something to do with his disappearance, so tell me where he is!");
+    ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,shock>Ali Morrisane?! You fool. You've been had!");
+    ~chatplayer("<p,neutral>What do you mean?");
+    ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,neutral>Go have a chat with these precious townspeople of yours. You'll soon learn the truth.");
+    ~chatplayer("<p,angry>I'll go talk to a villager now, just to prove you wrong. Now get out of here before I really get angry with you!");
+    %feud_var_banditboss = 1; // CANDIDATE leftover flag (varp 323)
+}
 return;
