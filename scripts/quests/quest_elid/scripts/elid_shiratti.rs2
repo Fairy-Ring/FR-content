@@ -1,0 +1,44 @@
+// Spirits of the Elid — Shiratti the Custodian Talk-to (four-option shrine
+// tree). New file.
+// CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Talking to
+// Shiratti the Custodian, dump §1.3). NPC elid_shiratti 3044 *Shiratti the
+// Custodian* @ 3424,2929 L0 (m53_45 0 32 49), op1=Talk-to. Gate:
+// %elidquest >= 1 (mayor start, PASS elid0svzkzn7) else return. Four
+// options, each dump-verbatim, each ends the dialogue (dump "(End of
+// dialogue)"). Chat only — %elidquest stays 1, no dest, no robes, no key
+// take. No cupboard this hop / no ballad Read (elid_ballad.rs2 is separate).
+// No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+
+[opnpc1,elid_shiratti]
+if (%elidquest < 1) { return; }
+def_int $s = ~p_choice4("I am trying to find out the cause of this town's curse.", 1, "Good day to you.", 2, "What is this building?", 3, "What is that key on display?", 4);
+if ($s = 1) {
+    ~chatplayer("<p,neutral>I am trying to find out the cause of this town's curse.");
+    ~chatnpc("<p,neutral>Well with the moral standards of this town lately, I'm hardly surprised.");
+    ~chatplayer("<p,quiz>Why, what have they been up to?");
+    ~chatnpc("<p,neutral>Nothing someone like you would understand.");
+    return;
+}
+if ($s = 2) {
+    ~chatplayer("<p,neutral>Good day to you.");
+    ~chatnpc("<p,neutral>Be Careful in here and don't touch anything! There's some old and valuable artefacts around here. Careless outsiders.. you're always coming in and making a mess of things!");
+    ~chatplayer("<p,neutral>Ok calm down, I'm not going to touch anything.");
+    ~chatnpc("<p,neutral>Yes, good don't.");
+    return;
+}
+if ($s = 3) {
+    ~chatplayer("<p,neutral>What is this building?");
+    ~chatnpc("<p,neutral>This is our local shrine to She.");
+    ~chatplayer("<p,quiz>What do you mean by She?");
+    ~chatnpc("<p,neutral>Such ignorance! I suppose I should come to expect it. People are forgetting the old ways of the desert around here. But then.. What do those bureaucratic fools in Menaphos expect! If they're going to take so long to send us a new priestess of She. Do you know we haven't had one for five years now!");
+    ~chatplayer("<p,neutral>Errm you still haven't told me what you mean by She.");
+    ~chatnpc("<p,neutral>She! Otherwise know as Elidinis, Goddess of growth and fertility, Lady of the river, Wife of Tumeken, Flower of the desert, Mother of Icthlarin.");
+    ~chatplayer("<p,neutral>That all sounds very confusing, I might just call her Elidinis for short.");
+    return;
+}
+~chatplayer("<p,neutral>What is that key on display?");
+~chatnpc("<p,neutral>That's a very valuable artefact. Keep your hands off it.");
+~chatplayer("<p,neutral>..I just wanted to know what it did.");
+~chatnpc("<p,neutral>That's the key to the holy chambers of the great and mighty Spirits of the Elid, and it's staying right there. There are other holy items about this building and keep your hands off them too, but most definitely keep your hands off the key. People already meddle too much with the affairs of the shrine.");
+return;
