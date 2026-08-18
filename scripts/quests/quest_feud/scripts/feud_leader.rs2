@@ -20,7 +20,9 @@
 // never get to me. Guards protect me." then spawn the Tough Guy fight:
 // npc_add(npc_coord, feud_menap_toughguy 1906, 500 CANDIDATE duration) +
 // npc_setmode(opplayer2). No stage write — no 28. Death [ai_queue3,feud_menap_toughguy]
-// dumps §18.5 verbatim (Leader threat + Ali's-nephew retort + villagers-reward hope)
+// then 100% drops CANDIDATE 2007-base (OSRS Tough Guy #Drops / The Feud
+// rewards / leftover blackjack_willow 4600): bones + willow blackjack.
+// Then dumps §18.5 verbatim (Leader threat + Ali's-nephew retort + villagers-reward hope)
 // then %feud_boss_vis = 0 (Leader gone — dump teleport, not dest / p_tele) and
 // %feud_var_menaboss = 1 (CANDIDATE leftover flag).
 // Cite copy-agent-opener-377.md · feud-config-unit-first-377.md ·
@@ -48,6 +50,10 @@ return;
 
 [ai_queue3,feud_menap_toughguy]
 gosub(npc_death);
+if (npc_findhero = ^true) {
+    obj_add(npc_coord, bones, 1, ^lootdrop_duration);
+    obj_add(npc_coord, blackjack_willow, 1, ^lootdrop_duration);
+}
 if (p_finduid(%npc_aggressive_player) = true) {
     ~chatnpc_specific("Menaphite Leader", feud_menap_boss_vis, "<p,angry>You haven't seen the last of me!");
     ~chatplayer("<p,neutral>No doubt I haven't seen the last of you... but what about Ali's nephew?");

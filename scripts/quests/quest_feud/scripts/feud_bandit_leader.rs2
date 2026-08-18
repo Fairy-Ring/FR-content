@@ -15,7 +15,10 @@
 // has turned..." -> "Pollnivneach is mine..." -> "Start packing your bags!"
 // then the champion spawn: npc_add(npc_coord, feud_bandit_toughguy 1885,
 // 500 CANDIDATE duration) + npc_setmode(opplayer2). No stage write — no 28.
-// [ai_queue3,feud_bandit_toughguy] gosub(npc_death) dumps §20.4 verbatim
+// [ai_queue3,feud_bandit_toughguy] gosub(npc_death) then 100% drops
+// CANDIDATE 2007-base (OSRS The Feud rewards / tip.it: bones + adamant
+// scimitar 1331). Willow blackjack 4600 is the Tough Guy drop, not this
+// face. Then dumps §20.4 verbatim
 // (defeated your champion / work for you / Ali? Which Ali? / You've been
 // had! / precious townspeople) then %feud_var_banditboss = 1 (varp 323,
 // CANDIDATE leftover flag). Leader stays — no vis write, no dest / p_tele.
@@ -40,6 +43,10 @@ return;
 
 [ai_queue3,feud_bandit_toughguy]
 gosub(npc_death);
+if (npc_findhero = ^true) {
+    obj_add(npc_coord, bones, 1, ^lootdrop_duration);
+    obj_add(npc_coord, adamant_scimitar, 1, ^lootdrop_duration);
+}
 if (p_finduid(%npc_aggressive_player) = true) {
     ~chatplayer("<p,neutral>I have defeated your champion, now get out of town.");
     ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,neutral>Adventurer... I have underestimated you. Perhaps we can come to an agreement. How about I work for you? Think of the riches you would make.");
