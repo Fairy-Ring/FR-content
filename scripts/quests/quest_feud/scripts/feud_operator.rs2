@@ -15,14 +15,19 @@
 // you've stolen the jewels / Talking to Ali the Operator: "I've completed
 // your task." -> crack that safe / hints lying around -> "Now give me the
 // jewels." -> mes hand-over, inv_del 4590, %feud_given_jewels 1 CANDIDATE ->
-// traitor briefing through "Well then get to it.").
+// traitor briefing through "Well then get to it."), and (f) after the thug
+// names Traitorous Ali, the traitor report tree (dump § Talking to Ali the
+// Operator again: "I have discovered the identity of the traitor. It was..."
+// / "Traitorous Ali!" -> sandpit and an umbrella -> "Find him and then kill
+// him" -> help menu; %feud_found_trait 1 CANDIDATE).
 // CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
 // another pocket / Pickpocketing part three / Welcome to the Menaphites /
-// Now you've stolen the jewels minus the 27 Apr 2022 lore pass). Gate:
-// %feud_var >= 1 AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 else
-// return. Jewels tree when the player holds feud_mayors_jewels; report when
-// %feud_talk_villager >= 3; oak when >= 2; progress when >= 1; else the
-// join tree.
+// Now you've stolen the jewels / Talking to Ali the Operator again minus the
+// 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
+// %feud_var_comp_gangs = 3 else return. Jewels tree when the player holds
+// feud_mayors_jewels; traitor report when %feud_given_jewels >= 1; report
+// when %feud_talk_villager >= 3; oak when >= 2; progress when >= 1; else
+// the join tree.
 // No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (report
 // keeps count 3), no 28 (28 = blackjack seller vis, not complete). No
 // %feud_npc_multi (lure/KO vis already shipped in the pickpocket file). No
@@ -35,6 +40,9 @@ if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
 if (inv_total(inv, feud_mayors_jewels) >= 1) {
     @feud_operator_jewels;
+}
+if (%feud_given_jewels >= 1) {
+    @feud_operator_traitor;
 }
 if (%feud_talk_villager >= 3) {
     @feud_operator_report;
@@ -150,6 +158,17 @@ inv_del(inv, feud_mayors_jewels, 1);
 ~chatplayer("<p,neutral>Aw! You can count on me to find the traitor.");
 ~chatnpc("<p,neutral>Well then get to it.");
 return;
+
+[label,feud_operator_traitor]
+~chatplayer("<p,neutral>I have discovered the identity of the traitor. It was...");
+~chatplayer("<p,neutral>Traitorous Ali!");
+~chatnpc("<p,neutral>No! I would never have suspected Traitorous Ali.");
+~chatnpc("<p,neutral>Well, there was that time he sold out his entire family for a sandpit and an umbrella.");
+~chatnpc("<p,neutral>But I'm sure it took much more for him to betray us!");
+~chatplayer("<p,neutral>Actually he sold you out for...");
+~chatnpc("<p,neutral>Stop, I don't want to know. It hurts too much already. Find him and then kill him, but do it quietly. I don't want a fuss.");
+%feud_found_trait = 1; // CANDIDATE
+@feud_operator_help;
 
 [label,feud_operator_oak]
 ~chatnpc("<p,quiz>Having problems?");
