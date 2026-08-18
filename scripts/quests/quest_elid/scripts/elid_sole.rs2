@@ -1,0 +1,17 @@
+// Spirits of the Elid — mayor's shoes sole (knife leftover).
+// Official day 5 Dec 2005. CANDIDATE 2007-base (research
+// elid-sole-leftover-377.md · dump § Cutting the mayor's shoes). Use knife
+// (946 — pack; spec id 1733 is the needle) on elid_shoes 6790 -> consume
+// shoes + elid_sole 6791 + dump tbox "You remove the soles from the shoes."
+// (CANDIDATE leftover line). Wrong item -> ~displaymessage(^dm_default).
+// Stay %elidquest 1. No dest. No genie retouch. No fountain. No && / ||.
+// Cite elid-sole-leftover-377.md · Transcript:Spirits of the Elid.
+
+[opheldu,elid_shoes]
+if (last_useitem ! knife) {
+    ~displaymessage(^dm_default);
+    return;
+}
+~mesbox("You remove the soles from the shoes."); // CANDIDATE dump tbox
+inv_del(inv, elid_shoes, 1);
+inv_add(inv, elid_sole, 1);
