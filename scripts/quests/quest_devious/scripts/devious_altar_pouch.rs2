@@ -1,0 +1,25 @@
+// Devious Minds — glowing pouch on church altar (Use on loc).
+// Official day 19 Dec 2005. CANDIDATE 2007-base (research
+// devious-altar-pouch-leftover-377.md — 0 dump Use mes; %devious_altar 1 =
+// pouch face, pack-cited varbit 1466). Use devious_glowingpouch 6819 on the
+// church altar (multi devious_altar 10638 @ 2853,3348, multivar
+// devious_altar, face altar bit 0) -> consume 6819 + %devious_altar = 1.
+// Both binds pin-gated (not worldwide altar) + last_useitem else dm_default.
+// [oploc1,_prayer_altar] Pray-at stays. Stay %devious_main 1. No dest.
+// No cutscene. No 2. No && / ||.
+// Cite devious-altar-pouch-leftover-377.md · varbit.pack 1466.
+
+[oplocu,devious_altar] @devious_altar_pouch_use;
+[oplocu,altar] @devious_altar_pouch_use;
+
+[label,devious_altar_pouch_use]
+if (last_useitem ! devious_glowingpouch) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (coordx(loc_coord) ! 2853 | coordz(loc_coord) ! 3348) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, devious_glowingpouch, 1);
+%devious_altar = 1;
