@@ -1,0 +1,11 @@
+// Devious Minds — dead monk Search (tbox only).
+// Official day 19 Dec 2005. CANDIDATE 2007-base (OSRS Transcript:Devious
+// Minds § Finding the dead monk, local dump spine-2). New
+// [opnpc1,devious_monk_dead_visable] 3077 (name Dead Monk, op1=Search).
+// Dump tbox verbatim. Do NOT write %devious_monk (varbit 1467 — dead face
+// flips on the bit, later leftover). Do not bind multi 3074. Stay
+// %devious_main 1 + altar 1. No dest. No && / ||.
+// Cite devious-dead-monk-leftover-377.md · _unpack/377/all.npc 3077.
+
+[opnpc1,devious_monk_dead_visable]
+~mesbox("The poor guy appears to have been killed by powerful magic!");
