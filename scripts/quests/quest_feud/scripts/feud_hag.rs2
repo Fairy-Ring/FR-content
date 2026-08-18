@@ -1,0 +1,32 @@
+// The Feud — Hag first talk (snake venom request). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Talking to Ali the Hag,
+// dump §15.3). NPC feud_hag 1871 @ 3346,2987 L0, display Ali the Hag.
+// Gate: %feud_found_trait >= 1 (traitor report) else return — the dump has
+// no pre-tree here. Tree verbatim: "Good day, Hag." / "Blockhead" / "remove
+// someone" / 'Traitorous Ali', please -> pickled aubergines -> "bring me
+// some snake venom" through "...that snake charmer's pet worm, it's about
+// as dangerous as a rubber knife." No state write (dump writes none — no
+// hag_list / witchbothered). Stage/count stay. No 28. No dest / p_tele.
+// Snake charm is LATER. No && / ||.
+// Cite feud-config-unit-first-377.md · osrs-wiki-changes-crawl-377.md.
+
+[opnpc1,feud_hag]
+if (%feud_found_trait < 1) { return; }
+~chatplayer("<p,neutral>Good day, Hag.");
+~chatnpc("<p,neutral>Good day to you too, Blockhead.");
+~chatnpc("<p,neutral>Now what do you want? A hex? A spot potion? Power, beauty, eternal youth, etcetera?");
+~chatplayer("<p,neutral>Actually I just want your help to, erm, remove someone. It's simple enough!");
+~chatnpc("<p,neutral>Ahh, I see. But I warn you, stranger - extinguishing the flame of life is simple, but people rarely wish to face the consequences, and I doubt you are any different.");
+~chatplayer("<p,neutral>Don't worry about the consequences - I need it carried out in a manner which would draw no suspicion to me.");
+~chatnpc("<p,neutral>Well now this is getting interesting. I'd recommend a poisoning. Who do you wish dead? I need to know so that I may tailor a poison to their specific needs.");
+~chatplayer("<p,quiz>'Traitorous Ali', please.");
+~chatnpc("<p,neutral>Traitorous Ali? Say no more! That wretch traded his grandmother's house for a jar of pickled aubergines! I believe he'll be easily gotten rid of...");
+~chatplayer("<p,quiz>What payment do you require?");
+~chatnpc("<p,neutral>None at all - I will extract much pleasure from his passing. Just bring me the ingredients I require.");
+~chatplayer("<p,quiz>What do you need?");
+~chatnpc("<p,neutral>Ah, impatience! Traitorous Ali's time is indeed nigh. Firstly bring me some snake venom, which will act as the main toxin.");
+~chatplayer("<p,quiz>Where would I get some snake poison?");
+~chatnpc("<p,neutral>From a snake perhaps?");
+~chatplayer("<p,neutral>What I meant was how do I extract the poison from the snake?");
+~chatnpc("<p,neutral>Sheesh! You'd make a terrible hag. Just bring me a snake with teeth in its head - and don't even think of giving me that snake charmer's pet worm, it's about as dangerous as a rubber knife.");
+return;
