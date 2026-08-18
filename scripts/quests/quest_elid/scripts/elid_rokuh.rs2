@@ -1,13 +1,15 @@
-// Spirits of the Elid — Rokuh curse Talk-to. New file.
+// Spirits of the Elid — Rokuh curse Talk-to + choc-ice buy. New file.
 // CANDIDATE 2007-base (OSRS Transcript:Spirits of the Elid § Rokuh, dump
 // §2.2). NPC elid_choc_ice_seller 3045 @ 3430,2914 L0 (m53_45 0 38 34,
 // display Rokuh). Greeting verbatim. The quest option "I am trying to find
-// out the cause of this town's curse." tree verbatim. The three non-quest
-// options (Cool I'd like to buy some. / No thanks, I'm not interested. /
-// How do you stop your icy snacks melting?) are the dump's trade/shop path —
-// LATER hop (silent return here; no Trade / shop this hop). Stay %elidquest
-// 1. No dest. No && / ||.
-// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the Elid.
+// out the cause of this town's curse." tree verbatim. Buy option (Cool I'd
+// like to buy some.): price 50 CANDIDATE 2007-base _unpack/727/all.inv
+// [chociceshopnardah] stock1=elid_choc_ice,30,50 (no 377 shop, no Changes).
+// No coins -> CANDIDATE mes. No thanks = dump-silent return CANDIDATE.
+// Melting question + op3=Trade shop IF later. Stay %elidquest 1. No dest.
+// No && / ||.
+// Cite osrs-wiki-changes-crawl-377.md elid row · Transcript:Spirits of the
+// Elid · _unpack/727/all.inv [chociceshopnardah].
 
 [opnpc1,elid_choc_ice_seller]
 ~chatnpc("<p,neutral>Come one, come all, buy my amazing choc ice invention here! Chocolate on the outside. Iced cream on the inside. Oh I also have some chocolate left over from making choc ices which I'm selling too.");
@@ -17,4 +19,14 @@ if ($r = 4) {
     ~chatnpc("<p,neutral>I really have no idea. It's most regrettable. Fortunately my innovation with my choc ice invention is helping people stay at least slightly cool.");
     return;
 }
-return; // trade/shop path = LATER hop
+if ($r = 1) {
+    if (inv_total(inv, coins) < 50) {
+        mes("You don't have 50 coins to buy the choc ice with."); // CANDIDATE
+        return;
+    }
+    inv_del(inv, coins, 50);
+    inv_add(inv, elid_choc_ice, 1);
+    mes("You buy a choc ice for 50 coins!"); // CANDIDATE 2007-base price
+    return;
+}
+return; // no-thanks = silent CANDIDATE; melting question + op3 Trade shop IF = LATER
