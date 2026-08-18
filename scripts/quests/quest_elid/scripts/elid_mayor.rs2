@@ -1,11 +1,19 @@
-// Spirits of the Elid — Awusah the Mayor (Nardah) start Talk-to.
+// Spirits of the Elid — Awusah the Mayor (Nardah) start Talk-to + after-start.
 // CANDIDATE lines (OSRS Transcript:Spirits of the Elid minus overlay/fairy-ring).
 // First write %elidquest 0 -> 1. Chat + write only — no river dest,
 // no ancestral-key dest, do not retouch elid_ballad.rs2 (already residual).
+// After-start (%elidquest >= 1): @elid_mayor_after — greeting keeps "sir"
+// period voice; three opts (working / meant to do / haven't had the time),
+// each returns. Stay 1. No dest.
 // Review: Yes uses ~chatplayer (same as Agrith / Two Cats).
-// Cite red-19-start-impl-377.md §12.
+// Cite red-19-start-impl-377.md §12 · Transcript:Spirits of the Elid
+// (after-start section).
 
 [opnpc1,elid_mayor]
+if (%elidquest >= 1) {
+    @elid_mayor_after;
+    return;
+}
 ~chatnpc("<p,neutral>Many salutations to you. What brings you to our little town?");
 ~chatplayer("<p,neutral>I am an adventurer in search of quests.");
 ~chatnpc("<p,neutral>Our town seems to have come under a curse");
@@ -18,3 +26,21 @@ if ($go = 2) {
 ~chatplayer("<p,neutral>Ok I will have a look around and see what I can do.");
 ~chatnpc("<p,neutral>Good luck to you.");
 %elidquest = 1;
+
+[label,elid_mayor_after]
+~chatnpc("<p,neutral>Many salutations to you sir, have you made any progress in uncovering the reasons for our curse yet?");
+def_int $m = ~p_choice3("I am working on it.", 1, "What was I meant to do again?", 2, "I haven't really had the time to investigate.", 3);
+if ($m = 1) {
+    ~chatplayer("<p,neutral>I am working on it.");
+    ~chatnpc("<p,neutral>Please try your best, that water salesman is not doing much good for the economy of our town.");
+    return;
+}
+if ($m = 2) {
+    ~chatplayer("<p,neutral>What was I meant to do again?");
+    ~chatnpc("<p,neutral>Look around this town, see if you can uncover any information to why we were cursed and how the curse might be lifted. I suspect that it might be because a priest of Saradomin died while staying at our town, but");
+    ~chatnpc("<p,neutral>that isn't much help in getting the curse lifted and it is possible I'm wrong anyway.");
+    return;
+}
+~chatplayer("<p,neutral>I haven't really had the time to investigate.");
+~chatnpc("<p,neutral>Well I hope somebody can find the time soon, the despair of the people of this town increases daily.");
+return;
