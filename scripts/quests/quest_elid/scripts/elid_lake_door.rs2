@@ -1,0 +1,20 @@
+// Spirits of the Elid — lake door Open (golem hall <-> spirits side).
+// Official day 5 Dec 2005. CANDIDATE 2007-base (research
+// elid-lake-door-leftover-377.md — dump silent on this Open; wiki walk
+// only). Doors elid_underground_lake_door 10423 @ 3354,9558 + _mirror
+// 10425 @ 3355,9558 (name Door, op1=Open, N-S corridor). Same dest rule as
+// the robe+key pair: coordz(coord) <= coordz(loc_coord) -> north
+// 0_52_149_26_23 3354,9559 L0, else south 0_52_149_26_21 3354,9557 L0
+// (CANDIDATE). Channel-bit gate UNKNOWN — none invented. Stay %elidquest 1.
+// No water-channel retouch. No dest onto door tiles. No && / ||.
+// Cite elid-lake-door-leftover-377.md · elid-dest-from-maps-377.md.
+
+[oploc1,elid_underground_lake_door] @elid_lake_door_open;
+[oploc1,elid_underground_lake_door_mirror] @elid_lake_door_open;
+
+[label,elid_lake_door_open]
+if (coordz(coord) <= coordz(loc_coord)) {
+    p_telejump(0_52_149_26_23); // CANDIDATE north dest-side 3354,9559 L0
+    return;
+}
+p_telejump(0_52_149_26_21); // CANDIDATE south dest-side 3354,9557 L0
