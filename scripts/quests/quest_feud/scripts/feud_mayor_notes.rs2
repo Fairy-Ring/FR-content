@@ -1,0 +1,18 @@
+// The Feud — Mayor-notes Read (opheld1). New file.
+// CANDIDATE 2007-base (OSRS Transcript:Note (Fibonacci) / Transcript:Note
+// (numbers)). Read (iop1) on both notes: feud_fib_hint 4597 and
+// feud_nos_note 4598. Fib: ~mesbox("The piece of paper has the word
+// 'Fibonacci' scrawled on it."). Numbers: ~mesbox 5-line poem ("|" =
+// newline): "These numbers contained within,|A sequence age old begin,|Have
+// a look,|Where do they fit in?|1,1,2,3,5....". Stage/count stay. No 28.
+// No if_open leftover title. No dest / p_tele. Safe combo is LATER.
+// No && / ||.
+// Cite feud-config-unit-first-377.md §3 · osrs-wiki-changes-crawl-377.md.
+
+[opheld1,feud_fib_hint]
+~mesbox("The piece of paper has the word 'Fibonacci' scrawled on it.");
+return;
+
+[opheld1,feud_nos_note]
+~mesbox("These numbers contained within,|A sequence age old begin,|Have a look,|Where do they fit in?|1,1,2,3,5....");
+return;
