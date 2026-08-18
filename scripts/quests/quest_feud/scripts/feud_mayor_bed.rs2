@@ -1,0 +1,25 @@
+// The Feud — Mayor's Bed Search (Fibonacci note). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Searching the Mayor's Bed,
+// dump §12.5). Loc feud_mayors_bed 6274 @ 3372,2972 L1 (upstairs; stairs
+// dest PARKED — tele L1 is commute), name Bed, width 2, length 3,
+// op1=Search. Dump: mes *You find a flattened note under the mattress.* then
+// full-inv -> *You don't have enough room in your inventory to take it.*
+// else inv_add(feud_fib_hint 4597, *Note* · "A note found in the Mayor's
+// bedroom mentioning the word 'Fibonacci'."). Already-has: dump silent —
+// CANDIDATE refuse mes only. Do NOT Read the note this hop (iop1 later).
+// Picture / safe are later hops. Stage/count stay. No 28. No dest / p_tele.
+// No && / ||.
+// Cite feud-config-unit-first-377.md §3 §5 · osrs-wiki-changes-crawl-377.md.
+
+[oploc1,feud_mayors_bed]
+if (inv_total(inv, feud_fib_hint) >= 1) {
+    mes("You've already found the note."); // CANDIDATE — dump silent on already-has
+    return;
+}
+mes("You find a flattened note under the mattress.");
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough room in your inventory to take it.");
+    return;
+}
+inv_add(inv, feud_fib_hint, 1);
+return;
