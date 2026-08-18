@@ -1,0 +1,27 @@
+// The Feud — Charm a desert snake (dump §15.5). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Charming a snake, dump
+// §15.5 — the two mes only). Play (iop1) the snake_flute 4605 next to a
+// desert snake: feud_desert_snake 1874 (Attack only; NOT the hag's pet
+// feud_charmers_snake 1875). Gate: must hold basket_for_snake 4606 and a
+// feud_desert_snake in range (npc_find). Success: mes "You successfully
+// charm and capture the snake!" + inv_del basket 4606 + inv_add
+// basket_with_snake 4607. Pet 1875 / no snake in range / no basket: mes
+// "Your snake charming skills are insufficient to pacify the creature."
+// First in-range Play with an empty basket CANDIDATE succeeds (no random
+// fail %). Stage/count stay. No 28. No dest / p_tele. Hag-with-basket
+// §15.6 is LATER. No && / ||.
+// Cite feud-first-slice-377.md · osrs-wiki-changes-crawl-377.md.
+
+[opheld1,snake_flute]
+if (inv_total(inv, basket_for_snake) < 1) {
+    mes("Your snake charming skills are insufficient to pacify the creature.");
+    return;
+}
+if (npc_find(coord, feud_desert_snake, 10, 0) = false) {
+    mes("Your snake charming skills are insufficient to pacify the creature.");
+    return;
+}
+mes("You successfully charm and capture the snake!");
+inv_del(inv, basket_for_snake, 1);
+inv_add(inv, basket_with_snake, 1);
+return;
