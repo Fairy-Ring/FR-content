@@ -3,12 +3,13 @@
 // Minds § Reporting to Sir Tiffy, local dump spine-2). Dispatch from
 // rd_tiffy.rs2 [label,rd_tiffy_complete] when %devious_monk = 1 (before the
 // Wanted jump). Dump tree verbatim: greeting + 2 opts (Devious Minds /
-// Something else). Devious Minds: 12-line bad-news tree + Qact
-// "Congratulations! Quest complete!" as CANDIDATE mes (no questlist
-// component / complete rung in pack — do not invent %). Something else ->
-// @rd_tiffy_after (live Wanted / hello). Stay %devious_main 1 + altar 1 +
-// monk 1. No dest. No Wanted write. No && / ||.
-// Cite devious-tiffy-leftover-377.md · Transcript:Devious Minds.
+// Something else). Devious Minds: 12-line bad-news tree; qact complete is a
+// later leftover (no mes / no ~send_quest_complete this hop — no complete
+// rung). Something else -> @rd_tiffy_after (live Wanted / hello). Stay
+// %devious_main 1 + altar 1 + monk 1. No dest. No Wanted write.
+// No && / ||.
+// Cite devious-tiffy-leftover-377.md · devious-tiffy-complete-mes-377.md ·
+// Transcript:Devious Minds.
 
 [label,devious_tiffy_report]
 ~chatnpc("<p,neutral>Good day Proselyte. Is there anything I can do for you?");
@@ -25,7 +26,6 @@ if ($t = 1) {
     ~chatnpc("<p,neutral>Ha ha ha, no. At least not yet anyway, we need to know more about what we're dealing with. We still don't know who the monk was and where he got that orb from.");
     ~chatplayer("<p,neutral>Is there anything I can do to help?");
     ~chatnpc("<p,neutral>Not yet, but we'll be in touch. Oh and don't worry about that relic, we'll get it back somehow!");
-    mes("Congratulations! Quest complete!"); // CANDIDATE — no questlist component / complete rung in pack
     return;
 }
 @rd_tiffy_after; // Something else -> live Wanted / hello
