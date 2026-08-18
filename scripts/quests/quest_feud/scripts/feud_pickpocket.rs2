@@ -82,6 +82,11 @@ if (%feud_talk_villager = 1 & %feud_distracted = 1) {
     return;
 }
 if (%feud_talk_villager >= 1) {
+    if (%feud_talk_villager >= 2) {
+        if (inv_total(inv, blackjack_oak) >= 1 | inv_total(worn, blackjack_oak) >= 1) {
+            %feud_npc_multi = 1; // CANDIDATE — opens Lure (vis 1) after the oak award; engine rejects op4 at vis 0
+        }
+    }
     ~chatnpc("<p,angry>I know your tricks, thief.");
     ~chatnpc("<p,angry>You won't get my purse.");
     ~damage_self(2); // dump: villager hits the player for 2 damage. Stun skipped (no opcode).

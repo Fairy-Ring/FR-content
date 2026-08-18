@@ -1,0 +1,46 @@
+// The Feud — Villager Lure (op4, vis 1). New file.
+// CANDIDATE 2007-base (OSRS Transcript:The Feud § Luring a villager, dump
+// §9.3). Gate: %feud_var >= 1 AND %feud_var_drink >= 3 AND
+// %feud_var_comp_gangs = 3 AND %feud_talk_villager >= 2 AND the oak
+// blackjack (4599) in inv or worn else return. op4=Lure exists only on the
+// concrete vis _2 faces (feud_villager_1_2/2_2/3_2 — NOT the multi bases
+// 1887/1891/1895); the world NPC is the multi and the vis child is resolved
+// by %feud_npc_multi (0 -> _1, 1 -> _2, 2 -> _3). The flip 0->1 happens on
+// the pickpocket refuse at count >= 2 with the oak held (feud_pickpocket.rs2
+// — the engine rejects op4 while vis 0); this file writes it idempotently
+// too. Lure tree verbatim: *Psst. Come here, I want to show you something* /
+// *What is it?* / *It's a surprise! Follow me.* Count stays 2. %feud_var
+// stays 1. No 28. No KO (npc_multi 2 is the next hop). No dest / p_tele.
+// No && / ||.
+// Cite feud-operator-blackjack-377.md §7.5 · osrs-wiki-changes-crawl-377.md.
+
+[opnpc4,feud_villager_1_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager < 2) { return; }
+if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
+@feud_villager_lure;
+
+[opnpc4,feud_villager_2_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager < 2) { return; }
+if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
+@feud_villager_lure;
+
+[opnpc4,feud_villager_3_2]
+if (%feud_var < 1) { return; }
+if (%feud_var_drink < 3) { return; }
+if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_talk_villager < 2) { return; }
+if (inv_total(inv, blackjack_oak) < 1 & inv_total(worn, blackjack_oak) < 1) { return; }
+@feud_villager_lure;
+
+[label,feud_villager_lure]
+~chatplayer("<p,neutral>Psst. Come here, I want to show you something");
+~chatnpc("<p,neutral>What is it?");
+~chatplayer("<p,neutral>It's a surprise! Follow me.");
+%feud_npc_multi = 1;
+return;
