@@ -1,0 +1,11 @@
+// Mountain Daughter — The Kendal Talk-to (mdaughter_bearman 1812, child of
+// multi mdaughter_multi_bear 1811 @ 2786,10081). CANDIDATE last-resort
+// 2007-base: OSRS Transcript:Mountain Daughter "Talking to him" minus
+// Changes. Chat header The Kendal. Prefer 0 write: %mdaughter_quest_var
+// stays 1. No bear bits / dest / pool / kill / fake complete. Hunt 289? no.
+// Cite docs/research/md-kendal-377.md §4.5.
+
+[opnpc1,mdaughter_bearman]
+~chatplayer("<p,neutral>Errr... hello?");
+~chatnpc("<p,neutral>Who dares to disturb my slumber?");
+return;
