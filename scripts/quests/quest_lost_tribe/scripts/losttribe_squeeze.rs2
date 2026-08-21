@@ -1,0 +1,11 @@
+// The Lost Tribe — cellar wall Squeeze-through back to the mines. The hole
+// is the multiloc child lost_tribe_cavewall_hole_walldecor (pack 6905) of
+// lost_tribe_cellar_wall 6899 @ 3221,9618 L0 (m50_150 0 21 18), visible when
+// %lost_tribe_quest >= 4; engine triggers bind the resolved child. Dest
+// 3318,9615 L0 is the first walkable W of Mistag 2084 @ 3319,9615 (m51_150)
+// — never onto the NPC. No var write; no mines complete.
+// Cite losttribe-cellar-dest-from-maps-377.md §2 (gap 003).
+
+[oploc1,lost_tribe_cavewall_hole_walldecor]
+p_telejump(0_51_150_54_15); // 3318,9615 L0 CANDIDATE dest-from-maps (W of Mistag, not on NPC)
+return;
