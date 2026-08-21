@@ -1,0 +1,105 @@
+// Recruitment Drive — Spishyus room fox / chicken / grain Pick-up.
+// Loc names + obj rd_fox / rd_chicken / rd_sack (5kg, iop2=Wear). Instance only.
+// One-at-a-time CANDIDATE 2007-base Transcript:Recruitment Drive (bridge 5kg).
+// Eat (fox fat / empty sack descs) is a later hop — not this file.
+
+[proc,rd_carry_count]()(int)
+def_int $n = 0;
+if (inv_total(inv, rd_fox) > 0 | inv_total(worn, rd_fox) > 0) {
+    $n = calc($n + 1);
+}
+if (inv_total(inv, rd_chicken) > 0 | inv_total(worn, rd_chicken) > 0) {
+    $n = calc($n + 1);
+}
+if (inv_total(inv, rd_sack) > 0 | inv_total(worn, rd_sack) > 0) {
+    $n = calc($n + 1);
+}
+return($n);
+
+[proc,rd_pickup_east]()(boolean)
+def_coord $sw = region_getcoord(0, 0, 0);
+if (calc(coordx(loc_coord) - coordx($sw)) >= 48) {
+    return(true);
+}
+return(false);
+
+[proc,rd_pickup_animal](namedobj $obj)
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (loc_type = rd_sack_empty) {
+    mes("The sack is empty.");
+    return;
+}
+if (~rd_carry_count > 0) {
+    mes("You can only carry one of these at a time."); // CANDIDATE 2007-base 5kg
+    return;
+}
+if (~pickup_obj_check_for_space($obj, 1) = false) {
+    return;
+}
+anim(human_pickupfloor, 0);
+p_delay(0);
+sound_synth(pick, 0, 0);
+if (~rd_pickup_east = true) {
+    if ($obj = rd_fox) {
+        %rd_foxleft = 1;
+    } else if ($obj = rd_chicken) {
+        %rd_chickleft = 1;
+    } else {
+        %rd_grainleft = 1;
+    }
+} else {
+    if ($obj = rd_fox) {
+        %rd_foxright = 0;
+    } else if ($obj = rd_chicken) {
+        %rd_chickright = 0;
+    } else {
+        %rd_grainright = 0;
+    }
+}
+inv_add(inv, $obj, 1);
+
+[oploc1,rd_room2_fox_multi]
+~rd_pickup_animal(rd_fox);
+return;
+
+[oploc1,rd_room2_fox_multi_right]
+~rd_pickup_animal(rd_fox);
+return;
+
+[oploc1,rd_fox_normal]
+~rd_pickup_animal(rd_fox);
+return;
+
+[oploc1,rd_fox_fat]
+~rd_pickup_animal(rd_fox);
+return;
+
+[oploc1,rd_room2_chicken_multi]
+~rd_pickup_animal(rd_chicken);
+return;
+
+[oploc1,rd_room2_chicken_multi_right]
+~rd_pickup_animal(rd_chicken);
+return;
+
+[oploc1,rd_chicken_normal]
+~rd_pickup_animal(rd_chicken);
+return;
+
+[oploc1,rd_room2_grain_multi]
+~rd_pickup_animal(rd_sack);
+return;
+
+[oploc1,rd_room2_grain_multi_right]
+~rd_pickup_animal(rd_sack);
+return;
+
+[oploc1,rd_sack_full]
+~rd_pickup_animal(rd_sack);
+return;
+
+[oploc1,rd_sack_empty]
+~rd_pickup_animal(rd_sack);
+return;
