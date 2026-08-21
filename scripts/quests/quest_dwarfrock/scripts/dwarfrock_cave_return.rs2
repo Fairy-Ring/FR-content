@@ -1,0 +1,9 @@
+// Between a Rock — Go-through cave entrance 5998 @ 2838,10123 back to the
+// statue hall. No %dwarfrock_quest gate (same commute pair as the tunnel
+// 5973 — dest-side loc 5998 has 0 [oploc1]). Stay dwarfrock_quest 10. Never
+// Fire dest 2306,4952 / demon L3. No schematic 12586.
+// Cite dest-cite-index-377.md (5998 @ 2838,10123) + dest-from-our-maps-remaining-377.md.
+
+[oploc1,dwarf_cave_entrance]
+p_telejump(0_43_158_28_49); // 2780,10161 L0 CANDIDATE dest-from-maps (W of 5973)
+return;
