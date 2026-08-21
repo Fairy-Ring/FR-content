@@ -2,10 +2,10 @@
 // dest east of the portal + first leftover puzzle IF chrome (balloon_animal
 // 16129). CANDIDATE join — leftover text does not name RD; no answers this hop.
 // The packed m38_77 template is the shared overworld — movecoord from the
-// instance loc keeps the dest on the private copy (map_build relocates).
+// instance loc keeps the dest on the private copy (region_set relocates).
 
 [oploc1,rd_portal_room3_entrance]
-if (in_instance() = true) {
+if (region_findbycoord(coord()) = true) {
     p_telejump(movecoord(loc_coord, 1, 0, 0)); // instance-local: east of 7315 into room 3
     if_openmain(balloon_animal); // CANDIDATE leftover — Close + title chrome only
 }

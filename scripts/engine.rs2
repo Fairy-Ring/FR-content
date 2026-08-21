@@ -78,9 +78,21 @@
 [command,map_findsquare](coord $coord, int $minradius, int $maxradius, int $type)(coord)
 // info: Returns true if the map tile at $coord is in a multi-way combat area
 [command,map_multiway](coord $coord)(boolean)
-// CANDIDATE 2005 region command (Ash / LC wiki). Swap names if a 2007-base list appears.
-[command,map_build](coord $src)(coord)
-[command,in_instance]()(boolean)
+// 2005 region commands (LC wiki / Engine-TS#95). Leftover 274 parked these as comments.
+[command,region_create](int $levels, int $zones_east, int $zones_north)(coord)
+[command,.region_create](int $levels, int $zones_east, int $zones_north)(coord)
+[command,region_set](int $dest_level, int $dest_east, int $dest_north, coord $source, int $rotation)
+[command,.region_set](int $dest_level, int $dest_east, int $dest_north, coord $source, int $rotation)
+[command,region_getcoord](int $level_off, int $x_off, int $z_off)(coord)
+[command,.region_getcoord](int $level_off, int $x_off, int $z_off)(coord)
+[command,region_findbycoord](coord $coord)(boolean)
+[command,.region_findbycoord](coord $coord)(boolean)
+[command,region_uid]()(int)
+[command,.region_uid]()(int)
+[command,region_findbyuid](int $uid)(boolean)
+[command,.region_findbyuid](int $uid)(boolean)
+[command,region_setexitcoord](coord $coord)
+[command,.region_setexitcoord](coord $coord)
 
 // Player ops (2000-2499)
 // info: Get access to $player if they are in the world
@@ -1075,13 +1087,11 @@
 
 // [command,inv_setvar](inv $inv, int $slot, obj $obj, int $value)
 // [command,inv_getvar](inv $inv, int $slot, obj $obj)(int)
-// [command,region_findbycoord](coord $coord)(boolean)
 // [command,controller_coord]()(coord)
 // [command,controller_del]
 // [command,mes_typed](int $type, string $message)
 // [command,controller_queue](int $id, int $type, int $delay)
 // [command,controller_findexact](regioncoord $coord, int $type)(boolean)
-// [command,region_getcoord](int $int1, int $int2, int $int3)(regioncoord)
 // [command,sound_area](coord $coord, int $int1, synth $sound, int $int2, int $int3)
 [command,p_transmogrify](npc $npc)
 // [command,if_setevents](component $component, int $int1, int $int2, boolean $boolean1, int $int3, int $int4, int $int5, boolean $boolean2, boolean $boolean3)

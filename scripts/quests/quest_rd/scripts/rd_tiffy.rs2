@@ -98,8 +98,7 @@ if ($choice = 1) {
 %rd_spoke_to_tiffy = 1;
 %rd_main = 1;
 ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
-def_coord $dest = map_build(0_38_77_57_44); // template 2489,4972 L0 — dest is the instance copy
-p_telejump($dest);
+p_telejump(~rd_instance_enter);
 return;
 
 [label,rd_tiffy_refuse]
@@ -115,8 +114,7 @@ def_int $again = ~p_choice2("Yes, let's go!", 1, "No, I've changed my mind.", 2)
 if ($again = 1) {
     ~chatplayer("<p,happy>Yeah, this sounds right up my street. Let's go!");
     ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
-    def_coord $dest = map_build(0_38_77_57_44); // template 2489,4972 L0 — dest is the instance copy
-    p_telejump($dest);
+    p_telejump(~rd_instance_enter);
 } else {
     @rd_tiffy_refuse;
 }
@@ -128,6 +126,28 @@ if (%devious_monk >= 1) {
     return;
 }
 @rd_tiffy_after;
+
+// Copy packed m38_77 zone-by-zone into a private region (Engine-TS#95).
+// Dest local 57,44 is template 2489,4972 L0. Do not dest onto the shared square.
+[proc,rd_instance_enter]()(coord)
+def_coord $sw = region_create(4, 8, 8);
+def_int $level = 0;
+def_int $zx = 0;
+def_int $zz = 0;
+while ($level < 4) {
+    $zx = 0;
+    while ($zx < 8) {
+        $zz = 0;
+        while ($zz < 8) {
+            region_set($level, $zx, $zz, movecoord(0_38_77_0_0, multiply($zx, 8), $level, multiply($zz, 8)), 0);
+            $zz = calc($zz + 1);
+        }
+        $zx = calc($zx + 1);
+    }
+    $level = calc($level + 1);
+}
+region_setexitcoord(npc_coord);
+return(region_getcoord(0, 57, 44));
 
 [label,rd_tiffy_after]
 if (%wanted_main = 0) {
