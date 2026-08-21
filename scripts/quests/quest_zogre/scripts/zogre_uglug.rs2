@@ -1,0 +1,13 @@
+// Zogre Flesh Eaters — Uglug Nar Talk-to (zogre_uglug_nar 2039 @ 2442,3049
+// L0, size-2 camp ogre). CANDIDATE last-resort 2007-base minus Changes:
+// OSRS Transcript:Zogre Flesh Eaters "Talking to Uglug Nar (before using
+// Relicym's balm on him)". Dump then return. Prefer 0 write: %zogre stays
+// 1. No dest / dungeon m38_147, no Trade op3 (uglug_nar_shop 260 has 0
+// 377 unpack stock — no shop IF), no [opnpcu] Relicym's balm, no Relicym
+// NPC invent, no fake complete. No && / ||. Cite
+// docs/research/zogre-first-slice-377.md (Uglug 2039 op1 silent rung) ·
+// Transcript:Zogre Flesh Eaters §4.1.
+
+[opnpc1,zogre_uglug_nar]
+~chatnpc("<p,neutral>Me's not got no glug-glugs to sell, yous bring me da sickies glug-glug den me's open da stufsies for ya.");
+return;
