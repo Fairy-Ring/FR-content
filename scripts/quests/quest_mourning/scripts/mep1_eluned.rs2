@@ -7,8 +7,9 @@
 // Roving Elves later-case (inline — no new ops / labels): Consecrating the
 // Tomb first briefing when %roving_elves_quest = 1 and %mourning_quest < 1
 // (seed from old tomb SE of Baxtorian Falls, defeat a guardian, return) —
-// write 1→2 CANDIDATE (not complete). At >= 2 and mourning < 1: again-talk
-// "any luck finding the consecration seed?" (no inv). MEP1 branches preserved.
+// write 1→2 CANDIDATE (not complete). At >= 2 and mourning < 1: holding old
+// seed 4205 -> hand over + re-enchant to 4206 (no stage write, stay 2); else
+// again-talk reminder (no inv). MEP1 branches preserved.
 // Cite mep1-eluned-period-media-377.md §4 / §6 + red-19-start-impl-377.md §1.
 
 [opnpc1,roving_female_woodelf]
@@ -25,7 +26,19 @@ if (%roving_elves_quest = 1) {
 }
 if (%roving_elves_quest >= 2) {
     if (%mourning_quest < 1) {
-        // no seed yet — reminder (later rows add the seed / enchant stages)
+        if (inv_total(inv, roving_old_consecration_seed) >= 1) {
+            ~chatplayer("<p,neutral>Hello.");
+            ~chatnpc("<p,neutral>Hello, any luck finding the consecration seed?");
+            ~chatplayer("<p,neutral>Yes I have it here.");
+            mes("You hand the crystal seed to Eluned.");
+            inv_del(inv, roving_old_consecration_seed, 1);
+            ~chatplayer("<p,neutral>How odd. I can see her lips moving... But there's no sound.");
+            inv_add(inv, roving_new_consecration_seed, 1);
+            ~chatnpc("<p,neutral>Plant this seed in Glarial's new tomb, close to her remains. With it in place, she will rest in peace.");
+            ~chatplayer("<p,neutral>Okay, will do.");
+            return;
+        }
+        // no seed yet — reminder
         ~chatnpc("<p,neutral>Hello, any luck finding the consecration seed?");
         ~chatplayer("<p,neutral>No not yet.");
         ~chatnpc("<p,neutral>You should be able to find it in her old resting place, I think you said it was south east of Baxtorian Falls. You'll need to defeat one of the old tomb's guardians to obtain it. Bring it to me as soon as you find it, then I can re-enchant it.");
