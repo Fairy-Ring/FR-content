@@ -1,0 +1,21 @@
+// Desert Treasure — hill Eblis Talk-to (fd_elder_by_mirrors 1925, concrete
+// child of multi fourdiamonds_elder2 1924 @ 3213,2956 L0; visible
+// %deserttreasure 10-15, overlaps village at 10). CANDIDATE last-resort
+// 2007-base minus Changes: OSRS Transcript:Desert Treasure I "Talking to
+// Eblis at the mirrors" — first hill Talk-to after village Excellent 8→10,
+// before Look-into. Dump then return. Prefer 0 write: %deserttreasure
+// stays 10. No %fd_mirror_present, no dest / Look-into, no 15, no AM, no
+// warrior map. Bind the child, not fourdiamonds_elder2. No && / ||.
+// Cite docs/research/dt-mirrors-look-into-still-stop-377.md (leftover 1925)
+//     · dt-eblis-four-diamonds-return-377.md §3 · Transcript:Desert Treasure I.
+
+[opnpc1,fd_elder_by_mirrors]
+~chatplayer("<p,neutral>So can you give me any help on where to find these warriors and their diamonds?");
+~chatnpc("<p,neutral>No, the magic used in this spell is powerful, but inaccurate. The direction the scrying glass faces is roughly the direction you will find the warrior, but I'm afraid I");
+~chatnpc("<p,neutral>can't be any more help than that.");
+~chatplayer("<p,neutral>I don't understand why there are six mirrors when there are only four diamonds...");
+~chatnpc("<p,neutral>As I say, the enchantment is very inaccurate.");
+~chatnpc("<p,neutral>I can only focus upon the aura the diamonds have left behind them, so any place where the Diamonds were present for a significant period of time will still be shown - such as the Bandit Camp where I make my home.");
+~chatnpc("<p,neutral>My apologies, but magic is an inaccurate art in many respects.");
+~chatnpc("<p,neutral>Don't forget to come back here when you have collected all four diamonds.");
+return;
