@@ -130,6 +130,7 @@ if (%devious_monk >= 1) {
 // Copy packed m38_77 zone-by-zone into a private region (Engine-TS#95).
 // Dest local 57,44 is template 2489,4972 L0. Do not dest onto the shared square.
 [proc,rd_instance_enter]()(coord)
+~rd_reset_fox;
 def_coord $sw = region_create(4, 8, 8);
 def_int $level = 0;
 def_int $zx = 0;

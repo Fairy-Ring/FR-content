@@ -105,6 +105,9 @@ if (p_finduid(uid) = true) {
 // Called whenever an obj is removed from the 'worn' inv, intented to be used as a central hook point for
 // handling unequipping effects
 [proc,on_unequip](obj $obj)
+if ($obj = rd_fox | $obj = rd_chicken | $obj = rd_sack) {
+    ~rd_putdown($obj);
+}
 if ($obj = castlewars_saradomin_banner | $obj = castlewars_zamorak_banner) {
     ~castlewars_flag_drop(inv, $obj);
 }
