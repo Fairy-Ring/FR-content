@@ -1,0 +1,19 @@
+// Haunted Mine leftover — Zealot Pickpocket (saradominist_zealot 1528).
+// CANDIDATE: always-succeed grant after %hauntedmine >= 1. Thieving % / XP
+// UNKNOWN — no stat_advance. Grant hauntedmine_lift_key 4078 (Zealot's key)
+// once; already-has refuses (same CANDIDATE mes, no second key). No
+// %hauntedmine write (stays 1). No hauntedmine_bits. No cart dest. No Treus.
+// Pre-key (%hauntedmine < 1): CANDIDATE mes then return.
+// Cite docs/research/hm-zealot-key-4078-377.md ·
+//     docs/research/haunted-mine-start-talk-377.md §4.9.
+
+[opnpc3,saradominist_zealot]
+if (%hauntedmine < 1) {
+    mes("I doubt he's got much of value on him.");
+    return;
+}
+if (inv_total(inv, hauntedmine_lift_key) >= 1) {
+    mes("I doubt he's got much of value on him.");
+    return;
+}
+inv_add(inv, hauntedmine_lift_key, 1);
