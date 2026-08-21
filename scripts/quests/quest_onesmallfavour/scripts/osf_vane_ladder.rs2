@@ -1,0 +1,20 @@
+// One Small Favour — Seers vane roof ladder / top trapdoor dest.
+// CANDIDATE dest-from-maps (docs/research/dest-from-our-maps-remaining-377.md
+// OSF vane rows): climb-up -> 2715,3471 L1, climb-down -> 2715,3471 L3.
+// ladder_5812 5812 L1 2715,3472 Climb-up; top loc trapdoor_5835 5835 L3
+// 2715,3472 Climb-down (jm2 m42_54). favour_seer_laddertop 5813 pack-only,
+// never placed — brief verbatim header kept (dead unless spawned), real
+// roof op rides trapdoor_5835. Stand next-to loc tiles, never on 2715,3472.
+// %onesmallfavour stays 45. No dest invent / Kharazi / Drink / Giant Dwarf.
+
+[oploc1,ladder_5812]
+p_telejump(1_42_54_27_15); // 2715,3471 L1 CANDIDATE dest-from-maps
+return;
+
+[oploc1,favour_seer_laddertop]
+p_telejump(3_42_54_27_15); // 2715,3471 L3 CANDIDATE dest-from-maps
+return;
+
+[oploc1,trapdoor_5835]
+p_telejump(3_42_54_27_15); // 2715,3471 L3 CANDIDATE dest-from-maps
+return;
