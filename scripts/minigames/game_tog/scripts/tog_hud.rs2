@@ -1,0 +1,9 @@
+// Tears of Guthix HUD — water_collected 3279 overlay (CANDIDATE chrome).
+// Opens after Juna's session-enter grant (tog_juna.rs2): "I will let you
+// into the cave for a short time." Leftover chrome only: Water Collected /
+// Time Left models + %1 (tog_tears_collected). No dest (cave pair shipped
+// in tog_caves.rs2), no weekly, no XP, no Personal Best (2018 SUBTRACT).
+// Cite residual-if-later-21-impl-377.md §2.1 + residual-if-3279-water-collected-377.md.
+
+[proc,tog_hud_enter]
+if_openoverlay(water_collected);
