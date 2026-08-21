@@ -98,7 +98,7 @@ if ($choice = 1) {
 %rd_spoke_to_tiffy = 1;
 %rd_main = 1;
 ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
-p_telejump(~rd_instance_enter);
+~rd_tiffy_go;
 return;
 
 [label,rd_tiffy_refuse]
@@ -114,7 +114,7 @@ def_int $again = ~p_choice2("Yes, let's go!", 1, "No, I've changed my mind.", 2)
 if ($again = 1) {
     ~chatplayer("<p,happy>Yeah, this sounds right up my street. Let's go!");
     ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
-    p_telejump(~rd_instance_enter);
+    ~rd_tiffy_go;
 } else {
     @rd_tiffy_refuse;
 }
@@ -126,6 +126,20 @@ if (%devious_monk >= 1) {
     return;
 }
 @rd_tiffy_after;
+
+// Blindfold ride: packed fade_to_black + 2007-base Tiffy lines (Transcript:Recruitment Drive).
+// Overlay before tele so the instance does not pop in under chat.
+[proc,rd_tiffy_go]
+if_close;
+if_openoverlay(fade_to_black);
+p_delay(1);
+~chatnpc("<p,happy>Here we go! Mind your head!");
+~chatnpc("<p,happy>Oops, ignore the smell! Nearly there!");
+p_telejump(~rd_instance_enter);
+~chatnpc("<p,happy>And... Here we are! Best of luck!");
+if_close;
+p_delay(1);
+if_openoverlay(null);
 
 // Copy packed m38_77 zone-by-zone into a private region (Engine-TS#95).
 // Dest local 57,44 is template 2489,4972 L0. Do not dest onto the shared square.
