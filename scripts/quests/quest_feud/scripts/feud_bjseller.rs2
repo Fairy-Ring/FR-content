@@ -1,0 +1,16 @@
+// The Feud — Blackjack seller Talk-to (feud_bjseller 2548, concrete child of
+// multi feud_black_jack_seller_multi 1876 @ 3351,2971; hidden until
+// %feud_var 28 = the VERIFIED seller-vis rung, NOT quest complete). Labeled
+// CANDIDATE one-line Talk-to dump: Transcript:The Feud has no seller Talk-to
+// section, so the greeting is cited from the seller's Talk-to in OSRS
+// Transcript:Rogue Trader §3.2 "Talking to Blackjack seller" (Rogue Trader
+// 15 Aug 2005, in-era <= 2 May 2006; minus Changes — no 27 Apr 2022 BCS lore
+// in this line). Gate reads the vis rung only; no write, no invented
+// complete integer, no dest / p_tele, no Trade (op3), no willow. No && / ||.
+// Cite docs/research/feud-operator-blackjack-377.md §3.2 ·
+//     docs/research/feud-varbit-map-377.md §6 · Transcript:Rogue Trader.
+
+[opnpc1,feud_bjseller]
+if (%feud_var ! 28) { return; }
+~chatnpc("<p,neutral>Hello. Could I interest you in a Blackjack?");
+return;
