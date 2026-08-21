@@ -1,0 +1,10 @@
+// Ghosts Ahoy — Ectofuntus Worship (ahoy_ectofunctus 5282 @ 3658,3518).
+// CANDIDATE 2007-base mes (OSRS Ectofuntus Worship minus Changes — no pot,
+// no bonemeal, no slime, no prayer XP, no invent %). Loc 4x4 — stand
+// next-to, never on 3658,3518. No dest, no ectophial Empty / refill touch.
+// ahoy_ectofuntus_small NOT bound (unpack has no op1=Worship). No quest var.
+// Cite docs/research/ahoy-ectophial-dest-hole-377.md.
+
+[oploc1,ahoy_ectofunctus]
+mes("You worship the Ectofuntus.");
+return;
