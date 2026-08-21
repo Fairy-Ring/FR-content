@@ -1,0 +1,43 @@
+// Creature of Fenkenstrain — Gardener Ghost Talk-to.
+// CANDIDATE 2007-base lines (OSRS Transcript:Creature of Fenkenstrain minus
+// the Ed Lestwit name and the follow-dest). Bind concrete fenk_gardener 1675
+// (child of multi fenk_gardener_multi_2 1667 @ 3551,3561). Gate %fenk_quest
+// >= 1 else return (no pre-start dump). No ghostspeak worn: CANDIDATE mes
+// then return, no bit write. Head option writes %fenk_spoken_to_gardener = 1
+// (fenk_flags bit 9) on the successful path only. No %fenk_quest write (stay
+// 1). No %fenk_gardener_directions write (keeps 1667 visible; woods spawn
+// UNKNOWN). No follow / Dig / shed key. No dest. No Charos. No fake complete.
+// Cite docs/research/fenkenstrain-gardener-first-slice-377.md ·
+//     OSRS Transcript:Creature of Fenkenstrain (2007-base minus Changes).
+
+[opnpc1,fenk_gardener]
+if (%fenk_quest < 1) {
+    return;
+}
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    mes("The gardener's neck twitches at you, but the lack of any head prevents him from speaking.");
+    return;
+}
+def_int $choice = ~p_choice3("What happened to your head?", 1, "Can you tell me anything about Fenkenstrain?", 2, "I must get back to work.", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>What happened to your head?");
+    ~chatnpc("<p,neutral>Oi was in the old 'aunted Forest to the south, diggin' a pit for moi old maaster, old Fenkenstrain, when would you believe it, someone chops me head off. Awful bad luck, weren't it?");
+    ~chatplayer("<p,neutral>Oh yes, dreadful bad luck.");
+    ~chatnpc("<p,neutral>So oi thinks to meself, I don't needs any 'ead to be gettin on with me gardenin', long as I got me hands and me spade.");
+    ~chatplayer("<p,neutral>Would you show me where the place was?");
+    ~chatnpc("<p,neutral>Well, oi s'pose oi've got 10 minutes to spare.");
+    %fenk_spoken_to_gardener = 1;
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>Can you tell me anything about Fenkenstrain?");
+    ~chatnpc("<p,neutral>Oi could tell you a few things about old Fenky, yeah.");
+    ~chatplayer("<p,neutral>Go on.");
+    ~chatnpc("<p,neutral>Once, this castle were full o' good folk - my friends. Fenky was just the castle doctor you know, to the Lord and the castle folk.");
+    ~chatnpc("<p,neutral>I don't know what happened to them all, but one by one they all disappeared. When they were gone a while, I went an dug graves for 'em, in the forest.");
+    ~chatnpc("<p,neutral>After a while there weren't no-one left, but the Lord, Fenkenstrain, and meself.");
+    ~chatnpc("<p,neutral>Old Fenky sent me into the Forest to dig 'im a pit. Never said what for. Then would you believe it, someone chops me head off.");
+    return;
+}
+~chatplayer("<p,neutral>I must get back to work.");
+return;
