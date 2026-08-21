@@ -1,12 +1,10 @@
-// Recruitment Drive — room 3 entrance (loc-silent room) Use: instance-local
-// dest east of the portal + first leftover puzzle IF chrome (balloon_animal
-// 16129). CANDIDATE join — leftover text does not name RD; no answers this hop.
-// The packed m38_77 template is the shared overworld — movecoord from the
-// instance loc keeps the dest on the private copy (region_set relocates).
+// Recruitment Drive — room 3 entrance Use: instance-local dest east of 7315.
+// Do not if_openmain(balloon_animal): leftover 16129 title is Prison Pete
+// ("Pop the correct balloon animal to find a key") + pack prisonpete_balloon*
+// / prisonpete_key. Kuam's room is loc-silent in rd.loc — not that IF.
 
 [oploc1,rd_portal_room3_entrance]
 if (region_findbycoord(coord()) = true) {
     p_telejump(movecoord(loc_coord, 1, 0, 0)); // instance-local: east of 7315 into room 3
-    if_openmain(balloon_animal); // CANDIDATE leftover — Close + title chrome only
 }
 return;
