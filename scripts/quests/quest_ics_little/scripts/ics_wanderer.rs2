@@ -1,10 +1,31 @@
-// Icthlarin's Little Helper — Wanderer (redheadlady) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:Icthlarin's Little Helper minus overlay).
-// First write %ics_little_var 0 -> 1. Yes without kit only; hypnosis dest
-// later. No dest / rock / Sophanem / inter_97. Gertrude's Cat is not a hard
-// start gate this slice. Cite red-19-start-impl-377.md §4.
+// Icthlarin's Little Helper — Wanderer (redheadlady) Talk-to.
+// Start (var 0): CANDIDATE lines (OSRS Transcript:Icthlarin's Little Helper
+// minus overlay). First write %ics_little_var 0 -> 1. Yes without kit only;
+// hypnosis dest later. No dest / rock / Sophanem / inter_97. Gertrude's Cat
+// is not a hard start gate this slice. Cite red-19-start-impl-377.md §4.
+// Later (var >= 1): supplies Talk-to + hypnosis chrome up to the fade
+// (OSRS Transcript:Icthlarin's Little Helper "Talking to the Wanderer, or
+// using a full waterskin or tinderbox on her" / "When the player has all
+// the supplies", minus overlay / dest). Fade / give kit / canopic jar /
+// wake in Sophanem = later dest hop, so stop before it. %ics_little_var
+// stays 1. Cite crawl/ics_little-changes-377.md.
 
 [opnpc1,ics_little_redheadlady]
+if (%ics_little_var >= 1) {
+    ~chatnpc("<p,neutral>You again. Do you have my supplies?");
+    if (inv_total(inv, water_skin4) > 0) {
+        if (inv_total(inv, tinderbox) > 0) {
+            ~chatplayer("<p,happy>Yes. I have them here.");
+            ~chatnpc("<p,neutral>Good... Now, look into my eyes...");
+            ~chatnpc("<p,neutral>Look deeply into them...");
+            ~chatnpc("<p,neutral>Don't blink...");
+            return;
+        }
+    }
+    ~chatplayer("<p,neutral>What did you need again?");
+    ~chatnpc("<p,neutral>Bring me a full waterskin and a tinderbox.");
+    return;
+}
 ~chatplayer("<p,neutral>Good day, wanderer.");
 ~chatnpc("<p,neutral>Hello to you too, adventurer.");
 ~chatnpc("<p,angry>Aghhh get that cat away from me.");
