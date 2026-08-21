@@ -78,6 +78,9 @@
 [command,map_findsquare](coord $coord, int $minradius, int $maxradius, int $type)(coord)
 // info: Returns true if the map tile at $coord is in a multi-way combat area
 [command,map_multiway](coord $coord)(boolean)
+// CANDIDATE 2005 region command (Ash / LC wiki). Swap names if a 2007-base list appears.
+[command,map_build](coord $src)(coord)
+[command,in_instance]()(boolean)
 
 // Player ops (2000-2499)
 // info: Get access to $player if they are in the world

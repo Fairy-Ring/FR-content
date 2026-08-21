@@ -2,7 +2,7 @@
 // CANDIDATE last-resort 2007-base: OSRS Transcript:Recruitment Drive minus later Changes
 // (Wanted! / Proselyte / post-2006 rank QoL). Official Update:Recruitment Drive 27 Jun 2005
 // names Amik; cache start surface is Tiffy @ 2997,3373. Hunt 289? no.
-// This slice: Talk-to + refuse + accept start bits only. No instance tele. No puzzles.
+// This slice: Talk-to + refuse + accept start bits + instance enter. No puzzles.
 
 [opnpc1,rd_teleporter_guy]
 if (%rd_main >= ^recruitmentdrive_complete) {
@@ -97,8 +97,9 @@ if ($choice = 1) {
 ~chatplayer("<p,happy>Yeah, this sounds right up my street. Let's go!");
 %rd_spoke_to_tiffy = 1;
 %rd_main = 1;
-// Slice stop: no empty-inv check, no "Here we go" tele. Portal / grounds = later unit.
 ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
+def_coord $dest = map_build(0_38_77_57_44); // template 2489,4972 L0 — dest is the instance copy
+p_telejump($dest);
 return;
 
 [label,rd_tiffy_refuse]
@@ -113,8 +114,9 @@ return;
 def_int $again = ~p_choice2("Yes, let's go!", 1, "No, I've changed my mind.", 2);
 if ($again = 1) {
     ~chatplayer("<p,happy>Yeah, this sounds right up my street. Let's go!");
-    // Still no tele this slice.
     ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
+    def_coord $dest = map_build(0_38_77_57_44); // template 2489,4972 L0 — dest is the instance copy
+    p_telejump($dest);
 } else {
     @rd_tiffy_refuse;
 }
