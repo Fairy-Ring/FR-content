@@ -8,3 +8,26 @@ if (region_findbycoord(coord()) = true) {
     p_telejump(movecoord(loc_coord, 1, 0, 0)); // instance-local: east of 7315 into room 3
 }
 return;
+
+// Fox-room far portal (loc family room2 in room1 span). Isolated rooms — one-tile dest
+// is a dead-end pocket (2470,4972). Dest = room2 dest-from-maps 2459,4979 CANDIDATE.
+[oploc1,rd_portal_room1_exit]
+if (region_findbycoord(coord()) = true) {
+    p_telejump(region_getcoord(0, 27, 51));
+}
+return;
+
+// Interior Zanaris-style door in front of that portal. Open is the fox *test*
+// gate (walkthrough: door unlocks after all three are across). Do not bind
+// rooms 2–7 to this proc — each test has its own condition.
+[oploc1,rd_room1_exitdoor]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (~rd_fox_complete = false) {
+    mes("The door is locked."); // CANDIDATE 2007-base: door unlocks after fox test
+    return;
+}
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+return;

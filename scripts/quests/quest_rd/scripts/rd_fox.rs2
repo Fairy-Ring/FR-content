@@ -41,6 +41,16 @@ if (inv_total(inv, rd_sack) > 0 | inv_total(worn, rd_sack) > 0) {
 }
 return($n);
 
+// West-bank uneaten (right=1). Eaten is 3 / fail-out. Carry still counts as not done.
+[proc,rd_fox_complete]()(boolean)
+if (~rd_carry_count > 0) {
+    return(false);
+}
+if (%rd_foxright = 1 & %rd_chickright = 1 & %rd_grainright = 1) {
+    return(true);
+}
+return(false);
+
 [proc,rd_pickup_east]()(boolean)
 def_coord $sw = region_getcoord(0, 0, 0);
 if (calc(coordx(loc_coord) - coordx($sw)) >= 48) {
