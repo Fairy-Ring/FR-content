@@ -64,8 +64,12 @@ if (oc_members($cooked_item) = true | oc_members($uncooked_item) = true) {
 }
 // check if player has high enough level
 def_int $levelrequired = db_getfield($data,cooking_generic:levelrequired,0);
+def_string $levelrequired_message = db_getfield($data,cooking_generic:levelrequired_message,0);
+if (string_length($levelrequired_message) < 1 & compare($levelrequired_message, "0") ! 0) {
+    $levelrequired_message = "You need a Cooking level of <tostring($levelrequired)> to cook <lowercase(oc_name($cooked_item))>.";
+}
 if (stat(cooking) < $levelrequired) {
-    ~mesbox("You need a Cooking level of <tostring($levelrequired)> to cook <lowercase(oc_name($cooked_item))>.");
+    ~mesbox($levelrequired_message);
     return;
 }
 // macro event
