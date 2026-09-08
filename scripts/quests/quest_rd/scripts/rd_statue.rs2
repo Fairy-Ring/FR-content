@@ -3,9 +3,11 @@
 // (11 statues). Order 0 is the full 12. Chat + 10s + fail dest = CANDIDATE
 // 2007-base Transcript:Recruitment Drive (Lady Table). Do not open leftover
 // 14191 / 4543. Do not invent a colour-count script — pack holes are the key.
+//
+// Map loc is the multi (7290–7301). Authentic OPLOC sends that parent id.
+// Engine resolveLocTypeForTrigger selects the child for [oploc1,rd_*] dispatch;
+// loc_type remains the multi. Match answer on multi first.
 
-// Map loc on the floor is the multi (7290–7301). loc_type stays the multi;
-// engine resolveLocTypeForTrigger picks the child for [oploc1,rd_1g] etc.
 [proc,rd_statue_missing]()(loc)
 if (%rd_templock_1 = 1) {
     return(rd_2b);
@@ -34,6 +36,8 @@ if (%rd_templock_1 = 1) {
 }
 return(null);
 
+// Pack hole: which multi lacks multiloc=<order>. Order 0 child of that multi
+// is the type that was "added" (rd.loc multiloc tables).
 [proc,rd_statue_missing_multi]()(loc)
 if (%rd_templock_1 = 1) {
     return(rd_statue_multi_6);
@@ -81,21 +85,25 @@ if (%rd_room2_complete = 1) {
 if (%rd_templock_1 >= 1 & %rd_templock_1 <= 12) {
     return;
 }
+// random(12) is 0..11 → order 1..12. Each omits one multi (rd.loc).
 def_int $order = add(random(12), 1);
 if ($order < 1 | $order > 12) {
     $order = 1;
 }
 %rd_room_order = $order;
-%rd_templock_1 = $order;
+%rd_templock_1 = $order; // answer survives order→0 shuffle
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>Welcome, <displayname>. This room will test your observation skills.");
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,neutral>Study the statues closely. There is one missing statue in this room.");
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>We will also mix the order up a little to make things interesting for you!");
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,shock>You have 10 seconds to memorise the statues... starting NOW!");
 clearqueue(rd_statue_shuffle);
-queue(rd_statue_shuffle, 17, 0); // CANDIDATE 10s at 600ms/tick
+queue(rd_statue_shuffle, 17, 0); // CANDIDATE 10s ≈ 17 ticks @ 600ms
 return;
 
 [queue,rd_statue_shuffle](int $arg)
+if (region_findbycoord(coord()) = false) {
+    return;
+}
 if (%rd_room2_complete = 1) {
     return;
 }
@@ -105,7 +113,7 @@ if (%rd_templock_1 < 1 | %rd_templock_1 > 12) {
 // Transcript order: announce, THEN dim, swap while black, fade in, THEN touch prompt.
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,neutral>We will now dim the lights and bring the missing statue back in.");
 ~rd_fade_out;
-%rd_room_order = 0;
+%rd_room_order = 0; // full 12; answer remains %rd_templock_1
 ~rd_fade_in;
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,quiz>Please touch the statue you think has been added.");
 return;
@@ -115,15 +123,18 @@ def_loc $clicked = loc_type;
 if (%rd_room2_complete = 1) {
     return;
 }
+// Pre-shuffle / not in trial: ignore (do not fail). Touch only after order 0.
 if (%rd_room_order ! 0 | %rd_templock_1 < 1 | %rd_templock_1 > 12) {
     return;
 }
-def_loc $want_child = ~rd_statue_missing;
 def_loc $want_multi = ~rd_statue_missing_multi;
+// Primary: parent multi id (authentic OPLOC / loc_type).
 if ($clicked = $want_multi) {
     ~rd_statue_pass;
     return;
 }
+// Defensive: if a host ever exposed resolved child as loc_type.
+def_loc $want_child = ~rd_statue_missing;
 if ($clicked = $want_child) {
     ~rd_statue_pass;
     return;
@@ -132,11 +143,13 @@ if ($clicked = $want_child) {
 return;
 
 [proc,rd_statue_pass]
+clearqueue(rd_statue_shuffle);
 %rd_room2_complete = 1;
 %rd_templock_1 = 0;
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
 return;
 
+// Child triggers: resolveLocTypeForTrigger dispatches here; loc_type stays multi.
 [oploc1,rd_1g]
 ~rd_statue_touch;
 return;
@@ -185,6 +198,7 @@ return;
 ~rd_statue_touch;
 return;
 
+// Parent multi triggers (hole state / no child resolve).
 [oploc1,rd_statue_multi_1]
 ~rd_statue_touch;
 return;
