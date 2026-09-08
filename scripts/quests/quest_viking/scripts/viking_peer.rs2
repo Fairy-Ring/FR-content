@@ -325,6 +325,10 @@ switch_int(getbit_range(%viking_bits, ^viking_seerdoor_start, ^viking_seerdoor_e
 
 // functionally (nearly) the same as the tribal door
 [if_button,combolockdoor:com_57]
+if (~rd_ren_owns_combolock = true) {
+    @rd_ren_submit;
+    return;
+}
 if_close;
 def_int $solved = ^false;
 def_int $riddle_id = getbit_range(%viking_bits, ^viking_seerdoor_start, ^viking_seerdoor_end);
@@ -361,15 +365,30 @@ if(~get_viking_peer_progress < ^peer_completed_riddle) {
     return;
 } 
 
-[if_button,combolockdoor:com_47] @viking_door_combo(1, -1);
-[if_button,combolockdoor:com_49] @viking_door_combo(2, -1);
-[if_button,combolockdoor:com_51] @viking_door_combo(3, -1);
-[if_button,combolockdoor:com_53] @viking_door_combo(4, -1);
-
-[if_button,combolockdoor:com_48] @viking_door_combo(1, 1);
-[if_button,combolockdoor:com_50] @viking_door_combo(2, 1);
-[if_button,combolockdoor:com_52] @viking_door_combo(3, 1);
-[if_button,combolockdoor:com_54] @viking_door_combo(4, 1);
+[if_button,combolockdoor:com_47]
+if (~rd_ren_owns_combolock = true) { @rd_ren_combo(1, -1); return; }
+@viking_door_combo(1, -1);
+[if_button,combolockdoor:com_49]
+if (~rd_ren_owns_combolock = true) { @rd_ren_combo(2, -1); return; }
+@viking_door_combo(2, -1);
+[if_button,combolockdoor:com_51]
+if (~rd_ren_owns_combolock = true) { @rd_ren_combo(3, -1); return; }
+@viking_door_combo(3, -1);
+[if_button,combolockdoor:com_53]
+if (~rd_ren_owns_combolock = true) { @rd_ren_combo(4, -1); return; }
+@viking_door_combo(4, -1);
+[if_button,combolockdoor:com_48]
+if (~rd_ren_owns_combolock = true) { @rd_ren_combo(1, 1); return; }
+@viking_door_combo(1, 1);
+[if_button,combolockdoor:com_50]
+if (~rd_ren_owns_combolock = true) { @rd_ren_combo(2, 1); return; }
+@viking_door_combo(2, 1);
+[if_button,combolockdoor:com_52]
+if (~rd_ren_owns_combolock = true) { @rd_ren_combo(3, 1); return; }
+@viking_door_combo(3, 1);
+[if_button,combolockdoor:com_54]
+if (~rd_ren_owns_combolock = true) { @rd_ren_combo(4, 1); return; }
+@viking_door_combo(4, 1);
 
 [label,viking_seer_enter_riddle]
 %temp = 0;

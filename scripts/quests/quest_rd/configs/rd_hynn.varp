@@ -1,0 +1,17 @@
+[rd_hynn_state]
+type=int
+scope=temp
+transmit=no
+protect=no
+
+[rd_hynn_riddle]
+type=int
+scope=temp
+transmit=no
+protect=no
+
+[rd_hynn_uid]
+type=int
+scope=temp
+transmit=no
+protect=no

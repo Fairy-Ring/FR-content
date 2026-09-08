@@ -1,0 +1,7 @@
+[rd_ren]
+scope=temp
+transmit=no
+
+[rd_ren_uid]
+scope=temp
+transmit=no

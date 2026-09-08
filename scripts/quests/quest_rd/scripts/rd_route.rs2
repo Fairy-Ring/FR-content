@@ -15,7 +15,7 @@
 // %rd_route_uid = region_uid at select/begin for stale guards.
 //
 // Final fifth mark does NOT write %rd_main=2 — ~rd_run_finish is the handoff
-// until root reward integration. Rooms 4-7 begin only teleport + observer spawn.
+// until reward integration. Chemistry still awaits its room implementation.
 //
 // Private regions do not copy template NPCs (InstanceController loc-only copy).
 // ~rd_spawn_observer places jm2 observer stands on room begin.
@@ -277,6 +277,13 @@ if (region_findbycoord(coord()) = true) {
 }
 return;
 
+// True only for the current physical trial in this player's bound instance.
+[proc,rd_room_is_current](int $room)(boolean)
+if (~rd_route_active = false) { return(false); }
+if (~rd_route_same_instance = false) { return(false); }
+if ($room = ~rd_route_current) { return(true); }
+return(false);
+
 // --- admission ---
 
 [proc,rd_admission_ok]()(boolean)
@@ -307,6 +314,9 @@ return;
 %rd_route_state = 0;
 %rd_route_uid = 0;
 ~rd_room_clear_all_complete;
+~rd_tinley_reset;
+~rd_ren_reset;
+~rd_hynn_reset;
 clearqueue(rd_statue_shuffle);
 ~rd_reset_fox;
 // Statue reset clears order/templock/queue; room2 bit already cleared above.
@@ -389,7 +399,7 @@ while ($s < 5) {
 return;
 
 // Teleport to room dest, spawn observer, start implemented room begin.
-// Rooms 4-7: tele + observer only — remain incomplete (no stub mark).
+// Each integrated room owns its dialogue/puzzle after shared placement.
 [proc,rd_room_begin](int $room)
 if (region_findbycoord(coord()) = false) {
     return;
@@ -412,8 +422,17 @@ if ($room = 1) {
 } else if ($room = 3) {
     ~rd_combat_begin;
     return;
+} else if ($room = 4) {
+    ~rd_tinley_enter;
+    return;
+} else if ($room = 5) {
+    ~rd_ren_enter;
+    return;
+} else if ($room = 7) {
+    ~rd_hynn_enter;
+    return;
 }
-// 4 Tinley / 5 Ren / 6 Chem / 7 Hynn: dest + observer only until their scripts land.
+// Room 6 chemistry awaits its implementation unit.
 return;
 
 // Set physical complete only if $room is route-current and same instance. No double credit.

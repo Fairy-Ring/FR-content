@@ -1,0 +1,7 @@
+[rd_tinley_state]
+scope=temp
+transmit=no
+
+[rd_tinley_uid]
+scope=temp
+transmit=no
