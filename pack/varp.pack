@@ -746,3 +746,5 @@
 745=varp745_bits
 746=varp746_bits
 747=varp747_unused
+748=rd_route_state
+749=rd_route_uid

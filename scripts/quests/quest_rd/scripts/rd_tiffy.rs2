@@ -139,7 +139,12 @@ p_delay(~seqlength20ms(seq_2115));
 if_openoverlay(null);
 
 // Overlay before tele so the instance does not pop in under chat.
+// Admission: empty inv + worn (CANDIDATE transcript). Refuse without tele.
 [proc,rd_tiffy_go]
+if (~rd_admission_ok = false) {
+    ~rd_admission_refuse;
+    return;
+}
 if_close;
 ~rd_fade_out;
 ~chatnpc("<p,happy>Here we go! Mind your head!");
@@ -147,16 +152,15 @@ if_close;
 p_telejump(~rd_instance_enter);
 ~rd_fade_in;
 ~chatnpc("<p,happy>And... Here we are! Best of luck!");
+// Land on first selected room dest; begin starts room (observer + implemented begin).
+~rd_room_begin(~rd_route_current);
 
 // Copy packed m38_77 zone-by-zone into a private region (Engine-TS#95).
-// Dest local 57,44 is template 2489,4972 L0. Do not dest onto the shared square.
-// New-instance entry cancels leftover statue trial (queue + templock + complete)
-// via product path — not harness setvar. Fox reset unchanged. Does not run on
-// in-instance room portals, so prior rooms within one run stay intact.
+// New-instance: full run reset, select five-of-seven (combat forced), bind UID.
+// Returns first room dest-from-maps. Private regions are loc-only — observers
+// spawn in ~rd_room_begin, not from template NPCs.
 [proc,rd_instance_enter]()(coord)
-~rd_reset_fox;
-~rd_reset_statue;
-~rd_reset_combat;
+~rd_run_reset;
 def_coord $sw = region_create(4, 8, 8);
 def_int $level = 0;
 def_int $zx = 0;
@@ -174,7 +178,8 @@ while ($level < 4) {
     $level = calc($level + 1);
 }
 region_setexitcoord(npc_coord);
-return(region_getcoord(0, 57, 44));
+~rd_route_select;
+return(~rd_room_dest(~rd_route_current));
 
 [label,rd_tiffy_after]
 if (%wanted_main = 0) {

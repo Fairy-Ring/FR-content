@@ -65,10 +65,8 @@ return(true);
 [proc,rd_statue_fail]
 clearqueue(rd_statue_shuffle);
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,sad>No... I am very sorry. Apparently you are not up to the challenge. I will return you where you came from, better luck in the future.");
-%rd_room_order = 0;
-%rd_templock_1 = 0;
-%rd_room2_complete = 0;
-p_telejump(0_46_52_52_45); // Falador park W of Tiffy — same as fox fail
+// Run-level fail: clear all trials, not statue-only.
+~rd_run_fail;
 return;
 
 [proc,rd_statue_begin]
@@ -79,6 +77,10 @@ if (region_findbycoord(coord()) = false) {
 // each yield — do not call region_uid() fresh after chat (could bless a foreign
 // instance the player entered while paused).
 def_int $uid = region_uid();
+// Physical-current-room guard when route is active.
+if (~rd_route_active = true & ~rd_route_current ! 2) {
+    return;
+}
 if (%rd_room2_complete = 1) {
     return;
 }
@@ -169,6 +171,9 @@ return;
 
 [proc,rd_statue_touch]
 def_loc $clicked = loc_type;
+if (~rd_route_active = true & ~rd_route_current ! 2) {
+    return;
+}
 if (%rd_room2_complete = 1) {
     return;
 }
@@ -187,7 +192,8 @@ return;
 
 [proc,rd_statue_pass]
 clearqueue(rd_statue_shuffle);
-%rd_room2_complete = 1;
+// Physical complete via shared mark (route-current + same-instance guards).
+~rd_room_mark_complete(2);
 %rd_templock_1 = 0;
 ~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
 return;
@@ -335,14 +341,5 @@ def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
 ~open_and_close_door2(desertdoor_inactive, $entering, door_open);
 return;
 
-// Gate portal the same as the door when physically reached without complete.
-[oploc1,rd_portal_room2_exit]
-if (region_findbycoord(coord()) = false) {
-    return;
-}
-if (%rd_room2_complete = 0) {
-    return;
-}
-p_telejump(region_getcoord(0, 24, 36)); // room 3 dest-from-maps 2456,4964
-~rd_combat_begin;
-return;
+// Exit portal handler lives in rd_puzzle_if.rs2 → ~rd_try_exit_portal(2).
+

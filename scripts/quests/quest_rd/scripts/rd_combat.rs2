@@ -48,13 +48,10 @@ if (region_uid() ! $expected_uid) {
 }
 return(true);
 
-// Quit / fail out of the grounds: clear this run's room progress and park.
-// CANDIDATE: Tiffy "quit a room… progress… cleared" + statue/fox fail dest.
+// Quit / fail out of the grounds: clear this run's progress and park.
+// Delegates to shared ~rd_run_fail / ~rd_run_quit (all trials).
 [proc,rd_combat_quit_to_park]
-~rd_reset_fox;
-~rd_reset_statue;
-~rd_reset_combat;
-p_telejump(0_46_52_52_45); // Falador park W of Tiffy
+~rd_run_quit;
 return;
 
 // Spawn stand: empty floor east of entrance dest, not on Kuam 25,38.
@@ -108,9 +105,14 @@ if (%rd_room3_complete = 1) {
 if (~rd_combat_same_instance($arg) = false) {
     return;
 }
-%rd_room3_complete = 1;
-// Mid-run completion (1–3 other rooms done elsewhere): standard next-challenge line.
-// Do not invent 4th/5th/final completion writer here — that is full-quest scope.
+// Physical complete via shared mark (route-current + route UID guards).
+// Also require combat scheduling uid still matches live region.
+if (~rd_route_active = true & ~rd_route_current ! 3) {
+    return;
+}
+~rd_room_mark_complete(3);
+// Mid-run completion: standard next-challenge line.
+// Do not invent 4th/5th/final completion writer here — ~rd_run_finish is handoff only.
 ~chatnpc_specific("Sir Kuam Ferentse", rd_observer_room_3, "<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
 return;
 
@@ -119,6 +121,9 @@ if (region_findbycoord(coord()) = false) {
     return;
 }
 def_int $uid = region_uid();
+if (~rd_route_active = true & ~rd_route_current ! 3) {
+    return;
+}
 if (%rd_room3_complete = 1) {
     return;
 }
@@ -179,28 +184,5 @@ def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
 ~open_and_close_door2(desertdoor_inactive, $entering, door_open);
 return;
 
-// Exit portal: require complete; dest = room4 dest-from-maps CANDIDATE.
-[oploc1,rd_portal_room3_exit]
-if (region_findbycoord(coord()) = false) {
-    return;
-}
-if (%rd_room3_complete = 0) {
-    return;
-}
-p_telejump(region_getcoord(0, 40, 28)); // room 4 dest-from-maps 2472,4956
-return;
-
-// Entrance portal: outside → into room + begin; inside → quit to park.
-// Loc at template 2455,4964; dest-side enter is east (local x greater).
-[oploc1,rd_portal_room3_entrance]
-if (region_findbycoord(coord()) = false) {
-    return;
-}
-if (coordx(coord) > coordx(loc_coord)) {
-    // Standing inside the room (east of portal) — quit.
-    ~rd_combat_quit_to_park;
-    return;
-}
-p_telejump(movecoord(loc_coord, 1, 0, 0)); // instance-local: east of 7315 into room 3
-~rd_combat_begin;
-return;
+// Exit + entrance portal handlers live in rd_puzzle_if.rs2
+// (~rd_try_exit_portal / ~rd_entrance_use).
