@@ -1,0 +1,10 @@
+// Recruitment Drive — Miss Cheevers chemistry room (room 6).
+// Stone-door multiloc values (rd.loc multivar=rd_room6_stone_door).
+^rd_stone_basic = 0
+^rd_stone_spade = 1
+^rd_stone_reacted = 2
+^rd_stone_opened = 3
+
+// Water shelf: rd_spare_water holds count already taken.
+// CANDIDATE: wiki "three vials + individual" / guides "4 vials of liquid".
+^rd_water_max = 4
