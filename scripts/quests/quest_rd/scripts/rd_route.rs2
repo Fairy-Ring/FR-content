@@ -314,6 +314,7 @@ return;
 %rd_route_state = 0;
 %rd_route_uid = 0;
 ~rd_room_clear_all_complete;
+~rd_spishyus_reset;
 ~rd_tinley_reset;
 ~rd_ren_reset;
 ~rd_hynn_reset;
@@ -414,7 +415,7 @@ if (~rd_route_active = true & ~rd_route_same_instance = false) {
 p_telejump(~rd_room_dest($room));
 ~rd_spawn_observer($room);
 if ($room = 1) {
-    // Fox: no forced intro; Spishyus Talk-to is independent later unit.
+    ~rd_spishyus_enter;
     return;
 } else if ($room = 2) {
     ~rd_statue_begin;

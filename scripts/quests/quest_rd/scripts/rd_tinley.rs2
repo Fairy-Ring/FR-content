@@ -75,6 +75,7 @@ cleartimer(rd_tinley_wait);
 clearqueue(rd_tinley_sentinel);
 %rd_tinley_state = 0;
 %rd_tinley_uid = 0;
+~chatnpc_specific("Sir Tinley", rd_observer_room_4, "<p,neutral>Ah, <displayname>, you have arrived. Speak to me to begin your task.");
 return;
 
 // Eight seconds is approximately 14 world ticks at the r377 600ms tick.
@@ -121,10 +122,6 @@ if (region_findbycoord(coord()) = false) {
 }
 %rd_tinley_uid = region_uid();
 def_int $uid = %rd_tinley_uid;
-~chatnpc_specific("Sir Tinley", rd_observer_room_4, "<p,neutral>Ah, <displayname>, you have arrived. Speak to me to begin your task.");
-if (~rd_tinley_same_instance($uid) = false) {
-    return;
-}
 ~chatnpc_specific("Sir Tinley", rd_observer_room_4, "<p,neutral>Ah, welcome <displayname>. I have but one clue for you to pass this room's puzzle: 'Patience'.");
 if (~rd_tinley_same_instance($uid) = false) {
     return;

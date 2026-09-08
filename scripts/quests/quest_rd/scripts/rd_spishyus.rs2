@@ -1,0 +1,69 @@
+// Recruitment Drive — Sir Spishyus room-entry and staged hints.
+// CANDIDATE later retained Transcript:Recruitment Drive (2025-07-16),
+// entry + first/second retalk; not dated r377 dialogue verification.
+[proc,rd_spishyus_valid](int $uid)(boolean)
+if (~rd_room_is_current(1) = false) { return(false); }
+if (region_uid() ! $uid) { return(false); }
+return(true);
+
+[proc,rd_spishyus_reset]
+%rd_spishyus_hint = 0;
+return;
+
+[proc,rd_spishyus_enter]
+if (~rd_room_is_current(1) = false) { return; }
+def_int $uid = region_uid();
+%rd_spishyus_hint = 0;
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>Ah, welcome <displayname>.");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatplayer("<p,neutral>Hello there. What am I supposed to be doing in this room?");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>Well, your task is to take this fox, this chicken and this bag of grain across that bridge there to the other side of the room.");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>When you have done that, your task is complete.");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatplayer("<p,neutral>Is that it?");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>Well, it is not quite as simple as that may sound.");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>Firstly, you may only carry one of the objects across the room at a time, for the bridge is old and fragile.");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>Secondly, the fox wants to eat the chicken, and the chicken wants to eat the grain. Should you ever leave the fox unattended with the chicken, or the grain unattended with the chicken, then");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>one of them will be eaten, and you will be unable to complete the test.");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatplayer("<p,neutral>Okay, I'll see what I can do.");
+if (~rd_spishyus_valid($uid) = false) { return; }
+return;
+
+[proc,rd_spishyus_hint_one]
+if (~rd_room_is_current(1) = false) { return; }
+def_int $uid = region_uid();
+~chatplayer("<p,neutral>Listen, this is really annoying me. Can't you just stop the fox eating the chicken or the chicken eating the grain for me, while I carry the other stuff across the bridge?");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>I am afraid not, <displayname>. My task is solely to observe your progress, we have explicit instructions not to assist you in any way..");
+if (~rd_spishyus_valid($uid) = false) { return; }
+return;
+
+[proc,rd_spishyus_hint_two]
+if (~rd_room_is_current(1) = false) { return; }
+def_int $uid = region_uid();
+~chatplayer("<p,neutral>No, but seriously, please? Think of the poor chicken and grain! Being eaten!");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>I am truly sorry, but my hands are tied. I suggest you think carefully before taking any items across the bridge with you, to ensure nothing gets eaten while you are not paying attention.");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatnpc_specific("Sir Spishyus", rd_observer_room_1, "<p,neutral>This is the only help I may give you...");
+if (~rd_spishyus_valid($uid) = false) { return; }
+~chatplayer("<p,neutral>Well, thanks I guess...");
+if (~rd_spishyus_valid($uid) = false) { return; }
+return;
+
+[opnpc1,rd_observer_room_1]
+if (~rd_room_is_current(1) = false) { return; }
+if (%rd_spishyus_hint = 0) {
+    %rd_spishyus_hint = 1;
+    ~rd_spishyus_hint_one;
+} else {
+    ~rd_spishyus_hint_two;
+}
+return;
