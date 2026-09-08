@@ -150,13 +150,17 @@ if_close;
 ~chatnpc("<p,happy>Here we go! Mind your head!");
 ~chatnpc("<p,happy>Oops, ignore the smell! Nearly there!");
 p_telejump(~rd_instance_enter);
+// Player is now inside the private region — rebind uid from player coord
+// (defense in depth; primary bind is post-create ActiveRegion in select).
+~rd_route_rebind_uid_from_player;
 ~rd_fade_in;
 ~chatnpc("<p,happy>And... Here we are! Best of luck!");
 // Land on first selected room dest; begin starts room (observer + implemented begin).
 ~rd_room_begin(~rd_route_current);
 
 // Copy packed m38_77 zone-by-zone into a private region (Engine-TS#95).
-// New-instance: full run reset, select five-of-seven (combat forced), bind UID.
+// New-instance: full run reset, select five-of-seven (combat forced), bind UID
+// from create ActiveRegion while pointer is still valid (player still Falador).
 // Returns first room dest-from-maps. Private regions are loc-only — observers
 // spawn in ~rd_room_begin, not from template NPCs.
 [proc,rd_instance_enter]()(coord)
@@ -178,6 +182,8 @@ while ($level < 4) {
     $level = calc($level + 1);
 }
 region_setexitcoord(npc_coord);
+// Select + bind uid from create pointer BEFORE any mainland findbycoord.
+// Do not rediscover uid via player coord here — player is still in Falador.
 ~rd_route_select;
 return(~rd_room_dest(~rd_route_current));
 

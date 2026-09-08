@@ -197,6 +197,20 @@ if ($room = 1) {
 }
 return(rd_observer_room_1);
 
+// Ensure ActiveRegion points at the run instance. Player may be on mainland.
+// Returns false if neither player-coord nor stored route uid resolves.
+[proc,rd_route_focus_instance]()(boolean)
+if (region_findbycoord(coord()) = true) {
+    return(true);
+}
+if (%rd_route_uid = 0) {
+    return(false);
+}
+if (region_findbyuid(%rd_route_uid) = true) {
+    return(true);
+}
+return(false);
+
 // Despawn then spawn observer for $room. No duplicates. Long lifetime for trial.
 [proc,rd_spawn_observer](int $room)
 if (region_findbycoord(coord()) = false) {
@@ -206,7 +220,8 @@ if ($room < 1 | $room > 7) {
     return;
 }
 def_npc $type = ~rd_observer_type($room);
-npc_findall(coord, $type, 64, 0);
+// Search from stand (instance coord), not only player tile — covers room edges.
+npc_findall(~rd_observer_stand($room), $type, 64, 0);
 while (npc_findnext = true) {
     npc_del;
 }
@@ -214,15 +229,17 @@ while (npc_findnext = true) {
 npc_add(~rd_observer_stand($room), $type, 5000);
 return;
 
+// Clear observers in the run instance. Uses stored %rd_route_uid when the
+// player is already on mainland (npc_findall is coord-based).
 [proc,rd_despawn_all_observers]
-if (region_findbycoord(coord()) = false) {
+if (~rd_route_focus_instance = false) {
     return;
 }
 def_int $r = 1;
 def_npc $type;
 while ($r <= 7) {
     $type = ~rd_observer_type($r);
-    npc_findall(coord, $type, 64, 0);
+    npc_findall(~rd_observer_stand($r), $type, 64, 0);
     while (npc_findnext = true) {
         npc_del;
     }
@@ -244,11 +261,19 @@ if (region_uid() ! %rd_route_uid) {
 }
 return(true);
 
+// Bind %rd_route_uid from the live ActiveRegion pointer.
+// After region_create / zone copy the pointer is valid even while the player is
+// still in Falador. Do NOT require region_findbycoord(coord()) first — mainland
+// coords return false and the old branch zeroed the uid, breaking same_instance
+// guards and first-room begin after enter tele.
 [proc,rd_route_bind_uid]
+%rd_route_uid = region_uid();
+return;
+
+// Defense in depth once the player is inside the private region.
+[proc,rd_route_rebind_uid_from_player]
 if (region_findbycoord(coord()) = true) {
     %rd_route_uid = region_uid();
-} else {
-    %rd_route_uid = 0;
 }
 return;
 
@@ -274,7 +299,11 @@ return;
 
 // Clear route cursor/slots; all physical room completes; trial temps/queues;
 // trial inv items. Do NOT clear %rd_main / %rd_spoke_to_tiffy / %rd_male_at_start / falador_spawn.
+// Despawn first while %rd_route_uid still identifies the prior instance — clearing
+// uid before despawn made mainland reset unable to find instance NPCs.
 [proc,rd_run_reset]
+~rd_combat_despawn_leye;
+~rd_despawn_all_observers;
 %rd_route_state = 0;
 %rd_route_uid = 0;
 ~rd_room_clear_all_complete;
@@ -284,8 +313,6 @@ clearqueue(rd_statue_shuffle);
 clearqueue(rd_statue_shuffle);
 %rd_room_order = 0;
 %rd_templock_1 = 0;
-~rd_combat_despawn_leye;
-~rd_despawn_all_observers;
 // Chem / other room temps left for their room cards; clear known chem bits if set mid-run later.
 return;
 
@@ -454,19 +481,26 @@ if (~rd_room_phys_complete($room) = false) {
 ~rd_route_advance;
 return;
 
-// Fail out: park first (leave instance before inv_del so unequip does not put-down), then clear run.
+// Fail out: despawn owned instance NPCs while instance context is still valid,
+// then park, then clear run state. (npc_findall is coord-based — park-first made
+// mainland despawn a no-op on instance observers/Leye.)
 [proc,rd_run_fail]
+~rd_combat_despawn_leye;
+~rd_despawn_all_observers;
 p_telejump(0_46_52_52_45); // Falador park W of Tiffy
 ~rd_run_reset;
 return;
 
-// Quit via entrance portal: park first, then clear entire run.
+// Quit via entrance portal: same cleanup order as fail.
 [proc,rd_run_quit]
+~rd_combat_despawn_leye;
+~rd_despawn_all_observers;
 p_telejump(0_46_52_52_45);
 ~rd_run_reset;
 return;
 
 // Five selected rooms marked. HANDOFF ONLY — do not write %rd_main=2 or rewards.
+// No player-facing mes: unsourced finish lines removed pending root reward/transcript.
 [proc,rd_run_finish]
 // Explicit handoff for root reward/journal integration.
 // Keep physical complete bits + finished cursor so root can inspect; clear trial temps.
@@ -477,8 +511,7 @@ clearqueue(rd_statue_shuffle);
 ~rd_combat_despawn_leye;
 ~rd_despawn_all_observers;
 // Leave %rd_route_state active with cursor=5 and complete bits for root detection.
-mes("You have completed the Temple Knight assessment trials."); // CANDIDATE handoff line
-mes("Report to Sir Tiffy Cashien — reward integration pending."); // root owns %rd_main=2
+// Silent state handoff only — root owns %rd_main=2 / reward UX.
 p_telejump(0_46_52_52_45);
 return;
 

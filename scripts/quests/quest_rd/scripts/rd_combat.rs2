@@ -24,12 +24,13 @@
 // ~rd_reset_combat from ~rd_instance_enter. Portal exit + door require complete.
 // Entrance Use from inside quits to Falador park (progress clear this run).
 
-// Despawn any Leye in the player's current private region.
+// Despawn any Leye in the run instance. Prefer player instance; else restore
+// ActiveRegion via %rd_route_uid and search at spawn (mainland player coord misses).
 [proc,rd_combat_despawn_leye]
-if (region_findbycoord(coord()) = false) {
+if (~rd_route_focus_instance = false) {
     return;
 }
-npc_findall(coord, rd_combat_npc_room_3, 64, 0);
+npc_findall(~rd_combat_leye_spawn_coord, rd_combat_npc_room_3, 64, 0);
 while (npc_findnext = true) {
     npc_del;
 }
