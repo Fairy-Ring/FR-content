@@ -156,6 +156,7 @@ p_telejump(~rd_instance_enter);
 [proc,rd_instance_enter]()(coord)
 ~rd_reset_fox;
 ~rd_reset_statue;
+~rd_reset_combat;
 def_coord $sw = region_create(4, 8, 8);
 def_int $level = 0;
 def_int $zx = 0;

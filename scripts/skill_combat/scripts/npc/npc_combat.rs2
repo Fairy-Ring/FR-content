@@ -58,6 +58,16 @@ if (npc_param(attack_sound) ! null) {
 }
 ~npc_meleeattack;
 
+// Cap player→NPC hit magnitude before XP/heropoints. Default = min(maxhit, max_dealt).
+// RD Sir Leye (rd_combat_npc_room_3): males deal 0 (live gender(); CANDIDATE pre-2022
+// "no man may defeat him"). Female and all other NPCs unchanged. $spell reserved for
+// magic callers (pass spell id or 0). Quest-local ai_queue2 remains secondary.
+[proc,npc_max_dealt](int $maxhit, int $spell)(int)
+if (npc_type = rd_combat_npc_room_3 & gender() = 0) {
+    return(0);
+}
+return(min($maxhit, npc_param(max_dealt)));
+
 // a default damage script.
 [proc,npc_default_damage](int $damage)
 // if the npc is already dead

@@ -344,4 +344,5 @@ if (%rd_room2_complete = 0) {
     return;
 }
 p_telejump(region_getcoord(0, 24, 36)); // room 3 dest-from-maps 2456,4964
+~rd_combat_begin;
 return;
