@@ -200,16 +200,12 @@ return(rd_observer_room_1);
 // Ensure ActiveRegion points at the run instance. Player may be on mainland.
 // Returns false if neither player-coord nor stored route uid resolves.
 [proc,rd_route_focus_instance]()(boolean)
-if (region_findbycoord(coord()) = true) {
-    return(true);
-}
-if (%rd_route_uid = 0) {
+// UID 0 is a valid engine instance. Explicit route-active state establishes
+// ownership; never adopt an arbitrary instance from the current player tile.
+if (~rd_route_active = false) {
     return(false);
 }
-if (region_findbyuid(%rd_route_uid) = true) {
-    return(true);
-}
-return(false);
+return(region_findbyuid(%rd_route_uid));
 
 // Despawn then spawn observer for $room. No duplicates. Long lifetime for trial.
 [proc,rd_spawn_observer](int $room)
@@ -250,10 +246,10 @@ return;
 // --- same-instance UID ---
 
 [proc,rd_route_same_instance]()(boolean)
-if (region_findbycoord(coord()) = false) {
+if (~rd_route_active = false) {
     return(false);
 }
-if (%rd_route_uid = 0) {
+if (region_findbycoord(coord()) = false) {
     return(false);
 }
 if (region_uid() ! %rd_route_uid) {
