@@ -1,5 +1,10 @@
 [opnpc1,makeover_mage]
 // https://youtu.be/Jo7pLNCeS_Y?si=jePemLxbhlJYZRid&t=214, try to find a source for 2004 (probably something before Sept 2005)
+// RD makeover voucher (rd_makeover_ticket 5606): pack examine "I can exchange this
+// for one free makeover with the makeover mage." Awarded on RD complete when
+// %rd_male_at_start=1 (pre-2022 gender combat rule). No period mage+voucher
+// transcript retained — free path is payment-only (skip 3000 / consume ticket
+// on successful apply). Ordinary paid dialogue and UI semantics unchanged.
 ~chatnpc("<p,happy>Hello there! I am known as the make-over mage! I have spent many years researching magics that can change your physical appearance!");
 ~chatnpc("<p,happy>I can alter your physical form for a small fee of only 3000 gold coins! Would you like me to perform my magics upon you?");
 @multi3("Tell me more about this 'make-over'.", makeover_mage_tell_more, "Sure. Do it.", makeover_mage_sure, "No thanks.", makeover_mage_no);
@@ -17,9 +22,13 @@
 
 [label,makeover_mage_sure]
 ~chatplayer("<p,happy>Sure. Do it.");
-if(inv_total(inv, coins) < 3000) {
-    ~chatnpc("<p,happy>Great. Come back with 3000 coins, and I'll get started.");
-    return;
+// Free path: holding the RD voucher skips the coin gate (pack examine exchange).
+// No period voucher-specific mage lines retained — payment branch only.
+if (inv_total(inv, rd_makeover_ticket) = 0) {
+    if(inv_total(inv, coins) < 3000) {
+        ~chatnpc("<p,happy>Great. Come back with 3000 coins, and I'll get started.");
+        return;
+    }
 }
 ~chatnpc("<p,happy>You of course agree that if by some accident you are turned into a frog you have no rights for compensation or refund.");
 %if1 = calc(gender + 1);
@@ -62,7 +71,13 @@ if(%if2 > 0) {
 }
 
 buildappearance(worn);
-inv_del(inv, coins, 3000);
+// Consume voucher on successful free apply; otherwise charge 3000 as ordinary paid.
+// Ticket preferred when both ticket and coins are present (one free exchange).
+if (inv_total(inv, rd_makeover_ticket) > 0) {
+    inv_del(inv, rd_makeover_ticket, 1);
+} else {
+    inv_del(inv, coins, 3000);
+}
 if (npc_find(coord, makeover_mage, 5, 0) = false) {
     return;
 }
