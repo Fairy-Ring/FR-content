@@ -14,6 +14,7 @@ return;
 [oploc1,rd_portal_room1_exit]
 if (region_findbycoord(coord()) = true) {
     p_telejump(region_getcoord(0, 27, 51));
+    ~rd_statue_begin;
 }
 return;
 

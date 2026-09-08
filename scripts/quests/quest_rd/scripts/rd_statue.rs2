@@ -1,0 +1,270 @@
+// Recruitment Drive — Lady Table statue test (observer room 2).
+// Mechanic is packed: each rd_statue_multi_* omits one rd_room_order key
+// (11 statues). Order 0 is the full 12. Chat + 10s + fail dest = CANDIDATE
+// 2007-base Transcript:Recruitment Drive (Lady Table). Do not open leftover
+// 14191 / 4543. Do not invent a colour-count script — pack holes are the key.
+
+// Map loc on the floor is the multi (7290–7301). loc_type stays the multi;
+// engine resolveLocTypeForTrigger picks the child for [oploc1,rd_1g] etc.
+[proc,rd_statue_missing]()(loc)
+if (%rd_templock_1 = 1) {
+    return(rd_2b);
+} else if (%rd_templock_1 = 2) {
+    return(rd_2s);
+} else if (%rd_templock_1 = 3) {
+    return(rd_2g);
+} else if (%rd_templock_1 = 4) {
+    return(rd_1b);
+} else if (%rd_templock_1 = 5) {
+    return(rd_1s);
+} else if (%rd_templock_1 = 6) {
+    return(rd_1g);
+} else if (%rd_templock_1 = 7) {
+    return(rd_4g);
+} else if (%rd_templock_1 = 8) {
+    return(rd_4s);
+} else if (%rd_templock_1 = 9) {
+    return(rd_4b);
+} else if (%rd_templock_1 = 10) {
+    return(rd_3b);
+} else if (%rd_templock_1 = 11) {
+    return(rd_3s);
+} else if (%rd_templock_1 = 12) {
+    return(rd_3g);
+}
+return(null);
+
+[proc,rd_statue_missing_multi]()(loc)
+if (%rd_templock_1 = 1) {
+    return(rd_statue_multi_6);
+} else if (%rd_templock_1 = 2) {
+    return(rd_statue_multi_5);
+} else if (%rd_templock_1 = 3) {
+    return(rd_statue_multi_4);
+} else if (%rd_templock_1 = 4) {
+    return(rd_statue_multi_3);
+} else if (%rd_templock_1 = 5) {
+    return(rd_statue_multi_2);
+} else if (%rd_templock_1 = 6) {
+    return(rd_statue_multi_1);
+} else if (%rd_templock_1 = 7) {
+    return(rd_statue_multi_10);
+} else if (%rd_templock_1 = 8) {
+    return(rd_statue_multi_11);
+} else if (%rd_templock_1 = 9) {
+    return(rd_statue_multi_12);
+} else if (%rd_templock_1 = 10) {
+    return(rd_statue_multi_9);
+} else if (%rd_templock_1 = 11) {
+    return(rd_statue_multi_8);
+} else if (%rd_templock_1 = 12) {
+    return(rd_statue_multi_7);
+}
+return(null);
+
+[proc,rd_statue_fail]
+clearqueue(rd_statue_shuffle);
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,sad>No... I am very sorry. Apparently you are not up to the challenge. I will return you where you came from, better luck in the future.");
+%rd_room_order = 0;
+%rd_templock_1 = 0;
+%rd_room2_complete = 0;
+p_telejump(0_46_52_52_45); // Falador park W of Tiffy — same as fox fail
+return;
+
+[proc,rd_statue_begin]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room2_complete = 1) {
+    return;
+}
+if (%rd_templock_1 >= 1 & %rd_templock_1 <= 12) {
+    return;
+}
+def_int $order = add(random(12), 1);
+if ($order < 1 | $order > 12) {
+    $order = 1;
+}
+%rd_room_order = $order;
+%rd_templock_1 = $order;
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>Welcome, <displayname>. This room will test your observation skills.");
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,neutral>Study the statues closely. There is one missing statue in this room.");
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>We will also mix the order up a little to make things interesting for you!");
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,shock>You have 10 seconds to memorise the statues... starting NOW!");
+clearqueue(rd_statue_shuffle);
+queue(rd_statue_shuffle, 17, 0); // CANDIDATE 10s at 600ms/tick
+return;
+
+[queue,rd_statue_shuffle](int $arg)
+if (%rd_room2_complete = 1) {
+    return;
+}
+if (%rd_templock_1 < 1 | %rd_templock_1 > 12) {
+    return;
+}
+// Transcript order: announce, THEN dim, swap while black, fade in, THEN touch prompt.
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,neutral>We will now dim the lights and bring the missing statue back in.");
+~rd_fade_out;
+%rd_room_order = 0;
+~rd_fade_in;
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,quiz>Please touch the statue you think has been added.");
+return;
+
+[proc,rd_statue_touch]
+def_loc $clicked = loc_type;
+if (%rd_room2_complete = 1) {
+    return;
+}
+if (%rd_room_order ! 0 | %rd_templock_1 < 1 | %rd_templock_1 > 12) {
+    return;
+}
+def_loc $want_child = ~rd_statue_missing;
+def_loc $want_multi = ~rd_statue_missing_multi;
+if ($clicked = $want_multi) {
+    ~rd_statue_pass;
+    return;
+}
+if ($clicked = $want_child) {
+    ~rd_statue_pass;
+    return;
+}
+~rd_statue_fail;
+return;
+
+[proc,rd_statue_pass]
+%rd_room2_complete = 1;
+%rd_templock_1 = 0;
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+return;
+
+[oploc1,rd_1g]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_1s]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_1b]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_2g]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_2s]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_2b]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_3g]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_3s]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_3b]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_4g]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_4s]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_4b]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_1]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_2]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_3]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_4]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_5]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_6]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_7]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_8]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_9]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_10]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_11]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_12]
+~rd_statue_touch;
+return;
+
+[opnpc1,rd_observer_room_2]
+if (%rd_room2_complete = 1) {
+    ~chatnpc("<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+    return;
+}
+if (%rd_room_order = 0 & %rd_templock_1 >= 1 & %rd_templock_1 <= 12) {
+    ~chatplayer("<p,quiz>What am I supposed to be doing again?");
+    ~chatnpc("<p,neutral>Touch the statue that was brought in after you entered.");
+    ~chatnpc("<p,neutral>If you touch the wrong one, you will fail this task, and will be escorted back to Falador.");
+    return;
+}
+if (%rd_templock_1 >= 1 & %rd_templock_1 <= 12) {
+    ~chatnpc("<p,neutral>Study the statues closely. There is one missing statue in this room.");
+    return;
+}
+~rd_statue_begin;
+return;
+
+[oploc1,rd_room2_exitdoor]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room2_complete = 0) {
+    mes("The door is locked."); // CANDIDATE 2007-base: door unlocks after the test
+    return;
+}
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+return;
+
+[oploc1,rd_portal_room2_exit]
+if (region_findbycoord(coord()) = true) {
+    p_telejump(region_getcoord(0, 24, 36)); // room 3 dest-from-maps 2456,4964
+}
+return;
