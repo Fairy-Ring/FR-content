@@ -75,7 +75,7 @@ if (%rd_male_at_start = 1) {
 // death.rs2 branch that honours this bit is root-owned.
 %falador_spawn = 1;
 session_log(^log_adventure, "Quest complete: Recruitment Drive");
-~send_quest_complete(questlist:rd, basic_tk_helm, 250, ^recruitmentdrive_questpoints, "You have completed the\\\\nRecruitment Drive Quest!", "1,000.5 Prayer XP|1,000.5 Herblore XP|1,000.5 Agility XP|3,000 Coins|Initiate helm|Gaze of Saradomin");
+~send_quest_complete(questlist:rd, basic_tk_helm, 250, ^recruitmentdrive_questpoints, "You have completed the\\nRecruitment Drive Quest!", "1,000.5 Prayer XP|1,000.5 Herblore XP|1,000.5 Agility XP|3,000 Coins|Initiate helm|Gaze of Saradomin");
 // Clear run temps so finish_ready cannot re-arm; do not clear rd_main/falador_spawn/male_at_start.
 ~rd_run_reset;
 return(true);
