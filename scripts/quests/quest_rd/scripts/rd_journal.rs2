@@ -1,0 +1,17 @@
+// Recruitment Drive quest journal — [if_button,questlist:rd].
+// CANDIDATE stage text from retained guide/transcript spine-old17 (not a dated
+// 2005 journal capture). Keep short and accurate to product state.
+
+[if_button,questlist:rd]
+def_string $text;
+if (%rd_main = 0) {
+    $text = "@dbl@I can start this quest by speaking to @dre@Sir Amik Varze@dbl@ at the|@dre@White Knights' Castle@dbl@ in @dre@Falador@dbl@, then meeting @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@.";
+} else if (%rd_main >= ^recruitmentdrive_complete) {
+    $text = "@str@I completed the Temple Knight recruitment tests under Sir Tiffy Cashien.||@str@I was appointed an Initiate and received the Gaze of Saradomin.||@red@QUEST COMPLETE!";
+} else if (~rd_rewards_finish_ready = true) {
+    // Finished five trials; award pending on Tiffy / finish proc.
+    $text = "@dbl@I have passed all five recruitment tests. I should speak to @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@.";
+} else {
+    $text = "@dbl@I am undergoing Temple Knight recruitment testing with @dre@Sir Tiffy Cashien@dbl@. I must pass five intelligence tests at the secret training grounds.";
+}
+~quest_journal("Recruitment Drive", $text);
