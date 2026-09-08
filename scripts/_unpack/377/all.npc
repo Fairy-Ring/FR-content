@@ -52345,6 +52345,8 @@ vislevel=hide
 walkanim=rogue_spinblades
 
 [rd_observer_room_1]
+defaultmode=none
+wanderrange=0
 name=Sir Spishyus
 desc=An observer for the Temple Knights.
 model1=idk_man_hair_wildspikes
@@ -52376,6 +52378,8 @@ head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_goatee_head
 
 [rd_observer_room_2]
+defaultmode=none
+wanderrange=0
 name=Lady Table
 desc=An observer for the Temple Knights.
 model1=idk_woman_hair_long
@@ -52403,6 +52407,8 @@ op1=Talk-to
 head1=obj_pickpocket_guide_warrior
 
 [rd_observer_room_3]
+defaultmode=none
+wanderrange=0
 name=Sir Kuam Ferentse
 desc=An observer for the Temple Knights.
 model1=idk_man_hair_medium
@@ -52469,6 +52475,8 @@ defence=0
 head1=obj_pickpocket_guide_guard
 
 [rd_observer_room_4]
+defaultmode=none
+wanderrange=0
 name=Sir Tinley
 desc=An observer for the Temple Knights.
 model1=idk_man_hair_long
@@ -52500,6 +52508,8 @@ head1=idk_man_hair_long_head
 head2=idk_man_jaw_goatee_head
 
 [rd_observer_room_5]
+defaultmode=none
+wanderrange=0
 name=Sir Ren Itchood
 desc=An observer for the Temple Knights.
 model1=obj_headband_red_manwear
@@ -52533,6 +52543,8 @@ head2=idk_man_jaw_goatee_head
 head3=obj_headband_red_manhead
 
 [rd_observer_room_6]
+defaultmode=none
+wanderrange=0
 name=Miss Cheevers
 desc=An observer for the Temple Knights.
 model1=obj_headband_red_womanwear
@@ -52562,6 +52574,8 @@ head1=idk_woman_hair_medium_head
 head2=obj_headband_red_womanhead
 
 [rd_observer_room_7]
+defaultmode=none
+wanderrange=0
 name=Ms. Hynn Terprett
 desc=An observer for the Temple Knights.
 model1=obj_headband_red_womanwear
