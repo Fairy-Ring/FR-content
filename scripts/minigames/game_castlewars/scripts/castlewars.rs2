@@ -287,12 +287,13 @@ if (%castlewars_team = ^castlewars_team_saradomin) {
 if (inzone(0_37_48_0_0, 3_37_48_63_63, $coord) = true) {
     return(true);
 }
-if (~in_castlewars_waitingroom(coord) = true) {
+if (~in_castlewars_waitingroom($coord) = true) {
     return(false);
 }
 if (inzone(0_37_148_0_0, 0_37_148_63_63, $coord) = true) {
     return(true);
 }
+return(false);
 
 [proc,in_castlewars_waitingroom](coord $coord)(boolean)
 if (inzone(0_37_148_0_0, 0_37_148_25_25, $coord) = true | inzone(0_37_148_40_40, 0_37_148_63_63, $coord) = true) {
