@@ -77,11 +77,14 @@ return;
 // Death only completes for a female hero. Male path should not reach HP 0
 // when max_dealt + ai_queue2 zero damage; if it does, refuse completion
 // (no heal theatre). Bind defeat queue to the instance where Leye died.
+// Local $uid = -1 is lookup-failure sentinel only; engine instance UID 0 is
+// valid (first free slot) and must still queue completion.
 [ai_queue3,rd_combat_npc_room_3]
-def_int $uid = 0;
+def_int $uid = -1;
 if (region_findbycoord(npc_coord) = true) {
     $uid = region_uid();
 }
+// Always run generic death cleanup, even when region lookup failed.
 gosub(npc_death);
 if (npc_findhero = ^false) {
     return;
@@ -90,10 +93,11 @@ if (gender() = 0) {
     // Should be unreachable if invuln holds; do not write complete.
     return;
 }
-if ($uid = 0) {
+if ($uid = -1) {
     return;
 }
 // Arg = region_uid of the dying instance — not a post-teleport fresh uid.
+// May be 0 on the first private instance slot.
 queue(rd_leye_defeated, 0, $uid);
 return;
 
