@@ -47,6 +47,7 @@ if (findhero = true) {
 }
 def_coord $death_dest = map_findsquare(0_50_50_21_18, 0, 2, ^map_findsquare_lineofwalk);
 // RuneHQ OSRS Recruitment Drive (2017): castle courtyard respawn.
+// https://www.runehq.com/oldschoolquest/recruitment-drive
 // Candidate r377 resolver: packed map 0_46_52_33_14, anchor 2977,3342.
 if (%rd_main >= ^recruitmentdrive_complete & %falador_spawn = 1) {
     $death_dest = map_findsquare(0_46_52_33_14, 0, 2, ^map_findsquare_lineofwalk);
