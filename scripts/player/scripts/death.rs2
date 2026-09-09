@@ -60,6 +60,8 @@ p_teleport($death_dest);
 buildappearance(worn);
 ~prayer_deactivate_all;
 ~follower_death;
+// CoF gardener: restore courtyard multi directions bit after player death.
+~fenk_on_player_cleanup;
 anim(null, 0);
 p_stopaction;
 

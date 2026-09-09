@@ -1,5 +1,13 @@
 // Temp follower session state (NONHISTORICAL representation).
 // Not a packed 377 quest bit — private ownership pointer for dynamic gardener.
+// protect=no: softtimer fenk_follow_watch must read session uid without p_active_player.
 [fenk_follower_uid]
 type=npc_uid
 scope=temp
+protect=no
+
+// NONHISTORICAL durable Charos(u) memory for post-complete recovery (Tip.it 2006-06-16).
+// Dedicated perm varp — do NOT reuse fenk_digresult (bits 17-19) for unlock memory.
+// Garden unlock content should set this when converting base→(u).
+[fenk_charos_unlocked_mem]
+scope=perm

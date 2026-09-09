@@ -678,9 +678,11 @@ scope=perm
 scope=perm
 
 [fenk_quest]
+scope=perm
 transmit=yes
 
 [fenk_flags]
+scope=perm
 transmit=yes
 
 [bankpin_len]

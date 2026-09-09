@@ -99,13 +99,14 @@ if (inv_total(inv, ring_of_charos_unlocked) > 0 | inv_total(worn, ring_of_charos
 return (false);
 
 // Post-complete recovery yield.
-// Tip.it CANDIDATE: if previously unlocked, recover unlocked.
-// Durable memory: %fenk_digresult = 7 (NONHISTORICAL, spare digresult values 0-7).
-// Garden unlock content should set this when converting base→(u). CoF also sets it
+// Tip.it CANDIDATE (2006-06-16): if previously unlocked, recover unlocked.
+// Durable memory: %fenk_charos_unlocked_mem (NONHISTORICAL perm varp).
+// digresult (fenk_flags bits 17-19) left free for possible historical dig-outcome encoding.
+// Garden unlock content should set this when converting base→(u). CoF sets it
 // whenever the player is observed holding unlocked (so drop/death can still recover (u)).
 // Without memory, recover base ring (first-complete form).
 [proc,fenk_give_charos_recovery]
-if (%fenk_digresult = 7) {
+if (%fenk_charos_unlocked_mem = 1) {
     inv_add(inv, ring_of_charos_unlocked, 1);
 } else {
     inv_add(inv, ring_of_charos, 1);
@@ -114,7 +115,7 @@ if (%fenk_digresult = 7) {
 // Call when unlocked is present so recovery after later loss yields (u).
 [proc,fenk_note_charos_unlocked]
 if (inv_total(inv, ring_of_charos_unlocked) > 0 | inv_total(worn, ring_of_charos_unlocked) > 0 | inv_total(bank, ring_of_charos_unlocked) > 0) {
-    %fenk_digresult = 7;
+    %fenk_charos_unlocked_mem = 1;
 }
 
 [queue,fenk_quest_complete]

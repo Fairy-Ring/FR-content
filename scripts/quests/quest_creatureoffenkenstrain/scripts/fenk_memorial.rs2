@@ -1,8 +1,10 @@
 // Creature of Fenkenstrain — memorial Search/Push/star Use + cavern/island return.
 // Easternmost coffin 3578,3527 CANDIDATE star target (guide map).
-// Push dest CANDIDATE: paired ladder band 3578,9927 (0_55_155_58_7) — exact
-// collision stand UNKNOWN; labeled candidate until live pair proof.
-// Island coffin 3505,3571 CANDIDATE return to east memorial surface.
+// Dest pairing: contract §2.2 dest tile UNKNOWN (no packed dest). Use topology
+// pair movecoord(loc, 0, 0, ±6400) matching ladder_1757 island hop convention,
+// with west stand offset (loc forceapproach=west, width=2). Full-footprint
+// collision stand remains UNKNOWN until live pair proof — labeled CANDIDATE,
+// not claimed historical PASS. Island coffin 3505,3571 returns the same way.
 // Cite full-source-contract §2.2 · §3.4 · Transcript 185-196.
 
 [oploc2,fenk_coffin]
@@ -26,15 +28,16 @@ if (loc_coord = 0_55_55_58_7) {
         mes("The coffin is incredibly heavy, and does not budge.");
         return;
     }
-    // CANDIDATE enter experiment cavern near ladder 3578,9927.
+    // CANDIDATE topology pair: same XZ, z+6400 (dungeon band), stand 1 west of loc
+    // (forceapproach=west). Exact collision stand UNKNOWN — not live-proved.
     mes("You push the memorial aside and climb down into the darkness.");
-    p_telejump(0_55_155_58_8);
+    p_telejump(movecoord(loc_coord, -1, 0, 6400));
     return;
 }
 if (loc_coord = 0_54_55_49_51) {
-    // Island exit memorial CANDIDATE return to east surface memorial.
+    // Island exit memorial CANDIDATE return: z-6400 to surface band, stand west.
     mes("You push the memorial aside and climb back up.");
-    p_telejump(0_55_55_58_8);
+    p_telejump(movecoord(loc_coord, -1, 0, -6400));
     return;
 }
 mes("The coffin is incredibly heavy, and does not budge.");

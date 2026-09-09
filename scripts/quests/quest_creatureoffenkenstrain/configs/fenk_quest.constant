@@ -14,5 +14,5 @@
 ^fenk_complete = 8
 // CANDIDATE follower duration: 10 minutes × 100 ticks/min ≈ 1000 ticks.
 ^fenk_follow_ticks = 1000
-// CANDIDATE leash distance (tiles); exact historical radius UNKNOWN.
-^fenk_follow_leash = 20
+// Exact historical follow leash radius: UNKNOWN material gap (contract §4).
+// Do not invent a tile distance constant; loss is duration + plane + logout/death.

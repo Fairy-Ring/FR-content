@@ -75,24 +75,14 @@ if (last_useitem = fenk_mausoleum_key) {
 }
 ~displaymessage(^dm_default);
 
-// --- experiment key drop (vislevel 51 combat VERIFIED unpack stats) ---
+// --- experiment key drop (vislevel 51 display VERIFIED; combat ints CANDIDATE) ---
+// Stay in ai_queue3 with active_npc + npc_findhero→active_player so obj_add(npc_coord)
+// is valid. Do not queue a label that needs npc_coord (queue loses active_npc).
 [ai_queue3,fenk_experiment_1]
 gosub(npc_death);
 if (npc_findhero = ^true) {
-    // Drop bones always if death_drop null — add key when killer lacks one.
-    if (p_finduid(uid) = true) {
-        @fenk_experiment_key_drop;
-    } else {
-        queue(fenk_experiment_key_q, 0, 0);
+    // Once-per-need: if killer already has key, no second key from this kill.
+    if (inv_total(inv, fenk_mausoleum_key) = 0) {
+        obj_add(npc_coord, fenk_mausoleum_key, 1, ^lootdrop_duration);
     }
 }
-
-[queue,fenk_experiment_key_q]
-@fenk_experiment_key_drop;
-
-[label,fenk_experiment_key_drop]
-// Once-per-need: if player already has key, no second key from this kill.
-if (inv_total(inv, fenk_mausoleum_key) > 0) {
-    return;
-}
-obj_add(npc_coord, fenk_mausoleum_key, 1, ^lootdrop_duration);

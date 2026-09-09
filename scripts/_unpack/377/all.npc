@@ -40931,6 +40931,10 @@ op3=Pickpocket
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_moustache_head
 head3=npc_councillor_halgrive_head
+// Scenery pin: 377 unpack omits server move fields (engine default wr=5).
+moverestrict=nomove
+wanderrange=0
+defaultmode=none
 
 [fenk_creature]
 walkanim=frank_walk
@@ -40945,6 +40949,9 @@ multinpc=4,fenk_creature_model
 multinpc=5,fenk_creature_model
 multinpc=6,fenk_creature_model
 multinpc=7,fenk_creature_model
+moverestrict=nomove
+wanderrange=0
+defaultmode=none
 
 [fenk_creature_released]
 walkanim=frank_walk
@@ -40952,6 +40959,9 @@ readyanim=frank_ready
 vislevel=1
 multivar=fenk_quest
 multinpc=8,fenk_creature_model_2
+moverestrict=nomove
+wanderrange=0
+defaultmode=none
 
 [fenk_creature_model]
 name=Fenkenstrain's Monster
@@ -40963,6 +40973,9 @@ op1=Talk-to
 alwaysontop=yes
 vislevel=hide
 head1=npc_1673_head
+moverestrict=nomove
+wanderrange=0
+defaultmode=none
 
 [fenk_creature_model_2]
 name=Lord Rologarth
@@ -40974,6 +40987,9 @@ op1=Talk-to
 alwaysontop=yes
 vislevel=hide
 head1=npc_1673_head
+moverestrict=nomove
+wanderrange=0
+defaultmode=none
 
 [fenk_gardener]
 name=Gardener Ghost
@@ -41005,6 +41021,11 @@ resizev=135
 alwaysontop=yes
 vislevel=hide
 head1=npc_1675_head
+// Courtyard multi child is pinned; dynamic follower overrides mode to playerfollow.
+// Without nomove, static multi child wanders off spawn (engine default wr=5).
+moverestrict=nomove
+wanderrange=0
+defaultmode=none
 
 [fenk_experiment_1]
 name=Experiment
@@ -41016,10 +41037,23 @@ readyanim=homolupus_ready
 op2=Attack
 alwaysontop=yes
 vislevel=51
+// Combat ints: CANDIDATE later-data inject (local 03997911d3 "Inject CANDIDATE combat ints
+// on 362 Attack NPCs"; osrsbox name+vis last-resort). NOT period-verified unpack stats.
+// vislevel=51 alone is donor/unpack display; do not derive authenticity from it.
 hitpoints=40
 attack=40
 strength=50
 defence=50
+wanderrange=4
+maxrange=6
+respawnrate=50
+// CANDIDATE combat wiring: packed homolupus_* seqs match model walk/ready family.
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,homolupus_attack
+param=defend_anim,homolupus_defend
+param=death_anim,homolupus_death
+param=death_drop,bones
 
 [fenk_experiment_2]
 name=Experiment
@@ -41030,10 +41064,20 @@ readyanim=waa_homo_arachnus_ready
 walkanim=waa_homo_arachnus_walk
 op2=Attack
 vislevel=25
+// CANDIDATE later-data combat ints (same 03997911d3 inject lineage) + matching seq family.
 hitpoints=100
 attack=1
 strength=1
 defence=30
+wanderrange=4
+maxrange=6
+respawnrate=50
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,waa_homo_arachnus_attack
+param=defend_anim,waa_homo_arachnus_defend
+param=death_anim,waa_homo_arachnus_death
+param=death_drop,bones
 
 [fenk_experiment_3]
 name=Experiment
@@ -41043,10 +41087,20 @@ readyanim=waa_ovinocanus_ready
 walkanim=waa_ovinocanus_walk
 op2=Attack
 vislevel=25
+// CANDIDATE later-data combat ints (same 03997911d3 inject lineage) + matching seq family.
 hitpoints=100
 attack=1
 strength=1
 defence=30
+wanderrange=4
+maxrange=6
+respawnrate=50
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,waa_ovinocanus_attack
+param=defend_anim,waa_ovinocanus_defend
+param=death_anim,waa_ovinocanus_death
+param=death_drop,bones
 
 [roving_female_woodelf]
 name=Eluned

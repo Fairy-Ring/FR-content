@@ -2,6 +2,8 @@
 ~set_pk_skull_logout;
 ~set_antifire_logout; // TODO: should be timer
 ~follower_logout;
+// CoF gardener: restore courtyard multi directions bit after player logout.
+~fenk_on_player_cleanup;
 ~duel_arena_logout;
 ~macro_event_logout;
 ~castlewars_logout;

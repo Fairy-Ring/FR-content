@@ -119,8 +119,26 @@ def main() -> int:
     must_contain(g, r"\^fenk_follow_ticks", "10 min candidate duration")
     must_contain(g, r"\[proc,fenk_clear_gardener_follow\]", "cleanup proc")
     must_contain(g, r"\[softtimer,fenk_follow_watch\]", "follow watch")
+    must_contain(g, r"\[proc,fenk_on_player_cleanup\]", "logout/death cleanup proc")
+    must_contain(g, r"\[queue,fenk_on_login_cleanup\]", "login cleanup queue")
+    # Softtimer must not call protected cleanup directly — queue for p_active_player.
+    must_contain(g, r"queue\s*\(\s*fenk_on_login_cleanup", "softtimer queues protected cleanup")
+    soft = re.search(r"\[softtimer,fenk_follow_watch\]([\s\S]*?)(?=\n\[|\Z)", g)
+    if not soft:
+        fail("softtimer body missing")
+    elif "~fenk_clear_gardener_follow" in soft.group(1):
+        fail("softtimer must not gosub protected clear")
+    # Voice honesty: following talk restates south Haunted Forest — no free compass.
+    must_contain(g, r"aunted Forest to the south", "following talk south forest")
+    must_contain(g, r"Exact tile leash radius", "leash UNKNOWN honesty comment")
+    must_contain(g, r"Do NOT hook pet\.rs2", "no pet.rs2 hook comment")
     must_contain(follower_varp, r"scope=temp", "follower uid temp")
     must_contain(follower_varp, r"type=npc_uid", "follower uid type")
+    must_contain(follower_varp, r"protect=no", "follower uid softtimer-readable")
+    # Charos durable memory: dedicated perm varp — NOT digresult=7.
+    must_contain(follower_varp, r"\[fenk_charos_unlocked_mem\]", "charos mem varp def")
+    must_contain(follower_varp, r"scope=perm", "charos mem perm")
+    must_not_contain(follower_varp, r"%fenk_digresult|fenk_digresult\s*=", "charos mem must not assign digresult")
 
     # --- B: graves Dig independent of follower + island part map ---
     graves = bodies["fenk_graves.rs2"]
@@ -157,7 +175,7 @@ def main() -> int:
     must_contain(roavar, r"inv_del\s*\(\s*inv\s*,\s*coins\s*,\s*50\s*\)", "50gp brain")
     must_contain(roavar, r"inv_add\s*\(\s*inv\s*,\s*fenk_brain", "brain grant")
 
-    # --- D: memorial star + push ---
+    # --- D: memorial star + push (topology pair CANDIDATE, ladder_1757 convention) ---
     mem = bodies["fenk_memorial.rs2"]
     must_contain(mem, r"\[oplocu,fenk_coffin\]", "star use on coffin")
     must_contain(mem, r"fenk_star_amulet", "star amulet")
@@ -165,11 +183,21 @@ def main() -> int:
     must_contain(mem, r"0_55_55_58_7", "east memorial coord")
     must_contain(mem, r"p_telejump", "push teleport")
     must_contain(mem, r"0_54_55_49_51", "island return coffin")
+    must_contain(mem, r"movecoord\s*\(\s*loc_coord\s*,\s*-1\s*,\s*0\s*,\s*6400\s*\)", "east push z+6400 pair")
+    must_contain(mem, r"movecoord\s*\(\s*loc_coord\s*,\s*-1\s*,\s*0\s*,\s*-6400\s*\)", "island return z-6400 pair")
+    must_contain(mem, r"ladder_1757|UNKNOWN", "pairing honesty label")
 
     # --- D: experiment key + doors ---
     doors = bodies["fenk_doors_experiment.rs2"]
     must_contain(doors, r"\[ai_queue3,fenk_experiment_1\]", "experiment death")
     must_contain(doors, r"fenk_mausoleum_key", "cavern key drop")
+    # Key drop stays in ai_queue3 (active_npc); no queue label needing npc_coord.
+    must_contain(
+        doors,
+        r"\[ai_queue3,fenk_experiment_1\][\s\S]*?obj_add\s*\(\s*npc_coord\s*,\s*fenk_mausoleum_key",
+        "key drop in death context with npc_coord",
+    )
+    must_not_contain(doors, r"\[queue,fenk_experiment_key", "no key-drop queue losing npc")
     must_contain(doors, r"\[oploc1,fenk_shed_door\]", "shed door")
     must_contain(doors, r"\[oploc1,fenk_tower_door\]", "tower door")
     must_contain(doors, r"\[oploc1,fenk_mausoleum_door\]", "mausoleum door")
@@ -204,6 +232,9 @@ def main() -> int:
     must_contain(tower, r"ring_of_charos_unlocked", "unlocked variant in guard/recovery")
     must_contain(tower, r"\[proc,fenk_give_charos_recovery\]", "lost-ring recovery")
     must_contain(tower, r"\[proc,fenk_has_charos_any\]", "duplicate guard both variants")
+    must_contain(tower, r"%fenk_charos_unlocked_mem", "durable charos memory varp use")
+    must_contain(tower, r"\[proc,fenk_note_charos_unlocked\]", "note unlocked proc")
+    must_not_contain(tower, r"%fenk_digresult\s*=\s*7", "must not use digresult=7 for charos mem")
     # recovery path must not re-advance XP
     recovery = re.search(
         r"%fenk_quest\s*>=\s*\^fenk_complete\s*\{([\s\S]*?)return;\s*\}",
@@ -211,13 +242,47 @@ def main() -> int:
     )
     if recovery and "stat_advance" in recovery.group(1):
         fail("post-complete recovery must not stat_advance")
-    # scroll newline house form
+    # scroll newline house form: on disk two backslash bytes then n
     tower_raw = (scripts_dir / "fenk_tower_complete.rs2").read_bytes()
-    if b"completed the\\\\nCreature" not in tower_raw and b"completed the\\\\\\\\nCreature" not in tower_raw:
-        # file write uses Python string with \\\\n → on disk \\n (two chars backslash-n for rs2)
-        if b"completed the\\nCreature" not in tower_raw:
-            fail("scroll title should use house two-backslash form before n")
+    # House form: two backslash bytes then n (not a real newline, not single \n).
+    if b"completed the\\\\nCreature" not in tower_raw:
+        fail("scroll title should use house two-backslash form before n")
     must_contain(tower, r"\[if_button,questlist:creatureoffenkenstrain\]", "journal button")
+
+    # --- authorized lifecycle hooks (NOT pet.rs2) ---
+    logout = read(ROOT / "scripts/login_logout/scripts/logout.rs2")
+    login = read(ROOT / "scripts/login_logout/scripts/login.rs2")
+    death = read(ROOT / "scripts/player/scripts/death.rs2")
+    pet = read(ROOT / "scripts/quests/quest_fluffs/scripts/pet.rs2")
+    must_contain(logout, r"~fenk_on_player_cleanup", "logout fenk cleanup")
+    must_contain(death, r"~fenk_on_player_cleanup", "death fenk cleanup")
+    must_contain(login, r"queue\s*\(\s*fenk_on_login_cleanup\s*,\s*0\s*,\s*0\s*\)", "login fenk cleanup queue")
+    must_not_contain(pet, r"fenk_", "pet.rs2 must not reference fenk")
+
+    # --- config-first: experiment combat named seq fills exist ---
+    all_npc = read(ROOT / "scripts/_unpack/377/all.npc")
+    all_seq = read(ROOT / "scripts/_unpack/377/all.seq")
+    for seq in (
+        "homolupus_attack",
+        "homolupus_defend",
+        "homolupus_death",
+        "waa_homo_arachnus_attack",
+        "waa_homo_arachnus_defend",
+        "waa_homo_arachnus_death",
+        "waa_ovinocanus_attack",
+        "waa_ovinocanus_defend",
+        "waa_ovinocanus_death",
+    ):
+        must_contain(all_seq, rf"\[{seq}\]", f"seq def {seq}")
+    must_contain(all_npc, r"param=attack_anim,homolupus_attack", "exp1 attack seq")
+    must_contain(all_npc, r"param=defend_anim,homolupus_defend", "exp1 defend seq")
+    must_contain(all_npc, r"param=death_anim,homolupus_death", "exp1 death seq")
+    must_contain(all_npc, r"param=attack_anim,waa_homo_arachnus_attack", "exp2 attack seq")
+    must_contain(all_npc, r"param=attack_anim,waa_ovinocanus_attack", "exp3 attack seq")
+    # pack id registration for new varps
+    varp_pack = read(ROOT / "pack/varp.pack")
+    must_contain(varp_pack, r"763=fenk_follower_uid", "pack id follower uid")
+    must_contain(varp_pack, r"764=fenk_charos_unlocked_mem", "pack id charos mem")
 
     # --- shared joins ---
     must_contain(

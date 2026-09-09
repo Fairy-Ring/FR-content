@@ -1,9 +1,12 @@
 // Creature of Fenkenstrain — Gardener Ghost Talk-to + follower lifecycle.
 // CANDIDATE 2007-base (Transcript + Tip.it beats). Bind fenk_gardener 1675.
 // Gate %fenk_quest >= 1. Ghostspeak worn check. Follow: dynamic npc_add +
-// playerfollow, CANDIDATE 10 min duration, loss on logout/tele/death/distance.
-// Dig independent of follower. directions bit hides courtyard multi while
-// following (1666 woods spawn UNKNOWN — dynamic add is I representation).
+// playerfollow, CANDIDATE 10 min duration, loss on logout/tele(plane)/death.
+// Exact historical leash radius: UNKNOWN material gap — do not invent a tile
+// distance. Dig independent of follower. directions bit hides courtyard multi
+// while following (1666 woods spawn UNKNOWN — dynamic add is I representation).
+// Cleanup: logout.rs2 + death.rs2 call ~fenk_on_player_cleanup; login queues
+// fenk_on_login_cleanup. Do NOT hook pet.rs2 follower_death (cat hunger/shoo).
 // Cite full-source-contract §3.2 · fenkenstrain-gardener-first-slice-377.md.
 
 [opnpc1,fenk_gardener]
@@ -18,6 +21,10 @@ if (inv_total(worn, amulet_of_ghostspeak) = 0) {
 if (%fenk_follower_uid ! null & npc_uid = %fenk_follower_uid) {
     @fenk_gardener_following_talk;
     return;
+}
+// Stale directions bit (e.g. crashed session before cleanup): restore courtyard.
+if (%fenk_gardener_directions = 1 & %fenk_follower_uid = null) {
+    %fenk_gardener_directions = 0;
 }
 // Courtyard / reacquire menu
 if (%fenk_quest >= ^fenk_assembled) {
@@ -112,7 +119,9 @@ return;
 ~chatnpc("<p,sad>E's dead, just like everyone else round 'ere ... 'cept for me.");
 return;
 
-// Directions while following (CANDIDATE Tip.it/RuneHQ).
+// While following: no invented compass third-voice. Transcript grounds south Haunted
+// Forest for the head grave; Tip.it/RuneHQ CANDIDATE "directions while following"
+// is covered by the follower leading + this re-statement of the head path.
 [label,fenk_gardener_following_talk]
 def_int $d = ~p_choice3("Which way to your grave?", 1, "What's your name?", 2, "I must get back to work.", 3);
 if ($d = 2) {
@@ -124,28 +133,13 @@ if ($d = 3) {
     return;
 }
 ~chatplayer("<p,quiz>Which way to your grave?");
-// Rough direction toward CANDIDATE head grave 3608,3491 from castle.
-def_coord $grave = 0_56_54_24_35;
-def_int $dx = sub(coordx($grave), coordx(coord));
-def_int $dz = sub(coordz($grave), coordz(coord));
-if (abs($dx) > abs($dz)) {
-    if ($dx > 0) {
-        ~chatnpc("<p,neutral>Head east through the woods, mate - keep goin'.");
-    } else {
-        ~chatnpc("<p,neutral>West a bit more, then look for a wooden cross.");
-    }
-} else {
-    if ($dz > 0) {
-        ~chatnpc("<p,neutral>Further north, near the old wooden crosses.");
-    } else {
-        ~chatnpc("<p,neutral>South into the 'aunted woods - that's where they took me head.");
-    }
-}
+// Transcript-grounded (head path): Haunted Forest to the south — not free compass prose.
+~chatnpc("<p,neutral>Oi was diggin' a pit in the old 'aunted Forest to the south when they took me head. Keep with me, mate.");
 return;
 
 // --- follower start / stop ---
 [proc,fenk_start_gardener_follow]
-// Clear any prior owned follower first.
+// Clear any prior owned follower first (also restores directions=0 then re-set).
 ~fenk_clear_gardener_follow;
 // Hide courtyard multi while following (bit 31).
 %fenk_gardener_directions = 1;
@@ -157,6 +151,7 @@ if ($spawn = null) {
 npc_add($spawn, fenk_gardener, ^fenk_follow_ticks);
 %npc_attacking_uid = uid;
 %fenk_follower_uid = npc_uid;
+// Dynamic follower must walk; override scenery nomove default.
 npc_setmode(playerfollow);
 npc_settimer(10);
 softtimer(fenk_follow_watch, 10);
@@ -166,36 +161,36 @@ mes("The gardener ghost starts to follow you.");
 clearsofttimer(fenk_follow_watch);
 if (%fenk_follower_uid ! null) {
     if (npc_finduid(%fenk_follower_uid) = true) {
-        // Only delete dynamic follower, not courtyard multi child if same type.
+        // Only delete dynamic follower owned by this player.
         if (%npc_attacking_uid = uid) {
             npc_del;
         }
     }
 }
 %fenk_follower_uid = null;
-// Restore courtyard gardener multi visibility.
+// Restore courtyard gardener multi visibility (bit31 → 0 shows multi_2 child).
 %fenk_gardener_directions = 0;
 
+// Softtimer has active_player only — not p_active_player. Protected writes
+// (%fenk_follower_uid, %fenk_gardener_directions via fenk_flags) must go through
+// a queue (p_active_player), not ~fenk_clear_gardener_follow directly.
 [softtimer,fenk_follow_watch]
 if (%fenk_follower_uid = null) {
     clearsofttimer(fenk_follow_watch);
     return;
 }
 if (npc_finduid(%fenk_follower_uid) = false) {
-    ~fenk_clear_gardener_follow;
+    clearsofttimer(fenk_follow_watch);
     mes("The gardener ghost has stopped following you.");
+    queue(fenk_on_login_cleanup, 0, 0);
     return;
 }
-// Distance loss CANDIDATE leash.
-if (npc_range(coord) > ^fenk_follow_leash) {
-    mes("The gardener ghost loses you and stops following.");
-    ~fenk_clear_gardener_follow;
-    return;
-}
-// Level change / far tele: also catch plane mismatch.
+// Plane change (level tele / dungeon hop): end follow. Exact tile leash radius
+// is UNKNOWN — do not invent a historical distance check here.
 if (coordy(coord) ! coordy(npc_coord)) {
+    clearsofttimer(fenk_follow_watch);
     mes("The gardener ghost stops following you.");
-    ~fenk_clear_gardener_follow;
+    queue(fenk_on_login_cleanup, 0, 0);
     return;
 }
 
@@ -210,21 +205,17 @@ if (finduid(%npc_attacking_uid) = false) {
 }
 if (p_finduid(%npc_attacking_uid) = true) {
     if (%fenk_follower_uid ! npc_uid) {
-        // Not the active follower session.
-        return;
-    }
-    if (npc_range(coord) > ^fenk_follow_leash) {
-        if (finduid(%npc_attacking_uid) = true) {
-            // player mes via finduid protected? Use npc_del; softtimer also cleans.
-        }
-        npc_del;
+        // Not the active follower session (courtyard multi child shares type).
         return;
     }
 }
 
-// Logout / death hooks — join existing follower cleanup patterns without
-// editing death.rs2/logout.rs2 (out of exclusive scope). Softtimer ends on
-// logout naturally for temp state; directions bit restored on next talk start
-// via ~fenk_clear if uid missing. Explicit login restore of courtyard multi:
+// Logout / death — called from login_logout/logout.rs2 and player/death.rs2.
+// Restores directions bit so courtyard gardener is never hidden forever.
+// Safe no-op when no active gardener follow.
 [proc,fenk_on_player_cleanup]
 ~fenk_clear_gardener_follow;
+
+// Login queue (login.rs2 adjacent follower_login): clear stale temp UID + restore multi.
+[queue,fenk_on_login_cleanup]
+~fenk_on_player_cleanup;
