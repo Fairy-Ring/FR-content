@@ -16,6 +16,9 @@ switch_obj (last_useitem)
         stat_advance(crafting, 40);
         mes("You put some string on your amulet. It makes a slight 'Ook' sound.");
         return;
+    // Haunted Mine Salve shard — 0 XP shared label (quest_hauntedmine hm_salve_string)
+    case crystalshard_necklace_unstrung :
+        @hm_string_salve;
 }
 ~displaymessage(^dm_default);
 
