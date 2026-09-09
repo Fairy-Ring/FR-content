@@ -1,7 +1,9 @@
 // Haunted Mine — Check the points panel opens the controls IF.
-// Chrome only: no cart dest / Climb-over 4918 / key 4078 / lever bits.
+// Ensure durable point bits before open so TEMP 383 matches store after relog.
+// Chrome only beyond ensure: no cart dest / Climb-over 4918 / key 4078.
 // Stay zealot 1. 0 [if_button] writers (Close is client-side).
-// Cite spine-17-remaining-impl-377.md §15 + hm-cart-dest-hole-377.md.
+// Lever Pull handlers live in hm_levers.rs2.
 
 [oploc1,hauntedmine_points_info]
+~hm_points_ensure;
 if_openmain(hauntedmine_controls);
