@@ -37,6 +37,9 @@ if (.finduid(%duel2accept) = true) {
     }
 }
 
+// Haunted Mine glowing fungus: destroy before keep/drop so it cannot be preserved or floored.
+~hm_fungus_on_death;
+
 def_obj $prev_wep = inv_getobj(worn, ^wearpos_rhand);
 if (findhero = true) {
     ~pvp_death_lose_items;
