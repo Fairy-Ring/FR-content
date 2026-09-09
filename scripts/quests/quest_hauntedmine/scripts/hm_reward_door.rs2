@@ -1,0 +1,108 @@
+// Haunted Mine conclusion — Crystal-mine key reward doors (4963/4964).
+// Locs: hauntedmine_rewarddoor_l / hauntedmine_rewarddoor_r.
+// Map m43_69: wall_straight angle south, pair at world 2773/2772,4450.
+// Model family matches lefaye large doors → temporary open uses
+// inaclefayeunopenabledoorl/r (existing inactive open visuals).
+// Key: hauntedmine_reward_key (4077). Non-consuming open (OSF key-ring bit 3).
+// No %hauntedmine stage write. No 383/762. No boss gate.
+// CANDIDATE locked mes / keyring mes from ikov/elemental_workshop patterns.
+
+[oploc1,hauntedmine_rewarddoor_l]
+@hm_reward_door_open(^left);
+
+[oploc1,hauntedmine_rewarddoor_r]
+@hm_reward_door_open(^right);
+
+[oplocu,hauntedmine_rewarddoor_l]
+@hm_reward_door_use(^left);
+
+[oplocu,hauntedmine_rewarddoor_r]
+@hm_reward_door_use(^right);
+
+[label,hm_reward_door_use](int $side)
+if (last_useitem = hauntedmine_reward_key) {
+    @hm_reward_door_open_unlocked($side);
+    return;
+}
+if (last_useitem = favour_key_ring) {
+    if (~osf_key_ring_has(hauntedmine_reward_key) = true) {
+        mes("You use your keyring to unlock the door.");
+        @hm_reward_door_open_unlocked($side);
+        return;
+    }
+}
+~displaymessage(^dm_default);
+
+[label,hm_reward_door_open](int $side)
+if (inv_total(inv, hauntedmine_reward_key) > 0) {
+    @hm_reward_door_open_unlocked($side);
+    return;
+}
+if (~osf_key_ring_has(hauntedmine_reward_key) = true) {
+    mes("You use your keyring to unlock the door.");
+    @hm_reward_door_open_unlocked($side);
+    return;
+}
+mes("The door is locked.");
+sound_synth(locked, 0, 0);
+
+[label,hm_reward_door_open_unlocked](int $side)
+// Open-and-walk without loc category / next_loc_stage (reward doors have neither).
+// Opposite found by explicit pair type + door_close offset (wall_straight).
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+def_coord $loc_coord = loc_coord;
+def_int $angle = loc_angle;
+def_locshape $shape = loc_shape;
+
+def_coord $opposite_coord = $loc_coord;
+def_loc $opposite_closed;
+def_loc $next_loc;
+def_loc $opposite_next_loc;
+if ($side = ^left) {
+    $opposite_coord = ~movecoord_loc_return(~door_close($angle, $shape));
+    $opposite_closed = hauntedmine_rewarddoor_r;
+    $next_loc = inaclefayeunopenabledoorl;
+    $opposite_next_loc = inaclefayeunopenabledoorr;
+} else {
+    $opposite_coord = ~movecoord_loc_return(~multiply2(~door_close($angle, $shape), -1));
+    $opposite_closed = hauntedmine_rewarddoor_l;
+    $next_loc = inaclefayeunopenabledoorr;
+    $opposite_next_loc = inaclefayeunopenabledoorl;
+}
+
+def_int $x;
+def_int $z;
+$x, $z = ~door_open($angle, $shape);
+sound_synth(door_open, 0, 0);
+
+def_coord $dest = $loc_coord;
+if ($entering = true) {
+    if (coord ! $loc_coord & coord ! $opposite_coord) {
+        p_teleport($loc_coord);
+        p_delay(1);
+    }
+    $dest = movecoord($loc_coord, $x, 0, $z);
+}
+p_teleport($dest);
+
+// Temp note: dur updated — match open_double_doors_*2 (3 ticks).
+def_int $duration = 3;
+if ($side = ^left) {
+    loc_del($duration);
+    loc_add($loc_coord, inviswall, $angle, $shape, 3);
+    loc_add(movecoord($loc_coord, $x, 0, $z), $next_loc, calc(($angle + 3) % 4), wall_straight, $duration);
+    if (loc_find($opposite_coord, $opposite_closed) = true) {
+        loc_del($duration);
+        loc_add($opposite_coord, inviswall, loc_angle, loc_shape, 3);
+        loc_add(~movecoord_loc_return(~door_open(loc_angle, loc_shape)), $opposite_next_loc, calc((loc_angle + 1) % 4), wall_straight, $duration);
+    }
+} else {
+    loc_del($duration);
+    loc_add($loc_coord, inviswall, $angle, $shape, 3);
+    loc_add(movecoord($loc_coord, $x, 0, $z), $next_loc, calc(($angle + 1) % 4), wall_straight, $duration);
+    if (loc_find($opposite_coord, $opposite_closed) = true) {
+        loc_del($duration);
+        loc_add($opposite_coord, inviswall, loc_angle, loc_shape, 3);
+        loc_add(~movecoord_loc_return(~door_open(loc_angle, loc_shape)), $opposite_next_loc, calc((loc_angle + 3) % 4), wall_straight, $duration);
+    }
+}

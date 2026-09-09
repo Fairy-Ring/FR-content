@@ -58,6 +58,10 @@
 ^recruitmentdrive_complete = 2
 // CANDIDATE 1 QP from retained Recruitment_Drive.wikitext Rewards table.
 ^recruitmentdrive_questpoints = 1
+// Haunted Mine (Morytania mines) — distinct from Ernest ^haunted_complete.
+// complete=2 preserves 0 unstarted / 1 started (Zealot). CANDIDATE 2 QP.
+^hauntedmine_complete = 2
+^hauntedmine_questpoints = 2
 ^deserttreasure_complete = 15
 ^priestperil_complete = 60
 ^death_complete = 80

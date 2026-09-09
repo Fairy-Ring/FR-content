@@ -281,6 +281,10 @@ if (%routequest = ^routequest_complete) {
 if (%rd_main = ^recruitmentdrive_complete) {
     $questpoints = add($questpoints, ^recruitmentdrive_questpoints);
 }
+// Haunted Mine — conclusion unit (t_24af0ea3). Distinct from Ernest %haunted.
+if (%hauntedmine >= ^hauntedmine_complete) {
+    $questpoints = add($questpoints, ^hauntedmine_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -365,6 +369,8 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:troll, %troll_quest, ^troll_complete);
 // Recruitment Drive — narrow journal colour (product writer t_130905cb).
 ~send_quest_progress_colour(questlist:rd, %rd_main, ^recruitmentdrive_complete);
+// Haunted Mine — conclusion unit (t_24af0ea3). Distinct from questlist:haunted (Ernest).
+~send_quest_progress_colour(questlist:hauntedmine, %hauntedmine, ^hauntedmine_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

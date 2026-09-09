@@ -1,0 +1,37 @@
+// Haunted Mine questlist journal (questlist:hauntedmine).
+// Stages this unit knows: 0 unstarted, 1 started (Zealot), 2 complete.
+// Boss/arena intermediate stages intentionally absent — natural Treus access
+// is a separate encounter unit. Journal text CANDIDATE from start + finish guides.
+
+[if_button,questlist:hauntedmine]
+def_string $text;
+
+if (%hauntedmine >= ^hauntedmine_complete) {
+    $text = "@str@I spoke to a Saradominist zealot south of Mort'ton about the|@str@abandoned mines and the crystals said to grow in the lower levels.||";
+    $text = append($text, "@str@I found my way into the deepest chambers, defeated the guardian|@str@of the crystals, and cut a shard from the crystal outcrops.||");
+    $text = append($text, "@str@With a ball of wool I can string the shard into a Salve amulet.||");
+    $text = append($text, "@red@QUEST COMPLETE!");
+    ~quest_journal("Haunted Mine", $text);
+    return;
+}
+
+if (%hauntedmine >= ^hauntedmine_started) {
+    $text = "@str@I spoke to a Saradominist zealot south of Mort'ton. He is trying|@str@to regain access to the abandoned mines and the crystals within.||";
+    $text = append($text, "@dbl@I should explore the @dre@mines@dbl@ and find a way to the lower levels|@dbl@where the @dre@crystals@dbl@ grow.");
+    ~quest_journal("Haunted Mine", $text);
+    return;
+}
+
+$text = "@dbl@I can start this quest by speaking to a @dre@Saradominist zealot@dbl@|@dbl@south of @dre@Mort'ton@dbl@.||";
+$text = append($text, "@dbl@Requirements:|");
+if (stat_base(agility) >= 15) {
+    $text = append($text, "@str@Level 15 Agility|");
+} else {
+    $text = append($text, "@dre@Level 15 Agility|");
+}
+if (stat_base(crafting) >= 35) {
+    $text = append($text, "@str@Level 35 Crafting");
+} else {
+    $text = append($text, "@dre@Level 35 Crafting");
+}
+~quest_journal("Haunted Mine", $text);
