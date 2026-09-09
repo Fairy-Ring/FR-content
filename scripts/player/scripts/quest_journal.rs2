@@ -1,5 +1,6 @@
 [proc,quest_journal](string $quest_name, string $journal_text)
-split_init($journal_text, 420, 99, q8_full);
+// Match packed 8134 body (com_4+): width=331 font=p12_full — not title q8@420.
+split_init($journal_text, 331, 99, p12_full);
 if_settext(questjournal:com_3, "@dre@<$quest_name>");
 if_settext(questjournal:com_4, split_get(0, 0));
 if_settext(questjournal:com_6, split_get(0, 1));
