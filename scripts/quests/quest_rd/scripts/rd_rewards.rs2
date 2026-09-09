@@ -24,26 +24,11 @@
 
 // True when the five-trial run is finished and ready to award (not yet complete).
 [proc,rd_rewards_finish_ready]()(boolean)
-if (%rd_main >= ^recruitmentdrive_complete) {
+if (%rd_main ! 1) {
     return(false);
 }
-if (~rd_route_active = false) {
+if (%rd_assessment ! 2) {
     return(false);
-}
-if (~rd_route_index ! 5) {
-    return(false);
-}
-def_int $s = 0;
-def_int $room = 0;
-while ($s < 5) {
-    $room = ~rd_route_get_slot($s);
-    if ($room < 1 | $room > 7) {
-        return(false);
-    }
-    if (~rd_room_phys_complete($room) = false) {
-        return(false);
-    }
-    $s = calc($s + 1);
 }
 return(true);
 
@@ -52,14 +37,15 @@ return(true);
 // Authoritative award path. Returns true if this call performed the award.
 // Safe to call repeatedly: second call is a no-op.
 [proc,rd_rewards_finish]()(boolean)
-if (%rd_main >= ^recruitmentdrive_complete) {
+if (%rd_main ! 1) {
     return(false);
 }
 if (~rd_rewards_finish_ready = false) {
     return(false);
 }
-// Durable mark first — no yield until grants below complete.
+// Durable mark and marker clear first — no yield until grants below complete.
 %rd_main = ^recruitmentdrive_complete;
+%rd_assessment = 0;
 // CANDIDATE XP tenths from guide table 1000.5 (not HTML-comment 10000.5).
 stat_advance(prayer, ^rd_reward_xp_tenths);
 stat_advance(herblore, ^rd_reward_xp_tenths);

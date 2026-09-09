@@ -1,0 +1,74 @@
+// Recruitment Drive durable lifecycle integration.
+// rd_assessment is permanent server state: 0 idle, 1 active, 2 pending Tiffy.
+// Temp route state is never used as the post-logout award signal.
+
+[proc,rd_lifecycle_finish_valid]()(boolean)
+if (%rd_assessment ! 1) {
+    return(false);
+}
+if (%rd_main ! 1) {
+    return(false);
+}
+if (~rd_route_active = false | ~rd_route_index ! 5) {
+    return(false);
+}
+if (~rd_route_same_instance = false) {
+    return(false);
+}
+// Validate five distinct valid slots, including combat room 3.
+def_int $i = 0;
+def_int $j = 0;
+def_int $room = 0;
+def_int $other = 0;
+def_boolean $combat = false;
+while ($i < 5) {
+    $room = ~rd_route_get_slot($i);
+    if ($room < 1 | $room > 7) {
+        return(false);
+    }
+    if (~rd_room_phys_complete($room) = false) {
+        return(false);
+    }
+    if ($room = 3) {
+        $combat = true;
+    }
+    $j = calc($i + 1);
+    while ($j < 5) {
+        $other = ~rd_route_get_slot($j);
+        if ($room = $other) {
+            return(false);
+        }
+        $j = calc($j + 1);
+    }
+    $i = calc($i + 1);
+}
+if ($combat = false) {
+    return(false);
+}
+return(true);
+
+// Called from login before any temp-route assumptions are made.
+// Active assessments are abandoned and parked; pending claims survive login.
+[proc,rd_lifecycle_login]
+if (%rd_assessment = 1) {
+    ~rd_run_reset;
+    p_telejump(0_46_52_52_45);
+}
+return;
+
+// Snapshot marker 1 before the normal death queue yields.
+[proc,rd_lifecycle_death_snapshot]
+if (%rd_assessment = 1) {
+    %rd_death_active = 1;
+} else {
+    %rd_death_active = 0;
+}
+return;
+
+// Called only after ordinary death item loss and respawn. Pending marker 2 is kept.
+[proc,rd_lifecycle_death_cleanup]
+if (%rd_death_active = 1) {
+    ~rd_run_reset;
+}
+%rd_death_active = 0;
+return;

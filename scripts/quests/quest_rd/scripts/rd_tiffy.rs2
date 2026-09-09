@@ -199,6 +199,8 @@ region_setexitcoord(npc_coord);
 // Select + bind uid from create pointer BEFORE any mainland findbycoord.
 // Do not rediscover uid via player coord here — player is still in Falador.
 ~rd_route_select;
+// Durable active marker is written only after real instance creation and UID bind.
+%rd_assessment = 1;
 return(~rd_room_dest(~rd_route_current));
 
 [label,rd_tiffy_after]

@@ -307,6 +307,7 @@ return;
 [proc,rd_run_reset]
 ~rd_combat_despawn_leye;
 ~rd_despawn_all_observers;
+%rd_assessment = 0;
 %rd_route_state = 0;
 %rd_route_uid = 0;
 ~rd_room_clear_all_complete;
@@ -521,16 +522,13 @@ return;
 // Five selected rooms marked. HANDOFF ONLY — do not write %rd_main=2 or rewards.
 // No player-facing mes: unsourced finish lines removed pending root reward/transcript.
 [proc,rd_run_finish]
-// Explicit handoff for root reward/journal integration.
-// Keep physical complete bits + finished cursor so root can inspect; clear trial temps.
-clearqueue(rd_statue_shuffle);
-%rd_room_order = 0;
-%rd_templock_1 = 0;
-~rd_reset_fox;
-~rd_combat_despawn_leye;
-~rd_despawn_all_observers;
-// Leave %rd_route_state active with cursor=5 and complete bits for root detection.
-// Silent state handoff only — root owns %rd_main=2 / reward UX.
+// Validate the complete owned route before mutating any lifecycle state.
+if (~rd_lifecycle_finish_valid = false) {
+    return;
+}
+// Reset/despawn first, then persist the pending Tiffy handoff and park.
+~rd_run_reset;
+%rd_assessment = 2;
 p_telejump(0_46_52_52_45);
 return;
 
