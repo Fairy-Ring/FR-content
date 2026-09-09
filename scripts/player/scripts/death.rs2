@@ -11,6 +11,9 @@ p_delay(3);
 %death = ^false;
 
 [queue,player_death_default]
+// The queue owns protected player access; snapshot before any death delay.
+// Marker 2 is an earned pending claim and must survive ordinary death.
+~rd_lifecycle_death_snapshot;
 if (~in_castlewars_game(coord) = true) {
     @player_death_castlewars;
 }
@@ -43,7 +46,14 @@ if (findhero = true) {
     // todo: what npc killed the player
     session_log(^log_moderator, "Player died");
 }
-p_teleport(map_findsquare(0_50_50_21_18, 0, 2, ^map_findsquare_lineofwalk));
+def_coord $death_dest = map_findsquare(0_50_50_21_18, 0, 2, ^map_findsquare_lineofwalk);
+// RuneHQ OSRS Recruitment Drive (2017): castle courtyard respawn.
+// https://www.runehq.com/oldschoolquest/recruitment-drive
+// Candidate r377 resolver: packed map 0_46_52_33_14, anchor 2977,3342.
+if (%rd_main >= ^recruitmentdrive_complete & %falador_spawn = 1) {
+    $death_dest = map_findsquare(0_46_52_33_14, 0, 2, ^map_findsquare_lineofwalk);
+}
+p_teleport($death_dest);
 buildappearance(worn);
 ~prayer_deactivate_all;
 ~follower_death;
@@ -57,6 +67,7 @@ healenergy(10000);
 ~update_all($prev_wep);
 ~initalltabs;
 ~player_end_poison;
+~rd_lifecycle_death_cleanup;
 
 [proc,player_death_lose_items]
 if (staffmodlevel > 1 & map_live = true) { return; }

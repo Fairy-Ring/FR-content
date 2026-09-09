@@ -277,6 +277,10 @@ if (%regicide_quest = ^regicide_complete) {
 if (%routequest = ^routequest_complete) {
     $questpoints = add($questpoints, ^routequest_questpoints);
 }
+// Recruitment Drive — narrow QP add.
+if (%rd_main = ^recruitmentdrive_complete) {
+    $questpoints = add($questpoints, ^recruitmentdrive_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -359,6 +363,8 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:troll_love, %troll_love, ^troll_love_complete);
 ~send_quest_progress_colour(questlist:golem, %golem_a, ^golem_complete);
 ~send_quest_progress_colour(questlist:troll, %troll_quest, ^troll_complete);
+// Recruitment Drive — narrow journal colour.
+~send_quest_progress_colour(questlist:rd, %rd_main, ^recruitmentdrive_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

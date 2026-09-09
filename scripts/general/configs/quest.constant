@@ -56,6 +56,8 @@
 ^misc_questpoints = 1
 ^mm_questpoints = 3
 ^recruitmentdrive_complete = 2
+// CANDIDATE 1 QP from retained Recruitment_Drive.wikitext Rewards table.
+^recruitmentdrive_questpoints = 1
 ^deserttreasure_complete = 15
 ^priestperil_complete = 60
 ^death_complete = 80

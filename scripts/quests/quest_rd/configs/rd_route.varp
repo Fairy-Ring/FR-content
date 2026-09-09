@@ -12,3 +12,14 @@ scope=temp
 [rd_route_uid]
 type=int
 scope=temp
+
+// Durable server-only marker: 0=no assessment, 1=active, 2=pending Tiffy.
+[rd_assessment]
+type=int
+scope=perm
+transmit=no
+
+// Lifecycle-only death snapshot; never transmitted or persisted.
+[rd_death_active]
+type=int
+scope=temp

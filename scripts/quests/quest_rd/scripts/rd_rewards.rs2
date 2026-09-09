@@ -1,0 +1,232 @@
+// Recruitment Drive — completion awards and postquest services (M1).
+//
+// Handoff ownership:
+// - Root may call ~rd_rewards_finish from ~rd_run_finish BEFORE park while the
+//   private region / route UID is still valid (preferred).
+// - After park, same_instance is false on mainland; finish eligibility does NOT
+//   require same_instance — only active route, cursor=5, and all five selected
+//   physical completes. Tiffy talk also calls finish when ready so awards are
+//   not stranded if root has not wired rd_run_finish yet.
+// - Single-award: %rd_main >= ^recruitmentdrive_complete is the durable guard.
+//   Mark rd_main=2 first, then awards with no yield between mark and grants.
+//
+// Sources (CANDIDATE after Changes subtraction):
+// - Transcript_Recruitment_Drive.wikitext Finishing up (player/Tiffy lines)
+// - Recruitment_Drive.wikitext Rewards: 1 QP, 1000.5 Prayer/Herblore/Agility XP,
+//   3000 coins, free Initiate helm/sallet, armour buy prices, Gaze Falador spawn
+// - XP HTML comment 10000.5 NOT used (see rd_rewards.constant)
+// - %rd_male_at_start → makeover voucher only if male at paid-makeover era start
+//
+// death.rs2 Falador tele on %falador_spawn is root-owned — this file only sets
+// the bit. Wanted! / Devious Minds branches stay in rd_tiffy.rs2.
+
+// --- eligibility -----------------------------------------------------------
+
+// True when the five-trial run is finished and ready to award (not yet complete).
+[proc,rd_rewards_finish_ready]()(boolean)
+if (%rd_main ! 1) {
+    return(false);
+}
+if (%rd_assessment ! 2) {
+    return(false);
+}
+return(true);
+
+// --- single-award finish ---------------------------------------------------
+
+// Authoritative award path. Returns true if this call performed the award.
+// Safe to call repeatedly: second call is a no-op.
+[proc,rd_rewards_finish]()(boolean)
+if (%rd_main ! 1) {
+    return(false);
+}
+if (~rd_rewards_finish_ready = false) {
+    return(false);
+}
+// Durable mark and marker clear first — no yield until grants below complete.
+%rd_main = ^recruitmentdrive_complete;
+%rd_assessment = 0;
+// CANDIDATE XP tenths from guide table 1000.5 (not HTML-comment 10000.5).
+stat_advance(prayer, ^rd_reward_xp_tenths);
+stat_advance(herblore, ^rd_reward_xp_tenths);
+stat_advance(agility, ^rd_reward_xp_tenths);
+inv_add(inv, coins, ^rd_reward_coins);
+// Free Initiate sallet/helm (pack name basic_tk_helm).
+inv_add(inv, basic_tk_helm, 1);
+// Makeover voucher only when player was male at quest start (pre-2022 rule).
+if (%rd_male_at_start = 1) {
+    inv_add(inv, rd_makeover_ticket, 1);
+}
+// Gaze of Saradomin default: Falador respawn option enabled.
+// death.rs2 branch that honours this bit is root-owned.
+%falador_spawn = 1;
+session_log(^log_adventure, "Quest complete: Recruitment Drive");
+~send_quest_complete(questlist:rd, basic_tk_helm, 250, ^recruitmentdrive_questpoints, "You have completed the\\nRecruitment Drive Quest!", "1,000.5 Prayer XP|1,000.5 Herblore XP|1,000.5 Agility XP|3,000 Coins|Initiate helm|Gaze of Saradomin");
+// Clear run temps so finish_ready cannot re-arm; do not clear rd_main/falador_spawn/male_at_start.
+~rd_run_reset;
+return(true);
+
+// Capture start-gender for voucher provenance. Call once at accept.
+[proc,rd_rewards_capture_start_gender]
+if (gender = ^gender_male) {
+    %rd_male_at_start = 1;
+} else {
+    %rd_male_at_start = 0;
+}
+return;
+
+// Progress colour helper after start / complete.
+[proc,rd_rewards_update_progress]
+~send_quest_progress(questlist:rd, %rd_main, ^recruitmentdrive_complete);
+return;
+
+// --- Initiate wear bind (Defence 20 + RD complete) -------------------------
+// CANDIDATE defence level 20 (OSRS Initiate). levelrequire_recruitmentdrive_defence
+// already refuses when %rd_main < complete.
+
+[opheld2,basic_tk_helm] @levelrequire_recruitmentdrive_defence(^rd_initiate_defence_req, last_slot);
+[opheld2,basic_tk_body] @levelrequire_recruitmentdrive_defence(^rd_initiate_defence_req, last_slot);
+[opheld2,basic_tk_legs] @levelrequire_recruitmentdrive_defence(^rd_initiate_defence_req, last_slot);
+
+// --- Postquest Tiffy services ----------------------------------------------
+// CANDIDATE last-resort: OSRS Transcript:Sir_Tiffy_Cashien "After Recruitment
+// Drive" (fetched 2026-09-08). Subtract later Proselyte/Slug/WGS lines.
+// Reachable from rd_tiffy_after only when Wanted is not taking first-start
+// (wanted_main != 0). Devious/Wanted jump order stays in rd_tiffy.rs2.
+//
+// Menu labels + Gaze explain + switch-respawn + buy lead-in + goodbye are
+// transcript-backed. Armour *purchase* after the lead-in has no packed
+// Initiate shop inv in this cache — dialogue buy at guide prices is the
+// functional CANDIDATE substitute (not claimed as period shop UI lines).
+
+[label,rd_tiffy_services]
+// Greeting: "What ho, sir./What ho, milady./What ho. Jolly good show on the
+// old training grounds thingy, what?" — third neutral form unused; gender pair.
+~chatnpc("<p,happy><text_gender("What ho, sir.", "What ho, milady.")> Jolly good show on the old training grounds thingy, what?");
+// "Do you have any jobs for me yet?" is Wanted — handled before this label.
+def_int $svc = ~p_choice4("Can you explain the Gaze of Saradomin to me?", 1, "Can I buy some armour?", 2, "Can I switch respawns please?", 3, "Goodbye.", 4);
+if ($svc = 1) {
+    @rd_tiffy_gaze_explain;
+}
+if ($svc = 2) {
+    @rd_tiffy_armour_shop;
+}
+if ($svc = 3) {
+    @rd_tiffy_switch_respawn;
+}
+// Goodbye.
+~chatplayer("<p,neutral>Well, see you around Tiffy.");
+~chatnpc("<p,happy>Ta-ta for now, old bean!");
+return;
+
+// Transcript Gaze explain (returns to services menu via re-entry on next talk;
+// in-tree no nested re-show of p_choice after explain without re-open).
+[label,rd_tiffy_gaze_explain]
+~chatplayer("<p,quiz>I don't really understand this 'Gaze of Saradomin' thing... Do you think you could explain what it does for me?");
+~chatnpc("<p,happy>Certainly <text_gender("sirrah", "milady")>! As you know, we Temple Knights are personally favoured by Saradomin himself.");
+~chatnpc("<p,happy>And when I say personally favoured, I don't mean that sometime off in the future he's going to buy us all a drink!");
+~chatnpc("<p,neutral>He watches over each of us, and when we die he catches us as we fall, and ensures we arrive back at Falador castle safe and sound.");
+~chatnpc("<p,neutral>We usually lose some equipment when he does so, but it's a small price to pay to be hale and hearty again, what?");
+~chatnpc("<p,neutral>Some lucky fellows have a similar system going already, but when they die they spawn in that squalid little swamp village Lumbridge.");
+~chatplayer("<p,neutral>Yeah, what kind of person would want to spawn there... Certainly not me, and I never have! Honest!");
+~chatnpc("<p,happy>Well, you should be glad that we offer you a step up then! Falador is clearly a far superior town to spend your time in!");
+~chatnpc("<p,quiz>Was there something else you wanted to ask good old Tiffy, <text_gender("sirrah", "milady")>?");
+// Re-offer the same services menu (transcript "Shows other options").
+def_int $svc2 = ~p_choice4("Can you explain the Gaze of Saradomin to me?", 1, "Can I buy some armour?", 2, "Can I switch respawns please?", 3, "Goodbye.", 4);
+if ($svc2 = 1) {
+    @rd_tiffy_gaze_explain;
+}
+if ($svc2 = 2) {
+    @rd_tiffy_armour_shop;
+}
+if ($svc2 = 3) {
+    @rd_tiffy_switch_respawn;
+}
+~chatplayer("<p,neutral>Well, see you around Tiffy.");
+~chatnpc("<p,happy>Ta-ta for now, old bean!");
+return;
+
+// Transcript buy lead-in; then CANDIDATE piece menu (no packed shop inv).
+[label,rd_tiffy_armour_shop]
+~chatplayer("<p,quiz>Can I buy some armour?");
+~chatnpc("<p,happy>Of course old bean. I can sell you up to Initiate level items only I'm afraid.");
+// Functional substitute for "Initiate Temple Knight Armoury interface opens."
+// Prices from retained spine-old17 Recruitment_Drive.wikitext Rewards table.
+~chatnpc("<p,neutral>Helm is 6,000 coins, platelegs 8,000, platemail 10,000, or the full set for 20,000.");
+def_int $buy = ~p_choice5("Buy Initiate helm (6,000).", 1, "Buy Initiate platelegs (8,000).", 2, "Buy Initiate platemail (10,000).", 3, "Buy full set (20,000).", 4, "No thanks.", 5);
+if ($buy = 1) {
+    ~rd_rewards_buy_piece(basic_tk_helm, ^rd_initiate_helm_price);
+} else if ($buy = 2) {
+    ~rd_rewards_buy_piece(basic_tk_legs, ^rd_initiate_legs_price);
+} else if ($buy = 3) {
+    ~rd_rewards_buy_piece(basic_tk_body, ^rd_initiate_body_price);
+} else if ($buy = 4) {
+    ~rd_rewards_buy_set;
+}
+return;
+
+[proc,rd_rewards_buy_piece](namedobj $piece, int $price)
+if (inv_total(inv, coins) < $price) {
+    ~chatnpc("<p,neutral>I'm afraid you're a bit short on the old coinage, what?");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    ~chatnpc("<p,neutral>You'll need a free inventory space first, old bean.");
+    return;
+}
+inv_del(inv, coins, $price);
+inv_add(inv, $piece, 1);
+~chatnpc("<p,happy>There you are — jolly good choice!");
+return;
+
+[proc,rd_rewards_buy_set]
+if (inv_total(inv, coins) < ^rd_initiate_set_price) {
+    ~chatnpc("<p,neutral>I'm afraid you're a bit short on the old coinage, what?");
+    return;
+}
+if (inv_freespace(inv) < 3) {
+    ~chatnpc("<p,neutral>You'll need three free inventory spaces for the full set.");
+    return;
+}
+inv_del(inv, coins, ^rd_initiate_set_price);
+inv_add(inv, basic_tk_helm, 1);
+inv_add(inv, basic_tk_body, 1);
+inv_add(inv, basic_tk_legs, 1);
+~chatnpc("<p,happy>Full Initiate set — top-hole!");
+return;
+
+// Transcript "Can I switch respawns please?" — toggles %falador_spawn.
+// death.rs2 must honour the bit (root-owned).
+[label,rd_tiffy_switch_respawn]
+~chatplayer("<p,quiz>Can I switch respawns, please?");
+if (%falador_spawn = 0) {
+    ~chatnpc("<p,quiz>Ah, so you'd like to respawn in Falador, the good old homestead! Are you sure?");
+    def_int $g = ~p_choice2("Yes, I want to respawn in Falador.", 1, "Actually, no thanks. I like my respawn point.", 2);
+    if ($g = 1) {
+        ~chatplayer("<p,happy>Yes, I want to respawn in Falador.");
+        %falador_spawn = 1;
+        ~chatnpc("<p,happy>Top-hole, what? Good old Fally is definitely the hot-spot nowadays!");
+    } else {
+        ~chatplayer("<p,neutral>Actually, no thanks. I like my respawn point.");
+        ~chatnpc("<p,happy>As you wish, what? Ta-ta for now.");
+    }
+} else {
+    ~chatnpc("<p,shock>What? You're saying you want to respawn in Lumbridge? Are you sure?");
+    def_int $g2 = ~p_choice2("Yes, I want to respawn in Lumbridge.", 1, "Actually, no thanks. I like my respawn point.", 2);
+    if ($g2 = 1) {
+        ~chatplayer("<p,neutral>Yes, I want to respawn in Lumbridge.");
+        %falador_spawn = 0;
+        ~chatnpc("<p,neutral>Why anyone would want to visit that smelly little swamp village of oiks is quite beyond me, I'm afraid, but the deed is done now.");
+    } else {
+        ~chatplayer("<p,neutral>Actually, no thanks. I like my respawn point.");
+        ~chatnpc("<p,happy>As you wish, what? Ta-ta for now.");
+    }
+}
+return;
+
+// Makeover voucher redemption: scripts/areas/area_falador/scripts/makeover_mage.rs2
+// (same worktree). Ticket awarded when %rd_male_at_start=1.
+// Coin "refund": guide Rewards lists 3,000 coins for all completers; RuneHQ
+// describes that 3,000 as getting the makeover fee back for male-start. Product
+// already grants ^rd_reward_coins once — no second 3,000 stack without a
+// period source that totals 6,000 for males.

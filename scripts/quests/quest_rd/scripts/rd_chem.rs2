@@ -560,8 +560,8 @@ if (~rd_room_is_current(6) = false) {
 
 [proc,rd_chem_book_page]
 // The compiler encodes each constant string in a 1024-byte buffer.
-def_string $text = "Acetic acid and Cupric Sulphate:|Endothermic.|The Cupric is in insufficient quantities to cause any noticeable reaction.||Acetic acid and Gypsum:|Endothermic.|Made a particularly bad smell, but little else that was productive.||Acetic acid and Sodium Chloride:|Endothermic.|Very tasty when combined with fried potatoes at room temperature.||Acetic acid and Dihydrogen Monoxide:|Endothermic.|The Dihydrogen Monoxide served only to dilute the Acetic acid at room temperature.||Acetic acid and Cupric Ore Powder:|Endothermic.|The powdered form of Cupric Ore allowed a lower than usual melting temperature, but the end product was non-usable.||Acetic acid and Tin Ore powder:|Endothermic.|Similar results";
-$text = append($text, " to those made using Cupric Ore.||Cupric Sulphate and Dihyrdogen Monoxide:|Exothermic.|A blue compound was produced, along with heat.||Cupric Sulphate and Gypsum:|Endothermic.|At room temperature, no useful product was created.||Gypsum and Dihydrogen Monoxide:|Exothermic.|A white liquid compound was formed, that quickly cooled at room temperature to a white heat resistant solid very similar to plaster.||Cupric Ore Powder and Tin Ore Powder:|Endothermic.|When both ores are in particulate form, a much lower than usual bonding temperature can be obtained. When combined at a moderate heat (my laboratory heating apparatus) I was able to form liquid Bronze quite easily.||Nitrous Monoxide:|Was not ");
+def_string $text = "Acetic acid and|Cupric Sulphate:|Endothermic.|The Cupric is in insufficient quantities to cause any noticeable reaction.||Acetic acid and Gypsum:|Endothermic.|Made a particularly bad smell, but little else that|was productive.||Acetic acid and|Sodium Chloride:|Endothermic.|Very tasty when combined with fried potatoes at|room temperature.||Acetic acid and|Dihydrogen Monoxide:|Endothermic.|The Dihydrogen Monoxide served only to dilute the|Acetic acid at|room temperature.||Acetic acid and|Cupric Ore Powder:|Endothermic.|The powdered form of Cupric Ore allowed a lower than usual melting temperature, but the end product was non-usable.||Acetic acid and|Tin Ore powder:|Endothermic.|Similar results";
+$text = append($text, " to those made using Cupric Ore.||Cupric Sulphate and|Dihyrdogen Monoxide:|Exothermic.|A blue compound was produced, along with heat.||Cupric Sulphate and|Gypsum:|Endothermic.|At room temperature, no useful product was created.||Gypsum and|Dihydrogen Monoxide:|Exothermic.|A white liquid compound was formed, that quickly cooled at room temperature to a white heat resistant solid very similar to plaster.||Cupric Ore Powder and|Tin Ore Powder:|Endothermic.|When both ores are in particulate form, a much lower than usual bonding temperature can be obtained. When combined at a moderate heat (my laboratory heating apparatus) I was able to form liquid Bronze quite|easily.||Nitrous Monoxide:|Was not ");
 $text = append($text, "able to perform an experimentation using this substance, as the gaseous form would always escape when the vial was opened.");
 split_init($text, 175, 22, q8_full);
 def_int $last = sub(split_pagecount, 1);
@@ -1042,11 +1042,18 @@ if (region_findbycoord(coord()) = false) {
 if (%rd_room6_stone_door ! ^rd_stone_opened) {
     return;
 }
-// Walk through opened stone door (east toward exit half).
-def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
-if ($entering = true) {
+// Opened stone is a length=2 ground barrier (map angle0 / west) between the
+// west chem half and the east exit half (final door one tile east of origin).
+// Generic check_axis tests wall-axis equality, not which side the player is on:
+// west approach (x < loc) returned false and telejumped back west (live probe
+// trial-chem-stone-01: 6892 stayed at 6892 beside stone 6893,z76).
+// Side compare matches other RD ground crossings (rd_entrance_inside) and
+// supports both directions without changing shared door procs.
+if (coordx(coord) < coordx(loc_coord)) {
+    // West of origin → east of barrier (toward exit / chained key).
     p_telejump(movecoord(loc_coord, 1, 0, 0));
 } else {
+    // On or east of origin → west chem half.
     p_telejump(movecoord(loc_coord, -1, 0, 0));
 }
 return;

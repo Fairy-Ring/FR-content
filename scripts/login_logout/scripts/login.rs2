@@ -69,6 +69,10 @@ queue(macro_event_login, 0, 0);
 ~stat_boost_login; // f2p boost reset
 ~sa_login; // start timer if low sa energy
 
+// Active Recruitment Drive assessments do not survive logout. A completed
+// assessment (marker 2) remains available to Tiffy after relog.
+~rd_lifecycle_login;
+
 if(inzone(movecoord(^grandtree_jail_coord, 0, 0, -2), movecoord(^grandtree_jail_coord, 3, 0, 2), coord) = true) {
     ~grandtree_spawn_charlie;
 }

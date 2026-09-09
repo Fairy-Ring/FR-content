@@ -1,0 +1,17 @@
+// Recruitment Drive reward quantities — CANDIDATE from retained
+// .wiki/extracts/spine-old17/Recruitment_Drive.wikitext Rewards table (guide).
+// XP is stored in tenths for stat_advance (1000.5 → 10005).
+//
+// XP discrepancy note: the same wikitext has an HTML comment claiming 10000.5
+// is accurate (modern OSRS diff). Table body lists 1,000.5. No retained 2007
+// tipit reward line confirmed this pass. Do NOT silently use 10000.5.
+// Product uses table 1000.5 until an opened era guide proves otherwise.
+
+^rd_reward_xp_tenths = 10005
+^rd_reward_coins = 3000
+^rd_initiate_helm_price = 6000
+^rd_initiate_legs_price = 8000
+^rd_initiate_body_price = 10000
+^rd_initiate_set_price = 20000
+// CANDIDATE OSRS wear req for Initiate armour (Defence 20 + RD complete).
+^rd_initiate_defence_req = 20

@@ -7,6 +7,9 @@
 [opnpc1,rd_teleporter_guy]
 if (%rd_main >= ^recruitmentdrive_complete) {
     @rd_tiffy_complete;
+} else if (~rd_rewards_finish_ready = true) {
+    // Five trials done; finish dialogue + single-award (also if root wired finish).
+    @rd_tiffy_finish;
 } else if (%rd_main > 0) {
     @rd_tiffy_in_progress;
 }
@@ -97,6 +100,9 @@ if ($choice = 1) {
 ~chatplayer("<p,happy>Yeah, this sounds right up my street. Let's go!");
 %rd_spoke_to_tiffy = 1;
 %rd_main = 1;
+// Voucher provenance: male at start of testing (pre-2022 gender rule).
+~rd_rewards_capture_start_gender;
+~rd_rewards_update_progress;
 ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
 ~rd_tiffy_go;
 return;
@@ -118,6 +124,14 @@ if ($again = 1) {
 } else {
     @rd_tiffy_refuse;
 }
+return;
+
+// Transcript Finishing up (CANDIDATE 2007-base spine-old17).
+[label,rd_tiffy_finish]
+~chatplayer("<p,happy>I believe I've managed to pass the tests!");
+~chatnpc("<p,happy>Oh, jolly well done! Your performance will need to be evaluated by Sir Vey personally, but I don't think it's going too far ahead of myself to welcome you to the team!");
+// Awards: durable %rd_main=2 then XP/coins/helm/voucher/gaze — no re-award.
+~rd_rewards_finish;
 return;
 
 [label,rd_tiffy_complete]
@@ -185,12 +199,14 @@ region_setexitcoord(npc_coord);
 // Select + bind uid from create pointer BEFORE any mainland findbycoord.
 // Do not rediscover uid via player coord here — player is still in Falador.
 ~rd_route_select;
+// Durable active marker is written only after real instance creation and UID bind.
+%rd_assessment = 1;
 return(~rd_room_dest(~rd_route_current));
 
 [label,rd_tiffy_after]
+// Wanted! first-start takes priority while wanted_main is still 0.
 if (%wanted_main = 0) {
     @wanted_tiffy_start;
 }
-~chatplayer("<p,happy>Hello.");
-~chatnpc("<p,happy>What ho, <displayname>! Spiffing to see you again, what?");
-return;
+// Postquest services: Initiate armour / Gaze (CANDIDATE). Devious already handled above.
+@rd_tiffy_services;
