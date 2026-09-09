@@ -15,4 +15,4 @@ if (%hauntedmine >= ^hauntedmine_complete) {
 %hauntedmine = ^hauntedmine_complete;
 stat_advance(strength, 220000);
 session_log(^log_adventure, "Quest complete: Haunted Mine");
-~send_quest_complete(questlist:hauntedmine, crystalshard_necklace_unstrung, 250, ^hauntedmine_questpoints, "You have completed the\\\\nHaunted Mine Quest!", "22,000 Strength XP|Ability to make the Salve amulet");
+~send_quest_complete(questlist:hauntedmine, crystalshard_necklace_unstrung, 250, ^hauntedmine_questpoints, "You have completed the\\nHaunted Mine Quest!", "22,000 Strength XP|Ability to make the Salve amulet");

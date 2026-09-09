@@ -91,6 +91,13 @@ def main() -> int:
     must_contain(complete, r"send_quest_complete\s*\(\s*questlist:hauntedmine", "quest scroll")
     must_contain(complete, r"\^hauntedmine_questpoints", "QP arg on scroll")
     must_contain(complete, r"session_log", "session log")
+    # House scroll newline: exactly two source backslashes before n (5c 5c 6e),
+    # matching RD/scorpcatcher — not four (5c×4 6e) which fails to line-break.
+    complete_raw = (HM / "scripts/hm_complete.rs2").read_bytes() if (HM / "scripts/hm_complete.rs2").is_file() else b""
+    if b"completed the\\\\nHaunted" not in complete_raw:
+        fail("scroll title must use house two-backslash form: completed the\\\\nHaunted")
+    if b"completed the\\\\\\\\nHaunted" in complete_raw:
+        fail("scroll title must not use four backslashes before n (would not line-break)")
     if "hauntedmine_bits" in complete or "hauntedmine_points_store" in complete:
         fail("complete must not touch 383/762")
 
