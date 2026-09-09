@@ -127,24 +127,44 @@ if (%devious_monk >= 1) {
 }
 @rd_tiffy_after;
 
-// Blindfold ride: packed fade_to_black + 2007-base Tiffy lines (Transcript:Recruitment Drive).
-// Overlay before tele so the instance does not pop in under chat.
-[proc,rd_tiffy_go]
-if_close;
+// Blindfold ride: leftover pair fade_to_black (seq_3541 out) then inter_379
+// (seq_2115 in). Null after the out seq leaves the last black frame.
+[proc,rd_fade_out]
 if_openoverlay(fade_to_black);
-p_delay(1);
+p_delay(~seqlength20ms(seq_3541));
+
+[proc,rd_fade_in]
+if_openoverlay(inter_379);
+p_delay(~seqlength20ms(seq_2115));
+if_openoverlay(null);
+
+// Overlay before tele so the instance does not pop in under chat.
+// Admission: empty inv + worn (CANDIDATE transcript). Refuse without tele.
+[proc,rd_tiffy_go]
+if (~rd_admission_ok = false) {
+    ~rd_admission_refuse;
+    return;
+}
+if_close;
+~rd_fade_out;
 ~chatnpc("<p,happy>Here we go! Mind your head!");
 ~chatnpc("<p,happy>Oops, ignore the smell! Nearly there!");
 p_telejump(~rd_instance_enter);
+// Player is now inside the private region — rebind uid from player coord
+// (defense in depth; primary bind is post-create ActiveRegion in select).
+~rd_route_rebind_uid_from_player;
+~rd_fade_in;
 ~chatnpc("<p,happy>And... Here we are! Best of luck!");
-if_close;
-p_delay(1);
-if_openoverlay(null);
+// Land on first selected room dest; begin starts room (observer + implemented begin).
+~rd_room_begin(~rd_route_current);
 
 // Copy packed m38_77 zone-by-zone into a private region (Engine-TS#95).
-// Dest local 57,44 is template 2489,4972 L0. Do not dest onto the shared square.
+// New-instance: full run reset, select five-of-seven (combat forced), bind UID
+// from create ActiveRegion while pointer is still valid (player still Falador).
+// Returns first room dest-from-maps. Private regions are loc-only — observers
+// spawn in ~rd_room_begin, not from template NPCs.
 [proc,rd_instance_enter]()(coord)
-~rd_reset_fox;
+~rd_run_reset;
 def_coord $sw = region_create(4, 8, 8);
 def_int $level = 0;
 def_int $zx = 0;
@@ -162,7 +182,10 @@ while ($level < 4) {
     $level = calc($level + 1);
 }
 region_setexitcoord(npc_coord);
-return(region_getcoord(0, 57, 44));
+// Select + bind uid from create pointer BEFORE any mainland findbycoord.
+// Do not rediscover uid via player coord here — player is still in Falador.
+~rd_route_select;
+return(~rd_room_dest(~rd_route_current));
 
 [label,rd_tiffy_after]
 if (%wanted_main = 0) {

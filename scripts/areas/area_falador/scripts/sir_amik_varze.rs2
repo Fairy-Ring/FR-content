@@ -76,3 +76,33 @@ if (%spy = 1) {
 [label,black_knights_fortress_sir_amik_postquest]
 ~chatplayer("<p,happy>Hello Sir Amik.");
 ~chatnpc("<p,happy>Hello, friend!");
+
+// Recruitment Drive pointer: preserve the BKF postquest greeting and do not
+// write RD state here. Tiffy's existing start writer remains authoritative.
+if (%rd_main >= ^recruitmentdrive_complete) {
+    return;
+} else if (%rd_main > 0) {
+    @recruitment_drive_sir_amik_in_progress;
+}
+@recruitment_drive_sir_amik_referral;
+
+[label,recruitment_drive_sir_amik_referral]
+~chatplayer("<p,quiz>Do you have any other quests for me to do?");
+~chatnpc("<p,neutral>Quests, eh? Well, I don't have anything on the go at the moment, but there is an organisation that is always looking for capable adventurers to assist them.");
+~chatnpc("<p,neutral>Your excellent work sorting out those Black Knights means I will happily write you a letter of recommendation.");
+~chatnpc("<p,quiz>Would you like me to put your name forwards to them?");
+def_int $choice = ~p_choice2("Sure thing Sir Amik, sign me up!", 1, "No thanks, that doesn't sound like the kind of thing that would interest me...", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,happy>Sure thing Sir Amik, sign me up!");
+    ~chatnpc("<p,confused>Erm, well, this is a little embarrassing, I already HAVE put you forward as a potential member.");
+    ~chatnpc("<p,neutral>They are called the Temple Knights, and you are to meet Sir Tiffy Cashien in Falador park for testing immediately.");
+} else {
+    ~chatplayer("<p,neutral>No thanks, that doesn't sound like the kind of thing that would interest me...");
+    ~chatnpc("<p,neutral>As you wish adventurer, let's say no more about it.");
+}
+return;
+
+[label,recruitment_drive_sir_amik_in_progress]
+~chatplayer("<p,quiz>Do you have any other quests for me to do?");
+~chatnpc("<p,neutral>No, I am afraid not. I suggest you go meet Sir Tiffy in Falador Park, he will be expecting you.");
+return;

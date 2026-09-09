@@ -1,0 +1,12 @@
+// Recruitment Drive chemistry room — no new basevars.
+// Chem state lives on existing transmit varps from unpack 377:
+//   recruitmentdrive  — rd_room6_complete, rd_got_* (vinegar/water/copsulph/gypsum/salt/n2o/tin)
+//   rd_rooms_tempvar  — rd_got_copore, rd_spare_water, rd_room6_stone_door
+//   rd_rooms_tempvar2 — rd_react_on_spade, rd_gypsum_in_tin, rd_water_in_tin, rd_room6_hint1
+// See scripts/_unpack/377/all.varbit + all.varp. Do not redeclare (duplicate debugname).
+
+// Internal finite-supply bookkeeping, not a reconstructed client varbit.
+[rd_chem_tin_ore_taken]
+scope=temp
+type=int
+transmit=no

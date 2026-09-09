@@ -1,0 +1,4 @@
+[rd_spishyus_hint]
+type=int
+scope=temp
+transmit=no

@@ -1,0 +1,14 @@
+// Recruitment Drive — route/lifecycle varps (internal encoding, not historical).
+// recruitmentdrive stays permanent for questmain / room-complete bits.
+// Route run state is server-only temp (transmit omitted = no client wire).
+// Do not make rd_rooms_tempvar* permanent.
+
+// Packed five-slot route + cursor + active. See rd_route.rs2 header.
+[rd_route_state]
+type=int
+scope=temp
+
+// region_uid captured at select/begin for mark_complete / stale guards.
+[rd_route_uid]
+type=int
+scope=temp

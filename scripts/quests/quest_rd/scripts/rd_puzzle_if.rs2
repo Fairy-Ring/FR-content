@@ -1,32 +1,86 @@
-// Recruitment Drive — room 3 entrance Use: instance-local dest east of 7315.
-// Do not if_openmain(balloon_animal): leftover 16129 title is Prison Pete
-// ("Pop the correct balloon animal to find a key") + pack prisonpete_balloon*
-// / prisonpete_key. Kuam's room is loc-silent in rd.loc — not that IF.
+// Recruitment Drive — shared portal/door helpers for the five-trial route.
+// Room-specific exit doors stay in fox/statue/combat scripts.
+// Entrance portals: inside → ~rd_run_quit; outside current → ~rd_room_begin.
+// Exit portals: gate physical complete + route-current, then ~rd_route_advance.
+// Do not if_openmain(balloon_animal): leftover 16129 title is Prison Pete.
+
+// --- entrance portals (yellow) — quit or enter current ---
+
+[oploc1,rd_portal_room1_entrance]
+~rd_entrance_use(1);
+return;
+
+[oploc1,rd_portal_room2_entrance]
+~rd_entrance_use(2);
+return;
 
 [oploc1,rd_portal_room3_entrance]
-if (region_findbycoord(coord()) = true) {
-    p_telejump(movecoord(loc_coord, 1, 0, 0)); // instance-local: east of 7315 into room 3
-}
+~rd_entrance_use(3);
 return;
 
-// Fox-room far portal (loc family room2 in room1 span). Isolated rooms — one-tile dest
-// is a dead-end pocket (2470,4972). Dest = room2 dest-from-maps 2459,4979 CANDIDATE.
+[oploc1,rd_portal_room4_entrance]
+~rd_entrance_use(4);
+return;
+
+[oploc1,rd_portal_room5_entrance]
+~rd_entrance_use(5);
+return;
+
+[oploc1,rd_portal_room6_entrance]
+~rd_entrance_use(6);
+return;
+
+[oploc1,rd_portal_room7_entrance]
+~rd_entrance_use(7);
+return;
+
+// --- exit portals — advance route (not hard-coded next room) ---
+
 [oploc1,rd_portal_room1_exit]
-if (region_findbycoord(coord()) = true) {
-    p_telejump(region_getcoord(0, 27, 51));
-}
+~rd_try_exit_portal(1);
 return;
 
-// Interior Zanaris-style door in front of that portal. Open is the fox *test*
-// gate (walkthrough: door unlocks after all three are across). Do not bind
-// rooms 2–7 to this proc — each test has its own condition.
+[oploc1,rd_portal_room2_exit]
+~rd_try_exit_portal(2);
+return;
+
+[oploc1,rd_portal_room3_exit]
+~rd_try_exit_portal(3);
+return;
+
+[oploc1,rd_portal_room4_exit]
+~rd_try_exit_portal(4);
+return;
+
+[oploc1,rd_portal_room5_exit]
+~rd_try_exit_portal(5);
+return;
+
+[oploc1,rd_portal_room6_exit]
+~rd_try_exit_portal(6);
+return;
+
+[oploc1,rd_portal_room7_exit]
+~rd_try_exit_portal(7);
+return;
+
+// Interior Zanaris-style door in front of fox exit portal. Open is the fox *test*
+// gate (walkthrough: door unlocks after all three are across).
 [oploc1,rd_room1_exitdoor]
 if (region_findbycoord(coord()) = false) {
     return;
 }
-if (~rd_fox_complete = false) {
-    mes("The door is locked."); // CANDIDATE 2007-base: door unlocks after fox test
+if (~rd_route_current ! 1 & ~rd_route_active = true) {
+    mes("The door is locked.");
     return;
+}
+// Prefer physical complete bit; also allow live fox_complete then mark.
+if (%rd_room1_complete = 0) {
+    if (~rd_fox_complete = false) {
+        mes("The door is locked."); // CANDIDATE 2007-base: door unlocks after fox test
+        return;
+    }
+    ~rd_room_mark_complete(1);
 }
 def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
 ~open_and_close_door2(desertdoor_inactive, $entering, door_open);

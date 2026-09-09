@@ -1,0 +1,189 @@
+// Recruitment Drive — room 3 Sir Kuam Ferentse / Sir Leye combat trial.
+//
+// Pack surface (VERIFIED): rd_observer_room_3 2284 Talk-to; rd_combat_npc_room_3
+// 2285 Talk-to+Attack vislevel=20; 0 static jm2 spawn for 2285 → script-spawn
+// CANDIDATE; %rd_room3_complete. %rd_male_at_start is quest-start/refund
+// provenance (name-only in cache) — do NOT write it from combat begin/retry.
+// Client unpacker only decodes vislevel — do not treat generated hitpoints/
+// attack/strength/defence rows as historical cache evidence (operator 2026-09-08).
+// Exact historical combat stats (HP, attack, defence) remain UNKNOWN.
+//
+// Sex restriction (CANDIDATE 2007-base minus later): pre-2022 OSRS Changes —
+// Sir Leye invulnerable to male characters ("no man may defeat him"). 2022-11-09
+// weapon/blade rewrite is OUT of era. Do not invent room weapons (no period
+// pack objs for that unit). Female via existing Makeover Mage product.
+// Primary immunity: shared ~npc_max_dealt (zeros hit before XP/heropoints).
+// Secondary: ai_queue2 gender zero. No death-then-heal theatre.
+//
+// Chat (CANDIDATE): 2007-base Transcript:Recruitment Drive with post-2022
+// "blade" lines restored to period "man" wording per wiki Changes note.
+// Completion line for mid-run rooms matches Lady Table pattern.
+//
+// Lifecycle: spawn bound to instance region; defeat queue binds scheduling
+// region_uid (like statue shuffle). New-instance enter resets via
+// ~rd_reset_combat from ~rd_instance_enter. Portal exit + door require complete.
+// Entrance Use from inside quits to Falador park (progress clear this run).
+
+// Despawn any Leye in the run instance. Prefer player instance; else restore
+// ActiveRegion via %rd_route_uid and search at spawn (mainland player coord misses).
+[proc,rd_combat_despawn_leye]
+if (~rd_route_focus_instance = false) {
+    return;
+}
+npc_findall(~rd_combat_leye_spawn_coord, rd_combat_npc_room_3, 64, 0);
+while (npc_findnext = true) {
+    npc_del;
+}
+
+[proc,rd_reset_combat]
+~rd_combat_despawn_leye;
+%rd_room3_complete = 0;
+
+// ActiveRegion pointer required for region_uid (engine REGION_UID).
+[proc,rd_combat_same_instance](int $expected_uid)(boolean)
+if (region_findbycoord(coord()) = false) {
+    return(false);
+}
+if (region_uid() ! $expected_uid) {
+    return(false);
+}
+return(true);
+
+// Quit / fail out of the grounds: clear this run's progress and park.
+// Delegates to shared ~rd_run_fail / ~rd_run_quit (all trials).
+[proc,rd_combat_quit_to_park]
+~rd_run_quit;
+return;
+
+// Spawn stand: empty floor east of entrance dest, not on Kuam 25,38.
+// CANDIDATE implementation tile — not a historical packed spawn (0 jm2).
+[proc,rd_combat_leye_spawn_coord]()(coord)
+return(region_getcoord(0, 28, 36)); // template ~2460,4964 L0
+
+// Secondary male HP zero (recoil / missed queue2). Primary immunity is shared
+// ~npc_max_dealt in skill_combat (zeros damage before XP/heropoints). Do not
+// use death-then-heal as a substitute (reviewed combat contract, 2026-09-08).
+[ai_queue2,rd_combat_npc_room_3]
+def_int $damage = last_int;
+if (finduid(%npc_aggressive_player) = true) {
+    if (gender() = 0) {
+        // Male: HP damage cancelled. Period CANDIDATE "no man may defeat him".
+        $damage = 0;
+    }
+}
+~npc_default_damage($damage);
+return;
+
+// Death only completes for a female hero. Male path should not reach HP 0
+// when max_dealt + ai_queue2 zero damage; if it does, refuse completion
+// (no heal theatre). Bind defeat queue to the instance where Leye died.
+[ai_queue3,rd_combat_npc_room_3]
+def_int $uid = 0;
+if (region_findbycoord(npc_coord) = true) {
+    $uid = region_uid();
+}
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+if (gender() = 0) {
+    // Should be unreachable if invuln holds; do not write complete.
+    return;
+}
+if ($uid = 0) {
+    return;
+}
+// Arg = region_uid of the dying instance — not a post-teleport fresh uid.
+queue(rd_leye_defeated, 0, $uid);
+return;
+
+// $arg = region_uid captured at Leye death (see ai_queue3).
+[queue,rd_leye_defeated](int $arg)
+if (%rd_room3_complete = 1) {
+    return;
+}
+// Region-exists-only is insufficient: a replacement instance must not credit.
+if (~rd_combat_same_instance($arg) = false) {
+    return;
+}
+// Physical complete via shared mark (route-current + route UID guards).
+// Also require combat scheduling uid still matches live region.
+if (~rd_route_active = true & ~rd_route_current ! 3) {
+    return;
+}
+~rd_room_mark_complete(3);
+// Mid-run completion: standard next-challenge line.
+// Do not invent 4th/5th/final completion writer here — ~rd_run_finish is handoff only.
+~chatnpc_specific("Sir Kuam Ferentse", rd_observer_room_3, "<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+return;
+
+[proc,rd_combat_begin]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+if (~rd_route_active = true & ~rd_route_current ! 3) {
+    return;
+}
+if (%rd_room3_complete = 1) {
+    return;
+}
+// Already fighting: Leye present in this region — do not double-spawn.
+if (npc_find(coord, rd_combat_npc_room_3, 64, 0) = true) {
+    return;
+}
+// Do not write %rd_male_at_start here — quest-start/refund provenance only;
+// overwriting on every begin/retry would erase original male status after makeover.
+// CANDIDATE period chat (man, not post-2022 blade).
+~chatnpc_specific("Sir Kuam Ferentse", rd_observer_room_3, "<p,happy>Ah, <displayname>, you're finally here. Your task for this room is to defeat Sir Leye. He has been blessed by Saradomin so that no man may defeat him, so it should be quite a challenge for you.");
+if (~rd_combat_same_instance($uid) = false) {
+    return;
+}
+~chatnpc_specific("Sir Kuam Ferentse", rd_observer_room_3, "<p,neutral>If you are having problems, remember; A true warrior uses his wits as much as his brawn. Fight smarter, not harder.");
+if (~rd_combat_same_instance($uid) = false) {
+    return;
+}
+if (%rd_room3_complete = 1) {
+    return;
+}
+if (npc_find(coord, rd_combat_npc_room_3, 64, 0) = true) {
+    return;
+}
+// Duration CANDIDATE (implementation): long enough for a real fight; not historical.
+npc_add(~rd_combat_leye_spawn_coord, rd_combat_npc_room_3, 1000);
+npc_say("No man may defeat me!");
+return;
+
+[opnpc1,rd_observer_room_3]
+if (%rd_room3_complete = 1) {
+    ~chatnpc("<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+    return;
+}
+if (npc_find(coord, rd_combat_npc_room_3, 64, 0) = true) {
+    ~chatplayer("<p,quiz>What am I supposed to be doing again?");
+    ~chatnpc("<p,neutral>Defeat Sir Leye. He has been blessed by Saradomin so that no man may defeat him.");
+    ~chatnpc("<p,neutral>If you are having problems, remember; A true warrior uses his wits as much as his brawn. Fight smarter, not harder.");
+    return;
+}
+~rd_combat_begin;
+return;
+
+[opnpc1,rd_combat_npc_room_3]
+~chatnpc("<p,laugh>AH-HA HA HA! You can NEVER defeat ME! I am blessed by Saradomin himself! NO MAN MAY DEFEAT ME!");
+return;
+
+// Door unlocks after Leye defeat (same gate pattern as fox/statue).
+[oploc1,rd_room3_exitdoor]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room3_complete = 0) {
+    mes("The door is locked."); // CANDIDATE 2007-base: door unlocks after the test
+    return;
+}
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+return;
+
+// Exit + entrance portal handlers live in rd_puzzle_if.rs2
+// (~rd_try_exit_portal / ~rd_entrance_use).

@@ -1,0 +1,581 @@
+// Recruitment Drive — shared five-trial route and run lifecycle (M1).
+//
+// Contract: preselect 5 distinct of 1..7 with room 3 (combat) forced; shuffle
+// order into server-only %rd_route_state. Physical %rd_roomN_complete bits stay
+// puzzle IDs. %rd_room_order remains statue multivar only.
+//
+// Encoding (internal, not historical) on %rd_route_state:
+//   bits 0-2   slot0 room (1-7)
+//   bits 3-5   slot1
+//   bits 6-8   slot2
+//   bits 9-11  slot3
+//   bits 12-14 slot4
+//   bits 15-17 cursor 0..5 (5 = finished handoff pending)
+//   bit  18    active run
+// %rd_route_uid = region_uid at select/begin for stale guards.
+//
+// Final fifth mark does NOT write %rd_main=2 — ~rd_run_finish is the handoff
+// until reward integration. Chemistry still awaits its room implementation.
+//
+// Private regions do not copy template NPCs (InstanceController loc-only copy).
+// ~rd_spawn_observer places jm2 observer stands on room begin.
+
+// --- bit helpers ---
+
+[proc,rd_route_slot_bits](int $slot)(int, int)
+// returns startbit, endbit for slot 0..4
+if ($slot = 0) {
+    return(0, 2);
+} else if ($slot = 1) {
+    return(3, 5);
+} else if ($slot = 2) {
+    return(6, 8);
+} else if ($slot = 3) {
+    return(9, 11);
+} else if ($slot = 4) {
+    return(12, 14);
+}
+return(0, 2);
+
+[proc,rd_route_get_slot](int $slot)(int)
+def_int $start;
+def_int $end;
+$start, $end = ~rd_route_slot_bits($slot);
+return(getbit_range(%rd_route_state, $start, $end));
+
+[proc,rd_route_set_slot](int $slot, int $room)
+def_int $start;
+def_int $end;
+$start, $end = ~rd_route_slot_bits($slot);
+%rd_route_state = setbit_range_toint(%rd_route_state, $room, $start, $end);
+return;
+
+[proc,rd_route_index]()(int)
+return(getbit_range(%rd_route_state, 15, 17));
+
+[proc,rd_route_set_index](int $idx)
+%rd_route_state = setbit_range_toint(%rd_route_state, $idx, 15, 17);
+return;
+
+[proc,rd_route_active]()(boolean)
+if (getbit_range(%rd_route_state, 18, 18) = 1) {
+    return(true);
+}
+return(false);
+
+[proc,rd_route_set_active](int $on)
+%rd_route_state = setbit_range_toint(%rd_route_state, $on, 18, 18);
+return;
+
+[proc,rd_route_current]()(int)
+if (~rd_route_active = false) {
+    return(0);
+}
+def_int $idx = ~rd_route_index;
+if ($idx < 0 | $idx > 4) {
+    return(0);
+}
+return(~rd_route_get_slot($idx));
+
+// --- physical complete bits ---
+
+[proc,rd_room_phys_complete](int $room)(boolean)
+if ($room = 1) {
+    if (%rd_room1_complete = 1) {
+        return(true);
+    }
+} else if ($room = 2) {
+    if (%rd_room2_complete = 1) {
+        return(true);
+    }
+} else if ($room = 3) {
+    if (%rd_room3_complete = 1) {
+        return(true);
+    }
+} else if ($room = 4) {
+    if (%rd_room4_complete = 1) {
+        return(true);
+    }
+} else if ($room = 5) {
+    if (%rd_room5_complete = 1) {
+        return(true);
+    }
+} else if ($room = 6) {
+    if (%rd_room6_complete = 1) {
+        return(true);
+    }
+} else if ($room = 7) {
+    if (%rd_room7_complete = 1) {
+        return(true);
+    }
+}
+return(false);
+
+[proc,rd_room_set_phys_complete](int $room)
+if ($room = 1) {
+    %rd_room1_complete = 1;
+} else if ($room = 2) {
+    %rd_room2_complete = 1;
+} else if ($room = 3) {
+    %rd_room3_complete = 1;
+} else if ($room = 4) {
+    %rd_room4_complete = 1;
+} else if ($room = 5) {
+    %rd_room5_complete = 1;
+} else if ($room = 6) {
+    %rd_room6_complete = 1;
+} else if ($room = 7) {
+    %rd_room7_complete = 1;
+}
+return;
+
+[proc,rd_room_clear_all_complete]
+%rd_room1_complete = 0;
+%rd_room2_complete = 0;
+%rd_room3_complete = 0;
+%rd_room4_complete = 0;
+%rd_room5_complete = 0;
+%rd_room6_complete = 0;
+%rd_room7_complete = 0;
+return;
+
+// --- dest-from-maps (CANDIDATE) local tiles in private m38_77 copy ---
+
+[proc,rd_room_dest](int $room)(coord)
+// Local lx,lz from rd-room-dest-from-maps-377.md (origin 2432,4928).
+if ($room = 1) {
+    return(region_getcoord(0, 57, 44)); // 2489,4972
+} else if ($room = 2) {
+    return(region_getcoord(0, 27, 51)); // 2459,4979
+} else if ($room = 3) {
+    return(region_getcoord(0, 24, 36)); // 2456,4964
+} else if ($room = 4) {
+    return(region_getcoord(0, 40, 28)); // 2472,4956
+} else if ($room = 5) {
+    return(region_getcoord(0, 8, 28)); // 2440,4956
+} else if ($room = 6) {
+    return(region_getcoord(0, 36, 12)); // 2468,4940
+} else if ($room = 7) {
+    return(region_getcoord(0, 19, 8)); // 2451,4936
+}
+return(region_getcoord(0, 57, 44));
+
+[proc,rd_observer_stand](int $room)(coord)
+// jm2 observer stands (occupancy, not dest).
+if ($room = 1) {
+    return(region_getcoord(0, 56, 45)); // Spishyus 2488,4973
+} else if ($room = 2) {
+    return(region_getcoord(0, 26, 53)); // Lady Table 2458,4981
+} else if ($room = 3) {
+    return(region_getcoord(0, 25, 38)); // Kuam 2457,4966
+} else if ($room = 4) {
+    return(region_getcoord(0, 44, 30)); // Tinley 2476,4958
+} else if ($room = 5) {
+    return(region_getcoord(0, 11, 28)); // Ren 2443,4956
+} else if ($room = 6) {
+    return(region_getcoord(0, 37, 13)); // Cheevers 2469,4941
+} else if ($room = 7) {
+    return(region_getcoord(0, 19, 11)); // Hynn 2451,4939
+}
+return(region_getcoord(0, 56, 45));
+
+[proc,rd_observer_type](int $room)(npc)
+if ($room = 1) {
+    return(rd_observer_room_1);
+} else if ($room = 2) {
+    return(rd_observer_room_2);
+} else if ($room = 3) {
+    return(rd_observer_room_3);
+} else if ($room = 4) {
+    return(rd_observer_room_4);
+} else if ($room = 5) {
+    return(rd_observer_room_5);
+} else if ($room = 6) {
+    return(rd_observer_room_6);
+} else if ($room = 7) {
+    return(rd_observer_room_7);
+}
+return(rd_observer_room_1);
+
+// Ensure ActiveRegion points at the run instance. Player may be on mainland.
+// Returns false if neither player-coord nor stored route uid resolves.
+[proc,rd_route_focus_instance]()(boolean)
+// UID 0 is a valid engine instance. Explicit route-active state establishes
+// ownership; never adopt an arbitrary instance from the current player tile.
+if (~rd_route_active = false) {
+    return(false);
+}
+return(region_findbyuid(%rd_route_uid));
+
+// Despawn then spawn observer for $room. No duplicates. Long lifetime for trial.
+[proc,rd_spawn_observer](int $room)
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if ($room < 1 | $room > 7) {
+    return;
+}
+def_npc $type = ~rd_observer_type($room);
+// Search from stand (instance coord), not only player tile — covers room edges.
+npc_findall(~rd_observer_stand($room), $type, 64, 0);
+while (npc_findnext = true) {
+    npc_del;
+}
+// Duration CANDIDATE: long enough for a full room; not historical packed spawn.
+npc_add(~rd_observer_stand($room), $type, 5000);
+return;
+
+// Clear observers in the run instance. Uses stored %rd_route_uid when the
+// player is already on mainland (npc_findall is coord-based).
+[proc,rd_despawn_all_observers]
+if (~rd_route_focus_instance = false) {
+    return;
+}
+def_int $r = 1;
+def_npc $type;
+while ($r <= 7) {
+    $type = ~rd_observer_type($r);
+    npc_findall(~rd_observer_stand($r), $type, 64, 0);
+    while (npc_findnext = true) {
+        npc_del;
+    }
+    $r = calc($r + 1);
+}
+return;
+
+// --- same-instance UID ---
+
+[proc,rd_route_same_instance]()(boolean)
+if (~rd_route_active = false) {
+    return(false);
+}
+if (region_findbycoord(coord()) = false) {
+    return(false);
+}
+if (region_uid() ! %rd_route_uid) {
+    return(false);
+}
+return(true);
+
+// Bind %rd_route_uid from the live ActiveRegion pointer.
+// After region_create / zone copy the pointer is valid even while the player is
+// still in Falador. Do NOT require region_findbycoord(coord()) first — mainland
+// coords return false and the old branch zeroed the uid, breaking same_instance
+// guards and first-room begin after enter tele.
+[proc,rd_route_bind_uid]
+%rd_route_uid = region_uid();
+return;
+
+// Defense in depth once the player is inside the private region.
+[proc,rd_route_rebind_uid_from_player]
+if (region_findbycoord(coord()) = true) {
+    %rd_route_uid = region_uid();
+}
+return;
+
+// True only for the current physical trial in this player's bound instance.
+[proc,rd_room_is_current](int $room)(boolean)
+if (~rd_route_active = false) { return(false); }
+if (~rd_route_same_instance = false) { return(false); }
+if ($room = ~rd_route_current) { return(true); }
+return(false);
+
+// --- admission ---
+
+[proc,rd_admission_ok]()(boolean)
+// Empty inv + worn. CANDIDATE transcript gate.
+if (inv_freespace(inv) ! inv_size(inv)) {
+    return(false);
+}
+if (inv_freespace(worn) ! inv_size(worn)) {
+    return(false);
+}
+return(true);
+
+[proc,rd_admission_refuse]
+// CANDIDATE 2007-base Transcript:Recruitment Drive (empty inv/worn refuse).
+~chatnpc("<p,neutral>Well, bad luck old bean, you'll need to have a completely empty inventory and you can't be wearing any equipment before we can accurately test you.");
+~chatnpc("<p,happy>Come and see me again after you've been to the old bank to drop your stuff off, what?");
+return;
+
+// --- reset / select / begin / mark / advance ---
+
+// Clear route cursor/slots; all physical room completes; trial temps/queues;
+// trial inv items. Do NOT clear %rd_main / %rd_spoke_to_tiffy / %rd_male_at_start / falador_spawn.
+// Despawn first while %rd_route_uid still identifies the prior instance — clearing
+// uid before despawn made mainland reset unable to find instance NPCs.
+[proc,rd_run_reset]
+~rd_combat_despawn_leye;
+~rd_despawn_all_observers;
+%rd_route_state = 0;
+%rd_route_uid = 0;
+~rd_room_clear_all_complete;
+~rd_spishyus_reset;
+~rd_tinley_reset;
+~rd_ren_reset;
+~rd_hynn_reset;
+~rd_chem_reset;
+clearqueue(rd_statue_shuffle);
+~rd_reset_fox;
+// Statue reset clears order/templock/queue; room2 bit already cleared above.
+clearqueue(rd_statue_shuffle);
+%rd_room_order = 0;
+%rd_templock_1 = 0;
+// Chem / other room temps left for their room cards; clear known chem bits if set mid-run later.
+return;
+
+// Fisher-Yates over seven packed 3-bit rooms, then ensure room 3 is in first five.
+[proc,rd_route_select]
+%rd_route_state = 0;
+// Init pack of seven rooms at bits 0..20 (temp slots 0..6)
+def_int $pack = 0;
+def_int $i = 0;
+def_int $j = 0;
+def_int $is = 0;
+def_int $ie = 0;
+def_int $js = 0;
+def_int $je = 0;
+def_int $vi = 0;
+def_int $vj = 0;
+def_int $pos3 = 7;
+def_int $s = 0;
+def_int $swap = 0;
+$pack = setbit_range_toint($pack, 1, 0, 2);
+$pack = setbit_range_toint($pack, 2, 3, 5);
+$pack = setbit_range_toint($pack, 3, 6, 8);
+$pack = setbit_range_toint($pack, 4, 9, 11);
+$pack = setbit_range_toint($pack, 5, 12, 14);
+$pack = setbit_range_toint($pack, 6, 15, 17);
+$pack = setbit_range_toint($pack, 7, 18, 20);
+// Shuffle indices 6..1. random(n) is 0..n-1.
+$i = 6;
+while ($i > 0) {
+    $j = random(add($i, 1));
+    $is = multiply($i, 3);
+    $ie = calc($is + 2);
+    $js = multiply($j, 3);
+    $je = calc($js + 2);
+    $vi = getbit_range($pack, $is, $ie);
+    $vj = getbit_range($pack, $js, $je);
+    $pack = setbit_range_toint($pack, $vj, $is, $ie);
+    $pack = setbit_range_toint($pack, $vi, $js, $je);
+    $i = calc($i - 1);
+}
+// Ensure combat (3) is among first five slots
+$pos3 = 7;
+$s = 0;
+while ($s < 7) {
+    $is = multiply($s, 3);
+    $ie = calc($is + 2);
+    if (getbit_range($pack, $is, $ie) = 3) {
+        $pos3 = $s;
+    }
+    $s = calc($s + 1);
+}
+if ($pos3 > 4) {
+    $swap = random(5);
+    $is = multiply($pos3, 3);
+    $ie = calc($is + 2);
+    $js = multiply($swap, 3);
+    $je = calc($js + 2);
+    $vi = getbit_range($pack, $is, $ie);
+    $vj = getbit_range($pack, $js, $je);
+    $pack = setbit_range_toint($pack, $vj, $is, $ie);
+    $pack = setbit_range_toint($pack, $vi, $js, $je);
+}
+// Store first five into route state
+$s = 0;
+while ($s < 5) {
+    $is = multiply($s, 3);
+    $ie = calc($is + 2);
+    ~rd_route_set_slot($s, getbit_range($pack, $is, $ie));
+    $s = calc($s + 1);
+}
+~rd_route_set_index(0);
+~rd_route_set_active(1);
+~rd_route_bind_uid;
+return;
+
+// Teleport to room dest, spawn observer, start implemented room begin.
+// Each integrated room owns its dialogue/puzzle after shared placement.
+[proc,rd_room_begin](int $room)
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if ($room < 1 | $room > 7) {
+    return;
+}
+// Stale begin must not run in a replacement instance.
+if (~rd_route_active = true & ~rd_route_same_instance = false) {
+    return;
+}
+p_telejump(~rd_room_dest($room));
+~rd_spawn_observer($room);
+if ($room = 1) {
+    ~rd_spishyus_enter;
+    return;
+} else if ($room = 2) {
+    ~rd_statue_begin;
+    return;
+} else if ($room = 3) {
+    ~rd_combat_begin;
+    return;
+} else if ($room = 4) {
+    ~rd_tinley_enter;
+    return;
+} else if ($room = 5) {
+    ~rd_ren_enter;
+    return;
+} else if ($room = 6) {
+    ~rd_chem_enter;
+    return;
+} else if ($room = 7) {
+    ~rd_hynn_enter;
+    return;
+}
+return;
+
+// Set physical complete only if $room is route-current and same instance. No double credit.
+[proc,rd_room_mark_complete](int $room)(boolean)
+if (~rd_route_active = false) {
+    return(false);
+}
+if (~rd_route_same_instance = false) {
+    return(false);
+}
+if ($room ! ~rd_route_current) {
+    return(false);
+}
+if (~rd_room_phys_complete($room) = true) {
+    // Already marked — reject repeated credit but treat as present for gates.
+    return(false);
+}
+~rd_room_set_phys_complete($room);
+return(true);
+
+// After gated exit portal: advance cursor; finish or begin next.
+[proc,rd_route_advance]
+if (~rd_route_active = false) {
+    return;
+}
+if (~rd_route_same_instance = false) {
+    return;
+}
+def_int $cur = ~rd_route_current;
+if ($cur = 0) {
+    return;
+}
+// Require physical complete for current before advance.
+if (~rd_room_phys_complete($cur) = false) {
+    return;
+}
+def_int $idx = ~rd_route_index;
+$idx = calc($idx + 1);
+if ($idx >= 5) {
+    ~rd_route_set_index(5);
+    ~rd_run_finish;
+    return;
+}
+~rd_route_set_index($idx);
+~rd_room_begin(~rd_route_current);
+return;
+
+// Shared exit-portal gate used by all room exit locs.
+[proc,rd_try_exit_portal](int $room)
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (~rd_route_active = false) {
+    return;
+}
+if (~rd_route_same_instance = false) {
+    return;
+}
+if ($room ! ~rd_route_current) {
+    return;
+}
+if (~rd_room_phys_complete($room) = false) {
+    return;
+}
+~rd_route_advance;
+return;
+
+// Fail out: despawn owned instance NPCs while instance context is still valid,
+// then park, then clear run state. (npc_findall is coord-based — park-first made
+// mainland despawn a no-op on instance observers/Leye.)
+[proc,rd_run_fail]
+~rd_combat_despawn_leye;
+~rd_despawn_all_observers;
+p_telejump(0_46_52_52_45); // Falador park W of Tiffy
+~rd_run_reset;
+return;
+
+// Quit via entrance portal: same cleanup order as fail.
+[proc,rd_run_quit]
+~rd_combat_despawn_leye;
+~rd_despawn_all_observers;
+p_telejump(0_46_52_52_45);
+~rd_run_reset;
+return;
+
+// Five selected rooms marked. HANDOFF ONLY — do not write %rd_main=2 or rewards.
+// No player-facing mes: unsourced finish lines removed pending root reward/transcript.
+[proc,rd_run_finish]
+// Explicit handoff for root reward/journal integration.
+// Keep physical complete bits + finished cursor so root can inspect; clear trial temps.
+clearqueue(rd_statue_shuffle);
+%rd_room_order = 0;
+%rd_templock_1 = 0;
+~rd_reset_fox;
+~rd_combat_despawn_leye;
+~rd_despawn_all_observers;
+// Leave %rd_route_state active with cursor=5 and complete bits for root detection.
+// Silent state handoff only — root owns %rd_main=2 / reward UX.
+p_telejump(0_46_52_52_45);
+return;
+
+// Entrance portal: outside → room begin if this room is route-current;
+// inside → quit entire run. Geometry from dest-from-maps dest-side.
+[proc,rd_entrance_use](int $room)
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_boolean $inside = ~rd_entrance_inside($room);
+if ($inside = true) {
+    ~rd_run_quit;
+    return;
+}
+// Outside corridor: only enter if this room is the current trial.
+if (~rd_route_active = true & $room = ~rd_route_current) {
+    ~rd_room_begin($room);
+    return;
+}
+// Not current: no-op (do not leak into unselected rooms mid-run).
+return;
+
+// Dest-side = inside room (see rd-room-dest-from-maps-377.md).
+[proc,rd_entrance_inside](int $room)(boolean)
+// Rooms 1-2: dest west of portal → inside when player x < portal x
+// Rooms 3-6: dest east → inside when player x > portal x
+// Room 7: dest north → inside when player z > portal z
+if ($room = 1 | $room = 2) {
+    if (coordx(coord) < coordx(loc_coord)) {
+        return(true);
+    }
+    return(false);
+}
+if ($room = 7) {
+    if (coordz(coord) > coordz(loc_coord)) {
+        return(true);
+    }
+    return(false);
+}
+// 3,4,5,6 east
+if (coordx(coord) > coordx(loc_coord)) {
+    return(true);
+}
+return(false);
+
+// Expose hooks for root Tinley/other room integration (names only — no Tinley refs).
+// ~rd_run_reset, ~rd_route_select, ~rd_room_begin, ~rd_room_mark_complete,
+// ~rd_route_advance, ~rd_run_fail, ~rd_run_quit, ~rd_run_finish, ~rd_route_current

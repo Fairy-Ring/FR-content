@@ -1,0 +1,1213 @@
+// Recruitment Drive — Miss Cheevers chemistry trial (physical room 6).
+//
+// Cache surface (VERIFIED): rd.loc shelves/bunsen/stone multi/key/crates/chest;
+// objs 5577–5605; varbits rd_got_*, rd_spare_water, rd_room6_stone_door,
+// rd_react_on_spade, rd_gypsum_in_tin, rd_water_in_tin, rd_room6_hint1,
+// rd_room6_complete; seq rd_pour_vial. No recipe in cache.
+//
+// Solutions (CANDIDATE 2007-base guide Recruitment_Drive lines 78–100):
+// spade→burner→door + cupric sulphate + liquid; tin+water+gypsum → imprint on
+// chained key → tin/copper powders → burner → pry knife/chisel/wire → exitdoor.
+// Wrong vial mixes → ??? mixture objs; wrong tin → tin_of_crap.
+//
+// Shelf/crate/chest provenance is CANDIDATE (no period per-loc item map). One-to-
+// one from got_* bits + guide item list; shelf_8 multi-water via spare_water.
+// Alchemical notes: CANDIDATE later wiki Transcript:Alchemical_notes.
+// Internal server state enforces the source-backed finite tin ore supply.
+// Expose ~rd_chem_enter / ~rd_reset_chem. Root owns portals/observer/route.
+// Write %rd_room6_complete only after sourced exit-door unlock with bronze key.
+// No entrance/exit portal handlers in this unit.
+
+// ─── inventory cleanup ───────────────────────────────────────────────────────
+
+[proc,rd_chem_del_all](namedobj $obj)
+if (inv_total(inv, $obj) > 0) {
+    inv_del(inv, $obj, inv_total(inv, $obj));
+}
+if (inv_total(worn, $obj) > 0) {
+    inv_del(worn, $obj, inv_total(worn, $obj));
+}
+
+[proc,rd_reset_chem]
+%rd_got_vinegar = 0;
+%rd_got_water = 0;
+%rd_got_copsulph = 0;
+%rd_got_gypsum = 0;
+%rd_got_salt = 0;
+%rd_got_n2o = 0;
+%rd_got_tin = 0;
+%rd_got_copore = 0;
+%rd_chem_tin_ore_taken = 0;
+%rd_spare_water = 0;
+%rd_room6_stone_door = ^rd_stone_basic;
+%rd_react_on_spade = 0;
+%rd_gypsum_in_tin = 0;
+%rd_water_in_tin = 0;
+%rd_room6_hint1 = 0;
+%rd_room6_complete = 0;
+~rd_chem_del_all(rd_cupric_sulphate);
+~rd_chem_del_all(rd_acetic_acid);
+~rd_chem_del_all(rd_gypsum);
+~rd_chem_del_all(rd_sodium_chloride);
+~rd_chem_del_all(rd_nitorus_oxide);
+~rd_chem_del_all(rd_dihydrogen_monoxide);
+~rd_chem_del_all(rd_tin_ore_powder);
+~rd_chem_del_all(rd_copper_ore_powder);
+~rd_chem_del_all(rd_puzzleroom_key);
+~rd_chem_del_all(rd_metal_spade);
+~rd_chem_del_all(rd_metal_spade_no_handle);
+~rd_chem_del_all(rd_chem_book);
+~rd_chem_del_all(rd_cupric_sulphate2);
+~rd_chem_del_all(rd_plaster_vial);
+~rd_chem_del_all(rd_spoilt_potion);
+~rd_chem_del_all(rd_tin);
+~rd_chem_del_all(rd_tinfull);
+~rd_chem_del_all(rd_keymould);
+~rd_chem_del_all(rd_full_keymould_tin);
+~rd_chem_del_all(rd_full_keymould_copper);
+~rd_chem_del_all(rd_full_keymould_unheated);
+~rd_chem_del_all(rd_full_keymould_complete);
+~rd_chem_del_all(rd_tin_of_crap);
+~rd_chem_del_all(rd_tin_of_crap_empty);
+~rd_chem_del_all(rd_chisel);
+~rd_chem_del_all(rd_wire);
+~rd_chem_del_all(rd_shears);
+~rd_chem_del_all(rd_magnet);
+~rd_chem_del_all(rd_knife);
+
+[proc,rd_chem_reset]
+~rd_reset_chem;
+
+[proc,rd_chem_enter]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+return;
+
+[proc,rd_chem_same_instance](int $expected_uid)(boolean)
+if (~rd_room_is_current(6) = false) {
+    return(false);
+}
+if (region_findbycoord(coord()) = false) {
+    return(false);
+}
+if (region_uid() ! $expected_uid) {
+    return(false);
+}
+return(true);
+
+[proc,rd_chem_try_give](namedobj $obj)(boolean)
+if (~pickup_obj_check_for_space($obj, 1) = false) {
+    return(false);
+}
+inv_add(inv, $obj, 1);
+return(true);
+
+// ─── Miss Cheevers (CANDIDATE Transcript_Recruitment_Drive Miss Cheevers) ────
+
+[opnpc1,rd_observer_room_6]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+if (%rd_room6_complete = 1) {
+    ~chatnpc("<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+    return;
+}
+if (%rd_room6_hint1 = 1) {
+    ~chatplayer("<p,quiz>Can you give me any more help?");
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    ~chatnpc("<p,neutral>I really can't be any more help than that I'm afraid, it is more than my job's worth to have given you the help I already have.");
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    ~chatnpc("<p,happy>Best of luck with the test <displayname>, I hope your application is successful.");
+    return;
+}
+// First conversation: briefing, then optional help → tip (hint1).
+// Transcript splits refuse and tip across later talks; one bit forces collapse
+// into this tree (CANDIDATE staging).
+~chatnpc("<p,happy>Greetings, <displayname>. Welcome to my challenge.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>All you need to do is leave from the opposite door to where you came in by.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>I will warn you that this is more complicated than it may at first appear.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>I should also warn you that there are limited supplies of the items in this room, so think carefully before using them, or you may find yourself stuck, and have to leave to start again!");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,happy>Best of luck!");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+def_int $help = ~p_choice2("Can you give me any help with this puzzle?", 1, "I'll get on with it.", 0);
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+if ($help = 0) {
+    return;
+}
+~chatplayer("<p,quiz>Can you give me any help with this puzzle?");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>No, I am sorry, but that is forbidden by our rules.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>If you are having a particularly tough time of it, I suggest you leave and come back later when you are in a more receptive frame of mind.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>Sometimes a break from concentration will yield fresh insight. Our aim is to test you, but not to the point of frustration!");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatplayer("<p,quiz>Please?");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>Well... Look, I really shouldn't say anything about this room, but...");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>When I was attempting to join the Temple Knights I myself had to do this puzzle myself.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>It was slightly different, but the idea behind it was the same, and I left the notes I had made while doing it hidden in one of the bookcases.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>If you look carefully you may find them, and they may be of some use to you.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,neutral>I really can't be any more help than that I'm afraid, it is more than my job's worth to have given you the help I already have.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+~chatnpc("<p,happy>Best of luck with the test <displayname>, I hope your application is successful.");
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+%rd_room6_hint1 = 1;
+return;
+
+// ─── shelves (CANDIDATE one-shot map from got_* + guide chemicals list) ──────
+
+[oploc1,rd_shelves_chemicals_1]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_got_copsulph = 1) {
+    mes("The shelf is empty."); // CANDIDATE
+    return;
+}
+if (~rd_chem_try_give(rd_cupric_sulphate) = false) {
+    return;
+}
+%rd_got_copsulph = 1;
+mes("You take a vial of Cupric sulfate."); // CANDIDATE name from obj
+return;
+
+[oploc1,rd_shelves_chemicals_2]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_got_vinegar = 1) {
+    mes("The shelf is empty.");
+    return;
+}
+if (~rd_chem_try_give(rd_acetic_acid) = false) {
+    return;
+}
+%rd_got_vinegar = 1;
+mes("You take a vial of Acetic acid.");
+return;
+
+[oploc1,rd_shelves_chemicals_3]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_got_gypsum = 1) {
+    mes("The shelf is empty.");
+    return;
+}
+if (~rd_chem_try_give(rd_gypsum) = false) {
+    return;
+}
+%rd_got_gypsum = 1;
+mes("You take a vial of Gypsum.");
+return;
+
+[oploc1,rd_shelves_chemicals_4]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_got_salt = 1) {
+    mes("The shelf is empty.");
+    return;
+}
+if (~rd_chem_try_give(rd_sodium_chloride) = false) {
+    return;
+}
+%rd_got_salt = 1;
+mes("You take a vial of Sodium chloride.");
+return;
+
+[oploc1,rd_shelves_chemicals_5]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_got_n2o = 1) {
+    mes("The shelf is empty.");
+    return;
+}
+if (~rd_chem_try_give(rd_nitorus_oxide) = false) {
+    return;
+}
+%rd_got_n2o = 1;
+mes("You take a vial of Nitrous oxide.");
+return;
+
+[oploc1,rd_shelves_chemicals_6]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_got_copore = 1) {
+    mes("The shelf is empty.");
+    return;
+}
+if (~rd_chem_try_give(rd_copper_ore_powder) = false) {
+    return;
+}
+%rd_got_copore = 1;
+mes("You take a vial of Cupric ore powder.");
+return;
+
+[oploc1,rd_shelves_chemicals_7]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+// Internal state; no new period client varbit is asserted.
+if (%rd_chem_tin_ore_taken = 1) {
+    mes("The shelf is empty.");
+    return;
+}
+if (~rd_chem_try_give(rd_tin_ore_powder) = false) {
+    return;
+}
+%rd_chem_tin_ore_taken = 1;
+mes("You take a vial of Tin ore powder.");
+return;
+
+[oploc1,rd_shelves_chemicals_8]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+// Multi water supply. spare_water = count already taken (max ^rd_water_max).
+if (%rd_spare_water >= ^rd_water_max) {
+    mes("The shelf is empty."); // desc: empty vial scenery
+    return;
+}
+if (~rd_chem_try_give(rd_dihydrogen_monoxide) = false) {
+    return;
+}
+%rd_spare_water = calc(%rd_spare_water + 1);
+if (%rd_got_water = 0) {
+    %rd_got_water = 1;
+}
+mes("You take a vial of liquid.");
+return;
+
+// ─── bookshelves: alchemical notes after Cheevers tip ────────────────────────
+
+[proc,rd_chem_search_bookshelf]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room6_hint1 = 0) {
+    mes("You search the bookshelf but find nothing of interest."); // CANDIDATE
+    return;
+}
+if (inv_total(inv, rd_chem_book) > 0) {
+    mes("You have already taken the notes from the bookshelf.");
+    return;
+}
+if (~rd_chem_try_give(rd_chem_book) = false) {
+    return;
+}
+mes("You find some alchemical notes hidden in the bookshelf."); // CANDIDATE
+return;
+
+[oploc1,rd_bookshelf_old_tall]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+~rd_chem_search_bookshelf;
+
+[oploc1,rd_bookshelf_old_tall2]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+~rd_chem_search_bookshelf;
+
+[oploc1,rd_bookshelf_old_tall3]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+~rd_chem_search_bookshelf;
+
+[oploc1,rd_bookshelf_old_tall4]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+~rd_chem_search_bookshelf;
+
+// ─── crates / chest ──────────────────────────────────────────────────────────
+
+[oploc1,rd_large_crate]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+// Metal spade — one-shot via inv of either spade stage.
+if (inv_total(inv, rd_metal_spade) > 0 | inv_total(inv, rd_metal_spade_no_handle) > 0 | %rd_room6_stone_door ! ^rd_stone_basic) {
+    mes("You search the crate but find nothing.");
+    return;
+}
+if (~rd_chem_try_give(rd_metal_spade) = false) {
+    return;
+}
+mes("You find a metal spade.");
+return;
+
+// CANDIDATE tool split across empty_crate family locs (guide: crates hold tools).
+[oploc1,rd_large_crates]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+// Two large_crates tiles — give chisel then shears by inv.
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (inv_total(inv, rd_chisel) = 0) {
+    if (~rd_chem_try_give(rd_chisel) = false) {
+        return;
+    }
+    mes("You find a chisel.");
+    return;
+}
+if (inv_total(inv, rd_shears) = 0) {
+    if (~rd_chem_try_give(rd_shears) = false) {
+        return;
+    }
+    mes("You find some shears.");
+    return;
+}
+mes("You search the crates but find nothing of value.");
+return;
+
+[oploc1,rd_small_crates]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (inv_total(inv, rd_wire) = 0) {
+    if (~rd_chem_try_give(rd_wire) = false) {
+        return;
+    }
+    mes("You find some bronze wire.");
+    return;
+}
+if (inv_total(inv, rd_magnet) = 0) {
+    if (~rd_chem_try_give(rd_magnet) = false) {
+        return;
+    }
+    mes("You find a magnet.");
+    return;
+}
+if (inv_total(inv, rd_knife) = 0) {
+    if (~rd_chem_try_give(rd_knife) = false) {
+        return;
+    }
+    mes("You find a knife.");
+    return;
+}
+mes("You search the crates but find nothing of value.");
+return;
+
+[oploc1,rd_chest_closed]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+p_arrivedelay;
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+anim(human_openchest, 0);
+sound_synth(chest_open, 0, 0);
+p_delay(0);
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+loc_change(rd_chest_open, 500);
+return;
+
+[oploc2,rd_chest_open]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+p_arrivedelay;
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+anim(human_closechest, 0);
+sound_synth(chest_close, 0, 0);
+p_delay(0);
+if (~rd_chem_same_instance($uid) = false) {
+    return;
+}
+loc_change(rd_chest_closed, 500);
+return;
+
+[oploc1,rd_chest_open]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_got_tin = 1 | inv_total(inv, rd_tin) > 0 | inv_total(inv, rd_tinfull) > 0 | inv_total(inv, rd_keymould) > 0 | inv_total(inv, rd_full_keymould_tin) > 0 | inv_total(inv, rd_full_keymould_copper) > 0 | inv_total(inv, rd_full_keymould_unheated) > 0 | inv_total(inv, rd_full_keymould_complete) > 0 | inv_total(inv, rd_tin_of_crap) > 0 | inv_total(inv, rd_tin_of_crap_empty) > 0) {
+    mes("The chest is empty.");
+    return;
+}
+if (~rd_chem_try_give(rd_tin) = false) {
+    return;
+}
+%rd_got_tin = 1;
+mes("You find a tin.");
+return;
+
+// ─── alchemical notes Read ───────────────────────────────────────────────────
+// Body CANDIDATE: runescape.wiki Transcript:Alchemical_notes (item release 2005).
+// Shared buttons delegate only this book to the owned-room pager.
+
+[opheld1,rd_chem_book]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+%open_book = rd_chem_book;
+%book_page = 0;
+~rd_chem_book_page;
+return;
+
+[proc,rd_chem_book_flip](int $direction)
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+%book_page = add(%book_page, $direction);
+~rd_chem_book_page;
+
+[proc,rd_chem_book_page]
+// The compiler encodes each constant string in a 1024-byte buffer.
+def_string $text = "Acetic acid and Cupric Sulphate:|Endothermic.|The Cupric is in insufficient quantities to cause any noticeable reaction.||Acetic acid and Gypsum:|Endothermic.|Made a particularly bad smell, but little else that was productive.||Acetic acid and Sodium Chloride:|Endothermic.|Very tasty when combined with fried potatoes at room temperature.||Acetic acid and Dihydrogen Monoxide:|Endothermic.|The Dihydrogen Monoxide served only to dilute the Acetic acid at room temperature.||Acetic acid and Cupric Ore Powder:|Endothermic.|The powdered form of Cupric Ore allowed a lower than usual melting temperature, but the end product was non-usable.||Acetic acid and Tin Ore powder:|Endothermic.|Similar results";
+$text = append($text, " to those made using Cupric Ore.||Cupric Sulphate and Dihyrdogen Monoxide:|Exothermic.|A blue compound was produced, along with heat.||Cupric Sulphate and Gypsum:|Endothermic.|At room temperature, no useful product was created.||Gypsum and Dihydrogen Monoxide:|Exothermic.|A white liquid compound was formed, that quickly cooled at room temperature to a white heat resistant solid very similar to plaster.||Cupric Ore Powder and Tin Ore Powder:|Endothermic.|When both ores are in particulate form, a much lower than usual bonding temperature can be obtained. When combined at a moderate heat (my laboratory heating apparatus) I was able to form liquid Bronze quite easily.||Nitrous Monoxide:|Was not ");
+$text = append($text, "able to perform an experimentation using this substance, as the gaseous form would always escape when the vial was opened.");
+split_init($text, 175, 22, q8_full);
+def_int $last = sub(split_pagecount, 1);
+if (%book_page < 0) { %book_page = 0; }
+if (%book_page > $last) { %book_page = $last; }
+~book_page("Alchemical notes", %book_page);
+if (%book_page = 0) {
+    if_sethide(book:page_left_button, true);
+} else {
+    if_sethide(book:page_left_button, false);
+}
+if (%book_page = $last) {
+    if_sethide(book:page_right_button, true);
+} else {
+    if_sethide(book:page_right_button, false);
+}
+return;
+
+// Nitrous Open — book: gas escapes.
+[opheld1,rd_nitorus_oxide]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+mes("You open the vial and the gas escapes."); // CANDIDATE from notes
+inv_del(inv, rd_nitorus_oxide, 1);
+return;
+
+// ─── vial-on-vial mixes (wrong / side products) ───────────────────────────────
+
+[proc,rd_chem_vial_mix](namedobj $a, namedobj $b)
+// Consumes one of each; produces spoilt / hot / plaster based on pair.
+inv_del(inv, $a, 1);
+inv_del(inv, $b, 1);
+// Cupric sulphate + water → hot mixture (obj rd_cupric_sulphate2).
+if (($a = rd_cupric_sulphate & $b = rd_dihydrogen_monoxide) | ($a = rd_dihydrogen_monoxide & $b = rd_cupric_sulphate)) {
+    inv_add(inv, rd_cupric_sulphate2, 1);
+    mes("The mixture gets very hot."); // CANDIDATE
+    return;
+}
+// Gypsum + water in vial → plaster vial (should have been tin).
+if (($a = rd_gypsum & $b = rd_dihydrogen_monoxide) | ($a = rd_dihydrogen_monoxide & $b = rd_gypsum)) {
+    inv_add(inv, rd_plaster_vial, 1);
+    mes("The mixture gets warm and lumpy."); // CANDIDATE
+    return;
+}
+inv_add(inv, rd_spoilt_potion, 1);
+mes("The mixture looks horrible. You think you messed something up."); // from spoilt desc
+return;
+
+[opheldu,rd_cupric_sulphate]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_dihydrogen_monoxide : ~rd_chem_vial_mix(rd_cupric_sulphate, rd_dihydrogen_monoxide);
+    case rd_acetic_acid : ~rd_chem_vial_mix(rd_cupric_sulphate, rd_acetic_acid);
+    case rd_gypsum : ~rd_chem_vial_mix(rd_cupric_sulphate, rd_gypsum);
+    case rd_sodium_chloride : ~rd_chem_vial_mix(rd_cupric_sulphate, rd_sodium_chloride);
+    case rd_tin_ore_powder : ~rd_chem_vial_mix(rd_cupric_sulphate, rd_tin_ore_powder);
+    case rd_copper_ore_powder : ~rd_chem_vial_mix(rd_cupric_sulphate, rd_copper_ore_powder);
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_acetic_acid]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_dihydrogen_monoxide : ~rd_chem_vial_mix(rd_acetic_acid, rd_dihydrogen_monoxide);
+    case rd_cupric_sulphate : ~rd_chem_vial_mix(rd_acetic_acid, rd_cupric_sulphate);
+    case rd_gypsum : ~rd_chem_vial_mix(rd_acetic_acid, rd_gypsum);
+    case rd_sodium_chloride : ~rd_chem_vial_mix(rd_acetic_acid, rd_sodium_chloride);
+    case rd_tin_ore_powder : ~rd_chem_vial_mix(rd_acetic_acid, rd_tin_ore_powder);
+    case rd_copper_ore_powder : ~rd_chem_vial_mix(rd_acetic_acid, rd_copper_ore_powder);
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_gypsum]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_dihydrogen_monoxide : ~rd_chem_vial_mix(rd_gypsum, rd_dihydrogen_monoxide);
+    case rd_cupric_sulphate : ~rd_chem_vial_mix(rd_gypsum, rd_cupric_sulphate);
+    case rd_acetic_acid : ~rd_chem_vial_mix(rd_gypsum, rd_acetic_acid);
+    case rd_sodium_chloride : ~rd_chem_vial_mix(rd_gypsum, rd_sodium_chloride);
+    case rd_tin_ore_powder : ~rd_chem_vial_mix(rd_gypsum, rd_tin_ore_powder);
+    case rd_copper_ore_powder : ~rd_chem_vial_mix(rd_gypsum, rd_copper_ore_powder);
+    case rd_tin : @rd_chem_gypsum_on_tin;
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_sodium_chloride]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_dihydrogen_monoxide : ~rd_chem_vial_mix(rd_sodium_chloride, rd_dihydrogen_monoxide);
+    case rd_cupric_sulphate : ~rd_chem_vial_mix(rd_sodium_chloride, rd_cupric_sulphate);
+    case rd_acetic_acid : ~rd_chem_vial_mix(rd_sodium_chloride, rd_acetic_acid);
+    case rd_gypsum : ~rd_chem_vial_mix(rd_sodium_chloride, rd_gypsum);
+    case rd_tin_ore_powder : ~rd_chem_vial_mix(rd_sodium_chloride, rd_tin_ore_powder);
+    case rd_copper_ore_powder : ~rd_chem_vial_mix(rd_sodium_chloride, rd_copper_ore_powder);
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_dihydrogen_monoxide]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_cupric_sulphate : ~rd_chem_vial_mix(rd_dihydrogen_monoxide, rd_cupric_sulphate);
+    case rd_acetic_acid : ~rd_chem_vial_mix(rd_dihydrogen_monoxide, rd_acetic_acid);
+    case rd_gypsum : ~rd_chem_vial_mix(rd_dihydrogen_monoxide, rd_gypsum);
+    case rd_sodium_chloride : ~rd_chem_vial_mix(rd_dihydrogen_monoxide, rd_sodium_chloride);
+    case rd_tin_ore_powder : ~rd_chem_vial_mix(rd_dihydrogen_monoxide, rd_tin_ore_powder);
+    case rd_copper_ore_powder : ~rd_chem_vial_mix(rd_dihydrogen_monoxide, rd_copper_ore_powder);
+    case rd_tin : @rd_chem_water_on_tin;
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_tin_ore_powder]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_cupric_sulphate : ~rd_chem_vial_mix(rd_tin_ore_powder, rd_cupric_sulphate);
+    case rd_acetic_acid : ~rd_chem_vial_mix(rd_tin_ore_powder, rd_acetic_acid);
+    case rd_gypsum : ~rd_chem_vial_mix(rd_tin_ore_powder, rd_gypsum);
+    case rd_sodium_chloride : ~rd_chem_vial_mix(rd_tin_ore_powder, rd_sodium_chloride);
+    case rd_dihydrogen_monoxide : ~rd_chem_vial_mix(rd_tin_ore_powder, rd_dihydrogen_monoxide);
+    case rd_copper_ore_powder : ~rd_chem_vial_mix(rd_tin_ore_powder, rd_copper_ore_powder);
+    case rd_keymould : @rd_chem_tinore_on_mould;
+    case rd_full_keymould_copper : @rd_chem_tinore_on_copper_mould;
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_copper_ore_powder]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_cupric_sulphate : ~rd_chem_vial_mix(rd_copper_ore_powder, rd_cupric_sulphate);
+    case rd_acetic_acid : ~rd_chem_vial_mix(rd_copper_ore_powder, rd_acetic_acid);
+    case rd_gypsum : ~rd_chem_vial_mix(rd_copper_ore_powder, rd_gypsum);
+    case rd_sodium_chloride : ~rd_chem_vial_mix(rd_copper_ore_powder, rd_sodium_chloride);
+    case rd_dihydrogen_monoxide : ~rd_chem_vial_mix(rd_copper_ore_powder, rd_dihydrogen_monoxide);
+    case rd_tin_ore_powder : ~rd_chem_vial_mix(rd_copper_ore_powder, rd_tin_ore_powder);
+    case rd_keymould : @rd_chem_copore_on_mould;
+    case rd_full_keymould_tin : @rd_chem_copore_on_tin_mould;
+    case default : ~displaymessage(^dm_default);
+}
+
+// ─── tin mould chain ─────────────────────────────────────────────────────────
+
+[label,rd_chem_water_on_tin]
+// Refuse double pour on partial tin — do not consume another vial.
+if (%rd_water_in_tin = 1) {
+    mes("The tin already has liquid in it."); // CANDIDATE
+    return;
+}
+inv_del(inv, rd_dihydrogen_monoxide, 1);
+if (%rd_gypsum_in_tin = 1) {
+    // Both present → tinfull.
+    inv_del(inv, rd_tin, 1);
+    inv_add(inv, rd_tinfull, 1);
+    %rd_water_in_tin = 0;
+    %rd_gypsum_in_tin = 0;
+    mes("You pour the liquid into the tin. The mixture turns into a white lumpy paste."); // CANDIDATE
+    return;
+}
+%rd_water_in_tin = 1;
+mes("You pour the liquid into the tin."); // CANDIDATE
+return;
+
+[label,rd_chem_gypsum_on_tin]
+// Refuse double pour on partial tin — do not consume another vial.
+if (%rd_gypsum_in_tin = 1) {
+    mes("The tin already has gypsum in it."); // CANDIDATE
+    return;
+}
+inv_del(inv, rd_gypsum, 1);
+if (%rd_water_in_tin = 1) {
+    inv_del(inv, rd_tin, 1);
+    inv_add(inv, rd_tinfull, 1);
+    %rd_water_in_tin = 0;
+    %rd_gypsum_in_tin = 0;
+    mes("You add the gypsum. The mixture turns into a white lumpy paste."); // CANDIDATE
+    return;
+}
+%rd_gypsum_in_tin = 1;
+mes("You add the gypsum to the tin."); // CANDIDATE
+return;
+
+[proc,rd_chem_spoil_tin](namedobj $reagent)
+inv_del(inv, $reagent, 1);
+inv_del(inv, rd_tin, 1);
+inv_add(inv, rd_tin_of_crap, 1);
+%rd_water_in_tin = 0;
+%rd_gypsum_in_tin = 0;
+mes("You ruin the contents of the tin."); // CANDIDATE waste
+
+[opheldu,rd_tin]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_dihydrogen_monoxide : @rd_chem_water_on_tin;
+    case rd_gypsum : @rd_chem_gypsum_on_tin;
+    case rd_cupric_sulphate : ~rd_chem_spoil_tin(rd_cupric_sulphate);
+    case rd_acetic_acid : ~rd_chem_spoil_tin(rd_acetic_acid);
+    case rd_sodium_chloride : ~rd_chem_spoil_tin(rd_sodium_chloride);
+    case rd_tin_ore_powder : ~rd_chem_spoil_tin(rd_tin_ore_powder);
+    case rd_copper_ore_powder : ~rd_chem_spoil_tin(rd_copper_ore_powder);
+    case default : ~displaymessage(^dm_default);
+}
+
+// Imprint: tinfull on chained key.
+[oplocu,rd_key_chained]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+if (last_useitem = rd_tinfull) {
+    anim(human_pickupfloor, 0);
+    p_delay(0);
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    inv_del(inv, rd_tinfull, 1);
+    inv_add(inv, rd_keymould, 1);
+    mes("You press the tin against the key. An impression forms in the mixture."); // CANDIDATE
+    return;
+}
+mes("Nothing interesting happens.");
+return;
+
+[opheldu,rd_tinfull]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case default : ~displaymessage(^dm_default);
+}
+
+[label,rd_chem_tinore_on_mould]
+inv_del(inv, rd_tin_ore_powder, 1);
+inv_del(inv, rd_keymould, 1);
+inv_add(inv, rd_full_keymould_tin, 1);
+mes("You fill the key impression with tin ore powder.");
+return;
+
+[label,rd_chem_copore_on_mould]
+inv_del(inv, rd_copper_ore_powder, 1);
+inv_del(inv, rd_keymould, 1);
+inv_add(inv, rd_full_keymould_copper, 1);
+mes("You fill the key impression with cupric ore powder.");
+return;
+
+[label,rd_chem_tinore_on_copper_mould]
+inv_del(inv, rd_tin_ore_powder, 1);
+inv_del(inv, rd_full_keymould_copper, 1);
+inv_add(inv, rd_full_keymould_unheated, 1);
+mes("You add tin ore powder. The mould now holds both ores.");
+return;
+
+[label,rd_chem_copore_on_tin_mould]
+inv_del(inv, rd_copper_ore_powder, 1);
+inv_del(inv, rd_full_keymould_tin, 1);
+inv_add(inv, rd_full_keymould_unheated, 1);
+mes("You add cupric ore powder. The mould now holds both ores.");
+return;
+
+[opheldu,rd_keymould]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_tin_ore_powder : @rd_chem_tinore_on_mould;
+    case rd_copper_ore_powder : @rd_chem_copore_on_mould;
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_full_keymould_tin]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_copper_ore_powder : @rd_chem_copore_on_tin_mould;
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_full_keymould_copper]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_tin_ore_powder : @rd_chem_tinore_on_copper_mould;
+    case default : ~displaymessage(^dm_default);
+}
+
+// Pry complete mould → bronze key.
+[proc,rd_chem_pry_key](namedobj $tool)
+if (inv_total(inv, rd_full_keymould_complete) < 1) {
+    return;
+}
+inv_del(inv, rd_full_keymould_complete, 1);
+// Tool not consumed (CANDIDATE).
+inv_add(inv, rd_puzzleroom_key, 1);
+inv_add(inv, rd_tin_of_crap_empty, 1);
+mes("You carefully pry the bronze key out of the tin."); // CANDIDATE
+return;
+
+[opheldu,rd_full_keymould_complete]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_knife : ~rd_chem_pry_key(rd_knife);
+    case rd_chisel : ~rd_chem_pry_key(rd_chisel);
+    case rd_wire : ~rd_chem_pry_key(rd_wire);
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_knife]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_full_keymould_complete : ~rd_chem_pry_key(rd_knife);
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_chisel]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_full_keymould_complete : ~rd_chem_pry_key(rd_chisel);
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_wire]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case rd_full_keymould_complete : ~rd_chem_pry_key(rd_wire);
+    case default : ~displaymessage(^dm_default);
+}
+
+// ─── Bunsen burner ───────────────────────────────────────────────────────────
+
+[oplocu,rd_wooden_table_bunsen_burner]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+def_obj $item = last_useitem;
+if ($item = rd_metal_spade) {
+    anim(human_cooking, 0); // CANDIDATE anim
+    p_delay(1);
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    inv_del(inv, rd_metal_spade, 1);
+    inv_add(inv, rd_metal_spade_no_handle, 1);
+    mes("You burn the wooden handle off the spade."); // CANDIDATE guide
+    return;
+}
+if ($item = rd_full_keymould_unheated) {
+    anim(human_cooking, 0);
+    p_delay(2);
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    inv_del(inv, rd_full_keymould_unheated, 1);
+    inv_add(inv, rd_full_keymould_complete, 1);
+    mes("You heat the tin. The ores melt into a bronze key set in plaster."); // CANDIDATE
+    return;
+}
+// Wrong heat attempts on partial tins / ores → crap (finite waste).
+if ($item = rd_full_keymould_tin | $item = rd_full_keymould_copper | $item = rd_keymould | $item = rd_tinfull | $item = rd_tin) {
+    anim(human_cooking, 0);
+    p_delay(1);
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    inv_del(inv, $item, 1);
+    inv_add(inv, rd_tin_of_crap, 1);
+    %rd_water_in_tin = 0;
+    %rd_gypsum_in_tin = 0;
+    mes("You heat the tin, but the contents are ruined.");
+    return;
+}
+mes("Nothing interesting happens.");
+return;
+
+// ─── stone door ──────────────────────────────────────────────────────────────
+
+[oploc1,rd_stone_door_basic]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+mes("There's a small hole in the centre of the door."); // from loc desc
+return;
+
+[oploc1,rd_stone_door]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+// Multi parent may receive Study when basic — resolve via var.
+if (%rd_room6_stone_door = ^rd_stone_opened) {
+    @rd_chem_walk_stone;
+    return;
+}
+if (%rd_room6_stone_door = ^rd_stone_reacted) {
+    @rd_chem_pull_spade;
+    return;
+}
+if (%rd_room6_stone_door = ^rd_stone_spade) {
+    @rd_chem_pull_spade;
+    return;
+}
+mes("There's a small hole in the centre of the door.");
+return;
+
+[oploc1,rd_stone_door_spade]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+@rd_chem_pull_spade;
+
+[oploc1,rd_stone_door_opened]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+@rd_chem_walk_stone;
+
+[label,rd_chem_pull_spade]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+if (%rd_room6_stone_door = ^rd_stone_reacted) {
+    anim(human_pickupfloor, 0);
+    p_delay(0);
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    %rd_room6_stone_door = ^rd_stone_opened;
+    %rd_react_on_spade = 0;
+    mes("You pull the spade. The expanded metal jams and forces the door open."); // CANDIDATE
+    return;
+}
+if (%rd_room6_stone_door = ^rd_stone_spade) {
+    // Not yet reacted — pull the spade back out.
+    if (~rd_chem_try_give(rd_metal_spade_no_handle) = false) {
+        return;
+    }
+    %rd_room6_stone_door = ^rd_stone_basic;
+    %rd_react_on_spade = 0;
+    mes("You pull the spade back out of the hole.");
+    return;
+}
+return;
+
+[label,rd_chem_walk_stone]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room6_stone_door ! ^rd_stone_opened) {
+    return;
+}
+// Walk through opened stone door (east toward exit half).
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+if ($entering = true) {
+    p_telejump(movecoord(loc_coord, 1, 0, 0));
+} else {
+    p_telejump(movecoord(loc_coord, -1, 0, 0));
+}
+return;
+
+[oplocu,rd_stone_door_basic]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+@rd_chem_use_on_stone;
+
+[oplocu,rd_stone_door_spade]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+@rd_chem_use_on_stone;
+
+[oplocu,rd_stone_door]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+@rd_chem_use_on_stone;
+
+[label,rd_chem_use_on_stone]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+def_obj $item = last_useitem;
+// Insert handle-less spade.
+if ($item = rd_metal_spade_no_handle) {
+    if (%rd_room6_stone_door ! ^rd_stone_basic) {
+        mes("The spade is already in the door.");
+        return;
+    }
+    anim(human_pickupfloor, 0);
+    p_delay(0);
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    inv_del(inv, rd_metal_spade_no_handle, 1);
+    %rd_room6_stone_door = ^rd_stone_spade;
+    mes("You jam the metal spade into the hole in the door."); // CANDIDATE
+    return;
+}
+// Cupric sulphate onto spade-in-door.
+if ($item = rd_cupric_sulphate) {
+    if (%rd_room6_stone_door ! ^rd_stone_spade & %rd_room6_stone_door ! ^rd_stone_reacted) {
+        mes("You need to put something in the hole first.");
+        return;
+    }
+    if (%rd_react_on_spade = 1) {
+        mes("You've already applied the cupric sulfate.");
+        return;
+    }
+    anim(human_herbing_vial, 0);
+    // Named pour seq exists; use if engine accepts.
+    // anim(rd_pour_vial, 0); — may not be player anim; keep herbing.
+    p_delay(0);
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    inv_del(inv, rd_cupric_sulphate, 1);
+    %rd_react_on_spade = 1;
+    mes("You pour the cupric sulfate onto the spade."); // CANDIDATE
+    return;
+}
+// Liquid activates expansion when sulphate present.
+if ($item = rd_dihydrogen_monoxide) {
+    if (%rd_room6_stone_door ! ^rd_stone_spade) {
+        mes("Nothing interesting happens.");
+        return;
+    }
+    if (%rd_react_on_spade = 0) {
+        mes("Nothing happens. Maybe another chemical is needed first."); // CANDIDATE
+        return;
+    }
+    anim(human_herbing_vial, 0);
+    p_delay(1);
+    if (~rd_chem_same_instance($uid) = false) {
+        return;
+    }
+    inv_del(inv, rd_dihydrogen_monoxide, 1);
+    %rd_room6_stone_door = ^rd_stone_reacted;
+    mes("The metal spade expands and jams tightly in the hole!"); // CANDIDATE guide
+    return;
+}
+mes("Nothing interesting happens.");
+return;
+
+// Also allow vial use via opheldu on spade item before insert? Guide pours on door.
+
+[opheldu,rd_metal_spade]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case default : ~displaymessage(^dm_default);
+}
+
+[opheldu,rd_metal_spade_no_handle]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+switch_obj (last_useitem) {
+    case default : ~displaymessage(^dm_default);
+}
+
+// ─── exit door (key) ─────────────────────────────────────────────────────────
+
+[proc,rd_chem_unlock_exit]
+if (%rd_room6_complete = 1) {
+    return;
+}
+if (inv_total(inv, rd_puzzleroom_key) < 1) {
+    mes("The door is locked.");
+    return;
+}
+// Consume key on unlock (CANDIDATE — key is room-temp).
+inv_del(inv, rd_puzzleroom_key, 1);
+if (~rd_room_mark_complete(6) = false) {
+    return;
+}
+mes("You unlock the door with the bronze key."); // CANDIDATE
+return;
+
+[oploc1,rd_room6_exitdoor]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room6_complete = 0) {
+    if (inv_total(inv, rd_puzzleroom_key) > 0) {
+        ~rd_chem_unlock_exit;
+    } else {
+        mes("The door is locked.");
+        return;
+    }
+}
+if (%rd_room6_complete = 0) {
+    return;
+}
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+return;
+
+[oplocu,rd_room6_exitdoor]
+if (~rd_room_is_current(6) = false) {
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (last_useitem = rd_puzzleroom_key) {
+    ~rd_chem_unlock_exit;
+    if (%rd_room6_complete = 1) {
+        def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+        ~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+    }
+    return;
+}
+mes("Nothing interesting happens.");
+return;

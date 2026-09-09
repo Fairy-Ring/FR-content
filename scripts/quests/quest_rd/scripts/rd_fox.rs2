@@ -62,6 +62,10 @@ return(false);
 if (region_findbycoord(coord()) = false) {
     return;
 }
+// Physical-current-room guard: fox ops only when route current is room 1.
+if (~rd_route_active = true & ~rd_route_current ! 1) {
+    return;
+}
 if (loc_type = rd_sack_empty) {
     mes("The sack is empty.");
     return;
@@ -157,6 +161,9 @@ return(false);
 if (region_findbycoord(coord()) = false) {
     return;
 }
+if (~rd_route_active = true & ~rd_route_current ! 1) {
+    return;
+}
 def_boolean $east = ~rd_player_east;
 if ($obj = rd_fox) {
     if ($east = true) {
@@ -203,6 +210,10 @@ if (inv_total(inv, $obj) > 0) {
 if (inv_total(worn, $obj) > 0) {
     inv_del(worn, $obj, inv_total(worn, $obj));
 }
+// Write physical room1 complete through shared mark when fox test is done.
+if (~rd_fox_complete = true) {
+    ~rd_room_mark_complete(1);
+}
 
 [proc,rd_side_eats]()(boolean)
 if (~rd_player_east = true) {
@@ -232,12 +243,15 @@ if (~rd_player_east = true) {
 }
 return(false);
 
+// Run-level fail: clear all trials (guide/transcript), not fox-only.
 [proc,rd_fox_fail]
-p_telejump(0_46_52_52_45); // Falador park W of Tiffy 2996,3373 — leave instance before inv_del so unequip does not put-down
-~rd_reset_fox;
+~rd_run_fail;
 
 [oploc1,rd_bridge_left]
 if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (~rd_route_active = true & ~rd_route_current ! 1) {
     return;
 }
 if (~rd_side_eats = true) {
@@ -254,6 +268,9 @@ return;
 
 [oploc1,rd_bridge_right]
 if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (~rd_route_active = true & ~rd_route_current ! 1) {
     return;
 }
 if (~rd_side_eats = true) {

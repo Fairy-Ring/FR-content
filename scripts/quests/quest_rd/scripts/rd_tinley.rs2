@@ -1,0 +1,150 @@
+// Recruitment Drive — Sir Tinley patience trial (physical room 4).
+//
+// Source contract: retained Transcript:Recruitment_Drive (rev 2025-07-16)
+// says Talk-to reveals the clue "Patience"; the later guide says that after
+// the final continue the player must stand still for eight seconds and any
+// interaction fails the task. The guide/transcript are later CANDIDATE
+// evidence after Changes subtraction, not r377 period verification.
+//
+// The timer begins only after the final clue dialogue returns. A weakqueue
+// sentinel is armed for longer than the trial; clearPendingAction/closeModal
+// clears it when an operation interrupts the wait. The timer rejects both an
+// already-cleared sentinel and a still-pending operation. Shared routing owns entry/reset, current-room validation, completion marking,
+// and exit portals. Timer/weakqueue behavior derives from reviewed unit29617a7a9.
+//
+// Private per-player state required by this isolated unit:
+//   %rd_tinley_state: 0 idle, 1 waiting, 2 passed
+//   %rd_tinley_uid: instance region uid captured before the wait
+// These names intentionally are not encoded into another room's shared bits.
+
+[proc,rd_tinley_reset]
+cleartimer(rd_tinley_wait);
+clearqueue(rd_tinley_sentinel);
+%rd_tinley_state = 0;
+%rd_tinley_uid = 0;
+%rd_room4_complete = 0;
+return;
+
+[proc,rd_tinley_same_instance](int $expected_uid)(boolean)
+if (region_findbycoord(coord()) = false) {
+    return(false);
+}
+if (region_uid() ! $expected_uid) {
+    return(false);
+}
+return(true);
+
+[proc,rd_tinley_fail]
+def_int $uid = %rd_tinley_uid;
+cleartimer(rd_tinley_wait);
+clearqueue(rd_tinley_sentinel);
+%rd_tinley_state = 0;
+%rd_room4_complete = 0;
+~chatnpc_specific("Sir Tinley", rd_observer_room_4, "<p,sad>No... I am very sorry. Apparently you are not up to the challenge. I will return you where you came from, better luck in the future.");
+if (~rd_tinley_same_instance($uid) = false) {
+    return;
+}
+%rd_tinley_uid = 0;
+~rd_run_fail;
+return;
+
+[proc,rd_tinley_pass]
+cleartimer(rd_tinley_wait);
+clearqueue(rd_tinley_sentinel);
+if (~rd_room_mark_complete(4) = false) {
+    %rd_tinley_state = 0;
+    %rd_tinley_uid = 0;
+    return;
+}
+%rd_tinley_state = 2;
+%rd_tinley_uid = 0;
+~chatnpc_specific("Sir Tinley", rd_observer_room_4, "<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+return;
+
+// Called by later route/instance wiring on entry to the physical room 4.
+// No permanent completion is inferred here; completion remains the physical
+// rd_room4_complete bit and is written only by rd_tinley_pass.
+[proc,rd_tinley_enter]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room4_complete = 1) {
+    return;
+}
+cleartimer(rd_tinley_wait);
+clearqueue(rd_tinley_sentinel);
+%rd_tinley_state = 0;
+%rd_tinley_uid = 0;
+~chatnpc_specific("Sir Tinley", rd_observer_room_4, "<p,neutral>Ah, <displayname>, you have arrived. Speak to me to begin your task.");
+return;
+
+// Eight seconds is approximately 14 world ticks at the r377 600ms tick.
+// This is a candidate timing conversion from the retained later guide.
+[timer,rd_tinley_wait]
+if (%rd_tinley_state ! 1) {
+    return;
+}
+if (~rd_tinley_same_instance(%rd_tinley_uid) = false) {
+    return;
+}
+if (getqueue(rd_tinley_sentinel) = 0) {
+    ~rd_tinley_fail;
+    return;
+}
+// Do not turn the challenge into a forced delay: movement or another active
+// player interaction during the interval is a failure, not a success.
+if (busy2 = true) {
+    ~rd_tinley_fail;
+    return;
+}
+clearqueue(rd_tinley_sentinel);
+~rd_tinley_pass;
+return;
+
+// Kept alive beyond the 14-tick trial. Player operation cancellation clears
+// this marker before the timer observes it; the body is never reached on pass.
+[queue,rd_tinley_sentinel](int $unused)
+return;
+
+// Sir Tinley's clue. The timer is armed after this final continue returns.
+[opnpc1,rd_observer_room_4]
+if (~rd_room_is_current(4) = false) { return; }
+if (%rd_room4_complete = 1 | %rd_tinley_state = 2) {
+    ~chatnpc("<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+    return;
+}
+if (%rd_tinley_state = 1) {
+    ~rd_tinley_fail;
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+%rd_tinley_uid = region_uid();
+def_int $uid = %rd_tinley_uid;
+~chatnpc_specific("Sir Tinley", rd_observer_room_4, "<p,neutral>Ah, welcome <displayname>. I have but one clue for you to pass this room's puzzle: 'Patience'.");
+if (~rd_tinley_same_instance($uid) = false) {
+    return;
+}
+%rd_tinley_state = 1;
+weakqueue(rd_tinley_sentinel, 20, 0);
+settimer(rd_tinley_wait, 14);
+return;
+
+// The physical exit door and exit portal are both gated by the room bit.
+[oploc1,rd_room4_exitdoor]
+if (~rd_room_is_current(4) = false) { return; }
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room4_complete = 0) {
+    if (%rd_tinley_state = 1) {
+        ~rd_tinley_fail;
+    } else {
+        mes("The door is locked.");
+    }
+    return;
+}
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+return;

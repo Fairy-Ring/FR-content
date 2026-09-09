@@ -1,0 +1,344 @@
+// Recruitment Drive — Lady Table statue test (observer room 2).
+// Mechanic is packed: each rd_statue_multi_* omits one rd_room_order key
+// (11 statues). Order 0 is the full 12. Chat + 10s + fail dest = CANDIDATE
+// 2007-base Transcript:Recruitment Drive (Lady Table). Do not open leftover
+// 14191 / 4543. Do not invent a colour-count script — pack holes are the key.
+//
+// Map loc is the multi (7290–7301). Authentic OPLOC sends that parent id.
+// Engine resolveLocTypeForTrigger selects the child for [oploc1,rd_*] dispatch;
+// loc_type remains the multi. Match answer on multi only (parent contract).
+//
+// Lifecycle: queue arg binds scheduling region_uid; recheck after chat/fade
+// yields before mutation. New-instance enter cancels mid-trial session.
+// Portal exit requires complete like the door (physically-reached gate).
+
+// Pack hole: which multi lacks multiloc=<order>. Order 0 child of that multi
+// is the type that was "added" (rd.loc multiloc tables).
+[proc,rd_statue_missing_multi]()(loc)
+if (%rd_templock_1 = 1) {
+    return(rd_statue_multi_6);
+} else if (%rd_templock_1 = 2) {
+    return(rd_statue_multi_5);
+} else if (%rd_templock_1 = 3) {
+    return(rd_statue_multi_4);
+} else if (%rd_templock_1 = 4) {
+    return(rd_statue_multi_3);
+} else if (%rd_templock_1 = 5) {
+    return(rd_statue_multi_2);
+} else if (%rd_templock_1 = 6) {
+    return(rd_statue_multi_1);
+} else if (%rd_templock_1 = 7) {
+    return(rd_statue_multi_10);
+} else if (%rd_templock_1 = 8) {
+    return(rd_statue_multi_11);
+} else if (%rd_templock_1 = 9) {
+    return(rd_statue_multi_12);
+} else if (%rd_templock_1 = 10) {
+    return(rd_statue_multi_9);
+} else if (%rd_templock_1 = 11) {
+    return(rd_statue_multi_8);
+} else if (%rd_templock_1 = 12) {
+    return(rd_statue_multi_7);
+}
+return(null);
+
+// Cancel mid-trial / leftover queue. Called from product new-instance enter
+// (~rd_instance_enter), not harness setvar. Within one instance, room→room
+// walks do not call this — prior rooms in the same run stay intact.
+[proc,rd_reset_statue]
+clearqueue(rd_statue_shuffle);
+%rd_room_order = 0;
+%rd_templock_1 = 0;
+%rd_room2_complete = 0;
+
+// ActiveRegion pointer required for region_uid (engine REGION_UID).
+// $expected_uid is the instance that scheduled the shuffle queue.
+[proc,rd_statue_same_instance](int $expected_uid)(boolean)
+if (region_findbycoord(coord()) = false) {
+    return(false);
+}
+if (region_uid() ! $expected_uid) {
+    return(false);
+}
+return(true);
+
+[proc,rd_statue_fail]
+clearqueue(rd_statue_shuffle);
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,sad>No... I am very sorry. Apparently you are not up to the challenge. I will return you where you came from, better luck in the future.");
+// Run-level fail: clear all trials, not statue-only.
+~rd_run_fail;
+return;
+
+[proc,rd_statue_begin]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+// Capture instance uid BEFORE any yielding chat. Revalidate the same uid after
+// each yield — do not call region_uid() fresh after chat (could bless a foreign
+// instance the player entered while paused).
+def_int $uid = region_uid();
+// Physical-current-room guard when route is active.
+if (~rd_route_active = true & ~rd_route_current ! 2) {
+    return;
+}
+if (%rd_room2_complete = 1) {
+    return;
+}
+if (%rd_templock_1 >= 1 & %rd_templock_1 <= 12) {
+    return;
+}
+// random(12) is 0..11 → order 1..12. Each omits one multi (rd.loc).
+def_int $order = add(random(12), 1);
+if ($order < 1 | $order > 12) {
+    $order = 1;
+}
+%rd_room_order = $order;
+%rd_templock_1 = $order; // answer survives order→0 shuffle
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>Welcome, <displayname>. This room will test your observation skills.");
+// UID mismatch: return only — do not ~rd_reset_statue. Trial vars are player-global;
+// a stale begin resume after new-instance enter must not wipe the replacement session.
+// Product ~rd_instance_enter owns cancel/reset.
+if (~rd_statue_same_instance($uid) = false) {
+    return;
+}
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,neutral>Study the statues closely. There is one missing statue in this room.");
+if (~rd_statue_same_instance($uid) = false) {
+    return;
+}
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>We will also mix the order up a little to make things interesting for you!");
+if (~rd_statue_same_instance($uid) = false) {
+    return;
+}
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,shock>You have 10 seconds to memorise the statues... starting NOW!");
+// Timer starts only after the final NOW line is continued — full observation
+// interval. Do not pre-arm queue before intro (that would shorten study time).
+if (~rd_statue_same_instance($uid) = false) {
+    return;
+}
+clearqueue(rd_statue_shuffle);
+// Bind queue arg to the uid captured at begin (not a post-chat fresh uid).
+queue(rd_statue_shuffle, 17, $uid); // CANDIDATE 10s ≈ 17 ticks @ 600ms
+return;
+
+// $arg = region_uid captured at schedule time (see begin).
+[queue,rd_statue_shuffle](int $arg)
+if (~rd_statue_same_instance($arg) = false) {
+    return;
+}
+if (%rd_room2_complete = 1) {
+    return;
+}
+if (%rd_templock_1 < 1 | %rd_templock_1 > 12) {
+    return;
+}
+// Transcript order: announce, THEN dim, swap while black, fade in, THEN touch prompt.
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,neutral>We will now dim the lights and bring the missing statue back in.");
+// After chat yield: PAUSEBUTTON can be aborted by closeModal; if resumed, still
+// guard before fade. p_delay uses SUSPENDED (not cleared by closeModal) — must
+// recheck after each yield before any later mutation.
+if (~rd_statue_same_instance($arg) = false) {
+    return;
+}
+if (%rd_room2_complete = 1) {
+    return;
+}
+if (%rd_templock_1 < 1 | %rd_templock_1 > 12) {
+    return;
+}
+~rd_fade_out;
+if (~rd_statue_same_instance($arg) = false) {
+    return;
+}
+if (%rd_room2_complete = 1) {
+    return;
+}
+if (%rd_templock_1 < 1 | %rd_templock_1 > 12) {
+    return;
+}
+%rd_room_order = 0; // full 12; answer remains %rd_templock_1
+~rd_fade_in;
+if (~rd_statue_same_instance($arg) = false) {
+    return;
+}
+if (%rd_room2_complete = 1) {
+    return;
+}
+if (%rd_templock_1 < 1 | %rd_templock_1 > 12) {
+    return;
+}
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,quiz>Please touch the statue you think has been added.");
+return;
+
+[proc,rd_statue_touch]
+def_loc $clicked = loc_type;
+if (~rd_route_active = true & ~rd_route_current ! 2) {
+    return;
+}
+if (%rd_room2_complete = 1) {
+    return;
+}
+// Pre-shuffle / not in trial: ignore (do not fail). Touch only after order 0.
+if (%rd_room_order ! 0 | %rd_templock_1 < 1 | %rd_templock_1 > 12) {
+    return;
+}
+def_loc $want_multi = ~rd_statue_missing_multi;
+// Parent multi id only (authentic OPLOC / loc_type contract).
+if ($clicked = $want_multi) {
+    ~rd_statue_pass;
+    return;
+}
+~rd_statue_fail;
+return;
+
+[proc,rd_statue_pass]
+clearqueue(rd_statue_shuffle);
+// Physical complete via shared mark (route-current + same-instance guards).
+~rd_room_mark_complete(2);
+%rd_templock_1 = 0;
+~chatnpc_specific("Lady Table", rd_observer_room_2, "<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+return;
+
+// Child triggers: resolveLocTypeForTrigger dispatches here; loc_type stays multi.
+[oploc1,rd_1g]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_1s]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_1b]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_2g]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_2s]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_2b]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_3g]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_3s]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_3b]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_4g]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_4s]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_4b]
+~rd_statue_touch;
+return;
+
+// Parent multi triggers (hole state / no child resolve).
+[oploc1,rd_statue_multi_1]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_2]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_3]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_4]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_5]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_6]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_7]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_8]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_9]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_10]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_11]
+~rd_statue_touch;
+return;
+
+[oploc1,rd_statue_multi_12]
+~rd_statue_touch;
+return;
+
+[opnpc1,rd_observer_room_2]
+if (%rd_room2_complete = 1) {
+    ~chatnpc("<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+    return;
+}
+if (%rd_room_order = 0 & %rd_templock_1 >= 1 & %rd_templock_1 <= 12) {
+    ~chatplayer("<p,quiz>What am I supposed to be doing again?");
+    ~chatnpc("<p,neutral>Touch the statue that was brought in after you entered.");
+    ~chatnpc("<p,neutral>If you touch the wrong one, you will fail this task, and will be escorted back to Falador.");
+    return;
+}
+if (%rd_templock_1 >= 1 & %rd_templock_1 <= 12) {
+    // Capture uid BEFORE yielding chat; revalidate after — post-chat region_uid()
+    // could bless a foreign instance while leftover templock remains.
+    def_int $uid = 0;
+    if (region_findbycoord(coord()) = true) {
+        $uid = region_uid();
+    }
+    ~chatnpc("<p,neutral>Study the statues closely. There is one missing statue in this room.");
+    // Bounded recovery: intro chat is PAUSEBUTTON — closeModal aborts the script
+    // after order/templock were set but before queue schedule. Do not pre-arm the
+    // 17-tick timer before NOW (that shortens observation). If still pre-shuffle
+    // with no pending queue, arm only when pre-bound uid still matches.
+    if (%rd_room_order ! 0 & getqueue(rd_statue_shuffle) = 0) {
+        if (~rd_statue_same_instance($uid) = true) {
+            queue(rd_statue_shuffle, 17, $uid);
+        }
+    }
+    return;
+}
+~rd_statue_begin;
+return;
+
+[oploc1,rd_room2_exitdoor]
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room2_complete = 0) {
+    mes("The door is locked."); // CANDIDATE 2007-base: door unlocks after the test
+    return;
+}
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+return;
+
+// Exit portal handler lives in rd_puzzle_if.rs2 → ~rd_try_exit_portal(2).

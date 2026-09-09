@@ -9,7 +9,7 @@ if (randominc($attack_roll) > randominc($defence_roll)) {
     if (npc_type = count_draynor & inv_total(inv, garlic) > 0) {
         $maxhit = add($maxhit, 1);
     }
-    $damage = randominc(min($maxhit, npc_param(max_dealt)));
+    $damage = randominc(~npc_max_dealt($maxhit, 0));
     if(npc_param(slayer_category) = ^slayer_kurask | npc_param(slayer_category) = ^slayer_turoth) {
         $damage = 0;
     }

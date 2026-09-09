@@ -1,0 +1,193 @@
+// Recruitment Drive — Ms Hynn Terprett riddle test (physical room 7).
+//
+// Source boundary: retained later Recruitment Drive guide/transcript (the
+// local spine-old17 extract named by the M1 requirements) supplies these five
+// riddle families and answer keys: product-of-zero/fingers = 0, daughter =
+// 10, three statements = choice 3, wolves = choice 3, bucket = choice 1.
+// The extract is later than r377 and is used only as CANDIDATE reconstruction
+// after Changes subtraction; this file does not claim period dialogue proof.
+//
+// Shared routing calls enter/reset, guards the current room, marks completion
+// after the correct answer, and owns both portal handlers.
+//
+// State: %rd_hynn_state = 0 idle, 1 awaiting answer, 2 passed.
+// %rd_hynn_riddle remains stable for this run until reset (1..5).
+
+[proc,rd_hynn_reset]
+%rd_hynn_state = 0;
+%rd_hynn_riddle = 0;
+%rd_hynn_uid = 0;
+%rd_room7_complete = 0;
+return;
+
+[proc,rd_hynn_same_instance](int $expected_uid)(boolean)
+if (region_findbycoord(coord()) = false) {
+    return(false);
+}
+if (region_uid() ! $expected_uid) {
+    return(false);
+}
+return(true);
+
+[proc,rd_hynn_fail]
+def_int $uid = %rd_hynn_uid;
+%rd_hynn_state = 0;
+%rd_hynn_riddle = 0;
+%rd_hynn_uid = 0;
+%rd_room7_complete = 0;
+// Failure ends the assessment through the shared reset and park path.
+~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,sad>No... I am very sorry. Apparently you are not up to the challenge. I will return you where you came from, better luck in the future.");
+if ($uid ! 0) {
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+}
+~rd_run_fail;
+return;
+
+[proc,rd_hynn_pass]
+if (~rd_room_mark_complete(7) = false) { return; }
+%rd_hynn_state = 2;
+%rd_hynn_uid = 0;
+~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+return;
+
+[proc,rd_hynn_prompt]
+if (%rd_hynn_state ! 1) {
+    return;
+}
+def_int $uid = %rd_hynn_uid;
+if (~rd_hynn_same_instance($uid) = false) {
+    return;
+}
+if (%rd_hynn_riddle = 1) {
+    ~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,neutral>Here is my riddle: I estimate there to be 1 million inhabitants in the world of Gielinor, creatures and people both.|What would be the number you would get if you multiply the number of fingers on everythings left hand, to the nearest million?");
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+    p_countdialog;
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+    if (last_int = 0) {
+        ~rd_hynn_pass;
+    } else {
+        ~rd_hynn_fail;
+    }
+    return;
+}
+if (%rd_hynn_riddle = 2) {
+    ~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,neutral>Here is my riddle: I have both a husband and daughter.|My husband is four times older than my daughter. In twenty years time, he will be twice as old as my daughter.|How old is my daughter now?");
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+    p_countdialog;
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+    if (last_int = 10) {
+        ~rd_hynn_pass;
+    } else {
+        ~rd_hynn_fail;
+    }
+    return;
+}
+if (%rd_hynn_riddle = 3) {
+    ~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,neutral>Here is my riddle: Which of the following statements is true?");
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+    def_int $choice = ~p_choice4_header("The number of false statements here is one", 1, "The number of false statements here is two", 2, "The number of false statements here is three.", 3, "The number of false statements here is four.", 4, "Which of the following is true?");
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+    if ($choice = 3) {
+        ~rd_hynn_pass;
+    } else {
+        ~rd_hynn_fail;
+    }
+    return;
+}
+if (%rd_hynn_riddle = 4) {
+    ~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,neutral>Here is my riddle: Imagine that you have been captured by an enemy. You are to be killed, but in a moment of mercy, the enemy has allowed you to pick your own demise.|Your first choice is to be drowned in a lake of acid.|Your second choice is to be burned on a fire.|Your third choice is to be thrown to a pack of wolves that have not been fed in over a month.|Your final choice of fate is to be thrown from the walls of a castle, many hundreds of feet high.|Which fate would you be wise to choose?");
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+    def_int $choice = ~p_choice4_header("The lake of acid.", 1, "The large fire.", 2, "The wolves.", 3, "The castle walls.", 4, "Select your fate");
+    if (~rd_hynn_same_instance($uid) = false) {
+        return;
+    }
+    if ($choice = 3) {
+        ~rd_hynn_pass;
+    } else {
+        ~rd_hynn_fail;
+    }
+    return;
+}
+~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,neutral>Here is my riddle: I dropped four identical stones, into four identical buckets, each containing an identical amount of water.|The first bucket's water was at 32 degrees Fahrenheit, the second was at 33 degrees, the third at 34 and the fourth was at 35 degrees.|Which bucket's stone dropped to the bottom of the bucket last?");
+if (~rd_hynn_same_instance($uid) = false) {
+    return;
+}
+def_int $choice = ~p_choice4_header("Bucket A (32 degrees)", 1, "Bucket B (33 degrees)", 2, "Bucket C (34 degrees)", 3, "Bucket D (35 degrees)", 4, "Which bucket's stone dropped last?");
+if (~rd_hynn_same_instance($uid) = false) {
+    return;
+}
+if ($choice = 1) {
+    ~rd_hynn_pass;
+} else {
+    ~rd_hynn_fail;
+}
+return;
+
+// Called by the shared route when physical room 7 is selected. Do not select
+// a new riddle on retalk; the answer remains stable until the run is reset.
+[proc,rd_hynn_enter]
+if (~rd_room_is_current(7) = false) { return; }
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room7_complete = 1) {
+    return;
+}
+if (%rd_hynn_state = 1) {
+    return;
+}
+def_int $uid = region_uid();
+~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,neutral>Greetings, <displayname>. I am here to test your wits with a simple riddle.");
+if (~rd_hynn_same_instance($uid) = false) {
+    return;
+}
+%rd_hynn_uid = $uid;
+%rd_hynn_riddle = add(random(5), 1);
+%rd_hynn_state = 1;
+~rd_hynn_prompt;
+return;
+
+[opnpc1,rd_observer_room_7]
+if (~rd_room_is_current(7) = false) { return; }
+if (%rd_room7_complete = 1 | %rd_hynn_state = 2) {
+    ~chatnpc("<p,happy>Excellent work, <displayname>. Please step through the portal to meet your next challenge.");
+    return;
+}
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_hynn_state = 0) {
+    ~rd_hynn_enter;
+} else {
+    ~rd_hynn_prompt;
+}
+return;
+
+[oploc1,rd_room7_exitdoor]
+if (~rd_room_is_current(7) = false) { return; }
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_room7_complete = 0) {
+    mes("The door is locked.");
+    return;
+}
+def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+return;

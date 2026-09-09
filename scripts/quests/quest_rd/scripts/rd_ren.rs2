@@ -1,0 +1,178 @@
+// Recruitment Drive — room 5 Sir Ren Itchood combination-lock trial.
+//
+// Historical confidence: CANDIDATE (2007-base transcript minus later Changes).
+// The six answers and three staged clue sets are retained from the local
+// Transcript_Recruitment_Drive artifact. The combination UI is the packed 377
+// combolockdoor interface (10051; components 10052-10110), not a chat choice.
+// Room completion is written only after a correct four-letter submission.
+//
+// rd_ren is a temp, non-transmitted integer varp. Bits:
+// 0..2 answer/clue variant (0..5), 3..22 four 5-bit wheel values,
+// 23..24 clue stage (0 before entry, 1..3 after clues), 25 initialized,
+// 26 room complete, 27 combolock session armed. The full instance UID is
+// held in rd_ren_uid.
+
+[proc,rd_ren_same_instance](int $expected_uid)(boolean)
+if (region_findbycoord(coord()) = false) {
+    return(false);
+}
+if (region_uid() ! $expected_uid) {
+    return(false);
+}
+return(true);
+
+[proc,rd_ren_reset]
+if_close;
+%rd_ren = 0;
+%rd_ren_uid = 0;
+%rd_room5_complete = 0;
+return;
+
+[proc,rd_ren_enter]
+~rd_ren_begin;
+return;
+
+[proc,rd_ren_owns_combolock]()(boolean)
+if (~rd_room_is_current(5) = false) { return(false); }
+if (region_findbycoord(coord()) = false) {
+    return(false);
+}
+if (getbit_range(%rd_ren, 25, 25) = 0 | getbit_range(%rd_ren, 27, 27) = 0) {
+    return(false);
+}
+if (~rd_ren_same_instance(%rd_ren_uid) = false) {
+    return(false);
+}
+return(true);
+
+[proc,rd_ren_show_clue](int $stage)
+switch_int(getbit_range(%rd_ren, 0, 2)) {
+    case 0 :
+        if ($stage = 1) ~chatnpc("<p,neutral>Better than me, you'll not find In rhyming and in puzzles. This clue so clear will tax your mind Entirely as it confuzzles!");
+        else if ($stage = 2) ~chatnpc("<p,neutral>Before you hurry through that door Inspect the words I spoke. There is a simple hidden flaw Ere you think my rhyme a joke.");
+        else ~chatnpc("<p,neutral>Betrayed by words the answer is In that what I say is the key There is no more help after this Especially no more from me.");
+    case 1 :
+        if ($stage = 1) ~chatnpc("<p,neutral>This riddle of mine may confuse, I am quite sure of that. Mayhap you should closely peruse Every word I have spat?");
+        else if ($stage = 2) ~chatnpc("<p,neutral>Twice it is now, I have stated In a rhyme, what is the pass. Maybe my words obfuscated Entirely beyond your class.");
+        else ~chatnpc("<p,neutral>Three times now, my riddle said; I hope you finally see the clue. Maybe think on what you've read; Easy when you know what to do.");
+    case 2 :
+        if ($stage = 1) ~chatnpc("<p,neutral>Feel the aching of your mind In puzzlement, confused. See the clue hidden behind His words, as you perused.");
+        else if ($stage = 2) ~chatnpc("<p,neutral>First my clue you did not see, I really wish you had. Such puzzling wordplay devilry Has left you kind of mad!");
+        else ~chatnpc("<p,neutral>For the last time I will state In simple words, the clue. Such tricky words make you irate Having no idea what to do...");
+    case 3 :
+        if ($stage = 1) ~chatnpc("<p,neutral>More than words, I have not for you Except the things I say today. Aware are you, this is a clue? Take note of what I say!");
+        else if ($stage = 2) ~chatnpc("<p,neutral>Many types have passed through here Even such as you amongst their sort. And in the end, the puzzle's clear; The hidden word you sought.");
+        else ~chatnpc("<p,neutral>Maybe I will do my best; Especially at giving clues. Attempt to help you pass the test! That should help me pay my dues.");
+    case 4 :
+        if ($stage = 1) ~chatnpc("<p,neutral>Look closely at the words I speak; And study closely every part. See for yourself the word you seek Trapped for you if you're smart.");
+        else if ($stage = 2) ~chatnpc("<p,neutral>Last time my puzzle did not help Apparently, so you've bidden. Study my speech carefully, whelp To find the answer, hidden.");
+        else ~chatnpc("<p,neutral>Lo! my final speech is now Attended to by you. Study my words, and find out how To understand my clue!");
+    case 5 :
+        if ($stage = 1) ~chatnpc("<p,neutral>Rare it is that you will see A puzzle such as this! In many ways it tickles me Now, watching you hit and miss!");
+        else if ($stage = 2) ~chatnpc("<p,neutral>Repetition, once again Against good sense it goes. In my words, the answer's plain Now that you see rhyme flows.");
+        else ~chatnpc("<p,neutral>Repeat myself to give the clue Again, I now do speak. It's hidden in my words - hey you! Now find the answer you seek.");
+}
+return;
+
+[proc,rd_ren_begin]
+if (~rd_room_is_current(5) = false) { return; }
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+if (%rd_ren = 0) {
+    %rd_ren = setbit_range_toint(%rd_ren, random(6), 0, 2);
+    %rd_ren = setbit_range_toint(%rd_ren, 0, 23, 24);
+    %rd_ren = setbit_range_toint(%rd_ren, 1, 25, 25);
+    %rd_ren_uid = $uid;
+}
+if (~rd_ren_same_instance(%rd_ren_uid) = false) {
+    return;
+}
+if (getbit_range(%rd_ren, 26, 26) = 1) {
+    return;
+}
+~chatnpc_specific("Sir Ren Itchood", rd_observer_room_5, "<p,neutral>Greetings friend, and welcome here, you'll find my puzzle not so clear. Hidden amongst my words, it's true, the password for the door as a clue.");
+return;
+
+[opnpc1,rd_observer_room_5]
+if (~rd_room_is_current(5) = false) { return; }
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+if (%rd_ren = 0) {
+    ~rd_ren_begin;
+} else if (getbit_range(%rd_ren, 26, 26) = 1) {
+    ~chatnpc("<p,happy>Your wit is sharp, your brains quite clear; You solved my puzzle with no fear. At puzzles I rank you quite the best, now enter the portal for your next test.");
+} else {
+    def_int $stage = getbit_range(%rd_ren, 23, 24);
+    if ($stage < 3) {
+        $stage = calc($stage + 1);
+        %rd_ren = setbit_range_toint(%rd_ren, $stage, 23, 24);
+        ~rd_ren_show_clue($stage);
+    }
+}
+return;
+
+[oploc1,rd_room5_exitdoor]
+if (~rd_room_is_current(5) = false) { return; }
+if (region_findbycoord(coord()) = false) {
+    return;
+}
+def_int $uid = region_uid();
+if (getbit_range(%rd_ren, 25, 25) = 0 | ~rd_ren_same_instance(%rd_ren_uid) = false) {
+    return;
+}
+if (getbit_range(%rd_ren, 26, 26) = 1) {
+    def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
+    ~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+    return;
+}
+if_openmain(combolockdoor);
+if_settext(combolockdoor:com_43, "A");
+if_settext(combolockdoor:com_44, "A");
+if_settext(combolockdoor:com_45, "A");
+if_settext(combolockdoor:com_46, "A");
+%rd_ren = setbit_range_toint(%rd_ren, 0, 3, 22);
+%rd_ren = setbit_range_toint(%rd_ren, 1, 27, 27);
+return;
+
+[label,rd_ren_combo](int $lock_index, int $change)
+if (~rd_ren_owns_combolock = false) return;
+def_int $stage = getbit_range(%rd_ren, calc(3 + (($lock_index - 1) * 5)), calc(7 + (($lock_index - 1) * 5)));
+def_int $next = ~calc_tribaldoor_value($stage, $change);
+%rd_ren = setbit_range_toint(%rd_ren, $next, calc(3 + (($lock_index - 1) * 5)), calc(7 + (($lock_index - 1) * 5)));
+switch_int($lock_index) {
+    case 1 : if_settext(combolockdoor:com_43, enum(int, string, alphabet, $next));
+    case 2 : if_settext(combolockdoor:com_44, enum(int, string, alphabet, $next));
+    case 3 : if_settext(combolockdoor:com_45, enum(int, string, alphabet, $next));
+    case 4 : if_settext(combolockdoor:com_46, enum(int, string, alphabet, $next));
+}
+return;
+
+[label,rd_ren_submit]
+if (~rd_ren_owns_combolock = false) return;
+if_close;
+%rd_ren = setbit_range_toint(%rd_ren, 0, 27, 27);
+def_int $answer = getbit_range(%rd_ren, 0, 2);
+def_boolean $solved = false;
+// Variant order follows clue acrostics: BITE, TIME, FISH, MEAT, LAST, RAIN.
+switch_int($answer) {
+    case 0 : if (getbit_range(%rd_ren, 3, 7) = 1 & getbit_range(%rd_ren, 8, 12) = 8 & getbit_range(%rd_ren, 13, 17) = 19 & getbit_range(%rd_ren, 18, 22) = 4) $solved = true;
+    case 1 : if (getbit_range(%rd_ren, 3, 7) = 19 & getbit_range(%rd_ren, 8, 12) = 8 & getbit_range(%rd_ren, 13, 17) = 12 & getbit_range(%rd_ren, 18, 22) = 4) $solved = true;
+    case 2 : if (getbit_range(%rd_ren, 3, 7) = 5 & getbit_range(%rd_ren, 8, 12) = 8 & getbit_range(%rd_ren, 13, 17) = 18 & getbit_range(%rd_ren, 18, 22) = 7) $solved = true;
+    case 3 : if (getbit_range(%rd_ren, 3, 7) = 12 & getbit_range(%rd_ren, 8, 12) = 4 & getbit_range(%rd_ren, 13, 17) = 0 & getbit_range(%rd_ren, 18, 22) = 19) $solved = true;
+    case 4 : if (getbit_range(%rd_ren, 3, 7) = 11 & getbit_range(%rd_ren, 8, 12) = 0 & getbit_range(%rd_ren, 13, 17) = 18 & getbit_range(%rd_ren, 18, 22) = 19) $solved = true;
+    case 5 : if (getbit_range(%rd_ren, 3, 7) = 17 & getbit_range(%rd_ren, 8, 12) = 0 & getbit_range(%rd_ren, 13, 17) = 8 & getbit_range(%rd_ren, 18, 22) = 13) $solved = true;
+}
+if ($solved = true) {
+    if (~rd_room_mark_complete(5) = false) { return; }
+    %rd_ren = setbit_range_toint(%rd_ren, 1, 26, 26);
+    ~chatnpc_specific("Sir Ren Itchood", rd_observer_room_5, "<p,happy>Your wit is sharp, your brains quite clear; You solved my puzzle with no fear. At puzzles I rank you quite the best, now enter the portal for your next test.");
+} else {
+    ~chatnpc_specific("Sir Ren Itchood", rd_observer_room_5, "<p,sad>It's sad to say, this test beat you. I'll send you to Tiffy, what to do?");
+    mes("You have failed to solve the riddle.");
+    if (~rd_ren_same_instance(%rd_ren_uid) = false) { return; }
+    ~rd_run_fail;
+}
+return;

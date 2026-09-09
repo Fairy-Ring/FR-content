@@ -746,3 +746,14 @@
 745=varp745_bits
 746=varp746_bits
 747=varp747_unused
+748=rd_route_state
+749=rd_route_uid
+750=rd_tinley_state
+751=rd_tinley_uid
+752=rd_ren
+753=rd_ren_uid
+754=rd_hynn_state
+755=rd_hynn_riddle
+756=rd_hynn_uid
+757=rd_spishyus_hint
+758=rd_chem_tin_ore_taken
