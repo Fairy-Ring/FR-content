@@ -1042,11 +1042,18 @@ if (region_findbycoord(coord()) = false) {
 if (%rd_room6_stone_door ! ^rd_stone_opened) {
     return;
 }
-// Walk through opened stone door (east toward exit half).
-def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
-if ($entering = true) {
+// Opened stone is a length=2 ground barrier (map angle0 / west) between the
+// west chem half and the east exit half (final door one tile east of origin).
+// Generic check_axis tests wall-axis equality, not which side the player is on:
+// west approach (x < loc) returned false and telejumped back west (live probe
+// trial-chem-stone-01: 6892 stayed at 6892 beside stone 6893,z76).
+// Side compare matches other RD ground crossings (rd_entrance_inside) and
+// supports both directions without changing shared door procs.
+if (coordx(coord) < coordx(loc_coord)) {
+    // West of origin → east of barrier (toward exit / chained key).
     p_telejump(movecoord(loc_coord, 1, 0, 0));
 } else {
+    // On or east of origin → west chem half.
     p_telejump(movecoord(loc_coord, -1, 0, 0));
 }
 return;
