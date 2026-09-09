@@ -689,23 +689,8 @@ switch_coord (loc_coord) {
     case default : @unhandled_stairs(loc_coord);
 }
 
-[oploc1,hauntedmine_dark_stairs_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
-
-[oploc1,hauntedmine_dark_stairs_bottom]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
-
-[oploc1,hauntedmine_light_stairs_bottom]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+// hauntedmine_dark_stairs_top / _bottom / light_stairs_bottom (4971-4973):
+// handlers live in quest_hauntedmine/scripts/hm_dark_stairs.rs2 (M1 fungus unit).
 
 [oploc1,scenery_5094]
 // arrive delay?

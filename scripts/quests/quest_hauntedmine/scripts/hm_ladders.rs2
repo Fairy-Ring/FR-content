@@ -1,0 +1,90 @@
+// Haunted Mine M1 paired ladder traversal unit (r377).
+// Config unit (keep together; packed ops/IDs/models unchanged):
+//   4965 hauntedmine_laddertop      op1=Climb-down  model=loc_1754
+//   4966 hauntedmine_ladder         op1=Climb-up    model=ladder
+//   4967 hauntedmine_laddertop_1e   op1=Climb-down  model=loc_1754
+//   4968 hauntedmine_ladder_1w      op1=Climb-up    model=ladder
+//   4969 hauntedmine_laddertop_1sw  op1=Climb-down  model=loc_1754
+//   4970 hauntedmine_ladder_1ne     op1=Climb-up    model=ladder
+// Pair routes: CANDIDATE — matching Climb-down/Climb-up families with
+// repeated exact coordinate translations across every member
+// (4965→4966: (-640,-5056); 4967→4968: (+64,0); 4969→4970: (-64,-64))
+// plus era-adjusted route support. Exact arrival side CANDIDATE (east x+1,z).
+// Landings: VERIFIED walkable + reachedLoc on 1x1 ladder footprints
+// with a full-footprint static map probe (not the rejected cardinal-only probe).
+// No %hauntedmine / %hauntedmine_bits writes. No climb anim / quest gates.
+
+// --- 4965 laddertop <-> 4966 ladder  (delta -640,-5056) ---
+// Origins: 3413,9633 <-> 2773,4577; 3422,9625 <-> 2782,4569.
+// Landings east of target: 2774,4577 / 2783,4569 ; 3414,9633 / 3423,9625.
+
+[oploc1,hauntedmine_laddertop]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_53_150_21_33 : p_telejump(0_43_71_22_33); // Climb-down -> 2774,4577
+    case 0_53_150_30_25 : p_telejump(0_43_71_31_25); // Climb-down -> 2783,4569
+    case default :
+        mes("Unhandled Haunted Mine ladder:");
+        mes(~coord_tostring(loc_coord));
+}
+
+[oploc1,hauntedmine_ladder]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_43_71_21_33 : p_telejump(0_53_150_22_33); // Climb-up -> 3414,9633
+    case 0_43_71_30_25 : p_telejump(0_53_150_31_25); // Climb-up -> 3423,9625
+    case default :
+        mes("Unhandled Haunted Mine ladder:");
+        mes(~coord_tostring(loc_coord));
+}
+
+// --- 4967 laddertop_1e <-> 4968 ladder_1w  (delta +64,0) ---
+// Origins: 2696,4497 <-> 2760,4497; 2710,4540 <-> 2774,4540;
+//          2725,4486 <-> 2789,4486; 2732,4529 <-> 2796,4529.
+
+[oploc1,hauntedmine_laddertop_1e]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_42_70_8_17 : p_telejump(0_43_70_9_17); // Climb-down -> 2761,4497
+    case 0_42_70_22_60 : p_telejump(0_43_70_23_60); // Climb-down -> 2775,4540
+    case 0_42_70_37_6 : p_telejump(0_43_70_38_6); // Climb-down -> 2790,4486
+    case 0_42_70_44_49 : p_telejump(0_43_70_45_49); // Climb-down -> 2797,4529
+    case default :
+        mes("Unhandled Haunted Mine ladder:");
+        mes(~coord_tostring(loc_coord));
+}
+
+[oploc1,hauntedmine_ladder_1w]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_43_70_8_17 : p_telejump(0_42_70_9_17); // Climb-up -> 2697,4497
+    case 0_43_70_22_60 : p_telejump(0_42_70_23_60); // Climb-up -> 2711,4540
+    case 0_43_70_37_6 : p_telejump(0_42_70_38_6); // Climb-up -> 2726,4486
+    case 0_43_70_44_49 : p_telejump(0_42_70_45_49); // Climb-up -> 2733,4529
+    case default :
+        mes("Unhandled Haunted Mine ladder:");
+        mes(~coord_tostring(loc_coord));
+}
+
+// --- 4969 laddertop_1sw <-> 4970 ladder_1ne  (delta -64,-64) ---
+// Origins: 2797,4599 <-> 2733,4535; 2798,4567 <-> 2734,4503.
+
+[oploc1,hauntedmine_laddertop_1sw]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_43_71_45_55 : p_telejump(0_42_70_46_55); // Climb-down -> 2734,4535
+    case 0_43_71_46_23 : p_telejump(0_42_70_47_23); // Climb-down -> 2735,4503
+    case default :
+        mes("Unhandled Haunted Mine ladder:");
+        mes(~coord_tostring(loc_coord));
+}
+
+[oploc1,hauntedmine_ladder_1ne]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_42_70_45_55 : p_telejump(0_43_71_46_55); // Climb-up -> 2798,4599
+    case 0_42_70_46_23 : p_telejump(0_43_71_47_23); // Climb-up -> 2799,4567
+    case default :
+        mes("Unhandled Haunted Mine ladder:");
+        mes(~coord_tostring(loc_coord));
+}

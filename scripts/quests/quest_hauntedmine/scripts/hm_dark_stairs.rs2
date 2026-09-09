@@ -1,0 +1,69 @@
+// Haunted Mine M1 fungus-dependent dark/light stairs (r377).
+// Config unit (keep together; packed ops/IDs/models/dims unchanged):
+//   4971 hauntedmine_dark_stairs_top     3x4 op1=Walk-down forceapproach=north
+//   4972 hauntedmine_dark_stairs_bottom  4x3 op1=Walk-up
+//   4973 hauntedmine_light_stairs_bottom 4x3 op1=Walk-up
+// Packed glowing_fungus = obj 4075.
+//
+// Pair routes: CANDIDATE — west angle3 / east angle1 families from contract table.
+// Current-inventory rule: source-backed early-2007 CANDIDATE; date of any later
+// change from permanent to per-visit access is UNKNOWN. Fungus is NOT consumed.
+// Landings: VERIFIED walkable + reachedLoc with a full-footprint static map probe
+// using the loaded GameMap; exact offsets among multi-candidate tiles remain CANDIDATE.
+//
+// No %hauntedmine / %hauntedmine_bits writes. No climb anim / damage / dialogue.
+// No fungus pickup/decay, cart, lift, or hazard logic (separate unfinished scope).
+//
+// Table (plane 0):
+//   Top 2692,4436 (W a3) +fungus -> light 2755,4452 land 2758,4453
+//                    -fungus -> dark  2709,4591 land 2712,4592 ; up land 2691,4437
+//   Top 2746,4436 (E a1) +fungus -> light 2812,4452 land 2811,4453
+//                    -fungus -> dark  2731,4561 land 2730,4562 ; up land 2750,4437
+
+// --- 4971 top: Walk-down; inventory selects light 4973 vs dark 4972 ---
+
+[oploc1,hauntedmine_dark_stairs_top]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_42_69_4_20 :
+        // West top 2692,4436
+        if (inv_total(inv, glowing_fungus) > 0) {
+            p_telejump(0_43_69_6_37); // Walk-down light -> 2758,4453
+        } else {
+            p_telejump(0_42_71_24_48); // Walk-down dark -> 2712,4592
+        }
+    case 0_42_69_58_20 :
+        // East top 2746,4436
+        if (inv_total(inv, glowing_fungus) > 0) {
+            p_telejump(0_43_69_59_37); // Walk-down light -> 2811,4453
+        } else {
+            p_telejump(0_42_71_42_18); // Walk-down dark -> 2730,4562
+        }
+    case default :
+        mes("Unhandled Haunted Mine stairs:");
+        mes(~coord_tostring(loc_coord));
+}
+
+// --- 4972 dark bottoms: Walk-up to matching upper return landing ---
+
+[oploc1,hauntedmine_dark_stairs_bottom]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_42_71_21_47 : p_telejump(0_42_69_3_21); // Walk-up W dark 2709,4591 -> 2691,4437
+    case 0_42_71_43_17 : p_telejump(0_42_69_62_21); // Walk-up E dark 2731,4561 -> 2750,4437
+    case default :
+        mes("Unhandled Haunted Mine stairs:");
+        mes(~coord_tostring(loc_coord));
+}
+
+// --- 4973 light bottoms: Walk-up to matching upper return landing ---
+
+[oploc1,hauntedmine_light_stairs_bottom]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_43_69_3_36 : p_telejump(0_42_69_3_21); // Walk-up W light 2755,4452 -> 2691,4437
+    case 0_43_69_60_36 : p_telejump(0_42_69_62_21); // Walk-up E light 2812,4452 -> 2750,4437
+    case default :
+        mes("Unhandled Haunted Mine stairs:");
+        mes(~coord_tostring(loc_coord));
+}
