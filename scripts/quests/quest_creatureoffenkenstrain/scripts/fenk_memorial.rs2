@@ -1,11 +1,19 @@
 // Creature of Fenkenstrain — memorial Search/Push/star Use + cavern/island return.
-// Easternmost coffin 3578,3527 CANDIDATE star target (guide map).
-// Dest pairing: contract §2.2 dest tile UNKNOWN (no packed dest). Use topology
-// pair movecoord(loc, 0, 0, ±6400) matching ladder_1757 island hop convention,
-// with west stand offset (loc forceapproach=west, width=2). Full-footprint
-// collision stand remains UNKNOWN until live pair proof — labeled CANDIDATE,
-// not claimed historical PASS. Island coffin 3505,3571 returns the same way.
-// Cite full-source-contract §2.2 · §3.4 · Transcript 185-196.
+//
+// Map pairing (CANDIDATE stands from root static collision receipt
+// `.tmp/r377-fenkenstrain-m1-2026-09-09/root-memorial-collision.json`):
+//   east-surface 5167@3578,3527 angle3 → underband stand 3577,9927 (0_55_155_57_7)
+//     unique reachable/unblocked sample beside ladder_1757@3578,9927
+//   island-surface 5167@3505,3571 angle0 → underband stand 3504,9969 (0_54_155_48_49)
+//     unique reachable/unblocked sample beside ladder_1757@3504,9970
+// Wiki (spine-old17 lines 105–110): climb ladder to island graves, then Push the
+// memorial you came out of and RETRACE STEPS THROUGH CAVERN — island Push is a
+// downward return to positive dungeon band, NOT surface z−6400 (that yields z=−2829).
+// Do not use generic west offset on rotated east coffin (angle3). Exact historical
+// teleport offset remains unproven live; collision proves approach/stand only.
+// Return surface←underband: stock ladder_1757 Climb-up movecoord(coord,0,0,−6400)
+// (ladders.rs2) at mapped 3504,9970 and 3578,9927 — no fenk-named ladder join.
+// Cite full-source-contract §2.2–2.4 · §3.4 · Transcript 185–196.
 
 [oploc2,fenk_coffin]
 // Search
@@ -28,16 +36,16 @@ if (loc_coord = 0_55_55_58_7) {
         mes("The coffin is incredibly heavy, and does not budge.");
         return;
     }
-    // CANDIDATE topology pair: same XZ, z+6400 (dungeon band), stand 1 west of loc
-    // (forceapproach=west). Exact collision stand UNKNOWN — not live-proved.
+    // CANDIDATE enter: underband stand 3577,9927 next to ladder_1757@3578,9927
     mes("You push the memorial aside and climb down into the darkness.");
-    p_telejump(movecoord(loc_coord, -1, 0, 6400));
+    p_telejump(0_55_155_57_7);
     return;
 }
 if (loc_coord = 0_54_55_49_51) {
-    // Island exit memorial CANDIDATE return: z-6400 to surface band, stand west.
-    mes("You push the memorial aside and climb back up.");
-    p_telejump(movecoord(loc_coord, -1, 0, -6400));
+    // CANDIDATE island→cavern return: underband stand 3504,9969 next to ladder@3504,9970
+    // (wiki retrace-through-cavern; NOT surface −6400)
+    mes("You push the memorial aside and climb back down into the cavern.");
+    p_telejump(0_54_155_48_49);
     return;
 }
 mes("The coffin is incredibly heavy, and does not budge.");

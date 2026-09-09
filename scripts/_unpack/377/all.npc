@@ -41048,6 +41048,8 @@ wanderrange=4
 maxrange=6
 respawnrate=50
 // CANDIDATE combat wiring: packed homolupus_* seqs match model walk/ready family.
+// CANDIDATE category tag (free-string like witches_experiment) for combat/script grouping.
+category=fenk_experiment
 param=attackrate,4
 param=damagetype,^stab_style
 param=attack_anim,homolupus_attack
@@ -41072,6 +41074,7 @@ defence=30
 wanderrange=4
 maxrange=6
 respawnrate=50
+category=fenk_experiment
 param=attackrate,4
 param=damagetype,^stab_style
 param=attack_anim,waa_homo_arachnus_attack
@@ -41095,6 +41098,7 @@ defence=30
 wanderrange=4
 maxrange=6
 respawnrate=50
+category=fenk_experiment
 param=attackrate,4
 param=damagetype,^stab_style
 param=attack_anim,waa_ovinocanus_attack

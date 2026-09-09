@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Offline source-grounded acceptance checks for Creature of Fenkenstrain M1.
+"""STATIC source-regex checks for Creature of Fenkenstrain M1 (offline only).
 
-No pack/service/live claims. Asserts required writers, constants, stage gates,
-hand-in semantics, shared joins, and reward-once patterns exist in product sources.
+These are NOT production-handler execution and do NOT establish functional or
+historical PASS. Label every matrix row that relies on this file as STATIC.
+No pack/service/live claims.
 """
 from __future__ import annotations
 
@@ -175,17 +176,20 @@ def main() -> int:
     must_contain(roavar, r"inv_del\s*\(\s*inv\s*,\s*coins\s*,\s*50\s*\)", "50gp brain")
     must_contain(roavar, r"inv_add\s*\(\s*inv\s*,\s*fenk_brain", "brain grant")
 
-    # --- D: memorial star + push (topology pair CANDIDATE, ladder_1757 convention) ---
+    # --- D: memorial star + push (CANDIDATE stands from root collision receipt) ---
+    # East surface → underband 3577,9927 = 0_55_155_57_7
+    # Island surface → underband 3504,9969 = 0_54_155_48_49 (NOT surface −6400)
     mem = bodies["fenk_memorial.rs2"]
     must_contain(mem, r"\[oplocu,fenk_coffin\]", "star use on coffin")
     must_contain(mem, r"fenk_star_amulet", "star amulet")
     must_contain(mem, r"%fenk_coffin\s*=\s*1", "coffin bit")
     must_contain(mem, r"0_55_55_58_7", "east memorial coord")
-    must_contain(mem, r"p_telejump", "push teleport")
     must_contain(mem, r"0_54_55_49_51", "island return coffin")
-    must_contain(mem, r"movecoord\s*\(\s*loc_coord\s*,\s*-1\s*,\s*0\s*,\s*6400\s*\)", "east push z+6400 pair")
-    must_contain(mem, r"movecoord\s*\(\s*loc_coord\s*,\s*-1\s*,\s*0\s*,\s*-6400\s*\)", "island return z-6400 pair")
-    must_contain(mem, r"ladder_1757|UNKNOWN", "pairing honesty label")
+    must_contain(mem, r"p_telejump\s*\(\s*0_55_155_57_7\s*\)", "east push dest 3577,9927 underband")
+    must_contain(mem, r"p_telejump\s*\(\s*0_54_155_48_49\s*\)", "island push dest 3504,9969 underband")
+    must_not_contain(mem, r"movecoord\s*\(\s*loc_coord\s*,\s*-1\s*,\s*0\s*,\s*-6400\s*\)", "must not use island surface −6400")
+    must_contain(mem, r"root-memorial-collision|3504,9969|3577,9927", "collision-receipt grounding")
+    must_contain(mem, r"ladder_1757", "ladder pair documented")
 
     # --- D: experiment key + doors ---
     doors = bodies["fenk_doors_experiment.rs2"]
@@ -235,6 +239,9 @@ def main() -> int:
     must_contain(tower, r"%fenk_charos_unlocked_mem", "durable charos memory varp use")
     must_contain(tower, r"\[proc,fenk_note_charos_unlocked\]", "note unlocked proc")
     must_not_contain(tower, r"%fenk_digresult\s*=\s*7", "must not use digresult=7 for charos mem")
+    # Honest residual: mem observation-only; must document incomplete (u) paths
+    must_contain(tower, r"OBSERVED held|Observation beat only", "charos mem observation honesty")
+    must_contain(tower, r"OUT OF SCOPE|residual", "charos Garden residual honesty")
     # recovery path must not re-advance XP
     recovery = re.search(
         r"%fenk_quest\s*>=\s*\^fenk_complete\s*\{([\s\S]*?)return;\s*\}",
@@ -279,6 +286,19 @@ def main() -> int:
     must_contain(all_npc, r"param=death_anim,homolupus_death", "exp1 death seq")
     must_contain(all_npc, r"param=attack_anim,waa_homo_arachnus_attack", "exp2 attack seq")
     must_contain(all_npc, r"param=attack_anim,waa_ovinocanus_attack", "exp3 attack seq")
+    # category fill on all three experiment NPCs
+    exp_blocks = re.findall(r"\[fenk_experiment_[123]\]([\s\S]*?)(?=\n\[|\Z)", all_npc)
+    if len(exp_blocks) < 3:
+        fail("expected three fenk_experiment_* npc defs")
+    for i, block in enumerate(exp_blocks, start=1):
+        if "category=fenk_experiment" not in block:
+            fail(f"fenk_experiment_{i} missing category=fenk_experiment")
+        if "param=attackrate" not in block:
+            fail(f"fenk_experiment_{i} missing attackrate")
+    # varp scope=perm for quest durable state
+    all_varp = read(ROOT / "scripts/_unpack/377/all.varp")
+    must_contain(all_varp, r"\[fenk_quest\][\s\S]*?scope=perm", "fenk_quest scope perm")
+    must_contain(all_varp, r"\[fenk_flags\][\s\S]*?scope=perm", "fenk_flags scope perm")
     # pack id registration for new varps
     varp_pack = read(ROOT / "pack/varp.pack")
     must_contain(varp_pack, r"763=fenk_follower_uid", "pack id follower uid")
@@ -317,11 +337,11 @@ def main() -> int:
     )
 
     if failures:
-        print("FAIL")
+        print("FAIL (static source-regex)")
         for f in failures:
             print(f"  - {f}")
         return 1
-    print("PASS")
+    print("PASS (static source-regex only — not functional/historical acceptance)")
     print(f"  checked {len(required_scripts)} fenk scripts + stairs/jewellery/roavar/quests joins")
     return 0
 
