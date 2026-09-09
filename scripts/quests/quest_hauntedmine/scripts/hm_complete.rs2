@@ -1,0 +1,18 @@
+// Haunted Mine conclusion — quest complete writer.
+// Trigger: first successful crystal cut (hm_crystal_cut.rs2).
+// Stage: %hauntedmine → ^hauntedmine_complete (2). Once-guarded.
+// Rewards (CANDIDATE wiki/Zybez): 2 QP, 22,000 Strength XP.
+// Engine XP unit: tenths of a point — scorpcatcher stat_advance(strength, 66250)
+// displays 6,625 Strength XP → 22,000 XP = stat_advance(strength, 220000).
+// Scroll + session_log follow house complete conventions.
+// Does not grant salve stringing, combat bonus, or touch 383/762.
+// Natural boss access / Treus kill remain missing (conclusion segment only).
+
+[queue,hm_quest_complete]
+if (%hauntedmine >= ^hauntedmine_complete) {
+    return;
+}
+%hauntedmine = ^hauntedmine_complete;
+stat_advance(strength, 220000);
+session_log(^log_adventure, "Quest complete: Haunted Mine");
+~send_quest_complete(questlist:hauntedmine, crystalshard_necklace_unstrung, 250, ^hauntedmine_questpoints, "You have completed the\\nHaunted Mine Quest!", "22,000 Strength XP|Ability to make the Salve amulet");

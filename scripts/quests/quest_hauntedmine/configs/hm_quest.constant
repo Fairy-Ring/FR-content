@@ -1,0 +1,7 @@
+// Haunted Mine stage ladder (internal product state).
+// 0 = unstarted, 1 = started (Zealot accept). Complete threshold lives in
+// general/configs/quest.constant as ^hauntedmine_complete = 2 (root choice).
+// Do not stuff boss/complete flags into %hauntedmine_bits (383) or
+// %hauntedmine_points_store (762).
+^hauntedmine_not_started = 0
+^hauntedmine_started = 1

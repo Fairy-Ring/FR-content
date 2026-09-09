@@ -1,0 +1,27 @@
+// Haunted Mine — manual Salve amulet stringing (CANDIDATE).
+// one ball_of_wool + crystalshard_necklace_unstrung (4082 Salve shard)
+//   → crystalshard_necklace (4081 Salve amulet).
+// Tip.It May2 2006: "use a ball of wool on the crystal". Period XP not verified;
+// OSRS reconstructs Crafting1 / 0 XP and dates Make-All to 2022 — out of scope.
+// No Crafting level gate here (cut owns 35). No generic jewelry 4 XP.
+// No Make-All, Lunar String Jewellery, Tarn, imbues, or combat-bonus writers.
+// No quest-stage gate: already-held shard may be strung without re-checking complete.
+// Both use directions share [label,hm_string_salve]; wool→shard also via narrow
+// case in skill_crafting jewellery/stringing.rs2 (cannot dual-bind opheldu wool).
+// Full inv OK: consume two inputs frees a slot for the one output.
+// No 383/762. No pack/objconfig edits.
+
+[opheldu,crystalshard_necklace_unstrung]
+if (last_useitem = ball_of_wool) {
+    @hm_string_salve;
+}
+~displaymessage(^dm_default);
+
+// Shared consume path for wool→shard (stringing.rs2) and shard→wool (above).
+[label,hm_string_salve]
+// No yields between entry and consume. Wrong pairs never reach this label.
+inv_del(inv, crystalshard_necklace_unstrung, 1);
+inv_del(inv, ball_of_wool, 1);
+inv_add(inv, crystalshard_necklace, 1);
+// Deliberately no stat_advance — 0 XP CANDIDATE (not string_amulet's 40 tenths).
+mes("You put some string on your salve shard."); // CANDIDATE house stringing phrasing
