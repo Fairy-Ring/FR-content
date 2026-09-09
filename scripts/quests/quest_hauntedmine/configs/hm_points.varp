@@ -1,0 +1,8 @@
+// Haunted Mine — durable point settings shadow (server-only).
+// Client UI remains %hauntedmine_bits (383, TEMP, transmit=yes).
+// bits 1-8 mirror point letters B/A/C/D/E/I/J/K; bit0 = init marker (internal).
+
+[hauntedmine_points_store]
+type=int
+scope=perm
+transmit=no
