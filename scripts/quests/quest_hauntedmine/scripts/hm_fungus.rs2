@@ -1,0 +1,108 @@
+// Haunted Mine M1 glowing fungus pickup + basic lifecycle (r377).
+// Config unit (unchanged; packed ops/IDs/models/fields):
+//   loc 4932 glowing_mushroom / 4933 glowing_mushroom2 — op1=Pick
+//   obj 4075 glowing_fungus — untradeable, unstackable
+//   ashes on manual drop / leaving HM map set
+//
+// Behavior: CANDIDATE from OSRS Wiki Haunted Mine + Glowing fungus (read 2026-09-09)
+// and retained Zybez multi-pickup notes. No RS3/modern graves/diaries. No questvars/XP.
+// No pick animation/regrowth timer. Losing last fungus while already in lit bottom chamber
+// remains UNKNOWN (not invented here). Cart persistence is a separate contract.
+//
+// HM map squares (plane 0): 42_69/70/71, 43_69/70/71, 53_150.
+// Music mapzone enter handlers stay in music/scripts/move.rs2 — this file only adds exits.
+
+// --- Pick: both mushroom locs yield one 4075 if inv has space; repeat allowed ---
+
+[oploc1,glowing_mushroom]
+~hm_fungus_pick;
+
+[oploc1,glowing_mushroom2]
+~hm_fungus_pick;
+
+[proc,hm_fungus_pick]
+p_arrivedelay;
+if (inv_freespace(inv) = 0) {
+    // Generic inventory-space refusal (pickup.rs2 idiom); do not replace/delete slots.
+    mes("You don't have enough inventory space to hold that item.");
+    return;
+}
+inv_add(inv, glowing_fungus, 1);
+
+// --- Manual Drop: selected fungus becomes ground ashes; guards before inv change ---
+
+[opheld5,glowing_fungus]
+~hm_fungus_drop(last_slot);
+
+[proc,hm_fungus_drop](int $slot)
+// Match normal drop guards (player/scripts/drop.rs2) before touching the slot.
+if (~in_duel_arena(coord) = true) {
+    mes("You cannot drop items here."); // osrs pvp arena
+    return;
+}
+if (~inzone_coord_pair_table(trawler_wreck_zones, coord) = true) {
+    mes("It would be seriously unwise for you to drop your items in the sea."); // osrs
+    return;
+}
+if (~in_games_room(coord) = true & %boardgames_drop_warning = ^false) {
+    ~mesbox("Are you sure you want to put that down? If you start playing a|boardgame, you may not get back to retrieve it.");
+    def_int $option = ~p_choice2("Put it down.", 1, "Don't put it down.", 2);
+    if ($option = 2) {
+        return;
+    }
+    %boardgames_drop_warning = ^true;
+}
+if (inv_getobj(inv, $slot) ! glowing_fungus) {
+    return;
+}
+// Consume fungus then spawn ashes with normal drop ownership/lifetime.
+inv_delslot(inv, $slot);
+obj_add(coord, ashes, 1, ^dropslot_duration);
+anim(null, 0);
+sound_synth(put_down, 0, 0);
+
+// --- Mapzone exit: convert carried fungus->ashes only when CURRENT coord is outside HM ---
+
+[mapzoneexit,0_42_69] ~hm_fungus_on_mapzone_exit;
+[mapzoneexit,0_42_70] ~hm_fungus_on_mapzone_exit;
+[mapzoneexit,0_42_71] ~hm_fungus_on_mapzone_exit;
+[mapzoneexit,0_43_69] ~hm_fungus_on_mapzone_exit;
+[mapzoneexit,0_43_70] ~hm_fungus_on_mapzone_exit;
+[mapzoneexit,0_43_71] ~hm_fungus_on_mapzone_exit;
+[mapzoneexit,0_53_150] ~hm_fungus_on_mapzone_exit;
+
+[proc,hm_in_mine]()(boolean)
+// Contiguous underground pack 42_69..43_71 plus secondary entrance square 53_150.
+if (inzone(0_42_69_0_0, 0_43_71_63_63, coord) = true) {
+    return (true);
+}
+if (inzone(0_53_150_0_0, 0_53_150_63_63, coord) = true) {
+    return (true);
+}
+return (false);
+
+[proc,hm_fungus_on_mapzone_exit]
+// Internal ladder/stair cross-map transitions keep fungus; surface/tele leave converts.
+if (~hm_in_mine = true) {
+    return;
+}
+~hm_fungus_convert_carried_to_ashes;
+
+[proc,hm_fungus_convert_carried_to_ashes]
+def_int $i = 0;
+def_int $size = inv_size(inv);
+while ($i < $size) {
+    if (inv_getobj(inv, $i) = glowing_fungus) {
+        // Replace in place; preserve slot count (unstackable → 1).
+        inv_setslot(inv, $i, ashes, inv_getnum(inv, $i));
+    }
+    $i = calc($i + 1);
+}
+
+// --- Ordinary death: destroy fungus before keep/drop allocation (called from death.rs2) ---
+
+[proc,hm_fungus_on_death]
+def_int $n = inv_total(inv, glowing_fungus);
+if ($n > 0) {
+    inv_del(inv, glowing_fungus, $n);
+}
