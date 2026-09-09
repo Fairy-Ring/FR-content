@@ -1,0 +1,73 @@
+// Salve amulet (4081 / crystalshard_necklace): hit-time NPC melee helper.
+// CANDIDATE factor scale(7, 6, $value). Advertised examine remains 15%.
+// Do not write target-dependent values into %com_* (shared with PvP/ranged/magic).
+
+[proc,player_npc_salve_active]()(boolean)
+if (inv_getobj(worn, ^wearpos_front) ! crystalshard_necklace) {
+    return(false);
+}
+if (~npc_salve_eligible = false) {
+    return(false);
+}
+return(true);
+
+[proc,player_npc_salve_scale](int $value)(int)
+if (~player_npc_salve_active = true) {
+    return(scale(7, 6, $value));
+}
+return($value);
+
+[proc,player_npc_melee_hit_roll](int $damagetype)(boolean)
+def_int $attack_roll = ~player_npc_salve_scale(~player_attack_roll_specific($damagetype));
+def_int $defence_roll = ~npc_defence_roll_specific($damagetype);
+if (randominc($attack_roll) > randominc($defence_roll)) {
+    return(true);
+}
+return(false);
+
+// Named exclusions first (even if undead flag is set). Then attackable undead flag,
+// then named extras that lack the Crumble flag. Explicit npc_type cases only.
+[proc,npc_salve_eligible]()(boolean)
+if (npc_hasop(2) = false) {
+    return(false);
+}
+switch_npc(npc_type) {
+    case barrows_ahrim, barrows_dharok, barrows_guthan, barrows_karil, barrows_torag, barrows_verac :
+        return(false);
+    case ghoul :
+        return(false);
+    case count_draynor, count_draynor_coffin, vampire_leech, vampire_flyer, vampire_misty, vampire_juve, vampire_juve_hound, vampire_count :
+        return(false);
+    case possessed_pickaxe, possessed_pickaxe_stationary :
+        return(false);
+    case tree_spirit :
+        return(false);
+}
+if (npc_param(undead) = ^true) {
+    return(true);
+}
+switch_npc(npc_type) {
+    case slayer_abberant_spectre_1, slayer_abberant_spectre_2, slayer_abberant_spectre_3, slayer_abberant_spectre_4 :
+        return(true);
+    case slayer_banshee_1 :
+        return(true);
+    case slayer_crawling_hand_1, slayer_crawling_hand_2, slayer_crawling_hand_3, slayer_crawling_hand_4, slayer_crawling_hand_5 :
+        return(true);
+    case slayer_crawling_hand_big_1, slayer_crawling_hand_big_2, slayer_crawling_hand_big_3, slayer_crawling_hand_big_4, slayer_crawling_hand_big_5 :
+        return(true);
+    case ahoy_undead_cow, ahoy_undead_chicken, ahoy_tortured_soul :
+        return(true);
+    case deserttreasure_mummy_1, deserttreasure_mummy_2, deserttreasure_mummy_3, deserttreasure_mummy_4, deserttreasure_mummy_5 :
+        return(true);
+    case deserttreasure_mummy_1_on_fire, deserttreasure_mummy_2_on_fire, deserttreasure_mummy_3_on_fire, deserttreasure_mummy_4_on_fire, deserttreasure_mummy_5_on_fire :
+        return(true);
+    case barrows_skeleton_unarmed, barrows_skeleton_armed :
+        return(true);
+    case skeletal_miner :
+        return(true);
+    case zogre_1, zogre_2, zogre_3, zogre_4, zogre_5, zogre_6 :
+        return(true);
+    case zogre_skele, zogre_slash_bash :
+        return(true);
+}
+return(false);
