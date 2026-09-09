@@ -1,6 +1,6 @@
 # Creature of Fenkenstrain — completion report (r377 / t_d99d6bbc)
 
-Date stamp: 2026-09-09 (round-3 after R2 reject of 76ea5db83)  
+Date stamp: 2026-09-09 (round-4 after R3 reject of 16b7aceb7)  
 Branch/worktree: `codex/r377-fenkenstrain-completion` / `r377-fenkenstrain-content`  
 Contracts: `.tmp/r377-fenkenstrain-m1-2026-09-09/` (root-precontract, full-source-contract, receipts, root-memorial-collision.json)
 
@@ -64,11 +64,16 @@ Brief retained counts 22obj/13npc/80loc/2varp/17varbit/8seq. Observed in unpack 
 ### Npc (13)
 
 Multi/static: gardener_multi, gardener_multi_2, fenkenstrain, fenkenstrain_in_tower, fenkenstrain_model, creature, creature_released, creature_model, creature_model_2, gardener.  
-Combat: experiment_1/2/3 — **fills this unit**: CANDIDATE combat ints (03997911d3 later-data lineage), `param=attackrate,4`, damagetype, attack/defend/death anims (named seqs exist), death_drop=bones, wander/max/respawn, **`category=fenk_experiment`** (free-string tag pattern like `witches_experiment`). Gardener: moverestrict=nomove for multi pin.
+Combat: experiment_1/2/3 — **fills this unit**: CANDIDATE combat ints (03997911d3 later-data lineage), `param=attackrate,4`, damagetype, attack/defend/death anims (named seqs exist), death_drop=bones, wander/max/respawn, **`category=fenk_experiment`** (free-string tag pattern like `witches_experiment`).  
+**Gardener movement (R3#1 / root runtime):** `fenk_gardener` is the **dynamic follower type** — **not** `moverestrict=nomove` (engine `Npc.updateMovement` returns false unconditionally on NOMOVE, independent of `npc_setmode(playerfollow)`). Pin is on multi **parents** only: `fenk_gardener_multi` / `fenk_gardener_multi_2` have `moverestrict=nomove` + `wanderrange=0` + `defaultmode=none`. Child keeps `wanderrange=0` + `defaultmode=none` so a non-following instance does not wander. Proven by `tests/fenkenstrain-completion/test_fenk_gardener_move.mjs` (real `updateMovement`, follower coords change, multi frozen; exceptions fail).
 
-### Loc (~78 fenk_*)
+### Loc (exact 80 = 78 all.loc + 2 stairs.loc)
 
-Interactive core: coffin, grave, grave_poor, doors (shed/tower/mausoleum + open), broomcupboard±open, canepile, signpost, fireplace±surrounds, bookcase, conductor broken/repaired, table/table_corpse/multi, stairs_lv1/_top, clock, chests, bridges (Construction shortcut **SUBTRACT** — present chrome only). Remainder walls/grass/columns chrome.  
+**Named inventory (root-precontract last paragraph resolved):**  
+- `scripts/_unpack/377/all.loc`: **78** `fenk_*` defs (interactive core + chrome).  
+- `scripts/ladders+stairs/configs/stairs.loc`: **`fenk_stairs_lv1`**, **`fenk_stairs_lv1_top`** (migrated; lines ~970/987) — not missing unknown.  
+- **Total 80** named fenk locs. No approximate 78-vs-80 residual.  
+Interactive core includes coffin, grave, grave_poor, doors (shed/tower/mausoleum + open), broomcupboard±open, canepile, signpost, fireplace±surrounds, bookcase, conductor broken/repaired, table/table_corpse/multi, clock, chests, bridges (Construction shortcut **SUBTRACT** — present chrome only). Remainder walls/grass/columns chrome.  
 **Movement/timer on locs**: stairs forceapproach + sharelight present; no missing loc timer fills identified under exclusive scope. Map **instance** placement is packed map (root pack), not all.loc defs.
 
 ### Varp (2 unpack + 2 exclusive)
@@ -99,13 +104,12 @@ Combat (not fenk-named but wired): homolupus_{attack,defend,death}, waa_homo_ara
 | Experiment sounds | UNKNOWN / absent | many combat NPCs have attack_sound; not filled without source |
 | Follower leash tiles | UNKNOWN | plane + duration only |
 | Charos mem without Garden observation | residual | see F3 |
-| Loc count 78 vs brief 80 | inventory delta | no silent invent of 2 locs |
 | Obj 23 vs brief 22 | + unlocked pack row | preserved |
 
 ### Pack needs for root (execution only)
 
 1. Server `varp.dat`: include 763, 764 + fenk_quest/flags with scope=perm.  
-2. Server `npc.dat`: experiment category + combat params.  
+2. Server `npc.dat`: experiment category + combat params; **gardener multi parents NOMOVE, `fenk_gardener` mobile** (no NOMOVE on follower type).  
 3. Client config JAG if any client-facing varbit/obj changes (this unit: no new client varbit).  
 4. Script pack from exclusive tree.  
 5. **Do not** treat models+vislevel alone as combat-ready without the param fills above (now present as CANDIDATE).  
@@ -122,7 +126,7 @@ Shared live pack/reload remains root-only; ISO compile proves scripts under work
 | A3 | Stages 0→1…→8 multi | STATIC | fenk_quest.constant + multi tables |
 | B1 | Partial body hand-in | STATIC | fenk_try_hand_parts |
 | B2 | Needle once + thread ≤5 cumulative | STATIC | Transcript 381–399 |
-| B3 | Ghostspeak + follower cleanup | STATIC | logout/death/login hooks; not pet.rs2 |
+| B3 | Ghostspeak + follower cleanup + **mobile follower** | STATIC + **engine movement** | logout/death/login hooks; not pet.rs2; `test_fenk_gardener_move.mjs` real coords |
 | B4 | Dig independent of follower; island map | STATIC + CANDIDATE coords | Transcript 305–350 NW/N/NE |
 | C1 | Brain 50gp + Telegrab alternate | STATIC | Roavar join; telegrab generic engine |
 | C2 | Bookcases + star | STATIC | titles + halves |
@@ -174,6 +178,7 @@ Evidence: Tip.it elComment_776260 16 Jun 2006 — recover by pickpocketing docto
 | Softtimer | queues protected cleanup (p_active_player) |
 | Voice | south Haunted Forest restatement only |
 | Leash | **UNKNOWN** — plane-change + duration; softtimer plane loss ≠ full any-teleport |
+| Movement | **follower type mobile**; multi parents `moverestrict=nomove`; engine movement proof PASS |
 
 ## Tests run
 
@@ -181,9 +186,15 @@ Evidence: Tip.it elComment_776260 16 Jun 2006 — recover by pickpocketing docto
 python3 tests/fenkenstrain-completion/test_fenk_offline.py
 → PASS (static source-regex only — not functional/historical acceptance)
 
-Isolated compile (.tmp/fenk-iso-compile-r422/) round-3 re-run after memorial/category edits:
+cd .tmp/fenk-iso-compile-r422/engine && node --import tsx ../../../tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
+→ RESULT PASS (real Npc.updateMovement: follower 3200,3200→3203,3200; multi frozen; exceptions fail)
+  (ISO data/config pems present for World import only; no World.start/services; shared packs untouched)
+
+Isolated config pack after gardener moverestrict fix:
   BUILD_SRC_DIR=<iso>/content npx tsx pack-server-configs.mjs
   → ISOLATED_CONFIG_PACK_OK (varp/varbit/npc)
+
+Isolated compile (.tmp/fenk-iso-compile-r422/) retained from R3:
   BUILD_SRC_DIR=<iso>/content npx tsx compile-isolated.mjs
   → ISOLATED_OK script.dat size 8497899; exit 0
   shared vendor/content/pack/script.pack sha256 unchanged:
@@ -191,15 +202,15 @@ Isolated compile (.tmp/fenk-iso-compile-r422/) round-3 re-run after memorial/cat
   ISO category.pack registered 150=fenk_experiment (revalidate crawl; ISO only)
 ```
 
-No live client / shared pack / server proof in this worker. Handler-execution tests not available without engine harness in exclusive scope — labeled STATIC honestly.
+No live client / shared pack / server proof in this worker. Handler-execution tests beyond movement proof not available without engine harness in exclusive scope — labeled STATIC honestly.
 
-## Reviewer focus (R3)
+## Reviewer focus (R4)
 
-1. Island Push dest `0_54_155_48_49` (3504,9969) — **not** −6400; east `0_55_155_57_7` (3577,9927).  
-2. Static tests assert valid underband dests and forbid broken −6400 pattern.  
-3. Matrix has no functional PASS from regex; F3 residual honest.  
-4. Named config inventory + experiment `category=fenk_experiment`; pack list for root only.  
-5. pet.rs2 clean; lifecycle hooks retained.  
-6. digresult not used for Charos.  
-7. quest.constant unique CoF pair; HM joins preserved.  
-)
+1. **Gardener movement:** `fenk_gardener` not NOMOVE; multi parents NOMOVE; engine test proves follower coords change and multi does not.  
+2. Loc inventory exact 80 = 78 all.loc + stairs `fenk_stairs_lv1`/`_top` (no 78-vs-80 residual).  
+3. Island Push dest `0_54_155_48_49` (3504,9969) — **not** −6400; east `0_55_155_57_7` (3577,9927).  
+4. Matrix has no functional PASS from regex; F3 residual honest.  
+5. Named config inventory + experiment `category=fenk_experiment`; pack list for root only.  
+6. pet.rs2 clean; lifecycle hooks retained.  
+7. digresult not used for Charos.  
+8. quest.constant unique CoF pair; HM joins preserved.  

@@ -295,6 +295,39 @@ def main() -> int:
             fail(f"fenk_experiment_{i} missing category=fenk_experiment")
         if "param=attackrate" not in block:
             fail(f"fenk_experiment_{i} missing attackrate")
+    # B3 gardener movement: multi parents NOMOVE-pinned; dynamic type must be mobile.
+    # Engine Npc.updateMovement short-circuits on moverestrict=NOMOVE independent of mode.
+    for multi_name in ("fenk_gardener_multi", "fenk_gardener_multi_2"):
+        m = re.search(rf"\[{multi_name}\]([\s\S]*?)(?=\n\[|\Z)", all_npc)
+        if not m:
+            fail(f"missing {multi_name}")
+        else:
+            if "moverestrict=nomove" not in m.group(1):
+                fail(f"{multi_name} must pin with moverestrict=nomove")
+            if "defaultmode=none" not in m.group(1):
+                fail(f"{multi_name} must defaultmode=none")
+    g_npc = re.search(r"\[fenk_gardener\]([\s\S]*?)(?=\n\[|\Z)", all_npc)
+    if not g_npc:
+        fail("missing fenk_gardener def")
+    else:
+        if re.search(r"moverestrict\s*=\s*nomove", g_npc.group(1)):
+            fail("fenk_gardener must NOT be moverestrict=nomove (dynamic follower type)")
+        if "wanderrange=0" not in g_npc.group(1):
+            fail("fenk_gardener wanderrange=0")
+        if "defaultmode=none" not in g_npc.group(1):
+            fail("fenk_gardener defaultmode=none")
+    must_contain(g, r"npc_add\s*\(\s*\$spawn\s*,\s*fenk_gardener\s*,", "follower npc_add fenk_gardener")
+    # Exact loc inventory: 78 all.loc + 2 stairs.loc = 80 (root-precontract resolved)
+    all_loc = read(ROOT / "scripts/_unpack/377/all.loc")
+    stairs_loc = read(ROOT / "scripts/ladders+stairs/configs/stairs.loc")
+    loc_all = re.findall(r"^\[(fenk_[^\]]+)\]", all_loc, re.M)
+    loc_stairs = re.findall(r"^\[(fenk_[^\]]+)\]", stairs_loc, re.M)
+    if len(loc_all) != 78:
+        fail(f"all.loc fenk_* count {len(loc_all)} != 78")
+    if set(loc_stairs) != {"fenk_stairs_lv1", "fenk_stairs_lv1_top"}:
+        fail(f"stairs.loc fenk defs unexpected: {loc_stairs}")
+    if len(loc_all) + len(loc_stairs) != 80:
+        fail("named fenk loc total must be 80 (78 unpack + 2 stairs)")
     # varp scope=perm for quest durable state
     all_varp = read(ROOT / "scripts/_unpack/377/all.varp")
     must_contain(all_varp, r"\[fenk_quest\][\s\S]*?scope=perm", "fenk_quest scope perm")

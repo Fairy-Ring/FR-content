@@ -148,10 +148,11 @@ if ($spawn = null) {
     $spawn = coord;
 }
 // Duration CANDIDATE 10 minutes; npc lifetime = follow window.
+// Type fenk_gardener is mobile (no moverestrict=nomove). Multi parents alone are
+// NOMOVE-pinned; engine short-circuits updateMovement on NOMOVE regardless of mode.
 npc_add($spawn, fenk_gardener, ^fenk_follow_ticks);
 %npc_attacking_uid = uid;
 %fenk_follower_uid = npc_uid;
-// Dynamic follower must walk; override scenery nomove default.
 npc_setmode(playerfollow);
 npc_settimer(10);
 softtimer(fenk_follow_watch, 10);

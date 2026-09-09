@@ -40873,6 +40873,11 @@ alwaysontop=yes
 vislevel=1
 multivar=fenk_gardener_directions
 multinpc=1,fenk_gardener
+// Map multi parent is the movement type (Npc.ts uses baseType). Pin courtyard/woods
+// static shells; do NOT put NOMOVE on fenk_gardener — dynamic npc_add follower must walk.
+moverestrict=nomove
+wanderrange=0
+defaultmode=none
 
 [fenk_gardener_multi_2]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -40880,6 +40885,10 @@ readyanim=human_ready
 vislevel=1
 multivar=fenk_gardener_directions
 multinpc=0,fenk_gardener
+// Courtyard multi parent pin (same as fenk_creature multi pattern).
+moverestrict=nomove
+wanderrange=0
+defaultmode=none
 
 [fenk_fenkenstrain]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -41021,9 +41030,11 @@ resizev=135
 alwaysontop=yes
 vislevel=hide
 head1=npc_1675_head
-// Courtyard multi child is pinned; dynamic follower overrides mode to playerfollow.
-// Without nomove, static multi child wanders off spawn (engine default wr=5).
-moverestrict=nomove
+// Dynamic follower type (npc_add + npc_setmode(playerfollow)). Engine updateMovement
+// returns false unconditionally when moverestrict=NOMOVE — independent of mode — so
+// this child must NOT be NOMOVE. Courtyard/woods pin lives on multi parents above
+// (movement uses map baseType, not multi child). defaultmode=none + wanderrange=0
+// keep a non-following instance from wandering if ever spawned static.
 wanderrange=0
 defaultmode=none
 
