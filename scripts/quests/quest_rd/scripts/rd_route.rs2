@@ -301,7 +301,8 @@ return;
 // --- reset / select / begin / mark / advance ---
 
 // Clear route cursor/slots; all physical room completes; trial temps/queues;
-// trial inv items. Do NOT clear %rd_main / %rd_spoke_to_tiffy / %rd_male_at_start / falador_spawn.
+// trial inv items. Do NOT clear %rd_main / %rd_spoke_to_tiffy / %rd_male_at_start /
+// %rd_tiffy_introduced / falador_spawn.
 // Despawn first while %rd_route_uid still identifies the prior instance — clearing
 // uid before despawn made mainland reset unable to find instance NPCs.
 [proc,rd_run_reset]

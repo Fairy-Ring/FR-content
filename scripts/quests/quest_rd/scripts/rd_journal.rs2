@@ -11,6 +11,9 @@ if (%rd_main = 0) {
 } else if (~rd_rewards_finish_ready = true) {
     // Finished five trials; award pending on Tiffy / finish proc.
     $text = "@dbl@I have passed all five recruitment tests. I should speak to @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@.";
+} else if (%rd_tiffy_introduced = 0) {
+    // CANDIDATE: Amik referred; meet Tiffy for testing (not yet accepted).
+    $text = "@dbl@Sir Amik Varze has put me forward for the Temple Knights. I should meet @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@ for testing.";
 } else {
     $text = "@dbl@I am undergoing Temple Knight recruitment testing with @dre@Sir Tiffy Cashien@dbl@. I must pass five intelligence tests at the secret training grounds.";
 }

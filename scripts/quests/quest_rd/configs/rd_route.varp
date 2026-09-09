@@ -19,6 +19,14 @@ type=int
 scope=perm
 transmit=no
 
+// Internal bookkeeping (not a historical pack bit): durable first-intro vs retry.
+// 0 = has not accepted Tiffy testing yet; 1 = accepted at least once.
+// Survives logout/run reset. Temp %rd_spoke_to_tiffy remains session-only.
+[rd_tiffy_introduced]
+type=int
+scope=perm
+transmit=no
+
 // Lifecycle-only death snapshot; never transmitted or persisted.
 [rd_death_active]
 type=int
