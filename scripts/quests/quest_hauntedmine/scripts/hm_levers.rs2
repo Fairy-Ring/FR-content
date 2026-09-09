@@ -1,0 +1,72 @@
+// Haunted Mine — point lever Pull + durable point settings.
+// Loc 4950–4957 hauntedmine_point_lever1…8, op1=Pull.
+// Letter bindings (packed desc + controls IF bits 1–8):
+//   lever1 B bit1, lever2 A bit2, lever3 C bit3, lever4 D bit4,
+//   lever5 E bit5, lever6 I bit6, lever7 J bit7, lever8 K bit8.
+// Flooded F/G/H and inactive levers have no Pull — do not add handlers.
+//
+// Client UI varp %hauntedmine_bits (383) stays TEMP + transmit.
+// Durable shadow %hauntedmine_points_store (762) is PERM server-only.
+// Store bit0 = initialized marker (internal reconstruction bookkeeping).
+// Store bits 1–8 = durable copies of point settings (mask 510 = 0x1FE).
+// First Check/Pull captures existing runtime point field then marks init.
+// Later Check/Pull restores only the point field; unrelated 383 bits kept.
+// Initial distribution UNKNOWN — preserve prior runtime or zero; no random.
+// No mes/anim/sound/locswap, stage gates, busy flag, cart writers, or login hook.
+
+// Point field mask: bits 1..8 inclusive.
+// Init marker lives on the store varp only (not on 383).
+
+[proc,hm_points_ensure]
+// Lazy latch/restore on first interaction. No global login path.
+if (testbit(%hauntedmine_points_store, 0) = ^false) {
+    // First touch: capture current runtime points; do not invent values.
+    def_int $pts = and(%hauntedmine_bits, 510);
+    %hauntedmine_points_store = or($pts, 1);
+} else {
+    // Restore durable points into TEMP transmit varp; keep non-point bits.
+    def_int $keep = clearbit_range(%hauntedmine_bits, 1, 8);
+    def_int $pts = and(%hauntedmine_points_store, 510);
+    %hauntedmine_bits = or($keep, $pts);
+}
+return;
+
+[proc,hm_points_toggle](int $bit)
+// $bit must be 1..8 (point letters only).
+~hm_points_ensure;
+%hauntedmine_bits = togglebit(%hauntedmine_bits, $bit);
+def_int $pts = and(%hauntedmine_bits, 510);
+%hauntedmine_points_store = or($pts, 1);
+return;
+
+[oploc1,hauntedmine_point_lever1]
+// Letter B → bit 1
+~hm_points_toggle(1);
+
+[oploc1,hauntedmine_point_lever2]
+// Letter A → bit 2
+~hm_points_toggle(2);
+
+[oploc1,hauntedmine_point_lever3]
+// Letter C → bit 3
+~hm_points_toggle(3);
+
+[oploc1,hauntedmine_point_lever4]
+// Letter D → bit 4
+~hm_points_toggle(4);
+
+[oploc1,hauntedmine_point_lever5]
+// Letter E → bit 5
+~hm_points_toggle(5);
+
+[oploc1,hauntedmine_point_lever6]
+// Letter I → bit 6
+~hm_points_toggle(6);
+
+[oploc1,hauntedmine_point_lever7]
+// Letter J → bit 7
+~hm_points_toggle(7);
+
+[oploc1,hauntedmine_point_lever8]
+// Letter K → bit 8
+~hm_points_toggle(8);
