@@ -1,14 +1,19 @@
 // Recruitment Drive — completion awards and postquest services (M1).
 //
-// Handoff ownership:
-// - Root may call ~rd_rewards_finish from ~rd_run_finish BEFORE park while the
-//   private region / route UID is still valid (preferred).
-// - After park, same_instance is false on mainland; finish eligibility does NOT
-//   require same_instance — only active route, cursor=5, and all five selected
-//   physical completes. Tiffy talk also calls finish when ready so awards are
-//   not stranded if root has not wired rd_run_finish yet.
-// - Single-award: %rd_main >= ^recruitmentdrive_complete is the durable guard.
-//   Mark rd_main=2 first, then awards with no yield between mark and grants.
+// Handoff ownership (actual pending marker 2 / Tiffy path):
+// - %rd_assessment is durable lifecycle state: 0 idle, 1 active run, 2 pending
+//   Tiffy award handoff (set by ~rd_run_finish after its own run reset + park).
+// - ~rd_rewards_finish_ready is true only when %rd_main = 1 and %rd_assessment = 2.
+//   Award path is Tiffy talk (~rd_tiffy_finish → ~rd_rewards_finish). Root may
+//   also call finish when marker 2 is already set; eligibility does not require
+//   same_instance or live route cursor.
+// - Single-award: %rd_main = ^recruitmentdrive_complete is the durable guard.
+//   Mark rd_main complete and clear assessment to 0 first, then grants with no
+//   yield between mark and grants.
+// - Run cleanup (~rd_run_reset) must run AFTER grants and BEFORE
+//   ~send_quest_complete. ~rd_ren_reset always if_close; calling reset after the
+//   scroll opens dismissed the quest complete interface (live: level-up only).
+//   Do not strip Ren if_close/reset — keep full run reset semantics; only order.
 //
 // Sources (CANDIDATE after Changes subtraction):
 // - Transcript_Recruitment_Drive.wikitext Finishing up (player/Tiffy lines)
@@ -61,9 +66,12 @@ if (%rd_male_at_start = 1) {
 // death.rs2 branch that honours this bit is root-owned.
 %falador_spawn = 1;
 session_log(^log_adventure, "Quest complete: Recruitment Drive");
-~send_quest_complete(questlist:rd, basic_tk_helm, 250, ^recruitmentdrive_questpoints, "You have completed the\\nRecruitment Drive Quest!", "1,000.5 Prayer XP|1,000.5 Herblore XP|1,000.5 Agility XP|3,000 Coins|Initiate helm|Gaze of Saradomin");
-// Clear run temps so finish_ready cannot re-arm; do not clear rd_main/falador_spawn/male_at_start.
+// Clear run temps before the quest scroll opens. ~rd_run_reset → ~rd_ren_reset
+// always if_close; post-scroll reset closed the complete interface. Grants and
+// mark already done above (no yield). Does not clear rd_main/falador_spawn/
+// male_at_start; trial inv only (fox/chem), not reward items.
 ~rd_run_reset;
+~send_quest_complete(questlist:rd, basic_tk_helm, 250, ^recruitmentdrive_questpoints, "You have completed the\\nRecruitment Drive Quest!", "1,000.5 Prayer XP|1,000.5 Herblore XP|1,000.5 Agility XP|3,000 Coins|Initiate helm|Gaze of Saradomin");
 return(true);
 
 // Capture start-gender for voucher provenance. Call once at accept.
