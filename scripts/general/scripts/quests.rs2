@@ -285,6 +285,10 @@ if (%rd_main = ^recruitmentdrive_complete) {
 if (%hauntedmine >= ^hauntedmine_complete) {
     $questpoints = add($questpoints, ^hauntedmine_questpoints);
 }
+// Creature of Fenkenstrain — M1 completion (t_d99d6bbc).
+if (%fenk_quest >= ^creatureoffenkenstrain_complete) {
+    $questpoints = add($questpoints, ^creatureoffenkenstrain_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -371,6 +375,8 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:rd, %rd_main, ^recruitmentdrive_complete);
 // Haunted Mine — conclusion unit (t_24af0ea3). Distinct from questlist:haunted (Ernest).
 ~send_quest_progress_colour(questlist:hauntedmine, %hauntedmine, ^hauntedmine_complete);
+// Creature of Fenkenstrain — M1 journal colour (t_d99d6bbc).
+~send_quest_progress_colour(questlist:creatureoffenkenstrain, %fenk_quest, ^creatureoffenkenstrain_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

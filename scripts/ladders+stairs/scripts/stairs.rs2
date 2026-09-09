@@ -719,14 +719,21 @@ switch_coord (loc_coord) {
 }
 
 [oploc1,fenk_stairs_lv1]
-// arrive delay?
+// Creature of Fenkenstrain castle stairs L0→L1 (VERIFIED pair 3537/3559,3551 ↔ L1 3552).
+// Destinations CANDIDATE stand tiles adjacent north of top (forceapproach south on bottom).
+p_arrivedelay;
 switch_coord (loc_coord) {
+    case 0_55_55_17_31 : p_telejump(1_55_55_17_33); // west stairs up 3537,3551 → 3537,3553 L1
+    case 0_55_55_39_31 : p_telejump(1_55_55_39_33); // east stairs up 3559,3551 → 3559,3553 L1
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,fenk_stairs_lv1_top]
-// arrive delay?
+// Creature of Fenkenstrain castle stairs L1→L0 (VERIFIED pair).
+p_arrivedelay;
 switch_coord (loc_coord) {
+    case 1_55_55_17_32 : p_telejump(0_55_55_17_30); // west stairs down 3537,3552 → 3537,3550 L0
+    case 1_55_55_39_32 : p_telejump(0_55_55_39_30); // east stairs down 3559,3552 → 3559,3550 L0
     case default : @unhandled_stairs(loc_coord);
 }
 

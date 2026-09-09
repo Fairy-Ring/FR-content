@@ -1,0 +1,89 @@
+// Creature of Fenkenstrain — brain buy/combine + bookcases + star amulet.
+// Brain: Roavar 50gp (werewolfinnkeeper join) + Telegrab alternate on table obj.
+// Bookcases L1: west Joy of Grave Digging → marble; east Handy Maggot → obsidian.
+// Cite full-source-contract §3.3-3.4 · Transcript 244-293.
+
+// Head + brain combine
+[opheldu,fenk_head_empty]
+if (last_useitem = fenk_brain) {
+    @fenk_combine_head_brain;
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,fenk_brain]
+if (last_useitem = fenk_head_empty) {
+    @fenk_combine_head_brain;
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,fenk_combine_head_brain]
+if (inv_total(inv, fenk_head_empty) < 1 | inv_total(inv, fenk_brain) < 1) {
+    return;
+}
+inv_del(inv, fenk_head_empty, 1);
+inv_del(inv, fenk_brain, 1);
+inv_add(inv, fenk_head_full, 1);
+~objbox(fenk_head_full, "You squeeze the pickled brain into the decapitated head.", 250, 0, 0);
+
+// Marble + obsidian → star
+[opheldu,fenk_marble_amulet]
+if (last_useitem = fenk_obsidian_amulet) {
+    @fenk_combine_star;
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,fenk_obsidian_amulet]
+if (last_useitem = fenk_marble_amulet) {
+    @fenk_combine_star;
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,fenk_combine_star]
+if (inv_total(inv, fenk_marble_amulet) < 1 | inv_total(inv, fenk_obsidian_amulet) < 1) {
+    return;
+}
+inv_del(inv, fenk_marble_amulet, 1);
+inv_del(inv, fenk_obsidian_amulet, 1);
+inv_add(inv, fenk_star_amulet, 1);
+~objbox(fenk_star_amulet, "The marble and obsidian amulets fit together to form a star amulet.", 250, 0, 0);
+
+// Bookcases
+[oploc1,fenk_bookcase]
+p_arrivedelay;
+// Upstairs pair L1 3542,3558 west / 3555,3558 east (VERIFIED placements).
+if (loc_coord = 1_55_55_22_38) {
+    // West — Joy of Grave Digging → marble
+    if (inv_total(inv, fenk_marble_amulet) > 0 | inv_total(inv, fenk_star_amulet) > 0) {
+        mes("You find nothing of interest.");
+        return;
+    }
+    if (inv_freespace(inv) = 0) {
+        mes("You don't have enough inventory space.");
+        return;
+    }
+    mes("You find a book titled 'The Joy of Grave Digging'.");
+    mes("Inside the cover is a marble amulet.");
+    inv_add(inv, fenk_marble_amulet, 1);
+    return;
+}
+if (loc_coord = 1_55_55_35_38) {
+    // East — Handy Maggot Avoidance → obsidian
+    if (inv_total(inv, fenk_obsidian_amulet) > 0 | inv_total(inv, fenk_star_amulet) > 0) {
+        mes("You find nothing of interest.");
+        return;
+    }
+    if (inv_freespace(inv) = 0) {
+        mes("You don't have enough inventory space.");
+        return;
+    }
+    mes("You find a book titled 'Handy Maggot Avoidance Techniques'.");
+    mes("Inside the cover is an obsidian amulet.");
+    inv_add(inv, fenk_obsidian_amulet, 1);
+    return;
+}
+// Ground-floor bookcases chrome.
+mes("You search the bookcase but find nothing of interest.");

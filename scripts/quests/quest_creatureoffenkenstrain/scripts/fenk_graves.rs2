@@ -1,0 +1,110 @@
+// Creature of Fenkenstrain — graves Read/Dig (woods head + island parts).
+// Poor grave 5169: CANDIDATE true head grave 3608,3491 Ed Lestwit.
+// Island 5168 trio: CANDIDATE map Transcript 305-350 —
+//   NW 3502,3576 torso · N 3504,3577 arms · NE 3506,3576 legs.
+// Dig works without follower. Empty graves mes. Spade via inv check on Dig op.
+// Cite full-source-contract §2.4-2.5 · §3.2 · §3.4.
+
+// --- woods poor graves ---
+[oploc1,fenk_grave_poor]
+// Read
+if (loc_coord = 0_56_54_24_35) {
+    // CANDIDATE Ed Lestwit grave (guide/transcript + Sal's name).
+    mes("The grave says:");
+    mes(" 'Here lies Ed Lestwit - REST IN PEACE'");
+    return;
+}
+mes("The grave says:");
+mes(" 'Here lies Unknown - REST IN PEACE'");
+
+[oploc2,fenk_grave_poor]
+// Dig
+p_arrivedelay;
+if (inv_total(inv, spade) < 1 & inv_total(worn, spade) < 1) {
+    mes("You need a spade to dig.");
+    return;
+}
+anim(human_dig, 0);
+p_delay(1);
+mes("You start digging...");
+if (loc_coord = 0_56_54_24_35) {
+    @fenk_dig_head_grave;
+    return;
+}
+mes("...but the grave is empty.");
+
+[label,fenk_dig_head_grave]
+if (inv_total(inv, fenk_head_empty) > 0 | inv_total(inv, fenk_head_full) > 0) {
+    mes("...but the grave is empty.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, fenk_head_empty, 1);
+mes("...and you find a decapitated head.");
+// Optional follower overhead (Transcript).
+if (%fenk_follower_uid ! null & npc_finduid(%fenk_follower_uid) = true) {
+    npc_say("This is the place where I met me' maker.");
+}
+return;
+
+// --- island / east fancy graves ---
+[oploc1,fenk_grave]
+mes("The grave says:");
+mes(" 'Here lies Unknown - REST IN PEACE'");
+
+[oploc2,fenk_grave]
+p_arrivedelay;
+if (inv_total(inv, spade) < 1 & inv_total(worn, spade) < 1) {
+    mes("You need a spade to dig.");
+    return;
+}
+anim(human_dig, 0);
+p_delay(1);
+mes("You start digging...");
+// Island CANDIDATE part map (Transcript 305-350 + mapped coords).
+if (loc_coord = 0_54_55_46_56) {
+    // NW torso
+    @fenk_dig_part(fenk_torso, "a decomposing torso");
+    return;
+}
+if (loc_coord = 0_54_55_48_57) {
+    // N arms
+    @fenk_dig_part(fenk_arms, "a pair of arms");
+    return;
+}
+if (loc_coord = 0_54_55_50_56) {
+    // NE legs
+    @fenk_dig_part(fenk_legs, "a pair of legs");
+    return;
+}
+// East memorial graves chrome — empty.
+mes("...but the grave is empty.");
+
+[label,fenk_dig_part](namedobj $part, string $desc)
+if (inv_total(inv, $part) > 0) {
+    mes("...but the grave is empty.");
+    return;
+}
+// If already handed in to doctor, still empty (no unlimited duplicates).
+if ($part = fenk_torso & %fenk_torso = 1) {
+    mes("...but the grave is empty.");
+    return;
+}
+if ($part = fenk_arms & %fenk_arms = 1) {
+    mes("...but the grave is empty.");
+    return;
+}
+if ($part = fenk_legs & %fenk_legs = 1) {
+    mes("...but the grave is empty.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, $part, 1);
+mes("...and you find <$desc>.");
+return;

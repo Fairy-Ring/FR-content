@@ -1,43 +1,230 @@
-// Creature of Fenkenstrain — Gardener Ghost Talk-to.
-// CANDIDATE 2007-base lines (OSRS Transcript:Creature of Fenkenstrain minus
-// the Ed Lestwit name and the follow-dest). Bind concrete fenk_gardener 1675
-// (child of multi fenk_gardener_multi_2 1667 @ 3551,3561). Gate %fenk_quest
-// >= 1 else return (no pre-start dump). No ghostspeak worn: CANDIDATE mes
-// then return, no bit write. Head option writes %fenk_spoken_to_gardener = 1
-// (fenk_flags bit 9) on the successful path only. No %fenk_quest write (stay
-// 1). No %fenk_gardener_directions write (keeps 1667 visible; woods spawn
-// UNKNOWN). No follow / Dig / shed key. No dest. No Charos. No fake complete.
-// Cite docs/research/fenkenstrain-gardener-first-slice-377.md ·
-//     OSRS Transcript:Creature of Fenkenstrain (2007-base minus Changes).
+// Creature of Fenkenstrain — Gardener Ghost Talk-to + follower lifecycle.
+// CANDIDATE 2007-base (Transcript + Tip.it beats). Bind fenk_gardener 1675.
+// Gate %fenk_quest >= 1. Ghostspeak worn check. Follow: dynamic npc_add +
+// playerfollow, CANDIDATE 10 min duration, loss on logout/tele/death/distance.
+// Dig independent of follower. directions bit hides courtyard multi while
+// following (1666 woods spawn UNKNOWN — dynamic add is I representation).
+// Cite full-source-contract §3.2 · fenkenstrain-gardener-first-slice-377.md.
 
 [opnpc1,fenk_gardener]
-if (%fenk_quest < 1) {
+if (%fenk_quest < ^fenk_hired) {
     return;
 }
 if (inv_total(worn, amulet_of_ghostspeak) = 0) {
     mes("The gardener's neck twitches at you, but the lack of any head prevents him from speaking.");
     return;
 }
-def_int $choice = ~p_choice3("What happened to your head?", 1, "Can you tell me anything about Fenkenstrain?", 2, "I must get back to work.", 3);
+// Active dynamic follower owned by this player?
+if (%fenk_follower_uid ! null & npc_uid = %fenk_follower_uid) {
+    @fenk_gardener_following_talk;
+    return;
+}
+// Courtyard / reacquire menu
+if (%fenk_quest >= ^fenk_assembled) {
+    def_int $c2 = ~p_choice4("What happened to your head?", 1, "Can you tell me anything about Fenkenstrain?", 2, "Do you know where the key to the shed is?", 3, "Do you know where a conductor mould is?", 4);
+    if ($c2 = 1) {
+        @fenk_gardener_head_path;
+        return;
+    }
+    if ($c2 = 2) {
+        @fenk_gardener_lore;
+        return;
+    }
+    if ($c2 = 3) {
+        @fenk_gardener_shed_key;
+        return;
+    }
+    @fenk_gardener_mould_hint;
+    return;
+}
+def_int $choice = ~p_choice4("What happened to your head?", 1, "Can you tell me anything about Fenkenstrain?", 2, "What's your name?", 3, "I must get back to work.", 4);
 if ($choice = 1) {
-    ~chatplayer("<p,neutral>What happened to your head?");
-    ~chatnpc("<p,neutral>Oi was in the old 'aunted Forest to the south, diggin' a pit for moi old maaster, old Fenkenstrain, when would you believe it, someone chops me head off. Awful bad luck, weren't it?");
-    ~chatplayer("<p,neutral>Oh yes, dreadful bad luck.");
-    ~chatnpc("<p,neutral>So oi thinks to meself, I don't needs any 'ead to be gettin on with me gardenin', long as I got me hands and me spade.");
-    ~chatplayer("<p,neutral>Would you show me where the place was?");
-    ~chatnpc("<p,neutral>Well, oi s'pose oi've got 10 minutes to spare.");
-    %fenk_spoken_to_gardener = 1;
+    @fenk_gardener_head_path;
     return;
 }
 if ($choice = 2) {
-    ~chatplayer("<p,neutral>Can you tell me anything about Fenkenstrain?");
-    ~chatnpc("<p,neutral>Oi could tell you a few things about old Fenky, yeah.");
-    ~chatplayer("<p,neutral>Go on.");
-    ~chatnpc("<p,neutral>Once, this castle were full o' good folk - my friends. Fenky was just the castle doctor you know, to the Lord and the castle folk.");
-    ~chatnpc("<p,neutral>I don't know what happened to them all, but one by one they all disappeared. When they were gone a while, I went an dug graves for 'em, in the forest.");
-    ~chatnpc("<p,neutral>After a while there weren't no-one left, but the Lord, Fenkenstrain, and meself.");
-    ~chatnpc("<p,neutral>Old Fenky sent me into the Forest to dig 'im a pit. Never said what for. Then would you believe it, someone chops me head off.");
+    @fenk_gardener_lore;
+    return;
+}
+if ($choice = 3) {
+    @fenk_gardener_name;
     return;
 }
 ~chatplayer("<p,neutral>I must get back to work.");
 return;
+
+[label,fenk_gardener_head_path]
+~chatplayer("<p,neutral>What happened to your head?");
+~chatnpc("<p,neutral>Oi was in the old 'aunted Forest to the south, diggin' a pit for moi old maaster, old Fenkenstrain, when would you believe it, someone chops me head off. Awful bad luck, weren't it?");
+~chatplayer("<p,neutral>Oh yes, dreadful bad luck.");
+~chatnpc("<p,neutral>So oi thinks to meself, I don't needs any 'ead to be gettin on with me gardenin', long as I got me hands and me spade.");
+~chatplayer("<p,neutral>Would you show me where the place was?");
+// Already have head item — refuse follow.
+if (inv_total(inv, fenk_head_empty) > 0 | inv_total(inv, fenk_head_full) > 0) {
+    ~chatnpc("<p,neutral>No mate, you've found my head already, oi think.");
+    %fenk_spoken_to_gardener = 1;
+    return;
+}
+~chatnpc("<p,neutral>Well, oi s'pose oi've got 10 minutes to spare.");
+%fenk_spoken_to_gardener = 1;
+~fenk_start_gardener_follow;
+return;
+
+[label,fenk_gardener_lore]
+~chatplayer("<p,neutral>Can you tell me anything about Fenkenstrain?");
+~chatnpc("<p,neutral>Oi could tell you a few things about old Fenky, yeah.");
+~chatplayer("<p,neutral>Go on.");
+~chatnpc("<p,neutral>Once, this castle were full o' good folk - my friends. Fenky was just the castle doctor you know, to the Lord and the castle folk.");
+~chatnpc("<p,neutral>I don't know what happened to them all, but one by one they all disappeared. When they were gone a while, I went an dug graves for 'em, in the forest.");
+~chatnpc("<p,neutral>After a while there weren't no-one left, but the Lord, Fenkenstrain, and meself.");
+~chatnpc("<p,neutral>Old Fenky sent me into the Forest to dig 'im a pit. Never said what for. Then would you believe it, someone chops me head off.");
+return;
+
+[label,fenk_gardener_name]
+~chatplayer("<p,quiz>What's your name?");
+~chatnpc("<p,neutral>Me name? It's been a moivellous long while, mate, since I had any use for such a thing as a name.");
+~chatplayer("<p,neutral>Don't worry, I was just trying to make conversation.");
+~chatnpc("<p,neutral>No, no, I can't be havin' that - I'll remember in a minute-");
+~chatplayer("<p,neutral>Please, don't worry.");
+~chatnpc("<p,happy>Lestwit, that's it! Ed Lestwit!");
+return;
+
+[label,fenk_gardener_shed_key]
+~chatplayer("<p,quiz>Do you know where the key to the shed is?");
+if (inv_total(inv, fenk_shed_key) > 0) {
+    ~chatnpc("<p,neutral>You've already got the key, mate.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    ~chatnpc("<p,neutral>Got it right 'ere in my pocket - but your hands are full.");
+    return;
+}
+~chatnpc("<p,neutral>Got it right 'ere in my pocket. Here you go.");
+inv_add(inv, fenk_shed_key, 1);
+~objbox(fenk_shed_key, "The headless gardener hands you a rusty key.", 250, 0, 0);
+return;
+
+[label,fenk_gardener_mould_hint]
+~chatplayer("<p,quiz>Do you know where I can find a lightning conductor mould?");
+~chatnpc("<p,neutral>A conductive mould, you say? Let me see-");
+~chatnpc("<p,neutral>There used to be a bloke 'ere, sort of an 'andyman e was. Did everything round the place - fixed what was broke, swept the chimneys and the like. He would 'ave had a mould, I imagine.");
+~chatplayer("<p,quiz>Where is he now?");
+~chatnpc("<p,sad>E's dead, just like everyone else round 'ere ... 'cept for me.");
+return;
+
+// Directions while following (CANDIDATE Tip.it/RuneHQ).
+[label,fenk_gardener_following_talk]
+def_int $d = ~p_choice3("Which way to your grave?", 1, "What's your name?", 2, "I must get back to work.", 3);
+if ($d = 2) {
+    @fenk_gardener_name;
+    return;
+}
+if ($d = 3) {
+    ~chatplayer("<p,neutral>I must get back to work.");
+    return;
+}
+~chatplayer("<p,quiz>Which way to your grave?");
+// Rough direction toward CANDIDATE head grave 3608,3491 from castle.
+def_coord $grave = 0_56_54_24_35;
+def_int $dx = sub(coordx($grave), coordx(coord));
+def_int $dz = sub(coordz($grave), coordz(coord));
+if (abs($dx) > abs($dz)) {
+    if ($dx > 0) {
+        ~chatnpc("<p,neutral>Head east through the woods, mate - keep goin'.");
+    } else {
+        ~chatnpc("<p,neutral>West a bit more, then look for a wooden cross.");
+    }
+} else {
+    if ($dz > 0) {
+        ~chatnpc("<p,neutral>Further north, near the old wooden crosses.");
+    } else {
+        ~chatnpc("<p,neutral>South into the 'aunted woods - that's where they took me head.");
+    }
+}
+return;
+
+// --- follower start / stop ---
+[proc,fenk_start_gardener_follow]
+// Clear any prior owned follower first.
+~fenk_clear_gardener_follow;
+// Hide courtyard multi while following (bit 31).
+%fenk_gardener_directions = 1;
+def_coord $spawn = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+if ($spawn = null) {
+    $spawn = coord;
+}
+// Duration CANDIDATE 10 minutes; npc lifetime = follow window.
+npc_add($spawn, fenk_gardener, ^fenk_follow_ticks);
+%npc_attacking_uid = uid;
+%fenk_follower_uid = npc_uid;
+npc_setmode(playerfollow);
+npc_settimer(10);
+softtimer(fenk_follow_watch, 10);
+mes("The gardener ghost starts to follow you.");
+
+[proc,fenk_clear_gardener_follow]
+clearsofttimer(fenk_follow_watch);
+if (%fenk_follower_uid ! null) {
+    if (npc_finduid(%fenk_follower_uid) = true) {
+        // Only delete dynamic follower, not courtyard multi child if same type.
+        if (%npc_attacking_uid = uid) {
+            npc_del;
+        }
+    }
+}
+%fenk_follower_uid = null;
+// Restore courtyard gardener multi visibility.
+%fenk_gardener_directions = 0;
+
+[softtimer,fenk_follow_watch]
+if (%fenk_follower_uid = null) {
+    clearsofttimer(fenk_follow_watch);
+    return;
+}
+if (npc_finduid(%fenk_follower_uid) = false) {
+    ~fenk_clear_gardener_follow;
+    mes("The gardener ghost has stopped following you.");
+    return;
+}
+// Distance loss CANDIDATE leash.
+if (npc_range(coord) > ^fenk_follow_leash) {
+    mes("The gardener ghost loses you and stops following.");
+    ~fenk_clear_gardener_follow;
+    return;
+}
+// Level change / far tele: also catch plane mismatch.
+if (coordy(coord) ! coordy(npc_coord)) {
+    mes("The gardener ghost stops following you.");
+    ~fenk_clear_gardener_follow;
+    return;
+}
+
+// NPC-side timer: expire / owner lost.
+[ai_timer,fenk_gardener]
+if (%npc_attacking_uid = null) {
+    return;
+}
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (p_finduid(%npc_attacking_uid) = true) {
+    if (%fenk_follower_uid ! npc_uid) {
+        // Not the active follower session.
+        return;
+    }
+    if (npc_range(coord) > ^fenk_follow_leash) {
+        if (finduid(%npc_attacking_uid) = true) {
+            // player mes via finduid protected? Use npc_del; softtimer also cleans.
+        }
+        npc_del;
+        return;
+    }
+}
+
+// Logout / death hooks — join existing follower cleanup patterns without
+// editing death.rs2/logout.rs2 (out of exclusive scope). Softtimer ends on
+// logout naturally for temp state; directions bit restored on next talk start
+// via ~fenk_clear if uid missing. Explicit login restore of courtyard multi:
+[proc,fenk_on_player_cleanup]
+~fenk_clear_gardener_follow;

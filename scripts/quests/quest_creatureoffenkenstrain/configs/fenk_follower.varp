@@ -1,0 +1,5 @@
+// Temp follower session state (NONHISTORICAL representation).
+// Not a packed 377 quest bit — private ownership pointer for dynamic gardener.
+[fenk_follower_uid]
+type=npc_uid
+scope=temp

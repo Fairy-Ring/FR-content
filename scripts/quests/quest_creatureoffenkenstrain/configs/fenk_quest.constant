@@ -1,0 +1,18 @@
+// Creature of Fenkenstrain stage ladder (internal product state).
+// Multi table (VERIFIED unpack): keys 0-7 ground Dr + monster; key 3 corpse table;
+// key 8 tower Dr + Lord Rologarth. Intermediate values are NONHISTORICAL.
+// Complete threshold also in general/configs/quest.constant.
+^fenk_not_started = 0
+^fenk_hired = 1
+// Internal: body parts handed; awaiting needle/thread assembly.
+^fenk_need_sewing = 2
+// Multi corpse table visible.
+^fenk_assembled = 3
+// Internal: lightning done; tower key path.
+^fenk_lightning_done = 4
+// Complete — multi key 8.
+^fenk_complete = 8
+// CANDIDATE follower duration: 10 minutes × 100 ticks/min ≈ 1000 ticks.
+^fenk_follow_ticks = 1000
+// CANDIDATE leash distance (tiles); exact historical radius UNKNOWN.
+^fenk_follow_leash = 20

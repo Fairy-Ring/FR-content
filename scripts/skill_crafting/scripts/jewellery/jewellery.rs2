@@ -297,7 +297,8 @@ p_delay(2);
 [label,craft_silver]
 // 377 leftover inter_282 titled "Silver Casting" — name from cache text (274/289 used chat).
 // Do not hunt 289 for this IF name.
-if (inv_total(inv, holy_symbol_mould) = 0 & inv_total(inv, unholy_symbol_mould) = 0 & inv_total(inv, sickle_mould) = 0) {
+// Conductor mould (fenk_lightning_mould) is a CoF silver-casting join (t_d99d6bbc).
+if (inv_total(inv, holy_symbol_mould) = 0 & inv_total(inv, unholy_symbol_mould) = 0 & inv_total(inv, sickle_mould) = 0 & inv_total(inv, fenk_lightning_mould) = 0) {
     ~mesbox("You require a mould to make that.");
     return;
 }
@@ -322,11 +323,46 @@ if (inv_total(inv, sickle_mould) > 0 & map_members = ^true) {
     if_sethide(silver_casting:com_104, true);
     if_sethide(silver_casting:com_107, false);
 }
+// Lightning conductor rod — IF com_111 (have mould) / com_114 (need mould).
+if (inv_total(inv, fenk_lightning_mould) > 0 & map_members = ^true) {
+    if_sethide(silver_casting:com_111, false);
+    if_sethide(silver_casting:com_114, true);
+} else {
+    if_sethide(silver_casting:com_111, true);
+    if_sethide(silver_casting:com_114, false);
+}
 if_openmain(silver_casting);
 
 [if_button,silver_casting:com_92] @craft_silver_product(nostringstar);
 [if_button,silver_casting:com_99] @craft_silver_product(nostringsnake);
 [if_button,silver_casting:com_106] @craft_silver_product(silver_sickle);
+// Creature of Fenkenstrain conductor — CANDIDATE 50 Crafting XP (Transcript 534). Hardcoded path
+// (no crafting_jewelry_struct on fenk_conductor pack obj yet; root may pack param later).
+[if_button,silver_casting:com_113] @craft_fenk_conductor;
+
+[label,craft_fenk_conductor]
+if (inv_total(inv, fenk_lightning_mould) < 1) {
+    ~mesbox("You need a conductor mould to make that.");
+    return;
+}
+if (inv_total(inv, silver_bar) < 1) {
+    ~mesbox("You need a silver bar to make that.");
+    return;
+}
+// macro event
+if (afk_event = ^true) {
+    ~macro_event_general_spawn(~macro_event_set_random);
+    return;
+}
+anim(human_furnace, 0);
+sound_synth(furnace, 0, 0);
+if_close;
+p_delay(2);
+inv_del(inv, silver_bar, 1);
+inv_add(inv, fenk_conductor, 1);
+// 50 Crafting XP → tenths 500 (house: 1 XP = 10 units). CANDIDATE Transcript 534.
+stat_advance(crafting, 500);
+mes("You make a conductor.");
 
 [label,craft_silver_product](namedobj $product)
 

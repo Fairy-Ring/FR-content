@@ -1,0 +1,22 @@
+// Creature of Fenkenstrain — pickled brain table Take (Hair of the Dog).
+// Taking the jar is not free pickup; routes to Roavar specialty buy (50gp).
+// Telegrab remains the free alternate via magic telegrab on the ground obj.
+// Cite Transcript 236-262 · full-source-contract §3.3.
+
+[opobj3,fenk_brain]
+// Already own one — Roavar refuses freebie.
+if (inv_total(inv, fenk_brain) > 0 | inv_total(bank, fenk_brain) > 0) {
+    // Prefer talking to Roavar if present; else mes.
+    if (npc_find(coord, werewolfinnkeeper, 8, 0) = true) {
+        @roavar_brain_take;
+        return;
+    }
+    mes("You've already got a pickled brain.");
+    return;
+}
+// Find Roavar nearby for specialty dialogue.
+if (npc_find(coord, werewolfinnkeeper, 8, 0) = true) {
+    @roavar_brain_take;
+    return;
+}
+mes("You should speak to the bartender about that.");

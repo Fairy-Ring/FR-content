@@ -1,0 +1,98 @@
+// Creature of Fenkenstrain — shed/tower/cavern doors + experiment key drop.
+// Doors use unlock bits + open_and_close with open loc variants.
+// Experiment_1 death: cavern key once-per-need (if not owned).
+// Cite full-source-contract §3.4-3.7 · Transcript.
+
+// --- shed door ---
+[oploc1,fenk_shed_door]
+if (%fenk_unlocked_shed = 1) {
+    ~open_and_close_door(fenk_shed_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+if (inv_total(inv, fenk_shed_key) > 0) {
+    %fenk_unlocked_shed = 1;
+    mes("You unlock the shed door.");
+    ~open_and_close_door(fenk_shed_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+mes("The door is locked.");
+sound_synth(locked, 0, 0);
+
+[oplocu,fenk_shed_door]
+if (last_useitem = fenk_shed_key) {
+    %fenk_unlocked_shed = 1;
+    mes("You unlock the shed door.");
+    ~open_and_close_door(fenk_shed_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+~displaymessage(^dm_default);
+
+// --- tower door ---
+[oploc1,fenk_tower_door]
+if (%fenk_unlocked_tower = 1) {
+    ~open_and_close_door(fenk_tower_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+if (inv_total(inv, fenk_tower_key) > 0) {
+    %fenk_unlocked_tower = 1;
+    mes("You unlock the tower door.");
+    ~open_and_close_door(fenk_tower_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+mes("The door is locked.");
+sound_synth(locked, 0, 0);
+
+[oplocu,fenk_tower_door]
+if (last_useitem = fenk_tower_key) {
+    %fenk_unlocked_tower = 1;
+    mes("You unlock the tower door.");
+    ~open_and_close_door(fenk_tower_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+~displaymessage(^dm_default);
+
+// --- mausoleum / cavern gate ---
+[oploc1,fenk_mausoleum_door]
+if (%fenk_unlocked_cavern = 1) {
+    ~open_and_close_door(fenk_mausoleum_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+if (inv_total(inv, fenk_mausoleum_key) > 0) {
+    %fenk_unlocked_cavern = 1;
+    mes("You unlock the entrance.");
+    ~open_and_close_door(fenk_mausoleum_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+mes("The entrance is locked.");
+sound_synth(locked, 0, 0);
+
+[oplocu,fenk_mausoleum_door]
+if (last_useitem = fenk_mausoleum_key) {
+    %fenk_unlocked_cavern = 1;
+    mes("You unlock the entrance.");
+    ~open_and_close_door(fenk_mausoleum_door_open, ~check_axis(coord, loc_coord, loc_angle), false);
+    return;
+}
+~displaymessage(^dm_default);
+
+// --- experiment key drop (vislevel 51 combat VERIFIED unpack stats) ---
+[ai_queue3,fenk_experiment_1]
+gosub(npc_death);
+if (npc_findhero = ^true) {
+    // Drop bones always if death_drop null — add key when killer lacks one.
+    if (p_finduid(uid) = true) {
+        @fenk_experiment_key_drop;
+    } else {
+        queue(fenk_experiment_key_q, 0, 0);
+    }
+}
+
+[queue,fenk_experiment_key_q]
+@fenk_experiment_key_drop;
+
+[label,fenk_experiment_key_drop]
+// Once-per-need: if player already has key, no second key from this kill.
+if (inv_total(inv, fenk_mausoleum_key) > 0) {
+    return;
+}
+obj_add(npc_coord, fenk_mausoleum_key, 1, ^lootdrop_duration);

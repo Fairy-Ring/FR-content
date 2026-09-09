@@ -62,6 +62,10 @@
 // complete=2 preserves 0 unstarted / 1 started (Zealot). CANDIDATE 2 QP.
 ^hauntedmine_complete = 2
 ^hauntedmine_questpoints = 2
+// Creature of Fenkenstrain — multi key 8 complete (VERIFIED unpack multi table).
+// CANDIDATE 2 QP / 1000 Thieving XP (period rewards).
+^creatureoffenkenstrain_complete = 8
+^creatureoffenkenstrain_questpoints = 2
 ^deserttreasure_complete = 15
 ^priestperil_complete = 60
 ^death_complete = 80

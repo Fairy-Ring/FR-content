@@ -1,0 +1,57 @@
+// Creature of Fenkenstrain — memorial Search/Push/star Use + cavern/island return.
+// Easternmost coffin 3578,3527 CANDIDATE star target (guide map).
+// Push dest CANDIDATE: paired ladder band 3578,9927 (0_55_155_58_7) — exact
+// collision stand UNKNOWN; labeled candidate until live pair proof.
+// Island coffin 3505,3571 CANDIDATE return to east memorial surface.
+// Cite full-source-contract §2.2 · §3.4 · Transcript 185-196.
+
+[oploc2,fenk_coffin]
+// Search
+if (loc_coord = 0_55_55_58_7) {
+    // Easternmost memorial
+    if (%fenk_coffin = 1) {
+        mes("The star amulet is already fitted into the depression.");
+        return;
+    }
+    mes("You find a depression in the memorial stone in the shape of a six-pointed star.");
+    return;
+}
+mes("You find nothing remarkable about the memorial stone.");
+
+[oploc1,fenk_coffin]
+// Push
+p_arrivedelay;
+if (loc_coord = 0_55_55_58_7) {
+    if (%fenk_coffin = 0) {
+        mes("The coffin is incredibly heavy, and does not budge.");
+        return;
+    }
+    // CANDIDATE enter experiment cavern near ladder 3578,9927.
+    mes("You push the memorial aside and climb down into the darkness.");
+    p_telejump(0_55_155_58_8);
+    return;
+}
+if (loc_coord = 0_54_55_49_51) {
+    // Island exit memorial CANDIDATE return to east surface memorial.
+    mes("You push the memorial aside and climb back up.");
+    p_telejump(0_55_55_58_8);
+    return;
+}
+mes("The coffin is incredibly heavy, and does not budge.");
+
+[oplocu,fenk_coffin]
+if (last_useitem ! fenk_star_amulet) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (loc_coord ! 0_55_55_58_7) {
+    mes("Nothing interesting happens.");
+    return;
+}
+if (%fenk_coffin = 1) {
+    mes("The star amulet is already fitted into the depression.");
+    return;
+}
+inv_del(inv, fenk_star_amulet, 1);
+%fenk_coffin = 1;
+~objbox(fenk_star_amulet, "The star amulet fits exactly into the depression on the coffin lid.", 250, 0, 0);

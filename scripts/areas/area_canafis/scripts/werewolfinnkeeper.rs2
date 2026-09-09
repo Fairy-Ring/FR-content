@@ -1,6 +1,7 @@
 [opnpc1,werewolfinnkeeper]
 ~chatplayer("<p,happy>Hello there!");
 ~chatnpc("<p,happy>Greetings traveller. Welcome to 'The Hair Of The Dog' Tavern. What can I do you for?");
+// Creature of Fenkenstrain brain path is via table Take/opobj (not main menu).
 @multi4("Can I buy a beer?", roavar_beer, "Can I hear some gossip?", roavar_gossip, "Can I hear a story?", roavar_story, "Nothing thanks.", roavar_nothing);
 
 [label,roavar_beer]
@@ -138,3 +139,34 @@ switch_int(~p_choice4("Tell me about this village.", 1, "Tell me about the land 
 inv_del(inv, coins, 5);
 inv_add(inv, moonlight_mead, 1);
 ~chatnpc("<p,neutral>Here ya go pal. Enjoy!");
+
+// --- Creature of Fenkenstrain: pickled brain (table Take) ---
+// Transcript: taking the jar triggers Roavar specialty dialogue; 50 coins buy.
+// Telegrab alternate uses generic telegrab (no free Take). CoF exclusive join.
+[label,roavar_brain_take]
+if (inv_total(inv, fenk_brain) > 0 | inv_total(bank, fenk_brain) > 0) {
+    ~chatnpc("<p,neutral>You can leave that alone, my friend. I've already sold you one of your own - eat that. I can't afford to give away freebies in this business!");
+    return;
+}
+~chatnpc("<p,neutral>You're interested in our speciality, I see. Would you like to buy some?");
+~chatplayer("<p,quiz>What exactly is in the jar?");
+~chatnpc("<p,neutral>Pickled brain, my friend. Only 50 gold to you.");
+~chatplayer("<p,quiz>Err...pickled brain from what animal?");
+~chatnpc("<p,angry>Animal? Don't be disgusting, man! No, this is a human brain - only the best for my customers.");
+if (inv_total(inv, coins) < 50) {
+    ~chatplayer("<p,sad>That sounds very nice, but I'm afraid I don't have enough gold at the moment.");
+    return;
+}
+def_int $buy = ~p_choice2("I'll buy one.", 1, "I'm not hungry.", 2);
+if ($buy = 2) {
+    ~chatplayer("<p,neutral>I'm afraid I'm not really hungry at the moment.");
+    return;
+}
+~chatplayer("<p,neutral>I'll buy one, please.");
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_del(inv, coins, 50);
+inv_add(inv, fenk_brain, 1);
+~chatnpc("<p,happy>A very wise choice, <text_gender("sir", "miss")>. Don't eat it all at once, savour every morsel - that's my advice to you.");

@@ -1,0 +1,173 @@
+// Creature of Fenkenstrain — shed cupboard/canes/brush Craft 20 + fireplace mould
+// + conductor repair. Cite full-source-contract §3.6 · Transcript 437-547.
+
+// Cupboard open → open model
+[oploc1,fenk_broomcupboard]
+p_arrivedelay;
+loc_change(fenk_broomcupboard_open, 500);
+
+[oploc3,fenk_broomcupboard_open]
+p_arrivedelay;
+loc_change(fenk_broomcupboard, 500);
+
+[oploc2,fenk_broomcupboard_open]
+// Search
+if (inv_total(inv, fenk_brush0) > 0 | inv_total(inv, fenk_brush1) > 0 | inv_total(inv, fenk_brush2) > 0 | inv_total(inv, fenk_brush3) > 0) {
+    mes("You search the cupboard but find nothing.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, fenk_brush0, 1);
+~objbox(fenk_brush0, "You find a garden brush in the cupboard.", 250, 0, 0);
+
+// Cane pile
+[oploc1,fenk_canepile]
+p_arrivedelay;
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, fenk_cane, 1);
+mes("You take a garden cane from the pile.");
+
+// Brush + cane + bronze wire — three extensions, one cane + one wire each.
+[opheldu,fenk_brush0]
+if (last_useitem = fenk_cane) {
+    @fenk_extend_brush(fenk_brush0, fenk_brush1);
+    return;
+}
+if (last_useitem = bronzecraftwire) {
+    ~mesbox("You need a garden cane as well to extend the brush.");
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,fenk_brush1]
+if (last_useitem = fenk_cane) {
+    @fenk_extend_brush(fenk_brush1, fenk_brush2);
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,fenk_brush2]
+if (last_useitem = fenk_cane) {
+    @fenk_extend_brush(fenk_brush2, fenk_brush3);
+    return;
+}
+~displaymessage(^dm_default);
+
+[opheldu,fenk_cane]
+if (last_useitem = fenk_brush0) {
+    @fenk_extend_brush(fenk_brush0, fenk_brush1);
+    return;
+}
+if (last_useitem = fenk_brush1) {
+    @fenk_extend_brush(fenk_brush1, fenk_brush2);
+    return;
+}
+if (last_useitem = fenk_brush2) {
+    @fenk_extend_brush(fenk_brush2, fenk_brush3);
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,fenk_extend_brush](namedobj $from, namedobj $to)
+if (stat(crafting) < 20) {
+    mes("You need Crafting level 20 to extend the brush.");
+    return;
+}
+if (inv_total(inv, bronzecraftwire) < 1) {
+    ~mesbox("You try to attach the canes, but you need something suitable to hold them together.");
+    return;
+}
+if (inv_total(inv, fenk_cane) < 1 | inv_total(inv, $from) < 1) {
+    return;
+}
+inv_del(inv, $from, 1);
+inv_del(inv, fenk_cane, 1);
+inv_del(inv, bronzecraftwire, 1);
+inv_add(inv, $to, 1);
+mes("You attach a cane to the brush with bronze wire.");
+return;
+
+// Fireplace — centre only yields mould (west L1 3544,3555 CANDIDATE).
+[oplocu,fenk_fireplace]
+if (last_useitem ! fenk_brush3 & last_useitem ! fenk_brush2 & last_useitem ! fenk_brush1 & last_useitem ! fenk_brush0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem ! fenk_brush3) {
+    mes("The brush isn't long enough to reach up the chimney.");
+    return;
+}
+// Correct fireplace: L1 west centre 3544,3555
+if (loc_coord ! 1_55_55_24_35) {
+    mes("You sweep around but find nothing.");
+    return;
+}
+if (inv_total(inv, fenk_lightning_mould) > 0) {
+    mes("You already have a conductor mould.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+// Anim poke short/long CANDIDATE
+anim(fenk_human_poke, 0);
+p_delay(2);
+inv_add(inv, fenk_lightning_mould, 1);
+~objbox(fenk_lightning_mould, "A lightning conductor mould falls down out of the chimney.", 250, 0, 0);
+
+// Wrong surrounds — refuse
+[oplocu,fenk_fireplace_right]
+if (last_useitem = fenk_brush3 | last_useitem = fenk_brush2 | last_useitem = fenk_brush1 | last_useitem = fenk_brush0) {
+    mes("This is just the fireplace surround - try the fireplace itself.");
+    return;
+}
+~displaymessage(^dm_default);
+
+[oplocu,fenk_fireplace_left]
+if (last_useitem = fenk_brush3 | last_useitem = fenk_brush2 | last_useitem = fenk_brush1 | last_useitem = fenk_brush0) {
+    mes("This is just the fireplace surround - try the fireplace itself.");
+    return;
+}
+~displaymessage(^dm_default);
+
+// Conductor repair on roof
+[oploc1,fenk_conductor_broken]
+@fenk_repair_conductor;
+
+[oplocu,fenk_conductor_broken]
+if (last_useitem = fenk_conductor | last_useitem = hammer) {
+    @fenk_repair_conductor;
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,fenk_repair_conductor]
+if (%fenk_conductor_repaired = 1) {
+    mes("The lightning conductor is now beyond repair.");
+    return;
+}
+if (inv_total(inv, fenk_conductor) < 1) {
+    mes("You need a silver lightning conductor to repair this.");
+    return;
+}
+if (inv_total(inv, hammer) < 1) {
+    mes("You need a hammer to repair the lightning conductor.");
+    return;
+}
+inv_del(inv, fenk_conductor, 1);
+%fenk_conductor_repaired = 1;
+if (%fenk_quest < ^fenk_lightning_done & %fenk_quest >= ^fenk_assembled) {
+    %fenk_quest = ^fenk_lightning_done;
+    ~update_questlist;
+}
+// Visual: change to repaired anim loc temporarily / permanently CANDIDATE
+loc_change(fenk_conductor_repaired, 100);
+~mesbox("You repair the lightning conductor not one moment too soon - a tremendous bolt of lightning melts the new lightning conductor, and power blazes throughout the castle, if only briefly.");
+return;

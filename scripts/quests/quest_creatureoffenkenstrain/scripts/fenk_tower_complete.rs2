@@ -1,0 +1,171 @@
+// Creature of Fenkenstrain — creature talk, pickpocket once, complete, journal,
+// optional clock letter. Cite Transcript 569-630 · full-source-contract §3.7.
+
+// Monster talk (do not kill)
+[opnpc1,fenk_creature_model]
+if (%fenk_quest >= ^fenk_complete) {
+    return;
+}
+if (%fenk_counter >= 1) {
+    // Second talk — ring advice
+    ~chatplayer("<p,quiz>Do you know how I can stop Fenkenstrain's experiments?");
+    ~chatnpc("<p,neutral>Take the Ring of Charos from him.");
+    ~chatplayer("<p,quiz>What is this ring?");
+    ~chatnpc("<p,neutral>It was my birthright, passed down to me through the ages, its origin forgotten.");
+    ~chatnpc("<p,neutral>The Ring of Charos has many powers, but Fenkenstrain has bent them to his own evil purposes. Without the power of the ring, he will not be able to raise the dead from their sleep.");
+    ~chatnpc("<p,neutral>It has one other, extremely important use - it confuses the werewolves' senses, making them believe that they smell one of their own kind. Without the ring, Fenkenstrain will be at their mercy.");
+    return;
+}
+~chatplayer("<p,angry>I am commanded to destroy you, creature!");
+~chatnpc("<p,drunk>Oh that's *hic* not very *hic* nice ...");
+~chatplayer("<p,quiz>Are you feeling okay?");
+~chatnpc("<p,drunk>Abso *hic* lutely. Never *buuurrp* better.");
+~chatplayer("<p,neutral>You don't look very dangerous.");
+~chatnpc("<p,drunk>How *hic* do I look?");
+~chatplayer("<p,neutral>You really don't know, do you? Have a look for yourself.");
+~mesbox("The creature stumbles over towards the mirror, focuses upon his reflection and...");
+~chatnpc("<p,shock>AAAAARRGGGGHHHH!");
+~mesbox("The creature becomes instantly sober, horror all too evident in his undead eyes.");
+~chatplayer("<p,sad>I'm sorry. I suppose I'm partly to blame for this.");
+~chatnpc("<p,angry>No - it was him I wager - Fenkenstrain - wasn't it? He's brought me back to life!");
+~chatplayer("<p,quiz>Who are - were - you?");
+~chatnpc("<p,neutral>I was Rologarth, Lord of the North Coast - this castle was once mine. Fenkenstrain was the castle doctor.");
+~chatplayer("<p,quiz>So the castle wasn't really abandoned when he found it?");
+~chatnpc("<p,sad>Is that what he told you? No, no, this castle was once full of people and life. Fenkenstrain advised me to sell them to the vampyres, which - I am sad to say - I did.");
+~chatplayer("<p,neutral>I found your brain in a jar in Canifis, so he must have sold you too.");
+~chatnpc("<p,sad>Of that I will not speak. There lie memories that should rest with the dead, the living unable to bear them.");
+~chatplayer("<p,neutral>That's it - I'm leaving this dreadful place, whether I get paid or not. Is there anything I can do for you before I leave?");
+~chatnpc("<p,neutral>Only one - please stop Fenkenstrain from carrying on his experiments, once and for all, so that no other poor soul has to endure suffering such as that of my people and I.");
+// Internal flag: creature identity known (NONHISTORICAL counter bit use).
+%fenk_counter = 1;
+return;
+
+// Lord Rologarth post-complete
+[opnpc1,fenk_creature_model_2]
+~chatnpc("<p,happy>How goes it, friend?");
+~chatplayer("<p,neutral>I stole the Ring of Charos from Fenkenstrain.");
+~chatnpc("<p,neutral>I saw him climb up into the Tower to hide it. It doesn't matter - soon the werewolves will come for him, and his experiments will be forever ceased.");
+~chatplayer("<p,quiz>Do you want the ring back? It is yours after all.");
+~chatnpc("<p,neutral>No, you keep it, my friend. Werewolves hunger for the scent of live flesh - I have no need for the ring. I have my castle back, if not my soul.");
+return;
+
+// Pickpocket Dr — Thieving 25.
+// First success: ring + complete (2 QP / 1000 Thieving once).
+// Post-complete lost-ring recovery: Tip.it 16 Jun 2006 Majin_Numark
+// (CANDIDATE, receipts/charos-recovery-20060616.json) — re-pickpocket on tower
+// floor; previously (u) stays (u). No repeat XP/QP. Duplicate guard covers
+// ring_of_charos and ring_of_charos_unlocked in inv/worn/bank.
+[opnpc3,fenk_fenkenstrain_model]
+if (~fenk_has_charos_any = true) {
+    ~fenk_note_charos_unlocked;
+    mes("I doubt he's got much of value on him.");
+    return;
+}
+if (stat(thieving) < 25) {
+    mes("You need Thieving level 25 to pickpocket Dr Fenkenstrain.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space for the ring.");
+    return;
+}
+// Post-complete recovery — item only, no completion side effects.
+if (%fenk_quest >= ^fenk_complete) {
+    anim(human_pickpocket, 0);
+    p_delay(1);
+    ~fenk_give_charos_recovery;
+    mes("You steal the Ring of Charos from Fenkenstrain.");
+    return;
+}
+// Pre-complete gate: lightning done + creature dialogue.
+if (%fenk_quest < ^fenk_lightning_done | %fenk_counter < 1) {
+    mes("I doubt he's got much of value on him.");
+    return;
+}
+anim(human_pickpocket, 0);
+p_delay(1);
+inv_add(inv, ring_of_charos, 1);
+mes("You steal the Ring of Charos from Fenkenstrain.");
+queue(fenk_quest_complete, 0, 0);
+
+// True if player holds base or unlocked Charos in inv, worn, or bank.
+[proc,fenk_has_charos_any]()(boolean)
+if (inv_total(inv, ring_of_charos) > 0 | inv_total(worn, ring_of_charos) > 0 | inv_total(bank, ring_of_charos) > 0) {
+    return (true);
+}
+if (inv_total(inv, ring_of_charos_unlocked) > 0 | inv_total(worn, ring_of_charos_unlocked) > 0 | inv_total(bank, ring_of_charos_unlocked) > 0) {
+    return (true);
+}
+return (false);
+
+// Post-complete recovery yield.
+// Tip.it CANDIDATE: if previously unlocked, recover unlocked.
+// Durable memory: %fenk_digresult = 7 (NONHISTORICAL, spare digresult values 0-7).
+// Garden unlock content should set this when converting base→(u). CoF also sets it
+// whenever the player is observed holding unlocked (so drop/death can still recover (u)).
+// Without memory, recover base ring (first-complete form).
+[proc,fenk_give_charos_recovery]
+if (%fenk_digresult = 7) {
+    inv_add(inv, ring_of_charos_unlocked, 1);
+} else {
+    inv_add(inv, ring_of_charos, 1);
+}
+
+// Call when unlocked is present so recovery after later loss yields (u).
+[proc,fenk_note_charos_unlocked]
+if (inv_total(inv, ring_of_charos_unlocked) > 0 | inv_total(worn, ring_of_charos_unlocked) > 0 | inv_total(bank, ring_of_charos_unlocked) > 0) {
+    %fenk_digresult = 7;
+}
+
+[queue,fenk_quest_complete]
+if (%fenk_quest >= ^fenk_complete) {
+    return;
+}
+%fenk_quest = ^fenk_complete;
+// 1000 Thieving XP → tenths 10000 (house: 1 XP = 10 units).
+stat_advance(thieving, 10000);
+session_log(^log_adventure, "Quest complete: Creature of Fenkenstrain");
+~send_quest_complete(questlist:creatureoffenkenstrain, ring_of_charos, 250, ^creatureoffenkenstrain_questpoints, "You have completed the\\nCreature of Fenkenstrain!", "2 Quest Points|1000 Thieving XP|Ring of Charos");
+~update_questlist;
+
+// Optional clock → letter
+[oploc1,fenk_clock]
+p_arrivedelay;
+if (%fenk_wound_clock = 1) {
+    mes("You have already wound the clock.");
+    return;
+}
+%fenk_wound_clock = 1;
+if (inv_freespace(inv) = 0) {
+    mes("You wind the clock. A letter falls out but you have no inventory space.");
+    return;
+}
+inv_add(inv, fenk_letter, 1);
+mes("You wind the clock and a letter falls out.");
+
+[opheld1,fenk_letter]
+~mesbox("The letter is hastily written and hard to make out.|It speaks of experiments and a ring of great power.|(Optional lore — not required for quest completion.)");
+
+// Questlist journal button
+[if_button,questlist:creatureoffenkenstrain]
+if (%fenk_quest >= ^fenk_complete) {
+    ~mesbox("You have completed Creature of Fenkenstrain.|You stole the Ring of Charos and ended Fenkenstrain's experiments.");
+    return;
+}
+if (%fenk_quest >= ^fenk_lightning_done) {
+    ~mesbox("I repaired the lightning conductor. The creature is in the tower.|I should speak with it, then deal with Fenkenstrain.");
+    return;
+}
+if (%fenk_quest >= ^fenk_assembled) {
+    ~mesbox("The body is assembled. I need to repair the lightning conductor with a silver conductor.");
+    return;
+}
+if (%fenk_quest >= ^fenk_need_sewing) {
+    ~mesbox("Dr Fenkenstrain needs a needle and 5 lots of thread to sew the body.");
+    return;
+}
+if (%fenk_quest >= ^fenk_hired) {
+    ~mesbox("I work for Dr Fenkenstrain. I must gather body parts - head, torso, arms and legs.");
+    return;
+}
+~mesbox("I can start Creature of Fenkenstrain by reading the signpost in Canifis|and applying for the job with Dr Fenkenstrain at the castle to the north-east.");
