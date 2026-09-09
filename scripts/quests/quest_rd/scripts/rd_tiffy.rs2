@@ -2,7 +2,8 @@
 // CANDIDATE last-resort 2007-base: OSRS Transcript:Recruitment Drive minus later Changes
 // (Wanted! / Proselyte / post-2006 rank QoL). Official Update:Recruitment Drive 27 Jun 2005
 // names Amik; cache start surface is Tiffy @ 2997,3373. Hunt 289? no.
-// This slice: Talk-to + refuse + accept start bits + instance enter. No puzzles.
+// Ownership: Amik writes main 0→1 + gender once; Tiffy owns testing intro/accept
+// (temp spoke + permanent internal %rd_tiffy_introduced). No puzzles here.
 
 [opnpc1,rd_teleporter_guy]
 if (%rd_main >= ^recruitmentdrive_complete) {
@@ -11,12 +12,17 @@ if (%rd_main >= ^recruitmentdrive_complete) {
     // Five trials done; finish dialogue + single-award (also if root wired finish).
     @rd_tiffy_finish;
 } else if (%rd_main > 0) {
+    // Durable intro vs retry via permanent introduced (not temp spoke alone).
+    if (%rd_tiffy_introduced = 0) {
+        @rd_tiffy_first_intro;
+    }
     @rd_tiffy_in_progress;
 }
-@rd_tiffy_start;
+// main == 0: park even if BKF+Druid complete — Amik referral is required first.
+@rd_tiffy_park_chat;
 
-[label,rd_tiffy_start]
-// Era deps: BKF + Druidic Ritual (wave3 / 2007-base reqs). Soft smoke may pre-set these.
+[label,rd_tiffy_first_intro]
+// First testing introduction after Amik start. Deps still enforced before testing.
 if (%spy < ^blackknight_complete | %druidquest < ^druid_complete) {
     @rd_tiffy_park_chat;
 }
@@ -32,7 +38,7 @@ if (%spy < ^blackknight_complete | %druidquest < ^druid_complete) {
 return;
 
 [label,rd_tiffy_testing_intro]
-// Tiffy-first CANDIDATE: treat dep-complete as Amik-sent (Amik RD branch is a later unit).
+// First intro after Amik put the player forward (main=1, introduced=0).
 ~chatplayer("<p,quiz>Sir Amik Varze sent me to meet you here for some sort of testing...?");
 ~chatnpc("<p,happy>Ah, <displayname>! Amik told me all about you, dontchaknow!|Spiffing job you did with the old Black Knights there, absolutely first class.");
 ~chatplayer("<p,confused>...thanks, I think.");
@@ -98,11 +104,9 @@ if ($choice = 1) {
 
 [label,rd_tiffy_accept]
 ~chatplayer("<p,happy>Yeah, this sounds right up my street. Let's go!");
+// Testing accept only: temp spoke + durable introduced. main/gender already set at Amik.
 %rd_spoke_to_tiffy = 1;
-%rd_main = 1;
-// Voucher provenance: male at start of testing (pre-2022 gender rule).
-~rd_rewards_capture_start_gender;
-~rd_rewards_update_progress;
+%rd_tiffy_introduced = 1;
 ~chatnpc("<p,happy>Jolly good show! Now, the training grounds location is a secret so...");
 ~rd_tiffy_go;
 return;
