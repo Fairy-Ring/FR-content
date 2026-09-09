@@ -267,10 +267,15 @@ return(true);
 return;
 
 // Defense in depth once the player is inside the private region.
+// Also the single music-select site for the run: private dynamic coords have no
+// musicregion mapsquare row, so mapzone never fires. Use template square 0_38_77
+// via music_playbycoord (unlock + auto/manual). Not in rd_room_begin — avoid
+// restarting on every portal advance. Park return uses ordinary mapzone 0_46_52.
 [proc,rd_route_rebind_uid_from_player]
 if (region_findbycoord(coord()) = true) {
     %rd_route_uid = region_uid();
 }
+~music_playbycoord(0_38_77_0_0);
 return;
 
 // True only for the current physical trial in this player's bound instance.
@@ -301,7 +306,8 @@ return;
 // --- reset / select / begin / mark / advance ---
 
 // Clear route cursor/slots; all physical room completes; trial temps/queues;
-// trial inv items. Do NOT clear %rd_main / %rd_spoke_to_tiffy / %rd_male_at_start / falador_spawn.
+// trial inv items. Do NOT clear %rd_main / %rd_spoke_to_tiffy / %rd_male_at_start /
+// %rd_tiffy_introduced / falador_spawn.
 // Despawn first while %rd_route_uid still identifies the prior instance — clearing
 // uid before despawn made mainland reset unable to find instance NPCs.
 [proc,rd_run_reset]

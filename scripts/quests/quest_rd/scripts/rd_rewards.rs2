@@ -74,7 +74,8 @@ session_log(^log_adventure, "Quest complete: Recruitment Drive");
 ~send_quest_complete(questlist:rd, basic_tk_helm, 250, ^recruitmentdrive_questpoints, "You have completed the\\nRecruitment Drive Quest!", "1,000.5 Prayer XP|1,000.5 Herblore XP|1,000.5 Agility XP|3,000 Coins|Initiate helm|Gaze of Saradomin");
 return(true);
 
-// Capture start-gender for voucher provenance. Call once at accept.
+// Capture start-gender for voucher provenance. Call once at Amik quest start
+// (main 0→1). Never from Tiffy accept, combat, or re-talk.
 [proc,rd_rewards_capture_start_gender]
 if (gender = ^gender_male) {
     %rd_male_at_start = 1;

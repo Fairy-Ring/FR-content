@@ -29,6 +29,9 @@ if (region_uid() ! $expected_uid) {
 }
 return(true);
 
+// Fail is only reached from ~rd_hynn_prompt after state=1 bind (enter stores
+// %rd_hynn_uid including valid engine UID 0). Match Tinley: always recheck
+// same_instance after the fail chat; never treat uid 0 as unbound skip.
 [proc,rd_hynn_fail]
 def_int $uid = %rd_hynn_uid;
 %rd_hynn_state = 0;
@@ -37,10 +40,8 @@ def_int $uid = %rd_hynn_uid;
 %rd_room7_complete = 0;
 // Failure ends the assessment through the shared reset and park path.
 ~chatnpc_specific("Ms. Hynn Terprett", rd_observer_room_7, "<p,sad>No... I am very sorry. Apparently you are not up to the challenge. I will return you where you came from, better luck in the future.");
-if ($uid ! 0) {
-    if (~rd_hynn_same_instance($uid) = false) {
-        return;
-    }
+if (~rd_hynn_same_instance($uid) = false) {
+    return;
 }
 ~rd_run_fail;
 return;

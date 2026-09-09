@@ -77,8 +77,8 @@ if (%spy = 1) {
 ~chatplayer("<p,happy>Hello Sir Amik.");
 ~chatnpc("<p,happy>Hello, friend!");
 
-// Recruitment Drive pointer: preserve the BKF postquest greeting and do not
-// write RD state here. Tiffy's existing start writer remains authoritative.
+// Recruitment Drive start: Amik owns main 0→1 + gender capture + progress once.
+// Tiffy owns testing intro/accept (spoke + permanent introduced). BKF spy 0–3 untouched.
 if (%rd_main >= ^recruitmentdrive_complete) {
     return;
 } else if (%rd_main > 0) {
@@ -94,6 +94,10 @@ if (%rd_main >= ^recruitmentdrive_complete) {
 def_int $choice = ~p_choice2("Sure thing Sir Amik, sign me up!", 1, "No thanks, that doesn't sound like the kind of thing that would interest me...", 2);
 if ($choice = 1) {
     ~chatplayer("<p,happy>Sure thing Sir Amik, sign me up!");
+    // Quest start once (this label only when main was 0). Spoke/introduced/assessment stay 0.
+    %rd_main = 1;
+    ~rd_rewards_capture_start_gender;
+    ~rd_rewards_update_progress;
     ~chatnpc("<p,confused>Erm, well, this is a little embarrassing, I already HAVE put you forward as a potential member.");
     ~chatnpc("<p,neutral>They are called the Temple Knights, and you are to meet Sir Tiffy Cashien in Falador park for testing immediately.");
 } else {
