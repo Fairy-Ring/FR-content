@@ -31,6 +31,13 @@ TMP_DIR="${ENGINE_DIR}/.tmp"
 mkdir -p "${TMP_DIR}"
 
 if [[ "${HM_SALVE_SKIP_COMPILE:-}" != "1" ]]; then
+  # CompileServerScript also scans ../content/scripts independently of BUILD_SRC_DIR.
+  # Fail visibly instead of compiling a different worktree or relying on hidden setup.
+  if [[ ! -d "${ENGINE_DIR}/../content/scripts" ]] ||
+     [[ "$(cd "${ENGINE_DIR}/../content/scripts" && pwd -P)" != "$(cd "${CONTENT_DIR}/scripts" && pwd -P)" ]]; then
+    echo "error: compiler sibling ../content/scripts must resolve to ${CONTENT_DIR}/scripts; arrange the isolated engine/content layout before compiling" >&2
+    exit 2
+  fi
   echo "compile: cwd=${ENGINE_DIR} BUILD_SRC_DIR=${CONTENT_DIR}"
   (
     cd "${ENGINE_DIR}"

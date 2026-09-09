@@ -517,6 +517,60 @@ function main(): void {
     assert('pvp dagger spec finished', pvpDagger.ok, pvpDagger.error ?? '');
     assert('pvp dagger spec did not poison com_maxhit', varp(player, 'com_maxhit') === 18, `v=${varp(player, 'com_maxhit')}`);
 
+    // Compare actual queued PvP damage, not merely script termination/cache state.
+    const pvpDamageScript = ScriptProvider.getByName('[queue,pvp_damage]');
+    if (!pvpDamageScript) throw new Error('missing pvp_damage queue');
+    for (const salveWorn of [false, true]) {
+        for (const [label, expected] of [
+            ['[label,pvp_melee_attack]', [18]],
+            ['[label,pvp_dragon_dagger_sa]', [20, 20]]
+        ] as Array<[string, number[]]>) {
+            const attacker = makePlayer();
+            const defender = makePlayer();
+            defender.uid = 2;
+            defender.username = 'salve_damage_control';
+            wear(attacker, WEARPOS_RHAND, 'dragon_dagger');
+            wear(attacker, WEARPOS_FRONT, salveWorn ? 'crystalshard_necklace' : null);
+            const prepared = runNamed('[proc,player_combat_stat]', attacker, null);
+            assert(`PvP fixture cache initialized ${label} salve=${salveWorn}`, prepared.ok, prepared.error ?? '');
+            varp(attacker, 'com_maxhit', 18);
+            varp(attacker, 'com_stabattack', 600);
+            varp(attacker, 'sa_energy', 1000);
+            varp(attacker, 'action_delay', 0);
+            const result = runNamed(label, attacker, null, [], defender);
+            const requests = [...defender.queue.all()].filter(q => q.script.id === pvpDamageScript.id);
+            const damages = requests.map(q => Number(q.args[0]));
+            assert(`PvP damage ${label} salve=${salveWorn}`, result.ok && JSON.stringify(damages) === JSON.stringify(expected), `damage=${JSON.stringify(damages)} error=${result.error ?? ''}`);
+            assert(`PvP caches ${label} salve=${salveWorn}`, varp(attacker, 'com_maxhit') === 18 && varp(attacker, 'com_stabattack') === 600);
+        }
+    }
+
+    // Exercise the actual special labels at accuracy thresholds that distinguish
+    // an unscaled miss from a Salve hit (fixed RNG is diagnostic only).
+    for (const [label, weapon, defence, expected] of [
+        ['[label,pvm_dragon_dagger_sa]', 'dragon_dagger', 2, [24, 24]],
+        ['[label,pvm_dragon_longsword_sa]', 'dragon_longsword', 1, [26]],
+        ['[label,pvm_dragon_mace_sa]', 'dragon_mace', 3, [31]],
+        ['[label,pvm_abyssal_whip_sa]', 'abyssal_whip', 3, [21]],
+        ['[label,pvm_rune_claws_sa]', 'rune_claws', 1, [23]]
+    ] as Array<[string, string, number, number[]]>) {
+        for (const salveWorn of [false, true]) {
+            const attacker = makePlayer();
+            const target = makeNpc('hauntedmine_boss_ghost');
+            target.levels[NpcStat.DEFENCE] = defence;
+            target.baseLevels[NpcStat.DEFENCE] = defence;
+            wear(attacker, WEARPOS_RHAND, weapon);
+            wear(attacker, WEARPOS_FRONT, salveWorn ? 'crystalshard_necklace' : null);
+            varp(attacker, 'sa_energy', 1000);
+            const defenceRoll = runNamed('[proc,npc_defence_roll_specific]', attacker, target, [weapon === 'dragon_mace' ? CRUSH : SLASH]);
+            assert(`special fixture defence ${weapon} salve=${salveWorn}`, defenceRoll.ok && defenceRoll.value === (defence + 9) * 69, `roll=${defenceRoll.value}`);
+            const result = runNamed(label, attacker, target);
+            const damages = queuedDamage(target);
+            const want = salveWorn ? expected : expected.map(() => 0);
+            assert(`special accuracy boundary ${weapon} salve=${salveWorn}`, result.ok && JSON.stringify(damages) === JSON.stringify(want), `damage=${JSON.stringify(damages)} error=${result.error ?? ''}`);
+        }
+    }
+
     const whipKurask = makeNpc('slayer_kursk_1');
     wear(player, WEARPOS_RHAND, 'abyssal_whip');
     varp(player, 'com_maxhit', 18);
