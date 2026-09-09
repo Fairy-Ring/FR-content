@@ -1,9 +1,9 @@
 [label,pvm_rune_claws_sa]
 ~set_sa_vars(oc_param(inv_getobj(worn, ^wearpos_rhand), sa_energy));
 def_int $damage = 0;
-def_int $maxhit = scale(110, 100, %com_maxhit);
+def_int $maxhit = scale(110, 100, ~player_npc_salve_scale(%com_maxhit));
 def_int $damage_capped = 0;
-if (~player_npc_hit_roll(%damagetype) = true) {
+if (~player_npc_melee_hit_roll(%damagetype) = true) {
     if (npc_type = count_draynor & inv_total(inv, garlic) > 0) {
         $maxhit = add($maxhit, 1);
     }
