@@ -669,15 +669,23 @@ switch_coord (loc_coord) {
     case default : @unhandled_stairs(loc_coord);
 }
 
+// Haunted Mine main stairs 4919 <-> 4923 (M1 traversal unit).
+// Locs: surface 3452,3243 (3x4 angle2 forceapproach north); inside 2790,4589 (4x3 angle2).
+// Chosen landings CANDIDATE from root engine-footprint-root.json:
+//   down -> 2792,4592 (centre of 2791..2793,4592); up -> 3454,3242.
+// Pair route CANDIDATE; static collision VERIFIED. No quest-state write.
+// Other HM stairs (dark/light) stay stubbed this unit.
 [oploc1,hauntedmine_main_entrance]
-// arrive delay?
+p_arrivedelay;
 switch_coord (loc_coord) {
+    case 0_53_50_60_43 : p_telejump(0_43_71_40_48); // Walk-down -> 2792,4592
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,hauntedmine_main_entrance_inside]
-// arrive delay?
+p_arrivedelay;
 switch_coord (loc_coord) {
+    case 0_43_71_38_45 : p_telejump(0_53_50_62_42); // Walk-up -> 3454,3242
     case default : @unhandled_stairs(loc_coord);
 }
 

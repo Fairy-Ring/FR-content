@@ -1,0 +1,95 @@
+// Haunted Mine M1 entrance traversal unit (r377).
+// Config unit (keep together; packed ops/IDs/models/forceapproach unchanged):
+//   surface 4913–4919, inside 4920–4923, ridge cart 4918;
+//   main stairs handlers live in stairs.rs2 (this file does not own them);
+//   deferred: ladders 4965–4970, dark/light stairs 4971–4973, fungus/cart/panel,
+//   lift/valve, NPC/boss/puzzle/reward.
+// Pair routes/offsets: CANDIDATE (names + map geometry + era-adjusted sequence).
+// Static adjacent landings were checked against the packed map collision.
+// No %hauntedmine / %hauntedmine_bits writes. No fabricated quest gates.
+
+// --- 4913 secondary entrance <-> 4920 inside ---
+// Surface loc 3440,3232; inside loc 3437,9637.
+// Chosen landings: surface 3439,3232; inside 3436,9637 (CANDIDATE offset).
+
+[oploc1,hauntedmine_secondary_entrance]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_53_50_48_32 : p_telejump(0_53_150_44_37); // Crawl down -> 3436,9637
+    case default :
+        mes("Unhandled Haunted Mine entrance:");
+        mes(~coord_tostring(loc_coord));
+}
+
+[oploc1,hauntedmine_secondary_entrance_inside]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_53_150_45_37 : p_telejump(0_53_50_47_32); // Crawl through -> 3439,3232
+    case default :
+        mes("Unhandled Haunted Mine entrance:");
+        mes(~coord_tostring(loc_coord));
+}
+
+// --- 4914 back entrance 1 <-> 4921 inside ---
+// Surface loc 3430,3233; inside loc 3404,9631.
+// Chosen landings: surface 3429,3233; inside 3405,9631.
+
+[oploc1,hauntedmine_back_entrance1]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_53_50_38_33 : p_telejump(0_53_150_13_31); // Crawl down -> 3405,9631
+    case default :
+        mes("Unhandled Haunted Mine entrance:");
+        mes(~coord_tostring(loc_coord));
+}
+
+[oploc1,hauntedmine_back_entrance1_inside]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_53_150_12_31 : p_telejump(0_53_50_37_33); // Crawl through -> 3429,3233
+    case default :
+        mes("Unhandled Haunted Mine entrance:");
+        mes(~coord_tostring(loc_coord));
+}
+
+// --- 4915 back entrance 2 <-> 4922 inside ---
+// Surface loc 3429,3225; inside loc 3408,9623.
+// Chosen landings: surface 3428,3225; inside 3409,9623.
+
+[oploc1,hauntedmine_back_entrance2]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_53_50_37_25 : p_telejump(0_53_150_17_23); // Crawl down -> 3409,9623
+    case default :
+        mes("Unhandled Haunted Mine entrance:");
+        mes(~coord_tostring(loc_coord));
+}
+
+[oploc1,hauntedmine_back_entrance2_inside]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_53_150_16_23 : p_telejump(0_53_50_36_25); // Crawl through -> 3428,3225
+    case default :
+        mes("Unhandled Haunted Mine entrance:");
+        mes(~coord_tostring(loc_coord));
+}
+
+// --- 4918 ridge obstacle cart: Climb over west/east only ---
+// Loc 3445,3236. VERIFIED walkable stand/reach: 3444,3236 and 3446,3236.
+// Exact climb animation / timing: UNKNOWN — do not invent seq or delays.
+// Side hop preserves ordinary walk/interaction path across the ridge block.
+
+[oploc1,hauntedmine_obstacle_cart]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_53_50_53_36 :
+        // CANDIDATE side crossing only; anim/timing UNKNOWN.
+        if (coordx(coord) <= coordx(loc_coord)) {
+            p_teleport(0_53_50_54_36); // west side -> east 3446,3236
+        } else {
+            p_teleport(0_53_50_52_36); // east side -> west 3444,3236
+        }
+    case default :
+        mes("Unhandled Haunted Mine cart:");
+        mes(~coord_tostring(loc_coord));
+}
