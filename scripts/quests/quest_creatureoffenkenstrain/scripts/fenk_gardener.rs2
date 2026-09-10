@@ -17,7 +17,8 @@ if (%fenk_quest < ^fenk_hired) {
     return;
 }
 if (inv_total(worn, amulet_of_ghostspeak) = 0) {
-    mes("The gardener's neck twitches at you, but the lack of any head prevents him from speaking.");
+    mes("The gardener's neck twitches at you, but the lack of any head");
+    mes("prevents him from speaking.");
     return;
 }
 // Active dynamic follower owned by this player?
