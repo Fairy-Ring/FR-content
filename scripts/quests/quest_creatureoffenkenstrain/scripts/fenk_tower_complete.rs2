@@ -137,23 +137,33 @@ session_log(^log_adventure, "Quest complete: Creature of Fenkenstrain");
 ~send_quest_complete(questlist:creatureoffenkenstrain, ring_of_charos, 250, ^creatureoffenkenstrain_questpoints, "You have completed the\\nCreature of Fenkenstrain!", "2 Quest Points|1000 Thieving XP|Ring of Charos");
 ~update_questlist;
 
-// Optional clock → letter
+// Optional clock → letter. Transcript 268-273 (CANDIDATE after era subtraction):
+// first wind grants letter with dust tbox; re-wind while holding letter is
+// "You wind the old clock." Full-inv must not write wound bit (retry). Lost
+// letter with %fenk_head-style recovery: inv check, not bit-only, so drop/retry
+// still works. Letter Read body is UNKNOWN in retained transcript — 377 cache
+// desc only; do not invent Rologarth prose or developer overlay text.
 [oploc1,fenk_clock]
 p_arrivedelay;
-if (%fenk_wound_clock = 1) {
-    mes("You have already wound the clock.");
+~fenk_try_clock_letter;
+
+[proc,fenk_try_clock_letter]
+if (inv_total(inv, fenk_letter) > 0) {
+    mes("You wind the old clock.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
     return;
 }
 %fenk_wound_clock = 1;
-if (inv_freespace(inv) = 0) {
-    mes("You wind the clock. A letter falls out but you have no inventory space.");
-    return;
-}
 inv_add(inv, fenk_letter, 1);
-mes("You wind the clock and a letter falls out.");
+~mesbox("As you wind the old clock a letter falls out. Judging by the thick covering of dust it must have been here for some time.");
 
 [opheld1,fenk_letter]
-~mesbox("The letter is hastily written and hard to make out.|It speaks of experiments and a ring of great power.|(Optional lore — not required for quest completion.)");
+// UNKNOWN letter body: retained Transcript:Creature of Fenkenstrain has the
+// wind tbox only (lines 268-273). 377 cache desc is the only VERIFIED string.
+~mesbox("A letter, clearly hastily written.");
 
 // Questlist journal button
 [if_button,questlist:creatureoffenkenstrain]

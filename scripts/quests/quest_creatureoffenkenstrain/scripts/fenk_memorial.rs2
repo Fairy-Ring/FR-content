@@ -38,6 +38,8 @@ if (loc_coord = 0_55_55_58_7) {
     }
     // CANDIDATE enter: underband stand 3577,9927 next to ladder_1757@3578,9927
     mes("You push the memorial aside and climb down into the darkness.");
+    // Exclusive loc tele (not p_telejump_safe). End gardener follow if active.
+    ~fenk_on_gameplay_teleport;
     p_telejump(0_55_155_57_7);
     return;
 }
@@ -45,6 +47,7 @@ if (loc_coord = 0_54_55_49_51) {
     // CANDIDATE island→cavern return: underband stand 3504,9969 next to ladder@3504,9970
     // (wiki retrace-through-cavern; NOT surface −6400)
     mes("You push the memorial aside and climb back down into the cavern.");
+    ~fenk_on_gameplay_teleport;
     p_telejump(0_54_155_48_49);
     return;
 }

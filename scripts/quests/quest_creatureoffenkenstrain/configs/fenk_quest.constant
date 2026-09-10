@@ -15,4 +15,5 @@
 // CANDIDATE follower duration: 10 minutes × 100 ticks/min ≈ 1000 ticks.
 ^fenk_follow_ticks = 1000
 // Exact historical follow leash radius: UNKNOWN material gap (contract §4).
-// Do not invent a tile distance constant; loss is duration + plane + logout/death.
+// Do not invent a tile distance constant; loss is duration + plane + logout/death
+// + ordinary gameplay teleport via ~fenk_on_gameplay_teleport / p_telejump_safe.

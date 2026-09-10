@@ -27,6 +27,11 @@ if (%fenk_quest >= ^fenk_hired) {
     return;
 }
 // --- hire interview (quest 0 only) ---
+// CANDIDATE kbase 1793: Priest in Peril + Restless Ghost. Product constants
+// ^priestperil_complete / ^priest_complete — not guessed completion ints.
+if (~fenk_hire_prereqs = false) {
+    return;
+}
 ~chatnpc("<p,neutral>Have you come to apply for the job?");
 def_int $apply = ~p_choice2("Yes.", 1, "No.", 2);
 if ($apply = 2) {
@@ -70,6 +75,20 @@ if ($desc = 4) {
 }
 ~chatnpc("<p,neutral>Mmmm, I see.");
 ~chatnpc("<p,neutral>I'm sorry, but I don't think you have the aptitude for this position.");
+
+// CANDIDATE kbase 1793 quest reqs. Refuse mes is stock req style — not a third
+// Dr voice (period greeting/refuse quotes still missing). Ghostspeak still
+// separately gates the gardener, not this hire Talk-to.
+[proc,fenk_hire_prereqs]()(boolean)
+if (%priestperil < ^priestperil_complete) {
+    mes("You need to complete the Priest in Peril quest.");
+    return(false);
+}
+if (%prieststart < ^priest_complete) {
+    mes("You need to complete the Restless Ghost quest.");
+    return(false);
+}
+return(true);
 
 // --- hired: body-part collection / hand-in ---
 [label,fenk_dr_hired]

@@ -1,12 +1,15 @@
 // Creature of Fenkenstrain — Gardener Ghost Talk-to + follower lifecycle.
 // CANDIDATE 2007-base (Transcript + Tip.it beats). Bind fenk_gardener 1675.
 // Gate %fenk_quest >= 1. Ghostspeak worn check. Follow: dynamic npc_add +
-// playerfollow, CANDIDATE 10 min duration, loss on logout/tele(plane)/death.
-// Exact historical leash radius: UNKNOWN material gap — do not invent a tile
-// distance. Dig independent of follower. directions bit hides courtyard multi
-// while following (1666 woods spawn UNKNOWN — dynamic add is I representation).
+// playerfollow, CANDIDATE 10 min duration, loss on logout/death/plane/timer
+// and ordinary gameplay teleport (stock ~p_telejump_safe). Exact historical
+// leash radius: UNKNOWN material gap — do not invent a tile distance or treat
+// p_teleport walk/stairs as teleport-loss. Dig independent of follower.
+// directions bit hides courtyard multi while following (1666 woods spawn
+// UNKNOWN — dynamic add is I representation).
 // Cleanup: logout.rs2 + death.rs2 call ~fenk_on_player_cleanup; login queues
-// fenk_on_login_cleanup. Do NOT hook pet.rs2 follower_death (cat hunger/shoo).
+// fenk_on_login_cleanup; ~fenk_on_gameplay_teleport from p_telejump_safe.
+// Do NOT hook pet.rs2 follower_death (cat hunger/shoo). Separate cat UID.
 // Cite full-source-contract §3.2 · fenkenstrain-gardener-first-slice-377.md.
 
 [opnpc1,fenk_gardener]
@@ -66,8 +69,8 @@ return;
 ~chatplayer("<p,neutral>Oh yes, dreadful bad luck.");
 ~chatnpc("<p,neutral>So oi thinks to meself, I don't needs any 'ead to be gettin on with me gardenin', long as I got me hands and me spade.");
 ~chatplayer("<p,neutral>Would you show me where the place was?");
-// Already have head item — refuse follow.
-if (inv_total(inv, fenk_head_empty) > 0 | inv_total(inv, fenk_head_full) > 0) {
+// Already have head item, or already handed it in — refuse follow.
+if (inv_total(inv, fenk_head_empty) > 0 | inv_total(inv, fenk_head_full) > 0 | %fenk_head = 1) {
     ~chatnpc("<p,neutral>No mate, you've found my head already, oi think.");
     %fenk_spoken_to_gardener = 1;
     return;
@@ -163,6 +166,7 @@ clearsofttimer(fenk_follow_watch);
 if (%fenk_follower_uid ! null) {
     if (npc_finduid(%fenk_follower_uid) = true) {
         // Only delete dynamic follower owned by this player.
+        // Guard stale owner / NPC-slot reuse: attacking_uid must match this player.
         if (%npc_attacking_uid = uid) {
             npc_del;
         }
@@ -171,6 +175,17 @@ if (%fenk_follower_uid ! null) {
 %fenk_follower_uid = null;
 // Restore courtyard gardener multi visibility (bit31 → 0 shows multi_2 child).
 %fenk_gardener_directions = 0;
+
+// Ordinary gameplay teleport loss (guide CANDIDATE: stop follow on teleport).
+// Stock owner: scripts/skill_magic/scripts/spells/teleport.rs2 ~p_telejump_safe
+// (magic, jewellery, levers that use ~player_teleport_normal). Not p_teleport
+// (stairs / death dest / short walk). Does not touch cat %follower_uid or RD.
+[proc,fenk_on_gameplay_teleport]
+if (%fenk_follower_uid = null) {
+    return;
+}
+mes("The gardener ghost stops following you.");
+~fenk_clear_gardener_follow;
 
 // Softtimer has active_player only — not p_active_player. Protected writes
 // (%fenk_follower_uid, %fenk_gardener_directions via fenk_flags) must go through

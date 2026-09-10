@@ -93,6 +93,11 @@ def main() -> int:
     must_contain(dr, r"Braindead", "interview Q1 answer")
     must_contain(dr, r"Grave-digging", "interview Q2 answer")
     must_contain(dr, r"don't think you have the aptitude", "wrong interview refuse")
+    must_contain(dr, r"\[proc,fenk_hire_prereqs\]", "hire prereq proc")
+    must_contain(dr, r"%priestperil\s*<\s*\^priestperil_complete", "PiP complete constant")
+    must_contain(dr, r"%prieststart\s*<\s*\^priest_complete", "Restless Ghost complete constant")
+    must_not_contain(dr, r"%priestperil\s*<\s*60", "no guessed PiP int")
+    must_not_contain(dr, r"%prieststart\s*<\s*5", "no guessed RG int")
 
     # --- B: partial body hand-in ---
     must_contain(dr, r"\[proc,fenk_try_hand_parts\]", "parts hand-in proc")
@@ -150,6 +155,8 @@ def main() -> int:
     must_contain(graves, r"0_54_55_48_57", "N arms coord")
     must_contain(graves, r"0_54_55_50_56", "NE legs coord")
     must_contain(graves, r"fenk_head_empty", "head yield")
+    must_contain(graves, r"\[proc,fenk_try_dig_head\]", "head dig proc")
+    must_contain(graves, r"%fenk_head\s*=\s*1", "head hand-in empty guard")
     must_contain(graves, r"fenk_torso", "torso yield")
     # Dig must not require follower uid
     dig_poor = re.search(r"\[oploc2,fenk_grave_poor\]([\s\S]*?)(?=\n\[|\Z)", graves)
@@ -195,6 +202,8 @@ def main() -> int:
     doors = bodies["fenk_doors_experiment.rs2"]
     must_contain(doors, r"\[ai_queue3,fenk_experiment_1\]", "experiment death")
     must_contain(doors, r"fenk_mausoleum_key", "cavern key drop")
+    must_contain(doors, r"gosub\s*\(\s*npc_default_death\s*\)", "experiment default death + bones")
+    must_not_contain(doors, r"gosub\s*\(\s*npc_death\s*\)", "experiment must not skip death_drop")
     # Key drop stays in ai_queue3 (active_npc); no queue label needing npc_coord.
     must_contain(
         doors,
@@ -255,6 +264,50 @@ def main() -> int:
     if b"completed the\\\\nCreature" not in tower_raw:
         fail("scroll title should use house two-backslash form before n")
     must_contain(tower, r"\[if_button,questlist:creatureoffenkenstrain\]", "journal button")
+
+    # --- G2 clock letter: no bit-before-grant; transcript wind; no invented Read ---
+    must_contain(tower, r"\[proc,fenk_try_clock_letter\]", "clock letter proc")
+    clock = re.search(r"\[proc,fenk_try_clock_letter\]([\s\S]*?)(?=\n\[|\Z)", tower)
+    if not clock:
+        fail("clock letter proc body missing")
+    else:
+        body = clock.group(1)
+        space = body.find("inv_freespace")
+        bit = body.find("%fenk_wound_clock")
+        if space < 0 or bit < 0 or bit < space:
+            fail("clock must write wound bit only after inv_freespace check")
+        if "You wind the old clock." not in body:
+            fail("clock re-wind must use transcript 'You wind the old clock.'")
+    must_contain(tower, r"As you wind the old clock a letter falls out", "transcript wind tbox")
+    must_contain(tower, r"A letter, clearly hastily written", "cache desc Read")
+    must_not_contain(tower, r"Optional lore", "no developer Optional lore on letter")
+    must_not_contain(tower, r"ring of great power", "no invented letter prose")
+
+    # --- B3b gameplay teleport hook (stock p_telejump_safe) ---
+    tele = read(ROOT / "scripts/skill_magic/scripts/spells/teleport.rs2")
+    must_contain(tele, r"\[proc,p_telejump_safe\]", "stock p_telejump_safe")
+    psafe = re.search(r"\[proc,p_telejump_safe\]([\s\S]*?)(?=\n\[|\Z)", tele)
+    if not psafe:
+        fail("p_telejump_safe body missing")
+    elif "~fenk_on_gameplay_teleport" not in psafe.group(1):
+        fail("p_telejump_safe must call ~fenk_on_gameplay_teleport after p_telejump")
+    elif "~follower_death" in psafe.group(1):
+        fail("p_telejump_safe must not call ~follower_death")
+    must_contain(g, r"\[proc,fenk_on_gameplay_teleport\]", "gameplay teleport cleanup proc")
+    must_not_contain(stairs, r"fenk_on_gameplay_teleport", "stairs p_teleport must not be teleport-loss")
+    must_contain(mem, r"~fenk_on_gameplay_teleport", "memorial loc tele cleanup")
+
+    # --- F3 Garden seam (no Garden port) ---
+    garden_el = read(ROOT / "scripts/quests/quest_garden/scripts/garden_ellamaria.rs2")
+    garden_be = read(ROOT / "scripts/quests/quest_garden/scripts/garden_bernald.rs2")
+    must_not_contain(garden_el, r"charos|fenk_", "Garden ellamaria has no Charos unlock")
+    must_not_contain(garden_be, r"charos|fenk_", "Garden bernald has no Charos unlock")
+    must_contain(follower_varp, r"scripts/quests/quest_garden/", "Garden seam path on mem varp")
+    must_contain(tower, r"inv_total\s*\(\s*bank\s*,\s*ring_of_charos", "F3 bank base")
+    must_contain(tower, r"inv_total\s*\(\s*worn\s*,\s*ring_of_charos", "F3 worn base")
+    must_contain(tower, r"inv_total\s*\(\s*inv\s*,\s*ring_of_charos", "F3 inv base")
+    must_contain(tower, r"inv_total\s*\(\s*bank\s*,\s*ring_of_charos_unlocked", "F3 bank (u)")
+    must_contain(tower, r"inv_total\s*\(\s*worn\s*,\s*ring_of_charos_unlocked", "F3 worn (u)")
 
     # --- authorized lifecycle hooks (NOT pet.rs2) ---
     logout = read(ROOT / "scripts/login_logout/scripts/logout.rs2")

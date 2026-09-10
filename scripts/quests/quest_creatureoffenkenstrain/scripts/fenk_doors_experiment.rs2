@@ -78,8 +78,11 @@ if (last_useitem = fenk_mausoleum_key) {
 // --- experiment key drop (vislevel 51 display VERIFIED; combat ints CANDIDATE) ---
 // Stay in ai_queue3 with active_npc + npc_findhero→active_player so obj_add(npc_coord)
 // is valid. Do not queue a label that needs npc_coord (queue loses active_npc).
+// gosub(npc_default_death) = npc_death + configured death_drop (bones) when hero
+// exists — same helper as [ai_queue3,_]. Then key once-per-need. Pointer after
+// npc_del is the house chicken pattern. Preserve killer via npc_findhero.
 [ai_queue3,fenk_experiment_1]
-gosub(npc_death);
+gosub(npc_default_death);
 if (npc_findhero = ^true) {
     // Once-per-need: if killer already has key, no second key from this kill.
     if (inv_total(inv, fenk_mausoleum_key) = 0) {

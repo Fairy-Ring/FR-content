@@ -8,6 +8,10 @@ protect=no
 
 // NONHISTORICAL durable Charos(u) memory for post-complete recovery (Tip.it 2006-06-16).
 // Dedicated perm varp — do NOT reuse fenk_digresult (bits 17-19) for unlock memory.
-// Garden unlock content should set this when converting base→(u).
+// Garden unlock SEAM (out of CoF scope): scripts/quests/quest_garden/ currently has
+// garden_ellamaria.rs2 + garden_bernald.rs2 and ZERO Charos writers. When Garden
+// authors base→(u) conversion it must set %fenk_charos_unlocked_mem = 1 (or call
+// ~fenk_note_charos_unlocked). Until then, recovery without a later doctor
+// observation of (u) yields base ring_of_charos.
 [fenk_charos_unlocked_mem]
 scope=perm

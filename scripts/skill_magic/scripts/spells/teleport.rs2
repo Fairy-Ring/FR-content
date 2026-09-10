@@ -64,6 +64,10 @@ if (~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true
 }
 p_telejump($coord);
 anim(null, 0);
+// CoF gardener: same-plane magic/jewellery teleport must end follow + restore
+// courtyard. No-op without an active fenk follower. Does not call cat
+// follower cleanup or alter cat session uid / RD death dest (those stay on logout/death.rs2).
+~fenk_on_gameplay_teleport;
 // todo: ensure this proc is used for other teleports too
 def_int $rum = inv_total(inv, karamja_rum);
 if ($rum > 0) {

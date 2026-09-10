@@ -28,13 +28,19 @@ anim(human_dig, 0);
 p_delay(1);
 mes("You start digging...");
 if (loc_coord = 0_56_54_24_35) {
-    @fenk_dig_head_grave;
+    ~fenk_try_dig_head;
     return;
 }
 mes("...but the grave is empty.");
 
-[label,fenk_dig_head_grave]
+[proc,fenk_try_dig_head]
+// Match island parts: held item OR completed hand-in → empty (no duplicate after
+// hand-in). Lost pre-hand-in item (%fenk_head = 0, not in inv) is reacquirable.
 if (inv_total(inv, fenk_head_empty) > 0 | inv_total(inv, fenk_head_full) > 0) {
+    mes("...but the grave is empty.");
+    return;
+}
+if (%fenk_head = 1) {
     mes("...but the grave is empty.");
     return;
 }

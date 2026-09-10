@@ -1,10 +1,57 @@
-# Creature of Fenkenstrain — completion report (r377 / t_d99d6bbc)
+# Creature of Fenkenstrain — completion report (r377 / t_3d84d490)
 
-Date stamp: 2026-09-09 (round-4 after R3 reject of 16b7aceb7)  
-Branch/worktree: `codex/r377-fenkenstrain-completion` / `r377-fenkenstrain-content`  
-Contracts: `.tmp/r377-fenkenstrain-m1-2026-09-09/` (root-precontract, full-source-contract, receipts, root-memorial-collision.json)
+Date stamp: 2026-09-10 (behavior-repair after integration APPROVE residuals)  
+Branch/worktree: `codex/r377-fenk-behavior-repair` / `r377-fenk-behavior-repair` @ 100ad6f4 + this commit  
+Contracts: root `.tmp/r377-fenkenstrain-m1-2026-09-09/` (full-source-contract, root-precontract, integration-review, retained transcript)
+
+## R5 behavior repairs (this card)
+
+Integration APPROVE listed residuals that did **not** remove original quest requirements. This unit implements the six required repairs. Exact leash distance remains **UNKNOWN**. Product not bent to fit a smoke.
+
+### Repair map (requirement / source / handler test / evidence)
+
+| ID | Requirement | Source | Production handler | Test | Evidence |
+|----|-------------|--------|--------------------|------|----------|
+| 1 | Same-plane teleport ends gardener follow + restores courtyard; not every walk; no invented leash | Contract §3.2 loss on teleport (C guide); engine PLAYERFOLLOW has no maxrange (U leash) | Stock owner `scripts/skill_magic/scripts/spells/teleport.rs2` `[proc,p_telejump_safe]` (magic/jewellery/`~player_teleport_normal`) calls `~fenk_on_gameplay_teleport`. Memorial Push (exclusive `p_telejump`) also calls it. **Not** hooked on `p_teleport` (stairs / death dest). | `test_fenk_handlers.mjs` executes `[proc,fenk_on_gameplay_teleport]`: clears `%fenk_follower_uid`, restores directions bit, **cat `%follower_uid` unchanged**. Offline: stairs must not call the hook; `p_telejump_safe` must not call `~follower_death`. | Isolated compile `ISOLATED_OK` script.dat 8706927. Gardener movement proof retained. Live same-plane tele still pending root live proof. |
+| 2 | experiment_1 bones + key once-per-need | 377 `param=death_drop,bones`; `[ai_queue3,_]` = `npc_default_death`; chicken pattern after `npc_del` | `[ai_queue3,fenk_experiment_1]` `gosub(npc_default_death)` then key `obj_add(npc_coord, …)` if inv lacks key. Killer via `npc_findhero`. | Compiled trigger present. **Constraint:** executing `npc_default_death` needs World `npc_delay`/`arrivedelay` tick loop — pending live. Offline asserts `gosub(npc_default_death)` not `gosub(npc_death)`. | Standard helper restored; key once-per-need preserved. |
+| 3 | Clock full-inv must not lose letter; Read not invented | Transcript 268–273 (wind tbox + re-wind while holding). Letter **body UNKNOWN**. 377 cache `desc=A letter, clearly hastily written.` | `[proc,fenk_try_clock_letter]`: holding letter → `You wind the old clock.`; full inv → refuse **before** wound bit; else bit+grant+transcript tbox. Read = cache desc only. | Handler: full-inv FINISHED no bit/no letter; grant PAUSEBUTTON; re-wind FINISHED no duplicate; lost-letter retry PAUSEBUTTON. Offline: bit after freespace; no invented Read. | FontType+Component loaded. Live Read/wind still pending. |
+| 4 | Head re-dig after hand-in like island parts; lost pre-hand-in reacquirable | Contract §3.2 loss of head → re-Dig; island parts already check hand-in bits | `[proc,fenk_try_dig_head]`: empty if held empty/full **or** `%fenk_head = 1`; else grant. Gardener follow also refuses if `%fenk_head = 1`. | Handler: grant; held refuse; hand-in empty; full-inv refuse without writing bit. | Matches island-part semantics. |
+| 5 | Hire PiP + Restless Ghost refusals | kbase 1793 CANDIDATE. Product constants `^priestperil_complete` / `^priest_complete` — not guessed ints. Period refuse quotes **missing** — stock mes, not a third Dr voice. Ghostspeak still gates gardener separately. | `[proc,fenk_hire_prereqs]` before interview. | Handler: false without PiP; false without RG; true when both complete. | CANDIDATE req mes. |
+| 6 | F3 bank/worn/inv duplicate guard; no repeat XP/QP; Garden seam recorded not ported | Tip.it 2006-06-16 CANDIDATE recovery; Garden out of scope | Existing `fenk_has_charos_any` / recovery / note. `quest_garden/{garden_ellamaria,garden_bernald}.rs2` have **zero** Charos writers. Varp comment names the exact seam: Garden unlock must set `%fenk_charos_unlocked_mem` when authored. | Handler: bank path; worn (u) notes mem; recovery base vs (u); recovery proc does not complete/XP. Offline: bank/worn/inv both variants. | No Garden port. |
+
+### Stock teleport ownership
+
+`~player_teleport_normal` → `~p_telejump_safe` in `scripts/skill_magic/scripts/spells/teleport.rs2` is the stock gameplay teleport procedure (magic buttons, glory/dueling/life/minigames jewellery, wilderness levers, KBD, mage arena, macros, etc.). Cat/RD: hook is fenk-only no-op without `%fenk_follower_uid`; death.rs2 still does RD dest then `~follower_death` then `~fenk_on_player_cleanup`; logout still `~follower_logout` then fenk cleanup; **zero** fenk in `pet.rs2`. Stairs remain `p_teleport` (not teleport-loss).
+
+### Tests run
+
+```
+python3 tests/fenkenstrain-completion/test_fenk_offline.py
+→ PASS (static source-regex only)
+
+tests/fenkenstrain-completion/setup-iso.sh
+→ ISOLATED_OK script.dat size 8706927; sibling content overlay + exclusive CoF/teleport;
+  RSA keys generated in ISO (not copied); worktree pack/script.pack not written;
+  shared vendor/content/pack/script.pack unchanged
+
+cd .tmp/fenk-iso-compile-r422/engine && node --import tsx ../../../tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
+→ RESULT PASS (real Npc.updateMovement)
+
+cd .tmp/fenk-iso-compile-r422/engine && node --import tsx ../../../tests/fenkenstrain-completion/test_fenk_handlers.mjs
+→ RESULT PASS (ScriptRunner on compiled procs: clock/head/hire/F3/teleport/cat UID)
+  FontType q8_full + Component loaded from ISO client jag. Clock grant/recovery
+  assert PAUSEBUTTON (mesbox Continue). Other procs assert FINISHED. ABORTED fails.
+  Prior attempt: missing fonts → split_init abort after grant; swallowed — not PASS.
+```
+
+Experiment **bones on the ground** and same-plane **live client teleport** remain pending root live proof. Unknown leash not invented.
+
+## Prior R4 summary (retained)
+
+Exclusive CoF writers + authorized shared joins for full A–G arcs. Round-3/4 fixes retained (memorial underband, mobile gardener, Charos mem honesty).
 
 ## Summary
+
 
 Exclusive CoF writers + authorized shared joins for full A–G arcs. Round-3 fixes vs R2:
 
