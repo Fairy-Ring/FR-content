@@ -58,7 +58,7 @@ if ($choice = 2) {
     return;
 }
 if ($choice = 3) {
-    @fenk_gardener_name;
+    ~fenk_gardener_name;
     return;
 }
 ~chatplayer("<p,neutral>I must get back to work.");
@@ -91,14 +91,13 @@ return;
 ~chatnpc("<p,neutral>Old Fenky sent me into the Forest to dig 'im a pit. Never said what for. Then would you believe it, someone chops me head off.");
 return;
 
-[label,fenk_gardener_name]
+[proc,fenk_gardener_name]
 ~chatplayer("<p,quiz>What's your name?");
 ~chatnpc("<p,neutral>Me name? It's been a moivellous long while, mate, since I had any use for such a thing as a name.");
 ~chatplayer("<p,neutral>Don't worry, I was just trying to make conversation.");
 ~chatnpc("<p,neutral>No, no, I can't be havin' that - I'll remember in a minute-");
 ~chatplayer("<p,neutral>Please, don't worry.");
 ~chatnpc("<p,happy>Lestwit, that's it! Ed Lestwit!");
-return;
 
 [label,fenk_gardener_shed_key]
 ~chatplayer("<p,quiz>Do you know where the key to the shed is?");
@@ -129,17 +128,36 @@ return;
 [label,fenk_gardener_following_talk]
 def_int $d = ~p_choice3("Which way to your grave?", 1, "What's your name?", 2, "I must get back to work.", 3);
 if ($d = 2) {
-    @fenk_gardener_name;
+    ~fenk_gardener_name;
+    ~fenk_resume_owned_follow;
     return;
 }
 if ($d = 3) {
     ~chatplayer("<p,neutral>I must get back to work.");
+    ~fenk_resume_owned_follow;
     return;
 }
 ~chatplayer("<p,quiz>Which way to your grave?");
 // Transcript-grounded (head path): Haunted Forest to the south — not free compass prose.
 ~chatnpc("<p,neutral>Oi was diggin' a pit in the old 'aunted Forest to the south when they took me head. Keep with me, mate.");
+~fenk_resume_owned_follow;
 return;
+
+// ~chatnpc sets playerfaceclose before each Continue. Restore PLAYERFOLLOW only
+// after a completed following-talk exit, and only on this player's owned
+// dynamic follower. Courtyard multi, another player's actor, or missing/stale
+// ownership: no-op. Does not npc_add, npc_del, retarget, or rewrite lifetime.
+[proc,fenk_resume_owned_follow]
+if (%fenk_follower_uid = null) {
+    return;
+}
+if (npc_uid ! %fenk_follower_uid) {
+    return;
+}
+if (%npc_attacking_uid ! uid) {
+    return;
+}
+npc_setmode(playerfollow);
 
 // --- follower start / stop ---
 [proc,fenk_start_gardener_follow]
