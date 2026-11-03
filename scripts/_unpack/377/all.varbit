@@ -119,22 +119,22 @@ startbit=17
 endbit=17
 
 [bits_30_varp732_bits_18_18]
-basevar=varp732_bits
+basevar=godbook_multi
 startbit=18
 endbit=18
 
 [bits_31_varp732_bits_19_19]
-basevar=varp732_bits
+basevar=godbook_multi
 startbit=19
 endbit=19
 
 [bits_32_varp732_bits_20_20]
-basevar=varp732_bits
+basevar=godbook_multi
 startbit=20
 endbit=20
 
 [bits_33_varp732_bits_21_21]
-basevar=varp732_bits
+basevar=godbook_multi
 startbit=21
 endbit=21
 
@@ -464,17 +464,17 @@ startbit=29
 endbit=29
 
 [mm_daero_option_bit_one]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=0
 endbit=0
 
 [mm_daero_option_bit_two]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=1
 endbit=1
 
 [mm_daero_option_bit_three]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=2
 endbit=2
 
@@ -489,12 +489,12 @@ startbit=4
 endbit=4
 
 [mm_player_is_unconscious]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=5
 endbit=5
 
 [mm_rock_falling]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=6
 endbit=6
 
@@ -534,27 +534,27 @@ startbit=13
 endbit=13
 
 [mm_monkey_child_waiting_for_talisman]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=14
 endbit=14
 
 [mm_waiting_for_final_battle]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=15
 endbit=15
 
 [mm_been_to_final_battle]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=16
 endbit=16
 
 [mm_player_received_monkey_trail_clue]
-basevar=varp744_bits
+basevar=mm_flags
 startbit=17
 endbit=17
 
 [mm_kruk]
-basevar=varp745_bits
+basevar=mm_monkeys
 startbit=0
 endbit=1
 
@@ -564,12 +564,12 @@ startbit=2
 endbit=4
 
 [mm_monkey_child]
-basevar=varp745_bits
+basevar=mm_monkeys
 startbit=5
 endbit=8
 
 [mm_elder_guard]
-basevar=varp745_bits
+basevar=mm_monkeys
 startbit=9
 endbit=10
 
@@ -639,7 +639,7 @@ startbit=12
 endbit=16
 
 [mm_final_battle_gnomes]
-basevar=varp746_bits
+basevar=mm_misc
 startbit=17
 endbit=20
 

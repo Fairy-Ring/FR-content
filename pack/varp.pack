@@ -395,7 +395,7 @@
 394=slayer_count
 395=slayer_target
 396=varp396_bits
-397=bankpin_delay
+397=bankpin_delay_days
 398=bankpin_buf
 399=fenk_quest
 400=fenk_flags
