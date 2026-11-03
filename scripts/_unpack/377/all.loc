@@ -33372,21 +33372,26 @@ desc=The door is closed.
 model=door
 active=yes
 op1=Open
+param=next_loc_stage,loc_1532
 
 [hauntedmine_rewarddoor_l]
 name=Large door
 desc=A large double door.
 model=lefayeunopenabledoorl
 op1=Open
+category=double_door_open_and_close_left
 raiseobject=no
+param=next_loc_stage,lefayeunopenabledoorl_1522
 
 [hauntedmine_rewarddoor_r]
 name=Large door
 desc=A large double door.
 model=lefayeunopenabledoorl
 op1=Open
+category=double_door_open_and_close_right
 mirror=yes
 raiseobject=no
+param=next_loc_stage,lefayeunopenabledoorl_1523
 
 [hauntedmine_laddertop]
 name=Ladder

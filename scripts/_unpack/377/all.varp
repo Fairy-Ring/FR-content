@@ -667,6 +667,7 @@ scope=perm
 
 [hauntedmine_bits]
 transmit=yes
+scope=perm
 
 [xmas_yoyo_unlocked]
 
