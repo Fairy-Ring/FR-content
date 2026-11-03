@@ -1,0 +1,8 @@
+// custom (local harness fixtures), ported from the 289 content's cheat_bank.rs2
+[debugproc,clearbank]
+if_close;
+if (p_finduid(uid) = true) {
+    inv_clear(bank);
+} else {
+    @please_finish;
+}
