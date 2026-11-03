@@ -478,13 +478,13 @@ basevar=varp744_bits
 startbit=2
 endbit=2
 
-[bits_102_varp744_bits_3_3]
-basevar=varp744_bits
+[mm_hangar_cutscene_flag]
+basevar=mm_flags
 startbit=3
 endbit=3
 
-[bits_103_varp744_bits_4_4]
-basevar=varp744_bits
+[mm_hangar_puzzle_complete]
+basevar=mm_flags
 startbit=4
 endbit=4
 
@@ -623,13 +623,13 @@ basevar=varp746_bits
 startbit=0
 endbit=1
 
-[bits_2138_varp746_bits_2_9]
-basevar=varp746_bits
+[mm_jail_count]
+basevar=mm_misc
 startbit=2
 endbit=9
 
-[bits_2139_varp746_bits_10_11]
-basevar=varp746_bits
+[mm_monkey_minder]
+basevar=mm_misc
 startbit=10
 endbit=11
 

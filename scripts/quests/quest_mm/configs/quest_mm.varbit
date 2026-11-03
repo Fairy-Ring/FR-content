@@ -1,13 +1,3 @@
 // MM flags on mm_flags (289 quest_mm.varbit layout).
-// Hangar: 131=mm_hangar_cutscene_flag, 132=mm_hangar_puzzle_complete
+// Hangar flags mm_hangar_cutscene_flag and mm_hangar_puzzle_complete are varbits 102 and 103 in _unpack/377/all.varbit (upstream ids).
 // Zooknock collection bits, mm_zooknock_monkey_relic and mm_awowogei live in _unpack/377/all.varbit on the upstream ids 106-112, 118 and 133.
-
-[mm_hangar_cutscene_flag]
-basevar=mm_flags
-startbit=3
-endbit=3
-
-[mm_hangar_puzzle_complete]
-basevar=mm_flags
-startbit=4
-endbit=4

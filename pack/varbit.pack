@@ -100,8 +100,8 @@
 99=mm_daero_option_bit_one
 100=mm_daero_option_bit_two
 101=mm_daero_option_bit_three
-102=bits_102_varp744_bits_3_3
-103=bits_103_varp744_bits_4_4
+102=mm_hangar_cutscene_flag
+103=mm_hangar_puzzle_complete
 104=mm_player_is_unconscious
 105=mm_rock_falling
 106=mm_zooknock_has_gold_bar
@@ -129,8 +129,8 @@
 128=mm_karam
 129=mm_lumo
 130=mm_foreman
-131=mm_hangar_cutscene_flag
-132=mm_hangar_puzzle_complete
+131=mm_jail_count
+132=mm_monkey_minder
 133=mm_zooknock_monkey_relic
 134=mm_final_battle_gnomes
 135=misc_cooked
@@ -2136,8 +2136,8 @@
 2135=misc_varbit_2_28_28
 2136=misc_varbit_3_29_29
 2137=bits_2137_varp746_bits_0_1
-2138=bits_2138_varp746_bits_2_9
-2139=bits_2139_varp746_bits_10_11
+2138=varbit_2138
+2139=varbit_2139
 2140=varbit_2140
 2141=varbit_2141
 2142=varbit_2142
