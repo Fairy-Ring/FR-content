@@ -5,7 +5,9 @@
 set -euo pipefail
 WT="$(cd "$(dirname "$0")/../.." && pwd)"
 ISO="${WT}/.tmp/fenk-iso-compile-r422"
-SIBLING="/Users/acfrazier/experiments/FR-vault/.worktrees/r377-fenkenstrain-content/.tmp/fenk-iso-compile-r422"
+# FENK_ISO_SIBLING: an isolated compiler layout holding engine/, content/,
+# compile-isolated.mjs and pack-server-configs.mjs.
+SIBLING="${FENK_ISO_SIBLING:?set FENK_ISO_SIBLING to the isolated compiler layout directory}"
 
 mkdir -p "${ISO}"
 
