@@ -489,15 +489,21 @@ transmit=yes
 [tbwt_main]
 transmit=yes
 
-[varp321_unused]
+[tbwt_tiadeche]
+scope=perm
+transmit=yes
 
-[varp322_unused]
+[tbwt_tinsay]
+scope=perm
 
-[varp323_unused]
+[tbwt_tamayu]
+scope=perm
 
-[varp324_unused]
+[tbwt_lubufu]
+scope=perm
 
-[varp325_unused]
+[tbwt_flags]
+scope=perm
 
 [varp326_unused]
 
@@ -523,7 +529,8 @@ transmit=yes
 
 [eadgar_quest]
 
-[varp336_bits]
+[eadgar_bits]
+scope=perm
 
 [bankpin_map_lo]
 scope=perm
@@ -538,6 +545,18 @@ scope=perm
 [varp733_unused]
 
 [varp734_unused]
+
+[varp_725]
+
+[varp_726]
+
+[varp_727]
+
+[varp_728]
+
+[varp_729]
+
+[varp_735]
 
 [temple_repaired_p]
 transmit=yes
@@ -657,7 +676,10 @@ transmit=yes
 
 [routequestmulti]
 
-[varp389_unused]
+[routequest_myreque_bits]
+scope=perm
+
+[varp_390]
 
 [varp740_unused]
 

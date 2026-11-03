@@ -1,20 +1,20 @@
-[bits_6_varp336_bits_0_0]
-basevar=varp336_bits
+[eadgar_pete_dialog_1]
+basevar=eadgar_bits
 startbit=0
 endbit=0
 
-[bits_7_varp336_bits_1_3]
-basevar=varp336_bits
+[eadgar_scarecrow_items]
+basevar=eadgar_bits
 startbit=1
 endbit=3
 
 [bits_8_varp336_bits_4_7]
-basevar=varp336_bits
+basevar=eadgar_bits
 startbit=4
 endbit=7
 
-[bits_9_varp336_bits_11_11]
-basevar=varp336_bits
+[eadgar_pete_dialog_2]
+basevar=eadgar_bits
 startbit=11
 endbit=11
 
@@ -498,38 +498,38 @@ basevar=varp744_bits
 startbit=6
 endbit=6
 
-[bits_106_varp744_bits_7_7]
-basevar=varp744_bits
+[mm_zooknock_has_gold_bar]
+basevar=mm_flags
 startbit=7
 endbit=7
 
-[bits_107_varp744_bits_8_8]
-basevar=varp744_bits
+[mm_zooknock_has_amulet_mould]
+basevar=mm_flags
 startbit=8
 endbit=8
 
-[bits_108_varp744_bits_9_9]
-basevar=varp744_bits
+[mm_zooknock_has_dentures]
+basevar=mm_flags
 startbit=9
 endbit=9
 
-[bits_109_varp744_bits_10_10]
-basevar=varp744_bits
+[mm_zooknock_has_magical_talisman]
+basevar=mm_flags
 startbit=10
 endbit=10
 
-[bits_110_varp744_bits_11_11]
-basevar=varp744_bits
+[mm_zooknock_has_monkey_relic]
+basevar=mm_flags
 startbit=11
 endbit=11
 
-[bits_111_varp744_bits_12_12]
-basevar=varp744_bits
+[mm_zooknock_player_is_collecting_for_amulet]
+basevar=mm_flags
 startbit=12
 endbit=12
 
-[bits_112_varp744_bits_13_13]
-basevar=varp744_bits
+[mm_zooknock_player_is_collecting_for_talisman]
+basevar=mm_flags
 startbit=13
 endbit=13
 
@@ -558,8 +558,8 @@ basevar=varp745_bits
 startbit=0
 endbit=1
 
-[bits_118_varp745_bits_2_4]
-basevar=varp745_bits
+[mm_awowogei]
+basevar=mm_monkeys
 startbit=2
 endbit=4
 
@@ -633,8 +633,8 @@ basevar=varp746_bits
 startbit=10
 endbit=11
 
-[bits_133_varp746_bits_12_16]
-basevar=varp746_bits
+[mm_zooknock_monkey_relic]
+basevar=mm_misc
 startbit=12
 endbit=16
 

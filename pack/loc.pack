@@ -5629,7 +5629,7 @@
 5628=flag_lumbridge
 5629=flag_lumbridge_overhang
 5630=flag_lumbridge_overhang_pole
-5631=fire
+5631=loc_5631
 5632=fire_5632
 5633=brickwall_riveredge
 5634=timberwall_2
@@ -10650,7 +10650,7 @@
 10649=scenery_10649
 10650=scenery_10650
 10651=scenery_10651
-10652=evergreen
+10652=loc_10652
 10653=evergreen_10653
 10654=evergreen_10654
 10655=evergreen_10655
@@ -14917,7 +14917,7 @@
 14916=rocks_14916
 14917=sink_14917
 14918=washbasin
-14919=range
+14919=loc_14919
 14920=table_14920
 14921=small_furnace
 14922=hole_14922

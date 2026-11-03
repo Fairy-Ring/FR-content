@@ -39791,7 +39791,7 @@ ambient=20
 blockwalk=no
 active=no
 
-[fire]
+[loc_5631]
 name=Fire
 desc=Glowing embers.
 model=loc_5631
@@ -70073,7 +70073,7 @@ active=no
 ambient=30
 contrast=30
 
-[evergreen]
+[loc_10652]
 name=Evergreen.
 desc=A large tree.
 model=loc_10652
@@ -70199,7 +70199,7 @@ active=yes
 length=5
 width=5
 multivar=win05_decorating
-multiloc=0,evergreen
+multiloc=0,loc_10652
 multiloc=1,evergreen_10653
 multiloc=2,evergreen_10654
 multiloc=3,evergreen_10658
@@ -70211,7 +70211,7 @@ active=yes
 length=7
 width=7
 multivar=win05_decorating
-multiloc=0,evergreen
+multiloc=0,loc_10652
 multiloc=1,evergreen_10653
 multiloc=2,evergreen_10654
 multiloc=3,evergreen_10658
@@ -94891,7 +94891,7 @@ desc=Rough but adequate.
 model=dwarf_keldagrim_sink
 length=2
 
-[range]
+[loc_14919]
 name=Range
 desc=Smells of fried fish.
 model=100_dave_stove
