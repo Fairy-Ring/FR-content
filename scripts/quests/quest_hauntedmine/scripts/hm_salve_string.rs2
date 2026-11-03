@@ -24,4 +24,4 @@ inv_del(inv, crystalshard_necklace_unstrung, 1);
 inv_del(inv, ball_of_wool, 1);
 inv_add(inv, crystalshard_necklace, 1);
 // Deliberately no stat_advance — 0 XP CANDIDATE (not string_amulet's 40 tenths).
-mes("You put some string on your salve shard."); // CANDIDATE house stringing phrasing
+mes("You carefully string the shard of crystal.");

@@ -235,3 +235,22 @@ while (map_blocked($random_coord) = true) {
     }
 }
 return($random_coord);
+
+// Lost City 289: one unclipped step towards a destination, including diagonals.
+[proc,movedir_coord](coord $origin, coord $dest)(coord)
+def_int $x = sub(coordx($dest), coordx($origin));
+def_int $z = sub(coordz($dest), coordz($origin));
+def_int $dirx = 0;
+def_int $dirz = 0;
+if ($x >= 1) $dirx = 1;
+else if ($x <= -1) $dirx = -1;
+if ($z >= 1) $dirz = 1;
+else if ($z <= -1) $dirz = -1;
+return(movecoord($origin, $dirx, 0, $dirz));
+
+// Lost City 289: midpoint used to locate carts across the boss hazard zones.
+[proc,centre_coord](coord $coord1, coord $coord2)(coord)
+def_int $x = divide(add(coordx($coord1), coordx($coord2)), 2);
+def_int $z = divide(add(coordz($coord1), coordz($coord2)), 2);
+def_int $y = divide(add(coordy($coord1), coordy($coord2)), 2);
+return(movecoord(0_0_0_0_0, $x, $y, $z));

@@ -1,15 +1,9 @@
 // Haunted Mine conclusion — quest complete writer.
-// Trigger: first successful crystal cut (hm_crystal_cut.rs2).
-// Stage: %hauntedmine → ^hauntedmine_complete (2). Once-guarded.
-// Rewards (CANDIDATE wiki/Zybez): 2 QP, 22,000 Strength XP.
-// Engine XP unit: tenths of a point — scorpcatcher stat_advance(strength, 66250)
-// displays 6,625 Strength XP → 22,000 XP = stat_advance(strength, 220000).
-// Scroll + session_log follow house complete conventions.
-// Does not grant salve stringing, combat bonus, or touch 383/762.
-// Natural boss access / Treus kill remain missing (conclusion segment only).
+// CANDIDATE: 289 completion is the first cut at stage 10, then stage 11.
+// Keep the r377 reward scroll, session log and XP units (tenths).
 
-[queue,hm_quest_complete]
-if (%hauntedmine >= ^hauntedmine_complete) {
+[proc,hm_quest_complete]
+if (%hauntedmine ! ^hauntedmine_rewarddoor_found) {
     return;
 }
 %hauntedmine = ^hauntedmine_complete;

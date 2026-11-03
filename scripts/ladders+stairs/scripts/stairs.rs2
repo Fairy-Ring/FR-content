@@ -674,7 +674,6 @@ switch_coord (loc_coord) {
 // Chosen landings CANDIDATE from root engine-footprint-root.json:
 //   down -> 2792,4592 (centre of 2791..2793,4592); up -> 3454,3242.
 // Pair route CANDIDATE; static collision VERIFIED. No quest-state write.
-// Other HM stairs (dark/light) stay stubbed this unit.
 [oploc1,hauntedmine_main_entrance]
 p_arrivedelay;
 switch_coord (loc_coord) {
@@ -685,12 +684,14 @@ switch_coord (loc_coord) {
 [oploc1,hauntedmine_main_entrance_inside]
 p_arrivedelay;
 switch_coord (loc_coord) {
-    case 0_43_71_38_45 : p_telejump(0_53_50_62_42); // Walk-up -> 3454,3242
+    case 0_43_71_38_45 :
+        p_telejump(0_53_50_62_42); // Walk-up -> 3454,3242
+        ~hauntedmine_fungus_stepout;
     case default : @unhandled_stairs(loc_coord);
 }
 
 // hauntedmine_dark_stairs_top / _bottom / light_stairs_bottom (4971-4973):
-// handlers live in quest_hauntedmine/scripts/hm_dark_stairs.rs2 (M1 fungus unit).
+// handlers live in quest_hauntedmine/scripts/hauntedmine_darkstairs.rs2.
 
 [oploc1,karam_dungeon_cavestairs]
 // arrive delay?

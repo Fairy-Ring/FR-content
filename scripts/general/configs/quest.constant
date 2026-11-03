@@ -59,8 +59,8 @@
 // CANDIDATE 1 QP from retained Recruitment_Drive.wikitext Rewards table.
 ^recruitmentdrive_questpoints = 1
 // Haunted Mine (Morytania mines) — distinct from Ernest ^haunted_complete.
-// complete=2 preserves 0 unstarted / 1 started (Zealot). CANDIDATE 2 QP.
-^hauntedmine_complete = 2
+// CANDIDATE: Lost City 289 stage ladder, no saved-account migration.
+^hauntedmine_complete = 11
 ^hauntedmine_questpoints = 2
 // Creature of Fenkenstrain — multi key 8 complete (VERIFIED unpack multi table).
 // CANDIDATE 2 QP / 1000 Thieving XP (period rewards).

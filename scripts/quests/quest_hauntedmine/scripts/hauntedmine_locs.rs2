@@ -1,0 +1,41 @@
+// CANDIDATE: LostCityRS/Content 289 at 457c8943b.
+// Keep r377 entrance landings except the operator-approved 4920 trace tile.
+
+[oploc1,hauntedmine_obstacle_cart]
+def_int $direction = ~coord_direction(coord, loc_coord);
+sound_synth(climb_wall, 0, 40);
+~agility_exactmove(human_walk_crumbledwall, 20, 2, coord, ~movecoord_indirection(coord, $direction, 2), 30, 100, $direction, true);
+
+[oploc1,hauntedmine_secondary_entrance]
+~crawl_through(0_53_150_44_37);
+if (%hauntedmine >= ^hauntedmine_started & %hauntedmine < ^hauntedmine_secondary_entrance) %hauntedmine = ^hauntedmine_secondary_entrance;
+
+[oploc1,hauntedmine_secondary_entrance_inside]
+~crawl_through(0_53_50_49_32);
+~hauntedmine_fungus_crawl;
+
+[oploc1,hauntedmine_back_entrance1]
+~crawl_through(0_53_150_13_31);
+~hauntedmine_fungus_crawl; // osrs
+if (%hauntedmine >= ^hauntedmine_started & %hauntedmine < ^hauntedmine_secondary_entrance) %hauntedmine = ^hauntedmine_secondary_entrance;
+
+[oploc1,hauntedmine_back_entrance1_inside]
+~crawl_through(0_53_50_37_33);
+~hauntedmine_fungus_crawl;
+
+[oploc1,hauntedmine_back_entrance2]
+~crawl_through(0_53_150_17_23);
+~hauntedmine_fungus_crawl; // osrs
+if (%hauntedmine >= ^hauntedmine_started & %hauntedmine < ^hauntedmine_secondary_entrance) %hauntedmine = ^hauntedmine_secondary_entrance;
+
+[oploc1,hauntedmine_back_entrance2_inside]
+~crawl_through(0_53_50_36_25);
+~hauntedmine_fungus_crawl;
+
+[proc,crawl_through](coord $tele)
+p_arrivedelay;
+anim(human_crawling, 20);
+p_delay(0);
+p_teleport($tele);
+anim(null, 0);
+

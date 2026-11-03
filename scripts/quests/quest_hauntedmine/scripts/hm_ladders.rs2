@@ -12,9 +12,7 @@
 // plus era-adjusted route support. Exact arrival side CANDIDATE (east x+1,z).
 // Landings: VERIFIED walkable + reachedLoc on 1x1 ladder footprints
 // via root floor-footprint-root.json (not the rejected cardinal-only probe).
-// No %hauntedmine / %hauntedmine_bits writes. No climb anim / quest gates.
-// Cite: docs/research/haunted-mine-traversal-contract-377.md (Ladder unit 03:18)
-//       .tmp/r377-hm-floor-contract/floor-footprint-root.json
+// Keep fixed-east r377 landings, but use the donor climb animation.
 
 // --- 4965 laddertop <-> 4966 ladder  (delta -640,-5056) ---
 // Origins: 3413,9633 <-> 2773,4577; 3422,9625 <-> 2782,4569.
@@ -23,8 +21,8 @@
 [oploc1,hauntedmine_laddertop]
 p_arrivedelay;
 switch_coord (loc_coord) {
-    case 0_53_150_21_33 : p_telejump(0_43_71_22_33); // Climb-down -> 2774,4577
-    case 0_53_150_30_25 : p_telejump(0_43_71_31_25); // Climb-down -> 2783,4569
+    case 0_53_150_21_33 : ~climb_ladder(0_43_71_22_33, true); // Climb-down -> 2774,4577
+    case 0_53_150_30_25 : ~climb_ladder(0_43_71_31_25, true); // Climb-down -> 2783,4569
     case default :
         mes("Unhandled Haunted Mine ladder:");
         mes(~coord_tostring(loc_coord));
@@ -33,8 +31,8 @@ switch_coord (loc_coord) {
 [oploc1,hauntedmine_ladder]
 p_arrivedelay;
 switch_coord (loc_coord) {
-    case 0_43_71_21_33 : p_telejump(0_53_150_22_33); // Climb-up -> 3414,9633
-    case 0_43_71_30_25 : p_telejump(0_53_150_31_25); // Climb-up -> 3423,9625
+    case 0_43_71_21_33 : ~climb_ladder(0_53_150_22_33, true); // Climb-up -> 3414,9633
+    case 0_43_71_30_25 : ~climb_ladder(0_53_150_31_25, true); // Climb-up -> 3423,9625
     case default :
         mes("Unhandled Haunted Mine ladder:");
         mes(~coord_tostring(loc_coord));
@@ -47,10 +45,10 @@ switch_coord (loc_coord) {
 [oploc1,hauntedmine_laddertop_1e]
 p_arrivedelay;
 switch_coord (loc_coord) {
-    case 0_42_70_8_17 : p_telejump(0_43_70_9_17); // Climb-down -> 2761,4497
-    case 0_42_70_22_60 : p_telejump(0_43_70_23_60); // Climb-down -> 2775,4540
-    case 0_42_70_37_6 : p_telejump(0_43_70_38_6); // Climb-down -> 2790,4486
-    case 0_42_70_44_49 : p_telejump(0_43_70_45_49); // Climb-down -> 2797,4529
+    case 0_42_70_8_17 : ~climb_ladder(0_43_70_9_17, true); // Climb-down -> 2761,4497
+    case 0_42_70_22_60 : ~climb_ladder(0_43_70_23_60, true); // Climb-down -> 2775,4540
+    case 0_42_70_37_6 : ~climb_ladder(0_43_70_38_6, true); // Climb-down -> 2790,4486
+    case 0_42_70_44_49 : ~climb_ladder(0_43_70_45_49, true); // Climb-down -> 2797,4529
     case default :
         mes("Unhandled Haunted Mine ladder:");
         mes(~coord_tostring(loc_coord));
@@ -59,10 +57,10 @@ switch_coord (loc_coord) {
 [oploc1,hauntedmine_ladder_1w]
 p_arrivedelay;
 switch_coord (loc_coord) {
-    case 0_43_70_8_17 : p_telejump(0_42_70_9_17); // Climb-up -> 2697,4497
-    case 0_43_70_22_60 : p_telejump(0_42_70_23_60); // Climb-up -> 2711,4540
-    case 0_43_70_37_6 : p_telejump(0_42_70_38_6); // Climb-up -> 2726,4486
-    case 0_43_70_44_49 : p_telejump(0_42_70_45_49); // Climb-up -> 2733,4529
+    case 0_43_70_8_17 : ~climb_ladder(0_42_70_9_17, true); // Climb-up -> 2697,4497
+    case 0_43_70_22_60 : ~climb_ladder(0_42_70_23_60, true); // Climb-up -> 2711,4540
+    case 0_43_70_37_6 : ~climb_ladder(0_42_70_38_6, true); // Climb-up -> 2726,4486
+    case 0_43_70_44_49 : ~climb_ladder(0_42_70_45_49, true); // Climb-up -> 2733,4529
     case default :
         mes("Unhandled Haunted Mine ladder:");
         mes(~coord_tostring(loc_coord));
@@ -74,8 +72,8 @@ switch_coord (loc_coord) {
 [oploc1,hauntedmine_laddertop_1sw]
 p_arrivedelay;
 switch_coord (loc_coord) {
-    case 0_43_71_45_55 : p_telejump(0_42_70_46_55); // Climb-down -> 2734,4535
-    case 0_43_71_46_23 : p_telejump(0_42_70_47_23); // Climb-down -> 2735,4503
+    case 0_43_71_45_55 : ~climb_ladder(0_42_70_46_55, true); // Climb-down -> 2734,4535
+    case 0_43_71_46_23 : ~climb_ladder(0_42_70_47_23, true); // Climb-down -> 2735,4503
     case default :
         mes("Unhandled Haunted Mine ladder:");
         mes(~coord_tostring(loc_coord));
@@ -84,8 +82,8 @@ switch_coord (loc_coord) {
 [oploc1,hauntedmine_ladder_1ne]
 p_arrivedelay;
 switch_coord (loc_coord) {
-    case 0_42_70_45_55 : p_telejump(0_43_71_46_55); // Climb-up -> 2798,4599
-    case 0_42_70_46_23 : p_telejump(0_43_71_47_23); // Climb-up -> 2799,4567
+    case 0_42_70_45_55 : ~climb_ladder(0_43_71_46_55, true); // Climb-up -> 2798,4599
+    case 0_42_70_46_23 : ~climb_ladder(0_43_71_47_23, true); // Climb-up -> 2799,4567
     case default :
         mes("Unhandled Haunted Mine ladder:");
         mes(~coord_tostring(loc_coord));

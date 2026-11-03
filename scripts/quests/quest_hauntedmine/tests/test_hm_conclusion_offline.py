@@ -39,15 +39,15 @@ def main() -> int:
     reward = read(HM / "scripts/hm_reward_door.rs2")
     cut = read(HM / "scripts/hm_crystal_cut.rs2")
     complete = read(HM / "scripts/hm_complete.rs2")
-    journal = read(HM / "scripts/hm_journal.rs2")
-    hm_const = read(HM / "configs/hm_quest.constant")
+    journal = read(HM / "scripts/hauntedmine_journal.rs2")
+    hm_const = read(HM / "configs/hauntedmine.constant")
     quests = read(GEN_QUESTS)
     qconst = read(QUEST_CONST)
 
-    # --- constants: complete=2, QP=2; preserve 0/1 ---
-    must_contain(hm_const, r"\^hauntedmine_not_started\s*=\s*0", "hm_quest.constant not_started")
-    must_contain(hm_const, r"\^hauntedmine_started\s*=\s*1", "hm_quest.constant started")
-    must_contain(qconst, r"\^hauntedmine_complete\s*=\s*2", "quest.constant complete=2")
+    # Donor ladder and rewards, with the r377 conclusion guards retained.
+    must_contain(hm_const, r"\^hauntedmine_not_started\s*=\s*0", "not_started")
+    must_contain(hm_const, r"\^hauntedmine_started\s*=\s*1", "started")
+    must_contain(qconst, r"\^hauntedmine_complete\s*=\s*11", "complete=11")
     must_contain(qconst, r"\^hauntedmine_questpoints\s*=\s*2", "quest.constant QP=2")
     # no Ernest collision
     if re.search(r"\^haunted_complete\s*=\s*2", qconst):
@@ -74,16 +74,16 @@ def main() -> int:
     must_contain(cut, r"inv_freespace\s*\(\s*inv\s*\)", "full inv guard")
     must_contain(cut, r"crystalshard_necklace_unstrung", "salve shard yield")
     must_contain(cut, r"You cut a shard from the crystal", "cut mes")
-    must_contain(cut, r"queue\s*\(\s*hm_quest_complete", "complete queue on first cut")
+    must_contain(cut, r"~hm_quest_complete\s*;", "synchronous completion after successful cut")
     if "hauntedmine_bits" in cut or "hauntedmine_points_store" in cut:
         fail("crystal cut must not touch 383/762")
 
     # --- complete writer: once-guard, XP tenths, scroll, session log ---
-    must_contain(complete, r"\[queue,hm_quest_complete\]", "complete queue trigger")
+    must_contain(complete, r"\[proc,hm_quest_complete\]", "completion procedure")
     must_contain(
         complete,
-        r"%hauntedmine\s*>=\s*\^hauntedmine_complete",
-        "once-guard before grants",
+        r"%hauntedmine\s*!\s*\^hauntedmine_rewarddoor_found",
+        "stage 10 guard before rewards",
     )
     must_contain(complete, r"%hauntedmine\s*=\s*\^hauntedmine_complete", "set complete stage")
     # 22,000 Strength XP → engine tenths 220000 (scorpcatcher 66250≡6625)

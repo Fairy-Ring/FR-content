@@ -1,39 +1,7 @@
-// Haunted Mine M1 glowing fungus pickup + basic lifecycle (r377).
-// Config unit (unchanged; packed ops/IDs/models/fields):
-//   loc 4932 glowing_mushroom / 4933 glowing_mushroom2 — op1=Pick
-//   obj 4075 glowing_fungus — untradeable, unstackable
-//   ashes on manual drop / leaving HM map set
-//
-// Behavior: CANDIDATE from OSRS Wiki Haunted Mine + Glowing fungus (read 2026-09-09)
-// and retained Zybez multi-pickup notes. No RS3/modern graves/diaries. No questvars/XP.
-// No pick animation/regrowth timer. Losing last fungus while already in lit bottom chamber
-// remains UNKNOWN (not invented here). Cart persistence is a separate contract.
-//
-// HM map squares (plane 0): 42_69/70/71, 43_69/70/71, 53_150.
-// Music mapzone enter handlers stay in music/scripts/move.rs2 — this file only adds exits.
-// Cite: .tmp/r377-hm-cart-route-root/fungus-contract.md
-
-// --- Pick: both mushroom locs yield one 4075 if inv has space; repeat allowed ---
-
-[oploc1,glowing_mushroom]
-~hm_fungus_pick;
-
-[oploc1,glowing_mushroom2]
-~hm_fungus_pick;
-
-[proc,hm_fungus_pick]
-p_arrivedelay;
-if (inv_freespace(inv) = 0) {
-    // Generic inventory-space refusal (pickup.rs2 idiom); do not replace/delete slots.
-    mes("You don't have enough inventory space to hold that item.");
-    return;
-}
-inv_add(inv, glowing_fungus, 1);
-
+// r377 fungus lifecycle boundaries and drop guards.
+// Keep the existing map-zone rule. Donor crawl/step messages run before these exits.
 // --- Manual Drop: selected fungus becomes ground ashes; guards before inv change ---
 
-[opheld5,glowing_fungus]
-~hm_fungus_drop(last_slot);
 
 [proc,hm_fungus_drop](int $slot)
 // Match normal drop guards (player/scripts/drop.rs2) before touching the slot.
@@ -57,6 +25,7 @@ if (inv_getobj(inv, $slot) ! glowing_fungus) {
     return;
 }
 // Consume fungus then spawn ashes with normal drop ownership/lifetime.
+mes("When you drop the fungus it crumbles mysteriously to dust.");
 inv_delslot(inv, $slot);
 obj_add(coord, ashes, 1, ^dropslot_duration);
 anim(null, 0);
@@ -87,7 +56,7 @@ return (false);
 if (~hm_in_mine = true) {
     return;
 }
-~hm_fungus_convert_carried_to_ashes;
+~hauntedmine_fungus_crumble;
 
 [proc,hm_fungus_convert_carried_to_ashes]
 def_int $i = 0;
@@ -100,10 +69,3 @@ while ($i < $size) {
     $i = calc($i + 1);
 }
 
-// --- Ordinary death: destroy fungus before keep/drop allocation (called from death.rs2) ---
-
-[proc,hm_fungus_on_death]
-def_int $n = inv_total(inv, glowing_fungus);
-if ($n > 0) {
-    inv_del(inv, glowing_fungus, $n);
-}

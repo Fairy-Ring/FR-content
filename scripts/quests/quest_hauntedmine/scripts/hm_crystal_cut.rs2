@@ -2,10 +2,8 @@
 // Locs 4926/4927/4928: crystalcorner / crystaledging / largecrystals (op1=Cut).
 // Requires chisel in inv; Crafting ≥ 35 (boostable via stat(), not stat_base).
 // Yield: crystalshard_necklace_unstrung (4082 Salve shard).
-// First successful cut queues hm_quest_complete once; repeat cuts still yield
-// shard when inv free (CANDIDATE guide FAQ). Missing tool / low level / full
-// inv do not yield shard and do not award complete.
-// No salve stringing. No 383/762. No boss writers.
+// Only stage 10 completes the quest. Repeated successful cuts still yield shards.
+// Keep the period-grounded Crafting 35 check, absent from the 289 donor.
 // Cut mes CANDIDATE from OSRS transcript: "You cut a shard from the crystal."
 
 [oploc1,crystalcorner]
@@ -16,6 +14,21 @@
 
 [oploc1,largecrystals]
 @hm_cut_crystal;
+
+[oplocu,crystalcorner]
+@hm_cut_crystal_use;
+
+[oplocu,crystaledging]
+@hm_cut_crystal_use;
+
+[oplocu,largecrystals]
+@hm_cut_crystal_use;
+
+[label,hm_cut_crystal_use]
+if (last_useitem = chisel) {
+    @hm_cut_crystal;
+}
+mes("A chisel might be more suitable for cutting these fine crystals.");
 
 [label,hm_cut_crystal]
 if (inv_total(inv, chisel) = 0) {
@@ -31,12 +44,9 @@ if (inv_freespace(inv) = 0) {
     return;
 }
 
-// Guard complete before yield so a failed complete path cannot double-grant later.
-// Shard is granted on every successful cut; complete queue is once-only.
-if (%hauntedmine < ^hauntedmine_complete) {
-    queue(hm_quest_complete, 0, 0);
-}
 
 sound_synth(chisel, 1, 0);
 mes("You cut a shard from the crystal.");
 inv_add(inv, crystalshard_necklace_unstrung, 1);
+anim(human_pickuptable, 0);
+~hm_quest_complete;

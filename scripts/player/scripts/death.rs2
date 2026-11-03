@@ -23,6 +23,8 @@ if (~in_castlewars_waitingroom(coord) = true) {
 
 ~player_death;
 midi_jingle(death2);
+// Convert fungus before normal keep/drop allocation, as in the 289 donor.
+~hauntedmine_fungus_crumble;
 // https://storage.googleapis.com/tannerdino/images/6543.jpg
 // https://youtu.be/gWmwSYxzUfo
 mes("Oh dear you are dead!");
@@ -37,8 +39,6 @@ if (.finduid(%duel2accept) = true) {
     }
 }
 
-// Haunted Mine glowing fungus: destroy before keep/drop so it cannot be preserved or floored.
-~hm_fungus_on_death;
 
 def_obj $prev_wep = inv_getobj(worn, ^wearpos_rhand);
 if (findhero = true) {

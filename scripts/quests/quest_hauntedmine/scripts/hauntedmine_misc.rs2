@@ -20,7 +20,7 @@ npc_anim(null, 0);
 
 
 [ai_timer,possessed_pickaxe]
-npc_anim(seq_1448, 0); // osrs uses it's death anim.... But it breaks all proceeding anims.
+npc_anim(pickaxe_projectile_summon, 0); // osrs uses it's death anim.... But it breaks all proceeding anims.
 npc_changetype_keepall(possessed_pickaxe_stationary, ^max_32bit_int);
 npc_setmode(null);
 npc_delay(1);
