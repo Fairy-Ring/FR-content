@@ -284,7 +284,7 @@ if (npc_find(^tbwt_tamayu_hunter_cutscene_final_spawn, tbwt_tamayu_final_hunter,
 
      if(%npc_int > map_clock) {
         p_delay(5);
-        midi_jingle("tamayu slays the shaikahan", ^tbwt_tamayu_jingle_millis);
+        midi_jingle("tamayu slays the shaikahan");
         p_delay(6);
         %tbwt_tamayu = ^tbwt_tamayu_complete;
         p_teleport(0_44_47_32_31);
@@ -308,7 +308,7 @@ if (npc_find(^tbwt_tamayu_hunter_cutscene_final_spawn, tbwt_tamayu_final_hunter,
     ~.sound_area(staff_stab, 0, coord, 0);
     p_delay(2);
 
-    midi_jingle("tamayu slays the shaikahan", ^tbwt_tamayu_jingle_millis);
+    midi_jingle("tamayu slays the shaikahan");
     npc_anim(human_spear_spike, 0);
     .npc_anim(lion_block, 0);
     ~.sound_area(beast_hit, 0, coord, 0);

@@ -6,7 +6,7 @@
 [label,open_bank_pin_setting]
 ~bankpin_tick_pending;
 if_openmain(bankpin_settings);
-sound_synth(PIN_pending, 0, 0);
+sound_synth(PIN_pending, 1, 0);
 ~bankpin_messages;
 ~bankpin_refresh_settings;
 
@@ -136,7 +136,7 @@ if_close;
 %bankpin_buf = 0;
 %bankpin_len = 0;
 if_openmain(bankpin_main);
-sound_synth(PIN_pending, 0, 0);
+sound_synth(PIN_pending, 1, 0);
 ~bankpin_paint_keypad;
 
 [proc,bankpin_paint_keypad]
@@ -268,7 +268,7 @@ if ($len > 3) {
 
 [label,bankpin_press](int $slot)
 def_int $d = ~bankpin_map_digit($slot);
-sound_synth(PIN_beep, 0, 0);
+sound_synth(PIN_beep, 1, 0);
 %bankpin_buf = add(multiply(%bankpin_buf, 10), $d);
 %bankpin_len = add(%bankpin_len, 1);
 ~bankpin_star(%bankpin_len);
@@ -320,7 +320,7 @@ if (%bankpin_mode = ^bankpin_mode_set) {
         @openbank;
     } else {
         mes("The PIN you entered is incorrect.");
-        sound_synth(PIN_cancel, 0, 0);
+        sound_synth(PIN_cancel, 1, 0);
         @open_bankpin_keypad;
     }
 } else if (%bankpin_mode = ^bankpin_mode_delete) {
@@ -332,7 +332,7 @@ if (%bankpin_mode = ^bankpin_mode_set) {
         if_close;
     } else {
         mes("The PIN you entered is incorrect.");
-        sound_synth(PIN_cancel, 0, 0);
+        sound_synth(PIN_cancel, 1, 0);
         @open_bankpin_keypad;
     }
 }
@@ -349,5 +349,5 @@ if (%bankpin_mode = ^bankpin_mode_unlock | %bankpin_mode = ^bankpin_mode_unlock_
 if_close;
 
 [if_button,bankpin_main:cancel]
-sound_synth(PIN_cancel, 0, 0);
+sound_synth(PIN_cancel, 1, 0);
 if_close;

@@ -25,7 +25,7 @@ if (%action_delay < map_clock) {
     p_oploc(1);
     return;
 }
-sound_synth(sickle_slash, 0, 0);
+sound_synth(sickle_slash, 1, 0);
 // worn check already passed; pick anim by which sickle is present
 if (inv_total(worn, silver_sickle_blessed) > 0) {
     anim(misc_herb_weeding_silver_sickle_blessed, 0);
@@ -41,7 +41,7 @@ if (%action_delay = map_clock) {
     p_delay(0);
     def_int $respawn = 50; // 5 minutes
     loc_change($loc_transform, $respawn);
-    sound_synth(sickle_stab, 0, 0);
+    sound_synth(sickle_stab, 1, 0);
     anim(null, 0);
     if (%misc_approval < 127) {
         %misc_approval = add(%misc_approval, 1);
@@ -62,7 +62,7 @@ if (inv_total(worn, iron_sickle) = 0 & inv_total(worn, silver_sickle) = 0 & inv_
     return;
 }
 def_int $weeding_rate = 3; // Inauthentic
-sound_synth(sickle_slash, 0, 0);
+sound_synth(sickle_slash, 1, 0);
 if (%action_delay < map_clock) {
     %action_delay = calc(map_clock + $weeding_rate);
 } else if (%action_delay = map_clock) {
@@ -76,7 +76,7 @@ if (%action_delay < map_clock) {
     p_delay(0);
     def_int $respawn = 50;
     loc_change($loc_transform, $respawn);
-    sound_synth(sickle_stab, 0, 0);
+    sound_synth(sickle_stab, 1, 0);
     anim(null, 0);
     if (%misc_approval < 127) {
         %misc_approval = add(%misc_approval, 1);

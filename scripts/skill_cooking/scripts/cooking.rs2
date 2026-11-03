@@ -134,7 +134,7 @@ weakqueue*(cook_generic, 3)(sub($count, 1), $low, $high, $anim, $succesmessage, 
 
 [label,cook_item](int $low, int $high, seq $anim, string $succesmessage, string $burnmessage, obj $uncooked_item, namedobj $cooked_item, namedobj $burnt_item, namedobj $additional_item, int $experience)
 anim($anim, 0);
-sound_synth(fry, 0, 0);
+sound_synth(fry, 1, 0);
 switch_obj($uncooked_item) {
     case half_baked_batta : $cooked_item = ~gnome_batta;
     case half_baked_bowl : $cooked_item = ~gnome_bowl;
@@ -178,7 +178,10 @@ p_delay(0);
 if_openchat(cookx);
 if_setobject(cookx:com_2, $obj, 200);
 
-if_setresumebuttons(cookx:com_3, cookx:com_4, cookx:com_5, cookx:com_6, null);
+if_addresumebutton(cookx:com_3);
+if_addresumebutton(cookx:com_4);
+if_addresumebutton(cookx:com_5);
+if_addresumebutton(cookx:com_6);
 p_pausebutton;
 switch_component(last_com) {
     case cookx:com_3 : return(inv_total(inv, $obj)); // all option does exact amount https://youtu.be/upmpbF8tLVA?list=PLn23LiLYLb1adxeMknKdwA6dBnehuEMeT&t=201

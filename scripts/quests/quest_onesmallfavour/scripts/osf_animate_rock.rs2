@@ -46,7 +46,7 @@ if_close;
 // Spawn tile UNKNOWN — map_findsquare in the alcove, not a dest.
 def_coord $spawn = map_findsquare(0_40_153_61_43, 1, 2, ^map_findsquare_lineofwalk);
 npc_add($spawn, slagilith_birth, 1000);
-sound_synth(slagilith_appear, 0, 0);
+sound_synth(slagilith_appear, 1, 0);
 p_delay(3);
 npc_changetype(slagilith, 1000);
 return;

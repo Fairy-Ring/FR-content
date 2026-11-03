@@ -294,7 +294,7 @@ if_settext(boardgames_runelink:winner, "");
 [proc,test_runelink_move](int $column)(boolean)
 if (%boardgames_myturn = 0) {
     if_settext(boardgames_runelink:status1, "It is not your turn!");
-    sound_synth(column_full, 0, 0);
+    sound_synth(column_full, 1, 0);
     return (false);
 }
 
@@ -302,7 +302,7 @@ def_int $col_idx = sub($column, 1);
 
 if (inv_getobj(boardgames_boardinv, $col_idx) ! null) {
     if_settext(boardgames_runelink:status1, "This column is full!");
-    sound_synth(column_full, 0, 0);
+    sound_synth(column_full, 1, 0);
     return (false); 
 }
 
@@ -336,7 +336,7 @@ def_int $col = modulo($found_slot, 7);
 def_int $x = multiply($col, ^runelink_tile_size);
 def_int $y = multiply($row, ^runelink_tile_size);
 
-sound_synth(runelink_bottom, 0, 0);
+sound_synth(runelink_bottom, 1, 0);
 anim(human_sittingdown_move, 0);
 if_setanim(boardgames_runelink:runeflash, null);
 if_setposition(boardgames_runelink:runeflash, $x, $y);
@@ -369,7 +369,7 @@ def_int $col = modulo($found_slot, 7);
 def_int $x = multiply($col, ^runelink_tile_size);
 def_int $y = multiply($row, ^runelink_tile_size);
 
-.sound_synth(runelink_bottom, 0, 0);
+.sound_synth(runelink_bottom, 1, 0);
 .if_setanim(boardgames_runelink:runeflash, null);
 .if_setposition(boardgames_runelink:runeflash, $x, $y);
 .if_setanim(boardgames_runelink:runeflash, runeflash);
@@ -566,7 +566,7 @@ anim(null, 0);
 ~setup_runelink_view($p1_rank, $p2_rank);
 
 if (%boardgames_closemode = ^boardgames_draw) {
-    midi_jingle("boardgames draw", ^boardgames_draw_jingle_millis);
+    midi_jingle("boardgames draw");
     if_settext(boardgames_runelink_view:winner, "It's a draw!");
     if (%boardgames_closereason = ^runelink_fullboard_draw) {
         if_settext(boardgames_runelink_view:status1, "All columns where full.");
@@ -575,7 +575,7 @@ if (%boardgames_closemode = ^boardgames_draw) {
     }
     if_settext(boardgames_runelink_view:status2, "");
 } else if (%boardgames_closemode = ^boardgames_win) {
-    midi_jingle("boardgames victory", ^boardgames_victory_jingle_millis);
+    midi_jingle("boardgames victory");
     if_settext(boardgames_runelink_view:winner, "You win!");
     if (%boardgames_closereason = ^runelink_connect_win) {
         if_settext(boardgames_runelink_view:status1, "Player got four in a row!");
@@ -589,7 +589,7 @@ if (%boardgames_closemode = ^boardgames_draw) {
         if_settext(boardgames_runelink_view:status2, "");
     }
 } else if (%boardgames_closemode = ^boardgames_loss) {
-    midi_jingle("boardgames defeat", ^boardgames_defeat_jingle_millis);
+    midi_jingle("boardgames defeat");
     if_settext(boardgames_runelink_view:winner, "You lose!");
     if (%boardgames_closereason = ^runelink_connect_win) {
         if_settext(boardgames_runelink_view:status1, "Player got four in a row!");
@@ -627,7 +627,7 @@ if($resigned = true) {
 
 if (.%boardgames_closemode = ^boardgames_draw) {
     .if_settext(boardgames_runelink_view:winner, "It's a draw!");
-    .midi_jingle("boardgames draw", ^boardgames_draw_jingle_millis);
+    .midi_jingle("boardgames draw");
     if (.%boardgames_closereason = ^runelink_fullboard_draw) {
         .if_settext(boardgames_runelink_view:status1, "All columns were full.");
     } else {
@@ -637,7 +637,7 @@ if (.%boardgames_closemode = ^boardgames_draw) {
     .if_settext(boardgames_runelink_view:status2, "");
 } else if (.%boardgames_closemode = ^boardgames_win) {
     .if_settext(boardgames_runelink_view:winner, "You Win!");
-    .midi_jingle("boardgames victory", ^boardgames_victory_jingle_millis);
+    .midi_jingle("boardgames victory");
     if (.%boardgames_closereason = ^runelink_connect_win) {
         .if_settext(boardgames_runelink_view:status1, "Player got four in a row!");
     } else {
@@ -651,7 +651,7 @@ if (.%boardgames_closemode = ^boardgames_draw) {
     }
 } else if (.%boardgames_closemode = ^boardgames_loss) {
     .if_settext(boardgames_runelink_view:winner, "You lose!");
-    .midi_jingle("boardgames defeat", ^boardgames_defeat_jingle_millis);
+    .midi_jingle("boardgames defeat");
     if (.%boardgames_closereason = ^runelink_connect_win) {
         .if_settext(boardgames_runelink_view:status1, "Player got four in a row!");
     } else {
@@ -735,7 +735,7 @@ if (%boardgames_viewing = 0) {
     p_teleport(movecoord(^runelink_room_tele_coord, ~random_range(-3, 3), 0, ~random_range(-3, 3)));
     anim(null, 0);
     ~setup_runelink_view_resign($winner_rank, $loser_rank);
-    midi_jingle("boardgames defeat", ^boardgames_defeat_jingle_millis);
+    midi_jingle("boardgames defeat");
     if_settext(boardgames_runelink_view:winner, "You lose!");
     if_settext(boardgames_runelink_view:status1, "Player resigned.");
     

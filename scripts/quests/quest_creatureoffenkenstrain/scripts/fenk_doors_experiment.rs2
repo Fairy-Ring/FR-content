@@ -16,7 +16,7 @@ if (inv_total(inv, fenk_shed_key) > 0) {
     return;
 }
 mes("The door is locked.");
-sound_synth(locked, 0, 0);
+sound_synth(locked, 1, 0);
 
 [oplocu,fenk_shed_door]
 if (last_useitem = fenk_shed_key) {
@@ -40,7 +40,7 @@ if (inv_total(inv, fenk_tower_key) > 0) {
     return;
 }
 mes("The door is locked.");
-sound_synth(locked, 0, 0);
+sound_synth(locked, 1, 0);
 
 [oplocu,fenk_tower_door]
 if (last_useitem = fenk_tower_key) {
@@ -64,7 +64,7 @@ if (inv_total(inv, fenk_mausoleum_key) > 0) {
     return;
 }
 mes("The entrance is locked.");
-sound_synth(locked, 0, 0);
+sound_synth(locked, 1, 0);
 
 [oplocu,fenk_mausoleum_door]
 if (last_useitem = fenk_mausoleum_key) {

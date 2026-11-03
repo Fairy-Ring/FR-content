@@ -68,7 +68,7 @@ mes("You open the large wooden doors and step into the muddy marsh of Mort Myre.
 
 [proc,open_freedomfighter_undergroundentrance](coord $loc_coord, boolean $mirrored)
 anim(human_pickuptable, 0);
-sound_synth(locked, 0, 0);
+sound_synth(locked, 1, 0);
 p_delay(0);
 if($mirrored = true) {
     loc_change(freedomfighterundergrounddooropenr, 3);
@@ -77,7 +77,7 @@ if($mirrored = true) {
     loc_change(freedomfighterundergrounddooropenl, 3);
     loc_add(movecoord($loc_coord, 1, 0, 0), freedomfighterundergrounddooropenr, loc_angle, loc_shape, 3);
 }
-sound_synth(iron_door_open, 0, 0);
+sound_synth(iron_door_open, 1, 0);
 p_delay(1);
 ~exit_freedomfighterunderground;
 

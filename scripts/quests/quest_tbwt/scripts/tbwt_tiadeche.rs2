@@ -191,7 +191,7 @@ if (%tbwt_tiadeche = ^tbwt_tiadeche_player_received_manual) {
 inv_del(inv, tbwt_crafting_manual, 1);
 %tbwt_tiadeche = ^tbwt_tiadeche_complete;
 ~objbox(tbwt_crafting_manual, "You hand over the crafting manual to Tiadeche.", 250, 0, 0);
-midi_jingle("tiadeche thankful", ^tbwt_tiadeche_jingle_millis);
+midi_jingle("tiadeche thankful");
 ~chatnpc("<p,happy>Thank you so much. You cannot understand what all of this means to me and our people.");
 @tbwt_tiadeche_complete;
 

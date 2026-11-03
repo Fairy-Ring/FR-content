@@ -16,7 +16,7 @@ if(inzone(0_40_71_0_0, 0_40_71_63_63, coord) = true) {
 
 [label,mm_ch2]
 ~music_jingle("new chapter");
-sound_synth(ooks, 0, 0);
+sound_synth(ooks, 1, 0);
 if_settext(scroll:com_2, "Monkey Madness: Chapter 2");
 if_settext(scroll:com_3, "");
 if_settext(scroll:com_4, "In which our <text_gender("hero", "heroine")> finds <text_gender("him", "her")>self engaging in");

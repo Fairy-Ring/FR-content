@@ -149,7 +149,7 @@ if(%mm_awowogei = ^awowogei_complete_mission) {
 // Chapter 4 card (289 mm_ch4 / inter_199 → 377 scroll like ch2)
 [label,mm_ch4_thin]
 ~music_jingle("new chapter");
-sound_synth(ooks, 0, 0);
+sound_synth(ooks, 1, 0);
 if_settext(scroll:com_2, "Monkey Madness: Chapter 4");
 if_settext(scroll:com_3, "");
 if_settext(scroll:com_4, "The Final Battle");

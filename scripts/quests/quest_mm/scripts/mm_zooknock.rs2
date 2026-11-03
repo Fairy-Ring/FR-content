@@ -251,7 +251,7 @@ if($multiple = ^false) {
     ~chatnpcnoturn("<p,neutral>Somewhere in the village. It ought to be obvious. Now give me a moment.");
     if_close;
     p_delay(4);
-    sound_synth(superheat_all, 0, 0);
+    sound_synth(superheat_all, 1, 0);
     spotanim_npc(windwave_impact, 80, 0);
     inv_add(inv, mm_enchanted_gold_bar, 1);
     inv_add(inv, mm_monkey_amulet_mould, 1);
@@ -279,7 +279,7 @@ if(%mm_zooknock_has_magical_talisman = ^false) {
 if_close;
 p_delay(4);
 def_namedobj $talisman = enum(int, namedobj, mm_bones_mapping, %mm_zooknock_monkey_relic);
-sound_synth(superheat_all, 0, 0);
+sound_synth(superheat_all, 1, 0);
 spotanim_npc(windwave_impact, 80, 0);
 inv_add(inv, $talisman, 1);
 if(%mm_zooknock_player_is_collecting_for_talisman = ^true) %mm_zooknock_player_is_collecting_for_talisman = ^false;

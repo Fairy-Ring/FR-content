@@ -134,7 +134,7 @@ if($slot <= 19) {
 } 
 
 if($open_slot ! -1) {
-    sound_synth(slide_puzzle, 0, 0);
+    sound_synth(slide_puzzle, 1, 0);
     inv_movetoslot(reinitialisation_inv, reinitialisation_inv, $slot, $open_slot);
 }
 
@@ -191,7 +191,7 @@ if(loc_find(0_40_70_16_30, mm_glider) = true) loc_anim(m_glider_unfold);
 if(loc_find(0_40_70_16_34, mm_glider) = true) loc_anim(m_glider_unfold);
 if(loc_find(0_40_70_16_38, mm_glider) = true) loc_anim(m_glider_unfold);
 if(loc_find(0_40_70_16_46, mm_glider) = true) loc_anim(m_glider_unfold);
-sound_synth(wing_unfold, 0, 0);
+sound_synth(wing_unfold, 1, 0);
 p_delay(7); // 8t
 // Final hangar + restore tabs/cam (same as 289 end)
 ~mm_hangar_cutscene_finish;

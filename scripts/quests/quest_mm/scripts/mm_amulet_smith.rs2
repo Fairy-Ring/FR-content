@@ -12,7 +12,7 @@ if(last_useitem = mm_enchanted_gold_bar) {
         return;
     }
     anim(human_furnace, 0);
-    sound_synth(furnace, 0, 0);
+    sound_synth(furnace, 1, 0);
     inv_delslot(inv, $slot);
     p_delay(2);
     mes("You smith the enchanted gold into an amulet.");

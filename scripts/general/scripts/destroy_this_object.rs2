@@ -267,7 +267,8 @@ if_settext(destroy_this_object:com_13, oc_name($obj));
 if_settext(destroy_this_object:com_11, ^string_empty);
 if_settext(destroy_this_object:com_12, ^string_empty);
 if_openchat(destroy_this_object);
-if_setresumebuttons(destroy_this_object:com_4, destroy_this_object:com_5, null, null, null);
+if_addresumebutton(destroy_this_object:com_4);
+if_addresumebutton(destroy_this_object:com_5);
 p_pausebutton;
 if (last_com = destroy_this_object:com_4) {
     inv_delslot(inv, $slot);

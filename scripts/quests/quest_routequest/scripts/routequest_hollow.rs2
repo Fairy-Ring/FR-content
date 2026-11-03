@@ -6,7 +6,7 @@ if(%routequest < ^routequest_answered_questions) {
 }
 p_arrivedelay;
 anim(human_pickuptable, 0);
-sound_synth(locked, 0, 0);
+sound_synth(locked, 1, 0);
 p_delay(0);
 if($mirrored = true) {
     loc_change(freedomfighterdooropenr, 3);
@@ -15,7 +15,7 @@ if($mirrored = true) {
     loc_change(freedomfighterdooropenl, 3);
     loc_add(movecoord($loc_coord, -1, 0, 0), freedomfighterdooropenr, loc_angle, loc_shape, 3);
 }
-sound_synth(iron_door_open, 0, 0);
+sound_synth(iron_door_open, 1, 0);
 p_delay(1);
 p_teleport(0_54_153_44_19);
 if(%routequest < ^routequest_entered_underground) {
@@ -341,12 +341,12 @@ if($q = 0) {
 if (npc_find(coord, route_curpile_fyod, 10, 0) = true) {
     npc_setmode(playerface);
     npc_anim(human_sword_slash, 0);
-    sound_synth(hacksword_slash, 0, 0);
+    sound_synth(hacksword_slash, 1, 0);
     p_delay(0);
     ~damage_self(1);
     spotanim_pl(stunned_thieving, 124, 0);
     anim(%com_defendanim, 0); // osrs
-    sound_synth(stunned, 0, 0);
+    sound_synth(stunned, 1, 0);
     p_delay(0);
     // 377: no shared ~fade_out/fade_in/fade_clear in tree — delay + tele (product path)
     p_delay(4);

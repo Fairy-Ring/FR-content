@@ -394,7 +394,7 @@ inv_del(inv, tbwt_burnt_jogre_bones_marinated_in_karambwanji, 1);
 ~objbox(tbwt_burnt_jogre_bones_marinated_in_karambwanji, "You hand Tinsay the burnt Jogre bones marinated in Karambwanji.", 250, 0, 0);
 if_close;
 npc_anim(human_eat, 0);
-midi_jingle("tinsay satisfied", ^tbwt_tinsay_jingle_millis);
+midi_jingle("tinsay satisfied");
 p_delay(1);
 npc_anim(human_wretch, 0);
 p_delay(6);

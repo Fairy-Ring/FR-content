@@ -37,6 +37,6 @@ if (%hauntedmine < ^hauntedmine_complete) {
     queue(hm_quest_complete, 0, 0);
 }
 
-sound_synth(chisel, 0, 0);
+sound_synth(chisel, 1, 0);
 mes("You cut a shard from the crystal.");
 inv_add(inv, crystalshard_necklace_unstrung, 1);

@@ -7,7 +7,7 @@
 
 [label,mm_ch1]
 ~music_jingle("new chapter");
-sound_synth(ooks, 0, 0);
+sound_synth(ooks, 1, 0);
 // 289 wrote inter_199:com_4 title + com_7/8 body; map onto 377 scroll text rows.
 if_settext(scroll:com_2, "Monkey Madness: Chapter 1");
 if_settext(scroll:com_3, "");

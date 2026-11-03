@@ -16,7 +16,7 @@ switch_obj(last_useitem) {
 [label,open_edgeville_dungeon_door]
 if (inv_total(inv, edgevilledungeonkey) > 0) {
     mes("You unlock the door.");
-    sound_synth(locked, 0, 0);
+    sound_synth(locked, 1, 0);
     def_coord $loc_coord = loc_coord;
     def_int $angle = loc_angle;
     def_locshape $shape = loc_shape;
@@ -32,16 +32,16 @@ if (inv_total(inv, edgevilledungeonkey) > 0) {
         if (coord ! $loc_coord) {
             p_delay(0);
             p_teleport($loc_coord);
-            sound_synth(door_open, 0, 0);
+            sound_synth(door_open, 1, 0);
             p_delay(1);
         } else {
             p_delay(0);
-            sound_synth(door_open, 0, 0);
+            sound_synth(door_open, 1, 0);
         }
         $dest = movecoord($loc_coord, $x, 0, $z);
     } else {
         p_delay(0);
-        sound_synth(door_open, 0, 0);
+        sound_synth(door_open, 1, 0);
     }
 
     p_teleport($dest);
@@ -57,7 +57,7 @@ if (inv_total(inv, edgevilledungeonkey) > 0) {
 // OSF leftover Use-ring. Cite osf-key-ring-doors-rest-377.md.
 // Do not require inv brass key. Do not dest.
 mes("You use your keyring to unlock the door.");
-sound_synth(locked, 0, 0);
+sound_synth(locked, 1, 0);
 def_coord $rloc = loc_coord;
 def_int $rangle = loc_angle;
 def_locshape $rshape = loc_shape;
@@ -71,16 +71,16 @@ if ($rentering = true) {
     if (coord ! $rloc) {
         p_delay(0);
         p_teleport($rloc);
-        sound_synth(door_open, 0, 0);
+        sound_synth(door_open, 1, 0);
         p_delay(1);
     } else {
         p_delay(0);
-        sound_synth(door_open, 0, 0);
+        sound_synth(door_open, 1, 0);
     }
     $rdest = movecoord($rloc, $rx, 0, $rz);
 } else {
     p_delay(0);
-    sound_synth(door_open, 0, 0);
+    sound_synth(door_open, 1, 0);
 }
 p_teleport($rdest);
 loc_add($rloc, inviswall, $rangle, $rshape, 3);

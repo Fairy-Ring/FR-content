@@ -27,7 +27,7 @@ inv_add(inv, mm_reinitialisation_hint, 1);
 [label,mm_bunker_teleport]
 anim(human_castteleport, 0);
 spotanim_pl(teleport_casting, 92, 0);
-sound_synth(teleport_all, 0, 0);
+sound_synth(teleport_all, 1, 0);
 p_delay(3);
 p_teleport(0_37_54_25_10);
 p_delay(0);

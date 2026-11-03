@@ -1,6 +1,6 @@
-// 377 engine has midi_jingle(midi, length); 274 used ~music_jingle(midi).
+// 377 engine has midi_jingle(midi); 274 used ~music_jingle(midi).
 [proc,music_jingle](midi $jingle)
-midi_jingle($jingle, 80);
+midi_jingle($jingle);
 
 // setidkcolour is a real engine command (274 PlayerOps colors[slot]).
-// Viking shoes: setidkcolour(^idk_colour_boots, $color). Makeover still uses setskincolour.
+// Viking shoes: setidkcolour(^idk_colour_boots, $color). Makeover uses setidkcolour(^idk_colour_skin, ...).

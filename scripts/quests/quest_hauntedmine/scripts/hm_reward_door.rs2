@@ -44,7 +44,7 @@ if (~osf_key_ring_has(hauntedmine_reward_key) = true) {
     return;
 }
 mes("The door is locked.");
-sound_synth(locked, 0, 0);
+sound_synth(locked, 1, 0);
 
 [label,hm_reward_door_open_unlocked](int $side)
 // Open-and-walk without loc category / next_loc_stage (reward doors have neither).
@@ -73,7 +73,7 @@ if ($side = ^left) {
 def_int $x;
 def_int $z;
 $x, $z = ~door_open($angle, $shape);
-sound_synth(door_open, 0, 0);
+sound_synth(door_open, 1, 0);
 
 def_coord $dest = $loc_coord;
 if ($entering = true) {

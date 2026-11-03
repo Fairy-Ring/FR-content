@@ -20,7 +20,7 @@ switch_int(%mm_awowogei) {
         if(inv_total(inv, mm_monkey_in_backpack) > 0) {
             ~chatplayer("<p,neutral>Yes, I have.");
             inv_del(inv, mm_monkey_in_backpack, 1);
-            sound_synth(ooks, 0, 0);
+            sound_synth(ooks, 1, 0);
             npc_add(map_findsquare(coord, 1, 1, ^map_findsquare_lineofsight), mm_freed_zoo_monkey, 50);
             %npc_attacking_uid = uid;
             @mm_awowogei_success;

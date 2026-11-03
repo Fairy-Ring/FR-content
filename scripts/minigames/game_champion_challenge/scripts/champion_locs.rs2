@@ -5,7 +5,7 @@
 
 [oploc1,champions_trap_door_closed]
 mes("The trapdoor opens...");
-sound_synth(door_open, 0, 0);
+sound_synth(door_open, 1, 0);
 loc_change(champions_trap_door_open, 500);
 
 [oploc1,champions_trap_door_open]
@@ -16,7 +16,7 @@ p_telejump(movecoord(coord(), 0, 0, 6400));
 
 [oploc2,champions_trap_door_open]
 mes("You close the trapdoor.");
-sound_synth(door_close, 0, 0);
+sound_synth(door_close, 1, 0);
 loc_change(champions_trap_door_closed, 500);
 
 [oploc1,champions_ladderup]

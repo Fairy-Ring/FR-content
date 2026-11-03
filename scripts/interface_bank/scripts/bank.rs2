@@ -114,7 +114,7 @@ if ($deposit > 0) {
     // (Peer H1: worn emptied, appearance/bonuses stayed). Do not invent engine ban.
     if ($inv = worn) {
         if ($obj = elemental_shield) {
-            sound_synth(shield_appear, 0, 0);
+            sound_synth(shield_appear, 1, 0);
         }
         if (oc_param($obj, specwep) = ^true) {
             %sa_attack = ^false;

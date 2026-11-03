@@ -60,7 +60,7 @@ if (inv_getobj(inv, $slot) ! glowing_fungus) {
 inv_delslot(inv, $slot);
 obj_add(coord, ashes, 1, ^dropslot_duration);
 anim(null, 0);
-sound_synth(put_down, 0, 0);
+sound_synth(put_down, 1, 0);
 
 // --- Mapzone exit: convert carried fungus->ashes only when CURRENT coord is outside HM ---
 

@@ -34,7 +34,7 @@ if(~mm_wearing_greegree = false) {
 ~chatnpc("<p,neutral>Pretty please with a banana on top?");
 ~chatplayer("<p,neutral>Look, I already said no. If you want to come then jump into my backpack.");
 ~chatnpc("<p,neutral>Ook!");
-sound_synth(ooks, 0, 0);
+sound_synth(ooks, 1, 0);
 inv_add(inv, mm_monkey_in_backpack, 1);
 // 289 sets monkey_backpack_timer for chatter; residual flavour
 
@@ -58,7 +58,7 @@ if(%npc_attacking_uid ! uid) {
 ~chatplayer("<p,neutral>Not quite yet ... you should get back in my backpack now.");
 npc_del;
 inv_add(inv, mm_monkey_in_backpack, 1);
-sound_synth(ooks, 0, 0);
+sound_synth(ooks, 1, 0);
 
 // ---- shared monkeyspeak (289 quest_mm thin) ----
 [proc,monkeyspeak_text]()(string)

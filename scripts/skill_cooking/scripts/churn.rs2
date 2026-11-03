@@ -14,7 +14,9 @@ if (inv_total(inv, bucket_milk) < 1) {
     return;
 }
 if_openchat(churn);
-if_setresumebuttons(churn:com_5, churn:com_6, churn:com_7, null, null);
+if_addresumebutton(churn:com_5);
+if_addresumebutton(churn:com_6);
+if_addresumebutton(churn:com_7);
 p_pausebutton;
 switch_component(last_com) {
     case churn:com_5 : @churn_product(pot_of_cream, 21, "cream");
