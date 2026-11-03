@@ -16,7 +16,7 @@ if(%biohazard = ^biohazard_spoken_chemist) {
     ~chatnpc("<p,shifty>Go on then.");
     @multi3("You give him the vial of ethenea...", devinci_ethenea, "You give him the vial of liquid honey...", devinci_liquidhoney, "You give him the vial of sulphuric broline...", devinci_sulphuricbroline);
 }
-mes("<nc_name(Artist1)> does not feel sufficiently moved to talk.");
+mes("<nc_name(artist1)> does not feel sufficiently moved to talk.");
 
 [label,devinci_ethenea]
 if(inv_total(inv, ethenea) < 1) {
@@ -86,5 +86,5 @@ if(testbit(%bioerrand, ^devinci_correct) = ^true) {
     ~chatplayer("<p,sad>That's great.|Thanks to you I'll have to walk back to East Ardougne to get another vial.");
     ~chatnpc("<p,happy>Well you can't put a price on art.");
 } else {
-    mes("<nc_name(Artist2)> does not feel sufficiently moved to talk.");
+    mes("<nc_name(artist2)> does not feel sufficiently moved to talk.");
 }

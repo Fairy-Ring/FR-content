@@ -805,7 +805,7 @@ y=103
 buttontype=normal
 width=64
 height=64
-overlayer=com_120
+overlayer=a
 graphic=number_button,0
 option=Enter digit
 
@@ -816,7 +816,7 @@ y=103
 buttontype=normal
 width=64
 height=64
-overlayer=com_122
+overlayer=b
 graphic=number_button,0
 option=Enter digit
 
@@ -827,7 +827,7 @@ y=103
 buttontype=normal
 width=64
 height=64
-overlayer=com_124
+overlayer=c
 graphic=number_button,0
 option=Enter digit
 
@@ -838,7 +838,7 @@ y=103
 buttontype=normal
 width=64
 height=64
-overlayer=com_126
+overlayer=d
 graphic=number_button,0
 option=Enter digit
 
@@ -849,7 +849,7 @@ y=175
 buttontype=normal
 width=64
 height=64
-overlayer=com_128
+overlayer=e
 graphic=number_button,0
 option=Enter digit
 
@@ -860,7 +860,7 @@ y=175
 buttontype=normal
 width=64
 height=64
-overlayer=com_130
+overlayer=f
 graphic=number_button,0
 option=Enter digit
 
@@ -871,7 +871,7 @@ y=175
 buttontype=normal
 width=64
 height=64
-overlayer=com_132
+overlayer=g
 graphic=number_button,0
 option=Enter digit
 
@@ -882,7 +882,7 @@ y=247
 buttontype=normal
 width=64
 height=64
-overlayer=com_134
+overlayer=h
 graphic=number_button,0
 option=Enter digit
 
@@ -893,7 +893,7 @@ y=247
 buttontype=normal
 width=64
 height=64
-overlayer=com_136
+overlayer=i
 graphic=number_button,0
 option=Enter digit
 
@@ -904,7 +904,7 @@ y=247
 buttontype=normal
 width=64
 height=64
-overlayer=com_138
+overlayer=j
 graphic=number_button,0
 option=Enter digit
 
@@ -1017,7 +1017,7 @@ height=64
 hide=yes
 
 [com_121]
-layer=com_120
+layer=a
 type=graphic
 x=0
 y=0
@@ -1034,7 +1034,7 @@ height=64
 hide=yes
 
 [com_123]
-layer=com_122
+layer=b
 type=graphic
 x=0
 y=0
@@ -1051,7 +1051,7 @@ height=64
 hide=yes
 
 [com_125]
-layer=com_124
+layer=c
 type=graphic
 x=0
 y=0
@@ -1068,7 +1068,7 @@ height=64
 hide=yes
 
 [com_127]
-layer=com_126
+layer=d
 type=graphic
 x=0
 y=0
@@ -1085,7 +1085,7 @@ height=64
 hide=yes
 
 [com_129]
-layer=com_128
+layer=e
 type=graphic
 x=0
 y=0
@@ -1102,7 +1102,7 @@ height=64
 hide=yes
 
 [com_131]
-layer=com_130
+layer=f
 type=graphic
 x=0
 y=0
@@ -1119,7 +1119,7 @@ height=64
 hide=yes
 
 [com_133]
-layer=com_132
+layer=g
 type=graphic
 x=0
 y=0
@@ -1136,7 +1136,7 @@ height=64
 hide=yes
 
 [com_135]
-layer=com_134
+layer=h
 type=graphic
 x=0
 y=0
@@ -1153,7 +1153,7 @@ height=64
 hide=yes
 
 [com_137]
-layer=com_136
+layer=i
 type=graphic
 x=0
 y=0
@@ -1170,7 +1170,7 @@ height=64
 hide=yes
 
 [com_139]
-layer=com_138
+layer=j
 type=graphic
 x=0
 y=0
@@ -1234,7 +1234,7 @@ width=146
 height=48
 
 [com_145]
-layer=com_144
+layer=bottombox
 type=graphic
 x=0
 y=0
@@ -1243,7 +1243,7 @@ height=104
 graphic=tex_brown,0
 
 [com_146]
-layer=com_144
+layer=bottombox
 type=graphic
 x=104
 y=-1
