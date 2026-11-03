@@ -43,7 +43,7 @@ stat_advance(agility, 85);
 // https://youtu.be/Fr0ZhqD6KKM?si=NUQInNCAp1j_PJhp&t=164
 mes("...You make it safely to the other side.");
 
-[oploc1,a_wooden_log]
+[oploc1,zq_logbalance]
 p_arrivedelay;
 def_int $x_dist = -2;
 def_coord $turn_coord = 0_45_47_27_47;

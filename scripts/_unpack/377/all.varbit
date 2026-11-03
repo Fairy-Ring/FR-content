@@ -553,7 +553,7 @@ basevar=varp744_bits
 startbit=17
 endbit=17
 
-[mm_kruk_117]
+[mm_kruk]
 basevar=varp745_bits
 startbit=0
 endbit=1
@@ -563,7 +563,7 @@ basevar=mm_monkeys
 startbit=2
 endbit=4
 
-[mm_monkey_child_119]
+[mm_monkey_child]
 basevar=varp745_bits
 startbit=5
 endbit=8
@@ -4878,98 +4878,98 @@ basevar=tzhaar_temp
 startbit=4
 endbit=4
 
-[bits_997_varp562_bits_0_3]
-basevar=varp562_bits
+[bankpin_a]
+basevar=bankpin_1
 startbit=0
 endbit=3
 
-[bits_998_varp562_bits_4_7]
-basevar=varp562_bits
+[bankpin_b]
+basevar=bankpin_1
 startbit=4
 endbit=7
 
-[bits_999_varp562_bits_8_11]
-basevar=varp562_bits
+[bankpin_c]
+basevar=bankpin_1
 startbit=8
 endbit=11
 
-[bits_1000_varp562_bits_12_15]
-basevar=varp562_bits
+[bankpin_d]
+basevar=bankpin_1
 startbit=12
 endbit=15
 
-[bits_1001_varp562_bits_16_19]
-basevar=varp562_bits
+[bankpin_e]
+basevar=bankpin_1
 startbit=16
 endbit=19
 
-[bits_1002_varp562_bits_20_23]
-basevar=varp562_bits
+[bankpin_f]
+basevar=bankpin_1
 startbit=20
 endbit=23
 
-[bits_1003_varp562_bits_24_27]
-basevar=varp562_bits
+[bankpin_g]
+basevar=bankpin_1
 startbit=24
 endbit=27
 
-[bits_1004_varp562_bits_28_31]
-basevar=varp562_bits
+[bankpin_h]
+basevar=bankpin_1
 startbit=28
 endbit=31
 
-[bits_1005_varp563_bits_0_3]
-basevar=varp563_bits
+[bankpin_i]
+basevar=bankpin_2
 startbit=0
 endbit=3
 
-[bits_1006_varp563_bits_4_7]
-basevar=varp563_bits
+[bankpin_j]
+basevar=bankpin_2
 startbit=4
 endbit=7
 
-[bits_1007_varp563_bits_8_21]
-basevar=varp563_bits
+[bankpin_guess]
+basevar=bankpin_2
 startbit=8
 endbit=21
 
-[bits_1008_varp563_bits_22_22]
-basevar=varp563_bits
+[bankpin_unlocked]
+basevar=bankpin_2
 startbit=22
 endbit=22
 
-[bits_1009_varp563_bits_23_25]
-basevar=varp563_bits
+[bankpin_counter]
+basevar=bankpin_2
 startbit=23
 endbit=25
 
 [bits_1010_varp563_bits_26_28]
-basevar=varp563_bits
+basevar=bankpin_2
 startbit=26
 endbit=28
 
 [bits_1011_varp563_bits_29_30]
-basevar=varp563_bits
+basevar=bankpin_2
 startbit=29
 endbit=30
 
-[bits_1012_varp536_bits_0_13]
-basevar=varp536_bits
+[bankpin_true]
+basevar=bankpin
 startbit=0
 endbit=13
 
-[bits_1013_varp536_bits_14_27]
-basevar=varp536_bits
+[bankpin_next]
+basevar=bankpin
 startbit=14
 endbit=27
 
-[bits_1014_varp536_bits_28_29]
-basevar=varp536_bits
+[bankpin_status]
+basevar=bankpin
 startbit=28
 endbit=29
 
-[bits_1015_varp536_bits_30_30]
-basevar=varp536_bits
+[bankpin_delay]
+basevar=bankpin
 startbit=30
 endbit=30
 
@@ -9704,7 +9704,7 @@ startbit=8
 endbit=9
 
 [bits_2010_varp563_bits_31_31]
-basevar=varp563_bits
+basevar=bankpin_2
 startbit=31
 endbit=31
 

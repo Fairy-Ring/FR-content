@@ -1,7 +1,7 @@
 // MM Zooknock — tunnel intro + material hand-in (289 mm_zooknock).
 // Map spawn: mm_zooknock_aa. ch3 cutscene residual after greegree.
 
-[opnpc1,mm_zooknock_aa]
+[opnpc1,mm_zooknock]
 switch_int(%mm_zooknock) {
     case ^zooknock_need_items, ^zooknock_made_talisman :
         if(%mm_zooknock_player_is_collecting_for_amulet = ^false & %mm_zooknock_player_is_collecting_for_talisman = ^true) {
@@ -123,7 +123,7 @@ switch_int(random(4)) {
     case default : ~chatnpc("<p,neutral>Excellent.");
 }
 
-[opnpcu,mm_zooknock_aa]
+[opnpcu,mm_zooknock]
 if(%mm_zooknock < ^zooknock_need_items) {
     ~displaymessage(^dm_default);
     return;

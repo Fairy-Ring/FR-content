@@ -1198,7 +1198,7 @@ if (%rd_room6_complete = 0) {
     return;
 }
 def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
-~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+~open_and_close_door2(loc_1532, $entering, door_open);
 return;
 
 [oplocu,rd_room6_exitdoor]
@@ -1212,7 +1212,7 @@ if (last_useitem = rd_puzzleroom_key) {
     ~rd_chem_unlock_exit;
     if (%rd_room6_complete = 1) {
         def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
-        ~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+        ~open_and_close_door2(loc_1532, $entering, door_open);
     }
     return;
 }

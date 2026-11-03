@@ -17,7 +17,7 @@ if (inv_total(worn, $pickaxe) > 0) {
     inv_add(inv, macro_pickaxehandle, 1);
 }
 def_coord $pickaxe_coord = map_findsquare(coord, 1, 7, ^map_findsquare_lineofwalk);
-anim(human_mining_dragon_pickaxe_pretty, 0);
+anim(human_mining_pickaxe_handle, 0);
 sound_synth(lost_pickaxe, 0, 0);
 %macro_event = ^no_macro_event;
 mes("You swing your pick at the rock.");

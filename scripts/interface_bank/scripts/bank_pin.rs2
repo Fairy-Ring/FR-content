@@ -135,26 +135,26 @@ if_close;
 [label,open_bankpin_keypad]
 %bankpin_buf = 0;
 %bankpin_len = 0;
-if_openmain(bankpin);
+if_openmain(bankpin_main);
 sound_synth(PIN_pending, 0, 0);
 ~bankpin_paint_keypad;
 
 [proc,bankpin_paint_keypad]
-if_settext(bankpin:com_140, "?");
-if_settext(bankpin:com_141, "?");
-if_settext(bankpin:com_142, "?");
-if_settext(bankpin:com_143, "?");
+if_settext(bankpin_main:digit1, "?");
+if_settext(bankpin_main:digit2, "?");
+if_settext(bankpin_main:digit3, "?");
+if_settext(bankpin_main:digit4, "?");
 if (%bankpin_state = ^bankpin_state_recover) {
-    if_settext(bankpin:com_150, "YOUR PIN WILL BE DELETED IN <tostring(~bankpin_days_left)> DAYS");
+    if_settext(bankpin_main:title, "YOUR PIN WILL BE DELETED IN <tostring(~bankpin_days_left)> DAYS");
 } else {
-    if_settext(bankpin:com_150, "");
+    if_settext(bankpin_main:title, "");
 }
 if (%bankpin_mode = ^bankpin_mode_confirm) {
-    if_settext(bankpin:com_147, "Please confirm your PIN using the buttons below.");
+    if_settext(bankpin_main:instruction, "Please confirm your PIN using the buttons below.");
 } else {
-    if_settext(bankpin:com_147, "Please enter your FOUR DIGIT PIN using the buttons below.");
+    if_settext(bankpin_main:instruction, "Please enter your FOUR DIGIT PIN using the buttons below.");
 }
-if_settext(bankpin:com_151, "Click the 1st digit...");
+if_settext(bankpin_main:digithint, "Click the 1st digit...");
 ~bankpin_shuffle_digits;
 
 [proc,bankpin_nth](int $n)(string)
@@ -178,16 +178,16 @@ return(1);
 
 [proc,bankpin_digit_com](int $slot)(component)
 switch_int($slot) {
-    case 0 : return(bankpin:com_110);
-    case 1 : return(bankpin:com_111);
-    case 2 : return(bankpin:com_112);
-    case 3 : return(bankpin:com_113);
-    case 4 : return(bankpin:com_114);
-    case 5 : return(bankpin:com_115);
-    case 6 : return(bankpin:com_116);
-    case 7 : return(bankpin:com_117);
-    case 8 : return(bankpin:com_118);
-    case 9 : return(bankpin:com_119);
+    case 0 : return(bankpin_main:a_text);
+    case 1 : return(bankpin_main:b_text);
+    case 2 : return(bankpin_main:c_text);
+    case 3 : return(bankpin_main:d_text);
+    case 4 : return(bankpin_main:e_text);
+    case 5 : return(bankpin_main:f_text);
+    case 6 : return(bankpin_main:g_text);
+    case 7 : return(bankpin_main:h_text);
+    case 8 : return(bankpin_main:i_text);
+    case 9 : return(bankpin_main:j_text);
 }
 
 // Leftover text comps sit at the pad's bottom-left (looks broken).
@@ -254,16 +254,16 @@ return(modulo(divide(%bankpin_map_hi, ~bankpin_pow10(sub($slot, 5))), 10));
 
 [proc,bankpin_star](int $len)
 if ($len > 0) {
-    if_settext(bankpin:com_140, "*");
+    if_settext(bankpin_main:digit1, "*");
 }
 if ($len > 1) {
-    if_settext(bankpin:com_141, "*");
+    if_settext(bankpin_main:digit2, "*");
 }
 if ($len > 2) {
-    if_settext(bankpin:com_142, "*");
+    if_settext(bankpin_main:digit3, "*");
 }
 if ($len > 3) {
-    if_settext(bankpin:com_143, "*");
+    if_settext(bankpin_main:digit4, "*");
 }
 
 [label,bankpin_press](int $slot)
@@ -273,22 +273,22 @@ sound_synth(PIN_beep, 0, 0);
 %bankpin_len = add(%bankpin_len, 1);
 ~bankpin_star(%bankpin_len);
 if (%bankpin_len < 4) {
-    if_settext(bankpin:com_151, "Click the <~bankpin_nth(add(%bankpin_len, 1))> digit...");
+    if_settext(bankpin_main:digithint, "Click the <~bankpin_nth(add(%bankpin_len, 1))> digit...");
     ~bankpin_shuffle_digits;
     return;
 }
 @bankpin_commit;
 
-[if_button,bankpin:com_100] @bankpin_press(0);
-[if_button,bankpin:com_101] @bankpin_press(1);
-[if_button,bankpin:com_102] @bankpin_press(2);
-[if_button,bankpin:com_103] @bankpin_press(3);
-[if_button,bankpin:com_104] @bankpin_press(4);
-[if_button,bankpin:com_105] @bankpin_press(5);
-[if_button,bankpin:com_106] @bankpin_press(6);
-[if_button,bankpin:com_107] @bankpin_press(7);
-[if_button,bankpin:com_108] @bankpin_press(8);
-[if_button,bankpin:com_109] @bankpin_press(9);
+[if_button,bankpin_main:a_button] @bankpin_press(0);
+[if_button,bankpin_main:b_button] @bankpin_press(1);
+[if_button,bankpin_main:c_button] @bankpin_press(2);
+[if_button,bankpin_main:d_button] @bankpin_press(3);
+[if_button,bankpin_main:e_button] @bankpin_press(4);
+[if_button,bankpin_main:f_button] @bankpin_press(5);
+[if_button,bankpin_main:g_button] @bankpin_press(6);
+[if_button,bankpin_main:h_button] @bankpin_press(7);
+[if_button,bankpin_main:i_button] @bankpin_press(8);
+[if_button,bankpin_main:j_button] @bankpin_press(9);
 
 [label,bankpin_commit]
 if (%bankpin_mode = ^bankpin_mode_set) {
@@ -337,7 +337,7 @@ if (%bankpin_mode = ^bankpin_mode_set) {
     }
 }
 
-[if_button,bankpin:com_148]
+[if_button,bankpin_main:forgotten]
 if (%bankpin_mode = ^bankpin_mode_unlock | %bankpin_mode = ^bankpin_mode_unlock_set | %bankpin_mode = ^bankpin_mode_delete) {
     if (%bankpin_state = ^bankpin_state_active) {
         %bankpin_state = ^bankpin_state_recover;
@@ -348,6 +348,6 @@ if (%bankpin_mode = ^bankpin_mode_unlock | %bankpin_mode = ^bankpin_mode_unlock_
 }
 if_close;
 
-[if_button,bankpin:com_149]
+[if_button,bankpin_main:cancel]
 sound_synth(PIN_cancel, 0, 0);
 if_close;

@@ -152,6 +152,6 @@ queue(fremennik_name, 0, 0);
 
 [queue,fremennik_name]
 ~generate_viking_name;
-if(npc_find(coord, viking_brundt_child, 10, 0) = true) {
+if(npc_find(coord, viking_brundt, 10, 0) = true) {
     ~chatnpc("<p,neutral>From this day onward, you are outerlander no more! In honour of your acceptance into the Fremennik You gain a new name to be known as; You will now be called <~get_viking_name>.");
 }

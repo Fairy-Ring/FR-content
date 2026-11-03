@@ -7,16 +7,16 @@
 // (4462). CANDIDATE mes lines (2007-base minus Changes). No varp write, no XP,
 // no dest / 12346. Cite spine-17-remaining-impl-377.md + osf-guthix-rest-brew-377.md.
 
-[oplocu,scenery_2728] @osf_bowl_heat_oven;
+[oplocu,range] @osf_bowl_heat_oven;
 [oplocu,scenery_2729] @osf_bowl_heat_oven;
 [oplocu,scenery_2730] @osf_bowl_heat_oven;
 [oplocu,scenery_2731] @osf_bowl_heat_oven;
 
-[oplocu,scenery_2724] @osf_bowl_heat_fire;
-[oplocu,scenery_2725] @osf_bowl_heat_fire;
-[oplocu,scenery_2726] @osf_bowl_heat_fire;
-[oplocu,scenery_2727] @osf_bowl_heat_fire;
-[oplocu,scenery_2732] @osf_bowl_heat_fire;
+[oplocu,fireplace] @osf_bowl_heat_fire;
+[oplocu,grandfireplace] @osf_bowl_heat_fire;
+[oplocu,grandfireplace_oldbrick] @osf_bowl_heat_fire;
+[oplocu,fireplacecookingpot] @osf_bowl_heat_fire;
+[oplocu,fire] @osf_bowl_heat_fire;
 
 [opheldu,bowl_hot_water]
 if (last_useitem = cup_empty) {

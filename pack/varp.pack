@@ -62,7 +62,7 @@
 61=sheepherdervar
 62=goblinquest
 63=runemysteries
-64=essencemine_exit_coord
+64=exit_essence_mine_coord
 65=waterfall_quest
 66=waterfall_golrie_and_puzzle
 67=hetty
@@ -301,7 +301,7 @@
 300=sa_energy
 301=sa_attack
 302=priestperil
-303=priestperil_mausoleum
+303=priestperilvar
 304=bankinsert
 305=ghast_delay
 306=mortmyre
@@ -534,7 +534,7 @@
 533=tai_bwo_cleanup
 534=tai_bwo_villagerchat
 535=tbw_cleanup_temp
-536=varp536_bits
+536=bankpin
 537=varp537_bits
 538=varp538_unused
 539=varp539_unused
@@ -560,8 +560,8 @@
 559=varp559_unused
 560=tzhaar_fightpit_remaining
 561=tzhaar_temp
-562=varp562_bits
-563=varp563_bits
+562=bankpin_1
+563=bankpin_2
 564=varp564_unused
 565=varp565_unused
 566=varp566_bits

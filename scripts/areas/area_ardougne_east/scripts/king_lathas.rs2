@@ -1,4 +1,4 @@
-[opnpc1,king_lathas]
+[opnpc1,kinglathas]
 // Regicide branches (274 kinglathas → 377 king_lathas). Start-gate: stage 1 → 2.
 if(%regicide_quest > ^regicide_not_started) {
     switch_int(%regicide_quest) {

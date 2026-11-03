@@ -1,4 +1,4 @@
-[opnpc1,viking_brundt_child]
+[opnpc1,viking_brundt]
 def_int $op;
 def_int $votes = max(0, sub(%viking, 1));
 switch_int(%viking) {

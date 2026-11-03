@@ -83,5 +83,5 @@ if (%rd_room1_complete = 0) {
     ~rd_room_mark_complete(1);
 }
 def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
-~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+~open_and_close_door2(loc_1532, $entering, door_open);
 return;

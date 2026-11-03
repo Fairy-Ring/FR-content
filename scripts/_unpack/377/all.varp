@@ -1042,7 +1042,7 @@ transmit=yes
 [tbw_cleanup_temp]
 transmit=yes
 
-[varp536_bits]
+[bankpin]
 
 [varp537_bits]
 
@@ -1108,9 +1108,9 @@ transmit=yes
 [tzhaar_temp]
 transmit=yes
 
-[varp562_bits]
+[bankpin_1]
 
-[varp563_bits]
+[bankpin_2]
 
 [varp564_unused]
 

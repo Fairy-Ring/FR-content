@@ -3,7 +3,7 @@
 // Residual: full ch4 Waydar/Caranock cutscene map; final battle / sigil wear.
 
 // 377 map spawn name is mm_garkor_aa (289 script type was mm_garkor).
-[opnpc1,mm_garkor_aa]
+[opnpc1,mm_garkor]
 
 if(%mm_main >= ^mm_defeated_demon) {
     ~chatplayer("<p,quiz>What are you doing now?");

@@ -82,7 +82,7 @@ anim($end_seq, 0);
 stat_advance(agility, 225);
 mes("You skillfully edge across the gap.");
 
-[oploc1,pile_of_rubble]
+[oploc1,climbingcaverocks1]
 if(stat(agility) < 67) {
     ~mesbox("You need an Agility level of 67 to climb this pile of rubble.");
     return;
@@ -90,7 +90,7 @@ if(stat(agility) < 67) {
 ~agility_climb_up(55, 0_40_148_55_34);
 mes("You climb up the pile of rubble...");
 
-[oploc1,pile_of_rubble_2318]
+[oploc1,climbingcaverocks2]
 mes("You climb down the pile of rubble...");
 p_telejump(0_40_149_56_35);
 

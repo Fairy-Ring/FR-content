@@ -186,7 +186,7 @@ if (%rd_room3_complete = 0) {
     return;
 }
 def_boolean $entering = ~check_axis(coord, loc_coord, loc_angle);
-~open_and_close_door2(desertdoor_inactive, $entering, door_open);
+~open_and_close_door2(loc_1532, $entering, door_open);
 return;
 
 // Exit + entrance portal handlers live in rd_puzzle_if.rs2

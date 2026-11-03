@@ -329,7 +329,7 @@ moverestrict=nomove
 timer=10
 wanderrange=0
 maxrange=0
-[death_saba]
+[death_hermit]
 name=Saba
 desc=A dishevelled and irritable hermit.
 model1=idk_man_hair_wildspikes
@@ -926,7 +926,7 @@ param=damagetype,^crush_style
 moverestrict=outdoors
 wanderrange=5
 maxrange=7
-[man4]
+[death_man_indoors1]
 name=Man
 desc=One of RuneScape's many citizens.
 model1=obj_viking_helmet_manwear
@@ -1104,7 +1104,7 @@ op2=Attack
 moverestrict=indoors
 wanderrange=5
 maxrange=7
-[death_woman_indoors2]
+[death_growncat_black]
 name=Bob
 desc=The Jagex cat.
 model1=npc_gertrudescat

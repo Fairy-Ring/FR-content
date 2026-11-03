@@ -5,10 +5,10 @@ switch_obj (last_useitem)
     case default : ~displaymessage(^dm_default);
 };
 
-[oplocu,potters_wheel] @use_potters_wheel(last_useitem);
+[oplocu,potterywheel] @use_potters_wheel(last_useitem);
 [oplocu,viking_potterywheel] @use_potters_wheel(last_useitem);
 
-[oplocu,pottery_oven] @use_pottery_oven(last_useitem);
+[oplocu,potteryoven] @use_pottery_oven(last_useitem);
 [oplocu,viking_potteryoven] @use_pottery_oven(last_useitem);
 [oplocu,fai_barbarian_pottery_oven] @use_pottery_oven(last_useitem);
 

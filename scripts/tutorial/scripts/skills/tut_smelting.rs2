@@ -6,7 +6,7 @@
 [oplocu,newbiefurnace]
 @tut_furnace_useitem;
 
-[oplocu,furnace_side]
+[oplocu,furnace2]
 // Type trigger beats [oplocu,_smithing_furnace] — handle island + mainland.
 if (~in_tutorial_island(coord) = true) {
     @tut_furnace_useitem;

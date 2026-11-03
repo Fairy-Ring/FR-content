@@ -1,11 +1,11 @@
-[oploc1,gate_1598]
+[oploc1,memberfencegate_l]
 if(map_members = ^false) {
     mes(^mes_members_gate);
     return;
 }
 ~open_gate;
 
-[oploc1,gate_1599]
+[oploc1,memberfencegate_r]
 if(map_members = ^false) {
     mes(^mes_members_gate);
     return;

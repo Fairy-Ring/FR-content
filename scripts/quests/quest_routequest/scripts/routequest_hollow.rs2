@@ -236,7 +236,7 @@ switch_coord (loc_coord) {
 }
 
 
-[opnpc1,route_curpile_fyod_child]
+[opnpc1,route_curpile_fyod]
 if(%routequest < ^routequest_entered_hollowed) {
     // OSRS/RS3
     ~chatnpc("<p,angry>Hey... you's trespassin'! Be off wiv ya.");
@@ -338,7 +338,7 @@ if($q = 0) {
 }
 
 [queue,route_curpile_knockout]
-if (npc_find(coord, route_curpile_fyod_child, 10, 0) = true) {
+if (npc_find(coord, route_curpile_fyod, 10, 0) = true) {
     npc_setmode(playerface);
     npc_anim(human_sword_slash, 0);
     sound_synth(hacksword_slash, 0, 0);

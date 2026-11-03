@@ -26,7 +26,7 @@ p_arrivedelay;
 mes("...To the platform above.");
 ~update_gnome_varp(3);
 
-[oploc1,gnome_balancing_rope]
+[oploc1,balancing_rope]
 p_arrivedelay;
 mes("You carefully cross the tightrope.");
 ~gnome_trainer_say("Come on scaredy cat, get across that rope!");
@@ -34,8 +34,8 @@ sound_synth(tightrope, 5, 0);
 ~agility_force_move(75, human_walk_logbalance, movecoord(coord, 6, 0, 0));
 ~update_gnome_varp(4);
 
-[oploc1,gnome_tree_branch_2] @climbdown_gnome_tree_branch;
-[oploc1,gnome_tree_branch_3] @climbdown_gnome_tree_branch;
+[oploc1,climbing_tree] @climbdown_gnome_tree_branch;
+[oploc1,climbing_tree2] @climbdown_gnome_tree_branch;
 
 [label,climbdown_gnome_tree_branch]
 mes("You climb down the tree...");

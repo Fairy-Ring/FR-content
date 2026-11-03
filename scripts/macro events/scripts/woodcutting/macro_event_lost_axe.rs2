@@ -16,7 +16,7 @@ if (inv_total(worn, $axe) > 0) {
     inv_add(inv, macro_hatchethandle, 1);
 }
 def_coord $axe_coord = map_findsquare(coord, 1, 7, ^map_findsquare_lineofwalk);
-anim(sang_mining_wall_dragon_pickaxe_pretty, 0);
+anim(human_woodcutting_axe_handle, 0);
 // not sure what sound to use
 sound_synth(lost_pickaxe, 0, 0);
 %macro_event = ^no_macro_event;

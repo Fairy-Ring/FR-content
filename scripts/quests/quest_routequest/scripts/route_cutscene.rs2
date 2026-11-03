@@ -86,7 +86,7 @@ npc_add(movecoord($roomcoords, 5, 0, -3), route_radigad_ponfit, 1000);
 ~chatnpc_specific(nc_name(route_veliaf_hurtz), route_veliaf_hurtz, "<p,angry>Hey, what's that mist coming in through the door!|! TEAM WE HAVE A VAMPIRE IN THE ROOM !");
 p_delay(3);
 mes("You see a shifting mist enter the room!");
-npc_add(movecoord($roomcoords, -2, 0, -5), route_vanstrom_vampire_misty, 1000);
+npc_add(movecoord($roomcoords, -2, 0, -5), route_vanstrom_klause_vamp_misty, 1000);
 npc_setmode(none);
 p_stopaction;
 
@@ -98,7 +98,7 @@ p_delay(4);
 npc_del;
 
 // Move camera
-.npc_add($vanstrom_coord, route_vanstrom_klause, 1000);
+.npc_add($vanstrom_coord, route_vanstrom_klause_normal, 1000);
 sound_synth(vanstrom_appears, 1, 0);
 cam_moveto(movecoord($roomcoords, 0, 0, 6), 500, 2, 2);
 cam_lookat($roomcoords, 125, 2, 2);
@@ -156,17 +156,17 @@ if(npc_findexact($harold_coord, route_harold_evans) = true) {
 }
 
 // Set Vanstrom as primary again so we can changetype.
-if(npc_findexact($vanstrom_coord, route_vanstrom_klause) = true) {
+if(npc_findexact($vanstrom_coord, route_vanstrom_klause_normal) = true) {
     cam_moveto(movecoord($roomcoords, 2, 0, 5), 500, 1, 1);
     cam_lookat($vanstrom_coord, 300, 1, 1);
-    npc_changetype(route_vanstrom_transform, 1000);
+    npc_changetype(route_vanstrom_klause_vamp_wingsgrow, 1000);
     sound_synth(vanstrom_wings, 1, 0);
     npc_facesquare(coord);
     cam_moveto(movecoord($roomcoords, 2, 0, 8), 500, 1, 1);
     ~route_cutscene_say_macro("<p,angry>", "And... now I'm going to finish the rest of them off...");
     p_delay(4);
     cam_moveto(movecoord($roomcoords, 4, 0, 5), 500, 1, 1);
-    npc_changetype(route_vanstrom_vampire, 1000);
+    npc_changetype(route_vanstrom_klause_vamp, 1000);
     npc_anim(wings_launch, 0);
     ~route_cutscene_say_macro("<p,angry>", "With my little pet!");
     p_delay(4);

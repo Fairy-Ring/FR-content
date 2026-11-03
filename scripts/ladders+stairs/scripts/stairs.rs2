@@ -1,4 +1,4 @@
-[oploc1,scenery_1722]
+[oploc1,stairs]
 p_arrivedelay;
 // Climb up
 switch_coord (loc_coord) {
@@ -692,7 +692,7 @@ switch_coord (loc_coord) {
 // hauntedmine_dark_stairs_top / _bottom / light_stairs_bottom (4971-4973):
 // handlers live in quest_hauntedmine/scripts/hm_dark_stairs.rs2 (M1 fungus unit).
 
-[oploc1,scenery_5094]
+[oploc1,karam_dungeon_cavestairs]
 // arrive delay?
 switch_coord (loc_coord) {
     case default : @unhandled_stairs(loc_coord);

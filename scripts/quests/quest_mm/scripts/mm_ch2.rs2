@@ -53,7 +53,7 @@ if_openmain(scroll);
 p_delay(4);
 if_close;
 // 377 pack names (289: mm_foreman_cutscene / mm_caranock_cutscene)
-if(npc_findexact(0_40_71_43_38, mm_cutscene_foreman) = true & .npc_findexact(0_40_71_43_36, mm_cutscene_caranock) = true) {
+if(npc_findexact(0_40_71_43_38, mm_foreman_cutscene) = true & .npc_findexact(0_40_71_43_36, mm_caranock_cutscene) = true) {
     p_teleport(0_40_71_36_37);
     .npc_facesquare(movecoord(.npc_coord, 0, 0, 2));
     npc_facesquare(movecoord(npc_coord, 0, 0, -2));
@@ -101,7 +101,7 @@ if(inzone(0_40_71_0_0, 0_40_71_63_63, coord) = false) {
 @mm_ch2_cutscene_dialogue;
 
 [label,mm_ch2_cutscene_dialogue]
-if(npc_findexact(0_40_71_43_38, mm_cutscene_foreman) = false | .npc_findexact(0_40_71_43_36, mm_cutscene_caranock) = false) {
+if(npc_findexact(0_40_71_43_38, mm_foreman_cutscene) = false | .npc_findexact(0_40_71_43_36, mm_caranock_cutscene) = false) {
     @mm_ch2_arrive_atoll;
 }
 if(%mm_cutscene_part = 0) {
