@@ -74,12 +74,26 @@ class AdoptionContracts(unittest.TestCase):
         self.assertNotIn("if_setmodel", source("hauntedmine_points.rs2"))
         self.assertNotIn("hauntedmine_points_store", (ROOT / "pack/varp.pack").read_text())
 
-    def test_ambient_hunt_is_wired(self):
+    def test_npc_behavior_fields_match_donor(self):
         hunt = (HM / "configs/hauntedmine.hunt").read_text()
         self.assertIn("[aggressive_hauntedmine]", hunt)
         npcs = (ROOT / "scripts/_unpack/377/all.npc").read_text()
-        for npc in ("possessed_pickaxe_stationary", "hauntedmine_suprise_ghost_hidden"):
-            self.assertIn("huntmode=aggressive_hauntedmine", block(npcs, f"[{npc}]"))
+        for npc in ("possessed_pickaxe_stationary", "skeletal_miner_sitting", "hauntedmine_suprise_ghost_hidden"):
+            for field in ("huntrange=2", "attackrange=2", "huntmode=aggressive_hauntedmine", "timer=50"):
+                self.assertIn(field, block(npcs, f"[{npc}]"))
+        for npc in ("hauntedmine_boss_ghost", "hauntedmine_boss_ghost_faded"):
+            self.assertIn("timer=1", block(npcs, f"[{npc}]"))
+        puzzle_cart = block(npcs, "[puzzle_cart]")
+        self.assertIn("moverestrict=blocked", puzzle_cart)
+        self.assertNotIn("blockwalk=all", puzzle_cart)
+        self.assertNotIn("moverestrict=nomove", block(npcs, "[hauntedmine_boss_cart]"))
+        for cart in range(1, 5):
+            config = block(npcs, f"[hauntedmine_cart{cart}]")
+            for field in ("timer=1", "category=hauntedmine_cart", "defaultmode=patrol"):
+                self.assertIn(field, config)
+            self.assertNotIn("moverestrict=nomove", config)
+            self.assertIn("patrol1=", config)
+            self.assertIn("patrol2=", config)
 
     def test_fungus_death_precedes_keep_drop(self):
         death = (ROOT / "scripts/player/scripts/death.rs2").read_text()
