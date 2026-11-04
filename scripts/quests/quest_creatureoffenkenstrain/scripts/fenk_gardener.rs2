@@ -1,5 +1,7 @@
 // Creature of Fenkenstrain — Gardener Ghost Talk-to + follower lifecycle.
 // CANDIDATE 2007-base (Transcript + Tip.it beats). Bind fenk_gardener 1675.
+// Following directions use later RS3/OSRS text; area bounds below are explicit
+// CANDIDATE map-square reconstructions, not historical measurements.
 // Gate %fenk_quest >= 1. Ghostspeak worn check. Follow: dynamic npc_add +
 // playerfollow, CANDIDATE 10 min duration, loss on logout/death/plane/timer
 // and ordinary gameplay teleport (stock ~p_telejump_safe). Exact historical
@@ -122,25 +124,34 @@ return;
 ~chatnpc("<p,sad>E's dead, just like everyone else round 'ere ... 'cept for me.");
 return;
 
-// While following: no invented compass third-voice. Transcript grounds south Haunted
-// Forest for the head grave; Tip.it/RuneHQ CANDIDATE "directions while following"
-// is covered by the follower leading + this re-statement of the head path.
+// Current RS3/OSRS transcripts provide qualitative area labels only. CANDIDATE
+// geometry: Castle=m55_55; Woods=m55_54..m56_54; grave threshold=3x3 at 3608,3491.
+// `coord_direction` supplies the dominant-axis cardinal; its tie is east/west.
 [label,fenk_gardener_following_talk]
-def_int $d = ~p_choice3("Which way to your grave?", 1, "What's your name?", 2, "I must get back to work.", 3);
-if ($d = 2) {
-    ~fenk_gardener_name;
+if (inzone(0_55_55_0_0, 0_55_55_63_63, coord) = true) {
+    npc_say("You need to head off to them Haunted Woods, mate.");
     ~fenk_resume_owned_follow;
     return;
 }
-if ($d = 3) {
-    ~chatplayer("<p,neutral>I must get back to work.");
+if (inzone(0_55_54_0_0, 0_56_54_63_63, coord) = true) {
+    if (inzone(0_56_54_23_34, 0_56_54_25_36, coord) = true) {
+        npc_say("This is the place where I met me' maker.");
+        // OSRS says he returns to the Castle; clear the owned dynamic copy so
+        // the courtyard multi becomes visible again after the overhead is sent.
+        queue(fenk_gardener_clear_follow, 0, 0);
+        return;
+    }
+    def_int $direction = ~coord_direction(coord, 0_56_54_24_35);
+    switch_int ($direction) {
+        case ^exact_north : npc_say("Go north, mate.");
+        case ^exact_east : npc_say("Go east, mate.");
+        case ^exact_south : npc_say("Go south, mate.");
+        case ^exact_west : npc_say("Go west, mate.");
+    }
     ~fenk_resume_owned_follow;
     return;
 }
-~chatplayer("<p,quiz>Which way to your grave?");
-// Transcript-grounded (head path): Haunted Forest to the south — not free compass prose.
-~chatnpc("<p,neutral>Oi was diggin' a pit in the old 'aunted Forest to the south when they took me head. Keep with me, mate.");
-~fenk_resume_owned_follow;
+~fenk_gardener_stray;
 return;
 
 // ~chatnpc sets playerfaceclose before each Continue. Restore PLAYERFOLLOW only
@@ -158,6 +169,40 @@ if (%npc_attacking_uid ! uid) {
     return;
 }
 npc_setmode(playerfollow);
+
+// The current transcript presents the two departure lines in sequence.
+// NPC_SAY replaces the active overhead for the tick, so put the second line
+// on the next queue tick, then clear only this player's owned follower.
+[proc,fenk_gardener_stray]
+if (%fenk_follower_uid = null) {
+    return;
+}
+if (npc_uid ! %fenk_follower_uid | %npc_attacking_uid ! uid) {
+    return;
+}
+clearsofttimer(fenk_follow_watch);
+npc_say("Oi'm afraid you've gone well off the beaten track.");
+queue(fenk_gardener_stray_followup, 0, 0);
+
+[queue,fenk_gardener_stray_followup]
+if (%fenk_follower_uid = null) {
+    ~fenk_clear_gardener_follow;
+    return;
+}
+if (npc_finduid(%fenk_follower_uid) = false) {
+    ~fenk_clear_gardener_follow;
+    return;
+}
+if (npc_uid ! %fenk_follower_uid | %npc_attacking_uid ! uid) {
+    ~fenk_clear_gardener_follow;
+    return;
+}
+npc_say("Fare thee well - oi must return to me' garden.");
+queue(fenk_gardener_clear_follow, 0, 0);
+
+[queue,fenk_gardener_clear_follow]
+~fenk_clear_gardener_follow;
+
 
 // --- follower start / stop ---
 [proc,fenk_start_gardener_follow]
@@ -226,6 +271,12 @@ if (coordy(coord) ! coordy(npc_coord)) {
     clearsofttimer(fenk_follow_watch);
     mes("The gardener ghost stops following you.");
     queue(fenk_on_login_cleanup, 0, 0);
+    return;
+}
+// Source-backed direction-area loss: only the explicit Castle/Woods map-square
+// reconstruction is accepted; no numeric leash radius is inferred.
+if (inzone(0_55_55_0_0, 0_55_55_63_63, coord) = false & inzone(0_55_54_0_0, 0_56_54_63_63, coord) = false) {
+    ~fenk_gardener_stray;
     return;
 }
 

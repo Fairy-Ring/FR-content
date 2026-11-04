@@ -7,10 +7,11 @@
  * player walked away. This file runs compiled production handlers through the
  * real interpreter (final Continue is not optional) and then real Npc movement.
  *
- * Prerequisites: tests/fenkenstrain-completion/setup-iso.sh and isolated
- * pack-server-configs (npc.dat) under this worktree .tmp.
+ * Prerequisites: server script.dat/npc.dat and client font packs under the
+ * selected engine's data/pack; HARNESS_ENGINE_DIR overrides the default.
  *
- *   node --import tsx tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs
+ * Invoke from sibling engine/:
+ *   node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs
  *
  * Not a live client proof. Does not write shared packs.
  */
@@ -19,9 +20,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const WT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
-const ISO_ROOT = path.join(WT, '.tmp/fenk-iso-compile-r422');
-const ISO_ENGINE = path.join(ISO_ROOT, 'engine');
-const ISO_CONTENT = path.join(ISO_ROOT, 'content');
+const ISO_ENGINE = process.env.HARNESS_ENGINE_DIR ?? path.resolve(WT, '../engine');
 const PACK_DIR = path.join(ISO_ENGINE, 'data/pack');
 const SCRIPT_DAT = path.join(PACK_DIR, 'server/script.dat');
 const NPC_DAT = path.join(PACK_DIR, 'server/npc.dat');
@@ -43,11 +42,11 @@ function assert(cond, msg) {
 }
 
 if (!fs.existsSync(SCRIPT_DAT)) {
-  fail(`missing ISO script.dat at ${SCRIPT_DAT} — run tests/fenkenstrain-completion/setup-iso.sh`);
+  fail(`missing server script.dat at ${SCRIPT_DAT}`);
   process.exit(1);
 }
 if (!fs.existsSync(NPC_DAT)) {
-  fail(`missing ISO npc.dat at ${NPC_DAT} — run isolated pack-server-configs`);
+  fail(`missing server npc.dat at ${NPC_DAT}`);
   process.exit(1);
 }
 
@@ -91,7 +90,7 @@ assert(loaded > 0, `ScriptProvider.load returned ${loaded}`);
 ok(`loaded ${loaded} compiled scripts`);
 
 function packMap(rel, name) {
-  const candidates = [path.join(WT, rel), path.join(ISO_CONTENT, rel)];
+  const candidates = [path.join(WT, rel)];
   for (const file of candidates) {
     if (!fs.existsSync(file)) continue;
     const text = fs.readFileSync(file, 'utf8');
