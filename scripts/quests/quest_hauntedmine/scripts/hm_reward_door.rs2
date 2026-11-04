@@ -33,7 +33,7 @@ if ($entering = true & inv_total(inv, hauntedmine_reward_key) < 1) {
         return;
     }
 }
-if (inzone(0_43_69_20_33, 0_43_69_21_34, coord) = true & %hauntedmine = ^hauntedmine_boss_defeated) {
+if ($entering = true & inzone(0_43_69_20_33, 0_43_69_21_34, coord) = true & %hauntedmine = ^hauntedmine_boss_defeated) {
     %hauntedmine = ^hauntedmine_rewarddoor_found;
 }
 ~open_and_close_double_door($entering, $side);

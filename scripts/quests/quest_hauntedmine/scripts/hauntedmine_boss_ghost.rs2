@@ -136,7 +136,7 @@ npc_anim(bossghost_attack, 0); // does this every time
 ~npc_set_attack_vars;
 
 
-if (inzone(0_43_69_30_40, 0_43_69_32_40, coord) = true) ~hauntedmine_boss_minecart_attack(0_43_69_30_40, 0_43_69_32_40, 0_43_69_31_40, 0_43_69_32_40); // yes these coords are diff than inzone coords
+if (inzone(0_43_69_30_40, 0_43_69_32_40, coord) = true) ~hauntedmine_boss_minecart_attack(0_43_69_30_40, 0_43_69_33_40, 0_43_69_31_40, 0_43_69_32_40); // Search includes the mapped cart at 33_40; keep the player lane and destinations.
 else if (inzone(0_43_69_31_30, 0_43_69_31_37, coord) = true) ~hauntedmine_boss_minecart_attack(0_43_69_31_30, 0_43_69_31_37, 0_43_69_31_30, 0_43_69_31_37);
 else if (inzone(0_43_69_33_31, 0_43_69_33_36, coord) = true) ~hauntedmine_boss_minecart_attack(0_43_69_33_31, 0_43_69_33_36, 0_43_69_33_31, 0_43_69_33_36);
 else if (inzone(0_43_69_39_31, 0_43_69_39_36, coord) = true) ~hauntedmine_boss_minecart_attack(0_43_69_39_31, 0_43_69_39_36, 0_43_69_39_31, 0_43_69_39_36);

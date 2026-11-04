@@ -62,10 +62,13 @@ class AdoptionContracts(unittest.TestCase):
             if result == "success":
                 successes.append(bits)
         self.assertEqual(successes, [6, 38, 70, 102, 262, 294, 326, 358])
-        self.assertEqual(route(tree, 70), "success")  # 2006-01-14 screenshot.
+        self.assertEqual(route(tree, 102), "success")  # 2006-01-14 screenshot, not a discriminator between rules.
 
     def test_377_interface_and_permanent_varp(self):
         varps = (ROOT / "scripts/_unpack/377/all.varp").read_text()
+        stage = block(varps, "[hauntedmine]")
+        self.assertIn("scope=perm", stage)
+        self.assertNotIn("transmit=yes", stage)  # Quest colour and journal read server state.
         bits = block(varps, "[hauntedmine_bits]")
         self.assertIn("scope=perm", bits)
         self.assertIn("transmit=yes", bits)
@@ -95,9 +98,34 @@ class AdoptionContracts(unittest.TestCase):
             self.assertIn("patrol1=", config)
             self.assertIn("patrol2=", config)
 
+    def test_treus_ownership_precedes_attack_permission(self):
+        combat = (ROOT / "scripts/skill_combat/scripts/npc/npc_combat.rs2").read_text()
+        guard = "if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded) & %npc_attacking_uid ! uid) {"
+        for proc in ("npc_is_attackable", "npc_is_attackable_opt"):
+            attackable = block(combat, f"[proc,{proc}]")
+            self.assertIn(guard, attackable)
+            refusal = attackable.split(guard, 1)[1].split("}", 1)[0]
+            self.assertIn('mes("Someone else is fighting that.");', refusal)
+            self.assertIn("return(false);", refusal)
+            self.assertLess(attackable.index(guard), attackable.index("if (npc_hasop(2)"))
+
+    def test_west_cart_search_includes_mapped_spawn(self):
+        self.assertIn("0 33 40: 1544", (ROOT / "maps/m43_69.jm2").read_text())
+        timer = block(source("hauntedmine_boss_ghost.rs2"), "[label,hauntedmine_boss_timer]")
+        self.assertIn(
+            "if (inzone(0_43_69_30_40, 0_43_69_32_40, coord) = true) "
+            "~hauntedmine_boss_minecart_attack(0_43_69_30_40, 0_43_69_33_40, 0_43_69_31_40, 0_43_69_32_40)",
+            timer,
+        )
+
     def test_fungus_death_precedes_keep_drop(self):
         death = (ROOT / "scripts/player/scripts/death.rs2").read_text()
-        self.assertLess(death.index("~hauntedmine_fungus_crumble;"), death.index("~player_death_lose_items;"))
+        self.assertRegex(death, r"@player_death_duel;\s*return;")
+        duel_return = death.index("return;", death.index("@player_death_duel;"))
+        conversion_call = death.index("~hauntedmine_fungus_crumble;")
+        self.assertLess(duel_return, conversion_call)
+        for allocation in ("~pvp_death_lose_items;", "~player_death_lose_items;"):
+            self.assertLess(conversion_call, death.index(allocation))
         crumble = block(source("hauntedmine_fungus.rs2"), "[proc,hauntedmine_fungus_crumble]")
         self.assertIn("~hm_fungus_convert_carried_to_ashes;", crumble)
         self.assertNotIn("obj_add", crumble)  # Normal death owns the ashes, no duplicate drop.
@@ -117,6 +145,11 @@ class AdoptionContracts(unittest.TestCase):
         self.assertIn("$entering = true & inv_total(inv, hauntedmine_reward_key) < 1", door)
         self.assertIn("~osf_key_ring_has(hauntedmine_reward_key)", door)
         self.assertIn("%hauntedmine = ^hauntedmine_rewarddoor_found", door)
+        writer = re.search(r"if \(([^{}\n]+)\) \{\s*%hauntedmine = \^hauntedmine_rewarddoor_found;", door)
+        self.assertIsNotNone(writer)
+        self.assertTrue(writer.group(1).startswith("$entering = true & "))
+        self.assertIn("%hauntedmine = ^hauntedmine_boss_defeated", writer.group(1))
+        self.assertIn("inzone(0_43_69_20_33, 0_43_69_21_34, coord)", writer.group(1))
         journal = source("hauntedmine_journal.rs2")
         self.assertNotIn("Tarn", journal)
         self.assertIn("Access to Morytania", journal)
