@@ -513,7 +513,7 @@ for (const [x, choice, item] of [[3542, 4, ID.marble], [3555, 3, ID.obsidian]]) 
 }
 ok('bookcase menus, restored eastern title, full-inventory retry and repeat controls');
 
-// ---- conductor cutscene: execute the real loc handler across server delays ----
+// ---- conductor repair: lightning and box start together; loc owns cleanup ----
 function roofConductor() {
   const type = LocType.get(ID.conductorBroken);
   const loc = new Loc(2, 3548, 3536, type.width, type.length, EntityLifeCycle.RESPAWN, ID.conductorBroken, 10, 2);
@@ -559,42 +559,32 @@ for (const [trigger, usedItem, startingStage] of [
     return animateLoc.call(this, target, seq);
   };
   let result;
-  const waits = [];
-  const cameras = [];
   try {
     result = runProc(p, trigger, true, loc);
-    assert(p.getVarBit(ID.conductorBit) === 1 && total(p, ID.inv, ID.conductor) === 0, 'repair commits once before the first scene suspension');
+    assert(p.getVarBit(ID.conductorBit) === 1 && total(p, ID.inv, ID.conductor) === 0, 'repair commits once before the immediate success box');
     assert(p.getVar(ID.fenkQuest) === Math.max(4, startingStage), 'repair advances assembled stage without regressing a later stage');
-    while (result.exec === ScriptState.SUSPENDED && waits.length < 10) {
-      assert(p.delayed, 'cutscene suspension protects the player from new movement/loc actions');
-      assert(!p.messages.some(text => text.includes('You repair the lightning conductor')), 'success box must not precede the timed strike');
-      waits.push(p.delayedUntil - World.currentTick);
-      for (const camera of p.cameraPackets.all()) {
-        cameras.push({ type: camera.type, x: camera.camX, z: camera.camZ, height: camera.height, rate: camera.rotationSpeed, rate2: camera.rotationMultiplier });
-      }
-      p.cameraPackets.clear();
-      World.currentTick = p.delayedUntil;
-      p.delayed = false;
-      result.exec = p.runScript(result.state, true, true);
-      assert(result.exec !== ScriptState.ABORTED, 'conductor continuation must not abort');
-    }
   } finally {
     World.animLoc = animateLoc;
   }
-  expectPausebutton(result, 'conductor success after cutscene');
-  assert(waits.join(',') === '1,2', `candidate scene tick waits changed: ${waits}`);
-  assert(World.currentTick - startTick === 3, 'camera settles one tick, then holds for the complete lightning sequence');
-  assert(cameras.length === 2 && cameras[0].type === 0 && cameras[1].type === 1, 'scene sends a roof origin and conductor target without an invented pan');
-  assert(cameras[0].rate2 === 100 && cameras[1].rate2 === 100, 'scene establishes its fixed shot immediately');
-  assert(cameras[1].x === 3548 && cameras[1].z === 3537, 'camera targets the cache conductor, not the ground-floor laboratory');
+  expectPausebutton(result, 'conductor success opens at repair');
+  assert(World.currentTick === startTick && !p.delayed, 'repair opens the box without any arrival or cutscene hold');
+  assert([...p.cameraPackets.all()].length === 0, 'repair leaves the normal player camera unchanged');
+  assert(!p.packets.some(packet => ['CamReset', 'CamShake', 'MinimapToggle', 'IfOpenOverlay'].includes(packet.constructor.name)), 'repair changes no camera, minimap or overlay state');
+  const tabUpdates = p.packets.filter(packet => packet.constructor.name === 'IfSetTab');
+  assert(tabUpdates.every(packet => packet.tab === 2 && Component.get(packet.component)?.comName?.split(':')[0] === 'questlist'), 'only the existing quest-journal progress refresh may update a tab');
   assert(animationEvents.length === 1 && animationEvents[0].target === loc && animationEvents[0].seq === ID.lightning && animationEvents[0].type === ID.conductorRepaired, 'repaired loc starts cache lightning at frame zero');
-  assert(animationEvents[0].tick === startTick + 1, 'camera is installed a tick before lightning begins');
+  assert(animationEvents[0].tick === startTick, 'lightning begins on the same tick as the success box');
   const sounds = p.packets.filter(packet => packet.constructor.name === 'SynthSound');
   assert(sounds.length === 2 && sounds[0].synth === ID.lightningSound && sounds[1].synth === ID.lightning2Sound && sounds.every(packet => packet.loops === 1), 'scene uses both quest lightning synths once');
-  const resetIndex = p.packets.findIndex(packet => packet.constructor.name === 'CamReset');
-  const successIndex = p.packets.findIndex(packet => typeof packet.text === 'string' && packet.text.includes('You repair the lightning conductor'));
-  assert(resetIndex >= 0 && resetIndex < successIndex, 'camera resets before the existing success box');
-  assert(loc.type === ID.conductorBroken && !loc.isChanged(), 'lightning does not loop after the scene; spent conductor returns to its broken model');
+  assert(p.messages.some(text => text.includes('You repair the lightning conductor')), 'existing success message is visible while lightning is active');
+  assert(loc.type === ID.conductorRepaired && loc.isChanged(), 'lightning loc is active with the box open');
+  for (let tick = 1; tick <= 2; tick++) {
+    World.currentTick++;
+    loc.turn();
+    assert(result.exec === ScriptState.PAUSEBUTTON, 'loc lifecycle must not require a message Continue');
+    assert(loc.type === (tick === 1 ? ID.conductorRepaired : ID.conductorBroken), 'bounded loc lifecycle restores spent conductor while box stays open');
+  }
+  assert(!loc.isChanged(), 'lightning loop cannot remain installed behind an open box');
   assert(p.level === 2 && p.x === 3549 && p.z === 3538, 'roof scene does not teleport the player or change plane');
   assert(total(p, ID.inv, ID.hammer) === 1, 'repair keeps the hammer');
   finishDialogue(p, result);
@@ -605,7 +595,7 @@ for (const [trigger, usedItem, startingStage] of [
   assert(!p.packets.slice(packetCount).some(packet => ['CamReset', 'SynthSound'].includes(packet.constructor.name)) && [...p.cameraPackets.all()].length === 0, 'repeat neither replays cutscene nor consumes another item');
   assert(p.getVarBit(ID.conductorBit) === 1 && p.getVar(ID.fenkQuest) === Math.max(4, startingStage), 'repeat preserves durable repair state');
 }
-ok('conductor refusal, Repair/item-use paths, timed camera/lightning/audio, message order, roof position and one-shot repeat');
+ok('conductor refusal, Repair/item-use paths, simultaneous lightning/audio/box, no camera or UI changes, independent lifecycle and one-shot repeat');
 
 // P2: execute the shared scroll renderer, not just the local reward literal.
 {
