@@ -4,7 +4,7 @@
 // was never in .wiki). Fresh 0: start talk (<displayname>, ferryman line),
 // Deal + ready-Yes (~p_choice2, not overlay), write 1 on ready-Yes, then
 // [proc,giantdwarf_intro_cutscene]: tele + cam first (palace 2841,10183), then
-// inter_260 q8 title + inter_235 sliding-window history (2014 t011-t032: lines
+// inter_273 model-letter titles + inter_235 sliding-window history (2014 t011-t032: lines
 // add one at a time, oldest drops), statue cam + force-timed crash talk (hide
 // continue before if_openchat, 1/2/3/4-line IFs, per-line delays) + cam_shake +
 // %giantdwarf_statue_invis = 1 + inter_234 crash map, explosion on the Both
@@ -78,13 +78,18 @@ cam_moveto(1_44_159_56_10, 720, 0, 100); // 2872,10186 L1 south edge
 cam_lookat(1_44_159_58_30, 80, 0, 100); // 2874,10206 L1 centre halls
 p_delay(2);
 if_openoverlay(null);
-// 2:30 — KELDAGRIM q8 title on inter_260 (top-only). NOT inter_235.
-if_openoverlay(inter_260);
-if_setcolour(inter_260:com_0, ^red_rgb);
-if_setcolour(inter_260:com_1, ^red_rgb);
-if_settext(inter_260:com_0, "KELDAGRIM");
-if_settext(inter_260:com_1, "Grand Capital of the Dwarven realm");
+// 2:30 — KELDAGRIM model-letter card over the live 3D scene.
+// Title holds 4/14/8 remain CANDIDATE (2014 pacing, not 377 packet evidence).
+if_openoverlay(inter_273);
+if_sethide(inter_273:com_10, false);
+if_sethide(inter_273:com_11, true);
+if_sethide(inter_273:com_12, true);
+if_sethide(inter_273:com_13, true);
+if_sethide(inter_273:com_14, true);
+if_sethide(inter_273:com_15, true);
+if_sethide(inter_273:com_16, true);
 p_delay(4);
+if_sethide(inter_273:com_10, true);
 if_openoverlay(null);
 p_delay(1); // t010 — title off one beat, history starts t011
 // 2:35-3:00 — history stanzas on inter_235 (b12, packed Alvis lines).
@@ -150,24 +155,20 @@ p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable (probe)
 cam_moveto(0_44_159_52_0, 520, 0, 100); // 2868,10176 — over the water
 cam_lookat(0_44_159_62_1, 140, 0, 100); // 2878,10177 — east along the Kelda
 p_delay(1);
-if_openoverlay(inter_260);
-if_setcolour(inter_260:com_0, ^red_rgb);
-if_setcolour(inter_260:com_1, ^red_rgb);
-if_settext(inter_260:com_0, "Rise of the Red Axe");
-if_settext(inter_260:com_1, "Part 1");
+if_openoverlay(inter_273);
+if_sethide(inter_273:com_11, false);
 p_delay(14);
+if_sethide(inter_273:com_11, true);
 if_openoverlay(null);
 // 3:35-3:45 — full 7042 over the water. The look-up at 2876,10176 h220
 // was a solid cyan fill (sx4a7s6 w01). Skip it; the SW pull already works.
 cam_moveto(0_44_159_48_0, 680, 0, 100); // 2864,10176 — pulled SW, high
 cam_lookat(0_44_159_62_1, 200, 0, 100); // 2878,10177 — full body
 p_delay(2);
-if_openoverlay(inter_260);
-if_setcolour(inter_260:com_0, ^red_rgb);
-if_setcolour(inter_260:com_1, ^red_rgb);
-if_settext(inter_260:com_0, "The Giant");
-if_settext(inter_260:com_1, "Dwarf");
+if_openoverlay(inter_273);
+if_sethide(inter_273:com_12, false);
 p_delay(8);
+if_sethide(inter_273:com_12, true);
 if_openoverlay(null);
 // 3:47 — map first, no chat. Boat at the river-mouth. Overlay (not main —
 // openChatModal IfClose's main; overlay survives the chat slot). Statue stays
