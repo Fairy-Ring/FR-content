@@ -169,11 +169,12 @@ if (%fenk_quest < ^fenk_lightning_done & %fenk_quest >= ^fenk_assembled) {
 }
 // CANDIDATE presentation: operator decision, corroborated by 2008/2013 footage.
 // Keep the ordinary camera/UI; show the existing box as the lightning starts.
-// Explicit animation restarts frame zero; the loc lifecycle ends it even if
-// the player leaves the box open or interrupts it (40 client cycles, rounded).
-loc_change(fenk_conductor_repaired, 2);
-loc_anim(fenk_lightning);
+// The client defers loc replacement but applies loc_anim immediately, so keep
+// the repaired loc's own cache sequence rather than animating the old stand.
+// Three lifecycle turns include this tick, leaving two full tick intervals.
+// The world restores the spent stand even if the success box stays open.
+loc_change(fenk_conductor_repaired, 3);
+// Java 377 has one wave slot; two immediate synths do not layer reliably.
 sound_synth(lightning, 1, 0);
-sound_synth(lightning2, 1, 0);
 ~mesbox("You repair the lightning conductor not one moment too soon - a tremendous bolt of lightning melts the new lightning conductor, and power blazes throughout the castle, if only briefly.");
 return;

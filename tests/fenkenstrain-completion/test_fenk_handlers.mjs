@@ -572,17 +572,19 @@ for (const [trigger, usedItem, startingStage] of [
   assert(!p.packets.some(packet => ['CamReset', 'CamShake', 'MinimapToggle', 'IfOpenOverlay'].includes(packet.constructor.name)), 'repair changes no camera, minimap or overlay state');
   const tabUpdates = p.packets.filter(packet => packet.constructor.name === 'IfSetTab');
   assert(tabUpdates.every(packet => packet.tab === 2 && Component.get(packet.component)?.comName?.split(':')[0] === 'questlist'), 'only the existing quest-journal progress refresh may update a tab');
-  assert(animationEvents.length === 1 && animationEvents[0].target === loc && animationEvents[0].seq === ID.lightning && animationEvents[0].type === ID.conductorRepaired, 'repaired loc starts cache lightning at frame zero');
-  assert(animationEvents[0].tick === startTick, 'lightning begins on the same tick as the success box');
+  assert(animationEvents.length === 0, 'do not send a LOC_ANIM that the client applies to the old stand before deferred replacement');
+  assert(LocType.get(ID.conductorRepaired).anim === ID.lightning && SeqType.get(ID.lightning).loops === 30, 'retain the repaired loc original cache sequence and native start behavior');
   const sounds = p.packets.filter(packet => packet.constructor.name === 'SynthSound');
-  assert(sounds.length === 2 && sounds[0].synth === ID.lightningSound && sounds[1].synth === ID.lightning2Sound && sounds.every(packet => packet.loops === 1), 'scene uses both quest lightning synths once');
+  assert(sounds.length === 1 && sounds[0].synth === ID.lightningSound && sounds[0].loops === 1, 'play lightning once, without competing for the Java 377 single-wave slot');
   assert(p.messages.some(text => text.includes('You repair the lightning conductor')), 'existing success message is visible while lightning is active');
   assert(loc.type === ID.conductorRepaired && loc.isChanged(), 'lightning loc is active with the box open');
-  for (let tick = 1; tick <= 2; tick++) {
-    World.currentTick++;
-    loc.turn();
+  assert(loc.lifecycleTick === 3, 'loc lifetime includes its creation-tick lifecycle pass');
+  for (let tick = 0; tick <= 2; tick++) {
+    World.currentTick = startTick + tick;
+    World.processZones();
     assert(result.exec === ScriptState.PAUSEBUTTON, 'loc lifecycle must not require a message Continue');
-    assert(loc.type === (tick === 1 ? ID.conductorRepaired : ID.conductorBroken), 'bounded loc lifecycle restores spent conductor while box stays open');
+    assert(loc.type === (tick < 2 ? ID.conductorRepaired : ID.conductorBroken), 'same-tick zone processing leaves lightning for two complete server-tick intervals, then restores the stand');
+    for (const zone of World.zonesTracking) zone.reset();
   }
   assert(!loc.isChanged(), 'lightning loop cannot remain installed behind an open box');
   assert(p.level === 2 && p.x === 3549 && p.z === 3538, 'roof scene does not teleport the player or change plane');
