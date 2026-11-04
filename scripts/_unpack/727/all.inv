@@ -1769,6 +1769,7 @@ size=4
 
 [dueloffer]
 size=9
+protect=no
 
 [duel_rottenfruitshop]
 scope=shared
@@ -1780,6 +1781,7 @@ stock1=rotten_tomato,2000,10
 
 [duelwinnings]
 size=9
+protect=no
 
 [aprilfoolshorseshop]
 scope=shared
@@ -1855,6 +1857,7 @@ stackall=yes
 
 [duelarrows]
 size=29
+protect=no
 
 [werewolfstore1]
 scope=shared

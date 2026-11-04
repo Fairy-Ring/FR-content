@@ -6,17 +6,13 @@ if (~in_duel_arena(coord) = true & %duelstatus < ^duelstatus_lost) {
     clearqueue(duel_finish);
     queue(duel_finish, 0, 0);
 
-    // both_moveinv needs protected access to the winner (.finduid gives only plain access). Same pattern as upstream
-    // castlewars_takefrom.rs2: .if_close the other player, then .p_finduid; no retry.
     if (%duelstatus = ^duelstatus_lost & .finduid(%duel2accept) = true) {
         session_log(^log_moderator, "Lost a duel against <.name>");
         .if_close;
-        if (.p_finduid(%duel2accept) = true) {
-            .%duelstatus = ^duelstatus_victory;
-            both_moveinv(dueloffer, duelwinnings);
-            .clearqueue(duel_finish);
-            .queue(duel_finish, 0, 0);
-        }
+        .%duelstatus = ^duelstatus_victory;
+        both_moveinv(dueloffer, duelwinnings);
+        .clearqueue(duel_finish);
+        .queue(duel_finish, 0, 0);
     }
     // ur able to get double mes if opponent kills u with knives: https://youtu.be/KRDZJKa1whI?list=PLn23LiLYLb1bQ7Hwp77KoNBjKvpZQTfJT&t=12
     midi_jingle(death2);

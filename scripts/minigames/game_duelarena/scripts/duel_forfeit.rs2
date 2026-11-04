@@ -14,14 +14,10 @@ if ($choice = 2) {
 }
 %duelstatus = ^duelstatus_lost;
 queue(duel_finish, 0, 0);
-// both_moveinv needs protected access to the winner (.finduid gives only plain access). Same pattern as upstream
-// castlewars_takefrom.rs2: .if_close the other player, then .p_finduid; no retry.
 if (.finduid(%duel2accept) = true) {
     session_log(^log_moderator, "Lost a duel by forfeit against <.name>");
     .if_close;
-    if (.p_finduid(%duel2accept) = true) {
-        both_moveinv(dueloffer, duelwinnings);
-        .%duelstatus = ^duelstatus_opponent_resigned;
-        .queue(duel_finish, 0, 0);
-    }
+    both_moveinv(dueloffer, duelwinnings);
+    .%duelstatus = ^duelstatus_opponent_resigned;
+    .queue(duel_finish, 0, 0);
 }
