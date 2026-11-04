@@ -123,7 +123,15 @@ const ID = {
   obsidian: packMap('pack/obj.pack', 'fenk_obsidian_amulet'),
   star: packMap('pack/obj.pack', 'fenk_star_amulet'),
   doctor: packMap('pack/npc.pack', 'fenk_fenkenstrain_model'),
-  bookcase: packMap('pack/loc.pack', 'fenk_bookcase')
+  bookcase: packMap('pack/loc.pack', 'fenk_bookcase'),
+  conductor: packMap('pack/obj.pack', 'fenk_conductor'),
+  hammer: packMap('pack/obj.pack', 'hammer'),
+  conductorBit: packMap('pack/varbit.pack', 'fenk_conductor_repaired'),
+  conductorBroken: packMap('pack/loc.pack', 'fenk_conductor_broken'),
+  conductorRepaired: packMap('pack/loc.pack', 'fenk_conductor_repaired'),
+  lightning: packMap('pack/seq.pack', 'fenk_lightning'),
+  lightningSound: packMap('pack/synth.pack', 'lightning'),
+  lightning2Sound: packMap('pack/synth.pack', 'lightning2')
 };
 
 const PRIESTPERIL_COMPLETE = 60;
@@ -135,9 +143,11 @@ function makePlayer() {
   p.pid = 1;
   p.staffModLevel = 0;
   p.messages = [];
+  p.packets = [];
   p.lastMovement = 0;
-  // Capture real outgoing text without a connected client.
+  // Capture real outgoing packets and text without a connected client.
   p.write = message => {
+    p.packets.push(message);
     if (typeof message.text === 'string') p.messages.push(message.text);
   };
   p.messageGame = message => p.messages.push(message);
@@ -499,6 +509,100 @@ for (const [x, choice, item] of [[3542, 4, ID.marble], [3555, 3, ID.obsidian]]) 
   assert(p.messages.includes('It is a bookcase full of books.'), 'ground floor does not grant amulet');
 }
 ok('bookcase menus, restored eastern title, full-inventory retry and repeat controls');
+
+// ---- conductor cutscene: execute the real loc handler across server delays ----
+function roofConductor() {
+  const type = LocType.get(ID.conductorBroken);
+  const loc = new Loc(2, 3548, 3536, type.width, type.length, EntityLifeCycle.RESPAWN, ID.conductorBroken, 10, 2);
+  World.addLoc(loc, -1);
+  return loc;
+}
+
+for (const [hasConductor, hasHammer, message] of [
+  [false, true, 'You need a silver lightning conductor to repair this.'],
+  [true, false, 'You need a hammer to repair the lightning conductor.']
+]) {
+  const p = makePlayer();
+  p.setVar(ID.fenkQuest, 3);
+  if (hasConductor) invOf(p, ID.inv).add(ID.conductor, 1);
+  if (hasHammer) invOf(p, ID.inv).add(ID.hammer, 1);
+  const result = runProc(p, '[oploc1,fenk_conductor_broken]', true, roofConductor());
+  expectFinished(result, 'conductor missing tool');
+  assert(p.messages.includes(message), 'repair refusal keeps existing wording');
+  assert(p.getVar(ID.fenkQuest) === 3 && p.getVarBit(ID.conductorBit) === 0, 'refusal preserves stage and repair bit');
+  assert(total(p, ID.inv, ID.conductor) === Number(hasConductor), 'refusal does not consume conductor');
+  assert([...p.cameraPackets.all()].length === 0 && !p.packets.some(packet => packet.constructor.name === 'SynthSound'), 'refusal does not start a scene');
+}
+
+for (const [trigger, usedItem, startingStage] of [
+  ['[oploc1,fenk_conductor_broken]', null, 3],
+  ['[oplocu,fenk_conductor_broken]', ID.conductor, 3],
+  ['[oplocu,fenk_conductor_broken]', ID.hammer, 5]
+]) {
+  const p = makePlayer();
+  p.level = 2;
+  p.x = 3549;
+  p.z = 3538;
+  p.setVar(ID.fenkQuest, startingStage);
+  invOf(p, ID.inv).add(ID.conductor, 1);
+  invOf(p, ID.inv).add(ID.hammer, 1);
+  p.lastUseItem = usedItem ?? -1;
+  const loc = roofConductor();
+  const startTick = World.currentTick;
+  const animationEvents = [];
+  const animateLoc = World.animLoc;
+  World.animLoc = function (target, seq) {
+    animationEvents.push({ target, seq, tick: World.currentTick, type: target.type });
+    return animateLoc.call(this, target, seq);
+  };
+  let result;
+  const waits = [];
+  const cameras = [];
+  try {
+    result = runProc(p, trigger, true, loc);
+    assert(p.getVarBit(ID.conductorBit) === 1 && total(p, ID.inv, ID.conductor) === 0, 'repair commits once before the first scene suspension');
+    assert(p.getVar(ID.fenkQuest) === Math.max(4, startingStage), 'repair advances assembled stage without regressing a later stage');
+    while (result.exec === ScriptState.SUSPENDED && waits.length < 10) {
+      assert(p.delayed, 'cutscene suspension protects the player from new movement/loc actions');
+      assert(!p.messages.some(text => text.includes('You repair the lightning conductor')), 'success box must not precede the timed strike');
+      waits.push(p.delayedUntil - World.currentTick);
+      for (const camera of p.cameraPackets.all()) {
+        cameras.push({ type: camera.type, x: camera.camX, z: camera.camZ, height: camera.height, rate: camera.rotationSpeed, rate2: camera.rotationMultiplier });
+      }
+      p.cameraPackets.clear();
+      World.currentTick = p.delayedUntil;
+      p.delayed = false;
+      result.exec = p.runScript(result.state, true, true);
+      assert(result.exec !== ScriptState.ABORTED, 'conductor continuation must not abort');
+    }
+  } finally {
+    World.animLoc = animateLoc;
+  }
+  expectPausebutton(result, 'conductor success after cutscene');
+  assert(waits.join(',') === '1,2', `candidate scene tick waits changed: ${waits}`);
+  assert(World.currentTick - startTick === 3, 'camera settles one tick, then holds for the complete lightning sequence');
+  assert(cameras.length === 2 && cameras[0].type === 0 && cameras[1].type === 1, 'scene sends a roof origin and conductor target without an invented pan');
+  assert(cameras[0].rate2 === 100 && cameras[1].rate2 === 100, 'scene establishes its fixed shot immediately');
+  assert(cameras[1].x === 3548 && cameras[1].z === 3537, 'camera targets the cache conductor, not the ground-floor laboratory');
+  assert(animationEvents.length === 1 && animationEvents[0].target === loc && animationEvents[0].seq === ID.lightning && animationEvents[0].type === ID.conductorRepaired, 'repaired loc starts cache lightning at frame zero');
+  assert(animationEvents[0].tick === startTick + 1, 'camera is installed a tick before lightning begins');
+  const sounds = p.packets.filter(packet => packet.constructor.name === 'SynthSound');
+  assert(sounds.length === 2 && sounds[0].synth === ID.lightningSound && sounds[1].synth === ID.lightning2Sound && sounds.every(packet => packet.loops === 1), 'scene uses both quest lightning synths once');
+  const resetIndex = p.packets.findIndex(packet => packet.constructor.name === 'CamReset');
+  const successIndex = p.packets.findIndex(packet => typeof packet.text === 'string' && packet.text.includes('You repair the lightning conductor'));
+  assert(resetIndex >= 0 && resetIndex < successIndex, 'camera resets before the existing success box');
+  assert(loc.type === ID.conductorBroken && !loc.isChanged(), 'lightning does not loop after the scene; spent conductor returns to its broken model');
+  assert(p.level === 2 && p.x === 3549 && p.z === 3538, 'roof scene does not teleport the player or change plane');
+  assert(total(p, ID.inv, ID.hammer) === 1, 'repair keeps the hammer');
+  finishDialogue(p, result);
+  const packetCount = p.packets.length;
+  const again = runProc(p, '[oploc1,fenk_conductor_broken]', true, loc);
+  expectFinished(again, 'conductor repeat');
+  assert(p.messages.includes('The lightning conductor is now beyond repair.'), 'repeat uses the existing post-repair message');
+  assert(!p.packets.slice(packetCount).some(packet => ['CamReset', 'SynthSound'].includes(packet.constructor.name)) && [...p.cameraPackets.all()].length === 0, 'repeat neither replays cutscene nor consumes another item');
+  assert(p.getVarBit(ID.conductorBit) === 1 && p.getVar(ID.fenkQuest) === Math.max(4, startingStage), 'repeat preserves durable repair state');
+}
+ok('conductor refusal, Repair/item-use paths, timed camera/lightning/audio, message order, roof position and one-shot repeat');
 
 // ---- F3 Charos bank/worn/inv + no XP on recovery ----
 {

@@ -167,7 +167,23 @@ if (%fenk_quest < ^fenk_lightning_done & %fenk_quest >= ^fenk_assembled) {
     %fenk_quest = ^fenk_lightning_done;
     ~update_questlist;
 }
-// Visual: change to repaired anim loc temporarily / permanently CANDIDATE
-loc_change(fenk_conductor_repaired, 100);
+// CANDIDATE 377 framing/timing: retained 2008 footage shows the roof strike,
+// not a laboratory awakening. Keep the player on the roof and add no speech.
+// FENK-CUTSCENE-1104/report.md records the source and reconstruction boundary.
+p_stopaction;
+if_close;
+p_arrivedelay;
+cam_moveto(2_55_55_35_11, 600, 0, 100);
+cam_lookat(2_55_55_28_17, 120, 0, 100);
+p_delay(0);
+// Restart at frame zero: an animated loc otherwise chooses a random loop phase.
+loc_change(fenk_conductor_repaired, 3);
+loc_anim(fenk_lightning);
+sound_synth(lightning, 1, 0);
+sound_synth(lightning2, 1, 0);
+// The packed 40-client-cycle sequence fits in two server ticks (p_delay + 1).
+p_delay(1);
+loc_change(fenk_conductor_broken, 1);
+cam_reset;
 ~mesbox("You repair the lightning conductor not one moment too soon - a tremendous bolt of lightning melts the new lightning conductor, and power blazes throughout the castle, if only briefly.");
 return;
