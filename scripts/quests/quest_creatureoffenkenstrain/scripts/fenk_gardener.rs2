@@ -24,7 +24,7 @@ if (inv_total(worn, amulet_of_ghostspeak) = 0) {
     return;
 }
 // Active dynamic follower owned by this player?
-if (%fenk_follower_uid ! null & npc_uid = %fenk_follower_uid) {
+if (%fenk_follower_uid ! null & npc_uid = %fenk_follower_uid & %npc_attacking_uid = uid) {
     @fenk_gardener_following_talk;
     return;
 }
@@ -138,7 +138,7 @@ if (inzone(0_55_54_0_0, 0_56_54_63_63, coord) = true) {
         npc_say("This is the place where I met me' maker.");
         // OSRS says he returns to the Castle; clear the owned dynamic copy so
         // the courtyard multi becomes visible again after the overhead is sent.
-        queue(fenk_gardener_clear_follow, 0, 0);
+        queue(fenk_gardener_clear_follow, 1, 0);
         return;
     }
     def_int $direction = ~coord_direction(coord, 0_56_54_24_35);
@@ -154,10 +154,9 @@ if (inzone(0_55_54_0_0, 0_56_54_63_63, coord) = true) {
 ~fenk_gardener_stray;
 return;
 
-// ~chatnpc sets playerfaceclose before each Continue. Restore PLAYERFOLLOW only
-// after a completed following-talk exit, and only on this player's owned
-// dynamic follower. Courtyard multi, another player's actor, or missing/stale
-// ownership: no-op. Does not npc_add, npc_del, retarget, or rewrite lifetime.
+// Talk-to sets a facing interaction. Resume PLAYERFOLLOW only for this player's
+// owned dynamic follower. Courtyard multi, another player's actor, or missing
+// ownership: no-op. Does not add, delete, retarget or rewrite lifetime.
 [proc,fenk_resume_owned_follow]
 if (%fenk_follower_uid = null) {
     return;
@@ -171,8 +170,8 @@ if (%npc_attacking_uid ! uid) {
 npc_setmode(playerfollow);
 
 // The current transcript presents the two departure lines in sequence.
-// NPC_SAY replaces the active overhead for the tick, so put the second line
-// on the next queue tick, then clear only this player's owned follower.
+// NPC_SAY replaces the active overhead for the tick. A nonzero queue delay keeps
+// each line visible before the next one or deletion, even within queue processing.
 [proc,fenk_gardener_stray]
 if (%fenk_follower_uid = null) {
     return;
@@ -182,7 +181,7 @@ if (npc_uid ! %fenk_follower_uid | %npc_attacking_uid ! uid) {
 }
 clearsofttimer(fenk_follow_watch);
 npc_say("Oi'm afraid you've gone well off the beaten track.");
-queue(fenk_gardener_stray_followup, 0, 0);
+queue(fenk_gardener_stray_followup, 1, 0);
 
 [queue,fenk_gardener_stray_followup]
 if (%fenk_follower_uid = null) {
@@ -198,7 +197,7 @@ if (npc_uid ! %fenk_follower_uid | %npc_attacking_uid ! uid) {
     return;
 }
 npc_say("Fare thee well - oi must return to me' garden.");
-queue(fenk_gardener_clear_follow, 0, 0);
+queue(fenk_gardener_clear_follow, 1, 0);
 
 [queue,fenk_gardener_clear_follow]
 ~fenk_clear_gardener_follow;

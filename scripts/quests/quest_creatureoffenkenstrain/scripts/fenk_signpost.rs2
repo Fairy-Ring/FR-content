@@ -1,9 +1,15 @@
-// Creature of Fenkenstrain — Read the signpost to start.
-// CANDIDATE note (2007-base minus the 2020 journal-start Change). First write
-// %fenk_read_signpost 0 -> 1 (fenk_flags bit 23). Do NOT write %fenk_quest on
-// Read. No dest / Dr chat / Charos. Cite red-19-start-impl-377.md §2.
+// Creature of Fenkenstrain — Read the job advertisement.
+// CANDIDATE OSRS guide retained 2026-11-04: the signpost checks both skills,
+// but the doctor still offers the job below those levels. No quest-start UI.
+// The refusal is stock product text; the period wording is not known.
 
 [oploc1,fenk_signpost]
+if (%fenk_quest = ^fenk_not_started) {
+    if (stat(crafting) < 20 | stat(thieving) < 25) {
+        mes("You need Crafting level 20 and Thieving level 25 to meet the requirements.");
+        return;
+    }
+}
 mes("The signpost has a note pinned onto it. The note says:");
 mes("'----Braindead Butler Wanted----");
 mes("Gravedigging skills essential - Hunchback advantageous");

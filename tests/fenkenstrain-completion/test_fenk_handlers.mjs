@@ -5,8 +5,8 @@
  * (not a handwritten state mirror). Control cases: full-inv, repeat, owner,
  * cat UID, hire refuse, head hand-in, Charos bank/worn/inv.
  *
- * Run after tests/fenkenstrain-completion/setup-iso.sh:
- *   node --import tsx tests/fenkenstrain-completion/test_fenk_handlers.mjs
+ * Run after npm run build in the sibling engine:
+ *   node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_handlers.mjs
  *
  * Fail-closed: runProc asserts ScriptRunner did not ABORT. Clock grant/recovery
  * use ~mesbox → p_pausebutton (PAUSEBUTTON), which is the production Continue
@@ -18,7 +18,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const WT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
-const ISO_ENGINE = path.join(WT, '.tmp/fenk-iso-compile-r422/engine');
+const ISO_ENGINE = process.env.HARNESS_ENGINE_DIR ?? path.resolve(WT, '../engine');
 const PACK_DIR = path.join(ISO_ENGINE, 'data/pack');
 const SCRIPT_DAT = path.join(PACK_DIR, 'server/script.dat');
 
@@ -39,7 +39,7 @@ function assert(cond, msg) {
 }
 
 if (!fs.existsSync(SCRIPT_DAT)) {
-  fail(`missing ISO script.dat at ${SCRIPT_DAT} — run tests/fenkenstrain-completion/setup-iso.sh`);
+  fail(`missing compiled script.dat at ${SCRIPT_DAT} — run npm run build in the sibling engine`);
   process.exit(1);
 }
 
@@ -49,6 +49,10 @@ const WorldMod = await eng('src/engine/World.ts');
 const World = WorldMod.default;
 const { default: VarPlayerType } = await eng('src/cache/config/VarPlayerType.ts');
 const { default: VarBitType } = await eng('src/cache/config/VarBitType.ts');
+const { default: VarNpcType } = await eng('src/cache/config/VarNpcType.ts');
+const { default: NpcType } = await eng('src/cache/config/NpcType.ts');
+const { default: LocType } = await eng('src/cache/config/LocType.ts');
+const { default: SeqType } = await eng('src/cache/config/SeqType.ts');
 const { default: InvType } = await eng('src/cache/config/InvType.ts');
 const { default: ObjType } = await eng('src/cache/config/ObjType.ts');
 const { default: FontType } = await eng('src/cache/config/FontType.ts');
@@ -57,9 +61,18 @@ const { default: ScriptProvider } = await eng('src/engine/script/ScriptProvider.
 const { default: ScriptRunner } = await eng('src/engine/script/ScriptRunner.ts');
 const { default: ScriptState } = await eng('src/engine/script/ScriptState.ts');
 const { default: Player } = await eng('src/engine/entity/Player.ts');
+const { default: Npc } = await eng('src/engine/entity/Npc.ts');
+const { default: Loc } = await eng('src/engine/entity/Loc.ts');
+const { EntityLifeCycle } = await eng('src/engine/entity/EntityLifeCycle.js');
+const { PlayerStat } = await eng('src/engine/entity/PlayerStat.js');
 
 VarPlayerType.load(PACK_DIR);
 VarBitType.load(PACK_DIR);
+VarNpcType.load(PACK_DIR);
+NpcType.load(PACK_DIR);
+LocType.load(PACK_DIR);
+SeqType.load(PACK_DIR);
+World.currentTick = 1;
 InvType.load(PACK_DIR);
 ObjType.load(PACK_DIR);
 FontType.load(PACK_DIR);
@@ -90,13 +103,24 @@ const ID = {
   coins: packMap('pack/obj.pack', 'coins'),
   fenkFlags: packMap('pack/varp.pack', 'fenk_flags'),
   fenkFollower: packMap('pack/varp.pack', 'fenk_follower_uid'),
-  fenkMem: packMap('pack/varp.pack', 'fenk_charos_unlocked_mem'),
+  fenkMem: packMap('pack/varp.pack', 'fenk_charos_unlocked'),
   catUid: packMap('pack/varp.pack', 'follower_uid'),
   priestperil: packMap('pack/varp.pack', 'priestperil'),
   prieststart: packMap('pack/varp.pack', 'prieststart'),
   woundBit: packMap('pack/varbit.pack', 'fenk_wound_clock'),
   headBit: packMap('pack/varbit.pack', 'fenk_head'),
-  directionsBit: packMap('pack/varbit.pack', 'fenk_gardener_directions')
+  directionsBit: packMap('pack/varbit.pack', 'fenk_gardener_directions'),
+  fenkQuest: packMap('pack/varp.pack', 'fenk_quest'),
+  readSignpost: packMap('pack/varbit.pack', 'fenk_read_signpost'),
+  needleBit: packMap('pack/varbit.pack', 'fenk_needle'),
+  threadsBit: packMap('pack/varbit.pack', 'fenk_threads_given'),
+  needle: packMap('pack/obj.pack', 'needle'),
+  thread: packMap('pack/obj.pack', 'thread'),
+  marble: packMap('pack/obj.pack', 'fenk_marble_amulet'),
+  obsidian: packMap('pack/obj.pack', 'fenk_obsidian_amulet'),
+  star: packMap('pack/obj.pack', 'fenk_star_amulet'),
+  doctor: packMap('pack/npc.pack', 'fenk_fenkenstrain_model'),
+  bookcase: packMap('pack/loc.pack', 'fenk_bookcase')
 };
 
 const PRIESTPERIL_COMPLETE = 60;
@@ -107,12 +131,14 @@ function makePlayer() {
   p.uid = 1;
   p.pid = 1;
   p.staffModLevel = 0;
-  // Swallow client writes (no connected client in this harness).
-  p.write = () => {};
-  p.messageGame = () => {};
-  if (typeof p.wrappedMessageGame === 'function') {
-    p.wrappedMessageGame = () => {};
-  }
+  p.messages = [];
+  p.lastMovement = 0;
+  // Capture real outgoing text without a connected client.
+  p.write = message => {
+    if (typeof message.text === 'string') p.messages.push(message.text);
+  };
+  p.messageGame = message => p.messages.push(message);
+  p.wrappedMessageGame = message => p.messages.push(message);
   return p;
 }
 
@@ -134,10 +160,10 @@ function total(player, invId, objId) {
   return inv.getItemCount(objId);
 }
 
-function runProc(player, name, protect = true) {
+function runProc(player, name, protect = true, target = null) {
   const script = ScriptProvider.getByName(name);
   assert(script, `compiled script missing ${name}`);
-  const state = ScriptRunner.init(script, player);
+  const state = ScriptRunner.init(script, player, target);
   const exec = player.runScript(state, protect, true);
   assert(exec !== -1, `${name} did not obtain protected access`);
   assert(exec !== ScriptState.ABORTED, `${name} ScriptRunner ABORTED`);
@@ -264,6 +290,134 @@ function popRet(state) {
   assert(popRet(r.state) === 1, 'hire prereq true when both complete');
   ok('hire prereq allows when PiP + Restless Ghost complete');
 }
+
+// ---- 2026-11-04 source and interruption regressions (compiled handlers) ----
+function doctor() {
+  return new Npc(0, 3551, 3550, 1, 1, EntityLifeCycle.DESPAWN, 1, ID.doctor, NpcType.get(ID.doctor).blockwalk);
+}
+
+function qualifiedPlayer() {
+  const p = makePlayer();
+  p.setVar(ID.priestperil, PRIESTPERIL_COMPLETE);
+  p.setVar(ID.prieststart, PRIEST_COMPLETE);
+  return p;
+}
+
+function finishDialogue(p, result, choices = [], onPause = () => {}) {
+  let pauses = 0;
+  while (result.exec === ScriptState.PAUSEBUTTON && pauses++ < 100) {
+    onPause();
+    const menu = result.state.script.name.match(/^\[proc,p_choice([2345])(?:_header)?\]$/);
+    if (menu) {
+      assert(choices.length > 0, `unanswered ${result.state.script.name}`);
+      p.lastCom = packMap('pack/interface.pack', `multi${menu[1]}:com_${choices.shift()}`);
+    }
+    result.exec = p.runScript(result.state, true, true);
+    assert(result.exec !== ScriptState.ABORTED, `dialogue aborted at ${result.state.script.name}`);
+  }
+  expectFinished(result, 'complete dialogue');
+  assert(choices.length === 0, 'unused dialogue choice');
+}
+
+for (const [crafting, thieving, accepted] of [[19, 25, false], [20, 24, false], [20, 25, true]]) {
+  const p = qualifiedPlayer();
+  p.levels[PlayerStat.CRAFTING] = crafting;
+  p.levels[PlayerStat.THIEVING] = thieving;
+  const result = runProc(p, '[oploc1,fenk_signpost]');
+  expectFinished(result, 'signpost');
+  assert(p.getVarBit(ID.readSignpost) === Number(accepted), `signpost boundary ${crafting}/${thieving}`);
+  assert(p.getVar(ID.fenkQuest) === 0, 'signpost does not start quest');
+}
+ok('signpost skill thresholds; read flag only, no quest-stage write');
+
+for (const read of [0, 1]) {
+  const p = qualifiedPlayer();
+  p.levels[PlayerStat.CRAFTING] = 1;
+  p.levels[PlayerStat.THIEVING] = 1;
+  p.setVarBit(ID.readSignpost, read);
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()), [1, 4, 4]);
+  assert(p.getVar(ID.fenkQuest) === 1, 'doctor hires below skill requirements');
+  assert(p.messages.some(text => text.includes('What job do you mean')) === !read, 'unread-signpost branch condition');
+}
+ok('doctor hires at skills 1/1 with and without signpost; unread branch is conditional');
+
+for (const choices of [[2], [1, 1], [1, 4, 1]]) {
+  const p = qualifiedPlayer();
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()), [...choices]);
+  assert(p.getVar(ID.fenkQuest) === 0, 'decline/wrong answer does not hire');
+}
+ok('decline and both wrong interview answers preserve stage 0');
+
+{
+  const p = qualifiedPlayer();
+  p.setVar(ID.fenkQuest, 1);
+  for (const part of ['fenk_head', 'fenk_torso', 'fenk_arms', 'fenk_legs']) {
+    p.setVarBit(packMap('pack/varbit.pack', part), 1);
+  }
+  // State left after cancelling the last part's reply: all parts accepted, stage 1.
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.getVar(ID.fenkQuest) === 2, 'retry recovers stage after interrupted final-part reply');
+  assert(p.messages.some(text => text.includes('Where are my needle and thread')), 'retry enters sewing branch');
+}
+
+{
+  const p = qualifiedPlayer();
+  p.setVar(ID.fenkQuest, 2);
+  invOf(p, ID.inv).add(ID.needle, 1);
+  invOf(p, ID.inv).add(ID.thread, 2);
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.getVarBit(ID.needleBit) === 1 && p.getVarBit(ID.threadsBit) === 2, 'partial supplies stored');
+  assert(total(p, ID.inv, ID.needle) === 0 && total(p, ID.inv, ID.thread) === 0, 'only offered supplies consumed');
+  invOf(p, ID.inv).add(ID.thread, 4);
+  let corpseVisibleDuringSewing = false;
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()), [], () => {
+    if (p.messages.join(' ').includes('Fenkenstrain uses the needle and thread')) {
+      corpseVisibleDuringSewing = p.getVar(ID.fenkQuest) === 3;
+    }
+  });
+  assert(p.getVar(ID.fenkQuest) === 3 && corpseVisibleDuringSewing, 'corpse stage set before sewing box Continue');
+  assert(p.getVarBit(ID.threadsBit) === 5 && total(p, ID.inv, ID.thread) === 1, 'exact remaining three threads consumed');
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(total(p, ID.inv, ID.thread) === 1, 'repeat assembled talk does not consume surplus');
+}
+
+{
+  const p = qualifiedPlayer();
+  p.setVar(ID.fenkQuest, 2);
+  p.setVarBit(ID.needleBit, 1);
+  p.setVarBit(ID.threadsBit, 5);
+  // Cancellation after accepting final thread, before entering the sewing label.
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.getVar(ID.fenkQuest) === 3, 'fully supplied interrupted state recovers without another item');
+}
+ok('interrupted body and sewing replies recover; partial supplies and corpse timing');
+
+function bookcase(x, z, level = 1) {
+  const loc = LocType.get(ID.bookcase);
+  return new Loc(level, x, z, loc.width, loc.length, EntityLifeCycle.RESPAWN, ID.bookcase, 10, 0);
+}
+
+for (const [x, choice, item] of [[3542, 4, ID.marble], [3555, 3, ID.obsidian]]) {
+  const p = qualifiedPlayer();
+  fillInv(p, ID.coins, 28);
+  finishDialogue(p, runProc(p, '[oploc1,fenk_bookcase]', true, bookcase(x, 3558)), [choice]);
+  assert(total(p, ID.inv, item) === 0, 'full inventory does not grant amulet');
+  invOf(p, ID.inv).set(0, null);
+  finishDialogue(p, runProc(p, '[oploc1,fenk_bookcase]', true, bookcase(x, 3558)), [choice]);
+  assert(total(p, ID.inv, item) === 1, 'correct title grants amulet on retry');
+  finishDialogue(p, runProc(p, '[oploc1,fenk_bookcase]', true, bookcase(x, 3558)), [choice]);
+  assert(total(p, ID.inv, item) === 1, 'repeat title does not duplicate amulet');
+}
+{
+  const p = qualifiedPlayer();
+  finishDialogue(p, runProc(p, '[oploc1,fenk_bookcase]', true, bookcase(3555, 3558)), [1]);
+  assert(p.messages.some(text => text.includes('fascinating insights')), 'restored eastern title has sourced response');
+  assert(invOf(p, ID.inv).freeSlotCount === 28, 'decoy book is display-only');
+  const ground = runProc(p, '[oploc1,fenk_bookcase]', true, bookcase(3542, 3558, 0));
+  expectFinished(ground, 'ground-floor bookcase');
+  assert(p.messages.includes('It is a bookcase full of books.'), 'ground floor does not grant amulet');
+}
+ok('bookcase menus, restored eastern title, full-inventory retry and repeat controls');
 
 // ---- F3 Charos bank/worn/inv + no XP on recovery ----
 {

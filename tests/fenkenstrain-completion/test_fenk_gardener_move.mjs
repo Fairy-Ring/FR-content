@@ -10,12 +10,10 @@
  * - assert multi coordinate does NOT change
  * - exceptions must FAIL (never OK-on-throw / OK-on-unchanged)
  *
- * Prerequisites: ISO pack-server-configs wrote
- *   .tmp/fenk-iso-compile-r422/engine/data/pack/server/npc.{dat,idx}
- * and client config jag under the same engine data/pack.
+ * Prerequisite: npm run build in the stopped sibling engine.
  *
- * Run from worktree:
- *   node --import tsx tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
+ * Run from that engine directory:
+ *   node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
  *
  * Does NOT touch shared live packs. Not a live client proof.
  */
@@ -24,7 +22,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const WT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
-const ISO_ENGINE = path.join(WT, '.tmp/fenk-iso-compile-r422/engine');
+const ISO_ENGINE = process.env.HARNESS_ENGINE_DIR ?? path.resolve(WT, '../engine');
 const PACK_DIR = path.join(ISO_ENGINE, 'data/pack');
 const NPC_DAT = path.join(PACK_DIR, 'server/npc.dat');
 
@@ -45,7 +43,7 @@ function assert(cond, msg) {
 }
 
 if (!fs.existsSync(NPC_DAT)) {
-  fail(`missing ISO npc.dat at ${NPC_DAT} — run pack-server-configs first`);
+  fail(`missing compiled npc.dat at ${NPC_DAT} — run npm run build in the sibling engine`);
   process.exit(1);
 }
 

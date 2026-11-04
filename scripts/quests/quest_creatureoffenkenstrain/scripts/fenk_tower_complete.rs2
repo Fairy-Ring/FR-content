@@ -100,7 +100,7 @@ return (false);
 
 // Post-complete recovery yield.
 // Tip.it CANDIDATE (2006-06-16): if previously unlocked, recover unlocked.
-// Durable memory: %fenk_charos_unlocked_mem (NONHISTORICAL perm varp).
+// Durable state: %fenk_charos_unlocked (server-only perm varp).
 // digresult (fenk_flags bits 17-19) left free for possible historical dig-outcome encoding.
 //
 // Recovery predicates (honest residual — do NOT claim all historical (u) loss paths):
@@ -113,7 +113,7 @@ return (false);
 // BASE, not (u). Full Tip.it retained-unlock path needs Garden (or equivalent) to
 // set mem on unlock — residual until that content lands.
 [proc,fenk_give_charos_recovery]
-if (%fenk_charos_unlocked_mem = 1) {
+if (%fenk_charos_unlocked = 1) {
     inv_add(inv, ring_of_charos_unlocked, 1);
 } else {
     inv_add(inv, ring_of_charos, 1);
@@ -123,7 +123,7 @@ if (%fenk_charos_unlocked_mem = 1) {
 // Does not invent Garden unlock; does not run on first-complete base grant.
 [proc,fenk_note_charos_unlocked]
 if (inv_total(inv, ring_of_charos_unlocked) > 0 | inv_total(worn, ring_of_charos_unlocked) > 0 | inv_total(bank, ring_of_charos_unlocked) > 0) {
-    %fenk_charos_unlocked_mem = 1;
+    %fenk_charos_unlocked = 1;
 }
 
 [queue,fenk_quest_complete]

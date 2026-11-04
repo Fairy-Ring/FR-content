@@ -83,7 +83,7 @@ def main() -> int:
     sign = bodies["fenk_signpost.rs2"]
     must_contain(sign, r"\[oploc1,fenk_signpost\]", "signpost op")
     must_contain(sign, r"%fenk_read_signpost\s*=\s*1", "signpost bit")
-    must_not_contain(sign, r"%fenk_quest\s*=", "signpost must not write fenk_quest")
+    must_not_contain(sign, r"%fenk_quest\s*=\s*[^;\n]+;", "signpost must not write fenk_quest")
 
     # --- A: doctor hire once / stage gates / wrong answers ---
     dr = bodies["fenk_dr_talk.rs2"]
@@ -98,6 +98,10 @@ def main() -> int:
     must_contain(dr, r"%prieststart\s*<\s*\^priest_complete", "Restless Ghost complete constant")
     must_not_contain(dr, r"%priestperil\s*<\s*60", "no guessed PiP int")
     must_not_contain(dr, r"%prieststart\s*<\s*5", "no guessed RG int")
+    must_contain(sign, r"stat\(crafting\)\s*<\s*20", "signpost Crafting gate")
+    must_contain(sign, r"stat\(thieving\)\s*<\s*25", "signpost Thieving gate")
+    must_not_contain(dr, r"stat\((?:crafting|thieving)\)", "doctor has no skill start gate")
+    must_contain(dr, r"%fenk_read_signpost\s*=\s*0", "unread signpost branch")
 
     # --- B: partial body hand-in ---
     must_contain(dr, r"\[proc,fenk_try_hand_parts\]", "parts hand-in proc")
@@ -134,15 +138,17 @@ def main() -> int:
         fail("softtimer body missing")
     elif "~fenk_clear_gardener_follow" in soft.group(1):
         fail("softtimer must not gosub protected clear")
-    # Voice honesty: following talk restates south Haunted Forest — no free compass.
-    must_contain(g, r"aunted Forest to the south", "following talk south forest")
+    # Sourced following directions are overhead, never an invented menu.
+    must_not_contain(g, r"Which way to your grave", "no invented following option")
+    must_contain(g, r"You need to head off to them Haunted Woods, mate\.", "following castle direction")
+    must_contain(g, r"This is the place where I met me' maker\.", "following grave arrival")
     must_contain(g, r"Exact tile leash radius", "leash UNKNOWN honesty comment")
     must_contain(g, r"Do NOT hook pet\.rs2", "no pet.rs2 hook comment")
     must_contain(follower_varp, r"scope=temp", "follower uid temp")
     must_contain(follower_varp, r"type=npc_uid", "follower uid type")
     must_contain(follower_varp, r"protect=no", "follower uid softtimer-readable")
     # Charos durable memory: dedicated perm varp — NOT digresult=7.
-    must_contain(follower_varp, r"\[fenk_charos_unlocked_mem\]", "charos mem varp def")
+    must_contain(follower_varp, r"\[fenk_charos_unlocked\]", "charos state varp def")
     must_contain(follower_varp, r"scope=perm", "charos mem perm")
     must_not_contain(follower_varp, r"%fenk_digresult|fenk_digresult\s*=", "charos mem must not assign digresult")
 
@@ -245,7 +251,7 @@ def main() -> int:
     must_contain(tower, r"ring_of_charos_unlocked", "unlocked variant in guard/recovery")
     must_contain(tower, r"\[proc,fenk_give_charos_recovery\]", "lost-ring recovery")
     must_contain(tower, r"\[proc,fenk_has_charos_any\]", "duplicate guard both variants")
-    must_contain(tower, r"%fenk_charos_unlocked_mem", "durable charos memory varp use")
+    must_contain(tower, r"%fenk_charos_unlocked", "durable charos varp use")
     must_contain(tower, r"\[proc,fenk_note_charos_unlocked\]", "note unlocked proc")
     must_not_contain(tower, r"%fenk_digresult\s*=\s*7", "must not use digresult=7 for charos mem")
     # Honest residual: mem observation-only; must document incomplete (u) paths
@@ -370,17 +376,20 @@ def main() -> int:
         if "defaultmode=none" not in g_npc.group(1):
             fail("fenk_gardener defaultmode=none")
     must_contain(g, r"npc_add\s*\(\s*\$spawn\s*,\s*fenk_gardener\s*,", "follower npc_add fenk_gardener")
-    # Exact loc inventory: 78 all.loc + 2 stairs.loc = 80 (root-precontract resolved)
+    # Exact loc inventory, including the four authored paired-door configs.
     all_loc = read(ROOT / "scripts/_unpack/377/all.loc")
     stairs_loc = read(ROOT / "scripts/ladders+stairs/configs/stairs.loc")
+    castle_loc = read(FENK / "configs/fenk_castle_doors.loc")
     loc_all = re.findall(r"^\[(fenk_[^\]]+)\]", all_loc, re.M)
     loc_stairs = re.findall(r"^\[(fenk_[^\]]+)\]", stairs_loc, re.M)
-    if len(loc_all) != 78:
-        fail(f"all.loc fenk_* count {len(loc_all)} != 78")
+    loc_castle = re.findall(r"^\[(fenk_[^\]]+)\]", castle_loc, re.M)
+    if set(loc_castle) != {"fenk_door", "fenk_door_mirror", "fenk_door_open", "fenk_door_open_mirror"}:
+        fail(f"castle door fenk defs unexpected: {loc_castle}")
     if set(loc_stairs) != {"fenk_stairs_lv1", "fenk_stairs_lv1_top"}:
         fail(f"stairs.loc fenk defs unexpected: {loc_stairs}")
-    if len(loc_all) + len(loc_stairs) != 80:
-        fail("named fenk loc total must be 80 (78 unpack + 2 stairs)")
+    loc_names = loc_all + loc_stairs + loc_castle
+    if len(loc_names) != 80 or len(set(loc_names)) != 80:
+        fail("named fenk loc total must be 80 unique definitions (unpack, castle doors and stairs)")
     # varp scope=perm for quest durable state
     all_varp = read(ROOT / "scripts/_unpack/377/all.varp")
     must_contain(all_varp, r"\[fenk_quest\][\s\S]*?scope=perm", "fenk_quest scope perm")
@@ -388,7 +397,7 @@ def main() -> int:
     # pack id registration for new varps
     varp_pack = read(ROOT / "pack/varp.pack")
     must_contain(varp_pack, r"763=fenk_follower_uid", "pack id follower uid")
-    must_contain(varp_pack, r"764=fenk_charos_unlocked_mem", "pack id charos mem")
+    must_contain(varp_pack, r"764=fenk_charos_unlocked$", "pack id charos state", re.M)
 
     # --- shared joins ---
     must_contain(

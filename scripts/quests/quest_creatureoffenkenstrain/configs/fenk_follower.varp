@@ -1,4 +1,4 @@
-// Temp follower session state (NONHISTORICAL representation).
+// Server-only follower session state, following Lost City's follower_uid pattern.
 // Not a packed 377 quest bit — private ownership pointer for dynamic gardener.
 // protect=no: softtimer fenk_follow_watch must read session uid without p_active_player.
 [fenk_follower_uid]
@@ -6,12 +6,12 @@ type=npc_uid
 scope=temp
 protect=no
 
-// NONHISTORICAL durable Charos(u) memory for post-complete recovery (Tip.it 2006-06-16).
+// Durable Charos(u) state for post-complete recovery (Tip.it 2006-06-16).
 // Dedicated perm varp — do NOT reuse fenk_digresult (bits 17-19) for unlock memory.
 // Garden unlock SEAM (out of CoF scope): scripts/quests/quest_garden/ currently has
 // garden_ellamaria.rs2 + garden_bernald.rs2 and ZERO Charos writers. When Garden
-// authors base→(u) conversion it must set %fenk_charos_unlocked_mem = 1 (or call
+// authors base→(u) conversion it must set %fenk_charos_unlocked = 1 (or call
 // ~fenk_note_charos_unlocked). Until then, recovery without a later doctor
 // observation of (u) yields base ring_of_charos.
-[fenk_charos_unlocked_mem]
+[fenk_charos_unlocked]
 scope=perm

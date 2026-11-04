@@ -109,9 +109,6 @@ const ID = {
   fenkFlags: packMap('pack/varp.pack', 'fenk_flags'),
   directionsBit: packMap('pack/varbit.pack', 'fenk_gardener_directions'),
   attackingUid: packMap('pack/varn.pack', 'npc_attacking_uid'),
-  multi3Com1: packMap('pack/interface.pack', 'multi3:com_1'),
-  multi3Com2: packMap('pack/interface.pack', 'multi3:com_2'),
-  multi3Com3: packMap('pack/interface.pack', 'multi3:com_3'),
   multi4Com3: packMap('pack/interface.pack', 'multi4:com_3'),
   multi4Com4: packMap('pack/interface.pack', 'multi4:com_4')
 };
@@ -121,8 +118,8 @@ const idMulti = packMap('pack/npc.pack', 'fenk_gardener_multi');
 const idMulti2 = packMap('pack/npc.pack', 'fenk_gardener_multi_2');
 
 const LEVEL = 0;
-const BASE_X = 3200;
-const BASE_Z = 3200;
+const BASE_X = 3544;
+const BASE_Z = 3556;
 const PLAYER_START_X = BASE_X + 1;
 const PLAYER_WALK_X = BASE_X + 4;
 const FOLLOW_TICKS = 1000;
@@ -248,6 +245,31 @@ function completeDialogue(player, scriptName, npc, firstChoiceCom = null) {
   assert(pauses > 0, `${scriptName} finished without any p_pausebutton — dialogue did not run`);
   return { state, exec, pauses, script };
 }
+function completeOverhead(player, npc, expected, scriptName = '[opnpc1,fenk_gardener]') {
+  const script = ScriptProvider.getByName(scriptName);
+  assert(script, `compiled script missing ${scriptName}`);
+  const state = ScriptRunner.init(script, player, npc);
+  const exec = player.runScript(state, true, true);
+  assert(exec === ScriptState.FINISHED, `${scriptName} must finish without a modal (exec=${exec})`);
+  assert(npc.sayMessage === expected, `${scriptName} overhead ${JSON.stringify(npc.sayMessage)} != ${JSON.stringify(expected)}`);
+}
+
+function queueTick(player) {
+  World.currentTick += 1;
+  player.processQueues();
+}
+
+function makeAreaFollower(x, z, nid) {
+  const player = makePlayer();
+  player.x = x;
+  player.z = z;
+  allocateIfAbsent(x - 1, z, LEVEL);
+  const npc = makeNpc(idFollower, x - 1, z, nid);
+  wearGhostspeak(player);
+  ownFollower(player, npc);
+  World.npcs.set(npc.nid, npc);
+  return { player, npc };
+}
 
 function tickModeMovement(npc) {
   npc.lastTickX = npc.x;
@@ -293,7 +315,7 @@ try {
     const script = ScriptProvider.getByName('[proc,chatnpc]');
     assert(script, 'compiled [proc,chatnpc] missing');
     const state = ScriptRunner.init(script, p, npc, [
-      "<p,neutral>Oi was diggin' a pit in the old 'aunted Forest to the south when they took me head. Keep with me, mate."
+      "<p,neutral>You need to head off to them Haunted Woods, mate."
     ]);
     let exec = p.runScript(state, true, true);
     assert(exec !== -1, 'chatnpc(text) did not obtain protected access');
@@ -330,17 +352,17 @@ try {
     );
   }
 
-  function runOwnedOpnpcChoice(choiceCom, label) {
+  function runOwnedOverhead() {
     const p = makePlayer();
-    const npc = makeNpc(idFollower, BASE_X, BASE_Z, 2000 + choiceCom);
+    const npc = makeNpc(idFollower, BASE_X, BASE_Z, 2001);
     wearGhostspeak(p);
     ownFollower(p, npc);
     const before = snapshot(npc);
     const questBefore = p.getVar(ID.fenkQuest);
     const dirBefore = p.getVarBit(ID.directionsBit);
     const uidVarBefore = p.getVar(ID.fenkFollower);
-    const result = completeDialogue(p, '[opnpc1,fenk_gardener]', npc, choiceCom);
-    ok(`${label}: handler finished pauses=${result.pauses} exec=${result.exec}`);
+    completeOverhead(p, npc, 'You need to head off to them Haunted Woods, mate.');
+    const label = 'castle overhead';
     assert(npc.uid === before.uid, `${label}: actor uid replaced`);
     assertPreserved(npc, before, label);
     assert(p.getVar(ID.fenkQuest) === questBefore, `${label}: quest stage rewritten`);
@@ -371,9 +393,72 @@ try {
     return npc;
   }
 
-  runOwnedOpnpcChoice(ID.multi3Com1, 'directions');
-  runOwnedOpnpcChoice(ID.multi3Com2, 'name');
-  runOwnedOpnpcChoice(ID.multi3Com3, 'leave');
+  runOwnedOverhead();
+
+  // All four woods directions use the same production op, not a dialogue menu.
+  for (const [x, z, direction, nid] of [
+    [3550, 3491, 'east', 6001],
+    [3620, 3491, 'west', 6002],
+    [3608, 3480, 'north', 6003],
+    [3608, 3510, 'south', 6004]
+  ]) {
+    const { player, npc } = makeAreaFollower(x, z, nid);
+    const before = snapshot(npc);
+    completeOverhead(player, npc, `Go ${direction}, mate.`);
+    assertPreserved(npc, before, direction);
+    assert(player.getVar(ID.fenkFollower) === npc.uid, `${direction}: follower identity changed`);
+    assert(player.getVarBit(ID.directionsBit) === 1, `${direction}: courtyard restored too early`);
+    assert(npc.targetOp === NpcMode.PLAYERFOLLOW, `${direction}: following was not resumed`);
+    ok(`woods overhead: ${direction}`);
+  }
+
+  // Grave speech precedes owned cleanup; Dig itself is not changed or required.
+  {
+    const { player, npc } = makeAreaFollower(3608, 3491, 6010);
+    completeOverhead(player, npc, "This is the place where I met me' maker.");
+    queueTick(player);
+    assert(npc.isActive, 'grave follower deleted before an overhead update');
+    queueTick(player);
+    assert(!npc.isActive, 'grave follower not returned after the queued cleanup');
+    assert(player.getVar(ID.fenkFollower) === -1, 'grave cleanup left the owned UID');
+    assert(player.getVarBit(ID.directionsBit) === 0, 'grave cleanup did not restore courtyard visibility');
+    assert(player.getVar(ID.fenkQuest) === 1, 'grave directions wrote the quest stage');
+    ok('grave overhead and queued owned return');
+  }
+
+  // Talk-to and the recurring watcher both implement the source's stray branch.
+  for (const [scriptName, nid] of [
+    ['[opnpc1,fenk_gardener]', 6020],
+    ['[softtimer,fenk_follow_watch]', 6021]
+  ]) {
+    const { player, npc } = makeAreaFollower(3500, 3510, nid);
+    completeOverhead(player, npc, "Oi'm afraid you've gone well off the beaten track.", scriptName);
+    queueTick(player);
+    assert(npc.sayMessage === "Oi'm afraid you've gone well off the beaten track.", 'first departure line overwritten in the same update');
+    queueTick(player);
+    assert(npc.sayMessage === "Fare thee well - oi must return to me' garden.", 'farewell not emitted on its queued update');
+    assert(npc.isActive, 'follower deleted before the farewell update');
+    queueTick(player);
+    queueTick(player);
+    assert(!npc.isActive, 'stray cleanup did not return the owned follower');
+    assert(player.getVar(ID.fenkFollower) === -1, 'stray cleanup left a stale UID');
+    assert(player.getVarBit(ID.directionsBit) === 0, 'stray cleanup left courtyard hidden');
+    ok(`${scriptName}: two departure overheads then owned return`);
+  }
+
+  // Ownership is rechecked when the delayed farewell resumes.
+  {
+    const { player, npc } = makeAreaFollower(3500, 3510, 6030);
+    completeOverhead(player, npc, "Oi'm afraid you've gone well off the beaten track.");
+    npc.setVar(ID.attackingUid, 99);
+    queueTick(player);
+    queueTick(player);
+    assert(npc.isActive, 'queued cleanup deleted an actor now owned by another player');
+    assert(npc.sayMessage !== "Fare thee well - oi must return to me' garden.", 'queued farewell spoke through another owner');
+    assert(player.getVar(ID.fenkFollower) === -1, 'stale owner UID not cleared');
+    assert(player.getVarBit(ID.directionsBit) === 0, 'stale owner courtyard visibility not restored');
+    ok('delayed farewell rejects changed ownership');
+  }
 
   // ---- Courtyard multi must not become the caller's follower ----
   {
@@ -411,11 +496,11 @@ try {
     p.setVar(ID.fenkFollower, other.uid);
     p.setVarBit(ID.directionsBit, 1);
     other.setVar(ID.attackingUid, 99);
-    other.setInteraction(Interaction.SCRIPT, p, NpcMode.PLAYERFOLLOW);
-    other.targetOp = NpcMode.PLAYERFOLLOW;
+    other.setInteraction(Interaction.SCRIPT, p, NpcMode.PLAYERFACECLOSE);
+    other.targetOp = NpcMode.PLAYERFACECLOSE;
     const before = snapshot(other);
-    const result = completeDialogue(p, '[opnpc1,fenk_gardener]', other, ID.multi3Com1);
-    ok(`unowned directions finished pauses=${result.pauses}`);
+    const result = completeDialogue(p, '[opnpc1,fenk_gardener]', other, ID.multi4Com4);
+    ok(`unowned actor used courtyard dialogue, pauses=${result.pauses}`);
     assertPreserved(other, before, 'unowned');
     assert(
       other.targetOp !== NpcMode.PLAYERFOLLOW || other.getVar(ID.attackingUid) === 99,

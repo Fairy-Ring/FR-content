@@ -1,5 +1,13 @@
 # Creature of Fenkenstrain — completion report (r377 / t_3d84d490)
 
+## 4 November 2026 unit update
+
+The doctor now uses the operator-selected RS3 speech, including the unread-signpost branch, without Quest Overview or tool-belt systems. The signpost checks Crafting 20 and Thieving 25; the doctor retains no skill start gate. Both upstairs bookcases present sourced four-title menus, including the eastern title removed from OSRS in 2024. Ordinary castle doors and the no-follower-gate Dig rule are unchanged.
+
+Body-part bits and sewing supplies now recover interrupted hand-ins, and stage 3 is written before the sewing box so the corpse appears with it. Server varp 764 is named `fenk_charos_unlocked`; its ID and persistence are unchanged. The detailed source records, September E–G diagnosis, offline checks and required live checks are in the vault's Fenkenstrain subject and the external `FENK-UNIT-1104/report.md`. This update does not claim a live E–G pass.
+
+The sections below retain the September implementation evidence.
+
 Date stamp: 2026-09-10 (behavior-repair after integration APPROVE residuals)  
 Branch/worktree: `codex/r377-fenk-behavior-repair` / `r377-fenk-behavior-repair` @ 100ad6f4 + this commit  
 Contracts: root `.tmp/r377-fenkenstrain-m1-2026-09-09/` (full-source-contract, root-precontract, integration-review, retained transcript)
@@ -17,7 +25,7 @@ Integration APPROVE listed residuals that did **not** remove original quest requ
 | 3 | Clock full-inv must not lose letter; Read not invented | Transcript 268–273 (wind tbox + re-wind while holding). Letter **body UNKNOWN**. 377 cache `desc=A letter, clearly hastily written.` | `[proc,fenk_try_clock_letter]`: holding letter → `You wind the old clock.`; full inv → refuse **before** wound bit; else bit+grant+transcript tbox. Read = cache desc only. | Handler: full-inv FINISHED no bit/no letter; grant PAUSEBUTTON; re-wind FINISHED no duplicate; lost-letter retry PAUSEBUTTON. Offline: bit after freespace; no invented Read. | FontType+Component loaded. Live Read/wind still pending. |
 | 4 | Head re-dig after hand-in like island parts; lost pre-hand-in reacquirable | Contract §3.2 loss of head → re-Dig; island parts already check hand-in bits | `[proc,fenk_try_dig_head]`: empty if held empty/full **or** `%fenk_head = 1`; else grant. Gardener follow also refuses if `%fenk_head = 1`. | Handler: grant; held refuse; hand-in empty; full-inv refuse without writing bit. | Matches island-part semantics. |
 | 5 | Hire PiP + Restless Ghost refusals | kbase 1793 CANDIDATE. Product constants `^priestperil_complete` / `^priest_complete` — not guessed ints. Period refuse quotes **missing** — stock mes, not a third Dr voice. Ghostspeak still gates gardener separately. | `[proc,fenk_hire_prereqs]` before interview. | Handler: false without PiP; false without RG; true when both complete. | CANDIDATE req mes. |
-| 6 | F3 bank/worn/inv duplicate guard; no repeat XP/QP; Garden seam recorded not ported | Tip.it 2006-06-16 CANDIDATE recovery; Garden out of scope | Existing `fenk_has_charos_any` / recovery / note. `quest_garden/{garden_ellamaria,garden_bernald}.rs2` have **zero** Charos writers. Varp comment names the exact seam: Garden unlock must set `%fenk_charos_unlocked_mem` when authored. | Handler: bank path; worn (u) notes mem; recovery base vs (u); recovery proc does not complete/XP. Offline: bank/worn/inv both variants. | No Garden port. |
+| 6 | F3 bank/worn/inv duplicate guard; no repeat XP/QP; Garden seam recorded not ported | Tip.it 2006-06-16 CANDIDATE recovery; Garden out of scope | Existing `fenk_has_charos_any` / recovery / note. `quest_garden/{garden_ellamaria,garden_bernald}.rs2` have **zero** Charos writers. Varp comment names the exact seam: Garden unlock must set `%fenk_charos_unlocked` when authored. | Handler: bank path; worn (u) notes mem; recovery base vs (u); recovery proc does not complete/XP. Offline: bank/worn/inv both variants. | No Garden port. |
 
 ### Stock teleport ownership
 
@@ -69,7 +77,7 @@ Lifecycle (R2 landed, retained): logout/death `~fenk_on_player_cleanup`; login `
 | Path | Role |
 |------|------|
 | `scripts/quests/quest_creatureoffenkenstrain/configs/fenk_quest.constant` | Stage ladder 0/1/2/3/4/8 |
-| `scripts/quests/quest_creatureoffenkenstrain/configs/fenk_follower.varp` | temp `%fenk_follower_uid` + perm `%fenk_charos_unlocked_mem` |
+| `scripts/quests/quest_creatureoffenkenstrain/configs/fenk_follower.varp` | temp `%fenk_follower_uid` + perm `%fenk_charos_unlocked` |
 | `scripts/.../fenk_*.rs2` (10 scripts) | Full quest writers |
 | `scripts/_unpack/377/all.{npc,varp}` | Experiment combat fills + perm scope |
 | `pack/varp.pack` | 763/764 |
@@ -130,7 +138,7 @@ Interactive core includes coffin, grave, grave_poor, doors (shed/tower/mausoleum
 | `%fenk_quest` | **perm** (filled R2) | stage |
 | `%fenk_flags` | **perm** (filled R2) | bitfield base |
 | `%fenk_follower_uid` | temp, protect=no | pack 763 NONHISTORICAL |
-| `%fenk_charos_unlocked_mem` | perm | pack 764 NONHISTORICAL |
+| `%fenk_charos_unlocked` | perm | pack 764 NONHISTORICAL |
 
 ### Varbit (17 on fenk_flags)
 
@@ -207,7 +215,7 @@ Evidence: Tip.it elComment_776260 16 Jun 2006 — recover by pickpocketing docto
 
 | Predicate | Yield |
 |-----------|-------|
-| `%fenk_charos_unlocked_mem = 1` | `ring_of_charos_unlocked` |
+| `%fenk_charos_unlocked = 1` | `ring_of_charos_unlocked` |
 | else | `ring_of_charos` (base) |
 
 - mem set only when unlocked **observed held** (`~fenk_note_charos_unlocked` on pickpocket refuse).  

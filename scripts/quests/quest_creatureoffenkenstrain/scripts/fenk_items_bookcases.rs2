@@ -1,7 +1,7 @@
 // Creature of Fenkenstrain — brain buy/combine + bookcases + star amulet.
 // Brain: Roavar 50gp (werewolfinnkeeper join) + Telegrab alternate on table obj.
-// Bookcases L1: west Joy of Grave Digging → marble; east Handy Maggot → obsidian.
-// Cite full-source-contract §3.3-3.4 · Transcript 244-293.
+// Bookcase choices: RS3 scenery transcript retained 2026-11-04, with the
+// removed OSRS eastern title restored. Cache journal 4203 is display-only.
 
 // Head + brain combine
 [opheldu,fenk_head_empty]
@@ -49,41 +49,58 @@ if (inv_total(inv, fenk_marble_amulet) < 1 | inv_total(inv, fenk_obsidian_amulet
 inv_del(inv, fenk_marble_amulet, 1);
 inv_del(inv, fenk_obsidian_amulet, 1);
 inv_add(inv, fenk_star_amulet, 1);
-~objbox(fenk_star_amulet, "The marble and obsidian amulets fit together to form a star amulet.", 250, 0, 0);
+~objbox(fenk_star_amulet, "The marble and obsidian amulets snap together tightly to form a six-pointed amulet.", 250, 0, 0);
 
-// Bookcases
+// Bookcases: 377 loc 5166 Search opens a title menu, not a free item grant.
 [oploc1,fenk_bookcase]
 p_arrivedelay;
-// Upstairs pair L1 3542,3558 west / 3555,3558 east (VERIFIED placements).
 if (loc_coord = 1_55_55_22_38) {
-    // West — Joy of Grave Digging → marble
-    if (inv_total(inv, fenk_marble_amulet) > 0 | inv_total(inv, fenk_star_amulet) > 0) {
-        mes("You find nothing of interest.");
-        return;
+    def_int $west = ~p_choice4_header("1001 Ways To Eat Fried Gizzards", 1, "Practical Gardening For The Headless", 2, "Human Taxidermy for Nincompoops", 3, "The Joy of Grave Digging", 4, "Which book would you like to read?");
+    if ($west = 1) {
+        ~objbox(fenk_journal, "This book leaves you contemplating vegetarianism.", 250, 0, 0);
+    } else if ($west = 2) {
+        ~objbox(fenk_journal, "This book has some very enlightening points to make, but you are at a loss to know how anyone without a head could possibly read it.", 250, 0, 0);
+    } else if ($west = 3) {
+        ~objbox(fenk_journal, "This book seems to have been read hundreds of times, and has scribbles and formulae on every page. One such scribble says 'None good enough - have had to lock them in the caverns...'", 250, 0, 0);
+    } else if ($west = 4) {
+        @fenk_bookcase_amulet(fenk_marble_amulet);
     }
-    if (inv_freespace(inv) = 0) {
-        mes("You don't have enough inventory space.");
-        return;
-    }
-    mes("You find a book titled 'The Joy of Grave Digging'.");
-    mes("Inside the cover is a marble amulet.");
-    inv_add(inv, fenk_marble_amulet, 1);
     return;
 }
 if (loc_coord = 1_55_55_35_38) {
-    // East — Handy Maggot Avoidance → obsidian
-    if (inv_total(inv, fenk_obsidian_amulet) > 0 | inv_total(inv, fenk_star_amulet) > 0) {
-        mes("You find nothing of interest.");
-        return;
+    def_int $east = ~p_choice4_header("Men are from Morytania, Women are from Lumbridge", 1, "Chimney Sweeping on a Budget", 2, "Handy Maggot Avoidance Techniques", 3, "My Family and Other Zombies", 4, "Which book would you like to read?");
+    if ($east = 1) {
+        ~objbox(fenk_journal, "You discover some fascinating insights into the mind of the <text_gender("female", "male")> kind.", 250, 0, 0);
+    } else if ($east = 2) {
+        ~objbox(fenk_journal, "Chimney Sweeping on a Budget|Page 26|that sometimes a sweep may find themselves brushless and without the funds to purchase the one tool that is most essential to their trade. What is a chimney sweep without his or her brush?||In this kind of situation any normal long-handled brush might be a suitable replacement, although when attaching extensions to the handle make sure to use something sturdy like wire, otherwise a sweep may find themselves losing their brush and livelihood to the forces of gravity", 250, 0, 0);
+    } else if ($east = 3) {
+        @fenk_bookcase_amulet(fenk_obsidian_amulet);
+    } else if ($east = 4) {
+        // The source lists these three results without their probability.
+        switch_int(random(3)) {
+            case 0 : ~objbox(fenk_journal, "The book is appallingly dull.", 250, 0, 0);
+            case 1 : ~objbox(fenk_journal, "The book is a mediocre read.", 250, 0, 0);
+            case 2 : ~objbox(fenk_journal, "The book is mildly amusing.", 250, 0, 0);
+        }
     }
-    if (inv_freespace(inv) = 0) {
-        mes("You don't have enough inventory space.");
-        return;
-    }
-    mes("You find a book titled 'Handy Maggot Avoidance Techniques'.");
-    mes("Inside the cover is an obsidian amulet.");
-    inv_add(inv, fenk_obsidian_amulet, 1);
     return;
 }
-// Ground-floor bookcases chrome.
-mes("You search the bookcase but find nothing of interest.");
+mes("It is a bookcase full of books.");
+
+[label,fenk_bookcase_amulet](namedobj $amulet)
+loc_anim(fenk_bookcase_open);
+~mesbox("As you pull the book a hidden latch springs into place, and the bookcase swings open, revealing a secret compartment.");
+if (inv_total(inv, $amulet) > 0 | inv_total(inv, fenk_star_amulet) > 0) {
+    mes("The secret compartment is empty.");
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, $amulet, 1);
+if ($amulet = fenk_marble_amulet) {
+    ~objbox(fenk_marble_amulet, "You find a marble amulet in the secret compartment.", 250, 0, 0);
+} else {
+    ~objbox(fenk_obsidian_amulet, "You find an obsidian amulet in the secret compartment.", 250, 0, 0);
+}

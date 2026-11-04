@@ -1,11 +1,16 @@
 // Creature of Fenkenstrain — Dr Fenkenstrain Talk-to (stage-gated).
-// CANDIDATE 2007-base lines (OSRS Transcript:Creature of Fenkenstrain minus
-// 2020 signpost-start overlay). Period menus VERIFIED (RuneVillage 14 Feb /
-// 5 May 2006): Q1 Braindead, Q2 Grave-digging. Bind fenk_fenkenstrain_model
-// 1670 (multi 1668 keys 0-7; key 8 tower). Fixes repeat-interview defect.
-// Cite full-source-contract §3.1 · Transcript · red-19-start-impl-377.md §2.
+// CANDIDATE RS3 Transcript:Creature of Fenkenstrain, retained 2026-11-04.
+// Operator prefers its original dialogue over OSRS. Remove Quest Overview UI,
+// retain the unread-signpost branch. Period guides corroborate the right answers.
+// Bind model 1670 through multi 1668 (keys 0-7; key 8 moves the doctor upstairs).
 
 [opnpc1,fenk_fenkenstrain_model]
+// Item hand-ins commit before their chat suspends. Recover the stage if the
+// last part's reply was interrupted after it set the fourth durable part bit.
+if (%fenk_quest = ^fenk_hired & %fenk_arms = 1 & %fenk_legs = 1 & %fenk_torso = 1 & %fenk_head = 1) {
+    %fenk_quest = ^fenk_need_sewing;
+    ~update_questlist;
+}
 if (%fenk_quest >= ^fenk_complete) {
     @fenk_dr_postquest;
     return;
@@ -33,9 +38,17 @@ if (~fenk_hire_prereqs = false) {
     return;
 }
 ~chatnpc("<p,neutral>Have you come to apply for the job?");
+if (%fenk_read_signpost = 0) {
+    ~chatplayer("<p,quiz>What job do you mean, sir?");
+    ~chatnpc("<p,angry>Oh, doesn't anybody read signposts anymore???");
+    ~chatplayer("<p,quiz>What signpost?");
+    ~chatnpc("<p,neutral>The signpost in the village nearby! Oh never mind.");
+    ~chatnpc("<p,neutral>I need a new butler. Would you like to apply?");
+}
 def_int $apply = ~p_choice2("Yes.", 1, "No.", 2);
 if ($apply = 2) {
-    ~chatplayer("<p,neutral>No.");
+    ~chatplayer("<p,neutral>No thanks, I wouldn't work here if you paid me.");
+    ~chatnpc("<p,neutral>Charming.");
     return;
 }
 ~chatplayer("<p,neutral>Yes, if it pays well.");
@@ -92,38 +105,57 @@ return(true);
 
 // --- hired: body-part collection / hand-in ---
 [label,fenk_dr_hired]
-~chatnpc("<p,neutral>Have you brought me any dead body parts yet?");
 @fenk_dr_parts_menu;
 
 [label,fenk_dr_parts_menu]
-def_int $choice = ~p_choice4("I have some body parts for you.", 1, "Remind me what you want me to do.", 2, "Why are you trying to make this creature?", 3, "I must get back to work, sir.", 4);
-if ($choice = 4) {
+def_string $parts = "Do you know where I could find body parts?";
+def_int $hasparts = 0;
+if (inv_total(inv, fenk_head_full) > 0 | inv_total(inv, fenk_torso) > 0 | inv_total(inv, fenk_arms) > 0 | inv_total(inv, fenk_legs) > 0) {
+    $parts = "I have some body parts for you.";
+    $hasparts = 1;
+}
+def_int $choice = ~p_choice5($parts, 1, "Remind me what you want me to do.", 2, "Why are you trying to make this creature?", 3, "Will this creature put me out of a job?", 4, "I must get back to work, sir.", 5);
+if ($choice = 5) {
     ~chatplayer("<p,neutral>I must get back to work, sir.");
     return;
 }
 if ($choice = 2) {
-    ~chatplayer("<p,neutral>Remind me what you want me to do.");
-    ~chatnpc("<p,neutral>I need enough dead body parts to stitch together a complete body - head, torso, arms and legs.");
+    ~chatplayer("<p,neutral>What do you want me to do, again?");
+    ~chatnpc("<p,neutral>I need you to get me enough dead body parts for me to stitch together a complete body, which I plan to bring to life.");
+    ~chatplayer("<p,neutral>Right...okay...if you insist.");
     return;
 }
 if ($choice = 3) {
-    ~chatplayer("<p,neutral>Why are you trying to make this creature?");
-    ~chatnpc("<p,neutral>I have my reasons. Do not question them.");
+    ~chatplayer("<p,quiz>Why do you want to make a creature?");
+    ~chatnpc("<p,neutral>I came to the land of Morytania many years ago, to find a safe sanctuary for my experiments. This abandoned castle suited my purposes exactly.");
+    ~chatplayer("<p,quiz>What were you experimenting in?");
+    ~chatnpc("<p,neutral>Oh, perfectly innocent experiments - for the good of mankind.");
+    ~chatplayer("<p,quiz>Then why did you need to come to Morytania?");
+    ~chatnpc("<p,angry>Enough questions, now. Get back to your work.");
+    return;
+}
+if ($choice = 4) {
+    ~chatplayer("<p,quiz>Will this creature put me out of a job?");
+    ~chatnpc("<p,neutral>No, my friend. I have a very special purpose in mind for this creature.");
+    return;
+}
+if ($hasparts = 0) {
+    ~chatplayer("<p,quiz>Do you know where I could find body parts?");
+    ~chatnpc("<p,neutral>The soil of Morytania is unique in its ability to preserve the bodies of the dead, which is one reason why I have chosen to carry out my experiments here.");
+    ~chatnpc("<p,neutral>I recommend digging up some graves in the local area. To the south-east you will find the Haunted Woods; I believe there are many graves there.");
+    ~chatnpc("<p,neutral>There is also a mausoleum on an island west of this castle. I expect the bodies that are buried there to be extremely well preserved, as they were wealthy in life.");
     return;
 }
 ~chatplayer("<p,neutral>I have some body parts for you.");
 ~fenk_try_hand_parts;
 if (%fenk_arms = 1 & %fenk_legs = 1 & %fenk_torso = 1 & %fenk_head = 1) {
-    ~chatnpc("<p,happy>Superb!! Those are all the parts I need. Now to sew them together ...");
-    ~chatnpc("<p,neutral>Go and get me a needle, and I'll need 5 lots of thread.");
     if (%fenk_quest < ^fenk_need_sewing) {
         %fenk_quest = ^fenk_need_sewing;
         ~update_questlist;
     }
-    return;
-}
-if (%fenk_arms = 0 & %fenk_legs = 0 & %fenk_torso = 0 & %fenk_head = 0) {
-    ~chatnpc("<p,neutral>I don't see any body parts. Get to work!");
+    ~chatnpc("<p,happy>Superb!! Those are all the parts I need. Now to sew them together ...");
+    ~chatnpc("<p,neutral>Oh bother! I haven't got a needle or thread!");
+    ~chatnpc("<p,neutral>Go and get me a needle, and I'll need 5 lots of thread.");
 }
 return;
 
@@ -133,12 +165,12 @@ return;
 if (%fenk_head = 0 & inv_total(inv, fenk_head_full) > 0) {
     inv_del(inv, fenk_head_full, 1);
     %fenk_head = 1;
-    ~chatnpc("<p,happy>Ah, a head - and with a brain no less. Excellent.");
+    ~chatnpc("<p,happy>Fantastic, you've brought me a head.");
 }
 if (%fenk_torso = 0 & inv_total(inv, fenk_torso) > 0) {
     inv_del(inv, fenk_torso, 1);
     %fenk_torso = 1;
-    ~chatnpc("<p,happy>Wonderful, you've brought me a torso.");
+    ~chatnpc("<p,happy>Splendid, you've brought me a torso.");
 }
 if (%fenk_arms = 0 & inv_total(inv, fenk_arms) > 0) {
     inv_del(inv, fenk_arms, 1);
@@ -167,6 +199,7 @@ if (%fenk_needle = 1 & %fenk_threads_given < 5) {
 }
 if (%fenk_needle = 0 & %fenk_threads_given >= 5) {
     ~chatnpc("<p,neutral>Where's my needle, <displayname>?");
+    ~chatnpc("<p,neutral>You've already brought me all the thread I need.");
     ~fenk_try_hand_needle;
     if (%fenk_needle = 1 & %fenk_threads_given >= 5) {
         @fenk_dr_do_sew;
@@ -192,6 +225,9 @@ if (inv_total(inv, needle) < 1) {
 inv_del(inv, needle, 1);
 %fenk_needle = 1;
 ~chatnpc("<p,happy>Ah, a needle. Wonderful.");
+if (%fenk_threads_given >= 5) {
+    ~chatnpc("<p,neutral>You've already brought me all the thread I need.");
+}
 
 [proc,fenk_try_hand_thread]
 if (%fenk_threads_given >= 5) {
@@ -211,20 +247,22 @@ inv_del(inv, thread, $take);
 ~chatnpc("<p,happy>Some thread, excellent.");
 
 [label,fenk_dr_do_sew]
+// Multi key 3 must show the corpse while the sewing box is visible, not only
+// after every subsequent chat Continue. This is an internal visibility write.
+if (%fenk_quest < ^fenk_assembled) {
+    %fenk_quest = ^fenk_assembled;
+    ~update_questlist;
+}
 ~mesbox("Fenkenstrain uses the needle and thread to sew the body parts together. Soon, a hideous creature lies inanimate on the ritual table.");
 ~chatnpc("<p,neutral>Perfect. But I need one more thing from you - flesh and bones by themselves do not make life.");
 ~chatplayer("<p,quiz>Really?");
 ~chatnpc("<p,neutral>I have honed to perfection an ancient ritual that will give life to this creature, but for this I must harness the very power of Nature.");
 ~chatplayer("<p,quiz>And what power is this?");
 ~chatnpc("<p,neutral>The power of lightning.");
-~chatplayer("<p,neutral>Sorry, can't make lightning, you've got the wrong man-");
+~chatplayer("<p,neutral>Sorry, can't make lightning, you've got the wrong <text_gender("man", "woman")>-");
 ~chatnpc("<p,angry>Silence your insolent tongue! The storm that brews overhead will create the lightning. What I need you to do is to repair the lightning conductor on the balcony above.");
 ~chatplayer("<p,neutral>Repair the lightning conductor, right. Can I have a break, soon? By law I'm entitled to 15 minutes every-");
 ~chatnpc("<p,angry>Repair the conductor and BEGONE!!!");
-if (%fenk_quest < ^fenk_assembled) {
-    %fenk_quest = ^fenk_assembled;
-    ~update_questlist;
-}
 return;
 
 // --- after body assembled: conductor advice ---
@@ -233,7 +271,7 @@ if (inv_total(inv, fenk_conductor) > 0) {
     ~chatnpc("<p,happy>Very good, you have made a new conductor - now get up on the roof and repair it before this storm passes!");
     return;
 }
-~chatplayer("<p,quiz>How do I repair the lightning conductor?");
+~chatplayer("<p,quiz>How do I repair the lighting conductor?");
 ~chatnpc("<p,angry>Oh, it would be easier to do it myself! If you find a conductor mould you should be able to cast a new one.");
 ~chatnpc("<p,neutral>Remember this, <displayname>: my experiment will only work with a conductor made from silver.");
 return;
@@ -243,7 +281,7 @@ return;
 if (inv_total(inv, fenk_tower_key) > 0 | %fenk_unlocked_tower = 1) {
     // Creature talked path: refuse release
     if (%fenk_counter >= 1) {
-        ~chatnpc("<p,shock>So have you destroyed it?!!!?");
+        ~chatnpc("<p,shock>So have you destroyed it?!!?");
         ~chatplayer("<p,angry>Never, now that he has told me the truth!");
         ~chatnpc("<p,shock>Oh my, oh my, this is exactly what I feared!");
         ~chatnpc("<p,shock>Why did you have to pick Rologarth's brain of all brains?!?");
@@ -251,7 +289,9 @@ if (inv_total(inv, fenk_tower_key) > 0 | %fenk_unlocked_tower = 1) {
         ~chatnpc("<p,angry>No!! I refuse to release you!! You must help me build another creature to destroy this dreadful mistake!!");
         return;
     }
-    ~chatnpc("<p,shock>Destroy it!!! Take the key to the Tower and take back the life I never should have granted!!!");
+    ~chatnpc("<p,shock>So have you destroyed it?!!?");
+    ~chatplayer("<p,neutral>Not yet.");
+    ~chatnpc("<p,shock>Please, hurry - save me!!!!");
     return;
 }
 ~chatplayer("<p,quiz>So did it work, then?");
@@ -271,7 +311,6 @@ if (inv_total(inv, fenk_tower_key) < 1 & inv_freespace(inv) = 0) {
 }
 if (inv_total(inv, fenk_tower_key) < 1) {
     inv_add(inv, fenk_tower_key, 1);
-    mes("Dr Fenkenstrain hands you a tower key.");
 }
 return;
 
