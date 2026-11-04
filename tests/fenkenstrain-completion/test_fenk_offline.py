@@ -75,6 +75,7 @@ def main() -> int:
     must_contain(const, r"\^fenk_need_sewing\s*=\s*2", "stage 2 sewing")
     must_contain(const, r"\^fenk_assembled\s*=\s*3", "stage 3 assembled/multi corpse")
     must_contain(const, r"\^fenk_lightning_done\s*=\s*4", "stage 4 lightning")
+    must_contain(const, r"\^fenk_tower_key_given\s*=\s*5", "stage 5 remembers tower-key issue")
     must_contain(const, r"\^fenk_complete\s*=\s*8", "stage 8 complete multi")
     must_contain(qconst, r"\^creatureoffenkenstrain_complete\s*=\s*8", "quest.constant complete=8")
     must_contain(qconst, r"\^creatureoffenkenstrain_questpoints\s*=\s*2", "quest.constant QP=2")

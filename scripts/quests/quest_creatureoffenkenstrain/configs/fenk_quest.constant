@@ -8,8 +8,10 @@
 ^fenk_need_sewing = 2
 // Multi corpse table visible.
 ^fenk_assembled = 3
-// Internal: lightning done; tower key path.
+// Internal: lightning done; first tower-key conversation pending.
 ^fenk_lightning_done = 4
+// Internal: tower key issued; remember loss before the tower is unlocked.
+^fenk_tower_key_given = 5
 // Complete — multi key 8.
 ^fenk_complete = 8
 // CANDIDATE follower duration: 10 minutes × 100 ticks/min ≈ 1000 ticks.

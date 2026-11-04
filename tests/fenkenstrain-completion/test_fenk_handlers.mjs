@@ -98,6 +98,7 @@ const ID = {
   headEmpty: packMap('pack/obj.pack', 'fenk_head_empty'),
   headFull: packMap('pack/obj.pack', 'fenk_head_full'),
   key: packMap('pack/obj.pack', 'fenk_mausoleum_key'),
+  towerKey: packMap('pack/obj.pack', 'fenk_tower_key'),
   charos: packMap('pack/obj.pack', 'ring_of_charos'),
   charosU: packMap('pack/obj.pack', 'ring_of_charos_unlocked'),
   coins: packMap('pack/obj.pack', 'coins'),
@@ -114,6 +115,8 @@ const ID = {
   readSignpost: packMap('pack/varbit.pack', 'fenk_read_signpost'),
   needleBit: packMap('pack/varbit.pack', 'fenk_needle'),
   threadsBit: packMap('pack/varbit.pack', 'fenk_threads_given'),
+  towerUnlockedBit: packMap('pack/varbit.pack', 'fenk_unlocked_tower'),
+  creatureKnownBit: packMap('pack/varbit.pack', 'fenk_counter'),
   needle: packMap('pack/obj.pack', 'needle'),
   thread: packMap('pack/obj.pack', 'thread'),
   marble: packMap('pack/obj.pack', 'fenk_marble_amulet'),
@@ -351,6 +354,32 @@ ok('decline and both wrong interview answers preserve stage 0');
 {
   const p = qualifiedPlayer();
   p.setVar(ID.fenkQuest, 1);
+  const parts = ['fenk_arms', 'fenk_legs', 'fenk_torso', 'fenk_head_full'];
+  for (const part of parts) invOf(p, ID.inv).add(packMap('pack/obj.pack', part), 1);
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()), [1]);
+  const replies = [
+    "Great, you've brought me some arms.",
+    "Excellent, you've brought me some legs.",
+    "Splendid, you've brought me a torso.",
+    "Fantastic, you've brought me a head.",
+    "Superb!! Those are all the parts I need.",
+    "Oh bother! I haven't got a needle or thread!",
+    "Go and get me a needle, and I'll need 5 lots of thread."
+  ];
+  let previous = -1;
+  for (const reply of replies) {
+    const index = p.messages.findIndex(text => text.includes(reply));
+    assert(index > previous, `RS3 hand-in reply order: ${reply}`);
+    previous = index;
+  }
+  for (const part of parts) assert(total(p, ID.inv, packMap('pack/obj.pack', part)) === 0, `${part} consumed once`);
+  assert(p.getVar(ID.fenkQuest) === 2, 'four-part hand-in enters sewing stage');
+}
+ok('four-part hand-in follows RS3 arms/legs/torso/head order and includes needle/thread complaint');
+
+{
+  const p = qualifiedPlayer();
+  p.setVar(ID.fenkQuest, 1);
   for (const part of ['fenk_head', 'fenk_torso', 'fenk_arms', 'fenk_legs']) {
     p.setVarBit(packMap('pack/varbit.pack', part), 1);
   }
@@ -391,6 +420,58 @@ ok('decline and both wrong interview answers preserve stage 0');
   assert(p.getVar(ID.fenkQuest) === 3, 'fully supplied interrupted state recovers without another item');
 }
 ok('interrupted body and sewing replies recover; partial supplies and corpse timing');
+{
+  const p = qualifiedPlayer();
+  p.setVar(ID.fenkQuest, 2);
+  p.setVarBit(ID.threadsBit, 5);
+  invOf(p, ID.inv).add(ID.needle, 1);
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.messages.filter(text => text.includes("You've already brought me all the thread I need.")).length === 2, 'thread-complete line occurs before and after needle hand-in');
+  assert(p.getVar(ID.fenkQuest) === 3, 'needle retry after complete thread sews body');
+}
+
+assert(ID.towerKey === 4185, 'tower-key replacement uses cache object 4185');
+for (const unlocked of [0, 1]) {
+  const p = qualifiedPlayer();
+  p.setVar(ID.fenkQuest, 4);
+  fillInv(p, ID.coins, 28);
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.messages.some(text => text.includes('So did it work, then?')), 'first key conversation uses first-time speech');
+  assert(p.messages.includes("You don't have enough inventory space for the tower key."), 'first key full-inventory refusal');
+  assert(p.getVar(ID.fenkQuest) === 4 && total(p, ID.inv, ID.towerKey) === 0, 'full first grant preserves stage 4 and retry');
+  invOf(p, ID.inv).set(0, null);
+  p.messages = [];
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.getVar(ID.fenkQuest) === 5 && total(p, ID.inv, ID.towerKey) === 1, 'first grant writes stage 5 and one key');
+  p.messages = [];
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.messages.some(text => text.includes('Not yet.')) && p.messages.some(text => text.includes('Please, hurry - save me!!!!')), 'key-held repeat uses RS3 reminder');
+  assert(!p.messages.some(text => text.includes('So did it work, then?')), 'key-held repeat does not replay first speech');
+  assert(total(p, ID.inv, ID.towerKey) === 1, 'key-held repeat cannot duplicate key');
+  invOf(p, ID.inv).remove(ID.towerKey, 1);
+  p.setVarBit(ID.towerUnlockedBit, unlocked);
+  fillInv(p, ID.coins, 28);
+  p.messages = [];
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.messages.some(text => text.includes('I seem to have lost the Tower key.')), 'lost-key branch before and after unlocking');
+  assert(p.messages.some(text => text.includes("Oh, for goodness sake. Here's a copy I had made.")), 'lost-key sourced copy reply');
+  assert(p.messages.includes("You don't have enough inventory space for the tower key."), 'lost-key full-inventory refusal');
+  assert(p.getVar(ID.fenkQuest) === 5 && total(p, ID.inv, ID.towerKey) === 0, 'failed replacement preserves issued state and no key');
+  invOf(p, ID.inv).set(0, null);
+  p.messages = [];
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(total(p, ID.inv, ID.towerKey) === 1 && p.getVar(ID.fenkQuest) === 5, 'lost-key retry grants exactly one copy');
+  assert(!p.messages.some(text => text.includes('So did it work, then?')), 'lost-key retry does not replay first speech');
+  assert(p.getVarBit(ID.towerUnlockedBit) === unlocked, 'copy does not unlock tower');
+  invOf(p, ID.inv).remove(ID.towerKey, 1);
+  p.setVarBit(ID.creatureKnownBit, 1);
+  p.messages = [];
+  finishDialogue(p, runProc(p, '[opnpc1,fenk_fenkenstrain_model]', true, doctor()));
+  assert(p.messages.some(text => text.includes('Never, now that he has told me the truth!')), 'creature-known confrontation takes precedence');
+  assert(total(p, ID.inv, ID.towerKey) === 0, 'confrontation does not silently grant another key');
+}
+ok('tower-key first/full/retry, held repeat, lost-copy/full/retry and creature-known precedence');
+
 
 function bookcase(x, z, level = 1) {
   const loc = LocType.get(ID.bookcase);

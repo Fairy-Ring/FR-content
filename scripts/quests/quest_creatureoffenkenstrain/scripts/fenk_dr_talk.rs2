@@ -159,19 +159,8 @@ if (%fenk_arms = 1 & %fenk_legs = 1 & %fenk_torso = 1 & %fenk_head = 1) {
 }
 return;
 
-// Partial / cumulative part hand-in (Transcript 361-369).
+// Partial / cumulative hand-in: RS3 transcript, "Handing in some body parts".
 [proc,fenk_try_hand_parts]
-// Full head preferred; empty head alone is not enough for final head bit.
-if (%fenk_head = 0 & inv_total(inv, fenk_head_full) > 0) {
-    inv_del(inv, fenk_head_full, 1);
-    %fenk_head = 1;
-    ~chatnpc("<p,happy>Fantastic, you've brought me a head.");
-}
-if (%fenk_torso = 0 & inv_total(inv, fenk_torso) > 0) {
-    inv_del(inv, fenk_torso, 1);
-    %fenk_torso = 1;
-    ~chatnpc("<p,happy>Splendid, you've brought me a torso.");
-}
 if (%fenk_arms = 0 & inv_total(inv, fenk_arms) > 0) {
     inv_del(inv, fenk_arms, 1);
     %fenk_arms = 1;
@@ -181,6 +170,17 @@ if (%fenk_legs = 0 & inv_total(inv, fenk_legs) > 0) {
     inv_del(inv, fenk_legs, 1);
     %fenk_legs = 1;
     ~chatnpc("<p,happy>Excellent, you've brought me some legs.");
+}
+if (%fenk_torso = 0 & inv_total(inv, fenk_torso) > 0) {
+    inv_del(inv, fenk_torso, 1);
+    %fenk_torso = 1;
+    ~chatnpc("<p,happy>Splendid, you've brought me a torso.");
+}
+// A head without its brain does not satisfy the final head bit.
+if (%fenk_head = 0 & inv_total(inv, fenk_head_full) > 0) {
+    inv_del(inv, fenk_head_full, 1);
+    %fenk_head = 1;
+    ~chatnpc("<p,happy>Fantastic, you've brought me a head.");
 }
 
 // --- needle + thread cumulative (Transcript 381-399) ---
@@ -278,10 +278,14 @@ return;
 
 // --- after lightning ---
 [label,fenk_dr_after_lightning]
-if (inv_total(inv, fenk_tower_key) > 0 | %fenk_unlocked_tower = 1) {
-    // Creature talked path: refuse release
+if (%fenk_quest >= ^fenk_tower_key_given | inv_total(inv, fenk_tower_key) > 0 | %fenk_unlocked_tower = 1) {
+    if (%fenk_quest < ^fenk_tower_key_given) {
+        %fenk_quest = ^fenk_tower_key_given;
+        ~update_questlist;
+    }
+    ~chatnpc("<p,shock>So have you destroyed it?!!?");
+    // Creature talked path: refuse release.
     if (%fenk_counter >= 1) {
-        ~chatnpc("<p,shock>So have you destroyed it?!!?");
         ~chatplayer("<p,angry>Never, now that he has told me the truth!");
         ~chatnpc("<p,shock>Oh my, oh my, this is exactly what I feared!");
         ~chatnpc("<p,shock>Why did you have to pick Rologarth's brain of all brains?!?");
@@ -289,7 +293,12 @@ if (inv_total(inv, fenk_tower_key) > 0 | %fenk_unlocked_tower = 1) {
         ~chatnpc("<p,angry>No!! I refuse to release you!! You must help me build another creature to destroy this dreadful mistake!!");
         return;
     }
-    ~chatnpc("<p,shock>So have you destroyed it?!!?");
+    if (inv_total(inv, fenk_tower_key) < 1) {
+        ~chatplayer("<p,neutral>I seem to have lost the Tower key.");
+        ~chatnpc("<p,neutral>Oh, for goodness sake. Here's a copy I had made.");
+        ~fenk_give_tower_key;
+        return;
+    }
     ~chatplayer("<p,neutral>Not yet.");
     ~chatnpc("<p,shock>Please, hurry - save me!!!!");
     return;
@@ -305,6 +314,10 @@ if (inv_total(inv, fenk_tower_key) > 0 | %fenk_unlocked_tower = 1) {
 ~chatnpc("<p,shock>I have no control over it! It's coming to get me!");
 ~chatplayer("<p,quiz>What do you want me to do about it?");
 ~chatnpc("<p,shock>Destroy it!!! Take the key to the Tower and take back the life I never should have granted!!!");
+~fenk_give_tower_key;
+return;
+
+[proc,fenk_give_tower_key]
 if (inv_total(inv, fenk_tower_key) < 1 & inv_freespace(inv) = 0) {
     mes("You don't have enough inventory space for the tower key.");
     return;
@@ -312,6 +325,9 @@ if (inv_total(inv, fenk_tower_key) < 1 & inv_freespace(inv) = 0) {
 if (inv_total(inv, fenk_tower_key) < 1) {
     inv_add(inv, fenk_tower_key, 1);
 }
+// Keys 0-7 keep the ground doctor/monster multis; 5 is internal memory only.
+%fenk_quest = ^fenk_tower_key_given;
+~update_questlist;
 return;
 
 // --- post-quest panic ---
