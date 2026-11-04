@@ -35,6 +35,7 @@ if (inv_total(worn, $obj) > 0) {
 %rd_got_gypsum = 0;
 %rd_got_salt = 0;
 %rd_got_n2o = 0;
+// rd_got_tin (cache varbit 677) is not written by this unit; cleared so a value saved by an older build cannot linger.
 %rd_got_tin = 0;
 %rd_got_copore = 0;
 %rd_chem_tin_ore_taken = 0;
@@ -527,14 +528,14 @@ if (~rd_room_is_current(6) = false) {
 if (region_findbycoord(coord()) = false) {
     return;
 }
-if (%rd_got_tin = 1 | inv_total(inv, rd_tin) > 0 | inv_total(inv, rd_tinfull) > 0 | inv_total(inv, rd_keymould) > 0 | inv_total(inv, rd_full_keymould_tin) > 0 | inv_total(inv, rd_full_keymould_copper) > 0 | inv_total(inv, rd_full_keymould_unheated) > 0 | inv_total(inv, rd_full_keymould_complete) > 0 | inv_total(inv, rd_tin_of_crap) > 0 | inv_total(inv, rd_tin_of_crap_empty) > 0) {
+if (inv_total(inv, rd_tin) > 0 | inv_total(inv, rd_tinfull) > 0 | inv_total(inv, rd_keymould) > 0 | inv_total(inv, rd_full_keymould_tin) > 0 | inv_total(inv, rd_full_keymould_copper) > 0 | inv_total(inv, rd_full_keymould_unheated) > 0 | inv_total(inv, rd_full_keymould_complete) > 0 | inv_total(inv, rd_tin_of_crap) > 0 | inv_total(inv, rd_tin_of_crap_empty) > 0) {
     mes("The chest is empty.");
     return;
 }
 if (~rd_chem_try_give(rd_tin) = false) {
     return;
 }
-%rd_got_tin = 1;
+// No one-shot flag for the empty Tin: the cache has no flag for it and the OSRS wiki records dropping and retaking it (recruitment-drive.chemistry-got-tin-flag).
 mes("You find a tin.");
 return;
 
