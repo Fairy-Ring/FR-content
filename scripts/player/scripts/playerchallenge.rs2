@@ -4,12 +4,17 @@ if (.busy = true) {
     return;
 }
 
-def_boolean $inDuelArena = ~in_duel_arena(coord);
-def_boolean $otherInDuelArena = ~in_duel_arena(.coord);
+// Duels are offered from the challenge area (the duel zones outside the fight zones), as in the 289 opplayer1 handler;
+// ~in_duel_arena is true only inside a fight zone, where Challenge is never available.
+def_boolean $inChallengeArea = ~in_duel_arena_challenge_area;
+def_boolean $otherInChallengeArea = ~inzone_coord_pair_table(duel_arena_zones, .coord);
+if ($otherInChallengeArea = true & ~in_duel_arena(.coord) = true) {
+    $otherInChallengeArea = false;
+}
 def_boolean $inGamesRoom = ~in_games_room(coord);
 def_boolean $otherInGamesRoom = ~in_games_room(.coord);
 
-if ($inDuelArena ! $otherInDuelArena | $inGamesRoom ! $otherInGamesRoom){
+if ($inGamesRoom ! $otherInGamesRoom){
     mes("You can't do that here.");
     return;
 }
@@ -36,9 +41,9 @@ if ($inGamesRoom = true & $otherInGamesRoom = true) {
     }
 }
 
-if ($inDuelArena = true) {
+if ($inChallengeArea = true) {
     // if the other player isnt in the duel area
-    if ($otherInDuelArena = false){
+    if ($otherInChallengeArea = false){
         mes("That player is not in the duel challenge area.");
         return;
     }
