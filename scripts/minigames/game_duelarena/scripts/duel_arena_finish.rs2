@@ -6,23 +6,17 @@ if (~in_duel_arena(coord) = true & %duelstatus < ^duelstatus_lost) {
     clearqueue(duel_finish);
     queue(duel_finish, 0, 0);
 
-    // both_moveinv writes into the winner's duelwinnings, which needs protected access to the winner;
-    // .finduid only gives plain access, so use .p_finduid. Close the winner's interfaces first (an open modal blocks
-    // protected access) and retry for up to 10 ticks while the winner is delayed.
-    if (.finduid(%duel2accept) = true) {
-        .if_close;
-    }
-    def_int $wait = 0;
-    while (.p_finduid(%duel2accept) = false & $wait < 10) {
-        p_delay(1);
-        $wait = calc($wait + 1);
-    }
-    if (%duelstatus = ^duelstatus_lost & .p_finduid(%duel2accept) = true) {
+    // both_moveinv needs protected access to the winner (.finduid gives only plain access). Same pattern as upstream
+    // castlewars_takefrom.rs2: .if_close the other player, then .p_finduid; no retry.
+    if (%duelstatus = ^duelstatus_lost & .finduid(%duel2accept) = true) {
         session_log(^log_moderator, "Lost a duel against <.name>");
-        .%duelstatus = ^duelstatus_victory;
-        both_moveinv(dueloffer, duelwinnings);
-        .clearqueue(duel_finish);
-        .queue(duel_finish, 0, 0);
+        .if_close;
+        if (.p_finduid(%duel2accept) = true) {
+            .%duelstatus = ^duelstatus_victory;
+            both_moveinv(dueloffer, duelwinnings);
+            .clearqueue(duel_finish);
+            .queue(duel_finish, 0, 0);
+        }
     }
     // ur able to get double mes if opponent kills u with knives: https://youtu.be/KRDZJKa1whI?list=PLn23LiLYLb1bQ7Hwp77KoNBjKvpZQTfJT&t=12
     midi_jingle(death2);
