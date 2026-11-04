@@ -3,19 +3,20 @@
 // Travel — verbatim block in giantdwarf-boatman-cutscene-377.md; the extract
 // was never in .wiki). Fresh 0: start talk (<displayname>, ferryman line),
 // Deal + ready-Yes (~p_choice2, not overlay), write 1 on ready-Yes, then
-// [proc,giantdwarf_intro_cutscene]: tele + cam first (palace 2841,10183), then
+// [proc,giantdwarf_intro_cutscene]: tele + cam first, then
 // inter_273 model-letter titles + inter_235 sliding-window history (2014 t011-t032: lines
-// add one at a time, oldest drops), statue cam + force-timed crash talk (hide
-// continue before if_openchat, 1/2/3/4-line IFs, per-line delays) + cam_shake +
-// %giantdwarf_statue_invis = 1 + inter_234 crash map, explosion on the Both
+// add one at a time, oldest drops), statue cam + force-timed crash talk using
+// the original no-Continue chat interfaces, then inter_234 crash map and
+// %giantdwarf_statue_invis = 1, explosion on the Both
 // card, dock guards (Halt! overhead via npc_say, then arrest chat), HQ dest,
 // then Veldaban "Identify yourself" via ~chatnpc_specific
 // (NOT Forget's [opnpc1,dwarf_city_black_guard_leader] — already bound) and
 // Yes help -> %giantdwarf_quest = 2 + %giantdwarf_veldaban_introduced = 1.
 // BAR cross-talk three-way (110 complete / >= 10 started / else). Re-talk
-// >= 1: stub + dest, no second crash. 0 new ops. Never dest the statue
-// 2878,10177 / L1-L2 / Veldaban tile / 16 Consortium rooms. No && / ||.
-// Cite giantdwarf-boatman-cutscene-377.md + crawl giantdwarf-changes-377.md.
+// >= 1: existing return-trip shortcut, no second crash (wording UNKNOWN).
+// Never dest the statue stack or Consortium meeting copies. Exact original
+// cameras, title holds, sound schedule and miniature crash phase are UNKNOWN;
+// candidate shot axes below come from the 2014 footage mapped to the 377 pack.
 
 [opnpc1,dwarf_city_boatman_mines_prequest]
 if (%giantdwarf_quest >= 1) {
@@ -69,13 +70,13 @@ if_settab(null, 12);
 // fade BEFORE any tele — opaque first. Shop floor is L0; Consortium is L1.
 if_openoverlay(fade_to_black);
 p_delay(3);
-// 10184 = lid (sx5j57j). 10186 = interiors + south colonnade in the
-// near plane (sx5n288). Dest WEST of the cam so the player is not on
-// the carpet (red shirt at the bottom of p07).
+// CANDIDATE roof-on shot from the 2014/377 tile study: stay south of
+// RemoveRoof at z10186 and look north through the colonnade. The later
+// roofs-off composition is not the 377 target; the south-rail busts are absent.
 p_telejump(1_44_159_44_10); // 2860,10186 L1 — west of the cam
 ~music_playbycoord(coord);
-cam_moveto(1_44_159_56_10, 720, 0, 100); // 2872,10186 L1 south edge
-cam_lookat(1_44_159_58_30, 80, 0, 100); // 2874,10206 L1 centre halls
+cam_moveto(1_44_159_56_6, 400, 0, 100); // 2872,10182 L1, roof-on candidate
+cam_lookat(1_44_159_56_24, 50, 0, 100); // 2872,10200 L1, through the colonnade
 p_delay(2);
 if_openoverlay(null);
 // 2:30 — KELDAGRIM model-letter card over the live 3D scene.
@@ -94,7 +95,7 @@ if_openoverlay(null);
 p_delay(1); // t010 — title off one beat, history starts t011
 // 2:35-3:00 — history stanzas on inter_235 (b12, packed Alvis lines).
 // 2014 t011-t032: lines ADD one at a time, then the OLDEST drops (slide).
-// Never more than 4 up. p_delay(1) ≈ 0.5s frame step.
+// Never more than 4 up. Delays are inherited candidates, not measured 377 time.
 if_openoverlay(inter_235);
 if_sethide(inter_235:com_0, false); // t011 — "Five hundred years..."
 p_delay(1);
@@ -147,12 +148,11 @@ p_telejump(0_44_159_40_18); // 2856,10194 behind the bridge aerial
 cam_moveto(0_44_159_44_14, 620, 0, 100); // 2860,10190
 cam_lookat(0_44_159_56_6, 160, 0, 100); // 2872,10182 — river, not the palace lid
 p_delay(6);
-// 3:25-3:33 — look-west from 2864,10178 is the cave (sx5j57j).
-// 2864,10176 look-east has water + a bank wedge. Sit 4 tiles further
-// east on that same z so the bank is behind the cam.
+// CANDIDATE long-water axis from the 2014/377 tile study. Look east,
+// not west into the cave. Preserve the existing height and title hold.
 p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable (probe)
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_52_0, 520, 0, 100); // 2868,10176 — over the water
+cam_moveto(0_44_159_56_4, 520, 0, 100); // 2872,10180, over the Kelda
 cam_lookat(0_44_159_62_1, 140, 0, 100); // 2878,10177 — east along the Kelda
 p_delay(1);
 if_openoverlay(inter_273);
@@ -160,10 +160,10 @@ if_sethide(inter_273:com_11, false);
 p_delay(14);
 if_sethide(inter_273:com_11, true);
 if_openoverlay(null);
-// 3:35-3:45 — full 7042 over the water. The look-up at 2876,10176 h220
-// was a solid cyan fill (sx4a7s6 w01). Skip it; the SW pull already works.
-cam_moveto(0_44_159_48_0, 680, 0, 100); // 2864,10176 — pulled SW, high
-cam_lookat(0_44_159_62_1, 200, 0, 100); // 2878,10177 — full body
+// CANDIDATE steep plinth axis: same packed built stack, not invented rubble.
+// Exact original climb and pullback packets are UNKNOWN and stay unimplemented.
+cam_moveto(0_44_159_60_2, 680, 0, 100); // 2876,10178, near the plinth
+cam_lookat(0_44_159_62_1, 200, 0, 100); // 2878,10177, steeply down the stack
 p_delay(2);
 if_openoverlay(inter_273);
 if_sethide(inter_273:com_12, false);
@@ -175,13 +175,11 @@ if_openoverlay(null);
 // WHOLE while the boat creeps (2014 t080-t105); the explode anim lands on the
 // Both card below, not here.
 if_openoverlay(inter_234);
-%giantdwarf_statue_invis = 1;
-cam_shake(3, 0, 20, 2);
 p_delay(2);
-// 3:50-4:00 — crash talk ON the map (chat box under overlay 234). Boat creeps.
-// 2014 t076-t102: ALL lines force-timed — no "Click here to continue" in any
-// frame; durations track text length (4.5s / 2.0s / 3.0s). Hide continue
-// BEFORE if_openchat; handle 1/2/3-line IFs.
+// Crash talk ON the miniature map. Its original boat-motion packets are UNKNOWN.
+// 2014 t076-t102: ALL lines force-timed — no "Click here to continue".
+// Use the packed no-Continue interfaces. Open before setting their contents:
+// a pending IF_CLOSE unloads the old chat's widgets on the 377 client.
 split_init("<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!", 380, 4, q8_full);
 ~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 7); // t076-t083 ≈ 4.0s
 split_init("<p,happy>Amazing! And we're going to go straight past it?", 380, 4, q8_full);
@@ -190,23 +188,26 @@ split_init("<p,happy>That's right!", 380, 4, q8_full);
 ~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 3); // t093-t096 ≈ 2.0s
 split_init("<p,angry>Er, hold on! There's something wrong!", 380, 4, q8_full);
 ~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 5); // t097-t102 ≈ 3.0s
-// 2014: hold-on ends t102, Argh opens t103 (~1 tick). Explosion lands ON the
-// Both card (t103 Argh, t110 statue explodes). delay1=275 hold plays on it.
+// The packed miniature sequence includes its own long initial hold. Its exact
+// phase relative to speech is UNKNOWN; retain the existing trigger and hold.
 p_delay(1);
 if_setanim(inter_234:com_3, mini_statue_explodes);
-// 4:04 — Both/Argh at impact, on that map. Do NOT close 234. Heads must talk.
+// Both/Argh uses the packed text and simultaneous animated heads.
 split_init("<p,shock>Argh!", 380, 4, q8_full);
+if_openchat(inter_274); // open before head writes; flush the pending IF_CLOSE
+%giantdwarf_statue_invis = 1; // the live-world statue changes only at the crash beat
+cam_shake(3, 0, 20, 2);
 if_setplayerhead(inter_274:com_0);
 if_setanim(inter_274:com_0, split_getanim(0));
 if_setnpchead(inter_274:com_3, dwarf_city_boatman_mines_prequest);
 if_setanim(inter_274:com_3, split_getanim(0));
-if_openchat(inter_274); // packed *Both* / *Argh!*
-p_delay(8); // explode ON this card
+p_delay(8); // inherited candidate hold; original sequence/speech phase UNKNOWN
 if_close; // chat only; overlay 234 stays
 // 4:07 — map, rubble, no chat
 p_delay(2);
-if_close; // close overlay 234
-if_openoverlay(null);
+// 2014 t118: black transition before the dock. Candidate fade placement.
+if_openoverlay(fade_to_black);
+p_delay(2);
 // dock — cutscene berserkers appear, then the arrest
 %giantdwarf_cutscene_guard_visible = 1;
 p_telejump(0_45_159_9_49); // 2889,10225 L0 — dock stand next to both berserkers
@@ -214,6 +215,7 @@ p_delay(3);
 ~music_playbycoord(coord); // east = Tale of Keldagrim (intro-end unlock via proc)
 cam_moveto(0_45_159_5_49, 380, 0, 100); // 2885,10225 — raise + back, planks out
 cam_lookat(0_45_159_10_49, 220, 0, 100); // 2890,10225 — guards 2231 in frame
+if_openoverlay(null);
 // 4:10-4:25 — dock 3D, high cam, two 2231 + player. 2014 t120-t122: the
 // guards are at their posts and "Halt!" floats ABOVE them (npc_say overhead),
 // THEN the arrest chat (t123). Force-timed like the map.
@@ -279,44 +281,42 @@ if ($help = 2) {
 %giantdwarf_veldaban_introduced = 1;
 %giantdwarf_quest = 2;
 
-// Hide continue BEFORE if_openchat. ~chatnpc_page then hide left npcchat3:com_5
-// up on the 3-line Look line, so continue showed and the rest never played.
+// The original 377 no-Continue family has NPC heads on the left and player
+// heads on the right. Do not hide a pause-button text child: type-4 hidden
+// state is not a supported visibility mechanism. Open first so a pending
+// IF_CLOSE cannot unload the text/head updates before the new chat opens.
 [proc,giantdwarf_timed_npcchat](string $npc_name, npc $npc, int $delay)
 def_int $lines = split_linecount(0);
 if ($lines = 1) {
-    if_setnpchead(npcchat1:com_0, $npc);
-    if_setanim(npcchat1:com_0, split_getanim(0));
-    if_settext(npcchat1:com_1, $npc_name);
-    if_settext(npcchat1:com_2, split_get(0, 0));
-    if_sethide(npcchat1:com_3, true);
-    if_openchat(npcchat1);
+    if_openchat(inter_256);
+    if_setnpchead(inter_256:com_0, $npc);
+    if_setanim(inter_256:com_0, split_getanim(0));
+    if_settext(inter_256:com_1, $npc_name);
+    if_settext(inter_256:com_2, split_get(0, 0));
 } else if ($lines = 2) {
-    if_setnpchead(npcchat2:com_0, $npc);
-    if_setanim(npcchat2:com_0, split_getanim(0));
-    if_settext(npcchat2:com_1, $npc_name);
-    if_settext(npcchat2:com_2, split_get(0, 0));
-    if_settext(npcchat2:com_3, split_get(0, 1));
-    if_sethide(npcchat2:com_4, true);
-    if_openchat(npcchat2);
+    if_openchat(inter_257);
+    if_setnpchead(inter_257:com_0, $npc);
+    if_setanim(inter_257:com_0, split_getanim(0));
+    if_settext(inter_257:com_1, $npc_name);
+    if_settext(inter_257:com_2, split_get(0, 0));
+    if_settext(inter_257:com_3, split_get(0, 1));
 } else if ($lines = 3) {
-    if_setnpchead(npcchat3:com_0, $npc);
-    if_setanim(npcchat3:com_0, split_getanim(0));
-    if_settext(npcchat3:com_1, $npc_name);
-    if_settext(npcchat3:com_2, split_get(0, 0));
-    if_settext(npcchat3:com_3, split_get(0, 1));
-    if_settext(npcchat3:com_4, split_get(0, 2));
-    if_sethide(npcchat3:com_5, true);
-    if_openchat(npcchat3);
+    if_openchat(inter_258);
+    if_setnpchead(inter_258:com_0, $npc);
+    if_setanim(inter_258:com_0, split_getanim(0));
+    if_settext(inter_258:com_1, $npc_name);
+    if_settext(inter_258:com_2, split_get(0, 0));
+    if_settext(inter_258:com_3, split_get(0, 1));
+    if_settext(inter_258:com_4, split_get(0, 2));
 } else if ($lines = 4) {
-    if_setnpchead(npcchat4:com_0, $npc);
-    if_setanim(npcchat4:com_0, split_getanim(0));
-    if_settext(npcchat4:com_1, $npc_name);
-    if_settext(npcchat4:com_2, split_get(0, 0));
-    if_settext(npcchat4:com_3, split_get(0, 1));
-    if_settext(npcchat4:com_4, split_get(0, 2));
-    if_settext(npcchat4:com_5, split_get(0, 3));
-    if_sethide(npcchat4:com_6, true);
-    if_openchat(npcchat4);
+    if_openchat(inter_227);
+    if_setnpchead(inter_227:com_0, $npc);
+    if_setanim(inter_227:com_0, split_getanim(0));
+    if_settext(inter_227:com_1, $npc_name);
+    if_settext(inter_227:com_2, split_get(0, 0));
+    if_settext(inter_227:com_3, split_get(0, 1));
+    if_settext(inter_227:com_4, split_get(0, 2));
+    if_settext(inter_227:com_5, split_get(0, 3));
 }
 p_delay($delay);
 if_close;
@@ -324,39 +324,35 @@ if_close;
 [proc,giantdwarf_timed_playerchat](int $delay)
 def_int $lines = split_linecount(0);
 if ($lines = 1) {
-    if_setplayerhead(chat1:com_0);
-    if_setanim(chat1:com_0, split_getanim(0));
-    if_settext(chat1:com_1, displayname);
-    if_settext(chat1:com_2, split_get(0, 0));
-    if_sethide(chat1:com_3, true);
-    if_openchat(chat1);
+    if_openchat(inter_245);
+    if_setplayerhead(inter_245:com_0);
+    if_setanim(inter_245:com_0, split_getanim(0));
+    if_settext(inter_245:com_1, displayname);
+    if_settext(inter_245:com_2, split_get(0, 0));
 } else if ($lines = 2) {
-    if_setplayerhead(chat2:com_0);
-    if_setanim(chat2:com_0, split_getanim(0));
-    if_settext(chat2:com_1, displayname);
-    if_settext(chat2:com_2, split_get(0, 0));
-    if_settext(chat2:com_3, split_get(0, 1));
-    if_sethide(chat2:com_4, true);
-    if_openchat(chat2);
+    if_openchat(inter_246);
+    if_setplayerhead(inter_246:com_0);
+    if_setanim(inter_246:com_0, split_getanim(0));
+    if_settext(inter_246:com_1, displayname);
+    if_settext(inter_246:com_2, split_get(0, 0));
+    if_settext(inter_246:com_3, split_get(0, 1));
 } else if ($lines = 3) {
-    if_setplayerhead(chat3:com_0);
-    if_setanim(chat3:com_0, split_getanim(0));
-    if_settext(chat3:com_1, displayname);
-    if_settext(chat3:com_2, split_get(0, 0));
-    if_settext(chat3:com_3, split_get(0, 1));
-    if_settext(chat3:com_4, split_get(0, 2));
-    if_sethide(chat3:com_5, true);
-    if_openchat(chat3);
+    if_openchat(inter_247);
+    if_setplayerhead(inter_247:com_0);
+    if_setanim(inter_247:com_0, split_getanim(0));
+    if_settext(inter_247:com_1, displayname);
+    if_settext(inter_247:com_2, split_get(0, 0));
+    if_settext(inter_247:com_3, split_get(0, 1));
+    if_settext(inter_247:com_4, split_get(0, 2));
 } else if ($lines = 4) {
-    if_setplayerhead(chat4:com_0);
-    if_setanim(chat4:com_0, split_getanim(0));
-    if_settext(chat4:com_1, displayname);
-    if_settext(chat4:com_2, split_get(0, 0));
-    if_settext(chat4:com_3, split_get(0, 1));
-    if_settext(chat4:com_4, split_get(0, 2));
-    if_settext(chat4:com_5, split_get(0, 3));
-    if_sethide(chat4:com_6, true);
-    if_openchat(chat4);
+    if_openchat(inter_228);
+    if_setplayerhead(inter_228:com_0);
+    if_setanim(inter_228:com_0, split_getanim(0));
+    if_settext(inter_228:com_1, displayname);
+    if_settext(inter_228:com_2, split_get(0, 0));
+    if_settext(inter_228:com_3, split_get(0, 1));
+    if_settext(inter_228:com_4, split_get(0, 2));
+    if_settext(inter_228:com_5, split_get(0, 3));
 }
 p_delay($delay);
 if_close;

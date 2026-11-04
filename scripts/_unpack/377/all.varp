@@ -887,6 +887,7 @@ transmit=yes
 [varp481_unused]
 
 [giantdwarf_main]
+scope=perm
 transmit=yes
 
 [varp483_bits]
