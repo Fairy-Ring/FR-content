@@ -65,6 +65,7 @@ const { default: Npc } = await eng('src/engine/entity/Npc.ts');
 const { default: Loc } = await eng('src/engine/entity/Loc.ts');
 const { EntityLifeCycle } = await eng('src/engine/entity/EntityLifeCycle.js');
 const { PlayerStat } = await eng('src/engine/entity/PlayerStat.js');
+const { default: Environment } = await eng('src/util/Environment.ts');
 
 VarPlayerType.load(PACK_DIR);
 VarBitType.load(PACK_DIR);
@@ -112,6 +113,8 @@ const ID = {
   headBit: packMap('pack/varbit.pack', 'fenk_head'),
   directionsBit: packMap('pack/varbit.pack', 'fenk_gardener_directions'),
   fenkQuest: packMap('pack/varp.pack', 'fenk_quest'),
+  questPoints: packMap('pack/varp.pack', 'qp'),
+  questScrollRows: [9, 10, 11, 12, 13, 14].map(row => packMap('pack/interface.pack', `questscroll_death:com_${row}`)),
   readSignpost: packMap('pack/varbit.pack', 'fenk_read_signpost'),
   needleBit: packMap('pack/varbit.pack', 'fenk_needle'),
   threadsBit: packMap('pack/varbit.pack', 'fenk_threads_given'),
@@ -603,6 +606,32 @@ for (const [trigger, usedItem, startingStage] of [
   assert(p.getVarBit(ID.conductorBit) === 1 && p.getVar(ID.fenkQuest) === Math.max(4, startingStage), 'repeat preserves durable repair state');
 }
 ok('conductor refusal, Repair/item-use paths, timed camera/lightning/audio, message order, roof position and one-shot repeat');
+
+// P2: execute the shared scroll renderer, not just the local reward literal.
+{
+  const p = qualifiedPlayer();
+  p.setVar(ID.fenkQuest, 5);
+  const recount = runProc(p, '[proc,count_questpoints]');
+  expectFinished(recount, 'quest points before completion');
+  const pointsBefore = popRet(recount.state);
+  p.setVar(ID.questPoints, pointsBefore);
+  const xpBefore = p.stats[PlayerStat.THIEVING];
+  const result = runProc(p, '[queue,fenk_quest_complete]');
+  expectFinished(result, 'quest complete');
+  const rows = new Map(p.packets.filter(packet => packet.constructor.name === 'IfSetText').map(packet => [packet.component, packet.text]));
+  const scroll = ID.questScrollRows.map(component => rows.get(component));
+  assert(scroll[0] === '2 Quest Points', `shared scroll must show its own quest-point row: ${JSON.stringify(scroll)}`);
+  assert(scroll[1] === '1000 Thieving XP' && scroll[2] === 'Ring of Charos', `reward rows must contain XP and ring: ${JSON.stringify(scroll)}`);
+  assert(scroll.filter(text => /Quest Points?/.test(text ?? '')).length === 1, `quest points duplicated in completion scroll: ${JSON.stringify(scroll)}`);
+  assert(scroll.slice(3).every(text => text === ''), `unused reward rows must be empty: ${JSON.stringify(scroll)}`);
+  assert(p.getVar(ID.fenkQuest) === 8 && p.getVar(ID.questPoints) === pointsBefore + 2, 'completion retains stage 8 and exactly two quest points');
+  const xpAfter = p.stats[PlayerStat.THIEVING];
+  assert(xpAfter === xpBefore + 10000 * Environment.NODE_XPRATE, 'completion retains 1000 Thieving XP at the configured rate');
+  const packetsBeforeRepeat = p.packets.length;
+  expectFinished(runProc(p, '[queue,fenk_quest_complete]'), 'quest complete repeat');
+  assert(p.packets.length === packetsBeforeRepeat && p.stats[PlayerStat.THIEVING] === xpAfter && p.getVar(ID.questPoints) === pointsBefore + 2, 'repeat completion sends no second scroll or rewards');
+  ok(`P2 quest-complete scroll: ${JSON.stringify(scroll)}; stage, QP, XP and repeat guard preserved`);
+}
 
 // ---- F3 Charos bank/worn/inv + no XP on recovery ----
 {

@@ -6,6 +6,8 @@ The doctor now uses the operator-selected RS3 speech, including the unread-signp
 
 Body-part bits and sewing supplies now recover interrupted hand-ins, and stage 3 is written before the sewing box so the corpse appears with it. Server varp 764 is named `fenk_charos_unlocked`; its ID and persistence are unchanged. The detailed source records, September E–G diagnosis, offline checks and required live checks are in the vault's Fenkenstrain subject and the external `FENK-UNIT-1104/report.md`. This update does not claim a live E–G pass.
 
+Live findings P1/P2 are repaired in the same unit. The reconstructed Woods rectangle now extends one zone north to z3527, joining the existing Castle rectangle across the walkable route near 3584,3522. The packed-map regression checks every tile of a shortest castle-door-to-grave route through the former gap against the compiled follower watcher. These bounds remain CANDIDATE, not recovered historical measurements. The completion reward text now lists only Thieving XP and the ring because the shared scroll renderer supplies its own quest-point row. Its compiled-handler regression checks the rendered rows and unchanged one-time rewards. Live route, protected main-escort Dig and scroll rechecks remain with the orchestrator.
+
 The sections below retain the September implementation evidence.
 
 Date stamp: 2026-09-10 (behavior-repair after integration APPROVE residuals)  

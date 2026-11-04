@@ -16,6 +16,7 @@
  * Not a live client proof. Does not write shared packs.
  */
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -63,6 +64,8 @@ const { default: ObjType } = await eng('src/cache/config/ObjType.ts');
 const { default: FontType } = await eng('src/cache/config/FontType.ts');
 const { default: Component } = await eng('src/cache/config/Component.ts');
 const { default: NpcType } = await eng('src/cache/config/NpcType.ts');
+const { default: LocType } = await eng('src/cache/config/LocType.ts');
+const { default: GameMap } = await eng('src/engine/GameMap.ts');
 const { default: ScriptProvider } = await eng('src/engine/script/ScriptProvider.ts');
 const { default: ScriptRunner } = await eng('src/engine/script/ScriptRunner.ts');
 const { default: ScriptState } = await eng('src/engine/script/ScriptState.ts');
@@ -412,6 +415,83 @@ try {
     ok(`woods overhead: ${direction}`);
   }
 
+  // P1: use the full pack's terrain/loc collisions, not an open synthetic grid.
+  // A shortest cardinal path leaves m55_55 through the north edge of m56_54.
+  // Sample the actual production watcher on EVERY tile, so its ten-tick phase
+  // cannot accidentally conceal a gap as it did in the original live run.
+  {
+    LocType.load(PACK_DIR);
+    const gameMap = new GameMap(true);
+    const { unzipSync } = createRequire(path.join(ISO_ENGINE, 'package.json'))('fflate');
+    const maps = unzipSync(fs.readFileSync(path.join(PACK_DIR, '.cache/maps-server.zip')), {
+      filter: entry => /^[ml](55|56)_(54|55)$/.test(entry.name)
+    });
+    gameMap.zonemap.beginInitialization();
+    for (const mx of [55, 56]) {
+      for (const mz of [54, 55]) {
+        const m = maps[`m${mx}_${mz}`];
+        const l = maps[`l${mx}_${mz}`];
+        assert(m?.length && l?.length, `full pack missing terrain/loc maps ${mx},${mz}`);
+        gameMap.loadPackedMapsquare({ m, l, n: new Uint8Array(), o: new Uint8Array() }, mx * 64, mz * 64);
+      }
+    }
+    gameMap.zonemap.endInitialization();
+    const start = { x: 3550, z: 3534 };
+    const target = { x: 3608, z: 3492 };
+    const key = ({ x, z }) => `${x},${z}`;
+    const previous = new Map([[key(start), null]]);
+    const pending = [start];
+    for (let cursor = 0; cursor < pending.length && !previous.has(key(target)); cursor++) {
+      const current = pending[cursor];
+      for (const [dx, dz] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+        const next = { x: current.x + dx, z: current.z + dz };
+        if (next.x < 3520 || next.x > 3647 || next.z < 3456 || next.z > 3583 || previous.has(key(next))) continue;
+        if (!canTravel(LEVEL, current.x, current.z, dx, dz, 1, 0, CollisionType.NORMAL)) continue;
+        previous.set(key(next), current);
+        pending.push(next);
+      }
+    }
+    assert(previous.has(key(target)), 'packed map has no main-castle-door to true-grave route');
+    const route = [];
+    for (let current = target; current; current = previous.get(key(current))) route.push(current);
+    route.reverse();
+    const seam = route.filter(({ x, z }) => x >= 3584 && z >= 3520);
+    assert(seam.length > 0, 'shortest packed-map route must exercise the m56_55 seam, not detour around it');
+    const { player, npc } = makeAreaFollower(start.x, start.z, 6005);
+    const before = snapshot(npc);
+    const watcher = ScriptProvider.getByName('[softtimer,fenk_follow_watch]');
+    assert(watcher, 'compiled follower watcher missing');
+    for (const { x, z } of route) {
+      walkPlayer(player, x, z);
+      const state = ScriptRunner.init(watcher, player);
+      const exec = player.runScript(state, true, true);
+      assert(exec === ScriptState.FINISHED, `watcher did not finish at ${x},${z}: ${exec}`);
+      assert(npc.sayMessage !== "Oi'm afraid you've gone well off the beaten track.", `watcher dismissed mapped route at ${x},${z}`);
+      assert(player.getVar(ID.fenkFollower) === npc.uid && player.getVarBit(ID.directionsBit) === 1, `watcher lost owned escort at ${x},${z}`);
+    }
+    for (let tick = 0; tick < 4; tick++) queueTick(player);
+    assert(npc.isActive && player.getVar(ID.fenkFollower) === npc.uid, 'mapped route queued a delayed follower dismissal');
+    assertPreserved(npc, before, 'shortest mapped route');
+    ok(`P1 mapped route: ${route.length - 1} cardinal steps; every tile keeps the same owned follower; seam=${JSON.stringify(seam)}`);
+  }
+
+  // Both Talk-to and the watcher use the joined area, including its exact edge.
+  for (const [x, z, expected, nid] of [
+    [3583, 3527, 'You need to head off to them Haunted Woods, mate.', 6006],
+    [3584, 3522, 'Go south, mate.', 6007],
+    [3584, 3520, 'Go south, mate.', 6008],
+    [3585, 3520, 'Go south, mate.', 6009],
+    [3584, 3527, 'Go south, mate.', 6011]
+  ]) {
+    const { player, npc } = makeAreaFollower(x, z, nid);
+    completeOverhead(player, npc, expected);
+    completeOverhead(player, npc, expected, '[softtimer,fenk_follow_watch]');
+    for (let tick = 0; tick < 4; tick++) queueTick(player);
+    assert(npc.isActive && player.getVar(ID.fenkFollower) === npc.uid, `joined area lost follower at ${x},${z}`);
+    assert(npc.targetOp === NpcMode.PLAYERFOLLOW, `joined area did not resume follow at ${x},${z}`);
+  }
+  ok('P1 joined-area Talk-to and watcher agree at the former gap and northern edge');
+
   // Grave speech precedes owned cleanup; Dig itself is not changed or required.
   {
     const { player, npc } = makeAreaFollower(3608, 3491, 6010);
@@ -427,11 +507,13 @@ try {
   }
 
   // Talk-to and the recurring watcher both implement the source's stray branch.
-  for (const [scriptName, nid] of [
-    ['[opnpc1,fenk_gardener]', 6020],
-    ['[softtimer,fenk_follow_watch]', 6021]
+  for (const [scriptName, nid, x, z] of [
+    ['[opnpc1,fenk_gardener]', 6020, 3500, 3510],
+    ['[softtimer,fenk_follow_watch]', 6021, 3500, 3510],
+    ['[opnpc1,fenk_gardener]', 6022, 3584, 3528],
+    ['[softtimer,fenk_follow_watch]', 6023, 3584, 3528]
   ]) {
-    const { player, npc } = makeAreaFollower(3500, 3510, nid);
+    const { player, npc } = makeAreaFollower(x, z, nid);
     completeOverhead(player, npc, "Oi'm afraid you've gone well off the beaten track.", scriptName);
     queueTick(player);
     assert(npc.sayMessage === "Oi'm afraid you've gone well off the beaten track.", 'first departure line overwritten in the same update');

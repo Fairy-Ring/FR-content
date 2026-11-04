@@ -134,7 +134,7 @@ if (%fenk_quest >= ^fenk_complete) {
 // 1000 Thieving XP → tenths 10000 (house: 1 XP = 10 units).
 stat_advance(thieving, 10000);
 session_log(^log_adventure, "Quest complete: Creature of Fenkenstrain");
-~send_quest_complete(questlist:creatureoffenkenstrain, ring_of_charos, 250, ^creatureoffenkenstrain_questpoints, "You have completed the\\nCreature of Fenkenstrain!", "2 Quest Points|1000 Thieving XP|Ring of Charos");
+~send_quest_complete(questlist:creatureoffenkenstrain, ring_of_charos, 250, ^creatureoffenkenstrain_questpoints, "You have completed the\\nCreature of Fenkenstrain!", "1000 Thieving XP|Ring of Charos");
 ~update_questlist;
 
 // Optional clock → letter. Transcript 268-273 (CANDIDATE after era subtraction):

@@ -125,7 +125,8 @@ return;
 return;
 
 // Current RS3/OSRS transcripts provide qualitative area labels only. CANDIDATE
-// geometry: Castle=m55_55; Woods=m55_54..m56_54; grave threshold=3x3 at 3608,3491.
+// geometry: Castle=m55_55; Woods=x3520..3647,z3456..3527. The northern zone
+// joins the castle to the mapped route through 3584,3522. Grave threshold=3x3.
 // `coord_direction` supplies the dominant-axis cardinal; its tie is east/west.
 [label,fenk_gardener_following_talk]
 if (inzone(0_55_55_0_0, 0_55_55_63_63, coord) = true) {
@@ -133,7 +134,7 @@ if (inzone(0_55_55_0_0, 0_55_55_63_63, coord) = true) {
     ~fenk_resume_owned_follow;
     return;
 }
-if (inzone(0_55_54_0_0, 0_56_54_63_63, coord) = true) {
+if (inzone(0_55_54_0_0, 0_56_55_63_7, coord) = true) {
     if (inzone(0_56_54_23_34, 0_56_54_25_36, coord) = true) {
         npc_say("This is the place where I met me' maker.");
         // OSRS says he returns to the Castle; clear the owned dynamic copy so
@@ -272,9 +273,9 @@ if (coordy(coord) ! coordy(npc_coord)) {
     queue(fenk_on_login_cleanup, 0, 0);
     return;
 }
-// Source-backed direction-area loss: only the explicit Castle/Woods map-square
-// reconstruction is accepted; no numeric leash radius is inferred.
-if (inzone(0_55_55_0_0, 0_55_55_63_63, coord) = false & inzone(0_55_54_0_0, 0_56_54_63_63, coord) = false) {
+// Source-backed direction-area loss: the reconstructed Castle/Woods rectangles
+// overlap across the walkable route; no numeric leash radius is inferred.
+if (inzone(0_55_55_0_0, 0_55_55_63_63, coord) = false & inzone(0_55_54_0_0, 0_56_55_63_7, coord) = false) {
     ~fenk_gardener_stray;
     return;
 }
