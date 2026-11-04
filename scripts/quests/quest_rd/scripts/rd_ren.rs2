@@ -64,7 +64,7 @@ switch_int(getbit_range(%rd_ren, 0, 2)) {
         else if ($stage = 2) ~chatnpc("<p,neutral>Many types have passed through here|Even such as you amongst their sort.|And in the end, the puzzle's clear;|The hidden word you sought.");
         else ~chatnpc("<p,neutral>Maybe I will do my best;|Especially at giving clues.|Attempt to help you pass the test!|That should help me pay my dues.");
     case 4 :
-        if ($stage = 1) ~chatnpc("<p,neutral>Look closely at the words I speak;|And study closely every part.|See for yourself the word you seek|Trapped for you if you're smart.");
+        if ($stage = 1) ~chatnpc("<p,neutral>Look closely at the words i speak;|And study closely every part.|See for yourself the word you seek|Trapped for you if you're smart.");
         else if ($stage = 2) ~chatnpc("<p,neutral>Last time my puzzle did not help|Apparently, so you've bidden.|Study my speech carefully, whelp|To find the answer, hidden.");
         else ~chatnpc("<p,neutral>Lo! my final speech is now|Attended to by you.|Study my words, and find out how|To understand my clue!");
     case 5 :
