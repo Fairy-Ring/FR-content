@@ -1,7 +1,15 @@
-// Ghosts Ahoy — Ghost captain_1 Talk-To + pay-25 ferry to Dragontooth Island.
+// Ghosts Ahoy — Ghost captain_1 Talk-To + ferry to Dragontooth Island.
 // CANDIDATE last-resort 2007-base (OSRS Talking to the Ghost captain
-// minus 500 unlimited 16 Mar 2017 / Charos / dest). Hunt 289? no.
-// Stay ahoy_questvar 3. Pay 25 ectotoken -> land 3793,3560 L0 (next to island
+// minus 500 unlimited 16 Mar 2017 / dest). Hunt 289? no.
+// Fare: 25 ecto-tokens; 10 while wearing ring_of_charos_unlocked (Ring of
+// charos(u), from Garden of Tranquillity). The 10-token fare is period-attested
+// (RuneHQ 17 Dec 2005 guide: "29 Ecto-tokens (Or 14 ... and the ring of charos
+// (u)", fact ghosts-ahoy.captain-charos-fare), not post-377. Worn, not held:
+// the ring's power "will only work whilst you are wearing it" (OSRS Transcript:
+// Garden of Tranquillity, Wise Old Man). The transcript and the Ghost captain
+// page have no offer line for the ring case, so the 25-token offer sentence is
+// reused with the count replaced (CANDIDATE wording).
+// Stay ahoy_questvar 3. Pay the fare -> land 3793,3560 L0 (next to island
 // captain 3792,3560, not rowboat 3791,3561). No write.
 // Cite ahoy-ghost-captain-first-slice-377.md + dest-uncited-pass-next-377.md.
 
@@ -11,17 +19,21 @@ if (inv_total(worn, amulet_of_ghostspeak) = 0) {
     ~mesbox("You cannot understand the ghost.");
     return;
 }
-~chatnpc("<p,neutral>I can take you to Dragontooth Island. The return trip will cost 25 ecto-tokens.");
-if (inv_total(inv, ectotoken) < 25) {
+def_int $fare = 25;
+if (inv_total(worn, ring_of_charos_unlocked) > 0) {
+    $fare = 10;
+}
+~chatnpc("<p,neutral>I can take you to Dragontooth Island. The return trip will cost <tostring($fare)> ecto-tokens.");
+if (inv_total(inv, ectotoken) < $fare) {
     ~chatplayer("<p,neutral>I'll come back later.");
     return;
 }
-def_int $trip = ~p_choice2("Okay, here's 25 ecto-tokens. Let's go.", 1, "I'll come back later.", 2);
+def_int $trip = ~p_choice2("Okay, here's <tostring($fare)> ecto-tokens. Let's go.", 1, "I'll come back later.", 2);
 if ($trip = 2) {
     ~chatplayer("<p,neutral>I'll come back later.");
     return;
 }
-~chatplayer("<p,neutral>Okay, here's 25 ecto-tokens. Let's go.");
-inv_del(inv, ectotoken, 25);
+~chatplayer("<p,neutral>Okay, here's <tostring($fare)> ecto-tokens. Let's go.");
+inv_del(inv, ectotoken, $fare);
 mes("After a long boat trip you arrive at Dragontooth Island.");
 p_telejump(0_59_55_17_40); // Ahoy island 3793,3560 L0 — next to island captain, not rowboat
