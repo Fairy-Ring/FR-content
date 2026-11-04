@@ -310,6 +310,9 @@ if ($bar > 21) {
 }
 %tutorial_progress_overlay = $bar;
 if_openoverlay(tutorial_island_progress);
+// The yellow "Please follow the instructions below" banner (com_24) is not
+// shown at every step in period footage; the progress bar is (TUT-BANNER-1104).
+if_sethide(tutorial_island_progress:com_24, true);
 
 [label,tutorial_complete]
 tut_close();
