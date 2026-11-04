@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "runescript": {
+      "command": "node",
+      "args": ["../engine/tools/rs2-lsp/launcher.mjs", "--stdio"],
+      "fileTypes": [".rs2", ".constant", ".obj", ".npc", ".loc", ".inv", ".varp", ".varbit", ".varn", ".vars", ".param", ".enum", ".struct", ".seq", ".spotanim", ".idk", ".hunt", ".mesanim", ".dbtable", ".dbrow", ".if", ".pack"],
+      "languageId": "runescript",
+      "rootMarkers": ["scripts/engine.rs2"]
+    }
+  }
+}
