@@ -1768,7 +1768,7 @@ stock3=zamorak_staff,5,100
 size=4
 
 [dueloffer]
-size=9
+size=28
 protect=no
 
 [duel_rottenfruitshop]
@@ -1780,7 +1780,7 @@ allstock=no
 stock1=rotten_tomato,2000,10
 
 [duelwinnings]
-size=9
+size=28
 protect=no
 
 [aprilfoolshorseshop]
