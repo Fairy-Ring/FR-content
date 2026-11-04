@@ -81,7 +81,7 @@ VarBitType.load(PACK_DIR);
 InvType.load(PACK_DIR);
 ObjType.load(PACK_DIR);
 FontType.load(PACK_DIR);
-assert(FontType.get(3), 'FontType q8_full (id 3) missing — need ISO data/pack/client/title');
+assert(FontType.get(3), `FontType q8_full (id 3) missing — need ${ISO_ENGINE}/data/pack/client/title`);
 Component.load(PACK_DIR);
 NpcType.load(PACK_DIR);
 
