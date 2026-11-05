@@ -268,48 +268,72 @@ function runIntro(equipment = [], interruptAtDock = false) {
   const intro = ScriptRunner.init(ScriptProvider.getByName('[proc,giantdwarf_intro_cutscene]'), trip);
   const guardHistory = [];
   let pendingWander = false;
-  let walkedBeforeStaging = false;
+  const walkedBeforeStaging = guards.map(() => false);
+  let stagedTick = -1;
   let shoutTick = -1;
   let result = trip.runScript(intro, true, true);
   for (let turns = 0; result === ScriptState.SUSPENDED; turns++) {
     assert(turns < 100, 'cutscene must reach the real Veldaban prompt');
     if (interruptAtDock && guards.every(npc => npc.targetOp === NpcMode.NONE)) {
-      return { trip, guardHistory, stagedTick: World.currentTick };
+      assert(stagedTick >= 0, 'interruption follows the armed staging regression');
+      return { trip, guardHistory, stagedTick };
     }
     // Reset in the same phase order as World: player writes, output/reset,
     // then the next tick's NPC turn before resuming the delayed player.
+    trip.encodeOut();
+    trip.updateMap();
+    // Inspect output only after encodeOut has flushed this suspension's fade.
+    // Before that flush the last overlay is still the map, not dock black.
     if (!pendingWander && trip.getVarBit(id('varbit', 'giantdwarf_cutscene_guard_visible')) === 0 &&
         trip.packets.some(message => message.kind === 'IfOpenChat' && message.component === id('interface', 'inter_274')) &&
         trip.packets.findLast(message => message.kind === 'IfOpenOverlay')?.component === id('interface', 'fade_to_black')) {
+      assert.equal(stagedTick, -1, 'wander must be armed before dock staging, never at the HQ fade');
+      assert(guards.every(npc => npc.targetOp === NpcMode.WANDER));
       guards.forEach((npc, index) => npc.queueWaypoint(index === 0 ? 2885 : 2895, npc.z));
       pendingWander = true;
     }
-    trip.encodeOut();
-    trip.updateMap();
     const resumeTick = trip.delayedUntil;
     while (World.currentTick < resumeTick) {
       for (const npc of guards) npc.resetEntity(false);
       World.currentTick++;
       const before = guards.map(npc => [npc.x, npc.z]);
       npcTurn();
-      if (pendingWander && guards.every(npc => npc.targetOp === NpcMode.WANDER)) {
-        walkedBeforeStaging ||= guards.some((npc, index) => npc.x !== before[index][0] || npc.z !== before[index][1]);
+      if (pendingWander && stagedTick < 0) {
+        guards.forEach((npc, index) => {
+          walkedBeforeStaging[index] ||= npc.x !== before[index][0] || npc.z !== before[index][1];
+        });
       }
       guardHistory.push({ tick: World.currentTick, guards: guards.map(npc => [npc.x, npc.z, npc.targetOp]) });
+      if (stagedTick >= 0 && guards.some(npc => npc.targetOp === NpcMode.NONE)) {
+        assert.deepEqual(guards.map(npc => [npc.x, npc.z]).sort((a, b) => a[1] - b[1]), [[2890, 10224], [2890, 10226]],
+          `held guards must not follow their old wander waypoints after staging, tick ${World.currentTick}`);
+      }
     }
     trip.delayed = false;
-    if (pendingWander && guards.every(npc => npc.targetOp === NpcMode.WANDER) &&
-        trip.getVarBit(id('varbit', 'giantdwarf_cutscene_guard_visible')) === 0) {
-      assert(guards.every(npc => npc.waypointIndex >= 0), 'unfinished wander paths reach the compiled staging call');
+    const staging = pendingWander && stagedTick < 0;
+    if (staging) {
+      assert(guards.every(npc => npc.targetOp === NpcMode.WANDER), 'both actors still wander before staging');
+      assert(walkedBeforeStaging.every(Boolean), 'both actors walk before staging');
+      assert(guards.every(npc => npc.waypointIndex >= 0 &&
+        npc.waypoints[npc.waypointIndex] !== CoordGrid.packCoord(0, npc.x, npc.z)),
+      'both actors have an unfinished wander waypoint immediately before compiled staging');
+      console.log(`OK armed wander immediately before staging at tick ${World.currentTick}: ${JSON.stringify(guards.map(npc =>
+        ({ x: npc.x, z: npc.z, waypoint: CoordGrid.unpackCoord(npc.waypoints[npc.waypointIndex]) })))}`);
     }
     result = trip.runScript(intro, true, true);
+    if (staging) {
+      assert(guards.every(npc => npc.targetOp === NpcMode.NONE), 'this resume must execute compiled dock staging');
+      stagedTick = World.currentTick;
+      assert.deepEqual(guards.map(npc => [npc.x, npc.z]).sort((a, b) => a[1] - b[1]), [[2890, 10224], [2890, 10226]]);
+    }
     if (guards.some(npc => npc.sayMessage === 'Halt!')) shoutTick = World.currentTick;
   }
   trip.encodeOut();
   trip.updateMap();
   assert.equal(result, ScriptState.PAUSEBUTTON, 'compiled intro reaches interactive Veldaban');
   assert(pendingWander, 'the staging regression supplies an unfinished wander waypoint');
-  assert(walkedBeforeStaging, 'real NPC movement must consume part of the unfinished wander paths');
+  assert(walkedBeforeStaging.every(Boolean), 'real NPC movement consumes both unfinished wander paths before staging');
+  assert(stagedTick >= 0, 'compiled staging must follow the armed wander');
   assert(shoutTick >= 0, 'real base lookup sends overhead speech before reset clears it');
   assert(guards.every(npc => npc.targetOp === NpcMode.WANDER), 'both shared actors resume normal movement');
   const arrest = trip.packets.find(message => message.kind === 'IfSetText' && message.text === 'Black Guard Berserker');
@@ -319,6 +343,14 @@ function runIntro(equipment = [], interruptAtDock = false) {
   assert(shout, 'record actual queue state at the overhead shout');
   assert.deepEqual(shout.guards.map(([x, z]) => [x, z]).sort((a, b) => a[1] - b[1]), [[2890, 10224], [2890, 10226]]);
   assert(shout.guards.every(([, , mode]) => mode === NpcMode.NONE), 'posts hold during Halt');
+  const held = guardHistory.filter(row => row.tick > stagedTick && row.tick <= arrest.tick);
+  assert.equal(held.length, arrest.tick - stagedTick, 'record every NPC turn from staging through the full shout hold');
+  for (const row of held) {
+    assert.deepEqual(row.guards.map(([x, z]) => [x, z]).sort((a, b) => a[1] - b[1]), [[2890, 10224], [2890, 10226]],
+      `both guards stay at their posts through the shout, tick ${row.tick}`);
+    assert(row.guards.every(([, , mode]) => mode === NpcMode.NONE), `both guards remain held at tick ${row.tick}`);
+  }
+  console.log(`OK both guard posts hold from staging ${stagedTick} through Halt ${shoutTick} and arrest ${arrest.tick}`);
   assert(guardHistory.find(row => row.tick === arrest.tick + 1).guards.every(([, , mode]) => mode === NpcMode.WANDER),
     'release is bounded to the shout, not the whole arrest');
   return { trip, guardHistory };
