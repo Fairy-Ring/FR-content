@@ -224,8 +224,8 @@ assert.equal(actor.packets.at(-1).kind, 'IfClose', 'real output phase flushes th
 assert.equal(actor.refreshModalClose, false);
 console.log('OK seven timed boxes have no visible defaults or missing heads at all five packet-cycle offsets');
 
-// Exercise the actual compiled intro. Displace the two real map identities to
-// their wander boundary, outside the old three-tile lookup. No new actor type.
+// Exercise the actual compiled intro with NPC turns and end-of-tick resets.
+// Give both original map identities an unfinished wander path at dock staging.
 const guardId = id('npc', 'dwarf_city_berserker_cutscene_multi');
 assert.equal(guardId, 2231);
 const guardType = NpcType.get(guardId);
@@ -241,9 +241,21 @@ const guards = [10224, 10226].map((z, index) => {
   World.addNpc(npc, -1);
   return npc;
 });
+function npcTurn() {
+  // Pin only random wander selection, not movement, queues or collision.
+  // A queued waypoint must still walk, including in NONE mode.
+  const random = Math.random;
+  Math.random = () => 0.999;
+  try {
+    for (const npc of guards) npc.turn();
+  } finally {
+    Math.random = random;
+  }
+}
 function runIntro(equipment = [], interruptAtDock = false) {
   guards.forEach((npc, index) => {
     npc.teleJump(index === 0 ? 2895 : 2885, index === 0 ? 10224 : 10226, 0);
+    npc.clearWaypoints(); // fixture setup only; the compiled staging must replace its own path
     npc.sayMessage = null;
     assert.equal(npc.targetOp, NpcMode.WANDER);
   });
@@ -255,33 +267,54 @@ function runIntro(equipment = [], interruptAtDock = false) {
   trip.setVarBit(id('varbit', 'giantdwarf_quest'), 1); // entry fixture, not a stage-write proof
   const intro = ScriptRunner.init(ScriptProvider.getByName('[proc,giantdwarf_intro_cutscene]'), trip);
   const guardHistory = [];
+  let pendingWander = false;
+  let walkedBeforeStaging = false;
+  let shoutTick = -1;
   let result = trip.runScript(intro, true, true);
   for (let turns = 0; result === ScriptState.SUSPENDED; turns++) {
     assert(turns < 100, 'cutscene must reach the real Veldaban prompt');
     if (interruptAtDock && guards.every(npc => npc.targetOp === NpcMode.NONE)) {
       return { trip, guardHistory, stagedTick: World.currentTick };
     }
+    // Reset in the same phase order as World: player writes, output/reset,
+    // then the next tick's NPC turn before resuming the delayed player.
+    if (!pendingWander && trip.getVarBit(id('varbit', 'giantdwarf_cutscene_guard_visible')) === 0 &&
+        trip.packets.some(message => message.kind === 'IfOpenChat' && message.component === id('interface', 'inter_274')) &&
+        trip.packets.findLast(message => message.kind === 'IfOpenOverlay')?.component === id('interface', 'fade_to_black')) {
+      guards.forEach((npc, index) => npc.queueWaypoint(index === 0 ? 2885 : 2895, npc.z));
+      pendingWander = true;
+    }
     trip.encodeOut();
     trip.updateMap();
     const resumeTick = trip.delayedUntil;
-    // Run the actual NPC-owned release queues on intervening NPC phases, before
-    // resuming the player. Do not pretend fixed-position fixtures prove pixels.
     while (World.currentTick < resumeTick) {
+      for (const npc of guards) npc.resetEntity(false);
       World.currentTick++;
-      for (const npc of guards) npc.processQueue();
+      const before = guards.map(npc => [npc.x, npc.z]);
+      npcTurn();
+      if (pendingWander && guards.every(npc => npc.targetOp === NpcMode.WANDER)) {
+        walkedBeforeStaging ||= guards.some((npc, index) => npc.x !== before[index][0] || npc.z !== before[index][1]);
+      }
       guardHistory.push({ tick: World.currentTick, guards: guards.map(npc => [npc.x, npc.z, npc.targetOp]) });
     }
     trip.delayed = false;
+    if (pendingWander && guards.every(npc => npc.targetOp === NpcMode.WANDER) &&
+        trip.getVarBit(id('varbit', 'giantdwarf_cutscene_guard_visible')) === 0) {
+      assert(guards.every(npc => npc.waypointIndex >= 0), 'unfinished wander paths reach the compiled staging call');
+    }
     result = trip.runScript(intro, true, true);
+    if (guards.some(npc => npc.sayMessage === 'Halt!')) shoutTick = World.currentTick;
   }
   trip.encodeOut();
   trip.updateMap();
   assert.equal(result, ScriptState.PAUSEBUTTON, 'compiled intro reaches interactive Veldaban');
-  assert(guards.some(npc => npc.sayMessage === 'Halt!'), 'real base lookup sends overhead speech');
+  assert(pendingWander, 'the staging regression supplies an unfinished wander waypoint');
+  assert(walkedBeforeStaging, 'real NPC movement must consume part of the unfinished wander paths');
+  assert(shoutTick >= 0, 'real base lookup sends overhead speech before reset clears it');
   assert(guards.every(npc => npc.targetOp === NpcMode.WANDER), 'both shared actors resume normal movement');
   const arrest = trip.packets.find(message => message.kind === 'IfSetText' && message.text === 'Black Guard Berserker');
   assert(arrest);
-  const shoutTick = arrest.tick - 3;
+  assert.equal(shoutTick, arrest.tick - 3, 'actual overhead speech precedes the arrest page by three intervals');
   const shout = guardHistory.find(row => row.tick === shoutTick);
   assert(shout, 'record actual queue state at the overhead shout');
   assert.deepEqual(shout.guards.map(([x, z]) => [x, z]).sort((a, b) => a[1] - b[1]), [[2890, 10224], [2890, 10226]]);
@@ -305,8 +338,8 @@ assert.deepEqual(approachPages.slice(1).map((message, index) => message.tick - a
 const firstFade = trip.packets.find(message => message.kind === 'IfOpenOverlay' && message.component === id('interface', 'fade_to_black'));
 const firstTitle = trip.packets.find(message => message.kind === 'IfOpenOverlay' && message.component === id('interface', 'inter_273'));
 console.log(`OK compiled cutscene intervals to Veldaban prompt: initial close ${World.currentTick - trip.packets[0].tick}, first fade ${World.currentTick - firstFade.tick}, first title ${World.currentTick - firstTitle.tick}; title-to-map ${mapOpen.tick - firstTitle.tick}`);
-assert.equal(World.currentTick - firstFade.tick, 134, 'candidate first-fade-to-prompt schedule is 80.4s, not 107.4s');
-assert.equal(firstTitle.tick - firstFade.tick, 3, 'first title follows the fade by 1.8s');
+assert.equal(World.currentTick - firstFade.tick, 141, 'candidate first-fade-to-prompt schedule is 84.6s versus footage 84.3s');
+assert.equal(firstTitle.tick - firstFade.tick, 10, 'first title follows first fade by 6.0s, not fade-in by 1.8s');
 assert.equal(mapOpen.tick - firstTitle.tick, 58, 'measured first-title-to-map span is 34.8s');
 const titleLayers = [10, 11, 12].map(n => trip.packets.find(message =>
   message.kind === 'IfSetHide' && message.component === id('interface', `inter_273:com_${n}`) && !message.hidden));
@@ -325,7 +358,7 @@ assert.deepEqual(historyTicks, [0, 1, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 16, 17, 
   'history reveals follow quantized retained transition times, without accumulated rounding');
 const canal = trip.packets.find(message => message.kind === 'CamMoveTo' && message.height === 440);
 const statue = trip.packets.find(message => message.kind === 'CamMoveTo' && message.height === 1340);
-assert(canal && statue, 'both measured candidate camera corrections are sent');
+assert(canal && statue, 'candidate canal and explicit full-stack product camera are sent');
 const lookAt = move => trip.packets.find(message => message.kind === 'CamLookAt' && message.tick === move.tick);
 assert.deepEqual([canal.worldX, canal.worldZ, lookAt(canal).worldX, lookAt(canal).worldZ, lookAt(canal).height], [2880, 10188, 2880, 10196, 0]);
 assert.deepEqual([statue.worldX, statue.worldZ, lookAt(statue).worldX, lookAt(statue).worldZ, lookAt(statue).height], [2874, 10168, 2880, 10179, 120]);
@@ -371,10 +404,15 @@ const interrupted = runIntro([], true);
 assert(guards.every(npc => npc.targetOp === NpcMode.NONE));
 for (let tick = 0; tick < 7; tick++) {
   World.currentTick++;
-  for (const npc of guards) npc.processQueue();
+  for (const npc of guards) npc.resetEntity(false);
+  npcTurn();
+  if (tick < 6) {
+    assert.deepEqual(guards.map(npc => [npc.x, npc.z]).sort((a, b) => a[1] - b[1]), [[2890, 10224], [2890, 10226]],
+      'abandoned player does not release the hold early or leave an old wander destination');
+  }
 }
 assert(guards.every(npc => npc.targetOp === NpcMode.WANDER), 'NPC-owned release survives an abandoned player script');
 assert.equal(interrupted.trip.delayed, true, 'do not resume the interrupted player to restore guards');
-console.log('OK wander-boundary guards stage for Halt and auto-release, including player interruption; equipped and empty bonus texts restore');
+console.log('OK unfinished-wander guards hold through real NPC movement and release after player interruption; equipped and empty bonus texts restore');
 console.log(`PASS Giant Dwarf compiled intro regressions (${scriptCount} scripts loaded; no live renderer)`);
 process.exit(0);
