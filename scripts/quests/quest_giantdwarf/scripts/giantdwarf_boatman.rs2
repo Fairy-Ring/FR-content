@@ -148,12 +148,12 @@ p_telejump(0_44_159_40_18); // 2856,10194 behind the bridge aerial
 cam_moveto(0_44_159_44_14, 620, 0, 100); // 2860,10190
 cam_lookat(0_44_159_56_6, 160, 0, 100); // 2872,10182 — river, not the palace lid
 p_delay(6);
-// CANDIDATE long-water composition: look east along the Kelda from the
-// cited water band, with a shallower pitch. Exact 377 packets are UNKNOWN.
+// CANDIDATE long-water composition: cited water band and beat-ledger h350.
+// Preserve the previous look height 140; exact 377 packets are UNKNOWN.
 p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable (probe)
 ~music_playbycoord(coord);
 cam_moveto(0_44_159_54_2, 350, 0, 100); // 2870,10178, over the Kelda
-cam_lookat(0_44_159_62_1, 220, 0, 100); // 2878,10177 — east along the Kelda
+cam_lookat(0_44_159_62_1, 140, 0, 100); // 2878,10177 — east along the Kelda
 p_delay(1);
 if_openoverlay(inter_273);
 if_sethide(inter_273:com_11, false);
