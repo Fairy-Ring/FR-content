@@ -151,7 +151,7 @@ p_delay(2);
 // eight-tile canal (o104), not east into the statue. Exact 377 packets UNKNOWN.
 p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable
 ~music_playbycoord(coord);
-cam_moveto(0_45_159_0_12, 460, 0, 100); // 2880,10188, above the canal
+cam_moveto(0_45_159_0_12, 440, 0, 100); // 2880,10188, measured 23.2-degree pitch
 cam_lookat(0_45_159_0_20, 0, 0, 100); // 2880,10196 — north between both banks
 p_delay(0);
 if_openoverlay(inter_273);

@@ -323,7 +323,7 @@ const historyTicks = [...new Set(trip.packets.filter(message => message.kind ===
   historyComponents.has(message.component)).map(message => message.tick - historyRoot.tick))];
 assert.deepEqual(historyTicks, [0, 1, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 16, 17, 18],
   'history reveals follow quantized retained transition times, without accumulated rounding');
-const canal = trip.packets.find(message => message.kind === 'CamMoveTo' && message.height === 460);
+const canal = trip.packets.find(message => message.kind === 'CamMoveTo' && message.height === 440);
 const statue = trip.packets.find(message => message.kind === 'CamMoveTo' && message.height === 1340);
 assert(canal && statue, 'both measured candidate camera corrections are sent');
 const lookAt = move => trip.packets.find(message => message.kind === 'CamLookAt' && message.tick === move.tick);
