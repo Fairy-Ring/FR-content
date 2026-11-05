@@ -69,7 +69,7 @@ if_settab(null, 11);
 if_settab(null, 12);
 // fade BEFORE any tele — opaque first. Shop floor is L0; Consortium is L1.
 if_openoverlay(fade_to_black);
-p_delay(3);
+p_delay(1); // two intervals: original fade reaches its opaque final frame
 // CANDIDATE roof-on shot from the 2014/377 tile study: stay south of
 // RemoveRoof at z10186 and look north through the colonnade. The later
 // roofs-off composition is not the 377 target; the south-rail busts are absent.
@@ -77,10 +77,9 @@ p_telejump(1_44_159_44_10); // 2860,10186 L1 — west of the cam
 ~music_playbycoord(coord);
 cam_moveto(1_44_159_56_6, 400, 0, 100); // 2872,10182 L1, roof-on candidate
 cam_lookat(1_44_159_56_24, 50, 0, 100); // 2872,10200 L1, through the colonnade
-p_delay(2);
+p_delay(0);
 if_openoverlay(null);
-// 2:30 — KELDAGRIM model-letter card over the live 3D scene.
-// Title holds 4/14/8 remain CANDIDATE (2014 pacing, not 377 packet evidence).
+// CANDIDATE 2014 t005-t010: 2.5s title, quantized to four 600ms intervals.
 if_openoverlay(inter_273);
 if_sethide(inter_273:com_10, false);
 if_sethide(inter_273:com_11, true);
@@ -89,85 +88,85 @@ if_sethide(inter_273:com_13, true);
 if_sethide(inter_273:com_14, true);
 if_sethide(inter_273:com_15, true);
 if_sethide(inter_273:com_16, true);
-p_delay(4);
+p_delay(3);
 if_sethide(inter_273:com_10, true);
 if_openoverlay(null);
-p_delay(1); // t010 — title off one beat, history starts t011
-// 2:35-3:00 — history stanzas on inter_235 (b12, packed Alvis lines).
+p_delay(0); // t010 — one interval before history starts at t011
+// History stanzas on inter_235 (b12, original packed Alvis wording).
 // 2014 t011-t032: lines ADD one at a time, then the OLDEST drops (slide).
-// Never more than 4 up. Delays are inherited candidates, not measured 377 time.
+// Quantize the retained t011-t034 transitions, not each 0.5s gap independently.
 if_openoverlay(inter_235);
 if_sethide(inter_235:com_0, false); // t011 — "Five hundred years..."
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_1, false); // t012-t014 — +"saviour of Keldagrim..."
-p_delay(3);
-if_sethide(inter_235:com_0, true); // t015 — com_1 only
 p_delay(1);
+if_sethide(inter_235:com_0, true); // t015 — com_1 only
+p_delay(0);
 if_sethide(inter_235:com_1, true); // t016 — "Founder of the Consortium..."
 if_sethide(inter_235:com_2, false);
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_3, false); // t017 — +"...serve the monarchy..."
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_4, false); // t018-t020 — +"to serve the Consortium."
-p_delay(3);
-if_sethide(inter_235:com_2, true); // t021 — com_3+4
 p_delay(1);
+if_sethide(inter_235:com_2, true); // t021 — com_3+4
+p_delay(0);
 if_sethide(inter_235:com_3, true); // t022 — none
 if_sethide(inter_235:com_4, true);
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_5, false); // t023 — "By the time of his death..."
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_6, false); // t024 — +"By now, the Kings..."
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_7, false); // t025 — +"with only the statue..."
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_8, false); // t026-t029 — +"old days." (4 up)
-p_delay(4);
+p_delay(2);
 if_sethide(inter_235:com_5, true); // t030 — com_6-8
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_6, true); // t031 — com_8 only
 if_sethide(inter_235:com_7, true);
-p_delay(1);
+p_delay(0);
 if_sethide(inter_235:com_8, true); // t032 — none
-p_delay(2);
+p_delay(0);
 if_openoverlay(null); // 235 closed — aerials need overlay null
-// 3:10-3:20 — aerials. hei 900/850 = square roof lids (sx4a7s6 air01).
-// hei < 800; look at streets / river, not down onto a rooftop.
+// CANDIDATE t034-t045 montage span: three existing static aerials, 5.4s total.
+// Missing moving shots, steamer and interior cuts remain open questions.
 p_telejump(0_44_159_40_18); // 2856,10194 behind the west aerial
 ~music_playbycoord(coord);
 cam_moveto(0_44_159_24_20, 620, 0, 100); // 2840,10196 — west, under the lid
 cam_lookat(0_44_159_16_28, 180, 0, 100); // 2832,10204 — street / furnace, not the tiles
-p_delay(5);
+p_delay(2);
 p_telejump(0_44_159_46_4); // 2862,10180 — behind the Kelda aerial
 ~music_playbycoord(coord);
 cam_moveto(0_44_159_48_2, 620, 0, 100); // 2864,10178 — Kelda, hei < 800
 cam_lookat(0_44_159_62_1, 220, 0, 100); // 2878,10177 — river mouth / statue
-p_delay(5);
+p_delay(2);
 p_telejump(0_44_159_40_18); // 2856,10194 behind the bridge aerial
 ~music_playbycoord(coord);
 cam_moveto(0_44_159_44_14, 620, 0, 100); // 2860,10190
 cam_lookat(0_44_159_56_6, 160, 0, 100); // 2872,10182 — river, not the palace lid
-p_delay(6);
-// CANDIDATE long-water composition: cited water band and beat-ledger h350.
-// Preserve the previous look height 140; exact 377 packets are UNKNOWN.
-p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable (probe)
+p_delay(2);
+// CANDIDATE t046: measured bank convergence, looking north along the actual
+// eight-tile canal (o104), not east into the statue. Exact 377 packets UNKNOWN.
+p_telejump(0_44_159_46_4); // 2862,10180 L0 — bank, walkable
 ~music_playbycoord(coord);
-cam_moveto(0_44_159_54_2, 350, 0, 100); // 2870,10178, over the Kelda
-cam_lookat(0_44_159_62_1, 140, 0, 100); // 2878,10177 — east along the Kelda
-p_delay(1);
+cam_moveto(0_45_159_0_12, 460, 0, 100); // 2880,10188, above the canal
+cam_lookat(0_45_159_0_20, 0, 0, 100); // 2880,10196 — north between both banks
+p_delay(0);
 if_openoverlay(inter_273);
 if_sethide(inter_273:com_11, false);
-p_delay(14);
+p_delay(3); // t046-t051: approximately 2.5s, four intervals
 if_sethide(inter_273:com_11, true);
 if_openoverlay(null);
-// CANDIDATE steep plinth pullback: use the cited water tile to fit the stack,
-// not a near-face crop. Exact original climb and moving pullback are UNKNOWN.
-cam_moveto(0_44_159_58_4, 680, 0, 100); // 2874,10180, back from the plinth
-cam_lookat(0_44_159_62_1, 200, 0, 100); // 2878,10177, down the built stack
-p_delay(2);
+// CANDIDATE t070 plinth-corner fit, pulled back to include the whole 377 stack.
+// This static wide shot does not reconstruct the unresolved moving climb.
+cam_moveto(0_44_158_58_56, 1340, 0, 100); // 2874,10168, terrain-relative height
+cam_lookat(0_45_159_0_3, 120, 0, 100); // 2880,10179 — centre of the 4x4 plinth
+p_delay(4); // t051-t057: retain the measured 3s pre-title window, without motion
 if_openoverlay(inter_273);
 if_sethide(inter_273:com_12, false);
-p_delay(8);
+p_delay(14); // t057-t075: nine-second title window
 if_sethide(inter_273:com_12, true);
 if_openoverlay(null);
 // Map alone first. Initialize the original sequence before revealing it:
@@ -205,26 +204,38 @@ if_close; // chat only; overlay 234 stays
 p_delay(2);
 // 2014 t118: black transition before the dock. Candidate fade placement.
 if_openoverlay(fade_to_black);
-p_delay(2);
+p_delay(1); // two intervals keep the original fade opaque before teleport
 // dock — cutscene berserkers appear, then the arrest
 %giantdwarf_cutscene_guard_visible = 1;
 p_telejump(0_45_159_9_49); // 2889,10225 L0 — dock stand next to both berserkers
-p_delay(3);
+// Stage only the two existing actors while black. Their six-tile search covers
+// original wander range 5 around both posts. The NPC-owned queue releases them
+// even if this player's script stops; shared movement config stays untouched.
+def_int $guard_post = 0;
+npc_findall(0_45_159_10_49, dwarf_city_berserker_cutscene_multi, 6, 0);
+while (npc_findnext = true) {
+    npc_setmode(none);
+    npc_telejump(movecoord(0_45_159_10_48, 0, 0, multiply($guard_post, 2)));
+    npc_facesquare(0_45_159_9_49);
+    npc_queue(4, 0, 7);
+    $guard_post = add($guard_post, 1);
+}
+p_delay(2);
 ~music_playbycoord(coord); // east = Tale of Keldagrim (intro-end unlock via proc)
 cam_moveto(0_45_159_5_49, 380, 0, 100); // 2885,10225 — raise + back, planks out
 cam_lookat(0_45_159_10_49, 220, 0, 100); // 2890,10225 — guards 2231 in frame
 if_openoverlay(null);
-// 4:10-4:25 — dock 3D, high cam, two 2231 + player. 2014 t120-t122: the
-// footage shows guards on the pier and "Halt!" ABOVE them (npc_say overhead).
+// 2014 t120-t122: "Halt!" is above the guards on the pier. Keep both posts in
+// view for this shout only, not stationary throughout the arrest or normal play.
 // One nearest guard speaks here, not the footage's repeated/both-guard shouts.
-if (npc_find(0_45_159_10_49, dwarf_city_berserker_cutscene_multi, 3, 0) = true) {
+if (npc_find(0_45_159_10_49, dwarf_city_berserker_cutscene_multi, 2, 0) = true) {
     npc_say("Halt!");
 }
 p_delay(2); // overhead holds ~1.5s, then the chat line
 split_init("<p,angry>Halt! By order of the Black Guard, you are under arrest!", 380, 4, q8_full);
-~giantdwarf_timed_npcchat("Black Guard Berserker", dwarf_city_berserker_cutscene, 8); // t123-t131 ≈ 4.5s
+~giantdwarf_timed_npcchat("Black Guard Berserker", dwarf_city_berserker_cutscene, 6); // t123-t132 ≈ 4.5s
 split_init("<p,shock>What?? I didn't do anything! It wasn't me!", 380, 4, q8_full);
-~giantdwarf_timed_playerchat(8); // t132-t140 ≈ 4.5s
+~giantdwarf_timed_playerchat(6); // t132-t141 ≈ 4.5s
 split_init("<p,neutral>Come with us, human! Commander Veldaban wants a word with you!", 380, 4, q8_full);
 ~giantdwarf_timed_npcchat("Black Guard Berserker", dwarf_city_berserker_cutscene, 8); // t141+ ≈ 5s
 // HQ — fade covers the dock BEFORE tele/reset (no warp into HQ)
@@ -236,6 +247,7 @@ p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
 cam_reset();
 minimap_toggle(0);
 ~initalltabs;
+~update_bonuses; // reopening wornitems restores packed defaults until refreshed
 p_delay(2);
 if_openoverlay(null);
 ~music_playbycoord(coord); // HQ = west, back to Land
@@ -279,6 +291,10 @@ if ($help = 2) {
 ~chatplayer("<p,neutral>I'll see what I can do.");
 %giantdwarf_veldaban_introduced = 1;
 %giantdwarf_quest = 2;
+
+// A bounded actor hold, not a type-global freeze. It outlives player interruption.
+[ai_queue4,dwarf_city_berserker_cutscene_multi]
+npc_setmode(null);
 
 // The original 377 no-Continue family has NPC heads on the left and player
 // heads on the right. Fill each root before opening it, as chatnpc_page does.
