@@ -222,16 +222,15 @@ const guardId = id('npc', 'dwarf_city_berserker_cutscene_multi');
 assert.equal(guardId, 2231);
 const guardType = NpcType.get(guardId);
 assert.equal(guardType.multinpc[1], id('npc', 'dwarf_city_berserker_cutscene'));
-assert.equal(guardType.wanderrange, 0);
-assert.equal(guardType.moverestrict, MoveRestrict.NOMOVE);
-assert.equal(guardType.defaultmode, NpcMode.NONE);
+assert.equal(guardType.wanderrange, 5, 'shared guards retain their original wandering range');
+assert.equal(guardType.moverestrict, MoveRestrict.NORMAL, 'no type-global cutscene freeze');
+assert.equal(guardType.defaultmode, NpcMode.WANDER, 'shared guards retain their original default mode');
 const guardRows = fs.readFileSync(path.join(content, 'maps/m45_159.jm2'), 'utf8')
   .split('\n').filter(line => /^0 10 (?:48|50): 2231$/.test(line));
 assert.deepEqual(guardRows, ['0 10 48: 2231', '0 10 50: 2231']);
 const guards = [10224, 10226].map((z, index) => {
   const npc = new Npc(0, 2890, z, 1, 1, EntityLifeCycle.RESPAWN, index + 1, guardId, guardType.blockwalk);
   World.addNpc(npc, -1);
-  assert.equal(npc.updateMovement(), false, 'the packed base refuses movement');
   return npc;
 });
 const trip = player();
@@ -242,22 +241,27 @@ for (let turns = 0; result === ScriptState.SUSPENDED; turns++) {
   assert(turns < 100, 'cutscene must reach the real Veldaban prompt');
   trip.encodeOut();
   const resumeTick = trip.delayedUntil;
-  while (World.currentTick < resumeTick) {
-    World.currentTick++;
-    for (const npc of guards) npc.turn();
-  }
+  // Map-position fixtures test lookup, not live wandering or stationary staging.
+  World.currentTick = resumeTick;
   trip.delayed = false;
   result = trip.runScript(intro, true, true);
 }
 trip.encodeOut();
 assert.equal(result, ScriptState.PAUSEBUTTON, 'full compiled intro reaches the interactive Veldaban briefing');
 assert(guards.some(npc => npc.sayMessage === 'Halt!'), 'real npc_find selects the spawned base and sends overhead speech');
-assert.deepEqual(guards.map(npc => [npc.x, npc.z]), [[2890, 10224], [2890, 10226]], 'real NPC turns retain both map posts through the trip');
 assertNoVisibleDefaults(trip.packets);
 const mapOpen = trip.packets.find(message => message.kind === 'IfOpenOverlay' && message.component === id('interface', 'inter_234'));
 const both = trip.packets.find(message => message.kind === 'IfOpenChat' && message.component === id('interface', 'inter_274'));
 assert(mapOpen && both);
 assert.equal(both.tick - mapOpen.tick, 24, 'Both opens 14.4 s after map open at the canonical 600 ms tick');
+const approachPages = trip.packets.filter(message => message.kind === 'IfOpenChat' && message.tick >= mapOpen.tick && message.tick <= both.tick);
+assert.equal(approachPages.length, 5, 'four approach pages followed by Both');
+assert.equal(approachPages[0].tick - mapOpen.tick, 1, 'one 600 ms map lead-in interval');
+assert.deepEqual(approachPages.slice(1).map((message, index) => message.tick - approachPages[index].tick),
+  [7, 7, 4, 5], '10-fps footage measurements map to the real compiled page suspensions');
+const firstFade = trip.packets.find(message => message.kind === 'IfOpenOverlay' && message.component === id('interface', 'fade_to_black'));
+const firstTitle = trip.packets.find(message => message.kind === 'IfOpenOverlay' && message.component === id('interface', 'inter_273'));
+console.log(`OK compiled cutscene intervals to Veldaban prompt: initial close ${World.currentTick - trip.packets[0].tick}, first fade ${World.currentTick - firstFade.tick}, first title ${World.currentTick - firstTitle.tick}; title-to-map ${mapOpen.tick - firstTitle.tick}`);
 const miniatureMessages = trip.packets.filter(message => message.kind === 'IfSetAnim' && message.component === id('interface', 'inter_234:com_3'));
 assert.deepEqual(miniatureMessages.map(message => message.seq), [-1, id('seq', 'mini_statue_explodes')]);
 assert(miniatureMessages.every(message => message.tick === mapOpen.tick), 'initialize before map reveal; never restart/rewind at Both');

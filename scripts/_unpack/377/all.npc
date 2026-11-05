@@ -51621,10 +51621,6 @@ readyanim=dwarf_ready
 vislevel=hide
 multivar=giantdwarf_cutscene_guard_visible
 multinpc=1,dwarf_city_berserker_cutscene
-// Map multi parent owns movement; keep this cutscene shell at its packed dock spawn.
-moverestrict=nomove
-wanderrange=0
-defaultmode=none
 
 [dwarf_city_berserker_cutscene]
 name=Black Guard Berserker

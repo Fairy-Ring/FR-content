@@ -176,17 +176,17 @@ if_openoverlay(null);
 if_setanim(inter_234:com_3, null);
 if_setanim(inter_234:com_3, mini_statue_explodes);
 if_openoverlay(inter_234);
-p_delay(2);
-// CANDIDATE 2014 holds, quantized at 600 ms: 3.6 / 4.2 / 1.8 / 3.0 s.
-// p_delay(n) resumes at n+1 ticks. Both therefore opens 14.4 s after map open,
-// before native impact. Keep each chat open until its replacement is prepared:
+p_delay(0);
+// CANDIDATE 10-fps 2014 measurements: 4.2 / 4.2 / 2.4 / 3.0 s.
+// p_delay(n) resumes at n+1 ticks. One lead-in tick plus 7/7/4/5 page ticks
+// puts Both at 14.4 s, before native impact. Keep each chat open until prepared:
 // closing between pages would unload same-root writes when the next chat opens.
 split_init("<p,neutral>Look, there's the statue of King Alvis, guarding the entrance to Keldagrim!", 380, 4, q8_full);
-~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 5);
+~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 6);
 split_init("<p,happy>Amazing! And we're going to go straight past it?", 380, 4, q8_full);
 ~giantdwarf_timed_playerchat(6);
 split_init("<p,happy>That's right!", 380, 4, q8_full);
-~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 2);
+~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 3);
 split_init("<p,angry>Er, hold on! There's something wrong!", 380, 4, q8_full);
 ~giantdwarf_timed_npcchat("Dwarven Boatman", dwarf_city_boatman_mines_prequest, 4);
 // Prepare both heads before revealing the packed Both/Argh card. No IF_CLOSE
@@ -215,8 +215,8 @@ cam_moveto(0_45_159_5_49, 380, 0, 100); // 2885,10225 — raise + back, planks o
 cam_lookat(0_45_159_10_49, 220, 0, 100); // 2890,10225 — guards 2231 in frame
 if_openoverlay(null);
 // 4:10-4:25 — dock 3D, high cam, two 2231 + player. 2014 t120-t122: the
-// guards are at their posts and "Halt!" floats ABOVE them (npc_say overhead),
-// THEN the arrest chat (t123). Force-timed like the map.
+// footage shows guards on the pier and "Halt!" ABOVE them (npc_say overhead).
+// One nearest guard speaks here, not the footage's repeated/both-guard shouts.
 if (npc_find(0_45_159_10_49, dwarf_city_berserker_cutscene_multi, 3, 0) = true) {
     npc_say("Halt!");
 }
