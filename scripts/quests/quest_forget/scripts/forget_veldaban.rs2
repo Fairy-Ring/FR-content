@@ -6,6 +6,12 @@
 // Cite red-19-start-impl-377.md §8.
 
 [opnpc1,dwarf_city_black_guard_leader]
+// CANDIDATE: unfinished GD briefing takes precedence after an interrupted trip.
+// Keep Forget's existing conversation outside this exact durable state.
+if (%giantdwarf_quest = 1 & %giantdwarf_veldaban_introduced = 0) {
+    ~giantdwarf_veldaban_intro;
+    return;
+}
 ~chatnpc("<p,neutral><displayname>! Have you heard?");
 ~chatnpc("<p,neutral>It's the Red Axe!");
 ~chatnpc("<p,neutral>They've left the city!");

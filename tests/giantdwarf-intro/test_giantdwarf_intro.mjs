@@ -15,6 +15,7 @@ const eng = rel => import(pathToFileURL(path.join(engine, 'src', rel)).href);
 const { default: World } = await eng('engine/World.ts');
 const { NetworkPlayer } = await eng('engine/entity/NetworkPlayer.ts');
 const { CoordGrid } = await eng('engine/CoordGrid.ts');
+const { allocateIfAbsent } = await eng('engine/routefinder/index.ts');
 const { default: Npc } = await eng('engine/entity/Npc.ts');
 const { EntityLifeCycle } = await eng('engine/entity/EntityLifeCycle.ts');
 const { MoveRestrict } = await eng('engine/entity/MoveRestrict.ts');
@@ -40,12 +41,18 @@ const { default: ScriptProvider } = await eng('engine/script/ScriptProvider.ts')
 const { default: ScriptRunner } = await eng('engine/script/ScriptRunner.ts');
 const { default: ScriptState } = await eng('engine/script/ScriptState.ts');
 const { ScriptOpcode } = await eng('engine/script/ScriptOpcode.ts');
+const { default: IfButton } = await eng('network/game/client/model/IfButton.ts');
+const { default: IfButtonHandler } = await eng('network/game/client/handler/IfButtonHandler.ts');
 
 for (const type of [VarPlayerType, VarBitType, VarNpcType, NpcType, SeqType, InvType, FontType, MesanimType, Component, DbRowType, DbTableType, EnumType, ObjType, ParamType]) type.load(pack);
 DbTableIndex.init();
 const scriptCount = ScriptProvider.load(pack);
 assert(scriptCount > 0, 'full compiled script pack is required');
 World.currentTick = 1;
+// Allocate only the scripted destination zones for transport-free teleport tests.
+// This is not a full terrain/collision or walkability proof.
+for (const [x, z, level] of [[2860, 10186, 1], [2856, 10194, 0], [2862, 10180, 0],
+  [2889, 10225, 0], [2827, 10215, 0]]) allocateIfAbsent(x, z, level);
 
 function id(kind, name) {
   const row = fs.readFileSync(path.join(content, `pack/${kind}.pack`), 'utf8')
@@ -54,9 +61,10 @@ function id(kind, name) {
   return Number(row.slice(0, row.indexOf('=')));
 }
 
-function player() {
+function player(saved = null) {
   // A transport-free fixture: use the real output phase but capture its messages.
-  const p = new NetworkPlayer('gd_unit', 0n, 0n, { uuid: 'offline-gd-fixture' });
+  const p = saved ? PlayerLoading.load('gd_unit', new Packet(saved), null) :
+    new NetworkPlayer('gd_unit', 0n, 0n, { uuid: 'offline-gd-fixture' });
   p.uid = 1;
   p.pid = 1;
   p.packets = [];
@@ -260,6 +268,8 @@ function runIntro(equipment = [], interruptAtDock = false) {
     assert.equal(npc.targetOp, NpcMode.WANDER);
   });
   const trip = player();
+  trip.positions = [];
+  trip.tabs[10] = id('interface', 'logout'); // ordinary login tab remains during the scene
   for (const name of equipment) {
     const obj = ObjType.get(id('obj', name));
     trip.invSet(id('inv', 'worn'), obj.id, 1, obj.wearpos);
@@ -321,6 +331,7 @@ function runIntro(equipment = [], interruptAtDock = false) {
         ({ x: npc.x, z: npc.z, waypoint: CoordGrid.unpackCoord(npc.waypoints[npc.waypointIndex]) })))}`);
     }
     result = trip.runScript(intro, true, true);
+    trip.positions.push({ tick: World.currentTick, x: trip.x, z: trip.z, level: trip.level });
     if (staging) {
       assert(guards.every(npc => npc.targetOp === NpcMode.NONE), 'this resume must execute compiled dock staging');
       stagedTick = World.currentTick;
@@ -373,6 +384,17 @@ console.log(`OK compiled cutscene intervals to Veldaban prompt: initial close ${
 assert.equal(World.currentTick - firstFade.tick, 141, 'candidate first-fade-to-prompt schedule is 84.6s versus footage 84.3s');
 assert.equal(firstTitle.tick - firstFade.tick, 10, 'first title follows first fade by 6.0s, not fade-in by 1.8s');
 assert.equal(mapOpen.tick - firstTitle.tick, 58, 'measured first-title-to-map span is 34.8s');
+const fadePackets = trip.packets.filter(message => message.kind === 'IfOpenOverlay' &&
+  message.component === id('interface', 'fade_to_black'));
+assert.equal(fadePackets.length, 3);
+for (const [index, [x, z, level]] of [[2860, 10186, 1], [2889, 10225, 0], [2827, 10215, 0]].entries()) {
+  const arrival = trip.positions.find(position => position.x === x && position.z === z && position.level === level);
+  assert(arrival, `compiled teleport ${index} reaches its actual destination`);
+  assert.equal(arrival.tick - fadePackets[index].tick, 3,
+    `teleport ${index} waits 1.8s, beyond the observed 1.34–1.44s client fade`);
+}
+assert(!trip.packets.some(message => message.text === 'Invalid teleport!'));
+console.log('OK all three real teleport destinations follow fade start by three 600ms intervals; opening and total durations unchanged');
 const titleLayers = [10, 11, 12].map(n => trip.packets.find(message =>
   message.kind === 'IfSetHide' && message.component === id('interface', `inter_273:com_${n}`) && !message.hidden));
 for (const [index, layer] of titleLayers.entries()) {
@@ -430,10 +452,78 @@ function assertRestoredBonuses(trip, items) {
   }
 }
 assertRestoredBonuses(trip, equipment);
+
+// D1: abandon the actual first briefing, save/load, then Talk-to the map type.
+// No quest repair writes and no direct briefing-proc call after the save.
+const veldabanId = id('npc', 'dwarf_city_black_guard_leader');
+const veldaban = new Npc(0, 2826, 10215, 1, 1, EntityLifeCycle.RESPAWN, 3, veldabanId, NpcType.get(veldabanId).blockwalk);
+World.addNpc(veldaban, -1);
+function talkVeldaban(p) {
+  const script = ScriptProvider.getByName('[opnpc1,dwarf_city_black_guard_leader]');
+  const state = ScriptRunner.init(script, p, veldaban);
+  const result = p.runScript(state, true, true);
+  assert.equal(result, ScriptState.PAUSEBUTTON);
+  return state;
+}
+function finishBriefing(p, state, accept) {
+  for (let pauses = 0; pauses < 40; pauses++) {
+    if (p.modalChat === id('interface', 'multi2')) {
+      p.lastCom = id('interface', `multi2:com_${accept ? 1 : 2}`);
+    }
+    const result = p.runScript(state, true, true);
+    if (result === ScriptState.FINISHED) return;
+    assert.equal(result, ScriptState.PAUSEBUTTON, 'briefing only waits for normal dialogue input');
+  }
+  assert.fail('briefing must finish within its known dialogue length');
+}
+const recovered = player(trip.save());
+assert.deepEqual([trip.x, trip.z, trip.level], [2827, 10215, 0], 'compiled first prompt is at HQ before save');
+assert.equal(recovered.getVarBit(id('varbit', 'giantdwarf_quest')), 1);
+assert.equal(recovered.getVarBit(id('varbit', 'giantdwarf_veldaban_introduced')), 0);
+assert.equal(recovered.getVarBit(id('varbit', 'giantdwarf_statue_invis')), 1);
+assert.deepEqual([recovered.x, recovered.z, recovered.level], [2827, 10215, 0]);
+let briefing = talkVeldaban(recovered);
+assert(recovered.packets.some(message => message.text === 'Identify yourself, human!'),
+  'saved interrupted first visit must reach GD briefing, not Forget');
+finishBriefing(recovered, briefing, false);
+assert.equal(recovered.getVarBit(id('varbit', 'giantdwarf_quest')), 1, 'refusal keeps briefing recoverable');
+assert.equal(recovered.getVarBit(id('varbit', 'giantdwarf_veldaban_introduced')), 0);
+// Re-save after refusal and interrupt the next briefing at its first prompt.
+const refused = player(recovered.save());
+talkVeldaban(refused);
+const retry = player(refused.save());
+briefing = talkVeldaban(retry);
+finishBriefing(retry, briefing, true);
+assert.equal(retry.getVarBit(id('varbit', 'giantdwarf_quest')), 2, 'real recovery dialogue writes progress');
+assert.equal(retry.getVarBit(id('varbit', 'giantdwarf_veldaban_introduced')), 1);
+assert.equal(retry.getVarBit(id('varbit', 'forget_quest')), 0, 'GD recovery never starts Forget');
+assert(!retry.packets.some(message => message.kind === 'CamMoveTo' || message.kind === 'CamLookAt' ||
+  message.kind === 'IfOpenOverlay'), 'HQ recovery does not replay voyage or crash');
+const completed = player(retry.save());
+assert.equal(completed.getVarBit(id('varbit', 'giantdwarf_quest')), 2);
+assert.equal(completed.getVarBit(id('varbit', 'giantdwarf_veldaban_introduced')), 1);
+for (const [stage, introduced] of [[0, 0], [1, 1], [2, 1]]) {
+  const other = player();
+  other.setVarBit(id('varbit', 'giantdwarf_quest'), stage);
+  other.setVarBit(id('varbit', 'giantdwarf_veldaban_introduced'), introduced);
+  talkVeldaban(other);
+  assert(other.packets.some(message => message.text?.includes('Have you heard?')),
+    `existing Forget dispatch outside unfinished GD state ${stage}/${introduced} is unchanged`);
+}
+console.log('OK saved HQ interruption, refusal and repeated interruption recover through real Veldaban Talk-to; acceptance persists and Forget remains unchanged outside the recovery state');
 const { trip: emptyTrip } = runIntro();
 assertRestoredBonuses(emptyTrip, []);
 const interrupted = runIntro([], true);
 assert(guards.every(npc => npc.targetOp === NpcMode.NONE));
+const logoutButton = id('interface', 'logout:try_logout');
+assert(interrupted.trip.isComponentVisible(Component.get(logoutButton)), 'logout tab is still visible');
+const packetCount = interrupted.trip.packets.length;
+assert.equal(new IfButtonHandler().handle(new IfButton(logoutButton), interrupted.trip), true,
+  'visible logout request reaches the ordinary input handler');
+assert.equal(interrupted.trip.loggingOut, false, 'delayed protected cutscene does not execute logout');
+assert.equal(interrupted.trip.packets.length, packetCount, 'blocked logout emits no UI close or message');
+assert.equal(interrupted.trip.delayed, true, 'blocked logout does not cancel the cutscene');
+console.log('OK visible logout button is accepted as input but cannot obtain protected access during dock delay (product behavior only)');
 for (let tick = 0; tick < 7; tick++) {
   World.currentTick++;
   for (const npc of guards) npc.resetEntity(false);
