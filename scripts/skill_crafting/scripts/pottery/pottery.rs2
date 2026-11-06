@@ -49,8 +49,7 @@ p_delay(1); // 2 ticks
 mes("You now have some soft workable clay.");
 
 [label,craft_pottery_interface]
-// After OSF potlid teach: leftover IF multiobj4 is 289-only / 377 commented.
-// CANDIDATE p_choice4 join. Keep ~multiobj3 below the gate.
+// After OSF potlid teach: the four-choice menu remains single-item.
 if (%onesmallfavour >= 35) {
     def_int $pick = ~p_choice4_header("Pot", 1, "Pie dish", 2, "Bowl", 3, "Pot lid", 4, "What would you like to make?");
     if ($pick = 1) {
@@ -64,17 +63,65 @@ if (%onesmallfavour >= 35) {
     }
     return;
 }
-def_namedobj $choice = ~multiobj3(
-    "What would you like to make?", 
-    pot_unfired, 0, 2, 185, "Pot", 0, 0, 
-    piedish_unfired, 0, -4, 190, "Pie Dish", 0, 0, 
-    bowl_unfired, 0, 0, 200, "Bowl", 0, 0
-);
-if ($choice = null) {
+def_namedobj $product;
+def_int $make_count;
+$product, $make_count = ~skillmulti3(pot_unfired, piedish_unfired, bowl_unfired);
+if_close;
+if ($product = null) {
     ~displaymessage(^dm_default);
     return;
 }
-@craft_pottery($choice);
+if ($make_count < 1) {
+    return;
+}
+@craft_pottery_batch($product, $make_count);
+
+[label,craft_pottery_batch](namedobj $item, int $count)
+if ($count < 1) {
+    return;
+}
+def_struct $struct = oc_param($item, crafting_pottery_struct);
+def_string $name = lowercase(oc_name($item));
+def_int $level = struct_param($struct, levelrequire);
+@process_craft_pottery($item, $struct, $name, $level, $count);
+
+[label,process_craft_pottery](namedobj $item, struct $struct, string $name, int $level, int $remaining)
+if ($remaining < 1) {
+    return;
+}
+if (stat(crafting) < $level) {
+    ~objbox($item, "You need a Crafting level of <tostring($level)> to make a <$name>.", 250, 0, divide(^objbox_height, 2));
+    return;
+}
+if (inv_total(inv, softclay) < 1) {
+    mes("You have run out of soft clay.");
+    return;
+}
+// Lost City f88816442/origin/289 uses a two-tick repeat; original 377 timing is UNKNOWN.
+sound_synth(pottery, 1, 0);
+anim(human_potterywheel, 0);
+if (%action_delay < map_clock) {
+    %action_delay = add(map_clock, 2);
+}
+weakqueue*(craft_pottery_batch_step, sub(%action_delay, map_clock))($item, $struct, $name, $level, $remaining);
+
+[queue,craft_pottery_batch_step](namedobj $item, struct $struct, string $name, int $level, int $remaining)
+if ($remaining < 1) {
+    return;
+}
+if (stat(crafting) < $level) {
+    ~objbox($item, "You need a Crafting level of <tostring($level)> to make a <$name>.", 250, 0, divide(^objbox_height, 2));
+    return;
+}
+if (inv_total(inv, softclay) < 1) {
+    mes("You have run out of soft clay.");
+    return;
+}
+@finish_craft_pottery($item, $struct, $name);
+if ($remaining > 1) {
+    %action_delay = add(map_clock, 2);
+    @process_craft_pottery($item, $struct, $name, $level, sub($remaining, 1));
+}
 
 // osrs is a weak queue that sets and checks %action_delay.
 // if %action_delay is under a certain point then it gives a roll
@@ -99,6 +146,9 @@ if (stat(crafting) < $level)
 sound_synth(pottery, 1, 0);
 anim(human_potterywheel, 0);
 p_delay(2);
+@finish_craft_pottery($item, $struct, $name);
+
+[label,finish_craft_pottery](namedobj $item, struct $struct, string $name)
 inv_del(inv, softclay, 1);
 inv_add(inv, $item, 1);
 stat_advance(crafting, struct_param($struct, processexp));
