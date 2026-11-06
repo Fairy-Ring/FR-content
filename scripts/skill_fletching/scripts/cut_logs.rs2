@@ -43,28 +43,23 @@ def_namedobj $obj2;
 def_namedobj $obj3;
 $obj2, $obj3 = db_getfield($data, fletch_bow_table:objchoices, 0);
 def_namedobj $product;
-// guess based off 2004
+def_int $make_count;
+// CANDIDATE for fletching: 377 skillmulti2/3 offer Make 1/5/10/X, not Make All.
+// Product set: Tip.It guide captured 2006-05-01; no later crossbow stocks.
 if ($shaft_count < 1) {
-    $product = ~multiobj2("What would you like to make?", 
-        $obj2, 0, -15, 175, "<~string_removeright(oc_name($log), 5)> Short Bow.", 0, 0,
-        $obj3, 0, -15, 175, "<~string_removeright(oc_name($log), 5)> Long Bow.", 0, 0
-    );
+    $product, $make_count = ~skillmulti2($obj2, $obj3);
 } else {
-    // 2004
-    $product = ~multiobj3_close("What would you like to make?", 
-        $obj1, 175, "Arrow Shafts.",
-        $obj2, 175, "Short Bow.",
-        $obj3, 175, "Long Bow."
-    );
+    $product, $make_count = ~skillmulti3($obj1, $obj2, $obj3);
 }
-if ($product = null) {
-    ~displaymessage(^dm_default);
+if_close;
+if ($product = null | $make_count < 1) {
     return;
 }
 def_int $level = 1;
 // default to shafts
 def_int $count = 1;
-def_int $fletching_experience = multiply($shaft_count, 5);
+// VERIFIED: the May 2006 Tip.It table gives 5 XP per set of 15 shafts.
+def_int $fletching_experience = 50;
 def_string $message;
 // 2005-osrs, rsc
 if ($product = $obj2) {
@@ -76,15 +71,27 @@ if ($product = $obj2) {
 } else {
     $message = "You carefully cut the wood into <tostring($shaft_count)> arrow shafts.";
     $count = $shaft_count;
-    $fletching_experience = multiply($shaft_count, 5);
+}
+@fletch_log_make($log, $product, $level, $fletching_experience, $count, $message, $make_count);
+
+[queue,fletch_log_make](obj $log, namedobj $product, int $level, int $experience, int $count, string $message, int $remaining)
+@fletch_log_make($log, $product, $level, $experience, $count, $message, $remaining);
+
+[label,fletch_log_make](obj $log, namedobj $product, int $level, int $experience, int $count, string $message, int $remaining)
+if ($remaining < 1 | inv_total(inv, $log) < 1 | inv_total(inv, knife) < 1) {
+    return;
 }
 if (stat(fletching) < $level) {
     // osrs has a level 1 fail message for arrow shafts but i doubt 2004 used it
     ~doubleobjbox($log, $product, "You need a Fletching level of at least <tostring($level)> to make <~add_article(lowercase(oc_name($product)))>.", 200);
     return;
 }
-// make one bow at a time
+anim(human_fletching, 0);
 inv_del(inv, $log, 1);
 mes($message);
-stat_advance(fletching, $fletching_experience);
+stat_advance(fletching, $experience);
 inv_add(inv, $product, $count);
+if ($remaining > 1) {
+    // CANDIDATE cadence: three ticks per log; weak queue permits interruption.
+    weakqueue*(fletch_log_make, 2)($log, $product, $level, $experience, $count, $message, sub($remaining, 1));
+}

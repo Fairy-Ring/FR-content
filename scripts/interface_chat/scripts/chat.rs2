@@ -640,53 +640,51 @@ switch_component (last_com) {
 }
 
 [proc,multiobj3](string $title, namedobj $obj1, int $x1, int $y1, int $scale1, string $string1, int $sx1, int $sy1, namedobj $obj2, int $x2, int $y2, int $scale2, string $string2, int $sx2, int $sy2, namedobj $obj3, int $x3, int $y3, int $scale3, string $string3, int $sx3, int $sy3)(namedobj)
-// // reset any positions out of place
-// if_setposition(multiobj3:com_2, $x1, $y1);
-// if_setposition(multiobj3:com_3, $x2, $y2);
-// if_setposition(multiobj3:com_4, $x3, $y3);
-// if_setposition(multiobj3:com_5, $sx1, $sy1);
-// if_setposition(multiobj3:com_6, $sx2, $sy2);
-// if_setposition(multiobj3:com_7, $sx3, $sy3);
+// 377 replaced the 289 three-object interfaces with skillmulti3.
+// These callers select one product, so expose only its Make 1 layer.
+~skillmulti3_setup($obj1, $obj2, $obj3);
+if_settext(skillmulti3:com_17, $title);
+if_setposition(skillmulti3:com_2, $x1, $y1);
+if_setposition(skillmulti3:com_3, $x2, $y2);
+if_setposition(skillmulti3:com_4, $x3, $y3);
+if_setobject(skillmulti3:com_2, $obj1, $scale1);
+if_setobject(skillmulti3:com_3, $obj2, $scale2);
+if_setobject(skillmulti3:com_4, $obj3, $scale3);
+if_setposition(skillmulti3:com_8, $sx1, $sy1);
+if_setposition(skillmulti3:com_12, $sx2, $sy2);
+if_setposition(skillmulti3:com_16, $sx3, $sy3);
+if_settext(skillmulti3:com_8, $string1);
+if_settext(skillmulti3:com_12, $string2);
+if_settext(skillmulti3:com_16, $string3);
+if_sethide(skillmulti3:com_5, true);
+if_sethide(skillmulti3:com_6, true);
+if_sethide(skillmulti3:com_7, true);
+if_sethide(skillmulti3:com_9, true);
+if_sethide(skillmulti3:com_10, true);
+if_sethide(skillmulti3:com_11, true);
+if_sethide(skillmulti3:com_13, true);
+if_sethide(skillmulti3:com_14, true);
+if_sethide(skillmulti3:com_15, true);
+if_openchat(skillmulti3);
+if_addresumebutton(skillmulti3:com_8);
+if_addresumebutton(skillmulti3:com_12);
+if_addresumebutton(skillmulti3:com_16);
+p_pausebutton;
 
-// if_settext(multiobj3:com_8, $title);
-// if_setobject(multiobj3:com_2, $obj1, $scale1);
-// if_settext(multiobj3:com_5, $string1);
-// if_setobject(multiobj3:com_3, $obj2, $scale2);
-// if_settext(multiobj3:com_6, $string2);
-// if_setobject(multiobj3:com_4, $obj3, $scale3);
-// if_settext(multiobj3:com_7, $string3);
-// if_openchat(multiobj3);
+switch_component (last_com) {
+    case skillmulti3:com_8 : return($obj1);
+    case skillmulti3:com_12 : return($obj2);
+    case skillmulti3:com_16 : return($obj3);
+    case default : return(null);
+}
 
-// if_setresumebuttons(multiobj3:com_2, multiobj3:com_3, multiobj3:com_4, null, null);
-// p_pausebutton;
-
-// switch_component (last_com) {
-//     case multiobj3:com_2 : return($obj1);
-//     case multiobj3:com_3 : return($obj2);
-//     case multiobj3:com_4 : return($obj3);
-//     case default : return(null);
-// }
-
-// [if_button,multiobj3_close:com_8] if_close;
 [proc,multiobj3_close](string $title, namedobj $obj1, int $scale1, string $string1, namedobj $obj2, int $scale2, string $string2, namedobj $obj3, int $scale3, string $string3)(namedobj)
-// if_settext(multiobj3_close:com_7, $title);
-// if_setobject(multiobj3_close:com_1, $obj1, $scale1);
-// if_settext(multiobj3_close:com_4, $string1);
-// if_setobject(multiobj3_close:com_2, $obj2, $scale2);
-// if_settext(multiobj3_close:com_5, $string2);
-// if_setobject(multiobj3_close:com_3, $obj3, $scale3);
-// if_settext(multiobj3_close:com_6, $string3);
-// if_openchat(multiobj3_close);
-
-// if_setresumebuttons(multiobj3_close:com_1, multiobj3_close:com_2, multiobj3_close:com_3, null, null);
-// p_pausebutton;
-
-// switch_component (last_com) {
-//     case multiobj3_close:com_1 : return($obj1);
-//     case multiobj3_close:com_2 : return($obj2);
-//     case multiobj3_close:com_3 : return($obj3);
-//     case default : return(null);
-// }
+// The old close-button interface is absent in 377; use its product-choice successor.
+return(~multiobj3($title,
+    $obj1, 0, 0, $scale1, $string1, 0, 0,
+    $obj2, 0, 0, $scale2, $string2, 0, 0,
+    $obj3, 0, 0, $scale3, $string3, 0, 0
+));
 
 // [proc,multiobj4](string $title, namedobj $obj1, int $x1, int $y1, int $scale1, string $string1, int $sx1, int $sy1, namedobj $obj2, int $x2, int $y2, int $scale2, string $string2, int $sx2, int $sy2, namedobj $obj3, int $x3, int $y3, int $scale3, string $string3, int $sx3, int $sy3, namedobj $obj4, int $x4, int $y4, int $scale4, string $string4, int $sx4, int $sy4)(namedobj)
 // // reset any positions out of place
@@ -722,7 +720,7 @@ switch_component (last_com) {
 // }
 
 
-// Used for make-x interfaces. Only skillmulti1 works for now until we figure out a good resumebutton solution.
+// Make-X interfaces register every overlapping option layer before pausing.
 
 [proc,skillmulti1](namedobj $obj1)(namedobj, int)
 if_openchat(skillmulti1);
@@ -745,10 +743,19 @@ switch_component (last_com) {
 }
 
 [proc,skillmulti2](namedobj $obj1, namedobj $obj2)(namedobj, int)
-if_openchat(skillmulti2);
 if_setobject(skillmulti2:com_2, $obj1, 200);
 if_setobject(skillmulti2:com_3, $obj2, 200);
-
+if_settext(skillmulti2:com_7, "\\n\\n\\n\\n<oc_name($obj1)>");
+if_settext(skillmulti2:com_11, "\\n\\n\\n\\n<oc_name($obj2)>");
+if_openchat(skillmulti2);
+if_addresumebutton(skillmulti2:com_4);
+if_addresumebutton(skillmulti2:com_5);
+if_addresumebutton(skillmulti2:com_6);
+if_addresumebutton(skillmulti2:com_7);
+if_addresumebutton(skillmulti2:com_8);
+if_addresumebutton(skillmulti2:com_9);
+if_addresumebutton(skillmulti2:com_10);
+if_addresumebutton(skillmulti2:com_11);
 p_pausebutton;
 
 switch_component (last_com) {
@@ -768,11 +775,20 @@ switch_component (last_com) {
 }
 
 [proc,skillmulti3](namedobj $obj1, namedobj $obj2, namedobj $obj3)(namedobj, int)
+~skillmulti3_setup($obj1, $obj2, $obj3);
 if_openchat(skillmulti3);
-if_setobject(skillmulti3:com_2, $obj1, 200);
-if_setobject(skillmulti3:com_3, $obj2, 200);
-if_setobject(skillmulti3:com_4, $obj3, 200);
-
+if_addresumebutton(skillmulti3:com_5);
+if_addresumebutton(skillmulti3:com_6);
+if_addresumebutton(skillmulti3:com_7);
+if_addresumebutton(skillmulti3:com_8);
+if_addresumebutton(skillmulti3:com_9);
+if_addresumebutton(skillmulti3:com_10);
+if_addresumebutton(skillmulti3:com_11);
+if_addresumebutton(skillmulti3:com_12);
+if_addresumebutton(skillmulti3:com_13);
+if_addresumebutton(skillmulti3:com_14);
+if_addresumebutton(skillmulti3:com_15);
+if_addresumebutton(skillmulti3:com_16);
 p_pausebutton;
 
 switch_component (last_com) {
@@ -797,6 +813,31 @@ switch_component (last_com) {
     case default : return(null, null);
 }
 
+[proc,skillmulti3_setup](namedobj $obj1, namedobj $obj2, namedobj $obj3)
+// Reset client-side overrides left by a previous single-product choice.
+if_settext(skillmulti3:com_17, "What would you like to make?");
+if_setposition(skillmulti3:com_2, 0, 0);
+if_setposition(skillmulti3:com_3, 0, 0);
+if_setposition(skillmulti3:com_4, 0, 0);
+if_setobject(skillmulti3:com_2, $obj1, 200);
+if_setobject(skillmulti3:com_3, $obj2, 200);
+if_setobject(skillmulti3:com_4, $obj3, 200);
+if_setposition(skillmulti3:com_8, 0, 0);
+if_setposition(skillmulti3:com_12, 0, 0);
+if_setposition(skillmulti3:com_16, 0, 0);
+if_settext(skillmulti3:com_8, "\\n\\n\\n\\n<oc_name($obj1)>");
+if_settext(skillmulti3:com_12, "\\n\\n\\n\\n<oc_name($obj2)>");
+if_settext(skillmulti3:com_16, "\\n\\n\\n\\n<oc_name($obj3)>");
+if_sethide(skillmulti3:com_5, false);
+if_sethide(skillmulti3:com_6, false);
+if_sethide(skillmulti3:com_7, false);
+if_sethide(skillmulti3:com_9, false);
+if_sethide(skillmulti3:com_10, false);
+if_sethide(skillmulti3:com_11, false);
+if_sethide(skillmulti3:com_13, false);
+if_sethide(skillmulti3:com_14, false);
+if_sethide(skillmulti3:com_15, false);
+
 [proc,skillmulti4](namedobj $obj1, namedobj $obj2, namedobj $obj3, namedobj $obj4)(namedobj, int)
 if_openchat(skillmulti4);
 if_setobject(skillmulti4:com_2, $obj1, 200);
@@ -804,6 +845,22 @@ if_setobject(skillmulti4:com_3, $obj2, 200);
 if_setobject(skillmulti4:com_4, $obj3, 200);
 if_setobject(skillmulti4:com_5, $obj4, 200);
 
+if_addresumebutton(skillmulti4:com_6);
+if_addresumebutton(skillmulti4:com_7);
+if_addresumebutton(skillmulti4:com_8);
+if_addresumebutton(skillmulti4:com_9);
+if_addresumebutton(skillmulti4:com_10);
+if_addresumebutton(skillmulti4:com_11);
+if_addresumebutton(skillmulti4:com_12);
+if_addresumebutton(skillmulti4:com_13);
+if_addresumebutton(skillmulti4:com_14);
+if_addresumebutton(skillmulti4:com_15);
+if_addresumebutton(skillmulti4:com_16);
+if_addresumebutton(skillmulti4:com_17);
+if_addresumebutton(skillmulti4:com_18);
+if_addresumebutton(skillmulti4:com_19);
+if_addresumebutton(skillmulti4:com_20);
+if_addresumebutton(skillmulti4:com_21);
 p_pausebutton;
 
 switch_component (last_com) {
@@ -842,6 +899,26 @@ if_setobject(skillmulti5:com_4, $obj3, 200);
 if_setobject(skillmulti5:com_5, $obj4, 200);
 if_setobject(skillmulti5:com_6, $obj5, 200);
 
+if_addresumebutton(skillmulti5:com_7);
+if_addresumebutton(skillmulti5:com_8);
+if_addresumebutton(skillmulti5:com_9);
+if_addresumebutton(skillmulti5:com_10);
+if_addresumebutton(skillmulti5:com_11);
+if_addresumebutton(skillmulti5:com_12);
+if_addresumebutton(skillmulti5:com_13);
+if_addresumebutton(skillmulti5:com_14);
+if_addresumebutton(skillmulti5:com_15);
+if_addresumebutton(skillmulti5:com_16);
+if_addresumebutton(skillmulti5:com_17);
+if_addresumebutton(skillmulti5:com_18);
+if_addresumebutton(skillmulti5:com_19);
+if_addresumebutton(skillmulti5:com_20);
+if_addresumebutton(skillmulti5:com_21);
+if_addresumebutton(skillmulti5:com_22);
+if_addresumebutton(skillmulti5:com_23);
+if_addresumebutton(skillmulti5:com_24);
+if_addresumebutton(skillmulti5:com_25);
+if_addresumebutton(skillmulti5:com_26);
 p_pausebutton;
 
 switch_component (last_com) {
