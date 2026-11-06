@@ -1,4 +1,10 @@
-[opnpc1,reldo]
+[opnpc1,reldo_normal]
+@reldo_dialogue;
+
+[opnpc1,reldo_withbook]
+@reldo_dialogue;
+
+[label,reldo_dialogue]
 if(%phoenixgang = ^phoenixgang_read_book) {
     @reldo_read_book;
 }

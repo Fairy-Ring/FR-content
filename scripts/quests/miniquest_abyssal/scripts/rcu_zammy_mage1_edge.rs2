@@ -1,5 +1,5 @@
 // This is actually the varrock zammy mage...
-[opnpc1,rcu_zammy_mage1_edge]
+[opnpc1,rcu_zammy_mage1_edgeb]
 // TODO: check for sara/guthix gear
 
 switch_int (%abyssal_miniquest) {

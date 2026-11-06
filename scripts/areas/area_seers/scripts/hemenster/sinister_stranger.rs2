@@ -1,4 +1,10 @@
-[opnpc1,sinister_stranger]
+[opnpc1,sinister_stranger0]
+@sinister_stranger_dialogue;
+
+[opnpc1,sinister_stranger1]
+@sinister_stranger_dialogue;
+
+[label,sinister_stranger_dialogue]
 ~chatnpc("<p,confused>...");
 def_int $option = ~p_choice3("...?", 1, "Who are you?", 2, "So... you like fishing?", 3);
 if($option = 1) {

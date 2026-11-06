@@ -1,7 +1,4 @@
-[opnpc1,edmond_top]
-@edmond_dialogue;
-
-[opnpc1,edmond_bottom]
+[opnpc1,edmond]
 @edmond_dialogue;
 
 [label,edmond_dialogue]

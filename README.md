@@ -97,6 +97,25 @@ It also checks every cooking recipe's forward/reverse row lookup and unchanged
 raw-oomlie refusal on ranges and fires.
 Research labels and the follow-up LIVE CHECK list are in evidence request `PRODUCT-FOLLOWUP-1106`.
 
+### Multinpc trigger regression
+
+NPC interaction triggers bind to the player's resolved visible form, not the placed multinpc root.
+Shared handlers retain one dialogue body. Sheep Herder wrappers pass the canonical sheep identity
+to the existing data-table lookups because the engine's `npc_type` returns the visible child.
+Dialogue, quest stages and rewards are unchanged.
+
+After building the matching isolated engine, run:
+
+```sh
+bash tests/multinpc-triggers/runtime.sh /absolute/path/to/engine
+```
+
+The suite checks every non-null form slot of the thirteen repaired roots through the real
+player trigger lookup. It executes Juliet's stage-10 dialogue through stage 20 and the message reward.
+It also executes prodding and poisoning for both forms of all four diseased sheep.
+Mourning's sheep have no client Prod option. Their direct-script cases test binding, not menu reachability.
+The source decisions and unexecuted LIVE CHECK list are in evidence request `MULTINPC-TRIGGERS-1106`.
+
 
 
 ## Completeness disclaimer

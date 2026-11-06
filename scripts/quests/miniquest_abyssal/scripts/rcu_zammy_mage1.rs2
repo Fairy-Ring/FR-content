@@ -1,6 +1,12 @@
 // This is the zammy mage at edgeville
 // Most of this is dialogue from rs3 as it seems to be the closest to the original, osrs completely reworked it with GoTR update
-[opnpc1,rcu_zammy_mage1]
+[opnpc1,rcu_zammy_mage1a]
+@rcu_zammy_mage1_talk;
+
+[opnpc1,rcu_zammy_mage1b]
+@rcu_zammy_mage1_talk;
+
+[label,rcu_zammy_mage1_talk]
 if (%runemysteries ! ^runemysteries_complete) @rcu_zammy_mage1_no_runemysteries;
 
 switch_int (%abyssal_miniquest) {
@@ -9,14 +15,20 @@ switch_int (%abyssal_miniquest) {
     case ^miniquest_abyssal_complete : @rcu_zammy_mage1_quest_complete;
 }
 
-[opnpc3,rcu_zammy_mage1]
+[opnpc3,rcu_zammy_mage1a]
+@rcu_zammy_mage1_trade;
+
+[opnpc3,rcu_zammy_mage1b]
+@rcu_zammy_mage1_trade;
+
+[label,rcu_zammy_mage1_trade]
 if (%abyssal_miniquest ! ^miniquest_abyssal_complete) {
     ~openshop(darkruneshop_crap, 400, 1300, 300, "Battle Runes.");
 } else {
     ~openshop(darkruneshop_uber, 550, 1000, 2, "Battle Runes.");
 }
 
-[opnpc4,rcu_zammy_mage1]
+[opnpc4,rcu_zammy_mage1b]
 if (%abyssal_miniquest ! ^miniquest_abyssal_complete) return;
 @rcu_zammy_mage1_teleport;
 

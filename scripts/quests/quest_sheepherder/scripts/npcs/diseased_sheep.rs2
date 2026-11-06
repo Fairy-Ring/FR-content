@@ -8,17 +8,29 @@
 // bit 2 - set when the sheep is fed the poison
 // bit 3 - set when the sheep has its bones burned
 
-[opnpc1,plaguesheep_1]
-@prod_sheep(npc_type);
+[opnpc1,herder_plaguesheep_1]
+@prod_sheep(plaguesheep_1);
 
-[opnpc1,plaguesheep_2]
-@prod_sheep(npc_type);
+[opnpc1,mourning_plaguesheep_1]
+@prod_sheep(plaguesheep_1);
 
-[opnpc1,plaguesheep_3]
-@prod_sheep(npc_type);
+[opnpc1,herder_plaguesheep_2]
+@prod_sheep(plaguesheep_2);
 
-[opnpc1,plaguesheep_4]
-@prod_sheep(npc_type);
+[opnpc1,mourning_plaguesheep_2]
+@prod_sheep(plaguesheep_2);
+
+[opnpc1,herder_plaguesheep_3]
+@prod_sheep(plaguesheep_3);
+
+[opnpc1,mourning_plaguesheep_3]
+@prod_sheep(plaguesheep_3);
+
+[opnpc1,herder_plaguesheep_4]
+@prod_sheep(plaguesheep_4);
+
+[opnpc1,mourning_plaguesheep_4]
+@prod_sheep(plaguesheep_4);
 
 [label,prod_sheep](npc $npc)
 p_arrivedelay;
@@ -112,28 +124,52 @@ npc_settimer(calc(10 + random(20)));
 npc_say("Baa");
 npc_setmode(null);
 
-[opnpcu,plaguesheep_2]
+[opnpcu,herder_plaguesheep_2]
+@plaguesheep_2_use;
+
+[opnpcu,mourning_plaguesheep_2]
+@plaguesheep_2_use;
+
+[label,plaguesheep_2_use]
 switch_obj(last_useitem) {
     case cattleprod : @cattle_prod_use_message;
-    case poisoned_feed : @poison_sheep(npc_type);
+    case poisoned_feed : @poison_sheep(plaguesheep_2);
 }
 
-[opnpcu,plaguesheep_1]
+[opnpcu,herder_plaguesheep_1]
+@plaguesheep_1_use;
+
+[opnpcu,mourning_plaguesheep_1]
+@plaguesheep_1_use;
+
+[label,plaguesheep_1_use]
 switch_obj(last_useitem) {
     case cattleprod : @cattle_prod_use_message;
-    case poisoned_feed : @poison_sheep(npc_type);
+    case poisoned_feed : @poison_sheep(plaguesheep_1);
 }
 
-[opnpcu,plaguesheep_3]
+[opnpcu,herder_plaguesheep_3]
+@plaguesheep_3_use;
+
+[opnpcu,mourning_plaguesheep_3]
+@plaguesheep_3_use;
+
+[label,plaguesheep_3_use]
 switch_obj(last_useitem) {
     case cattleprod : @cattle_prod_use_message;
-    case poisoned_feed : @poison_sheep(npc_type);
+    case poisoned_feed : @poison_sheep(plaguesheep_3);
 }
 
-[opnpcu,plaguesheep_4]
+[opnpcu,herder_plaguesheep_4]
+@plaguesheep_4_use;
+
+[opnpcu,mourning_plaguesheep_4]
+@plaguesheep_4_use;
+
+[label,plaguesheep_4_use]
 switch_obj(last_useitem) {
     case cattleprod : @cattle_prod_use_message;
-    case poisoned_feed : @poison_sheep(npc_type);
+    case poisoned_feed : @poison_sheep(plaguesheep_4);
 }
 
 [label,poison_sheep](npc $npc)
