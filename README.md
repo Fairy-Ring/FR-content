@@ -68,7 +68,13 @@ Knife-on-logs uses the revision-377 `skillmulti2` and `skillmulti3` interfaces.
 They offer Make 1, Make 5, Make 10 and Make X. They do not offer Make All.
 The quantity UI is a period-cache-backed **CANDIDATE** for fletching, not a dated server transcript.
 Normal logs offer shafts, shortbow and longbow. Other supported logs offer the two bows.
-Shared pottery and dragonhide choices still return one product.
+Glass, dragonhide and pre-potlid pottery choices now use the same quantity interface.
+The obsolete single-item wrappers are removed, not hidden from the client menu.
+Jagex's [27 September 2004 news](https://secure.runescape.com/m=news/skills-duels-and-the-kalphite)
+verifies Make 5/10/X for glass, leather crafting and pottery wheels on that date.
+May 2006 continuity and the dragonhide-specific binding remain **CANDIDATE**.
+Original crafting batch timing remains **UNKNOWN**. Queue values follow Lost City,
+not a measured period-server timing claim. Existing recipes and XP are retained.
 Log cuts use an interruptible weak queue with a uniform three-tick repeat interval.
 The first cut runs in the selection tick. Its original 377 delay remains unknown.
 The repeat interval adapts Lost City 289's queue pattern and remains **CANDIDATE**.
@@ -83,6 +89,13 @@ The suite runs the real script interpreter and input handlers without starting a
 Cadence scenarios process queues once per world tick, after the selection input.
 They check the first repeat and every later repeat for all thirteen products.
 Research labels and the headed live-check list are in evidence request `FLETCH-CHOICE-1106`.
+The suite also checks menu reachability using packed component geometry and
+Java 377's hit-test rules. It exercises the three crafting callers' quantities,
+exhaustion, refusals and interruption. It tests both karambwan choices through
+the real cooking script, plus the pre-teaching default, consumption and recipe XP.
+It also checks every cooking recipe's forward/reverse row lookup and unchanged
+raw-oomlie refusal on ranges and fires.
+Research labels and the follow-up LIVE CHECK list are in evidence request `PRODUCT-FOLLOWUP-1106`.
 
 
 

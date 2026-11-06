@@ -60,11 +60,8 @@ if (map_members = ^false) {
 }
 def_namedobj $item;
 def_int $process_count;
-$item, $process_count = ~skill_multi3(
-    beer_glass, 0, 5, 200, "\\n\\n\\n\\nBeer Glass",
-    vial_empty, 2, 10, 180, "\\n\\n\\n\\nVial",
-    stafforb, 2, -10, 200, "\\n\\n\\n\\nOrb"
-);
+$item, $process_count = ~skillmulti3(beer_glass, vial_empty, stafforb);
+if_close;
 if ($item = null) {
     ~displaymessage(^dm_default);
     return;

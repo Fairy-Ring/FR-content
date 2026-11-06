@@ -97,7 +97,7 @@ if (inv_total(inv, softclay) < 1) {
     mes("You have run out of soft clay.");
     return;
 }
-// Lost City f88816442/origin/289 uses a two-tick repeat; original 377 timing is UNKNOWN.
+// Lost City f88816442/origin/289 uses map_clock + 2; original 377 timing is UNKNOWN.
 sound_synth(pottery, 1, 0);
 anim(human_potterywheel, 0);
 if (%action_delay < map_clock) {
@@ -117,7 +117,7 @@ if (inv_total(inv, softclay) < 1) {
     mes("You have run out of soft clay.");
     return;
 }
-@finish_craft_pottery($item, $struct, $name);
+~finish_craft_pottery($item, $struct, $name);
 if ($remaining > 1) {
     %action_delay = add(map_clock, 2);
     @process_craft_pottery($item, $struct, $name, $level, sub($remaining, 1));
@@ -146,9 +146,9 @@ if (stat(crafting) < $level)
 sound_synth(pottery, 1, 0);
 anim(human_potterywheel, 0);
 p_delay(2);
-@finish_craft_pottery($item, $struct, $name);
+~finish_craft_pottery($item, $struct, $name);
 
-[label,finish_craft_pottery](namedobj $item, struct $struct, string $name)
+[proc,finish_craft_pottery](namedobj $item, struct $struct, string $name)
 inv_del(inv, softclay, 1);
 inv_add(inv, $item, 1);
 stat_advance(crafting, struct_param($struct, processexp));

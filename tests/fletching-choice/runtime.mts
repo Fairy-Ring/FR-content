@@ -1,9 +1,11 @@
 // Executes packed RuneScript and real button/count-dialog handlers, not a world server.
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import Component from "#/cache/config/Component.js";
 import VarPlayerType from "#/cache/config/VarPlayerType.js";
 import ParamType from "#/cache/config/ParamType.js";
 import ObjType from "#/cache/config/ObjType.js";
+import LocType from "#/cache/config/LocType.js";
 import InvType from "#/cache/config/InvType.js";
 import CategoryType from "#/cache/config/CategoryType.js";
 import EnumType from "#/cache/config/EnumType.js";
@@ -15,6 +17,8 @@ import DbRowType from "#/cache/config/DbRowType.js";
 import DbTableIndex from "#/cache/config/DbTableIndex.js";
 import FontType from "#/cache/config/FontType.js";
 import Player from "#/engine/entity/Player.js";
+import Loc from "#/engine/entity/Loc.js";
+import { EntityLifeCycle } from "#/engine/entity/EntityLifeCycle.js";
 import { PlayerStat } from "#/engine/entity/PlayerStat.js";
 import ScriptProvider from "#/engine/script/ScriptProvider.js";
 import ScriptRunner from "#/engine/script/ScriptRunner.js";
@@ -24,7 +28,10 @@ import IfButtonHandler from "#/network/game/client/handler/IfButtonHandler.js";
 import IfButton from "#/network/game/client/model/IfButton.js";
 import ResumePCountDialogHandler from "#/network/game/client/handler/ResumePCountDialogHandler.js";
 import ResumePCountDialog from "#/network/game/client/model/ResumePCountDialog.js";
-import IfSetHide from "#/network/game/server/model/IfSetHide.js";
+import ResumePauseButtonHandler from "#/network/game/client/handler/ResumePauseButtonHandler.js";
+import ResumePauseButton from "#/network/game/client/model/ResumePauseButton.js";
+import IfSetPosition from "#/network/game/server/model/IfSetPosition.js";
+import IfSetText from "#/network/game/server/model/IfSetText.js";
 
 let checks = 0;
 const button = new IfButtonHandler();
@@ -50,6 +57,8 @@ function player(level = 99): Player {
   p.baseLevels[PlayerStat.FLETCHING] = level;
   p.levels[PlayerStat.FLETCHING] = level;
   p.stats[PlayerStat.FLETCHING] = level === 99 ? 130344310 : 0;
+  p.stats[PlayerStat.CRAFTING] = 130344310;
+  p.stats[PlayerStat.COOKING] = 130344310;
   p.buildArea.originX = 3000;
   p.buildArea.originZ = 3000;
   const output: unknown[] = [];
@@ -63,10 +72,11 @@ function start(
   p: Player,
   name: string,
   args: (number | string)[] = [],
+  target: Loc | null = null,
 ): ScriptState {
   const script = ScriptProvider.getByName(name);
   assert(script, `missing script ${name}`);
-  const state = ScriptRunner.init(script, p, null, args);
+  const state = ScriptRunner.init(script, p, target, args);
   p.executeScript(state, true);
   assert.notEqual(state.execution, ScriptState.ABORTED, name);
   return state;
@@ -78,6 +88,10 @@ function click(p: Player, name: string): void {
   );
 }
 function tick(p: Player): void {
+  // Mirror World.processPlayers' delayed-script phase before its queue phase.
+  if (p.delayed && World.currentTick >= p.delayedUntil) p.delayed = false;
+  if (!p.delayed && p.activeScript?.execution === ScriptState.SUSPENDED)
+    p.executeScript(p.activeScript, true, true);
   p.processQueues();
   World.currentTick++;
 }
@@ -126,11 +140,98 @@ function chooserArgs(objects: string[], close: boolean): (number | string)[] {
   ];
 }
 
+function skillmulti3Buttons(p: Player) {
+  const root = Component.get(component("skillmulti3"));
+  const offsets = new Map<number, IfSetPosition>();
+  for (const packet of packets.get(p)!)
+    if (packet instanceof IfSetPosition) offsets.set(packet.component, packet);
+  return [...root.childId!].flatMap((id, index) => {
+    const child = Component.get(id);
+    if (child.buttonType !== 1) return [];
+    // Client-Java 377:11305-11342. Non-layer hide is deliberately ignored.
+    const x = root.childX![index] + (offsets.get(id)?.x ?? 0);
+    const y = root.childY![index] + (offsets.get(id)?.y ?? 0);
+    return [
+      {
+        id,
+        option: child.option,
+        x,
+        y,
+        right: x + child.width,
+        bottom: y + child.height,
+        reachable:
+          x <= root.width &&
+          y <= root.height &&
+          x + child.width > 0 &&
+          y + child.height > 0,
+      },
+    ];
+  });
+}
+
+function assertSkillmulti3Menu(p: Player): void {
+  const buttons = skillmulti3Buttons(p);
+  const reachable = buttons.filter((b) => b.reachable);
+  // Check the entire root, not just one click point: no unreachable registration
+  // or unregistered hitbox can leave a dead right-click entry elsewhere.
+  assert.deepEqual(
+    reachable.map((b) => b.id).sort((a, b) => a - b),
+    [...p.resumeButtons].sort((a, b) => a - b),
+  );
+  for (const index of [8, 12, 16]) {
+    const product = buttons.find(
+      (b) => b.id === component(`skillmulti3:com_${index}`),
+    )!;
+    const x = product.x + 50;
+    const y = product.y + 40;
+    assert.deepEqual(
+      reachable
+        .filter((b) => x >= b.x && x < b.right && y >= b.y && y < b.bottom)
+        .map((b) => b.option),
+      ["Make X", "Make 10", "Make 5", "Make 1"],
+    );
+  }
+}
+
+type CraftRecipe = [
+  family: "glass" | "pottery" | "dhide",
+  product: string,
+  selection: number,
+  input: string,
+  per: number,
+  xp: number,
+  level: number,
+];
+
+function beginCraft(p: Player, recipe: CraftRecipe): ScriptState {
+  const [family, , , input] = recipe;
+  const tool = family === "glass" ? "glassblowingpipe" : "needle";
+  if (family !== "pottery") p.invAdd(InvType.getId("inv"), id(tool), 1);
+  p.invAdd(InvType.getId("inv"), id(input), 24);
+  if (family === "dhide") p.invAdd(InvType.getId("inv"), id("thread"), 100);
+  assert.equal(inventory(p, input), 24, "fixture stock");
+  p.lastUseItem = id(input);
+  p.lastUseSlot = family === "pottery" ? 0 : 1;
+  if (family === "pottery") {
+    const type = LocType.getId("potterywheel");
+    assert(type >= 0);
+    return start(
+      p,
+      "[oplocu,potterywheel]",
+      [],
+      new Loc(0, 3200, 3200, 1, 1, EntityLifeCycle.RESPAWN, type, 10, 0),
+    );
+  }
+  p.lastItem = id(tool);
+  return start(p, `[opheldu,${tool}]`);
+}
+
 try {
   for (const config of [
     VarPlayerType,
     ParamType,
     ObjType,
+    LocType,
     InvType,
     CategoryType,
     EnumType,
@@ -250,62 +351,103 @@ try {
   assert.equal(inventory(interrupted, "logs"), remaining);
   checks++;
 
-  // Pottery uses multiobj3. Dragonhide uses multiobj3_close. Both return one obj.
-  for (const [proc, objects] of [
-    ["multiobj3", ["pot_unfired", "piedish_unfired", "bowl_unfired"]],
-    [
-      "multiobj3_close",
-      ["dragonhide_body", "dragon_vambraces", "dragonhide_chaps"],
-    ],
-  ] as [string, string[]][]) {
-    for (let i = 0; i < objects.length; i++) {
+  // Period batch menus: real callers, every product, every quantity layer.
+  const crafts: CraftRecipe[] = [
+    ["glass", "beer_glass", 0, "molten_glass", 1, 175, 1],
+    ["glass", "vial_empty", 1, "molten_glass", 1, 350, 33],
+    ["glass", "stafforb", 2, "molten_glass", 1, 525, 46],
+    ["pottery", "pot_unfired", 0, "softclay", 1, 63, 1],
+    ["pottery", "piedish_unfired", 1, "softclay", 1, 150, 7],
+    ["pottery", "bowl_unfired", 2, "softclay", 1, 180, 8],
+    ["dhide", "dragonhide_body", 0, "dragon_leather", 3, 1860, 63],
+    ["dhide", "dragon_vambraces", 1, "dragon_leather", 1, 620, 57],
+    ["dhide", "dragonhide_chaps", 2, "dragon_leather", 2, 1240, 60],
+  ];
+  for (const recipe of crafts) {
+    const [family, product, selection, input, per, xp, level] = recipe;
+    for (const requested of [1, 5, 10, 3, 28, 0, -2]) {
       const p = player();
-      const state = start(
-        p,
-        `[proc,${proc}]`,
-        chooserArgs(objects, proc.endsWith("_close")),
-      );
-      assert.equal(state.execution, ScriptState.PAUSEBUTTON);
-      assert.equal(p.resumeButtons.length, 3);
-      for (const index of [5, 6, 7, 9, 10, 11, 13, 14, 15]) {
-        assert(
-          !p.resumeButtons.includes(component(`skillmulti3:com_${index}`)),
-        );
-        assert(
-          packets
-            .get(p)!
-            .some(
-              (packet) =>
-                packet instanceof IfSetHide &&
-                packet.component === component(`skillmulti3:com_${index}`) &&
-                packet.hidden,
-            ),
-        );
+      const before = p.stats[PlayerStat.CRAFTING];
+      const state = beginCraft(p, recipe);
+      assert.equal(state.execution, ScriptState.PAUSEBUTTON, `${family} menu`);
+      assertSkillmulti3Menu(p);
+      quantity(p, "skillmulti3", selection, requested);
+      const made = Math.max(0, Math.min(requested, Math.floor(24 / per)));
+      assert.equal(inventory(p, product), made, `${product} Make ${requested}`);
+      assert.equal(inventory(p, input), 24 - made * per);
+      assert.equal(p.stats[PlayerStat.CRAFTING] - before, made * xp);
+      if (family === "dhide")
+        assert.equal(inventory(p, "thread"), 100 - Math.floor(made / 5));
+      // A crafting chooser must not alter the next fletching chooser.
+      beginLogs(p, "logs", 1);
+      assertSkillmulti3Menu(p);
+      p.stopAction();
+      checks++;
+    }
+    // Walk/cancel during production, and before any product selection.
+    for (const afterFirst of [false, true]) {
+      const p = player();
+      beginCraft(p, recipe);
+      if (afterFirst) {
+        click(p, `skillmulti3:com_${6 + selection * 4}`);
+        for (let i = 0; i < 20 && !inventory(p, product); i++) tick(p);
+        assert.equal(inventory(p, product), 1, `${family} first batch action`);
       }
-      click(p, `skillmulti3:com_${8 + i * 4}`);
-      assert.equal(state.execution, ScriptState.FINISHED);
-      assert.equal(state.popInt(), id(objects[i]));
-      // Reopen the shared interface: fletching must restore every quantity layer.
-      const next = start(p, "[proc,skillmulti3]", objects.map(id));
-      assert.equal(next.execution, ScriptState.PAUSEBUTTON);
-      assert.equal(p.resumeButtons.length, 12);
-      assert(
-        packets
-          .get(p)!
-          .some(
-            (packet) =>
-              packet instanceof IfSetHide &&
-              packet.component === component("skillmulti3:com_5") &&
-              !packet.hidden,
-          ),
-      );
-      quantity(p, "skillmulti3", i, 5);
-      assert.equal(next.execution, ScriptState.FINISHED);
-      assert.equal(next.popInt(), 5);
-      assert.equal(next.popInt(), id(objects[i]));
+      p.stopAction();
+      const made = inventory(p, product);
+      drain(p);
+      assert.equal(inventory(p, product), made, `${family} interrupted`);
+      checks++;
+    }
+    // Remove prerequisites directly between actions to distinguish a per-action
+    // recheck from stopAction's ordinary weak-queue cancellation.
+    for (const remove of family === "glass"
+      ? ["glassblowingpipe"]
+      : family === "dhide"
+        ? ["needle", "thread"]
+        : []) {
+      const p = player();
+      beginCraft(p, recipe);
+      click(p, `skillmulti3:com_${6 + selection * 4}`);
+      for (let i = 0; i < 20 && !inventory(p, product); i++) tick(p);
+      assert.equal(inventory(p, product), 1);
+      p.invDel(InvType.getId("inv"), id(remove), inventory(p, remove));
+      drain(p);
+      assert.equal(inventory(p, product), 1, `${family} missing ${remove}`);
+      assert.equal(inventory(p, input), 24 - per);
+      checks++;
+    }
+    if (level > 1) {
+      const p = player();
+      p.levels[PlayerStat.CRAFTING] = level - 1;
+      beginCraft(p, recipe);
+      quantity(p, "skillmulti3", selection, 5);
+      assert.equal(inventory(p, input), 24, `${product} level refusal`);
+      assert.equal(inventory(p, product), 0);
+      assert.equal(p.stats[PlayerStat.CRAFTING], 130344310);
+      checks++;
+      const threshold = player();
+      threshold.levels[PlayerStat.CRAFTING] = level;
+      beginCraft(threshold, recipe);
+      quantity(threshold, "skillmulti3", selection, 1);
+      assert.equal(inventory(threshold, product), 1, `${product} threshold`);
+      assert.equal(threshold.stats[PlayerStat.CRAFTING] - 130344310, xp);
       checks++;
     }
   }
+  // Keep the separate OSF four-choice gate and its single-item potlid contract.
+  const osf = player();
+  const osfVar = VarPlayerType.getId("onesmallfavour");
+  assert(osfVar >= 0);
+  osf.vars[osfVar] = 35;
+  beginCraft(osf, crafts[3]);
+  assert.equal(osf.activeScript?.execution, ScriptState.PAUSEBUTTON);
+  click(osf, "multi4:com_4");
+  drain(osf);
+  assert.equal(inventory(osf, "potlid_unfired"), 1);
+  assert.equal(inventory(osf, "softclay"), 23);
+  assert.equal(osf.stats[PlayerStat.CRAFTING] - 130344310, 200);
+  checks++;
   // Unchanged multiobj2 callers (karambwan/fruit) use text overlays, not model buttons.
   for (const [index, name] of ["objtext1", "objtext2"].entries()) {
     const p = player();
@@ -316,6 +458,136 @@ try {
     assert.equal(state.execution, ScriptState.FINISHED);
     assert.equal(state.popInt(), id(objects[index]));
     checks++;
+  }
+  // Every source recipe must retain its existing uncooked lookup, including
+  // duplicate raw inputs. Cooked lookups now resolve the same complete row sets.
+  const cooking = DbTableType.getByName("cooking_generic");
+  assert(cooking);
+  const source = readFileSync(process.env.COOKING_SOURCE!, "utf8");
+  const cookingRecipes = source
+    .split(/^\[/m)
+    .slice(1)
+    .map((section) => {
+      const name = section.slice(0, section.indexOf("]"));
+      const raw = /^data=uncooked,(.+)$/m.exec(section)?.[1];
+      const cooked = /^data=cooked,(.+)$/m.exec(section)?.[1];
+      assert(raw && cooked, name);
+      return {
+        name,
+        raw: id(raw),
+        cooked: cooked === "null" ? -1 : id(cooked),
+      };
+    });
+  const rows = DbRowType.getInTable(cooking.id);
+  assert.equal(rows.length, cookingRecipes.length);
+  for (const recipe of cookingRecipes) {
+    const row = DbRowType.getByName(recipe.name);
+    assert(row);
+    assert.deepEqual(row.getValue(1, 0), [recipe.raw]);
+    assert.deepEqual(row.getValue(0, 0), [recipe.cooked]);
+    for (const [column, value, field] of [
+      [1, recipe.raw, "raw"],
+      [0, recipe.cooked, "cooked"],
+    ] as const) {
+      const expected = cookingRecipes
+        .filter((other) => other[field] === value)
+        .map((other) => DbRowType.getId(other.name))
+        .sort((a, b) => a - b);
+      assert.deepEqual(
+        [...DbTableIndex.find(value, (cooking.id << 12) | (column << 4))].sort(
+          (a, b) => a - b,
+        ),
+        expected,
+        `${recipe.name} ${field} lookup`,
+      );
+    }
+    checks++;
+  }
+  console.log(
+    `PASS cooking_generic lookup parity for all ${rows.length} source rows`,
+  );
+  // Raw oomlie remains a refusal: same text, no input loss, product or XP.
+  for (const trigger of ["[oplocu,_cooking_oven]", "[oplocu,_cooking_fire]"]) {
+    const p = player();
+    p.invAdd(InvType.getId("inv"), id("raw_oomlie"), 1);
+    p.lastUseItem = id("raw_oomlie");
+    const loc = new Loc(
+      0,
+      3200,
+      3200,
+      1,
+      1,
+      EntityLifeCycle.RESPAWN,
+      LocType.getId(
+        trigger.endsWith("_cooking_fire]") ? "fire" : "cooksquestrange",
+      ),
+      10,
+      0,
+    );
+    const state = start(p, trigger, [], loc);
+    assert.equal(state.execution, ScriptState.PAUSEBUTTON);
+    assert.equal(
+      (packets.get(p) ?? [])
+        .filter((packet): packet is IfSetText => packet instanceof IfSetText)
+        .map((packet) => packet.text)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim(),
+      "The meat is far too delicate to cook like this. Perhaps you should wrap it up to protect it from the heat.",
+    );
+    assert(new ResumePauseButtonHandler().handle(new ResumePauseButton(), p));
+    drain(p);
+    assert.equal(state.execution, ScriptState.FINISHED);
+    assert.equal(inventory(p, "raw_oomlie"), 1);
+    assert.equal(inventory(p, "cooked_oomlie"), 0);
+    assert.equal(inventory(p, "burnt_oomlie"), 0);
+    assert.equal(p.stats[PlayerStat.COOKING], 130344310);
+    checks++;
+  }
+  // Exercise the real location-use cooking path, not just multiobj2's return.
+  // Level 99 and high=255 give STAT_RANDOM value 256, so success is certain.
+  for (const taught of [false, true]) {
+    for (const selection of taught ? [0, 1] : [0]) {
+      const p = player();
+      const products = [
+        "tbwt_poorly_cooked_karambwan",
+        "tbwt_cooked_karambwan",
+      ];
+      const tinsay = VarPlayerType.getId("tbwt_tinsay");
+      assert(tinsay >= 0);
+      p.vars[tinsay] = taught ? 8 : 0;
+      p.invAdd(InvType.getId("inv"), id("tbwt_raw_karambwan"), 1);
+      p.lastUseItem = id("tbwt_raw_karambwan");
+      const rangeId = LocType.getId("cooksquestrange");
+      assert(rangeId >= 0);
+      const range = new Loc(
+        0,
+        3200,
+        3200,
+        1,
+        1,
+        EntityLifeCycle.RESPAWN,
+        rangeId,
+        10,
+        0,
+      );
+      const before = p.stats[PlayerStat.COOKING];
+      const state = start(p, "[oplocu,_cooking_oven]", [], range);
+      if (taught) {
+        assert.equal(state.execution, ScriptState.PAUSEBUTTON);
+        click(p, `multiobj2:objtext${selection + 1}`);
+      }
+      assert.equal(state.execution, ScriptState.FINISHED);
+      assert.equal(inventory(p, "tbwt_raw_karambwan"), 0);
+      assert.equal(inventory(p, products[selection]), 1);
+      assert.equal(inventory(p, products[1 - selection]), 0);
+      assert.equal(inventory(p, "tbwt_burnt_karambwan"), 0);
+      assert.equal(
+        p.stats[PlayerStat.COOKING] - before,
+        selection ? 1900 : 800,
+      );
+      checks++;
+    }
   }
   // All related skillmulti procs: every product and every cache quantity layer resumes.
   const objects = [

@@ -129,11 +129,8 @@ $interface_item1, $interface_item2, $interface_item3 = db_getfield($leather_data
 def_string $color = db_getfield($leather_data, dhide_interface_table:color, 0);
 def_namedobj $product;
 def_int $process_count;
-$product, $process_count = ~skill_multi3(
-    $interface_item1, 1, -19, 155, "\\n\\n\\n\\n<$color> body",
-    $interface_item2, 1, -23, 180, "\\n\\n\\n\\n<$color> vambraces",
-    $interface_item3, 2, -22, 180, "\\n\\n\\n\\n<$color> chaps"
-);
+$product, $process_count = ~skillmulti3($interface_item1, $interface_item2, $interface_item3);
+if_close;
 if ($product = null) {
     ~displaymessage(^dm_default);
     return;
@@ -171,16 +168,16 @@ if (inv_total(inv, $ingredient) < $ingredient_count) {
     mes("<$end>.");
     return;
 }
-@process_dhide_crafting($product_data, $product, $product_name, $level, $exp, $process_count, $ingredient, $ingredient_count, $color);
+@process_dhide_crafting($product, $product_name, $level, $exp, $process_count, $ingredient, $ingredient_count, $color);
 
-[label,process_dhide_crafting](dbrow $product_data, namedobj $product, string $product_name, int $level, int $exp, int $process_count, namedobj $ingredient, int $ingredient_count, string $color)
+[label,process_dhide_crafting](namedobj $product, string $product_name, int $level, int $exp, int $process_count, namedobj $ingredient, int $ingredient_count, string $color)
 anim(human_leather_crafting, 0);
 if (%action_delay < map_clock) {
     %action_delay = add(map_clock, 2);
 }
-weakqueue*(craft_dhide_queue, sub(%action_delay, map_clock))($product_data, $product, $product_name, $level, $exp, $process_count, $ingredient, $ingredient_count, $color);
+weakqueue*(craft_dhide_queue, sub(%action_delay, map_clock))($product, $product_name, $level, $exp, $process_count, $ingredient, $ingredient_count, $color);
 
-[queue,craft_dhide_queue](dbrow $product_data, namedobj $product, string $product_name, int $level, int $exp, int $process_count, namedobj $ingredient, int $ingredient_count, string $color)
+[queue,craft_dhide_queue](namedobj $product, string $product_name, int $level, int $exp, int $process_count, namedobj $ingredient, int $ingredient_count, string $color)
 if (map_members = ^false) {
     mes(^mes_members_feature);
     anim(null, 20);
@@ -228,39 +225,5 @@ if (sub($process_count, 1) < 1) {
     return;
 }
 %action_delay = add(map_clock, 2);
-@process_dhide_crafting($product_data, $product, $product_name, $level, $exp, sub($process_count, 1), $ingredient, $ingredient_count, $color);
+@process_dhide_crafting($product, $product_name, $level, $exp, sub($process_count, 1), $ingredient, $ingredient_count, $color);
 
-//---
-
-
-/** UNUSED
-// crafting leather used no weakqueue before 27 September 2004.
-// https://oldschool.runescape.wiki/w/Update:Skills,_Duels_and_the_Kalphite
-[weakqueue,leather_crafting](int $crafting_exp, namedobj $crafting_product, string $crafting_message, seq $crafting_anim, int $count, int $crafting_bar_count, namedobj $crafting_ingredient, string $crafting_productfailure)
-
-//items with a ingredient count of more than 1 have a product fail message
-if ($count < 1) {
-    return;
-}
-if ($count < $crafting_bar_count) {
-    mes($crafting_productfailure);
-    return;
-}
-
-if (%action_delay < calc(map_clock + 1)) {
-    inv_del(inv, $crafting_ingredient, $crafting_bar_count);
-    inv_add(inv, $crafting_product, 1);
-    stat_advance(crafting, $crafting_exp);
-    mes($crafting_message);
-    
-    %thread_used = calc(%thread_used + 1);
-    if (%thread_used > 4) {
-        inv_del(inv, thread, 1);
-        mes("You use up one of your reels of Thread.");
-        %thread_used = 0;
-    }
-    $count = sub($count, $crafting_bar_count);
-    %action_delay = calc(map_clock + 1);
-    weakqueue(leather_crafting, 3, $crafting_exp, $crafting_product, $crafting_message, $crafting_anim, $count, $crafting_bar_count, $crafting_ingredient, $crafting_productfailure);
-}
-*/
