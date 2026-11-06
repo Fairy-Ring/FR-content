@@ -8,3 +8,11 @@ switch_int(%elenaquest) {
         ~quest_elena_set_progress(^quest_elena_freed_elena);
         ~chatnpc("<p,neutral>Go and see my father,|I'll make sure he adequately rewards you.");
 }
+
+// Across the bars, talk without granting the rescue that requires cell entry.
+[apnpc1,elenap_vis]
+if (npc_range(coord) > 2) {
+    p_aprange(2);
+    return;
+}
+@elena_imprisoned;

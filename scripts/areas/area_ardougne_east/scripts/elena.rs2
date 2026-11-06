@@ -110,7 +110,7 @@ switch_int(%biohazard) { // ^biohazard_used_birdfeed intentionally has no dialog
         ~chatplayer("<p,sad>No, I'm afraid not.");
         ~chatnpc("<p,neutral>Speak to Jerico, he will help you to cross the wall.|He lives next to the chapel.");
     case ^biohazard_not_started :
-        ~chatplayer("<p,happy>Good day to you <nc_name(elena2)>.");
+        ~chatplayer("<p,happy>Good day to you <nc_name(elena2_vis)>.");
         ~chatnpc("<p,happy>You too, thanks for freeing me.");
         ~chatnpc("<p,sad>It's just a shame the mourners confiscated my equipment.");
         ~chatplayer("<p,quiz>What did they take?");

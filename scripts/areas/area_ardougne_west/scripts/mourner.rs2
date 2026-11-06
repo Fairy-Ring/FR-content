@@ -85,7 +85,7 @@ if(inv_total(inv, mournerkeytw) = 0) {
 if (~inzone_coord_pair_table(ardougne_west, coord) = true) {
     ~chatnpc("<p,confused>Hmmm, how did you get over here? You're not one of this rabble. Ah well, you'll have to stay. Can't risk you going back now.");
     if(%elenaquest < ^quest_elena_freed_elena) {
-        @multi3("So what's a mourner?", mourner_so_whats_a_mourner, "I haven't got the plague though...", mourner_i_havent_got_the_plague_though, "I'm looking for a woman named <nc_name(elena2)>.", mourner_im_looking_for_a_woman);
+        @multi3("So what's a mourner?", mourner_so_whats_a_mourner, "I haven't got the plague though...", mourner_i_havent_got_the_plague_though, "I'm looking for a woman named <nc_name(elena2_vis)>.", mourner_im_looking_for_a_woman);
     } else {
         @multi2("So what's a mourner?", mourner_so_whats_a_mourner, "I haven't got the plague though...", mourner_i_havent_got_the_plague_though);
     }
@@ -104,7 +104,7 @@ if (~inzone_coord_pair_table(ardougne_west, coord) = true) {
 ~chatnpc("<p,neutral>Can't risk you being a carrier. That protective clothing you have isn't regulation issue. It won't meet safety standards.");
 
 [label,mourner_im_looking_for_a_woman]
-~chatplayer("<p,neutral>I'm looking for a woman named <nc_name(elena2)>.");
+~chatplayer("<p,neutral>I'm looking for a woman named <nc_name(elena2_vis)>.");
 ~chatnpc("<p,neutral>Ah yes, I've heard of her. A healer I believe. She must be mad coming over here voluntarily.");
 ~chatnpc("<p,neutral>I hear rumours she has probably caught the plague now. Very tragic, a stupid waste of life.");
 
@@ -112,9 +112,9 @@ if (~inzone_coord_pair_table(ardougne_west, coord) = true) {
 ~chatnpc("<p,neutral>How did you get into West Ardougne? Ah well you'll have to stay, can't risk you spreading the plague outside.");
 switch_int(%elenaquest) {
     case ^quest_elena_spoke_to_plague_house, ^quest_elena_spoke_to_clerk, ^quest_elena_spoke_to_bravek, ^quest_elena_spoke_cured_bravek :
-        @multi4("I need clearance to enter a plague house.", headmourner_i_need_clearance, "So what's a mourner?", mourner_so_whats_a_mourner, "I haven't got the plague though...", mourner_i_havent_got_the_plague_though, "I'm looking for a woman named <nc_name(elena2)>.", mourner_im_looking_for_a_woman);
+        @multi4("I need clearance to enter a plague house.", headmourner_i_need_clearance, "So what's a mourner?", mourner_so_whats_a_mourner, "I haven't got the plague though...", mourner_i_havent_got_the_plague_though, "I'm looking for a woman named <nc_name(elena2_vis)>.", mourner_im_looking_for_a_woman);
     case ^quest_elena_freed_elena, ^elena_complete, ^elena_complete_read_scroll : @multi2("So what's a mourner?", mourner_so_whats_a_mourner, "I haven't got the plague though...", mourner_i_havent_got_the_plague_though);
-    case default : @multi3("So what's a mourner?", mourner_so_whats_a_mourner, "I haven't got the plague though...", mourner_i_havent_got_the_plague_though, "I'm looking for a woman named <nc_name(elena2)>.", mourner_im_looking_for_a_woman);
+    case default : @multi3("So what's a mourner?", mourner_so_whats_a_mourner, "I haven't got the plague though...", mourner_i_havent_got_the_plague_though, "I'm looking for a woman named <nc_name(elena2_vis)>.", mourner_im_looking_for_a_woman);
 }
 
 [label,headmourner_i_need_clearance]

@@ -38,12 +38,17 @@ switch_int(%elenaquest) {
         } else {
             ~mesbox("The door is locked.");
             if (npc_find(coord, elenap, 5, 0) = true) {
-                ~chatnpc("<p,shock>Hey get me out of here please!");
-                ~chatplayer("<p,sad>I would do but I don't have a key.");
-                ~chatnpc("<p,confused>I think there may be one around somewhere. I'm sure I heard them stashing it somewhere.");
-                @multi2("Have you caught the plague?", elena_improsoned_have_you_caught_the_plague, "Okay, I'll look for it.", elena_improsioned_ok_ill_look_for_it);
+                @elena_imprisoned;
             }
         }
+}
+
+[label,elena_imprisoned]
+~chatnpc("<p,shock>Hey get me out of here please!");
+if (inv_total(inv, elenakey) = 0) {
+    ~chatplayer("<p,sad>I would do but I don't have a key.");
+    ~chatnpc("<p,confused>I think there may be one around somewhere. I'm sure I heard them stashing it somewhere.");
+    @multi2("Have you caught the plague?", elena_improsoned_have_you_caught_the_plague, "Okay, I'll look for it.", elena_improsioned_ok_ill_look_for_it);
 }
 
 [label,elena_improsoned_have_you_caught_the_plague]

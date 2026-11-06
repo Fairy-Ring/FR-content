@@ -35,11 +35,11 @@ switch_int(%elenaquest) {
         ~quest_elena_set_progress(^quest_elena_opened_pipe);
     case ^quest_elena_opened_pipe, ^quest_elena_shown_picture, ^quest_elena_returned_book, ^quest_elena_spoken_martha_ted, ^quest_elena_spoke_to_milli, ^quest_elena_spoke_to_plague_house, ^quest_elena_spoke_to_clerk, ^quest_elena_spoke_to_bravek, ^quest_elena_spoke_cured_bravek :
         ~chatplayer("<p,neutral>Hello.");
-        ~chatnpc("<p,quiz>Have you found <nc_name(elena2)> yet?");
+        ~chatnpc("<p,quiz>Have you found <nc_name(elena2_vis)> yet?");
         ~chatplayer("<p,sad>Not yet, it's a big city over there.");
         ~chatnpc("<p,sad>I hope it's not too late.");
     case ^quest_elena_freed_elena :
-        ~chatnpc("<p,happy>Thank you, thank you! <nc_name(elena2)> beat you back by minutes. Now I said I'd give you a reward. What can I give you as a reward I wonder? Here take this magic scroll, I have little use for it but it may help you.");
+        ~chatnpc("<p,happy>Thank you, thank you! <nc_name(elena2_vis)> beat you back by minutes. Now I said I'd give you a reward. What can I give you as a reward I wonder? Here take this magic scroll, I have little use for it but it may help you.");
         ~chatnpc("<p,happy>Now I'd recommend you go and see Elena. She'll want to thank you herself. She lives in the house opposite ours.");
         queue(quest_elena_complete, 0, 0);
     case ^elena_complete, ^elena_complete_read_scroll :
@@ -70,13 +70,13 @@ switch_int(%elenaquest) {
 
 [label,edmond_tell_me_more]
 ~chatplayer("<p,neutral>Tell me more about the plague.");
-~chatnpc("<p,sad>The mourners can tell you more than me, they're the only ones allowed to cross the border. I do know the plague is a horrible way to go... That's why <nc_name(elena2)> felt she had to go help.");
+~chatnpc("<p,sad>The mourners can tell you more than me, they're the only ones allowed to cross the border. I do know the plague is a horrible way to go... That's why <nc_name(elena2_vis)> felt she had to go help.");
 @multi2("Can I help find her?", edmond_can_i_help_find_elena, "I'm sorry, I have to go.", edmond_sorry_i_have_to_go);
 
 [label,edmond_can_i_help_find_elena]
 ~chatplayer("<p,quiz>Can I help find her?");
 ~chatnpc("<p,confused>Really, would you? I've been working on a plan to get over the wall, but I'm too old and tired to carry it through.");
-~chatnpc("<p,neutral>If you're going over, the first thing you'll need is protection. My wife made a special gasmask for <nc_name(elena2)> with <lowercase(oc_name(dwellberries))> rubbed into it.");
+~chatnpc("<p,neutral>If you're going over, the first thing you'll need is protection. My wife made a special gasmask for <nc_name(elena2_vis)> with <lowercase(oc_name(dwellberries))> rubbed into it.");
 ~chatnpc("<p,neutral><oc_name(dwellberries)> help repel the virus.|We need some more though...");
 ~chatplayer("<p,quiz>Where can I find these <oc_name(dwellberries)>?");
 ~quest_elena_set_progress(^quest_elena_started);
