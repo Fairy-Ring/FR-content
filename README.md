@@ -69,6 +69,9 @@ They offer Make 1, Make 5, Make 10 and Make X. They do not offer Make All.
 The quantity UI is a period-cache-backed **CANDIDATE** for fletching, not a dated server transcript.
 Normal logs offer shafts, shortbow and longbow. Other supported logs offer the two bows.
 Shared pottery and dragonhide choices still return one product.
+Log cuts use an interruptible weak queue with a uniform three-tick repeat interval.
+The first cut runs in the selection tick. Its original 377 delay remains unknown.
+The repeat interval adapts Lost City 289's queue pattern and remains **CANDIDATE**.
 
 After building the matching isolated engine, run the packed-script regressions:
 
@@ -77,6 +80,8 @@ bash tests/fletching-choice/runtime.sh /absolute/path/to/engine
 ```
 
 The suite runs the real script interpreter and input handlers without starting a world server.
+Cadence scenarios process queues once per world tick, after the selection input.
+They check the first repeat and every later repeat for all thirteen products.
 Research labels and the headed live-check list are in evidence request `FLETCH-CHOICE-1106`.
 
 

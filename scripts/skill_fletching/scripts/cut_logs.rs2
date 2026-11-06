@@ -72,12 +72,11 @@ if ($product = $obj2) {
     $message = "You carefully cut the wood into <tostring($shaft_count)> arrow shafts.";
     $count = $shaft_count;
 }
-@fletch_log_make($log, $product, $level, $fletching_experience, $count, $message, $make_count);
+// Run the first cut in this tick's weak-queue phase, like all later cuts.
+// CANDIDATE: immediate first cut; original 377 first-cut delay is unknown.
+weakqueue*(fletch_log_make, 0)($log, $product, $level, $fletching_experience, $count, $message, $make_count);
 
 [queue,fletch_log_make](obj $log, namedobj $product, int $level, int $experience, int $count, string $message, int $remaining)
-@fletch_log_make($log, $product, $level, $experience, $count, $message, $remaining);
-
-[label,fletch_log_make](obj $log, namedobj $product, int $level, int $experience, int $count, string $message, int $remaining)
 if ($remaining < 1 | inv_total(inv, $log) < 1 | inv_total(inv, knife) < 1) {
     return;
 }
@@ -92,6 +91,6 @@ mes($message);
 stat_advance(fletching, $experience);
 inv_add(inv, $product, $count);
 if ($remaining > 1) {
-    // CANDIDATE cadence: three ticks per log; weak queue permits interruption.
+    // CANDIDATE: uniform three-tick repeats, adapting Lost City 289's +2 queue.
     weakqueue*(fletch_log_make, 2)($log, $product, $level, $experience, $count, $message, sub($remaining, 1));
 }

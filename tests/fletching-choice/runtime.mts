@@ -78,10 +78,11 @@ function click(p: Player, name: string): void {
   );
 }
 function tick(p: Player): void {
-  for (let i = 0; i < 100; i++) {
-    World.currentTick++;
-    p.processQueues();
-  }
+  p.processQueues();
+  World.currentTick++;
+}
+function drain(p: Player): void {
+  for (let i = 0; i < 100; i++) tick(p);
 }
 function beginLogs(
   p: Player,
@@ -111,7 +112,7 @@ function quantity(p: Player, root: string, product: number, n: number): void {
     assert.equal(p.activeScript?.execution, ScriptState.COUNTDIALOG);
     assert(countDialog.handle(new ResumePCountDialog(n), p));
   }
-  tick(p);
+  drain(p);
 }
 function inventory(p: Player, obj: string): number {
   return p.invTotal(InvType.getId("inv"), id(obj));
@@ -171,6 +172,47 @@ try {
     assert.equal(p.stats[PlayerStat.FLETCHING] - before, xp, `${product} XP`);
     checks++;
   }
+  // World processes input before queues in the same tick. Check both the initial
+  // input-armed queue and every queue-armed repeat, including Make X resumption.
+  for (const [log, product, selection, output, xp] of recipes) {
+    for (const makeX of [false, true]) {
+      const p = player();
+      const before = p.stats[PlayerStat.FLETCHING];
+      beginLogs(p, log, 12);
+      const root = log === "logs" ? "skillmulti3" : "skillmulti2";
+      const base = root === "skillmulti3" ? 5 : 4;
+      click(p, `${root}:com_${base + selection * 4 + (makeX ? 0 : 1)}`);
+      if (makeX) {
+        assert.equal(p.activeScript?.execution, ScriptState.COUNTDIALOG);
+        assert(countDialog.handle(new ResumePCountDialog(10), p));
+      }
+      const startTick = World.currentTick;
+      const cuts: number[] = [];
+      let previous = 12;
+      for (let elapsed = 0; elapsed < 32; elapsed++) {
+        // Read after the queue pass, before advancing to the next input phase.
+        p.processQueues();
+        const remaining = inventory(p, log);
+        if (remaining !== previous) {
+          assert.equal(previous - remaining, 1, "one log per cut");
+          cuts.push(World.currentTick - startTick);
+          previous = remaining;
+        }
+        World.currentTick++;
+      }
+      assert.deepEqual(cuts, [0, 3, 6, 9, 12, 15, 18, 21, 24, 27]);
+      assert.equal(inventory(p, log), 2, "requested count stops the queue");
+      assert.equal(inventory(p, product), output * 10);
+      assert.equal(p.stats[PlayerStat.FLETCHING] - before, xp * 10);
+      console.log(
+        `CADENCE ${product} ${makeX ? "Make X=10" : "Make 10"} cuts=${cuts.join(",")} gaps=${cuts
+          .slice(1)
+          .map((t, i) => t - cuts[i])
+          .join(",")}`,
+      );
+      checks++;
+    }
+  }
   for (const n of [5, 10, 3, 28, 0, -1]) {
     const p = player();
     beginLogs(p, "logs", 12);
@@ -183,7 +225,7 @@ try {
   const cancelled = player();
   beginLogs(cancelled, "logs", 5);
   cancelled.closeModal();
-  tick(cancelled);
+  drain(cancelled);
   assert.equal(inventory(cancelled, "logs"), 5);
   checks++;
   const minimums = [1, 5, 10, 20, 25, 35, 40, 50, 55, 65, 70, 80, 85];
@@ -200,9 +242,11 @@ try {
   const interrupted = player();
   beginLogs(interrupted, "logs", 10);
   click(interrupted, "skillmulti3:com_6");
+  tick(interrupted);
+  assert.equal(inventory(interrupted, "logs"), 9, "first cut before walking");
   interrupted.stopAction();
   const remaining = inventory(interrupted, "logs");
-  tick(interrupted);
+  drain(interrupted);
   assert.equal(inventory(interrupted, "logs"), remaining);
   checks++;
 
