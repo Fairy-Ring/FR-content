@@ -112,8 +112,10 @@ bash tests/multinpc-triggers/runtime.sh /absolute/path/to/engine
 
 The suite checks every non-null form slot of the thirteen repaired roots through the real
 player trigger lookup. It executes Juliet's stage-10 dialogue through stage 20 and the message reward.
-It also executes prodding and poisoning for both forms of all four diseased sheep.
-Mourning's sheep have no client Prod option. Their direct-script cases test binding, not menu reachability.
+It also executes prodding, cattleprod advice and poisoning for all four herder sheep forms.
+Dyed mourning forms have neither a Prod menu nor Sheep Herder bindings.
+Negative lookup cases cover both items at unstarted, active and complete Sheep Herder stages.
+Removing their unsupported item-use bindings is CANDIDATE, not verified historical item-use behavior.
 The source decisions and unexecuted LIVE CHECK list are in evidence request `MULTINPC-TRIGGERS-1106`.
 
 

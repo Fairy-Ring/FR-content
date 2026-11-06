@@ -193,6 +193,22 @@ try {
       const p = player();
       const child = select(p, n, slot);
       for (const op of ops) {
+        if (name.startsWith("plaguesheep_") && slot === 1) {
+          assert(
+            child.op === null || child.op.every((option) => option === null),
+          );
+          assert.equal(
+            ScriptProvider.getByTriggerSpecific(op, child.id, child.category),
+            undefined,
+          );
+          p.target = n;
+          p.targetOp = op - 7;
+          assert.equal(p.getOpTrigger(), null);
+          pass(
+            `no Sheep Herder binding on dyed ${child.debugname} op=${ServerTriggerType[op]}`,
+          );
+          continue;
+        }
         if (
           name === "rcu_zammy_mage1" &&
           op === ServerTriggerType.OPNPC4 &&
@@ -247,7 +263,7 @@ try {
   }
 
   for (const i of [1, 2, 3, 4]) {
-    for (const slot of [0, 1]) {
+    for (const slot of [0]) {
       const root = `plaguesheep_${i}`;
       const p = player();
       const n = npc(root);
@@ -262,9 +278,15 @@ try {
       );
       assert.equal(n.sayMessage, "BAAAAA!");
       assert.equal(varp(p, "sheepherdervar"), 0);
-      pass(
-        `prod ${child.debugname} queues movement (slot 1 has no client Prod menu)`,
-      );
+      pass(`prod ${child.debugname} queues movement`);
+
+      const prodUser = player();
+      select(prodUser, n, slot);
+      prodUser.lastUseItem = ObjType.getId("cattleprod");
+      finish(prodUser, start(prodUser, n, ServerTriggerType.OPNPCU));
+      assert(text(prodUser).includes("I'd do better to equip the cattleprod"));
+      assert.equal(varp(prodUser, "sheepherdervar"), 0);
+      pass(`item-use cattleprod on ${child.debugname} keeps equipment advice`);
 
       const poisoner = player();
       const victim = npc(root, 2596 + i, 3362 + slot);
@@ -293,6 +315,30 @@ try {
       pass(
         `poison ${child.debugname} sets correct bits, removes sheep and drops matching bones`,
       );
+    }
+  }
+
+  // Dyed forms cannot reach poison_sheep, even with an in-pen NPC and feed.
+  // Stages 0/2/3 are labelled fixtures: unstarted/active/complete.
+  for (const i of [1, 2, 3, 4]) {
+    for (const stage of [0, 2, 3]) {
+      for (const item of ["poisoned_feed", "cattleprod"]) {
+        const p = player();
+        const n = npc(`plaguesheep_${i}`, 2596 + i, 3364);
+        const child = select(p, n, 1);
+        varp(p, "sheepherderquest", stage);
+        p.lastUseItem = ObjType.getId(item);
+        p.target = n;
+        p.targetOp = ServerTriggerType.OPNPCU - 7;
+        assert.equal(p.getOpTrigger(), null);
+        assert.equal(
+          ScriptProvider.getByName(`[opnpcu,${child.debugname}]`),
+          undefined,
+        );
+        pass(
+          `dyed ${child.debugname} rejects ${item} lookup at quest stage=${stage}`,
+        );
+      }
     }
   }
   console.log(`PASS ${checks} packed runtime scenarios; no server started`);

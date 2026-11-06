@@ -11,25 +11,13 @@
 [opnpc1,herder_plaguesheep_1]
 @prod_sheep(plaguesheep_1);
 
-[opnpc1,mourning_plaguesheep_1]
-@prod_sheep(plaguesheep_1);
-
 [opnpc1,herder_plaguesheep_2]
-@prod_sheep(plaguesheep_2);
-
-[opnpc1,mourning_plaguesheep_2]
 @prod_sheep(plaguesheep_2);
 
 [opnpc1,herder_plaguesheep_3]
 @prod_sheep(plaguesheep_3);
 
-[opnpc1,mourning_plaguesheep_3]
-@prod_sheep(plaguesheep_3);
-
 [opnpc1,herder_plaguesheep_4]
-@prod_sheep(plaguesheep_4);
-
-[opnpc1,mourning_plaguesheep_4]
 @prod_sheep(plaguesheep_4);
 
 [label,prod_sheep](npc $npc)
@@ -127,9 +115,6 @@ npc_setmode(null);
 [opnpcu,herder_plaguesheep_2]
 @plaguesheep_2_use;
 
-[opnpcu,mourning_plaguesheep_2]
-@plaguesheep_2_use;
-
 [label,plaguesheep_2_use]
 switch_obj(last_useitem) {
     case cattleprod : @cattle_prod_use_message;
@@ -137,9 +122,6 @@ switch_obj(last_useitem) {
 }
 
 [opnpcu,herder_plaguesheep_1]
-@plaguesheep_1_use;
-
-[opnpcu,mourning_plaguesheep_1]
 @plaguesheep_1_use;
 
 [label,plaguesheep_1_use]
@@ -151,9 +133,6 @@ switch_obj(last_useitem) {
 [opnpcu,herder_plaguesheep_3]
 @plaguesheep_3_use;
 
-[opnpcu,mourning_plaguesheep_3]
-@plaguesheep_3_use;
-
 [label,plaguesheep_3_use]
 switch_obj(last_useitem) {
     case cattleprod : @cattle_prod_use_message;
@@ -161,9 +140,6 @@ switch_obj(last_useitem) {
 }
 
 [opnpcu,herder_plaguesheep_4]
-@plaguesheep_4_use;
-
-[opnpcu,mourning_plaguesheep_4]
 @plaguesheep_4_use;
 
 [label,plaguesheep_4_use]
