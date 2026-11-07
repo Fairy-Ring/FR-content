@@ -5,7 +5,7 @@ if(inv_freespace(trail_puzzleinv) > 1) {
     inv_clear(trail_puzzleinv); // prob shouldn't ever need this
     ~init_trail_puzzle;
 }
-inv_transmit(trail_puzzleinv, trail_puzzle:com_3);
+inv_transmit(trail_puzzleinv, trail_puzzle:com_2);
 if_openmain(trail_puzzle);
 
 [proc,init_trail_puzzle]
