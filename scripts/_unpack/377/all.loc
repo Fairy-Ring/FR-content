@@ -93773,6 +93773,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=mining_rock_empty,1
 
 [rocks_14833]
 name=Rocks
@@ -93788,6 +93790,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=mining_rock_empty,1
 
 [rocks_14834]
 name=Rocks
@@ -93803,6 +93807,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=mining_rock_empty,1
 
 [rocks_14835]
 name=Rocks
@@ -94058,6 +94064,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14832
 
 [rocks_14851]
 name=Rocks
@@ -94073,6 +94081,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14833
 
 [rocks_14852]
 name=Rocks
@@ -94088,6 +94098,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14834
 
 [rocks_14853]
 name=Rocks
@@ -94103,6 +94115,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14832
 
 [rocks_14854]
 name=Rocks
@@ -94118,6 +94132,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14833
 
 [rocks_14855]
 name=Rocks
@@ -94133,6 +94149,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14834
 
 [rocks_14856]
 name=Rocks
@@ -94148,6 +94166,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_fast
+param=next_loc_stage_mining,rocks_14832
 
 [rocks_14857]
 name=Rocks
@@ -94163,6 +94183,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_fast
+param=next_loc_stage_mining,rocks_14833
 
 [rocks_14858]
 name=Rocks
@@ -94178,6 +94200,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_fast
+param=next_loc_stage_mining,rocks_14834
 
 [rocks_14859]
 name=Rocks
@@ -94193,6 +94217,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14832
 
 [rocks_14860]
 name=Rocks
@@ -94208,6 +94234,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14833
 
 [rocks_14861]
 name=Rocks
@@ -94223,6 +94251,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14834
 
 [rocks_14862]
 name=Rocks
@@ -94238,6 +94268,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14832
 
 [rocks_14863]
 name=Rocks
@@ -94253,6 +94285,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14833
 
 [rocks_14864]
 name=Rocks
@@ -94268,6 +94302,8 @@ op3=hidden
 mapscene=12
 blockrange=no
 ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_14834
 
 [qip_cook_barrel]
 name=Barrel

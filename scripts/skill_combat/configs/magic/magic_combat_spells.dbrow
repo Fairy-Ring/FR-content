@@ -556,3 +556,14 @@ data=spotanim_proj,slayer_magicdart_travel,43,31,51,16,-5,64,10
 data=spotanim_target,slayer_magicdart_impact,124
 data=sound_cast,magic_dart_fire
 data=continue_by_autocast,true
+
+[magic_spell_saradomin_strike_npc]
+table=magic_spell_table
+data=spell,^saradomin_strike_npc
+data=levelrequired,0
+data=anim,human_casting
+data=spotanim_target,saradomin_lightning,128
+data=sound_cast,firewave_cast_and_fire
+data=sound_hit,saradomin_strike
+data=continue_by_autocast,true
+data=maxhit,20
