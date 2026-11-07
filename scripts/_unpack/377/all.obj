@@ -31159,7 +31159,6 @@ weight=20g
 category=trail_clue_easy
 param=trail_desc,A crate found in the|tower of a church is|your next location.
 tradeable=no
-param=trail_desc,The crate in the ground|floor of a church is|your next location.
 param=trail_coord,1_40_51_52_40
 [trail_clue_easy_vague005]
 name=Clue scroll
@@ -32190,7 +32189,6 @@ model=obj_trail_clue_easy_simple001
 iop1=Read
 weight=20g
 category=trail_clue_hard
-param=trail_desc,Come to the evil ledge,|Yew know yew want to.|Try not to get stung.
 param=trail_casket,trail_clue_hard_riddle002_casket
 param=trail_coord,0_48_54_17_12
 tradeable=no
@@ -32341,7 +32339,6 @@ model=obj_trail_clue_easy_simple001
 iop1=Read
 weight=20g
 category=trail_clue_hard
-param=trail_desc,The beasts to my east|snap claws and tails,|The rest to my west|can slide and eat fish.|The force to my north|will jump and they'll wail,|Come dig by my fire|and make a wish.
 param=trail_casket,trail_clue_hard_riddle007_casket
 param=trail_coord,0_40_51_39_3
 tradeable=no
@@ -32509,7 +32506,6 @@ model=obj_trail_clue_easy_simple001
 iop1=Read
 weight=20g
 category=trail_clue_hard
-param=trail_desc,@or2@'A bag belt only?'|He asked his balding brothers.
 tradeable=no
 param=trail_desc,@or2@'A bag belt only?'@end@|He asked his balding brothers.
 [trail_clue_hard_riddle014]
@@ -33185,7 +33181,6 @@ model=obj_trail_clue_easy_simple001
 iop1=Read
 weight=20g
 category=trail_clue_medium
-param=trail_desc,In a town where the guards|are armed with maces, search|the upstairs rooms of the|Public House.
 tradeable=no
 param=trail_desc,In a town where the guards|are armed with maces search|the upstairs rooms of the|Public House.
 [trail_clue_medium_riddle002_key]
@@ -33245,7 +33240,6 @@ model=obj_trail_clue_easy_simple001
 iop1=Read
 weight=20g
 category=trail_clue_medium
-param=trail_desc,In a town where everyone has|perfect vision, seek some|locked drawers in a house that|sits opposite a workshop.
 tradeable=no
 param=trail_desc,Look for some locked drawers|in the house opposite a|workshop in a town where|everyone has perfect vision.
 [trail_clue_medium_riddle004_key]
