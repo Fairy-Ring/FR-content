@@ -30631,7 +30631,7 @@ weight=20g
 category=trail_clue_easy
 param=trail_desc,Search the crate in the left-|hand tower of Lumbridge Castle.
 tradeable=no
-param=trail_coord,1_50_50_28_16
+param=trail_coord,1_50_50_28_12
 [trail_clue_easy_simple003]
 name=Clue scroll
 desc=A clue!
@@ -30647,7 +30647,7 @@ weight=20g
 category=trail_clue_easy
 param=trail_desc,Search the boxes in the goblin|house near Lumbridge.
 tradeable=no
-param=trail_coord,0_50_50_48_46
+param=trail_coord,0_50_50_45_45
 [trail_clue_easy_simple004]
 name=Clue scroll
 desc=A clue!
@@ -30887,7 +30887,7 @@ weight=20g
 category=trail_clue_easy
 param=trail_desc,Search the drawers in|Falador's chain mail shop.
 tradeable=no
-param=trail_coord,0_46_51_25_46
+param=trail_coord,0_46_51_25_47
 [trail_clue_easy_simple019]
 name=Clue scroll
 desc=A clue!
@@ -31160,7 +31160,7 @@ category=trail_clue_easy
 param=trail_desc,A crate found in the|tower of a church is|your next location.
 tradeable=no
 param=trail_desc,The crate in the ground|floor of a church is|your next location.
-param=trail_coord,0_40_51_49_40
+param=trail_coord,1_40_51_52_40
 [trail_clue_easy_vague005]
 name=Clue scroll
 desc=A clue!
