@@ -3,7 +3,7 @@
 // CANDIDATE last-resort 2007-base: OSRS Giving Eblis ingredients minus
 // RS3 dump-all / remaining-count / [sir/madam]. Hunt 289? no.
 // Gate %deserttreasure = 8. Increment fd_* only. Never write 10 / 15 here.
-// Cite dt-eblis-ingredient-take-377.md.
+// Research: subject desert-treasure.
 
 [opnpcu,fd_elder_village]
 if (%deserttreasure ! 8) {

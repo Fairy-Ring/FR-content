@@ -47,7 +47,7 @@ return;
 if (%deserttreasure = 8) {
     %deserttreasure = 10;
 }
-%fd_mirror_present = 1; // CANDIDATE present-bit — Eblis sets up the mirrors (dt-mirrors-look-into-next-377.md)
+%fd_mirror_present = 1; // CANDIDATE present-bit — Eblis sets up the mirrors (research: subject desert-treasure)
 return;
 
 [label,dt_eblis_east]

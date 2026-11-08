@@ -6,8 +6,7 @@
 // before Look-into. Dump then return. Prefer 0 write: %deserttreasure
 // stays 10. No %fd_mirror_present, no dest / Look-into, no 15, no AM, no
 // warrior map. Bind the child, not fourdiamonds_elder2. No && / ||.
-// Cite docs/research/dt-mirrors-look-into-still-stop-377.md (leftover 1925)
-//     · dt-eblis-four-diamonds-return-377.md §3 · Transcript:Desert Treasure I.
+// Research: subject desert-treasure (leftover 1925) · Transcript:Desert Treasure I.
 
 [opnpc1,fd_elder_by_mirrors]
 ~chatplayer("<p,neutral>So can you give me any help on where to find these warriors and their diamonds?");
