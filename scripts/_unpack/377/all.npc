@@ -61867,8 +61867,8 @@ alwaysontop=yes
 head1=obj_pickpocket_guide_farmer
 head2=npc_2747_head
 head3=idk_man_jaw_long_head
-// CANDIDATE server staging: no autonomous movement for noncombat Wanted actors.
-// Keep scripted movement available; combat actors/allocation belong to S1b.
+// Product staging; historical movement UNKNOWN (vault wanted.npc-staging).
+// Engine defaults are not period evidence; keep scripted motion available. Combat/allocation belong to S1b.
 wanderrange=0
 defaultmode=none
 

@@ -206,7 +206,8 @@
 ^twocats_questpoints = 2
 ^zogre_questpoints = 1
 
-// CANDIDATE product terminal from the Wanted plan's stage ladder, not a recovered 377 integer.
-^wanted_complete = 18
+// CANDIDATE: early-OSRS cache 323 script 5 PCs 2012-2017, RuneStar 2018 case 444 (vault wanted.terminal-stage).
+// 2007-base fallback, as for the other 26 registry terminals; continuity from 377 is unproven.
+^wanted_complete = 11
 // VERIFIED 1 QP: period quest lists/guides (vault wanted.rewards).
 ^wanted_questpoints = 1
