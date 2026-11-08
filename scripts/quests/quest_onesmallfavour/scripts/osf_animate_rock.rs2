@@ -3,8 +3,7 @@
 // After misfire: birth 1804 → Attack 1802. Kill leftover 25→26.
 // Second Read at 26 = free Petra leftover (CANDIDATE 2007-base minus Changes).
 // Use at >25 stays default — do not invent both firing. No dest / 12346 / lamps.
-// Hunt 289? no. Cite osf-animate-rock-377.md + osf-slagilith-fight-377.md
-// + osf-petra-free-377.md.
+// Research: subject one-small-favour.
 
 [opheld1,favour_animate_rock]
 if (%onesmallfavour >= 26) {

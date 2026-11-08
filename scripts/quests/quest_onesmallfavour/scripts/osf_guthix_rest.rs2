@@ -5,7 +5,7 @@
 // (4460) + 1 harralander (255) + 2 guam (249) + 1 marentill (251) via the pack
 // favour_cup_* graph -> cup_guthix_rest_3 (4419); wrong herb -> favour_herbtea_ruined
 // (4462). CANDIDATE mes lines (2007-base minus Changes). No varp write, no XP,
-// no dest / 12346. Cite spine-17-remaining-impl-377.md + osf-guthix-rest-brew-377.md.
+// no dest / 12346. Research: subject one-small-favour · spine-17-remaining-impl-377.md.
 
 [oplocu,range] @osf_bowl_heat_oven;
 [oplocu,scenery_2729] @osf_bowl_heat_oven;

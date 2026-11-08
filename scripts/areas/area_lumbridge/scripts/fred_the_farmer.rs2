@@ -1,7 +1,7 @@
 [opnpc1,fred_the_farmer]
 // One Small Favour leftover after Johanhus 5→6. Keep shearer.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Fred).
-// No dest / cages / Seth / 12346. Cite osf-fred-after-johanhus-377.md.
+// No dest / cages / Seth / 12346. Research: subject one-small-favour.
 if (%onesmallfavour >= 6) {
     ~chatnpc("<p,angry>What are you doing on my land?");
     def_int $osf = 0;

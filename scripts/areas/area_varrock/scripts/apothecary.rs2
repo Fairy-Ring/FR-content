@@ -7,7 +7,7 @@ if(%rjquest = ^romeojuliet_spoken_father) {
     // One Small Favour leftover after Horvik 8→9. Keep potions.
     // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Apothecary).
     // No dest / Tassie product / 12346. Hunt 289? no.
-    // Salts PREFIX after airtight 4436 (osf-apothecary-salts-return-377.md).
+    // Salts PREFIX after airtight 4436 (Research: subject one-small-favour).
     if (%onesmallfavour >= 35 & inv_total(inv, favour_airtight_pot) > 0) {
         @osf_apothecary_salts;
         return;

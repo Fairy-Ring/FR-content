@@ -54,7 +54,7 @@ if (inv_total(inv, edgevilledungeonkey) > 0) {
 }
 
 [label,open_edgeville_from_ring]
-// OSF leftover Use-ring. Cite osf-key-ring-doors-rest-377.md.
+// OSF leftover Use-ring. Research: subject one-small-favour.
 // Do not require inv brass key. Do not dest.
 mes("You use your keyring to unlock the door.");
 sound_synth(locked, 1, 0);

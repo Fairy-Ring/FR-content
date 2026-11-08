@@ -1,7 +1,7 @@
 // One Small Favour — Tassie after Apothecary 9→10.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Tassie).
 // No dest / 4436 / 12346. Hunt 289? no.
-// Cite osf-tassie-slipcast-377.md · osf-tassie-clay-377.md.
+// Research: subject one-small-favour.
 
 [opnpc1,favour_tassie_slipcast]
 if (%onesmallfavour < 10) {
@@ -9,7 +9,7 @@ if (%onesmallfavour < 10) {
     return;
 }
 // Return leftover after Hammerspike bargain 33→34. Teach potlid + clay grant.
-// No 4436 / 4438 / 4440 grant. Cite osf-tassie-potlid-377.md · osf-tassie-clay-377.md.
+// No 4436 / 4438 / 4440 grant. Research: subject one-small-favour.
 if (%onesmallfavour >= 34) {
     @osf_tassie_potlid;
     return;

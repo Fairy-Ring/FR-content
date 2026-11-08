@@ -2,7 +2,7 @@
 // CANDIDATE last-resort 2007-base (OSRS Asking Johanhus about Jimmy).
 // Return after Seth 37→38: spoken release of Jimmy the Chisel.
 // No dest / trapdoor / empty-cage / Aggie unwind / 12346 / lamps. Hunt 289? no.
-// Cite osf-johanhus-later-377.md · osf-johanhus-jimmy-release-377.md.
+// Research: subject one-small-favour.
 
 [opnpc1,favour_johanhus_ulsbrecht]
 if (%onesmallfavour < 5) {

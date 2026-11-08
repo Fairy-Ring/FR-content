@@ -1,7 +1,7 @@
 // One Small Favour — sculpture Look/Search after Phantuwti 15→16.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Petra).
 // No dest / Petra spawn / Cromperty Talk-to / 12346. Hunt 289? no.
-// Cite osf-petra-after-phantuwti-377.md.
+// Research: subject one-small-favour.
 
 [oploc1,favour_lady_in_wall]
 if (%onesmallfavour < 16) {

@@ -22,7 +22,7 @@ if(%chompybird >= ^chompybird_rantz_gave_player_bow & ~obj_gettotal(ogre_bow) = 
 // One Small Favour leftover after Tindel 18→19. Keep Chompy / hats / Use-on.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Rantz).
 // No dest / comfy 4426 / lights / 12346. Hunt 289? no.
-// Cite osf-rantz-after-tindel-377.md.
+// Research: subject one-small-favour.
 if (%onesmallfavour >= 19) {
     def_int $osf = 0;
     if (%onesmallfavour >= 22) {

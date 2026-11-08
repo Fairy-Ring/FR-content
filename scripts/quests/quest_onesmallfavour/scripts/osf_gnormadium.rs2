@@ -1,7 +1,7 @@
 // One Small Favour — Gnormadium after Rantz 19→20.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Gnormadium).
 // Lights ask only. No dest / Feldip / lights flip / gem / comfy / 12346.
-// Hunt 289? no. Cite osf-gnormadium-after-rantz-377.md.
+// Hunt 289? no. Research: subject one-small-favour.
 
 [opnpc1,gnormadium_avlafrim]
 if (%onesmallfavour < 20) {
@@ -39,7 +39,7 @@ if ($op = 4) {
 return;
 
 [label,osf_gnorm_menu_after]
-// CANDIDATE p_choice5 slot swap. Cite osf-gnormadium-chisel-377.md / osf-gnormadium-fixed-lights-377.md.
+// CANDIDATE p_choice5 slot swap. Research: subject one-small-favour.
 def_int $again = 0;
 if (%all_lights_fixed = 1) {
     $again = ~p_choice5("Hello there, what are you working on?", 1, "What are you working on?", 2, "Is there anything I can do?", 3, "Do you need any more help from me?", 4, "Okay, thanks.", 5);

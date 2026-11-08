@@ -1,7 +1,7 @@
 // One Small Favour — Hammerspike after Tassie 10→11.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Hammerspike).
 // No dest / gang Attack / Sanfew product / 12346. Hunt 289? no.
-// Cite osf-hammerspike-after-tassie-377.md.
+// Research: subject one-small-favour.
 
 [opnpc1,favour_hammerspike_stoutbeard]
 if (%onesmallfavour < 11) {
@@ -10,7 +10,7 @@ if (%onesmallfavour < 11) {
 }
 // Return leftover after Sanfew unwind 31→32. Tip.it 2007 two-talk:
 // first talk = initiate news + changed mind (this hop). Second talk /
-// leftover-IF Attack / after-kill = later. Cite osf-hammerspike-return-377.md.
+// leftover-IF Attack / after-kill = later. Research: subject one-small-favour.
 if (%onesmallfavour >= 32) {
     @osf_hammerspike_return;
     return;

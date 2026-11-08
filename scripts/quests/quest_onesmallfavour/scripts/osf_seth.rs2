@@ -1,7 +1,7 @@
 // One Small Favour — Seth Groats after Fred 6→7.
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Seth).
 // Return consume after Horvik 36→37. No dest / Jimmy release / 12346.
-// Cite osf-seth-groats-after-fred-377.md · osf-seth-cages-return-377.md.
+// Research: subject one-small-favour · osf-seth-groats-after-fred-377.md.
 
 [opnpc1,favour_seth_groats]
 if (%onesmallfavour < 7) {

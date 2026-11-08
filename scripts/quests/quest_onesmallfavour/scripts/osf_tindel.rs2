@@ -2,7 +2,7 @@
 // CANDIDATE last-resort 2007-base (OSRS Transcript:One Small Favour Tindel).
 // First-write stodgy 4425 18→19 KEEP. Return: inv_del 4426 + inv_add 4427, 23→24.
 // No dest / 4428 / Sword give / Ring-bell / 12346 / 200gp rematch (later leftover).
-// Hunt 289? no. Cite osf-tindel-oxide-grant-377.md + osf-tindel-comfy-return-377.md.
+// Hunt 289? no. Research: subject one-small-favour.
 
 [opnpc1,tindel_marchant]
 if (%onesmallfavour < 18) {

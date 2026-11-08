@@ -17,7 +17,7 @@ switch_obj ($item)
 {
     case bowl_unfired, piedish_unfired, pot_unfired : @fire_pottery(last_useslot);
     case potlid_unfired :
-        // OSF potlid craft after teach 35. Cite osf-tassie-clay-377.md.
+        // OSF potlid craft after teach 35. Research: subject one-small-favour.
         if (%onesmallfavour >= 35) {
             @fire_pottery(last_useslot);
         }

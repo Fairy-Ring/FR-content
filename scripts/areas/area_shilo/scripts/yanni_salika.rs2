@@ -1,11 +1,11 @@
 // Shop path is live Shilo antiques (RuneHQ city-guide). OSF favour branch is
 // CANDIDATE last-resort 2007-base (Transcript:One Small Favour minus ~Feb 2022
 // overlay / RS3 Overview / hatchet). Hunt 289? no. Accept %onesmallfavour 0→1.
-// Mahogany-return leftover (cite osf-yanni-mahogany-return-377.md): prefix only
+// Mahogany-return leftover (Research: subject one-small-favour): prefix only
 // when >= 42 + inv 4445. Consume 4445. 42→43.
-// Key ring award leftover (cite osf-key-ring-award-377.md): inv_add 4446 once
+// Key ring award leftover (Research: subject one-small-favour): inv_add 4446 once
 // on the same rant. 43→44.
-// Lamps leftover (cite osf-reward-lamps-377.md): inv_add 4447 twice (to 2).
+// Lamps leftover (Research: subject one-small-favour): inv_add 4447 twice (to 2).
 // 44→45. No dest / leftover 12346 / Check-keys / Rub / shop rewrite.
 
 [opnpc1,shiloantiques]
