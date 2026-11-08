@@ -1,6 +1,6 @@
-// CANDIDATE wording: wanted.dlg.tiffy-start, tiffy-plan and tiffy-crisis.
-// Retained 2025 transcript as a 2007-base fallback, authorised by D1.
-// Product stages follow the bounded 0..11 ladder. No Commorb exchange here.
+// CANDIDATE wording: wanted.dlg.tiffy-start, tiffy-plan, tiffy-crisis,
+// tiffy-mission and tiffy-commorb-help. Product stages follow the 0..11 ladder.
+// The exchange and replacement checks do not yield between item and stage writes.
 
 [label,wanted_tiffy_menu]
 ~chatnpc("<p,happy>What ho, <text_gender("sirrah", "milady")>. Jolly good show on the old training grounds thingy, what?");
@@ -26,9 +26,9 @@ switch_int (%wanted_main) {
     case ^wanted_squire : @wanted_tiffy_squire_crisis;
     case ^wanted_no_crisis : @wanted_tiffy_crisis;
     case ^wanted_crisis_reported : @wanted_tiffy_crisis_reminder;
+    case ^wanted_deputised : @wanted_tiffy_mission;
+    case ^wanted_commorb_issued, ^wanted_intelligence_open, ^wanted_chase, ^wanted_solus_defeated, ^wanted_complete : @wanted_tiffy_commorb_help;
 }
-// S2 ends at deputising. The quest option still exposes its current objective;
-// the subsequent mission/equipment conversation belongs to the Commorb unit.
 ~wanted_journal;
 return;
 
@@ -187,4 +187,157 @@ return;
 ~chatplayer("<p,quiz>Hi Tiffy. What am I supposed to be doing again?");
 ~chatnpc("<p,neutral>Go and report to Sir Amik for 'orders'. You will be unsurprised to find out he will now be prepared to deputise you.");
 ~chatnpc("<p,neutral>After you have spoken to him return here immediately, your life will be at risk without our assistance, and we don't want you dying on your first mission for us, what?");
+return;
+[label,wanted_tiffy_mission]
+if (%wanted_main ! ^wanted_deputised | inv_total(inv, wanted_crystal_ball) > 0 | inv_total(bank, wanted_crystal_ball) > 0) {
+    return;
+}
+~chatplayer("<p,neutral>Tiffy, it worked exactly to plan! Sir Amik deputised me to take care of this Solus Doolally dude, so let's go get him!");
+~chatnpc("<p,neutral>His name is Solus Dellagar, and honestly, he is one of the most dangerous men on the planet.");
+~chatnpc("<p,neutral>Not only is he extremely adapt at magic, he is also quite prepared to use that magic at a moments notice, because he is quite, quite mad.");
+~chatplayer("<p,quiz>So... Dragonhide armour and an elemental shield and I'm laughing?");
+~chatnpc("<p,neutral>No, no, no. Listen to me <text_gender("boy", "girl")>; You are under NO CIRCUMSTANCES to engage him directly in combat!");
+~chatnpc("<p,neutral>You are to act as our agent and track him down, when you have managed to corner him somewhere then we will send in a field recovery team directly to take him away without incident.");
+~chatnpc("<p,neutral>I cannot stress this enough; You are to observe and locate, you are NOT to enter a combat situation!");
+~chatplayer("<p,neutral>Riiiiight.... So I'm just going to scout him out for you then.");
+~chatplayer("<p,quiz>Any tips on how to find him?");
+~chatnpc("<p,neutral>Well old <text_gender("boy", "girl")>, we need to equip you for the task, but you'll need to get something for me first, what?");
+~chatplayer("<p,quiz>What kind of stuff?");
+~chatnpc("<p,neutral>Well, we teach our operatives the value of their equipment by making them pay for it, what?");
+~chatnpc("<p,neutral>You have two choices here, you can either give me the cash directly, and I will hand it over, or you can bring me the raw materials and I will make you one.");
+def_int $method = ~p_choice2("Buy One", 1, "Have One Made", 2);
+if ($method = 1) {
+    @wanted_tiffy_buy_commorb;
+} else {
+    @wanted_tiffy_make_commorb;
+}
+return;
+
+[label,wanted_tiffy_buy_commorb]
+// The recorded Buy One route refuses a full inventory before checking coins.
+if (inv_freespace(inv) = 0) {
+    ~chatnpc("<p,neutral>Well we in the Temple Knights have some specific equipment for situations such as this dontchaknow, but you'll need to free up some inventory space first!");
+    return;
+}
+~chatnpc("<p,neutral>It's 10,000 coins for the Temple Knight Communication Orb. You have that kind of money with you?");
+if (inv_total(inv, coins) < 10000) {
+    @wanted_tiffy_commorb_missing_coins;
+    return;
+}
+~chatplayer("<p,neutral>Oh yeah, I got your money.");
+~chatnpc("<p,neutral>Then you wish to purchase a Temple Knight Communication Orb?");
+def_int $confirm = ~p_choice2("Yes", 1, "No", 2);
+if ($confirm ! 1) {
+    ~chatplayer("<p,neutral>Actually, no thanks.");
+    ~chatnpc("<p,neutral>As you wish, what?");
+    return;
+}
+// The confirmation yields. Recheck every precondition, then commit the payment,
+// item and stage together before the next dialogue can yield.
+if (%wanted_main ! ^wanted_deputised | inv_total(inv, wanted_crystal_ball) > 0 | inv_total(bank, wanted_crystal_ball) > 0) {
+    return;
+}
+if (inv_freespace(inv) = 0) {
+    ~chatnpc("<p,neutral>Well we in the Temple Knights have some specific equipment for situations such as this dontchaknow, but you'll need to free up some inventory space first!");
+    return;
+}
+if (inv_total(inv, coins) < 10000) {
+    return;
+}
+inv_del(inv, coins, 10000);
+inv_add(inv, wanted_crystal_ball, 1);
+%wanted_main = ^wanted_commorb_issued;
+~wanted_update_progress;
+@wanted_tiffy_commorb_issued;
+return;
+
+[label,wanted_tiffy_commorb_missing_coins]
+~chatplayer("<p,sad>I don't have that kind of money with me...");
+~chatnpc("<p,neutral>Perhaps you would like to just bring me the components of it then, what?");
+~chatnpc("<p,neutral>Bring me one law rune, one slayer gem and one piece of molten glass and I will make you a Communication Orb.");
+if (inv_total(inv, lawrune) > 0 | inv_total(inv, slayer_gem) > 0 | inv_total(inv, molten_glass) > 0) {
+    ~chatplayer("<p,quiz>Can I give you the components I have with me now?");
+    ~chatnpc("<p,neutral>Heavens, boy! I am not a pawn shop, to be holding bits and pieces for you while you go off and do something else!");
+    ~chatnpc("<p,neutral>No, no you bring me all three components at the same time, what?");
+}
+~chatplayer("<p,neutral>Okay Tiffy.");
+return;
+
+[label,wanted_tiffy_make_commorb]
+if (inv_total(inv, lawrune) = 0 & inv_total(inv, slayer_gem) = 0 & inv_total(inv, molten_glass) = 0) {
+    ~chatnpc("<p,neutral>Bring me one Law Rune, one Slayer Gem and one piece of Molten Glass and I will make you a Communication Orb.");
+    return;
+}
+if (inv_total(inv, lawrune) < 1 | inv_total(inv, slayer_gem) < 1 | inv_total(inv, molten_glass) < 1) {
+    ~chatplayer("<p,quiz>Can I give you the components I have with me now?");
+    ~chatnpc("<p,neutral>Heavens, boy! I am not a pawn shop, to be holding bits and pieces for you while you go off and do something else!");
+    ~chatnpc("<p,neutral>No, no you bring me all three components at the same time, what?");
+    return;
+}
+~chatplayer("<p,neutral>I have all three components for you to make me a Communication Orb out of now Tiffy.");
+~chatnpc("<p,happy>Excellent! You wish me to make you one now then, what?");
+def_int $confirm = ~p_choice2("Yes", 1, "No", 2);
+if ($confirm ! 1) {
+    ~chatplayer("<p,neutral>Actually, no thanks.");
+    ~chatnpc("<p,neutral>As you wish, what?");
+    return;
+}
+// Consuming the three source items frees output capacity even when the inventory
+// was full; the post-confirmation check avoids partial payment after a stale menu.
+if (%wanted_main ! ^wanted_deputised | inv_total(inv, wanted_crystal_ball) > 0 | inv_total(bank, wanted_crystal_ball) > 0) {
+    return;
+}
+if (inv_total(inv, lawrune) < 1 | inv_total(inv, slayer_gem) < 1 | inv_total(inv, molten_glass) < 1) {
+    return;
+}
+inv_del(inv, lawrune, 1);
+inv_del(inv, slayer_gem, 1);
+inv_del(inv, molten_glass, 1);
+inv_add(inv, wanted_crystal_ball, 1);
+%wanted_main = ^wanted_commorb_issued;
+~wanted_update_progress;
+@wanted_tiffy_commorb_issued;
+return;
+
+[label,wanted_tiffy_commorb_issued]
+~chatnpc("<p,happy>Here take this Communications Orb, or 'CommOrb' for short.");
+~chatnpc("<p,neutral>It is a precise magical mechanism that we can use to track him, by sending data of the surrounding area back to one of our information operatives at the Temple Knight Headquarters.");
+~chatnpc("<p,neutral>Your information operative is known as Savant, I suggest you contact them using your CommOrb at your earliest convenience.");
+~chatnpc("<p,neutral>They will be able to send you any useful data about Solus directly through it for your perusal, dontchaknow.");
+~chatplayer("<p,neutral>Ok, thanks Tiffy!");
+return;
+
+[label,wanted_tiffy_commorb_help]
+if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated & %wanted_main ! ^wanted_complete) {
+    return;
+}
+// A held or banked Commorb is still the player's; only a genuinely missing
+// orb gets the source-record free replacement. No floor inventory is consulted.
+if (inv_total(inv, wanted_crystal_ball) = 0 & inv_total(bank, wanted_crystal_ball) = 0) {
+    if (inv_freespace(inv) = 0) {
+        return;
+    }
+    ~chatplayer("<p,sad>Hey Tiffy, I lost my CommOrb...");
+    if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated & %wanted_main ! ^wanted_complete) {
+        return;
+    }
+    if (inv_total(inv, wanted_crystal_ball) > 0 | inv_total(bank, wanted_crystal_ball) > 0 | inv_freespace(inv) = 0) {
+        return;
+    }
+    inv_add(inv, wanted_crystal_ball, 1);
+    ~chatnpc("<p,neutral>Very careless of you, what? Here, take another, but be careful of this one!");
+    if (inv_total(inv, wanted_crystal_ball) > 0 & %wanted_commorb_intel = 0) {
+        @wanted_tiffy_commorb_first_use;
+    }
+    return;
+}
+if (%wanted_commorb_intel = 0 & (inv_total(inv, wanted_crystal_ball) > 0 | inv_total(bank, wanted_crystal_ball) > 0)) {
+    @wanted_tiffy_commorb_first_use;
+}
+return;
+
+[label,wanted_tiffy_commorb_first_use]
+~chatplayer("<p,quiz>Hi Tiffy. What am I supposed to be doing again?");
+~chatnpc("<p,neutral>You are hunting for Solus Dellagar, the evil criminal mastermind.");
+~chatnpc("<p,neutral>I suggest you contact Savant through your CommOrb and see if she can send you any relevant information about your assignment.");
 return;

@@ -1,0 +1,144 @@
+// CANDIDATE wording: wanted.dlg.savant-chat, using the retained 2025 transcript
+// as a 2007-base fallback. The stage and flag mapping is product-defined.
+
+[label,wanted_savant_contact]
+if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated & %wanted_main ! ^wanted_complete) {
+    return;
+}
+if (%wanted_contacted_savant = ^false) {
+    // First greeting is independent of the assignment and record transfer.
+    ~chatplayer("<p,neutral>Hello...?");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, hello! You must be <displayname>? Sir Tiffy told me to expect you to call in on this frequency!");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>So what do you think? Pretty nifty little piece of kit this crystal, huh?");
+    ~chatplayer("<p,neutral>Yeah, it must be very useful.");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Oh, trust me you'll find out exactly how useful! Now, was there something you wanted?");
+    %wanted_contacted_savant = ^true;
+    @wanted_savant_first_menu;
+    return;
+}
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Hello there <displayname>. What can I help you with?");
+@wanted_savant_repeat_menu;
+return;
+
+[label,wanted_savant_first_menu]
+def_int $choice = ~p_choice3("Current Assignment", 1, "Savant", 2, "The Temple Knights", 3);
+switch_int ($choice) {
+    case 1 : @wanted_savant_assignment;
+    case 2 : @wanted_savant_name;
+    case 3 : @wanted_savant_temple_knights;
+}
+return;
+
+[label,wanted_savant_repeat_menu]
+def_int $choice = ~p_choice4("Current Assignment", 1, "Savant", 2, "The Temple Knights", 3, "Nothing", 4);
+switch_int ($choice) {
+    case 1 : @wanted_savant_assignment;
+    case 2 : @wanted_savant_name;
+    case 3 : @wanted_savant_temple_knights;
+    case 4 : @wanted_savant_nothing;
+}
+return;
+
+[label,wanted_savant_assignment]
+// Choosing the assignment is not the transfer. Recheck the stage after the menu.
+if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated & %wanted_main ! ^wanted_complete) {
+    return;
+}
+if (%wanted_main ! ^wanted_commorb_issued & %wanted_daquarius_hint = 2 & %wanted_zammy_mage_hint = 2) {
+    ~chatplayer("<p,neutral>Hi Savant. Where am I supposed to look for Solus again?");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>The clue was that Solus is somewhere where you might find Fur, East of Varrock...");
+    return;
+}
+@wanted_savant_assignment_transfer;
+return;
+
+[label,wanted_savant_assignment_transfer]
+~chatplayer("<p,neutral>Hi Savant! I was wondering if you could give me details on my current assignment?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Okaaaaay... Bringing up your current assignment details...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Oh! You're chasing Solus Dellagar?");
+~chatplayer("<p,neutral>Oh yeah! So any information you can give me?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Listen <displayname>. Solus is an incredibly dangerous criminal, and I don't think his grasp on reality is too tight, if you understand what I'm saying.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>You really need to take care with this one. I'm amazed you got an assignment as tough as this one as a first assignment to be honest!");
+~chatplayer("<p,neutral>So, how would you suggest I go about finding him?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, this CommOrb can use the scan function to find him, but its range is very limited.");
+~chatplayer("<p,neutral>So I have to just wander around the place looking for him?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>No, that would take far too long... Listen, I am going to transfer all information on Solus that we currently have to your CommOrb.");
+// The information is available after this transfer line, not on the menu click.
+// Commit the flag and main stage together before the next dialogue yield.
+if (%wanted_main = ^wanted_commorb_issued) {
+    %wanted_commorb_intel = ^true;
+    %wanted_main = ^wanted_intelligence_open;
+    ~wanted_update_progress;
+}
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>You should be able to find a hint of where to find him by examining it.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>The Library tells me that we have two visual recordings from SpyOrbs available to you, as well as a standard dossier.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I would suggest the people that the SpyOrbs were observing, when they picked up records of Solus, would be a good place to start your investigation.");
+~chatplayer("<p,neutral>Who are these people then?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Okay just checking now...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Record one is from a routine monitoring of Lord Daquarius.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>In case you haven't heard of him, he is the leader of the Kinshra, also known as Black Knights.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>As a major enemy of the White Knights we have had him under observation for some time now, so it was pretty lucky that Solus decided to visit him.");
+~chatplayer("<p,neutral>So where would I find this Lord Daquarius?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>He has a secret Black Knight training ground deep in the heart of Taverley dungeon, along with holding facilities for prisoners who they wish to interrogate later.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>He is almost certain to be found thereabouts.");
+~chatplayer("<p,neutral>And what is Record 2 about?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Just checking... Ah yes.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>This shady fellow is a member of the Zamorakian Magical Institute.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>We suspect them to be the group responsible for destroying the Wizards Tower all of those years ago, as well as other more recent acts of sabotage.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>We also suspect that they have been responsible for a number of thefts of a mysterious rock that the Wizards Tower has started producing, but don't have much intelligence about that.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>We set up an observation SpyOrb in a known Zamorakian shrine in south-east Varrock, but he moves between there and the wilderness just north of Edgeville quite frequently.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>He doesn't seem much of a threat, but we placed him under observation anyway, which seems to have paid off by getting some more information about Solus.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>From the look of the record, he would be worth talking to as well.");
+~chatplayer("<p,neutral>Thanks Savant!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Any time, <displayname>. Over and out.");
+return;
+
+[label,wanted_savant_name]
+~chatplayer("<p,neutral>So... Savant... That's an unusual name...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, obviously it's not my real name!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>My real name is Elyssa Van Lendes, but for operational purposes I am called Savant.");
+~chatplayer("<p,neutral>So what exactly do you do for the Temple Knights?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I am the S.M.R. and Chief Librarian for the Temple Knights.");
+~chatplayer("<p,neutral>S.M.R? What's that?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It stands for Senior Mystical Researcher. The Temple Knights have a world class research team investigating new types of magic constantly. As senior researcher, and liaison, I can pass on information to the rest of the Temple Knights.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Many of the devices used by the Temple Knights such as our CommOrbs and SpyOrbs were first designed by my team as experimental devices, and have since become standard field equipment!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I have always had a gift for magic, and have spent most of my life trying to find applications for it that would serve our order and give us an edge over our opponents.");
+~chatplayer("<p,neutral>Your opponents?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Oh yes, don't think for a second that we are the only secret organisation in Gielinor!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>There are many factions in these lands, some almost as magically advanced and organised as ourselves!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It is a constant struggle to keep our operatives with advanced magical equipment that our opponents don't have - this is why we have the self-destruct safeguards, to prevent our equipment ever falling into unfriendly hands.");
+~chatplayer("<p,neutral>So how did you end up working for the Temple Knights?");
+~chatplayer("<p,neutral>I would have thought someone like you would have ended up researching at the Wizards' Tower or something instead...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Oh yes... The Wizards' Tower...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Let me tell you something, the mages who work there are idiots! They told me that magical research wasn't suitable for 'just a girl' and that I would be 'too scared' to research for them effectively!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Luckily the Temple Knights are far more open minded about things, and I really feel like my work is making a difference to them!");
+~chatplayer("<p,neutral>Ok, thanks Savant, that was very interesting.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Hey, we're all Temple Knights here, right? Glad I could help, <displayname>");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Savant over and out.");
+return;
+
+[label,wanted_savant_temple_knights]
+~chatplayer("<p,neutral>Hi Savant. I was just wondering if you could give me a little information about the Temple Knights?");
+~chatplayer("<p,neutral>I've just realised that I really don't know very much about them...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, you are not officially a full fledged Temple Knight now, are you Initiate <displayname>?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I am afraid that means for security reasons I can only give you a brief overview of the organisation...");
+~chatplayer("<p,neutral>Well, that's better than nothing right?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>That is usually the case, yes, I agree. Well, let's see if I remember how this goes... 'Legends tell us that Lord Saradomin once walked these lands amongst us, and delivered his wisdom unto us personally, so that we could grow wise in his honour.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>But then came the war, that shattered our lands, and the interloper banished our land from us!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>But the wisdom of Saradomin knew that such events might occur, and he laid plans in secret amongst his most devout followers!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Those warriors whose hearts were as pure as their minds were sharp were called to him, and were made into his Temple Knights, for they were the Knights that guarded his very first Temple.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>All who dwelled in his lands knew that the Temple Knights were the honoured, the blessed, the personally chosen warriors of Saradomin, and thus were they given great freedom and authority in all of our Lords lands.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>But with Saradomin no longer with us, the Temple Knights were no longer honoured and respected by all!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Rather, they were made targets by Saradomins enemies, and driven from the lands unjustly!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Thus it was that they became a secret force, hidden from the eyes of Saradomins enemies, that could strike against evil in his name swiftly and quietly whenever they may be needed.'");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Something like that I think, it's been a long time since I heard it last...");
+~chatplayer("<p,neutral>Okay, thanks Savant.");
+return;
+
+[label,wanted_savant_nothing]
+~chatplayer("<p,neutral>Nothing thanks Savant, I was just checking this thing still worked!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>You shouldn't really waste my time like this, <displayname>...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Still no harm done, I guess! Call me if you need me!");
+~chatplayer("<p,neutral>Okay Savant, will do.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Savant out.");
+return;

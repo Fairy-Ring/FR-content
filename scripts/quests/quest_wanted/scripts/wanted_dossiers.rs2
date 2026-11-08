@@ -1,0 +1,46 @@
+// CANDIDATE dossier text: wanted.dlg.dossier-solus, wanted.dlg.dossier-daquarius,
+// and wanted.dlg.dossier-zamorak-mage. Layout follows the D5 Commorb v2 reading.
+// The selector is product UI. The existing quest journal supplies the scroll.
+// Keep literal operands below 512 bytes to avoid the compiler writer overflow.
+// Join the parts once for the journal scroll.
+
+[label,wanted_dossiers]
+def_int $choice = ~p_choice4("Solus Dellagar", 1, "Lord Daquarius", 2, "Zamorakian research mage", 3, "Cancel", 4);
+switch_int ($choice) {
+    case 1 : @wanted_dossier_solus;
+    case 2 : @wanted_dossier_daquarius;
+    case 3 : @wanted_dossier_zamorak_mage;
+}
+return;
+
+[label,wanted_dossier_solus]
+def_string $part1 = "CLASSIFIED|@red@Solus Dellagar@bla@|@blu@Age:@bla@|Unknown.|@blu@Place of Birth:@bla@|Unknown.|@blu@Known aliases:@bla@|Solus Darkheart|The Murder-mage|'Mad Solus'|Stealthy Pete|@blu@Known affiliates:@bla@|Solus Dellagar has shown time and time again that he|considers others to be mere pawns in his schemes, and|will discard them at the first viable opportunity.";
+def_string $part2 = "|Despite having been associated with many criminal and|undesirable elements known to us, these will not be|listed as affiliates, because as a general rule, if you|have worked with Solus once you are unlikely to ever do|so again.|The only loyalty he has ever managed to inspire in|others is through threat of force, and he is indeed|powerful, but the general hatred of him amongst those";
+def_string $part3 = "|he has encountered means that an experienced field|operative will find opportunities to turn associates|against him.|@blu@Known History:@bla@|Solus' exact history is still unknown to us, but we|suspect he originated in or close to the city of|Ardougne.|He was first brought to our attention as a possible|threat in the infamous zombie attack of Varrock";
+def_string $part4 = "|masterminded by the Mahjarrat Lucien, but did not|serve a particularly key role.|Reports of his whereabouts after that are somewhat|sketchy, but he seems to have trained a quite|formidable magical aptitude in the decades immediately|following.|Although he has kept a low profile from conventional|authorities, he has made quite a name for himself";
+def_string $part5 = "|amongst various underworld circles, especially amongst|Zamorakians, where his particularly brutal methods have|been cause for some concern.|He earned the nickname 'Murder-mage' and 'Mad Solus' in|the incident at Edgeville where he was eventually|apprehended by one of our field teams, but not before|the wilful slaughter of over 800 civilians, as well as";
+def_string $part6 = "|an equal number of White and Black Knights - we are|still unsure as to why Lord Daquarius allowed his men|to be involved in this affair, because it was distinctly|against his usual methods, and this is the only report|on file of him making an action under someone else's|direct command.|Solus' reputation as an evil, bloodthirsty, greedy and|dangerous individual is well deserved, and field";
+def_string $part7 = "|operatives should avoid direct confrontation at all|costs.|Standard observation rules apply, and if you find|yourself in a position where confrontation seems likely,|then guidelines suggest you immediately contact your|handler who will provide you ample backup - your chances|of surviving a one on one assault are slim to none.|End of Report.";
+def_string $text = "<$part1><$part2><$part3><$part4><$part5><$part6><$part7>";
+~quest_journal("CommOrb Dossier", $text);
+return;
+
+[label,wanted_dossier_daquarius]
+def_string $part1 = "CLASSIFIED|@red@Lord Daquarius@bla@|@blu@Age:@bla@|34.|@blu@Place of Birth:@bla@|Falador.|@blu@Known aliases:@bla@|Lord of the Kinshra|Daquarius Rennard|@blu@Known affiliates:@bla@|Leader of the Kinshra, commonly known as the Black|Knights.|Has occasional ties to various other Zamorakian|agencies.|Has been linked with the Witch Lensig and her familiar|Greebo most recently.";
+def_string $part2 = "|Has a number of jail guards in his employ deep in the|Taverley dungeon, where enemies of the Kinshra are often|imprisoned.|@blu@Known History:@bla@|The charismatic Lord Daquarius was the youngest Black|Knight to ever take lead of the Kinshra, being|unanimously voted into leadership after the death of|Lord Shadwell in the infamous incident at Edgeville.";
+def_string $part3 = "|As leader of the Kinshra, he has been a high priority|threat to the White Knights, and his activities with the|Black Knights have been a constant thorn in both the|side of the White Knights and of the Temple Knights.|However, while the White Knights still actively seek his|capture and execution for crimes against the state, the|Temple Knights have taken a more reactive position of|observation.";
+def_string $part4 = "|Those of us who survived the Edgeville incident and|recall what the Black Knight's activities under Lord|Shadwell were like, can see that Lord Daquarius is|better to keep around than risk another fanatical|extremist taking his place.|For all of his misguided belief in Zamorak, Daquarius|is an undeniably noble man; we have numerous reports of";
+def_string $part5 = "|him risking personal injury so that he may save a fellow|Kinshra from harm or death.|His belief in his men as more than simply subjects to be|used in war against the White Knights makes him a|predictable and easily manipulated enemy that is worth|keeping in place, and also accounts for the high regard|in which he is held by the rest of the Kinshra.|End of Report.";
+def_string $text = "<$part1><$part2><$part3><$part4><$part5>";
+~quest_journal("CommOrb Dossier", $text);
+return;
+
+[label,wanted_dossier_zamorak_mage]
+def_string $part1 = "CLASSIFIED|@red@Name Unknown@bla@|@blu@Age:@bla@|Unknown.|@blu@Place of Birth:@bla@|Unknown.|@blu@Known aliases:@bla@|Unknown|@blu@Known affiliates:@bla@|The Zamorakian Magical Institute, a research group|that we have classified as fairly innocuous that|primarily focuses on magical research dedicated to|assisting Zamorak.|Observation suggests that the Z.M.I. is the same";
+def_string $part2 = "|faction of Zamorakians that burnt down the Wizards|Tower in Operation: Phoenix, but firm conclusions as|to the reason for this remain at best sketchy and|unsupported by evidence.|It is certainly worthwhile to keep any known members|of the Z.M.I. under observation, however.|@blu@Known History:@bla@|Recently this unidentified mage has begun to base his|activities in and around the area of Varrock,";
+def_string $part3 = "|specifically the Temple to Zamorak that was foolishly|allowed to be built there.|We have some evidence that this Mage also works as a|rune-dealer in the vicinity of Edgeville, but|preventing his operations in the Wilderness is far|beyond our jurisdiction, and any actions taken there|would bring unwanted attention to our own order by|various entities.";
+def_string $part4 = "|We have installed standard observation devices in the|Zamorakian temple, but his activities have apparently|been limited to a small degree of smuggling and the|purchasing and resale of various pieces of contraband.|Although no obvious threat from his presence has been|detected, we will continue standard observation in case|he turns out to be a bigger fish than he at first glance|seems.";
+def_string $part5 = "|End of Report.";
+def_string $text = "<$part1><$part2><$part3><$part4><$part5>";
+~quest_journal("CommOrb Dossier", $text);
+return;

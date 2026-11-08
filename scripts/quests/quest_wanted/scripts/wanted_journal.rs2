@@ -20,6 +20,10 @@ switch_int (%wanted_main) {
         $text = "@dbl@Sir Tiffy reported a crisis to Sir Amik. I should return to @dre@Sir Amik Varze@dbl@ in @dre@Falador Castle@dbl@ and offer my help.";
     case ^wanted_deputised :
         $text = "@dbl@Sir Amik deputised me as a White Knight to find Solus Dellagar. I should return to @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@ for help with the hunt.";
+    case ^wanted_commorb_issued :
+        $text = "@dbl@Sir Tiffy gave me a Commorb. I should use it to contact @dre@Savant@dbl@ for information about Solus Dellagar.";
+    case ^wanted_intelligence_open :
+        $text = "@dbl@Savant briefed me on Solus Dellagar. I can use my @dre@Commorb@dbl@ to contact her, review dossiers and play the two observation records.";
     case ^wanted_complete :
         $text = "@str@I helped the White Knights bring Solus Dellagar to justice.||@red@QUEST COMPLETE!";
 }
