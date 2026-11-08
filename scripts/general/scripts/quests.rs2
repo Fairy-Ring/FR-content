@@ -289,6 +289,85 @@ if (%hauntedmine >= ^hauntedmine_complete) {
 if (%fenk_quest >= ^creatureoffenkenstrain_complete) {
     $questpoints = add($questpoints, ^creatureoffenkenstrain_questpoints);
 }
+// Registry predicates preserve the sourced operators; see vault subject quest-registry.
+if (%lost_tribe_quest >= ^lost_tribe_complete) {
+    $questpoints = add($questpoints, ^lost_tribe_questpoints);
+}
+if (%agrith_quest >= ^agrith_complete) {
+    $questpoints = add($questpoints, ^agrith_questpoints);
+}
+if (%ahoy_questvar >= ^ahoy_complete) {
+    $questpoints = add($questpoints, ^ahoy_questpoints);
+}
+if (%deal_quest >= ^deal_complete) {
+    $questpoints = add($questpoints, ^deal_questpoints);
+}
+if (%devious_main = ^devious_complete) {
+    $questpoints = add($questpoints, ^devious_questpoints);
+}
+if (%dwarfrock_quest >= ^dwarfrock_complete) {
+    $questpoints = add($questpoints, ^dwarfrock_questpoints);
+}
+if (%elidquest >= ^elid_complete) {
+    $questpoints = add($questpoints, ^elid_questpoints);
+}
+if (%enakh_quest >= ^enakh_complete) {
+    $questpoints = add($questpoints, ^enakh_questpoints);
+}
+if (%fairy_farmers_quest = ^fairy_farmers_complete) {
+    $questpoints = add($questpoints, ^fairy_farmers_questpoints);
+}
+if (%feud_var >= ^feud_complete) {
+    $questpoints = add($questpoints, ^feud_questpoints);
+}
+if (%fever_quest >= ^fever_complete) {
+    $questpoints = add($questpoints, ^fever_questpoints);
+}
+if (%forget_quest >= ^forget_complete) {
+    $questpoints = add($questpoints, ^forget_questpoints);
+}
+if (%garden_quest = ^garden_complete) {
+    $questpoints = add($questpoints, ^garden_questpoints);
+}
+if (%handsand_quest >= ^handsand_complete) {
+    $questpoints = add($questpoints, ^handsand_questpoints);
+}
+if (%ics_little_var >= ^ics_little_complete) {
+    $questpoints = add($questpoints, ^ics_little_questpoints);
+}
+if (%makinghistory_prog >= ^makinghistory_complete) {
+    $questpoints = add($questpoints, ^makinghistory_questpoints);
+}
+if (%mdaughter_quest_var >= ^mdaughter_complete) {
+    $questpoints = add($questpoints, ^mdaughter_questpoints);
+}
+if (%mourning_quest >= ^mourning_complete) {
+    $questpoints = add($questpoints, ^mourning_questpoints);
+}
+if (%mourning_quest_main >= ^mourning2_complete) {
+    $questpoints = add($questpoints, ^mourning2_questpoints);
+}
+if (%myreque_2_quest >= ^myreque_2_complete) {
+    $questpoints = add($questpoints, ^myreque_2_questpoints);
+}
+if (%onesmallfavour >= ^onesmallfavour_complete) {
+    $questpoints = add($questpoints, ^onesmallfavour_questpoints);
+}
+if (%ratcatch_var >= ^ratcatch_complete) {
+    $questpoints = add($questpoints, ^ratcatch_questpoints);
+}
+if (%soulbane_prog >= ^soulbane_complete) {
+    $questpoints = add($questpoints, ^soulbane_questpoints);
+}
+if (%swansong = ^swansong_complete) {
+    $questpoints = add($questpoints, ^swansong_questpoints);
+}
+if (%twocats_quest = ^twocats_complete) {
+    $questpoints = add($questpoints, ^twocats_questpoints);
+}
+if (%zogre >= ^zogre_complete) {
+    $questpoints = add($questpoints, ^zogre_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
