@@ -84,6 +84,35 @@
 ^itexam_complete = 9
 ^itwatchtower_complete = 13
 
+// CANDIDATE completion predicates from the early 2014 cache; see vault quest-registry.
+// Range constants are lower bounds; count_questpoints preserves each source operator.
+^lost_tribe_complete = 11
+^agrith_complete = 125
+^ahoy_complete = 8
+^deal_complete = 19
+^devious_complete = 80
+^dwarfrock_complete = 110
+^elid_complete = 60
+^enakh_complete = 70
+^fairy_farmers_complete = 90
+^feud_complete = 28
+^fever_complete = 131
+^forget_complete = 140
+^garden_complete = 60
+^handsand_complete = 160
+^ics_little_complete = 26
+^makinghistory_complete = 4
+^mdaughter_complete = 70
+^mourning_complete = 8
+^mourning2_complete = 60
+^myreque_2_complete = 421
+^onesmallfavour_complete = 276
+^ratcatch_complete = 127
+^soulbane_complete = 13
+^swansong_complete = 200
+^twocats_complete = 70
+^zogre_complete = 13
+
 ^blackarmgang_questpoints = 1
 ^blackknight_questpoints = 3
 ^cook_questpoints = 1
@@ -148,3 +177,31 @@
 ^death_questpoints = 1
 ^troll_love_questpoints = 2
 ^golem_questpoints = 1
+
+// VERIFIED period QP rewards; sources in vault subject quest-registry.
+^lost_tribe_questpoints = 1
+^agrith_questpoints = 1
+^ahoy_questpoints = 2
+^deal_questpoints = 2
+^devious_questpoints = 1
+^dwarfrock_questpoints = 2
+^elid_questpoints = 2
+^enakh_questpoints = 2
+^fairy_farmers_questpoints = 2
+^feud_questpoints = 1
+^fever_questpoints = 2
+^forget_questpoints = 2
+^garden_questpoints = 2
+^handsand_questpoints = 1
+^ics_little_questpoints = 2
+^makinghistory_questpoints = 3
+^mdaughter_questpoints = 2
+^mourning_questpoints = 2
+^mourning2_questpoints = 2
+^myreque_2_questpoints = 2
+^onesmallfavour_questpoints = 2
+^ratcatch_questpoints = 2
+^soulbane_questpoints = 1
+^swansong_questpoints = 2
+^twocats_questpoints = 2
+^zogre_questpoints = 1
