@@ -1,7 +1,7 @@
 // MEP1 Lletya Arianwyn first Talk-to after licensed Eluned.
 // CANDIDATE last-resort pre-SoE dump (period-media §6) minus Essyllt /
 // 8-charge / dest / crystal give. Hunt 289? no.
-// Gate mourning_quest >= 1. Stay 1. No dest. Cite mep1-arianwyn-talk-only-377.md.
+// Gate mourning_quest >= 1. Stay 1. No dest. Research: subject mournings-end-1.
 
 [opnpc1,mourning_arianwyn]
 if (%mourning_quest < 1) {

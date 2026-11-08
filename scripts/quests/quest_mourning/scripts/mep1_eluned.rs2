@@ -10,7 +10,7 @@
 // write 1→2 CANDIDATE (not complete). At >= 2 and mourning < 1: holding old
 // seed 4205 -> hand over + re-enchant to 4206 (no stage write, stay 2); else
 // again-talk reminder (no inv). MEP1 branches preserved.
-// Cite mep1-eluned-period-media-377.md §4 / §6 + red-19-start-impl-377.md §1.
+// Research: subject mournings-end-1 + red-19-start-impl-377.md §1.
 
 [opnpc1,roving_female_woodelf]
 if (%roving_elves_quest = 1) {

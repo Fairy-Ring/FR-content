@@ -1,7 +1,7 @@
 // MEP1 HQ Head mourner first Talk-to after Arianwyn. No dest. Stay 1.
 // CANDIDATE last-resort pre-SoE dump (RS3 Talking to the Head Mourner
 // minus Essyllt / letter consume / kit / dest). Hunt 289? no.
-// Display Head mourner. Never rename 2372. Cite mep1-head-mourner-2372-377.md.
+// Display Head mourner. Never rename 2372. Research: subject mournings-end-1.
 
 [opnpc1,mourner_hideout_head_mourner]
 if (%mourning_quest < 1) {
