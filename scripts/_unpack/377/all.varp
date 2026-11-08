@@ -729,9 +729,6 @@ transmit=yes
 [bankpin_session]
 scope=perm
 
-[ahoy_varbits_1]
-transmit=yes
-
 [varp409_bits]
 
 [varp410_unused]
@@ -744,8 +741,6 @@ transmit=yes
 transmit=yes
 
 [roving_update_ilfeen_chant]
-
-[onesmallfavour]
 
 [onesmallfavourmulti]
 transmit=yes
@@ -760,9 +755,6 @@ scope=perm
 [varp421_unused]
 
 [varp422_unused]
-
-[mdaughter_var]
-transmit=yes
 
 [varp424_unused]
 
@@ -781,13 +773,7 @@ transmit=yes
 
 [varp432_unused]
 
-[dwarfrock_main]
-transmit=yes
-
 [varp434_unused]
-
-[main_feud_var]
-transmit=yes
 
 [feud_var_multi]
 
@@ -808,8 +794,6 @@ transmit=yes
 transmit=yes
 
 [varp444_unused]
-
-[main_ics_var]
 
 [ics_little_multi_extra]
 
@@ -832,9 +816,6 @@ transmit=yes
 
 [worn_set]
 
-[zombie_ogre]
-transmit=yes
-
 [disease]
 
 [varp457_bits]
@@ -850,9 +831,6 @@ transmit=yes
 [varp462_bits]
 
 [varp463_unused]
-
-[lost_tribe]
-transmit=yes
 
 [cutscene_var]
 
@@ -1001,17 +979,12 @@ scope=perm
 transmit=yes
 scope=perm
 
-[mourning_quest]
-
 [mourning_quest_bits]
 transmit=yes
 
 [varp519_unused]
 
 [dagganoth_area_project]
-transmit=yes
-
-[forget_main_var]
 transmit=yes
 
 [varp522_unused]
@@ -1090,9 +1063,6 @@ protect=no
 [prayer_drain_resistance]
 protect=no
 
-[garden_varp_1]
-transmit=yes
-
 [garden_varp_2]
 transmit=yes
 
@@ -1124,9 +1094,6 @@ transmit=yes
 
 [varp567_unused]
 
-[twocats_varbit]
-transmit=yes
-
 [varp569_bits]
 
 [varp570_unused]
@@ -1138,8 +1105,6 @@ transmit=yes
 transmit=yes
 
 [varp573_unused]
-
-[mourning_quest_part2]
 
 [varp575_bits]
 
@@ -1206,25 +1171,14 @@ transmit=yes
 [desert]
 transmit=yes
 
-[deal_quest]
-
 [deal_var]
-transmit=yes
-
-[agrith_quest_varp]
 transmit=yes
 
 [varp603_unused]
 
-[makinghistory]
-transmit=yes
-
 [varp605_bits]
 
 [varp606_unused]
-
-[main_ratcatch_var]
-transmit=yes
 
 [varp608_unused]
 
@@ -1247,9 +1201,6 @@ transmit=yes
 transmit=yes
 scope=perm
 
-[elid_main]
-transmit=yes
-
 [champions_defeated]
 transmit=yes
 
@@ -1261,9 +1212,6 @@ transmit=yes
 transmit=yes
 
 [varp621_unused]
-transmit=yes
-
-[devious_base]
 transmit=yes
 
 [win05_var]
@@ -1291,8 +1239,6 @@ transmit=yes
 
 [varp634_bits]
 
-[handsand]
-
 [handsand_transmit]
 transmit=yes
 
@@ -1305,8 +1251,6 @@ transmit=yes
 
 [agility_pyramid]
 transmit=yes
-
-[enakh_quest_expositbits]
 
 [enakh_multivarbits]
 transmit=yes
@@ -1343,8 +1287,6 @@ scope=perm
 
 [varp654_unused]
 
-[fever_quest]
-
 [fever_cannon_var]
 transmit=yes
 
@@ -1377,9 +1319,6 @@ transmit=yes
 [varp669_unused]
 
 [varp670_unused]
-
-[fairytale_multi]
-transmit=yes
 
 [varp672_bits]
 
@@ -1453,17 +1392,11 @@ transmit=yes
 [myreque_2_main_var]
 transmit=yes
 
-[myreque2_multivar]
-transmit=yes
-
 [myreque2_extravar]
 
 [varp707_unused]
 
 [varp708_bits]
-
-[soulbane]
-transmit=yes
 
 [soulbane2]
 transmit=yes
@@ -1493,9 +1426,6 @@ transmit=yes
 scope=perm
 
 [varp722_bits]
-
-[swansong_quest]
-transmit=yes
 
 [varp724_unused]
 
