@@ -1,0 +1,11 @@
+// VERIFIED requirements: wanted.requirements, official quest page (2005).
+// Lost Tribe's registered terminal is a CANDIDATE early-OSRS fallback.
+[proc,wanted_requirements_met]()(boolean)
+~update_questpoints;
+if (%rd_main ! ^recruitmentdrive_complete | %priestperil ! ^priestperil_complete | %lost_tribe_quest < ^lost_tribe_complete | %runemysteries ! ^runemysteries_complete | %qp < ^wanted_required_questpoints) {
+    return(false);
+}
+return(true);
+
+[proc,wanted_update_progress]
+~send_quest_progress(questlist:wanted, %wanted_main, ^wanted_complete);

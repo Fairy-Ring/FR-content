@@ -458,6 +458,8 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:hauntedmine, %hauntedmine, ^hauntedmine_complete);
 // Creature of Fenkenstrain — M1 journal colour (t_d99d6bbc).
 ~send_quest_progress_colour(questlist:creatureoffenkenstrain, %fenk_quest, ^creatureoffenkenstrain_complete);
+// Wanted! start/deputising progress persists through the shared login refresh.
+~send_quest_progress_colour(questlist:wanted, %wanted_main, ^wanted_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

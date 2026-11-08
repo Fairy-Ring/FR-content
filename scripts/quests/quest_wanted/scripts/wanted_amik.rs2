@@ -1,0 +1,170 @@
+// CANDIDATE wording: wanted.dlg.amik-first-visit, amik-after-refusing,
+// amik-squire and amik-deputise. Period guides verify the deputising sequence,
+// not the exact speech or the product-defined intermediate integers.
+// The shared BKF/RD handler supplies the existing greeting before this jump.
+
+[label,wanted_amik]
+switch_int (%wanted_main) {
+    case ^wanted_not_started, ^wanted_plan_accepted :
+        ~chatnpc("<p,neutral>Well, I did have something you may have been interested in, but I've been given orders not to approach you for trivial matters now that you are a member of the Temple Knights.");
+        ~chatplayer("<p,sad>Aaaaawwwww...");
+    case ^wanted_plan_explained : @wanted_amik_first_visit;
+    case ^wanted_squire : @wanted_amik_squire;
+    case ^wanted_no_crisis : @wanted_amik_no_crisis;
+    case ^wanted_crisis_reported : @wanted_amik_crisis;
+    case ^wanted_deputised : @wanted_amik_reminder;
+}
+return;
+
+[label,wanted_amik_first_visit]
+~chatplayer("<p,quiz>got any jobs for me to do today?");
+~chatnpc("<p,neutral>Well, I did have something you may be interested in, but I've been given orders not to-");
+~chatplayer("<p,neutral>Can I just stop you right there?");
+~chatplayer("<p,neutral>I am no longer a member of the Temple Knights, I have entirely renounced my application because after many hours of soul searching I have come to the conclusion that I desperately want to become a White Knight instead!");
+if (%wanted_joke_option = 0 & inv_total(worn, basic_tk_helm) > 0 & inv_total(worn, basic_tk_body) > 0 & inv_total(worn, basic_tk_legs) > 0) {
+    %wanted_joke_option = 1;
+    ~chatnpc("<p,quiz>You don't want to be a Temple Knight anymore?");
+    ~chatplayer("<p,neutral>That is correct, yes.");
+    ~chatnpc("<p,quiz>But you are wearing their armour!");
+    ~chatplayer("<p,neutral>So? Did you hear me bad mouth their armour? The armour is cool, I kept the armour!");
+}
+~chatnpc("<p,confused>I'm not sure I understand... You wish to desert the Temple Knights in favour of my own humble White Knights?");
+~chatplayer("<p,happy>Absolutely!");
+~chatplayer("<p,neutral>And this is definitely not some kind of elaborate hoax to get my application processed faster.");
+~chatnpc("<p,quiz>I'm sorry, did you say something just then?");
+~chatplayer("<p,neutral>No... Not if you didn't hear it...");
+~chatnpc("<p,neutral>...Well anyway, for the fine work you achieved at that incident in the Black Knights Fortress, I would be honoured to accept you as my squire.");
+~chatnpc("<p,quiz>So what do you say?");
+@wanted_amik_squire_menu;
+
+[label,wanted_amik_squire_menu]
+def_int $choice = ~p_choice3("What does being a Squire entail?", 1, "Yes please!", 2, "No, not right now...", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,quiz>So what exactly does being a squire consist of, then?");
+    ~chatnpc("<p,neutral>You will spend the next five years of your life running various errands for me.");
+    ~chatnpc("<p,neutral>If I consider you to have done a more than adequate job of this, then I will begin to consider possibly moving your name forwards to becoming a full-fledged member of the Order of the White Knights.");
+    ~chatplayer("<p,quiz>So... No killing stuff for you, or anything fun like that...?");
+    ~chatnpc("<p,neutral>Not as such, no. Unless you consider killing time by running errands fun...?");
+    ~chatplayer("<p,neutral>Well, erm...");
+    ~chatnpc("<p,quiz>So what say you <displayname>? Spend five long years of your life doing pointless busywork without pay for me, on the off chance that at some point in the future I may put your name forward as a novice White Knight?");
+    @wanted_amik_squire_menu;
+}
+if ($choice = 2) {
+    // The explicit acceptance commits before any later Continue.
+    if (%wanted_main ! ^wanted_plan_explained) {
+        return;
+    }
+    %wanted_main = ^wanted_squire;
+    ~wanted_update_progress;
+    ~chatplayer("<p,happy>Yes please! I would LOVE to be your squire!");
+    ~chatplayer("<p,quiz>Wait... Didn't Sir Tiffy tell me to decline...?");
+    ~chatplayer("<p,happy>Nah, Squire me up, Amik!");
+    ~chatnpc("<p,neutral>As you wish, from this day forth you are my Squire!");
+    return;
+}
+~chatplayer("<p,neutral>Um... As tempting an offer as that sounds Sir Amik, I am really not a fan of waiting around...");
+~chatplayer("<p,neutral>Now I heard from some completely random stranger that was definitely not Sir Tiffy Cashien as part of an elaborate ruse to fast track my application into the White Knights, that I could be deputised directly as a White Knight, and entirely bypass that while boring waiting for five year thing...");
+~chatnpc("<p,neutral>That is entirely correct <displayname>, but I have no idea where you might have heard that for it is a secret guarded only to members of our order!");
+~chatplayer("<p,quiz>Right. Well, Can I do that instead?");
+~chatnpc("<p,neutral>Well, a fine adventurer would be a perfect candidate as a deputy in my eyes, but fortunately this can only be done in a time of crisis, and all is currently well.");
+if (%wanted_main = ^wanted_plan_explained) {
+    %wanted_main = ^wanted_no_crisis;
+    ~wanted_update_progress;
+}
+~chatplayer("<p,neutral>All is well huh? I'll be right back, I just have to go ask...");
+~chatplayer("<p,neutral>nobody in particular if they can organise...nothing at all to happen.");
+~chatnpc("<p,neutral>You are a strange one <displayname>...");
+return;
+
+[label,wanted_amik_no_crisis]
+~chatplayer("<p,quiz>Got any jobs for me to do today?");
+~chatnpc("<p,quiz>Only to become my Squire. Do you wish to become my squire?");
+~chatplayer("<p,quiz>No, not really. So there isn't a crisis yet?");
+~chatnpc("<p,neutral>Thank Saradomin, no! We have not had a crisis for many years now!");
+~chatplayer("<p,neutral>Right. Well, I'll go and see if Tiffy can fix that for me then.");
+~chatplayer("<p,neutral>Er, I mean: How fortunate for us all that nothing terrible has happened or is conveniently about to happen.");
+~chatnpc("<p,neutral>Indeed!");
+return;
+
+[label,wanted_amik_squire]
+if (inv_total(inv, asgarnian_ale) > 0) {
+    ~chatplayer("<p,neutral>Hi boss.");
+    ~chatnpc("<p,neutral>Call me Sir Amik, or liege.");
+    // Only the ordinary, held Asgarnian ale is accepted. No stage/reward write.
+    if (%wanted_main ! ^wanted_squire | inv_total(inv, asgarnian_ale) < 1) {
+        return;
+    }
+    inv_del(inv, asgarnian_ale, 1);
+    ~chatplayer("<p,neutral>Sure thing, boss. I brought you a beer.");
+    ~chatplayer("<p,quiz>Anything else you want boss?");
+    ~chatnpc("<p,neutral>Well, another Asgarnian Ale would be greatly appreciated. And stop calling me Boss.");
+    ~chatplayer("<p,neutral>Sure thing boss!");
+    return;
+}
+~chatplayer("<p,quiz>So do you have any squiring for me today Amik?");
+~chatnpc("<p,neutral>Yes, yes in fact I do. I would like you to bring me an Asgarnian Ale.");
+~chatnpc("<p,neutral>No matured Ale, no other brand, simply an Asgarnian Ale.");
+~chatplayer("<p,neutral>Okay boss.");
+~chatnpc("<p,neutral>That is 'Sir Amik' or 'My Liege' – not 'Boss'.");
+~chatplayer("<p,neutral>Gotcha, boss.");
+return;
+
+[label,wanted_amik_crisis]
+~chatnpc("<p,happy>Thank Saradomin you have come back here!");
+~chatnpc("<p,neutral>We have received word from one of our scouts that the evil Solus Dellagar has returned to Asgarnia!");
+~chatnpc("<p,neutral>What is worse, it seems he is in possession of dangerous new magics we are powerless against!");
+~chatnpc("<p,neutral>Please, I implore you in the name of all that is holy, assist us in banishing him from our kingdom once more!");
+~chatnpc("<p,sad>I cannot bear to think of the troubles he may bring us...");
+@wanted_amik_deputise_menu;
+
+[label,wanted_amik_deputise_menu]
+def_int $choice = ~p_choice4("Who is Solus?", 1, "What will I get for helping?", 2, "Sure I'll help you!", 3, "I don't feel like helping you right now.", 4);
+if ($choice = 1) {
+    ~chatplayer("<p,quiz>Solus Dellagar? Who - or what - is that?");
+    ~chatnpc("<p,neutral>You have not heard of the infamous murder-mage? He terrorised these lands many years past, thinking himself above the law with his powerful enchantments, but the White Knights finally managed to bring him to justice and he was permanently exiled.");
+    ~chatplayer("<p,quiz>Exiled? Why didn't you just kill him? Or, you know, imprison him or whatever?");
+    ~chatnpc("<p,neutral>Kill an unarmed foe? That is not the way of Saradomin, nor of the White Knights.");
+    ~chatnpc("<p,neutral>As for imprisonment...Solus is a highly dangerous man not just because of his mastery of the magical arts, but for his uncanny resourcefulness.");
+    ~chatnpc("<p,neutral>To tell you the truth, I fear that I would be unable to guarantee his captivity in any holding cell belonging to us...");
+    ~chatplayer("<p,quiz>So if you can't imprison him, and exile obviously didn't work, you want me to kill him?");
+    ~chatnpc("<p,neutral>I did not say that. I did not say that at all. That is against all of our codes of honour.");
+    ~chatnpc("<p,neutral>However, should you find yourself in combat with him, and there is no other way, then perhaps for him to die would be best for us all.");
+    ~chatnpc("<p,quiz>You understand me, <displayname>?");
+    ~chatplayer("<p,neutral>Oh yes. You've made yourself very clear.");
+    ~chatnpc("<p,quiz>So will you aid us in this fight?");
+    @wanted_amik_deputise_menu;
+} else if ($choice = 2) {
+    ~chatplayer("<p,quiz>So what will I get if I help you out against this, er, solus doolalala guy then?");
+    ~chatnpc("<p,neutral>Why, you will help keep Asgarnia free of malicious influence, and perform a good deed in the name of King Vallance and of the White Knights!");
+    ~chatplayer("<p,quiz>Yes, yes I see. So...No monetary compensation or other actual reward then?");
+    ~chatnpc("<p,neutral>As Saradomin has told us, 'a good deed is its own reward'.");
+    ~chatplayer("<p,quiz>So I don't actually get anything out of this then?");
+    ~chatnpc("<p,neutral>Nothing tangible, no, but you will be deputized to act as a White Knight, and you will feel a warm glow inside of having done the right thing.");
+    ~chatplayer("<p,neutral>But you can't buy things with a warm glow...");
+    ~chatnpc("<p,quiz>So what say you <displayname>? Fight with honour in the name of the White Knights against the terrible Solus?");
+    @wanted_amik_deputise_menu;
+} else if ($choice = 3) {
+    if (%wanted_main ! ^wanted_crisis_reported) {
+        return;
+    }
+    %wanted_main = ^wanted_deputised;
+    ~wanted_update_progress;
+    ~chatplayer("<p,happy>Hey, there's nothing I like more than fighting! Deputise me up, and I'll go get this guy for you!");
+    ~chatnpc("<p,neutral>Very well then; In the name of King Vallance, and for the honour of Saradomin, I now pronounce you a fully deputised White Knight.");
+    ~chatnpc("<p,neutral>May honour and glory follow you in every action.");
+    ~chatplayer("<p,quiz>So where should I start looking for this Solus guy anyway?");
+    ~chatnpc("<p,neutral>I haven't the faintest idea. Good Luck!");
+    return;
+}
+~chatplayer("<p,shock>A scary mage huh? Sounds like I could get KILLED!");
+~chatplayer("<p,angry>Forget that and forget you! No way am I risking my neck unless there is a big fat reward on the table for it!");
+~chatplayer("<p,neutral>And sometimes not even then...");
+~chatnpc("<p,sad>It is a tragedy to hear you speak so, but we must trust in our valour and the wisdom of Saradomin to protect us from this evil man if we can not enlist help against him.");
+return;
+
+[label,wanted_amik_reminder]
+~chatnpc("<p,sad><displayname>... Solus Dellagar is still loose... Please, for the safety of my lands you must find him immediately...");
+~chatplayer("<p,quiz>Any hints on where he might be?");
+~chatnpc("<p,neutral>We have no idea where he might be now... His magic is too powerful for us, I do not know how to stop him...");
+~chatplayer("<p,quiz>Hum. I wonder if Sir Tiffy might be able to help?");
+return;

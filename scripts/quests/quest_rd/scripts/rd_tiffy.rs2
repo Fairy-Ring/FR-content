@@ -208,9 +208,6 @@ region_setexitcoord(npc_coord);
 return(~rd_room_dest(~rd_route_current));
 
 [label,rd_tiffy_after]
-// Wanted! first-start takes priority while wanted_main is still 0.
-if (%wanted_main = 0) {
-    @wanted_tiffy_start;
-}
-// Postquest services: Initiate armour / Gaze (CANDIDATE). Devious already handled above.
-@rd_tiffy_services;
+// Keep Wanted alongside the original services, including before acceptance.
+// Devious and Recruitment Drive completion/rewards retain priority above.
+@wanted_tiffy_menu;
