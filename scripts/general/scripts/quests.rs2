@@ -368,6 +368,10 @@ if (%twocats_quest = ^twocats_complete) {
 if (%zogre >= ^zogre_complete) {
     $questpoints = add($questpoints, ^zogre_questpoints);
 }
+// Wanted! registry only; the completion writer belongs to its quest unit.
+if (%wanted_main = ^wanted_complete) {
+    $questpoints = add($questpoints, ^wanted_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]

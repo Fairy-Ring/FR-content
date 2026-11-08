@@ -1,0 +1,7 @@
+[quest_wanted]
+scope=perm
+transmit=yes
+
+[quest_wanted2]
+scope=perm
+transmit=yes

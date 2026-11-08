@@ -1098,12 +1098,6 @@ transmit=yes
 
 [varp570_unused]
 
-[quest_wanted]
-transmit=yes
-
-[quest_wanted2]
-transmit=yes
-
 [varp573_unused]
 
 [varp575_bits]

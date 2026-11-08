@@ -205,3 +205,8 @@
 ^swansong_questpoints = 2
 ^twocats_questpoints = 2
 ^zogre_questpoints = 1
+
+// CANDIDATE product terminal from the Wanted plan's stage ladder, not a recovered 377 integer.
+^wanted_complete = 18
+// VERIFIED 1 QP: period quest lists/guides (vault wanted.rewards).
+^wanted_questpoints = 1

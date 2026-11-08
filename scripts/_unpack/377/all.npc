@@ -61867,6 +61867,10 @@ alwaysontop=yes
 head1=obj_pickpocket_guide_farmer
 head2=npc_2747_head
 head3=idk_man_jaw_long_head
+// CANDIDATE server staging: no autonomous movement for noncombat Wanted actors.
+// Keep scripted movement available; combat actors/allocation belong to S1b.
+wanderrange=0
+defaultmode=none
 
 [wanted_savant]
 name=Savant
@@ -61896,6 +61900,8 @@ op1=Talk-to
 alwaysontop=yes
 head1=obj_pickpocket_guide_fham
 head2=npc_2748_head
+wanderrange=0
+defaultmode=none
 
 [wanted_lord_daquarius_for_cutscene]
 name=Lord Daquarius
@@ -61925,6 +61931,8 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 alwaysontop=yes
 head1=obj_pickpocket_guide_farmer
+wanderrange=0
+defaultmode=none
 
 [wanted_solus_for_cutscene]
 name=Solus Dellagar
@@ -61960,6 +61968,8 @@ alwaysontop=yes
 head1=obj_pickpocket_guide_farmer
 head2=npc_2747_head
 head3=idk_man_jaw_long_head
+wanderrange=0
+defaultmode=none
 
 [wanted_black_knight_for_cutscene]
 name=Black Knight
@@ -61985,6 +61995,8 @@ vislevel=hide
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 alwaysontop=yes
+wanderrange=0
+defaultmode=none
 
 [wanted_lord_daquarius_for_cutscene2]
 name=Lord Daquarius
@@ -62014,6 +62026,8 @@ walkanim=wanted_human_injured_cutscene,wanted_human_injured_cutscene,wanted_huma
 readyanim=wanted_human_injured_cutscene
 alwaysontop=yes
 head1=obj_pickpocket_guide_farmer
+wanderrange=0
+defaultmode=none
 
 [wanted_zammy_mage_for_cutscene]
 name=Mage of Zamorak
@@ -62043,6 +62057,8 @@ readyanim=human_ready
 alwaysontop=yes
 head1=obj_pickpocket_guide_mham
 head2=idk_man_jaw_medium_head
+wanderrange=0
+defaultmode=none
 
 [wanted_zammy_mage_for_cutscene_pray]
 name=Mage of Zamorak
@@ -62072,6 +62088,8 @@ readyanim=wanted_prayer_anim
 alwaysontop=yes
 head1=obj_pickpocket_guide_mham
 head2=idk_man_jaw_medium_head
+wanderrange=0
+defaultmode=none
 
 [wanted_zammy_mage_for_cutscene_telly]
 name=Mage of Zamorak
@@ -62101,6 +62119,8 @@ readyanim=wanted_interrupt_teleport
 alwaysontop=yes
 head1=obj_pickpocket_guide_mham
 head2=idk_man_jaw_medium_head
+wanderrange=0
+defaultmode=none
 
 [wanted_solus1]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62109,6 +62129,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission1
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus2]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62117,6 +62139,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission2
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus3]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62125,6 +62149,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission3
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus4]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62133,6 +62159,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission4
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus5]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62141,6 +62169,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission5
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus6]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62149,6 +62179,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission6
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus7]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62157,6 +62189,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission7
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus8]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62165,6 +62199,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission8
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus9]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62173,6 +62209,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission9
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus10]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62181,6 +62219,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission10
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus11]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62189,6 +62229,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission11
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus12]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62197,6 +62239,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission12
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus13]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62205,6 +62249,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission13
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus14]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62213,6 +62259,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission14
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus15]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62221,6 +62269,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission15
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus16]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62229,6 +62279,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission16
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus17]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62237,6 +62289,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission17
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus18]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62245,6 +62299,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission18
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus19]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62253,6 +62309,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission19
 multinpc=1,wanted_solus
+wanderrange=0
+defaultmode=none
 
 [wanted_solus_fake_woman]
 walkanim=human_halberdwalk_f,human_halberdwalk_b,human_halberdwalk_l,human_halberdwalk_r
@@ -62261,6 +62319,8 @@ alwaysontop=yes
 vislevel=1
 multivar=wanted_mission3
 multinpc=1,wanted_solus_fake_woman_base_config
+wanderrange=0
+defaultmode=none
 
 [wanted_solus_fake_woman_base_config]
 name=Woman
@@ -62288,6 +62348,8 @@ op1=Talk-to
 alwaysontop=yes
 head1=idk_woman_hair_medium_head
 head2=npc_woman2_head
+wanderrange=0
+defaultmode=none
 
 [wanted_summoned_black_knight]
 name=Black Knight
