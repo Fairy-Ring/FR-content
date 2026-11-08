@@ -99,7 +99,43 @@ for (const [name, below] of [['rd_main', 1], ['priestperil', 59], ['lost_tribe_q
     set(p, 'cookquest', 2); assert.equal(eligible(p), 1); assert.equal(get(p, 'qp'), 32);
     set(p, 'lost_tribe_quest', 12); assert.equal(eligible(p), 1, 'Lost Tribe preserves registered >= terminal predicate');
 }
+for (const [priestperil, expected] of [[59, 0], [60, 1], [61, 1]]) {
+    const p = qualified(); set(p, 'priestperil', priestperil);
+    if (priestperil === 59) set(p, 'doricquest', 100);
+    assert.equal(eligible(p), expected, `Priest in Peril ${priestperil}: registered >= completion predicate`);
+    assert.equal(get(p, 'qp'), 32, 'Priest in Peril boundary has 32 recomputed QP');
+}
 console.log('PASS requirements: four independent gates, real 31/32 QP recount, Lost Tribe registry predicate');
+// Exercise opnpc1, not the Wanted label alone. The player greeting deliberately
+// pauses before Amik's first NPC page, exactly as in the retained route probe.
+for (const [s, firstWantedLine] of [
+    [1, "Well, I did have something you may have been interested in, but I've been given orders not to approach you for trivial matters now that you are a member of the Temple Knights."],
+    [2, "Well, I did have something you may be interested in, but I've been given orders not to-"],
+    [3, 'Yes, yes in fact I do. I would like you to bring me an Asgarnian Ale.'],
+    [4, 'Only to become my Squire. Do you wish to become my squire?'],
+    [5, 'Thank Saradomin you have come back here!']
+]) {
+    const p = qualified(); set(p, 'wanted_main', s);
+    const r = run(p, '[opnpc1,sir_amik_varze]', npc('sir_amik_varze'));
+    assert.equal(r.exec, ScriptState.PAUSEBUTTON, `stage ${s}: player greeting pauses`);
+    assert.match(text(p), /Hello Sir Amik\./);
+    assert.doesNotMatch(text(p), /Hello, friend!/, 'Amik waits for the player Continue');
+    const npcPages = [];
+    for (let pauses = 0; r.exec === ScriptState.PAUSEBUTTON && npcPages.length < 2 && pauses < 30; pauses++) {
+        p.packets.length = 0;
+        r.exec = p.runScript(r.state, true, true);
+        assert.notEqual(r.exec, ScriptState.ABORTED);
+        const page = p.packets.filter(x => x.constructor.name === 'IfSetText');
+        for (const lines of [1, 2, 3, 4]) {
+            if (page.some(x => x.component === id('interface', `npcchat${lines}:com_1`) && x.text === 'Sir Amik Varze')) {
+                npcPages.push(page.filter(x => Array.from({ length: lines }, (_, n) => id('interface', `npcchat${lines}:com_${n + 2}`)).includes(x.component)).map(x => x.text).join(' ').replace(/\s+/g, ' ').trim());
+            }
+        }
+    }
+    assert.deepEqual(npcPages, ['Hello, friend!', firstWantedLine], `stage ${s}: Amik's first shared and Wanted NPC pages match the records`);
+    assert.equal(stage(p), s, 'reading the first NPC lines does not advance Wanted');
+}
+console.log('PASS Amik opnpc1 stages 1/2/3/4/5: player Continue, NPC greeting and first Wanted line');
 {
     const p = qualified();
     const interrupted = drive(p, run(p, '[opnpc1,rd_teleporter_guy]'), [1], true);
