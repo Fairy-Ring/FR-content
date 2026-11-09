@@ -367,6 +367,18 @@ console.log('PASS held or banked ownership suppresses duplicate free replacement
     assert.equal(count(p, 'wanted_crystal_ball'), 0);
     assert.equal(get(p, 'wanted_commorb_intel'), 1);
 }
+// Direct quest entry has no menu/greeting text to obscure a fabricated response.
+for (const held of [false, true]) {
+    const p = player();
+    set(p, 'wanted_main', 8);
+    set(p, 'wanted_commorb_intel', 1);
+    if (held) inventory(p).add(id('obj', 'wanted_crystal_ball'), 1);
+    else fillFull(p);
+    drive(p, run(p, '[label,wanted_tiffy_quest]'));
+    assert.equal(text(p), '', held ? 'no recorded stage-8 held-orb reminder' : 'no recorded full-inventory replacement refusal');
+    assert.equal(get(p, 'wanted_main'), 8);
+    assert.equal(count(p, 'wanted_crystal_ball'), held ? 1 : 0);
+}
 
 // Actual held operations 1/2 both reach Savant Contact without advancing stage or assignment;
 // operation 4 reaches the parent's real Playback selector and remains progress-neutral.

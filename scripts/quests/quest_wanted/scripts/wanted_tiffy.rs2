@@ -314,6 +314,7 @@ if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_
 // A held or banked Commorb is still the player's; only a genuinely missing
 // orb gets the source-record free replacement. No floor inventory is consulted.
 if (inv_total(inv, wanted_crystal_ball) = 0 & inv_total(bank, wanted_crystal_ball) = 0) {
+    // No recorded capacity response exists. Do not invent NPC speech.
     if (inv_freespace(inv) = 0) {
         return;
     }
@@ -331,6 +332,7 @@ if (inv_total(inv, wanted_crystal_ball) = 0 & inv_total(bank, wanted_crystal_bal
     }
     return;
 }
+// The record has no post-intelligence reminder. Keep that state silent.
 if (%wanted_commorb_intel = 0 & (inv_total(inv, wanted_crystal_ball) > 0 | inv_total(bank, wanted_crystal_ball) > 0)) {
     @wanted_tiffy_commorb_first_use;
 }

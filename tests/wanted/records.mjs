@@ -21,7 +21,7 @@ for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'NpcType', 'Loc
     type.load(pack);
 }
 assert(ScriptProvider.load(pack) > 0);
-World.currentTick = 1;
+World.currentTick = 100;
 const maps = new Map();
 function id(kind, name) {
     if (!maps.has(kind)) maps.set(kind, new Map(fs.readFileSync(path.join(content, `pack/${kind}.pack`), 'utf8').split('\n').filter(x => /^\d+=/.test(x)).map(x => { const at = x.indexOf('='); return [x.slice(at + 1).trim(), Number(x.slice(0, at))]; })));
@@ -43,6 +43,8 @@ function player(slot = 1) {
     p.isActive = true;
     p.level = home[0]; p.x = home[1]; p.z = home[2];
     p.lastMovement = World.currentTick - 20;
+    p.levels.fill(10);
+    p.baseLevels.fill(10);
     p.packets = [];
     p.write = packet => p.packets.push(packet);
     p.messageGame = text => p.packets.push({ text });
@@ -85,20 +87,20 @@ function finish(p, state) {
     assert.equal(state.execution, ScriptState.FINISHED);
     return boundaries;
 }
-function assertReturned(p, label) {
+function assertReturned(p, label, destination = home, expectedOrbs = 1) {
     assert.equal(get(p, 'wanted_record_active'), 0, `${label}: active cleared`);
-    assert.deepEqual(tile(p), home, `${label}: exact return tile`);
+    assert.deepEqual(tile(p), destination, `${label}: expected exit tile`);
     assert.equal(actors(p).length, 0, `${label}: owned actors removed`);
     assert.equal(stage(p), 8, `${label}: no progression write`);
-    assert.equal(orbCount(p), 1, `${label}: no item mutation`);
+    assert.equal(orbCount(p), expectedOrbs, `${label}: expected held orb count`);
     for (const name of ['wanted_contacted_savant', 'wanted_commorb_intel']) assert.equal(p.getVarBit(id('varbit', name)), 1, `${label}: preserve ${name}`);
     assert.deepEqual([get(p, 'quest_wanted'), get(p, 'quest_wanted2')], p.wantedBefore, `${label}: preserve both permanent packed bases`);
     assert.equal([...p.queue.all()].length, 0, `${label}: logout queue cleared`);
     assert.equal([...p.weakQueue.all()].length, 0, `${label}: operation marker cleared`);
     assert(![...p.timers.values()].some(x => x.script.name === '[softtimer,wanted_record_watch]'), `${label}: timer cleared`);
-    assert(p.packets.some(x => x.constructor.name === 'CamReset'), `${label}: camera restored`);
-    assert(p.packets.some(x => x.constructor.name === 'MinimapToggle' && x.minimapType === 0), `${label}: minimap restored`);
-    assert(p.packets.some(x => x.constructor.name === 'IfSetTab' && x.tab === 6 && x.component !== -1), `${label}: magic tab restored`);
+    assert(p.packets.some(x => x.constructor.name === 'CamReset'), `${label}: camera reset to defaults`);
+    assert(p.packets.some(x => x.constructor.name === 'MinimapToggle' && x.minimapType === 0), `${label}: minimap reset to defaults`);
+    assert(p.packets.some(x => x.constructor.name === 'IfSetTab' && x.tab === 6 && x.component !== -1), `${label}: default magic tab restored`);
 }
 function interrupt(p) {
     p.closeModal();
@@ -159,12 +161,13 @@ for (const [name, expectedActors] of [['daquarius', 4], ['zamorak', 2]]) {
 {
     const p = player();
     invoke(p, '[label,wanted_record_zamorak]');
-    // Stay in the allocated home zone; the unit fixture does not load overworld maps.
-    p.teleJump(home[1] + 1, home[2], home[0]);
-    assert.deepEqual(tile(p), [home[0], home[1] + 1, home[2]], 'external teleport actually leaves the instance');
+    const destination = [0, 2993, 3375];
+    World.gameMap.getZone(destination[1], destination[2], destination[0]);
+    p.teleJump(destination[1], destination[2], destination[0]);
+    assert.deepEqual(tile(p), destination, 'external teleport actually leaves the instance');
     World.currentTick++;
     p.processTimers(PlayerTimerType.SOFT);
-    assertReturned(p, 'external scene exit');
+    assertReturned(p, 'external scene exit', destination);
     assert.equal(p.activeScript, null, 'external exit detaches the paused scene');
 }
 for (const name of ['daquarius', 'zamorak']) {
@@ -213,6 +216,72 @@ for (const name of ['daquarius', 'zamorak']) {
     assert.equal(get(p, 'wanted_record_active'), 0);
     assert.equal(stage(p), 8);
 }
+// Entry uses the real shared teleport checks, then rechecks after the selector.
+for (const [label, position, setup, expected] of [
+    ['deep wilderness', [0, 3100, 3700], () => {}, /level 20 wilderness/],
+    ['duel', [0, 3340, 3250], () => {}, /can't teleport from a duel/],
+    ['Castle Wars', [0, 2400, 3100], () => {}, /can't leave just like that/],
+    ['recent combat', home, p => p.setVar(id('varp', 'lastcombat'), World.currentTick), /cannot use this whilst in combat/],
+    ['recent PvP', home, p => p.setVar(id('varp', 'lastcombat_pvp'), World.currentTick), /cannot use this whilst in combat/],
+]) {
+    const p = player();
+    p.level = position[0]; p.x = position[1]; p.z = position[2];
+    setup(p);
+    const menu = invoke(p, '[label,wanted_playback]');
+    p.lastCom = id('interface', 'multi4:com_1');
+    resume(p, menu);
+    while (menu.execution === ScriptState.PAUSEBUTTON) resume(p, menu);
+    assert.equal(menu.execution, ScriptState.FINISHED, label);
+    assert.equal(get(p, 'wanted_record_active'), 0, `${label}: no scene`);
+    assert.deepEqual(tile(p), position, `${label}: no movement`);
+    assert.equal(actors(p).length, 0, `${label}: no actors`);
+    assert.match(p.packets.map(x => x.text ?? '').join(' '), expected, label);
+}
+{
+    const p = player();
+    const menu = invoke(p, '[label,wanted_playback]');
+    p.setVar(id('varp', 'lastcombat'), World.currentTick);
+    p.lastCom = id('interface', 'multi4:com_2');
+    resume(p, menu);
+    assert.equal(menu.execution, ScriptState.FINISHED, 'combat acquired during selector blocks entry');
+    assert.equal(get(p, 'wanted_record_active'), 0);
+    assert.deepEqual(tile(p), home);
+}
+for (const name of ['playerhit_n_retaliate', 'combat_damage_player', 'pvp_damage', 'damage_player', 'recoil_damage', 'poison_damage', 'player_death_default']) {
+    const p = player();
+    const menu = invoke(p, '[label,wanted_playback]');
+    p.enqueueScript(ScriptProvider.getByName(`[queue,${name}]`));
+    p.lastCom = id('interface', 'multi4:com_1');
+    resume(p, menu);
+    assert.equal(menu.execution, ScriptState.FINISHED, `${name}: pending damage refuses entry`);
+    assert.equal(get(p, 'wanted_record_active'), 0, `${name}: no private scene`);
+    assert.deepEqual(tile(p), home);
+    assert(p.packets.some(x => x.text === 'You cannot use this whilst in combat.'), `${name}: standard refusal`);
+}
+// The ordinary death queue must leave the disposable region before its first
+// delay and before keep/drop allocation. Death is not a free safe-death escape.
+for (const external of [false, true]) {
+    const p = player();
+    invoke(p, '[label,wanted_record_zamorak]');
+    const destination = external ? [0, 2993, 3375] : home;
+    if (external) {
+        World.gameMap.getZone(destination[1], destination[2], destination[0]);
+        p.teleJump(destination[1], destination[2], destination[0]);
+    }
+    p.closeModal();
+    const death = invoke(p, '[queue,player_death_default]');
+    assert.equal(death.execution, ScriptState.SUSPENDED, 'real death queue reaches its first delay');
+    assertReturned(p, external ? 'death after external exit' : 'death before ordinary loss', destination);
+    // Execute ordinary keep/drop allocation on the mainland. Skull forces the
+    // Commorb into an actual ground object rather than the three kept items.
+    p.setVar(id('varp', 'pk_skull'), 1);
+    p.delayed = false;
+    invoke(p, '[proc,player_death_lose_items]');
+    assert.equal(orbCount(p), 0, 'ordinary death still loses the unprotected orb');
+    const zone = World.gameMap.getZone(destination[1], destination[2], destination[0]);
+    assert(zone.getObj(destination[1], destination[2], id('obj', 'wanted_crystal_ball'), p.username37), 'death orb remains recoverable outside the deleted instance');
+}
+console.log('PASS teleport wilderness/duel/Castle Wars/combat admission, selector race, external destination and ordinary death drops');
 console.log('PASS playback admission/cancel, exact return, camera/minimap/tabs, real logout queue, isolated two-player actors');
 console.log('RESULT PASS Wanted S3 compiled observation records');
 process.exit(0);

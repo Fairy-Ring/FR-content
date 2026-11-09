@@ -23,6 +23,24 @@ return;
 // gives the normal save/logout path the exact original tile if the client drops.
 [proc,wanted_record_begin](int $record)(int)
 if (%wanted_record_active ! 0) { ~wanted_record_cleanup(%wanted_record_generation); }
+// Match jewellery teleports and reuse their shared activity restrictions.
+// Check here, after the yielding selector, before creating a private region.
+if (~wilderness_level(coord) > 20) {
+    mes("A mysterious force blocks your teleport spell!");
+    mes("You can't use this teleport after level 20 wilderness.");
+    return(-1);
+}
+if (~pre_tele_checks(coord) = false) { return(-1); }
+// Same combat window and refusal as the Monkey Greegree. Pending hits must
+// resolve outside the disposable scene, even if their combat timestamp expired.
+if (add(%lastcombat, 10) > map_clock | add(%lastcombat_pvp, 10) > map_clock
+    | getqueue(playerhit_n_retaliate) > 0 | getqueue(combat_damage_player) > 0
+    | getqueue(pvp_damage) > 0 | getqueue(damage_player) > 0
+    | getqueue(recoil_damage) > 0 | getqueue(poison_damage) > 0
+    | getqueue(player_death_default) > 0 | stat(hitpoints) = 0 | %death = ^true) {
+    mes("You cannot use this whilst in combat.");
+    return(-1);
+}
 %wanted_record_return = coord;
 %wanted_record_generation = calc(%wanted_record_generation + 1);
 %wanted_record_active = $record;
@@ -95,6 +113,10 @@ if (p_finduid(uid) = true) { ~wanted_record_cleanup($generation); }
 
 [proc,wanted_record_cleanup](int $generation)
 if (%wanted_record_active = 0 | %wanted_record_generation ! $generation) { return; }
+def_boolean $in_scene = false;
+if (region_findbycoord(coord) = true) {
+    if (region_uid = %wanted_record_uid) { $in_scene = true; }
+}
 %wanted_record_active = 0;
 clearsofttimer(wanted_record_watch);
 clearqueue(wanted_record_marker);
@@ -107,13 +129,15 @@ if (region_findbyuid(%wanted_record_uid) = true) {
 }
 %wanted_record_uid = 0;
 if_close;
+// These are defaults, not a snapshot of the player's pre-scene camera/tabs.
 cam_reset;
 minimap_toggle(0);
-p_telejump(%wanted_record_return);
+if ($in_scene = true) { p_telejump(%wanted_record_return); }
 ~initalltabs;
 
 [label,wanted_record_daquarius]
 def_int $generation = ~wanted_record_begin(1);
+if ($generation = -1) { return; }
 ~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,angry>Lord Daquarius! Still festering in your pathetic little dungeon, I see.");
 if (~wanted_record_valid($generation) = false) { return; }
 ~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene, "<p,neutral>Solus. I thought you dead many moons past...");
@@ -178,6 +202,7 @@ return;
 
 [label,wanted_record_zamorak]
 def_int $generation = ~wanted_record_begin(2);
+if ($generation = -1) { return; }
 ~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene, "<p,shock>What? Who dares... Oh no. Oh no, no, no.");
 if (~wanted_record_valid($generation) = false) { return; }
 ~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,quiz>Well, what have we here? A shrine to Zamorak in the middle of Varrock?");
