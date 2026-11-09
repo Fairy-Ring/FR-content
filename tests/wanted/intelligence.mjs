@@ -338,6 +338,18 @@ for (const [who, abyssState, choices, expected] of [
     assert.match(text(p), expected, `${who}: stage-8 Wanted topic leaves the Abyss talk available`);
     assert.equal(get(p, 'wanted_zammy_mage_hint'), 0, `${who}: choosing Abyss does not set Wanted evidence`);
 }
+{
+    const p = player(8);
+    set(p, 'runemysteries', 6);
+    set(p, 'abyssal_miniquest', 0);
+    set(p, 'wanted_daquarius_hint', 2);
+    talk(p, 'rcu_zammy_mage1a', [1]);
+    assert.match(text(p), /Twenty parts of rune essence is the price for my information\./, 'Solus option enters the Wanted conversation');
+    assert.equal(get(p, 'wanted_zammy_mage_hint'), 1, 'Solus option records the Wanted conversation');
+    assert.doesNotMatch(text(p), /Meet me in Varrock's Chaos Temple/, 'Solus option returns before the Abyss dialogue');
+    assert.equal(get(p, 'abyssal_miniquest'), 0, 'Solus option never starts the Abyss miniquest');
+}
+
 for (const stage of [8, 9, 10]) {
     const p = player(stage);
     set(p, 'runemysteries', 6);
