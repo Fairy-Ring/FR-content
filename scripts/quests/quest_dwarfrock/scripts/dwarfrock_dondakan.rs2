@@ -1,7 +1,7 @@
 // Between a Rock… start-gate — Dondakan the Dwarf (dwarfrock_dondakan 1837).
 // CANDIDATE last-resort 2007-base: OSRS Transcript minus Overview / overlay.
 // Hunt 289? no. Bind the child, not the multi parent.
-// Accept: %dwarfrock_quest 0→1 only. Pointer may set dwarfrock_lookingforinfo.
+// Accept: %dwarfrock_quest 0→10 only. Pointer may set dwarfrock_lookingforinfo.
 // Never schematic / gold CB / inside / complete. Cite between-a-rock-start-talk-377.md §4.
 
 [opnpc1,dwarfrock_dondakan]
