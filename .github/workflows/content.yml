@@ -142,7 +142,7 @@ jobs:
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
           run_test tests/content-gaps/packed.mts bash ../content/tests/content-gaps/packed.sh "$PWD"
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
-          run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' env HM_SALVE_SKIP_COMPILE=1 bash ../content/tests/run-hm-salve-runtime.sh "$PWD"
+          run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           exit "$failed"
 
       - name: Write job summary
