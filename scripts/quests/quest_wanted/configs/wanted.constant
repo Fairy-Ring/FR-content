@@ -1,0 +1,10 @@
+// Product-defined intermediate stages, not recovered 377 integers.
+// CANDIDATE terminal ^wanted_complete = 11 belongs to general/quest.constant.
+^wanted_not_started = 0
+^wanted_plan_accepted = 1
+^wanted_plan_explained = 2
+^wanted_squire = 3
+^wanted_no_crisis = 4
+^wanted_crisis_reported = 5
+^wanted_deputised = 6
+^wanted_required_questpoints = 32

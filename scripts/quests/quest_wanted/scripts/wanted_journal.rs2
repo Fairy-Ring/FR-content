@@ -1,0 +1,26 @@
+// Product journal authorised by D5. Original wording: wanted.journal-text UNKNOWN.
+// Objectives follow wanted.requirements and wanted.deputise-flow, not a transcript.
+[if_button,questlist:wanted]
+~wanted_journal;
+
+[proc,wanted_journal]
+def_string $text = "@dbl@I am helping the White Knights track Solus Dellagar.";
+switch_int (%wanted_main) {
+    case ^wanted_not_started :
+        $text = "@dbl@I can ask @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@ about work.||I need to complete Recruitment Drive, Priest in Peril, The Lost Tribe and Rune Mysteries, and have 32 Quest Points.";
+    case ^wanted_plan_accepted :
+        $text = "@dbl@I agreed to Sir Tiffy's plan. I should ask @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@ what I need to do.";
+    case ^wanted_plan_explained :
+        $text = "@dbl@Sir Tiffy explained his plan. I should tell @dre@Sir Amik Varze@dbl@ in @dre@Falador Castle@dbl@ that I want to join the White Knights. I should decline the squire post and ask to be deputised.";
+    case ^wanted_squire :
+        $text = "@dbl@I became Sir Amik's squire instead of asking to be deputised. I should return to @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@ for advice.";
+    case ^wanted_no_crisis :
+        $text = "@dbl@Sir Amik cannot deputise me without a crisis. I should speak to @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@.";
+    case ^wanted_crisis_reported :
+        $text = "@dbl@Sir Tiffy reported a crisis to Sir Amik. I should return to @dre@Sir Amik Varze@dbl@ in @dre@Falador Castle@dbl@ and offer my help.";
+    case ^wanted_deputised :
+        $text = "@dbl@Sir Amik deputised me as a White Knight to find Solus Dellagar. I should return to @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@ for help with the hunt.";
+    case ^wanted_complete :
+        $text = "@str@I helped the White Knights bring Solus Dellagar to justice.||@red@QUEST COMPLETE!";
+}
+~quest_journal("Wanted!", $text);

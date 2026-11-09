@@ -80,7 +80,7 @@ if (%spy = 1) {
 // Recruitment Drive start: Amik owns main 0→1 + gender capture + progress once.
 // Tiffy owns testing intro/accept (spoke + permanent introduced). BKF spy 0–3 untouched.
 if (%rd_main >= ^recruitmentdrive_complete) {
-    return;
+    @wanted_amik;
 } else if (%rd_main > 0) {
     @recruitment_drive_sir_amik_in_progress;
 }
