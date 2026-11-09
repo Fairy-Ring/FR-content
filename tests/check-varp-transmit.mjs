@@ -99,11 +99,12 @@ function scanContent(contentRoot, exceptions) {
         for (const file of listFiles(scriptsRoot, extension)) {
             const rel = relativePath(contentRoot, file);
             for (const section of sections(file)) {
-                const multivar = section.values.get('multivar') ?? section.values.get('multivarp');
+                const multivar = section.values.get('multivar');
                 if (!multivar) {
                     continue;
                 }
-                const varbit = varbits.get(multivar);
+                // Same order as the packer (LocConfig/NpcConfig): a varp name first, then a varbit.
+                const varbit = varps.has(multivar) ? undefined : varbits.get(multivar);
                 const varp = varbit?.basevar ?? multivar;
                 if (varps.has(varp)) {
                     const source = varbit ? `${multivar} (${varbit.file})` : multivar;
