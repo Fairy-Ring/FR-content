@@ -27,7 +27,7 @@ switch_int (%wanted_main) {
     case ^wanted_no_crisis : @wanted_tiffy_crisis;
     case ^wanted_crisis_reported : @wanted_tiffy_crisis_reminder;
     case ^wanted_deputised : @wanted_tiffy_mission;
-    case ^wanted_commorb_issued, ^wanted_intelligence_open, ^wanted_witnesses_complete, ^wanted_chase, ^wanted_complete : @wanted_tiffy_commorb_help;
+    case ^wanted_commorb_issued, ^wanted_intelligence_open, ^wanted_chase, ^wanted_solus_defeated, ^wanted_complete : @wanted_tiffy_commorb_help;
 }
 ~wanted_journal;
 return;
@@ -308,7 +308,7 @@ return;
 return;
 
 [label,wanted_tiffy_commorb_help]
-if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_witnesses_complete & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_complete) {
+if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated & %wanted_main ! ^wanted_complete) {
     return;
 }
 // A held or banked Commorb is still the player's; only a genuinely missing
@@ -319,7 +319,7 @@ if (inv_total(inv, wanted_crystal_ball) = 0 & inv_total(bank, wanted_crystal_bal
         return;
     }
     ~chatplayer("<p,sad>Hey Tiffy, I lost my CommOrb...");
-    if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_witnesses_complete & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_complete) {
+    if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated & %wanted_main ! ^wanted_complete) {
         return;
     }
     if (inv_total(inv, wanted_crystal_ball) > 0 | inv_total(bank, wanted_crystal_ball) > 0 | inv_freespace(inv) = 0) {

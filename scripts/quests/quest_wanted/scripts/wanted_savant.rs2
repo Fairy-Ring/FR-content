@@ -2,7 +2,7 @@
 // as a 2007-base fallback. The stage and flag mapping is product-defined.
 
 [label,wanted_savant_contact]
-if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_witnesses_complete & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_complete) {
+if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated & %wanted_main ! ^wanted_complete) {
     return;
 }
 if (%wanted_contacted_savant = ^false) {
@@ -41,7 +41,7 @@ return;
 
 [label,wanted_savant_assignment]
 // Choosing the assignment is not the transfer. Recheck the stage after the menu.
-if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_witnesses_complete & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_complete) {
+if (%wanted_main ! ^wanted_commorb_issued & %wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated & %wanted_main ! ^wanted_complete) {
     return;
 }
 if (%wanted_main ! ^wanted_commorb_issued & %wanted_daquarius_hint = 2 & %wanted_zammy_mage_hint = 2) {

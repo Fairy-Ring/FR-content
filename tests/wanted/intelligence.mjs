@@ -132,7 +132,7 @@ function prepareMage(p, who) {
     assert.equal(get(p, 'wanted_black_knight_dead'), 1);
     talk(p, 'lord_daquarius');
     assert.equal(get(p, 'wanted_daquarius_hint'), 2);
-    talk(p, who);
+    talk(p, who, [1]);
     assert.equal(get(p, 'wanted_zammy_mage_hint'), 1);
 }
 
@@ -165,6 +165,7 @@ function prepareMage(p, who) {
     talk(p, 'lord_daquarius');
     assert.equal(get(p, 'wanted_daquarius_hint'), 2);
     assert.match(text(p), /It was not bear fur, I know that much/);
+    assert.match(text(p), /Stop! I will tell you what you want! Please\.\.\. leave my men be\.\.\./);
     assert.equal(p.getVar(id('varp', 'quest_wanted')) & ~(2047 | (3 << 14) | (3 << 16)), initialQuest);
 }
 
@@ -176,6 +177,12 @@ function prepareMage(p, who) {
     talk(p, 'lord_daquarius');
     assert.equal(get(p, 'wanted_daquarius_hint'), 2);
     assert.match(text(p), /It was not bear fur, I know that much/);
+}
+{
+    const p = player(8);
+    const aggressive = creditedDeath(p, 'aggressive_black_knight', 'aggressive_black_knight', 2502, 3702);
+    assert.equal(get(p, 'wanted_black_knight_dead'), 1, 'aggressive ordinary Black Knight satisfies D12');
+    assert(aggressive.after > aggressive.before, 'aggressive Black Knight still uses its normal death drops');
 }
 
 // STEP 4: both mage identities refuse to pay or deduce before the fur clue, then share the same recorded flow.
@@ -189,19 +196,30 @@ for (const who of ['rcu_zammy_mage1a', 'rcu_zammy_mage1_edgeb']) {
     assert.doesNotMatch(text(p), /Daquarius told us|moved East of here/);
     prepareMageAfterRefusal(p, who);
     clearText(p);
-    talk(p, who);
-    assert.equal(get(p, 'wanted_main'), 9);
+    talk(p, who, [1]);
+    assert.equal(get(p, 'wanted_main'), 8);
     assert.equal(get(p, 'wanted_zammy_mage_hint'), 2);
-    assert(p.packets.some(packet => packet.constructor.name === 'IfSetColour'), `${who}: stage 9 refreshes progress colour`);
     assert.equal(count(p, 'blankrune'), 0, `${who}: exactly 20 unnoted essence paid`);
     assert.match(text(p), /moved East of here when he left me/);
     assert.match(text(p), /Wolf fur\.\.\. and the East\.\.\. I know where he is/);
     assert.equal((text(p).match(/Daquarius told us/g) ?? []).length, 1, `${who}: deduction tail plays once after both clues`);
+    inventory(p).add(id('obj', 'blankrune'), 20);
     clearText(p);
     talk(p, who);
-    assert.equal(get(p, 'wanted_main'), 9);
-    assert.equal(count(p, 'blankrune'), 0, `${who}: repeat talk does not charge again`);
-    assert.equal(text(p), '', `${who}: completed deduction is not replayed`);
+    assert.equal(get(p, 'wanted_main'), 8);
+    assert.equal(count(p, 'blankrune'), 20, `${who}: later essence is not charged again`);
+    assert.doesNotMatch(text(p), /Twenty parts of rune essence is the price|I have your essences right here/);
+    assert.doesNotMatch(text(p), /Daquarius told us/, `${who}: completed deduction is not replayed`);
+}
+
+// A stack above the price loses exactly 20, and the witness flags do not add a main stage.
+{
+    const p = player(8);
+    prepareMage(p, 'rcu_zammy_mage1a');
+    inventory(p).add(id('obj', 'blankrune'), 27);
+    talk(p, 'rcu_zammy_mage1a', [1]);
+    assert.equal(count(p, 'blankrune'), 7, 'only the 20-essence price is removed');
+    assert.equal(get(p, 'wanted_main'), 8, 'both witness hints remain sub-progress');
 }
 
 // The helper starts after both Daquarius clues and the mage's recorded price are known.
@@ -211,7 +229,7 @@ function prepareMageAfterRefusal(p, who) {
     creditedDeath(p, 'black_knight', 'black_knight', 2400, 3600);
     talk(p, 'lord_daquarius');
     assert.equal(get(p, 'wanted_daquarius_hint'), 2);
-    talk(p, who);
+    talk(p, who, [1]);
     assert.equal(get(p, 'wanted_zammy_mage_hint'), 1);
 }
 
@@ -231,7 +249,7 @@ for (const [label, offer] of invalidOffers) {
     for (const item of offer) (item.bank ? bank(p) : inventory(p)).add(id('obj', item.item), item.amount);
     const beforeInv = new Map(offer.filter(item => !item.bank).map(item => [item.item, count(p, item.item)]));
     const beforeBank = new Map(offer.filter(item => item.bank).map(item => [item.item, count(p, item.item, bank(p))]));
-    talk(p, 'rcu_zammy_mage1a');
+    talk(p, 'rcu_zammy_mage1a', [1]);
     for (const [item, amount] of beforeInv) assert.equal(count(p, item), amount, `${label}: ${item} inventory unchanged`);
     for (const [item, amount] of beforeBank) assert.equal(count(p, item, bank(p)), amount, `${label}: ${item} bank unchanged`);
     assert.equal(get(p, 'wanted_zammy_mage_hint'), 1, `${label}: no paid flag`);
@@ -239,9 +257,9 @@ for (const [label, offer] of invalidOffers) {
     assert.doesNotMatch(text(p), /moved East of here|Wolf fur/);
 }
 
-// STEP 5: only entering the Canifis mapzone at stage 9 starts the lecture; the write follows its final line.
+// STEP 5: both witness hints stay at stage 8; the existing Canifis owner runs the lecture.
 {
-    const p = player(9);
+    const p = player(8);
     set(p, 'wanted_daquarius_hint', 2);
     set(p, 'wanted_zammy_mage_hint', 2);
     p.level = 0;
@@ -251,49 +269,102 @@ for (const [label, offer] of invalidOffers) {
     clearText(p);
     const lecture = run(p, '[mapzone,0_54_54]', null);
     assert.equal(lecture.exec, ScriptState.PAUSEBUTTON);
-    assert.equal(get(p, 'wanted_main'), 9, 'stage remains 9 during Savant lecture');
+    assert.equal(get(p, 'wanted_main'), 8, 'stage remains 8 during Savant lecture');
     drive(p, lecture);
-    assert.equal(get(p, 'wanted_main'), 10, 'stage advances only after lecture completes');
-    assert(p.packets.some(packet => packet.constructor.name === 'IfSetColour'), 'stage 10 refreshes progress colour');
+    assert.equal(get(p, 'wanted_main'), 9, 'stage advances only after lecture completes');
+    assert(p.packets.some(packet => packet.constructor.name === 'IfSetColour'), 'stage 9 refreshes progress colour');
+    assert.match(text(p), /From your perspective you can see three places simultaneously, and can choose to move between all three at will!/);
+    assert.match(text(p), /But it is close enough to be a cause of concern\./);
     assert.match(text(p), /Use the 'Scan' function of your CommOrb/);
     assert.equal(p.getVar(id('varp', 'quest_wanted')) & ~2047, beforeHigh);
     const transcript = text(p);
     const repeat = run(p, '[mapzone,0_54_54]', null);
     drive(p, repeat);
-    assert.equal(get(p, 'wanted_main'), 10);
+    assert.equal(get(p, 'wanted_main'), 9);
     assert.equal(text(p), transcript, 'repeat entry does not duplicate the lecture');
+}
+{
+    const p = player(8);
+    set(p, 'wanted_daquarius_hint', 2);
+    set(p, 'wanted_zammy_mage_hint', 1);
+    p.level = 0;
+    p.x = 3490;
+    p.z = 3490;
+    clearText(p);
+    const pending = run(p, '[mapzone,0_54_54]', null);
+    assert.notEqual(pending.exec, ScriptState.PAUSEBUTTON, 'Canifis waits for both witness hints');
+    drive(p, pending);
+    assert.equal(get(p, 'wanted_main'), 8, 'one hint cannot start the Canifis lecture');
+    assert.doesNotMatch(text(p), /begin a low level scan/);
+}
+{
+    const p = player(8);
+    set(p, 'wanted_daquarius_hint', 2);
+    set(p, 'wanted_zammy_mage_hint', 2);
+    p.level = 0;
+    p.x = 3490;
+    p.z = 3490;
+    const lecture = run(p, '[proc,wanted_intelligence_witnesses_complete]');
+    assert.equal(lecture.exec, ScriptState.PAUSEBUTTON, 'becoming eligible inside Canifis starts the lecture');
+    drive(p, lecture);
+    assert.equal(get(p, 'wanted_main'), 9, 'inside-zone eligibility completes the lecture and enters the chase');
 }
 
 // STEP 6: pre-Wanted Daquarius and both established Abyss mage branches remain active.
 {
     const p = player(7);
     talk(p, 'lord_daquarius');
-    assert.equal(text(p), '', 'pre-Wanted Daquarius remains inactive');
+    assert.equal(text(p), 'Nothing interesting happens.', 'inactive Daquarius keeps the engine default response');
     assert.equal(get(p, 'wanted_main'), 7);
 }
 {
-    const p = player(7);
+    const p = player(8);
     set(p, 'runemysteries', 6);
     set(p, 'abyssal_miniquest', 0);
     talk(p, 'rcu_zammy_mage1a');
-    assert.equal(get(p, 'abyssal_miniquest'), 1, 'Edgeville mage still starts the Abyss miniquest');
+    assert.equal(get(p, 'abyssal_miniquest'), 1, 'stage 8 before the fur clue still reaches the Abyss talk');
     assert.match(text(p), /Meet me in Varrock's Chaos Temple/);
-    assert.equal(get(p, 'wanted_main'), 7);
+    assert.equal(get(p, 'wanted_main'), 8);
 }
-{
-    const p = player(7);
+for (const [who, abyssState, choices, expected] of [
+    ['rcu_zammy_mage1a', 0, [2], /Meet me in Varrock's Chaos Temple/],
+    ['rcu_zammy_mage1_edgeb', 1, [2, 4], /Ah, you again/],
+]) {
+    const p = player(8);
     set(p, 'runemysteries', 6);
+    set(p, 'abyssal_miniquest', abyssState);
+    set(p, 'wanted_daquarius_hint', 2);
+    talk(p, who, choices);
+    assert.match(text(p), expected, `${who}: stage-8 Wanted topic leaves the Abyss talk available`);
+    assert.equal(get(p, 'wanted_zammy_mage_hint'), 0, `${who}: choosing Abyss does not set Wanted evidence`);
+}
+for (const stage of [8, 9, 10]) {
+    const p = player(stage);
+    set(p, 'runemysteries', 6);
+    set(p, 'abyssal_miniquest', 0);
+    set(p, 'wanted_daquarius_hint', 2);
+    set(p, 'wanted_zammy_mage_hint', 2);
+    talk(p, 'rcu_zammy_mage1a');
+    assert.equal(get(p, 'abyssal_miniquest'), 1, `stage ${stage}: completed Wanted clue leaves the Abyss talk available`);
+    assert.match(text(p), /Meet me in Varrock's Chaos Temple/);
+    assert.equal(get(p, 'wanted_main'), stage);
+}
+for (const stage of [8, 9, 10]) {
+    const p = player(stage);
     set(p, 'abyssal_miniquest', 1);
+    set(p, 'wanted_daquarius_hint', 2);
+    set(p, 'wanted_zammy_mage_hint', 2);
     talk(p, 'rcu_zammy_mage1_edgeb', [4]);
-    assert.match(text(p), /Ah, you again/);
-    assert.equal(get(p, 'wanted_main'), 7);
+    assert.match(text(p), /Ah, you again/, `stage ${stage}: Edgeville mage still reaches its Abyss dialogue`);
+    assert.equal(get(p, 'wanted_main'), stage);
 }
 
-// Journal follows the authored product stage transitions, while the quest's packed base remains intact.
+// Journal follows the §3.1 product stages; the packed base remains intact.
 for (const [stage, phrase] of [
-    [8, 'speak to Lord Daquarius'],
-    [9, 'I have both intelligence leads'],
-    [10, 'Savant explained that I can use my CommOrb to scan for Solus'],
+    [8, 'speak to Lord Daquarius, then find the Zamorakian mage for the second clue'],
+    [9, 'Savant explained that I can use my CommOrb to scan for Solus in Canifis'],
+    [10, 'I have defeated Solus Dellagar'],
+    [11, 'QUEST COMPLETE!'],
 ]) {
     const p = player(stage);
     clearText(p);
@@ -303,3 +374,4 @@ for (const [stage, phrase] of [
 
 console.log('PASS Wanted S4 intelligence, attribution, payment, entry lecture, and regressions');
 process.exit(0);
+

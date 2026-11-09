@@ -1,5 +1,7 @@
 [opnpc1,lord_daquarius]
-if (%wanted_main = ^wanted_intelligence_open | %wanted_main = ^wanted_witnesses_complete | %wanted_main = ^wanted_chase) {
+if (%wanted_main = ^wanted_intelligence_open | %wanted_main = ^wanted_chase | %wanted_main = ^wanted_solus_defeated) {
     ~wanted_daquarius_talk;
+    return;
 }
+mes("Nothing interesting happens.");
 return;

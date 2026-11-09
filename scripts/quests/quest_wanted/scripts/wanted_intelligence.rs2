@@ -2,13 +2,14 @@
 
 [proc,wanted_intelligence_witnesses_complete]
 if (%wanted_main = ^wanted_intelligence_open & %wanted_daquarius_hint = 2 & %wanted_zammy_mage_hint = 2) {
-    %wanted_main = ^wanted_witnesses_complete;
-    ~wanted_update_progress;
+    if (inzone(0_54_54_0_0, 0_54_54_63_63, coord) = true) {
+        ~wanted_canifis_entry;
+    }
 }
 return;
 
 [proc,wanted_daquarius_talk]
-if (%wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_witnesses_complete & %wanted_main ! ^wanted_chase) {
+if (%wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated) {
     return;
 }
 if (%wanted_daquarius_hint = 2) {
@@ -49,6 +50,7 @@ if (%wanted_black_knight_dead = ^false) {
     return;
 }
 
+~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>Stop! I will tell you what you want! Please... leave my men be...");
 ~chatplayer("<p,neutral>Hello.");
 ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,neutral>What want you with lord of Kinshra?|Speak!");
 ~chatplayer("<p,angry>Ok Daquarius, you tell me the whereabouts of Solus Dellagar right now, or I will put every Black Knight here to their death in front of you!");
@@ -71,17 +73,13 @@ if (%wanted_black_knight_dead = ^false) {
 return;
 
 [proc,wanted_zammy_mage_talk]
-if (%wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_witnesses_complete & %wanted_main ! ^wanted_chase) {
+if (%wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated) {
     return;
 }
 if (%wanted_daquarius_hint ! 2) {
     return;
 }
 if (%wanted_zammy_mage_hint = 2) {
-    if (%wanted_main = ^wanted_intelligence_open) {
-        ~wanted_zammy_mage_deduction;
-        ~wanted_intelligence_witnesses_complete;
-    }
     return;
 }
 if (%wanted_zammy_mage_hint = 0) {
@@ -149,7 +147,7 @@ if (%wanted_daquarius_hint ! 2 | %wanted_zammy_mage_hint ! 2) {
 return;
 
 [proc,wanted_canifis_entry]
-if (%wanted_main ! ^wanted_witnesses_complete) {
+if (%wanted_main ! ^wanted_intelligence_open | %wanted_daquarius_hint ! 2 | %wanted_zammy_mage_hint ! 2) {
     return;
 }
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Ok <displayname>, I'm going to begin a low level scan for Solus now...");
@@ -167,6 +165,7 @@ if (%wanted_main ! ^wanted_witnesses_complete) {
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>We stopped the research as it was too dangerous to be practically useful, but our initial studies showed that we could use the entire dimension as a kind of scrying glass to see a precise point where we wished to teleport to, then teleport extremely slowly between two points.");
 ~chatplayer("<p,neutral>How is teleporting really slowly particularly useful?");
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, basically, you are stretched so thinly between dimensions that you effectively become invisible!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>From your perspective you can see three places simultaneously, and can choose to move between all three at will!");
 ~chatplayer("<p,neutral>I'm... not sure I follow...");
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Let me give you an example: If you were in Falador castle, and wished to teleport to Varrock, then you could use this 'slow-teleport' technique to be in both places simultaneously, but invisible to anyone in either.");
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>You could also move freely between the two invisibly and then choose which place you wished to end up, simply by concentrating on the location you wanted to appear in.");
@@ -179,7 +178,7 @@ if (%wanted_main ! ^wanted_witnesses_complete) {
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>We ceased experimentation immediately, there are enough things in this world to haunt a Temple Knight, we did not see the need to create anymore.");
 ~chatplayer("<p,neutral>But this signature you are finding is the same as this 'slow-teleport' experiment created?");
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>No... it is not exactly the same...");
-~chatnpc_specific("Savant", wanted_savant, "<p,neutral>But it is close enough to be a cause for concern.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>But it is close enough to be a cause of concern.");
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Either someone else has found this strange dimension and begun their own research, and reached the same conclusions that we did...");
 ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Or... We have had a security leak within the Temple Knights and abandoned research has been sold to our enemies!");
 ~chatplayer("<p,neutral>Well, I can see how that might be a cause for concern, but right now our priority is Solus, right?");
