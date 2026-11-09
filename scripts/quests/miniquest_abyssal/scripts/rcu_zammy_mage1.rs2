@@ -1,9 +1,21 @@
 // This is the zammy mage at edgeville
 // Most of this is dialogue from rs3 as it seems to be the closest to the original, osrs completely reworked it with GoTR update
 [opnpc1,rcu_zammy_mage1a]
+if (%wanted_main = ^wanted_intelligence_open | %wanted_main = ^wanted_witnesses_complete | %wanted_main = ^wanted_chase) {
+    if (%wanted_daquarius_hint = 2) {
+        ~wanted_zammy_mage_talk;
+    }
+    return;
+}
 @rcu_zammy_mage1_talk;
 
 [opnpc1,rcu_zammy_mage1b]
+if (%wanted_main = ^wanted_intelligence_open | %wanted_main = ^wanted_witnesses_complete | %wanted_main = ^wanted_chase) {
+    if (%wanted_daquarius_hint = 2) {
+        ~wanted_zammy_mage_talk;
+    }
+    return;
+}
 @rcu_zammy_mage1_talk;
 
 [label,rcu_zammy_mage1_talk]

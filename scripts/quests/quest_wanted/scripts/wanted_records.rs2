@@ -9,7 +9,7 @@ if (%wanted_record_active ! 0) {
 if (inv_total(inv, wanted_crystal_ball) = 0) { return; }
 if (%wanted_commorb_intel ! 1) { @wanted_savant_contact; }
 switch_int (%wanted_main) {
-    case ^wanted_intelligence_open, ^wanted_chase, ^wanted_solus_defeated, ^wanted_complete :
+    case ^wanted_intelligence_open, ^wanted_witnesses_complete, ^wanted_chase, ^wanted_complete :
         def_int $record = ~p_choice4("Observation Record 1", 1, "Observation Record 2", 2, "Dossiers", 3, "Cancel", 4);
         switch_int ($record) {
             case 1 : @wanted_record_daquarius;

@@ -4,7 +4,13 @@
 
 [label,black_knight_drops]
 gosub(npc_death);
-if (npc_findhero = ^false) {
+if (npc_findhero = ^true) {
+    if (p_finduid(uid) = ^true) {
+        if (%wanted_main = ^wanted_intelligence_open) {
+            %wanted_black_knight_dead = ^true;
+        }
+    }
+} else {
     return;
 }
 

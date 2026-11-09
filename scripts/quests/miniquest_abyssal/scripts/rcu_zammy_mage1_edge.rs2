@@ -1,5 +1,11 @@
 // This is actually the varrock zammy mage...
 [opnpc1,rcu_zammy_mage1_edgeb]
+if (%wanted_main = ^wanted_intelligence_open | %wanted_main = ^wanted_witnesses_complete | %wanted_main = ^wanted_chase) {
+    if (%wanted_daquarius_hint = 2) {
+        ~wanted_zammy_mage_talk;
+    }
+    return;
+}
 // TODO: check for sara/guthix gear
 
 switch_int (%abyssal_miniquest) {

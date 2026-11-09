@@ -10,5 +10,5 @@
 ^wanted_required_questpoints = 32
 ^wanted_commorb_issued = 7
 ^wanted_intelligence_open = 8
-^wanted_chase = 9
-^wanted_solus_defeated = 10
+^wanted_witnesses_complete = 9
+^wanted_chase = 10
