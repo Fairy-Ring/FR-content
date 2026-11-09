@@ -78,13 +78,16 @@ function resume(p, state) {
     p.executeScript(state, true, true);
     assert.notEqual(state.execution, ScriptState.ABORTED, state.script.name);
 }
-function finish(p, state) {
+function finish(p, state, teleportDelay = false) {
     let boundaries = 0;
+    const effectDelays = [];
     while ([ScriptState.PAUSEBUTTON, ScriptState.SUSPENDED].includes(state.execution)) {
         assert(boundaries++ < 100, 'finite record');
+        if (state.execution === ScriptState.SUSPENDED) effectDelays.push(p.delayedUntil - World.currentTick);
         resume(p, state);
     }
     assert.equal(state.execution, ScriptState.FINISHED);
+    if (teleportDelay) assert.equal(effectDelays.at(-1), 3, 'teleport uses the standard two-tick delay plus the engine continuation tick');
     return boundaries;
 }
 function assertReturned(p, label, destination = home, expectedOrbs = 1) {
@@ -115,7 +118,7 @@ for (const [name, expectedActors] of [['daquarius', 4], ['zamorak', 2]]) {
     assert.equal(state.execution, ScriptState.PAUSEBUTTON);
     assert.equal(actors(p).length, expectedActors);
     assert.notDeepEqual(tile(p), home);
-    const boundaries = finish(p, state);
+    const boundaries = finish(p, state, name === 'daquarius');
     assertReturned(p, `${name} complete`);
     state = invoke(p, `[label,wanted_record_${name}]`);
     assert.equal(finish(p, state), boundaries, 'repeat has the same complete sequence');

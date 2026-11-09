@@ -192,7 +192,8 @@ if (npc_findexact(region_getcoord(0, 12, 12), wanted_solus_for_cutscene) = true)
     spotanim_npc(teleport_casting, 0, 0);
 }
 sound_synth(teleport_all, 1, 0);
-p_delay(~seqlength20ms(human_castteleport));
+// Match player_teleport_normal's two-tick departure, not the sequence's long tail.
+p_delay(2);
 if (~wanted_record_valid($generation) = false) { return; }
 if (npc_findexact(region_getcoord(0, 12, 12), wanted_solus_for_cutscene) = true) { npc_del; }
 ~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene2, "<p,sad>I swear... in the name of *cough* Zamorak... I will see you rot for this Solus...");
