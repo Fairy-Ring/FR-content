@@ -148,13 +148,17 @@ jobs:
       - name: Write job summary
         if: always()
         shell: bash
+        env:
+          ENGINE_SHA: ${{ steps.engine_ref.outputs.sha }}
+          RS2CHECK_ERRORS: ${{ steps.rs2check.outputs.errors }}
+          RS2CHECK_WARNINGS: ${{ steps.rs2check.outputs.warnings }}
         run: |
           {
             echo '## Content CI summary'
             echo
-            echo '- Pinned engine SHA: `${{ steps.engine_ref.outputs.sha || "unavailable" }}`'
-            echo '- rs2check errors: `${{ steps.rs2check.outputs.errors || "unavailable" }}`'
-            echo '- rs2check warnings: `${{ steps.rs2check.outputs.warnings || "unavailable" }}`'
+            echo "- Pinned engine SHA: \`${ENGINE_SHA:-unavailable}\`"
+            echo "- rs2check errors: \`${RS2CHECK_ERRORS:-unavailable}\`"
+            echo "- rs2check warnings: \`${RS2CHECK_WARNINGS:-unavailable}\`"
             echo
             echo '### Offline content test files'
             if [[ -f "$RUNNER_TEMP/content-test-results.tsv" ]]; then
