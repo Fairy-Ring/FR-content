@@ -95,6 +95,23 @@ function scanContent(contentRoot, exceptions) {
         sources.push(evidence);
         readers.set(varp, sources);
     }
+    for (const extension of ['.loc', '.npc']) {
+        for (const file of listFiles(scriptsRoot, extension)) {
+            const rel = relativePath(contentRoot, file);
+            for (const section of sections(file)) {
+                const multivar = section.values.get('multivar') ?? section.values.get('multivarp');
+                if (!multivar) {
+                    continue;
+                }
+                const varbit = varbits.get(multivar);
+                const varp = varbit?.basevar ?? multivar;
+                if (varps.has(varp)) {
+                    const source = varbit ? `${multivar} (${varbit.file})` : multivar;
+                    addReader(varp, `${rel} [${section.name}] multivar=${source}`);
+                }
+            }
+        }
+    }
 
     for (const [name, varp] of varps) {
         if (varp.clientcode) {
@@ -178,9 +195,18 @@ function selfTest() {
         '[clientcode_reader]', 'transmit=yes', 'clientcode=7', '',
         '[direct_reader]', 'transmit=yes', '',
         '[varbit_reader]', 'transmit=yes', '',
+        '[loc_multivar_reader]', 'transmit=yes', '',
+        '[npc_multivar_reader]', 'transmit=yes', '',
         '[unread_varp]', 'transmit=yes', ''
     ].join('\n'));
     writeFileSync(path.join(scripts, 'fixtures', 'fixture.varbit'), '[fixture_bit]\nbasevar=varbit_reader\n');
+    writeFileSync(path.join(scripts, 'fixtures', 'fixture_loc.loc'), [
+        '[loc_varbit_multi]', 'multivar=fixture_bit', '',
+        '[loc_direct_multi]', 'multivar=loc_multivar_reader'
+    ].join('\n'));
+    writeFileSync(path.join(scripts, 'fixtures', 'fixture_npc.npc'), [
+        '[npc_direct_multi]', 'multivar=npc_multivar_reader'
+    ].join('\n'));
     writeFileSync(path.join(scripts, 'interfaces', 'fixture.if'), [
         'script1op1=pushvar,direct_reader',
         'script1op2=testbit,direct_reader,0',
@@ -191,18 +217,19 @@ function selfTest() {
         const unclassified = scanContent(fixture, []);
         assert.equal(unclassified.issues.length, 1, JSON.stringify(unclassified.issues));
         assert.match(unclassified.issues[0], /unread_varp/);
+        assert.equal(unclassified.readerCount, 5);
 
         const classified = scanContent(fixture, [{
             varp: 'unread_varp',
             reason: 'Fixture exception represents a documented non-interface client use.'
         }]);
         assert.deepEqual(classified.issues, []);
-        assert.equal(classified.transmitted.length, 4);
-        assert.equal(classified.readerCount, 3);
+        assert.equal(classified.transmitted.length, 6);
+        assert.equal(classified.readerCount, 5);
         assert.equal(classified.exceptionCount, 1);
 
         const unnecessary = scanContent(fixture, [{
-            varp: 'direct_reader',
+            varp: 'loc_multivar_reader',
             reason: 'Fixture exception represents a documented non-interface client use.'
         }]);
         assert(unnecessary.issues.some(issue => issue.includes('unnecessary exception')));
