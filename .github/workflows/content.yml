@@ -49,6 +49,9 @@ jobs:
       - name: Install engine dependencies
         working-directory: engine
         run: npm ci
+      - name: Guard transmitted varps against 377 client readers
+        working-directory: content
+        run: node tests/check-varp-transmit.mjs
 
       - name: rs2check
         id: rs2check

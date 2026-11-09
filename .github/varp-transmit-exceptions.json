@@ -1,0 +1,78 @@
+[
+  {
+    "varp": "agrith_quest_varp",
+    "reason": "377 NPC and location multi definitions use agrith_quest varbits for quest-stage morphs."
+  },
+  {
+    "varp": "ahoy_varbits_1",
+    "reason": "377 quest NPCs use ahoy_questvar to select their visible Akharanu state."
+  },
+  {
+    "varp": "devious_base",
+    "reason": "377 loc and NPC multi definitions use devious_altar and devious_monk varbits for visible states."
+  },
+  {
+    "varp": "dwarfrock_main",
+    "reason": "377 NPCs use dwarfrock_quest for quest states and locs use the fired-cannonball varbit."
+  },
+  {
+    "varp": "elid_main",
+    "reason": "377 loc and NPC multi definitions use elidquest and channel varbits for visible states."
+  },
+  {
+    "varp": "ernestlever",
+    "reason": "The 377 cache's lever multi-var locations read ernestlever_* varbits to render their visible states."
+  },
+  {
+    "varp": "fairytale_multi",
+    "reason": "377 loc and NPC multi definitions use fairy quest varbits for wall, queen and NPC states."
+  },
+  {
+    "varp": "forget_main_var",
+    "reason": "377 Keldagrim farm and boarded-door locs morph from forget_farming and forget_boarding_removed."
+  },
+  {
+    "varp": "garden_varp_1",
+    "reason": "377 loc and NPC multi definitions use garden varbits for plants, statues and trolley states."
+  },
+  {
+    "varp": "golem_quest",
+    "reason": "update_questlist reads %golem_a and sends the questlist:golem progress colour."
+  },
+  {
+    "varp": "macro_candlelight_var",
+    "reason": "The anti-macro candle-pillar multi-var locations use macro_candlelight_1..11 varbits for visible states."
+  },
+  {
+    "varp": "makinghistory",
+    "reason": "377 display/crate locs and Melina/Droalak NPCs use makinghistory varbits to morph."
+  },
+  {
+    "varp": "main_feud_var",
+    "reason": "377 NPC multi definitions use Feud varbits for the mayor, bandits and guards."
+  },
+  {
+    "varp": "mdaughter_var",
+    "reason": "377 bear and burial mound NPC/loc definitions use mdaughter varbits for visible states."
+  },
+  {
+    "varp": "quest_wanted",
+    "reason": "update_questlist reads %wanted_main for questlist:wanted; Solus NPC morphs use wanted_mission1-7."
+  },
+  {
+    "varp": "quest_wanted2",
+    "reason": "377 Solus NPC morphs use wanted_mission8-19, varbits based on quest_wanted2."
+  },
+  {
+    "varp": "soulbane",
+    "reason": "377 Soul Bane loc and NPC multi definitions use soulbane varbits for visible states."
+  },
+  {
+    "varp": "swansong_quest",
+    "reason": "377 Swan Song loc and NPC multi definitions use swansong quest varbits for visible states."
+  },
+  {
+    "varp": "zombie_ogre",
+    "reason": "377 Zogre loc definitions use thzfe varbits for visible object states."
+  }
+]
