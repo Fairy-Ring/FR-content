@@ -87,7 +87,11 @@ jobs:
       - name: Build full content pack
         id: build_pack
         working-directory: engine
-        run: BUILD_SRC_DIR=../content npm run build
+        # Mirror the engine .env: current free-ID varp appends change historical CRCs.
+        env:
+          BUILD_SRC_DIR: ../content
+          BUILD_VERIFY: 'false'
+        run: npm run build
 
       # Suite classification (all are transport-free and are run below; live-only: none).
       # tests/ root: CI — hm-salve compiled runtime uses the built pack and starts no server.
