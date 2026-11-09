@@ -52,7 +52,10 @@ inv_add(inv, fenk_head_empty, 1);
 mes("...and you find a decapitated head.");
 // Optional follower overhead (Transcript).
 if (%fenk_follower_uid ! null & npc_finduid(%fenk_follower_uid) = true) {
-    npc_say("This is the place where I met me' maker.");
+    // UID reuse must not let a different player's NPC speak as this escort.
+    if (%npc_attacking_uid = uid) {
+        npc_say("This is the place where I met me' maker.");
+    }
 }
 return;
 
