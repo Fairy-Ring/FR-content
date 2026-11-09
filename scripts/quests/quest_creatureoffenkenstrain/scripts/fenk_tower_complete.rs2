@@ -168,23 +168,23 @@ inv_add(inv, fenk_letter, 1);
 // Questlist journal button
 [if_button,questlist:creatureoffenkenstrain]
 if (%fenk_quest >= ^fenk_complete) {
-    ~mesbox("You have completed Creature of Fenkenstrain.|You stole the Ring of Charos and ended Fenkenstrain's experiments.");
+    ~quest_journal("Creature of Fenkenstrain", "You have completed Creature of Fenkenstrain.|You stole the Ring of Charos and ended Fenkenstrain's experiments.");
     return;
 }
 if (%fenk_quest >= ^fenk_lightning_done) {
-    ~mesbox("I repaired the lightning conductor. The creature is in the tower.|I should speak with it, then deal with Fenkenstrain.");
+    ~quest_journal("Creature of Fenkenstrain", "I repaired the lightning conductor. The creature is in the tower.|I should speak with it, then deal with Fenkenstrain.");
     return;
 }
 if (%fenk_quest >= ^fenk_assembled) {
-    ~mesbox("The body is assembled. I need to repair the lightning conductor with a silver conductor.");
+    ~quest_journal("Creature of Fenkenstrain", "The body is assembled. I need to repair the lightning conductor with a silver conductor.");
     return;
 }
 if (%fenk_quest >= ^fenk_need_sewing) {
-    ~mesbox("Dr Fenkenstrain needs a needle and 5 lots of thread to sew the body.");
+    ~quest_journal("Creature of Fenkenstrain", "Dr Fenkenstrain needs a needle and 5 lots of thread to sew the body.");
     return;
 }
 if (%fenk_quest >= ^fenk_hired) {
-    ~mesbox("I work for Dr Fenkenstrain. I must gather body parts - head, torso, arms and legs.");
+    ~quest_journal("Creature of Fenkenstrain", "I work for Dr Fenkenstrain. I must gather body parts - head, torso, arms and legs.");
     return;
 }
-~mesbox("I can start Creature of Fenkenstrain by reading the signpost in Canifis|and applying for the job with Dr Fenkenstrain at the castle to the north-east.");
+~quest_journal("Creature of Fenkenstrain", "I can start Creature of Fenkenstrain by reading the signpost in Canifis|and applying for the job with Dr Fenkenstrain at the castle to the north-east.");
