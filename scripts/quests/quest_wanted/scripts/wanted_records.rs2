@@ -1,0 +1,256 @@
+// CANDIDATE scenes: wanted.dlg.record-daquarius / record-zamorak-mage.
+// D2 retains the wording warning; spell identification and placement are not 377 facts.
+// Playback selectors and private copies of existing scenery are product presentation.
+[label,wanted_playback]
+if (%wanted_record_active ! 0) {
+    ~wanted_record_cleanup(%wanted_record_generation);
+    return;
+}
+if (inv_total(inv, wanted_crystal_ball) = 0) { return; }
+if (%wanted_commorb_intel ! 1) { @wanted_savant_contact; }
+switch_int (%wanted_main) {
+    case ^wanted_intelligence_open, ^wanted_chase, ^wanted_solus_defeated, ^wanted_complete :
+        def_int $record = ~p_choice4("Observation Record 1", 1, "Observation Record 2", 2, "Dossiers", 3, "Cancel", 4);
+        switch_int ($record) {
+            case 1 : @wanted_record_daquarius;
+            case 2 : @wanted_record_zamorak;
+            case 3 : @wanted_dossiers;
+        }
+}
+return;
+
+// Private regions copy scenery only, never shared NPCs. region_setexitcoord also
+// gives the normal save/logout path the exact original tile if the client drops.
+[proc,wanted_record_begin](int $record)(int)
+if (%wanted_record_active ! 0) { ~wanted_record_cleanup(%wanted_record_generation); }
+// Match jewellery teleports and reuse their shared activity restrictions.
+// Check here, after the yielding selector, before creating a private region.
+if (~wilderness_level(coord) > 20) {
+    mes("A mysterious force blocks your teleport spell!");
+    mes("You can't use this teleport after level 20 wilderness.");
+    return(-1);
+}
+if (~pre_tele_checks(coord) = false) { return(-1); }
+// Same combat window and refusal as the Monkey Greegree. Pending hits must
+// resolve outside the disposable scene, even if their combat timestamp expired.
+if (add(%lastcombat, 10) > map_clock | add(%lastcombat_pvp, 10) > map_clock
+    | getqueue(playerhit_n_retaliate) > 0 | getqueue(combat_damage_player) > 0
+    | getqueue(pvp_damage) > 0 | getqueue(damage_player) > 0
+    | getqueue(recoil_damage) > 0 | getqueue(poison_damage) > 0
+    | getqueue(player_death_default) > 0 | stat(hitpoints) = 0 | %death = ^true) {
+    mes("You cannot use this whilst in combat.");
+    return(-1);
+}
+%wanted_record_return = coord;
+%wanted_record_generation = calc(%wanted_record_generation + 1);
+%wanted_record_active = $record;
+if_close;
+p_stopaction;
+def_coord $sw = region_create(1, 4, 4);
+%wanted_record_uid = region_uid;
+region_setexitcoord(%wanted_record_return);
+def_coord $source = 0_45_151_0_0;
+if ($record = 2) { $source = 0_50_52_48_48; }
+def_int $x = 0;
+def_int $z;
+while ($x < 4) {
+    $z = 0;
+    while ($z < 4) {
+        region_set(0, $x, $z, movecoord($source, multiply($x, 8), 0, multiply($z, 8)), 0);
+        $z = calc($z + 1);
+    }
+    $x = calc($x + 1);
+}
+if ($record = 1) {
+    p_telejump(region_getcoord(0, 8, 10));
+    ~wanted_record_actor(region_getcoord(0, 12, 12), wanted_solus_for_cutscene, region_getcoord(0, 12, 16));
+    ~wanted_record_actor(region_getcoord(0, 12, 16), wanted_lord_daquarius_for_cutscene, region_getcoord(0, 12, 12));
+    ~wanted_record_actor(region_getcoord(0, 12, 14), wanted_black_knight_for_cutscene, region_getcoord(0, 12, 12));
+    ~wanted_record_actor(region_getcoord(0, 12, 18), wanted_black_knight_for_cutscene, region_getcoord(0, 12, 12));
+    cam_moveto(region_getcoord(0, 12, 7), 650, 232, 232);
+    cam_lookat(region_getcoord(0, 12, 15), 100, 232, 232);
+} else {
+    p_telejump(region_getcoord(0, 8, 4));
+    ~wanted_record_actor(region_getcoord(0, 10, 7), wanted_solus_for_cutscene, region_getcoord(0, 12, 7));
+    ~wanted_record_actor(region_getcoord(0, 12, 7), wanted_zammy_mage_for_cutscene, region_getcoord(0, 10, 7));
+    cam_moveto(region_getcoord(0, 10, 1), 650, 232, 232);
+    cam_lookat(region_getcoord(0, 11, 7), 100, 232, 232);
+}
+minimap_toggle(2);
+if_settab(null, ^tab_magic);
+// An ordinary operation clears the weak marker. The soft timer can detect that
+// even when a replacement modal is open; the long queue accelerates on logout.
+weakqueue(wanted_record_marker, ^max_32bit_int, 0);
+longqueue(wanted_record_logout, ^max_32bit_int, %wanted_record_generation, ^accelerate);
+softtimer(wanted_record_watch, 1, %wanted_record_generation);
+return(%wanted_record_generation);
+
+[proc,wanted_record_actor](coord $tile, npc $type, coord $facing)
+npc_add($tile, $type, ^max_32bit_int);
+%npc_attacking_uid = uid;
+npc_setmode(none);
+npc_facesquare($facing);
+
+[proc,wanted_record_valid](int $generation)(boolean)
+if (%wanted_record_active = 0 | %wanted_record_generation ! $generation) { return(false); }
+if (getqueue(wanted_record_marker) = 0) { return(false); }
+if (region_findbycoord(coord) = false) { return(false); }
+if (region_uid ! %wanted_record_uid) { return(false); }
+return(true);
+
+
+[queue,wanted_record_marker](int $unused)
+return;
+
+[softtimer,wanted_record_watch](int $generation)
+if (%wanted_record_active = 0 | %wanted_record_generation ! $generation) { return; }
+if (~wanted_record_valid($generation) = true) { return; }
+if_close;
+if (p_finduid(uid) = true) { ~wanted_record_cleanup($generation); }
+
+[queue,wanted_record_logout](int $generation)
+~wanted_record_cleanup($generation);
+
+[proc,wanted_record_cleanup](int $generation)
+if (%wanted_record_active = 0 | %wanted_record_generation ! $generation) { return; }
+def_boolean $in_scene = false;
+if (region_findbycoord(coord) = true) {
+    if (region_uid = %wanted_record_uid) { $in_scene = true; }
+}
+%wanted_record_active = 0;
+clearsofttimer(wanted_record_watch);
+clearqueue(wanted_record_marker);
+clearqueue(wanted_record_logout);
+if (region_findbyuid(%wanted_record_uid) = true) {
+    npc_findallany(region_getcoord(0, 16, 16), 24, 0);
+    while (npc_findnext = true) {
+        if (%npc_attacking_uid = uid) { npc_del; }
+    }
+}
+%wanted_record_uid = 0;
+if_close;
+// These are defaults, not a snapshot of the player's pre-scene camera/tabs.
+cam_reset;
+minimap_toggle(0);
+if ($in_scene = true) { p_telejump(%wanted_record_return); }
+~initalltabs;
+
+[label,wanted_record_daquarius]
+def_int $generation = ~wanted_record_begin(1);
+if ($generation = -1) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,angry>Lord Daquarius! Still festering in your pathetic little dungeon, I see.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene, "<p,neutral>Solus. I thought you dead many moons past...");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,laugh>Ha! Wishful thinking, perhaps?");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene, "<p,angry>Cut the banter, Solus. What do you want? You know you are not welcome here.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,quiz>Now is that any way to talk to a fellow Zamorakian?");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene, "<p,angry>You are not a Zamorakian! You worship nothing but your own selfish greed.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,neutral>Ah... Such mistrust of your forgotten ally! Why did I ever leave these lands?");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene, "<p,angry>You left because your own stupidity brought the wrath of the Temple Knights upon you. Now I ask you a final time before I draw my blade: WHAT do you WANT?");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,neutral>Oh... nothing much. I just thought you would like to know that I have returned as your new master.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene, "<p,angry>The Kinshra are not your personal soldiers Solus! I will not waste any of my warriors in your foolish schemes!");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,quiz>And that is your final answer Daquarius?");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene, "<p,angry>Leave. Now. Or there will be blood shed between us.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,angry>You would threaten Solus Dellagar? Have you forgotten just who I am? Perhaps you need reminding!");
+if (~wanted_record_valid($generation) = false) { return; }
+// Shared spell assets; exact composition and duration remain CANDIDATE.
+if_close;
+weakqueue(wanted_record_marker, ^max_32bit_int, 0);
+if (npc_findexact(region_getcoord(0, 12, 12), wanted_solus_for_cutscene) = true) { npc_anim(zaros_casting, 0); }
+sound_synth(ice_cast, 1, 0);
+npc_findall(region_getcoord(0, 12, 16), wanted_black_knight_for_cutscene, 4, 0);
+while (npc_findnext = true) {
+    spotanim_npc(ice_barrage_impact, 0, 0);
+    npc_anim(human_death, 0);
+}
+if (npc_findexact(region_getcoord(0, 12, 16), wanted_lord_daquarius_for_cutscene) = true) {
+    spotanim_npc(ice_barrage_impact, 0, 0);
+    npc_changetype(wanted_lord_daquarius_for_cutscene2, ^max_32bit_int);
+}
+sound_synth(ice_barrage_impact, 1, 0);
+p_delay(~seqlength20ms(ice_barrage_impact));
+if (~wanted_record_valid($generation) = false) { return; }
+npc_findall(region_getcoord(0, 12, 16), wanted_black_knight_for_cutscene, 4, 0);
+while (npc_findnext = true) { npc_del; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,angry>Still alive Daquarius? Good! I won't have to remind you of my power again next time! Make sure you are more prepared to follow orders next time I come to your little Taverley hideout!");
+if (~wanted_record_valid($generation) = false) { return; }
+if_close;
+weakqueue(wanted_record_marker, ^max_32bit_int, 0);
+if (npc_findexact(region_getcoord(0, 12, 12), wanted_solus_for_cutscene) = true) {
+    npc_anim(human_castteleport, 0);
+    spotanim_npc(teleport_casting, 0, 0);
+}
+sound_synth(teleport_all, 1, 0);
+// Match player_teleport_normal's two-tick departure, not the sequence's long tail.
+p_delay(2);
+if (~wanted_record_valid($generation) = false) { return; }
+if (npc_findexact(region_getcoord(0, 12, 12), wanted_solus_for_cutscene) = true) { npc_del; }
+~chatnpc_specific("Lord Daquarius", wanted_lord_daquarius_for_cutscene2, "<p,sad>I swear... in the name of *cough* Zamorak... I will see you rot for this Solus...");
+if (~wanted_record_valid($generation) = false) { return; }
+~wanted_record_cleanup($generation);
+return;
+
+[label,wanted_record_zamorak]
+def_int $generation = ~wanted_record_begin(2);
+if ($generation = -1) { return; }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene, "<p,shock>What? Who dares... Oh no. Oh no, no, no.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,quiz>Well, what have we here? A shrine to Zamorak in the middle of Varrock?");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene, "<p,shock>S-S-Solus???");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,happy>I assume my reputation precedes me!");
+if (~wanted_record_valid($generation) = false) { return; }
+if (npc_findexact(region_getcoord(0, 12, 7), wanted_zammy_mage_for_cutscene) = true) { npc_changetype(wanted_zammy_mage_for_cutscene_pray, ^max_32bit_int); }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene_pray, "<p,sad>Please. Please don't kill me. I have no riches, I am but a magical researcher...");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,laugh>Kill you? HAH HAH HAH! My dear fellow, if I wanted you dead, you ALREADY WOULD BE!");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene_pray, "<p,sad>I... I don't know w-what you want Solus...but whatever it is, please, just t-take it and leave, please.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,neutral>Well I am particularly interested in your brains at the moment! But you wouldn't want me taking those and leaving, now would you?");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene_pray, "<p,confused>My b-brains? I... I don't understand...");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,angry>I am interested in your research!");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene_pray, "<p,sad>My... r-research? I c-cannot let you have my research it is being done in order to assist my lord Zamorak.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,quiz>Ah! But he is not here, is he?");
+if (~wanted_record_valid($generation) = false) { return; }
+if (npc_findexact(region_getcoord(0, 12, 7), wanted_zammy_mage_for_cutscene_pray) = true) { npc_changetype(wanted_zammy_mage_for_cutscene_telly, ^max_32bit_int); }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene_telly, "<p,sad>No...I...");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,angry>Ah-ah-ah!");
+if (~wanted_record_valid($generation) = false) { return; }
+if_close;
+weakqueue(wanted_record_marker, ^max_32bit_int, 0);
+if (npc_findexact(region_getcoord(0, 10, 7), wanted_solus_for_cutscene) = true) { npc_anim(human_castentangle, 0); }
+sound_synth(bind_cast, 1, 0);
+if (npc_findexact(region_getcoord(0, 12, 7), wanted_zammy_mage_for_cutscene_telly) = true) { spotanim_npc(bind_impact, 124, 0); }
+sound_synth(bind_impact, 1, 0);
+p_delay(~seqlength20ms(human_castentangle));
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,angry>You are going nowhere just yet sir.");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene_telly, "<p,sad>P-please I meant no disrespect Solus, please do not kill me...");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,neutral>With your most interesting research! No, I will be content with simply taking your money sir!");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Mage", wanted_zammy_mage_for_cutscene_telly, "<p,sad>Take it, take it all!");
+if (~wanted_record_valid($generation) = false) { return; }
+~chatnpc_specific("Solus Dellagar", wanted_solus_for_cutscene, "<p,happy>Well a most productive trip on all accounts! I will see you again...Very soon!");
+if (~wanted_record_valid($generation) = false) { return; }
+~wanted_record_cleanup($generation);
+return;

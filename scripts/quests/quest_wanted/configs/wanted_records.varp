@@ -1,0 +1,17 @@
+// Runtime-only recording identity. No NPC UID or region survives login.
+[wanted_record_active]
+scope=temp
+transmit=no
+
+[wanted_record_generation]
+scope=temp
+transmit=no
+
+[wanted_record_uid]
+scope=temp
+transmit=no
+
+[wanted_record_return]
+type=coord
+scope=temp
+transmit=no

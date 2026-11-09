@@ -762,3 +762,7 @@
 761=rd_tiffy_introduced
 763=fenk_follower_uid
 764=fenk_charos_unlocked
+765=wanted_record_active
+766=wanted_record_generation
+767=wanted_record_uid
+768=wanted_record_return

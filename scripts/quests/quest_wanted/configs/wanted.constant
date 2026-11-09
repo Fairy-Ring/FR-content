@@ -8,3 +8,7 @@
 ^wanted_crisis_reported = 5
 ^wanted_deputised = 6
 ^wanted_required_questpoints = 32
+^wanted_commorb_issued = 7
+^wanted_intelligence_open = 8
+^wanted_chase = 9
+^wanted_solus_defeated = 10

@@ -1,0 +1,11 @@
+// Actual held options from wanted.obj-set: Scan 1, Contact 2, Playback 4.
+// In the intelligence slice Scan and Contact both open Savant. Neither selects
+// a hunt destination or clue. Playback uses the observation-record handler.
+[opheld1,wanted_crystal_ball]
+@wanted_savant_contact;
+
+[opheld2,wanted_crystal_ball]
+@wanted_savant_contact;
+
+[opheld4,wanted_crystal_ball]
+@wanted_playback;
