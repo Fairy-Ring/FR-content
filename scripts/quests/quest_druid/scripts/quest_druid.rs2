@@ -13,6 +13,11 @@ if(npc_finduid($uid) = true) {
 
 [oplocu,cauldron_of_thunder]
 def_obj $useitem = last_useitem;
+// CANDIDATE (druidic-ritual.cauldron-stage-gate): match the era-checked Lost City guard.
+if (%druidquest ! ^druid_spoken_sanfew) {
+    ~displaymessage(^dm_default);
+    return;
+}
 p_arrivedelay;
 if($useitem = raw_rat_meat) {
     mes("You dip the raw rat meat in the cauldron.");
