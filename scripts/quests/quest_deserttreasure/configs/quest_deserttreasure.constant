@@ -1,0 +1,59 @@
+// CANDIDATE: product stage encoding from the accepted plan; not recovered historical 377 integers.
+^dt_stage_not_started = 0
+^dt_stage_etchings_received = 1
+^dt_stage_translation_with_terry = 2
+^dt_stage_translation_return = 3
+^dt_stage_partnership_pending = 4
+^dt_stage_partnership_accepted = 5
+^dt_stage_brew_purchased = 6
+^dt_stage_diamonds_requested = 7
+^dt_stage_ingredients_pending = 8
+^dt_stage_unused_9 = 9
+^dt_stage_hunts = 10
+^dt_stage_placing_diamonds = 11
+^dt_stage_four_columns = 12
+^dt_stage_inside_pyramid = 13
+^dt_stage_reward_pending = 14
+^dt_stage_complete = 15
+
+// CANDIDATE: 439 is permanent and server-only; 0=standard and 1=Ancient is product selector encoding.
+^dt_spellbook_standard = 0
+^dt_spellbook_ancient = 1
+
+// VERIFIED: these 0/1 values match the original single-bit varbit and multi windows; writers remain product behavior.
+^dt_flag_off = 0
+^dt_flag_on = 1
+^dt_column_unplaced = 0
+^dt_column_placed = 1
+
+// CANDIDATE: Ice child progression follows the accepted product contract, not a recovered historical subquest ladder.
+^dt_ice_substate_crying = 0
+^dt_ice_substate_agreed = 1
+^dt_ice_substate_kamil_dead = 2
+^dt_ice_substate_parents_freed = 3
+^dt_ice_substate_family_returned = 4
+^dt_ice_substate_awarded = 5
+// CANDIDATE: source-backed product requirement; count saturates at five.
+^dt_ice_trolls_required = 5
+
+// CANDIDATE: product representation for fdvw_subquest; pot item identity carries blessing and ingredient order.
+^dt_blood_substate_not_started = 0
+^dt_blood_substate_malak_agreed = 1
+^dt_blood_substate_silver_pot = 2
+^dt_blood_substate_blood_drawn = 3
+^dt_blood_substate_one_ingredient = 4
+^dt_blood_substate_prepared = 5
+^dt_blood_substate_dessous_active = 6
+^dt_blood_substate_dessous_defeated = 7
+^dt_blood_substate_diamond_claimed = 8
+
+// CANDIDATE: product representation for fd_shadowwarrior_quest, not historical values.
+^dt_shadow_substate_not_started = 0
+^dt_shadow_substate_rasolo_agreed = 1
+^dt_shadow_substate_cross_returned_ring_awarded = 2
+^dt_shadow_substate_damis_first_form = 3
+^dt_shadow_substate_damis_second_form = 4
+^dt_shadow_substate_damis_defeated = 5
+^dt_shadow_substate_diamond_claimed = 6
+
+// UNKNOWN: historical Blood/Shadow substate integers, exact arrival tiles and fight tiles remain unrecovered.
