@@ -778,7 +778,7 @@ transmit=yes
 [feud_var_multi]
 
 [varp438_unused]
-
+// PRODUCT: S0 selects permanent save scope; this is not a recovered 377 fact.
 [alternate_spells]
 scope=perm
 

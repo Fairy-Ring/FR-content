@@ -337,16 +337,11 @@ def check_constants() -> None:
     if not QUEST_CONSTANTS.is_file():
         require(False, f"missing shared quest constants: {QUEST_CONSTANTS}")
         return
-    if not LOCAL_CONSTANTS.is_file():
-        require(False, f"missing required Desert Treasure constants: {LOCAL_CONSTANTS}")
-        return
     quest_text = QUEST_CONSTANTS.read_text(encoding="utf-8")
     quest, quest_duplicates = parse_constants_text(quest_text, str(QUEST_CONSTANTS))
-    local, local_duplicates = parse_constants(LOCAL_CONSTANTS)
     base_quest_text = baseline_text("scripts/general/configs/quest.constant")
     base_quest, base_quest_duplicates = parse_constants_text(base_quest_text, "baseline quest.constant")
     require(not quest_duplicates, f"duplicate shared quest constants: {quest_duplicates[:3]}")
-    require(not local_duplicates, f"duplicate Desert Treasure constants: {local_duplicates[:3]}")
     require(not base_quest_duplicates, f"duplicate baseline quest constants: {base_quest_duplicates[:3]}")
     missing = set(base_quest) - set(quest)
     changed = {name for name in base_quest.keys() & quest.keys() if base_quest[name] != quest[name]}
@@ -360,6 +355,11 @@ def check_constants() -> None:
         "// VERIFIED: period 3 QP reward (desert-treasure.period-requirements)." in quest_text,
         "shared QP reward needs its VERIFIED source label",
     )
+    if not LOCAL_CONSTANTS.is_file():
+        require(False, f"missing required Desert Treasure constants: {LOCAL_CONSTANTS}")
+        return
+    local, local_duplicates = parse_constants(LOCAL_CONSTANTS)
+    require(not local_duplicates, f"duplicate Desert Treasure constants: {local_duplicates[:3]}")
     expected = {
         "dt_stage_not_started": 0,
         "dt_stage_etchings_received": 1,
