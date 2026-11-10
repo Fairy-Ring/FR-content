@@ -780,14 +780,18 @@ transmit=yes
 [varp438_unused]
 
 [alternate_spells]
+scope=perm
 
 [deserttreasuremain]
+scope=perm
 transmit=yes
 
 [deserttreasurevarbit]
+scope=perm
 transmit=yes
 
 [deserttreasurevarbit2]
+scope=perm
 transmit=yes
 
 [ics_little_multi]
