@@ -41,11 +41,23 @@ if (%fd_magiclog >= 12 & %fd_steelbar >= 6 & %fd_glass >= 6 & %fd_bones = 1 & %f
 return;
 
 [label,dt_eblis_excellent]
+def_int $slot = 0;
+def_obj $worn;
+// CANDIDATE reconstruction: worn Zamorak equipment blocks glass creation.
+// The refusal text and exact 377 check timing are UNKNOWN; do not consume anything.
+while ($slot < inv_size(worn)) {
+    $worn = inv_getobj(worn, $slot);
+    if ($worn ! null & oc_param($worn, zamorakitem) = ^true) {
+        return;
+    }
+    $slot = add($slot, 1);
+}
 ~chatnpc("<p,happy>Excellent! Those are all the ingredients I need to create the scrying glasses.");
 ~chatnpc("<p,neutral>I will find a suitable spot in the desert to the East of here, and set them up. When you are ready to begin your search, please come and find me there, I will show you how to utilise the");
 ~chatnpc("<p,neutral>mirrors to find the diamonds.");
 if (%deserttreasure = 8) {
     %deserttreasure = 10;
+    ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 }
 %fd_mirror_present = 1; // CANDIDATE present-bit — Eblis sets up the mirrors (research: subject desert-treasure)
 return;
@@ -177,5 +189,6 @@ if ($go = 2) {
 ~chatplayer("<p,neutral>It's a slightly odd collection of ingredients, but I shouldn't have too much trouble getting those for you.");
 if (%deserttreasure = 7) {
     %deserttreasure = 8;
+    ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 }
 return;

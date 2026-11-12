@@ -45,6 +45,7 @@ inv_del(inv, four_diamonds_etchings, inv_total(inv, four_diamonds_etchings));
 ~chatnpc("<p,neutral>It might be slightly obscure on the finer details, but it should be good enough to understand the rough meaning of what was originally written. Please, just wait a moment, I will write up what I can");
 ~chatnpc("<p,neutral>translate into a journal for you. Then you can take it back to Asgarnia, I think he will be extremely interested in the translation!");
 %deserttreasure = 2;
+~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 return;
 
 [label,dt_terry_stage2]
@@ -55,6 +56,7 @@ if (inv_itemspace(inv, four_diamonds_translation_primer, 1, inv_size(inv)) = fal
 ~chatnpc("<p,happy>right track for a find of great archaeological importance");
 inv_add(inv, four_diamonds_translation_primer, 1);
 %deserttreasure = 3;
+~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 ~chatplayer("<p,shock>Wow! You write really quickly don't you?");
 ~chatnpc("<p,happy>What can I say? It's a skill I picked up through my many years of taking field notes!");
 return;

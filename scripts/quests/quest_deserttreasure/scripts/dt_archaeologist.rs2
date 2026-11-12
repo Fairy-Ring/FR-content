@@ -4,7 +4,12 @@
 // Display stays Archaeologist (not Asgarnia Smith). Spoken name only in Who-are-you.
 // Accept: %deserttreasure 0→1 + four_diamonds_etchings. No Terry / diamonds / AM.
 
+[opheld1,four_diamonds_translation_primer]
+@dt_translation_read;
+return;
+
 [opnpc1,fourdiamonds_indiana]
+
 if (%deserttreasure = 1) {
     @dt_arch_started;
 }
@@ -21,9 +26,18 @@ if (%deserttreasure = 5) {
     @dt_arch_south_nag;
 }
 if (%deserttreasure > 5) {
+    if (inv_total(inv, fd_blood_diamond) > 0 & inv_total(inv, fd_icediamond) > 0 & inv_total(inv, fd_diamond_fire) > 0 & inv_total(inv, fd_dark_diamond) > 0) {
+        @dt_arch_with_diamonds;
+        return;
+    }
+    if (%fd_column_blood = ^dt_column_placed & %fd_column_fire = ^dt_column_placed & %fd_column_ice = ^dt_column_placed & %fd_column_shadow = ^dt_column_placed & inv_total(inv, fd_blood_diamond) = 0 & inv_total(inv, fd_icediamond) = 0 & inv_total(inv, fd_diamond_fire) = 0 & inv_total(inv, fd_dark_diamond) = 0) {
+        @dt_arch_after_place;
+        return;
+    }
     // Bartender / diamonds later. Do not re-grant etchings or restart.
     return;
 }
+
 @dt_arch_hello;
 
 [label,dt_arch_hello]
@@ -86,6 +100,7 @@ if (inv_itemspace(inv, four_diamonds_etchings, 1, inv_size(inv)) = false) {
 ~chatnpc("<p,happy>Come back and let me know what he says, I would hate to waste my time excavating anything that isn't worth my time as a world famous archaeologist!");
 inv_add(inv, four_diamonds_etchings, 1);
 %deserttreasure = 1;
+~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 return;
 
 [label,dt_arch_started]
@@ -135,13 +150,15 @@ if (inv_total(inv, four_diamonds_translation_primer) < 1) {
 ~chatnpc("<p,quiz>Did you take a read of this? It will do you good to understand how this profession works. Here, have a read.");
 def_int $read = ~p_choice2("Read book", 1, "Don't read book", 2);
 if ($read = 1) {
-    // Leftover Translation IF is stay-closed (0 leftover join). Book stays. No write.
+    // Read leaves item 4655 and stage 3 unchanged.
+    @dt_translation_read;
     return;
 }
 ~chatplayer("<p,neutral>Yeah, I did. Kind of boring really.");
 inv_del(inv, four_diamonds_translation_primer, 1);
 ~chatnpc("<p,happy>Excellent. Just give me a moment to read this, and talk to me again in a second.");
 %deserttreasure = 4;
+~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 return;
 
 [label,dt_arch_partners]
@@ -190,8 +207,8 @@ return;
 ~chatplayer("<p,happy>Aw, go on then. Count me in.");
 ~chatnpc("<p,happy>Good lad! Well, if we split up we'll be able to find treasure quicker.");
 ~chatnpc("<p,neutral>I'll continue searching around here in this Bedabin Camp, you head due South to the Bandit Village. If either of us find anything, we'll come find each other and say what, okay?");
-~chatnpc("<p,neutral>You head due South, see what you can find out about this tablet.");
 %deserttreasure = 5;
+~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 return;
 
 [label,dt_arch_south_nag]
@@ -200,4 +217,54 @@ return;
 ~chatplayer("<p,sad>Not yet...");
 ~chatnpc("<p,neutral>Well, head south to that bandit camp. I bet if there's anything out here, they'll know about it.");
 ~chatnpc("<p,angry>Don't let on it might be valuable though! Those thieves will steal it as soon as look at you!");
+return;
+
+[label,dt_translation_read]
+// CANDIDATE: translation page breaks are editorial; each page is kept within one book render.
+%book_page = 0;
+%open_book = four_diamonds_translation_primer;
+@book_flip_page(0, 0, 5, dt_translation_book_page);
+
+[proc,dt_translation_book_page]
+switch_int (%book_page) {
+    case 0 : ~book("Translation", "This is a rough translation of the stone tablet brought to me by courier earlier today.|The cuneiforms of this particular tablet are far different to anything I have previously seen in my career as an archaeological expert.");
+    case 1 : ~book("Translation", "Where possible I have given as accurate a translation as possible, but some of the words I have attempted to translate hold different meanings depending upon their intonation and context; Due to my unfamiliarity with this language, I have given possible translations for these words wherever I have encountered them. Wherever I have a word in brackets, it is a word which has many meanings depending on the context, although the general meaning should be clear to even a casual study.");
+    case 2 : ~book("Translation", "Hopefully this translation will help you in your excavations Asgarnia, and as usual I look forward to seeing what relics you bring back to the Museum of Varrock this time!|Your friend, as always,|Terry Balando|Translation follows:|(There are some missing sentence fragments here, presumably from a stone tablet preceding this one which you have not yet discovered)|...the permanent (exile/journey) of the people ended.");
+    case 3 : ~book("Translation", "And so it came to pass, that deep in the (fiery/uncomfortable) desert, the gods (argued/decided) amongst themselves that the (fortress/home) would be the (selected/chosen) place that would (imprison/conceal) the (wealth/power).");
+    case 4 : ~book("Translation", "Thus (guarded/protected) by the (unusually archaic word here, I believe it means either the sick or the dead depending on context) and (defended/trapped) by the (diamonds/crystals) of (this word is untranslatable). So it was that the gods left the four (diamonds/crystals) as the (key/secret). (Guarded/Protected) by the (again, this word has no modern equivalent) and held by the (worthy/strong) so that the (wealth/power) might forever be (imprisoned/concealed).");
+    case 5 : ~book("Translation", "There seems to be some further missing information continued onto a further tablet, but from this preliminary translation I think you may be onto something very big indeed!");
+}
+[label,dt_arch_with_diamonds]
+// CANDIDATE return conversation; do not hand over the diamonds or write stage.
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,neutral>Hello again. How's the treasure hunting going?");
+~chatplayer("<p,neutral>Well, I've found four diamonds.");
+~chatnpc("<p,shock>What? But you've been gone ages!");
+~chatnpc("<p,neutral>C'mon, you can be square with me, you must have found more treasure than just four measly diamonds by now!");
+~chatplayer("<p,neutral>No, I really haven't.");
+~chatnpc("<p,neutral>Hmmm. Well, okay a deal is a deal. Hand two of them over.");
+~chatplayer("<p,neutral>Actually, I think I'm going to need them to gain access to the real treasure...");
+~chatnpc("<p,shock>REALLY? Great, I love treasure!");
+~chatnpc("<p,neutral>Don't worry about two measly diamonds if you think they'll lead to something better!");
+~chatnpc("<p,neutral>I don't usually get out of bed for less than a hundred gold certs!");
+return;
+
+[label,dt_arch_after_place]
+// CANDIDATE return conversation; source anomalously gives one line to Eblis.
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,neutral>Hello again, apprentice archaeologist. How's the treasure hunting going?");
+~chatplayer("<p,neutral>Well... I found four diamonds...");
+~chatnpc("<p,happy>Great! Pass me my share, and it's a good job all around!");
+~chatnpc_specific(nc_name(fd_elder_village), fd_elder_village, "<p,neutral>Um... sorry, I can't.");
+~chatnpc("<p,angry>Huh? You're not trying to break a deal here are ya???");
+~chatplayer("<p,neutral>No, it's just... There were these weird pillars around this pyramid...");
+~chatnpc("<p,neutral>Yes?");
+~chatplayer("<p,neutral>Um... Well...");
+~chatplayer("<p,sad>They kind of... ate the diamonds...");
+~chatnpc("<p,shock>Pyramid columns ate your diamonds?");
+~chatnpc("<p,neutral>That's a crazy story kid. Why would you go putting diamonds into them in the first place anyway? Diamonds!");
+~chatnpc("<p,angry>Of all things!");
+~chatplayer("<p,neutral>Well, I have this feeling there is some better treasure inside that pyramid, and I needed to put the diamonds in to gain entrance.");
+~chatnpc("<p,neutral>Well what are you wasting time talking to me for?");
+~chatnpc("<p,neutral>Go get me some treasure, pal!");
 return;

@@ -37,6 +37,7 @@ inv_add(inv, bandit_brew, 1);
 ~chatnpc("<p,angry>There you go. Now get out, we don't like your sort around here.");
 if (%deserttreasure = 5) {
     %deserttreasure = 6;
+    ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 }
 return;
 
@@ -65,5 +66,6 @@ if ($ask = 3) {
 ~chatnpc("<p,angry>Now get out of here, your sort isn't welcome in my bar.");
 if (%deserttreasure = 6) {
     %deserttreasure = 7;
+    ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 }
 return;
