@@ -1,41 +1,176 @@
 name: Verify Content
 
 on:
-  pull_request:
   push:
+  pull_request:
     paths:
-    - '.github/workflows/content.yml'
-    - '**'
+      - '**'
   workflow_dispatch:
 
-
 jobs:
-  pack:
+  verify:
+    name: Content checks
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        path: content
+      - name: Checkout content
+        uses: actions/checkout@v6
+        with:
+          path: content
 
-    - uses: actions/checkout@v4
-      with:
-        repository: LostCityRS/Engine-TS
-        ref: 377-wip
-        path: engine
+      - name: Read pinned engine SHA
+        id: engine_ref
+        working-directory: content
+        shell: bash
+        run: |
+          set -euo pipefail
+          sha="$(tr -d '\r\n' < .github/fr-engine-ref)"
+          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Expected .github/fr-engine-ref to contain one full lowercase commit SHA" >&2
+            exit 1
+          fi
+          printf 'sha=%s\n' "$sha" >> "$GITHUB_OUTPUT"
 
-    - uses: oven-sh/setup-bun@v2
-      with:
-        bun-version: latest
+      - name: Checkout FR-engine at pinned SHA
+        uses: actions/checkout@v6
+        with:
+          repository: Fairy-Ring/FR-engine
+          ref: ${{ steps.engine_ref.outputs.sha }}
+          ssh-key: ${{ secrets.FR_ENGINE_DEPLOY_KEY }}
+          path: engine
 
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: engine/package-lock.json
 
-    - working-directory: engine
-      run: bun install
+      - name: Install engine dependencies
+        working-directory: engine
+        run: npm ci
+      - name: Guard transmitted varps against 377 client readers
+        working-directory: content
+        run: node tests/check-varp-transmit.mjs
 
-    - name: Pack
-      working-directory: engine
-      run: bun run build
+      - name: rs2check
+        id: rs2check
+        working-directory: engine
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$RUNNER_TEMP/rs2check.json"
+          set +e
+          npx tsx tools/rs2check.ts --content ../content --json > "$report"
+          check_status=$?
+          set -e
+          if [[ ! -s "$report" ]]; then
+            echo "rs2check did not produce a JSON report (exit $check_status)" >&2
+            if ((check_status == 0)); then
+              exit 1
+            fi
+            exit "$check_status"
+          fi
+          node --input-type=module - "$report" "$check_status" <<'NODE'
+          import { appendFileSync, readFileSync } from 'node:fs';
+          const report = JSON.parse(readFileSync(process.argv[2], 'utf8'));
+          const errors = report.summary.errors;
+          const warnings = report.summary.warnings;
+          const checkStatus = Number(process.argv[3]);
+          if (!Number.isInteger(errors) || !Number.isInteger(warnings)) {
+            throw new Error('rs2check report is missing numeric error/warning counts');
+          }
+          console.log(`rs2check: ${errors} errors, ${warnings} warnings`);
+          appendFileSync(process.env.GITHUB_OUTPUT, `errors=${errors}\nwarnings=${warnings}\n`);
+          if (checkStatus !== 0 || errors !== 0 || warnings !== 0 || report.internalError !== null) {
+            process.exitCode = 1;
+          }
+          NODE
+
+      - name: Build full content pack
+        id: build_pack
+        working-directory: engine
+        # Mirror the engine .env: current free-ID varp appends change historical CRCs.
+        env:
+          BUILD_SRC_DIR: ../content
+          BUILD_VERIFY: 'false'
+        run: npm run build
+
+      # Suite classification (all are transport-free and are run below; live-only: none).
+      # tests/ root: CI — hm-salve compiled runtime uses the built pack and starts no server.
+      # tests/wanted/: CI — four production interpreter scenarios, no server.
+      # tests/multinpc-triggers/: CI — runtime.sh explicitly starts no server.
+      # tests/fenkenstrain-completion/: CI — three compiled runtime tests and the offline static check;
+      #   setup-iso.sh is an optional isolated-layout helper, not a test or a live-server requirement.
+      # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
+      # tests/giantdwarf-intro/: CI — compiled runtime/save-load checks; no engine is started.
+      # tests/content-gaps/: CI — packed configuration/trigger integration, no server.
+      # tests/elena-fence/: CI — packed map/dispatch runtime, runtime.sh starts no server.
+      - name: Run offline content tests
+        id: content_tests
+        working-directory: engine
+        shell: bash
+        run: |
+          set -uo pipefail
+          failed=0
+          results="$RUNNER_TEMP/content-test-results.tsv"
+          : > "$results"
+          run_test() {
+            local file="$1"
+            shift
+            echo "::group::$file"
+            local status=0
+            if "$@"; then
+              status=0
+            else
+              status=$?
+              failed=1
+            fi
+            echo "::endgroup::"
+            printf '%s\t%s\n' "$file" "$status" >> "$results"
+            echo "$file: exit $status"
+            return 0
+          }
+
+          run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
+          run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
+          run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
+          run_test tests/wanted/records.mjs node --import tsx ../content/tests/wanted/records.mjs
+          run_test tests/fenkenstrain-completion/test_fenk_handlers.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_handlers.mjs
+          run_test tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs
+          run_test tests/fenkenstrain-completion/test_fenk_gardener_move.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
+          run_test tests/fenkenstrain-completion/test_fenk_offline.py python3 ../content/tests/fenkenstrain-completion/test_fenk_offline.py
+          run_test tests/fenkenstrain-completion/test_fenk_s0.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s0.py
+          run_test tests/fenkenstrain-completion/test_fenk_s2.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s2.py
+          run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
+          run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
+          run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
+          run_test tests/content-gaps/packed.mts bash ../content/tests/content-gaps/packed.sh "$PWD"
+          run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
+          run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
+          exit "$failed"
+
+      - name: Write job summary
+        if: always()
+        shell: bash
+        env:
+          ENGINE_SHA: ${{ steps.engine_ref.outputs.sha }}
+          RS2CHECK_ERRORS: ${{ steps.rs2check.outputs.errors }}
+          RS2CHECK_WARNINGS: ${{ steps.rs2check.outputs.warnings }}
+        run: |
+          {
+            echo '## Content CI summary'
+            echo
+            echo "- Pinned engine SHA: \`${ENGINE_SHA:-unavailable}\`"
+            echo "- rs2check errors: \`${RS2CHECK_ERRORS:-unavailable}\`"
+            echo "- rs2check warnings: \`${RS2CHECK_WARNINGS:-unavailable}\`"
+            echo
+            echo '### Offline content test files'
+            if [[ -f "$RUNNER_TEMP/content-test-results.tsv" ]]; then
+              while IFS=$'\t' read -r file status; do
+                printf -- '- `%s`: exit %s\n' "$file" "$status"
+              done < "$RUNNER_TEMP/content-test-results.tsv"
+            else
+              echo '- Tests did not run.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

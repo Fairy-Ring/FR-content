@@ -12,7 +12,7 @@
 // (npc_findhero alone does not arm the player pointer for a varbit write —
 // Feud fix). Stay %elidquest 1. No robe door retouch. No channel leftover.
 // No style % invent. No && / ||.
-// Cite elid-golem-doors-leftover-377.md · elid-dest-from-maps-377.md ·
+// Cite elid-golem-doors-leftover-377.md · Research: subject spirits-of-the-elid ·
 // _unpack/377/all.varbit.
 
 [oploc1,elid_whitegolem_door]

@@ -1,7 +1,7 @@
 // Spirits of the Elid — robe+key door Open (ancestral key + Robe of elidinis).
 // Official day 5 Dec 2005 — before golem doors. CANDIDATE 2007-base (dump §
 // *Attempting to open the door without the robes of Elidinis equipped*; dest
-// research elid-robe-door-leftover-377.md / elid-dest-from-maps-377.md §3).
+// Research: subject spirits-of-the-elid).
 // Doors elid_underground_robe_door 10427 @ 3353,9544 + _mirror 10429 @
 // 3354,9544 (both name Door, op1=Open). No key = silent return (dump silent,
 // no invented "The door is locked."). Key + robes not worn = dump tbox +
@@ -11,7 +11,7 @@
 // 0_52_149_25_9 3353,9545 L0, else south 0_52_149_25_7 3353,9543 L0
 // (CANDIDATE). Key not consumed. Stay %elidquest 1. No loc_change. No lake
 // door. No golem doors. No ballad gate. No && / ||.
-// Cite elid-robe-door-leftover-377.md · elid-dest-from-maps-377.md ·
+// Research: subject spirits-of-the-elid ·
 // Transcript:Spirits of the Elid.
 
 [oploc1,elid_underground_robe_door] @elid_robe_door_open;

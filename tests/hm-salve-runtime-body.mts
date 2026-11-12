@@ -479,6 +479,8 @@ function main(): void {
     assert('com_stabattack cache unchanged after specs', varp(player, 'com_stabattack') === 600, `v=${varp(player, 'com_stabattack')}`);
 
     const ordinary = makeNpc('hauntedmine_boss_ghost');
+    // Treus accepts attacks only from its owner (content 0edffd447 owner guard); the encounter binds it in hauntedmine_boss_ghost.rs2.
+    ordinary.setVar(requireId('varnpc', VarNpcType.getId('npc_attacking_uid'), 'npc_attacking_uid'), player.uid);
     ordinary.levels[NpcStat.HITPOINTS] = 200;
     ordinary.baseLevels[NpcStat.HITPOINTS] = 200;
     wear(player, WEARPOS_RHAND, 'dragon_dagger');
