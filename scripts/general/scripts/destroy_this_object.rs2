@@ -1,6 +1,6 @@
-// Leftover destroy_this_object 14170. Unpack iop5=Destroy (127 of 131).
-// Crest gauntlets stay @drop_gauntlets. Leftover title + Yes/No only.
-// Preview inv has no leftover inv= name — leave empty. Chat leftover (sworddecor).
+// Destroy prompt interface 14170.
+// com_0 is a 1x1 picture slot; display the selected item from inventory slot 0.
+// Swap it back on No, and preserve the previous slot-0 item on Yes.
 
 [opheld5,kelda_hop_seed]
 @open_destroy_this_object;
@@ -257,6 +257,9 @@
 [opheld5,templetrek_blue_token]
 @open_destroy_this_object;
 
+[if_close,destroy_this_object]
+inv_stoptransmit(destroy_this_object:com_0);
+
 [label,open_destroy_this_object]
 def_int $slot = last_slot;
 def_obj $obj = inv_getobj(inv, $slot);
@@ -266,11 +269,18 @@ if ($obj = null) {
 if_settext(destroy_this_object:com_13, oc_name($obj));
 if_settext(destroy_this_object:com_11, ^string_empty);
 if_settext(destroy_this_object:com_12, ^string_empty);
+def_obj $slot0_obj = inv_getobj(inv, 0);
+if ($slot ! 0) inv_movetoslot(inv, inv, $slot, 0);
+inv_transmit(inv, destroy_this_object:com_0);
 if_openchat(destroy_this_object);
 if_addresumebutton(destroy_this_object:com_4);
 if_addresumebutton(destroy_this_object:com_5);
 p_pausebutton;
+inv_stoptransmit(destroy_this_object:com_0);
 if (last_com = destroy_this_object:com_4) {
-    inv_delslot(inv, $slot);
+    inv_delslot(inv, 0);
+    if ($slot ! 0 & $slot0_obj ! null) inv_movetoslot(inv, inv, $slot, 0);
+} else if ($slot ! 0) {
+    inv_movetoslot(inv, inv, 0, $slot);
 }
 if_close;
