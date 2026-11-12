@@ -277,6 +277,9 @@ if (%regicide_quest = ^regicide_complete) {
 if (%routequest = ^routequest_complete) {
     $questpoints = add($questpoints, ^routequest_questpoints);
 }
+if (%deserttreasure = ^deserttreasure_complete) {
+    $questpoints = add($questpoints, ^deserttreasure_questpoints);
+}
 // Recruitment Drive — narrow QP add (product writer t_130905cb).
 if (%rd_main = ^recruitmentdrive_complete) {
     $questpoints = add($questpoints, ^recruitmentdrive_questpoints);

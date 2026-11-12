@@ -1,0 +1,63 @@
+// Product status summary; historical Desert Treasure journal prose is UNKNOWN.
+// Requirements are from the period guides; exact 377 start enforcement is UNKNOWN.
+[if_button,questlist:deserttreasure]
+def_string $n = "Desert Treasure";
+def_string $x;
+~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
+
+if (%deserttreasure = ^dt_stage_not_started) {
+    $x = append($x, "@dbl@I can start Desert Treasure by speaking to the @dre@Archaeologist@dbl@ at the Bedabin Camp.|" );
+    $x = append($x, "@dbl@The period requirements are these quests and levels:|");
+    if (~itexam_progress() >= ^itexam_complete) {
+        $x = append($x, "@str@The Digsite Quest|");
+    } else {
+        $x = append($x, "@dre@The Digsite Quest|");
+    }
+    if (%desertrescue >= ^desertrescue_complete) {
+        $x = append($x, "@str@The Tourist Trap|");
+    } else {
+        $x = append($x, "@dre@The Tourist Trap|");
+    }
+    if (%ikov >= ^ikov_completed_armadyl | %ikov >= ^ikov_completed_lucien) {
+        $x = append($x, "@str@The Temple of Ikov|");
+    } else {
+        $x = append($x, "@dre@The Temple of Ikov|");
+    }
+    if (%priestperil >= ^priestperil_complete) {
+        $x = append($x, "@str@Priest in Peril|");
+    } else {
+        $x = append($x, "@dre@Priest in Peril|");
+    }
+    if (%waterfall_quest >= ^waterfall_complete) {
+        $x = append($x, "@str@Waterfall Quest|");
+    } else {
+        $x = append($x, "@dre@Waterfall Quest|");
+    }
+    if (%troll_quest >= ^troll_complete) {
+        $x = append($x, "@str@Troll Stronghold|");
+    } else {
+        $x = append($x, "@dre@Troll Stronghold|");
+    }
+    if (stat_base(slayer) >= 10) {
+        $x = append($x, "@str@Level 10 Slayer|");
+    } else {
+        $x = append($x, "@dre@Level 10 Slayer|");
+    }
+    if (stat_base(firemaking) >= 50) {
+        $x = append($x, "@str@Level 50 Firemaking|");
+    } else {
+        $x = append($x, "@dre@Level 50 Firemaking|");
+    }
+    if (stat_base(magic) >= 50) {
+        $x = append($x, "@str@Level 50 Magic|");
+    } else {
+        $x = append($x, "@dre@Level 50 Magic|");
+    }
+    if (stat_base(thieving) >= 53) {
+        $x = append($x, "@str@Level 53 Thieving|");
+    } else {
+        $x = append($x, "@dre@Level 53 Thieving|");
+    }
+    ~quest_journal($n, $x);
+    return;
+}
