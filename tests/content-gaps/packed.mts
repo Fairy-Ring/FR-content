@@ -6,15 +6,46 @@ import DbTableType from '#/cache/config/DbTableType.js';
 import EnumType from '#/cache/config/EnumType.js';
 import LocType from '#/cache/config/LocType.js';
 import NpcType from '#/cache/config/NpcType.js';
+import VarPlayerType from '#/cache/config/VarPlayerType.js';
 import ObjType from '#/cache/config/ObjType.js';
 import ParamType from '#/cache/config/ParamType.js';
 import ScriptProvider from '#/engine/script/ScriptProvider.js';
 import ServerTriggerType from '#/engine/script/ServerTriggerType.js';
+import { ScriptOpcodeNameMap } from '#/engine/script/ScriptOpcode.js';
 
-for (const config of [ParamType, CategoryType, LocType, NpcType, ObjType, EnumType, DbTableType, DbRowType]) config.load('data/pack');
+for (const config of [ParamType, CategoryType, LocType, NpcType, ObjType, EnumType, DbTableType, DbRowType, VarPlayerType]) config.load('data/pack');
 assert(ScriptProvider.load('data/pack') > 0);
 let checks = 0;
 function pass(message: string): void { console.log(`PASS ${++checks}: ${message}`); }
+const druidquestId = VarPlayerType.getId('druidquest');
+assert.notEqual(druidquestId, -1);
+const cauldronUse = ScriptProvider.getByTriggerSpecific(ServerTriggerType.OPLOCU, LocType.getId('cauldron_of_thunder'));
+assert(cauldronUse, 'compiled Cauldron item-use trigger');
+assert.equal(cauldronUse.fileName, 'quest_druid.rs2');
+const opcodeName = (pc: number) => ScriptOpcodeNameMap.get(cauldronUse.opcodes[pc]);
+const guardPc = cauldronUse.opcodes.findIndex(
+    (opcode, pc) => ScriptOpcodeNameMap.get(opcode) === 'PUSH_VARP' && cauldronUse.intOperands[pc] === druidquestId
+);
+assert.notEqual(guardPc, -1, 'compiled Cauldron guard reads druidquest');
+assert.equal(opcodeName(guardPc + 1), 'PUSH_CONSTANT_INT');
+assert.equal(cauldronUse.intOperands[guardPc + 1], 2);
+const rejectPc = guardPc + 2;
+assert.equal(opcodeName(rejectPc), 'BRANCH_NOT');
+const rejectTarget = rejectPc + 1 + cauldronUse.intOperands[rejectPc];
+assert.equal(opcodeName(rejectTarget), 'PUSH_CONSTANT_INT');
+assert.equal(cauldronUse.intOperands[rejectTarget], 0);
+const refusalCallPc = rejectTarget + 1;
+assert.equal(opcodeName(refusalCallPc), 'GOSUB_WITH_PARAMS');
+assert.equal(ScriptProvider.get(cauldronUse.intOperands[refusalCallPc])?.name, '[proc,displaymessage]');
+const refusalReturnPc = refusalCallPc + 1;
+assert.equal(opcodeName(refusalReturnPc), 'RETURN');
+const arriveDelayPc = cauldronUse.opcodes.findIndex(opcode => ScriptOpcodeNameMap.get(opcode) === 'P_ARRIVEDELAY');
+assert.notEqual(arriveDelayPc, -1, 'compiled Cauldron transform keeps its arrival delay');
+assert.ok(refusalReturnPc < arriveDelayPc, 'non-stage-2 refusal returns before arrival delay');
+const stage2JumpPc = rejectPc + 1;
+assert.equal(opcodeName(stage2JumpPc), 'BRANCH');
+assert.equal(stage2JumpPc + 1 + cauldronUse.intOperands[stage2JumpPc], arriveDelayPc);
+pass('compiled Cauldron guard refuses non-stage-2 use before arrival delay');
 function param(holder: { params: Map<number, number | string> }, name: string): number | string | undefined {
     const id = ParamType.getId(name); assert(id >= 0, name);
     return holder.params.get(id);
