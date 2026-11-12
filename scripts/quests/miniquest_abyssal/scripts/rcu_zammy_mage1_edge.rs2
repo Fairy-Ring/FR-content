@@ -1,5 +1,12 @@
 // This is actually the varrock zammy mage...
 [opnpc1,rcu_zammy_mage1_edgeb]
+if (%wanted_main = ^wanted_intelligence_open & %wanted_daquarius_hint = 2 & %wanted_zammy_mage_hint ! 2) {
+    def_int $choice = ~p_choice2_header("Ask about Solus.", 1, "Talk about the Abyss.", 2, "What do you need?");
+    if ($choice = 1) {
+        ~wanted_zammy_mage_talk;
+        return;
+    }
+}
 // TODO: check for sara/guthix gear
 
 switch_int (%abyssal_miniquest) {

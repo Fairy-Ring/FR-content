@@ -241,7 +241,9 @@
 [mapzone,0_54_51] @music_playbyregion(coord);
 [mapzone,0_54_52] @music_playbyregion(coord);
 [mapzone,0_54_53] @music_playbyregion(coord);
-[mapzone,0_54_54] @music_playbyregion(coord);
+[mapzone,0_54_54]
+~wanted_canifis_entry;
+@music_playbyregion(coord);
 [mapzone,0_54_55] @music_playbyregion(coord);
 [mapzone,0_55_49] @music_playbyregion(coord);
 [mapzone,0_55_50] @music_playbyregion(coord);
