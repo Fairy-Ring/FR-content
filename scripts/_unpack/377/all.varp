@@ -778,16 +778,20 @@ transmit=yes
 [feud_var_multi]
 
 [varp438_unused]
-
+// PRODUCT: S0 selects permanent save scope; this is not a recovered 377 fact.
 [alternate_spells]
+scope=perm
 
 [deserttreasuremain]
+scope=perm
 transmit=yes
 
 [deserttreasurevarbit]
+scope=perm
 transmit=yes
 
 [deserttreasurevarbit2]
+scope=perm
 transmit=yes
 
 [ics_little_multi]

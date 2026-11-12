@@ -67,6 +67,8 @@
 ^creatureoffenkenstrain_complete = 8
 ^creatureoffenkenstrain_questpoints = 2
 ^deserttreasure_complete = 15
+// VERIFIED: period 3 QP reward (desert-treasure.period-requirements).
+^deserttreasure_questpoints = 3
 ^priestperil_complete = 60
 ^death_complete = 80
 ^golem_complete = 10

@@ -44807,10 +44807,13 @@ walkanim=human_transwalk_f
 readyanim=human_transready
 op2=Attack
 vislevel=154
+// CANDIDATE: early-osrs-warrior-combat-r2 subtractive 2007-base stats; not verified 377.
 hitpoints=130
 attack=190
 strength=80
 defence=135
+magic=1
+param=attackrate,4
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_medium_head
 
@@ -44838,10 +44841,13 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=139
+// CANDIDATE: early-osrs-warrior-combat-r2 subtractive 2007-base stats; not verified 377.
 hitpoints=200
 attack=99
 strength=99
 defence=99
+magic=1
+param=attackrate,3
 head1=npc_1914_head
 
 [blooddiamond_vampirewarrior_unkillable]
@@ -44868,10 +44874,13 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=139
+// CANDIDATE: early-osrs-warrior-combat-r2 subtractive 2007-base stats; not verified 377.
 hitpoints=200
 attack=99
 strength=99
 defence=99
+magic=1
+param=attackrate,3
 head1=npc_1914_head
 
 [malak]
@@ -46159,10 +46168,13 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=103
+// CANDIDATE: early-osrs-warrior-combat-r2 subtractive 2007-base stats; not verified 377.
 hitpoints=90
 attack=90
 strength=90
 defence=90
+magic=1
+param=attackrate,4
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_short_head
 
@@ -46190,10 +46202,13 @@ readyanim=human_ready
 op2=Attack
 alwaysontop=yes
 vislevel=174
+// CANDIDATE: early-osrs-warrior-combat-r2 subtractive 2007-base stats; not verified 377.
 hitpoints=200
 attack=160
 strength=100
 defence=160
+magic=1
+param=attackrate,3
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
 
@@ -46229,10 +46244,13 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op2=Attack
 vislevel=167
+// CANDIDATE: early-osrs-warrior-combat-r2 subtractive 2007-base stats; not verified 377.
 hitpoints=130
 attack=190
 strength=120
 defence=135
+magic=1
+param=attackrate,4
 
 [ics_little_worker1]
 name=Slave
