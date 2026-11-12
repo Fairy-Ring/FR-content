@@ -8,6 +8,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+process.on('uncaughtException', error => {
+  console.error(error);
+  process.exit(1);
+});
+process.on('unhandledRejection', error => {
+  console.error(error);
+  process.exit(1);
+});
 
 const WT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../..');
 const ENGINE = process.env.HARNESS_ENGINE_DIR ?? path.resolve(WT, '../engine');
@@ -69,3 +77,4 @@ assert.equal(execution, ScriptState.FINISHED, 'completion queue did not finish')
 const delta = player.stats[PlayerStat.PRAYER] - before;
 assert.equal(delta, 14060, `compiled completion queue Prayer award must be 14060 tenths; got ${delta}`);
 console.log(`PASS compiled Priest in Peril completion awards ${delta} Prayer tenths`);
+process.exit(0);
