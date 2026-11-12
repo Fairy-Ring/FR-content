@@ -354,13 +354,13 @@ if (inv_total(inv, agrith_sigil_mould) > 0 & map_members = ^true) {
     if_sethide(silver_casting:com_136, false);
 }
 
-inv_setslot(silvercast_holysymbol, 1, nostringstar, 1);
-inv_setslot(silvercast_unholysymbol, 1, nostringsnake, 1);
-inv_setslot(silvercast_sickle, 1, silver_sickle, 1);
-inv_setslot(silvercast_lightning, 1, fenk_conductor, 1);
-inv_setslot(silvercast_tiara, 1, tiara, 1);
-inv_setslot(silvercast_commandrod, 1, burgh_rod_command1, 1);
-inv_setslot(silvercast_agrith, 1, agrith_sigil, 1);
+inv_setslot(silvercast377_holysymbol, 1, nostringstar, 1);
+inv_setslot(silvercast377_unholysymbol, 1, nostringsnake, 1);
+inv_setslot(silvercast377_sickle, 1, silver_sickle, 1);
+inv_setslot(silvercast377_lightning, 1, fenk_conductor, 1);
+inv_setslot(silvercast377_tiara, 1, tiara, 1);
+inv_setslot(silvercast377_commandrod, 1, burgh_rod_command1, 1);
+inv_setslot(silvercast377_agrith, 1, agrith_sigil, 1);
 
 if_setobject(silver_casting:com_94, nostringstar, 400);
 if_setobject(silver_casting:com_101, nostringsnake, 400);
@@ -371,13 +371,13 @@ if_setobject(silver_casting:com_122, tiara, 400);
 if_setobject(silver_casting:com_130, burgh_rod_command1, 400);
 if_setobject(silver_casting:com_137, agrith_sigil, 400);
 
-inv_transmit(silvercast_holysymbol, silver_casting:com_91);
-inv_transmit(silvercast_unholysymbol, silver_casting:com_98);
-inv_transmit(silvercast_sickle, silver_casting:com_105);
-inv_transmit(silvercast_lightning, silver_casting:com_112);
-inv_transmit(silvercast_tiara, silver_casting:com_119);
-inv_transmit(silvercast_commandrod, silver_casting:com_126);
-inv_transmit(silvercast_agrith, silver_casting:com_134);
+inv_transmit(silvercast377_holysymbol, silver_casting:com_91);
+inv_transmit(silvercast377_unholysymbol, silver_casting:com_98);
+inv_transmit(silvercast377_sickle, silver_casting:com_105);
+inv_transmit(silvercast377_lightning, silver_casting:com_112);
+inv_transmit(silvercast377_tiara, silver_casting:com_119);
+inv_transmit(silvercast377_commandrod, silver_casting:com_126);
+inv_transmit(silvercast377_agrith, silver_casting:com_134);
 if_openmain(silver_casting);
 
 [if_button,silver_casting:com_92] @craft_silver_product(nostringstar, 1);

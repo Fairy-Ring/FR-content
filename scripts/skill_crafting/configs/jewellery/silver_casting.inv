@@ -1,34 +1,34 @@
-[silvercast_holysymbol]
+[silvercast377_holysymbol]
 scope=temp
 size=1
 dummyinv=yes
 
-[silvercast_unholysymbol]
+[silvercast377_unholysymbol]
 scope=temp
 size=1
 dummyinv=yes
 
-[silvercast_sickle]
+[silvercast377_sickle]
 scope=temp
 size=1
 dummyinv=yes
 
-[silvercast_lightning]
+[silvercast377_lightning]
 scope=temp
 size=1
 dummyinv=yes
 
-[silvercast_tiara]
+[silvercast377_tiara]
 scope=temp
 size=1
 dummyinv=yes
 
-[silvercast_commandrod]
+[silvercast377_commandrod]
 scope=temp
 size=1
 dummyinv=yes
 
-[silvercast_agrith]
+[silvercast377_agrith]
 scope=temp
 size=1
 dummyinv=yes
