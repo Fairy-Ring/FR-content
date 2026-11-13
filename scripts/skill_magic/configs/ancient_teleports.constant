@@ -1,0 +1,21 @@
+// CANDIDATE product DB keys use original inter_267 component numbers.
+// These are not saved-state slots or recovered server spell integers.
+^paddewwa_teleport = 179
+^senntisten_teleport = 189
+^kharyrll_teleport = 197
+^lassar_teleport = 205
+^dareeyak_teleport = 213
+^carrallangar_teleport = 223
+^annakarl_teleport = 231
+^ghorrock_teleport = 239
+
+// CANDIDATE reconstructed centers inside the cited destination regions.
+// DB rows use these named centers; exact historical arrival tiles are unknown.
+^paddewwa_teleport_arrival = 0_48_154_25_25
+^senntisten_teleport_arrival = 0_51_52_56_9
+^kharyrll_teleport_arrival = 0_54_54_38_17
+^lassar_teleport_arrival = 0_46_54_60_15
+^dareeyak_teleport_arrival = 0_46_57_24_48
+^carrallangar_teleport_arrival = 0_49_57_22_18
+^annakarl_teleport_arrival = 0_51_60_24_48
+^ghorrock_teleport_arrival = 0_46_60_33_32

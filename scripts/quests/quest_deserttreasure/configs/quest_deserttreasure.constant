@@ -60,3 +60,11 @@
 
 // CANDIDATE: desert-treasure.column-message-candidates and period-requirements; later action gate.
 ^dt_column_magic_required = 50
+// S8: period staff price (Tip.It); exact server transaction is reconstructed.
+^dt_ancient_staff_price = 80000
+// CANDIDATE reconstruction endpoints: chamber and outside the rear tunnel.
+// Source-backed regions and production collision/walk-away evidence: U-DT-1109/s8.
+^dt_shortcut_chamber_arrival = 0_50_145_31_32
+^dt_portal_pyramid_exit = 0_50_45_33_7
+// CANDIDATE hold for the preserved zaros_teleport sequence, not historical ticks.
+^dt_ancient_teleport_delay = 3

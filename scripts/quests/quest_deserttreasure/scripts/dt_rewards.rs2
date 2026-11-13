@@ -1,0 +1,90 @@
+// S8: period altar/shortcut/staff services. Selector encoding and exact
+// movement endpoints are CANDIDATE reconstructions, not recovered server code.
+// Research: desert-treasure.s8-services, s8-arrival-reconstruction and
+// desert-treasure.dlg.eblis-ancient-staff. Ordinary prayer altars are unchanged.
+
+[proc,dt_restore_spellbook]
+if (%deserttreasure = ^dt_stage_complete & %alternate_spells = ^dt_spellbook_ancient) {
+    if_settab(inter_267, ^tab_magic);
+} else {
+    if_settab(magic, ^tab_magic);
+}
+
+[oploc1,dt_zaros_altar]
+if (%deserttreasure ! ^dt_stage_complete) {
+    mes("This altar seems to do nothing...");
+    return;
+}
+anim(human_pray, 0);
+// Later-source CANDIDATE: switching drains Prayer, including at zero.
+stat_sub(prayer, stat(prayer), 0);
+~prayer_deactivate_all;
+if (%alternate_spells = ^dt_spellbook_ancient) {
+    %alternate_spells = ^dt_spellbook_standard;
+} else {
+    %alternate_spells = ^dt_spellbook_ancient;
+}
+~dt_restore_spellbook;
+
+[oploc1,desert_trasure_back_door_skew]
+if (%deserttreasure ! ^dt_stage_complete) {
+    mes("Nothing interesting happens.");
+    return;
+}
+if_close;
+p_stopaction;
+p_telejump(^dt_shortcut_chamber_arrival);
+
+[oploc1,dt_portal]
+if (%deserttreasure ! ^dt_stage_complete) {
+    mes("Nothing interesting happens.");
+    return;
+}
+if_close;
+p_stopaction;
+p_telejump(^dt_portal_pyramid_exit);
+
+[label,dt_eblis_postquest]
+if (%deserttreasure ! ^dt_stage_complete) {
+    return;
+}
+if (%fd_got_zaros_staff = ^dt_flag_on) {
+    ~chatplayer("<p,neutral>Hello again.");
+    ~chatnpc("<p,neutral>Greetings. I await the return of my Lord Azzanadra and of our god. I do not know why, but I feel this spot has some significance...");
+    return;
+}
+~chatnpc("<p,neutral>So have you spoken to my Lord Azzanadra yet?");
+~chatplayer("<p,neutral>Yes I have.");
+~chatnpc("<p,neutral>And what words did he have for his followers?");
+~chatplayer("<p,neutral>Er.... He didn't really mention you at all, but he did teach me some cool new magic spells.");
+~chatnpc("<p,neutral>It is understandable perhaps... His poor mind must be addled after all of those years of confinement, he would not willingly ignore his followers...");
+~chatnpc("<p,neutral>Anyway, if he has taught you our ancient magics, you may be interested in purchasing an ancient heirloom that was passed down to me. My ancestor fought in the ancient battles using the");
+~chatnpc("<p,neutral>magic of our god. This heirloom will help you with the speed of your spell-casting.");
+~chatnpc("<p,neutral>Normally I could not bear to part with such a priceless relic, but for your help in freeing my Lord Azzanadra, I will be prepared to sell it to you for a mere 80,000 gold.");
+~chatnpc("<p,neutral>Are you interested?");
+// The signet option is a later addition and is not in the 377 item unit.
+def_int $choice = ~p_choice2("Yes please", 1, "No thanks", 2);
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>No thanks.");
+    ~chatnpc("<p,neutral>As you wish. Bear my offer in mind should you ever change your decision, I will remain here.");
+    return;
+}
+// Recheck every transaction guard after the yielding offer.
+if (%deserttreasure ! ^dt_stage_complete | %fd_got_zaros_staff = ^dt_flag_on) {
+    return;
+}
+if (inv_total(inv, coins) < ^dt_ancient_staff_price) {
+    ~chatnpc("<p,neutral>Stranger... Do not abuse my generosity... I cannot possibly sell it for less than 80,000 gold.");
+    ~chatnpc("<p,neutral>Come back and see me when you have the necessary funds to buy.");
+    return;
+}
+// Exact payment frees its own coin slot; otherwise a free slot is required.
+if (inv_freespace(inv) = 0 & inv_total(inv, coins) > ^dt_ancient_staff_price) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_del(inv, coins, ^dt_ancient_staff_price);
+inv_add(inv, staff_of_zaros, 1);
+%fd_got_zaros_staff = ^dt_flag_on;
+~chatnpc("<p,neutral>Take care of it, it is the only heirloom from those times I possess, although rumour has it many of our ancient warriors were buried with identical weapons so that they could continue to fight for my Lord in their deaths.");
+return;
