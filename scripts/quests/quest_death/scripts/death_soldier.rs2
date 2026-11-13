@@ -54,7 +54,7 @@ while (.npc_findnext = true) {
 if(.npc_find(npc_coord, death_ig_solider_training, 5, 0) = true) {
     npc_facesquare(.npc_coord);
     npc_delay(1);
-    switch_int(random(6)) {
+    switch_int(random(10)) {
         case 0 : npc_say("I want to see you sweat soldier!");
         case 1 : npc_say("Put your back into it soldier!");
         case 2 : npc_say("That dummy is the enemy. Kill it!");
