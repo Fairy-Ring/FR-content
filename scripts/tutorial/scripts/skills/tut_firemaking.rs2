@@ -2,7 +2,11 @@
     @tut_light_logs_ground;
 
 [opobju,newbielogs]
+if (last_useitem = tinderbox) {
     @tut_light_logs_ground;
+} else {
+    ~displaymessage(^dm_default);
+}
 
 [label,tut_light_logs_ground]
 def_obj $log = obj_type;
@@ -19,7 +23,7 @@ if (map_locaddunsafe(obj_coord) = true | ~inzone_coord_pair_table(bank_zones, co
     return;
 }
 // check if they have tinderbox
-if(inv_total(inv, tinderbox) < 0) {
+if(inv_total(inv, tinderbox) < 1) {
     mes("You need a tinderbox to light a fire.");
     return;
 }
@@ -52,7 +56,7 @@ if (~inzone_coord_pair_table(bank_zones, coord) = true) {
     return;
 }
 // check if they have tinderbox
-if(inv_total(inv, tinderbox) < 0) {
+if(inv_total(inv, tinderbox) < 1) {
     mes("You need a tinderbox to light a fire.");
     return;
 }
