@@ -1,6 +1,22 @@
 {
   "regionsAndLevels": [
     {
+      "name": "karam_dungeon_cavestairs",
+      "coord": "0_41_149_24_56",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [2, 2643, 9595],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_5096",
+      "coord": "2_41_149_20_57",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [0, 2649, 9591],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
       "name": "board_game_stairs_grey_all",
       "coord": "0_45_55_19_46",
       "trigger": "oploc1",

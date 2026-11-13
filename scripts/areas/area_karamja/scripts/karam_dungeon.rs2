@@ -94,7 +94,8 @@ p_teleport(0_42_49_57_16);
 
 [label,start_cut_vines](int $req, coord $start, coord $dest)
 // check level first
-def_obj $axe = ~woodcutting_axe_checker(false);
+def_obj $axe = null;
+if (coord = $start) $axe = ~woodcutting_axe_checker(false);
 def_seq $anim = human_pickuptable;
 if ($axe = null & coord = $start) { // inherited reverse-side bypass
     ~mesbox("To chop through the vines, you'll need an axe that you have the Woodcutting level to use.");
@@ -124,7 +125,8 @@ if (%action_delay = map_clock) {
 p_oploc(3);
 
 [label,cut_vines](int $req, coord $start, coord $dest)
-def_obj $axe = ~woodcutting_axe_checker(false);
+def_obj $axe = null;
+if (coord = $start) $axe = ~woodcutting_axe_checker(false);
 def_seq $anim = human_pickuptable;
 if ($axe = null & coord = $start) {
     ~mesbox("To chop through the vines, you'll need an axe that you have the Woodcutting level to use.");
@@ -221,8 +223,8 @@ stat_advance(agility, 75);
 mes("...You safely cross to the other side.");
 
 [oploc1,karam_dungeon_bamboo_logbalance1]
-if(stat(agility) < 22) {
-    ~mesbox("You need an Agility level of 22 to cross the log.");
+if(stat(agility) < 30) {
+    ~mesbox("You need an Agility level of 30 to cross the log.");
     return;
 }
 @cross_karam_dungeon_log(1, 0_41_148_57_35);

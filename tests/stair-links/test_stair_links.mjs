@@ -57,7 +57,7 @@ assert.deepEqual(legacy.map(r => `${r.trigger}:${r.name}`).sort(), handlers.filt
 const regionExceptions = new Map(exceptions.regionsAndLevels.map(r => [executionKey(r), r]));
 const collisionExceptions = new Map(exceptions.blockedOrFloorless.map(r => [executionKey(r), r]));
 assert.equal(regionExceptions.size, exceptions.regionsAndLevels.length);
-assert.equal(regionExceptions.size, 28, 'exact inherited remote-region and non-adjacent-level exceptions');
+assert.equal(regionExceptions.size, 30, 'exact inherited remote-region and non-adjacent-level exceptions');
 assert.equal(collisionExceptions.size, 2, 'exactly the two inherited Fenkenstrain up landings');
 for (const [list, classification] of [[regionExceptions, 'inherited link to another region or a non-adjacent level'], [collisionExceptions, 'inherited landing that the collision data calls blocked or floorless']]) {
   for (const [id, exception] of list) {
@@ -126,8 +126,8 @@ for (const entry of manifest) {
         assert.equal(map.isMapBlocked(result.destination[1], result.destination[2], result.destination[0]), true, 'inherited blocked Fenkenstrain landing is preserved');
         assert.equal(floors.has(result.destination.join(',')), false, 'inherited floorless Fenkenstrain landing is preserved');
       }
-      if (entry.status === 'new') {
-        assert.ok(!region && !collision, 'new links have no exception');
+      if (entry.status === 'new') assert.ok(!region && !collision, 'new links have no exception');
+      if (entry.counterpart) {
         const counterpart = locs.find(r => r.name === entry.counterpart.name && r.coord === entry.counterpart.coord && r.angle === entry.counterpart.angle);
         assert.ok(counterpart, 'matching counterpart is a verified native map placement');
         assert.equal(counterpart.level, result.destination[0]);

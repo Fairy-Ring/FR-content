@@ -191,7 +191,7 @@ const VINES = [
 const AGILITY_OBSTACLES = [
   { name: 'karam_dungeon_stone1', placement: [2649, 9561], start: { level: 0, x: 2649, z: 9562 }, end: { level: 0, x: 2647, z: 9557 }, fail: { level: 0, x: 2648, z: 9562 }, requirement: 12, xp: 75 },
   { name: 'karam_dungeon_stone2', placement: [2647, 9558], start: { level: 0, x: 2647, z: 9557 }, end: { level: 0, x: 2649, z: 9562 }, fail: { level: 0, x: 2648, z: 9557 }, xp: 75 },
-  { name: 'karam_dungeon_bamboo_logbalance1', placement: [2683, 9506], start: { level: 0, x: 2682, z: 9506 }, end: { level: 0, x: 2687, z: 9506 }, fail: { level: 0, x: 2681, z: 9507 }, requirement: 22, xp: 100 },
+  { name: 'karam_dungeon_bamboo_logbalance1', placement: [2683, 9506], start: { level: 0, x: 2682, z: 9506 }, end: { level: 0, x: 2687, z: 9506 }, fail: { level: 0, x: 2681, z: 9507 }, requirement: 30, xp: 100 },
   { name: 'karam_dungeon_bamboo_logbalance3', placement: [2686, 9506], start: { level: 0, x: 2687, z: 9506 }, end: { level: 0, x: 2682, z: 9506 }, fail: { level: 0, x: 2688, z: 9508 }, xp: 100 }
 ];
 const PIPES = [
@@ -291,7 +291,7 @@ function startScript(player, script, target = null) {
   player.executeScript(state, true, true);
   return { state, result: state.execution };
 }
-function finishDelayed(player) {
+function finishDelayed(player, choices = []) {
   let boundaries = 0;
   while (player.activeScript) {
     assert.ok(boundaries++ < 100, 'each packed dungeon obstacle has a finite delay schedule');
@@ -303,15 +303,23 @@ function finishDelayed(player) {
       player.delayed = false;
     } else {
       assert.equal(state.execution, ScriptState.PAUSEBUTTON, 'only normal dialogue continuation may resume without a delay');
+      if (['multi3', 'multi4'].some(name => config.Component.getId(name) === player.modalChat)) {
+        const [menu, option] = choices.shift() ?? [];
+        assert.equal(player.modalChat, config.Component.getId(menu), 'the expected packed choice menu is open');
+        const component = config.Component.getId(`${menu}:com_${option}`);
+        assert(player.resumeButtons.includes(component), 'the selected option is offered by the packed dialogue');
+        player.lastCom = component;
+      }
     }
     player.executeScript(state, true, true);
   }
   assert.equal(player.delayed, false, 'all scheduled dungeon delays are drained');
+  assert.equal(choices.length, 0, 'every expected dialogue choice was consumed');
 }
-function runToCompletion(player, script, target = null) {
+function runToCompletion(player, script, target = null, choices = []) {
   const { state, result } = startScript(player, script, target);
   assert.notEqual(result, ScriptState.ABORTED, `${script.name} does not abort`);
-  if (player.activeScript) finishDelayed(player);
+  if (player.activeScript) finishDelayed(player, choices);
   assert.equal(state.execution, ScriptState.FINISHED, `${script.name} finishes`);
   assert.equal(player.activeScript, null, `${script.name} leaves no active script`);
   return state;
@@ -361,12 +369,39 @@ assert.equal(coinCount(payer), 875, 'Pay does not charge again while the flag is
 assert.equal(payer.getVar(PAID_FLAG), 1, 'repeat Pay preserves the paid-entry flag');
 console.log('PASS Saniboch exact payment, refusal and repeat payment');
 
+const talkTrigger = requireTrigger(ServerTriggerType.OPNPC1, doormanId, '[opnpc1,tribesman_doorman]');
+for (const amount of [0, 874, 875]) {
+  const player = makePlayer({ tile: { level: 0, x: 2742, z: 3153 }, coins: amount });
+  runToCompletion(player, talkTrigger, doorman(), amount === 875 ? [['multi4', 1], ['multi3', 1]] : [['multi4', 1]]);
+  assert.equal(coinCount(player), amount === 875 ? 0 : amount, 'Talk-to charges exactly the fee or refuses without taking coins');
+  assert.equal(player.getVar(PAID_FLAG), amount === 875 ? 1 : 0, 'Talk-to earns admission only with the fee');
+  if (amount === 875) {
+    player.getInventory(INV).add(COINS, 875);
+    runToCompletion(player, talkTrigger, doorman(), [['multi4', 1]]);
+    assert.equal(coinCount(player), 875, 'Talk-to does not charge again before entry');
+  }
+}
+for (const option of [2, 3, 4]) {
+  const player = makePlayer({ tile: { level: 0, x: 2742, z: 3153 }, coins: 875 });
+  runToCompletion(player, talkTrigger, doorman(), [['multi4', option]]);
+  assert.equal(coinCount(player), 875, 'non-payment Talk-to branches keep coins');
+  assert.equal(player.getVar(PAID_FLAG), 0, 'non-payment Talk-to branches do not earn admission');
+}
+for (const option of [2, 3]) {
+  const player = makePlayer({ tile: { level: 0, x: 2742, z: 3153 }, coins: 875 });
+  runToCompletion(player, talkTrigger, doorman(), [['multi4', 1], ['multi3', option]]);
+  assert.equal(coinCount(player), 875, 'declining or asking about the fee keeps coins');
+  assert.equal(player.getVar(PAID_FLAG), 0, 'declining or asking about the fee does not earn admission');
+}
+console.log('PASS packed Talk-to labels, dialogue payment, refusal and repeat payment');
+
 const entranceStand = { level: 0, x: 2742, z: 3153 };
-const unpaidEntrant = makePlayer({ tile: entranceStand });
+const unpaidEntrant = makePlayer({ tile: entranceStand, coins: 875 });
 const closedEntrance = activeLoc('dungeon_tree_closed', 2743, 3153);
 runToCompletion(unpaidEntrant, entryTrigger, closedEntrance);
 assert.deepEqual(tileOf(unpaidEntrant), entranceStand, 'the unpaid entrance does not move the player');
 assert.equal(unpaidEntrant.getVar(PAID_FLAG), 0, 'the unpaid entrance leaves the flag clear');
+assert.equal(coinCount(unpaidEntrant), 875, 'the unpaid entrance takes no coins');
 const paidEntryLoc = activeLoc('dungeon_tree_closed', 2743, 3153);
 runToCompletion(payer, entryTrigger, paidEntryLoc);
 assert.deepEqual(tileOf(payer), { level: 0, x: 2713, z: 9564 }, 'paid entry lands at the donor dungeon coordinate');
@@ -422,6 +457,9 @@ function runVine(vine, option, { from, woodcutting, axe, random, succeeds }) {
   assert.deepEqual(tileOf(player), expected, `${vine.name} op${option} ${from}-side ${succeeds ? 'success' : 'random failure'} landing`);
   assert.equal(skillXp(player, WOODCUTTING), beforeWoodcuttingXp, `${vine.name} op${option} awards no Woodcutting XP`);
   assert.equal(skillXp(player, AGILITY), beforeAgilityXp, `${vine.name} op${option} awards no Agility XP`);
+  if (from === 'reverse') {
+    assert.equal(player.messages.some(message => message.includes('You need an axe')), false, 'an exempt vine crossing prints no axe refusal');
+  }
 }
 for (const vine of VINES) {
   for (const option of [1, 3]) {
@@ -477,9 +515,9 @@ runAgilityAttempt(stone1, { agility: 12, random: 0, succeeds: true, label: 'at A
 runAgilityAttempt(stone1, { agility: 12, random: 0.999999999, succeeds: false, label: 'deterministic random failure at Agility 12' });
 runAgilityAttempt(stone2, { agility: 1, random: 0, succeeds: true, label: 'reverse-side donor bypass' });
 runAgilityAttempt(stone2, { agility: 1, random: 0.999999999, succeeds: false, label: 'reverse-side donor bypass with deterministic random failure' });
-assertAgilityRefusal(log1, 22);
-runAgilityAttempt(log1, { agility: 22, random: 0, succeeds: true, label: 'at period Agility 22' });
-runAgilityAttempt(log1, { agility: 22, random: 0.999999999, succeeds: false, label: 'deterministic random failure at Agility 22' });
+assertAgilityRefusal(log1, 30);
+runAgilityAttempt(log1, { agility: 30, random: 0, succeeds: true, label: 'at inherited Agility 30' });
+runAgilityAttempt(log1, { agility: 30, random: 0.999999999, succeeds: false, label: 'deterministic random failure at Agility 30' });
 runAgilityAttempt(log3, { agility: 1, random: 0, succeeds: true, label: 'reverse-side donor bypass' });
 runAgilityAttempt(log3, { agility: 1, random: 0.999999999, succeeds: false, label: 'reverse-side donor bypass with deterministic random failure' });
 console.log('PASS stepping stones and logs: forward level gates, both directions, XP, fall damage and random failures');
