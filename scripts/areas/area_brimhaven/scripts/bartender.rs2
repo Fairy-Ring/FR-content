@@ -21,7 +21,7 @@ switch_int ($option) {
     case 3 :
         ~chatplayer("<p,happy>A bottle of rum please.");
         ~chatnpc("<p,happy>That'll be 27 coins.");
-        if (inv_total(inv, coins) < 3) {
+        if (inv_total(inv, coins) < 27) {
             ~chatplayer("<p,sad>Oh dear. I don't seem to have enough money.");
             return;
         } 
