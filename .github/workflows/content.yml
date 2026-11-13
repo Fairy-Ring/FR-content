@@ -100,7 +100,7 @@ jobs:
       # tests/ root: CI — hm-salve compiled runtime uses the built pack and starts no server.
       # tests/wanted/: CI — four production interpreter scenarios, no server.
       # tests/multinpc-triggers/: CI — runtime.sh explicitly starts no server.
-      # tests/fenkenstrain-completion/: CI — three compiled runtime tests and the offline static check;
+      # tests/fenkenstrain-completion/: CI — four compiled runtime tests and the offline static check;
       #   setup-iso.sh is an optional isolated-layout helper, not a test or a live-server requirement.
       # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
       # tests/giantdwarf-intro/: CI — compiled runtime/save-load checks; no engine is started.
@@ -137,10 +137,12 @@ jobs:
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
           run_test tests/wanted/records.mjs node --import tsx ../content/tests/wanted/records.mjs
           run_test tests/fenkenstrain-completion/test_fenk_handlers.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_handlers.mjs
+          run_test tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs
           run_test tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs
           run_test tests/fenkenstrain-completion/test_fenk_gardener_move.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
           run_test tests/fenkenstrain-completion/test_fenk_offline.py python3 ../content/tests/fenkenstrain-completion/test_fenk_offline.py
           run_test tests/fenkenstrain-completion/test_fenk_s0.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s0.py
+          run_test tests/fenkenstrain-completion/test_fenk_s1.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s1.py
           run_test tests/fenkenstrain-completion/test_fenk_s2.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s2.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"

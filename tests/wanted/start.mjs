@@ -185,7 +185,7 @@ console.log('PASS every S2 writer preserves all adjacent packed fields and base5
 for (const s of [0, 1, 2, 3, 4, 5, 6, 7, 8]) {
     const p = qualified(); set(p, 'wanted_main', s);
     drive(p, run(p, '[if_button,questlist:wanted]'));
-    assert.match(text(p), s === 0 ? /32 Quest Points/ : s <= 6 ? /Sir (?:Tiffy|Amik)/ : /Commorb/);
+    assert.match(text(p), s === 0 ? /32 Quest Points/ : s <= 6 ? /Sir (?:Tiffy|Amik)/ : s === 7 ? /Commorb/ : /Lord Daquarius/);
     run(p, '[proc,wanted_update_progress]');
     const colour = p.packets.findLast(x => x.constructor.name === 'IfSetColour');
     assert(colour, `quest colour stage${s}`);

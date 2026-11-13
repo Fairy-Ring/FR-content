@@ -1,0 +1,194 @@
+// Candidate dialogue follows the retained Wanted records; D12 accepts any attributed ordinary Black Knight.
+
+[proc,wanted_intelligence_witnesses_complete]
+if (%wanted_main = ^wanted_intelligence_open & %wanted_daquarius_hint = 2 & %wanted_zammy_mage_hint = 2) {
+    if (inzone(0_54_54_0_0, 0_54_54_63_63, coord) = true) {
+        ~wanted_canifis_entry;
+    }
+}
+return;
+
+[proc,wanted_daquarius_talk]
+if (%wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated) {
+    return;
+}
+if (%wanted_daquarius_hint = 2) {
+    ~chatplayer("<p,neutral>Hello.");
+    ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,neutral>What want you, with the Lord of the Kinshra?|Speak!");
+    ~chatplayer("<p,neutral>Okay Daquarius, tell me all that you know of Solus, or I will kill some more Black Knights!");
+    ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,neutral>I have already told you, I know nothing except that he left some fur behind.|Now leave me and my men be, or it will be the worse for you!");
+    return;
+}
+if (%wanted_black_knight_dead = ^false) {
+    if (%wanted_daquarius_hint = 0) {
+        ~chatplayer("<p,neutral>Hello.");
+        ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>What want you with lord of Kinshra?|Speak!");
+        ~chatplayer("<p,neutral>I am here on behalf of the White Knights...");
+        ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>Pah! Begone, fool, or prepare to taste my blade!");
+        ~chatplayer("<p,neutral>Now wait a minute, this concerns a friend of yours....");
+        ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>A friend of mine? What friend of mine would the Temple Knights show any intere-");
+        ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>Oh. This... Is about Solus, isn't it?");
+        ~chatplayer("<p,neutral>Bingo.");
+        ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>Then let me assure you, that monster is no 'friend' of mine - if indeed such a creature even has 'friends'!");
+        ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>No, that man is certainly no friend of mine nor the Kinshra.");
+        ~chatplayer("<p,neutral>So you will help me find him?");
+        ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>No fool... You and your White Knight cronies are no friend of the Kinshra either.|I will help neither of you, and I wish you all a slow and painful death.");
+        ~chatplayer("<p,angry>You know...I'm sure I could MAKE you tell me where he is...");
+        ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>Is that a threat, whelp? Do your worst. I care not for my own life, I stand only for the protection of the Kinshra!");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral><displayname>? I've been monitoring you. He's telling the truth, so don't try to bluff him by starting a fight.");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>All of our records show that the only thing he will make a stand for is the protection of his men, and he has little regard for his own safety in comparison.");
+        ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>You're going to have to find some other way to intimidate him into giving you the information we need.");
+        ~chatplayer("<p,neutral>Understood. <displayname> out.");
+        %wanted_lord_d_exposition = ^true;
+        %wanted_daquarius_hint = 1;
+        return;
+    }
+    ~chatplayer("<p,neutral>Hello.");
+    ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,neutral>What want you, with the Lord of the Kinshra?|Speak!");
+    ~chatplayer("<p,neutral>I still want to know the whereabouts of Solus Dellagar!");
+    ~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>Well you will not hear that from me, White Knight dog!|And you can threaten me all you want, I care for nothing in this world save the welfare of my Kinshra brothers!");
+    return;
+}
+
+~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,angry>Stop! I will tell you what you want! Please... leave my men be...");
+~chatplayer("<p,neutral>Hello.");
+~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,neutral>What want you with lord of Kinshra?|Speak!");
+~chatplayer("<p,angry>Ok Daquarius, you tell me the whereabouts of Solus Dellagar right now, or I will put every Black Knight here to their death in front of you!");
+~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,sad>*Sigh* I should have known the White Knights would be my ruin once again...");
+~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,neutral>I do not know his exact whereabouts, and when last we met we did not leave...on the best of terms.");
+~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,neutral>All I know is that he left behind some fur when he left, I would expect him to be in an area with furred creatures of some sort.");
+~chatplayer("<p,neutral>What king of fur? Dog? Wolf? Bear?");
+~chatnpc_specific("Lord Daquarius", lord_daquarius, "<p,neutral>I do not know, I am a warrior, not a zoo keeper. It was not bear fur, I know that much.");
+%wanted_daquarius_hint = 2;
+%wanted_lord_d_exposition = ^true;
+~chatplayer("<p,angry>That's it? That's your help? You'd better not be lying Daquarius, or...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Calm yourself <displayname>, he is telling the truth.");
+~chatplayer("<p,neutral>How do you know?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>I am monitoring your conversation through the CommOrb, his physiology shows none of the changes we usually get when someone lies to us.");
+~chatplayer("<p,happy>So this CommOrb thing can work as a lie-detector? That's pretty useful!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Yes, it is, but back to the task at hand. I suggest you head to the next subject of our observations, he might be more help in locating Solus.");
+~chatplayer("<p,neutral>You mean that Zamorakian mage in Varrock?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Yes, he would seem a likely bet. Savant out.");
+~wanted_intelligence_witnesses_complete;
+return;
+
+[proc,wanted_zammy_mage_talk]
+if (%wanted_main ! ^wanted_intelligence_open & %wanted_main ! ^wanted_chase & %wanted_main ! ^wanted_solus_defeated) {
+    return;
+}
+if (%wanted_daquarius_hint ! 2) {
+    return;
+}
+if (%wanted_zammy_mage_hint = 2) {
+    return;
+}
+if (%wanted_zammy_mage_hint = 0) {
+    ~chatplayer("<p,neutral>I am looking for information about a very dangerous man... I believe he visited you quite recently.");
+    ~chatnpc("<p,angry>Ah, you mean that accursed Solus!");
+    ~chatplayer("<p,neutral>Yes, him. I need to find him and make sure he doesn't come back to these lands.");
+    ~chatnpc("<p,neutral>You are working for the Temple Knights correct?|No, don't deny it, I recognise the magical signature of your Communication Orb, a very nice piece of equipment indeed.|I will tell you what I know in exchange for it, I believe such a device could be very useful to my research...");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,angry><displayname>, I've been monitoring your conversation; You can't let him have Temple Knight equipment, he is a Zamorakian!");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Even if we wanted to let the ZMI have access to our research, the built in security magics would destroy it before trading anyway!");
+    ~chatplayer("<p,neutral>Sorry, I cannot trade you my Communications Orb...");
+    ~chatnpc("<p,neutral>Ah well, it was worth a try, but I did not seriously expect you to part with it.");
+    ~chatplayer("<p,neutral>Then perhaps you will be willing to trade something else for your information...?");
+    ~chatnpc("<p,neutral>I have little information, and would give it freely to make sure Solus is... disposed of... but unfortunately I am somewhat... financially distraught at the moment due to a recent... incident.");
+    ~chatplayer("<p,neutral>You mean Solus robbed you of all of your money?");
+    ~chatnpc("<p,neutral>...Yes. He took a large degree of my research into various things as well, but my research is inside my mind and easily replaceable, the money I possessed was essential for my experimentation, and as I have no real skills to speak of, is not so easily replaceable...");
+    ~chatplayer("<p,neutral>You want me to pay you for information?");
+    ~chatnpc("<p,neutral>No... not as such. You know of the substance known as 'rune essence' yes?|A small number of those will allow me to create runes from them, which I may then sell and get myself back on my feet.|Twenty parts of rune essence is the price for my information. You may take it or leave it...");
+    ~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Hi <displayname>, it sounds like a pretty good deal for this kind of information to me, but it's your call. We REALLY need to find Solus as soon as possible though, who knows what kind of damage he might cause now he is at large again!");
+    ~chatplayer("<p,neutral>Okay, I'll see what I can do.");
+    %wanted_zammy_mage_hint = 1;
+    return;
+}
+if (%wanted_zammy_mage_hint ! 1) {
+    return;
+}
+~chatplayer("<p,neutral>So you have information about the whereabouts of Solus Dellagar?");
+~chatnpc("<p,neutral>I do indeed. My price for this information is 20 pieces of rune essence.");
+def_int $essence = inv_total(inv, blankrune);
+if ($essence = 0) {
+    ~chatplayer("<p,neutral>Okay. I'll go get those for you then.");
+    return;
+}
+if ($essence < 20) {
+    ~chatplayer("<p,neutral>I have some essences with me, if you would take those...?");
+    ~chatnpc("<p,neutral>I will not haggle you on my price. 20 Rune essences, and not a single essence less.");
+    ~chatplayer("<p,neutral>Okay, I'll go get those for you then.");
+    return;
+}
+~chatplayer("<p,neutral>I have your essences right here, take them.");
+if (%wanted_main ! ^wanted_intelligence_open | %wanted_daquarius_hint ! 2 | %wanted_zammy_mage_hint ! 1 | inv_total(inv, blankrune) < 20) {
+    return;
+}
+inv_del(inv, blankrune, 20);
+%wanted_zammy_mage_hint = 2;
+~chatplayer("<p,neutral>Okay, now you have your essence, give me my information.");
+~chatnpc("<p,neutral>Certainly. As I say, I have little information, but the cost was not too dear, was it?");
+~chatplayer("<p,angry>Get on with it, I haven't got all day to waste.");
+~chatnpc("<p,neutral>As you wish. As a powerful magician, I could sense his aura once I had encountered him, and it definitely moved East of here when he left me.");
+~chatplayer("<p,neutral>He went East. That's it? That's your 'information'?");
+~chatnpc("<p,neutral>I am sorry I cannot be more specific, but that is all of the information I have to offer...");
+~wanted_zammy_mage_deduction;
+~wanted_intelligence_witnesses_complete;
+return;
+
+[proc,wanted_zammy_mage_deduction]
+if (%wanted_daquarius_hint ! 2 | %wanted_zammy_mage_hint ! 2) {
+    return;
+}
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Okay, so Daquarius told us he was probably somewhere with furry animals of some kind, and this mage has told us that he is East of here...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Any ideas? Frankly, I'm stumped. I just don't have enough information to work out where he might be...");
+~chatplayer("<p,neutral>Hmmm. Wolf fur... and the East... I know where he is.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>You do?");
+~chatplayer("<p,neutral>He will be in Canifis. He must be.");
+~chatnpc_specific("Savant", wanted_savant, "<p,happy>Wow, that's some good thinking <displayname>! Okay, let's head there and get him!");
+return;
+
+[proc,wanted_canifis_entry]
+if (%wanted_main ! ^wanted_intelligence_open | %wanted_daquarius_hint ! 2 | %wanted_zammy_mage_hint ! 2) {
+    return;
+}
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Ok <displayname>, I'm going to begin a low level scan for Solus now...");
+~chatplayer("<p,neutral>Any signs?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Hmmm... These readings are very strange...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>There's... SOMETHING here... You know, I'm sure I've seen readings like this somewhere before...");
+~chatplayer("<p,neutral>What's wrong?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Just give me a minute to cross reference the records in the Library. I know that I've seen readings like this before...");
+~chatnpc_specific("Savant", wanted_savant, "<p,angry>GAH! This is infuriating! It's on the tip of my tongue...");
+~chatplayer("<p,neutral>Well, that Zamorakian mage mentioned that he had a strong magical aura, perhaps that is it?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>No...no, it is something...");
+~chatnpc_specific("Savant", wanted_savant, "<p,happy>Oh my! I know what it is!");
+~chatplayer("<p,neutral>Savant...?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Many years ago the Temple Knights were studying teleportation techniques, and found a strange dimension that was accessed when teleporting..");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>We stopped the research as it was too dangerous to be practically useful, but our initial studies showed that we could use the entire dimension as a kind of scrying glass to see a precise point where we wished to teleport to, then teleport extremely slowly between two points.");
+~chatplayer("<p,neutral>How is teleporting really slowly particularly useful?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Well, basically, you are stretched so thinly between dimensions that you effectively become invisible!");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>From your perspective you can see three places simultaneously, and can choose to move between all three at will!");
+~chatplayer("<p,neutral>I'm... not sure I follow...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Let me give you an example: If you were in Falador castle, and wished to teleport to Varrock, then you could use this 'slow-teleport' technique to be in both places simultaneously, but invisible to anyone in either.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>You could also move freely between the two invisibly and then choose which place you wished to end up, simply by concentrating on the location you wanted to appear in.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Needless to say, in our line of work this could come in very handy for sneaking around unobserved...");
+~chatplayer("<p,neutral>But you abandoned this research? Why?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>It is far too dangerous. In my example I only used two places, but in practice there is a third place involved. It is a strange, empty dimension that teleports seem to pass through.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Frankly, the human mind isn't equipped to cope with processing so much information simultaneously, and the test subjects started to display... behavioral problems...");
+~chatplayer("<p,neutral>Er... That doesn't sound good...");
+~chatnpc_specific("Savant", wanted_savant, "<p,angry>No, it wasn't: Aggressiveness was highly increased, and there were numerous perceptual faults, hallucinations and the like.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>We ceased experimentation immediately, there are enough things in this world to haunt a Temple Knight, we did not see the need to create anymore.");
+~chatplayer("<p,neutral>But this signature you are finding is the same as this 'slow-teleport' experiment created?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>No... it is not exactly the same...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>But it is close enough to be a cause of concern.");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Either someone else has found this strange dimension and begun their own research, and reached the same conclusions that we did...");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Or... We have had a security leak within the Temple Knights and abandoned research has been sold to our enemies!");
+~chatplayer("<p,neutral>Well, I can see how that might be a cause for concern, but right now our priority is Solus, right?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Yes <displayname>, you're right. But if he is using this 'slow-teleport' technique, then that means it is going to be a lot harder to catch him!");
+~chatplayer("<p,neutral>Because he is invisible and in three separate places simultaneously?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Exactly. Listen, I might be able to block his teleportation magics using your CommOrb, but I will need you to get close to him, and if we're unlucky then he will end up teleporting to the point away from you instead of appearing in front of you");
+~chatplayer("<p,neutral>Well, we have nothing else to try, right? What will I have to do?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>Use the 'Scan' function of your CommOrb, if he is in the vicinity it should knock him out of his 'in-between' state, and make him appear.");
+~chatplayer("<p,neutral>So I should try a scan here in Canifis?");
+~chatnpc_specific("Savant", wanted_savant, "<p,neutral>That would seem best... Savant over and out.");
+%wanted_main = ^wanted_chase;
+~wanted_update_progress;
+return;
