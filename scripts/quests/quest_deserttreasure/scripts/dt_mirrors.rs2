@@ -18,5 +18,7 @@
 [oploc1,sword_mirror6] @dt_mirror_look;
 
 [label,dt_mirror_look]
-mes("You gaze into the mirror…");
+// Three full stops, not U+2026: the engine writes one byte per character, so the 377 client
+// received "&" (found by the S1 live round 2).
+mes("You gaze into the mirror...");
 mes("The image is unclear.");
