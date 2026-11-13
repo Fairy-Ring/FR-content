@@ -127,7 +127,7 @@ if ($resource_amount < 10 & stat_random(crafting, 5, 65) = true) {
     $resource_amount = ~random_range(10,35);
 }
 
-if(gettimer(sanctity_drain) = ^false) {
+if(gettimer(sanctity_drain) < 1) {
     settimer(sanctity_drain, 100);
 }
 
