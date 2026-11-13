@@ -38,7 +38,8 @@ if ($identity > 0) {
 // UNKNOWN owned-summon attribution policy: the normal combat hero must own it.
 // A map placement has no private generation and keeps normal killer attribution.
 [proc,barrows_npc_credit]
-if (npc_stat(hitpoints) > 0 | ~barrows_inside(npc_coord) = false) return;
+// Regeneration runs before queued death. The lethal death trigger is authoritative.
+if (~barrows_inside(npc_coord) = false) return;
 def_int $level = ~barrows_npc_level(npc_type);
 if ($level <= 0) return;
 if (npc_findhero = ^false) return;

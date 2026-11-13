@@ -428,6 +428,40 @@ await run(async () => {
     assert.equal(bitField(getCredit(staleOwner), 6, POTENTIAL_MASK), 43, 'matching-generation queue control adds potential');
     assert.equal(bitField(getCredit(staleOwner), 17, 0x7fff), 1, 'matching-generation queue control increments count');
 
+    for (const regenDue of [false, true]) {
+      const label = regenDue ? 'lethal_damage_regen_due' : 'lethal_damage';
+      const lethalOwner = makePlayer(label);
+      const generation = regenDue ? 169 : 168;
+      setRun(lethalOwner, { generation, phase: 1, credit: 0 });
+      const lethalNpc = actor('barrows_ahrim', 3, lethalOwner.uid);
+      seedActor(lethalNpc, { owner: lethalOwner.uid, generation, aggressor: lethalOwner.uid, hp: 100 });
+      lethalNpc.setTimer(1);
+      lethalNpc.turn();
+      assert.equal(lethalNpc.isActive, true, `${label} survives a normal live actor turn`);
+      assert.equal(lethalNpc.regenInterval, NpcType.get(npcTypes.barrows_ahrim).regenrate, `${label} warms the native regeneration interval`);
+      lethalNpc.heroPoints.addHero(lethalOwner.hash64, 100);
+      if (regenDue) lethalNpc.regenClock = lethalNpc.regenInterval - 1;
+      npcProc(lethalNpc, 'npc_default_damage', [100]);
+      assert.equal(lethalNpc.levels[hitpointsIndex], 0, `${label} applies real lethal NPC damage`);
+      assert(Array.from(lethalNpc.queue.all()).some(request => request.queueId === ServerTriggerType.AI_QUEUE3), `${label} naturally queues the native death trigger`);
+      World.currentTick++;
+      lethalNpc.turn();
+      const hpAfterTurn = lethalNpc.levels[hitpointsIndex];
+      assert.equal(hpAfterTurn, regenDue ? 1 : 0, `${label} observes native regeneration before queued death`);
+      const lethalEvent = captureCredit(lethalOwner, `${label} (HP ${hpAfterTurn}; regeneration interval ${lethalNpc.regenInterval})`);
+      assertCaptured(lethalEvent, generation, 'barrows_ahrim', 98, label);
+      let turns = 0;
+      while ((lethalNpc.isActive || capturedCreditRequests(lethalOwner).length > 0) && turns < 1024) {
+        World.currentTick++;
+        lethalOwner.processQueues();
+        if (lethalNpc.isActive) lethalNpc.turn();
+        turns++;
+      }
+      assert.equal(lethalNpc.isActive, false, `${label} completes the unchanged normal death`);
+      assert.equal(capturedCreditRequests(lethalOwner).length, 0, `${label} delivers its captured event through native player queues`);
+      assert.equal(getCredit(lethalOwner), creditWord({ slain: 1, potential: 98, count: 1 }), `${label} credits the natural first Ahrim death exactly once`);
+    }
+
     const noHero = makePlayer('no_hero_aggressor');
     setRun(noHero, { generation: 171, phase: 1, credit: 0 });
     const noHeroNpc = actor('barrows_rat', 3, null);
