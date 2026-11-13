@@ -115,7 +115,7 @@ def main() -> int:
         "^dt_stage_brew_purchased",
         "I should ask him about the four diamonds",
         "^dt_stage_diamonds_requested",
-        "I should speak to Eblis at the Bedabin Camp",
+        "I should speak to Eblis at the Bandit Camp",
         "^dt_stage_ingredients_pending",
         "I should use them to find the four diamonds",
         "%fd_magiclog >= 12",
@@ -135,7 +135,7 @@ def main() -> int:
         and "%priestperil < ^priestperil_complete" in archaeologist
         and "%waterfall_quest < ^waterfall_complete" in archaeologist
         and "%troll_quest < ^troll_complete" in archaeologist
-        and 'mes("He seems to be lost in his own thoughts...");' in archaeologist
+        and '~mesbox("He seems to be lost in his own thoughts...");' in archaeologist
         and "stat_base(" not in archaeologist,
         "start must refuse each missing quest with the existing line, but not enforce the listed skill levels",
     )
@@ -193,6 +193,25 @@ def main() -> int:
     require("%deserttreasure =" not in mirror_code, "mirror Look-into must not add quest progress")
     for index in range(1, 7):
         require(f"[oploc1,fd_mirror{index}]" in mirror_code, f"mirror child {index} must have Look-into")
+    require(
+        'mes("You gaze into the mirror...");' in mirror_code
+        and "The image is unclear." not in mirror_code,
+        "mirror text must keep the sourced gaze message without an unsupported second sentence",
+    )
+    partnership = archaeologist.split("[label,dt_arch_partners_yes]", 1)[1].split("\n[label,", 1)[0]
+    require(
+        '~chatnpc("<p,neutral>...You head due South, see what you can find out about this tablet.");' in partnership
+        and partnership.index("...You head due South") < partnership.index("%deserttreasure = 5;"),
+        "partnership must retain the sourced final direction before writing stage 5",
+    )
+    require(
+        "I should speak to Eblis at the Bedabin Camp" not in journal,
+        "stage 7 must direct players to village Eblis at the Bandit Camp",
+    )
+    require(
+        '"@dbl@Requirements:|"' in journal and "The period requirements" not in journal,
+        "the stage-zero requirement heading must use player-facing journal wording",
+    )
 
     for label in ("dt_arch_with_diamonds", "dt_arch_after_place"):
         block = archaeologist.split(f"[label,{label}]", 1)[1].split("\n[label,", 1)[0]

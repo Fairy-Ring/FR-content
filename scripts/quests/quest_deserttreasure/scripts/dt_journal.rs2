@@ -1,4 +1,4 @@
-// Product status summary; historical Desert Treasure journal prose is UNKNOWN.
+// Every journal sentence is project-authored; historical Desert Treasure prose is UNKNOWN.
 // Requirements are from the period guides; exact 377 start enforcement is UNKNOWN.
 [if_button,questlist:deserttreasure]
 def_string $n = "Desert Treasure";
@@ -7,7 +7,7 @@ def_string $x;
 
 if (%deserttreasure = ^dt_stage_not_started) {
     $x = append($x, "@dbl@I can start Desert Treasure by speaking to the @dre@Archaeologist@dbl@ at the Bedabin Camp.|" );
-    $x = append($x, "@dbl@The period requirements are these quests and levels:|");
+    $x = append($x, "@dbl@Requirements:|");
     if (~itexam_progress() >= ^itexam_complete) {
         $x = append($x, "@str@The Digsite Quest|");
     } else {
@@ -114,7 +114,7 @@ if (%deserttreasure = ^dt_stage_brew_purchased) {
 
 if (%deserttreasure = ^dt_stage_diamonds_requested) {
     $x = append($x, "@str@The bartender told me about the four diamonds.|");
-    $x = append($x, "@dbl@I should speak to Eblis at the Bedabin Camp.");
+    $x = append($x, "@dbl@I should speak to Eblis at the Bandit Camp.");
     ~quest_journal($n, $x);
     return;
 }

@@ -1,8 +1,8 @@
 // Desert Treasure start-gate — Archaeologist (fourdiamonds_indiana 1918) @ 3178,3043.
-// CANDIDATE last-resort 2007-base: OSRS Transcript:Desert Treasure minus DT2 rename /
-// Desert Treasure I overlay / skill toast / RS3 Overview. Hunt 289? no.
+// CANDIDATE wording from later OSRS Transcript:Desert Treasure minus rename/overlay.
+// Inventory-full and stage-2 wait dialogue instead use the later RS3 transcript basis below.
 // Display stays Archaeologist (not Asgarnia Smith). Spoken name only in Who-are-you.
-// Accept: %deserttreasure 0→1 + four_diamonds_etchings. No Terry / diamonds / AM.
+// S1 covers opening, Translation Read and late advice; no diamond/reward grant.
 
 [opheld1,four_diamonds_translation_primer]
 @dt_translation_read;
@@ -42,9 +42,9 @@ if (%deserttreasure > 5) {
 
 [label,dt_arch_hello]
 ~chatplayer("<p,neutral>Hello there.");
-// Period kbase six quests. OSRS dump: silent ignore if missing (no spoken fail).
+// Period kbase six quests; later OSRS transcript tbox maps to the project's mesbox.
 if (~itexam_progress() < ^itexam_complete | %desertrescue < ^desertrescue_complete | (%ikov < ^ikov_completed_armadyl & %ikov < ^ikov_completed_lucien) | %priestperil < ^priestperil_complete | %waterfall_quest < ^waterfall_complete | %troll_quest < ^troll_complete) {
-    mes("He seems to be lost in his own thoughts...");
+    ~mesbox("He seems to be lost in his own thoughts...");
     return;
 }
 ~chatnpc("<p,quiz>Howdy stranger. What brings you out to these parts?");
@@ -92,6 +92,8 @@ if ($yes = 2) {
 
 [label,dt_arch_accept]
 if (inv_itemspace(inv, four_diamonds_etchings, 1, inv_size(inv)) = false) {
+    // CANDIDATE: later RS3 Transcript:Desert Treasure rev 37098141 (2026-07-14),
+    // not a recovered 377 quote or an OSRS/2007-base line.
     ~chatnpc("<p,neutral>Well, you're going to have to clear some junk out of your inventory before I hand this over.");
     return;
 }
@@ -120,7 +122,8 @@ if (inv_total(inv, four_diamonds_etchings) < 1) {
 return;
 
 [label,dt_arch_wait_translation]
-// CANDIDATE-RS3 gap-fill: OSRS dump omitted the wait-at-Exam-Centre state.
+// CANDIDATE: later RS3 Transcript:Desert Treasure rev 37098141 (2026-07-14).
+// This scene is RS3 gap-fill, not a recovered 377 quote or an OSRS/2007-base scene.
 ~chatplayer("<p,neutral>Hello there.");
 ~chatnpc("<p,quiz>So what did Terry Balando say about those etchings? Did he give you a translation for me?");
 ~chatplayer("<p,neutral>He said he could translate it and that I should wait around for a translation.");
@@ -133,7 +136,7 @@ return;
 
 // CANDIDATE last-resort 2007-base: OSRS after receiving / after delivering / after agreeing
 // minus I overlay / display rename / gender / Overview / 4 Mar 2019 skip-collapse.
-// Don't-read 3→4. Partners Yes 4→5. Read book = option only (no IF invent).
+// Don't-read 3→4. Partners Yes 4→5. Read opens the candidate Translation book.
 // No bartender / Eblis / diamonds / AM. Display stays Archaeologist.
 
 [label,dt_arch_return]
@@ -207,6 +210,7 @@ return;
 ~chatplayer("<p,happy>Aw, go on then. Count me in.");
 ~chatnpc("<p,happy>Good lad! Well, if we split up we'll be able to find treasure quicker.");
 ~chatnpc("<p,neutral>I'll continue searching around here in this Bedabin Camp, you head due South to the Bandit Village. If either of us find anything, we'll come find each other and say what, okay?");
+~chatnpc("<p,neutral>...You head due South, see what you can find out about this tablet.");
 %deserttreasure = 5;
 ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 return;
@@ -220,7 +224,8 @@ return;
 return;
 
 [label,dt_translation_read]
-// CANDIDATE: translation page breaks are editorial; each page is kept within one book render.
+// CANDIDATE text, editorial breaks: six product renders conflict with the later item gallery's
+// four two-page spreads. Retained sources do not assign the text to historical 377 pages.
 %book_page = 0;
 %open_book = four_diamonds_translation_primer;
 @book_flip_page(0, 0, 5, dt_translation_book_page);

@@ -1,6 +1,6 @@
 // Desert Treasure — village Eblis (fd_elder_village 1923) after bartender rumor.
-// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Eblis
-// minus Desert Treasure I overlay / [sir/madam] / Overview / lodestone / take-items.
+// CANDIDATE later OSRS Transcript Talking to Eblis wording, except UNKNOWN leave-us line below.
+// Subtract Desert Treasure I overlay / [sir/madam] / Overview / lodestone / take-items.
 // Hunt 289? no. Display stays Eblis. Bind the child, not fourdiamonds_elder.
 // Leave-us <5. Museum 5–6. Diamonds+list at 7. Yes-I-will-go 7→8.
 // Full fd_* Talk-to Excellent 8→10 + CANDIDATE %fd_mirror_present = 1.
@@ -28,6 +28,8 @@ if (%deserttreasure = 6) {
 return;
 
 [label,dt_eblis_leave]
+// UNKNOWN project-authored refusal: absent from retained RS3 rev 37098141 and bounded
+// latest-50 OSRS transcript history pass (2024-01-21 through 2026-09-13); operator decision pending.
 ~chatnpc("<p,angry>Leave us to our fate. We care nothing for the world that betrayed us, or those that come from it.");
 return;
 
