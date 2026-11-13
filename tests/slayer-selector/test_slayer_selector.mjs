@@ -1031,6 +1031,38 @@ function testChaeldarRetargets() {
     return { mappings, elfGate: 'unfinished exclusion; no true mock', thresholds, endpoints: drawLiveRowEndpoints('chaeldar', 'cockatrice', fixture) };
 }
 
+function testDuradelTables() {
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters.duradel);
+    const minimum = FIXTURES.get('duradel:minimum');
+    const cases = [
+        ...[[99, 73], [100, 79], [101, 83]].map(([combat, prayer]) => ({ ...minimum, key: `duradel_cb${combat}_current99`, combat, baseCombatSkills: { [PlayerStat.PRAYER]: prayer }, baseSlayer: 99, currentSlayer: 99, expected: combat >= 100, axis: 'combat only' })),
+        ...[49, 50, 51].map(currentSlayer => ({ ...minimum, key: `duradel_cb100_base99_current${currentSlayer}`, baseSlayer: 99, currentSlayer, expected: currentSlayer >= 50, axis: 'current Slayer only' }))
+    ];
+    const boundaries = cases.map(fixture => {
+        applyFixture(player, fixture);
+        assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: exact real combat boundary`);
+        const prior = sentinelTask(player);
+        const trace = traceWrites(player);
+        let accepted, recommended;
+        try {
+            accepted = eligibleMaster(player, npc, IDS.masters.duradel);
+            recommended = runInt(player, '[proc,get_best_slayer_master]').value;
+        } finally { trace.restore(); }
+        assert.equal(accepted, fixture.expected, `${fixture.key}: independent Duradel admission boundary`);
+        assert.equal(recommended, fixture.expected ? IDS.masters.duradel : IDS.masters.chaeldar, `${fixture.key}: independent recommendation boundary`);
+        assert.deepEqual(trace.events, [], 'master admission and recommendation cannot alter task state');
+        assert.equal(player.getVar(IDS.target), prior.target);
+        assert.equal(player.getVar(IDS.count), prior.count);
+        assert.equal(gemCount(player), 0);
+        return { axis: fixture.axis, fixture: recordFixture(fixture), accepted, recommended };
+    });
+    const dragonEndpoints = MASTER_TABLES.duradel.filter(([, category]) => category.endsWith('dragon')).flatMap(([suffix]) => drawLiveRowEndpoints('duradel', suffix, FIXTURES.get('duradel:high')));
+    assert.equal(dragonEndpoints.length, 8, 'four retained Duradel dragon rows, both inclusive endpoints');
+    return { historicalNumbers: 'UNKNOWN: keeps the Lost City value; no inferred minimum130', boundaries, dragonEndpoints };
+}
+
+
 
 function testOldTableRepairs(basePack) {
     loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
@@ -1645,8 +1677,10 @@ function testCurrentSuite() {
     const packedRows = assertPackedLiveRows();
     const masterSnapshots = testMasterSnapshots();
     const turaelPredicate = testTuraelPredicate();
-    const ernest = ['mazchna', 'vannaka'].filter(key => MASTER_TABLES[key]).map(testErnestGate);
-    const chaeldarRetargets = MASTER_TABLES.chaeldar ? testChaeldarRetargets() : null;
+    assert.deepEqual(Object.keys(MASTER_TABLES), MASTER_DEFS.map(master => master.key), 'all five fixed labelled master snapshots are required');
+    const ernest = ['mazchna', 'vannaka'].map(testErnestGate);
+    const chaeldarRetargets = testChaeldarRetargets();
+    const duradelTables = testDuradelTables();
     const admission = testCombatAndMasterAdmission();
     const harpieThreshold = testHarpieThreshold();
     const thresholds = testThresholds();
@@ -1693,7 +1727,7 @@ function testCurrentSuite() {
     const dispatch = testDispatchAndOneShotOrder(packedRows);
     const teachingAdmission = testCurrentTeachingAdmission();
     const teachingSuccess = testCurrentTeachingSuccess();
-    return { packedRows, masterSnapshots, turaelPredicate, ernest, chaeldarRetargets, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+    return { packedRows, masterSnapshots, turaelPredicate, ernest, chaeldarRetargets, duradelTables, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
 }
 
 function fixtureSourceRows() {
@@ -2056,6 +2090,7 @@ try {
             turaelPredicate: current.turaelPredicate,
             ernest: current.ernest,
             chaeldarRetargets: current.chaeldarRetargets,
+            duradelTables: current.duradelTables,
             admission: current.admission,
             harpieThreshold: current.harpieThreshold,
             thresholds: current.thresholds,
