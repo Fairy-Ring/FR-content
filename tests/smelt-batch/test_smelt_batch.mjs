@@ -3,34 +3,40 @@
  * Packed smelting triggers through the production ScriptProvider, Player and handlers.
  * Run from the sibling engine after npm run build:
  *   node --import tsx ../content/tests/smelt-batch/test_smelt_batch.mjs
- *
- * SMELT_PACK selects a pack directory. Set SMELT_BASELINE_ONLY=1 against the published
- * pack to emit the single-smelt oracle; set BASELINE_PACK on the changed-pack run to
- * compare that oracle automatically. SMELT_BASELINE_JSON may instead name a saved JSON
- * snapshot emitted by the baseline-only mode.
+ * Set SMELT_GROUP=T1 (or --group T1) to run one independently selectable group.
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const CONTENT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const ENGINE_DIR = process.env.HARNESS_ENGINE_DIR ?? path.resolve(CONTENT_DIR, '../engine');
-const BASELINE_ONLY = process.env.SMELT_BASELINE_ONLY === '1' || process.argv.includes('--baseline-only');
-const BASELINE_PACK = process.env.BASELINE_PACK;
+const groupArgIndex = process.argv.indexOf('--group');
+const groupInlineArg = process.argv.find(argument => argument.startsWith('--group='));
+const groupFromArg = groupInlineArg
+  ? groupInlineArg.slice('--group='.length)
+  : groupArgIndex >= 0 ? (process.argv[groupArgIndex + 1] ?? '') : null;
+const requestedGroup = process.env.SMELT_TEST_GROUP ?? process.env.SMELT_GROUP ?? groupFromArg;
+assert.ok(requestedGroup == null || ['T1', 'T2', 'T3', 'T4'].includes(requestedGroup), `unknown smelt test group ${requestedGroup}`);
+const runGroup = name => requestedGroup == null || requestedGroup === name;
 const PACK_DIR = path.resolve(
-  process.env.SMELT_PACK ?? process.env.SMELT_PACK_DIR ??
-    (BASELINE_ONLY && BASELINE_PACK ? BASELINE_PACK : path.join(ENGINE_DIR, 'data/pack'))
+  process.env.SMELT_PACK ?? process.env.SMELT_PACK_DIR ?? path.join(ENGINE_DIR, 'data/pack')
 );
 const SCRIPT_DAT = path.join(PACK_DIR, 'server/script.dat');
 assert.ok(fs.existsSync(SCRIPT_DAT), `compiled content pack is missing at ${SCRIPT_DAT}`);
+const synthNames = new Map(fs.readFileSync(path.join(CONTENT_DIR, 'pack/synth.pack'), 'utf8')
+  .split(/\r?\n/).filter(Boolean).map(line => {
+    const at = line.indexOf('=');
+    return [Number(line.slice(0, at)), line.slice(at + 1)];
+  }));
 
 const eng = async relative => import(pathToFileURL(path.join(ENGINE_DIR, relative)).href);
 const load = async relative => (await eng(relative)).default;
 const World = await load('src/engine/World.ts');
 const Player = await load('src/engine/entity/Player.ts');
 const Loc = await load('src/engine/entity/Loc.ts');
+const JavaRandom = await load('src/util/JavaRandom.ts');
 const ScriptProvider = await load('src/engine/script/ScriptProvider.ts');
 const ScriptRunner = await load('src/engine/script/ScriptRunner.ts');
 const ScriptState = await load('src/engine/script/ScriptState.ts');
@@ -75,6 +81,7 @@ for (const config of [
 DbTableIndex.init();
 assert.ok(FontType.get(3), 'FontType q8_full is missing');
 assert.ok(ScriptProvider.load(PACK_DIR) > 0, 'ScriptProvider.load returned no compiled scripts');
+World.gameMap.init();
 World.currentTick = 100;
 
 const id = (type, name) => {
@@ -83,25 +90,33 @@ const id = (type, name) => {
   return value;
 };
 const inventoryId = id(InvType, 'inv');
-const furnaceId = id(LocType, 'furnace');
-const furnaceType = LocType.get(furnaceId);
-assert.ok(furnaceType, 'Furnace LocType is missing');
+const wornInventoryId = id(InvType, 'worn');
+const ringVarpId = id(VarPlayerType, 'ring_of_forging');
+const actionDelayVarpId = id(VarPlayerType, 'action_delay');
+const vikingVarpId = id(VarPlayerType, 'viking');
+const vikingComplete = 10;
 const smithingStat = PlayerStat.SMITHING;
 const smeltingStructParam = id(ParamType, 'smelting_struct');
 const recipeParamId = name => id(ParamType, name);
 const valueOf = (struct, name) => struct.params.get(recipeParamId(name));
 const namedObject = name => id(ObjType, name);
-const barNames = [
-  'bronze_bar', 'iron_bar', 'silver_bar', 'steel_bar',
-  'gold_bar', 'mithril_bar', 'adamantite_bar', 'runite_bar'
+const menuBars = [
+  { name: 'bronze_bar', primary: 'copper_ore', secondary: 'tin_ore', buttonBase: 12 },
+  { name: 'iron_bar', primary: 'iron_ore', secondary: null, buttonBase: 16 },
+  { name: 'silver_bar', primary: 'silver_ore', secondary: null, buttonBase: 20 },
+  { name: 'steel_bar', primary: 'iron_ore', secondary: 'coal', buttonBase: 24 },
+  { name: 'gold_bar', primary: 'gold_ore', secondary: null, buttonBase: 28 },
+  { name: 'mithril_bar', primary: 'mithril_ore', secondary: 'coal', buttonBase: 32 },
+  { name: 'adamantite_bar', primary: 'adamantite_ore', secondary: 'coal', buttonBase: 36 },
+  { name: 'runite_bar', primary: 'runite_ore', secondary: 'coal', buttonBase: 40 }
+];
+const recipeSpecs = [
+  ...menuBars,
+  { name: 'perfect_gold_bar', primary: 'perfect_gold_ore', secondary: null, buttonBase: 28, menuBarName: 'gold_bar' }
 ];
 const amountButtons = [
   { amount: 'X', offset: 0 }, { amount: 10, offset: 1 },
   { amount: 5, offset: 2 }, { amount: 1, offset: 3 }
-];
-const testedBars = [
-  { name: 'silver_bar', primary: 'silver_ore', secondary: null, buttonBase: 20 },
-  { name: 'steel_bar', primary: 'iron_ore', secondary: 'coal', buttonBase: 24 }
 ];
 
 function recipeFor(barName, primaryName, secondaryName) {
@@ -139,9 +154,14 @@ function recipeFor(barName, primaryName, secondaryName) {
   return recipe;
 }
 
-const recipes = new Map(testedBars.map(bar => [
-  bar.name,
-  recipeFor(bar.name, bar.primary, bar.secondary)
+const recipes = new Map(recipeSpecs.map(spec => [
+  spec.name,
+  {
+    ...recipeFor(spec.name, spec.primary, spec.secondary),
+    name: spec.name,
+    buttonBase: spec.buttonBase,
+    menuBarName: spec.menuBarName ?? spec.name
+  }
 ]));
 
 let nextPlayer = 0;
@@ -162,17 +182,35 @@ function makePlayer(smithingLevel = 99) {
   player.messages = [];
   player.packets = [];
   player.textEvents = [];
+  player.traceEvents = [];
   player.write = packet => {
     player.packets.push(packet);
     if (packet instanceof IfSetText) {
       const component = Component.get(packet.component);
       assert.ok(component, `IfSetText refers to unknown component ${packet.component}`);
       player.textEvents.push({ kind: 'interface', component: component.comName, text: packet.text });
+      player.traceEvents.push({ kind: 'interface_text', text: packet.text });
+    } else if (packet.constructor.name === 'SynthSound') {
+      const synth = synthNames.get(packet.synth);
+      assert.ok(synth, `unknown emitted synth ${packet.synth}`);
+      player.traceEvents.push({
+        kind: 'sound', synth, loops: packet.loops, delay: packet.delay
+      });
     }
   };
   const recordMessage = text => {
     player.messages.push(text);
     player.textEvents.push({ kind: 'game', text });
+    player.traceEvents.push({ kind: 'game', text });
+  };
+  const playAnimation = player.playAnimation.bind(player);
+  player.playAnimation = (sequence, delay) => {
+    player.traceEvents.push({
+      kind: 'animation',
+      sequence: SeqType.get(sequence)?.debugname ?? sequence,
+      delay
+    });
+    return playAnimation(sequence, delay);
   };
   player.messageGame = recordMessage;
   player.wrappedMessageGame = recordMessage;
@@ -190,6 +228,55 @@ function count(player, itemName) {
 function add(player, itemName, quantity) {
   if (quantity > 0) inventory(player).add(namedObject(itemName), quantity);
 }
+function countWorn(player, itemName) {
+  const worn = player.getInventory(wornInventoryId);
+  assert.ok(worn, 'player worn inventory is missing');
+  return worn.getItemCount(namedObject(itemName));
+}
+function addWorn(player, itemName, quantity) {
+  if (quantity > 0) player.getInventory(wornInventoryId).add(namedObject(itemName), quantity);
+}
+function setCountedItems(player, items) {
+  let slot = 0;
+  for (const [name, quantity] of Object.entries(items)) {
+    if (quantity <= 0) continue;
+    assert.ok(slot < inventory(player).capacity, 'counted packed fixture exceeds inventory slots');
+    inventory(player).set(slot++, { id: namedObject(name), count: quantity });
+  }
+}
+function interfaceText(player) {
+  return player.textEvents.filter(event => event.kind === 'interface').map(event => event.text).join(' ');
+}
+function withForcedRandom(value, callback) {
+  const original = JavaRandom.nextDouble;
+  JavaRandom.nextDouble = () => value;
+  try {
+    return callback();
+  } finally {
+    JavaRandom.nextDouble = original;
+  }
+}
+function traceFrame(player, scenario, experienceBefore, tick) {
+  const events = player.traceEvents.splice(0);
+  const dialogTextParts = events.filter(event => event.kind === 'interface_text').map(event => event.text);
+  const traceEvents = events.filter(event => event.kind !== 'interface_text');
+  return {
+    tick,
+    delayed: player.delayed,
+    inventory: {
+      primary: count(player, scenario.primary),
+      secondary: scenario.secondary === null ? 0 : count(player, scenario.secondary),
+      bar: scenario.bar === null ? 0 : count(player, scenario.bar),
+      wornRing: countWorn(player, 'ring_of_forging'),
+      wornGauntlets: countWorn(player, 'gauntlets_of_goldsmithing')
+    },
+    experience: player.stats[smithingStat] - experienceBefore,
+    ringCharge: player.vars[ringVarpId],
+    dialogOpen: player.modalChat !== -1,
+    dialogText: dialogTextParts.length === 0 ? null : dialogTextParts.join(' '),
+    events: traceEvents
+  };
+}
 function addRecipeInputs(player, recipe, bars) {
   const primaryCount = recipe.primaryCount * bars;
   const secondaryCount = recipe.secondaryCount * bars;
@@ -205,10 +292,13 @@ function addRecipeInputs(player, recipe, bars) {
 function weakQueueLength(player) {
   return Array.from(player.weakQueue.all()).length;
 }
-function furnace() {
+function furnace(typeName = 'furnace') {
+  const locId = id(LocType, typeName);
+  const type = LocType.get(locId);
+  assert.ok(type, `${typeName} LocType is missing`);
   return new Loc(
-    0, 3272, 3185, furnaceType.width, furnaceType.length,
-    EntityLifeCycle.RESPAWN, furnaceId, 10, 0
+    0, 3272, 3185, type.width, type.length,
+    EntityLifeCycle.RESPAWN, locId, 10, 0
   );
 }
 function openSmeltingInterface(player) {
@@ -265,242 +355,372 @@ function driveUntilIdle(player, maxTicks = 120) {
 function expectedMessages(recipe, bars) {
   return Array.from({ length: bars }, () => [recipe.processMessage, recipe.productMessage]).flat();
 }
-function countTextEvents(player, value) {
-  return player.textEvents.filter(event => event.text === value).length;
+
+function readRequiredFixture(name) {
+  const fixturePath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', name);
+  assert.ok(fs.existsSync(fixturePath), `required committed smelt fixture is missing: ${name}`);
+  return JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
 }
 
-// The baseline-only run is intentionally limited to the legacy item-on-furnace route,
-// so it works with the published pack that has none of the new interface triggers.
-const singleObservations = [];
-for (const bar of testedBars) {
-  const recipe = recipes.get(bar.name);
-  const player = makePlayer(99);
-  World.currentTick = 100;
-  add(player, recipe.primaryName, recipe.primaryCount);
-  if (recipe.secondaryName !== null) add(player, recipe.secondaryName, recipe.secondaryCount);
-  player.lastUseItem = recipe.primaryId;
-  player.lastUseSlot = 0;
+if (runGroup('T1')) {
+  const fixture = readRequiredFixture('single-smelt-donor-trace.json');
+  assert.equal(fixture.entryDelay, 2, 'donor single smelt must enter the weak queue with delay 2');
+  assert.equal(fixture.finishTick, fixture.triggerTick + 3, 'donor single smelt must finish three ticks after triggering');
+  assert.deepEqual(fixture.ticks, [100, 101, 102, 103], 'single trace must include trigger through finish ticks');
   const trigger = ScriptProvider.getByName('[oplocu,_smithing_furnace]');
-  assert.ok(trigger, 'published item-on-furnace trigger is missing');
-  const state = ScriptRunner.init(trigger, player, furnace());
-  const experienceBefore = player.stats[smithingStat];
-  player.executeScript(state, true, true);
-  driveUntilIdle(player, 16);
-  assert.equal(state.execution, ScriptState.FINISHED, `${recipe.barName} item-on-furnace smelt should finish`);
-  assert.equal(count(player, recipe.primaryName), 0, `${recipe.barName} item-on-furnace primary consumption`);
-  if (recipe.secondaryName !== null) assert.equal(count(player, recipe.secondaryName), 0, `${recipe.barName} item-on-furnace secondary consumption`);
-  assert.equal(count(player, recipe.barName), 1, `${recipe.barName} item-on-furnace product`);
-  const observation = {
-    bar: recipe.barName,
-    produced: count(player, recipe.barName),
-    primaryRemaining: count(player, recipe.primaryName),
-    secondaryRemaining: recipe.secondaryName === null ? 0 : count(player, recipe.secondaryName),
-    experience: player.stats[smithingStat] - experienceBefore,
-    messages: player.textEvents
-  };
-  assert.equal(observation.experience, recipe.experience, `${recipe.barName} single-smelt XP`);
-  assert.equal(player.messages.filter(text => text === recipe.processMessage).length, 1, `${recipe.barName} single-smelt process message`);
-  assert.equal(player.messages.filter(text => text === recipe.productMessage).length, 1, `${recipe.barName} single-smelt product message`);
-  singleObservations.push(observation);
-}
+  assert.ok(trigger, 'packed item-on-furnace trigger is missing');
 
-if (BASELINE_ONLY) {
-  process.stdout.write(`SMELT_SINGLE_BASELINE=${JSON.stringify(singleObservations)}\n`);
-  process.exit(0);
-}
-World.gameMap.init();
-
-// Every interface button must resolve by its name; generated IDs are resolved from the
-// built pack at runtime rather than copied into the test.
-for (let barIndex = 0; barIndex < barNames.length; barIndex++) {
-  const base = 12 + barIndex * 4;
-  for (const button of amountButtons) {
-    const componentName = `smelting:com_${base + button.offset}`;
-    id(Component, componentName);
-    assert.ok(
-      ScriptProvider.getByName(`[if_button,${componentName}]`),
-      `packed ${button.amount} button is missing for ${barNames[barIndex]}`
-    );
-  }
-}
-assert.ok(ScriptProvider.getByName('[label,smelt_ore]'), 'published single-smelt ore label is missing');
-assert.ok(ScriptProvider.getByName('[label,smelt_ore_makex]'), 'packed Make-X label is missing');
-assert.ok(ScriptProvider.getByName('[queue,smelting_ore]'), 'packed smelting finish queue is missing');
-assert.ok(ScriptProvider.getByName('[queue,start_smelt_ore]'), 'packed smelting recovery queue is missing');
-
-if (!BASELINE_PACK && !process.env.SMELT_BASELINE_JSON) {
-  console.warn('BASELINE_PACK or SMELT_BASELINE_JSON not set; published single-smelt comparison was not run');
-} else {
-  let baseline;
-  if (process.env.SMELT_BASELINE_JSON) {
-    const serialized = fs.readFileSync(path.resolve(process.env.SMELT_BASELINE_JSON), 'utf8');
-    const line = serialized.split(/\r?\n/).find(value => value.startsWith('SMELT_SINGLE_BASELINE='));
-    baseline = line ? JSON.parse(line.slice('SMELT_SINGLE_BASELINE='.length)) : JSON.parse(serialized);
-  } else {
-    const baselinePack = path.resolve(BASELINE_PACK);
-    const result = spawnSync(process.execPath, [...process.execArgv, fileURLToPath(import.meta.url)], {
-      cwd: process.cwd(),
-      encoding: 'utf8',
-      env: {
-        ...process.env,
-        SMELT_PACK: baselinePack,
-        SMELT_BASELINE_ONLY: '1'
+  for (const scenario of fixture.cases) {
+    World.currentTick = fixture.triggerTick;
+    const player = makePlayer(scenario.level);
+    for (const [itemName, quantity] of Object.entries(scenario.items)) add(player, itemName, quantity);
+    for (const [itemName, quantity] of Object.entries(scenario.worn)) addWorn(player, itemName, quantity);
+    player.vars[ringVarpId] = scenario.ringCharge;
+    player.lastUseItem = namedObject(scenario.use);
+    player.lastUseSlot = inventory(player).getItemIndex(player.lastUseItem);
+    const state = ScriptRunner.init(trigger, player, furnace());
+    const experienceBefore = player.stats[smithingStat];
+    const observe = () => {
+      player.executeScript(state, true, true);
+      const frames = [traceFrame(player, scenario, experienceBefore, World.currentTick)];
+      for (const tick of fixture.ticks.slice(1)) {
+        advancePlayerTick(player);
+        if (scenario.walkAt === World.currentTick) {
+          const movement = new MoveClickHandler();
+          assert.equal(
+            movement.handle(new MoveClick([{ x: player.x + 1, z: player.z }], 0, false), player),
+            true,
+            `${scenario.name} walk before finish must be accepted`
+          );
+          assert.equal(weakQueueLength(player), 0, `${scenario.name} walk must cancel the weak-queue finish`);
+        }
+        frames.push(traceFrame(player, scenario, experienceBefore, World.currentTick));
       }
-    });
-    assert.equal(result.status, 0, `published baseline capture failed: ${result.stderr || result.stdout}`);
-    const line = result.stdout.split(/\r?\n/).find(value => value.startsWith('SMELT_SINGLE_BASELINE='));
-    assert.ok(line, `published baseline capture emitted no snapshot: ${result.stdout}`);
-    baseline = JSON.parse(line.slice('SMELT_SINGLE_BASELINE='.length));
+      return frames;
+    };
+    const frames = scenario.forceRandom === null
+      ? observe()
+      : withForcedRandom(scenario.forceRandom, observe);
+    const actual = {
+      ticks: frames.map(frame => frame.tick),
+      delayed: frames.map(frame => frame.delayed),
+      inventory: frames.map(frame => frame.inventory),
+      experience: frames.map(frame => frame.experience),
+      ringCharge: frames.map(frame => frame.ringCharge),
+      dialogOpen: frames.map(frame => frame.dialogOpen),
+      dialogText: frames.map(frame => frame.dialogText),
+      events: frames.map(frame => frame.events)
+    };
+    assert.deepEqual(actual.ticks, fixture.ticks, `${scenario.name} observed tick sequence`);
+    assert.deepEqual(actual.delayed, scenario.expected.delayed, `${scenario.name} delayed state per tick`);
+    assert.deepEqual(actual.inventory, scenario.expected.inventory, `${scenario.name} inventory per tick`);
+    assert.deepEqual(actual.experience, scenario.expected.experience, `${scenario.name} Smithing XP per tick`);
+    assert.deepEqual(actual.ringCharge, scenario.expected.ringCharge, `${scenario.name} ring charge per tick`);
+    assert.deepEqual(actual.dialogOpen, scenario.expected.dialogOpen, `${scenario.name} dialog state per tick`);
+    assert.deepEqual(actual.dialogText, scenario.expected.dialogText, `${scenario.name} dialog text per tick`);
+    assert.deepEqual(actual.events, scenario.expected.events, `${scenario.name} animation, sound and message trace`);
   }
-  assert.deepEqual(singleObservations, baseline, 'item-on-furnace consumption, Smithing XP and messages must match the published pack');
+  console.log(`RESULT PASS smelt-batch T1: ${fixture.cases.length} donor-traced single cases`);
 }
 
-// Check every fixed quantity and Make-X on both a deterministic single-ore bar and a
-// deterministic ore-plus-coal bar. Each run uses the actual packed button and input handler.
-const passingCases = [];
-for (const bar of testedBars) {
-  const recipe = recipes.get(bar.name);
-  for (const { amount } of amountButtons) {
-    const quantity = amount === 'X' ? 7 : amount;
+if (runGroup('T2')) {
+  const stock = {
+    copper_ore: 12, tin_ore: 12, iron_ore: 12, silver_ore: 12,
+    gold_ore: 12, mithril_ore: 12, adamantite_ore: 12, runite_ore: 12,
+    coal: 200
+  };
+  const passingCases = [];
+  for (const bar of menuBars) {
+    const recipe = recipes.get(bar.name);
+    for (const { amount } of amountButtons) {
+      World.currentTick = 100;
+      const player = makePlayer(99);
+      setCountedItems(player, stock);
+      const experienceBefore = player.stats[smithingStat];
+      openSmeltingInterface(player);
+      const quantity = amount === 'X' ? 3 : amount;
+      selectAmount(player, recipe, amount, amount === 'X' ? quantity : null);
+      withForcedRandom(0.1, () => driveUntilIdle(player, 120));
+
+      const produced = {};
+      for (const item of inventory(player).items) {
+        if (!item) continue;
+        const itemName = ObjType.get(item.id)?.debugname;
+        if (itemName?.endsWith('_bar')) produced[itemName] = (produced[itemName] ?? 0) + item.count;
+      }
+      assert.deepEqual(produced, { [recipe.barName]: quantity }, `${bar.name} ${amount} exact bar type and count`);
+      assert.equal(
+        count(player, recipe.primaryName),
+        stock[recipe.primaryName] - recipe.primaryCount * quantity,
+        `${bar.name} ${amount} exact primary ore consumption`
+      );
+      if (recipe.secondaryName !== null) {
+        assert.equal(
+          count(player, recipe.secondaryName),
+          stock[recipe.secondaryName] - recipe.secondaryCount * quantity,
+          `${bar.name} ${amount} exact secondary ore consumption`
+        );
+      }
+      assert.equal(
+        player.stats[smithingStat] - experienceBefore,
+        recipe.experience * quantity,
+        `${bar.name} ${amount} exact Smithing XP`
+      );
+      assert.deepEqual(
+        player.messages,
+        expectedMessages(recipe, quantity),
+        `${bar.name} ${amount} must contain only the exact process/product messages`
+      );
+      assert.equal(player.modalChat, -1, `${bar.name} ${amount} must not open a refusal or stop dialog`);
+      assert.equal(
+        player.textEvents.some(event => event.kind === 'interface'),
+        false,
+        `${bar.name} ${amount} must not emit refusal or stop text`
+      );
+      assert.equal(weakQueueLength(player), 0, `${bar.name} ${amount} must drain the queue`);
+      passingCases.push(`${bar.name}:${amount}`);
+    }
+  }
+  assert.equal(passingCases.length, 32, 'all 32 packed amount buttons must execute');
+  console.log('RESULT PASS smelt-batch T2: all 32 packed buttons, Make-X below stock');
+}
+
+if (runGroup('T3')) {
+  const donorFixture = readRequiredFixture('queueore-donor-messages.json');
+  assert.ok(donorFixture.queueore, 'donor queueore text map is missing');
+
+  function runExhaustion(recipe, shortage) {
+    const message = donorFixture.queueore[recipe.barName]?.[shortage];
+    assert.equal(typeof message, 'string', `${recipe.barName} donor ${shortage} exhaustion text is missing`);
+    const items = {};
+    if (shortage === 'primary') {
+      items[recipe.primaryName] = recipe.primaryCount;
+      if (recipe.secondaryName !== null) items[recipe.secondaryName] = recipe.secondaryCount * 2;
+    } else {
+      items[recipe.primaryName] = recipe.primaryCount * 2;
+      items[recipe.secondaryName] = recipe.secondaryCount;
+    }
     World.currentTick = 100;
     const player = makePlayer(99);
-    addRecipeInputs(player, recipe, quantity);
+    setCountedItems(player, items);
     const experienceBefore = player.stats[smithingStat];
     openSmeltingInterface(player);
-    const startTick = World.currentTick;
-    selectAmount(player, bar, amount, amount === 'X' ? quantity : null);
-    const productTicks = [];
-    let observedProducts = 0;
-    for (let tick = 0; tick < quantity * 6 + 12; tick++) {
-      const state = player.activeScript?.execution;
-      if (state === ScriptState.COUNTDIALOG || state === ScriptState.PAUSEBUTTON) break;
-      if (!player.activeScript && weakQueueLength(player) === 0) break;
-      advancePlayerTick(player);
-      const products = count(player, recipe.barName);
-      while (observedProducts < products) {
-        productTicks.push(World.currentTick);
-        observedProducts++;
+    selectAmount(player, recipe, 5);
+    withForcedRandom(0.1, () => driveUntilIdle(player, 80));
+    assert.equal(player.modalChat, -1, `${recipe.barName} ${shortage} runout must not open a dialog`);
+    assert.equal(
+      player.textEvents.some(event => event.kind === 'interface'),
+      false,
+      `${recipe.barName} ${shortage} runout must not emit dialog text`
+    );
+    assert.equal(count(player, recipe.barName), 1, `${recipe.barName} ${shortage} runout should finish one bar`);
+    assert.equal(
+      count(player, recipe.primaryName),
+      items[recipe.primaryName] - recipe.primaryCount,
+      `${recipe.barName} ${shortage} runout primary inventory`
+    );
+    if (recipe.secondaryName !== null) {
+      assert.equal(
+        count(player, recipe.secondaryName),
+        (items[recipe.secondaryName] ?? 0) - recipe.secondaryCount,
+        `${recipe.barName} ${shortage} runout secondary inventory`
+      );
+    }
+    assert.equal(
+      player.stats[smithingStat] - experienceBefore,
+      recipe.experience,
+      `${recipe.barName} ${shortage} runout XP`
+    );
+    assert.deepEqual(
+      player.messages,
+      [recipe.processMessage, recipe.productMessage, message],
+      `${recipe.barName} ${shortage} runout must print the committed donor message`
+    );
+    assert.equal(weakQueueLength(player), 0, `${recipe.barName} ${shortage} runout must leave no queued work`);
+  }
+
+  for (const spec of recipeSpecs) {
+    const recipe = recipes.get(spec.name);
+    runExhaustion(recipe, 'primary');
+    if (recipe.secondaryName !== null && ['steel_bar', 'mithril_bar', 'adamantite_bar', 'runite_bar'].includes(recipe.barName)) {
+      runExhaustion(recipe, 'secondary');
+    }
+  }
+
+  for (const spec of recipeSpecs) {
+    const recipe = recipes.get(spec.name);
+    assert.equal(typeof recipe.failureMessage, 'string', `${recipe.barName} processfailure must be a string`);
+    assert.notEqual(recipe.failureMessage, '', `${recipe.barName} processfailure must not be empty`);
+  }
+  for (const bar of menuBars) {
+    const recipe = recipes.get(bar.name);
+    const shortageModes = recipe.secondaryName === null ? ['primary'] : ['primary', 'secondary'];
+    for (const shortage of shortageModes) {
+      const items = {};
+      if (shortage === 'secondary') items[recipe.primaryName] = recipe.primaryCount;
+      World.currentTick = 100;
+      const player = makePlayer(99);
+      setCountedItems(player, items);
+      const experienceBefore = player.stats[smithingStat];
+      openSmeltingInterface(player);
+      selectAmount(player, recipe, 1, null, false);
+      assert.notEqual(player.modalChat, -1, `${recipe.barName} ${shortage} initial shortage must open a dialog`);
+      assert.equal(
+        interfaceText(player),
+        recipe.failureMessage,
+        `${recipe.barName} ${shortage} initial refusal must exactly match struct processfailure`
+      );
+      assert.deepEqual(player.messages, [], `${recipe.barName} ${shortage} initial refusal is not a plain game message`);
+      assert.equal(count(player, recipe.barName), 0, `${recipe.barName} ${shortage} initial refusal makes no bar`);
+      assert.equal(
+        player.stats[smithingStat] - experienceBefore,
+        0,
+        `${recipe.barName} ${shortage} initial refusal awards no XP`
+      );
+      assert.equal(weakQueueLength(player), 0, `${recipe.barName} ${shortage} initial refusal queues no work`);
+    }
+  }
+  // No gold menu button can select perfect gold without a perfect-gold ore. Exercise its
+  // struct refusal through the matching item trigger so its required text is still tested.
+  {
+    const recipe = recipes.get('perfect_gold_bar');
+    World.currentTick = 100;
+    const player = makePlayer(99);
+    player.lastUseItem = namedObject('perfect_gold_ore');
+    player.lastUseSlot = -1;
+    const trigger = ScriptProvider.getByName('[oplocu,_smithing_furnace]');
+    const experienceBefore = player.stats[smithingStat];
+    player.executeScript(ScriptRunner.init(trigger, player, furnace()), true, true);
+    assert.notEqual(player.modalChat, -1, 'empty perfect gold validation must open a dialog');
+    assert.equal(interfaceText(player), recipe.failureMessage, 'empty perfect gold refusal must match struct processfailure');
+    assert.deepEqual(player.messages, [], 'empty perfect gold refusal is a dialog, not a plain game message');
+    assert.equal(count(player, recipe.barName), 0, 'empty perfect gold validation makes no bar');
+    assert.equal(player.stats[smithingStat] - experienceBefore, 0, 'empty perfect gold validation awards no XP');
+    assert.equal(weakQueueLength(player), 0, 'empty perfect gold validation queues no work');
+  }
+
+  for (const bar of [menuBars[2], menuBars[3]]) {
+    const recipe = recipes.get(bar.name);
+    World.currentTick = 100;
+    const player = makePlayer(recipe.level - 1);
+    addRecipeInputs(player, recipe, 1);
+    const experienceBefore = player.stats[smithingStat];
+    openSmeltingInterface(player);
+    selectAmount(player, recipe, 1, null, false);
+    assert.equal(interfaceText(player), recipe.levelFailure, `${bar.name} level refusal text`);
+    assert.equal(count(player, recipe.barName), 0, `${bar.name} below-level batch must not produce a bar`);
+    assert.equal(count(player, recipe.primaryName), recipe.primaryCount, `${bar.name} below-level primary ore is retained`);
+    if (recipe.secondaryName !== null) {
+      assert.equal(count(player, recipe.secondaryName), recipe.secondaryCount, `${bar.name} below-level secondary ore is retained`);
+    }
+    assert.equal(player.stats[smithingStat] - experienceBefore, 0, `${bar.name} below-level batch awards no XP`);
+    assert.equal(weakQueueLength(player), 0, `${bar.name} below-level batch queues no work`);
+  }
+
+  {
+    const recipe = recipes.get('silver_bar');
+    World.currentTick = 100;
+    const player = makePlayer(99);
+    add(player, recipe.primaryName, recipe.primaryCount * 5);
+    const experienceBefore = player.stats[smithingStat];
+    openSmeltingInterface(player);
+    selectAmount(player, recipe, 5);
+    advancePlayerTick(player);
+    assert.equal(player.delayed, false, 'a batch must not hold the player with p_delay');
+    assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 5, 'unfinished bar must retain its ore');
+    const movement = new MoveClickHandler();
+    assert.equal(movement.handle(new MoveClick([{ x: player.x + 1, z: player.z }], 0, false), player), true);
+    assert.equal(weakQueueLength(player), 0, 'movement must cancel the unfinished completion');
+    driveUntilIdle(player, 24);
+    assert.equal(count(player, recipe.barName), 0, 'cancelled unfinished bar must not be made');
+    assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 5, 'cancelled unfinished bar must keep all ore');
+    assert.equal(player.stats[smithingStat], experienceBefore, 'cancelled unfinished bar must give no XP');
+  }
+
+  for (const offset of [1, 2]) {
+    const recipe = recipes.get('silver_bar');
+    World.currentTick = 100;
+    const player = makePlayer(99);
+    add(player, recipe.primaryName, recipe.primaryCount * 5);
+    const experienceBefore = player.stats[smithingStat];
+    openSmeltingInterface(player);
+    selectAmount(player, recipe, 5);
+    for (let tick = 0; tick < 12 && count(player, recipe.barName) === 0; tick++) advancePlayerTick(player);
+    assert.equal(count(player, recipe.barName), 1, 'first bar must complete before between-bar cancellation');
+    for (let tick = 0; tick < offset; tick++) advancePlayerTick(player);
+    assert.equal(player.delayed, false, 'between-bar movement must be admitted at arbitrary interior ticks');
+    assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 4, 'next unfinished bar must retain its ore');
+    const movement = new MoveClickHandler();
+    assert.equal(movement.handle(new MoveClick([{ x: player.x + 1, z: player.z }], 0, false), player), true);
+    assert.equal(weakQueueLength(player), 0, 'movement must clear every staged weak continuation');
+    driveUntilIdle(player, 24);
+    assert.equal(count(player, recipe.barName), 1, 'no further bar may complete after between-bar movement');
+    assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 4, 'movement must preserve unfinished ore');
+    assert.equal(player.stats[smithingStat] - experienceBefore, recipe.experience, 'only the completed bar gives XP');
+  }
+  console.log('RESULT PASS smelt-batch T3: nine bar recipes, all specified shortages and cancellations');
+}
+
+if (runGroup('T4')) {
+  const silver = recipes.get('silver_bar');
+  World.currentTick = 100;
+  const delayedPlayer = makePlayer(99);
+  add(delayedPlayer, silver.primaryName, 1);
+  delayedPlayer.vars[actionDelayVarpId] = 105;
+  openSmeltingInterface(delayedPlayer);
+  selectAmount(delayedPlayer, silver, 1);
+  assert.deepEqual(delayedPlayer.traceEvents.splice(0), [], 'future action_delay must queue without starting immediately');
+  assert.equal(weakQueueLength(delayedPlayer), 1, 'future action_delay must leave a queued start');
+  const animationTicks = [];
+  let startEvents = [];
+  for (let tick = 101; tick <= 105; tick++) {
+    advancePlayerTick(delayedPlayer);
+    const events = delayedPlayer.traceEvents.splice(0);
+    if (events.some(event => event.kind === 'animation')) {
+      animationTicks.push(World.currentTick);
+      startEvents = events;
+    }
+  }
+  assert.deepEqual(animationTicks, [105], 'first furnace animation must wait for the future action-delay tick');
+  assert.deepEqual(
+    startEvents.filter(event => event.kind === 'game'),
+    [{ kind: 'game', text: silver.processMessage }],
+    'the delayed start must print its process message on the animation tick'
+  );
+  assert.equal(delayedPlayer.vars[actionDelayVarpId], 108, 'starting a bar must set the donor action-delay window');
+  assert.equal(count(delayedPlayer, silver.barName), 0, 'the delayed start has not yet finished the bar');
+
+  const itemTrigger = ScriptProvider.getByName('[oplocu,_smithing_furnace]');
+  assert.ok(itemTrigger, 'packed item-on-furnace trigger is missing');
+  for (const furnaceName of ['viking_furnace', 'viking_furnace2']) {
+    for (const progress of [vikingComplete - 1, vikingComplete]) {
+      World.currentTick = 100;
+      const player = makePlayer(99);
+      add(player, 'iron_ore', 1);
+      player.lastUseItem = namedObject('iron_ore');
+      player.lastUseSlot = inventory(player).getItemIndex(player.lastUseItem);
+      player.vars[vikingVarpId] = progress;
+      const state = ScriptRunner.init(itemTrigger, player, furnace(furnaceName));
+      player.executeScript(state, true, true);
+      if (progress < vikingComplete) {
+        assert.deepEqual(player.messages, ['Only Fremenniks may use this furnace.'], `${furnaceName} below quest threshold message`);
+        assert.equal(player.traceEvents.some(event => event.kind === 'animation'), false, `${furnaceName} below threshold must not start smelting`);
+        assert.equal(count(player, 'iron_ore'), 1, `${furnaceName} below threshold must retain the ore`);
+        assert.equal(count(player, 'iron_bar'), 0, `${furnaceName} below threshold must make no bar`);
+        assert.equal(weakQueueLength(player), 0, `${furnaceName} below threshold must queue no work`);
+      } else {
+        const iron = recipes.get('iron_bar');
+        assert.deepEqual(player.messages, [iron.processMessage], `${furnaceName} at quest threshold must start smelting`);
+        assert.equal(player.traceEvents.filter(event => event.kind === 'animation').length, 1, `${furnaceName} at threshold must play the furnace animation`);
+        assert.equal(player.traceEvents.filter(event => event.kind === 'sound').length, 1, `${furnaceName} at threshold must play the furnace sound`);
+        assert.equal(count(player, 'iron_ore'), 1, `${furnaceName} at threshold consumes ore only at the finish`);
+        assert.equal(count(player, 'iron_bar'), 0, `${furnaceName} at threshold has not finished yet`);
       }
     }
-    assert.equal(observedProducts, quantity, `${bar.name} ${amount} product count`);
-    assert.equal(count(player, recipe.primaryName), 0, `${bar.name} ${amount} primary ore consumption`);
-    if (recipe.secondaryName !== null) assert.equal(count(player, recipe.secondaryName), 0, `${bar.name} ${amount} secondary coal consumption`);
-    assert.equal(count(player, recipe.barName), quantity, `${bar.name} ${amount} bars produced`);
-    assert.equal(player.stats[smithingStat] - experienceBefore, recipe.experience * quantity, `${bar.name} ${amount} Smithing XP`);
-    assert.deepEqual(player.messages, expectedMessages(recipe, quantity), `${bar.name} ${amount} process/product messages`);
-    // This direct-trigger fixture first drains queues on the following tick.
-    assert.equal(productTicks[0], startTick + 5, `${bar.name} ${amount} first queued finish`);
-    assert.deepEqual(
-      productTicks.slice(1).map((tick, index) => tick - productTicks[index]),
-      Array(quantity - 1).fill(5),
-      `${bar.name} ${amount} donor-staged completions must be five ticks apart`
-    );
-    assert.equal(weakQueueLength(player), 0, `${bar.name} ${amount} must finish without pending weak work`);
-    console.log(`SMELT_BATCH_TIMING=${JSON.stringify({ bar: bar.name, amount, productTicks })}`);
-    passingCases.push(`${bar.name} ${amount}`);
   }
+  console.log('RESULT PASS smelt-batch T4: action-delay start and both Rellekka furnace gates');
 }
 
-// Exhausted silver ore stops a requested batch after the available three bars.
-{
-  const recipe = recipes.get('silver_bar');
-  World.currentTick = 100;
-  const player = makePlayer(99);
-  add(player, recipe.primaryName, recipe.primaryCount * 3);
-  const experienceBefore = player.stats[smithingStat];
-  openSmeltingInterface(player);
-  selectAmount(player, testedBars[0], 10);
-  driveUntilIdle(player, 80);
-  assert.equal(count(player, recipe.barName), 3, 'silver smelting must stop when silver ore runs out');
-  assert.equal(count(player, recipe.primaryName), 0, 'silver ore depletion must be exact');
-  assert.equal(player.stats[smithingStat] - experienceBefore, recipe.experience * 3, 'silver depletion Smithing XP');
-  assert.deepEqual(player.messages, expectedMessages(recipe, 3), 'silver depletion must retain exactly three single-smelt messages');
-  assert.equal(weakQueueLength(player), 0, 'silver depletion must leave no weak continuation');
-}
-
-// Steel depletion is specifically coal exhaustion: spare iron proves no extra bar can be made.
-{
-  const recipe = recipes.get('steel_bar');
-  World.currentTick = 100;
-  const player = makePlayer(99);
-  add(player, recipe.primaryName, recipe.primaryCount * 5);
-  add(player, recipe.secondaryName, recipe.secondaryCount);
-  const experienceBefore = player.stats[smithingStat];
-  openSmeltingInterface(player);
-  selectAmount(player, testedBars[1], 10);
-  driveUntilIdle(player, 80);
-  assert.equal(count(player, recipe.barName), 1, 'steel smelting must stop when coal runs out');
-  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 4, 'coal depletion must not consume spare iron');
-  assert.equal(count(player, recipe.secondaryName), 0, 'steel coal depletion must be exact');
-  assert.equal(player.stats[smithingStat] - experienceBefore, recipe.experience, 'steel depletion Smithing XP');
-  assert.deepEqual(player.messages, expectedMessages(recipe, 1), 'steel depletion must preserve the one completed smelt messages');
-  assert.equal(countTextEvents(player, recipe.failureMessage), 1, 'published steel ingredient refusal must be shown once');
-  assert.equal(weakQueueLength(player), 0, 'steel depletion must leave no weak continuation');
-}
-
-// A level refusal runs the packed failure text and consumes no item or experience.
-for (const bar of testedBars) {
-  const recipe = recipes.get(bar.name);
-  World.currentTick = 100;
-  const player = makePlayer(recipe.level - 1);
-  add(player, recipe.primaryName, recipe.primaryCount);
-  if (recipe.secondaryName !== null) add(player, recipe.secondaryName, recipe.secondaryCount);
-  const experienceBefore = player.stats[smithingStat];
-  openSmeltingInterface(player);
-  selectAmount(player, bar, 1, null, false);
-  driveUntilIdle(player, 16);
-  assert.equal(count(player, recipe.barName), 0, `${bar.name} below level must not make a bar`);
-  assert.equal(count(player, recipe.primaryName), recipe.primaryCount, `${bar.name} below level must preserve primary ore`);
-  if (recipe.secondaryName !== null) assert.equal(count(player, recipe.secondaryName), recipe.secondaryCount, `${bar.name} below level must preserve coal`);
-  assert.equal(player.stats[smithingStat] - experienceBefore, 0, `${bar.name} below level must award no XP`);
-  assert.equal(countTextEvents(player, recipe.levelFailure), 1, `${bar.name} published level refusal must be shown once`);
-  assert.equal(weakQueueLength(player), 0, `${bar.name} level refusal must not queue another smelt`);
-}
-
-// Moving during an unfinished first bar cancels its finish: no ore, XP or bar is committed.
-{
-  const recipe = recipes.get('silver_bar');
-  World.currentTick = 100;
-  const player = makePlayer(99);
-  add(player, recipe.primaryName, recipe.primaryCount * 5);
-  const experienceBefore = player.stats[smithingStat];
-  openSmeltingInterface(player);
-  selectAmount(player, testedBars[0], 5);
-  advancePlayerTick(player);
-  assert.equal(player.delayed, false, 'a batch must not hold the player with p_delay');
-  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 5, 'unfinished bar must retain its ore');
-  const movement = new MoveClickHandler();
-  assert.equal(movement.handle(new MoveClick([{ x: player.x + 1, z: player.z }], 0, false), player), true);
-  assert.equal(weakQueueLength(player), 0, 'movement must cancel the unfinished completion');
-  driveUntilIdle(player, 24);
-  assert.equal(count(player, recipe.barName), 0, 'cancelled unfinished bar must not be made');
-  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 5, 'cancelled unfinished bar must keep all ore');
-  assert.equal(player.stats[smithingStat], experienceBefore, 'cancelled unfinished bar must give no XP');
-}
-
-// After one completed bar, cancel the next bar at two different interior ticks.
-for (const offset of [1, 2]) {
-  const recipe = recipes.get('silver_bar');
-  World.currentTick = 100;
-  const player = makePlayer(99);
-  add(player, recipe.primaryName, recipe.primaryCount * 5);
-  const experienceBefore = player.stats[smithingStat];
-  openSmeltingInterface(player);
-  selectAmount(player, testedBars[0], 5);
-  for (let tick = 0; tick < 12 && count(player, recipe.barName) === 0; tick++) advancePlayerTick(player);
-  assert.equal(count(player, recipe.barName), 1, 'first bar must complete before between-bar cancellation');
-  for (let tick = 0; tick < offset; tick++) advancePlayerTick(player);
-  assert.equal(player.delayed, false, 'between-bar movement must be admitted at arbitrary interior ticks');
-  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 4, 'next unfinished bar must retain its ore');
-  const movement = new MoveClickHandler();
-  assert.equal(movement.handle(new MoveClick([{ x: player.x + 1, z: player.z }], 0, false), player), true);
-  assert.equal(weakQueueLength(player), 0, 'movement must clear every staged weak continuation');
-  driveUntilIdle(player, 24);
-  assert.equal(count(player, recipe.barName), 1, 'no further bar may complete after between-bar movement');
-  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 4, 'movement must preserve unfinished ore');
-  assert.equal(player.stats[smithingStat] - experienceBefore, recipe.experience, 'only the completed bar gives XP');
-}
-
-console.log(`RESULT PASS smelt-batch: ${passingCases.length} amount/button cases, depletion, level refusal, movement interruption and packed single-smelt baseline`);
+console.log(`RESULT PASS smelt-batch groups: ${requestedGroup ?? 'T1,T2,T3,T4'}`);
 // Production imports retain engine resources; match the standalone packed-test lifecycle.
 process.exit(0);
