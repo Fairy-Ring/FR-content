@@ -245,3 +245,32 @@ val=0,5
 val=1,10
 val=2,12
 val=3,14
+
+// VERIFIED original ladder parents and the measured tile south of each ladder.
+[barrows_ladder_landing]
+inputtype=int
+outputtype=coord
+val=0,0_55_151_14_47
+val=1,0_55_151_48_47
+val=2,0_55_151_14_13
+val=3,0_55_151_48_13
+
+[barrows_ladder_corner_by_loc]
+inputtype=loc
+outputtype=int
+default=-1
+val=barrows_ladder_a,0
+val=barrows_ladder_c,1
+val=barrows_ladder_g,2
+val=barrows_ladder_i,3
+
+// Inverse of the original six slain-name identities, not a second selection.
+[barrows_identity_brother]
+inputtype=int
+outputtype=npc
+val=1,barrows_ahrim
+val=2,barrows_dharok
+val=3,barrows_guthan
+val=4,barrows_karil
+val=5,barrows_torag
+val=6,barrows_verac

@@ -1,5 +1,5 @@
-// Six original Search operations consume S00's brother/slain joins. The selected
-// hidden-tunnel crypt deliberately has no resident; S05 supplies its real route.
+// Six original Search operations consume the existing brother/slain joins.
+// Only the selected crypt offers its hidden tunnel; every other crypt has a resident.
 [oploc1,barrow_ahrim_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
 [oploc1,barrow_dharok_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
 [oploc1,barrow_guthan_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
@@ -12,7 +12,15 @@ if (~barrows_phase ! ^barrows_phase_unlooted | ~barrows_inside(coord) = false | 
 def_npc $brother = enum(loc, npc, barrows_sarcophagus_brother, $sarcophagus);
 if ($brother = null) return;
 def_int $identity = ~barrows_brother_identity($brother);
-if ($identity = 0 | $identity = ~barrows_tunnel_identity | ~barrows_brother_slain($identity) = true | ~barrows_brother_find($brother) = true) return;
+if ($identity = 0) return;
+if ($identity = ~barrows_tunnel_identity) {
+    def_int $generation = %barrows_generation;
+    def_coord $origin = coord;
+    ~mesbox("You've found a hidden tunnel, do you want to enter?");
+    if (~barrows_tunnel_enter($generation, $identity, $origin) = true) return;
+    return;
+}
+if (~barrows_brother_slain($identity) = true | ~barrows_brother_find($brother) = true) return;
 // Trace to the owner's legal approach tile, not the clipped sarcophagus origin.
 def_coord $spawn = map_findsquare(coord, ^barrows_crypt_spawn_min_radius, ^barrows_crypt_spawn_radius, ^map_findsquare_lineofwalk);
 if ($spawn = coord) return; // No eligible square: map_findsquare returns its origin.

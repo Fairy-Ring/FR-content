@@ -211,7 +211,13 @@ const ENUM_SIGNATURES = new Map([
     ['barrows_door_lock_state', ['int', 'string']],
     ['barrows_monster_level', ['npc', 'int']],
     ['barrows_door_class_npc', ['autoint', 'npc']],
-    ['barrows_door_draw_class', ['int', 'string']]
+    ['barrows_door_draw_class', ['int', 'string']],
+    ['barrows_central_lock_bit', ['int', 'int']],
+    ['barrows_side_first_lock_bit', ['int', 'int']],
+    ['barrows_side_second_lock_bit', ['int', 'int']],
+    ['barrows_ladder_landing', ['int', 'coord']],
+    ['barrows_ladder_corner_by_loc', ['loc', 'int']],
+    ['barrows_identity_brother', ['int', 'npc']]
 ]);
 
 

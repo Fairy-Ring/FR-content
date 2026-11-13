@@ -1,0 +1,24 @@
+// CANDIDATE: the selected sarcophagus uses the retained prompt and Continue.
+// The captured invocation cannot descend after a run or location change.
+[proc,barrows_tunnel_enter](int $generation, int $identity, coord $origin)(boolean)
+if (~barrows_phase ! ^barrows_phase_unlooted | %barrows_generation ! $generation | ~barrows_tunnel_identity ! $identity | coord ! $origin | ~barrows_inside($origin) = false | coordy($origin) ! 3) return(false);
+p_stopaction;
+p_telejump(enum(int, coord, barrows_ladder_landing, ~barrows_ladder_corner));
+~barrows_resume;
+return(true);
+
+// Trigger lookup resolves the visible child, while loc_type remains its parent.
+[oploc1,barrows_ladder]
+if (~barrows_tunnel_exit(loc_type) = true) return;
+
+[proc,barrows_tunnel_exit](loc $ladder)(boolean)
+if (~barrows_in_tunnels(coord) = false) return(false);
+if (~barrows_phase ! ^barrows_phase_unlooted & ~barrows_phase ! ^barrows_phase_paid) return(false);
+if (enum(loc, int, barrows_ladder_corner_by_loc, $ladder) ! ~barrows_ladder_corner) return(false);
+def_npc $brother = enum(int, npc, barrows_identity_brother, ~barrows_tunnel_identity);
+def_coord $entry = enum(npc, coord, barrows_brother_crypt_entry, $brother);
+p_stopaction;
+~barrows_close_presentation;
+p_telejump($entry);
+~barrows_resume;
+return(true);

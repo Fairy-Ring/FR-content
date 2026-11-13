@@ -130,8 +130,13 @@ await run(async () => {
       assert.equal(owned(p).length, 0, 'credited resident does not respawn');
       p.setVar(vars.barrows_kills, 0);
       p.setVar(vars.barrows_state, 0x12340008 | identity);
-      search(p, index);
-      assert.equal(owned(p).length, 0, 'selected tunnel crypt has no resident before S05');
+      approach(p, index);
+      const selected = ScriptRunner.init(ScriptProvider.getByName(`[oploc1,barrow_${name}_sarcophagus]`), p, sarcs[index]);
+      p.executeScript(selected, true, true);
+      assert.equal(selected.execution, ScriptState.PAUSEBUTTON, 'selected tunnel crypt opens the existing Continue prompt');
+      assert.equal(owned(p).length, 0, 'selected tunnel crypt has no resident');
+      p.closeModal();
+      assert.equal(p.activeScript, null, 'cancelling the selected prompt releases its script');
       p.setVar(vars.barrows_state, 0x12340010 | (identity === 6 ? 1 : identity + 1));
       search(p, index);
       assert.equal(owned(p).length, 0, 'paid Search never creates a crypt encounter');

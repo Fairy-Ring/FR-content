@@ -92,3 +92,11 @@ node --import tsx ../content/tests/barrows/test_topology.mjs
 The packed chooser enumerates all 324 connected masks with exactly one central entrance. The graph includes nine rooms and four paired exterior corridors. The tests cover rotations, access from every room, all four ladder corners, state writes before presentation, relog retention and the run-begin, paid-reset, wrong-answer and Search redraw events. Seeded wrong-answer and Search cases change the corner. Uniform sampling is an UNKNOWN engineering choice. Original door transforms remain personal. Their shared wall collision never changes.
 
 Open-door operations transfer between measured room-side tiles in the clicked lane. Central access remains closed until the later puzzle slice supplies authorization. No door encounter, puzzle or chest operation is reachable in this prefix.
+
+## Hidden tunnel (S05)
+
+```sh
+node --import tsx ../content/tests/barrows/test_tunnel.mjs
+```
+
+All six selected identities use the existing Continue prompt. The packed tests cover each identity at all four measured ladder landings, native button resumption and parent-ladder dispatch, cancellation, captured generation/identity/phase/origin guards and clean shared logout/login. The other five crypts still summon their residents. Entry and exit preserve unfinished progress and the already chosen layout; the visible ladder returns to the selected crypt's original entry join. No default-zero door layout or new selection is exposed.
