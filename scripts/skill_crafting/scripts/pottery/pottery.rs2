@@ -65,7 +65,11 @@ if (%onesmallfavour >= 35) {
 }
 def_namedobj $product;
 def_int $make_count;
-$product, $make_count = ~skillmulti3(pot_unfired, piedish_unfired, bowl_unfired);
+$product, $make_count = ~skill_multi3(
+    pot_unfired, 0, 2, 185, "\\n\\n\\n\\nPot",
+    piedish_unfired, 0, -4, 190, "\\n\\n\\n\\nPie Dish",
+    bowl_unfired, 0, 0, 200, "\\n\\n\\n\\nBowl"
+);
 if_close;
 if ($product = null) {
     ~displaymessage(^dm_default);
