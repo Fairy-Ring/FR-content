@@ -42,8 +42,8 @@
 ^barrows_generation_max = 2147483647
 ^barrows_actor_scan_radius = 32
 
-// UNKNOWN engineering crypt placement/lifetime and runtime-owner check cadence.
-^barrows_crypt_spawn_min_radius = 0
+// UNKNOWN engineering open-ring placement around the owner, lifetime and check cadence.
+^barrows_crypt_spawn_min_radius = 1
 ^barrows_crypt_spawn_radius = 2
 ^barrows_crypt_summon_lifetime = 1000
 ^barrows_owner_check_ticks = 1

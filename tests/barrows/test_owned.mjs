@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { createRunner, loadPackedRuntime, parseOptions, run } from './packed.mjs';
 
 await run(async () => {
   const runtime = await loadPackedRuntime(parseOptions());
   const { World, Loc, LocType, NpcType, VarPlayerType, VarNpcType, ScriptProvider, ScriptRunner, ScriptState, EntityLifeCycle, NpcMode, allocateIfAbsent, CoordGrid } = runtime;
+  const { changeLocCollision, isMapBlocked, isLineOfWalk } = await import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/GameMap.ts')).href);
   for (const name of ['barrows_sarc_search', 'barrows_brother_identity', 'barrows_brother_slain', 'barrows_brother_find', 'barrows_actor_spawn', 'barrows_actor_attackable', 'barrows_actor_tick']) {
     assert(ScriptProvider.getByName(`[proc,${name}]`), `compiled S03 proc missing [proc,${name}]`);
   }
@@ -18,6 +21,8 @@ await run(async () => {
   const owner = VarNpcType.getId('npc_barrows_owner');
   const generation = VarNpcType.getId('npc_barrows_generation');
   const combatTarget = VarNpcType.getId('npc_attacking_uid');
+  const attackDelay = VarNpcType.getId('npc_action_delay');
+  assert.notEqual(attackDelay, -1, 'native combat attack-delay field exists');
   for (const [name, id] of [['owner', owner], ['generation', generation], ['combat target', combatTarget]]) assert.notEqual(id, -1, `missing NPC ${name}`);
   const rows = [
     ['ahrim', 3555, 9698, 0], ['dharok', 3554, 9714, 3], ['guthan', 3538, 9703, 1],
@@ -43,18 +48,28 @@ await run(async () => {
     const id = LocType.getId(`barrow_${name}_sarcophagus`);
     assert.notEqual(id, -1, `missing original ${name} sarcophagus`);
     const type = LocType.get(id);
-    // This transport-free fixture allocates only the placement search radius.
-    // Natural live Search supplies the actual terrain/walkability proof.
-    for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) allocateIfAbsent(x + dx, z + dz, 3);
-    return new Loc(3, x, z, type.width, type.length, EntityLifeCycle.RESPAWN, id, 10, angle);
+    // Apply the packed loc's real shape, rotation and clipping. Other terrain is
+    // still a live concern; empty allocated tiles are not a placement proof.
+    for (let dx = -4; dx <= 6; dx++) for (let dz = -4; dz <= 6; dz++) allocateIfAbsent(x + dx, z + dz, 3);
+    const loc = new Loc(3, x, z, type.width, type.length, EntityLifeCycle.RESPAWN, id, 10, angle);
+    clipSarc(loc, true);
+    return loc;
   }
   const sarcs = rows.map(sarc);
+  function clipSarc(loc, add) {
+    const type = LocType.get(loc.type);
+    changeLocCollision(loc.shape, loc.angle, type.blockrange, type.length, type.width, type.active, loc.x, loc.z, loc.level, add);
+  }
+  function approach(p, index) {
+    const loc = sarcs[index];
+    const type = LocType.get(loc.type);
+    p.level = loc.level;
+    p.x = loc.x + ((loc.angle & 1) === 1 ? type.length : type.width);
+    p.z = loc.z;
+  }
   function search(p, index = 1) {
-    const row = rows[index];
-    p.level = 3;
-    p.x = row[1] + 2;
-    p.z = row[2];
-    call(p, `[oploc1,barrow_${row[0]}_sarcophagus]`, [], sarcs[index]);
+    approach(p, index);
+    call(p, `[oploc1,barrow_${rows[index][0]}_sarcophagus]`, [], sarcs[index]);
   }
   function tick(npc) {
     const name = NpcType.get(npc.type).debugname;
@@ -65,13 +80,13 @@ await run(async () => {
     assert.equal(state.execution, ScriptState.FINISHED, `${name} owner timer must finish without a suspension or abort`);
   }
   try {
+    World.currentTick = 100;
     for (let index = 0; index < rows.length; index++) {
       const name = rows[index][0];
       const identity = index + 1;
       const p = player(name, identity === 6 ? 1 : identity + 1, 100 + identity);
       const bystander = player(`${name}_bystander`);
-      bystander.x = rows[index][1] + 2;
-      bystander.z = rows[index][2];
+      approach(bystander, index);
       const type = NpcType.getId(`barrows_${name}`);
       assert.equal(procInt(p, 'barrows_brother_identity', [type]), identity, `${name} consumes its original slain-name join`);
       assert.equal(procInt(p, 'barrows_brother_slain', [identity]), 0, 'fresh identity is uncredited');
@@ -87,8 +102,24 @@ await run(async () => {
       assert.equal(actor.target, p, `${name} targets its searching owner at spawn`);
       assert.notEqual(actor.target, bystander, `${name} does not target the second player on the owner's tile`);
       assert.equal(actor.timerInterval, 1, 'spawn arms the one-tick native ownership timer');
-      assert(Math.max(Math.abs(actor.x - rows[index][1]), Math.abs(actor.z - rows[index][2])) <= 2, 'spawn stays within the configured crypt radius');
+      const distanceFromOwner = Math.max(Math.abs(actor.x - p.x), Math.abs(actor.z - p.z));
+      assert(distanceFromOwner >= 1 && distanceFromOwner <= 2, 'spawn stays in the configured open ring around the searching owner');
       assert.equal(actor.level, 3, 'crypt actor stays on the crypt level');
+      assert.equal(isMapBlocked(p.x, p.z, p.level), false, `${name} owner has a legal approach square`);
+      assert.equal(isMapBlocked(sarcs[index].x, sarcs[index].z, 3), true, `${name} sarcophagus anchor is clipped`);
+      assert.equal(isMapBlocked(actor.x, actor.z, actor.level), false, `${name} does not spawn in the clipped sarcophagus`);
+      assert.equal(isLineOfWalk(3, actor.x, actor.z, p.x, p.z), true, `${name} spawn can approach its searching owner`);
+      for (let turn = 0; turn < 3 && actor.getVar(attackDelay) <= World.currentTick; turn++) {
+        World.currentTick++;
+        // Normal World turn preparation after the spawn's INSTANT frame.
+        actor.lastTickX = actor.x;
+        actor.lastTickZ = actor.z;
+        actor.moveSpeed = actor.defaultMoveSpeed();
+        actor.walkDir = -1;
+        actor.runDir = -1;
+        actor.turn();
+      }
+      assert(actor.getVar(attackDelay) > World.currentTick, `${name} native turns begin ordinary combat without owner retaliation`);
       assert.deepEqual(snapshot(p), before, 'Search itself grants no credit or run mutation');
       search(p, index);
       assert.deepEqual(owned(p), [actor], 'same owner and generation cannot duplicate a living resident');
@@ -105,6 +136,26 @@ await run(async () => {
       search(p, index);
       assert.equal(owned(p).length, 0, 'paid Search never creates a crypt encounter');
     }
+    const enclosed = player('enclosed_ring', 3, 777);
+    approach(enclosed, 1);
+    const clippedRing = [];
+    try {
+      for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
+        const x = enclosed.x + dx;
+        const z = enclosed.z + dz;
+        if ((dx === 0 && dz === 0) || isMapBlocked(x, z, 3)) continue;
+        changeLocCollision(10, 0, false, 1, 1, 0, x, z, 3, true);
+        clippedRing.push({ x, z });
+      }
+      assert.equal(isMapBlocked(enclosed.x, enclosed.z, 3), false, 'sealed-ring owner is a legal origin control');
+      search(enclosed);
+      assert.equal(owned(enclosed).length, 0, 'no eligible square does not spawn on the returned owner-origin sentinel');
+    } finally {
+      for (const { x, z } of clippedRing) changeLocCollision(10, 0, false, 1, 1, 0, x, z, 3, false);
+    }
+    search(enclosed);
+    assert.equal(owned(enclosed).length, 1, 'restored open ring is a positive spawn control');
+    World.removeNpc(owned(enclosed)[0], -1);
     assert.equal(procInt(players[0], 'barrows_brother_identity', [NpcType.getId('barrows_rat')]), 0, 'ordinary monster has no brother identity');
     for (const identity of [-1, 0, 7]) assert.equal(procInt(players[0], 'barrows_brother_slain', [identity]), 0, 'invalid identity cannot read another bit');
 
@@ -170,6 +221,7 @@ await run(async () => {
     assert.equal(actors().length, noSpawnBefore, 'idle state cannot construct a run actor');
     console.log('PASS S03 six compiled Searches, sourced spawn text, immediate owner targeting, attack gates and cleanup/retry');
   } finally {
+    for (const loc of sarcs) clipSarc(loc, false);
     for (const npc of Array.from(World.npcs)) if (npc.isActive) World.removeNpc(npc, -1);
     for (const p of players) delete World.players[p.slot];
   }
