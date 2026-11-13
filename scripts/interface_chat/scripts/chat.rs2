@@ -695,8 +695,6 @@ switch_component (last_com) {
 }
 
 [proc,skill_multi2](namedobj $obj1, int $x1, int $y1, int $scale1, string $string1, namedobj $obj2, int $x2, int $y2, int $scale2, string $string2)(namedobj, int)
-if_openchat(skillmulti2);
-
 if_setposition(skillmulti2:com_2, $x1, $y1);
 if_setposition(skillmulti2:com_3, $x2, $y2);
 
@@ -706,6 +704,8 @@ if_setobject(skillmulti2:com_3, $obj2, $scale2);
 if_settext(skillmulti2:com_12, "What would you like to make?");
 if_settext(skillmulti2:com_7, $string1);
 if_settext(skillmulti2:com_11, $string2);
+// Order adapted to the 377 client: opening after setters repaints the chat area.
+if_openchat(skillmulti2);
 
 if_addresumebutton(skillmulti2:com_7);
 if_addresumebutton(skillmulti2:com_6);
@@ -740,8 +740,6 @@ switch_component ($last_com) {
 }
 
 [proc,skill_multi2_header](string $header, namedobj $obj1, int $x1, int $y1, int $scale1, string $string1, namedobj $obj2, int $x2, int $y2, int $scale2, string $string2)(namedobj, int)
-if_openchat(skillmulti2);
-
 if_setposition(skillmulti2:com_2, $x1, $y1);
 if_setposition(skillmulti2:com_3, $x2, $y2);
 
@@ -751,6 +749,7 @@ if_setobject(skillmulti2:com_3, $obj2, $scale2);
 if_settext(skillmulti2:com_12, $header);
 if_settext(skillmulti2:com_7, $string1);
 if_settext(skillmulti2:com_11, $string2);
+if_openchat(skillmulti2);
 
 if_addresumebutton(skillmulti2:com_7);
 if_addresumebutton(skillmulti2:com_6);
@@ -785,8 +784,6 @@ switch_component ($last_com) {
 }
 
 [proc,skill_multi3](namedobj $obj1, int $x1, int $y1, int $scale1, string $string1, namedobj $obj2, int $x2, int $y2, int $scale2, string $string2, namedobj $obj3, int $x3, int $y3, int $scale3, string $string3)(namedobj, int)
-if_openchat(skillmulti3);
-
 if_setposition(skillmulti3:com_2, $x1, $y1);
 if_setposition(skillmulti3:com_3, $x2, $y2);
 if_setposition(skillmulti3:com_4, $x3, $y3);
@@ -799,6 +796,7 @@ if_settext(skillmulti3:com_17, "What would you like to make?");
 if_settext(skillmulti3:com_8, $string1);
 if_settext(skillmulti3:com_12, $string2);
 if_settext(skillmulti3:com_16, $string3);
+if_openchat(skillmulti3);
 
 if_addresumebutton(skillmulti3:com_8);
 if_addresumebutton(skillmulti3:com_7);
@@ -844,8 +842,6 @@ switch_component ($last_com) {
 
 [proc,skill_multi4](namedobj $obj1, int $x1, int $y1, int $scale1, string $string1, namedobj $obj2, int $x2, int $y2, int $scale2, string $string2,
                     namedobj $obj3, int $x3, int $y3, int $scale3, string $string3, namedobj $obj4, int $x4, int $y4, int $scale4, string $string4)(namedobj, int)
-if_openchat(skillmulti4);
-
 if_setposition(skillmulti4:com_2, $x1, $y1);
 if_setposition(skillmulti4:com_3, $x2, $y2);
 if_setposition(skillmulti4:com_4, $x3, $y3);
@@ -861,6 +857,7 @@ if_settext(skillmulti4:com_9, $string1);
 if_settext(skillmulti4:com_13, $string2);
 if_settext(skillmulti4:com_17, $string3);
 if_settext(skillmulti4:com_21, $string4);
+if_openchat(skillmulti4);
 
 if_addresumebutton(skillmulti4:com_9);
 if_addresumebutton(skillmulti4:com_8);
@@ -917,8 +914,6 @@ switch_component ($last_com) {
 [proc,skill_multi5](namedobj $obj1, int $x1, int $y1, int $scale1, string $string1, namedobj $obj2, int $x2, int $y2, int $scale2, string $string2,
                     namedobj $obj3, int $x3, int $y3, int $scale3, string $string3, namedobj $obj4, int $x4, int $y4, int $scale4, string $string4,
                     namedobj $obj5, int $x5, int $y5, int $scale5, string $string5)(namedobj, int)
-if_openchat(skillmulti5);
-
 if_setposition(skillmulti5:com_2, $x1, $y1);
 if_setposition(skillmulti5:com_3, $x2, $y2);
 if_setposition(skillmulti5:com_4, $x3, $y3);
@@ -937,6 +932,7 @@ if_settext(skillmulti5:com_14, $string2);
 if_settext(skillmulti5:com_18, $string3);
 if_settext(skillmulti5:com_22, $string4);
 if_settext(skillmulti5:com_26, $string5);
+if_openchat(skillmulti5);
 
 if_addresumebutton(skillmulti5:com_10);
 if_addresumebutton(skillmulti5:com_9);

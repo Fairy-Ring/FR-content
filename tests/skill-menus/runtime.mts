@@ -156,6 +156,20 @@ function assertMenuPackets(
   );
   const promptId = requiredComponent(`${rootName}:com_${promptIndex(size)}`);
   const observed = packetLog.get(p)!.slice(firstPacket);
+  const openIndex = observed.findIndex(
+    (packet) => packet instanceof IfOpenChat && packet.component === rootId,
+  );
+  const lastSetter = observed.findLastIndex(
+    (packet) =>
+      ((packet instanceof IfSetPosition || packet instanceof IfSetObject) &&
+        modelIds.has(packet.component)) ||
+      (packet instanceof IfSetText &&
+        (makeOneIds.has(packet.component) || packet.component === promptId)),
+  );
+  assert(
+    lastSetter >= 0 && openIndex > lastSetter,
+    `${rootName} must open after its last setter so the 377 client repaints`,
+  );
 
 
   assert.deepEqual(
