@@ -108,6 +108,34 @@ for (let variant = 1; variant <= 7; variant++) {
   console.log(`PASS packed Ice death ${variant}: online sole hero, native removal and credit1`);
 }
 
+for (const countBefore of [0, 4]) {
+  for (const [name, expectedCount] of [
+    ["ice_wolf_5", countBefore],
+    ["trollrescue_icetroll_melee1", countBefore + 1],
+  ] as const) {
+    hero.setVarBit(countBit, countBefore);
+    const npc = actor(name);
+    if (name === "ice_wolf_5") assert.equal(npc.type, 1955);
+    assert.equal(hero.getVarBit(stageBit), 10);
+    assert.equal(hero.getVarBit(VarBitType.getId("fd_icewarrior_subquest")), 1);
+    assert.equal(World.getPlayerByHash64(hero.hash64), hero);
+    npc.heroPoints.addHero(hero.hash64, npc.levels[NpcStat.HITPOINTS]);
+    assert.equal(npc.heroPoints.findHero(), hero.hash64, "online sole hero");
+    const state = death(npc);
+    assert.equal(state.execution, ScriptState.FINISHED, `${name} death completes`);
+    assert.equal(npc.isActive, false, `${name} native removal completes`);
+    assert(hero.canAccess(), "native protected queue can run");
+    for (let turn = 0; turn < 3; turn++) {
+      World.currentTick++;
+      hero.processQueues();
+    }
+    assert.equal(hero.getVarBit(countBit), expectedCount,
+      `${name} death at count${countBefore}: only an Ice troll earns credit`);
+    console.log(`PASS packed ${name} death: type${npc.type}, online sole hero, ` +
+      `native removal, count${countBefore}->${expectedCount}; ${state.script.name}`);
+  }
+}
+
 // Published control: no S5 death handler is on this call path. The winning hero
 // logged out after 85 damage; the online last attacker supplies the remaining 15.
 const shade = actor("shade_level1");
