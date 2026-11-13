@@ -945,6 +945,60 @@ function testTuraelPredicate() {
     return results;
 }
 
+function drawLiveRowEndpoints(masterKey, suffix, fixture) {
+    const master = ORACLE.masters.find(entry => entry.key === masterKey);
+    const index = MASTER_TABLES[masterKey].findIndex(([name]) => name === suffix);
+    assert(index >= 0, `${masterKey}_${suffix}: no fixed row oracle`);
+    const [, category, weight, min, max] = MASTER_TABLES[masterKey][index];
+    const target = Number(ORACLE.constants.get(`slayer_${category}`));
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters[masterKey]);
+    applyFixture(player, fixture);
+    assert.equal(combatLevel(player), fixture.combat, 'live-table endpoint fixture combat');
+    assert.equal(runInt(player, '[proc,validate_slayer_target]', npc, [target]).value, 1, `${masterKey}_${suffix}: real validator positive control`);
+    return ['min', 'max'].map(side => {
+        const prior = sentinelTask(player);
+        const trace = traceWrites(player);
+        let random;
+        try {
+            const stream = [...Array(index).fill(1 - Number.EPSILON), 0, side === 'min' ? 0 : 1 - Number.EPSILON];
+            random = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id]));
+        } finally { trace.restore(); }
+        const count = side === 'min' ? min : max;
+        assert.equal(random.result.value, 1, `${masterKey}_${suffix}: real master table must assign`);
+        assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count'], 'live-table protected write order');
+        assert.equal(player.getVar(IDS.target), target, `${masterKey}_${suffix}: real master target`);
+        assert.equal(player.getVar(IDS.count), count, `${masterKey}_${suffix}: inclusive ${side} endpoint`);
+        assert.equal(gemCount(player), 0, 'direct generator must not grant introductory gem');
+        return { master: masterKey, row: suffix, target, weight, endpoint: side, count, fixture: recordFixture(fixture), prior, randomValues: random.observed, opcount: random.result.opcount };
+    });
+}
+
+function testErnestGate(masterKey) {
+    const target = Number(ORACLE.constants.get('slayer_killerwatt'));
+    assert.equal(Number(ORACLE.constants.get('haunted_complete')), 3, 'Ernest completion must remain inherited state 3');
+    assert.deepEqual(ORACLE.questGates.get(target), { variable: 'haunted', thresholdName: 'haunted_complete', threshold: 3 }, 'killerwatt must use Ernest, not Haunted Mine');
+    const fixture = { ...FIXTURES.get(`${masterKey}:high`), questValues: { ...ORACLE.questValues, haunted: 3 } };
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters[masterKey]);
+    const states = [];
+    for (const haunted of [0, 1, 2, 3, 4]) {
+        applyFixture(player, { ...fixture, questValues: { ...fixture.questValues, haunted } });
+        const prior = sentinelTask(player);
+        const trace = traceWrites(player);
+        let result;
+        try { result = runInt(player, '[proc,validate_slayer_target]', npc, [target]); }
+        finally { trace.restore(); }
+        assert.equal(result.value, haunted >= 3 ? 1 : 0, `${masterKey}: killerwatt Ernest state ${haunted}`);
+        assert.deepEqual(trace.events, [], 'existing Ernest validation must not write task state');
+        assert.equal(player.getVar(IDS.target), prior.target);
+        assert.equal(player.getVar(IDS.count), prior.count);
+        states.push({ haunted, accepted: result.value === 1, opcount: result.opcount });
+    }
+    return { master: masterKey, historicalRule: 'UNKNOWN: keeps the Lost City value', states, endpoints: drawLiveRowEndpoints(masterKey, 'killerwatts', fixture) };
+}
+
+
 function testOldTableRepairs(basePack) {
     loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
     const results = [];
@@ -1551,6 +1605,7 @@ function testCurrentSuite() {
     const packedRows = assertPackedLiveRows();
     const masterSnapshots = testMasterSnapshots();
     const turaelPredicate = testTuraelPredicate();
+    const ernest = ['mazchna', 'vannaka'].filter(key => MASTER_TABLES[key]).map(testErnestGate);
     const admission = testCombatAndMasterAdmission();
     const harpieThreshold = testHarpieThreshold();
     const thresholds = testThresholds();
@@ -1597,7 +1652,7 @@ function testCurrentSuite() {
     const dispatch = testDispatchAndOneShotOrder(packedRows);
     const teachingAdmission = testCurrentTeachingAdmission();
     const teachingSuccess = testCurrentTeachingSuccess();
-    return { packedRows, masterSnapshots, turaelPredicate, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+    return { packedRows, masterSnapshots, turaelPredicate, ernest, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
 }
 
 function fixtureSourceRows() {
@@ -1958,6 +2013,7 @@ try {
             packedRows: Object.fromEntries([...current.packedRows].map(([name, master]) => [name, { memberOccurrences: master.rows.length }])),
             masterSnapshots: current.masterSnapshots,
             turaelPredicate: current.turaelPredicate,
+            ernest: current.ernest,
             admission: current.admission,
             harpieThreshold: current.harpieThreshold,
             thresholds: current.thresholds,
