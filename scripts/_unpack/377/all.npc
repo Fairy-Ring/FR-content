@@ -37272,6 +37272,10 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=npc_gnomepilot_head
+wanderrange=0
+maxrange=0
+moverestrict=nomove
+defaultmode=none
 
 [waydar]
 name=Waydar
@@ -37300,6 +37304,8 @@ resizev=150
 op1=Talk-to
 vislevel=hide
 head1=npc_commander_montai_head
+wanderrange=2
+maxrange=2
 
 [mm_garkor_final_battle]
 name=Garkor
@@ -37337,6 +37343,8 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+wanderrange=2
+maxrange=2
 
 [mm_lumo_final_battle]
 name=Lumo
@@ -37373,6 +37381,8 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+wanderrange=2
+maxrange=2
 
 [mm_bunkdo_final_battle]
 name=Bunkdo
@@ -37407,6 +37417,8 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+wanderrange=2
+maxrange=2
 
 [mm_carado_final_battle]
 name=Carado
@@ -37454,6 +37466,8 @@ readyanim=m_assassin_ready
 op1=Talk-to
 vislevel=hide
 head1=npc_1420_head
+wanderrange=2
+maxrange=2
 
 [mm_karam_final_battle]
 name=Karam
@@ -37480,6 +37494,8 @@ readyanim=m_assassin_ready
 op1=Talk-to
 vislevel=hide
 head1=npc_1420_head
+wanderrange=2
+maxrange=2
 
 [mm_bunkwicket]
 name=Bunkwicket
@@ -37496,6 +37512,10 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+defaultmode=none
+wanderrange=0
+maxrange=0
+moverestrict=nomove
 
 [mm_waymottin]
 name=Waymottin
@@ -37512,6 +37532,10 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+defaultmode=none
+wanderrange=0
+maxrange=0
+moverestrict=nomove
 
 [mm_zooknock]
 name=Zooknock
@@ -37532,6 +37556,8 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=npc_1425_head
+wanderrange=2
+maxrange=2
 
 [mm_zooknock_final_battle]
 name=Zooknock
@@ -37589,6 +37615,9 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [mm_dugopul]
 name=Dugopul
@@ -37874,6 +37903,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 blockwalk=none
+param=death_drop,mm_medium_ninja_monkey_bones
 [mm_oipuis]
 name=Oipuis
 desc=A large ninja monkey wielding two scimitars.
@@ -37903,6 +37933,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 blockwalk=none
+param=death_drop,mm_medium_ninja_monkey_bones
 [mm_uyoro]
 name=Uyoro
 desc=A large ninja monkey wielding two scimitars.
@@ -37932,6 +37963,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 blockwalk=none
+param=death_drop,mm_medium_ninja_monkey_bones
 [mm_ouhai]
 name=Ouhai
 desc=A large ninja monkey wielding two scimitars.
@@ -37961,6 +37993,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 blockwalk=none
+param=death_drop,mm_medium_ninja_monkey_bones
 [mm_uodai]
 name=Uodai
 desc=A large ninja monkey wielding two scimitars.
@@ -38581,6 +38614,9 @@ readyanim=human_ready
 vislevel=hide
 head1=idk_man_hair_long_head
 head2=idk_man_jaw_moustache_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [mm_skeleton]
 name=Skeleton
