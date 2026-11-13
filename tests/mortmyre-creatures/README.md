@@ -1,11 +1,13 @@
 # Mort Myre creature packed test
 
-Build the sibling engine, then run from its directory:
+Use the engine pinned by `.github/fr-engine-ref`. Build the sibling engine, then run from its directory:
 
 ```sh
 npm run build
 node --import tsx ../content/tests/mortmyre-creatures/test_mortmyre_creatures.mjs
 ```
+
+If `HARNESS_ENGINE_DIR` selects another engine tree, run from that engine's directory too. The TypeScript module aliases and the loaded config pack must use the same engine instance.
 
 The test loads the real server config and compiled scripts, executes them on engine NPC/player entities, and controls only the random source and test fixtures. It never starts a world or reads git history. Config IDs are resolved by name from the current pack.
 
