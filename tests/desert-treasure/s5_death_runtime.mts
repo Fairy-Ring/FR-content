@@ -23,10 +23,17 @@ import { BlockWalk } from "#/engine/entity/BlockWalk.js";
 import Npc from "#/engine/entity/Npc.js";
 import { NpcStat } from "#/engine/entity/NpcStat.js";
 import Player from "#/engine/entity/Player.js";
+import Loc from "#/engine/entity/Loc.js";
+import { allocateIfAbsent } from "#/engine/routefinder/index.js";
 import ScriptProvider from "#/engine/script/ScriptProvider.js";
 import ScriptRunner from "#/engine/script/ScriptRunner.js";
 import ScriptState from "#/engine/script/ScriptState.js";
 import ServerTriggerType from "#/engine/script/ServerTriggerType.js";
+import { ScriptOpcode } from "#/engine/script/ScriptOpcode.js";
+import ResumePauseButtonHandler from "#/network/game/client/handler/ResumePauseButtonHandler.js";
+import ResumePauseButton from "#/network/game/client/model/ResumePauseButton.js";
+import IfSetText from "#/network/game/server/model/IfSetText.js";
+import MessageGame from "#/network/game/server/model/MessageGame.js";
 import World from "#/engine/World.js";
 
 for (const config of [VarPlayerType, VarBitType, VarNpcType, ParamType, ObjType,
@@ -135,6 +142,110 @@ for (const countBefore of [0, 4]) {
       `native removal, count${countBefore}->${expectedCount}; ${state.script.name}`);
   }
 }
+// Run the original packed Wear/Remove, ledge and Tenzing handlers, not test procs.
+const inv = InvType.getId("inv");
+const worn = InvType.getId("worn");
+const boots = ObjType.getByName("death_spikedboots")!;
+assert(boots && boots.wearpos >= 0);
+const refusal = "Trying to walk in these would be difficult. I'll carry them for now.";
+const wear = ScriptProvider.getByTrigger(ServerTriggerType.OPHELD2, boots.id, boots.category)!;
+assert(wear);
+if (process.env.DTS5_BOOTS_REFUSAL_MUTANT === "1") {
+  // Isolated in-memory mutant of this one handler: the published unconditional refusal.
+  wear.opcodes = [ScriptOpcode.PUSH_CONSTANT_STRING, ScriptOpcode.MES, ScriptOpcode.RETURN];
+  wear.intOperands = [0, 0, 0];
+  wear.stringOperands = [refusal, "", ""];
+}
+function output(): string {
+  return packets.map(packet => packet instanceof IfSetText ? packet.text :
+    packet instanceof MessageGame ? packet.msg : "").join("\n");
+}
+function runPacked(trigger: NonNullable<ReturnType<typeof ScriptProvider.getByTrigger>>,
+  target: Npc | Loc | null = null): void {
+  const state = ScriptRunner.init(trigger, hero, target);
+  hero.executeScript(state, true);
+  for (let turn = 0; turn < 100 && state.execution !== ScriptState.FINISHED; turn++) {
+    assert.notEqual(state.execution, ScriptState.ABORTED, `${trigger.name} aborted`);
+    if (state.execution === ScriptState.PAUSEBUTTON) {
+      assert(new ResumePauseButtonHandler().handle(new ResumePauseButton(), hero));
+    } else if (state.execution === ScriptState.SUSPENDED) {
+      World.currentTick = Math.max(World.currentTick + 1, hero.delayedUntil);
+      hero.delayed = false;
+      hero.executeScript(state, true, true);
+    } else assert.fail(`unexpected ${trigger.name} suspension ${state.execution}`);
+  }
+  assert.equal(state.execution, ScriptState.FINISHED, trigger.name);
+}
+hero.baseLevels.fill(1);
+hero.levels.fill(1);
+hero.x = 2836; hero.z = 3700; hero.level = 0;
+hero.invSet(inv, boots.id, 1, 0);
+hero.lastItem = boots.id; hero.lastSlot = 0;
+packets.length = 0;
+runPacked(wear);
+assert.equal(hero.invTotal(inv, boots.id), 1, "outside Wear leaves inventory unchanged");
+assert.equal(hero.invTotal(worn, boots.id), 0, "outside Wear cannot equip");
+assert(output().includes(refusal), "outside Wear retains the exact published refusal");
+console.log("PASS packed spiked-boots Wear outside the Ice area: exact refusal, still carried");
+
+hero.x = 2837; hero.z = 3805;
+runPacked(wear);
+assert.equal(hero.invGetSlot(worn, boots.wearpos)?.id, boots.id,
+  "inside Wear equips spiked boots at the ledge hint tile with no skill requirement");
+assert.equal(hero.invTotal(inv, boots.id), 0);
+console.log("PASS packed spiked-boots Wear inside the Ice area: feet slot, level1 skills");
+const remove = ScriptProvider.getByTrigger(ServerTriggerType.INV_BUTTON1,
+  Component.getId("wornitems:worn"), -1)!;
+assert(remove);
+hero.lastSlot = boots.wearpos;
+runPacked(remove);
+assert.equal(hero.invTotal(worn, boots.id), 0);
+assert.equal(hero.invTotal(inv, boots.id), 1, "Remove returns boots to inventory");
+console.log("PASS packed spiked-boots Remove: no worn boots, one carried");
+
+hero.setVarBit(VarBitType.getId("fd_icewarrior_dead"), 1);
+const ledgeType = LocType.getByName("trollrescue_blankmodel")!;
+assert(ledgeType);
+const ledge = new Loc(0, 2837, 3804, 1, 1, EntityLifeCycle.RESPAWN,
+  ledgeType.id, 10, 0);
+const climb = ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1,
+  ledgeType.id, ledgeType.category)!;
+assert(climb);
+packets.length = 0;
+runPacked(climb, ledge);
+assert.equal(hero.level, 0, "carried boots do not admit the ledge");
+assert.equal(hero.getVarBit(VarBitType.getId("fd_icewarrior_bootshint")), 1);
+assert(output().includes("without some spiked boots"));
+hero.lastSlot = hero.getInventory(inv)!.items.findIndex(item => item?.id === boots.id);
+runPacked(wear);
+// This trigger test has no world map loader: allocate the real destination zone.
+allocateIfAbsent(2838, 3803, 1);
+runPacked(climb, ledge);
+assert.equal(hero.level, 1, "worn boots admit the original local height transition");
+assert.equal(hero.invGetSlot(worn, boots.wearpos)?.id, boots.id);
+console.log("PASS packed ledge: carried boots hint; worn boots admit level1");
+hero.lastSlot = boots.wearpos;
+runPacked(remove);
+
+// Tenzing consumes inventory supplies, not equipment; the published flow is unchanged.
+hero.baseLevels.fill(99); hero.levels.fill(99);
+hero.x = 2822; hero.z = 3554; hero.level = 0;
+hero.setVar(VarPlayerType.getId("death_equiproom"), 70);
+hero.setVar(VarPlayerType.getId("death_map"), 5);
+const bread = ObjType.getId("bread"), trout = ObjType.getId("trout");
+hero.invAdd(inv, bread, 10); hero.invAdd(inv, trout, 10);
+const tenzing = actor("death_sherpa");
+const handin = ScriptProvider.getByTrigger(ServerTriggerType.OPNPC1,
+  tenzing.type, NpcType.get(tenzing.type).category)!;
+assert(handin);
+runPacked(handin, tenzing);
+assert.equal(hero.getVar(VarPlayerType.getId("death_map")) & 15, 7,
+  "inventory hand-in reaches the original map-given state");
+assert.equal(hero.invTotal(inv, boots.id), 0);
+assert.equal(hero.invTotal(inv, bread), 0);
+assert.equal(hero.invTotal(inv, trout), 0);
+assert.equal(hero.invTotal(inv, ObjType.getId("death_secretwaymap")), 1);
+console.log("PASS packed Death Plateau hand-in: one carried boots, ten bread/trout, map received");
 
 // Published control: no S5 death handler is on this call path. The winning hero
 // logged out after 85 damage; the online last attacker supplies the remaining 15.
