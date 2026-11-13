@@ -1,0 +1,35 @@
+// VERIFIED: 377 loc/NPC/object identities and original varbit mappings are unchanged.
+// CANDIDATE: action-level gates from the retained 2007-base product contract.
+^dt_smoke_mask_slayer = 10
+^dt_smoke_torch_firemaking = 50
+
+// CANDIDATE: later Smoke Dungeon account, excluding later helmets/toggle/HUD.
+^dt_smoke_damage = 20
+^dt_smoke_damage_interval = 20
+
+// UNKNOWN: no retained period source gives the exact torch lifetime.
+// Product reconstruction: each newly lit torch lasts 300 server ticks; relighting
+// an already lit torch does not extend it. These are not claimed as authentic 377.
+^dt_smoke_torch_lifetime = 300
+
+// VERIFIED: these bounds cover the two baked Smoke Dungeon mapsquares.
+^dt_smoke_sw = 0_50_146_0_0
+^dt_smoke_ne = 0_51_146_63_63
+// CANDIDATE reconstruction destinations adjacent to the sourced well/rope/gate.
+// The offline topology test loads the packed 377 floor and loc collision.
+^dt_smoke_arrival = 0_50_146_6_35
+^dt_smoke_surface = 0_51_46_46_17
+^dt_smoke_gate_inside = 0_51_146_42_31
+^dt_smoke_gate_outside = 0_51_146_40_31
+^dt_fareed_room_sw = 0_51_146_42_29
+^dt_fareed_room_ne = 0_51_146_47_35
+^dt_fareed_spawn = 0_51_146_45_32
+
+// UNKNOWN: period sources establish melee + fire magic, not the selection odds,
+// exact fire spell, maximum magic hit, appearance delay or actor lifetime.
+// The product uses the shared Fire Bolt resolver, a 20 cap from the later Fareed
+// account, equal selection odds, and the existing owned-actor lifetime convention.
+^dt_fareed_magic_maxhit = 20
+^dt_fareed_magic_chance = 2
+^dt_fareed_spawn_delay = 2
+^dt_fareed_duration = 1000

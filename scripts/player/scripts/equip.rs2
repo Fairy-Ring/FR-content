@@ -10,6 +10,7 @@ if (p_finduid(uid) = true) {
 [proc,equip](int $slot)
 if (p_finduid(uid) = true) {
     def_obj $obj = inv_getobj(inv, $slot);
+    if ($obj = slayer_facemask & ~dt_smoke_mask_allowed = false) return;
     if (oc_wearpos($obj) = null) {
         mes("[DEBUG]: No wearpos set on <oc_debugname($obj)>");
         return;

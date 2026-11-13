@@ -293,6 +293,30 @@ def check_original_entity_configs() -> None:
             not any(value.startswith("attackrate,") for value in base_params),
             f"[{name}] baseline must not already define an attack rate",
         )
+        if name == "firediamond_firewarrior":
+            # S2 exact additions only: CANDIDATE later Fareed bonuses/ashes;
+            # UNKNOWN product-owned lifecycle fields. Preserve the comparison.
+            for field, expected in {
+                "defaultmode": "none",  # UNKNOWN owned spawn, not a static aggressor
+                "wanderrange": "0",  # UNKNOWN owned encounter boundary
+                "huntrange": "0",  # UNKNOWN no public target hunting
+                "timer": "1",  # UNKNOWN owner-presence check interval
+            }.items():
+                require(current_values.pop(field, None) == [expected], f"[{name}] S2 {field} must be {expected}")
+                require(field not in base_values, f"[{name}] baseline must not define S2 {field}")
+            for expected in (
+                "strengthbonus,120",  # CANDIDATE later Fareed equipment strength
+                "stabdefence,100",  # CANDIDATE later Fareed stab defence
+                "slashdefence,100",  # CANDIDATE later Fareed slash defence
+                "crushdefence,100",  # CANDIDATE later Fareed crush defence
+                "magicdefence,0",  # CANDIDATE later Fareed magic defence
+                "rangedefence,0",  # CANDIDATE later Fareed ranged defence
+                "damagetype,^slash_style",  # CANDIDATE later melee attack style
+                "death_drop,ashes",  # CANDIDATE later Smoke transcript
+            ):
+                require(current_params.count(expected) == 1, f"[{name}] must add exactly {expected}")
+                require(expected not in base_params, f"[{name}] baseline must not define {expected}")
+                current_params = [value for value in current_params if value != expected]
         current_values["param"] = [value for value in current_params if value != candidate_rate]
         if not current_values["param"]:
             current_values.pop("param")
@@ -300,8 +324,22 @@ def check_original_entity_configs() -> None:
             current_values == base_values,
             f"[{name}] may change only the labelled candidate combat fields",
         )
+    published_s1_bandits = {
+        # S1 added these exact server fields (6086b0ff2 merge; published a87ed08f9).
+        "fourdiamonds_sword_bandit_sitsouth": {"wanderrange": ["0"], "moverestrict": ["nomove"], "defaultmode": ["none"]},
+        # S1 added these exact server fields (6086b0ff2 merge; published a87ed08f9).
+        "fourdiamonds_sword_bandit_sitnorth": {"wanderrange": ["0"], "moverestrict": ["nomove"], "defaultmode": ["none"]},
+        # S1 added these exact server fields (6086b0ff2 merge; published a87ed08f9).
+        "fourdiamonds_sword_bandit_siteast": {"wanderrange": ["0"], "moverestrict": ["nomove"], "defaultmode": ["none"]},
+        # S1 added these exact server fields (6086b0ff2 merge; published a87ed08f9).
+        "fourdiamonds_sword_bandit_sitwest": {"wanderrange": ["0"], "moverestrict": ["nomove"], "defaultmode": ["none"]},
+    }
     for name, base_values in base_npcs.items():
-        if name not in expected_npcs:
+        if name in published_s1_bandits:
+            additions = published_s1_bandits[name]
+            require(not set(additions) & set(base_values), f"[{name}] S1 fields must be new to the baseline")
+            require(npcs.get(name) == {**base_values, **additions}, f"[{name}] must retain exact published S1 values")
+        elif name not in expected_npcs:
             require(npcs.get(name) == base_values, f"[{name}] non-candidate NPC data must remain unchanged")
     npc_text = (UNPACK / "all.npc").read_text(encoding="utf-8")
     for name, (hp, attack, strength, defence, rate, _, _) in expected_npcs.items():

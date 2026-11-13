@@ -1,0 +1,149 @@
+// S2 Fareed. Period guides establish the key/gate, melee + fire magic, ice-glove
+// disarm and inventory diamond. Config/timing/wording labels: dt_smoke.constant.
+// Water spells and ice arrows use the existing shared combat/rune-payment paths.
+// No unsupported elemental multiplier or exhaustive attack allowlist is invented.
+
+[oploc1,fd_fw_metalgateclosed_l] @dt_smoke_gate;
+[oploc1,fd_fw_metalgateclosed_r] @dt_smoke_gate;
+[oplocu,fd_fw_metalgateclosed_l] @dt_smoke_gate_use;
+[oplocu,fd_fw_metalgateclosed_r] @dt_smoke_gate_use;
+
+[label,dt_smoke_gate_use]
+if (last_useitem ! fd_firekey) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@dt_smoke_gate;
+
+[label,dt_smoke_gate]
+if (~dt_fareed_inside(coord) = true) {
+    ~dt_fareed_cleanup;
+    p_teleport(^dt_smoke_gate_outside);
+    return;
+}
+if (%deserttreasure < ^dt_stage_hunts) {
+    ~mesbox("This gate is locked.");
+    return;
+}
+if (%fd_firewargate = ^dt_flag_off) {
+    if (inv_total(inv, fd_firekey) < 1) {
+        ~mesbox("This gate is locked.");
+        return;
+    }
+    inv_del(inv, fd_firekey, 1);
+    %fd_firewargate = ^dt_flag_on;
+    mes("You unlock the gate and enter the room.");
+}
+p_teleport(^dt_smoke_gate_inside);
+if (%fd_killed_firewarrior = ^dt_flag_on) @dt_smoke_reclaim;
+if (~dt_fareed_find = true) return;
+npc_add(^dt_fareed_spawn, firediamond_firewarrior, ^dt_fareed_duration);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+%npc_action_delay = add(map_clock, ^dt_fareed_spawn_delay);
+npc_setmode(opplayer2);
+npc_say("You dare trespass in my realm?");
+
+[proc,dt_fareed_inside](coord $tile)(boolean)
+return(inzone(^dt_fareed_room_sw, ^dt_fareed_room_ne, $tile));
+
+[proc,dt_fareed_find]()(boolean)
+npc_findall(^dt_fareed_spawn, firediamond_firewarrior, 10, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return(true);
+}
+return(false);
+
+[proc,dt_fareed_cleanup]
+npc_findall(^dt_fareed_spawn, firediamond_firewarrior, 10, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) {
+        npc_del;
+        return;
+    }
+}
+
+[proc,dt_fareed_attackable]()(boolean)
+if (%npc_attacking_uid ! uid) {
+    mes("Someone else is fighting that.");
+    return(false);
+}
+if (~dt_fareed_inside(coord) = false | %deserttreasure < ^dt_stage_hunts | %fd_killed_firewarrior = ^dt_flag_on) return(false);
+return(true);
+
+[ai_timer,firediamond_firewarrior]
+if (npc_stat(hitpoints) = 0) return;
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (~dt_fareed_inside(coord) = false) {
+    npc_del;
+    return;
+}
+// Protected/modal players do not acquire queued or retried equipment actions.
+if (p_finduid(%npc_attacking_uid) = true) ~dt_fareed_disarm;
+
+[proc,dt_fareed_disarm]
+if (inv_getobj(worn, ^wearpos_hands) = ice_gloves) return;
+if (distance(coord, npc_coord) > 1) return;
+def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
+if ($weapon = null) return;
+inv_dropslot(worn, coord, ^wearpos_rhand, ^dropslot_duration);
+~update_all($weapon);
+~on_unequip($weapon);
+mes("The heat from the warrior causes you to drop your weapon.");
+
+[ai_queue1,firediamond_firewarrior]
+// Only the owning account can pass either shared Attack admission path.
+if (%npc_aggressive_player = %npc_attacking_uid) ~npc_default_retaliate;
+
+[ai_opplayer2,firediamond_firewarrior]
+if (%npc_action_delay > map_clock) return;
+if (random(^dt_fareed_magic_chance) = 0) {
+    ~npc_cast_spell_with_forced_max_hit(^fire_bolt, npc_param(attackrate), ^dt_fareed_magic_maxhit);
+} else {
+    ~npc_default_attack;
+}
+
+[ai_applayer2,firediamond_firewarrior]
+// Fareed's fire attack is melee-distance; resume approach if a shared combat
+// check changed the mode. Do not turn it into a ranged Fire Bolt attack.
+npc_setmode(opplayer2);
+
+[ai_queue3,firediamond_firewarrior]
+if (finduid(%npc_attacking_uid) = true & npc_findhero = ^true & uid = %npc_attacking_uid) {
+    queue*(dt_fareed_death, 0)(%npc_attacking_uid);
+}
+// The shared Slayer death path also reads the secondary NPC pointer.
+if (.npc_finduid(npc_uid) = true) ~npc_default_death;
+
+[queue,dt_fareed_death](player_uid $owner)
+if (uid ! $owner | ~dt_fareed_inside(coord) = false | %deserttreasure < ^dt_stage_hunts | %fd_killed_firewarrior = ^dt_flag_on) return;
+%fd_killed_firewarrior = ^dt_flag_on;
+~dt_smoke_give_diamond;
+
+[proc,dt_smoke_diamond_owned]()(boolean)
+if (~obj_gettotal(fd_diamond_fire) > 0 | %fd_column_fire = ^dt_column_placed) return(true);
+return(false);
+
+[proc,dt_smoke_give_diamond]
+if (~dt_smoke_diamond_owned = true) return;
+if (inv_freespace(inv) < 1) {
+    // UNKNOWN full-inventory presentation: use the existing owned-loot path and
+    // generic refusal, not an invented historical inventory message.
+    obj_add(coord, fd_diamond_fire, 1, ^lootdrop_duration);
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, fd_diamond_fire, 1);
+mes("You take the Diamond of Smoke from the ashes of the warrior.");
+
+[label,dt_smoke_reclaim]
+if (~dt_smoke_diamond_owned = true) return;
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, fd_diamond_fire, 1);
+mes("The Diamond of Smoke seems to have mystically found its way back here.");

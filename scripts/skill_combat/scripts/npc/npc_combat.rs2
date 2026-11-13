@@ -205,6 +205,7 @@ if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded
     return(false);
 }
 
+if (npc_type = firediamond_firewarrior & ~dt_fareed_attackable = false) return(false);
 if (npc_hasop(2) = true) {
     return (true);
 }
@@ -293,6 +294,7 @@ if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded
     return(false);
 }
 
+if (npc_type = firediamond_firewarrior & ~dt_fareed_attackable = false) return(false);
 if (npc_hasop(2) = true) {
     return (true);
 }
