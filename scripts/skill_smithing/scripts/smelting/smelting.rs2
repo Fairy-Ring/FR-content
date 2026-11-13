@@ -69,13 +69,18 @@ return(true);
 
 [proc,smelt_ore_bar](namedobj $bar)
 def_struct $struct = oc_param($bar, smelting_struct);
+~smelt_ore_start($struct);
+p_delay(3);
+~smelt_ore_finish($bar, $struct);
+
+[proc,smelt_ore_start](struct $struct)
 anim(human_furnace, 0);
 sound_synth(furnace, 1, 0);
 
 // display process message
 mes(struct_param($struct, processmessage));
 
-p_delay(3);
+[proc,smelt_ore_finish](namedobj $bar, struct $struct)
 
 // delete main ore
 inv_del(inv, struct_param($struct, ingredient), struct_param($struct, bar_count));
@@ -178,20 +183,25 @@ if ($count <= 0) return;
 
 [label,smelt_ore_batch](namedobj $bar, int $count)
 if_close;
-@smelt_ore_weakqueue($bar, $count);
+@smelt_ore_weakqueue($bar, $count, 4);
 
-[queue,smelt_ore_weakqueue](namedobj $bar, int $count)
-@smelt_ore_weakqueue($bar, $count);
+[queue,start_smelt_ore](namedobj $bar, int $count)
+@smelt_ore_weakqueue($bar, $count, 3);
 
-[label,smelt_ore_weakqueue](namedobj $bar, int $count)
+[queue,smelting_ore](namedobj $bar, struct $struct, int $count)
+~smelt_ore_finish($bar, $struct);
+if ($count > 1) {
+    weakqueue*(start_smelt_ore, 0)($bar, sub($count, 1));
+}
+
+[label,smelt_ore_weakqueue](namedobj $bar, int $count, int $delay)
 if ($count < 1) return;
 // Lost City selects perfect gold only after ordinary gold is exhausted.
 if ($bar = gold_bar & inv_total(inv, gold_ore) = 0 & inv_total(inv, perfect_gold_ore) > 0) {
     $bar = perfect_gold_bar;
 }
 if (~validate_first_smelt($bar) = false) return;
-// Match cooking: schedule before the action so walking clears its continuation.
-if ($count > 1) {
-    weakqueue*(smelt_ore_weakqueue, 3)($bar, sub($count, 1));
-}
-~smelt_ore_bar($bar);
+def_struct $struct = oc_param($bar, smelting_struct);
+~smelt_ore_start($struct);
+// Inherited Lost City initial/recovery delays; walking cancels even an unfinished bar.
+weakqueue*(smelting_ore, $delay)($bar, $struct, $count);

@@ -242,8 +242,7 @@ function selectAmount(player, bar, amount, countDialogValue = null, expectQueued
     assert.equal(typeof countDialogValue, 'number', 'Make-X needs a numeric count-dialog input');
     assert.equal(countDialogHandler.handle(new ResumePCountDialog(countDialogValue), player), true, 'count dialog input should resume the Make-X script');
   }
-  const hasContinuation = expectQueued && (amount === 'X' ? countDialogValue : amount) > 1;
-  assert.equal(weakQueueLength(player), hasContinuation ? 1 : 0, `${bar.name} ${amount} continuation admission`);
+  assert.equal(weakQueueLength(player), expectQueued ? 1 : 0, `${bar.name} ${amount} pending completion`);
 }
 
 function advancePlayerTick(player) {
@@ -326,7 +325,8 @@ for (let barIndex = 0; barIndex < barNames.length; barIndex++) {
 }
 assert.ok(ScriptProvider.getByName('[label,smelt_ore]'), 'published single-smelt ore label is missing');
 assert.ok(ScriptProvider.getByName('[label,smelt_ore_makex]'), 'packed Make-X label is missing');
-assert.ok(ScriptProvider.getByName('[queue,smelt_ore_weakqueue]'), 'packed smelting weak queue is missing');
+assert.ok(ScriptProvider.getByName('[queue,smelting_ore]'), 'packed smelting finish queue is missing');
+assert.ok(ScriptProvider.getByName('[queue,start_smelt_ore]'), 'packed smelting recovery queue is missing');
 
 if (!BASELINE_PACK && !process.env.SMELT_BASELINE_JSON) {
   console.warn('BASELINE_PACK or SMELT_BASELINE_JSON not set; published single-smelt comparison was not run');
@@ -388,13 +388,15 @@ for (const bar of testedBars) {
     assert.equal(count(player, recipe.barName), quantity, `${bar.name} ${amount} bars produced`);
     assert.equal(player.stats[smithingStat] - experienceBefore, recipe.experience * quantity, `${bar.name} ${amount} Smithing XP`);
     assert.deepEqual(player.messages, expectedMessages(recipe, quantity), `${bar.name} ${amount} process/product messages`);
-    assert.equal(productTicks[0], startTick + 4, `${bar.name} ${amount} first bar interval`);
+    // This direct-trigger fixture first drains queues on the following tick.
+    assert.equal(productTicks[0], startTick + 5, `${bar.name} ${amount} first queued finish`);
     assert.deepEqual(
       productTicks.slice(1).map((tick, index) => tick - productTicks[index]),
-      Array(quantity - 1).fill(4),
-      `${bar.name} ${amount} bars must be produced at four-tick intervals`
+      Array(quantity - 1).fill(5),
+      `${bar.name} ${amount} donor-staged completions must be five ticks apart`
     );
     assert.equal(weakQueueLength(player), 0, `${bar.name} ${amount} must finish without pending weak work`);
+    console.log(`SMELT_BATCH_TIMING=${JSON.stringify({ bar: bar.name, amount, productTicks })}`);
     passingCases.push(`${bar.name} ${amount}`);
   }
 }
@@ -455,30 +457,48 @@ for (const bar of testedBars) {
   assert.equal(weakQueueLength(player), 0, `${bar.name} level refusal must not queue another smelt`);
 }
 
-// Exercise the actual MoveClickHandler path after the action delay expires.
-// Dispatch before draining player queues; the in-flight smelt completes but its
-// weak-queued continuation is cleared by Player.clearPendingAction.
+// Moving during an unfinished first bar cancels its finish: no ore, XP or bar is committed.
 {
   const recipe = recipes.get('silver_bar');
   World.currentTick = 100;
   const player = makePlayer(99);
   add(player, recipe.primaryName, recipe.primaryCount * 5);
+  const experienceBefore = player.stats[smithingStat];
   openSmeltingInterface(player);
   selectAmount(player, testedBars[0], 5);
-  assert.equal(weakQueueLength(player), 1, 'batch continuation must be pending before movement');
-  World.currentTick = player.delayedUntil;
-  player.delayed = false;
+  advancePlayerTick(player);
+  assert.equal(player.delayed, false, 'a batch must not hold the player with p_delay');
+  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 5, 'unfinished bar must retain its ore');
   const movement = new MoveClickHandler();
-  assert.equal(
-    movement.handle(new MoveClick([{ x: player.x + 1, z: player.z }], 0, false), player),
-    true,
-    'movement must be accepted after the action delay expires'
-  );
-  assert.equal(weakQueueLength(player), 0, 'accepted movement must clear the engine weak queue');
+  assert.equal(movement.handle(new MoveClick([{ x: player.x + 1, z: player.z }], 0, false), player), true);
+  assert.equal(weakQueueLength(player), 0, 'movement must cancel the unfinished completion');
   driveUntilIdle(player, 24);
-  assert.equal(count(player, recipe.barName), 1, 'the in-flight smelt may finish, but walking must stop the batch');
-  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 4, 'walking must preserve the unprocessed silver ore');
-  assert.equal(weakQueueLength(player), 0, 'movement interruption must not leave a continuation');
+  assert.equal(count(player, recipe.barName), 0, 'cancelled unfinished bar must not be made');
+  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 5, 'cancelled unfinished bar must keep all ore');
+  assert.equal(player.stats[smithingStat], experienceBefore, 'cancelled unfinished bar must give no XP');
+}
+
+// After one completed bar, cancel the next bar at two different interior ticks.
+for (const offset of [1, 2]) {
+  const recipe = recipes.get('silver_bar');
+  World.currentTick = 100;
+  const player = makePlayer(99);
+  add(player, recipe.primaryName, recipe.primaryCount * 5);
+  const experienceBefore = player.stats[smithingStat];
+  openSmeltingInterface(player);
+  selectAmount(player, testedBars[0], 5);
+  for (let tick = 0; tick < 12 && count(player, recipe.barName) === 0; tick++) advancePlayerTick(player);
+  assert.equal(count(player, recipe.barName), 1, 'first bar must complete before between-bar cancellation');
+  for (let tick = 0; tick < offset; tick++) advancePlayerTick(player);
+  assert.equal(player.delayed, false, 'between-bar movement must be admitted at arbitrary interior ticks');
+  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 4, 'next unfinished bar must retain its ore');
+  const movement = new MoveClickHandler();
+  assert.equal(movement.handle(new MoveClick([{ x: player.x + 1, z: player.z }], 0, false), player), true);
+  assert.equal(weakQueueLength(player), 0, 'movement must clear every staged weak continuation');
+  driveUntilIdle(player, 24);
+  assert.equal(count(player, recipe.barName), 1, 'no further bar may complete after between-bar movement');
+  assert.equal(count(player, recipe.primaryName), recipe.primaryCount * 4, 'movement must preserve unfinished ore');
+  assert.equal(player.stats[smithingStat] - experienceBefore, recipe.experience, 'only the completed bar gives XP');
 }
 
 console.log(`RESULT PASS smelt-batch: ${passingCases.length} amount/button cases, depletion, level refusal, movement interruption and packed single-smelt baseline`);
