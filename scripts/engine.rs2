@@ -380,7 +380,7 @@
 [command,cleartimer](timer $timer)
 // info: Clear a timer from the secondary active_player
 [command,.cleartimer](timer $timer)
-// info: Return ^true if the active_player has $timer running
+// info: Return the world tick when $timer was set or last fired on the active_player, or -1 if absent
 [command,gettimer](timer $timer)(int) // confirmed
 // info: Play a spotanim on the active_player
 [command,spotanim_pl](spotanim $spotanim, int $height, int $delay)
