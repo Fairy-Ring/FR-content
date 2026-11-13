@@ -28,8 +28,16 @@ if($op = 1) {
 ~chatplayer("<p,shock>Pleeeaasssse! I'll be your best friend!");
 ~chatnpc("<p,happy>Oh okay then; you twisted my arm. You'll have to train against specific groups of creatures.");
 ~chatplayer("<p,quiz>Okay then, what's first?");
+if (~slayer_master_eligible(npc_type) = false) {
+    def_npc $slayer_master = ~get_best_slayer_master;
+    def_string $master_location = ~get_slayer_master_location;
+    ~chatnpc("<p,sad>Sorry, but you're not strong enough to be taught by me. Your best trainer would be <nc_name($slayer_master)> <$master_location>.");
+    return;
+}
+if (~slayer_new_target = false) {
+    return;
+}
 inv_add(inv, slayer_gem, 1);
-~slayer_new_target;
 ~chatnpc("<p,neutral>We'll start you off hunting <~slayer_taskname>, you'll need to kill <tostring(%slayer_count)> of them.");
 ~chatnpc("<p,neutral>You'll also need this enchanted gem, it allows Slayer Masters like myself to contact you and update you on your progress. Don't worry if you lose it, you can buy another from any Slayer Master.");
 @multi2("Got any tips for me?", slayer_master_tips, "Okay, great!", slayer_master_great);
@@ -91,7 +99,9 @@ if(npc_type ! slayer_master_4 & npc_type ! slayer_master_5 & $slayer_master ! np
 @slayer_master_newassign;
 
 [label,slayer_master_newassign]
-~slayer_new_target;
+if (~slayer_new_target = false) {
+    return;
+}
 ~chatnpc("<p,happy>Excellent, you're doing great. Your new task is to kill <tostring(%slayer_count)> <~slayer_taskname>.");
 @multi2("Got any tips for me?", slayer_master_tips, "Okay, great!", slayer_master_great);
 
