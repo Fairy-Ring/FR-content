@@ -31465,6 +31465,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+category=slimeyfish
 param=fishing_movement_enum,fishing_movement_slimey_eel_east_enum
 [0_53_53_slimey_eel]
 name=Fishing spot
@@ -31482,6 +31483,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+category=slimeyfish
 param=fishing_movement_enum,fishing_movement_slimey_eel_west_enum
 [0_53_51_slimey_eel]
 name=Fishing spot
@@ -31499,6 +31501,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+category=slimeyfish
 param=fishing_movement_enum,fishing_movement_slimey_eel_south_enum
 [bedabin_fighter]
 name=Bedabin Nomad Fighter
