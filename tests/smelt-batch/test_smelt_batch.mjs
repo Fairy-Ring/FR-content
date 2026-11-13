@@ -482,3 +482,5 @@ for (const bar of testedBars) {
 }
 
 console.log(`RESULT PASS smelt-batch: ${passingCases.length} amount/button cases, depletion, level refusal, movement interruption and packed single-smelt baseline`);
+// Production imports retain engine resources; match the standalone packed-test lifecycle.
+process.exit(0);
