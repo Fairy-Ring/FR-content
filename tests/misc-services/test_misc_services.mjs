@@ -232,10 +232,10 @@ function useInventoryButton(p, op, obj, slot, com) {
   assert.ok(invButtonHandler.handle(new InvButton(op, obj, slot, com), p), `inventory button ${op} on ${com} was rejected`);
 }
 
-function assertJourney(p, state, initialTabs, destination, arrivalText) {
+function assertJourney(p, state, initialTabs, destination, arrivalText, sequenceName) {
   const shipRoot = componentId('misc_shipjourney');
   const animationComponent = componentId('misc_shipjourney:com_6');
-  const animation = requiredId(SeqType, 'misc_shipjourney_to_misc');
+  const animation = requiredId(SeqType, sequenceName);
   const journeyTick = World.currentTick;
   const hiddenTabs = [0, 1, 2, 3, 4, 5, 6, 10, 11, 12, 13];
   const visibleTabs = [7, 8, 9];
@@ -303,7 +303,7 @@ const vegStock = [
   ['tomato', 10, 100], ['garlic', 2, 400]
 ];
 const shops = [
-  { npc: 'etc_fish_monger', shop: 'etc_fishmonger', title: 'Etceteria Fish', buy: 700, sell: 1300, delta: 30, greeting: 'My fish is fresher than any in Miscellania!', stock: fishStock, sample: 'net' },
+  { npc: 'etc_fish_monger', shop: 'etc_fishmonger', title: 'Etceteria Fish', buy: 700, sell: 1000, delta: 30, greeting: 'My fish is fresher than any in Miscellania!', stock: fishStock, sample: 'net' },
   { npc: 'etc_veg_monger', shop: 'etc_greengrocer', title: 'Island Greengrocer', buy: 950, sell: 1200, delta: 20, greeting: 'right place for yer greens!', stock: vegStock, sample: 'cabbage' },
   { npc: 'misc_fish_monger', shop: 'misc_fishmonger', title: 'Island Fishmonger', buy: 700, sell: 1300, delta: 30, greeting: "I've heard that the Etceterian fish is stored in a cow shed.", stock: fishStock, sample: 'net' },
   { npc: 'misc_veg_monger', shop: 'misc_greengrocer', title: 'Greengrocer of Miscellania', buy: 950, sell: 1200, delta: 20, greeting: 'finest and freshest vegetables!', stock: vegStock, sample: 'cabbage' }
@@ -365,6 +365,30 @@ for (const shop of shops) {
     useInventoryButton(tradePlayer, sellOne, item, playerSlot, playerCom);
     assert.equal(playerInv.getItemCount(item), 0, `${shop.shop} sell button transfers the item back`);
     assert.equal(shopInv.getItemCount(item), beforeStock, `${shop.shop} stock is restored by the sale`);
+  });
+}
+
+// Sal's Etceteria table (18 December 2005): the eight equipment prices at base stock.
+for (const [name, price] of [
+  ['net', 5], ['fishing_rod', 5], ['fly_fishing_rod', 5], ['harpoon', 5],
+  ['lobster_pot', 20], ['fishing_bait', 3], ['feather', 2], ['big_net', 20]
+]) {
+  check(`Etceteria Fish base-stock ${name} costs ${price} coins through the packed shop`, () => {
+    const p = player();
+    finish(p, startNpcOp(p, npc('etc_fish_monger'), ServerTriggerType.OPNPC3, '[opnpc3,etc_fish_monger]'));
+    const { shopInv, playerInv, shopCom } = openShop(p, 'etc_fishmonger', 'Etceteria Fish');
+    const item = requiredId(ObjType, name);
+    const coins = requiredId(ObjType, 'coins');
+    const definition = InvType.getByName('etc_fishmonger');
+    const stockIndex = Array.from(definition.stockobj).indexOf(item);
+    const base = definition.stockcount[stockIndex];
+    assert.ok(base > 0, `${name} has positive base stock`);
+    assert.equal(shopInv.getItemCount(item), base, `${name} starts at packed base stock`);
+    playerInv.add(coins, price);
+    useInventoryButton(p, optionIndex('shop_template:inv', /buy[^\d]*1\b/i), item, shopInv.getItemIndex(item), shopCom);
+    assert.equal(playerInv.getItemCount(item), 1, `${name} purchase with exactly ${price} coins`);
+    assert.equal(playerInv.getItemCount(coins), 0, `${name} exact period-table debit`);
+    assert.equal(shopInv.getItemCount(item), base - 1, `${name} leaves shop stock`);
   });
 }
 
@@ -615,7 +639,7 @@ check('Miscellania sailor decline stays put; return trip uses the six-tick longs
   resumeMessage(returning, state);
   choose(returning, state, 2, 0);
   resumeMessage(returning, state);
-  assertJourney(returning, state, tabs, [2629, 3692, 0], 'The ship arrives at Rellekka.');
+  assertJourney(returning, state, tabs, [2629, 3692, 0], 'The ship arrives at Rellekka.', 'misc_shipjourney_to_rellekka');
 });
 
 check('viking sailor only offers the outward ride after completion and reuses the longship journey', () => {
@@ -651,7 +675,7 @@ check('viking sailor only offers the outward ride after completion and reuses th
   resumeMessage(going, state);
   choose(going, state, 2, 0);
   resumeMessage(going, state);
-  assertJourney(going, state, tabs, [2580, 3845, 0], 'The ship arrives at Miscellania.');
+  assertJourney(going, state, tabs, [2580, 3845, 0], 'The ship arrives at Miscellania.', 'misc_shipjourney_to_misc');
 });
 
 console.log(`RESULT ${failures.length ? 'FAIL' : 'PASS'} misc-services: ${passed} passed, ${failures.length} failed`);

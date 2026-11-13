@@ -12,7 +12,11 @@ if ($choice = 2) {
 
 [proc,misc_longship_sail](coord $dest, string $mes)
 if_openmain(misc_shipjourney);
-if_setanim(misc_shipjourney:com_6, misc_shipjourney_to_misc);
+if ($dest = ^from_miscellania_tele_coord) {
+    if_setanim(misc_shipjourney:com_6, misc_shipjourney_to_rellekka);
+} else {
+    if_setanim(misc_shipjourney:com_6, misc_shipjourney_to_misc);
+}
 ~music_jingle("quick sail");
 mes("You board the longship...");
 // hide all tabs except friends list and ignore list
