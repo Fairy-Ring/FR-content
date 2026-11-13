@@ -189,8 +189,8 @@ const VINES = [
   { name: 'karam_dungeon_vineblocking5', level: 34, placement: [2694, 9482], start: { level: 0, x: 2693, z: 9482 }, end: { level: 0, x: 2695, z: 9482 } }
 ];
 const AGILITY_OBSTACLES = [
-  { name: 'karam_dungeon_stone1', placement: [2649, 9561], start: { level: 0, x: 2650, z: 9567 }, end: { level: 0, x: 2648, z: 9561 }, fail: { level: 0, x: 2648, z: 9562 }, requirement: 12, xp: 75 },
-  { name: 'karam_dungeon_stone2', placement: [2647, 9558], start: { level: 0, x: 2646, z: 9558 }, end: { level: 0, x: 2648, z: 9563 }, fail: { level: 0, x: 2648, z: 9557 }, xp: 75 },
+  { name: 'karam_dungeon_stone1', placement: [2649, 9561], start: { level: 0, x: 2649, z: 9562 }, end: { level: 0, x: 2647, z: 9557 }, fail: { level: 0, x: 2648, z: 9562 }, requirement: 12, xp: 75 },
+  { name: 'karam_dungeon_stone2', placement: [2647, 9558], start: { level: 0, x: 2647, z: 9557 }, end: { level: 0, x: 2649, z: 9562 }, fail: { level: 0, x: 2648, z: 9557 }, xp: 75 },
   { name: 'karam_dungeon_bamboo_logbalance1', placement: [2683, 9506], start: { level: 0, x: 2682, z: 9506 }, end: { level: 0, x: 2687, z: 9506 }, fail: { level: 0, x: 2681, z: 9507 }, requirement: 22, xp: 100 },
   { name: 'karam_dungeon_bamboo_logbalance3', placement: [2686, 9506], start: { level: 0, x: 2687, z: 9506 }, end: { level: 0, x: 2682, z: 9506 }, fail: { level: 0, x: 2688, z: 9508 }, xp: 100 }
 ];
@@ -250,9 +250,10 @@ let nextPlayerId = 1;
 function makePlayer({ tile, agility = 1, woodcutting = 1, hitpoints = 90, coins = 0, axe = false }) {
   const serial = nextPlayerId++;
   const player = new Player(`brim_dungeon_${serial}`, BigInt(serial), BigInt(1000 + serial));
-  player.uid = serial;
+  player.uid = ((Number(player.username37 & 0x1fffffn) << 11) | serial) >>> 0;
   player.pid = serial;
   player.slot = serial;
+  World.players[serial] = player;
   player.packets = [];
   player.messages = [];
   player.write = packet => player.packets.push(packet);
@@ -287,19 +288,22 @@ function requireTrigger(type, id, name) {
 }
 function startScript(player, script, target = null) {
   const state = ScriptRunner.init(script, player, target);
-  const result = player.runScript(state, true, true);
-  return { state, result };
+  player.executeScript(state, true, true);
+  return { state, result: state.execution };
 }
 function finishDelayed(player) {
   let boundaries = 0;
   while (player.activeScript) {
     assert.ok(boundaries++ < 100, 'each packed dungeon obstacle has a finite delay schedule');
     const state = player.activeScript;
-    assert.equal(state.execution, ScriptState.SUSPENDED, 'the active dungeon script resumes from a delay');
-    assert(player.delayed, 'the player remains delayed while the active script is suspended');
-    assert(Number.isFinite(player.delayedUntil), 'the delayed tick is numeric');
-    World.currentTick = Math.max(World.currentTick, player.delayedUntil);
-    player.delayed = false;
+    if (state.execution === ScriptState.SUSPENDED) {
+      assert(player.delayed, 'the player remains delayed while the active script is suspended');
+      assert(Number.isFinite(player.delayedUntil), 'the delayed tick is numeric');
+      World.currentTick = Math.max(World.currentTick, player.delayedUntil);
+      player.delayed = false;
+    } else {
+      assert.equal(state.execution, ScriptState.PAUSEBUTTON, 'only normal dialogue continuation may resume without a delay');
+    }
     player.executeScript(state, true, true);
   }
   assert.equal(player.delayed, false, 'all scheduled dungeon delays are drained');
@@ -505,6 +509,7 @@ function assertPipeRefusal(pipe) {
   assert.equal(World.vars[lock], 0, `${pipe.name} level refusal does not acquire its shared lock`);
 }
 function assertPipeLockAndExpiry(pipe) {
+  World.npcs.reset();
   World.gameMap.init();
   const lock = sharedVarId(pipe.lock);
   World.vars[lock] = 0;
@@ -514,10 +519,18 @@ function assertPipeLockAndExpiry(pipe) {
   const firstTick = NEXT_TICK();
   const firstLoc = activeLoc(pipe.name, ...pipe.placement);
   const firstRun = startScript(first, script, firstLoc);
+  for (let approach = 0; World.vars[lock] === 0; approach++) {
+    assert(approach < 10, 'pipe approach reaches its lock before crossing');
+    assert.equal(firstRun.state.execution, ScriptState.SUSPENDED);
+    World.currentTick = Math.max(World.currentTick, first.delayedUntil);
+    first.delayed = false;
+    first.executeScript(firstRun.state, true, true);
+  }
+  const approachTicks = World.currentTick - firstTick;
   assert.equal(firstRun.result, ScriptState.SUSPENDED, `${pipe.name} suspends after it acquires the shared lock`);
   assert.equal(first.activeScript, firstRun.state, `${pipe.name} keeps its first crossing active`);
   const lockUntil = World.vars[lock];
-  assert.equal(lockUntil, firstTick + 9, `${pipe.name} records the donor nine-tick timestamp`);
+  assert.equal(lockUntil, World.currentTick + 9, `${pipe.name} records the donor nine-tick timestamp`);
 
   const second = makePlayer({ tile: pipe.forward.start, agility: pipe.forward.requirement, woodcutting: 1 });
   const secondXp = skillXp(second, AGILITY);
@@ -533,6 +546,7 @@ function assertPipeLockAndExpiry(pipe) {
   if (World.currentTick <= lockUntil) World.currentTick = lockUntil + 1;
   assert(World.currentTick > lockUntil, `${pipe.name} timestamp expires after normal crossing`);
 
+  World.npcs.reset();
   World.gameMap.init();
   const after = makePlayer({ tile: pipe.forward.start, agility: pipe.forward.requirement, woodcutting: 1 });
   const afterXp = skillXp(after, AGILITY);
@@ -540,9 +554,10 @@ function assertPipeLockAndExpiry(pipe) {
   runToCompletion(after, script, activeLoc(pipe.name, ...pipe.placement));
   assert.deepEqual(tileOf(after), pipe.forward.end, `${pipe.name} admits a player after the timestamp expires`);
   assert.equal(skillXp(after, AGILITY) - afterXp, pipe.xp, `${pipe.name} expired lock permits its normal XP award`);
-  assert.equal(World.vars[lock], afterTick + 9, `${pipe.name} starts a new timestamp after the later crossing`);
+  assert.equal(World.vars[lock], afterTick + approachTicks + 9, `${pipe.name} starts a new timestamp after the later crossing`);
 }
 function assertPipeReverseBypass(pipe) {
+  World.npcs.reset();
   World.gameMap.init();
   const lock = sharedVarId(pipe.lock);
   World.vars[lock] = 0;
