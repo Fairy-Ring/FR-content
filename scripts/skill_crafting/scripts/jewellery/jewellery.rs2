@@ -294,11 +294,20 @@ p_delay(2);
 ~crafting_gold($product, $gem, $productexp, $count);
 
 
+[if_close,silver_casting]
+inv_stoptransmit(silver_casting:com_91);
+inv_stoptransmit(silver_casting:com_98);
+inv_stoptransmit(silver_casting:com_105);
+inv_stoptransmit(silver_casting:com_112);
+inv_stoptransmit(silver_casting:com_119);
+inv_stoptransmit(silver_casting:com_126);
+inv_stoptransmit(silver_casting:com_134);
+
 [label,craft_silver]
 // 377 leftover inter_282 titled "Silver Casting" — name from cache text (274/289 used chat).
 // Do not hunt 289 for this IF name.
 // Conductor mould (fenk_lightning_mould) is a CoF silver-casting join (t_d99d6bbc).
-if (inv_total(inv, holy_symbol_mould) = 0 & inv_total(inv, unholy_symbol_mould) = 0 & inv_total(inv, sickle_mould) = 0 & inv_total(inv, fenk_lightning_mould) = 0) {
+if (inv_total(inv, holy_symbol_mould) = 0 & inv_total(inv, unholy_symbol_mould) = 0 & inv_total(inv, sickle_mould) = 0 & inv_total(inv, fenk_lightning_mould) = 0 & inv_total(inv, tiara_mould) = 0 & (inv_total(inv, agrith_sigil_mould) = 0 | map_members = ^false)) {
     ~mesbox("You require a mould to make that.");
     return;
 }
@@ -323,7 +332,6 @@ if (inv_total(inv, sickle_mould) > 0 & map_members = ^true) {
     if_sethide(silver_casting:com_104, true);
     if_sethide(silver_casting:com_107, false);
 }
-// Lightning conductor rod — IF com_111 (have mould) / com_114 (need mould).
 if (inv_total(inv, fenk_lightning_mould) > 0 & map_members = ^true) {
     if_sethide(silver_casting:com_111, false);
     if_sethide(silver_casting:com_114, true);
@@ -331,16 +339,65 @@ if (inv_total(inv, fenk_lightning_mould) > 0 & map_members = ^true) {
     if_sethide(silver_casting:com_111, true);
     if_sethide(silver_casting:com_114, false);
 }
+if (inv_total(inv, tiara_mould) > 0) {
+    if_sethide(silver_casting:com_118, false);
+    if_sethide(silver_casting:com_121, true);
+} else {
+    if_sethide(silver_casting:com_118, true);
+    if_sethide(silver_casting:com_121, false);
+}
+if (inv_total(inv, agrith_sigil_mould) > 0 & map_members = ^true) {
+    if_sethide(silver_casting:com_133, false);
+    if_sethide(silver_casting:com_136, true);
+} else {
+    if_sethide(silver_casting:com_133, true);
+    if_sethide(silver_casting:com_136, false);
+}
+
+if_setobject(silver_casting:com_94, nostringstar, 400);
+if_setobject(silver_casting:com_101, nostringsnake, 400);
+if_setobject(silver_casting:com_108, silver_sickle, 400);
+if_setobject(silver_casting:com_115, fenk_conductor, 400);
+if_setobject(silver_casting:com_122, tiara, 400);
+// Candidate: item 7637 is the 377 model candidate for the Silvthrill rod.
+if_setobject(silver_casting:com_130, burgh_rod_command1, 400);
+if_setobject(silver_casting:com_137, agrith_sigil, 400);
+
+inv_setslot(silvercast377_commandrod, 0, burgh_rod_command1, 1);
+
+inv_transmit(silvercast_holysymbol, silver_casting:com_91);
+inv_transmit(silvercast_unholysymbol, silver_casting:com_98);
+inv_transmit(silvercast_sickle, silver_casting:com_105);
+inv_transmit(silvercast_lightning, silver_casting:com_112);
+inv_transmit(silvercast_tiara, silver_casting:com_119);
+inv_transmit(silvercast377_commandrod, silver_casting:com_126);
+inv_transmit(silvercast_agrith, silver_casting:com_134);
 if_openmain(silver_casting);
 
-[if_button,silver_casting:com_92] @craft_silver_product(nostringstar);
-[if_button,silver_casting:com_99] @craft_silver_product(nostringsnake);
-[if_button,silver_casting:com_106] @craft_silver_product(silver_sickle);
-// Creature of Fenkenstrain conductor — CANDIDATE 50 Crafting XP (Transcript 534). Hardcoded path
-// (no crafting_jewelry_struct on fenk_conductor pack obj yet; root may pack param later).
-[if_button,silver_casting:com_113] @craft_fenk_conductor;
+[if_button,silver_casting:com_92] @craft_silver_product(nostringstar, holy_symbol_mould, 1);
+[if_button,silver_casting:com_99] @craft_silver_product(nostringsnake, unholy_symbol_mould, 1);
+[if_button,silver_casting:com_106] @craft_silver_product(silver_sickle, sickle_mould, 1);
+[if_button,silver_casting:com_113] @craft_fenk_conductor(1);
 
-[label,craft_fenk_conductor]
+[inv_button1,silver_casting:com_91] @craft_silver_product(nostringstar, holy_symbol_mould, 1);
+[inv_button2,silver_casting:com_91] @craft_silver_product(nostringstar, holy_symbol_mould, 5);
+[inv_button3,silver_casting:com_91] @craft_silver_product(nostringstar, holy_symbol_mould, 10);
+[inv_button1,silver_casting:com_98] @craft_silver_product(nostringsnake, unholy_symbol_mould, 1);
+[inv_button2,silver_casting:com_98] @craft_silver_product(nostringsnake, unholy_symbol_mould, 5);
+[inv_button3,silver_casting:com_98] @craft_silver_product(nostringsnake, unholy_symbol_mould, 10);
+[inv_button1,silver_casting:com_105] @craft_silver_product(silver_sickle, sickle_mould, 1);
+[inv_button2,silver_casting:com_105] @craft_silver_product(silver_sickle, sickle_mould, 5);
+[inv_button3,silver_casting:com_105] @craft_silver_product(silver_sickle, sickle_mould, 10);
+[inv_button1,silver_casting:com_112] @craft_fenk_conductor(1);
+[inv_button2,silver_casting:com_112] @craft_fenk_conductor(5);
+[inv_button3,silver_casting:com_112] @craft_fenk_conductor(10);
+
+[label,craft_fenk_conductor](int $count)
+// Shown only on a members' world (see craft_silver); refuse a hidden button on a free world.
+if (map_members = ^false) {
+    mes(^mes_members_do_that);
+    return;
+}
 if (inv_total(inv, fenk_lightning_mould) < 1) {
     ~mesbox("You need a conductor mould to make that.");
     return;
@@ -354,17 +411,48 @@ if (afk_event = ^true) {
     ~macro_event_general_spawn(~macro_event_set_random);
     return;
 }
+if_close;
+~crafting_silver_conductor($count);
+
+[proc,crafting_silver_conductor](int $count)
+if (inv_total(inv, silver_bar) < 1) {
+    ~mesbox("You need a silver bar to make that.");
+    return;
+}
 anim(human_furnace, 0);
 sound_synth(furnace, 1, 0);
-if_close;
 p_delay(2);
+if (inv_total(inv, silver_bar) < 1) {
+    ~mesbox("You need a silver bar to make that.");
+    return;
+}
 inv_del(inv, silver_bar, 1);
 inv_add(inv, fenk_conductor, 1);
 // 50 Crafting XP → tenths 500 (house: 1 XP = 10 units). CANDIDATE Transcript 534.
 stat_advance(crafting, 500);
 mes("You make a conductor.");
+$count = calc($count - 1);
+if ($count < 1) {
+    return;
+}
+if (inv_total(inv, silver_bar) < 1) {
+    ~mesbox("You need a silver bar to make that.");
+    return;
+}
+~crafting_silver_conductor($count);
 
-[label,craft_silver_product](namedobj $product)
+[label,craft_silver_product](namedobj $product, namedobj $mould, int $count)
+// The interface hides a product's buttons when its mould is absent and, for members' products,
+// on a free world. A hidden button can still be sent, so both are checked here. CANDIDATE: order
+// and messages follow Lost City's silver menu (members refusal first, then the mould).
+if (map_members = ^false & oc_members($product) = true) {
+    mes(^mes_members_do_that);
+    return;
+}
+if (inv_total(inv, $mould) < 1) {
+    ~mesbox("You require a mould to make that.");
+    return;
+}
 
 def_struct $struct = oc_param($product, crafting_jewelry_struct);
 
@@ -379,19 +467,42 @@ if (afk_event = ^true) {
     ~macro_event_general_spawn(~macro_event_set_random);
     return;
 }
+if (inv_total(inv, silver_bar) < 1) {
+    ~mesbox("You need a silver bar to make that.");
+    return;
+}
+def_int $productexp = struct_param($struct, productexp);
+if_close;
+~crafting_silver($product, $productexp, $count);
 
+[proc,crafting_silver](namedobj $product, int $productexp, int $count)
+if (inv_total(inv, silver_bar) < 1) {
+    ~mesbox("You need a silver bar to make that.");
+    return;
+}
 anim(human_furnace, 0);
 sound_synth(furnace, 1, 0);
-if_close;
-// osrs is 4 ticks on first
-// openrsc uses delay(2); 2 ticks on first, 3 ticks on remaining
-// ill just make it 3 ticks for now
+// Preserve the current silver action's two-tick delay for each item.
 p_delay(2);
+if (inv_total(inv, silver_bar) < 1) {
+    ~mesbox("You need a silver bar to make that.");
+    return;
+}
+def_struct $struct = oc_param($product, crafting_jewelry_struct);
 inv_del(inv, silver_bar, 1);
 inv_add(inv, $product, 1);
-stat_advance(crafting, struct_param($struct, productexp));
+stat_advance(crafting, $productexp);
 // Confirmed, no period at the end. https://i.imgur.com/sCKRVO9.png
 mes("You make <~add_article(struct_param($struct, name))>");
+$count = calc($count - 1);
+if ($count < 1) {
+    return;
+}
+if (inv_total(inv, silver_bar) < 1) {
+    ~mesbox("You need a silver bar to make that.");
+    return;
+}
+~crafting_silver($product, $productexp, $count);
 
 // weakqueue(crafting_silver, 1, $productexp, $product);
 //----------------------

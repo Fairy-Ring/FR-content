@@ -103,6 +103,7 @@ jobs:
       # tests/fenkenstrain-completion/: CI — four compiled runtime tests and the offline static check;
       #   setup-iso.sh is an optional isolated-layout helper, not a test or a live-server requirement.
       # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
+      # tests/silver-casting/: CI — compiled furnace handler fills each Silver Casting slot; no engine is started.
       # tests/giantdwarf-intro/: CI — compiled runtime/save-load checks; no engine is started.
       # tests/content-gaps/: CI — packed configuration/trigger integration, no server.
       # tests/elena-fence/: CI — packed map/dispatch runtime, runtime.sh starts no server.
@@ -147,6 +148,7 @@ jobs:
           run_test tests/fenkenstrain-completion/test_fenk_s0.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s0.py
           run_test tests/fenkenstrain-completion/test_fenk_s1.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s1.py
           run_test tests/fenkenstrain-completion/test_fenk_s2.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s2.py
+          run_test tests/silver-casting/test_silver_casting.mjs node --import tsx ../content/tests/silver-casting/test_silver_casting.mjs
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
