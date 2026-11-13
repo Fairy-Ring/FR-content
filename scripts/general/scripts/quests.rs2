@@ -47,7 +47,10 @@ switch_component ($component) {
         if_settext(questscroll_death:com_12, split_get(0, 2));
         if_settext(questscroll_death:com_13, split_get(0, 3));
         if_settext(questscroll_death:com_14, split_get(0, 4));
-        if_setobject(questscroll_death:com_4, $obj, $objscale);
+        // com_4 has no packed model; item-less scrolls need no object setter.
+        if ($obj ! null) {
+            if_setobject(questscroll_death:com_4, $obj, $objscale);
+        }
         if_openmain(questscroll_death);
 }
 // Update Quest Tab color
