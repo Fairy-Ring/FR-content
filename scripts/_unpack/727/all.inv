@@ -2091,6 +2091,8 @@ stock3=swamppaste,1000,10
 
 [trail_puzzlehintinv]
 size=25
+dummyinv=yes
+protect=no
 
 [viking_clothes_shop]
 scope=shared

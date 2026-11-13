@@ -1,6 +1,5 @@
 // Destroy prompt interface 14170.
-// com_0 is a 1x1 picture slot; display the selected item from inventory slot 0.
-// Swap it back on No, and preserve the previous slot-0 item on Yes.
+// com_0 displays a copy of the selected item; the real item stays in its backpack slot.
 
 [opheld5,kelda_hop_seed]
 @open_destroy_this_object(kelda_hop_seed);

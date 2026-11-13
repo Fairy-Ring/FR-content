@@ -1,5 +1,6 @@
 [if_close,trail_puzzle]
 inv_stoptransmit(trail_puzzle:com_8);
+inv_clear(trail_puzzlehintinv);
 
 [opheld1,_trail_puzzle] @trail_open_puzzle;
 
@@ -8,9 +9,9 @@ if(inv_freespace(trail_puzzleinv) > 1) {
     inv_clear(trail_puzzleinv); // prob shouldn't ever need this
     ~init_trail_puzzle;
 }
-inv_clear(trail_puzzlehint_display);
+inv_clear(trail_puzzlehintinv);
 ~init_trail_puzzle_hint;
-inv_transmit(trail_puzzlehint_display, trail_puzzle:com_8);
+inv_transmit(trail_puzzlehintinv, trail_puzzle:com_8);
 inv_transmit(trail_puzzleinv, trail_puzzle:com_2);
 if_openmain(trail_puzzle);
 
@@ -43,30 +44,30 @@ inv_setslot(trail_puzzleinv, 23, trail_slidingpuzzleb24, 1);
 ~shuffle_trail_puzzle;
 
 [proc,init_trail_puzzle_hint]
-inv_setslot(trail_puzzlehint_display, 0, trail_slidingpuzzleb01, 1);
-inv_setslot(trail_puzzlehint_display, 1, trail_slidingpuzzleb02, 1);
-inv_setslot(trail_puzzlehint_display, 2, trail_slidingpuzzleb03, 1);
-inv_setslot(trail_puzzlehint_display, 3, trail_slidingpuzzleb04, 1);
-inv_setslot(trail_puzzlehint_display, 4, trail_slidingpuzzleb05, 1);
-inv_setslot(trail_puzzlehint_display, 5, trail_slidingpuzzleb06, 1);
-inv_setslot(trail_puzzlehint_display, 6, trail_slidingpuzzleb07, 1);
-inv_setslot(trail_puzzlehint_display, 7, trail_slidingpuzzleb08, 1);
-inv_setslot(trail_puzzlehint_display, 8, trail_slidingpuzzleb09, 1);
-inv_setslot(trail_puzzlehint_display, 9, trail_slidingpuzzleb10, 1);
-inv_setslot(trail_puzzlehint_display, 10, trail_slidingpuzzleb11, 1);
-inv_setslot(trail_puzzlehint_display, 11, trail_slidingpuzzleb12, 1);
-inv_setslot(trail_puzzlehint_display, 12, trail_slidingpuzzleb13, 1);
-inv_setslot(trail_puzzlehint_display, 13, trail_slidingpuzzleb14, 1);
-inv_setslot(trail_puzzlehint_display, 14, trail_slidingpuzzleb15, 1);
-inv_setslot(trail_puzzlehint_display, 15, trail_slidingpuzzleb16, 1);
-inv_setslot(trail_puzzlehint_display, 16, trail_slidingpuzzleb17, 1);
-inv_setslot(trail_puzzlehint_display, 17, trail_slidingpuzzleb18, 1);
-inv_setslot(trail_puzzlehint_display, 18, trail_slidingpuzzleb19, 1);
-inv_setslot(trail_puzzlehint_display, 19, trail_slidingpuzzleb20, 1);
-inv_setslot(trail_puzzlehint_display, 20, trail_slidingpuzzleb21, 1);
-inv_setslot(trail_puzzlehint_display, 21, trail_slidingpuzzleb22, 1);
-inv_setslot(trail_puzzlehint_display, 22, trail_slidingpuzzleb23, 1);
-inv_setslot(trail_puzzlehint_display, 23, trail_slidingpuzzleb24, 1);
+inv_setslot(trail_puzzlehintinv, 0, trail_slidingpuzzleb01, 1);
+inv_setslot(trail_puzzlehintinv, 1, trail_slidingpuzzleb02, 1);
+inv_setslot(trail_puzzlehintinv, 2, trail_slidingpuzzleb03, 1);
+inv_setslot(trail_puzzlehintinv, 3, trail_slidingpuzzleb04, 1);
+inv_setslot(trail_puzzlehintinv, 4, trail_slidingpuzzleb05, 1);
+inv_setslot(trail_puzzlehintinv, 5, trail_slidingpuzzleb06, 1);
+inv_setslot(trail_puzzlehintinv, 6, trail_slidingpuzzleb07, 1);
+inv_setslot(trail_puzzlehintinv, 7, trail_slidingpuzzleb08, 1);
+inv_setslot(trail_puzzlehintinv, 8, trail_slidingpuzzleb09, 1);
+inv_setslot(trail_puzzlehintinv, 9, trail_slidingpuzzleb10, 1);
+inv_setslot(trail_puzzlehintinv, 10, trail_slidingpuzzleb11, 1);
+inv_setslot(trail_puzzlehintinv, 11, trail_slidingpuzzleb12, 1);
+inv_setslot(trail_puzzlehintinv, 12, trail_slidingpuzzleb13, 1);
+inv_setslot(trail_puzzlehintinv, 13, trail_slidingpuzzleb14, 1);
+inv_setslot(trail_puzzlehintinv, 14, trail_slidingpuzzleb15, 1);
+inv_setslot(trail_puzzlehintinv, 15, trail_slidingpuzzleb16, 1);
+inv_setslot(trail_puzzlehintinv, 16, trail_slidingpuzzleb17, 1);
+inv_setslot(trail_puzzlehintinv, 17, trail_slidingpuzzleb18, 1);
+inv_setslot(trail_puzzlehintinv, 18, trail_slidingpuzzleb19, 1);
+inv_setslot(trail_puzzlehintinv, 19, trail_slidingpuzzleb20, 1);
+inv_setslot(trail_puzzlehintinv, 20, trail_slidingpuzzleb21, 1);
+inv_setslot(trail_puzzlehintinv, 21, trail_slidingpuzzleb22, 1);
+inv_setslot(trail_puzzlehintinv, 22, trail_slidingpuzzleb23, 1);
+inv_setslot(trail_puzzlehintinv, 23, trail_slidingpuzzleb24, 1);
 
 // This achieves randomization by essentially simulating 101 moves using the adj slot to each piece starting from the bottom right
 // (since the puzzle is init'd in a completed state: https://x.com/JagexAsh/status/1301202083845201921)

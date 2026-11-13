@@ -70,6 +70,9 @@ inv_stoptransmit(smithing:column4);
 inv_stoptransmit(smithing:column5);
 inv_stoptransmit(smithing:column_claws);
 inv_stoptransmit(smithing:com_147);
+if (p_finduid(uid) = true) {
+    %if2 = 0;
+}
 
 [label,smithing_anvil_interface](obj $last_item)
 def_struct $struct = oc_param($last_item, smithing_anvil_struct);
@@ -93,6 +96,11 @@ if (inv_total(inv, hammer) < 1) {
 //set varps
 %smithbars = inv_total(inv, struct_param($struct, namedobj));
 %modified_smith = $player_level;
+// CANDIDATE: use the cache's lantern-label gate for the reconstructed recipe.
+%if2 = 0;
+if ($last_item = iron_bar & $player_level >= db_getfield(oil_lantern_frame, smithing:levelrequired, 0) & %smithbars >= db_getfield(oil_lantern_frame, smithing:bar_amount, 0)) {
+    %if2 = 1;
+}
 // Check if tourist trap is completed before sending white text option on darts
 if (%desertrescue >= ^desertrescue_learned_darts) {
     %if1 = 1;
