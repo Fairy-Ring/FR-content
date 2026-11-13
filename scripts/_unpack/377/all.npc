@@ -30637,7 +30637,6 @@ param=shop_sell_multiplier,1300
 param=shop_buy_multiplier,400
 param=shop_delta,30
 param=shop_title,Quatermaster's Stores
-param=owned_shop,regicide_general_shop_2
 [caveguide6]
 name=Koftik
 desc=The cave guide.

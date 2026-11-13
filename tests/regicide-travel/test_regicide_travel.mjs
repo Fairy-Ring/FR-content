@@ -115,7 +115,7 @@ function text(player) {
   return packetLog.get(player)
     .filter(message => message instanceof IfSetText || message instanceof MessageGame)
     .map(message => message instanceof MessageGame ? message.msg : message.text)
-    .join('\n');
+    .join('\n').replace(/\s+/g, ' ');
 }
 
 function componentTexts(player) {
@@ -580,7 +580,7 @@ check('king summons Read opens the packed 377 scroll interface with the letter t
   assert.match(letter, /Squire /i);
   assert.match(letter, /Kingdom of/i);
   assert.match(letter, /Kandarin/i);
-  assert.match(letter, /reopened the well of voyage/i);
+  assert.match(letter, /reopened\s+the well of voyage/i);
   assert.match(letter, /next commission/i);
   assert.match(letter, /King Lathas/i);
   assertStageUnchanged(p, stage, 'king summons Read');
@@ -666,13 +666,14 @@ check('quartermaster Talk-to opens parameterized base zero stock before completi
   const slot = before.shopInv.getItemIndex(halberd);
   assert.ok(slot >= 0, 'zero-stock halberd slot is still represented to the shop UI');
   const coins = requiredId(types.ObjType, 'coins');
-  before.playerInv.add(coins, 10000);
+  before.playerInv.add(coins, 1000000);
   const coinsBefore = before.playerInv.getItemCount(coins);
   const itemsBefore = before.playerInv.getItemCount(halberd);
   useInventoryButton(p, optionIndex('shop_template:inv', /buy[^\d]*1\b/i), halberd, slot, before.shopCom);
   assert.equal(before.shopInv.getItemCount(halberd), 0, 'packed shop buy leaves zero stock unchanged');
   assert.equal(before.playerInv.getItemCount(halberd), itemsBefore, 'out-of-stock buy transfers no halberd');
   assert.equal(before.playerInv.getItemCount(coins), coinsBefore, 'out-of-stock buy charges no coins');
+  assert.match(text(p), /out of stock/i, 'the published out-of-stock branch sends its existing refusal');
   assertStageUnchanged(p, stage, 'quartermaster base-stock opening and refusal');
 
   const afterNpc = spawnNpc(nativeNpc('regicidegeneralshopkeeper'));

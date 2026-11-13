@@ -1,0 +1,36 @@
+// Summons: use the published Regicide letter layout, not the donor's inter_102.
+[opheld1,regicide_quest_kings_summons]
+if_settext(scroll:com_2, "Squire <displayname()>.");
+if_settext(scroll:com_3, "");
+if_settext(scroll:com_4, "You are needed to serve the Kingdom of");
+if_settext(scroll:com_5, "Kandarin. At last our magi have reopened");
+if_settext(scroll:com_6, "the well of voyage. We must discuss your");
+if_settext(scroll:com_7, "next commission.");
+if_settext(scroll:com_8, "");
+if_settext(scroll:com_9, "His Majesty King Lathas");
+if_settext(scroll:com_10, "");
+if_settext(scroll:com_11, "");
+if_settext(scroll:com_12, "");
+if_settext(scroll:com_13, "");
+if_openmain(scroll);
+
+[oploc1,regicide_voyage_temple_well1]
+anim(human_reachforladder, 0);
+mes("You climb into the well..");
+if(testbit(%regicide_bits, ^regicide_down_well) = ^false) {
+    %regicide_bits = setbit(%regicide_bits, ^regicide_down_well);
+}
+p_delay(0);
+p_teleport(0_36_150_39_22);
+
+[oploc1,regicide_voyage_temple_well2]
+anim(human_reachforladder, 0);
+mes("You climb into the well..");
+p_delay(0);
+p_teleport(1_31_73_26_40);
+
+[oploc1,regicide_voyage_temple_entrance]
+p_teleport(0_36_150_10_24);
+
+[oploc1,regicide_voyage_temple_exit]
+p_teleport(0_36_50_8_16);
