@@ -1,0 +1,21 @@
+// UNKNOWN engineering protocol shared by the S06 Prayer and S13 collapse effects.
+// A normal protected one-tick timer consumes these saved fields, never gettimer.
+// The effect slices own timer startup, eligibility and due effects. Zero is unarmed.
+[proc,barrows_prayer_remaining]()(int)
+return(getbit_range(%barrows_countdowns, ^barrows_prayer_start, ^barrows_prayer_end));
+
+[proc,barrows_collapse_remaining]()(int)
+return(getbit_range(%barrows_countdowns, ^barrows_collapse_start, ^barrows_collapse_end));
+
+[proc,barrows_prayer_set](int $remaining)
+%barrows_countdowns = setbit_range_toint(%barrows_countdowns, min(^barrows_countdown_max, max(0, $remaining)), ^barrows_prayer_start, ^barrows_prayer_end);
+
+[proc,barrows_collapse_set](int $remaining)
+%barrows_countdowns = setbit_range_toint(%barrows_countdowns, min(^barrows_countdown_max, max(0, $remaining)), ^barrows_collapse_start, ^barrows_collapse_end);
+
+// At one the caller delivers its effect and stores this reloaded interval in the
+// same non-suspending callback. Entry/login does not replace a positive remainder.
+[proc,barrows_countdown_step](int $remaining, int $interval)(int, boolean)
+if ($remaining = 0) return(0, false);
+if ($remaining = 1) return($interval, true);
+return(sub($remaining, 1), false);

@@ -37,6 +37,7 @@ if (inzone(0_55_51_37_34, 0_55_51_37_34, coord) = true) {
 return (false);
 
 [proc,barrows_dig_dest](coord $dest)
+if (~barrows_run_begin = false) return;
 p_delay(1);
 p_telejump($dest);
 if_openoverlay(kill_count);

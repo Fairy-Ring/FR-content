@@ -305,15 +305,15 @@ for (const name of ['barrows', 'barrows_kills']) {
     assert.equal(one(fields, 'scope', 'all.varp'), 'perm', `[${name}] scope`);
 }
 const barrowsVarps = [...varpPack.byId].filter(([, name]) => name.startsWith('barrows')).sort(([left], [right]) => left - right);
-assert.deepEqual(barrowsVarps, [[452, 'barrows'], [453, 'barrows_kills']]);
+assert.deepEqual(barrowsVarps, [[452, 'barrows'], [453, 'barrows_kills'], [654, 'barrows_state'], [659, 'barrows_generation'], [660, 'barrows_countdowns']]);
 for (const id of [650, 651, 652, 653]) {
     assert(!varpPack.byId.get(id)?.startsWith('barrows'), `reserved varp ${id} was assigned to Barrows`);
 }
-for (const id of [654, 659, 660]) {
-    const name = `varp${id}_unused`;
-    assert.equal(varpPack.byId.get(id), name, `original unused varp ${id} identity changed`);
-    assert.equal(values(section(allVarps, name), 'scope').length, 0, `${name} must remain unnamed and untouched`);
-    assert.equal(values(section(allVarps, name), 'transmit').length, 0, `${name} must remain untouched`);
+for (const [id, name] of [[654, 'barrows_state'], [659, 'barrows_generation'], [660, 'barrows_countdowns']]) {
+    assert.equal(varpPack.byId.get(id), name, `allocated server varp ${id}`);
+    const fields = section(allVarps, name);
+    assert.equal(one(fields, 'scope', 'all.varp'), 'perm', `[${name}] scope`);
+    assert.equal(one(fields, 'transmit', 'all.varp'), 'no', `[${name}] transmit`);
 }
 
 const allVarbits = parseSections(readText('scripts/_unpack/377/all.varbit'), 'all.varbit');
@@ -344,7 +344,6 @@ for (const [name, [inputType, outputType]] of ENUM_SIGNATURES) {
 
 const noModelConfigs = `${enumText}\n${readText(PARAM_PATH)}`;
 assert(!/\bmodel\w*\s*=|\b4623\b|\b45(?:44|45|46|47|48|49|50|51|52|53|54|55|56|57)\b/i.test(noModelConfigs), 'S00 must not add guessed puzzle model joins');
-assert(!fs.existsSync(path.join(contentRoot, 'scripts/minigames/game_barrows/configs/barrows.constant')), 'S00 does not allocate server-only constants');
 
 const expectedSarcToBrother = new Map(ENCOUNTERS.map(({ sarc, brother }) => [sarc, brother]));
 const expectedSlainByBrother = new Map(ENCOUNTERS.map(({ brother, slain }) => [brother, slain]));

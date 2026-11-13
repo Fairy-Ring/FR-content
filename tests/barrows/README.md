@@ -1,4 +1,4 @@
-# Barrows S00 static config check
+# Barrows checks
 
 Run the registered check from the sibling engine:
 
@@ -18,3 +18,13 @@ Each negative control must exit 1. Add `--mutant NAME` to the command:
 - `swapped-parent-polarity`: swap the two `multiloc` children on parent `barrows_door_e_r`.
 
 Mutants change only text in memory. They do not modify content files.
+
+## Durable core (S01)
+
+Build the sibling engine packs, then run:
+
+```sh
+node --import tsx ../content/tests/barrows/test_core.mjs
+```
+
+This check executes the packed run procs through the production script runner. It covers masked state, phases, generation changes, owner-only actor removal, the non-suspending Search latch/reset, initial locked doors and saved countdown fields. The Search latch has no player trigger or reward grant in this build group. S07 replaces the all-locked layout initializer. S06 and S13 attach their effects to the shared saved-countdown primitives.

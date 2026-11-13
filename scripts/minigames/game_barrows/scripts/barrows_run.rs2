@@ -1,0 +1,98 @@
+// CANDIDATE D9 run lifecycle. Search/reset are protected, non-suspending transitions.
+// No player operation reaches the Search latch until the chest/reward slices attach.
+[proc,barrows_phase]()(int)
+return(getbit_range(%barrows_state, ^barrows_phase_start, ^barrows_phase_end));
+
+[proc,barrows_tunnel_identity]()(int)
+return(getbit_range(%barrows_state, ^barrows_identity_start, ^barrows_identity_end));
+
+[proc,barrows_inside](coord $coord)(boolean)
+if (inzone(0_55_151_0_0, 0_55_151_63_63, $coord) = true | inzone(3_55_151_0_0, 3_55_151_63_63, $coord) = true) return(true);
+return(false);
+
+[proc,barrows_in_tunnels](coord $coord)(boolean)
+return(inzone(0_55_151_0_0, 0_55_151_63_63, $coord));
+
+[proc,barrows_run_begin]()(boolean)
+def_int $phase = ~barrows_phase;
+if ($phase = ^barrows_phase_unlooted) return(true);
+if ($phase ! ^barrows_phase_idle) return(false);
+p_stopaction;
+~barrows_generation_advance;
+%barrows_state = clearbit_range(%barrows_state, 0, ^barrows_state_end);
+%barrows_kills = 0;
+%barrows_countdowns = 0;
+// An idle replacement value is never reused as the next run's identity.
+%barrows_state = setbit_range_toint(%barrows_state, add(1, random(^barrows_identity_count)), ^barrows_identity_start, ^barrows_identity_end);
+%barrows_state = setbit_range_toint(%barrows_state, ^barrows_phase_unlooted, ^barrows_phase_start, ^barrows_phase_end);
+~barrows_layout_choose;
+return(true);
+
+// S07 replaces this one initializer with its connected-layout/corner chooser.
+// Zero means visually unlocked. Never expose the default-zero tunnel locks.
+[proc,barrows_layout_choose]
+%barrows = clearbit_range(%barrows, ^barrows_ladder_start, ^barrows_ladder_end);
+%barrows = setbit_range(%barrows, ^barrows_locks_start, ^barrows_locks_end);
+%barrows = clearbit_range(%barrows, ^barrows_puzzle_start, ^barrows_puzzle_end);
+%barrows_state = clearbit_range(%barrows_state, ^barrows_corner_start, ^barrows_entrance_end);
+%barrows_state = clearbit(%barrows_state, ^barrows_solved_bit);
+
+[proc,barrows_generation_advance]
+if (%barrows_generation = ^barrows_generation_max) {
+    // Actor deletion completes before the wrapped generation can be used by a new encounter.
+    ~barrows_remove_owned;
+    %barrows_generation = 1;
+} else {
+    %barrows_generation = add(%barrows_generation, 1);
+    ~barrows_remove_owned;
+}
+
+[proc,barrows_actor_type](npc $type)(boolean)
+if ($type = barrows_ahrim | $type = barrows_dharok | $type = barrows_guthan | $type = barrows_karil | $type = barrows_torag | $type = barrows_verac | $type = barrows_rat | $type = barrows_bloodworm | $type = barrows_spider | $type = barrows_giantrat | $type = barrows_skeleton_unarmed | $type = barrows_skeleton_armed | $type = barrows_giantspider) return(true);
+return(false);
+
+// Use the secondary NPC pointer so shared death processing retains its active actor.
+// Ordinary unowned map placements and every other player's summons remain untouched.
+[proc,barrows_remove_owned]
+.npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
+while (.npc_findnext = true) {
+    if (.%npc_attacking_uid = uid & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) .npc_del;
+}
+.npc_findallany(3_55_151_32_32, ^barrows_actor_scan_radius, 0);
+while (.npc_findnext = true) {
+    if (.%npc_attacking_uid = uid & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) .npc_del;
+}
+
+[proc,barrows_search_allowed](int $generation)(boolean)
+if (~barrows_phase = ^barrows_phase_unlooted & %barrows_generation = $generation & ~barrows_tunnel_identity >= 1 & ~barrows_tunnel_identity <= ^barrows_identity_count & ~barrows_in_tunnels(coord) = true) return(true);
+return(false);
+
+// S10 supplies chest/location/authorization guards. S11 supplies reward data.
+// S12 calls this latch within the same protected invocation as its complete grant,
+// then draws the escape layout. This proc alone neither rolls nor grants treasure.
+[proc,barrows_search_latch](int $generation)(boolean)
+if (~barrows_search_allowed($generation) = false) return(false);
+p_stopaction;
+%barrows_state = setbit_range_toint(%barrows_state, ^barrows_phase_paid, ^barrows_phase_start, ^barrows_phase_end);
+%barrows_state = clearbit(%barrows_state, ^barrows_solved_bit);
+%barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
+~barrows_generation_advance;
+return(true);
+
+[proc,barrows_run_reset]
+p_stopaction;
+~barrows_generation_advance;
+%barrows_kills = 0;
+%barrows_state = clearbit_range(%barrows_state, 0, ^barrows_state_end);
+%barrows_countdowns = 0;
+~barrows_layout_choose;
+if_close;
+if_openoverlay(null);
+cam_reset;
+
+// Login reconciles interaction state only. It never redraws or refreshes a countdown.
+[proc,barrows_resume]
+if (testbit(%barrows_state, ^barrows_challenge_bit) = 1) {
+    %barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
+    if_close;
+}

@@ -1,0 +1,43 @@
+// VERIFIED original 377 client fields. Server-only fields are UNKNOWN engineering storage.
+^barrows_identity_start = 0
+^barrows_identity_end = 2
+^barrows_phase_start = 3
+^barrows_phase_end = 4
+^barrows_corner_start = 5
+^barrows_corner_end = 6
+^barrows_entrance_start = 7
+^barrows_entrance_end = 8
+^barrows_solved_bit = 9
+^barrows_family_start = 10
+^barrows_family_end = 11
+^barrows_permutation_start = 12
+^barrows_permutation_end = 14
+^barrows_challenge_bit = 15
+^barrows_state_end = 15
+^barrows_ladder_start = 6
+^barrows_ladder_end = 9
+^barrows_locks_start = 10
+^barrows_locks_end = 25
+^barrows_puzzle_start = 29
+^barrows_puzzle_end = 31
+^barrows_slain_start = 0
+^barrows_slain_end = 5
+^barrows_potential_start = 6
+^barrows_potential_end = 15
+^barrows_count_start = 17
+^barrows_count_end = 31
+^barrows_prayer_start = 0
+^barrows_prayer_end = 15
+^barrows_collapse_start = 16
+^barrows_collapse_end = 31
+
+// CANDIDATE D9 lifecycle. Phase 3 is invalid and never authorizes entry or payment.
+^barrows_phase_idle = 0
+^barrows_phase_unlooted = 1
+^barrows_phase_paid = 2
+
+// UNKNOWN engineering bounds, not historical progression or timing claims.
+^barrows_identity_count = 6
+^barrows_countdown_max = 65535
+^barrows_generation_max = 2147483647
+^barrows_actor_scan_radius = 32
