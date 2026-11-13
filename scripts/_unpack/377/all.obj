@@ -36841,6 +36841,7 @@ model=obj_tbwt_karambwan_vessel_loaded_with_karambwanji
 manwear=obj_tbwt_karambwan_vessel_manwear,0
 womanwear=obj_tbwt_karambwan_vessel_manwear,6
 weight=3150g
+param=fish_equipment_struct,fish_equipment_karambwan_vessel
 
 [cert_tbwt_karambwan_vessel_loaded_with_karambwanji]
 certlink=tbwt_karambwan_vessel_loaded_with_karambwanji
