@@ -225,6 +225,11 @@ const cases = {
       assert.equal(p.runScript(state, true, true), ScriptState.FINISHED);
       assert.equal(p.invTotal(worn, type.id), Number(base >= 10), 'base Slayer, not the boosted level, gates wearing');
     }
+    // Control: without a mask the same timer run hurts, so the two "prevents" assertions below can fail.
+    const unmasked = player(); unmasked.x = 3206; unmasked.z = 9379;
+    const unmaskedHp = unmasked.levels[PlayerStat.HITPOINTS];
+    run(unmasked, '[timer,dt_smoke_damage]');
+    assert.equal(unmasked.levels[PlayerStat.HITPOINTS], unmaskedHp - 20, 'unmasked Smoke damage is 20 hitpoints');
     const p = player(); p.x = 3206; p.z = 9379;
     for (const name of ['slayer_facemask', 'gasmask']) {
       const type = types.ObjType.get(id('ObjType', name));

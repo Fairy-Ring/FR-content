@@ -70,33 +70,39 @@ for (const clock of [0, 100]) {
   console.log(`PASS compiled Smoke timer: absent arms; present clock ${clock} is preserved`);
 }
 
-// Exercise a real light action followed by the engine timer, not a source pin.
-const player = new Player('dts2_torch_expiry', 2n, 2n);
-player.uid = 2;
-player.pid = 2;
-player.levels.fill(99);
-player.baseLevels.fill(99);
-player.setVarBit(VarBitType.getId('deserttreasure'), 10);
-player.lastUseItem = ObjType.getId('tinderbox');
-player.invAdd(InvType.getId('inv'), player.lastUseItem, 1);
-World.currentTick = 100;
-const light = ScriptProvider.getByName('[oplocu,4d_standing_torch1]');
-const expiry = ScriptProvider.getByName('[timer,dt_smoke_torch_ne]');
-assert(light && expiry);
-assert.equal(player.runScript(ScriptRunner.init(light, player), true, true), ScriptState.FINISHED);
-const bit = VarBitType.getId('fd_torch_count1');
-assert.equal(player.getVarBit(bit), 1, 'packed lighting sets the real torch bit');
-const timer = player.timers.get(expiry.id);
-assert(timer && timer.interval === 300, 'native light arms the configured torch lifetime');
-World.currentTick = 399;
-player.processTimers(timer.type);
-assert.equal(player.getVarBit(bit), 1, 'torch remains lit before expiry');
-World.currentTick = 400;
-player.processTimers(timer.type);
-assert.equal(player.getVarBit(bit), 0, 'executed packed expiry clears the original torch bit');
-assert.equal(player.timers.has(expiry.id), false, 'expiry removes its timer');
-assert.equal(player.getVarBit(VarBitType.getId('fd_firechest')), 0, 'expiry grants no chest progress');
-console.log('PASS packed torch light and real engine expiry at 300 ticks');
+// Exercise a real light action followed by the engine timer for each of the four torches, not a source pin.
+for (const [index, corner] of [[1, 'ne'], [2, 'se'], [3, 'sw'], [4, 'nw']]) {
+  const player = new Player(`dts2_torch_expiry_${index}`, 2n, 2n);
+  player.uid = 2;
+  player.pid = 2;
+  player.levels.fill(99);
+  player.baseLevels.fill(99);
+  player.setVarBit(VarBitType.getId('deserttreasure'), 10);
+  player.lastUseItem = ObjType.getId('tinderbox');
+  player.invAdd(InvType.getId('inv'), player.lastUseItem, 1);
+  World.currentTick = 100;
+  const light = ScriptProvider.getByName(`[oplocu,4d_standing_torch${index}]`);
+  const expiry = ScriptProvider.getByName(`[timer,dt_smoke_torch_${corner}]`);
+  assert(light && expiry, `torch ${index} has its packed light trigger and ${corner} timer`);
+  assert.equal(player.runScript(ScriptRunner.init(light, player), true, true), ScriptState.FINISHED);
+  const bit = VarBitType.getId(`fd_torch_count${index}`);
+  const others = [1, 2, 3, 4].filter(other => other !== index).map(other => VarBitType.getId(`fd_torch_count${other}`));
+  assert.equal(player.getVarBit(bit), 1, `packed lighting sets the real bit of torch ${index}`);
+  for (const other of others) assert.equal(player.getVarBit(other), 0, `lighting torch ${index} sets no other torch bit`);
+  const timer = player.timers.get(expiry.id);
+  assert(timer && timer.interval === 300, `native light arms the configured lifetime on the ${corner} timer`);
+  assert.equal(player.timers.size, 1, `lighting torch ${index} arms exactly one timer`);
+  World.currentTick = 399;
+  player.processTimers(timer.type);
+  assert.equal(player.getVarBit(bit), 1, `torch ${index} remains lit before expiry`);
+  World.currentTick = 400;
+  player.processTimers(timer.type);
+  assert.equal(player.getVarBit(bit), 0, `executed packed expiry clears the bit of torch ${index}`);
+  for (const other of others) assert.equal(player.getVarBit(other), 0, `the expiry of torch ${index} touches no other torch bit`);
+  assert.equal(player.timers.has(expiry.id), false, 'expiry removes its timer');
+  assert.equal(player.getVarBit(VarBitType.getId('fd_firechest')), 0, 'expiry grants no chest progress');
+}
+console.log('PASS packed torch light and real engine expiry at 300 ticks, all four torches');
 
 // World imports create workers; this offline test starts no network listener.
 process.exit(0);
