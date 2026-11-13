@@ -44,6 +44,7 @@ const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
 const Environment = (await load('src/util/Environment.ts')).default;
 const CoordGrid = (await load('src/engine/CoordGrid.ts')).CoordGrid;
 const { CollisionFlag, isFlagged } = await load('src/engine/routefinder/index.ts');
+const { isZoneAllocated } = await load('src/engine/GameMap.ts');
 const MoveClick = (await load('src/network/game/client/model/MoveClick.ts')).default;
 const MoveClickHandler = (await load('src/network/game/client/handler/MoveClickHandler.ts')).default;
 
@@ -84,8 +85,8 @@ const ids = {
     inv: namedId(InvType, 'inv'),
     rod: namedId(ObjType, 'fishing_rod'),
     bait: namedId(ObjType, 'fishing_bait'),
-    net: namedId(ObjType, 'small_fishing_net'),
-    coins: namedId(ObjType, 'coins'),
+    net: namedId(ObjType, 'net'),
+    logs: namedId(ObjType, 'logs'),
     fish: namedId(ObjType, 'mort_slimey_eel'),
     movement: namedId(ParamType, 'fishing_movement_enum'),
     fishingStruct: namedId(ParamType, 'fishing_struct'),
@@ -122,21 +123,20 @@ const expectedMessages = {
     wrongTool: 'There is nothing suitable for catching with a net here.',
     full: "You can't carry any more fish."
 };
+// preserved donor enum tiles with no free cardinal bank on the 377 map; U-SLIMYEEL-1113 ruling 3
+const preservedUnreachableTiles = ['0_3432_3405', '0_3440_3282', '0_3444_3280', '0_3439_3284'].sort();
 
 let caseNumber = 0;
 let failed = 0;
-let skipped = 0;
 function runCase(name, body) {
     const checks = [];
     let details;
-    let skipReason;
     const ctx = {
         check(label, actual, expected) {
             const pass = JSON.stringify(actual) === JSON.stringify(expected);
             checks.push({ label, actual, expected, pass });
         },
         detail(value) { details = value; },
-        skip(reason) { skipReason = reason; },
         fail(label, error) {
             checks.push({ label, actual: error?.stack ?? String(error), expected: 'no exception', pass: false });
         }
@@ -145,12 +145,6 @@ function runCase(name, body) {
         body(ctx);
     } catch (error) {
         ctx.fail('case execution', error);
-    }
-    if (skipReason && checks.every(check => check.pass)) {
-        skipped++;
-        console.log(`CASE SKIP ${name} ${JSON.stringify({ reason: skipReason, ...(details === undefined ? {} : { details }) })}`);
-        caseNumber++;
-        return true;
     }
     const pass = checks.length > 0 && checks.every(check => check.pass);
     if (!pass) failed++;
@@ -229,10 +223,11 @@ const waterNames = new Set([
     'dwarf_glacial_water', 'mdaugher_water', 'dagganoth_cave_water', 'elid_underground_water'
 ]);
 const isWater = tile => Boolean(tile?.names.some(name => waterNames.has(name)));
-const hasFloor = tile => Boolean(tile?.names.length);
+const hasLandFloor = tile => Boolean(tile?.names.some(name => name !== null && !waterNames.has(name)));
 const walkableLand = coord => {
     const floor = packedMap(coord.level, coord.x, coord.z);
-    return hasFloor(floor) && !isWater(floor) && World.gameMap.hasZone(coord.x, coord.z, coord.level) &&
+    // A shoreline tile can have both a water overlay and a land underlay.
+    return hasLandFloor(floor) && isZoneAllocated(coord.level, coord.x, coord.z) &&
         !isFlagged(coord.x, coord.z, coord.level, CollisionFlag.WALK_BLOCKED);
 };
 const neighbors = (coord) => {
@@ -313,6 +308,13 @@ function findApproach(type, coord) {
     }
     return null;
 }
+function reachableFishingFixture(type) {
+    for (const { coord } of enumCoords(type)) {
+        const approach = findApproach(type, coord);
+        if (approach) return { coord, approach };
+    }
+    throw new Error(`no operable bank beside any enum tile for ${type.debugname}`);
+}
 function dataForType(type) {
     return enumCoords(type).map(({ key, coord }) => {
         const floor = packedMap(coord.level, coord.x, coord.z);
@@ -322,7 +324,14 @@ function dataForType(type) {
             coord: `${coord.level}_${coord.x}_${coord.z}`,
             floor: floor?.names ?? null,
             water: isWater(floor),
-            approach: approach ? `${approach.level}_${approach.x}_${approach.z}` : null
+            approach: approach ? `${approach.level}_${approach.x}_${approach.z}` : null,
+            adjacent: approach ? undefined : neighbors(coord).map(tile => ({
+                coord: `${tile.level}_${tile.x}_${tile.z}`,
+                floor: packedMap(tile.level, tile.x, tile.z)?.names ?? null,
+                allocated: isZoneAllocated(tile.level, tile.x, tile.z),
+                water: isWater(packedMap(tile.level, tile.x, tile.z)),
+                blocked: isFlagged(tile.x, tile.z, tile.level, CollisionFlag.WALK_BLOCKED)
+            }))
         };
     });
 }
@@ -383,6 +392,7 @@ function placePlayerForTarget(player, npc, op) {
 }
 function interactTick(player, trace, tick) {
     World.currentTick = tick;
+    player.resetEntity(false);
     const trigger = player.getOpTrigger();
     const before = {
         messages: trace.messages.length,
@@ -418,22 +428,20 @@ function equip(player, { rod = true, bait = 3, net = false, freeSlots = 0 } = {}
     const inventory = player.getInventory(ids.inv);
     const capacity = inventory.capacity;
     assert(capacity >= 4, `inventory capacity too small for fixture: ${capacity}`);
-    inventory.set(0, rod ? ids.rod : ids.net, 1);
-    if (bait > 0) inventory.set(1, ids.bait, bait);
+    inventory.set(0, { id: rod ? ids.rod : ids.net, count: 1 });
+    if (bait > 0) inventory.set(1, { id: ids.bait, count: bait });
     if (net) player.lastUseItem = ids.net;
     else if (rod) player.lastUseItem = ids.rod;
     let slot = bait > 0 ? 2 : 1;
     const occupiedLimit = capacity - freeSlots;
-    while (slot < occupiedLimit) inventory.set(slot++, ids.coins, 1);
+    while (slot < occupiedLimit) inventory.set(slot++, { id: ids.logs, count: 1 });
     return inventory;
 }
 function setNpcActionTarget(player, npc, op) {
     placePlayerForTarget(player, npc, op);
 }
 function performAction(type, options, lastTick) {
-    const coordinates = enumCoords(type);
-    const coord = coordinates[0]?.coord ?? { level: 0, x: 3200, z: 3200 };
-    const approach = findApproach(type, coord) ?? coord;
+    const { coord, approach } = reachableFishingFixture(type);
     const npc = activateNpc(makeNpc(type, coord));
     const { player, trace } = makePlayer(options.level ?? 28);
     player.level = approach.level;
@@ -476,14 +484,15 @@ runCase('packed-trigger-dispatch', ctx => {
         ctx.check(`${name} category`, type.category, ids.slimeyfish);
         ctx.check(`${name} timer`, type.timer, 1);
         ctx.check(`${name} bait option`, type.op?.[0] ?? null, 'Bait');
-        ctx.check(`${name} lure option`, type.op?.[2] ?? null, 'Lure');
+        ctx.check(`${name} internal operation 3`, type.op?.[2] ?? null, 'hidden');
+        ctx.check(`${name} internal operation 5`, type.op?.[4] ?? null, 'hidden');
         ctx.check(`${name} movement enum`, EnumType.get(type.params?.get(ids.movement))?.debugname ?? null, name === eelSpecs[0].name ? eelSpecs[0].movement : name === eelSpecs[1].name ? eelSpecs[1].movement : eelSpecs[2].movement);
         for (const spec of opSpecs) {
             const script = ScriptProvider.getByTrigger(spec.trigger, type.id, type.category);
             ctx.check(`${name} ${spec.name}`, script?.name ?? null, spec.name);
         }
     }
-    ctx.check('movement helper label packed', ScriptProvider.getByName('[proc,move_fishing_spot]')?.name ?? null, '[proc,move_fishing_spot]');
+    ctx.check('movement helper label packed', ScriptProvider.getByName('[label,move_fishing_spot]')?.name ?? null, '[label,move_fishing_spot]');
 });
 
 runCase('slimy-eel-object-fishing-struct', ctx => {
@@ -525,7 +534,9 @@ runCase('fishing-enum-water-and-operable-bank', ctx => {
             if (!row.approach) failures.push({ type: name, tile: row.coord, reason: 'no adjacent walkable land tile passes Player.inOperableDistance', floor: row.floor });
         }
     }
-    ctx.check('every enum tile is water and has a reachable walkable bank', failures, []);
+    const bankReason = 'no adjacent walkable land tile passes Player.inOperableDistance';
+    ctx.check('all enum tiles retain their water data', failures.filter(failure => failure.reason !== bankReason), []);
+    ctx.check('only the preserved donor tiles lack a free cardinal bank', failures.filter(failure => failure.reason === bankReason).map(failure => failure.tile).sort(), preservedUnreachableTiles);
     ctx.detail(tileDetails);
 });
 
@@ -564,8 +575,6 @@ runCase('fishing-category-controls', ctx => {
 });
 
 runCase('level-rod-bait-and-wrong-tool-validation', ctx => {
-    const { type } = eelTypes[0];
-    if (!type) throw new Error(`missing ${eelSpecs[0].name}`);
     const scenarios = [
         { name: 'level gate', options: { level: 27, inventory: { rod: true, bait: 2 } }, message: expectedMessages.level },
         { name: 'missing rod', options: { inventory: { rod: false, bait: 2 } }, message: expectedMessages.rod },
@@ -573,12 +582,15 @@ runCase('level-rod-bait-and-wrong-tool-validation', ctx => {
         { name: 'wrong net', options: { op: ServerTriggerType.OPNPCU, inventory: { rod: false, bait: 0, net: true }, lastUseItem: ids.net }, message: expectedMessages.wrongTool }
     ];
     const observed = [];
-    for (const scenario of scenarios) {
-        const result = performAction(type, scenario.options, 0);
-        const text = result.trace.messages.concat(result.trace.interfaceText);
-        observed.push({ name: scenario.name, trigger: result.frames[0]?.trigger ?? null, text });
-        ctx.check(`${scenario.name} is visible`, text.includes(scenario.message), true);
-        ctx.check(`${scenario.name} does not run fish_roll`, result.trace.fishRollCalls, 0);
+    for (const { name, type } of eelTypes) {
+        assert(type, `missing ${name}`);
+        for (const scenario of scenarios) {
+            const result = performAction(type, scenario.options, 0);
+            const text = result.trace.messages.concat(result.trace.interfaceText);
+            observed.push({ type: name, name: scenario.name, trigger: result.frames[0]?.trigger ?? null, text });
+            ctx.check(`${name} ${scenario.name} is visible`, text.includes(scenario.message), true);
+            ctx.check(`${name} ${scenario.name} does not run fish_roll`, result.trace.fishRollCalls, 0);
+        }
     }
     ctx.detail(observed);
 });
@@ -597,7 +609,7 @@ runCase('tick-by-tick-fishing-catch-and-repeat', ctx => {
             '[opnpc3,_slimeyfish]', '[opnpc3,_slimeyfish]'
         ];
         ctx.check(`${name} ScriptRunner trigger sequence`, triggerNames, expectedTriggers);
-        ctx.check(`${name} action-delay sequence`, frames.map(frame => frame.actionDelay), [105, 105, 105, 105, 105, 105, 110, 110, 110, 110, 110]);
+        ctx.check(`${name} action-delay sequence`, frames.map(frame => frame.actionDelay - result.startTick), [5, 5, 5, 5, 5, 5, 10, 10, 10, 10, 10]);
         ctx.check(`${name} cast at tick +1`, frameAt(result, 1).messages, ['You cast out your line...']);
         ctx.check(`${name} cast animation at tick +1`, frameAt(result, 1).animations, ['human_fishing_casting']);
         ctx.check(`${name} attempt and sound at tick +2`, frameAt(result, 2).messages, ['You attempt to catch a fish.']);
@@ -615,54 +627,62 @@ runCase('tick-by-tick-fishing-catch-and-repeat', ctx => {
 });
 
 runCase('failed-fish-roll-consumes-no-bait-or-fish', ctx => {
-    const { type } = eelTypes[0];
-    if (!type) throw new Error(`missing ${eelSpecs[0].name}`);
-    const result = performAction(type, { inventory: { rod: true, bait: 3, freeSlots: 2 }, random: 0.999999 }, 5);
-    ctx.check('fish_roll reached at the scheduled tick', frameAt(result, 5).fishRollCalls, 1);
-    ctx.check('failed roll does not consume bait', itemCount(result.player, ids.bait), 3);
-    ctx.check('failed roll does not add eel', itemCount(result.player, ids.fish), 0);
-    ctx.check('failed roll grants no fishing XP', result.player.stats[ids.fishingStat] - getExpByLevel(28), 0);
-    ctx.detail({ frames: result.frames, inventory: inventorySnapshot(result.player) });
+    const observed = [];
+    for (const { name, type } of eelTypes) {
+        assert(type, `missing ${name}`);
+        const result = performAction(type, { inventory: { rod: true, bait: 3, freeSlots: 2 }, random: 0.999999 }, 5);
+        ctx.check(`${name} fish_roll reached at the scheduled tick`, frameAt(result, 5).fishRollCalls, 1);
+        ctx.check(`${name} failed roll does not consume bait`, itemCount(result.player, ids.bait), 3);
+        ctx.check(`${name} failed roll does not add eel`, itemCount(result.player, ids.fish), 0);
+        ctx.check(`${name} failed roll grants no fishing XP`, result.player.stats[ids.fishingStat] - getExpByLevel(28), 0);
+        observed.push({ name, frames: result.frames, inventory: inventorySnapshot(result.player) });
+    }
+    ctx.detail(observed);
 });
 
 runCase('full-inventory-and-last-bait-branches', ctx => {
-    const { type } = eelTypes[0];
-    if (!type) throw new Error(`missing ${eelSpecs[0].name}`);
-    const alreadyFull = performAction(type, { inventory: { rod: true, bait: 2, freeSlots: 0 } }, 0);
-    const alreadyFullText = alreadyFull.trace.messages.concat(alreadyFull.trace.interfaceText);
-    ctx.check('full bag with spare bait stops with message', alreadyFullText.includes(expectedMessages.full), true);
-    ctx.check('full bag prevents fish_roll', alreadyFull.trace.fishRollCalls, 0);
+    const observed = [];
+    for (const { name, type } of eelTypes) {
+        assert(type, `missing ${name}`);
+        const alreadyFull = performAction(type, { inventory: { rod: true, bait: 2, freeSlots: 0 } }, 0);
+        const alreadyFullText = alreadyFull.trace.messages.concat(alreadyFull.trace.interfaceText);
+        ctx.check(`${name} full bag with spare bait stops with message`, alreadyFullText.includes(expectedMessages.full), true);
+        ctx.check(`${name} full bag prevents fish_roll`, alreadyFull.trace.fishRollCalls, 0);
 
-    const lastBait = performAction(type, { inventory: { rod: true, bait: 1, freeSlots: 0 } }, 6);
-    const lastBaitText = lastBait.trace.messages.concat(lastBait.trace.interfaceText);
-    ctx.check('one bait fits the packed-full-bag exception', frameAt(lastBait, 5).fishRollCalls, 1);
-    ctx.check('last bait is consumed', itemCount(lastBait.player, ids.bait), 0);
-    ctx.check('last-bait catch adds eel', itemCount(lastBait.player, ids.fish), 1);
-    ctx.check('last-bait exception does not report full bag', lastBaitText.includes(expectedMessages.full), false);
-    ctx.check('last-bait exhaustion reports published message', lastBaitText.includes(expectedMessages.bait), true);
+        const lastBait = performAction(type, { inventory: { rod: true, bait: 1, freeSlots: 0 } }, 6);
+        const lastBaitText = lastBait.trace.messages.concat(lastBait.trace.interfaceText);
+        ctx.check(`${name} one bait fits the packed-full-bag exception`, frameAt(lastBait, 5).fishRollCalls, 1);
+        ctx.check(`${name} last bait is consumed`, itemCount(lastBait.player, ids.bait), 0);
+        ctx.check(`${name} last-bait catch adds eel`, itemCount(lastBait.player, ids.fish), 1);
+        ctx.check(`${name} last-bait exception does not report full bag`, lastBaitText.includes(expectedMessages.full), false);
+        ctx.check(`${name} last-bait exhaustion reports published message`, lastBaitText.includes(expectedMessages.bait), true);
 
-    const fillsAfterCatch = performAction(type, { inventory: { rod: true, bait: 3, freeSlots: 1 } }, 6);
-    const fullAfterCatchText = fillsAfterCatch.trace.messages.concat(fillsAfterCatch.trace.interfaceText);
-    ctx.check('catch fills the final slot', itemCount(fillsAfterCatch.player, ids.fish), 1);
-    ctx.check('next tick stops at full inventory', frameAt(fillsAfterCatch, 6).messages.concat(frameAt(fillsAfterCatch, 6).interfaceText).includes(expectedMessages.full), true);
-    ctx.check('full bag stops another fish_roll', fillsAfterCatch.trace.fishRollCalls, 1);
+        const fillsAfterCatch = performAction(type, { inventory: { rod: true, bait: 3, freeSlots: 1 } }, 6);
+        ctx.check(`${name} catch fills the final slot`, itemCount(fillsAfterCatch.player, ids.fish), 1);
+        ctx.check(`${name} next tick stops at full inventory`, frameAt(fillsAfterCatch, 6).messages.concat(frameAt(fillsAfterCatch, 6).interfaceText).includes(expectedMessages.full), true);
+        ctx.check(`${name} full bag stops another fish_roll`, fillsAfterCatch.trace.fishRollCalls, 1);
 
-    const exhausted = performAction(type, { inventory: { rod: true, bait: 1, freeSlots: 2 } }, 6);
-    ctx.check('real catch consumes the final bait', itemCount(exhausted.player, ids.bait), 0);
-    ctx.check('real catch is retained after exhaustion', itemCount(exhausted.player, ids.fish), 1);
-    ctx.check('exhaustion stops at published message', exhausted.trace.messages.concat(exhausted.trace.interfaceText).includes(expectedMessages.bait), true);
-    ctx.detail({ full: alreadyFull.trace.messages.concat(alreadyFull.trace.interfaceText), lastBait: lastBait.frames, fullAfterCatch: fillsAfterCatch.frames, exhausted: exhausted.frames });
+        const exhausted = performAction(type, { inventory: { rod: true, bait: 1, freeSlots: 2 } }, 6);
+        ctx.check(`${name} real catch consumes the final bait`, itemCount(exhausted.player, ids.bait), 0);
+        ctx.check(`${name} real catch is retained after exhaustion`, itemCount(exhausted.player, ids.fish), 1);
+        ctx.check(`${name} exhaustion stops at published message`, exhausted.trace.messages.concat(exhausted.trace.interfaceText).includes(expectedMessages.bait), true);
+        observed.push({ name, full: alreadyFullText, lastBait: lastBait.frames, fullAfterCatch: fillsAfterCatch.frames, exhausted: exhausted.frames });
+    }
+    ctx.detail(observed);
 });
 
 runCase('rod-use-dispatches-to-bait-operation', ctx => {
-    const { type } = eelTypes[0];
-    if (!type) throw new Error(`missing ${eelSpecs[0].name}`);
-    const result = performAction(type, { op: ServerTriggerType.OPNPCU, inventory: { rod: true, bait: 2 } }, 1);
-    ctx.check('rod use resolves OPNPCU', result.frames[0].trigger, '[opnpcu,_slimeyfish]');
-    ctx.check('rod use queues operation 1', result.player.targetOp, ServerTriggerType.APNPC1);
-    ctx.check('queued bait operation runs next tick', result.frames[1].trigger, '[opnpc1,_slimeyfish]');
-    ctx.check('queued bait operation starts five-tick action', result.frames[1].actionDelay, result.startTick + 1 + 5);
-    ctx.detail(result.frames);
+    const observed = [];
+    for (const { name, type } of eelTypes) {
+        assert(type, `missing ${name}`);
+        const result = performAction(type, { op: ServerTriggerType.OPNPCU, inventory: { rod: true, bait: 2, freeSlots: 2 } }, 1);
+        ctx.check(`${name} rod use resolves OPNPCU`, result.frames[0].trigger, '[opnpcu,_slimeyfish]');
+        ctx.check(`${name} rod use queues operation 1`, result.player.targetOp, ServerTriggerType.APNPC1);
+        ctx.check(`${name} queued bait operation runs next tick`, result.frames[1].trigger, '[opnpc1,_slimeyfish]');
+        ctx.check(`${name} queued bait operation starts five-tick action`, result.frames[1].actionDelay, result.startTick + 1 + 5);
+        observed.push({ name, frames: result.frames });
+    }
+    ctx.detail(observed);
 });
 
 function freeEnumTiles(type) {
@@ -683,17 +703,29 @@ function runMovement(type, targetIndex, blockerType, timerRandom, startTick) {
     if (!candidateEntry || !homeEntry) return null;
     const targetCoord = candidateEntry.coord;
     const homeCoord = homeEntry.coord;
-    const trace = { opcodes: {}, messages: [], interfaceText: [], animations: [], sounds: [], fishRollCalls: 0 };
+    const trace = { entries: [], frames: [], opcodes: {}, messages: [], interfaceText: [], animations: [], sounds: [], fishRollCalls: 0 };
     const npc = activateNpc(makeNpc(type, homeCoord));
     const blocker = blockerType ? activateNpc(makeNpc(blockerType, targetCoord)) : null;
+    const executeScript = npc.executeScript.bind(npc);
+    npc.executeScript = state => {
+        trace.entries.push({ name: state.script.name, tick: World.currentTick });
+        return executeScript(state);
+    };
     const repeatDraws = blockerType ? 50 : 1;
     let draws = 0;
     const desired = candidateFraction(candidateEntry.key, enumValues.length);
     try {
         withRandom(() => draws++ < repeatDraws ? desired : timerRandom, () => {
-            for (let offset = 0; offset <= 2; offset++) {
+            for (let offset = 0; offset <= 3; offset++) {
                 World.currentTick = startTick + offset;
                 withWatch({ npc, trace }, () => npc.turn());
+                trace.frames.push({
+                    tick: World.currentTick,
+                    coord: `${npc.level}_${npc.x}_${npc.z}`,
+                    delayed: npc.delayed,
+                    timerInterval: npc.timerInterval,
+                    timerClock: npc.timerClock
+                });
             }
         });
         return {
@@ -720,17 +752,19 @@ runCase('ai-timer-movement-period-boundaries', ctx => {
         const low = runMovement(type, targetIndex, null, 0, 1000 + caseNumber * 20);
         const high = runMovement(type, targetIndex, null, 0.999999, 1100 + caseNumber * 20);
         if (!low || !high) throw new Error(`could not allocate map-backed movement fixtures for ${name}`);
-        ctx.check(`${name} uses AI_TIMER`, low.trace.opcodes.AI_TIMER, 1);
-        ctx.check(`${name} delays twice`, low.trace.opcodes.NPC_DELAY, 1);
+        ctx.check(`${name} enters the packed AI_TIMER`, low.trace.entries[0]?.name ?? null, '[ai_timer,_slimeyfish]');
+        ctx.check(`${name} suspends with npc_delay(2)`, low.trace.opcodes.NPC_DELAY, 1);
         ctx.check(`${name} calls npc_tele`, low.trace.opcodes.NPC_TELE, 1);
         ctx.check(`${name} sets timer`, low.trace.opcodes.NPC_SETTIMER, 1);
         ctx.check(`${name} lower period`, low.timerInterval, 280);
         ctx.check(`${name} upper period`, high.timerInterval, 529);
         ctx.check(`${name} picks enum tile`, low.final, low.candidate);
+        ctx.check(`${name} stays home during delay`, low.trace.frames.slice(0, 3).map(frame => frame.coord), [low.home, low.home, low.home]);
+        ctx.check(`${name} teleports on resumed tick +3`, low.trace.frames[3]?.coord, low.candidate);
         results.push({
             name,
-            low: { candidate: low.candidate, home: low.home, final: low.final, timerInterval: low.timerInterval, draws: low.draws, opcodes: low.trace.opcodes },
-            high: { candidate: high.candidate, home: high.home, final: high.final, timerInterval: high.timerInterval, draws: high.draws, opcodes: high.trace.opcodes }
+            low: { candidate: low.candidate, home: low.home, final: low.final, timerInterval: low.timerInterval, draws: low.draws, trace: low.trace },
+            high: { candidate: high.candidate, home: high.home, final: high.final, timerInterval: high.timerInterval, draws: high.draws, trace: high.trace }
         });
     }
     ctx.detail(results);
@@ -756,52 +790,51 @@ runCase('ai-timer-preserves-slimeyfish-occupancy-rule', ctx => {
 });
 
 runCase('walk-input-interrupts-fishing', ctx => {
-    const { type } = eelTypes[0];
-    if (!type) throw new Error(`missing ${eelSpecs[0].name}`);
-    const coord = enumCoords(type)[0]?.coord;
-    const approach = coord && findApproach(type, coord);
-    if (!coord || !approach) {
-        ctx.skip('no enum tile has a reachable walkable bank in this selected pack');
-        return;
-    }
-    const npc = activateNpc(makeNpc(type, coord));
-    const { player, trace } = makePlayer(28);
-    player.level = approach.level;
-    player.x = approach.x;
-    player.z = approach.z;
-    equip(player, { rod: true, bait: 3, freeSlots: 2 });
-    placePlayerForTarget(player, npc, ServerTriggerType.OPNPC1);
-    const startTick = 1800 + caseNumber * 20;
-    try {
-        const cast = interactTick(player, trace, startTick);
-        ctx.check('first fishing interaction started', cast.trigger, '[opnpc1,_slimeyfish]');
+    const observed = [];
+    for (const { name, type } of eelTypes) {
+        assert(type, `missing ${name}`);
+        const { coord, approach } = reachableFishingFixture(type);
         const destination = neighbors(approach).find(tile => walkableLand(tile) && (tile.x !== approach.x || tile.z !== approach.z));
-        if (!destination) {
-            ctx.skip('no adjacent land destination is available to the production MoveClick handler');
-            ctx.detail({ approach, cast });
-            return;
+        assert(destination, `no walk destination beside ${name}`);
+        const npc = activateNpc(makeNpc(type, coord));
+        const { player, trace } = makePlayer(28);
+        player.level = approach.level;
+        player.x = approach.x;
+        player.z = approach.z;
+        equip(player, { rod: true, bait: 3, freeSlots: 2 });
+        placePlayerForTarget(player, npc, ServerTriggerType.OPNPC1);
+        const startTick = 1800 + caseNumber * 20;
+        try {
+            const start = interactTick(player, trace, startTick);
+            const cast = interactTick(player, trace, startTick + 1);
+            ctx.check(`${name} starts operation 1`, start.trigger, '[opnpc1,_slimeyfish]');
+            ctx.check(`${name} casts before the walk`, cast.messages, ['You cast out your line...']);
+            ctx.check(`${name} cast animation precedes the walk`, cast.animations, ['human_fishing_casting']);
+            const handler = new MoveClickHandler();
+            const accepted = handler.handle(new MoveClick([{ x: destination.x, z: destination.z }], 0, false), player);
+            ctx.check(`${name} real MoveClick accepted`, accepted, true);
+            ctx.check(`${name} walk clears fishing target`, player.target, null);
+            ctx.check(`${name} walk queues a real route`, player.hasWaypoints(), true);
+            const afterWalk = [];
+            withRandom(() => 0, () => {
+                for (let offset = 2; offset <= 13; offset++) {
+                    afterWalk.push(interactTick(player, trace, startTick + offset));
+                }
+            });
+            ctx.check(`${name} walks off the casting tile`, player.x !== approach.x || player.z !== approach.z, true);
+            ctx.check(`${name} walk interruption does not reach fish_roll`, trace.fishRollCalls, 0);
+            ctx.check(`${name} walk interruption adds no eel`, itemCount(player, ids.fish), 0);
+            ctx.check(`${name} walk interruption consumes no bait`, itemCount(player, ids.bait), 3);
+            ctx.check(`${name} walk interruption grants no XP`, player.stats[ids.fishingStat] - getExpByLevel(28), 0);
+            observed.push({ name, approach, destination, start, cast, afterWalk, final: { x: player.x, z: player.z } });
+        } finally {
+            disposeNpc(npc);
         }
-        const handler = new MoveClickHandler();
-        const accepted = handler.handle(new MoveClick([{ x: destination.x, z: destination.z }], 0, false), player);
-        ctx.check('real MoveClick accepted', accepted, true);
-        ctx.check('walk clears fishing target', player.target, null);
-        const walking = player.hasWaypoints();
-        if (!walking) {
-            ctx.skip('the production MoveClick handler accepted input but the selected pack has no queued route');
-            ctx.detail({ approach, destination, cast });
-            return;
-        }
-        World.currentTick = startTick + 1;
-        withWatch({ player, trace }, () => player.processInteraction());
-        ctx.check('walk interruption does not reach fish_roll', trace.fishRollCalls, 0);
-        ctx.check('walk interruption adds no eel', itemCount(player, ids.fish), 0);
-        ctx.detail({ approach, destination, cast, targetAfterWalk: player.target, waypoints: player.waypoints });
-    } finally {
-        disposeNpc(npc);
     }
+    ctx.detail(observed);
 });
 
 console.log('LIMIT movement occupancy follows donor slimeyfish-category checks; enum map checks verify water and reachable walkable banks, not blocked-terrain filtering.');
 for (const restore of handlerRestores.reverse()) restore();
-console.log(`RESULT ${failed ? 'FAIL' : 'PASS'} slimy-eel: ${caseNumber - failed - skipped}/${caseNumber} cases passed${skipped ? `, ${skipped} walk fixture skip(s)` : ''}`);
+console.log(`RESULT ${failed ? 'FAIL' : 'PASS'} slimy-eel: ${caseNumber - failed}/${caseNumber} cases passed`);
 process.exit(failed ? 1 : 0);
