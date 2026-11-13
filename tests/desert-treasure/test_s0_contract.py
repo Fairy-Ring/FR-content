@@ -278,11 +278,11 @@ def check_original_entity_configs() -> None:
     candidate_fields = ("hitpoints", "attack", "strength", "defence", "magic")
     damis_server_fields = {
         "fd_damis_normal": {
-            "size": "1", "wanderrange": "0", "maxrange": "64",
+            "wanderrange": "0", "maxrange": "64",
             "attackrange": "1", "defaultmode": "none", "timer": "1", "ranged": "1",
         },
         "fd_damis_tougher": {
-            "size": "1", "wanderrange": "0", "maxrange": "64",
+            "wanderrange": "0", "maxrange": "64",
             "attackrange": "1", "defaultmode": "none", "timer": "1", "ranged": "1",
         },
     }

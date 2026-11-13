@@ -46381,7 +46381,7 @@ head2=idk_man_jaw_short_head
 // CANDIDATE src.dt-osrs-r2-page-damis#19,27,43,45-46,51-60: nine fields are ranged, size, damagetype, strengthbonus and five defences.
 // The other twelve fields below are product choices, not values supplied by that page.
 ranged=1
-size=1
+// Size 1 is the engine default; not written because an explicit line changes the client's npc.dat.
 // UNKNOWN shadow-engineering-constants-s3: three ranges and timer. Product defaultmode: shadow-reconstruction-s3.
 wanderrange=0
 maxrange=64
@@ -46442,7 +46442,7 @@ head2=idk_man_jaw_short_head
 // CANDIDATE src.dt-osrs-r2-page-damis#19,27,43,45-46,51-60: nine fields are ranged, size, damagetype, strengthbonus and five defences.
 // The other twelve fields below are product choices, not values supplied by that page.
 ranged=1
-size=1
+// Size 1 is the engine default; not written because an explicit line changes the client's npc.dat.
 // UNKNOWN shadow-engineering-constants-s3: three ranges and timer. Product defaultmode: shadow-reconstruction-s3.
 wanderrange=0
 maxrange=64

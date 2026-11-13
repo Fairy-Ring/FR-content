@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Offline source tripwires for the Desert Treasure S3 shadow slice."""
+"""Offline source and packed-NPC tripwires for the Desert Treasure S3 shadow slice."""
 from __future__ import annotations
 
 import os
 import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(os.environ.get("DT_S3_CONTENT_ROOT", Path(__file__).resolve().parents[2])).resolve()
@@ -323,11 +324,11 @@ def check_damis(damis: str, shared_constants: str, shadow_constants: str, npc_so
 
     server_fields = {
         "fd_damis_normal": {
-            "size": "1", "wanderrange": "0", "maxrange": "64",
+            "wanderrange": "0", "maxrange": "64",
             "attackrange": "1", "defaultmode": "none", "timer": "1", "ranged": "1",
         },
         "fd_damis_tougher": {
-            "size": "1", "wanderrange": "0", "maxrange": "64",
+            "wanderrange": "0", "maxrange": "64",
             "attackrange": "1", "defaultmode": "none", "timer": "1", "ranged": "1",
         },
     }
@@ -348,6 +349,7 @@ def check_damis(damis: str, shared_constants: str, shadow_constants: str, npc_so
         ),
     }
     for npc, fields in server_fields.items():
+        require("size" not in npcs.get(npc, {}), f"[{npc}] must inherit size 1 without changing client bytes")
         for field, expected in fields.items():
             require(npcs.get(npc, {}).get(field) == [expected], f"[{npc}] {field} pins server behavior to {expected}")
         for param in server_params[npc]:
@@ -410,6 +412,26 @@ def check_damis(damis: str, shared_constants: str, shadow_constants: str, npc_so
         require(shared.get(state) == value, f"shared constant {state} is {value}")
 
 
+def check_packed_damis_sizes() -> None:
+    engine = Path(os.environ.get("HARNESS_ENGINE_DIR", ROOT.parent / "engine")).resolve()
+    result = subprocess.run(
+        ["node", "--import", "tsx", "--input-type=module", "-e", """
+import assert from 'node:assert/strict';
+import NpcType from './src/cache/config/NpcType.ts';
+NpcType.load('data/pack');
+for (const name of ['fd_damis_normal', 'fd_damis_tougher']) {
+    const npc = NpcType.getByName(name);
+    assert(npc, `Packed ${name} must exist`);
+    assert.equal(npc.size, 1, `Packed ${name} must retain engine-default size 1`);
+    console.log(`PASS: packed ${name} size=${npc.size}`);
+}
+"""],
+        cwd=engine, text=True, capture_output=True, check=False,
+    )
+    print(result.stdout, end="")
+    require(result.returncode == 0, f"packed Damis size check failed: {result.stderr.strip()}")
+
+
 def main() -> int:
     shadow = text(SCRIPTS / "dt_shadow.rs2")
     damis = text(SCRIPTS / "dt_damis.rs2")
@@ -419,6 +441,7 @@ def main() -> int:
     combat_source = text(ROOT / "scripts" / "skill_combat" / "scripts" / "npc" / "npc_combat.rs2")
     check_shadow(shadow, shadow_constants, shared_constants)
     check_damis(damis, shared_constants, shadow_constants, npc_source, combat_source)
+    check_packed_damis_sizes()
     if failures:
         print("\n".join(f"FAIL: {failure}" for failure in failures))
         return 1
