@@ -81,6 +81,108 @@ def branch(body: str, condition: str) -> str:
     return ""
 
 
+def check_ring_dialogue(shadow: str, shared_constants: str) -> None:
+    """Execute the small dialogue/control-flow subset reached by these ring cases.
+
+    This is a source tripwire, not a packed-engine or historical proof. Unknown
+    statements fail rather than being skipped. The live cell covers real packets.
+    """
+    parts = sections(shadow)
+    values = constants(shared_constants)
+    lost = [
+        "I lost that ring you gave me...",
+        "Then by all means, take another. Only a foolish merchant would give away his only stock!",
+    ]
+    opening = [
+        "So how goes your quest? Did you manage to find the Diamond you were looking for yet?",
+        "Not yet...",
+    ]
+    standard = ["Greetings friend. I am Rasolo, the famous merchant. Would you care to see my wares?"]
+
+    def talk(stage: int, substate: int, held: list[int], free: int) -> tuple[list[str], int]:
+        pages: list[str] = []
+        state = {"deserttreasure": stage, "fd_shadowwarrior_quest": substate}
+
+        def condition(source: str) -> bool:
+            source = source.replace("~obj_gettotal(fd_ring_visibility)", str(sum(held)))
+            source = source.replace("inv_freespace(inv)", str(free))
+            source = source.replace('~p_choice2("Yes", 1, "No", 2)', "2")
+            source = re.sub(r"%(\w+)", lambda m: str(state[m[1]]), source)
+            source = re.sub(r"\^(\w+)", lambda m: values[m[1]], source)
+            source = source.replace("|", " or ").replace("&", " and ")
+            source = re.sub(r"(?<![<>=!])=(?!=)", "==", source)
+            source = re.sub(r"(?<![<>=])!(?!=)", "!=", source)
+            if not re.fullmatch(r"(?:\d+|\s+|[<>=!()]|and\b|or\b)+", source):
+                raise ValueError(f"unsupported ring condition: {source}")
+            return bool(eval(source, {"__builtins__": {}}, {}))
+
+        def execute(body: str, depth: int = 0) -> bool:
+            if depth > 12:
+                raise ValueError("ring dialogue control-flow cycle")
+            while body.strip():
+                body = body.lstrip()
+                if body.startswith("if ("):
+                    level, end, quoted = 1, 4, False
+                    while level:
+                        char = body[end]
+                        if char == '"':
+                            quoted = not quoted
+                        if not quoted:
+                            level += (char == "(") - (char == ")")
+                        end += 1
+                    test, tail = body[4:end - 1], body[end:].lstrip()
+                    if tail.startswith("{"):
+                        level, end = 1, 1
+                        while level:
+                            level += (tail[end] == "{") - (tail[end] == "}")
+                            end += 1
+                        statement, body = tail[1:end - 1], tail[end:]
+                    else:
+                        statement, _, body = tail.partition(";")
+                        statement += ";"
+                    if condition(test) and execute(statement, depth + 1):
+                        return True
+                    continue
+                speech = re.match(r'~chat(?:npc|player)\("([^"]*)"\);', body)
+                if speech:
+                    pages.append(speech[1])
+                    body = body[speech.end():]
+                    continue
+                statement, separator, body = body.partition(";")
+                if not separator:
+                    raise ValueError(f"unterminated ring statement: {statement}")
+                if statement.startswith("@"):
+                    execute(parts[("label", statement[1:])], depth + 1)
+                    return True
+                if statement == "return":
+                    return True
+                if statement == "inv_add(inv, fd_ring_visibility, 1)":
+                    held[0] += 1
+                    continue
+                raise ValueError(f"unsupported ring statement: {statement}")
+            return False
+
+        execute(parts[("opnpc1", "shadow_warrior_rasool")])
+        return pages, held[0]
+
+    for stage in (10, 15):
+        for location, held in (("inventory", [1, 0, 0]), ("bank", [0, 1, 0]), ("worn", [0, 0, 1])):
+            require(talk(stage, 6, held.copy(), 27) == (standard, held[0]),
+                    f"state 6 stage {stage} ring in {location}: standard talk and no new ring")
+        require(talk(stage, 6, [0, 0, 0], 28) == (lost, 1),
+                f"state 6 stage {stage} lost ring: exactly the two pages and one ring")
+        held = [0, 0, 0]
+        require(talk(stage, 6, held, 0) == (lost, 0),
+                f"state 6 stage {stage} full inventory: pages but no ring")
+        require(talk(stage, 6, held, 1) == (lost, 1),
+                f"state 6 stage {stage} next talk with a slot: one ring")
+    require(talk(10, 2, [0, 0, 0], 28) == (opening + lost, 1),
+            "hunt-stage lost ring retains its opening, replacement pages and grant")
+    require(talk(10, 2, [0, 1, 0], 28) ==
+            (opening + ["Well, his lair is very close to here. I suggest you look around for it."], 0),
+            "hunt-stage banked ring retains its opening and lair page without a grant")
+
+
 def check_shadow(shadow: str, shadow_constants: str, shared_constants: str) -> None:
     parts = sections(shadow)
     values = constants(shadow_constants)
@@ -111,15 +213,16 @@ def check_shadow(shadow: str, shadow_constants: str, shared_constants: str) -> N
     require(exchange.index("~chatnpc") < exchange.index("inv_del") < exchange.index("inv_add") < exchange.index("^dt_shadow_substate_cross_returned_ring_awarded"), "exchange rechecks and updates state after its dialogue")
 
     ring_total = "obj_gettotal(fd_ring_visibility)"
-    require(ring_total in after and "inv_add(inv, fd_ring_visibility, 1)" in after, "Rasolo can reissue a missing ring")
-    require("inv_freespace(inv)" in after, "ring reissue checks inventory capacity")
+    replacement = require_section(parts, "label", "dt_rasolo_replace_ring")
+    require(ring_total in after and "@dt_rasolo_replace_ring" in after, "hunt-stage Rasolo shares missing-ring replacement")
+    require("inv_freespace(inv)" in replacement, "ring reissue checks inventory capacity")
+    require(replacement.count("inv_add(inv, fd_ring_visibility, 1)") == 1, "shared replacement has exactly one grant")
     require("bank" in shadow.lower() and "worn" in shadow.lower(), "ring total includes inventory, bank and worn storage")
-    lost_ring = branch(after, "~obj_gettotal(fd_ring_visibility) = 0")
-    require(bool(lost_ring) and lost_ring.endswith("return;"), "lost-ring replacement ends without the extra lair page")
+    require("his lair" not in replacement, "lost-ring replacement ends without the extra lair page")
     standard = require_section(parts, "label", "dt_rasolo_standard")
     require(
-        re.search(r"if \(%deserttreasure < \^dt_stage_hunts \| %fd_shadowwarrior_quest >= \^dt_shadow_substate_diamond_claimed\) @dt_rasolo_standard;", rasolo) is not None,
-        "diamond-claimed Rasolo talk routes to the same standard greeting as outside the hunt",
+        bool(branch(rasolo, "%fd_shadowwarrior_quest >= ^dt_shadow_substate_diamond_claimed")),
+        "diamond-claimed Rasolo talk checks for a lost ring before the standard greeting",
     )
     require(
         '~p_choice2("Yes", 1, "No", 2)' in standard and "@dt_rasolo_shop" in standard
@@ -174,6 +277,7 @@ def check_shadow(shadow: str, shadow_constants: str, shared_constants: str) -> N
     require(shared.get("dt_shadow_substate_rasolo_agreed") == "1" and shared.get("dt_shadow_substate_cross_returned_ring_awarded") == "2", "shared constants pin shadow substates 1 and 2")
     active_source = active(shadow)
     require(not re.search(r"%deserttreasure(?:main|varbit2?)?\s*=(?!=)", active_source), "S3 never assigns a whole-word quest varp")
+    check_ring_dialogue(shadow, shared_constants)
     require(not re.search(r"(?m)^\s*varp\s*=", active_source), "S3 never appends a varp declaration")
 
 def check_damis(damis: str, shared_constants: str, shadow_constants: str, npc_source: str, combat_source: str) -> None:

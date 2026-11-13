@@ -1,7 +1,11 @@
 // CANDIDATE wording: desert-treasure.dlg.shadow-hunt (r15343078).
 // State encodings are the accepted product contract, not recovered 377 writers.
 [opnpc1,shadow_warrior_rasool]
-if (%deserttreasure < ^dt_stage_hunts | %fd_shadowwarrior_quest >= ^dt_shadow_substate_diamond_claimed) @dt_rasolo_standard;
+if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_diamond_claimed) {
+    if (~obj_gettotal(fd_ring_visibility) = 0) @dt_rasolo_replace_ring;
+    @dt_rasolo_standard;
+}
+if (%deserttreasure < ^dt_stage_hunts) @dt_rasolo_standard;
 if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_cross_returned_ring_awarded) @dt_rasolo_after;
 if (%fd_shadowwarrior_quest = ^dt_shadow_substate_rasolo_agreed) {
     if (inv_total(inv, fd_sword_cross) > 0) @dt_rasolo_cross;
@@ -106,13 +110,15 @@ inv_add(inv, fd_ring_visibility, 1);
 ~chatnpc("So how goes your quest? Did you manage to find the Diamond you were looking for yet?");
 ~chatplayer("Not yet...");
 // obj_gettotal includes inventory, bank and worn. Banked is not lost.
-if (~obj_gettotal(fd_ring_visibility) = 0) {
-    ~chatplayer("I lost that ring you gave me...");
-    ~chatnpc("Then by all means, take another. Only a foolish merchant would give away his only stock!");
-    if (~obj_gettotal(fd_ring_visibility) = 0 & inv_freespace(inv) > 0) inv_add(inv, fd_ring_visibility, 1);
-    return;
-}
+if (~obj_gettotal(fd_ring_visibility) = 0) @dt_rasolo_replace_ring;
 ~chatnpc("Well, his lair is very close to here. I suggest you look around for it.");
+
+[label,dt_rasolo_replace_ring]
+// CANDIDATE reissue during/after quest: src.dt-runehq-ring-2140-20051128#HTML270.
+// Post-diamond wording is UNKNOWN; reuse the transcript's two lost-ring pages.
+~chatplayer("I lost that ring you gave me...");
+~chatnpc("Then by all means, take another. Only a foolish merchant would give away his only stock!");
+if (~obj_gettotal(fd_ring_visibility) = 0 & inv_freespace(inv) > 0) inv_add(inv, fd_ring_visibility, 1);
 
 [oploc1,fd_bandit_shutchest] @dt_shadow_chest;
 
