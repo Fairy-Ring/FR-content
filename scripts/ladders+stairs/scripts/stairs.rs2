@@ -169,6 +169,10 @@ switch_coord (loc_coord) {
     case 0_39_51_30_27 : p_telejump(1_39_51_31_29); // West Ardy Church - level 0
     case 0_46_52_26_19 : p_telejump(1_46_52_24_20); // Falador castle courtyard
     case 0_39_53_20_32 : p_telejump(1_39_53_21_34); // Waterfall tourism building - level 0
+    // VERIFIED 377 placements: Ardougne offset anchors, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: retain the walkable destinations of the stale anchors two tiles north; those cases stay intact.
+    case 0_39_51_34_53 : p_telejump(1_39_51_33_53);
+    case 0_41_51_38_27 : p_telejump(1_41_51_37_27);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -226,6 +230,10 @@ switch_coord (loc_coord) {
     case 0_53_54_25_36 : p_telejump(1_53_54_24_37); // Paterdomus Temple - Ground Floor (North)
     case 0_53_54_25_28 : p_telejump(1_53_54_24_29); // Paterdomus Temple - Ground Floor (South)
     case 0_54_54_45_19 : p_telejump(1_54_54_44_20); // Canifis Hair of the Dog Tavern
+    // VERIFIED 377 placements: Inherited-model world spirals, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: inherited same-type/rotation offsets (+2,0 up; +1,0 down), with matching paired flights.
+    case 0_40_60_53_27 : p_telejump(1_40_60_55_27);
+    case 2_50_54_2_16 : p_telejump(3_50_54_4_16);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -329,6 +337,8 @@ switch_coord (loc_coord) {
     case 1_53_54_25_37 : p_telejump(0_53_54_25_38); // Paterdomus Temple - Level 1 (North)
     case 1_53_54_25_29 : p_telejump(0_53_54_25_30); // Paterdomus Temple - Level 1 (South)
     case 1_54_54_45_20 : p_telejump(0_54_54_45_21); // Canifis Hair of the Dog Tavern
+    case 1_40_60_54_27 : p_telejump(0_40_60_55_27);
+    case 3_50_54_3_16 : p_telejump(2_50_54_4_16);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -432,18 +442,32 @@ switch_coord (loc_coord) {
 [oploc1,scenery_1743]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Miscellania middle spirals, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 1_39_60_9_31 : @stair_options(2_39_60_11_31, 0_39_60_10_30);
+    case 1_39_60_9_8 : @stair_options(2_39_60_8_9, 0_39_60_9_10);
+    case 2_39_60_9_31 : @stair_options(3_39_60_11_31, 1_39_60_10_30);
+    case 2_39_60_9_8 : @stair_options(3_39_60_8_9, 1_39_60_9_10);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc2,scenery_1743]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_39_60_9_31 : p_telejump(2_39_60_11_31);
+    case 1_39_60_9_8 : p_telejump(2_39_60_8_9);
+    case 2_39_60_9_31 : p_telejump(3_39_60_11_31);
+    case 2_39_60_9_8 : p_telejump(3_39_60_8_9);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc3,scenery_1743]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_39_60_9_31 : p_telejump(0_39_60_10_30);
+    case 1_39_60_9_8 : p_telejump(0_39_60_9_10);
+    case 2_39_60_9_31 : p_telejump(1_39_60_10_30);
+    case 2_39_60_9_8 : p_telejump(1_39_60_9_10);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -533,24 +557,30 @@ switch_coord (loc_coord) {
 [oploc1,scenery_4493]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Slayer Tower public stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_53_55_42_17 : p_telejump(1_53_55_41_18);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_4494]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_53_55_42_17 : p_telejump(0_53_55_46_18);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_4495]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_53_55_21_20 : p_telejump(2_53_55_25_21);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_4496]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 2_53_55_23_20 : p_telejump(1_53_55_20_21);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -765,36 +795,80 @@ switch_coord (loc_coord) {
 [oploc1,dwarf_keldagrim_stairs_lower]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Keldagrim narrow stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_44_158_55_62 : p_telejump(1_44_159_55_0);
+    case 0_44_159_12_39 : p_telejump(1_44_159_12_38);
+    case 0_44_159_12_49 : p_telejump(1_44_159_12_51);
+    case 0_44_159_18_48 : p_telejump(1_44_159_18_50);
+    case 0_44_159_19_20 : p_telejump(1_44_159_21_20);
+    case 0_44_159_49_46 : p_telejump(1_44_159_49_48);
+    case 0_45_158_31_51 : p_telejump(1_45_158_33_51);
+    case 0_45_158_51_53 : p_telejump(1_45_158_53_53);
+    case 0_45_159_25_32 : p_telejump(1_45_159_27_32);
+    case 0_45_159_35_20 : p_telejump(1_45_159_34_20);
+    case 1_44_158_57_62 : p_telejump(2_44_158_57_61);
+    case 1_44_159_19_48 : p_telejump(2_44_159_19_47);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,dwarf_keldagrim_stairs_upper]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_44_158_55_63 : p_telejump(0_44_158_55_61);
+    case 1_44_159_12_39 : p_telejump(0_44_159_12_41);
+    case 1_44_159_12_50 : p_telejump(0_44_159_12_48);
+    case 1_44_159_18_49 : p_telejump(0_44_159_18_47);
+    case 1_44_159_20_20 : p_telejump(0_44_159_18_20);
+    case 1_44_159_49_47 : p_telejump(0_44_159_49_45);
+    case 1_45_158_32_51 : p_telejump(0_45_158_30_51);
+    case 1_45_158_52_53 : p_telejump(0_45_158_50_53);
+    case 1_45_159_26_32 : p_telejump(0_45_159_24_32);
+    case 1_45_159_35_20 : p_telejump(0_45_159_37_20);
+    case 2_44_158_57_62 : p_telejump(1_44_159_57_0);
+    case 2_44_159_19_48 : p_telejump(1_44_159_19_50);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,dwarf_keldagrim_wide_stairs_lower]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Keldagrim wide stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_44_159_47_12 : p_telejump(1_44_159_46_12);
+    case 0_44_159_47_33 : p_telejump(1_44_159_46_33);
+    case 0_45_159_14_12 : p_telejump(1_45_159_16_12);
+    case 0_45_159_14_33 : p_telejump(1_45_159_16_33);
+    case 0_45_159_50_4 : p_telejump(1_45_159_50_3);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,dwarf_keldagrim_wide_stairs_upper]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_44_159_47_12 : p_telejump(0_44_159_49_12);
+    case 1_44_159_47_33 : p_telejump(0_44_159_49_33);
+    case 1_45_159_15_12 : p_telejump(0_45_159_13_12);
+    case 1_45_159_15_33 : p_telejump(0_45_159_13_33);
+    case 1_45_159_50_4 : p_telejump(0_45_159_50_6);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,dwarf_keldagrim_wide_stairs_3_lower]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Keldagrim three-wide stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 1_44_159_50_22 : p_telejump(2_44_159_49_22);
+    case 1_45_159_11_22 : p_telejump(2_45_159_13_22);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,dwarf_keldagrim_wide_stairs_3_upper]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 2_44_159_50_22 : p_telejump(1_44_159_52_22);
+    case 2_45_159_12_22 : p_telejump(1_45_159_10_22);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -887,12 +961,16 @@ switch_coord (loc_coord) {
 [oploc1,scenery_7056]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Wise Old Man house, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 1_48_50_19_51 : p_telejump(0_48_50_17_51);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_7057]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 0_48_50_18_51 : p_telejump(1_48_50_21_51);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -911,18 +989,27 @@ switch_coord (loc_coord) {
 [oploc1,scenery_9470]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Rimmington house, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_46_50_21_15 : p_telejump(1_46_50_24_15);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_9471]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_46_50_22_15 : p_telejump(0_46_50_20_15);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,sarim_spiralstairs]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Sarim spiral stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_45_51_51_18 : p_telejump(1_45_51_53_18);
+    case 0_47_50_15_61 : p_telejump(1_47_50_17_61);
+    case 0_47_50_18_48 : p_telejump(1_47_50_18_47);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -930,6 +1017,9 @@ switch_coord (loc_coord) {
 // arrive delay?
 switch_coord (loc_coord) {
     case 2_48_52_33_35 : p_telejump(1_48_52_34_35); // Draynor Manor - level 2
+    case 1_45_51_52_18 : p_telejump(0_45_51_52_17);
+    case 1_47_50_16_61 : p_telejump(0_47_50_16_60);
+    case 1_47_50_18_48 : p_telejump(0_47_50_17_48);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1002,6 +1092,9 @@ switch_coord (loc_coord) {
 [oploc1,magictraining_stairs_base]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Mage Training Arena stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_52_51_39_42 : p_telejump(1_52_51_40_43);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1014,6 +1107,7 @@ switch_coord (loc_coord) {
 [oploc1,magictraining_stairs_top]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_52_51_39_42 : p_telejump(0_52_51_38_43);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1026,12 +1120,16 @@ switch_coord (loc_coord) {
 [oploc1,magictraining_stairs_base_mirror]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Mage Training Arena mirror stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_52_51_29_42 : p_telejump(1_52_51_30_43);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,magictraining_stairs_top_mirror]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_52_51_29_42 : p_telejump(0_52_51_32_43);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1071,12 +1169,16 @@ switch_coord (loc_coord) {
 [oploc1,scenery_11724]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Falador courtyard, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_46_52_24_19 : p_telejump(1_46_52_24_20);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_11725]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_46_52_24_19 : p_telejump(0_46_52_27_19);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1086,6 +1188,9 @@ switch_coord (loc_coord) {
     case 0_46_52_10_10 : p_telejump(1_46_52_12_10); // White Knight's Castle - level 0
     case 1_46_52_16_10 : p_telejump(2_46_52_15_11); // White Knight's Castle - level 1
     case 2_46_52_13_10 : p_telejump(3_46_52_12_11); // White Knight's Castle - level 1
+    // VERIFIED 377 placements: Falador dwarf spiral, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_47_52_3_10 : p_telejump(1_47_52_3_9);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1095,18 +1200,27 @@ switch_coord (loc_coord) {
     case 3_46_52_14_10 : p_telejump(2_46_52_13_12); // White Knight's Castle - level 3
     case 2_46_52_16_11 : p_telejump(1_46_52_16_12); // White Knight's Castle - level 2
     case 1_46_52_11_10 : p_telejump(0_46_52_11_9); // White Knight's Castle - level 1
+    case 1_47_52_3_10 : p_telejump(0_47_52_2_10);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_11732]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Falador house spirals, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_46_52_29_56 : p_telejump(1_46_52_29_58);
+    case 0_47_52_26_35 : p_telejump(1_47_52_28_35);
+    case 0_47_52_40_24 : p_telejump(1_47_52_41_26);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_11733]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_46_52_29_57 : p_telejump(0_46_52_28_56);
+    case 1_47_52_27_35 : p_telejump(0_47_52_28_35);
+    case 1_47_52_41_25 : p_telejump(0_47_52_41_26);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1114,6 +1228,11 @@ switch_coord (loc_coord) {
 // arrive delay?
 switch_coord (loc_coord) {
     case 1_46_52_40_9 : p_telejump(2_46_52_40_12); // White Knight's Castle east side - level 1
+    // VERIFIED 377 placements: Falador tall straight stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: inherited offsets where the rotation matches, otherwise first free beyond the paired flight.
+    case 0_47_52_10_15 : p_telejump(1_47_52_13_16);
+    case 0_47_52_13_4 : p_telejump(1_47_52_16_5);
+    case 0_47_52_36_53 : p_telejump(1_47_52_36_56);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1121,48 +1240,66 @@ switch_coord (loc_coord) {
 // arrive delay?
 switch_coord (loc_coord) {
     case 2_46_52_40_10 : p_telejump(1_46_52_40_8);  // White Knight's Castle west side - level 2
+    case 1_47_52_11_15 : p_telejump(0_47_52_9_16);
+    case 1_47_52_14_4 : p_telejump(0_47_52_12_5);
+    case 1_47_52_36_54 : p_telejump(0_47_52_36_52);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_11736]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Falador straight stairs, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_46_52_15_41 : p_telejump(1_46_52_15_44);
+    case 0_46_52_27_42 : p_telejump(1_46_52_27_45);
+    case 0_47_52_37_35 : p_telejump(1_47_52_37_38);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,scenery_11737]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_46_52_15_42 : p_telejump(0_46_52_15_40);
+    case 1_46_52_27_43 : p_telejump(0_46_52_27_41);
+    case 1_47_52_37_36 : p_telejump(0_47_52_37_34);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,fai_darkwiztower_spiralstairs]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Dark Wizards Tower, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_45_52_27_6 : p_telejump(1_45_52_28_8);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,fai_darkwiztower_spiralstairs_middle]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_45_52_27_6 : @stair_options(2_45_52_28_8, 0_45_52_29_7);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc2,fai_darkwiztower_spiralstairs_middle]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_45_52_27_6 : p_telejump(2_45_52_28_8);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc3,fai_darkwiztower_spiralstairs_middle]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_45_52_27_6 : p_telejump(0_45_52_29_7);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,fai_darkwiztower_spiralstairstop]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 2_45_52_28_7 : p_telejump(1_45_52_28_8);
     case default : @unhandled_stairs(loc_coord);
 }
 
@@ -1205,30 +1342,40 @@ switch_coord (loc_coord) {
 [oploc1,wild6_spiralstairs]
 // arrive delay?
 switch_coord (loc_coord) {
+    // VERIFIED 377 placements: Rogues Castle, with matching adjacent-floor stair locs.
+    // CANDIDATE landings: first free tiles beyond the paired flights; collision and round trips checked.
+    case 0_51_61_16_32 : p_telejump(1_51_61_18_32);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,wild6_spiralstairs_middle]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_51_61_16_32 : @stair_options(2_51_61_18_32, 0_51_61_17_31);
+    case 2_51_61_16_32 : @stair_options(3_51_61_18_32, 1_51_61_18_32);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc2,wild6_spiralstairs_middle]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_51_61_16_32 : p_telejump(2_51_61_18_32);
+    case 2_51_61_16_32 : p_telejump(3_51_61_18_32);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc3,wild6_spiralstairs_middle]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 1_51_61_16_32 : p_telejump(0_51_61_17_31);
+    case 2_51_61_16_32 : p_telejump(1_51_61_18_32);
     case default : @unhandled_stairs(loc_coord);
 }
 
 [oploc1,wild6_spiralstairstop]
 // arrive delay?
 switch_coord (loc_coord) {
+    case 3_51_61_17_32 : p_telejump(2_51_61_18_32);
     case default : @unhandled_stairs(loc_coord);
 }
 // ---

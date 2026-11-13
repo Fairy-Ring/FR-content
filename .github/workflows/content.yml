@@ -144,6 +144,7 @@ jobs:
           run_test tests/string-charset/check_string_charset.mjs node ../content/tests/string-charset/check_string_charset.mjs ../content
           run_test tests/string-charset/check_string_charset.test.mjs node --test ../content/tests/string-charset/check_string_charset.test.mjs
           run_test tests/varp-scope/test_varp_scope.mjs node --import tsx ../content/tests/varp-scope/test_varp_scope.mjs
+          run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
           run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
@@ -168,11 +169,14 @@ jobs:
           run_test tests/fenkenstrain-completion/test_fenk_s2.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s2.py
           run_test tests/silver-casting/test_silver_casting.mjs node --import tsx ../content/tests/silver-casting/test_silver_casting.mjs
           run_test tests/leather-batch/test_leather_batch.mjs node --import tsx ../content/tests/leather-batch/test_leather_batch.mjs
+          run_test tests/desert-treasure/test_s3_contract.py python3 ../content/tests/desert-treasure/test_s3_contract.py
           run_test tests/desert-treasure/test_s1_contract.py python3 ../content/tests/desert-treasure/test_s1_contract.py
           run_test tests/desert-treasure/test_s6_contract.py python3 ../content/tests/desert-treasure/test_s6_contract.py
           run_test tests/teleother/test_teleother.mjs node --import tsx ../content/tests/teleother/test_teleother.mjs
           run_test tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs node --import tsx ../content/tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs
           run_test tests/rowboat/test_rowboat.mjs node --import tsx ../content/tests/rowboat/test_rowboat.mjs
+          run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
+          run_test tests/stair-links/test_stair_links.mjs node --import tsx ../content/tests/stair-links/test_stair_links.mjs
           run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
