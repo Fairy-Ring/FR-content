@@ -109,11 +109,13 @@ function beginLogs(
   p.invAdd(InvType.getId("inv"), id(log), amount);
   p.lastItem = id(reverse ? "knife" : log);
   p.lastUseItem = id(reverse ? log : "knife");
+  const packetStart = packets.get(p)!.length;
   const state = start(
     p,
     reverse ? "[opheldu,knife]" : "[opheldu,_category_22]",
   );
   assert.equal(state.execution, ScriptState.PAUSEBUTTON);
+  assertFletchingMenu(p, packetStart, log);
   return state;
 }
 function quantity(p: Player, root: string, product: number, n: number): void {
@@ -131,6 +133,48 @@ function quantity(p: Player, root: string, product: number, n: number): void {
 }
 function inventory(p: Player, obj: string): number {
   return p.invTotal(InvType.getId("inv"), id(obj));
+}
+
+function assertFletchingMenu(p: Player, packetStart: number, log: string): void {
+  const wood = new Map([
+    ["oak_logs", "Oak"], ["willow_logs", "Willow"], ["maple_logs", "Maple"],
+    ["yew_logs", "Yew"], ["magic_logs", "Magic"],
+  ]).get(log);
+  assert(log === "logs" || wood, `unsupported fletching menu fixture ${log}`);
+  const root = log === "logs" ? "skillmulti3" : "skillmulti2";
+  const products = log === "logs"
+    ? [
+        { object: "arrow_shaft", x: 5, y: -15, label: "15 Arrow Shafts" },
+        { object: "shortbow", x: 9, y: -11, label: "Short Bow" },
+        { object: "longbow", x: 0, y: -15, label: "Long Bow" },
+      ]
+    : [
+        { object: `${log.replace("_logs", "")}_shortbow`, x: 0, y: -15, label: `${wood} Short Bow` },
+        { object: `${log.replace("_logs", "")}_longbow`, x: 0, y: -15, label: `${wood} Long Bow` },
+      ];
+  const output = packets.get(p)!.slice(packetStart);
+  for (const [index, expected] of products.entries()) {
+    const model = component(`${root}:com_${index + 2}`);
+    const label = component(`${root}:com_${products.length + 5 + index * 4}`);
+    assert.deepEqual(
+      output.filter((p): p is IfSetPosition => p instanceof IfSetPosition && p.component === model)
+        .map((p) => [p.x, p.y]),
+      [[expected.x, expected.y]],
+      `${log} product ${index} Lost City position`,
+    );
+    assert.deepEqual(
+      output.filter((p): p is IfSetObject => p instanceof IfSetObject && p.component === model)
+        .map((p) => [p.obj, p.scale]),
+      [[id(expected.object), 175]],
+      `${log} product ${index} display object and Lost City scale`,
+    );
+    assert.deepEqual(
+      output.filter((p): p is IfSetText => p instanceof IfSetText && p.component === label)
+        .map((p) => p.text),
+      [`\\n\\n\\n\\n${expected.label}`],
+      `${log} product ${index} Lost City label`,
+    );
+  }
 }
 function chooserArgs(objects: string[], close: boolean): (number | string)[] {
   return [
@@ -247,6 +291,16 @@ try {
   Component.load("data/pack");
   FontType.load("data/pack");
   ScriptProvider.load("data/pack");
+  if (process.env.FLETCHING_CHOICE_MUTANT === "swap-labels") {
+    const caller = ScriptProvider.getByName("[label,fletch_log]");
+    assert(caller, "mutant requires packed fletching caller");
+    const first = caller.stringOperands.indexOf("\\n\\n\\n\\n15 Arrow Shafts");
+    const second = caller.stringOperands.indexOf("\\n\\n\\n\\nShort Bow");
+    assert(first >= 0 && second >= 0, "mutant requires both fletching label literals");
+    [caller.stringOperands[first], caller.stringOperands[second]] =
+      [caller.stringOperands[second], caller.stringOperands[first]];
+    console.error("MUTANT: swapped two packed fletching label operands; failure is expected");
+  }
 
   // Ordinary logs offer three products; each other supported log offers two.
   const recipes: [string, string, number, number, number][] = [

@@ -157,20 +157,6 @@ function assertMenuPackets(
   const promptId = requiredComponent(`${rootName}:com_${promptIndex(size)}`);
   const observed = packetLog.get(p)!.slice(firstPacket);
 
-  if (mutantSwapLabels && !mutantApplied && expected.length > 1) {
-    const labelPositions = observed.flatMap((packet, index) =>
-      packet instanceof IfSetText && makeOneIds.has(packet.component)
-        ? [index]
-        : [],
-    );
-    assert(labelPositions.length >= 2, "mutant needs two captured labels");
-    const first = observed[labelPositions[0]] as IfSetText;
-    const second = observed[labelPositions[1]] as IfSetText;
-    observed[labelPositions[0]] = new IfSetText(first.component, second.text);
-    observed[labelPositions[1]] = new IfSetText(second.component, first.text);
-    mutantApplied = true;
-    console.error("MUTANT: swapped the first two captured product labels; failure is expected");
-  }
 
   assert.deepEqual(
     observed
@@ -374,37 +360,18 @@ try {
   assert(ScriptProvider.load(packDir) > 0, `no compiled scripts in ${packDir}`);
   World.currentTick = 100;
 
-  // The retained single-item cache still takes only a product id and restores
-  // its own static title when opened.
-  const retained = player();
-  const retainedObject = "bronze_bar";
-  const retainedStart = packetLog.get(retained)!.length;
-  const retainedState = start(
-    retained,
-    "[proc,skillmulti1]",
-    [requiredId(retainedObject)],
-  );
-  assert.equal(retainedState.execution, ScriptState.PAUSEBUTTON);
-  const singlePrompt = requiredComponent("skillmulti1:com_7");
-  assert.deepEqual(
-    packetLog
-      .get(retained)!
-      .slice(retainedStart)
-      .filter(
-        (packet): packet is IfSetText =>
-          packet instanceof IfSetText && packet.component === singlePrompt,
-      )
-      .map((packet) => packet.text),
-    ["How many would you like to make?"],
-  );
-  assert.equal(
-    packetLog.get(retained)!.filter((packet) => packet instanceof IfSetText).length,
-    1,
-    "single-item cache must not set a product label",
-  );
-  assert.equal(retained.resumeButtons.length, 4);
-  pressMenuButton(retained, retainedState, 1, 0, 3, 1);
-  assertReturnedObject(retainedState, retainedObject);
+  if (mutantSwapLabels) {
+    const script = ScriptProvider.getByName("[label,fletch_log]");
+    assert(script, "mutant requires packed fletching caller");
+    const first = script.stringOperands.indexOf(labels("15 Arrow Shafts"));
+    const second = script.stringOperands.indexOf(labels("Short Bow"));
+    assert(first >= 0 && second >= 0, "mutant requires both fletching label literals");
+    [script.stringOperands[first], script.stringOperands[second]] =
+      [script.stringOperands[second], script.stringOperands[first]];
+    mutantApplied = true;
+    console.error("MUTANT: swapped two packed fletching label operands; failure is expected");
+  }
+
 
   // Ordinary fletching dispatch: the standard log menu has three products;
   // each other published bow-wood row has two. Product IDs stay in caller order.
@@ -414,8 +381,8 @@ try {
       size: 3,
       products: [
         { object: "arrow_shaft", x: 5, y: -15, scale: 175, label: labels("15 Arrow Shafts") },
-        { object: "unstrung_shortbow", x: 9, y: -11, scale: 175, label: labels("Short Bow") },
-        { object: "unstrung_longbow", x: 0, y: -15, scale: 175, label: labels("Long Bow") },
+        { object: "shortbow", x: 9, y: -11, scale: 175, label: labels("Short Bow") },
+        { object: "longbow", x: 0, y: -15, scale: 175, label: labels("Long Bow") },
       ],
       result: "arrow_shaft",
       resultCount: 15,
@@ -430,8 +397,8 @@ try {
       log,
       size: 2,
       products: [
-        { object: shortbow, x: 0, y: -15, scale: 175, label: labels(`${wood} Short Bow`) },
-        { object: longbow, x: 0, y: -15, scale: 175, label: labels(`${wood} Long Bow`) },
+        { object: shortbow.replace("unstrung_", ""), x: 0, y: -15, scale: 175, label: labels(`${wood} Short Bow`) },
+        { object: longbow.replace("unstrung_", ""), x: 0, y: -15, scale: 175, label: labels(`${wood} Long Bow`) },
       ],
       result: shortbow,
       resultCount: 1,
@@ -487,6 +454,37 @@ try {
   pressMenuButton(potteryPlayer, potteryState, 3, 0, 3, 1, false);
   assertCrafted(potteryPlayer, "softclay", "pot_unfired");
 
+  // The retained single-item cache still takes only a product id and restores
+  // its own static title when opened.
+  const retained = player();
+  const retainedObject = "bronze_bar";
+  const retainedStart = packetLog.get(retained)!.length;
+  const retainedState = start(
+    retained,
+    "[proc,skillmulti1]",
+    [requiredId(retainedObject)],
+  );
+  assert.equal(retainedState.execution, ScriptState.PAUSEBUTTON);
+  const singlePrompt = requiredComponent("skillmulti1:com_7");
+  assert.deepEqual(
+    packetLog
+      .get(retained)!
+      .slice(retainedStart)
+      .filter(
+        (packet): packet is IfSetText =>
+          packet instanceof IfSetText && packet.component === singlePrompt,
+      )
+      .map((packet) => packet.text),
+    ["How many would you like to make?"],
+  );
+  assert.equal(
+    packetLog.get(retained)!.filter((packet) => packet instanceof IfSetText).length,
+    1,
+    "single-item cache must not set a product label",
+  );
+  assert.equal(retained.resumeButtons.length, 4);
+  pressMenuButton(retained, retainedState, 1, 0, 3, 1);
+  assertReturnedObject(retainedState, retainedObject);
   // One shared skillmulti3 client root receives two real caller menus in order.
   // The second menu must replace all three prior labels rather than inherit any.
   const shared = player();
