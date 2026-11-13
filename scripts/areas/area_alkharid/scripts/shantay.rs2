@@ -21,6 +21,9 @@ if (map_members = ^false) {
 }
 ~openshop_activenpc;
 
+[opnpc4,shantay]
+@shantay_purchase_pass;
+
 [label,shantay_what_is_this_place]
 if (%shantay_jail_progress = ^put_in_shantay_jail) {
     %shantay_jail_progress = ^talked_to_shantay;
@@ -126,11 +129,16 @@ if (map_members = ^false) {
 ~chatnpc("<p,neutral>So long...");
 
 [label,shantay_buy_shantay_pass]
+if (map_members = ^true) {
+    ~chatplayer("<p,neutral>I want to buy a shantay pass for 5 gold coins.");
+}
+@shantay_purchase_pass;
+
+[label,shantay_purchase_pass]
 if (map_members = ^false) {
     ~chatnpc("<p,neutral>Sorry effendi, I can't offer this service right now.");
     return;
 }
-~chatplayer("<p,neutral>I want to buy a shantay pass for 5 gold coins.");
 if (inv_total(inv, coins) < 5) {
     ~chatnpc("<p,neutral>Sorry friend, the Shantay Pass is 5 gold coins. You|don't seem to have enough money!");
     return;
