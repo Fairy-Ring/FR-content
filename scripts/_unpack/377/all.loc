@@ -47130,6 +47130,9 @@ multivar=barrows_door_a
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,469
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_b_r]
 mirror=yes
 active=yes
@@ -47137,6 +47140,9 @@ multivar=barrows_door_b
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,470
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_c_r]
 mirror=yes
 active=yes
@@ -47144,6 +47150,9 @@ multivar=barrows_door_c
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,471
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_d_r]
 mirror=yes
 active=yes
@@ -47151,6 +47160,9 @@ multivar=barrows_door_d
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,472
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_e_r]
 mirror=yes
 active=yes
@@ -47158,6 +47170,9 @@ multivar=barrows_door_e
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,473
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_f_r]
 mirror=yes
 active=yes
@@ -47165,6 +47180,9 @@ multivar=barrows_door_f
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,474
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_g_r]
 mirror=yes
 active=yes
@@ -47172,6 +47190,9 @@ multivar=barrows_door_g
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,475
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_h_r]
 mirror=yes
 active=yes
@@ -47179,6 +47200,9 @@ multivar=barrows_door_h
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,476
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_i_r]
 mirror=yes
 active=yes
@@ -47186,6 +47210,9 @@ multivar=barrows_door_i
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,477
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_j_r]
 mirror=yes
 active=yes
@@ -47193,6 +47220,9 @@ multivar=barrows_door_j
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,478
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_k_r]
 mirror=yes
 active=yes
@@ -47200,6 +47230,9 @@ multivar=barrows_door_k
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,479
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_l_r]
 mirror=yes
 active=yes
@@ -47207,6 +47240,9 @@ multivar=barrows_door_l
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,480
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_m_r]
 mirror=yes
 active=yes
@@ -47214,6 +47250,9 @@ multivar=barrows_door_m
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,481
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_n_r]
 mirror=yes
 active=yes
@@ -47221,6 +47260,9 @@ multivar=barrows_door_n
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,482
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_o_r]
 mirror=yes
 active=yes
@@ -47228,12 +47270,18 @@ multivar=barrows_door_o
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
 
+param=barrows_room_edge_lock,483
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_p_r]
 mirror=yes
 active=yes
 multivar=barrows_door_p
 multiloc=0,barrows_door_unlocked_r
 multiloc=1,barrows_door_locked_r
+param=barrows_room_edge_lock,484
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 
 [barrows_door_inactive_l]
 name=Door
@@ -47272,96 +47320,144 @@ multivar=barrows_door_a
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,469
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_b_l]
 active=yes
 multivar=barrows_door_b
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,470
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_c_l]
 active=yes
 multivar=barrows_door_c
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,471
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_d_l]
 active=yes
 multivar=barrows_door_d
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,472
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_e_l]
 active=yes
 multivar=barrows_door_e
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,473
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_f_l]
 active=yes
 multivar=barrows_door_f
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,474
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_g_l]
 active=yes
 multivar=barrows_door_g
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,475
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_h_l]
 active=yes
 multivar=barrows_door_h
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,476
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_i_l]
 active=yes
 multivar=barrows_door_i
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,477
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_j_l]
 active=yes
 multivar=barrows_door_j
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,478
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_k_l]
 active=yes
 multivar=barrows_door_k
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,479
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_l_l]
 active=yes
 multivar=barrows_door_l
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,480
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_m_l]
 active=yes
 multivar=barrows_door_m
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,481
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_n_l]
 active=yes
 multivar=barrows_door_n
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,482
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_o_l]
 active=yes
 multivar=barrows_door_o
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,483
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_door_p_l]
 active=yes
 multivar=barrows_door_p
 multiloc=0,barrows_door_unlocked_l
 multiloc=1,barrows_door_locked_l
 
+param=barrows_room_edge_lock,484
+param=barrows_door_open_state,0
+param=barrows_door_locked_state,1
 [barrows_rockslide_a]
 recol1s=12580
 recol1d=5282
@@ -47600,6 +47696,9 @@ recol5d=7235
 length=3
 width=2
 op1=Search
+param=barrows_brother,barrows_dharok
+param=barrows_slain_varbit,barrows_killed_dharok
+param=barrows_crypt_entry,3_55_151_36_54
 
 [barrow_torag_sarcophagus]
 name=Sarcophagus
@@ -47619,6 +47718,9 @@ recol5d=7235
 length=3
 width=2
 op1=Search
+param=barrows_brother,barrows_torag
+param=barrows_slain_varbit,barrows_killed_torag
+param=barrows_crypt_entry,3_55_151_45_20
 
 [barrow_guthan_sarcophagus]
 name=Sarcophagus
@@ -47638,6 +47740,9 @@ recol5d=7235
 length=3
 width=2
 op1=Search
+param=barrows_brother,barrows_guthan
+param=barrows_slain_varbit,barrows_killed_guthan
+param=barrows_crypt_entry,3_55_151_15_41
 
 [barrows_stone_chest_closed]
 name=Chest
@@ -48166,6 +48271,9 @@ recol5d=7235
 length=3
 width=2
 op1=Search
+param=barrows_brother,barrows_ahrim
+param=barrows_slain_varbit,barrows_killed_ahrim
+param=barrows_crypt_entry,3_55_151_37_39
 
 [barrow_karil_sarcophagus]
 name=Sarcophagus
@@ -48185,6 +48293,9 @@ recol5d=7235
 length=3
 width=2
 op1=Search
+param=barrows_brother,barrows_karil
+param=barrows_slain_varbit,barrows_killed_karil
+param=barrows_crypt_entry,3_55_151_27_21
 
 [barrow_verac_sarcophagus]
 name=Sarcophagus
@@ -48204,6 +48315,9 @@ recol5d=7235
 length=3
 width=2
 op1=Search
+param=barrows_brother,barrows_verac
+param=barrows_slain_varbit,barrows_killed_verac
+param=barrows_crypt_entry,3_55_151_57_39
 
 [barrows_locked_door]
 name=Door
@@ -85682,14 +85796,6 @@ resizex=64
 resizey=64
 resizez=64
 
-[stepping_stone_12568]
-name=Stepping stone
-desc=A very slippery stepping stone.
-model=loc_12568
-op1=Jump-to
-active=yes
-blockrange=no
-
 [temp_stone_4_zip]
 name=Temp Stone 4 Zip
 desc=A very slippery stepping stone.
@@ -85698,20 +85804,6 @@ op1=Climb-down
 active=yes
 blockrange=no
 forceapproach=south
-
-[tropical_tree]
-name=Tropical tree
-desc=A terribly tall tropical tree.
-model=loc_12570
-recol1s=19910
-recol1d=18853
-recol2s=20968
-recol2d=15685
-recol3s=12869
-recol3d=8547
-ambient=25
-op1=Climb
-forceapproach=east
 
 [tropical_tree_12571]
 name=Tropical tree
@@ -85740,51 +85832,16 @@ recol3d=8547
 width=3
 ambient=25
 
-[monkeybars_12573]
-name=Monkeybars
-desc=I can traverse these.
-model=loc_12573
-op1=Swing across
-blockwalk=no
-hillskew=yes
-op1=Swing Across
-
 [scenery_12574]
 model=loc_12574
 blockwalk=no
 active=no
 hillskew=yes
 
-[monkeybars_12575]
-name=Monkeybars
-desc=I can traverse these.
-model=loc_12573
-op1=Swing across
-blockwalk=no
-hillskew=yes
-op1=Swing Across
-
-[skull_slope_12576]
-name=Skull slope
-desc=A climbing wall made from skulls.
-model=loc_12576
-hillskew=yes
-forcedecor=yes
-op1=Climb-up
-
 [scenery_12577]
 model=loc_12576
 hillskew=yes
 forcedecor=yes
-
-[rope_12578]
-name=Rope
-desc=For swinging on.
-model=loc_12578
-width=4
-forceapproach=west
-shadow=no
-op1=Swing
 
 [tropical_tree_12579]
 name=Tropical tree
@@ -86206,19 +86263,6 @@ model=cavewall_face1withcrack
 sharelight=yes
 hillskew=yes
 op1=Enter
-
-[tropical_tree_12618]
-name=Tropical tree
-desc=A terribly tall tropical tree.
-model=bamboo_tree_base
-recol1s=19910
-recol1d=18853
-recol2s=20968
-recol2d=15685
-recol3s=12869
-recol3d=8547
-mapscene=0
-op1=Climb-down
 
 [scenery_12619]
 model=loc_12619

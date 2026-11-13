@@ -1,0 +1,98 @@
+[
+  {
+    "name": "scenery_1724",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:414",
+    "cases": 0
+  },
+  {
+    "name": "scenery_1727",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:420",
+    "cases": 0
+  },
+  {
+    "name": "scenery_1732",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:426",
+    "cases": 0
+  },
+  {
+    "name": "castlewars_topstair_linked",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:475",
+    "cases": 0
+  },
+  {
+    "name": "scenery_4497",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:557",
+    "cases": 0
+  },
+  {
+    "name": "scenery_4498",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:563",
+    "cases": 0
+  },
+  {
+    "name": "board_game_stairs_top2",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:606",
+    "cases": 0
+  },
+  {
+    "name": "board_game_stairs_base2",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:620",
+    "cases": 0
+  },
+  {
+    "name": "golem_stairs_up",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:825",
+    "cases": 0
+  },
+  {
+    "name": "golem_stairs_down",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:831",
+    "cases": 0
+  },
+  {
+    "name": "icthalarins_stairs_lv1",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:837",
+    "cases": 0
+  },
+  {
+    "name": "icthalarins_stairs_lv1_top",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:843",
+    "cases": 0
+  },
+  {
+    "name": "cavewalltunnel_to_temple_open",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:936",
+    "cases": 0
+  },
+  {
+    "name": "magictraining_stairs_upper",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:1008",
+    "cases": 0
+  },
+  {
+    "name": "magictraining_stairs_top2",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:1020",
+    "cases": 0
+  },
+  {
+    "name": "spiralstairs_with_killerwatt_check",
+    "trigger": "oploc1",
+    "source": "scripts/ladders+stairs/scripts/stairs.rs2:1050",
+    "cases": 0
+  }
+]

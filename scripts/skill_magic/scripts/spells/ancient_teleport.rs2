@@ -1,0 +1,49 @@
+// Original 377 inter_267 teleport buttons. Names, levels and rune conditions
+// are cache-VERIFIED. XP/arrival provenance: tests/desert-treasure/s8-facts.json.
+[if_button,inter_267:com_179] @ancient_teleport(^paddewwa_teleport);
+[if_button,inter_267:com_189] @ancient_teleport(^senntisten_teleport);
+[if_button,inter_267:com_197] @ancient_teleport(^kharyrll_teleport);
+[if_button,inter_267:com_205] @ancient_teleport(^lassar_teleport);
+[if_button,inter_267:com_213] @ancient_teleport(^dareeyak_teleport);
+[if_button,inter_267:com_223] @ancient_teleport(^carrallangar_teleport);
+[if_button,inter_267:com_231] @ancient_teleport(^annakarl_teleport);
+[if_button,inter_267:com_239] @ancient_teleport(^ghorrock_teleport);
+
+[label,ancient_teleport](int $spell)
+if_close;
+if (p_finduid(uid) = true) {
+    // The selector is server-only. A stale/forged button cannot select a book.
+    if (%deserttreasure ! ^dt_stage_complete | %alternate_spells ! ^dt_spellbook_ancient) {
+        mes("Nothing interesting happens.");
+        return;
+    }
+    def_dbrow $spell_data = ~get_spell_data($spell);
+    if (~check_spell_requirements($spell_data) = false) {
+        return;
+    }
+    if (~wilderness_level(coord) > 20) {
+        mes("A mysterious force blocks your teleport spell!");
+        mes("You can't use this teleport after level 20 wilderness.");
+        return;
+    }
+    if (~pre_tele_checks(coord) = false) {
+        return;
+    }
+    if (afk_event = ^true) {
+        ~macro_event_general_spawn(~macro_event_set_random);
+        return;
+    }
+    // Keep the shared rune checker/payment calls: combination-rune work owns them.
+    ~delete_spell_runes($spell_data);
+    ~give_spell_xp($spell_data);
+    ~player_teleport_ancient(map_findsquare(db_getfield($spell_data, magic_spell_table:tele_coord, 0), 0, 2, ^map_findsquare_lineofwalk));
+}
+
+[proc,player_teleport_ancient](coord $coord)
+if_close;
+p_stopaction;
+anim(zaros_teleport, 0);
+spotanim_pl(zaros_teleport, 0, 0);
+// CANDIDATE animation hold in ticks, not a recovered 377 server delay.
+p_delay(^dt_ancient_teleport_delay);
+~p_telejump_safe($coord);

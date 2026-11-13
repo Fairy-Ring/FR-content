@@ -11,6 +11,8 @@ model=obj_firerune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_waterrune_king]
@@ -26,6 +28,8 @@ model=obj_waterrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_earthrune_king]
@@ -41,6 +45,8 @@ model=obj_earthrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_airrune_king]
@@ -56,6 +62,8 @@ model=obj_airrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_mindrune_king]
@@ -71,6 +79,8 @@ model=obj_mindrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_bodyrune_king]
@@ -86,6 +96,8 @@ model=obj_bodyrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_naturerune_king]
@@ -101,6 +113,8 @@ model=obj_naturerune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_chaosrune_king]
@@ -116,6 +130,8 @@ model=obj_chaosrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_lawrune_king]
@@ -131,6 +147,8 @@ model=obj_lawrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_cosmicrune_king]
@@ -146,6 +164,8 @@ model=obj_cosmicrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_bloodrune_king]
@@ -161,6 +181,8 @@ model=obj_bloodrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king
 
 [boardgames_draughts_soulrune_king]
@@ -176,4 +198,6 @@ model=obj_soulrune
 members=yes
 ambient=30
 weight=2g
+tradeable=no
+dummyitem=inv_only
 category=draughts_king

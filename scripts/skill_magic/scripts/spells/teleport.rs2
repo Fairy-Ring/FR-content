@@ -8,6 +8,10 @@
 [label,magic_teleport](int $spell)
 if_close;
 if (p_finduid(uid) = true) {
+    if (%alternate_spells ! ^dt_spellbook_standard) {
+        mes("Nothing interesting happens.");
+        return;
+    }
     // look for spell in db
     def_dbrow $spell_data = ~get_spell_data($spell);
     if (~check_spell_requirements($spell_data)= false) {

@@ -80,7 +80,14 @@ def main() -> int:
     require(not re.search(r"%deserttreasure(?:main|varbit|varbit2)\s*=", active), "never write a whole 440-442 word")
     require("p_tele" not in entry and not re.search(r"%\w+\s*=", entry) and "loc_add" not in entry, "S6 all-four attempt stays outside stage 12; S7 owns opening")
     require("dt_eblis_four_diamonds" in hill and "$held = 3" in hill and "dt_eblis_after_place" in hill, "hill dispatch has partial, all-four and after-place advice")
-    require("inv_del" not in hill and "%deserttreasure =" not in hill and "inv_total(bank" not in hill, "advice neither takes diamonds, counts bank nor writes stage")
+    # A stage write is an assignment statement. Drop comments, string literals and every parenthesised group
+    # (conditions and call arguments), so an equality test such as `if (%deserttreasure = ^x)` does not count.
+    hill_code = re.sub(r'"[^"\n]*"', '""', "\n".join(line.split("//", 1)[0] for line in hill.splitlines()))
+    previous = None
+    while previous != hill_code:
+        previous = hill_code
+        hill_code = re.sub(r"\([^()]*\)", "", hill_code)
+    require("inv_del" not in hill and re.search(r"%deserttreasure\s*=", hill_code) is None and "inv_total(bank" not in hill, "advice neither takes diamonds, counts bank nor writes stage")
     advice = block(hill, "opnpc1", "fd_elder_by_mirrors")
     placed_gate = advice.split("def_int $held", 1)[0]
     require("@dt_eblis_after_place;" in placed_gate and "inv_total" not in placed_gate and all(f"%fd_column_{bit} = ^dt_column_placed" in placed_gate for bit in ("blood", "fire", "ice", "shadow")), "all placed bits select after-placement advice before held-diamond counts")

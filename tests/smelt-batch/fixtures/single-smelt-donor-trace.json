@@ -1,0 +1,351 @@
+{
+  "source": "Hand-authored from Lost City 289 smelt_ore_single, commit 457c8943b5c1c3ebe338a12a9b12418c6c96c325; not captured from the product pack.",
+  "entryDelay": 2,
+  "triggerTick": 100,
+  "finishTick": 103,
+  "ticks": [100, 101, 102, 103],
+  "cases": [
+    {
+      "name": "bronze",
+      "level": 99,
+      "primary": "copper_ore",
+      "secondary": "tin_ore",
+      "bar": "bronze_bar",
+      "use": "copper_ore",
+      "items": {"copper_ore": 1, "tin_ore": 1},
+      "worn": {},
+      "ringCharge": 0,
+      "forceRandom": null,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 1, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 1, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 1, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 0, "secondary": 0, "bar": 1, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 62],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "animation", "sequence": "human_furnace", "delay": 0}, {"kind": "sound", "synth": "furnace", "loops": 1, "delay": 0}, {"kind": "game", "text": "You smelt the copper and tin together in the furnace."}],
+          [],
+          [],
+          [{"kind": "game", "text": "You retrieve a bar of bronze."}]
+        ]
+      }
+    },
+    {
+      "name": "iron_success",
+      "level": 99,
+      "primary": "iron_ore",
+      "secondary": null,
+      "bar": "iron_bar",
+      "use": "iron_ore",
+      "items": {"iron_ore": 1},
+      "worn": {},
+      "ringCharge": 0,
+      "forceRandom": 0.1,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 0, "secondary": 0, "bar": 1, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 125],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "animation", "sequence": "human_furnace", "delay": 0}, {"kind": "sound", "synth": "furnace", "loops": 1, "delay": 0}, {"kind": "game", "text": "You smelt the iron in the furnace."}],
+          [],
+          [],
+          [{"kind": "game", "text": "You retrieve a bar of iron."}]
+        ]
+      }
+    },
+    {
+      "name": "iron_failure",
+      "level": 99,
+      "primary": "iron_ore",
+      "secondary": null,
+      "bar": "iron_bar",
+      "use": "iron_ore",
+      "items": {"iron_ore": 1},
+      "worn": {},
+      "ringCharge": 0,
+      "forceRandom": 0.9,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 0, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 0],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "animation", "sequence": "human_furnace", "delay": 0}, {"kind": "sound", "synth": "furnace", "loops": 1, "delay": 0}, {"kind": "game", "text": "You smelt the iron in the furnace."}],
+          [],
+          [],
+          [{"kind": "game", "text": "The ore is too impure and you fail to refine it."}]
+        ]
+      }
+    },
+    {
+      "name": "ring_charge",
+      "level": 99,
+      "primary": "iron_ore",
+      "secondary": null,
+      "bar": "iron_bar",
+      "use": "iron_ore",
+      "items": {"iron_ore": 1},
+      "worn": {"ring_of_forging": 1},
+      "ringCharge": 7,
+      "forceRandom": null,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 1, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 1, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 1, "wornGauntlets": 0},
+          {"primary": 0, "secondary": 0, "bar": 1, "wornRing": 1, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 125],
+        "ringCharge": [7, 7, 7, 8],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "animation", "sequence": "human_furnace", "delay": 0}, {"kind": "sound", "synth": "furnace", "loops": 1, "delay": 0}, {"kind": "game", "text": "You smelt the iron in the furnace."}],
+          [],
+          [],
+          [{"kind": "game", "text": "You retrieve a bar of iron."}]
+        ]
+      }
+    },
+    {
+      "name": "ring_melt",
+      "level": 99,
+      "primary": "iron_ore",
+      "secondary": null,
+      "bar": "iron_bar",
+      "use": "iron_ore",
+      "items": {"iron_ore": 1},
+      "worn": {"ring_of_forging": 1},
+      "ringCharge": 139,
+      "forceRandom": null,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 1, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 1, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 1, "wornGauntlets": 0},
+          {"primary": 0, "secondary": 0, "bar": 1, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 125],
+        "ringCharge": [139, 139, 139, 0],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "animation", "sequence": "human_furnace", "delay": 0}, {"kind": "sound", "synth": "furnace", "loops": 1, "delay": 0}, {"kind": "game", "text": "You smelt the iron in the furnace."}],
+          [],
+          [],
+          [{"kind": "game", "text": "Your Ring of Forging has melted."}, {"kind": "game", "text": "You retrieve a bar of iron."}]
+        ]
+      }
+    },
+    {
+      "name": "gold_gauntlets",
+      "level": 99,
+      "primary": "gold_ore",
+      "secondary": null,
+      "bar": "gold_bar",
+      "use": "gold_ore",
+      "items": {"gold_ore": 1},
+      "worn": {"gauntlets_of_goldsmithing": 1},
+      "ringCharge": 0,
+      "forceRandom": null,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 1},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 1},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 1},
+          {"primary": 0, "secondary": 0, "bar": 1, "wornRing": 0, "wornGauntlets": 1}
+        ],
+        "experience": [0, 0, 0, 562],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "animation", "sequence": "human_furnace", "delay": 0}, {"kind": "sound", "synth": "furnace", "loops": 1, "delay": 0}, {"kind": "game", "text": "You place a lump of gold in the furnace."}],
+          [],
+          [],
+          [{"kind": "game", "text": "You retrieve a bar of gold from the furnace."}]
+        ]
+      }
+    },
+    {
+      "name": "perfect_gold",
+      "level": 99,
+      "primary": "perfect_gold_ore",
+      "secondary": null,
+      "bar": "perfect_gold_bar",
+      "use": "perfect_gold_ore",
+      "items": {"perfect_gold_ore": 1},
+      "worn": {},
+      "ringCharge": 0,
+      "forceRandom": null,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 0, "secondary": 0, "bar": 1, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 225],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "animation", "sequence": "human_furnace", "delay": 0}, {"kind": "sound", "synth": "furnace", "loops": 1, "delay": 0}, {"kind": "game", "text": "You place a lump of gold in the furnace."}],
+          [],
+          [],
+          [{"kind": "game", "text": "You retrieve a bar of gold from the furnace."}]
+        ]
+      }
+    },
+    {
+      "name": "level_refusal",
+      "level": 14,
+      "primary": "iron_ore",
+      "secondary": null,
+      "bar": "iron_bar",
+      "use": "iron_ore",
+      "items": {"iron_ore": 1},
+      "worn": {},
+      "ringCharge": 0,
+      "forceRandom": null,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 0],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [true, true, true, true],
+        "dialogText": ["You need a Smithing level of 15 to smelt an iron bar.", null, null, null],
+        "events": [[], [], [], []]
+      }
+    },
+    {
+      "name": "ore_refusal",
+      "level": 99,
+      "primary": "copper_ore",
+      "secondary": "tin_ore",
+      "bar": "bronze_bar",
+      "use": "copper_ore",
+      "items": {"copper_ore": 1},
+      "worn": {},
+      "ringCharge": 0,
+      "forceRandom": null,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 0],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [true, true, true, true],
+        "dialogText": ["You need at least 1 Copper ore and 1 Tin ore to smelt a bronze bar.", null, null, null],
+        "events": [[], [], [], []]
+      }
+    },
+    {
+      "name": "null_bar",
+      "level": 99,
+      "primary": "blurite_ore",
+      "secondary": null,
+      "bar": null,
+      "use": "blurite_ore",
+      "items": {"blurite_ore": 1},
+      "worn": {},
+      "ringCharge": 0,
+      "forceRandom": null,
+      "walkAt": null,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 0],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "game", "text": "Nothing interesting happens."}],
+          [],
+          [],
+          []
+        ]
+      }
+    },
+    {
+      "name": "walk_before_finish",
+      "level": 99,
+      "primary": "silver_ore",
+      "secondary": null,
+      "bar": "silver_bar",
+      "use": "silver_ore",
+      "items": {"silver_ore": 1},
+      "worn": {},
+      "ringCharge": 0,
+      "forceRandom": null,
+      "walkAt": 101,
+      "expected": {
+        "delayed": [false, false, false, false],
+        "inventory": [
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0},
+          {"primary": 1, "secondary": 0, "bar": 0, "wornRing": 0, "wornGauntlets": 0}
+        ],
+        "experience": [0, 0, 0, 0],
+        "ringCharge": [0, 0, 0, 0],
+        "dialogOpen": [false, false, false, false],
+        "dialogText": [null, null, null, null],
+        "events": [
+          [{"kind": "animation", "sequence": "human_furnace", "delay": 0}, {"kind": "sound", "synth": "furnace", "loops": 1, "delay": 0}, {"kind": "game", "text": "You place a lump of silver in the furnace."}],
+          [],
+          [],
+          []
+        ]
+      }
+    }
+  ]
+}

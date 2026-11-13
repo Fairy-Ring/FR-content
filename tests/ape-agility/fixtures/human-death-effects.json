@@ -1,0 +1,2031 @@
+{
+  "commands": [
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "rd_death_active",
+      "strings": []
+    },
+    {
+      "ints": [
+        1
+      ],
+      "name": "POP_VARP",
+      "pointer": "death",
+      "strings": []
+    },
+    {
+      "ints": [
+        1
+      ],
+      "name": "P_DELAY",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [],
+      "name": "P_STOPACTION",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [],
+      "name": "IF_CLOSE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "human_death",
+        0
+      ],
+      "name": "ANIM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        3
+      ],
+      "name": "P_DELAY",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "death",
+      "strings": []
+    },
+    {
+      "ints": [
+        "death2"
+      ],
+      "name": "MIDI_JINGLE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [],
+      "name": "MES",
+      "pointer": 0,
+      "strings": [
+        "Oh dear you are dead!"
+      ]
+    },
+    {
+      "ints": [
+        "[queue,playerhit_n_retaliate]"
+      ],
+      "name": "CLEARQUEUE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[queue,combat_damage_player]"
+      ],
+      "name": "CLEARQUEUE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[queue,pvp_damage]"
+      ],
+      "name": "CLEARQUEUE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[queue,damage_player]"
+      ],
+      "name": "CLEARQUEUE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[queue,pvp_retaliate]"
+      ],
+      "name": "CLEARQUEUE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[queue,recoil_damage]"
+      ],
+      "name": "CLEARQUEUE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[queue,poison_damage]"
+      ],
+      "name": "CLEARQUEUE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[queue,player_death_default]"
+      ],
+      "name": "CLEARQUEUE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "deathkeep"
+      ],
+      "name": "INV_CLEAR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn",
+        "deathkeep",
+        "bronze_sword",
+        1
+      ],
+      "name": "INV_MOVEITEM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "inv",
+        45140662,
+        200
+      ],
+      "name": "INV_DROPALL",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn",
+        45140662,
+        200
+      ],
+      "name": "INV_DROPALL",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        45140662,
+        "bones",
+        1,
+        200
+      ],
+      "name": "OBJ_ADDALL",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "deathkeep",
+        "inv",
+        "bronze_sword",
+        1
+      ],
+      "name": "INV_MOVEITEM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "deathkeep"
+      ],
+      "name": "INV_CLEAR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "SESSION_LOG",
+      "pointer": 0,
+      "strings": [
+        "Player died"
+      ]
+    },
+    {
+      "ints": [
+        52743314
+      ],
+      "name": "P_TELEPORT",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn"
+      ],
+      "name": "BUILDAPPEARANCE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer0",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer1",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer2",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer3",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer4",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer5",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer6",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer7",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer8",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer9",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer10",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer11",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer12",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer13",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer14",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "HEADICONS_SET",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn"
+      ],
+      "name": "BUILDAPPEARANCE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "HEADICONS_SET",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn"
+      ],
+      "name": "BUILDAPPEARANCE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "HEADICONS_SET",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn"
+      ],
+      "name": "BUILDAPPEARANCE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer_drain_effect",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer_drain_counter",
+      "strings": []
+    },
+    {
+      "ints": [
+        "[timer,prayer_drain]"
+      ],
+      "name": "CLEARTIMER",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[softtimer,fenk_follow_watch]"
+      ],
+      "name": "CLEARSOFTTIMER",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        -1
+      ],
+      "name": "POP_VARP",
+      "pointer": "fenk_follower_uid",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARBIT",
+      "pointer": "fenk_gardener_directions",
+      "strings": []
+    },
+    {
+      "ints": [
+        -1,
+        0
+      ],
+      "name": "ANIM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [],
+      "name": "P_STOPACTION",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        1
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        2
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        3
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        4
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        5
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        6
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        7
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        8
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        9
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        10
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        11
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        12
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        13
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        14
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        15
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        16
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        17
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        18
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        19
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        20
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        105,
+        83,
+        76,
+        21
+      ],
+      "name": "ENUM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        10000
+      ],
+      "name": "HEALENERGY",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "HEADICONS_SET",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn"
+      ],
+      "name": "BUILDAPPEARANCE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "[softtimer,pk_skull_timer]"
+      ],
+      "name": "CLEARSOFTTIMER",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "pk_skull",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "poison",
+      "strings": []
+    },
+    {
+      "ints": [
+        "[timer,poison]"
+      ],
+      "name": "CLEARTIMER",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "P_ANIMPROTECT",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "trawler_wreck_zones",
+        4096,
+        0
+      ],
+      "name": "DB_GETFIELD",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "human_ready"
+      ],
+      "name": "READYANIM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "human_turnonspot"
+      ],
+      "name": "TURNANIM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "human_walk_f"
+      ],
+      "name": "WALKANIM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "human_walk_b"
+      ],
+      "name": "WALKANIM_B",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "human_walk_l"
+      ],
+      "name": "WALKANIM_L",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "human_walk_r"
+      ],
+      "name": "WALKANIM_R",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "human_running"
+      ],
+      "name": "RUNANIM",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn"
+      ],
+      "name": "BUILDAPPEARANCE",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        60
+      ],
+      "name": "POP_VARP",
+      "pointer": "prayer_drain_resistance",
+      "strings": []
+    },
+    {
+      "ints": [
+        1675
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Stab: +0"
+      ]
+    },
+    {
+      "ints": [
+        1676
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Slash: +0"
+      ]
+    },
+    {
+      "ints": [
+        1677
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Crush: +0"
+      ]
+    },
+    {
+      "ints": [
+        1678
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Magic: +0"
+      ]
+    },
+    {
+      "ints": [
+        1679
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Range: +0"
+      ]
+    },
+    {
+      "ints": [
+        1680
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Stab: +0"
+      ]
+    },
+    {
+      "ints": [
+        1681
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Slash: +0"
+      ]
+    },
+    {
+      "ints": [
+        1682
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Crush: +0"
+      ]
+    },
+    {
+      "ints": [
+        1683
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Magic: +0"
+      ]
+    },
+    {
+      "ints": [
+        1684
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Range: +0"
+      ]
+    },
+    {
+      "ints": [
+        1686
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Strength: +0"
+      ]
+    },
+    {
+      "ints": [
+        1687
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "Prayer: +0"
+      ]
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_mode",
+      "strings": []
+    },
+    {
+      "ints": [
+        "weapon_unarmed_table",
+        45072,
+        0
+      ],
+      "name": "DB_GETFIELD",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "weapon_unarmed_table",
+        45056,
+        0
+      ],
+      "name": "DB_GETFIELD",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        2
+      ],
+      "name": "POP_VARP",
+      "pointer": "damagetype",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "damagestyle",
+      "strings": []
+    },
+    {
+      "ints": [
+        704
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_stabattack",
+      "strings": []
+    },
+    {
+      "ints": [
+        512
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_stabdef",
+      "strings": []
+    },
+    {
+      "ints": [
+        704
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_slashattack",
+      "strings": []
+    },
+    {
+      "ints": [
+        512
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_slashdef",
+      "strings": []
+    },
+    {
+      "ints": [
+        704
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_crushattack",
+      "strings": []
+    },
+    {
+      "ints": [
+        512
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_crushdef",
+      "strings": []
+    },
+    {
+      "ints": [
+        576
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_magicattack",
+      "strings": []
+    },
+    {
+      "ints": [
+        512
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_magicdef",
+      "strings": []
+    },
+    {
+      "ints": [
+        512
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_rangeattack",
+      "strings": []
+    },
+    {
+      "ints": [
+        512
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_rangedef",
+      "strings": []
+    },
+    {
+      "ints": [
+        1
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_maxhit",
+      "strings": []
+    },
+    {
+      "ints": [
+        417
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_attacksound",
+      "strings": []
+    },
+    {
+      "ints": [
+        422
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_attackanim",
+      "strings": []
+    },
+    {
+      "ints": [
+        424
+      ],
+      "name": "POP_VARP",
+      "pointer": "com_defendanim",
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARBIT",
+      "pointer": "autocast_set",
+      "strings": []
+    },
+    {
+      "ints": [
+        -1
+      ],
+      "name": "POP_VARBIT",
+      "pointer": "autocast_spell",
+      "strings": []
+    },
+    {
+      "ints": [
+        "gnomeball_zones",
+        4096,
+        0
+      ],
+      "name": "DB_GETFIELD",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "gnomeball_zones",
+        4096,
+        1
+      ],
+      "name": "DB_GETFIELD",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "gnomeball_zones",
+        4096,
+        2
+      ],
+      "name": "DB_GETFIELD",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "gnomeball_zones",
+        4096,
+        3
+      ],
+      "name": "DB_GETFIELD",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        5857
+      ],
+      "name": "IF_SETTEXT",
+      "pointer": 0,
+      "strings": [
+        "unarmed"
+      ]
+    },
+    {
+      "ints": [
+        "combat_unarmed",
+        0
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "stats",
+        1
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "questlist",
+        2
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7335,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7336,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7333,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7343,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7348,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        673,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7337,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7346,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7340,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7355,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        8137,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7338,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7344,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7360,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7334,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7342,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7332,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7339,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7341,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7369,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7347,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7381,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7359,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7373,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7367,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7383,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7345,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7372,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7374,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7368,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7380,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7350,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7364,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7351,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7370,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7354,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7362,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7363,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7371,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7358,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7365,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        1740,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        10135,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        8969,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        8679,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        10115,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        8576,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        11907,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        6518,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7378,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7352,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7375,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7356,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7353,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7361,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        11132,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        9927,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7376,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7357,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7379,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7349,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7366,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        7459,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        8115,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        8438,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        191,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        11858,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        12839,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        668,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        11857,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        12129,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        6024,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        12852,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "questlist",
+        2
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "inv",
+        3214
+      ],
+      "name": "INV_TRANSMIT",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "worn",
+        1688
+      ],
+      "name": "INV_TRANSMIT",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "inventory",
+        3
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "wornitems",
+        4
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "prayer",
+        5
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "magic",
+        6
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "friends",
+        8
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "ignore",
+        9
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "logout",
+        10
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "controls",
+        12
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "options",
+        11
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        "music",
+        13
+      ],
+      "name": "IF_SETTAB",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "poison",
+      "strings": []
+    },
+    {
+      "ints": [
+        "[timer,poison]",
+        30
+      ],
+      "name": "SETTIMER",
+      "pointer": 0,
+      "strings": [
+        ""
+      ]
+    },
+    {
+      "ints": [
+        0
+      ],
+      "name": "POP_VARP",
+      "pointer": "rd_death_active",
+      "strings": []
+    }
+  ],
+  "drops": [
+    {
+      "count": 1,
+      "duration": 200,
+      "id": 526,
+      "owner": "-1",
+      "tile": {
+        "level": 0,
+        "x": 2755,
+        "z": 2742
+      }
+    }
+  ]
+}

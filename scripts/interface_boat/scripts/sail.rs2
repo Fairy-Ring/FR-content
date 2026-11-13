@@ -2,7 +2,19 @@
 %journey_number = $map_route;
 
 // todo: should com_0 be set to "You sail to <$place_name>."?
-if_openmain(ship_journey);
+~sail_open(ship_journey);
+
+mes($start_mes);
+p_delay($delay);
+
+~sail_close($destination);
+
+def_string $arrival_mes = "The ship arrives at <$place_name>.";
+~mesbox($arrival_mes);
+
+// Shared sailing lifecycle; the northern ferry has its own cache journey map.
+[proc,sail_open](interface $map)
+if_openmain($map);
 midi_jingle("sailing journey");
 
 // hide all tabs except friends list and ignore list
@@ -18,12 +30,7 @@ if_settab(null, 11);
 if_settab(null, 12);
 if_settab(null, 13);
 
-mes($start_mes);
-p_delay($delay);
-
+[proc,sail_close](coord $destination)
 ~initalltabs;
 if_close;
 p_telejump($destination);
-
-def_string $arrival_mes = "The ship arrives at <$place_name>.";
-~mesbox($arrival_mes);

@@ -178,6 +178,7 @@ if (%deserttreasure = ^dt_stage_hunts) {
     $x = append($x, "@dbl@I should use them to find the four diamonds.|");
     $x = append($x, ~dt_column_journal);
     $x = append($x, ~dt_blood_journal);
+    $x = append($x, ~dt_shadow_journal);
     ~quest_journal($n, $x);
     return;
 }

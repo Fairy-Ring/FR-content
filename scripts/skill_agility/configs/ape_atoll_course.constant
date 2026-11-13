@@ -1,0 +1,116 @@
+// VERIFIED period requirement: Sal's 5 April and Tip.It 1 May 2006, Ape course.
+// CANDIDATE field selection: base Agility (Tip.It RFD 2 May 2006 no-potting statement).
+// Recorded conflict: the Tip.It Agility guide (15 April, 27 April, 1 May 2006) says in general that an
+// Agility potion or Summer Pie lets a player cross obstacles or enter courses a few levels above his own.
+^ape_atoll_level = 48
+
+// VERIFIED period displayed XP, in course order. Existing product convention: tenths.
+// Sal's 5 April / Tip.It 1 May 2006. No additional lap bonus, state slot or counter.
+^ape_atoll_stone_xp = 400
+^ape_atoll_tree_xp = 400
+^ape_atoll_bars_xp = 400
+^ape_atoll_slope_xp = 600
+^ape_atoll_rope_xp = 1000
+^ape_atoll_descent_xp = 3000
+
+// All coordinates below are CANDIDATE reconstruction constants, not historical destinations.
+// Map witnesses use original revision-377 JM2 placements and static size-one collision.
+// U-APEAGILITY-1113 impl/topology-calibration-r2.log corrects the derivative's shape22 active default.
+
+// Entrance bank east of stone: maps/m43_42.jm2:5290; topology-output.txt:132-142,219; flags 0.
+^ape_candidate_entry_stand = 0_43_42_3_54
+// Inner island north of first tree, also its rotated east/angle3 (north) approach.
+// maps/m43_42.jm2:5256-5257; shape22 icon has no ops/shape10, hence is inactive; flags 0.
+^ape_candidate_stone_end = 0_43_42_1_54
+^ape_candidate_tree_stand = 0_43_42_1_54
+// East upper bamboo platform north of bar end: maps/m43_42.jm2:6600-6611; flags 0x402, walkable.
+^ape_candidate_tree_end = 2_43_42_0_54
+^ape_candidate_bars_east = 2_43_42_0_54
+// Western bar origin: maps/m42_42.jm2:5907. TRANSIENT L2 end (floor-blocked), never final settlement.
+// Protected script telejumps immediately after its delay. Login recovery grants no XP.
+^ape_candidate_bars_west_transient = 2_42_42_59_53
+// Stable west landing beside slope east face: maps/m42_42.jm2:5641,5670; flags 0.
+^ape_candidate_bars_west = 0_42_42_59_53
+^ape_candidate_slope_stand = 0_42_42_59_53
+// West of all three slope pieces: maps/m42_42.jm2:5578,5610,5641; flags 0, path to rope west bank.
+^ape_candidate_slope_end = 0_42_42_55_53
+// West edge of original four-tile rope: maps/m43_42.jm2:5225; topology-output.txt:162-176,222; flags 0.
+^ape_candidate_rope_stand = 0_42_42_63_43
+// East of rope footprint, on final island: maps/m43_42.jm2:5225,5373; flags 0, path to final tree.
+^ape_candidate_rope_end = 0_43_42_4_43
+// South of original final tree: maps/m43_42.jm2:5373; flags 0, reachable from rope east end.
+^ape_candidate_descent_stand = 0_43_42_5_45
+// Vine entry beside upper tree: maps/m43_42.jm2:6470-6478; L1 flags 0.
+// TRANSIENT upper-vine checkpoint. Login recovery returns to the descent's start, without XP.
+^ape_candidate_vine_start = 1_43_42_6_46
+// Upper strip's northern exit: maps/m43_42.jm2:6554-6555; L1 flags 0, then level-aware ground settlement.
+^ape_candidate_vine_end = 1_43_42_18_59
+// Ground below vine exit: maps/m43_42.jm2:6555; flags 0x402 (wall-edge bits, walkable); normal path around north cliff to entrance.
+^ape_candidate_descent_end = 0_43_42_18_59
+
+// CANDIDATE animation calibration, NOT recovered original server timings.
+// Asset roles: seq.pack 3480,3487,3482-3484,3485,3488,3494; identity fields preserved in this unit.
+// Client exact-move units are 20 ms cycles. p_delay(n) resumes after n+1 server ticks (600 ms).
+// No animation lead-in/start-cycle offset. Existing agility_exactmove calling convention.
+// Non-looping movement ends match the packed asset's summed frame delays (candidate visual calibration).
+// Server delays round up to a full following tick. Slope loops its eight frames across four tiles.
+^ape_candidate_anim_delay = 0
+^ape_candidate_start_cycle = 0
+// Stone: 36 asset cycles (720 ms), server delay 1 (2 ticks).
+^ape_candidate_stone_end_cycle = 36
+^ape_candidate_stone_delay = 1
+// First tree: 94 asset cycles (1880 ms), server delay 3 (4 ticks), then level-aware telejump.
+^ape_candidate_tree_end_cycle = 94
+^ape_candidate_tree_delay = 3
+// Bars jump-up: stationary 49 asset cycles, server delay 1 (2 ticks).
+^ape_candidate_bars_up_end_cycle = 49
+^ape_candidate_bars_up_delay = 1
+// Bars traverse: 44 asset cycles, server delay 1 (2 ticks), then level-aware telejump.
+^ape_candidate_bars_end_cycle = 44
+^ape_candidate_bars_delay = 1
+// Bars jump-down: stationary on stable destination, 45 asset cycles, server delay 1 (2 ticks).
+^ape_candidate_bars_down_end_cycle = 45
+^ape_candidate_bars_down_delay = 1
+// Slope: 120 cycles, server delay 4 (5 ticks).
+^ape_candidate_slope_end_cycle = 120
+^ape_candidate_slope_delay = 4
+// Rope: 67 asset cycles, server delay 2 (3 ticks).
+^ape_candidate_rope_end_cycle = 67
+^ape_candidate_rope_delay = 2
+// Descent: 54 asset cycles, server delay 1 (2 ticks), then level-aware ground settlement.
+^ape_candidate_descent_end_cycle = 54
+^ape_candidate_descent_delay = 1
+
+// INHERITED PRODUCT DEFAULTS: Barbarian log pattern, not original Ape probability or damage equations.
+^ape_inherited_roll_low = 185
+^ape_inherited_roll_high = 260
+^ape_inherited_damage_percent = 9
+^ape_inherited_damage_divisor = 100
+^ape_inherited_damage_add = 1
+// CANDIDATE envelope: RuneHQ captures 9/28 April 2006, HP-dependent damage from any obstacle.
+^ape_inherited_damage_min = 3
+^ape_inherited_damage_max = 7
+// CANDIDATE current-Agility cutoff: RuneScape Wiki revision 100558, 6 April 2007.
+^ape_candidate_no_fail_level = 75
+
+// CANDIDATE reconstruction landings, NOT recovered original failure coordinates.
+// Entrance bank beside signpost: maps/m43_42.jm2:5290; topology-output.txt:132-142,219; flags 0.
+^ape_candidate_fail_return_entrance = 0_43_42_3_54
+// Rope west bank: maps/m43_42.jm2:5225; topology-output.txt:162-176,220; flags 0.
+// Geometric reconstruction only; the later rope page's unnamed tree is ambiguous.
+^ape_candidate_fail_rope_west_bank = 0_42_42_63_43
+// Below vines east of cliff: maps/m43_42.jm2:6470-6478; topology-output.txt:178-216; L0 open.
+^ape_candidate_fail_descent_ground = 0_43_42_7_49
+
+// CANDIDATE failure choreography using original-keyed named assets 3489,3492,3486,3493.
+// Both cycle operands use the existing zero-start convention above; delays are server ticks minus one.
+// Packed asset durations: stone 54, tree 148, slope 45, falling 24 client cycles.
+// End cycles match those totals; delays round up to a full 600 ms tick before settlement.
+^ape_candidate_stone_fail_end_cycle = 54
+^ape_candidate_stone_fail_delay = 1
+^ape_candidate_tree_fail_end_cycle = 148
+^ape_candidate_tree_fail_delay = 4
+^ape_candidate_slope_fail_end_cycle = 45
+^ape_candidate_slope_fail_delay = 1
+^ape_candidate_fall_end_cycle = 24
+^ape_candidate_fall_delay = 0

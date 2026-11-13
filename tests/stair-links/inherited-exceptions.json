@@ -1,0 +1,380 @@
+{
+  "regionsAndLevels": [
+    {
+      "name": "karam_dungeon_cavestairs",
+      "coord": "0_41_149_24_56",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [2, 2643, 9595],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_5096",
+      "coord": "2_41_149_20_57",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [0, 2649, 9591],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "board_game_stairs_grey_all",
+      "coord": "0_45_55_19_46",
+      "trigger": "oploc1",
+      "choice": null,
+      "destinationBounds": {
+        "min": [1, 2205, 4933],
+        "max": [1, 2207, 4934]
+      },
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "board_game_stairs_grey_base2",
+      "coord": "1_34_77_29_7",
+      "trigger": "oploc1",
+      "choice": null,
+      "destinationBounds": {
+        "min": [0, 2898, 3564],
+        "max": [0, 2900, 3565]
+      },
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "castlewars_outsidestairs_saradomin_linked",
+      "coord": "0_37_48_49_2",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2417,
+        3077
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "castlewars_outsidestairs_zamorak_linked",
+      "coord": "0_37_48_14_59",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2383,
+        3133
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "cryptstairsdown",
+      "coord": "0_48_52_43_29",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3077,
+        9771
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "cryptstairsup",
+      "coord": "0_48_152_5_40",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3115,
+        3356
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "hauntedmine_main_entrance",
+      "coord": "0_53_50_60_43",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2792,
+        4592
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "hauntedmine_main_entrance_inside",
+      "coord": "0_43_71_38_45",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3454,
+        3242
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "ladder_1765",
+      "coord": "0_47_60_9_9",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3069,
+        10255
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1728",
+      "coord": "0_40_148_60_25",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2620,
+        9566
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1729",
+      "coord": "0_40_149_60_26",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2621,
+        9496
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1733",
+      "coord": "0_40_48_9_50",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2569,
+        9525
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1733",
+      "coord": "0_40_48_43_6",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2601,
+        9478
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1733",
+      "coord": "0_42_52_36_46",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2727,
+        9774
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1733",
+      "coord": "0_47_61_36_20",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3045,
+        10323
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1733",
+      "coord": "0_47_52_50_48",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3058,
+        9776
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1733",
+      "coord": "0_49_53_51_41",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3190,
+        9833
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1734",
+      "coord": "0_40_148_9_50",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2569,
+        3121
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1734",
+      "coord": "0_40_148_43_6",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2606,
+        3078
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1734",
+      "coord": "0_42_152_36_46",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2723,
+        3374
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1734",
+      "coord": "0_47_161_36_20",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3045,
+        3927
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1734",
+      "coord": "0_47_152_51_48",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3061,
+        3376
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_1734",
+      "coord": "0_49_153_51_41",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3186,
+        3433
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_2316",
+      "coord": "0_40_149_18_48",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2567,
+        9524
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_5097",
+      "coord": "0_41_148_11_42",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        2,
+        2636,
+        9510
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "scenery_5098",
+      "coord": "2_41_148_11_39",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        2636,
+        9517
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "wizards_tower_ladder",
+      "coord": "0_48_149_31_40",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3105,
+        3162
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    },
+    {
+      "name": "wizards_tower_laddertop",
+      "coord": "0_48_49_32_26",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        0,
+        3104,
+        9576
+      ],
+      "class": "inherited link to another region or a non-adjacent level"
+    }
+  ],
+  "blockedOrFloorless": [
+    {
+      "name": "fenk_stairs_lv1",
+      "coord": "0_55_55_17_31",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        1,
+        3537,
+        3553
+      ],
+      "class": "inherited landing that the collision data calls blocked or floorless"
+    },
+    {
+      "name": "fenk_stairs_lv1",
+      "coord": "0_55_55_39_31",
+      "trigger": "oploc1",
+      "choice": null,
+      "destination": [
+        1,
+        3559,
+        3553
+      ],
+      "class": "inherited landing that the collision data calls blocked or floorless"
+    }
+  ]
+}

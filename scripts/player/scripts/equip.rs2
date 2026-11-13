@@ -114,14 +114,19 @@ if ($obj = castlewars_saradomin_banner | $obj = castlewars_zamorak_banner) {
 // MM greegree — 289 unequip_effect branch (clear monkey form)
 // $obj is often null when equipping into an empty rhand — never oc_category(null)
 if ($obj ! null & oc_category($obj) = mm_greegree) {
-    p_transmogrify(null);
-    cleartimer(mm_greegree_timer);
-    p_animprotect(^false);
+    ~greegree_clearform_silent;
     spotanim_pl(windwave_impact, 124, 0);
     sound_synth(oc_param($obj, revert_sound), 0, 0);
     if_settab(magic, ^tab_magic);
 }
 ~runecraft_unset_no_tally($obj);
+
+// Shared silent portion only. Remove keeps its published visual, sound and tab order.
+// Death's existing initalltabs restores the Magic tab after update_all restores BAS.
+[proc,greegree_clearform_silent]
+p_transmogrify(null);
+cleartimer(mm_greegree_timer);
+p_animprotect(^false);
 
 // used for duel arena, no weapon/no armour
 [proc,try_unequip](int $slot)
