@@ -1,5 +1,6 @@
 [trawler_rewardinv]
 size=40
+protect=no
 stackall=yes
 
 [axeshop]
