@@ -204,6 +204,29 @@ def check_blood_constants() -> None:
         "Blood progression constants must be declared once",
     )
 
+    # Both persistent Blood outputs share original varp 442, not temporary slots.
+    player_vars, _ = parse_sections(read_text(ROOT / "scripts" / "_unpack" / "377" / "all.varp"))
+    player_bits, _ = parse_sections(read_text(ROOT / "scripts" / "_unpack" / "377" / "all.varbit"))
+    varp_rows = read_text(ROOT / "pack" / "varp.pack").splitlines()
+    bit_rows = read_text(ROOT / "pack" / "varbit.pack").splitlines()
+    require(varp_rows.count("442=deserttreasurevarbit2") == 1, "Blood retains original backing varp 442")
+    require(
+        player_vars.get("deserttreasurevarbit2", {}).get("scope") == ["perm"],
+        "Blood agreement, preparation and valid-kill progress survive clean logout",
+    )
+    for name, original_id, startbit, endbit in (
+        ("fdvw_cutscene", 372, 2, 2),
+        ("fdvw_subquest", 373, 3, 6),
+    ):
+        require(bit_rows.count(f"{original_id}={name}") == 1, f"{name} retains original varbit {original_id}")
+        fields = player_bits.get(name, {})
+        require(
+            fields.get("basevar") == ["deserttreasurevarbit2"]
+            and fields.get("startbit") == [str(startbit)]
+            and fields.get("endbit") == [str(endbit)],
+            f"{name} retains its original permanent backing field",
+        )
+
     combat_values, combat_duplicates = parse_constants(read_text(QUEST / "configs" / "dt_blood.constant"))
     expected_combat = {
         "dt_dessous_teleports_limit": 3,
