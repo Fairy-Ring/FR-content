@@ -21,7 +21,8 @@
 ^dt_smoke_surface = 0_51_46_46_17
 ^dt_smoke_gate_inside = 0_51_146_42_31
 ^dt_smoke_gate_outside = 0_51_146_40_31
-^dt_fareed_room_sw = 0_51_146_42_29
+// The gate's east-side doorway tile is 3305; its west wall blocks 3304.
+^dt_fareed_room_sw = 0_51_146_41_29
 ^dt_fareed_room_ne = 0_51_146_47_35
 ^dt_fareed_spawn = 0_51_146_45_32
 

@@ -96,7 +96,7 @@ def main() -> int:
     if failures:
         print("\n".join(f"FAIL: {failure}" for failure in failures))
         return 1
-    for script in ("test_s2_topology.mjs", "test_s2_timer.mjs"):
+    for script in ("test_s2_topology.mjs", "test_s2_timer.mjs", "test_s2_room.mjs"):
         result = subprocess.run(
             ["node", "--import", "tsx", str(ROOT / "tests/desert-treasure" / script)],
             cwd=ROOT.parent / "engine",
