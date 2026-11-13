@@ -2,6 +2,8 @@
 // This is NOT the finished historical course: no failure chance, damage or failure destination is defined here.
 // VERIFIED period requirement: Sal's 5 April and Tip.It 1 May 2006, Ape course.
 // CANDIDATE field selection: base Agility (Tip.It RFD 2 May 2006 no-potting statement).
+// Recorded conflict: the Tip.It Agility guide (15 April, 27 April, 1 May 2006) says in general that an
+// Agility potion or Summer Pie lets a player cross obstacles or enter courses a few levels above his own.
 ^ape_atoll_level = 48
 
 // VERIFIED period displayed XP, in course order. Existing product convention: tenths.
@@ -45,7 +47,7 @@
 ^ape_candidate_vine_start = 1_43_42_6_46
 // Upper strip's northern exit: maps/m43_42.jm2:6554-6555; L1 flags 0, then level-aware ground settlement.
 ^ape_candidate_vine_end = 1_43_42_18_59
-// Ground below vine exit: maps/m43_42.jm2:6555; flags 0; normal path around north cliff to entrance.
+// Ground below vine exit: maps/m43_42.jm2:6555; flags 0x402 (wall-edge bits, walkable); normal path around north cliff to entrance.
 ^ape_candidate_descent_end = 0_43_42_18_59
 
 // CANDIDATE animation calibration, NOT recovered original server timings.
