@@ -266,6 +266,55 @@ def check_original_entity_configs() -> None:
         "firediamond_firewarrior": (130, 190, 120, 135, 4, "npc_1977", "167"),
     }
     candidate_fields = ("hitpoints", "attack", "strength", "defence", "magic")
+    # S5 may add only these server behaviours; all original client/cache fields stay pinned.
+    s5_behaviour = {
+        "icediamond_icewarrior": {
+            "wanderrange": "0", "maxrange": "32", "attackrange": "8", "timer": "1",
+            "param": (
+                "attackbonus,60", "strengthbonus,100", "stabdefence,35", "slashdefence,60",
+                "crushdefence,35", "damagetype,^slash_style", "attack_anim,human_sword_slash",
+                "defend_anim,human_sword_block", "death_anim,human_death",
+            ),
+        },
+    }
+    for index in range(1, 8):
+        s5_behaviour[f"trollrescue_icetroll_melee{index}"] = {
+            "wanderrange": "3", "maxrange": "7", "attackrange": "1", "respawnrate": "83",
+            "huntmode": "aggressive_melee", "huntrange": "5",
+            "param": (
+                "attackrate,4", "attackbonus,60", "strengthbonus,60", "stabdefence,30",
+                "slashdefence,60", "crushdefence,30", "damagetype,^crush_style",
+                "attack_anim,troll_attack", "defend_anim,troll_block", "death_anim,troll_death",
+            ),
+        }
+    for index in range(1, 7):
+        s5_behaviour[f"ice_wolf_{index}"] = {
+            "wanderrange": "3", "maxrange": "7", "attackrange": "1", "respawnrate": "17",
+            "huntmode": "aggressive_melee", "huntrange": "5",
+            "param": (
+                "attackrate,4", "damagetype,^stab_style", "attack_anim,dog_attack",
+                "defend_anim,dog_block", "death_anim,dog_death",
+            ),
+        }
+    for name in ("troll_block_1", "fd_trollblock1", "troll_block_2", "fd_trollblock2"):
+        s5_behaviour[name] = {"hitpoints": "10", "wanderrange": "0", "defaultmode": "none"}
+
+    def strip_s5_behaviour(name, values):
+        result = {key: list(items) for key, items in values.items()}
+        for key, expected in s5_behaviour.get(name, {}).items():
+            if key == "param":
+                params = result.get(key, [])
+                for item in expected:
+                    require(params.count(item) == 1, f"[{name}] S5 must add exactly param={item}")
+                    if item in params:
+                        params.remove(item)
+                if not params:
+                    result.pop(key, None)
+            else:
+                require(result.get(key) == [expected], f"[{name}] S5 {key} must be {expected}")
+                result.pop(key, None)
+        return result
+
     for name, (hp, attack, strength, defence, rate, model, vislevel) in expected_npcs.items():
         expected_fields = {
             "hitpoints": str(hp),
@@ -296,13 +345,15 @@ def check_original_entity_configs() -> None:
         current_values["param"] = [value for value in current_params if value != candidate_rate]
         if not current_values["param"]:
             current_values.pop("param")
+        current_values = strip_s5_behaviour(name, current_values)
         require(
             current_values == base_values,
             f"[{name}] may change only the labelled candidate combat fields",
         )
     for name, base_values in base_npcs.items():
         if name not in expected_npcs:
-            require(npcs.get(name) == base_values, f"[{name}] non-candidate NPC data must remain unchanged")
+            current_values = strip_s5_behaviour(name, npcs.get(name, {}))
+            require(current_values == base_values, f"[{name}] non-candidate NPC data must remain unchanged")
     npc_text = (UNPACK / "all.npc").read_text(encoding="utf-8")
     for name, (hp, attack, strength, defence, rate, _, _) in expected_npcs.items():
         match = re.search(

@@ -44814,6 +44814,20 @@ strength=80
 defence=135
 magic=1
 param=attackrate,4
+// CANDIDATE: S5 combat behaviour; original 377 cache fields remain unchanged.
+wanderrange=0
+maxrange=32
+attackrange=8
+timer=1
+param=attackbonus,60
+param=strengthbonus,100
+param=stabdefence,35
+param=slashdefence,60
+param=crushdefence,35
+param=damagetype,^slash_style
+param=attack_anim,human_sword_slash
+param=defend_anim,human_sword_block
+param=death_anim,human_death
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_medium_head
 
@@ -45463,6 +45477,23 @@ hitpoints=80
 attack=140
 strength=120
 defence=80
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=83
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee2]
 name=Ice Troll
@@ -45487,6 +45518,23 @@ hitpoints=80
 attack=120
 strength=120
 defence=100
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=83
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee3]
 name=Ice Troll
@@ -45510,6 +45558,23 @@ hitpoints=100
 attack=100
 strength=100
 defence=120
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=83
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee4]
 name=Ice Troll
@@ -45534,6 +45599,23 @@ hitpoints=90
 attack=110
 strength=110
 defence=110
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=83
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee5]
 name=Ice Troll
@@ -45557,6 +45639,23 @@ hitpoints=100
 attack=100
 strength=100
 defence=120
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=83
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee6]
 name=Ice Troll
@@ -45581,6 +45680,23 @@ hitpoints=100
 attack=100
 strength=100
 defence=120
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=83
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee7]
 name=Ice Troll
@@ -45603,6 +45719,23 @@ hitpoints=90
 attack=110
 strength=110
 defence=110
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=83
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [troll_block_1]
 turnspeed=0
@@ -45613,6 +45746,10 @@ multivar=fd_icewarrior_dadfree
 multinpc=0,fd_trollblock1
 multinpc=1,fd_troll_dad
 
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
 [fd_trollblock1]
 name=Ice block
 desc=A troll frozen in a block of ice.
@@ -45623,6 +45760,10 @@ op1=Talk-to
 op2=Smash-ice
 turnspeed=0
 
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
 [troll_block_2]
 turnspeed=0
 size=2
@@ -45632,6 +45773,10 @@ multivar=fd_icewarrior_mumfree
 multinpc=0,fd_trollblock2
 multinpc=1,fd_troll_mum
 
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
 [fd_trollblock2]
 name=Ice block
 desc=A troll frozen in a block of ice.
@@ -45642,6 +45787,10 @@ op1=Talk-to
 op2=Smash-ice
 turnspeed=0
 
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
 [troll_frozen_1]
 walkanim=troll_walk
 readyanim=troll_ready
@@ -45713,6 +45862,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=17
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_2]
 name=Ice wolf
@@ -45733,6 +45894,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=17
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_3]
 name=Ice wolf
@@ -45753,6 +45926,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=17
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_4]
 name=Ice wolf
@@ -45773,6 +45958,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=17
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_5]
 name=Ice wolf
@@ -45793,6 +45990,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=17
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_6]
 name=Ice wolf
@@ -45813,6 +46022,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=17
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [desert_treasure_invisible_npc]
 model1=trollrescue_blankmodel_8

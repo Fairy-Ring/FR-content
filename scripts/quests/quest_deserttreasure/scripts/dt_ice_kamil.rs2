@@ -1,0 +1,89 @@
+// CANDIDATE: Ice combat contract; ordinary spell admission pending ELEMENTAL-WEAKNESS-1109.
+[proc,dt_kamil_attackable]()(boolean)
+if (%npc_macro_event_target ! uid | %deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_dead ! 0) return(false);
+return(true);
+
+[proc,dt_kamil_spawn]
+if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_dead ! 0 | %fd_icewarrior_trollskilled < ^dt_ice_trolls_required) return;
+// CANDIDATE: the native clearing after the wolf valley, before the ice ledge.
+if (inzone(0_44_59_24_0, 0_44_59_31_7, coord) = false) return;
+npc_huntall(coord, 40, 0);
+while (npc_findnext = true) {
+    if (npc_type = icediamond_icewarrior & %npc_macro_event_target = uid) return;
+}
+npc_add(0_44_59_29_4, icediamond_icewarrior, 1000);
+%npc_macro_event_target = uid;
+%npc_aggressive_player = uid;
+npc_setmode(applayer2);
+
+[opnpc2,icediamond_icewarrior]
+if (~dt_kamil_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,icediamond_icewarrior]
+if (~dt_kamil_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_timer,icediamond_icewarrior]
+if (finduid(%npc_macro_event_target) = false) {
+    npc_del;
+    return;
+}
+if (%fd_icewarrior_dead ! 0 | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | distance(coord, npc_coord) > 32 | coordy(coord) ! 0) {
+    npc_del;
+    return;
+}
+npc_setmode(applayer2);
+
+[ai_queue1,icediamond_icewarrior]
+if (finduid(%npc_macro_event_target) = true) npc_setmode(applayer2);
+
+[ai_opplayer2,icediamond_icewarrior] ~dt_kamil_attack;
+[ai_applayer2,icediamond_icewarrior] ~dt_kamil_attack;
+
+[proc,dt_kamil_attack]
+if (~dt_kamil_attackable = false | %npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false | ~npc_check_notcombat_self = false) return;
+// CANDIDATE split: half the close attacks are melee; distant attacks are magic.
+if (distance(coord, npc_coord) <= 1 & random(2) = 0) {
+    ~npc_default_attack;
+    return;
+}
+if_close;
+npc_anim(human_castentangle, 0);
+npc_say("Sallamakar Ro!");
+spotanim_pl(ice_barrage_impact, 0, 0);
+sound_synth(ice_cast, 1, 0);
+def_int $damage1 = 0;
+def_int $damage2 = 0;
+if (~npc_player_hit_roll(^magic_style) = true & ~check_protect_prayer(^magic_style) = false) {
+    $damage1 = randominc(5);
+    $damage2 = randominc(5);
+}
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+~npc_set_attack_vars;
+queue*(dt_kamil_freeze, 0)($damage1, $damage2);
+queue*(playerhit_n_retaliate, 0)(npc_uid);
+
+[queue,dt_kamil_freeze](int $damage1, int $damage2)
+// A full player delay, not just a movement root: food and teleport also stop.
+if_close;
+~damage_self($damage1);
+~damage_self($damage2);
+p_delay(^dt_ice_freeze_ticks);
+
+[ai_queue3,icediamond_icewarrior]
+def_player_uid $owner = %npc_macro_event_target;
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+if (uid ! $owner) return;
+if (%fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_dead ! 0) return;
+obj_add(npc_coord, chocolate_cake, 2, ^lootdrop_duration);
+obj_add(npc_coord, 4dose2restore, 1, ^lootdrop_duration);
+queue(dt_ice_kamil_defeated, 0, 0);
+
+[queue,dt_ice_kamil_defeated]
+if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_dead ! 0) return;
+%fd_icewarrior_dead = 1;
+%fd_icewarrior_subquest = ^dt_ice_substate_kamil_dead;
+~chatplayer("Well, that must have been the 'bad man' that the troll kid was on about... His parents must be up ahead somewhere.");
