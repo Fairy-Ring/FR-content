@@ -989,6 +989,7 @@ transmit=yes
 [varp519_unused]
 
 [dagganoth_area_project]
+scope=perm
 transmit=yes
 
 [varp522_unused]
