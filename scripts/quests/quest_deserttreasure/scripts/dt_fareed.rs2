@@ -1,0 +1,178 @@
+// S2 Fareed. Period guides establish the key/gate, melee + fire magic, ice-glove
+// disarm and inventory diamond. Config/timing/wording labels: dt_smoke.constant.
+// Water spells and ice arrows use the existing shared combat/rune-payment paths.
+// No unsupported elemental multiplier or exhaustive attack allowlist is invented.
+
+[oploc1,fd_fw_metalgateclosed_l] @dt_smoke_gate;
+[oploc1,fd_fw_metalgateclosed_r] @dt_smoke_gate;
+[oplocu,fd_fw_metalgateclosed_l] @dt_smoke_gate_use;
+[oplocu,fd_fw_metalgateclosed_r] @dt_smoke_gate_use;
+
+[label,dt_smoke_gate_use]
+if (last_useitem ! fd_firekey) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@dt_smoke_gate;
+
+[label,dt_smoke_gate]
+if (~dt_fareed_inside(coord) = true) {
+    ~dt_fareed_cleanup;
+    p_teleport(^dt_smoke_gate_outside);
+    return;
+}
+if (%deserttreasure < ^dt_stage_hunts) {
+    ~mesbox("This gate is locked.");
+    return;
+}
+if (%fd_firewargate = ^dt_flag_off) {
+    if (inv_total(inv, fd_firekey) < 1) {
+        ~mesbox("This gate is locked.");
+        return;
+    }
+    inv_del(inv, fd_firekey, 1);
+    %fd_firewargate = ^dt_flag_on;
+    mes("You unlock the gate and enter the room.");
+}
+p_teleport(^dt_smoke_gate_inside);
+if (%fd_killed_firewarrior = ^dt_flag_on) @dt_smoke_reclaim;
+if (~dt_fareed_find = true) return;
+npc_add(^dt_fareed_spawn, firediamond_firewarrior, ^dt_fareed_duration);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = uid;
+%npc_action_delay = add(map_clock, ^dt_fareed_spawn_delay);
+npc_setmode(opplayer2);
+npc_say("You dare trespass in my realm?");
+
+[proc,dt_fareed_inside](coord $tile)(boolean)
+if (inzone(^dt_fareed_room_sw, ^dt_fareed_room_ne, $tile) = true) return(true);
+return(inzone(^dt_fareed_room_west_sw, ^dt_fareed_room_west_ne, $tile));
+
+[proc,dt_fareed_find]()(boolean)
+npc_findall(^dt_fareed_spawn, firediamond_firewarrior, ^dt_fareed_search_radius, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return(true);
+}
+return(false);
+
+[proc,dt_fareed_cleanup]
+npc_findall(^dt_fareed_spawn, firediamond_firewarrior, ^dt_fareed_search_radius, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) {
+        npc_del;
+        return;
+    }
+}
+
+[proc,dt_fareed_attackable]()(boolean)
+if (%npc_attacking_uid ! uid) {
+    mes("Someone else is fighting that.");
+    return(false);
+}
+if (~dt_fareed_inside(coord) = false | %deserttreasure < ^dt_stage_hunts | %fd_killed_firewarrior = ^dt_flag_on) return(false);
+return(true);
+
+[ai_timer,firediamond_firewarrior]
+if (npc_stat(hitpoints) = 0) return;
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (~dt_fareed_inside(coord) = false) {
+    npc_del;
+    return;
+}
+// Protected/modal players do not acquire queued or retried equipment actions.
+if (p_finduid(%npc_attacking_uid) = true) ~dt_fareed_disarm;
+
+[proc,dt_fareed_disarm]
+if (inv_getobj(worn, ^wearpos_hands) = ice_gloves) return;
+def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
+if ($weapon = null) return;
+inv_dropslot(worn, coord, ^wearpos_rhand, ^dropslot_duration);
+~update_all($weapon);
+~on_unequip($weapon);
+mes("The heat from the warrior causes you to drop your weapon.");
+
+[ai_queue1,firediamond_firewarrior]
+// Only the owning account can pass either shared Attack admission path.
+if (%npc_aggressive_player = %npc_attacking_uid) ~npc_default_retaliate;
+
+[ai_opplayer2,firediamond_firewarrior]
+if (%npc_action_delay > map_clock) return;
+if (random(^dt_fareed_magic_chance) = 0) {
+    ~dt_fareed_cast;
+} else {
+    ~npc_default_attack;
+}
+
+[proc,dt_fareed_cast]
+if (~npc_combat_spell_checks = false) return;
+// Period RuneHQ names Flames of Zamorak. Reuse its shared visuals and damage,
+// not npc_stat_change_effect: no source gives Fareed a Magic drain.
+def_dbrow $spell_data = ~get_spell_data(^flames_of_zamorak);
+def_int $duration = ~npc_spell_cast($spell_data, npc_param(attackrate));
+if (~npc_player_hit_roll(^magic_style) = true) {
+    ~npc_spell_success($spell_data, ^dt_fareed_magic_maxhit, $duration);
+} else {
+    ~npc_spell_fail($spell_data, $duration);
+}
+~npc_set_attack_vars;
+
+[ai_applayer2,firediamond_firewarrior]
+// Fareed's fire attack is melee-distance; resume approach if a shared combat
+// check changed the mode. The spell's look does not alter the attack range.
+npc_setmode(opplayer2);
+
+[ai_queue3,firediamond_firewarrior]
+if (finduid(%npc_attacking_uid) = true & npc_findhero = ^true & uid = %npc_attacking_uid) {
+    queue*(dt_fareed_death, 0)(%npc_attacking_uid);
+}
+// The shared Slayer death path also reads the secondary NPC pointer.
+if (.npc_finduid(npc_uid) = true) ~npc_default_death;
+
+[queue,dt_fareed_death](player_uid $owner)
+if (uid ! $owner | ~dt_fareed_inside(coord) = false | %deserttreasure < ^dt_stage_hunts | %fd_killed_firewarrior = ^dt_flag_on) return;
+%fd_killed_firewarrior = ^dt_flag_on;
+~dt_smoke_give_diamond;
+
+[proc,dt_smoke_diamond_owned]()(boolean)
+if (~obj_gettotal(fd_diamond_fire) > 0 | %fd_column_fire = ^dt_column_placed) return(true);
+return(false);
+
+[proc,dt_smoke_give_diamond]
+if (~dt_smoke_diamond_owned = true) return;
+if (inv_freespace(inv) < 1) {
+    // UNKNOWN full-inventory presentation: use the existing owned-loot path and
+    // generic refusal, not an invented historical inventory message.
+    obj_add(coord, fd_diamond_fire, 1, ^lootdrop_duration);
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, fd_diamond_fire, 1);
+mes("You take the Diamond of Smoke from the ashes of the warrior.");
+
+[label,dt_smoke_reclaim]
+if (~dt_smoke_diamond_owned = true | ~dt_smoke_diamond_ground = true) return;
+// VERIFIED period recovery form; CANDIDATE coordinate: dt_smoke.constant.
+obj_add(^dt_smoke_diamond_ground, fd_diamond_fire, 1, ^lootdrop_duration);
+mes("The Diamond of Smoke seems to have mystically found its way back here.");
+
+[proc,dt_smoke_diamond_ground]()(boolean)
+// S3 visibility pattern, restricted to the R1 chamber. A foreign private drop
+// must not block this owner's recovery. Engine map zones are eight tiles wide.
+def_int $x = 0;
+while ($x <= sub(coordx(^dt_fareed_room_ne), coordx(^dt_fareed_room_sw))) {
+    def_int $z = 0;
+    while ($z <= sub(coordz(^dt_fareed_room_ne), coordz(^dt_fareed_room_sw))) {
+        obj_findallzone(movecoord(^dt_fareed_room_sw, $x, 0, $z));
+        while (obj_findnext = true) {
+            if (obj_type = fd_diamond_fire & ~dt_fareed_inside(obj_coord) = true) {
+                if (obj_find(obj_coord, fd_diamond_fire) = true) return(true);
+            }
+        }
+        $z = add($z, 8);
+    }
+    $x = add($x, 8);
+}
+return(false);
