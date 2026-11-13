@@ -2,6 +2,13 @@
  * Deterministic compiled production-handler proof for the Ape Atoll course unit.
  * Run after the full content pack is built, from the sibling engine directory:
  *   node --import tsx ../content/tests/ape-agility/test_ape_atoll.mjs
+ * Recapture after reviewing an intentional change to ordinary human death:
+ * build any published tree's full pack, then run the same command with
+ * --capture-human-death-baseline > capture.log. No old source or git history is needed.
+ * Parse the JSON after APE_ATOLL_HUMAN_DEATH_BASELINE_V1 and save its observation
+ * to fixtures/human-death-published.json (retain marker and deathSourceSha256).
+ * Save its effects to fixtures/human-death-effects.json. Review both diffs.
+ * The source hash is provenance only. Appended varps must retain type defaults.
  * It starts no server and writes its JSON receipt beneath RUNNER_TEMP (or the OS temp directory).
  */
 import assert from 'node:assert/strict';
@@ -266,13 +273,15 @@ const greegreeTimerScript = ScriptProvider.getByName('[timer,mm_greegree_timer]'
 const greegreeWieldScript = ScriptProvider.getByName('[opheld2,_mm_greegree]');
 const MAIN_INVENTORY = packId('inv', 'inv');
 const greegreeObjectIds = new Set(ninjaForms.map(form => packId('obj', form.object)));
-const HUMAN_DEATH_SOURCE_SHA256 = '486ef86eb32c165c40db7d78a09de833fe642388d4b2c5a64aff911e0a2987b0';
+const deathSourceSha256 = crypto.createHash('sha256')
+  .update(fs.readFileSync(path.join(CONTENT_DIR, 'scripts/player/scripts/death.rs2'))).digest('hex');
 const HUMAN_DEATH_BASELINE_MARKER = 'APE_ATOLL_HUMAN_DEATH_BASELINE_V1';
 const HUMAN_DEATH_BASELINE_PATH = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
   'fixtures',
   'human-death-published.json'
 );
+const HUMAN_DEATH_EFFECTS_PATH = path.join(path.dirname(HUMAN_DEATH_BASELINE_PATH), 'human-death-effects.json');
 const DEATH_TEST_START_TICK = 100;
 // The real MAP_FINDSQUARE opcode samples Math.random, not JavaRandom.
 const DEATH_RESPAWN_RANDOM = 0;
@@ -579,23 +588,6 @@ for (const name of ['monkeybars_12573', 'monkeybars_12575']) {
   const calls = script.opcodes.flatMap((opcode, pc) => ScriptOpcodeNameMap.get(opcode) === 'GOSUB_WITH_PARAMS' ? [ScriptProvider.get(script.intOperands[pc])] : []);
   assert.equal(calls.filter(callee => callee?.id === barsProcedure.id).length, 1, `${name} calls the one shared bars procedure once`);
 }
-if (captureHumanDeathBaseline) {
-  assert.equal(
-    crypto.createHash('sha256')
-      .update(fs.readFileSync(path.join(CONTENT_DIR, 'scripts/player/scripts/death.rs2')))
-      .digest('hex'),
-    HUMAN_DEATH_SOURCE_SHA256,
-    'baseline capture requires the unchanged published death source'
-  );
-  const humanDeathRun = runHumanDeath();
-  const baseline = {
-    marker: HUMAN_DEATH_BASELINE_MARKER,
-    deathSourceSha256: HUMAN_DEATH_SOURCE_SHA256,
-    observation: humanDeathRun.observation
-  };
-  fs.writeFileSync(process.stdout.fd, `${HUMAN_DEATH_BASELINE_MARKER} ${JSON.stringify(baseline)}\n`);
-  process.exit(0);
-}
 assert(greegreeTimerScript, 'the real greegree timer is packed');
 assert(greegreeWieldScript, 'the real greegree Wield/Hold action is packed');
 
@@ -679,7 +671,7 @@ function withPlayerTrace(player, callback) {
   ScriptRunner.HANDLERS[ScriptOpcode.RETURN] = state => {
     const name = isPlayerState(state) ? state.script.name : null;
     const result = originalReturn(state);
-    if (name === '[proc,on_unequip]' || name === '[proc,update_bas]') {
+    if (['[proc,on_unequip]', '[proc,greegree_clearform_silent]', '[proc,update_bas]'].includes(name)) {
       events.push({
         kind: 'stateAfterProcedure',
         name,
@@ -909,6 +901,83 @@ function startDeathTestTick() {
   nextDeathTestTick = World.currentTick + 100;
 }
 
+// Void engine commands are effects. Pure getters/branches are intentionally excluded:
+// a guarded form read must not change the ordinary human-death contract.
+const commandSignatures = new Map();
+for (const line of fs.readFileSync(path.join(CONTENT_DIR, 'scripts/engine.rs2'), 'utf8').split(/\r?\n/)) {
+  const match = line.match(/^\[command,([.\w]+)\](?:\/\*)?(?:\(([^)]*)\))?(.*)$/);
+  if (!match || /^\s*\(/.test(match[3])) continue;
+  const name = match[1].replace(/^\./, '').toUpperCase();
+  const types = [...(match[2] ?? '').matchAll(/(\w+)\s+\$/g)].map(m => m[1]);
+  commandSignatures.set(name, types);
+}
+const namedPacks = new Map();
+function namedArgument(type, value) {
+  const kind = ({ namedobj: 'obj', timer: 'script', softtimer: 'script', queue: 'script', proc: 'script' })[type] ?? type;
+  if (value < 0) return value;
+  const file = path.join(CONTENT_DIR, `pack/${kind}.pack`);
+  if (!fs.existsSync(file)) return value;
+  if (!namedPacks.has(kind)) {
+    namedPacks.set(kind, new Map(fs.readFileSync(file, 'utf8').trim().split(/\r?\n/).map(line => {
+      const equal = line.indexOf('=');
+      return [Number(line.slice(0, equal)), line.slice(equal + 1)];
+    })));
+  }
+  return namedPacks.get(kind).get(value) ?? value;
+}
+function withDeathEffects(player, callback) {
+  const commands = [];
+  const drops = [];
+  const handlers = new Map();
+  const originalAddObj = World.addObj;
+  World.addObj = function (object, owner, duration) {
+    drops.push({ tile: tileOf(object), id: object.type, count: object.count, owner: String(owner), duration });
+    return originalAddObj.apply(this, arguments);
+  };
+  for (const [opcode, name] of ScriptOpcodeNameMap) {
+    const variable = ['POP_VARP', 'POP_VARS', 'POP_VARBIT'].includes(name);
+    if ((!commandSignatures.has(name) || opcode < 1000) && !variable) continue;
+    const original = ScriptRunner.HANDLERS[opcode];
+    if (typeof original !== 'function') continue;
+    handlers.set(opcode, original);
+    ScriptRunner.HANDLERS[opcode] = state => {
+      const ints = [];
+      const strings = [];
+      const popInt = state.popInt;
+      const popString = state.popString;
+      state.popInt = function () { const value = popInt.call(this); ints.unshift(value); return value; };
+      state.popString = function () { const value = popString.call(this); strings.unshift(value); return value; };
+      const command = { name, pointer: state.intOperand };
+      commands.push(command);
+      try { return original(state); } finally {
+        state.popInt = popInt;
+        state.popString = popString;
+        const types = (commandSignatures.get(name) ?? []).filter(type => type !== 'string');
+        command.ints = ints.map((value, index) => namedArgument(types[index], value));
+        command.strings = strings;
+        if (variable) command.pointer = namedArgument(name === 'POP_VARBIT' ? 'varbit' : 'varp', state.intOperand);
+      }
+    };
+  }
+  try { return { result: callback(), effects: { commands, drops } }; } finally {
+    World.addObj = originalAddObj;
+    for (const [opcode, handler] of handlers) ScriptRunner.HANDLERS[opcode] = handler;
+  }
+}
+
+function assertHumanDeathObservation(actual, baseline) {
+  const comparison = structuredClone(actual);
+  for (const [key, defaultValue] of [['vars', 0], ['varsString', { $undefined: true }]]) {
+    const old = baseline.player[key];
+    const current = comparison.player[key];
+    assert(current.length >= old.length, `${key} retains all baseline entries`);
+    for (const value of current.slice(old.length)) {
+      assert.deepEqual(value, defaultValue, `appended ${key} entry retains its type default`);
+    }
+    comparison.player[key] = current.slice(0, old.length);
+  }
+  assert.deepEqual(comparison, baseline, 'human death preserves packets, messages, inventories, respawn and reset stats');
+}
 function runDeathQueue(player) {
   const packetsBeforeDeath = player.packets.map(canonicalJsonValue);
   const originalRandom = Math.random;
@@ -948,15 +1017,29 @@ function runHumanDeath() {
   startDeathTestTick();
   const player = makePlayer(48, null, STAGES[0].start);
   player.invSet(WORN_INVENTORY, packId('obj', 'bronze_sword'), 1, RIGHT_HAND);
-  const death = runDeathQueue(player);
+  const traced = withDeathEffects(player, () => runDeathQueue(player));
+  const death = traced.result;
   return {
     player,
     events: death.events,
+    effects: canonicalJsonValue(traced.effects),
     observation: canonicalJsonValue({
       worldTick: World.currentTick,
       player: death.snapshot
     })
   };
+}
+if (captureHumanDeathBaseline) {
+  // Capture the built tree as it exists, including after this repair is published.
+  const humanDeathRun = runHumanDeath();
+  const baseline = {
+    marker: HUMAN_DEATH_BASELINE_MARKER,
+    deathSourceSha256,
+    observation: humanDeathRun.observation,
+    effects: humanDeathRun.effects
+  };
+  fs.writeFileSync(process.stdout.fd, `${HUMAN_DEATH_BASELINE_MARKER} ${JSON.stringify(baseline)}\n`);
+  process.exit(0);
 }
 
 let humanDeathBaselineCases = 0;
@@ -964,15 +1047,20 @@ let monkeyDeathRepairCases = 0;
 let greegreeReequipCases = 0;
 let unmatchedGreegreeDeathControlCases = 0;
 const humanDeathRun = runHumanDeath();
-assert(fs.existsSync(HUMAN_DEATH_BASELINE_PATH), 'capture the published human-death baseline before rebuilding the packed death script');
+assert(fs.existsSync(HUMAN_DEATH_BASELINE_PATH), 'capture the published human-death baseline from a full pack');
 const humanDeathBaseline = JSON.parse(fs.readFileSync(HUMAN_DEATH_BASELINE_PATH, 'utf8'));
-assert.equal(humanDeathBaseline.marker, HUMAN_DEATH_BASELINE_MARKER, 'human death fixture is the marked real published-pack capture');
-assert.equal(humanDeathBaseline.deathSourceSha256, HUMAN_DEATH_SOURCE_SHA256, 'human death fixture names the published death source');
-assert.deepEqual(
-  humanDeathRun.observation,
-  humanDeathBaseline.observation,
-  'death in human form: same packet and state results as on the published pack'
-);
+assert.equal(humanDeathBaseline.marker, HUMAN_DEATH_BASELINE_MARKER, 'human death fixture is a marked real pack capture');
+assert.match(humanDeathBaseline.deathSourceSha256, /^[0-9a-f]{64}$/, 'source digest is retained as provenance, not an admission lock');
+assertHumanDeathObservation(humanDeathRun.observation, humanDeathBaseline.observation);
+assert.deepEqual(humanDeathRun.effects, JSON.parse(fs.readFileSync(HUMAN_DEATH_EFFECTS_PATH, 'utf8')),
+  'human death preserves commands and arguments in order, and actual ground drops');
+// Exercise the append-only rule without requiring an unrelated product varp edit.
+const appendedDefault = structuredClone(humanDeathRun.observation);
+appendedDefault.player.vars.push(0);
+appendedDefault.player.varsString.push({ $undefined: true });
+assertHumanDeathObservation(appendedDefault, humanDeathBaseline.observation);
+appendedDefault.player.vars[appendedDefault.player.vars.length - 1] = 1;
+assert.throws(() => assertHumanDeathObservation(appendedDefault, humanDeathBaseline.observation), /type default/);
 assert.equal(
   humanDeathRun.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length,
   0,
@@ -1016,13 +1104,13 @@ for (const form of ninjaForms) {
   );
   assert(removalIndex >= 0, `${form.label} death executes the real worn-item removal`);
   const resetIndex = death.events.findIndex((event, index) =>
-    index > removalIndex && event.kind === 'call' && event.name === '[proc,on_unequip]'
+    index > removalIndex && event.kind === 'call' && event.name === '[proc,greegree_clearform_silent]'
   );
-  assert(resetIndex > removalIndex, `${form.label} death calls the real Remove reset after the item leaves worn`);
+  assert(resetIndex > removalIndex, `${form.label} death calls the silent reset after the item leaves worn`);
   assert.equal(
-    death.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length,
+    death.events.filter(event => event.kind === 'call' && event.name === '[proc,greegree_clearform_silent]').length,
     1,
-    `${form.label} death invokes the real Remove reset exactly once`
+    `${form.label} death invokes the shared silent reset exactly once`
   );
   const inventoryAddIndex = death.events.findIndex(event =>
     event.kind === 'inventoryItemAdded' && event.inventoryId === MAIN_INVENTORY && event.objectId === objectId
@@ -1041,12 +1129,12 @@ for (const form of ninjaForms) {
     `${form.label} death removes its worn greegree exactly once`
   );
   const resetState = death.events.find(event =>
-    event.kind === 'stateAfterProcedure' && event.name === '[proc,on_unequip]'
+    event.kind === 'stateAfterProcedure' && event.name === '[proc,greegree_clearform_silent]'
   );
-  assert(resetState, `${form.label} records the actual completed Remove reset`);
+  assert(resetState, `${form.label} records the actual completed silent reset`);
   assert.equal(resetState.tick, death.events[removalIndex].tick, `${form.label} actual form reset shares the item-move tick`);
-  assert.equal(resetState.npcId, humanDeathBaseline.observation.player.npcId, `${form.label} getter form is clear when Remove returns`);
-  assert.equal(resetState.animProtect, 0, `${form.label} Remove clears protection in the item-move tick`);
+  assert.equal(resetState.npcId, humanDeathBaseline.observation.player.npcId, `${form.label} getter form is clear when silent reset returns`);
+  assert.equal(resetState.animProtect, 0, `${form.label} silent reset clears protection in the item-move tick`);
   assert(!resetState.timers.includes(greegreeTimerScript.name), `${form.label} Remove clears its timer in the item-move tick`);
   const basState = death.events.find(event =>
     event.kind === 'stateAfterProcedure' && event.name === '[proc,update_bas]'
@@ -1092,6 +1180,11 @@ for (const form of ninjaForms) {
     humanDeathBaseline.observation.player.messages,
     `${form.label} death adds no player-visible text`
   );
+  assert.equal(death.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length, 0,
+    `${form.label} death never invokes Remove's visible/sound effects`);
+  assert.equal(player.spotanimId, -1, `${form.label} respawn has no revert spot animation`);
+  assert.equal(death.events.filter(event => event.kind === 'packet' && event.packet.$type === 'SynthSound').length, 0,
+    `${form.label} death emits no greegree revert sound`);
   monkeyDeathRepairCases++;
 
   // A disclosed position fixture returns to the valid Ape region, not a form seed.
@@ -1117,7 +1210,34 @@ for (const form of ninjaForms) {
     `${form.label} real Wield/Hold rearms the real greegree timer`
   );
   greegreeReequipCases++;
+  const unequip = ScriptProvider.getByName('[proc,unequip]');
+  assert(unequip, 'ordinary Remove is packed');
+  const removeEffects = withDeathEffects(player, () => withPlayerTrace(player, () => {
+    assert.equal(player.runScript(ScriptRunner.init(unequip, player, null, [RIGHT_HAND]), true, true),
+      ScriptState.FINISHED, `${form.label} real Remove finishes`);
+  }));
+  const remove = removeEffects.result;
+  const clearAt = removeEffects.effects.commands.findIndex(command => command.name === 'P_TRANSMOGRIFY');
+  assert(clearAt >= 0, `${form.label} Remove executes its form-clear command`);
+  assert.deepEqual(removeEffects.effects.commands.slice(clearAt, clearAt + 6), [
+    { name: 'P_TRANSMOGRIFY', pointer: 0, ints: [-1], strings: [] },
+    { name: 'CLEARTIMER', pointer: 0, ints: ['[timer,mm_greegree_timer]'], strings: [] },
+    { name: 'P_ANIMPROTECT', pointer: 0, ints: [0], strings: [] },
+    { name: 'SPOTANIM_PL', pointer: 0, ints: ['windwave_impact', 124, 0], strings: [] },
+    { name: 'SOUND_SYNTH', pointer: 0, ints: [form.accepted ? 'smallmonkey_into_human' : 'monkey_into_human', 0, 0], strings: [] },
+    { name: 'IF_SETTAB', pointer: 0, ints: ['magic', 6], strings: [] }
+  ], `${form.label} compiled Remove keeps the published command arguments and order`);
+  assert.equal(player.npcId, -1, `${form.label} Remove still clears form`);
+  assert.equal(player.spotanimId, packId('spotanim', 'windwave_impact'), `${form.label} Remove retains its published spot animation`);
+  const sounds = remove.events.filter(event => event.kind === 'packet' && event.packet.$type === 'SynthSound');
+  assert.equal(sounds.length, 1, `${form.label} Remove retains its one published revert sound`);
 }
+
+// The donor policy covers any NPC form, not only a matching worn greegree.
+const otherForm = makePlayer(48, null, STAGES[0].start);
+otherForm.npcId = packId('npc', 'imp');
+runDeathQueue(otherForm);
+assert.equal(otherForm.npcId, -1, 'ordinary death clears a non-greegree NPC form too');
 
 assert.equal(humanDeathBaselineCases, 1, 'one complete published human-death fixture is compared');
 assert.equal(monkeyDeathRepairCases, ninjaForms.length, 'all three configured greegree forms clear on ordinary death');
@@ -1231,7 +1351,8 @@ for (const stage of STAGES) {
     assert(failure, `${stage.name} has a pinned candidate failure landing and animation`);
     const player = makePlayer(48, ninjaForms[0], stage.start);
     player.levels[AGILITY] = 74;
-    player.setLevel(HITPOINTS, hpCase.hitpoints);
+    player.setLevel(HITPOINTS, 99);
+    player.levels[HITPOINTS] = hpCase.hitpoints;
     const beforeXp = player.stats[AGILITY];
     const beforeStats = Array.from(player.stats);
     const beforeBas = BAS_FIELDS.map(field => player[field]);

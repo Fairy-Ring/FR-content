@@ -52,12 +52,6 @@ if (findhero = true) {
     // todo: what npc killed the player
     session_log(^log_moderator, "Player died");
 }
-// CANDIDATE: death has no sourced period greegree rule. Reuse Remove's reset
-// only after the matching worn greegree leaves; the existing update_all below
-// restores its BAS in this same uninterrupted death tick.
-if ($prev_wep ! null & oc_category($prev_wep) = mm_greegree & inv_getobj(worn, ^wearpos_rhand) ! $prev_wep & p_gettransmogrify = oc_param($prev_wep, next_npc_type)) {
-    ~on_unequip($prev_wep);
-}
 def_coord $death_dest = map_findsquare(0_50_50_21_18, 0, 2, ^map_findsquare_lineofwalk);
 // RuneHQ OSRS Recruitment Drive (2017): castle courtyard respawn.
 // https://www.runehq.com/oldschoolquest/recruitment-drive
@@ -67,6 +61,11 @@ if (%rd_main >= ^recruitmentdrive_complete & %falador_spawn = 1) {
 }
 p_teleport($death_dest);
 buildappearance(worn);
+// CANDIDATE: Lost City 289's undated branch tip clears every form here silently.
+// Guard the reset so an ordinary human death keeps the published command path.
+if (p_gettransmogrify ! null) {
+    ~greegree_clearform_silent;
+}
 ~prayer_deactivate_all;
 ~follower_death;
 // CoF gardener: restore courtyard multi directions bit after player death.
