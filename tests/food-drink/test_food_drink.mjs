@@ -56,10 +56,10 @@ World.gameMap.init();
 
 const foods = [
     { name: 'tbwt_sliced_banana', objectId: 3162, heal: 2, published: 'missing' },
-    { name: 'mort_slimey_eel_cooked', objectId: 3381, heal: [6, 10], published: 'meat' },
-    { name: 'snail_corpse_cooked1', objectId: 3369, heal: [5, 7], published: 'meat' },
-    { name: 'snail_corpse_cooked2', objectId: 3371, heal: [6, 8], published: 'meat' },
-    { name: 'snail_corpse_cooked3', objectId: 3373, heal: [7, 9], published: 'meat' },
+    { name: 'mort_slimey_eel_cooked', objectId: 3381, heal: [6, 10], eatLine: 'You eat the cooked slimy eel - ummm, slimy!', published: 'meat' },
+    { name: 'snail_corpse_cooked1', objectId: 3369, heal: [5, 7], eatLine: 'You eat the cooked snail - ummm, slimy!', published: 'meat' },
+    { name: 'snail_corpse_cooked2', objectId: 3371, heal: [6, 8], eatLine: 'You eat the cooked snail - ummm, slimy!', published: 'meat' },
+    { name: 'snail_corpse_cooked3', objectId: 3373, heal: [7, 9], eatLine: 'You eat the cooked snail - ummm, slimy!', published: 'meat' },
     { name: 'mm_monkey_nuts', objectId: 4012, heal: 4, published: 'missing' },
     { name: 'mm_monkey_bar', objectId: 4014, heal: 5, published: 'missing' },
     { name: 'mm_banana_stew', objectId: 4016, heal: 11, container: bowlId, published: 'missing' },
@@ -165,8 +165,9 @@ function assertPresentation(p, item, expectedCount = 1) {
         assert.equal(p.messages.filter(text => text === 'You chug the keg. You feel reinvigorated...').length, expectedCount);
         assert.equal(p.messages.filter(text => text === '...but extremely drunk too.').length, expectedCount);
     } else {
-        const genericLines = p.messages.filter(text => /^You (?:eat|drink) the /i.test(text));
-        assert.equal(genericLines.length, expectedCount, `${item.name} uses the generic consumption message`);
+        const eatLines = p.messages.filter(text => /^You (?:eat|drink) the /i.test(text));
+        const expectedLine = item.eatLine ?? `You eat the ${item.obj.name.toLowerCase()}.`;
+        assert.deepEqual(eatLines, Array(expectedCount).fill(expectedLine), `${item.name} emits its exact consumption message`);
     }
 }
 function assertItemOutcome(item, { hp = 40, baseHp = 99, random = 0.5 } = {}) {
@@ -209,6 +210,22 @@ function assertFullHitpointsConsumption(item) {
     if (isKeg) {
         assert.equal(p.levels[STRENGTH], 110, 'keg strength boost uses stat_boost base-level cap');
         assert.equal(p.levels[ATTACK], 5, 'keg attack drain uses stat_drain current-level rule');
+    }
+}
+function assertKegOffBaseStats() {
+    const keg = foods.find(item => item.name === 'keg_of_beer');
+    // PlayerOps: boost = floor(2 + 99*10/100) = 11, capped at 99+11.
+    // Drain = floor(5 + current*50/100), not a percentage of base 20.
+    for (const [attack, expectedAttack] of [[30, 10], [4, 0]]) {
+        const p = fixture({ strength: 105, baseStrength: 99, attack, baseAttack: 20 });
+        inventory(p).add(keg.id, 1);
+        const tick = freshTick();
+        assert.ok(eat(p, keg), 'missing packed keg opheld1 trigger');
+        assert.equal(p.levels[STRENGTH], 110, 'already-boosted keg Strength stops at base plus boost, not 116');
+        assert.equal(p.levels[ATTACK], expectedAttack, `keg drains current Attack ${attack}/20 with floor zero`);
+        assertContents(p, [], 'off-base keg consumes exactly one item without a container');
+        assertDelays(p, tick);
+        assertPresentation(p, keg);
     }
 }
 function assertEatingDelay(item) {
@@ -315,6 +332,7 @@ if (publishedMode) {
     console.log('PASS published baseline: four meat-category items consume without healing, five items have no trigger, and bread is unchanged');
     process.exit(0);
 }
+assertKegOffBaseStats();
 
 for (const item of foods) {
     assertItemOutcome(item);

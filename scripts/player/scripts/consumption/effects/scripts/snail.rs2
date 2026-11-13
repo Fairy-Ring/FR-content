@@ -5,7 +5,7 @@
 [label,consume_effect_snail3] @consume_snail(7, 9);
 
 [label,consume_snail](int $low, int $high)
-mes("You eat the <lowercase(oc_name(last_item))>.");
+mes("You eat the cooked snail - ummm, slimy!");
 sound_synth(eat, 0, 0);
 anim(human_eat, 0);
 inv_delslot(inv, last_slot);
