@@ -30,6 +30,8 @@ const ResumePauseButtonHandler = await load('network/game/client/handler/ResumeP
 const ResumePauseButton = await load('network/game/client/model/ResumePauseButton.ts');
 const ResumePCountDialogHandler = await load('network/game/client/handler/ResumePCountDialogHandler.ts');
 const ResumePCountDialog = await load('network/game/client/model/ResumePCountDialog.ts');
+const IfOpenChat = await load('network/game/server/model/IfOpenChat.ts');
+const IfSetModel = await load('network/game/server/model/IfSetModel.ts');
 const IfSetObject = await load('network/game/server/model/IfSetObject.ts');
 const IfSetPosition = await load('network/game/server/model/IfSetPosition.ts');
 const IfSetText = await load('network/game/server/model/IfSetText.ts');
@@ -274,6 +276,19 @@ function normalizedInterfaceText(value) {
 }
 
 function assertProductMenu(p) {
+  const menuComponent = componentId('skillmulti5');
+  const packets = packetLog.get(p);
+  const openIndex = packets.findIndex(message => message instanceof IfOpenChat && message.component === menuComponent);
+  assert.ok(openIndex >= 0, 'skillmulti5 sends its IfOpenChat packet');
+  for (const [index, message] of packets.entries()) {
+    if ((message instanceof IfSetText || message instanceof IfSetModel ||
+         message instanceof IfSetObject || message instanceof IfSetPosition) &&
+        (message.component === menuComponent || Component.get(message.component).rootLayer === menuComponent)) {
+      assert.ok(index < openIndex,
+        `skillmulti5 must open after every menu setter: ${message.constructor.name} for ${Component.get(message.component).comName} arrives after IfOpenChat`);
+    }
+  }
+
   const modelComponents = RECIPES.map((_, index) => componentId(`skillmulti5:com_${index + 2}`));
   const modelPackets = packetLog.get(p)
     .filter(message => message instanceof IfSetObject && modelComponents.includes(message.component))
@@ -466,6 +481,8 @@ for (const [recipeIndex, recipe] of RECIPES.entries()) {
       assert.deepEqual(canonicalCounts(inventoryCounts(p)), canonicalCounts(before), 'an initial shortage changes no inventory item');
       assert.equal(inventory(p).getItemCount(recipe.productId), 0, 'an initial shortage grants no product');
       assertText(p, recipe.short);
+      assert.ok(!visibleText(p).includes(recipe.stop),
+        `${recipe.product}: an initial shortage must show the initial refusal, not the partial-batch stop line`);
     });
   }
 }
