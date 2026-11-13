@@ -19,29 +19,42 @@ if (p_finduid(uid) = true) {
 }
 
 [proc,refresh_chill]
-if (~inzone_coord_pair_table(chill_zones, coord) = true) {
-    settimer(chill, 10); // refresh / start the timer
-} else {
-    cleartimer(chill);
-}
+settimer(chill, 10);
 
 [proc,clear_chill_timer]
-if(~inzone_coord_pair_table(chill_zones, coord) = false) {
+if (inzone(0_44_58_0_24, 0_44_58_15_39, coord) = false) {
     cleartimer(chill);
-    return;
 }
 
 [timer,chill]
+// Native player timers repeat at their interval until cleared.
 if (~inzone_coord_pair_table(chill_zones, coord) = true) {
     ~apply_chill;
-    settimer(chill, 10);
 }
+
+// The cold rectangle spans four 8x8 zones. Keep the exact effect bounds in the table.
+[zone,0_44_58_0_24]
+~refresh_chill;
+[zone,0_44_58_8_24]
+~refresh_chill;
+[zone,0_44_58_0_32]
+~refresh_chill;
+[zone,0_44_58_8_32]
+~refresh_chill;
+
+[zoneexit,0_44_58_0_24]
+~clear_chill_timer;
+[zoneexit,0_44_58_8_24]
+~clear_chill_timer;
+[zoneexit,0_44_58_0_32]
+~clear_chill_timer;
+[zoneexit,0_44_58_8_32]
+~clear_chill_timer;
 
 [mapzone,0_44_58]
 if_openoverlay(overlay_atmosphere_snow_flakes);
-~refresh_chill; // check + start timer if needed
 @music_playbyregion(coord);
 
 [mapzoneexit,0_44_58]
 if_openoverlay(null);
-~refresh_chill;
+cleartimer(chill);
