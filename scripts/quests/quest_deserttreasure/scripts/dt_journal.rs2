@@ -1,0 +1,168 @@
+// Every journal sentence is project-authored; historical Desert Treasure prose is UNKNOWN.
+// Requirements are from the period guides; exact 377 start enforcement is UNKNOWN.
+[if_button,questlist:deserttreasure]
+def_string $n = "Desert Treasure";
+def_string $x;
+~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
+
+if (%deserttreasure = ^dt_stage_not_started) {
+    $x = append($x, "@dbl@I can start Desert Treasure by speaking to the @dre@Archaeologist@dbl@ at the Bedabin Camp.|" );
+    $x = append($x, "@dbl@Requirements:|");
+    if (~itexam_progress() >= ^itexam_complete) {
+        $x = append($x, "@str@The Digsite Quest|");
+    } else {
+        $x = append($x, "@dre@The Digsite Quest|");
+    }
+    if (%desertrescue >= ^desertrescue_complete) {
+        $x = append($x, "@str@The Tourist Trap|");
+    } else {
+        $x = append($x, "@dre@The Tourist Trap|");
+    }
+    if (%ikov >= ^ikov_completed_armadyl | %ikov >= ^ikov_completed_lucien) {
+        $x = append($x, "@str@The Temple of Ikov|");
+    } else {
+        $x = append($x, "@dre@The Temple of Ikov|");
+    }
+    if (%priestperil >= ^priestperil_complete) {
+        $x = append($x, "@str@Priest in Peril|");
+    } else {
+        $x = append($x, "@dre@Priest in Peril|");
+    }
+    if (%waterfall_quest >= ^waterfall_complete) {
+        $x = append($x, "@str@Waterfall Quest|");
+    } else {
+        $x = append($x, "@dre@Waterfall Quest|");
+    }
+    if (%troll_quest >= ^troll_complete) {
+        $x = append($x, "@str@Troll Stronghold|");
+    } else {
+        $x = append($x, "@dre@Troll Stronghold|");
+    }
+    if (stat_base(slayer) >= 10) {
+        $x = append($x, "@str@Level 10 Slayer|");
+    } else {
+        $x = append($x, "@dre@Level 10 Slayer|");
+    }
+    if (stat_base(firemaking) >= 50) {
+        $x = append($x, "@str@Level 50 Firemaking|");
+    } else {
+        $x = append($x, "@dre@Level 50 Firemaking|");
+    }
+    if (stat_base(magic) >= 50) {
+        $x = append($x, "@str@Level 50 Magic|");
+    } else {
+        $x = append($x, "@dre@Level 50 Magic|");
+    }
+    if (stat_base(thieving) >= 53) {
+        $x = append($x, "@str@Level 53 Thieving|");
+    } else {
+        $x = append($x, "@dre@Level 53 Thieving|");
+    }
+    ~quest_journal($n, $x);
+    return;
+}
+
+if (%deserttreasure = ^dt_stage_etchings_received) {
+    $x = append($x, "@str@The Archaeologist gave me etchings of an ancient stone tablet.|");
+    if (inv_total(inv, four_diamonds_etchings) > 0) {
+        $x = append($x, "@dbl@I should take the etchings to Terry Balando.");
+    } else {
+        $x = append($x, "@dbl@I should ask the Archaeologist for replacement etchings.");
+    }
+    ~quest_journal($n, $x);
+    return;
+}
+
+if (%deserttreasure = ^dt_stage_translation_with_terry) {
+    $x = append($x, "@str@Terry has taken the etchings and is preparing a translation.|");
+    $x = append($x, "@dbl@I should speak to Terry again.");
+    ~quest_journal($n, $x);
+    return;
+}
+
+if (%deserttreasure = ^dt_stage_translation_return) {
+    if (inv_total(inv, four_diamonds_translation_primer) > 0) {
+        $x = append($x, "@str@Terry gave me the Translation.|");
+        $x = append($x, "@dbl@I should take the translation to the Archaeologist.");
+    } else {
+        $x = append($x, "@str@I no longer have the Translation.|");
+        $x = append($x, "@dbl@I should recover the translation before I deliver it.");
+    }
+    ~quest_journal($n, $x);
+    return;
+}
+
+if (%deserttreasure = ^dt_stage_partnership_pending) {
+    $x = append($x, "@str@The Archaeologist has read the translation.|");
+    $x = append($x, "@dbl@I should discuss a partnership.");
+    ~quest_journal($n, $x);
+    return;
+}
+
+if (%deserttreasure = ^dt_stage_partnership_accepted) {
+    $x = append($x, "@str@I agreed to partner with the Archaeologist.|");
+    $x = append($x, "@dbl@I should buy a drink at the bandit camp.");
+    ~quest_journal($n, $x);
+    return;
+}
+if (%deserttreasure = ^dt_stage_brew_purchased) {
+    $x = append($x, "@str@The bartender sold me the beer.|");
+    $x = append($x, "@dbl@I should ask him about the four diamonds.");
+    ~quest_journal($n, $x);
+    return;
+}
+
+if (%deserttreasure = ^dt_stage_diamonds_requested) {
+    $x = append($x, "@str@The bartender told me about the four diamonds.|");
+    $x = append($x, "@dbl@I should speak to Eblis at the Bandit Camp.");
+    ~quest_journal($n, $x);
+    return;
+}
+
+if (%deserttreasure = ^dt_stage_ingredients_pending) {
+    $x = append($x, "@str@Eblis told me what he needs to create the scrying glasses.|");
+    if (%fd_magiclog >= 12) {
+        $x = append($x, "@str@12 magic logs|");
+    } else {
+        $x = append($x, "@dbl@I still need @dre@<tostring(calc(12 - %fd_magiclog))> magic logs@dbl@.|");
+    }
+    if (%fd_steelbar >= 6) {
+        $x = append($x, "@str@6 steel bars|");
+    } else {
+        $x = append($x, "@dbl@I still need @dre@<tostring(calc(6 - %fd_steelbar))> steel bars@dbl@.|");
+    }
+    if (%fd_glass >= 6) {
+        $x = append($x, "@str@6 molten glass|");
+    } else {
+        $x = append($x, "@dbl@I still need @dre@<tostring(calc(6 - %fd_glass))> molten glass@dbl@.|");
+    }
+    if (%fd_bones >= 1) {
+        $x = append($x, "@str@1 set of normal bones|");
+    } else {
+        $x = append($x, "@dbl@I still need a set of @dre@normal bones@dbl@.|");
+    }
+    if (%fd_ash >= 1) {
+        $x = append($x, "@str@ashes|");
+    } else {
+        $x = append($x, "@dbl@I still need @dre@ashes@dbl@.|");
+    }
+    if (%fd_charcoal >= 1) {
+        $x = append($x, "@str@charcoal|");
+    } else {
+        $x = append($x, "@dbl@I still need @dre@charcoal@dbl@.|");
+    }
+    if (%fd_bloodrune >= 1) {
+        $x = append($x, "@str@1 blood rune|");
+    } else {
+        $x = append($x, "@dbl@I still need a @dre@blood rune@dbl@.|");
+    }
+    ~quest_journal($n, $x);
+    return;
+}
+
+if (%deserttreasure = ^dt_stage_hunts) {
+    $x = append($x, "@str@Eblis has set up the scrying glasses.|");
+    $x = append($x, "@dbl@I should use them to find the four diamonds.");
+    ~quest_journal($n, $x);
+    return;
+}

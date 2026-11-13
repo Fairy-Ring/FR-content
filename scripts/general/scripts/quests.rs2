@@ -277,6 +277,9 @@ if (%regicide_quest = ^regicide_complete) {
 if (%routequest = ^routequest_complete) {
     $questpoints = add($questpoints, ^routequest_questpoints);
 }
+if (%deserttreasure = ^deserttreasure_complete) {
+    $questpoints = add($questpoints, ^deserttreasure_questpoints);
+}
 // Recruitment Drive — narrow QP add (product writer t_130905cb).
 if (%rd_main = ^recruitmentdrive_complete) {
     $questpoints = add($questpoints, ^recruitmentdrive_questpoints);
@@ -460,6 +463,8 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:creatureoffenkenstrain, %fenk_quest, ^creatureoffenkenstrain_complete);
 // Wanted! start/deputising progress persists through the shared login refresh.
 ~send_quest_progress_colour(questlist:wanted, %wanted_main, ^wanted_complete);
+// Desert Treasure: without this line a relog leaves the started quest's row at its default colour.
+~send_quest_progress_colour(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {
