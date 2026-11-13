@@ -63,7 +63,9 @@ p_teleport(0_54_52_42_52);
 if_close;
 ~initalltabs;
 minimap_toggle(0);
-%routequest = ^routequest_entered_hollowed;
+if (%routequest < ^routequest_entered_hollowed) {
+    %routequest = ^routequest_entered_hollowed;
+}
 ~mesbox("You arrive at the hollows."); // not a typo
 
 [opnpc1,route_cyreg_paddlehorn]
