@@ -44,3 +44,11 @@ node --import tsx ../content/tests/barrows/test_owned.mjs
 ```
 
 This check executes all six packed Search handlers with native loc/NPC fixtures. It covers the original slain joins, selected/credited suppression, private immutable owner and captured generation, both shared attack gates, independent owners, cleanup and uncredited retry. Mutable combat targeting does not make a map monster an owned summon. Offline placement-radius allocation is not a terrain proof; the natural live Search supplies that evidence. Brother combat styles and special attacks remain outside this group.
+
+## Monster configuration (S04)
+
+```sh
+node --import tsx ../content/tests/barrows/test_monsters.mjs
+```
+
+The source contract includes all seven original ordinary-monster level joins, the selected class NPCs and the one named engineering policy. The packed check executes all 128 draw-label/class bridges and verifies exact 12/52/32/32 counts, selected NPCs and the unknown-label no-spawn default. Numeric class keys are an internal representation; the authorized draw labels and rules are unchanged.

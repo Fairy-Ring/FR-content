@@ -1,0 +1,8 @@
+// The authorized draw labels are strings; native enum keys are integers.
+// This is the sole bridge to the UNKNOWN internal class encoding.
+[proc,barrows_door_class](string $label)(int)
+if (compare($label, "brother") = 0) return(^barrows_door_class_brother);
+if (compare($label, "skeleton") = 0) return(^barrows_door_class_skeleton);
+if (compare($label, "bloodworm") = 0) return(^barrows_door_class_bloodworm);
+if (compare($label, "crypt_rat") = 0) return(^barrows_door_class_crypt_rat);
+return(^barrows_door_class_none);
