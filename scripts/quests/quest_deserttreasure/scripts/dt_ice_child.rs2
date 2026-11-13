@@ -1,5 +1,8 @@
 // CANDIDATE wording: desert-treasure.dlg.ice-hunt. State assignment: ice-product-contract-1109.
-[opnpc1,fourdiamonds_troll_child]
+[opnpc1,fourdiamonds_troll_child_crying] ~dt_ice_child_talk;
+[opnpc1,fourdiamonds_troll_child_okay] ~dt_ice_child_talk;
+
+[proc,dt_ice_child_talk]
 if (%deserttreasure < ^dt_stage_hunts) {
     ~dt_ice_child_crying;
     return;
@@ -53,7 +56,10 @@ if ($choice = 1) {
 ~chatnpc("Waaaaaaa!");
 mes("This troll seems very upset about something. Maybe some sweet food would take his mind off things?");
 
-[opnpcu,fourdiamonds_troll_child]
+[opnpcu,fourdiamonds_troll_child_crying] ~dt_ice_child_offer;
+[opnpcu,fourdiamonds_troll_child_okay] ~dt_ice_child_offer;
+
+[proc,dt_ice_child_offer]
 if (%deserttreasure < ^dt_stage_hunts | %fd_trollchild_intro ! 0 | %fd_icewarrior_subquest ! ^dt_ice_substate_crying) {
     return;
 }

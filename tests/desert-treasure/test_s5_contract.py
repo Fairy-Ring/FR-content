@@ -65,7 +65,7 @@ def check_script_definitions(sources: dict[str, str]) -> None:
     active = without_comments(all_sources)
     headers = re.findall(r"(?m)^\s*\[([^,\]]+),([^\]]+)\]", active)
     target_names = {
-        "dt_ice_child_crying", "dt_ice_give_diamond", "dt_ice_family_reward",
+        "dt_ice_child_talk", "dt_ice_child_offer", "dt_ice_child_crying", "dt_ice_give_diamond", "dt_ice_family_reward",
         "dt_ice_cold_area", "dt_ice_enter_zone", "dt_ice_cold", "dt_ice_cold_damage",
         "dt_ice_slip", "dt_kamil_attackable", "dt_kamil_spawn", "dt_kamil_attack",
         "dt_kamil_freeze", "dt_kamil_defeated", "dt_ice_smash", "dt_ice_block_broken",
@@ -78,7 +78,7 @@ def check_script_definitions(sources: dict[str, str]) -> None:
                     f"duplicate S5 section [{kind},{name}]")
 
     trigger_names = {
-        "fourdiamonds_troll_child", "icediamond_icewarrior",
+        "fourdiamonds_troll_child_crying", "fourdiamonds_troll_child_okay", "icediamond_icewarrior",
         "trollrescue_icetroll_melee1", "trollrescue_icetroll_melee2",
         "trollrescue_icetroll_melee3", "trollrescue_icetroll_melee4",
         "trollrescue_icetroll_melee5", "trollrescue_icetroll_melee6",
@@ -182,14 +182,14 @@ def main() -> int:
         text(ROOT / "pack/varp.pack"),
     )
 
-    offer = block(child, "opnpcu", "fourdiamonds_troll_child")
+    offer = block(child, "proc", "dt_ice_child_offer")
     require("%fd_icewarrior_subquest ! ^dt_ice_substate_crying" in offer, "sweet offer is limited to the crying substate")
     valid_foods = "cake, partial_cake, cake_slice, chocolate_cake, partial_chocolate_cake, chocolate_slice, chocolate_bar"
     require(valid_foods in offer, "offer accepts the sourced cake/chocolate portions only")
     require("def_obj $sweet = last_useitem;" in offer and offer.count("inv_del(inv, $sweet, 1)") == 1 and offer.index("inv_total(inv, $sweet) = 0") < offer.index("inv_del(inv, $sweet, 1)"),
             "valid sweet food is captured before dialogue and consumed exactly once after inventory confirmation")
     require(offer.index("inv_del(inv, $sweet, 1)") < offer.index("%fd_trollchild_intro = 1"), "intro flag follows the one-time food consume")
-    choice = block(child, "opnpc1", "fourdiamonds_troll_child")
+    choice = block(child, "proc", "dt_ice_child_talk")
     require(choice.count("%fd_icewarrior_subquest = ^dt_ice_substate_agreed") == 1 and "if ($choice = 1)" in choice and "} else {" in choice,
             "only acceptance advances the child to agreed; decline leaves substate unchanged")
     require("%fd_icewarrior_subquest = ^dt_ice_substate_family_returned" in choice,
@@ -230,6 +230,18 @@ def main() -> int:
     require(re.search(r"(?m)^1913=icediamond_icewarrior$", npc_pack) is not None,
             "Kamil retains original NPC identity 1913")
     block_config = config_sections(text(UNPACK / "all.npc"))
+    visible_children = {entry.split(",", 1)[1] for entry in block_config.get("fourdiamonds_troll_child", {}).get("multinpc", [])}
+    require(visible_children == {"fourdiamonds_troll_child_crying", "fourdiamonds_troll_child_okay"},
+            "original child multi-NPC resolves to exactly the two original visible variants")
+    for name in sorted(visible_children):
+        require(block_config.get(name, {}).get("op1") == ["Talk-to"], f"visible child [{name}] exposes original Talk-to")
+        require(block(child, "opnpc1", name).strip() == "~dt_ice_child_talk;",
+                f"visible child [{name}] dispatches native Talk-to to the shared child body")
+        require(block(child, "opnpcu", name).strip() == "~dt_ice_child_offer;",
+                f"visible child [{name}] dispatches native item-use to the shared sweet-offer body")
+    require("[opnpc1,fourdiamonds_troll_child]" not in without_comments(child) and
+            "[opnpcu,fourdiamonds_troll_child]" not in without_comments(child),
+            "non-visible child parent has no obsolete interactive dispatch bindings")
     for identifier, name in ((1943, "troll_block_1"), (1944, "fd_trollblock1"),
                              (1945, "troll_block_2"), (1946, "fd_trollblock2")):
         require(re.search(rf"(?m)^{identifier}={name}$", npc_pack) is not None,
