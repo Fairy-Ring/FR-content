@@ -171,10 +171,10 @@ if ($item = digtalisman) {
     ~chatnpc("<p,neutral>Hey you should be careful of that. It might cut your fingers, throw it away!");
 } else if ($item = digsitearrow) {
     ~chatplayer("<p,happy>Have a look at this arrow.");
-        ~chatnpc("<p,neutral>No doubt this arrow was shot by a strong warrior - it's split in half! It is not a valuable object though.");
+    ~chatnpc("<p,neutral>No doubt this arrow was shot by a strong warrior - it's split in half! It is not a valuable object though.");
 } else if ($item = bones) {
     ~chatplayer("<p,happy>Have a look at these bones.");
-        ~chatnpc("<p,neutral>Ah, yes - a fine bone example... no noticeable fractures... and in good condition. These are common cow bones, however; they have no archaeological value.");
+    ~chatnpc("<p,neutral>Ah, yes - a fine bone example... no noticeable fractures... and in good condition. These are common cow bones, however; they have no archaeological value.");
 } else if ($item = digsitebuttons) {
     ~chatplayer("<p,happy>I found these buttons.");
     ~chatnpc("<p,neutral>Let's have a look. Ah, I think these are from the nobility, perhaps a royal servant?");
