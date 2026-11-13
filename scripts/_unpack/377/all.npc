@@ -30016,6 +30016,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_34_50_enum
 param=whirlpool,macro_whirlpool_freshfish
 [0_35_50_freshfish]
 name=Fishing spot
@@ -30035,6 +30036,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_35_50_enum
 param=whirlpool,macro_whirlpool_freshfish
 [0_33_51_memberfish]
 name=Fishing spot
@@ -30053,6 +30055,7 @@ wanderrange=0
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_33_51_enum
 param=whirlpool,macro_whirlpool_memberfish
 [regicide_rabbit]
 name=Rabbit
@@ -34564,6 +34567,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_41_57_saltfish_enum
 param=whirlpool,macro_whirlpool_saltfish
 [0_41_57_rarefish]
 name=Fishing spot
@@ -34583,6 +34587,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_41_57_rarefish_enum
 param=whirlpool,macro_whirlpool_rarefish
 [0_41_57_memberfish]
 name=Fishing spot
@@ -34602,6 +34607,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_41_57_memberfish_enum
 param=whirlpool,macro_whirlpool_memberfish
 [horror_lighthousekeeeper_well]
 name=Jossik
@@ -37037,6 +37043,7 @@ moverestrict=nomove
 defaultmode=none
 timer=1
 category=rarefish
+param=fishing_movement_enum,fishing_movement_miscellania_enum
 param=whirlpool,macro_whirlpool_rarefish
 [misc_seagull]
 name=Gull
@@ -37205,6 +37212,7 @@ moverestrict=nomove
 defaultmode=none
 category=memberfish
 timer=1
+param=fishing_movement_enum,fishing_movement_0_43_42_memberfish_enum
 param=whirlpool,macro_whirlpool_memberfish
 [0_42_42_memberfish]
 name=Fishing spot
@@ -37218,9 +37226,14 @@ op1=Net
 op3=Harpoon
 op4=hidden
 op5=hidden
+category=memberfish
 wanderrange=0
+maxrange=50
+timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_42_42_memberfish_enum
+param=whirlpool,macro_whirlpool_memberfish
 
 [mm_daero]
 name=Daero
