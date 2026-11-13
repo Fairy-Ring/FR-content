@@ -255,12 +255,12 @@ switch_int (%book_page) {
 return;
 
 [label,dt_arch_after_place]
-// CANDIDATE return conversation; source anomalously gives one line to Eblis.
+// CANDIDATE: revision 15343078 (2026-09-13) gives the refusal to the Player.
 ~chatplayer("<p,neutral>Hello there.");
 ~chatnpc("<p,neutral>Hello again, apprentice archaeologist. How's the treasure hunting going?");
 ~chatplayer("<p,neutral>Well... I found four diamonds...");
 ~chatnpc("<p,happy>Great! Pass me my share, and it's a good job all around!");
-~chatnpc_specific(nc_name(fd_elder_village), fd_elder_village, "<p,neutral>Um... sorry, I can't.");
+~chatplayer("<p,neutral>Um... sorry, I can't.");
 ~chatnpc("<p,angry>Huh? You're not trying to break a deal here are ya???");
 ~chatplayer("<p,neutral>No, it's just... There were these weird pillars around this pyramid...");
 ~chatnpc("<p,neutral>Yes?");

@@ -57,3 +57,6 @@
 ^dt_shadow_substate_diamond_claimed = 6
 
 // UNKNOWN: historical Blood/Shadow substate integers, exact arrival tiles and fight tiles remain unrecovered.
+
+// CANDIDATE: desert-treasure.column-message-candidates and period-requirements; later action gate.
+^dt_column_magic_required = 50
