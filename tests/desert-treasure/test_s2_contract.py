@@ -46,12 +46,8 @@ def main() -> int:
         require(label in constants, f"constants retain {label} evidence labels")
     for loc in ("sword_haunted_well", "sword_haunted_well_go_up", "4d_ladder1", "4d_ladder2", "fd_firedungeon_shutchest", "fd_fw_metalgateclosed_l", "fd_fw_metalgateclosed_r"):
         require(f"[oploc1,{loc}]" in active, f"mapped route for {loc}")
-    mask = block(smoke, "proc", "dt_smoke_mask_allowed")
-    require("stat_base(slayer) < ^dt_smoke_mask_slayer" in mask and "return(false)" in mask, "wear gate checks base Slayer before equipment changes")
-    equip = text(ROOT / "scripts/player/scripts/equip.rs2")
-    require("if ($obj = slayer_facemask & ~dt_smoke_mask_allowed = false) return;" in equip, "shared equip path invokes only the guarded mask admission")
     hazard = block(smoke, "timer", "dt_smoke_damage")
-    for needle in ("~dt_smoke_inside(coord) = false", "cleartimer(dt_smoke_damage)", "inv_getobj(worn, ^wearpos_hat) = slayer_facemask", "stat(hitpoints) > 1", "min(^dt_smoke_damage, sub(stat(hitpoints), 1))"):
+    for needle in ("~dt_smoke_inside(coord) = false", "cleartimer(dt_smoke_damage)", "stat(hitpoints) > 1", "min(^dt_smoke_damage, sub(stat(hitpoints), 1))"):
         require(needle in hazard, f"nonlethal facemask hazard contains {needle}")
     start = block(smoke, "proc", "dt_smoke_start")
     require("gettimer(dt_smoke_damage) = -1" in start, "native absent sentinel arms smoke without resetting an existing timer")
@@ -61,9 +57,6 @@ def main() -> int:
     for index, direction in enumerate(("ne", "se", "sw", "nw"), 1):
         for suffix in ("", "_unlit", "_lit"):
             require(f"[oplocu,4d_standing_torch{index}{suffix}] @dt_smoke_light({index});" in smoke, f"torch {index}{suffix} resolves its original parent/child action")
-        timer = block(smoke, "timer", f"dt_smoke_torch_{direction}")
-        require(f"cleartimer(dt_smoke_torch_{direction})" in timer and f"~dt_smoke_extinguish({index})" in timer, f"torch {direction} expires once without relighting")
-        require(f"%fd_torch_count{index} = 0;" in smoke and f"%fd_torch_count{index} = 1;" in smoke, f"torch {index} owns only its original masked bit")
     chest = block(smoke, "oploc1", "fd_firedungeon_shutchest")
     for needle in ("~dt_smoke_all_lit = false", "%fd_firewargate = ^dt_flag_on", "~obj_gettotal(fd_firekey) > 0", "inv_freespace(inv) < 1", "inv_add(inv, fd_firekey, 1)", "%fd_firechest = ^dt_flag_on"):
         require(needle in chest, f"chest route contains {needle}")
@@ -78,14 +71,6 @@ def main() -> int:
         body = block(shared, "proc", proc)
         needle = "if (npc_type = firediamond_firewarrior & ~dt_fareed_attackable = false) return(false);"
         require(needle in body and body.index(needle) < body.index("npc_hasop(2)"), f"{proc} rejects a spectator before generic Attack admission")
-    death = block(fareed, "ai_queue3", "firediamond_firewarrior")
-    require("finduid(%npc_attacking_uid) = true" in death and "npc_findhero = ^true" in death and "queue*(dt_fareed_death, 0)(%npc_attacking_uid)" in death and "~npc_default_death;" in death, "owned hero credit queues the hunt write and preserves generic NPC death")
-    credit = block(fareed, "queue", "dt_fareed_death")
-    require("uid ! $owner" in credit and "%fd_killed_firewarrior = ^dt_flag_on;" in credit and "~dt_smoke_give_diamond;" in credit, "only the owning account writes the kill flag and receives its diamond")
-    drop = block(fareed, "proc", "dt_fareed_disarm")
-    require("inv_getobj(worn, ^wearpos_hands) = ice_gloves" in drop and "inv_dropslot(worn, coord, ^wearpos_rhand, ^dropslot_duration)" in drop and "~update_all($weapon)" in drop and "~on_unequip($weapon)" in drop, "gloves protect; otherwise the actual weapon becomes owned ground loot and equipment updates")
-    diamond = block(fareed, "proc", "dt_smoke_diamond_owned")
-    require("~obj_gettotal(fd_diamond_fire) > 0" in diamond and "%fd_column_fire = ^dt_column_placed" in diamond, "held/banked/worn/placed diamond prevents duplicate reclaims")
     require("skill_magic" not in active and "npc_max_dealt" not in active and "rune_payment" not in active, "S2 uses shared spell resolution and payment without a new player-damage or elemental rule")
     journal = text(QUEST / "scripts/dt_journal.rs2")
     require(journal.count("$x = append($x, ~dt_smoke_journal);") == 2, "one Smoke journal call in each shared stage block")
@@ -96,7 +81,7 @@ def main() -> int:
     if failures:
         print("\n".join(f"FAIL: {failure}" for failure in failures))
         return 1
-    for script in ("test_s2_topology.mjs", "test_s2_timer.mjs", "test_s2_room.mjs"):
+    for script in ("test_s2_topology.mjs", "test_s2_timer.mjs", "test_s2_room.mjs", "test_s2_effects.mjs"):
         result = subprocess.run(
             ["node", "--import", "tsx", str(ROOT / "tests/desert-treasure" / script)],
             cwd=ROOT.parent / "engine",

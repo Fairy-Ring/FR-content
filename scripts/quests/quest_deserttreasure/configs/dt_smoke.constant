@@ -21,16 +21,25 @@
 ^dt_smoke_surface = 0_51_46_46_17
 ^dt_smoke_gate_inside = 0_51_146_42_31
 ^dt_smoke_gate_outside = 0_51_146_40_31
-// The gate's east-side doorway tile is 3305; its west wall blocks 3304.
-^dt_fareed_room_sw = 0_51_146_41_29
-^dt_fareed_room_ne = 0_51_146_47_35
+// UNKNOWN engineering boundary: 377 map topology, enclosed by the gate.
+// The packed flood fill proves two rectangles are needed: two isolated floor
+// tiles on the west edge of the bounding box are outside the chamber.
+^dt_fareed_room_sw = 0_51_146_42_17
+^dt_fareed_room_ne = 0_51_146_61_49
+^dt_fareed_room_west_sw = 0_51_146_41_29
+^dt_fareed_room_west_ne = 0_51_146_41_34
 ^dt_fareed_spawn = 0_51_146_45_32
 
-// UNKNOWN: period sources establish melee + fire magic, not the selection odds,
-// exact fire spell, maximum magic hit, appearance delay or actor lifetime.
-// The product uses the shared Fire Bolt resolver, a 20 cap from the later Fareed
-// account, equal selection odds, and the existing owned-actor lifetime convention.
+// CANDIDATE: Smoke diamond page revision 15327769's coordinate comment.
+// The packed-map test verifies that this tile is walkable inside the chamber.
+^dt_smoke_diamond_ground = 0_51_146_52_33
+
+// VERIFIED period cap: Sal's Realm, 24 May 2005, "up to 20 with Magic".
 ^dt_fareed_magic_maxhit = 20
-^dt_fareed_magic_chance = 2
+// UNKNOWN selection number: period sources say mostly melee, sometimes magic.
+^dt_fareed_magic_chance = 4
+// UNKNOWN: appearance delay and actor lifetime use the owned-actor convention.
 ^dt_fareed_spawn_delay = 2
 ^dt_fareed_duration = 1000
+// UNKNOWN engineering value: covers the R1 chamber from Fareed's spawn.
+^dt_fareed_search_radius = 64

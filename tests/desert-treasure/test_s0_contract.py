@@ -342,6 +342,7 @@ def check_original_entity_configs() -> None:
             for field, expected in {
                 "defaultmode": "none",  # UNKNOWN owned spawn, not a static aggressor
                 "wanderrange": "0",  # UNKNOWN owned encounter boundary
+                "maxrange": "64",  # UNKNOWN lifecycle value, S3 precedent
                 "huntrange": "0",  # UNKNOWN no public target hunting
                 "timer": "1",  # UNKNOWN owner-presence check interval
             }.items():

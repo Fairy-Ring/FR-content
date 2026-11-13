@@ -46540,6 +46540,8 @@ param=death_drop,ashes
 // UNKNOWN: owned-encounter lifecycle controls are product configuration, not 377 combat facts.
 defaultmode=none
 wanderrange=0
+// UNKNOWN product lifecycle value: S3 precedent, keeps the owner across the chamber.
+maxrange=64
 huntrange=0
 timer=1
 

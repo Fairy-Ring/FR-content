@@ -22,14 +22,6 @@ cleartimer(dt_smoke_damage);
 [proc,dt_smoke_inside](coord $tile)(boolean)
 return(inzone(^dt_smoke_sw, ^dt_smoke_ne, $tile));
 
-[proc,dt_smoke_mask_allowed]()(boolean)
-if (stat_base(slayer) < ^dt_smoke_mask_slayer) {
-    // Existing generic product refusal; no invented quest dialogue.
-    mes("You are not a high enough level to use this item.");
-    return(false);
-}
-return(true);
-
 [proc,dt_smoke_start]
 // GETTIMER returns the stored timer clock, or -1 when absent; it is not Boolean.
 if (~dt_smoke_inside(coord) = true & gettimer(dt_smoke_damage) = -1) {
@@ -41,7 +33,8 @@ if (~dt_smoke_inside(coord) = false) {
     cleartimer(dt_smoke_damage);
     return;
 }
-if (inv_getobj(worn, ^wearpos_hat) = slayer_facemask) return;
+// CANDIDATE: earliest Old School Smoke Dungeon statement includes the gas mask.
+if (inv_getobj(worn, ^wearpos_hat) = slayer_facemask | inv_getobj(worn, ^wearpos_hat) = gasmask) return;
 if (stat(hitpoints) > 1) {
     ~damage_self(min(^dt_smoke_damage, sub(stat(hitpoints), 1)));
 }
