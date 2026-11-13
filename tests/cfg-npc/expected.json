@@ -59,55 +59,55 @@
       "group": "C05-Fishing-Movement",
       "npc": "0_33_51_memberfish",
       "field": "param:fishing_movement_enum",
-      "expected": 117
+      "expected": { "ref": "enum", "name": "fishing_movement_0_33_51_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
       "npc": "0_34_50_freshfish",
       "field": "param:fishing_movement_enum",
-      "expected": 115
+      "expected": { "ref": "enum", "name": "fishing_movement_0_34_50_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
       "npc": "0_35_50_freshfish",
       "field": "param:fishing_movement_enum",
-      "expected": 116
+      "expected": { "ref": "enum", "name": "fishing_movement_0_35_50_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
       "npc": "0_40_60_rarefish",
       "field": "param:fishing_movement_enum",
-      "expected": 114
+      "expected": { "ref": "enum", "name": "fishing_movement_miscellania_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
       "npc": "0_41_57_memberfish",
       "field": "param:fishing_movement_enum",
-      "expected": 120
+      "expected": { "ref": "enum", "name": "fishing_movement_0_41_57_memberfish_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
       "npc": "0_41_57_rarefish",
       "field": "param:fishing_movement_enum",
-      "expected": 119
+      "expected": { "ref": "enum", "name": "fishing_movement_0_41_57_rarefish_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
       "npc": "0_41_57_saltfish",
       "field": "param:fishing_movement_enum",
-      "expected": 118
+      "expected": { "ref": "enum", "name": "fishing_movement_0_41_57_saltfish_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
       "npc": "0_42_42_memberfish",
       "field": "param:fishing_movement_enum",
-      "expected": 125
+      "expected": { "ref": "enum", "name": "fishing_movement_0_42_42_memberfish_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
       "npc": "0_43_42_memberfish",
       "field": "param:fishing_movement_enum",
-      "expected": 124
+      "expected": { "ref": "enum", "name": "fishing_movement_0_43_42_memberfish_enum" }
     },
     {
       "group": "C05-Fishing-Movement",
@@ -161,25 +161,25 @@
       "group": "C05-Fishing-Movement",
       "npc": "0_42_42_memberfish",
       "field": "category",
-      "expected": 121
+      "expected": { "ref": "category", "name": "memberfish" }
     },
     {
       "group": "C07-Misc-Npcs",
       "npc": "misc_chicken",
       "field": "category",
-      "expected": 103
+      "expected": { "ref": "category", "name": "chicken" }
     },
     {
       "group": "C07-Misc-Npcs",
       "npc": "misc_chicken_brown",
       "field": "category",
-      "expected": 103
+      "expected": { "ref": "category", "name": "chicken" }
     },
     {
       "group": "C07-Misc-Npcs",
       "npc": "misc_rooster",
       "field": "category",
-      "expected": 103
+      "expected": { "ref": "category", "name": "chicken" }
     },
     {
       "group": "C05-Fishing-Movement",
@@ -197,19 +197,19 @@
       "group": "C09-Npc-Core",
       "npc": "zq_mainzombie1",
       "field": "huntmode",
-      "expected": 6
+      "expected": { "ref": "hunt", "name": "aggressive_melee" }
     },
     {
       "group": "C09-Npc-Core",
       "npc": "zq_mainzombie2",
       "field": "huntmode",
-      "expected": 6
+      "expected": { "ref": "hunt", "name": "aggressive_melee" }
     },
     {
       "group": "C09-Npc-Core",
       "npc": "zq_mainzombie3",
       "field": "huntmode",
-      "expected": 6
+      "expected": { "ref": "hunt", "name": "aggressive_melee" }
     },
     {
       "group": "C09-Npc-Core",
@@ -1265,61 +1265,61 @@
       "group": "C08-TR-Npcs",
       "npc": "trollromance_ice_wolf_1",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C08-TR-Npcs",
       "npc": "trollromance_ice_wolf_2",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C08-TR-Npcs",
       "npc": "trollromance_icetroll_melee1",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C08-TR-Npcs",
       "npc": "trollromance_icetroll_melee2",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C08-TR-Npcs",
       "npc": "trollromance_icetroll_melee3",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C08-TR-Npcs",
       "npc": "trollromance_icetroll_melee4",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C08-TR-Npcs",
       "npc": "trollromance_icetroll_melee5",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C08-TR-Npcs",
       "npc": "trollromance_icetroll_melee6",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C08-TR-Npcs",
       "npc": "trollromance_icetroll_melee7",
       "field": "huntmode",
-      "expected": 3
+      "expected": { "ref": "hunt", "name": "cowardly" }
     },
     {
       "group": "C09-Npc-Core",
       "npc": "vampire_spider",
       "field": "huntmode",
-      "expected": 8
+      "expected": { "ref": "hunt", "name": "aggressive_ranged" }
     },
     {
       "group": "C09-Npc-Core",

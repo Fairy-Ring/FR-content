@@ -23,8 +23,24 @@ const NpcType = (await engineImport('src/cache/config/NpcType.ts')).default;
 const ParamType = (await engineImport('src/cache/config/ParamType.ts')).default;
 const { ParamHelper } = await engineImport('src/cache/config/ParamHelper.ts');
 const Jagfile = (await engineImport('src/io/Jagfile.ts')).default;
+// Enum, hunt and category ids are allocated when the generated packs are built, so they differ between a
+// fresh clone and an incremental checkout. A row that names one of them gives the config name, not the id.
+const refTypes = {
+    enum: (await engineImport('src/cache/config/EnumType.ts')).default,
+    hunt: (await engineImport('src/cache/config/HuntType.ts')).default,
+    category: (await engineImport('src/cache/config/CategoryType.ts')).default
+};
 NpcType.load(packDir);
 ParamType.load(packDir);
+for (const type of Object.values(refTypes)) type.load(packDir);
+function expectedValue(expectation) {
+    if (expectation === null || typeof expectation !== 'object' || Array.isArray(expectation)) return expectation;
+    const type = refTypes[expectation.ref];
+    assert(type, `Unknown reference kind ${expectation.ref}`);
+    const id = type.getId(expectation.name);
+    assert(id >= 0, `Packed ${expectation.ref} ${expectation.name} must exist`);
+    return id;
+}
 assert(NpcType.count > 0 && ParamType.count > 0, 'The engine server pack must be present');
 assert(expected.rows.length > 0, 'The restoration manifest must not be empty');
 
@@ -67,7 +83,8 @@ for (const row of expected.rows) {
     const npc = NpcType.getByName(row.npc);
     assert(npc, `Packed NPC ${row.npc} must exist`);
     const actual = effectiveValue(npc, row.field);
-    const pass = JSON.stringify(actual) === JSON.stringify(row.expected);
+    const want = expectedValue(row.expected);
+    const pass = JSON.stringify(actual) === JSON.stringify(want);
     assertions.push({ id, group: row.group, pass, expected: row.expected, actual });
 }
 
