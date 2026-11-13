@@ -1,0 +1,12 @@
+// Tip.It 2005-11-05 and RuneHQ 2006-04-28 give 6-10 hitpoints.
+[label,consume_effect_mort_slimey_eel_cooked]
+mes("You eat the <lowercase(oc_name(last_item))>.");
+sound_synth(eat, 1, 0);
+anim(human_eat, 0);
+inv_delslot(inv, last_slot);
+def_int $hitpoints = stat(hitpoints);
+def_int $heal = ~random_range(6, 10);
+if ($hitpoints < stat_base(hitpoints)) {
+    stat_heal(hitpoints, $heal, 0);
+    mes("It heals some health.");
+}
