@@ -74,7 +74,7 @@ switch_int($target) {
     case ^slayer_crawlinghand, ^slayer_banshee, ^slayer_infernalmage, ^slayer_bloodveld, 
             ^slayer_aberrantspecter, ^slayer_gargoyle, ^slayer_nechryael, ^slayer_abyssaldemon, 
             ^slayer_ghoul, ^slayer_werewolf, ^slayer_vampire : // priest peril
-        return (false);
+        return (~slayer_priestperil_unlocked);
     case ^slayer_otherworldlybeing, ^slayer_mutatedzygomite :
         if(%zanaris < ^zanaris_complete) {
             return (false);
@@ -91,17 +91,36 @@ switch_int($target) {
         }
         return (true);
     case ^slayer_dagannoth : // horror from the deep
-        return (false);
+        return (~slayer_horror_unlocked);
     case ^slayer_elf : // regicide
-        return (false);
+        return (~slayer_regicide_unlocked);
     case ^slayer_dustdevil : // dt
-        return (false);
+        return (~slayer_deserttreasure_unlocked);
     case ^slayer_darkbeast : // mep2
-        return (false);
+        return (~slayer_mourning2_unlocked);
     case ^slayer_mogre : // skippy miniquest
-        return (false);
+        return (~slayer_skippy_unlocked);
 }
 return (true);
+
+// Unfinished exclusions. Each quest owner supplies its authentic predicate.
+[proc,slayer_priestperil_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_horror_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_regicide_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_deserttreasure_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_mourning2_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_skippy_unlocked]()(boolean)
+return (false);
 
 [proc,slayer_taskname]()(string)
 return(enum(int, string, task_name, %slayer_target));
@@ -113,7 +132,7 @@ return(enum(int, string, task_tip, %slayer_target));
 // this doesnt actually check for tasks assigned by turael, but rather the types he assigns
 if(%slayer_target = ^slayer_rat | %slayer_target = ^slayer_monkey | %slayer_target = ^slayer_cow | %slayer_target = ^slayer_bird 
     | %slayer_target = ^slayer_spider | %slayer_target = ^slayer_dwarf | %slayer_target = ^slayer_lizard | %slayer_target = ^slayer_cavebug
-    | %slayer_target = ^slayer_scorpion | %slayer_target = ^slayer_zombie | %slayer_target = ^slayer_bat | %slayer_target = ^slayer_bear
+    | %slayer_target = ^slayer_scorpion | %slayer_target = ^slayer_zombie | %slayer_target = ^slayer_bat
     | %slayer_target = ^slayer_ghost | %slayer_target = ^slayer_cavecrawler | %slayer_target = ^slayer_icefiend | %slayer_target = ^slayer_kalphite
     | %slayer_target = ^slayer_caveslime | %slayer_target = ^slayer_dog | %slayer_target = ^slayer_goblin | %slayer_target = ^slayer_wolf
     | %slayer_target = ^slayer_skeleton | %slayer_target = ^slayer_crawlinghand | %slayer_target = ^slayer_banshee) {

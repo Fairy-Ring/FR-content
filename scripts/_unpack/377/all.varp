@@ -8,6 +8,7 @@ scope=perm
 scope=perm
 
 [cog_bits]
+scope=perm
 
 [damagetype]
 protect=no
@@ -179,6 +180,7 @@ protect=no
 transmit=yes
 
 [qp]
+protect=no
 transmit=yes
 
 [poison]
@@ -271,6 +273,7 @@ type=obj
 scope=perm
 
 [option_nodef]
+scope=perm
 protect=no
 transmit=yes
 
@@ -280,6 +283,7 @@ transmit=yes
 clientcode=7
 
 [marketthief]
+scope=perm
 transmit=yes
 
 [varp189_unused]
@@ -293,8 +297,10 @@ transmit=yes
 [varp199_unused]
 
 [hopper_full]
+scope=perm
 
 [flour]
+scope=perm
 
 [smithbars]
 transmit=yes
@@ -459,6 +465,7 @@ scope=perm
 scope=perm
 
 [trail_status]
+scope=perm
 
 [varp747_unused]
 
@@ -482,11 +489,13 @@ clientcode=9
 [rune_pouch_type_2_basevar]
 
 [emote_access]
+scope=perm
 transmit=yes
 
 [varp319_unused]
 
 [tbwt_main]
+scope=perm
 transmit=yes
 
 [tbwt_tiadeche]
@@ -510,8 +519,10 @@ scope=perm
 [varp327_unused]
 
 [regicide_quest]
+scope=perm
 
 [regicide_bits]
+scope=perm
 
 [regicide_still_total]
 protect=no
@@ -528,6 +539,7 @@ transmit=yes
 [varp731_unused]
 
 [eadgar_quest]
+scope=perm
 
 [eadgar_bits]
 scope=perm
@@ -539,8 +551,12 @@ scope=perm
 scope=perm
 
 [morttonquest]
+scope=perm
+protect=no
 
 [morttonmulti]
+scope=perm
+protect=no
 
 [varp733_unused]
 
@@ -559,15 +575,19 @@ scope=perm
 [varp_735]
 
 [temple_repaired_p]
+protect=no
 transmit=yes
 
 [temple_resources_p]
+protect=no
 transmit=yes
 
 [temple_sanctity_p]
+protect=no
 transmit=yes
 
 [viking]
+scope=perm
 
 [varp738_unused]
 
@@ -576,6 +596,7 @@ transmit=yes
 [varp732_bits]
 
 [deephorror]
+scope=perm
 
 [boardgames_drop_warning]
 
@@ -602,22 +623,27 @@ transmit=yes
 [boardgames_varbit4]
 
 [misc_quest]
+scope=perm
 
 [misc_last_update]
 scope=perm
 
 [misc_varbit_1]
+scope=perm
 
 [misc_varbit_2]
+scope=perm
 transmit=yes
 
 [misc_varbit_3]
+scope=perm
 transmit=yes
 
 [bankpin_value]
 scope=perm
 
 [mm_main]
+scope=perm
 
 [varp741_unused]
 
@@ -634,12 +660,14 @@ scope=perm
 [varp744_bits]
 
 [mm_gnomes]
+scope=perm
 
 [varp745_bits]
 
 [varp746_bits]
 
 [armourhitsound]
+protect=no
 
 [castlewars_team]
 scope=perm
@@ -670,12 +698,15 @@ transmit=yes
 scope=perm
 
 [xmas_yoyo_unlocked]
+scope=perm
 
 [wearing_sled]
 
 [routequest]
+scope=perm
 
 [routequestmulti]
+scope=perm
 
 [routequest_myreque_bits]
 scope=perm
@@ -685,6 +716,7 @@ scope=perm
 [varp740_unused]
 
 [trawler_water_overlay]
+protect=no
 transmit=yes
 
 [castlewars_flag_clock]
@@ -744,6 +776,7 @@ transmit=yes
 
 [onesmallfavourmulti]
 transmit=yes
+scope=perm
 
 [favour_key_ring]
 scope=perm
@@ -776,6 +809,7 @@ transmit=yes
 [varp434_unused]
 
 [feud_var_multi]
+scope=perm
 
 [varp438_unused]
 // PRODUCT: S0 selects permanent save scope; this is not a recovered 377 fact.
@@ -814,9 +848,11 @@ transmit=yes
 
 [barrows]
 transmit=yes
+scope=perm
 
 [barrows_kills]
 transmit=yes
+scope=perm
 
 [worn_set]
 
@@ -1202,6 +1238,7 @@ scope=perm
 
 [champions_defeated]
 transmit=yes
+scope=perm
 
 [spectator_toplevel_enabled_basevar]
 
@@ -1253,8 +1290,10 @@ transmit=yes
 
 [enakh_multivarbits]
 transmit=yes
+scope=perm
 
 [enakh_varbits]
+scope=perm
 
 [boardgames_runesquares_va]
 transmit=yes
@@ -1378,6 +1417,7 @@ transmit=yes
 
 [millcheck_multi]
 transmit=yes
+scope=perm
 
 [templetrek_main_var]
 transmit=yes
@@ -1399,6 +1439,7 @@ transmit=yes
 
 [soulbane2]
 transmit=yes
+scope=perm
 
 [soulbane_unprotected]
 

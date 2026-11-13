@@ -122,8 +122,8 @@ function timed(p, who, lines, delay = 5) {
   state.splitMesanim = MesanimType.getId('neutral');
   p.delayed = false;
   // Real call contract: no close between pages; previous roots remain populated.
-  // Phase-boundary closes are flushed by encodeOut during an earlier delay.
-  assert.equal(p.refreshModalClose, false);
+  // The engine writes a close where the modal closes (no pending-close flag), so the
+  // packet list itself shows whether a close happened.
   const firstMessage = p.packets.length;
   const result = p.runScript(state, true, true);
   assert.equal(result, ScriptState.SUSPENDED, 'timed chat delays, never p_pausebutton or ABORTED');
@@ -145,7 +145,7 @@ function timed(p, who, lines, delay = 5) {
   p.delayed = false;
   assert.equal(p.runScript(state, true, true), ScriptState.FINISHED, 'resume without user input');
   assert.equal(p.modalChat, id('interface', root), 'leave the filled page open for its replacement');
-  assert.equal(p.refreshModalClose, false);
+  assert(!p.packets.slice(firstMessage).some(message => message.kind === 'IfClose'), 'no close while the filled page stays open');
   return messages;
 }
 
@@ -226,10 +226,11 @@ function assertNoVisibleDefaults(messages) {
   }
 }
 assertNoVisibleDefaults(actor.packets);
+const beforeClose = actor.packets.length;
 actor.closeModal();
+assert.equal(actor.packets.slice(beforeClose).filter(message => message.kind === 'IfClose').length, 1, 'closeModal writes the close at the lifecycle boundary');
 actor.encodeOut();
-assert.equal(actor.packets.at(-1).kind, 'IfClose', 'real output phase flushes the phase-boundary close');
-assert.equal(actor.refreshModalClose, false);
+assert.equal(actor.packets.slice(beforeClose).filter(message => message.kind === 'IfClose').length, 1, 'the output phase adds no second close');
 console.log('OK seven timed boxes have no visible defaults or missing heads at all five packet-cycle offsets');
 
 // Exercise the actual compiled intro with NPC turns and end-of-tick resets.
