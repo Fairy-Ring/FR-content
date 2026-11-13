@@ -296,6 +296,27 @@ def check_original_entity_configs() -> None:
         current_values["param"] = [value for value in current_params if value != candidate_rate]
         if not current_values["param"]:
             current_values.pop("param")
+        if name in ("blooddiamond_vampirewarrior", "blooddiamond_vampirewarrior_unkillable"):
+            # UNKNOWN historical 377 values for every added field below.
+            # Combat values use the subtractive 2025-09-16 Dessous CANDIDATE;
+            # human animations/sounds keep shared defaults; mode/range/timer
+            # make the product owner-driven and bounded. Null drop preserves
+            # the period no-gem/Malak-award rule without inventing a loot table.
+            base_values.update({
+                "ranged": ["1"],
+                "defaultmode": ["none"],
+                "wanderrange": ["0"],
+                "maxrange": ["25"],
+                "timer": ["1"],
+                "param": base_params + [
+                    "attackbonus,50", "strengthbonus,50", "stabdefence,10",
+                    "slashdefence,150", "crushdefence,150", "magicdefence,0",
+                    "rangedefence,0", "damagetype,^crush_style", "death_drop,null",
+                    "attack_anim,human_unarmedpunch", "defend_anim,human_unarmed_def",
+                    "death_anim,human_death", "attack_sound,unarmed_punch",
+                    "defend_sound,human_hit4", "death_sound,human_death",
+                ],
+            })
         require(
             current_values == base_values,
             f"[{name}] may change only the labelled candidate combat fields",

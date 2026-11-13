@@ -168,6 +168,7 @@ if (%deserttreasure = ^dt_stage_placing_diamonds | %deserttreasure = ^dt_stage_f
         $x = append($x, "@dbl@I should place each remaining diamond in its matching column.|");
     }
     $x = append($x, ~dt_column_journal);
+    $x = append($x, ~dt_blood_journal);
     ~quest_journal($n, $x);
     return;
 }
@@ -176,6 +177,7 @@ if (%deserttreasure = ^dt_stage_hunts) {
     $x = append($x, "@str@Eblis has set up the scrying glasses.|");
     $x = append($x, "@dbl@I should use them to find the four diamonds.|");
     $x = append($x, ~dt_column_journal);
+    $x = append($x, ~dt_blood_journal);
     ~quest_journal($n, $x);
     return;
 }

@@ -44849,6 +44849,29 @@ defence=99
 magic=1
 param=attackrate,3
 head1=npc_1914_head
+// UNKNOWN: historical server bonuses/style; use the 2025-09-16 Dessous 2007-base CANDIDATE package.
+ranged=1
+param=attackbonus,50
+param=strengthbonus,50
+param=stabdefence,10
+param=slashdefence,150
+param=crushdefence,150
+param=magicdefence,0
+param=rangedefence,0
+param=damagetype,^crush_style
+param=death_drop,null
+// UNKNOWN: historical combat animation/sound bindings; retain the shared human defaults explicitly.
+param=attack_anim,human_unarmedpunch
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=attack_sound,unarmed_punch
+param=defend_sound,human_hit4
+param=death_sound,human_death
+// UNKNOWN: historical mode/range/timer; product owner timer 1 and leash 25 prevent unowned wandering.
+defaultmode=none
+wanderrange=0
+maxrange=25
+timer=1
 
 [blooddiamond_vampirewarrior_unkillable]
 name=Dessous
@@ -44882,6 +44905,29 @@ defence=99
 magic=1
 param=attackrate,3
 head1=npc_1914_head
+// UNKNOWN: historical server bonuses/style; same 2007-base CANDIDATE package as the valid form.
+ranged=1
+param=attackbonus,50
+param=strengthbonus,50
+param=stabdefence,10
+param=slashdefence,150
+param=crushdefence,150
+param=magicdefence,0
+param=rangedefence,0
+param=damagetype,^crush_style
+param=death_drop,null
+// UNKNOWN: historical combat animation/sound bindings; retain the shared human defaults explicitly.
+param=attack_anim,human_unarmedpunch
+param=defend_anim,human_unarmed_def
+param=death_anim,human_death
+param=attack_sound,unarmed_punch
+param=defend_sound,human_hit4
+param=death_sound,human_death
+// UNKNOWN: historical mode/range/timer; product owner timer 1 and leash 25 prevent unowned wandering.
+defaultmode=none
+wanderrange=0
+maxrange=25
+timer=1
 
 [malak]
 name=Ruantun

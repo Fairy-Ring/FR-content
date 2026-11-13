@@ -1,0 +1,14 @@
+// CANDIDATE: source-backed graveyard region, reconstructed exact tile from m55_53.
+// The spawn is north of the inner grave rail, on unblocked terrain at local 50,16.
+// Historical exact spawn, chase distance, lifetime and bat delay remain UNKNOWN.
+^dt_dessous_spawn = 0_55_53_50_16
+^dt_dessous_grave = 0_55_53_48_9
+^dt_dessous_leash = 25
+^dt_dessous_chase_distance = 5
+^dt_dessous_lifetime = 1000
+^dt_dessous_bat_first_delay = 1
+^dt_dessous_bat_second_delay = 2
+// CANDIDATE: Dessous page 2025-09-16 says three; quest page says more than three.
+^dt_dessous_teleports_limit = 3
+^dt_dessous_bat_damage = 5
+^dt_malak_blood_damage = 5
