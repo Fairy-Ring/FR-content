@@ -210,7 +210,7 @@ return;
 ~chatplayer("<p,happy>Aw, go on then. Count me in.");
 ~chatnpc("<p,happy>Good lad! Well, if we split up we'll be able to find treasure quicker.");
 ~chatnpc("<p,neutral>I'll continue searching around here in this Bedabin Camp, you head due South to the Bandit Village. If either of us find anything, we'll come find each other and say what, okay?");
-~chatnpc("<p,neutral>...You head due South, see what you can find out about this tablet.");
+~chatnpc("<p,neutral>You head due South, see what you can find out about this tablet.");
 %deserttreasure = 5;
 ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 return;

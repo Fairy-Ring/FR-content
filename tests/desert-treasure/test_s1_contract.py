@@ -200,8 +200,8 @@ def main() -> int:
     )
     partnership = archaeologist.split("[label,dt_arch_partners_yes]", 1)[1].split("\n[label,", 1)[0]
     require(
-        '~chatnpc("<p,neutral>...You head due South, see what you can find out about this tablet.");' in partnership
-        and partnership.index("...You head due South") < partnership.index("%deserttreasure = 5;"),
+        '~chatnpc("<p,neutral>You head due South, see what you can find out about this tablet.");' in partnership
+        and partnership.index("You head due South, see what you can find out") < partnership.index("%deserttreasure = 5;"),
         "partnership must retain the sourced final direction before writing stage 5",
     )
     require(
