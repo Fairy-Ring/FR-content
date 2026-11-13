@@ -255,9 +255,30 @@ function addRunes(player, spell, omitted = null) {
     if (name !== omitted) inventory(player).add(ObjType.getId(name), 10);
   }
 }
+function placeCasterAdjacent(caster, recipient) {
+  caster.level = recipient.level;
+  for (const [dx, dz] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+    caster.x = recipient.x + dx;
+    caster.z = recipient.z + dz;
+    if (caster.inApproachDistance(1, recipient)) return true;
+  }
+  return false;
+}
+function placePairInZone({ caster, recipient }, minX, minZ, maxX, maxZ, label) {
+  // Keep the recipient inside the actual restriction rectangle while choosing
+  // a cached corridor, rather than placing either player in a solid border.
+  for (let x = minX; x <= maxX; x++) {
+    for (let z = minZ; z <= maxZ; z++) {
+      recipient.x = x;
+      recipient.z = z;
+      if (placeCasterAdjacent(caster, recipient)) return;
+    }
+  }
+  assert.fail(`${label}: no adjacent production line of sight inside its zone`);
+}
 function makePair(spell, { aid = 1, missingRune = null, staff = null, recipientCoord = home } = {}) {
-  const caster = createPlayer(`teleother_caster_${nextSlot}`);
-  const recipient = createPlayer(`teleother_recipient_${nextSlot}`);
+  const caster = createPlayer(`telec${nextSlot}`);
+  const recipient = createPlayer(`teler${nextSlot}`);
   setVar(recipient, 'option_aid', aid);
   addRunes(caster, spell, missingRune ?? staff?.rune ?? null);
   addRunes(recipient, spell);
@@ -265,9 +286,7 @@ function makePair(spell, { aid = 1, missingRune = null, staff = null, recipientC
   recipient.level = recipientCoord.level;
   recipient.x = recipientCoord.x;
   recipient.z = recipientCoord.z;
-  caster.level = recipient.level;
-  caster.x = recipient.x;
-  caster.z = recipient.z;
+  assert.ok(placeCasterAdjacent(caster, recipient), `${spell.name}: adjacent fixture has production line of sight`);
   return { caster, recipient };
 }
 function economy(player, spell) {
@@ -301,13 +320,14 @@ function dispatchPlayerCast(caster, recipient, spell) {
   const trigger = caster.getApTrigger();
   assert.ok(trigger, `${spell.name}: compiled APPLAYERT trigger is missing`);
   assert.equal(caster.getOpTrigger(), null, `${spell.name}: target dispatch must not fall through to an OPPLAYERT handler`);
+  assert.equal(caster.inApproachDistance(caster.apRange, recipient), true, `${spell.name}: fixture is adjacent with production line of sight`);
   assert.equal(caster.tryInteract(false), true, `${spell.name}: Player.tryInteract dispatches the compiled trigger`);
 }
 function assertOffer(pair, spell) {
   assert.equal(getVar(pair.caster, 'teleother_spell'), 0, 'pending selector belongs only to the recipient');
   assert.equal(getVar(pair.recipient, 'teleother_spell'), spell.selector, `${spell.name}: recipient pending selector`);
   assert.equal(pair.recipient.modalMain, targetInterface, `${spell.name}: recipient sees the Teleother offer root`);
-  assert.equal(lastText(pair.recipient, casterText), pair.caster.username, `${spell.name}: complete caster display name`);
+  assert.equal(lastText(pair.recipient, casterText), pair.caster.displayName, `${spell.name}: complete caster display name`);
   assert.equal(lastText(pair.recipient, destinationText), spell.destination, `${spell.name}: destination text`);
 }
 function button(player, component) {
@@ -418,18 +438,16 @@ try {
     { label: 'Trawler wreck restriction', options: {}, setup: ({ recipient }) => { recipient.x = 1921; recipient.z = 4801; } },
     { label: 'Trawler game restriction', options: {}, setup: ({ recipient }) => { recipient.x = 1985; recipient.z = 4801; } },
     { label: 'Mime event restriction', options: {}, setup: ({ recipient }) => { recipient.x = 1985; recipient.z = 4737; } },
-    { label: 'Maze event restriction', options: {}, setup: ({ recipient }) => { recipient.x = 2881; recipient.z = 4545; } },
+    { label: 'Maze event restriction', options: {}, setup: pair => placePairInZone(pair, 2880, 4544, 2943, 4607, 'Maze') },
     { label: 'Duel Arena fight restriction', options: {}, setup: ({ recipient }) => { recipient.x = 3336; recipient.z = 3250; } },
     { label: 'Castle Wars arena restriction', options: {}, setup: ({ recipient }) => { recipient.x = 2369; recipient.z = 3073; } },
-    { label: 'Castle Wars waiting-room restriction', options: {}, setup: ({ recipient }) => { recipient.x = 2369; recipient.z = 9473; } }
+    { label: 'Castle Wars waiting-room restriction', options: {}, setup: pair => placePairInZone(pair, 2368, 9472, 2393, 9497, 'Castle Wars waiting room') }
   ];
   const lumbridge = spells[0];
   for (const invalid of invalidTargetCases) {
     const pair = makePair(lumbridge, invalid.options);
     invalid.setup(pair);
-    pair.caster.level = pair.recipient.level;
-    pair.caster.x = pair.recipient.x;
-    pair.caster.z = pair.recipient.z;
+    assert.ok(placeCasterAdjacent(pair.caster, pair.recipient), `${invalid.label}: adjacent fixture has production line of sight`);
     const beforeCaster = economy(pair.caster, lumbridge);
     const beforeRecipient = economy(pair.recipient, lumbridge);
     const modalBefore = pair.recipient.modalMain;
