@@ -1,7 +1,7 @@
 /**
  * Compiled production-handler regression for Silver Casting preview inventories.
  * Run after npm run build in the sibling engine:
- *   node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs
+ *   node --import tsx ../content/tests/silver-casting/test_silver_casting.mjs
  */
 import fs from 'node:fs';
 import path from 'node:path';
