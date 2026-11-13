@@ -1,0 +1,1427 @@
+{
+  "publishedContent": "3a01f1dd62bfa96569083e19ab3320cf3ddaaa54",
+  "inheritedReference": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
+  "periodTruth": "UNKNOWN: keeps the Lost City value",
+  "clientHashes": {
+    "npc.dat": "34b8cc11f47120b0f3d825857354eb4c783ea1f5643716fed4c88e3e4bbd5332",
+    "npc.idx": "7d0b466150a1f8b3e36b52f8210eeb587a1129664328d2851d058cd9fd0b797b"
+  },
+  "rows": [
+    {
+      "group": "C03-CW-Collision",
+      "npc": "castlewars_barricade_burning_saradomin",
+      "field": "blockwalk",
+      "expected": 2
+    },
+    {
+      "group": "C03-CW-Collision",
+      "npc": "castlewars_barricade_burning_zamorak",
+      "field": "blockwalk",
+      "expected": 2
+    },
+    {
+      "group": "C03-CW-Collision",
+      "npc": "castlewars_barricade_zamorak",
+      "field": "blockwalk",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_duke",
+      "field": "param:death_drop",
+      "expected": 3180
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_oipuis",
+      "field": "param:death_drop",
+      "expected": 3180
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_ouhai",
+      "field": "param:death_drop",
+      "expected": 3180
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_uyoro",
+      "field": "param:death_drop",
+      "expected": 3180
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "route_vanstrom_klause_vamp_misty",
+      "field": "param:death_drop",
+      "expected": -1
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_33_51_memberfish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_0_33_51_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_34_50_freshfish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_0_34_50_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_35_50_freshfish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_0_35_50_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_40_60_rarefish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_miscellania_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_41_57_memberfish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_0_41_57_memberfish_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_41_57_rarefish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_0_41_57_rarefish_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_41_57_saltfish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_0_41_57_saltfish_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_42_42_memberfish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_0_42_42_memberfish_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_43_42_memberfish",
+      "field": "param:fishing_movement_enum",
+      "expected": { "ref": "enum", "name": "fishing_movement_0_43_42_memberfish_enum" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_42_42_memberfish",
+      "field": "param:whirlpool",
+      "expected": 406
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "defaultmode",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_bunkwicket",
+      "field": "defaultmode",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_caranock_cutscene",
+      "field": "defaultmode",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_foreman_cutscene",
+      "field": "defaultmode",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_waydar_cutscene",
+      "field": "defaultmode",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_waymottin",
+      "field": "defaultmode",
+      "expected": 0
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "santa_claus",
+      "field": "defaultmode",
+      "expected": 0
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_42_42_memberfish",
+      "field": "category",
+      "expected": { "ref": "category", "name": "memberfish" }
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_chicken",
+      "field": "category",
+      "expected": { "ref": "category", "name": "chicken" }
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_chicken_brown",
+      "field": "category",
+      "expected": { "ref": "category", "name": "chicken" }
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_rooster",
+      "field": "category",
+      "expected": { "ref": "category", "name": "chicken" }
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_42_42_memberfish",
+      "field": "timer",
+      "expected": 1
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "grandtree_blackdemon",
+      "field": "timer",
+      "expected": 20
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "zq_mainzombie1",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "aggressive_melee" }
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "zq_mainzombie2",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "aggressive_melee" }
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "zq_mainzombie3",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "aggressive_melee" }
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "dog_wild",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "dog_wild_2",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant2",
+      "field": "huntrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant3",
+      "field": "huntrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant_big",
+      "field": "huntrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant_big2",
+      "field": "huntrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant_big3",
+      "field": "huntrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "zq_mainzombie1",
+      "field": "huntrange",
+      "expected": 4
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "zq_mainzombie2",
+      "field": "huntrange",
+      "expected": 4
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "zq_mainzombie3",
+      "field": "huntrange",
+      "expected": 4
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "troll_champion",
+      "field": "regenrate",
+      "expected": 10
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "vampire_flyer",
+      "field": "regenrate",
+      "expected": 5
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "vampire_juve",
+      "field": "regenrate",
+      "expected": 5
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_bunkwicket",
+      "field": "moverestrict",
+      "expected": 5
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_caranock_cutscene",
+      "field": "moverestrict",
+      "expected": 5
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_foreman_cutscene",
+      "field": "moverestrict",
+      "expected": 5
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_waydar_cutscene",
+      "field": "moverestrict",
+      "expected": 5
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_waymottin",
+      "field": "moverestrict",
+      "expected": 5
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "santa_claus",
+      "field": "moverestrict",
+      "expected": 5
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:crushdefence",
+      "expected": 16
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:damagetype",
+      "expected": 0
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:magicdefence",
+      "expected": 8
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:slashdefence",
+      "expected": 10
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:stabdefence",
+      "expected": 12
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol1",
+      "expected": [
+        41586443,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol10",
+      "expected": [
+        41586434,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol11",
+      "expected": [
+        41586435,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol12",
+      "expected": [
+        41586436,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol13",
+      "expected": [
+        41586437,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol14",
+      "expected": [
+        41586438,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol15",
+      "expected": [
+        41586439,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol16",
+      "expected": [
+        41586440,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol17",
+      "expected": [
+        41586441,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol18",
+      "expected": [
+        41586442,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol19",
+      "expected": [
+        41586443,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol2",
+      "expected": [
+        41586442,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol20",
+      "expected": [
+        41586444,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol21",
+      "expected": [
+        41586445,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol22",
+      "expected": [
+        41586446,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol23",
+      "expected": [
+        41586447,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol24",
+      "expected": [
+        41586448,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol25",
+      "expected": [
+        41586447,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol26",
+      "expected": [
+        41586446,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol27",
+      "expected": [
+        41586445,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol28",
+      "expected": [
+        41586444,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol3",
+      "expected": [
+        41586441,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol4",
+      "expected": [
+        41586440,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol5",
+      "expected": [
+        41586439,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol6",
+      "expected": [
+        41586438,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol7",
+      "expected": [
+        41586437,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol8",
+      "expected": [
+        41586436,
+        4
+      ]
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_farmer",
+      "field": "patrol9",
+      "expected": [
+        41586435,
+        4
+      ]
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "imp",
+      "field": "givechase",
+      "expected": false
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "etc_guard1",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "etc_guard2",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant2",
+      "field": "respawnrate",
+      "expected": 60
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant3",
+      "field": "respawnrate",
+      "expected": 60
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant_big",
+      "field": "respawnrate",
+      "expected": 60
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant_big2",
+      "field": "respawnrate",
+      "expected": 60
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "firegiant_big3",
+      "field": "respawnrate",
+      "expected": 60
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_chicken",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_chicken_brown",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_etc_man_1",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_etc_man_2",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_etc_woman_1",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_etc_woman_2",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_etc_woman_3",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_man_1",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_man_2",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_man_3",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_man_4",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_man_5",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_man_6",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_man_7",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_rooster",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_woman_1",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_woman_2",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_woman_3",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_woman_4",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_woman_5",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_woman_6",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C05-Fishing-Movement",
+      "npc": "0_42_42_memberfish",
+      "field": "maxrange",
+      "expected": 50
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "elf_overpass_guard",
+      "field": "wanderrange",
+      "expected": 8
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "maxrange",
+      "expected": 20
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_bunkdo",
+      "field": "maxrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_bunkdo",
+      "field": "wanderrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_bunkwicket",
+      "field": "maxrange",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_bunkwicket",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_carado",
+      "field": "maxrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_carado",
+      "field": "wanderrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_caranock_cutscene",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_foreman_cutscene",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_garkor",
+      "field": "maxrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_garkor",
+      "field": "wanderrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_karam",
+      "field": "maxrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_karam",
+      "field": "wanderrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_karam_talker",
+      "field": "maxrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_karam_talker",
+      "field": "wanderrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_lumo",
+      "field": "maxrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_lumo",
+      "field": "wanderrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_waydar_cutscene",
+      "field": "maxrange",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_waydar_cutscene",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_waymottin",
+      "field": "maxrange",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_waymottin",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_zooknock",
+      "field": "maxrange",
+      "expected": 2
+    },
+    {
+      "group": "C06-MM-Npcs",
+      "npc": "mm_zooknock",
+      "field": "wanderrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "route_curpile_fyod",
+      "field": "wanderrange",
+      "expected": 1
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "route_vanstrom_klause_normal",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "route_vanstrom_klause_vamp",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "route_vanstrom_klause_vamp_misty",
+      "field": "maxrange",
+      "expected": 10
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "route_vanstrom_klause_vamp_misty",
+      "field": "wanderrange",
+      "expected": 10
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "route_vanstrom_klause_vamp_wingsgrow",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "santa_claus",
+      "field": "wanderrange",
+      "expected": 0
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "viking_brundt",
+      "field": "wanderrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "green_dragon",
+      "field": "members",
+      "expected": true
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:attack_anim",
+      "expected": 344
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:death_anim",
+      "expected": 343
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:defend_anim",
+      "expected": 345
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "ardougne_guard",
+      "field": "param:defend_sound",
+      "expected": 783
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "arena_guard1",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "arena_guard2",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "arena_guard3",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "arena_guard4",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "arena_leadguard",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "death_guard1",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "death_guard2",
+      "field": "param:defend_sound",
+      "expected": 783
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "desertminingcaptain",
+      "field": "param:defend_sound",
+      "expected": 783
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "desertminingmercenary1",
+      "field": "param:defend_sound",
+      "expected": 783
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "desertminingmercenary2",
+      "field": "param:defend_sound",
+      "expected": 783
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "dwarf_tunnel",
+      "field": "param:death_sound",
+      "expected": 905
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "dwarf_tunnel",
+      "field": "param:defend_sound",
+      "expected": 904
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "enclave_guard",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "gorad",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "grip",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "guard1",
+      "field": "param:defend_sound",
+      "expected": 414
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "macro_watchman1",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "macro_watchman2",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "macro_watchman3",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "macro_watchman4",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "macro_watchman5",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "macro_watchman6",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:attack_sound",
+      "expected": 22
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:death_sound",
+      "expected": 21
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_seagull",
+      "field": "param:defend_sound",
+      "expected": 23
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "pirate_guard",
+      "field": "param:defend_sound",
+      "expected": 782
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "regicide_old_camp_guard",
+      "field": "param:defend_sound",
+      "expected": 782
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "regicide_tyras_camp_guard",
+      "field": "param:defend_sound",
+      "expected": 782
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "regicide_tyras_guard",
+      "field": "param:defend_sound",
+      "expected": 782
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "renegade_knight",
+      "field": "param:defend_sound",
+      "expected": 414
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "rowdymineguard",
+      "field": "param:defend_sound",
+      "expected": 783
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "tower_guard",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "upass_paladin1",
+      "field": "param:defend_sound",
+      "expected": 414
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "upass_paladin2",
+      "field": "param:defend_sound",
+      "expected": 414
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "upass_paladin3",
+      "field": "param:defend_sound",
+      "expected": 414
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "viking_guard",
+      "field": "param:defend_sound",
+      "expected": 785
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "viking_guard2",
+      "field": "param:defend_sound",
+      "expected": 785
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "viking_man",
+      "field": "param:defend_sound",
+      "expected": 785
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "yanille_soldier",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "yanille_watchman",
+      "field": "param:defend_sound",
+      "expected": 784
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "vampire_spider",
+      "field": "timer",
+      "expected": 1
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_ice_wolf_1",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_ice_wolf_2",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee1",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee2",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee3",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee4",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee5",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee6",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee7",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "cowardly" }
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "vampire_spider",
+      "field": "huntmode",
+      "expected": { "ref": "hunt", "name": "aggressive_ranged" }
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "babyreddragon",
+      "field": "huntrange",
+      "expected": 2
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_ice_wolf_1",
+      "field": "huntrange",
+      "expected": 5
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_ice_wolf_2",
+      "field": "huntrange",
+      "expected": 5
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee1",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee2",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee3",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee4",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee5",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee6",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C08-TR-Npcs",
+      "npc": "trollromance_icetroll_melee7",
+      "field": "huntrange",
+      "expected": 3
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "vampire_spider",
+      "field": "attackrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "vampire_spider",
+      "field": "huntrange",
+      "expected": 2
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "babyreddragon",
+      "field": "respawnrate",
+      "expected": 60
+    },
+    {
+      "group": "C07-Misc-Npcs",
+      "npc": "misc_etc_man_3",
+      "field": "respawnrate",
+      "expected": 50
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "elf_city_guard",
+      "field": "wanderrange",
+      "expected": 1
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "vampire_spider",
+      "field": "maxrange",
+      "expected": 15
+    },
+    {
+      "group": "C09-Npc-Core",
+      "npc": "vampire_spider",
+      "field": "wanderrange",
+      "expected": 15
+    }
+  ]
+}

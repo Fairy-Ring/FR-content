@@ -20,6 +20,12 @@
 [opheld2,adamant_claws] @levelrequire_attack(30, last_slot);
 [opheld2,adamant_halberd] @levelrequire_attack_and_strength(30, 15, last_slot);
 
+[opheld2,viking_sword]
+if (~levelrequire_viking_quest = false) {
+    return;
+}
+@levelrequire_attack(30, last_slot);
+
 [opheld2,adamant_med_helm] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_full_helm] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_sq_shield] @levelrequire_defence(30, last_slot);
@@ -29,12 +35,17 @@
 [opheld2,adamant_chainbody] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_platebody] @levelrequire_defence(30, last_slot);
 
+[opheld2,viking_helmet] @levelrequire_viking_quest_defence(30, last_slot);
+[opheld2,viking_shield] @levelrequire_viking_quest_defence(30, last_slot);
+
 [opheld2,adamant_platebody_trim] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_platelegs_trim] @levelrequire_defence(30, last_slot);
+[opheld2,adamant_plateskirt_trim] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_full_helm_trim] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_kiteshield_trim] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_platebody_gold] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_platelegs_gold] @levelrequire_defence(30, last_slot);
+[opheld2,adamant_plateskirt_gold] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_full_helm_gold] @levelrequire_defence(30, last_slot);
 [opheld2,adamant_kiteshield_gold] @levelrequire_defence(30, last_slot);
 
@@ -75,3 +86,4 @@
 [opheld2,water_battlestaff] @levelrequire_magic_and_attack(30, 30, last_slot);
 [opheld2,earth_battlestaff] @levelrequire_magic_and_attack(30, 30, last_slot);
 [opheld2,fire_battlestaff] @levelrequire_magic_and_attack(30, 30, last_slot);
+[opheld2,lava_battlestaff] @levelrequire_magic_and_attack(30, 30, last_slot);

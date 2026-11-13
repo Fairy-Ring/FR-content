@@ -345,6 +345,7 @@ model=obj_display_tea
 2dyan=1980
 2dxan=156
 members=yes
+weight=150g
 param=next_obj_stage,cup_empty
 
 [cup_empty]
@@ -364,6 +365,7 @@ model=obj_murdercup
 2dyan=1980
 2dxan=156
 members=yes
+weight=50g
 
 [rottenapples]
 name=Rotten apple

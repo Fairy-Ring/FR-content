@@ -1,0 +1,35 @@
+[if_button,teleport_option:com_97]
+def_int $spell = %teleother_spell;
+%teleother_spell = 0;
+if_close;
+if ($spell ! ^teleother_lumbridge & $spell ! ^teleother_falador & $spell ! ^teleother_camelot) {
+    return;
+}
+// The engine admits this button only while its root is visible. Consume the
+// invitation before any delay. Caster logout cannot undo an already-paid offer.
+if (~teleother_travel_checks = false) {
+    return;
+}
+def_dbrow $spell_data = ~get_spell_data($spell);
+p_stopaction;
+anim(human_teleport_other_impact, 0);
+def_spotanim $impact;
+def_int $height;
+$impact, $height = db_getfield($spell_data, magic_spell_table:spotanim_target, 0);
+spotanim_pl($impact, $height, 0);
+sound_synth(db_getfield($spell_data, magic_spell_table:sound_hit, 0), 1, 0);
+// Reuse the shared travel delay convention, not a claimed historical Teleother
+// duration. Recheck restrictions if the recipient's state changed during it.
+p_delay(2);
+if (~teleother_travel_checks = false) {
+    anim(null, 0);
+    return;
+}
+~p_telejump_safe(map_findsquare(db_getfield($spell_data, magic_spell_table:tele_coord, 0), 0, 2, ^map_findsquare_lineofwalk));
+
+[if_button,teleport_option:com_99]
+%teleother_spell = 0;
+if_close;
+
+[if_close,teleport_option]
+%teleother_spell = 0;

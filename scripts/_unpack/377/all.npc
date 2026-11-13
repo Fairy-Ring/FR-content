@@ -371,6 +371,7 @@ param=attack_anim,human_sword_stab
 param=defend_anim,human_sword_def
 param=attack_sound,stabsword_stab
 category=guard
+param=defend_sound,brassclash2
 
 [guard2]
 name=Guard
@@ -1237,6 +1238,7 @@ param=attack_anim,human_blunt_pound
 param=defend_anim,human_blunt_block
 param=attack_sound,warhammer_crush
 category=guard
+param=defend_sound,sound_783
 
 [doorman]
 name=Door man
@@ -1298,6 +1300,7 @@ param=crushdefence,19
 param=magicdefence,-4
 param=rangedefence,16
 param=damagetype,^crush_style
+param=defend_sound,sound_784
 
 [yanille_soldier]
 name=Soldier
@@ -1335,6 +1338,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
+param=defend_sound,sound_784
 
 [wyson]
 name=Wyson the gardener
@@ -3541,6 +3545,8 @@ param=defend_anim,dwarf_block
 param=death_anim,dwarf_death
 param=attack_sound,warhammer_crush
 param=slayer_category,^slayer_dwarf
+param=defend_sound,dwarf_hit
+param=death_sound,dwarf_death
 
 [hobgoblin_unarmed]
 name=Hobgoblin
@@ -7100,6 +7106,7 @@ param=defend_anim,human_sword_def
 param=attack_sound,stabsword_stab
 huntmode=cowardly
 huntrange=1
+param=defend_sound,brassclash2
 
 [thrantax]
 name=Thrantax the Mighty
@@ -7625,6 +7632,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [arena_guard2]
 name=Khazard Guard
@@ -7664,6 +7672,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [arena_guard3]
 name=Khazard Guard
@@ -7702,6 +7711,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [arena_guard4]
 name=Khazard Guard
@@ -7741,6 +7751,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [arena_leadguard]
 name=Khazard Guard
@@ -7777,6 +7788,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [general_khazard]
 name=General Khazard
@@ -12851,6 +12863,8 @@ param=undead,^true
 ranged=0
 magic=0
 param=death_drop,null
+huntmode=aggressive_melee
+huntrange=4
 [zq_mainzombie2]
 name=Nazastarool
 desc=A giant skeleton of huge strength and devastating power.
@@ -12887,6 +12901,8 @@ ranged=0
 magic=0
 param=attack_sound,stabsword_slash
 param=death_drop,null
+huntmode=aggressive_melee
+huntrange=4
 [zq_mainzombie3]
 name=Nazastarool
 desc=A giant ghost of huge strength and devastating power.
@@ -12915,6 +12931,8 @@ param=undead,^true
 ranged=0
 magic=0
 param=death_drop,null
+huntmode=aggressive_melee
+huntrange=4
 [brimhavencartdriver]
 name=Hajedy
 desc=A cart driver, it looks like he's quite experienced.
@@ -18548,6 +18566,7 @@ param=death_drop,ashes
 param=retreat,4
 param=demonbane_vulnerable,yes
 timer=70
+givechase=false
 [alrena]
 name=Alrena
 desc=She looks concerned.
@@ -20652,6 +20671,7 @@ param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
 param=death_drop,grip_keys
+param=defend_sound,sound_784
 
 [alfonse_the_waiter]
 name=Alfonse the waiter
@@ -20900,6 +20920,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,stabsword_slash
+param=defend_sound,sound_782
 
 [0_45_152_lavafish]
 name=Fishing spot
@@ -21672,6 +21693,7 @@ param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
 ranged=0
 magic=0
+param=defend_sound,sound_783
 [desertminingmercenary2]
 name=Mercenary
 desc=He looks a bit aggressive.
@@ -21720,6 +21742,7 @@ param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
 ranged=0
 magic=0
+param=defend_sound,sound_783
 [desertminingcaptain]
 name=Mercenary Captain
 desc=He looks a bit aggressive.
@@ -21773,6 +21796,7 @@ param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
 ranged=0
 magic=0
+param=defend_sound,sound_783
 [capt_siad]
 name=Captain Siad
 desc=He's in control of the whole mining camp.
@@ -22212,6 +22236,7 @@ huntrange=1
 huntmode=cowardly
 ranged=0
 magic=0
+param=defend_sound,sound_783
 [rpdt_employee]
 name=RPDT employee
 desc=Inefficient looking.
@@ -22517,6 +22542,7 @@ param=death_anim,ogre_death
 param=attack_sound,mace_crush
 param=death_sound,giant_death
 param=death_drop,big_bones
+param=defend_sound,sound_784
 
 [ogre_guard]
 name=Ogre guard
@@ -22824,6 +22850,7 @@ param=death_anim,ogre_death
 param=attack_sound,mace_stab
 param=death_sound,giant_death
 param=death_drop,big_bones
+param=defend_sound,sound_784
 
 [ogre_shaman]
 name=Ogre shaman
@@ -23045,6 +23072,7 @@ param=damagetype,^stab_style
 param=attack_anim,human_sword_stab
 param=defend_anim,human_sword_def
 param=attack_sound,stabsword_stab
+param=defend_sound,sound_784
 
 [colonel_radick]
 name=Colonel Radick
@@ -26234,6 +26262,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
+param=defend_sound,brassclash2
 
 [upass_paladin2]
 name=Sir Carl
@@ -26277,6 +26306,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
+param=defend_sound,brassclash2
 
 [upass_paladin3]
 name=Sir Harry
@@ -26320,6 +26350,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
+param=defend_sound,brassclash2
 
 [soulman]
 name=Half-Souless
@@ -28493,6 +28524,7 @@ timer=1
 param=attack_sound,troll_champion_attack
 param=defend_sound,troll_champion_hit
 param=death_sound,troll_champion_death
+regenrate=10
 [troll_prison_guard1_awake]
 name=Twig
 desc=He's guarding the cells.
@@ -29953,6 +29985,7 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_staffready
 op1=Talk-to
 head1=npc_1185_head
+wanderrange=1
 
 [regicide_good_elf1]
 name=Idris
@@ -30016,6 +30049,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_34_50_enum
 param=whirlpool,macro_whirlpool_freshfish
 [0_35_50_freshfish]
 name=Fishing spot
@@ -30035,6 +30069,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_35_50_enum
 param=whirlpool,macro_whirlpool_freshfish
 [0_33_51_memberfish]
 name=Fishing spot
@@ -30053,6 +30088,7 @@ wanderrange=0
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_33_51_enum
 param=whirlpool,macro_whirlpool_memberfish
 [regicide_rabbit]
 name=Rabbit
@@ -30338,6 +30374,7 @@ category=tyras_guard
 param=death_drop,bones
 param=attack_sound,scythe_slash
 param=attack_anim,human_staff_pummel
+param=defend_sound,sound_782
 [elf_overpass_guard]
 name=Elf warrior
 desc=He looks pretty handy with that bow.
@@ -30351,6 +30388,7 @@ readyanim=human_staffready
 op1=Talk-to
 vislevel=hide
 head1=npc_1185_head
+wanderrange=8
 
 [regicide_good_elf3]
 name=Arianwyn
@@ -30418,6 +30456,7 @@ attackrange=2
 respawnrate=100
 param=attack_sound,scythe_slash
 param=attack_anim,human_spear_spike
+param=defend_sound,sound_782
 [regicide_tyras_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -30470,6 +30509,7 @@ attackrange=2
 respawnrate=100
 param=attack_sound,scythe_slash
 param=attack_anim,human_spear_spike
+param=defend_sound,sound_782
 [regicide_tyras_lazy_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -30870,6 +30910,7 @@ param=death_sound,vampire_death
 param=death_drop,vampire_dust
 wanderrange=5
 maxrange=7
+regenrate=5
 [vampire_spider]
 name=Spider
 desc=Nasty little creature.
@@ -30879,6 +30920,12 @@ recol1d=2048
 vislevel=hide
 walkanim=spider_walk
 minimap=no
+wanderrange=15
+maxrange=15
+huntrange=2
+timer=1
+attackrange=2
+huntmode=aggressive_ranged
 
 [vampire_misty]
 name=Mist
@@ -30928,6 +30975,7 @@ param=defend_anim,human_unarmedblock
 param=attack_sound,vampire_attack
 param=defend_sound,vampire_hit
 param=death_sound,vampire_death
+regenrate=5
 [vampire_juve_hound]
 name=Vampyric hound
 desc=And I shall call him Fang.
@@ -33215,6 +33263,7 @@ head1=obj_pickpocket_guide_fremennik_citizen
 head2=idk_man_jaw_long_head
 head3=obj_eye_patch_manhead
 head4=obj_viking_helmet_manhead2
+wanderrange=2
 
 [viking_askelapen]
 name=Askeladden
@@ -33603,6 +33652,7 @@ param=attack_anim,human_blunt_pound
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_crush
 maxrange=14
+param=defend_sound,sound_785
 [viking_man2]
 category=viking_citizen
 name=Freidir
@@ -34111,6 +34161,7 @@ param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
 maxrange=14
+param=defend_sound,sound_785
 [viking_guard2]
 name=Warrior
 desc=A hardened Fremennik warrior.
@@ -34165,6 +34216,7 @@ param=attack_anim,human_blunt_pound
 param=defend_anim,human_blunt_def
 param=attack_sound,warhammer_crush
 maxrange=14
+param=defend_sound,sound_785
 [viking_fox]
 name=Fox
 desc=Foxy.
@@ -34564,6 +34616,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_41_57_saltfish_enum
 param=whirlpool,macro_whirlpool_saltfish
 [0_41_57_rarefish]
 name=Fishing spot
@@ -34583,6 +34636,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_41_57_rarefish_enum
 param=whirlpool,macro_whirlpool_rarefish
 [0_41_57_memberfish]
 name=Fishing spot
@@ -34602,6 +34656,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_41_57_memberfish_enum
 param=whirlpool,macro_whirlpool_memberfish
 [horror_lighthousekeeeper_well]
 name=Jossik
@@ -35631,6 +35686,7 @@ param=death_anim,human_death
 head1=obj_pickpocket_guide_fremennik_citizen
 head2=idk_man_jaw_medium_head
 wanderrange=5
+respawnrate=50
 [misc_etc_man_2]
 name=Haming
 desc=A subject of Etceteria.
@@ -35666,6 +35722,7 @@ param=defend_anim,human_unarmed_def
 param=death_anim,human_death
 head1=obj_pickpocket_guide_fremennik_citizen
 wanderrange=5
+respawnrate=50
 [misc_etc_man_3]
 name=Moldof
 desc=A subject of Etceteria.
@@ -35699,6 +35756,7 @@ param=death_anim,human_death
 head1=idk_man_hair_dreadlocks_head
 head2=idk_man_jaw_long_head
 wanderrange=5
+respawnrate=50
 [misc_etc_woman_1]
 name=Helga
 desc=A subject of Etceteria.
@@ -35735,6 +35793,7 @@ head1=idk_woman_hair_medium_head
 param=defend_sound,female_hit
 param=death_sound,female_death
 wanderrange=5
+respawnrate=50
 [misc_etc_woman_2]
 name=Matilda
 desc=A subject of Etceteria.
@@ -35771,6 +35830,7 @@ head1=obj_pickpocket_guide_warrior
 param=defend_sound,female_hit
 param=death_sound,female_death
 wanderrange=5
+respawnrate=50
 [misc_etc_woman_3]
 name=Ashild
 desc=A subject of Etceteria.
@@ -35806,6 +35866,7 @@ head1=idk_woman_hair_short_head
 param=defend_sound,female_hit
 param=death_sound,female_death
 wanderrange=5
+respawnrate=50
 [etc_guard1]
 name=Skraeling
 desc=A warrior of Etceteria.
@@ -35859,6 +35920,7 @@ param=defend_sound,null
 param=death_sound,null
 wanderrange=5
 maxrange=7
+respawnrate=50
 [etc_guard2]
 name=Skraeling
 desc=A warrior of Etceteria.
@@ -35912,6 +35974,7 @@ param=defend_sound,null
 param=death_sound,null
 wanderrange=5
 maxrange=7
+respawnrate=50
 [etc_fish_monger]
 name=Fishmonger
 desc=Hmm, he smells.
@@ -35944,6 +36007,11 @@ op1=Talk-to
 op3=Trade
 head1=idk_man_hair_dreadlocks_head
 wanderrange=2
+param=owned_shop,etc_fishmonger
+param=shop_sell_multiplier,1000
+param=shop_buy_multiplier,700
+param=shop_delta,30
+param=shop_title,Etceteria Fish
 [etc_veg_monger]
 name=Greengrocer
 desc=At least he eats his greens.
@@ -35975,6 +36043,11 @@ op3=Trade
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_goatee_head
 wanderrange=2
+param=owned_shop,etc_greengrocer
+param=shop_sell_multiplier,1200
+param=shop_buy_multiplier,950
+param=shop_delta,20
+param=shop_title,Island Greengrocer
 [misc_prince_brand]
 name=Prince Brand
 desc=The Prince of Miscellania.
@@ -36175,6 +36248,35 @@ vislevel=hide
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
 maxrange=24
+defaultmode=patrol
+patrol1=0_39_60_42_11,4
+patrol2=0_39_60_42_10,4
+patrol3=0_39_60_42_9,4
+patrol4=0_39_60_42_8,4
+patrol5=0_39_60_42_7,4
+patrol6=0_39_60_42_6,4
+patrol7=0_39_60_42_5,4
+patrol8=0_39_60_42_4,4
+patrol9=0_39_60_42_3,4
+patrol10=0_39_60_42_2,4
+patrol11=0_39_60_42_3,4
+patrol12=0_39_60_42_4,4
+patrol13=0_39_60_42_5,4
+patrol14=0_39_60_42_6,4
+patrol15=0_39_60_42_7,4
+patrol16=0_39_60_42_8,4
+patrol17=0_39_60_42_9,4
+patrol18=0_39_60_42_10,4
+patrol19=0_39_60_42_11,4
+patrol20=0_39_60_42_12,4
+patrol21=0_39_60_42_13,4
+patrol22=0_39_60_42_14,4
+patrol23=0_39_60_42_15,4
+patrol24=0_39_60_42_16,4
+patrol25=0_39_60_42_15,4
+patrol26=0_39_60_42_14,4
+patrol27=0_39_60_42_13,4
+patrol28=0_39_60_42_12,4
 [misc_flowergirl]
 name=Flower Girl
 desc=No-one would mistake her for a duchess.
@@ -36244,6 +36346,7 @@ param=defend_sound,human_hit
 param=death_sound,human_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_man_2]
 name=Einar
 desc=A subject of Miscellania.
@@ -36287,6 +36390,7 @@ param=defend_sound,human_hit
 param=death_sound,human_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_man_3]
 name=Alrik
 desc=A subject of Miscellania.
@@ -36332,6 +36436,7 @@ param=defend_sound,human_hit
 param=death_sound,human_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_woman_1]
 name=Thorhild
 desc=A subject of Miscellania.
@@ -36373,6 +36478,7 @@ param=defend_sound,human_hit
 param=death_sound,human_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_woman_2]
 name=Halla
 desc=A subject of Miscellania.
@@ -36414,6 +36520,7 @@ param=defend_sound,female_hit
 param=death_sound,female_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_woman_3]
 name=Yrsa
 desc=A subject of Miscellania.
@@ -36450,6 +36557,7 @@ param=death_anim,human_death
 param=attack_sound,unarmed_punch
 param=defend_sound,female_hit
 param=death_sound,female_death
+respawnrate=50
 [misc_sailor]
 name=Sailor
 desc=He's strong to the finish, because he eats cabbage.
@@ -36525,6 +36633,7 @@ param=defend_sound,female_hit
 param=death_sound,female_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_woman_5]
 name=Thora
 desc=A subject of Miscellania.
@@ -36571,6 +36680,7 @@ param=defend_sound,female_hit
 param=death_sound,female_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_woman_6]
 name=Valgerd
 desc=A subject of Miscellania.
@@ -36619,6 +36729,7 @@ param=defend_sound,female_hit
 param=death_sound,female_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_man_4]
 name=Skraeling
 desc=A warrior of Miscellania.
@@ -36672,6 +36783,7 @@ param=defend_sound,null
 param=death_sound,null
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_man_5]
 name=Broddi
 desc=A subject of Miscellania.
@@ -36720,6 +36832,7 @@ param=defend_sound,human_hit
 param=death_sound,human_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_man_6]
 name=Skraeling
 desc=A warrior of Miscellania.
@@ -36772,6 +36885,7 @@ param=defend_sound,human_hit
 param=death_sound,human_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_man_7]
 name=Ragnvald
 desc=A subject of Miscellania.
@@ -36822,6 +36936,7 @@ param=defend_sound,human_hit
 param=death_sound,human_death
 wanderrange=5
 maxrange=7
+respawnrate=50
 [misc_fish_monger]
 name=Fishmonger
 desc=Hmm, he smells.
@@ -36855,6 +36970,11 @@ op3=Trade
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_split_head
 wanderrange=2
+param=owned_shop,misc_fishmonger
+param=shop_sell_multiplier,1300
+param=shop_buy_multiplier,700
+param=shop_delta,30
+param=shop_title,Island Fishmonger
 [misc_veg_monger]
 name=Greengrocer
 desc=At least he eats his greens.
@@ -36886,6 +37006,11 @@ op3=Trade
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
 wanderrange=2
+param=owned_shop,misc_greengrocer
+param=shop_sell_multiplier,1200
+param=shop_buy_multiplier,950
+param=shop_delta,20
+param=shop_title,Greengrocer of Miscellania
 [misc_lumberjack]
 name=Lumberjack Leif
 desc=He's a lumberjack, and he's okay.
@@ -37037,6 +37162,7 @@ moverestrict=nomove
 defaultmode=none
 timer=1
 category=rarefish
+param=fishing_movement_enum,fishing_movement_miscellania_enum
 param=whirlpool,macro_whirlpool_rarefish
 [misc_seagull]
 name=Gull
@@ -37057,6 +37183,19 @@ hitpoints=32
 attack=22
 strength=22
 defence=17
+respawnrate=50
+maxrange=20
+param=stabdefence,12
+param=slashdefence,10
+param=crushdefence,16
+param=magicdefence,8
+param=damagetype,^stab_style
+param=attack_anim,bird_attack
+param=defend_anim,bird_block
+param=death_anim,bird_death
+param=attack_sound,bird_attack
+param=defend_sound,bird_hit
+param=death_sound,bird_death
 
 [misc_chicken]
 name=Chicken
@@ -37085,6 +37224,8 @@ param=death_anim,chicken_death
 param=attack_sound,chicken_attack
 param=defend_sound,chicken_hit
 param=death_sound,chicken_death
+category=chicken
+respawnrate=50
 [misc_chicken_brown]
 name=Chicken
 desc=Yep, definitely a chicken.
@@ -37119,6 +37260,8 @@ param=death_anim,chicken_death
 param=attack_sound,chicken_attack
 param=defend_sound,chicken_hit
 param=death_sound,chicken_death
+category=chicken
+respawnrate=50
 [misc_rooster]
 name=Rooster
 desc=He rules the...er...roost.
@@ -37155,6 +37298,8 @@ param=death_anim,chicken_death
 param=attack_sound,chicken_attack
 param=defend_sound,chicken_hit
 param=death_sound,chicken_death
+category=chicken
+respawnrate=50
 [misc_rabbit]
 name=Rabbit
 desc=Aww, how cute.
@@ -37205,6 +37350,7 @@ moverestrict=nomove
 defaultmode=none
 category=memberfish
 timer=1
+param=fishing_movement_enum,fishing_movement_0_43_42_memberfish_enum
 param=whirlpool,macro_whirlpool_memberfish
 [0_42_42_memberfish]
 name=Fishing spot
@@ -37218,9 +37364,14 @@ op1=Net
 op3=Harpoon
 op4=hidden
 op5=hidden
+category=memberfish
 wanderrange=0
+maxrange=50
+timer=1
 moverestrict=nomove
 defaultmode=none
+param=fishing_movement_enum,fishing_movement_0_42_42_memberfish_enum
+param=whirlpool,macro_whirlpool_memberfish
 
 [mm_daero]
 name=Daero
@@ -37259,6 +37410,10 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=npc_gnomepilot_head
+wanderrange=0
+maxrange=0
+moverestrict=nomove
+defaultmode=none
 
 [waydar]
 name=Waydar
@@ -37287,6 +37442,8 @@ resizev=150
 op1=Talk-to
 vislevel=hide
 head1=npc_commander_montai_head
+wanderrange=2
+maxrange=2
 
 [mm_garkor_final_battle]
 name=Garkor
@@ -37324,6 +37481,8 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+wanderrange=2
+maxrange=2
 
 [mm_lumo_final_battle]
 name=Lumo
@@ -37360,6 +37519,8 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+wanderrange=2
+maxrange=2
 
 [mm_bunkdo_final_battle]
 name=Bunkdo
@@ -37394,6 +37555,8 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+wanderrange=2
+maxrange=2
 
 [mm_carado_final_battle]
 name=Carado
@@ -37441,6 +37604,8 @@ readyanim=m_assassin_ready
 op1=Talk-to
 vislevel=hide
 head1=npc_1420_head
+wanderrange=2
+maxrange=2
 
 [mm_karam_final_battle]
 name=Karam
@@ -37467,6 +37632,8 @@ readyanim=m_assassin_ready
 op1=Talk-to
 vislevel=hide
 head1=npc_1420_head
+wanderrange=2
+maxrange=2
 
 [mm_bunkwicket]
 name=Bunkwicket
@@ -37483,6 +37650,10 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+defaultmode=none
+wanderrange=0
+maxrange=0
+moverestrict=nomove
 
 [mm_waymottin]
 name=Waymottin
@@ -37499,6 +37670,10 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+defaultmode=none
+wanderrange=0
+maxrange=0
+moverestrict=nomove
 
 [mm_zooknock]
 name=Zooknock
@@ -37519,6 +37694,8 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=npc_1425_head
+wanderrange=2
+maxrange=2
 
 [mm_zooknock_final_battle]
 name=Zooknock
@@ -37576,6 +37753,9 @@ readyanim=midget_ready
 op1=Talk-to
 vislevel=hide
 head1=obj_pickpocket_guide_gnome
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [mm_dugopul]
 name=Dugopul
@@ -37861,6 +38041,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 blockwalk=none
+param=death_drop,mm_medium_ninja_monkey_bones
 [mm_oipuis]
 name=Oipuis
 desc=A large ninja monkey wielding two scimitars.
@@ -37890,6 +38071,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 blockwalk=none
+param=death_drop,mm_medium_ninja_monkey_bones
 [mm_uyoro]
 name=Uyoro
 desc=A large ninja monkey wielding two scimitars.
@@ -37919,6 +38101,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 blockwalk=none
+param=death_drop,mm_medium_ninja_monkey_bones
 [mm_ouhai]
 name=Ouhai
 desc=A large ninja monkey wielding two scimitars.
@@ -37948,6 +38131,7 @@ param=attack_sound,stabsword_slash
 param=defend_sound,monkey_hit
 param=death_sound,monkey_death
 blockwalk=none
+param=death_drop,mm_medium_ninja_monkey_bones
 [mm_uodai]
 name=Uodai
 desc=A large ninja monkey wielding two scimitars.
@@ -38568,6 +38752,9 @@ readyanim=human_ready
 vislevel=hide
 head1=idk_man_hair_long_head
 head2=idk_man_jaw_moustache_head
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [mm_skeleton]
 name=Skeleton
@@ -39858,6 +40045,9 @@ op1=Talk-to
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_long_head
 head3=obj_santa_hat_manhead
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [route_cyreg_paddlehorn]
 name=Cyreg Paddlehorn
@@ -39920,6 +40110,7 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_moustache_head
+wanderrange=1
 
 [route_veliaf_hurtz]
 name=Veliaf Hurtz
@@ -40190,6 +40381,9 @@ size=3
 walkanim=misty
 readyanim=misty
 alwaysontop=yes
+wanderrange=10
+maxrange=10
+param=death_drop,null
 
 [route_vanstrom_klause_normal]
 name=Vanstrom Klause
@@ -40211,6 +40405,7 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=npc_clivet_hazeel_cultist_head
+wanderrange=0
 
 [route_vanstrom_klause_vamp_wingsgrow]
 name=Vanstrom Klause
@@ -40233,6 +40428,7 @@ walkanim=wings_unfold
 readyanim=wings_unfold
 op1=Talk-to
 head1=npc_1580_head
+wanderrange=0
 
 [route_vanstrom_klause_vamp]
 name=Vanstrom Klause
@@ -40255,6 +40451,7 @@ walkanim=wings_ready
 readyanim=wings_ready
 op1=Talk-to
 head1=npc_1580_head
+wanderrange=0
 
 [firegiant_big]
 name=Fire giant
@@ -40295,6 +40492,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [firegiant_big2]
 name=Fire giant
 desc=A very large elemental adversary.
@@ -40334,6 +40533,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [firegiant_big3]
 name=Fire giant
 desc=A very large elemental adversary.
@@ -40373,6 +40574,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [firegiant2]
 name=Fire giant
 desc=A very large elemental adversary.
@@ -40410,6 +40613,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [firegiant3]
 name=Fire giant
 desc=A very large elemental adversary.
@@ -40448,6 +40653,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [mossgiant2]
 name=Moss giant
 desc=His beard seems to have a life of its own.
@@ -40558,6 +40765,7 @@ param=death_anim,dog_death
 param=attack_sound,wolf_attack
 param=defend_sound,wolf_hit
 param=death_sound,wolf_death
+huntrange=3
 [dog_wild_2]
 name=Wild dog
 desc=An unsuitable pet.
@@ -40584,6 +40792,7 @@ param=death_anim,dog_death
 param=attack_sound,wolf_attack
 param=defend_sound,wolf_hit
 param=death_sound,wolf_death
+huntrange=3
 [tribesman_doorman]
 name=Saniboch
 desc=Looks like he wants money.
@@ -46189,6 +46398,33 @@ magic=1
 param=attackrate,4
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_short_head
+// CANDIDATE src.dt-osrs-r2-page-damis#19,27,43,45-46,51-60: nine fields are ranged, size, damagetype, strengthbonus and five defences.
+// The other twelve fields below are product choices, not values supplied by that page.
+ranged=1
+// Size 1 is the engine default; not written because an explicit line changes the client's npc.dat.
+// UNKNOWN shadow-engineering-constants-s3: three ranges and timer. Product defaultmode: shadow-reconstruction-s3.
+wanderrange=0
+maxrange=64
+attackrange=1
+defaultmode=none
+timer=1
+// CANDIDATE Damis-page damage style and bonuses (seven of the nine source-backed fields).
+param=damagetype,^crush_style
+param=strengthbonus,80
+param=stabdefence,60
+param=slashdefence,60
+param=crushdefence,60
+param=magicdefence,60
+param=rangedefence,60
+// CANDIDATE shadow-reconstruction-s3: six inherited human/sword animation and sound joins are product choices.
+param=attack_anim,human_dhsword_chop
+param=defend_anim,human_dhsword_def
+param=death_anim,human_death
+param=attack_sound,2H_slash
+param=defend_sound,steel
+param=death_sound,human_death
+// Product choice shadow-reconstruction-s3: no generic death drop; owned diamond comes from the death script.
+param=death_drop,null
 
 [fd_damis_tougher]
 name=Damis
@@ -46223,6 +46459,33 @@ magic=1
 param=attackrate,3
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
+// CANDIDATE src.dt-osrs-r2-page-damis#19,27,43,45-46,51-60: nine fields are ranged, size, damagetype, strengthbonus and five defences.
+// The other twelve fields below are product choices, not values supplied by that page.
+ranged=1
+// Size 1 is the engine default; not written because an explicit line changes the client's npc.dat.
+// UNKNOWN shadow-engineering-constants-s3: three ranges and timer. Product defaultmode: shadow-reconstruction-s3.
+wanderrange=0
+maxrange=64
+attackrange=1
+defaultmode=none
+timer=1
+// CANDIDATE Damis-page damage style and bonuses (seven of the nine source-backed fields).
+param=damagetype,^crush_style
+param=strengthbonus,100
+param=stabdefence,100
+param=slashdefence,100
+param=crushdefence,100
+param=magicdefence,80
+param=rangedefence,120
+// CANDIDATE shadow-reconstruction-s3: six inherited human/sword animation and sound joins are product choices.
+param=attack_anim,human_dhsword_chop
+param=defend_anim,human_dhsword_def
+param=death_anim,human_death
+param=attack_sound,2H_slash
+param=defend_sound,steel
+param=death_sound,human_death
+// Product choice shadow-reconstruction-s3: no generic death drop; owned diamond comes from the death script.
+param=death_drop,null
 
 [shadow_dog_wild]
 name=Shadow Hound

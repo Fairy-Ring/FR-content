@@ -850,6 +850,7 @@ param=damagetype,^crush_style
 param=combat_xp_multiplier,25
 // defend_sound blade3_mail
 // https://storage.googleapis.com/tannerdino/images/watchman.PNG here we can see defend animation.
+param=defend_sound,sound_784
 
 
 [macro_watchman2]
@@ -886,6 +887,7 @@ param=attack_sound,mace_crush
 param=damagetype,^crush_style
 param=combat_xp_multiplier,25
 // defend_sound blade3_mail (This information is taken from watchman.)
+param=defend_sound,sound_784
 
 [macro_watchman3]
 name=Watchman
@@ -921,6 +923,7 @@ param=attack_sound,mace_crush
 param=damagetype,^crush_style
 param=combat_xp_multiplier,25
 // defend_sound blade3_mail (This information is taken from watchman.)
+param=defend_sound,sound_784
 
 [macro_watchman4]
 name=Watchman
@@ -956,6 +959,7 @@ param=attack_sound,mace_crush
 param=damagetype,^crush_style
 param=combat_xp_multiplier,25
 // defend_sound blade3_mail (This information is taken from watchman.)
+param=defend_sound,sound_784
 
 [macro_watchman5]
 name=Watchman
@@ -991,6 +995,7 @@ param=attack_sound,mace_crush
 param=damagetype,^crush_style
 param=combat_xp_multiplier,25
 // defend_sound blade3_mail (This information is taken from watchman.)
+param=defend_sound,sound_784
 
 [macro_watchman6]
 name=Watchman
@@ -1026,6 +1031,7 @@ param=attack_sound,mace_crush
 param=damagetype,^crush_style
 param=combat_xp_multiplier,25
 // defend_sound blade3_mail (This information is taken from watchman.)
+param=defend_sound,sound_784
 
 [macro_dryhadguardian_1]
 name=Tree spirit

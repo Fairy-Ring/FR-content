@@ -1,0 +1,8 @@
+// Research subject: waterbirth-ferry; evidence U-WATERBIRTH-1113.
+// CANDIDATE Jagex KB 26 Oct 2006 round-trip fare; Sal's 29 Apr 2006 advises 2,000 coins.
+^waterbirth_ferry_reconstructed_fare = 1000
+// CANDIDATE nearest walkable tiles to the 377 Jarvald spawns, not historical arrival tiles.
+^waterbirth_ferry_reconstructed_rellekka = 0_40_57_60_35
+^waterbirth_ferry_reconstructed_island = 0_39_58_47_49
+// VERIFIED terminal held-frame duration in both 377 northern journey sequences.
+^waterbirth_ferry_map_hold_cycles = 20001

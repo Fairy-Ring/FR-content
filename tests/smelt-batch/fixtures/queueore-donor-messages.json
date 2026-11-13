@@ -1,0 +1,37 @@
+{
+  "source": "Hand-authored from Lost City 289 smelting.struct, commit 457c8943b5c1c3ebe338a12a9b12418c6c96c325; expected texts do not depend on new packed params.",
+  "queueore": {
+    "bronze_bar": {
+      "primary": "You have run out of ore to smelt into bronze.",
+      "secondary": "You have run out of ore to smelt into bronze."
+    },
+    "iron_bar": {
+      "primary": "You have run out of iron ore to smelt."
+    },
+    "steel_bar": {
+      "primary": "You have run out of iron ore with which to make steel.",
+      "secondary": "You don't have enough coal to make any more steel."
+    },
+    "silver_bar": {
+      "primary": "You have run out of silver ore to smelt."
+    },
+    "gold_bar": {
+      "primary": "You have run out of gold ore to smelt."
+    },
+    "mithril_bar": {
+      "primary": "You have run out of mithril ore to smelt.",
+      "secondary": "You don't have enough coal to make any more mithril."
+    },
+    "adamantite_bar": {
+      "primary": "You have run out of adamantite ore to smelt.",
+      "secondary": "You don't have enough coal to make any more adamantite."
+    },
+    "runite_bar": {
+      "primary": "You have run out of runite ore to smelt.",
+      "secondary": "You don't have enough coal to make any more runite."
+    },
+    "perfect_gold_bar": {
+      "primary": "You have run out of gold ore to smelt."
+    }
+  }
+}

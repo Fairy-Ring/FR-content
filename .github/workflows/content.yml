@@ -104,12 +104,19 @@ jobs:
       #   setup-iso.sh is an optional isolated-layout helper, not a test or a live-server requirement.
       # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
       # tests/silver-casting/: CI — compiled furnace handler fills each Silver Casting slot; no engine is started.
+      # tests/leather-batch/: CI — published Make1 baseline plus packed Make5/10 handlers and weak-queue processing; no server.
+      # tests/teleother/: CI — compiled Player triggers and button handlers cover all three offers, settlement and recipient lifecycle; no server is started.
       # tests/giantdwarf-intro/: CI — compiled runtime/save-load checks; no engine is started.
       # tests/content-gaps/: CI — packed configuration/trigger integration, no server.
       # tests/elena-fence/: CI — packed map/dispatch runtime, runtime.sh starts no server.
       # tests/drop-tables/: CI — compiled KQ ScriptRunner outcomes, no server.
       # tests/priestperil-completion/: CI — compiled completion queue, Prayer reward in tenths, no server.
       # tests/string-charset/: CI — client-visible strings stay within the Client-Java 377 byte/font character set.
+      # tests/combo-runes/: CI — all 122 original spell buttons versus compiled rune checks, and every existing row's payment.
+      # tests/slayer-selector/: CI — deterministic packed cases and reduced seeded distribution, no server.
+      # tests/ape-agility/: CI — compiled packed obstacle handlers, entry matrix and recovery checkpoints; no server.
+      # tests/brim-dungeon/: CI — packed entrance, obstacle, lock and collision checks; no server.
+      # tests/splitbark-service/: CI — packed wizard dialogue, labeled five-piece selector and inventory purchases; no server.
       - name: Run offline content tests
         id: content_tests
         working-directory: engine
@@ -138,6 +145,18 @@ jobs:
 
           run_test tests/string-charset/check_string_charset.mjs node ../content/tests/string-charset/check_string_charset.mjs ../content
           run_test tests/string-charset/check_string_charset.test.mjs node --test ../content/tests/string-charset/check_string_charset.test.mjs
+          run_test tests/varp-scope/test_varp_scope.mjs node --import tsx ../content/tests/varp-scope/test_varp_scope.mjs
+          run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
+          run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
+          run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
+          run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
+          run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
+          run_test tests/barrows/test_config.mjs node ../content/tests/barrows/test_config.mjs --content-root ../content
+          run_test tests/citizen-tables/test_citizen_tables.mjs node --import tsx ../content/tests/citizen-tables/test_citizen_tables.mjs
+          run_test tests/cfg-other/test_cfg_other.mjs node --import tsx ../content/tests/cfg-other/test_cfg_other.mjs
+          run_test tests/npc-death/test_npc_death.mjs node --import tsx ../content/tests/npc-death/test_npc_death.mjs
+          run_test tests/cfg-npc/test_cfg_npc.mjs node --import tsx ../content/tests/cfg-npc/test_cfg_npc.mjs
+          run_test tests/spawn-repair/test_spawn_repair.mjs node --import tsx ../content/tests/spawn-repair/test_spawn_repair.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
@@ -152,14 +171,28 @@ jobs:
           run_test tests/fenkenstrain-completion/test_fenk_s1.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s1.py
           run_test tests/fenkenstrain-completion/test_fenk_s2.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s2.py
           run_test tests/silver-casting/test_silver_casting.mjs node --import tsx ../content/tests/silver-casting/test_silver_casting.mjs
+          run_test tests/smelt-batch/test_smelt_batch.mjs node --import tsx ../content/tests/smelt-batch/test_smelt_batch.mjs
+          run_test tests/leather-batch/test_leather_batch.mjs node --import tsx ../content/tests/leather-batch/test_leather_batch.mjs
+          run_test tests/desert-treasure/test_s3_contract.py python3 ../content/tests/desert-treasure/test_s3_contract.py
           run_test tests/desert-treasure/test_s1_contract.py python3 ../content/tests/desert-treasure/test_s1_contract.py
           run_test tests/desert-treasure/test_s6_contract.py python3 ../content/tests/desert-treasure/test_s6_contract.py
           run_test tests/desert-treasure/test_s2_contract.py python3 ../content/tests/desert-treasure/test_s2_contract.py
+          run_test tests/teleother/test_teleother.mjs node --import tsx ../content/tests/teleother/test_teleother.mjs
+          run_test tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs node --import tsx ../content/tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs
+          run_test tests/rowboat/test_rowboat.mjs node --import tsx ../content/tests/rowboat/test_rowboat.mjs
+          run_test tests/misc-services/test_misc_services.mjs node --import tsx ../content/tests/misc-services/test_misc_services.mjs
+          run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
+          run_test tests/food-drink/test_food_drink.mjs node --import tsx ../content/tests/food-drink/test_food_drink.mjs
+          run_test tests/stair-links/test_stair_links.mjs node --import tsx ../content/tests/stair-links/test_stair_links.mjs
+          run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
           run_test tests/content-gaps/packed.mts bash ../content/tests/content-gaps/packed.sh "$PWD"
+          run_test tests/ape-agility/test_ape_atoll.mjs node --import tsx ../content/tests/ape-agility/test_ape_atoll.mjs
+          run_test tests/brim-dungeon/test_brim_dungeon.mjs node --import tsx ../content/tests/brim-dungeon/test_brim_dungeon.mjs
+          run_test tests/splitbark-service/test_splitbark_service.mjs node --import tsx ../content/tests/splitbark-service/test_splitbark_service.mjs
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           exit "$failed"

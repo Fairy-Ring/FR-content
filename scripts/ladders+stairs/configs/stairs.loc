@@ -1278,6 +1278,7 @@ op1=Climb-up
 forceapproach=south
 sharelight=yes
 mapscene=7
+param=barrows_surface_exit,0_55_51_45_25
 
 [barrows_stairs_dharok]
 name=Staircase
@@ -1298,6 +1299,7 @@ op1=Climb-up
 forceapproach=south
 sharelight=yes
 mapscene=7
+param=barrows_surface_exit,0_55_51_55_34
 
 [barrows_stairs_guthan]
 name=Staircase
@@ -1318,6 +1320,7 @@ op1=Climb-up
 forceapproach=south
 sharelight=yes
 mapscene=7
+param=barrows_surface_exit,0_55_51_57_19
 
 [barrows_stairs_karil]
 name=Staircase
@@ -1338,6 +1341,7 @@ op1=Climb-up
 forceapproach=south
 sharelight=yes
 mapscene=7
+param=barrows_surface_exit,0_55_51_46_12
 
 [barrows_stairs_torag]
 name=Staircase
@@ -1358,6 +1362,7 @@ op1=Climb-up
 forceapproach=south
 sharelight=yes
 mapscene=7
+param=barrows_surface_exit,0_55_51_33_19
 
 [barrows_stairs_verac]
 name=Staircase
@@ -1378,6 +1383,7 @@ op1=Climb-up
 forceapproach=south
 sharelight=yes
 mapscene=7
+param=barrows_surface_exit,0_55_51_37_34
 
 [ogre_stairs_down]
 name=Stairs

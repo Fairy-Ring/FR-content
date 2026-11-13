@@ -22,7 +22,7 @@ if(~inzone_coord_pair_table(mortton_temple_zones, coord) = true & %morttonquest 
     if(%temple_sanctity_p < 100) {
         %temple_sanctity = add(%temple_sanctity, 60);
     }
-    if(gettimer(sanctity_drain) = ^false) {
+    if(gettimer(sanctity_drain) < 1) {
         settimer(sanctity_drain, 100);
     }
 }

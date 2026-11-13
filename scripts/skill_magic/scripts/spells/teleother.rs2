@@ -1,0 +1,63 @@
+[applayert,magic:com_511] @teleother_offer(^teleother_lumbridge);
+[applayert,magic:com_521] @teleother_offer(^teleother_falador);
+[applayert,magic:com_541] @teleother_offer(^teleother_camelot);
+
+// OD-1: only a valid offer pays. There is no caster-owned pending transaction.
+[label,teleother_offer](int $spell)
+p_stopaction;
+def_player_uid $caster = uid;
+def_player_uid $recipient = .uid;
+def_string $caster_name = displayname;
+def_dbrow $spell_data = ~get_spell_data($spell);
+if (~check_spell_requirements($spell_data) = false) {
+    return;
+}
+if (.%option_aid = 0) {
+    return;
+}
+if (.busy = true) {
+    mes("<.displayname> is busy at the moment.");
+    return;
+}
+if (.p_finduid($recipient) = false) {
+    mes("<.displayname> is busy at the moment.");
+    return;
+}
+// Both actors are owned. Bind the recipient as primary for the shared travel
+// checks, which send any existing refusal text to the player being transported.
+if (p_finduid($recipient) = false) {
+    return;
+}
+if (~teleother_travel_checks = false) {
+    return;
+}
+// A successful check never suspends. Restore the caster before the shared
+// requirements/payment helpers; the secondary pointer still owns the recipient.
+if (finduid($caster) = false) {
+    return;
+}
+if (p_finduid(uid) = false) {
+    return;
+}
+~delete_spell_runes($spell_data);
+~give_spell_xp($spell_data);
+anim(db_getfield($spell_data, magic_spell_table:anim, 0), 0);
+spotanim_pl(db_getfield($spell_data, magic_spell_table:spotanim_origin, 0), 0, 0);
+sound_synth(db_getfield($spell_data, magic_spell_table:sound_cast, 0), 1, 0);
+.%teleother_spell = $spell;
+.if_settext(teleport_option:com_89, $caster_name);
+.if_settext(teleport_option:com_91, ~string_removeleft(db_getfield($spell_data, magic_spell_table:name, 0), 10));
+.if_openmain(teleport_option);
+
+// OD-2: these are recipient restrictions, with no combat gate. Historical
+// Teleother eligibility remains UNKNOWN; shared messages are reused unchanged.
+[proc,teleother_travel_checks]()(boolean)
+if (stat(hitpoints) = 0) {
+    return(false);
+}
+if (~wilderness_level(coord) > 20) {
+    mes("A mysterious force blocks your teleport spell!");
+    mes("You can't use this teleport after level 20 wilderness.");
+    return(false);
+}
+return(~pre_tele_checks(coord));
