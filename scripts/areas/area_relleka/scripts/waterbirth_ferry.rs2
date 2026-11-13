@@ -1,5 +1,5 @@
 // Research subject: waterbirth-ferry; U-WATERBIRTH-1113.
-// CANDIDATE dialogue/fare/quick-travel policy from later sources; see registered facts.
+// CANDIDATE dialogue/fare/quick-travel policy from later and conflicting sources; see registered facts.
 // VERIFIED 377 NPC aliases, morph bit, interface and directional animations are reused.
 [opnpc1,viking_dagganoth_cave_ferryman_rellekka]
 @waterbirth_ferry_talk;
