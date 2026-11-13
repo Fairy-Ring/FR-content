@@ -371,6 +371,7 @@ param=attack_anim,human_sword_stab
 param=defend_anim,human_sword_def
 param=attack_sound,stabsword_stab
 category=guard
+param=defend_sound,brassclash2
 
 [guard2]
 name=Guard
@@ -1237,6 +1238,7 @@ param=attack_anim,human_blunt_pound
 param=defend_anim,human_blunt_block
 param=attack_sound,warhammer_crush
 category=guard
+param=defend_sound,sound_783
 
 [doorman]
 name=Door man
@@ -1298,6 +1300,7 @@ param=crushdefence,19
 param=magicdefence,-4
 param=rangedefence,16
 param=damagetype,^crush_style
+param=defend_sound,sound_784
 
 [yanille_soldier]
 name=Soldier
@@ -1335,6 +1338,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
+param=defend_sound,sound_784
 
 [wyson]
 name=Wyson the gardener
@@ -3541,6 +3545,8 @@ param=defend_anim,dwarf_block
 param=death_anim,dwarf_death
 param=attack_sound,warhammer_crush
 param=slayer_category,^slayer_dwarf
+param=defend_sound,dwarf_hit
+param=death_sound,dwarf_death
 
 [hobgoblin_unarmed]
 name=Hobgoblin
@@ -7100,6 +7106,7 @@ param=defend_anim,human_sword_def
 param=attack_sound,stabsword_stab
 huntmode=cowardly
 huntrange=1
+param=defend_sound,brassclash2
 
 [thrantax]
 name=Thrantax the Mighty
@@ -7625,6 +7632,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [arena_guard2]
 name=Khazard Guard
@@ -7664,6 +7672,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [arena_guard3]
 name=Khazard Guard
@@ -7702,6 +7711,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [arena_guard4]
 name=Khazard Guard
@@ -7741,6 +7751,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [arena_leadguard]
 name=Khazard Guard
@@ -7777,6 +7788,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
+param=defend_sound,sound_784
 
 [general_khazard]
 name=General Khazard
@@ -12851,6 +12863,8 @@ param=undead,^true
 ranged=0
 magic=0
 param=death_drop,null
+huntmode=aggressive_melee
+huntrange=4
 [zq_mainzombie2]
 name=Nazastarool
 desc=A giant skeleton of huge strength and devastating power.
@@ -12887,6 +12901,8 @@ ranged=0
 magic=0
 param=attack_sound,stabsword_slash
 param=death_drop,null
+huntmode=aggressive_melee
+huntrange=4
 [zq_mainzombie3]
 name=Nazastarool
 desc=A giant ghost of huge strength and devastating power.
@@ -12915,6 +12931,8 @@ param=undead,^true
 ranged=0
 magic=0
 param=death_drop,null
+huntmode=aggressive_melee
+huntrange=4
 [brimhavencartdriver]
 name=Hajedy
 desc=A cart driver, it looks like he's quite experienced.
@@ -18548,6 +18566,7 @@ param=death_drop,ashes
 param=retreat,4
 param=demonbane_vulnerable,yes
 timer=70
+givechase=false
 [alrena]
 name=Alrena
 desc=She looks concerned.
@@ -20652,6 +20671,7 @@ param=attack_anim,human_axe_hack
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_slash
 param=death_drop,grip_keys
+param=defend_sound,sound_784
 
 [alfonse_the_waiter]
 name=Alfonse the waiter
@@ -20900,6 +20920,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,stabsword_slash
+param=defend_sound,sound_782
 
 [0_45_152_lavafish]
 name=Fishing spot
@@ -21672,6 +21693,7 @@ param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
 ranged=0
 magic=0
+param=defend_sound,sound_783
 [desertminingmercenary2]
 name=Mercenary
 desc=He looks a bit aggressive.
@@ -21720,6 +21742,7 @@ param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
 ranged=0
 magic=0
+param=defend_sound,sound_783
 [desertminingcaptain]
 name=Mercenary Captain
 desc=He looks a bit aggressive.
@@ -21773,6 +21796,7 @@ param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
 ranged=0
 magic=0
+param=defend_sound,sound_783
 [capt_siad]
 name=Captain Siad
 desc=He's in control of the whole mining camp.
@@ -22212,6 +22236,7 @@ huntrange=1
 huntmode=cowardly
 ranged=0
 magic=0
+param=defend_sound,sound_783
 [rpdt_employee]
 name=RPDT employee
 desc=Inefficient looking.
@@ -22517,6 +22542,7 @@ param=death_anim,ogre_death
 param=attack_sound,mace_crush
 param=death_sound,giant_death
 param=death_drop,big_bones
+param=defend_sound,sound_784
 
 [ogre_guard]
 name=Ogre guard
@@ -22824,6 +22850,7 @@ param=death_anim,ogre_death
 param=attack_sound,mace_stab
 param=death_sound,giant_death
 param=death_drop,big_bones
+param=defend_sound,sound_784
 
 [ogre_shaman]
 name=Ogre shaman
@@ -23045,6 +23072,7 @@ param=damagetype,^stab_style
 param=attack_anim,human_sword_stab
 param=defend_anim,human_sword_def
 param=attack_sound,stabsword_stab
+param=defend_sound,sound_784
 
 [colonel_radick]
 name=Colonel Radick
@@ -26234,6 +26262,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
+param=defend_sound,brassclash2
 
 [upass_paladin2]
 name=Sir Carl
@@ -26277,6 +26306,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
+param=defend_sound,brassclash2
 
 [upass_paladin3]
 name=Sir Harry
@@ -26320,6 +26350,7 @@ param=damagetype,^slash_style
 param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
+param=defend_sound,brassclash2
 
 [soulman]
 name=Half-Souless
@@ -28493,6 +28524,7 @@ timer=1
 param=attack_sound,troll_champion_attack
 param=defend_sound,troll_champion_hit
 param=death_sound,troll_champion_death
+regenrate=10
 [troll_prison_guard1_awake]
 name=Twig
 desc=He's guarding the cells.
@@ -29953,6 +29985,7 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_staffready
 op1=Talk-to
 head1=npc_1185_head
+wanderrange=1
 
 [regicide_good_elf1]
 name=Idris
@@ -30341,6 +30374,7 @@ category=tyras_guard
 param=death_drop,bones
 param=attack_sound,scythe_slash
 param=attack_anim,human_staff_pummel
+param=defend_sound,sound_782
 [elf_overpass_guard]
 name=Elf warrior
 desc=He looks pretty handy with that bow.
@@ -30354,6 +30388,7 @@ readyanim=human_staffready
 op1=Talk-to
 vislevel=hide
 head1=npc_1185_head
+wanderrange=8
 
 [regicide_good_elf3]
 name=Arianwyn
@@ -30421,6 +30456,7 @@ attackrange=2
 respawnrate=100
 param=attack_sound,scythe_slash
 param=attack_anim,human_spear_spike
+param=defend_sound,sound_782
 [regicide_tyras_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -30473,6 +30509,7 @@ attackrange=2
 respawnrate=100
 param=attack_sound,scythe_slash
 param=attack_anim,human_spear_spike
+param=defend_sound,sound_782
 [regicide_tyras_lazy_guard]
 name=Tyras guard
 desc=One of King Tyras's men.
@@ -30873,6 +30910,7 @@ param=death_sound,vampire_death
 param=death_drop,vampire_dust
 wanderrange=5
 maxrange=7
+regenrate=5
 [vampire_spider]
 name=Spider
 desc=Nasty little creature.
@@ -30882,6 +30920,12 @@ recol1d=2048
 vislevel=hide
 walkanim=spider_walk
 minimap=no
+wanderrange=15
+maxrange=15
+huntrange=2
+timer=1
+attackrange=2
+huntmode=aggressive_ranged
 
 [vampire_misty]
 name=Mist
@@ -30931,6 +30975,7 @@ param=defend_anim,human_unarmedblock
 param=attack_sound,vampire_attack
 param=defend_sound,vampire_hit
 param=death_sound,vampire_death
+regenrate=5
 [vampire_juve_hound]
 name=Vampyric hound
 desc=And I shall call him Fang.
@@ -33218,6 +33263,7 @@ head1=obj_pickpocket_guide_fremennik_citizen
 head2=idk_man_jaw_long_head
 head3=obj_eye_patch_manhead
 head4=obj_viking_helmet_manhead2
+wanderrange=2
 
 [viking_askelapen]
 name=Askeladden
@@ -33606,6 +33652,7 @@ param=attack_anim,human_blunt_pound
 param=defend_anim,human_axe_def
 param=attack_sound,baxe_crush
 maxrange=14
+param=defend_sound,sound_785
 [viking_man2]
 category=viking_citizen
 name=Freidir
@@ -34114,6 +34161,7 @@ param=attack_anim,human_sword_slash
 param=defend_anim,human_sword_def
 param=attack_sound,hacksword_slash
 maxrange=14
+param=defend_sound,sound_785
 [viking_guard2]
 name=Warrior
 desc=A hardened Fremennik warrior.
@@ -34168,6 +34216,7 @@ param=attack_anim,human_blunt_pound
 param=defend_anim,human_blunt_def
 param=attack_sound,warhammer_crush
 maxrange=14
+param=defend_sound,sound_785
 [viking_fox]
 name=Fox
 desc=Foxy.
@@ -39976,6 +40025,9 @@ op1=Talk-to
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_long_head
 head3=obj_santa_hat_manhead
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
 
 [route_cyreg_paddlehorn]
 name=Cyreg Paddlehorn
@@ -40038,6 +40090,7 @@ readyanim=human_ready
 op1=Talk-to
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_moustache_head
+wanderrange=1
 
 [route_veliaf_hurtz]
 name=Veliaf Hurtz
@@ -40308,6 +40361,9 @@ size=3
 walkanim=misty
 readyanim=misty
 alwaysontop=yes
+wanderrange=10
+maxrange=10
+param=death_drop,null
 
 [route_vanstrom_klause_normal]
 name=Vanstrom Klause
@@ -40329,6 +40385,7 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=npc_clivet_hazeel_cultist_head
+wanderrange=0
 
 [route_vanstrom_klause_vamp_wingsgrow]
 name=Vanstrom Klause
@@ -40351,6 +40408,7 @@ walkanim=wings_unfold
 readyanim=wings_unfold
 op1=Talk-to
 head1=npc_1580_head
+wanderrange=0
 
 [route_vanstrom_klause_vamp]
 name=Vanstrom Klause
@@ -40373,6 +40431,7 @@ walkanim=wings_ready
 readyanim=wings_ready
 op1=Talk-to
 head1=npc_1580_head
+wanderrange=0
 
 [firegiant_big]
 name=Fire giant
@@ -40413,6 +40472,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [firegiant_big2]
 name=Fire giant
 desc=A very large elemental adversary.
@@ -40452,6 +40513,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [firegiant_big3]
 name=Fire giant
 desc=A very large elemental adversary.
@@ -40491,6 +40554,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [firegiant2]
 name=Fire giant
 desc=A very large elemental adversary.
@@ -40528,6 +40593,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [firegiant3]
 name=Fire giant
 desc=A very large elemental adversary.
@@ -40566,6 +40633,8 @@ param=attack_sound,giant_attack
 param=defend_sound,giant_hit
 param=death_sound,giant_death
 param=death_drop,big_bones
+huntrange=2
+respawnrate=60
 [mossgiant2]
 name=Moss giant
 desc=His beard seems to have a life of its own.
@@ -40676,6 +40745,7 @@ param=death_anim,dog_death
 param=attack_sound,wolf_attack
 param=defend_sound,wolf_hit
 param=death_sound,wolf_death
+huntrange=3
 [dog_wild_2]
 name=Wild dog
 desc=An unsuitable pet.
@@ -40702,6 +40772,7 @@ param=death_anim,dog_death
 param=attack_sound,wolf_attack
 param=defend_sound,wolf_hit
 param=death_sound,wolf_death
+huntrange=3
 [tribesman_doorman]
 name=Saniboch
 desc=Looks like he wants money.
