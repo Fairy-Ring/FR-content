@@ -998,11 +998,51 @@ function testErnestGate(masterKey) {
     return { master: masterKey, historicalRule: 'UNKNOWN: keeps the Lost City value', states, endpoints: drawLiveRowEndpoints(masterKey, 'killerwatts', fixture) };
 }
 
+function chaeldarCockatriceFixture() {
+    return { ...FIXTURES.get('chaeldar:minimum'), key: 'chaeldar_cb70_base25_current25', baseSlayer: 25, currentSlayer: 25 };
+}
+
+function assertChaeldarRetarget(suffix, category, weight) {
+    const { row } = rowForPacked(`chaeldar_${suffix}`);
+    const actual = ['task', 'weight', 'min_amount', 'max_amount'].map(column => Number(packedValues(row, column)[0]));
+    const expected = [Number(ORACLE.constants.get(`slayer_${category}`)), weight, 110, 170];
+    assert.deepEqual(actual, expected, `S6 chaeldar_${suffix}: corrected category, unchanged Lost City numbers`);
+    return { row: suffix, actual, historicalCategory: 'CANDIDATE', historicalNumbers: 'UNKNOWN: keeps the Lost City value' };
+}
+
+function testChaeldarRetargets() {
+    const mappings = [assertChaeldarRetarget('elves', 'elf', 8), assertChaeldarRetarget('cockatrice', 'cockatrice', 6)];
+    const fixture = chaeldarCockatriceFixture();
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters.chaeldar);
+    const elf = Number(ORACLE.constants.get('slayer_elf'));
+    const cockatrice = Number(ORACLE.constants.get('slayer_cockatrice'));
+    applyFixture(player, { ...FIXTURES.get('chaeldar:high'), questValues: completedQuestValues() });
+    assert.equal(runInt(player, '[proc,slayer_regicide_unlocked]').value, 0, 'unfinished Regicide proc must stay false');
+    assert.equal(runInt(player, '[proc,validate_slayer_target]', npc, [elf]).value, 0, 'retargeted elves must remain excluded by their real packed gate');
+    const thresholds = [];
+    for (const baseSlayer of [24, 25, 26]) {
+        applyFixture(player, { ...fixture, baseSlayer, currentSlayer: 1 });
+        assert.equal(combatLevel(player), 70, 'cockatrice reachability fixture is exactly CB70');
+        const accepted = runInt(player, '[proc,validate_slayer_target]', npc, [cockatrice]).value;
+        assert.equal(accepted, baseSlayer >= 25 ? 1 : 0, 'cockatrice uses base Slayer25, not current Slayer');
+        thresholds.push({ baseSlayer, currentSlayer: 1, accepted: accepted === 1 });
+    }
+    return { mappings, elfGate: 'unfinished exclusion; no true mock', thresholds, endpoints: drawLiveRowEndpoints('chaeldar', 'cockatrice', fixture) };
+}
+
 
 function testOldTableRepairs(basePack) {
     loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
     const results = [];
-    for (const [id, check] of [['S3 duplicate bats', turaelBatMultiplicity], ['S3 bear predicate', testTuraelPredicate]]) {
+    const checks = [
+        ['S3 duplicate bats', turaelBatMultiplicity],
+        ['S3 bear predicate', testTuraelPredicate],
+        ['S6 elf mapping', () => assertChaeldarRetarget('elves', 'elf', 8)],
+        ['S6 cockatrice mapping', () => assertChaeldarRetarget('cockatrice', 'cockatrice', 6)],
+        ['S6 real cockatrice draw', () => drawLiveRowEndpoints('chaeldar', 'cockatrice', chaeldarCockatriceFixture())]
+    ];
+    for (const [id, check] of checks) {
         let error;
         try { check(); } catch (failure) { error = failure; }
         assert(error instanceof assert.AssertionError, `${id}: published pack did not fail the new product assertion`);
@@ -1606,6 +1646,7 @@ function testCurrentSuite() {
     const masterSnapshots = testMasterSnapshots();
     const turaelPredicate = testTuraelPredicate();
     const ernest = ['mazchna', 'vannaka'].filter(key => MASTER_TABLES[key]).map(testErnestGate);
+    const chaeldarRetargets = MASTER_TABLES.chaeldar ? testChaeldarRetargets() : null;
     const admission = testCombatAndMasterAdmission();
     const harpieThreshold = testHarpieThreshold();
     const thresholds = testThresholds();
@@ -1652,7 +1693,7 @@ function testCurrentSuite() {
     const dispatch = testDispatchAndOneShotOrder(packedRows);
     const teachingAdmission = testCurrentTeachingAdmission();
     const teachingSuccess = testCurrentTeachingSuccess();
-    return { packedRows, masterSnapshots, turaelPredicate, ernest, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+    return { packedRows, masterSnapshots, turaelPredicate, ernest, chaeldarRetargets, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
 }
 
 function fixtureSourceRows() {
@@ -2014,6 +2055,7 @@ try {
             masterSnapshots: current.masterSnapshots,
             turaelPredicate: current.turaelPredicate,
             ernest: current.ernest,
+            chaeldarRetargets: current.chaeldarRetargets,
             admission: current.admission,
             harpieThreshold: current.harpieThreshold,
             thresholds: current.thresholds,
