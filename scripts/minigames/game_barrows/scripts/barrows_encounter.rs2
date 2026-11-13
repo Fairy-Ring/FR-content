@@ -1,0 +1,77 @@
+// Original slain-name joins define the six run identities. Ownership, lifetime
+// and cleanup scheduling are UNKNOWN engineering policy, not recovered combat.
+[proc,barrows_brother_identity](npc $brother)(int)
+// Missing string-enum keys use the engine's int fallback; admit only the finite
+// brother domain established by the original typed crypt-entry join.
+def_coord $entry = enum(npc, coord, barrows_brother_crypt_entry, $brother);
+if (~barrows_inside($entry) = false | coordy($entry) ! 3) return(0);
+def_string $slain = enum(npc, string, barrows_brother_slain_varbit, $brother);
+if (compare($slain, "barrows_killed_ahrim") = 0) return(1);
+if (compare($slain, "barrows_killed_dharok") = 0) return(2);
+if (compare($slain, "barrows_killed_guthan") = 0) return(3);
+if (compare($slain, "barrows_killed_karil") = 0) return(4);
+if (compare($slain, "barrows_killed_torag") = 0) return(5);
+if (compare($slain, "barrows_killed_verac") = 0) return(6);
+return(0);
+
+[proc,barrows_brother_slain](int $identity)(boolean)
+if ($identity < 1 | $identity > ^barrows_identity_count) return(false);
+if (testbit(%barrows_kills, calc(^barrows_slain_start + $identity - 1)) = 1) return(true);
+return(false);
+
+// The primary NPC pointer is preserved. A foreign owner or an old generation
+// never suppresses this owner's current encounter.
+[proc,barrows_brother_find](npc $brother)(boolean)
+if (%barrows_generation <= 0) return(false);
+.npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
+while (.npc_findnext = true) {
+    if (.npc_type = $brother & .%npc_barrows_owner = uid & .%npc_barrows_generation = %barrows_generation & .npc_stat(hitpoints) > 0 & ~barrows_inside(.npc_coord) = true) return(true);
+}
+.npc_findallany(3_55_151_32_32, ^barrows_actor_scan_radius, 0);
+while (.npc_findnext = true) {
+    if (.npc_type = $brother & .%npc_barrows_owner = uid & .%npc_barrows_generation = %barrows_generation & .npc_stat(hitpoints) > 0 & ~barrows_inside(.npc_coord) = true) return(true);
+}
+return(false);
+
+// Callers choose a legal destination tile and their named lifetime. Deliberately
+// no duplicate check here: D4 twins use the same owner/generation constructor.
+[proc,barrows_actor_spawn](npc $type, coord $tile, int $lifetime)
+def_int $phase = ~barrows_phase;
+if ($phase ! ^barrows_phase_unlooted & $phase ! ^barrows_phase_paid) return;
+if (%barrows_generation <= 0 | $tile = null | ~barrows_inside(coord) = false | ~barrows_inside($tile) = false | ~barrows_actor_type($type) = false) return;
+npc_add($tile, $type, $lifetime);
+%npc_barrows_owner = uid;
+%npc_barrows_generation = %barrows_generation;
+npc_settimer(^barrows_owner_check_ticks);
+
+// Shared melee/ranged/autocast and opted-magic gates call the same narrow guard.
+[proc,barrows_actor_attackable]()(boolean)
+if (%npc_barrows_generation <= 0) return(true);
+if (~barrows_actor_type(npc_type) = false) return(true);
+def_int $phase = ~barrows_phase;
+if (%npc_barrows_owner = uid & %npc_barrows_generation = %barrows_generation & ~barrows_inside(coord) = true & ~barrows_inside(npc_coord) = true & ($phase = ^barrows_phase_unlooted | $phase = ^barrows_phase_paid)) return(true);
+mes("Someone else is fighting that.");
+return(false);
+
+[proc,barrows_actor_tick]
+if (%npc_barrows_generation <= 0) return;
+if (finduid(%npc_barrows_owner) = false) {
+    npc_del;
+    return;
+}
+def_int $phase = ~barrows_phase;
+if (~barrows_inside(coord) = false | ~barrows_inside(npc_coord) = false | %npc_barrows_generation ! %barrows_generation | ($phase ! ^barrows_phase_unlooted & $phase ! ^barrows_phase_paid)) npc_del;
+
+[ai_timer,barrows_ahrim] ~barrows_actor_tick;
+[ai_timer,barrows_dharok] ~barrows_actor_tick;
+[ai_timer,barrows_guthan] ~barrows_actor_tick;
+[ai_timer,barrows_karil] ~barrows_actor_tick;
+[ai_timer,barrows_torag] ~barrows_actor_tick;
+[ai_timer,barrows_verac] ~barrows_actor_tick;
+[ai_timer,barrows_rat] ~barrows_actor_tick;
+[ai_timer,barrows_bloodworm] ~barrows_actor_tick;
+[ai_timer,barrows_spider] ~barrows_actor_tick;
+[ai_timer,barrows_giantrat] ~barrows_actor_tick;
+[ai_timer,barrows_skeleton_unarmed] ~barrows_actor_tick;
+[ai_timer,barrows_skeleton_armed] ~barrows_actor_tick;
+[ai_timer,barrows_giantspider] ~barrows_actor_tick;

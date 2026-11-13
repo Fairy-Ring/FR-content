@@ -36,3 +36,11 @@ node --import tsx ../content/tests/barrows/test_entry.mjs
 ```
 
 This check executes the packed entry, leave, logout and resume procs. It checks all six joined destinations and inverse exits, pre-loot retention, paid reset, exact saved countdown retention, and HUD reconstruction after login. Shared offline fixtures resolve generated config ids by name.
+
+## Owned encounters (S03)
+
+```sh
+node --import tsx ../content/tests/barrows/test_owned.mjs
+```
+
+This check executes all six packed Search handlers with native loc/NPC fixtures. It covers the original slain joins, selected/credited suppression, private immutable owner and captured generation, both shared attack gates, independent owners, cleanup and uncredited retry. Mutable combat targeting does not make a map monster an owned summon. Offline placement-radius allocation is not a terrain proof; the natural live Search supplies that evidence. Brother combat styles and special attacks remain outside this group.

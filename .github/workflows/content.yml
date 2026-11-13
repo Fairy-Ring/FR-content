@@ -149,6 +149,7 @@ jobs:
           run_test tests/barrows/test_config.mjs node ../content/tests/barrows/test_config.mjs --content-root ../content
           run_test tests/barrows/test_core.mjs node --import tsx ../content/tests/barrows/test_core.mjs
           run_test tests/barrows/test_entry.mjs node --import tsx ../content/tests/barrows/test_entry.mjs
+          run_test tests/barrows/test_owned.mjs node --import tsx ../content/tests/barrows/test_owned.mjs
           run_test tests/citizen-tables/test_citizen_tables.mjs node --import tsx ../content/tests/citizen-tables/test_citizen_tables.mjs
           run_test tests/cfg-other/test_cfg_other.mjs node --import tsx ../content/tests/cfg-other/test_cfg_other.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs

@@ -200,6 +200,8 @@ if(npc_type = horror_dagannoth_jr4 | npc_category = dagannoth_mother) {
     }
 }
 
+if (~barrows_actor_attackable = false) return(false);
+
 if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded) & %npc_attacking_uid ! uid) {
     mes("Someone else is fighting that.");
     return(false);
@@ -288,6 +290,8 @@ if (npc_type = count_draynor) {
         return(false);
     }
 }
+if (~barrows_actor_attackable = false) return(false);
+
 if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded) & %npc_attacking_uid ! uid) {
     mes("Someone else is fighting that.");
     return(false);

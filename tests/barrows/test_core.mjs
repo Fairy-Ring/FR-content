@@ -176,7 +176,8 @@ async function main() {
     state: parsePackedId(CONTENT_ROOT, 'varp', 'barrows_state'),
     generation: parsePackedId(CONTENT_ROOT, 'varp', 'barrows_generation'),
     countdowns: parsePackedId(CONTENT_ROOT, 'varp', 'barrows_countdowns'),
-    attackingUid: parsePackedId(CONTENT_ROOT, 'varn', 'npc_attacking_uid'),
+    actorOwner: parsePackedId(CONTENT_ROOT, 'varn', 'npc_barrows_owner'),
+    actorGeneration: parsePackedId(CONTENT_ROOT, 'varn', 'npc_barrows_generation'),
     npcTypes: Object.fromEntries(BARROWS_TYPES.map(name => [name, parsePackedId(CONTENT_ROOT, 'npc', name)]))
   };
   assert.deepEqual(
@@ -194,8 +195,10 @@ async function main() {
     assert.equal(VarPlayerType.getId(name), id, `packed varp identity for ${name}`);
     assert(VarPlayerType.get(id), `packed varp config missing ${name}`);
   }
-  assert.equal(VarNpcType.getId('npc_attacking_uid'), ids.attackingUid);
-  assert(VarNpcType.get(ids.attackingUid), 'npc_attacking_uid config is missing');
+  for (const [name, id] of [['npc_barrows_owner', ids.actorOwner], ['npc_barrows_generation', ids.actorGeneration]]) {
+    assert.equal(VarNpcType.getId(name), id);
+    assert(VarNpcType.get(id), `${name} config is missing`);
+  }
   for (const [name, id] of Object.entries(ids.npcTypes)) {
     assert.equal(NpcType.getId(name), id, `packed NPC identity for ${name}`);
     assert(NpcType.get(id), `packed NPC config missing ${name}`);
@@ -296,7 +299,8 @@ async function main() {
     const type = NpcType.get(typeId);
     const npc = new Npc(level, x, z, type.size, type.size, lifecycle, World.getNextNid(), typeId, BlockWalk.NONE);
     World.addNpc(npc, -1);
-    npc.setVar(ids.attackingUid, ownerUid);
+    npc.setVar(ids.actorOwner, ownerUid);
+    npc.setVar(ids.actorGeneration, ownerUid > 0 ? 1 : 0);
     assert(npc.isActive, `World.addNpc did not activate ${typeName} at L${level}`);
     const record = { npc, nid: npc.nid, typeName, level, ownerUid };
     spawnedActors.push(record);

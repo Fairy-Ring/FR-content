@@ -54,12 +54,13 @@ export async function loadPackedRuntime(options = {}) {
   assert(fs.existsSync(scriptDat), `missing compiled script.dat at ${scriptDat} — build the selected engine pack first`);
   const eng = relative => import(pathToFileURL(path.join(roots.engineRoot, relative)).href);
   const loadDefault = async relative => (await eng(relative)).default;
-  const [World, Player, Npc, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType, VarBitType,
-    VarNpcType, LocType, NpcType, EnumType, InvType, ObjType, FontType, Component, JavaRandom,
+  const [World, Player, Npc, Loc, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType, VarBitType,
+    VarNpcType, LocType, NpcType, EnumType, DbRowType, DbTableType, DbTableIndex, InvType, ObjType, FontType, Component, JavaRandom,
     { EntityLifeCycle }, { BlockWalk }, { CoordGrid }, { allocateIfAbsent }] = await Promise.all([
     loadDefault('src/engine/World.ts'),
     loadDefault('src/engine/entity/Player.ts'),
     loadDefault('src/engine/entity/Npc.ts'),
+    loadDefault('src/engine/entity/Loc.ts'),
     loadDefault('src/engine/script/ScriptProvider.ts'),
     loadDefault('src/engine/script/ScriptRunner.ts'),
     loadDefault('src/engine/script/ScriptState.ts'),
@@ -69,6 +70,9 @@ export async function loadPackedRuntime(options = {}) {
     loadDefault('src/cache/config/LocType.ts'),
     loadDefault('src/cache/config/NpcType.ts'),
     loadDefault('src/cache/config/EnumType.ts'),
+    loadDefault('src/cache/config/DbRowType.ts'),
+    loadDefault('src/cache/config/DbTableType.ts'),
+    loadDefault('src/cache/config/DbTableIndex.ts'),
     loadDefault('src/cache/config/InvType.ts'),
     loadDefault('src/cache/config/ObjType.ts'),
     loadDefault('src/cache/config/FontType.ts'),
@@ -79,10 +83,11 @@ export async function loadPackedRuntime(options = {}) {
     eng('src/engine/CoordGrid.ts'),
     eng('src/engine/routefinder/index.ts')
   ]);
-  for (const config of [VarPlayerType, VarBitType, VarNpcType, LocType, NpcType, EnumType, InvType, ObjType, FontType, Component]) config.load(roots.packDir);
+  for (const config of [VarPlayerType, VarBitType, VarNpcType, LocType, NpcType, EnumType, DbRowType, DbTableType, InvType, ObjType, FontType, Component]) config.load(roots.packDir);
+  DbTableIndex.init();
   assert(FontType.get(3), `FontType q8_full is missing in ${roots.packDir}`);
   assert(ScriptProvider.load(roots.packDir) > 0, `ScriptProvider.load found no compiled scripts in ${roots.packDir}`);
-  return { ...roots, World, Player, Npc, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType,
+  return { ...roots, World, Player, Npc, Loc, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType,
     VarBitType, VarNpcType, LocType, NpcType, EnumType, InvType, ObjType, FontType, Component, JavaRandom,
     EntityLifeCycle, BlockWalk, CoordGrid, allocateIfAbsent };
 }
@@ -137,7 +142,14 @@ export function createRunner(runtime, { prefix = 'barrows_test', firstUid = 8100
     const npc = new Npc(level, x, z, type.size, type.size, lifecycle, World.getNextNid(), typeId, BlockWalk.NONE);
     World.addNpc(npc, -1);
     // addNpc resets vars; ownership must be assigned only after insertion.
-    if (ownerUid !== undefined && ownerUid !== null) npc.setVar(VarNpcType.getId('npc_attacking_uid'), ownerUid);
+    if (ownerUid !== undefined && ownerUid !== null) {
+      const owner = VarNpcType.getId('npc_barrows_owner');
+      const generation = VarNpcType.getId('npc_barrows_generation');
+      assert.notEqual(owner, -1, 'owned fixture requires npc_barrows_owner');
+      assert.notEqual(generation, -1, 'owned fixture requires npc_barrows_generation');
+      npc.setVar(owner, ownerUid);
+      npc.setVar(generation, 1);
+    }
     assert(npc.isActive, `World.addNpc did not activate ${typeName} at L${level}`);
     const row = { npc, nid: npc.nid, typeName, level, ownerUid };
     spawnedActors.push(row);
