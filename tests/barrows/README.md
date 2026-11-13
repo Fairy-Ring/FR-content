@@ -63,6 +63,7 @@ node --import tsx ../content/tests/barrows/test_hint.mjs
 Unowned tunnel monsters retain the published default poison timer, including the rat's first 35-to-31 hitpoint step. Owned actors use the shared counted poison helper without interrupting their one-tick owner check. Native turns cover the whole poison countdown and removal within one tick of departure, before and after poison ends. Poison is the published combat rule; counting timer runs is engineering.
 
 Each awakened brother sends the existing `hint_npc` command only to its owner. The packed checks read the real hint packets at spawn, death, removal, timer departure and logout, with a second-player negative control. Ordinary tunnel monsters get no brother hint. This CANDIDATE appearance follows the near-target video and official picture; it changes no client cache bytes. The command precedent is the Haunted Mine ghost's appearance in `hauntedmine_boss_ghost.rs2`.
+Both players are registered in the world's player slots and native zone list, so the second-player control also detects an accidental area broadcast.
 
 ## Monster configuration (S04)
 

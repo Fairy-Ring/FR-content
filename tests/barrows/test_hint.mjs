@@ -9,6 +9,7 @@ await run(async () => {
   const players = [];
   const vars = Object.fromEntries(['barrows_state', 'barrows_generation'].map(name => [name, VarPlayerType.getId(name)]));
   const owner = VarNpcType.getId('npc_barrows_owner');
+  const playerZone = World.gameMap.getZone(3556, 9714, 3);
   const make = label => {
     const p = runner.makePlayer(label, 3, 3556, 9714);
     p.slot = p.pid = p.uid = players.length + 1;
@@ -16,6 +17,7 @@ await run(async () => {
     p.setVar(vars.barrows_state, 11);
     p.setVar(vars.barrows_generation, 44);
     World.players[p.slot] = p;
+    playerZone.enter(p);
     players.push(p);
     return p;
   };
@@ -83,6 +85,9 @@ await run(async () => {
     console.log('PASS Barrows owner-only NPC hint packets for six brothers, death, removal, timer departure and logout');
   } finally {
     for (const npc of Array.from(World.npcs)) if (npc.isActive) World.removeNpc(npc, -1);
-    for (const p of players) delete World.players[p.slot];
+    for (const p of players) {
+      playerZone.leave(p);
+      delete World.players[p.slot];
+    }
   }
 });
