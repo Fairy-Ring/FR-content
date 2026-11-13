@@ -1,0 +1,5 @@
+[trail_puzzlehint_display]
+scope=temp
+size=25
+protect=no
+dummyinv=yes
