@@ -716,7 +716,11 @@ function openShop(player, shopName, title) {
   const side = componentId('shop_template_side');
   assert.equal(player.modalMain, main, `${shopName} opens the published shop main interface`);
   assert.equal(player.modalSide, side, `${shopName} opens the published player inventory interface`);
-  assert.ok(text(player).includes(title), `${shopName} uses the packed NPC shop title`);
+  assert.deepEqual(
+    componentTexts(player).filter(([component]) => component === componentId('shop_template:com_76')).map(([, value]) => value),
+    [title],
+    `${shopName} displays the exact packed NPC shop title`
+  );
   const shopType = requiredId(types.InvType, shopName);
   const shopCom = componentId('shop_template:inv');
   const playerCom = componentId('shop_template_side:inv');
@@ -769,7 +773,7 @@ check('quartermaster Talk-to opens parameterized base zero stock before completi
   const buy = npcType.params.get(params.buy);
   const sell = npcType.params.get(params.sell);
   const delta = npcType.params.get(params.delta);
-  assert.equal(typeof title, 'string');
+  assert.equal(title, "Quartermaster's Stores", 'the packed shop title matches ruling A1');
   assert.equal(npcType.params.get(params.ownedShop), requiredId(types.InvType, baseShop), 'NPC owns the published base stock');
   assert.equal(typeof buy, 'number');
   assert.equal(typeof sell, 'number');
@@ -826,7 +830,7 @@ check('quartermaster stock and published params remain readable directly from pa
   };
   assert.equal(count(base, halberd), 0);
   assert.equal(count(after, halberd), 5);
-  assert.equal(type.params.get(requiredId(types.ParamType, 'shop_title')), "Quatermaster's Stores");
+  assert.equal(type.params.get(requiredId(types.ParamType, 'shop_title')), "Quartermaster's Stores");
 });
 
 console.log(`RESULT ${failures.length ? 'FAIL' : 'PASS'} regicide-travel: ${passed} passed, ${failures.length} failed; ${builtTriggers.length} built, ${notBuiltTriggers.size} explicitly not built`);
