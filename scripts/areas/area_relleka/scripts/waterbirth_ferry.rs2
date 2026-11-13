@@ -1,0 +1,167 @@
+// Research subject: waterbirth-ferry; U-WATERBIRTH-1113.
+// CANDIDATE dialogue/fare/quick-travel policy from later sources; see registered facts.
+// VERIFIED 377 NPC aliases, morph bit, interface and directional animations are reused.
+[opnpc1,viking_dagganoth_cave_ferryman_rellekka]
+@waterbirth_ferry_talk;
+
+[opnpc1,viking_dagganoth_cave_ferryman_1op]
+@waterbirth_ferry_talk;
+
+[opnpc1,viking_dagganoth_cave_ferryman_island]
+@waterbirth_ferry_talk;
+
+[opnpc3,viking_dagganoth_cave_ferryman_rellekka]
+~waterbirth_ferry_outward;
+
+[opnpc3,viking_dagganoth_cave_ferryman_island]
+~waterbirth_ferry_outward;
+
+[label,waterbirth_ferry_talk]
+if (%viking < ^viking_complete) {
+    ~chatnpc("<p,neutral>What do you want from me outerlander? It is our policy not to associate with those not of our tribe.");
+    switch_int (~p_choice3_header("Where is your chieftain?", 1, "What Jarvald is doing.", 2, "Nothing", 3, "What would you like to ask about?")) {
+        case 1 : @waterbirth_ferry_chieftain;
+        case 2 : @waterbirth_ferry_expedition;
+        case 3 : @waterbirth_ferry_nothing;
+    }
+}
+~chatnpc("<p,neutral>Greetings, <~get_viking_name>!");
+if (compare(~get_viking_name, "Jarvald") = 0) {
+    ~chatnpc("<p,neutral>Ah, and what a glorious name that is! Worthy of only the finest warriors!");
+    ~chatplayer("<p,neutral>Heh. Yup, you're right there.");
+}
+~chatnpc("<p,neutral>So what brings you back to fair Rellekka? It has been too long since you have drunk in the longhall with us and sang of your battles!");
+switch_int (~p_choice2("What Jarvald is doing.", 1, "Nothing", 2)) {
+    case 1 : @waterbirth_ferry_expedition;
+    case 2 : @waterbirth_ferry_nothing;
+}
+
+[label,waterbirth_ferry_chieftain]
+~chatplayer("<p,neutral>Where is your chieftain? I find it highly discriminatory to refuse to talk to someone on the grounds that they are not part of your tribe.");
+~chatnpc("<p,neutral>I don't rightly understand your speech outerlander, but my loyalty is with Chieftain Brundt.");
+~chatnpc("<p,neutral>He resides in our longhall; it is the large building over there, you should speak to him for he speaks for us all.");
+
+[label,waterbirth_ferry_nothing]
+~chatplayer("<p,neutral>Actually, I don't think I have anything to speak to you about...");
+
+[label,waterbirth_ferry_expedition]
+~chatplayer("<p,neutral>So what are you doing here?");
+if (%viking < ^viking_complete) {
+    ~chatnpc("<p,neutral>This should not concern you, outerlander. I am awaiting other Fremenniks to join me on an expedition to Waterbirth Island.");
+} else {
+    ~chatnpc("<p,neutral>You have not heard, <~get_viking_name>? I am leading an expedition to Waterbirth Island!");
+}
+@waterbirth_ferry_expedition_menu;
+
+[label,waterbirth_ferry_expedition_menu]
+switch_int (~p_choice4("Waterbirth Island?", 1, "Can I come?", 2, "Nice hat!", 3, "Ok, 'bye.", 4)) {
+    case 1 : @waterbirth_ferry_island;
+    case 2 : @waterbirth_ferry_come;
+    case 3 : @waterbirth_ferry_hat;
+    case 4 : @waterbirth_ferry_bye;
+}
+
+[label,waterbirth_ferry_island]
+if (%viking < ^viking_complete) {
+    ~chatnpc("<p,neutral>It is a small crescent-shaped island just north-west of here, outerlander.");
+    ~chatnpc("<p,neutral>We have many legends about it, such as the tale of the broken sky, and the day of the green seas.");
+    ~chatnpc("<p,neutral>The reason I am travelling there is more serious Fremennik business, however. I doubt an outerlander would be interested.");
+} else {
+    ~chatnpc("<p,neutral>You have not ever travelled to Waterbirth Island, <~get_viking_name>? I am surprised, it is a place of outstanding natural beauty.");
+    ~chatnpc("<p,neutral>Or at least it used to be! But things have now changed...");
+    ~chatplayer("<p,neutral>Changed? How do you mean, changed?");
+    ~chatnpc("<p,neutral>It seems as though the sea-beasts known to us as the dagger-mouths have begun their hatching once again... And there may be others of their ilk there too.");
+    ~chatplayer("<p,neutral>Dagger-mouths?");
+    ~chatnpc("<p,neutral>Aye, the dagger-mouths! The vile creatures lived near here once, but we had thought them all driven back to the ocean depths many moons past.");
+    ~chatnpc("<p,neutral>I can only imagine a dagger-mouth queen has nested somewhere nearby,");
+    ~chatnpc("<p,neutral>and spawned her foul brood under the sea once more, and some of them have migrated to fair Waterbirth Island.");
+    ~chatplayer("<p,neutral>So you're scared they might attack Rellekka?");
+    ~chatnpc("<p,neutral>Scared? Ha ha ha!");
+    ~chatnpc("<p,neutral>You wound us with your questioning, <~get_viking_name>!");
+    ~chatnpc("<p,neutral>We are glad the dagger-mouths have returned to these shores, for it means we will get the chance to hunt them once again as our ancestors did!");
+    ~chatnpc("<p,neutral>When treated in the correct manner, the creatures' remains can be used to make fine battleworthy armour!");
+}
+@waterbirth_ferry_expedition_menu;
+
+[label,waterbirth_ferry_come]
+~chatplayer("<p,neutral>Can I come?");
+if (%viking < ^viking_complete) {
+    ~chatnpc("<p,neutral>An outerlander join us on an honoured hunt???");
+    ~chatnpc("<p,neutral>Well.... I guess... I might be able to allow you to join us, although it is a breach of many of our customs...");
+    ~chatplayer("<p,neutral>Oh, pleeeeease? I really LOVE killing stuff!");
+    ~chatnpc("<p,neutral>Well... I remain unconvinced that it would be wise to allow an outerlander to join us in such dangerous battle,");
+    ~chatnpc("<p,neutral>but your enthusiasm seems genuine enough...");
+    ~chatnpc("<p,neutral>I will allow you to escort us, but you must pay me a sum of money first.");
+    ~chatplayer("<p,neutral>What? That's outrageous, why charge me money? And, uh, how much does it cost me?");
+    ~chatnpc("<p,neutral>Ah, the outerlanders have stolen from my people for many years, in this way you can help my community with a small amount of money...");
+    ~chatnpc("<p,neutral>Let us say... 1,000 coins. Payable in advance, of course.");
+    ~chatnpc("<p,neutral>For this I will take you to Waterbirth Island on my boat, and will bring you back here when you have had your fill of the hunt.");
+    ~chatnpc("<p,neutral>Assuming you are still alive to wish to leave, of course.");
+    ~chatnpc("<p,neutral>So do you have the 1,000 coins for my service, and are you ready to leave now?");
+} else {
+    ~chatnpc("<p,neutral>Of course, <~get_viking_name>! Your presence is more than welcome on this cull! You wish to leave now?");
+}
+if (~p_choice2("YES", 1, "NO", 2) = 1) {
+    ~waterbirth_ferry_outward;
+    return;
+}
+~chatplayer("<p,neutral>No, actually I have some stuff to do here first.");
+~chatnpc("<p,neutral>As you wish. Come and see me when your bloodlust needs sating.");
+
+[label,waterbirth_ferry_hat]
+~chatplayer("<p,neutral>Hey, I have to say, that's a fine looking hat you are wearing there.");
+if (%viking < ^viking_complete) {
+    ~chatnpc("<p,neutral>It is actually a helm, outerlander, but the sentiment is appreciated nonetheless.");
+    return;
+}
+~chatnpc("<p,neutral>Aye, that it is <~get_viking_name>! Skulgrimen fashioned it for me from the carcass of one of the monsters on Waterbirth Island after our last hunt!");
+~chatnpc("<p,neutral>I hope to kill enough creatures to fashion some fine armour as well when next we leave!");
+@waterbirth_ferry_expedition_menu;
+
+[label,waterbirth_ferry_bye]
+~chatplayer("<p,neutral>Wow, you Fremenniks sure know how to party. Well, see ya around.");
+
+[proc,waterbirth_ferry_outward]
+if (%viking < ^viking_complete) {
+    // UNKNOWN Jarvald refusal wording: no inherited or invented line, delay or debit.
+    if (inv_total(inv, coins) < ^waterbirth_ferry_reconstructed_fare) {
+        if_close;
+        return;
+    }
+    inv_del(inv, coins, ^waterbirth_ferry_reconstructed_fare);
+}
+~waterbirth_ferry_journey(dagganoth_shipjourney_to_dagganoth, ^waterbirth_ferry_reconstructed_island);
+%dagganoth_area_project = setbit(%dagganoth_area_project, 13);
+if (%viking < ^viking_complete) {
+    ~chatnpc("<p,neutral>I suggest you head to the cave with some urgency outerlander, the cold air out here might be too much for the likes of you...");
+}
+
+[opnpc1,viking_dagganoth_cave_waterbirth_island]
+if (%viking < ^viking_complete) {
+    ~chatnpc("<p,neutral>Ah, you live yet, outerlander!");
+    ~chatnpc("<p,neutral>Have you had your fill of the hunt and wish to return, or are you still feeling the joy of the cull?");
+} else {
+    ~chatnpc("<p,neutral>Ah, <~get_viking_name>! Such glorious battle makes you feel glad of life, does it not?");
+    ~chatnpc("<p,neutral>So what say you, stay here for the hunt, or return home to sweet Rellekka to feast and drink with your tribe?");
+}
+if (~p_choice2("I wish to return to Rellekka.", 1, "I want to stay here.", 2) = 1) {
+    ~chatplayer("<p,neutral>I wish to return to Rellekka.");
+    ~chatnpc("<p,neutral>Then let us away; There will be death to bring here another day!");
+    @waterbirth_ferry_return;
+}
+~chatplayer("<p,neutral>I want to stay here.");
+~chatnpc("<p,neutral>Ha Ha Ha! A true huntsman at heart!");
+~chatnpc("<p,neutral>I myself have killed over a hundred of the dagger- mouths, and did not think it too many!");
+
+[opnpc3,viking_dagganoth_cave_waterbirth_island]
+@waterbirth_ferry_return;
+
+[label,waterbirth_ferry_return]
+~waterbirth_ferry_journey(dagganoth_shipjourney_to_rellekka, ^waterbirth_ferry_reconstructed_rellekka);
+
+[proc,waterbirth_ferry_journey](seq $animation, coord $destination)
+~sail_open(misc_shipjourney);
+if_setanim(misc_shipjourney:com_6, $animation);
+// Exclude the cache's terminal held frame; round active 20ms cycles up to game ticks.
+p_delay(calc((seqlength($animation) - ^waterbirth_ferry_map_hold_cycles + 29) / 30));
+~sail_close($destination);
