@@ -1323,7 +1323,9 @@ scope=perm
 
 [varp653_unused]
 
-[varp654_unused]
+[barrows_state]
+scope=perm
+transmit=no
 
 [fever_cannon_var]
 transmit=yes
@@ -1334,9 +1336,13 @@ transmit=yes
 [fever_storage_var]
 transmit=yes
 
-[varp659_unused]
+[barrows_generation]
+scope=perm
+transmit=no
 
-[varp660_unused]
+[barrows_countdowns]
+scope=perm
+transmit=no
 
 [slayer_killerwatt_var]
 transmit=yes

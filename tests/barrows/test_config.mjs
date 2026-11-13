@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Offline S00 contract: source-backed config joins and every mapped tunnel parent placement.
+// Offline S00/S04 contract: source-backed config joins and every mapped tunnel parent placement.
 // Run from content: node tests/barrows/test_config.mjs --content-root .
 // The --mutant modes alter only an in-memory config string and must fail without touching the root.
 import assert from 'node:assert/strict';
@@ -120,7 +120,11 @@ function parseIdPack(text, source) {
 function enumValues(parsed, sectionName) {
     const fields = section(parsed, sectionName);
     const result = new Map();
-    for (const value of values(fields, 'val')) {
+    for (const [index, value] of values(fields, 'val').entries()) {
+        if (one(fields, 'inputtype', parsed.source) === 'autoint') {
+            result.set(String(index), value);
+            continue;
+        }
         const comma = value.indexOf(',');
         assert(comma > 0, `${parsed.source} [${sectionName}]: malformed val=${value}`);
         const key = value.slice(0, comma);
@@ -204,7 +208,10 @@ const ENUM_SIGNATURES = new Map([
     ['barrows_brother_crypt_entry', ['npc', 'coord']],
     ['barrows_stair_surface_exit', ['loc', 'coord']],
     ['barrows_room_edges_by_lock', ['int', 'string']],
-    ['barrows_door_lock_state', ['int', 'string']]
+    ['barrows_door_lock_state', ['int', 'string']],
+    ['barrows_monster_level', ['npc', 'int']],
+    ['barrows_door_class_npc', ['autoint', 'npc']],
+    ['barrows_door_draw_class', ['int', 'string']]
 ]);
 
 
@@ -305,15 +312,15 @@ for (const name of ['barrows', 'barrows_kills']) {
     assert.equal(one(fields, 'scope', 'all.varp'), 'perm', `[${name}] scope`);
 }
 const barrowsVarps = [...varpPack.byId].filter(([, name]) => name.startsWith('barrows')).sort(([left], [right]) => left - right);
-assert.deepEqual(barrowsVarps, [[452, 'barrows'], [453, 'barrows_kills']]);
+assert.deepEqual(barrowsVarps, [[452, 'barrows'], [453, 'barrows_kills'], [654, 'barrows_state'], [659, 'barrows_generation'], [660, 'barrows_countdowns']]);
 for (const id of [650, 651, 652, 653]) {
     assert(!varpPack.byId.get(id)?.startsWith('barrows'), `reserved varp ${id} was assigned to Barrows`);
 }
-for (const id of [654, 659, 660]) {
-    const name = `varp${id}_unused`;
-    assert.equal(varpPack.byId.get(id), name, `original unused varp ${id} identity changed`);
-    assert.equal(values(section(allVarps, name), 'scope').length, 0, `${name} must remain unnamed and untouched`);
-    assert.equal(values(section(allVarps, name), 'transmit').length, 0, `${name} must remain untouched`);
+for (const [id, name] of [[654, 'barrows_state'], [659, 'barrows_generation'], [660, 'barrows_countdowns']]) {
+    assert.equal(varpPack.byId.get(id), name, `allocated server varp ${id}`);
+    const fields = section(allVarps, name);
+    assert.equal(one(fields, 'scope', 'all.varp'), 'perm', `[${name}] scope`);
+    assert.equal(one(fields, 'transmit', 'all.varp'), 'no', `[${name}] transmit`);
 }
 
 const allVarbits = parseSections(readText('scripts/_unpack/377/all.varbit'), 'all.varbit');
@@ -344,7 +351,6 @@ for (const [name, [inputType, outputType]] of ENUM_SIGNATURES) {
 
 const noModelConfigs = `${enumText}\n${readText(PARAM_PATH)}`;
 assert(!/\bmodel\w*\s*=|\b4623\b|\b45(?:44|45|46|47|48|49|50|51|52|53|54|55|56|57)\b/i.test(noModelConfigs), 'S00 must not add guessed puzzle model joins');
-assert(!fs.existsSync(path.join(contentRoot, 'scripts/minigames/game_barrows/configs/barrows.constant')), 'S00 does not allocate server-only constants');
 
 const expectedSarcToBrother = new Map(ENCOUNTERS.map(({ sarc, brother }) => [sarc, brother]));
 const expectedSlainByBrother = new Map(ENCOUNTERS.map(({ brother, slain }) => [brother, slain]));
@@ -357,6 +363,37 @@ assert.deepEqual(enumValues(enums, 'barrows_stair_surface_exit'), expectedExitBy
 const allLoc = parseSections(readText('scripts/_unpack/377/all.loc'), 'all.loc');
 const allNpcs = parseSections(readText('scripts/_unpack/377/all.npc'), 'all.npc');
 const stairsConfig = parseSections(readText('scripts/ladders+stairs/configs/stairs.loc'), 'stairs.loc');
+
+// VERIFIED original level joins, CANDIDATE draw weights, UNKNOWN class encoding.
+const monsterLevels = new Map([
+    ['barrows_rat', '43'], ['barrows_bloodworm', '52'], ['barrows_spider', '56'],
+    ['barrows_giantrat', '76'], ['barrows_skeleton_unarmed', '77'],
+    ['barrows_skeleton_armed', '77'], ['barrows_giantspider', '79']
+]);
+assert.deepEqual(enumValues(enums, 'barrows_monster_level'), monsterLevels);
+for (const [name, level] of monsterLevels) assert.equal(one(section(allNpcs, name), 'vislevel', 'all.npc'), level, `${name} original combat level`);
+assert.deepEqual(enumValues(enums, 'barrows_door_class_npc'), new Map([
+    ['0', '^barrows_door_skeleton_npc'],
+    ['1', 'barrows_bloodworm'],
+    ['2', 'barrows_rat']
+]));
+assert.deepEqual(enumValues(enums, 'barrows_door_draw_class'), new Map(Array.from({ length: 128 }, (_, draw) => [
+    String(draw), draw < 12 ? 'brother' : draw < 64 ? 'skeleton' : draw < 96 ? 'bloodworm' : 'crypt_rat'
+])));
+const doorConstants = new Map([
+    ['barrows_door_skeleton_npc', 'barrows_skeleton_unarmed'],
+    ['barrows_door_spawn_min_radius', '0'], ['barrows_door_spawn_radius', '2'],
+    ['barrows_door_summon_lifetime', '1000'], ['barrows_door_summon_credit', '"owner_and_killer"'],
+    ['barrows_door_class_none', '-1'], ['barrows_door_class_brother', '3'],
+    ['barrows_door_class_skeleton', '0'], ['barrows_door_class_bloodworm', '1'],
+    ['barrows_door_class_crypt_rat', '2']
+]);
+const constantText = readText('scripts/minigames/game_barrows/configs/barrows.constant');
+for (const [name, expected] of doorConstants) {
+    const definitions = [...constantText.matchAll(new RegExp(`^\\^${name}\\s*=\\s*(.+)$`, 'gm'))];
+    assert.equal(definitions.length, 1, `one engineering constant ${name}`);
+    assert.equal(definitions[0][1].trim(), expected, `${name} selected engineering policy`);
+}
 
 for (const encounter of ENCOUNTERS) {
     assert.equal(locPack.byId.get(encounter.sarcId), encounter.sarc, `sarcophagus loc id ${encounter.sarcId}`);
@@ -378,24 +415,20 @@ for (const encounter of ENCOUNTERS) {
 }
 
 const digText = readText('scripts/minigames/game_barrows/scripts/barrows_dig.rs2');
-const digDestinations = new Map();
-const digPattern = /~barrows_dig_dest\(([^)]+)\);\s*\/\/\s*(Ahrim|Dharok|Guthan|Karil|Torag|Verac)\b/g;
-for (const match of digText.matchAll(digPattern)) digDestinations.set(`barrows_${match[2].toLowerCase()}`, match[1]);
-assert.equal(digDestinations.size, 6, 'original Dig must retain its six brother destinations');
-for (const [brother, entry] of expectedEntryByBrother) assert.equal(digDestinations.get(brother), entry, `[${brother}] entry must match barrows_dig.rs2`);
+const digPattern = /~barrows_dig_dest\(enum\(npc, coord, barrows_brother_crypt_entry, (barrows_\w+)\)\);/g;
+const digBrothers = [...digText.matchAll(digPattern)].map(match => match[1]);
+assert.deepEqual(digBrothers, [...expectedEntryByBrother.keys()], 'all six measured Dig branches consume their brother entry join');
 
 const stairsText = readText('scripts/ladders+stairs/scripts/stairs.rs2');
-const stairsDestinations = new Map();
+const delegatedStairs = [];
 let currentStair = null;
 for (const line of stairsText.split(/\r?\n/)) {
     const header = line.match(/^\[oploc1,barrows_stairs_(ahrim|dharok|guthan|karil|torag|verac)\]$/);
     if (header) currentStair = `barrows_stairs_${header[1]}`;
     else if (/^\[/.test(line)) currentStair = null;
-    const jump = line.match(/p_telejump\((0_\d+_\d+_\d+_\d+)\)/);
-    if (currentStair && jump) stairsDestinations.set(currentStair, jump[1]);
+    if (currentStair && line.trim() === '~barrows_stair_exit(loc_type);') delegatedStairs.push(currentStair);
 }
-assert.equal(stairsDestinations.size, 6, 'original stairs must retain six inverse destinations');
-for (const [stair, exit] of expectedExitByStair) assert.equal(stairsDestinations.get(stair), exit, `[${stair}] exit must match stairs.rs2`);
+assert.deepEqual(delegatedStairs, [...expectedExitByStair.keys()], 'all six stair operations delegate to the joined inverse exit');
 
 const roomEdges = enumValues(enums, 'barrows_room_edges_by_lock');
 assert.deepEqual(enumValues(enums, 'barrows_door_lock_state'), new Map([['0', 'unlocked'], ['1', 'locked']]));

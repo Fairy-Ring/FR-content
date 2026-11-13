@@ -1,0 +1,5 @@
+// UNKNOWN engineering ownership. Combat's npc_attacking_uid is mutable.
+[npc_barrows_owner]
+type=player_uid
+
+[npc_barrows_generation]

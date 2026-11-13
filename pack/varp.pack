@@ -652,13 +652,13 @@
 651=varp651_unused
 652=varp652_unused
 653=varp653_unused
-654=varp654_unused
+654=barrows_state
 655=fever_quest
 656=fever_cannon_var
 657=fever_extra_var
 658=fever_storage_var
-659=varp659_unused
-660=varp660_unused
+659=barrows_generation
+660=barrows_countdowns
 661=slayer_killerwatt_var
 662=musicmulti_13
 663=varp663_bits

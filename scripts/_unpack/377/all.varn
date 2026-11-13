@@ -14,6 +14,11 @@ type=player_uid
 
 [npc_poison]
 
+// Server-only opt-in for NPC types that own their timer.
+[npc_owned_timer_interval]
+
+[npc_poison_timer_runs]
+
 [npc_trawler_flood_status]
 
 [npc_trawler_fish_caught]

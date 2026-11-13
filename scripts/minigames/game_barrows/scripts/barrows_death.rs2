@@ -1,0 +1,59 @@
+// Original NPC identities retain their ordinary death and drop pipeline.
+[ai_queue3,barrows_ahrim] ~barrows_npc_death;
+[ai_queue3,barrows_dharok] ~barrows_npc_death;
+[ai_queue3,barrows_guthan] ~barrows_npc_death;
+[ai_queue3,barrows_karil] ~barrows_npc_death;
+[ai_queue3,barrows_torag] ~barrows_npc_death;
+[ai_queue3,barrows_verac] ~barrows_npc_death;
+[ai_queue3,barrows_rat] ~barrows_npc_death;
+[ai_queue3,barrows_bloodworm] ~barrows_npc_death;
+[ai_queue3,barrows_spider] ~barrows_npc_death;
+[ai_queue3,barrows_giantrat] ~barrows_npc_death;
+[ai_queue3,barrows_skeleton_unarmed] ~barrows_npc_death;
+[ai_queue3,barrows_skeleton_armed] ~barrows_npc_death;
+[ai_queue3,barrows_giantspider] ~barrows_npc_death;
+
+// VERIFIED pack levels. The six brothers are not ordinary-monster enum rows.
+[proc,barrows_npc_level](npc $type)(int)
+if (~barrows_brother_identity($type) > 0) return(nc_vislevel($type));
+return(enum(npc, int, barrows_monster_level, $type));
+
+// Protected delivery revalidates the captured run before any credit write.
+[queue,barrows_credit_kill](int $generation, npc $type, int $level)
+~barrows_credit($generation, $type, $level);
+
+[proc,barrows_credit](int $generation, npc $type, int $level)
+if ($generation <= 0 | $generation ! %barrows_generation | $level <= 0) return;
+if (~barrows_phase ! ^barrows_phase_unlooted | ~barrows_inside(coord) = false) return;
+def_int $identity = ~barrows_brother_identity($type);
+if ($identity > 0) {
+    if (~barrows_brother_slain($identity) = true) return;
+    %barrows_kills = setbit(%barrows_kills, sub($identity, 1));
+} else if (enum(npc, int, barrows_monster_level, $type) <= 0) {
+    return;
+}
+%barrows_killed_count = min(^barrows_kill_count_max, add(%barrows_killed_count, 1));
+%barrows_killed_monster = min(^barrows_potential_max, add(%barrows_killed_monster, $level));
+
+// UNKNOWN owned-summon attribution policy: the normal combat hero must own it.
+// A map placement has no private generation and keeps normal killer attribution.
+[proc,barrows_npc_credit]
+// Regeneration runs before queued death. The lethal death trigger is authoritative.
+if (~barrows_inside(npc_coord) = false) return;
+def_int $level = ~barrows_npc_level(npc_type);
+if ($level <= 0) return;
+if (npc_findhero = ^false) return;
+def_int $generation = %barrows_generation;
+if (%npc_barrows_generation > 0) {
+    if (%npc_barrows_owner ! uid) return;
+    $generation = %npc_barrows_generation;
+}
+queue*(barrows_credit_kill, 0)($generation, npc_type, $level);
+
+[proc,barrows_npc_death]
+if (%npc_barrows_generation > 0 & ~barrows_brother_identity(npc_type) > 0) {
+    if (.finduid(%npc_barrows_owner) = true) .hint_stop;
+}
+~barrows_npc_credit;
+// Shared npc_death's Slayer path can use .npc_findhero after its arrival delay.
+if (.npc_finduid(npc_uid) = true) ~npc_default_death;

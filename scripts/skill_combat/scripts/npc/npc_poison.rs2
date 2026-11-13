@@ -17,6 +17,19 @@ if (%npc_poison > 0) {
     return;
 }
 
+// Opt-in engineering: the caller invokes this once per run of its own timer.
+// Poison keeps the published countdown, damage and lethal queue.
+[proc,npc_poison_counted_timer](int $interval)
+%npc_owned_timer_interval = $interval;
+npc_settimer($interval);
+if (%npc_poison <= 0) {
+    %npc_poison_timer_runs = 0;
+    return;
+}
+%npc_poison_timer_runs = add(%npc_poison_timer_runs, 1);
+if (modulo(%npc_poison_timer_runs, 30) ! 0) return;
+~npc_poison_timer;
+
 
 
 
@@ -24,7 +37,12 @@ if (%npc_poison > 0) {
 
 [proc,npc_poison_clear]
 %npc_poison = 0;
-npc_settimer(0); // npc_cleartimer?
+if (%npc_owned_timer_interval > 0) {
+    npc_settimer(%npc_owned_timer_interval);
+    %npc_poison_timer_runs = 0;
+} else {
+    npc_settimer(0); // npc_cleartimer?
+}
 
 
 [proc,npc_poison_start](int $severity)
@@ -36,6 +54,11 @@ if (map_members = ^false) {
 }
 
 if ($severity > %npc_poison) {
-    npc_settimer(30);
+    if (%npc_owned_timer_interval > 0) {
+        npc_settimer(%npc_owned_timer_interval);
+        %npc_poison_timer_runs = 0;
+    } else {
+        npc_settimer(30);
+    }
     %npc_poison = $severity;
 }

@@ -1,11 +1,22 @@
-// Barrows — Search Ahrim's sarcophagus spawns Ahrim the Blighted in the crypt.
-// Combat VERIFIED unpack all.npc (vislevel=98 hitpoints=100 attack=1 strength=1 defence=100).
-// Spawn on a walkable floor tile next to the sarc (map_findsquare lineofwalk).
-// No prayer drain / 4535 write (stays closed until unit 24) / Faithful Servants
-// / set-effect procs. Cite xl-minigames-remaining-impl-377.md C.4 (unit 21).
+// Six original Search operations consume S00's brother/slain joins. The selected
+// hidden-tunnel crypt deliberately has no resident; S05 supplies its real route.
+[oploc1,barrow_ahrim_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
+[oploc1,barrow_dharok_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
+[oploc1,barrow_guthan_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
+[oploc1,barrow_karil_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
+[oploc1,barrow_torag_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
+[oploc1,barrow_verac_sarcophagus] ~barrows_sarc_search(loc_type, loc_coord);
 
-[oploc1,barrow_ahrim_sarcophagus]
-if (npc_find(3_55_151_35_34, barrows_ahrim, 8, 0) = true) {
-    return;
-}
-npc_add(map_findsquare(3_55_151_35_34, 0, 2, ^map_findsquare_lineofwalk), barrows_ahrim, 1000);
+[proc,barrows_sarc_search](loc $sarcophagus, coord $anchor)
+if (~barrows_phase ! ^barrows_phase_unlooted | ~barrows_inside(coord) = false | coordy(coord) ! 3 | ~barrows_inside($anchor) = false | coordy($anchor) ! 3) return;
+def_npc $brother = enum(loc, npc, barrows_sarcophagus_brother, $sarcophagus);
+if ($brother = null) return;
+def_int $identity = ~barrows_brother_identity($brother);
+if ($identity = 0 | $identity = ~barrows_tunnel_identity | ~barrows_brother_slain($identity) = true | ~barrows_brother_find($brother) = true) return;
+// Trace to the owner's legal approach tile, not the clipped sarcophagus origin.
+def_coord $spawn = map_findsquare(coord, ^barrows_crypt_spawn_min_radius, ^barrows_crypt_spawn_radius, ^map_findsquare_lineofwalk);
+if ($spawn = coord) return; // No eligible square: map_findsquare returns its origin.
+if (npc_finduid(~barrows_actor_spawn($brother, $spawn, ^barrows_crypt_summon_lifetime)) = false) return;
+npc_say("You dare disturb my rest!");
+// Published summon convention: Rashiliyia's minions target the active player.
+npc_setmode(opplayer2);
