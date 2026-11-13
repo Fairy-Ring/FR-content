@@ -1,9 +1,9 @@
 // CANDIDATE: desert-treasure.dlg.eblis-{partial-diamonds,four-diamonds,after-place}
 // and eblis-mirrors-first-talk. Later OSRS transcript, not recovered 377 speech.
-// Page breaks are editorial. Held inventory alone counts; no item or progress writes.
+// Page breaks are editorial. Placed bits take priority over held inventory; no writes.
 
 [opnpc1,fd_elder_by_mirrors]
-if (%fd_column_blood = ^dt_column_placed & %fd_column_fire = ^dt_column_placed & %fd_column_ice = ^dt_column_placed & %fd_column_shadow = ^dt_column_placed & inv_total(inv, fd_blood_diamond) = 0 & inv_total(inv, fd_icediamond) = 0 & inv_total(inv, fd_diamond_fire) = 0 & inv_total(inv, fd_dark_diamond) = 0) {
+if (%fd_column_blood = ^dt_column_placed & %fd_column_fire = ^dt_column_placed & %fd_column_ice = ^dt_column_placed & %fd_column_shadow = ^dt_column_placed) {
     @dt_eblis_after_place;
 }
 def_int $held = 0;

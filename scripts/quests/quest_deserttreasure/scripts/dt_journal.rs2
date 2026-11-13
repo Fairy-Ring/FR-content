@@ -160,10 +160,10 @@ if (%deserttreasure = ^dt_stage_ingredients_pending) {
     return;
 }
 
-// CANDIDATE authored summaries: desert-treasure.stage-product-contract-1109.
+// Project-authored summaries: desert-treasure.presentation-unknown-1109.
 if (%deserttreasure = ^dt_stage_placing_diamonds | %deserttreasure = ^dt_stage_four_columns) {
     if (~dt_columns_full = true) {
-        $x = append($x, "@dbl@I have placed all four diamonds. The pyramid is ready to enter.|");
+        $x = append($x, "@dbl@I have placed all four diamonds.|");
     } else {
         $x = append($x, "@dbl@I should place each remaining diamond in its matching column.|");
     }
@@ -181,7 +181,7 @@ if (%deserttreasure = ^dt_stage_hunts) {
 }
 
 [proc,dt_column_journal]()(string)
-// CANDIDATE authored per-bit summaries: desert-treasure.stage-product-contract-1109.
+// Project-authored per-bit summaries: desert-treasure.presentation-unknown-1109.
 def_string $columns;
 if (%fd_column_blood = ^dt_column_placed) {
     $columns = append($columns, "@str@Blood diamond placed.|");

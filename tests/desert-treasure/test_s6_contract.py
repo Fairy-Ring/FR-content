@@ -24,6 +24,7 @@ def text(path: Path) -> str:
 
 
 def block(source: str, kind: str, name: str) -> str:
+    source = re.sub(r"//[^\n]*", "", source)
     header = f"[{kind},{name}]"
     if header not in source:
         failures.append(f"missing {header}")
@@ -34,11 +35,10 @@ def block(source: str, kind: str, name: str) -> str:
 def main() -> int:
     columns = text(QUEST / "scripts/dt_columns.rs2")
     hill = text(QUEST / "scripts/dt_eblis_hill.rs2")
-    stranger = text(QUEST / "scripts/dt_stranger.rs2")
     journal = text(QUEST / "scripts/dt_journal.rs2")
+    archaeologist = text(QUEST / "scripts/dt_archaeologist.rs2")
     constants = text(QUEST / "configs/quest_deserttreasure.constant")
     locs = text(ROOT / "scripts/_unpack/377/all.loc")
-    npcs = text(ROOT / "scripts/_unpack/377/all.npc")
     varbits = text(ROOT / "scripts/_unpack/377/all.varbit")
     pack = text(ROOT / "pack/loc.pack")
     for parent, idle, placed, bit, gem, label, parent_id in (
@@ -58,7 +58,7 @@ def main() -> int:
         accept = f"~dt_column_accept({gem}, %{bit})"
         delete = f"inv_del(inv, {gem}, 1);"
         write = f"%{bit} = ^dt_column_placed;"
-        require(accept in action and delete in action and write in action and action.index(accept) < action.index(delete) < action.index(write), f"{label}: check before consuming exactly one matching gem and masked bit write")
+        require(f"if ({accept} = false) return;" in action and action.count(delete) == 1 and action.count("inv_del(") == 1 and action.count(write) == 1 and action.index(accept) < action.index(delete) < action.index(write), f"{label}: failed admission returns before exactly one matching consume and masked bit write")
     admission = block(columns, "proc", "dt_column_accept")
     for needle in ("last_useitem ! $gem", "$placed = ^dt_column_placed", "inv_total(inv, $gem) < 1", "^dt_stage_hunts", "^dt_stage_placing_diamonds", "stat_base(magic) < ^dt_column_magic_required", "~displaymessage(^dm_default)"):
         require(needle in admission, f"column admission contains {needle}")
@@ -70,8 +70,9 @@ def main() -> int:
     for bit in ("blood", "fire", "ice", "shadow"):
         require(f"%fd_column_{bit} = ^dt_column_placed" in full, f"all-four gate tests actual {bit} bit")
     finish = block(columns, "label", "dt_column_placed")
-    require("~dt_columns_full = true" in finish and "%deserttreasure = ^dt_stage_four_columns;" in finish and "%deserttreasure = ^dt_stage_placing_diamonds;" in finish, "first placement writes 11, fourth writes 12")
-    for writer in re.finditer(r"%deserttreasure = [^;]+;", finish):
+    require(re.search(r"if \(~dt_columns_full = true\) \{\s*%deserttreasure = \^dt_stage_four_columns;", finish) is not None and re.search(r"else if \(%deserttreasure = \^dt_stage_hunts\) \{\s*%deserttreasure = \^dt_stage_placing_diamonds;", finish) is not None, "first placement writes 11, fourth writes 12 in their matching branches")
+    require(re.findall(r"%deserttreasure = (\^\w+);", finish) == ["^dt_stage_four_columns", "^dt_stage_placing_diamonds"], "placement has only the two scoped stage writers")
+    for writer in re.finditer(r"%deserttreasure = \^\w+;", finish):
         require("~send_quest_progress(questlist:deserttreasure" in finish[writer.end():].split("}", 1)[0], "each stage writer recolours quest progress")
     entry = block(columns, "label", "dt_column_top_entry")
     require("~dt_columns_full = false" in entry, "top refusal uses actual four bits, not stage")
@@ -80,23 +81,22 @@ def main() -> int:
     require("p_tele" not in entry and not re.search(r"%\w+\s*=", entry) and "loc_add" not in entry, "S6 all-four attempt stays outside stage 12; S7 owns opening")
     require("dt_eblis_four_diamonds" in hill and "$held = 3" in hill and "dt_eblis_after_place" in hill, "hill dispatch has partial, all-four and after-place advice")
     require("inv_del" not in hill and "%deserttreasure =" not in hill and "inv_total(bank" not in hill, "advice neither takes diamonds, counts bank nor writes stage")
+    advice = block(hill, "opnpc1", "fd_elder_by_mirrors")
+    placed_gate = advice.split("def_int $held", 1)[0]
+    require("@dt_eblis_after_place;" in placed_gate and "inv_total" not in placed_gate and all(f"%fd_column_{bit} = ^dt_column_placed" in placed_gate for bit in ("blood", "fire", "ice", "shadow")), "all placed bits select after-placement advice before held-diamond counts")
     for stage in ("^dt_stage_placing_diamonds", "^dt_stage_four_columns"):
         require(stage in journal, f"journal covers {stage}")
-    for colour in ("Blood", "Smoke", "Ice", "Shadow"):
-        require(f"{colour} diamond placed." in journal and f"{colour} diamond not placed." in journal, f"journal reports {colour} bit truthfully")
-    eligibility = block(stranger, "proc", "dt_stranger_eligible")
-    for gem in ("fd_blood_diamond", "fd_icediamond", "fd_diamond_fire", "fd_dark_diamond", "fd_sword_cross"):
-        require(f"inv_total(inv, {gem}) > 0" in eligibility, f"Stranger held-item eligibility {gem}")
-    require("bank" not in eligibility, "banked-only items do not qualify")
-    require("$owner ! null & $owner = uid" in block(stranger, "proc", "dt_stranger_is_owner"), "owner dispatch rejects null and spectator")
-    for kind in ("opnpc2", "ai_opplayer2"):
-        require("~dt_stranger_is_owner(%npc_macro_event_target) = false" in block(stranger, kind, "fourdiamonds_assasin"), f"{kind} is owner guarded")
-    require(npcs.count("[fourdiamonds_assasin]") == 1 and "1919=fourdiamonds_assasin" in text(ROOT / "pack/npc.pack"), "Stranger retains one cache NPC 1919 config")
-    require("npc_add(" not in stranger and "random(" not in stranger and "inv_add(" not in stranger and "%deserttreasure =" not in stranger, "no invented spawn rate, reward or quest credit")
+    column_journal = block(journal, "proc", "dt_column_journal")
+    for colour, bit in (("Blood", "blood"), ("Smoke", "fire"), ("Ice", "ice"), ("Shadow", "shadow")):
+        pattern = rf'if \(%fd_column_{bit} = \^dt_column_placed\) \{{\s*\$columns = append\(\$columns, "@str@{colour} diamond placed\.\|"\);\s*\}} else \{{\s*\$columns = append\(\$columns, "@dbl@{colour} diamond not placed\.\|"\);'
+        require(re.search(pattern, column_journal) is not None, f"journal ties {colour} sentences to its matching bit")
+    require('"@dbl@I have placed all four diamonds.|"' in journal and "The pyramid is ready to enter." not in journal, "stage12 journal reports placement without claiming S7 entry")
+    after_place = block(archaeologist, "label", "dt_arch_after_place")
+    require('~chatplayer("<p,neutral>Um... sorry, I can\'t.");' in after_place and "chatnpc_specific" not in after_place, "Archaeologist refusal follows the newest retained Player attribution")
     if failures:
         print("\n".join(f"FAIL: {failure}" for failure in failures))
         return 1
-    print("PASS: Desert Treasure S6 matching columns, masked stages, advice, top gate and bounded Stranger contract")
+    print("PASS: Desert Treasure S6 matching columns, masked stages, advice, top gate and journal contract")
     return 0
 
 

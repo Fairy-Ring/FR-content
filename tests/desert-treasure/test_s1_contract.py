@@ -220,8 +220,8 @@ def main() -> int:
         "inv_total(inv, fd_blood_diamond) > 0" in archaeologist
         and "%fd_column_blood = ^dt_column_placed" in archaeologist
         and "inv_total(inv, fd_blood_diamond) = 0" in archaeologist
-        and "~chatnpc_specific(nc_name(fd_elder_village), fd_elder_village" in archaeologist,
-        "late Archaeologist scenes must distinguish held diamonds from placed columns and retain the sourced Eblis line",
+        and '~chatplayer("<p,neutral>Um... sorry, I can\'t.");' in archaeologist,
+        "late Archaeologist scenes distinguish held diamonds from placed columns and use Player for the refusal (transcript revision 15343078, 2026-09-13)",
     )
 
     require(

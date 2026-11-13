@@ -58,5 +58,5 @@
 
 // UNKNOWN: historical Blood/Shadow substate integers, exact arrival tiles and fight tiles remain unrecovered.
 
-// CANDIDATE: desert-treasure.column-use-unknown; action gate from the later transcript.
+// CANDIDATE: desert-treasure.column-message-candidates and period-requirements; later action gate.
 ^dt_column_magic_required = 50
