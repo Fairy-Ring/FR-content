@@ -105,6 +105,7 @@ jobs:
       # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
       # tests/giantdwarf-intro/: CI — compiled runtime/save-load checks; no engine is started.
       # tests/content-gaps/: CI — packed configuration/trigger integration, no server.
+      # tests/elena-fence/: CI — packed map/dispatch runtime, runtime.sh starts no server.
       # tests/drop-tables/: CI — compiled KQ ScriptRunner outcomes, no server.
       - name: Run offline content tests
         id: content_tests
