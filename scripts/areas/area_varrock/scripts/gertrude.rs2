@@ -50,14 +50,7 @@ switch_int (%fluffs) {
         ~chatnpc("<p,happy>Here you go, look after her and thank you again!");
         ~mesbox("Gertrude gives you a kitten.");
         if_close;
-        %fluffs = ^fluffs_complete;
         ~gertrude_give_cat;
-        p_delay(3);
-        mes("... and some food!");
-        inv_add(inv, chocolate_cake, 1);
-        inv_add(inv, stew, 1);
-        p_delay(3);
-        queue(fluffs_complete, 0, 0);
     case ^fluffs_complete :
         if (getbit_range(%cat_growth, 20, 26) = 100 & inv_total(inv, felinemedal) = 0) {
             ~chatplayer("<p,happy>Hello again Gertrude!");
@@ -150,3 +143,14 @@ if (oc_category($obj) ! kitten) return;
 if_close;
 %cat_growth = 0;
 ~cat_spawn(oc_param($obj, follower_id));
+// INV_BUTTON1 is a new script; closing the picker cancels its paused NPC caller.
+// CANDIDATE: retain the inherited kitten, food, then completion-queue order here.
+if (%fluffs = ^fluffs_rescued) {
+    %fluffs = ^fluffs_complete;
+    p_delay(3);
+    mes("... and some food!");
+    inv_add(inv, chocolate_cake, 1);
+    inv_add(inv, stew, 1);
+    p_delay(3);
+    queue(fluffs_complete, 0, 0);
+}

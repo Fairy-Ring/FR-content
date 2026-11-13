@@ -1,5 +1,19 @@
-// Leftover recipe_for_disaster 18436. Questlist hundred_main.
-// Leftover 8 guest names stay on the IF. Do not invent journal fills.
+// Recipe for Disaster guest icons; see the evidence file for source confidence.
+// CANDIDATE: these fixed cache heads match the eight named rows.
 
 [if_button,questlist:hundred_main]
+inv_clear(rfd_journal_icons);
+inv_setslot(rfd_journal_icons, 0, 100_journal_head_dwarf, 1);
+inv_setslot(rfd_journal_icons, 1, 100_journal_head_goblin, 1);
+inv_setslot(rfd_journal_icons, 2, 100_journal_head_pirate, 1);
+inv_setslot(rfd_journal_icons, 3, 100_journal_head_guide, 1);
+inv_setslot(rfd_journal_icons, 4, 100_journal_head_dave, 1);
+inv_setslot(rfd_journal_icons, 5, 100_journal_head_monkey, 1);
+inv_setslot(rfd_journal_icons, 6, 100_journal_head_sir, 1);
+inv_setslot(rfd_journal_icons, 7, 100_journal_head_skrach, 1);
+inv_transmit(rfd_journal_icons, recipe_for_disaster:com_11);
 if_openmain(recipe_for_disaster);
+
+[if_close,recipe_for_disaster]
+inv_stoptransmit(recipe_for_disaster:com_11);
+inv_clear(rfd_journal_icons);
