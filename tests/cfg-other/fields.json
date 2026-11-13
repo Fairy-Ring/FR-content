@@ -1,0 +1,556 @@
+[
+  {
+    "group": "C20",
+    "type": "LocType",
+    "name": "castlewars_tap",
+    "field": "category",
+    "expected": {
+      "type": "CategoryType",
+      "name": "watersource"
+    }
+  },
+  {
+    "group": "C16",
+    "type": "DbRowType",
+    "name": "cooking_generic_swordfish",
+    "field": "data:successchance_gauntlets",
+    "expected": [
+      30,
+      310
+    ]
+  },
+  {
+    "group": "C15",
+    "type": "ObjType",
+    "name": "tbwt_karambwan_vessel_loaded_with_karambwanji",
+    "field": "param:fish_equipment_struct",
+    "expected": {
+      "type": "StructType",
+      "name": "fish_equipment_karambwan_vessel"
+    }
+  },
+  {
+    "group": "C15",
+    "type": "StructType",
+    "name": "fish_equipment_karambwan_vessel",
+    "field": "param:fish_equipment_failmessage",
+    "expected": "You need a Karambwan vessel to fish here."
+  },
+  {
+    "group": "C15",
+    "type": "StructType",
+    "name": "fish_equipment_karambwan_vessel",
+    "field": "param:fish_wrong_spot_message",
+    "expected": "There is nothing suitable for catching with a Karambwan vessel here."
+  },
+  {
+    "group": "C14",
+    "type": "ObjType",
+    "name": "trollromance_rare_flower",
+    "field": "category",
+    "expected": {
+      "type": "CategoryType",
+      "name": "flowers"
+    }
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "plague_trousers",
+    "field": "wearpos2",
+    "expected": 10
+  },
+  {
+    "group": "C12",
+    "type": "InvType",
+    "name": "partyroom_tempinv",
+    "field": "protect",
+    "expected": false
+  },
+  {
+    "group": "C11",
+    "type": "InvType",
+    "name": "trawler_rewardinv",
+    "field": "protect",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_airrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_bloodrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_bodyrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_chaosrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_cosmicrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_earthrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_firerune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_lawrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_mindrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_naturerune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_soulrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_waterrune_king",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_armour_body",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_armour_legs",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_manual",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_med_helm",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_saradomin_banner",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_shield",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_sword",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_ticket",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_zamorak_banner",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "cert_trail_clue_easy_map001_casket",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "cert_trail_clue_easy_map002_casket",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "cert_trail_clue_easy_map003_casket",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C14",
+    "type": "ObjType",
+    "name": "trollromance_rare_flower",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C14",
+    "type": "ObjType",
+    "name": "trollromance_toboggon",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C14",
+    "type": "ObjType",
+    "name": "trollromance_toboggon_waxed",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C14",
+    "type": "ObjType",
+    "name": "trollromance_wax",
+    "field": "tradeable",
+    "expected": false
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "cup_empty",
+    "field": "weight",
+    "expected": 50
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "cup_of_tea",
+    "field": "weight",
+    "expected": 150
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "cert_trail_clue_easy_map001_casket",
+    "field": "weight",
+    "expected": 5000
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "cert_trail_clue_easy_map002_casket",
+    "field": "weight",
+    "expected": 5000
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "cert_trail_clue_easy_map003_casket",
+    "field": "weight",
+    "expected": 5000
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "tbwt_raw_karambwanji",
+    "field": "weight",
+    "expected": 140
+  },
+  {
+    "group": "C13",
+    "type": "ObjType",
+    "name": "vodka",
+    "field": "weight",
+    "expected": 1000
+  },
+  {
+    "group": "C10",
+    "type": "InvType",
+    "name": "boardgames_boardinv",
+    "field": "dummyinv",
+    "expected": true
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_airrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_bloodrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_bodyrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_chaosrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_cosmicrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_earthrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_firerune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_lawrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_mindrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_naturerune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_soulrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_draughts_waterrune_king",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_airrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_bloodrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_bodyrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_chaosrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_cosmicrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_earthrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_firerune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_lawrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_mindrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_naturerune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_soulrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C10",
+    "type": "ObjType",
+    "name": "boardgames_runelink_waterrune",
+    "field": "dummyitem",
+    "expected": 2
+  },
+  {
+    "group": "C14",
+    "type": "ObjType",
+    "name": "trollromance_rare_flower",
+    "field": "param:crushattack_anim",
+    "expected": {
+      "type": "SeqType",
+      "name": "human_blunt_spike"
+    }
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_saradomin_banner",
+    "field": "param:crush_sound",
+    "expected": 393
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_saradomin_banner",
+    "field": "param:slash_sound",
+    "expected": 394
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_saradomin_banner",
+    "field": "param:stab_sound",
+    "expected": 395
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_zamorak_banner",
+    "field": "param:crush_sound",
+    "expected": 393
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_zamorak_banner",
+    "field": "param:slash_sound",
+    "expected": 394
+  },
+  {
+    "group": "C04",
+    "type": "ObjType",
+    "name": "castlewars_zamorak_banner",
+    "field": "param:stab_sound",
+    "expected": 395
+  },
+  {
+    "group": "C14",
+    "type": "ObjType",
+    "name": "trollromance_rare_flower",
+    "field": "param:crush_sound",
+    "expected": 416
+  }
+]

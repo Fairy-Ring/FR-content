@@ -724,6 +724,7 @@ name=Tap
 desc=Water comes out of this.
 model=viking_seers_tap
 active=yes
+category=watersource
 
 [castlewars_bankchest]
 name=Bank chest

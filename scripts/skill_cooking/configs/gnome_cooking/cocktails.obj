@@ -9,6 +9,7 @@ model=obj_vodka
 2dzoom=970
 2dyan=1888
 2dxan=104
+weight=1kg
 category=alcoholic_drinks
 param=gnome_cocktail_ingredient,^true
 

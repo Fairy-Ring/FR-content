@@ -3213,6 +3213,7 @@ iop2=Wear
 manwear=obj_plague_trousers_manwear,0
 womanwear=obj_plague_trousers_womanwear,0
 wearpos=legs
+wearpos2=feet
 weight=5lb
 tradeable=no
 
@@ -31222,6 +31223,8 @@ cost=50
 iop1=Open
 members=yes
 stackable=yes
+weight=5kg
+tradeable=no
 
 [trail_clue_easy_map002]
 name=Clue scroll
@@ -31269,6 +31272,8 @@ cost=50
 iop1=Open
 members=yes
 stackable=yes
+weight=5kg
+tradeable=no
 
 [trail_clue_easy_map003]
 name=Clue scroll
@@ -31316,6 +31321,8 @@ cost=50
 iop1=Open
 members=yes
 stackable=yes
+weight=5kg
+tradeable=no
 
 [trail_clue_hard_map001]
 name=Clue scroll
@@ -36701,6 +36708,7 @@ model=obj_tbwt_raw_karambwanji
 2dyof=6
 2dzoom=1000
 2dxan=464
+weight=140g
 category=category_57
 param=grindable_ingredient_refined,tbwt_raw_karambwanji_paste
 param=grindable_ingredient_message,You grind the raw Karambwanji to form a sticky paste.
@@ -36833,6 +36841,7 @@ model=obj_tbwt_karambwan_vessel_loaded_with_karambwanji
 manwear=obj_tbwt_karambwan_vessel_manwear,0
 womanwear=obj_tbwt_karambwan_vessel_manwear,6
 weight=3150g
+param=fish_equipment_struct,fish_equipment_karambwan_vessel
 
 [cert_tbwt_karambwan_vessel_loaded_with_karambwanji]
 certlink=tbwt_karambwan_vessel_loaded_with_karambwanji
