@@ -419,7 +419,7 @@ const SOURCE_HASHES = Object.fromEntries(Object.entries(SOURCES).map(([name, fil
 const S8_PROTECTED_BASELINE = {
     commit: '8bfd772a3',
     boundaries: [
-        { file: 'taskScript', marker: '[proc,check_progress_task]', label: 'procedure block through the next [declaration]', sha256: '5405f96d0ac1ae1a4a9ac7ab4aa811aa25d1542a634521a7a98452331f9ed24c' },
+        // [proc,check_progress_task] left this list with the NPC death repair (U-NPCDEATH-1113); tests/npc-death executes its packed truth table.
         { file: 'taskScript', marker: '[queue,progress_task]', label: 'queue block through the next [declaration]', sha256: 'deebdd136885e28d8ab2f2b8413c54cfde99b5e236be3c2a5e055accc5237a43' },
         { file: 'taskScript', marker: '[proc,complete_task]', label: 'completion procedure block through EOF', sha256: '3586f3f37799c51ed52dc93101dd199cecdd3448c31228477be625352db041bf' },
         { file: 'taskScript', marker: '[proc,slayer_taskname]', label: 'task-name reader block through the next [declaration]', sha256: '64e28a6beb1849b62f4e21d287bcc23d6897154ac3935922cfe1acd5027748b8' },

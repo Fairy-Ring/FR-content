@@ -4,6 +4,7 @@
 [opheld1,_category_58] @player_consume_item(consume_effect_stat, 2, 3);
 [opheld1,_category_59] @player_consume_item(consume_effect_stat, 2, 3);
 [opheld1,_category_86] @player_consume_item(consume_effect_stat, 2, 3);
+[opheld1,tbwt_sliced_banana] @player_consume_item(consume_effect_stat, 2, 3);
 [opheld1,rottenapples] ~displaymessage(^dm_default);
 [opheld1,_category_120] @player_consume_item(consume_effect_stat, 2, 3);
 [opheld1,_category_131] @player_consume_item(consume_effect_stat, 2, 3);
@@ -20,6 +21,16 @@ mes("You cant eat it whole; maybe you should cut it up.");
 [opheld1,kebab] @player_consume_item(consume_effect_kebab, 2, 3);
 [opheld1,ugthanki_kebab_bad] @player_consume_item(consume_effect_ugthanki_kebab_bad, 2, 3);
 [opheld1,ugthanki_kebab] @player_consume_item(consume_effect_stat_say, 2, 3);
+
+// Special foods retain the published consumption and combat delays.
+[opheld1,mort_slimey_eel_cooked] @player_consume_item(consume_effect_mort_slimey_eel_cooked, 2, 3);
+[opheld1,snail_corpse_cooked1] @player_consume_item(consume_effect_snail1, 2, 3);
+[opheld1,snail_corpse_cooked2] @player_consume_item(consume_effect_snail2, 2, 3);
+[opheld1,snail_corpse_cooked3] @player_consume_item(consume_effect_snail3, 2, 3);
+[opheld1,mm_monkey_nuts] @player_consume_item(consume_monkey_nuts, 2, 3);
+[opheld1,mm_monkey_bar] @player_consume_item(consume_monkey_bar, 2, 3);
+[opheld1,mm_banana_stew] @player_consume_item(consume_banana_stew, 2, 3);
+[opheld1,keg_of_beer] @player_consume_item(consume_effect_keg_of_beer, 2, 3);
 
 // stews
 [opheld1,curry] @player_consume_item(consume_effect_stat2, 2, 3);

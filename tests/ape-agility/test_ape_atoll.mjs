@@ -2,6 +2,15 @@
  * Deterministic compiled production-handler proof for the Ape Atoll course unit.
  * Run after the full content pack is built, from the sibling engine directory:
  *   node --import tsx ../content/tests/ape-agility/test_ape_atoll.mjs
+ * Recapture after reviewing an intentional change to ordinary human death:
+ * build any published tree's full pack, then run the same command with
+ * --capture-human-death-baseline > capture.log. No old source or git history is needed.
+ * Parse the JSON after APE_ATOLL_HUMAN_DEATH_BASELINE_V1 and save its observation
+ * to fixtures/human-death-published.json (retain marker and deathSourceSha256).
+ * Save its effects to fixtures/human-death-effects.json. Review both diffs.
+ * Generated enum and database-column references use kind/name records resolved
+ * through the built pack tables. Keep every command and every game value.
+ * The source hash is provenance only. Appended varps must retain type defaults.
  * It starts no server and writes its JSON receipt beneath RUNNER_TEMP (or the OS temp directory).
  */
 import assert from 'node:assert/strict';
@@ -20,6 +29,7 @@ const eng = rel => import(pathToFileURL(path.join(ENGINE_DIR, rel)).href);
 
 const { default: World } = await eng('src/engine/World.ts');
 const { default: Player } = await eng('src/engine/entity/Player.ts');
+const { Inventory } = await eng('src/engine/Inventory.ts');
 const { default: Loc } = await eng('src/engine/entity/Loc.ts');
 const { EntityLifeCycle } = await eng('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStatMap } = await eng('src/engine/entity/PlayerStat.ts');
@@ -27,6 +37,7 @@ const { default: CategoryType } = await eng('src/cache/config/CategoryType.ts');
 const { default: Component } = await eng('src/cache/config/Component.ts');
 const { default: DbTableType } = await eng('src/cache/config/DbTableType.ts');
 const { default: DbRowType } = await eng('src/cache/config/DbRowType.ts');
+const { default: EnumType } = await eng('src/cache/config/EnumType.ts');
 const { default: FontType } = await eng('src/cache/config/FontType.ts');
 const { default: InvType } = await eng('src/cache/config/InvType.ts');
 const { default: LocType } = await eng('src/cache/config/LocType.ts');
@@ -42,14 +53,15 @@ const { default: Packet } = await eng('src/io/Packet.ts');
 const { default: ScriptProvider } = await eng('src/engine/script/ScriptProvider.ts');
 const { default: ScriptRunner } = await eng('src/engine/script/ScriptRunner.ts');
 const { default: ScriptState } = await eng('src/engine/script/ScriptState.ts');
+const { default: JavaRandom } = await eng('src/util/JavaRandom.ts');
 const { default: ServerTriggerType } = await eng('src/engine/script/ServerTriggerType.ts');
-const { ScriptOpcodeNameMap } = await eng('src/engine/script/ScriptOpcode.ts');
+const { ScriptOpcode, ScriptOpcodeNameMap } = await eng('src/engine/script/ScriptOpcode.ts');
 const { default: routefinder, CollisionFlag } = await eng('src/engine/routefinder/index.ts');
 const { unzipSync } = createRequire(path.join(ENGINE_DIR, 'package.json'))('fflate');
 
 for (const config of [
   VarPlayerType, VarBitType, VarNpcType, CategoryType, ParamType, NpcType,
-  LocType, InvType, ObjType, SeqType, FontType, Component, DbTableType, DbRowType
+  LocType, InvType, ObjType, SeqType, FontType, Component, DbTableType, DbRowType, EnumType
 ]) config.load(PACK_DIR);
 Environment.NODE_XPRATE = 1;
 Environment.NODE_DEBUG = false;
@@ -230,6 +242,7 @@ const collisionWitnesses = [
   { level: 0, x: 2751, z: 2731, label: 'rope setup stand' },
   { level: 0, x: 2756, z: 2731, label: 'rope landing' },
   { level: 0, x: 2757, z: 2733, label: 'descent setup stand' },
+  { level: 0, x: 2759, z: 2737, label: 'candidate descent failure ground' },
   { level: 1, x: 2758, z: 2734, label: 'upper vine start' },
   { level: 1, x: 2770, z: 2747, label: 'upper vine exit' },
   { level: 0, x: 2770, z: 2747, label: 'ground below vine exit' }
@@ -251,21 +264,55 @@ assert.equal(packId('npc', ninjaForms[0].npc), 1480, 'the small ninja form retai
 assert.equal(packId('npc', ninjaForms[1].npc), 1481, 'the medium ninja form retains npc ID 1481');
 const WORN_INVENTORY = packId('inv', 'worn');
 const RIGHT_HAND = 3;
+const BAS_FIELDS = ['readyanim', 'turnanim', 'walkanim', 'walkanim_b', 'walkanim_l', 'walkanim_r', 'runanim'];
 const transformScript = ScriptProvider.getByName('[proc,mm_greegree_transmogrify]');
 assert(transformScript, 'the packed normal greegree transform procedure is present');
+const updateBasScript = ScriptProvider.getByName('[proc,update_bas]');
+assert(updateBasScript, 'the ordinary transformed-player BAS procedure is packed');
+const deathQueue = ScriptProvider.getByName('[queue,player_death_default]');
+assert(deathQueue, 'the real player death queue is packed');
+const greegreeTimerScript = ScriptProvider.getByName('[timer,mm_greegree_timer]');
+const greegreeWieldScript = ScriptProvider.getByName('[opheld2,_mm_greegree]');
+const MAIN_INVENTORY = packId('inv', 'inv');
+const greegreeObjectIds = new Set(ninjaForms.map(form => packId('obj', form.object)));
+const deathSourceSha256 = crypto.createHash('sha256')
+  .update(fs.readFileSync(path.join(CONTENT_DIR, 'scripts/player/scripts/death.rs2'))).digest('hex');
+const HUMAN_DEATH_BASELINE_MARKER = 'APE_ATOLL_HUMAN_DEATH_BASELINE_V1';
+const HUMAN_DEATH_BASELINE_PATH = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  'fixtures',
+  'human-death-published.json'
+);
+const HUMAN_DEATH_EFFECTS_PATH = path.join(path.dirname(HUMAN_DEATH_BASELINE_PATH), 'human-death-effects.json');
+const DEATH_TEST_START_TICK = 100;
+// The real MAP_FINDSQUARE opcode samples Math.random, not JavaRandom.
+const DEATH_RESPAWN_RANDOM = 0;
+let nextDeathTestTick = DEATH_TEST_START_TICK;
+const captureHumanDeathBaseline = process.argv.includes('--capture-human-death-baseline');
 function transform(player, form) {
   const objectId = packId('obj', form.object);
   player.invSet(WORN_INVENTORY, objectId, 1, RIGHT_HAND);
   const state = ScriptRunner.init(transformScript, player, null, [objectId]);
   assert.equal(player.runScript(state, true, true), ScriptState.FINISHED, `${form.label} uses the packed greegree transform`);
   assert.equal(player.npcId, packId('npc', form.npc), `${form.label} writes the real Player.npcId`);
+  assert.equal(
+    player.runScript(ScriptRunner.init(updateBasScript, player, null), true, true),
+    ScriptState.FINISHED,
+    `${form.label} derives its real BAS as ordinary equipment handling does`
+  );
 }
 let nextTestPlayerId = 1;
 
 function makePlayer(level, form, tile) {
-  const player = new Player('ape_atoll_packed_test', 0n, 0n);
-  player.uid = nextTestPlayerId;
-  player.pid = nextTestPlayerId++;
+  const id = nextTestPlayerId++;
+  const player = new Player('ape_atoll_packed_test', BigInt(id), BigInt(id));
+  player.slot = id;
+  player.pid = id;
+  player.uid = (id << 11) | id;
+  // Real DAMAGE and ring-of-life opcodes resolve the UID through the world, not the active pointer.
+  World.players[id] = player;
+  World.playerLoop.add(player.hash64, player);
+  assert.equal(World.getPlayerByUid(player.uid), player, 'the real damage path can resolve its fixture player');
   player.packets = [];
   player.messages = [];
   player.write = message => player.packets.push(message);
@@ -324,6 +371,87 @@ function snapshot(player) {
     packetCount: player.packets.length
   };
 }
+function canonicalJsonValue(value) {
+  if (value === undefined) return { $undefined: true };
+  if (typeof value === 'bigint') return `${value}n`;
+  if (typeof value === 'number' && !Number.isFinite(value)) return String(value);
+  if (value === null || typeof value !== 'object') return value;
+  if (value instanceof ArrayBuffer) return Array.from(new Uint8Array(value));
+  if (ArrayBuffer.isView(value)) {
+    return value instanceof DataView
+      ? Array.from(new Uint8Array(value.buffer, value.byteOffset, value.byteLength))
+      : Array.from(value);
+  }
+  if (Array.isArray(value)) return Array.from(value, canonicalJsonValue);
+  if (value instanceof Map) {
+    return [...value.entries()].map(([key, entry]) => [canonicalJsonValue(key), canonicalJsonValue(entry)]);
+  }
+  if (value instanceof Set) return [...value.values()].map(canonicalJsonValue);
+  const fields = Object.fromEntries(
+    Object.getOwnPropertyNames(value)
+      .sort()
+      .map(key => [key, canonicalJsonValue(value[key])])
+  );
+  return Object.getPrototypeOf(value) === Object.prototype || Object.getPrototypeOf(value) === null
+    ? fields
+    : { $type: value.constructor?.name ?? 'Object', fields };
+}
+
+function inventorySnapshot(player) {
+  return [...player.invs.entries()]
+    .sort(([left], [right]) => left - right)
+    .map(([id, inventory]) => ({
+      id,
+      capacity: inventory.capacity,
+      stackType: inventory.stackType,
+      items: inventory.items.map(item => item ? { id: item.id, count: item.count } : null)
+    }));
+}
+
+function queuedScriptSnapshot(queue) {
+  return [...queue.all()].map(request => ({
+    type: request.type,
+    script: request.script.name,
+    args: canonicalJsonValue(request.args),
+    delay: request.delay,
+    lastInt: request.lastInt
+  }));
+}
+
+function deathSnapshot(player, packets) {
+  return {
+    ...snapshot(player),
+    identity: {
+      username: player.username,
+      username37: String(player.username37),
+      slot: player.slot,
+      pid: player.pid,
+      uid: player.uid,
+      hash64: String(player.hash64)
+    },
+    bas: Object.fromEntries(BAS_FIELDS.map(field => [field, player[field]])),
+    lastStats: Array.from(player.lastStats),
+    lastLevels: Array.from(player.lastLevels),
+    tabs: [...player.tabs],
+    inventories: inventorySnapshot(player),
+    timers: [...player.timers.values()]
+      .map(timer => ({
+        type: timer.type,
+        script: timer.script.name,
+        args: canonicalJsonValue(timer.args),
+        interval: timer.interval,
+        clock: timer.clock
+      }))
+      .sort((left, right) => left.script.localeCompare(right.script)),
+    queues: {
+      normal: queuedScriptSnapshot(player.queue),
+      weak: queuedScriptSnapshot(player.weakQueue),
+      engine: queuedScriptSnapshot(player.engineQueue)
+    },
+    worldTick: World.currentTick,
+    packets
+  };
+}
 
 function persistentEffects(player) {
   const state = snapshot(player);
@@ -379,6 +507,74 @@ const STAGES = [
     placement: MAP_LOCS[6], start: { level: 0, x: 2757, z: 2733 }, end: { level: 0, x: 2770, z: 2747 }, xp: 3000
   }
 ];
+const EXACT_DIRECTION = { north: 0, east: 1, south: 2, west: 3 };
+const SUCCESS_PATHS = new Map([
+  ['stepping_stone_12568', {
+    exactMoves: [{ level: 0, startX: 2755, startZ: 2742, endX: 2753, endZ: 2742, startCycle: 0, endCycle: 36, direction: EXACT_DIRECTION.west }],
+    teleJumps: [],
+    delayTicks: [1, 2],
+    animations: [[3480, 0], [-1, 0]]
+  }],
+  ['tropical_tree', {
+    exactMoves: [{ level: 0, startX: 2753, startZ: 2742, endX: 2753, endZ: 2742, startCycle: 0, endCycle: 94, direction: EXACT_DIRECTION.south }],
+    teleJumps: [{ from: { level: 0, x: 2753, z: 2742 }, to: { level: 2, x: 2752, z: 2742 } }],
+    delayTicks: [1, 4],
+    animations: [[3487, 0], [-1, 0]]
+  }],
+  ['monkeybars_12573', {
+    exactMoves: [
+      { level: 2, startX: 2752, startZ: 2742, endX: 2752, endZ: 2742, startCycle: 0, endCycle: 49, direction: EXACT_DIRECTION.west },
+      { level: 2, startX: 2752, startZ: 2742, endX: 2747, endZ: 2741, startCycle: 0, endCycle: 44, direction: EXACT_DIRECTION.west },
+      { level: 0, startX: 2747, startZ: 2741, endX: 2747, endZ: 2741, startCycle: 0, endCycle: 45, direction: EXACT_DIRECTION.west }
+    ],
+    teleJumps: [{ from: { level: 2, x: 2747, z: 2741 }, to: { level: 0, x: 2747, z: 2741 } }],
+    delayTicks: [1, 2, 2, 2],
+    animations: [[3482, 0], [3483, 0], [3484, 0], [-1, 0]]
+  }],
+  ['monkeybars_12575', {
+    exactMoves: [
+      { level: 2, startX: 2747, startZ: 2741, endX: 2747, endZ: 2741, startCycle: 0, endCycle: 49, direction: EXACT_DIRECTION.east },
+      { level: 2, startX: 2747, startZ: 2741, endX: 2752, endZ: 2742, startCycle: 0, endCycle: 44, direction: EXACT_DIRECTION.east },
+      { level: 2, startX: 2752, startZ: 2742, endX: 2752, endZ: 2742, startCycle: 0, endCycle: 45, direction: EXACT_DIRECTION.east }
+    ],
+    teleJumps: [{ from: { level: 2, x: 2752, z: 2742 }, to: { level: 2, x: 2752, z: 2742 } }],
+    delayTicks: [1, 2, 2, 2],
+    animations: [[3482, 0], [3483, 0], [3484, 0], [-1, 0]]
+  }],
+  ['skull_slope_12576', {
+    exactMoves: [{ level: 0, startX: 2747, startZ: 2741, endX: 2743, endZ: 2741, startCycle: 0, endCycle: 120, direction: EXACT_DIRECTION.west }],
+    teleJumps: [],
+    delayTicks: [1, 5],
+    animations: [[3485, 0], [-1, 0]]
+  }],
+  ['rope_12578', {
+    exactMoves: [{ level: 0, startX: 2751, startZ: 2731, endX: 2756, endZ: 2731, startCycle: 0, endCycle: 67, direction: EXACT_DIRECTION.east }],
+    teleJumps: [],
+    delayTicks: [1, 3],
+    animations: [[3488, 0], [-1, 0]]
+  }],
+  ['tropical_tree_12618', {
+    exactMoves: [{ level: 1, startX: 2758, startZ: 2734, endX: 2770, endZ: 2747, startCycle: 0, endCycle: 54, direction: EXACT_DIRECTION.north }],
+    teleJumps: [
+      { from: { level: 0, x: 2757, z: 2733 }, to: { level: 1, x: 2758, z: 2734 } },
+      { from: { level: 1, x: 2770, z: 2747 }, to: { level: 0, x: 2770, z: 2747 } }
+    ],
+    delayTicks: [1, 2],
+    animations: [[3494, 0], [-1, 0]]
+  }]
+]);
+const FAILURE_PATHS = new Map([
+  ['stepping_stone_12568', { landing: { level: 0, x: 2755, z: 2742 }, animation: 3489 }],
+  ['tropical_tree', { landing: { level: 0, x: 2755, z: 2742 }, animation: 3492 }],
+  ['monkeybars_12573', { landing: { level: 0, x: 2755, z: 2742 }, animation: 3493 }],
+  ['monkeybars_12575', { landing: { level: 0, x: 2755, z: 2742 }, animation: 3493 }],
+  ['skull_slope_12576', { landing: { level: 0, x: 2755, z: 2742 }, animation: 3486 }],
+  ['rope_12578', { landing: { level: 0, x: 2751, z: 2731 }, animation: 3493 }],
+  ['tropical_tree_12618', { landing: { level: 0, x: 2759, z: 2737 }, animation: 3493 }]
+]);
+const SUCCESS_RANDOM = 0;
+const FAILURE_RANDOM = 1 - Number.EPSILON;
+const HIT_SOUND_RANDOM = 0;
 const locTriggers = new Map();
 for (const stage of STAGES) {
   const script = ScriptProvider.getByTriggerSpecific(ServerTriggerType.OPLOC1, stage.id);
@@ -394,8 +590,12 @@ for (const name of ['monkeybars_12573', 'monkeybars_12575']) {
   const calls = script.opcodes.flatMap((opcode, pc) => ScriptOpcodeNameMap.get(opcode) === 'GOSUB_WITH_PARAMS' ? [ScriptProvider.get(script.intOperands[pc])] : []);
   assert.equal(calls.filter(callee => callee?.id === barsProcedure.id).length, 1, `${name} calls the one shared bars procedure once`);
 }
+assert(greegreeTimerScript, 'the real greegree timer is packed');
+assert(greegreeWieldScript, 'the real greegree Wield/Hold action is packed');
+
 const courseProcedures = [
-  'ape_atoll_ninja_form', 'ape_atoll_entry', 'ape_atoll_setup', 'ape_atoll_finish', 'ape_atoll_bars', 'ape_atoll_recover'
+  'ape_atoll_ninja_form', 'ape_atoll_entry', 'ape_atoll_setup', 'ape_atoll_finish', 'ape_atoll_bars', 'ape_atoll_recover',
+  'ape_atoll_success', 'ape_atoll_fail'
 ].map(name => {
   const script = ScriptProvider.getByName(`[proc,${name}]`);
   assert(script, `[proc,${name}] is packed`);
@@ -408,8 +608,223 @@ for (const script of [...locTriggers.values(), ...courseProcedures]) {
     assert(!/(?:VARP|VARBIT)/.test(name), `${script.name} has no course varp/varbit state`);
   }
 }
+function withRandomStream(values, callback, allowUnused = false) {
+  const original = JavaRandom.nextDouble;
+  const observed = [];
+  let index = 0;
+  JavaRandom.nextDouble = function () {
+    assert(index < values.length, `unexpected random opcode call ${index + 1}; stream has ${values.length} values`);
+    const value = values[index++];
+    assert(value >= 0 && value < 1, `test seam supplied invalid nextDouble value ${value}`);
+    observed.push(value);
+    return value;
+  };
+  try {
+    const result = callback();
+    if (!allowUnused) assert.equal(index, values.length, `random opcode consumed ${index}/${values.length} forced values`);
+    return { result, observed };
+  } finally {
+    JavaRandom.nextDouble = original;
+  }
+}
 
-function finishDelayed(player) {
+function withPlayerTrace(player, callback) {
+  const events = [];
+  const methodNames = [
+    'exactMove', 'teleport', 'teleJump', 'applyDamage', 'addXp', 'playAnimation', 'invDel', 'invAdd'
+  ];
+  const originalMethods = new Map(methodNames.map(name => [name, {
+    descriptor: Object.getOwnPropertyDescriptor(Player.prototype, name),
+    method: Player.prototype[name]
+  }]));
+  const originalInventoryDelete = Object.getOwnPropertyDescriptor(Inventory.prototype, 'delete');
+  const originalWrite = player.write;
+  const originalHandlers = new Map();
+  const isPlayerState = state => state.self === player || state._activePlayer === player;
+  const traceGosub = opcode => {
+    const original = ScriptRunner.HANDLERS[opcode];
+    assert.equal(typeof original, 'function', `opcode ${opcode} has a real ScriptRunner handler`);
+    originalHandlers.set(opcode, original);
+    ScriptRunner.HANDLERS[opcode] = state => {
+      if (isPlayerState(state)) {
+        const procedureId = opcode === ScriptOpcode.GOSUB_WITH_PARAMS
+          ? state.intOperand
+          : state.isp > 0 ? state.intStack[state.isp - 1] : undefined;
+        const procedure = Number.isInteger(procedureId) ? ScriptProvider.get(procedureId) : null;
+        if (procedure) events.push({ kind: 'call', name: procedure.name, tick: World.currentTick });
+      }
+      return original(state);
+    };
+  };
+  traceGosub(ScriptOpcode.GOSUB);
+  traceGosub(ScriptOpcode.GOSUB_WITH_PARAMS);
+  const originalDelay = ScriptRunner.HANDLERS[ScriptOpcode.P_DELAY];
+  assert.equal(typeof originalDelay, 'function', 'the real player delay opcode is installed');
+  originalHandlers.set(ScriptOpcode.P_DELAY, originalDelay);
+  ScriptRunner.HANDLERS[ScriptOpcode.P_DELAY] = state => {
+    const trace = isPlayerState(state);
+    const result = originalDelay(state);
+    if (trace) events.push({ kind: 'delay', tick: World.currentTick, delayedUntil: player.delayedUntil });
+    return result;
+  };
+  const originalReturn = ScriptRunner.HANDLERS[ScriptOpcode.RETURN];
+  assert.equal(typeof originalReturn, 'function', 'the real procedure return opcode is installed');
+  originalHandlers.set(ScriptOpcode.RETURN, originalReturn);
+  ScriptRunner.HANDLERS[ScriptOpcode.RETURN] = state => {
+    const name = isPlayerState(state) ? state.script.name : null;
+    const result = originalReturn(state);
+    if (['[proc,on_unequip]', '[proc,greegree_clearform_silent]', '[proc,update_bas]'].includes(name)) {
+      events.push({
+        kind: 'stateAfterProcedure',
+        name,
+        tick: World.currentTick,
+        npcId: player.npcId,
+        bas: BAS_FIELDS.map(field => player[field]),
+        animProtect: player.animProtect,
+        timers: [...player.timers.values()].map(timer => timer.script.name)
+      });
+    }
+    return result;
+  };
+  const originalExactMove = Player.prototype.exactMove;
+  const originalTeleport = Player.prototype.teleport;
+  const originalTeleJump = Player.prototype.teleJump;
+  const originalApplyDamage = Player.prototype.applyDamage;
+  const originalAddXp = Player.prototype.addXp;
+  const originalPlayAnimation = Player.prototype.playAnimation;
+  const originalInvDel = Player.prototype.invDel;
+  const originalInvAdd = Player.prototype.invAdd;
+  const originalInventoryDeleteMethod = Inventory.prototype.delete;
+  assert.equal(typeof originalExactMove, 'function', 'the real Player exactMove method exists');
+  assert.equal(typeof originalTeleJump, 'function', 'the real PathingEntity teleJump method exists');
+  assert.equal(typeof originalApplyDamage, 'function', 'the real Player applyDamage method exists');
+  assert.equal(typeof originalAddXp, 'function', 'the real Player addXp method exists');
+  assert.equal(typeof originalPlayAnimation, 'function', 'the real Player playAnimation method exists');
+  assert.equal(typeof originalInvDel, 'function', 'the real Player inventory removal method exists');
+  assert.equal(typeof originalInvAdd, 'function', 'the real Player inventory addition method exists');
+  assert.equal(typeof originalInventoryDeleteMethod, 'function', 'the real Inventory delete method exists');
+  Player.prototype.exactMove = function (...args) {
+    if (this === player) {
+      const [startX, startZ, endX, endZ, startCycle, endCycle, direction] = args;
+      events.push({ kind: 'exactMove', level: this.level, startX, startZ, endX, endZ, startCycle, endCycle, direction });
+    }
+    return originalExactMove.apply(this, args);
+  };
+  Player.prototype.teleport = function (...args) {
+    const event = this === player ? { kind: 'teleport', from: tileOf(this), to: null } : null;
+    if (event) events.push(event);
+    const result = originalTeleport.apply(this, args);
+    if (event) event.to = tileOf(this);
+    return result;
+  };
+  Player.prototype.teleJump = function (...args) {
+    const event = this === player ? { kind: 'teleJump', from: tileOf(this), to: null } : null;
+    if (event) events.push(event);
+    const result = originalTeleJump.apply(this, args);
+    if (event) event.to = tileOf(this);
+    return result;
+  };
+  Player.prototype.applyDamage = function (...args) {
+    const event = this === player
+      ? { kind: 'applyDamage', amount: args[0], type: args[1], tile: tileOf(this), hitpointsBefore: this.levels[HITPOINTS], hitpointsAfter: null }
+      : null;
+    if (event) events.push(event);
+    const result = originalApplyDamage.apply(this, args);
+    if (event) event.hitpointsAfter = this.levels[HITPOINTS];
+    return result;
+  };
+  Player.prototype.addXp = function (...args) {
+    if (this === player) events.push({ kind: 'addXp', stat: args[0], xp: args[1] });
+    return originalAddXp.apply(this, args);
+  };
+  Player.prototype.playAnimation = function (...args) {
+    if (this === player) events.push({ kind: 'playAnimation', animation: args[0], delay: args[1] });
+    return originalPlayAnimation.apply(this, args);
+  };
+  Player.prototype.invDel = function (...args) {
+    const result = originalInvDel.apply(this, args);
+    if (this === player && args[0] === WORN_INVENTORY && greegreeObjectIds.has(args[1]) && result > 0) {
+      events.push({
+        kind: 'wornItemRemoved',
+        inventoryId: args[0],
+        objectId: args[1],
+        count: result,
+        tick: World.currentTick,
+        via: 'invDel'
+      });
+    }
+    return result;
+  };
+  Player.prototype.invAdd = function (...args) {
+    const result = originalInvAdd.apply(this, args);
+    if (this === player && greegreeObjectIds.has(args[1]) && result > 0) {
+      events.push({
+        kind: 'inventoryItemAdded',
+        inventoryId: args[0],
+        objectId: args[1],
+        count: result,
+        tick: World.currentTick
+      });
+    }
+    return result;
+  };
+  Inventory.prototype.delete = function (slot) {
+    const item = this.get(slot);
+    const result = originalInventoryDeleteMethod.call(this, slot);
+    if (player.invs.get(WORN_INVENTORY) === this && item && greegreeObjectIds.has(item.id)) {
+      events.push({
+        kind: 'wornItemRemoved',
+        inventoryId: this.type,
+        objectId: item.id,
+        count: item.count,
+        tick: World.currentTick,
+        via: 'delete'
+      });
+    }
+    return result;
+  };
+  player.write = function (packet) {
+    events.push({
+      kind: 'packet',
+      tick: World.currentTick,
+      packet: canonicalJsonValue(packet)
+    });
+    return originalWrite.call(this, packet);
+  };
+  try {
+    return { result: callback(events), events };
+  } finally {
+    for (const [name, { descriptor }] of originalMethods) {
+      if (descriptor) Object.defineProperty(Player.prototype, name, descriptor);
+      else delete Player.prototype[name];
+    }
+    if (originalInventoryDelete) Object.defineProperty(Inventory.prototype, 'delete', originalInventoryDelete);
+    for (const [opcode, handler] of originalHandlers) ScriptRunner.HANDLERS[opcode] = handler;
+    player.write = originalWrite;
+  }
+}
+
+function assertSuccessfulPath(stage, events, delayTicks) {
+  const expected = SUCCESS_PATHS.get(stage.name);
+  assert(expected, `${stage.name} has a pinned published success path`);
+  const setupIndex = events.findIndex(event => event.kind === 'call' && event.name === '[proc,ape_atoll_setup]');
+  const rollIndex = events.findIndex(event => event.kind === 'call' && event.name === '[proc,ape_atoll_success]');
+  const firstSuccessMovementIndex = events.findIndex(event => ['exactMove', 'teleJump'].includes(event.kind));
+  assert(setupIndex >= 0 && setupIndex < rollIndex, `${stage.name} rolls only after valid setup`);
+  assert(rollIndex >= 0 && rollIndex < firstSuccessMovementIndex, `${stage.name} rolls before its first success movement leg`);
+  assert.equal(events.filter(event => event.kind === 'call' && event.name === '[proc,ape_atoll_success]').length, 1, `${stage.name} invokes the shared roll once`);
+  assert.deepEqual(events.filter(event => event.kind === 'exactMove').map(({ kind, ...event }) => event), expected.exactMoves, `${stage.name} preserves its published exact-move legs, cycles and directions`);
+  assert.deepEqual(events.filter(event => event.kind === 'teleJump').map(({ kind, ...event }) => event), expected.teleJumps, `${stage.name} preserves its published level-aware telejumps`);
+  assert.deepEqual(events.filter(event => event.kind === 'playAnimation').map(event => [event.animation, event.delay]), expected.animations, `${stage.name} preserves its published animations and animation delays`);
+  assert.deepEqual(delayTicks, expected.delayTicks, `${stage.name} preserves its published success delay schedule`);
+  const awards = events.map((event, index) => ({ event, index })).filter(({ event }) => event.kind === 'addXp');
+  assert.deepEqual(awards.map(({ event }) => [event.stat, event.xp]), [[AGILITY, stage.xp]], `${stage.name} preserves its one Agility award`);
+  const finalMovementIndex = Math.max(...events.map((event, index) => ['exactMove', 'teleport', 'teleJump'].includes(event.kind) ? index : -1));
+  assert(awards[0].index > finalMovementIndex, `${stage.name} awards XP only after all published movement legs`);
+  assert.equal(events.filter(event => event.kind === 'applyDamage').length, 0, `${stage.name} success applies no damage`);
+}
+
+function finishDelayed(player, observedDelayTicks = null) {
   let boundaries = 0;
   while (player.activeScript) {
     assert.ok(boundaries++ < 100, 'each compiled obstacle has a finite delay schedule');
@@ -417,6 +832,7 @@ function finishDelayed(player) {
     assert.equal(state.execution, ScriptState.SUSPENDED, 'obstacle delay suspends the active script');
     assert(player.delayed, 'suspended obstacle keeps the player protected');
     assert(player.delayedUntil > World.currentTick, 'obstacle resumes on a future server tick');
+    if (observedDelayTicks) observedDelayTicks.push(player.delayedUntil - World.currentTick);
     World.currentTick = player.delayedUntil;
     player.delayed = false;
     player.executeScript(state, true, true);
@@ -439,7 +855,7 @@ function finishConcurrent(players) {
   }
 }
 
-function runSuccessfulStage(player, stage) {
+function runSuccessfulStage(player, stage, { randomValues = [SUCCESS_RANDOM], allowUnusedRandom = false } = {}) {
   const script = locTriggers.get(stage.name);
   const loc = stageLoc(stage);
   const beforeXp = player.stats[AGILITY];
@@ -448,25 +864,30 @@ function runSuccessfulStage(player, stage) {
   const baseLevelsBefore = Array.from(player.baseLevels);
   const messagesBefore = [...player.messages];
   const varsBefore = Array.from(player.vars);
-  const state = ScriptRunner.init(script, player, loc);
-  player.executeScript(state, true, true);
-  assert.equal(player.activeScript, state, `${stage.name} first suspends inside its protected setup`);
-  assert.equal(state.execution, ScriptState.SUSPENDED, `${stage.name} starts through the packed delay`);
-  const during = snapshot(player);
-  const duplicate = ScriptRunner.init(script, player, loc);
-  player.executeScript(duplicate, true);
-  assert.deepEqual(snapshot(player), during, `${stage.name} duplicate click is refused while protected`);
-  assert.equal(player.activeScript, state, `${stage.name} duplicate cannot replace the active attempt`);
-  finishDelayed(player);
-  assert.deepEqual(tileOf(player), stage.end, `${stage.name} settles at its exact endpoint`);
-  assert.equal(player.stats[AGILITY] - beforeXp, stage.xp, `${stage.name} awards exactly ${stage.xp} internal tenths`);
-  assert.deepEqual(Array.from(player.vars), varsBefore, `${stage.name} adds no player varp state`);
-  const statsAfter = Array.from(player.stats);
-  statsAfter[AGILITY] = statsBefore[AGILITY];
-  assert.deepEqual(statsAfter, statsBefore, `${stage.name} awards no other skill XP`);
-  assert.deepEqual(Array.from(player.levels), levelsBefore, `${stage.name} causes no damage or current-level change`);
-  assert.deepEqual(Array.from(player.baseLevels), baseLevelsBefore, `${stage.name} causes no base-level change`);
-  assert.deepEqual(player.messages, messagesBefore, `${stage.name} emits no course text`);
+  const delayTicks = [];
+  const trace = withPlayerTrace(player, () => withRandomStream(randomValues, () => {
+    const state = ScriptRunner.init(script, player, loc);
+    player.executeScript(state, true, true);
+    assert.equal(player.activeScript, state, `${stage.name} first suspends inside its protected setup`);
+    assert.equal(state.execution, ScriptState.SUSPENDED, `${stage.name} starts through the packed delay`);
+    const during = snapshot(player);
+    const duplicate = ScriptRunner.init(script, player, loc);
+    player.executeScript(duplicate, true);
+    assert.deepEqual(snapshot(player), during, `${stage.name} duplicate click is refused while protected`);
+    assert.equal(player.activeScript, state, `${stage.name} duplicate cannot replace the active attempt`);
+    finishDelayed(player, delayTicks);
+    assert.deepEqual(tileOf(player), stage.end, `${stage.name} settles at its exact endpoint`);
+    assert.equal(player.stats[AGILITY] - beforeXp, stage.xp, `${stage.name} awards exactly ${stage.xp} internal tenths`);
+    assert.deepEqual(Array.from(player.vars), varsBefore, `${stage.name} adds no player varp state`);
+    const statsAfter = Array.from(player.stats);
+    statsAfter[AGILITY] = statsBefore[AGILITY];
+    assert.deepEqual(statsAfter, statsBefore, `${stage.name} awards no other skill XP`);
+    assert.deepEqual(Array.from(player.levels), levelsBefore, `${stage.name} causes no damage or current-level change`);
+    assert.deepEqual(Array.from(player.baseLevels), baseLevelsBefore, `${stage.name} causes no base-level change`);
+    assert.deepEqual(player.messages, messagesBefore, `${stage.name} emits no course text`);
+  }, allowUnusedRandom));
+  assert.deepEqual(trace.result.observed, allowUnusedRandom ? [] : randomValues, `${stage.name} uses only the forced engine random values`);
+  assertSuccessfulPath(stage, trace.events, delayTicks);
 }
 
 function assertRejected(player, stage, label) {
@@ -476,6 +897,369 @@ function assertRejected(player, stage, label) {
   assert.deepEqual(snapshot(player), before, `${label} writes no movement, damage, XP, varp, appearance, animation, message or packet state`);
   assert.equal(player.activeScript, null, `${label} does not leave a suspended script`);
 }
+
+function startDeathTestTick() {
+  World.currentTick = nextDeathTestTick;
+  nextDeathTestTick = World.currentTick + 100;
+}
+
+// Void engine commands are effects. Pure getters/branches are intentionally excluded:
+// a guarded form read must not change the ordinary human-death contract.
+const commandSignatures = new Map();
+for (const line of fs.readFileSync(path.join(CONTENT_DIR, 'scripts/engine.rs2'), 'utf8').split(/\r?\n/)) {
+  const match = line.match(/^\[command,([.\w]+)\](?:\/\*)?(?:\(([^)]*)\))?(.*)$/);
+  if (!match || /^\s*\(/.test(match[3])) continue;
+  const name = match[1].replace(/^\./, '').toUpperCase();
+  const types = [...(match[2] ?? '').matchAll(/(\w+)\s+\$/g)].map(m => m[1]);
+  commandSignatures.set(name, types);
+}
+// ENUM has a dynamic signature documented in a comment, not parsed above.
+commandSignatures.set('ENUM', ['type', 'type', 'enum']);
+const namedPacks = new Map();
+function namedArgument(type, value) {
+  const kind = ({ namedobj: 'obj', timer: 'script', softtimer: 'script', queue: 'script', proc: 'script' })[type] ?? type;
+  if (value < 0) return value;
+  if (kind === 'dbcolumn') {
+    return {
+      kind,
+      name: namedArgument('dbtable', (value >> 12) & 0xffff),
+      column: (value >> 4) & 0x7f,
+      tuple: (value & 15) - 1
+    };
+  }
+  const file = path.join(CONTENT_DIR, `pack/${kind}.pack`);
+  if (!fs.existsSync(file)) return value;
+  if (!namedPacks.has(kind)) {
+    namedPacks.set(kind, new Map(fs.readFileSync(file, 'utf8').trim().split(/\r?\n/).map(line => {
+      const equal = line.indexOf('=');
+      return [Number(line.slice(0, equal)), line.slice(equal + 1)];
+    })));
+  }
+  const name = namedPacks.get(kind).get(value);
+  if (kind === 'enum' || kind === 'dbtable') assert(name, `${kind}.pack is missing id ${value}`);
+  return name ?? value;
+}
+function withDeathEffects(player, callback) {
+  const commands = [];
+  const drops = [];
+  const handlers = new Map();
+  const originalAddObj = World.addObj;
+  World.addObj = function (object, owner, duration) {
+    drops.push({ tile: tileOf(object), id: object.type, count: object.count, owner: String(owner), duration });
+    return originalAddObj.apply(this, arguments);
+  };
+  for (const [opcode, name] of ScriptOpcodeNameMap) {
+    const variable = ['POP_VARP', 'POP_VARS', 'POP_VARBIT'].includes(name);
+    if ((!commandSignatures.has(name) || opcode < 1000) && !variable) continue;
+    const original = ScriptRunner.HANDLERS[opcode];
+    if (typeof original !== 'function') continue;
+    handlers.set(opcode, original);
+    ScriptRunner.HANDLERS[opcode] = state => {
+      const ints = [];
+      const strings = [];
+      const popInt = state.popInt;
+      const popString = state.popString;
+      state.popInt = function () { const value = popInt.call(this); ints.unshift(value); return value; };
+      state.popString = function () { const value = popString.call(this); strings.unshift(value); return value; };
+      const command = { name, pointer: state.intOperand };
+      commands.push(command);
+      try { return original(state); } finally {
+        state.popInt = popInt;
+        state.popString = popString;
+        const types = (commandSignatures.get(name) ?? []).filter(type => type !== 'string');
+        command.ints = ints.map((value, index) => {
+          const argument = namedArgument(types[index], value);
+          return name === 'ENUM' && index === 2 ? { kind: 'enum', name: argument } : argument;
+        });
+        command.strings = strings;
+        if (variable) command.pointer = namedArgument(name === 'POP_VARBIT' ? 'varbit' : 'varp', state.intOperand);
+      }
+    };
+  }
+  try { return { result: callback(), effects: { commands, drops } }; } finally {
+    World.addObj = originalAddObj;
+    for (const [opcode, handler] of handlers) ScriptRunner.HANDLERS[opcode] = handler;
+  }
+}
+
+function assertHumanDeathObservation(actual, baseline) {
+  const comparison = structuredClone(actual);
+  for (const [key, defaultValue] of [['vars', 0], ['varsString', { $undefined: true }]]) {
+    const old = baseline.player[key];
+    const current = comparison.player[key];
+    assert(current.length >= old.length, `${key} retains all baseline entries`);
+    for (const value of current.slice(old.length)) {
+      assert.deepEqual(value, defaultValue, `appended ${key} entry retains its type default`);
+    }
+    comparison.player[key] = current.slice(0, old.length);
+  }
+  assert.deepEqual(comparison, baseline, 'human death preserves packets, messages, inventories, respawn and reset stats');
+}
+function runDeathQueue(player) {
+  const packetsBeforeDeath = player.packets.map(canonicalJsonValue);
+  const originalRandom = Math.random;
+  let randomCalls = 0;
+  let trace;
+  Math.random = () => {
+    assert.equal(++randomCalls, 1, 'ordinary death consumes only its one real respawn-square random sample');
+    return DEATH_RESPAWN_RANDOM;
+  };
+  try {
+    trace = withPlayerTrace(player, () => {
+      const state = ScriptRunner.init(deathQueue, player, null, []);
+      player.executeScript(state, true, true);
+      assert.equal(state.execution, ScriptState.SUSPENDED, 'real death queue reaches its first production delay');
+      assert.equal(player.activeScript, state, 'real death queue owns the active player script');
+      finishDelayed(player);
+      assert.equal(state.execution, ScriptState.FINISHED, 'real death queue drains every production delay');
+      assert.equal(player.activeScript, null, 'real death queue leaves no active script');
+    });
+  } finally {
+    Math.random = originalRandom;
+  }
+  assert.equal(randomCalls, 1, 'ordinary death executes the production respawn-square sampler');
+  const packetWrites = trace.events.filter(event => event.kind === 'packet').map(event => event.packet);
+  assert.equal(
+    packetWrites.length,
+    player.packets.length - packetsBeforeDeath.length,
+    'the death trace retains every real outgoing packet write'
+  );
+  return {
+    events: trace.events,
+    snapshot: deathSnapshot(player, [...packetsBeforeDeath, ...packetWrites])
+  };
+}
+
+function runHumanDeath() {
+  startDeathTestTick();
+  const player = makePlayer(48, null, STAGES[0].start);
+  player.invSet(WORN_INVENTORY, packId('obj', 'bronze_sword'), 1, RIGHT_HAND);
+  const traced = withDeathEffects(player, () => runDeathQueue(player));
+  const death = traced.result;
+  return {
+    player,
+    events: death.events,
+    effects: canonicalJsonValue(traced.effects),
+    observation: canonicalJsonValue({
+      worldTick: World.currentTick,
+      player: death.snapshot
+    })
+  };
+}
+if (captureHumanDeathBaseline) {
+  // Capture the built tree as it exists, including after this repair is published.
+  const humanDeathRun = runHumanDeath();
+  const baseline = {
+    marker: HUMAN_DEATH_BASELINE_MARKER,
+    deathSourceSha256,
+    observation: humanDeathRun.observation,
+    effects: humanDeathRun.effects
+  };
+  fs.writeFileSync(process.stdout.fd, `${HUMAN_DEATH_BASELINE_MARKER} ${JSON.stringify(baseline)}\n`);
+  process.exit(0);
+}
+
+let humanDeathBaselineCases = 0;
+let monkeyDeathRepairCases = 0;
+let greegreeReequipCases = 0;
+let unmatchedGreegreeDeathControlCases = 0;
+const humanDeathRun = runHumanDeath();
+assert(fs.existsSync(HUMAN_DEATH_BASELINE_PATH), 'capture the published human-death baseline from a full pack');
+const humanDeathBaseline = JSON.parse(fs.readFileSync(HUMAN_DEATH_BASELINE_PATH, 'utf8'));
+assert.equal(humanDeathBaseline.marker, HUMAN_DEATH_BASELINE_MARKER, 'human death fixture is a marked real pack capture');
+assert.match(humanDeathBaseline.deathSourceSha256, /^[0-9a-f]{64}$/, 'source digest is retained as provenance, not an admission lock');
+assertHumanDeathObservation(humanDeathRun.observation, humanDeathBaseline.observation);
+assert.deepEqual(humanDeathRun.effects, JSON.parse(fs.readFileSync(HUMAN_DEATH_EFFECTS_PATH, 'utf8')),
+  'human death preserves commands and arguments in order, and actual ground drops');
+// Exercise the append-only rule without requiring an unrelated product varp edit.
+const appendedDefault = structuredClone(humanDeathRun.observation);
+appendedDefault.player.vars.push(0);
+appendedDefault.player.varsString.push({ $undefined: true });
+assertHumanDeathObservation(appendedDefault, humanDeathBaseline.observation);
+appendedDefault.player.vars[appendedDefault.player.vars.length - 1] = 1;
+assert.throws(() => assertHumanDeathObservation(appendedDefault, humanDeathBaseline.observation), /type default/);
+assert.equal(
+  humanDeathRun.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length,
+  0,
+  'ordinary human death does not invoke the greegree Remove reset'
+);
+humanDeathBaselineCases++;
+
+for (const form of ninjaForms) {
+  const objectId = packId('obj', form.object);
+  startDeathTestTick();
+  const unmatched = makePlayer(48, null, STAGES[0].start);
+  unmatched.invSet(WORN_INVENTORY, objectId, 1, RIGHT_HAND);
+  const unmatchedDeath = runDeathQueue(unmatched);
+  assert.equal(
+    unmatchedDeath.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length,
+    0,
+    `${form.label} item without its matching getter form does not trigger the death reset`
+  );
+  unmatchedGreegreeDeathControlCases++;
+
+  startDeathTestTick();
+  const player = makePlayer(48, null, STAGES[0].start);
+  const transformPacketStart = player.packets.length;
+  transform(player, form);
+  const transformedBas = BAS_FIELDS.map(field => player[field]);
+  assert.equal(player.npcId, packId('npc', form.npc), `${form.label} starts from its real packed getter form`);
+  assert(
+    [...player.timers.values()].some(timer => timer.script.name === greegreeTimerScript.name),
+    `${form.label} starts with the real Remove-owned greegree timer`
+  );
+  const transformedTabPacket = player.packets
+    .slice(transformPacketStart)
+    .filter(packet => packet.constructor.name === 'IfSetTab')
+    .at(-1);
+  assert(transformedTabPacket, `${form.label} transform writes the real magic-tab removal packet`);
+  assert.equal(player.tabs[transformedTabPacket.tab], transformedTabPacket.component, `${form.label} fixture records its transformed tab state`);
+
+  const death = runDeathQueue(player);
+  const removalIndex = death.events.findIndex(event =>
+    event.kind === 'wornItemRemoved' && event.inventoryId === WORN_INVENTORY && event.objectId === objectId
+  );
+  assert(removalIndex >= 0, `${form.label} death executes the real worn-item removal`);
+  const resetIndex = death.events.findIndex((event, index) =>
+    index > removalIndex && event.kind === 'call' && event.name === '[proc,greegree_clearform_silent]'
+  );
+  assert(resetIndex > removalIndex, `${form.label} death calls the silent reset after the item leaves worn`);
+  assert.equal(
+    death.events.filter(event => event.kind === 'call' && event.name === '[proc,greegree_clearform_silent]').length,
+    1,
+    `${form.label} death invokes the shared silent reset exactly once`
+  );
+  const inventoryAddIndex = death.events.findIndex(event =>
+    event.kind === 'inventoryItemAdded' && event.inventoryId === MAIN_INVENTORY && event.objectId === objectId
+  );
+  assert(inventoryAddIndex > removalIndex && inventoryAddIndex < resetIndex, `${form.label} death records the real kept-item move into inventory before reset`);
+  assert.equal(death.events[inventoryAddIndex].tick, death.events[removalIndex].tick, `${form.label} kept-item inventory move shares the removal tick`);
+  assert.equal(death.events[resetIndex].tick, death.events[removalIndex].tick, `${form.label} reset shares the worn-item move's World tick`);
+  assert.deepEqual(
+    death.events.slice(removalIndex + 1, resetIndex).filter(event => event.kind === 'delay'),
+    [],
+    `${form.label} death inserts no delay between worn-item removal and reset`
+  );
+  assert.equal(
+    death.events.filter(event => event.kind === 'wornItemRemoved' && event.objectId === objectId).length,
+    1,
+    `${form.label} death removes its worn greegree exactly once`
+  );
+  const resetState = death.events.find(event =>
+    event.kind === 'stateAfterProcedure' && event.name === '[proc,greegree_clearform_silent]'
+  );
+  assert(resetState, `${form.label} records the actual completed silent reset`);
+  assert.equal(resetState.tick, death.events[removalIndex].tick, `${form.label} actual form reset shares the item-move tick`);
+  assert.equal(resetState.npcId, humanDeathBaseline.observation.player.npcId, `${form.label} getter form is clear when silent reset returns`);
+  assert.equal(resetState.animProtect, 0, `${form.label} silent reset clears protection in the item-move tick`);
+  assert(!resetState.timers.includes(greegreeTimerScript.name), `${form.label} Remove clears its timer in the item-move tick`);
+  const basState = death.events.find(event =>
+    event.kind === 'stateAfterProcedure' && event.name === '[proc,update_bas]'
+  );
+  assert(basState, `${form.label} records the actual completed BAS derivation`);
+  assert.equal(basState.tick, death.events[removalIndex].tick, `${form.label} all BAS fields restore in the item-move tick`);
+  assert.deepEqual(
+    basState.bas,
+    BAS_FIELDS.map(field => humanDeathBaseline.observation.player.bas[field]),
+    `${form.label} item-move tick derives all seven human BAS values`
+  );
+
+  assert.equal(player.npcId, humanDeathBaseline.observation.player.npcId, `${form.label} death clears the actual getter form`);
+  assert.deepEqual(
+    BAS_FIELDS.map(field => player[field]),
+    BAS_FIELDS.map(field => humanDeathBaseline.observation.player.bas[field]),
+    `${form.label} death restores all seven human BAS values`
+  );
+  assert.equal(player.animProtect, 0, `${form.label} death clears Remove-owned animation protection`);
+  assert(
+    ![...player.timers.values()].some(timer => timer.script.name === greegreeTimerScript.name),
+    `${form.label} death clears the real Remove-owned greegree timer`
+  );
+  assert.deepEqual(player.tabs, humanDeathBaseline.observation.player.tabs, `${form.label} death restores ordinary human tab state`);
+  const restoredTabPacket = player.packets
+    .slice(transformPacketStart)
+    .filter(packet => packet.constructor.name === 'IfSetTab' && packet.tab === transformedTabPacket.tab)
+    .at(-1);
+  assert(restoredTabPacket, `${form.label} death sends the real tab restoration packet`);
+  assert.notEqual(restoredTabPacket.component, transformedTabPacket.component, `${form.label} death reverses the transform's tab change`);
+  assert.equal(
+    restoredTabPacket.component,
+    player.tabs[restoredTabPacket.tab],
+    `${form.label} tab restoration packet matches the final player tab state`
+  );
+  assert.deepEqual(
+    death.snapshot.inventories,
+    unmatchedDeath.snapshot.inventories,
+    `${form.label} death preserves the ordinary kept-item allocation`
+  );
+  assert.deepEqual(
+    player.messages,
+    humanDeathBaseline.observation.player.messages,
+    `${form.label} death adds no player-visible text`
+  );
+  assert.equal(death.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length, 0,
+    `${form.label} death never invokes Remove's visible/sound effects`);
+  assert.equal(player.spotanimId, -1, `${form.label} respawn has no revert spot animation`);
+  assert.equal(death.events.filter(event => event.kind === 'packet' && event.packet.$type === 'SynthSound').length, 0,
+    `${form.label} death emits no greegree revert sound`);
+  monkeyDeathRepairCases++;
+
+  // A disclosed position fixture returns to the valid Ape region, not a form seed.
+  player.level = STAGES[0].start.level;
+  player.x = STAGES[0].start.x;
+  player.z = STAGES[0].start.z;
+  const inventory = player.getInventory(MAIN_INVENTORY);
+  const greegreeSlot = inventory.getItemIndex(objectId);
+  assert(greegreeSlot >= 0, `${form.label} ordinary death keeps its greegree available for a real re-wield`);
+  player.lastSlot = greegreeSlot;
+  const wieldState = ScriptRunner.init(greegreeWieldScript, player, null, []);
+  assert.equal(player.runScript(wieldState, true, true), ScriptState.FINISHED, `${form.label} real Wield/Hold action finishes at an Ape tile`);
+  assert.equal(
+    player.getInventory(WORN_INVENTORY)?.get(RIGHT_HAND)?.id,
+    objectId,
+    `${form.label} real Wield/Hold moves the greegree back to worn`
+  );
+  assert.equal(player.npcId, packId('npc', form.npc), `${form.label} real Wield/Hold restores the actual getter form`);
+  assert.deepEqual(BAS_FIELDS.map(field => player[field]), transformedBas, `${form.label} real Wield/Hold restores all seven transformed BAS values`);
+  assert.equal(player.animProtect, 1, `${form.label} real Wield/Hold restores animation protection`);
+  assert(
+    [...player.timers.values()].some(timer => timer.script.name === greegreeTimerScript.name),
+    `${form.label} real Wield/Hold rearms the real greegree timer`
+  );
+  greegreeReequipCases++;
+  const unequip = ScriptProvider.getByName('[proc,unequip]');
+  assert(unequip, 'ordinary Remove is packed');
+  const removeEffects = withDeathEffects(player, () => withPlayerTrace(player, () => {
+    assert.equal(player.runScript(ScriptRunner.init(unequip, player, null, [RIGHT_HAND]), true, true),
+      ScriptState.FINISHED, `${form.label} real Remove finishes`);
+  }));
+  const remove = removeEffects.result;
+  const clearAt = removeEffects.effects.commands.findIndex(command => command.name === 'P_TRANSMOGRIFY');
+  assert(clearAt >= 0, `${form.label} Remove executes its form-clear command`);
+  assert.deepEqual(removeEffects.effects.commands.slice(clearAt, clearAt + 6), [
+    { name: 'P_TRANSMOGRIFY', pointer: 0, ints: [-1], strings: [] },
+    { name: 'CLEARTIMER', pointer: 0, ints: ['[timer,mm_greegree_timer]'], strings: [] },
+    { name: 'P_ANIMPROTECT', pointer: 0, ints: [0], strings: [] },
+    { name: 'SPOTANIM_PL', pointer: 0, ints: ['windwave_impact', 124, 0], strings: [] },
+    { name: 'SOUND_SYNTH', pointer: 0, ints: [form.accepted ? 'smallmonkey_into_human' : 'monkey_into_human', 0, 0], strings: [] },
+    { name: 'IF_SETTAB', pointer: 0, ints: ['magic', 6], strings: [] }
+  ], `${form.label} compiled Remove keeps the published command arguments and order`);
+  assert.equal(player.npcId, -1, `${form.label} Remove still clears form`);
+  assert.equal(player.spotanimId, packId('spotanim', 'windwave_impact'), `${form.label} Remove retains its published spot animation`);
+  const sounds = remove.events.filter(event => event.kind === 'packet' && event.packet.$type === 'SynthSound');
+  assert.equal(sounds.length, 1, `${form.label} Remove retains its one published revert sound`);
+}
+
+// The donor policy covers any NPC form, not only a matching worn greegree.
+const otherForm = makePlayer(48, null, STAGES[0].start);
+otherForm.npcId = packId('npc', 'imp');
+runDeathQueue(otherForm);
+assert.equal(otherForm.npcId, -1, 'ordinary death clears a non-greegree NPC form too');
+
+assert.equal(humanDeathBaselineCases, 1, 'one complete published human-death fixture is compared');
+assert.equal(monkeyDeathRepairCases, ninjaForms.length, 'all three configured greegree forms clear on ordinary death');
+assert.equal(greegreeReequipCases, ninjaForms.length, 'all three configured greegree forms restore through real Wield/Hold');
+assert.equal(unmatchedGreegreeDeathControlCases, ninjaForms.length, 'all three untransformed greegree controls avoid the death reset');
 
 let matrixCases = 0;
 let rejectedCases = 0;
@@ -558,15 +1342,129 @@ assert.deepEqual(Array.from(lapPlayer.vars), lapVars, 'repeat use still stores n
 // Separate players can hold the same protected obstacle concurrently; there is no world-wide lock.
 const concurrentPlayers = [makePlayer(48, ninjaForms[0], STAGES[0].start), makePlayer(48, ninjaForms[1], STAGES[0].start)];
 const concurrentXpBefore = concurrentPlayers.map(player => player.stats[AGILITY]);
-for (const player of concurrentPlayers) {
-  const state = ScriptRunner.init(locTriggers.get(STAGES[0].name), player, stageLoc(STAGES[0]));
-  player.executeScript(state, true, true);
-  assert.equal(player.activeScript, state, 'each player owns an independent protected attempt');
-}
-finishConcurrent(concurrentPlayers);
+const concurrentRolls = withRandomStream([SUCCESS_RANDOM, SUCCESS_RANDOM], () => {
+  for (const player of concurrentPlayers) {
+    const state = ScriptRunner.init(locTriggers.get(STAGES[0].name), player, stageLoc(STAGES[0]));
+    player.executeScript(state, true, true);
+    assert.equal(player.activeScript, state, 'each player owns an independent protected attempt');
+  }
+  finishConcurrent(concurrentPlayers);
+});
+assert.deepEqual(concurrentRolls.observed, [SUCCESS_RANDOM, SUCCESS_RANDOM], 'concurrent successes use the shared engine random seam deterministically');
 for (const [index, player] of concurrentPlayers.entries()) {
   assert.equal(player.stats[AGILITY] - concurrentXpBefore[index], 400, 'both concurrent players settle their own stone award');
 }
+
+const FAILURE_HP_CASES = [
+  { label: '3-damage lower clamp', hitpoints: 20, damage: 3 },
+  { label: 'interior damage', hitpoints: 50, damage: 5 },
+  { label: '7-damage upper clamp', hitpoints: 90, damage: 7 },
+  { label: 'lethal low HP', hitpoints: 2, damage: 3 }
+];
+let failureCases = 0;
+for (const stage of STAGES) {
+  for (const hpCase of FAILURE_HP_CASES) {
+    const failure = FAILURE_PATHS.get(stage.name);
+    assert(failure, `${stage.name} has a pinned candidate failure landing and animation`);
+    const player = makePlayer(48, ninjaForms[0], stage.start);
+    player.levels[AGILITY] = 74;
+    player.setLevel(HITPOINTS, 99);
+    player.levels[HITPOINTS] = hpCase.hitpoints;
+    const beforeXp = player.stats[AGILITY];
+    const beforeStats = Array.from(player.stats);
+    const beforeBas = BAS_FIELDS.map(field => player[field]);
+    const priorDeathQueues = [...player.queue.all()].filter(request => request.script.id === deathQueue.id).length;
+    const trace = withPlayerTrace(player, () => withRandomStream([FAILURE_RANDOM, HIT_SOUND_RANDOM], () => {
+      const state = ScriptRunner.init(locTriggers.get(stage.name), player, stageLoc(stage));
+      player.executeScript(state, true, true);
+      assert.equal(player.activeScript, state, `${stage.name} failure first suspends inside valid setup`);
+      assert.equal(state.execution, ScriptState.SUSPENDED);
+      finishDelayed(player);
+      assert.equal(player.activeScript, null, `${stage.name} failure returns without leaving a suspended script`);
+    }));
+    const events = trace.events;
+    assert.deepEqual(trace.result.observed, [FAILURE_RANDOM, HIT_SOUND_RANDOM], `${stage.name} consumes its forced failure roll and real damage sound roll`);
+    const callNames = events.filter(event => event.kind === 'call').map(event => event.name);
+    const setupIndex = events.findIndex(event => event.kind === 'call' && event.name === '[proc,ape_atoll_setup]');
+    const rollIndex = events.findIndex(event => event.kind === 'call' && event.name === '[proc,ape_atoll_success]');
+    const failIndex = events.findIndex(event => event.kind === 'call' && event.name === '[proc,ape_atoll_fail]');
+    const damageSelfIndex = events.findIndex(event => event.kind === 'call' && event.name === '[proc,damage_self]');
+    const damageIndex = events.findIndex(event => event.kind === 'applyDamage');
+    const updateBasIndex = events.findIndex(event => event.kind === 'call' && event.name === '[proc,update_bas]');
+    assert(setupIndex >= 0 && setupIndex < rollIndex, `${stage.name} checks failure only after valid setup`);
+    assert(rollIndex >= 0 && rollIndex < failIndex, `${stage.name} failure follows its shared roll`);
+    assert.equal(events.filter(event => event.kind === 'call' && event.name === '[proc,ape_atoll_success]').length, 1, `${stage.name} calls the shared roll once`);
+    assert.equal(events.filter(event => event.kind === 'call' && event.name === '[proc,ape_atoll_fail]').length, 1, `${stage.name} calls the real failure procedure once`);
+    assert(failIndex < damageSelfIndex && damageSelfIndex < damageIndex, `${stage.name} lands and restores before invoking real damage_self`);
+    assert(updateBasIndex > failIndex && updateBasIndex < damageSelfIndex, `${stage.name} restores the current form BAS before damage`);
+    assert.equal(callNames.filter(name => name === '[proc,damage_self]').length, 1, `${stage.name} invokes real damage_self exactly once`);
+    assert.equal(callNames.includes('[proc,ape_atoll_finish]'), false, `${stage.name} failure never reaches the success award procedure`);
+    const failureAnimations = events.filter(event => event.kind === 'playAnimation' && event.animation === failure.animation);
+    assert.equal(failureAnimations.length, 1, `${stage.name} plays its candidate failure animation`);
+    const damageResetIndex = events.findIndex((event, index) => index < damageIndex && event.kind === 'playAnimation' && event.animation === -1);
+    assert(damageResetIndex > failIndex, `${stage.name} restores the animation before damage`);
+    const damageEvents = events.filter(event => event.kind === 'applyDamage');
+    assert.equal(damageEvents.length, 1, `${stage.name} applies exactly one real hit`);
+    const damage = damageEvents[0];
+    assert.deepEqual(damage.tile, failure.landing, `${stage.name} is already on its landing tile at the real damage call`);
+    assert.equal(damage.hitpointsBefore, hpCase.hitpoints, `${stage.name} damages the current Hitpoints fixture`);
+    assert.equal(damage.amount, hpCase.damage, `${stage.name} uses the expected ${hpCase.damage}-damage envelope`);
+    assert.equal(damage.hitpointsAfter, Math.max(0, hpCase.hitpoints - hpCase.damage), `${stage.name} mutates HP through the engine damage method`);
+    const movementBeforeDamage = events.slice(0, damageIndex).filter(event => ['exactMove', 'teleJump'].includes(event.kind));
+    assert.equal(movementBeforeDamage.length > 0, true, `${stage.name} performs its real landing movement before damage`);
+    const failureExactMoves = movementBeforeDamage.filter(event => event.kind === 'exactMove');
+    assert.equal(failureExactMoves.length, 1, `${stage.name} uses one exact-move landing leg`);
+    const exactMove = failureExactMoves[0];
+    assert.equal(exactMove.level, stage.start.level, `${stage.name} exact-move remains on the current plane`);
+    if (stage.start.level === failure.landing.level) {
+      assert.deepEqual(
+        { x: exactMove.startX, z: exactMove.startZ, endX: exactMove.endX, endZ: exactMove.endZ },
+        { x: stage.start.x, z: stage.start.z, endX: failure.landing.x, endZ: failure.landing.z },
+        `${stage.name} exact-moves from its setup stand to the same-plane landing`
+      );
+      assert.deepEqual(
+        movementBeforeDamage.filter(event => event.kind === 'teleJump').map(event => ({ from: event.from, to: event.to })),
+        [{ from: failure.landing, to: failure.landing }],
+        `${stage.name} explicitly settles on its same-plane failure landing before damage`
+      );
+    } else {
+      assert.deepEqual(
+        { startX: exactMove.startX, startZ: exactMove.startZ, endX: exactMove.endX, endZ: exactMove.endZ },
+        { startX: stage.start.x, startZ: stage.start.z, endX: stage.start.x, endZ: stage.start.z },
+        `${stage.name} cross-level failure uses a stationary exact-move on the current plane`
+      );
+      assert.deepEqual(
+        movementBeforeDamage.filter(event => event.kind === 'teleJump').map(event => event.to),
+        [failure.landing],
+        `${stage.name} reaches its level-aware failure landing before damage`
+      );
+    }
+    const postDamageEffects = events.slice(damageIndex + 1).filter(event => ['exactMove', 'teleport', 'teleJump', 'addXp'].includes(event.kind));
+    assert.deepEqual(postDamageEffects, [], `${stage.name} performs no success movement or award after damage`);
+    assert.equal(player.stats[AGILITY], beforeXp, `${stage.name} failure awards no Agility XP`);
+    assert.deepEqual(Array.from(player.stats), beforeStats, `${stage.name} failure awards no skill XP`);
+    assert.equal(player.animProtect, 1, `${stage.name} restores the engine's integer animation-protection flag`);
+    assert.deepEqual(BAS_FIELDS.map(field => player[field]), beforeBas, `${stage.name} restores all seven transformed BAS fields`);
+    assert.equal(player.animId, -1, `${stage.name} clears the failure animation`);
+    const deathQueueCount = [...player.queue.all()].filter(request => request.script.id === deathQueue.id).length;
+    assert.equal(deathQueueCount - priorDeathQueues, hpCase.hitpoints <= hpCase.damage ? 1 : 0, `${stage.name} lethal damage schedules the real death queue exactly once`);
+    assert.equal(callNames.filter(name => name === '[proc,player_die]').length, hpCase.hitpoints <= hpCase.damage ? 1 : 0, `${stage.name} lethal damage reaches player_die`);
+    assert.equal(callNames.filter(name => name === '[proc,ring_of_life_check]').length, hpCase.hitpoints > hpCase.damage ? 1 : 0, `${stage.name} surviving damage reaches the real ring-of-life check`);
+    failureCases++;
+  }
+}
+assert.equal(failureCases, STAGES.length * FAILURE_HP_CASES.length, 'all seven failable handler paths cover four damage edges');
+
+let bypassCases = 0;
+for (const stage of STAGES) {
+  for (const currentLevel of [75, 76, 99]) {
+    const player = makePlayer(48, ninjaForms[0], stage.start);
+    player.levels[AGILITY] = currentLevel;
+    runSuccessfulStage(player, stage, { randomValues: [FAILURE_RANDOM], allowUnusedRandom: true });
+    bypassCases++;
+  }
+}
+assert.equal(bypassCases, STAGES.length * 3, 'all seven handler paths bypass failure at current Agility 75, 76 and 99 without consuming the failure seam');
 
 // One-tile collision fixture proves a clipped approach stops before animation, travel and reward.
 const ropeStage = STAGES[5];
@@ -640,11 +1538,17 @@ const result = {
   entryMatrix: { total: matrixCases, rejected: rejectedCases, successful: successfulCases },
   fullLapXpTenths: 5800,
   repeatedLapXpTenths: 5800,
+  failureCases,
+  bypassCases,
+  humanDeathBaselineCases,
+  monkeyDeathRepairCases,
+  greegreeReequipCases,
+  unmatchedGreegreeDeathControlCases,
   recovery: { barsCheckpoints, vineCheckpoints, controls: 3 }
 };
 const outputRoot = process.env.RUNNER_TEMP || os.tmpdir();
 fs.mkdirSync(outputRoot, { recursive: true });
 const outputDirectory = fs.mkdtempSync(path.join(outputRoot, 'ape-atoll-packed-'));
 fs.writeFileSync(path.join(outputDirectory, 'result.json'), `${JSON.stringify(result, null, 2)}\n`);
-console.log(`RESULT PASS (packed Ape Atoll handlers, ${matrixCases} entry combinations, ${barsCheckpoints + vineCheckpoints} recovery tiles; receipt written under temporary storage)`);
+console.log(`RESULT PASS (packed Ape Atoll handlers, ${matrixCases} entry combinations, ${failureCases} failure cases, ${monkeyDeathRepairCases} death repairs, ${greegreeReequipCases} real re-equips, ${barsCheckpoints + vineCheckpoints} recovery tiles; receipt written under temporary storage)`);
 process.exit(0);

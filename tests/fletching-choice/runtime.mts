@@ -30,7 +30,9 @@ import ResumePCountDialogHandler from "#/network/game/client/handler/ResumePCoun
 import ResumePCountDialog from "#/network/game/client/model/ResumePCountDialog.js";
 import ResumePauseButtonHandler from "#/network/game/client/handler/ResumePauseButtonHandler.js";
 import ResumePauseButton from "#/network/game/client/model/ResumePauseButton.js";
+import IfOpenChat from "#/network/game/server/model/IfOpenChat.js";
 import IfSetPosition from "#/network/game/server/model/IfSetPosition.js";
+import IfSetObject from "#/network/game/server/model/IfSetObject.js";
 import IfSetText from "#/network/game/server/model/IfSetText.js";
 
 let checks = 0;
@@ -108,11 +110,13 @@ function beginLogs(
   p.invAdd(InvType.getId("inv"), id(log), amount);
   p.lastItem = id(reverse ? "knife" : log);
   p.lastUseItem = id(reverse ? log : "knife");
+  const packetStart = packets.get(p)!.length;
   const state = start(
     p,
     reverse ? "[opheldu,knife]" : "[opheldu,_category_22]",
   );
   assert.equal(state.execution, ScriptState.PAUSEBUTTON);
+  assertFletchingMenu(p, packetStart, log);
   return state;
 }
 function quantity(p: Player, root: string, product: number, n: number): void {
@@ -130,6 +134,74 @@ function quantity(p: Player, root: string, product: number, n: number): void {
 }
 function inventory(p: Player, obj: string): number {
   return p.invTotal(InvType.getId("inv"), id(obj));
+}
+
+function assertMenuOrder(p: Player, packetStart: number, root: string): void {
+  const observed = packets.get(p)!.slice(packetStart);
+  const rootId = component(root);
+  const openIndex = observed.findIndex(
+    (packet) => packet instanceof IfOpenChat && packet.component === rootId,
+  );
+  const lastSetter = observed.findLastIndex(
+    (packet) =>
+      packet instanceof IfSetPosition ||
+      packet instanceof IfSetObject ||
+      packet instanceof IfSetText,
+  );
+  assert(
+    lastSetter >= 0 && openIndex > lastSetter,
+    `${root} must open after its last setter so the 377 client repaints`,
+  );
+  assert.deepEqual(
+    observed
+      .filter((packet): packet is IfOpenChat => packet instanceof IfOpenChat)
+      .map((packet) => packet.component),
+    [rootId],
+    `${root} must open the packed chat root exactly once`,
+  );
+}
+
+function assertFletchingMenu(p: Player, packetStart: number, log: string): void {
+  const wood = new Map([
+    ["oak_logs", "Oak"], ["willow_logs", "Willow"], ["maple_logs", "Maple"],
+    ["yew_logs", "Yew"], ["magic_logs", "Magic"],
+  ]).get(log);
+  assert(log === "logs" || wood, `unsupported fletching menu fixture ${log}`);
+  const root = log === "logs" ? "skillmulti3" : "skillmulti2";
+  assertMenuOrder(p, packetStart, root);
+  const products = log === "logs"
+    ? [
+        { object: "arrow_shaft", x: 5, y: -15, label: "15 Arrow Shafts" },
+        { object: "shortbow", x: 9, y: -11, label: "Short Bow" },
+        { object: "longbow", x: 0, y: -15, label: "Long Bow" },
+      ]
+    : [
+        { object: `${log.replace("_logs", "")}_shortbow`, x: 0, y: -15, label: `${wood} Short Bow` },
+        { object: `${log.replace("_logs", "")}_longbow`, x: 0, y: -15, label: `${wood} Long Bow` },
+      ];
+  const output = packets.get(p)!.slice(packetStart);
+  for (const [index, expected] of products.entries()) {
+    const model = component(`${root}:com_${index + 2}`);
+    const label = component(`${root}:com_${products.length + 5 + index * 4}`);
+    assert.deepEqual(
+      output.filter((p): p is IfSetPosition => p instanceof IfSetPosition && p.component === model)
+        .map((p) => [p.x, p.y]),
+      [[expected.x, expected.y]],
+      `${log} product ${index} Lost City position`,
+    );
+    assert.deepEqual(
+      output.filter((p): p is IfSetObject => p instanceof IfSetObject && p.component === model)
+        .map((p) => [p.obj, p.scale]),
+      [[id(expected.object), 175]],
+      `${log} product ${index} display object and Lost City scale`,
+    );
+    assert.deepEqual(
+      output.filter((p): p is IfSetText => p instanceof IfSetText && p.component === label)
+        .map((p) => p.text),
+      [`\\n\\n\\n\\n${expected.label}`],
+      `${log} product ${index} Lost City label`,
+    );
+  }
 }
 function chooserArgs(objects: string[], close: boolean): (number | string)[] {
   return [
@@ -246,6 +318,16 @@ try {
   Component.load("data/pack");
   FontType.load("data/pack");
   ScriptProvider.load("data/pack");
+  if (process.env.FLETCHING_CHOICE_MUTANT === "swap-labels") {
+    const caller = ScriptProvider.getByName("[label,fletch_log]");
+    assert(caller, "mutant requires packed fletching caller");
+    const first = caller.stringOperands.indexOf("\\n\\n\\n\\n15 Arrow Shafts");
+    const second = caller.stringOperands.indexOf("\\n\\n\\n\\nShort Bow");
+    assert(first >= 0 && second >= 0, "mutant requires both fletching label literals");
+    [caller.stringOperands[first], caller.stringOperands[second]] =
+      [caller.stringOperands[second], caller.stringOperands[first]];
+    console.error("MUTANT: swapped two packed fletching label operands; failure is expected");
+  }
 
   // Ordinary logs offer three products; each other supported log offers two.
   const recipes: [string, string, number, number, number][] = [
@@ -589,7 +671,7 @@ try {
       checks++;
     }
   }
-  // All related skillmulti procs: every product and every cache quantity layer resumes.
+  // Retained skillmulti1 and skill_multi2..5: every product and quantity layer.
   const objects = [
     "bronze_bar",
     "iron_bar",
@@ -597,18 +679,152 @@ try {
     "mithril_bar",
     "runite_bar",
   ];
+  const productNames = ["Bronze bar", "Iron bar", "Steel bar", "Mithril bar", "Runite bar"];
+  const productPositions = [
+    [0, -15],
+    [4, -11],
+    [-3, 10],
+    [6, -7],
+    [8, 2],
+  ];
+  const productScales = [175, 180, 185, 190, 195];
   for (let size = 1; size <= 5; size++) {
     for (let product = 0; product < size; product++) {
       for (let option = 0; option < 4; option++) {
         const p = player();
-        const state = start(
-          p,
-          `[proc,skillmulti${size}]`,
-          objects.slice(0, size).map(id),
-        );
+        const products = objects.slice(0, size).map((object, index) => ({
+          object,
+          x: productPositions[index][0],
+          y: productPositions[index][1],
+          scale: productScales[index],
+          label: `\\n\\n\\n\\n${productNames[index]}`,
+        }));
+        const args =
+          size === 1
+            ? [id(objects[0])]
+            : products.flatMap((entry) => [
+                id(entry.object),
+                entry.x,
+                entry.y,
+                entry.scale,
+                entry.label,
+              ]);
+        const name =
+          size === 1 ? "[proc,skillmulti1]" : `[proc,skill_multi${size}]`;
+        const packetStart = packets.get(p)!.length;
+        const state = start(p, name, args);
         assert.equal(state.execution, ScriptState.PAUSEBUTTON);
         assert.equal(p.resumeButtons.length, size * 4);
-        click(p, `skillmulti${size}:com_${size + 2 + product * 4 + option}`);
+        assertMenuOrder(p, packetStart, `skillmulti${size}`);
+        if (size === 1) {
+          const observed = packets.get(p)!.slice(packetStart);
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetObject =>
+                  packet instanceof IfSetObject &&
+                  packet.component === component("skillmulti1:com_2"),
+              )
+              .map((packet) => ({
+                object: packet.obj,
+                scale: packet.scale,
+              })),
+            [{ object: id(objects[0]), scale: 200 }],
+          );
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetText =>
+                  packet instanceof IfSetText &&
+                  packet.component === component("skillmulti1:com_7"),
+              )
+              .map((packet) => packet.text),
+            ["How many would you like to make?"],
+          );
+          assert.equal(
+            observed.filter((packet) => packet instanceof IfSetText).length,
+            1,
+            "single-item cache must not set a product label",
+          );
+        } else {
+          const root = `skillmulti${size}`;
+          const modelIds = new Map(
+            products.map((entry, index) => [
+              component(`${root}:com_${index + 2}`),
+              index,
+            ]),
+          );
+          const makeOneIds = new Map(
+            products.map((entry, index) => [
+              component(`${root}:com_${size + 5 + index * 4}`),
+              index,
+            ]),
+          );
+          const promptId = component(`${root}:com_${size * 5 + 2}`);
+          const observed = packets.get(p)!.slice(packetStart);
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetPosition =>
+                  packet instanceof IfSetPosition && modelIds.has(packet.component),
+              )
+              .map((packet) => ({
+                product: modelIds.get(packet.component),
+                x: packet.x,
+                y: packet.y,
+              })),
+            products.map((entry, index) => ({
+              product: index,
+              x: entry.x,
+              y: entry.y,
+            })),
+          );
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetObject =>
+                  packet instanceof IfSetObject && modelIds.has(packet.component),
+              )
+              .map((packet) => ({
+                product: modelIds.get(packet.component),
+                object: packet.obj,
+                scale: packet.scale,
+              })),
+            products.map((entry, index) => ({
+              product: index,
+              object: id(entry.object),
+              scale: entry.scale,
+            })),
+          );
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetText =>
+                  packet instanceof IfSetText && makeOneIds.has(packet.component),
+              )
+              .map((packet) => ({
+                product: makeOneIds.get(packet.component),
+                text: packet.text,
+              })),
+            products.map((entry, index) => ({
+              product: index,
+              text: entry.label,
+            })),
+          );
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetText =>
+                  packet instanceof IfSetText && packet.component === promptId,
+              )
+              .map((packet) => packet.text),
+            ["What would you like to make?"],
+          );
+        }
+        click(
+          p,
+          `skillmulti${size}:com_${size + 2 + product * 4 + option}`,
+        );
         if (state.execution === ScriptState.COUNTDIALOG)
           assert(countDialog.handle(new ResumePCountDialog(3), p));
         assert.equal(state.execution, ScriptState.FINISHED);

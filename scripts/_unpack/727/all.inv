@@ -1,5 +1,6 @@
 [trawler_rewardinv]
 size=40
+protect=no
 stackall=yes
 
 [axeshop]
@@ -1464,6 +1465,7 @@ scope=shared
 
 [partyroom_tempinv]
 size=8
+protect=no
 
 [crafting_make_rings]
 scope=temp
@@ -2036,6 +2038,7 @@ stock9=black_halberd,10,100
 stock10=mithril_halberd,7,100
 stock11=adamant_halberd,7,100
 stock12=rune_halberd,7,100
+stock13=dragon_halberd,0,500
 
 [regicide_general_shop_2]
 scope=shared
@@ -2248,6 +2251,7 @@ stock24=wizards_mind_bomb,5,500
 size=64
 protect=no
 scope=temp
+dummyinv=yes
 
 [boardgames_sideinv]
 size=28
