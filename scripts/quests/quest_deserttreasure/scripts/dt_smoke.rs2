@@ -31,7 +31,8 @@ if (stat_base(slayer) < ^dt_smoke_mask_slayer) {
 return(true);
 
 [proc,dt_smoke_start]
-if (~dt_smoke_inside(coord) = true & gettimer(dt_smoke_damage) = ^false) {
+// GETTIMER returns the stored timer clock, or -1 when absent; it is not Boolean.
+if (~dt_smoke_inside(coord) = true & gettimer(dt_smoke_damage) = -1) {
     settimer(dt_smoke_damage, ^dt_smoke_damage_interval);
 }
 

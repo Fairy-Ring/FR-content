@@ -54,7 +54,7 @@ def main() -> int:
     for needle in ("~dt_smoke_inside(coord) = false", "cleartimer(dt_smoke_damage)", "inv_getobj(worn, ^wearpos_hat) = slayer_facemask", "stat(hitpoints) > 1", "min(^dt_smoke_damage, sub(stat(hitpoints), 1))"):
         require(needle in hazard, f"nonlethal facemask hazard contains {needle}")
     start = block(smoke, "proc", "dt_smoke_start")
-    require("gettimer(dt_smoke_damage) = ^false" in start, "crossing mapsquares does not reset the smoke clock")
+    require("gettimer(dt_smoke_damage) = -1" in start, "native absent sentinel arms smoke without resetting an existing timer")
     light = block(smoke, "label", "dt_smoke_light")
     for needle in ("last_useitem ! tinderbox", "inv_total(inv, tinderbox) < 1", "stat(firemaking) < ^dt_smoke_torch_firemaking", "~dt_smoke_torch_lit($torch) = true"):
         require(needle in light, f"torch admission contains {needle}")
@@ -96,13 +96,14 @@ def main() -> int:
     if failures:
         print("\n".join(f"FAIL: {failure}" for failure in failures))
         return 1
-    topology = subprocess.run(
-        ["node", "--import", "tsx", str(ROOT / "tests/desert-treasure/test_s2_topology.mjs")],
-        cwd=ROOT.parent / "engine",
-        check=False,
-    )
-    if topology.returncode != 0:
-        return topology.returncode
+    for script in ("test_s2_topology.mjs", "test_s2_timer.mjs"):
+        result = subprocess.run(
+            ["node", "--import", "tsx", str(ROOT / "tests/desert-treasure" / script)],
+            cwd=ROOT.parent / "engine",
+            check=False,
+        )
+        if result.returncode != 0:
+            return result.returncode
     print("PASS: Desert Treasure S2 original configs, smoke, torch/key/gate, owned Fareed, masked credit and journal source contract")
     return 0
 
