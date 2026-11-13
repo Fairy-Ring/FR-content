@@ -196,6 +196,15 @@ function startLoc(player, row, name, choices = []) {
   return runPacked(player, name, loc, choices);
 }
 
+function settleLocChanges(row) {
+  // The offline runner resumes scripts, not world cycles. Expire temporary door/gate forms
+  // through the production lifecycle before the next approach uses the native placement.
+  const locs = [...World.gameMap.getZone(row.x, row.z, row.level).getAllLocsUnsafe()];
+  for (const loc of locs) {
+    while (loc.lifecycleTick > 0) loc.turn();
+  }
+}
+
 function allCandidateTiles(row, radius = 6) {
   const result = [];
   for (let x = row.x - radius; x <= row.x + radius; x++) {
@@ -420,15 +429,18 @@ function setAgility(player, level) {
 }
 
 const logCases = [
-  { name: 'regicide_logbalance1_start', axis: 'x' },
-  { name: 'regicide_logbalance2_start', axis: 'x' },
-  { name: 'regicide_logbalance3_start', axis: 'z' }
+  { name: 'regicide_logbalance1_start', axis: 'x', ends: [[0, 2197, 3237], [0, 2201, 3237]], landings: [[0, 2202, 3237], [0, 2196, 3237]] },
+  { name: 'regicide_logbalance2_start', axis: 'x', ends: [[0, 2259, 3250], [0, 2263, 3250]], landings: [[0, 2264, 3250], [0, 2258, 3250]] },
+  { name: 'regicide_logbalance3_start', axis: 'z', ends: [[0, 2290, 3233], [0, 2290, 3238]], landings: [[0, 2290, 3239], [0, 2290, 3232]] }
 ];
 for (const log of logCases) {
   check(`${log.name} enforces Agility 45, gives no XP/failure, and crosses from both sides at every placement`, () => {
     const rows = nativeLocRows(log.name);
     assert.equal(rows.length, 2, `${log.name} has two native map placements`);
     for (const row of rows) {
+      const end = log.ends.findIndex(tile => tile[0] === row.level && tile[1] === row.x && tile[2] === row.z);
+      assert.notEqual(end, -1, `${log.name} ${row.coord} is an expected native log end`);
+      const expectedLanding = log.landings[end];
       const lowStart = approachOnSide(row, log.axis, -1);
       const low = playerAt(lowStart);
       setAgility(low, 44);
@@ -451,8 +463,7 @@ for (const log of logCases) {
         const stageBefore = varp(p, 'regicide_quest');
         startLoc(p, row, `[oploc1,${log.name}]`);
         const destination = tileOf(p);
-        const axisIndex = log.axis === 'x' ? 1 : 2;
-        assert.ok(Math.abs(destination[axisIndex] - row[log.axis]) >= 2, `${log.name} crosses the log from approach side ${side}`);
+        assert.deepEqual(destination, expectedLanding, `${log.name} ${row.coord} approach ${side}: wrong landing, expected ${expectedLanding.join(',')}, got ${destination.join(',')}`);
         assert.notDeepEqual(destination, start, `${log.name} moves the player`);
         walkable(destination, `${log.name} ${row.coord} approach ${side}`);
         assert.deepEqual([...p.stats], statsBefore, `${log.name} awards no Agility or other XP`);
@@ -533,7 +544,7 @@ check('open_iban_door preserves both exact stage-1 refusals without moving', () 
     }
   }
 });
-check('open_iban_door stage 2 enters mapped well-room tiles through both native doors without quest writes', () => {
+check('open_iban_door stages 2 and 15 enter mapped well-room tiles through both native doors without quest writes', () => {
   const entries = [
     ['upass_templedoor_closed_right', '_33_72_31_40', '_31_73_31_40'],
     ['upass_templedoor_closed_left', '_33_72_31_39', '_31_73_31_39']
@@ -549,20 +560,22 @@ check('open_iban_door stage 2 enters mapped well-room tiles through both native 
     const start = approachOnSide(row, 'x', 1, true);
     const destination = [roomDoor.level, roomDoor.x - 1, roomDoor.z + (row.name === 'upass_templedoor_closed_left' ? 1 : 0)];
     assert.deepEqual(destination, [roomDoor.level, 2014, 4712], `${row.name} maps to the clear interior well-room tile`);
-    const player = playerAt(start);
-    const worn = player.getInventory(requiredId(types.InvType, 'worn'));
-    assert.equal(worn.getItemCount(requiredId(types.ObjType, 'zamrobetop')), 0, 'no Zamorak top is worn');
-    assert.equal(worn.getItemCount(requiredId(types.ObjType, 'zamrobebottom')), 0, 'no Zamorak bottom is worn');
-    varp(player, 'regicide_quest', constant('regicide_spoken_lathas'));
-    varp(player, 'upass', constant('upass_complete'));
-    const stageBefore = varp(player, 'regicide_quest');
-    const bitsBefore = varp(player, 'regicide_bits');
-    startLoc(player, row, `[oploc1,${row.name}]`);
-    assert.deepEqual(tileOf(player), destination, `${row.name} lands at the mapped room tile`);
-    walkable(destination, `${row.name} well-room landing`);
-    assert.equal(text(player), 'You pull open the large doors...', `${row.name} preserves the outbound door message`);
-    assertStageUnchanged(player, stageBefore, 'completed Underground Pass entry');
-    assert.equal(varp(player, 'regicide_bits'), bitsBefore, `${row.name} does not write Regicide bits`);
+    for (const stage of [constant('regicide_spoken_lathas'), constant('regicide_complete')]) {
+      const player = playerAt(start);
+      const worn = player.getInventory(requiredId(types.InvType, 'worn'));
+      assert.equal(worn.getItemCount(requiredId(types.ObjType, 'zamrobetop')), 0, 'no Zamorak top is worn');
+      assert.equal(worn.getItemCount(requiredId(types.ObjType, 'zamrobebottom')), 0, 'no Zamorak bottom is worn');
+      varp(player, 'regicide_quest', stage);
+      varp(player, 'upass', constant('upass_complete'));
+      const bitsBefore = varp(player, 'regicide_bits');
+      startLoc(player, row, `[oploc1,${row.name}]`);
+      assert.deepEqual(tileOf(player), destination, `${row.name} stage ${stage}: wrong landing, expected ${destination.join(',')}, got ${tileOf(player).join(',')}`);
+      walkable(destination, `${row.name} stage ${stage} well-room landing`);
+      assert.equal(text(player), 'You pull open the large doors...', `${row.name} stage ${stage} preserves the outbound door message`);
+      assertStageUnchanged(player, stage, 'completed Underground Pass entry');
+      assert.equal(varp(player, 'regicide_bits'), bitsBefore, `${row.name} does not write Regicide bits`);
+      settleLocChanges(row);
+    }
   }
 });
 
@@ -630,50 +643,47 @@ function setPlayerPosition(player, tile) {
   player.buildArea.originZ = Math.floor(tile[2] / 8) * 8;
 }
 
-check('Arandar gate rejects stage 12 from the north, admits stage 13, and lets a south-side exit pass at stage 0', () => {
+check('Arandar gate rejects stage 12 north and lands exactly through both leaves in both directions and columns', () => {
   const gates = [
-    { name: 'overpass_gate_left' },
-    { name: 'overpass_gate_right' }
+    { name: 'overpass_gate_left', columns: [2384, 2385], landingX: 2385 },
+    { name: 'overpass_gate_right', columns: [2386, 2387], landingX: 2386 }
   ];
-  const left = firstNativeLoc(gates[0].name);
-  const right = firstNativeLoc(gates[1].name);
-  assert.equal(nativeLocRows(gates[0].name).length, 1);
-  assert.equal(nativeLocRows(gates[1].name).length, 1);
   const guards = nativeNpcRows('elf_overpass_guard').map(spawnNpc);
   assert.equal(guards.length, 2, 'both native overpass guards are present');
 
-  for (const row of [left, right]) {
-    const north = approachOnSide(row, 'z', 1, true);
-    const p = playerAt(north);
-    varp(p, 'regicide_quest', constant('regicide_killed_tyras'));
-    const stage = varp(p, 'regicide_quest');
-    const start = tileOf(p);
-    startLoc(p, row, `[oploc1,${row.name}]`);
-    assert.deepEqual(tileOf(p), start, `${row.name} stays closed at exactly stage 12 from the north`);
-    assert.match(text(p), /no human/i);
-    assert.match(text(p), /proper documentation/i);
-    assertStageUnchanged(p, stage, `${row.name} stage-12 refusal`);
+  for (const gate of gates) {
+    assert.equal(nativeLocRows(gate.name).length, 1);
+    const row = firstNativeLoc(gate.name);
+    assert.deepEqual([row.level, row.x, row.z], [0, gate.columns[0], 3334], `${gate.name} has the expected native closed placement`);
+    for (const x of gate.columns) {
+      for (const direction of [
+        { z: 3335, landingZ: 3333, stages: ['regicide_killed_tyras', 'regicide_reported_iorwerth'] },
+        { z: 3333, landingZ: 3335, stages: ['regicide_not_started'] }
+      ]) {
+        const start = [row.level, x, direction.z];
+        walkable(start, `${gate.name} approach`);
+        assert.ok(reachable(start, row), `${gate.name} is reachable from ${start.join(',')}`);
+        for (const stageName of direction.stages) {
+          const p = playerAt(start);
+          const stage = constant(stageName);
+          varp(p, 'regicide_quest', stage);
+          startLoc(p, row, `[oploc1,${row.name}]`);
+          if (stageName === 'regicide_killed_tyras') {
+            assert.deepEqual(tileOf(p), start, `${row.name} stays closed at exactly stage 12 from the north`);
+            assert.match(text(p), /no human/i);
+            assert.match(text(p), /proper documentation/i);
+          } else {
+            const destination = [row.level, gate.landingX, direction.landingZ];
+            const actual = tileOf(p);
+            assert.deepEqual(actual, destination, `${row.name} stage ${stage} from ${start.join(',')}: wrong landing, expected ${destination.join(',')}, got ${actual.join(',')}`);
+            walkable(actual, `${row.name} stage ${stage} landing`);
+          }
+          assertStageUnchanged(p, stage, `${row.name} stage ${stage}`);
+          settleLocChanges(row);
+        }
+      }
+    }
   }
-
-  const highStart = approachOnSide(left, 'z', 1, true);
-  const high = playerAt(highStart);
-  varp(high, 'regicide_quest', constant('regicide_reported_iorwerth'));
-  const highStage = varp(high, 'regicide_quest');
-  startLoc(high, left, '[oploc1,overpass_gate_left]');
-  const highLanding = tileOf(high);
-  assert.ok(highLanding[2] < left.z, 'post-killed-Tyras stage crosses the Arandar gate from the north');
-  walkable(highLanding, 'Arandar gate stage-13 crossing');
-  assertStageUnchanged(high, highStage, 'Arandar gate stage-13 crossing');
-
-  const southStart = approachOnSide(right, 'z', -1, true);
-  const south = playerAt(southStart);
-  varp(south, 'regicide_quest', constant('regicide_not_started'));
-  const southStage = varp(south, 'regicide_quest');
-  startLoc(south, right, '[oploc1,overpass_gate_right]');
-  const southLanding = tileOf(south);
-  assert.ok(southLanding[2] > right.z, 'a south-side exit is permitted before the quest');
-  walkable(southLanding, 'Arandar gate south-side exit');
-  assertStageUnchanged(south, southStage, 'Arandar gate south-side exit');
 });
 
 check('king summons Read opens the packed 377 scroll interface with the letter text', () => {
