@@ -30,6 +30,7 @@ import ResumePCountDialogHandler from "#/network/game/client/handler/ResumePCoun
 import ResumePCountDialog from "#/network/game/client/model/ResumePCountDialog.js";
 import ResumePauseButtonHandler from "#/network/game/client/handler/ResumePauseButtonHandler.js";
 import ResumePauseButton from "#/network/game/client/model/ResumePauseButton.js";
+import IfOpenChat from "#/network/game/server/model/IfOpenChat.js";
 import IfSetPosition from "#/network/game/server/model/IfSetPosition.js";
 import IfSetObject from "#/network/game/server/model/IfSetObject.js";
 import IfSetText from "#/network/game/server/model/IfSetText.js";
@@ -135,6 +136,31 @@ function inventory(p: Player, obj: string): number {
   return p.invTotal(InvType.getId("inv"), id(obj));
 }
 
+function assertMenuOrder(p: Player, packetStart: number, root: string): void {
+  const observed = packets.get(p)!.slice(packetStart);
+  const rootId = component(root);
+  const openIndex = observed.findIndex(
+    (packet) => packet instanceof IfOpenChat && packet.component === rootId,
+  );
+  const lastSetter = observed.findLastIndex(
+    (packet) =>
+      packet instanceof IfSetPosition ||
+      packet instanceof IfSetObject ||
+      packet instanceof IfSetText,
+  );
+  assert(
+    lastSetter >= 0 && openIndex > lastSetter,
+    `${root} must open after its last setter so the 377 client repaints`,
+  );
+  assert.deepEqual(
+    observed
+      .filter((packet): packet is IfOpenChat => packet instanceof IfOpenChat)
+      .map((packet) => packet.component),
+    [rootId],
+    `${root} must open the packed chat root exactly once`,
+  );
+}
+
 function assertFletchingMenu(p: Player, packetStart: number, log: string): void {
   const wood = new Map([
     ["oak_logs", "Oak"], ["willow_logs", "Willow"], ["maple_logs", "Maple"],
@@ -142,6 +168,7 @@ function assertFletchingMenu(p: Player, packetStart: number, log: string): void 
   ]).get(log);
   assert(log === "logs" || wood, `unsupported fletching menu fixture ${log}`);
   const root = log === "logs" ? "skillmulti3" : "skillmulti2";
+  assertMenuOrder(p, packetStart, root);
   const products = log === "logs"
     ? [
         { object: "arrow_shaft", x: 5, y: -15, label: "15 Arrow Shafts" },
@@ -644,7 +671,7 @@ try {
       checks++;
     }
   }
-  // Retained skillmulti1 and migrated helpers: every product and quantity layer.
+  // Retained skillmulti1 and skill_multi2..5: every product and quantity layer.
   const objects = [
     "bronze_bar",
     "iron_bar",
@@ -688,6 +715,7 @@ try {
         const state = start(p, name, args);
         assert.equal(state.execution, ScriptState.PAUSEBUTTON);
         assert.equal(p.resumeButtons.length, size * 4);
+        assertMenuOrder(p, packetStart, `skillmulti${size}`);
         if (size === 1) {
           const observed = packets.get(p)!.slice(packetStart);
           assert.deepEqual(

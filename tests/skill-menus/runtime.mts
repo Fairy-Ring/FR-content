@@ -552,7 +552,14 @@ try {
   // exact amount. Existing production batch coverage remains in
   // tests/fletching-choice/runtime.mts and tests/leather-batch/test_leather_batch.mjs.
   const bars = ["bronze_bar", "iron_bar", "steel_bar", "mithril_bar", "runite_bar"];
-  for (let size = 2; size <= 5; size++) {
+  for (const { size, proc, prompt } of [
+    ...[2, 3, 4, 5].map((size) => ({
+      size,
+      proc: `[proc,skill_multi${size}]`,
+      prompt: defaultPrompt,
+    })),
+    { size: 2, proc: "[proc,skill_multi2_header]", prompt: header },
+  ]) {
     const products = syntheticProducts(bars, size);
     for (let product = 0; product < size; product++) {
       for (const choice of [
@@ -563,7 +570,9 @@ try {
       ]) {
         const p = player();
         const firstPacket = packetLog.get(p)!.length;
-        const state = start(p, `[proc,skill_multi${size}]`, callArgs(products));
+        const args = callArgs(products);
+        if (proc === "[proc,skill_multi2_header]") args.unshift(prompt);
+        const state = start(p, proc, args);
         assert.equal(state.execution, ScriptState.PAUSEBUTTON);
         assert.equal(p.resumeButtons.length, size * 4);
         assertMenuPackets(
@@ -571,7 +580,7 @@ try {
           firstPacket,
           size,
           products,
-          defaultPrompt,
+          prompt,
         );
         pressMenuButton(p, state, size, product, choice.option, choice.count);
         assertReturnedObject(state, products[product].object);
