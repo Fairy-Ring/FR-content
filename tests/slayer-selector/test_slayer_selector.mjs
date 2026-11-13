@@ -3,7 +3,8 @@
  * Offline proof against real compiled RuneScript and packed configs.
  * Run from the sibling engine:
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode full
- *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-scripts /Volumes/dev-scratch/fairy-ring-evidence/U-SLAYERSEL-1113/s1/base-scripts
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-scripts <directory holding the base pack's script.dat and script.idx>
+ * Artifacts go to --artifact-dir, else SLAYER_SELECTOR_EVIDENCE_DIR, else a directory under the system temporary directory.
  *
  * No server or live client is started. The adversarial DBRows are compiled in
  * an isolated temporary content/engine copy by compile_adversarial_pack.mjs.
@@ -11,6 +12,7 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { once } from 'node:events';
@@ -23,7 +25,7 @@ const CONTENT_ROOT = path.resolve(TEST_DIR, '../..');
 const ENGINE_ROOT = process.env.HARNESS_ENGINE_DIR ?? path.resolve(CONTENT_ROOT, '../engine');
 const PACK_DIR = path.join(ENGINE_ROOT, 'data/pack');
 const SCRIPT_DIR = path.join(CONTENT_ROOT, 'scripts');
-const EVIDENCE_DEFAULT = '/Volumes/dev-scratch/fairy-ring-evidence/U-SLAYERSEL-1113/s1';
+const EVIDENCE_DEFAULT = path.join(os.tmpdir(), 'slayer-selector');
 const ADJACENT_FIXTURE = path.join(TEST_DIR, 'fixtures/slayer_selector_adversarial.dbrow');
 const COMPILE_HELPER = path.join(TEST_DIR, 'compile_adversarial_pack.mjs');
 const SLAYER_CONFIG_DIR = path.join(SCRIPT_DIR, 'skill_slayer/configs');
