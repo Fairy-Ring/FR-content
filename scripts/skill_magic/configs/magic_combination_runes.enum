@@ -1,0 +1,10 @@
+// Product payment order follows all four 377 CS1 addition orders, after plain runes.
+[magic_combination_runes]
+inputtype=int
+outputtype=namedobj
+val=0,steamrune
+val=1,smokerune
+val=2,mistrune
+val=3,dustrune
+val=4,lavarune
+val=5,mudrune
