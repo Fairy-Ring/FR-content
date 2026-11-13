@@ -9,6 +9,8 @@
 // Research: subject desert-treasure (leftover 1925) · Transcript:Desert Treasure I.
 
 [opnpc1,fd_elder_by_mirrors]
+// S8 owns the completed-quest Ancient staff service.
+if (%deserttreasure = ^dt_stage_complete) { @dt_eblis_postquest; }
 ~chatplayer("<p,neutral>So can you give me any help on where to find these warriors and their diamonds?");
 ~chatnpc("<p,neutral>No, the magic used in this spell is powerful, but inaccurate. The direction the scrying glass faces is roughly the direction you will find the warrior, but I'm afraid I");
 ~chatnpc("<p,neutral>can't be any more help than that.");

@@ -153,6 +153,7 @@ jobs:
           run_test tests/fenkenstrain-completion/test_fenk_s2.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s2.py
           run_test tests/silver-casting/test_silver_casting.mjs node --import tsx ../content/tests/silver-casting/test_silver_casting.mjs
           run_test tests/desert-treasure/test_s1_contract.py python3 ../content/tests/desert-treasure/test_s1_contract.py
+          run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"

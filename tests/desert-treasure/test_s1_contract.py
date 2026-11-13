@@ -189,7 +189,10 @@ def main() -> int:
     )
     hill_code = "\n".join(line.split("//", 1)[0] for line in hill.splitlines())
     mirror_code = "\n".join(line.split("//", 1)[0] for line in mirrors.splitlines())
-    require("%deserttreasure =" not in hill_code, "hill dialogue must not add quest progress")
+    require(
+        __import__("re").search(r"(?m)(?:^|[;{}])\s*%deserttreasure\s*=\s*[^;{}]+;", hill_code) is None,
+        "hill dialogue must not add quest progress",
+    )
     require("%deserttreasure =" not in mirror_code, "mirror Look-into must not add quest progress")
     for index in range(1, 7):
         require(f"[oploc1,fd_mirror{index}]" in mirror_code, f"mirror child {index} must have Look-into")
