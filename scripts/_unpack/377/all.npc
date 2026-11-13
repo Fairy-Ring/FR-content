@@ -44871,6 +44871,9 @@ param=death_sound,human_death
 defaultmode=none
 wanderrange=0
 maxrange=25
+// UNKNOWN: no period source for the range; engineering value that follows the published NPC convention.
+// Magic/Ranged bats follow wizard and druid (attackrange=8), independently of the leash.
+attackrange=8
 timer=1
 
 [blooddiamond_vampirewarrior_unkillable]
@@ -44927,6 +44930,9 @@ param=death_sound,human_death
 defaultmode=none
 wanderrange=0
 maxrange=25
+// UNKNOWN: no period source for the range; engineering value that follows the published NPC convention.
+// Magic/Ranged bats follow wizard and druid (attackrange=8), independently of the leash.
+attackrange=8
 timer=1
 
 [malak]

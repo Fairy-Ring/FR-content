@@ -145,6 +145,10 @@ def check_config_identity() -> None:
                 fields.get("param", []).count("death_drop,null") == 1,
                 f"[{name}] must not drop a Blood diamond or other boss reward",
             )
+            require(
+                fields.get("attackrange") == ["8"],
+                f"[{name}] needs the published magic/ranged approach range 8, not the inert default 0 or the encounter leash",
+            )
     expected_objects = {
         4658: "fd_silver_pot",
         4659: "fd_silver_pot_blessed",
