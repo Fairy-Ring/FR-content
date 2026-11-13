@@ -267,6 +267,8 @@ def main() -> int:
     smash = block(parents, "proc", "dt_ice_smash")
     require("%fd_icewarrior_dead = 0" in smash and "%fd_icewarrior_subquest ! ^dt_ice_substate_kamil_dead" in smash,
             "parent blocks require Kamil defeated")
+    require("~player_combat_stat;" in smash and "randominc(%com_maxhit)" in smash and smash.index("~player_combat_stat;") < smash.index("randominc(%com_maxhit)"),
+            "Smash refreshes native equipped combat stats before rolling damage, including after relog")
     broken = block(parents, "proc", "dt_ice_block_broken")
     freed = block(parents, "queue", "dt_ice_block_freed")
     require("npc_findhero = ^false" in broken and "queue*(dt_ice_block_freed, 0)($dad)" in broken and "%fd_icewarrior_dadfree = 1" in freed and "%fd_icewarrior_mumfree = 1" in freed,

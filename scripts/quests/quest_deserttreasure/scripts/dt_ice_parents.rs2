@@ -12,9 +12,10 @@ if (%action_delay > map_clock) {
     return;
 }
 if_close;
+~player_combat_stat;
 anim(%com_attackanim, 0);
 // CANDIDATE: ordinary equipped melee maximum; no elemental shortcut or fixed kill.
-def_int $damage = min(randominc(max(1, %com_maxhit)), npc_stat(hitpoints));
+def_int $damage = min(randominc(%com_maxhit), npc_stat(hitpoints));
 npc_heropoints($damage);
 if ($damage = 0) npc_damage(^hitmark_block, 0);
 else npc_damage(^hitmark_damage, $damage);
