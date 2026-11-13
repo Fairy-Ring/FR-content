@@ -1,0 +1,5 @@
+[destroy_this_object_display]
+scope=temp
+size=1
+protect=no
+dummyinv=yes

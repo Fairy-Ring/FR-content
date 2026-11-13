@@ -1472,3 +1472,13 @@ data=levelfailmessage,some rune claws
 data=bar,runite_bar
 data=bar_amount,2
 
+[oil_lantern_frame]
+table=smithing
+data=ifproduct,oil_lantern_frame
+data=product,oil_lantern_frame
+data=product_amount,1
+data=levelrequired,26
+data=end_message,an oil lantern frame
+data=levelfailmessage,an Oil Lantern Frame
+data=bar,iron_bar
+data=bar_amount,1
