@@ -814,9 +814,11 @@ transmit=yes
 
 [barrows]
 transmit=yes
+scope=perm
 
 [barrows_kills]
 transmit=yes
+scope=perm
 
 [worn_set]
 
