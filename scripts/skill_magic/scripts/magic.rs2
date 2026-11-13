@@ -7,7 +7,7 @@ if ($spell_data = null) {
 }
 return ($spell_data);
 
-// Staff and combination-rune substitutes match the spell buttons.
+// VERIFIED client availability: combo-runes.cache-elemental-alternatives.
 [proc,check_spell_requirements](dbrow $spell_data)(boolean)
 // check if members
 if (db_getfield($spell_data, magic_spell_table:members, 0) = true & map_members = ^false) {
@@ -86,6 +86,10 @@ if ($staff_rune = $rune3 | $staff_rune2 = $rune3) {
 }
 return($rune1, $rune_count1, $rune2, $rune_count2, $rune3, $rune_count3);
 
+// CANDIDATE minimum total, then fewest combinations: combo-runes.period-payment-priority
+// (generalized from the 2007 FAQ example, not 377 server proof). Co-credit:
+// combo-runes.period-single-combo-dual-element. Enum tie order is an UNKNOWN
+// product default: combo-runes.period-payment-ties. Current rows have at most two elements.
 [proc,delete_spell_runes](dbrow $spell_data)
 def_namedobj $rune1;
 def_int $rune_count1;
@@ -94,47 +98,195 @@ def_int $rune_count2;
 def_namedobj $rune3;
 def_int $rune_count3;
 $rune1, $rune_count1, $rune2, $rune_count2, $rune3, $rune_count3 = ~staff_runes($spell_data);
-$rune_count1 = ~delete_plain_spell_rune($rune1, $rune_count1);
-$rune_count2 = ~delete_plain_spell_rune($rune2, $rune_count2);
-$rune_count3 = ~delete_plain_spell_rune($rune3, $rune_count3);
 if (map_members = ^false) {
+    $rune_count1 = ~delete_plain_spell_rune($rune1, $rune_count1);
+    $rune_count2 = ~delete_plain_spell_rune($rune2, $rune_count2);
+    $rune_count3 = ~delete_plain_spell_rune($rune3, $rune_count3);
     return;
 }
+// Only the combination joining both required elements can save physical runes.
+// Enumerate its bounded spend; every other combination covers one remaining slot.
+def_namedobj $shared = null;
+def_int $limit = 0;
 def_int $i = 0;
-while ($i < enum_getoutputcount(magic_combination_runes) & ($rune_count1 > 0 | $rune_count2 > 0 | $rune_count3 > 0)) {
+while ($i < enum_getoutputcount(magic_combination_runes)) {
     def_namedobj $combination = enum(int, namedobj, magic_combination_runes, $i);
-    def_int $available = inv_total(inv, $combination);
-    if ($available > 0) {
+    def_namedobj $element1;
+    def_namedobj $element2;
+    $element1, $element2 = ~combination_rune_elements($combination);
+    def_int $matches = 0;
+    if ($rune_count1 > 0 & ($rune1 = $element1 | $rune1 = $element2)) {
+        $matches = add($matches, 1);
+    }
+    if ($rune_count2 > 0 & ($rune2 = $element1 | $rune2 = $element2)) {
+        $matches = add($matches, 1);
+    }
+    if ($rune_count3 > 0 & ($rune3 = $element1 | $rune3 = $element2)) {
+        $matches = add($matches, 1);
+    }
+    if ($matches = 2) {
+        $shared = $combination;
+        $limit = min(inv_total(inv, $shared), max($rune_count1, max($rune_count2, $rune_count3)));
+    }
+    $i = add($i, 1);
+}
+def_int $best = 0;
+def_int $best_cost = -1;
+def_int $best_combos = 0;
+def_int $best_steam = 0;
+def_int $best_smoke = 0;
+def_int $best_mist = 0;
+def_int $best_dust = 0;
+def_int $best_lava = 0;
+def_int $best_mud = 0;
+def_int $k = 0;
+while ($k <= $limit) {
+    def_int $cost;
+    def_int $combos;
+    def_int $steam;
+    def_int $smoke;
+    def_int $mist;
+    def_int $dust;
+    def_int $lava;
+    def_int $mud;
+    $cost, $combos, $steam, $smoke, $mist, $dust, $lava, $mud = ~spell_rune_plan($rune1, $rune_count1, $rune2, $rune_count2, $rune3, $rune_count3, $shared, $k, false);
+    def_boolean $better = false;
+    if ($best_cost < 0 | $cost < $best_cost) {
+        $better = true;
+    } else if ($cost = $best_cost) {
+        if ($combos ! $best_combos) {
+            if ($combos < $best_combos) { $better = true; }
+        } else if ($steam ! $best_steam) {
+            if ($steam > $best_steam) { $better = true; }
+        } else if ($smoke ! $best_smoke) {
+            if ($smoke > $best_smoke) { $better = true; }
+        } else if ($mist ! $best_mist) {
+            if ($mist > $best_mist) { $better = true; }
+        } else if ($dust ! $best_dust) {
+            if ($dust > $best_dust) { $better = true; }
+        } else if ($lava ! $best_lava) {
+            if ($lava > $best_lava) { $better = true; }
+        } else if ($mud ! $best_mud) {
+            if ($mud > $best_mud) { $better = true; }
+        }
+    }
+    if ($cost >= 0 & $better = true) {
+        $best = $k;
+        $best_cost = $cost;
+        $best_combos = $combos;
+        $best_steam = $steam;
+        $best_smoke = $smoke;
+        $best_mist = $mist;
+        $best_dust = $dust;
+        $best_lava = $lava;
+        $best_mud = $mud;
+    }
+    $k = add($k, 1);
+}
+if ($best_cost < 0) {
+    error("Spell rune payment reached without sufficient runes.");
+}
+def_int $unused_cost;
+def_int $unused_combos;
+def_int $unused_steam;
+def_int $unused_smoke;
+def_int $unused_mist;
+def_int $unused_dust;
+def_int $unused_lava;
+def_int $unused_mud;
+$unused_cost, $unused_combos, $unused_steam, $unused_smoke, $unused_mist, $unused_dust, $unused_lava, $unused_mud = ~spell_rune_plan($rune1, $rune_count1, $rune2, $rune_count2, $rune3, $rune_count3, $shared, $best, true);
+
+// CANDIDATE ranking: combo-runes.period-payment-priority; UNKNOWN enum ties:
+// combo-runes.period-payment-ties. No period claim about this implementation.
+// Evaluate one shared-combination spend without mutation, or apply the selected plan.
+// Once shared spend is fixed, all remaining substitutes serve disjoint demands:
+// plains before single-element substitutes minimizes combinations; enum order breaks ties.
+[proc,spell_rune_plan](namedobj $rune1, int $count1, namedobj $rune2, int $count2, namedobj $rune3, int $count3, namedobj $shared, int $shared_count, boolean $apply)(int, int, int, int, int, int, int, int)
+$count1 = max(0, $count1);
+$count2 = max(0, $count2);
+$count3 = max(0, $count3);
+def_int $cost = 0;
+def_int $combos = 0;
+def_int $steam = 0;
+def_int $smoke = 0;
+def_int $mist = 0;
+def_int $dust = 0;
+def_int $lava = 0;
+def_int $mud = 0;
+def_int $plain1 = 0;
+def_int $plain2 = 0;
+def_int $plain3 = 0;
+// Visit the shared rune first, then the six enum entries (skip its second visit).
+def_int $i = -1;
+while ($i < enum_getoutputcount(magic_combination_runes)) {
+    def_namedobj $combination = $shared;
+    if ($i >= 0) {
+        $combination = enum(int, namedobj, magic_combination_runes, $i);
+    }
+    if ($combination ! null & ($i = -1 | $combination ! $shared)) {
         def_namedobj $element1;
         def_namedobj $element2;
         $element1, $element2 = ~combination_rune_elements($combination);
         def_int $required = 0;
         if ($rune1 = $element1 | $rune1 = $element2) {
-            $required = max($required, $rune_count1);
+            $required = max($required, $count1);
         }
         if ($rune2 = $element1 | $rune2 = $element2) {
-            $required = max($required, $rune_count2);
+            $required = max($required, $count2);
         }
         if ($rune3 = $element1 | $rune3 = $element2) {
-            $required = max($required, $rune_count3);
+            $required = max($required, $count3);
         }
-        def_int $used = min($available, $required);
+        def_int $used = min(inv_total(inv, $combination), $required);
+        if ($i = -1) {
+            $used = $shared_count;
+        }
         if ($used > 0) {
-            inv_del(inv, $combination, $used);
-            // One physical rune pays both of its still-required elements.
+            if ($apply = true) {
+                inv_del(inv, $combination, $used);
+            }
+            // CANDIDATE co-credit: combo-runes.period-single-combo-dual-element.
             if ($rune1 = $element1 | $rune1 = $element2) {
-                $rune_count1 = max(0, sub($rune_count1, $used));
+                $count1 = max(0, sub($count1, $used));
             }
             if ($rune2 = $element1 | $rune2 = $element2) {
-                $rune_count2 = max(0, sub($rune_count2, $used));
+                $count2 = max(0, sub($count2, $used));
             }
             if ($rune3 = $element1 | $rune3 = $element2) {
-                $rune_count3 = max(0, sub($rune_count3, $used));
+                $count3 = max(0, sub($count3, $used));
+            }
+            $combos = add($combos, $used);
+            switch_obj($combination) {
+                case steamrune : $steam = $used;
+                case smokerune : $smoke = $used;
+                case mistrune : $mist = $used;
+                case dustrune : $dust = $used;
+                case lavarune : $lava = $used;
+                case mudrune : $mud = $used;
             }
         }
     }
-    $i = calc($i + 1);
+    if ($i = -1) {
+        // After fixing shared spend, reserve the available plains before substitutes.
+        $plain1 = min($count1, inv_total(inv, $rune1));
+        $plain2 = min($count2, inv_total(inv, $rune2));
+        $plain3 = min($count3, inv_total(inv, $rune3));
+        $count1 = sub($count1, $plain1);
+        $count2 = sub($count2, $plain2);
+        $count3 = sub($count3, $plain3);
+    }
+    $i = add($i, 1);
 }
+if ($count1 > 0 | $count2 > 0 | $count3 > 0) {
+    return(-1, 0, 0, 0, 0, 0, 0, 0);
+}
+$cost = add($combos, add($plain1, add($plain2, $plain3)));
+if ($apply = true) {
+    $plain1 = ~delete_plain_spell_rune($rune1, $plain1);
+    $plain2 = ~delete_plain_spell_rune($rune2, $plain2);
+    $plain3 = ~delete_plain_spell_rune($rune3, $plain3);
+}
+return($cost, $combos, $steam, $smoke, $mist, $dust, $lava, $mud);
 
 [proc,delete_plain_spell_rune](namedobj $rune, int $count)(int)
 if ($count <= 0) {

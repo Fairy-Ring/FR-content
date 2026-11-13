@@ -1,4 +1,6 @@
-// Product payment order follows all four 377 CS1 addition orders, after plain runes.
+// UNKNOWN product tie default: combo-runes.period-payment-ties.
+// Steam, Smoke, Mist, Dust, Lava, Mud is not derived from a client debit order:
+// the VERIFIED 377 CS1 additions are availability sums, not payment evidence.
 [magic_combination_runes]
 inputtype=int
 outputtype=namedobj
