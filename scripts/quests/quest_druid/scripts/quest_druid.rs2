@@ -13,6 +13,12 @@ if(npc_finduid($uid) = true) {
 
 [oplocu,cauldron_of_thunder]
 def_obj $useitem = last_useitem;
+// CANDIDATE (druidic-ritual.cauldron-stage-gate): follows Lost City's guard, which is one 2026 fix
+// (commit 542251b92, PR 399) present on both its 274 and 289 branches. No period source states the stage rule.
+if (%druidquest ! ^druid_spoken_sanfew) {
+    ~displaymessage(^dm_default);
+    return;
+}
 p_arrivedelay;
 if($useitem = raw_rat_meat) {
     mes("You dip the raw rat meat in the cauldron.");
