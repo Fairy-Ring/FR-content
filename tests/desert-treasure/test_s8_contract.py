@@ -656,15 +656,17 @@ def check_selector_and_login(root: Path, rewards: str, login: str, failures: lis
         ancient_branches = [
             block
             for block in parse_if_blocks(restore_code)
-            if "%alternate_spells" in compact(block.condition)
-            and "^dt_spellbook_ancient" in compact(block.condition)
+            if compact(block.condition) == "%deserttreasure=^dt_stage_complete&%alternate_spells=^dt_spellbook_ancient"
         ]
         require(
             failures,
             bool(ancient_branches)
-            and any(re.search(r"\bif_settab\s*\(\s*inter_267\s*,", block.then_body) for block in ancient_branches)
-            and any(re.search(r"\bif_settab\s*\(\s*magic\s*,", block.else_body) for block in ancient_branches),
-            "dt_restore_spellbook must select inter_267 for Ancient and magic for standard",
+            and any(
+                re.search(r"\bif_settab\s*\(\s*inter_267\s*,", block.then_body)
+                and re.search(r"\bif_settab\s*\(\s*magic\s*,", block.else_body)
+                for block in ancient_branches
+            ),
+            "dt_restore_spellbook must require completion AND Ancient selection, otherwise select standard",
         )
 
 
@@ -686,6 +688,41 @@ def two_way_toggle(text: str) -> bool:
         expected_then = "standard" if current == "ancient" else "ancient"
         return expected_then in then_targets and current in else_targets
     return False
+
+
+def check_altar_messages(rewards: str, facts: dict[str, object], failures: list[str]) -> None:
+    messages = facts.get("altar_messages", {})
+    require(failures, isinstance(messages, dict), "S8 facts must record both altar message directions")
+    if not isinstance(messages, dict):
+        return
+    source = strip_comments(rewards)
+    handler = re.search(r"\[oploc1,dt_zaros_altar\]([\s\S]*?)(?=\n\[|\Z)", source)
+    require(failures, handler is not None, "altar message checks must reach the bound altar handler")
+    if handler is None:
+        return
+    body = handler.group(1)
+    toggles = [
+        block for block in parse_if_blocks(body)
+        if compact(block.condition) == "%alternate_spells=^dt_spellbook_ancient"
+    ]
+    require(failures, len(toggles) == 1, "altar messages must follow the actual two-way selector branch")
+    if len(toggles) != 1:
+        return
+    toggle = toggles[0]
+    for direction, branch in (
+        ("standard", body[toggle.then_start:toggle.then_end]),
+        ("ancient", body[toggle.else_start:toggle.else_end] if toggle.else_start is not None else ""),
+    ):
+        message = messages.get(direction)
+        require(failures, isinstance(message, str) and bool(message), f"missing {direction} altar message fact")
+        if not isinstance(message, str) or not message:
+            continue
+        pattern = rf'%alternate_spells\s*=\s*\^dt_spellbook_{direction}\s*;\s*mes\("{re.escape(message)}"\)\s*;'
+        require(
+            failures,
+            re.search(pattern, branch) is not None and source.count(f'mes("{message}")') == 1,
+            f"altar must emit the sourced {direction} message after selecting {direction}, once",
+        )
 
 
 def check_reward_action_gates(rewards: str, failures: list[str]) -> None:
@@ -813,6 +850,27 @@ def check_postquest_staff(root: Path, rewards: str, hill: str, tier50: str, fail
             capacity_guard,
             "a full inventory must refuse the sale only when spending 80000 coins leaves the coin stack",
         )
+
+        if del_match is not None:
+            blocks = parse_if_blocks(code)
+            rechecks = [
+                block for block in blocks
+                if compact(block.condition) == "%deserttreasure!^dt_stage_complete|%fd_got_zaros_staff=^dt_flag_on"
+                and has_return(block.then_body) and block.end < del_match.start()
+            ]
+            require(failures, len(rechecks) == 1, "staff transaction must recheck completion and purchase after the offer")
+            if len(rechecks) == 1:
+                recheck = rechecks[0]
+                success_path = code[recheck.end:del_match.start()]
+                for block in sorted(blocks, key=lambda item: item.start, reverse=True):
+                    if recheck.end <= block.start < block.end <= del_match.start() and has_return(block.then_body) and not block.else_body:
+                        start, end = block.start - recheck.end, block.end - recheck.end
+                        success_path = success_path[:start] + success_path[end:]
+                require(
+                    failures,
+                    not success_path.strip(),
+                    "staff success path must not suspend or execute other statements between guard recheck and transaction",
+                )
 
         paths: list[set[str]] = []
         for hook in postquest_hooks:
@@ -1163,7 +1221,8 @@ def main() -> int:
     root = content_root()
     failures: list[str] = []
     facts_file = facts_path(root)
-    facts = load_teleports(read_facts(facts_file, failures), failures)
+    raw_facts = read_facts(facts_file, failures)
+    facts = load_teleports(raw_facts, failures)
     sources = {
         "rewards": read_text(root, "scripts/quests/quest_deserttreasure/scripts/dt_rewards.rs2", failures),
         "hill": read_text(root, "scripts/quests/quest_deserttreasure/scripts/dt_eblis_hill.rs2", failures),
@@ -1172,6 +1231,7 @@ def main() -> int:
     }
     check_selector_and_login(root, sources["rewards"], sources["login"], failures)
     check_reward_action_gates(sources["rewards"], failures)
+    check_altar_messages(sources["rewards"], raw_facts, failures)
     check_postquest_staff(root, sources["rewards"], sources["hill"], sources["tier50"], failures)
     check_teleports(root, facts, failures)
 

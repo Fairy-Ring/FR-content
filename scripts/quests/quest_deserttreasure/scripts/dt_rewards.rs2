@@ -1,7 +1,7 @@
 // S8: period altar/shortcut/staff services. Selector encoding and exact
 // movement endpoints are CANDIDATE reconstructions, not recovered server code.
-// Research: desert-treasure.s8-services, s8-arrival-reconstruction and
-// desert-treasure.dlg.eblis-ancient-staff. Ordinary prayer altars are unchanged.
+// Research: desert-treasure.s8-services, s8-arrival-reconstruction,
+// s8-altar-messages and desert-treasure.dlg.eblis-ancient-staff.
 
 [proc,dt_restore_spellbook]
 if (%deserttreasure = ^dt_stage_complete & %alternate_spells = ^dt_spellbook_ancient) {
@@ -16,17 +16,21 @@ if (%deserttreasure ! ^dt_stage_complete) {
     return;
 }
 anim(human_pray, 0);
-// Later-source CANDIDATE: switching drains Prayer, including at zero.
+// Period guides support drain; to zero and use at zero are later-source CANDIDATE.
 stat_sub(prayer, stat(prayer), 0);
 ~prayer_deactivate_all;
+// CANDIDATE wording/direction: retained later altar page, no period transcript.
 if (%alternate_spells = ^dt_spellbook_ancient) {
     %alternate_spells = ^dt_spellbook_standard;
+    mes("You feel a strange drain upon your memory...");
 } else {
     %alternate_spells = ^dt_spellbook_ancient;
+    mes("You feel a strange wisdom fill your mind...");
 }
 ~dt_restore_spellbook;
 
 [oploc1,desert_trasure_back_door_skew]
+// Incomplete tunnel/portal refusals reuse the generic product message.
 if (%deserttreasure ! ^dt_stage_complete) {
     mes("Nothing interesting happens.");
     return;

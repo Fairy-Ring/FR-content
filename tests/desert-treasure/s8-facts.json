@@ -1,9 +1,16 @@
 {
   "request": "U-DT-1109 S8",
   "authority": {
-    "client": "VERIFIED preserved revision-377 inter_267 root12855 names, components, levels and rune predicates; SHA256 7ca93e0655489b55736956a5316c7189fa86f2bbd5cfe15b4f5e1c30ad4394d0",
-    "xp": "CANDIDATE for 2 May2006: Tip.It Ancient Magicks capture3Jul2006, page last-updated4Sep2005, matches retained later subtractive spell pages",
-    "destinations": "CANDIDATE reconstruction constants inside source-backed regions, not authenticated historical tiles; topology and walk-away witnesses are retained under U-DT-1109/s8"
+    "client": "VERIFIED preserved revision-377 inter_267 root 12855 names, components, levels and rune predicates; SHA256 7ca93e0655489b55736956a5316c7189fa86f2bbd5cfe15b4f5e1c30ad4394d0",
+    "xp": "VERIFIED period-guide numbers: src.dt-s8-runehq-magic-20060428 (28 April 2006) Base XP 64/70/76/82/88/94/100/106, corroborated by src.dt-s8-zybez-ancient-20060220 except Dareeyak 77 (recorded conflict). Tip.It 3 July 2006 corroborates. Server arithmetic and rounding remain CANDIDATE.",
+    "destinations": "CANDIDATE reconstruction constants inside source-backed regions, not authenticated historical tiles; topology and walk-away witnesses are retained under U-DT-1109/s8",
+    "staff_wield": "VERIFIED period-guide statement, not server code: RuneHQ 28 April 2006 Ancient staff row requires Attack 50 and Magic 50.",
+    "staff_sale": "VERIFIED period-guide statements: desert-treasure.period-ancient-staff-sale and pre-target Sal's/Zybez captures support Eblis, 80000 coins and one purchase; transaction boundaries remain CANDIDATE."
+  },
+  "altar_messages": {
+    "ancient": "You feel a strange wisdom fill your mind...",
+    "standard": "You feel a strange drain upon your memory...",
+    "authority": "CANDIDATE wording and direction: src.dt-osrs-r2-page-altar-ancient-pyramid#18, revision 12 June 2025. Zybez 20 February 2006 hints at wisdom and fading memory, not exact text or timing."
   },
   "teleports": [
     {"name":"Paddewwa", "component":"inter_267:com_179", "level":54, "runes":{"lawrune":2,"firerune":1,"airrune":1}, "xp":64, "destination":{"x":3097,"z":9881,"level":0}, "region":{"minX":3095,"maxX":3099,"minZ":9879,"maxZ":9883,"level":0}, "source":"src.dt-osrs-r2-page-paddewwa-teleport#35-36; src.dt-s8-tipit-ancient-20060703#333-342"},
@@ -11,7 +18,7 @@
     {"name":"Kharyrll", "component":"inter_267:com_197", "level":66, "runes":{"lawrune":2,"bloodrune":1}, "xp":76, "destination":{"x":3494,"z":3473,"level":0}, "region":{"minX":3492,"maxX":3496,"minZ":3471,"maxZ":3475,"level":0}, "source":"src.dt-osrs-r2-page-kharyrll-teleport#37-38; src.dt-s8-tipit-ancient-20060703#395-404"},
     {"name":"Lassar", "component":"inter_267:com_205", "level":72, "runes":{"lawrune":2,"waterrune":4}, "xp":82, "destination":{"x":3004,"z":3471,"level":0}, "region":{"minX":3002,"maxX":3007,"minZ":3468,"maxZ":3473,"level":0}, "source":"src.dt-osrs-r2-page-lassar-teleport#37-38; src.dt-s8-tipit-ancient-20060703#426-435"},
     {"name":"Dareeyak", "component":"inter_267:com_213", "level":78, "runes":{"lawrune":2,"firerune":3,"airrune":2}, "xp":88, "destination":{"x":2968,"z":3696,"level":0}, "region":{"minX":2966,"maxX":2970,"minZ":3694,"maxZ":3698,"level":0}, "source":"src.dt-osrs-r2-page-dareeyak-teleport#35-36; src.dt-s8-tipit-ancient-20060703#457-466"},
-    {"name":"Carrallangar", "component":"inter_267:com_223", "level":84, "runes":{"lawrune":2,"soulrune":2}, "xp":94, "destination":{"x":3158,"z":3666,"level":0}, "region":{"minX":3156,"maxX":3160,"minZ":3664,"maxZ":3668,"level":0}, "source":"src.dt-osrs-r2-page-carrallanger-teleport#35-36; subtract2023rename; src.dt-s8-tipit-ancient-20060703#488-497"},
+    {"name":"Carrallangar", "component":"inter_267:com_223", "level":84, "runes":{"lawrune":2,"soulrune":2}, "xp":94, "destination":{"x":3158,"z":3666,"level":0}, "region":{"minX":3156,"maxX":3160,"minZ":3664,"maxZ":3668,"level":0}, "source":"src.dt-osrs-r2-page-carrallanger-teleport#35-36; subtract 26 July 2023 rename; src.dt-s8-tipit-ancient-20060703#488-497"},
     {"name":"Annakarl", "component":"inter_267:com_231", "level":90, "runes":{"lawrune":2,"bloodrune":2}, "xp":100, "destination":{"x":3288,"z":3888,"level":0}, "region":{"minX":3286,"maxX":3290,"minZ":3886,"maxZ":3890,"level":0}, "source":"src.dt-osrs-r2-page-annakarl-teleport#34-35; src.dt-s8-tipit-ancient-20060703#519-528"},
     {"name":"Ghorrock", "component":"inter_267:com_239", "level":96, "runes":{"lawrune":2,"waterrune":8}, "xp":106, "destination":{"x":2977,"z":3872,"level":0}, "region":{"minX":2974,"maxX":2979,"minZ":3870,"maxZ":3875,"level":0}, "source":"src.dt-osrs-r2-page-ghorrock-teleport#37-39; src.dt-s8-tipit-ancient-20060703#550-559"}
   ]
