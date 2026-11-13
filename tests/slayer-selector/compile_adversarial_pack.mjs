@@ -15,8 +15,9 @@ function arg(name) {
 function digestFile(file) {
     return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 }
+const FIXTURE_MODES = new Set(['standard', 'replacement-empty-turael']);
 
-function validPack(directory, sourceKey) {
+function validPack(directory, sourceKey, fixtureMode) {
     const manifestPath = path.join(directory, 'fixture-pack.json');
     if (!fs.existsSync(manifestPath)) {
         return false;
@@ -24,7 +25,7 @@ function validPack(directory, sourceKey) {
 
     try {
         const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-        if (manifest.sourceKey !== sourceKey) {
+        if (manifest.sourceKey !== sourceKey || manifest.fixtureMode !== fixtureMode) {
             return false;
         }
         for (const name of ['script.dat', 'script.idx', 'dbrow.dat', 'dbrow.idx']) {
@@ -39,7 +40,45 @@ function validPack(directory, sourceKey) {
     }
 }
 
-function chooseOutput(outputBase, sourceKey) {
+function replaceTuraelTableInTemporarySource(masterRowsFile, fixtureSource) {
+    const source = fs.readFileSync(masterRowsFile, 'utf8');
+    const lines = source.split(/\r?\n/);
+    const headers = lines.flatMap((line, index) => line.trim() === '[turael_task_table]' ? [index] : []);
+    if (headers.length !== 1) {
+        throw new Error(`Expected exactly one temporary [turael_task_table] stanza, found ${headers.length}`);
+    }
+
+    const start = headers[0];
+    let end = start + 1;
+    while (end < lines.length && !/^\s*\[[^\]]+\]\s*$/.test(lines[end])) end++;
+
+    const adversarialSource = fs.readFileSync(fixtureSource, 'utf8');
+    const children = ['s1_selector_dagannoth', 's1_selector_elf'];
+    for (const name of children) {
+        const matches = adversarialSource.match(new RegExp(`^\\[${name}\\]$`, 'gm')) ?? [];
+        if (matches.length !== 1) throw new Error(`Expected existing adversarial row [${name}] exactly once`);
+    }
+
+    lines.splice(start, end - start,
+        '[turael_task_table]',
+        'table=slayer_task_table',
+        ...children.map(name => `data=task,${name}`),
+        ''
+    );
+    const replacement = lines.join('\n');
+    if ((replacement.match(/^\[turael_task_table\]$/gm) ?? []).length !== 1) {
+        throw new Error('Temporary Turael table replacement created a duplicate configuration name');
+    }
+    fs.writeFileSync(masterRowsFile, replacement);
+    return {
+        table: 'turael_task_table',
+        children,
+        sourceSha256: digestFile(masterRowsFile)
+    };
+}
+
+
+function chooseOutput(outputBase, sourceKey, fixtureMode) {
     const parent = path.dirname(outputBase);
     const prefix = `${path.basename(outputBase)}-`;
     if (fs.existsSync(parent)) {
@@ -48,7 +87,7 @@ function chooseOutput(outputBase, sourceKey) {
             .sort()
             .map(name => path.join(parent, name));
         for (const candidate of candidates) {
-            if (validPack(candidate, sourceKey)) {
+            if (validPack(candidate, sourceKey, fixtureMode)) {
                 return { directory: candidate, reused: true };
             }
         }
@@ -74,10 +113,21 @@ async function main() {
     const fixtureSource = path.resolve(arg('--fixture'));
     const outputBase = path.resolve(arg('--output-dir'));
     const sourceKey = arg('--source-key');
-    const output = chooseOutput(outputBase, sourceKey);
+    const fixtureMode = process.argv.includes('--fixture-mode') ? arg('--fixture-mode') : 'standard';
+    if (!FIXTURE_MODES.has(fixtureMode)) throw new Error(`Unsupported --fixture-mode ${fixtureMode}`);
+    const output = chooseOutput(outputBase, sourceKey, fixtureMode);
 
     if (output.reused) {
-        console.log(JSON.stringify({ ...output, sourceKey, compiled: false }));
+        const manifest = JSON.parse(fs.readFileSync(path.join(output.directory, 'fixture-pack.json'), 'utf8'));
+        console.log(JSON.stringify({
+            ...output,
+            sourceKey,
+            fixtureMode,
+            temporaryTableOverride: manifest.temporaryTableOverride ?? null,
+            files: manifest.files,
+            compilerPackageVersion: manifest.compilerPackageVersion,
+            compiled: false
+        }));
         return;
     }
 
@@ -88,7 +138,9 @@ async function main() {
     const tempEngine = path.join(tempRoot, 'engine');
     const tempScripts = path.join(tempContent, 'scripts');
     const tempFixture = path.join(tempScripts, 'skill_slayer', 'configs', 's1_selector_adversarial.dbrow');
+    const temporaryMasterRows = path.join(tempScripts, 'skill_slayer', 'configs', 'slayer_master_tasks.dbrow');
     let originalCwd = process.cwd();
+    let temporaryTableOverride = null;
 
     try {
         fs.mkdirSync(tempContent, { recursive: true });
@@ -96,6 +148,9 @@ async function main() {
         fs.cpSync(path.join(contentRoot, 'scripts'), tempScripts, { recursive: true, preserveTimestamps: true });
         fs.cpSync(path.join(contentRoot, 'pack'), path.join(tempContent, 'pack'), { recursive: true, preserveTimestamps: true });
         fs.copyFileSync(fixtureSource, tempFixture);
+        if (fixtureMode === 'replacement-empty-turael') {
+            temporaryTableOverride = replaceTuraelTableInTemporarySource(temporaryMasterRows, fixtureSource);
+        }
         fs.cpSync(path.join(engineRoot, 'data', 'pack'), path.join(tempEngine, 'data', 'pack'), { recursive: true, preserveTimestamps: true });
 
         const serverPack = path.join(tempEngine, 'data', 'pack', 'server');
@@ -159,6 +214,8 @@ async function main() {
         const manifest = {
             format: 'slayer-selector-fixture-pack-v1',
             sourceKey,
+            fixtureMode,
+            temporaryTableOverride,
             compiledAt: new Date().toISOString(),
             compilerEntry: 'engine/tools/pack/Compiler.ts:runServerCompiler',
             compilerPackageVersion: JSON.parse(fs.readFileSync(path.join(engineRoot, 'node_modules/@lostcityrs/runescript/package.json'), 'utf8')).version,
@@ -166,7 +223,7 @@ async function main() {
             files: Object.fromEntries(names.map(name => [name, digestFile(path.join(output.directory, 'server', name))]))
         };
         fs.writeFileSync(path.join(output.directory, 'fixture-pack.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-        console.log(JSON.stringify({ ...output, sourceKey, compiled: true, files: manifest.files, compilerPackageVersion: manifest.compilerPackageVersion }));
+        console.log(JSON.stringify({ ...output, sourceKey, fixtureMode, temporaryTableOverride, compiled: true, files: manifest.files, compilerPackageVersion: manifest.compilerPackageVersion }));
     } finally {
         process.chdir(originalCwd);
         fs.rmSync(tempRoot, { recursive: true, force: true });

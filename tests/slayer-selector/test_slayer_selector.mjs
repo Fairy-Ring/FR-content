@@ -8,6 +8,7 @@
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --base-pack <S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-pack <pre-S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode table-old-discriminator --base-pack <published S2 pack>
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode replacement [--base-pack <published full pack>]
  * Artifacts go to --artifact-dir, else SLAYER_SELECTOR_EVIDENCE_DIR, else RUNNER_TEMP or the system temporary directory.
  *
  * No server or live client is started. The adversarial DBRows are compiled in
@@ -119,7 +120,7 @@ function parseArgs(argv) {
         else if (token === '--base-pack' && argv[i + 1]) result.basePack = path.resolve(argv[++i]);
         else throw new Error(`Unknown or incomplete argument: ${token}`);
     }
-    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator'].includes(result.mode), `unsupported --mode ${result.mode}`);
+    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator', 'replacement'].includes(result.mode), `unsupported --mode ${result.mode}`);
     if (['old-regressions', 'old-discriminator', 'table-old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
     return result;
 }
@@ -415,6 +416,18 @@ function loadOracle() {
 const ORACLE = loadOracle();
 const SOURCE_HASHES = Object.fromEntries(Object.entries(SOURCES).map(([name, file]) => [name, digestFile(file)]));
 
+const S8_PROTECTED_BASELINE = {
+    commit: '8bfd772a3',
+    boundaries: [
+        { file: 'taskScript', marker: '[proc,check_progress_task]', label: 'procedure block through the next [declaration]', sha256: '5405f96d0ac1ae1a4a9ac7ab4aa811aa25d1542a634521a7a98452331f9ed24c' },
+        { file: 'taskScript', marker: '[queue,progress_task]', label: 'queue block through the next [declaration]', sha256: 'deebdd136885e28d8ab2f2b8413c54cfde99b5e236be3c2a5e055accc5237a43' },
+        { file: 'taskScript', marker: '[proc,complete_task]', label: 'completion procedure block through EOF', sha256: '3586f3f37799c51ed52dc93101dd199cecdd3448c31228477be625352db041bf' },
+        { file: 'taskScript', marker: '[proc,slayer_taskname]', label: 'task-name reader block through the next [declaration]', sha256: '64e28a6beb1849b62f4e21d287bcc23d6897154ac3935922cfe1acd5027748b8' },
+        { file: 'taskScript', marker: '[proc,slayer_task_tip]', label: 'task-tip reader block through the next [declaration]', sha256: 'eabeae1f4ebf4336b27a80a23e541c2d277ae4636653a1dc82d88762da133ec0' },
+        { file: 'recommendationScript', marker: '[opheld1,slayer_gem]', label: 'held-gem reader block through EOF', sha256: '2e6e567289320928f895874f78574bf527d3d33877e9eecfcc2d42b9b95e307b' }
+    ]
+};
+
 function expectedValidator(target, fixture) {
     const slayerRequirement = ORACLE.slayerReq.get(target) ?? 0;
     const combatRequirement = ORACLE.combatReq.get(target) ?? 0;
@@ -544,7 +557,7 @@ const FIXTURE_SOURCE_PATH = path.join(RUN_DIR, 'slayer_selector_compiled_fixture
 fs.writeFileSync(FIXTURE_SOURCE_PATH, GENERATED_FIXTURES.source);
 const FIXTURE_SOURCE_HASH = digestFile(FIXTURE_SOURCE_PATH);
 
-function compilerSourceKey() {
+function compilerSourceKey(fixtureMode = 'standard') {
     const compilerPackage = path.join(ENGINE_ROOT, 'node_modules/@lostcityrs/runescript/package.json');
     const packageVersion = fs.existsSync(compilerPackage) ? JSON.parse(fs.readFileSync(compilerPackage, 'utf8')).version : 'missing';
     const roots = [
@@ -556,22 +569,24 @@ function compilerSourceKey() {
     ];
     const hashes = Object.fromEntries(roots.map(([key, directory]) => [key, hashTree(directory)]));
     const helperSha256 = digestFile(COMPILE_HELPER);
-    const key = sha256(JSON.stringify({ hashes, packageVersion, fixtureSource: FIXTURE_SOURCE_HASH, helperSha256 }));
-    return { key, hashes, packageVersion, helperSha256 };
+    const key = sha256(JSON.stringify({ hashes, packageVersion, fixtureSource: FIXTURE_SOURCE_HASH, helperSha256, fixtureMode }));
+    return { key, hashes, packageVersion, helperSha256, fixtureMode };
 }
 
 const COMPILER_INPUTS = compilerSourceKey();
-const FIXTURE_OUTPUT_BASE = path.join(OPTIONS.artifactDir, 'compiled-fixtures', COMPILER_INPUTS.key.slice(0, 20));
 
-function compileFixturePack() {
+function compileFixturePack(fixtureMode = 'standard') {
+    const inputs = fixtureMode === 'standard' ? COMPILER_INPUTS : compilerSourceKey(fixtureMode);
+    const outputBase = path.join(OPTIONS.artifactDir, 'compiled-fixtures', inputs.key.slice(0, 20));
     const args = [
         ...process.execArgv,
         COMPILE_HELPER,
         '--content', CONTENT_ROOT,
         '--engine', ENGINE_ROOT,
         '--fixture', FIXTURE_SOURCE_PATH,
-        '--output-dir', FIXTURE_OUTPUT_BASE,
-        '--source-key', COMPILER_INPUTS.key
+        '--output-dir', outputBase,
+        '--source-key', inputs.key,
+        '--fixture-mode', fixtureMode
     ];
     const child = spawnSync(process.execPath, args, { cwd: ENGINE_ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
     const output = `${child.stdout ?? ''}${child.stderr ?? ''}`;
@@ -580,13 +595,14 @@ function compileFixturePack() {
     const jsonLine = (child.stdout ?? '').split(/\r?\n/).filter(line => line.trim().startsWith('{')).at(-1);
     assert(jsonLine, `fixture compiler did not return its pack manifest:\n${output}`);
     const result = JSON.parse(jsonLine);
-    assert.equal(result.sourceKey, COMPILER_INPUTS.key);
+    assert.equal(result.sourceKey, inputs.key);
+    assert.equal(result.fixtureMode, fixtureMode);
     assert.equal(result.compiled || result.reused, true);
     return result;
 }
 
-const FIXTURE_PACK_RESULT = compileFixturePack();
-const FIXTURE_PACK_DIR = FIXTURE_PACK_RESULT.directory;
+const FIXTURE_PACK_RESULT = OPTIONS.mode === 'replacement' ? null : compileFixturePack();
+const FIXTURE_PACK_DIR = FIXTURE_PACK_RESULT?.directory ?? null;
 
 async function importEngine(relative) {
     return import(pathToFileURL(path.join(ENGINE_ROOT, relative)).href);
@@ -714,6 +730,23 @@ function tracePackedCalls(procNames, callback) {
     }
 }
 
+function tracePackedReturns(procNames, callback) {
+    const names = new Set(procNames.map(name => `[proc,${name}]`));
+    const returns = [];
+    const originalPopFrame = ScriptState.prototype.popFrame;
+    ScriptState.prototype.popFrame = function () {
+        const scriptName = this.script?.name;
+        const value = names.has(scriptName) ? this.intStack[this.isp - 1] ?? null : null;
+        originalPopFrame.call(this);
+        if (names.has(scriptName)) returns.push({ script: scriptName, value });
+    };
+    try {
+        return { result: callback(), returns };
+    } finally {
+        ScriptState.prototype.popFrame = originalPopFrame;
+    }
+}
+
 function packedEnum(name) {
     const id = packId('enum', name);
     const value = configTypes.EnumType.get(id);
@@ -740,6 +773,7 @@ function eligibleMaster(player, npc, masterId) {
 function traceWrites(player) {
     const events = [];
     const timeline = [];
+    const inventoryWrites = [];
     const originalSetVar = player.setVar;
     const originalInvAdd = player.invAdd;
     const originalWrite = player.write;
@@ -758,6 +792,7 @@ function traceWrites(player) {
         return originalSetVar.call(this, id, value);
     };
     player.invAdd = function (inv, object, count) {
+        inventoryWrites.push({ inv, object, count });
         if (object === IDS.gem) {
             const event = { kind: 'gem', inv, object, count };
             events.push(event);
@@ -780,6 +815,7 @@ function traceWrites(player) {
     return {
         events,
         timeline,
+        inventoryWrites,
         restore() {
             player.setVar = originalSetVar;
             player.invAdd = originalInvAdd;
@@ -818,6 +854,21 @@ function inventory(player) {
 
 function gemCount(player) {
     return inventory(player).getItemCount(IDS.gem);
+}
+
+function taskSnapshot(player) {
+    const target = player.getVar(IDS.target);
+    return {
+        target,
+        targetName: ORACLE.taskNamesById.get(target) ?? null,
+        count: player.getVar(IDS.count),
+        gemCount: gemCount(player)
+    };
+}
+
+function seedExistingGem(player) {
+    player.invAdd(IDS.inv, IDS.gem, 1);
+    assert.equal(gemCount(player), 1, 'S8 prior-state fixture must contain exactly one existing Slayer gem');
 }
 
 function sentinelTask(player, target = 123456, count = 789) {
@@ -1287,12 +1338,15 @@ function testCurrentSlayerDoesNotGateAssignment() {
     return { target, requirement: 25, observations };
 }
 
-function extractProcSource(source, procName) {
-    const marker = `[proc,${procName}]`;
+function extractBoundedSourceBlock(source, marker) {
     const start = source.indexOf(marker);
-    assert(start >= 0, `missing owner predicate ${marker}`);
+    assert(start >= 0, `missing source boundary ${marker}`);
     const next = source.indexOf('\n[', start + marker.length);
     return source.slice(start, next < 0 ? source.length : next);
+}
+
+function extractProcSource(source, procName) {
+    return extractBoundedSourceBlock(source, `[proc,${procName}]`);
 }
 
 function testOwnerPredicateDispatch() {
@@ -1409,6 +1463,31 @@ function driveDialogue(player, result, choices) {
     return result;
 }
 
+function runTrackedDialogue(player, npc, scriptName, choices, forcedRandomValues, trackedProcedures = []) {
+    const trace = traceWrites(player);
+    const requestedChoices = [...choices];
+    let tracked;
+    try {
+        tracked = tracePackedCalls(trackedProcedures, () => withRandomStream(forcedRandomValues, () => {
+            const result = startDialogue(player, npc, scriptName);
+            const driven = driveDialogue(player, result, [...requestedChoices]);
+            return { exec: driven.exec, opcount: driven.state.opcount };
+        }));
+    } finally {
+        trace.restore();
+    }
+    return {
+        choices: requestedChoices,
+        pages: trace.timeline.filter(event => event.kind === 'dialogue').map(event => event.text),
+        timeline: trace.timeline,
+        taskWrites: trace.events,
+        inventoryWrites: trace.inventoryWrites,
+        forcedRandomValues: tracked.result.observed,
+        dispatchCalls: tracked.calls,
+        execution: tracked.result.result
+    };
+}
+
 function underqualifiedChaeldarFixture() {
     // Six non-prayer combat stats at 55 and Prayer at 52 produce CB69; current
     // stats are independently drained, while both Slayer bases stay at 50.
@@ -1481,6 +1560,442 @@ function testCurrentTeachingSuccess() {
     assert.match(dialogueText(player), /we.ll start you off hunting/i, 'successful first teaching assignment line missing');
     assert.match(dialogueText(player), /enchanted gem/i, 'successful first teaching gem explanation missing');
     return { fixture: recordFixture(fixture), selectedSourceRow: forced.row.sourceName, target: player.getVar(IDS.target), count: player.getVar(IDS.count), forcedRandomValues: stream.observed, writes: trace.events, timeline: trace.timeline, gemCount: gemCount(player) };
+}
+
+function testS8ProtectedReaders() {
+    const files = {
+        taskScript: ORACLE.taskSource,
+        recommendationScript: ORACLE.recommendationSource
+    };
+    const fingerprints = S8_PROTECTED_BASELINE.boundaries.map(boundary => {
+        const actual = sha256(extractBoundedSourceBlock(files[boundary.file], boundary.marker));
+        assert.equal(actual, boundary.sha256, `${boundary.marker} ${boundary.label} changed from pinned baseline ${S8_PROTECTED_BASELINE.commit}`);
+        return { ...boundary, actualSha256: actual };
+    });
+    return { baselineCommit: S8_PROTECTED_BASELINE.commit, fingerprints };
+}
+
+function forcedStreamForRow(master, fixture, sourceName) {
+    const index = master.rows.findIndex(row => row.sourceName === sourceName);
+    assert(index >= 0, `${master.key}: missing selected source row ${sourceName}`);
+    const row = master.rows[index];
+    assert.equal(expectedRowEligibility(row, fixture), true, `${sourceName}: selected S8 row must pass the source oracle`);
+    const values = [];
+    for (const preceding of master.rows.slice(0, index)) {
+        assert(preceding.weight > 0, `${preceding.sourceName}: cannot force through a nonpositive row`);
+        values.push(1 - Number.EPSILON);
+    }
+    values.push(0, 0);
+    return { row, index, values };
+}
+
+function assertNoS8AssignmentSuccess(pages, label) {
+    assert.doesNotMatch(pages.join(' '), /we.ll start you off hunting|your new task is to kill|excellent, you.re doing great/i, `${label}: refusal displayed assignment success`);
+}
+
+function assertS8NoMutation(player, prior, outcome, label) {
+    assert.deepEqual(outcome.taskWrites, [], `${label}: refusal wrote target/count/gem`);
+    assert.deepEqual(outcome.inventoryWrites, [], `${label}: refusal wrote inventory`);
+    assert.deepEqual(outcome.forcedRandomValues, [], `${label}: refusal consumed RNG`);
+    assert.deepEqual(outcome.dispatchCalls, [], `${label}: refusal reached the S1 assignment dispatcher`);
+    assert.deepEqual(taskSnapshot(player), prior, `${label}: refusal changed prior task or gem state`);
+    assertNoS8AssignmentSuccess(outcome.pages, label);
+}
+
+function assertS8SuccessfulAssignment(player, npc, fixture, row, prior, outcome, label) {
+    const after = taskSnapshot(player);
+    assert.deepEqual(outcome.taskWrites.map(event => event.kind), ['target', 'count'], `${label}: real S1 dispatch must write target then count`);
+    assert.deepEqual(outcome.inventoryWrites, [], `${label}: repeat assignment must not write inventory`);
+    assert.deepEqual(outcome.dispatchCalls, ['[proc,slayer_new_target]', '[proc,generate_slayer_task]'], `${label}: insist must traverse packed S1 dispatch and selector`);
+    assert.equal(after.target, row.target, `${label}: selected task target mismatch`);
+    assert(after.count >= row.min && after.count <= row.max, `${label}: selected count outside ${row.sourceName} range`);
+    assert.equal(after.gemCount, prior.gemCount, `${label}: assignment added or removed a Slayer gem`);
+    const targetIndex = outcome.timeline.findIndex(event => event.kind === 'target');
+    const countIndex = outcome.timeline.findIndex(event => event.kind === 'count');
+    assert(targetIndex >= 0 && countIndex >= 0, `${label}: missing task varp write from real selector`);
+    assert.equal(countIndex, targetIndex + 1, `${label}: dialogue or another write split target/count`);
+    assert.equal(outcome.timeline.findIndex(event => event.kind === 'gem'), -1, `${label}: repeat assignment wrote a gem`);
+    const successIndex = outcome.timeline.findIndex(event => event.kind === 'dialogue' && /your new task is to kill/i.test(event.text));
+    assert(successIndex > countIndex, `${label}: success page must follow adjacent target/count writes`);
+    assert.match(outcome.pages.join(' '), /your new task is to kill/i, `${label}: successful assignment page missing`);
+    assert.equal(validatorAccepts(player, npc, after.target), true, `${label}: real packed validator rejected selected task`);
+    return after;
+}
+
+function recordS8Conversation(name, fixture, prior, player, outcome, extra = {}) {
+    return {
+        name,
+        fixture: recordFixture(fixture),
+        choices: outcome.choices,
+        pages: outcome.pages,
+        forcedRandomValues: outcome.forcedRandomValues,
+        taskWrites: outcome.taskWrites,
+        inventoryWrites: outcome.inventoryWrites,
+        dispatchCalls: outcome.dispatchCalls,
+        prior,
+        after: taskSnapshot(player),
+        ...extra
+    };
+}
+
+function runS8CountZeroAssignment(masterKey, fixture, {
+    decision = 'insist',
+    sourceName = null,
+    expectedWarning,
+    expectedBestMasterKey
+} = {}) {
+    const master = ORACLE.masters.find(candidate => candidate.key === masterKey);
+    assert(master, `unknown S8 master ${masterKey}`);
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: count-zero dialogue fixture combat mismatch`);
+    const npc = makeNpc(IDS.masters[masterKey]);
+    assert.equal(eligibleMaster(player, npc, IDS.masters[masterKey]), true, `${fixture.key}: requested count-zero master must admit`);
+    const bestMasterId = runInt(player, '[proc,get_best_slayer_master]').value;
+    const recommended = MASTER_DEFS.find(candidate => IDS.masters[candidate.key] === bestMasterId)?.key;
+    const exempt = masterKey === 'chaeldar' || masterKey === 'duradel';
+    const warningExpected = !exempt && bestMasterId !== IDS.masters[masterKey];
+    if (expectedWarning !== undefined) assert.equal(warningExpected, expectedWarning, `${fixture.key}: S8 count-zero warning precondition`);
+    if (expectedBestMasterKey !== undefined) assert.equal(recommended, expectedBestMasterKey, `${fixture.key}: best-master precondition`);
+
+    const bearTarget = Number(ORACLE.constants.get('slayer_bear'));
+    sentinelTask(player, bearTarget, 0);
+    seedExistingGem(player);
+    const prior = taskSnapshot(player);
+    let selected = null;
+    let randomValues = [];
+    let choices = [1];
+    if (decision === 'decline') {
+        assert.equal(warningExpected, true, `${fixture.key}: only a warned assignment can decline here`);
+        choices.push(2);
+    } else {
+        selected = sourceName
+            ? forcedStreamForRow(master, fixture, sourceName)
+            : streamForFirstEligible(master, fixture);
+        randomValues = selected.values;
+        if (warningExpected) choices.push(1);
+        choices.push(2);
+    }
+
+    const outcome = runTrackedDialogue(
+        player,
+        npc,
+        '[opnpc1,_slayer_master]',
+        choices,
+        randomValues,
+        ['slayer_new_target', 'generate_slayer_task']
+    );
+    const warningSeen = outcome.pages.some(page => /actually very strong|sure you don.t want/i.test(page));
+    assert.equal(warningSeen, warningExpected, `${fixture.key}: count-zero warning presence`);
+    if (decision === 'decline') {
+        assertS8NoMutation(player, prior, outcome, `${fixture.key}: count-zero warning decline`);
+        assert.match(outcome.pages.join(' '), /actually very strong/i, `${fixture.key}: warning page missing`);
+    } else {
+        assert(selected, `${fixture.key}: insist case has no selected real table row`);
+        assertS8SuccessfulAssignment(player, npc, fixture, selected.row, prior, outcome, `${fixture.key}: count-zero insist`);
+    }
+
+    const record = recordS8Conversation(`${masterKey}-count-zero-${decision}`, fixture, prior, player, outcome, {
+        bestMaster: recommended,
+        warningExpected,
+        selectedSourceRow: selected?.row.sourceName ?? null,
+        assignedBy: decision === 'insist' ? masterKey : null,
+        taskProvenanceStored: false
+    });
+    return { record, player, fixture, master, npc, selectedRow: selected?.row ?? null, outcome, prior, bestMasterId };
+}
+
+function findCrossMasterEligibleRow(sourceMasterKey, targetMasterKey, fixture) {
+    const sourceMaster = ORACLE.masters.find(candidate => candidate.key === sourceMasterKey);
+    const targetMaster = ORACLE.masters.find(candidate => candidate.key === targetMasterKey);
+    assert(sourceMaster && targetMaster, `missing cross-master source ${sourceMasterKey}/${targetMasterKey}`);
+    const targetCategories = new Set(targetMaster.rows.map(row => row.target));
+    const row = sourceMaster.rows.find(candidate => targetCategories.has(candidate.target) && expectedRowEligibility(candidate, fixture));
+    assert(row, `${sourceMasterKey}: no eligible row also recognized by ${targetMasterKey}`);
+    return row;
+}
+
+function testS8ReplacementFailure(scriptPack, configs = scriptPack) {
+    const compiled = compileFixturePack('replacement-empty-turael');
+    const replacementPack = compiled.directory;
+    loadRuntime({ scripts: scriptPack, rows: replacementPack, configs });
+
+    const fixture = FIXTURES.get('turael:high');
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    const npc = makeNpc(IDS.masters.turael);
+    const bearTarget = Number(ORACLE.constants.get('slayer_bear'));
+    const tableId = rowForPacked('turael_task_table').id;
+    const tableReferences = packedValues(rowForPacked('turael_task_table').row, 'task').map(Number);
+    const childNames = ['s1_selector_dagannoth', 's1_selector_elf'];
+    const childIds = childNames.map(name => rowForPacked(name).id);
+    assert.deepEqual(tableReferences, childIds, 'replacement fixture must substitute the Turael list with the two existing adversarial rows');
+    const childDefinitions = childNames.map((name, index) => {
+        const child = rowForPacked(name).row;
+        const target = Number(packedValues(child, 'task')[0]);
+        const accepted = validatorAccepts(player, npc, target);
+        assert.equal(accepted, false, `${name}: replacement row must be rejected by the real packed validator`);
+        return { name, rowId: childIds[index], target, targetName: ORACLE.taskNamesById.get(target) ?? null, realValidatorAccepted: accepted };
+    });
+    sentinelTask(player, bearTarget, 27);
+    assert.equal(runInt(player, '[proc,has_turael_task]').value, 0, 'bear prior task must take the real Turael reassignment consent path');
+    seedExistingGem(player);
+    const prior = taskSnapshot(player);
+
+    const directTrace = traceWrites(player);
+    let direct;
+    try {
+        direct = withRandomStream([], () => runInt(player, '[proc,generate_slayer_task]', npc, [tableId]));
+    } finally {
+        directTrace.restore();
+    }
+    assert.equal(direct.result.value, 0, 'replacement Turael table must make the real selector return false');
+    assert.deepEqual(directTrace.events, [], 'replacement selector failure wrote target/count/gem');
+    assert.deepEqual(directTrace.inventoryWrites, [], 'replacement selector failure wrote inventory');
+    assert.deepEqual(direct.observed, [], 'replacement selector preflight consumed RNG');
+    assert.deepEqual(taskSnapshot(player), prior, 'replacement selector failure changed prior bear/count/gem');
+
+    const tracedDialogue = tracePackedReturns(['generate_slayer_task'], () => runTrackedDialogue(
+        player,
+        npc,
+        '[opnpc1,_slayer_master]',
+        [1, 1],
+        [],
+        ['slayer_new_target', 'generate_slayer_task']
+    ));
+    const dialogue = tracedDialogue.result;
+    const generatorReturns = tracedDialogue.returns;
+    assert.deepEqual(generatorReturns, [{ script: '[proc,generate_slayer_task]', value: 0 }], 'consented replacement dialogue must observe generate_slayer_task returning false');
+    assert.deepEqual(dialogue.dispatchCalls, ['[proc,slayer_new_target]', '[proc,generate_slayer_task]'], 'consented replacement dialogue must call real S1 dispatch and generator');
+    assert.deepEqual(dialogue.taskWrites, [], 'consented replacement dialogue failure wrote target/count/gem');
+    assert.deepEqual(dialogue.inventoryWrites, [], 'consented replacement dialogue failure wrote inventory');
+    assert.deepEqual(dialogue.forcedRandomValues, [], 'consented replacement dialogue failure consumed RNG');
+    assert.deepEqual(taskSnapshot(player), prior, 'consented replacement dialogue did not preserve prior bear/count/gem');
+    assert.match(dialogue.pages.join(' '), /yes, please/i, 'replacement failure did not execute the consent choice');
+    assertNoS8AssignmentSuccess(dialogue.pages, 'consented replacement dialogue');
+
+    const countZeroPlayer = makePlayer();
+    applyFixture(countZeroPlayer, fixture);
+    assert.equal(eligibleMaster(countZeroPlayer, npc, IDS.masters.turael), true, 'count-zero failed insist must pass real Turael admission');
+    sentinelTask(countZeroPlayer, bearTarget, 0);
+    assert.equal(runInt(countZeroPlayer, '[proc,has_turael_task]').value, 0, 'count-zero bear must take the real new-task path');
+    seedExistingGem(countZeroPlayer);
+    const countZeroPrior = taskSnapshot(countZeroPlayer);
+    const tracedCountZero = tracePackedReturns(['generate_slayer_task'], () => runTrackedDialogue(
+        countZeroPlayer,
+        npc,
+        '[opnpc1,_slayer_master]',
+        [1, 1],
+        [],
+        ['slayer_new_target', 'generate_slayer_task']
+    ));
+    const countZeroDialogue = tracedCountZero.result;
+    assert.deepEqual(tracedCountZero.returns, [{ script: '[proc,generate_slayer_task]', value: 0 }], 'count-zero failed insist must observe generate_slayer_task returning false');
+    assert.deepEqual(countZeroDialogue.dispatchCalls, ['[proc,slayer_new_target]', '[proc,generate_slayer_task]'], 'count-zero failed insist must call real S1 dispatch and generator');
+    assert.deepEqual(countZeroDialogue.taskWrites, [], 'count-zero failed insist wrote target/count/gem');
+    assert.deepEqual(countZeroDialogue.inventoryWrites, [], 'count-zero failed insist wrote inventory');
+    assert.deepEqual(countZeroDialogue.forcedRandomValues, [], 'count-zero failed insist consumed RNG');
+    assert.deepEqual(taskSnapshot(countZeroPlayer), countZeroPrior, 'count-zero failed insist changed prior bear/count/gem');
+    assert.match(countZeroDialogue.pages.join(' '), /actually very strong|sure you don.t want/i, 'count-zero failed insist warning page missing');
+    assertNoS8AssignmentSuccess(countZeroDialogue.pages, 'count-zero failed insist');
+
+    return {
+        fixture: recordFixture(fixture),
+        replacementPack: compiled,
+        fixtureDefinitions: {
+            mode: compiled.fixtureMode,
+            table: 'turael_task_table',
+            originalMasterRowsSha256: digestFile(SOURCES.masterRows),
+            children: childDefinitions,
+            temporaryTableSourceSha256: compiled.temporaryTableOverride?.sourceSha256 ?? null,
+            sourceFixtureSha256: FIXTURE_SOURCE_HASH,
+            compiledFilesSha256: compiled.files
+        },
+        directSelector: {
+            returnValue: direct.result.value,
+            opcount: direct.result.opcount,
+            forcedRandomValues: direct.observed,
+            taskWrites: directTrace.events,
+            inventoryWrites: directTrace.inventoryWrites,
+            prior,
+            after: taskSnapshot(player)
+        },
+        consentedDialogue: {
+            choices: dialogue.choices,
+            pages: dialogue.pages,
+            dispatchCalls: dialogue.dispatchCalls,
+            forcedRandomValues: dialogue.forcedRandomValues,
+            taskWrites: dialogue.taskWrites,
+            inventoryWrites: dialogue.inventoryWrites,
+            prior,
+            after: taskSnapshot(player),
+            generatorReturns
+        },
+        countZeroFailedInsist: {
+            choices: countZeroDialogue.choices,
+            pages: countZeroDialogue.pages,
+            dispatchCalls: countZeroDialogue.dispatchCalls,
+            forcedRandomValues: countZeroDialogue.forcedRandomValues,
+            generatorReturns: tracedCountZero.returns,
+            taskWrites: countZeroDialogue.taskWrites,
+            inventoryWrites: countZeroDialogue.inventoryWrites,
+            prior: countZeroPrior,
+            after: taskSnapshot(countZeroPlayer)
+        }
+    };
+}
+
+function testS8DialogueCases(scriptPack, configs = scriptPack) {
+    loadRuntime({ scripts: scriptPack, rows: scriptPack, configs });
+    const protectedReaders = testS8ProtectedReaders();
+    const taskProcedures = ['slayer_new_target', 'generate_slayer_task'];
+    const bearTarget = Number(ORACLE.constants.get('slayer_bear'));
+    assert(Number.isInteger(bearTarget), 'S8 bear target constant is missing');
+    const turael = ORACLE.masters.find(master => master.key === 'turael');
+    const turaelHigh = FIXTURES.get('turael:high');
+
+    const bearConsentPlayer = makePlayer();
+    applyFixture(bearConsentPlayer, turaelHigh);
+    const turaelNpc = makeNpc(IDS.masters.turael);
+    sentinelTask(bearConsentPlayer, bearTarget, 31);
+    assert.equal(runInt(bearConsentPlayer, '[proc,has_turael_task]').value, 0, 'bear must remain outside the packed Turael category predicate');
+    seedExistingGem(bearConsentPlayer);
+    const bearConsentPrior = taskSnapshot(bearConsentPlayer);
+    const bearForced = streamForFirstEligible(turael, turaelHigh);
+    const bearConsent = runTrackedDialogue(bearConsentPlayer, turaelNpc, '[opnpc1,_slayer_master]', [1, 1, 2], bearForced.values, taskProcedures);
+    assertS8SuccessfulAssignment(bearConsentPlayer, turaelNpc, turaelHigh, bearForced.row, bearConsentPrior, bearConsent, 'positive-count bear consent through Turael');
+    assert.match(bearConsent.pages.join(' '), /tougher assignment|new assignment if you.d like/i, 'Turael positive-count bear consent prompt missing');
+    const bearConsentRecord = recordS8Conversation('turael-positive-bear-consent', turaelHigh, bearConsentPrior, bearConsentPlayer, bearConsent, {
+        priorTaskName: 'bear',
+        selectedSourceRow: bearForced.row.sourceName,
+        assignedBy: 'turael',
+        taskProvenanceStored: false
+    });
+
+    const bearDeclinePlayer = makePlayer();
+    applyFixture(bearDeclinePlayer, turaelHigh);
+    sentinelTask(bearDeclinePlayer, bearTarget, 31);
+    seedExistingGem(bearDeclinePlayer);
+    const bearDeclinePrior = taskSnapshot(bearDeclinePlayer);
+    const bearDecline = runTrackedDialogue(bearDeclinePlayer, turaelNpc, '[opnpc1,_slayer_master]', [1, 2], [], taskProcedures);
+    assertS8NoMutation(bearDeclinePlayer, bearDeclinePrior, bearDecline, 'positive-count bear decline through Turael');
+    assert.match(bearDecline.pages.join(' '), /tougher assignment|new assignment if you.d like/i, 'Turael positive-count decline prompt missing');
+    const bearDeclineRecord = recordS8Conversation('turael-positive-bear-decline', turaelHigh, bearDeclinePrior, bearDeclinePlayer, bearDecline, { priorTaskName: 'bear' });
+
+    const highFixture = FIXTURES.get('turael:high');
+    const crossRow = findCrossMasterEligibleRow('mazchna', 'turael', highFixture);
+    const mazchnaCross = runS8CountZeroAssignment('mazchna', FIXTURES.get('mazchna:high'), {
+        decision: 'insist',
+        sourceName: crossRow.sourceName,
+        expectedWarning: true,
+        expectedBestMasterKey: 'duradel'
+    });
+    assert.equal(mazchnaCross.selectedRow.target, crossRow.target, 'Mazchna actual assignment must select the cross-master category');
+    assert.equal(runInt(mazchnaCross.player, '[proc,has_turael_task]').value, 1, 'category assigned by Mazchna must be recognized by Turael without provenance');
+    assert(mazchnaCross.master.rows.some(row => row.target === crossRow.target), 'cross-master task source must be present in Mazchna table');
+    assert(turael.rows.some(row => row.target === crossRow.target), 'cross-master task category must be present in Turael predicate source');
+    const categoryPrior = taskSnapshot(mazchnaCross.player);
+    const categoryRefusal = runTrackedDialogue(mazchnaCross.player, turaelNpc, '[opnpc1,_slayer_master]', [1], [], taskProcedures);
+    assertS8NoMutation(mazchnaCross.player, categoryPrior, categoryRefusal, 'Turael positive-count refusal for category assigned by Mazchna');
+    assert.match(categoryRefusal.pages.join(' '), /still hunting something; come back when you.ve finished your task/i, 'Turael category refusal page missing');
+    const categoryRefusalRecord = recordS8Conversation('turael-category-refusal-from-mazchna', mazchnaCross.fixture, categoryPrior, mazchnaCross.player, categoryRefusal, {
+        assignedBy: 'mazchna via real packed dialogue and S1 dispatch',
+        taskProvenanceStored: false,
+        targetRecognizedByTuraelPredicate: true,
+        sourceRow: mazchnaCross.selectedRow.sourceName
+    });
+
+    const warningDeclines = ['turael', 'mazchna', 'vannaka'].map(masterKey => runS8CountZeroAssignment(masterKey, FIXTURES.get(`${masterKey}:high`), {
+        decision: 'decline',
+        expectedWarning: true,
+        expectedBestMasterKey: 'duradel'
+    }).record);
+    const turaelWarningInsist = runS8CountZeroAssignment('turael', FIXTURES.get('turael:high'), {
+        decision: 'insist',
+        expectedWarning: true,
+        expectedBestMasterKey: 'duradel'
+    });
+    const mazchnaWarningInsist = mazchnaCross;
+    const vannakaWarningInsist = runS8CountZeroAssignment('vannaka', FIXTURES.get('vannaka:high'), {
+        decision: 'insist',
+        expectedWarning: true,
+        expectedBestMasterKey: 'duradel'
+    });
+    const warningInsists = [turaelWarningInsist.record, mazchnaWarningInsist.record, vannakaWarningInsist.record];
+
+    const otherMasterRefusals = [];
+    for (const master of ORACLE.masters.slice(1)) {
+        const npc = makeNpc(IDS.masters[master.key]);
+        assert.equal(eligibleMaster(turaelWarningInsist.player, npc, IDS.masters[master.key]), true, `${master.key}: high fixture must admit this repeat-refusal check`);
+        const prior = taskSnapshot(turaelWarningInsist.player);
+        assert(prior.count > 0, `${master.key}: S8 another-master refusal needs a positive count`);
+        const outcome = runTrackedDialogue(turaelWarningInsist.player, npc, '[opnpc1,_slayer_master]', [1], [], taskProcedures);
+        assertS8NoMutation(turaelWarningInsist.player, prior, outcome, `${master.key} positive-count refusal of a Turael-assigned task`);
+        assert.match(outcome.pages.join(' '), /still hunting something; come back when you.ve finished your task/i, `${master.key}: positive-count refusal page missing`);
+        otherMasterRefusals.push(recordS8Conversation(`${master.key}-positive-count-refusal-from-turael`, turaelWarningInsist.fixture, prior, turaelWarningInsist.player, outcome, {
+            assignedBy: 'turael via real packed dialogue and S1 dispatch',
+            taskProvenanceStored: false
+        }));
+    }
+
+    const underqualified = underqualifiedChaeldarFixture();
+    const underqualifiedNpc = makeNpc(IDS.masters.chaeldar);
+    assert.equal(eligibleMaster(underqualified.player, underqualifiedNpc, IDS.masters.chaeldar), false, 'underqualified repeat fixture must still fail real Chaeldar admission');
+    sentinelTask(underqualified.player, bearTarget, 19);
+    seedExistingGem(underqualified.player);
+    const underqualifiedPrior = taskSnapshot(underqualified.player);
+    const underqualifiedRepeat = runTrackedDialogue(underqualified.player, underqualifiedNpc, '[opnpc1,_slayer_master]', [1], [], taskProcedures);
+    assertS8NoMutation(underqualified.player, underqualifiedPrior, underqualifiedRepeat, 'underqualified repeat assignment refusal');
+    assert.match(underqualifiedRepeat.pages.join(' '), /not strong enough to be taught by me/i, 'underqualified repeat refusal page missing');
+    const underqualifiedRecord = recordS8Conversation('underqualified-repeat-refusal', underqualified.fixture, underqualifiedPrior, underqualified.player, underqualifiedRepeat);
+
+    const alreadyBest = ['turael', 'mazchna', 'vannaka'].map(masterKey => runS8CountZeroAssignment(masterKey, FIXTURES.get(`${masterKey}:minimum`), {
+        decision: 'insist',
+        expectedWarning: false,
+        expectedBestMasterKey: masterKey
+    }).record);
+    const warningExemptions = ['chaeldar', 'duradel'].map(masterKey => runS8CountZeroAssignment(masterKey, FIXTURES.get(`${masterKey}:high`), {
+        decision: 'insist',
+        expectedWarning: false,
+        expectedBestMasterKey: 'duradel'
+    }).record);
+
+    const gemReaderPlayer = makePlayer();
+    applyFixture(gemReaderPlayer, turaelHigh);
+    const gemReaderCount = 23;
+    sentinelTask(gemReaderPlayer, bearTarget, gemReaderCount);
+    seedExistingGem(gemReaderPlayer);
+    const gemReaderPrior = taskSnapshot(gemReaderPlayer);
+    const gemReader = runTrackedDialogue(gemReaderPlayer, null, '[opheld1,slayer_gem]', [1, 4], [], []);
+    assertS8NoMutation(gemReaderPlayer, gemReaderPrior, gemReader, 'Slayer gem task reader');
+    const expectedTaskName = (ORACLE.taskNamesById.get(bearTarget) ?? '').toLowerCase();
+    assert(expectedTaskName, 'bear task name is missing from the real packed task-name oracle');
+    assert(gemReader.pages.join(' ').toLowerCase().includes(`currently assigned to kill ${expectedTaskName}; only ${gemReaderCount} more to go`), 'Slayer gem reader did not output the real task name and count');
+    const gemReaderRecord = recordS8Conversation('slayer-gem-real-task-reader', turaelHigh, gemReaderPrior, gemReaderPlayer, gemReader, {
+        selectedTaskName: expectedTaskName,
+        selectedCount: gemReaderCount
+    });
+
+    const replacementFailure = testS8ReplacementFailure(scriptPack, configs);
+    loadRuntime({ scripts: scriptPack, rows: scriptPack, configs });
+    return {
+        protectedReaders,
+        positiveCount: {
+            bearConsent: bearConsentRecord,
+            bearDecline: bearDeclineRecord,
+            turaelCategoryRefusalFromAnotherMaster: categoryRefusalRecord,
+            otherMasterRefusals
+        },
+        countZero: {
+            warningDeclines,
+            warningInsists,
+            alreadyBestNoWarning: alreadyBest,
+            masterFourFiveWarningExemptions: warningExemptions
+        },
+        underqualifiedRepeatRefusal: underqualifiedRecord,
+        gemReader: gemReaderRecord,
+        replacementFailure
+    };
 }
 
 function buildDistribution(master, fixture, rows) {
@@ -2039,11 +2554,11 @@ function testDeterministicCases() {
     loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
     const adversarial = testAdversarialFixtures();
     const endpoints = testEveryEndpoint();
-    loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
-    return { current, missingListEngineBoundary, adversarial, endpoints };
+    const s8 = testS8DialogueCases(ACTIVE_PACK_DIR);
+    return { current, missingListEngineBoundary, adversarial, endpoints, s8 };
 }
 const metadata = {
-    assignment: 'U-SLAYERSEL-1113 S3–S7 compiled proof (preserving S1/S2 cases)',
+    assignment: 'U-SLAYERSEL-1113 S3–S8 compiled proof (preserving S1/S2 cases)',
     revision: 377,
     mode: OPTIONS.mode,
     runId: RUN_ID,
@@ -2103,6 +2618,7 @@ try {
         metadata.checks.missingListEngineBoundary = deterministic.missingListEngineBoundary;
         metadata.checks.adversarial = deterministic.adversarial;
         metadata.checks.endpoints = { count: deterministic.endpoints.length, results: deterministic.endpoints };
+        metadata.checks.s8 = deterministic.s8;
         metadata.checks.outOfS1 = OUT_OF_S1;
 
         const distributions = [];
@@ -2137,6 +2653,9 @@ try {
         metadata.checks.oldHarpieDiscriminator = testOldHarpieDiscriminator(basePack);
     } else if (OPTIONS.mode === 'table-old-discriminator') {
         metadata.checks.oldTableRepairs = testOldTableRepairs(findBasePackDirectory(OPTIONS.basePack));
+    } else if (OPTIONS.mode === 'replacement') {
+        const basePack = OPTIONS.basePack ? findBasePackDirectory(OPTIONS.basePack) : findBasePackDirectory(ACTIVE_PACK_DIR);
+        metadata.checks.s8 = testS8DialogueCases(basePack, basePack);
     } else {
         const basePack = findBasePackDirectory(OPTIONS.basePack);
         metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(basePack);
