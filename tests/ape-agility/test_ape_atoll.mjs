@@ -25,6 +25,8 @@ const { EntityLifeCycle } = await eng('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStatMap } = await eng('src/engine/entity/PlayerStat.ts');
 const { default: CategoryType } = await eng('src/cache/config/CategoryType.ts');
 const { default: Component } = await eng('src/cache/config/Component.ts');
+const { default: DbTableType } = await eng('src/cache/config/DbTableType.ts');
+const { default: DbRowType } = await eng('src/cache/config/DbRowType.ts');
 const { default: FontType } = await eng('src/cache/config/FontType.ts');
 const { default: InvType } = await eng('src/cache/config/InvType.ts');
 const { default: LocType } = await eng('src/cache/config/LocType.ts');
@@ -47,7 +49,7 @@ const { unzipSync } = createRequire(path.join(ENGINE_DIR, 'package.json'))('ffla
 
 for (const config of [
   VarPlayerType, VarBitType, VarNpcType, CategoryType, ParamType, NpcType,
-  LocType, InvType, ObjType, SeqType, FontType, Component
+  LocType, InvType, ObjType, SeqType, FontType, Component, DbTableType, DbRowType
 ]) config.load(PACK_DIR);
 Environment.NODE_XPRATE = 1;
 Environment.NODE_DEBUG = false;
@@ -198,6 +200,7 @@ function packedMapLocs() {
           const localX = (coord >> 6) & 63;
           const level = (coord >> 12) & 3;
           found.get(expected.name).push({
+            name: expected.name,
             level,
             x: (Number(mapX) << 6) + localX,
             z: (Number(mapZ) << 6) + localZ,
@@ -528,20 +531,27 @@ const lapVars = Array.from(lapPlayer.vars);
 const lapOrder = [STAGES[0], STAGES[1], STAGES[2], STAGES[4], STAGES[5], STAGES[6]];
 const lapAwards = [];
 const lapStartXp = lapPlayer.stats[AGILITY];
+// Direct OPLOC1 dispatch bypasses the engine's ordinary approach walking. Seed each
+// handler's valid stand, not an out-of-range click; the live cell proves the walks.
 for (const stage of lapOrder) {
+  lapPlayer.level = stage.start.level;
+  lapPlayer.x = stage.start.x;
+  lapPlayer.z = stage.start.z;
   const before = lapPlayer.stats[AGILITY];
   runSuccessfulStage(lapPlayer, stage);
   lapAwards.push(lapPlayer.stats[AGILITY] - before);
   assert.equal(lapPlayer.npcId, packId('npc', ninjaForms[0].npc), `${stage.name} preserves the current form`);
 }
 assert.deepEqual(lapAwards, [400, 400, 400, 600, 1000, 3000]);
-assert.equal(lapPlayer.stats[AGILITY] - lapStartXp, 5800, 'one complete six-step lap is 580 displayed XP in tenths');
+assert.equal(lapPlayer.stats[AGILITY] - lapStartXp, 5800, 'the ordered six-step rewards total 580 displayed XP in tenths');
 assert.deepEqual(Array.from(lapPlayer.vars), lapVars, 'a full lap stores no course state');
 const firstLapEndXp = lapPlayer.stats[AGILITY];
-lapPlayer.level = STAGES[0].start.level;
-lapPlayer.x = STAGES[0].start.x;
-lapPlayer.z = STAGES[0].start.z;
-for (const stage of lapOrder) runSuccessfulStage(lapPlayer, stage);
+for (const stage of lapOrder) {
+  lapPlayer.level = stage.start.level;
+  lapPlayer.x = stage.start.x;
+  lapPlayer.z = stage.start.z;
+  runSuccessfulStage(lapPlayer, stage);
+}
 assert.equal(lapPlayer.stats[AGILITY] - firstLapEndXp, 5800, 'a second lap awards the same six steps with no replay lock or bonus');
 assert.deepEqual(Array.from(lapPlayer.vars), lapVars, 'repeat use still stores no course state');
 
