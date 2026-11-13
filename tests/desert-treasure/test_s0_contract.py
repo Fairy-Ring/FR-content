@@ -27,6 +27,15 @@ LOCAL_CONSTANTS = (
 )
 ANCIENT_INTERFACE = ROOT / "scripts" / "interfaces" / "inter_267.if"
 
+# The S0 named-family census, not every unrelated config in the shared unpack.
+# Auxiliary quest NPCs retain their original sections too.
+DT_ENTITY = re.compile(
+    r"(?:deserttreasure.*|desert_treasure_.*|dt_.*|fourdiamonds_.*|"
+    r"four_diamonds_.*|fd_.*|fdvw_.*|icediamond_.*|blooddiamond_.*|"
+    r"firediamond_.*|azzanadra.*|malak|shadow_warrior_rasool|"
+    r"shadow_dog_wild|staff_of_zaros|cert_staff_of_zaros|archaeological_expert)"
+)
+
 failures: list[str] = []
 
 
@@ -125,15 +134,9 @@ def check_original_varps() -> None:
     base_text = baseline_text("scripts/_unpack/377/all.varp")
     base_sections, base_duplicates = parse_sections_text(base_text, "baseline all.varp")
     require(not base_duplicates, f"duplicate baseline all.varp sections: {base_duplicates[:3]}")
-    current_names = section_names(varp_text)
-    baseline_names = section_names(base_text)
-    require(current_names == baseline_names, "all.varp section order must match the 377 baseline")
-
+    # Other published units may add configs or restore their saved scope.
+    # Numeric identities and original fields below protect the four S0 varps.
     varp_pack_text = VARP_PACK.read_text(encoding="utf-8")
-    require(
-        varp_pack_text == baseline_text("pack/varp.pack"),
-        "varp.pack must preserve the original ID-to-name mapping",
-    )
     pack_ids: dict[int, str] = {}
     for raw_line in varp_pack_text.splitlines():
         match = re.fullmatch(r"(\d+)=([A-Za-z0-9_]+)", raw_line.strip())
@@ -154,11 +157,11 @@ def check_original_varps() -> None:
         "deserttreasurevarbit": "yes",
         "deserttreasurevarbit2": "yes",
     }
-    for name, base_values in base_sections.items():
+    for name in expected:
+        base_values = base_sections.get(name, {})
         current_values = {key: list(values) for key, values in sections.get(name, {}).items()}
-        if name in expected:
-            require("scope" not in base_values, f"baseline [{name}] must not already set scope")
-            current_values.pop("scope", None)
+        require("scope" not in base_values, f"baseline [{name}] must not already set scope")
+        current_values.pop("scope", None)
         require(
             current_values == base_values,
             f"[{name}] may only add the authorized permanent scope",
@@ -239,20 +242,27 @@ def check_original_entity_configs() -> None:
         base_text = baseline_text(f"scripts/_unpack/377/{filename}")
         base_sections, base_duplicates = parse_sections_text(base_text, f"baseline {filename}")
         require(not base_duplicates, f"duplicate baseline {filename} sections: {base_duplicates[:3]}")
+        names = [name for name in section_names(base_text) if DT_ENTITY.fullmatch(name)]
+        require(bool(names), f"{filename} must contain the original Desert Treasure family")
         require(
-            section_names(text) == section_names(base_text),
-            f"{filename} section identities/order must match the 377 baseline",
+            [name for name in section_names(text) if name in names] == names,
+            f"{filename} must preserve Desert Treasure section identities/order",
         )
         if filename in ("all.loc", "all.obj"):
-            require(text == base_text, f"{filename} must preserve original definitions and operations")
+            for name in names:
+                require(sections.get(name) == base_sections[name],
+                        f"[{name}] must preserve original definitions and operations")
         configs[filename] = sections
         base_configs[filename] = base_sections
 
     for pack_name in ("npc.pack", "loc.pack", "obj.pack"):
         relative_path = f"pack/{pack_name}"
+        def identities(text: str) -> dict[int, str]:
+            return {int(slot): name for slot, name in re.findall(r"(?m)^(\d+)=([^\r\n]+)$", text)
+                    if DT_ENTITY.fullmatch(name)}
         require(
-            (ROOT / relative_path).read_text(encoding="utf-8") == baseline_text(relative_path),
-            f"{pack_name} must preserve original numeric identities",
+            identities((ROOT / relative_path).read_text(encoding="utf-8")) == identities(baseline_text(relative_path)),
+            f"{pack_name} must preserve Desert Treasure numeric identities",
         )
 
     npcs = configs["all.npc"]
@@ -266,6 +276,32 @@ def check_original_entity_configs() -> None:
         "firediamond_firewarrior": (130, 190, 120, 135, 4, "npc_1977", "167"),
     }
     candidate_fields = ("hitpoints", "attack", "strength", "defence", "magic")
+    damis_server_fields = {
+        "fd_damis_normal": {
+            "wanderrange": "0", "maxrange": "64",
+            "attackrange": "1", "defaultmode": "none", "timer": "1", "ranged": "1",
+        },
+        "fd_damis_tougher": {
+            "wanderrange": "0", "maxrange": "64",
+            "attackrange": "1", "defaultmode": "none", "timer": "1", "ranged": "1",
+        },
+    }
+    damis_server_params = {
+        "fd_damis_normal": (
+            "damagetype,^crush_style", "attack_anim,human_dhsword_chop",
+            "defend_anim,human_dhsword_def", "death_anim,human_death",
+            "attack_sound,2H_slash", "defend_sound,steel", "death_sound,human_death",
+            "death_drop,null", "strengthbonus,80", "stabdefence,60",
+            "slashdefence,60", "crushdefence,60", "magicdefence,60", "rangedefence,60",
+        ),
+        "fd_damis_tougher": (
+            "damagetype,^crush_style", "attack_anim,human_dhsword_chop",
+            "defend_anim,human_dhsword_def", "death_anim,human_death",
+            "attack_sound,2H_slash", "defend_sound,steel", "death_sound,human_death",
+            "death_drop,null", "strengthbonus,100", "stabdefence,100",
+            "slashdefence,100", "crushdefence,100", "magicdefence,80", "rangedefence,120",
+        ),
+    }
     for name, (hp, attack, strength, defence, rate, model, vislevel) in expected_npcs.items():
         expected_fields = {
             "hitpoints": str(hp),
@@ -279,10 +315,17 @@ def check_original_entity_configs() -> None:
         }
         for field, expected in expected_fields.items():
             require(one(npcs, name, field) == expected, f"[{name}] {field} must be {expected}")
+        server_fields = damis_server_fields.get(name, {})
+        for field, expected in server_fields.items():
+            require(one(npcs, name, field) == expected, f"[{name}] server field {field} must be {expected}")
+            require(not base_npcs.get(name, {}).get(field), f"[{name}] server field {field} must be a boss-only addition")
         current_values = {key: list(values) for key, values in npcs.get(name, {}).items()}
         base_values = {key: list(values) for key, values in base_npcs.get(name, {}).items()}
         require(name in base_npcs, f"[{name}] must retain its original NPC identity")
         for field in candidate_fields:
+            current_values.pop(field, None)
+            base_values.pop(field, None)
+        for field in server_fields:
             current_values.pop(field, None)
             base_values.pop(field, None)
         current_params = current_values.get("param", [])
@@ -293,16 +336,28 @@ def check_original_entity_configs() -> None:
             not any(value.startswith("attackrate,") for value in base_params),
             f"[{name}] baseline must not already define an attack rate",
         )
-        current_values["param"] = [value for value in current_params if value != candidate_rate]
+        for value in damis_server_params.get(name, ()):
+            require(current_params.count(value) == 1, f"[{name}] must add exactly server param {value}")
+            require(value not in base_params, f"[{name}] baseline must not already define server param {value}")
+        allowed_params = {candidate_rate, *damis_server_params.get(name, ())}
+        current_values["param"] = [value for value in current_params if value not in allowed_params]
         if not current_values["param"]:
             current_values.pop("param")
         require(
             current_values == base_values,
-            f"[{name}] may change only the labelled candidate combat fields",
+            f"[{name}] may change only the labelled candidate combat and Damis server fields",
         )
+    seated_fields = {"defaultmode": ["none"], "moverestrict": ["nomove"], "wanderrange": ["0"]}
     for name, base_values in base_npcs.items():
-        if name not in expected_npcs:
-            require(npcs.get(name) == base_values, f"[{name}] non-candidate NPC data must remain unchanged")
+        if name in expected_npcs or not DT_ENTITY.fullmatch(name):
+            continue
+        current_values = {key: list(values) for key, values in npcs.get(name, {}).items()}
+        if name.startswith("fourdiamonds_sword_bandit_sit"):
+            # Published S1 fixes the four seated, non-wandering bandits.
+            for field, expected in seated_fields.items():
+                require(current_values.pop(field, None) == expected,
+                        f"[{name}] must preserve the S1 seated field {field}={expected[0]}")
+        require(current_values == base_values, f"[{name}] other Desert Treasure NPC data must remain unchanged")
     npc_text = (UNPACK / "all.npc").read_text(encoding="utf-8")
     for name, (hp, attack, strength, defence, rate, _, _) in expected_npcs.items():
         match = re.search(
