@@ -105,7 +105,7 @@ if (inv_total(inv, asgarnian_ale) > 0) {
 ~chatnpc("<p,neutral>Yes, yes in fact I do. I would like you to bring me an Asgarnian Ale.");
 ~chatnpc("<p,neutral>No matured Ale, no other brand, simply an Asgarnian Ale.");
 ~chatplayer("<p,neutral>Okay boss.");
-~chatnpc("<p,neutral>That is 'Sir Amik' or 'My Liege' – not 'Boss'.");
+~chatnpc("<p,neutral>That is 'Sir Amik' or 'My Liege' - not 'Boss'.");
 ~chatplayer("<p,neutral>Gotcha, boss.");
 return;
 

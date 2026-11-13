@@ -185,7 +185,7 @@ if (inv_freespace(inv) < 1) {
 }
 inv_del(inv, coins, $price);
 inv_add(inv, $piece, 1);
-~chatnpc("<p,happy>There you are — jolly good choice!");
+~chatnpc("<p,happy>There you are - jolly good choice!");
 return;
 
 [proc,rd_rewards_buy_set]
@@ -201,7 +201,7 @@ inv_del(inv, coins, ^rd_initiate_set_price);
 inv_add(inv, basic_tk_helm, 1);
 inv_add(inv, basic_tk_body, 1);
 inv_add(inv, basic_tk_legs, 1);
-~chatnpc("<p,happy>Full Initiate set — top-hole!");
+~chatnpc("<p,happy>Full Initiate set - top-hole!");
 return;
 
 // Transcript "Can I switch respawns please?" — toggles %falador_spawn.
