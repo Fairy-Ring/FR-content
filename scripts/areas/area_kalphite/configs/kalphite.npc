@@ -202,8 +202,6 @@ size=5
 walkanim=kalphite_walk
 readyanim=kalphite_ready
 defaultmode=none
-wanderrange=0
-maxrange=1
 
 [kalphite_flyingqueen]
 name=Kalphite Queen

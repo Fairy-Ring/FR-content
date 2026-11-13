@@ -385,7 +385,6 @@ huntrange=3
 wanderrange=5
 maxrange=20
 param=attack_anim,dragon_head_attack
-respawnrate=60
 [iron_dragon]
 name=Iron dragon
 desc=Its scales seem to be made of iron.
@@ -428,7 +427,6 @@ huntrange=3
 wanderrange=5
 maxrange=20
 param=attack_anim,dragon_head_attack
-respawnrate=60
 [steel_dragon]
 name=Steel dragon
 desc=Its scales seem to be made of steel.
@@ -471,7 +469,6 @@ wanderrange=5
 maxrange=20
 hitpoints=210
 param=attack_anim,dragon_head_attack
-respawnrate=60
 [chickenquest_baby_black_dragon]
 name=Baby black dragon
 desc=Young but still dangerous.

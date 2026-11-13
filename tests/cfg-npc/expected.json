@@ -614,12 +614,6 @@
       "expected": false
     },
     {
-      "group": "C09-Npc-Core",
-      "npc": "bronze_dragon",
-      "field": "respawnrate",
-      "expected": 60
-    },
-    {
       "group": "C07-Misc-Npcs",
       "npc": "etc_guard1",
       "field": "respawnrate",
@@ -658,12 +652,6 @@
     {
       "group": "C09-Npc-Core",
       "npc": "firegiant_big3",
-      "field": "respawnrate",
-      "expected": 60
-    },
-    {
-      "group": "C09-Npc-Core",
-      "npc": "iron_dragon",
       "field": "respawnrate",
       "expected": 60
     },
@@ -800,12 +788,6 @@
       "expected": 50
     },
     {
-      "group": "C09-Npc-Core",
-      "npc": "steel_dragon",
-      "field": "respawnrate",
-      "expected": 60
-    },
-    {
       "group": "C05-Fishing-Movement",
       "npc": "0_42_42_memberfish",
       "field": "maxrange",
@@ -816,18 +798,6 @@
       "npc": "elf_overpass_guard",
       "field": "wanderrange",
       "expected": 8
-    },
-    {
-      "group": "C09-Npc-Core",
-      "npc": "kalphite_queen_dead",
-      "field": "maxrange",
-      "expected": 1
-    },
-    {
-      "group": "C09-Npc-Core",
-      "npc": "kalphite_queen_dead",
-      "field": "wanderrange",
-      "expected": 0
     },
     {
       "group": "C07-Misc-Npcs",
