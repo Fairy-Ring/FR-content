@@ -200,6 +200,12 @@ function makePlayer(recipe, {
   player.write = packet => player.packets.push(packet);
   player.messageGame = text => player.messages.push(text);
   player.wrappedMessageGame = text => player.messages.push(text);
+  player.animations = [];
+  const playAnimation = player.playAnimation.bind(player);
+  player.playAnimation = (id, delay) => {
+    player.animations.push({ id, delay, tick: World.currentTick });
+    playAnimation(id, delay);
+  };
 
   const inventory = inventoryOf(player);
   inventory.add(needleId, 1);
@@ -324,6 +330,7 @@ function runMakeOne(scenario) {
       assert.equal(itemCount(player, threadId), 0, 'no-thread fixture must remove its reel after opening the interface');
     }
     clickButton(player, recipe.make1, `${recipe.rowName} Make1`);
+    assert.deepEqual(player.animations, [], `${scenario.key}: published Make1 has no animation`);
     return snapshot(player, recipe);
   });
 }
@@ -394,6 +401,24 @@ function assertEffects(player, recipe, {
   assert.equal(player.stats[craftingStat] - initialXp, crafted * recipe.productExp, `${label}: exact Crafting XP`);
 }
 
+// All published refusal classes must match Make1 at dispatch, before any queue tick.
+for (const scenario of make1Scenarios.filter(scenario => !scenario.key.includes(':success-'))) {
+  for (const amount of [5, 10]) {
+    withMembers(scenario.members, () => {
+      const { recipe } = scenario;
+      const label = `${scenario.key} Make${amount} immediate refusal`;
+      const player = makePlayer(recipe, scenario);
+      if (scenario.removeThreadAfterOpen) inventoryOf(player).remove(threadId, itemCount(player, threadId));
+      const pressTick = World.currentTick;
+      dispatchBatch(player, recipe, amount);
+      assert.equal(World.currentTick, pressTick, `${label}: refusal must occur on the press tick`);
+      assert.equal(queueCount(player), 0, `${label}: refusal must not queue a batch`);
+      assert.deepEqual(player.animations, [], `${label}: refusal must not animate`);
+      assert.deepEqual(snapshot(player, recipe), baseline.cases[scenario.key], `${label}: same text, packets and interface state as published Make1`);
+    });
+  }
+}
+
 // Each of the seven real Make5/Make10 interface buttons crafts exactly the requested amount.
 for (const recipe of recipes) {
   for (const amount of [5, 10]) {
@@ -408,7 +433,11 @@ for (const recipe of recipes) {
     dispatchBatch(player, recipe, amount);
     assert.equal(itemCount(player, recipe.product), 0, `${label}: batch must use the delayed weak queue, not craft inline`);
     assert.equal(queueCount(player), 1, `${label}: one delayed batch request should be queued`);
-    drainWeakQueue(player, label, amount);
+    for (let tick = 1; tick <= amount * 3; tick++) {
+      advanceTick(player);
+      assert.equal(itemCount(player, recipe.product), Math.floor(tick / 3), `${label}: exactly one new product every three ticks (tick ${tick})`);
+    }
+    assert.equal(queueCount(player), 0, `${label}: completed batch leaves no queued item`);
     assertEffects(player, recipe, {
       initialLeather: amount * recipe.ingredientCount,
       initialThread: threadCount,
@@ -534,22 +563,6 @@ for (const recipe of recipes) {
   }
 }
 
-// A delay of two ticks is observed through Player.processQueues: first product on tick three.
-{
-  const recipe = recipes[0];
-  const amount = 5;
-  const player = makePlayer(recipe, { leatherUnits: amount * recipe.ingredientCount, threadCount: 1, threadUsed: 0 });
-  dispatchBatch(player, recipe, amount);
-  assert.equal(itemCount(player, recipe.product), 0, 'queued batch produced a product on the button-dispatch tick');
-  advanceTick(player);
-  assert.equal(itemCount(player, recipe.product), 0, 'queued batch produced before the first two-tick delay elapsed');
-  advanceTick(player);
-  assert.equal(itemCount(player, recipe.product), 0, 'queued batch produced before its third Player queue tick');
-  advanceTick(player);
-  assert.equal(itemCount(player, recipe.product), 1, 'delay=2 weakqueue should produce its first item on tick three');
-  drainWeakQueue(player, 'three-tick weakqueue cadence', amount);
-  assert.equal(itemCount(player, recipe.product), amount, 'three-tick cadence did not complete the requested batch');
-}
 
 // One reel from a fresh counter supports exactly five products, even for Make10.
 {
