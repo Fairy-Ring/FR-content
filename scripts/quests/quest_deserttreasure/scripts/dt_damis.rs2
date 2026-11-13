@@ -1,0 +1,153 @@
+// CANDIDATE: shadow-product-contract-1109; owned actor pattern, not recovered 377 code.
+[zone,0_42_79_48_24] queue(dt_damis_approach, 0, 0);
+[zone,0_42_79_48_32] queue(dt_damis_approach, 0, 0);
+
+[queue,dt_damis_approach]
+if (inzone(^dt_damis_approach_sw, ^dt_damis_approach_ne, coord) = false) return;
+if (%deserttreasure < ^dt_stage_hunts | %fd_shadowwarrior_quest < ^dt_shadow_substate_cross_returned_ring_awarded) return;
+if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_damis_defeated) {
+    if (~obj_gettotal(fd_dark_diamond) > 0 | %fd_column_shadow = ^dt_column_placed) return;
+    if (~dt_damis_ground = true) return;
+    // VERIFIED period-guide statement: src.dt-zybez-20060220#HTML307, diamond reappears without a re-fight.
+    // CANDIDATE trigger/tile: shadow-reconstruction-s3. Lifetime: UNKNOWN shadow-engineering-constants-s3.
+    obj_add(^dt_damis_spawn, fd_dark_diamond, 1, ^lootdrop_duration);
+    return;
+}
+~dt_damis_spawn;
+
+[proc,dt_damis_ground]()(boolean)
+// Do not replace a still-visible earned drop while its owner walks across an approach zone.
+// obj_find filters the iterated tile through this player's private-ground visibility.
+def_int $x = 0;
+while ($x < 128) {
+    def_int $z = 0;
+    while ($z < 64) {
+        obj_findallzone(movecoord(0_41_79_0_0, $x, 0, $z));
+        while (obj_findnext = true) {
+            if (obj_type = fd_dark_diamond) {
+                if (obj_find(obj_coord, fd_dark_diamond) = true) return(true);
+            }
+        }
+        $z = add($z, 8);
+    }
+    $x = add($x, 8);
+}
+return(false);
+
+[proc,dt_damis_alive]()(boolean)
+npc_findall(^dt_damis_spawn, fd_damis_normal, 128, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid) return(true);
+}
+npc_findall(^dt_damis_spawn, fd_damis_tougher, 128, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid) return(true);
+}
+return(false);
+
+[proc,dt_damis_spawn]
+if (~dt_damis_alive = true) return;
+def_npc $form = fd_damis_normal;
+if (%fd_shadowwarrior_quest = ^dt_shadow_substate_cross_returned_ring_awarded) {
+    // CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#664.
+    mes("A voice seems to come from the walls around you;");
+    // CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#665.
+    mes("'You... do not be... long in this... place...");
+    // CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#666.
+    mes("Turn... back now, or... prepare... to meet your... doom...'");
+}
+if (%fd_shadowwarrior_quest = ^dt_shadow_substate_damis_second_form) $form = fd_damis_tougher;
+else %fd_shadowwarrior_quest = ^dt_shadow_substate_damis_first_form;
+npc_add(^dt_damis_spawn, $form, ^dt_damis_lifetime);
+%npc_aggressive_player = uid;
+// CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#668.
+if ($form = fd_damis_normal) npc_say("You should... have listened to me!");
+npc_setmode(opplayer2);
+
+[proc,dt_damis_attackable]()(boolean)
+if (%npc_aggressive_player ! uid) return(false);
+if (%deserttreasure < ^dt_stage_hunts) return(false);
+if (%fd_shadowwarrior_quest < ^dt_shadow_substate_damis_first_form | %fd_shadowwarrior_quest > ^dt_shadow_substate_damis_second_form) return(false);
+return(true);
+
+[opnpc2,fd_damis_normal]
+if (~dt_damis_attackable = false) return;
+@player_combat_start;
+[apnpc2,fd_damis_normal]
+if (~dt_damis_attackable = false) return;
+@player_combat_start_ap;
+[opnpc2,fd_damis_tougher]
+if (~dt_damis_attackable = false) return;
+@player_combat_start;
+[apnpc2,fd_damis_tougher]
+if (~dt_damis_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_opplayer2,fd_damis_normal] ~dt_damis_hit;
+[ai_opplayer2,fd_damis_tougher] ~dt_damis_hit;
+[proc,dt_damis_hit]
+if (~dt_damis_attackable = false) return;
+// Use the shared resolver and drain only when it actually scheduled a living melee hit.
+def_int $before = %npc_action_delay;
+~npc_default_attack;
+if (%npc_action_delay <= $before | npc_stat(hitpoints) = 0) return;
+// RuneHQ 2006-04-24: 4-6 per hit, even when that hit dealt zero.
+// Normal form has no drain. No modern 5% rule or cap is substituted.
+if (npc_type = fd_damis_tougher) {
+    stat_sub(prayer, add(^dt_damis_prayer_min, random(^dt_damis_prayer_spread)), 0);
+    if (stat(prayer) = 0) ~prayer_deactivate_all;
+}
+
+[ai_timer,fd_damis_normal] ~dt_damis_cleanup;
+[ai_timer,fd_damis_tougher] ~dt_damis_cleanup;
+[proc,dt_damis_cleanup]
+if (finduid(%npc_aggressive_player) = false) {
+    npc_del;
+    return;
+}
+if (inzone(0_41_79_0_0, 0_42_79_63_63, coord) = false) npc_del;
+
+[ai_queue3,fd_damis_normal] @dt_damis_first_death;
+[label,dt_damis_first_death]
+// CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#671.
+npc_say("This armour... is for restraint, not... protection...");
+npc_delay(^dt_damis_first_death_gap);
+// CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#672.
+npc_say("Now I show... you... my true... power!");
+gosub(npc_death);
+if (npc_findhero = ^true) {
+    if (uid = %npc_aggressive_player & %fd_shadowwarrior_quest = ^dt_shadow_substate_damis_first_form) {
+        queue(dt_damis_second, 0, 0);
+    }
+}
+
+[queue,dt_damis_second]
+if (%fd_shadowwarrior_quest ! ^dt_shadow_substate_damis_first_form) return;
+%fd_shadowwarrior_quest = ^dt_shadow_substate_damis_second_form;
+if (inzone(0_41_79_0_0, 0_42_79_63_63, coord) = false) return;
+~dt_damis_spawn;
+
+[ai_queue3,fd_damis_tougher] @dt_damis_second_death;
+[label,dt_damis_second_death]
+gosub(npc_death);
+if (npc_findhero = ^true) {
+    if (uid = %npc_aggressive_player & %fd_shadowwarrior_quest = ^dt_shadow_substate_damis_second_form) {
+        queue*(dt_damis_award, 0)(npc_coord);
+    }
+}
+
+[queue,dt_damis_award](coord $ground)
+if (%fd_shadowwarrior_quest ! ^dt_shadow_substate_damis_second_form) return;
+%fd_shadowwarrior_quest = ^dt_shadow_substate_damis_defeated;
+// Ground award belongs to this owner. Inventory changes only on the native Take below.
+if (~obj_gettotal(fd_dark_diamond) = 0 & %fd_column_shadow ! ^dt_column_placed) obj_add($ground, fd_dark_diamond, 1, ^lootdrop_duration);
+
+[opobj3,fd_dark_diamond]
+// Recovery has no extra dialogue. Only native Take transfers an original or recovered diamond.
+if (%fd_shadowwarrior_quest < ^dt_shadow_substate_damis_defeated | %fd_shadowwarrior_quest > ^dt_shadow_substate_diamond_claimed) return;
+if (~obj_gettotal(fd_dark_diamond) > 0 | %fd_column_shadow = ^dt_column_placed) return;
+if (~pickup_obj_check_for_space(obj_type, obj_count) = false) return;
+anim(null, 0);
+obj_takeitem(inv);
+sound_synth(pick2, 1, 0);
+%fd_shadowwarrior_quest = ^dt_shadow_substate_diamond_claimed;
