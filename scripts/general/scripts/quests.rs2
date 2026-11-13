@@ -22,12 +22,11 @@ if ($random < 32) {       // The least common music that plays when completing a
 } else {                 // The most common music that plays when completing a quest.
     midi_jingle("quest complete 1");
 }
-// Send Quest Scroll
+// Send Quest Scroll. CANDIDATE: Fluffs uses the generic reward scroll below;
+// its inherited custom interface id 2302 is the Rogues' Den puzzle in 377.
 switch_component ($component) {
     case questlist:itgronigen ://Obveratory: Updates QP before quest scroll is queued & uses custom quest scroll
         if_openmain(questscroll_itgronigen);
-    case questlist:fluffs ://Gertrude's Cat: Updates QP before quest scroll is queued & uses custom quest scroll
-        if_openmain(questscroll_fluffs);
     case questlist:tbwt : // Tai Bwo Wannai Trio (custom scroll) — port 289
         if_settext(questscroll_tbwt:com_3, $questmessage);
         if_settext(questscroll_tbwt:com_8, tostring($questpoints));
