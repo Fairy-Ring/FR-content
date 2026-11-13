@@ -1,0 +1,158 @@
+// S2 Smoke hunt. VERIFIED cache routes; CANDIDATE retained OSRS dialogue and
+// period guide sequence. UNKNOWN exact timers/arrival tiles: dt_smoke.constant.
+
+[oploc1,sword_haunted_well]
+~chatplayer("<p,neutral>I can see a lot of foul looking smoke at the bottom of this well.");
+~chatplayer("<p,neutral>I don't think breathing it in directly would be very good for my health.");
+anim(human_climbing_down, 0);
+p_delay(2);
+p_teleport(^dt_smoke_arrival);
+~dt_smoke_start;
+
+[oploc1,sword_haunted_well_go_up] @dt_smoke_leave;
+[oploc1,4d_ladder1] @dt_smoke_leave;
+[oploc1,4d_ladder2] @dt_smoke_leave;
+
+[label,dt_smoke_leave]
+anim(human_climbing, 0);
+p_delay(2);
+p_teleport(^dt_smoke_surface);
+cleartimer(dt_smoke_damage);
+
+[proc,dt_smoke_inside](coord $tile)(boolean)
+return(inzone(^dt_smoke_sw, ^dt_smoke_ne, $tile));
+
+[proc,dt_smoke_start]
+// GETTIMER returns the stored timer clock, or -1 when absent; it is not Boolean.
+if (~dt_smoke_inside(coord) = true & gettimer(dt_smoke_damage) = -1) {
+    settimer(dt_smoke_damage, ^dt_smoke_damage_interval);
+}
+
+[timer,dt_smoke_damage]
+if (~dt_smoke_inside(coord) = false) {
+    cleartimer(dt_smoke_damage);
+    return;
+}
+// CANDIDATE: earliest Old School Smoke Dungeon statement includes the gas mask.
+if (inv_getobj(worn, ^wearpos_hat) = slayer_facemask | inv_getobj(worn, ^wearpos_hat) = gasmask) return;
+if (stat(hitpoints) > 1) {
+    ~damage_self(min(^dt_smoke_damage, sub(stat(hitpoints), 1)));
+}
+
+[oplocu,4d_standing_torch1] @dt_smoke_light(1);
+[oplocu,4d_standing_torch1_unlit] @dt_smoke_light(1);
+[oplocu,4d_standing_torch1_lit] @dt_smoke_light(1);
+[oplocu,4d_standing_torch2] @dt_smoke_light(2);
+[oplocu,4d_standing_torch2_unlit] @dt_smoke_light(2);
+[oplocu,4d_standing_torch2_lit] @dt_smoke_light(2);
+[oplocu,4d_standing_torch3] @dt_smoke_light(3);
+[oplocu,4d_standing_torch3_unlit] @dt_smoke_light(3);
+[oplocu,4d_standing_torch3_lit] @dt_smoke_light(3);
+[oplocu,4d_standing_torch4] @dt_smoke_light(4);
+[oplocu,4d_standing_torch4_unlit] @dt_smoke_light(4);
+[oplocu,4d_standing_torch4_lit] @dt_smoke_light(4);
+
+[label,dt_smoke_light](int $torch)
+if (last_useitem ! tinderbox | inv_total(inv, tinderbox) < 1 | %deserttreasure < ^dt_stage_hunts) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (stat(firemaking) < ^dt_smoke_torch_firemaking) {
+    // Existing generic equipment/skill refusal, not reconstructed torch prose.
+    mes("You are not a high enough level to use this item.");
+    return;
+}
+if (~dt_smoke_torch_lit($torch) = true) return;
+anim(human_createfire, 0);
+sound_synth(tinderbox_strike, 1, 0);
+switch_int ($torch) {
+    case 1 : %fd_torch_count1 = 1; settimer(dt_smoke_torch_ne, ^dt_smoke_torch_lifetime);
+    case 2 : %fd_torch_count2 = 1; settimer(dt_smoke_torch_se, ^dt_smoke_torch_lifetime);
+    case 3 : %fd_torch_count3 = 1; settimer(dt_smoke_torch_sw, ^dt_smoke_torch_lifetime);
+    case 4 : %fd_torch_count4 = 1; settimer(dt_smoke_torch_nw, ^dt_smoke_torch_lifetime);
+}
+mes("You light the torch.");
+if (~dt_smoke_all_lit = true) mes("The path is lit, now claim the key...");
+
+[proc,dt_smoke_torch_lit](int $torch)(boolean)
+switch_int ($torch) {
+    case 1 : if (%fd_torch_count1 = 1) return(true);
+    case 2 : if (%fd_torch_count2 = 1) return(true);
+    case 3 : if (%fd_torch_count3 = 1) return(true);
+    case 4 : if (%fd_torch_count4 = 1) return(true);
+}
+return(false);
+
+[proc,dt_smoke_all_lit]()(boolean)
+if (%fd_torch_count1 = 1 & %fd_torch_count2 = 1 & %fd_torch_count3 = 1 & %fd_torch_count4 = 1) return(true);
+return(false);
+
+[timer,dt_smoke_torch_ne]
+cleartimer(dt_smoke_torch_ne);
+~dt_smoke_extinguish(1);
+
+[timer,dt_smoke_torch_se]
+cleartimer(dt_smoke_torch_se);
+~dt_smoke_extinguish(2);
+
+[timer,dt_smoke_torch_sw]
+cleartimer(dt_smoke_torch_sw);
+~dt_smoke_extinguish(3);
+
+[timer,dt_smoke_torch_nw]
+cleartimer(dt_smoke_torch_nw);
+~dt_smoke_extinguish(4);
+
+[proc,dt_smoke_extinguish](int $torch)
+if (~dt_smoke_torch_lit($torch) = false) return;
+switch_int ($torch) {
+    case 1 : %fd_torch_count1 = 0; mes("The North-east torch burns out...");
+    case 2 : %fd_torch_count2 = 0; mes("The South-east torch burns out...");
+    case 3 : %fd_torch_count3 = 0; mes("The South-west torch burns out...");
+    case 4 : %fd_torch_count4 = 0; mes("The North-west torch burns out...");
+}
+
+[oploc1,fd_firedungeon_shutchest]
+if (%deserttreasure < ^dt_stage_hunts | ~dt_smoke_all_lit = false) {
+    ~mesbox("There seems to be no way to open this chest. Engraved where the keyhole should be is a message; 'Light the path, and find the key...'");
+    return;
+}
+if (%fd_firewargate = ^dt_flag_on) {
+    mes("There is nothing inside the chest.");
+    return;
+}
+if (~obj_gettotal(fd_firekey) > 0) {
+    mes("The chest is empty.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+anim(human_pickuptable, 0);
+inv_add(inv, fd_firekey, 1);
+%fd_firechest = ^dt_flag_on;
+mes("You open the chest and take a key.");
+
+[proc,dt_smoke_logout]
+// The four original cache bits are permanent storage, but their timers are not.
+// Do not leave a lit bit behind when its owning session ends.
+%fd_torch_count1 = 0;
+%fd_torch_count2 = 0;
+%fd_torch_count3 = 0;
+%fd_torch_count4 = 0;
+cleartimer(dt_smoke_torch_ne);
+cleartimer(dt_smoke_torch_se);
+cleartimer(dt_smoke_torch_sw);
+cleartimer(dt_smoke_torch_nw);
+cleartimer(dt_smoke_damage);
+~dt_fareed_cleanup;
+
+[proc,dt_smoke_journal]()(string)
+// CANDIDATE: reuse retained action messages verbatim, rather than inventing
+// an otherwise unattested historical journal transcript.
+if (%fd_killed_firewarrior = ^dt_flag_on) return("@str@You take the Diamond of Smoke from the ashes of the warrior.|");
+if (%fd_firewargate = ^dt_flag_on) return("@str@You unlock the gate and enter the room.|");
+if (%fd_firechest = ^dt_flag_on) return("@str@You open the chest and take a key.|");
+if (~dt_smoke_all_lit = true) return("@dbl@The path is lit, now claim the key...|");
+return("");

@@ -74,6 +74,9 @@ queue(macro_event_login, 0, 0);
 ~rd_lifecycle_login;
 ~barrows_resume;
 
+// A fresh login cannot retain the session timers for saved Smoke torch bits.
+if (%fd_torch_count1 ! 0 | %fd_torch_count2 ! 0 | %fd_torch_count3 ! 0 | %fd_torch_count4 ! 0) ~dt_smoke_logout;
+
 if(inzone(movecoord(^grandtree_jail_coord, 0, 0, -2), movecoord(^grandtree_jail_coord, 3, 0, 2), coord) = true) {
     ~grandtree_spawn_charlie;
 }
