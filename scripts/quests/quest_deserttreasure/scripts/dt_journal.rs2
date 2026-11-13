@@ -160,9 +160,47 @@ if (%deserttreasure = ^dt_stage_ingredients_pending) {
     return;
 }
 
-if (%deserttreasure = ^dt_stage_hunts) {
-    $x = append($x, "@str@Eblis has set up the scrying glasses.|");
-    $x = append($x, "@dbl@I should use them to find the four diamonds.");
+// CANDIDATE authored summaries: desert-treasure.stage-product-contract-1109.
+if (%deserttreasure = ^dt_stage_placing_diamonds | %deserttreasure = ^dt_stage_four_columns) {
+    if (~dt_columns_full = true) {
+        $x = append($x, "@dbl@I have placed all four diamonds. The pyramid is ready to enter.|");
+    } else {
+        $x = append($x, "@dbl@I should place each remaining diamond in its matching column.|");
+    }
+    $x = append($x, ~dt_column_journal);
     ~quest_journal($n, $x);
     return;
 }
+
+if (%deserttreasure = ^dt_stage_hunts) {
+    $x = append($x, "@str@Eblis has set up the scrying glasses.|");
+    $x = append($x, "@dbl@I should use them to find the four diamonds.|");
+    $x = append($x, ~dt_column_journal);
+    ~quest_journal($n, $x);
+    return;
+}
+
+[proc,dt_column_journal]()(string)
+// CANDIDATE authored per-bit summaries: desert-treasure.stage-product-contract-1109.
+def_string $columns;
+if (%fd_column_blood = ^dt_column_placed) {
+    $columns = append($columns, "@str@Blood diamond placed.|");
+} else {
+    $columns = append($columns, "@dbl@Blood diamond not placed.|");
+}
+if (%fd_column_fire = ^dt_column_placed) {
+    $columns = append($columns, "@str@Smoke diamond placed.|");
+} else {
+    $columns = append($columns, "@dbl@Smoke diamond not placed.|");
+}
+if (%fd_column_ice = ^dt_column_placed) {
+    $columns = append($columns, "@str@Ice diamond placed.|");
+} else {
+    $columns = append($columns, "@dbl@Ice diamond not placed.|");
+}
+if (%fd_column_shadow = ^dt_column_placed) {
+    $columns = append($columns, "@str@Shadow diamond placed.|");
+} else {
+    $columns = append($columns, "@dbl@Shadow diamond not placed.|");
+}
+return($columns);

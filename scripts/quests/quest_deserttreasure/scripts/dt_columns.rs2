@@ -1,0 +1,84 @@
+// VERIFIED identities: desert-treasure.column-oblix-locs and S0 config-manifest.
+// CANDIDATE writers/gate: desert-treasure.stage-product-contract-1109 and column-use-unknown.
+// Bind all original parent/idle/placed forms; a same-name unrelated loc is never accepted.
+[oplocu,desert_treasure_oblix1] @dt_column_blood;
+[oplocu,desert_treasure_oblix_a] @dt_column_blood;
+[oplocu,fd_blood_column] @dt_column_blood;
+[oplocu,desert_treasure_oblix2] @dt_column_fire;
+[oplocu,desert_treasure_oblix_b] @dt_column_fire;
+[oplocu,fd_smoke_column] @dt_column_fire;
+[oplocu,desert_treasure_oblix3] @dt_column_ice;
+[oplocu,desert_treasure_oblix_c] @dt_column_ice;
+[oplocu,fd_ice_column] @dt_column_ice;
+[oplocu,desert_treasure_oblix4] @dt_column_shadow;
+[oplocu,desert_treasure_oblix_d] @dt_column_shadow;
+[oplocu,fd_shadow_column] @dt_column_shadow;
+
+[label,dt_column_blood]
+if (~dt_column_accept(fd_blood_diamond, %fd_column_blood) = false) return;
+inv_del(inv, fd_blood_diamond, 1);
+%fd_column_blood = ^dt_column_placed;
+@dt_column_placed;
+
+[label,dt_column_fire]
+if (~dt_column_accept(fd_diamond_fire, %fd_column_fire) = false) return;
+inv_del(inv, fd_diamond_fire, 1);
+%fd_column_fire = ^dt_column_placed;
+@dt_column_placed;
+
+[label,dt_column_ice]
+if (~dt_column_accept(fd_icediamond, %fd_column_ice) = false) return;
+inv_del(inv, fd_icediamond, 1);
+%fd_column_ice = ^dt_column_placed;
+@dt_column_placed;
+
+[label,dt_column_shadow]
+if (~dt_column_accept(fd_dark_diamond, %fd_column_shadow) = false) return;
+inv_del(inv, fd_dark_diamond, 1);
+%fd_column_shadow = ^dt_column_placed;
+@dt_column_placed;
+
+[proc,dt_column_accept](namedobj $gem, int $placed)(boolean)
+if (last_useitem ! $gem | $placed = ^dt_column_placed | inv_total(inv, $gem) < 1 | (%deserttreasure ! ^dt_stage_hunts & %deserttreasure ! ^dt_stage_placing_diamonds)) {
+    // UNKNOWN exact wrong/duplicate wording: desert-treasure.column-use-unknown.
+    // Reuse the existing generic response, not a claimed historical column quotation.
+    ~displaymessage(^dm_default);
+    return(false);
+}
+if (stat_base(magic) < ^dt_column_magic_required) {
+    // CANDIDATE wording: desert-treasure.dlg.column-place-messages.
+    mes("You are not a powerful enough mage to breach the protective aura.");
+    mes("You need a magic level of at least 50 to enter the Pyramid.");
+    return(false);
+}
+return(true);
+
+[proc,dt_columns_full]()(boolean)
+if (%fd_column_blood = ^dt_column_placed & %fd_column_fire = ^dt_column_placed & %fd_column_ice = ^dt_column_placed & %fd_column_shadow = ^dt_column_placed) return(true);
+return(false);
+
+[label,dt_column_placed]
+// CANDIDATE wording: desert-treasure.dlg.column-place-messages.
+mes("The diamond is absorbed into the pillar...");
+if (~dt_columns_full = true) {
+    %deserttreasure = ^dt_stage_four_columns;
+    ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
+    mes("The force preventing access to the Pyramid has now vanished.");
+} else if (%deserttreasure = ^dt_stage_hunts) {
+    %deserttreasure = ^dt_stage_placing_diamonds;
+    ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
+}
+return;
+
+[oploc1,four_diamonds_door_1] @dt_column_top_entry;
+[oploc1,four_diamonds_door_mirror] @dt_column_top_entry;
+
+[label,dt_column_top_entry]
+if (~dt_columns_full = false) {
+    // CANDIDATE wording: desert-treasure.dlg.column-place-messages.
+    mes("This passage doesn't seem to lead anywhere...");
+    return;
+}
+// S6 boundary: remain outside at stage 12. S7 owns opening, traversal and stage 13.
+// No invented success speech, destination or historical door animation.
+return;

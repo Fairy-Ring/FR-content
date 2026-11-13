@@ -1,14 +1,21 @@
-// Desert Treasure — hill Eblis Talk-to (fd_elder_by_mirrors 1925, concrete
-// child of multi fourdiamonds_elder2 1924 @ 3213,2956 L0; visible
-// %deserttreasure 10-15, overlaps village at 10). CANDIDATE last-resort
-// 2007-base minus Changes: OSRS Transcript:Desert Treasure I "Talking to
-// Eblis at the mirrors" — first hill Talk-to after village Excellent 8→10,
-// before Look-into. Dump then return. Prefer 0 write: %deserttreasure
-// stays 10. No %fd_mirror_present, no dest / Look-into, no 15, no AM, no
-// warrior map. Bind the child, not fourdiamonds_elder2. No && / ||.
-// Research: subject desert-treasure (leftover 1925) · Transcript:Desert Treasure I.
+// CANDIDATE: desert-treasure.dlg.eblis-{partial-diamonds,four-diamonds,after-place}
+// and eblis-mirrors-first-talk. Later OSRS transcript, not recovered 377 speech.
+// Page breaks are editorial. Held inventory alone counts; no item or progress writes.
 
 [opnpc1,fd_elder_by_mirrors]
+if (%fd_column_blood = ^dt_column_placed & %fd_column_fire = ^dt_column_placed & %fd_column_ice = ^dt_column_placed & %fd_column_shadow = ^dt_column_placed & inv_total(inv, fd_blood_diamond) = 0 & inv_total(inv, fd_icediamond) = 0 & inv_total(inv, fd_diamond_fire) = 0 & inv_total(inv, fd_dark_diamond) = 0) {
+    @dt_eblis_after_place;
+}
+def_int $held = 0;
+if (inv_total(inv, fd_blood_diamond) > 0) $held = add($held, 1);
+if (inv_total(inv, fd_icediamond) > 0) $held = add($held, 1);
+if (inv_total(inv, fd_diamond_fire) > 0) $held = add($held, 1);
+if (inv_total(inv, fd_dark_diamond) > 0) $held = add($held, 1);
+if ($held = 4) @dt_eblis_four_diamonds;
+if ($held = 1) ~chatplayer("<p,neutral>I have collected one Diamond so far!");
+if ($held = 2) ~chatplayer("<p,neutral>I have collected 2 Diamonds so far!");
+if ($held = 3) ~chatplayer("<p,neutral>I have collected 3 Diamonds so far!");
+if ($held > 0) ~chatnpc("<p,neutral>That is a good start... but Azzanadra is still imprisoned!");
 ~chatplayer("<p,neutral>So can you give me any help on where to find these warriors and their diamonds?");
 ~chatnpc("<p,neutral>No, the magic used in this spell is powerful, but inaccurate. The direction the scrying glass faces is roughly the direction you will find the warrior, but I'm afraid I");
 ~chatnpc("<p,neutral>can't be any more help than that.");
@@ -17,4 +24,31 @@
 ~chatnpc("<p,neutral>I can only focus upon the aura the diamonds have left behind them, so any place where the Diamonds were present for a significant period of time will still be shown - such as the Bandit Camp where I make my home.");
 ~chatnpc("<p,neutral>My apologies, but magic is an inaccurate art in many respects.");
 ~chatnpc("<p,neutral>Don't forget to come back here when you have collected all four diamonds.");
+return;
+
+[label,dt_eblis_four_diamonds]
+// CANDIDATE wording: desert-treasure.dlg.eblis-four-diamonds.
+~chatplayer("<p,neutral>So I have all four of these Diamonds of Azzanadra, now what?");
+~chatnpc("<p,neutral>Azzanadra was a Mahjarrat hero. He was unkillable, and the cowardly traitors who stole our lands did not know what to do with him,");
+~chatnpc("<p,neutral>for his hatred for them was as strong as his magics.");
+~chatnpc("<p,neutral>In the end, they cast a spell upon him, to trap him in the stone structure to the South of here.");
+~chatnpc("<p,neutral>They stole his very life force, the essence of his power, and trapped it within four crystals -");
+~chatnpc("<p,neutral>the very same Four Diamonds which you have now recovered from the brigands who stole from us.");
+~chatnpc("<p,neutral>The four pillars surrounding the structure are keeping the containment spell intact.");
+~chatnpc("<p,neutral>By placing a diamond into each, you will breach the magical defences and begin to restore Azzanadra's power, and be able to enter the structure.");
+~chatnpc("<p,neutral>Go, place the diamonds, and free my lord Azzanadra!");
+~chatnpc("<p,neutral>The path will be hard, for his prison is full of traps and danger to prevent his rescue, but he will reward you beyond your wildest dreams when freed!");
+~chatnpc("<p,neutral>Quickly... After all these centuries, Lord Azzanadra is nearly free!");
+~chatnpc("<p,neutral>You must spare no time, place the Diamonds upon the pillars and enter the pyramid so that you may free him!");
+return;
+
+[label,dt_eblis_after_place]
+// CANDIDATE wording and gate: desert-treasure.dlg.eblis-after-place.
+~chatplayer("<p,neutral>I used the Four Diamonds on the pillars surrounding the pyramid...");
+~chatnpc("<p,neutral>Yes? And what happened?");
+~chatplayer("<p,neutral>Er... they changed colour.");
+~chatnpc("<p,neutral>Ah, that was the power being re-absorbed back into them.");
+~chatnpc("<p,neutral>That should have been sufficient to break the magic seal preventing anyone exiting or entering the structure.");
+~chatnpc("<p,neutral>Quickly, you must let Lord Azzanadra know that he is free again after these many years!");
+~chatnpc("<p,neutral>Please, when you have freed Azzanadra, let me know what words he has for his faithful followers...");
 return;

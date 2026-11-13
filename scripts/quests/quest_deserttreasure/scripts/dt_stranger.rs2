@@ -1,0 +1,35 @@
+// VERIFIED eligibility basis: desert-treasure.stranger-npc, RuneVillage 14 Feb 2006.
+// CANDIDATE implementation: held inventory only; reuse existing per-player actor owner.
+// UNKNOWN trigger, probability, spawn tile, poison severity and aftermath. The plan
+// gives no spawn constant. No scheduler/spawn/combat-value reconstruction is enabled.
+
+[proc,dt_stranger_eligible]()(boolean)
+if (inv_total(inv, fd_blood_diamond) > 0 | inv_total(inv, fd_icediamond) > 0 | inv_total(inv, fd_diamond_fire) > 0 | inv_total(inv, fd_dark_diamond) > 0 | inv_total(inv, fd_sword_cross) > 0) return(true);
+return(false);
+
+[proc,dt_stranger_is_owner](player_uid $owner)(boolean)
+if ($owner ! null & $owner = uid) return(true);
+return(false);
+
+[opnpc2,fourdiamonds_assasin]
+if (~dt_stranger_is_owner(%npc_macro_event_target) = false) {
+    // CANDIDATE generic actor refusal, not recovered Stranger speech: desert-treasure.stranger-npc.
+    mes("It's not after you.");
+    return;
+}
+@player_combat_start;
+
+[ai_opplayer2,fourdiamonds_assasin]
+if (~dt_stranger_is_owner(%npc_macro_event_target) = false) {
+    npc_setmode(none);
+    return;
+}
+~npc_default_attack;
+
+// Read-only probe: no NPC, progress, inventory or eligibility state is manufactured.
+[debugproc,dt_stranger_status]
+if (~dt_stranger_eligible = true) {
+    mes("[dt_stranger] eligible=1");
+} else {
+    mes("[dt_stranger] eligible=0");
+}
