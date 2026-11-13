@@ -2,9 +2,12 @@
 /**
  * Offline proof against real compiled RuneScript and packed configs.
  * Run from the sibling engine:
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode full
- *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-scripts <directory holding the base pack's script.dat and script.idx>
- * Artifacts go to --artifact-dir, else SLAYER_SELECTOR_EVIDENCE_DIR, else a directory under the system temporary directory.
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-discriminator --base-pack <S1 full pack>
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --base-pack <S1 full pack>
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-pack <pre-S1 full pack>
+ * Artifacts go to --artifact-dir, else SLAYER_SELECTOR_EVIDENCE_DIR, else RUNNER_TEMP or the system temporary directory.
  *
  * No server or live client is started. The adversarial DBRows are compiled in
  * an isolated temporary content/engine copy by compile_adversarial_pack.mjs.
@@ -25,7 +28,7 @@ const CONTENT_ROOT = path.resolve(TEST_DIR, '../..');
 const ENGINE_ROOT = process.env.HARNESS_ENGINE_DIR ?? path.resolve(CONTENT_ROOT, '../engine');
 const PACK_DIR = path.join(ENGINE_ROOT, 'data/pack');
 const SCRIPT_DIR = path.join(CONTENT_ROOT, 'scripts');
-const EVIDENCE_DEFAULT = path.join(os.tmpdir(), 'slayer-selector');
+const EVIDENCE_DEFAULT = path.join(process.env.RUNNER_TEMP || os.tmpdir(), 'slayer-selector');
 const ADJACENT_FIXTURE = path.join(TEST_DIR, 'fixtures/slayer_selector_adversarial.dbrow');
 const COMPILE_HELPER = path.join(TEST_DIR, 'compile_adversarial_pack.mjs');
 const SLAYER_CONFIG_DIR = path.join(SCRIPT_DIR, 'skill_slayer/configs');
@@ -52,30 +55,74 @@ const MASTER_DEFS = [
 const HIGH_FIXTURE = { key: 'cb126_slayer99', combat: 126, level: 99, slayer: 99, currentSlayer: 99 };
 const SEEDS = [1, 377, 20060502, 1113];
 const DRAWS_PER_SEED = 50000;
+const CI_DRAWS_PER_SEED = 1000;
+// Independent VERIFIED oracle from the period threshold table (facts.md:48-75).
+const SOURCED_SLAYER_THRESHOLDS = [
+    ['slayer_crawlinghand', 5],
+    ['slayer_cavebug', 7],
+    ['slayer_cavecrawler', 10],
+    ['slayer_banshee', 15],
+    ['slayer_caveslime', 17],
+    ['slayer_rockslug', 20],
+    ['slayer_lizard', 22],
+    ['slayer_cockatrice', 25],
+    ['slayer_pyrefiend', 30],
+    ['slayer_mogre', 32],
+    ['slayer_harpiebugswarm', 33],
+    ['slayer_wallbeast', 35],
+    ['slayer_killerwatt', 37],
+    ['slayer_basilisk', 40],
+    ['slayer_feverspider', 42],
+    ['slayer_infernalmage', 45],
+    ['slayer_bloodveld', 50],
+    ['slayer_jelly', 52],
+    ['slayer_turoth', 55],
+    ['slayer_mutatedzygomite', 57],
+    ['slayer_aberrantspecter', 60],
+    ['slayer_dustdevil', 65],
+    ['slayer_kurask', 70],
+    ['slayer_skeletalwyvern', 72],
+    ['slayer_gargoyle', 75],
+    ['slayer_nechryael', 80],
+    ['slayer_abyssaldemon', 85],
+    ['slayer_darkbeast', 90]
+];
 const FAMILY_B = 3800;
 const ALPHA = 1e-6;
 const LOG_BOUND = Math.log((2 * FAMILY_B) / ALPHA);
 const OUT_OF_S1 = [
-    'S2: new per-creature Slayer thresholds and validator gate dispatch/ownership.',
     'S3–S7: per-master table repairs, target corrections, new membership, and numeric retunes.',
     'S8 replacement consent/semantics, has_turael_task changes, and death transitions.'
 ];
+const OWNER_PREDICATES = [
+    {
+        proc: 'slayer_priestperil_unlocked',
+        categories: ['slayer_crawlinghand', 'slayer_banshee', 'slayer_infernalmage', 'slayer_bloodveld', 'slayer_aberrantspecter', 'slayer_gargoyle', 'slayer_nechryael', 'slayer_abyssaldemon', 'slayer_ghoul', 'slayer_werewolf', 'slayer_vampire']
+    },
+    { proc: 'slayer_horror_unlocked', categories: ['slayer_dagannoth'] },
+    { proc: 'slayer_regicide_unlocked', categories: ['slayer_elf'] },
+    { proc: 'slayer_deserttreasure_unlocked', categories: ['slayer_dustdevil'] },
+    { proc: 'slayer_mourning2_unlocked', categories: ['slayer_darkbeast'] },
+    { proc: 'slayer_skippy_unlocked', categories: ['slayer_mogre'] }
+];
 
 function parseArgs(argv) {
-    const result = { mode: 'full', artifactDir: process.env.SLAYER_SELECTOR_EVIDENCE_DIR ?? EVIDENCE_DEFAULT, baseScripts: null };
+    const result = { mode: 'full', artifactDir: process.env.SLAYER_SELECTOR_EVIDENCE_DIR ?? EVIDENCE_DEFAULT, basePack: null };
     for (let i = 0; i < argv.length; i++) {
         const token = argv[i];
         if (token === '--mode' && argv[i + 1]) result.mode = argv[++i];
         else if (token === '--artifact-dir' && argv[i + 1]) result.artifactDir = path.resolve(argv[++i]);
-        else if (token === '--base-scripts' && argv[i + 1]) result.baseScripts = path.resolve(argv[++i]);
+        else if (token === '--base-pack' && argv[i + 1]) result.basePack = path.resolve(argv[++i]);
         else throw new Error(`Unknown or incomplete argument: ${token}`);
     }
-    assert(['full', 'adversarial', 'old-regressions'].includes(result.mode), `unsupported --mode ${result.mode}`);
-    if (result.mode === 'old-regressions') assert(result.baseScripts, '--mode old-regressions requires --base-scripts <directory>');
+    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator'].includes(result.mode), `unsupported --mode ${result.mode}`);
+    if (['old-regressions', 'old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
     return result;
 }
 
 const OPTIONS = parseArgs(process.argv.slice(2));
+const ACTIVE_PACK_DIR = OPTIONS.basePack ?? PACK_DIR;
+const ACTIVE_DRAWS_PER_SEED = OPTIONS.mode === 'ci' ? CI_DRAWS_PER_SEED : DRAWS_PER_SEED;
 const RUN_ID = `${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`;
 const RUN_DIR = path.join(OPTIONS.artifactDir, `run-${RUN_ID}`);
 const METADATA_PATH = path.join(RUN_DIR, 'metadata.json');
@@ -236,7 +283,7 @@ function matchingBrace(text, openIndex) {
     throw new Error('unclosed validator switch block');
 }
 
-function parseBlockedTargets(taskSource, constants, questValues) {
+function parseValidatorRoutes(taskSource, constants) {
     const body = extractValidatorBody(taskSource).replace(/\/\/[^\n]*/g, '');
     const switchStart = body.indexOf('switch_int($target)');
     assert(switchStart >= 0, 'validator has no target switch; revise independent oracle instead of silently weakening it');
@@ -246,8 +293,10 @@ function parseBlockedTargets(taskSource, constants, questValues) {
     const switchBody = body.slice(openIndex + 1, closeIndex);
     const headers = [...switchBody.matchAll(/^[ \t]*case\s+([\s\S]*?):[ \t]*$/gm)];
     assert(headers.length > 0, 'independent parser found no validator cases');
-    const blocked = new Set();
+    const alwaysBlocked = new Set();
     const recognized = new Set();
+    const questGates = new Map();
+    const ownerProcByTarget = new Map();
     for (let i = 0; i < headers.length; i++) {
         const header = headers[i];
         const nextIndex = i + 1 < headers.length ? headers[i + 1].index : switchBody.length;
@@ -259,19 +308,22 @@ function parseBlockedTargets(taskSource, constants, questValues) {
             return Number(constants.get(name));
         });
         for (const target of targetIds) recognized.add(target);
-        if (!/\breturn\s*\(\s*false\s*\)/.test(block)) continue;
+
         const questGate = block.match(/%([A-Za-z0-9_]+)\s*<\s*\^([A-Za-z0-9_]+)/);
+        const ownerCall = block.match(/\breturn\s*\(\s*~([A-Za-z0-9_]+)\s*\)\s*;/);
         if (questGate) {
-            const [, questVar, thresholdName] = questGate;
+            const [, variable, thresholdName] = questGate;
             assert(constants.has(thresholdName), `validator quest gate references unknown ^${thresholdName}`);
-            const currentValue = questValues[questVar] ?? 0;
-            if (currentValue < Number(constants.get(thresholdName))) for (const target of targetIds) blocked.add(target);
-        } else {
-            for (const target of targetIds) blocked.add(target);
+            const gate = { variable, threshold: Number(constants.get(thresholdName)), thresholdName };
+            for (const target of targetIds) questGates.set(target, gate);
+        } else if (ownerCall) {
+            for (const target of targetIds) ownerProcByTarget.set(target, ownerCall[1]);
+        } else if (/\breturn\s*\(\s*false\s*\)/.test(block)) {
+            for (const target of targetIds) alwaysBlocked.add(target);
         }
     }
     assert(recognized.size > 0, 'validator category cases were not parsed');
-    return { blocked, recognized };
+    return { alwaysBlocked, recognized, questGates, ownerProcByTarget };
 }
 
 function loadOracle() {
@@ -297,7 +349,7 @@ function loadOracle() {
     const recommendationSource = fs.readFileSync(SOURCES.recommendationScript, 'utf8');
     const questNames = [...new Set([...extractValidatorBody(taskSource).matchAll(/%([A-Za-z0-9_]+)\s*</g)].map(match => match[1]))];
     const questValues = Object.fromEntries(questNames.map(name => [name, 0]));
-    const blocked = parseBlockedTargets(taskSource, constants, questValues);
+    const validatorRoutes = parseValidatorRoutes(taskSource, constants);
     const reverseConstants = new Map();
     for (const [name, rawValue] of constants) {
         if (name.startsWith('slayer_') && /^\d+$/.test(rawValue)) reverseConstants.set(Number(rawValue), name);
@@ -347,8 +399,10 @@ function loadOracle() {
         recommendationSource,
         questNames,
         questValues,
-        blockedTargets: blocked.blocked,
-        validatorCaseTargets: blocked.recognized,
+        alwaysBlockedTargets: validatorRoutes.alwaysBlocked,
+        validatorCaseTargets: validatorRoutes.recognized,
+        questGates: validatorRoutes.questGates,
+        ownerProcByTarget: validatorRoutes.ownerProcByTarget,
         reverseConstants,
         masters
     };
@@ -360,7 +414,13 @@ const SOURCE_HASHES = Object.fromEntries(Object.entries(SOURCES).map(([name, fil
 function expectedValidator(target, fixture) {
     const slayerRequirement = ORACLE.slayerReq.get(target) ?? 0;
     const combatRequirement = ORACLE.combatReq.get(target) ?? 0;
-    return fixture.baseSlayer >= slayerRequirement && fixture.combat >= combatRequirement && !ORACLE.blockedTargets.has(target);
+    const questGate = ORACLE.questGates.get(target);
+    const questValue = questGate ? (fixture.questValues?.[questGate.variable] ?? ORACLE.questValues[questGate.variable] ?? 0) : 0;
+    return fixture.baseSlayer >= slayerRequirement
+        && fixture.combat >= combatRequirement
+        && !ORACLE.alwaysBlockedTargets.has(target)
+        && !ORACLE.ownerProcByTarget.has(target)
+        && (!questGate || questValue >= questGate.threshold);
 }
 
 function expectedRowEligibility(row, fixture) {
@@ -542,9 +602,9 @@ for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'NpcType', 'Inv
     configTypes[name] = (await importEngine(`src/cache/config/${name}.ts`)).default;
 }
 
-function loadRuntime({ scripts = PACK_DIR, rows = PACK_DIR } = {}) {
+function loadRuntime({ scripts = OPTIONS.basePack ?? PACK_DIR, rows = OPTIONS.basePack ?? PACK_DIR, configs = OPTIONS.basePack ?? PACK_DIR } = {}) {
     for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'NpcType', 'InvType', 'ObjType', 'FontType', 'Component', 'EnumType', 'DbTableType']) {
-        configTypes[name].load(PACK_DIR);
+        configTypes[name].load(configs);
     }
     configTypes.DbRowType.load(rows);
     assert(ScriptProvider.load(scripts) > 0, `ScriptProvider.load found no scripts under ${scripts}`);
@@ -633,6 +693,36 @@ function validatorAccepts(player, npc, target) {
     const result = runInt(player, '[proc,validate_slayer_target]', npc, [target]);
     assert(result.value === 0 || result.value === 1, `validator returned nonboolean ${result.value}`);
     return result.value === 1;
+}
+function tracePackedCalls(procNames, callback) {
+    const names = new Set(procNames.map(name => `[proc,${name}]`));
+    const calls = [];
+    const originalGet = ScriptProvider.get;
+    ScriptProvider.get = function (id) {
+        const script = originalGet.call(this, id);
+        if (script && names.has(script.name)) calls.push(script.name);
+        return script;
+    };
+    try {
+        return { result: callback(), calls };
+    } finally {
+        ScriptProvider.get = originalGet;
+    }
+}
+
+function packedEnum(name) {
+    const id = packId('enum', name);
+    const value = configTypes.EnumType.get(id);
+    assert(value, `packed enum ${name} (id ${id}) is missing`);
+    return value;
+}
+
+function completedQuestValues() {
+    const values = { ...ORACLE.questValues };
+    for (const gate of ORACLE.questGates.values()) {
+        values[gate.variable] = Math.max(values[gate.variable] ?? 0, gate.threshold);
+    }
+    return values;
 }
 
 function eligibleMaster(player, npc, masterId) {
@@ -887,34 +977,161 @@ function testCombatAndMasterAdmission() {
 }
 
 function testThresholds() {
+    assert.equal(SOURCED_SLAYER_THRESHOLDS.length, 28, 'fixed VERIFIED oracle must cover all 28 sourced Slayer thresholds');
+    const sourceThresholds = new Map(ORACLE.slayerReqRows.map(row => [ORACLE.reverseConstants.get(row.id), row.requirement]));
+    assert.equal(sourceThresholds.size, SOURCED_SLAYER_THRESHOLDS.length, 'source slayer_req category set differs from the independent VERIFIED threshold oracle');
+    for (const [category, requirement] of SOURCED_SLAYER_THRESHOLDS) {
+        assert.equal(sourceThresholds.get(category), requirement, `${category}: source slayer_req differs from the independent VERIFIED threshold`);
+    }
     const player = makePlayer();
     const npc = makeNpc(IDS.masters.turael);
+    const packedRequirements = packedEnum('slayer_req');
+    const completeQuests = completedQuestValues();
+    for (const gate of ORACLE.questGates.values()) {
+        assert.equal(completeQuests[gate.variable], gate.threshold, `threshold fixture must complete ${gate.thresholdName}`);
+    }
     const targets = [];
     const observations = [];
-    for (const row of ORACLE.slayerReqRows) {
-        const requirement = row.requirement;
-        assert(Number.isInteger(requirement) && requirement >= 0, `slayer_req row ${row.key} is not a nonnegative integer`);
+    for (const [category, requirement] of SOURCED_SLAYER_THRESHOLDS) {
+        const target = Number(ORACLE.constants.get(category));
+        assert(Number.isInteger(requirement) && requirement >= 0, `sourced threshold for ${category} is not a nonnegative integer`);
+        assert.equal(ORACLE.slayerReq.get(target), requirement, `${category}: source threshold differs from the independent VERIFIED oracle`);
+        assert.equal(packedRequirements.values.get(target), requirement, `${category}: packed slayer_req enum differs from the independent VERIFIED threshold`);
+        const ownerProc = ORACLE.ownerProcByTarget.get(target);
         for (const baseSlayer of [...new Set([Math.max(0, requirement - 1), requirement, requirement + 1])]) {
             for (const currentSlayer of [1, 99]) {
                 const fixture = {
-                    key: `slayer_req_${row.key}_base${baseSlayer}_current${currentSlayer}`,
+                    key: `slayer_req_${category}_base${baseSlayer}_current${currentSlayer}`,
                     combat: 126,
                     level: 99,
                     baseSlayer,
                     currentSlayer,
-                    questValues: { ...ORACLE.questValues }
+                    questValues: completeQuests
                 };
                 applyFixture(player, fixture);
                 assert.equal(combatLevel(player), 126, `${fixture.key}: combat level must be independent of current skill drain`);
-                const actual = validatorAccepts(player, npc, row.id);
-                const expected = expectedValidator(row.id, fixture);
-                assert.equal(actual, expected, `${fixture.key}: packed validator must use base Slayer threshold ${requirement}`);
-                targets.push(row.id);
-                observations.push({ target: row.id, targetName: ORACLE.taskNamesById.get(row.id) ?? null, requirement, baseSlayer, currentSlayer, expected, actual });
+                const traced = ownerProc
+                    ? tracePackedCalls([ownerProc], () => validatorAccepts(player, npc, target))
+                    : { result: validatorAccepts(player, npc, target), calls: [] };
+                const expected = expectedValidator(target, fixture);
+                assert.equal(traced.result, expected, `${fixture.key}: packed validator must use base Slayer threshold ${requirement}`);
+                if (ownerProc) {
+                    const expectedCalls = baseSlayer >= requirement ? [`[proc,${ownerProc}]`] : [];
+                    assert.deepEqual(traced.calls, expectedCalls, `${fixture.key}: packed threshold must run before its unfinished owner gate`);
+                }
+                targets.push(target);
+                observations.push({
+                    target,
+                    targetName: ORACLE.taskNamesById.get(target) ?? null,
+                    requirement,
+                    packedRequirement: packedRequirements.values.get(target),
+                    baseSlayer,
+                    currentSlayer,
+                    ownerProc: ownerProc ?? null,
+                    ownerGateCalled: traced.calls.length > 0,
+                    expected,
+                    actual: traced.result
+                });
             }
         }
     }
-    return { rows: ORACLE.slayerReqRows.length, observations, testedTargets: [...new Set(targets)].length };
+    const zygomite = Number(ORACLE.constants.get('slayer_mutatedzygomite'));
+    const lostCityGate = ORACLE.questGates.get(zygomite);
+    assert.equal(lostCityGate?.variable, 'zanaris', 'zygomite threshold fixture must include completed Lost City');
+    assert.equal(completeQuests.zanaris, Number(ORACLE.constants.get('zanaris_complete')), 'zygomite Lost City setup must be complete');
+    assert.equal(completeQuests.haunted, Number(ORACLE.constants.get('haunted_complete')), 'Ernest setup must be complete');
+    assert.equal(completeQuests.legendsquest, Number(ORACLE.constants.get('legends_complete')), 'Legends setup must be complete');
+    return { rows: SOURCED_SLAYER_THRESHOLDS.length, observations, testedTargets: [...new Set(targets)].length, questSetup: completeQuests };
+}
+
+function testHarpieThreshold() {
+    const target = Number(ORACLE.constants.get('slayer_harpiebugswarm'));
+    assert.equal(ORACLE.slayerReq.get(target), 33, 'source oracle harpie threshold must be 33');
+    assert.equal(packedEnum('slayer_req').values.get(target), 33, 'S2 harpie acceptance: packed slayer_req enum must contain 33; published S1 pack has no harpie key');
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters.turael);
+    const questValues = completedQuestValues();
+    const cases = [
+        { key: 'cb45_base32', combat: 45, level: 36, baseSlayer: 32, currentSlayer: 99, expected: false },
+        { key: 'cb45_base33', combat: 45, level: 36, baseSlayer: 33, currentSlayer: 1, expected: true },
+        { key: 'cb40_base32', combat: 40, level: 32, baseSlayer: 32, currentSlayer: 99, expected: false },
+        { key: 'cb40_base33', combat: 40, level: 32, baseSlayer: 33, currentSlayer: 1, expected: false }
+    ];
+    const observations = [];
+    for (const entry of cases) {
+        const fixture = { ...entry, questValues };
+        applyFixture(player, fixture);
+        assert.equal(combatLevel(player), entry.combat, `${entry.key}: harpie combat fixture mismatch`);
+        const actual = validatorAccepts(player, npc, target);
+        assert.equal(actual, entry.expected, `${entry.key}: harpie discriminator mismatch`);
+        observations.push({ key: entry.key, combat: entry.combat, baseSlayer: entry.baseSlayer, currentSlayer: entry.currentSlayer, expected: entry.expected, actual });
+    }
+    return { target, requirement: 33, observations };
+}
+
+function testCurrentSlayerDoesNotGateAssignment() {
+    const target = Number(ORACLE.constants.get('slayer_cockatrice'));
+    assert.equal(ORACLE.slayerReq.get(target), 25, 'cockatrice must retain its sourced base-Slayer requirement');
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters.turael);
+    const observations = [];
+    for (const entry of [
+        { baseSlayer: 24, currentSlayer: 99, expected: false },
+        { baseSlayer: 25, currentSlayer: 1, expected: true },
+        { baseSlayer: 25, currentSlayer: 99, expected: true },
+        { baseSlayer: 26, currentSlayer: 1, expected: true }
+    ]) {
+        const fixture = { ...entry, key: `cockatrice_base${entry.baseSlayer}_current${entry.currentSlayer}`, combat: 126, level: 99, questValues: completedQuestValues() };
+        applyFixture(player, fixture);
+        const actual = validatorAccepts(player, npc, target);
+        assert.equal(actual, entry.expected, `${fixture.key}: assignment must use base Slayer, independent of current drain/boost`);
+        observations.push({ baseSlayer: entry.baseSlayer, currentSlayer: entry.currentSlayer, expected: entry.expected, actual });
+    }
+    return { target, requirement: 25, observations };
+}
+
+function extractProcSource(source, procName) {
+    const marker = `[proc,${procName}]`;
+    const start = source.indexOf(marker);
+    assert(start >= 0, `missing owner predicate ${marker}`);
+    const next = source.indexOf('\n[', start + marker.length);
+    return source.slice(start, next < 0 ? source.length : next);
+}
+
+function testOwnerPredicateDispatch() {
+    const expectedRoutes = new Map();
+    for (const owner of OWNER_PREDICATES) {
+        for (const category of owner.categories) {
+            const target = Number(ORACLE.constants.get(category));
+            assert(Number.isInteger(target), `owner route references missing category ^${category}`);
+            assert(!expectedRoutes.has(target), `category ^${category} has multiple owner predicates`);
+            expectedRoutes.set(target, owner.proc);
+        }
+        const body = extractProcSource(ORACLE.taskSource, owner.proc).replace(/\/\/[^\n]*/g, '').replace(/\s+/g, '');
+        assert.equal(body, `[proc,${owner.proc}]()(boolean)return(false);`, `${owner.proc} must remain an unfinished false body`);
+    }
+    assert.equal(ORACLE.ownerProcByTarget.size, expectedRoutes.size, 'validator source must route exactly the six planned unfinished owner contracts');
+    for (const [target, proc] of expectedRoutes) {
+        assert.equal(ORACLE.ownerProcByTarget.get(target), proc, `${ORACLE.reverseConstants.get(target)} must route to ${proc}`);
+    }
+
+    const fixture = { key: 'owner_gates_cb126_slayer99', combat: 126, level: 99, baseSlayer: 99, currentSlayer: 1, questValues: completedQuestValues() };
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    const npc = makeNpc(IDS.masters.turael);
+    const results = [];
+    for (const owner of OWNER_PREDICATES) {
+        const direct = runInt(player, `[proc,${owner.proc}]`, npc);
+        assert.equal(direct.value, 0, `${owner.proc}: compiled unfinished predicate must return false`);
+        for (const category of owner.categories) {
+            const target = Number(ORACLE.constants.get(category));
+            const traced = tracePackedCalls([owner.proc], () => validatorAccepts(player, npc, target));
+            assert.equal(traced.result, false, `${category}: unfinished owner gate must exclude the target`);
+            assert.deepEqual(traced.calls, [`[proc,${owner.proc}]`], `${category}: packed validator did not dispatch to ${owner.proc}`);
+            results.push({ category, target, ownerProc: owner.proc, predicateResult: direct.value, validatorResult: traced.result, packedCalls: traced.calls });
+        }
+    }
+    return { fixture, routes: results };
 }
 
 function testDispatchAndOneShotOrder(packedRows) {
@@ -1152,7 +1369,7 @@ function locateOccurrence(master, fixture, target, count, randomCalls, acceptanc
     throw new Error(`${master.key}/${fixture.key}: cannot reconcile ${randomCalls} RNG calls with selected target ${target}; positiveRows=${weightCount}`);
 }
 
-async function runDistribution(master, fixture, packedRows, acceptance) {
+async function runDistribution(master, fixture, packedRows, acceptance, drawsPerSeed = DRAWS_PER_SEED) {
     const actualMaster = packedRows.get(master.key);
     const model = buildDistribution(master, fixture, actualMaster.rows);
     for (const category of [0, ...ORACLE.taskNamesById.keys()]) assert(category >= 0 && category <= 75, `category ${category} is outside fixed 0..75 family`);
@@ -1178,7 +1395,7 @@ async function runDistribution(master, fixture, packedRows, acceptance) {
             JavaRandom.setSeed(seed);
             const counts = makeCountMap();
             const sequenceStartCalls = totalRandomCalls;
-            for (let draw = 0; draw < DRAWS_PER_SEED; draw++) {
+            for (let draw = 0; draw < drawsPerSeed; draw++) {
                 const randomCallsBefore = totalRandomCalls;
                 const messagesBefore = player.messages.length;
                 const result = runInt(player, '[proc,slayer_new_target]', npc);
@@ -1225,7 +1442,7 @@ async function runDistribution(master, fixture, packedRows, acceptance) {
         for (let category = 0; category < 76; category++) {
             const probability = model.categoryProbability.get(category) ?? 0;
             const observed = counts.get(category);
-            const sampleCount = DRAWS_PER_SEED;
+            const sampleCount = drawsPerSeed;
             const bound = binBound(probability, sampleCount);
             const expectedCount = sampleCount * probability;
             assert(probability === 0 ? observed === 0 : Math.abs(observed - expectedCount) <= bound,
@@ -1236,7 +1453,7 @@ async function runDistribution(master, fixture, packedRows, acceptance) {
     for (let category = 0; category < 76; category++) {
         const probability = model.categoryProbability.get(category) ?? 0;
         const observed = combined.get(category);
-        const sampleCount = DRAWS_PER_SEED * SEEDS.length;
+        const sampleCount = drawsPerSeed * SEEDS.length;
         const bound = binBound(probability, sampleCount);
         const expectedCount = sampleCount * probability;
         assert(probability === 0 ? observed === 0 : Math.abs(observed - expectedCount) <= bound,
@@ -1246,7 +1463,7 @@ async function runDistribution(master, fixture, packedRows, acceptance) {
 
     return {
         bins,
-        draws: DRAWS_PER_SEED * SEEDS.length,
+        draws: drawsPerSeed * SEEDS.length,
         seedCount: SEEDS.length,
         seeds: SEEDS,
         outputPath,
@@ -1259,11 +1476,13 @@ async function runDistribution(master, fixture, packedRows, acceptance) {
 }
 
 function testCurrentSuite() {
-    loadRuntime({ scripts: PACK_DIR, rows: PACK_DIR });
+    loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
     const packedRows = assertPackedLiveRows();
     const admission = testCombatAndMasterAdmission();
+    const harpieThreshold = testHarpieThreshold();
     const thresholds = testThresholds();
-
+    const currentStatSource = testCurrentSlayerDoesNotGateAssignment();
+    const ownerPredicateDispatch = testOwnerPredicateDispatch();
     const fixtureValidatorCaches = new Map();
     const emptyMinimumFailures = [];
     for (const master of ORACLE.masters) {
@@ -1305,7 +1524,7 @@ function testCurrentSuite() {
     const dispatch = testDispatchAndOneShotOrder(packedRows);
     const teachingAdmission = testCurrentTeachingAdmission();
     const teachingSuccess = testCurrentTeachingSuccess();
-    return { packedRows, admission, thresholds, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+    return { packedRows, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
 }
 
 function fixtureSourceRows() {
@@ -1481,24 +1700,17 @@ function testEveryEndpoint() {
     return results;
 }
 
-function findBaseScriptDirectory(baseScripts, runDir) {
-    assert(fs.existsSync(baseScripts), `base script directory missing: ${baseScripts}`);
-    const candidates = [
-        { root: baseScripts, server: path.join(baseScripts, 'server') },
-        { root: baseScripts, server: baseScripts }
-    ];
-    const match = candidates.find(candidate => fs.existsSync(path.join(candidate.server, 'script.dat')) && fs.existsSync(path.join(candidate.server, 'script.idx')));
-    assert(match, `${baseScripts} must contain server/script.dat+idx or script.dat+idx`);
-    if (match.server !== baseScripts) return match.root;
-    const normalized = path.join(runDir, 'base-scripts-pack');
-    fs.mkdirSync(path.join(normalized, 'server'), { recursive: true });
-    fs.copyFileSync(path.join(baseScripts, 'script.dat'), path.join(normalized, 'server/script.dat'));
-    fs.copyFileSync(path.join(baseScripts, 'script.idx'), path.join(normalized, 'server/script.idx'));
-    return normalized;
+function findBasePackDirectory(basePack) {
+    assert(fs.existsSync(basePack), `base pack directory missing: ${basePack}`);
+    const server = path.join(basePack, 'server');
+    for (const name of ['script.dat', 'script.idx', 'enum.dat', 'dbrow.dat', 'dbrow.idx', 'dbtable.dat']) {
+        assert(fs.existsSync(path.join(server, name)), `${basePack} is missing server/${name}`);
+    }
+    return basePack;
 }
 
-function testLegacyEmptyRecursion() {
-    loadRuntime({ scripts: LEGACY_SCRIPT_DIR, rows: FIXTURE_PACK_DIR });
+function testLegacyEmptyRecursion(basePack) {
+    loadRuntime({ scripts: basePack, rows: FIXTURE_PACK_DIR, configs: basePack });
     const player = makePlayer();
     const fixture = FIXTURES.get('turael:high');
     applyFixture(player, fixture);
@@ -1539,13 +1751,14 @@ function streamForFirstEligible(master, fixture) {
     return { first, row: master.rows[first], values };
 }
 
-function testLegacyFirstTeachingAdmission() {
-    const master = ORACLE.masters.find(entry => entry.key === 'chaeldar');
+function testLegacyFirstTeachingAdmission(basePack) {
+    loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
+    const packedRows = assertPackedLiveRows();
+    const master = packedRows.get('chaeldar');
     const { player, fixture } = underqualifiedChaeldarFixture();
-    const expectedMasterRows = master.rows;
     const npc = makeNpc(IDS.masters.chaeldar);
     const forced = streamForFirstEligible(master, fixture);
-    const actualAcceptance = buildActualValidatorCache(player, npc, fixture, expectedMasterRows.map(row => row.target), fixture.key);
+    const actualAcceptance = buildActualValidatorCache(player, npc, fixture, [forced.row.target], fixture.key);
     assert.equal(actualAcceptance.get(forced.row.target), true, 'legacy first-row proof target is not accepted by actual base-code validator');
     const prior = sentinelTask(player, 0, 0);
     const trace = traceWrites(player);
@@ -1565,15 +1778,76 @@ function testLegacyFirstTeachingAdmission() {
     assert.notEqual(player.getVar(IDS.target), prior.target, 'legacy proof did not replace the initial empty target');
     return { fixture: recordFixture(fixture), selectedSourceRow: forced.row.sourceName, target: player.getVar(IDS.target), count: player.getVar(IDS.count), forcedRandomValues: stream.observed, writes: trace.events, gemCount: gemCount(player), messages: player.messages };
 }
+function testOldHarpieDiscriminator(basePack) {
+    loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
+    const target = Number(ORACLE.constants.get('slayer_harpiebugswarm'));
+    const oldSlayerEnum = packedEnum('slayer_req');
+    assert.equal(oldSlayerEnum.defaultInt, 0, 'published S1 slayer_req enum missing-key default must be zero');
+    assert.equal(oldSlayerEnum.values.has(target), false, 'published S1 slayer_req enum unexpectedly contains a harpie key');
+    const oldCombatRequirement = packedEnum('combat_req').values.get(target);
+    assert.equal(oldCombatRequirement, 45, 'published S1 combat_req must retain the Harpie combat-45 gate');
 
-let LEGACY_SCRIPT_DIR = null;
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters.turael);
+    const cases = [
+        { key: 'old_cb45_base32', combat: 45, level: 36, baseSlayer: 32, currentSlayer: 99, expected: true },
+        { key: 'old_cb40_base32', combat: 40, level: 32, baseSlayer: 32, currentSlayer: 1, expected: false }
+    ];
+    const observations = [];
+    for (const entry of cases) {
+        const fixture = { ...entry, questValues: completedQuestValues() };
+        applyFixture(player, fixture);
+        assert.equal(combatLevel(player), entry.combat, `${entry.key}: old Harpie combat fixture mismatch`);
+        const actual = validatorAccepts(player, npc, target);
+        assert.equal(actual, entry.expected, `${entry.key}: published S1 validator discriminator mismatch`);
+        observations.push({ key: entry.key, combat: entry.combat, baseSlayer: entry.baseSlayer, currentSlayer: entry.currentSlayer, expected: entry.expected, actual });
+    }
+    const missingThresholds = [];
+    for (const [category, requirement] of SOURCED_SLAYER_THRESHOLDS.filter(([category]) => [
+        'slayer_caveslime', 'slayer_lizard', 'slayer_harpiebugswarm', 'slayer_feverspider', 'slayer_mutatedzygomite'
+    ].includes(category))) {
+        const categoryId = Number(ORACLE.constants.get(category));
+        assert.equal(oldSlayerEnum.values.has(categoryId), false, `${category}: old pack must reproduce the omitted key`);
+        const fixture = { key: `old_${category}_below`, combat: 126, level: 99, baseSlayer: requirement - 1, currentSlayer: 1, questValues: completedQuestValues() };
+        applyFixture(player, fixture);
+        const accepted = validatorAccepts(player, npc, categoryId);
+        assert.equal(accepted, true, `${category}: published missing-key validator must accept N-1 with all other prerequisites fixed`);
+        missingThresholds.push({ category, categoryId, sourcedRequirement: requirement, oldRequirement: oldSlayerEnum.defaultInt, baseSlayer: fixture.baseSlayer, currentSlayer: fixture.currentSlayer, oldAccepted: accepted, requiredS2Accepted: false, questSetup: fixture.questValues });
+    }
+    const missingPredicates = OWNER_PREDICATES.map(owner => {
+        const present = Boolean(ScriptProvider.getByName(`[proc,${owner.proc}]`));
+        assert.equal(present, false, `${owner.proc}: published pack must lack the extracted owner contract`);
+        return { proc: owner.proc, present, requiredS2Present: true };
+    });
+    console.log(`REPRODUCED S2 old-pack failures ${JSON.stringify({ missingThresholds, missingPredicates })}`);
+    return {
+        target,
+        oldSlayerEnum: { hasHarpieKey: false, defaultInt: oldSlayerEnum.defaultInt },
+        combatRequirement: oldCombatRequirement,
+        observations,
+        missingThresholds,
+        missingPredicates
+    };
+}
+
+function testDeterministicCases() {
+    const current = testCurrentSuite();
+    const missingListEngineBoundary = testMissingListEngineBoundary(ACTIVE_PACK_DIR);
+    loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
+    const adversarial = testAdversarialFixtures();
+    const endpoints = testEveryEndpoint();
+    loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
+    return { current, missingListEngineBoundary, adversarial, endpoints };
+}
 const metadata = {
-    assignment: 'U-SLAYERSEL-1113 S1',
+    assignment: 'U-SLAYERSEL-1113 S2 compiled proof (preserving S1 cases)',
     revision: 377,
     mode: OPTIONS.mode,
     runId: RUN_ID,
     contentRoot: CONTENT_ROOT,
     engineRoot: ENGINE_ROOT,
+    activePack: ACTIVE_PACK_DIR,
+    basePack: null,
     artifactDirectory: RUN_DIR,
     pins: { content: gitHead(CONTENT_ROOT), engine: gitHead(ENGINE_ROOT) },
     sourceHashes: SOURCE_HASHES,
@@ -1581,35 +1855,47 @@ const metadata = {
     compilerFixturePack: FIXTURE_PACK_RESULT,
     fixtureSourceSha256: FIXTURE_SOURCE_HASH,
     fixtures: [...FIXTURES.values()].map(recordFixture),
-    questSetup: ORACLE.questValues,
+    sourcedThresholds: SOURCED_SLAYER_THRESHOLDS,
     seeds: SEEDS,
-    drawsPerSeed: DRAWS_PER_SEED,
+    drawsPerSeed: ACTIVE_DRAWS_PER_SEED,
     family: { categories: 76, B: FAMILY_B, alpha: ALPHA, logBound: LOG_BOUND },
     outOfS1: OUT_OF_S1,
     checks: {}
 };
 
 try {
-    if (OPTIONS.mode === 'full') {
-        const current = testCurrentSuite();
+    if (OPTIONS.basePack) {
+        const basePack = findBasePackDirectory(OPTIONS.basePack);
+        metadata.basePack = {
+            requested: OPTIONS.basePack,
+            loadedFrom: basePack,
+            contentHead: fs.existsSync(path.join(basePack, 'content-head.txt')) ? fs.readFileSync(path.join(basePack, 'content-head.txt'), 'utf8').trim() : null,
+            engineHead: fs.existsSync(path.join(basePack, 'engine-head.txt')) ? fs.readFileSync(path.join(basePack, 'engine-head.txt'), 'utf8').trim() : null,
+            sha256: hashTree(basePack),
+            files: Object.fromEntries(['script.dat', 'script.idx', 'enum.dat', 'dbrow.dat', 'dbrow.idx', 'dbtable.dat']
+                .map(name => [name, digestFile(path.join(basePack, 'server', name))]))
+        };
+    }
+
+    if (OPTIONS.mode === 'full' || OPTIONS.mode === 'ci') {
+        const deterministic = testDeterministicCases();
+        const current = deterministic.current;
         metadata.checks.current = {
             packedRows: Object.fromEntries([...current.packedRows].map(([name, master]) => [name, { memberOccurrences: master.rows.length }])),
             admission: current.admission,
+            harpieThreshold: current.harpieThreshold,
             thresholds: current.thresholds,
+            currentStatSource: current.currentStatSource,
+            ownerPredicateDispatch: current.ownerPredicateDispatch,
             dispatch: current.dispatch,
             emptyMinimumFailures: current.emptyMinimumFailures,
             teaching: current.teaching
         };
-        metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(PACK_DIR);
-
-        loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
-        const adversarial = testAdversarialFixtures();
-        const endpoints = testEveryEndpoint();
-        metadata.checks.adversarial = adversarial;
-        metadata.checks.endpoints = { count: endpoints.length, results: endpoints };
+        metadata.checks.missingListEngineBoundary = deterministic.missingListEngineBoundary;
+        metadata.checks.adversarial = deterministic.adversarial;
+        metadata.checks.endpoints = { count: deterministic.endpoints.length, results: deterministic.endpoints };
         metadata.checks.outOfS1 = OUT_OF_S1;
 
-        loadRuntime({ scripts: PACK_DIR, rows: PACK_DIR });
         const distributions = [];
         const allBins = [];
         for (const master of ORACLE.masters) {
@@ -1619,7 +1905,7 @@ try {
                 applyFixture(player, fixture);
                 const npc = makeNpc(IDS.masters[master.key]);
                 const acceptance = buildActualValidatorCache(player, npc, fixture, [...ORACLE.taskNamesById.keys(), ...master.rows.map(row => row.target)], `${fixture.key}:distribution`);
-                const result = await runDistribution(master, fixture, current.packedRows, acceptance);
+                const result = await runDistribution(master, fixture, current.packedRows, acceptance, ACTIVE_DRAWS_PER_SEED);
                 distributions.push({ master: master.key, fixture: fixture.key, ...result, bins: undefined });
                 allBins.push(...result.bins);
                 console.log(`PASS distribution ${master.key}/${fixture.key}: ${result.draws} draws, ${result.outputPath}`);
@@ -1627,7 +1913,7 @@ try {
         }
         const binPath = path.join(RUN_DIR, 'distribution-bins.json');
         fs.writeFileSync(binPath, `${JSON.stringify({
-            family: { categories: 76, B: FAMILY_B, alpha: ALPHA, logBound: LOG_BOUND, seeds: SEEDS, drawsPerSeed: DRAWS_PER_SEED },
+            family: { categories: 76, B: FAMILY_B, alpha: ALPHA, logBound: LOG_BOUND, seeds: SEEDS, drawsPerSeed: ACTIVE_DRAWS_PER_SEED },
             formula: 'abs(observed - N*P) <= ceil(sqrt(2*N*P*(1-P)*ln(2*B/alpha)) + 2*ln(2*B/alpha)/3); P=0 or 1 is exact',
             bins: allBins
         }, null, 2)}\n`);
@@ -1637,19 +1923,14 @@ try {
         loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
         metadata.checks.adversarial = testAdversarialFixtures();
         metadata.checks.endpoints = { count: testEveryEndpoint().length };
+    } else if (OPTIONS.mode === 'old-discriminator') {
+        const basePack = findBasePackDirectory(OPTIONS.basePack);
+        metadata.checks.oldHarpieDiscriminator = testOldHarpieDiscriminator(basePack);
     } else {
-        LEGACY_SCRIPT_DIR = findBaseScriptDirectory(OPTIONS.baseScripts, RUN_DIR);
-        metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(LEGACY_SCRIPT_DIR);
-        const empty = testLegacyEmptyRecursion();
-        const admission = testLegacyFirstTeachingAdmission();
-        metadata.baseScripts = {
-            requested: OPTIONS.baseScripts,
-            loadedFrom: LEGACY_SCRIPT_DIR,
-            scriptDatSha256: digestFile(path.join(LEGACY_SCRIPT_DIR, 'server/script.dat')),
-            scriptIdxSha256: digestFile(path.join(LEGACY_SCRIPT_DIR, 'server/script.idx'))
-        };
-        metadata.checks.oldEmptyRecursion = empty;
-        metadata.checks.oldFirstTeachingAdmission = admission;
+        const basePack = findBasePackDirectory(OPTIONS.basePack);
+        metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(basePack);
+        metadata.checks.oldEmptyRecursion = testLegacyEmptyRecursion(basePack);
+        metadata.checks.oldFirstTeachingAdmission = testLegacyFirstTeachingAdmission(basePack);
     }
     metadata.status = 'PASS';
     metadata.completedAt = new Date().toISOString();

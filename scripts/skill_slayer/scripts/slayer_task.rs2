@@ -74,7 +74,7 @@ switch_int($target) {
     case ^slayer_crawlinghand, ^slayer_banshee, ^slayer_infernalmage, ^slayer_bloodveld, 
             ^slayer_aberrantspecter, ^slayer_gargoyle, ^slayer_nechryael, ^slayer_abyssaldemon, 
             ^slayer_ghoul, ^slayer_werewolf, ^slayer_vampire : // priest peril
-        return (false);
+        return (~slayer_priestperil_unlocked);
     case ^slayer_otherworldlybeing, ^slayer_mutatedzygomite :
         if(%zanaris < ^zanaris_complete) {
             return (false);
@@ -91,17 +91,36 @@ switch_int($target) {
         }
         return (true);
     case ^slayer_dagannoth : // horror from the deep
-        return (false);
+        return (~slayer_horror_unlocked);
     case ^slayer_elf : // regicide
-        return (false);
+        return (~slayer_regicide_unlocked);
     case ^slayer_dustdevil : // dt
-        return (false);
+        return (~slayer_deserttreasure_unlocked);
     case ^slayer_darkbeast : // mep2
-        return (false);
+        return (~slayer_mourning2_unlocked);
     case ^slayer_mogre : // skippy miniquest
-        return (false);
+        return (~slayer_skippy_unlocked);
 }
 return (true);
+
+// Unfinished exclusions. Each quest owner supplies its authentic predicate.
+[proc,slayer_priestperil_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_horror_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_regicide_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_deserttreasure_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_mourning2_unlocked]()(boolean)
+return (false);
+
+[proc,slayer_skippy_unlocked]()(boolean)
+return (false);
 
 [proc,slayer_taskname]()(string)
 return(enum(int, string, task_name, %slayer_target));
