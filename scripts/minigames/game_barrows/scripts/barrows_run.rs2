@@ -86,13 +86,16 @@ p_stopaction;
 %barrows_state = clearbit_range(%barrows_state, 0, ^barrows_state_end);
 %barrows_countdowns = 0;
 ~barrows_layout_choose;
-if_close;
-if_openoverlay(null);
-cam_reset;
+~barrows_close_presentation;
 
-// Login reconciles interaction state only. It never redraws or refreshes a countdown.
+// Reconstruct presentation without redrawing a run or refreshing countdowns.
 [proc,barrows_resume]
 if (testbit(%barrows_state, ^barrows_challenge_bit) = 1) {
     %barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
     if_close;
+}
+if (~barrows_inside(coord) = true) {
+    if (~barrows_phase = ^barrows_phase_unlooted | ~barrows_phase = ^barrows_phase_paid) if_openoverlay(kill_count);
+} else if (~barrows_phase = ^barrows_phase_paid) {
+    ~barrows_leave;
 }

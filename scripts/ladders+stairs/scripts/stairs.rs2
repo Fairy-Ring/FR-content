@@ -847,30 +847,22 @@ switch_coord (loc_coord) {
 }
 
 [oploc1,barrows_stairs_ahrim]
-// Ahrim crypt stairs — Climb-up returns to the peak 3565,3289 L0
-// (inverse of the Dig dest, barrows_dig.rs2). 4535 stays closed.
-// Cite barrows-next-product-unit-377.md (unit 19).
-p_telejump(0_55_51_45_25); // 3565,3289 L0 — Ahrim peak / Dig stand
+~barrows_stair_exit(loc_type);
 
 [oploc1,barrows_stairs_dharok]
-// Climb-up returns to the Dharok peak 3575,3298 L0 (remesure §4).
-p_telejump(0_55_51_55_34); // 3575,3298 L0 — Dharok peak / Dig stand
+~barrows_stair_exit(loc_type);
 
 [oploc1,barrows_stairs_guthan]
-// Climb-up returns to the Guthan peak 3577,3283 L0 (remesure §4).
-p_telejump(0_55_51_57_19); // 3577,3283 L0 — Guthan peak / Dig stand
+~barrows_stair_exit(loc_type);
 
 [oploc1,barrows_stairs_karil]
-// Climb-up returns to the Karil peak 3566,3276 L0 (remesure §4).
-p_telejump(0_55_51_46_12); // 3566,3276 L0 — Karil peak / Dig stand
+~barrows_stair_exit(loc_type);
 
 [oploc1,barrows_stairs_torag]
-// Climb-up returns to the Torag peak 3553,3283 L0 (remesure §4).
-p_telejump(0_55_51_33_19); // 3553,3283 L0 — Torag peak / Dig stand
+~barrows_stair_exit(loc_type);
 
 [oploc1,barrows_stairs_verac]
-// Climb-up returns to the Verac peak 3557,3298 L0 (remesure §4).
-p_telejump(0_55_51_37_34); // 3557,3298 L0 — Verac peak / Dig stand
+~barrows_stair_exit(loc_type);
 
 [oploc1,ogre_stairs_down]
 // arrive delay?

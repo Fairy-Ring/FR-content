@@ -1,0 +1,30 @@
+// CANDIDATE D9: departure resets only a paid run; logout never resets it.
+[proc,barrows_close_presentation]
+%barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
+if_close;
+if_openoverlay(null);
+cam_reset;
+
+[proc,barrows_leave]
+if (~barrows_phase = ^barrows_phase_paid) {
+    ~barrows_run_reset;
+} else {
+    ~barrows_remove_owned;
+    ~barrows_close_presentation;
+}
+
+[proc,barrows_logout]
+if (~barrows_inside(coord) = false) return;
+~barrows_remove_owned;
+~barrows_close_presentation;
+
+[proc,barrows_stair_exit](loc $stairs)
+def_coord $dest = enum(loc, coord, barrows_stair_surface_exit, $stairs);
+if ($dest = null) return;
+~barrows_leave;
+p_telejump($dest);
+
+// Mapzone exit requests run with the player's new coordinate. Internal level
+// changes in this map square remain inside and preserve the current encounter.
+[mapzoneexit,0_55_151]
+if (~barrows_inside(coord) = false) ~barrows_leave;

@@ -28,3 +28,11 @@ node --import tsx ../content/tests/barrows/test_core.mjs
 ```
 
 This check executes the packed run procs through the production script runner. It covers masked state, phases, generation changes, owner-only actor removal, the non-suspending Search latch/reset, initial locked doors and saved countdown fields. The Search latch has no player trigger or reward grant in this build group. S07 replaces the all-locked layout initializer. S06 and S13 attach their effects to the shared saved-countdown primitives.
+
+## Entry and exit (S02)
+
+```sh
+node --import tsx ../content/tests/barrows/test_entry.mjs
+```
+
+This check executes the packed entry, leave, logout and resume procs. It checks all six joined destinations and inverse exits, pre-loot retention, paid reset, exact saved countdown retention, and HUD reconstruction after login. Shared offline fixtures resolve generated config ids by name.

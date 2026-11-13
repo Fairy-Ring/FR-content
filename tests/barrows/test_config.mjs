@@ -377,24 +377,20 @@ for (const encounter of ENCOUNTERS) {
 }
 
 const digText = readText('scripts/minigames/game_barrows/scripts/barrows_dig.rs2');
-const digDestinations = new Map();
-const digPattern = /~barrows_dig_dest\(([^)]+)\);\s*\/\/\s*(Ahrim|Dharok|Guthan|Karil|Torag|Verac)\b/g;
-for (const match of digText.matchAll(digPattern)) digDestinations.set(`barrows_${match[2].toLowerCase()}`, match[1]);
-assert.equal(digDestinations.size, 6, 'original Dig must retain its six brother destinations');
-for (const [brother, entry] of expectedEntryByBrother) assert.equal(digDestinations.get(brother), entry, `[${brother}] entry must match barrows_dig.rs2`);
+const digPattern = /~barrows_dig_dest\(enum\(npc, coord, barrows_brother_crypt_entry, (barrows_\w+)\)\);/g;
+const digBrothers = [...digText.matchAll(digPattern)].map(match => match[1]);
+assert.deepEqual(digBrothers, [...expectedEntryByBrother.keys()], 'all six measured Dig branches consume their brother entry join');
 
 const stairsText = readText('scripts/ladders+stairs/scripts/stairs.rs2');
-const stairsDestinations = new Map();
+const delegatedStairs = [];
 let currentStair = null;
 for (const line of stairsText.split(/\r?\n/)) {
     const header = line.match(/^\[oploc1,barrows_stairs_(ahrim|dharok|guthan|karil|torag|verac)\]$/);
     if (header) currentStair = `barrows_stairs_${header[1]}`;
     else if (/^\[/.test(line)) currentStair = null;
-    const jump = line.match(/p_telejump\((0_\d+_\d+_\d+_\d+)\)/);
-    if (currentStair && jump) stairsDestinations.set(currentStair, jump[1]);
+    if (currentStair && line.trim() === '~barrows_stair_exit(loc_type);') delegatedStairs.push(currentStair);
 }
-assert.equal(stairsDestinations.size, 6, 'original stairs must retain six inverse destinations');
-for (const [stair, exit] of expectedExitByStair) assert.equal(stairsDestinations.get(stair), exit, `[${stair}] exit must match stairs.rs2`);
+assert.deepEqual(delegatedStairs, [...expectedExitByStair.keys()], 'all six stair operations delegate to the joined inverse exit');
 
 const roomEdges = enumValues(enums, 'barrows_room_edges_by_lock');
 assert.deepEqual(enumValues(enums, 'barrows_door_lock_state'), new Map([['0', 'unlocked'], ['1', 'locked']]));
