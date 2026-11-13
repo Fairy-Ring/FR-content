@@ -36007,6 +36007,11 @@ op1=Talk-to
 op3=Trade
 head1=idk_man_hair_dreadlocks_head
 wanderrange=2
+param=owned_shop,etc_fishmonger
+param=shop_sell_multiplier,1000
+param=shop_buy_multiplier,700
+param=shop_delta,30
+param=shop_title,Etceteria Fish
 [etc_veg_monger]
 name=Greengrocer
 desc=At least he eats his greens.
@@ -36038,6 +36043,11 @@ op3=Trade
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_goatee_head
 wanderrange=2
+param=owned_shop,etc_greengrocer
+param=shop_sell_multiplier,1200
+param=shop_buy_multiplier,950
+param=shop_delta,20
+param=shop_title,Island Greengrocer
 [misc_prince_brand]
 name=Prince Brand
 desc=The Prince of Miscellania.
@@ -36960,6 +36970,11 @@ op3=Trade
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_split_head
 wanderrange=2
+param=owned_shop,misc_fishmonger
+param=shop_sell_multiplier,1300
+param=shop_buy_multiplier,700
+param=shop_delta,30
+param=shop_title,Island Fishmonger
 [misc_veg_monger]
 name=Greengrocer
 desc=At least he eats his greens.
@@ -36991,6 +37006,11 @@ op3=Trade
 head1=idk_man_hair_wildspikes_head
 head2=idk_man_jaw_split_head
 wanderrange=2
+param=owned_shop,misc_greengrocer
+param=shop_sell_multiplier,1200
+param=shop_buy_multiplier,950
+param=shop_delta,20
+param=shop_title,Greengrocer of Miscellania
 [misc_lumberjack]
 name=Lumberjack Leif
 desc=He's a lumberjack, and he's okay.
@@ -46378,6 +46398,33 @@ magic=1
 param=attackrate,4
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_short_head
+// CANDIDATE src.dt-osrs-r2-page-damis#19,27,43,45-46,51-60: nine fields are ranged, size, damagetype, strengthbonus and five defences.
+// The other twelve fields below are product choices, not values supplied by that page.
+ranged=1
+// Size 1 is the engine default; not written because an explicit line changes the client's npc.dat.
+// UNKNOWN shadow-engineering-constants-s3: three ranges and timer. Product defaultmode: shadow-reconstruction-s3.
+wanderrange=0
+maxrange=64
+attackrange=1
+defaultmode=none
+timer=1
+// CANDIDATE Damis-page damage style and bonuses (seven of the nine source-backed fields).
+param=damagetype,^crush_style
+param=strengthbonus,80
+param=stabdefence,60
+param=slashdefence,60
+param=crushdefence,60
+param=magicdefence,60
+param=rangedefence,60
+// CANDIDATE shadow-reconstruction-s3: six inherited human/sword animation and sound joins are product choices.
+param=attack_anim,human_dhsword_chop
+param=defend_anim,human_dhsword_def
+param=death_anim,human_death
+param=attack_sound,2H_slash
+param=defend_sound,steel
+param=death_sound,human_death
+// Product choice shadow-reconstruction-s3: no generic death drop; owned diamond comes from the death script.
+param=death_drop,null
 
 [fd_damis_tougher]
 name=Damis
@@ -46412,6 +46459,33 @@ magic=1
 param=attackrate,3
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
+// CANDIDATE src.dt-osrs-r2-page-damis#19,27,43,45-46,51-60: nine fields are ranged, size, damagetype, strengthbonus and five defences.
+// The other twelve fields below are product choices, not values supplied by that page.
+ranged=1
+// Size 1 is the engine default; not written because an explicit line changes the client's npc.dat.
+// UNKNOWN shadow-engineering-constants-s3: three ranges and timer. Product defaultmode: shadow-reconstruction-s3.
+wanderrange=0
+maxrange=64
+attackrange=1
+defaultmode=none
+timer=1
+// CANDIDATE Damis-page damage style and bonuses (seven of the nine source-backed fields).
+param=damagetype,^crush_style
+param=strengthbonus,100
+param=stabdefence,100
+param=slashdefence,100
+param=crushdefence,100
+param=magicdefence,80
+param=rangedefence,120
+// CANDIDATE shadow-reconstruction-s3: six inherited human/sword animation and sound joins are product choices.
+param=attack_anim,human_dhsword_chop
+param=defend_anim,human_dhsword_def
+param=death_anim,human_death
+param=attack_sound,2H_slash
+param=defend_sound,steel
+param=death_sound,human_death
+// Product choice shadow-reconstruction-s3: no generic death drop; owned diamond comes from the death script.
+param=death_drop,null
 
 [shadow_dog_wild]
 name=Shadow Hound

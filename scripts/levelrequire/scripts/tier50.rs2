@@ -1,4 +1,6 @@
 // Melee
+[opheld2,granite_shield] @levelrequire_defence_and_strength(50, last_slot);
+
 [opheld2,granite_maul] 
 if (stat_base(attack) < 50 | stat_base(strength) < 50) {
     mes("You are not a high enough level to use this item.");

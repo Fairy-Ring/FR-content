@@ -5,6 +5,22 @@
 [if_button,leather_crafting:com_125] @craft_leather(leather_chaps);
 [if_button,leather_crafting:com_128] @craft_leather(coif);
 [if_button,leather_crafting:com_131] @craft_leather(leather_cowl);
+
+[if_button,leather_crafting:com_112] @process_leather_crafting(leather_armour, 5);
+[if_button,leather_crafting:com_111] @process_leather_crafting(leather_armour, 10);
+[if_button,leather_crafting:com_115] @process_leather_crafting(leather_gloves, 5);
+[if_button,leather_crafting:com_114] @process_leather_crafting(leather_gloves, 10);
+[if_button,leather_crafting:com_118] @process_leather_crafting(leather_boots, 5);
+[if_button,leather_crafting:com_117] @process_leather_crafting(leather_boots, 10);
+[if_button,leather_crafting:com_121] @process_leather_crafting(leather_vambraces, 5);
+[if_button,leather_crafting:com_120] @process_leather_crafting(leather_vambraces, 10);
+[if_button,leather_crafting:com_124] @process_leather_crafting(leather_chaps, 5);
+[if_button,leather_crafting:com_123] @process_leather_crafting(leather_chaps, 10);
+[if_button,leather_crafting:com_127] @process_leather_crafting(coif, 5);
+[if_button,leather_crafting:com_126] @process_leather_crafting(coif, 10);
+[if_button,leather_crafting:com_130] @process_leather_crafting(leather_cowl, 5);
+[if_button,leather_crafting:com_129] @process_leather_crafting(leather_cowl, 10);
+
 [if_button,leather_crafting:com_89] if_close;
 
 [opheldu,needle]
@@ -52,37 +68,51 @@ if (last_useitem = needle) {
 
 //--- all leather
 [label,craft_leather](namedobj $product)
-//p_stopaction;
+~craft_leather_make($product);
+
+// One set of checks for Make 1, batch entry and each queued item.
+[proc,craft_leather_check](namedobj $product)(dbrow)
 if_close;
 db_find(craft_leather_table:product, $product);
 def_dbrow $product_data = db_findnext;
 if ($product_data = null) {
     ~displaymessage(^dm_default);
-    return;
+    return(null);
 }
 if (db_getfield($product_data, craft_leather_table:members, 0) = true) {
     if (map_members = ^false) {
         mes(^mes_members_feature);
-        return;
+        return(null);
     }
 }
 // check level
 def_int $level = db_getfield($product_data, craft_leather_table:levelrequired, 0);
 if (stat(crafting) < $level) {
     ~mesbox("You need a Crafting level of <tostring($level)> to make <db_getfield($product_data, craft_leather_table:name, 0)>.");
-    return;
+    return(null);
 }
 def_namedobj $leather;
 def_int $leather_count;
 $leather, $leather_count = db_getfield($product_data, craft_leather_table:leather, 0);
 if (inv_total(inv, $leather) < $leather_count) {
     mes("You don't have enough leather to make <db_getfield($product_data, craft_leather_table:name, 0)>.");
-    return;
+    return(null);
 }
 if (inv_total(inv, thread) < 1) {
     ~objbox(thread, "You need some thread to make anything out of leather.", 250, 0, divide(^objbox_height, 2));
-    return;
+    return(null);
 }
+return($product_data);
+
+// Keep each batch item identical to the published single make.
+[proc,craft_leather_make](namedobj $product)(boolean)
+def_dbrow $product_data = ~craft_leather_check($product);
+if ($product_data = null) {
+    return(false);
+}
+def_namedobj $leather;
+def_int $leather_count;
+$leather, $leather_count = db_getfield($product_data, craft_leather_table:leather, 0);
 // delete thread after 5 uses are met
 %thread_used = calc(%thread_used + 1);
 if (%thread_used > 4) {
@@ -95,7 +125,34 @@ inv_del(inv, $leather, $leather_count);
 inv_add(inv, $product, 1);
 stat_advance(crafting, db_getfield($product_data, craft_leather_table:productexp, 0));
 mes("You make <db_getfield($product_data, craft_leather_table:name, 0)>.");
-//----------------------------
+return(true);
+
+[label,process_leather_crafting](namedobj $product, int $count)
+if (~craft_leather_check($product) = null) {
+    return;
+}
+@queue_leather_crafting($product, $count);
+
+[label,queue_leather_crafting](namedobj $product, int $count)
+if_close;
+anim(human_leather_crafting, 0);
+if (%action_delay < map_clock) {
+    %action_delay = add(map_clock, 2);
+}
+weakqueue*(craft_leather_queue, sub(%action_delay, map_clock))($product, $count);
+
+[queue,craft_leather_queue](namedobj $product, int $count)
+if (~craft_leather_make($product) = false) {
+    anim(null, 20);
+    return;
+}
+$count = sub($count, 1);
+if ($count < 1) {
+    anim(null, 20);
+    return;
+}
+%action_delay = add(map_clock, 2);
+@queue_leather_crafting($product, $count);
 
 [label,craft_leather_interface]
 if (inv_total(inv, thread) < 1) {

@@ -1,0 +1,17 @@
+// Sal's Realm 2006-04-24, RuneHQ 2006-04-28 and Zybez 2006-02-20.
+// Lean snail is 6-8, not the donor's 5-8.
+[label,consume_effect_snail1] @consume_snail(5, 7);
+[label,consume_effect_snail2] @consume_snail(6, 8);
+[label,consume_effect_snail3] @consume_snail(7, 9);
+
+[label,consume_snail](int $low, int $high)
+mes("You eat the cooked snail - ummm, slimy!");
+sound_synth(eat, 0, 0);
+anim(human_eat, 0);
+inv_delslot(inv, last_slot);
+def_int $hitpoints = stat(hitpoints);
+def_int $heal = ~random_range($low, $high);
+if ($hitpoints < stat_base(hitpoints)) {
+    stat_heal(hitpoints, $heal, 0);
+    mes("It heals some health.");
+}
