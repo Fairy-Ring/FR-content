@@ -9,16 +9,35 @@ import { CONTENT_ROOT, scanSource, scanTree, printReport } from './scan_random_t
 
 // These hashes freeze the published text, tags, pages, branch order and non-table code.
 // Only random bounds and numeric case labels are excluded from the hashes.
+// `index` is the table's position among the file's direct random switches (file order);
+// `ordinal` is its position among the SWITCH opcodes of its packed script.
 const TARGETS = [
     {
         file: 'scripts/areas/area_ardougne_east/scripts/man_east_ardougne.rs2',
-        script: '[label,citizen_dialogue_eastardy]', count: 23,
+        script: '[label,citizen_dialogue_eastardy]', index: 0, ordinal: 0, switches: 1, count: 23,
         hash: '227c44f0189a1bb188bc2c710249b2792fa58f188fca1c346c7e2812e8c2c68a'
     },
     {
         file: 'scripts/areas/area_burthorpe/scripts/citizen_burthrope.rs2',
-        script: '[label,citizen_burthorpe_talk]', count: 12,
+        script: '[label,citizen_burthorpe_talk]', index: 0, ordinal: 0, switches: 1, count: 12,
         hash: 'e1b4c4ea1ec100f590bd11c0f287e3d5cadc90e7328369ccc76d26df5e8fe89a'
+    },
+    // Burthorpe training sergeant shout table (U-SOLDIERTABLE-1113), and the two
+    // tables of the wandering soldier in the same file.
+    {
+        file: 'scripts/quests/quest_death/scripts/death_soldier.rs2',
+        script: '[ai_timer,death_ig_sergeant_training]', index: 0, ordinal: 0, switches: 1, count: 10,
+        hash: 'e3eba7a8db1eaa9d4320152e5c47df377e629447a44014a8b642f51fab563072'
+    },
+    {
+        file: 'scripts/quests/quest_death/scripts/death_soldier.rs2',
+        script: '[opnpc1,death_ig_solider_wander]', index: 1, ordinal: 0, switches: 2, count: 25,
+        hash: 'e3eba7a8db1eaa9d4320152e5c47df377e629447a44014a8b642f51fab563072'
+    },
+    {
+        file: 'scripts/quests/quest_death/scripts/death_soldier.rs2',
+        script: '[opnpc1,death_ig_solider_wander]', index: 2, ordinal: 1, switches: 2, count: 5,
+        hash: 'e3eba7a8db1eaa9d4320152e5c47df377e629447a44014a8b642f51fab563072'
     }
 ];
 
@@ -76,17 +95,18 @@ function rawSwitches(id) {
 }
 
 const failures = [];
+let totalRolls = 0;
 for (const target of TARGETS) {
     const source = fs.readFileSync(path.join(CONTENT_ROOT, target.file), 'utf8');
     const normalized = source.replace(/(switch_int\(random\()\d+/g, '$1BOUND').replace(/(\bcase\s+)\d+(\s*:)/g, '$1LABEL$2');
     assert.equal(crypto.createHash('sha256').update(normalized).digest('hex'), target.hash, `${target.file}: authored content changed`);
-    const table = scanSource(source, target.file)[0];
+    const table = scanSource(source, target.file)[target.index];
     assert.equal(table.branches.length, target.count, `${target.file}: authored branch count`);
     const script = ScriptProvider.getByName(target.script);
     assert(script, `Missing packed ${target.script}`);
     const switches = script.opcodes.flatMap((op, pc) => op === ScriptOpcode.SWITCH ? [pc] : []);
-    assert.equal(switches.length, 1, `${target.script}: expected one selector`);
-    const pc = switches[0];
+    assert.equal(switches.length, target.switches, `${target.script}: expected ${target.switches} selector(s)`);
+    const pc = switches[target.ordinal];
     assert.equal(script.opcodes[pc - 1], ScriptOpcode.RANDOM, 'Selector must use exclusive RANDOM');
     assert.equal(script.opcodes[pc - 2], ScriptOpcode.PUSH_CONSTANT_INT, 'Selector bound must be constant');
     const bound = script.intOperands[pc - 2];
@@ -101,6 +121,7 @@ for (const target of TARGETS) {
     console.log(JSON.stringify({ script: target.script, bound, rawMap }));
     const counts = Array(target.count).fill(0);
     const map = [];
+    totalRolls += bound;
     for (let roll = 0; roll < bound; roll++) {
         const offset = packed[roll];
         if (offset === undefined) {
@@ -135,5 +156,5 @@ if (failures.length) {
     console.error(`FAIL citizen tables:\n${failures.join('\n')}`);
     process.exitCode = 1;
 } else {
-    console.log('PASS citizen tables: all 35 rolls select one distinct authored branch, inherited content unchanged');
+    console.log(`PASS citizen tables: all ${totalRolls} rolls select one distinct authored branch, inherited content unchanged`);
 }

@@ -157,16 +157,7 @@ if(npc_findhero = ^true) {
         queue*(progress_task, 0)(npc_uid, 1);
     }
 } else if(finduid(%npc_aggressive_player) = true) {
-    if(.npc_findhero = ^true & uid ! .uid) {
-        if(%slayer_target = $key) {
-            if_close;
-            queue*(progress_task, 0)(npc_uid, 2);
-        }
-        if(.%slayer_target = $key) {
-            .if_close;
-            .queue*(progress_task, 0)(npc_uid, 2);
-        }
-    } else if(%slayer_target = $key) {
+    if(%slayer_target = $key) {
         if_close;
         queue*(progress_task, 0)(npc_uid, 1);
     }
