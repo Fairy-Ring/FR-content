@@ -381,7 +381,7 @@ try {
   const retainedStart = packetLog.get(retained)!.length;
   const retainedState = start(
     retained,
-    "[proc,skill_multi1]",
+    "[proc,skillmulti1]",
     [requiredId(retainedObject)],
   );
   assert.equal(retainedState.execution, ScriptState.PAUSEBUTTON);
@@ -396,6 +396,11 @@ try {
       )
       .map((packet) => packet.text),
     ["How many would you like to make?"],
+  );
+  assert.equal(
+    packetLog.get(retained)!.filter((packet) => packet instanceof IfSetText).length,
+    1,
+    "single-item cache must not set a product label",
   );
   assert.equal(retained.resumeButtons.length, 4);
   pressMenuButton(retained, retainedState, 1, 0, 3, 1);

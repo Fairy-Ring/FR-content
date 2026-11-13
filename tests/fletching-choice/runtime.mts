@@ -31,6 +31,7 @@ import ResumePCountDialog from "#/network/game/client/model/ResumePCountDialog.j
 import ResumePauseButtonHandler from "#/network/game/client/handler/ResumePauseButtonHandler.js";
 import ResumePauseButton from "#/network/game/client/model/ResumePauseButton.js";
 import IfSetPosition from "#/network/game/server/model/IfSetPosition.js";
+import IfSetObject from "#/network/game/server/model/IfSetObject.js";
 import IfSetText from "#/network/game/server/model/IfSetText.js";
 
 let checks = 0;
@@ -589,7 +590,7 @@ try {
       checks++;
     }
   }
-  // All related skillmulti procs: every product and every cache quantity layer resumes.
+  // Retained skillmulti1 and migrated helpers: every product and quantity layer.
   const objects = [
     "bronze_bar",
     "iron_bar",
@@ -597,18 +598,151 @@ try {
     "mithril_bar",
     "runite_bar",
   ];
+  const productNames = ["Bronze bar", "Iron bar", "Steel bar", "Mithril bar", "Runite bar"];
+  const productPositions = [
+    [0, -15],
+    [4, -11],
+    [-3, 10],
+    [6, -7],
+    [8, 2],
+  ];
+  const productScales = [175, 180, 185, 190, 195];
   for (let size = 1; size <= 5; size++) {
     for (let product = 0; product < size; product++) {
       for (let option = 0; option < 4; option++) {
         const p = player();
-        const state = start(
-          p,
-          `[proc,skillmulti${size}]`,
-          objects.slice(0, size).map(id),
-        );
+        const products = objects.slice(0, size).map((object, index) => ({
+          object,
+          x: productPositions[index][0],
+          y: productPositions[index][1],
+          scale: productScales[index],
+          label: `\\n\\n\\n\\n${productNames[index]}`,
+        }));
+        const args =
+          size === 1
+            ? [id(objects[0])]
+            : products.flatMap((entry) => [
+                id(entry.object),
+                entry.x,
+                entry.y,
+                entry.scale,
+                entry.label,
+              ]);
+        const name =
+          size === 1 ? "[proc,skillmulti1]" : `[proc,skill_multi${size}]`;
+        const packetStart = packets.get(p)!.length;
+        const state = start(p, name, args);
         assert.equal(state.execution, ScriptState.PAUSEBUTTON);
         assert.equal(p.resumeButtons.length, size * 4);
-        click(p, `skillmulti${size}:com_${size + 2 + product * 4 + option}`);
+        if (size === 1) {
+          const observed = packets.get(p)!.slice(packetStart);
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetObject =>
+                  packet instanceof IfSetObject &&
+                  packet.component === component("skillmulti1:com_2"),
+              )
+              .map((packet) => ({
+                object: packet.obj,
+                scale: packet.scale,
+              })),
+            [{ object: id(objects[0]), scale: 200 }],
+          );
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetText =>
+                  packet instanceof IfSetText &&
+                  packet.component === component("skillmulti1:com_7"),
+              )
+              .map((packet) => packet.text),
+            ["How many would you like to make?"],
+          );
+          assert.equal(
+            observed.filter((packet) => packet instanceof IfSetText).length,
+            1,
+            "single-item cache must not set a product label",
+          );
+        } else {
+          const root = `skillmulti${size}`;
+          const modelIds = new Map(
+            products.map((entry, index) => [
+              component(`${root}:com_${index + 2}`),
+              index,
+            ]),
+          );
+          const makeOneIds = new Map(
+            products.map((entry, index) => [
+              component(`${root}:com_${size + 5 + index * 4}`),
+              index,
+            ]),
+          );
+          const promptId = component(`${root}:com_${size * 5 + 2}`);
+          const observed = packets.get(p)!.slice(packetStart);
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetPosition =>
+                  packet instanceof IfSetPosition && modelIds.has(packet.component),
+              )
+              .map((packet) => ({
+                product: modelIds.get(packet.component),
+                x: packet.x,
+                y: packet.y,
+              })),
+            products.map((entry, index) => ({
+              product: index,
+              x: entry.x,
+              y: entry.y,
+            })),
+          );
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetObject =>
+                  packet instanceof IfSetObject && modelIds.has(packet.component),
+              )
+              .map((packet) => ({
+                product: modelIds.get(packet.component),
+                object: packet.obj,
+                scale: packet.scale,
+              })),
+            products.map((entry, index) => ({
+              product: index,
+              object: id(entry.object),
+              scale: entry.scale,
+            })),
+          );
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetText =>
+                  packet instanceof IfSetText && makeOneIds.has(packet.component),
+              )
+              .map((packet) => ({
+                product: makeOneIds.get(packet.component),
+                text: packet.text,
+              })),
+            products.map((entry, index) => ({
+              product: index,
+              text: entry.label,
+            })),
+          );
+          assert.deepEqual(
+            observed
+              .filter(
+                (packet): packet is IfSetText =>
+                  packet instanceof IfSetText && packet.component === promptId,
+              )
+              .map((packet) => packet.text),
+            ["What would you like to make?"],
+          );
+        }
+        click(
+          p,
+          `skillmulti${size}:com_${size + 2 + product * 4 + option}`,
+        );
         if (state.execution === ScriptState.COUNTDIALOG)
           assert(countDialog.handle(new ResumePCountDialog(3), p));
         assert.equal(state.execution, ScriptState.FINISHED);
