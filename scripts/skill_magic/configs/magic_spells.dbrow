@@ -95,6 +95,56 @@ data=runesrequired,airrune,5,lawrune,1,null,null
 data=experience,555
 data=tele_coord,0_43_54_5_22
 
+// CANDIDATE XP/membership/effect family approved by OD-0 (U-TELEOTHER-1112).
+// OD-3 uses each existing self-teleport center; exact 377 tiles remain UNKNOWN.
+[magic_spell_teleother_lumbridge]
+table=magic_spell_table
+data=spell,^teleother_lumbridge
+data=spellcom,magic:com_511
+data=name,Teleother Lumbridge
+data=members,true
+data=levelrequired,74
+data=runesrequired,soulrune,1,lawrune,1,earthrune,1
+data=experience,840
+data=tele_coord,0_50_50_21_18
+data=anim,human_teleport_other_casting
+data=spotanim_origin,teleport_other_casting
+data=spotanim_target,teleport_other_impact,92
+data=sound_cast,tele_other_cast
+data=sound_hit,teleport_all
+
+[magic_spell_teleother_falador]
+table=magic_spell_table
+data=spell,^teleother_falador
+data=spellcom,magic:com_521
+data=name,Teleother Falador
+data=members,true
+data=levelrequired,82
+data=runesrequired,soulrune,1,lawrune,1,waterrune,1
+data=experience,920
+data=tele_coord,0_46_52_21_50
+data=anim,human_teleport_other_casting
+data=spotanim_origin,teleport_other_casting
+data=spotanim_target,teleport_other_impact,92
+data=sound_cast,tele_other_cast
+data=sound_hit,teleport_all
+
+[magic_spell_teleother_camelot]
+table=magic_spell_table
+data=spell,^teleother_camelot
+data=spellcom,magic:com_541
+data=name,Teleother Camelot
+data=members,true
+data=levelrequired,90
+data=runesrequired,soulrune,2,lawrune,1,null,null
+data=experience,1000
+data=tele_coord,0_43_54_5_22
+data=anim,human_teleport_other_casting
+data=spotanim_origin,teleport_other_casting
+data=spotanim_target,teleport_other_impact,92
+data=sound_cast,tele_other_cast
+data=sound_hit,teleport_all
+
 [magic_spell_teleport_ardougne]
 table=magic_spell_table
 data=spell,^ardougne_teleport

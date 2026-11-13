@@ -1,0 +1,7 @@
+// Server-only invitation state. The original client receives the named interface,
+// not this authored varp, so there is no revision-377 client reader to transmit to.
+[teleother_spell]
+type=int
+scope=temp
+transmit=no
+protect=no
