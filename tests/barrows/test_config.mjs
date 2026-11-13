@@ -25,21 +25,36 @@ for (let i = 2; i < process.argv.length; i++) {
         assert.fail(`unknown argument: ${process.argv[i]}`);
     }
 }
-assert([null, 'wrong-brother-join', 'reversed-lock-polarity'].includes(mutant), `unknown mutant: ${mutant}`);
+assert([null, 'wrong-brother-join', 'reversed-lock-polarity', 'wrong-door-lock', 'swapped-parent-polarity'].includes(mutant), `unknown mutant: ${mutant}`);
 
 function readText(relativePath) {
-    let text = fs.readFileSync(path.join(contentRoot, relativePath), 'utf8');
-    if (relativePath !== ENUM_PATH || mutant === null) return text;
-
-    if (mutant === 'wrong-brother-join') {
+    const text = fs.readFileSync(path.join(contentRoot, relativePath), 'utf8');
+    if (relativePath === ENUM_PATH && mutant === 'wrong-brother-join') {
         const original = 'val=barrow_ahrim_sarcophagus,barrows_ahrim';
         assert(text.includes(original), 'wrong-brother-join mutant source anchor is missing');
         return text.replace(original, 'val=barrow_ahrim_sarcophagus,barrows_dharok');
     }
-
-    const original = 'val=0,unlocked\nval=1,locked';
-    assert(text.includes(original), 'reversed-lock-polarity mutant source anchor is missing');
-    return text.replace(original, 'val=0,locked\nval=1,unlocked');
+    if (relativePath === ENUM_PATH && mutant === 'reversed-lock-polarity') {
+        const original = 'val=0,unlocked\nval=1,locked';
+        assert(text.includes(original), 'reversed-lock-polarity mutant source anchor is missing');
+        return text.replace(original, 'val=0,locked\nval=1,unlocked');
+    }
+    if (relativePath === 'scripts/_unpack/377/all.loc' && ['wrong-door-lock', 'swapped-parent-polarity'].includes(mutant)) {
+        const original = text.match(/\[barrows_door_e_r\][\s\S]*?(?=\n\[)/)?.[0];
+        assert(original, `${mutant} parent section is missing`);
+        let changed;
+        if (mutant === 'wrong-door-lock') {
+            assert(original.includes('multivar=barrows_door_e\n') && original.includes('param=barrows_room_edge_lock,473\n'), 'wrong-door-lock source anchors are missing');
+            changed = original.replace('multivar=barrows_door_e\n', 'multivar=barrows_door_f\n')
+                .replace('param=barrows_room_edge_lock,473\n', 'param=barrows_room_edge_lock,474\n');
+        } else {
+            const polarity = 'multiloc=0,barrows_door_unlocked_r\nmultiloc=1,barrows_door_locked_r';
+            assert(original.includes(polarity), 'swapped-parent-polarity source anchor is missing');
+            changed = original.replace(polarity, 'multiloc=0,barrows_door_locked_r\nmultiloc=1,barrows_door_unlocked_r');
+        }
+        return text.replace(original, changed);
+    }
+    return text;
 }
 
 function parseSections(text, source) {
@@ -183,14 +198,6 @@ const PARAM_DEFAULTS = new Map([
 ]);
 
 
-const ENUM_IDS = new Map([
-    [154, 'barrows_sarcophagus_brother'],
-    [155, 'barrows_brother_slain_varbit'],
-    [156, 'barrows_brother_crypt_entry'],
-    [157, 'barrows_stair_surface_exit'],
-    [158, 'barrows_room_edges_by_lock'],
-    [159, 'barrows_door_lock_state']
-]);
 const ENUM_SIGNATURES = new Map([
     ['barrows_sarcophagus_brother', ['loc', 'npc']],
     ['barrows_brother_slain_varbit', ['npc', 'string']],
@@ -201,15 +208,6 @@ const ENUM_SIGNATURES = new Map([
 ]);
 
 
-const PARAM_IDS = new Map([
-    [244, 'barrows_brother'],
-    [245, 'barrows_slain_varbit'],
-    [246, 'barrows_crypt_entry'],
-    [247, 'barrows_surface_exit'],
-    [248, 'barrows_room_edge_lock'],
-    [249, 'barrows_door_open_state'],
-    [250, 'barrows_door_locked_state']
-]);
 
 const ENCOUNTERS = [
     { brother: 'barrows_ahrim', npcId: 2025, sarc: 'barrow_ahrim_sarcophagus', sarcId: 6821, slain: 'barrows_killed_ahrim', slainId: 457, entry: '3_55_151_37_39', stair: 'barrows_stairs_ahrim', exit: '0_55_51_45_25' },
@@ -238,24 +236,12 @@ const VARBIT_LAYOUTS = [
     ['barrows_chest_open', 1394, 'barrows_kills', 16, 16]
 ];
 
-const ROOM_EDGE_ENDPOINTS = new Map([
-    [469, 'nw>north_outside|ne>north_outside'],
-    [470, 'nw>west_outside|sw>west_outside'],
-    [471, 'nw>w'],
-    [472, 'nw>n'],
-    [473, 'n>center'],
-    [474, 'n>ne'],
-    [475, 'ne>e'],
-    [476, 'ne>east_outside|se>east_outside'],
-    [477, 'w>center'],
-    [478, 'center>e'],
-    [479, 'w>sw'],
-    [480, 'center>s'],
-    [481, 'e>se'],
-    [482, 'sw>s'],
-    [483, 's>se'],
-    [484, 'sw>south_outside|se>south_outside']
-]);
+// Names only: coordinates come from the four mapped corner ladders and the chest.
+const ROOM_NAMES = {
+    rows: [['nw', 'n', 'ne'], ['w', 'center', 'e'], ['sw', 's', 'se']],
+    north: 'north_outside', south: 'south_outside',
+    west: 'west_outside', east: 'east_outside'
+};
 
 const EXPECTED_DOORS = [
     [6717, 3528, 9677, '6717 0 2'], [6736, 3528, 9678, '6736 0 2'],
@@ -308,8 +294,6 @@ const varpPack = parseIdPack(readText('pack/varp.pack'), 'pack/varp.pack');
 const varbitPack = parseIdPack(readText('pack/varbit.pack'), 'pack/varbit.pack');
 const locPack = parseIdPack(readText('pack/loc.pack'), 'pack/loc.pack');
 const npcPack = parseIdPack(readText('pack/npc.pack'), 'pack/npc.pack');
-const paramPack = parseIdPack(readText('pack/param.pack'), 'pack/param.pack');
-const enumPack = parseIdPack(readText('pack/enum.pack'), 'pack/enum.pack');
 const interfacePack = parseIdPack(readText('pack/interface.pack'), 'pack/interface.pack');
 
 assert.equal(varpPack.byId.get(452), 'barrows');
@@ -342,10 +326,6 @@ for (const [name, id, basevar, startbit, endbit] of VARBIT_LAYOUTS) {
 }
 assert.equal(VARBIT_LAYOUTS.length, 30, 'original Barrows varbit inventory must remain complete');
 
-for (const [id, name] of PARAM_IDS) assert.equal(paramPack.byId.get(id), name, `new param id ${id}`);
-for (const [id, name] of ENUM_IDS) assert.equal(enumPack.byId.get(id), name, `new enum id ${id}`);
-assert.equal(Math.max(...paramPack.byId.keys()), 250, 'Barrows params must append after original id 243');
-assert.equal(Math.max(...enumPack.byId.keys()), 159, 'Barrows enums must append after original id 153');
 
 const params = parseSections(readText(PARAM_PATH), PARAM_PATH);
 assert.deepEqual([...params.sections.keys()], [...PARAM_TYPES.keys()]);
@@ -355,8 +335,7 @@ for (const [name, defaultValue] of PARAM_DEFAULTS) assert.equal(one(section(para
 
 const enumText = readText(ENUM_PATH);
 const enums = parseSections(enumText, ENUM_PATH);
-assert.deepEqual([...enums.sections.keys()], [...ENUM_IDS.values()]);
-for (const [id, name] of ENUM_IDS) assert.equal(enumPack.byName.get(name), id, `[${name}] pack ID`);
+assert.deepEqual([...enums.sections.keys()], [...ENUM_SIGNATURES.keys()]);
 for (const [name, [inputType, outputType]] of ENUM_SIGNATURES) {
     const fields = section(enums, name);
     assert.equal(one(fields, 'inputtype', ENUM_PATH), inputType, `[${name}] input type`);
@@ -419,44 +398,7 @@ assert.equal(stairsDestinations.size, 6, 'original stairs must retain six invers
 for (const [stair, exit] of expectedExitByStair) assert.equal(stairsDestinations.get(stair), exit, `[${stair}] exit must match stairs.rs2`);
 
 const roomEdges = enumValues(enums, 'barrows_room_edges_by_lock');
-assert.deepEqual(new Map([...roomEdges].map(([key, value]) => [Number(key), value])), ROOM_EDGE_ENDPOINTS);
 assert.deepEqual(enumValues(enums, 'barrows_door_lock_state'), new Map([['0', 'unlocked'], ['1', 'locked']]));
-assert.equal(ROOM_EDGE_ENDPOINTS.size, 16, 'one enum key per original lock bit');
-const roomPoints = new Map([
-    ['nw', [0, 2]], ['n', [1, 2]], ['ne', [2, 2]],
-    ['w', [0, 1]], ['center', [1, 1]], ['e', [2, 1]],
-    ['sw', [0, 0]], ['s', [1, 0]], ['se', [2, 0]]
-]);
-const outsideDirections = new Map([
-    ['north_outside', ['z', 2]], ['south_outside', ['z', 0]],
-    ['west_outside', ['x', 0]], ['east_outside', ['x', 2]]
-]);
-let internalEdges = 0;
-let outerEdges = 0;
-for (const [lockId, endpointList] of ROOM_EDGE_ENDPOINTS) {
-    const endpoints = endpointList.split('|');
-    assert.equal(endpoints.length, [469, 470, 476, 484].includes(lockId) ? 2 : 1, `lock ${lockId} endpoint reuse`);
-    for (const endpoint of endpoints) {
-        const [left, right] = endpoint.split('>');
-        assert(left && right, `malformed room edge ${endpoint}`);
-        if (roomPoints.has(left) && roomPoints.has(right)) {
-            const [lx, lz] = roomPoints.get(left);
-            const [rx, rz] = roomPoints.get(right);
-            assert.equal(Math.abs(lx - rx) + Math.abs(lz - rz), 1, `nonadjacent rooms in ${endpoint}`);
-            internalEdges++;
-        } else {
-            const room = roomPoints.has(left) ? left : right;
-            const outside = outsideDirections.has(left) ? left : right;
-            assert(roomPoints.has(room) && outsideDirections.has(outside), `invalid outer endpoint ${endpoint}`);
-            const [x, z] = roomPoints.get(room);
-            const [axis, edge] = outsideDirections.get(outside);
-            assert.equal(axis === 'x' ? x : z, edge, `room ${room} is not on ${outside}`);
-            outerEdges++;
-        }
-    }
-}
-assert.equal(internalEdges, 12, 'all twelve internal room edges');
-assert.equal(outerEdges, 8, 'all eight outer openings');
 
 const doorParentIds = new Set([
     ...Array.from({ length: 16 }, (_, index) => 6716 + index),
@@ -472,11 +414,11 @@ for (const id of doorParentIds) {
     const name = `barrows_door_${letter}_${side}`;
     assert.equal(locPack.byId.get(id), name, `original door parent loc id ${id}`);
     const fields = section(allLoc, name);
-    const lockName = `barrows_door_${letter}`;
-    assert.equal(one(fields, 'multivar', 'all.loc'), lockName, `[${name}] original multivar`);
+    const lockName = one(fields, 'multivar', 'all.loc');
+    assert(/^barrows_door_[a-p]$/.test(lockName), `[${name}] original lock varbit`);
     assert.deepEqual(values(fields, 'multiloc'), [`0,barrows_door_unlocked_${side}`, `1,barrows_door_locked_${side}`], `[${name}] 0 unlocked / 1 locked children`);
     const paramsForDoor = paramValues(fields, `[${name}]`);
-    assert.equal(paramsForDoor.get('barrows_room_edge_lock'), String(469 + letterIndex), `[${name}] lock-bit param`);
+    assert.equal(paramsForDoor.get('barrows_room_edge_lock'), String(varbitPack.byName.get(lockName)), `[${name}] lock-bit param must match multivar`);
     assert.equal(paramsForDoor.get('barrows_door_open_state'), '0', `[${name}] open polarity`);
     assert.equal(paramsForDoor.get('barrows_door_locked_state'), '1', `[${name}] locked polarity`);
     assert.equal(paramsForDoor.size, 3, `[${name}] unexpected Barrows params`);
@@ -498,14 +440,61 @@ assert.equal(loopPlacements.filter(row => row.id >= 6751 && row.id <= 6766).leng
 assert.equal(loopPlacements.filter(row => doorParentIds.has(row.id)).length, 64, 'all 64 placed door parent rows');
 for (const id of [6713, 6714, 6715, 6732, 6733, 6734]) assert.equal(mappedLocs.filter(row => row.id === id).length, 0, `multi-loc child ${id} is not directly placed`);
 
-for (const row of loopPlacements.filter(row => doorParentIds.has(row.id))) {
-    const rightSide = row.id <= 6731;
-    const letterIndex = rightSide ? row.id - 6716 : row.id - 6735;
-    const lockId = 469 + letterIndex;
-    const sectionName = `barrows_door_${String.fromCharCode('a'.charCodeAt(0) + letterIndex)}_${rightSide ? 'r' : 'l'}`;
-    const fields = section(allLoc, sectionName);
-    assert.equal(paramValues(fields, `[${sectionName}]`).get('barrows_room_edge_lock'), String(lockId), `map row ${row.line} must point at its declared lock edge`);
+// The map format gives absolute x/z in mapLocRows. Corner ladders define the
+// outer room centres; the chest defines the middle row and column.
+function mappedLandmark(name) {
+    const rows = mappedLocs.filter(row => row.level === 0 && row.id === locPack.byName.get(name));
+    assert.equal(rows.length, 1, `one mapped ${name}`);
+    return rows[0];
 }
+const corners = ['a', 'c', 'g', 'i'].map(letter => mappedLandmark(`barrows_ladder_${letter}`));
+const chest = mappedLandmark('barrows_stone_chest');
+const columns = [Math.min(...corners.map(row => row.x)), chest.x, Math.max(...corners.map(row => row.x))];
+const rows = [Math.max(...corners.map(row => row.z)), chest.z, Math.min(...corners.map(row => row.z))];
+assert.equal(columns[1] - columns[0], columns[2] - columns[1], 'evenly spaced room columns');
+assert.equal(rows[0] - rows[1], rows[1] - rows[2], 'evenly spaced room rows');
+
+function edgeAt(placement) {
+    const column = columns.reduce((best, x, index) => Math.abs(placement.x - x) < Math.abs(placement.x - columns[best]) ? index : best, 0);
+    const row = rows.reduce((best, z, index) => Math.abs(placement.z - z) < Math.abs(placement.z - rows[best]) ? index : best, 0);
+    const dx = placement.x - columns[column];
+    const dz = placement.z - rows[row];
+    // Both halves lie on the centre line (within one tile) of the other axis.
+    assert(Math.min(Math.abs(dx), Math.abs(dz)) <= 1 && Math.max(Math.abs(dx), Math.abs(dz)) > 1, `map row ${placement.line}: door must lie between room centres`);
+    const horizontal = Math.abs(dx) > Math.abs(dz);
+    const nextColumn = column + (horizontal ? Math.sign(dx) : 0);
+    const nextRow = row - (horizontal ? 0 : Math.sign(dz));
+    const room = ROOM_NAMES.rows[row][column];
+    if (nextColumn < 0) return `${room}>${ROOM_NAMES.west}`;
+    if (nextColumn > 2) return `${room}>${ROOM_NAMES.east}`;
+    if (nextRow < 0) return `${room}>${ROOM_NAMES.north}`;
+    if (nextRow > 2) return `${room}>${ROOM_NAMES.south}`;
+    const neighbor = ROOM_NAMES.rows[nextRow][nextColumn];
+    return row * 3 + column < nextRow * 3 + nextColumn ? `${room}>${neighbor}` : `${neighbor}>${room}`;
+}
+
+const mappedEdgesByLock = new Map();
+for (const placement of loopPlacements.filter(row => doorParentIds.has(row.id))) {
+    const name = locPack.byId.get(placement.id);
+    const fields = section(allLoc, name);
+    const lockId = paramValues(fields, `[${name}]`).get('barrows_room_edge_lock');
+    const edge = edgeAt(placement);
+    assert(roomEdges.get(lockId)?.split('|').includes(edge), `map row ${placement.line} [${name}] lock ${lockId} does not contain map-derived edge ${edge}`);
+    const edges = mappedEdgesByLock.get(lockId) ?? new Set();
+    edges.add(edge);
+    mappedEdgesByLock.set(lockId, edges);
+}
+const normalizedEnumEdges = new Map([...roomEdges].map(([lock, edges]) => {
+    const list = edges.split('|');
+    assert.equal(new Set(list).size, list.length, `lock ${lock}: duplicate enum edge`);
+    return [lock, list.sort()];
+}));
+assert.deepEqual(normalizedEnumEdges, new Map([...mappedEdgesByLock].map(([lock, edges]) => [lock, [...edges].sort()])), 'all sixteen lock enums must equal the edges measured from every placed parent');
+assert.equal(mappedEdgesByLock.size, 16, 'all sixteen original locks have mapped edges');
+const measuredEdges = [...mappedEdgesByLock.values()].flatMap(edges => [...edges]);
+assert.equal(new Set(measuredEdges).size, measuredEdges.length, 'no room edge belongs to multiple locks');
+assert.equal(measuredEdges.filter(edge => !edge.includes('_outside')).length, 12, 'all twelve internal room edges');
+assert.equal(measuredEdges.filter(edge => edge.includes('_outside')).length, 8, 'all eight outer openings');
 
 assert.equal(interfacePack.byId.get(4535), 'kill_count', 'original kill_count interface id');
 assert.equal(interfacePack.byId.get(4543), 'next_shape', 'original next_shape interface id');
