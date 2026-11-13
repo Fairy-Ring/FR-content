@@ -160,7 +160,7 @@ await run(async () => {
     for (const identity of [-1, 0, 7]) assert.equal(procInt(players[0], 'barrows_brother_slain', [identity]), 0, 'invalid identity cannot read another bit');
 
     const a = player('owner_a', 3, 44);
-    const b = player('owner_b', 3, 55);
+    const b = player('owner_b', 3, 44);
     search(a);
     const actorA = owned(a)[0];
     assert(actorA, 'A has a positive resident control');
@@ -192,8 +192,12 @@ await run(async () => {
     for (const guard of ['npc_is_attackable', 'npc_is_attackable_opt']) assert.equal(procInt(b, guard, [], mapActor), 1, 'ordinary map attribution keeps normal attackability');
 
     const tile = CoordGrid.packCoord(3, 3555, 9714);
-    assert.notEqual(procInt(a, 'barrows_actor_spawn', [NpcType.getId('barrows_dharok'), tile, 1000]), -1, 'constructor returns the native actor handle');
-    const stale = owned(a)[0];
+    const handle = procInt(a, 'barrows_actor_spawn', [NpcType.getId('barrows_dharok'), tile, 1000]);
+    const stale = World.getNpcByUid(handle);
+    assert(stale, 'constructor returns a handle resolving to the spawned actor');
+    assert.equal(stale.type, NpcType.getId('barrows_dharok'), 'returned handle identifies the requested NPC type');
+    assert.equal(stale.getVar(owner), a.uid, 'returned handle identifies the searching owner actor');
+    assert.equal(stale.getVar(generation), 44, 'returned handle carries the current run generation');
     assert(stale, 'current generation can spawn before the stale-generation control');
     a.setVar(vars.barrows_generation, 45);
     assert.equal(procInt(a, 'barrows_brother_find', [stale.type]), 0, 'old generation never suppresses the current encounter');

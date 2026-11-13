@@ -29,13 +29,15 @@ node --import tsx ../content/tests/barrows/test_core.mjs
 
 This check executes the packed run procs through the production script runner. It covers masked state, phases, generation changes, owner-only actor removal, the non-suspending Search latch/reset, initial locked doors and saved countdown fields. The Search latch has no player trigger or reward grant in this build group. S07 replaces the all-locked layout initializer. S06 and S13 attach their effects to the shared saved-countdown primitives.
 
+Reset accepts only a paid run. Idle, unlooted and invalid phases retain every field, actor and presentation state. The paid control still proves generation advancement before actor removal and field clearing.
+
 ## Entry and exit (S02)
 
 ```sh
 node --import tsx ../content/tests/barrows/test_entry.mjs
 ```
 
-This check executes the packed entry, leave, logout and resume procs. It checks all six joined destinations and inverse exits, pre-loot retention, paid reset, exact saved countdown retention, and HUD reconstruction after login. Shared offline fixtures resolve generated config ids by name.
+This check executes the packed entry, leave, logout and resume procs and the actual shared login/logout triggers, both with and without a run. It checks all six joined destinations and inverse exits, pre-loot retention, paid reset, exact saved countdown retention, and HUD reconstruction after login. Shared offline fixtures resolve generated config ids by name.
 
 ## Owned encounters (S03)
 
@@ -48,6 +50,19 @@ This check executes all six packed Search handlers with native loc/NPC fixtures.
 Each crypt summon says the exact CANDIDATE 2007-base line and immediately targets its searching owner, following the published Rashiliyia minion convention. All six packed handlers prove that a second player on the owner's tile is not targeted. The speech is an OSRS-documentation fallback, not verified 377 wording; the period Tip.It guide separately verifies the immediate-attack statement. Tunnel-door and chest presentation are not implemented here.
 
 The shared actor constructor returns a native NPC UID, or null on refusal. Presentation callers bind it with `npc_finduid` before reading or changing the active NPC; they do not assume that a proc call exports its pointer state. Its owner/generation admission and the common attackability/timer guards are unchanged.
+
+The two-owner controls use the same generation, so a different generation cannot hide a missing owner check. Constructor-handle checks resolve the native UID and assert its requested type, owner and captured generation.
+
+## Poison and appearance
+
+```sh
+node --import tsx ../content/tests/barrows/test_poison.mjs
+node --import tsx ../content/tests/barrows/test_hint.mjs
+```
+
+Unowned tunnel monsters retain the published default poison timer, including the rat's first 35-to-31 hitpoint step. Owned actors use the shared counted poison helper without interrupting their one-tick owner check. Native turns cover the whole poison countdown and removal within one tick of departure, before and after poison ends. Poison is the published combat rule; counting timer runs is engineering.
+
+Each awakened brother sends the existing `hint_npc` command only to its owner. The packed checks read the real hint packets at spawn, death, removal, timer departure and logout, with a second-player negative control. Ordinary tunnel monsters get no brother hint. This CANDIDATE appearance follows the near-target video and official picture; it changes no client cache bytes. The command precedent is the Haunted Mine ghost's appearance in `hauntedmine_boss_ghost.rs2`.
 
 ## Monster configuration (S04)
 

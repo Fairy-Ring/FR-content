@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createRunner, loadPackedRuntime, packedId, parseEnum, parseOptions, run } from './packed.mjs';
 
@@ -10,6 +11,24 @@ async function main() {
   const { contentRoot, World, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType, LocType, NpcType, EnumType, CoordGrid, Component, allocateIfAbsent } = runtime;
   const runner = createRunner(runtime, { prefix: 'barrows_entry' });
   const { makePlayer, call, procVoid, procInt, addNpc, removeFixtures, measureRandom } = runner;
+  const { default: ServerTriggerType } = await import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/script/ServerTriggerType.ts')).href);
+  const { default: VarSharedType } = await import(pathToFileURL(path.join(runtime.engineRoot, 'src/cache/config/VarSharedType.ts')).href);
+  VarSharedType.load(runtime.packDir);
+  World.vars = new Int32Array(VarSharedType.count);
+  const runLifecycleTrigger = (player, name) => {
+    const triggerName = `[${name},_]`;
+    const triggerType = name === 'login' ? ServerTriggerType.LOGIN : ServerTriggerType.LOGOUT;
+    const script = ScriptProvider.getByTriggerSpecific(triggerType, -1, -1);
+    assert(script, `compiled ${triggerName} server trigger is present`);
+    assert.equal(script, ScriptProvider.getByName(triggerName), `${triggerName} resolves through the engine's server-trigger lookup`);
+    const state = ScriptRunner.init(script, player);
+    const execution = player.runScript(state, true);
+    assert.equal(execution, ScriptState.FINISHED, `${triggerName} finishes synchronously`);
+    assert.equal(state.execution, ScriptState.FINISHED, `${triggerName} completes the compiled trigger`);
+    assert.equal(player.delayed, false, `${triggerName} does not leave a delay`);
+    assert.equal(player.activeScript, null, `${triggerName} does not leave a suspended script`);
+    assert.equal(player.protect, false, `${triggerName} releases protected access`);
+  };
   const varp = name => {
     const id = packedId(contentRoot, 'varp', name);
     assert.equal(VarPlayerType.getId(name), id, `runtime varp identity ${name}`);
@@ -187,6 +206,38 @@ async function main() {
     assert.equal(player.timers.size, timersBefore, 'resume does not add or replace timers');
     assert.equal(player.getVar(ids.countdowns) >>> 0, seed.countdowns, 'resume preserves saved countdowns');
   }
+  // Execute the exact compiled login server trigger through the engine's trigger
+  // lookup, not only its Barrows helper proc. A live actor distinguishes resume
+  // from the shared leave hook: resuming restores the HUD without deleting it.
+  const killCountOverlay = Component.getId('kill_count');
+  assert.notEqual(killCountOverlay, -1, 'runtime component config contains kill_count');
+  const loginRun = makePlayer('login_trigger_run', 3);
+  const loginRunSeed = {
+    client: 0x5a5a1234, credit: 0x76543210,
+    state: (0xbeef0000 | (1 << 3) | 0x8000 | 5) >>> 0,
+    generation: 404, countdowns: 0xf00dbeef
+  };
+  set(loginRun, loginRunSeed);
+  const loginRunActor = addNpc('barrows_giantrat', 3, loginRun.uid, 3551, 9696);
+  loginRun.packets.length = 0;
+  runLifecycleTrigger(loginRun, 'login');
+  assert.deepEqual(snapshot(loginRun), { ...loginRunSeed, state: u32(loginRunSeed.state & ~0x8000) }, '[login,_] preserves the unfinished run and clears only its active challenge');
+  assert.equal(phase(loginRun.getVar(ids.state)), 1, '[login,_] preserves an unlooted run');
+  assert.equal(loginRun.overlay, killCountOverlay, '[login,_] restores the kill-count HUD for an active run');
+  assert.equal(loginRunActor.npc.isActive, true, '[login,_] resumes without removing the owner’s live actor');
+
+  // A player inside the crypt without a run must not acquire one from login.
+  const loginNoRun = makePlayer('login_trigger_no_run', 3);
+  const loginNoRunSeed = {
+    client: 0x12345678, credit: 0, state: 0xcafe8000,
+    generation: 0, countdowns: 0
+  };
+  set(loginNoRun, loginNoRunSeed);
+  runLifecycleTrigger(loginNoRun, 'login');
+  assert.deepEqual(snapshot(loginNoRun), { ...loginNoRunSeed, state: u32(loginNoRunSeed.state & ~0x8000) }, '[login,_] does not invent a run and clears only the stale challenge');
+  assert.equal(phase(loginNoRun.getVar(ids.state)), 0, '[login,_] keeps a no-run player idle');
+  assert.notEqual(loginNoRun.overlay, killCountOverlay, '[login,_] does not open the kill-count HUD without a run');
+
 
   // Outside paid login reconciles through leave/reset; outside phase 1 retains the
   // run and unrelated activity overlay instead of replacing it with Barrows HUD.
@@ -235,6 +286,52 @@ async function main() {
     assert.equal(player.pendingModalClose, true, 'disconnected logout fixture retains its real pending close');
     assert(player.packets.some(packet => packet.constructor.name === 'CamReset'), 'logout resets camera presentation');
   }
+  // The logout server trigger must dispatch Barrows cleanup for both a live
+  // unfinished run and an idle player, without deleting a foreign owner’s actor.
+  const logoutRun = makePlayer('logout_trigger_run', 3);
+  const logoutRunSeed = {
+    client: 0x98765432, credit: 0xabcdef01,
+    state: (0xa5a50000 | (1 << 3) | 0x8000 | 5) >>> 0,
+    generation: 991, countdowns: 0xfedcba98
+  };
+  set(logoutRun, logoutRunSeed);
+  const logoutRunActor = addNpc('barrows_giantrat', 3, logoutRun.uid, 3551, 9696);
+  const logoutRunForeignActor = addNpc('barrows_dharok', 3, logoutRun.uid + 1_000_000, 3552, 9697);
+  logoutRun.openMainModal(activityModal);
+  logoutRun.openMainOverlay(killCountOverlay);
+  logoutRun.packets.length = 0;
+  runLifecycleTrigger(logoutRun, 'logout');
+  assert.deepEqual(snapshot(logoutRun), { ...logoutRunSeed, state: u32(logoutRunSeed.state & ~0x8000) }, '[logout,_] preserves the unfinished run and clears only its active challenge');
+  assert.equal(phase(logoutRun.getVar(ids.state)), 1, '[logout,_] does not reset an unfinished run');
+  assert.equal(logoutRunActor.npc.isActive, false, '[logout,_] removes the player’s owned actor');
+  assert.equal(logoutRunForeignActor.npc.isActive, true, '[logout,_] retains a foreign owner’s actor');
+  assert.equal(logoutRun.modalMain, -1, '[logout,_] closes modal presentation');
+  assert.equal(logoutRun.pendingModalClose, true, '[logout,_] records the disconnected modal close');
+  assert.equal(logoutRun.overlay, -1, '[logout,_] closes the Barrows HUD');
+  assert(logoutRun.packets.some(packet => packet.constructor.name === 'CamReset'), '[logout,_] resets camera presentation');
+  assert(!logoutRun.packets.some(packet => packet.constructor.name === 'IfOpenOverlay'), '[logout,_] does not reopen an overlay');
+
+  const logoutNoRun = makePlayer('logout_trigger_no_run', 3);
+  const logoutNoRunSeed = {
+    client: 0x11223344, credit: 0, state: 0xabcd8000,
+    generation: 0, countdowns: 0
+  };
+  set(logoutNoRun, logoutNoRunSeed);
+  const logoutNoRunActor = addNpc('barrows_bloodworm', 3, logoutNoRun.uid, 3550, 9697);
+  const logoutNoRunForeignActor = addNpc('barrows_ahrim', 3, logoutNoRun.uid + 1_000_000, 3553, 9698);
+  logoutNoRun.openMainModal(activityModal);
+  logoutNoRun.openMainOverlay(killCountOverlay);
+  logoutNoRun.packets.length = 0;
+  runLifecycleTrigger(logoutNoRun, 'logout');
+  assert.deepEqual(snapshot(logoutNoRun), { ...logoutNoRunSeed, state: u32(logoutNoRunSeed.state & ~0x8000) }, '[logout,_] does not invent or reset a run');
+  assert.equal(phase(logoutNoRun.getVar(ids.state)), 0, '[logout,_] keeps a no-run player idle');
+  assert.equal(logoutNoRunActor.npc.isActive, false, '[logout,_] removes only the no-run player’s own actor');
+  assert.equal(logoutNoRunForeignActor.npc.isActive, true, '[logout,_] retains a foreign actor without a run');
+  assert.equal(logoutNoRun.modalMain, -1, '[logout,_] closes no-run modal presentation');
+  assert.equal(logoutNoRun.pendingModalClose, true, '[logout,_] records no-run modal close');
+  assert.equal(logoutNoRun.overlay, -1, '[logout,_] closes no-run overlay presentation');
+  assert(logoutNoRun.packets.some(packet => packet.constructor.name === 'CamReset'), '[logout,_] resets no-run camera presentation');
+
 
   // The map-zone hook is asked after movement: inside Barrows it must not leave,
   // while crossing the zone boundary in paid phase must reset exactly once.
@@ -299,7 +396,7 @@ async function main() {
   assert.deepEqual([offPeak.level, offPeak.x, offPeak.z], [0, 3540, 3300], 'off-peak Dig stays on the surface');
 
   removeFixtures();
-  console.log('PASS S02 compiled Barrows leave, stair exits, login/logout reconciliation and map-zone exit');
+  console.log('PASS S02 compiled Barrows leave, stair exits, actual login/logout triggers and map-zone exit');
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) run(main);

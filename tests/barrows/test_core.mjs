@@ -149,6 +149,7 @@ async function main() {
   const VarBitType = await loadDefault('src/cache/config/VarBitType.ts');
   const VarNpcType = await loadDefault('src/cache/config/VarNpcType.ts');
   const NpcType = await loadDefault('src/cache/config/NpcType.ts');
+  const EnumType = await loadDefault('src/cache/config/EnumType.ts');
   const InvType = await loadDefault('src/cache/config/InvType.ts');
   const ObjType = await loadDefault('src/cache/config/ObjType.ts');
   const FontType = await loadDefault('src/cache/config/FontType.ts');
@@ -158,7 +159,7 @@ async function main() {
   const { BlockWalk } = await eng('src/engine/entity/BlockWalk.js');
   const { CoordGrid } = await eng('src/engine/CoordGrid.ts');
 
-  for (const config of [VarPlayerType, VarBitType, VarNpcType, NpcType, InvType, ObjType, FontType, Component]) {
+  for (const config of [VarPlayerType, VarBitType, VarNpcType, NpcType, EnumType, InvType, ObjType, FontType, Component]) {
     config.load(PACK_DIR);
   }
   assert(FontType.get(3), `FontType q8_full is missing in ${PACK_DIR}`);
@@ -628,10 +629,55 @@ async function main() {
     assert.equal(u32(zeroGenerationPlayer.getVar(ids.credit)), 0x12345678, 'generation advance from zero must preserve credit');
     assert.equal(u32(zeroGenerationPlayer.getVar(ids.countdowns)), 0x80000001, 'generation advance from zero must preserve countdowns');
 
-    // A blocked protected call cannot partially reset; the accepted reset then
+    // Reset is reserved for a paid run. Every other phase is a strict no-op,
+    // including owned actors and the current UI presentation.
+    const resetGuardModal = Component.getId('inter_234');
+    const resetGuardOverlay = Component.getId('kill_count');
+    assert.notEqual(resetGuardModal, -1, 'runtime component config contains the guard modal');
+    assert.notEqual(resetGuardOverlay, -1, 'runtime component config contains kill_count');
+    for (const [index, phase] of [0, 1, 3].entries()) {
+      const guardedPlayer = makePlayer(`reset_guard_phase_${phase}`);
+      const guardedSeed = {
+        clientState: 0x5a5a1234 + index,
+        credit: 0x76543210 + index,
+        state: stateWord({
+          high: 0x71000000 | (index << 16), identity: index + 1, phase,
+          corner: index + 1, entrance: index + 2, solved: true,
+          family: 2, permutation: 6, challenge: true
+        }),
+        generation: 151 + index,
+        countdowns: 0x80004321 + index
+      };
+      setVars(guardedPlayer, guardedSeed);
+      const guardedOwned = addActor('barrows_giantrat', 3, guardedPlayer.uid, 3551, 9696);
+      const guardedForeign = addActor('barrows_ahrim', 3, guardedPlayer.uid + 1_000_000, 3553, 9698);
+      guardedPlayer.openMainModal(resetGuardModal);
+      guardedPlayer.openMainOverlay(resetGuardOverlay);
+      guardedPlayer.packets.length = 0;
+      const before = snapshot(guardedPlayer);
+      const modalBefore = guardedPlayer.modalMain;
+      const overlayBefore = guardedPlayer.overlay;
+      const pendingCloseBefore = guardedPlayer.pendingModalClose;
+      const packetCountBefore = guardedPlayer.packets.length;
+      const messageCountBefore = guardedPlayer.messages.length;
+      const guardedReset = measureRandom(() => procVoid(guardedPlayer, 'barrows_run_reset'));
+      assert.equal(guardedReset.calls, 0, `phase-${phase} reset guard must not draw randomness`);
+      assert.deepEqual(snapshot(guardedPlayer), before, `phase-${phase} reset guard preserves every durable field`);
+      assertRetained([guardedOwned, guardedForeign], `phase-${phase} reset guard`);
+      assert.equal(guardedPlayer.modalMain, modalBefore, `phase-${phase} reset guard preserves modal presentation`);
+      assert.equal(guardedPlayer.overlay, overlayBefore, `phase-${phase} reset guard preserves overlay presentation`);
+      assert.equal(guardedPlayer.pendingModalClose, pendingCloseBefore, `phase-${phase} reset guard preserves pending modal state`);
+      assert.equal(guardedPlayer.packets.length, packetCountBefore, `phase-${phase} reset guard emits no presentation packets`);
+      assert.equal(guardedPlayer.messages.length, messageCountBefore, `phase-${phase} reset guard emits no messages`);
+      assert.equal(procInt(guardedPlayer, 'barrows_phase'), phase, `phase-${phase} reset guard preserves phase`);
+      removeFixtures([guardedOwned, guardedForeign]);
+    }
+
+    // A blocked protected call cannot partially reset; the paid reset then
     // deletes actors before clearing state/credit/countdowns and returns idle.
     const resetPlayer = makePlayer('reset');
     const resetSeedState = stateWord({ high: 0x6b6b0000, identity: 6, phase: 2, corner: 1, entrance: 3, solved: true, family: 2, permutation: 5, challenge: true });
+    assert.equal(field(resetSeedState, STATE.phaseMask, STATE.phaseShift), 2, 'successful reset fixture must be a paid run');
     const resetSeedClient = 0xe13579bd;
     const resetSeedCredit = 0xabcdef98;
     const resetSeedCountdowns = 0x8000cafe;
@@ -642,6 +688,8 @@ async function main() {
       generation: 80,
       countdowns: resetSeedCountdowns
     });
+    resetPlayer.openMainModal(resetGuardModal);
+    resetPlayer.openMainOverlay(resetGuardOverlay);
     const resetActors = [
       addActor('barrows_verac', 0, resetPlayer.uid, 3548, 9694),
       addActor('barrows_giantspider', 3, resetPlayer.uid, 3551, 9700)
@@ -674,6 +722,10 @@ async function main() {
     assert.equal(u32(resetPlayer.getVar(ids.state)), stateHigh(resetSeedState), 'run_reset must clear state fields 0..15 and preserve 16..31');
     assert.equal(procInt(resetPlayer, 'barrows_phase'), 0, 'run_reset must leave the phase idle');
     assertLockedLayout(resetPlayer, resetSeedClient, 'run_reset');
+    assert.equal(resetPlayer.modalMain, -1, 'paid run_reset closes its active modal');
+    assert.equal(resetPlayer.pendingModalClose, true, 'paid run_reset records the disconnected modal close');
+    assert.equal(resetPlayer.overlay, -1, 'paid run_reset closes its overlay');
+    assert(resetPlayer.packets.some(packet => packet.constructor.name === 'CamReset'), 'paid run_reset resets camera presentation');
     removeFixtures();
 
     // A new run after reset increments again, draws one valid identity and

@@ -56,11 +56,17 @@ return(false);
 [proc,barrows_remove_owned]
 .npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
 while (.npc_findnext = true) {
-    if (.%npc_barrows_owner = uid & .%npc_barrows_generation > 0 & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) .npc_del;
+    if (.%npc_barrows_owner = uid & .%npc_barrows_generation > 0 & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) {
+        if (~barrows_brother_identity(.npc_type) > 0) hint_stop;
+        .npc_del;
+    }
 }
 .npc_findallany(3_55_151_32_32, ^barrows_actor_scan_radius, 0);
 while (.npc_findnext = true) {
-    if (.%npc_barrows_owner = uid & .%npc_barrows_generation > 0 & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) .npc_del;
+    if (.%npc_barrows_owner = uid & .%npc_barrows_generation > 0 & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) {
+        if (~barrows_brother_identity(.npc_type) > 0) hint_stop;
+        .npc_del;
+    }
 }
 
 [proc,barrows_search_allowed](int $generation)(boolean)
@@ -80,6 +86,7 @@ p_stopaction;
 return(true);
 
 [proc,barrows_run_reset]
+if (~barrows_phase ! ^barrows_phase_paid) return;
 p_stopaction;
 ~barrows_generation_advance;
 %barrows_kills = 0;

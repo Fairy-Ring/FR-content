@@ -42,7 +42,10 @@ if (%barrows_generation <= 0 | $tile = null | ~barrows_inside(coord) = false | ~
 npc_add($tile, $type, $lifetime);
 %npc_barrows_owner = uid;
 %npc_barrows_generation = %barrows_generation;
+%npc_owned_timer_interval = ^barrows_owner_check_ticks;
 npc_settimer(^barrows_owner_check_ticks);
+// CANDIDATE appearance: the published hint command targets this owner's client.
+if (~barrows_brother_identity($type) > 0) hint_npc;
 return(npc_uid);
 
 // Shared melee/ranged/autocast and opted-magic gates call the same narrow guard.
@@ -55,13 +58,21 @@ mes("Someone else is fighting that.");
 return(false);
 
 [proc,barrows_actor_tick]
-if (%npc_barrows_generation <= 0) return;
+if (%npc_barrows_generation <= 0) {
+    ~npc_poison_timer;
+    return;
+}
 if (finduid(%npc_barrows_owner) = false) {
     npc_del;
     return;
 }
 def_int $phase = ~barrows_phase;
-if (~barrows_inside(coord) = false | ~barrows_inside(npc_coord) = false | %npc_barrows_generation ! %barrows_generation | ($phase ! ^barrows_phase_unlooted & $phase ! ^barrows_phase_paid)) npc_del;
+if (~barrows_inside(coord) = false | ~barrows_inside(npc_coord) = false | %npc_barrows_generation ! %barrows_generation | ($phase ! ^barrows_phase_unlooted & $phase ! ^barrows_phase_paid)) {
+    if (~barrows_brother_identity(npc_type) > 0) hint_stop;
+    npc_del;
+    return;
+}
+~npc_poison_counted_timer(^barrows_owner_check_ticks);
 
 [ai_timer,barrows_ahrim] ~barrows_actor_tick;
 [ai_timer,barrows_dharok] ~barrows_actor_tick;

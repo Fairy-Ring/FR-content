@@ -4,6 +4,7 @@
 if_close;
 if_openoverlay(null);
 cam_reset;
+hint_stop;
 
 [proc,barrows_leave]
 if (~barrows_phase = ^barrows_phase_paid) {

@@ -51,6 +51,9 @@ if (%npc_barrows_generation > 0) {
 queue*(barrows_credit_kill, 0)($generation, npc_type, $level);
 
 [proc,barrows_npc_death]
+if (%npc_barrows_generation > 0 & ~barrows_brother_identity(npc_type) > 0) {
+    if (.finduid(%npc_barrows_owner) = true) .hint_stop;
+}
 ~barrows_npc_credit;
 // Shared npc_death's Slayer path can use .npc_findhero after its arrival delay.
 if (.npc_finduid(npc_uid) = true) ~npc_default_death;

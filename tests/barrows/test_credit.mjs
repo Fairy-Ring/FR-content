@@ -383,9 +383,9 @@ await run(async () => {
     const despawnNpc = actor('barrows_rat', 3, despawnOwner.uid);
     seedActor(despawnNpc, { owner: despawnOwner.uid, generation: 151, aggressor: despawnOwner.uid, hp: 9 });
     const beforeDespawn = creditSnapshot(despawnOwner);
-    World.removeNpc(despawnNpc, -1);
-    assert.equal(despawnNpc.isActive, false, 'native despawn removes the living actor');
-    assertNoCreditRequest(despawnOwner, 'actor despawn');
+    procVoid(despawnOwner, 'barrows_remove_owned', [], despawnNpc);
+    assert.equal(despawnNpc.isActive, false, 'real Barrows removal removes the living actor');
+    assertNoCreditRequest(despawnOwner, 'real Barrows actor removal');
     assert.deepEqual(creditSnapshot(despawnOwner), beforeDespawn, 'departure/despawn itself never grants credit');
 
     const staleOwner = makePlayer('stale_replay_owner');
@@ -400,6 +400,7 @@ await run(async () => {
     capturedOldEvent.unlink();
     const capturedArgs = capturedOldEvent.args.slice();
 
+    staleOwner.setVar(playerVarIds.barrows_state, stateWord({ phase: 2, identity: 1 }));
     procVoid(staleOwner, 'barrows_run_reset', [], staleNpc);
     assert.equal(staleNpc.isActive, false, 'real run reset removes the owned actor before clearing the run');
     assert.equal(u32(staleOwner.getVar(playerVarIds.barrows_generation)), resetGeneration + 1, 'reset advances the captured generation');

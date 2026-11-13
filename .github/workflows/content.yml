@@ -151,6 +151,8 @@ jobs:
           run_test tests/barrows/test_core.mjs node --import tsx ../content/tests/barrows/test_core.mjs
           run_test tests/barrows/test_entry.mjs node --import tsx ../content/tests/barrows/test_entry.mjs
           run_test tests/barrows/test_owned.mjs node --import tsx ../content/tests/barrows/test_owned.mjs
+          run_test tests/barrows/test_poison.mjs node --import tsx ../content/tests/barrows/test_poison.mjs
+          run_test tests/barrows/test_hint.mjs node --import tsx ../content/tests/barrows/test_hint.mjs
           run_test tests/barrows/test_monsters.mjs node --import tsx ../content/tests/barrows/test_monsters.mjs
           run_test tests/barrows/test_credit.mjs node --import tsx ../content/tests/barrows/test_credit.mjs
           run_test tests/citizen-tables/test_citizen_tables.mjs node --import tsx ../content/tests/citizen-tables/test_citizen_tables.mjs
