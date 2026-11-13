@@ -288,6 +288,29 @@ anim(null, 0);
 say("Ouch!");
 ~damage_self(15); // always 15
 
+[oploc1,regicide_trap_hand_holds]
+p_delay(0);
+anim(human_reachforladder, 0);
+p_delay(0);
+mes("You crawl out of the pit.");
+if(inzone(0_36_150_50_56, 0_36_150_51_56, coord) = true) {
+    p_teleport(0_35_50_27_1);
+} else if(inzone(0_36_150_50_57, 0_36_150_51_57, coord) = true) {
+    p_teleport(0_35_50_27_5);
+} else if(inzone(0_36_150_50_43, 0_36_150_50_44, coord) = true) {
+    p_teleport(0_35_50_35_62);
+} else if(inzone(0_36_150_51_43, 0_36_150_51_44, coord) = true) {
+    p_teleport(0_35_50_39_62);
+} else if(inzone(0_36_150_9_56, 0_36_150_10_56, coord) = true) {
+    p_teleport(0_34_50_33_1);
+} else if(inzone(0_36_150_9_57, 0_36_150_10_57, coord) = true) {
+    p_teleport(0_34_50_33_5);
+} else if(inzone(0_36_150_32_56, 0_36_150_33_56, coord) = true) {
+    p_teleport(0_35_49_34_36);
+} else if(inzone(0_36_150_32_57, 0_36_150_33_57, coord) = true) {
+    p_teleport(0_35_49_34_40);
+}
+
 
 // Footprints (stage 6→7)
 [oploc1,regicide_old_camp_footprints]

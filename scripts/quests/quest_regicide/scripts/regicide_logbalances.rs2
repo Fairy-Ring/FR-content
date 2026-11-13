@@ -1,0 +1,43 @@
+// Level 45 is period-attested; no XP/failure and the delays are donor-only CANDIDATE.
+[oploc1,regicide_logbalance1_start] @regicide_logbalance(2200);
+[oploc1,regicide_logbalance2_start] @regicide_logbalance(2261);
+
+[oploc1,regicide_logbalance3_start]
+if(stat(agility) < 45) {
+    mes("You need to be level 45 agility to cross this log.");
+    return;
+}
+def_int $dz = -2;
+if(coordz(loc_coord) < 3235) {
+    $dz = 2;
+}
+~set_readywalk_bas(human_walk_logbalance_ready, human_walk_logbalance);
+sound_synth(log_balance, 2, 0);
+~forcemove(loc_coord);
+~forcemove(movecoord(coord, 0, 0, $dz));
+sound_synth(log_balance, 2, 0);
+~forcemove(movecoord(coord, 0, 0, $dz));
+p_delay(0);
+sound_synth(log_balance, 2, 0);
+~forcemove(movecoord(coord, 0, 0, $dz));
+~update_bas;
+
+[label,regicide_logbalance](int $center_coord)
+if(stat(agility) < 45) {
+    mes("You need to be level 45 agility to cross this log.");
+    return;
+}
+def_int $dx = -2;
+if(coordx(loc_coord) < $center_coord) {
+    $dx = 2;
+}
+~set_readywalk_bas(human_walk_logbalance_ready, human_walk_logbalance);
+sound_synth(log_balance, 2, 0);
+~forcemove(loc_coord);
+~forcemove(movecoord(coord, divide($dx, 2), 0, 0));
+sound_synth(log_balance, 2, 0);
+~forcemove(movecoord(coord, $dx, 0, 0));
+p_delay(0);
+sound_synth(log_balance, 2, 0);
+~forcemove(movecoord(coord, $dx, 0, 0));
+~update_bas;
