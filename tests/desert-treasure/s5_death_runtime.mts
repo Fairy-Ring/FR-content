@@ -253,12 +253,20 @@ const shade = actor("shade_level1");
 shade.heroPoints.addHero(999n, 85);
 shade.heroPoints.addHero(hero.hash64, 15);
 assert.equal(World.getPlayerByHash64(999n), undefined);
-console.log("EXPECTED inherited abort: published shade_level1; offline hero999 damage85, online last attacker101 damage15");
-const inherited = death(shade);
-assert.equal(inherited.execution, ScriptState.ABORTED);
-assert.match(inherited.script.name, /check_progress_task/);
-assert.equal(inherited.intOperand, 1, "failing opcode accesses secondary NPC");
-assert.equal(inherited._activeNpc, shade, "primary NPC was not lost or rebound");
-assert.equal(inherited._activeNpc2, null, "published path has no secondary NPC");
-assert.equal(shade.isActive, true, "inherited abort prevents native removal");
-console.log("PASS published offline-hero control reproduces inherited secondary-NPC abort before removal");
+const countBeforeShade = hero.getVarBit(countBit);
+const published = death(shade);
+assert.equal(published.execution, ScriptState.FINISHED, "published offline-hero death completes");
+assert.match(published.script.name, /shade/);
+assert.equal(published._activeNpc, shade, "primary NPC was not lost or rebound");
+assert.equal(published._activeNpc2, null, "published path needs no secondary NPC");
+assert.equal(shade.isActive, false, "native removal completes with an offline winning hero");
+assert(shade.lifecycleTick > 0, "native respawn lifecycle is scheduled");
+assert.equal(hero.getVarBit(countBit), countBeforeShade, "published shade path awards no S5 credit");
+assert(![...hero.queue.all()].some(request => request.script.name.includes("dt_ice")),
+  "published shade path queues no S5 handler");
+console.log("PASS published offline-hero shade control", {
+  execution: published.execution, script: published.script.name,
+  active: shade.isActive, lifecycleTick: shade.lifecycleTick,
+  primaryNpc: published._activeNpc === shade, secondaryNpc: published._activeNpc2,
+  iceCountBefore: countBeforeShade, iceCountAfter: hero.getVarBit(countBit),
+});
