@@ -2575,7 +2575,7 @@ stock5=wilderness_cape_50,100,100
 
 [smithing_lamp_iron]
 size=1
-stock1=oil_lantern_frame,1
+stock0=oil_lantern_frame,1
 
 [smithing_lamp_steel]
 size=1
