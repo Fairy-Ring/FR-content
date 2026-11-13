@@ -197,6 +197,7 @@ jobs:
           run_test tests/splitbark-service/test_splitbark_service.mjs node --import tsx ../content/tests/splitbark-service/test_splitbark_service.mjs
           run_test tests/small-repairs/test_r1_chill.mjs node --import tsx ../content/tests/small-repairs/test_r1_chill.mjs
           run_test tests/small-repairs/test_r2_eblis.mjs node --import tsx ../content/tests/small-repairs/test_r2_eblis.mjs
+          run_test tests/small-repairs/test_r3_cat_scroll.mjs node --import tsx ../content/tests/small-repairs/test_r3_cat_scroll.mjs
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           exit "$failed"
