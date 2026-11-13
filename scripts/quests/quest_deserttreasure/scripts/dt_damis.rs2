@@ -6,10 +6,12 @@
 if (inzone(^dt_damis_approach_sw, ^dt_damis_approach_ne, coord) = false) return;
 if (%deserttreasure < ^dt_stage_hunts | %fd_shadowwarrior_quest < ^dt_shadow_substate_cross_returned_ring_awarded) return;
 if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_damis_defeated) {
-    if (%fd_shadowwarrior_quest = ^dt_shadow_substate_damis_defeated & ~dt_damis_ground = true) return;
     if (~obj_gettotal(fd_dark_diamond) > 0 | %fd_column_shadow = ^dt_column_placed) return;
-    // CANDIDATE Shadow diamond page: loss/re-entry is another encounter, never a Rasolo grant.
-    %fd_shadowwarrior_quest = ^dt_shadow_substate_cross_returned_ring_awarded;
+    if (~dt_damis_ground = true) return;
+    // VERIFIED period-guide statement: src.dt-zybez-20060220#HTML307, diamond reappears without a re-fight.
+    // CANDIDATE trigger/tile: shadow-reconstruction-s3. Lifetime: UNKNOWN shadow-engineering-constants-s3.
+    obj_add(^dt_damis_spawn, fd_dark_diamond, 1, ^lootdrop_duration);
+    return;
 }
 ~dt_damis_spawn;
 
@@ -47,14 +49,18 @@ return(false);
 if (~dt_damis_alive = true) return;
 def_npc $form = fd_damis_normal;
 if (%fd_shadowwarrior_quest = ^dt_shadow_substate_cross_returned_ring_awarded) {
+    // CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#664.
     mes("A voice seems to come from the walls around you;");
+    // CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#665.
     mes("'You... do not be... long in this... place...");
+    // CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#666.
     mes("Turn... back now, or... prepare... to meet your... doom...'");
 }
 if (%fd_shadowwarrior_quest = ^dt_shadow_substate_damis_second_form) $form = fd_damis_tougher;
 else %fd_shadowwarrior_quest = ^dt_shadow_substate_damis_first_form;
 npc_add(^dt_damis_spawn, $form, ^dt_damis_lifetime);
 %npc_aggressive_player = uid;
+// CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#668.
 if ($form = fd_damis_normal) npc_say("You should... have listened to me!");
 npc_setmode(opplayer2);
 
@@ -103,8 +109,10 @@ if (inzone(0_41_79_0_0, 0_42_79_63_63, coord) = false) npc_del;
 
 [ai_queue3,fd_damis_normal] @dt_damis_first_death;
 [label,dt_damis_first_death]
+// CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#671.
 npc_say("This armour... is for restraint, not... protection...");
-npc_delay(2);
+npc_delay(^dt_damis_first_death_gap);
+// CANDIDATE wording: desert-treasure.dlg.shadow-hunt; src.dt-osrs-transcript-dt1#672.
 npc_say("Now I show... you... my true... power!");
 gosub(npc_death);
 if (npc_findhero = ^true) {
@@ -135,8 +143,8 @@ if (%fd_shadowwarrior_quest ! ^dt_shadow_substate_damis_second_form) return;
 if (~obj_gettotal(fd_dark_diamond) = 0 & %fd_column_shadow ! ^dt_column_placed) obj_add($ground, fd_dark_diamond, 1, ^lootdrop_duration);
 
 [opobj3,fd_dark_diamond]
-// No extra dialogue: lost-ground recovery/re-entry wording is not recovered.
-if (%fd_shadowwarrior_quest ! ^dt_shadow_substate_damis_defeated) return;
+// Recovery has no extra dialogue. Only native Take transfers an original or recovered diamond.
+if (%fd_shadowwarrior_quest < ^dt_shadow_substate_damis_defeated | %fd_shadowwarrior_quest > ^dt_shadow_substate_diamond_claimed) return;
 if (~obj_gettotal(fd_dark_diamond) > 0 | %fd_column_shadow = ^dt_column_placed) return;
 if (~pickup_obj_check_for_space(obj_type, obj_count) = false) return;
 anim(null, 0);

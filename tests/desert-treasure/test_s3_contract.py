@@ -66,6 +66,21 @@ def constants(text_value: str) -> dict[str, str]:
     return dict(re.findall(r"(?m)^\s*\^([A-Za-z0-9_]+)\s*=\s*([^\s/]+)", active(text_value)))
 
 
+def branch(body: str, condition: str) -> str:
+    """Read one braced branch, including nested braces, without matching dead comments."""
+    marker = f"if ({condition}) {{"
+    start = body.find(marker)
+    if start < 0:
+        return ""
+    start += len(marker)
+    depth = 1
+    for end in range(start, len(body)):
+        depth += (body[end] == "{") - (body[end] == "}")
+        if depth == 0:
+            return body[start:end].strip()
+    return ""
+
+
 def check_shadow(shadow: str, shadow_constants: str, shared_constants: str) -> None:
     parts = sections(shadow)
     values = constants(shadow_constants)
@@ -99,6 +114,18 @@ def check_shadow(shadow: str, shadow_constants: str, shared_constants: str) -> N
     require(ring_total in after and "inv_add(inv, fd_ring_visibility, 1)" in after, "Rasolo can reissue a missing ring")
     require("inv_freespace(inv)" in after, "ring reissue checks inventory capacity")
     require("bank" in shadow.lower() and "worn" in shadow.lower(), "ring total includes inventory, bank and worn storage")
+    lost_ring = branch(after, "~obj_gettotal(fd_ring_visibility) = 0")
+    require(bool(lost_ring) and lost_ring.endswith("return;"), "lost-ring replacement ends without the extra lair page")
+    standard = require_section(parts, "label", "dt_rasolo_standard")
+    require(
+        re.search(r"if \(%deserttreasure < \^dt_stage_hunts \| %fd_shadowwarrior_quest >= \^dt_shadow_substate_diamond_claimed\) @dt_rasolo_standard;", rasolo) is not None,
+        "diamond-claimed Rasolo talk routes to the same standard greeting as outside the hunt",
+    )
+    require(
+        '~p_choice2("Yes", 1, "No", 2)' in standard and "@dt_rasolo_shop" in standard
+        and "Diamonds of Azzanadra" not in standard and "Not yet" not in standard,
+        "standard Rasolo dialogue retains only the existing greeting and shop menu",
+    )
     require("obj_gettotal(fd_sword_cross)" in cross and "fd_sword_cross" in cross, "chest refuses a cross already held or banked")
     require("inv_add(inv, fd_sword_cross, 1)" in cross, "chest awards the cross only after the duplicate check")
 
@@ -109,6 +136,23 @@ def check_shadow(shadow: str, shadow_constants: str, shared_constants: str) -> N
     require("inv_total(inv, lockpick) = 0" in pick, "chest refuses to proceed without a lockpick")
     require("inv_add" not in pick and "obj_add" not in pick, "missing-lockpick branch grants no item")
     require(values.get("dt_shadow_locks_required") == "3", "chest has exactly three locks")
+    require(
+        '~p_choice2_header("Yes", 1, "No", 2, "Try to open the chest?")' in chest,
+        "chest confirmation uses the transcript menu title, not the default header",
+    )
+    for body, message, name in (
+        (pick, "You will need a lockpick for this lock.", "missing-lockpick"),
+        (cross, "You find nothing of interest inside the chest.", "already-held-cross"),
+        (cross, "Inside the chest, hidden under some rags, you find a Gilded Cross.", "cross-found"),
+    ):
+        require(
+            f'mes("{message}");' in body and f'~mesbox("{message}");' not in body,
+            f"{name} uses a game message, not a textbox",
+        )
+    require(
+        '~mesbox("Your skill as a thief allows you to see some kind of elaborate booby trapped locking mechanism on this chest.");' in chest,
+        "only the chest trap introduction retains its transcript textbox",
+    )
     require(values.get("dt_shadow_lock_low") == "52" and values.get("dt_shadow_lock_high") == "128", "each lock uses the 52-128 Thieving roll")
     require("while ($lock < ^dt_shadow_locks_required)" in pick and "stat_random(thieving, ^dt_shadow_lock_low, ^dt_shadow_lock_high)" in pick, "explicit three-iteration loop makes independent lock rolls")
     require("$lock = add($lock, 1)" in pick, "each successful lock advances the independent roll counter")
@@ -149,6 +193,29 @@ def check_damis(damis: str, shared_constants: str, shadow_constants: str, npc_so
     shared = constants(shared_constants)
     values = constants(shadow_constants)
     npcs = npc_configs(npc_source)
+    approach = require_section(parts, "queue", "dt_damis_approach")
+    recovery = branch(approach, "%fd_shadowwarrior_quest >= ^dt_shadow_substate_damis_defeated")
+    require(bool(recovery), "defeated and claimed states have a dedicated loss-recovery branch")
+    require(
+        "if (~obj_gettotal(fd_dark_diamond) > 0 | %fd_column_shadow = ^dt_column_placed) return;" in recovery,
+        "loss recovery keeps held, banked and column-placed diamond guards",
+    )
+    require(
+        "if (~dt_damis_ground = true) return;" in recovery
+        and "%fd_shadowwarrior_quest = ^dt_shadow_substate_damis_defeated" not in recovery,
+        "both defeated and claimed recovery preserve a visible owner ground diamond",
+    )
+    require(
+        "obj_add(^dt_damis_spawn, fd_dark_diamond, 1, ^lootdrop_duration);" in recovery
+        and recovery.count("obj_add(") == 1,
+        "loss recovery recreates exactly one owner-only ground diamond",
+    )
+    require(
+        not re.search(r"%fd_shadowwarrior_quest\s*=(?!=)", recovery)
+        and "dt_damis_spawn;" not in recovery and "inv_add" not in recovery
+        and recovery.endswith("return;"),
+        "loss recovery preserves state 5 or 6 and returns without a Damis re-fight or inventory grant",
+    )
 
     server_fields = {
         "fd_damis_normal": {
@@ -215,9 +282,13 @@ def check_damis(damis: str, shared_constants: str, shadow_constants: str, npc_so
     require("~obj_gettotal(fd_dark_diamond) = 0" in award_queue and "%fd_column_shadow ! ^dt_column_placed" in award_queue, "ground drop is unique and suppressed after placement")
     require(award_queue.index("^dt_shadow_substate_damis_defeated") < award_queue.index("obj_add"), "state 5 is written before the owned ground drop")
     require("inv_add" not in award_queue, "second-form reward never adds the diamond to inventory")
-    require("^dt_shadow_substate_damis_defeated" in pickup and "obj_takeitem" in pickup, "pickup requires state 5 and takes the ground object")
-    require("^dt_shadow_substate_diamond_claimed" in pickup, "pickup advances to state 6 after taking the diamond")
-    require(pickup.index("obj_takeitem") < pickup.index("^dt_shadow_substate_diamond_claimed"), "state 6 is written only after obj_takeitem")
+    require(
+        "if (%fd_shadowwarrior_quest < ^dt_shadow_substate_damis_defeated | %fd_shadowwarrior_quest > ^dt_shadow_substate_diamond_claimed) return;" in pickup
+        and "obj_takeitem" in pickup,
+        "native Take accepts original or recovered ground diamonds at states 5 and 6 only",
+    )
+    require("%fd_shadowwarrior_quest = ^dt_shadow_substate_diamond_claimed;" in pickup, "pickup advances to state 6 after taking the diamond")
+    require(pickup.index("obj_takeitem") < pickup.index("%fd_shadowwarrior_quest = ^dt_shadow_substate_diamond_claimed;"), "state 6 is written only after obj_takeitem")
 
     require("stat_sub(prayer, add(^dt_damis_prayer_min, random(^dt_damis_prayer_spread)), 0)" in hit, "each tougher hit drains a random 4-6 Prayer points, including zero damage")
     require("npc_default_attack" in hit and "%npc_action_delay <= $before" in hit and "npc_stat(hitpoints) = 0" in hit, "Prayer drain follows a live actual-hit path, even for zero damage")

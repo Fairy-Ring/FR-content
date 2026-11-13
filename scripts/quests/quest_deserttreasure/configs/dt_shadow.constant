@@ -5,7 +5,7 @@
 ^dt_shadow_lock_low = 52
 ^dt_shadow_lock_high = 128
 ^dt_shadow_chest_xp = 1500
-// CANDIDATE: no period odds survive. Equal poison/no-poison outcomes preserve the sourced risk.
+// UNKNOWN shadow-engineering-constants-s3: poison_probability=1/2 is an engineering default, not recovered odds.
 ^dt_shadow_poison_chance = 2
 // Shared poison uses ceil(severity / 5). Severity 30 produces a first poison hit of 6.
 ^dt_shadow_poison_severity = 30
@@ -18,9 +18,13 @@
 ^dt_damis_spawn = 0_42_79_49_32
 ^dt_damis_approach_sw = 0_42_79_48_24
 ^dt_damis_approach_ne = 0_42_79_55_39
-// CANDIDATE encounter lifetime, not a recovered period despawn timer.
+// UNKNOWN shadow-engineering-constants-s3: lifetime_ticks=1000 is an engineering default.
 ^dt_damis_lifetime = 1000
-// CANDIDATE period RuneHQ effect: 4-6 Prayer per hit including zero damage.
-// Conflicts with later 5%+1 per tick in melee distance; period evidence takes precedence.
+// UNKNOWN shadow-engineering-constants-s3: first_death_gap_ticks=2 is an engineering default.
+^dt_damis_first_death_gap = 2
+// UNKNOWN same fact: all.npc uses cleanup_timer_ticks=1, maxrange_tiles=64, attackrange_tiles=1, wanderrange_tiles=0.
+// UNKNOWN same fact: inherited lootdrop_duration=200 ticks controls original and recovered ground diamonds.
+// CANDIDATE: only src.dt-runehq-20060424#HTML522 gives 4-6 per hit including zero; absent in its 20051105 capture.
+// Conflicts with Zybez 20060220#HTML285 (50 Prayer in about six seconds) and the later 5%+1 per-tick rule.
 ^dt_damis_prayer_min = 4
 ^dt_damis_prayer_spread = 3

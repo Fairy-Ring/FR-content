@@ -1,11 +1,7 @@
 // CANDIDATE wording: desert-treasure.dlg.shadow-hunt (r15343078).
 // State encodings are the accepted product contract, not recovered 377 writers.
 [opnpc1,shadow_warrior_rasool]
-if (%deserttreasure < ^dt_stage_hunts) {
-    ~chatnpc("Greetings friend. I am Rasolo, the famous merchant. Would you care to see my wares?");
-    if (~p_choice2("Yes", 1, "No", 2) = 1) @dt_rasolo_shop;
-    return;
-}
+if (%deserttreasure < ^dt_stage_hunts | %fd_shadowwarrior_quest >= ^dt_shadow_substate_diamond_claimed) @dt_rasolo_standard;
 if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_cross_returned_ring_awarded) @dt_rasolo_after;
 if (%fd_shadowwarrior_quest = ^dt_shadow_substate_rasolo_agreed) {
     if (inv_total(inv, fd_sword_cross) > 0) @dt_rasolo_cross;
@@ -28,6 +24,11 @@ def_int $intro = ~p_choice3("Yes", 1, "No", 2, "Ask about the Diamonds of Azzana
 if ($intro = 1) @dt_rasolo_shop;
 if ($intro = 3) @dt_rasolo_diamonds;
 return;
+
+[label,dt_rasolo_standard]
+// CANDIDATE: shadow-hunt, first Talk-to greeting/shop; transcript reverts here after the diamond.
+~chatnpc("Greetings friend. I am Rasolo, the famous merchant. Would you care to see my wares?");
+if (~p_choice2("Yes", 1, "No", 2) = 1) @dt_rasolo_shop;
 
 [label,dt_rasolo_shop]
 ~openshop_activenpc;
@@ -109,6 +110,7 @@ if (~obj_gettotal(fd_ring_visibility) = 0) {
     ~chatplayer("I lost that ring you gave me...");
     ~chatnpc("Then by all means, take another. Only a foolish merchant would give away his only stock!");
     if (~obj_gettotal(fd_ring_visibility) = 0 & inv_freespace(inv) > 0) inv_add(inv, fd_ring_visibility, 1);
+    return;
 }
 ~chatnpc("Well, his lair is very close to here. I suggest you look around for it.");
 
@@ -123,13 +125,13 @@ if (%fd_banditchest_disarmed = ^dt_flag_on) {
 // No recovered Shadow refusal. Shared attempt_locked_chest cannot be reused without granting its unrelated loot.
 if (stat(thieving) < ^dt_shadow_thieving_required) return;
 ~mesbox("Your skill as a thief allows you to see some kind of elaborate booby trapped locking mechanism on this chest.");
-if (~p_choice2("Yes", 1, "No", 2) = 1) @dt_shadow_pick;
+if (~p_choice2_header("Yes", 1, "No", 2, "Try to open the chest?") = 1) @dt_shadow_pick;
 return;
 
 [label,dt_shadow_pick]
 if (stat(thieving) < ^dt_shadow_thieving_required | %fd_shadowwarrior_quest ! ^dt_shadow_substate_rasolo_agreed) return;
 if (inv_total(inv, lockpick) = 0) {
-    ~mesbox("You will need a lockpick for this lock.");
+    mes("You will need a lockpick for this lock.");
     return;
 }
 def_int $lock = 0;
@@ -163,12 +165,12 @@ stat_advance(thieving, ^dt_shadow_chest_xp);
 
 [proc,dt_shadow_cross]
 if (~obj_gettotal(fd_sword_cross) > 0) {
-    ~mesbox("You find nothing of interest inside the chest.");
+    mes("You find nothing of interest inside the chest.");
     return;
 }
 if (inv_freespace(inv) = 0) return;
 inv_add(inv, fd_sword_cross, 1);
-~mesbox("Inside the chest, hidden under some rags, you find a Gilded Cross.");
+mes("Inside the chest, hidden under some rags, you find a Gilded Cross.");
 
 [proc,dt_shadow_visibility]
 if (inv_total(worn, fd_ring_visibility) > 0) %fd_ladder_present = ^dt_flag_on;
