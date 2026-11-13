@@ -56,7 +56,7 @@ export async function loadPackedRuntime(options = {}) {
   const loadDefault = async relative => (await eng(relative)).default;
   const [World, Player, Npc, Loc, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType, VarBitType,
     VarNpcType, LocType, NpcType, EnumType, DbRowType, DbTableType, DbTableIndex, InvType, ObjType, FontType, ParamType, SeqType, Component, JavaRandom,
-    { EntityLifeCycle }, { BlockWalk }, { CoordGrid }, { allocateIfAbsent }] = await Promise.all([
+    { EntityLifeCycle }, { NpcMode }, { BlockWalk }, { CoordGrid }, { allocateIfAbsent }] = await Promise.all([
     loadDefault('src/engine/World.ts'),
     loadDefault('src/engine/entity/Player.ts'),
     loadDefault('src/engine/entity/Npc.ts'),
@@ -81,6 +81,7 @@ export async function loadPackedRuntime(options = {}) {
     loadDefault('src/cache/config/Component.ts'),
     loadDefault('src/util/JavaRandom.ts'),
     eng('src/engine/entity/EntityLifeCycle.js'),
+    eng('src/engine/entity/NpcMode.ts'),
     eng('src/engine/entity/BlockWalk.js'),
     eng('src/engine/CoordGrid.ts'),
     eng('src/engine/routefinder/index.ts')
@@ -91,7 +92,7 @@ export async function loadPackedRuntime(options = {}) {
   assert(ScriptProvider.load(roots.packDir) > 0, `ScriptProvider.load found no compiled scripts in ${roots.packDir}`);
   return { ...roots, World, Player, Npc, Loc, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType,
     VarBitType, VarNpcType, LocType, NpcType, EnumType, InvType, ObjType, FontType, ParamType, SeqType, Component, JavaRandom,
-    EntityLifeCycle, BlockWalk, CoordGrid, allocateIfAbsent };
+    EntityLifeCycle, NpcMode, BlockWalk, CoordGrid, allocateIfAbsent };
 }
 
 export function createRunner(runtime, { prefix = 'barrows_test', firstUid = 8100 } = {}) {

@@ -45,6 +45,10 @@ node --import tsx ../content/tests/barrows/test_owned.mjs
 
 This check executes all six packed Search handlers with native loc/NPC fixtures. It covers the original slain joins, selected/credited suppression, private immutable owner and captured generation, both shared attack gates, independent owners, cleanup and uncredited retry. Mutable combat targeting does not make a map monster an owned summon. Offline placement-radius allocation is not a terrain proof; the natural live Search supplies that evidence. Brother combat styles and special attacks remain outside this group.
 
+Each crypt summon says the exact CANDIDATE 2007-base line and immediately targets its searching owner, following the published Rashiliyia minion convention. All six packed handlers prove that a second player on the owner's tile is not targeted. The speech is an OSRS-documentation fallback, not verified 377 wording; the period Tip.It guide separately verifies the immediate-attack statement. Tunnel-door and chest presentation are not implemented here.
+
+The shared actor constructor returns a native NPC UID, or null on refusal. Presentation callers bind it with `npc_finduid` before reading or changing the active NPC; they do not assume that a proc call exports its pointer state. Its owner/generation admission and the common attackability/timer guards are unchanged.
+
 ## Monster configuration (S04)
 
 ```sh

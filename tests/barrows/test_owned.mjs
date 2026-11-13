@@ -4,7 +4,7 @@ import { createRunner, loadPackedRuntime, parseOptions, run } from './packed.mjs
 
 await run(async () => {
   const runtime = await loadPackedRuntime(parseOptions());
-  const { World, Loc, LocType, NpcType, VarPlayerType, VarNpcType, ScriptProvider, ScriptRunner, ScriptState, EntityLifeCycle, allocateIfAbsent, CoordGrid } = runtime;
+  const { World, Loc, LocType, NpcType, VarPlayerType, VarNpcType, ScriptProvider, ScriptRunner, ScriptState, EntityLifeCycle, NpcMode, allocateIfAbsent, CoordGrid } = runtime;
   for (const name of ['barrows_sarc_search', 'barrows_brother_identity', 'barrows_brother_slain', 'barrows_brother_find', 'barrows_actor_spawn', 'barrows_actor_attackable', 'barrows_actor_tick']) {
     assert(ScriptProvider.getByName(`[proc,${name}]`), `compiled S03 proc missing [proc,${name}]`);
   }
@@ -69,6 +69,9 @@ await run(async () => {
       const name = rows[index][0];
       const identity = index + 1;
       const p = player(name, identity === 6 ? 1 : identity + 1, 100 + identity);
+      const bystander = player(`${name}_bystander`);
+      bystander.x = rows[index][1] + 2;
+      bystander.z = rows[index][2];
       const type = NpcType.getId(`barrows_${name}`);
       assert.equal(procInt(p, 'barrows_brother_identity', [type]), identity, `${name} consumes its original slain-name join`);
       assert.equal(procInt(p, 'barrows_brother_slain', [identity]), 0, 'fresh identity is uncredited');
@@ -79,6 +82,10 @@ await run(async () => {
       const actor = first[0];
       assert.equal(actor.type, type, `${name} joins to its own brother`);
       assert.equal(actor.getVar(generation), 100 + identity, 'actor captures the run generation');
+      assert.equal(actor.sayMessage, 'You dare disturb my rest!', `${name} uses the sourced CANDIDATE 2007-base overhead line`);
+      assert.equal(actor.targetOp, NpcMode.OPPLAYER2, `${name} starts the published player-attack mode without a scripted delay`);
+      assert.equal(actor.target, p, `${name} targets its searching owner at spawn`);
+      assert.notEqual(actor.target, bystander, `${name} does not target the second player on the owner's tile`);
       assert.equal(actor.timerInterval, 1, 'spawn arms the one-tick native ownership timer');
       assert(Math.max(Math.abs(actor.x - rows[index][1]), Math.abs(actor.z - rows[index][2])) <= 2, 'spawn stays within the configured crypt radius');
       assert.equal(actor.level, 3, 'crypt actor stays on the crypt level');
@@ -134,7 +141,7 @@ await run(async () => {
     for (const guard of ['npc_is_attackable', 'npc_is_attackable_opt']) assert.equal(procInt(b, guard, [], mapActor), 1, 'ordinary map attribution keeps normal attackability');
 
     const tile = CoordGrid.packCoord(3, 3555, 9714);
-    procVoid(a, 'barrows_actor_spawn', [NpcType.getId('barrows_dharok'), tile, 1000]);
+    assert.notEqual(procInt(a, 'barrows_actor_spawn', [NpcType.getId('barrows_dharok'), tile, 1000]), -1, 'constructor returns the native actor handle');
     const stale = owned(a)[0];
     assert(stale, 'current generation can spawn before the stale-generation control');
     a.setVar(vars.barrows_generation, 45);
@@ -150,7 +157,7 @@ await run(async () => {
     tick(actorB);
     assert.equal(actorB.isActive, false, 'owner departure cleans its actor');
     b.x = 3556; b.z = 9714;
-    procVoid(b, 'barrows_actor_spawn', [NpcType.getId('barrows_dharok'), tile, 1000]);
+    assert.notEqual(procInt(b, 'barrows_actor_spawn', [NpcType.getId('barrows_dharok'), tile, 1000]), -1, 'present owner receives an actor handle');
     const offline = owned(b)[0];
     assert(offline, 'present owner can spawn before the logout control');
     delete World.players[b.slot];
@@ -159,9 +166,9 @@ await run(async () => {
     World.players[b.slot] = b;
     const noSpawnBefore = actors().length;
     a.setVar(vars.barrows_state, 0);
-    procVoid(a, 'barrows_actor_spawn', [NpcType.getId('barrows_dharok'), tile, 1000]);
+    assert.equal(procInt(a, 'barrows_actor_spawn', [NpcType.getId('barrows_dharok'), tile, 1000]), -1, 'idle constructor returns no actor handle');
     assert.equal(actors().length, noSpawnBefore, 'idle state cannot construct a run actor');
-    console.log('PASS S03 six compiled Searches, owner/generation binding, attack gates, independent owners and cleanup/retry');
+    console.log('PASS S03 six compiled Searches, sourced spawn text, immediate owner targeting, attack gates and cleanup/retry');
   } finally {
     for (const npc of Array.from(World.npcs)) if (npc.isActive) World.removeNpc(npc, -1);
     for (const p of players) delete World.players[p.slot];

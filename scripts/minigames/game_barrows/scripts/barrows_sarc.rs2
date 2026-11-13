@@ -15,4 +15,7 @@ def_int $identity = ~barrows_brother_identity($brother);
 if ($identity = 0 | $identity = ~barrows_tunnel_identity | ~barrows_brother_slain($identity) = true | ~barrows_brother_find($brother) = true) return;
 def_coord $spawn = map_findsquare($anchor, ^barrows_crypt_spawn_min_radius, ^barrows_crypt_spawn_radius, ^map_findsquare_lineofwalk);
 if ($spawn = null) return;
-~barrows_actor_spawn($brother, $spawn, ^barrows_crypt_summon_lifetime);
+if (npc_finduid(~barrows_actor_spawn($brother, $spawn, ^barrows_crypt_summon_lifetime)) = false) return;
+npc_say("You dare disturb my rest!");
+// Published summon convention: Rashiliyia's minions target the active player.
+npc_setmode(opplayer2);

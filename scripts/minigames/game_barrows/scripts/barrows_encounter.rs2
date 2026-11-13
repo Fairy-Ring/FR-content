@@ -35,14 +35,15 @@ return(false);
 
 // Callers choose a legal destination tile and their named lifetime. Deliberately
 // no duplicate check here: D4 twins use the same owner/generation constructor.
-[proc,barrows_actor_spawn](npc $type, coord $tile, int $lifetime)
+[proc,barrows_actor_spawn](npc $type, coord $tile, int $lifetime)(npc_uid)
 def_int $phase = ~barrows_phase;
-if ($phase ! ^barrows_phase_unlooted & $phase ! ^barrows_phase_paid) return;
-if (%barrows_generation <= 0 | $tile = null | ~barrows_inside(coord) = false | ~barrows_inside($tile) = false | ~barrows_actor_type($type) = false) return;
+if ($phase ! ^barrows_phase_unlooted & $phase ! ^barrows_phase_paid) return(null);
+if (%barrows_generation <= 0 | $tile = null | ~barrows_inside(coord) = false | ~barrows_inside($tile) = false | ~barrows_actor_type($type) = false) return(null);
 npc_add($tile, $type, $lifetime);
 %npc_barrows_owner = uid;
 %npc_barrows_generation = %barrows_generation;
 npc_settimer(^barrows_owner_check_ticks);
+return(npc_uid);
 
 // Shared melee/ranged/autocast and opted-magic gates call the same narrow guard.
 [proc,barrows_actor_attackable]()(boolean)
