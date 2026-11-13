@@ -137,6 +137,7 @@ jobs:
           }
 
           run_test tests/string-charset/check_string_charset.mjs node ../content/tests/string-charset/check_string_charset.mjs ../content
+          run_test tests/string-charset/check_string_charset.test.mjs node --test ../content/tests/string-charset/check_string_charset.test.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
