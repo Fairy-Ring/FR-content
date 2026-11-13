@@ -105,7 +105,7 @@ jobs:
       # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
       # tests/giantdwarf-intro/: CI — compiled runtime/save-load checks; no engine is started.
       # tests/content-gaps/: CI — packed configuration/trigger integration, no server.
-      # tests/elena-fence/: CI — packed map/dispatch runtime, runtime.sh starts no server.
+      # tests/drop-tables/: CI — compiled KQ ScriptRunner outcomes, no server.
       - name: Run offline content tests
         id: content_tests
         working-directory: engine
@@ -136,6 +136,7 @@ jobs:
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
           run_test tests/wanted/records.mjs node --import tsx ../content/tests/wanted/records.mjs
+          run_test tests/drop-tables/test_kalphite_queen.mjs node --import tsx ../content/tests/drop-tables/test_kalphite_queen.mjs
           run_test tests/fenkenstrain-completion/test_fenk_handlers.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_handlers.mjs
           run_test tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs
           run_test tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs
