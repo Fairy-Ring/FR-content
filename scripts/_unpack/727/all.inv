@@ -1465,6 +1465,7 @@ scope=shared
 
 [partyroom_tempinv]
 size=8
+protect=no
 
 [crafting_make_rings]
 scope=temp
