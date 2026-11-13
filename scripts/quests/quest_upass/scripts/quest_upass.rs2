@@ -573,6 +573,18 @@ switch_obj (last_useitem) {
 
 [label,open_iban_door]
 if(coordx(loc_coord) < coordx(coord)) {
+    if(%regicide_quest >= ^regicide_spoken_lathas) {
+        def_int $voyage_dz = 64;
+        // m31_73:9223 rockslide3_upass blocks the donor left landing at 30,39.
+        if(loc_type = upass_templedoor_closed_left) $voyage_dz = 65;
+        mes("You pull open the large doors...");
+        loc_change(loc_param(next_loc_stage), 5);
+        sound_synth(door_open, 1, 0);
+        p_teleport(movecoord(loc_coord, 1, 0, 0));
+        p_delay(0);
+        p_teleport(movecoord(coord, -130, 0, $voyage_dz));
+        return;
+    }
     if(inv_total(worn, zamrobetop) = 0 | inv_total(worn, zamrobebottom) = 0 | inv_freespace(worn) ! calc(inv_size(worn) - 2)) {
         mes("The door refuses to open...");
         p_delay(1);
@@ -616,6 +628,9 @@ if(coordx(loc_coord) < coordx(coord)) {
     mes("...And walk out of the temple.");
     sound_synth(door_open, 1, 0);
     ~forcemove(movecoord(loc_coord, 2, 0, 0));
+    if(%regicide_quest >= ^regicide_spoken_lathas) {
+        p_teleport(movecoord(coord, 128, 0, -64));
+    }
 }
 
 [opheld1,ibandoll]

@@ -493,6 +493,121 @@ check('tent door switches between the king-quarters and Hining-pavilion guard li
   }
 });
 
+check('open_iban_door preserves both exact stage-1 refusals without moving', () => {
+  const entries = [
+    ['upass_templedoor_closed_right', '_33_72_31_40'],
+    ['upass_templedoor_closed_left', '_33_72_31_39']
+  ].map(([name, coord]) => {
+    const row = nativeLocRows(name).find(candidate => candidate.coord.endsWith(coord));
+    assert.ok(row, `native entry door placement required: ${name} ${coord}`);
+    return row;
+  });
+  const wornId = requiredId(types.InvType, 'worn');
+  const zamorakTop = requiredId(types.ObjType, 'zamrobetop');
+  const zamorakBottom = requiredId(types.ObjType, 'zamrobebottom');
+  for (const row of entries) {
+    const start = approachOnSide(row, 'x', 1, true);
+    for (const wearRobes of [false, true]) {
+      const player = playerAt(start);
+      varp(player, 'regicide_quest', constant('regicide_received_message'));
+      varp(player, 'upass', constant('upass_complete'));
+      if (wearRobes) {
+        const worn = player.getInventory(wornId);
+        worn.add(zamorakTop, 1);
+        worn.add(zamorakBottom, 1);
+        assert.equal(worn.itemsFiltered.length, 2, 'only the named Zamorak top and bottom are worn');
+      }
+      const stageBefore = varp(player, 'regicide_quest');
+      const bitsBefore = varp(player, 'regicide_bits');
+      startLoc(player, row, `[oploc1,${row.name}]`);
+      assert.deepEqual(tileOf(player), start, `${row.name} stage-1 refusal leaves the player in place`);
+      assert.equal(
+        text(player),
+        wearRobes
+          ? 'The temple is in ruins... ...You cannot enter.'
+          : 'The door refuses to open... Only followers of Zamorak may enter.',
+        `${row.name} preserves the exact ${wearRobes ? 'temple-ruins' : 'followers-of-Zamorak'} refusal text`
+      );
+      assertStageUnchanged(player, stageBefore, 'stage-1 door refusal');
+      assert.equal(varp(player, 'regicide_bits'), bitsBefore, `${row.name} refusal does not write Regicide bits`);
+    }
+  }
+});
+check('open_iban_door stage 2 enters mapped well-room tiles through both native doors without quest writes', () => {
+  const entries = [
+    ['upass_templedoor_closed_right', '_33_72_31_40', '_31_73_31_40'],
+    ['upass_templedoor_closed_left', '_33_72_31_39', '_31_73_31_39']
+  ].map(([name, coord, roomCoord]) => {
+    const row = nativeLocRows(name).find(candidate => candidate.coord.endsWith(coord));
+    const roomDoor = nativeLocRows(name).find(candidate => candidate.coord.endsWith(roomCoord));
+    assert.ok(row, `native entry door placement required: ${name} ${coord}`);
+    assert.ok(roomDoor, `native well-room door placement required: ${name} ${roomCoord}`);
+    return { row, roomDoor };
+  });
+  assert.ok(packed('[label,open_iban_door]'), 'the shared native door label is packed');
+  for (const { row, roomDoor } of entries) {
+    const start = approachOnSide(row, 'x', 1, true);
+    const destination = [roomDoor.level, roomDoor.x - 1, roomDoor.z + (row.name === 'upass_templedoor_closed_left' ? 1 : 0)];
+    assert.deepEqual(destination, [roomDoor.level, 2014, 4712], `${row.name} maps to the clear interior well-room tile`);
+    const player = playerAt(start);
+    const worn = player.getInventory(requiredId(types.InvType, 'worn'));
+    assert.equal(worn.getItemCount(requiredId(types.ObjType, 'zamrobetop')), 0, 'no Zamorak top is worn');
+    assert.equal(worn.getItemCount(requiredId(types.ObjType, 'zamrobebottom')), 0, 'no Zamorak bottom is worn');
+    varp(player, 'regicide_quest', constant('regicide_spoken_lathas'));
+    varp(player, 'upass', constant('upass_complete'));
+    const stageBefore = varp(player, 'regicide_quest');
+    const bitsBefore = varp(player, 'regicide_bits');
+    startLoc(player, row, `[oploc1,${row.name}]`);
+    assert.deepEqual(tileOf(player), destination, `${row.name} lands at the mapped room tile`);
+    walkable(destination, `${row.name} well-room landing`);
+    assert.equal(text(player), 'You pull open the large doors...', `${row.name} preserves the outbound door message`);
+    assertStageUnchanged(player, stageBefore, 'completed Underground Pass entry');
+    assert.equal(varp(player, 'regicide_bits'), bitsBefore, `${row.name} does not write Regicide bits`);
+  }
+});
+
+check('open_iban_door returns from both native well-room doors to mapped temple tiles', () => {
+  const returns = [
+    ['upass_templedoor_closed_right', '_31_73_31_40', '_33_72_31_40'],
+    ['upass_templedoor_closed_left', '_31_73_31_39', '_33_72_31_39']
+  ].map(([name, roomCoord, templeCoord]) => {
+    const row = nativeLocRows(name).find(candidate => candidate.coord.endsWith(roomCoord));
+    const templeDoor = nativeLocRows(name).find(candidate => candidate.coord.endsWith(templeCoord));
+    assert.ok(row, `native return door placement required: ${name} ${roomCoord}`);
+    assert.ok(templeDoor, `native temple door placement required: ${name} ${templeCoord}`);
+    return { row, templeDoor };
+  });
+  for (const { row, templeDoor } of returns) {
+    const roomSide = [row.level, row.x - 1, row.z + (row.name === 'upass_templedoor_closed_left' ? 1 : 0)];
+    assert.ok(floorTiles.has(roomSide.join(',')), `${row.name} room-side tile has a map floor`);
+    if (row.name === 'upass_templedoor_closed_left') {
+      assert.equal(map.isMapBlocked(roomSide[1], roomSide[2], roomSide[0]), false, 'the paired left-entry offset lands clear of rockslide3_upass');
+      assert.equal(reachable(roomSide, row), false, 'the left return door is not reached by real loc interaction geometry');
+      const westApproaches = allCandidateTiles(row, 8).filter(tile => tile[1] < row.x && tile[2] === roomSide[2]);
+      assert.equal(westApproaches.length, 0, 'no collision-free west-side path reaches the left return door');
+    } else {
+      assert.ok(reachable(roomSide, row), 'right return door is reachable from its room-side tile');
+      const westApproaches = allCandidateTiles(row, 8).filter(tile => tile[1] < row.x && tile[2] === roomSide[2]);
+      assert.ok(westApproaches.some(tile => tile[1] === roomSide[1]), 'right return door has a collision-free west-side path');
+      walkable(roomSide, `${row.name} room-side approach`);
+    }
+    const player = playerAt(roomSide);
+    const destination = [templeDoor.level, templeDoor.x + 2, templeDoor.z];
+    varp(player, 'regicide_quest', constant('regicide_spoken_lathas'));
+    varp(player, 'upass', constant('upass_complete'));
+    const stageBefore = varp(player, 'regicide_quest');
+    const bitsBefore = varp(player, 'regicide_bits');
+    // Left return is a direct packed invocation, not a claim of reachable native dispatch.
+    startLoc(player, row, `[oploc1,${row.name}]`);
+    assert.deepEqual(tileOf(player), destination, `${row.name} return lands using the native row and paired remap`);
+    walkable(destination, `${row.name} temple-side return landing`);
+    assert.equal(text(player), 'You pull open the large doors. ...And walk out of the temple.', `${row.name} preserves the return messages`);
+    assertStageUnchanged(player, stageBefore, 'completed Underground Pass return');
+    assert.equal(varp(player, 'regicide_bits'), bitsBefore, `${row.name} return does not write Regicide bits`);
+  }
+});
+
+
 check('General Hining changes his Talk-to lines only after stage 11', () => {
   const hining = spawnNpc(nativeNpc('regicide_general_hining'));
   for (const [stage, expected, absent] of [
