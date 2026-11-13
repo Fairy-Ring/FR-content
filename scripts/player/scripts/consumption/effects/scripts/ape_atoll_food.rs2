@@ -5,7 +5,7 @@
 
 [label,consume_ape_atoll_food](int $heal)
 mes("You eat the <lowercase(oc_name(last_item))>.");
-sound_synth(eat, 1, 0);
+sound_synth(eat, 0, 0);
 anim(human_eat, 0);
 if (oc_param(last_item, next_obj_stage) ! null) {
     inv_setslot(inv, last_slot, oc_param(last_item, next_obj_stage), 1);

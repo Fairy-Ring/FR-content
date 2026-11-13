@@ -28,6 +28,8 @@ for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType'
     types[name] = await load(`cache/config/${name}.ts`);
     types[name].load(pack);
 }
+const DbTableIndex = await load('cache/config/DbTableIndex.ts');
+DbTableIndex.init();
 assert.ok(fs.existsSync(path.join(scriptPack, 'server/script.dat')), `full compiled server pack required at ${scriptPack}`);
 assert.ok(ScriptProvider.load(scriptPack) > 0, 'ScriptProvider.load returned no compiled scripts');
 
@@ -38,6 +40,11 @@ const invId = types.InvType.getId('inv');
 const eatDelayVarp = types.VarPlayerType.getId('eat_delay');
 const actionDelayVarp = types.VarPlayerType.getId('action_delay');
 const humanEat = types.SeqType.getId('human_eat');
+const kegDrink = types.SeqType.getId('viking_keg_drink_full');
+const soundIds = new Map([...fs.readFileSync(path.join(content, 'pack/synth.pack'), 'utf8').matchAll(/^(\d+)=(.+)$/gm)].map(match => [match[2].trim(), Number(match[1])]));
+const eatSound = soundIds.get('eat');
+const liquidSound = soundIds.get('liquid');
+assert.ok(kegDrink >= 0 && Number.isInteger(eatSound) && Number.isInteger(liquidSound), 'missing revision-377 keg or food presentation assets');
 const bowlId = types.ObjType.getId('bowl_empty');
 const breadId = types.ObjType.getId('bread');
 for (const [name, id] of [['inventory', invId], ['eat_delay', eatDelayVarp], ['action_delay', actionDelayVarp], ['human_eat', humanEat], ['bowl_empty', bowlId], ['bread', breadId]]) {
@@ -147,12 +154,20 @@ function assertDelays(p, tick, actionDelay = 3) {
     assert.equal(p.vars[actionDelayVarp], actionDelay, 'published three-tick action delay');
 }
 function assertPresentation(p, item, expectedCount = 1) {
-    assert.equal(p.animations.length, expectedCount, `${item.name} plays one eat animation per successful Eat/Drink`);
-    assert.ok(p.animations.every(({ anim, delay }) => anim === humanEat && delay === 0), `${item.name} uses the published human_eat animation`);
+    const isKeg = item.name === 'keg_of_beer';
+    const animation = isKeg ? kegDrink : humanEat;
+    assert.equal(p.animations.length, expectedCount, `${item.name} plays one consumption animation per successful Eat/Drink`);
+    assert.ok(p.animations.every(({ anim, delay }) => anim === animation && delay === 0), `${item.name} uses its exact packed consumption animation`);
     const sounds = p.packets.filter(packet => packet.constructor?.name === 'SynthSound');
-    assert.equal(sounds.length, expectedCount, `${item.name} emits one consumption sound per successful Eat/Drink`);
-    const genericLines = p.messages.filter(text => /^You (?:eat|drink) the /i.test(text));
-    assert.equal(genericLines.length, expectedCount, `${item.name} uses the generic consumption message`);
+    assert.equal(sounds.length, expectedCount * (isKeg ? 2 : 1), `${item.name} emits its exact consumption sound count`);
+    assert.ok(sounds.every(packet => packet.synth === (isKeg ? liquidSound : eatSound) && packet.loops === (isKeg ? 1 : 0) && packet.delay === 0), `${item.name} emits its exact packed sound`);
+    if (isKeg) {
+        assert.equal(p.messages.filter(text => text === 'You chug the keg. You feel reinvigorated...').length, expectedCount);
+        assert.equal(p.messages.filter(text => text === '...but extremely drunk too.').length, expectedCount);
+    } else {
+        const genericLines = p.messages.filter(text => /^You (?:eat|drink) the /i.test(text));
+        assert.equal(genericLines.length, expectedCount, `${item.name} uses the generic consumption message`);
+    }
 }
 function assertItemOutcome(item, { hp = 40, baseHp = 99, random = 0.5 } = {}) {
     const isKeg = item.name === 'keg_of_beer';
@@ -247,7 +262,7 @@ function assertPublishedFoodControl() {
     const tick = freshTick();
     const script = eat(p, bread);
     assert.ok(script, 'published bread opheld1 trigger is present');
-    assert.equal(p.levels[HITPOINTS], 45, 'published bread still heals five hitpoints');
+    assert.equal(p.levels[HITPOINTS], 44, 'published bread still heals its table value of four hitpoints');
     assert.equal(inventory(p).getItemCount(bread.id), 0, 'published bread is still consumed');
     assertContents(p, [], 'published bread leaves no container');
     assertDelays(p, tick);
