@@ -14,7 +14,10 @@ if (p_finduid(uid) = false) {
 }
 def_obj $obj;
 def_int $int;
-$obj, $int = ~skillmulti2(bronze_bar, iron_bar);
+$obj, $int = ~skill_multi2(
+    bronze_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(bronze_bar)>",
+    iron_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(iron_bar)>"
+);
 
 mes("<oc_debugname($obj)>, <tostring($int)>");
 
@@ -24,7 +27,11 @@ if (p_finduid(uid) = false) {
 }
 def_obj $obj;
 def_int $int;
-$obj, $int = ~skillmulti3(bronze_bar, iron_bar, steel_bar);
+$obj, $int = ~skill_multi3(
+    bronze_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(bronze_bar)>",
+    iron_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(iron_bar)>",
+    steel_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(steel_bar)>"
+);
 
 mes("<oc_debugname($obj)>, <tostring($int)>");
 
@@ -34,7 +41,12 @@ if (p_finduid(uid) = false) {
 }
 def_obj $obj;
 def_int $int;
-$obj, $int = ~skillmulti4(bronze_bar, iron_bar, steel_bar, mithril_bar);
+$obj, $int = ~skill_multi4(
+    bronze_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(bronze_bar)>",
+    iron_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(iron_bar)>",
+    steel_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(steel_bar)>",
+    mithril_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(mithril_bar)>"
+);
 
 mes("<oc_debugname($obj)>, <tostring($int)>");
 
@@ -44,6 +56,12 @@ if (p_finduid(uid) = false) {
 }
 def_obj $obj;
 def_int $int;
-$obj, $int = ~skillmulti5(bronze_bar, iron_bar, steel_bar, mithril_bar, runite_bar);
+$obj, $int = ~skill_multi5(
+    bronze_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(bronze_bar)>",
+    iron_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(iron_bar)>",
+    steel_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(steel_bar)>",
+    mithril_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(mithril_bar)>",
+    runite_bar, 0, 0, 200, "\\n\\n\\n\\n<oc_name(runite_bar)>"
+);
 
 mes("<oc_debugname($obj)>, <tostring($int)>");
