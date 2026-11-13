@@ -1,0 +1,73 @@
+[ai_queue1,_snail] ~npc_default_retaliate_ap;
+[ai_opplayer2,_snail] npc_setmode(applayer2);
+
+[ai_applayer2,_snail]
+if (%npc_action_delay > map_clock) {
+    npc_setmode(applayer2);
+    return;
+}
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) {
+    return;
+}
+// CANDIDATE: earliest plausible Old School values; the other five forms use2.
+// Research subject: mortmyre-creatures, snail-per-type-maxima.
+def_int $maxhit = 2;
+switch_npc(npc_type) {
+    case mmsnailround_swamp, mmsnailpoint_swamp :
+        $maxhit = 1;
+    case mmsnailpoint_red+black, mmsnailpoint_blue :
+        $maxhit = 3;
+}
+
+npc_anim(npc_param(attack_anim), 0);
+~.sound_area(snail_spit, 0, npc_coord, 10);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+// CANDIDATE: Lost City's uncited projectile constants and defence-ignoring spit.
+def_int $duration = ~player_projectile(npc_coord, coord, uid, curse_travel, 43, 31, 20, 16, 26, 56, 10);
+def_int $damage = ~snelm_reduction(randominc($maxhit));
+if (~check_protect_prayer(^ranged_style) = true) {
+    $damage = 0;
+}
+anim(%com_defendanim, 0);
+~playerhit_n_ranged($damage, $duration, npc_param(attackrate));
+
+[ai_queue3,mmsnailround_swamp] @thin_snail_drop;
+[ai_queue3,mmsnailpoint_swamp] @thin_snail_drop;
+[ai_queue3,mmsnailround_yellow] @thin_snail_drop;
+
+[ai_queue3,mmsnailround_blue] @fat_snail_drop;
+[ai_queue3,mmsnailpoint_blue] @fat_snail_drop;
+[ai_queue3,mmsnailround_red+black] @fat_snail_drop;
+[ai_queue3,mmsnailpoint_red+black] @fat_snail_drop;
+
+// VERIFIED: RuneHQ263, capture20050403215059, identifies pointed Ochre as Lean.
+[ai_queue3,mmsnailpoint_yellow] @lean_snail_drop;
+[ai_queue3,mmsnailround_orange] @lean_snail_drop;
+
+[label,thin_snail_drop]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+obj_add(npc_coord, npc_param(death_drop), 1, ^lootdrop_duration);
+obj_add(npc_coord, snail_corpse1, 1, ^lootdrop_duration);
+
+[label,lean_snail_drop]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+obj_add(npc_coord, npc_param(death_drop), 1, ^lootdrop_duration);
+obj_add(npc_coord, snail_corpse2, 1, ^lootdrop_duration);
+
+[label,fat_snail_drop]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+obj_add(npc_coord, npc_param(death_drop), 1, ^lootdrop_duration);
+obj_add(npc_coord, snail_corpse3, 1, ^lootdrop_duration);

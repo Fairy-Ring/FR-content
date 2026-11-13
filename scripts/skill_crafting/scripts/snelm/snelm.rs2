@@ -1,0 +1,16 @@
+// CANDIDATE: earliest stated Old School mapping; research subject mortmyre-creatures.
+// Pointed swamp replaces Lost City's duplicated round-swamp entry (copy slip).
+[proc,snelm_reduction](int $damage)(int)
+def_obj $head = inv_getobj(worn, ^wearpos_hat);
+if ($head = null) {
+    return ($damage);
+}
+def_int $reduction = 0;
+if ($head = snelm_round_red+black | $head = snelm_point_red+black | $head = snelm_point_blue) {
+    $reduction = 12;
+} else if ($head = snelm_round_blue | $head = snelm_round_orange | $head = snelm_point_yellow) {
+    $reduction = 8;
+} else if ($head = snelm_round_swamp | $head = snelm_point_swamp | $head = snelm_round_yellow) {
+    $reduction = 4;
+}
+return (max(0, sub($damage, $reduction)));

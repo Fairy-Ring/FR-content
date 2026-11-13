@@ -1,0 +1,16 @@
+# Mort Myre creature packed test
+
+Build the sibling engine, then run from its directory:
+
+```sh
+npm run build
+node --import tsx ../content/tests/mortmyre-creatures/test_mortmyre_creatures.mjs
+```
+
+The test loads the real server config and compiled scripts, executes them on engine NPC/player entities, and controls only the random source and test fixtures. It never starts a world or reads git history. Config IDs are resolved by name from the current pack.
+
+Coverage includes the27 audited identities, species dispatch and a cow non-leakage control; all nine snail corpse/shell pairs, every spit damage outcome, all nine helmets and no helmet, prayer and combat guards; both vampires' dust-only default drop; vampire table boundaries, clue and shared jewel/rare-table paths; all23 uncommon seed members and their cumulative boundaries over998 rolls; the caller's watermelon quantity2 versus the shared quantity1; the unchanged general seed table and lizard drops; both vampire attack branches, holy-symbol equality gates and inherited message, bite damage/drain/healing with and without prayer; both random outcomes for each of20 leech skills, Farming exclusion and prayer; spider proximity dispatch, cooldown and the real flyer's owner, life, mode and landing animation.
+
+The dust defaults implement Ruling14: period pages identify the level61 juvenile and level72 flyer and list vampire dust. The juvenile's server param overrides the inherited bones default; the common script still reads `npc_param(death_drop)`.
+
+These are behavioral regression expectations, not independent historical proof. VERIFIED and CANDIDATE source decisions are recorded in the Mort Myre research subject. A headed live cell separately exercises the placed content without NPC or drop seeding.

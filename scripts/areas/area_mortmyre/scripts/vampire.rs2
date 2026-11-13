@@ -1,0 +1,120 @@
+// Level61: vampire_juve. Level72: vampire_flyer.
+// https://web.archive.org/web/20041209225827/http://www.runehq.com/cache/viewMonster256.htm
+// https://web.archive.org/web/20041127023732/http://www.tip.it/runescape/index.php?rs2monster_id=308
+// https://web.archive.org/web/20041209230425/http://www.runehq.com/cache/viewMonster257.htm
+// https://web.archive.org/web/20041127015713/http://www.tip.it/runescape/index.php?rs2monster_id=309
+// https://oldschool.runescape.wiki/w/Feral_Vampyre
+
+[ai_queue3,_vampire]
+gosub(npc_death);
+if (npc_findhero = ^false) {
+    return;
+}
+obj_add(npc_coord, npc_param(death_drop), 1, ^lootdrop_duration);
+~trail_mediumcluedrop(128, npc_coord);
+def_int $random = random(128);
+
+if ($random < 10) {
+    // VERIFIED quantity: Tip.It308/309, retained pre-target2005 captures.
+    obj_add(npc_coord, earthrune, 4, ^lootdrop_duration);
+} else if ($random < 20) {
+    obj_add(npc_coord, deathrune, 2, ^lootdrop_duration);
+} else if ($random < 28) {
+    obj_add(npc_coord, chaosrune, 3, ^lootdrop_duration);
+} else if ($random < 33) {
+    obj_add(npc_coord, bloodrune, 1, ^lootdrop_duration);
+} else if ($random < 34) {
+    obj_add(npc_coord, bloodrune, 2, ^lootdrop_duration);
+} else if ($random < 44) {
+    obj_add(npc_coord, ~randomherb, ^lootdrop_duration);
+} else if ($random < 63) {
+    // Four period-listed seed kinds are VERIFIED; the table and band are CANDIDATE.
+    def_namedobj $seed;
+    def_int $quantity;
+    $seed, $quantity = ~roll_uncommon_seed_table;
+    if ($seed = watermelon_seed) {
+        $quantity = 2; // VERIFIED for this monster; the shared candidate table gives1.
+    }
+    obj_add(npc_coord, $seed, $quantity, ^lootdrop_duration);
+} else if ($random < 103) {
+    obj_add(npc_coord, coins, 15, ^lootdrop_duration);
+} else if ($random < 106) {
+    obj_add(npc_coord, black_axe, 1, ^lootdrop_duration);
+} else if ($random < 108) {
+    obj_add(npc_coord, earth_talisman, 1, ^lootdrop_duration);
+} else if ($random < 112) {
+    obj_add(npc_coord, ~randomjewel, ^lootdrop_duration);
+}
+
+[proc,vampire_holysymbol_weaken]
+if (inv_total(worn, blessedstar) > 0) {
+    // CANDIDATE quarter, four stats, equality gate and inherited wording.
+    // https://twitter.com/JagexAsh/status/650998169736753152 (cited, not checked)
+    def_boolean $weakened = false;
+    if (npc_stat(attack) = npc_basestat(attack)) {
+        npc_statsub(attack, divide(npc_basestat(attack), 4), 0);
+        $weakened = true;
+    }
+    if (npc_stat(strength) = npc_basestat(strength)) {
+        npc_statsub(strength, divide(npc_basestat(strength), 4), 0);
+        $weakened = true;
+    }
+    if (npc_stat(defence) = npc_basestat(defence)) {
+        npc_statsub(defence, divide(npc_basestat(defence), 4), 0);
+        $weakened = true;
+    }
+    if (npc_stat(magic) = npc_basestat(magic)) {
+        npc_statsub(magic, divide(npc_basestat(magic), 4), 0);
+        $weakened = true;
+    }
+    if ($weakened = true) {
+        mes("The vampire is weakened by your holy symbol of Saradomin.");
+    }
+}
+
+[ai_opplayer2,_vampire]
+~vampire_attack;
+
+[proc,vampire_attack]
+if (%npc_action_delay > map_clock) {
+    return;
+}
+if (random(6) = 0) { // CANDIDATE: donor estimate, no numeric Old School statement.
+    ~vampire_bite;
+} else {
+    ~npc_default_attack;
+}
+~vampire_holysymbol_weaken;
+
+[proc,vampire_bite]
+if (%npc_action_delay > map_clock) {
+    return;
+}
+if (~npc_check_notcombat = false) {
+    return;
+}
+if (~npc_check_notcombat_self = false) {
+    return;
+}
+anim(%com_defendanim, 0);
+npc_anim(vamp_bite, 0);
+sound_synth(vampire_suck, 1, 0);
+// CANDIDATE: donor raw accuracy, Strength drain and healing pass Protect from Melee.
+def_int $attack_roll = ~npc_melee_attack_roll_typeless;
+def_int $defence_roll = ~player_defence_roll_specific(npc_param(damagetype));
+def_int $maxhit = ~npc_melee_maxhit;
+def_int $damage = 0;
+if (randominc($attack_roll) > randominc($defence_roll)) {
+    $damage = randominc($maxhit);
+    stat_drain(strength, 1, 0);
+    npc_statheal(hitpoints, divide($damage, 2), 0);
+}
+
+if_close;
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+if (npc_stat(hitpoints) = 0) {
+    return;
+}
+~npc_set_attack_vars;
+queue*(playerhit_n_retaliate, 0)(npc_uid);
+queue(combat_damage_player, 0, $damage);
