@@ -826,7 +826,7 @@ data=max_amount,170
 
 [chaeldar_elves]
 table=slayer_master_task
-data=task,^slayer_bluedragon
+data=task,^slayer_elf
 data=weight,8
 data=min_amount,110
 data=max_amount,170
@@ -882,7 +882,7 @@ data=max_amount,20
 
 [chaeldar_cockatrice]
 table=slayer_master_task
-data=task,^slayer_caveslime
+data=task,^slayer_cockatrice
 data=weight,6
 data=min_amount,110
 data=max_amount,170

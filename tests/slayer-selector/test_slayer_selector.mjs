@@ -7,6 +7,7 @@
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-discriminator --base-pack <S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --base-pack <S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-pack <pre-S1 full pack>
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode table-old-discriminator --base-pack <published S2 pack>
  * Artifacts go to --artifact-dir, else SLAYER_SELECTOR_EVIDENCE_DIR, else RUNNER_TEMP or the system temporary directory.
  *
  * No server or live client is started. The adversarial DBRows are compiled in
@@ -87,12 +88,15 @@ const SOURCED_SLAYER_THRESHOLDS = [
     ['slayer_abyssaldemon', 85],
     ['slayer_darkbeast', 90]
 ];
+// Accepted plan's fixed row census, independently transcribed from its labelled report.
+// Historical membership labels vary by row; every stored number/order keeps Lost City values.
+const MASTER_TABLES_FILE = path.join(TEST_DIR, 'master_tables.json');
+const MASTER_TABLES = JSON.parse(fs.readFileSync(MASTER_TABLES_FILE, 'utf8'));
 const FAMILY_B = 3800;
 const ALPHA = 1e-6;
 const LOG_BOUND = Math.log((2 * FAMILY_B) / ALPHA);
 const OUT_OF_S1 = [
-    'S3–S7: per-master table repairs, target corrections, new membership, and numeric retunes.',
-    'S8 replacement consent/semantics, has_turael_task changes, and death transitions.'
+    'S8 replacement branch changes and death transitions; historical numeric retunes.',
 ];
 const OWNER_PREDICATES = [
     {
@@ -115,8 +119,8 @@ function parseArgs(argv) {
         else if (token === '--base-pack' && argv[i + 1]) result.basePack = path.resolve(argv[++i]);
         else throw new Error(`Unknown or incomplete argument: ${token}`);
     }
-    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator'].includes(result.mode), `unsupported --mode ${result.mode}`);
-    if (['old-regressions', 'old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
+    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator'].includes(result.mode), `unsupported --mode ${result.mode}`);
+    if (['old-regressions', 'old-discriminator', 'table-old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
     return result;
 }
 
@@ -887,6 +891,199 @@ function assertPackedLiveRows() {
 
     return packedRowsByMaster;
 }
+function turaelBatMultiplicity() {
+    const { row } = rowForPacked('turael_task_table');
+    const bats = configTypes.DbRowType.getId('turael_bats');
+    const count = packedValues(row, 'task').filter(id => id === bats).length;
+    assert.equal(count, 1, 'S3 packed Turael list must contain exactly one bat occurrence');
+    return count;
+}
+
+function testMasterSnapshots() {
+    const results = {};
+    turaelBatMultiplicity();
+    for (const [key, expected] of Object.entries(MASTER_TABLES)) {
+        const master = ORACLE.masters.find(candidate => candidate.key === key);
+        assert(master, `unknown fixed master snapshot ${key}`);
+        const { row } = rowForPacked(master.table);
+        const refs = packedValues(row, 'task');
+        assert.equal(refs.length, expected.length, `${key}: fixed report membership length`);
+        for (const [index, [suffix, category, weight, min, max]] of expected.entries()) {
+            const name = `${key}_${suffix}`;
+            const target = Number(ORACLE.constants.get(`slayer_${category}`));
+            assert(Number.isInteger(target), `${name}: unresolved fixed category`);
+            const { id, row: child } = rowForPacked(name);
+            assert.equal(refs[index], id, `${key}: fixed report order at ${index}`);
+            const actual = ['task', 'weight', 'min_amount', 'max_amount'].map(column => Number(packedValues(child, column)[0]));
+            assert.deepEqual(actual, [target, weight, min, max], `${name}: packed row differs from accepted labelled report`);
+            const source = master.rows[index];
+            assert.deepEqual([source.sourceName, source.target, source.weight, source.min, source.max], [name, target, weight, min, max], `${name}: source row differs from accepted labelled report`);
+        }
+        results[key] = { rows: expected.length, numericLabel: 'UNKNOWN: keeps the Lost City value', snapshotSha256: digestFile(MASTER_TABLES_FILE) };
+    }
+    return results;
+}
+
+function testTuraelPredicate() {
+    const player = makePlayer();
+    applyFixture(player, FIXTURES.get('turael:high'));
+    const categories = new Set(MASTER_TABLES.turael.map(([, category]) => Number(ORACLE.constants.get(`slayer_${category}`))));
+    assert.equal(categories.has(Number(ORACLE.constants.get('slayer_bear'))), false, 'S3 disclosed keep-off bear membership');
+    const results = [];
+    for (const target of [-1, ...Array.from({ length: 77 }, (_, i) => i)]) {
+        const prior = sentinelTask(player, target, 41);
+        const trace = traceWrites(player);
+        let actual;
+        try { actual = runInt(player, '[proc,has_turael_task]').value; }
+        finally { trace.restore(); }
+        assert.equal(actual, categories.has(target) ? 1 : 0, `S3 has_turael_task must equal remaining Turael list: category ${target}`);
+        assert.deepEqual(trace.events, [], 'membership predicate must not write task state');
+        assert.equal(player.getVar(IDS.target), prior.target);
+        assert.equal(player.getVar(IDS.count), prior.count);
+        results.push({ target, member: actual === 1 });
+    }
+    return results;
+}
+
+function drawLiveRowEndpoints(masterKey, suffix, fixture) {
+    const master = ORACLE.masters.find(entry => entry.key === masterKey);
+    const index = MASTER_TABLES[masterKey].findIndex(([name]) => name === suffix);
+    assert(index >= 0, `${masterKey}_${suffix}: no fixed row oracle`);
+    const [, category, weight, min, max] = MASTER_TABLES[masterKey][index];
+    const target = Number(ORACLE.constants.get(`slayer_${category}`));
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters[masterKey]);
+    applyFixture(player, fixture);
+    assert.equal(combatLevel(player), fixture.combat, 'live-table endpoint fixture combat');
+    assert.equal(runInt(player, '[proc,validate_slayer_target]', npc, [target]).value, 1, `${masterKey}_${suffix}: real validator positive control`);
+    return ['min', 'max'].map(side => {
+        const prior = sentinelTask(player);
+        const trace = traceWrites(player);
+        let random;
+        try {
+            const stream = [...Array(index).fill(1 - Number.EPSILON), 0, side === 'min' ? 0 : 1 - Number.EPSILON];
+            random = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id]));
+        } finally { trace.restore(); }
+        const count = side === 'min' ? min : max;
+        assert.equal(random.result.value, 1, `${masterKey}_${suffix}: real master table must assign`);
+        assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count'], 'live-table protected write order');
+        assert.equal(player.getVar(IDS.target), target, `${masterKey}_${suffix}: real master target`);
+        assert.equal(player.getVar(IDS.count), count, `${masterKey}_${suffix}: inclusive ${side} endpoint`);
+        assert.equal(gemCount(player), 0, 'direct generator must not grant introductory gem');
+        return { master: masterKey, row: suffix, target, weight, endpoint: side, count, fixture: recordFixture(fixture), prior, randomValues: random.observed, opcount: random.result.opcount };
+    });
+}
+
+function testErnestGate(masterKey) {
+    const target = Number(ORACLE.constants.get('slayer_killerwatt'));
+    assert.equal(Number(ORACLE.constants.get('haunted_complete')), 3, 'Ernest completion must remain inherited state 3');
+    assert.deepEqual(ORACLE.questGates.get(target), { variable: 'haunted', thresholdName: 'haunted_complete', threshold: 3 }, 'killerwatt must use Ernest, not Haunted Mine');
+    const fixture = { ...FIXTURES.get(`${masterKey}:high`), questValues: { ...ORACLE.questValues, haunted: 3 } };
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters[masterKey]);
+    const states = [];
+    for (const haunted of [0, 1, 2, 3, 4]) {
+        applyFixture(player, { ...fixture, questValues: { ...fixture.questValues, haunted } });
+        const prior = sentinelTask(player);
+        const trace = traceWrites(player);
+        let result;
+        try { result = runInt(player, '[proc,validate_slayer_target]', npc, [target]); }
+        finally { trace.restore(); }
+        assert.equal(result.value, haunted >= 3 ? 1 : 0, `${masterKey}: killerwatt Ernest state ${haunted}`);
+        assert.deepEqual(trace.events, [], 'existing Ernest validation must not write task state');
+        assert.equal(player.getVar(IDS.target), prior.target);
+        assert.equal(player.getVar(IDS.count), prior.count);
+        states.push({ haunted, accepted: result.value === 1, opcount: result.opcount });
+    }
+    return { master: masterKey, historicalRule: 'UNKNOWN: keeps the Lost City value', states, endpoints: drawLiveRowEndpoints(masterKey, 'killerwatts', fixture) };
+}
+
+function chaeldarCockatriceFixture() {
+    return { ...FIXTURES.get('chaeldar:minimum'), key: 'chaeldar_cb70_base25_current25', baseSlayer: 25, currentSlayer: 25 };
+}
+
+function assertChaeldarRetarget(suffix, category, weight) {
+    const { row } = rowForPacked(`chaeldar_${suffix}`);
+    const actual = ['task', 'weight', 'min_amount', 'max_amount'].map(column => Number(packedValues(row, column)[0]));
+    const expected = [Number(ORACLE.constants.get(`slayer_${category}`)), weight, 110, 170];
+    assert.deepEqual(actual, expected, `S6 chaeldar_${suffix}: corrected category, unchanged Lost City numbers`);
+    return { row: suffix, actual, historicalCategory: 'CANDIDATE', historicalNumbers: 'UNKNOWN: keeps the Lost City value' };
+}
+
+function testChaeldarRetargets() {
+    const mappings = [assertChaeldarRetarget('elves', 'elf', 8), assertChaeldarRetarget('cockatrice', 'cockatrice', 6)];
+    const fixture = chaeldarCockatriceFixture();
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters.chaeldar);
+    const elf = Number(ORACLE.constants.get('slayer_elf'));
+    const cockatrice = Number(ORACLE.constants.get('slayer_cockatrice'));
+    applyFixture(player, { ...FIXTURES.get('chaeldar:high'), questValues: completedQuestValues() });
+    assert.equal(runInt(player, '[proc,slayer_regicide_unlocked]').value, 0, 'unfinished Regicide proc must stay false');
+    assert.equal(runInt(player, '[proc,validate_slayer_target]', npc, [elf]).value, 0, 'retargeted elves must remain excluded by their real packed gate');
+    const thresholds = [];
+    for (const baseSlayer of [24, 25, 26]) {
+        applyFixture(player, { ...fixture, baseSlayer, currentSlayer: 1 });
+        assert.equal(combatLevel(player), 70, 'cockatrice reachability fixture is exactly CB70');
+        const accepted = runInt(player, '[proc,validate_slayer_target]', npc, [cockatrice]).value;
+        assert.equal(accepted, baseSlayer >= 25 ? 1 : 0, 'cockatrice uses base Slayer25, not current Slayer');
+        thresholds.push({ baseSlayer, currentSlayer: 1, accepted: accepted === 1 });
+    }
+    return { mappings, elfGate: 'unfinished exclusion; no true mock', thresholds, endpoints: drawLiveRowEndpoints('chaeldar', 'cockatrice', fixture) };
+}
+
+function testDuradelTables() {
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters.duradel);
+    const minimum = FIXTURES.get('duradel:minimum');
+    const cases = [
+        ...[[99, 73], [100, 79], [101, 83]].map(([combat, prayer]) => ({ ...minimum, key: `duradel_cb${combat}_current99`, combat, baseCombatSkills: { [PlayerStat.PRAYER]: prayer }, baseSlayer: 99, currentSlayer: 99, expected: combat >= 100, axis: 'combat only' })),
+        ...[49, 50, 51].map(currentSlayer => ({ ...minimum, key: `duradel_cb100_base99_current${currentSlayer}`, baseSlayer: 99, currentSlayer, expected: currentSlayer >= 50, axis: 'current Slayer only' }))
+    ];
+    const boundaries = cases.map(fixture => {
+        applyFixture(player, fixture);
+        assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: exact real combat boundary`);
+        const prior = sentinelTask(player);
+        const trace = traceWrites(player);
+        let accepted, recommended;
+        try {
+            accepted = eligibleMaster(player, npc, IDS.masters.duradel);
+            recommended = runInt(player, '[proc,get_best_slayer_master]').value;
+        } finally { trace.restore(); }
+        assert.equal(accepted, fixture.expected, `${fixture.key}: independent Duradel admission boundary`);
+        assert.equal(recommended, fixture.expected ? IDS.masters.duradel : IDS.masters.chaeldar, `${fixture.key}: independent recommendation boundary`);
+        assert.deepEqual(trace.events, [], 'master admission and recommendation cannot alter task state');
+        assert.equal(player.getVar(IDS.target), prior.target);
+        assert.equal(player.getVar(IDS.count), prior.count);
+        assert.equal(gemCount(player), 0);
+        return { axis: fixture.axis, fixture: recordFixture(fixture), accepted, recommended };
+    });
+    const dragonEndpoints = MASTER_TABLES.duradel.filter(([, category]) => category.endsWith('dragon')).flatMap(([suffix]) => drawLiveRowEndpoints('duradel', suffix, FIXTURES.get('duradel:high')));
+    assert.equal(dragonEndpoints.length, 8, 'four retained Duradel dragon rows, both inclusive endpoints');
+    return { historicalNumbers: 'UNKNOWN: keeps the Lost City value; no inferred minimum130', boundaries, dragonEndpoints };
+}
+
+
+
+function testOldTableRepairs(basePack) {
+    loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
+    const results = [];
+    const checks = [
+        ['S3 duplicate bats', turaelBatMultiplicity],
+        ['S3 bear predicate', testTuraelPredicate],
+        ['S6 elf mapping', () => assertChaeldarRetarget('elves', 'elf', 8)],
+        ['S6 cockatrice mapping', () => assertChaeldarRetarget('cockatrice', 'cockatrice', 6)],
+        ['S6 real cockatrice draw', () => drawLiveRowEndpoints('chaeldar', 'cockatrice', chaeldarCockatriceFixture())]
+    ];
+    for (const [id, check] of checks) {
+        let error;
+        try { check(); } catch (failure) { error = failure; }
+        assert(error instanceof assert.AssertionError, `${id}: published pack did not fail the new product assertion`);
+        results.push({ id, result: 'EXPECTED_FAILURE', message: error.message });
+        console.log(`EXPECTED_FAILURE ${id}: ${error.message}`);
+    }
+    return results;
+}
+
 
 function buildActualValidatorCache(player, npc, fixture, targets, label) {
     const cache = new Map();
@@ -1478,6 +1675,12 @@ async function runDistribution(master, fixture, packedRows, acceptance, drawsPer
 function testCurrentSuite() {
     loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
     const packedRows = assertPackedLiveRows();
+    const masterSnapshots = testMasterSnapshots();
+    const turaelPredicate = testTuraelPredicate();
+    assert.deepEqual(Object.keys(MASTER_TABLES), MASTER_DEFS.map(master => master.key), 'all five fixed labelled master snapshots are required');
+    const ernest = ['mazchna', 'vannaka'].map(testErnestGate);
+    const chaeldarRetargets = testChaeldarRetargets();
+    const duradelTables = testDuradelTables();
     const admission = testCombatAndMasterAdmission();
     const harpieThreshold = testHarpieThreshold();
     const thresholds = testThresholds();
@@ -1524,7 +1727,7 @@ function testCurrentSuite() {
     const dispatch = testDispatchAndOneShotOrder(packedRows);
     const teachingAdmission = testCurrentTeachingAdmission();
     const teachingSuccess = testCurrentTeachingSuccess();
-    return { packedRows, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+    return { packedRows, masterSnapshots, turaelPredicate, ernest, chaeldarRetargets, duradelTables, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
 }
 
 function fixtureSourceRows() {
@@ -1840,7 +2043,7 @@ function testDeterministicCases() {
     return { current, missingListEngineBoundary, adversarial, endpoints };
 }
 const metadata = {
-    assignment: 'U-SLAYERSEL-1113 S2 compiled proof (preserving S1 cases)',
+    assignment: 'U-SLAYERSEL-1113 S3–S7 compiled proof (preserving S1/S2 cases)',
     revision: 377,
     mode: OPTIONS.mode,
     runId: RUN_ID,
@@ -1851,6 +2054,7 @@ const metadata = {
     artifactDirectory: RUN_DIR,
     pins: { content: gitHead(CONTENT_ROOT), engine: gitHead(ENGINE_ROOT) },
     sourceHashes: SOURCE_HASHES,
+    masterTablesSha256: digestFile(MASTER_TABLES_FILE),
     compilerInputs: COMPILER_INPUTS,
     compilerFixturePack: FIXTURE_PACK_RESULT,
     fixtureSourceSha256: FIXTURE_SOURCE_HASH,
@@ -1882,6 +2086,11 @@ try {
         const current = deterministic.current;
         metadata.checks.current = {
             packedRows: Object.fromEntries([...current.packedRows].map(([name, master]) => [name, { memberOccurrences: master.rows.length }])),
+            masterSnapshots: current.masterSnapshots,
+            turaelPredicate: current.turaelPredicate,
+            ernest: current.ernest,
+            chaeldarRetargets: current.chaeldarRetargets,
+            duradelTables: current.duradelTables,
             admission: current.admission,
             harpieThreshold: current.harpieThreshold,
             thresholds: current.thresholds,
@@ -1926,6 +2135,8 @@ try {
     } else if (OPTIONS.mode === 'old-discriminator') {
         const basePack = findBasePackDirectory(OPTIONS.basePack);
         metadata.checks.oldHarpieDiscriminator = testOldHarpieDiscriminator(basePack);
+    } else if (OPTIONS.mode === 'table-old-discriminator') {
+        metadata.checks.oldTableRepairs = testOldTableRepairs(findBasePackDirectory(OPTIONS.basePack));
     } else {
         const basePack = findBasePackDirectory(OPTIONS.basePack);
         metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(basePack);
