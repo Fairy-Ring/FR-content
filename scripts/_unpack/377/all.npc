@@ -46746,6 +46746,24 @@ strength=120
 defence=135
 magic=1
 param=attackrate,4
+// VERIFIED: 377 identity above. CANDIDATE: Fareed 2007-base equipment bonuses.
+param=strengthbonus,120
+param=stabdefence,100
+param=slashdefence,100
+param=crushdefence,100
+param=magicdefence,0
+param=rangedefence,0
+param=damagetype,^slash_style
+// CANDIDATE: the retained Smoke transcript describes ashes after the kill.
+param=death_drop,ashes
+// UNKNOWN: animation and sound timing keeps the Lost City values.
+// UNKNOWN: owned-encounter lifecycle controls are product configuration, not 377 combat facts.
+defaultmode=none
+wanderrange=0
+// UNKNOWN product lifecycle value: S3 precedent, keeps the owner across the chamber.
+maxrange=64
+huntrange=0
+timer=1
 
 [ics_little_worker1]
 name=Slave

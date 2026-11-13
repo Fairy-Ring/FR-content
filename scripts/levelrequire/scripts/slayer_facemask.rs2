@@ -1,0 +1,7 @@
+// CANDIDATE Slayer requirement. Match the item-specific levelrequire convention.
+[opheld2,slayer_facemask]
+if (stat_base(slayer) < ^dt_smoke_mask_slayer) {
+    mes("You are not a high enough level to use this item.");
+    return;
+}
+~equip(last_slot);

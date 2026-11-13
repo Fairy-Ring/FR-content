@@ -7,6 +7,7 @@
 ~duel_arena_logout;
 ~macro_event_logout;
 ~castlewars_logout;
+if (%deserttreasure >= ^dt_stage_hunts) ~dt_smoke_logout;
 %last_logout = map_clock;
 
 [if_button,logout:try_logout]
