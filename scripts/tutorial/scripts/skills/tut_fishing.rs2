@@ -1,4 +1,9 @@
-[opnpcu,0_48_48_newbiefishing] @tutorial_fishing;
+[opnpcu,0_48_48_newbiefishing]
+if (last_useitem = net) {
+    @tutorial_fishing;
+} else {
+    ~displaymessage(^dm_default);
+}
 [opnpc1,0_48_48_newbiefishing] @tutorial_fishing;
 
 [label,tutorial_fishing]
