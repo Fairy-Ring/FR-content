@@ -393,6 +393,11 @@ if_openmain(silver_casting);
 [inv_button3,silver_casting:com_112] @craft_fenk_conductor(10);
 
 [label,craft_fenk_conductor](int $count)
+// Shown only on a members' world (see craft_silver); refuse a hidden button on a free world.
+if (map_members = ^false) {
+    mes(^mes_members_do_that);
+    return;
+}
 if (inv_total(inv, fenk_lightning_mould) < 1) {
     ~mesbox("You need a conductor mould to make that.");
     return;
@@ -437,13 +442,15 @@ if (inv_total(inv, silver_bar) < 1) {
 ~crafting_silver_conductor($count);
 
 [label,craft_silver_product](namedobj $product, namedobj $mould, int $count)
-// The interface hides a product's buttons when its mould is absent (and, for members' products,
-// on a free world). Check the same conditions here: a hidden button can still be sent.
-if (inv_total(inv, $mould) < 1) {
-    ~mesbox("You require a mould to make that.");
+// The interface hides a product's buttons when its mould is absent and, for members' products,
+// on a free world. A hidden button can still be sent, so both are checked here. CANDIDATE: order
+// and messages follow Lost City's silver menu (members refusal first, then the mould).
+if (map_members = ^false & oc_members($product) = true) {
+    mes(^mes_members_do_that);
     return;
 }
-if ($mould ! holy_symbol_mould & map_members = ^false) {
+if (inv_total(inv, $mould) < 1) {
+    ~mesbox("You require a mould to make that.");
     return;
 }
 
