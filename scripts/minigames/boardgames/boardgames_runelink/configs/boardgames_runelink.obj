@@ -9,6 +9,7 @@ model=obj_firerune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_waterrune]
@@ -22,6 +23,7 @@ model=obj_waterrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_earthrune]
@@ -35,6 +37,7 @@ model=obj_earthrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_airrune]
@@ -48,6 +51,7 @@ model=obj_airrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_mindrune]
@@ -61,6 +65,7 @@ model=obj_mindrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_bodyrune]
@@ -74,6 +79,7 @@ model=obj_bodyrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_naturerune]
@@ -87,6 +93,7 @@ model=obj_naturerune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_chaosrune]
@@ -100,6 +107,7 @@ model=obj_chaosrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_lawrune]
@@ -113,6 +121,7 @@ model=obj_lawrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_cosmicrune]
@@ -126,6 +135,7 @@ model=obj_cosmicrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_bloodrune]
@@ -139,6 +149,7 @@ model=obj_bloodrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece
 
 [boardgames_runelink_soulrune]
@@ -152,4 +163,5 @@ model=obj_soulrune
 members=yes
 ambient=30
 weight=2g
+dummyitem=inv_only
 category=boardgames_piece

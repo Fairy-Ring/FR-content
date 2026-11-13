@@ -85796,14 +85796,6 @@ resizex=64
 resizey=64
 resizez=64
 
-[stepping_stone_12568]
-name=Stepping stone
-desc=A very slippery stepping stone.
-model=loc_12568
-op1=Jump-to
-active=yes
-blockrange=no
-
 [temp_stone_4_zip]
 name=Temp Stone 4 Zip
 desc=A very slippery stepping stone.
@@ -85812,20 +85804,6 @@ op1=Climb-down
 active=yes
 blockrange=no
 forceapproach=south
-
-[tropical_tree]
-name=Tropical tree
-desc=A terribly tall tropical tree.
-model=loc_12570
-recol1s=19910
-recol1d=18853
-recol2s=20968
-recol2d=15685
-recol3s=12869
-recol3d=8547
-ambient=25
-op1=Climb
-forceapproach=east
 
 [tropical_tree_12571]
 name=Tropical tree
@@ -85854,51 +85832,16 @@ recol3d=8547
 width=3
 ambient=25
 
-[monkeybars_12573]
-name=Monkeybars
-desc=I can traverse these.
-model=loc_12573
-op1=Swing across
-blockwalk=no
-hillskew=yes
-op1=Swing Across
-
 [scenery_12574]
 model=loc_12574
 blockwalk=no
 active=no
 hillskew=yes
 
-[monkeybars_12575]
-name=Monkeybars
-desc=I can traverse these.
-model=loc_12573
-op1=Swing across
-blockwalk=no
-hillskew=yes
-op1=Swing Across
-
-[skull_slope_12576]
-name=Skull slope
-desc=A climbing wall made from skulls.
-model=loc_12576
-hillskew=yes
-forcedecor=yes
-op1=Climb-up
-
 [scenery_12577]
 model=loc_12576
 hillskew=yes
 forcedecor=yes
-
-[rope_12578]
-name=Rope
-desc=For swinging on.
-model=loc_12578
-width=4
-forceapproach=west
-shadow=no
-op1=Swing
 
 [tropical_tree_12579]
 name=Tropical tree
@@ -86320,19 +86263,6 @@ model=cavewall_face1withcrack
 sharelight=yes
 hillskew=yes
 op1=Enter
-
-[tropical_tree_12618]
-name=Tropical tree
-desc=A terribly tall tropical tree.
-model=bamboo_tree_base
-recol1s=19910
-recol1d=18853
-recol2s=20968
-recol2d=15685
-recol3s=12869
-recol3d=8547
-mapscene=0
-op1=Climb-down
 
 [scenery_12619]
 model=loc_12619

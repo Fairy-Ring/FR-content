@@ -620,6 +620,7 @@ param=attack_sound,warhammer_crush
 category=death_guard
 ranged=0
 param=defend_anim,human_blunt_block
+param=defend_sound,sound_784
 [death_guard2]
 name=Guard
 desc=A Burthorpe Castle guard.
@@ -670,6 +671,7 @@ param=attack_sound,warhammer_crush
 category=death_guard
 ranged=0
 param=defend_anim,human_blunt_block
+param=defend_sound,sound_783
 [death_guard_equiproom]
 name=Harold
 desc=An off-duty Burthorpe Castle guard.

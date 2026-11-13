@@ -11,6 +11,7 @@ members=yes
 cost=150
 wearpos=righthand
 weight=18g
+tradeable=no
 
 [trollromance_toboggon_waxed]
 name=Sled
@@ -33,6 +34,7 @@ cost=175
 wearpos=righthand
 wearpos2=lefthand
 weight=18g
+tradeable=no
 param=ready_baseanim,trollromance_toboggan_ready
 param=turnonspot_baseanim,trollromance_toboggan_walking
 param=walk_f_baseanim,trollromance_toboggan_walking
@@ -57,6 +59,7 @@ members=yes
 cost=15
 wearpos=lefthand
 weight=25g
+tradeable=no
 
 [trollromance_rare_flower]
 name=Trollweiss
@@ -82,9 +85,13 @@ womanwear=obj_flowers_waterfall_quest_manwear,6
 members=yes
 cost=5
 weight=1oz
+tradeable=no
 wearpos=righthand
+category=flowers
 param=stabattack,-100
 param=slashattack,-100
 param=crushattack,-50
 param=strengthbonus,-10
 param=attackrate,4
+param=crushattack_anim,human_blunt_spike
+param=crush_sound,flower_attack
