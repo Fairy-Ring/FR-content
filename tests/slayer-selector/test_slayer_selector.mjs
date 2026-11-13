@@ -1,0 +1,1671 @@
+#!/usr/bin/env node
+/**
+ * Offline proof against real compiled RuneScript and packed configs.
+ * Run from the sibling engine:
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode full
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-scripts <directory holding the base pack's script.dat and script.idx>
+ * Artifacts go to --artifact-dir, else SLAYER_SELECTOR_EVIDENCE_DIR, else a directory under the system temporary directory.
+ *
+ * No server or live client is started. The adversarial DBRows are compiled in
+ * an isolated temporary content/engine copy by compile_adversarial_pack.mjs.
+ */
+import assert from 'node:assert/strict';
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { once } from 'node:events';
+import { finished } from 'node:stream/promises';
+import { createGzip } from 'node:zlib';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+const TEST_DIR = path.dirname(fileURLToPath(import.meta.url));
+const CONTENT_ROOT = path.resolve(TEST_DIR, '../..');
+const ENGINE_ROOT = process.env.HARNESS_ENGINE_DIR ?? path.resolve(CONTENT_ROOT, '../engine');
+const PACK_DIR = path.join(ENGINE_ROOT, 'data/pack');
+const SCRIPT_DIR = path.join(CONTENT_ROOT, 'scripts');
+const EVIDENCE_DEFAULT = path.join(os.tmpdir(), 'slayer-selector');
+const ADJACENT_FIXTURE = path.join(TEST_DIR, 'fixtures/slayer_selector_adversarial.dbrow');
+const COMPILE_HELPER = path.join(TEST_DIR, 'compile_adversarial_pack.mjs');
+const SLAYER_CONFIG_DIR = path.join(SCRIPT_DIR, 'skill_slayer/configs');
+const SOURCES = {
+    taskScript: path.join(SCRIPT_DIR, 'skill_slayer/scripts/slayer_task.rs2'),
+    masterScript: path.join(SCRIPT_DIR, 'skill_slayer/scripts/slayer_master.rs2'),
+    recommendationScript: path.join(SCRIPT_DIR, 'skill_slayer/scripts/slayer_gem.rs2'),
+    masterRows: path.join(SLAYER_CONFIG_DIR, 'slayer_master_tasks.dbrow'),
+    taskRows: path.join(SLAYER_CONFIG_DIR, 'slayer_tasks.dbrow'),
+    constants: path.join(SLAYER_CONFIG_DIR, 'slayer.constant'),
+    questConstants: path.join(SCRIPT_DIR, 'general/configs/quest.constant'),
+    taskNames: path.join(SLAYER_CONFIG_DIR, 'task_name.enum'),
+    slayerRequirements: path.join(SLAYER_CONFIG_DIR, 'slayer_req.enum'),
+    combatRequirements: path.join(SLAYER_CONFIG_DIR, 'combat_req.enum')
+};
+
+const MASTER_DEFS = [
+    { key: 'turael', table: 'turael_task_table', npc: 'slayer_master_1', combat: 3, level: 3, slayer: 1 },
+    { key: 'mazchna', table: 'mazchna_task_table', npc: 'slayer_master_2', combat: 20, level: 16, slayer: 1 },
+    { key: 'vannaka', table: 'vannaka_task_table', npc: 'slayer_master_3', combat: 40, level: 32, slayer: 1 },
+    { key: 'chaeldar', table: 'chaeldar_task_table', npc: 'slayer_master_4', combat: 70, level: 55, slayer: 50 },
+    { key: 'duradel', table: 'duradel_task_table', npc: 'slayer_master_5', combat: 100, level: 79, slayer: 50 }
+];
+const HIGH_FIXTURE = { key: 'cb126_slayer99', combat: 126, level: 99, slayer: 99, currentSlayer: 99 };
+const SEEDS = [1, 377, 20060502, 1113];
+const DRAWS_PER_SEED = 50000;
+const FAMILY_B = 3800;
+const ALPHA = 1e-6;
+const LOG_BOUND = Math.log((2 * FAMILY_B) / ALPHA);
+const OUT_OF_S1 = [
+    'S2: new per-creature Slayer thresholds and validator gate dispatch/ownership.',
+    'S3–S7: per-master table repairs, target corrections, new membership, and numeric retunes.',
+    'S8 replacement consent/semantics, has_turael_task changes, and death transitions.'
+];
+
+function parseArgs(argv) {
+    const result = { mode: 'full', artifactDir: process.env.SLAYER_SELECTOR_EVIDENCE_DIR ?? EVIDENCE_DEFAULT, baseScripts: null };
+    for (let i = 0; i < argv.length; i++) {
+        const token = argv[i];
+        if (token === '--mode' && argv[i + 1]) result.mode = argv[++i];
+        else if (token === '--artifact-dir' && argv[i + 1]) result.artifactDir = path.resolve(argv[++i]);
+        else if (token === '--base-scripts' && argv[i + 1]) result.baseScripts = path.resolve(argv[++i]);
+        else throw new Error(`Unknown or incomplete argument: ${token}`);
+    }
+    assert(['full', 'adversarial', 'old-regressions'].includes(result.mode), `unsupported --mode ${result.mode}`);
+    if (result.mode === 'old-regressions') assert(result.baseScripts, '--mode old-regressions requires --base-scripts <directory>');
+    return result;
+}
+
+const OPTIONS = parseArgs(process.argv.slice(2));
+const RUN_ID = `${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`;
+const RUN_DIR = path.join(OPTIONS.artifactDir, `run-${RUN_ID}`);
+const METADATA_PATH = path.join(RUN_DIR, 'metadata.json');
+fs.mkdirSync(RUN_DIR, { recursive: true });
+
+function sha256(value) {
+    return crypto.createHash('sha256').update(value).digest('hex');
+}
+
+function digestFile(file) {
+    return sha256(fs.readFileSync(file));
+}
+
+function hashTree(root) {
+    const hash = crypto.createHash('sha256');
+    const files = [];
+    function visit(directory) {
+        for (const entry of fs.readdirSync(directory, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+            const file = path.join(directory, entry.name);
+            if (entry.isDirectory()) visit(file);
+            else if (entry.isFile()) files.push(file);
+            else if (entry.isSymbolicLink()) {
+                hash.update(`symlink:${path.relative(root, file)}:${fs.readlinkSync(file)}\n`);
+            }
+        }
+    }
+    visit(root);
+    for (const file of files) {
+        hash.update(`${path.relative(root, file)}\0`);
+        hash.update(fs.readFileSync(file));
+        hash.update('\0');
+    }
+    return hash.digest('hex');
+}
+
+function gitHead(directory) {
+    try {
+        return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: directory, encoding: 'utf8' }).trim();
+    } catch {
+        return null;
+    }
+}
+
+function packEntries(kind) {
+    const file = path.join(CONTENT_ROOT, `pack/${kind}.pack`);
+    return fs.readFileSync(file, 'utf8').split(/\r?\n/).filter(line => /^\d+=/.test(line)).map(line => {
+        const separator = line.indexOf('=');
+        return [line.slice(separator + 1).trim(), Number(line.slice(0, separator))];
+    });
+}
+
+const PACK_MAPS = new Map();
+function packId(kind, name) {
+    let map = PACK_MAPS.get(kind);
+    if (!map) {
+        map = new Map(packEntries(kind));
+        PACK_MAPS.set(kind, map);
+    }
+    const value = map.get(name);
+    assert.notEqual(value, undefined, `pack/${kind}.pack missing ${name}`);
+    return value;
+}
+
+function parseConstants(file) {
+    const result = new Map();
+    for (const rawLine of fs.readFileSync(file, 'utf8').split(/\r?\n/)) {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('//')) continue;
+        const separator = line.indexOf('=');
+        assert(separator > 0, `${file}: malformed constant ${rawLine}`);
+        let name = line.slice(0, separator).trim();
+        if (name.startsWith('^')) name = name.slice(1);
+        const value = line.slice(separator + 1).trim();
+        assert(!result.has(name), `${file}: duplicate constant ${name}`);
+        result.set(name, value);
+    }
+    return result;
+}
+
+function sourceValue(raw, constants, context) {
+    const value = String(raw).trim();
+    if (value.startsWith('^')) {
+        const constant = value.slice(1);
+        assert(constants.has(constant), `${context}: unresolved constant ${value}`);
+        const resolved = constants.get(constant);
+        assert(/^-?\d+$/.test(resolved), `${context}: ${value} is not an integer (${resolved})`);
+        return Number(resolved);
+    }
+    if (/^-?\d+$/.test(value)) return Number(value);
+    return value;
+}
+
+function parseDbRowFile(file) {
+    const rows = new Map();
+    let current = null;
+    for (const [lineIndex, rawLine] of fs.readFileSync(file, 'utf8').split(/\r?\n/).entries()) {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('//')) continue;
+        if (line.startsWith('[') && line.endsWith(']')) {
+            const name = line.slice(1, -1);
+            assert(name && !rows.has(name), `${file}:${lineIndex + 1}: duplicate/empty DBRow ${name}`);
+            current = { name, table: null, data: new Map(), file, line: lineIndex + 1 };
+            rows.set(name, current);
+            continue;
+        }
+        assert(current, `${file}:${lineIndex + 1}: property outside DBRow`);
+        const separator = line.indexOf('=');
+        assert(separator > 0, `${file}:${lineIndex + 1}: missing property separator`);
+        const key = line.slice(0, separator).trim();
+        const value = line.slice(separator + 1).trim();
+        if (key === 'table') {
+            assert.equal(current.table, null, `${file}:${lineIndex + 1}: repeated table field`);
+            current.table = value;
+        } else if (key === 'data') {
+            const comma = value.indexOf(',');
+            assert(comma > 0, `${file}:${lineIndex + 1}: malformed data field ${value}`);
+            const column = value.slice(0, comma).trim();
+            const fieldValue = value.slice(comma + 1).trim();
+            const values = current.data.get(column) ?? [];
+            values.push(fieldValue);
+            current.data.set(column, values);
+        } else {
+            throw new Error(`${file}:${lineIndex + 1}: unexpected DBRow key ${key}`);
+        }
+    }
+    return rows;
+}
+
+function parseEnum(file, constants) {
+    const values = [];
+    for (const [lineIndex, rawLine] of fs.readFileSync(file, 'utf8').split(/\r?\n/).entries()) {
+        const line = rawLine.trim();
+        if (!line || line.startsWith('//') || !line.startsWith('val=')) continue;
+        const body = line.slice(4);
+        const comma = body.indexOf(',');
+        assert(comma > 0, `${file}:${lineIndex + 1}: malformed enum row ${line}`);
+        const key = body.slice(0, comma).trim();
+        const value = body.slice(comma + 1).trim();
+        values.push({ key, id: sourceValue(key, constants, `${file}:${lineIndex + 1}`), value, line: lineIndex + 1 });
+    }
+    return values;
+}
+
+function extractValidatorBody(text) {
+    const marker = '[proc,validate_slayer_target]';
+    const start = text.indexOf(marker);
+    assert(start >= 0, `missing ${marker}`);
+    const next = text.indexOf('\n[', start + marker.length);
+    return text.slice(start, next < 0 ? text.length : next);
+}
+
+function matchingBrace(text, openIndex) {
+    let depth = 0;
+    for (let i = openIndex; i < text.length; i++) {
+        if (text[i] === '{') depth++;
+        else if (text[i] === '}' && --depth === 0) return i;
+    }
+    throw new Error('unclosed validator switch block');
+}
+
+function parseBlockedTargets(taskSource, constants, questValues) {
+    const body = extractValidatorBody(taskSource).replace(/\/\/[^\n]*/g, '');
+    const switchStart = body.indexOf('switch_int($target)');
+    assert(switchStart >= 0, 'validator has no target switch; revise independent oracle instead of silently weakening it');
+    const openIndex = body.indexOf('{', switchStart);
+    assert(openIndex >= 0, 'validator switch has no opening brace');
+    const closeIndex = matchingBrace(body, openIndex);
+    const switchBody = body.slice(openIndex + 1, closeIndex);
+    const headers = [...switchBody.matchAll(/^[ \t]*case\s+([\s\S]*?):[ \t]*$/gm)];
+    assert(headers.length > 0, 'independent parser found no validator cases');
+    const blocked = new Set();
+    const recognized = new Set();
+    for (let i = 0; i < headers.length; i++) {
+        const header = headers[i];
+        const nextIndex = i + 1 < headers.length ? headers[i + 1].index : switchBody.length;
+        const block = switchBody.slice(header.index + header[0].length, nextIndex);
+        const labels = [...header[1].matchAll(/\^([A-Za-z0-9_]+)/g)].map(match => match[1]);
+        assert(labels.length > 0, `validator case had no constant labels: ${header[1]}`);
+        const targetIds = labels.map(name => {
+            assert(constants.has(name), `validator case references unknown constant ^${name}`);
+            return Number(constants.get(name));
+        });
+        for (const target of targetIds) recognized.add(target);
+        if (!/\breturn\s*\(\s*false\s*\)/.test(block)) continue;
+        const questGate = block.match(/%([A-Za-z0-9_]+)\s*<\s*\^([A-Za-z0-9_]+)/);
+        if (questGate) {
+            const [, questVar, thresholdName] = questGate;
+            assert(constants.has(thresholdName), `validator quest gate references unknown ^${thresholdName}`);
+            const currentValue = questValues[questVar] ?? 0;
+            if (currentValue < Number(constants.get(thresholdName))) for (const target of targetIds) blocked.add(target);
+        } else {
+            for (const target of targetIds) blocked.add(target);
+        }
+    }
+    assert(recognized.size > 0, 'validator category cases were not parsed');
+    return { blocked, recognized };
+}
+
+function loadOracle() {
+    for (const file of Object.values(SOURCES)) assert(fs.existsSync(file), `missing source oracle input ${file}`);
+    const constants = new Map([...parseConstants(SOURCES.questConstants), ...parseConstants(SOURCES.constants)]);
+    const taskNameRows = parseEnum(SOURCES.taskNames, constants);
+    const taskNamesById = new Map();
+    for (const row of taskNameRows) {
+        const value = row.value.replace(/^\"|\"$/g, '');
+        assert(value.length > 0, `empty task_name at ${row.line}`);
+        taskNamesById.set(row.id, value);
+    }
+    const slayerReqRows = parseEnum(SOURCES.slayerRequirements, constants).map(row => ({ ...row, requirement: Number(row.value) }));
+    const combatReqRows = parseEnum(SOURCES.combatRequirements, constants).map(row => ({ ...row, requirement: Number(row.value) }));
+    const slayerReq = new Map(slayerReqRows.map(row => [row.id, row.requirement]));
+    const combatReq = new Map(combatReqRows.map(row => [row.id, row.requirement]));
+    const sourceRows = new Map([
+        ...parseDbRowFile(SOURCES.masterRows),
+        ...parseDbRowFile(SOURCES.taskRows)
+    ]);
+    const taskSource = fs.readFileSync(SOURCES.taskScript, 'utf8');
+    const masterSource = fs.readFileSync(SOURCES.masterScript, 'utf8');
+    const recommendationSource = fs.readFileSync(SOURCES.recommendationScript, 'utf8');
+    const questNames = [...new Set([...extractValidatorBody(taskSource).matchAll(/%([A-Za-z0-9_]+)\s*</g)].map(match => match[1]))];
+    const questValues = Object.fromEntries(questNames.map(name => [name, 0]));
+    const blocked = parseBlockedTargets(taskSource, constants, questValues);
+    const reverseConstants = new Map();
+    for (const [name, rawValue] of constants) {
+        if (name.startsWith('slayer_') && /^\d+$/.test(rawValue)) reverseConstants.set(Number(rawValue), name);
+    }
+    const masters = MASTER_DEFS.map(master => {
+        const tableRow = sourceRows.get(master.table);
+        assert(tableRow, `missing source master table DBRow ${master.table}`);
+        assert.equal(tableRow.table, 'slayer_task_table', `${master.table} has wrong DBTable`);
+        const refs = tableRow.data.get('task') ?? [];
+        const rows = refs.map((name, occurrenceIndex) => {
+            const child = sourceRows.get(name);
+            assert(child, `${master.table} refers to missing task DBRow ${name}`);
+            assert.equal(child.table, 'slayer_master_task', `${name} has wrong DBTable`);
+            const rawTarget = child.data.get('task')?.[0];
+            const rawWeight = child.data.get('weight')?.[0];
+            const rawMin = child.data.get('min_amount')?.[0];
+            const rawMax = child.data.get('max_amount')?.[0];
+            assert.notEqual(rawTarget, undefined, `${name} has no task field`);
+            assert.notEqual(rawWeight, undefined, `${name} has no weight field`);
+            assert.notEqual(rawMin, undefined, `${name} has no min_amount field`);
+            assert.notEqual(rawMax, undefined, `${name} has no max_amount field`);
+            return {
+                master: master.key,
+                table: master.table,
+                sourceName: name,
+                occurrenceIndex,
+                rawTarget,
+                target: sourceValue(rawTarget, constants, name),
+                weight: Number(rawWeight),
+                min: Number(rawMin),
+                max: Number(rawMax)
+            };
+        });
+        return { ...master, rows };
+    });
+    assert.equal(masters.length, 5);
+    return {
+        constants,
+        taskNamesById,
+        slayerReqRows,
+        combatReqRows,
+        slayerReq,
+        combatReq,
+        sourceRows,
+        taskSource,
+        masterSource,
+        recommendationSource,
+        questNames,
+        questValues,
+        blockedTargets: blocked.blocked,
+        validatorCaseTargets: blocked.recognized,
+        reverseConstants,
+        masters
+    };
+}
+
+const ORACLE = loadOracle();
+const SOURCE_HASHES = Object.fromEntries(Object.entries(SOURCES).map(([name, file]) => [name, digestFile(file)]));
+
+function expectedValidator(target, fixture) {
+    const slayerRequirement = ORACLE.slayerReq.get(target) ?? 0;
+    const combatRequirement = ORACLE.combatReq.get(target) ?? 0;
+    return fixture.baseSlayer >= slayerRequirement && fixture.combat >= combatRequirement && !ORACLE.blockedTargets.has(target);
+}
+
+function expectedRowEligibility(row, fixture) {
+    return row.weight > 0 && row.min <= row.max && ORACLE.taskNamesById.has(row.target) && expectedValidator(row.target, fixture);
+}
+
+function eligibleRows(master, fixture) {
+    return master.rows.filter(row => expectedRowEligibility(row, fixture));
+}
+
+function uniformCombatFixture(level) {
+    const base = 10 * (2 * level + Math.floor(level / 2));
+    const melee = 26 * level;
+    const rangedOrMagic = 13 * Math.floor(3 * level / 2);
+    return Math.floor((base + Math.max(melee, rangedOrMagic)) / 40);
+}
+
+function minimumFixture(master) {
+    return {
+        key: `${master.key}_minimum`,
+        master: master.key,
+        kind: 'restricted-minimum',
+        combat: master.combat,
+        level: master.level,
+        baseSlayer: master.slayer,
+        currentSlayer: master.slayer,
+        questValues: { ...ORACLE.questValues }
+    };
+}
+
+function firstNonemptyFixture(master) {
+    const exact = minimumFixture(master);
+    if (eligibleRows(master, exact).length > 0) return { ...exact, fallbackForEmptyMinimum: null, emptyMinimumFixture: null };
+
+    // Keep the exact minimum as a deterministic false proof; then disclose the
+    // first stronger, still-admitted equal-combat-stat fixture with eligible rows.
+    for (let level = master.level; level <= 99; level++) {
+        const combat = uniformCombatFixture(level);
+        if (combat < master.combat) continue;
+        for (let slayer = master.slayer; slayer <= 99; slayer++) {
+            if (master.key === 'duradel' && slayer < 50) continue;
+            const candidate = {
+                key: `${master.key}_first_nonempty_cb${combat}_slayer${slayer}`,
+                master: master.key,
+                kind: 'first-nonempty-admitted',
+                combat,
+                level,
+                baseSlayer: slayer,
+                currentSlayer: master.key === 'duradel' ? 50 : master.slayer,
+                questValues: { ...ORACLE.questValues },
+                fallbackForEmptyMinimum: exact.key,
+                emptyMinimumFixture: exact
+            };
+            if (eligibleRows(master, candidate).length > 0) return candidate;
+        }
+    }
+    throw new Error(`${master.key}: no nonempty admitted fixture through combat 126/base Slayer 99`);
+}
+
+const FIXTURES = new Map();
+for (const master of ORACLE.masters) {
+    FIXTURES.set(`${master.key}:minimum`, firstNonemptyFixture(master));
+    FIXTURES.set(`${master.key}:high`, {
+        ...HIGH_FIXTURE,
+        key: `${master.key}_${HIGH_FIXTURE.key}`,
+        master: master.key,
+        kind: 'combat126-slayer99',
+        baseSlayer: 99,
+        currentSlayer: 99,
+        questValues: { ...ORACLE.questValues },
+        fallbackForEmptyMinimum: null
+    });
+}
+
+function fixtureRowsForCompile() {
+    const blocks = [fs.readFileSync(ADJACENT_FIXTURE, 'utf8').trim()];
+    const endpointCases = [];
+    for (const master of ORACLE.masters) {
+        for (const fixtureKey of ['minimum', 'high']) {
+            const fixture = FIXTURES.get(`${master.key}:${fixtureKey}`);
+            for (const row of eligibleRows(master, fixture)) {
+                const suffix = `${master.key}_${fixtureKey}_${row.occurrenceIndex}`;
+                const masterName = `s1_selector_endpoint_table_${suffix}`;
+                const childName = `s1_selector_endpoint_task_${suffix}`;
+                blocks.push([
+                    `[${masterName}]`,
+                    'table=slayer_task_table',
+                    `data=task,${childName}`,
+                    '',
+                    `[${childName}]`,
+                    'table=slayer_master_task',
+                    `data=task,${row.rawTarget}`,
+                    `data=weight,${row.weight}`,
+                    `data=min_amount,${row.min}`,
+                    `data=max_amount,${row.max}`
+                ].join('\n'));
+                endpointCases.push({
+                    master: master.key,
+                    fixtureKind: fixtureKey,
+                    sourceName: row.sourceName,
+                    occurrenceIndex: row.occurrenceIndex,
+                    target: row.target,
+                    weight: row.weight,
+                    min: row.min,
+                    max: row.max,
+                    masterName,
+                    childName
+                });
+            }
+        }
+    }
+    return { source: `${blocks.join('\n\n')}\n`, endpointCases };
+}
+
+const GENERATED_FIXTURES = fixtureRowsForCompile();
+const FIXTURE_SOURCE_PATH = path.join(RUN_DIR, 'slayer_selector_compiled_fixtures.dbrow');
+fs.writeFileSync(FIXTURE_SOURCE_PATH, GENERATED_FIXTURES.source);
+const FIXTURE_SOURCE_HASH = digestFile(FIXTURE_SOURCE_PATH);
+
+function compilerSourceKey() {
+    const compilerPackage = path.join(ENGINE_ROOT, 'node_modules/@lostcityrs/runescript/package.json');
+    const packageVersion = fs.existsSync(compilerPackage) ? JSON.parse(fs.readFileSync(compilerPackage, 'utf8')).version : 'missing';
+    const roots = [
+        ['content-scripts', path.join(CONTENT_ROOT, 'scripts')],
+        ['content-pack-map', path.join(CONTENT_ROOT, 'pack')],
+        ['engine-pack-tools', path.join(ENGINE_ROOT, 'tools/pack')],
+        ['engine-config-types', path.join(ENGINE_ROOT, 'src/cache/config')],
+        ['engine-script-runtime', path.join(ENGINE_ROOT, 'src/engine/script')]
+    ];
+    const hashes = Object.fromEntries(roots.map(([key, directory]) => [key, hashTree(directory)]));
+    const helperSha256 = digestFile(COMPILE_HELPER);
+    const key = sha256(JSON.stringify({ hashes, packageVersion, fixtureSource: FIXTURE_SOURCE_HASH, helperSha256 }));
+    return { key, hashes, packageVersion, helperSha256 };
+}
+
+const COMPILER_INPUTS = compilerSourceKey();
+const FIXTURE_OUTPUT_BASE = path.join(OPTIONS.artifactDir, 'compiled-fixtures', COMPILER_INPUTS.key.slice(0, 20));
+
+function compileFixturePack() {
+    const args = [
+        ...process.execArgv,
+        COMPILE_HELPER,
+        '--content', CONTENT_ROOT,
+        '--engine', ENGINE_ROOT,
+        '--fixture', FIXTURE_SOURCE_PATH,
+        '--output-dir', FIXTURE_OUTPUT_BASE,
+        '--source-key', COMPILER_INPUTS.key
+    ];
+    const child = spawnSync(process.execPath, args, { cwd: ENGINE_ROOT, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
+    const output = `${child.stdout ?? ''}${child.stderr ?? ''}`;
+    if (child.error) throw child.error;
+    assert.equal(child.status, 0, `fixture compiler failed (status ${child.status}):\n${output}`);
+    const jsonLine = (child.stdout ?? '').split(/\r?\n/).filter(line => line.trim().startsWith('{')).at(-1);
+    assert(jsonLine, `fixture compiler did not return its pack manifest:\n${output}`);
+    const result = JSON.parse(jsonLine);
+    assert.equal(result.sourceKey, COMPILER_INPUTS.key);
+    assert.equal(result.compiled || result.reused, true);
+    return result;
+}
+
+const FIXTURE_PACK_RESULT = compileFixturePack();
+const FIXTURE_PACK_DIR = FIXTURE_PACK_RESULT.directory;
+
+async function importEngine(relative) {
+    return import(pathToFileURL(path.join(ENGINE_ROOT, relative)).href);
+}
+
+const World = (await importEngine('src/engine/World.ts')).default;
+const ScriptProvider = (await importEngine('src/engine/script/ScriptProvider.ts')).default;
+const ScriptRunner = (await importEngine('src/engine/script/ScriptRunner.ts')).default;
+const ScriptState = (await importEngine('src/engine/script/ScriptState.ts')).default;
+const Player = (await importEngine('src/engine/entity/Player.ts')).default;
+const Npc = (await importEngine('src/engine/entity/Npc.ts')).default;
+const { EntityLifeCycle } = await importEngine('src/engine/entity/EntityLifeCycle.ts');
+const { PlayerStat } = await importEngine('src/engine/entity/PlayerStat.ts');
+const JavaRandom = (await importEngine('src/util/JavaRandom.ts')).default;
+const configTypes = {};
+for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'NpcType', 'InvType', 'ObjType', 'FontType', 'Component', 'DbTableType', 'DbRowType', 'EnumType']) {
+    configTypes[name] = (await importEngine(`src/cache/config/${name}.ts`)).default;
+}
+
+function loadRuntime({ scripts = PACK_DIR, rows = PACK_DIR } = {}) {
+    for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'NpcType', 'InvType', 'ObjType', 'FontType', 'Component', 'EnumType', 'DbTableType']) {
+        configTypes[name].load(PACK_DIR);
+    }
+    configTypes.DbRowType.load(rows);
+    assert(ScriptProvider.load(scripts) > 0, `ScriptProvider.load found no scripts under ${scripts}`);
+    World.currentTick = 1;
+}
+
+function makePlayer() {
+    const player = new Player('slayer_selector_offline', 0n, 0n);
+    player.uid = 1;
+    player.pid = 1;
+    player.staffModLevel = 0;
+    player.messages = [];
+    player.packets = [];
+    player.lastMovement = 0;
+    player.write = packet => {
+        player.packets.push(packet);
+        if (typeof packet.text === 'string') player.messages.push(packet.text);
+    };
+    player.messageGame = message => player.messages.push(message);
+    player.wrappedMessageGame = message => player.messages.push(message);
+    return player;
+}
+
+const COMBAT_STATS = [PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE, PlayerStat.HITPOINTS, PlayerStat.PRAYER, PlayerStat.RANGED, PlayerStat.MAGIC];
+const QUEST_VAR_IDS = Object.fromEntries(ORACLE.questNames.map(name => [name, packId('varp', name)]));
+const IDS = {
+    inv: packId('inv', 'inv'),
+    gem: packId('obj', 'slayer_gem'),
+    target: packId('varp', 'slayer_target'),
+    count: packId('varp', 'slayer_count'),
+    masters: Object.fromEntries(MASTER_DEFS.map(master => [master.key, packId('npc', master.npc)]))
+};
+
+function applyFixture(player, fixture, { drainCombat = true } = {}) {
+    for (const stat of COMBAT_STATS) {
+        const base = fixture.baseCombatSkills?.[stat] ?? fixture.level;
+        player.baseLevels[stat] = base;
+        player.levels[stat] = drainCombat ? 1 : base;
+    }
+    player.baseLevels[PlayerStat.SLAYER] = fixture.baseSlayer;
+    player.levels[PlayerStat.SLAYER] = fixture.currentSlayer;
+    for (const [name, value] of Object.entries(fixture.questValues ?? ORACLE.questValues)) player.setVar(QUEST_VAR_IDS[name], value);
+}
+
+function makeNpc(type) {
+    const npcType = configTypes.NpcType.get(type);
+    assert(npcType, `NpcType ${type} is not loaded`);
+    return new Npc(0, 3551, 3550, 1, 1, EntityLifeCycle.DESPAWN, 1, type, npcType.blockwalk);
+}
+
+function getScript(name) {
+    const script = ScriptProvider.getByName(name);
+    assert(script, `compiled packed script missing ${name}`);
+    return script;
+}
+
+function runRaw(player, name, npc = null, args = []) {
+    const state = ScriptRunner.init(getScript(name), player, npc, args);
+    const exec = player.runScript(state, true, true);
+    return { state, exec, opcount: state.opcount };
+}
+
+function runPacked(player, name, npc = null, args = []) {
+    const result = runRaw(player, name, npc, args);
+    assert.notEqual(result.exec, -1, `${name} was refused instead of running protected`);
+    assert.equal(result.exec, ScriptState.FINISHED, `${name} did not finish (exec=${result.exec}, ops=${result.opcount})`);
+    assert.equal(result.state.execution, ScriptState.FINISHED, `${name} state is not FINISHED`);
+    return result;
+}
+
+function returnedInt(result, label) {
+    assert(result.state.isp > 0, `${label} returned no integer`);
+    return result.state.popInt();
+}
+
+function runInt(player, name, npc = null, args = []) {
+    const result = runPacked(player, name, npc, args);
+    return { value: returnedInt(result, name), ...result };
+}
+
+function combatLevel(player) {
+    return runInt(player, '[proc,player_combat_level]').value;
+}
+
+function validatorAccepts(player, npc, target) {
+    const result = runInt(player, '[proc,validate_slayer_target]', npc, [target]);
+    assert(result.value === 0 || result.value === 1, `validator returned nonboolean ${result.value}`);
+    return result.value === 1;
+}
+
+function eligibleMaster(player, npc, masterId) {
+    const result = runRaw(player, '[proc,slayer_master_eligible]', npc, [masterId]);
+    driveDialogue(player, result, []);
+    result.value = returnedInt(result, 'slayer_master_eligible');
+    assert(result.value === 0 || result.value === 1, `master admission returned nonboolean ${result.value}`);
+    return result.value === 1;
+}
+
+function traceWrites(player) {
+    const events = [];
+    const timeline = [];
+    const originalSetVar = player.setVar;
+    const originalInvAdd = player.invAdd;
+    const originalWrite = player.write;
+    const originalMessageGame = player.messageGame;
+    const originalWrappedMessageGame = player.wrappedMessageGame;
+    player.setVar = function (id, value) {
+        if (id === IDS.target) {
+            const event = { kind: 'target', value };
+            events.push(event);
+            timeline.push(event);
+        } else if (id === IDS.count) {
+            const event = { kind: 'count', value };
+            events.push(event);
+            timeline.push(event);
+        }
+        return originalSetVar.call(this, id, value);
+    };
+    player.invAdd = function (inv, object, count) {
+        if (object === IDS.gem) {
+            const event = { kind: 'gem', inv, object, count };
+            events.push(event);
+            timeline.push(event);
+        }
+        return originalInvAdd.call(this, inv, object, count);
+    };
+    player.write = function (packet) {
+        if (typeof packet.text === 'string') timeline.push({ kind: 'dialogue', text: packet.text });
+        return originalWrite.call(this, packet);
+    };
+    player.messageGame = function (message) {
+        timeline.push({ kind: 'dialogue', text: message });
+        return originalMessageGame.call(this, message);
+    };
+    player.wrappedMessageGame = function (message) {
+        timeline.push({ kind: 'dialogue', text: message });
+        return originalWrappedMessageGame.call(this, message);
+    };
+    return {
+        events,
+        timeline,
+        restore() {
+            player.setVar = originalSetVar;
+            player.invAdd = originalInvAdd;
+            player.write = originalWrite;
+            player.messageGame = originalMessageGame;
+            player.wrappedMessageGame = originalWrappedMessageGame;
+        }
+    };
+}
+
+function withRandomStream(values, callback) {
+    const original = JavaRandom.nextDouble;
+    const observed = [];
+    let index = 0;
+    JavaRandom.nextDouble = function () {
+        assert(index < values.length, `unexpected random opcode call ${index + 1}; stream has ${values.length} values`);
+        const value = values[index++];
+        assert(value >= 0 && value < 1, `test seam supplied invalid nextDouble value ${value}`);
+        observed.push(value);
+        return value;
+    };
+    try {
+        const result = callback();
+        assert.equal(index, values.length, `random opcode consumed ${index}/${values.length} forced values`);
+        return { result, observed };
+    } finally {
+        JavaRandom.nextDouble = original;
+    }
+}
+
+function inventory(player) {
+    const result = player.getInventory(IDS.inv);
+    assert(result, 'player inventory was not loaded');
+    return result;
+}
+
+function gemCount(player) {
+    return inventory(player).getItemCount(IDS.gem);
+}
+
+function sentinelTask(player, target = 123456, count = 789) {
+    player.setVar(IDS.target, target);
+    player.setVar(IDS.count, count);
+    return { target, count };
+}
+
+function rowForPacked(rowName) {
+    const id = configTypes.DbRowType.getId(rowName);
+    assert(id >= 0, `packed DBRow name missing: ${rowName}`);
+    const row = configTypes.DbRowType.get(id);
+    assert(row, `packed DBRow id ${id} missing for ${rowName}`);
+    return { id, row };
+}
+
+function tableColumn(row, name) {
+    const table = configTypes.DbTableType.get(row.tableId);
+    assert(table, `DbTableType ${row.tableId} missing for packed row`);
+    const column = table.columnNames.indexOf(name);
+    assert(column >= 0, `DbTableType ${row.tableId} has no column ${name}`);
+    return column;
+}
+
+function packedValues(row, name) {
+    const column = tableColumn(row, name);
+    const encoded = row.columnValues[column] ?? [];
+    const arity = row.types[column]?.length ?? 1;
+    assert.equal(encoded.length % arity, 0, `packed ${name} column has incomplete tuple`);
+    const count = encoded.length / arity;
+    return Array.from({ length: count }, (_, index) => {
+        const value = row.getValue(column, index);
+        return Array.isArray(value) ? value[0] : value;
+    });
+}
+
+function assertPackedLiveRows() {
+    const tableId = configTypes.DbTableType.getId('slayer_task_table');
+    const taskTableId = configTypes.DbTableType.getId('slayer_master_task');
+    assert(tableId >= 0 && taskTableId >= 0, 'Slayer DBTable configs are not packed');
+    const packedRowsByMaster = new Map();
+    const packedChildrenByName = new Map();
+    for (const master of ORACLE.masters) {
+        const { row: tableRow } = rowForPacked(master.table);
+        assert.equal(tableRow.tableId, tableId, `${master.table} packed table id mismatch`);
+        const references = packedValues(tableRow, 'task');
+        assert.equal(references.length, master.rows.length, `${master.table} packed membership length differs from source`);
+        const childRows = [];
+        for (let index = 0; index < master.rows.length; index++) {
+            const expected = master.rows[index];
+            const childId = configTypes.DbRowType.getId(expected.sourceName);
+            assert(childId >= 0, `packed child row missing ${expected.sourceName}`);
+            assert.equal(references[index], childId, `${master.table} order/membership differs at occurrence ${index}: expected ${expected.sourceName}`);
+            const child = configTypes.DbRowType.get(childId);
+            assert(child, `packed child row ${expected.sourceName} missing`);
+            assert.equal(child.tableId, taskTableId, `${expected.sourceName} packed table id mismatch`);
+            const target = Number(packedValues(child, 'task')[0]);
+            const weight = Number(packedValues(child, 'weight')[0]);
+            const min = Number(packedValues(child, 'min_amount')[0]);
+            const max = Number(packedValues(child, 'max_amount')[0]);
+            assert.equal(target, expected.target, `${expected.sourceName} packed category differs from source`);
+            assert.equal(weight, expected.weight, `${expected.sourceName} packed weight differs from source`);
+            assert.equal(min, expected.min, `${expected.sourceName} packed min differs from source`);
+            assert.equal(max, expected.max, `${expected.sourceName} packed max differs from source`);
+            const packed = { ...expected, packedId: childId, target, weight, min, max };
+            childRows.push(packed);
+            packedChildrenByName.set(expected.sourceName, packed);
+        }
+        packedRowsByMaster.set(master.key, { ...master, rows: childRows });
+    }
+
+    return packedRowsByMaster;
+}
+
+function buildActualValidatorCache(player, npc, fixture, targets, label) {
+    const cache = new Map();
+    for (const target of new Set(targets)) {
+        const actual = validatorAccepts(player, npc, target);
+        const expected = expectedValidator(target, fixture);
+        assert.equal(actual, expected, `${label}: source-parsed validator expectation differs for target ${target} (${ORACLE.reverseConstants.get(target) ?? 'unresolved'})`);
+        cache.set(target, actual);
+    }
+    return cache;
+}
+
+function assertSelectedTask(master, fixture, selectedTarget, selectedCount, acceptance) {
+    assert(selectedTarget >= 0 && selectedTarget <= 75, `selected category ${selectedTarget} is outside the fixed 0..75 family`);
+    const occurrences = master.rows.filter(row => row.target === selectedTarget && expectedRowEligibility(row, fixture));
+    assert(occurrences.length > 0, `${master.key}/${fixture.key}: selected target is not an independently eligible member`);
+    assert.equal(acceptance.get(selectedTarget), true, `${master.key}/${fixture.key}: actual packed validator rejected selected category`);
+    assert(occurrences.some(row => selectedCount >= row.min && selectedCount <= row.max), `${master.key}/${fixture.key}: count ${selectedCount} is outside every matching eligible occurrence`);
+}
+
+function recordFixture(fixture) {
+    return {
+        key: fixture.key,
+        master: fixture.master,
+        kind: fixture.kind,
+        combat: fixture.combat,
+        uniformBaseCombatSkill: fixture.baseCombatSkills ? null : fixture.level,
+        baseCombatSkills: Object.fromEntries(COMBAT_STATS.map(stat => [stat, fixture.baseCombatSkills?.[stat] ?? fixture.level])),
+        currentCombatSkills: Object.fromEntries(COMBAT_STATS.map(stat => [stat, 1])),
+        baseSlayer: fixture.baseSlayer,
+        currentSlayer: fixture.currentSlayer,
+        questValues: fixture.questValues,
+        fallbackForEmptyMinimum: fixture.fallbackForEmptyMinimum,
+        emptyMinimumFixture: fixture.emptyMinimumFixture ? recordFixture(fixture.emptyMinimumFixture) : null
+    };
+}
+
+function testCombatAndMasterAdmission() {
+    const player = makePlayer();
+    const observedFixtures = [];
+    for (const master of ORACLE.masters) {
+        const fixture = FIXTURES.get(`${master.key}:minimum`);
+        applyFixture(player, fixture);
+        const actualCombat = combatLevel(player);
+        assert.equal(actualCombat, fixture.combat, `${fixture.key}: compiled player_combat_level must return requested CB`);
+        observedFixtures.push({ ...recordFixture(fixture), actualCombatLevel: actualCombat });
+        const npc = makeNpc(IDS.masters[master.key]);
+        assert.equal(eligibleMaster(player, npc, IDS.masters[master.key]), true, `${fixture.key}: minimum admitted master must accept`);
+
+        const below = { ...fixture, level: Math.max(1, fixture.level - 1), combat: uniformCombatFixture(Math.max(1, fixture.level - 1)) };
+        applyFixture(player, below);
+        const belowCombat = combatLevel(player);
+        assert.equal(belowCombat, below.combat, `${master.key}: lower uniform stats combat formula mismatch`);
+        const expectedBelow = master.key === 'turael' || belowCombat >= master.combat && (master.key !== 'duradel' || fixture.currentSlayer >= 50);
+        assert.equal(eligibleMaster(player, npc, IDS.masters[master.key]), expectedBelow, `${master.key}: master admission below combat boundary`);
+
+        const above = { ...fixture, level: Math.min(99, fixture.level + 1), combat: uniformCombatFixture(Math.min(99, fixture.level + 1)) };
+        applyFixture(player, above);
+        assert.equal(combatLevel(player), above.combat, `${master.key}: upper uniform stats combat formula mismatch`);
+        const expectedAbove = master.key === 'turael' || above.combat >= master.combat && (master.key !== 'duradel' || fixture.currentSlayer >= 50);
+        assert.equal(eligibleMaster(player, npc, IDS.masters[master.key]), expectedAbove, `${master.key}: master admission above combat boundary`);
+    }
+
+    const duradelNpc = makeNpc(IDS.masters.duradel);
+    const cb100 = { key: 'duradel_cb100_current_slayer_probe', combat: 100, level: 79, baseSlayer: 1, currentSlayer: 49, questValues: { ...ORACLE.questValues } };
+    applyFixture(player, cb100);
+    assert.equal(combatLevel(player), 100, 'Duradel current-Slayer probe must be CB100');
+    assert.equal(eligibleMaster(player, duradelNpc, IDS.masters.duradel), false, 'Duradel admission must use current Slayer 49 even with base Slayer 1');
+    player.levels[PlayerStat.SLAYER] = 50;
+    assert.equal(eligibleMaster(player, duradelNpc, IDS.masters.duradel), true, 'Duradel admission must use current Slayer 50 even with base Slayer 1');
+    player.levels[PlayerStat.SLAYER] = 49;
+    assert.equal(runInt(player, '[proc,get_best_slayer_master]').value, IDS.masters.chaeldar, 'recommendation must use current, not base, Slayer');
+    player.levels[PlayerStat.SLAYER] = 50;
+    assert.equal(runInt(player, '[proc,get_best_slayer_master]').value, IDS.masters.duradel, 'recommendation must use current Slayer 50 for Duradel');
+
+    return {
+        fixtures: observedFixtures,
+        duradelCurrentVsBaseSlayer: {
+            combat: 100,
+            baseSlayer: 1,
+            currentSlayerBoundary: [49, 50],
+            admittedAtCurrent50: true,
+            recommendedAtCurrent50: true,
+            admittedAtCurrent49: false,
+            recommendedBelowCurrent50: false
+        }
+    };
+}
+
+function testThresholds() {
+    const player = makePlayer();
+    const npc = makeNpc(IDS.masters.turael);
+    const targets = [];
+    const observations = [];
+    for (const row of ORACLE.slayerReqRows) {
+        const requirement = row.requirement;
+        assert(Number.isInteger(requirement) && requirement >= 0, `slayer_req row ${row.key} is not a nonnegative integer`);
+        for (const baseSlayer of [...new Set([Math.max(0, requirement - 1), requirement, requirement + 1])]) {
+            for (const currentSlayer of [1, 99]) {
+                const fixture = {
+                    key: `slayer_req_${row.key}_base${baseSlayer}_current${currentSlayer}`,
+                    combat: 126,
+                    level: 99,
+                    baseSlayer,
+                    currentSlayer,
+                    questValues: { ...ORACLE.questValues }
+                };
+                applyFixture(player, fixture);
+                assert.equal(combatLevel(player), 126, `${fixture.key}: combat level must be independent of current skill drain`);
+                const actual = validatorAccepts(player, npc, row.id);
+                const expected = expectedValidator(row.id, fixture);
+                assert.equal(actual, expected, `${fixture.key}: packed validator must use base Slayer threshold ${requirement}`);
+                targets.push(row.id);
+                observations.push({ target: row.id, targetName: ORACLE.taskNamesById.get(row.id) ?? null, requirement, baseSlayer, currentSlayer, expected, actual });
+            }
+        }
+    }
+    return { rows: ORACLE.slayerReqRows.length, observations, testedTargets: [...new Set(targets)].length };
+}
+
+function testDispatchAndOneShotOrder(packedRows) {
+    const results = [];
+    for (const master of ORACLE.masters) {
+        for (const fixtureKind of ['minimum', 'high']) {
+            const fixture = FIXTURES.get(`${master.key}:${fixtureKind}`);
+            const player = makePlayer();
+            applyFixture(player, fixture);
+            const actualCombat = combatLevel(player);
+            assert.equal(actualCombat, fixture.combat, `${fixture.key}: actual CB fixture mismatch`);
+            const npc = makeNpc(IDS.masters[master.key]);
+            const expectedRows = packedRows.get(master.key).rows.filter(row => expectedRowEligibility(row, fixture));
+            const trace = traceWrites(player);
+            JavaRandom.setSeed(1);
+            const result = runInt(player, '[proc,slayer_new_target]', npc);
+            trace.restore();
+            if (expectedRows.length === 0) {
+                assert.equal(result.value, 0, `${fixture.key}: empty eligible set must return false`);
+                assert.deepEqual(trace.events, [], `${fixture.key}: false dispatch wrote target/count`);
+                results.push({ fixture: recordFixture(fixture), expectedEligible: 0, success: false, writes: trace.events });
+                continue;
+            }
+            assert.equal(result.value, 1, `${fixture.key}: five-master dispatch should return true for nonempty fixture`);
+            const target = player.getVar(IDS.target);
+            const count = player.getVar(IDS.count);
+            const acceptance = buildActualValidatorCache(player, npc, fixture, expectedRows.map(row => row.target), fixture.key);
+            assertSelectedTask(packedRows.get(master.key), fixture, target, count, acceptance);
+            assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count'], `${fixture.key}: selector must write target then count`);
+            assert.equal(gemCount(player), 0, `${fixture.key}: selector dispatch must not grant the teaching gem`);
+            results.push({ fixture: recordFixture(fixture), expectedEligible: expectedRows.length, success: true, target, count, opcount: result.opcount, writes: trace.events });
+        }
+    }
+
+    const nonMasterEntry = packEntries('npc').find(([name]) => !MASTER_DEFS.some(master => master.npc === name) && configTypes.NpcType.get(packId('npc', name)));
+    assert(nonMasterEntry, 'no loaded nonmaster NPC found in npc.pack');
+    const [nonMasterName, nonMasterId] = nonMasterEntry;
+    const fixture = FIXTURES.get('turael:high');
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    const trace = traceWrites(player);
+    JavaRandom.setSeed(1);
+    const result = runInt(player, '[proc,slayer_new_target]', makeNpc(nonMasterId));
+    trace.restore();
+    assert.equal(result.value, 0, `nonmaster ${nonMasterName} dispatch must return false`);
+    assert.deepEqual(trace.events, [], 'nonmaster dispatch wrote target/count');
+    assert.equal(gemCount(player), 0, 'nonmaster dispatch granted gem');
+    results.push({ nonMasterName, nonMasterId, success: false, writes: trace.events });
+    return results;
+}
+
+function dialogueText(player) {
+    return [...player.messages, ...player.packets.map(packet => packet.text ?? '')].join(' ').replace(/\s+/g, ' ').trim();
+}
+
+function startDialogue(player, npc, name) {
+    const state = ScriptRunner.init(getScript(name), player, npc);
+    const exec = player.runScript(state, true, true);
+    assert.notEqual(exec, -1, `${name} protected dialogue start was refused`);
+    assert.notEqual(exec, ScriptState.ABORTED, `${name} aborted at start`);
+    return { state, exec };
+}
+
+function driveDialogue(player, result, choices) {
+    let pauses = 0;
+    while (result.exec === ScriptState.PAUSEBUTTON && pauses++ < 300) {
+        const menu = result.state.script.name.match(/^\[proc,p_choice([2345])(?:_header)?\]$/);
+        if (menu) {
+            assert(choices.length > 0, `unanswered packed menu ${result.state.script.name}`);
+            player.lastCom = packId('interface', `multi${menu[1]}:com_${choices.shift()}`);
+        }
+        result.exec = player.runScript(result.state, true, true);
+        assert.notEqual(result.exec, -1, `${result.state.script.name} protected dialogue resume was refused`);
+        assert.notEqual(result.exec, ScriptState.ABORTED, `${result.state.script.name} aborted while resuming`);
+    }
+    assert.equal(result.exec, ScriptState.FINISHED, `dialogue did not finish (exec=${result.exec}, script=${result.state.script.name})`);
+    assert.equal(choices.length, 0, `dialogue did not consume requested choices: ${choices}`);
+    return result;
+}
+
+function underqualifiedChaeldarFixture() {
+    // Six non-prayer combat stats at 55 and Prayer at 52 produce CB69; current
+    // stats are independently drained, while both Slayer bases stay at 50.
+    const player = makePlayer();
+    const fixture = {
+        key: 'chaeldar_cb69_base_current_slayer50',
+        combat: 69,
+        level: 55,
+        baseCombatSkills: { [PlayerStat.PRAYER]: 52 },
+        baseSlayer: 50,
+        currentSlayer: 50,
+        questValues: { ...ORACLE.questValues }
+    };
+    applyFixture(player, fixture);
+    assert.equal(combatLevel(player), 69, 'underqualified teaching fixture must be exactly CB69');
+    return { player, fixture };
+}
+
+function testCurrentTeachingAdmission() {
+    const { player, fixture } = underqualifiedChaeldarFixture();
+    const npc = makeNpc(IDS.masters.chaeldar);
+    assert.equal(eligibleMaster(player, npc, IDS.masters.chaeldar), false, 'Chaeldar must reject CB69 before first teaching');
+    player.messages.length = 0;
+    player.packets.length = 0;
+    const prior = sentinelTask(player, 0, 789);
+    const trace = traceWrites(player);
+    const random = withRandomStream([], () => {
+        const result = startDialogue(player, npc, '[opnpc1,_slayer_master]');
+        return driveDialogue(player, result, [1, 2, 1]);
+    });
+    trace.restore();
+    assert.deepEqual(trace.events, [], 'underqualified first teaching wrote task or gem');
+    assert.equal(player.getVar(IDS.target), prior.target, 'underqualified teaching changed prior target');
+    assert.equal(player.getVar(IDS.count), prior.count, 'underqualified teaching changed prior count');
+    assert.equal(gemCount(player), 0, 'underqualified teaching granted a Slayer gem');
+    assert.match(dialogueText(player), /not strong enough to be taught by me/i, 'teaching admission refusal line missing');
+    assert.doesNotMatch(dialogueText(player), /we.ll start you off hunting|your new task is to kill/i, 'underqualified teaching displayed assignment success');
+    return { fixture: recordFixture(fixture), randomValues: random.observed, writes: trace.events, messages: player.messages, packets: player.packets.length };
+}
+function testCurrentTeachingSuccess() {
+    const master = ORACLE.masters.find(entry => entry.key === 'turael');
+    const fixture = FIXTURES.get('turael:minimum');
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: teaching fixture combat mismatch`);
+    const npc = makeNpc(IDS.masters.turael);
+    assert.equal(eligibleMaster(player, npc, IDS.masters.turael), true, 'Turael should admit first teaching fixture');
+    const forced = streamForFirstEligible(master, fixture);
+    const acceptance = buildActualValidatorCache(player, npc, fixture, [forced.row.target], `${fixture.key}:teaching`);
+    sentinelTask(player, 0, 0);
+    const trace = traceWrites(player);
+    JavaRandom.setSeed(1);
+    const stream = withRandomStream(forced.values, () => {
+        const result = startDialogue(player, npc, '[opnpc1,_slayer_master]');
+        return driveDialogue(player, result, [1, 2, 1, 2]);
+    });
+    trace.restore();
+    assert.equal(player.getVar(IDS.target), forced.row.target, 'first teaching selected a different row than the forced first eligible occurrence');
+    assert(player.getVar(IDS.count) >= forced.row.min && player.getVar(IDS.count) <= forced.row.max, 'first teaching count is outside the selected row');
+    assert.equal(acceptance.get(player.getVar(IDS.target)), true, 'teaching task was rejected by the packed validator');
+    assert.equal(gemCount(player), 1, 'successful first teaching must grant exactly one Slayer gem');
+    assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count', 'gem'], 'first teaching must write target, count, then gem');
+    const targetIndex = trace.timeline.findIndex(event => event.kind === 'target');
+    const countIndex = trace.timeline.findIndex(event => event.kind === 'count');
+    const gemIndex = trace.timeline.findIndex(event => event.kind === 'gem');
+    assert.equal(countIndex, targetIndex + 1, 'dialogue or another write occurred between target and count');
+    assert.equal(gemIndex, countIndex + 1, 'dialogue or another write occurred between count and gem');
+    const successLineIndex = trace.timeline.findIndex(event => event.kind === 'dialogue' && /We'll start you off hunting/i.test(event.text));
+    assert(successLineIndex > gemIndex, 'assignment success sentence must follow target, count and gem');
+    assert.match(dialogueText(player), /we.ll start you off hunting/i, 'successful first teaching assignment line missing');
+    assert.match(dialogueText(player), /enchanted gem/i, 'successful first teaching gem explanation missing');
+    return { fixture: recordFixture(fixture), selectedSourceRow: forced.row.sourceName, target: player.getVar(IDS.target), count: player.getVar(IDS.count), forcedRandomValues: stream.observed, writes: trace.events, timeline: trace.timeline, gemCount: gemCount(player) };
+}
+
+function buildDistribution(master, fixture, rows) {
+    let survival = 1;
+    const occurrenceWeights = [];
+    let passSuccess = 0;
+    for (const row of rows) {
+        const probability = expectedRowEligibility(row, fixture) ? 1 / row.weight : 0;
+        const perPass = probability * survival;
+        occurrenceWeights.push({ row, probability, perPass });
+        passSuccess += perPass;
+        survival *= 1 - probability;
+    }
+    assert(passSuccess > 0, `${master.key}/${fixture.key}: no eligible ordered-pass probability`);
+    const categoryProbability = new Map();
+    for (const occurrence of occurrenceWeights) {
+        if (occurrence.perPass === 0) continue;
+        const probability = occurrence.perPass / passSuccess;
+        categoryProbability.set(occurrence.row.target, (categoryProbability.get(occurrence.row.target) ?? 0) + probability);
+    }
+    return { occurrenceWeights, categoryProbability, passSuccess };
+}
+
+class GzipJsonlWriter {
+    constructor(file) {
+        this.file = file;
+        this.output = fs.createWriteStream(file);
+        this.gzip = createGzip({ level: 9 });
+        this.gzip.pipe(this.output);
+        this.buffer = '';
+        this.pendingDrain = null;
+        this.chunkLimit = 256 * 1024;
+    }
+    write(record) {
+        this.buffer += `${JSON.stringify(record)}\n`;
+        return this.buffer.length >= this.chunkLimit ? this.flushChunk() : null;
+    }
+    async flushChunk() {
+        if (this.pendingDrain) {
+            await this.pendingDrain;
+            this.pendingDrain = null;
+        }
+        const chunk = this.buffer;
+        this.buffer = '';
+        if (chunk && !this.gzip.write(chunk)) this.pendingDrain = once(this.gzip, 'drain');
+    }
+    async close() {
+        if (this.buffer) await this.flushChunk();
+        if (this.pendingDrain) {
+            await this.pendingDrain;
+            this.pendingDrain = null;
+        }
+        this.gzip.end();
+        await finished(this.output);
+    }
+}
+
+function binBound(probability, sampleCount) {
+    if (probability === 0 || probability === 1) return 0;
+    return Math.ceil(Math.sqrt(2 * sampleCount * probability * (1 - probability) * LOG_BOUND) + (2 * LOG_BOUND) / 3);
+}
+
+function makeCountMap() {
+    return new Map(Array.from({ length: 76 }, (_, category) => [category, 0]));
+}
+
+function locateOccurrence(master, fixture, target, count, randomCalls, acceptance) {
+    const positive = master.rows.filter(row => row.weight > 0);
+    const weightCount = positive.length;
+    assert(weightCount > 0, `${master.key}: no positive weights`);
+    const amountCalls = 1;
+    for (let index = 0; index < positive.length; index++) {
+        const row = positive[index];
+        if (row.target !== target || !expectedRowEligibility(row, fixture)) continue;
+        const rowPosition = index + 1;
+        const remainder = randomCalls - amountCalls - rowPosition;
+        if (remainder < 0 || remainder % weightCount !== 0) continue;
+        const retries = remainder / weightCount;
+        assert.equal(acceptance.get(target), true, `${master.key}/${fixture.key}: selected target lacks actual validator acceptance`);
+        assert(count >= row.min && count <= row.max, `${master.key}/${fixture.key}: count ${count} outside selected occurrence ${row.sourceName} [${row.min},${row.max}]`);
+        return { row, retries, rowPosition, weightCount };
+    }
+    throw new Error(`${master.key}/${fixture.key}: cannot reconcile ${randomCalls} RNG calls with selected target ${target}; positiveRows=${weightCount}`);
+}
+
+async function runDistribution(master, fixture, packedRows, acceptance) {
+    const actualMaster = packedRows.get(master.key);
+    const model = buildDistribution(master, fixture, actualMaster.rows);
+    for (const category of [0, ...ORACLE.taskNamesById.keys()]) assert(category >= 0 && category <= 75, `category ${category} is outside fixed 0..75 family`);
+    const fixtureSlug = fixture.key.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const outputPath = path.join(RUN_DIR, `draws-${master.key}-${fixtureSlug}.jsonl.gz`);
+    const writer = new GzipJsonlWriter(outputPath);
+    const combined = makeCountMap();
+    const perSeedBins = [];
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: actual player_combat_level changed before draws`);
+    const npc = makeNpc(IDS.masters[master.key]);
+    const positiveWeights = actualMaster.rows.filter(row => row.weight > 0).length;
+    assert(positiveWeights > 0, `${master.key}: no positive category weights`);
+    const originalNextDouble = JavaRandom.nextDouble;
+    let totalRandomCalls = 0;
+    JavaRandom.nextDouble = function () {
+        totalRandomCalls++;
+        return originalNextDouble.call(this);
+    };
+    try {
+        for (const seed of SEEDS) {
+            JavaRandom.setSeed(seed);
+            const counts = makeCountMap();
+            const sequenceStartCalls = totalRandomCalls;
+            for (let draw = 0; draw < DRAWS_PER_SEED; draw++) {
+                const randomCallsBefore = totalRandomCalls;
+                const messagesBefore = player.messages.length;
+                const result = runInt(player, '[proc,slayer_new_target]', npc);
+                const randomCalls = totalRandomCalls - randomCallsBefore;
+                assert.equal(result.value, 1, `${master.key}/${fixture.key}/seed${seed}/draw${draw}: selector failed`);
+                const target = player.getVar(IDS.target);
+                const count = player.getVar(IDS.count);
+                assert(target >= 0 && target <= 75, `invalid category ${target} outside the declared family`);
+                const located = locateOccurrence(master, fixture, target, count, randomCalls, acceptance);
+                assert.equal(expectedValidator(target, fixture), true, `source oracle rejected selected target ${target}`);
+                assert.equal(acceptance.get(target), true, `packed validator rejected selected target ${target}`);
+                assert.equal(player.messages.length, messagesBefore, 'direct selector unexpectedly emitted a message');
+                assert.equal(gemCount(player), 0, 'direct selector unexpectedly granted a gem');
+                counts.set(target, counts.get(target) + 1);
+                combined.set(target, combined.get(target) + 1);
+                const record = {
+                    master: master.key,
+                    fixture: fixture.key,
+                    seed,
+                    draw,
+                    target,
+                    targetName: ORACLE.taskNamesById.get(target),
+                    count,
+                    occurrence: located.row.sourceName,
+                    occurrenceIndex: located.row.occurrenceIndex,
+                    retries: located.retries,
+                    categoryRandomCalls: randomCalls - 1,
+                    amountRandomCalls: 1,
+                    allRandomCalls: randomCalls,
+                    opcount: result.opcount
+                };
+                const pending = writer.write(record);
+                if (pending) await pending;
+            }
+            perSeedBins.push({ seed, counts, firstRandomCall: sequenceStartCalls, finalRandomCalls: totalRandomCalls });
+        }
+    } finally {
+        JavaRandom.nextDouble = originalNextDouble;
+        await writer.close();
+    }
+
+    const bins = [];
+    for (const { seed, counts } of perSeedBins) {
+        for (let category = 0; category < 76; category++) {
+            const probability = model.categoryProbability.get(category) ?? 0;
+            const observed = counts.get(category);
+            const sampleCount = DRAWS_PER_SEED;
+            const bound = binBound(probability, sampleCount);
+            const expectedCount = sampleCount * probability;
+            assert(probability === 0 ? observed === 0 : Math.abs(observed - expectedCount) <= bound,
+                `${master.key}/${fixture.key}/seed${seed}/category${category}: observed ${observed}, expected ${expectedCount}, P=${probability}, bound=${bound}`);
+            bins.push({ master: master.key, fixture: fixture.key, assertion: `seed:${seed}`, category, P: probability, N: sampleCount, bound, count: observed });
+        }
+    }
+    for (let category = 0; category < 76; category++) {
+        const probability = model.categoryProbability.get(category) ?? 0;
+        const observed = combined.get(category);
+        const sampleCount = DRAWS_PER_SEED * SEEDS.length;
+        const bound = binBound(probability, sampleCount);
+        const expectedCount = sampleCount * probability;
+        assert(probability === 0 ? observed === 0 : Math.abs(observed - expectedCount) <= bound,
+            `${master.key}/${fixture.key}/combined/category${category}: observed ${observed}, expected ${expectedCount}, P=${probability}, bound=${bound}`);
+        bins.push({ master: master.key, fixture: fixture.key, assertion: 'combined', category, P: probability, N: sampleCount, bound, count: observed });
+    }
+
+    return {
+        bins,
+        draws: DRAWS_PER_SEED * SEEDS.length,
+        seedCount: SEEDS.length,
+        seeds: SEEDS,
+        outputPath,
+        outputSha256: digestFile(outputPath),
+        categoryCount: 76,
+        passSuccessProbability: model.passSuccess,
+        positiveRowsPerPass: positiveWeights,
+        fixture: recordFixture(fixture)
+    };
+}
+
+function testCurrentSuite() {
+    loadRuntime({ scripts: PACK_DIR, rows: PACK_DIR });
+    const packedRows = assertPackedLiveRows();
+    const admission = testCombatAndMasterAdmission();
+    const thresholds = testThresholds();
+
+    const fixtureValidatorCaches = new Map();
+    const emptyMinimumFailures = [];
+    for (const master of ORACLE.masters) {
+        for (const fixtureKind of ['minimum', 'high']) {
+            const fixture = FIXTURES.get(`${master.key}:${fixtureKind}`);
+            const effective = eligibleRows(master, fixture);
+            const player = makePlayer();
+            applyFixture(player, fixture);
+            assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: actual combat-level fixture mismatch`);
+            const npc = makeNpc(IDS.masters[master.key]);
+            const targets = [...ORACLE.taskNamesById.keys(), ...master.rows.map(row => row.target)];
+            const acceptance = buildActualValidatorCache(player, npc, fixture, targets, fixture.key);
+            for (const row of master.rows) {
+                assert.equal(acceptance.get(row.target), expectedValidator(row.target, fixture), `${fixture.key}/${row.sourceName}: actual validator/source oracle mismatch`);
+                assert.equal(expectedRowEligibility(row, fixture), row.weight > 0 && row.min <= row.max && ORACLE.taskNamesById.has(row.target) && acceptance.get(row.target), `${fixture.key}/${row.sourceName}: independent row eligibility mismatch`);
+            }
+            fixtureValidatorCaches.set(`${master.key}:${fixtureKind}`, acceptance);
+            if (fixtureKind === 'minimum' && fixture.emptyMinimumFixture) {
+                const exact = fixture.emptyMinimumFixture;
+                assert.equal(eligibleRows(master, exact).length, 0, `${exact.key}: empty-minimum fallback precondition changed`);
+                const emptyPlayer = makePlayer();
+                applyFixture(emptyPlayer, exact);
+                assert.equal(combatLevel(emptyPlayer), exact.combat, `${exact.key}: exact minimum combat level mismatch`);
+                const prior = sentinelTask(emptyPlayer, 31415, 9265);
+                const trace = traceWrites(emptyPlayer);
+                JavaRandom.setSeed(1);
+                const random = withRandomStream([], () => runInt(emptyPlayer, '[proc,generate_slayer_task]', makeNpc(IDS.masters[master.key]), [configTypes.DbRowType.getId(master.table)]));
+                trace.restore();
+                assert.equal(random.result.value, 0, `${exact.key}: empty minimum fixture must return false`);
+                assert.deepEqual(trace.events, [], `${exact.key}: empty minimum fixture wrote task state`);
+                assert.equal(emptyPlayer.getVar(IDS.target), prior.target);
+                assert.equal(emptyPlayer.getVar(IDS.count), prior.count);
+                assert.equal(gemCount(emptyPlayer), 0);
+                emptyMinimumFailures.push({ exactMinimum: recordFixture(exact), firstNonempty: recordFixture(fixture), opcount: random.result.opcount });
+            }
+        }
+    }
+
+    const dispatch = testDispatchAndOneShotOrder(packedRows);
+    const teachingAdmission = testCurrentTeachingAdmission();
+    const teachingSuccess = testCurrentTeachingSuccess();
+    return { packedRows, admission, thresholds, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+}
+
+function fixtureSourceRows() {
+    return parseDbRowFile(FIXTURE_SOURCE_PATH);
+}
+
+function assertFixturePackMembership(fixtureRows) {
+    const fixtureTableId = configTypes.DbTableType.getId('slayer_task_table');
+    const fixtureTaskTableId = configTypes.DbTableType.getId('slayer_master_task');
+    const checks = [];
+    for (const [name, sourceRow] of fixtureRows) {
+        const { row, id } = rowForPacked(name);
+        assert.equal(row.tableId, sourceRow.table === 'slayer_task_table' ? fixtureTableId : fixtureTaskTableId, `${name}: compiled fixture table mismatch`);
+        for (const [column, rawValues] of sourceRow.data) {
+            const actual = packedValues(row, column);
+            assert.equal(actual.length, rawValues.length, `${name}.${column}: packed field count differs from source`);
+            const values = sourceRow.table === 'slayer_task_table' && column === 'task'
+                ? rawValues.map(raw => configTypes.DbRowType.getId(raw))
+                : rawValues.map(raw => sourceValue(raw, ORACLE.constants, `${name}.${column}`));
+            assert.deepEqual(actual.map(value => typeof value === 'string' ? value : Number(value)), values, `${name}.${column}: packed values differ from fixture source`);
+        }
+        checks.push({ name, id, table: sourceRow.table });
+    }
+    return checks;
+}
+
+function testMissingListEngineBoundary(scripts) {
+    loadRuntime({ scripts, rows: FIXTURE_PACK_DIR });
+    const player = makePlayer();
+    applyFixture(player, FIXTURES.get('turael:high'));
+    const prior = sentinelTask(player, 321, 654);
+    const { id, row } = rowForPacked('s1_selector_fixture_empty');
+    assert.equal(row.columnValues[0], undefined, 'minimal missing-list fixture no longer reproduces the pinned engine representation');
+    const trace = traceWrites(player);
+    const attempted = withRandomStream([], () => runRaw(player, '[proc,generate_slayer_task]', makeNpc(IDS.masters.turael), [id]));
+    trace.restore();
+    assert.equal(attempted.result.exec, ScriptState.ABORTED, 'pinned engine no longer aborts on the missing-list column');
+    assert.deepEqual(trace.events, [], 'missing-list engine abort wrote task or gem state');
+    assert.equal(player.getVar(IDS.target), prior.target);
+    assert.equal(player.getVar(IDS.count), prior.count);
+    assert.equal(gemCount(player), 0);
+    assert.doesNotMatch(dialogueText(player), /we.ll start you off hunting|your new task is to kill/i);
+    return {
+        status: 'ENGINE_LIMITATION',
+        fixture: 's1_selector_fixture_empty',
+        owner: 'engine follow-up, outside S1',
+        cause: 'DbOps.ts:149 DB_GETFIELDCOUNT reads undefined columnValues[0].length',
+        exec: attempted.result.exec,
+        opcount: attempted.result.opcount,
+        engineMessages: [...player.messages],
+        prior,
+        writes: trace.events,
+        randomValues: attempted.observed
+    };
+}
+
+function testAdversarialFixtures() {
+    loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
+    const fixtureRows = fixtureSourceRows();
+    const membership = assertFixturePackMembership(fixtureRows);
+    const master = ORACLE.masters.find(value => value.key === 'turael');
+    const fixture = FIXTURES.get('turael:high');
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    const npc = makeNpc(IDS.masters.turael);
+    const selector = '[proc,generate_slayer_task]';
+    const falseCases = [
+        ['s1_selector_fixture_all_ineligible', ['s1_selector_dagannoth', 's1_selector_elf']],
+        ['s1_selector_fixture_nonpositive', ['s1_selector_zero_weight', 's1_selector_negative_weight']],
+        ['s1_selector_fixture_inverted', ['s1_selector_inverted_range']],
+        ['s1_selector_fixture_unresolved', ['s1_selector_unresolved_target']]
+    ];
+    const results = [];
+    for (const [masterName, rows] of falseCases) {
+        const { id: masterId } = rowForPacked(masterName);
+        const prior = sentinelTask(player, 700000 + results.length, 800000 + results.length);
+        const trace = traceWrites(player);
+        const random = withRandomStream([], () => runInt(player, selector, npc, [masterId]));
+        trace.restore();
+        assert.equal(random.result.value, 0, `${masterName}: invalid/empty eligible set must fail closed`);
+        assert.deepEqual(trace.events, [], `${masterName}: false result wrote task target/count or gem`);
+        assert.equal(player.getVar(IDS.target), prior.target, `${masterName}: false result changed prior target`);
+        assert.equal(player.getVar(IDS.count), prior.count, `${masterName}: false result changed prior count`);
+        assert.equal(gemCount(player), 0, `${masterName}: false result granted a gem`);
+        assert.equal(player.messages.length, 0, `${masterName}: false result emitted success text`);
+        for (const childName of rows) {
+            const child = rowForPacked(childName).row;
+            const target = Number(packedValues(child, 'task')[0]);
+            const actual = validatorAccepts(player, npc, target);
+            if (childName === 's1_selector_dagannoth' || childName === 's1_selector_elf') assert.equal(actual, false, `${childName}: expected the real validator to reject this row`);
+            results.push({ fixture: masterName, child: childName, actualValidatorAcceptance: actual });
+        }
+        results.push({ fixture: masterName, selector: false, writes: trace.events, prior, opcount: random.result.opcount, randomValues: random.observed });
+    }
+
+    // A test-only two-row compiled table proves that validator rejection consumes
+    // its weight roll and continues through the same pass to the valid row.
+    const mixedId = rowForPacked('s1_selector_fixture_rejected_then_valid').id;
+    const mixed = rowForPacked('s1_selector_fixture_rejected_then_valid');
+    const mixedChildIds = packedValues(mixed.row, 'task');
+    assert.equal(mixedChildIds.length, 2, 'mixed fixture must retain both ordered occurrences');
+    const rejectedTarget = Number(packedValues(configTypes.DbRowType.get(Number(mixedChildIds[0])), 'task')[0]);
+    const acceptedTarget = Number(packedValues(configTypes.DbRowType.get(Number(mixedChildIds[1])), 'task')[0]);
+    assert.equal(validatorAccepts(player, npc, rejectedTarget), false, 'mixed first row must be rejected by real validator');
+    assert.equal(validatorAccepts(player, npc, acceptedTarget), true, 'mixed second row must pass real validator');
+    sentinelTask(player, 23, 45);
+    const trace = traceWrites(player);
+    JavaRandom.setSeed(1);
+    const mixedRun = withRandomStream([0, 0, 0], () => runInt(player, selector, npc, [mixedId]));
+    trace.restore();
+    assert.equal(mixedRun.result.value, 1, 'mixed selector must succeed after a rejected row');
+    assert.equal(player.getVar(IDS.target), acceptedTarget, 'mixed selector must continue within the same pass');
+    assert.equal(player.getVar(IDS.count), 1, 'mixed fixture inclusive amount lower endpoint mismatch');
+    assert.deepEqual(mixedRun.observed, [0, 0, 0], 'rejected and accepted rows plus amount must use exactly three random opcode calls');
+    assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count'], 'mixed selector must write target then count');
+    assert.equal(gemCount(player), 0, 'selector-only mixed fixture must not grant gem');
+    results.push({ fixture: 's1_selector_fixture_rejected_then_valid', rejectedTarget, acceptedTarget, success: true, randomValues: mixedRun.observed, writes: trace.events, opcount: mixedRun.result.opcount });
+
+    const unrecognized = packEntries('npc').find(([name]) => !MASTER_DEFS.some(masterDef => masterDef.npc === name) && configTypes.NpcType.get(packId('npc', name)));
+    assert(unrecognized, 'nonmaster NPC missing for fixture dispatcher check');
+    const nonMaster = makeNpc(unrecognized[1]);
+    const prior = sentinelTask(player, 99, 88);
+    const nonMasterTrace = traceWrites(player);
+    const dispatch = runInt(player, '[proc,slayer_new_target]', nonMaster);
+    nonMasterTrace.restore();
+    assert.equal(dispatch.value, 0, 'unrecognized NPC must return false from slayer_new_target');
+    assert.deepEqual(nonMasterTrace.events, [], 'unrecognized NPC dispatch wrote target/count');
+    assert.equal(player.getVar(IDS.target), prior.target);
+    assert.equal(player.getVar(IDS.count), prior.count);
+    assert.equal(gemCount(player), 0);
+    results.push({ fixture: 'nonmaster-dispatch', npc: unrecognized[0], success: false, writes: nonMasterTrace.events });
+
+    return { membership, results };
+}
+
+function testEveryEndpoint() {
+    const results = [];
+    const grouped = new Map();
+    for (const endpoint of GENERATED_FIXTURES.endpointCases) {
+        const groupKey = `${endpoint.master}:${endpoint.fixtureKind}`;
+        if (!grouped.has(groupKey)) grouped.set(groupKey, []);
+        grouped.get(groupKey).push(endpoint);
+    }
+    for (const [groupKey, endpoints] of grouped) {
+        const [masterKey, fixtureKey] = groupKey.split(':');
+        const master = ORACLE.masters.find(entry => entry.key === masterKey);
+        const fixture = FIXTURES.get(`${masterKey}:${fixtureKey}`);
+        const player = makePlayer();
+        applyFixture(player, fixture);
+        const npc = makeNpc(IDS.masters[masterKey]);
+        assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: endpoint fixture combat mismatch`);
+        const acceptance = buildActualValidatorCache(player, npc, fixture, endpoints.map(endpoint => endpoint.target), `${fixture.key}:endpoint`);
+        for (const endpoint of endpoints) {
+            assert.equal(acceptance.get(endpoint.target), true, `${endpoint.sourceName}: endpoint target rejected by packed validator`);
+            for (const side of ['min', 'max']) {
+                const desiredRandom = side === 'min' ? 0 : 1 - Number.EPSILON;
+                const prior = sentinelTask(player, 123, 456);
+                const trace = traceWrites(player);
+                const random = withRandomStream([0, desiredRandom], () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(endpoint.masterName).id]));
+                trace.restore();
+                const expectedCount = side === 'min' ? endpoint.min : endpoint.max;
+                assert.equal(random.result.value, 1, `${endpoint.sourceName}/${side}: singleton compiled selector failed`);
+                assert.equal(player.getVar(IDS.target), endpoint.target, `${endpoint.sourceName}/${side}: endpoint target mismatch`);
+                assert.equal(player.getVar(IDS.count), expectedCount, `${endpoint.sourceName}/${side}: randominc ${side} endpoint mismatch`);
+                assert.equal(expectedRowEligibility({ ...endpoint, target: endpoint.target }, fixture), true, `${endpoint.sourceName}: independent endpoint eligibility failed`);
+                assert.equal(acceptance.get(endpoint.target), true, `${endpoint.sourceName}: real validator rejected endpoint target`);
+                assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count'], `${endpoint.sourceName}/${side}: write ordering mismatch`);
+                assert.equal(gemCount(player), 0, `${endpoint.sourceName}/${side}: direct selector granted a gem`);
+                results.push({ master: masterKey, fixture: fixture.key, sourceName: endpoint.sourceName, occurrenceIndex: endpoint.occurrenceIndex, endpoint: side, target: endpoint.target, amount: expectedCount, weight: endpoint.weight, randomValues: random.observed, opcount: random.result.opcount, prior });
+            }
+        }
+    }
+    return results;
+}
+
+function findBaseScriptDirectory(baseScripts, runDir) {
+    assert(fs.existsSync(baseScripts), `base script directory missing: ${baseScripts}`);
+    const candidates = [
+        { root: baseScripts, server: path.join(baseScripts, 'server') },
+        { root: baseScripts, server: baseScripts }
+    ];
+    const match = candidates.find(candidate => fs.existsSync(path.join(candidate.server, 'script.dat')) && fs.existsSync(path.join(candidate.server, 'script.idx')));
+    assert(match, `${baseScripts} must contain server/script.dat+idx or script.dat+idx`);
+    if (match.server !== baseScripts) return match.root;
+    const normalized = path.join(runDir, 'base-scripts-pack');
+    fs.mkdirSync(path.join(normalized, 'server'), { recursive: true });
+    fs.copyFileSync(path.join(baseScripts, 'script.dat'), path.join(normalized, 'server/script.dat'));
+    fs.copyFileSync(path.join(baseScripts, 'script.idx'), path.join(normalized, 'server/script.idx'));
+    return normalized;
+}
+
+function testLegacyEmptyRecursion() {
+    loadRuntime({ scripts: LEGACY_SCRIPT_DIR, rows: FIXTURE_PACK_DIR });
+    const player = makePlayer();
+    const fixture = FIXTURES.get('turael:high');
+    applyFixture(player, fixture);
+    const prior = sentinelTask(player, 321, 654);
+    const npc = makeNpc(IDS.masters.turael);
+    const emptyId = rowForPacked('s1_selector_fixture_all_ineligible').id;
+    const trace = traceWrites(player);
+    JavaRandom.setSeed(1);
+    const state = ScriptRunner.init(getScript('[proc,generate_slayer_task]'), player, npc, [emptyId]);
+    let exec;
+    let thrown = null;
+    try {
+        exec = player.runScript(state, true, true);
+    } catch (error) {
+        thrown = String(error?.stack ?? error);
+    }
+    trace.restore();
+    assert(thrown !== null || exec !== ScriptState.FINISHED, `old empty table unexpectedly finished (ops=${state.opcount})`);
+    assert(state.fp >= 50 || state.opcount >= 500000 || thrown !== null, `old eligible-set recursion did not reach its interpreter failure boundary (fp=${state.fp}, ops=${state.opcount}, error=${thrown})`);
+    assert.deepEqual(trace.events, [], 'old empty recursion wrote task target/count');
+    assert.equal(player.getVar(IDS.target), prior.target);
+    assert.equal(player.getVar(IDS.count), prior.count);
+    assert.equal(gemCount(player), 0);
+    assert.doesNotMatch(dialogueText(player), /we.ll start you off hunting|your new task is to kill/i);
+    return { fixture: 's1_selector_fixture_all_ineligible', exec: exec ?? null, stateExecution: state.execution, framePointer: state.fp, opcount: state.opcount, thrown, prior, writes: trace.events };
+}
+
+function streamForFirstEligible(master, fixture) {
+    const first = master.rows.findIndex(row => expectedRowEligibility(row, fixture));
+    assert(first >= 0, `${master.key}: no independently eligible row for legacy admission proof`);
+    const values = [];
+    for (let index = 0; index < first; index++) {
+        const row = master.rows[index];
+        assert(row.weight > 0, `${row.sourceName}: old packed code cannot safely roll nonpositive table weight`);
+        values.push(1 - Number.EPSILON);
+    }
+    values.push(0, 0);
+    return { first, row: master.rows[first], values };
+}
+
+function testLegacyFirstTeachingAdmission() {
+    const master = ORACLE.masters.find(entry => entry.key === 'chaeldar');
+    const { player, fixture } = underqualifiedChaeldarFixture();
+    const expectedMasterRows = master.rows;
+    const npc = makeNpc(IDS.masters.chaeldar);
+    const forced = streamForFirstEligible(master, fixture);
+    const actualAcceptance = buildActualValidatorCache(player, npc, fixture, expectedMasterRows.map(row => row.target), fixture.key);
+    assert.equal(actualAcceptance.get(forced.row.target), true, 'legacy first-row proof target is not accepted by actual base-code validator');
+    const prior = sentinelTask(player, 0, 0);
+    const trace = traceWrites(player);
+    JavaRandom.setSeed(1);
+    const stream = withRandomStream(forced.values, () => {
+        const dialog = startDialogue(player, npc, '[opnpc1,_slayer_master]');
+        return driveDialogue(player, dialog, [1, 2, 1, 2]);
+    });
+    trace.restore();
+    assert.equal(player.getVar(IDS.target), forced.row.target, 'old first teaching did not assign the first actually eligible low-level row');
+    assert(player.getVar(IDS.count) >= forced.row.min && player.getVar(IDS.count) <= forced.row.max, 'old first teaching count is outside selected row range');
+    assert.equal(gemCount(player), 1, 'old first teaching must grant the gem before its failed admission');
+    assert.match(dialogueText(player), /we.ll start you off hunting/i, 'old first teaching assignment success line missing');
+    assert.deepEqual(trace.events.map(event => event.kind), ['gem', 'target', 'count'], 'legacy first teaching did not expose old gem-before-task order');
+    assert.equal(eligibleMaster(player, npc, IDS.masters.chaeldar), false, 'legacy target must remain under current Chaeldar admission threshold');
+    assert.equal(actualAcceptance.get(player.getVar(IDS.target)), true, 'legacy target not accepted by the actual validator');
+    assert.notEqual(player.getVar(IDS.target), prior.target, 'legacy proof did not replace the initial empty target');
+    return { fixture: recordFixture(fixture), selectedSourceRow: forced.row.sourceName, target: player.getVar(IDS.target), count: player.getVar(IDS.count), forcedRandomValues: stream.observed, writes: trace.events, gemCount: gemCount(player), messages: player.messages };
+}
+
+let LEGACY_SCRIPT_DIR = null;
+const metadata = {
+    assignment: 'U-SLAYERSEL-1113 S1',
+    revision: 377,
+    mode: OPTIONS.mode,
+    runId: RUN_ID,
+    contentRoot: CONTENT_ROOT,
+    engineRoot: ENGINE_ROOT,
+    artifactDirectory: RUN_DIR,
+    pins: { content: gitHead(CONTENT_ROOT), engine: gitHead(ENGINE_ROOT) },
+    sourceHashes: SOURCE_HASHES,
+    compilerInputs: COMPILER_INPUTS,
+    compilerFixturePack: FIXTURE_PACK_RESULT,
+    fixtureSourceSha256: FIXTURE_SOURCE_HASH,
+    fixtures: [...FIXTURES.values()].map(recordFixture),
+    questSetup: ORACLE.questValues,
+    seeds: SEEDS,
+    drawsPerSeed: DRAWS_PER_SEED,
+    family: { categories: 76, B: FAMILY_B, alpha: ALPHA, logBound: LOG_BOUND },
+    outOfS1: OUT_OF_S1,
+    checks: {}
+};
+
+try {
+    if (OPTIONS.mode === 'full') {
+        const current = testCurrentSuite();
+        metadata.checks.current = {
+            packedRows: Object.fromEntries([...current.packedRows].map(([name, master]) => [name, { memberOccurrences: master.rows.length }])),
+            admission: current.admission,
+            thresholds: current.thresholds,
+            dispatch: current.dispatch,
+            emptyMinimumFailures: current.emptyMinimumFailures,
+            teaching: current.teaching
+        };
+        metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(PACK_DIR);
+
+        loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
+        const adversarial = testAdversarialFixtures();
+        const endpoints = testEveryEndpoint();
+        metadata.checks.adversarial = adversarial;
+        metadata.checks.endpoints = { count: endpoints.length, results: endpoints };
+        metadata.checks.outOfS1 = OUT_OF_S1;
+
+        loadRuntime({ scripts: PACK_DIR, rows: PACK_DIR });
+        const distributions = [];
+        const allBins = [];
+        for (const master of ORACLE.masters) {
+            for (const fixtureKind of ['minimum', 'high']) {
+                const fixture = FIXTURES.get(`${master.key}:${fixtureKind}`);
+                const player = makePlayer();
+                applyFixture(player, fixture);
+                const npc = makeNpc(IDS.masters[master.key]);
+                const acceptance = buildActualValidatorCache(player, npc, fixture, [...ORACLE.taskNamesById.keys(), ...master.rows.map(row => row.target)], `${fixture.key}:distribution`);
+                const result = await runDistribution(master, fixture, current.packedRows, acceptance);
+                distributions.push({ master: master.key, fixture: fixture.key, ...result, bins: undefined });
+                allBins.push(...result.bins);
+                console.log(`PASS distribution ${master.key}/${fixture.key}: ${result.draws} draws, ${result.outputPath}`);
+            }
+        }
+        const binPath = path.join(RUN_DIR, 'distribution-bins.json');
+        fs.writeFileSync(binPath, `${JSON.stringify({
+            family: { categories: 76, B: FAMILY_B, alpha: ALPHA, logBound: LOG_BOUND, seeds: SEEDS, drawsPerSeed: DRAWS_PER_SEED },
+            formula: 'abs(observed - N*P) <= ceil(sqrt(2*N*P*(1-P)*ln(2*B/alpha)) + 2*ln(2*B/alpha)/3); P=0 or 1 is exact',
+            bins: allBins
+        }, null, 2)}\n`);
+        metadata.checks.distributions = distributions;
+        metadata.checks.binFile = { path: binPath, sha256: digestFile(binPath), binCount: allBins.length };
+    } else if (OPTIONS.mode === 'adversarial') {
+        loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
+        metadata.checks.adversarial = testAdversarialFixtures();
+        metadata.checks.endpoints = { count: testEveryEndpoint().length };
+    } else {
+        LEGACY_SCRIPT_DIR = findBaseScriptDirectory(OPTIONS.baseScripts, RUN_DIR);
+        metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(LEGACY_SCRIPT_DIR);
+        const empty = testLegacyEmptyRecursion();
+        const admission = testLegacyFirstTeachingAdmission();
+        metadata.baseScripts = {
+            requested: OPTIONS.baseScripts,
+            loadedFrom: LEGACY_SCRIPT_DIR,
+            scriptDatSha256: digestFile(path.join(LEGACY_SCRIPT_DIR, 'server/script.dat')),
+            scriptIdxSha256: digestFile(path.join(LEGACY_SCRIPT_DIR, 'server/script.idx'))
+        };
+        metadata.checks.oldEmptyRecursion = empty;
+        metadata.checks.oldFirstTeachingAdmission = admission;
+    }
+    metadata.status = 'PASS';
+    metadata.completedAt = new Date().toISOString();
+    fs.writeFileSync(METADATA_PATH, `${JSON.stringify(metadata, null, 2)}\n`);
+    console.log(`RESULT PASS ${OPTIONS.mode}; artifacts=${RUN_DIR}; out-of-S1=${OUT_OF_S1.length} boundaries disclosed`);
+    // World import starts background workers; this runner is intentionally standalone.
+    process.exit(0);
+} catch (error) {
+    metadata.status = 'FAIL';
+    metadata.error = String(error?.stack ?? error);
+    metadata.completedAt = new Date().toISOString();
+    try {
+        fs.writeFileSync(METADATA_PATH, `${JSON.stringify(metadata, null, 2)}\n`);
+    } catch {
+        // Preserve the primary failure; no external state is touched by this fallback.
+    }
+    console.error(error?.stack ?? error);
+    process.exit(1);
+}
