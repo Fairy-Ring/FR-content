@@ -374,20 +374,20 @@ inv_transmit(silvercast377_commandrod, silver_casting:com_126);
 inv_transmit(silvercast_agrith, silver_casting:com_134);
 if_openmain(silver_casting);
 
-[if_button,silver_casting:com_92] @craft_silver_product(nostringstar, 1);
-[if_button,silver_casting:com_99] @craft_silver_product(nostringsnake, 1);
-[if_button,silver_casting:com_106] @craft_silver_product(silver_sickle, 1);
+[if_button,silver_casting:com_92] @craft_silver_product(nostringstar, holy_symbol_mould, 1);
+[if_button,silver_casting:com_99] @craft_silver_product(nostringsnake, unholy_symbol_mould, 1);
+[if_button,silver_casting:com_106] @craft_silver_product(silver_sickle, sickle_mould, 1);
 [if_button,silver_casting:com_113] @craft_fenk_conductor(1);
 
-[inv_button1,silver_casting:com_91] @craft_silver_product(nostringstar, 1);
-[inv_button2,silver_casting:com_91] @craft_silver_product(nostringstar, 5);
-[inv_button3,silver_casting:com_91] @craft_silver_product(nostringstar, 10);
-[inv_button1,silver_casting:com_98] @craft_silver_product(nostringsnake, 1);
-[inv_button2,silver_casting:com_98] @craft_silver_product(nostringsnake, 5);
-[inv_button3,silver_casting:com_98] @craft_silver_product(nostringsnake, 10);
-[inv_button1,silver_casting:com_105] @craft_silver_product(silver_sickle, 1);
-[inv_button2,silver_casting:com_105] @craft_silver_product(silver_sickle, 5);
-[inv_button3,silver_casting:com_105] @craft_silver_product(silver_sickle, 10);
+[inv_button1,silver_casting:com_91] @craft_silver_product(nostringstar, holy_symbol_mould, 1);
+[inv_button2,silver_casting:com_91] @craft_silver_product(nostringstar, holy_symbol_mould, 5);
+[inv_button3,silver_casting:com_91] @craft_silver_product(nostringstar, holy_symbol_mould, 10);
+[inv_button1,silver_casting:com_98] @craft_silver_product(nostringsnake, unholy_symbol_mould, 1);
+[inv_button2,silver_casting:com_98] @craft_silver_product(nostringsnake, unholy_symbol_mould, 5);
+[inv_button3,silver_casting:com_98] @craft_silver_product(nostringsnake, unholy_symbol_mould, 10);
+[inv_button1,silver_casting:com_105] @craft_silver_product(silver_sickle, sickle_mould, 1);
+[inv_button2,silver_casting:com_105] @craft_silver_product(silver_sickle, sickle_mould, 5);
+[inv_button3,silver_casting:com_105] @craft_silver_product(silver_sickle, sickle_mould, 10);
 [inv_button1,silver_casting:com_112] @craft_fenk_conductor(1);
 [inv_button2,silver_casting:com_112] @craft_fenk_conductor(5);
 [inv_button3,silver_casting:com_112] @craft_fenk_conductor(10);
@@ -436,7 +436,16 @@ if (inv_total(inv, silver_bar) < 1) {
 }
 ~crafting_silver_conductor($count);
 
-[label,craft_silver_product](namedobj $product, int $count)
+[label,craft_silver_product](namedobj $product, namedobj $mould, int $count)
+// The interface hides a product's buttons when its mould is absent (and, for members' products,
+// on a free world). Check the same conditions here: a hidden button can still be sent.
+if (inv_total(inv, $mould) < 1) {
+    ~mesbox("You require a mould to make that.");
+    return;
+}
+if ($mould ! holy_symbol_mould & map_members = ^false) {
+    return;
+}
 
 def_struct $struct = oc_param($product, crafting_jewelry_struct);
 
