@@ -1,0 +1,75 @@
+// Revision-377 keyed identity unit, moved unchanged from scripts/_unpack/377/all.loc.
+// VERIFIED current product bindings. Original numeric model-wire identity is UNKNOWN:
+// retain Lost City aliases and the packer's existing _8/shape10 and _0/shape22 resolution.
+// Both op1 case variants on the bars are retained. The last value wins, as before.
+
+[stepping_stone_12568]
+name=Stepping stone
+desc=A very slippery stepping stone.
+model=loc_12568
+op1=Jump-to
+active=yes
+blockrange=no
+
+[tropical_tree]
+name=Tropical tree
+desc=A terribly tall tropical tree.
+model=loc_12570
+recol1s=19910
+recol1d=18853
+recol2s=20968
+recol2d=15685
+recol3s=12869
+recol3d=8547
+ambient=25
+op1=Climb
+forceapproach=east
+
+[monkeybars_12573]
+name=Monkeybars
+desc=I can traverse these.
+model=loc_12573
+op1=Swing across
+blockwalk=no
+hillskew=yes
+op1=Swing Across
+
+[monkeybars_12575]
+name=Monkeybars
+desc=I can traverse these.
+model=loc_12573
+op1=Swing across
+blockwalk=no
+hillskew=yes
+op1=Swing Across
+
+[skull_slope_12576]
+name=Skull slope
+desc=A climbing wall made from skulls.
+model=loc_12576
+hillskew=yes
+forcedecor=yes
+op1=Climb-up
+
+[rope_12578]
+name=Rope
+desc=For swinging on.
+model=loc_12578
+width=4
+forceapproach=west
+shadow=no
+op1=Swing
+
+[tropical_tree_12618]
+name=Tropical tree
+desc=A terribly tall tropical tree.
+model=bamboo_tree_base
+recol1s=19910
+recol1d=18853
+recol2s=20968
+recol2d=15685
+recol3s=12869
+recol3d=8547
+mapscene=0
+op1=Climb-down
+

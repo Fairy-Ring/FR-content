@@ -92,6 +92,7 @@ if (%tutorial < ^tutorial_complete & ~in_tutorial_island(coord) = true) {
 // Regicide start: spawn King's messenger timer if UP complete and quest not started
 ~start_king_messenger_timer;
 ~tbw_cleanup_login;
+if (inzone(2_42_42_59_53, 2_43_42_1_54, coord) = true | inzone(1_43_42_6_46, 1_43_42_18_59, coord) = true) ~ape_atoll_recover;
 
 ~initalltabs;
 ~update_all(inv_getobj(worn, ^wearpos_rhand));

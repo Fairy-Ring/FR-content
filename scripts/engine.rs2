@@ -1094,6 +1094,8 @@
 // [command,controller_findexact](regioncoord $coord, int $type)(boolean)
 // [command,sound_area](coord $coord, int $int1, synth $sound, int $int2, int $int3)
 [command,p_transmogrify](npc $npc)
+// info: Read the active player's current NPC form, or null for a human. Custom read-only API.
+[command,p_gettransmogrify]()(npc)
 // [command,if_setevents](component $component, int $int1, int $int2, boolean $boolean1, int $int3, int $int4, int $int5, boolean $boolean2, boolean $boolean3)
 // [command,runclientscript](string $string)
 // [command,obj_getvar]

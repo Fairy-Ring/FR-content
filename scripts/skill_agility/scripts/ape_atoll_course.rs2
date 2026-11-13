@@ -1,0 +1,115 @@
+// U-APEAGILITY-1113 A-E and G-success only. Every eligible attempt succeeds.
+// F and G-failure are deliberately absent. This is NOT the finished historical course.
+// No course state, bonus or world lock. Natural topology is the CANDIDATE progression model.
+// No new player-visible text: original Ape narration/refusals remain UNKNOWN.
+
+[proc,ape_atoll_ninja_form]()(boolean)
+// CANDIDATE accepted-ninja-forms: both original-keyed product identities, not an item proxy.
+def_npc $form = p_gettransmogrify;
+if ($form = mm_transmogrification_small_ninja_monkey | $form = mm_transmogrification_medium_ninja_monkey) return(true);
+return(false);
+
+[proc,ape_atoll_entry]()(boolean)
+// VERIFIED threshold, CANDIDATE base-level interpretation. Read current form at EVERY entry.
+if (stat_base(agility) >= ^ape_atoll_level & ~ape_atoll_ninja_form = true) return(true);
+return(false);
+
+[proc,ape_atoll_setup](coord $stand)(boolean)
+// Existing clipped approach. It may stop short: do not animate or award in that case.
+~forcewalk2($stand);
+if (coord = $stand) return(true);
+return(false);
+
+[proc,ape_atoll_finish](int $xp)
+// The protected obstacle owns this single award, only after authoritative settlement.
+// Restore the current worn form's BAS and its inherited animation protection.
+anim(null, 0);
+~update_bas;
+p_animprotect(^true);
+stat_advance(agility, $xp);
+
+[oploc1,stepping_stone_12568]
+if (~ape_atoll_entry = false) return;
+if (coordy(coord) ! 0 | coordx(coord) < coordx(^ape_candidate_entry_stand)) return;
+if (~ape_atoll_setup(^ape_candidate_entry_stand) = false) return;
+p_animprotect(^false);
+~agility_exactmove(100_ilm_stepping_stone_jump, ^ape_candidate_anim_delay, ^ape_candidate_stone_delay, ^ape_candidate_entry_stand, ^ape_candidate_stone_end, ^ape_candidate_start_cycle, ^ape_candidate_stone_end_cycle, ^exact_west, false);
+~ape_atoll_finish(^ape_atoll_stone_xp);
+
+[oploc1,tropical_tree]
+if (~ape_atoll_entry = false) return;
+if (coordy(coord) ! 0 | coordx(coord) > coordx(^ape_candidate_tree_stand)) return;
+if (~ape_atoll_setup(^ape_candidate_tree_stand) = false) return;
+p_animprotect(^false);
+// Keep the same-plane exact part on stable ground; telejump carries the level change.
+~agility_exactmove(100_ilm_climb_tree, ^ape_candidate_anim_delay, ^ape_candidate_tree_delay, ^ape_candidate_tree_stand, ^ape_candidate_tree_stand, ^ape_candidate_start_cycle, ^ape_candidate_tree_end_cycle, ^exact_south, false);
+p_telejump(^ape_candidate_tree_end);
+~ape_atoll_finish(^ape_atoll_tree_xp);
+
+[oploc1,monkeybars_12573]
+~ape_atoll_bars(true);
+
+[oploc1,monkeybars_12575]
+~ape_atoll_bars(false);
+
+[proc,ape_atoll_bars](boolean $westbound)
+if (~ape_atoll_entry = false) return;
+if (coordy(coord) ! 2) return;
+def_coord $start = ^ape_candidate_bars_east;
+def_coord $end = ^ape_candidate_bars_west_transient;
+def_coord $landing = ^ape_candidate_bars_west;
+def_int $direction = ^exact_west;
+if ($westbound = false) {
+    $start = ^ape_candidate_bars_west_transient;
+    $end = ^ape_candidate_bars_east;
+    $landing = ^ape_candidate_bars_east;
+    $direction = ^exact_east;
+}
+if (~ape_atoll_setup($start) = false) return;
+p_animprotect(^false);
+~agility_exactmove(100_ilm_monkeybar_jump_up, ^ape_candidate_anim_delay, ^ape_candidate_bars_up_delay, $start, $start, ^ape_candidate_start_cycle, ^ape_candidate_bars_up_end_cycle, $direction, false);
+// Operator-approved transient L2 checkpoint: normal logout waits; process-stop login recovers.
+~agility_exactmove(100_ilm_monkeybar_move, ^ape_candidate_anim_delay, ^ape_candidate_bars_delay, $start, $end, ^ape_candidate_start_cycle, ^ape_candidate_bars_end_cycle, $direction, false);
+p_telejump($landing);
+~agility_exactmove(100_ilm_monkeybar_jump_down, ^ape_candidate_anim_delay, ^ape_candidate_bars_down_delay, $landing, $landing, ^ape_candidate_start_cycle, ^ape_candidate_bars_down_end_cycle, $direction, false);
+~ape_atoll_finish(^ape_atoll_bars_xp);
+
+[oploc1,skull_slope_12576]
+if (~ape_atoll_entry = false) return;
+if (coordy(coord) ! 0 | coordx(coord) < coordx(^ape_candidate_slope_stand)) return;
+if (~ape_atoll_setup(^ape_candidate_slope_stand) = false) return;
+p_animprotect(^false);
+~agility_exactmove(100_ilm_climb_slope, ^ape_candidate_anim_delay, ^ape_candidate_slope_delay, ^ape_candidate_slope_stand, ^ape_candidate_slope_end, ^ape_candidate_start_cycle, ^ape_candidate_slope_end_cycle, ^exact_west, false);
+~ape_atoll_finish(^ape_atoll_slope_xp);
+
+[oploc1,rope_12578]
+if (~ape_atoll_entry = false) return;
+if (coordy(coord) ! 0 | coordx(coord) > coordx(^ape_candidate_rope_stand)) return;
+if (~ape_atoll_setup(^ape_candidate_rope_stand) = false) return;
+p_animprotect(^false);
+~agility_exactmove(100_ilm_vine_swing, ^ape_candidate_anim_delay, ^ape_candidate_rope_delay, ^ape_candidate_rope_stand, ^ape_candidate_rope_end, ^ape_candidate_start_cycle, ^ape_candidate_rope_end_cycle, ^exact_east, false);
+~ape_atoll_finish(^ape_atoll_rope_xp);
+
+[oploc1,tropical_tree_12618]
+if (~ape_atoll_entry = false) return;
+if (coordy(coord) ! 0 | coordz(coord) > coordz(loc_coord)) return;
+if (~ape_atoll_setup(^ape_candidate_descent_stand) = false) return;
+p_animprotect(^false);
+// Upper vine is a transient course checkpoint. A process stop loses this award, never replays it.
+p_telejump(^ape_candidate_vine_start);
+~agility_exactmove(100_ilm_monkey_down_vine, ^ape_candidate_anim_delay, ^ape_candidate_descent_delay, ^ape_candidate_vine_start, ^ape_candidate_vine_end, ^ape_candidate_start_cycle, ^ape_candidate_descent_end_cycle, ^exact_north, false);
+p_telejump(^ape_candidate_descent_end);
+~ape_atoll_finish(^ape_atoll_descent_xp);
+
+[proc,ape_atoll_recover]
+// CANDIDATE process-stop reconstruction, not original 377 behaviour. No XP or message.
+// Bars: direction is not recoverable from a saved midpoint; return to east START platform.
+if (inzone(2_42_42_59_53, 2_43_42_1_54, coord) = true) {
+    if (coord ! ^ape_candidate_bars_east & coord ! 2_43_42_1_54) {
+        p_telejump(^ape_candidate_bars_east);
+    }
+}
+// Descent: upper-vine strip checkpoints cannot finish after process loss. Return to its START.
+if (inzone(1_43_42_6_46, 1_43_42_18_59, coord) = true) {
+    p_telejump(^ape_candidate_descent_stand);
+}
