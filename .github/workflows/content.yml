@@ -142,6 +142,7 @@ jobs:
           run_test tests/fenkenstrain-completion/test_fenk_gardener_move.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
           run_test tests/fenkenstrain-completion/test_fenk_offline.py python3 ../content/tests/fenkenstrain-completion/test_fenk_offline.py
           run_test tests/fenkenstrain-completion/test_fenk_s0.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s0.py
+          run_test tests/fenkenstrain-completion/test_fenk_s1.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s1.py
           run_test tests/fenkenstrain-completion/test_fenk_s2.py python3 ../content/tests/fenkenstrain-completion/test_fenk_s2.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
