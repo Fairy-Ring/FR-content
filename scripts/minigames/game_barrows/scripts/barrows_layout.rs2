@@ -1,0 +1,54 @@
+// CANDIDATE D2. Include all nine rooms and the four paired exterior corridors.
+// Each exterior corridor has only its paired lock, so connectivity opens a/b/h/p.
+// Each side room then needs d/f, c/k, g/m or n/o: first, second or both.
+// Four ternary digits enumerate all 81 connected layouts for a selected centre edge.
+[proc,barrows_layout_mask](int $entrance, int $rank)(int)
+def_int $locks = ^barrows_lock_mask;
+$locks = clearbit($locks, 0);
+$locks = clearbit($locks, 1);
+$locks = clearbit($locks, 7);
+$locks = clearbit($locks, 15);
+$locks = clearbit($locks, enum(int, int, barrows_central_lock_bit, $entrance));
+def_int $side = 0;
+while ($side < ^barrows_corner_count) {
+    def_int $choice = modulo($rank, 3);
+    if ($choice ! 1) $locks = clearbit($locks, enum(int, int, barrows_side_first_lock_bit, $side));
+    if ($choice ! 0) $locks = clearbit($locks, enum(int, int, barrows_side_second_lock_bit, $side));
+    $rank = divide($rank, 3);
+    $side = add($side, 1);
+}
+return($locks);
+
+[proc,barrows_ladder_corner]()(int)
+return(getbit_range(%barrows_state, ^barrows_corner_start, ^barrows_corner_end));
+
+[proc,barrows_layout_choose]
+~barrows_layout_draw(-1);
+
+// UNKNOWN uniform sampling policy; repetition of the ladder corner is allowed.
+// This invocation never suspends or exposes a view with partially written fields.
+[proc,barrows_layout_draw](int $excluded_entrance)
+def_int $corner = random(^barrows_corner_count);
+def_int $entrance;
+if ($excluded_entrance = -1) {
+    $entrance = random(^barrows_corner_count);
+} else {
+    $entrance = random(sub(^barrows_corner_count, 1));
+    if ($entrance >= $excluded_entrance) $entrance = add($entrance, 1);
+}
+def_int $locks = ~barrows_layout_mask($entrance, random(^barrows_layout_count));
+%barrows = setbit_range_toint(%barrows, $locks, ^barrows_locks_start, ^barrows_locks_end);
+%barrows = setbit_range_toint(%barrows, setbit(0, $corner), ^barrows_ladder_start, ^barrows_ladder_end);
+%barrows = clearbit_range(%barrows, ^barrows_puzzle_start, ^barrows_puzzle_end);
+%barrows_state = setbit_range_toint(%barrows_state, $corner, ^barrows_corner_start, ^barrows_corner_end);
+%barrows_state = setbit_range_toint(%barrows_state, $entrance, ^barrows_entrance_start, ^barrows_entrance_end);
+%barrows_state = clearbit_range(%barrows_state, ^barrows_solved_bit, ^barrows_challenge_bit);
+
+// S09 calls this only after validating its bound answer. No player operation
+// reaches it in S07. Every room and exterior corridor retains a route after redraw.
+[proc,barrows_layout_wrong](int $generation)(boolean)
+if (~barrows_phase ! ^barrows_phase_unlooted | %barrows_generation ! $generation | ~barrows_in_tunnels(coord) = false) return(false);
+def_int $old_entrance = getbit_range(%barrows_state, ^barrows_entrance_start, ^barrows_entrance_end);
+p_stopaction;
+~barrows_layout_draw($old_entrance);
+return(true);

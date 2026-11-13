@@ -63,3 +63,8 @@
 // CANDIDATE capped combat-level sum; UNKNOWN displayed-count saturation policy.
 ^barrows_potential_max = 1000
 ^barrows_kill_count_max = 32767
+
+// UNKNOWN uniform layout/corner sampling over the complete connected room graph.
+^barrows_corner_count = 4
+^barrows_layout_count = 81
+^barrows_lock_mask = 65535

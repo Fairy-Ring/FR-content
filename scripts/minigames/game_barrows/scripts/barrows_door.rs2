@@ -1,0 +1,70 @@
+// CANDIDATE D10: original per-player transforms, unchanged shared wall collision.
+// Trigger lookup resolves the child; loc_type and its params still identify the parent.
+[oploc1,barrows_door_unlocked_r] ~barrows_door_use(loc_type, loc_coord);
+[oploc1,barrows_door_unlocked_l] ~barrows_door_use(loc_type, loc_coord);
+
+[proc,barrows_door_use](loc $parent, coord $anchor)
+if (~barrows_in_tunnels(coord) = false | distance(coord, $anchor) > 1) return;
+if (~barrows_phase ! ^barrows_phase_unlooted & ~barrows_phase ! ^barrows_phase_paid) return;
+def_int $lock = lc_param($parent, barrows_room_edge_lock);
+if ($lock < 469 | $lock > 484) return;
+if (testbit(%barrows, add(^barrows_locks_start, sub($lock, 469))) ! lc_param($parent, barrows_door_open_state)) return;
+// S09 supplies the bound puzzle and solved authorization, not a temporary bypass.
+if ($lock = 473 | $lock = 477 | $lock = 478 | $lock = 480) {
+    if (~barrows_phase = ^barrows_phase_unlooted & testbit(%barrows_state, ^barrows_solved_bit) = 0) return;
+}
+def_coord $destination = ~barrows_door_destination($anchor, coord);
+if ($destination = null) return;
+p_stopaction;
+p_telejump($destination);
+sound_synth(door_open, 1, 0);
+// S08 attaches its one destination-room encounter attempt here, after transfer.
+
+// Measured room-side tiles at both faces of every mapped opening. Internal
+// corridors transfer room to room, so a redraw cannot trap a player between walls.
+// Preserve the clicked half's lane. Paired exterior ends cross just their own wall.
+[proc,barrows_door_destination](coord $anchor, coord $source)(coord)
+def_int $x = coordx($anchor);
+def_int $z = coordz($anchor);
+def_int $destination;
+if ($x = 3528) {
+    $destination = 3528;
+    if (coordx($source) <= 3528) $destination = 3529;
+    return(movecoord($anchor, sub($destination, $x), 0, 0));
+}
+if ($x = 3575) {
+    $destination = 3575;
+    if (coordx($source) >= 3575) $destination = 3574;
+    return(movecoord($anchor, sub($destination, $x), 0, 0));
+}
+if ($z = 9671) {
+    $destination = 9671;
+    if (coordz($source) <= 9671) $destination = 9672;
+    return(movecoord($anchor, 0, 0, sub($destination, $z)));
+}
+if ($z = 9718) {
+    $destination = 9718;
+    if (coordz($source) >= 9718) $destination = 9717;
+    return(movecoord($anchor, 0, 0, sub($destination, $z)));
+}
+if ($x = 3541 | $x = 3545) {
+    $destination = 3540;
+    if (coordx($source) <= 3541) $destination = 3546;
+    return(movecoord($anchor, sub($destination, $x), 0, 0));
+}
+if ($x = 3558 | $x = 3562) {
+    $destination = 3557;
+    if (coordx($source) <= 3558) $destination = 3563;
+    return(movecoord($anchor, sub($destination, $x), 0, 0));
+}
+if ($z = 9684 | $z = 9688) {
+    $destination = 9683;
+    if (coordz($source) <= 9684) $destination = 9689;
+    return(movecoord($anchor, 0, 0, sub($destination, $z)));
+}
+if ($z = 9701 | $z = 9705) {
+    $destination = 9700;
+    if (coordz($source) <= 9701) $destination = 9706;
+    return(movecoord($anchor, 0, 0, sub($destination, $z)));
+}
+return(null);

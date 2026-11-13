@@ -218,3 +218,30 @@ val=124,crypt_rat
 val=125,crypt_rat
 val=126,crypt_rat
 val=127,crypt_rat
+
+// VERIFIED measured lock-bit joins, relative to the sixteen-bit lock field.
+// Central entrance order is north, west, east, south.
+[barrows_central_lock_bit]
+inputtype=int
+outputtype=int
+val=0,4
+val=1,8
+val=2,9
+val=3,11
+
+// Each cardinal room must retain one or both of its corner-room routes.
+[barrows_side_first_lock_bit]
+inputtype=int
+outputtype=int
+val=0,3
+val=1,2
+val=2,6
+val=3,13
+
+[barrows_side_second_lock_bit]
+inputtype=int
+outputtype=int
+val=0,5
+val=1,10
+val=2,12
+val=3,14

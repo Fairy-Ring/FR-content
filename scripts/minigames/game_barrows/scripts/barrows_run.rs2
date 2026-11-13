@@ -28,15 +28,6 @@ p_stopaction;
 ~barrows_layout_choose;
 return(true);
 
-// S07 replaces this one initializer with its connected-layout/corner chooser.
-// Zero means visually unlocked. Never expose the default-zero tunnel locks.
-[proc,barrows_layout_choose]
-%barrows = clearbit_range(%barrows, ^barrows_ladder_start, ^barrows_ladder_end);
-%barrows = setbit_range(%barrows, ^barrows_locks_start, ^barrows_locks_end);
-%barrows = clearbit_range(%barrows, ^barrows_puzzle_start, ^barrows_puzzle_end);
-%barrows_state = clearbit_range(%barrows_state, ^barrows_corner_start, ^barrows_entrance_end);
-%barrows_state = clearbit(%barrows_state, ^barrows_solved_bit);
-
 [proc,barrows_generation_advance]
 if (%barrows_generation = ^barrows_generation_max) {
     // Actor deletion completes before the wrapped generation can be used by a new encounter.
@@ -74,8 +65,8 @@ if (~barrows_phase = ^barrows_phase_unlooted & %barrows_generation = $generation
 return(false);
 
 // S10 supplies chest/location/authorization guards. S11 supplies reward data.
-// S12 calls this latch within the same protected invocation as its complete grant,
-// then draws the escape layout. This proc alone neither rolls nor grants treasure.
+// S12 calls this latch within the same protected invocation as its complete grant.
+// The latch also draws the escape layout; it alone neither rolls nor grants treasure.
 [proc,barrows_search_latch](int $generation)(boolean)
 if (~barrows_search_allowed($generation) = false) return(false);
 p_stopaction;
@@ -83,6 +74,7 @@ p_stopaction;
 %barrows_state = clearbit(%barrows_state, ^barrows_solved_bit);
 %barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
 ~barrows_generation_advance;
+~barrows_layout_choose;
 return(true);
 
 [proc,barrows_run_reset]

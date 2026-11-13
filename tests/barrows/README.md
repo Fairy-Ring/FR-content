@@ -27,7 +27,7 @@ Build the sibling engine packs, then run:
 node --import tsx ../content/tests/barrows/test_core.mjs
 ```
 
-This check executes the packed run procs through the production script runner. It covers masked state, phases, generation changes, owner-only actor removal, the non-suspending Search latch/reset, initial locked doors and saved countdown fields. The Search latch has no player trigger or reward grant in this build group. S07 replaces the all-locked layout initializer. S06 and S13 attach their effects to the shared saved-countdown primitives.
+This check executes the packed run procs through the production script runner. It covers masked state, phases, generation changes, owner-only actor removal, the non-suspending Search latch/reset, personal connected layouts and saved countdown fields. The Search latch has no player trigger or reward grant in this build group. S06 and S13 attach their effects to the shared saved-countdown primitives.
 
 Reset accepts only a paid run. Idle, unlooted and invalid phases retain every field, actor and presentation state. The paid control still proves generation advancement before actor removal and field clearing.
 
@@ -82,3 +82,13 @@ node --import tsx ../content/tests/barrows/test_credit.mjs
 The packed death hooks preserve the ordinary NPC death/drop path and bind its secondary NPC pointer. Credit delivery uses a captured generation, type and level; only an inside, matching unlooted run can change the original flag/count/potential fields. Brother identities credit once, owned summons require their normal combat hero to be their owner, and ordinary map monsters keep normal hero attribution. The check includes both caps and stale queued deliveries after reset and a new begin.
 
 Native lethal-damage cases use the ordinary damage proc and owner timer, including HP regeneration immediately before queued death. The death trigger, not a second zero-HP test, is the credit producer's authority. Ownership, captured generation and protected unlooted delivery remain required.
+
+## Personal topology (S07)
+
+```sh
+node --import tsx ../content/tests/barrows/test_topology.mjs
+```
+
+The packed chooser enumerates all 324 connected masks with exactly one central entrance. The graph includes nine rooms and four paired exterior corridors. The tests cover rotations, access from every room, all four ladder corners, state writes before presentation, relog retention and the run-begin, paid-reset, wrong-answer and Search redraw events. Seeded wrong-answer and Search cases change the corner. Uniform sampling is an UNKNOWN engineering choice. Original door transforms remain personal. Their shared wall collision never changes.
+
+Open-door operations transfer between measured room-side tiles in the clicked lane. Central access remains closed until the later puzzle slice supplies authorization. No door encounter, puzzle or chest operation is reachable in this prefix.

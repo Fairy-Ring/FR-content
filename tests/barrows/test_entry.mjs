@@ -38,6 +38,15 @@ async function main() {
     client: varp('barrows'), credit: varp('barrows_kills'), state: varp('barrows_state'),
     generation: varp('barrows_generation'), countdowns: varp('barrows_countdowns')
   };
+  const assertLayout = player => {
+    const state = player.getVar(ids.state) >>> 0;
+    const client = player.getVar(ids.client) >>> 0;
+    assert.equal((client >>> 6) & 15, 1 << ((state >>> 5) & 3), 'exactly the selected ladder is visible');
+    const locks = (client >>> 10) & 0xffff;
+    for (const [entrance, bit] of [4, 8, 9, 11].entries()) assert.equal((locks >>> bit) & 1, entrance === ((state >>> 7) & 3) ? 0 : 1, 'one central entrance matches its stored selector');
+    for (const bit of [0, 1, 7, 15]) assert.equal((locks >>> bit) & 1, 0, 'paired exterior corridors remain reachable');
+    for (const [a, b] of [[3, 5], [2, 10], [6, 12], [13, 14]]) assert.notEqual(((locks >>> a) & 1) + ((locks >>> b) & 1), 2, 'each side room retains a corner route');
+  };
   const phase = word => (word >>> 3) & 3;
   const set = (player, values) => {
     for (const [key, value] of Object.entries(values)) player.setVar(ids[key], value);
@@ -145,7 +154,7 @@ async function main() {
   };
   try {
     const random = measureRandom(() => procVoid(paid, 'barrows_leave'));
-    assert.equal(random.calls, 0, 'leave must not redraw random state');
+    assert.equal(random.calls, 3, 'paid leave redraws only the idle replacement layout');
   } finally { World.removeNpc = removeNpc; }
   assert.equal(deletionRows.length, owned.length, 'leave removes each owned actor using World.removeNpc');
   for (const row of deletionRows) assert.deepEqual(row, { ...paidSeed, generation: paidSeed.generation + 1 }, 'paid reset advances generation before removing actors and clearing durable fields');
@@ -153,11 +162,11 @@ async function main() {
   for (const row of [other, unowned]) assert.equal(row.npc.isActive, true, 'foreign or unowned actor retained');
   assert.equal(phase(paid.getVar(ids.state)), 0, 'paid exit resets phase to idle');
   assert.equal(paid.getVar(ids.credit) >>> 0, 0, 'paid exit clears credit');
-  assert.equal((paid.getVar(ids.client) >>> 0) & (0xffff << 10), (0xffff << 10) >>> 0, 'paid exit initializes all locks');
-  assert.equal(paid.getVar(ids.state) >>> 0, u32(paidSeed.state & 0xffff0000), 'paid exit retains only the unassigned upper state bits');
+  assertLayout(paid);
+  assert.equal((paid.getVar(ids.state) & ~0x1e0) >>> 0, u32(paidSeed.state & 0xffff0000), 'paid exit retains upper state bits and only idle layout selectors');
   const preservedClientMask = (0x3f | (0x7 << 26)) >>> 0;
-  assert.equal(paid.getVar(ids.client) >>> 0, (((paidSeed.client & preservedClientMask) | (0xffff << 10)) >>> 0), 'paid exit retains original client fields and initializes every lock');
-  assert.equal((paid.getVar(ids.state) >>> 0) & 0xffff, 0, 'paid exit clears assigned transient state');
+  assert.equal(paid.getVar(ids.client) & preservedClientMask, paidSeed.client & preservedClientMask, 'paid exit preserves unrelated original client fields');
+  assert.equal((paid.getVar(ids.state) >>> 0) & (0xffff & ~0x1e0), 0, 'paid exit clears progression and retains only idle layout selectors');
   assert.equal(paid.modalMain, -1, 'paid leave closes the active modal');
   assert.equal(paid.pendingModalClose, true, 'disconnected paid fixture retains its real pending close');
   assert(paid.packets.some(packet => packet.constructor.name === 'CamReset'), 'paid leave resets the camera');
@@ -248,7 +257,7 @@ async function main() {
   set(paidResume, paidResumeSeed);
   paidResume.packets.length = 0;
   const outside = measureRandom(() => procVoid(paidResume, 'barrows_resume'));
-  assert.equal(outside.calls, 0, 'outside paid resume must not redraw random state');
+  assert.equal(outside.calls, 3, 'outside paid resume draws only the idle replacement layout');
   assert.equal(phase(paidResume.getVar(ids.state)), 0, 'outside paid resume resets phase');
   assert.equal(paidResume.getVar(ids.credit), 0, 'outside paid resume clears credit');
   assert.equal(paidResume.getVar(ids.generation) >>> 0, paidResumeSeed.generation + 1, 'outside paid resume advances generation');
@@ -349,7 +358,8 @@ async function main() {
     if (expectedPhase === 0) {
       assert.equal(player.getVar(ids.credit) >>> 0, 0, 'outside paid map-zone exit clears credit');
       assert.equal(player.getVar(ids.countdowns) >>> 0, 0, 'outside paid map-zone exit clears countdowns');
-      assert.equal(player.getVar(ids.state) >>> 0, u32(seed.state & 0xffff0000), 'outside paid map-zone exit clears assigned run fields');
+      assert.equal((player.getVar(ids.state) & ~0x1e0) >>> 0, u32(seed.state & 0xffff0000), 'outside paid map-zone exit clears progression and writes idle layout selectors');
+      assertLayout(player);
     } else {
       assert.deepEqual(snapshot(player), seed, 'inside and preloot map-zone exits retain all run state');
     }
@@ -374,8 +384,8 @@ async function main() {
     assert.equal(moundPlayer.activeScript, state, 'ordinary player execution retains the delayed script');
     assert.deepEqual([moundPlayer.level, moundPlayer.x, moundPlayer.z], [0, x, z], 'run initialization precedes the teleport');
     assert.equal(phase(moundPlayer.getVar(ids.state)), 1, 'Dig initializes the unlooted phase before the view');
-    assert.equal((moundPlayer.getVar(ids.client) >>> 10) & 0xffff, 0xffff, 'every lock is set before the crypt view');
-    assert.equal(measured.calls, firstEntry ? 0 : 1, 'another crypt never redraws the unfinished run');
+    assertLayout(moundPlayer);
+    assert.equal(measured.calls, firstEntry ? 0 : 4, 'first Dig draws identity and topology, another crypt never redraws');
     // World clears this flag at delayedUntil, then resumes this same script.
     World.currentTick = moundPlayer.delayedUntil;
     moundPlayer.delayed = false;
