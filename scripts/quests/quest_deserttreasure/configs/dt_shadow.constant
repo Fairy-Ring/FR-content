@@ -1,0 +1,26 @@
+// CANDIDATE: shadow-product-contract-1109; 53 is a reconstructed action gate.
+^dt_shadow_thieving_required = 53
+// CANDIDATE: Secure chest page, subtractive 2007-base. Three independent locks.
+^dt_shadow_locks_required = 3
+^dt_shadow_lock_low = 52
+^dt_shadow_lock_high = 128
+^dt_shadow_chest_xp = 1500
+// CANDIDATE: no period odds survive. Equal poison/no-poison outcomes preserve the sourced risk.
+^dt_shadow_poison_chance = 2
+// Shared poison uses ceil(severity / 5). Severity 30 produces a first poison hit of 6.
+^dt_shadow_poison_severity = 30
+// CANDIDATE topology reconstruction, not historical arrivals: adjacent to the mapped ladders.
+// maps/m41_79.jm2 LOC 0 5 16:6450; surface parent at maps/m39_53.jm2 LOC 0 51 29:6560.
+^dt_shadow_inside_arrival = 0_41_79_6_16
+^dt_shadow_outside_arrival = 0_39_53_52_29
+// CANDIDATE eastern chamber: maps/m42_79.jm2 LOC rows 46-56/26-38 contain no blocking wall.
+// The source supports the eastern end, not this particular spawn or approach rectangle.
+^dt_damis_spawn = 0_42_79_49_32
+^dt_damis_approach_sw = 0_42_79_48_24
+^dt_damis_approach_ne = 0_42_79_55_39
+// CANDIDATE encounter lifetime, not a recovered period despawn timer.
+^dt_damis_lifetime = 1000
+// CANDIDATE period RuneHQ effect: 4-6 Prayer per hit including zero damage.
+// Conflicts with later 5%+1 per tick in melee distance; period evidence takes precedence.
+^dt_damis_prayer_min = 4
+^dt_damis_prayer_spread = 3

@@ -266,6 +266,32 @@ def check_original_entity_configs() -> None:
         "firediamond_firewarrior": (130, 190, 120, 135, 4, "npc_1977", "167"),
     }
     candidate_fields = ("hitpoints", "attack", "strength", "defence", "magic")
+    damis_server_fields = {
+        "fd_damis_normal": {
+            "size": "1", "wanderrange": "0", "maxrange": "64",
+            "attackrange": "1", "defaultmode": "none", "timer": "1", "ranged": "1",
+        },
+        "fd_damis_tougher": {
+            "size": "1", "wanderrange": "0", "maxrange": "64",
+            "attackrange": "1", "defaultmode": "none", "timer": "1", "ranged": "1",
+        },
+    }
+    damis_server_params = {
+        "fd_damis_normal": (
+            "damagetype,^crush_style", "attack_anim,human_dhsword_chop",
+            "defend_anim,human_dhsword_def", "death_anim,human_death",
+            "attack_sound,2H_slash", "defend_sound,steel", "death_sound,human_death",
+            "death_drop,null", "strengthbonus,80", "stabdefence,60",
+            "slashdefence,60", "crushdefence,60", "magicdefence,60", "rangedefence,60",
+        ),
+        "fd_damis_tougher": (
+            "damagetype,^crush_style", "attack_anim,human_dhsword_chop",
+            "defend_anim,human_dhsword_def", "death_anim,human_death",
+            "attack_sound,2H_slash", "defend_sound,steel", "death_sound,human_death",
+            "death_drop,null", "strengthbonus,100", "stabdefence,100",
+            "slashdefence,100", "crushdefence,100", "magicdefence,80", "rangedefence,120",
+        ),
+    }
     for name, (hp, attack, strength, defence, rate, model, vislevel) in expected_npcs.items():
         expected_fields = {
             "hitpoints": str(hp),
@@ -279,10 +305,17 @@ def check_original_entity_configs() -> None:
         }
         for field, expected in expected_fields.items():
             require(one(npcs, name, field) == expected, f"[{name}] {field} must be {expected}")
+        server_fields = damis_server_fields.get(name, {})
+        for field, expected in server_fields.items():
+            require(one(npcs, name, field) == expected, f"[{name}] server field {field} must be {expected}")
+            require(not base_npcs.get(name, {}).get(field), f"[{name}] server field {field} must be a boss-only addition")
         current_values = {key: list(values) for key, values in npcs.get(name, {}).items()}
         base_values = {key: list(values) for key, values in base_npcs.get(name, {}).items()}
         require(name in base_npcs, f"[{name}] must retain its original NPC identity")
         for field in candidate_fields:
+            current_values.pop(field, None)
+            base_values.pop(field, None)
+        for field in server_fields:
             current_values.pop(field, None)
             base_values.pop(field, None)
         current_params = current_values.get("param", [])
@@ -293,12 +326,16 @@ def check_original_entity_configs() -> None:
             not any(value.startswith("attackrate,") for value in base_params),
             f"[{name}] baseline must not already define an attack rate",
         )
-        current_values["param"] = [value for value in current_params if value != candidate_rate]
+        for value in damis_server_params.get(name, ()):
+            require(current_params.count(value) == 1, f"[{name}] must add exactly server param {value}")
+            require(value not in base_params, f"[{name}] baseline must not already define server param {value}")
+        allowed_params = {candidate_rate, *damis_server_params.get(name, ())}
+        current_values["param"] = [value for value in current_params if value not in allowed_params]
         if not current_values["param"]:
             current_values.pop("param")
         require(
             current_values == base_values,
-            f"[{name}] may change only the labelled candidate combat fields",
+            f"[{name}] may change only the labelled candidate combat and Damis server fields",
         )
     for name, base_values in base_npcs.items():
         if name not in expected_npcs:

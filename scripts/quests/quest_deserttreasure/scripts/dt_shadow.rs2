@@ -1,0 +1,201 @@
+// CANDIDATE wording: desert-treasure.dlg.shadow-hunt (r15343078).
+// State encodings are the accepted product contract, not recovered 377 writers.
+[opnpc1,shadow_warrior_rasool]
+if (%deserttreasure < ^dt_stage_hunts) {
+    ~chatnpc("Greetings friend. I am Rasolo, the famous merchant. Would you care to see my wares?");
+    if (~p_choice2("Yes", 1, "No", 2) = 1) @dt_rasolo_shop;
+    return;
+}
+if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_cross_returned_ring_awarded) @dt_rasolo_after;
+if (%fd_shadowwarrior_quest = ^dt_shadow_substate_rasolo_agreed) {
+    if (inv_total(inv, fd_sword_cross) > 0) @dt_rasolo_cross;
+    ~chatnpc("Have you retrieved my gilded cross for me yet?");
+    ~chatplayer("No, not yet...");
+    ~chatnpc("Well what seems to be the problem?");
+    def_int $repeat = ~p_choice3("Where can I find Laheeb?", 1, "Can't I just buy your ring?", 2, "Is Damis near here, then?", 3);
+    if ($repeat = 1) @dt_rasolo_where;
+    if ($repeat = 2) @dt_rasolo_buy;
+    if ($repeat = 3) @dt_rasolo_near;
+    return;
+}
+if (%fd_shadowwar_intro = ^dt_flag_on) {
+    ~chatplayer("Where can I find this Damis again?");
+    ~chatnpc("I have already told you, he is of the shadows. You will see neither him nor his lair without the aid of magic.");
+    @dt_rasolo_offer;
+}
+~chatnpc("Greetings friend. I am Rasolo, the famous merchant. Would you care to see my wares?");
+def_int $intro = ~p_choice3("Yes", 1, "No", 2, "Ask about the Diamonds of Azzanadra", 3);
+if ($intro = 1) @dt_rasolo_shop;
+if ($intro = 3) @dt_rasolo_diamonds;
+return;
+
+[label,dt_rasolo_shop]
+~openshop_activenpc;
+
+[label,dt_rasolo_diamonds]
+~chatplayer("No, actually I was looking for something specific...");
+~chatnpc("Hmmmm? And what would that be?");
+~chatplayer("I am looking for one of the Diamonds of Azzanadra. I have reason to believe it may be somewhere around here...");
+~chatnpc("Ahhh... The Shadow Diamond...");
+~chatnpc("I know the object of which you speak. It is guarded by a fearsome warrior known as Damis, they say, who lives in the shadows, invisible to prying eyes...");
+~chatplayer("How can I find this 'Damis' then?");
+%fd_shadowwar_intro = ^dt_flag_on;
+@dt_rasolo_offer;
+
+[label,dt_rasolo_offer]
+~chatnpc("Well now... perhaps we can help each other out here.");
+~chatnpc("I have in my possession a small trinket, a ring, that allows its wearer to see the unseen...");
+~chatplayer("How much do you want for it?");
+~chatnpc("Ah, but it is not for sale... As such...");
+~chatnpc("I am offering to trade it for an item that was rightfully mine, but that was stolen by a bandit named Laheeb.");
+~chatnpc("The item in question is a gilded cross, that has some sentimental value to myself. I wish for you to recover this item for me, and I will happily let you have my ring of visibility.");
+~chatplayer("Where can I find this Laheeb?");
+@dt_rasolo_directions;
+
+[label,dt_rasolo_directions]
+~chatnpc("Well, as a travelling merchant I have roamed these lands for many years...");
+~chatnpc("To the far east of here there is an area that is dry, and barren like the desert... it is called...");
+~chatplayer("Al Kharid?");
+~chatnpc("...Yes, Al Kharid. Now, to the south of Al Kharid there is a passageway, it is called the...");
+~chatplayer("Shantay Pass.");
+~chatnpc("...Yes. I didn't realise you had travelled there yourself.");
+~chatnpc("Anyway, when you have gone through the Shantay Pass, you will find yourself in a hostile desert... You will need to bring water with you to keep your life. Now, to the south-west of this pass, you will find a small");
+~chatnpc("village...");
+~chatplayer("The Bedabin camp.");
+~chatnpc("If you know where Laheeb lives, why did you ask me?");
+~chatplayer("I don't. Sorry, please continue.");
+~chatnpc("Well, okay then. Anyway, south of this encampment there is an area where few have ever been... It is a village of murderous bandits, and treacherous");
+~chatnpc("thieves... This is where Laheeb makes his home.");
+~chatnpc("He will have hidden his stolen treasure somewhere in that village, I am sure of it. When you find his loot, you will find my gilded cross. Return it to me, and I will reward you with my ring");
+~chatnpc("of visibility, so that you may find Damis. Does this seem fair to you?");
+if (~p_choice2("Yes", 1, "No", 2) = 1) @dt_rasolo_accept;
+@dt_rasolo_decline;
+
+[label,dt_rasolo_accept]
+~chatplayer("Not a problem. I'll be back with your cross before you know it.");
+if (%fd_shadowwarrior_quest = ^dt_shadow_substate_not_started) %fd_shadowwarrior_quest = ^dt_shadow_substate_rasolo_agreed;
+
+[label,dt_rasolo_decline]
+~chatplayer("Sounds like too much effort to me. I'll find this Damis by myself.");
+~chatnpc("As you wish.");
+
+[label,dt_rasolo_where]
+~chatplayer("Where can I find this Laheeb?");
+@dt_rasolo_directions;
+
+[label,dt_rasolo_buy]
+~chatplayer("Can't I just buy your ring?");
+~chatnpc("No, it is not for sale. Some things are more important than money, and the return of my gilded cross is one of them.");
+
+[label,dt_rasolo_near]
+~chatplayer("Is Damis near here, then?");
+~chatnpc("You would be surprised to know just how close he is...");
+
+[label,dt_rasolo_cross]
+~chatnpc("Have you retrieved my gilded cross for me yet?");
+~chatplayer("Yes I have!");
+~chatnpc("Excellent, excellent. Here, take this ring. While you wear it, you will be able to see the things that live in shadows...");
+~chatnpc("And you will be able to find the entrance to Damis' lair.");
+if (%fd_shadowwarrior_quest ! ^dt_shadow_substate_rasolo_agreed | inv_total(inv, fd_sword_cross) = 0) return;
+inv_del(inv, fd_sword_cross, 1);
+inv_add(inv, fd_ring_visibility, 1);
+%fd_shadowwarrior_quest = ^dt_shadow_substate_cross_returned_ring_awarded;
+
+[label,dt_rasolo_after]
+~chatnpc("So how goes your quest? Did you manage to find the Diamond you were looking for yet?");
+~chatplayer("Not yet...");
+// obj_gettotal includes inventory, bank and worn. Banked is not lost.
+if (~obj_gettotal(fd_ring_visibility) = 0) {
+    ~chatplayer("I lost that ring you gave me...");
+    ~chatnpc("Then by all means, take another. Only a foolish merchant would give away his only stock!");
+    if (~obj_gettotal(fd_ring_visibility) = 0 & inv_freespace(inv) > 0) inv_add(inv, fd_ring_visibility, 1);
+}
+~chatnpc("Well, his lair is very close to here. I suggest you look around for it.");
+
+[oploc1,fd_bandit_shutchest] @dt_shadow_chest;
+
+[label,dt_shadow_chest]
+if (%deserttreasure < ^dt_stage_hunts | %fd_shadowwarrior_quest ! ^dt_shadow_substate_rasolo_agreed) return;
+if (%fd_banditchest_disarmed = ^dt_flag_on) {
+    ~dt_shadow_cross;
+    return;
+}
+// No recovered Shadow refusal. Shared attempt_locked_chest cannot be reused without granting its unrelated loot.
+if (stat(thieving) < ^dt_shadow_thieving_required) return;
+~mesbox("Your skill as a thief allows you to see some kind of elaborate booby trapped locking mechanism on this chest.");
+if (~p_choice2("Yes", 1, "No", 2) = 1) @dt_shadow_pick;
+return;
+
+[label,dt_shadow_pick]
+if (stat(thieving) < ^dt_shadow_thieving_required | %fd_shadowwarrior_quest ! ^dt_shadow_substate_rasolo_agreed) return;
+if (inv_total(inv, lockpick) = 0) {
+    ~mesbox("You will need a lockpick for this lock.");
+    return;
+}
+def_int $lock = 0;
+while ($lock < ^dt_shadow_locks_required) {
+    switch_int ($lock) {
+        case 0 : mes("You attempt to pick the first lock...");
+        case 1 : mes("You attempt to pick the second lock...");
+        case 2 : mes("You attempt to pick the final lock...");
+    }
+    anim(human_lockedchest, 0);
+    p_delay(1);
+    if (stat_random(thieving, ^dt_shadow_lock_low, ^dt_shadow_lock_high) = false) {
+        mes("...and fail. The locking mechanism has reset itself.");
+        inv_del(inv, lockpick, 1);
+        mes("Your lock pick snapped while attempting to pick the lock.");
+        // CANDIDATE later Secure chest: 2-3 damage; poison chance is reconstruction.
+        ~damage_self(add(2, random(2)));
+        if (random(^dt_shadow_poison_chance) = 0) queue(poison_player, 0, ^dt_shadow_poison_severity);
+        return;
+    }
+    switch_int ($lock) {
+        case 0 : mes("...You successfully picked the first lock!");
+        case 1 : mes("...You successfully picked the second lock!");
+        case 2 : mes("You manage to pick final lock.");
+    }
+    $lock = add($lock, 1);
+}
+%fd_banditchest_disarmed = ^dt_flag_on;
+stat_advance(thieving, ^dt_shadow_chest_xp);
+~dt_shadow_cross;
+
+[proc,dt_shadow_cross]
+if (~obj_gettotal(fd_sword_cross) > 0) {
+    ~mesbox("You find nothing of interest inside the chest.");
+    return;
+}
+if (inv_freespace(inv) = 0) return;
+inv_add(inv, fd_sword_cross, 1);
+~mesbox("Inside the chest, hidden under some rags, you find a Gilded Cross.");
+
+[proc,dt_shadow_visibility]
+if (inv_total(worn, fd_ring_visibility) > 0) %fd_ladder_present = ^dt_flag_on;
+else %fd_ladder_present = ^dt_flag_off;
+
+[proc,.dt_shadow_visibility]
+if (.inv_total(worn, fd_ring_visibility) > 0) .%fd_ladder_present = ^dt_flag_on;
+else .%fd_ladder_present = ^dt_flag_off;
+
+[oploc1,fd_shadowladder1] @dt_shadow_enter;
+[oploc1,fd_shadow_ladder_there] @dt_shadow_enter;
+
+[label,dt_shadow_enter]
+if (inv_total(worn, fd_ring_visibility) = 0) return;
+p_arrivedelay;
+~climb_ladder(^dt_shadow_inside_arrival, true);
+
+[oploc1,fd_shadowladder]
+// Exit never requires the ring: it can be removed after entering.
+p_arrivedelay;
+~climb_ladder(^dt_shadow_outside_arrival, true);
+
+[proc,dt_shadow_journal]()(string)
+// Project-authored summaries: desert-treasure.presentation-unknown-1109. Not historical quotes.
+if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_diamond_claimed) return("@str@I have taken the Shadow diamond.| ");
+if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_damis_defeated) return("@dbl@I have defeated Damis. I should take his Shadow diamond.| ");
+if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_damis_second_form) return("@dbl@I have defeated Damis' first form.| ");
+if (%fd_shadowwarrior_quest >= ^dt_shadow_substate_cross_returned_ring_awarded) return("@str@I have returned Rasolo's gilded cross.| ");
+if (%fd_shadowwarrior_quest = ^dt_shadow_substate_rasolo_agreed) return("@dbl@I should recover Rasolo's gilded cross.| ");
+return("@dbl@I should ask Rasolo about the Shadow diamond.| ");

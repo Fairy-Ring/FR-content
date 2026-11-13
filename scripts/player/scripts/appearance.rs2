@@ -118,6 +118,7 @@ if (%tutorial > ^newbie_combat_instructor_unequipping_items) {
 }
 ~player_combat_stat; // update combat varps
 ~mm_greegree_transmogrify(inv_getobj(worn, ^wearpos_rhand)); // MM greegree slice (289 appearance hook)
+if (%fd_ladder_present = 1 | inv_total(worn, fd_ring_visibility) > 0) ~dt_shadow_visibility;
 
 [proc,.update_all](obj $previous_weapon)
 // secret sauce
@@ -141,6 +142,7 @@ if (.p_finduid(.uid) = true) {
 ~.update_weapon_category($previous_weapon); // the attack tab weapon category
 //}
 ~.player_combat_stat; // update combat varps
+if (.%fd_ladder_present = 1 | .inv_total(worn, fd_ring_visibility) > 0) ~.dt_shadow_visibility;
 
 [queue,update_all]
 ~update_all(null);

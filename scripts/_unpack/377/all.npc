@@ -46189,6 +46189,28 @@ magic=1
 param=attackrate,4
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_short_head
+// CANDIDATE: Damis page, subtractive 2007-base; owned encounter uses local AI, no hunt.
+ranged=1
+size=1
+wanderrange=0
+maxrange=64
+attackrange=1
+defaultmode=none
+timer=1
+param=damagetype,^crush_style
+param=strengthbonus,80
+param=stabdefence,60
+param=slashdefence,60
+param=crushdefence,60
+param=magicdefence,60
+param=rangedefence,60
+param=attack_anim,human_dhsword_chop
+param=defend_anim,human_dhsword_def
+param=death_anim,human_death
+param=attack_sound,2H_slash
+param=defend_sound,steel
+param=death_sound,human_death
+param=death_drop,null
 
 [fd_damis_tougher]
 name=Damis
@@ -46223,6 +46245,28 @@ magic=1
 param=attackrate,3
 head1=obj_pickpocket_guide_man
 head2=idk_man_jaw_short_head
+// CANDIDATE: Damis page, subtractive 2007-base; owned encounter uses local AI, no hunt.
+ranged=1
+size=1
+wanderrange=0
+maxrange=64
+attackrange=1
+defaultmode=none
+timer=1
+param=damagetype,^crush_style
+param=strengthbonus,100
+param=stabdefence,100
+param=slashdefence,100
+param=crushdefence,100
+param=magicdefence,80
+param=rangedefence,120
+param=attack_anim,human_dhsword_chop
+param=defend_anim,human_dhsword_def
+param=death_anim,human_death
+param=attack_sound,2H_slash
+param=defend_sound,steel
+param=death_sound,human_death
+param=death_drop,null
 
 [shadow_dog_wild]
 name=Shadow Hound
