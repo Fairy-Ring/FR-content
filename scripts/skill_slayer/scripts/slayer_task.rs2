@@ -132,7 +132,7 @@ return(enum(int, string, task_tip, %slayer_target));
 // this doesnt actually check for tasks assigned by turael, but rather the types he assigns
 if(%slayer_target = ^slayer_rat | %slayer_target = ^slayer_monkey | %slayer_target = ^slayer_cow | %slayer_target = ^slayer_bird 
     | %slayer_target = ^slayer_spider | %slayer_target = ^slayer_dwarf | %slayer_target = ^slayer_lizard | %slayer_target = ^slayer_cavebug
-    | %slayer_target = ^slayer_scorpion | %slayer_target = ^slayer_zombie | %slayer_target = ^slayer_bat | %slayer_target = ^slayer_bear
+    | %slayer_target = ^slayer_scorpion | %slayer_target = ^slayer_zombie | %slayer_target = ^slayer_bat
     | %slayer_target = ^slayer_ghost | %slayer_target = ^slayer_cavecrawler | %slayer_target = ^slayer_icefiend | %slayer_target = ^slayer_kalphite
     | %slayer_target = ^slayer_caveslime | %slayer_target = ^slayer_dog | %slayer_target = ^slayer_goblin | %slayer_target = ^slayer_wolf
     | %slayer_target = ^slayer_skeleton | %slayer_target = ^slayer_crawlinghand | %slayer_target = ^slayer_banshee) {

@@ -1,0 +1,26 @@
+{
+    "turael": [
+        ["rats", "rat", 7, 15, 50],
+        ["monkeys", "monkey", 6, 15, 50],
+        ["cows", "cow", 8, 15, 50],
+        ["birds", "bird", 6, 15, 50],
+        ["spiders", "spider", 6, 15, 50],
+        ["dwarves", "dwarf", 7, 10, 50],
+        ["lizards", "lizard", 8, 15, 50],
+        ["cavebugs", "cavebug", 8, 10, 20],
+        ["scorpions", "scorpion", 7, 15, 50],
+        ["zombies", "zombie", 7, 15, 50],
+        ["bats", "bat", 7, 15, 50],
+        ["ghosts", "ghost", 7, 15, 50],
+        ["cavecrawlers", "cavecrawler", 8, 15, 50],
+        ["icefiends", "icefiend", 8, 15, 20],
+        ["kalphite", "kalphite", 6, 15, 50],
+        ["caveslimes", "caveslime", 8, 10, 20],
+        ["dogs", "dog", 7, 15, 50],
+        ["goblins", "goblin", 7, 15, 50],
+        ["wolves", "wolf", 7, 15, 50],
+        ["skeletons", "skeleton", 7, 15, 50],
+        ["crawlinghands", "crawlinghand", 8, 15, 50],
+        ["banshees", "banshee", 8, 15, 50]
+    ]
+}
