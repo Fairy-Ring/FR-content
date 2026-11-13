@@ -8,6 +8,8 @@
  * Parse the JSON after APE_ATOLL_HUMAN_DEATH_BASELINE_V1 and save its observation
  * to fixtures/human-death-published.json (retain marker and deathSourceSha256).
  * Save its effects to fixtures/human-death-effects.json. Review both diffs.
+ * Generated enum and database-column references use kind/name records resolved
+ * through the built pack tables. Keep every command and every game value.
  * The source hash is provenance only. Appended varps must retain type defaults.
  * It starts no server and writes its JSON receipt beneath RUNNER_TEMP (or the OS temp directory).
  */
@@ -911,10 +913,20 @@ for (const line of fs.readFileSync(path.join(CONTENT_DIR, 'scripts/engine.rs2'),
   const types = [...(match[2] ?? '').matchAll(/(\w+)\s+\$/g)].map(m => m[1]);
   commandSignatures.set(name, types);
 }
+// ENUM has a dynamic signature documented in a comment, not parsed above.
+commandSignatures.set('ENUM', ['type', 'type', 'enum']);
 const namedPacks = new Map();
 function namedArgument(type, value) {
   const kind = ({ namedobj: 'obj', timer: 'script', softtimer: 'script', queue: 'script', proc: 'script' })[type] ?? type;
   if (value < 0) return value;
+  if (kind === 'dbcolumn') {
+    return {
+      kind,
+      name: namedArgument('dbtable', (value >> 12) & 0xffff),
+      column: (value >> 4) & 0x7f,
+      tuple: (value & 15) - 1
+    };
+  }
   const file = path.join(CONTENT_DIR, `pack/${kind}.pack`);
   if (!fs.existsSync(file)) return value;
   if (!namedPacks.has(kind)) {
@@ -923,7 +935,9 @@ function namedArgument(type, value) {
       return [Number(line.slice(0, equal)), line.slice(equal + 1)];
     })));
   }
-  return namedPacks.get(kind).get(value) ?? value;
+  const name = namedPacks.get(kind).get(value);
+  if (kind === 'enum' || kind === 'dbtable') assert(name, `${kind}.pack is missing id ${value}`);
+  return name ?? value;
 }
 function withDeathEffects(player, callback) {
   const commands = [];
@@ -953,7 +967,10 @@ function withDeathEffects(player, callback) {
         state.popInt = popInt;
         state.popString = popString;
         const types = (commandSignatures.get(name) ?? []).filter(type => type !== 'string');
-        command.ints = ints.map((value, index) => namedArgument(types[index], value));
+        command.ints = ints.map((value, index) => {
+          const argument = namedArgument(types[index], value);
+          return name === 'ENUM' && index === 2 ? { kind: 'enum', name: argument } : argument;
+        });
         command.strings = strings;
         if (variable) command.pointer = namedArgument(name === 'POP_VARBIT' ? 'varbit' : 'varp', state.intOperand);
       }
