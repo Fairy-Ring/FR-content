@@ -143,6 +143,7 @@ jobs:
           run_test tests/string-charset/check_string_charset.test.mjs node --test ../content/tests/string-charset/check_string_charset.test.mjs
           run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
+          run_test tests/cfg-other/test_cfg_other.mjs node --import tsx ../content/tests/cfg-other/test_cfg_other.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
