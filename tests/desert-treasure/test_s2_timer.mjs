@@ -1,0 +1,108 @@
+#!/usr/bin/env node
+/** Run the packed Smoke start proc with absent and already-running real timers. */
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+
+process.on('uncaughtException', error => {
+  console.error(error);
+  process.exit(1);
+});
+process.on('unhandledRejection', error => {
+  console.error(error);
+  process.exit(1);
+});
+
+const CONTENT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const ENGINE = process.env.HARNESS_ENGINE_DIR ?? path.resolve(CONTENT, '../engine');
+const PACK = path.join(ENGINE, 'data/pack');
+assert(fs.existsSync(path.join(PACK, 'server/script.dat')), 'pack the sibling engine before this test');
+const eng = relative => import(pathToFileURL(path.join(ENGINE, relative)).href);
+const World = (await eng('src/engine/World.ts')).default;
+const VarPlayerType = (await eng('src/cache/config/VarPlayerType.ts')).default;
+const VarBitType = (await eng('src/cache/config/VarBitType.ts')).default;
+const InvType = (await eng('src/cache/config/InvType.ts')).default;
+const ScriptProvider = (await eng('src/engine/script/ScriptProvider.ts')).default;
+const ObjType = (await eng('src/cache/config/ObjType.ts')).default;
+const SeqType = (await eng('src/cache/config/SeqType.ts')).default;
+const FontType = (await eng('src/cache/config/FontType.ts')).default;
+const ScriptRunner = (await eng('src/engine/script/ScriptRunner.ts')).default;
+const ScriptState = (await eng('src/engine/script/ScriptState.ts')).default;
+const Player = (await eng('src/engine/entity/Player.ts')).default;
+
+VarPlayerType.load(PACK);
+VarBitType.load(PACK);
+InvType.load(PACK);
+ObjType.load(PACK);
+SeqType.load(PACK);
+FontType.load(PACK);
+assert(ScriptProvider.load(PACK) > 0, 'compiled scripts must load');
+const start = ScriptProvider.getByName('[proc,dt_smoke_start]');
+const damage = ScriptProvider.getByName('[timer,dt_smoke_damage]');
+assert(start && damage, 'compiled S2 Smoke start proc and damage timer must exist');
+
+function runStart(player) {
+  const execution = player.runScript(ScriptRunner.init(start, player), true, true);
+  assert.equal(execution, ScriptState.FINISHED, 'compiled Smoke start proc must finish');
+}
+
+// A timer created at world tick 0 is still present: test the sentinel, not truthiness.
+for (const clock of [0, 100]) {
+  const player = new Player(`dts2_timer_${clock}`, 0n, 0n);
+  player.uid = 1;
+  player.pid = 1;
+  player.x = 3206;
+  player.z = 9379;
+  player.level = 0;
+  World.currentTick = clock;
+  assert.equal(player.timers.has(damage.id), false, 'fixture starts with the Smoke timer absent');
+  runStart(player);
+  const timer = player.timers.get(damage.id);
+  assert(timer, `absent timer must be armed at world tick ${clock}`);
+  assert.equal(timer.interval, 20, 'the real timer uses the configured 20-tick interval');
+  assert.equal(timer.clock, clock, 'the timer starts on this world tick');
+
+  World.currentTick = clock + 5;
+  runStart(player);
+  assert.strictEqual(player.timers.get(damage.id), timer, 'a present timer must not be replaced');
+  assert.equal(timer.clock, clock, 'a present timer must not be re-armed or postponed');
+  console.log(`PASS compiled Smoke timer: absent arms; present clock ${clock} is preserved`);
+}
+
+// Exercise a real light action followed by the engine timer for each of the four torches, not a source pin.
+for (const [index, corner] of [[1, 'ne'], [2, 'se'], [3, 'sw'], [4, 'nw']]) {
+  const player = new Player(`dts2_torch_expiry_${index}`, 2n, 2n);
+  player.uid = 2;
+  player.pid = 2;
+  player.levels.fill(99);
+  player.baseLevels.fill(99);
+  player.setVarBit(VarBitType.getId('deserttreasure'), 10);
+  player.lastUseItem = ObjType.getId('tinderbox');
+  player.invAdd(InvType.getId('inv'), player.lastUseItem, 1);
+  World.currentTick = 100;
+  const light = ScriptProvider.getByName(`[oplocu,4d_standing_torch${index}]`);
+  const expiry = ScriptProvider.getByName(`[timer,dt_smoke_torch_${corner}]`);
+  assert(light && expiry, `torch ${index} has its packed light trigger and ${corner} timer`);
+  assert.equal(player.runScript(ScriptRunner.init(light, player), true, true), ScriptState.FINISHED);
+  const bit = VarBitType.getId(`fd_torch_count${index}`);
+  const others = [1, 2, 3, 4].filter(other => other !== index).map(other => VarBitType.getId(`fd_torch_count${other}`));
+  assert.equal(player.getVarBit(bit), 1, `packed lighting sets the real bit of torch ${index}`);
+  for (const other of others) assert.equal(player.getVarBit(other), 0, `lighting torch ${index} sets no other torch bit`);
+  const timer = player.timers.get(expiry.id);
+  assert(timer && timer.interval === 300, `native light arms the configured lifetime on the ${corner} timer`);
+  assert.equal(player.timers.size, 1, `lighting torch ${index} arms exactly one timer`);
+  World.currentTick = 399;
+  player.processTimers(timer.type);
+  assert.equal(player.getVarBit(bit), 1, `torch ${index} remains lit before expiry`);
+  World.currentTick = 400;
+  player.processTimers(timer.type);
+  assert.equal(player.getVarBit(bit), 0, `executed packed expiry clears the bit of torch ${index}`);
+  for (const other of others) assert.equal(player.getVarBit(other), 0, `the expiry of torch ${index} touches no other torch bit`);
+  assert.equal(player.timers.has(expiry.id), false, 'expiry removes its timer');
+  assert.equal(player.getVarBit(VarBitType.getId('fd_firechest')), 0, 'expiry grants no chest progress');
+}
+console.log('PASS packed torch light and real engine expiry at 300 ticks, all four torches');
+
+// World imports create workers; this offline test starts no network listener.
+process.exit(0);

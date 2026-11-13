@@ -467,10 +467,10 @@
 [mapzone,0_49_75] @music_playbyregion(coord);
 [mapzone,0_49_150] @music_playbyregion(coord);
 [mapzone,0_50_145] @music_playbyregion(coord);
-[mapzone,0_50_146] @music_playbyregion(coord);
+[mapzone,0_50_146] ~dt_smoke_start; @music_playbyregion(coord);
 [mapzone,0_50_148] @music_playbyregion(coord);
 [mapzone,0_51_143] @music_playbyregion(coord);
-[mapzone,0_51_146] @music_playbyregion(coord);
+[mapzone,0_51_146] ~dt_smoke_start; @music_playbyregion(coord);
 [mapzone,0_51_150] @music_playbyregion(coord);
 [mapzone,0_52_62] @music_playbyregion(coord);
 [mapzone,0_52_145] @music_playbyregion(coord);
