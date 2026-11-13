@@ -175,8 +175,8 @@ if ($passes_roll = true) {
 
 [proc,cookx](obj $obj)(int)
 p_delay(0);
-if_openchat(cookx);
 if_setobject(cookx:com_2, $obj, 200);
+if_openchat(cookx);
 
 if_addresumebutton(cookx:com_3);
 if_addresumebutton(cookx:com_4);

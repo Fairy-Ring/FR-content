@@ -419,10 +419,6 @@ if ($lines = 0) {
 } else if ($lines = 5) {
     $interface = message5;
 }
-// Open first, then if_settext (same order as login welcome).
-// settext-before-open left messageN showing pack defaults Line1–4 on 377 client
-// (IF_OPENCHAT / unloadCom rehydrate path); open-then-settext lands real copy.
-if_openchat($interface);
 if ($lines = 1) {
     if_settext(message1:com_0, split_get($page, 0));
 } else if ($lines = 2) {
@@ -444,6 +440,8 @@ if ($lines = 1) {
     if_settext(message5:com_3, split_get($page, 3));
     if_settext(message5:com_4, split_get($page, 4));
 }
+// The final open requests a redraw after every line, including across packet drains.
+if_openchat($interface);
 
 [proc,mesbox](string $string)
 split_init($string, 470, 5, q8_full);
@@ -473,8 +471,6 @@ if ($lines = 0) {
 } else if ($lines = 5) {
     $interface = message5;
 }
-// Same open-then-settext as primary ~mesbox_page (377 Line1–4 residual).
-.if_openchat($interface);
 if ($lines = 1) {
     .if_settext(message1:com_0, split_get($page, 0));
 } else if ($lines = 2) {
@@ -496,6 +492,8 @@ if ($lines = 1) {
     .if_settext(message5:com_3, split_get($page, 3));
     .if_settext(message5:com_4, split_get($page, 4));
 }
+// Keep the secondary player's text before its redraw event too.
+.if_openchat($interface);
 
 [proc,.mesbox](string $string)
 split_init($string, 470, 5, q8_full);
@@ -676,8 +674,8 @@ switch_component (last_com) {
 // Make-X interfaces register every overlapping option layer before pausing.
 
 [proc,skillmulti1](namedobj $obj1)(namedobj, int)
-if_openchat(skillmulti1);
 if_setobject(skillmulti1:com_2, $obj1, 200);
+if_openchat(skillmulti1);
 
 if_addresumebutton(skillmulti1:com_3);
 if_addresumebutton(skillmulti1:com_4);
@@ -772,11 +770,11 @@ switch_component (last_com) {
 }
 
 [proc,skillmulti4](namedobj $obj1, namedobj $obj2, namedobj $obj3, namedobj $obj4)(namedobj, int)
-if_openchat(skillmulti4);
 if_setobject(skillmulti4:com_2, $obj1, 200);
 if_setobject(skillmulti4:com_3, $obj2, 200);
 if_setobject(skillmulti4:com_4, $obj3, 200);
 if_setobject(skillmulti4:com_5, $obj4, 200);
+if_openchat(skillmulti4);
 
 if_addresumebutton(skillmulti4:com_6);
 if_addresumebutton(skillmulti4:com_7);
@@ -825,12 +823,12 @@ switch_component (last_com) {
 }
 
 [proc,skillmulti5](namedobj $obj1, namedobj $obj2, namedobj $obj3, namedobj $obj4, namedobj $obj5)(namedobj, int)
-if_openchat(skillmulti5);
 if_setobject(skillmulti5:com_2, $obj1, 200);
 if_setobject(skillmulti5:com_3, $obj2, 200);
 if_setobject(skillmulti5:com_4, $obj3, 200);
 if_setobject(skillmulti5:com_5, $obj4, 200);
 if_setobject(skillmulti5:com_6, $obj5, 200);
+if_openchat(skillmulti5);
 
 if_addresumebutton(skillmulti5:com_7);
 if_addresumebutton(skillmulti5:com_8);
