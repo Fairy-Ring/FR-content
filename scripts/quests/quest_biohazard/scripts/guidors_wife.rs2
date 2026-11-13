@@ -1,8 +1,8 @@
 [opnpc1,guidors_wife]
 if(map_members = ^false | %biohazard >= ^biohazard_reported_elena) {
     ~chatplayer("<p,neutral>Hello.");
-    ~chatnpc("<p,sad>Oh hello, I can’t chat now.|I have to keep an eye on my husband.|He’s very ill!");
-    ~chatplayer("<p,sad>I’m sorry to hear that!");
+    ~chatnpc("<p,sad>Oh hello, I can't chat now.|I have to keep an eye on my husband.|He's very ill!");
+    ~chatplayer("<p,sad>I'm sorry to hear that!");
     return;
 }
 switch_int(%biohazard) {

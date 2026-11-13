@@ -109,6 +109,7 @@ jobs:
       # tests/elena-fence/: CI — packed map/dispatch runtime, runtime.sh starts no server.
       # tests/drop-tables/: CI — compiled KQ ScriptRunner outcomes, no server.
       # tests/priestperil-completion/: CI — compiled completion queue, Prayer reward in tenths, no server.
+      # tests/string-charset/: CI — client-visible strings stay within the Client-Java 377 byte/font character set.
       - name: Run offline content tests
         id: content_tests
         working-directory: engine
@@ -135,6 +136,7 @@ jobs:
             return 0
           }
 
+          run_test tests/string-charset/check_string_charset.mjs node ../content/tests/string-charset/check_string_charset.mjs ../content
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs

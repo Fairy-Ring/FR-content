@@ -18,5 +18,5 @@
 [oploc1,sword_mirror6] @dt_mirror_look;
 
 [label,dt_mirror_look]
-mes("You gaze into the mirror…");
+mes("You gaze into the mirror...");
 mes("The image is unclear.");

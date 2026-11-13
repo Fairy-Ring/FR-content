@@ -57,7 +57,7 @@ if (~wanted_requirements_met = false) {
 ~chatnpc("<p,neutral>Sadly, this is not the case anymore, and the fact that you have to serve as a Squire to a White Knight for a minimum period of five years before you can actually become one tends to put the more short-attention spanned adventurers off joining, what?");
 ~chatplayer("<p,shock>You want me to be a squire for five years?!?!");
 ~chatnpc("<p,laugh>Haw Haw Haw! No, no, goodness me, no!");
-~chatnpc("<p,neutral>Five years is a very long period of time nowadays – ANYTHING could happen in that time, and we need capable <text_gender("men", "women")> like yourself as soon as possible.");
+~chatnpc("<p,neutral>Five years is a very long period of time nowadays - ANYTHING could happen in that time, and we need capable <text_gender("men", "women")> like yourself as soon as possible.");
 ~chatnpc("<p,neutral>No, I had a bit of a chat with Sir Vey, and we came up with... A different solution to the problem. Assuming you're still interested, of course.");
 def_int $go = ~p_choice2("Yes I'm interested.", 1, "No, I'm bored now.", 2);
 if ($go = 2) {
