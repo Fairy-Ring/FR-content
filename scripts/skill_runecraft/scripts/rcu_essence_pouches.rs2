@@ -160,6 +160,7 @@ def_int $blankrune_type = ^rcu_pouch_blankrune_type_high;
 
 if ($blankrune_count = 0) {
     $blankrune_count = inv_total(inv, blankrune);
+    $blankrune_type = ^rcu_pouch_blankrune_type_normal;
 }
 
 if ($blankrune_count = 0) {
@@ -173,8 +174,9 @@ if (%small_essence_pouch_type > 0 & $blankrune_type ! %small_essence_pouch_type)
     return;
 }
 
-def_int $ess_to_fill = calc(^rcu_pouch_max_capacity_small - %small_essence_pouch);
-
+def_int $max_capacity = ^rcu_pouch_max_capacity_small;
+def_int $remaining_capacity = max(0, calc($max_capacity - %small_essence_pouch));
+def_int $ess_to_fill = min($blankrune_count, $remaining_capacity);
 if ($ess_to_fill = 0) {
     mes(^rcu_message_pouch_full);
     return;
@@ -230,6 +232,7 @@ def_int $blankrune_type = ^rcu_pouch_blankrune_type_high;
 
 if ($blankrune_count = 0) {
     $blankrune_count = inv_total(inv, blankrune);
+    $blankrune_type = ^rcu_pouch_blankrune_type_normal;
 }
 
 if ($blankrune_count = 0) {
@@ -324,6 +327,7 @@ def_int $blankrune_type = ^rcu_pouch_blankrune_type_high;
 
 if ($blankrune_count = 0) {
     $blankrune_count = inv_total(inv, blankrune);
+    $blankrune_type = ^rcu_pouch_blankrune_type_normal;
 }
 
 if ($blankrune_count = 0) {
@@ -418,6 +422,7 @@ def_int $blankrune_type = ^rcu_pouch_blankrune_type_high;
 
 if ($blankrune_count = 0) {
     $blankrune_count = inv_total(inv, blankrune);
+    $blankrune_type = ^rcu_pouch_blankrune_type_normal;
 }
 
 if ($blankrune_count = 0) {
@@ -425,7 +430,7 @@ if ($blankrune_count = 0) {
     return;
 }
 
-if (stat_base(runecraft) < 50) {
+if (stat_base(runecraft) < 75) {
     mes("You need level 75 Runecraft to fill a giant pouch.");
     return;
 }
