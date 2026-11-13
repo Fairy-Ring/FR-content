@@ -44,7 +44,7 @@ switch_int(random(23)) {
     case 18 :
         ~chatnpc("<p,neutral>Not too bad, but I'm a little worried|about the increase of goblins these days.");
         ~chatplayer("<p,happy>Don't worry, I'll kill them."); 
-    case 23 :
+    case 19 :
         inv_add(inv, flier, 1);
         ~chatnpc("<p,happy>Have this flier...");
     case 20 :
