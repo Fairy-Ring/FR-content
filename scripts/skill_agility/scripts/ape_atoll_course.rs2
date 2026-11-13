@@ -68,7 +68,7 @@ if ($westbound = false) {
 if (~ape_atoll_setup($start) = false) return;
 p_animprotect(^false);
 ~agility_exactmove(100_ilm_monkeybar_jump_up, ^ape_candidate_anim_delay, ^ape_candidate_bars_up_delay, $start, $start, ^ape_candidate_start_cycle, ^ape_candidate_bars_up_end_cycle, $direction, false);
-// Operator-approved transient L2 checkpoint: normal logout waits; process-stop login recovers.
+// Transient L2 checkpoint (U-APEAGILITY-1113 ruling): a logout request during the leg is refused while the player is protected; a process stop is recovered at login.
 ~agility_exactmove(100_ilm_monkeybar_move, ^ape_candidate_anim_delay, ^ape_candidate_bars_delay, $start, $end, ^ape_candidate_start_cycle, ^ape_candidate_bars_end_cycle, $direction, false);
 p_telejump($landing);
 ~agility_exactmove(100_ilm_monkeybar_jump_down, ^ape_candidate_anim_delay, ^ape_candidate_bars_down_delay, $landing, $landing, ^ape_candidate_start_cycle, ^ape_candidate_bars_down_end_cycle, $direction, false);

@@ -1,3 +1,5 @@
+// U-APEAGILITY-1113: success path only. Every eligible attempt succeeds until the failure slice exists.
+// This is NOT the finished historical course: no failure chance, damage or failure destination is defined here.
 // VERIFIED period requirement: Sal's 5 April and Tip.It 1 May 2006, Ape course.
 // CANDIDATE field selection: base Agility (Tip.It RFD 2 May 2006 no-potting statement).
 ^ape_atoll_level = 48
