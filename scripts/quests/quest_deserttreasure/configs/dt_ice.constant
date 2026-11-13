@@ -1,0 +1,8 @@
+// CANDIDATE product timings, not recovered 377 server constants.
+// Cold: Sal's says ten seconds; 17 native ticks approximate 10.2 seconds.
+^dt_ice_cold_ticks = 17
+// Kamil's later description gives a short full-action freeze, but no duration.
+^dt_ice_freeze_ticks = 2
+// Slipping is source-backed; these odds and the one-hitpoint fall are selected.
+^dt_ice_slip_chance = 10
+^dt_ice_slip_damage = 1
