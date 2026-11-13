@@ -61,6 +61,11 @@ if (%rd_main >= ^recruitmentdrive_complete & %falador_spawn = 1) {
 }
 p_teleport($death_dest);
 buildappearance(worn);
+// CANDIDATE: Lost City 289's undated branch tip clears every form here silently.
+// Guard the reset so an ordinary human death keeps the published command path.
+if (p_gettransmogrify ! null) {
+    ~greegree_clearform_silent;
+}
 ~prayer_deactivate_all;
 ~follower_death;
 // CoF gardener: restore courtyard multi directions bit after player death.

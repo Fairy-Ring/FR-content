@@ -1,5 +1,3 @@
-// U-APEAGILITY-1113: success path only. Every eligible attempt succeeds until the failure slice exists.
-// This is NOT the finished historical course: no failure chance, damage or failure destination is defined here.
 // VERIFIED period requirement: Sal's 5 April and Tip.It 1 May 2006, Ape course.
 // CANDIDATE field selection: base Agility (Tip.It RFD 2 May 2006 no-potting statement).
 // Recorded conflict: the Tip.It Agility guide (15 April, 27 April, 1 May 2006) says in general that an
@@ -82,3 +80,37 @@
 // Descent: 54 asset cycles, server delay 1 (2 ticks), then level-aware ground settlement.
 ^ape_candidate_descent_end_cycle = 54
 ^ape_candidate_descent_delay = 1
+
+// INHERITED PRODUCT DEFAULTS: Barbarian log pattern, not original Ape probability or damage equations.
+^ape_inherited_roll_low = 185
+^ape_inherited_roll_high = 260
+^ape_inherited_damage_percent = 9
+^ape_inherited_damage_divisor = 100
+^ape_inherited_damage_add = 1
+// CANDIDATE envelope: RuneHQ captures 9/28 April 2006, HP-dependent damage from any obstacle.
+^ape_inherited_damage_min = 3
+^ape_inherited_damage_max = 7
+// CANDIDATE current-Agility cutoff: RuneScape Wiki revision 100558, 6 April 2007.
+^ape_candidate_no_fail_level = 75
+
+// CANDIDATE reconstruction landings, NOT recovered original failure coordinates.
+// Entrance bank beside signpost: maps/m43_42.jm2:5290; topology-output.txt:132-142,219; flags 0.
+^ape_candidate_fail_return_entrance = 0_43_42_3_54
+// Rope west bank: maps/m43_42.jm2:5225; topology-output.txt:162-176,220; flags 0.
+// Geometric reconstruction only; the later rope page's unnamed tree is ambiguous.
+^ape_candidate_fail_rope_west_bank = 0_42_42_63_43
+// Below vines east of cliff: maps/m43_42.jm2:6470-6478; topology-output.txt:178-216; L0 open.
+^ape_candidate_fail_descent_ground = 0_43_42_7_49
+
+// CANDIDATE failure choreography using original-keyed named assets 3489,3492,3486,3493.
+// Both cycle operands use the existing zero-start convention above; delays are server ticks minus one.
+// Packed asset durations: stone 54, tree 148, slope 45, falling 24 client cycles.
+// End cycles match those totals; delays round up to a full 600 ms tick before settlement.
+^ape_candidate_stone_fail_end_cycle = 54
+^ape_candidate_stone_fail_delay = 1
+^ape_candidate_tree_fail_end_cycle = 148
+^ape_candidate_tree_fail_delay = 4
+^ape_candidate_slope_fail_end_cycle = 45
+^ape_candidate_slope_fail_delay = 1
+^ape_candidate_fall_end_cycle = 24
+^ape_candidate_fall_delay = 0
