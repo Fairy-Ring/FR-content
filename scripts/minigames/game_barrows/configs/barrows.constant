@@ -59,3 +59,7 @@
 ^barrows_door_class_skeleton = 0
 ^barrows_door_class_bloodworm = 1
 ^barrows_door_class_crypt_rat = 2
+
+// CANDIDATE capped combat-level sum; UNKNOWN displayed-count saturation policy.
+^barrows_potential_max = 1000
+^barrows_kill_count_max = 32767
