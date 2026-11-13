@@ -166,7 +166,7 @@ while ($choice ! 0) {
 
         if (inv_total(inv, scrying_orb_empty) > 0) {
             ~chatnpc_specific("Mage of Zamorak", rcu_zammy_mage1_edgeb, "<p,neutral>No you haven't.|I can see that you have it there in your backpack.|Now quit your foolishness and get on with the task at hand!");
-        } else if (inv_total(inv, scrying_orb_empty) > 0) {
+        } else if (inv_total(bank, scrying_orb_empty) > 0) {
             ~chatnpc_specific("Mage of Zamorak", rcu_zammy_mage1_edgeb, "<p,neutral>No you haven't.|You have it in your bank.|Now get on with it!");
         }
         
@@ -192,6 +192,8 @@ inv_del(inv, scrying_orb_full, ^max_32bit_int);
 ~chatnpc_specific("Mage of Zamorak", rcu_zammy_mage1_edgeb, "<p,neutral>Indeed, a deal is always a deal.");
 ~chatnpc_specific("Mage of Zamorak", rcu_zammy_mage1_edgeb, "<p,neutral>I offer you three things as a reward for your effords on behalf of my Lord Zamorak;");
 ~chatnpc_specific("Mage of Zamorak", rcu_zammy_mage1_edgeb, "<p,neutral>The first is knowledge.|I offer you my collected research on the abyss.|I also offer you 1000 points of experience in RuneCrafting for your trouble.");
+// Engine experience units are tenths: 1000 displayed XP = 10000 engine XP.
+stat_advance(runecraft, 10000);
 ~chatnpc_specific("Mage of Zamorak", rcu_zammy_mage1_edgeb, "<p,neutral>Your second gift is convenience.|Here, you may take this pouch I discovered amidst my research.|You will find it to have certain... interesting properties.");
 ~chatnpc_specific("Mage of Zamorak", rcu_zammy_mage1_edgeb, "<p,neutral>Your final gift is that of movement.|I will from now on offer you a teleport to the abyss whenever you should require it.");
 %abyssal_miniquest = ^miniquest_abyssal_complete;
