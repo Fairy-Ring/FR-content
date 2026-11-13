@@ -675,6 +675,7 @@ switch_component (last_com) {
 
 [proc,skillmulti1](namedobj $obj1)(namedobj, int)
 if_setobject(skillmulti1:com_2, $obj1, 200);
+if_settext(skillmulti1:com_7, "How many would you like to make?");
 if_openchat(skillmulti1);
 
 if_addresumebutton(skillmulti1:com_3);
