@@ -674,8 +674,8 @@ switch_component (last_com) {
 // Make-X interfaces register every overlapping option layer before pausing.
 
 [proc,skillmulti1](namedobj $obj1)(namedobj, int)
-if_openchat(skillmulti1);
 if_setobject(skillmulti1:com_2, $obj1, 200);
+if_openchat(skillmulti1);
 
 if_addresumebutton(skillmulti1:com_3);
 if_addresumebutton(skillmulti1:com_4);
@@ -770,11 +770,11 @@ switch_component (last_com) {
 }
 
 [proc,skillmulti4](namedobj $obj1, namedobj $obj2, namedobj $obj3, namedobj $obj4)(namedobj, int)
-if_openchat(skillmulti4);
 if_setobject(skillmulti4:com_2, $obj1, 200);
 if_setobject(skillmulti4:com_3, $obj2, 200);
 if_setobject(skillmulti4:com_4, $obj3, 200);
 if_setobject(skillmulti4:com_5, $obj4, 200);
+if_openchat(skillmulti4);
 
 if_addresumebutton(skillmulti4:com_6);
 if_addresumebutton(skillmulti4:com_7);
@@ -823,12 +823,12 @@ switch_component (last_com) {
 }
 
 [proc,skillmulti5](namedobj $obj1, namedobj $obj2, namedobj $obj3, namedobj $obj4, namedobj $obj5)(namedobj, int)
-if_openchat(skillmulti5);
 if_setobject(skillmulti5:com_2, $obj1, 200);
 if_setobject(skillmulti5:com_3, $obj2, 200);
 if_setobject(skillmulti5:com_4, $obj3, 200);
 if_setobject(skillmulti5:com_5, $obj4, 200);
 if_setobject(skillmulti5:com_6, $obj5, 200);
+if_openchat(skillmulti5);
 
 if_addresumebutton(skillmulti5:com_7);
 if_addresumebutton(skillmulti5:com_8);
