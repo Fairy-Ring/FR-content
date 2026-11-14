@@ -131,6 +131,7 @@ p_delay(1);
 spotanim_map(smokepuff, coord, 124, 0);
 sound_synth(smokepuff2, 1, 0);
 //--
+~tele_checks;
 ~p_telejump_safe($teleport_coord); // todo: Confirm this
 
 // called when the npc needs to be poofed away

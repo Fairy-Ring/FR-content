@@ -7,7 +7,7 @@ if ($spell ! ^teleother_lumbridge & $spell ! ^teleother_falador & $spell ! ^tele
 }
 // The engine admits this button only while its root is visible. Consume the
 // invitation before any delay. Caster logout cannot undo an already-paid offer.
-if (~teleother_travel_checks = false) {
+if (~teleother_travel_checks(true) = false) {
     return;
 }
 def_dbrow $spell_data = ~get_spell_data($spell);
@@ -23,7 +23,7 @@ sound_synth(db_getfield($spell_data, magic_spell_table:sound_hit, 0), 1, 0);
 // Reuse the shared travel delay convention, not a claimed historical Teleother
 // duration. Recheck restrictions if the recipient's state changed during it.
 p_delay(2);
-if (~teleother_travel_checks = false) {
+if (~teleother_travel_checks(false) = false) {
     anim(null, 0);
     return;
 }
