@@ -351,6 +351,12 @@ def check_original_entity_configs() -> None:
             "slashdefence,100", "crushdefence,100", "magicdefence,80", "rangedefence,120",
         ),
     }
+    # U1 (operator, 14 November 2026): server-only selectors of the elemental
+    # damage rules (dt_elemental.param); CANDIDATE, tested by test_elemental.mjs.
+    elemental_server_params = {
+        "firediamond_firewarrior": ("dt_elemental_magic,^water_strike", "dt_elemental_ammo,ice_arrow"),
+        "icediamond_icewarrior": ("dt_elemental_magic,^fire_strike",),
+    }
     for name, (hp, attack, strength, defence, rate, model, vislevel) in expected_npcs.items():
         expected_fields = {
             "hitpoints": str(hp),
@@ -410,10 +416,10 @@ def check_original_entity_configs() -> None:
                 require(current_params.count(expected) == 1, f"[{name}] must add exactly {expected}")
                 require(expected not in base_params, f"[{name}] baseline must not define {expected}")
                 current_params = [value for value in current_params if value != expected]
-        for value in damis_server_params.get(name, ()):
+        for value in (*damis_server_params.get(name, ()), *elemental_server_params.get(name, ())):
             require(current_params.count(value) == 1, f"[{name}] must add exactly server param {value}")
             require(value not in base_params, f"[{name}] baseline must not already define server param {value}")
-        allowed_params = {candidate_rate, *damis_server_params.get(name, ())}
+        allowed_params = {candidate_rate, *damis_server_params.get(name, ()), *elemental_server_params.get(name, ())}
         current_values["param"] = [value for value in current_params if value not in allowed_params]
         if not current_values["param"]:
             current_values.pop("param")

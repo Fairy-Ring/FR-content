@@ -1,4 +1,4 @@
-// CANDIDATE: Ice combat contract; ordinary spell admission pending ELEMENTAL-WEAKNESS-1109.
+// CANDIDATE: Ice combat contract; Fire-only Magic damage is selected by the U1 rule.
 [proc,dt_kamil_attackable]()(boolean)
 if (%npc_macro_event_target ! uid | %deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_dead ! 0) return(false);
 return(true);

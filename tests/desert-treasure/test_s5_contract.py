@@ -276,8 +276,8 @@ def main() -> int:
     require("obj_add(npc_coord, chocolate_cake, 2, ^lootdrop_duration)" in kamil_death and "obj_add(npc_coord, 4dose2restore, 1, ^lootdrop_duration)" in kamil_death,
             "Kamil drops cake and restore potion")
     require("icediamond" not in kamil_death.lower() and "fd_icediamond" not in kamil_death, "Kamil does not drop the Ice diamond")
-    require("npc_default_attack" in kamil and "npc_player_hit_roll(^magic_style)" in kamil and "Fire" not in kamil,
-            "Kamil retains ordinary attack behavior without an elemental Fire allowlist")
+    require("npc_default_attack" in kamil and "npc_player_hit_roll(^magic_style)" in kamil and "dt_elemental_magic,^fire_strike" in block_config.get("icediamond_icewarrior", {}).get("param", []),
+            "Kamil retains native attacks and selects the U1 Fire-only player-Magic rule")
 
     smash = block(parents, "proc", "dt_ice_smash")
     require("%fd_icewarrior_dead = 0" in smash and "%fd_icewarrior_subquest ! ^dt_ice_substate_kamil_dead" in smash,

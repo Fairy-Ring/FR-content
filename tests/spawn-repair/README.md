@@ -23,10 +23,14 @@ All repairs are **CANDIDATE**, not verified period history:
 - Four NPC records are removed. Their intended tiles remain **UNKNOWN**.
   Other exact-type spawns remain in their home regions.
 - The tea quantity becomes one, matching the map's other single-item rows.
-- Piglet 2320 remains unchanged at its known-wrong tile. It has no other spawn,
-  and its intended tile is **UNKNOWN**. No coordinate is invented.
+- Piglet 2320 moves from the copied-coordinate tile 3019,3019 to 3019,3309
+  inside the farm pen south of Falador. This is **CANDIDATE** Old School Piglet
+  page r15196637 (25 April 2026) map data, not recovered 2006 coordinates.
+  RuneScape wiki r240834 (9 October 2007) confirms the farm, not the tile.
+  The production map loader and routefinder show the destination is standable
+  inside the same enclosed pen as 2318 and 2319; no fence or terrain is changed.
 
-The test checks all 23 tiles, the three genuine Nardah citizens, every ground
+The test checks all 23 audited entities (24 target positions with the relocation), the three genuine Nardah citizens, every ground
 quantity, exact totals, surviving home-region copies and packed identities.
 It also compares every source spawn with the runtime map archive. A hash freezes
 all non-target spawn rows, including the audit's 1,721 questionable records.

@@ -1,0 +1,14 @@
+// CANDIDATE: period Water/Fire advice plus the 2017 immunity statements, selected by U1.
+// Clamp only damage: payment, accuracy, base XP and zero-hit secondary effects stay native.
+[proc,dt_elemental_magic_damage](int $permitted_strike, int $spell, int $damage)(int)
+if ($permitted_strike = ^water_strike) {
+    if ($spell = ^water_strike | $spell = ^water_bolt | $spell = ^water_blast | $spell = ^water_wave) return($damage);
+} else if ($permitted_strike = ^fire_strike) {
+    if ($spell = ^fire_strike | $spell = ^fire_bolt | $spell = ^fire_blast | $spell = ^fire_wave) return($damage);
+}
+return(0);
+
+// Ice arrows retain the ordinary projectile consumption and ground-drop/loss path.
+[proc,dt_elemental_ranged_damage](obj $permitted_ammo, obj $ammo, int $damage)(int)
+if ($ammo = $permitted_ammo) return($damage);
+return(0);
