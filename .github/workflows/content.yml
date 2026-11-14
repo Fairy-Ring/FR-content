@@ -187,6 +187,8 @@ jobs:
           run_test tests/desert-treasure/test_s5_contract.py python3 ../content/tests/desert-treasure/test_s5_contract.py
           run_test tests/desert-treasure/s5_death_runtime.mts bash ../content/tests/desert-treasure/s5_death_runtime.sh "$PWD"
           run_test tests/desert-treasure/test_s6_contract.py python3 ../content/tests/desert-treasure/test_s6_contract.py
+          run_test tests/desert-treasure/test_s4_contract.py python3 ../content/tests/desert-treasure/test_s4_contract.py
+          run_test tests/desert-treasure/test_s4_effects.mjs node --import tsx ../content/tests/desert-treasure/test_s4_effects.mjs
           run_test tests/desert-treasure/test_s2_contract.py python3 ../content/tests/desert-treasure/test_s2_contract.py
           # CI: real packed elemental attacks, published-bytecode controls and isolated mutants; no server.
           run_test tests/desert-treasure/test_elemental.mjs node --import tsx ../content/tests/desert-treasure/test_elemental.mjs
