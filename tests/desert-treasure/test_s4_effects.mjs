@@ -21,6 +21,11 @@ const ScriptState = (await load('src/engine/script/ScriptState.ts')).default;
 const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
 const { EntityLifeCycle } = await load('src/engine/entity/EntityLifeCycle.ts');
 const { NpcStat } = await load('src/engine/entity/NpcStat.ts');
+const { Interaction } = await load('src/engine/entity/Interaction.ts');
+const { NpcMode } = await load('src/engine/entity/NpcMode.ts');
+const ServerTriggerType = (await load('src/engine/script/ServerTriggerType.ts')).default;
+const { NpcInfoSay } = await load('src/network/rsbuf/messages.ts');
+const { Packet } = await load('src/network/rsbuf/packet.ts');
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType',
   'ObjType', 'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType',
@@ -322,15 +327,37 @@ const cases = {
       assert.deepEqual(requests.map(request => request.delay), expectedDelays, `${invalid}/${prayer}: independent delayed hits`);
       World.removeNpc(n, 0);
     }
-    const p = player(), n = dessous(p, true);
-    setBit(p, 'fdvw_subquest', 4);
-    const base = n.baseLevels[NpcStat.HITPOINTS];
-    runNpc(n, '[ai_queue2,blooddiamond_vampirewarrior_unkillable]', null, base + 50);
-    assert.equal(n.levels[NpcStat.HITPOINTS], base, 'invalid form regenerates a lethal hit');
-    assert.equal(n.isActive, true);
-    assert.equal(getBit(p, 'fdvw_subquest'), 4);
-    assert.equal(ScriptProvider.getByName('[ai_queue3,blooddiamond_vampirewarrior_unkillable]'), undefined);
-    World.removeNpc(n, 0);
+    for (const [attackReady, roll] of [[false, 0.99], [true, 0], [true, 0.99]]) {
+      const p = player(), n = dessous(p, true);
+      setBit(p, 'fdvw_subquest', 4);
+      const base = n.baseLevels[NpcStat.HITPOINTS];
+      const issued = [];
+      const say = n.say.bind(n);
+      n.say = text => { issued.push({ tick: World.currentTick, text }); say(text); };
+      n.setInteraction(Interaction.SCRIPT, p, NpcMode.APPLAYER2);
+      setNpc(n, 'npc_action_delay', attackReady ? 0 : World.currentTick + 1);
+      n.enqueueScript(ServerTriggerType.AI_QUEUE2, 0, base + 50);
+      random(roll, () => n.turn());
+      assert.equal(n.levels[NpcStat.HITPOINTS], base, 'invalid form regenerates a lethal hit');
+      assert.equal(n.isActive, true);
+      assert.equal(getBit(p, 'fdvw_subquest'), 4);
+      const batsDue = attackReady && roll === 0.99;
+      assert.deepEqual(issued.map(call => call.text), batsDue
+        ? ['You will never defeat me', 'Hssssssssssss'] : ['You will never defeat me'],
+        'the real NPC turn issues regeneration speech before a due bat special');
+      assert(issued.every(call => call.tick === World.currentTick), 'both say calls belong to the same tick');
+      const text = batsDue ? 'Hssssssssssss' : 'You will never defeat me';
+      assert.equal(n.sayMessage, text, 'the native NPC retains only the last say');
+      const message = new NpcInfoSay(n.sayMessage);
+      const wire = new Packet(message.test());
+      message.encode(wire);
+      assert.deepEqual([...wire.data], [...Buffer.from(`${text}\n`)],
+        'the native SAY block encodes exactly one final overhead string');
+      console.log(`regeneration-speech ${JSON.stringify({ attackReady, roll, issued, hit: n.hitmarkDamage,
+        health: n.levels[NpcStat.HITPOINTS], wireText: Buffer.from(wire.data).toString('latin1') })}`);
+      assert.equal(ScriptProvider.getByName('[ai_queue3,blooddiamond_vampirewarrior_unkillable]'), undefined);
+      World.removeNpc(n, 0);
+    }
   },
   chases() {
     const p = player(), n = dessous(p);
