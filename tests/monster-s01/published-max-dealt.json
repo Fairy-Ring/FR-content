@@ -1,0 +1,194 @@
+{
+  "contentCommit": "fd897df92a72b94c536c5e6a27c0d2ae31771103",
+  "rows": [
+    {
+      "type": 1,
+      "debugname": "man",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1,
+      "debugname": "man",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1,
+      "debugname": "man",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 41,
+      "debugname": "chicken",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 41,
+      "debugname": "chicken",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 41,
+      "debugname": "chicken",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 81,
+      "debugname": "cow",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 81,
+      "debugname": "cow",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 81,
+      "debugname": "cow",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1154,
+      "debugname": "kalphite_soldier",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1154,
+      "debugname": "kalphite_soldier",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1154,
+      "debugname": "kalphite_soldier",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1604,
+      "debugname": "slayer_abberant_spectre_1",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1604,
+      "debugname": "slayer_abberant_spectre_1",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1604,
+      "debugname": "slayer_abberant_spectre_1",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1612,
+      "debugname": "slayer_banshee_1",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1612,
+      "debugname": "slayer_banshee_1",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1612,
+      "debugname": "slayer_banshee_1",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1831,
+      "debugname": "swamp_cave_slime",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1831,
+      "debugname": "swamp_cave_slime",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1831,
+      "debugname": "swamp_cave_slime",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 2690,
+      "debugname": "sarim_pub_drinker_1",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 2690,
+      "debugname": "sarim_pub_drinker_1",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 2690,
+      "debugname": "sarim_pub_drinker_1",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 2285,
+      "debugname": "rd_combat_npc_room_3",
+      "style": 0,
+      "maximum": 23,
+      "cap": 0
+    },
+    {
+      "type": 2285,
+      "debugname": "rd_combat_npc_room_3",
+      "style": 3,
+      "maximum": 23,
+      "cap": 0
+    },
+    {
+      "type": 2285,
+      "debugname": "rd_combat_npc_room_3",
+      "style": 4,
+      "maximum": 23,
+      "cap": 0
+    }
+  ]
+}
