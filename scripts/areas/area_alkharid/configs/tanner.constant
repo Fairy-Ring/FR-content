@@ -5,3 +5,12 @@
 ^werewolftanner_soft_leather_cost = 2
 ^werewolftanner_hard_leather_cost = 5
 ^werewolftanner_dragonhide_cost = 45
+
+// CANDIDATE: Tip.It Crafting (12 April 2006, Al Kharid); RuneScape wiki Snakeskin (3 September 2006).
+^tanner_village_snake_hide_cost = 15
+// CANDIDATE: Tip.It swamp snake hide item page (12 October 2007): most places.
+^tanner_swamp_snake_hide_cost = 20
+// CANDIDATE: Canifis menu capture (7 May 2006), retained in the tanner-snake research.
+^werewolftanner_village_snake_hide_cost = 25
+// CANDIDATE: Tip.It swamp snake hide item page (12 October 2007): Canifis.
+^werewolftanner_swamp_snake_hide_cost = 45
