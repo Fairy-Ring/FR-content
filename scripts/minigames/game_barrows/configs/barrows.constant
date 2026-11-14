@@ -48,6 +48,9 @@
 ^barrows_crypt_summon_lifetime = 1000
 ^barrows_owner_check_ticks = 1
 
+// UNKNOWN engineering forced-chest lifetime; placement reuses the door policy.
+^barrows_chest_summon_lifetime = 1000
+
 // UNKNOWN engineering door placement, summon policy and internal class encoding.
 ^barrows_door_skeleton_npc = barrows_skeleton_unarmed
 ^barrows_door_spawn_min_radius = 0

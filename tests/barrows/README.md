@@ -95,7 +95,7 @@ The UNKNOWN engineering policy is uniform over the complete set that satisfies t
 
 First runs permit all four corners and central doors. Consecutive begin/latch/reset cycles exclude the preceding run's corner and central door, including after save/load and relog. Search preserves the layout and draws nothing. Begin, paid reset and a wrong puzzle answer are the draw events. Original door transforms remain personal; shared wall collision never changes.
 
-Open-door operations transfer between measured room-side tiles in the clicked lane. Pre-loot central access requires the real puzzle's authorization. The topology fixtures retain their lock, movement and shared-collision assertions while allowing S08's encounter draw. Chest operations remain unreachable in this prefix.
+Open-door operations transfer between measured room-side tiles in the clicked lane. Pre-loot central access requires the real puzzle's authorization. The topology fixtures retain their lock, movement and shared-collision assertions while allowing S08's encounter draw. Chest Open is separate from the still-unreachable payment.
 
 ## Hidden tunnel (S05)
 
@@ -138,6 +138,21 @@ The original main interface renders three prompts and three real answer buttons 
 The packed fixture covers all 24 presentations and all 72 native button positions. It checks the measured graph, single visible ladder and sole open ladder-room door after begin, reset and every wrong answer; Search draws nothing. Native main-modal access freezes both halves of the shared saved countdown without replacing its normal timer. A face already displayed can keep pulsing in the client until callbacks resume and clear it at the saved fade remainder. The real incoming NPC melee path cancels the modal and its buttons before queued damage; it retains the layout, selectors, raw puzzle field and timer.
 
 Cancellation clears only challenge activity. Correct answers and ordinary save/load retain solved authorization, family, permutation and the raw client field. Search/payment and the post-Search inward-door policy are not reachable in this prefix.
+
+## Chest and final brother (S10)
+
+```sh
+node --import tsx ../content/tests/barrows/test_chest.mjs
+node --import tsx ../content/tests/barrows/test_chest.mjs --regression --baseline-pack "$BASELINE_PACK"
+```
+
+Set `BASELINE_PACK` to the saved pre-S10 pack for the second command. It must fail on the unchanged native chest-open bit, before any S10 procedure lookup. The normal command runs the complete encounter, gate and lifecycle cases.
+
+The original closed chest's native Open requires an unlooted, positive-generation run, the solved puzzle and one of its two original south-side approach squares. It sets only the original chest-open bit. An uncredited tunnel identity is forced without the D4 draw or room cap, unless this owner already has that living brother in the same generation, in the crypts or tunnels. Foreign owners, stale generations and corpses do not suppress the encounter. Placement reuses the complete native door-tile validation; a failed placement leaves the chest closed for a natural retry. Repeated Open creates no duplicate.
+
+The forced actor uses the shared owner/generation constructor and targets the owner. Its 1,000-tick lifetime and reused 0-to-2 placement policy are UNKNOWN engineering choices. The exact challenge, "You dare steal from us!", is a CANDIDATE later reconstruction, not verified 377 wording.
+
+`barrows_chest_search_allowed(generation)` supplies the future chest/location/authorization gate. It requires Open, not the final death or all six slain. No Search/payment/grant is attached: clicking the shown open chest's Search or Close gets the engine's unchanged "Nothing interesting happens." refusal, with no reward or state transition. Open-unlooted save/load and clean shared logout/login retain the visual and genuine credit without paying; owner-only cleanup remains the existing encounter contract.
 
 ## Shared login compatibility
 

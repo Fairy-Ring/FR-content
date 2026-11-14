@@ -1,0 +1,31 @@
+// Open is presentation and the final encounter, never payment or a reward.
+[oploc1,barrows_stone_chest_closed]
+~barrows_chest_open(loc_type, loc_coord);
+
+// The original 2x2 map chest permits these two south-side operating squares.
+[proc,barrows_chest_authorized](int $generation)(boolean)
+if (%barrows_generation <= 0 | ~barrows_search_allowed($generation) = false | testbit(%barrows_state, ^barrows_solved_bit) = 0) return(false);
+if (coordz(coord) ! 9694 | coordx(coord) < 3551 | coordx(coord) > 3552) return(false);
+return(true);
+
+[proc,barrows_chest_open](loc $chest, coord $anchor)
+if ($chest ! barrows_stone_chest | $anchor ! 0_55_151_31_31) return;
+if (~barrows_chest_authorized(%barrows_generation) = false | %barrows_chest_open = 1) return;
+def_int $identity = ~barrows_tunnel_identity;
+def_npc $brother = enum(int, npc, barrows_identity_brother, $identity);
+if (~barrows_brother_slain($identity) = false & ~barrows_brother_find($brother) = false) {
+    // Forced final encounters do not draw D4 outcomes or use its room cap.
+    def_coord $tile = ~barrows_door_tile(coord, $brother);
+    if ($tile = null) return;
+    if (npc_finduid(~barrows_actor_spawn($brother, $tile, ^barrows_chest_summon_lifetime)) = false) return;
+    // CANDIDATE later reconstruction, not a recovered 377 transcript.
+    npc_say("You dare steal from us!");
+    npc_setmode(opplayer2);
+}
+%barrows_chest_open = 1;
+
+// S11/S12 attach Search here; neither a final kill nor B=6 is required.
+// No player operation calls this gate or the protected payment latch yet.
+[proc,barrows_chest_search_allowed](int $generation)(boolean)
+if (~barrows_chest_authorized($generation) = false | %barrows_chest_open = 0) return(false);
+return(true);
