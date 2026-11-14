@@ -577,11 +577,7 @@
         ],
         [],
         []
-      ],
-      "actors": {
-        "count": 11662,
-        "sha256": "c23b3a799741cfcf2b9a3a0f338cc686c284395ab5ec85024fb8f4118a95a4fb"
-      }
+      ]
     },
     "[queue,macro_event_login]": {
       "tile": [
@@ -646,11 +642,7 @@
         [],
         [],
         []
-      ],
-      "actors": {
-        "count": 11662,
-        "sha256": "c23b3a799741cfcf2b9a3a0f338cc686c284395ab5ec85024fb8f4118a95a4fb"
-      }
+      ]
     },
     "[proc,p_telejump_safe]": {
       "tile": [
@@ -732,11 +724,7 @@
             []
           ]
         ]
-      ],
-      "actors": {
-        "count": 11662,
-        "sha256": "c23b3a799741cfcf2b9a3a0f338cc686c284395ab5ec85024fb8f4118a95a4fb"
-      }
+      ]
     },
     "[queue,player_death_default]": {
       "tile": [
@@ -1320,11 +1308,7 @@
             []
           ]
         ]
-      ],
-      "actors": {
-        "count": 11662,
-        "sha256": "c23b3a799741cfcf2b9a3a0f338cc686c284395ab5ec85024fb8f4118a95a4fb"
-      }
+      ]
     },
     "[if_button,magic:lumbridge_teleport]": {
       "tile": [
@@ -1412,11 +1396,7 @@
             []
           ]
         ]
-      ],
-      "actors": {
-        "count": 11662,
-        "sha256": "c23b3a799741cfcf2b9a3a0f338cc686c284395ab5ec85024fb8f4118a95a4fb"
-      }
+      ]
     }
   }
 }

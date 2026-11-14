@@ -52,16 +52,19 @@ function run(p, root, args = [], { npc = null, protect = true, resume = true } =
 function json(value) { return JSON.parse(JSON.stringify(value, (_, item) => typeof item === 'bigint' ? item.toString() : item)); }
 function digest(value) { return createHash('sha256').update(JSON.stringify(value)).digest('hex'); }
 function actors() { return [...World.npcs].map(n => [n.uid, types.NpcType.get(n.type).debugname, n.level, n.x, n.z]).sort((a, b) => a[0] - b[0]); }
+function actorInventory() {
+  const list = actors();
+  return { count: list.length, sha256: digest(list) };
+}
 function snapshot(p) {
   const vars = {};
   for (let id = 0; id < p.vars.length; id++) if (p.vars[id] !== p.defaults[id]) vars[types.VarPlayerType.get(id).debugname] = p.vars[id];
-  const list = actors();
   return {
     tile: [p.level, p.x, p.z], vars,
     inventory: p.getInventory(inv).items.map(i => i ? [types.ObjType.get(i.id).debugname, i.count] : null),
     messages: json(p.messages), tabs: [...p.tabs], modals: [p.modalMain, p.modalChat, p.modalSide],
     queues: ['queue', 'weakQueue', 'engineQueue'].map(key => [...p[key].all()].map(q => [q.script.name, q.type, q.delay, q.args])),
-    actors: { count: list.length, sha256: digest(list) }
+    actors: actorInventory()
   };
 }
 function give(p, name, quantity = 1) { p.invAdd(inv, requiredId(types.ObjType, name), quantity); }
@@ -72,8 +75,8 @@ function reload(directory) {
 }
 // The saved comparison is produced by executing the published pack, not by
 // projecting expected RuneScript or hashing bytecode. Default-only added varps
-// are absent; every changed varp, packet, queue, tile, inventory and actor list
-// is compared. Actor lists are canonically digested to keep the fixture small.
+// are absent; every changed varp, packet, queue, tile and inventory stays pinned.
+// Actor inventory must not change across a root, independent of static-map updates.
 const roots = ['[login,_]', '[queue,macro_event_login]', '[proc,p_telejump_safe]', '[queue,player_death_default]', '[if_button,magic:lumbridge_teleport]'];
 function effects(root) {
   const p = player();
@@ -82,9 +85,13 @@ function effects(root) {
   const random = Math.random;
   Math.random = () => 0.5;
   try {
+    const beforeActors = actorInventory();
     run(p, root, root.includes('p_telejump_safe') ? [D] : []);
+    const after = snapshot(p);
+    assert.deepEqual(after.actors, beforeActors, `${root} must not change actor inventory`);
     assert.equal(p.getVar(v('macro_event')), 0);
-    return snapshot(p);
+    delete after.actors;
+    return after;
   } finally { Math.random = random; }
 }
 if (process.env.U01_CAPTURE_BASELINE) {
