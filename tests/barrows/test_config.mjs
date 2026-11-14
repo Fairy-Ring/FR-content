@@ -219,7 +219,11 @@ const ENUM_SIGNATURES = new Map([
     ['barrows_identity_brother', ['int', 'npc']],
     ['barrows_face_object', ['int', 'obj']],
     ['barrows_face_object_green', ['int', 'obj']],
-    ['barrows_face_slot', ['int', 'component']]
+    ['barrows_face_slot', ['int', 'component']],
+    ['barrows_puzzle_prompt_model', ['int', 'int']],
+    ['barrows_puzzle_answer_model', ['int', 'int']],
+    ['barrows_puzzle_correct_answer', ['int', 'int']],
+    ['barrows_puzzle_permutation', ['int', 'int']]
 ]);
 
 

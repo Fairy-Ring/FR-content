@@ -415,17 +415,21 @@ await run(async () => {
     return player.getOpTrigger();
   }
 
-  function runLocAction(player, crossing) {
+  function runLocAction(player, crossing, expected = ScriptState.FINISHED) {
     const trigger = nativeLocTrigger(player, crossing.loc);
     assert(trigger, `${LocType.get(crossing.id).debugname}: native OPLOC1 dispatch selects the unlocked child`);
     assert.equal(trigger.name, `[oploc1,barrows_door_unlocked_${crossing.side}]`, `${LocType.get(crossing.id).debugname}: native OPLOC1 selects the measured unlocked side`);
     const state = ScriptRunner.init(trigger, player, crossing.loc, []);
-    const execution = player.runScript(state, true);
-    assert.equal(execution, ScriptState.FINISHED, 'native door loc action finishes synchronously');
-    assert.equal(state.execution, ScriptState.FINISHED, 'native door loc action does not suspend or abort');
-    assert.equal(player.activeScript, null, 'native door loc action leaves no suspended script');
+    player.executeScript(state, true);
+    assert.equal(state.execution, expected, 'native door loc action reaches its expected continuation state');
     assert.equal(player.delayed, false, 'native door loc action leaves no delay');
-    assert.equal(player.protect, false, 'native door loc action releases protected access');
+    if (expected === ScriptState.PAUSEBUTTON) {
+      assert.equal(player.activeScript, state, 'the unanswered puzzle retains its native continuation');
+      assert.equal(player.protect, true, 'the unanswered puzzle retains protected access');
+    } else {
+      assert.equal(player.activeScript, null, 'native completed door action leaves no suspended script');
+      assert.equal(player.protect, false, 'native completed door action releases protected access');
+    }
     return state;
   }
 
@@ -835,16 +839,20 @@ await run(async () => {
     setRun(puzzlePlayer, { phase: 1, generation: 407, openLock: centralCrossing.lock, solved: false, position: centralCrossing.source });
     const puzzleBefore = new Set(activeNpcs().map(npc => npc.nid));
     const unsolved = withMapDraws([], () => withDraws(
-      [], () => runLocAction(puzzlePlayer, centralCrossing), 'unsolved central door'
+      [[2, 4], [3, 6]], () => runLocAction(puzzlePlayer, centralCrossing, ScriptState.PAUSEBUTTON), 'unsolved central door'
     ), 'unsolved central door');
     assert.equal(unsolved.calls, 0, 'unsolved central door does not attempt a native tile draw');
-    assert.equal(unsolved.value.calls, 0, 'unsolved central door does not attempt an encounter selection');
+    assert.equal(unsolved.value.calls, 2, 'the unanswered puzzle draws only its family and permutation');
     assert.deepEqual(
       [puzzlePlayer.level, puzzlePlayer.x, puzzlePlayer.z],
       [centralCrossing.source.level, centralCrossing.source.x, centralCrossing.source.z],
       'unsolved central door does not transfer the player'
     );
     assert.equal(spawnDelta(puzzleBefore).length, 0, 'unsolved central door spawns no actor');
+    withMapDraws([], () => withDraws([], () => puzzlePlayer.closeModal(), 'cancel unanswered puzzle'), 'cancel unanswered puzzle');
+    assert.equal(puzzlePlayer.activeScript, null, 'cancellation removes the unanswered door continuation');
+    assert.equal(readRange(u32(puzzlePlayer.getVar(vars.barrows_state)), [15, 15]), 0, 'cancellation clears only the active challenge');
+    assert.equal(spawnDelta(puzzleBefore).length, 0, 'canceling the puzzle never creates a door actor');
 
     clearNpcs();
     const occupancyOwner = makePlayer('occupancy-owner');

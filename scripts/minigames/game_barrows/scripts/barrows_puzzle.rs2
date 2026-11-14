@@ -1,0 +1,79 @@
+// D5: three VERIFIED family joins, CANDIDATE bars and uniform selection policies.
+// Original next_shape text, models and real answer buttons are retained.
+[proc,barrows_puzzle_render](int $family, int $permutation)
+def_int $models = multiply($family, ^barrows_puzzle_answer_count);
+def_int $slots = multiply($permutation, ^barrows_puzzle_answer_count);
+if_setmodel(next_shape:com_1, enum(int, int, barrows_puzzle_prompt_model, $models));
+if_setmodel(next_shape:com_2, enum(int, int, barrows_puzzle_prompt_model, add($models, 1)));
+if_setmodel(next_shape:com_3, enum(int, int, barrows_puzzle_prompt_model, add($models, 2)));
+if_setmodel(next_shape:com_6, enum(int, int, barrows_puzzle_answer_model, add($models, enum(int, int, barrows_puzzle_permutation, $slots))));
+if_setmodel(next_shape:com_7, enum(int, int, barrows_puzzle_answer_model, add($models, enum(int, int, barrows_puzzle_permutation, add($slots, 1)))));
+if_setmodel(next_shape:com_8, enum(int, int, barrows_puzzle_answer_model, add($models, enum(int, int, barrows_puzzle_permutation, add($slots, 2)))));
+
+[proc,barrows_puzzle_answer](int $family, int $permutation, int $slot)(boolean)
+if ($family < 0 | $family >= ^barrows_puzzle_family_count) return(false);
+if ($permutation < 0 | $permutation >= ^barrows_puzzle_permutation_count) return(false);
+if ($slot < 0 | $slot >= ^barrows_puzzle_answer_count) return(false);
+def_int $answer = enum(int, int, barrows_puzzle_permutation, add(multiply($permutation, ^barrows_puzzle_answer_count), $slot));
+if ($answer = enum(int, int, barrows_puzzle_correct_answer, $family)) return(true);
+return(false);
+
+// The suspended interaction owns its locals, not a loc pointer or a free-standing
+// if_button trigger. Closing it cancels the native PAUSEBUTTON continuation.
+[proc,barrows_puzzle_open](loc $parent, coord $anchor)(boolean)
+if (~barrows_phase ! ^barrows_phase_unlooted | %barrows_generation <= 0) return(false);
+if (~barrows_in_tunnels(coord) = false | distance(coord, $anchor) > 1) return(false);
+def_int $lock = lc_param($parent, barrows_room_edge_lock);
+if ($lock ! 473 & $lock ! 477 & $lock ! 478 & $lock ! 480) return(false);
+if (testbit(%barrows, add(^barrows_locks_start, sub($lock, 469))) ! lc_param($parent, barrows_door_open_state)) return(false);
+if (testbit(%barrows_state, ^barrows_solved_bit) = 1) return(false);
+if (~barrows_door_destination($anchor, coord) = null) return(false);
+p_stopaction;
+def_int $generation = %barrows_generation;
+def_coord $origin = coord;
+def_int $entrance = getbit_range(%barrows_state, ^barrows_entrance_start, ^barrows_entrance_end);
+def_int $family = random(^barrows_puzzle_family_count);
+def_int $permutation = random(^barrows_puzzle_permutation_count);
+%barrows = setbit_range_toint(%barrows, $family, ^barrows_puzzle_start, ^barrows_puzzle_end);
+%barrows_state = setbit_range_toint(%barrows_state, $family, ^barrows_family_start, ^barrows_family_end);
+%barrows_state = setbit_range_toint(%barrows_state, $permutation, ^barrows_permutation_start, ^barrows_permutation_end);
+%barrows_state = setbit(%barrows_state, ^barrows_challenge_bit);
+if_openmain(next_shape);
+~barrows_puzzle_render($family, $permutation);
+if_addresumebutton(next_shape:com_6);
+if_addresumebutton(next_shape:com_7);
+if_addresumebutton(next_shape:com_8);
+p_pausebutton;
+// p_pausebutton invalidates transient entity pointers. Revalidate the captured
+// run, room-side origin, entrance, lock and presentation before any answer effect.
+if (%barrows_generation ! $generation | ~barrows_phase ! ^barrows_phase_unlooted) return(false);
+if (coord ! $origin | ~barrows_in_tunnels(coord) = false) return(false);
+if (getbit_range(%barrows_state, ^barrows_entrance_start, ^barrows_entrance_end) ! $entrance) return(false);
+if (getbit_range(%barrows_state, ^barrows_family_start, ^barrows_family_end) ! $family) return(false);
+if (getbit_range(%barrows_state, ^barrows_permutation_start, ^barrows_permutation_end) ! $permutation) return(false);
+if (getbit_range(%barrows, ^barrows_puzzle_start, ^barrows_puzzle_end) ! $family) return(false);
+if (testbit(%barrows_state, ^barrows_challenge_bit) = 0) return(false);
+if (testbit(%barrows, add(^barrows_locks_start, sub($lock, 469))) ! lc_param($parent, barrows_door_open_state)) return(false);
+def_int $slot = -1;
+switch_component(last_com) {
+    case next_shape:com_6 : $slot = 0;
+    case next_shape:com_7 : $slot = 1;
+    case next_shape:com_8 : $slot = 2;
+}
+if ($slot = -1) return(false);
+if_close;
+if (~barrows_puzzle_answer($family, $permutation, $slot) = true) {
+    %barrows_state = setbit(%barrows_state, ^barrows_solved_bit);
+    return(true);
+}
+~barrows_layout_wrong($generation);
+cam_shake(^barrows_puzzle_error_shake_axis, ^barrows_puzzle_error_shake_random, 0, 0);
+p_delay(sub(^barrows_puzzle_error_shake_ticks, 1));
+cam_reset;
+return(false);
+
+[if_close,next_shape]
+if (p_finduid(uid) = false) return;
+if (testbit(%barrows_state, ^barrows_challenge_bit) = 1) {
+    %barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
+}

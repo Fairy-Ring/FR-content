@@ -9,12 +9,14 @@ if (~barrows_phase ! ^barrows_phase_unlooted & ~barrows_phase ! ^barrows_phase_p
 def_int $lock = lc_param($parent, barrows_room_edge_lock);
 if ($lock < 469 | $lock > 484) return;
 if (testbit(%barrows, add(^barrows_locks_start, sub($lock, 469))) ! lc_param($parent, barrows_door_open_state)) return;
-// S09 supplies the bound puzzle and solved authorization, not a temporary bypass.
-if ($lock = 473 | $lock = 477 | $lock = 478 | $lock = 480) {
-    if (~barrows_phase = ^barrows_phase_unlooted & testbit(%barrows_state, ^barrows_solved_bit) = 0) return;
-}
 def_coord $destination = ~barrows_door_destination($anchor, coord);
 if ($destination = null) return;
+// A protected real-button answer authorizes the unsolved pre-loot crossing.
+if ($lock = 473 | $lock = 477 | $lock = 478 | $lock = 480) {
+    if (~barrows_phase = ^barrows_phase_unlooted & testbit(%barrows_state, ^barrows_solved_bit) = 0) {
+        if (~barrows_puzzle_open($parent, $anchor) = false) return;
+    }
+}
 p_stopaction;
 p_telejump($destination);
 sound_synth(door_open, 1, 0);

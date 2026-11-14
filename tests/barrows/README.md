@@ -95,7 +95,7 @@ The UNKNOWN engineering policy is uniform over the complete set that satisfies t
 
 First runs permit all four corners and central doors. Consecutive begin/latch/reset cycles exclude the preceding run's corner and central door, including after save/load and relog. Search preserves the layout and draws nothing. Begin, paid reset and a wrong puzzle answer are the draw events. Original door transforms remain personal; shared wall collision never changes.
 
-Open-door operations transfer between measured room-side tiles in the clicked lane. Central access remains closed until the later puzzle slice supplies authorization. The topology fixtures retain their lock, movement and shared-collision assertions while allowing S08's encounter draw. Puzzle and chest operations remain unreachable in this prefix.
+Open-door operations transfer between measured room-side tiles in the clicked lane. Pre-loot central access requires the real puzzle's authorization. The topology fixtures retain their lock, movement and shared-collision assertions while allowing S08's encounter draw. Chest operations remain unreachable in this prefix.
 
 ## Hidden tunnel (S05)
 
@@ -126,3 +126,15 @@ node --import tsx ../content/tests/barrows/test_doors.mjs
 Each successful traversal attempts one encounter in its destination room. The CANDIDATE table has exactly 12 brother, 52 skeleton, 32 bloodworm and 32 crypt-rat outcomes. Shared living occupancy admits a spawn at 10 enemies and suppresses it at 11. Paid traversals choose an uncredited brother instead of the 128-way table. An empty brother pool gives no spawn for a brother outcome or a paid traversal; ordinary unlooted outcomes still spawn.
 
 Placement uses the measured landing tile, the named 0-to-2 radius and line-of-walk mode. Every tile of the selected NPC's footprint must be unblocked and in the destination room, without overlapping another NPC footprint. The overlap guard preserves native NPC occupancy when the summon is removed. An unsuccessful placement does not undo traversal or repeat the draw. Living twins remain eligible, but their identity credits only once. Owner, generation, killer attribution and cleanup use the existing S03/S04 contract.
+
+## Puzzle (S09)
+
+```sh
+node --import tsx ../content/tests/barrows/test_puzzle.mjs
+```
+
+The original main interface renders three prompts and three real answer buttons from server-only model tables. The first three family joins are VERIFIED; the rising bars remain CANDIDATE, including the allocation of the byte-identical 6727/6729 distractors. Four uniform families and six semantic permutations use the original model ids. A correct button authorizes one door transfer. A wrong button changes the central entrance, may retain or change the ladder corner, and uses the uniform occupied-room-safe layout draw. It shakes and resets the camera without rock damage.
+
+The packed fixture covers all 24 presentations and all 72 native button positions. It checks the measured graph, single visible ladder and sole open ladder-room door after begin, reset and every wrong answer; Search draws nothing. Native main-modal access freezes both halves of the shared saved countdown without replacing its normal timer. A face already displayed can keep pulsing in the client until callbacks resume and clear it at the saved fade remainder. The real incoming NPC melee path cancels the modal and its buttons before queued damage; it retains the layout, selectors, raw puzzle field and timer.
+
+Cancellation clears only challenge activity. Correct answers and ordinary save/load retain solved authorization, family, permutation and the raw client field. Search/payment and the post-Search inward-door policy are not reachable in this prefix.

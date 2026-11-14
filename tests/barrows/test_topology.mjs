@@ -986,6 +986,17 @@ function main() {
 
     const doorA = makePlayer('door-a');
     const doorB = makePlayer('door-b');
+    const nativeDoorPlayers = [doorA, doorB];
+    for (const player of nativeDoorPlayers) {
+      const slot = World.players.findIndex((entry, index) => index > 0 && !entry);
+      assert.notEqual(slot, -1, 'a native player slot is available for the protected puzzle close hook');
+      player.slot = slot;
+      player.pid = slot;
+      player.uid = (Number(player.username37 & 0x1fffffn) << 11) | slot;
+      player.isActive = true;
+      World.players[slot] = player;
+      World.playerLoop.add(0x73000000n + BigInt(slot), player);
+    }
     const doorGeneration = 700;
     const prepareDoorPlayer = (player, placement, locked, identity, solved) => {
       const mask = locked ? (0xffff | (1 << placement.lockBit)) & 0xffff : (0xffff & ~(1 << placement.lockBit));
@@ -1061,10 +1072,11 @@ function main() {
     let doorRandomCalls = 0;
     let doorTransferCount = 0;
     let eligibleDoorTransferCount = 0;
+    let puzzleRandomCalls = 0;
     const originalRandom = JavaRandom.nextDouble;
     JavaRandom.nextDouble = function () {
       doorRandomCalls++;
-      // S08's one monster-class draw is separate from a topology redraw.
+      // S08's monster class and S09's presentation draws never redraw topology.
       return 0.5;
     };
     try {
@@ -1118,9 +1130,25 @@ function main() {
             setPosition(doorA, source);
             const unsolvedTrigger = setNativeLocTarget(doorA, placement.loc);
             const unsolvedBefore = snapshotPlayer(doorA);
-            runSelected(doorA, unsolvedTrigger, placement.loc, `${placement.name} unsolved central block`);
-            assert.deepEqual([doorA.level, doorA.x, doorA.z], [source.level, source.x, source.z], `${placement.name}: an unsolved selected central edge does not transfer`);
-            assert.deepEqual(snapshotPlayer(doorA), unsolvedBefore, `${placement.name}: central puzzle guard does not mutate state`);
+            const randomBeforePuzzle = doorRandomCalls;
+            const unsolvedState = ScriptRunner.init(unsolvedTrigger, doorA, placement.loc, []);
+            doorA.executeScript(unsolvedState, true);
+            assert.equal(unsolvedState.execution, ScriptState.PAUSEBUTTON, `${placement.name}: an unsolved central edge binds the real puzzle buttons`);
+            assert.equal(doorA.activeScript, unsolvedState, `${placement.name}: the native continuation is retained`);
+            assert.equal(doorRandomCalls - randomBeforePuzzle, 2, `${placement.name}: only family and permutation draw before an answer`);
+            puzzleRandomCalls += 2;
+            assert.deepEqual([doorA.level, doorA.x, doorA.z], [source.level, source.x, source.z], `${placement.name}: an unanswered central puzzle does not transfer`);
+            const puzzlePresentation = {
+              ...unsolvedBefore,
+              client: setRange(unsolvedBefore.client, 2, ...clientRanges.puzzle),
+              state: u32(setRange(setRange(unsolvedBefore.state, 2, ...stateRanges.family), 3, ...stateRanges.permutation) | (1 << challengeBit))
+            };
+            assert.deepEqual(snapshotPlayer(doorA), puzzlePresentation, `${placement.name}: opening changes only the puzzle presentation fields`);
+            doorA.closeModal();
+            assert.equal(doorA.activeScript, null, `${placement.name}: closing cancels the protected continuation`);
+            assert.deepEqual(snapshotPlayer(doorA), {
+              ...puzzlePresentation, state: u32(puzzlePresentation.state & ~(1 << challengeBit))
+            }, `${placement.name}: cancellation preserves topology, credit, generation, countdown and selected models`);
             prepareDoorPlayer(doorA, placement, false, 1, true);
             setPosition(doorA, source);
           }
@@ -1167,7 +1195,7 @@ function main() {
       assert(lockedPathNegativeChecked, 'one representative locked internal corridor has a native pathfinder negative');
       assert(openPathPositiveChecked, 'one representative unlocked internal transfer has a native walk-positive control');
       assert(eligibleDoorTransferCount > 0 && eligibleDoorTransferCount < doorTransferCount, 'original map rooms exercise both below-cap and full-room traversals');
-      assert.equal(doorRandomCalls, eligibleDoorTransferCount, 'below-cap traversals draw one S08 monster outcome; full rooms and refusals draw none');
+      assert.equal(doorRandomCalls, eligibleDoorTransferCount + puzzleRandomCalls, 'only below-cap S08 encounters and S09 presentation choices draw; refusals draw none');
       assert.deepEqual(worldMutations, [], 'personal door operations never call World loc add/change/remove/revert');
       assert.equal(World.getTotalNpcs(), npcCountBeforeDoors, 'door encounter cleanup preserves every pre-existing map NPC');
       // Native transfers move PLAYER_OCC too. Return both fixtures to their
@@ -1178,6 +1206,12 @@ function main() {
     } finally {
       JavaRandom.nextDouble = originalRandom;
       for (const [name, original] of originalWorldMethods) World[name] = original;
+      for (const player of nativeDoorPlayers) {
+        player.closeModal();
+        delete World.players[player.slot];
+        player.unlink();
+        player.isActive = false;
+      }
     }
 
     console.log(`PASS packed S07 topology: cornerTagged=${cornerTaggedLayouts}, uniqueMasks=${actualMasks.size}, corridorClosedLayouts=${actualCorridorClosedLayouts}, corridorClosedByNode=${JSON.stringify(actualCorridorClosedCounts)}`);

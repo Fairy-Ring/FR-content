@@ -104,3 +104,13 @@
 ^barrows_face_slot_karil = kill_count:com_4
 ^barrows_face_slot_torag = kill_count:com_5
 ^barrows_face_slot_verac = kill_count:com_6
+
+// CANDIDATE D5 uniform family/permutation selection; engineering index bounds.
+^barrows_puzzle_family_count = 4
+^barrows_puzzle_answer_count = 3
+^barrows_puzzle_permutation_count = 6
+
+// UNKNOWN engineering parameters for the CANDIDATE nonverbal wrong-answer shake.
+^barrows_puzzle_error_shake_axis = 0
+^barrows_puzzle_error_shake_random = 5
+^barrows_puzzle_error_shake_ticks = 1
