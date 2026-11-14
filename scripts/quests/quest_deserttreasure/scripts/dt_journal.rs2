@@ -179,6 +179,7 @@ if (%deserttreasure = ^dt_stage_hunts) {
     $x = append($x, ~dt_column_journal);
     $x = append($x, ~dt_smoke_journal);
     $x = append($x, ~dt_shadow_journal);
+    $x = append($x, ~dt_ice_journal);
     ~quest_journal($n, $x);
     return;
 }

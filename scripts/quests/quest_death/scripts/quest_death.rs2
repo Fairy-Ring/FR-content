@@ -120,7 +120,12 @@ if(%death_equiproom < ^death_complete) {
 ~equip(last_slot);
 
 [opheld2,death_spikedboots]
-mes("Trying to walk in these would be difficult. I'll carry them for now."); // maybe changed with dt? not sure
+// VERIFIED mountain-only use; CANDIDATE boundary reuses the Ice area's bounds.
+if (~dt_ice_cold_area = true) {
+    ~equip(last_slot);
+} else {
+    mes("Trying to walk in these would be difficult. I'll carry them for now.");
+}
 
 [zone,0_44_56_48_24]
 if(~death_get_map = ^death_got_map) {

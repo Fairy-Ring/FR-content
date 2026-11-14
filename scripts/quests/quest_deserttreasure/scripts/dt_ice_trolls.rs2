@@ -1,0 +1,26 @@
+// CANDIDATE: five native valley kills, credited to the native combat hero only.
+[ai_queue3,trollrescue_icetroll_melee1] ~dt_ice_troll_death;
+[ai_queue3,trollrescue_icetroll_melee2] ~dt_ice_troll_death;
+[ai_queue3,trollrescue_icetroll_melee3] ~dt_ice_troll_death;
+[ai_queue3,trollrescue_icetroll_melee4] ~dt_ice_troll_death;
+[ai_queue3,trollrescue_icetroll_melee5] ~dt_ice_troll_death;
+[ai_queue3,trollrescue_icetroll_melee6] ~dt_ice_troll_death;
+[ai_queue3,trollrescue_icetroll_melee7] ~dt_ice_troll_death;
+
+[proc,dt_ice_troll_death]
+def_coord $killed_at = npc_coord;
+gosub(npc_default_death);
+if (npc_findhero = ^false) return;
+if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_trollskilled >= ^dt_ice_trolls_required) return;
+// UNKNOWN engineering bounds: the original Ice troll valley before the cave.
+if (inzone(^dt_ice_troll_valley_sw, ^dt_ice_troll_valley_ne, $killed_at) = false) return;
+queue(dt_ice_troll_credit, 0, 0);
+
+[queue,dt_ice_troll_credit]
+if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_trollskilled >= ^dt_ice_trolls_required) return;
+%fd_icewarrior_trollskilled = min(^dt_ice_trolls_required, add(%fd_icewarrior_trollskilled, 1));
+mes("A chunk of ice falls away from the cave entrance.");
+
+[opnpc1,i_troll_guard]
+~chatnpc("Hur hur hur! Well look here, a puny fleshy human!");
+~chatnpc("You should beware of the icy wind that runs through this valley, it will bring a fleshy like you to a cold end indeed!");
