@@ -1,5 +1,5 @@
 {
-  "contentCommit": "fd897df92a72b94c536c5e6a27c0d2ae31771103",
+  "contentCommit": "b195a0ade83c9ef3a6c9b6c35a42c9e0520c7888",
   "rows": [
     {
       "type": 1,
@@ -123,6 +123,27 @@
     {
       "type": 1612,
       "debugname": "slayer_banshee_1",
+      "style": 4,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1624,
+      "debugname": "slayer_dustdevil",
+      "style": 0,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1624,
+      "debugname": "slayer_dustdevil",
+      "style": 3,
+      "maximum": 23,
+      "cap": 23
+    },
+    {
+      "type": 1624,
+      "debugname": "slayer_dustdevil",
       "style": 4,
       "maximum": 23,
       "cap": 23

@@ -66,11 +66,8 @@ if (npc_param(attack_sound) ! null) {
 if (npc_type = rd_combat_npc_room_3 & gender() = 0) {
     return(0);
 }
-// CANDIDATE slayer.s01-{dust-unmasked,harpie-unlit}-damage-cap.
-// Keep these equipment rules local to their own NPC types, before damage XP.
-if (npc_type = slayer_dustdevil & inv_total(worn, slayer_facemask) = 0) {
-    return(0);
-}
+// CANDIDATE slayer.s01-harpie-unlit-damage-cap.
+// Keep the equipment rule local to this NPC type, before damage XP.
 if (npc_type = slayer_harpiebugswarm & inv_total(worn, slayer_buglan_on) = 0) {
     return(0);
 }
