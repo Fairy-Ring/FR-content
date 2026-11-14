@@ -1,0 +1,15 @@
+// UNKNOWN engineering: numerical boundaries not stated by period sources.
+^killerwatt_melee_distance = 1
+^killerwatt_revert_delay = 8
+^killerwatt_timer_interval = 1
+^killerwatt_form_lifetime = 2147483647
+
+// CANDIDATE monster-combat-data.s02-killerwatt-distance: later documented reach.
+^killerwatt_attack_range = 13
+// CANDIDATE monster-combat-data.s02-killerwatt-damage: corrected base maxima.
+^killerwatt_melee_maxhit = 6
+^killerwatt_magic_maxhit = 8
+^killerwatt_uninsulated_maxhit = 15
+
+// VERIFIED slayer.s02-killerwatt-task; period equipment guides also give 37.
+^killerwatt_slayer_level = 37

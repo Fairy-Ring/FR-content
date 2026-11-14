@@ -1340,6 +1340,7 @@ transmit=yes
 
 [slayer_killerwatt_var]
 transmit=yes
+scope=perm
 
 [varp663_bits]
 

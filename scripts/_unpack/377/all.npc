@@ -71931,34 +71931,6 @@ attack=270
 strength=270
 defence=270
 
-[slayer_killerwatt]
-name=Killerwatt
-desc=An angry electrical shock!
-model1=npc_3201
-walkanim=killerwatt_biped_walk
-readyanim=killerwatt_biped_ready
-turnspeed=900
-op2=Attack
-vislevel=55
-hitpoints=51
-attack=50
-strength=50
-defence=40
-
-[slayer_killerwatt_ball]
-name=Killerwatt
-desc=A ball of electrical energy.
-model1=npc_3202
-walkanim=killerwatt_ball_ready
-readyanim=killerwatt_ball_ready
-vislevel=55
-hitpoints=51
-attack=50
-strength=50
-defence=40
-turnspeed=900
-op2=Attack
-
 [stormcloud_non_attacking]
 name=Storm Cloud
 desc=A very small storm!

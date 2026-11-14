@@ -86236,6 +86236,10 @@ iop2=Wear
 cost=200
 wearpos=feet
 weight=3lb
+// CANDIDATE slayer.s02-insulated-boots-item: corrected base defence bonuses.
+param=stabdefence,1
+param=slashdefence,1
+param=rangedefence,1
 
 [slayerguide_killerwatt]
 name=Killerwatt

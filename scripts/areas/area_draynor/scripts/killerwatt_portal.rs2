@@ -1,0 +1,49 @@
+// CANDIDATE draynor-village.s02-killerwatt-warning: historical transcript wording.
+[oploc1,draynor_killerwatt_portal]
+if (map_members = ^false) return;
+if (%slayer_killerwatt_strobe_warning = 0) {
+    ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral><pname> before you go through there I must warn you that there are flashing lights and strobe effects on the other side. If you are an epilepsy sufferer you must NOT enter! Do you still want to go through?");
+    def_int $choice = ~p_choice3("Yes I still want to go in.", 1, "Yes I want to go in and don't show me this message again.", 2, "No, I dont want to go in.", 3);
+    if ($choice = 3) {
+        ~chatplayer("<p,neutral>No, I dont want to go in.");
+        ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral>That's a good decision, if you ask me.");
+        return;
+    }
+    if ($choice = 2) {
+        ~chatplayer("<p,neutral>Yes I want to go in and don't show me this message again.");
+        %slayer_killerwatt_strobe_warning = 1;
+    } else {
+        ~chatplayer("<p,neutral>Yes I still want to go in.");
+    }
+    ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral>All right. Good luck then.");
+}
+if (inv_total(worn, slayer_boots) = 0) {
+    ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral>Errr, just before you go through there...");
+    ~chatplayer("<p,quiz>What's the problem?");
+    ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral>That portal opens into a plane populated with some very shocking creatures. You should wear some kind of insulated armour before going there.");
+    def_int $boots = ~p_choice3("Where can I get insulated armour from?", 1, "Thanks, I think I'll stay here for a while then.", 2, "Thanks for the warning, but I'm not scared of any monster.", 3);
+    if ($boots = 1) {
+        ~chatplayer("<p,quiz>Where can I get insulated armour from?");
+        ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral>Well there were some pretty tough people here last week. Said they were Slayer Masters. They were planning on making some protective boots. You should speak to one of them.");
+        def_int $advice = ~p_choice2("Thanks, I'll do that.", 1, "I don't want to run around after Slayer Masters, I'm going through.", 2);
+        if ($advice = 1) {
+            ~chatplayer("<p,neutral>Thanks, I'll do that.");
+            ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral>No problem. See you later.");
+            return;
+        }
+        ~chatplayer("<p,neutral>I don't want to run around after Slayer Masters, I'm going through.");
+        ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral>Fair enough, just don't say I didn't warn you");
+    } else if ($boots = 2) {
+        ~chatplayer("<p,neutral>Thanks, I think I'll stay here for a while then.");
+        return;
+    } else {
+        ~chatplayer("<p,neutral>Thanks for the warning, but I'm not scared of any monster.");
+        ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral>Ok. Just don't say I didn't warn you");
+    }
+}
+// UNKNOWN engineering free tile adjacent to the cache's plane portal.
+p_telejump(2_41_81_53_30);
+
+[oploc1,draynor_killerwatt_portal2]
+// UNKNOWN engineering free tile adjacent to the cache's manor rift.
+p_telejump(2_48_52_38_33);

@@ -224,5 +224,48 @@
         "wanderrange": 5
       }
     }
+    ,
+    {
+      "identity": {"debugname": "slayer_killerwatt", "id": 3201},
+      "contentCommit": "7b07e3d3ae144aeec4fd1f450e353d58f433b513",
+      "fields": {
+        "active": true, "alwaysontop": false, "ambient": 0, "attack": 50,
+        "attackrange": 0, "blockwalk": 1, "category": -1, "contrast": 0,
+        "defaultmode": 1, "defence": 40, "desc": "An angry electrical shock!",
+        "givechase": true, "headicon": -1, "heads": null, "hitpoints": 51,
+        "huntmode": -1, "huntrange": 0, "magic": 1, "maxrange": 7,
+        "members": false, "minimap": true, "models": [11264], "moverestrict": 0,
+        "multinpc": [], "multivarbit": -1, "multivarp": -1, "name": "Killerwatt",
+        "op": [null, "Attack", null, null, null], "patrolCoord": [], "patrolDelay": [],
+        "ranged": 1, "readyanim": {"ref": "seq", "name": "killerwatt_biped_ready"},
+        "recol_d": null, "recol_s": null, "regenrate": 100, "resizeh": 128,
+        "resizev": 128, "resizex": -1, "resizey": -1, "resizez": -1,
+        "respawnrate": 100, "size": 1, "strength": 50, "timer": -1,
+        "turnspeed": 900, "vislevel": 55,
+        "walkanim": {"ref": "seq", "name": "killerwatt_biped_walk"},
+        "walkanim_b": -1, "walkanim_l": -1, "walkanim_r": -1, "wanderrange": 5
+      }
+    },
+    {
+      "identity": {"debugname": "slayer_killerwatt_ball", "id": 3202},
+      "contentCommit": "7b07e3d3ae144aeec4fd1f450e353d58f433b513",
+      "fields": {
+        "active": true, "alwaysontop": false, "ambient": 0, "attack": 50,
+        "attackrange": 0, "blockwalk": 1, "category": -1, "contrast": 0,
+        "defaultmode": 1, "defence": 40, "desc": "A ball of electrical energy.",
+        "givechase": true, "headicon": -1, "heads": null, "hitpoints": 51,
+        "huntmode": -1, "huntrange": 0, "magic": 1, "maxrange": 7,
+        "members": false, "minimap": true, "models": [11263], "moverestrict": 0,
+        "multinpc": [], "multivarbit": -1, "multivarp": -1, "name": "Killerwatt",
+        "op": [null, "Attack", null, null, null], "patrolCoord": [], "patrolDelay": [],
+        "ranged": 1, "readyanim": {"ref": "seq", "name": "killerwatt_ball_ready"},
+        "recol_d": null, "recol_s": null, "regenrate": 100, "resizeh": 128,
+        "resizev": 128, "resizex": -1, "resizey": -1, "resizez": -1,
+        "respawnrate": 100, "size": 1, "strength": 50, "timer": -1,
+        "turnspeed": 900, "vislevel": 55,
+        "walkanim": {"ref": "seq", "name": "killerwatt_ball_ready"},
+        "walkanim_b": -1, "walkanim_l": -1, "walkanim_r": -1, "wanderrange": 5
+      }
+    }
   ]
 }

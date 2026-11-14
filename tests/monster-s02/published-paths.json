@@ -1,0 +1,492 @@
+{
+  "contentCommit": "7b07e3d3ae144aeec4fd1f450e353d58f433b513",
+  "rows": [
+    {
+      "name": "man",
+      "style": 0,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "man",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "man",
+      "style": 3,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "man",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "man",
+      "style": 4,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "man",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "chicken",
+      "style": 0,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "chicken",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "chicken",
+      "style": 3,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "chicken",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "chicken",
+      "style": 4,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "chicken",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "cow",
+      "style": 0,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "cow",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "cow",
+      "style": 3,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "cow",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "cow",
+      "style": 4,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "cow",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "lesser_demon",
+      "style": 0,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "lesser_demon",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "lesser_demon",
+      "style": 3,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "lesser_demon",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "lesser_demon",
+      "style": 4,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "lesser_demon",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_banshee_1",
+      "style": 0,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_banshee_1",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_banshee_1",
+      "style": 3,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_banshee_1",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_banshee_1",
+      "style": 4,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_banshee_1",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_cockatrice",
+      "style": 0,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_cockatrice",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_cockatrice",
+      "style": 3,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_cockatrice",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_cockatrice",
+      "style": 4,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_cockatrice",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_dustdevil",
+      "style": 0,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_dustdevil",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_dustdevil",
+      "style": 3,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_dustdevil",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_dustdevil",
+      "style": 4,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_dustdevil",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_harpiebugswarm",
+      "style": 0,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_harpiebugswarm",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_harpiebugswarm",
+      "style": 3,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_harpiebugswarm",
+      "actionDelay": 0,
+      "queues": []
+    },
+    {
+      "name": "slayer_harpiebugswarm",
+      "style": 4,
+      "admission": [
+        1
+      ],
+      "attackable": [
+        1
+      ],
+      "attackableOpt": [
+        1
+      ],
+      "spellChecks": [
+        1
+      ],
+      "messages": [],
+      "type": "slayer_harpiebugswarm",
+      "actionDelay": 0,
+      "queues": []
+    }
+  ],
+  "unquestedStairs": {
+    "level": 2,
+    "x": 3105,
+    "z": 3364,
+    "portal": 0,
+    "messages": []
+  }
+}
