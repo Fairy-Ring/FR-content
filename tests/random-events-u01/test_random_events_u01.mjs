@@ -289,5 +289,39 @@ check('legacy saved zero origin stays unknown and never becomes a return to 0,0'
   assert.deepEqual([p.level, p.x, p.z], [0, 3213, 3424]);
   cleared(p);
 });
+for (const populated of [false, true]) check(`read-only staff inventory fixture: ${populated ? 'stack boundary and long object name' : 'empty inventory'}`, () => {
+  const p = player(); const other = player();
+  run(p, '[login,_]');
+  give(other, 'airrune', 9);
+  if (populated) {
+    const longest = readFileSync(new URL('../../pack/obj.pack', import.meta.url), 'utf8').split('\n').reduce((name, line) => {
+      const candidate = line.slice(line.indexOf('=') + 1);
+      return candidate.length > name.length ? candidate : name;
+    }, '');
+    give(p, 'coins', 2147483647); give(p, 'airrune', 3); give(p, longest);
+    assert.equal(p.invTotal(inv, requiredId(types.ObjType, 'coins')), 2147483647);
+    assert.equal(p.invTotal(inv, requiredId(types.ObjType, 'airrune')), 3);
+    assert.equal(p.invTotal(inv, requiredId(types.ObjType, longest)), 1);
+  }
+  p.messages = [];
+  const before = snapshot(p); const otherBefore = snapshot(other);
+  const expected = ['[inv_readback] begin'];
+  let occupied = 0;
+  before.inventory.forEach((item, slot) => {
+    if (!item) return;
+    const [name, count] = item;
+    expected.push(`[inv_readback] slot=${slot} count=${count}`);
+    for (let offset = 0; offset < name.length; offset += 40) expected.push(`[inv_readback] objpart=${name.slice(offset, offset + 40)}`);
+    occupied++;
+  });
+  expected.push(`[inv_readback] end=${occupied}`);
+  assert.equal(packed('[debugproc,inv_readback]').info.parameterTypes.length, 0, 'the fixture cannot name another player');
+  run(p, '[debugproc,inv_readback]', [], { protect: false });
+  assert.deepEqual(p.messages.map(packet => packet.msg), expected);
+  assert(p.messages.every(packet => packet.msg.length <= 70), 'every emitted line is safe for the client');
+  const after = snapshot(p); after.messages = [];
+  assert.deepEqual(after, before, 'inventory, varps, queues, actors and UI are unchanged');
+  assert.deepEqual(snapshot(other), otherBefore, 'no other player is read or changed');
+});
 console.log(`RESULT ${failed ? 'FAIL' : 'PASS'} random-events-u01 passed=${passed} failed=${failed}`);
 process.exit(failed ? 1 : 0);
