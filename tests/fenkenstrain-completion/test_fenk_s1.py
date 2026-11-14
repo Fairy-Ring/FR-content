@@ -84,11 +84,16 @@ def main() -> int:
     require(arrival, r"queue\s*\(\s*fenk_gardener_clear_follow\s*,\s*1\s*,\s*0\s*\)", "departure after overhead")
     forbid(arrival, r"%fenk_quest\s*=|inv_(?:add|del)|%fenk_head\s*=", "arrival Talk must not advance quest/items")
 
-    # Wrong graves and repeated digs remain empty; the real Dig is follower-independent.
+    # Wrong/repeated digs remain empty; a fresh head needs talk, not a follower.
     require(dig, r"loc_coord\s*=\s*0_56_54_24_35", "true-head tile selection")
     require(dig, r"~fenk_try_dig_head\s*;", "true-head result dispatch")
     require(dig, r"\.\.\.but the grave is empty\.", "wrong/repeated Dig refusal")
-    forbid(dig, r"fenk_follower_uid|fenk_gardener_directions|fenk_spoken_to_gardener", "Dig must not require follower/proximity state")
+    forbid(dig, r"fenk_follower_uid|fenk_gardener_directions", "Dig must not require follower/proximity state")
+    require(
+        dig,
+        r"if\s*\(\s*loc_coord\s*=\s*0_56_54_24_35\s*&\s*%fenk_spoken_to_gardener\s*=\s*0\s*&\s*inv_total\(inv,\s*fenk_head_empty\)\s*=\s*0\s*&\s*inv_total\(inv,\s*fenk_head_full\)\s*=\s*0\s*&\s*%fenk_head\s*=\s*0\s*\)\s*\{\s*~displaymessage\(\^dm_default\);\s*return;\s*\}\s*anim\(human_dig,\s*0\)",
+        "fresh-head talk gate uses only default before animation",
+    )
     require(head, r"inv_total\s*\(\s*inv\s*,\s*fenk_head_empty\s*\)\s*>\s*0", "no duplicate empty head")
     require(head, r"inv_total\s*\(\s*inv\s*,\s*fenk_head_full\s*\)\s*>\s*0", "no duplicate full head")
     require(head, r"%fenk_head\s*=\s*1", "no duplicate after hand-in")
