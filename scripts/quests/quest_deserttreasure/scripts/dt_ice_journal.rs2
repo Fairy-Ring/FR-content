@@ -1,0 +1,25 @@
+// CANDIDATE project-authored journal summaries, not recovered 377 prose.
+[proc,dt_ice_journal]()(string)
+def_string $x = "@blu@Ice diamond|";
+if (%fd_icewarrior_subquest = ^dt_ice_substate_crying) {
+    return(append($x, "I should offer sweet food to the crying troll child and agree to rescue his parents.|"));
+}
+if (%fd_icewarrior_subquest >= ^dt_ice_substate_awarded) {
+    return(append($x, "@str@The troll family gave me the Ice diamond.|"));
+}
+if (%fd_icewarrior_subquest = ^dt_ice_substate_family_returned) {
+    return(append($x, "The troll family is home. I should speak to the child about the diamond.|"));
+}
+if (%fd_icewarrior_trollskilled < ^dt_ice_trolls_required) {
+    $x = append($x, "Ice trolls still needed to clear the cave: <tostring(sub(^dt_ice_trolls_required, %fd_icewarrior_trollskilled))>.|");
+} else {
+    $x = append($x, "@str@The five icicles have fallen from the cave entrance.|");
+}
+if (%fd_icewarrior_dead = 0) $x = append($x, "I still need to defeat Kamil beyond the wolf valley.|");
+else $x = append($x, "Kamil is defeated. I need spiked boots for the icy ledge.|");
+if (%fd_icewarrior_dadfree = 0) $x = append($x, "The troll father is still frozen.|");
+else $x = append($x, "@str@The troll father is free.|");
+if (%fd_icewarrior_mumfree = 0) $x = append($x, "The troll mother is still frozen.|");
+else $x = append($x, "@str@The troll mother is free.|");
+if (%fd_icewarrior_dadfree ! 0 & %fd_icewarrior_mumfree ! 0) $x = append($x, "I should speak to the parents and return to their child.|");
+return($x);

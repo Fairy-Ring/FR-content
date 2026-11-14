@@ -106,6 +106,7 @@ return(false);
 // allows any npc with op2 defined to be attacked
 [proc,npc_is_attackable]()(boolean)
 if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
+if (npc_type = icediamond_icewarrior) return(~dt_kamil_attackable);
 // TODO 377: re-enable these!!
 // https://web.archive.org/web/20060828222012/http://www.trillionareguild.com/runescape/dragon.php at the very end of the guide
 // it says "You have no reason to do that.", so its prob this osrs message.
@@ -217,6 +218,7 @@ return (false);
 // this proc is used for magic (TODO 377: re-enable later!!)
 [proc,npc_is_attackable_opt]()(boolean)
 if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
+if (npc_type = icediamond_icewarrior) return(~dt_kamil_attackable);
 if (npc_type = wormbrain & (~quest_dragon_getting_map_parts = false | inv_total(inv, mappart2) > 0 | %dragon_goblin ! ^quest_dragon_knows_about_goblin)) {
     mes("The goblin is already in prison. You have no reason to attack him.");
     return (false);

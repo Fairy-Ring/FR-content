@@ -53,6 +53,7 @@ if (p_finduid(uid) = true) {
 [proc,player_teleport_normal](coord $coord)
 if_close;
 p_stopaction;
+~tele_checks;
 sound_synth(teleport_all, 1, 0);
 anim(human_castteleport, 0);
 spotanim_pl(teleport_casting, 92, 0);
@@ -67,12 +68,14 @@ if (~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true
     return; // https://youtu.be/Yk7DSYxGucE?t=111 Random event is supposed to teleport you & note. But he only notes
 }
 p_telejump($coord);
+cam_reset;
 anim(null, 0);
 // CoF gardener: same-plane magic/jewellery teleport must end follow + restore
 // courtyard. No-op without an active fenk follower. Does not call cat
 // follower cleanup or alter cat session uid / RD death dest (those stay on logout/death.rs2).
 ~fenk_on_gameplay_teleport;
 // todo: ensure this proc is used for other teleports too
+~reset_haunted_levers;
 def_int $rum = inv_total(inv, karamja_rum);
 if ($rum > 0) {
     inv_del(inv, karamja_rum, $rum);
@@ -81,7 +84,6 @@ if ($rum > 0) {
 if(inv_total(inv, plaguesample) > 0) { // Biohazard plague sample
     inv_del(inv, plaguesample, ^max_32bit_int);
     mes("The plague sample is too delicate...it disintegrates in the crossing.");
-    return;
 }
 if (inv_getobj(worn, ^wearpos_rhand) = trollromance_toboggon_waxed) { // Troll Romance sled
     if(inv_freespace(inv) > 0) {
@@ -93,12 +95,29 @@ if (inv_getobj(worn, ^wearpos_rhand) = trollromance_toboggon_waxed) { // Troll R
         mes("You drop the sled.");
     }
 }
+~clear_peer_trial_items;
+if (inv_total(inv, mm_monkey_in_backpack) > 0) {
+    inv_del(inv, mm_monkey_in_backpack, ^max_32bit_int);
+    mes("The monkey in your backpack disappears in a puff of smoke!");
+}
+
+[proc,tele_checks]
+if (inv_total(inv, thanainabarrel) > 0) {
+    inv_del(inv, thanainabarrel, ^max_32bit_int);
+    mes("You drop 'Ana in a barrel' before you teleport.");
+}
 
 [proc,pre_tele_checks](coord $coord)(boolean)
-if(inv_total(inv, thanainabarrel) > 0) {
-    ~chatnpc_specific("Ana (in a Barrel)", anabarrel, "<p,idle>@dbl@-- You can't teleport while holding the barrel, it's just @dbl@too difficult to concentrate. --");
+if (~pre_tele_checks_no_ana($coord) = false) {
     return(false);
 }
+if (inv_total(inv, thanainabarrel) > 0) {
+    ~chatnpc_specific("Ana (in a Barrel)", anabarrel, "<p,idle>@dbl@-- You can't teleport while holding the barrel, it's just @dbl@too difficult to concentrate. --");
+}
+return(true);
+
+// Eligibility without Ana's departure page: offers and scenes do not teleport.
+[proc,pre_tele_checks_no_ana](coord $coord)(boolean)
 if (~inzone_coord_pair_table(trawler_wreck_zones, $coord) = true) {
     ~mesbox("Water and magic don't mix!|You can't teleport whilst swimming."); // osrs
     return(false);

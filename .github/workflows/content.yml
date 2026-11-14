@@ -118,6 +118,7 @@ jobs:
       # tests/ape-agility/: CI — compiled packed obstacle handlers, entry matrix and recovery checkpoints; no server.
       # tests/brim-dungeon/: CI — packed entrance, obstacle, lock and collision checks; no server.
       # tests/splitbark-service/: CI — packed wizard dialogue, labeled five-piece selector and inventory purchases; no server.
+      # tests/ana-barrel/: CI — packed departures, barrel ordering and unchanged refusal controls; no server.
       - name: Run offline content tests
         id: content_tests
         working-directory: engine
@@ -167,6 +168,8 @@ jobs:
           run_test tests/citizen-tables/test_citizen_tables.mjs node --import tsx ../content/tests/citizen-tables/test_citizen_tables.mjs
           run_test tests/cfg-other/test_cfg_other.mjs node --import tsx ../content/tests/cfg-other/test_cfg_other.mjs
           run_test tests/npc-death/test_npc_death.mjs node --import tsx ../content/tests/npc-death/test_npc_death.mjs
+          run_test tests/elf-viking-drops/test_elf_viking_drops.mjs node --import tsx ../content/tests/elf-viking-drops/test_elf_viking_drops.mjs
+          run_test tests/mortmyre-creatures/test_mortmyre_creatures.mjs node --import tsx ../content/tests/mortmyre-creatures/test_mortmyre_creatures.mjs
           run_test tests/cfg-npc/test_cfg_npc.mjs node --import tsx ../content/tests/cfg-npc/test_cfg_npc.mjs
           run_test tests/spawn-repair/test_spawn_repair.mjs node --import tsx ../content/tests/spawn-repair/test_spawn_repair.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
@@ -187,6 +190,8 @@ jobs:
           run_test tests/leather-batch/test_leather_batch.mjs node --import tsx ../content/tests/leather-batch/test_leather_batch.mjs
           run_test tests/desert-treasure/test_s3_contract.py python3 ../content/tests/desert-treasure/test_s3_contract.py
           run_test tests/desert-treasure/test_s1_contract.py python3 ../content/tests/desert-treasure/test_s1_contract.py
+          run_test tests/desert-treasure/test_s5_contract.py python3 ../content/tests/desert-treasure/test_s5_contract.py
+          run_test tests/desert-treasure/s5_death_runtime.mts bash ../content/tests/desert-treasure/s5_death_runtime.sh "$PWD"
           run_test tests/desert-treasure/test_s6_contract.py python3 ../content/tests/desert-treasure/test_s6_contract.py
           run_test tests/desert-treasure/test_s2_contract.py python3 ../content/tests/desert-treasure/test_s2_contract.py
           run_test tests/teleother/test_teleother.mjs node --import tsx ../content/tests/teleother/test_teleother.mjs
@@ -194,6 +199,7 @@ jobs:
           run_test tests/rowboat/test_rowboat.mjs node --import tsx ../content/tests/rowboat/test_rowboat.mjs
           run_test tests/misc-services/test_misc_services.mjs node --import tsx ../content/tests/misc-services/test_misc_services.mjs
           run_test tests/regicide-travel/test_regicide_travel.mjs node --import tsx ../content/tests/regicide-travel/test_regicide_travel.mjs
+          run_test tests/slimy-eel/test_slimy_eel.mjs node --import tsx ../content/tests/slimy-eel/test_slimy_eel.mjs
           run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
           run_test tests/food-drink/test_food_drink.mjs node --import tsx ../content/tests/food-drink/test_food_drink.mjs
           run_test tests/stair-links/test_stair_links.mjs node --import tsx ../content/tests/stair-links/test_stair_links.mjs
@@ -207,6 +213,11 @@ jobs:
           run_test tests/ape-agility/test_ape_atoll.mjs node --import tsx ../content/tests/ape-agility/test_ape_atoll.mjs
           run_test tests/brim-dungeon/test_brim_dungeon.mjs node --import tsx ../content/tests/brim-dungeon/test_brim_dungeon.mjs
           run_test tests/splitbark-service/test_splitbark_service.mjs node --import tsx ../content/tests/splitbark-service/test_splitbark_service.mjs
+          run_test tests/small-repairs/test_r1_chill.mjs node --import tsx ../content/tests/small-repairs/test_r1_chill.mjs
+          run_test tests/small-repairs/test_r2_eblis.mjs node --import tsx ../content/tests/small-repairs/test_r2_eblis.mjs
+          run_test tests/small-repairs/test_r3_cat_scroll.mjs node --import tsx ../content/tests/small-repairs/test_r3_cat_scroll.mjs
+          run_test tests/small-repairs/test_r4_teleport.mjs node --import tsx ../content/tests/small-repairs/test_r4_teleport.mjs
+          run_test tests/ana-barrel/test_ana_barrel.mjs node --import tsx ../content/tests/ana-barrel/test_ana_barrel.mjs
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           exit "$failed"

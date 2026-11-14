@@ -112,3 +112,57 @@ else if ($roll < 994) {
         return (cactus_seed, 1);
     }
 }
+
+// CANDIDATE: earliest Old School form, 6 May 2018; the 2019 re-tune subtracted.
+// https://oldschool.runescape.wiki/w/Drop_table?oldid=6356697
+// This corrects revision 6356515 (5 May 2018) without a named game update.
+// The 23 members sum 998: use that sum, with no invented empty outcome.
+[proc,roll_uncommon_seed_table]()(namedobj, int)
+def_int $roll = random(998);
+if ($roll < 134) {
+    return (limpwurt_seed, 1);
+} else if ($roll < 265) {
+    return (strawberry_seed, 1);
+} else if ($roll < 388) {
+    return (marrentill_seed, 1);
+} else if ($roll < 482) {
+    return (jangerberry_bush_seed, 1);
+} else if ($roll < 566) {
+    return (tarromin_seed, 1);
+} else if ($roll < 649) {
+    return (wildblood_hop_seed, 1);
+} else if ($roll < 712) {
+    return (watermelon_seed, 1);
+} else if ($roll < 770) {
+    return (harralander_seed, 1);
+} else if ($roll < 810) {
+    return (ranarr_seed, 1);
+} else if ($roll < 844) {
+    return (whiteberry_bush_seed, 1);
+} else if ($roll < 873) {
+    return (mushroom_seed, 1);
+} else if ($roll < 900) {
+    return (toadflax_seed, 1);
+} else if ($roll < 918) {
+    return (belladonna_seed, 1);
+} else if ($roll < 936) {
+    return (irit_seed, 1);
+} else if ($roll < 949) {
+    return (poisonivy_bush_seed, 1);
+} else if ($roll < 961) {
+    return (avantoe_seed, 1);
+} else if ($roll < 973) {
+    return (cactus_seed, 1);
+} else if ($roll < 982) {
+    return (kwuarm_seed, 1);
+} else if ($roll < 988) {
+    return (snapdragon_seed, 1);
+} else if ($roll < 992) {
+    return (cadantine_seed, 1);
+} else if ($roll < 995) {
+    return (lantadyme_seed, 1);
+} else if ($roll < 997) {
+    return (dwarf_weed_seed, 1);
+} else {
+    return (torstol_seed, 1);
+}
