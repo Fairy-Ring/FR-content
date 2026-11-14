@@ -120,6 +120,7 @@ jobs:
       # tests/splitbark-service/: CI — packed wizard dialogue, labeled five-piece selector and inventory purchases; no server.
       # tests/ana-barrel/: CI — packed departures, barrel ordering and unchanged refusal controls; no server.
       # tests/tan-snake/: CI — packed eight-tile tanning, exact inventory settlement and published-six fingerprints; no server.
+      # tests/random-events-u00/: CI — real packed staff caller, genuine targets, refusal snapshots and two scratch mutants; no server.
       - name: Run offline content tests
         id: content_tests
         working-directory: engine
@@ -211,6 +212,7 @@ jobs:
           run_test tests/small-repairs/test_r3_cat_scroll.mjs node --import tsx ../content/tests/small-repairs/test_r3_cat_scroll.mjs
           run_test tests/small-repairs/test_r4_teleport.mjs node --import tsx ../content/tests/small-repairs/test_r4_teleport.mjs
           run_test tests/ana-barrel/test_ana_barrel.mjs node --import tsx ../content/tests/ana-barrel/test_ana_barrel.mjs
+          run_test tests/random-events-u00/test_random_events_u00.mjs node --import tsx ../content/tests/random-events-u00/test_random_events_u00.mjs
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           exit "$failed"
