@@ -72,6 +72,7 @@ const published = JSON.parse(fs.readFileSync(new URL('./elemental-published.json
 const publishedSpecials = JSON.parse(fs.readFileSync(new URL('./elemental-specials-published.json', import.meta.url)));
 const publishedCannon = JSON.parse(fs.readFileSync(new URL('./elemental-cannon-published.json', import.meta.url)));
 const paramIdentities = JSON.parse(fs.readFileSync(new URL('./elemental-published-params.json', import.meta.url)));
+const operandIdentities = JSON.parse(fs.readFileSync(new URL('./elemental-published-operands.json', import.meta.url)));
 const originalScripts = [
   ...published.scripts.map(record => [record, paramIdentities.published]),
   ...publishedSpecials.scripts.map(record => [record, paramIdentities.specials]),
@@ -79,6 +80,18 @@ const originalScripts = [
 ];
 assert.equal(published.publishedContent, 'ccdca1101a225a38d2583e56ce1023ab028c8b75');
 assert.equal(published.publishedEngine, 'ef96f86623697dc0d5367cc0a889c4c56eb091d3');
+for (const fixture of [published, publishedSpecials, publishedCannon]) {
+  assert.equal(fixture.publishedContent, operandIdentities.publishedContent);
+}
+const variableKinds = {
+  PUSH_VARN: 'VarNpcType', POP_VARN: 'VarNpcType',
+  PUSH_VARS: 'VarSharedType', POP_VARS: 'VarSharedType'
+};
+function generatedIdentity(kind, operand, context) {
+  const name = operandIdentities[kind][operand];
+  assert(name, `${context} has a recorded ${kind} identity for ${operand}`);
+  return name;
+}
 const bytecodeFields = ['intLocalCount', 'stringLocalCount', 'intArgCount', 'stringArgCount', 'switchTables', 'opcodes', 'intOperands', 'stringOperands'];
 function withPublished(fn) {
   const saved = [];
@@ -88,13 +101,35 @@ function withPublished(fn) {
     for (const field of bytecodeFields) current[field] = structuredClone(original[field]);
     // Procedure ids can move when the production compiler adds scripts. Resolve recorded callees by identity.
     for (const [pc, name] of Object.entries(original.callees)) current.intOperands[pc] = script(name).id;
-    // A clean pack regenerates server-only param ids. Restore each literal by its recorded name.
-    for (let pc = 1; pc < original.opcodes.length; pc++) {
-      if (!['NPC_PARAM', 'OC_PARAM'].includes(ScriptOpcodeNameMap.get(original.opcodes[pc]))) continue;
-      assert.equal(ScriptOpcodeNameMap.get(original.opcodes[pc - 1]), 'PUSH_CONSTANT_INT');
-      const name = paramNames[original.intOperands[pc - 1]];
-      assert(name, `${original.info.scriptName}:${pc} has a recorded parameter identity`);
-      current.intOperands[pc - 1] = id('ParamType', name);
+    // Generated variable, parameter, category and database ids also resolve by their published names.
+    for (let pc = 0; pc < original.opcodes.length; pc++) {
+      const opcode = ScriptOpcodeNameMap.get(original.opcodes[pc]);
+      const context = `${original.info.scriptName}:${pc}`;
+      if (opcode === 'GOSUB_WITH_PARAMS') {
+        assert(original.callees[pc], `${context} has a recorded procedure identity`);
+      } else if (variableKinds[opcode]) {
+        const kind = variableKinds[opcode];
+        current.intOperands[pc] = id(kind, generatedIdentity(kind, original.intOperands[pc], context));
+      } else if (['NPC_PARAM', 'OC_PARAM'].includes(opcode)) {
+        assert.equal(ScriptOpcodeNameMap.get(original.opcodes[pc - 1]), 'PUSH_CONSTANT_INT', context);
+        const name = paramNames[original.intOperands[pc - 1]];
+        assert(name, `${context} has a recorded parameter identity`);
+        current.intOperands[pc - 1] = id('ParamType', name);
+      } else if (opcode === 'OC_CATEGORY') {
+        assert.equal(ScriptOpcodeNameMap.get(original.opcodes[pc + 1]), 'PUSH_CONSTANT_INT', context);
+        assert(['BRANCH_EQUALS', 'BRANCH_NOT'].includes(ScriptOpcodeNameMap.get(original.opcodes[pc + 2])), context);
+        current.intOperands[pc + 1] = id('CategoryType',
+          generatedIdentity('CategoryType', original.intOperands[pc + 1], context));
+      } else if (['DB_GETFIELD', 'DB_GETFIELDCOUNT'].includes(opcode)) {
+        const fieldPc = pc - (opcode === 'DB_GETFIELD' ? 2 : 1);
+        assert.equal(ScriptOpcodeNameMap.get(original.opcodes[fieldPc]), 'PUSH_CONSTANT_INT', context);
+        const operand = original.intOperands[fieldPc];
+        const [tableName, columnName] = generatedIdentity('DbTableField', operand, context).split(':');
+        const table = types.DbTableType.get(id('DbTableType', tableName));
+        const column = table.columnNames.indexOf(columnName);
+        assert(column >= 0, `${context} has packed database column ${tableName}:${columnName}`);
+        current.intOperands[fieldPc] = (table.id << 12) | (column << 4) | (operand & 0xf);
+      }
     }
   }
   try { return fn(); } finally { for (const [current, fields] of saved) Object.assign(current, fields); }

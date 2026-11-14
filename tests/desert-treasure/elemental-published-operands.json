@@ -1,0 +1,32 @@
+{
+  "publishedContent": "ccdca1101a225a38d2583e56ce1023ab028c8b75",
+  "VarNpcType": {
+    "0": "npc_action_delay",
+    "1": "npc_attacking_uid",
+    "2": "npc_aggressive_player",
+    "3": "npc_lastcombat",
+    "4": "npc_stunned",
+    "5": "npc_lastattack",
+    "6": "npc_poison",
+    "7": "npc_trawler_flood_status",
+    "8": "npc_trawler_fish_caught",
+    "9": "npc_int",
+    "10": "npc_int2",
+    "11": "npc_combat_xp_multiplier",
+    "12": "npc_macro_event_target",
+    "13": "quest_chompybird_baiter",
+    "14": "rantz_attacking_chompy",
+    "15": "npc_start_coord"
+  },
+  "VarSharedType": {},
+  "CategoryType": {
+    "212": "weapon_bow"
+  },
+  "DbTableField": {
+    "77824": "magic_spell_table:spell",
+    "78128": "magic_spell_table:spotanim_target",
+    "78144": "magic_spell_table:sound_cast",
+    "78160": "magic_spell_table:sound_hit"
+  },
+  "identitySource": "Clean generated packs at publishedContent. NPC ids 0-11 also match scripts/_unpack/377/all.varn declaration order. The six frozen scripts use only NPC variable 11 and no shared variables. Category and database-field literals also use generated identities. Database fields retain their tuple selector and resolve both table and column by name. Tracked varp, varbit and other client-pack ids, literal spell integers and fixed queue numbers retain their published values."
+}
