@@ -60,6 +60,10 @@
 ^barrows_door_class_bloodworm = 1
 ^barrows_door_class_crypt_rat = 2
 
+// CANDIDATE D4 complete draw domain and shared destination-room occupancy cap.
+^barrows_door_draw_count = 128
+^barrows_door_room_cap = 11
+
 // CANDIDATE capped combat-level sum; UNKNOWN displayed-count saturation policy.
 ^barrows_potential_max = 1000
 ^barrows_kill_count_max = 32767

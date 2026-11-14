@@ -47,7 +47,7 @@ node --import tsx ../content/tests/barrows/test_owned.mjs
 
 This check executes all six packed Search handlers with native loc/NPC fixtures. It covers the original slain joins, selected/credited suppression, private immutable owner and captured generation, both shared attack gates, independent owners, cleanup and uncredited retry. The fixtures apply each packed sarcophagus's real shape, rotation and clipping; native NPC turns must begin ordinary combat. Placement uses an open ring around the owner's legal approach tile, never a line back into the clipped coffin. A sealed-ring control rejects the native origin-return sentinel. Other terrain remains a natural-live concern. Mutable combat targeting does not make a map monster an owned summon. Brother combat styles and special attacks remain outside this group.
 
-Each crypt summon says the exact CANDIDATE 2007-base line and immediately targets its searching owner, following the published Rashiliyia minion convention. All six packed handlers prove that a second player on the owner's tile is not targeted. The speech is an OSRS-documentation fallback, not verified 377 wording; the period Tip.It guide separately verifies the immediate-attack statement. Tunnel-door and chest presentation are not implemented here.
+Each crypt summon says the exact CANDIDATE 2007-base line and immediately targets its searching owner, following the published Rashiliyia minion convention. All six packed handlers prove that a second player on the owner's tile is not targeted. The speech is an OSRS-documentation fallback, not verified 377 wording; the period Tip.It guide separately verifies the immediate-attack statement. S08 uses the same owned constructor for door encounters.
 
 The shared actor constructor returns a native NPC UID, or null on refusal. Presentation callers bind it with `npc_finduid` before reading or changing the active NPC; they do not assume that a proc call exports its pointer state. Its owner/generation admission and the common attackability/timer guards are unchanged.
 
@@ -95,7 +95,7 @@ The UNKNOWN engineering policy is uniform over the complete set that satisfies t
 
 First runs permit all four corners and central doors. Consecutive begin/latch/reset cycles exclude the preceding run's corner and central door, including after save/load and relog. Search preserves the layout and draws nothing. Begin, paid reset and a wrong puzzle answer are the draw events. Original door transforms remain personal; shared wall collision never changes.
 
-Open-door operations transfer between measured room-side tiles in the clicked lane. Central access remains closed until the later puzzle slice supplies authorization. No door encounter, puzzle or chest operation is reachable in this prefix.
+Open-door operations transfer between measured room-side tiles in the clicked lane. Central access remains closed until the later puzzle slice supplies authorization. The topology fixtures retain their lock, movement and shared-collision assertions while allowing S08's encounter draw. Puzzle and chest operations remain unreachable in this prefix.
 
 ## Hidden tunnel (S05)
 
@@ -116,3 +116,13 @@ The native protected timer repeats every tick and stores its exact Prayer remain
 Face clearing sends `if_setobject(component, null, 1)` for every slot. The packed test runs the native IF_SETOBJECT encoder, decodes packet 21 as the 377 client does and asserts object 65535 changes every slot's model type to none. A hide-only negative control demonstrates why IF_SETHIDE cannot clear these model components; repeated faces cannot accumulate.
 
 When a due drain leaves Prayer at zero, the same callback deactivates every active native prayer. A positive control leaves prayers active while points remain. Every nonempty high-detail face selection consumes exactly one random draw; B=0 and low detail consume none.
+
+## Door encounters (S08)
+
+```sh
+node --import tsx ../content/tests/barrows/test_doors.mjs
+```
+
+Each successful traversal attempts one encounter in its destination room. The CANDIDATE table has exactly 12 brother, 52 skeleton, 32 bloodworm and 32 crypt-rat outcomes. Shared living occupancy admits a spawn at 10 enemies and suppresses it at 11. Paid traversals choose an uncredited brother instead of the 128-way table. An empty brother pool gives no spawn for a brother outcome or a paid traversal; ordinary unlooted outcomes still spawn.
+
+Placement uses the measured landing tile, the named 0-to-2 radius and line-of-walk mode. Every tile of the selected NPC's footprint must be unblocked and in the destination room, without overlapping another NPC footprint. The overlap guard preserves native NPC occupancy when the summon is removed. An unsuccessful placement does not undo traversal or repeat the draw. Living twins remain eligible, but their identity credits only once. Owner, generation, killer attribution and cleanup use the existing S03/S04 contract.

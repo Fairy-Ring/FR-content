@@ -18,7 +18,7 @@ if ($destination = null) return;
 p_stopaction;
 p_telejump($destination);
 sound_synth(door_open, 1, 0);
-// S08 attaches its one destination-room encounter attempt here, after transfer.
+~barrows_door_encounter($destination);
 
 // Measured room-side tiles at both faces of every mapped opening. Internal
 // corridors transfer room to room, so a redraw cannot trap a player between walls.

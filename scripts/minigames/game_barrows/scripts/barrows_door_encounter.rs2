@@ -1,0 +1,95 @@
+// CANDIDATE D4 encounters. The original map fixes room boundaries; placement,
+// summon lifetime and owner-and-killer credit are named UNKNOWN engineering policy.
+[proc,barrows_door_room](coord $tile)(int)
+if (~barrows_in_tunnels($tile) = false) return(-1);
+def_int $x = coordx($tile);
+def_int $z = coordz($tile);
+// Exterior corridor ends are separate destinations, not second door attempts.
+if ($x <= 3528) return(9);
+if ($x >= 3575) return(10);
+if ($z <= 9671) return(11);
+if ($z >= 9718) return(12);
+def_int $column = divide(sub($x, 3529), 17);
+def_int $row = divide(sub($z, 9672), 17);
+if (modulo(sub($x, 3529), 17) > 11 | modulo(sub($z, 9672), 17) > 11) return(-1);
+return(add(multiply($row, 3), $column));
+
+// A live twin does not remove an identity from this pool. Only slain bits do.
+[proc,barrows_door_brother]()(npc)
+def_int $count = 0;
+def_int $identity = 1;
+while ($identity <= ^barrows_identity_count) {
+    if (~barrows_brother_slain($identity) = false) $count = add($count, 1);
+    $identity = add($identity, 1);
+}
+if ($count = 0) return(null);
+def_int $rank = random($count);
+$identity = 1;
+while ($identity <= ^barrows_identity_count) {
+    if (~barrows_brother_slain($identity) = false) {
+        if ($rank = 0) return(enum(int, npc, barrows_identity_brother, $identity));
+        $rank = sub($rank, 1);
+    }
+    $identity = add($identity, 1);
+}
+return(null);
+
+[proc,barrows_door_select]()(npc)
+if (~barrows_phase = ^barrows_phase_paid) return(~barrows_door_brother);
+if (~barrows_phase ! ^barrows_phase_unlooted) return(null);
+def_int $class = ~barrows_door_class(enum(int, string, barrows_door_draw_class, random(^barrows_door_draw_count)));
+if ($class = ^barrows_door_class_brother) return(~barrows_door_brother);
+return(enum(int, npc, barrows_door_class_npc, $class));
+
+// map_findsquare searches one legal 1x1 square. Check the complete selected NPC
+// footprint as well. Its origin is a valid result because this rule permits radius 0.
+[proc,barrows_door_tile](coord $landing, npc $type)(coord)
+def_int $room = ~barrows_door_room($landing);
+if ($room = -1) return(null);
+def_coord $tile = map_findsquare($landing, ^barrows_door_spawn_min_radius, ^barrows_door_spawn_radius, ^map_findsquare_lineofwalk);
+def_int $size = nc_size($type);
+def_int $x = 0;
+while ($x < $size) {
+    def_int $z = 0;
+    while ($z < $size) {
+        def_coord $part = movecoord($tile, $x, 0, $z);
+        if (~barrows_door_room($part) ! $room | map_blocked($part) = true) return(null);
+        $z = add($z, 1);
+    }
+    $x = add($x, 1);
+}
+// Native map_blocked excludes NPC occupancy. Do not overlap a second footprint:
+// removing this summon would clear that actor's non-reference-counted collision.
+def_int $tile_x = coordx($tile);
+def_int $tile_z = coordz($tile);
+def_int $end_x = add($tile_x, $size);
+def_int $end_z = add($tile_z, $size);
+.npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
+while (.npc_findnext = true) {
+    def_coord $occupied = .npc_coord;
+    def_int $occupied_x = coordx($occupied);
+    def_int $occupied_z = coordz($occupied);
+    def_int $occupied_size = nc_size(.npc_type);
+    if ($tile_x < add($occupied_x, $occupied_size) & $end_x > $occupied_x & $tile_z < add($occupied_z, $occupied_size) & $end_z > $occupied_z) return(null);
+}
+return($tile);
+
+[proc,barrows_door_encounter](coord $landing)
+if (~barrows_in_tunnels(coord) = false | %barrows_generation <= 0) return;
+if (~barrows_phase ! ^barrows_phase_unlooted & ~barrows_phase ! ^barrows_phase_paid) return;
+def_int $room = ~barrows_door_room($landing);
+if ($room = -1) return;
+def_int $count = 0;
+// Shared physical occupancy includes ordinary monsters and either player's summons.
+// The secondary pointer preserves the caller's primary actor across this scan.
+.npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
+while (.npc_findnext = true) {
+    if (.npc_stat(hitpoints) > 0 & ~barrows_door_room(.npc_coord) = $room) $count = add($count, 1);
+}
+if ($count >= ^barrows_door_room_cap) return;
+def_npc $type = ~barrows_door_select;
+if ($type = null) return;
+def_coord $tile = ~barrows_door_tile($landing, $type);
+if ($tile = null) return;
+if (npc_finduid(~barrows_actor_spawn($type, $tile, ^barrows_door_summon_lifetime)) = false) return;
+npc_setmode(opplayer2);

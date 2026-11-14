@@ -1059,10 +1059,13 @@ function main() {
     let lockedPathNegativeChecked = false;
     let openPathPositiveChecked = false;
     let doorRandomCalls = 0;
+    let doorTransferCount = 0;
+    let eligibleDoorTransferCount = 0;
     const originalRandom = JavaRandom.nextDouble;
     JavaRandom.nextDouble = function () {
       doorRandomCalls++;
-      return originalRandom.call(this);
+      // S08's one monster-class draw is separate from a topology redraw.
+      return 0.5;
     };
     try {
       for (const placement of doorRows) {
@@ -1124,8 +1127,15 @@ function main() {
           const openTrigger = setNativeLocTarget(doorA, placement.loc);
           assert.equal(openMask & (1 << placement.lockBit), 0, `${placement.name}: the product helper receives this player's unlocked lock bit`);
           const aBeforeTransfer = snapshotPlayer(doorA);
+          const nativeNpcsBefore = Array.from(World.npcs).filter(npc => npc.isActive);
+          const randomBeforeTransfer = doorRandomCalls;
           runSelected(doorA, openTrigger, placement.loc, `${placement.name} ${placement.edge}`);
+          doorTransferCount++;
           const landed = { level: doorA.level, x: doorA.x, z: doorA.z };
+          const destinationOccupants = nativeNpcsBefore.filter(npc => npc.level === landed.level && withinBounds(npc, nodeBounds[other]));
+          const eligibleDraw = destinationOccupants.length < 11;
+          if (eligibleDraw) eligibleDoorTransferCount++;
+          assert.equal(doorRandomCalls - randomBeforeTransfer, Number(eligibleDraw), `${placement.name}: only a below-cap destination consumes its fixed monster-class draw`);
           assert.equal(landed.level, placement.level, `${placement.name}: transfer remains on the measured tunnel level`);
           assert.equal(landed[placement.laneAxis], placement[placement.laneAxis], `${placement.name}: transfer preserves the clicked lane`);
           assert(manhattan(landed, source) > 0, `${placement.name}: allowed transfer leaves its source tile`);
@@ -1139,6 +1149,9 @@ function main() {
           assert.deepEqual(snapshotPlayer(doorA), aBeforeTransfer, `${placement.name}: door use changes no stored topology or generation`);
           assert.deepEqual(snapshotPlayer(doorB), bOpenBefore, `${placement.name}: A's allowed transfer cannot alter B's same-generation layout`);
           assert.equal(doorA.getVarBit(lockVarbit), 0, `${placement.name}: A retains its own unlocked door visual`);
+          // S08 owns encounter assertions in test_doors. Remove only A's summons
+          // between these map-lane fixtures so their collision snapshots stay local.
+          procVoid(doorA, 'barrows_remove_owned');
           assert.equal(doorB.getVarBit(lockVarbit), 1, `${placement.name}: B retains its own locked door visual`);
         }
         coverage.set(placement.edge, edgeCoverage);
@@ -1153,9 +1166,10 @@ function main() {
       }
       assert(lockedPathNegativeChecked, 'one representative locked internal corridor has a native pathfinder negative');
       assert(openPathPositiveChecked, 'one representative unlocked internal transfer has a native walk-positive control');
-      assert.equal(doorRandomCalls, 0, 'personal door operations never redraw topology');
+      assert(eligibleDoorTransferCount > 0 && eligibleDoorTransferCount < doorTransferCount, 'original map rooms exercise both below-cap and full-room traversals');
+      assert.equal(doorRandomCalls, eligibleDoorTransferCount, 'below-cap traversals draw one S08 monster outcome; full rooms and refusals draw none');
       assert.deepEqual(worldMutations, [], 'personal door operations never call World loc add/change/remove/revert');
-      assert.equal(World.getTotalNpcs(), npcCountBeforeDoors, 'personal door operations never spawn or remove NPCs');
+      assert.equal(World.getTotalNpcs(), npcCountBeforeDoors, 'door encounter cleanup preserves every pre-existing map NPC');
       // Native transfers move PLAYER_OCC too. Return both fixtures to their
       // initial tile before comparing every collision bit, including occupancy.
       setPosition(doorA, doorHome);
