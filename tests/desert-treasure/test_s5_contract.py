@@ -186,9 +186,12 @@ def main() -> int:
     require("%fd_icewarrior_subquest ! ^dt_ice_substate_crying" in offer, "sweet offer is limited to the crying substate")
     valid_foods = "cake, partial_cake, cake_slice, chocolate_cake, partial_chocolate_cake, chocolate_slice, chocolate_bar"
     require(valid_foods in offer, "offer accepts the sourced cake/chocolate portions only")
-    require("def_obj $sweet = last_useitem;" in offer and offer.count("inv_del(inv, $sweet, 1)") == 1 and offer.index("inv_total(inv, $sweet) = 0") < offer.index("inv_del(inv, $sweet, 1)"),
+    confirm_at = offer.find("inv_total(inv, $sweet) = 0")
+    consume_at = offer.find("inv_del(inv, $sweet, 1)")
+    intro_at = offer.find("%fd_trollchild_intro = 1")
+    require("def_obj $sweet = last_useitem;" in offer and offer.count("inv_del(inv, $sweet, 1)") == 1 and 0 <= confirm_at < consume_at,
             "valid sweet food is captured before dialogue and consumed exactly once after inventory confirmation")
-    require(offer.index("inv_del(inv, $sweet, 1)") < offer.index("%fd_trollchild_intro = 1"), "intro flag follows the one-time food consume")
+    require(0 <= consume_at < intro_at, "intro flag follows the one-time food consume")
     choice = block(child, "proc", "dt_ice_child_talk")
     require(choice.count("%fd_icewarrior_subquest = ^dt_ice_substate_agreed") == 1 and "if ($choice = 1)" in choice and "} else {" in choice,
             "only acceptance advances the child to agreed; decline leaves substate unchanged")
@@ -199,7 +202,7 @@ def main() -> int:
     require("gosub(npc_default_death)" in death and "npc_findhero = ^false" in death, "native troll death handler credits only the native combat hero")
     require("%fd_icewarrior_subquest ! ^dt_ice_substate_agreed" in death and "%deserttreasure < ^dt_stage_hunts" in death,
             "troll kills require S5 hunt stage and an agreed child")
-    require("inzone(0_44_58_23_0, 0_44_58_55_45, $killed_at) = false" in death, "kill credit is restricted to the Ice troll valley")
+    require("inzone(^dt_ice_troll_valley_sw, ^dt_ice_troll_valley_ne, $killed_at) = false" in death, "kill credit is restricted to the Ice troll valley")
     credit = block(trolls, "queue", "dt_ice_troll_credit")
     require("queue(dt_ice_troll_credit, 0, 0)" in death and "min(^dt_ice_trolls_required, add(%fd_icewarrior_trollskilled, 1))" in credit,
             "native hero queues protected troll credit and saturates the count at five")
@@ -302,25 +305,25 @@ def main() -> int:
     gate = block(route, "proc", "dt_ice_gate")
     require("%fd_icewarrior_subquest < ^dt_ice_substate_agreed" in gate and "agility_exactmove" in gate,
             "original lower gates require agreement and use only short local transit")
-    cave_transit = enter.count("p_teleport(0_44_58_59_8)") == 1 and "p_teleport" not in enter.replace("p_teleport(0_44_58_59_8)", "")
+    cave_transit = enter.count("p_teleport(^dt_ice_cave_east)") == 1 and "p_teleport" not in enter.replace("p_teleport(^dt_ice_cave_east)", "")
     require(cave_transit, "cave transit is limited to its original short tunnel endpoint")
     ledge = block(route, "oploc1", "trollrescue_blankmodel")
-    require("inv_getobj(worn, ^wearpos_feet) ! death_spikedboots" in ledge and "p_telejump(1_44_59_22_27)" in ledge and "p_telejump(0_44_59_22_27)" in ledge,
+    require("inv_getobj(worn, ^wearpos_feet) ! death_spikedboots" in ledge and "p_telejump(^dt_ice_ledge_upper)" in ledge and "p_telejump(^dt_ice_ledge_lower)" in ledge,
             "original ledge requires worn spiked boots and retains only its local height transition")
     require("113-tile ridge is walked" in route and "p_teleport" not in ledge, "natural ridge walk is retained")
     upper = block(route, "proc", "dt_ice_upper_gate")
-    require("%fd_icewarrior_dead = 0" in upper and "p_telejump(2_44_59_35_33)" in upper,
+    require("%fd_icewarrior_dead = 0" in upper and "p_telejump(^dt_ice_bridge_arrival)" in upper,
             "original upper gate remains Kamil-gated and locally connected")
 
     area = block(cold, "proc", "dt_ice_cold_area")
     damage = block(cold, "queue", "dt_ice_cold_damage")
     require("stat($stat) > 1) stat_sub($stat, 1, 0)" in damage and "healenergy(-10000)" in damage,
             "cold drains non-HP stats by one to floor one and empties energy")
-    require("min(add(random(2), 1), max(0, sub(stat(hitpoints), 1)))" in damage,
-            "cold deals selected 1-2 damage but cannot reduce HP below one")
-    require("random(^dt_ice_slip_chance)" in cold and "queue(dt_ice_slip, 0, 0)" in cold and "%fd_icewarrior" not in cold and "%fd_trollchild_intro" not in cold,
-            "slips/freezes use existing timing only and add no saved Ice state")
-    require("^dt_ice_cold_ticks = 17" in timing and "selected" in timing.lower(), "17-tick cadence is explicitly a selected product value")
+    require("min(1, max(0, sub(stat(hitpoints), 1)))" in damage,
+            "cold deals period one-hitpoint damage and cannot reduce HP below one")
+    require("stat_random(agility, ^dt_ice_slip_low, ^dt_ice_slip_high)" in cold and "queue(dt_ice_slip, 0, 0)" in cold and "%fd_icewarrior" not in cold and "%fd_trollchild_intro" not in cold,
+            "Agility-dependent slips use existing timing and add no saved Ice state")
+    require("^dt_ice_cold_ticks = 10" in timing and "CANDIDATE" in timing, "six-second cadence is labelled CANDIDATE")
     require(bool(area) and "settimer(dt_ice_cold, ^dt_ice_cold_ticks)" in cold, "cold cadence is zone-scoped and rescheduled")
 
     for field in (

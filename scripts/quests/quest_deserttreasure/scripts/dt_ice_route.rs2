@@ -1,4 +1,4 @@
-// CANDIDATE transit endpoints measured against original 377 placements and collision.
+// UNKNOWN engineering transit endpoints measured against original 377 placements and collision.
 [oploc1,icegate_left] ~dt_ice_gate;
 [oploc1,icegate_right] ~dt_ice_gate;
 
@@ -7,14 +7,14 @@ if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest < ^dt_ice_substa
     mes("The bars are frozen tightly shut and a sturdy layer of ice prevents you from slipping through.");
     return;
 }
-if (coordx(coord) < 2838) {
+if (coordx(coord) < ^dt_ice_gate_divider_x) {
     ~chatnpc_specific("Troll child", fourdiamonds_troll_child_okay, "Oh, I'm sorry. My mommy says that we ice trolls are so cold we can freeze the air around us when we are upset or angry.");
     ~chatnpc_specific("Troll child", fourdiamonds_troll_child_okay, "I'm afraid I must have frozen those gates too much when I was crying, but since you told me you are going to help rescue my mommy and daddy you should be able to squeeze through the bars.");
     ~chatnpc_specific("Troll child", fourdiamonds_troll_child_okay, "You are much smaller than most trolls, it should be easy for you!");
-    ~agility_exactmove(human_walk_f, 0, 1, 0_44_58_21_25, 0_44_58_23_25, 0, 60, ^exact_east, false);
+    ~agility_exactmove(human_walk_f, 0, 1, ^dt_ice_gate_west, ^dt_ice_gate_east, 0, ^dt_ice_gate_move_speed, ^exact_east, false);
     ~dt_ice_enter_zone;
 } else {
-    ~agility_exactmove(human_walk_f, 0, 1, 0_44_58_23_25, 0_44_58_21_25, 0, 60, ^exact_west, false);
+    ~agility_exactmove(human_walk_f, 0, 1, ^dt_ice_gate_east, ^dt_ice_gate_west, 0, ^dt_ice_gate_move_speed, ^exact_west, false);
     cleartimer(dt_ice_cold);
 }
 mes("You squeeze through the large icy bars of the gate.");
@@ -33,11 +33,11 @@ if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest < ^dt_ice_substa
     return;
 }
 // Short tunnel, from one original cave mouth to the other; the wolf valley remains on foot.
-p_teleport(0_44_58_59_8);
+p_teleport(^dt_ice_cave_east);
 ~dt_ice_enter_zone;
 
 [oploc1,trollrescue_troll_cave_exit]
-p_teleport(0_44_58_51_8);
+p_teleport(^dt_ice_cave_west);
 ~dt_ice_enter_zone;
 
 [oploc1,trollrescue_blankmodel]
@@ -48,8 +48,8 @@ if (inv_getobj(worn, ^wearpos_feet) ! death_spikedboots) {
     return;
 }
 // Only the original ledge's local height transition; the full 113-tile ridge is walked.
-if (coordy(coord) = 0) p_telejump(1_44_59_22_27);
-else p_telejump(0_44_59_22_27);
+if (coordy(coord) = 0) p_telejump(^dt_ice_ledge_upper);
+else p_telejump(^dt_ice_ledge_lower);
 ~dt_ice_enter_zone;
 
 [oploc1,icegate_left_small] ~dt_ice_upper_gate;
@@ -58,12 +58,12 @@ else p_telejump(0_44_59_22_27);
 [proc,dt_ice_upper_gate]
 if (%fd_icewarrior_dead = 0) return;
 // Original gate joins the end of the level-one ridge to the level-two bridge.
-p_telejump(2_44_59_35_33);
+p_telejump(^dt_ice_bridge_arrival);
 mes("You Squeeze through the large icy bars of the gate.");
 ~dt_ice_enter_zone;
 
 [oploc1,trollrescue_blankmodel2]
-p_telejump(1_44_59_39_33);
+p_telejump(^dt_ice_ridge_arrival);
 ~dt_ice_enter_zone;
 
 [queue,dt_ice_slip]
@@ -72,4 +72,4 @@ p_stopaction;
 if_close;
 anim(human_walk_logbalance_stumble, 0);
 ~damage_self(^dt_ice_slip_damage);
-p_delay(^dt_ice_freeze_ticks);
+p_delay(^dt_ice_slip_ticks);

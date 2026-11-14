@@ -289,7 +289,7 @@ def check_original_entity_configs() -> None:
     }
     for index in range(1, 8):
         s5_behaviour[f"trollrescue_icetroll_melee{index}"] = {
-            "wanderrange": "3", "maxrange": "7", "attackrange": "1", "respawnrate": "83",
+            "wanderrange": "3", "maxrange": "7", "attackrange": "1", "respawnrate": "50",
             "huntmode": "aggressive_melee", "huntrange": "5",
             "param": (
                 "attackrate,4", "attackbonus,60", "strengthbonus,60", "stabdefence,30",
@@ -299,7 +299,7 @@ def check_original_entity_configs() -> None:
         }
     for index in range(1, 7):
         s5_behaviour[f"ice_wolf_{index}"] = {
-            "wanderrange": "3", "maxrange": "7", "attackrange": "1", "respawnrate": "17",
+            "wanderrange": "3", "maxrange": "7", "attackrange": "1", "respawnrate": "10",
             "huntmode": "aggressive_melee", "huntrange": "5",
             "param": (
                 "attackrate,4", "damagetype,^stab_style", "attack_anim,dog_attack",

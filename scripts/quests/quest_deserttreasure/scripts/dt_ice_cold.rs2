@@ -1,6 +1,6 @@
 // CANDIDATE: source-backed drain, selected bounds/cadence; see ice-product-contract-1109.
 [proc,dt_ice_cold_area]()(boolean)
-if (inzone(0_44_58_23_0, 0_44_58_63_63, coord) = true | inzone(0_45_58_0_0, 0_45_58_31_63, coord) = true | inzone(0_44_59_16_0, 0_44_59_63_55, coord) = true | inzone(1_44_59_16_8, 1_44_59_63_47, coord) = true | inzone(2_44_59_8_24, 2_44_59_39_39, coord) = true) return(true);
+if (inzone(^dt_ice_cold_valley_sw, ^dt_ice_cold_valley_ne, coord) = true | inzone(^dt_ice_cold_wolves_sw, ^dt_ice_cold_wolves_ne, coord) = true | inzone(^dt_ice_cold_clearing_sw, ^dt_ice_cold_clearing_ne, coord) = true | inzone(^dt_ice_cold_ridge_sw, ^dt_ice_cold_ridge_ne, coord) = true | inzone(^dt_ice_cold_parents_sw, ^dt_ice_cold_parents_ne, coord) = true) return(true);
 return(false);
 
 [proc,dt_ice_enter_zone]
@@ -16,7 +16,7 @@ if (~dt_ice_cold_area = false) {
 }
 settimer(dt_ice_cold, ^dt_ice_cold_ticks);
 queue(dt_ice_cold_damage, 0, 0);
-if (coordy(coord) = 1 & random(^dt_ice_slip_chance) = 0) queue(dt_ice_slip, 0, 0);
+if (coordy(coord) = 1 & stat_random(agility, ^dt_ice_slip_low, ^dt_ice_slip_high) = false) queue(dt_ice_slip, 0, 0);
 ~dt_kamil_spawn;
 
 [queue,dt_ice_cold_damage]
@@ -29,8 +29,8 @@ while ($i <= enum_getoutputcount(stats)) {
 }
 healenergy(-10000);
 %sa_energy = 0;
-// Ice Path says 1-2; the quest page says 1. Choose 1-2, never fatal from cold alone.
-def_int $damage = min(add(random(2), 1), max(0, sub(stat(hitpoints), 1)));
+// Period guides agree on one hitpoint; cold alone never takes the last hitpoint.
+def_int $damage = min(1, max(0, sub(stat(hitpoints), 1)));
 if ($damage > 0) ~damage_self($damage);
 
 // Original zone coordinates; no new saved state or shared mapzone override.

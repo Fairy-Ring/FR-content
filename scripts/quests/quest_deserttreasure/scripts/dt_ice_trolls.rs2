@@ -12,8 +12,8 @@ def_coord $killed_at = npc_coord;
 gosub(npc_default_death);
 if (npc_findhero = ^false) return;
 if (%deserttreasure < ^dt_stage_hunts | %fd_icewarrior_subquest ! ^dt_ice_substate_agreed | %fd_icewarrior_trollskilled >= ^dt_ice_trolls_required) return;
-// CANDIDATE qualifying region: the original Ice troll valley before the cave.
-if (inzone(0_44_58_23_0, 0_44_58_55_45, $killed_at) = false) return;
+// UNKNOWN engineering bounds: the original Ice troll valley before the cave.
+if (inzone(^dt_ice_troll_valley_sw, ^dt_ice_troll_valley_ne, $killed_at) = false) return;
 queue(dt_ice_troll_credit, 0, 0);
 
 [queue,dt_ice_troll_credit]

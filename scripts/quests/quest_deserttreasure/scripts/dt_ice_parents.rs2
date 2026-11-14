@@ -19,7 +19,7 @@ def_int $damage = min(randominc(%com_maxhit), npc_stat(hitpoints));
 npc_heropoints($damage);
 if ($damage = 0) npc_damage(^hitmark_block, 0);
 else npc_damage(^hitmark_damage, $damage);
-%action_delay = add(map_clock, 4);
+%action_delay = add(map_clock, ^dt_ice_smash_ticks);
 if (npc_stat(hitpoints) = 0) {
     p_stopaction;
     ~dt_ice_block_broken($dad);
@@ -34,12 +34,12 @@ p_opnpc(2);
 
 [proc,dt_ice_block_broken](boolean $dad)
 if (npc_findhero = ^false) {
-    npc_statheal(hitpoints, 10, 0);
+    npc_statheal(hitpoints, ^dt_ice_block_hitpoints, 0);
     return;
 }
 queue*(dt_ice_block_freed, 0)($dad);
 // Keep the native multi-NPC for other players. Full healing also clears native hero points.
-npc_statheal(hitpoints, 10, 0);
+npc_statheal(hitpoints, ^dt_ice_block_hitpoints, 0);
 
 [queue,dt_ice_block_freed](boolean $dad)
 if (%deserttreasure < ^dt_stage_hunts) return;
@@ -90,6 +90,6 @@ if (%fd_icewarrior_subquest ! ^dt_ice_substate_parents_freed) return;
 ~chatnpc_specific("Troll father", fd_troll_dad, "Now, now dear, all's well that ends well. We've been freed and this fleshy has certainly earned himself that diamond.");
 ~chatnpc_specific("Troll father", fd_troll_dad, "Let's get out of this terrible place and see our son!");
 %fd_icewarrior_subquest = ^dt_ice_substate_family_returned;
-// CANDIDATE arrival: original family spawn, not a shortcut around the rescue route.
-p_teleport(0_44_58_20_27);
+// UNKNOWN engineering arrival: original family spawn, not a shortcut around the rescue route.
+p_teleport(^dt_ice_family_return);
 cleartimer(dt_ice_cold);

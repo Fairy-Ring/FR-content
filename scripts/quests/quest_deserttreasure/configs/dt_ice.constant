@@ -1,8 +1,56 @@
-// CANDIDATE product timings, not recovered 377 server constants.
-// Cold: Sal's says ten seconds; 17 native ticks approximate 10.2 seconds.
-^dt_ice_cold_ticks = 17
-// Kamil's later description gives a short full-action freeze, but no duration.
+// CANDIDATE: Zybez 20 February 2006 says six seconds, exactly ten ticks.
+// Sal's Realm 22 April 2006 says ten seconds instead; R2 selects the six-second account.
+^dt_ice_cold_ticks = 10
+// UNKNOWN (engineering default): duration passed to the published NPC movement freeze.
+// npc_freeze_player adds one boundary tick, exactly as for ordinary NPC Bind/Ice spells.
 ^dt_ice_freeze_ticks = 2
-// Slipping is source-backed; these odds and the one-hitpoint fall are selected.
-^dt_ice_slip_chance = 10
-^dt_ice_slip_damage = 1
+// UNKNOWN (engineering defaults): no period or earliest Old School source gives slip odds.
+// stat_random success bounds 218/242 give 231/256 success at Agility 50 (25/256 slips).
+// Old School quest rev 54053 (2 August 2006) and Ice Path rev 259988 (1 January 2015) give no odds.
+^dt_ice_slip_low = 218
+^dt_ice_slip_high = 242
+// CANDIDATE: RuneVillage 14 February 2006 and Sal's Realm 22 April 2006 state two damage.
+^dt_ice_slip_damage = 2
+// UNKNOWN (engineering default): selected stumble pause, independent of Kamil's freeze.
+^dt_ice_slip_ticks = 2
+// UNKNOWN (engineering default): native Smash repetition interval.
+^dt_ice_smash_ticks = 4
+// CANDIDATE: RuneHQ 24 April 2006, Ice diamond, gives ten Hitpoints per block.
+^dt_ice_block_hitpoints = 10
+// CANDIDATE: RuneVillage 14 February 2006 describes Kamil's five-damage special.
+^dt_ice_kamil_magic_maxhit = 5
+// UNKNOWN (engineering defaults): owned spawn, search, lifetime and owner leash.
+^dt_ice_kamil_lifetime = 1000
+^dt_ice_kamil_search_radius = 40
+^dt_ice_kamil_owner_range = 32
+^dt_ice_kamil_spawn = 0_44_59_29_4
+^dt_ice_kamil_clearing_sw = 0_44_59_24_0
+^dt_ice_kamil_clearing_ne = 0_44_59_31_7
+// UNKNOWN (engineering default): one-tile adjacent search, using the published abyssal teleport form.
+^dt_ice_kamil_adjacent_radius = 1
+// UNKNOWN (engineering defaults): original map placements do not recover script arrival tiles or timings.
+^dt_ice_gate_divider_x = 2838
+^dt_ice_gate_west = 0_44_58_21_25
+^dt_ice_gate_east = 0_44_58_23_25
+^dt_ice_gate_move_speed = 60
+^dt_ice_cave_east = 0_44_58_59_8
+^dt_ice_cave_west = 0_44_58_51_8
+^dt_ice_ledge_upper = 1_44_59_22_27
+^dt_ice_ledge_lower = 0_44_59_22_27
+^dt_ice_bridge_arrival = 2_44_59_35_33
+^dt_ice_ridge_arrival = 1_44_59_39_33
+^dt_ice_family_return = 0_44_58_20_27
+// UNKNOWN (engineering defaults): selected valley kill-credit rectangle.
+^dt_ice_troll_valley_sw = 0_44_58_23_0
+^dt_ice_troll_valley_ne = 0_44_58_55_45
+// UNKNOWN (engineering defaults): selected cold envelopes, not recovered historical script bounds.
+^dt_ice_cold_valley_sw = 0_44_58_23_0
+^dt_ice_cold_valley_ne = 0_44_58_63_63
+^dt_ice_cold_wolves_sw = 0_45_58_0_0
+^dt_ice_cold_wolves_ne = 0_45_58_31_63
+^dt_ice_cold_clearing_sw = 0_44_59_16_0
+^dt_ice_cold_clearing_ne = 0_44_59_63_55
+^dt_ice_cold_ridge_sw = 1_44_59_16_8
+^dt_ice_cold_ridge_ne = 1_44_59_63_47
+^dt_ice_cold_parents_sw = 2_44_59_8_24
+^dt_ice_cold_parents_ne = 2_44_59_39_39
