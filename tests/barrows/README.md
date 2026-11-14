@@ -138,3 +138,13 @@ The original main interface renders three prompts and three real answer buttons 
 The packed fixture covers all 24 presentations and all 72 native button positions. It checks the measured graph, single visible ladder and sole open ladder-room door after begin, reset and every wrong answer; Search draws nothing. Native main-modal access freezes both halves of the shared saved countdown without replacing its normal timer. A face already displayed can keep pulsing in the client until callbacks resume and clear it at the saved fade remainder. The real incoming NPC melee path cancels the modal and its buttons before queued damage; it retains the layout, selectors, raw puzzle field and timer.
 
 Cancellation clears only challenge activity. Correct answers and ordinary save/load retain solved authorization, family, permutation and the raw client field. Search/payment and the post-Search inward-door policy are not reachable in this prefix.
+
+## Shared login compatibility
+
+`test_core.mjs` also executes the real protected login for a native account with all Barrows fields unset. It compares every saved varp value, the game messages, native interface packets and final coordinates against `inert-login-baseline.json`, captured from the published pack. This observable contract is independent of the shared login's bytecode hash.
+
+To reproduce the reference side with an independently built published pack:
+
+```sh
+BARROWS_PUBLISHED_LOGIN_PACK=../reference-engine/data/pack node --import tsx ../content/tests/barrows/test_core.mjs
+```
