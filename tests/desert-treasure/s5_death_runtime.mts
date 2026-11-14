@@ -424,10 +424,14 @@ runPacked(cold); queues();
 assert.equal(hero.levels[PlayerStat.HITPOINTS], 1, "cold cannot take the last hitpoint");
 assert(hero.levels.every(value => value === 1), "all non-HP drains also floor at one");
 // Leave after a successful inside pulse, with a live timer still armed.
-hero.x = 3222; hero.z = 3222;
+hero.x = 2912; hero.z = 3753; // Authorized Trollweiss map-exit fixture: outside both cold systems.
 hero.levels.fill(80);
 hero.runenergy = 7500;
 hero.setVar(VarPlayerType.getId("sa_energy"), 600);
+const outsideArea = ScriptRunner.init(packed("[proc,dt_ice_cold_area]"), hero);
+hero.executeScript(outsideArea, true);
+assert.equal(outsideArea.execution, ScriptState.FINISHED);
+assert.equal(outsideArea.popInt(), 0, "the shared outside-Trollweiss fixture is outside the Ice cold area");
 const outsideStats = [...hero.levels];
 World.currentTick += 10;
 hero.processTimers(PlayerTimerType.NORMAL);
@@ -454,7 +458,7 @@ for (let seed = 0; seed < 1000000 && seeds.size < 256; seed++) {
   if (!seeds.has(chance)) seeds.set(chance, seed);
 }
 assert.equal(seeds.size, 256, "deterministic seeds cover every native chance bucket");
-for (const [agility, success, expectedSlips] of [[1, 219, 37], [50, 231, 25], [99, 243, 13]]) {
+for (const [agility, success, expectedSlips] of [[1, 129, 127], [50, 192, 64], [99, 256, 0]]) {
   let slips = 0;
   hero.levels[PlayerStat.AGILITY] = agility;
   for (const [chance, seed] of seeds) {
@@ -466,7 +470,7 @@ for (const [agility, success, expectedSlips] of [[1, 219, 37], [50, 231, 25], [9
     if (slipped) slips++;
   }
   assert.equal(slips, expectedSlips, `Agility ${agility} slip chance is ${expectedSlips}/256`);
-  console.log(`PASS packed Agility ${agility}: ${slips}/256 slips from success bounds 218/242`);
+  console.log(`PASS packed Agility ${agility}: ${slips}/256 slips from success bounds 128/255`);
 }
 
 resetIce();

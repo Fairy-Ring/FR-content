@@ -4,11 +4,11 @@
 // UNKNOWN (engineering default): duration passed to the published NPC movement freeze.
 // npc_freeze_player adds one boundary tick, exactly as for ordinary NPC Bind/Ice spells.
 ^dt_ice_freeze_ticks = 2
-// UNKNOWN (engineering defaults): no period or earliest Old School source gives slip odds.
-// stat_random success bounds 218/242 give 231/256 success at Agility 50 (25/256 slips).
-// Old School quest rev 54053 (2 August 2006) and Ice Path rev 259988 (1 January 2015) give no odds.
-^dt_ice_slip_low = 218
-^dt_ice_slip_high = 242
+// CANDIDATE: Old School Ice Path rev 15232810 (13 June 2026), success bounds 128/255.
+// 2026 data; no change note found; the period guides give only the direction.
+// Native stat_random adds one: falls at Agility 1/50/99 are 127/256, 64/256 and 0/256.
+^dt_ice_slip_low = 128
+^dt_ice_slip_high = 255
 // CANDIDATE: RuneVillage 14 February 2006 and Sal's Realm 22 April 2006 state two damage.
 ^dt_ice_slip_damage = 2
 // UNKNOWN (engineering default): selected stumble pause, independent of Kamil's freeze.
