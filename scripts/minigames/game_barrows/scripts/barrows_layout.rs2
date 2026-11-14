@@ -1,42 +1,77 @@
-// CANDIDATE D2. Include all nine rooms and the four paired exterior corridors.
-// Each exterior corridor has only its paired lock, so connectivity opens a/b/h/p.
-// Each side room then needs d/f, c/k, g/m or n/o: first, second or both.
-// Four ternary digits enumerate all 81 connected layouts for a selected centre edge.
-[proc,barrows_layout_mask](int $entrance, int $rank)(int)
-def_int $locks = ^barrows_lock_mask;
-$locks = clearbit($locks, 0);
-$locks = clearbit($locks, 1);
-$locks = clearbit($locks, 7);
-$locks = clearbit($locks, 15);
-$locks = clearbit($locks, enum(int, int, barrows_central_lock_bit, $entrance));
-def_int $side = 0;
-while ($side < ^barrows_corner_count) {
-    def_int $choice = modulo($rank, 3);
-    if ($choice ! 1) $locks = clearbit($locks, enum(int, int, barrows_side_first_lock_bit, $side));
-    if ($choice ! 0) $locks = clearbit($locks, enum(int, int, barrows_side_second_lock_bit, $side));
-    $rank = divide($rank, 3);
-    $side = add($side, 1);
-}
-return($locks);
+// CANDIDATE D2: the nine rooms connect; the ladder room has exactly one door.
+// The packed table lists every valid outer mask in ascending order per corner.
+// Paired exterior corridors may be closed. One selected central lock is opened.
+[proc,barrows_layout_mask](int $entrance, int $corner, int $rank)(int)
+def_int $locks = enum(int, int, barrows_layout_locks, add(multiply($corner, ^barrows_layout_count), $rank));
+return(clearbit($locks, enum(int, int, barrows_central_lock_bit, $entrance)));
 
 [proc,barrows_ladder_corner]()(int)
 return(getbit_range(%barrows_state, ^barrows_corner_start, ^barrows_corner_end));
 
-[proc,barrows_layout_choose]
-~barrows_layout_draw(-1);
+// Only exterior corridors need an additional occupancy constraint: all nine
+// rooms already connect, and an internal transfer never leaves a player in its gap.
+[proc,barrows_layout_occupied_lock]()(int)
+if (~barrows_in_tunnels(coord) = false) return(-1);
+if (coordx(coord) <= 3528) return(1);
+if (coordx(coord) >= 3575) return(7);
+if (coordz(coord) <= 9671) return(15);
+if (coordz(coord) >= 9718) return(0);
+return(-1);
 
-// UNKNOWN uniform sampling policy; repetition of the ladder corner is allowed.
-// This invocation never suspends or exposes a view with partially written fields.
-[proc,barrows_layout_draw](int $excluded_entrance)
-def_int $corner = random(^barrows_corner_count);
-def_int $entrance;
-if ($excluded_entrance = -1) {
-    $entrance = random(^barrows_corner_count);
-} else {
-    $entrance = random(sub(^barrows_corner_count, 1));
-    if ($entrance >= $excluded_entrance) $entrance = add($entrance, 1);
+// Packed counts index the complete mask table; they are not another draw rule.
+[proc,barrows_layout_available](int $corner, int $occupied_lock)(int)
+if ($occupied_lock = -1) return(^barrows_layout_count);
+return(enum(int, int, barrows_layout_corridor_count, add(multiply($corner, 16), $occupied_lock)));
+
+[proc,barrows_layout_rank](int $corner, int $occupied_lock, int $rank)(int)
+if ($occupied_lock = -1) return($rank);
+def_int $base = multiply($corner, ^barrows_layout_count);
+def_int $candidate = -1;
+while ($rank >= 0) {
+    $candidate = add($candidate, 1);
+    if (testbit(enum(int, int, barrows_layout_locks, add($base, $candidate)), $occupied_lock) = 0) $rank = sub($rank, 1);
 }
-def_int $locks = ~barrows_layout_mask($entrance, random(^barrows_layout_count));
+return($candidate);
+
+// UNKNOWN engineering: one uniform draw over the complete allowed set.
+// Entrance-major, corner-major, then mask rank gives each layout one index.
+// First runs pass -1; later runs exclude the saved selectors of the prior run.
+[proc,barrows_layout_choose](int $excluded_corner, int $excluded_entrance)
+def_int $occupied_lock = ~barrows_layout_occupied_lock;
+def_int $count = 0;
+def_int $corner = 0;
+while ($corner < ^barrows_corner_count) {
+    if ($corner ! $excluded_corner) $count = add($count, ~barrows_layout_available($corner, $occupied_lock));
+    $corner = add($corner, 1);
+}
+def_int $entrance_count = ^barrows_corner_count;
+if ($excluded_entrance ! -1) $entrance_count = sub($entrance_count, 1);
+def_int $index = random(multiply($count, $entrance_count));
+def_int $entrance = divide($index, $count);
+if ($excluded_entrance ! -1 & $entrance >= $excluded_entrance) $entrance = add($entrance, 1);
+$index = modulo($index, $count);
+$corner = 0;
+while ($corner < ^barrows_corner_count) {
+    if ($corner ! $excluded_corner) {
+        def_int $available = ~barrows_layout_available($corner, $occupied_lock);
+        if ($index < $available) {
+            ~barrows_layout_write($corner, $entrance, ~barrows_layout_rank($corner, $occupied_lock, $index));
+            return;
+        }
+        $index = sub($index, $available);
+    }
+    $corner = add($corner, 1);
+}
+
+// Reset fixes the completed run's selectors, but uniformly redraws its idle mask.
+[proc,barrows_layout_draw](int $corner, int $entrance)
+def_int $occupied_lock = ~barrows_layout_occupied_lock;
+def_int $rank = random(~barrows_layout_available($corner, $occupied_lock));
+~barrows_layout_write($corner, $entrance, ~barrows_layout_rank($corner, $occupied_lock, $rank));
+
+// No suspension or view occurs between any of these field writes.
+[proc,barrows_layout_write](int $corner, int $entrance, int $rank)
+def_int $locks = ~barrows_layout_mask($entrance, $corner, $rank);
 %barrows = setbit_range_toint(%barrows, $locks, ^barrows_locks_start, ^barrows_locks_end);
 %barrows = setbit_range_toint(%barrows, setbit(0, $corner), ^barrows_ladder_start, ^barrows_ladder_end);
 %barrows = clearbit_range(%barrows, ^barrows_puzzle_start, ^barrows_puzzle_end);
@@ -45,10 +80,10 @@ def_int $locks = ~barrows_layout_mask($entrance, random(^barrows_layout_count));
 %barrows_state = clearbit_range(%barrows_state, ^barrows_solved_bit, ^barrows_challenge_bit);
 
 // S09 calls this only after validating its bound answer. No player operation
-// reaches it in S07. Every room and exterior corridor retains a route after redraw.
+// reaches it in S07. The current vertex retains a route into the nine rooms.
 [proc,barrows_layout_wrong](int $generation)(boolean)
 if (~barrows_phase ! ^barrows_phase_unlooted | %barrows_generation ! $generation | ~barrows_in_tunnels(coord) = false) return(false);
 def_int $old_entrance = getbit_range(%barrows_state, ^barrows_entrance_start, ^barrows_entrance_end);
 p_stopaction;
-~barrows_layout_draw($old_entrance);
+~barrows_layout_choose(-1, $old_entrance);
 return(true);

@@ -131,8 +131,7 @@ await run(async () => {
     [['sw', 'south_outside'], ['se', 'south_outside']]
   ];
   const centralLockBits = [4, 8, 9, 11];
-  const exteriorLockBits = [0, 1, 7, 15];
-  function connected(mask) {
+  function connected(mask, corner) {
     const neighbors = new Map(lockVertices.map(vertex => [vertex, []]));
     for (let bit = 0; bit < edges.length; bit++) {
       if (((mask >>> bit) & 1) !== 0) continue;
@@ -141,8 +140,10 @@ await run(async () => {
         neighbors.get(right).push(left);
       }
     }
-    const reached = new Set(['nw']);
-    const pending = ['nw'];
+    const ladderRoom = corners[corner].name.toLowerCase();
+    if (neighbors.get(ladderRoom).length !== 1) return false;
+    const reached = new Set([ladderRoom]);
+    const pending = [ladderRoom];
     while (pending.length) {
       for (const next of neighbors.get(pending.pop())) {
         if (reached.has(next)) continue;
@@ -150,29 +151,28 @@ await run(async () => {
         pending.push(next);
       }
     }
-    return reached.size === lockVertices.length;
+    return lockVertices.filter(vertex => !vertex.endsWith('_outside')).every(vertex => reached.has(vertex));
   }
-  function validLayout(mask, entrance) {
+  function validLayout(mask, corner, entrance) {
     if (!Number.isInteger(mask) || mask < 0 || mask > 0xffff) return false;
-    if (exteriorLockBits.some(bit => ((mask >>> bit) & 1) !== 0)) return false;
     const openCentral = centralLockBits.flatMap((bit, index) => ((mask >>> bit) & 1) === 0 ? [index] : []);
-    return openCentral.length === 1 && openCentral[0] === entrance && connected(mask);
+    return openCentral.length === 1 && openCentral[0] === entrance && connected(mask, corner);
   }
 
-  const masksByEntrance = Array.from({ length: 4 }, () => []);
+  const masksByCornerAndEntrance = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => []));
   const measuredMasks = measureRandom(() => {
-    for (let entrance = 0; entrance < 4; entrance++) {
-      for (let rank = 0; rank < 81; rank++) {
-        const mask = procInt(layoutProbe, 'barrows_layout_mask', [entrance, rank]);
-        assert(mask >= 0 && mask <= 0xffff, `entrance ${entrance}, rank ${rank} returns a 16-bit lock mask`);
-        if (validLayout(mask, entrance)) masksByEntrance[entrance].push(mask);
+    for (let corner = 0; corner < 4; corner++) {
+      for (let entrance = 0; entrance < 4; entrance++) {
+        for (let rank = 0; rank < 64; rank++) {
+          const mask = procInt(layoutProbe, 'barrows_layout_mask', [entrance, corner, rank]);
+          assert(validLayout(mask, corner, entrance), `corner ${corner}, entrance ${entrance}, rank ${rank} connects nine rooms and gives the ladder room one door`);
+          masksByCornerAndEntrance[corner][entrance].push(mask);
+        }
+        assert.equal(new Set(masksByCornerAndEntrance[corner][entrance]).size, 64, 'the packed corner/entrance has all 64 distinct masks');
       }
     }
   });
   assert.equal(measuredMasks.calls, 0, 'the packed layout mask is pure');
-  for (let entrance = 0; entrance < 4; entrance++) {
-    assert(masksByEntrance[entrance].length > 0, `entrance ${entrance} has a connected packed lock layout`);
-  }
 
   const { makePlayer: makeBarePlayer } = runner;
   const players = [];
@@ -218,8 +218,8 @@ await run(async () => {
     assert(identity >= 1 && identity <= 6, 'the selected tunnel identity is valid');
     assert.equal(phase, 1, 'the tunnel interaction has an active unlooted run');
     assert.equal(corner, expectedCorner, 'the stored corner matches the selected ladder');
-    assert(masksByEntrance[entrance].includes(mask), 'the lock field matches a connected packed layout mask');
-    assert(validLayout(mask, entrance), 'all 13 measured room and outside vertices connect before transfer');
+    assert(masksByCornerAndEntrance[corner][entrance].includes(mask), 'the lock field matches a connected packed layout mask for the selected corner');
+    assert(validLayout(mask, corner, entrance), 'all nine rooms connect and the selected ladder room has exactly one door before transfer');
     assert.deepEqual(
       corners.map(row => player.getVarBit(row.varbitId)),
       corners.map(row => row.index === expectedCorner ? 1 : 0),
@@ -332,7 +332,7 @@ await run(async () => {
       const sarcLoc = sarcLocs.get(identity.sarcName);
       for (const corner of corners) {
         const entrance = (identity.identity + corner.index) % 4;
-        const layouts = masksByEntrance[entrance];
+        const layouts = masksByCornerAndEntrance[corner.index][entrance];
         const mask = layouts[(identity.identity + corner.index) % layouts.length];
         const player = makeTestPlayer(`selected_${identity.name}_${corner.name}`);
         const generation = generationSeed++;
@@ -410,7 +410,7 @@ await run(async () => {
       const identity = identities[0];
       const corner = corners[0];
       const entrance = 0;
-      const mask = masksByEntrance[entrance][0];
+      const mask = masksByCornerAndEntrance[corner.index][entrance][0];
       const player = makeTestPlayer('closed_prompt');
       setRun(player, identity.identity, corner.index, entrance, mask, generationSeed++);
       approachSarcophagus(player, sarcRows.get(identity.sarcName));
@@ -445,7 +445,7 @@ await run(async () => {
       const identity = identities[index % identities.length];
       const corner = corners[index % corners.length];
       const entrance = (identity.identity + corner.index) % 4;
-      const mask = masksByEntrance[entrance][0];
+      const mask = masksByCornerAndEntrance[corner.index][entrance][0];
       const generation = generationSeed++;
       const player = makeTestPlayer(`stale_resume_${stale.name}`);
       setRun(player, identity.identity, corner.index, entrance, mask, generation);
@@ -475,7 +475,7 @@ await run(async () => {
     for (const corner of corners) {
       const identity = identities[corner.index % identities.length];
       const entrance = (identity.identity + corner.index) % 4;
-      const mask = masksByEntrance[entrance][0];
+      const mask = masksByCornerAndEntrance[corner.index][entrance][0];
       const generation = generationSeed++;
       const player = makeTestPlayer(`direct_enter_${corner.name}`);
       setRun(player, identity.identity, corner.index, entrance, mask, generation);
@@ -503,7 +503,7 @@ await run(async () => {
       const identity = identities[index % identities.length];
       const corner = corners[index % corners.length];
       const entrance = (identity.identity + corner.index) % 4;
-      const mask = masksByEntrance[entrance][0];
+      const mask = masksByCornerAndEntrance[corner.index][entrance][0];
       const generation = generationSeed++;
       const player = makeTestPlayer(`direct_stale_${stale.name}`);
       setRun(player, identity.identity, corner.index, entrance, mask, generation);
@@ -531,7 +531,7 @@ await run(async () => {
       assert.notEqual(tunnelIdentity.identity, residentIdentity, `${name} resident control is not the selected tunnel crypt`);
       const corner = corners[index % corners.length];
       const entrance = (tunnelIdentity.identity + corner.index) % 4;
-      const mask = masksByEntrance[entrance][0];
+      const mask = masksByCornerAndEntrance[corner.index][entrance][0];
       const generation = generationSeed++;
       const player = makeTestPlayer(`resident_${name}`);
       setRun(player, tunnelIdentity.identity, corner.index, entrance, mask, generation);

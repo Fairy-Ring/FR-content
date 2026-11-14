@@ -64,9 +64,10 @@
 ^barrows_potential_max = 1000
 ^barrows_kill_count_max = 32767
 
-// UNKNOWN uniform layout/corner sampling over the complete connected room graph.
+// UNKNOWN engineering: uniform over the complete set allowed by shape,
+// prior-run exclusions and the occupied corridor, with its implied corner weights.
 ^barrows_corner_count = 4
-^barrows_layout_count = 81
+^barrows_layout_count = 64
 ^barrows_lock_mask = 65535
 
 // CANDIDATE D3 timing conversion and drain, not exact May 2006 measurements.

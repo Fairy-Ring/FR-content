@@ -125,7 +125,7 @@ function main() {
       return constants.get(name);
     };
     assert.equal(constant('barrows_corner_count'), 4);
-    assert.equal(constant('barrows_layout_count'), 81);
+    assert.equal(constant('barrows_layout_count'), 64);
     assert.equal(constant('barrows_lock_mask'), 0xffff);
 
     const vars = Object.fromEntries(['barrows', 'barrows_kills', 'barrows_state', 'barrows_generation', 'barrows_countdowns'].map(name => {
@@ -209,7 +209,7 @@ function main() {
       assert.equal(readRange(player.getVar(vars.barrows), ...clientRanges.ladder), 1 << expected, `${label}: native client varbits encode the selected corner`);
     };
     const assertLayout = (player, { entrance, rank, corner, phase, label }) => {
-      const expectedMask = expectedLockMask(entrance, rank);
+      const expectedMask = expectedLockMask(entrance, corner, rank);
       assert.equal(clientLockMask(player), expectedMask, `${label}: exact 16-bit personal lock layout`);
       assertCorner(player, corner, label);
       assert.equal(readRange(player.getVar(vars.barrows_state), ...stateRanges.entrance), entrance, `${label}: selected central entrance`);
@@ -219,28 +219,7 @@ function main() {
     };
 
     const centralBits = [4, 8, 9, 11];
-    const firstSideBits = [3, 2, 6, 13];
-    const secondSideBits = [5, 10, 12, 14];
-    const exteriorBits = [0, 1, 7, 15];
     assert.deepEqual([...parseEnum(runtime.contentRoot, 'barrows_central_lock_bit')], centralBits.map((bit, index) => [String(index), String(bit)]));
-    assert.deepEqual([...parseEnum(runtime.contentRoot, 'barrows_side_first_lock_bit')], firstSideBits.map((bit, index) => [String(index), String(bit)]));
-    assert.deepEqual([...parseEnum(runtime.contentRoot, 'barrows_side_second_lock_bit')], secondSideBits.map((bit, index) => [String(index), String(bit)]));
-
-    function expectedLockMask(entrance, rank) {
-      assert(Number.isInteger(entrance) && entrance >= 0 && entrance < 4, `invalid central entrance ${entrance}`);
-      assert(Number.isInteger(rank) && rank >= 0 && rank < 81, `invalid layout rank ${rank}`);
-      let mask = 0xffff;
-      for (const bit of exteriorBits) mask &= ~(1 << bit);
-      mask &= ~(1 << centralBits[entrance]);
-      let digits = rank;
-      for (let side = 0; side < 4; side++) {
-        const digit = digits % 3;
-        digits = Math.floor(digits / 3);
-        if (digit !== 1) mask &= ~(1 << firstSideBits[side]);
-        if (digit !== 0) mask &= ~(1 << secondSideBits[side]);
-      }
-      return mask & 0xffff;
-    }
 
     const roomEdges = parseEnum(runtime.contentRoot, 'barrows_room_edges_by_lock');
     assert.equal(roomEdges.size, 16, 'S00 supplies exactly sixteen measured lock joins');
@@ -260,14 +239,200 @@ function main() {
     }
     const nodes = ['nw', 'n', 'ne', 'w', 'center', 'e', 'sw', 's', 'se', 'north_outside', 'south_outside', 'west_outside', 'east_outside'];
     const nodeSet = new Set(nodes);
+    const roomNodes = nodes.filter(node => !node.endsWith('_outside'));
+    const cornerRooms = ['nw', 'ne', 'sw', 'se'];
+    const exteriorNodes = ['north_outside', 'west_outside', 'east_outside', 'south_outside'];
+    const corridorBitByNode = Object.fromEntries(exteriorNodes.map(node => {
+      const bits = new Set(edgesByBit.flatMap((edges, bit) => edges.some(edge => edge.split('>').includes(node)) ? [bit] : []));
+      assert.equal(bits.size, 1, `${node}: both measured corridor edges share one lock bit`);
+      return [node, [...bits][0]];
+    }));
+    const exteriorBits = Object.values(corridorBitByNode);
+    assert.deepEqual([...exteriorBits].sort((left, right) => left - right), [0, 1, 7, 15]);
+    const cornerBits = cornerRooms.map(room => edgesByBit.flatMap((edges, bit) =>
+      edges.some(edge => edge.split('>').includes(room)) ? [bit] : []
+    ));
+    assert(cornerBits.every(bits => bits.length === 4), 'each measured ladder room has four door edges');
     assert.equal(nodeSet.size, 13);
     assert.equal(edgeToBit.size, 20, 'the measured graph has twelve internal and eight exterior openings');
     assert.equal([...edgeToBit.keys()].filter(edge => !edge.includes('_outside')).length, 12);
     assert.equal([...edgeToBit.keys()].filter(edge => edge.includes('_outside')).length, 8);
+
+    function graphEdges(mask) {
+      const edges = new Set();
+      for (let bit = 0; bit < 16; bit++) {
+        if ((mask & (1 << bit)) !== 0) continue;
+        for (const edge of edgesByBit[bit]) edges.add(edge);
+      }
+      return edges;
+    }
+
+    function reachableRooms(mask, start) {
+      const adjacency = new Map(nodes.map(node => [node, new Set()]));
+      for (const edge of graphEdges(mask)) {
+        const [left, right] = edge.split('>');
+        adjacency.get(left).add(right);
+        adjacency.get(right).add(left);
+      }
+      const seen = new Set([start]);
+      const queue = [start];
+      for (let index = 0; index < queue.length; index++) {
+        for (const next of adjacency.get(queue[index])) {
+          if (seen.has(next)) continue;
+          seen.add(next);
+          queue.push(next);
+        }
+      }
+      return new Set(roomNodes.filter(node => seen.has(node)));
+    }
+
+    function openCornerDoors(mask, corner) {
+      return cornerBits[corner].filter(bit => (mask & (1 << bit)) === 0).length;
+    }
+
+    function validLayout(mask, corner, entrance) {
+      const openCentral = centralBits.filter(bit => (mask & (1 << bit)) === 0);
+      if (openCentral.length !== 1 || openCentral[0] !== centralBits[entrance]) return false;
+      if (openCornerDoors(mask, corner) !== 1) return false;
+      const reachable = reachableRooms(mask, cornerRooms[corner]);
+      return reachable.size === 9 && reachable.has('center');
+    }
+
+    function assertValidLayout(mask, corner, entrance, label) {
+      assert.deepEqual(
+        centralBits.filter(bit => (mask & (1 << bit)) === 0),
+        [centralBits[entrance]],
+        `${label}: exactly the selected central edge is open`
+      );
+      assert.equal(openCornerDoors(mask, corner), 1, `${label}: exactly one door opens in the ladder room`);
+      const reachable = reachableRooms(mask, cornerRooms[corner]);
+      assert.deepEqual([...reachable].sort(), [...roomNodes].sort(), `${label}: all nine rooms connect to the ladder room`);
+      assert(reachable.has('center'), `${label}: the ladder room reaches the chest room`);
+    }
+
+    // Independently enumerate every 16-bit outer mask and all four ladder
+    // corners. A base row locks all central doors; each entrance then opens
+    // exactly one central edge for the nine-room connectivity check.
+    const validOuterMasksByCorner = Array.from({ length: 4 }, () => []);
+    for (let mask = 0; mask <= 0xffff; mask++) {
+      const allCentralLocked = centralBits.every(bit => (mask & (1 << bit)) !== 0);
+      for (let corner = 0; corner < 4; corner++) {
+        if (!allCentralLocked || openCornerDoors(mask, corner) !== 1) continue;
+        let valid = true;
+        for (let entrance = 0; entrance < 4; entrance++) {
+          const opened = mask & ~(1 << centralBits[entrance]);
+          if (!validLayout(opened, corner, entrance)) {
+            valid = false;
+            break;
+          }
+        }
+        if (valid) validOuterMasksByCorner[corner].push(mask);
+      }
+    }
+    assert.deepEqual(validOuterMasksByCorner.map(rows => rows.length), [64, 64, 64, 64], 'exhaustive 65536-mask enumeration yields 64 valid rows per ladder corner');
+
+    const layoutLocks = parseEnum(runtime.contentRoot, 'barrows_layout_locks');
+    assert.equal(layoutLocks.size, 4 * 64, 'the packed corner/rank table contains exactly 256 rows');
+    const layoutMasksByCorner = Array.from({ length: 4 }, () => []);
+    for (let corner = 0; corner < 4; corner++) {
+      const packedRows = new Set();
+      for (let rank = 0; rank < 64; rank++) {
+        const key = String(corner * 64 + rank);
+        assert(layoutLocks.has(key), `packed layout row ${key} exists`);
+        const mask = Number(layoutLocks.get(key));
+        assert(Number.isInteger(mask) && mask >= 0 && mask <= 0xffff, `packed layout row ${key} is a 16-bit mask`);
+        assert(centralBits.every(bit => (mask & (1 << bit)) !== 0), `packed layout row ${key} locks all four central edges`);
+        assert(!packedRows.has(mask), `corner ${corner} rank ${rank} has a unique outer mask`);
+        assert(validOuterMasksByCorner[corner].includes(mask), `packed layout row ${key} satisfies independently enumerated topology`);
+        packedRows.add(mask);
+        layoutMasksByCorner[corner].push(mask);
+      }
+      assert.deepEqual(layoutMasksByCorner[corner], validOuterMasksByCorner[corner], `corner ${corner}: every packed rank matches the ascending exhaustive mask inventory`);
+    }
+    const layoutCorridorCounts = parseEnum(runtime.contentRoot, 'barrows_layout_corridor_count');
+    assert.equal(layoutCorridorCounts.size, 16, 'the packed corridor count enum covers four corners and four exterior locks');
+    for (let corner = 0; corner < 4; corner++) {
+      for (const [node, bit] of Object.entries(corridorBitByNode)) {
+        const key = String(corner * 16 + bit);
+        const count = layoutMasksByCorner[corner].filter(mask => (mask & (1 << bit)) === 0).length;
+        assert(layoutCorridorCounts.has(key), `packed corridor count row ${key} exists`);
+        assert.equal(Number(layoutCorridorCounts.get(key)), count, `corner ${corner} ${node}: corridor count matches its complete valid mask set`);
+        assert.equal(count, cornerBits[corner].includes(bit) ? 16 : 48, `corner ${corner} ${node}: incident/nonincident corridor count`);
+      }
+    }
+
+    function expectedLockMask(entrance, corner, rank) {
+      assert(Number.isInteger(entrance) && entrance >= 0 && entrance < 4, `invalid central entrance ${entrance}`);
+      assert(Number.isInteger(corner) && corner >= 0 && corner < 4, `invalid ladder corner ${corner}`);
+      assert(Number.isInteger(rank) && rank >= 0 && rank < 64, `invalid layout rank ${rank}`);
+      return layoutMasksByCorner[corner][rank] & ~(1 << centralBits[entrance]) & 0xffff;
+    }
+
+    function eligibleLayouts({ excludedCorner = -1, excludedEntrance = -1, occupiedLock = -1 } = {}) {
+      const layouts = [];
+      for (let entrance = 0; entrance < 4; entrance++) {
+        if (entrance === excludedEntrance) continue;
+        for (let corner = 0; corner < 4; corner++) {
+          if (corner === excludedCorner) continue;
+          for (let rank = 0; rank < 64; rank++) {
+            const outerMask = layoutMasksByCorner[corner][rank];
+            if (occupiedLock !== -1 && (outerMask & (1 << occupiedLock)) !== 0) continue;
+            layouts.push({ corner, entrance, rank, mask: expectedLockMask(entrance, corner, rank) });
+          }
+        }
+      }
+      return layouts;
+    }
+
+    function assertSeamBijection({ label, player, excludedCorner = -1, excludedEntrance = -1, occupiedLock = -1, point, expectedCount }) {
+      const layouts = eligibleLayouts({ excludedCorner, excludedEntrance, occupiedLock });
+      assert.equal(layouts.length, expectedCount, `${label}: candidate count`);
+      const seen = new Set();
+      player.level = point.level;
+      player.x = point.x;
+      player.z = point.z;
+      for (let seam = 0; seam < layouts.length; seam++) {
+        const expected = layouts[seam];
+        const draw = withDraws([[seam, layouts.length]], () => procVoid(player, 'barrows_layout_choose', [excludedCorner, excludedEntrance]));
+        assert.equal(draw.calls, 1, `${label}, seam ${seam}: chooser uses one joint uniform draw`);
+        const corner = readRange(player.getVar(vars.barrows_state), ...stateRanges.corner);
+        const entrance = readRange(player.getVar(vars.barrows_state), ...stateRanges.entrance);
+        const mask = clientLockMask(player);
+        const baseMask = mask | (1 << centralBits[entrance]);
+        const rank = layoutMasksByCorner[corner].indexOf(baseMask);
+        assert.deepEqual({ corner, entrance, rank, mask }, expected, `${label}, seam ${seam}: exact entrance-major/corner-major/rank mapping`);
+        assertValidLayout(mask, corner, entrance, `${label}, seam ${seam}`);
+        if (occupiedLock !== -1) assert.equal(mask & (1 << occupiedLock), 0, `${label}, seam ${seam}: current corridor remains open`);
+        const key = `${entrance}/${corner}/${rank}`;
+        assert(!seen.has(key), `${label}, seam ${seam}: chooser does not repeat a layout`);
+        seen.add(key);
+      }
+      assert.equal(seen.size, layouts.length, `${label}: every eligible layout has exactly one seam`);
+      return layouts.length;
+    }
+
     const rankProbe = makePlayer('mask');
     const maskProbeBefore = snapshotPlayer(rankProbe);
-    const generated = new Map();
-    const masksByEntrance = Array.from({ length: 4 }, () => new Set());
+    const expectedMasks = new Set();
+    const corridorClosedCounts = Object.fromEntries(exteriorNodes.map(node => [node, 0]));
+    let expectedCorridorClosedLayouts = 0;
+    for (let corner = 0; corner < 4; corner++) {
+      for (let entrance = 0; entrance < 4; entrance++) {
+        for (const outerMask of validOuterMasksByCorner[corner]) {
+          const mask = outerMask & ~(1 << centralBits[entrance]) & 0xffff;
+          expectedMasks.add(mask);
+          const closed = exteriorNodes.filter(node => (mask & (1 << corridorBitByNode[node])) !== 0);
+          if (closed.length) expectedCorridorClosedLayouts++;
+          for (const node of closed) corridorClosedCounts[node]++;
+        }
+      }
+    }
+
+    const actualMasks = new Set();
+    const masksByCornerEntrance = Array.from({ length: 4 }, () => Array.from({ length: 4 }, () => new Set()));
+    const actualCorridorClosedCounts = Object.fromEntries(exteriorNodes.map(node => [node, 0]));
+    let actualCorridorClosedLayouts = 0;
+    let cornerTaggedLayouts = 0;
     const maskMeasure = (() => {
       const original = JavaRandom.nextDouble;
       let calls = 0;
@@ -276,23 +441,23 @@ function main() {
         return original.call(this);
       };
       try {
-        for (let entrance = 0; entrance < 4; entrance++) {
-          for (let rank = 0; rank < 81; rank++) {
-            const label = `entrance=${entrance}, rank=${rank}`;
-            const expectedMask = expectedLockMask(entrance, rank);
-            const actualMask = procInt(rankProbe, 'barrows_layout_mask', [entrance, rank]);
-            assert(Number.isInteger(actualMask) && actualMask >= 0 && actualMask <= 0xffff, `${label}: result is a 16-bit unsigned lock mask`);
-            assert.equal(actualMask, expectedMask, `${label}: exact ternary lock mask`);
-            const expectedEdges = graphEdges(expectedMask);
-            const actualEdges = graphEdges(actualMask);
-            assert.deepEqual([...actualEdges].sort(), [...expectedEdges].sort(), `${label}: graph edges exactly match barrows_room_edges_by_lock`);
-            const openCentral = centralBits.filter(bit => (actualMask & (1 << bit)) === 0);
-            assert.equal(openCentral.length, 1, `${label}: exactly one central edge is open`);
-            assert.deepEqual([...exteriorBits].filter(bit => (actualMask & (1 << bit)) !== 0), [], `${label}: all paired exterior corridors remain open`);
-            assertConnectedFromEveryRoom(actualEdges, label);
-            assert(!generated.has(actualMask), `${label}: each central/rank pair has a distinct layout`);
-            generated.set(actualMask, { entrance, rank, edges: actualEdges });
-            masksByEntrance[entrance].add(actualMask);
+        for (let corner = 0; corner < 4; corner++) {
+          for (let entrance = 0; entrance < 4; entrance++) {
+            for (let rank = 0; rank < 64; rank++) {
+              const label = `corner=${corner}, entrance=${entrance}, rank=${rank}`;
+              const expectedMask = expectedLockMask(entrance, corner, rank);
+              const actualMask = procInt(rankProbe, 'barrows_layout_mask', [entrance, corner, rank]);
+              assert(Number.isInteger(actualMask) && actualMask >= 0 && actualMask <= 0xffff, `${label}: result is a 16-bit unsigned lock mask`);
+              assert.equal(actualMask, expectedMask, `${label}: exact packed outer mask plus selected central opening`);
+              assert.deepEqual([...graphEdges(actualMask)].sort(), [...graphEdges(expectedMask)].sort(), `${label}: graph edges exactly match measured lock joins`);
+              assertValidLayout(actualMask, corner, entrance, label);
+              actualMasks.add(actualMask);
+              masksByCornerEntrance[corner][entrance].add(actualMask);
+              cornerTaggedLayouts++;
+              const closed = exteriorNodes.filter(node => (actualMask & (1 << corridorBitByNode[node])) !== 0);
+              if (closed.length) actualCorridorClosedLayouts++;
+              for (const node of closed) actualCorridorClosedCounts[node]++;
+            }
           }
         }
         return calls;
@@ -301,8 +466,12 @@ function main() {
       }
     })();
     assert.equal(maskMeasure, 0, 'the pure layout-mask proc must never draw randomness');
-    assert.equal(generated.size, 324, 'all 324 connected central/rank layouts are represented exactly once');
-    assert.deepEqual(masksByEntrance.map(values => values.size), [81, 81, 81, 81], 'each central entrance has all 81 ranks');
+    assert.equal(cornerTaggedLayouts, 4 * 4 * 64, 'all 1024 corner-tagged layouts are checked');
+    assert.equal(actualMasks.size, 1024, 'the 1024 corner-tagged layouts have 1024 unique masks');
+    assert.deepEqual(masksByCornerEntrance.map(corners => corners.map(masks => masks.size)), Array.from({ length: 4 }, () => [64, 64, 64, 64]), 'each corner and entrance has all 64 ranks');
+    assert.deepEqual([...actualMasks].sort((left, right) => left - right), [...expectedMasks].sort((left, right) => left - right), 'the packed mask proc produces the complete independently enumerated mask set');
+    assert.equal(actualCorridorClosedLayouts, expectedCorridorClosedLayouts, 'corridor-closed layout count matches exhaustive enumeration');
+    assert.deepEqual(actualCorridorClosedCounts, corridorClosedCounts, 'each exterior corridor closed count matches exhaustive enumeration');
     assert.deepEqual(snapshotPlayer(rankProbe), maskProbeBefore, 'layout_mask changes no player varp or native varbit');
 
     const nodeIndex = new Map(nodes.map((node, index) => [node, index]));
@@ -335,40 +504,8 @@ function main() {
       }
       return rotated & 0xffff;
     };
-    for (const mask of generated.keys()) {
-      assert(generated.has(rotateMask(mask)), `layout ${mask.toString(16)} has a 90-degree rotation in the finite layout set`);
-    }
-
-    function graphEdges(mask) {
-      const edges = new Set();
-      for (let bit = 0; bit < 16; bit++) {
-        if ((mask & (1 << bit)) !== 0) continue;
-        for (const edge of edgesByBit[bit]) edges.add(edge);
-      }
-      return edges;
-    }
-
-    function assertConnectedFromEveryRoom(edges, label) {
-      const adjacency = new Map(nodes.map(node => [node, new Set()]));
-      for (const edge of edges) {
-        const [left, right] = edge.split('>');
-        assert(adjacency.has(left) && adjacency.has(right), `${label}: edge ${edge} uses one of the thirteen measured vertices`);
-        adjacency.get(left).add(right);
-        adjacency.get(right).add(left);
-      }
-      assert.equal(adjacency.size, 13, `${label}: the measured graph includes every room and paired exterior corridor`);
-      for (const start of nodes) {
-        const seen = new Set([start]);
-        const queue = [start];
-        for (let index = 0; index < queue.length; index++) {
-          for (const next of adjacency.get(queue[index])) {
-            if (seen.has(next)) continue;
-            seen.add(next);
-            queue.push(next);
-          }
-        }
-        assert.deepEqual([...seen].sort(), [...nodes].sort(), `${label}: current-room access from ${start} reaches all thirteen vertices`);
-      }
+    for (const mask of actualMasks) {
+      assert(actualMasks.has(rotateMask(mask)), `layout ${mask.toString(16)} has a 90-degree rotation in the finite layout set`);
     }
 
     const stalePlayer = makePlayer('transitions', 0, 3565, 3289);
@@ -388,7 +525,7 @@ function main() {
 
     const beginCorner = 0;
     const beginEntrance = 1;
-    const beginRank = 80;
+    const beginRank = 63;
     const surface = { level: 0, x: 55 * 64 + 45, z: 51 * 64 + 25 };
     const destination = CoordGrid.packCoord(3, 55 * 64 + 37, 151 * 64 + 39);
     assert.deepEqual([stalePlayer.level, stalePlayer.x, stalePlayer.z], [surface.level, surface.x, surface.z]);
@@ -398,12 +535,14 @@ function main() {
       if (component === runtime.Component.getId('kill_count')) entryWrites.push(snapshotPlayer(this));
       return originalEntryOpen.call(this, component);
     };
-    const entryDraw = withDraws([[4, 6], [beginCorner, 4], [beginEntrance, 4], [beginRank, 81]], () => startSuspendedProc(stalePlayer, 'barrows_dig_dest', [destination]));
-    assert.equal(entryDraw.calls, 4, 'run begin consumes one identity draw followed by corner, central and rank draws');
+    const entryDraw = withDraws([[4, 6], [255, 576]], () => startSuspendedProc(stalePlayer, 'barrows_dig_dest', [destination]));
+    assert.equal(entryDraw.calls, 2, 'run begin consumes an identity draw and one global layout-seam draw');
     const entryState = entryDraw.value;
     assert.equal(stalePlayer.level, surface.level, 'the tunnel view is not entered before the delayed Dig continuation');
     assert.deepEqual([stalePlayer.x, stalePlayer.z], [surface.x, surface.z]);
     const beginMask = assertLayout(stalePlayer, { entrance: beginEntrance, rank: beginRank, corner: beginCorner, phase: 1, label: 'run begin before descent' });
+    assert.notEqual(beginCorner, 3, 'run begin excludes the previous ladder corner');
+    assert.notEqual(beginEntrance, 2, 'run begin excludes the previous central entrance');
     assert.equal(readRange(stalePlayer.getVar(vars.barrows_state), 16, 31), initialHigh >>> 16, 'run begin preserves unassigned high state bits');
     assert.equal(readRange(stalePlayer.getVar(vars.barrows_state), ...stateRanges.identity), 5, 'run begin uses its first controlled identity draw');
     assert.equal(u32(stalePlayer.getVar(vars.barrows_generation)), 42, 'run begin advances only its owner generation');
@@ -466,11 +605,13 @@ function main() {
 
     const wrongCorner = 1;
     const wrongOldEntrance = readRange(stalePlayer.getVar(vars.barrows_state), ...stateRanges.entrance);
-    const wrongOffset = 1;
-    const wrongEntrance = wrongOffset >= wrongOldEntrance ? wrongOffset + 1 : wrongOffset;
-    const wrongRank = 79;
-    const wrongDraw = withDraws([[wrongCorner, 4], [wrongOffset, 3], [wrongRank, 81]], () => procInt(stalePlayer, 'barrows_layout_wrong', [runGeneration]));
-    assert.equal(wrongDraw.calls, 3, 'a valid wrong answer draws one corner, a different central edge and one rank');
+    const wrongEntrance = 2;
+    const wrongRank = 63;
+    const wrongEntranceIndex = [0, 1, 2, 3].filter(entrance => entrance !== wrongOldEntrance).indexOf(wrongEntrance);
+    assert.notEqual(wrongEntranceIndex, -1, 'wrong-answer seam selects an entrance other than the previous one');
+    const wrongSeam = (wrongEntranceIndex * 4 + wrongCorner) * 64 + wrongRank;
+    const wrongDraw = withDraws([[wrongSeam, 768]], () => procInt(stalePlayer, 'barrows_layout_wrong', [runGeneration]));
+    assert.equal(wrongDraw.calls, 1, 'a valid wrong answer draws one global eligible-layout seam');
     assert.equal(wrongDraw.value, 1, 'a current-generation wrong answer is accepted');
     assert.notEqual(wrongEntrance, wrongOldEntrance, 'the seeded wrong-answer central edge differs from the old edge');
     assertLayout(stalePlayer, { entrance: wrongEntrance, rank: wrongRank, corner: wrongCorner, phase: 1, label: 'wrong-answer transition' });
@@ -480,14 +621,22 @@ function main() {
     assert.equal(u32(stalePlayer.getVar(vars.barrows)) & rangeMask(...clientRanges.puzzle), 0, 'wrong answer clears the original puzzle presentation bits');
     assertCorner(stalePlayer, wrongCorner, 'wrong-answer transition');
 
-    const searchCorner = 2;
-    const searchEntrance = 3;
-    const searchRank = 0;
-    const searchDraw = withDraws([[searchCorner, 4], [searchEntrance, 4], [searchRank, 81]], () => procInt(stalePlayer, 'barrows_search_latch', [runGeneration]));
-    assert.equal(searchDraw.calls, 3, 'a successful Search latch draws a fresh corner, central edge and rank after generation advance');
+    const searchClientBefore = u32(stalePlayer.getVar(vars.barrows) | rangeMask(...clientRanges.puzzle));
+    const searchStateBefore = u32(stalePlayer.getVar(vars.barrows_state) | rangeMask(solvedBit, challengeBit));
+    setPlayerVar(stalePlayer, 'barrows', searchClientBefore);
+    setPlayerVar(stalePlayer, 'barrows_state', searchStateBefore);
+    const searchCorner = readRange(searchStateBefore, ...stateRanges.corner);
+    const searchEntrance = readRange(searchStateBefore, ...stateRanges.entrance);
+    const searchMask = readRange(searchClientBefore, ...clientRanges.locks);
+    const searchDraw = withNoRandom(() => procInt(stalePlayer, 'barrows_search_latch', [runGeneration]));
+    assert.equal(searchDraw.calls, 0, 'successful Search advances phase and generation without drawing a layout');
     assert.equal(searchDraw.value, 1, 'a current-generation Search latch is accepted');
-    const searchMask = assertLayout(stalePlayer, { entrance: searchEntrance, rank: searchRank, corner: searchCorner, phase: 2, label: 'successful Search transition' });
-    assert.equal(u32(stalePlayer.getVar(vars.barrows_generation)), runGeneration + 1, 'Search advances the owner generation before storing its escape layout');
+    assert.equal(u32(stalePlayer.getVar(vars.barrows)), searchClientBefore, 'Search preserves all 32 bits of original varp 452');
+    assert.equal(readRange(stalePlayer.getVar(vars.barrows_state), ...stateRanges.corner), searchCorner, 'Search preserves the ladder-corner selector');
+    assert.equal(readRange(stalePlayer.getVar(vars.barrows_state), ...stateRanges.entrance), searchEntrance, 'Search preserves the central-door selector');
+    assert.equal(clientLockMask(stalePlayer), searchMask, 'Search preserves the current personal lock layout without redrawing');
+    assert.equal(u32(stalePlayer.getVar(vars.barrows_generation)), runGeneration + 1, 'Search advances the owner generation without storing a new layout');
+    assert.equal(u32(stalePlayer.getVar(vars.barrows_state)) & rangeMask(solvedBit, challengeBit), 0, 'Search clears solved and all challenge fields');
     assert.equal(procInt(stalePlayer, 'barrows_tunnel_identity'), 5, 'Search preserves the tunnel identity');
     assertCorner(stalePlayer, searchCorner, 'successful Search transition');
     const staleSearch = withNoRandom(() => procInt(stalePlayer, 'barrows_search_latch', [runGeneration]));
@@ -495,31 +644,102 @@ function main() {
     assert.equal(staleSearch.value, 0, 'stale Search is refused');
     assert.equal(clientLockMask(stalePlayer), searchMask, 'stale Search preserves the escape layout');
 
-    const resetCorner = 3;
-    const resetEntrance = 0;
-    const resetRank = 80;
+    const resetCorner = searchCorner;
+    const resetEntrance = searchEntrance;
+    const resetRank = 0;
     const resetWrites = [];
     const originalResetOpen = stalePlayer.openMainOverlay;
     stalePlayer.openMainOverlay = function (component) {
       resetWrites.push(snapshotPlayer(this));
       return originalResetOpen.call(this, component);
     };
-    const resetDraw = withDraws([[resetCorner, 4], [resetEntrance, 4], [resetRank, 81]], () => procVoid(stalePlayer, 'barrows_run_reset'));
-    assert.equal(resetDraw.calls, 3, 'paid reset draws only the new corner, central edge and rank');
+    const resetDraw = withDraws([[resetRank, 64]], () => procVoid(stalePlayer, 'barrows_run_reset'));
+    assert.equal(resetDraw.calls, 1, 'paid reset retains its corner and central door and draws one replacement rank');
     stalePlayer.openMainOverlay = originalResetOpen;
     assert(resetWrites.length > 0, 'paid reset reaches its original HUD close after drawing the idle layout');
     const resetMask = assertLayout(stalePlayer, { entrance: resetEntrance, rank: resetRank, corner: resetCorner, phase: 0, label: 'paid reset transition' });
     assert.equal(u32(stalePlayer.getVar(vars.barrows_generation)), runGeneration + 2, 'paid reset advances the generation');
     assert.equal(procInt(stalePlayer, 'barrows_tunnel_identity'), 0, 'idle reset clears the previous tunnel identity');
-    assert.equal(u32(stalePlayer.getVar(vars.barrows_state)) & 0xffff, (resetCorner << stateRanges.corner[0]) | (resetEntrance << stateRanges.entrance[0]), 'paid reset clears run fields while preserving its freshly drawn corner and entrance selectors');
+    assert.equal(u32(stalePlayer.getVar(vars.barrows_state)) & 0xffff, (resetCorner << stateRanges.corner[0]) | (resetEntrance << stateRanges.entrance[0]), 'paid reset clears run fields and retains the previous corner and entrance selectors');
     assert.equal(u32(stalePlayer.getVar(vars.barrows_state)) & 0xffff0000, initialHigh & 0xffff0000, 'paid reset preserves unassigned high state bits');
     assert.equal(u32(stalePlayer.getVar(vars.barrows)) & rangeMask(...clientRanges.puzzle), 0, 'paid reset clears the original puzzle presentation bits');
     for (const write of resetWrites) {
       assert.equal(readRange(write.client, ...clientRanges.locks), resetMask, 'reset presentation is emitted only after the idle lock layout is stored');
-      assert.deepEqual(write.cornerBits, corners.map((_, index) => index === resetCorner ? 1 : 0), 'reset presentation is emitted only after the replacement corner is stored');
+      assert.deepEqual(write.cornerBits, corners.map((_, index) => index === resetCorner ? 1 : 0), 'reset presentation is emitted only after the retained corner is stored');
     }
     assertCorner(stalePlayer, resetCorner, 'paid reset transition');
     assert.deepEqual(snapshotPlayer(otherPlayer), peerBeforeBegin, 'begin, wrong answer, Search, reset and resume never write another player');
+    const unconstrainedSeamCount = assertSeamBijection({
+      label: 'unconstrained chooser',
+      player: makePlayer('all-layout-seams'),
+      point: { level: 0, x: 3565, z: 3289 },
+      expectedCount: 1024
+    });
+    const excludedSeamCount = assertSeamBijection({
+      label: 'R2 chooser exclusions',
+      player: makePlayer('excluded-layout-seams'),
+      excludedCorner: 1,
+      excludedEntrance: 2,
+      point: { level: 0, x: 3565, z: 3289 },
+      expectedCount: 576
+    });
+    assert.equal(unconstrainedSeamCount, 1024, 'uniform unconstrained seams cover every corner, entrance and rank once');
+    assert.equal(excludedSeamCount, 576, 'R2 exclusions remove exactly one corner and one entrance');
+    const generationZeroPlayer = makePlayer('generation-zero-no-exclusions', 0, 3565, 3289);
+    setPlayerVar(generationZeroPlayer, 'barrows_state', stateWord({ phase: 0, corner: 3, entrance: 2 }));
+    setPlayerVar(generationZeroPlayer, 'barrows_generation', 0);
+    const generationZeroBegin = withDraws([[0, 6], [704, 1024]], () => procInt(generationZeroPlayer, 'barrows_run_begin'));
+    assert.equal(generationZeroBegin.calls, 2, 'generation-zero begin draws identity and one unconstrained global seam');
+    assert.equal(generationZeroBegin.value, 1, 'generation-zero begin succeeds');
+    assertLayout(generationZeroPlayer, { corner: 3, entrance: 2, rank: 0, phase: 1, label: 'generation-zero no-exclusion transition' });
+    let cyclePlayer = makePlayer('r2-consecutive-runs');
+    setPlayerVar(cyclePlayer, 'barrows_state', stateWord({ phase: 0 }));
+    setPlayerVar(cyclePlayer, 'barrows_generation', 0);
+    JavaRandom.setSeed(0x377b02);
+    let previousSelectors = null;
+    for (let cycle = 0; cycle < 64; cycle++) {
+      const begin = withNoRandom(() => procInt(cyclePlayer, 'barrows_run_begin'));
+      assert.equal(begin.calls, 2, `R2 cycle ${cycle}: begin draws identity and one layout seam`);
+      assert.equal(begin.value, 1, `R2 cycle ${cycle}: begin succeeds`);
+      const corner = readRange(cyclePlayer.getVar(vars.barrows_state), ...stateRanges.corner);
+      const entrance = readRange(cyclePlayer.getVar(vars.barrows_state), ...stateRanges.entrance);
+      if (previousSelectors) {
+        assert.notEqual(corner, previousSelectors.corner, `R2 cycle ${cycle}: begin excludes the previous ladder corner`);
+        assert.notEqual(entrance, previousSelectors.entrance, `R2 cycle ${cycle}: begin excludes the previous central entrance`);
+      }
+      const mask = clientLockMask(cyclePlayer);
+      assertValidLayout(mask, corner, entrance, `R2 cycle ${cycle} begin`);
+      const baseMask = mask | (1 << centralBits[entrance]);
+      assert(layoutMasksByCorner[corner].includes(baseMask), `R2 cycle ${cycle}: begin stores one of the packed ranks`);
+
+      const generation = u32(cyclePlayer.getVar(vars.barrows_generation));
+      const clientBeforeLatch = u32(cyclePlayer.getVar(vars.barrows));
+      const latch = withNoRandom(() => procInt(cyclePlayer, 'barrows_search_latch', [generation]));
+      assert.equal(latch.calls, 0, `R2 cycle ${cycle}: packed Search latch draws no layout`);
+      assert.equal(latch.value, 1, `R2 cycle ${cycle}: packed Search latch succeeds`);
+      assert.equal(u32(cyclePlayer.getVar(vars.barrows)), clientBeforeLatch, `R2 cycle ${cycle}: latch preserves varp 452`);
+      assert.equal(readRange(cyclePlayer.getVar(vars.barrows_state), ...stateRanges.corner), corner, `R2 cycle ${cycle}: latch preserves corner`);
+      assert.equal(readRange(cyclePlayer.getVar(vars.barrows_state), ...stateRanges.entrance), entrance, `R2 cycle ${cycle}: latch preserves entrance`);
+
+      const reset = withNoRandom(() => procVoid(cyclePlayer, 'barrows_run_reset'));
+      assert.equal(reset.calls, 1, `R2 cycle ${cycle}: reset draws one replacement layout seam`);
+      assert.equal(readRange(cyclePlayer.getVar(vars.barrows_state), ...stateRanges.corner), corner, `R2 cycle ${cycle}: reset retains the previous corner selector`);
+      assert.equal(readRange(cyclePlayer.getVar(vars.barrows_state), ...stateRanges.entrance), entrance, `R2 cycle ${cycle}: reset retains the previous entrance selector`);
+
+      const resetSnapshot = snapshotPlayer(cyclePlayer);
+      const savedBeforeLogout = restorePlayer(cyclePlayer);
+      assert.deepEqual(snapshotPlayer(savedBeforeLogout), resetSnapshot, `R2 cycle ${cycle}: native Player.save/load retains exclusion selectors`);
+      const logout = withNoRandom(() => runNativeTrigger(savedBeforeLogout, logoutTrigger, `R2 cycle ${cycle} LOGOUT`));
+      assert.equal(logout.calls, 0, `R2 cycle ${cycle}: clean logout draws no layout`);
+      assert.deepEqual(snapshotPlayer(savedBeforeLogout), resetSnapshot, `R2 cycle ${cycle}: logout keeps the idle layout selectors`);
+      const savedAfterLogout = restorePlayer(savedBeforeLogout);
+      const login = withNoRandom(() => runNativeTrigger(savedAfterLogout, loginTrigger, `R2 cycle ${cycle} LOGIN`));
+      assert.equal(login.calls, 0, `R2 cycle ${cycle}: clean login draws no layout`);
+      assert.deepEqual(snapshotPlayer(savedAfterLogout), resetSnapshot, `R2 cycle ${cycle}: relog retains exclusion selectors`);
+      cyclePlayer = savedAfterLogout;
+      previousSelectors = { corner, entrance };
+    }
+
 
     const mapInventory = readMapRows(runtime.contentRoot, 'm55_151.jm2');
     const roomGrid = [['nw', 'n', 'ne'], ['w', 'center', 'e'], ['sw', 's', 'se']];
@@ -606,10 +826,10 @@ function main() {
         nodeBounds[node] = { minX: point.x - 6, maxX: point.x + 6, minZ: point.z - 6, maxZ: point.z + 6 };
       }
     }
-    nodeBounds.north_outside = { minX: columns[0] - 2, maxX: columns[2] + 2, minZ: zRows[0] + 1, maxZ: zRows[0] + 8 };
-    nodeBounds.south_outside = { minX: columns[0] - 2, maxX: columns[2] + 2, minZ: zRows[2] - 8, maxZ: zRows[2] - 1 };
-    nodeBounds.west_outside = { minX: columns[0] - 8, maxX: columns[0] - 1, minZ: zRows[2] - 2, maxZ: zRows[0] + 2 };
-    nodeBounds.east_outside = { minX: columns[2] + 1, maxX: columns[2] + 8, minZ: zRows[2] - 2, maxZ: zRows[0] + 2 };
+    nodeBounds.north_outside = { minX: columns[0] - 2, maxX: columns[2] + 2, minZ: zRows[0] + 6, maxZ: zRows[0] + 8 };
+    nodeBounds.south_outside = { minX: columns[0] - 2, maxX: columns[2] + 2, minZ: zRows[2] - 8, maxZ: zRows[2] - 7 };
+    nodeBounds.west_outside = { minX: columns[0] - 8, maxX: columns[0] - 6, minZ: zRows[2] - 2, maxZ: zRows[0] + 2 };
+    nodeBounds.east_outside = { minX: columns[2] + 7, maxX: columns[2] + 8, minZ: zRows[2] - 2, maxZ: zRows[0] + 2 };
     const withinBounds = (point, bounds) => point.x >= bounds.minX && point.x <= bounds.maxX && point.z >= bounds.minZ && point.z <= bounds.maxZ;
     const nativeRoute = (start, finish) => {
       if (start.level !== finish.level) return false;
@@ -632,6 +852,105 @@ function main() {
       return anchor;
     };
     const nodeAnchors = Object.fromEntries(nodes.map(node => [node, findNodeAnchor(node)]));
+    const corridorCases = exteriorNodes.map(node => ({
+      node,
+      lockBit: corridorBitByNode[node],
+      point: nodeAnchors[node]
+    }));
+    const corridorForPoint = point => {
+      if (point.x <= 3528) return 1;
+      if (point.x >= 3575) return 7;
+      if (point.z <= 9671) return 15;
+      if (point.z >= 9718) return 0;
+      return -1;
+    };
+    for (const corridor of corridorCases) {
+      assert.equal(corridorForPoint(corridor.point), corridor.lockBit, `${corridor.node}: mapped corridor anchor selects its measured exterior door`);
+    }
+    const northCorridor = corridorCases.find(corridor => corridor.node === 'north_outside');
+    assert(northCorridor, 'the measured north exterior corridor is available for seam coverage');
+    const northIncidentCorner = cornerBits.findIndex(bits => bits.includes(northCorridor.lockBit));
+    const northNonincidentCorner = cornerBits.findIndex(bits => !bits.includes(northCorridor.lockBit));
+    assert.notEqual(northIncidentCorner, -1);
+    assert.notEqual(northNonincidentCorner, -1);
+    assert.equal(assertSeamBijection({
+      label: 'north corridor open',
+      player: makePlayer('north-corridor-seams', northCorridor.point.level, northCorridor.point.x, northCorridor.point.z),
+      occupiedLock: northCorridor.lockBit,
+      point: northCorridor.point,
+      expectedCount: 512
+    }), 512, 'the north corridor filter leaves exactly 512 global layout seams');
+    assert.equal(assertSeamBijection({
+      label: 'north R2 incident corner exclusion',
+      player: makePlayer('north-r2-incident-seams', northCorridor.point.level, northCorridor.point.x, northCorridor.point.z),
+      excludedCorner: northIncidentCorner,
+      excludedEntrance: 1,
+      occupiedLock: northCorridor.lockBit,
+      point: northCorridor.point,
+      expectedCount: 336
+    }), 336, 'excluding an incident corner and one entrance leaves 336 safe seams');
+    assert.equal(assertSeamBijection({
+      label: 'north R2 nonincident corner exclusion',
+      player: makePlayer('north-r2-nonincident-seams', northCorridor.point.level, northCorridor.point.x, northCorridor.point.z),
+      excludedCorner: northNonincidentCorner,
+      excludedEntrance: 1,
+      occupiedLock: northCorridor.lockBit,
+      point: northCorridor.point,
+      expectedCount: 240
+    }), 240, 'excluding a nonincident corner and one entrance leaves 240 safe seams');
+
+    const redrawPlayer = makePlayer('corridor-redraw');
+    for (const corridor of corridorCases) {
+      redrawPlayer.level = corridor.point.level;
+      redrawPlayer.x = corridor.point.x;
+      redrawPlayer.z = corridor.point.z;
+      for (let corner = 0; corner < 4; corner++) {
+        const allowedOuterMasks = layoutMasksByCorner[corner].filter(mask => (mask & (1 << corridor.lockBit)) === 0);
+        assert(allowedOuterMasks.length > 0, `${corridor.node}, corner ${corner}: at least one rank keeps the occupied corridor open`);
+        for (let entrance = 0; entrance < 4; entrance++) {
+          for (let selection = 0; selection < allowedOuterMasks.length; selection++) {
+            setPlayerVar(redrawPlayer, 'barrows_state', stateWord({ identity: 5, phase: 1, corner, entrance }));
+            setPlayerVar(redrawPlayer, 'barrows_generation', 811);
+            const draw = withDraws([[selection, allowedOuterMasks.length]], () => procVoid(redrawPlayer, 'barrows_layout_draw', [corner, entrance]));
+            assert.equal(draw.calls, 1, `${corridor.node}, corner ${corner}, entrance ${entrance}, selection ${selection}: one bounded rank draw`);
+            const mask = allowedOuterMasks[selection] & ~(1 << centralBits[entrance]) & 0xffff;
+            assert.equal(clientLockMask(redrawPlayer), mask, `${corridor.node}: draw selects the indexed corridor-safe packed rank`);
+            assert.equal(mask & (1 << corridor.lockBit), 0, `${corridor.node}: redraw keeps the player's exterior door open`);
+            assertValidLayout(mask, corner, entrance, `${corridor.node} redraw ${corner}/${entrance}/${selection}`);
+          }
+        }
+      }
+    }
+
+    for (const [index, corridor] of corridorCases.entries()) {
+      const oldCorner = index;
+      const oldEntrance = index;
+      const targetCorner = (index + 1) % 4;
+      const layouts = eligibleLayouts({ excludedEntrance: oldEntrance, occupiedLock: corridor.lockBit });
+      const target = layouts.find(layout => layout.corner === targetCorner);
+      assert(target, `${corridor.node}: a new corner has a corridor-safe wrong-answer layout`);
+      const seam = layouts.indexOf(target);
+      const wrongPlayer = makePlayer(`wrong-corridor-${index}`, corridor.point.level, corridor.point.x, corridor.point.z);
+      setPlayerVar(wrongPlayer, 'barrows', clientWord(expectedLockMask(oldEntrance, oldCorner, 0), oldCorner));
+      setPlayerVar(wrongPlayer, 'barrows_state', stateWord({ identity: 5, phase: 1, corner: oldCorner, entrance: oldEntrance }));
+      setPlayerVar(wrongPlayer, 'barrows_generation', 900 + index);
+      const wrong = withDraws([[seam, layouts.length]], () => procInt(wrongPlayer, 'barrows_layout_wrong', [900 + index]));
+      assert.equal(wrong.calls, 1, `${corridor.node}: wrong-answer redraw consumes one global safe-layout seam`);
+      assert.equal(layouts.length, 384, `${corridor.node}: excluding the prior entrance leaves 384 corridor-safe seams`);
+      assert.equal(wrong.value, 1, `${corridor.node}: current-generation wrong answer is accepted`);
+      const wrongCorner = readRange(wrongPlayer.getVar(vars.barrows_state), ...stateRanges.corner);
+      const wrongEntrance = readRange(wrongPlayer.getVar(vars.barrows_state), ...stateRanges.entrance);
+      const wrongMask = clientLockMask(wrongPlayer);
+      const wrongRank = layoutMasksByCorner[wrongCorner].indexOf(wrongMask | (1 << centralBits[wrongEntrance]));
+      assert.deepEqual({ corner: wrongCorner, entrance: wrongEntrance, rank: wrongRank, mask: wrongMask }, target, `${corridor.node}: seam selects the indexed safe layout`);
+      assert.notEqual(wrongEntrance, oldEntrance, `${corridor.node}: wrong answer excludes the previous central entrance`);
+      assert.notEqual(wrongCorner, oldCorner, `${corridor.node}: wrong answer may select a different ladder corner`);
+      assert.equal(wrongMask & (1 << corridor.lockBit), 0, `${corridor.node}: wrong-answer redraw leaves the paired exterior door open`);
+      assertValidLayout(wrongMask, wrongCorner, wrongEntrance, `${corridor.node} wrong-answer redraw`);
+    }
+    redrawPlayer.level = 0;
+    redrawPlayer.x = 3552;
+    redrawPlayer.z = 9696;
     for (const [edge, placements] of edgeRows) {
       const [left, right] = edge.split('>');
       assert(nodeAnchors[left] && nodeAnchors[right], `${edge}: both measured endpoints have native walkable map tiles`);
@@ -847,7 +1166,8 @@ function main() {
       for (const [name, original] of originalWorldMethods) World[name] = original;
     }
 
-    console.log('PASS packed S07 topology: all 324 exact masks, thirteen-room connectivity and rotational closure');
+    console.log(`PASS packed S07 topology: cornerTagged=${cornerTaggedLayouts}, uniqueMasks=${actualMasks.size}, corridorClosedLayouts=${actualCorridorClosedLayouts}, corridorClosedByNode=${JSON.stringify(actualCorridorClosedCounts)}`);
+    console.log('PASS packed S07 layout seams: unconstrained 1024, R2 exclusions 576, north corridor 512, incident R2 336 and nonincident R2 240');
     console.log('PASS packed S07 lifecycle: begin/reset/wrong/Search varbits, seeded corner changes, stale guards and relog save/load');
     console.log('PASS packed S07 doors: all 64 native parent placements, both directions, personal visuals and unchanged shared collision');
   });

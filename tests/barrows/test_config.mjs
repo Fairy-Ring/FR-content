@@ -213,8 +213,8 @@ const ENUM_SIGNATURES = new Map([
     ['barrows_door_class_npc', ['autoint', 'npc']],
     ['barrows_door_draw_class', ['int', 'string']],
     ['barrows_central_lock_bit', ['int', 'int']],
-    ['barrows_side_first_lock_bit', ['int', 'int']],
-    ['barrows_side_second_lock_bit', ['int', 'int']],
+    ['barrows_layout_locks', ['int', 'int']],
+    ['barrows_layout_corridor_count', ['int', 'int']],
     ['barrows_ladder_landing', ['int', 'coord']],
     ['barrows_ladder_corner_by_loc', ['loc', 'int']],
     ['barrows_identity_brother', ['int', 'npc']],
@@ -355,6 +355,29 @@ for (const [name, [inputType, outputType]] of ENUM_SIGNATURES) {
     const fields = section(enums, name);
     assert.equal(one(fields, 'inputtype', ENUM_PATH), inputType, `[${name}] input type`);
     assert.equal(one(fields, 'outputtype', ENUM_PATH), outputType, `[${name}] output type`);
+}
+
+const layoutLocks = enumValues(enums, 'barrows_layout_locks');
+assert.equal(layoutLocks.size, 4 * 64, 'packed layout table contains all 256 corner/rank rows');
+const corridorCounts = enumValues(enums, 'barrows_layout_corridor_count');
+assert.equal(corridorCounts.size, 4 * 4, 'packed corridor counts cover four corners and four exterior locks');
+for (let corner = 0; corner < 4; corner++) {
+    const masks = [];
+    for (let rank = 0; rank < 64; rank++) {
+        const key = String(corner * 64 + rank);
+        assert(layoutLocks.has(key), `packed layout row ${key} exists`);
+        const mask = Number(layoutLocks.get(key));
+        assert(Number.isInteger(mask) && mask >= 0 && mask <= 0xffff, `packed layout row ${key} is a 16-bit mask`);
+        for (const bit of [4, 8, 9, 11]) assert((mask & (1 << bit)) !== 0, `packed layout row ${key} locks central bit ${bit}`);
+        masks.push(mask);
+    }
+    for (const bit of [0, 1, 7, 15]) {
+        const key = String(corner * 16 + bit);
+        assert(corridorCounts.has(key), `packed corridor count row ${key} exists`);
+        const eligible = masks.filter(mask => (mask & (1 << bit)) === 0).length;
+        assert.equal(Number(corridorCounts.get(key)), eligible, `corner ${corner} corridor bit ${bit} count derives from all packed layout rows`);
+        assert([16, 48].includes(eligible), `corner ${corner} corridor bit ${bit} count is 16 or 48`);
+    }
 }
 
 const noModelConfigs = `${enumText}\n${readText(PARAM_PATH)}`;

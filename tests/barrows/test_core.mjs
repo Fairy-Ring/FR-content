@@ -370,7 +370,6 @@ async function main() {
     const locks = (actual >>> 10) & 0xffff;
     const central = [4, 8, 9, 11];
     for (const [entrance, bit] of central.entries()) assert.equal((locks >>> bit) & 1, entrance === ((state >>> 7) & 3) ? 0 : 1, `${label} central edge ${entrance}`);
-    for (const bit of [0, 1, 7, 15]) assert.equal((locks >>> bit) & 1, 0, `${label} paired exterior route ${bit}`);
     for (const [first, second] of [[3, 5], [2, 10], [6, 12], [13, 14]]) assert.notEqual(((locks >>> first) & 1) + ((locks >>> second) & 1), 2, `${label} side room retains a corner route`);
   }
 
@@ -410,7 +409,7 @@ async function main() {
       measureRandom(() => procInt(player, 'barrows_run_begin'))
     );
     assert.equal(beginDeletion.value.value, 1, 'idle run_begin must return true');
-    assert.equal(beginDeletion.value.calls, 4, 'idle run_begin draws identity, corner, central edge and connected layout');
+    assert.equal(beginDeletion.value.calls, 2, 'idle run_begin draws identity and one global layout seam');
     assertDeleteOrder(beginDeletion.observations, beginActors, {
       generation: 42,
       state: beginSeedState,
@@ -430,6 +429,8 @@ async function main() {
     assert.equal(field(beginState, STATE.phaseMask, STATE.phaseShift), 1);
     assert.equal(beginState & (STATE.solvedMask | STATE.familyMask | STATE.permutationMask | STATE.challengeMask), 0, 'run_begin clears solved, puzzle and active-challenge fields');
     assertLayout(player, beginSeedClient, 'run_begin');
+    assert.notEqual(field(beginState, STATE.cornerMask, STATE.cornerShift), 3, 'run_begin excludes the previous ladder corner from its nonzero-generation state');
+    assert.notEqual(field(beginState, STATE.entranceMask, STATE.entranceShift), 2, 'run_begin excludes the previous central entrance from its nonzero-generation state');
 
     // An unlooted run is idempotent: no state writes, actor cleanup, or RNG.
     const idempotentSeedState = stateWord({ high: 0xa55a0000, identity: 4, phase: 1, corner: 2, entrance: 3, solved: true, family: 2, permutation: 6, challenge: true });
@@ -546,16 +547,19 @@ async function main() {
     searchPlayer.x = 3552;
     searchPlayer.z = 9696;
     setVars(searchPlayer, searchSeed);
+    const searchCornerBefore = field(searchSeed.state, STATE.cornerMask, STATE.cornerShift);
+    const searchEntranceBefore = field(searchSeed.state, STATE.entranceMask, STATE.entranceShift);
+    const searchLocksBefore = (u32(searchSeed.clientState) >>> 10) & 0xffff;
     const latchActors = [
       addActor('barrows_guthan', 0, searchPlayer.uid, 3549, 9694),
       addActor('barrows_skeleton_armed', 3, searchPlayer.uid, 3550, 9700)
     ];
-    const latchStateAfter = stateWord({ high: 0x5a5a0000, identity: 5, phase: 2, corner: 2, entrance: 3, family: 3, permutation: 6 });
+    const latchStateAfter = stateWord({ high: 0x5a5a0000, identity: 5, phase: 2, corner: 2, entrance: 3 });
     const latchDeletion = observeWorldDeletions(searchPlayer, new Set(latchActors.map(row => row.nid)), () =>
       measureRandom(() => procInt(searchPlayer, 'barrows_search_latch', [searchGeneration]))
     );
     assert.equal(latchDeletion.value.value, 1, 'valid Search latch must return true');
-    assert.equal(latchDeletion.value.calls, 3, 'Search draws only the escape corner, central edge and connected layout, not rewards');
+    assert.equal(latchDeletion.value.calls, 0, 'Search performs no random layout, corner or entrance draw');
     assertDeleteOrder(latchDeletion.observations, latchActors, {
       generation: searchGeneration + 1,
       state: latchStateAfter,
@@ -563,12 +567,14 @@ async function main() {
       countdowns: searchSeed.countdowns
     }, 'search_latch');
     assertDeleted(latchActors, 'search_latch');
-    assert.equal(u32(searchPlayer.getVar(ids.state) & ~(STATE.cornerMask | STATE.entranceMask)), u32(latchStateAfter & ~(STATE.cornerMask | STATE.entranceMask | STATE.familyMask | STATE.permutationMask)), 'Search retains identity/phase/upper state and clears puzzle authorization before its redraw');
+    assert.equal(u32(searchPlayer.getVar(ids.state)), latchStateAfter, 'Search retains identity, phase, selectors and upper state and clears puzzle authorization before cleanup');
     assert.equal(procInt(searchPlayer, 'barrows_phase'), 2, 'Search must freeze the run in paid phase');
     assert.equal(procInt(searchPlayer, 'barrows_tunnel_identity'), 5, 'Search must retain the selected tunnel identity');
     assert.equal(u32(searchPlayer.getVar(ids.generation)), searchGeneration + 1, 'Search must advance generation after latching');
+    assert.equal(field(searchPlayer.getVar(ids.state), STATE.cornerMask, STATE.cornerShift), searchCornerBefore, 'Search preserves the selected ladder corner');
+    assert.equal(field(searchPlayer.getVar(ids.state), STATE.entranceMask, STATE.entranceShift), searchEntranceBefore, 'Search preserves the selected central entrance');
+    assert.equal(((u32(searchPlayer.getVar(ids.clientState)) >>> 10) & 0xffff), searchLocksBefore, 'Search preserves the current personal lock layout');
     assert.equal(u32(searchPlayer.getVar(ids.credit)), searchSeed.credit, 'Search must freeze and retain all 453 credit bits');
-    assertLayout(searchPlayer, searchSeed.clientState, 'Search escape layout');
     assert.equal(u32(searchPlayer.getVar(ids.countdowns)), searchSeed.countdowns, 'S01 Search must not change either countdown');
     assert.equal(procInt(searchPlayer, 'barrows_search_allowed', [searchGeneration + 1]), 0, 'paid phase must reject Search authorization');
 
@@ -708,7 +714,7 @@ async function main() {
     const resetDeletion = observeWorldDeletions(resetPlayer, new Set(resetActors.map(row => row.nid)), () =>
       measureRandom(() => procVoid(resetPlayer, 'barrows_run_reset', [], { target: resetPrimary.npc }))
     );
-    assert.equal(resetDeletion.value.calls, 3, 'run_reset draws the idle corner, central edge and connected layout');
+    assert.equal(resetDeletion.value.calls, 1, 'run_reset draws one replacement rank for the retained corner and entrance');
     assertDeleteOrder(resetDeletion.observations, resetActors, {
       generation: 81,
       state: resetSeedState,
@@ -721,6 +727,8 @@ async function main() {
     assert.equal(u32(resetPlayer.getVar(ids.credit)), 0, 'run_reset must clear all of varp 453');
     assert.equal(u32(resetPlayer.getVar(ids.countdowns)), 0, 'run_reset must clear both saved countdowns');
     assert.equal(u32(resetPlayer.getVar(ids.state)) & ~(STATE.cornerMask | STATE.entranceMask), stateHigh(resetSeedState), 'run_reset clears progression while preserving upper bits and writing idle layout selectors');
+    assert.equal(field(resetPlayer.getVar(ids.state), STATE.cornerMask, STATE.cornerShift), field(resetSeedState, STATE.cornerMask, STATE.cornerShift), 'run_reset retains the previous ladder corner selector');
+    assert.equal(field(resetPlayer.getVar(ids.state), STATE.entranceMask, STATE.entranceShift), field(resetSeedState, STATE.entranceMask, STATE.entranceShift), 'run_reset retains the previous central entrance selector');
     assert.equal(procInt(resetPlayer, 'barrows_phase'), 0, 'run_reset must leave the phase idle');
     assertLayout(resetPlayer, resetSeedClient, 'run_reset');
     assert.equal(resetPlayer.modalMain, -1, 'paid run_reset closes its active modal');
@@ -742,7 +750,7 @@ async function main() {
     });
     const postResetBegin = measureRandom(() => procInt(resetPlayer, 'barrows_run_begin'));
     assert.equal(postResetBegin.value, 1, 'a post-reset run must begin successfully');
-    assert.equal(postResetBegin.calls, 4, 'a post-reset run draws identity, corner, central edge and layout');
+    assert.equal(postResetBegin.calls, 2, 'a post-reset run draws identity and one global layout seam');
     assert.equal(u32(resetPlayer.getVar(ids.generation)), 82, 'post-reset run must advance generation');
     const postResetIdentity = procInt(resetPlayer, 'barrows_tunnel_identity');
     assert(postResetIdentity >= 1 && postResetIdentity <= 6, 'post-reset run must choose a valid identity');
@@ -750,6 +758,8 @@ async function main() {
     assert.equal(u32(resetPlayer.getVar(ids.countdowns)), 0, 'post-reset run must clear prior countdowns');
     assert.equal(u32(resetPlayer.getVar(ids.state)) & ~(STATE.cornerMask | STATE.entranceMask), stateHigh(postResetState) | postResetIdentity | (1 << STATE.phaseShift), 'post-reset run clears progression and retains upper bits');
     assertLayout(resetPlayer, postResetClient, 'post-reset run_begin');
+    assert.notEqual(field(resetPlayer.getVar(ids.state), STATE.cornerMask, STATE.cornerShift), 3, 'post-reset begin excludes the previous ladder corner');
+    assert.notEqual(field(resetPlayer.getVar(ids.state), STATE.entranceMask, STATE.entranceShift), 2, 'post-reset begin excludes the previous central entrance');
     const staleAfterReset = snapshot(resetPlayer);
     assert.equal(procInt(resetPlayer, 'barrows_search_allowed', [81]), 0, 'the previous run generation must be stale after reset and a new begin');
     assert.deepEqual(snapshot(resetPlayer), staleAfterReset, 'stale Search authorization must not mutate the new run');

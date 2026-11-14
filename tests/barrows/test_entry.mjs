@@ -44,7 +44,6 @@ async function main() {
     assert.equal((client >>> 6) & 15, 1 << ((state >>> 5) & 3), 'exactly the selected ladder is visible');
     const locks = (client >>> 10) & 0xffff;
     for (const [entrance, bit] of [4, 8, 9, 11].entries()) assert.equal((locks >>> bit) & 1, entrance === ((state >>> 7) & 3) ? 0 : 1, 'one central entrance matches its stored selector');
-    for (const bit of [0, 1, 7, 15]) assert.equal((locks >>> bit) & 1, 0, 'paired exterior corridors remain reachable');
     for (const [a, b] of [[3, 5], [2, 10], [6, 12], [13, 14]]) assert.notEqual(((locks >>> a) & 1) + ((locks >>> b) & 1), 2, 'each side room retains a corner route');
   };
   const phase = word => (word >>> 3) & 3;
@@ -137,6 +136,8 @@ async function main() {
   // other owners and unowned map placements stay active.
   const paid = makePlayer('paid_exit');
   const paidSeed = { client: 0xa5a5a5a5, credit: 0xfedcba98, state: 0x5a5a8012, generation: 91, countdowns: 0x87654321 };
+  const paidPreviousCorner = (paidSeed.state >>> 5) & 3;
+  const paidPreviousEntrance = (paidSeed.state >>> 7) & 3;
   set(paid, paidSeed);
   const owned = [
     addNpc('barrows_ahrim', 0, paid.uid, 3548, 9695),
@@ -154,7 +155,7 @@ async function main() {
   };
   try {
     const random = measureRandom(() => procVoid(paid, 'barrows_leave'));
-    assert.equal(random.calls, 3, 'paid leave redraws only the idle replacement layout');
+    assert.equal(random.calls, 1, 'paid leave redraws one idle layout rank');
   } finally { World.removeNpc = removeNpc; }
   assert.equal(deletionRows.length, owned.length, 'leave removes each owned actor using World.removeNpc');
   for (const row of deletionRows) assert.deepEqual(row, { ...paidSeed, generation: paidSeed.generation + 1 }, 'paid reset advances generation before removing actors and clearing durable fields');
@@ -163,6 +164,8 @@ async function main() {
   assert.equal(phase(paid.getVar(ids.state)), 0, 'paid exit resets phase to idle');
   assert.equal(paid.getVar(ids.credit) >>> 0, 0, 'paid exit clears credit');
   assertLayout(paid);
+  assert.equal((paid.getVar(ids.state) >>> 5) & 3, paidPreviousCorner, 'paid leave retains the previous ladder corner');
+  assert.equal((paid.getVar(ids.state) >>> 7) & 3, paidPreviousEntrance, 'paid leave retains the previous central entrance');
   assert.equal((paid.getVar(ids.state) & ~0x1e0) >>> 0, u32(paidSeed.state & 0xffff0000), 'paid exit retains upper state bits and only idle layout selectors');
   const preservedClientMask = (0x3f | (0x7 << 26)) >>> 0;
   assert.equal(paid.getVar(ids.client) & preservedClientMask, paidSeed.client & preservedClientMask, 'paid exit preserves unrelated original client fields');
@@ -252,15 +255,20 @@ async function main() {
   // run and unrelated activity overlay instead of replacing it with Barrows HUD.
   const paidResume = makePlayer('resume_outside_paid', 0, 3400, 3400);
   const paidResumeSeed = { client: 0x12345678, credit: 900, state: 0x5a5a8012, generation: 66, countdowns: 0x12345678 };
+  const paidResumePreviousCorner = (paidResumeSeed.state >>> 5) & 3;
+  const paidResumePreviousEntrance = (paidResumeSeed.state >>> 7) & 3;
   paidResume.openMainModal(activityModal);
   paidResume.openMainOverlay(activityModal);
   set(paidResume, paidResumeSeed);
   paidResume.packets.length = 0;
   const outside = measureRandom(() => procVoid(paidResume, 'barrows_resume'));
-  assert.equal(outside.calls, 3, 'outside paid resume draws only the idle replacement layout');
+  assert.equal(outside.calls, 1, 'outside paid resume draws one idle layout rank');
   assert.equal(phase(paidResume.getVar(ids.state)), 0, 'outside paid resume resets phase');
   assert.equal(paidResume.getVar(ids.credit), 0, 'outside paid resume clears credit');
   assert.equal(paidResume.getVar(ids.generation) >>> 0, paidResumeSeed.generation + 1, 'outside paid resume advances generation');
+  assert.equal((paidResume.getVar(ids.state) >>> 5) & 3, paidResumePreviousCorner, 'outside paid resume retains the previous ladder corner');
+  assert.equal((paidResume.getVar(ids.state) >>> 7) & 3, paidResumePreviousEntrance, 'outside paid resume retains the previous central entrance');
+  assertLayout(paidResume);
   assert(!paidResume.packets.some(packet => packet.constructor.name === 'IfOpenOverlay'), 'outside resume does not open a Barrows HUD');
   assert.equal(paidResume.overlay, -1, 'outside paid resume closes the HUD overlay');
 
@@ -385,7 +393,7 @@ async function main() {
     assert.deepEqual([moundPlayer.level, moundPlayer.x, moundPlayer.z], [0, x, z], 'run initialization precedes the teleport');
     assert.equal(phase(moundPlayer.getVar(ids.state)), 1, 'Dig initializes the unlooted phase before the view');
     assertLayout(moundPlayer);
-    assert.equal(measured.calls, firstEntry ? 0 : 4, 'first Dig draws identity and topology, another crypt never redraws');
+    assert.equal(measured.calls, firstEntry ? 0 : 2, 'first Dig draws identity and one global layout seam, another crypt never redraws');
     // World clears this flag at delayedUntil, then resumes this same script.
     World.currentTick = moundPlayer.delayedUntil;
     moundPlayer.delayed = false;

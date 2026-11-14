@@ -89,7 +89,11 @@ Native lethal-damage cases use the ordinary damage proc and owner timer, includi
 node --import tsx ../content/tests/barrows/test_topology.mjs
 ```
 
-The packed chooser enumerates all 324 connected masks with exactly one central entrance. The graph includes nine rooms and four paired exterior corridors. The tests cover rotations, access from every room, all four ladder corners, state writes before presentation, relog retention and the run-begin, paid-reset, wrong-answer and Search redraw events. Seeded wrong-answer and Search cases change the corner. Uniform sampling is an UNKNOWN engineering choice. Original door transforms remain personal. Their shared wall collision never changes.
+The packed chooser has 64 masks per ladder corner and central entrance: 1,024 distinct layouts. An independent enumeration of all sixteen-bit masks proves that the packed table contains every allowed layout. Each has one central entrance, exactly one openable door in the ladder room and routes between all nine rooms. Paired exterior corridors may be closed; a redraw keeps the occupied corridor open.
+
+The UNKNOWN engineering policy is uniform over the complete set that satisfies the current shape, prior-run exclusions and occupancy constraints. The single random seam maps one-to-one onto 1,024 unconstrained layouts, 512 layouts with the north corridor occupied, or 576 layouts with one prior corner and central door excluded. An occupied corridor gives each corner 16 or 48 eligible masks per central entrance, not equal corner weights.
+
+First runs permit all four corners and central doors. Consecutive begin/latch/reset cycles exclude the preceding run's corner and central door, including after save/load and relog. Search preserves the layout and draws nothing. Begin, paid reset and a wrong puzzle answer are the draw events. Original door transforms remain personal; shared wall collision never changes.
 
 Open-door operations transfer between measured room-side tiles in the clicked lane. Central access remains closed until the later puzzle slice supplies authorization. No door encounter, puzzle or chest operation is reachable in this prefix.
 
