@@ -1,7 +1,6 @@
-// CANDIDATE: blood-product-contract-1109 / early-osrs-warrior-combat-r2.
+// CANDIDATE: blood-product-contract-1109 / RuneVillage and RuneHQ period guides.
 // Use the existing owner pointer, combat queues and death-credit conventions.
 [oplocu,vampire_big_grave_noblood] ~dt_dessous_pour(last_useitem, last_useslot);
-[oplocu,vampire_big_grave_withblood] ~dt_dessous_pour(last_useitem, last_useslot);
 
 [proc,dt_dessous_pour](obj $pot, int $slot)
 if (~dt_blood_pot($pot) = false) {
@@ -89,20 +88,23 @@ if (%death = ^true) {
 }
 if (%npc_attacking_uid ! uid | %npc_action_delay > map_clock) return;
 if (~npc_check_notcombat = false | ~npc_check_notcombat_self = false) return;
-if (distance(npc_coord, coord) > ^dt_dessous_chase_distance) {
+// CANDIDATE: RuneVillage 2006-02-14 describes missile-prayer teleports.
+if (distance(npc_coord, coord) > ^dt_dessous_chase_distance | (distance(npc_coord, coord) > 1 & ~check_protect_prayer(^ranged_style) = true)) {
     npc_tele(map_findsquare(coord, 1, 1, 0));
     %npc_int = add(%npc_int, 1);
-    if (%npc_int >= ^dt_dessous_teleports_limit) {
-        // NPC page says three, quest page says more than three; see facts.md.
+    if (%npc_int > ^dt_dessous_teleports_limit) {
+        // CANDIDATE: RuneHQ 2006-11-28 update: more than three. No exact leaving speech.
         npc_del;
         return;
     }
 }
-if (~check_protect_prayer(^melee_style) = false & distance(npc_coord, coord) <= 1 & lineofsight(npc_coord, coord) = true) {
+// RuneVillage describes the whole mixed fight; RuneHQ describes the moment after a teleport.
+// The exact melee share is UNKNOWN. Protection from Melee blocks damage, not attack choice.
+if (distance(npc_coord, coord) <= 1 & lineofsight(npc_coord, coord) = true & random(^dt_dessous_melee_rolls) < ^dt_dessous_melee_chances) {
     ~npc_default_attack;
     return;
 }
-// CANDIDATE split attack: each component is five, with native Prayer checks.
+// CANDIDATE: RuneVillage 2006-02-14 / Zybez 2006-02-20, five per valid bat hit.
 // Exact historical delays UNKNOWN; the two named delays remain reconstruction.
 npc_say("Hssssssssssss");
 npc_anim(vampire_summonbats, 0);
@@ -110,8 +112,10 @@ spotanim_pl(vampire_bats, 0, 0);
 if_close;
 ~npc_set_attack_vars;
 %npc_action_delay = add(map_clock, npc_param(attackrate));
-if (~check_protect_prayer(^magic_style) = false) queue(combat_damage_player, ^dt_dessous_bat_first_delay, ^dt_dessous_bat_damage);
-if (~check_protect_prayer(^ranged_style) = false) queue(combat_damage_player, ^dt_dessous_bat_second_delay, ^dt_dessous_bat_damage);
+def_int $damage = ^dt_dessous_bat_damage;
+if (npc_type = blooddiamond_vampirewarrior_unkillable) $damage = ^dt_dessous_invalid_bat_damage;
+if (~check_protect_prayer(^magic_style) = false) queue(combat_damage_player, ^dt_dessous_bat_first_delay, $damage);
+if (~check_protect_prayer(^ranged_style) = false) queue(combat_damage_player, ^dt_dessous_bat_second_delay, $damage);
 queue*(playerhit_n_retaliate, 0)(npc_uid);
 
 [ai_queue2,blooddiamond_vampirewarrior] ~npc_default_damage(last_int);

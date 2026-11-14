@@ -1,6 +1,7 @@
 // CANDIDATE: source-backed graveyard region, reconstructed exact tile from m55_53.
 // The spawn is north of the inner grave rail, on unblocked terrain at local 50,16.
-// Historical exact spawn, chase distance, lifetime and bat delay remain UNKNOWN.
+// Historical exact spawn, leash, chase distance, lifetime and bat delays remain UNKNOWN.
+// Each is an engineering default, not a recovered 377 server value.
 ^dt_dessous_spawn = 0_55_53_50_16
 ^dt_dessous_grave = 0_55_53_48_9
 ^dt_dessous_leash = 25
@@ -8,7 +9,15 @@
 ^dt_dessous_lifetime = 1000
 ^dt_dessous_bat_first_delay = 1
 ^dt_dessous_bat_second_delay = 2
-// CANDIDATE: Dessous page 2025-09-16 says three; quest page says more than three.
+// CANDIDATE: RuneHQ, updated 2006-11-28 (capture 2007-02-02), says MORE than three.
+// Three visible chase teleports; the fourth removes him. No sourced exact leaving line.
 ^dt_dessous_teleports_limit = 3
+// CANDIDATE: RuneVillage 2006-02-14 and Zybez 2006-02-20 attest five per bat hit.
 ^dt_dessous_bat_damage = 5
+// UNKNOWN engineering defaults: invalid bats exceed five (RuneVillage 2006-02-14).
+^dt_dessous_invalid_bat_damage = 10
+// UNKNOWN engineering share: adjacent melee is the minority, bats the majority.
+^dt_dessous_melee_chances = 1
+^dt_dessous_melee_rolls = 4
+// CANDIDATE: RuneHQ 2005-11-05 / 2006-04-24 and Zybez 2006-02-20 attest five.
 ^dt_malak_blood_damage = 5

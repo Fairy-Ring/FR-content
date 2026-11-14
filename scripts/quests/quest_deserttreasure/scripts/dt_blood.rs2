@@ -20,7 +20,7 @@ if (inv_total(inv, fd_silver_pot) > 0) {
     return;
 }
 ~chatnpc("<p,neutral>Why are you still here? I notice Dessous still lives.");
-@dt_malak_advice;
+@dt_malak_repeat_advice;
 
 [label,dt_malak_intro]
 ~chatnpc("<p,neutral>A human, eh? Give me one good reason why I should not just take you to Lord Drakan now.");
@@ -108,12 +108,34 @@ if ($advice = 2) {
 ~chatplayer("<p,neutral>Never mind, I will figure out all I need to know by myself.");
 ~chatnpc("<p,neutral>As you wish. Come and see me when you have managed to kill Dessous.");
 
+// CANDIDATE: Old School transcript r15343078, second visit, lines 835-853.
+[label,dt_malak_repeat_advice]
+def_int $advice = ~p_choice3("Where can I find Dessous?", 1, "How do I kill Dessous again?", 2, "Actually, I don't need to know anything.", 3);
+if ($advice = 1) {
+    ~chatplayer("<p,neutral>Where can I find this Dessous?");
+    ~chatnpc("<p,neutral>He currently resides in a graveyard to the South-East of here. You will not be able to move the gravestone which he lies beneath however, you will need to find some way to lure him out from his tomb.");
+    ~chatplayer("<p,neutral>And how exactly would I go about doing that?");
+    ~chatnpc("<p,neutral>Come and see my when you have prepared a silver ritual pot in the manner I have told you.");
+    ~chatnpc("<p,neutral>I will ensure that you get some fresh blood that you may taint with garlic and spices, to lure our Dessous.");
+    return;
+}
+if ($advice = 2) {
+    ~chatplayer("<p,neutral>How am I supposed to kill Dessous again?");
+    ~chatnpc("<p,neutral>Take a silver bar to the man in the Draynor sewers. He will fashion a ritualistic pot for you, which you should then take to Entrana and get blessed.");
+    ~chatnpc("<p,neutral>When you have done that, come back here and speak to me, I will provide you with some fresh blood which you will then crush some garlic into, and then add some spices to hide the garlic.");
+    ~chatnpc("<p,neutral>In this way, you will be able to lure him from his tomb and he should be sufficiently weakened to be vulnerable to your attacks.");
+    return;
+}
+~chatplayer("<p,neutral>Never mind, I will figure out all I need to know by myself.");
+~chatnpc("<p,neutral>As you wish. Come and see me when you have managed to kill Dessous.");
+
 [opnpc1,malak]
-~chatplayer("<p,neutral>Hello.");
-~chatnpc("<p,neutral>You ssshould not be down here...");
+// Original NPC config name "malak" is Ruantun. Unknown pre-agreement speech is silent.
 if (%deserttreasure < ^dt_stage_hunts | %fdvw_subquest < ^dt_blood_substate_malak_agreed) {
     return;
 }
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>You ssshould not be down here...");
 ~chatplayer("<p,neutral>Are you an assistant to Count Draynor?");
 ~chatnpc("<p,neutral>I usssed to have that honour... Why do you ssseek me?");
 if (inv_total(inv, silver_bar) = 0) {
@@ -139,13 +161,22 @@ return(false);
 
 // Called only by the existing Entrana priest, after his greeting. No travel bypass.
 [proc,dt_blood_bless]
-~chatplayer("<p,neutral>Hi, I was wondering, can you quickly bless this for me?");
-~chatnpc("<p,neutral>A somewhat strange request, but I see no harm in it. There you go. May Saradomin walk with you.");
 def_int $slot = 0;
 while ($slot < inv_size(inv)) {
     def_obj $pot = inv_getobj(inv, $slot);
     def_namedobj $blessed = ~dt_blood_blessed($pot);
     if ($blessed ! null) {
+        ~chatplayer("<p,neutral>Hi, I was wondering, can you quickly bless this for me?");
+        if ($pot = fd_silver_pot) {
+            ~chatnpc("<p,neutral>A somewhat strange request, but I see no harm in it. There you go. May Saradomin walk with you.");
+        } else {
+            // CANDIDATE: Old School transcript r15343078, blood case, lines 883-891.
+            ~chatnpc("<p,neutral>A somewhat strange request, but I see no harm in... Wait a moment... is that BLOOD?");
+            ~chatplayer("<p,neutral>Erm... yes...");
+            ~chatnpc("<p,neutral>Why do you want me to bless a pot full of someones blood???");
+            ~chatplayer("<p,neutral>Oh, don't worry, it's not 'someones', it's my own!");
+            ~chatnpc("<p,neutral>I... see... Well it is an unusual thing, but I see no harm in it. Take this, and walk in peace with Saradomin.");
+        }
         inv_setslot(inv, $slot, $blessed, 1);
         if ($blessed = fd_silver_pot_blood_garlic_spiced_blessed & %fdvw_subquest < ^dt_blood_substate_prepared) %fdvw_subquest = ^dt_blood_substate_prepared;
         return;
@@ -286,8 +317,10 @@ return(false);
 ~dt_blood_take_pot(fd_silver_pot_blood_garlic_spiced_blessed);
 
 [proc,dt_blood_take_pot](namedobj $pot)
-inv_del(inv, $pot, inv_total(inv, $pot));
-inv_del(bank, $pot, inv_total(bank, $pot));
+def_int $held = inv_total(inv, $pot);
+def_int $banked = inv_total(bank, $pot);
+if ($held > 0) inv_del(inv, $pot, $held);
+if ($banked > 0) inv_del(bank, $pot, $banked);
 
 [proc,dt_blood_journal]()(string)
 // Project-authored summaries, not historical quotations: presentation-unknown-1109.

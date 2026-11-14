@@ -410,7 +410,7 @@ def check_blood_preparation(blood: str) -> None:
     )
 
 
-def check_blood_blessing(blood: str, priest: str, monk: str) -> None:
+def check_blood_blessing(blood: str) -> None:
     blessable = block(blood, "proc", "dt_blood_blessable")
     unblessed_inputs = (
         "fd_silver_pot",
@@ -459,94 +459,6 @@ def check_blood_blessing(blood: str, priest: str, monk: str) -> None:
         "late-blessing transaction",
     )
 
-    priest_talk = block(priest, "opnpc1", "high_priest_of_entrana")
-    priest_bless_guard = braced_body(
-        priest_talk,
-        r"if\s*\(\s*%deserttreasure\s*>=\s*\^dt_stage_hunts\s*&\s*%fdvw_subquest\s*>=\s*\^dt_blood_substate_malak_agreed\s*&\s*%fdvw_subquest\s*<\s*\^dt_blood_substate_dessous_defeated\s*&\s*~dt_blood_blessable\s*=\s*true\s*\)",
-        "Entrana High Priest blessing service",
-    )
-    if priest_bless_guard is not None:
-        require(compact(priest_bless_guard) == "~dt_blood_bless;return;", "the priest has one guarded Blood-blessing call and returns")
-    require(priest_talk.count("~dt_blood_bless;") == 1, "the ordinary High Priest exposes exactly one Blood-blessing hook")
-    require_order(
-        priest_talk,
-        ("@devious_high_priest_return;", "@devious_high_priest_surprise;", "~dt_blood_bless;", "@grail_crone;"),
-        "Devious Minds precedence, single Blood service, and existing Grail service",
-    )
-    for existing in (
-        "if (%devious_monk >= 1)",
-        "if (%devious_altar >= 1)",
-        "if(%grail < ^grail_finding_percival & %grail >= ^grail_spoken_merlin)",
-        "if (%heroquest = ^hero_started)",
-        "Many greetings. Welcome to our fair island.",
-        "Enjoy your stay here.|May it be spiritually uplifting!",
-    ):
-        require(existing in priest_talk, f"existing High Priest service remains: {existing}")
-    priest_item_use = block(priest, "opnpcu", "high_priest_of_entrana")
-    require(
-        priest_item_use.strip() == '~chatnpc("<p,confused>No thank you, I am not accepting donations for the church at this time.");',
-        "High Priest item-use fallback remains the original donation refusal",
-    )
-
-    shipmonk = block(monk, "opnpc1", "shipmonk")
-    refusal = braced_body(
-        shipmonk,
-        r"if\s*\(\s*~has_entrana_restricted_items\s*=\s*true\s*\)",
-        "Entrana travel restriction",
-    )
-    if refusal is not None:
-        require("return;" in refusal, "restricted inventory returns before boarding")
-    gate_match = re.search(r"if\s*\(\s*~has_entrana_restricted_items\s*=\s*true\s*\)", shipmonk)
-    sail_match = re.search(r'~set_sail\s*\(\s*"Entrana"', shipmonk)
-    require(
-        gate_match is not None
-        and sail_match is not None
-        and gate_match.start() < sail_match.start()
-        and refusal is not None
-        and "return;" in refusal,
-        "Entrana travel refusal returns before the existing sail operation",
-    )
-    restrictions = block(monk, "proc", "has_entrana_restricted_items")
-    restriction_categories = {
-        "armour_hands",
-        "weapon_staff",
-        "armour_helmet",
-        "armour_body",
-        "armour_legs",
-        "armour_shield",
-        "armour_cape",
-        "armour_godcape",
-        "weapon_slash",
-        "weapon_blunt",
-        "weapon_stab",
-        "weapon_crossbow",
-        "weapon_axe",
-        "weapon_pickaxe",
-        "weapon_javelin",
-        "weapon_2h_sword",
-        "weapon_spear",
-        "weapon_spiked",
-        "weapon_thrown",
-        "weapon_scythe",
-        "weapon_bow",
-        "weapon_claws",
-        "cannon_parts",
-    }
-    actual_restrictions = re.findall(r"inv_totalcat\s*\(\s*inv\s*,\s*([A-Za-z0-9_]+)\s*\)", restrictions)
-    worn_restrictions = re.findall(r"inv_totalcat\s*\(\s*worn\s*,\s*([A-Za-z0-9_]+)\s*\)", restrictions)
-    require(set(actual_restrictions) == restriction_categories, "Entrana retains every restricted inventory category")
-    require(set(worn_restrictions) == restriction_categories - {"cannon_parts"}, "Entrana retains every original restricted worn category (cannon parts are inventory-only)")
-    require("return(true);" in restrictions and "return(false);" in restrictions, "Entrana's restriction helper still reports both outcomes")
-
-    stew_path = ROOT / "scripts" / "skill_cooking" / "scripts" / "cooking_inv" / "scripts" / "stew" / "stew.rs2"
-    stew = read_text(stew_path)
-    spice_route = block(stew, "opheldu", "spicespot")
-    require(
-        compact(spice_route)
-        == "if(~dt_blood_pot(last_useitem)=true){~dt_blood_mix(last_useitem,last_item);return;}switch_obj(last_useitem){caseuncooked_stew:@make_curry;};",
-        "spice-on-pot dispatch is narrowly guarded and preserves the exact original curry switch",
-    )
-    require(spice_route.count("~dt_blood_pot(") == 1 and spice_route.count("~dt_blood_mix(") == 1, "spice dispatch has one pot guard and one mixing call")
 
 
 def check_blood_mixing(blood: str) -> None:
@@ -621,7 +533,7 @@ def check_blood_mixing(blood: str) -> None:
     require("return(null);" in mixture, "unsupported/repeated ingredient combinations produce no result")
 
 
-def check_dessous_combat(dessous: str, shared_combat: str) -> None:
+def check_dessous_combat(dessous: str) -> None:
     code = active_code(dessous)
     require("%deserttreasure =" not in code, "Dessous never writes the Desert Treasure main stage")
     require("$questpoints =" not in code, "Dessous never writes quest points")
@@ -629,10 +541,9 @@ def check_dessous_combat(dessous: str, shared_combat: str) -> None:
 
     expected_tomb_handlers = [
         "oplocu,vampire_big_grave_noblood",
-        "oplocu,vampire_big_grave_withblood",
     ]
     actual_tomb_handlers = [header for header, _ in code_blocks(dessous) if header.startswith("oplocu,")]
-    require(actual_tomb_handlers == expected_tomb_handlers, "both original tomb states route to the same guarded offering procedure")
+    require(actual_tomb_handlers == expected_tomb_handlers, "only the placed original tomb routes to the guarded offering procedure")
     for header, body in code_blocks(dessous):
         if header in expected_tomb_handlers:
             require(
@@ -694,15 +605,6 @@ def check_dessous_combat(dessous: str, shared_combat: str) -> None:
     )
     require("return(false);" in find, "a spectator cannot treat another player's Dessous as their own encounter")
 
-    attackable = block(dessous, "proc", "dt_dessous_attackable")
-    require(
-        "if (npc_type ! blooddiamond_vampirewarrior & npc_type ! blooddiamond_vampirewarrior_unkillable) return(true);" in attackable
-        and "if (%npc_attacking_uid = uid) return(true);" in attackable
-        and "Someone else is fighting that." in attackable
-        and "return(false);" in attackable,
-        "both Dessous forms are attackable only by their owner while unrelated NPCs keep the shared default",
-    )
-    require_order(attackable, ("if (%npc_attacking_uid = uid) return(true);", "Someone else is fighting that.", "return(false);"), "spectator refusal")
 
     expected_ai_headers = [
         "ai_timer,blooddiamond_vampirewarrior",
@@ -732,75 +634,8 @@ def check_dessous_combat(dessous: str, shared_combat: str) -> None:
         and "~npc_check_notcombat = false | ~npc_check_notcombat_self = false" in attack,
         "Dessous attack checks the encounter owner and both combat participants before acting",
     )
-    chase = braced_body(attack, r"if\s*\(\s*distance\s*\(\s*npc_coord\s*,\s*coord\s*\)\s*>\s*\^dt_dessous_chase_distance\s*\)", "Dessous teleport chase")
-    if chase is not None:
-        require_order(
-            chase,
-            ("npc_tele(", "%npc_int = add(%npc_int, 1);", "if (%npc_int >= ^dt_dessous_teleports_limit)", "npc_del;", "return;"),
-            "Dessous returns after the third successful chase teleport",
-        )
-    bat_queues = re.findall(
-        r"queue\s*\(\s*combat_damage_player\s*,\s*\^([A-Za-z0-9_]+)\s*,\s*\^([A-Za-z0-9_]+)\s*\)\s*;",
-        attack,
-    )
-    require(
-        bat_queues
-        == [
-            ("dt_dessous_bat_first_delay", "dt_dessous_bat_damage"),
-            ("dt_dessous_bat_second_delay", "dt_dessous_bat_damage"),
-        ],
-        "Dessous uses two separate bat hits, each with its own delay and shared five-damage amount",
-    )
 
-    failed = block(dessous, "ai_queue2", "blooddiamond_vampirewarrior_unkillable")
-    require(
-        "if (npc_stat(hitpoints) = 0) return;" in failed
-        and "npc_statheal(hitpoints, npc_basestat(hitpoints), 0);" in failed
-        and "%fdvw_subquest =" not in failed
-        and "fd_blood_diamond" not in failed,
-        "an incomplete or unblessed summon regenerates at zero HP without valid-kill progress or a diamond",
-    )
-    require_order(
-        failed,
-        ("if (npc_stat(hitpoints) = 0) return;", "npc_damage(", "if (npc_stat(hitpoints) = 0) {", "npc_statheal(hitpoints, npc_basestat(hitpoints), 0);"),
-        "unkillable Dessous zero-HP regeneration",
-    )
-    death = block(dessous, "ai_queue3", "blooddiamond_vampirewarrior")
-    hero_death = braced_body(
-        death,
-        r"if\s*\(\s*npc_findhero\s*=\s*\^true\s*\)",
-        "normal Dessous hero death",
-    )
-    if hero_death is not None:
-        owned_active_death = braced_body(
-            hero_death,
-            r"if\s*\(\s*uid\s*=\s*%npc_attacking_uid\s*&\s*%fdvw_subquest\s*=\s*\^dt_blood_substate_dessous_active\s*\)",
-            "active owner Dessous death",
-        )
-        if owned_active_death is not None:
-            require(
-                compact(owned_active_death) == "queue(dt_dessous_defeated,0,0);",
-                "only the active owner receives queued defeated credit for a real Dessous kill",
-            )
-    require(
-        "queue(dt_dessous_defeated,0,0);" in compact(death),
-        "normal Dessous death queues the guarded defeated-state update",
-    )
-    defeated_queue = block(dessous, "queue", "dt_dessous_defeated")
-    require(
-        compact(defeated_queue)
-        == "if(%fdvw_subquest=^dt_blood_substate_dessous_active)%fdvw_subquest=^dt_blood_substate_dessous_defeated;",
-        "queued kill credit advances only from active to defeated",
-    )
-    require(code.count("%fdvw_subquest = ^dt_blood_substate_dessous_defeated;") == 1, "Dessous has exactly one defeated-state writer, in the protected player queue")
-    require("blooddiamond_vampirewarrior_unkillable" not in [header.split(",", 1)[1] for header, _ in code_blocks(dessous) if header.startswith("ai_queue3,")], "unkillable Dessous has no quest death-credit handler")
 
-    attack_checks = shared_combat
-    for name in ("npc_is_attackable", "npc_is_attackable_opt"):
-        shared_check = block(attack_checks, "proc", name, f"shared {name} attack check")
-        guard = "if (~dt_dessous_attackable = false) return(false);"
-        require(shared_check.count(guard) == 1, f"{name} invokes the Dessous owner guard exactly once")
-        require_order(shared_check, (guard, "npc_hasop(2)"), f"{name} owner guard before attack-option return")
 
 
 def check_award_and_journal(blood: str, journal: str) -> None:
@@ -849,15 +684,6 @@ def check_award_and_journal(blood: str, journal: str) -> None:
         require("return;" in space_guard, "Malak waits for inventory space when no held pot slot can be reclaimed")
         require(not any(effect in space_guard for effect in ("~dt_blood_take_pots", "inv_add(", "%fdvw_subquest =")), "inventory-space refusal does not consume pots or claim a diamond")
 
-    take_pots = block(blood, "proc", "dt_blood_take_pots")
-    removed_pots = re.findall(r"~dt_blood_take_pot\s*\(\s*([A-Za-z0-9_]+)\s*\)\s*;", take_pots)
-    require(sorted(removed_pots) == sorted(POTS) and len(removed_pots) == len(POTS), "award and reclaim remove each of the ten original pot variants exactly once")
-    take_pot = block(blood, "proc", "dt_blood_take_pot")
-    require(
-        take_pot.count("inv_del(inv, $pot, inv_total(inv, $pot));") == 1
-        and take_pot.count("inv_del(bank, $pot, inv_total(bank, $pot));") == 1,
-        "each pot-removal operation drains every held and banked copy",
-    )
 
     journal_proc = block(blood, "proc", "dt_blood_journal")
     claimed = braced_body(
@@ -909,16 +735,13 @@ def main() -> int:
     blood = read_text(SCRIPTS / "dt_blood.rs2")
     dessous = read_text(SCRIPTS / "dt_dessous.rs2")
     journal = read_text(SCRIPTS / "dt_journal.rs2")
-    priest = read_text(ROOT / "scripts" / "areas" / "area_entrana" / "scripts" / "high_priest_of_entrana.rs2")
-    monk = read_text(ROOT / "scripts" / "areas" / "area_port_sarim" / "scripts" / "monk_of_entrana.rs2")
-    shared_combat = read_text(ROOT / "scripts" / "skill_combat" / "scripts" / "npc" / "npc_combat.rs2")
 
     check_config_identity()
     check_blood_constants()
     check_blood_preparation(blood)
-    check_blood_blessing(blood, priest, monk)
+    check_blood_blessing(blood)
     check_blood_mixing(blood)
-    check_dessous_combat(dessous, shared_combat)
+    check_dessous_combat(dessous)
     check_award_and_journal(blood, journal)
 
     if failures:

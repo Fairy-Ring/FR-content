@@ -379,6 +379,7 @@ def check_original_entity_configs() -> None:
                 "defaultmode": ["none"],
                 "wanderrange": ["0"],
                 "maxrange": ["25"],
+                "attackrange": ["8"],
                 "timer": ["1"],
                 "param": base_params + [
                     "attackbonus,50", "strengthbonus,50", "stabdefence,10",
