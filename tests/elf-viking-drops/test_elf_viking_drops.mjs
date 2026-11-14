@@ -220,6 +220,21 @@ async function run() {
       ]
     }
   ];
+  // Original published bands remain the oracle for every previously occupied slot.
+  const publishedTables = tables.map(table => ({ ...table, rows: [...table.rows] }));
+  const additions = [
+    { key: 'archer', names: ['regicide_darkelf'], emptyFrom: 108, emptyTail: 20,
+      rows: [[102, 103, 'dragon_vambraces', 1], [103, 105, 'airrune', 10],
+        [105, 106, 'poisonivy_bush_seed', 1], [106, 107, 'cactus_seed', 1], [107, 108, 'belladonna_seed', 1]] },
+    { key: 'pikeman', names: ['regicide_darkelf2'], emptyFrom: 106, emptyTail: 22,
+      rows: [[102, 103, 'rune_med_helm', 1], [103, 104, 'poisonivy_bush_seed', 1],
+        [104, 105, 'cactus_seed', 1], [105, 106, 'belladonna_seed', 1]] }
+  ];
+  const elfTable = tables.shift();
+  tables.unshift(...additions.map(addition => ({ ...elfTable, ...addition,
+    rows: [...elfTable.rows, ...addition.rows] })));
+  tables[2] = { ...tables[2], emptyFrom: 96, emptyTail: 32,
+    rows: [...tables[2].rows, [95, 96, 'steel_bar', 1]] };
   for (const table of tables) {
     const enumType = configs.EnumType.getByName(table.clueEnum);
     assert(enumType, `missing ${table.clueEnum}`);
@@ -282,8 +297,9 @@ async function run() {
   }
 
   function addPlayer(x, z, vikingState = vikingNotStarted) {
-    const slot = ++serial;
-    const hash = BigInt(1000 + slot);
+    // Cases are sequential. Keep the player slot within the engine's 11-bit uid.
+    const slot = 1;
+    const hash = BigInt(1000 + ++serial);
     const actor = new Player(`elfviking${slot}`, hash, hash);
     actor.slot = slot;
     actor.pid = slot;
@@ -410,6 +426,7 @@ async function run() {
       assert.equal(tracker.index, draws.length, `${label}: exact scheduled random draw count`);
       const expected = noHero ? [] : expectedRegular(table, roll, vikingState, helper);
       assertDrops(label, records, actor, expected, expectedClue, noHero);
+      return records.map(record => ({ name: byId.obj.get(record.id), count: record.count }));
     } finally {
       objectCapture = null;
       for (const record of records) if (record.object.isActive) World.removeObj(record.object, -1);
@@ -487,6 +504,21 @@ async function run() {
   }
 
   try {
+    // Optional differential run uses the retained, unmodified published binary pack.
+    // Normal CI still pins those same original bands with the literal rows above.
+    const published = new Map();
+    if (process.env.ELFDROPS2_PUBLISHED_PACK) {
+      ScriptProvider.load(path.resolve(process.env.ELFDROPS2_PUBLISHED_PACK));
+      for (const table of publishedTables) {
+        for (const npcName of table.names) {
+          for (let roll = 0; roll < 128; roll++) {
+            published.set(`${npcName}:${roll}`, runDeathCase(table, npcName, roll));
+          }
+        }
+      }
+      ScriptProvider.load(packDir);
+      console.log(`PASS published-pack capture: ${published.size} real packed roll results`);
+    }
     runCombatRoute('regicide_darkelf', 'queue1', 4);
     runCombatRoute('regicide_darkelf', 'opplayer2', 1);
     runCombatRoute('regicide_darkelf2', 'queue1', 1);
@@ -496,11 +528,35 @@ async function run() {
     let rollChecks = 0;
     for (const table of tables) {
       for (const npcName of table.names) {
+        const totals = new Map();
         for (let roll = 0; roll < 128; roll++) {
           if (roll >= table.emptyFrom) emptyTailHits++;
-          runDeathCase(table, npcName, roll);
+          const actual = runDeathCase(table, npcName, roll);
+          const oldTable = publishedTables.find(row => row.names.includes(npcName));
+          if (published.size) {
+            const old = published.get(`${npcName}:${roll}`);
+            if (roll < oldTable.emptyFrom || roll >= table.emptyFrom) {
+              assert.deepEqual(actual, old, `${npcName}:${roll}: differs from published pack`);
+            } else {
+              assert.deepEqual(old, [{ name: 'bones', count: 1 }],
+                `${npcName}:${roll}: new row did not consume an empty published slot`);
+            }
+          }
+          if (roll >= oldTable.emptyFrom && roll < table.emptyFrom) {
+            const regular = actual.filter(item => item.name !== 'bones');
+            assert.equal(regular.length, 1, `${npcName}:${roll}: new row cardinality`);
+            const item = regular[0];
+            totals.set(item.name, (totals.get(item.name) ?? 0) + item.count);
+          }
           rollChecks++;
         }
+        const expectedTotals = table.key === 'archer'
+          ? { dragon_vambraces: 1, airrune: 20, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1 }
+          : table.key === 'pikeman'
+            ? { rune_med_helm: 1, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1 }
+            : { steel_bar: 1 };
+        assert.deepEqual(Object.fromEntries(totals), expectedTotals, `${npcName}: added item totals`);
+        console.log(`PASS ${npcName}: ${table.emptyFrom} allocated/${table.emptyTail} empty; additions ${JSON.stringify(expectedTotals)}`);
       }
       for (const npcName of table.names) {
         runDeathCase(table, npcName, table.clueMainRoll, { clue: 'hit', expectedClue: table.clueItem, suffix: ':clue-hit' });
@@ -511,18 +567,18 @@ async function run() {
       }
     }
     assert.equal(rollChecks, 4 * 128, 'every roll for both target types in both tables');
-    assert.equal(emptyTailHits, 2 * (26 + 33), 'both target types preserve the 26/33-roll empty tails');
+    assert.equal(emptyTailHits, 20 + 22 + 2 * 32, 'exact remaining empty allocations');
 
     for (const npcName of guardNpcNames) {
       for (const state of [vikingNotStarted, vikingStarted]) {
         for (const roll of [11, 12, 13]) {
-          runDeathCase(tables[1], npcName, roll, { vikingState: state, suffix: `:viking-${state}-suppressed` });
+          runDeathCase(tables[2], npcName, roll, { vikingState: state, suffix: `:viking-${state}-suppressed` });
         }
       }
       for (const [roll, item] of [[11, 'viking_sword'], [12, 'viking_shield'], [13, 'viking_helmet']]) {
-        runDeathCase(tables[1], npcName, roll, { vikingState: vikingComplete, suffix: `:viking-complete-${item}` });
+        runDeathCase(tables[2], npcName, roll, { vikingState: vikingComplete, suffix: `:viking-complete-${item}` });
       }
-      runDeathCase(tables[1], npcName, 94, { helper: 127, suffix: ':null-jewel' });
+      runDeathCase(tables[2], npcName, 94, { helper: 127, suffix: ':null-jewel' });
     }
 
     console.log(`PASS elf-viking-drops: ${rollChecks} exhaustive roll cases; 9 trigger selections; two real combat types`);
