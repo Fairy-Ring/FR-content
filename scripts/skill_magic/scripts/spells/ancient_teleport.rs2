@@ -42,6 +42,8 @@ if (p_finduid(uid) = true) {
 [proc,player_teleport_ancient](coord $coord)
 if_close;
 p_stopaction;
+// CANDIDATE extension of the donor's general barrel-drop rule to Ancient travel.
+~tele_checks;
 anim(zaros_teleport, 0);
 spotanim_pl(zaros_teleport, 0, 0);
 // CANDIDATE animation hold in ticks, not a recovered 377 server delay.

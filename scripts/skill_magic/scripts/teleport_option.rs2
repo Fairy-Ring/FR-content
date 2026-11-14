@@ -12,6 +12,8 @@ if (~teleother_travel_checks = false) {
 }
 def_dbrow $spell_data = ~get_spell_data($spell);
 p_stopaction;
+// CANDIDATE extension of the donor's rule: the recipient drops, not the caster.
+~tele_checks;
 anim(human_teleport_other_impact, 0);
 def_spotanim $impact;
 def_int $height;

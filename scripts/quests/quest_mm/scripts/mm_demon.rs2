@@ -33,6 +33,8 @@ mes("The 10th squad sigil begins to shake violently!");
 %mm_cutscene_coord = 1_42_143_14_21;
 p_delay(1);
 // No ~fade_* on 377 thin tree
+// CANDIDATE extension of the donor's general barrel-drop rule to sigil travel.
+~tele_checks;
 anim(human_castteleport, 0);
 sound_synth(teleport_all, 1, 0);
 p_delay(1);
