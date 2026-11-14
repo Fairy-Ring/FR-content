@@ -9,11 +9,21 @@ while (string_length(~macro_fixture_name($event)) > 0) {
         @macro_fixture_enter($event);
         return;
     }
+    $event = add($event, 1);
+}
+mes("[staff fixture] Unknown event.");
+$event = 1;
+while (string_length(~macro_fixture_name($event)) > 0) {
+    def_string $candidate = ~macro_fixture_name($event);
+    if (add(add(string_length($accepted), string_length($candidate)), 2) > 180) {
+        mes("[staff fixture] Accepted: <$accepted>");
+        $accepted = "";
+    }
     if (string_length($accepted) > 0) $accepted = "<$accepted>, ";
     $accepted = "<$accepted><$candidate>";
     $event = add($event, 1);
 }
-mes("[staff fixture] Unknown event. Accepted: <$accepted>");
+if (string_length($accepted) > 0) mes("[staff fixture] Accepted: <$accepted>");
 
 // One source for the public names and the unknown-name diagnostic.
 [proc,macro_fixture_name](int $event)(string)

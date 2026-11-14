@@ -8,6 +8,7 @@ const { ScriptOpcode: op } = await import(pathToFileURL(`${engine}/src/engine/sc
 const { default: ClientCheatHandler } = await import(pathToFileURL(`${engine}/src/network/game/client/handler/ClientCheatHandler.ts`).href);
 const { default: ClientCheat } = await import(pathToFileURL(`${engine}/src/network/game/client/model/ClientCheat.ts`).href);
 const { default: DbTableIndex } = await import(pathToFileURL(`${engine}/src/cache/config/DbTableIndex.ts`).href);
+const { default: MessageGameEncoder } = await import(pathToFileURL(`${engine}/src/network/game/server/codec/MessageGameEncoder.ts`).href);
 const invId = requiredId(types.InvType, 'inv');
 const eventVar = requiredId(types.VarPlayerType, 'macro_event');
 const handlers = { ...ScriptRunner.HANDLERS };
@@ -106,6 +107,7 @@ function run(p, name, { stop = true, removeAdmission = false, unknownFallthrough
       ScriptRunner.execute(state);
     }
     assert.notEqual(state.execution, ScriptState.ABORTED, `${name} aborts`);
+    for (const message of p.messages.filter(m => m.msg?.startsWith('[staff fixture]'))) assert(new MessageGameEncoder().test(message) <= 255, `fixture diagnostic exceeds MESSAGE_GAME framing: ${message.msg}`);
     return { state, calls, entries: calls.filter(c => spawners.some(s => c.name === `[proc,${s}]`)) };
   } finally {
     Object.assign(ScriptRunner.HANDLERS, handlers);
@@ -158,6 +160,11 @@ check('packed command has only one string argument; obsolete aliases are absent'
   assert.equal(script.intArgCount, 0); assert.equal(script.stringArgCount, 1);
   assert.equal(ScriptProvider.getByName('[debugproc,random_event]'), undefined);
   assert.equal(ScriptProvider.getByName('[debugproc,random]'), undefined);
+});
+check('every packed fixture diagnostic literal fits the real MESSAGE_GAME frame', () => {
+  for (const name of ['[debugproc,macro_event]', '[label,macro_fixture_enter]']) {
+    for (const literal of packed(name).stringOperands.filter(s => s?.includes('[staff fixture]'))) assert(Buffer.byteLength(literal) + 1 <= 255, literal);
+  }
 });
 for (let index = 1; index <= names.length; index++) check(`packed accepted name ${names[index - 1]} reaches its production boundary`, () => {
   const p = prep(index);
