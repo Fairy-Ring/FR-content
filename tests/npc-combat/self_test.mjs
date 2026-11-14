@@ -56,6 +56,19 @@ export async function runSelfTests(pack, tempRoot) {
         await rejects('missing source hashes', 'evidence', entry => entry.evidence.sources = []);
         await rejects('malformed source hash', 'evidence', entry => entry.evidence.sources[0].sha256 = 'bad');
         await rejects('stale unlisted skill', 'stale', entry => delete entry.fields.strength);
+        await rejects('stale unlisted added explicit param', 'stale', (entry, data) => {
+            delete entry.fields['param:attack_anim'];
+            delete data.snapshots.types[0].fields['param:attack_anim'];
+        });
+        await rejects('stale unlisted removed explicit param', 'stale', (_entry, data) => {
+            const param = pack.ParamType.configs.find(param => param?.debugname && !chicken.params.has(param.id));
+            assert(param, 'self-test needs a parameter not explicit on chicken');
+            data.snapshots.types[0].fields[`param:${param.debugname}`] = 0;
+        });
+        await rejects('stale unlisted changed explicit param', 'stale', (entry, data) => {
+            delete entry.fields['param:attack_anim'];
+            data.snapshots.types[0].fields['param:attack_anim'] = pack.rawField(chicken, 'param:attack_anim') + 1;
+        });
         await rejects('missing entry', 'missing-entry', (_entry, data) => data.manifest.entries = []);
         await rejects('missing snapshot', 'stale', (_entry, data) => data.snapshots.types = []);
         await rejects('incomplete snapshot', 'stale', (_entry, data) => delete data.snapshots.types[0].fields.huntrange);
@@ -73,19 +86,66 @@ export async function runSelfTests(pack, tempRoot) {
         delete entry.evidence;
         await checkFiles(perField);
         cases++;
+        await rejects('invalid field override with valid entry evidence', 'evidence', entry => {
+            entry.fields.attack.evidence = { ...structuredClone(fixtureEvidence), label: 'verified' };
+        });
+        const invalidPerField = structuredClone(perField);
+        invalidPerField.manifest.entries[0].fields.attack.evidence.label = 'verified';
+        await assert.rejects(() => checkFiles(invalidPerField), /\[evidence\].*chicken\/attack.*invalid label/);
+        console.log('PASS self-test rejects invalid field-only evidence');
+        cases++;
+        const laterUnit = structuredClone(valid);
+        laterUnit.manifest.entries[0].fields.attack = {
+            value: pack.rawField(chicken, 'attack'), unit: 'U-NPC-EXAMINE',
+            evidence: { ...structuredClone(fixtureEvidence), facts: ['npc-examine.chicken-description'] }
+        };
+        await checkFiles(laterUnit);
+        cases++;
+        await rejects('invalid field unit', 'schema', entry => entry.fields.attack.unit = '');
         const mismatchNpc = pack.NpcType.configs.find(npc => npc.debugname && npc.vislevel > 0 &&
             combatLevel(Object.fromEntries(skills.map(skill => [skill, pack.rawField(npc, skill)]))) !== npc.vislevel);
         assert(mismatchNpc, 'self-test needs a visible formula mismatch');
         const mismatch = fixture(mismatchNpc);
-        mismatch.manifest.entries[0].levelException = { kind: 'formula-mismatch', reason: 'Synthetic test of the recorded diagnostic, not a historical claim.' };
+        mismatch.manifest.entries[0].levelException = { kind: 'formula-mismatch', reason: 'Synthetic formula exception, not a historical claim.' };
         const diagnostic = await checkFiles(mismatch);
-        assert.equal(diagnostic.levels[0].status, 'mismatch-diagnostic');
+        assert.equal(diagnostic.levels[0].status, 'mismatch-exception');
         assert.notEqual(diagnostic.levels[0].formula, diagnostic.levels[0].visible);
-        console.log(`PASS self-test level diagnostic: ${diagnostic.levels[0].npc} formula=${diagnostic.levels[0].formula} cache=${diagnostic.levels[0].visible}`);
+        console.log(`PASS self-test level exception: ${diagnostic.levels[0].npc} formula=${diagnostic.levels[0].formula} cache=${diagnostic.levels[0].visible}`);
         cases++;
+        const noException = structuredClone(mismatch);
+        delete noException.manifest.entries[0].levelException;
+        await assert.rejects(() => checkFiles(noException), /\[level\].*formula=.*cache=.*exception/);
+        console.log('PASS self-test rejects visible mismatch without exception');
+        cases++;
+        await rejects('stale level exception on match', 'level-exception', entry => {
+            entry.levelException = { kind: 'formula-mismatch', reason: 'No mismatch exists.' };
+        });
+        const fourSkills = structuredClone(valid);
+        delete fourSkills.manifest.entries[0].fields.ranged;
+        delete fourSkills.manifest.entries[0].fields.magic;
+        assert.equal((await checkFiles(fourSkills)).levels[0].status, 'match');
+        cases++;
+        const fourMismatch = structuredClone(noException);
+        delete fourMismatch.manifest.entries[0].fields.ranged;
+        delete fourMismatch.manifest.entries[0].fields.magic;
+        await assert.rejects(() => checkFiles(fourMismatch), /\[level\].*formula=.*cache=.*exception/);
+        console.log('PASS self-test rejects four-skill visible mismatch without exception');
+        cases++;
+        fourMismatch.manifest.entries[0].levelException = structuredClone(mismatch.manifest.entries[0].levelException);
+        assert.equal((await checkFiles(fourMismatch)).levels[0].status, 'mismatch-exception');
+        cases++;
+        await rejects('stale level exception without whole vector', 'level-exception', entry => {
+            delete entry.fields.attack;
+            entry.levelException = { kind: 'formula-mismatch', reason: 'No whole vector exists.' };
+        });
         const hiddenNpc = pack.NpcType.configs.find(npc => npc.debugname && npc.vislevel === 0);
         assert(hiddenNpc, 'self-test needs a hidden level');
         assert.equal((await checkFiles(fixture(hiddenNpc))).levels[0].status, 'hidden');
+        cases++;
+        const hiddenException = fixture(hiddenNpc);
+        hiddenException.manifest.entries[0].levelException = { kind: 'formula-mismatch', reason: 'No visible level exists.' };
+        await assert.rejects(() => checkFiles(hiddenException), /\[level-exception\].*stale/);
+        console.log('PASS self-test rejects stale hidden-level exception');
         cases++;
         // Odd ranged/magic values require the inner floor, not a floating-point shortcut.
         assert.equal(combatLevel({ attack: 1, defence: 1, strength: 1, hitpoints: 2, ranged: 9, magic: 1 }), 4);
@@ -98,6 +158,9 @@ export async function runSelfTests(pack, tempRoot) {
         const multi = fixture(parent);
         const multiEntry = multi.manifest.entries[0];
         multiEntry.unit = 'A5';
+        if (parent.vislevel > 0 && combatLevel(Object.fromEntries(skills.map(skill => [skill, pack.rawField(parent, skill)]))) !== parent.vislevel) {
+            multiEntry.levelException = { kind: 'formula-mismatch', reason: 'Synthetic routing fixture retains the published parent vector.' };
+        }
         const kind = parent.multivarp !== -1 ? 'varp' : 'varbit';
         const selectorId = kind === 'varp' ? parent.multivarp : parent.multivarbit;
         const selectorName = pack.normalize(selectorId, kind).name;
@@ -112,16 +175,16 @@ export async function runSelfTests(pack, tempRoot) {
         assert.equal((await checkFiles(multi)).routes, 1);
         console.log(`PASS self-test native routing: spawned=${parent.debugname}:${parent.id} resolved=${form.debugname}:${form.id}`);
         cases++;
-        for (const [name, mutate] of [
-            ['wrong routed stat', route => route.stats.attack++],
-            ['wrong routed parameter', route => route.params.attack_anim++],
-            ['wrong routed hasop', route => route.hasop['2'] = !route.hasop['2']],
-            ['wrong resolved options', route => route.resolvedOptions = ['not-an-option', null, null, null, null]],
-            ['wrong resolved identity', route => route.resolvedForm.id++]
+        for (const [name, error, mutate] of [
+            ['wrong routed stat', /\[routing\].*spawned NPC_STAT attack/, route => route.stats.attack++],
+            ['wrong routed parameter', /\[routing\].*spawned NPC_PARAM attack_anim/, route => route.params.attack_anim++],
+            ['wrong routed hasop', /\[routing\].*spawned NPC_HASOP 2/, route => route.hasop['2'] = !route.hasop['2']],
+            ['wrong resolved options', /\[routing\].*resolved options/, route => route.resolvedOptions = ['not-an-option', null, null, null, null]],
+            ['wrong resolved identity', /\[identity\].*feud_arabian_guard/, route => route.resolvedForm.id++]
         ]) {
             const data = structuredClone(multi);
             mutate(data.manifest.entries[0].routing);
-            await assert.rejects(() => checkFiles(data), undefined, name);
+            await assert.rejects(() => checkFiles(data), error, name);
             console.log(`PASS self-test rejects ${name}`);
             cases++;
         }

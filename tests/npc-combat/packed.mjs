@@ -5,10 +5,11 @@ import { isDeepStrictEqual } from 'node:util';
 
 export const skills = ['attack', 'defence', 'strength', 'hitpoints', 'ranged', 'magic'];
 const namePattern = /^[a-z0-9_]+$/;
-const factPattern = /^monster-combat-data\.[a-z0-9]+(?:[._-][a-z0-9]+)*$/;
+const factPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*\.[a-z0-9]+(?:[._-][a-z0-9]+)*$/;
 const sourcePattern = /^src\.[a-z0-9]+(?:[._-][a-z0-9]+)*(?:#[^\s]+)?$/;
 const commitPattern = /^[0-9a-f]{40}$/;
 const hashPattern = /^[0-9a-f]{64}$/;
+const unitPattern = /^(?!T0$)[A-Za-z0-9]+(?:[._-][A-Za-z0-9]+)*$/;
 const fieldRefs = {
     category: 'category', huntmode: 'hunt', readyanim: 'seq', walkanim: 'seq',
     walkanim_b: 'seq', walkanim_l: 'seq', walkanim_r: 'seq', multinpc: 'npc',
@@ -42,7 +43,7 @@ function identityShape(value) {
 function evidence(value, context) {
     keys(value, ['facts', 'label', 'researchCommit', 'sources', 'sourcePriorityException'], `${context} evidence`);
     need(Array.isArray(value.facts) && value.facts.length > 0 && value.facts.every(id =>
-        typeof id === 'string' && factPattern.test(id)), 'evidence', `${context}: missing or malformed fact id`);
+        typeof id === 'string' && factPattern.test(id)), 'evidence', `${context}: missing or malformed fact id in ${JSON.stringify(value.facts)}`);
     need(new Set(value.facts).size === value.facts.length, 'evidence', `${context}: duplicate fact id`);
     need(['VERIFIED', 'CANDIDATE'].includes(value.label), 'evidence', `${context}: missing or invalid label`);
     need(typeof value.researchCommit === 'string' && commitPattern.test(value.researchCommit),
@@ -50,7 +51,7 @@ function evidence(value, context) {
     need(Array.isArray(value.sources) && value.sources.length > 0, 'evidence', `${context}: missing source hashes`);
     const sources = new Set();
     for (const source of value.sources) {
-        keys(source, ['id', 'sha256'], 'source');
+        keys(source, ['id', 'sha256'], `${context} source`);
         need(typeof source.id === 'string' && sourcePattern.test(source.id), 'evidence', `${context}: malformed source id`);
         need(typeof source.sha256 === 'string' && hashPattern.test(source.sha256), 'evidence', `${context}: malformed source hash`);
         need(!sources.has(source.id), 'evidence', `${context}: duplicate source ${source.id}`);
@@ -58,7 +59,7 @@ function evidence(value, context) {
     }
     if (value.sourcePriorityException !== undefined) {
         const exception = value.sourcePriorityException;
-        keys(exception, ['kind', 'preferred', 'overridden', 'reason'], 'source-priority exception');
+        keys(exception, ['kind', 'preferred', 'overridden', 'reason'], `${context} source-priority exception`);
         need(exception.kind === 'source-priority' && text(exception.reason), 'evidence', `${context}: source-priority exception needs kind and reason`);
         need(sources.has(exception.preferred), 'evidence', `${context}: preferred source must have a hash`);
         need(Array.isArray(exception.overridden) && exception.overridden.length > 0 &&
@@ -164,7 +165,16 @@ export async function loadPack(contentDir, engineDir, packDir) {
             [field, normalize(rawField(npc, field), fieldKind(field))])) };
     }
     function expectField(npc, field, value, context) {
-        same(rawField(npc, field), resolve(value, fieldKind(field)), 'expected-field', `${context}/${field}`);
+        let actual;
+        let expected;
+        try {
+            actual = rawField(npc, field);
+            expected = resolve(value, fieldKind(field));
+        } catch (error) {
+            error.message = `${context}/${field}: ${error.message}`;
+            throw error;
+        }
+        same(actual, expected, 'expected-field', `${context}/${field}`);
     }
     let routingRuntime;
     async function checkRouting(routing, entry) {
@@ -244,8 +254,9 @@ export async function checkManifest(manifest, snapshots, pack) {
     for (const snapshot of snapshots.types) {
         keys(snapshot, ['identity', 'contentCommit', 'fields'], 'snapshot');
         identityShape(snapshot.identity);
-        need(!baseline.has(snapshot.identity.debugname), 'schema', 'duplicate snapshot');
-        need(typeof snapshot.contentCommit === 'string' && commitPattern.test(snapshot.contentCommit) && object(snapshot.fields), 'schema', 'snapshot needs commit and fields');
+        need(!baseline.has(snapshot.identity.debugname), 'schema', `${snapshot.identity.debugname}: duplicate snapshot`);
+        need(typeof snapshot.contentCommit === 'string' && commitPattern.test(snapshot.contentCommit) && object(snapshot.fields),
+            'schema', `${snapshot.identity.debugname}: snapshot needs commit and fields`);
         baseline.set(snapshot.identity.debugname, snapshot);
     }
     const seen = new Set();
@@ -258,11 +269,11 @@ export async function checkManifest(manifest, snapshots, pack) {
         const context = entry.identity.debugname;
         need(!seen.has(context), 'identity', `duplicate entry ${context}`);
         seen.add(context);
-        need(typeof entry.unit === 'string' && /^(?:S\d{2}[a-z]?|A(?:[1-9]|1[0-4]))$/.test(entry.unit), 'schema', `${context}: invalid build unit`);
+        need(typeof entry.unit === 'string' && unitPattern.test(entry.unit), 'schema', `${context}: invalid build unit`);
         need(object(entry.fields) && Object.keys(entry.fields).length > 0, 'schema', `${context}: fields must not be empty`);
         if (entry.evidence !== undefined) evidence(entry.evidence, context);
         if (entry.levelException !== undefined) {
-            keys(entry.levelException, ['kind', 'reason'], 'level exception');
+            keys(entry.levelException, ['kind', 'reason'], `${context} level exception`);
             need(entry.levelException.kind === 'formula-mismatch' && text(entry.levelException.reason), 'level-exception', `${context}: level exception needs kind and reason`);
         }
         const snapshot = baseline.get(context);
@@ -273,7 +284,11 @@ export async function checkManifest(manifest, snapshots, pack) {
         same(Object.keys(snapshot.fields).filter(field => !field.startsWith('param:')).sort(), coreFields,
             'stale', `${context}: snapshot must include every decoded native field`);
         for (const [field, expectation] of Object.entries(entry.fields)) {
-            keys(expectation, ['value', 'evidence'], `${context}/${field}`);
+            keys(expectation, ['value', 'evidence', 'unit'], `${context}/${field}`);
+            if (expectation.unit !== undefined) {
+                need(typeof expectation.unit === 'string' && unitPattern.test(expectation.unit), 'schema', `${context}/${field}: invalid build unit`);
+                evidence(expectation.evidence, `${context}/${field}`);
+            }
             need(Object.hasOwn(expectation, 'value'), 'schema', `${context}/${field}: missing value`);
             evidence(expectation.evidence ?? entry.evidence, `${context}/${field}`);
             pack.expectField(npc, field, expectation.value, context);
@@ -285,12 +300,22 @@ export async function checkManifest(manifest, snapshots, pack) {
             need(currentFields.includes(field) && Object.hasOwn(snapshot.fields, field), 'stale', `${context}/${field}: unlisted added or removed field`);
             same(pack.rawField(npc, field), pack.resolve(snapshot.fields[field], pack.fieldKind(field)), 'stale', `${context}/${field}: unlisted drift`);
         }
-        if (skills.every(skill => Object.hasOwn(entry.fields, skill))) {
+        const wholeVector = ['attack', 'defence', 'hitpoints', 'strength'].every(skill => Object.hasOwn(entry.fields, skill));
+        if (wholeVector || entry.levelException !== undefined) {
             const vector = Object.fromEntries(skills.map(skill => [skill, pack.rawField(npc, skill)]));
             const formula = combatLevel(vector);
+            const mismatch = npc.vislevel > 0 && formula !== npc.vislevel;
             levels.push({ npc: context, formula, visible: npc.vislevel,
-                status: npc.vislevel <= 0 ? 'hidden' : formula === npc.vislevel ? 'match' : 'mismatch-diagnostic',
+                status: npc.vislevel <= 0 ? 'hidden' : !mismatch ? 'match'
+                    : entry.levelException ? 'mismatch-exception' : 'mismatch',
                 exception: entry.levelException ?? null });
+            const staleException = entry.levelException !== undefined && (!wholeVector || !mismatch);
+            if (staleException || (mismatch && !entry.levelException)) {
+                const kind = staleException ? 'level-exception' : 'level';
+                const reason = staleException ? 'stale formula-mismatch exception requires a visible whole-vector mismatch'
+                    : 'visible whole-vector mismatch requires a formula-mismatch exception with a reason';
+                throw Object.assign(new Error(`[${kind}] ${context}: formula=${formula} cache=${npc.vislevel}: ${reason}`), { levels });
+            }
         }
         if (entry.routing !== undefined) {
             await pack.checkRouting(entry.routing, entry);
