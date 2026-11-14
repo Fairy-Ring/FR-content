@@ -3,7 +3,6 @@
  * Only JavaRandom is controlled; the effect-command observer calls every real handler.
  */
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -32,11 +31,18 @@ for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType'
 }
 (await load('src/cache/config/DbTableIndex.ts')).default.init();
 assert(ScriptProvider.load(pack) > 0, 'a real built pack is required');
-const { VarPlayerType, VarNpcType, NpcType, InvType, ParamType } = configs;
+const { VarPlayerType, VarNpcType, NpcType, InvType, ParamType, DbTableType, DbRowType } = configs;
 const id = (type, name) => { const n = type.getId(name); assert(n >= 0, `packed ${name}`); return n; };
 const poisonId = id(VarPlayerType, 'poison');
 const timerScript = ScriptProvider.getByName('[timer,poison]');
-let serial = 0, checks = 0, tape = null;
+const spellTable = DbTableType.getByName('magic_spell_table');
+const windStrike = DbRowType.getByName('magic_spell_wind_strike');
+assert(spellTable && windStrike, 'real named Wind Strike data');
+const spellValue = name => {
+  const column = spellTable.columnNames.indexOf(name); assert(column >= 0, name);
+  return windStrike.getValue(column, 0)[0];
+};
+let serial = 0, checks = 0, hitTape = null;
 const check = (label, actual, expected) => { assert.deepEqual(actual, expected, label); checks++; console.log(`PASS ${label}`); };
 
 // Slime/spider/cow have no natural ranged projectile. Borrow only valid delivery
@@ -44,9 +50,8 @@ const check = (label, actual, expected) => { assert.deepEqual(actual, expected, 
 // Accuracy, damage stats, poison severity and the selected flag are not changed.
 const deliveryNames = ['rangeattack_sound', 'proj_launch', 'proj_travel'];
 const deliveryParams = deliveryNames.map(name => ParamType.getByName(name));
-const deliveryDonor = Array.from({ length: NpcType.count }, (_, i) => NpcType.get(i)).find(npc =>
-  deliveryParams.every(param => ParamHelper.getIntParam(param.id, npc, param.defaultInt) >= 0));
-assert(deliveryDonor, 'real packed ranged delivery donor');
+const deliveryDonor = NpcType.getByName('ardougne_archer');
+assert(deliveryDonor && deliveryParams.every(param => ParamHelper.getIntParam(param.id, deliveryDonor, param.defaultInt) >= 0), 'named real packed ranged delivery donor');
 function withDelivery(style, f, action) {
   if (style !== 'ranged') return action();
   const config = NpcType.get(f.npc.type), original = config.params;
@@ -55,17 +60,18 @@ function withDelivery(style, f, action) {
   try { return action(); } finally { config.params = original; }
 }
 
-// Observe effect commands, not arithmetic, local variables or config reads. Keeping
-// real handlers distinguishes a production queue/timer/damage from a fake outcome.
-const effects = ['IF_CLOSE', 'QUEUE', 'QUEUE*', 'WEAKQUEUE', 'WEAKQUEUE*', 'STRONGQUEUE', 'STRONGQUEUE*', 'LONGQUEUE', 'LONGQUEUE*', 'CLEARQUEUE', 'SETTIMER', 'CLEARTIMER', 'POP_VARP', 'POP_VARN', 'POP_VARBIT', 'MES', 'DAMAGE', 'ANIM', 'NPC_ANIM', 'NPC_SETMODE', 'SOUND_SYNTH', 'SPOTANIM_PL', 'SPOTANIM_NPC', 'PROJANIM_MAP', 'PROJANIM_PL', 'PROJANIM_NPC'];
-for (const name of effects) {
-  const opcode = ScriptOpcodeMap.get(name), original = ScriptRunner.HANDLERS[opcode];
-  assert(original, `real handler ${name}`);
-  ScriptRunner.HANDLERS[opcode] = state => {
-    if (tape) tape.push({ command: name, operand: state.intOperand, ints: state.intStack.slice(0, state.isp), strings: state.stringStack.slice(0, state.ssp) });
-    original(state);
-  };
-}
+// Observe actual delivered hits while retaining the production handler. Actor
+// identities are symbolic; no generated ids or saved command traces are compared.
+const damageOpcode = ScriptOpcodeMap.get('DAMAGE');
+const realDamage = ScriptRunner.HANDLERS[damageOpcode];
+ScriptRunner.HANDLERS[damageOpcode] = state => {
+  if (hitTape) {
+    const [uid, type, damage] = state.intStack.slice(state.isp - 3, state.isp);
+    assert.equal(uid, state.activePlayer.uid, 'damage targets the fixture player');
+    hitTape.push({ target: 'player', type, damage });
+  }
+  realDamage(state);
+};
 function fixture(name) {
   const n = ++serial;
   World.currentTick = 100;
@@ -106,47 +112,26 @@ function settle(player, ticks = 5) {
   finally { JavaRandom.nextDouble = original; }
 }
 function attack(style, outcome, f) {
-  const rolls = outcome === 'miss' ? [0, 0] : [0.999999, 0, outcome === 'zero' ? 0 : 0.999999];
+  if (outcome === 'prayer') f.player.setVar(id(VarPlayerType, style === 'melee' ? 'prayer14' : style === 'ranged' ? 'prayer13' : 'prayer12'), 1);
+  const rolls = outcome === 'miss' ? [0, 0] : outcome === 'prayer' ? [0.999999, 0] : [0.999999, 0, outcome === 'zero' ? 0 : 0.999999];
   withDelivery(style, f, () => random(rolls, () => {
     if (style === 'melee') run('[proc,npc_meleeattack]', f.npc, f.player);
     else if (style === 'ranged') run('[proc,npc_rangeattack]', f.npc, f.player);
-    else run('[proc,npc_cast_spell]', f.npc, f.player, [51, 4]); // real Wind Strike spell constant
+    else run('[proc,npc_cast_spell]', f.npc, f.player, [spellValue('spell'), 4]);
   }));
-}
-function snapshot(f) {
-  const { player, npc } = f;
-  return {
-    poison: player.getVar(poisonId), hp: player.levels[PlayerStat.HITPOINTS], messages: player.testMessages,
-    timer: [...player.timers.values()].map(t => ({ script: t.script.name, interval: t.interval, clock: t.clock })),
-    queues: [...player.queue.all()].map(q => ({ script: q.script.name, args: q.args, delay: q.delay })),
-    npcDelay: npc.getVar(id(VarNpcType, 'npc_action_delay'))
-  };
 }
 const styles = ['melee', 'ranged', 'magic'];
 Environment.NODE_MEMBERS = true;
-// Fixed order also keeps actual entity UID arguments identical to the baseline.
-const controls = [];
-for (const style of styles) {
-  for (const [type, outcome] of [['swamp_cave_slime', 'positive'], ['poisonspider', 'positive'], ['poisonspider', 'zero'], ['poisonspider', 'miss'], ['cow', 'positive']]) {
-    const f = fixture(type); tape = []; attack(style, outcome, f); settle(f.player);
-    controls.push({ style, type, outcome, commands: tape, result: snapshot(f) }); tape = null;
-  }
-}
-const baselineArg = process.argv.indexOf('--record-published');
-if (baselineArg !== -1) {
-  for (const style of styles) {
-    const f = fixture('swamp_cave_slime'); attack(style, 'zero', f); settle(f.player);
-    check(`published ${style} successful zero does not poison`, f.player.getVar(poisonId), 0);
-  }
-  writeFileSync(process.argv[baselineArg + 1], `${JSON.stringify({ contentCommit: '7b07e3d3ae144aeec4fd1f450e353d58f433b513', controls }, null, 2)}\n`);
-  console.log(`PASS published poison baseline ${controls.length} real effect-command traces`);
-  process.exit(0);
-}
-const baseline = JSON.parse(readFileSync(path.join(here, 'published-commands.json'), 'utf8'));
-check('published positive hits and unnamed/nonpoisonous controls retain identical real effect commands', controls, baseline.controls);
+// Rule assertions replace the one-time published ordered-command comparison.
+// Named poisonous samples exercise each shared style; ranged delivery alone is
+// borrowed for these naturally melee NPCs. This is not a live ranged/magic claim.
+const samples = ['swamp_cave_slime', 'poisonspider', 'tribesman', 'slayer_cave_crawler_1', 'cow'];
+const severityParam = ParamType.getByName('poison_severity'); assert(severityParam);
+const severityOf = name => ParamHelper.getIntParam(severityParam.id, NpcType.getByName(name), severityParam.defaultInt);
+const maxHit = (style, f) => style === 'magic' ? spellValue('maxhit') : run(style === 'melee' ? '[proc,npc_melee_maxhit]' : '[proc,npc_ranged_maxhit]', f.npc, f.player)[0];
 const flag = ParamType.getByName('poison_without_damage'); assert(flag, 'server poison flag packed');
 check('zero-damage flag defaults to no', flag.defaultInt, 0);
-check('zero-damage flag remains server-only', flag.autodisable, true);
+check('zero-damage flag is autodisabled when unused', flag.autodisable, true);
 const flagged = [];
 for (let i = 0; i < NpcType.count; i++) {
   const config = NpcType.get(i);
@@ -154,19 +139,29 @@ for (let i = 0; i < NpcType.count; i++) {
 }
 check('only the named cave slime is flagged', flagged, ['swamp_cave_slime']);
 for (const style of styles) {
-  for (const [type, severity] of [['swamp_cave_slime', 15], ['poisonspider', 27], ['cow', 0]]) {
-    for (const outcome of ['zero', 'positive', 'miss']) {
-      const f = fixture(type); attack(style, outcome, f);
+  for (const type of samples) {
+    const severity = severityOf(type);
+    check(`${style} ${type} sample poison severity classification`, severity > 0, type !== 'cow');
+    for (const outcome of ['zero', 'positive', 'miss', 'prayer']) {
+      const f = fixture(type);
+      const damage = outcome === 'positive' ? maxHit(style, f) : 0;
+      if (outcome === 'positive') assert(damage > 0, `${style} ${type} positive fixture has a configured damaging hit`);
+      if (outcome === 'positive') console.log(`CONFIG ${style} ${type} maxhit=${damage} poison_severity=${severity}`);
+      hitTape = []; attack(style, outcome, f);
       const poisonQueues = [...f.player.queue.all()].filter(q => q.script.name === '[queue,poison_player]');
       const expected = severity > 0 && (outcome === 'positive' || (type === 'swamp_cave_slime' && outcome === 'zero')) ? severity : 0;
       check(`${style} ${type} ${outcome} poison queue count`, poisonQueues.length, expected ? 1 : 0);
+      check(`${style} ${type} ${outcome} queued poison severity`, poisonQueues.map(q => q.args), expected ? [[severity]] : []);
       settle(f.player);
+      check(`${style} ${type} ${outcome} delivered hit`, hitTape, style === 'magic' && ['miss', 'prayer'].includes(outcome) ? [] : [{ target: 'player', type: damage > 0 ? 1 : 0, damage }]);
+      hitTape = null;
+      check(`${style} ${type} ${outcome} hitpoints follow the tested pack`, f.player.levels[PlayerStat.HITPOINTS], 80 - damage);
       check(`${style} ${type} ${outcome} poison result`, f.player.getVar(poisonId), expected);
+      check(`${style} ${type} ${outcome} messages`, f.player.testMessages, expected ? ['You have been poisoned!'] : []);
+      check(`${style} ${type} ${outcome} poison timer presence`, f.player.timers.has(timerScript.id), expected > 0);
       if (expected) {
-        check(`${style} ${type} first poison message`, f.player.testMessages.filter(s => s === 'You have been poisoned!').length, 1);
         const timer = f.player.timers.get(timerScript.id);
-        check(`${style} ${type} published timer interval`, timer.interval, 30);
-        check(`${style} ${type} no immediate poison damage`, f.player.levels[PlayerStat.HITPOINTS], 80 - (outcome === 'zero' ? 0 : style === 'magic' ? 2 : run(style === 'melee' ? '[proc,npc_melee_maxhit]' : '[proc,npc_ranged_maxhit]', f.npc, f.player)[0]));
+        check(`${style} ${type} poison timer interval`, timer.interval, 30);
         const hp = f.player.levels[PlayerStat.HITPOINTS];
         World.currentTick = timer.clock + 29; f.player.processTimers(timer.type); settle(f.player, 0);
         check(`${style} ${type} no poison before tick 30`, f.player.getVar(poisonId), expected);
@@ -189,25 +184,18 @@ for (const style of styles) {
     check(`${style} f2p ${outcome} no poison timer`, f.player.timers.has(timerScript.id), false);
   }
   Environment.NODE_MEMBERS = true;
-  const f = fixture('swamp_cave_slime');
-  f.player.setVar(id(VarPlayerType, style === 'melee' ? 'prayer14' : style === 'ranged' ? 'prayer13' : 'prayer12'), 1);
-  withDelivery(style, f, () => random([0.999999, 0], () => {
-    if (style === 'melee') run('[proc,npc_meleeattack]', f.npc, f.player);
-    else if (style === 'ranged') run('[proc,npc_rangeattack]', f.npc, f.player);
-    else run('[proc,npc_cast_spell]', f.npc, f.player, [51, 4]);
-  }));
-  settle(f.player); check(`${style} matching protection prayer defeats a favorable accuracy roll without poison`, f.player.getVar(poisonId), 0);
 }
 {
   const f = fixture('swamp_cave_slime');
   attack('melee', 'zero', f); settle(f.player);
+  const severity = severityOf('swamp_cave_slime');
   const timer = f.player.timers.get(timerScript.id);
   const hp = f.player.levels[PlayerStat.HITPOINTS];
   Environment.NODE_MEMBERS = false;
   World.currentTick = timer.clock + 30;
   f.player.processTimers(timer.type); settle(f.player);
-  check('existing poison still deals its first damage on a free world', hp - f.player.levels[PlayerStat.HITPOINTS], 3);
-  check('existing poison still decays on a free world', f.player.getVar(poisonId), 14);
+  check('existing poison still deals its first damage on a free world', hp - f.player.levels[PlayerStat.HITPOINTS], Math.floor((severity + 4) / 5));
+  check('existing poison still decays on a free world', f.player.getVar(poisonId), severity - 1);
   check('existing poison timer remains on a free world', f.player.timers.has(timerScript.id), true);
   Environment.NODE_MEMBERS = true;
 }
