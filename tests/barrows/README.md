@@ -100,3 +100,11 @@ node --import tsx ../content/tests/barrows/test_tunnel.mjs
 ```
 
 All six selected identities use the existing Continue prompt. The packed tests cover each identity at all four measured ladder landings, native button resumption and parent-ladder dispatch, cancellation, captured generation/identity/phase/origin guards and clean shared logout/login. The other five crypts still summon their residents. Entry and exit preserve unfinished progress and the already chosen layout; the visible ladder returns to the selected crypt's original entry join. No default-zero door layout or new selection is exposed.
+
+## Prayer and faces (S06)
+
+```sh
+node --import tsx ../content/tests/barrows/test_prayer.mjs
+```
+
+The native protected timer repeats every tick and stores its exact Prayer remainder in varp 660's low half. The tests cover B=0..6, zero clamping, opposite-half preservation, busy-player stalls, all 64 slain masks and one-based face ranks, the original normal objects and six blank overlay slots, high/low-detail controls, sequence-derived fade cleanup, generation changes, Search and reset, real shared login/logout, and native player save/load without offline replay. The 17-tick 8+B drain is CANDIDATE. Normal palette, uniform slain selection, matching original slot and unscaled object zoom are UNKNOWN engineering policies named in `barrows.constant`; no green alternative is drawn.

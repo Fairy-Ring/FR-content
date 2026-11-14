@@ -217,7 +217,9 @@ const ENUM_SIGNATURES = new Map([
     ['barrows_side_second_lock_bit', ['int', 'int']],
     ['barrows_ladder_landing', ['int', 'coord']],
     ['barrows_ladder_corner_by_loc', ['loc', 'int']],
-    ['barrows_identity_brother', ['int', 'npc']]
+    ['barrows_identity_brother', ['int', 'npc']],
+    ['barrows_face_object', ['int', 'obj']],
+    ['barrows_face_slot', ['int', 'component']]
 ]);
 
 

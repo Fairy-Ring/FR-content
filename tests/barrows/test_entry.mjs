@@ -212,7 +212,7 @@ async function main() {
     const killCountOverlay = Component.getId('kill_count');
     assert.notEqual(killCountOverlay, -1, 'runtime component config contains kill_count');
     assert.equal(player.overlay, killCountOverlay, 'inside resume restores the Barrows kill-count HUD');
-    assert.equal(player.timers.size, timersBefore, 'resume does not add or replace timers');
+    assert.equal(player.timers.size, timersBefore + 1, 'resume arms the one-tick Barrows timer');
     assert.equal(player.getVar(ids.countdowns) >>> 0, seed.countdowns, 'resume preserves saved countdowns');
   }
   // Execute the exact compiled login server trigger through the engine's trigger

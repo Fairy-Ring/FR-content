@@ -29,6 +29,7 @@ p_stopaction;
 return(true);
 
 [proc,barrows_generation_advance]
+~barrows_timer_stop;
 if (%barrows_generation = ^barrows_generation_max) {
     // Actor deletion completes before the wrapped generation can be used by a new encounter.
     ~barrows_remove_owned;
@@ -75,6 +76,7 @@ p_stopaction;
 %barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
 ~barrows_generation_advance;
 ~barrows_layout_choose;
+~barrows_timer_resume;
 return(true);
 
 [proc,barrows_run_reset]
@@ -87,14 +89,17 @@ p_stopaction;
 ~barrows_layout_choose;
 ~barrows_close_presentation;
 
-// Reconstruct presentation without redrawing a run or refreshing countdowns.
+// Restore presentation and the exact saved remainder without redrawing a run.
 [proc,barrows_resume]
 if (testbit(%barrows_state, ^barrows_challenge_bit) = 1) {
     %barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
     if_close;
 }
 if (~barrows_inside(coord) = true) {
-    if (~barrows_phase = ^barrows_phase_unlooted | ~barrows_phase = ^barrows_phase_paid) if_openoverlay(kill_count);
+    if (~barrows_phase = ^barrows_phase_unlooted | ~barrows_phase = ^barrows_phase_paid) {
+        if_openoverlay(kill_count);
+        ~barrows_timer_resume;
+    }
 } else if (~barrows_phase = ^barrows_phase_paid) {
     ~barrows_leave;
 }

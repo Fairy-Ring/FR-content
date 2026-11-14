@@ -1,0 +1,36 @@
+// CANDIDATE slain-only faces in high detail. Palette, selection and slot policy
+// are UNKNOWN engineering choices named together in barrows.constant.
+[proc,barrows_slain_count]()(int)
+return(bitcount(getbit_range(%barrows_kills, ^barrows_slain_start, ^barrows_slain_end)));
+
+// Pure one-based rank among the slain identities. An absent rank returns zero.
+[proc,barrows_face_identity](int $rank)(int)
+def_int $bit = ^barrows_slain_start;
+while ($bit <= ^barrows_slain_end) {
+    if (testbit(%barrows_kills, $bit) = 1) {
+        $rank = sub($rank, 1);
+        if ($rank = 0) return(add(sub($bit, ^barrows_slain_start), 1));
+    }
+    $bit = add($bit, 1);
+}
+return(0);
+
+[proc,barrows_face_show]
+if (lowmem = true) return;
+def_int $slain = ~barrows_slain_count;
+if ($slain = 0) return;
+~barrows_face_clear;
+def_int $identity = ~barrows_face_identity(add(1, random($slain)));
+def_component $slot = enum(int, component, barrows_face_slot, $identity);
+if_setobject($slot, enum(int, obj, barrows_face_object, $identity), ^barrows_face_scale);
+if_setanim($slot, ^barrows_face_fade);
+if_sethide($slot, false);
+
+[proc,barrows_face_clear]
+def_int $identity = 1;
+while ($identity <= ^barrows_identity_count) {
+    def_component $slot = enum(int, component, barrows_face_slot, $identity);
+    if_setanim($slot, null);
+    if_sethide($slot, true);
+    $identity = add($identity, 1);
+}

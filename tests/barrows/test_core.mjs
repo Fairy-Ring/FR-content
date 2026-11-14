@@ -755,8 +755,8 @@ async function main() {
     assert.deepEqual(snapshot(resetPlayer), staleAfterReset, 'stale Search authorization must not mutate the new run');
     assert.equal(procInt(resetPlayer, 'barrows_search_allowed', [82]), 1, 'the newly begun generation must authorize a valid tunnel Search guard');
 
-    // Resume closes an active challenge and does nothing to retained run fields,
-    // saved countdowns, or timer registrations.
+    // Resume clears the active challenge and arms the one-tick timer without
+    // refreshing either positive saved countdown.
     const resumePlayer = makePlayer('resume');
     const resumeSeedState = stateWord({ high: 0x9abc0000, identity: 2, phase: 2, corner: 3, entrance: 1, solved: true, family: 2, permutation: 5, challenge: true });
     const resumeSeed = {
@@ -778,7 +778,7 @@ async function main() {
       ...resumeBefore,
       state: u32(resumeSeedState & ~STATE.challengeMask)
     }, 'barrows_resume may clear only the active-challenge bit');
-    assert.equal(resumePlayer.timers.size, resumeTimerCount, 'barrows_resume must not arm, clear, or replace timers');
+    assert.equal(resumePlayer.timers.size, resumeTimerCount + 1, 'barrows_resume arms the one-tick timer from the saved remainder');
     assert.equal(procInt(resumePlayer, 'barrows_prayer_remaining'), 0xbeef, 'resume must retain the exact prayer countdown half');
     assert.equal(procInt(resumePlayer, 'barrows_collapse_remaining'), 0xf00d, 'resume must retain the exact collapse countdown half');
 

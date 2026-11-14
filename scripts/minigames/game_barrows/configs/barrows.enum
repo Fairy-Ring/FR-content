@@ -274,3 +274,26 @@ val=3,barrows_guthan
 val=4,barrows_karil
 val=5,barrows_torag
 val=6,barrows_verac
+
+// UNKNOWN engineering normal-palette and identity-to-slot policy, named in barrows.constant.
+[barrows_face_object]
+inputtype=int
+outputtype=obj
+default=null
+val=1,^barrows_face_ahrim
+val=2,^barrows_face_dharok
+val=3,^barrows_face_guthan
+val=4,^barrows_face_karil
+val=5,^barrows_face_torag
+val=6,^barrows_face_verac
+
+[barrows_face_slot]
+inputtype=int
+outputtype=component
+default=null
+val=1,^barrows_face_slot_ahrim
+val=2,^barrows_face_slot_dharok
+val=3,^barrows_face_slot_guthan
+val=4,^barrows_face_slot_karil
+val=5,^barrows_face_slot_torag
+val=6,^barrows_face_slot_verac

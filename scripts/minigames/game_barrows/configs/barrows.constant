@@ -68,3 +68,27 @@
 ^barrows_corner_count = 4
 ^barrows_layout_count = 81
 ^barrows_lock_mask = 65535
+
+// CANDIDATE D3 timing conversion and drain, not exact May 2006 measurements.
+^barrows_prayer_interval_ticks = 17
+^barrows_prayer_base_drain = 8
+
+// VERIFIED original sequence; inherited 20 ms client cycles / 600 ms server tick.
+^barrows_face_fade = barrows_chathead_fade
+^barrows_client_cycles_per_tick = 30
+
+// UNKNOWN engineering face selection, unscaled object zoom, normal palette and slots.
+^barrows_face_selection = "uniform_slain"
+^barrows_face_scale = 100
+^barrows_face_ahrim = barrows_interface_ahrim
+^barrows_face_dharok = barrows_interface_dharok
+^barrows_face_guthan = barrows_interface_guthan
+^barrows_face_karil = barrows_interface_karil
+^barrows_face_torag = barrows_interface_torag
+^barrows_face_verac = barrows_interface_verac
+^barrows_face_slot_ahrim = kill_count:com_1
+^barrows_face_slot_dharok = kill_count:com_2
+^barrows_face_slot_guthan = kill_count:com_3
+^barrows_face_slot_karil = kill_count:com_4
+^barrows_face_slot_torag = kill_count:com_5
+^barrows_face_slot_verac = kill_count:com_6

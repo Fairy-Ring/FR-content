@@ -1,5 +1,6 @@
 // CANDIDATE D9: departure resets only a paid run; logout never resets it.
 [proc,barrows_close_presentation]
+~barrows_timer_stop;
 %barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
 if_close;
 if_openoverlay(null);

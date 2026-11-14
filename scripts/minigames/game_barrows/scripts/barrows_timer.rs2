@@ -1,0 +1,32 @@
+// CANDIDATE D3: 17 server ticks and 8 plus the number of slain brothers.
+// The normal timer repeats every tick; only the saved low half measures time.
+[timer,barrows_timer_tick](int $generation)
+if (%barrows_generation ! $generation | ~barrows_inside(coord) = false | (~barrows_phase ! ^barrows_phase_unlooted & ~barrows_phase ! ^barrows_phase_paid)) {
+    ~barrows_timer_stop;
+    return;
+}
+def_int $remaining = ~barrows_prayer_remaining;
+if ($remaining = 1) {
+    ~barrows_prayer_set(^barrows_prayer_interval_ticks);
+    stat_sub(prayer, add(^barrows_prayer_base_drain, ~barrows_slain_count), 0);
+    ~barrows_face_show;
+} else if ($remaining > 1) {
+    $remaining = sub($remaining, 1);
+    ~barrows_prayer_set($remaining);
+    // The original sequence duration determines cleanup, not a saved face cursor.
+    if (sub(^barrows_prayer_interval_ticks, $remaining) = divide(add(seqlength(^barrows_face_fade), sub(^barrows_client_cycles_per_tick, 1)), ^barrows_client_cycles_per_tick)) ~barrows_face_clear;
+}
+
+[proc,barrows_timer_resume]
+if (~barrows_inside(coord) = false | (~barrows_phase ! ^barrows_phase_unlooted & ~barrows_phase ! ^barrows_phase_paid)) {
+    ~barrows_timer_stop;
+    return;
+}
+~barrows_face_clear;
+if (~barrows_prayer_remaining = 0) ~barrows_prayer_set(^barrows_prayer_interval_ticks);
+// gettimer is an absolute clock. It is used only to test runtime presence.
+if (gettimer(barrows_timer_tick) = -1) settimer(barrows_timer_tick, 1, %barrows_generation);
+
+[proc,barrows_timer_stop]
+cleartimer(barrows_timer_tick);
+~barrows_face_clear;
