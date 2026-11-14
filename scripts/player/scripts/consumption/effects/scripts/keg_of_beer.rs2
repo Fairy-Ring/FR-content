@@ -9,4 +9,7 @@ mes("...but extremely drunk too.");
 stat_boost(strength, 2, 10);
 stat_drain(attack, 5, 50);
 cam_shake(3, 0, 20, 2);
-longqueue(cr_queue, 60, 0, ^discard);
+longqueue(keg_of_beer_end, ^keg_of_beer_duration, 0, ^discard);
+
+[queue,keg_of_beer_end]
+cam_reset;

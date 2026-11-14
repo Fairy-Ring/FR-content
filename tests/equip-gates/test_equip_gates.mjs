@@ -46,6 +46,7 @@ const cases = [
   ['boots_wizard', 2579, { MAGIC: 20 }, magic(20)],
   ['viking_sword', 3757, { ATTACK: 30 }, [generic, 'You need to have an attack level of 30.'], true],
   ['viking_helmet', 3748, { DEFENCE: 30 }, defence(30), true],
+  // Keep completed: RS wiki rev84110 (2007-03-17) outranks the later OSRS started claim.
   ['viking_shield', 3758, { DEFENCE: 30 }, defence(30), true],
   ['adamant_plateskirt_trim', 3474, { DEFENCE: 30 }, defence(30)],
   ['adamant_plateskirt_gold', 3475, { DEFENCE: 30 }, defence(30)],
@@ -115,6 +116,7 @@ for (const row of cases) {
     }
     if (quest) {
       refused(row, requirements, 0, questMessage, 'qualified stats without quest');
+      if (row[0] === 'viking_shield') refused(row, requirements, 1, questMessage, 'started is not completed (near-target source)');
       refused(row, requirements, 9, questMessage, 'quest one stage below completion');
     }
     equipped(row, requirements, quest ? 10 : 0);

@@ -30,7 +30,7 @@ if (~wilderness_level(coord) > 20) {
     mes("You can't use this teleport after level 20 wilderness.");
     return(-1);
 }
-if (~pre_tele_checks(coord) = false) { return(-1); }
+if (~pre_tele_checks_no_ana(coord) = false) { return(-1); }
 // Same combat window and refusal as the Monkey Greegree. Pending hits must
 // resolve outside the disposable scene, even if their combat timestamp expired.
 if (add(%lastcombat, 10) > map_clock | add(%lastcombat_pvp, 10) > map_clock

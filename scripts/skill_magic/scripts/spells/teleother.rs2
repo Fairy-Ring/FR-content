@@ -28,7 +28,7 @@ if (.p_finduid($recipient) = false) {
 if (p_finduid($recipient) = false) {
     return;
 }
-if (~teleother_travel_checks = false) {
+if (~teleother_travel_checks(false) = false) {
     return;
 }
 // A successful check never suspends. Restore the caster before the shared
@@ -51,7 +51,7 @@ sound_synth(db_getfield($spell_data, magic_spell_table:sound_cast, 0), 1, 0);
 
 // OD-2: these are recipient restrictions, with no combat gate. Historical
 // Teleother eligibility remains UNKNOWN; shared messages are reused unchanged.
-[proc,teleother_travel_checks]()(boolean)
+[proc,teleother_travel_checks](boolean $departure)(boolean)
 if (stat(hitpoints) = 0) {
     return(false);
 }
@@ -60,4 +60,7 @@ if (~wilderness_level(coord) > 20) {
     mes("You can't use this teleport after level 20 wilderness.");
     return(false);
 }
-return(~pre_tele_checks(coord));
+if ($departure = true) {
+    return(~pre_tele_checks(coord));
+}
+return(~pre_tele_checks_no_ana(coord));

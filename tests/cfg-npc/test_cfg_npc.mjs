@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Packed server-value proof. Expectations keep Lost City 289 values, not period claims. */
+/** Packed server-value proof. Historical confidence is recorded in the expectation manifest. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
@@ -98,7 +98,7 @@ for (const result of assertions) {
 }
 const failures = assertions.filter(row => !row.pass);
 const report = { status: failures.length === 0 ? 'PASS' : 'FAIL', publishedContent: expected.publishedContent,
-    inheritedReference: expected.inheritedReference, periodTruth: 'UNKNOWN: keeps the Lost City value',
+    inheritedReference: expected.inheritedReference, periodTruth: expected.periodTruth,
     hashes, counts, rowCount: expected.rows.length, failures: failures.length, assertions };
 if (reportFile) {
     fs.mkdirSync(path.dirname(reportFile), { recursive: true });

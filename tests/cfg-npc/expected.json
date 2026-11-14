@@ -1,7 +1,7 @@
 {
   "publishedContent": "3a01f1dd62bfa96569083e19ab3320cf3ddaaa54",
   "inheritedReference": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
-  "periodTruth": "UNKNOWN: keeps the Lost City value",
+  "periodTruth": "Inherited rows keep Lost City values; DWM-Movement rows are CANDIDATE operator recollection, not verified period history",
   "clientHashes": {
     "npc.dat": "34b8cc11f47120b0f3d825857354eb4c783ea1f5643716fed4c88e3e4bbd5332",
     "npc.idx": "7d0b466150a1f8b3e36b52f8210eeb587a1129664328d2851d058cd9fd0b797b"
@@ -1422,6 +1422,34 @@
       "npc": "vampire_spider",
       "field": "wanderrange",
       "expected": 15
+    },
+    {
+      "group": "DWM-Movement",
+      "npc": "wom_bankguard",
+      "field": "wanderrange",
+      "expected": 0,
+      "reason": "CANDIDATE operator recollection: fixed guard outside Draynor bank; matches wom_gossip server-only convention"
+    },
+    {
+      "group": "DWM-Movement",
+      "npc": "wom_bankguard",
+      "field": "moverestrict",
+      "expected": 5,
+      "reason": "NOMOVE blocks ordinary movement without changing client config"
+    },
+    {
+      "group": "DWM-Movement",
+      "npc": "wom_multi",
+      "field": "wanderrange",
+      "expected": 0,
+      "reason": "CANDIDATE operator recollection: house sage stays still; server movement reads spawned container, not displayed form"
+    },
+    {
+      "group": "DWM-Movement",
+      "npc": "wom_multi",
+      "field": "moverestrict",
+      "expected": 5,
+      "reason": "NOMOVE applies to the sole house spawn in all seven visible states, not other Wise Old Man types"
     }
   ]
 }

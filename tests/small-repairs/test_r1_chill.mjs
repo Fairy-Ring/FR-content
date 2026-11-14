@@ -198,7 +198,8 @@ try {
     assert.equal(player.runenergy, 4321, 'outside-table timer must not clear energy');
 
     const beforeMapExitTick = World.currentTick;
-    player.teleport(45 * 64 + 1, outsideZoneZ, 0);
+    // S5 cold covers x=2880-2911 at this row; x=2912 is outside both cold systems.
+    player.teleport(45 * 64 + 32, outsideZoneZ, 0);
     assert.ok(engineQueueNames().includes(mapZoneExitName), 'crossing the mapsquare must enqueue the packed map-zone exit');
     player.processEngineQueue();
     assert.equal(player.timers.has(timerScript.id), false, 'packed map-zone exit must clear the real chill timer');

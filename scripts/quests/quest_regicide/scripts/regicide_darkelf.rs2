@@ -37,3 +37,17 @@ else if ($random < 93) obj_add(npc_coord, bass, 1, ^lootdrop_duration);
 else if ($random < 96) obj_add(npc_coord, shark, 1, ^lootdrop_duration);
 else if ($random < 97) obj_add(npc_coord, adamantite_ore, 1, ^lootdrop_duration);
 else if ($random < 102) obj_add(npc_coord, ~randomjewel, ^lootdrop_duration);
+// U-ELFDROPS2: period-listed additions use only the donor's empty tail.
+else if (npc_type = regicide_darkelf) {
+    if ($random < 103) obj_add(npc_coord, dragon_vambraces, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+    else if ($random < 105) obj_add(npc_coord, airrune, 10, ^lootdrop_duration); // UNKNOWN engineering: 2/128.
+    else if ($random < 106) obj_add(npc_coord, poisonivy_bush_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+    else if ($random < 107) obj_add(npc_coord, cactus_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+    else if ($random < 108) obj_add(npc_coord, belladonna_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+}
+else if (npc_type = regicide_darkelf2) {
+    if ($random < 103) obj_add(npc_coord, rune_med_helm, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+    else if ($random < 104) obj_add(npc_coord, poisonivy_bush_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+    else if ($random < 105) obj_add(npc_coord, cactus_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+    else if ($random < 106) obj_add(npc_coord, belladonna_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+}

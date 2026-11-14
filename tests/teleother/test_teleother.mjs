@@ -434,7 +434,7 @@ try {
     { label: 'modal-busy recipient', options: {}, setup: ({ recipient }) => { recipient.openMainModal(Component.get(Component.getId('magic:com_511')).rootLayer); } },
     { label: 'dead recipient', options: {}, setup: ({ recipient }) => { recipient.levels[PlayerStat.HITPOINTS] = 0; } },
     { label: 'recipient Wilderness above level 20', options: {}, setup: ({ recipient }) => { recipient.x = 3200; recipient.z = 3680; } },
-    { label: 'Ana in a Barrel restriction', options: {}, setup: ({ recipient }) => { inventory(recipient).add(ObjType.getId('thanainabarrel'), 1); } },
+    // Carried Ana: tests/ana-barrel covers real-dispatch offer, one fee, and the drop at Accept.
     { label: 'Trawler wreck restriction', options: {}, setup: ({ recipient }) => { recipient.x = 1921; recipient.z = 4801; } },
     { label: 'Trawler game restriction', options: {}, setup: ({ recipient }) => { recipient.x = 1985; recipient.z = 4801; } },
     { label: 'Mime event restriction', options: {}, setup: ({ recipient }) => { recipient.x = 1985; recipient.z = 4737; } },

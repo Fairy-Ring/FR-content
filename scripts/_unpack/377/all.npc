@@ -30872,6 +30872,7 @@ param=attack_sound,leech_suck
 param=defend_sound,leech_hit
 param=death_sound,leech_death
 [vampire_flyer]
+category=vampire
 name=Vampire
 desc=Where did that come from?
 model1=npc_1220
@@ -30936,6 +30937,7 @@ readyanim=misty
 vislevel=1
 
 [vampire_juve]
+category=vampire
 name=Vampire
 desc=It looks really hungry!
 model1=npc_1220
@@ -30974,6 +30976,7 @@ param=defend_anim,human_unarmedblock
 param=attack_sound,vampire_attack
 param=defend_sound,vampire_hit
 param=death_sound,vampire_death
+param=death_drop,vampire_dust
 regenrate=5
 [vampire_juve_hound]
 name=Vampyric hound
@@ -31053,6 +31056,7 @@ param=attack_anim,deadtree_attack
 param=attack_sound,nasty_tree_attack
 blockwalk=all
 [mmsnailround_swamp]
+category=snail
 name=Myre Blamish Snail
 desc=A marsh coloured blamish snail, these types are said to spit acid.
 model1=npc_1227
@@ -31098,6 +31102,7 @@ param=death_drop,shellround_swamp
 maxrange=22
 attackrange=3
 [mmsnailround_red+black]
+category=snail
 name=Blood Blamish Snail
 desc=A blood coloured blamish snail, these types are said to spit acid.
 model1=npc_1227
@@ -31143,6 +31148,7 @@ param=rangeattack_sound,snail_spit
 param=death_drop,shellround_red+black
 attackrange=3
 [mmsnailround_yellow]
+category=snail
 name=Ochre Blamish Snail
 desc=A muddy coloured blamish snail, these types are said to spit acid.
 model1=npc_1227
@@ -31188,6 +31194,7 @@ param=death_drop,shellround_yellow
 maxrange=17
 attackrange=3
 [mmsnailround_blue]
+category=snail
 name=Bruise Blamish Snail
 desc=A bruise blue coloured blamish snail, these types are said to spit acid.
 model1=npc_1227
@@ -31233,6 +31240,7 @@ param=death_drop,shellround_blue
 maxrange=52
 attackrange=3
 [mmsnailround_orange]
+category=snail
 name=Bark Blamish Snail
 desc=A branch bark coloured blamish snail, these types are said to spit acid.
 model1=npc_1227
@@ -31278,6 +31286,7 @@ param=death_drop,shellround_orange
 maxrange=32
 attackrange=3
 [mmsnailpoint_swamp]
+category=snail
 name=Myre Blamish Snail
 desc=A marsh coloured blamish snail, these types are said to spit acid.
 model1=npc_1232
@@ -31321,6 +31330,7 @@ param=death_drop,shellpoint_swamp
 maxrange=12
 attackrange=3
 [mmsnailpoint_red+black]
+category=snail
 name=Blood Blamish Snail
 desc=A blood coloured blamish snail, these types are said to spit acid.
 model1=npc_1232
@@ -31364,6 +31374,7 @@ param=rangeattack_sound,snail_spit
 param=death_drop,shellpoint_red+black
 attackrange=3
 [mmsnailpoint_yellow]
+category=snail
 name=Ochre Blamish Snail
 desc=A muddy coloured blamish snail, these types are said to spit acid.
 model1=npc_1232
@@ -31407,6 +31418,7 @@ param=death_drop,shellpoint_yellow
 maxrange=27
 attackrange=3
 [mmsnailpoint_blue]
+category=snail
 name=Bruise Blamish Snail
 desc=A bruise blue coloured blamish snail, these types are said to spit acid.
 model1=npc_1232
@@ -31465,6 +31477,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+category=slimeyfish
 param=fishing_movement_enum,fishing_movement_slimey_eel_east_enum
 [0_53_53_slimey_eel]
 name=Fishing spot
@@ -31482,6 +31495,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+category=slimeyfish
 param=fishing_movement_enum,fishing_movement_slimey_eel_west_enum
 [0_53_51_slimey_eel]
 name=Fishing spot
@@ -31499,6 +31513,7 @@ maxrange=50
 timer=1
 moverestrict=nomove
 defaultmode=none
+category=slimeyfish
 param=fishing_movement_enum,fishing_movement_slimey_eel_south_enum
 [bedabin_fighter]
 name=Bedabin Nomad Fighter
@@ -45022,6 +45037,20 @@ strength=80
 defence=135
 magic=1
 param=attackrate,4
+// CANDIDATE: S5 combat behaviour; original 377 cache fields remain unchanged.
+wanderrange=0
+maxrange=32
+attackrange=8
+timer=1
+param=attackbonus,60
+param=strengthbonus,100
+param=stabdefence,35
+param=slashdefence,60
+param=crushdefence,35
+param=damagetype,^slash_style
+param=attack_anim,human_sword_slash
+param=defend_anim,human_sword_block
+param=death_anim,human_death
 head1=obj_khazard_helmet_manhead
 head2=idk_man_jaw_medium_head
 
@@ -45723,6 +45752,23 @@ hitpoints=80
 attack=140
 strength=120
 defence=80
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=50
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee2]
 name=Ice Troll
@@ -45747,6 +45793,23 @@ hitpoints=80
 attack=120
 strength=120
 defence=100
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=50
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee3]
 name=Ice Troll
@@ -45770,6 +45833,23 @@ hitpoints=100
 attack=100
 strength=100
 defence=120
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=50
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee4]
 name=Ice Troll
@@ -45794,6 +45874,23 @@ hitpoints=90
 attack=110
 strength=110
 defence=110
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=50
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee5]
 name=Ice Troll
@@ -45817,6 +45914,23 @@ hitpoints=100
 attack=100
 strength=100
 defence=120
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=50
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee6]
 name=Ice Troll
@@ -45841,6 +45955,23 @@ hitpoints=100
 attack=100
 strength=100
 defence=120
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=50
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [trollrescue_icetroll_melee7]
 name=Ice Troll
@@ -45863,6 +45994,23 @@ hitpoints=90
 attack=110
 strength=110
 defence=110
+// CANDIDATE: S5 ice-troll behaviour; later pre-elemental combat reconstruction.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=50
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=attackbonus,60
+param=strengthbonus,60
+param=stabdefence,30
+param=slashdefence,60
+param=crushdefence,30
+param=damagetype,^crush_style
+param=attack_anim,troll_attack
+param=defend_anim,troll_block
+param=death_anim,troll_death
 
 [troll_block_1]
 turnspeed=0
@@ -45873,6 +46021,10 @@ multivar=fd_icewarrior_dadfree
 multinpc=0,fd_trollblock1
 multinpc=1,fd_troll_dad
 
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
 [fd_trollblock1]
 name=Ice block
 desc=A troll frozen in a block of ice.
@@ -45883,6 +46035,10 @@ op1=Talk-to
 op2=Smash-ice
 turnspeed=0
 
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
 [troll_block_2]
 turnspeed=0
 size=2
@@ -45892,6 +46048,10 @@ multivar=fd_icewarrior_mumfree
 multinpc=0,fd_trollblock2
 multinpc=1,fd_troll_mum
 
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
 [fd_trollblock2]
 name=Ice block
 desc=A troll frozen in a block of ice.
@@ -45902,6 +46062,10 @@ op1=Talk-to
 op2=Smash-ice
 turnspeed=0
 
+// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
+hitpoints=10
+wanderrange=0
+defaultmode=none
 [troll_frozen_1]
 walkanim=troll_walk
 readyanim=troll_ready
@@ -45973,6 +46137,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=10
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_2]
 name=Ice wolf
@@ -45993,6 +46169,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=10
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_3]
 name=Ice wolf
@@ -46013,6 +46201,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=10
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_4]
 name=Ice wolf
@@ -46033,6 +46233,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=10
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_5]
 name=Ice wolf
@@ -46053,6 +46265,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=10
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [ice_wolf_6]
 name=Ice wolf
@@ -46073,6 +46297,18 @@ hitpoints=70
 attack=150
 strength=150
 defence=70
+// CANDIDATE: S5 ice-wolf behaviour, without later elemental weakness.
+wanderrange=3
+maxrange=7
+attackrange=1
+respawnrate=10
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,dog_attack
+param=defend_anim,dog_block
+param=death_anim,dog_death
 
 [desert_treasure_invisible_npc]
 model1=trollrescue_blankmodel_8
@@ -58003,6 +58239,8 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_man
+wanderrange=0
+moverestrict=nomove
 
 [wom_fakeplayer1]
 name=Purepker895
@@ -84344,6 +84582,8 @@ multinpc=15,wise_old_man
 multinpc=20,wise_old_man
 multinpc=190,wise_old_man
 multinpc=200,wise_old_man
+wanderrange=0
+moverestrict=nomove
 
 [wom_inactive]
 name=Wise Old Man
