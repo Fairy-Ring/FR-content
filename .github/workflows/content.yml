@@ -160,6 +160,8 @@ jobs:
           run_test tests/elf-viking-drops/test_elf_viking_drops.mjs node --import tsx ../content/tests/elf-viking-drops/test_elf_viking_drops.mjs
           run_test tests/mortmyre-creatures/test_mortmyre_creatures.mjs node --import tsx ../content/tests/mortmyre-creatures/test_mortmyre_creatures.mjs
           run_test tests/cfg-npc/test_cfg_npc.mjs node --import tsx ../content/tests/cfg-npc/test_cfg_npc.mjs
+          # Built combat vectors and checker self-tests use the native pack; no server or vault.
+          run_test tests/npc-combat/test_npc_combat.mjs node --import tsx ../content/tests/npc-combat/test_npc_combat.mjs
           run_test tests/spawn-repair/test_spawn_repair.mjs node --import tsx ../content/tests/spawn-repair/test_spawn_repair.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
