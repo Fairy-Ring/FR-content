@@ -66,8 +66,9 @@ if (npc_find(coord, werewolftanner, 8, 0) = true) {
 ~tanner_caption(tanner:com_111, tanner:com_119, "Blue D'hide", $hide, dragonhide_blue);
 ~tanner_caption(tanner:com_112, tanner:com_120, "Red D'hide", $hide, dragonhide_red);
 ~tanner_caption(tanner:com_113, tanner:com_121, "Black D'hide", $hide, dragonhide_black);
-if_setobject(tanner:com_98, leather, 250);
-if_setobject(tanner:com_99, hard_leather, 250);
+// Canifis picture: both leather tiles show raw cowhide; CANDIDATE at Ellis/guild.
+if_setobject(tanner:com_98, cow_hide, 250);
+if_setobject(tanner:com_99, cow_hide, 250);
 if_setobject(tanner:com_100, templetrek_swamp_snake_hide, 250);
 if_setobject(tanner:com_101, village_snake_hide, 250);
 if_setobject(tanner:com_102, dragonhide_green, 250);

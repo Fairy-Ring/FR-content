@@ -119,7 +119,7 @@ jobs:
       # tests/brim-dungeon/: CI — packed entrance, obstacle, lock and collision checks; no server.
       # tests/splitbark-service/: CI — packed wizard dialogue, labeled five-piece selector and inventory purchases; no server.
       # tests/ana-barrel/: CI — packed departures, barrel ordering and unchanged refusal controls; no server.
-      # tests/tan-snake/: CI — packed eight-tile tanning, exact inventory settlement and published-six fingerprints; no server.
+      # tests/tan-snake/: CI — packed eight-tile tanning, exact inventory settlement and published comparisons by product; no server.
       # tests/random-events-u00/: CI — real packed staff caller, genuine targets, refusal snapshots and two scratch mutants; no server.
       - name: Run offline content tests
         id: content_tests

@@ -182,7 +182,7 @@ for (const town of towns) {
   const text = number => p.packets.find(packet => packet.kind === 'IfSetText' && packet.component === com(number))?.text;
   const model = number => p.packets.find(packet => packet.kind === 'IfSetObject' && packet.component === com(number));
   const names = ['Soft leather', 'Hard leather', 'Snake skin', 'Snake skin', "Green D'hide", "Blue D'hide", "Red D'hide", "Black D'hide"];
-  const models = ['leather', 'hard_leather', 'templetrek_swamp_snake_hide', 'village_snake_hide', 'dragonhide_green', 'dragonhide_blue', 'dragonhide_red', 'dragonhide_black'];
+  const models = ['cow_hide', 'cow_hide', 'templetrek_swamp_snake_hide', 'village_snake_hide', 'dragonhide_green', 'dragonhide_blue', 'dragonhide_red', 'dragonhide_black'];
   const costs = [town.old[0], town.old[1], town.prices[1], town.prices[0], ...town.old.slice(2)];
   for (let i = 0; i < 8; i++) {
     assert.equal(text(106 + i), names[i]);
@@ -249,8 +249,8 @@ for (let tile = 0; tile < 2; tile++) {
   console.log(`PASS tile ${snakeTiles[tile] + 1} scratch wrong-hide mutant rejected; restored script passes`);
 }
 // Baseline outcomes were captured from the real published pack by reviewer C.
-// Its IfSetObject packets identify each product's original tile. On this head,
-// find the product by its IfSetObject packet again, not by the old button id.
+// Its IfSetObject packets identify each product's original tile on the published pack.
+// This head shows the same cowhide for soft/hard: match picture AND caption.
 const published = JSON.parse(readFileSync(path.join(content, 'tests/tan-snake/published-products.json'), 'utf8'));
 const fixtures = [
   ['plenty', 8, 1000, 3, false], ['two-hides', 2, 1000, 3, false], ['one-coin-short', 1, 0, 3, false],
@@ -262,6 +262,8 @@ const inventory = p => p.getInventory(inv).items.map(item => item && `${ObjType.
 let compared = 0;
 for (const town of towns) for (const [modelName, product] of Object.entries(published.products)) {
   const raw = product.publishedTile < 2 ? obj('cow_hide') : obj(modelName);
+  const picture = product.publishedTile < 2 ? obj('cow_hide') : obj(modelName);
+  const caption = ['Soft leather', 'Hard leather', "Green D'hide", "Blue D'hide", "Red D'hide", "Black D'hide"][product.publishedTile];
   for (const mode of ['one', 'five', 'x', 'all']) {
     const outcomes = [];
     for (const [, count, money, input, full, snake] of fixtures) {
@@ -272,10 +274,11 @@ for (const town of towns) for (const [modelName, product] of Object.entries(publ
       if (full) p.invAdd(inv, obj('knife'), p.invFreeSpace(inv));
       const before = inventory(p);
       open(p, town);
-      const fill = p.packets.find(packet => packet.kind === 'IfSetObject' && packet.obj === obj(modelName));
-      assert(fill, `product picture ${modelName}`);
-      const tile = Array.from({ length: 8 }, (_, i) => i).find(i => com(98 + i) === fill.component);
-      assert(Number.isInteger(tile), 'product picture belongs to a tile');
+      const tiles = Array.from({ length: 8 }, (_, i) => i).filter(i =>
+        p.packets.some(packet => packet.kind === 'IfSetObject' && packet.component === com(98 + i) && packet.obj === picture) &&
+        p.packets.some(packet => packet.kind === 'IfSetText' && packet.component === com(106 + i) && packet.text === caption));
+      assert.equal(tiles.length, 1, `unique product picture and caption: ${modelName} / ${caption}`);
+      const [tile] = tiles;
       const from = p.packets.length;
       click(p, tile, mode, input);
       outcomes.push({ before, handled: true, countdialog: mode === 'x', after: inventory(p), modalMain: p.modalMain,
