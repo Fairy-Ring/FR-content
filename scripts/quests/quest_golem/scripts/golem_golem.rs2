@@ -111,6 +111,11 @@ if(last_useitem = softclay) {
 } else if(last_useitem = clay) {
     mes("The clay is not soft enough to stick to the golem.");
 } else if(last_useitem = golem_program) {
+    // Preserve the published missing-handler result outside the completion stage.
+    if (%golem_a ! ^golem_informed_golem) {
+        ~displaymessage(^dm_default);
+        return;
+    }
     if (%golem_head_open = 0) {
         mes("You can't see a way to put the instructions in the golem's skkull.");
         return;

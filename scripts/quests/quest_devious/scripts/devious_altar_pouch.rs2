@@ -13,6 +13,11 @@
 [oplocu,altar] @devious_altar_pouch_use;
 
 [label,devious_altar_pouch_use]
+// Preserve the pouch-present and scorched forms' published refusal.
+if (%devious_altar ! 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
 if (last_useitem ! devious_glowingpouch) {
     ~displaymessage(^dm_default);
     return;
