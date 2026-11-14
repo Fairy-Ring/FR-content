@@ -49,7 +49,7 @@ if ($random < 10) {
 [proc,vampire_holysymbol_weaken]
 if (inv_total(worn, blessedstar) > 0) {
     // CANDIDATE quarter, four stats, equality gate and inherited wording.
-    // https://twitter.com/JagexAsh/status/650998169736753152 (cited, not checked)
+    // https://twitter.com/JagexAsh/status/650998169736753152 (opened: web.archive.org capture 20200430193906)
     def_boolean $weakened = false;
     if (npc_stat(attack) = npc_basestat(attack)) {
         npc_statsub(attack, divide(npc_basestat(attack), 4), 0);

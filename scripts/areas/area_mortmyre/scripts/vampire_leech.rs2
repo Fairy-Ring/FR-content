@@ -26,7 +26,7 @@ def_int $maxhit = ~npc_melee_maxhit;
 def_int $damage = 0;
 
 // CANDIDATE: independent 1/5 per skill, from the checked Old School transcription.
-// https://x.com/JagexAsh/status/1368496987356737537 (cited, not checked)
+// https://x.com/JagexAsh/status/1368496987356737537 (opened: web.archive.org capture 20210307094225 of the twitter.com form)
 if (randominc($attack_roll) > randominc($defence_roll)) {
     $damage = randominc($maxhit);
     if (~check_protect_prayer(^melee_style) = true) {
