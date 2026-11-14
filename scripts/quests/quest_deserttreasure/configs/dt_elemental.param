@@ -1,0 +1,9 @@
+// Server-only CANDIDATE damage rules selected by the operator's U1 decision.
+// The permitted standard element is identified by its Strike spell.
+[dt_elemental_magic]
+type=int
+default=null
+
+[dt_elemental_ammo]
+type=namedobj
+default=null

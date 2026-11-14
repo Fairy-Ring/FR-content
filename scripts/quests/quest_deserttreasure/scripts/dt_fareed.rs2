@@ -1,7 +1,7 @@
 // S2 Fareed. Period guides establish the key/gate, melee + fire magic, ice-glove
 // disarm and inventory diamond. Config/timing/wording labels: dt_smoke.constant.
-// Water spells and ice arrows use the existing shared combat/rune-payment paths.
-// No unsupported elemental multiplier or exhaustive attack allowlist is invented.
+// CANDIDATE U1: only Water spells and ice arrows deal Magic/Ranged damage.
+// The guarded shared paths preserve melee, payment and zero-hit secondary effects.
 
 [oploc1,fd_fw_metalgateclosed_l] @dt_smoke_gate;
 [oploc1,fd_fw_metalgateclosed_r] @dt_smoke_gate;

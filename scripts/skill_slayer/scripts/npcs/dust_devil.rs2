@@ -1,0 +1,34 @@
+[ai_opplayer2,slayer_dustdevil]
+if (inv_total(worn, slayer_facemask) > 0) {
+    gosub(npc_default_attack);
+    return;
+}
+if (%death = ^true) {
+    npc_setmode(null);
+    return;
+}
+if (%npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+
+// CANDIDATE slayer.s01-dust-unmasked-penalty: each attack, even a protected zero.
+// Near-target damage 14 outranks later 16; the explicit Defence correction halves it.
+stat_drain(attack, 0, 100);
+stat_drain(strength, 0, 100);
+stat_drain(ranged, 0, 100);
+stat_drain(magic, 0, 100);
+stat_drain(defence, 0, 50);
+stat_drain(prayer, 0, 50);
+// Weakest correction: Agility half, first stated in the 2024 wiki revision.
+stat_drain(agility, 0, 50);
+anim(%com_defendanim, 0);
+npc_anim(npc_param(attack_anim), 0);
+if (npc_param(attack_sound) ! null) {
+    sound_synth(npc_param(attack_sound), 0, 0);
+}
+def_int $damage = 14;
+if (~check_protect_prayer(^melee_style) = true) $damage = 0;
+~playerhit_n_melee($damage, npc_param(attackrate));

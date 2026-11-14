@@ -66,6 +66,11 @@ if (npc_param(attack_sound) ! null) {
 if (npc_type = rd_combat_npc_room_3 & gender() = 0) {
     return(0);
 }
+// CANDIDATE slayer.s01-harpie-unlit-damage-cap.
+// Keep the equipment rule local to this NPC type, before damage XP.
+if (npc_type = slayer_harpiebugswarm & inv_total(worn, slayer_buglan_on) = 0) {
+    return(0);
+}
 return(min($maxhit, npc_param(max_dealt)));
 
 // a default damage script.

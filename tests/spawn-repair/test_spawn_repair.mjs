@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /** Run from the sibling engine after a full pack. No server is started.
  * CANDIDATE repairs follow the spawn-audit rulings, not verified period history.
- * Piglet 2320 stays at its known-wrong tile: no other copy or intended tile survives.
+ * Piglet 2320 moves to the farm pen: CANDIDATE OSRS Piglet r15196637 map data.
  */
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
@@ -21,7 +21,7 @@ NpcType.load(PACK); ObjType.load(PACK);
 assert(NpcType.count > 3233, 'Full pack required');
 
 // map square, section, level, local X, local Z, old type, repaired type, quantity.
-// null means remove only that record. The Piglet entry deliberately keeps its type.
+// null means remove only that record. Piglet relocation has source and destination entries.
 const TARGETS = [
     ['46_52', 'NPC', 0, 24, 51, 3031, 3231],
     ['50_50', 'NPC', 0, 59, 57, 1183, null],
@@ -41,7 +41,8 @@ const TARGETS = [
     ['44_56', 'OBJ', 0, 48, 1, 1926, 1925, 1],
     ['44_56', 'OBJ', 0, 42, 2, 1926, 1925, 1],
     ['40_60', 'NPC', 0, 34, 46, 1633, 1363],
-    ['47_47', 'NPC', 0, 11, 11, 2320, 2320],
+    ['47_47', 'NPC', 0, 11, 11, 2320, null],
+    ['47_51', 'NPC', 0, 11, 45, null, 2320],
     ['41_58', 'OBJ', 0, 47, 25, 461, 561, 2],
     ['41_58', 'OBJ', 0, 48, 26, 461, 561, 2],
     ['41_41', 'NPC', 0, 61, 61, 1318, null],
@@ -125,4 +126,4 @@ check('runtime packed spawns equal source records', () => assert.deepEqual(canon
 if (failures.length) {
     console.error(failures.join('\n'));
     process.exitCode = 1;
-} else console.log('PASS spawn repair: 23 audited records (22 changed, Piglet kept), three Nardah citizens, all quantities, source conservation and runtime packed data');
+} else console.log('PASS spawn repair: 23 audited entities, including Piglet relocation, three Nardah citizens, all quantities, source conservation and runtime packed data');
