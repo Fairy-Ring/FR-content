@@ -119,6 +119,8 @@ jobs:
       # tests/brim-dungeon/: CI — packed entrance, obstacle, lock and collision checks; no server.
       # tests/splitbark-service/: CI — packed wizard dialogue, labeled five-piece selector and inventory purchases; no server.
       # tests/ana-barrel/: CI — packed departures, barrel ordering and unchanged refusal controls; no server.
+      # tests/tan-snake/: CI — packed eight-tile tanning, exact inventory settlement and published comparisons by product; no server.
+      # tests/random-events-u00/: CI — real packed staff caller, genuine targets, refusal snapshots and two scratch mutants; no server.
       - name: Run offline content tests
         id: content_tests
         working-directory: engine
@@ -173,6 +175,8 @@ jobs:
           run_test tests/elf-viking-drops/test_elf_viking_drops.mjs node --import tsx ../content/tests/elf-viking-drops/test_elf_viking_drops.mjs
           run_test tests/mortmyre-creatures/test_mortmyre_creatures.mjs node --import tsx ../content/tests/mortmyre-creatures/test_mortmyre_creatures.mjs
           run_test tests/cfg-npc/test_cfg_npc.mjs node --import tsx ../content/tests/cfg-npc/test_cfg_npc.mjs
+          # Built combat vectors and checker self-tests use the native pack; no server or vault.
+          run_test tests/npc-combat/test_npc_combat.mjs node --import tsx ../content/tests/npc-combat/test_npc_combat.mjs
           run_test tests/spawn-repair/test_spawn_repair.mjs node --import tsx ../content/tests/spawn-repair/test_spawn_repair.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
@@ -190,6 +194,7 @@ jobs:
           run_test tests/silver-casting/test_silver_casting.mjs node --import tsx ../content/tests/silver-casting/test_silver_casting.mjs
           run_test tests/smelt-batch/test_smelt_batch.mjs node --import tsx ../content/tests/smelt-batch/test_smelt_batch.mjs
           run_test tests/leather-batch/test_leather_batch.mjs node --import tsx ../content/tests/leather-batch/test_leather_batch.mjs
+          run_test tests/tan-snake/test_tan_snake.mjs node --import tsx ../content/tests/tan-snake/test_tan_snake.mjs
           run_test tests/desert-treasure/test_s3_contract.py python3 ../content/tests/desert-treasure/test_s3_contract.py
           run_test tests/desert-treasure/test_s1_contract.py python3 ../content/tests/desert-treasure/test_s1_contract.py
           run_test tests/desert-treasure/test_s5_contract.py python3 ../content/tests/desert-treasure/test_s5_contract.py
@@ -220,6 +225,7 @@ jobs:
           run_test tests/small-repairs/test_r3_cat_scroll.mjs node --import tsx ../content/tests/small-repairs/test_r3_cat_scroll.mjs
           run_test tests/small-repairs/test_r4_teleport.mjs node --import tsx ../content/tests/small-repairs/test_r4_teleport.mjs
           run_test tests/ana-barrel/test_ana_barrel.mjs node --import tsx ../content/tests/ana-barrel/test_ana_barrel.mjs
+          run_test tests/random-events-u00/test_random_events_u00.mjs node --import tsx ../content/tests/random-events-u00/test_random_events_u00.mjs
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           exit "$failed"

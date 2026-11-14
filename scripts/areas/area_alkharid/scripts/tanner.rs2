@@ -4,7 +4,7 @@ if(map_members = ^true & inv_total(inv, trail_clue_easy_simple008) = 1) {
     @trail_tanner;
 }
 ~chatnpc("<p,happy>Greetings friend. I am a manufacturer of leather.");
-def_int $total = calc(inv_total(inv, cow_hide) + inv_total(inv, dragonhide_green) + inv_total(inv, dragonhide_blue) + inv_total(inv, dragonhide_red) + inv_total(inv, dragonhide_black));
+def_int $total = calc(inv_total(inv, cow_hide) + inv_total(inv, dragonhide_green) + inv_total(inv, dragonhide_blue) + inv_total(inv, dragonhide_red) + inv_total(inv, dragonhide_black) + inv_total(inv, village_snake_hide) + inv_total(inv, templetrek_swamp_snake_hide));
 if($total > 0) {
     if ($total = 1) {
         ~chatnpc("<p,happy>I see you have brought me a hide.|Would you like me to tan it for you?");
@@ -33,7 +33,7 @@ switch_int (~p_choice2_header("Can I buy some leather then?", 1, "Leather is rat
 
 [opnpcu,ellis_tanner]
 switch_obj(last_useitem) {
-    case cow_hide, dragonhide_green, dragonhide_blue, dragonhide_red, dragonhide_black : @tan_leather_choices;
+    case cow_hide, dragonhide_green, dragonhide_blue, dragonhide_red, dragonhide_black, village_snake_hide, templetrek_swamp_snake_hide : @tan_leather_choices;
     case leather, hard_leather, dragon_leather, dragon_leather_blue, dragon_leather_red, dragon_leather_black : ~chatnpc("<p,confused>Err... I have no use for that, I make the stuff!");
     case default : ~chatnpc("<p,confused>Er... Thanks, but no thanks!");
 }
@@ -47,30 +47,50 @@ switch_obj(last_useitem) {
 def_int $soft = ^tanner_soft_leather_cost;
 def_int $hard = ^tanner_hard_leather_cost;
 def_int $hide = ^tanner_dragonhide_cost;
+def_int $village_snake = ^tanner_village_snake_hide_cost;
+def_int $swamp_snake = ^tanner_swamp_snake_hide_cost;
 if (npc_find(coord, werewolftanner, 8, 0) = true) {
     $soft = ^werewolftanner_soft_leather_cost;
     $hard = ^werewolftanner_hard_leather_cost;
     $hide = ^werewolftanner_dragonhide_cost;
+    $village_snake = ^werewolftanner_village_snake_hide_cost;
+    $swamp_snake = ^werewolftanner_swamp_snake_hide_cost;
 }
-if_settext(tanner:com_106, "Soft leather");
-if_settext(tanner:com_114, "<tostring($soft)> gp");
-if_settext(tanner:com_107, "Hard leather");
-if_settext(tanner:com_115, "<tostring($hard)> gp");
-if_settext(tanner:com_108, "Green");
-if_settext(tanner:com_116, "<tostring($hide)> gp");
-if_settext(tanner:com_109, "Blue");
-if_settext(tanner:com_117, "<tostring($hide)> gp");
-if_settext(tanner:com_110, "Red");
-if_settext(tanner:com_118, "<tostring($hide)> gp");
-if_settext(tanner:com_111, "Black");
-if_settext(tanner:com_119, "<tostring($hide)> gp");
-if_setobject(tanner:com_98, leather, 250);
-if_setobject(tanner:com_99, hard_leather, 250);
-if_setobject(tanner:com_100, dragonhide_green, 250);
-if_setobject(tanner:com_101, dragonhide_blue, 250);
-if_setobject(tanner:com_102, dragonhide_red, 250);
-if_setobject(tanner:com_103, dragonhide_black, 250);
+// Canifis screen captured 7 May 2006: product captions and dragonhide positions.
+// CANDIDATE at all three callers: swamp before village, from the 2007 Ellis table.
+~tanner_caption(tanner:com_106, tanner:com_114, "Soft leather", $soft, cow_hide);
+~tanner_caption(tanner:com_107, tanner:com_115, "Hard leather", $hard, cow_hide);
+~tanner_caption(tanner:com_108, tanner:com_116, "Snake skin", $swamp_snake, templetrek_swamp_snake_hide);
+~tanner_caption(tanner:com_109, tanner:com_117, "Snake skin", $village_snake, village_snake_hide);
+~tanner_caption(tanner:com_110, tanner:com_118, "Green D'hide", $hide, dragonhide_green);
+~tanner_caption(tanner:com_111, tanner:com_119, "Blue D'hide", $hide, dragonhide_blue);
+~tanner_caption(tanner:com_112, tanner:com_120, "Red D'hide", $hide, dragonhide_red);
+~tanner_caption(tanner:com_113, tanner:com_121, "Black D'hide", $hide, dragonhide_black);
+// Canifis picture: both leather tiles show raw cowhide; CANDIDATE at Ellis/guild.
+if_setobject(tanner:com_98, cow_hide, 250);
+if_setobject(tanner:com_99, cow_hide, 250);
+if_setobject(tanner:com_100, templetrek_swamp_snake_hide, 250);
+if_setobject(tanner:com_101, village_snake_hide, 250);
+if_setobject(tanner:com_102, dragonhide_green, 250);
+if_setobject(tanner:com_103, dragonhide_blue, 250);
+if_setobject(tanner:com_104, dragonhide_red, 250);
+if_setobject(tanner:com_105, dragonhide_black, 250);
 if_openmain(tanner);
+
+[proc,tanner_caption](component $name, component $cost, string $text, int $price, namedobj $hide)
+if_settext($name, $text);
+// CANDIDATE engineering: no retained Ellis screen establishes the singular.
+if ($price = 1) {
+    if_settext($cost, "1 coin");
+} else {
+    if_settext($cost, "<tostring($price)> coins");
+}
+// Canifis period picture: both lines red when absent.
+// CANDIDATE held colour: the 2007 Ellis caption's "blue", read as the cache default.
+def_int $colour = ^red_rgb;
+if (inv_total(inv, $hide) > 0) $colour = 0x00CFFF;
+if_setcolour($name, $colour);
+if_setcolour($cost, $colour);
 
 [if_button,tanner:com_146] @tan_soft_leather(1);
 [if_button,tanner:com_138] @tan_soft_leather(5);
@@ -88,37 +108,53 @@ if (last_int <= 0) return;
 @tan_hard_leather(last_int);
 [if_button,tanner:com_123] @tan_hard_leather(inv_total(inv, cow_hide));
 
-[if_button,tanner:com_148] @tan_dragonhide(dragonhide_green, dragon_leather, 1);
-[if_button,tanner:com_140] @tan_dragonhide(dragonhide_green, dragon_leather, 5);
+[if_button,tanner:com_148] @tan_snake_hide(templetrek_swamp_snake_hide, 1);
+[if_button,tanner:com_140] @tan_snake_hide(templetrek_swamp_snake_hide, 5);
 [if_button,tanner:com_132]
 p_countdialog;
 if (last_int <= 0) return;
-@tan_dragonhide(dragonhide_green, dragon_leather, last_int);
-[if_button,tanner:com_124] @tan_dragonhide(dragonhide_green, dragon_leather, inv_total(inv, dragonhide_green));
+@tan_snake_hide(templetrek_swamp_snake_hide, last_int);
+[if_button,tanner:com_124] @tan_snake_hide(templetrek_swamp_snake_hide, inv_total(inv, templetrek_swamp_snake_hide));
 
-[if_button,tanner:com_149] @tan_dragonhide(dragonhide_blue, dragon_leather_blue, 1);
-[if_button,tanner:com_141] @tan_dragonhide(dragonhide_blue, dragon_leather_blue, 5);
+[if_button,tanner:com_149] @tan_snake_hide(village_snake_hide, 1);
+[if_button,tanner:com_141] @tan_snake_hide(village_snake_hide, 5);
 [if_button,tanner:com_133]
 p_countdialog;
 if (last_int <= 0) return;
-@tan_dragonhide(dragonhide_blue, dragon_leather_blue, last_int);
-[if_button,tanner:com_125] @tan_dragonhide(dragonhide_blue, dragon_leather_blue, inv_total(inv, dragonhide_blue));
+@tan_snake_hide(village_snake_hide, last_int);
+[if_button,tanner:com_125] @tan_snake_hide(village_snake_hide, inv_total(inv, village_snake_hide));
 
-[if_button,tanner:com_150] @tan_dragonhide(dragonhide_red, dragon_leather_red, 1);
-[if_button,tanner:com_142] @tan_dragonhide(dragonhide_red, dragon_leather_red, 5);
+[if_button,tanner:com_150] @tan_dragonhide(dragonhide_green, dragon_leather, 1);
+[if_button,tanner:com_142] @tan_dragonhide(dragonhide_green, dragon_leather, 5);
 [if_button,tanner:com_134]
 p_countdialog;
 if (last_int <= 0) return;
-@tan_dragonhide(dragonhide_red, dragon_leather_red, last_int);
-[if_button,tanner:com_126] @tan_dragonhide(dragonhide_red, dragon_leather_red, inv_total(inv, dragonhide_red));
+@tan_dragonhide(dragonhide_green, dragon_leather, last_int);
+[if_button,tanner:com_126] @tan_dragonhide(dragonhide_green, dragon_leather, inv_total(inv, dragonhide_green));
 
-[if_button,tanner:com_151] @tan_dragonhide(dragonhide_black, dragon_leather_black, 1);
-[if_button,tanner:com_143] @tan_dragonhide(dragonhide_black, dragon_leather_black, 5);
+[if_button,tanner:com_151] @tan_dragonhide(dragonhide_blue, dragon_leather_blue, 1);
+[if_button,tanner:com_143] @tan_dragonhide(dragonhide_blue, dragon_leather_blue, 5);
 [if_button,tanner:com_135]
 p_countdialog;
 if (last_int <= 0) return;
+@tan_dragonhide(dragonhide_blue, dragon_leather_blue, last_int);
+[if_button,tanner:com_127] @tan_dragonhide(dragonhide_blue, dragon_leather_blue, inv_total(inv, dragonhide_blue));
+
+[if_button,tanner:com_152] @tan_dragonhide(dragonhide_red, dragon_leather_red, 1);
+[if_button,tanner:com_144] @tan_dragonhide(dragonhide_red, dragon_leather_red, 5);
+[if_button,tanner:com_136]
+p_countdialog;
+if (last_int <= 0) return;
+@tan_dragonhide(dragonhide_red, dragon_leather_red, last_int);
+[if_button,tanner:com_128] @tan_dragonhide(dragonhide_red, dragon_leather_red, inv_total(inv, dragonhide_red));
+
+[if_button,tanner:com_153] @tan_dragonhide(dragonhide_black, dragon_leather_black, 1);
+[if_button,tanner:com_145] @tan_dragonhide(dragonhide_black, dragon_leather_black, 5);
+[if_button,tanner:com_137]
+p_countdialog;
+if (last_int <= 0) return;
 @tan_dragonhide(dragonhide_black, dragon_leather_black, last_int);
-[if_button,tanner:com_127] @tan_dragonhide(dragonhide_black, dragon_leather_black, inv_total(inv, dragonhide_black));
+[if_button,tanner:com_129] @tan_dragonhide(dragonhide_black, dragon_leather_black, inv_total(inv, dragonhide_black));
 
 [label,tan_soft_leather](int $hides)
 def_int $cost = ^tanner_soft_leather_cost;
@@ -196,6 +232,38 @@ if (inv_total(inv, coins) < $cost & $count > $hides_to_be_tanned) {
     return;
 }
 mes($hides_to_be_tanned_message);
+
+[label,tan_snake_hide](namedobj $hide, int $count)
+if (map_members = ^false) {
+    mes("You need to be on a members' server to do that."); // guess, inherited dragonhide form
+    return;
+}
+def_int $cost = ^tanner_village_snake_hide_cost;
+if ($hide = templetrek_swamp_snake_hide) $cost = ^tanner_swamp_snake_hide_cost;
+if (npc_find(coord, werewolftanner, 8, 0) = true) {
+    $cost = ^werewolftanner_village_snake_hide_cost;
+    if ($hide = templetrek_swamp_snake_hide) $cost = ^werewolftanner_swamp_snake_hide_cost;
+}
+def_int $total_hides = min($count, inv_total(inv, $hide));
+if ($total_hides < 1) {
+    mes("You don't have any snake hides to tan."); // guess, inherited hide form
+    return;
+}
+if (inv_total(inv, coins) < $cost) {
+    mes("You haven't got enough coins to pay for snakeskin."); // guess, inherited hide form
+    return;
+}
+def_int $hides_to_be_tanned = min(divide(inv_total(inv, coins), $cost), $total_hides);
+def_string $message = "The tanner tans <tostring($hides_to_be_tanned)> snake hides for you."; // guess, inherited hide form
+if ($hides_to_be_tanned = 1) {
+    $message = "The tanner tans your snake hide."; // guess, inherited hide form
+}
+// CANDIDATE one-to-one recipe: Tip.It 2007 and Old School 2014 use the singular.
+~tan_leather($hide, village_snake_skin, $cost, $hides_to_be_tanned);
+mes($message);
+if (inv_total(inv, coins) < $cost & $count > $hides_to_be_tanned) {
+    mes("You haven't got enough coins to pay for more snakeskin."); // guess, inherited hide form
+}
 
 [proc,tan_leather](namedobj $hide, namedobj $leather, int $cost, int $tan_count)
 if_close;
