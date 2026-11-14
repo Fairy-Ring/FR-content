@@ -25,7 +25,7 @@ def_int $defence_roll = ~player_defence_roll_specific(npc_param(damagetype));
 def_int $maxhit = ~npc_melee_maxhit;
 def_int $damage = 0;
 
-// CANDIDATE: independent1/5 per skill, from the checked Old School transcription.
+// CANDIDATE: independent 1/5 per skill, from the checked Old School transcription.
 // https://x.com/JagexAsh/status/1368496987356737537 (cited, not checked)
 if (randominc($attack_roll) > randominc($defence_roll)) {
     $damage = randominc($maxhit);
@@ -102,8 +102,8 @@ if (random(5) = 0) {
 if (random(5) = 0) {
     stat_drain(runecraft, 1, 0);
 }
-// Slayer exists in377; the donor's commented block is obsolete.
-// Farming is excluded: the Old School change adding it is dated24 March2021.
+// Slayer exists in 377; the donor's commented block is obsolete.
+// Farming is excluded: the Old School change adding it is dated 24 March 2021.
 if (random(5) = 0) {
     stat_drain(slayer, 1, 0);
 }

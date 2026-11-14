@@ -1,4 +1,4 @@
-// Level61: vampire_juve. Level72: vampire_flyer.
+// Level 61: vampire_juve. Level 72: vampire_flyer.
 // https://web.archive.org/web/20041209225827/http://www.runehq.com/cache/viewMonster256.htm
 // https://web.archive.org/web/20041127023732/http://www.tip.it/runescape/index.php?rs2monster_id=308
 // https://web.archive.org/web/20041209230425/http://www.runehq.com/cache/viewMonster257.htm
@@ -15,7 +15,7 @@ obj_add(npc_coord, npc_param(death_drop), 1, ^lootdrop_duration);
 def_int $random = random(128);
 
 if ($random < 10) {
-    // VERIFIED quantity: Tip.It308/309, retained pre-target2005 captures.
+    // VERIFIED quantity: Tip.It 308/309, retained pre-target 2005 captures.
     obj_add(npc_coord, earthrune, 4, ^lootdrop_duration);
 } else if ($random < 20) {
     obj_add(npc_coord, deathrune, 2, ^lootdrop_duration);
@@ -33,7 +33,7 @@ if ($random < 10) {
     def_int $quantity;
     $seed, $quantity = ~roll_uncommon_seed_table;
     if ($seed = watermelon_seed) {
-        $quantity = 2; // VERIFIED for this monster; the shared candidate table gives1.
+        $quantity = 2; // VERIFIED for this monster; the shared candidate table gives 1.
     }
     obj_add(npc_coord, $seed, $quantity, ^lootdrop_duration);
 } else if ($random < 103) {

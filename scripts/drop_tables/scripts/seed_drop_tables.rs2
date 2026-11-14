@@ -113,47 +113,47 @@ else if ($roll < 994) {
     }
 }
 
-// CANDIDATE: earliest explicit uncommon seed table, later2019 members removed.
-// https://oldschool.runescape.wiki/w/Drop_table?oldid=10637361
-// Listed weights1046 disagree with denominator1048; no correction through15263067.
-// The23 period members sum998: use that sum, with no invented empty outcome.
+// CANDIDATE: earliest Old School form, 6 May 2018; the 2019 re-tune subtracted.
+// https://oldschool.runescape.wiki/w/Drop_table?oldid=6356697
+// This corrects revision 6356515 (5 May 2018) without a named game update.
+// The 23 members sum 998: use that sum, with no invented empty outcome.
 [proc,roll_uncommon_seed_table]()(namedobj, int)
 def_int $roll = random(998);
-if ($roll < 137) {
+if ($roll < 134) {
     return (limpwurt_seed, 1);
-} else if ($roll < 268) {
+} else if ($roll < 265) {
     return (strawberry_seed, 1);
-} else if ($roll < 393) {
+} else if ($roll < 388) {
     return (marrentill_seed, 1);
-} else if ($roll < 485) {
+} else if ($roll < 482) {
     return (jangerberry_bush_seed, 1);
-} else if ($roll < 570) {
+} else if ($roll < 566) {
     return (tarromin_seed, 1);
-} else if ($roll < 653) {
+} else if ($roll < 649) {
     return (wildblood_hop_seed, 1);
-} else if ($roll < 716) {
+} else if ($roll < 712) {
     return (watermelon_seed, 1);
-} else if ($roll < 772) {
+} else if ($roll < 770) {
     return (harralander_seed, 1);
-} else if ($roll < 811) {
+} else if ($roll < 810) {
     return (ranarr_seed, 1);
-} else if ($roll < 845) {
+} else if ($roll < 844) {
     return (whiteberry_bush_seed, 1);
-} else if ($roll < 874) {
+} else if ($roll < 873) {
     return (mushroom_seed, 1);
-} else if ($roll < 901) {
+} else if ($roll < 900) {
     return (toadflax_seed, 1);
-} else if ($roll < 919) {
+} else if ($roll < 918) {
     return (belladonna_seed, 1);
-} else if ($roll < 937) {
+} else if ($roll < 936) {
     return (irit_seed, 1);
-} else if ($roll < 950) {
+} else if ($roll < 949) {
     return (poisonivy_bush_seed, 1);
-} else if ($roll < 962) {
+} else if ($roll < 961) {
     return (avantoe_seed, 1);
-} else if ($roll < 974) {
+} else if ($roll < 973) {
     return (cactus_seed, 1);
-} else if ($roll < 983) {
+} else if ($roll < 982) {
     return (kwuarm_seed, 1);
 } else if ($roll < 988) {
     return (snapdragon_seed, 1);

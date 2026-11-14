@@ -13,7 +13,7 @@ if (~npc_check_notcombat = false) {
 if (~npc_check_notcombat_self = false) {
     return;
 }
-// CANDIDATE: earliest plausible Old School values; the other five forms use2.
+// CANDIDATE: earliest plausible Old School values; the other five forms use 2.
 // Research subject: mortmyre-creatures, snail-per-type-maxima.
 def_int $maxhit = 2;
 switch_npc(npc_type) {
@@ -27,16 +27,17 @@ npc_anim(npc_param(attack_anim), 0);
 ~.sound_area(snail_spit, 0, npc_coord, 10);
 %npc_action_delay = add(map_clock, npc_param(attackrate));
 // CANDIDATE: Lost City's uncited projectile constants and defence-ignoring spit.
+// Donor observation: map_projanim_v2 id=curse_travel (109), starttime=20, endtime=56, angle=10, progress=56, startheight=32, endheight=124.
+// Reduction is on the rolled damage rather than the maximum hit.
 def_int $duration = ~player_projectile(npc_coord, coord, uid, curse_travel, 43, 31, 20, 16, 26, 56, 10);
 def_int $damage = ~snelm_reduction(randominc($maxhit));
 if (~check_protect_prayer(^ranged_style) = true) {
     $damage = 0;
 }
-anim(%com_defendanim, 0);
+anim(%com_defendanim, $duration);
 ~playerhit_n_ranged($damage, $duration, npc_param(attackrate));
 
 [ai_queue3,mmsnailround_swamp] @thin_snail_drop;
-[ai_queue3,mmsnailpoint_swamp] @thin_snail_drop;
 [ai_queue3,mmsnailround_yellow] @thin_snail_drop;
 
 [ai_queue3,mmsnailround_blue] @fat_snail_drop;
@@ -44,7 +45,9 @@ anim(%com_defendanim, 0);
 [ai_queue3,mmsnailround_red+black] @fat_snail_drop;
 [ai_queue3,mmsnailpoint_red+black] @fat_snail_drop;
 
-// VERIFIED: RuneHQ263, capture20050403215059, identifies pointed Ochre as Lean.
+// CANDIDATE: RuneHQ 261 (5 March 2005) names large-coned Myre as Lean; its level 9 differs from the cache.
+[ai_queue3,mmsnailpoint_swamp] @lean_snail_drop;
+// VERIFIED: RuneHQ 263, capture 20050403215059, identifies pointed Ochre as Lean.
 [ai_queue3,mmsnailpoint_yellow] @lean_snail_drop;
 [ai_queue3,mmsnailround_orange] @lean_snail_drop;
 

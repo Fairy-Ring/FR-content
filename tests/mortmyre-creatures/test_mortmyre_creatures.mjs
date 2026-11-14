@@ -85,7 +85,8 @@ async function main() {
       npcInt: requireId('varn', VarNpcType.getId('npc_int'), 'npc_int'),
       protectMelee: requireId('varp', VarPlayerType.getId('prayer14'), 'prayer14'),
       protectRanged: requireId('varp', VarPlayerType.getId('prayer13'), 'prayer13'),
-      legendsQuest: requireId('varp', VarPlayerType.getId('legendsquest'), 'legendsquest')
+      legendsQuest: requireId('varp', VarPlayerType.getId('legendsquest'), 'legendsquest'),
+      defendAnim: requireId('varp', VarPlayerType.getId('com_defendanim'), 'com_defendanim')
     };
     const objId = name => requireId('object', ObjType.getId(name), name);
     const npcType = name => {
@@ -272,6 +273,7 @@ async function main() {
       const player = makePlayer(x, z);
       const npc = makeNpc(typeName, x, z);
       setWorn(player, 0, helmet);
+      player.setVar(ids.defendAnim, requireId('sequence', SeqType.getId('human_unarmedblock'), 'human_unarmedblock'));
       player.setVar(ids.protectRanged, protect ? 1 : 0);
       if (forcedNpcDelay) npc.setVar(ids.npcActionDelay, World.currentTick + 1);
       if (lockSelf) {
@@ -290,16 +292,18 @@ async function main() {
         npcMode: npc.targetOp,
         initialMode,
         draws,
-        anim: npc.animId
+        anim: npc.animId,
+        defendAnim: player.animId,
+        defendDelay: player.animDelay
       };
     }
     const UNCOMMON_SEEDS = [
-      ['limpwurt_seed', 137], ['strawberry_seed', 131], ['marrentill_seed', 125],
-      ['jangerberry_bush_seed', 92], ['tarromin_seed', 85], ['wildblood_hop_seed', 83],
-      ['watermelon_seed', 63], ['harralander_seed', 56], ['ranarr_seed', 39],
+      ['limpwurt_seed', 134], ['strawberry_seed', 131], ['marrentill_seed', 123],
+      ['jangerberry_bush_seed', 94], ['tarromin_seed', 84], ['wildblood_hop_seed', 83],
+      ['watermelon_seed', 63], ['harralander_seed', 58], ['ranarr_seed', 40],
       ['whiteberry_bush_seed', 34], ['mushroom_seed', 29], ['toadflax_seed', 27],
       ['belladonna_seed', 18], ['irit_seed', 18], ['poisonivy_bush_seed', 13],
-      ['avantoe_seed', 12], ['cactus_seed', 12], ['kwuarm_seed', 9], ['snapdragon_seed', 5],
+      ['avantoe_seed', 12], ['cactus_seed', 12], ['kwuarm_seed', 9], ['snapdragon_seed', 6],
       ['cadantine_seed', 4], ['lantadyme_seed', 3], ['dwarf_weed_seed', 2], ['torstol_seed', 1]
     ];
     const UNCOMMON_SEED_ROLL_COUNT = UNCOMMON_SEEDS.reduce((total, [, weight]) => total + weight, 0);
@@ -329,7 +333,7 @@ async function main() {
       { name: 'mmsnailround_yellow', shell: 'shellround_yellow', corpse: 'snail_corpse1', corpseLabel: 'thin', maxhit: 2 },
       { name: 'mmsnailround_blue', shell: 'shellround_blue', corpse: 'snail_corpse3', corpseLabel: 'fat', maxhit: 2 },
       { name: 'mmsnailround_orange', shell: 'shellround_orange', corpse: 'snail_corpse2', corpseLabel: 'lean', maxhit: 2 },
-      { name: 'mmsnailpoint_swamp', shell: 'shellpoint_swamp', corpse: 'snail_corpse1', corpseLabel: 'thin', maxhit: 1 },
+      { name: 'mmsnailpoint_swamp', shell: 'shellpoint_swamp', corpse: 'snail_corpse2', corpseLabel: 'lean', maxhit: 1 },
       { name: 'mmsnailpoint_red+black', shell: 'shellpoint_red+black', corpse: 'snail_corpse3', corpseLabel: 'fat', maxhit: 3 },
       { name: 'mmsnailpoint_yellow', shell: 'shellpoint_yellow', corpse: 'snail_corpse2', corpseLabel: 'lean', maxhit: 2 },
       { name: 'mmsnailpoint_blue', shell: 'shellpoint_blue', corpse: 'snail_corpse3', corpseLabel: 'fat', maxhit: 3 }
@@ -484,8 +488,10 @@ async function main() {
           scenario(`${snail.name} spit ${damage} with ${helmet.name ?? 'no helmet'}`, () => {
             const actual = runRangedAttack(snail.name, helmet.name, damage);
             return {
-              actual: { execution: actual.execution, hpDamage: actual.hpDamage, draws: actual.draws },
-              expected: { execution: ScriptState.FINISHED, hpDamage: expectedDamage, draws: 1 }
+              actual: { execution: actual.execution, hpDamage: actual.hpDamage, draws: actual.draws,
+                defendAnim: actual.defendAnim, defendDelay: actual.defendDelay },
+              expected: { execution: ScriptState.FINISHED, hpDamage: expectedDamage, draws: 1,
+                defendAnim: SeqType.getId('human_unarmedblock'), defendDelay: 46 }
             };
           });
         }
@@ -493,8 +499,8 @@ async function main() {
       scenario(`${snail.name} Protect Missiles blocks the spit`, () => {
         const actual = runRangedAttack(snail.name, null, snail.maxhit, true);
         return {
-          actual: { execution: actual.execution, hpDamage: actual.hpDamage },
-          expected: { execution: ScriptState.FINISHED, hpDamage: 0 }
+          actual: { execution: actual.execution, hpDamage: actual.hpDamage, defendAnim: actual.defendAnim, defendDelay: actual.defendDelay },
+          expected: { execution: ScriptState.FINISHED, hpDamage: 0, defendAnim: SeqType.getId('human_unarmedblock'), defendDelay: 46 }
         };
       });
     }
@@ -581,7 +587,7 @@ async function main() {
 
     let seedStart = 0;
     for (const [name, weight] of UNCOMMON_SEEDS) {
-      for (const roll of new Set([seedStart, seedStart + weight - 1])) {
+      for (let roll = seedStart; roll < seedStart + weight; roll++) {
         scenario(`uncommon seed roll ${roll} returns ${name} x1`, () => {
           const actual = runPureProc('[proc,roll_uncommon_seed_table]', [], [randomValue(UNCOMMON_SEED_ROLL_COUNT, roll)]);
           return {
@@ -593,7 +599,7 @@ async function main() {
       seedStart += weight;
     }
     record('uncommon seed weights cover the specified cumulative interval', seedStart, 998);
-    for (const [roll, seedRoll, quantity] of [[44, 653, 2], [62, 715, 2]]) {
+    for (const [roll, seedRoll, quantity] of [[44, 649, 2], [62, 711, 2]]) {
       scenario(`vampire seed caller overrides watermelon to x${quantity} at seed roll ${seedRoll}`, () => {
         const result = addVampireDrops(roll, { seedRoll });
         return {
