@@ -1,0 +1,2404 @@
+{
+  "contentCommit": "7b07e3d3ae144aeec4fd1f450e353d58f433b513",
+  "controls": [
+    {
+      "style": "melee",
+      "type": "swamp_cave_slime",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2050049
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            119996417
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            0,
+            2
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13473,
+            0,
+            15
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            0,
+            119996417
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2050049,
+            1,
+            2
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "MES",
+          "operand": 0,
+          "ints": [],
+          "strings": [
+            "You have been poisoned!"
+          ]
+        },
+        {
+          "command": "SETTIMER",
+          "operand": 0,
+          "ints": [
+            13474,
+            30
+          ],
+          "strings": [
+            ""
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 102,
+          "ints": [
+            15
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            103
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 15,
+        "hp": 78,
+        "messages": [
+          "You have been poisoned!"
+        ],
+        "timer": [
+          {
+            "script": "[timer,poison]",
+            "interval": 30,
+            "clock": 101
+          }
+        ],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "melee",
+      "type": "poisonspider",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2052098
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781826
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            0,
+            7
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13473,
+            0,
+            27
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            0,
+            8781826
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2052098,
+            1,
+            7
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "MES",
+          "operand": 0,
+          "ints": [],
+          "strings": [
+            "You have been poisoned!"
+          ]
+        },
+        {
+          "command": "SETTIMER",
+          "operand": 0,
+          "ints": [
+            13474,
+            30
+          ],
+          "strings": [
+            ""
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 102,
+          "ints": [
+            27
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            103
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 27,
+        "hp": 73,
+        "messages": [
+          "You have been poisoned!"
+        ],
+        "timer": [
+          {
+            "script": "[timer,poison]",
+            "interval": 30,
+            "clock": 101
+          }
+        ],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "melee",
+      "type": "poisonspider",
+      "outcome": "zero",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2054147
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781827
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            0,
+            8781827
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2054147,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            103
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 80,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "melee",
+      "type": "poisonspider",
+      "outcome": "miss",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2056196
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781828
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            0,
+            8781828
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2056196,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            103
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 80,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "melee",
+      "type": "cow",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2058245
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            5308421
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            0,
+            1
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            0,
+            5308421
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2058245,
+            1,
+            1
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            103
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 79,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "ranged",
+      "type": "swamp_cave_slime",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            422,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            370,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            18,
+            96,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2060294,
+            9,
+            40,
+            36,
+            32,
+            37,
+            15,
+            11
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            1
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13473,
+            0,
+            15
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            119996422
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2060294
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            119996422
+          ],
+          "strings": []
+        },
+        {
+          "command": "MES",
+          "operand": 0,
+          "ints": [],
+          "strings": [
+            "You have been poisoned!"
+          ]
+        },
+        {
+          "command": "SETTIMER",
+          "operand": 0,
+          "ints": [
+            13474,
+            30
+          ],
+          "strings": [
+            ""
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 102,
+          "ints": [
+            15
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2060294,
+            1,
+            1
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 15,
+        "hp": 79,
+        "messages": [
+          "You have been poisoned!"
+        ],
+        "timer": [
+          {
+            "script": "[timer,poison]",
+            "interval": 30,
+            "clock": 101
+          }
+        ],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "ranged",
+      "type": "poisonspider",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            143,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            370,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            18,
+            96,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2062343,
+            9,
+            40,
+            36,
+            32,
+            37,
+            15,
+            11
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            1
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13473,
+            0,
+            27
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            8781831
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2062343
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781831
+          ],
+          "strings": []
+        },
+        {
+          "command": "MES",
+          "operand": 0,
+          "ints": [],
+          "strings": [
+            "You have been poisoned!"
+          ]
+        },
+        {
+          "command": "SETTIMER",
+          "operand": 0,
+          "ints": [
+            13474,
+            30
+          ],
+          "strings": [
+            ""
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 102,
+          "ints": [
+            27
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2062343,
+            1,
+            1
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 27,
+        "hp": 79,
+        "messages": [
+          "You have been poisoned!"
+        ],
+        "timer": [
+          {
+            "script": "[timer,poison]",
+            "interval": 30,
+            "clock": 101
+          }
+        ],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "ranged",
+      "type": "poisonspider",
+      "outcome": "zero",
+      "commands": [
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            143,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            370,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            18,
+            96,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2064392,
+            9,
+            40,
+            36,
+            32,
+            37,
+            15,
+            11
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            8781832
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2064392
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781832
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2064392,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 80,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "ranged",
+      "type": "poisonspider",
+      "outcome": "miss",
+      "commands": [
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            143,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            370,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            18,
+            96,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2066441,
+            9,
+            40,
+            36,
+            32,
+            37,
+            15,
+            11
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            8781833
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2066441
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781833
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2066441,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 80,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "ranged",
+      "type": "cow",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            59,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            370,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            18,
+            96,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2068490,
+            9,
+            40,
+            36,
+            32,
+            37,
+            15,
+            11
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            1
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            5308426
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2068490
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            5308426
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2068490,
+            1,
+            1
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 79,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "magic",
+      "type": "swamp_cave_slime",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            711,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            90,
+            92,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2070539,
+            91,
+            43,
+            31,
+            51,
+            56,
+            16,
+            64
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            992,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            2
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13473,
+            0,
+            15
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_PL",
+          "operand": 0,
+          "ints": [
+            92,
+            124,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            995,
+            0,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            119996427
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2070539
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            119996427
+          ],
+          "strings": []
+        },
+        {
+          "command": "MES",
+          "operand": 0,
+          "ints": [],
+          "strings": [
+            "You have been poisoned!"
+          ]
+        },
+        {
+          "command": "SETTIMER",
+          "operand": 0,
+          "ints": [
+            13474,
+            30
+          ],
+          "strings": [
+            ""
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 102,
+          "ints": [
+            15
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2070539,
+            1,
+            2
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 15,
+        "hp": 78,
+        "messages": [
+          "You have been poisoned!"
+        ],
+        "timer": [
+          {
+            "script": "[timer,poison]",
+            "interval": 30,
+            "clock": 101
+          }
+        ],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "magic",
+      "type": "poisonspider",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            711,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            90,
+            92,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2072588,
+            91,
+            43,
+            31,
+            51,
+            56,
+            16,
+            64
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            992,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            2
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13473,
+            0,
+            27
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_PL",
+          "operand": 0,
+          "ints": [
+            92,
+            124,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            995,
+            0,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            8781836
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2072588
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781836
+          ],
+          "strings": []
+        },
+        {
+          "command": "MES",
+          "operand": 0,
+          "ints": [],
+          "strings": [
+            "You have been poisoned!"
+          ]
+        },
+        {
+          "command": "SETTIMER",
+          "operand": 0,
+          "ints": [
+            13474,
+            30
+          ],
+          "strings": [
+            ""
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 102,
+          "ints": [
+            27
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2072588,
+            1,
+            2
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 27,
+        "hp": 78,
+        "messages": [
+          "You have been poisoned!"
+        ],
+        "timer": [
+          {
+            "script": "[timer,poison]",
+            "interval": 30,
+            "clock": 101
+          }
+        ],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "magic",
+      "type": "poisonspider",
+      "outcome": "zero",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            711,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            90,
+            92,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2074637,
+            91,
+            43,
+            31,
+            51,
+            56,
+            16,
+            64
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            992,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_PL",
+          "operand": 0,
+          "ints": [
+            92,
+            124,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            995,
+            0,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            8781837
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2074637
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781837
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2074637,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 80,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "magic",
+      "type": "poisonspider",
+      "outcome": "miss",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            711,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            90,
+            92,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2076686,
+            91,
+            43,
+            31,
+            51,
+            56,
+            16,
+            64
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            992,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            940,
+            1,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_PL",
+          "operand": 0,
+          "ints": [
+            85,
+            92,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            0,
+            8781838
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2076686
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            8781838
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            103
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 80,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    },
+    {
+      "style": "magic",
+      "type": "cow",
+      "outcome": "positive",
+      "commands": [
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "NPC_ANIM",
+          "operand": 0,
+          "ints": [
+            711,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_NPC",
+          "operand": 0,
+          "ints": [
+            90,
+            92,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 0,
+          "ints": [
+            104
+          ],
+          "strings": []
+        },
+        {
+          "command": "PROJANIM_PL",
+          "operand": 0,
+          "ints": [
+            57363884,
+            2078735,
+            91,
+            43,
+            31,
+            51,
+            56,
+            16,
+            64
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            992,
+            0,
+            0
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE",
+          "operand": 0,
+          "ints": [
+            13225,
+            1,
+            2
+          ],
+          "strings": []
+        },
+        {
+          "command": "SPOTANIM_PL",
+          "operand": 0,
+          "ints": [
+            92,
+            124,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            995,
+            0,
+            56
+          ],
+          "strings": []
+        },
+        {
+          "command": "QUEUE*",
+          "operand": 0,
+          "ints": [
+            13283,
+            1,
+            5308431
+          ],
+          "strings": [
+            "u"
+          ]
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 38,
+          "ints": [
+            100
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARN",
+          "operand": 1,
+          "ints": [
+            2078735
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 41,
+          "ints": [
+            5308431
+          ],
+          "strings": []
+        },
+        {
+          "command": "IF_CLOSE",
+          "operand": 0,
+          "ints": [],
+          "strings": []
+        },
+        {
+          "command": "DAMAGE",
+          "operand": 0,
+          "ints": [
+            2078735,
+            1,
+            2
+          ],
+          "strings": []
+        },
+        {
+          "command": "SOUND_SYNTH",
+          "operand": 0,
+          "ints": [
+            75,
+            0,
+            20
+          ],
+          "strings": []
+        },
+        {
+          "command": "POP_VARP",
+          "operand": 58,
+          "ints": [
+            104
+          ],
+          "strings": []
+        }
+      ],
+      "result": {
+        "poison": 0,
+        "hp": 78,
+        "messages": [],
+        "timer": [],
+        "queues": [],
+        "npcDelay": 104
+      }
+    }
+  ]
+}
