@@ -9,6 +9,11 @@
 [oploc1,soulbane_falloff2_rope_multi] @soulbane_rage_enter;
 
 [label,soulbane_rage_enter]
+// Preserve the unroped form's published refusal when parent fallback selects us.
+if (%soulbane_riftrope_pres ! 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
 p_arrivedelay;
 p_teleport(0_47_81_5_59); // 3013,5243 L0 — collision walkable E of rack 3012,5243
 if_openoverlay(rage_level);

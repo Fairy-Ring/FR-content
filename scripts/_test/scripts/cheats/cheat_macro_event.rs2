@@ -1,25 +1,263 @@
-[debugproc,macro_event](int $event)
-if_close;
-if (p_finduid(uid) = false) {
-    @please_finish;
-    return;
+// Staff fixture only. ClientCheatHandler admits debugprocs only on non-production worlds at staff level 4.
+// The names below select production spawners, never random selectors or fabricated event state.
+[debugproc,macro_event](string $name)
+def_int $event = 1;
+def_string $accepted = "";
+while (string_length(~macro_fixture_name($event)) > 0) {
+    def_string $candidate = ~macro_fixture_name($event);
+    if (compare($candidate, $name) = 0) {
+        @macro_fixture_enter($event);
+        return;
+    }
+    $event = add($event, 1);
 }
-if ($event < 1 | $event > add(~macro_event_general_count,1)) {
-    mes("event_id must be between 1 and <tostring(add(~macro_event_general_count,1))>.");
-    @debugusage("::macro_event (event_id)", "::macro_event 2", "");
-    return;
+mes("[staff fixture] Unknown event.");
+$event = 1;
+while (string_length(~macro_fixture_name($event)) > 0) {
+    def_string $candidate = ~macro_fixture_name($event);
+    if (add(add(string_length($accepted), string_length($candidate)), 2) > 180) {
+        mes("[staff fixture] Accepted: <$accepted>");
+        $accepted = "";
+    }
+    if (string_length($accepted) > 0) $accepted = "<$accepted>, ";
+    $accepted = "<$accepted><$candidate>";
+    $event = add($event, 1);
 }
-~macro_event_general_spawn($event);
+if (string_length($accepted) > 0) mes("[staff fixture] Accepted: <$accepted>");
 
-[debugproc,random_event]
-if_close;
-if (p_finduid(uid) = false) {
-    @please_finish;
+// One source for the public names and the unknown-name diagnostic.
+[proc,macro_fixture_name](int $event)(string)
+switch_int ($event) {
+    case 1 : return("swarm");
+    case 2 : return("genie");
+    case 3 : return("drunken-dwarf");
+    case 4 : return("mysterious-old-man");
+    case 5 : return("candlelight");
+    case 6 : return("strange-plant");
+    case 7 : return("lost-pickaxe");
+    case 8 : return("smoking-rock");
+    case 9 : return("rock-golem");
+    case 10 : return("tree-spirit");
+    case 11 : return("ent");
+    case 12 : return("lost-axe");
+    case 13 : return("big-fish");
+    case 14 : return("river-troll");
+    case 15 : return("whirlpool");
+    case 16 : return("zombie");
+    case 17 : return("shade");
+    case 18 : return("watchman");
+    case 19 : return("poisonous-gas");
+    case 20 : return("lost-and-found");
+}
+return("");
+
+[label,macro_fixture_enter](int $event)
+if (~macro_event_allowed = false) {
+    mes("[staff fixture] Refused: area or active event.");
     return;
 }
-~macro_event_general_spawn(~macro_event_set_random);
-
-[debugproc,random]
-if (p_finduid(uid) = true) {
-    %macro_event = ^no_macro_event;
+if (p_finduid(uid) = false) {
+    mes("[staff fixture] Refused: player unavailable.");
+    return;
 }
+if ($event <= 6) {
+    if (~macro_event_npc($event) = null | map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk) = null) {
+        mes("[staff fixture] Refused: no actor or adjacent square.");
+        return;
+    }
+    if_close;
+    mes("[staff fixture] Entry: <~macro_fixture_name($event)>.");
+    ~macro_event_general_spawn($event);
+    return;
+}
+if ($event >= 7 & $event <= 12 | $event = 19) {
+    def_int $kind = 0;
+    if ($event >= 10 & $event <= 12) $kind = 1;
+    if ($event = 19) $kind = 2;
+    def_coord $target_coord;
+    def_loc $target;
+    $target_coord, $target = ~macro_fixture_loc($kind, $event);
+    if ($target = null) {
+        mes("[staff fixture] Refused: missing prerequisite or tile not proved adjacent.");
+        return;
+    }
+    if (loc_find($target_coord, $target) = false) {
+        mes("[staff fixture] Refused: target unavailable.");
+        return;
+    }
+    if_close;
+    mes("[staff fixture] Entry: <~macro_fixture_name($event)>.");
+    switch_int ($event) {
+        case 7 : ~macro_event_lost_pickaxe_spawn;
+        case 8 : ~macro_event_gas_spawn;
+        case 9 : ~macro_event_rock_golem_spawn;
+        case 10 : ~macro_event_dryad_spawn;
+        case 11 : ~macro_event_ent_spawn;
+        case 12 : ~macro_event_lost_axe_spawn;
+        case 19 : ~macro_event_macro_gas_chest;
+    }
+    return;
+}
+if ($event >= 13 & $event <= 15 | $event = 18) {
+    def_npc_uid $target_uid;
+    def_namedobj $equipment;
+    $target_uid, $equipment = ~macro_fixture_npc($event);
+    if ($target_uid = null) {
+        mes("[staff fixture] Refused: missing prerequisite or tile not proved adjacent.");
+        return;
+    }
+    if (npc_finduid($target_uid) = false) {
+        mes("[staff fixture] Refused: target unavailable.");
+        return;
+    }
+    if_close;
+    mes("[staff fixture] Entry: <~macro_fixture_name($event)>.");
+    switch_int ($event) {
+        case 13 : ~macro_event_bigfish_spawn($equipment);
+        case 14 : ~macro_event_river_troll_spawn;
+        case 15 : ~macro_event_whirlpool_spawn;
+        case 18 : ~macro_event_watchman_spawn;
+    }
+    return;
+}
+if ($event = 16 | $event = 17) {
+    def_int $slot = 0;
+    def_boolean $bones = false;
+    while ($slot < inv_size(inv)) {
+        def_obj $item = inv_getobj(inv, $slot);
+        if ($item ! null) {
+            if (oc_category($item) = bones & (oc_members($item) = false | map_members = ^true)) $bones = true;
+        }
+        $slot = add($slot, 1);
+    }
+    if ($bones = false) {
+        mes("[staff fixture] Refused: missing ordinary bones.");
+        return;
+    }
+    if_close;
+    mes("[staff fixture] Entry: <~macro_fixture_name($event)>.");
+    if ($event = 16) ~macro_event_zombie_spawn;
+    if ($event = 17) ~macro_event_shade_spawn;
+    return;
+}
+// D is the published Varrock teleport center, not the caller's origin or an input coordinate.
+if_close;
+mes("[staff fixture] Entry: <~macro_fixture_name($event)>.");
+~macro_laf_start(0_50_53_13_32);
+
+// Search all nine neighboring zones, but admit only adjacent genuine production targets.
+// Return identities, then reacquire in the caller: pointers are not fixture arguments.
+[proc,macro_fixture_loc](int $kind, int $event)(coord, loc)
+def_int $dx = -8;
+while ($dx <= 8) {
+    def_int $dz = -8;
+    while ($dz <= 8) {
+        loc_findallzone(movecoord(coord, $dx, 0, $dz));
+        while (loc_findnext = true) {
+            def_int $width = lc_width(loc_type);
+            def_int $length = lc_length(loc_type);
+            if (loc_angle = 1 | loc_angle = 3) {
+                $width = lc_length(loc_type);
+                $length = lc_width(loc_type);
+            }
+            if (~macro_fixture_reached(loc_coord, $width, $length, true) = true) {
+                def_dbrow $data;
+                if ($kind = 0) {
+                    db_find(mining_table:rock, loc_type);
+                    $data = db_findnext;
+                    if ($data ! null & loc_category ! mining_rock_macro_gas & loc_param(mining_rock_empty) = ^false & inv_freespace(inv) > 0) {
+                        if (stat(mining) >= db_getfield($data, mining_table:rock_level, 0) & ~pickaxe_checker ! null) {
+                            if ($event ! 8 | loc_param(macro_gas) ! null) return(loc_coord, loc_type);
+                        }
+                    }
+                }
+                if ($kind = 1) {
+                    db_find(woodcutting_trees:tree, loc_type);
+                    $data = db_findnext;
+                    if ($data ! null & inv_freespace(inv) > 0) {
+                        def_namedobj $product = db_getfield($data, woodcutting_trees:product, 0);
+                        if ((oc_members($product) = false | map_members = ^true) & stat(woodcutting) >= db_getfield($data, woodcutting_trees:levelrequired, 0)) {
+                            if (~woodcutting_axe_checker(false) ! null) {
+                                if ($event ! 11 | loc_param(ent) ! null) return(loc_coord, loc_type);
+                            }
+                        }
+                    }
+                }
+                if ($kind = 2 & map_members = ^true) {
+                    db_find(trapped_chest:loc, loc_type);
+                    $data = db_findnext;
+                    if ($data ! null) {
+                        // Every trapped-chest table loc has forceapproach=north.
+                        // Rotate its required front edge with the loc.
+                        def_boolean $front = false;
+                        if (loc_angle = 0 & coordz(coord) = add(coordz(loc_coord), $length)) $front = true;
+                        if (loc_angle = 1 & coordx(coord) = add(coordx(loc_coord), $width)) $front = true;
+                        if (loc_angle = 2 & coordz(coord) = sub(coordz(loc_coord), 1)) $front = true;
+                        if (loc_angle = 3 & coordx(coord) = sub(coordx(loc_coord), 1)) $front = true;
+                        if ($front = true & stat(thieving) >= db_getfield($data, trapped_chest:level, 0) & loc_type ! chest_steel_arrowtips) return(loc_coord, loc_type);
+                    }
+                }
+            }
+        }
+        $dz = add($dz, 8);
+    }
+    $dx = add($dx, 8);
+}
+return(null, null);
+
+[proc,macro_fixture_npc](int $event)(npc_uid, namedobj)
+def_int $dx = -8;
+while ($dx <= 8) {
+    def_int $dz = -8;
+    while ($dz <= 8) {
+        npc_findallzone(movecoord(coord, $dx, 0, $dz));
+        while (npc_findnext = true) {
+            if (~macro_fixture_reached(npc_coord, nc_size(npc_type), nc_size(npc_type), false) = true) {
+                if ($event = 18 & map_members = ^true & npc_stat(hitpoints) > 0) {
+                    db_find(pickpocket:npc, npc_type);
+                    def_dbrow $data = db_findnext;
+                    if ($data ! null) {
+                        if (stat(thieving) >= db_getfield($data, pickpocket:level, 0)) return(npc_uid, null);
+                    }
+                }
+                // The fixture uses the real saltwater Net operation (saltfish.rs2:26-58).
+                // This supplies net as the natural big-fish argument; no bait or level is invented.
+                if ($event >= 13 & $event <= 15 & npc_category = saltfish & npc_param(is_whirlpool) = ^false & inv_freespace(inv) > 0 & inv_total(inv, net) > 0) {
+                    if ($event ! 15 | npc_param(whirlpool) ! null) return(npc_uid, net);
+                }
+            }
+        }
+        $dz = add($dz, 8);
+    }
+    $dx = add($dx, 8);
+}
+return(null, null);
+
+// Operate reach for the rectangular production targets, not a sight or distance
+// approximation. The caller rotates loc dimensions; NPC footprints are square.
+// A one-step walk ray FROM the nearest footprint tile checks the player's wall,
+// without trying to walk INTO a solid rock/tree or a water-bound fishing spot.
+// The packed whole-map comparison checks zero rock/tree blockaccess; chests
+// additionally require their rotated front edge in the caller.
+[proc,macro_fixture_reached](coord $target, int $width, int $length, boolean $overlap)(boolean)
+if (coordy(coord) ! coordy($target)) return(false);
+// CollisionEngine.get treats an unallocated map as NULL, but its ray predicate
+// treats it as unflagged. No script command exposes allocation. Do not certify
+// an approach across a map-square boundary with a potentially unallocated side.
+if (calc(coordx(coord) / 64) ! calc(coordx($target) / 64) | calc(coordz(coord) / 64) ! calc(coordz($target) / 64)) return(false);
+def_int $x = coordx(coord);
+def_int $z = coordz(coord);
+def_int $west = coordx($target);
+def_int $south = coordz($target);
+def_int $east = sub(add($west, $width), 1);
+def_int $north = sub(add($south, $length), 1);
+if ($x >= $west & $x <= $east) {
+    if ($z = sub($south, 1)) return(lineofwalk(movecoord(coord, 0, 0, 1), coord));
+    if ($z = add($north, 1)) return(lineofwalk(movecoord(coord, 0, 0, -1), coord));
+    if ($z >= $south & $z <= $north) return($overlap);
+}
+if ($z >= $south & $z <= $north) {
+    if ($x = sub($west, 1)) return(lineofwalk(movecoord(coord, 1, 0, 0), coord));
+    if ($x = add($east, 1)) return(lineofwalk(movecoord(coord, -1, 0, 0), coord));
+}
+return(false);

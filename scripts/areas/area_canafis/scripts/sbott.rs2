@@ -2,7 +2,7 @@
 [opnpc1,werewolftanner]
 ~chatnpc("<p,neutral>Hello stranger. Would you like me to tan any hides for you?");
 ~chatnpc("<p,neutral>Soft leather - 2 gp per hide|Hard leather - 5 gp per hide|Dragon leather - 45 gp per hide.");
-def_int $total = calc(inv_total(inv, cow_hide) + inv_total(inv, dragonhide_green) + inv_total(inv, dragonhide_blue) + inv_total(inv, dragonhide_red) + inv_total(inv, dragonhide_black));
+def_int $total = calc(inv_total(inv, cow_hide) + inv_total(inv, dragonhide_green) + inv_total(inv, dragonhide_blue) + inv_total(inv, dragonhide_red) + inv_total(inv, dragonhide_black) + inv_total(inv, village_snake_hide) + inv_total(inv, templetrek_swamp_snake_hide));
 if($total > 0) {
     switch_int(~p_choice3_header("Yes please.", 1, "Why are you so expensive?", 2, "No thanks, I'm not interested.", 3, "What would you like to say?")) {
         case 1 : @tan_leather_choices;
