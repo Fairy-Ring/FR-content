@@ -84,10 +84,12 @@ if ($price = 1) {
 } else {
     if_settext($cost, "<tostring($price)> coins");
 }
-// CANDIDATE: Ellis r265524 (21 November 2007) states red absent, blue held.
+// Canifis period picture: both lines red when absent.
+// CANDIDATE held colour: the 2007 Ellis caption's "blue", read as the cache default.
 def_int $colour = ^red_rgb;
-if (inv_total(inv, $hide) > 0) $colour = ^blue_rgb;
+if (inv_total(inv, $hide) > 0) $colour = 0x00CFFF;
 if_setcolour($name, $colour);
+if_setcolour($cost, $colour);
 
 [if_button,tanner:com_146] @tan_soft_leather(1);
 [if_button,tanner:com_138] @tan_soft_leather(5);

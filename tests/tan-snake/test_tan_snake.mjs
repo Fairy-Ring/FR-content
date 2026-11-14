@@ -188,7 +188,10 @@ for (const town of towns) {
     assert.equal(text(106 + i), names[i]);
     assert.equal(text(114 + i), `${costs[i]} ${costs[i] === 1 ? 'coin' : 'coins'}`);
     assert.deepEqual(model(98 + i), { kind: 'IfSetObject', component: com(98 + i), obj: obj(models[i]), scale: 250 });
-    assert.equal(p.packets.find(packet => packet.kind === 'IfSetColour' && packet.component === com(106 + i))?.colour, 0x7C00, 'absent hide caption is red (RGB15 packet)');
+    for (const line of [106, 114]) {
+      assert.equal(p.packets.find(packet => packet.kind === 'IfSetColour' && packet.component === com(line + i))?.colour,
+        0x7C00, `${town.name} absent tile ${i + 1} line ${line} is red (RGB15 packet)`);
+    }
   }
   for (let tile = 0; tile < 2; tile++) {
     const cost = town.prices[tile];
@@ -210,10 +213,22 @@ for (const town of towns) {
     held.invAdd(inv, obj(raw), 1);
     open(held, town);
     for (let i = 0; i < 8; i++) {
-      assert.equal(held.packets.find(packet => packet.kind === 'IfSetColour' && packet.component === com(106 + i))?.colour,
-        inputs[i] === raw ? 0x001F : 0x7C00, 'held raw hide alone makes its product caption blue');
+      for (const line of [106, 114]) {
+        assert.equal(held.packets.find(packet => packet.kind === 'IfSetColour' && packet.component === com(line + i))?.colour,
+          inputs[i] === raw ? 0x033F : 0x7C00, `${town.name} held ${raw} tile ${i + 1} line ${line} uses default light blue or absent red`);
+      }
     }
     captionCases++;
+  }
+  const reopened = player(town);
+  for (const raw of new Set(inputs)) reopened.invAdd(inv, obj(raw), 1);
+  for (const held of [true, false]) {
+    reopened.packets = [];
+    open(reopened, town);
+    const colours = reopened.packets.filter(packet => packet.kind === 'IfSetColour');
+    assert.equal(colours.length, 16, 'every opening explicitly sets both lines of all eight tiles');
+    for (const packet of colours) assert.equal(packet.colour, held ? 0x033F : 0x7C00, 'opening reflects current raw hides without coins');
+    for (const raw of new Set(inputs)) reopened.invDel(inv, obj(raw), 1);
   }
   console.log(`PASS ${town.name}: eight ordered captions/costs/pictures, both snake settlements, Tan 1/5/X/All, caps, refusals, full inventory`);
 }
@@ -313,7 +328,7 @@ function talk(town, hide, use = false) {
   entryCases++;
 }
 for (const town of towns) {
-  for (const hide of town.name === 'Guild' ? [hides[0]] : hides) talk(town, hide);
+  for (const hide of hides) talk(town, hide);
 }
 for (const hide of hides) talk(towns[0], hide, true);
 console.log(`PASS ${entryCases} snake-only Talk/use entries through packed dialogue and option resumes`);
