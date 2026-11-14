@@ -4,7 +4,7 @@ if(map_members = ^true & inv_total(inv, trail_clue_easy_simple008) = 1) {
     @trail_tanner;
 }
 ~chatnpc("<p,happy>Greetings friend. I am a manufacturer of leather.");
-def_int $total = calc(inv_total(inv, cow_hide) + inv_total(inv, dragonhide_green) + inv_total(inv, dragonhide_blue) + inv_total(inv, dragonhide_red) + inv_total(inv, dragonhide_black));
+def_int $total = calc(inv_total(inv, cow_hide) + inv_total(inv, dragonhide_green) + inv_total(inv, dragonhide_blue) + inv_total(inv, dragonhide_red) + inv_total(inv, dragonhide_black) + inv_total(inv, village_snake_hide) + inv_total(inv, templetrek_swamp_snake_hide));
 if($total > 0) {
     if ($total = 1) {
         ~chatnpc("<p,happy>I see you have brought me a hide.|Would you like me to tan it for you?");
@@ -33,7 +33,7 @@ switch_int (~p_choice2_header("Can I buy some leather then?", 1, "Leather is rat
 
 [opnpcu,ellis_tanner]
 switch_obj(last_useitem) {
-    case cow_hide, dragonhide_green, dragonhide_blue, dragonhide_red, dragonhide_black : @tan_leather_choices;
+    case cow_hide, dragonhide_green, dragonhide_blue, dragonhide_red, dragonhide_black, village_snake_hide, templetrek_swamp_snake_hide : @tan_leather_choices;
     case leather, hard_leather, dragon_leather, dragon_leather_blue, dragon_leather_red, dragon_leather_black : ~chatnpc("<p,confused>Err... I have no use for that, I make the stuff!");
     case default : ~chatnpc("<p,confused>Er... Thanks, but no thanks!");
 }
@@ -47,10 +47,14 @@ switch_obj(last_useitem) {
 def_int $soft = ^tanner_soft_leather_cost;
 def_int $hard = ^tanner_hard_leather_cost;
 def_int $hide = ^tanner_dragonhide_cost;
+def_int $village_snake = ^tanner_village_snake_hide_cost;
+def_int $swamp_snake = ^tanner_swamp_snake_hide_cost;
 if (npc_find(coord, werewolftanner, 8, 0) = true) {
     $soft = ^werewolftanner_soft_leather_cost;
     $hard = ^werewolftanner_hard_leather_cost;
     $hide = ^werewolftanner_dragonhide_cost;
+    $village_snake = ^werewolftanner_village_snake_hide_cost;
+    $swamp_snake = ^werewolftanner_swamp_snake_hide_cost;
 }
 if_settext(tanner:com_106, "Soft leather");
 if_settext(tanner:com_114, "<tostring($soft)> gp");
@@ -70,6 +74,13 @@ if_setobject(tanner:com_100, dragonhide_green, 250);
 if_setobject(tanner:com_101, dragonhide_blue, 250);
 if_setobject(tanner:com_102, dragonhide_red, 250);
 if_setobject(tanner:com_103, dragonhide_black, 250);
+// UNKNOWN engineering order: the cache does not assign hides to the two spare tiles.
+if_settext(tanner:com_112, "<oc_name(village_snake_hide)>");
+if_settext(tanner:com_120, "<tostring($village_snake)> gp");
+if_settext(tanner:com_113, "<oc_name(templetrek_swamp_snake_hide)>");
+if_settext(tanner:com_121, "<tostring($swamp_snake)> gp");
+if_setobject(tanner:com_104, village_snake_hide, 250);
+if_setobject(tanner:com_105, templetrek_swamp_snake_hide, 250);
 if_openmain(tanner);
 
 [if_button,tanner:com_146] @tan_soft_leather(1);
@@ -119,6 +130,22 @@ p_countdialog;
 if (last_int <= 0) return;
 @tan_dragonhide(dragonhide_black, dragon_leather_black, last_int);
 [if_button,tanner:com_127] @tan_dragonhide(dragonhide_black, dragon_leather_black, inv_total(inv, dragonhide_black));
+
+[if_button,tanner:com_152] @tan_snake_hide(village_snake_hide, 1);
+[if_button,tanner:com_144] @tan_snake_hide(village_snake_hide, 5);
+[if_button,tanner:com_136]
+p_countdialog;
+if (last_int <= 0) return;
+@tan_snake_hide(village_snake_hide, last_int);
+[if_button,tanner:com_128] @tan_snake_hide(village_snake_hide, inv_total(inv, village_snake_hide));
+
+[if_button,tanner:com_153] @tan_snake_hide(templetrek_swamp_snake_hide, 1);
+[if_button,tanner:com_145] @tan_snake_hide(templetrek_swamp_snake_hide, 5);
+[if_button,tanner:com_137]
+p_countdialog;
+if (last_int <= 0) return;
+@tan_snake_hide(templetrek_swamp_snake_hide, last_int);
+[if_button,tanner:com_129] @tan_snake_hide(templetrek_swamp_snake_hide, inv_total(inv, templetrek_swamp_snake_hide));
 
 [label,tan_soft_leather](int $hides)
 def_int $cost = ^tanner_soft_leather_cost;
@@ -196,6 +223,38 @@ if (inv_total(inv, coins) < $cost & $count > $hides_to_be_tanned) {
     return;
 }
 mes($hides_to_be_tanned_message);
+
+[label,tan_snake_hide](namedobj $hide, int $count)
+if (map_members = ^false) {
+    mes("You need to be on a members' server to do that.");
+    return;
+}
+def_int $cost = ^tanner_village_snake_hide_cost;
+if ($hide = templetrek_swamp_snake_hide) $cost = ^tanner_swamp_snake_hide_cost;
+if (npc_find(coord, werewolftanner, 8, 0) = true) {
+    $cost = ^werewolftanner_village_snake_hide_cost;
+    if ($hide = templetrek_swamp_snake_hide) $cost = ^werewolftanner_swamp_snake_hide_cost;
+}
+def_int $total_hides = min($count, inv_total(inv, $hide));
+if ($total_hides < 1) {
+    mes("You don't have any snake hides to tan.");
+    return;
+}
+if (inv_total(inv, coins) < $cost) {
+    mes("You haven't got enough coins to pay for snakeskin.");
+    return;
+}
+def_int $hides_to_be_tanned = min(divide(inv_total(inv, coins), $cost), $total_hides);
+def_string $message = "The tanner tans <tostring($hides_to_be_tanned)> snake hides for you.";
+if ($hides_to_be_tanned = 1) {
+    $message = "The tanner tans your snake hide.";
+}
+// CANDIDATE one-to-one recipe: Tip.It 2007 and Old School 2014 use the singular.
+~tan_leather($hide, village_snake_skin, $cost, $hides_to_be_tanned);
+mes($message);
+if (inv_total(inv, coins) < $cost & $count > $hides_to_be_tanned) {
+    mes("You haven't got enough coins to pay for more snakeskin.");
+}
 
 [proc,tan_leather](namedobj $hide, namedobj $leather, int $cost, int $tan_count)
 if_close;

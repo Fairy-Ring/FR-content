@@ -119,6 +119,7 @@ jobs:
       # tests/brim-dungeon/: CI — packed entrance, obstacle, lock and collision checks; no server.
       # tests/splitbark-service/: CI — packed wizard dialogue, labeled five-piece selector and inventory purchases; no server.
       # tests/ana-barrel/: CI — packed departures, barrel ordering and unchanged refusal controls; no server.
+      # tests/tan-snake/: CI — packed eight-tile tanning, exact inventory settlement and published-six fingerprints; no server.
       - name: Run offline content tests
         id: content_tests
         working-directory: engine
@@ -177,6 +178,7 @@ jobs:
           run_test tests/silver-casting/test_silver_casting.mjs node --import tsx ../content/tests/silver-casting/test_silver_casting.mjs
           run_test tests/smelt-batch/test_smelt_batch.mjs node --import tsx ../content/tests/smelt-batch/test_smelt_batch.mjs
           run_test tests/leather-batch/test_leather_batch.mjs node --import tsx ../content/tests/leather-batch/test_leather_batch.mjs
+          run_test tests/tan-snake/test_tan_snake.mjs node --import tsx ../content/tests/tan-snake/test_tan_snake.mjs
           run_test tests/desert-treasure/test_s3_contract.py python3 ../content/tests/desert-treasure/test_s3_contract.py
           run_test tests/desert-treasure/test_s1_contract.py python3 ../content/tests/desert-treasure/test_s1_contract.py
           run_test tests/desert-treasure/test_s5_contract.py python3 ../content/tests/desert-treasure/test_s5_contract.py
