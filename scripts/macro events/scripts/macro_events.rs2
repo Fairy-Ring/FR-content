@@ -24,13 +24,25 @@ if (afk_event = ^true) {
 // - smithing at furnace. Confirmed? https://youtu.be/a6NobmSGBYw
 // - crafting at furnace. Confirmed: https://youtu.be/7pS6s5rvvEY
 [proc,macro_event_general_spawn](int $event)
+// DECISION: acquire before allocating either an actor or encounter state.
+if (p_finduid(uid) = false) {
+    return;
+}
 if (~macro_event_allowed = false) { 
+    return;
+}
+// Hostile Swarm/Plant retain their existing combat entry.
+if ($event ! ^macro_swarm & $event ! ^macro_triffidseed & ~macro_event_in_combat = true) {
     return;
 }
 def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
 if ($event_coord = null) {
     return;
 }
+~macro_event_general_create($event, $event_coord);
+
+// Both initial admission and configured reconnect restoration already own the player.
+[proc,macro_event_general_create](int $event, coord $event_coord)
 %macro_event = $event;
 def_npc $event_npc = ~macro_event_npc($event);
 npc_add($event_coord, $event_npc, 1000);
@@ -67,6 +79,11 @@ return(true);
 if (~macro_event_area(coord) = false) {
     return(false);
 }
+if (~inzone_coord_pair_table(random_event_mime_zones, coord) = true |
+    ~inzone_coord_pair_table(random_event_maze_zones, coord) = true |
+    ~inzone_coord_pair_table(random_event_lost_and_found_zones, coord) = true) {
+    return(false);
+}
 // this goes here to allow this bug: https://youtu.be/c0HABEQe41s
 // - bug desc: random events will follow you into castle wars
 if (~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true) {
@@ -80,15 +97,46 @@ return(true);
 
 // called when the player logs in
 [queue,macro_event_login]
-def_int $macro_event = %macro_event;
-%macro_event = 0;
-if (nc_param(~macro_event_npc($macro_event), follow_player_on_logout) = ^true) {
-    ~macro_event_general_spawn($macro_event);
+// DECISION: an old save's zero slot is an unknown O, never a return to 0,0.
+if (%macro_event ! ^no_macro_event & %macro_event_origin_coord = 0_0_0_0_0) {
+    %macro_event_origin_coord = null;
+}
+// DECISION: a task's identity, departure and intended destination are persistent.
+if (%macro_event = ^macro_lost_and_found) {
+    if (~inzone_coord_pair_table(random_event_lost_and_found_zones, coord) = true) {
+        ~macro_events_hide_tabs;
+    } else {
+        ~macro_event_cleanup(%macro_event, %macro_event_uid);
+    }
+    return;
+}
+if (%macro_event = ^no_macro_event) {
+    return;
+}
+if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
+    if (~macro_event_area(coord) = false |
+        ~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true) {
+        ~macro_event_cleanup(%macro_event, %macro_event_uid);
+        return;
+    }
+    if (npc_finduid(%macro_event_uid) = true) {
+        if (%npc_macro_event_target = uid) {
+            return;
+        }
+    }
+    def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+    if ($event_coord ! null) {
+        ~macro_event_general_create(%macro_event, $event_coord);
+    }
+} else {
+    ~macro_event_cleanup(%macro_event, %macro_event_uid);
 }
 
 [proc,macro_event_logout]
 if (npc_finduid(%macro_event_uid) = true) {
-    %npc_macro_event_target = null;
+    if (%npc_macro_event_target = uid) {
+        %npc_macro_event_target = null;
+    }
 }
 
 [proc,macro_event_npc](int $event)(npc)
@@ -224,7 +272,32 @@ if_settab(null, 6);
 if_settab(null, 11);
 if_settab(null, 12);
 
+// Existing Candlelight exit caller; it must not erase a different encounter.
 [proc,macro_events_varps_reset]
+~macro_event_cleanup(^macro_candlelight, %macro_event_uid);
+
+// DECISION: compare the caller's exact identity before releasing any state.
+[proc,macro_event_cleanup](int $event, npc_uid $actor)
+if ($event = ^no_macro_event | %macro_event ! $event | %macro_event_uid ! $actor) {
+    return;
+}
+if (npc_finduid($actor) = true) {
+    if (%npc_macro_event_target = uid) {
+        npc_del;
+    }
+}
+if ($event = ^macro_lost_and_found) {
+    %macro_transmit = 0;
+    ~initalltabs;
+}
 %macro_event = ^no_macro_event;
 %macro_event_target_coord = null;
+%macro_event_origin_coord = null;
 %macro_event_uid = null;
+
+// No active NPC is needed: admission precedes allocation, unlike combat targeting.
+[proc,macro_event_in_combat]()(boolean)
+if (add(%lastcombat_pvp, 8) > map_clock | add(%lastcombat, 8) > map_clock) {
+    return(true);
+}
+return(false);

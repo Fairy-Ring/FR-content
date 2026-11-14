@@ -1,0 +1,293 @@
+import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
+import { Player, ScriptProvider, ScriptRunner, ScriptState, World, engine, pack, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
+
+const { default: DbTableIndex } = await import(pathToFileURL(`${engine}/src/cache/config/DbTableIndex.ts`).href);
+const { ScriptOpcode: op } = await import(pathToFileURL(`${engine}/src/engine/script/ScriptOpcode.ts`).href);
+const inv = requiredId(types.InvType, 'inv');
+const v = name => requiredId(types.VarPlayerType, name);
+const coord = (level, x, z) => (level << 28) | (x << 14) | z;
+const O = [0, 3222, 3218];
+const D = coord(0, 3213, 3424);
+const laf = 7;
+let serial = 0;
+let passed = 0;
+let failed = 0;
+function check(name, fn) {
+  try { fn(); passed++; console.log(`PASS ${name}`); }
+  catch (error) { failed++; console.error(`FAIL ${name}\n${error.stack}`); }
+}
+function player(tile = O) {
+  const slot = ++serial;
+  const p = new Player(`u01_${slot}`, BigInt(slot), 0n);
+  p.slot = slot; p.pid = slot;
+  p.uid = ((Number(p.username37 & 0x1fffffn) << 11) | slot) >>> 0;
+  p.baseLevels.fill(99); p.levels.fill(99);
+  [p.level, p.x, p.z] = tile;
+  p.buildArea.originX = Math.floor(p.x / 8) * 8;
+  p.buildArea.originZ = Math.floor(p.z / 8) * 8;
+  p.messages = [];
+  p.write = packet => p.messages.push(packet);
+  p.defaults = [...p.vars];
+  World.players[slot] = p;
+  return p;
+}
+function run(p, root, args = [], { npc = null, protect = true, resume = true } = {}) {
+  const state = ScriptRunner.init(packed(root), p, npc, args);
+  p.runScript(state, protect);
+  for (let i = 0; resume && state.execution === ScriptState.SUSPENDED && i < 20; i++) {
+    p.delayed = false;
+    state.execution = ScriptState.RUNNING;
+    p.runScript(state, true, true);
+  }
+  assert.notEqual(state.execution, ScriptState.ABORTED, `${root} must not abort in the real VM`);
+  assert.notEqual(state.execution, ScriptState.SUSPENDED, `${root} must finish its bounded delays`);
+  return state;
+}
+function json(value) { return JSON.parse(JSON.stringify(value, (_, item) => typeof item === 'bigint' ? item.toString() : item)); }
+function digest(value) { return createHash('sha256').update(JSON.stringify(value)).digest('hex'); }
+function actors() { return [...World.npcs].map(n => [n.uid, types.NpcType.get(n.type).debugname, n.level, n.x, n.z]).sort((a, b) => a[0] - b[0]); }
+function snapshot(p) {
+  const vars = {};
+  for (let id = 0; id < p.vars.length; id++) if (p.vars[id] !== p.defaults[id]) vars[types.VarPlayerType.get(id).debugname] = p.vars[id];
+  const list = actors();
+  return {
+    tile: [p.level, p.x, p.z], vars,
+    inventory: p.getInventory(inv).items.map(i => i ? [types.ObjType.get(i.id).debugname, i.count] : null),
+    messages: json(p.messages), tabs: [...p.tabs], modals: [p.modalMain, p.modalChat, p.modalSide],
+    queues: ['queue', 'weakQueue', 'engineQueue'].map(key => [...p[key].all()].map(q => [q.script.name, q.type, q.delay, q.args])),
+    actors: { count: list.length, sha256: digest(list) }
+  };
+}
+function give(p, name, quantity = 1) { p.invAdd(inv, requiredId(types.ObjType, name), quantity); }
+function reload(directory) {
+  for (const Type of Object.values(types)) Type.load(directory);
+  DbTableIndex.init();
+  assert(ScriptProvider.load(directory) > 0);
+}
+// The saved comparison is produced by executing the published pack, not by
+// projecting expected RuneScript or hashing bytecode. Default-only added varps
+// are absent; every changed varp, packet, queue, tile, inventory and actor list
+// is compared. Actor lists are canonically digested to keep the fixture small.
+const roots = ['[login,_]', '[queue,macro_event_login]', '[proc,p_telejump_safe]', '[queue,player_death_default]', '[if_button,magic:lumbridge_teleport]'];
+function effects(root) {
+  const p = player();
+  if (root.includes('death')) for (const item of ['bronze_pickaxe', 'airrune', 'lawrune']) give(p, item);
+  if (root.includes('if_button')) for (const [item, quantity] of [['lawrune', 1], ['airrune', 3], ['earthrune', 1]]) give(p, item, quantity);
+  const random = Math.random;
+  Math.random = () => 0.5;
+  try {
+    run(p, root, root.includes('p_telejump_safe') ? [D] : []);
+    assert.equal(p.getVar(v('macro_event')), 0);
+    return snapshot(p);
+  } finally { Math.random = random; }
+}
+if (process.env.U01_CAPTURE_BASELINE) {
+  if (process.env.U01_PUBLISHED_PACK) reload(process.env.U01_PUBLISHED_PACK);
+  console.log(`PUBLISHED_EFFECTS ${JSON.stringify(Object.fromEntries(roots.map(root => [root, effects(root)])))}`);
+  process.exit(0);
+}
+const baseline = JSON.parse(readFileSync(new URL('./inert-effects.json', import.meta.url), 'utf8'));
+for (const root of roots) check(`no-event effects match published pack ${root}`, () => assert.deepEqual(effects(root), baseline.effects[root]));
+if (process.env.U01_PUBLISHED_PACK) {
+  reload(process.env.U01_PUBLISHED_PACK);
+  try {
+    for (const root of roots) check(`saved effects are reproduced by published pack ${root}`, () => assert.deepEqual(effects(root), baseline.effects[root]));
+  } finally { reload(pack); }
+}
+check('an altered no-event result is rejected by the effects predicate', () => {
+  const original = ScriptRunner.HANDLERS[op.P_TELEJUMP];
+  ScriptRunner.HANDLERS[op.P_TELEJUMP] = state => {
+    original(state);
+    state.activePlayer.x++;
+  };
+  try { assert.throws(() => assert.deepEqual(effects('[proc,p_telejump_safe]'), baseline.effects['[proc,p_telejump_safe]']), assert.AssertionError); }
+  finally { ScriptRunner.HANDLERS[op.P_TELEJUMP] = original; }
+});
+check('static packed identities and client configs match the published pack', () => {
+  const genie = types.NpcType.get(requiredId(types.NpcType, 'macro_geni'));
+  assert.equal(genie.id, 409);
+  assert.deepEqual([...genie.models], [231, 241, 252, 315, 173, 176, 264, 270]);
+  assert.deepEqual(genie.op, ['Talk-to', null, null, null, null]);
+  assert.deepEqual([1, 2, 3, 4].map(i => requiredId(types.LocType, `macro_laf_appendage_${i}`)), [8994, 8995, 8996, 8997]);
+  const origin = types.VarPlayerType.get(v('macro_event_origin_coord'));
+  assert.equal(origin.id, 59, 'reuse an original unused client slot rather than append a varp');
+  assert.equal(origin.scope, types.VarPlayerType.SCOPE_PERM);
+  assert.equal(origin.transmit, false);
+  for (const name of ['macro_event', 'macro_event_target_coord']) assert.equal(types.VarPlayerType.get(v(name)).scope, types.VarPlayerType.SCOPE_PERM);
+  for (const [file, expected] of Object.entries(baseline.clientConfigs)) assert.equal(createHash('sha256').update(readFileSync(`${pack}/client/${file}`)).digest('hex'), expected, file);
+});
+function genie(p) {
+  run(p, '[proc,macro_event_general_spawn]', [2], { protect: false });
+  assert.equal(p.getVar(v('macro_event')), 2);
+  const npc = World.getNpcByUid(p.getVar(v('macro_event_uid')));
+  assert(npc, 'real packed Genie was allocated');
+  assert.equal(npc.type, requiredId(types.NpcType, 'macro_geni'));
+  assert.equal(npc.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), p.uid | 0);
+  return npc;
+}
+function cleanup(p, event = p.getVar(v('macro_event')), actor = p.getVar(v('macro_event_uid'))) { run(p, '[proc,macro_event_cleanup]', [event, actor]); }
+function noReward(p) { assert.equal(p.invTotal(inv, requiredId(types.ObjType, 'macro_genilamp')), 0); }
+function cleared(p) {
+  assert.equal(p.getVar(v('macro_event')), 0);
+  for (const name of ['macro_event_uid', 'macro_event_origin_coord', 'macro_event_target_coord']) assert.equal(p.getVar(v(name)), -1, name);
+  noReward(p);
+}
+for (const kind of ['modal', 'unavailable', 'delayed', 'npc combat', 'pvp combat']) check(`production Genie atomic refusal: ${kind}`, () => {
+  const p = player();
+  if (kind === 'modal') p.openMainModal(requiredId(types.Component, 'welcome_screen'));
+  if (kind === 'unavailable') p.protect = true;
+  if (kind === 'delayed') p.delayed = true;
+  if (kind === 'npc combat') p.setVar(v('lastcombat'), World.currentTick);
+  if (kind === 'pvp combat') p.setVar(v('lastcombat_pvp'), World.currentTick);
+  const before = snapshot(p);
+  run(p, '[proc,macro_event_general_spawn]', [2], { protect: false });
+  assert.deepEqual(snapshot(p), before, 'no actor, state, queue, packet or action mutation before admission');
+  p.processQueues(); p.processWeakQueue(); p.processEngineQueue();
+  assert.deepEqual(snapshot(p), before, 'refusal must not leave a later spawn or queued retry');
+  p.closeModal(); p.protect = false; p.delayed = false;
+  p.setVar(v('lastcombat'), 0); p.setVar(v('lastcombat_pvp'), 0);
+  const n = genie(p);
+  cleanup(p);
+  assert.equal(World.getNpcByUid(n.uid), null);
+});
+for (const [tile, area] of [[[0, 2000, 4740], 'Mime'], [[0, 2900, 4550], 'Maze'], [[0, 2338, 4747], 'Lost and Found']]) check(`event-area admission uses packed zone row: ${area}`, () => {
+  const p = player(tile);
+  const before = snapshot(p);
+  run(p, '[proc,macro_event_general_spawn]', [2], { protect: false });
+  assert.deepEqual(snapshot(p), before);
+});
+function startTask(p) {
+  run(p, '[proc,macro_laf_start]', [D], { protect: false });
+  assert.equal(p.getVar(v('macro_event')), laf);
+  assert.equal(p.getVar(v('macro_event_origin_coord')), coord(...O));
+  assert.equal(p.getVar(v('macro_event_target_coord')), D);
+  assert.deepEqual([p.level, p.x, p.z], [0, 2338, 4747]);
+  p.closeModal();
+}
+check('genuine task entry keeps O/D and survives logout/login without overwrite', () => {
+  const p = player(); startTask(p);
+  const identity = [p.getVar(v('macro_event')), p.getVar(v('macro_event_origin_coord')), p.getVar(v('macro_event_target_coord')), p.getVar(v('macro_transmit'))];
+  run(p, '[proc,macro_event_logout]');
+  // Reconnect copies only real persistent fields into a fresh player, as login does.
+  const reconnected = player([p.level, p.x, p.z]);
+  for (let id = 0; id < p.vars.length; id++) if (types.VarPlayerType.get(id).scope === types.VarPlayerType.SCOPE_PERM) reconnected.vars[id] = p.vars[id];
+  run(reconnected, '[queue,macro_event_login]');
+  assert.deepEqual([reconnected.getVar(v('macro_event')), reconnected.getVar(v('macro_event_origin_coord')), reconnected.getVar(v('macro_event_target_coord')), reconnected.getVar(v('macro_transmit'))], identity);
+  for (const tab of [0, 1, 2, 3, 4, 5, 6, 11, 12]) assert.equal(reconnected.tabs[tab], -1);
+  const before = snapshot(reconnected);
+  run(reconnected, '[proc,macro_event_general_spawn]', [2], { protect: false });
+  run(reconnected, '[proc,macro_laf_start]', [coord(1, 3000, 3000)], { protect: false });
+  assert.deepEqual(snapshot(reconnected), before, 'neither follower nor task admission overwrites a task');
+  cleanup(reconnected); cleanup(p);
+});
+check('configured follower logout restoration preserves origin and excludes another event', () => {
+  const p = player(); const old = genie(p);
+  const origin = p.getVar(v('macro_event_origin_coord'));
+  run(p, '[proc,macro_event_logout]');
+  assert.equal(old.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), -1);
+  p.setVar(v('macro_event_uid'), -1);
+  run(p, '[queue,macro_event_login]');
+  const restored = World.getNpcByUid(p.getVar(v('macro_event_uid')));
+  assert(restored && restored.uid !== old.uid);
+  assert.equal(p.getVar(v('macro_event_origin_coord')), origin);
+  const before = snapshot(p);
+  run(p, '[proc,macro_event_general_spawn]', [2], { protect: false });
+  assert.deepEqual(snapshot(p), before);
+  cleanup(p); World.removeNpc(old, -1);
+});
+check('two simultaneous followers have independent ownership; stale cleanup is inert', () => {
+  const a = player(); const b = player(); const an = genie(a); const bn = genie(b);
+  assert.notEqual(an.uid, bn.uid);
+  const beforeA = snapshot(a); const beforeB = snapshot(b);
+  cleanup(a, 2, bn.uid);
+  cleanup(a, laf, an.uid);
+  assert.deepEqual(snapshot(a), beforeA);
+  assert.deepEqual(snapshot(b), beforeB);
+  cleanup(a);
+  cleared(a);
+  assert(World.getNpcByUid(bn.uid));
+  assert.equal(b.getVar(v('macro_event_uid')), bn.uid);
+  cleanup(b); cleared(b);
+});
+check('logout cannot detach a different owner even with a stale actor reference', () => {
+  const a = player(); const b = player(); const bn = genie(b);
+  a.setVar(v('macro_event_uid'), bn.uid);
+  run(a, '[proc,macro_event_logout]');
+  assert.equal(bn.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), b.uid | 0);
+  cleanup(b);
+});
+check('death releases only the owned follower and cannot leave its lamp claim', () => {
+  const a = player(); const b = player(); const an = genie(a); const bn = genie(b);
+  run(a, '[queue,player_death_default]');
+  cleared(a);
+  assert.equal(World.getNpcByUid(an.uid), null);
+  assert(World.getNpcByUid(bn.uid));
+  assert.equal(b.getVar(v('macro_event_uid')), bn.uid);
+  run(a, '[queue,macro_event_login]'); cleared(a);
+  cleanup(b);
+});
+check('task death keeps normal location/items and cannot complete after reconnect', () => {
+  const p = player(); for (const item of ['bronze_pickaxe', 'airrune', 'lawrune']) give(p, item);
+  startTask(p);
+  run(p, '[queue,player_death_default]');
+  cleared(p);
+  const [plane, x, z] = [p.level, p.x, p.z];
+  assert.equal(plane, 0); assert(Math.abs(x - 3221) <= 2 && Math.abs(z - 3218) <= 2);
+  assert.deepEqual(snapshot(p).inventory, baseline.effects['[queue,player_death_default]'].inventory);
+  run(p, '[queue,macro_event_login]');
+  const before = snapshot(p); run(p, '[proc,macro_laf_complete]');
+  assert.deepEqual(snapshot(p), before);
+});
+check('real normal teleport aborts task at exact destination with no reward', () => {
+  const p = player(); startTask(p);
+  run(p, '[proc,player_teleport_normal]', [D]);
+  assert.deepEqual([p.level, p.x, p.z], [0, 3213, 3424]);
+  cleared(p);
+  run(p, '[queue,macro_event_login]'); cleared(p);
+});
+check('ordinary teleport retains a follower and its owned actor follows', () => {
+  const p = player(); const n = genie(p);
+  run(p, '[proc,player_teleport_normal]', [D]);
+  assert.equal(p.getVar(v('macro_event')), 2);
+  assert.equal(p.getVar(v('macro_event_uid')), n.uid);
+  const result = run(p, '[proc,macro_event_lost]', [], { npc: n, protect: false });
+  assert.equal(result.popInt(), 0);
+  assert.equal(n.level, p.level);
+  assert(Math.abs(n.x - p.x) <= 1 && Math.abs(n.z - p.z) <= 1);
+  cleanup(p);
+});
+check('Lost and Found completion returns to D once without changing compensation', () => {
+  const p = player(); startTask(p);
+  run(p, '[proc,macro_laf_complete]');
+  assert.deepEqual([p.level, p.x, p.z], [0, 3213, 3424]);
+  cleared(p);
+  p.closeModal(); const before = snapshot(p);
+  run(p, '[proc,macro_laf_complete]');
+  assert.deepEqual(snapshot(p), before);
+});
+check('an unrelated map exit or unowned lever cannot clear/advance a follower', () => {
+  const p = player(); const n = genie(p);
+  const before = snapshot(p);
+  run(p, '[mapzoneexit,0_36_74]');
+  run(p, '[proc,check_appendages]', [0]);
+  run(p, '[proc,macro_events_varps_reset]');
+  assert.deepEqual(snapshot(p), before);
+  assert(World.getNpcByUid(n.uid)); cleanup(p);
+});
+check('legacy saved zero origin stays unknown and never becomes a return to 0,0', () => {
+  const p = player(); startTask(p);
+  p.setVar(v('macro_event_origin_coord'), 0);
+  run(p, '[queue,macro_event_login]');
+  assert.equal(p.getVar(v('macro_event')), laf);
+  assert.equal(p.getVar(v('macro_event_origin_coord')), -1);
+  assert.equal(p.getVar(v('macro_event_target_coord')), D);
+  assert.deepEqual([p.level, p.x, p.z], [0, 2338, 4747]);
+  run(p, '[proc,macro_laf_complete]');
+  assert.deepEqual([p.level, p.x, p.z], [0, 3213, 3424]);
+  cleared(p);
+});
+console.log(`RESULT ${failed ? 'FAIL' : 'PASS'} random-events-u01 passed=${passed} failed=${failed}`);
+process.exit(failed ? 1 : 0);

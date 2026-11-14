@@ -11,6 +11,10 @@ p_delay(3);
 %death = ^false;
 
 [queue,player_death_default]
+// DECISION: release only this player's owned encounter before any death delay.
+if (%macro_event ! ^no_macro_event) {
+    ~macro_event_cleanup(%macro_event, %macro_event_uid);
+}
 // The queue owns protected player access; snapshot before any death delay.
 // Marker 2 is an earned pending claim and must survive ordinary death.
 ~rd_lifecycle_death_snapshot;

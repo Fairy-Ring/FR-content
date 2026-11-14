@@ -57,7 +57,7 @@
 56=com_attacksound
 57=com_maxhit
 58=action_delay
-59=varp59_unused
+59=macro_event_origin_coord
 60=sheepherderquest
 61=sheepherdervar
 62=goblinquest

@@ -67,6 +67,12 @@ if (stat(hitpoints) = 0) {
 if (~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true) {
     return; // https://youtu.be/Yk7DSYxGucE?t=111 Random event is supposed to teleport you & note. But he only notes
 }
+// DECISION: a valid task escape aborts without changing ordinary teleport costs.
+// Followers retain the sourced teleport-follow behaviour, including Castle Wars.
+if (%macro_event = ^macro_lost_and_found &
+    ~inzone_coord_pair_table(random_event_lost_and_found_zones, $coord) = false) {
+    ~macro_event_cleanup(%macro_event, %macro_event_uid);
+}
 p_telejump($coord);
 cam_reset;
 anim(null, 0);
