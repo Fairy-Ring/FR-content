@@ -3,7 +3,7 @@ import { pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 // Reuse the existing transport-free packed-world loader, including the genuine 377 map.
-import { Player, ScriptProvider, ScriptRunner, ScriptState, World, engine, pack, locFor, nativeLocRows, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
+import { Player, ScriptProvider, ScriptRunner, ScriptState, World, engine, map, pack, locFor, nativeLocRows, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
 const { ScriptOpcode: op } = await import(pathToFileURL(`${engine}/src/engine/script/ScriptOpcode.ts`).href);
 const { default: ClientCheatHandler } = await import(pathToFileURL(`${engine}/src/network/game/client/handler/ClientCheatHandler.ts`).href);
 const { default: ClientCheat } = await import(pathToFileURL(`${engine}/src/network/game/client/model/ClientCheat.ts`).href);
@@ -43,16 +43,18 @@ function player(tile = [0, 3222, 3218]) {
 }
 function give(p, name) { p.invAdd(invId, requiredId(types.ObjType, name), 1); }
 function nextTo(row) { return [row.level, row.x - 1, row.z]; }
-function targetLoc(name) {
+function targetLoc(name, kind = name === 'tree' ? 1 : name === 'chest_10_coins' ? 2 : 0) {
   const rows = nativeLocRows(name);
   for (const row of rows) {
-    const p = player(nextTo(row));
     const loc = locFor(row);
-    const state = ScriptRunner.init(packed('[proc,macro_fixture_loc]'), p, null, [name === 'tree' ? 1 : name === 'chest_10_coins' ? 2 : 0, name === 'tree' ? 11 : name === 'chest_10_coins' ? 19 : 8]);
-    give(p, 'bronze_pickaxe'); give(p, 'bronze_axe');
-    ScriptRunner.execute(state);
-    if (state.execution === ScriptState.FINISHED && state.intStack[state.isp - 1] !== -1) return { row, loc };
-    World.players[p.slot] = null;
+    for (const tile of [[row.level, row.x - 1, row.z], [row.level, row.x + loc.width, row.z], [row.level, row.x, row.z - 1], [row.level, row.x, row.z + loc.length]]) {
+      const p = player(tile);
+      const state = ScriptRunner.init(packed('[proc,macro_fixture_loc]'), p, null, [kind, kind === 1 ? 10 : kind === 2 ? 19 : 8]);
+      give(p, 'bronze_pickaxe'); give(p, 'bronze_axe');
+      ScriptRunner.execute(state);
+      if (state.execution === ScriptState.FINISHED && state.intStack[state.isp - 1] === loc.type) return { row, loc, tile };
+      World.players[p.slot] = null;
+    }
   }
   assert.fail(`no accessible genuine ${name} target`);
 }
@@ -60,16 +62,16 @@ const rock = targetLoc('copperrock1');
 const tree = targetLoc('tree');
 const chest = targetLoc('chest_10_coins');
 const saltCategory = requiredId(types.CategoryType, 'saltfish');
-const fish = [...World.npcs].find(n => types.NpcType.get(n.type).category === saltCategory);
+const fish = [...World.npcs].find(n => types.NpcType.get(n.type).category === saltCategory && !map.isMapBlocked(n.x - 1, n.z, n.level) && map.reachedEntity(n.level, n.x - 1, n.z, n.x, n.z, n.width, n.length, 1));
 assert(fish, 'a genuine saltfish placement is packed');
 const man = [...World.npcs].find(n => n.type === requiredId(types.NpcType, 'man'));
 assert(man, 'a genuine pickpocketable Man is packed');
 function prep(index) {
-  if (index >= 7 && index <= 9) { const p = player(nextTo(rock.row)); give(p, 'bronze_pickaxe'); return p; }
-  if (index >= 10 && index <= 12) { const p = player(nextTo(tree.row)); give(p, 'bronze_axe'); return p; }
+  if (index >= 7 && index <= 9) { const p = player(rock.tile); give(p, 'bronze_pickaxe'); return p; }
+  if (index >= 10 && index <= 12) { const p = player(tree.tile); give(p, 'bronze_axe'); return p; }
   if (index >= 13 && index <= 15) { const p = player([fish.level, fish.x - 1, fish.z]); give(p, 'net'); return p; }
   if (index === 18) return player([man.level, man.x - 1, man.z]);
-  if (index === 19) return player(nextTo(chest.row));
+  if (index === 19) return player(chest.tile);
   const p = player();
   if (index === 16 || index === 17) give(p, 'bones');
   return p;
@@ -176,24 +178,20 @@ for (let index = 1; index <= names.length; index++) check(`packed accepted name 
   assert.deepEqual(call.ints, index <= 6 ? [index] : index === 13 ? [requiredId(types.ObjType, 'net')] : index === 20 ? [(3213 << 14) | 3424] : []);
   if ([8, 11, 19].includes(index)) {
     assert(call.loc && World.getLoc(call.loc.x, call.loc.z, call.loc.level, call.loc.type), 'bound target is a genuine map loc');
-    assert(Math.max(Math.abs(p.x - call.loc.x), Math.abs(p.z - call.loc.z)) <= 1, 'bound target is adjacent');
+    assert(p.inOperableDistance(World.getLoc(call.loc.x, call.loc.z, call.loc.level, call.loc.type)), 'bound target is within the engine operate reach');
     if (index === 8) assert.equal(call.loc.type, rock.loc.type);
     if (index === 19) assert.equal(call.loc.type, chest.loc.type);
   }
   if ([13, 15].includes(index)) assert.equal(call.npc, fish.type);
   assert.equal(p.getVar(eventVar), 0, 'caller itself seeds no active event');
 });
-check('ordinary Varrock mining adjacency admits a solid genuine rock without walking into it', () => {
+check('blocked Varrock tile is conservatively refused although engine operate reach accepts', () => {
   const row = nativeLocRows('copperrock1').find(r => r.level === 0 && r.x === 3282 && r.z === 3368);
-  assert(row, 'the live ordinary copper placement is genuine');
+  assert(row);
   const p = player(nextTo(row));
+  assert(p.inOperableDistance(locFor(row)));
   give(p, 'bronze_pickaxe');
-  const result = run(p, 'lost-pickaxe');
-  assert.equal(result.entries.length, 1, JSON.stringify(p.messages));
-  const call = result.entries[0];
-  assert.equal(call.name, '[proc,macro_event_lost_pickaxe_spawn]');
-  assert(call.loc && World.getLoc(call.loc.x, call.loc.z, call.loc.level, call.loc.type), 'the production pointer is an actual map target');
-  assert(Math.max(Math.abs(p.x - call.loc.x), Math.abs(p.z - call.loc.z)) <= 1);
+  refusal(p, 'lost-pickaxe');
 });
 function refusal(p, name, options = {}) {
   const before = snap(p);
@@ -204,6 +202,89 @@ function refusal(p, name, options = {}) {
 }
 for (const name of ['not-built', '2', 'genie somebody', 'maze', '', player().username, '1234567', '0_50_53_13_32']) check(`unknown/refused ${JSON.stringify(name)}`, () => refusal(player(), name));
 for (let index = 7; index <= 19; index++) check(`missing prerequisite ${names[index - 1]}`, () => refusal(player([0, 2000, 2000]), names[index - 1]));
+// Genuine targets remain present in every prerequisite regression. Each has a
+// same-target positive control, so dropping a prerequisite cannot hide behind reach.
+for (const [name, index, skill] of [['lost-pickaxe', 7, 'mining'], ['tree-spirit', 10, 'woodcutting'], ['big-fish', 13, null], ['poisonous-gas', 19, 'thieving'], ['watchman', 18, 'thieving']]) {
+  if (index <= 13) check(`real target without tool refuses ${name} without mutation`, () => {
+    const p = prep(index);
+    p.getInventory(invId).items.fill(null);
+    refusal(p, name);
+    assert(p.messages.some(m => m.msg === '[staff fixture] Refused: missing prerequisite or tile not proved adjacent.'));
+    give(p, index === 7 ? 'bronze_pickaxe' : index === 10 ? 'bronze_axe' : 'net');
+    assert.equal(run(p, name).entries.length, 1, 'same-target tool positive control');
+  });
+  if (skill) check(`real target below level refuses ${name} without mutation`, () => {
+    const p = skill === 'woodcutting' ? player(targetLoc('oaktree', 1).tile) : prep(index);
+    if (skill === 'woodcutting') give(p, 'bronze_axe');
+    const stat = { mining: 14, woodcutting: 8, thieving: 17 }[skill];
+    p.levels[stat] = 0;
+    refusal(p, name);
+    assert(p.messages.some(m => m.msg === '[staff fixture] Refused: missing prerequisite or tile not proved adjacent.'));
+    p.levels[stat] = 99;
+    assert.equal(run(p, name).entries.length, 1, 'same-target level positive control');
+  });
+}
+function locSelection(tile, kind, event, tool) {
+  const p = player(tile);
+  give(p, tool);
+  const before = snap(p);
+  const state = ScriptRunner.init(packed('[proc,macro_fixture_loc]'), p, null, [kind, event]);
+  ScriptRunner.execute(state);
+  assert.equal(state.execution, ScriptState.FINISHED);
+  assert.deepEqual(snap(p), before, 'target selection itself is inert');
+  const type = state.intStack[state.isp - 1];
+  const coord = state.intStack[state.isp - 2] >>> 0;
+  return type === -1 ? null : World.getLoc((coord >>> 14) & 0x3fff, coord & 0x3fff, coord >>> 28, type);
+}
+for (const tile of [[0, 1992, 4663], [0, 1992, 4665], [0, 1994, 4663], [0, 1994, 4665], [0, 2688, 3335]]) check(`diagonal or fenced genuine rock refuses ${tile}`, () => {
+  assert.equal(locSelection(tile, 0, 7, 'bronze_pickaxe'), null);
+});
+for (const tile of [[0, 2890, 4849]]) check(`five-tile essence rock edge admits ${tile}`, () => {
+  const loc = locSelection(tile, 0, 7, 'bronze_pickaxe');
+  assert(loc);
+  assert.equal(loc.type, requiredId(types.LocType, 'blankrunestone'));
+  assert(map.reachedLoc(tile[0], tile[1], tile[2], loc.x, loc.z, loc.width, loc.length, 1, loc.angle, loc.shape, types.LocType.get(loc.type).forceapproach));
+});
+for (const tile of [[0, 1876, 4507], [0, 1874, 4509]]) check(`large genuine tree east or north edge admits ${tile}`, () => {
+  const loc = locSelection(tile, 1, 10, 'bronze_axe');
+  assert(loc);
+  assert(map.reachedLoc(tile[0], tile[1], tile[2], loc.x, loc.z, loc.width, loc.length, 1, loc.angle, loc.shape, types.LocType.get(loc.type).forceapproach));
+});
+check('unallocated neighbor map tree tile is refused with the engine', () => {
+  const row = nativeLocRows('deadtree1').find(r => r.level === 0 && r.x === 2304 && r.z === 3459);
+  const p = player([0, 2303, 3459]);
+  assert.equal(p.inOperableDistance(locFor(row)), false);
+  assert.equal(locSelection([0, 2303, 3459], 1, 10, 'bronze_axe'), null);
+});
+check('blocked essence east tile is conservatively refused although engine accepts', () => {
+  const row = nativeLocRows('blankrunestone').find(r => r.level === 0 && r.x === 2891 && r.z === 4847);
+  const p = player([0, 2896, 4849]);
+  assert(p.inOperableDistance(locFor(row)));
+  assert.equal(locSelection([0, 2896, 4849], 0, 7, 'bronze_pickaxe'), null);
+});
+check('blocked fishing west tile is conservatively refused although engine accepts', () => {
+  const target = [...World.npcs].find(n => n.x === 3267 && n.z === 3148 && n.level === 0 && types.NpcType.get(n.type).category === saltCategory);
+  assert(target);
+  const p = player([0, 3266, 3148]);
+  assert(p.inOperableDistance(target));
+  give(p, 'net');
+  refusal(p, 'big-fish');
+});
+for (const name of ['lost-pickaxe', 'rock-golem', 'smoking-rock']) check(`smoking rock is excluded by the real mining selector ${name}`, () => {
+  const row = rock.row;
+  const loc = locFor(row);
+  const original = { type: loc.type, shape: loc.shape, angle: loc.angle };
+  loc.change(requiredId(types.LocType, 'macro_clayrock1'), loc.shape, loc.angle);
+  try {
+    const p = player(rock.tile);
+    give(p, 'bronze_pickaxe');
+    refusal(p, name);
+    assert(p.messages.some(m => m.msg === '[staff fixture] Refused: missing prerequisite or tile not proved adjacent.'));
+  } finally { loc.change(original.type, original.shape, original.angle); }
+  const p = player(rock.tile);
+  give(p, 'bronze_pickaxe');
+  assert.equal(run(p, name).entries.length, 1, 'healthy same-target positive control');
+});
 for (const name of ['genie', 'lost-pickaxe', 'lost-and-found']) {
   check(`unsafe area ${name} refuses without mutation`, () => refusal(player([0, 3100, 3100]), name));
   check(`active event ${name} refuses without mutation`, () => { const p = prep(name === 'lost-pickaxe' ? 7 : 2); p.setVar(eventVar, 2); refusal(p, name); });

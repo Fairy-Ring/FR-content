@@ -78,7 +78,7 @@ if ($event >= 7 & $event <= 12 | $event = 19) {
     def_loc $target;
     $target_coord, $target = ~macro_fixture_loc($kind, $event);
     if ($target = null) {
-        mes("[staff fixture] Refused: missing eligible target or tool.");
+        mes("[staff fixture] Refused: missing prerequisite or tile not proved adjacent.");
         return;
     }
     if (loc_find($target_coord, $target) = false) {
@@ -103,7 +103,7 @@ if ($event >= 13 & $event <= 15 | $event = 18) {
     def_namedobj $equipment;
     $target_uid, $equipment = ~macro_fixture_npc($event);
     if ($target_uid = null) {
-        mes("[staff fixture] Refused: missing eligible target or tool.");
+        mes("[staff fixture] Refused: missing prerequisite or tile not proved adjacent.");
         return;
     }
     if (npc_finduid($target_uid) = false) {
@@ -154,12 +154,18 @@ while ($dx <= 8) {
     while ($dz <= 8) {
         loc_findallzone(movecoord(coord, $dx, 0, $dz));
         while (loc_findnext = true) {
-            if (distance(coord, loc_coord) <= 1 & lineofsight(coord, loc_coord) = true) {
+            def_int $width = lc_width(loc_type);
+            def_int $length = lc_length(loc_type);
+            if (loc_angle = 1 | loc_angle = 3) {
+                $width = lc_length(loc_type);
+                $length = lc_width(loc_type);
+            }
+            if (~macro_fixture_reached(loc_coord, $width, $length, true) = true) {
                 def_dbrow $data;
                 if ($kind = 0) {
                     db_find(mining_table:rock, loc_type);
                     $data = db_findnext;
-                    if ($data ! null & loc_param(mining_rock_empty) = ^false & inv_freespace(inv) > 0) {
+                    if ($data ! null & loc_category ! mining_rock_macro_gas & loc_param(mining_rock_empty) = ^false & inv_freespace(inv) > 0) {
                         if (stat(mining) >= db_getfield($data, mining_table:rock_level, 0) & ~pickaxe_checker ! null) {
                             if ($event ! 8 | loc_param(macro_gas) ! null) return(loc_coord, loc_type);
                         }
@@ -181,7 +187,14 @@ while ($dx <= 8) {
                     db_find(trapped_chest:loc, loc_type);
                     $data = db_findnext;
                     if ($data ! null) {
-                        if (stat(thieving) >= db_getfield($data, trapped_chest:level, 0) & loc_type ! chest_steel_arrowtips) return(loc_coord, loc_type);
+                        // Every trapped-chest table loc has forceapproach=north.
+                        // Rotate its required front edge with the loc.
+                        def_boolean $front = false;
+                        if (loc_angle = 0 & coordz(coord) = add(coordz(loc_coord), $length)) $front = true;
+                        if (loc_angle = 1 & coordx(coord) = add(coordx(loc_coord), $width)) $front = true;
+                        if (loc_angle = 2 & coordz(coord) = sub(coordz(loc_coord), 1)) $front = true;
+                        if (loc_angle = 3 & coordx(coord) = sub(coordx(loc_coord), 1)) $front = true;
+                        if ($front = true & stat(thieving) >= db_getfield($data, trapped_chest:level, 0) & loc_type ! chest_steel_arrowtips) return(loc_coord, loc_type);
                     }
                 }
             }
@@ -199,7 +212,7 @@ while ($dx <= 8) {
     while ($dz <= 8) {
         npc_findallzone(movecoord(coord, $dx, 0, $dz));
         while (npc_findnext = true) {
-            if (npc_range(coord) <= 1 & lineofsight(coord, npc_coord) = true) {
+            if (~macro_fixture_reached(npc_coord, nc_size(npc_type), nc_size(npc_type), false) = true) {
                 if ($event = 18 & map_members = ^true & npc_stat(hitpoints) > 0) {
                     db_find(pickpocket:npc, npc_type);
                     def_dbrow $data = db_findnext;
@@ -219,3 +232,32 @@ while ($dx <= 8) {
     $dx = add($dx, 8);
 }
 return(null, null);
+
+// Operate reach for the rectangular production targets, not a sight or distance
+// approximation. The caller rotates loc dimensions; NPC footprints are square.
+// A one-step walk ray FROM the nearest footprint tile checks the player's wall,
+// without trying to walk INTO a solid rock/tree or a water-bound fishing spot.
+// The packed whole-map comparison checks zero rock/tree blockaccess; chests
+// additionally require their rotated front edge in the caller.
+[proc,macro_fixture_reached](coord $target, int $width, int $length, boolean $overlap)(boolean)
+if (coordy(coord) ! coordy($target)) return(false);
+// CollisionEngine.get treats an unallocated map as NULL, but its ray predicate
+// treats it as unflagged. No script command exposes allocation. Do not certify
+// an approach across a map-square boundary with a potentially unallocated side.
+if (calc(coordx(coord) / 64) ! calc(coordx($target) / 64) | calc(coordz(coord) / 64) ! calc(coordz($target) / 64)) return(false);
+def_int $x = coordx(coord);
+def_int $z = coordz(coord);
+def_int $west = coordx($target);
+def_int $south = coordz($target);
+def_int $east = sub(add($west, $width), 1);
+def_int $north = sub(add($south, $length), 1);
+if ($x >= $west & $x <= $east) {
+    if ($z = sub($south, 1)) return(lineofwalk(movecoord(coord, 0, 0, 1), coord));
+    if ($z = add($north, 1)) return(lineofwalk(movecoord(coord, 0, 0, -1), coord));
+    if ($z >= $south & $z <= $north) return($overlap);
+}
+if ($z >= $south & $z <= $north) {
+    if ($x = sub($west, 1)) return(lineofwalk(movecoord(coord, 1, 0, 0), coord));
+    if ($x = add($east, 1)) return(lineofwalk(movecoord(coord, -1, 0, 0), coord));
+}
+return(false);
