@@ -6,7 +6,7 @@
 ^werewolftanner_hard_leather_cost = 5
 ^werewolftanner_dragonhide_cost = 45
 
-// CANDIDATE: Sal's Realm April 2006 guides; RuneScape wiki Snakeskin (3 September 2006).
+// CANDIDATE: Tip.It Crafting (12 April 2006, Al Kharid); RuneScape wiki Snakeskin (3 September 2006).
 ^tanner_village_snake_hide_cost = 15
 // CANDIDATE: Tip.It swamp snake hide item page (12 October 2007): most places.
 ^tanner_swamp_snake_hide_cost = 20

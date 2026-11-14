@@ -1,6 +1,7 @@
 /** Real packed tanning scripts; transport-free, not a client rendering proof. */
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -10,6 +11,9 @@ const pack = path.join(engine, 'data/pack');
 const load = async rel => (await import(pathToFileURL(path.join(engine, 'src', rel)).href)).default;
 const World = await load('engine/World.ts');
 const Player = await load('engine/entity/Player.ts');
+const Npc = await load('engine/entity/Npc.ts');
+const { EntityLifeCycle } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/EntityLifeCycle.ts')).href);
+const { BlockWalk } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/BlockWalk.ts')).href);
 const ScriptProvider = await load('engine/script/ScriptProvider.ts');
 const ScriptRunner = await load('engine/script/ScriptRunner.ts');
 const ScriptState = await load('engine/script/ScriptState.ts');
@@ -18,6 +22,8 @@ const IfButtonHandler = await load('network/game/client/handler/IfButtonHandler.
 const IfButton = await load('network/game/client/model/IfButton.ts');
 const ResumePCountDialogHandler = await load('network/game/client/handler/ResumePCountDialogHandler.ts');
 const ResumePCountDialog = await load('network/game/client/model/ResumePCountDialog.ts');
+const ResumePauseButtonHandler = await load('network/game/client/handler/ResumePauseButtonHandler.ts');
+const ResumePauseButton = await load('network/game/client/model/ResumePauseButton.ts');
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType', 'ObjType',
   'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType', 'SeqType', 'SpotanimType',
@@ -40,9 +46,9 @@ const hides = [obj('village_snake_hide'), obj('templetrek_swamp_snake_hide')];
 assert.deepEqual(hides, [6287, 7801]);
 assert.equal(skin, 6289);
 const towns = [
-  { name: 'Ellis', x: 3276, z: 3193, prices: [15, 20], old: [1, 3, 20, 20, 20, 20], opener: '[opnpc3,ellis_tanner]' },
-  { name: 'Sbott', x: 3490, z: 3503, prices: [25, 45], old: [2, 5, 45, 45, 45, 45], opener: '[opnpc3,werewolftanner]' },
-  { name: 'Ranging Guild', x: 2678, z: 3434, prices: [15, 20], old: [1, 3, 20, 20, 20, 20], opener: '[label,tan_leather_choices]' }
+  { name: 'Ellis', npc: 'ellis_tanner', x: 3276, z: 3193, prices: [15, 20], old: [1, 3, 20, 20, 20, 20], opener: '[opnpc3,ellis_tanner]' },
+  { name: 'Sbott', npc: 'werewolftanner', x: 3490, z: 3503, prices: [25, 45], old: [2, 5, 45, 45, 45, 45], opener: '[opnpc3,werewolftanner]' },
+  { name: 'Guild', npc: 'ranging_guild_leatherworker', x: 2678, z: 3434, prices: [15, 20], old: [1, 3, 20, 20, 20, 20], opener: '[label,tan_leather_choices]' }
 ];
 // The loaded map supplies Sbott for real NPC_FIND, without replacing a handler.
 let serial = 0;
@@ -71,8 +77,10 @@ function execute(p, name) {
 function open(p, town) { execute(p, town.opener); assert.equal(p.modalMain, root); }
 const button = new IfButtonHandler();
 const resume = new ResumePCountDialogHandler();
+const pause = new ResumePauseButtonHandler();
+const snakeTiles = [3, 2]; // Village, swamp; zero-based positions from the reconstruction.
 function click(p, tile, mode, input = 3) {
-  const base = { one: 152, five: 144, x: 136, all: 128 }[mode];
+  const base = { one: 146, five: 138, x: 130, all: 122 }[mode];
   assert.equal(button.handle(new IfButton(com(base + tile)), p), true);
   if (mode === 'x') {
     assert.equal(p.activeScript?.execution, ScriptState.COUNTDIALOG);
@@ -98,10 +106,10 @@ function check(town, tile, mode, count, money, expectedCount, input = 3, full = 
   const before = totals(p);
   open(p, town);
   const slots = p.getInventory(inv).items.map(item => item && { ...item });
-  click(p, tile, mode, input);
+  click(p, snakeTiles[tile], mode, input);
   const expected = { coins: money - expectedCount * town.prices[tile], hides: [0, 0], skins: expectedCount };
   expected.hides[tile] = count - expectedCount;
-  assert.deepEqual(totals(p), expected, `${town.name} tile ${tile + 7} ${mode}: exact settlement from ${JSON.stringify(before)}`);
+  assert.deepEqual(totals(p), expected, `${town.name} tile ${snakeTiles[tile] + 1} ${mode}: exact settlement from ${JSON.stringify(before)}`);
   if (expectedCount === 0) assert.deepEqual(p.getInventory(inv).items, slots, 'refusal leaves every slot unchanged');
   else assert.equal(p.modalMain, -1, 'successful tanning closes the interface');
   if (message) assert(p.packets.some(packet => packet.kind === 'MessageGame' && packet.msg === message), message);
@@ -143,7 +151,7 @@ const publishedHashes = [
   '57a602a834823d4d1472bf7a7820c6212b60732d2df9d29e3806482b4820d6c1'
 ];
 const names = [];
-for (let tile = 0; tile < 6; tile++) for (const base of [146, 138, 130, 122]) names.push(`[if_button,tanner:com_${base + tile}]`);
+for (const tile of [0, 1, 4, 5, 6, 7]) for (const base of [146, 138, 130, 122]) names.push(`[if_button,tanner:com_${base + tile}]`);
 names.push('[label,tan_soft_leather]', '[label,tan_hard_leather]', '[label,tan_dragonhide]', '[proc,tan_leather]');
 const fields = ['intLocalCount', 'stringLocalCount', 'intArgCount', 'stringArgCount', 'switchTables', 'opcodes', 'intOperands', 'stringOperands'];
 // The compiler relocates script ids when eight buttons and a label are inserted.
@@ -165,24 +173,24 @@ for (const [index, name] of names.entries()) {
   const hash = createHash('sha256').update(JSON.stringify(executable)).digest('hex');
   assert.equal(hash, publishedHashes[index], `published executable unchanged: ${name}`);
 }
-console.log('PASS published six: all 24 buttons, three labels and shared settlement executable fingerprints');
+console.log('PASS published products: 24 relocated buttons, three labels and shared settlement executable fingerprints');
+let captionCases = 0;
 
 for (const town of towns) {
   const p = player(town);
   open(p, town);
   const text = number => p.packets.find(packet => packet.kind === 'IfSetText' && packet.component === com(number))?.text;
   const model = number => p.packets.find(packet => packet.kind === 'IfSetObject' && packet.component === com(number));
-  const oldNames = ['Soft leather', 'Hard leather', 'Green', 'Blue', 'Red', 'Black'];
-  const oldObjects = ['leather', 'hard_leather', 'dragonhide_green', 'dragonhide_blue', 'dragonhide_red', 'dragonhide_black'];
-  for (let i = 0; i < 6; i++) {
-    assert.equal(text(106 + i), oldNames[i]);
-    assert.equal(text(114 + i), `${town.old[i]} gp`);
-    assert.deepEqual(model(98 + i), { kind: 'IfSetObject', component: com(98 + i), obj: obj(oldObjects[i]), scale: 250 });
+  const names = ['Soft leather', 'Hard leather', 'Snake skin', 'Snake skin', "Green D'hide", "Blue D'hide", "Red D'hide", "Black D'hide"];
+  const models = ['leather', 'hard_leather', 'templetrek_swamp_snake_hide', 'village_snake_hide', 'dragonhide_green', 'dragonhide_blue', 'dragonhide_red', 'dragonhide_black'];
+  const costs = [town.old[0], town.old[1], town.prices[1], town.prices[0], ...town.old.slice(2)];
+  for (let i = 0; i < 8; i++) {
+    assert.equal(text(106 + i), names[i]);
+    assert.equal(text(114 + i), `${costs[i]} ${costs[i] === 1 ? 'coin' : 'coins'}`);
+    assert.deepEqual(model(98 + i), { kind: 'IfSetObject', component: com(98 + i), obj: obj(models[i]), scale: 250 });
+    assert.equal(p.packets.find(packet => packet.kind === 'IfSetColour' && packet.component === com(106 + i))?.colour, 0x7C00, 'absent hide caption is red (RGB15 packet)');
   }
   for (let tile = 0; tile < 2; tile++) {
-    assert.equal(text(112 + tile), 'Snake hide');
-    assert.equal(text(120 + tile), `${town.prices[tile]} gp`);
-    assert.deepEqual(model(104 + tile), { kind: 'IfSetObject', component: com(104 + tile), obj: hides[tile], scale: 250 });
     const cost = town.prices[tile];
     for (const [mode, quantity] of [['one', 1], ['five', 5], ['x', 3], ['all', 8]]) check(town, tile, mode, 8, 8 * cost, quantity);
     check(town, tile, 'one', 1, cost, 1);
@@ -196,12 +204,23 @@ for (const town of towns) {
     check(town, tile, 'all', 8, 8 * cost, 8, 3, true);
     check(town, tile, 'all', 8, 8 * cost + 1, 8, 3, true);
   }
-  console.log(`PASS ${town.name}: unchanged six fills, both new pictures/names/prices, Tan 1/5/X/All, caps, refusals, full inventory`);
+  const inputs = ['cow_hide', 'cow_hide', ...models.slice(2)];
+  for (const raw of new Set(inputs)) {
+    const held = player(town);
+    held.invAdd(inv, obj(raw), 1);
+    open(held, town);
+    for (let i = 0; i < 8; i++) {
+      assert.equal(held.packets.find(packet => packet.kind === 'IfSetColour' && packet.component === com(106 + i))?.colour,
+        inputs[i] === raw ? 0x001F : 0x7C00, 'held raw hide alone makes its product caption blue');
+    }
+    captionCases++;
+  }
+  console.log(`PASS ${town.name}: eight ordered captions/costs/pictures, both snake settlements, Tan 1/5/X/All, caps, refusals, full inventory`);
 }
 // Each mutant changes only a scratch in-memory compiled button and is always restored.
 // Running the same exact-settlement assertion must reject the wrong hide for each tile.
 for (let tile = 0; tile < 2; tile++) {
-  const script = ScriptProvider.getByName(`[if_button,tanner:com_${152 + tile}]`);
+  const script = ScriptProvider.getByName(`[if_button,tanner:com_${146 + snakeTiles[tile]}]`);
   const operand = script.intOperands.indexOf(hides[tile]);
   assert(operand >= 0, 'packed button contains its hide operand');
   const saved = script.intOperands[operand];
@@ -212,8 +231,93 @@ for (let tile = 0; tile < 2; tile++) {
     script.intOperands[operand] = saved;
   }
   check(towns[0], tile, 'one', 1, 100, 1);
-  console.log(`PASS tile ${tile + 7} scratch wrong-hide mutant rejected; restored script passes`);
+  console.log(`PASS tile ${snakeTiles[tile] + 1} scratch wrong-hide mutant rejected; restored script passes`);
 }
-console.log(`PASS ${cases} exact settlement cases; published-six executable and fill checks; two caught mutants`);
+// Baseline outcomes were captured from the real published pack by reviewer C.
+// Its IfSetObject packets identify each product's original tile. On this head,
+// find the product by its IfSetObject packet again, not by the old button id.
+const published = JSON.parse(readFileSync(path.join(content, 'tests/tan-snake/published-products.json'), 'utf8'));
+const fixtures = [
+  ['plenty', 8, 1000, 3, false], ['two-hides', 2, 1000, 3, false], ['one-coin-short', 1, 0, 3, false],
+  ['no-hide', 0, 1000, 3, false], ['partial-coins', 8, 2, 3, false], ['x-zero', 8, 1000, 0, false],
+  ['x-big', 8, 1000, 100, false], ['full-inventory', 8, 1000, 3, true], ['exact-coins-3', 8, 60, 3, false],
+  ['snake-also-present', 8, 1000, 3, false, true]
+];
+const inventory = p => p.getInventory(inv).items.map(item => item && `${ObjType.get(item.id).debugname}x${item.count}`).filter(Boolean).join(',');
+let compared = 0;
+for (const town of towns) for (const [modelName, product] of Object.entries(published.products)) {
+  const raw = product.publishedTile < 2 ? obj('cow_hide') : obj(modelName);
+  for (const mode of ['one', 'five', 'x', 'all']) {
+    const outcomes = [];
+    for (const [, count, money, input, full, snake] of fixtures) {
+      const p = player(town);
+      if (count) p.invAdd(inv, raw, count);
+      if (money) p.invAdd(inv, coins, money);
+      if (snake) for (const hide of hides) p.invAdd(inv, hide, 2);
+      if (full) p.invAdd(inv, obj('knife'), p.invFreeSpace(inv));
+      const before = inventory(p);
+      open(p, town);
+      const fill = p.packets.find(packet => packet.kind === 'IfSetObject' && packet.obj === obj(modelName));
+      assert(fill, `product picture ${modelName}`);
+      const tile = Array.from({ length: 8 }, (_, i) => i).find(i => com(98 + i) === fill.component);
+      assert(Number.isInteger(tile), 'product picture belongs to a tile');
+      const from = p.packets.length;
+      click(p, tile, mode, input);
+      outcomes.push({ before, handled: true, countdialog: mode === 'x', after: inventory(p), modalMain: p.modalMain,
+        messages: p.packets.slice(from).filter(packet => packet.kind === 'MessageGame').map(packet => packet.msg) });
+      compared++;
+    }
+    assert.equal(createHash('sha256').update(JSON.stringify(outcomes)).digest('hex'), product.results[town.name][mode],
+      `${town.name} ${modelName} ${mode}: coins, items, messages and interface equal published pack`);
+  }
+}
+console.log(`PASS ${compared} published-pack comparisons by product: 6 products x 4 modes x 10 fixtures x 3 tanners`);
+
+// Resume real packed Talk scripts and option buttons; no replacement opener.
+let entryCases = 0;
+function talk(town, hide, use = false) {
+  const p = player(town);
+  p.invAdd(inv, hide, 1);
+  const typeId = NpcType.getId(town.npc);
+  const type = NpcType.get(typeId);
+  const npc = new Npc(0, 0, 0, type.size, type.size, EntityLifeCycle.RESPAWN, 9000 + serial, typeId, BlockWalk.NONE);
+  npc.isActive = true;
+  npc.x = town.x;
+  npc.z = town.z;
+  if (use) p.lastUseItem = hide;
+  const script = ScriptProvider.getByName(`[${use ? 'opnpcu' : 'opnpc1'},${town.npc}]`);
+  const state = ScriptRunner.init(script, p, npc);
+  p.executeScript(state, true);
+  const wanted = town.name === 'Guild' ? "I'd like you to tan something for me." : 'Yes please.';
+  let chosen = null;
+  for (let step = 0; step < 60 && state.execution !== ScriptState.FINISHED; step++) {
+    assert.notEqual(state.execution, ScriptState.ABORTED, 'dialogue script does not abort');
+    if (state.execution === ScriptState.PAUSEBUTTON) {
+      const texts = new Map(p.packets.filter(packet => packet.kind === 'IfSetText').map(packet => [packet.component, packet.text]));
+      let component = 0;
+      if (p.resumeButtons.length > 1) {
+        component = p.resumeButtons.find(id => texts.get(id) === wanted);
+        assert(Number.isInteger(component), `${town.name} snake-only Talk offers ${wanted}`);
+        chosen = texts.get(component);
+        p.lastCom = component;
+      }
+      pause.handle(new ResumePauseButton(component), p);
+    } else if (state.execution === ScriptState.SUSPENDED) {
+      World.currentTick = Math.max(World.currentTick + 1, p.delayedUntil ?? 0);
+      p.delayed = false;
+      p.executeScript(state, true, true);
+    } else assert.fail(`unexpected dialogue execution ${state.execution}`);
+  }
+  if (!use) assert.equal(chosen, wanted);
+  assert.equal(p.modalMain, root, `${town.name} ${use ? 'use hide' : 'Talk'} opens tanner`);
+  entryCases++;
+}
+for (const town of towns) {
+  for (const hide of town.name === 'Guild' ? [hides[0]] : hides) talk(town, hide);
+}
+for (const hide of hides) talk(towns[0], hide, true);
+console.log(`PASS ${entryCases} snake-only Talk/use entries through packed dialogue and option resumes`);
+console.log(`PASS ${captionCases} held-hide caption-colour states, plus absent-hide controls at all three tanners`);
+console.log(`PASS ${cases} exact snake settlement cases; two caught wrong-hide mutants`);
 // Engine imports retain service handles; this offline fixture starts no server.
 process.exit(0);
