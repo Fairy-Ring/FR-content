@@ -35,9 +35,11 @@ if (finduid(%npc_macro_event_target) = true) {
     } else if (%npc_int = 3) { // fail
         npc_say("No-one ignores me!");
         npc_anim(human_castteleport, 0);
-        %macro_event = ^no_macro_event;
-        // https://youtu.be/Ai89wqupYqA?t=45
-        queue(macro_event_fail_teleport, 0, 0);
+        if (%macro_event = ^macro_mysterious_old_man & %macro_event_uid = npc_uid) {
+            %macro_event = ^no_macro_event;
+            // https://youtu.be/Ai89wqupYqA?t=45
+            queue*(macro_event_fail_teleport, 0)(%macro_event, npc_uid);
+        }
         npc_delay(0);
         npc_del;
         return;

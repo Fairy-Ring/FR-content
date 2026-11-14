@@ -113,6 +113,11 @@ if (%macro_event = ^macro_lost_and_found) {
 if (%macro_event = ^no_macro_event) {
     return;
 }
+// Candlelight owns its church, taper and departure lifecycle (plan U21).
+// Do not treat its priest as a disposable non-restoring follower.
+if (%macro_event = ^macro_candlelight) {
+    return;
+}
 if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
     if (~macro_event_area(coord) = false |
         ~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true) {
@@ -127,9 +132,12 @@ if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
     def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
     if ($event_coord ! null) {
         ~macro_event_general_create(%macro_event, $event_coord);
+    } else {
+        ~macro_event_cleanup(%macro_event, %macro_event_uid);
     }
 } else {
-    ~macro_event_cleanup(%macro_event, %macro_event_uid);
+    // Preserve published non-restoring event login: clear only the identity.
+    %macro_event = ^no_macro_event;
 }
 
 [proc,macro_event_logout]
@@ -163,7 +171,11 @@ if (map_members = ^true) {
 return(enum_getoutputcount(general_macro_events_free));
 
 // teleports the player to a random location, using the coords in configs/macro_events_teleports.enum
-[queue,macro_event_fail_teleport]
+[queue,macro_event_fail_teleport](int $event, npc_uid $actor)
+// The actor already released its identity; a newer encounter owns neither token.
+if (%macro_event ! $event | %macro_event_uid ! $actor) {
+    return;
+}
 session_log(^log_adventure, "Failed random event and got teleported");
 def_coord $teleport_coord;
 if (map_members = ^true) {
@@ -175,6 +187,10 @@ if (map_members = ^true) {
 // doesnt if_close
 %macro_event = ^no_macro_event;
 p_delay(1);
+// A delay is another boundary: never move a newer encounter.
+if (%macro_event ! $event | %macro_event_uid ! $actor) {
+    return;
+}
 // https://youtu.be/g5k3XuXxyYQ?list=PLn23LiLYLb1Y3P9S9qZbijcJihiD416jT&t=37
 spotanim_map(smokepuff, coord, 124, 0);
 sound_synth(smokepuff2, 1, 0);
