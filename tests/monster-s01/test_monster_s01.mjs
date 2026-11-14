@@ -223,9 +223,21 @@ for (const protectedMelee of [false, true]) {
 }
 {
   const { player, npc } = fixture('slayer_dustdevil');
+  player.getInventory(invId).set(0, { id: id(ObjType, 'slayer_facemask'), count: 1 });
+  run('[ai_opplayer2,slayer_dustdevil]', npc, player);
+  check('carried facemask does not stop the unmasked stat drain', ['ATTACK', 'STRENGTH', 'RANGED', 'MAGIC', 'DEFENCE', 'PRAYER', 'AGILITY'].map(s => player.levels[PlayerStat[s]]), [0, 0, 0, 0, 40, 40, 40]);
+  check('carried facemask still queues fourteen damage', [...player.queue.all()].filter(q => q.script.name === '[queue,combat_damage_player]').map(q => q.args), [[14]]);
+  settle(player);
+  check('carried facemask still receives fourteen damage', player.levels[PlayerStat.HITPOINTS], 66);
+}
+{
+  const { player, npc } = fixture('slayer_dustdevil');
   wear(player, 0, 'slayer_facemask');
   random([0, 0], () => run('[ai_opplayer2,slayer_dustdevil]', npc, player));
   check('facemask keeps ordinary stats', [...player.levels], [...player.baseLevels]);
+  check('worn facemask uses an ordinary missed hit, not fixed fourteen', [...player.queue.all()].filter(q => q.script.name === '[queue,combat_damage_player]').map(q => q.args), [[0]]);
+  settle(player);
+  check('worn facemask receives no fixed fourteen damage', player.levels[PlayerStat.HITPOINTS], 80);
 }
 for (const [label, rolls, expectedPoison] of [['accuracy miss', [0, 0], 0], ['successful zero at damage threshold below one', [0.999999, 0, 0.1], 0], ['positive hit at damage threshold above zero', [0.999999, 0, 0.5], 15]]) {
   const { player, npc } = fixture('swamp_cave_slime');
