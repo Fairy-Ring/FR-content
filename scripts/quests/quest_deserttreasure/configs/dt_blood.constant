@@ -16,8 +16,9 @@
 ^dt_dessous_bat_damage = 5
 // UNKNOWN engineering defaults: invalid bats exceed five (RuneVillage 2006-02-14).
 ^dt_dessous_invalid_bat_damage = 10
-// UNKNOWN engineering share: adjacent melee is the minority, bats the majority.
+// CANDIDATE: RuneScape wiki Dessous r191085-r194523, 2007-07-12 through 2007-07-18.
+// "half his attacks will be melee"; he "doesn't cotton on" to protection prayers.
 ^dt_dessous_melee_chances = 1
-^dt_dessous_melee_rolls = 4
+^dt_dessous_melee_rolls = 2
 // CANDIDATE: RuneHQ 2005-11-05 / 2006-04-24 and Zybez 2006-02-20 attest five.
 ^dt_malak_blood_damage = 5

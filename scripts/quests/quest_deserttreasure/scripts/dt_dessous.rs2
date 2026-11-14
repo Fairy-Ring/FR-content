@@ -99,7 +99,8 @@ if (distance(npc_coord, coord) > ^dt_dessous_chase_distance | (distance(npc_coor
     }
 }
 // RuneVillage describes the whole mixed fight; RuneHQ describes the moment after a teleport.
-// The exact melee share is UNKNOWN. Protection from Melee blocks damage, not attack choice.
+// CANDIDATE: RuneScape wiki Dessous r191085-r194523 (2007-07-12 to 2007-07-18): half melee.
+// Protection from Melee blocks damage, not attack choice.
 if (distance(npc_coord, coord) <= 1 & lineofsight(npc_coord, coord) = true & random(^dt_dessous_melee_rolls) < ^dt_dessous_melee_chances) {
     ~npc_default_attack;
     return;

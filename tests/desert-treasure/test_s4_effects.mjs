@@ -284,7 +284,7 @@ const cases = {
   },
   attacks() {
     const rolls = constant('dt_dessous_melee_rolls'), chances = constant('dt_dessous_melee_chances');
-    assert(chances > 0 && chances * 2 < rolls, 'named melee share is nonzero and a minority');
+    assert(chances > 0 && chances * 2 === rolls, 'near-target CANDIDATE: adjacent attacks are half melee');
     for (const prayer of [null, 'prayer14', 'prayer12']) {
       const p = player(), n = dessous(p);
       if (prayer) setVar(p, prayer, 1);
