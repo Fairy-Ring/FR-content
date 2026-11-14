@@ -2,10 +2,13 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { Player, ScriptProvider, ScriptRunner, ScriptState, World, engine, pack, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
+import { Player, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType, World, engine, pack, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
 
 const { default: DbTableIndex } = await import(pathToFileURL(`${engine}/src/cache/config/DbTableIndex.ts`).href);
 const { ScriptOpcode: op } = await import(pathToFileURL(`${engine}/src/engine/script/ScriptOpcode.ts`).href);
+const { default: IfButtonHandler } = await import(pathToFileURL(`${engine}/src/network/game/client/handler/IfButtonHandler.ts`).href);
+const { default: IfButton } = await import(pathToFileURL(`${engine}/src/network/game/client/model/IfButton.ts`).href);
+const { PlayerStat } = await import(pathToFileURL(`${engine}/src/engine/entity/PlayerStat.ts`).href);
 const inv = requiredId(types.InvType, 'inv');
 const v = name => requiredId(types.VarPlayerType, name);
 const coord = (level, x, z) => (level << 28) | (x << 14) | z;
@@ -322,6 +325,68 @@ for (const populated of [false, true]) check(`read-only staff inventory fixture:
   const after = snapshot(p); after.messages = [];
   assert.deepEqual(after, before, 'inventory, varps, queues, actors and UI are unchanged');
   assert.deepEqual(snapshot(other), otherBefore, 'no other player is read or changed');
+});
+check('real packed Teleother cast and visible consent release only the owned task', () => {
+  const recipient = player(); const other = player(); const caster = player([0, 2336, 4746]);
+  for (const p of [recipient, caster]) run(p, '[proc,initalltabs]');
+  recipient.setVar(v('option_aid'), 1);
+  give(recipient, 'coins', 17);
+  for (const rune of ['soulrune', 'lawrune', 'earthrune']) give(caster, rune, 2);
+  startTask(recipient); startTask(other);
+  run(recipient, '[mapzone,0_36_74]');
+  run(caster, '[mapzone,0_36_74]');
+  for (const tab of [3, 4, 6]) {
+    assert.equal(recipient.tabs[tab], -1);
+    assert(caster.tabs[tab] >= 0, 'the no-event visitor retains normal interfaces');
+  }
+  const otherBefore = snapshot(other);
+  const inventoryBefore = snapshot(recipient).inventory;
+  const xpBefore = caster.stats[PlayerStat.MAGIC];
+  const component = requiredId(types.Component, 'magic:com_511');
+  const trigger = ScriptProvider.getByTrigger(ServerTriggerType.APPLAYERT, component, -1);
+  assert.equal(trigger, packed('[applayert,magic:com_511]'));
+  assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPPLAYERT, component, -1), undefined);
+  assert.equal(caster.inApproachDistance(10, recipient), false, 'this task has no ordinary legal caster approach');
+  // Ruling 9: execute the real AP body to prove the landed-cast predicate,
+  // not the unreachable physical approach. No spell, offer or task is mocked.
+  const cast = ScriptRunner.init(trigger, caster, recipient);
+  caster.executeScript(cast, true);
+  assert.equal(cast.execution, ScriptState.FINISHED);
+  assert.equal(caster.stats[PlayerStat.MAGIC] - xpBefore, 840);
+  for (const rune of ['soulrune', 'lawrune', 'earthrune']) assert.equal(caster.invTotal(inv, requiredId(types.ObjType, rune)), 1);
+  assert.equal(recipient.getVar(v('teleother_spell')), 61);
+  assert.equal(recipient.modalMain, requiredId(types.Component, 'teleport_option'));
+  assert.equal(recipient.getVar(v('macro_event')), laf, 'an offer alone cannot abort the task');
+  const casterAfterCast = snapshot(caster);
+  const accept = requiredId(types.Component, 'teleport_option:com_97');
+  const buttons = new IfButtonHandler();
+  assert.equal(buttons.handle(new IfButton(accept), recipient), true);
+  let boundaries = 0;
+  while (recipient.activeScript) {
+    assert(boundaries++ < 10, 'finite real consent delay');
+    const state = recipient.activeScript;
+    assert.equal(state.execution, ScriptState.SUSPENDED);
+    assert(recipient.delayed && recipient.delayedUntil > World.currentTick);
+    World.currentTick = recipient.delayedUntil;
+    recipient.delayed = false;
+    recipient.executeScript(state, true, true);
+  }
+  assert.equal(recipient.level, 0);
+  assert(Math.abs(recipient.x - 3221) <= 2 && Math.abs(recipient.z - 3218) <= 2);
+  cleared(recipient);
+  assert.equal(recipient.getVar(v('macro_transmit')), 0);
+  assert.equal(recipient.getVar(v('teleother_spell')), 0);
+  assert.deepEqual(snapshot(recipient).inventory, inventoryBefore);
+  for (const tab of [3, 4, 6]) assert(recipient.tabs[tab] >= 0);
+  assert.deepEqual(snapshot(caster), casterAfterCast, 'consent cannot charge or mutate the caster again');
+  assert.equal(caster.stats[PlayerStat.MAGIC], xpBefore + 840);
+  assert.deepEqual(snapshot(other), otherBefore, 'another owned task is untouched');
+  const after = snapshot(recipient);
+  assert.equal(buttons.handle(new IfButton(accept), recipient), false, 'closed consent interface cannot be replayed');
+  assert.deepEqual(snapshot(recipient), after);
+  assert.deepEqual(snapshot(caster), casterAfterCast);
+  assert.deepEqual(snapshot(other), otherBefore);
+  cleanup(other);
 });
 console.log(`RESULT ${failed ? 'FAIL' : 'PASS'} random-events-u01 passed=${passed} failed=${failed}`);
 process.exit(failed ? 1 : 0);
