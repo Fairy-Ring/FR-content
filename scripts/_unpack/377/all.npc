@@ -57966,6 +57966,8 @@ walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 op1=Talk-to
 head1=obj_pickpocket_guide_man
+wanderrange=0
+moverestrict=nomove
 
 [wom_fakeplayer1]
 name=Purepker895
@@ -84307,6 +84309,8 @@ multinpc=15,wise_old_man
 multinpc=20,wise_old_man
 multinpc=190,wise_old_man
 multinpc=200,wise_old_man
+wanderrange=0
+moverestrict=nomove
 
 [wom_inactive]
 name=Wise Old Man
