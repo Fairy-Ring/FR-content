@@ -336,6 +336,31 @@ def check_original_entity_configs() -> None:
             not any(value.startswith("attackrate,") for value in base_params),
             f"[{name}] baseline must not already define an attack rate",
         )
+        if name == "firediamond_firewarrior":
+            # S2 exact additions only: CANDIDATE later Fareed bonuses/ashes;
+            # UNKNOWN product-owned lifecycle fields. Preserve the comparison.
+            for field, expected in {
+                "defaultmode": "none",  # UNKNOWN owned spawn, not a static aggressor
+                "wanderrange": "0",  # UNKNOWN owned encounter boundary
+                "maxrange": "64",  # UNKNOWN lifecycle value, S3 precedent
+                "huntrange": "0",  # UNKNOWN no public target hunting
+                "timer": "1",  # UNKNOWN owner-presence check interval
+            }.items():
+                require(current_values.pop(field, None) == [expected], f"[{name}] S2 {field} must be {expected}")
+                require(field not in base_values, f"[{name}] baseline must not define S2 {field}")
+            for expected in (
+                "strengthbonus,120",  # CANDIDATE later Fareed equipment strength
+                "stabdefence,100",  # CANDIDATE later Fareed stab defence
+                "slashdefence,100",  # CANDIDATE later Fareed slash defence
+                "crushdefence,100",  # CANDIDATE later Fareed crush defence
+                "magicdefence,0",  # CANDIDATE later Fareed magic defence
+                "rangedefence,0",  # CANDIDATE later Fareed ranged defence
+                "damagetype,^slash_style",  # CANDIDATE later melee attack style
+                "death_drop,ashes",  # CANDIDATE later Smoke transcript
+            ):
+                require(current_params.count(expected) == 1, f"[{name}] must add exactly {expected}")
+                require(expected not in base_params, f"[{name}] baseline must not define {expected}")
+                current_params = [value for value in current_params if value != expected]
         for value in damis_server_params.get(name, ()):
             require(current_params.count(value) == 1, f"[{name}] must add exactly server param {value}")
             require(value not in base_params, f"[{name}] baseline must not already define server param {value}")

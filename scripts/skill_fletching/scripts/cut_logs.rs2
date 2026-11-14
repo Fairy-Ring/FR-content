@@ -47,9 +47,16 @@ def_int $make_count;
 // CANDIDATE for fletching: 377 skillmulti2/3 offer Make 1/5/10/X, not Make All.
 // Product set: Tip.It guide captured 2006-05-01; no later crossbow stocks.
 if ($shaft_count < 1) {
-    $product, $make_count = ~skillmulti2($obj2, $obj3);
+    $product, $make_count = ~skill_multi2(
+        $obj2, 0, -15, 175, "\\n\\n\\n\\n<~string_removeright(oc_name($log), 5)> Short Bow",
+        $obj3, 0, -15, 175, "\\n\\n\\n\\n<~string_removeright(oc_name($log), 5)> Long Bow"
+    );
 } else {
-    $product, $make_count = ~skillmulti3($obj1, $obj2, $obj3);
+    $product, $make_count = ~skill_multi3(
+        $obj1, 5, -15, 175, "\\n\\n\\n\\n15 Arrow Shafts",
+        $obj2, 9, -11, 175, "\\n\\n\\n\\nShort Bow",
+        $obj3, 0, -15, 175, "\\n\\n\\n\\nLong Bow"
+    );
 }
 if_close;
 if ($product = null | $make_count < 1) {

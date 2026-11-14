@@ -103,6 +103,7 @@ jobs:
       # tests/fenkenstrain-completion/: CI — four compiled runtime tests and the offline static check;
       #   setup-iso.sh is an optional isolated-layout helper, not a test or a live-server requirement.
       # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
+      # tests/skill-menus/: CI — packed trigger, menu packet, reset and button tests; no world server.
       # tests/silver-casting/: CI — compiled furnace handler fills each Silver Casting slot; no engine is started.
       # tests/leather-batch/: CI — published Make1 baseline plus packed Make5/10 handlers and weak-queue processing; no server.
       # tests/teleother/: CI — compiled Player triggers and button handlers cover all three offers, settlement and recipient lifecycle; no server is started.
@@ -177,10 +178,12 @@ jobs:
           run_test tests/desert-treasure/test_s1_contract.py python3 ../content/tests/desert-treasure/test_s1_contract.py
           run_test tests/desert-treasure/test_s6_contract.py python3 ../content/tests/desert-treasure/test_s6_contract.py
           run_test tests/desert-treasure/test_s4_contract.py python3 ../content/tests/desert-treasure/test_s4_contract.py
+          run_test tests/desert-treasure/test_s2_contract.py python3 ../content/tests/desert-treasure/test_s2_contract.py
           run_test tests/teleother/test_teleother.mjs node --import tsx ../content/tests/teleother/test_teleother.mjs
           run_test tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs node --import tsx ../content/tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs
           run_test tests/rowboat/test_rowboat.mjs node --import tsx ../content/tests/rowboat/test_rowboat.mjs
           run_test tests/misc-services/test_misc_services.mjs node --import tsx ../content/tests/misc-services/test_misc_services.mjs
+          run_test tests/regicide-travel/test_regicide_travel.mjs node --import tsx ../content/tests/regicide-travel/test_regicide_travel.mjs
           run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
           run_test tests/food-drink/test_food_drink.mjs node --import tsx ../content/tests/food-drink/test_food_drink.mjs
           run_test tests/stair-links/test_stair_links.mjs node --import tsx ../content/tests/stair-links/test_stair_links.mjs
@@ -189,10 +192,15 @@ jobs:
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
+          run_test tests/skill-menus/runtime.mts bash ../content/tests/skill-menus/runtime.sh "$PWD"
           run_test tests/content-gaps/packed.mts bash ../content/tests/content-gaps/packed.sh "$PWD"
           run_test tests/ape-agility/test_ape_atoll.mjs node --import tsx ../content/tests/ape-agility/test_ape_atoll.mjs
           run_test tests/brim-dungeon/test_brim_dungeon.mjs node --import tsx ../content/tests/brim-dungeon/test_brim_dungeon.mjs
           run_test tests/splitbark-service/test_splitbark_service.mjs node --import tsx ../content/tests/splitbark-service/test_splitbark_service.mjs
+          run_test tests/small-repairs/test_r1_chill.mjs node --import tsx ../content/tests/small-repairs/test_r1_chill.mjs
+          run_test tests/small-repairs/test_r2_eblis.mjs node --import tsx ../content/tests/small-repairs/test_r2_eblis.mjs
+          run_test tests/small-repairs/test_r3_cat_scroll.mjs node --import tsx ../content/tests/small-repairs/test_r3_cat_scroll.mjs
+          run_test tests/small-repairs/test_r4_teleport.mjs node --import tsx ../content/tests/small-repairs/test_r4_teleport.mjs
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           exit "$failed"

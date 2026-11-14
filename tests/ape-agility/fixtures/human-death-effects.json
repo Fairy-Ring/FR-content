@@ -471,7 +471,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         1
       ],
       "name": "ENUM",
@@ -482,7 +485,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         2
       ],
       "name": "ENUM",
@@ -493,7 +499,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         3
       ],
       "name": "ENUM",
@@ -504,7 +513,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         4
       ],
       "name": "ENUM",
@@ -515,7 +527,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         5
       ],
       "name": "ENUM",
@@ -526,7 +541,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         6
       ],
       "name": "ENUM",
@@ -537,7 +555,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         7
       ],
       "name": "ENUM",
@@ -548,7 +569,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         8
       ],
       "name": "ENUM",
@@ -559,7 +583,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         9
       ],
       "name": "ENUM",
@@ -570,7 +597,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         10
       ],
       "name": "ENUM",
@@ -581,7 +611,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         11
       ],
       "name": "ENUM",
@@ -592,7 +625,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         12
       ],
       "name": "ENUM",
@@ -603,7 +639,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         13
       ],
       "name": "ENUM",
@@ -614,7 +653,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         14
       ],
       "name": "ENUM",
@@ -625,7 +667,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         15
       ],
       "name": "ENUM",
@@ -636,7 +681,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         16
       ],
       "name": "ENUM",
@@ -647,7 +695,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         17
       ],
       "name": "ENUM",
@@ -658,7 +709,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         18
       ],
       "name": "ENUM",
@@ -669,7 +723,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         19
       ],
       "name": "ENUM",
@@ -680,7 +737,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         20
       ],
       "name": "ENUM",
@@ -691,7 +751,10 @@
       "ints": [
         105,
         83,
-        76,
+        {
+          "kind": "enum",
+          "name": "stats"
+        },
         21
       ],
       "name": "ENUM",
@@ -765,7 +828,12 @@
     {
       "ints": [
         "trawler_wreck_zones",
-        4096,
+        {
+          "kind": "dbcolumn",
+          "name": "coord_pair_table",
+          "column": 0,
+          "tuple": -1
+        },
         0
       ],
       "name": "DB_GETFIELD",
@@ -975,7 +1043,12 @@
     {
       "ints": [
         "weapon_unarmed_table",
-        45072,
+        {
+          "kind": "dbcolumn",
+          "name": "combat_style_table",
+          "column": 1,
+          "tuple": -1
+        },
         0
       ],
       "name": "DB_GETFIELD",
@@ -985,7 +1058,12 @@
     {
       "ints": [
         "weapon_unarmed_table",
-        45056,
+        {
+          "kind": "dbcolumn",
+          "name": "combat_style_table",
+          "column": 0,
+          "tuple": -1
+        },
         0
       ],
       "name": "DB_GETFIELD",
@@ -1139,7 +1217,12 @@
     {
       "ints": [
         "gnomeball_zones",
-        4096,
+        {
+          "kind": "dbcolumn",
+          "name": "coord_pair_table",
+          "column": 0,
+          "tuple": -1
+        },
         0
       ],
       "name": "DB_GETFIELD",
@@ -1149,7 +1232,12 @@
     {
       "ints": [
         "gnomeball_zones",
-        4096,
+        {
+          "kind": "dbcolumn",
+          "name": "coord_pair_table",
+          "column": 0,
+          "tuple": -1
+        },
         1
       ],
       "name": "DB_GETFIELD",
@@ -1159,7 +1247,12 @@
     {
       "ints": [
         "gnomeball_zones",
-        4096,
+        {
+          "kind": "dbcolumn",
+          "name": "coord_pair_table",
+          "column": 0,
+          "tuple": -1
+        },
         2
       ],
       "name": "DB_GETFIELD",
@@ -1169,7 +1262,12 @@
     {
       "ints": [
         "gnomeball_zones",
-        4096,
+        {
+          "kind": "dbcolumn",
+          "name": "coord_pair_table",
+          "column": 0,
+          "tuple": -1
+        },
         3
       ],
       "name": "DB_GETFIELD",
