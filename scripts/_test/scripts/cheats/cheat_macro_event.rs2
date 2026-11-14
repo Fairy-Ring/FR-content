@@ -154,7 +154,7 @@ while ($dx <= 8) {
     while ($dz <= 8) {
         loc_findallzone(movecoord(coord, $dx, 0, $dz));
         while (loc_findnext = true) {
-            if (distance(coord, loc_coord) <= 1 & lineofwalk(coord, loc_coord) = true) {
+            if (distance(coord, loc_coord) <= 1 & lineofsight(coord, loc_coord) = true) {
                 def_dbrow $data;
                 if ($kind = 0) {
                     db_find(mining_table:rock, loc_type);

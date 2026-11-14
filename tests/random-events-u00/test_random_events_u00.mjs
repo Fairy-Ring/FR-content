@@ -183,6 +183,18 @@ for (let index = 1; index <= names.length; index++) check(`packed accepted name 
   if ([13, 15].includes(index)) assert.equal(call.npc, fish.type);
   assert.equal(p.getVar(eventVar), 0, 'caller itself seeds no active event');
 });
+check('ordinary Varrock mining adjacency admits a solid genuine rock without walking into it', () => {
+  const row = nativeLocRows('copperrock1').find(r => r.level === 0 && r.x === 3282 && r.z === 3368);
+  assert(row, 'the live ordinary copper placement is genuine');
+  const p = player(nextTo(row));
+  give(p, 'bronze_pickaxe');
+  const result = run(p, 'lost-pickaxe');
+  assert.equal(result.entries.length, 1, JSON.stringify(p.messages));
+  const call = result.entries[0];
+  assert.equal(call.name, '[proc,macro_event_lost_pickaxe_spawn]');
+  assert(call.loc && World.getLoc(call.loc.x, call.loc.z, call.loc.level, call.loc.type), 'the production pointer is an actual map target');
+  assert(Math.max(Math.abs(p.x - call.loc.x), Math.abs(p.z - call.loc.z)) <= 1);
+});
 function refusal(p, name, options = {}) {
   const before = snap(p);
   const result = run(p, name, options);
