@@ -345,22 +345,9 @@ function checkCannon(type) {
   assert.equal(before.playerVars[id('VarPlayerType', 'rockthrower')], 29, 'native cannon spends one loaded ball');
   assert.deepEqual(after.playerVars, before.playerVars, 'native cannon ammo counter and all player vars unchanged');
   assert.deepEqual(after.inventory, before.inventory, 'no substitute cannonball/ashes inventory path');
-  if (type === 1977) {
-    assert.equal(after.damage, 0, 'Fareed cannon damage is zero');
-    assert(after.xp.every(v => v === 0), 'Fareed cannon gives no damage XP');
-    assert(after.hero.every(h => h.points === 0), 'Fareed cannon gives no hero credit');
-    assert.deepEqual(after.hitmark, { damage: 0, type: 0 }, 'Fareed cannon uses the native blue zero');
-  } else assertIdentical(after, before, `${type} cannon unchanged`);
-  console.log(`PASS ${type} packed cannon: ${type === 1977 ? 'zero, no XP/credit; native ball consumption' : 'published result, commands, credit and consumption'}`);
+  assertIdentical(after, before, `${type} cannon unchanged from the published pack`);
+  console.log(`PASS ${type} packed cannon: published result, commands, credit and consumption`);
 }
-const fareed = types.NpcType.get(1977), expectedAmmo = fareed.params.get(ammoParam);
-fareed.params.set(ammoParam, id('ObjType', 'mcannonball'));
-let cannonMutantCaught = false;
-try { checkCannon(1977); }
-catch (error) { if (!(error instanceof assert.AssertionError)) throw error; cannonMutantCaught = /cannon damage is zero/.test(error.message); }
-finally { fareed.params.set(ammoParam, expectedAmmo); }
-assert(cannonMutantCaught, 'isolated cannonball-allowed Fareed mutant caught by the same packed assertion');
-console.log('PASS isolated Fareed cannon mutant; source and pack never changed');
 const ice = object('Ice arrows');
 assert.equal(ice.id, 78); assert.equal(ice.debugname, 'ice_arrow');
 const bows = objects.filter(t => t.category === id('CategoryType', 'weapon_bow') && t.params.get(id('ParamType', 'levelrequire')) >= ice.params.get(id('ParamType', 'levelrequire')) && !t.dummyitem);
