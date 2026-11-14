@@ -10,7 +10,24 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createRunner, loadPackedRuntime, packedId, parseOptions, run } from './packed.mjs';
 
-const options = parseOptions(process.argv);
+function parseTestOptions(argv) {
+  const forwarded = argv.slice(0, 2);
+  let regression = null;
+  for (let index = 2; index < argv.length; index++) {
+    const [name, inlineValue] = argv[index].split(/=(.*)/s, 2);
+    if (name !== '--regression') {
+      forwarded.push(argv[index]);
+      continue;
+    }
+    assert.equal(regression, null, '--regression may be supplied only once');
+    const value = inlineValue ?? argv[++index];
+    assert.equal(value, 'prayer-zero', `unknown or missing regression: ${value ?? ''}`);
+    regression = value;
+  }
+  return { options: parseOptions(forwarded), regression };
+}
+
+const { options, regression } = parseTestOptions(process.argv);
 const PRAYER = 5;
 const COUNTDOWN_MASK = 0xffff;
 const COUNTDOWN_HIGH_MASK = 0xffff0000;
@@ -54,7 +71,7 @@ await run(async () => {
   World.currentTick = Math.max(1, World.currentTick);
 
   const runner = createRunner(runtime, { prefix: 'barrows_prayer', firstUid: 10900 });
-  const { makePlayer, procVoid, procInt } = runner;
+  const { makePlayer, call, procVoid, procInt } = runner;
   const ids = Object.fromEntries(['barrows', 'barrows_kills', 'barrows_state', 'barrows_generation', 'barrows_countdowns']
     .map(name => {
       const id = packedId(contentRoot, 'varp', name);
@@ -62,6 +79,12 @@ await run(async () => {
       return [name, id];
     }));
   assert.deepEqual(Object.values(ids), [452, 453, 654, 659, 660], 'S06 uses the original saved Barrows varps');
+  const prayerVarps = Array.from({ length: 15 }, (_, index) => {
+    const name = `prayer${index}`;
+    const id = VarPlayerType.getId(name);
+    assert.notEqual(id, -1, `native prayer activation state ${name} is packed`);
+    return id;
+  });
   assert.equal(VarPlayerType.get(ids.barrows_countdowns).scope, VarPlayerType.SCOPE_PERM,
     'the shared 660 countdown is in the ordinary persistent player save');
 
@@ -191,7 +214,7 @@ await run(async () => {
     player.packets.length = 0;
     const draw = (selectedRank + 0.25) / candidates.length;
     const measured = withRandom(draw, () => procVoid(player, 'barrows_face_show'));
-    assert(measured.calls <= 1, 'one uniformly bounded random draw selects a face');
+    assert.equal(measured.calls, 1, 'every nonempty slain mask consumes exactly one uniform face draw');
     const identity = candidates[selectedRank];
     assert.deepEqual(visibleObjects(player).map(message => [message.component, message.obj]),
       [[identity.slotId, identity.objectId]], 'exactly one normal original face object is set in its corresponding original slot');
@@ -200,6 +223,40 @@ await run(async () => {
     assert(!player.packets.some(message => packetKind(message) === 'IfSetObject' && faces.some(face => message.obj === face.greenId)),
       'face display never substitutes a green palette object');
     return identity;
+  }
+
+  function testPrayerZeroShutdown() {
+    const assertActivePrayers = player => prayerVarps
+      .map((id, index) => player.getVar(id) ? index : -1)
+      .filter(index => index >= 0);
+    const activatePrayer = (player, name, index) => {
+      call(player, `[if_button,prayer:prayer_${name}]`);
+      assert.equal(player.getVar(prayerVarps[index]), 1, `packed prayer button activates prayer${index}`);
+    };
+    const positive = makeRun('prayer_zero_positive', { slainMask: 0, remainder: 1, prayer: 20 });
+    procVoid(positive, 'barrows_timer_resume');
+    activatePrayer(positive, 'thickskin', 0);
+    const positiveDrain = withRandom(0.5, () => tick(positive));
+    assert.equal(positive.levels[PRAYER], 12, 'positive control drains Prayer but leaves points above zero');
+    assert.deepEqual(assertActivePrayers(positive), [0], 'nonzero Prayer drain leaves the packed prayer active');
+    assert.equal(positiveDrain.calls, 0, 'B=0 positive control needs no face draw');
+
+    const zero = makeRun('prayer_zero_shutdown', { slainMask: 0, remainder: 1, prayer: 3 });
+    procVoid(zero, 'barrows_timer_resume');
+    activatePrayer(zero, 'thickskin', 0);
+    activatePrayer(zero, 'rapidrestore', 6);
+    assert.deepEqual(assertActivePrayers(zero), [0, 6], 'packed buttons activate multiple compatible prayers');
+    const zeroDrain = withRandom(0.5, () => tick(zero));
+    assert.equal(zero.levels[PRAYER], 0, 'due Barrows callback clamps Prayer to zero');
+    assert.equal(zeroDrain.calls, 0, 'B=0 zero-shutdown case needs no face draw');
+    assert.deepEqual(assertActivePrayers(zero), [],
+      'Prayer-zero shutdown: the due Barrows callback deactivates every active prayer before returning');
+  }
+
+  if (regression === 'prayer-zero') {
+    testPrayerZeroShutdown();
+    console.log('OK targeted Barrows Prayer-zero shutdown regression');
+    return;
   }
 
   // The packed pure rank selector visits the complete six-bit space, including invalid ranks.
@@ -238,6 +295,9 @@ await run(async () => {
       displayOneFace(facePlayer, mask, rank);
     }
   }
+
+  // R5: zero Prayer deactivates all currently active prayers.
+  testPrayerZeroShutdown();
 
   // The six original client slots are blank until a compiled face is chosen; clear and resume erase, not replay.
   const presentation = makeRun('presentation', { slainMask: 0b100101, remainder: 8 });
@@ -367,8 +427,8 @@ await run(async () => {
     assert.equal(healthy.levels[PRAYER], 100 - drain, `B=${slain} drains exactly 8+B Prayer points`);
     assert.equal(prayerRemaining(healthy), COUNTDOWN_INTERVAL, `B=${slain} reloads 17 in the due callback`);
     assert.equal(countdownHigh(healthy), 0xc17e, `B=${slain} due low write preserves high-half 660`);
-    assert(healthyDraw.calls <= 1, `B=${slain} consumes at most one uniform face draw`);
-    if (slain > 1) assert.equal(healthyDraw.calls, 1, `B=${slain} draws uniformly among multiple slain faces`);
+    assert.equal(healthyDraw.calls, slain === 0 ? 0 : 1,
+      `B=${slain} consumes exactly one face draw when nonempty and none at B=0`);
     if (slain === 0) {
       assert.deepEqual(visibleObjects(healthy), [], 'B=0 displays no non-null face');
       assert.equal(healthyDraw.calls, 0, 'B=0 needs no random face draw');
@@ -378,7 +438,7 @@ await run(async () => {
       const choice = Math.min(candidates.length - 1, Math.floor(0.61 * candidates.length));
       const chosen = candidates[choice];
       assert.deepEqual(visibleObjects(healthy).map(message => [message.component, message.obj]),
-        [[chosen.slotId, chosen.objectId]], `B=${slain} chooses exactly one slain original object in its slot`);
+        [[chosen.slotId, chosen.objectId]], `B=${slain} chooses exactly one slain original crypt object in its slot`);
       assert.deepEqual(fadePackets(healthy).map(message => [message.component, message.seq]),
         [[chosen.slotId, fadeId]], `B=${slain} starts the original fade in the chosen slot`);
     }
@@ -398,7 +458,8 @@ await run(async () => {
   // Low-memory suppression has a paired HD positive control, both using the native repeating callback.
   const hd = makeRun('hd_face_control', { slainMask: 0b000101, remainder: 1, highHalf: 0x9876 });
   procVoid(hd, 'barrows_timer_resume');
-  withRandom(0.25, () => tick(hd));
+  const hdDraw = withRandom(0.25, () => tick(hd));
+  assert.equal(hdDraw.calls, 1, 'HD positive control chooses one face on its due drain');
   assert.equal(visibleObjects(hd).length, 1, 'HD positive control displays one slain face');
   assert.equal(fadePackets(hd).length, 1, 'HD positive control animates its selected face');
   const ld = makeRun('ld_face_absence', { slainMask: 0b000101, remainder: 1, highHalf: 0x9876 });

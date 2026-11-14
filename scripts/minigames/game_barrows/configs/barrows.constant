@@ -79,7 +79,6 @@
 ^barrows_client_cycles_per_tick = 30
 
 // UNKNOWN engineering face selection, unscaled object zoom, normal palette and slots.
-^barrows_face_selection = "uniform_slain"
 ^barrows_face_scale = 100
 ^barrows_face_ahrim = barrows_interface_ahrim
 ^barrows_face_dharok = barrows_interface_dharok

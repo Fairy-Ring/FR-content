@@ -524,15 +524,6 @@ val=1,0_55_151_48_47
 val=2,0_55_151_14_13
 val=3,0_55_151_48_13
 
-[barrows_ladder_corner_by_loc]
-inputtype=loc
-outputtype=int
-default=-1
-val=barrows_ladder_a,0
-val=barrows_ladder_c,1
-val=barrows_ladder_g,2
-val=barrows_ladder_i,3
-
 // Inverse of the original six slain-name identities, not a second selection.
 [barrows_identity_brother]
 inputtype=int

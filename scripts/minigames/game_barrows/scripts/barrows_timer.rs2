@@ -9,6 +9,7 @@ def_int $remaining = ~barrows_prayer_remaining;
 if ($remaining = 1) {
     ~barrows_prayer_set(^barrows_prayer_interval_ticks);
     stat_sub(prayer, add(^barrows_prayer_base_drain, ~barrows_slain_count), 0);
+    if (stat(prayer) = 0) ~prayer_deactivate_all;
     ~barrows_face_show;
 } else if ($remaining > 1) {
     $remaining = sub($remaining, 1);
