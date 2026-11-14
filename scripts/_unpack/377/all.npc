@@ -45037,6 +45037,7 @@ strength=80
 defence=135
 magic=1
 param=attackrate,4
+param=dt_elemental_magic,^fire_strike
 // CANDIDATE: S5 combat behaviour; original 377 cache fields remain unchanged.
 wanderrange=0
 maxrange=32
@@ -46761,6 +46762,8 @@ strength=120
 defence=135
 magic=1
 param=attackrate,4
+param=dt_elemental_magic,^water_strike
+param=dt_elemental_ammo,ice_arrow
 // VERIFIED: 377 identity above. CANDIDATE: Fareed 2007-base equipment bonuses.
 param=strengthbonus,120
 param=stabdefence,100
