@@ -1,4 +1,337 @@
 {
   "version": 1,
-  "entries": []
+  "entries": [
+    {
+      "identity": {
+        "debugname": "slayer_dustdevil",
+        "id": 1624
+      },
+      "unit": "S01",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.slayer-dustdevil-individual-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+        "sources": [
+          {
+            "id": "src.monster-2007-slayer-dustdevil",
+            "sha256": "581d4f7b9b2fd92a81205eb72249cc00b996852fdf2d46c2c7491c6a44ac9fab"
+          },
+          {
+            "id": "src.monster-osrs-slayer-dustdevil",
+            "sha256": "e23c79b3eecb1472e31da74afb815f4a47937adfd2c850029b032dcff2d4338f"
+          },
+          {
+            "id": "src.monster-r1-osrs-earliest-slayer-dustdevil-4",
+            "sha256": "19211844b0084e9b9c2c9c386f4fa405c2c7afe9cba8ec54981cecdf1e97cc9a"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 105
+        },
+        "strength": {
+          "value": 70
+        },
+        "defence": {
+          "value": 40
+        },
+        "hitpoints": {
+          "value": 105,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.slayer-dustdevil-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+            "sources": [
+              {
+                "id": "src.monster-osrs-slayer-dustdevil",
+                "sha256": "e23c79b3eecb1472e31da74afb815f4a47937adfd2c850029b032dcff2d4338f"
+              },
+              {
+                "id": "src.monster-r1-earliest-slayer-dustdevil",
+                "sha256": "6fd87fc2a4985bfa6bf98144ea966c1aea2a99da491cab3d5d2fdbaa06284761"
+              },
+              {
+                "id": "src.monster-r1-osrs-earliest-slayer-dustdevil-1",
+                "sha256": "5cb4026648438b84f557a98ef400a65619f01ef8e1bf6533dee7a9da081edd69"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m474-20051125151303",
+                "sha256": "d659253303776d3030465adc5e6a7a8d01655c7bd8af3fde6da7a77f3cd0741c"
+              },
+              {
+                "id": "src.monster-r1-rhq-469-20060108232021",
+                "sha256": "2d8f9c04d97e40d4d872adf2918c3e66cbb08e8102277686b6721c7b7afd132b"
+              }
+            ]
+          }
+        },
+        "param:slayer_category": {
+          "value": 49,
+          "evidence": {
+            "facts": [
+              "slayer.s01-task-requirements"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+            "sources": [
+              {
+                "id": "src.slayer-tipit-guide-20060427",
+                "sha256": "eb3cc73876da3c79882e2544aba7eb73321de339ac0c6c8621cc66973db959a2"
+              },
+              {
+                "id": "src.slayer-runehq-guide-20060428",
+                "sha256": "48200dfefbbbf632f746f096245707a17138086342f6e26598a3c7775e85fe15"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m460-20051111045130",
+                "sha256": "9c23abc68fb59a24b73d3be7158830169b048b7be701c4591cd7eba82e7927bd"
+              },
+              {
+                "id": "src.slayer-content-constant",
+                "sha256": "f948f203684c930f48c7f01099fb246bcd4a3efb45c567d1bb0991b464858b8b"
+              },
+              {
+                "id": "src.slayer-content-req-enum",
+                "sha256": "611259ac958e0c3fae0afc598e9a29677326c506e447e737e4d7724092223d61"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "slayer_harpiebugswarm",
+        "id": 3153
+      },
+      "unit": "S01",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.slayer-harpiebugswarm-individual-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+        "sources": [
+          {
+            "id": "src.monster-osrs-slayer-harpiebugswarm",
+            "sha256": "c0c7649385e1bda199128abd2621af2f1c75d337d5228c7c2ec2c06b20b0d31c"
+          },
+          {
+            "id": "src.monster-r1-osrs-earliest-slayer-harpiebugswarm-2",
+            "sha256": "bace8774b297253fdb29aea61f2836804be569effe1bb5955959def7a5ab2a71"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 54
+        },
+        "strength": {
+          "value": 46
+        },
+        "defence": {
+          "value": 32
+        },
+        "hitpoints": {
+          "value": 25,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.slayer-harpiebugswarm-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+            "sources": [
+              {
+                "id": "src.monster-osrs-slayer-harpiebugswarm",
+                "sha256": "c0c7649385e1bda199128abd2621af2f1c75d337d5228c7c2ec2c06b20b0d31c"
+              },
+              {
+                "id": "src.monster-r1-earliest-slayer-harpiebugswarm",
+                "sha256": "bb2ae60d2e0d10a2a9b60e28686def88d0852e915cf4d3eb0d9801583ad6580b"
+              },
+              {
+                "id": "src.monster-r1-osrs-earliest-slayer-harpiebugswarm-1",
+                "sha256": "5155f2452f948d0288d04a4142dffbbecf3d35aded566be6aee8f603d5237300"
+              },
+              {
+                "id": "src.monster-rhq-570-20060524034313",
+                "sha256": "1f0a261517ba9846c946860b7bca54231f60fcee87243d162c1f6f73eb4195fa"
+              }
+            ]
+          }
+        },
+        "param:slayer_category": {
+          "value": 70,
+          "evidence": {
+            "facts": [
+              "slayer.s01-task-requirements"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+            "sources": [
+              {
+                "id": "src.slayer-tipit-guide-20060427",
+                "sha256": "eb3cc73876da3c79882e2544aba7eb73321de339ac0c6c8621cc66973db959a2"
+              },
+              {
+                "id": "src.slayer-runehq-guide-20060428",
+                "sha256": "48200dfefbbbf632f746f096245707a17138086342f6e26598a3c7775e85fe15"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m460-20051111045130",
+                "sha256": "9c23abc68fb59a24b73d3be7158830169b048b7be701c4591cd7eba82e7927bd"
+              },
+              {
+                "id": "src.slayer-content-constant",
+                "sha256": "f948f203684c930f48c7f01099fb246bcd4a3efb45c567d1bb0991b464858b8b"
+              },
+              {
+                "id": "src.slayer-content-req-enum",
+                "sha256": "611259ac958e0c3fae0afc598e9a29677326c506e447e737e4d7724092223d61"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "swamp_cave_slime",
+        "id": 1831
+      },
+      "unit": "S01",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.swamp-cave-slime-individual-skills"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+        "sources": [
+          {
+            "id": "src.monster-2007-swamp-cave-slime",
+            "sha256": "943f62f628d8a5e36406c5cc22157919ef50d7e7a927e0894596478677dd9c13"
+          },
+          {
+            "id": "src.monster-osrs-swamp-cave-slime",
+            "sha256": "f26680b0655653aea2110863c7e243699ed1b779f7627be2883715a53d74129a"
+          },
+          {
+            "id": "src.monster-r1-osrs-earliest-swamp-cave-slime-2",
+            "sha256": "ba5bf90539b8f022fb120aac5aa438ddfe9d731a4388ba177510b508f3c5cba8"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 13
+        },
+        "strength": {
+          "value": 13
+        },
+        "defence": {
+          "value": 35
+        },
+        "hitpoints": {
+          "value": 25,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.swamp-cave-slime-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+            "sources": [
+              {
+                "id": "src.monster-osrs-swamp-cave-slime",
+                "sha256": "f26680b0655653aea2110863c7e243699ed1b779f7627be2883715a53d74129a"
+              },
+              {
+                "id": "src.monster-r1-earliest-swamp-cave-slime",
+                "sha256": "44b58a68a2199aec61ff8dd35e1c96ff40d2ba42fdf8912bdbbcb0b05a1c3317"
+              },
+              {
+                "id": "src.monster-r1-osrs-earliest-swamp-cave-slime-1",
+                "sha256": "5812abc1477b92c3dadfc899effdf3dbba400608f695429bb5869afc8dee391a"
+              },
+              {
+                "id": "src.monster-r1-osrs-earliest-swamp-cave-slime-2",
+                "sha256": "ba5bf90539b8f022fb120aac5aa438ddfe9d731a4388ba177510b508f3c5cba8"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m460-20051111045130",
+                "sha256": "9c23abc68fb59a24b73d3be7158830169b048b7be701c4591cd7eba82e7927bd"
+              },
+              {
+                "id": "src.monster-r1-rhq-457-20060108231558",
+                "sha256": "fcd6b11fc92db159c1136f2f8fc8331a2d57984bc78e2c4def646dec0e6c390d"
+              }
+            ]
+          }
+        },
+        "magic": {
+          "value": 13
+        },
+        "param:slayer_category": {
+          "value": 62,
+          "evidence": {
+            "facts": [
+              "slayer.s01-task-requirements"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+            "sources": [
+              {
+                "id": "src.slayer-tipit-guide-20060427",
+                "sha256": "eb3cc73876da3c79882e2544aba7eb73321de339ac0c6c8621cc66973db959a2"
+              },
+              {
+                "id": "src.slayer-runehq-guide-20060428",
+                "sha256": "48200dfefbbbf632f746f096245707a17138086342f6e26598a3c7775e85fe15"
+              },
+              {
+                "id": "src.monster-r1-review-tipit-m460-20051111045130",
+                "sha256": "9c23abc68fb59a24b73d3be7158830169b048b7be701c4591cd7eba82e7927bd"
+              },
+              {
+                "id": "src.slayer-content-constant",
+                "sha256": "f948f203684c930f48c7f01099fb246bcd4a3efb45c567d1bb0991b464858b8b"
+              },
+              {
+                "id": "src.slayer-content-req-enum",
+                "sha256": "611259ac958e0c3fae0afc598e9a29677326c506e447e737e4d7724092223d61"
+              }
+            ]
+          }
+        },
+        "param:poison_severity": {
+          "value": 15,
+          "evidence": {
+            "facts": [
+              "slayer.s01-cave-slime-poison-severity"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee755eb3f3ffda70c339085481613ea96b9478b9",
+            "sources": [
+              {
+                "id": "src.monster-r1-review-tipit-m460-20051111045130",
+                "sha256": "9c23abc68fb59a24b73d3be7158830169b048b7be701c4591cd7eba82e7927bd"
+              },
+              {
+                "id": "src.slayer-s01-published-poison",
+                "sha256": "7c61d675a72f8ccdd741e3d160adcf39f2522f3030a2e2ab111bc99043176a5d"
+              },
+              {
+                "id": "src.slayer-s01-donor-mechanism",
+                "sha256": "5f19acb44eadc14fba0086354bfaa290e451d69ea917beb53b33ae42c70b0f49"
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
 }

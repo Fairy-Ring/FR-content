@@ -1,4 +1,228 @@
 {
   "version": 1,
-  "types": []
+  "types": [
+    {
+      "identity": {
+        "debugname": "slayer_dustdevil",
+        "id": 1624
+      },
+      "contentCommit": "fd897df92a72b94c536c5e6a27c0d2ae31771103",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "The vacuumed face of evil.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          5076,
+          5077
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Dust devil",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "dustdevil_ready"
+        },
+        "recol_d": null,
+        "recol_s": null,
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 93,
+        "walkanim": {
+          "ref": "seq",
+          "name": "dustdevil_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "slayer_harpiebugswarm",
+        "id": 3153
+      },
+      "contentCommit": "fd897df92a72b94c536c5e6a27c0d2ae31771103",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "A swarm of bugs.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          11075
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Harpie Bug Swarm",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "slayer_harpie_swarm"
+        },
+        "recol_d": null,
+        "recol_s": null,
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 46,
+        "walkanim": {
+          "ref": "seq",
+          "name": "slayer_harpie_swarm"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "swamp_cave_slime",
+        "id": 1831
+      },
+      "contentCommit": "fd897df92a72b94c536c5e6a27c0d2ae31771103",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "A foul-smelling blob of protoplasm.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          5786
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Cave Slime",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "cave_slime_idle"
+        },
+        "recol_d": null,
+        "recol_s": null,
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 23,
+        "walkanim": {
+          "ref": "seq",
+          "name": "cave_slime_walks"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    }
+  ]
 }

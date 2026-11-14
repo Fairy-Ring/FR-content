@@ -218,6 +218,7 @@ jobs:
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test tests/multiform-guards/test_multiform_guards.mjs node --import tsx ../content/tests/multiform-guards/test_multiform_guards.mjs
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
+          run_test tests/monster-s01/test_monster_s01.mjs node --import tsx ../content/tests/monster-s01/test_monster_s01.mjs
           exit "$failed"
 
       - name: Write job summary
