@@ -43,7 +43,7 @@ const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
 const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
 const Environment = (await load('src/util/Environment.ts')).default;
 const CoordGrid = (await load('src/engine/CoordGrid.ts')).CoordGrid;
-const { CollisionFlag, isFlagged } = await load('src/engine/routefinder/index.ts');
+const { CollisionFlag, CollisionType, canTravel, isFlagged } = await load('src/engine/routefinder/index.ts');
 const { isZoneAllocated } = await load('src/engine/GameMap.ts');
 const MoveClick = (await load('src/network/game/client/model/MoveClick.ts')).default;
 const MoveClickHandler = (await load('src/network/game/client/handler/MoveClickHandler.ts')).default;
@@ -123,8 +123,8 @@ const expectedMessages = {
     wrongTool: 'There is nothing suitable for catching with a net here.',
     full: "You can't carry any more fish."
 };
-// preserved donor enum tiles with no free cardinal bank on the 377 map; U-SLIMYEEL-1113 ruling 3
-const preservedUnreachableTiles = ['0_3432_3405', '0_3440_3282', '0_3444_3280', '0_3439_3284'].sort();
+// Removed under U-SLIMYEEL-1113 fix-round ruling R1: the 377 map has no side bank.
+const removedUnreachableTiles = ['0_3432_3405', '0_3440_3282', '0_3444_3280', '0_3439_3284'];
 
 let caseNumber = 0;
 let failed = 0;
@@ -296,11 +296,34 @@ function enumCoords(type) {
         .sort(([left], [right]) => left - right)
         .map(([key, value]) => ({ key, coord: toCoord(value) }));
 }
+// Engine collision BFS from the first tile inside the Mort Myre gate. No jump,
+// teleport, NPC mutation or hand-written bank list supplies reachability.
+const bankKey = (x, z) => `${x},${z}`;
+let reachableBanks;
+function banksFromGate() {
+    const queue = [[3444, 3457]];
+    const seen = new Set([bankKey(...queue[0])]);
+    const steps = [[0, -1], [0, 1], [-1, 0], [1, 0], [-1, -1], [-1, 1], [1, -1], [1, 1]];
+    for (let head = 0; head < queue.length; head++) {
+        const [x, z] = queue[head];
+        for (const [dx, dz] of steps) {
+            const nx = x + dx, nz = z + dz;
+            if (nx < 3328 || nx > 3583 || nz < 3200 || nz > 3519) continue;
+            const key = bankKey(nx, nz);
+            if (seen.has(key) || !isZoneAllocated(0, nx, nz) ||
+                !canTravel(0, x, z, dx, dz, 1, 0, CollisionType.NORMAL)) continue;
+            seen.add(key);
+            queue.push([nx, nz]);
+        }
+    }
+    return seen;
+}
 function findApproach(type, coord) {
     const npc = new Npc(coord.level, coord.x, coord.z, type.size, type.size, EntityLifeCycle.DESPAWN, 0, type.id, type.blockwalk);
     const player = makePlayer(28).player;
     for (const candidate of neighbors(coord)) {
-        if (!walkableLand(candidate)) continue;
+        if (Math.abs(candidate.x - coord.x) + Math.abs(candidate.z - coord.z) !== 1 ||
+            !reachableBanks.has(bankKey(candidate.x, candidate.z)) || !walkableLand(candidate)) continue;
         player.level = candidate.level;
         player.x = candidate.x;
         player.z = candidate.z;
@@ -455,6 +478,7 @@ function performAction(type, options, lastTick) {
     try {
         withRandom(() => options.random ?? 0, () => {
             for (let offset = 0; offset <= lastTick; offset++) {
+                if (offset === options.lowerFishingAt) player.levels[ids.fishingStat] = 27;
                 frames.push(interactTick(player, trace, startTick + offset));
             }
         });
@@ -471,6 +495,7 @@ function frameAt(result, offset) {
 // bytes below come from the selected pack; a content-only change must not alter maps.
 process.chdir(engineRoot);
 World.gameMap.init();
+reachableBanks = banksFromGate();
 console.log(`MAP ${JSON.stringify({ selected: readHash('.cache/maps-server.zip'), collision: createHash('sha256').update(collisionMapZip).digest('hex'), sameArchive: Boolean(sameMapArchive) })}`);
 
 runCase('packed-trigger-dispatch', ctx => {
@@ -531,13 +556,18 @@ runCase('fishing-enum-water-and-operable-bank', ctx => {
         if (!rows.length) failures.push({ type: name, tile: null, reason: 'movement enum missing or empty' });
         for (const row of rows) {
             if (!row.water) failures.push({ type: name, tile: row.coord, reason: 'enum tile is not a recognized water floor', floor: row.floor });
-            if (!row.approach) failures.push({ type: name, tile: row.coord, reason: 'no adjacent walkable land tile passes Player.inOperableDistance', floor: row.floor });
+            if (!row.approach) failures.push({ type: name, tile: row.coord, reason: 'no standable side bank reachable on foot from the gate', floor: row.floor });
+            if (removedUnreachableTiles.includes(row.coord)) failures.push({ type: name, tile: row.coord, reason: 'removed unfishable tile remains in enum' });
         }
     }
-    const bankReason = 'no adjacent walkable land tile passes Player.inOperableDistance';
-    ctx.check('all enum tiles retain their water data', failures.filter(failure => failure.reason !== bankReason), []);
-    ctx.check('only the preserved donor tiles lack a free cardinal bank', failures.filter(failure => failure.reason === bankReason).map(failure => failure.tile).sort(), preservedUnreachableTiles);
-    ctx.detail(tileDetails);
+    ctx.check('collision data matches the selected packed map', Boolean(sameMapArchive), true);
+    ctx.check('every enum tile is water with a reachable standable side bank; removed tiles absent', failures, []);
+    const enumIds = eelTypes.map(({ type }) => enumFor(type)?.id);
+    const consumers = Array.from({ length: NpcType.count }, (_, id) => NpcType.get(id))
+        .filter(type => enumIds.includes(type?.params?.get(ids.movement)))
+        .map(type => type.debugname).sort();
+    ctx.check('only the three eel types read these movement lists', consumers, eelSpecs.map(spec => spec.name).sort());
+    ctx.detail({ reachableTilesFromGate: reachableBanks.size, types: tileDetails, consumers });
 });
 
 runCase('fishing-category-controls', ctx => {
@@ -636,6 +666,47 @@ runCase('failed-fish-roll-consumes-no-bait-or-fish', ctx => {
         ctx.check(`${name} failed roll does not add eel`, itemCount(result.player, ids.fish), 0);
         ctx.check(`${name} failed roll grants no fishing XP`, result.player.stats[ids.fishingStat] - getExpByLevel(28), 0);
         observed.push({ name, frames: result.frames, inventory: inventorySnapshot(result.player) });
+    }
+    ctx.detail(observed);
+});
+
+runCase('catch-roll-boundaries-from-packed-struct', ctx => {
+    const struct = StructType.get(ObjType.get(ids.fish).params.get(ids.fishingStruct));
+    const low = struct.params.get(namedId(ParamType, 'success_low'));
+    const high = struct.params.get(namedId(ParamType, 'success_high'));
+    const xp = struct.params.get(namedId(ParamType, 'productexp'));
+    const observed = [];
+    for (const level of [28, 99]) {
+        // Published STAT_RANDOM: floor each interpolated term separately, then +1.
+        const chance = Math.floor(low * (99 - level) / 98) + Math.floor(high * (level - 1) / 98) + 1;
+        ctx.check(`level ${level} packed/interpolated successful rolls out of 256`, chance, level === 28 ? 30 : 81);
+        for (const { name, type } of eelTypes) {
+            for (const roll of [chance - 1, chance]) {
+                const catches = roll < chance;
+                const result = performAction(type, { level, inventory: { rod: true, bait: 3, freeSlots: 2 }, random: (roll + 0.25) / 256 }, 5);
+                const label = `${name} level ${level} roll ${roll}`;
+                ctx.check(`${label} runs real fish_roll once`, result.trace.fishRollCalls, 1);
+                ctx.check(`${label} eel count`, itemCount(result.player, ids.fish), catches ? 1 : 0);
+                ctx.check(`${label} bait count`, itemCount(result.player, ids.bait), catches ? 2 : 3);
+                ctx.check(`${label} earned XP`, result.player.stats[ids.fishingStat] - getExpByLevel(level), catches ? xp : 0);
+                ctx.check(`${label} catch message`, result.trace.messages.includes(expectedMessage), catches);
+                observed.push({ name, level, low, high, chance, roll, catches, frame: frameAt(result, 5) });
+            }
+        }
+    }
+    ctx.detail(observed);
+});
+
+runCase('continuation-rechecks-effective-fishing-level', ctx => {
+    const observed = [];
+    for (const { name, type } of eelTypes) {
+        const result = performAction(type, { lowerFishingAt: 3, inventory: { rod: true, bait: 3, freeSlots: 2 } }, 12);
+        ctx.check(`${name} cast begins at level 28`, frameAt(result, 1).messages, ['You cast out your line...']);
+        ctx.check(`${name} continuation is reached after effective level drops`, frameAt(result, 3).trigger, '[opnpc3,_slimeyfish]');
+        ctx.check(`${name} continuation refuses level 27`, frameAt(result, 3).messages.concat(frameAt(result, 3).interfaceText).includes(expectedMessages.level), true);
+        ctx.check(`${name} continuation never rolls after refusal`, result.trace.fishRollCalls, 0);
+        ctx.check(`${name} refusal preserves eel/bait/XP`, [itemCount(result.player, ids.fish), itemCount(result.player, ids.bait), result.player.stats[ids.fishingStat] - getExpByLevel(28)], [0, 3, 0]);
+        observed.push({ name, frames: result.frames });
     }
     ctx.detail(observed);
 });
@@ -768,6 +839,43 @@ runCase('ai-timer-movement-period-boundaries', ctx => {
         });
     }
     ctx.detail(results);
+});
+
+runCase('ai-timer-seeded-draws-cover-every-enum-destination', ctx => {
+    // Isolate offline timer fixtures from map-spawned spots. Restore them after
+    // this case; the live cell never changes NPC state.
+    const natural = Array.from(World.npcs).filter(npc => npc?.isActive && eelTypes.some(({ type }) => type.id === npc.type));
+    for (const npc of natural) disposeNpc(npc);
+    let seed = 0x377ee1;
+    const random = () => {
+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+        return seed / 0x100000000;
+    };
+    const observed = [];
+    try {
+        for (const { name, type } of eelTypes) {
+            const rows = enumCoords(type);
+            const keys = rows.map(row => row.key);
+            for (let i = keys.length - 1; i > 0; i--) {
+                const j = Math.floor(random() * (i + 1));
+                [keys[i], keys[j]] = [keys[j], keys[i]];
+            }
+            const seen = new Set();
+            for (const key of keys) {
+                const result = runMovement(type, key, null, random(), 1500 + observed.length * 10);
+                assert(result, `missing timer fixture for ${name} key ${key}`);
+                ctx.check(`${name} seeded key ${key} reaches selected tile`, result.final, result.candidate);
+                ctx.check(`${name} seeded key ${key} stays in its list`, rows.some(row => `${row.coord.level}_${row.coord.x}_${row.coord.z}` === result.final), true);
+                ctx.check(`${name} seeded key ${key} avoids removed tiles`, removedUnreachableTiles.includes(result.final), false);
+                seen.add(result.final);
+                observed.push({ name, key, final: result.final, draws: result.draws, timer: result.timerInterval });
+            }
+            ctx.check(`${name} every destination visited`, seen.size, rows.length);
+        }
+    } finally {
+        for (const npc of natural) World.addNpc(npc, -1, false);
+    }
+    ctx.detail({ initialSeed: 0x377ee1, observed });
 });
 
 runCase('ai-timer-preserves-slimeyfish-occupancy-rule', ctx => {
