@@ -78,14 +78,22 @@
 ^barrows_face_fade = barrows_chathead_fade
 ^barrows_client_cycles_per_tick = 30
 
-// UNKNOWN engineering face selection, unscaled object zoom, normal palette and slots.
+// UNKNOWN engineering uniform slain selection and unscaled object zoom.
 ^barrows_face_scale = 100
+// CANDIDATE normal crypt / green tunnel palette; VERIFIED original object joins.
 ^barrows_face_ahrim = barrows_interface_ahrim
 ^barrows_face_dharok = barrows_interface_dharok
 ^barrows_face_guthan = barrows_interface_guthan
 ^barrows_face_karil = barrows_interface_karil
 ^barrows_face_torag = barrows_interface_torag
 ^barrows_face_verac = barrows_interface_verac
+^barrows_face_ahrim_green = barrows_interface_ahrim_green
+^barrows_face_dharok_green = barrows_interface_dharok_green
+^barrows_face_guthan_green = barrows_interface_guthan_green
+^barrows_face_karil_green = barrows_interface_karil_green
+^barrows_face_torag_green = barrows_interface_torag_green
+^barrows_face_verac_green = barrows_interface_verac_green
+// UNKNOWN engineering identity-to-original blank overlay slot mapping.
 ^barrows_face_slot_ahrim = kill_count:com_1
 ^barrows_face_slot_dharok = kill_count:com_2
 ^barrows_face_slot_guthan = kill_count:com_3

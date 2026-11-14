@@ -1,5 +1,5 @@
-// CANDIDATE slain-only faces in high detail. Palette, selection and slot policy
-// are UNKNOWN engineering choices named together in barrows.constant.
+// CANDIDATE slain-only faces: normal in crypts and green in tunnels.
+// Uniform slain selection, zoom and slot mapping are UNKNOWN engineering.
 [proc,barrows_slain_count]()(int)
 return(bitcount(getbit_range(%barrows_kills, ^barrows_slain_start, ^barrows_slain_end)));
 
@@ -22,15 +22,20 @@ if ($slain = 0) return;
 ~barrows_face_clear;
 def_int $identity = ~barrows_face_identity(add(1, random($slain)));
 def_component $slot = enum(int, component, barrows_face_slot, $identity);
-if_setobject($slot, enum(int, obj, barrows_face_object, $identity), ^barrows_face_scale);
+def_obj $face;
+if (~barrows_in_tunnels(coord) = true) {
+    $face = enum(int, obj, barrows_face_object_green, $identity);
+} else {
+    $face = enum(int, obj, barrows_face_object, $identity);
+}
+if_setobject($slot, $face, ^barrows_face_scale);
 if_setanim($slot, ^barrows_face_fade);
-if_sethide($slot, false);
 
 [proc,barrows_face_clear]
 def_int $identity = 1;
 while ($identity <= ^barrows_identity_count) {
     def_component $slot = enum(int, component, barrows_face_slot, $identity);
     if_setanim($slot, null);
-    if_sethide($slot, true);
+    if_setobject($slot, null, 1);
     $identity = add($identity, 1);
 }

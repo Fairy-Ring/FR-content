@@ -535,7 +535,7 @@ val=4,barrows_karil
 val=5,barrows_torag
 val=6,barrows_verac
 
-// UNKNOWN engineering normal-palette and identity-to-slot policy, named in barrows.constant.
+// CANDIDATE normal crypt palette, with VERIFIED original object identities.
 [barrows_face_object]
 inputtype=int
 outputtype=obj
@@ -547,6 +547,19 @@ val=4,^barrows_face_karil
 val=5,^barrows_face_torag
 val=6,^barrows_face_verac
 
+// CANDIDATE green tunnel palette, with VERIFIED original object identities.
+[barrows_face_object_green]
+inputtype=int
+outputtype=obj
+default=null
+val=1,^barrows_face_ahrim_green
+val=2,^barrows_face_dharok_green
+val=3,^barrows_face_guthan_green
+val=4,^barrows_face_karil_green
+val=5,^barrows_face_torag_green
+val=6,^barrows_face_verac_green
+
+// UNKNOWN engineering identity-to-original blank overlay slot mapping.
 [barrows_face_slot]
 inputtype=int
 outputtype=component

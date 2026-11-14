@@ -21,7 +21,7 @@ function parseTestOptions(argv) {
     }
     assert.equal(regression, null, '--regression may be supplied only once');
     const value = inlineValue ?? argv[++index];
-    assert.equal(value, 'prayer-zero', `unknown or missing regression: ${value ?? ''}`);
+    assert(['prayer-zero', 'face-clear'].includes(value), `unknown or missing regression: ${value ?? ''}`);
     regression = value;
   }
   return { options: parseOptions(forwarded), regression };
@@ -56,14 +56,23 @@ await run(async () => {
     ScriptState, JavaRandom } = runtime;
   const eng = relative => import(pathToFileURL(path.join(runtime.engineRoot, 'src', relative)).href);
   const [{ PlayerLoading }, { default: Packet }, { default: VarSharedType },
-    { PlayerTimerType }, { default: ServerTriggerType }, { default: ColorConversion }] = await Promise.all([
+    { PlayerTimerType }, { default: ServerTriggerType }, { default: ColorConversion },
+    { default: IfSetObject }, { default: IfSetHide }, { default: IfSetObjectEncoder }, { default: ServerGameProt }] = await Promise.all([
     eng('engine/entity/PlayerLoading.ts'),
     eng('io/Packet.ts'),
     eng('cache/config/VarSharedType.ts'),
     eng('engine/entity/EntityTimer.ts'),
     eng('engine/script/ServerTriggerType.ts'),
-    eng('util/ColorConversion.ts')
+    eng('util/ColorConversion.ts'),
+    eng('network/game/server/model/IfSetObject.ts'),
+    eng('network/game/server/model/IfSetHide.ts'),
+    eng('network/game/server/codec/IfSetObjectEncoder.ts'),
+    eng('network/game/server/ServerGameProt.ts')
   ]);
+  const ifSetObjectEncoder = new IfSetObjectEncoder();
+  assert.equal(ifSetObjectEncoder.prot, ServerGameProt.IF_SETOBJECT);
+  assert.equal(ifSetObjectEncoder.prot.id, 21, 'native IF_SETOBJECT uses client packet 21');
+  assert.equal(ifSetObjectEncoder.prot.length, 6, 'native IF_SETOBJECT encodes a six-byte payload');
 
   // Shared logout reaches castlewars_logout before Barrows; match the native lifecycle fixture.
   VarSharedType.load(runtime.packDir);
@@ -96,35 +105,29 @@ await run(async () => {
     'barrows_generation_advance', 'barrows_search_latch', 'barrows_run_reset'
   ]) assert(ScriptProvider.getByName(`[proc,${name}]`), `compiled S06/lifecycle proc exists: ${name}`);
 
-  const faces = BROTHERS.map((brother, index) => {
+  const faces = BROTHERS.map(brother => {
     const name = `barrows_interface_${brother.name}`;
     const greenName = `${name}_green`;
     const objectId = packedId(contentRoot, 'obj', name);
-    const greenId = packedId(contentRoot, 'obj', greenName);
     const slotId = packedId(contentRoot, 'interface', brother.slot);
     assert.equal(ObjType.getId(name), objectId, `${name} resolves in native ObjType`);
-    assert.equal(ObjType.getId(greenName), greenId, `${greenName} resolves in native ObjType`);
     const object = ObjType.get(objectId);
-    const green = ObjType.get(greenId);
-    assert(object && green, `both original ${brother.name} face objects are loaded`);
-    assert.equal(object.model, green.model, `${brother.name} normal and green objects retain their shared original model`);
-    assert(object.model > 0, `${brother.name} face pair has a real original model`);
+    assert(object, `original ${brother.name} face object is loaded`);
+    assert(object.model > 0, `${brother.name} face object has a real original model`);
     assert.deepEqual(Array.from(object.recol_s ?? []), [], `${brother.name} normal object keeps its original palette`);
     assert.deepEqual(Array.from(object.recol_d ?? []), [], `${brother.name} normal object has no recolor destinations`);
-    assert.deepEqual(Array.from(green.recol_s ?? []), [16487, 18601, 27255].map(colour => ColorConversion.rgb15toHsl16(colour)), `${brother.name} green object retains all pack-converted original recolor sources`);
-    assert.deepEqual(Array.from(green.recol_d ?? []), [4423, 6537, 20308].map(colour => ColorConversion.rgb15toHsl16(colour)), `${brother.name} green object retains all pack-converted original recolor destinations`);
     assert.equal(objectId, brother.originalId, `${name} is original object ${brother.originalId}`);
-    assert.equal(greenId, brother.originalId + 1, `${greenName} is the adjacent original palette object`);
 
     assert.equal(Component.getId(brother.slot), slotId, `${brother.slot} resolves as its original packed child`);
     const slot = Component.get(slotId);
     assert(slot, `${brother.slot} is loaded from the original interface`);
     assert.equal(slot.comType, Component.TYPE_MODEL, `${brother.slot} remains an original model child`);
+    assert.equal(slot.comType, 6, `${brother.slot} retains original client interface type 6`);
     assert([0, -1].includes(slot.model), `${brother.slot} remains blank in the original interface`);
     assert([0, -1].includes(slot.activeModel), `${brother.slot} has no active model in the original interface`);
     assert.equal(slot.anim, -1, `${brother.slot} has no default animation`);
     assert.equal(slot.activeAnim, -1, `${brother.slot} has no active animation`);
-    return { ...brother, objectName: name, greenName, objectId, greenId, slotId };
+    return { ...brother, objectName: name, greenName, objectId, slotId };
   });
 
   const fadeId = packedId(contentRoot, 'seq', 'barrows_chathead_fade');
@@ -171,6 +174,11 @@ await run(async () => {
   function makeRun(label, state = {}) {
     const player = makePlayer(label);
     setRun(player, state);
+    const write = player.write;
+    player.write = message => {
+      write(message);
+      applyClientMessage(player, message);
+    };
     return player;
   }
 
@@ -194,14 +202,87 @@ await run(async () => {
   const queueHasTimer = player => ['queue', 'weakQueue', 'engineQueue'].some(name =>
     Array.from(player[name].all()).some(request => request.script === timerScript));
   const assertNoQueuedTimer = (player, label) => assert.equal(queueHasTimer(player), false, `${label} does not self-requeue the timer`);
-  const visibleObjects = player => player.packets.filter(message =>
-    packetKind(message) === 'IfSetObject' && faces.some(face => message.obj === face.objectId));
+  function decodeIfSetObject(message) {
+    assert.equal(packetKind(message), 'IfSetObject', 'packet decoder receives a native IfSetObject message');
+    const packet = new Packet(new Uint8Array(ifSetObjectEncoder.prot.length));
+    ifSetObjectEncoder.encode(packet, message);
+    assert.equal(packet.pos, ifSetObjectEncoder.prot.length, 'engine encoder writes the complete packet 21 payload');
+    packet.pos = 0;
+    const decoded = { scale: packet.g2(), obj: packet.g2_alt1(), component: packet.g2_alt3() };
+    assert.equal(packet.available, 0, 'packet 21 decoder consumes the complete encoded payload');
+    return decoded;
+  }
+  const decodeSetObjects = messages => messages.filter(message => packetKind(message) === 'IfSetObject')
+    .map(decodeIfSetObject);
+  const clientSlotStates = new WeakMap();
+  const ensureClientSlots = player => {
+    let slots = clientSlotStates.get(player);
+    if (!slots) {
+      slots = new Map(faces.map(face => {
+        const component = Component.get(face.slotId);
+        return [face.slotId, {
+          component: face.slotId, interfaceType: component.comType, modelType: 0,
+          obj: component.model, scale: null, hidden: false
+        }];
+      }));
+      clientSlotStates.set(player, slots);
+    }
+    return slots;
+  };
+  function applyClientMessage(player, message) {
+    const slots = ensureClientSlots(player);
+    const kind = packetKind(message);
+    if (kind === 'IfSetObject') {
+      const decoded = decodeIfSetObject(message);
+      const slot = slots.get(decoded.component);
+      if (!slot) return;
+      slot.obj = decoded.obj;
+      slot.scale = decoded.scale;
+      if (decoded.obj === 65535) {
+        slot.modelType = 0;
+      } else {
+        assert(decoded.obj >= 0 && decoded.obj < 65535, 'non-null packet 21 object is a valid unsigned object id');
+        assert(ObjType.get(decoded.obj), `client packet 21 object ${decoded.obj} is loaded`);
+        slot.modelType = 4;
+      }
+    } else if (kind === 'IfSetHide') {
+      const slot = slots.get(message.component);
+      if (slot && slot.interfaceType !== Component.TYPE_MODEL) slot.hidden = message.hidden;
+    }
+  }
+  const clientSlots = player => {
+    const slots = ensureClientSlots(player);
+    for (const message of player.packets) applyClientMessage(player, message);
+    return slots;
+  };
+  const visibleObjects = player => [...clientSlots(player).values()]
+    .filter(slot => slot.modelType === 4 && slot.obj !== 65535 && !slot.hidden)
+    .map(({ component, obj, scale }) => ({ component, obj, scale }));
+  const clearObjectPackets = player => decodeSetObjects(player.packets).filter(({ obj }) => obj === 65535);
+  function assertAllFaceSlotsCleared(player, label) {
+    assert.deepEqual(clearObjectPackets(player).map(({ component, obj, scale }) => [component, obj, scale]),
+      faces.map(face => [face.slotId, 65535, 1]),
+      `${label} sends native packet 21 object 65535 at each exact face component`);
+    const slots = clientSlots(player);
+    for (const face of faces) {
+      assert.equal(slots.get(face.slotId).modelType, 0, `${label} sets ${face.slot} client model type to none`);
+      assert.equal(slots.get(face.slotId).obj, 65535, `${label} retains the null object in ${face.slot}`);
+    }
+    assert.deepEqual(visibleObjects(player), [], `${label} leaves no face visible in any of the six client slots`);
+  }
+  function assertHideDoesNotClearModelComponent() {
+    const player = makeRun('hide_is_not_clear');
+    const face = faces[0];
+    player.packets.push(new IfSetObject(face.slotId, face.objectId, 1), new IfSetHide(face.slotId, true));
+    const slot = clientSlots(player).get(face.slotId);
+    assert.equal(slot.interfaceType, 6, 'original face component is a type-6 model interface');
+    assert.equal(slot.modelType, 4, 'hide does not change the client model type of a set object');
+    assert.equal(slot.hidden, false, 'IF_SETHIDE is not honored for a type-6 model component');
+    assert.deepEqual(visibleObjects(player).map(({ component, obj }) => [component, obj]),
+      [[face.slotId, face.objectId]], 'client still renders the face after a hide-only message');
+  }
   const fadePackets = player => player.packets.filter(message =>
     packetKind(message) === 'IfSetAnim' && message.seq === fadeId);
-  const blankingPacket = message =>
-    (packetKind(message) === 'IfSetHide' && message.hidden === true) ||
-    (packetKind(message) === 'IfSetModel' && (message.model === -1 || message.model === 0)) ||
-    (packetKind(message) === 'IfSetObject' && (message.obj === -1 || message.obj === 0));
   function withRandom(value, action) {
     const original = JavaRandom.nextDouble;
     let calls = 0;
@@ -216,12 +297,14 @@ await run(async () => {
     const measured = withRandom(draw, () => procVoid(player, 'barrows_face_show'));
     assert.equal(measured.calls, 1, 'every nonempty slain mask consumes exactly one uniform face draw');
     const identity = candidates[selectedRank];
-    assert.deepEqual(visibleObjects(player).map(message => [message.component, message.obj]),
-      [[identity.slotId, identity.objectId]], 'exactly one normal original face object is set in its corresponding original slot');
+    const expectedObject = player.level === 0 ? identity.greenId : identity.objectId;
+    assert.deepEqual(visibleObjects(player).map(({ component, obj }) => [component, obj]),
+      [[identity.slotId, expectedObject]],
+      `exactly one ${player.level === 0 ? 'green tunnel' : 'normal crypt'} object is set in its corresponding original slot`);
+    assert.equal(clientSlots(player).get(identity.slotId).modelType, 4,
+      'a valid encoded packet 21 object sets the client model type to 4');
     assert.deepEqual(fadePackets(player).map(message => [message.component, message.seq]),
       [[identity.slotId, fadeId]], 'the selected original slot receives barrows_chathead_fade(2085)');
-    assert(!player.packets.some(message => packetKind(message) === 'IfSetObject' && faces.some(face => message.obj === face.greenId)),
-      'face display never substitutes a green palette object');
     return identity;
   }
 
@@ -254,9 +337,43 @@ await run(async () => {
   }
 
   if (regression === 'prayer-zero') {
+    // This path precedes R4/R6 checks so the old pack fails only the named zero-shutdown behavior.
     testPrayerZeroShutdown();
     console.log('OK targeted Barrows Prayer-zero shutdown regression');
     return;
+  }
+
+  if (regression === 'face-clear') {
+    assertHideDoesNotClearModelComponent();
+    const player = makeRun('face_clear_packet21', { slainMask: 0b111111 });
+    for (const face of faces) player.packets.push(new IfSetObject(face.slotId, face.objectId, 1));
+    assert.deepEqual(visibleObjects(player).map(({ component, obj }) => [component, obj]),
+      faces.map(face => [face.slotId, face.objectId]), 'fixture places a normal face in all six client slots');
+    procVoid(player, 'barrows_face_clear');
+    assertAllFaceSlotsCleared(player, 'barrows_face_clear');
+    console.log('OK targeted Barrows face-clear packet 21 regression');
+    return;
+  }
+
+  assertHideDoesNotClearModelComponent();
+
+  // CANDIDATE: the operator's Old School description and paired source-cache objects select normal crypt faces and green tunnel faces.
+  for (const face of faces) {
+    face.greenId = packedId(contentRoot, 'obj', face.greenName);
+    assert.equal(ObjType.getId(face.greenName), face.greenId, `${face.greenName} resolves in native ObjType`);
+    const normal = ObjType.get(face.objectId);
+    const green = ObjType.get(face.greenId);
+    assert(green, `original ${face.name} green face object is loaded`);
+    assert.equal(face.greenId, face.originalId + 1, `${face.greenName} is the adjacent cached palette object`);
+    assert.equal(normal.model, green.model, `${face.name} normal and green objects retain their shared original model`);
+    assert.deepEqual(Array.from(green.recol_s ?? []),
+      [16487, 18601, 27255].map(colour => ColorConversion.rgb15toHsl16(colour)),
+      `${face.name} green object retains its original recolor sources`);
+    assert.deepEqual(Array.from(green.recol_d ?? []),
+      [4423, 6537, 20308].map(colour => ColorConversion.rgb15toHsl16(colour)),
+      `${face.name} green object retains its original recolor destinations`);
+    assert(faceDecisionText.includes(face.greenName),
+      `${face.greenName} is declared for candidate crypt/tunnel face selection in barrows.constant`);
   }
 
   // The packed pure rank selector visits the complete six-bit space, including invalid ranks.
@@ -278,45 +395,71 @@ await run(async () => {
     assert.equal(rankPlayer.packets.length, 0, 'pure rank selection emits no face packets');
   }
 
-  // Deterministically sweep every possible selected rank for every nonempty slain mask.
+  // R5: the Barrows zero-point callback shuts down real active prayers before it returns.
+  testPrayerZeroShutdown();
+
+  // B=0 draws nothing in either location; every nonempty mask/rank gets one exact draw
+  // in crypts (normal palette) and tunnels (green palette).
+  const faceZeroPlayer = makeRun('face_zero');
+  for (const level of [3, 0]) {
+    faceZeroPlayer.level = level;
+    faceZeroPlayer.packets.length = 0;
+    const measured = withRandom(0.5, () => procVoid(faceZeroPlayer, 'barrows_face_show'));
+    assert.equal(measured.calls, 0, `B=0 at level ${level} needs no random face draw`);
+    assert.deepEqual(visibleObjects(faceZeroPlayer), [], `B=0 at level ${level} displays no face`);
+    assert.deepEqual(fadePackets(faceZeroPlayer), [], `B=0 at level ${level} starts no face animation`);
+  }
   const facePlayer = makeRun('face_selection');
-  for (let mask = 0; mask < 64; mask++) {
+  for (let mask = 1; mask < 64; mask++) {
     const candidates = faces.filter((_, index) => mask & (1 << index));
     facePlayer.setVar(ids.barrows_kills, u32(0x6b3dffc0 | mask));
-    if (mask === 0) {
-      facePlayer.packets.length = 0;
-      const measured = withRandom(0.5, () => procVoid(facePlayer, 'barrows_face_show'));
-      assert.equal(measured.calls, 0, 'B=0 needs no random face draw');
-      assert.deepEqual(visibleObjects(facePlayer), [], 'B=0 displays no non-null face object');
-      assert.deepEqual(fadePackets(facePlayer), [], 'B=0 starts no face animation');
-      continue;
-    }
-    for (let rank = 0; rank < candidates.length; rank++) {
-      displayOneFace(facePlayer, mask, rank);
+    for (const level of [3, 0]) {
+      facePlayer.level = level;
+      for (let rank = 0; rank < candidates.length; rank++) {
+        displayOneFace(facePlayer, mask, rank);
+      }
     }
   }
 
-  // R5: zero Prayer deactivates all currently active prayers.
-  testPrayerZeroShutdown();
+  // Seed all six original slots with actual packet-21 objects, then clear every client slot.
+  const allSixSlots = makeRun('all_six_slots', { slainMask: 0b111111 });
+  for (const face of faces) allSixSlots.packets.push(new IfSetObject(face.slotId, face.objectId, 1));
+  assert.deepEqual(visibleObjects(allSixSlots).map(({ component, obj }) => [component, obj]),
+    faces.map(face => [face.slotId, face.objectId]), 'all six original components hold client model type 4 faces');
+  procVoid(allSixSlots, 'barrows_face_clear');
+  assertAllFaceSlotsCleared(allSixSlots, 'six-slot clear');
 
-  // The six original client slots are blank until a compiled face is chosen; clear and resume erase, not replay.
+  // Natural compiled draws clear the prior slot before setting the next; repeated selections never pile up.
+  const repeated = makeRun('natural_face_repeat', { slainMask: 0b111111 });
+  const firstDraw = runner.measureRandom(() => procVoid(repeated, 'barrows_face_show'));
+  assert.equal(firstDraw.calls, 1, 'first natural packed face selection consumes exactly one random draw');
+  const firstFace = visibleObjects(repeated)[0];
+  assert(firstFace, 'first natural packed face selection renders one face');
+  const secondStart = repeated.packets.length;
+  const secondDraw = runner.measureRandom(() => procVoid(repeated, 'barrows_face_show'));
+  assert.equal(secondDraw.calls, 1, 'later natural packed face selection consumes exactly one random draw');
+  const secondPackets = decodeSetObjects(repeated.packets.slice(secondStart));
+  const lastClearIndex = secondPackets.reduce((last, packet, index) => packet.obj === 65535 ? index : last, -1);
+  const nextShowIndex = secondPackets.findIndex(packet => packet.obj !== 65535);
+  assert(secondPackets.some(packet => packet.component === firstFace.component && packet.obj === 65535),
+    'next natural selection clears the previously shown component');
+  assert(lastClearIndex >= 0 && lastClearIndex < nextShowIndex,
+    'all native null-object clears precede the next face set');
+  assert.equal(visibleObjects(repeated).length, 1, 'repeated natural selections do not pile faces into multiple slots');
+
+  // Direct clear and timer resume erase every slot; resume never replays a face or fade.
   const presentation = makeRun('presentation', { slainMask: 0b100101, remainder: 8 });
-  const shown = displayOneFace(presentation, 0b100101, 1);
+  displayOneFace(presentation, 0b100101, 1);
   presentation.packets.length = 0;
   procVoid(presentation, 'barrows_face_clear');
-  assert(presentation.packets.some(message => message.component === shown.slotId && blankingPacket(message)),
-    'barrows_face_clear blanks the previously populated original slot');
-  assert.deepEqual(visibleObjects(presentation), [], 'barrows_face_clear leaves no visible original face object');
+  assertAllFaceSlotsCleared(presentation, 'barrows_face_clear');
   assert.deepEqual(fadePackets(presentation), [], 'barrows_face_clear stops the face fade');
   displayOneFace(presentation, 0b100101, 0);
   presentation.packets.length = 0;
   procVoid(presentation, 'barrows_timer_resume');
   assert(timer(presentation), 'eligible resume arms the native Barrows timer');
-  assert.deepEqual(visibleObjects(presentation), [], 'resume clears old faces without replaying one');
+  assertAllFaceSlotsCleared(presentation, 'timer resume');
   assert.deepEqual(fadePackets(presentation), [], 'resume never replays an old fade');
-  assert(presentation.packets.some(message => message.component === faces[0].slotId && blankingPacket(message)),
-    'resume clears the previously visible slot');
-
   // Prayer setter and every ordinary countdown tick preserve the unrelated 660 high half.
   const setter = makeRun('prayer_set');
   for (const [input, expected] of [[-1, 0], [0, 0], [1, 1], [17, 17], [65535, 65535], [65536, 65535]]) {
@@ -462,6 +605,9 @@ await run(async () => {
   assert.equal(hdDraw.calls, 1, 'HD positive control chooses one face on its due drain');
   assert.equal(visibleObjects(hd).length, 1, 'HD positive control displays one slain face');
   assert.equal(fadePackets(hd).length, 1, 'HD positive control animates its selected face');
+  const laterHdDraw = withRandom(0.25, () => ticks(hd, COUNTDOWN_INTERVAL));
+  assert.equal(laterHdDraw.calls, 1, 'every later nonempty due drain still makes one uniform face draw');
+  assert.equal(visibleObjects(hd).length, 1, 'later natural due drain replaces rather than piles up the prior face');
   const ld = makeRun('ld_face_absence', { slainMask: 0b000101, remainder: 1, highHalf: 0x9876 });
   ld.lowMemory = true;
   procVoid(ld, 'barrows_timer_resume');
@@ -487,12 +633,13 @@ await run(async () => {
     const changedVars = Array.from(fading.vars, (value, id) => value !== beforeFadeVars[id] ? id : -1).filter(id => id >= 0);
     assert.deepEqual(changedVars, [ids.barrows_countdowns], 'fade cleanup stores no additional saved face cursor');
     if (elapsed < fadeTicks) {
-      assert(!fading.packets.some(message => message.component === faces[0].slotId && blankingPacket(message)),
-        `original face remains until its native sequence duration (${elapsed}/${fadeTicks})`);
+      assert.equal(clearObjectPackets(fading).length, 0,
+        `original face receives no null object before its native sequence duration (${elapsed}/${fadeTicks})`);
+      assert.equal(clientSlots(fading).get(faces[0].slotId).modelType, 4,
+        `original client object remains model type 4 until sequence duration (${elapsed}/${fadeTicks})`);
     }
   }
-  assert(fading.packets.some(message => message.component === faces[0].slotId && blankingPacket(message)),
-    `native timer clears the face after ${fadeSequence.duration} cycles using its updated remainder`);
+  assertAllFaceSlotsCleared(fading, `native timer after ${fadeSequence.duration} cycles`);
 
   // Run reset and generation advance stop the old timer; Search resumes only the new captured generation.
   const generationAdvance = makeRun('generation_advance', { remainder: 7, highHalf: 0x82ab });
@@ -617,15 +764,21 @@ await run(async () => {
   assert(timer(faceLoaded), 'process-like login arms a fresh runtime timer from saved counters');
 
   // Resume/stop/close are safe on repeated calls and leave durable counters alone.
-  const stop = makeRun('timer_stop', { remainder: 4, highHalf: 0xa812 });
+  const stop = makeRun('timer_stop', { slainMask: 1, remainder: 4, highHalf: 0xa812 });
   procVoid(stop, 'barrows_timer_resume');
+  displayOneFace(stop, 1, 0);
   const beforeStop = countdown(stop);
+  stop.packets.length = 0;
   procVoid(stop, 'barrows_timer_stop');
+  assertAllFaceSlotsCleared(stop, 'timer stop');
   procVoid(stop, 'barrows_timer_stop');
   assert.equal(timer(stop), undefined, 'explicit stop is idempotent and clears the timer');
   assert.equal(countdown(stop), beforeStop, 'explicit stop does not consume or erase either saved half');
   procVoid(stop, 'barrows_timer_resume');
+  displayOneFace(stop, 1, 0);
+  stop.packets.length = 0;
   procVoid(stop, 'barrows_close_presentation');
+  assertAllFaceSlotsCleared(stop, 'closing presentation');
   assert.equal(timer(stop), undefined, 'closing presentation stops the native Prayer timer');
   assert.equal(countdown(stop), beforeStop, 'closing presentation preserves exact saved countdown state');
 
