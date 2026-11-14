@@ -117,6 +117,16 @@ export async function runSelfTests(pack, tempRoot) {
         await assert.rejects(() => checkFiles(noException), /\[level\].*formula=.*cache=.*exception/);
         console.log('PASS self-test rejects visible mismatch without exception');
         cases++;
+        const nearNpc = pack.NpcType.getByName('dwarf_tunnel');
+        assert(nearNpc, 'self-test needs packed dwarf_tunnel');
+        const nearMismatch = fixture(nearNpc);
+        const nearFormula = combatLevel(Object.fromEntries(skills.map(skill => [skill, pack.rawField(nearNpc, skill)])));
+        assert.equal(nearFormula, 10);
+        assert.equal(nearNpc.vislevel, 9);
+        await assert.rejects(() => checkFiles(nearMismatch), /\[level\].*dwarf_tunnel.*formula=10 cache=9.*exception/,
+            'visible mismatch of exactly one level without exception');
+        console.log('PASS self-test rejects visible mismatch of exactly one level without exception: dwarf_tunnel formula=10 cache=9');
+        cases++;
         await rejects('stale level exception on match', 'level-exception', entry => {
             entry.levelException = { kind: 'formula-mismatch', reason: 'No mismatch exists.' };
         });
@@ -134,10 +144,12 @@ export async function runSelfTests(pack, tempRoot) {
         fourMismatch.manifest.entries[0].levelException = structuredClone(mismatch.manifest.entries[0].levelException);
         assert.equal((await checkFiles(fourMismatch)).levels[0].status, 'mismatch-exception');
         cases++;
-        await rejects('stale level exception without whole vector', 'level-exception', entry => {
-            delete entry.fields.attack;
-            entry.levelException = { kind: 'formula-mismatch', reason: 'No whole vector exists.' };
-        });
+        const partialMismatch = structuredClone(fourMismatch);
+        delete partialMismatch.manifest.entries[0].fields.attack;
+        await assert.rejects(() => checkFiles(partialMismatch), /\[level-exception\].*stale/,
+            'stale level exception without whole vector');
+        console.log('PASS self-test rejects stale level exception without whole vector');
+        cases++;
         const hiddenNpc = pack.NpcType.configs.find(npc => npc.debugname && npc.vislevel === 0);
         assert(hiddenNpc, 'self-test needs a hidden level');
         assert.equal((await checkFiles(fixture(hiddenNpc))).levels[0].status, 'hidden');
