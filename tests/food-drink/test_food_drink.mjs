@@ -60,6 +60,7 @@ const foods = [
     { name: 'snail_corpse_cooked1', objectId: 3369, heal: [5, 7], eatLine: 'You eat the cooked snail - ummm, slimy!', published: 'meat' },
     { name: 'snail_corpse_cooked2', objectId: 3371, heal: [6, 8], eatLine: 'You eat the cooked snail - ummm, slimy!', published: 'meat' },
     { name: 'snail_corpse_cooked3', objectId: 3373, heal: [7, 9], eatLine: 'You eat the cooked snail - ummm, slimy!', published: 'meat' },
+    // Keep four: RS wiki rev117930 (2007-04-26) outranks OSRS rev162947's later two.
     { name: 'mm_monkey_nuts', objectId: 4012, heal: 4, published: 'missing' },
     { name: 'mm_monkey_bar', objectId: 4014, heal: 5, published: 'missing' },
     { name: 'mm_banana_stew', objectId: 4016, heal: 11, container: bowlId, published: 'missing' },
@@ -228,6 +229,74 @@ function assertKegOffBaseStats() {
         assertPresentation(p, keg);
     }
 }
+function assertKegRefusals() {
+    const keg = foods.find(item => item.name === 'keg_of_beer');
+    const seaLine = 'With my sea sickness? You must be joking!';
+    const repeatLine = 'Not another one! Not so soon!';
+    // CANDIDATE: OSRS rev177664, with RS2007 and pre-target RuneHQ duration context.
+    const duration = 100;
+    const requests = p => [...p.queue.all()].filter(request => request.script.name === '[queue,keg_of_beer_end]');
+    function unchanged(p, line) {
+        const before = {
+            contents: inventoryContents(p), levels: [...p.levels],
+            eatDelay: p.vars[eatDelayVarp], actionDelay: p.vars[actionDelayVarp],
+            animations: p.animations.length, packets: p.packets.length
+        };
+        eat(p, keg);
+        assert.deepEqual(inventoryContents(p), before.contents, `${line}: keeps the keg`);
+        assert.deepEqual([...p.levels], before.levels, `${line}: changes no stats, including Hitpoints`);
+        assert.equal(p.vars[eatDelayVarp], before.eatDelay, `${line}: no consumption delay`);
+        assert.equal(p.vars[actionDelayVarp], before.actionDelay, `${line}: no action delay`);
+        assert.equal(p.animations.length, before.animations, `${line}: no drink animation`);
+        assert.equal(p.packets.length, before.packets, `${line}: no sound or inventory packet`);
+        assert.equal(p.messages.at(-1), line, 'exact game-message refusal');
+    }
+    // Existing trawler_all_zones: both planes of waiting/trip, plus the wreck.
+    for (const [x, z, level] of [[2671, 3174, 0], [2671, 3174, 1], [1880, 4820, 0], [2010, 4820, 1], [1950, 4820, 0]]) {
+        const p = fixture();
+        p.x = x; p.z = z; p.level = level;
+        inventory(p).add(keg.id, 1);
+        freshTick();
+        unchanged(p, seaLine);
+        assert.equal(requests(p).length, 0, 'aboard refusal creates no effect');
+    }
+    const p = fixture();
+    p.x = 2674; p.z = 3174; p.level = 0; // immediately ashore, outside published lobby rectangle
+    inventory(p).add(keg.id, 2);
+    const start = freshTick();
+    eat(p, keg);
+    assert.equal(inventory(p).getItemCount(keg.id), 1, 'ashore positive control drinks normally');
+    assert.equal(p.levels[HITPOINTS], 40, 'keg still does not heal');
+    assertPresentation(p, keg);
+    assert.equal(requests(p).length, 1, 'one own-effect queue');
+    assert.equal(requests(p)[0].delay, duration, 'single named candidate duration');
+    assert.equal(requests(p)[0].args[0], 1, 'discard long queue does not block logout or persist');
+    // Held input precedes processQueues in World, including the initial drink tick.
+    p.processQueues();
+    for (let offset = 1; offset < duration; offset++) {
+        setTick(start + offset);
+        p.processQueues();
+    }
+    unchanged(p, repeatLine);
+    assert.equal(requests(p).length, 1, 'still running one tick before timeout');
+    assert.equal(p.packets.filter(packet => packet.constructor.name === 'CamReset').length, 0, 'camera not reset early');
+    setTick(start + duration);
+    p.processQueues();
+    assert.equal(requests(p).length, 0, 'effect queue ends at duration');
+    assert.equal(p.packets.filter(packet => packet.constructor.name === 'CamReset').length, 1, 'camera ends on the same boundary');
+    eat(p, keg);
+    assert.equal(inventory(p).getItemCount(keg.id), 0, 'can drink at the ended window');
+    assertPresentation(p, keg, 2);
+    // Real Player.cleanup is the World.removePlayer logout cleanup, not a varp reset.
+    p.cleanup();
+    assert.equal(requests(p).length, 0, 'logout cleanup discards the refusal window');
+    inventory(p).add(keg.id, 1);
+    setTick(clock + 3);
+    eat(p, keg);
+    assert.equal(inventory(p).getItemCount(keg.id), 0, 'drink after logout cleanup starts a fresh window');
+    assert.equal(requests(p).length, 1);
+    console.log('PASS keg refusal edges: five aboard coordinates, ashore control, tick99/tick100, camera boundary and logout cleanup');
+}
 function assertEatingDelay(item) {
     const isKeg = item.name === 'keg_of_beer';
     const p = fixture({ hp: 40, baseHp: 99, attack: isKeg ? 20 : 10, baseAttack: isKeg ? 20 : 10, strength: isKeg ? 99 : 10, baseStrength: isKeg ? 99 : 10 });
@@ -333,12 +402,13 @@ if (publishedMode) {
     process.exit(0);
 }
 assertKegOffBaseStats();
+assertKegRefusals();
 
 for (const item of foods) {
     assertItemOutcome(item);
     if (item.heal !== undefined) assertCappedHealing(item);
     assertFullHitpointsConsumption(item);
-    assertEatingDelay(item);
+    if (item.name !== 'keg_of_beer') assertEatingDelay(item);
 }
 
 for (const item of foods.filter(food => Array.isArray(food.heal))) {

@@ -30,7 +30,18 @@ mes("You cant eat it whole; maybe you should cut it up.");
 [opheld1,mm_monkey_nuts] @player_consume_item(consume_monkey_nuts, 2, 3);
 [opheld1,mm_monkey_bar] @player_consume_item(consume_monkey_bar, 2, 3);
 [opheld1,mm_banana_stew] @player_consume_item(consume_banana_stew, 2, 3);
-[opheld1,keg_of_beer] @player_consume_item(consume_effect_keg_of_beer, 2, 3);
+[opheld1,keg_of_beer]
+// CANDIDATE: OSRS Keg of beer rev177664 (2013-11-18).
+// Published table covers the waiting boat, the trip and the wreck.
+if (~inzone_coord_pair_table(trawler_all_zones, coord) = true) {
+    mes("With my sea sickness? You must be joking!");
+    return;
+}
+if (getqueue(keg_of_beer_end) > 0) {
+    mes("Not another one! Not so soon!");
+    return;
+}
+@player_consume_item(consume_effect_keg_of_beer, 2, 3);
 
 // stews
 [opheld1,curry] @player_consume_item(consume_effect_stat2, 2, 3);
