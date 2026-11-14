@@ -207,7 +207,8 @@ anim(null, 0);
 p_delay(0);
 
 [label,rcu_break_rock]
-def_namedobj $pickaxe = rune_pickaxe; // TODO: fixme, pickaxe check
+// CANDIDATE engineering: published skill tool check; exact Abyss refusal wording UNKNOWN.
+def_obj $pickaxe = ~pickaxe_checker;
 
 if ($pickaxe = null) {
     mes("You need a pickaxe for which you have the required Mining level to mine this rock.");
@@ -249,11 +250,10 @@ mes("You attempt to chop your way through...");
 ~rcu_loc_face_center;
 p_delay(3);
 
-def_namedobj $axe = mithril_axe; // TODO: fixme, axe check
+// CANDIDATE engineering: published skill tool check; exact Abyss refusal wording UNKNOWN.
+def_obj $axe = ~woodcutting_axe_checker(true);
 
 if ($axe = null) {
-    mes("You need an axe to chop through the tendrils.");
-    mes("You do not have an axe that you have the Woodcutting level to use.");
     return;
 }
 anim(human_woodcutting_mithril_axe, 0); // TODO: fixme, correct axe anim

@@ -12,6 +12,11 @@
 [oplocu,elid_statuette_multiloc] @elid_plinth_place;
 
 [label,elid_plinth_place]
+// A placed statuette must not consume another through parent fallback.
+if (%elidquest >= 60) {
+    ~displaymessage(^dm_default);
+    return;
+}
 if (last_useitem ! elid_statuette) {
     ~displaymessage(^dm_default);
     return;
