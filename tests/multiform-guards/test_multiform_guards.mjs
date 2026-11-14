@@ -2,18 +2,30 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { engine, World, Player, ScriptState, ScriptProvider, types, floorTiles, map, locFor, nativeLocRows } from '../regicide-travel/runtime.mjs';
+import { engine, World, Player, ScriptState, ScriptProvider, types, floorTiles, map, locFor, nativeLocRows, nativeNpcRows, ResumePauseButtonHandler, ResumePauseButton, IfSetText } from '../regicide-travel/runtime.mjs';
 const load = async file => (await import(pathToFileURL(path.join(engine, 'src', file)).href)).default;
 const OpLoc = await load('network/game/client/model/OpLoc.ts');
 const OpLocHandler = await load('network/game/client/handler/OpLocHandler.ts');
 const OpLocU = await load('network/game/client/model/OpLocU.ts');
 const OpLocUHandler = await load('network/game/client/handler/OpLocUHandler.ts');
+const OpNpcU = await load('network/game/client/model/OpNpcU.ts');
+const OpNpcUHandler = await load('network/game/client/handler/OpNpcUHandler.ts');
 const MessageGame = await load('network/game/server/model/MessageGame.ts');
 const IfOpenOverlay = await load('network/game/server/model/IfOpenOverlay.ts');
 const rsbuf = await import(pathToFileURL(path.join(engine, 'src/network/rsbuf/index.ts')).href);
 const selectedCase = process.argv[2];
 let serial = 0;
 let passed = 0;
+let parentFallback;
+function dispatchPath(selected, expected) {
+  parentFallback ??= selected !== null;
+  assert.equal(selected !== null, parentFallback, 'consistent observed parent-fallback capability');
+  if (parentFallback) assert.equal(selected, expected, 'guarded parent path selected');
+}
+const extraCases = [
+  'golem-complete-once', 'golem-stage-0', 'golem-stage-6', 'golem-head-closed',
+  ...['mine', 'chop'].flatMap(op => ['none', 'carried', 'worn', 'unusable'].map(tool => `abyss-${op}-${tool}`))
+];
 const specs = [
   { name: 'rift-unroped', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2', state: 0, refused: true },
   { name: 'rift-roped', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2_rope', state: 1 },
@@ -23,7 +35,7 @@ const specs = [
   { name: 'altar-scorched', parent: 'devious_altar', child: 'devious_altar_scorched', state: 2, item: 'devious_glowingpouch', refused: true },
   { name: 'altar-empty', parent: 'devious_altar', child: 'altar', state: 0, item: 'devious_glowingpouch', nextState: 1 }
 ];
-assert(!selectedCase || specs.some(s => s.name === selectedCase), 'unknown case');
+assert(!selectedCase || [...specs.map(s => s.name), ...extraCases].includes(selectedCase), 'unknown case');
 for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) {
   const p = new Player('guard_' + ++serial, BigInt(serial), BigInt(serial));
   Object.assign(p, { slot: serial, pid: serial, uid: (serial << 11) | serial, isActive: true });
@@ -78,6 +90,7 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
   // The published engine selects no handler for refused forms. The repaired
   // engine selects the guarded parent. Assert identical player outcomes below.
   if (!spec.refused) assert(selected, 'working child-bound handler');
+  if (spec.refused) dispatchPath(selected, `[${spec.item ? 'oplocu' : 'oploc1'},${spec.parent}]`);
   let reached = false;
   for (let i = 0; i < 3 && !reached; i++) reached = p.tryInteract(true);
   assert(reached, 'click processed');
@@ -104,6 +117,13 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
     // Debug servers additionally diagnose a missing handler. It is not a
     // player-facing content message and is absent when a guard executes.
     assert(messages.every(m => m === 'Nothing interesting happens.' || m.startsWith('No trigger for ')), 'no new content wording');
+    if (selected) {
+      assert(executions.length > 0, 'guarded handler executed, not bypassed');
+      for (const e of executions) {
+        assert.equal(e.script, selected, 'refusal came from the selected guarded path');
+        assert.equal(e.state.execution, ScriptState.FINISHED, 'guarded handler returned');
+      }
+    } else assert.equal(executions.length, 0, 'published missing-handler path');
   } else if (!spec.item) {
     assert.deepEqual(after.coordinates, [0, 3013, 5243]);
     assert.equal(after.state, 1);
@@ -122,5 +142,167 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
   console.log('PASS ' + spec.name);
 }
 assert(ScriptProvider.getByName('[oploc1,soulbane_falloff2_rope]'));
+const pause = new ResumePauseButtonHandler();
+const statIndex = { woodcutting: 8, crafting: 12, mining: 14, thieving: 17 };
+function fixture() {
+  const id = ++serial;
+  const p = new Player('guard_' + id, BigInt(id), BigInt(id));
+  Object.assign(p, { slot: id, pid: id, uid: (id << 11) | id, isActive: true });
+  p.vars.fill(0); p.baseLevels.fill(99); p.levels.fill(99); p.stats.fill(130344310);
+  World.players[id] = p; rsbuf.addPlayer(id);
+  const packets = [], executions = [];
+  p.write = packet => packets.push(packet);
+  const execute = p.executeScript;
+  p.executeScript = function(state, ...args) {
+    executions.push({ script: state.script.name, state });
+    return execute.call(this, state, ...args);
+  };
+  const invId = types.InvType.getId('inv'), inv = p.getInventory(invId);
+  p.tabs[3] = types.Component.get(3214).rootLayer;
+  p.invListenOnCom(invId, 3214, p.uid);
+  return { p, packets, executions, inv };
+}
+function approach(p, entity) {
+  const candidates = [];
+  for (let x = entity.x - 5; x <= entity.x + 5; x++) for (let z = entity.z - 5; z <= entity.z + 5; z++) {
+    if (!floorTiles.has([entity.level, x, z].join(',')) || map.isMapBlocked(x, z, entity.level)) continue;
+    Object.assign(p, { level: entity.level, x, z });
+    if (p.inOperableDistance(entity)) candidates.push([entity.level, x, z]);
+  }
+  candidates.sort((a, b) => Math.abs(a[1] - entity.x) + Math.abs(a[2] - entity.z) - Math.abs(b[1] - entity.x) - Math.abs(b[2] - entity.z));
+  assert(candidates.length, 'native operable floor approach');
+  [p.level, p.x, p.z] = candidates[0];
+  p.buildArea.rebuild();
+}
+function varbit(p, name, value) {
+  const id = types.VarBitType.getId(name);
+  assert(id >= 0, name);
+  if (value !== undefined) p.setVarBit(id, value);
+  return p.getVarBit(id);
+}
+function finish(p, executions, from) {
+  let reached = false;
+  for (let i = 0; i < 3 && !reached; i++) reached = p.tryInteract(true);
+  assert(reached, 'production click processed');
+  for (let q = 0; q < 3; q++) {
+    for (let k = from; k < executions.length; k++) {
+      const { state } = executions[k];
+      for (let i = 0; state.execution !== ScriptState.FINISHED && i < 60; i++) {
+        assert.notEqual(state.execution, ScriptState.ABORTED, state.script.name);
+        if (state.execution === ScriptState.PAUSEBUTTON) assert(pause.handle(new ResumePauseButton(0), p));
+        else if (state.execution === ScriptState.SUSPENDED) {
+          World.currentTick = Math.max(World.currentTick + 1, p.delayedUntil);
+          p.delayed = false;
+          p.executeScript(state, true, true);
+        } else assert.fail(`unexpected VM state ${state.execution}`);
+      }
+      assert.equal(state.execution, ScriptState.FINISHED, 'selected handler returned');
+    }
+    p.processQueues();
+  }
+}
+const messagesOf = packets => packets.filter(p => p instanceof MessageGame).map(p => p.msg);
+function publishedDefault(messages) {
+  assert.equal(messages.filter(m => m === 'Nothing interesting happens.').length, 1);
+  assert(messages.every(m => m === 'Nothing interesting happens.' || m.startsWith('No trigger for ')));
+}
+function record(name, data) {
+  console.log('OBSERVED ' + JSON.stringify({ case: name, enginePath: parentFallback ? 'guarded-parent' : 'published-missing-handler', ...data }));
+  passed++;
+  console.log('PASS ' + name);
+}
+for (const name of extraCases.filter(n => n.startsWith('golem-') && (!selectedCase || n === selectedCase))) {
+  const { p, packets, executions, inv } = fixture();
+  const root = types.NpcType.getByName('golem_golem');
+  const native = nativeNpcRows('golem_golem')[0];
+  assert(native);
+  const npc = [...World.npcs].find(n => n.type === root.id && n.level === native.level && n.x === native.x && n.z === native.z);
+  assert(npc, 'native packed golem');
+  approach(p, npc);
+  const appearance = p.generateAppearance();
+  rsbuf.computePlayer(p.x, p.level, p.z, p.originX, p.originZ, p.slot, p.tele, p.jump, p.runDir, p.walkDir, p.visibility, p.isActive, p.masks, appearance, p.lastAppearance, p.faceEntity, p.faceSquareX, p.faceSquareZ, p.faceAngleX, p.faceAngleZ, p.hitmarkDamage, p.hitmarkType, p.hitmark2Damage, p.hitmark2Type, p.levels[3], p.baseLevels[3], p.animId, p.animDelay, p.sayMessage, p.chatMessage, p.chatColour ?? -1, p.chatEffect ?? -1, p.chatRights ?? 0, p.spotanimId, p.spotanimHeight, p.spotanimTime);
+  rsbuf.computeNpc(npc.x, npc.level, npc.z, npc.nid, npc.type, npc.tele, npc.jump, npc.runDir, npc.walkDir, npc.isActive, npc.masks, npc.faceEntity, npc.faceSquareX, npc.faceSquareZ, npc.faceAngleX, npc.faceAngleZ, npc.hitmarkDamage, npc.hitmarkType, npc.hitmark2Damage, npc.hitmark2Type, npc.levels[3], npc.baseLevels[3], npc.animId, npc.animDelay, npc.sayMessage, npc.spotanimId, npc.spotanimHeight, npc.spotanimTime);
+  rsbuf.npcInfo(0, p.slot, 0, 0, true);
+  assert(rsbuf.hasNpc(p.slot, npc.nid), 'native NPC visible');
+  const program = types.ObjType.getId('golem_program'), key = types.ObjType.getId('golem_golemkey');
+  inv.add(program, 1); inv.add(key, 1);
+  const stage = name === 'golem-stage-0' ? 0 : name === 'golem-stage-6' ? 6 : 7;
+  varbit(p, 'golem_a', stage); varbit(p, 'golem_clay', 4);
+  varbit(p, 'golem_head_open', name === 'golem-head-closed' ? 0 : 1);
+  const rounds = [];
+  for (let round = 0; round < (name === 'golem-complete-once' ? 2 : 1); round++) {
+    const before = { stage: varbit(p, 'golem_a'), xp: [p.stats[12], p.stats[17]], vars: Array.from(p.vars), tile: [p.level, p.x, p.z], items: inv.items.map(i => i && { ...i }) };
+    const from = executions.length, start = packets.length;
+    assert.equal(new OpNpcUHandler().handle(new OpNpcU(npc.nid, program, 0, 3214), p), true);
+    assert.equal(p.target, npc);
+    const selected = p.getOpTrigger()?.name ?? null;
+    dispatchPath(selected, '[opnpcu,golem_golem]');
+    finish(p, executions, from);
+    const after = { stage: varbit(p, 'golem_a'), xp: [p.stats[12], p.stats[17]], vars: Array.from(p.vars), tile: [p.level, p.x, p.z], items: inv.items.map(i => i && { ...i }) };
+    const messages = messagesOf(packets.slice(start));
+    const scripts = executions.slice(from).map(e => ({ script: e.script, execution: e.state.execution }));
+    if (selected) assert(scripts.some(e => e.script === selected), 'guarded NPC handler executed');
+    else assert.deepEqual(scripts, [], 'published engine has no NPC item-use handler');
+    const completes = selected && name === 'golem-complete-once' && round === 0;
+    assert.deepEqual(after.xp.map((v, i) => v - before.xp[i]), completes ? [10000, 10000] : [0, 0], 'XP awarded once only');
+    assert.equal(after.stage, completes ? 10 : before.stage);
+    assert.deepEqual(after.tile, before.tile);
+    assert.deepEqual(after.items, before.items, 'key and program retained');
+    if (!completes) {
+      assert.deepEqual(after.vars, before.vars, 'refusal writes no varp');
+      if (!selected || name !== 'golem-head-closed') publishedDefault(messages);
+      else assert.deepEqual(messages, ["You can't see a way to put the instructions in the golem's skkull."]);
+    } else {
+      assert(scripts.some(e => e.script === '[queue,golem_complete]'), 'real completion queue executed');
+      assert(packets.slice(start).some(p => p instanceof IfSetText && p.text.includes('You have completed the Golem quest!')));
+    }
+    rounds.push({ round: round + 1, selected, before, after, messages, scripts });
+    p.closeModal();
+  }
+  record(name, { native, fixture: { stage, clay: 4, headOpen: name !== 'golem-head-closed', inventory: ['golem_program', 'golem_golemkey'], stats: 99 }, rounds });
+}
+for (const name of extraCases.filter(n => n.startsWith('abyss-') && (!selectedCase || n === selectedCase))) {
+  const [, op, tool] = name.split('-');
+  const { p, packets, executions, inv } = fixture();
+  const root = types.LocType.getByName('rcu_outer_multi1');
+  const native = nativeLocRows(root.debugname)[0], entity = locFor(native);
+  assert(entity);
+  approach(p, entity);
+  const generator = op === 'mine' ? 1 : 2, skill = op === 'mine' ? 'mining' : 'woodcutting', index = statIndex[skill];
+  p.setVarBit(root.multivarbit, generator);
+  const shown = types.LocType.get(root.multiloc[generator]);
+  assert.equal(shown.op[0], op === 'mine' ? 'Mine' : 'Chop');
+  if (tool !== 'none') {
+    const id = types.ObjType.getId(op === 'mine' ? 'rune_pickaxe' : 'rune_axe');
+    if (tool === 'worn') p.getInventory(types.InvType.getId('worn')).set(3, { id, count: 1 });
+    else inv.add(id, 1);
+    if (tool === 'unusable') p.levels[index] = p.baseLevels[index] = 1;
+  }
+  const snapshot = () => ({ tile: [p.level, p.x, p.z], xp: p.stats[index], vars: Array.from(p.vars), generator: p.getVarBit(root.multivarbit) });
+  const before = snapshot();
+  assert.equal(new OpLocHandler().handle(new OpLoc(1, entity.x, entity.z, root.id), p), true);
+  assert.equal(p.target, entity);
+  const selected = p.getOpTrigger()?.name ?? null;
+  dispatchPath(selected, '[oploc1,rcu_outer_multi1]');
+  finish(p, executions, 0);
+  const after = snapshot(), messages = messagesOf(packets);
+  const scripts = executions.map(e => ({ script: e.script, execution: e.state.execution }));
+  if (selected) assert(scripts.some(e => e.script === selected), 'guarded obstacle handler executed');
+  else assert.deepEqual(scripts, []);
+  if (!selected || tool === 'none' || tool === 'unusable') {
+    assert.deepEqual(after, before, 'no tool or unusable tool: no passage, XP or state change');
+    if (!selected) publishedDefault(messages);
+    else assert.deepEqual(messages, op === 'mine'
+      ? ['You need a pickaxe for which you have the required Mining level to mine this rock.']
+      : ['You attempt to chop your way through...', 'You need an axe to chop down this tree.', 'You do not have an axe which you have the level to use.']);
+  } else {
+    // rcu_outer_multi1's published rcu_outer_inner_coord, not a synthetic route.
+    assert.deepEqual(after.tile, [0, 3042, 4819], 'published handler passage');
+    assert.equal(after.xp - before.xp, 250, 'published handler XP in tenths');
+    assert.equal(after.generator, 0);
+    assert(messages.includes(op === 'mine' ? '...and manage to break through the rock.' : '...and manage to cut a way through the tendrils.'));
+  }
+  record(name, { native, shown: shown.debugname, selected, fixture: { generator, tool, skillLevel: p.levels[index] }, before, after, messages, scripts });
+}
 console.log(`MULTIFORM_GUARDS_PASS=${passed}`);
 process.exit(0);
