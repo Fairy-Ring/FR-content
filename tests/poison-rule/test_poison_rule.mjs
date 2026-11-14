@@ -191,12 +191,12 @@ for (const style of styles) {
   Environment.NODE_MEMBERS = true;
   const f = fixture('swamp_cave_slime');
   f.player.setVar(id(VarPlayerType, style === 'melee' ? 'prayer14' : style === 'ranged' ? 'prayer13' : 'prayer12'), 1);
-  withDelivery(style, f, () => random([0, 0], () => {
+  withDelivery(style, f, () => random([0.999999, 0], () => {
     if (style === 'melee') run('[proc,npc_meleeattack]', f.npc, f.player);
     else if (style === 'ranged') run('[proc,npc_rangeattack]', f.npc, f.player);
     else run('[proc,npc_cast_spell]', f.npc, f.player, [51, 4]);
   }));
-  settle(f.player); check(`${style} protection prayer remains a nonpoisoning accuracy miss`, f.player.getVar(poisonId), 0);
+  settle(f.player); check(`${style} matching protection prayer defeats a favorable accuracy roll without poison`, f.player.getVar(poisonId), 0);
 }
 {
   const f = fixture('swamp_cave_slime');
