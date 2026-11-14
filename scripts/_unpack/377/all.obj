@@ -39795,6 +39795,7 @@ model=obj_mort_slimey_eel
 2dxan=256
 members=yes
 weight=2kg
+param=fishing_struct,fishing_struct_mort_slimey_eel
 
 [cert_mort_slimey_eel]
 certlink=mort_slimey_eel
