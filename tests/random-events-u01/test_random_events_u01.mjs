@@ -148,7 +148,7 @@ function cleared(p) {
   noReward(p);
 }
 const admissionStates = ['free', 'npc combat', 'multiple attackers', 'pvp combat', 'modal', 'delayed', 'unavailable', 'another event active'];
-function admissionEffects(kind, noSquare = false) {
+function admissionEffects(kind, noSquare = false, root = '[timer,general_macro_events]') {
   const p = player(), attackers = [];
   const random = JavaRandom.nextDouble, enabled = Environment.NODE_RANDOM_EVENTS;
   const findSquare = ScriptRunner.HANDLERS[op.MAP_FINDSQUARE];
@@ -175,7 +175,7 @@ function admissionEffects(kind, noSquare = false) {
     if (kind === 'another event active') genie(p);
     p.afkEventReady = true;
     if (noSquare) ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = state => { state.popInts(4); state.pushInt(-1); };
-    run(p, '[timer,general_macro_events]', [], { protect: false });
+    run(p, root, root.startsWith('[timer,') ? [] : [2], { protect: false });
     const owned = [...World.npcs].filter(n => n.isActive && n.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')) === (p.uid | 0));
     const result = {
       identity: p.getVar(v('macro_event')), ready: p.afkEventReady,
@@ -198,13 +198,14 @@ function admissionEffects(kind, noSquare = false) {
   }
 }
 const admissionHead = new Map();
-for (const kind of admissionStates) check(`published Genie admission is preserved: ${kind}`, () => {
-  const result = admissionEffects(kind);
-  admissionHead.set(kind, result);
+const admissionRoots = ['[timer,general_macro_events]', '[proc,macro_event_general_spawn]'];
+for (const root of admissionRoots) for (const kind of admissionStates) check(`published Genie admission is preserved: ${root} ${kind}`, () => {
+  const result = admissionEffects(kind, false, root);
+  admissionHead.set(`${root}:${kind}`, result);
   assert.equal(result.identity, 2);
   assert.deepEqual(result.actors, ['macro_geni']);
   assert.equal(result.uidMatches, true);
-  assert.equal(result.ready, kind === 'another event active', 'an existing event keeps readiness before AFK_EVENT');
+  assert.equal(result.ready, !root.startsWith('[timer,') || kind === 'another event active', 'only a served timer roll consumes readiness');
   assert.equal(result.modal, kind === 'modal' ? requiredId(types.Component, 'welcome_screen') : -1);
   assert.equal(result.delayed, kind === 'delayed');
   assert.deepEqual(result.queues, [[], [], []], 'no new retry queue');
@@ -626,9 +627,9 @@ if (process.env.U01_PUBLISHED_PACK) {
       console.log(`IDENTITY_COMPARISON ${JSON.stringify({ identity, root, published, actual })}`);
       assert.deepEqual(actual, expected, 'only F1 Candlelight identity retention may differ');
     });
-    for (const kind of admissionStates) check(`published-pack admission comparison: ${kind}`, () => {
-      const published = admissionEffects(kind), actual = admissionHead.get(kind);
-      console.log(`ADMISSION_COMPARISON ${JSON.stringify({ kind, published, actual })}`);
+    for (const root of admissionRoots) for (const kind of admissionStates) check(`published-pack admission comparison: ${root} ${kind}`, () => {
+      const published = admissionEffects(kind, false, root), actual = admissionHead.get(`${root}:${kind}`);
+      console.log(`ADMISSION_COMPARISON ${JSON.stringify({ root, kind, published, actual })}`);
       assert.deepEqual(actual, published);
     });
     check('published-pack follower death, respawn and lamp comparison', () => {

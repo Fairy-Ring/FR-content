@@ -4,7 +4,7 @@
 if (~macro_event_allowed = false) { 
     return;
 }
-// A blocked allocation keeps this roll for the next timer, without a retry queue.
+// No free square: retain readiness until a later timer, without a retry queue.
 def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
 if ($event_coord = null) {
     return;
