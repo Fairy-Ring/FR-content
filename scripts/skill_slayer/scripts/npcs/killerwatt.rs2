@@ -24,19 +24,6 @@ npc_changetype_keepall(slayer_killerwatt, ^killerwatt_form_lifetime);
 %killerwatt_awake_clock = map_clock;
 npc_queue(19, 0, ^killerwatt_return_interval);
 
-// CANDIDATE monster-combat-data.s02-killerwatt-forms: every player hit, including zero, wakes.
-[ai_queue2,slayer_killerwatt_ball]
-if (npc_stat(hitpoints) > 0) {
-    ~killerwatt_wake;
-    // Queue 1 may already have admitted melee retaliation in this same turn.
-    if (npc_getmode = opplayer2) {
-        if (finduid(%npc_attacking_uid) = true) npc_setmode(applayer2);
-    } else {
-        ~npc_default_retaliate_ap;
-    }
-}
-~npc_default_damage(last_int);
-
 [ai_queue1,slayer_killerwatt] gosub(npc_default_retaliate_ap);
 [ai_applayer2,slayer_killerwatt] ~killerwatt_attack;
 [ai_opplayer2,slayer_killerwatt] ~killerwatt_attack;
@@ -55,7 +42,7 @@ if (~npc_check_notcombat = false) {
 if (~npc_check_notcombat_self = false) return;
 def_int $style = ~killerwatt_attack_style;
 def_int $damage = 0;
-// CANDIDATE monster-combat-data.s02-killerwatt-damage: Magic defence, Missiles protection.
+// CANDIDATE monster-combat-data.s02-killerwatt-prayer: Magic defence, Missiles protection.
 def_boolean $hit = false;
 if ($style = ^magic_style) {
     def_int $attack_roll = 0;

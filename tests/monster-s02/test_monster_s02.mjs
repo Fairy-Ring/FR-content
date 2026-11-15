@@ -362,117 +362,28 @@ check('waking an already-poisoned ball preserves the original poison deadline', 
   const { player } = fixture('slayer_killerwatt_ball', 3, [2, 2660, 5199]);
   pv(player, 'mcannon', Number(cannonComplete[1]));
   pv(player, 'ownedmcannon', -1);
-  player.getInventory(invId).set(0, { id: id(ObjType, 'twpart1'), count: 1 });
+  const base = { id: id(ObjType, 'twpart1'), count: 1 };
+  player.getInventory(invId).set(0, base);
+  // Both centres could place a base before the ban. The second is beside Portal
+  // Home at the eastern island edge, not a blocked-space false positive.
+  for (const [x, z] of [[2660, 5199], [2676, 5214]]) {
+    player.x = x; player.z = z;
+    const origin = { x: x - 1, z: z - 1, level: player.level };
+    dialogue(player, start('[opheld1,twpart1]', player));
+    check(`plane cannon refusal at ${x},${z} leaves ownership unset`, player.getVar(id(VarPlayerType, 'ownedmcannon')), -1);
+    check(`plane cannon refusal at ${x},${z} leaves the carried base`, player.getInventory(invId).get(0), base);
+    check(`plane cannon refusal at ${x},${z} creates no base loc`,
+      World.getLoc(origin.x, origin.z, origin.level, id(LocType, 'multicannon_base')), null);
+  }
+  player.level = 0; player.x = 3100; player.z = 3300;
   const origin = { x: player.x - 1, z: player.z - 1, level: player.level };
   dialogue(player, start('[opheld1,twpart1]', player));
-  check('legal plane cannon setup records its owned origin', player.getVar(id(VarPlayerType, 'ownedmcannon')),
+  check('same quest-complete account sets up outside the plane', player.getVar(id(VarPlayerType, 'ownedmcannon')),
     (origin.level << 28) | (origin.x << 14) | origin.z);
-  check('ordinary quest-complete account places the base at that origin',
+  check('outside-plane control places a base at its owned origin',
     World.getLoc(origin.x, origin.z, origin.level, id(LocType, 'multicannon_base'))?.type, id(LocType, 'multicannon_base'));
-  check('legal plane cannon setup consumes the carried base', player.getInventory(invId).get(0), null);
+  check('outside-plane control consumes the carried base', player.getInventory(invId).get(0), null);
 }
-{
-  const { player, npc } = fixture('slayer_killerwatt_ball', 3, [2, 2660, 5210]);
-  // The real cannon proc only needs its owned origin, ammo and admitted target.
-  // A packed coordinate is a native coord value, not a generated config id.
-  pv(player, 'ownedmcannon', (2 << 28) | ((player.x - 1) << 14) | (player.z - 1));
-  pv(player, 'rockthrower', 1);
-  pv(player, 'com_stabattack', 1); // Nonzero native accuracy for the explicit maximum/zero accuracy draws.
-  rng([0.999999, 0, 0.2], () => run('[proc,cannon_fire]', player, npc));
-  const damage = [...npc.queue.all()].find(q => q.queueId === ServerTriggerType.AI_QUEUE2)?.lastInt;
-  check('real cannon hit queues positive non-selection damage', damage > 0, true);
-  for (let turn = 0; turn < 10 && npc.type === ball; turn++) { World.currentTick++; npc.turn(); }
-  check('first cannon damage wakes the ball through native damage dispatch', npc.type, biped);
-  check('non-selection wake preserves the published cannon damage', npc.levels[NpcStat.HITPOINTS], 51 - damage);
-  const { npc: control } = fixture('slayer_killerwatt', 3);
-  run('[proc,npc_default_retaliate_ap]', control);
-  check('non-selection wake uses the same distant retaliation mode', npc.targetOp, control.targetOp);
-}
-
-function cannonMiss(player, npc) {
-  pv(player, 'option_nodef', 1); // Observe NPC retaliation before the owner's manual Attack.
-  pv(player, 'ownedmcannon', (2 << 28) | ((player.x - 1) << 14) | (player.z - 1));
-  pv(player, 'rockthrower', 1);
-  pv(player, 'com_stabattack', 1);
-  rng([0, 0.999999], () => run('[proc,cannon_fire]', player, npc));
-  const hit = [...npc.queue.all()].find(q => q.queueId === ServerTriggerType.AI_QUEUE2);
-  check('real cannon miss queues zero damage', hit?.lastInt, 0);
-  return Math.max(1, hit.delay);
-}
-function npcTurn(npc, draws = []) {
-  World.currentTick++;
-  rng(draws, () => npc.turn());
-}
-const wakeFailures = [];
-function wakeCase(name, action) {
-  try { action(); console.log(`PASS ${name}`); }
-  catch (error) { wakeFailures.push({ name, error }); console.error(`FAIL ${name}: ${error.stack}`); }
-}
-for (const distance of [1, 2, 13]) {
-  wakeCase(`cannon zero immediate wake and S02 style at distance ${distance}`, () => {
-    const { player, npc } = fixture('slayer_killerwatt_ball', distance, [2, 2660, 5210]);
-    wear(player, 'slayer_boots');
-    // At the far boundary the ball wandered five tiles from its spawn. The owner
-    // remains eight tiles from that spawn, inside the published OP retaliation guard.
-    if (distance === 13) npc.startX -= 5;
-    const flight = cannonMiss(player, npc);
-    for (let turn = 0; turn < flight; turn++) npcTurn(npc);
-    check('first state after zero cannon damage is the biped', npc.type, biped);
-    check('zero cannon damage preserves full NPC hitpoints', npc.levels[NpcStat.HITPOINTS], 51);
-    check('zero cannon wake admits AP retaliation, not published ball melee', npc.targetOp, 13);
-    pv(player, distance === 1 ? 'prayer13' : 'prayer12', 1);
-    npcTurn(npc, [0.999999, 0, 0.999999]);
-    check('woken biped uses S02 boots maximum and the nonmatching prayer does not block',
-      [...player.queue.all()].filter(q => q.script.name === '[queue,combat_damage_player]').map(q => q.args), [[distance === 1 ? 6 : 8]]);
-    player.processQueues();
-    pv(player, distance === 1 ? 'prayer13' : 'prayer12', 0);
-    pv(player, distance === 1 ? 'prayer14' : 'prayer13', 1);
-    npcTurn(npc);
-    npcTurn(npc, [0.999999, 0]);
-    check('woken biped obeys the S02 matching protection prayer',
-      [...player.queue.all()].filter(q => q.script.name === '[queue,combat_damage_player]').map(q => q.args), [[0]]);
-  });
-}
-wakeCase('cannon zero then later hit does not stall either combatant', () => {
-  const { player, npc } = fixture('slayer_killerwatt_ball', 1, [2, 2660, 5210]);
-  cannonMiss(player, npc);
-  for (let turn = 1; turn <= 4; turn++) {
-    npcTurn(npc, turn % 2 === 0 ? [0.999999, 0, 0.5] : []);
-    player.processQueues();
-  }
-  // This is the reviewer's stalled sequence. The old head first fights as a ball,
-  // then changes uid on this positive hit while the player still holds the ball uid.
-  pv(player, 'rockthrower', 1);
-  rng([0.999999, 0, 0.2], () => run('[proc,cannon_fire]', player, npc));
-  npcTurn(npc);
-  check('manual Attack admission after the cannon miss and later hit', run('[proc,player_in_combat_check]', player, npc), [1]);
-  player.testMessages.length = 0;
-  rng([0, 0], () => run('[opnpc2,_]', player, npc));
-  check('manual Attack actually queues its own hit', [...npc.queue.all()].some(q => q.queueId === ServerTriggerType.AI_QUEUE2), true);
-  check('manual Attack receives no combat refusal', player.testMessages.filter(p => p.text).map(p => p.text), []);
-  npcTurn(npc, [0.999999, 0, 0.5]);
-  check('biped fights back after the manual Attack', [...player.queue.all()].some(q => q.script.name === '[queue,combat_damage_player]'), true);
-});
-for (const positive of [false, true]) {
-  wakeCase(`recoil ring after cannon zero, incoming ${positive ? 'positive' : 'zero'} hit`, () => {
-    const { player, npc } = fixture('slayer_killerwatt_ball', 1, [2, 2660, 5210]);
-    wear(player, 'slayer_boots');
-    player.getInventory(wornId).set(12, { id: id(ObjType, 'ring_of_recoil'), count: 1 });
-    cannonMiss(player, npc);
-    npcTurn(npc);
-    npcTurn(npc, positive ? [0.999999, 0, 0.999999] : [0, 0]);
-    check('first attack with the recoil ring is already a biped attack, never a ball attack', npc.type, biped);
-    const awake = npc.getVar(id(VarNpcType, 'killerwatt_awake_clock'));
-    player.processQueues(); // Real combat_damage_player, including its recoil callback.
-    check('published recoil queues damage only for a positive incoming hit',
-      [...npc.queue.all()].filter(q => q.queueId === ServerTriggerType.AI_QUEUE2).map(q => q.lastInt), positive ? [1] : []);
-    npcTurn(npc);
-    check('recoil preserves the biped and does not wake twice', [npc.type, npc.getVar(id(VarNpcType, 'killerwatt_awake_clock'))], [biped, awake]);
-    check('recoil damage uses the published queue and is retained', npc.levels[NpcStat.HITPOINTS], positive ? 50 : 51);
-    check('recoil path leaves the owner admitted against the biped', run('[proc,player_in_combat_check]', player, npc), [1]);
-  });
-}
-assert.equal(wakeFailures.length, 0, `cannon/recoil regressions: ${wakeFailures.map(failure => failure.name).join(', ')}`);
 const portalBit = id(VarBitType, 'slayer_killerwatt_portal_check');
 const warningBit = id(VarBitType, 'slayer_killerwatt_strobe_warning');
 const portalBase = id(VarPlayerType, 'slayer_killerwatt_var');

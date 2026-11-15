@@ -339,16 +339,26 @@
       "evidence": {
         "facts": ["monster-combat-data.s02-killerwatt-vectors", "monster-combat-data.s02-killerwatt-attack-interval", "monster-combat-data.s02-killerwatt-distance"],
         "label": "CANDIDATE",
-        "researchCommit": "ea0969405caec185f498bccd2ef86e768b812a1a",
+        "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
         "sources": [
-          { "id": "src.monster-s02-history-corpus", "sha256": "b6dd9d9f3979992a473b3628609703c4d0db109631488558a8a2b2e74d151bb4" },
+          { "id": "src.monster-s02-history-corpus", "sha256": "ae9a66c319ab54a13603657a7cdf1a7d7845705ee0876591b6f657f14447ba0c" },
           { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
           { "id": "src.monster-s02-cache-unit", "sha256": "511a3c796acb9347541257ede9737d2c7903bb0aada0adc3d046f4f396d90fbd" },
-          { "id": "src.monster-s02-history-diffs", "sha256": "d0985af80cc2010f90823d58c9a02051ca5bce0d789cf140910c2226cc4bc74e" }
+          { "id": "src.monster-s02-history-diffs", "sha256": "362ddf55dc3a1986e0c8fed0278edcd344b6d2a965b0ec9b5c9d21bde50c2f77" }
         ]
       },
       "fields": {
-        "hitpoints": { "value": 51 },
+        "hitpoints": {
+          "value": 51,
+          "evidence": {
+            "facts": ["monster-combat-data.s02-killerwatt-period-hitpoints-level"],
+            "label": "VERIFIED",
+            "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+            "sources": [
+              { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" }
+            ]
+          }
+        },
         "attack": { "value": 50 },
         "strength": { "value": 50 },
         "defence": { "value": 40 },
@@ -377,16 +387,26 @@
       "evidence": {
         "facts": ["monster-combat-data.s02-killerwatt-vectors", "monster-combat-data.s02-killerwatt-attack-interval", "monster-combat-data.s02-killerwatt-distance"],
         "label": "CANDIDATE",
-        "researchCommit": "ea0969405caec185f498bccd2ef86e768b812a1a",
+        "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
         "sources": [
-          { "id": "src.monster-s02-history-corpus", "sha256": "b6dd9d9f3979992a473b3628609703c4d0db109631488558a8a2b2e74d151bb4" },
+          { "id": "src.monster-s02-history-corpus", "sha256": "ae9a66c319ab54a13603657a7cdf1a7d7845705ee0876591b6f657f14447ba0c" },
           { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
           { "id": "src.monster-s02-cache-unit", "sha256": "511a3c796acb9347541257ede9737d2c7903bb0aada0adc3d046f4f396d90fbd" },
-          { "id": "src.monster-s02-history-diffs", "sha256": "d0985af80cc2010f90823d58c9a02051ca5bce0d789cf140910c2226cc4bc74e" }
+          { "id": "src.monster-s02-history-diffs", "sha256": "362ddf55dc3a1986e0c8fed0278edcd344b6d2a965b0ec9b5c9d21bde50c2f77" }
         ]
       },
       "fields": {
-        "hitpoints": { "value": 51 },
+        "hitpoints": {
+          "value": 51,
+          "evidence": {
+            "facts": ["monster-combat-data.s02-killerwatt-period-hitpoints-level"],
+            "label": "VERIFIED",
+            "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+            "sources": [
+              { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" }
+            ]
+          }
+        },
         "attack": { "value": 50 },
         "strength": { "value": 50 },
         "defence": { "value": 40 },
