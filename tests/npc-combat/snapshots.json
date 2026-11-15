@@ -266,6 +266,142 @@
         "walkanim": {"ref": "seq", "name": "killerwatt_ball_ready"},
         "walkanim_b": -1, "walkanim_l": -1, "walkanim_r": -1, "wanderrange": 5
       }
+    },
+    {
+      "identity": {
+        "debugname": "swamp_wallbeast",
+        "id": 1826
+      },
+      "contentCommit": "84cb1560ac80d18ef47c1285cec4a59c7462a0b9",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 1,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 1,
+        "desc": "What could be hiding in that crack in the wall?",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 1,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": false,
+        "models": [
+          5788
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Hole in the wall",
+        "op": null,
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "wall_beast_ready"
+        },
+        "recol_d": null,
+        "recol_s": null,
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 1,
+        "timer": -1,
+        "turnspeed": 0,
+        "vislevel": 0,
+        "walkanim": -1,
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "swamp_wallbeast_combat",
+        "id": 1827
+      },
+      "contentCommit": "84cb1560ac80d18ef47c1285cec4a59c7462a0b9",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 30,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 16,
+        "desc": "A big scary hand!",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 105,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          5788
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Wall Beast",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "wall_beast_combat_ready"
+        },
+        "recol_d": null,
+        "recol_s": null,
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 30,
+        "timer": -1,
+        "turnspeed": 0,
+        "vislevel": 49,
+        "walkanim": -1,
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
     }
   ]
 }

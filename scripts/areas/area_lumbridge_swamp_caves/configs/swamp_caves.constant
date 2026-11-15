@@ -29,3 +29,20 @@
 ^swamp_cave_gas_ticks = 7
 ^swamp_cave_gas_hp_divisor = 4
 ^swamp_cave_gas_min_damage = 1
+
+// SC-05 UNKNOWN engineering: exact activation anchors, locks and reset.
+^swamp_wallbeast_1 = 0_49_149_25_11
+^swamp_wallbeast_2 = 0_49_149_26_38
+^swamp_wallbeast_3 = 0_49_149_28_20
+^swamp_wallbeast_4 = 0_49_149_62_18
+^swamp_wallbeast_5 = 0_49_149_62_36
+^swamp_wallbeast_6 = 0_50_149_15_24
+^swamp_wallbeast_7 = 0_50_149_16_52
+^swamp_wallbeast_hold_ticks = 6
+^swamp_wallbeast_hit_tick = 5
+^swamp_wallbeast_cooldown_ticks = 10
+^swamp_wallbeast_leash = 6
+^swamp_wallbeast_reset_ticks = 10
+// SC-05 Q3: CANDIDATE overlap bounds; UNKNOWN uniform distribution.
+^swamp_wallbeast_grab_min = 11
+^swamp_wallbeast_grab_max = 13

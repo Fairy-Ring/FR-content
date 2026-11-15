@@ -43490,6 +43490,12 @@ readyanim=wall_beast_ready
 minimap=no
 vislevel=hide
 turnspeed=0
+// SC-05 UNKNOWN engineering: natural holes remain at their fixed anchors.
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+givechase=no
+respawnrate=100
 
 [swamp_wallbeast_combat]
 name=Wall Beast
@@ -43503,6 +43509,34 @@ hitpoints=105
 attack=30
 strength=30
 defence=16
+magic=1
+ranged=1
+// SC-05 CANDIDATE complete combat row; no max-hit override.
+param=attackrate,6
+param=damagetype,^crush_style
+param=attackbonus,0
+param=strengthbonus,0
+param=magicattack,0
+param=rangeattack,0
+param=rangebonus,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+// Numeric original sequences VERIFIED; server bindings are engineering.
+param=attack_anim,wall_beast_specialattack_attack
+param=defend_anim,wall_beast_specialattack_defend
+param=death_anim,wall_beast_specialattack_death
+param=slayer_category,^slayer_wallbeast
+// SC-05 UNKNOWN engineering: combat cannot move or chase away from the hole.
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+givechase=no
+respawnrate=100
+// Disengagement resets to the per-type timer; keep the reset clock alive.
+timer=1
 
 [giant_frog]
 name=Giant frog
