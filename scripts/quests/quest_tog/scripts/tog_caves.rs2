@@ -4,6 +4,7 @@
 [oploc1,tog_cave_up]
 p_arrivedelay;
 // Next to tog_cave_down 3225,9539 L0 (3x3) — south stand.
+if (~swamp_cave_inside(coord) = true & ~swamp_cave_inside(0_50_149_25_2) = false) ~swamp_cave_release;
 p_teleport(0_50_149_25_2);
 
 [oploc1,tog_cave_down]

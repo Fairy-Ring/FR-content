@@ -41,6 +41,15 @@ if($product ! lit_black_candle & $product ! lit_candle) {
 def_obj $source = inv_getobj(inv, last_slot);
 inv_setslot(inv, last_slot, oc_param($source, next_obj_stage), 1);
 
+// A queued environmental effect owns a captured slot/type, not last_slot.
+[proc,extinguish_light_source_slot](int $slot, obj $source)(boolean)
+if ($slot < 0 | $slot >= inv_size(inv)) return(false);
+if ($source = null | inv_getobj(inv, $slot) ! $source) return(false);
+def_namedobj $unlit = oc_param($source, next_obj_stage);
+if ($unlit = null) return(false);
+inv_setslot(inv, $slot, $unlit, inv_getnum(inv, $slot));
+return(true);
+
 // Lost City 289 lift-water behavior, using r377 product-pair parameters.
 [proc,extinguish_light_sources]
 def_int $i = 0;

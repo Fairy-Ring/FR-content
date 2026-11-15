@@ -186,6 +186,7 @@ jobs:
           run_test tests/cfg-npc/test_cfg_npc.mjs node --import tsx ../content/tests/cfg-npc/test_cfg_npc.mjs
           # Built combat vectors and checker self-tests use the native pack; no server or vault.
           run_test tests/npc-combat/test_npc_combat.mjs node --import tsx ../content/tests/npc-combat/test_npc_combat.mjs
+          run_test tests/npc-combat/test_outcomes.mjs node --import tsx ../content/tests/npc-combat/test_outcomes.mjs
           run_test tests/poison-rule/test_poison_rule.mjs node --import tsx ../content/tests/poison-rule/test_poison_rule.mjs
           run_test tests/spawn-repair/test_spawn_repair.mjs node --import tsx ../content/tests/spawn-repair/test_spawn_repair.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
@@ -228,6 +229,8 @@ jobs:
           run_test tests/swamp-caves/test_sc01_lights.mjs node --import tsx ../content/tests/swamp-caves/test_sc01_lights.mjs
           run_test tests/swamp-caves/test_sc02_seller.mjs node --import tsx ../content/tests/swamp-caves/test_sc02_seller.mjs
           run_test tests/swamp-caves/test_sc02l_manufacture.mjs node --import tsx ../content/tests/swamp-caves/test_sc02l_manufacture.mjs
+          run_test tests/swamp-caves/test_sc03_darkness.mjs node --import tsx ../content/tests/swamp-caves/test_sc03_darkness.mjs
+          run_test tests/swamp-caves/test_sc04_gas.mjs node --import tsx ../content/tests/swamp-caves/test_sc04_gas.mjs
           run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs

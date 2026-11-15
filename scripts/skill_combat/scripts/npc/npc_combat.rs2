@@ -58,6 +58,34 @@ if (npc_param(attack_sound) ! null) {
 }
 ~npc_meleeattack;
 
+// Explicit callers can choose a policy after readiness, before accuracy.
+// The ordinary wrapper above retains its native prefix without another frame.
+[proc,npc_default_attack_ready]()(boolean)
+if (%death = ^true) {
+    npc_setmode(null);
+    return(false);
+}
+if (%npc_action_delay > map_clock) return(false);
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return(false);
+}
+if (~npc_check_notcombat_self = false) {
+    return(false);
+}
+anim(%com_defendanim, 0);
+npc_anim(npc_param(attack_anim), 0);
+if (npc_param(attack_sound) ! null) {
+    sound_synth(npc_param(attack_sound), 0, 0);
+}
+return(true);
+
+[proc,npc_default_attack_outcome](int $maxhit, int $defence_policy, boolean $protected_roll)(boolean, int, int, int, int)
+if (~npc_default_attack_ready = false) {
+    return(false, -1, 0, 0, 0);
+}
+return(~npc_meleeattack_outcome($maxhit, $defence_policy, $protected_roll));
+
 // Cap player→NPC hit magnitude before XP/heropoints. Default = min(maxhit, max_dealt).
 // RD Sir Leye (rd_combat_npc_room_3): males deal 0 (live gender(); CANDIDATE pre-2022
 // "no man may defeat him"). Female and all other NPCs unchanged. $spell reserved for
@@ -102,7 +130,10 @@ if ($drop ! null & npc_findhero = ^true) {
 [proc,npc_player_hit_roll](int $damagetype)(boolean)
 def_int $attack_roll = ~npc_attack_roll_specific($damagetype);
 def_int $defence_roll = ~player_defence_roll_specific($damagetype);
-//mes("Clock: <tostring(map_clock)>, Player A: <tostring($attack_roll)>, NPC D: <tostring($defence_roll)>, Player Max: <tostring(%com_maxhit)>");
+return(~npc_attack_accuracy($attack_roll, $defence_roll));
+
+// Shared native comparison, including randominc(0) under protection.
+[proc,npc_attack_accuracy](int $attack_roll, int $defence_roll)(boolean)
 if (randominc($attack_roll) > randominc($defence_roll)) {
     return(true);
 }

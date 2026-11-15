@@ -9,6 +9,7 @@ const { default: ClientCheatHandler } = await import(pathToFileURL(`${engine}/sr
 const { default: ClientCheat } = await import(pathToFileURL(`${engine}/src/network/game/client/model/ClientCheat.ts`).href);
 const { default: DbTableIndex } = await import(pathToFileURL(`${engine}/src/cache/config/DbTableIndex.ts`).href);
 const { default: MessageGameEncoder } = await import(pathToFileURL(`${engine}/src/network/game/server/codec/MessageGameEncoder.ts`).href);
+const { default: JavaRandom } = await import(pathToFileURL(`${engine}/src/util/JavaRandom.ts`).href);
 const invId = requiredId(types.InvType, 'inv');
 const eventVar = requiredId(types.VarPlayerType, 'macro_event');
 const handlers = { ...ScriptRunner.HANDLERS };
@@ -138,6 +139,9 @@ function inertTrace(name) {
   };
   try {
     const state = ScriptRunner.init(packed(name), p, row ? locFor(row) : null, []);
+    // RANDOM, RANDOMINC and STAT_RANDOM use this singleton, not Math.random.
+    // Reset each root so earlier draws and process state cannot select its trace.
+    JavaRandom.setSeed(0);
     p.runScript(state, true);
     for (let resumes = 0; state.execution === ScriptState.SUSPENDED && resumes < 10; resumes++) {
       state.execution = ScriptState.RUNNING;

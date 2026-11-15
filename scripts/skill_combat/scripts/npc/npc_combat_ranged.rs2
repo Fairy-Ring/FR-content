@@ -54,23 +54,71 @@ spotanim_npc(npc_param(proj_launch), npc_param(proj_height), 0);
 def_int $duration = 64;
 $duration = ~player_projectile(npc_coord, coord, uid, npc_param(proj_travel), 40, 36, 32, 15, 0, 11, 5);
 
+~npc_rangeattack_resolve($attack_roll, $defence_roll, $maxhit, $poison_prayer, $duration);
+
+// Null presentation is opt-in; the ordinary entry above remains strict.
+[proc,npc_rangeattack_outcome](int $maxhit, boolean $protected_roll, boolean $allow_null_presentation)(boolean, int, int, int, int)
+if (%npc_action_delay > map_clock) {
+    npc_setmode(applayer2);
+    return(false, -1, 0, 0, 0);
+}
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return(false, -1, 0, 0, 0);
+}
+if (~npc_check_notcombat_self = false) {
+    return(false, -1, 0, 0, 0);
+}
+def_int $attack_roll = ~npc_ranged_attack_roll;
+def_int $defence_roll = ~player_defence_roll_specific(npc_param(damagetype));
+def_int $poison_prayer = 0;
+if (npc_param(poison_severity) > 0 & ~check_protect_prayer(^ranged_style) = true) {
+    $attack_roll = ~npc_ranged_attack_roll_no_prot;
+    $poison_prayer = 1;
+} else if ($protected_roll = true & ~check_protect_prayer(^ranged_style) = true) {
+    $attack_roll = ~npc_ranged_attack_roll_no_prot;
+    $poison_prayer = 1;
+}
+npc_anim(npc_param(attack_anim), 0);
+def_synth $sound = npc_param(rangeattack_sound);
+if ($allow_null_presentation = false | $sound ! null) {
+    sound_synth($sound, 0, 0);
+}
+def_spotanim $launch = npc_param(proj_launch);
+if ($allow_null_presentation = false | $launch ! null) {
+    spotanim_npc($launch, npc_param(proj_height), 0);
+}
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration;
+def_spotanim $travel = npc_param(proj_travel);
+if ($allow_null_presentation = false | $travel ! null) {
+    $duration = ~player_projectile(npc_coord, coord, uid, $travel, 40, 36, 32, 15, 0, 11, 5);
+} else {
+    $duration = calc(32 + 5 * distance(npc_coord, coord));
+}
+return(~npc_rangeattack_resolve($attack_roll, $defence_roll, $maxhit, $poison_prayer, $duration));
+
+[proc,npc_rangeattack_resolve](int $attack_roll, int $defence_roll, int $maxhit, int $poison_prayer, int $duration)(boolean, int, int, int, int)
 if (randominc($attack_roll) > randominc($defence_roll)) {
-    def_int $damage = randominc($maxhit);
+    def_int $rolled = randominc($maxhit);
+    def_int $damage = $rolled;
     if ($poison_prayer = 1) {
         $damage = 0;
     }
-    ~playerhit_n_ranged($damage, $duration, npc_param(attackrate));
+    def_int $ticks = ~playerhit_n_ranged($damage, $duration, npc_param(attackrate));
     if ($damage = 0 & npc_param(poison_severity) > 0) {
         ~npc_poison_player;
     }
-    return;
+    return(true, 1, $rolled, $damage, $ticks);
 }
-~playerhit_n_ranged(0, $duration, npc_param(attackrate));
+def_int $ticks = ~playerhit_n_ranged(0, $duration, npc_param(attackrate));
+return(true, 0, 0, 0, $ticks);
 
-[proc,playerhit_n_ranged](int $damage, int $duration, int $delay)
+[proc,playerhit_n_ranged](int $damage, int $duration, int $delay)(int)
 if_close; // close the player interface when taking a hit.
 // not sure if this is correct
-queue(combat_damage_player, calc($duration / 30), $damage);
+def_int $ticks = calc($duration / 30);
+queue(combat_damage_player, $ticks, $damage);
 if (npc_param(poison_severity) > 0 & $damage > 0) {
     queue(poison_player, 0, npc_param(poison_severity));
 }
@@ -79,6 +127,7 @@ queue*(playerhit_n_retaliate, calc($duration / 30))(npc_uid);
 if(npc_param(npc_ammo) ! null) {
     ~npc_drop_ammo(npc_param(npc_ammo), $duration);
 }
+return($ticks);
 
 // For npcs that will drop their ammo as they fire, might just be ranged guild specific?
 // rates: https://x.com/JagexAsh/status/1802647479772414116

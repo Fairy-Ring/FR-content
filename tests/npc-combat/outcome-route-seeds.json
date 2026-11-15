@@ -1,0 +1,1235 @@
+{
+  "schema": 1,
+  "rng": "xorshift32",
+  "routes": [
+    {
+      "script": "[ai_opplayer2,_]",
+      "npc": "hans",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,guard2]",
+      "npc": "guard2",
+      "seeds": {
+        "no-accuracy": 2654435769
+      },
+      "unsupportedBranches": {
+        "hit": "Native strict ranged presentation aborts at SOUND_SYNTH: rangeattack_sound is null, before accuracy or damage.",
+        "zero": "Native strict ranged presentation aborts before accuracy or damage.",
+        "miss": "Native strict ranged presentation aborts before accuracy or damage."
+      }
+    },
+    {
+      "script": "[ai_opplayer2,barbarian]",
+      "npc": "barbarian",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "hit": 3189639355
+      }
+    },
+    {
+      "script": "[ai_applayer2,wizard]",
+      "npc": "wizard",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 1070407172
+      }
+    },
+    {
+      "script": "[ai_opplayer2,druid]",
+      "npc": "druid",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_applayer2,druid]",
+      "npc": "druid",
+      "seeds": {
+        "zero": 2654435769,
+        "no-accuracy": 1013904242,
+        "hit": 2027808484,
+        "miss": 2415085441
+      }
+    },
+    {
+      "script": "[ai_opplayer2,barbarian_woman]",
+      "npc": "barbarian_woman",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "hit": 3189639355
+      }
+    },
+    {
+      "script": "[ai_applayer2,ardougne_archer]",
+      "npc": "ardougne_archer",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,king_dragon]",
+      "npc": "king_dragon",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 535203586
+      }
+    },
+    {
+      "script": "[ai_opplayer2,red_dragon]",
+      "npc": "red_dragon",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 2027808484
+      }
+    },
+    {
+      "script": "[ai_opplayer2,black_dragon]",
+      "npc": "black_dragon",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 2027808484
+      }
+    },
+    {
+      "script": "[ai_opplayer2,blue_dragon]",
+      "npc": "blue_dragon",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 2027808484
+      }
+    },
+    {
+      "script": "[ai_opplayer2,shadow_spider]",
+      "npc": "shadow_spider",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,gnome]",
+      "npc": "gnome",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,browclothedgnome]",
+      "npc": "browclothedgnome",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,darkskinned_gnome]",
+      "npc": "darkskinned_gnome",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_opplayer2,skeletonmage]",
+      "npc": "skeletonmage",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "no-accuracy": 2415085441,
+        "hit": 3189639355
+      }
+    },
+    {
+      "script": "[ai_applayer2,gnomefemale]",
+      "npc": "gnomefemale",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,gnomefemale_dskinned]",
+      "npc": "gnomefemale_dskinned",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_opplayer2,bearded_dark_wizard]",
+      "npc": "bearded_dark_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 387276957,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_applayer2,bearded_dark_wizard]",
+      "npc": "bearded_dark_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 387276957,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_opplayer2,invrigar_the_necromancer]",
+      "npc": "invrigar_the_necromancer",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "no-accuracy": 2415085441,
+        "zero": 774553914,
+        "hit": 1788458156
+      }
+    },
+    {
+      "script": "[ai_applayer2,invrigar_the_necromancer]",
+      "npc": "invrigar_the_necromancer",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "no-accuracy": 2415085441,
+        "zero": 774553914,
+        "hit": 1788458156
+      }
+    },
+    {
+      "script": "[ai_opplayer2,young_dark_wizard]",
+      "npc": "young_dark_wizard",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1788458156,
+        "success": 2175735113,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_applayer2,young_dark_wizard]",
+      "npc": "young_dark_wizard",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1788458156,
+        "success": 2175735113,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_applayer2,_witch]",
+      "npc": "witch1",
+      "seeds": {
+        "success": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_opplayer2,chaos_druid]",
+      "npc": "chaos_druid",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "zero": 1788458156,
+        "hit": 3189639355
+      }
+    },
+    {
+      "script": "[ai_applayer2,chaos_druid]",
+      "npc": "chaos_druid",
+      "seeds": {
+        "miss": 2654435769,
+        "success": 3668340011
+      },
+      "unsupportedBranches": {
+        "hit": "This route chooses Bind or Confuse, both with a null maximum; neither queues combat damage. It has non-damaging success and miss branches.",
+        "zero": "This route never queues combat damage, including zero damage."
+      }
+    },
+    {
+      "script": "[ai_opplayer2,chaosmonk1]",
+      "npc": "chaosmonk1",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "hit": 387276957
+      }
+    },
+    {
+      "script": "[ai_opplayer2,chaosmonk2]",
+      "npc": "chaosmonk2",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "hit": 2175735113
+      }
+    },
+    {
+      "script": "[ai_opplayer2,chaosmonk3]",
+      "npc": "chaosmonk3",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_opplayer2,necromancer]",
+      "npc": "necromancer",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 387276957,
+        "no-accuracy": 2415085441,
+        "zero": 774553914
+      }
+    },
+    {
+      "script": "[ai_applayer2,necromancer]",
+      "npc": "necromancer",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 387276957,
+        "no-accuracy": 2415085441,
+        "zero": 774553914
+      }
+    },
+    {
+      "script": "[ai_opplayer2,entrana_monk]",
+      "npc": "entrana_monk",
+      "seeds": {
+        "miss": 2654435769,
+        "no-accuracy": 2415085441,
+        "hit": 1309757500,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_opplayer2,ikov_firewarrior]",
+      "npc": "ikov_firewarrior",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,ikov_firewarrior]",
+      "npc": "ikov_firewarrior",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,_macro_event_rock_golem]",
+      "npc": "macro_golemguardian_1",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,gnomeknight]",
+      "npc": "gnomeknight",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,d_skingnomeknight]",
+      "npc": "d_skingnomeknight",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,ranging_guild_guard]",
+      "npc": "ranging_guild_guard",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,guild_towerarcher1]",
+      "npc": "guild_towerarcher1",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_applayer2,guild_towerarcher2]",
+      "npc": "guild_towerarcher2",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,guild_towerarcher3]",
+      "npc": "guild_towerarcher3",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,guild_towerarcher4]",
+      "npc": "guild_towerarcher4",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,wizard_grayzag]",
+      "npc": "wizard_grayzag",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_opplayer2,elvarg]",
+      "npc": "elvarg",
+      "seeds": {
+        "hit": 2654435769,
+        "zero": 2415085441,
+        "miss": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,melzar_the_mad]",
+      "npc": "melzar_the_mad",
+      "seeds": {
+        "hit": 2654435769,
+        "success": 3668340011,
+        "no-accuracy": 2027808484,
+        "zero": 1788458156,
+        "miss": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,melzar_the_mad]",
+      "npc": "melzar_the_mad",
+      "seeds": {
+        "no-accuracy": 2654435769,
+        "hit": 1401181199,
+        "miss": 535203586,
+        "success": 3724842941,
+        "zero": 1261498123
+      }
+    },
+    {
+      "script": "[ai_opplayer2,count_draynor]",
+      "npc": "count_draynor",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_opplayer2,monk]",
+      "npc": "monk",
+      "seeds": {
+        "miss": 2654435769,
+        "no-accuracy": 2415085441,
+        "hit": 1309757500,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kolhuman]",
+      "npc": "kolhuman",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "hit": 774553914
+      }
+    },
+    {
+      "script": "[ai_applayer2,kolhuman]",
+      "npc": "kolhuman",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "hit": 774553914
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kologre]",
+      "npc": "kologre",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_applayer2,kologre]",
+      "npc": "kologre",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kolspider]",
+      "npc": "kolspider",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_applayer2,kolspider]",
+      "npc": "kolspider",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kolethereal]",
+      "npc": "kolethereal",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_applayer2,kolethereal]",
+      "npc": "kolethereal",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_opplayer2,koldemon]",
+      "npc": "koldemon",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_applayer2,koldemon]",
+      "npc": "koldemon",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_opplayer2,zamorak_mage]",
+      "npc": "zamorak_mage",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_applayer2,zamorak_mage]",
+      "npc": "zamorak_mage",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,saradomin_mage]",
+      "npc": "saradomin_mage",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_applayer2,saradomin_mage]",
+      "npc": "saradomin_mage",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,guthix_mage]",
+      "npc": "guthix_mage",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_applayer2,guthix_mage]",
+      "npc": "guthix_mage",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_opplayer2,nezikchened]",
+      "npc": "nezikchened",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
+      "script": "[ai_applayer2,nezikchened]",
+      "npc": "nezikchened",
+      "seeds": {
+        "no-accuracy": 2654435769
+      },
+      "distance": 2,
+      "unsupportedBranches": {
+        "hit": "At magic distance the native nezikchened_mage_attack spell has no magic_spell_table row; the wrapper aborts before accuracy.",
+        "zero": "The native spell-row lookup aborts before accuracy or damage.",
+        "miss": "The native spell-row lookup aborts before accuracy or damage."
+      }
+    },
+    {
+      "script": "[ai_opplayer2,san_tojalon]",
+      "npc": "san_tojalon",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,irvig_senay]",
+      "npc": "irvig_senay",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,ranalph_devere]",
+      "npc": "ranalph_devere",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,green_dragon]",
+      "npc": "green_dragon",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 2027808484
+      }
+    },
+    {
+      "script": "[ai_opplayer2,blessed_spider]",
+      "npc": "blessed_spider",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,trail_hard]",
+      "npc": "trail_hard",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
+      "script": "[ai_applayer2,trail_hard]",
+      "npc": "trail_hard",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
+      "script": "[ai_opplayer2,ghast_vis]",
+      "npc": "ghast_vis",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,_death_archer]",
+      "npc": "death_archer1",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,_troll_thrower]",
+      "npc": "death_troll_thrower1",
+      "seeds": {
+        "hit": 2654435769,
+        "zero": 535203586
+      },
+      "unsupportedBranches": {
+        "miss": "This bespoke route calls playerhit_n_ranged with a magnitude directly; it does not make an accuracy roll."
+      }
+    },
+    {
+      "script": "[ai_opplayer2,troll_champion]",
+      "npc": "troll_champion",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 4055616968
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kalphite_worker]",
+      "npc": "kalphite_worker",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "hit": 387276957
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kalphite_soldier]",
+      "npc": "kalphite_soldier",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kalphite_lord]",
+      "npc": "kalphite_lord",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 4055616968
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kalphite_worker_chamber]",
+      "npc": "kalphite_worker_chamber",
+      "seeds": {
+        "zero": 2654435769,
+        "miss": 1013904242,
+        "hit": 387276957
+      }
+    },
+    {
+      "script": "[ai_opplayer2,kalphite_lord_chamber]",
+      "npc": "kalphite_lord_chamber",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 4055616968
+      }
+    },
+    {
+      "script": "[ai_applayer2,kalphite_queen]",
+      "npc": "kalphite_queen",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "no-accuracy": 3668340011,
+        "zero": 3006791957
+      }
+    },
+    {
+      "script": "[ai_applayer2,kalphite_flyingqueen]",
+      "npc": "kalphite_flyingqueen",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "no-accuracy": 3668340011,
+        "zero": 3006791957
+      }
+    },
+    {
+      "script": "[ai_applayer2,regicide_darkelf]",
+      "npc": "regicide_darkelf",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,regicide_darkelf2]",
+      "npc": "regicide_darkelf2",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,regicide_old_camp_guard]",
+      "npc": "regicide_old_camp_guard",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,regicide_tyras_camp_guard]",
+      "npc": "regicide_tyras_camp_guard",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,regicide_tyras_guard]",
+      "npc": "regicide_tyras_guard",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,_vampire]",
+      "npc": "vampire_flyer",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 3668340011
+      }
+    },
+    {
+      "script": "[ai_applayer2,_snail]",
+      "npc": "mmsnailround_swamp",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242
+      },
+      "unsupportedBranches": {
+        "miss": "This bespoke route calls playerhit_n_ranged with a magnitude directly; it does not make an accuracy roll."
+      }
+    },
+    {
+      "script": "[ai_opplayer2,trail_hard2]",
+      "npc": "trail_hard2",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,trail_hard2]",
+      "npc": "trail_hard2",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
+      "script": "[ai_opplayer2,_dagannoth_mother]",
+      "npc": "horror_dagannoth_jr4",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,bronze_dragon]",
+      "npc": "bronze_dragon",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 2027808484
+      }
+    },
+    {
+      "script": "[ai_opplayer2,iron_dragon]",
+      "npc": "iron_dragon",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 2027808484
+      }
+    },
+    {
+      "script": "[ai_opplayer2,steel_dragon]",
+      "npc": "steel_dragon",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 2027808484
+      }
+    },
+    {
+      "script": "[ai_opplayer2,_slayer_aberrant_specter]",
+      "npc": "slayer_abberant_spectre_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 4055616968,
+        "zero": 2415085441
+      },
+      "equipment": "slayer_nosepeg"
+    },
+    {
+      "script": "[ai_applayer2,_slayer_aberrant_specter]",
+      "npc": "slayer_abberant_spectre_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 4055616968,
+        "zero": 2415085441
+      },
+      "equipment": "slayer_nosepeg"
+    },
+    {
+      "script": "[ai_opplayer2,slayer_banshee_1]",
+      "npc": "slayer_banshee_1",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      },
+      "equipment": "slayer_earmuffs"
+    },
+    {
+      "script": "[ai_opplayer2,slayer_nechryael]",
+      "npc": "slayer_nechryael",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 4055616968
+      }
+    },
+    {
+      "script": "[ai_opplayer2,_slayer_basilisk]",
+      "npc": "slayer_basilisk",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "equipment": "slayer_mirror_shield"
+    },
+    {
+      "script": "[ai_opplayer2,slayer_cockatrice]",
+      "npc": "slayer_cockatrice",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      },
+      "equipment": "slayer_mirror_shield"
+    },
+    {
+      "script": "[ai_opplayer2,slayer_dustdevil]",
+      "npc": "slayer_dustdevil",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      },
+      "equipment": "slayer_facemask"
+    },
+    {
+      "script": "[ai_opplayer2,_slayer_infernalmage]",
+      "npc": "slayer_infernal_mage_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,_slayer_infernalmage]",
+      "npc": "slayer_infernal_mage_1",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,icediamond_icewarrior]",
+      "npc": "icediamond_icewarrior",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "deserttreasure": 10,
+        "fd_icewarrior_subquest": 1
+      },
+      "npcVars": {
+        "npc_macro_event_target": "target"
+      }
+    },
+    {
+      "script": "[ai_applayer2,icediamond_icewarrior]",
+      "npc": "icediamond_icewarrior",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "deserttreasure": 10,
+        "fd_icewarrior_subquest": 1
+      },
+      "npcVars": {
+        "npc_macro_event_target": "target"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,blooddiamond_vampirewarrior]",
+      "npc": "blooddiamond_vampirewarrior",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 535203586
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target"
+      }
+    },
+    {
+      "script": "[ai_applayer2,blooddiamond_vampirewarrior]",
+      "npc": "blooddiamond_vampirewarrior",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 535203586
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,blooddiamond_vampirewarrior_unkillable]",
+      "npc": "blooddiamond_vampirewarrior_unkillable",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 535203586
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target"
+      }
+    },
+    {
+      "script": "[ai_applayer2,blooddiamond_vampirewarrior_unkillable]",
+      "npc": "blooddiamond_vampirewarrior_unkillable",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 535203586
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,fd_damis_normal]",
+      "npc": "fd_damis_normal",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "deserttreasure": 10,
+        "fd_shadowwarrior_quest": 3
+      }
+    },
+    {
+      "script": "[ai_opplayer2,fd_damis_tougher]",
+      "npc": "fd_damis_tougher",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      },
+      "playerVars": {
+        "deserttreasure": 10,
+        "fd_shadowwarrior_quest": 4
+      }
+    },
+    {
+      "script": "[ai_opplayer2,firediamond_firewarrior]",
+      "npc": "firediamond_firewarrior",
+      "seeds": {
+        "zero": 2654435769,
+        "hit": 1013904242,
+        "miss": 2415085441
+      }
+    },
+    {
+      "script": "[ai_opplayer2,fire_wizard]",
+      "npc": "fire_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 1788458156,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_applayer2,fire_wizard]",
+      "npc": "fire_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 1788458156,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_opplayer2,water_wizard]",
+      "npc": "water_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 1788458156,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_applayer2,water_wizard]",
+      "npc": "water_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 1788458156,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_opplayer2,earth_wizard]",
+      "npc": "earth_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 1788458156,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_applayer2,earth_wizard]",
+      "npc": "earth_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "hit": 1788458156,
+        "zero": 2710938699
+      }
+    },
+    {
+      "script": "[ai_opplayer2,air_wizard]",
+      "npc": "air_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "zero": 1788458156,
+        "hit": 3189639355
+      }
+    },
+    {
+      "script": "[ai_applayer2,air_wizard]",
+      "npc": "air_wizard",
+      "seeds": {
+        "success": 2654435769,
+        "miss": 1013904242,
+        "zero": 1788458156,
+        "hit": 3189639355
+      }
+    },
+    {
+      "script": "[ai_opplayer2,slayer_killerwatt]",
+      "npc": "slayer_killerwatt",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_applayer2,slayer_killerwatt]",
+      "npc": "slayer_killerwatt",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      }
+    }
+  ]
+}

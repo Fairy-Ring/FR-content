@@ -62,6 +62,7 @@ while ($x < 4) {
     $x = calc($x + 1);
 }
 if ($record = 1) {
+    if (~swamp_cave_inside(coord) = true & ~swamp_cave_inside(region_getcoord(0, 8, 10)) = false) ~swamp_cave_release;
     p_telejump(region_getcoord(0, 8, 10));
     ~wanted_record_actor(region_getcoord(0, 12, 12), wanted_solus_for_cutscene, region_getcoord(0, 12, 16));
     ~wanted_record_actor(region_getcoord(0, 12, 16), wanted_lord_daquarius_for_cutscene, region_getcoord(0, 12, 12));
@@ -70,6 +71,7 @@ if ($record = 1) {
     cam_moveto(region_getcoord(0, 12, 7), 650, 232, 232);
     cam_lookat(region_getcoord(0, 12, 15), 100, 232, 232);
 } else {
+    if (~swamp_cave_inside(coord) = true & ~swamp_cave_inside(region_getcoord(0, 8, 4)) = false) ~swamp_cave_release;
     p_telejump(region_getcoord(0, 8, 4));
     ~wanted_record_actor(region_getcoord(0, 10, 7), wanted_solus_for_cutscene, region_getcoord(0, 12, 7));
     ~wanted_record_actor(region_getcoord(0, 12, 7), wanted_zammy_mage_for_cutscene, region_getcoord(0, 10, 7));
