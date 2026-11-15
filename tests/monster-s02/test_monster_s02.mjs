@@ -10,6 +10,7 @@ const engine = process.env.HARNESS_ENGINE_DIR ?? path.resolve(here, '../../../en
 const pack = process.env.HARNESS_PACK_DIR ?? path.join(engine, 'data/pack');
 const load = async relative => import(pathToFileURL(path.join(engine, relative)).href);
 const World = (await load('src/engine/World.ts')).default;
+const mapGeometry = await load('src/engine/GameMap.ts');
 const ScriptProvider = (await load('src/engine/script/ScriptProvider.ts')).default;
 const ScriptRunner = (await load('src/engine/script/ScriptRunner.ts')).default;
 const ScriptState = (await load('src/engine/script/ScriptState.ts')).default;
@@ -334,16 +335,18 @@ for (const [boots, suppressed, choices, enters, remembers] of [
   [false, true, [1, 1], false, true], [false, true, [1, 2], true, true]
 ]) {
   const { player } = fixture();
-  player.level = 2; player.x = 3110; player.z = 3361;
+  player.level = 2; player.x = 3110; player.z = 3363;
   player.setVarBit(portalBit, 1);
   player.setVarBit(warningBit, Number(suppressed));
   if (boots) wear(player, 'slayer_boots');
   dialogue(player, start('[oploc1,draynor_killerwatt_portal]', player, loc('draynor_killerwatt_portal', 2, 3110, 3362)), [...choices]);
-  check(`portal boots=${boots} suppressed=${suppressed} choices=${choices} destination`, [player.level, player.x, player.z], enters ? [2, 2677, 5214] : [2, 3110, 3361]);
+  check(`portal boots=${boots} suppressed=${suppressed} choices=${choices} destination`, [player.level, player.x, player.z], enters ? [2, 2677, 5214] : [2, 3110, 3363]);
   check('only explicit suppression changes warning choice', player.getVarBit(warningBit), Number(remembers));
   if (enters) {
     run('[oploc1,draynor_killerwatt_portal2]', player, loc('draynor_killerwatt_portal2', 2, 2678, 5214));
-    check('home portal returns to manor beside the rift', [player.level, player.x, player.z], [2, 3110, 3361]);
+    check('home portal returns to manor beside the rift', [player.level, player.x, player.z], [2, 3110, 3363]);
+    check('home portal return tile is unblocked', mapGeometry.isMapBlocked(player.x, player.z, player.level), false);
+    check('home portal return can reach the natural manor rift', mapGeometry.reachedLoc(player.level, player.x, player.z, 3110, 3362, hidden.width, hidden.length, 1, 0, 10, hidden.forceapproach), true);
   }
 }
 {
