@@ -73,6 +73,7 @@ if (%macro_event = ^macro_lost_and_found &
     ~inzone_coord_pair_table(random_event_lost_and_found_zones, $coord) = false) {
     ~macro_event_cleanup(%macro_event, %macro_event_uid);
 }
+if (~swamp_cave_inside(coord) = true & ~swamp_cave_inside($coord) = false) ~swamp_cave_release;
 p_telejump($coord);
 cam_reset;
 anim(null, 0);

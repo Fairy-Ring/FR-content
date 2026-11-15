@@ -16,6 +16,8 @@ export const ScriptState = await defaultExport('engine/script/ScriptState.ts');
 export const ServerTriggerType = await defaultExport('engine/script/ServerTriggerType.ts');
 export const { PlayerStat } = await load('engine/entity/PlayerStat.ts');
 export const map = await load('engine/GameMap.ts');
+export const { PlayerTimerType } = await load('engine/entity/EntityTimer.ts');
+export const engineModule = load;
 export const types = {};
 export const { CollisionType } = await load('engine/routefinder/index.ts');
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType', 'ObjType', 'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType', 'SeqType', 'SpotanimType', 'MesanimType', 'DbTableType', 'DbRowType', 'HuntType', 'IdkType', 'Component', 'FontType']) {
@@ -210,4 +212,22 @@ export function settle(p, maxTicks = 160) {
     tick(p);
   }
   assert.fail(`player did not settle: active=${p.activeScript?.execution} weak=${weakCount(p)}`);
+}
+
+// SC-03 needs the real World player phases, including both kinds of timer and
+// queued zone callbacks. Keep the older delay/dialogue-only tick unchanged.
+export function environmentTick(...players) {
+  for (const p of players) p.resetEntity(false);
+  World.currentTick++;
+  for (const p of players) {
+    if (p.delayed && World.currentTick >= p.delayedUntil) p.delayed = false;
+    if (!p.delayed && p.activeScript?.execution === ScriptState.SUSPENDED) p.executeScript(p.activeScript, true, true);
+    p.processQueues();
+    if (!p.loggingOut) {
+      p.processTimers(PlayerTimerType.NORMAL);
+      p.processTimers(PlayerTimerType.SOFT);
+    }
+    p.processEngineQueue();
+    p.processInteraction();
+  }
 }

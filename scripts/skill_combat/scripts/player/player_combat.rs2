@@ -68,6 +68,7 @@ switch_int ($damagetype) {
 }
 
 [proc,player_in_combat_check]()(boolean)
+if (~swamp_cave_can_attack = false) return(false);
 // npc_forcemulti: treat as multi even outside multiway (274 player_combat; Draugen etc.)
 if (map_multiway(npc_coord) = false & nc_param(npc_type, npc_forcemulti) = ^false) {
     // player has been attacked in the last 8 ticks, and not by the current npc
@@ -103,6 +104,7 @@ return(true);
 
 // mage arena and crumble undead use this for no discenerable reason
 [proc,player_in_combat_check2]()(boolean)
+if (~swamp_cave_can_attack = false) return(false);
 if (map_multiway(npc_coord) = false & nc_param(npc_type, npc_forcemulti) = ^false) {
     // "I'm already under attack" with no period:
     // - 2004: https://web.archive.org/web/20130303093547/http://img86.exs.cx/img86/271/80mage.jpg
