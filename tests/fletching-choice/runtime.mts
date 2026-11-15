@@ -124,7 +124,7 @@ function quantity(p: Player, root: string, product: number, n: number): void {
   const offset = n === 1 ? 3 : n === 5 ? 2 : n === 10 ? 1 : 0;
   click(
     p,
-    `${root}:com_${(root === "skillmulti2" ? 4 : 5) + product * 4 + offset}`,
+    `${root}:com_${(root === "glass_crafting" ? product : (root === "skillmulti2" ? 4 : 5) + product * 4) + offset}`,
   );
   if (offset === 0) {
     assert.equal(p.activeScript?.execution, ScriptState.COUNTDIALOG);
@@ -265,10 +265,30 @@ function assertSkillmulti3Menu(p: Player): void {
   }
 }
 
+function assertGlassMenu(p: Player): void {
+  const root = Component.get(component("glass_crafting"));
+  assert.equal(p.modalMain, root.id, "original glass interface is open");
+  for (const base of [18, 10, 14]) {
+    const buttons = [0, 1, 2, 3].map((offset) => {
+      const id = component(`glass_crafting:com_${base + offset}`);
+      const child = Component.get(id);
+      const index = root.childId!.indexOf(id);
+      assert(index >= 0, "glass button belongs to original interface");
+      assert.equal(child.buttonType, Component.BUTTON);
+      const x = root.childX![index];
+      const y = root.childY![index];
+      assert(x >= 0 && y >= 0 && x + child.width <= root.width && y + child.height <= root.height);
+      return { option: child.option, bounds: [x, y, child.width, child.height] };
+    });
+    assert.deepEqual(buttons.map((entry) => entry.option), ["Make X", "Make 10", "Make 5", "Make 1"]);
+    for (const entry of buttons) assert.deepEqual(entry.bounds, buttons[0].bounds, "all four glass options share a hitbox");
+  }
+}
+
 type CraftRecipe = [
   family: "glass" | "pottery" | "dhide",
   product: string,
-  selection: number,
+  selection: number, // Glass Make X component; skillmulti3 product index otherwise.
   input: string,
   per: number,
   xp: number,
@@ -435,9 +455,9 @@ try {
 
   // Period batch menus: real callers, every product, every quantity layer.
   const crafts: CraftRecipe[] = [
-    ["glass", "beer_glass", 0, "molten_glass", 1, 175, 1],
-    ["glass", "vial_empty", 1, "molten_glass", 1, 350, 33],
-    ["glass", "stafforb", 2, "molten_glass", 1, 525, 46],
+    ["glass", "beer_glass", 18, "molten_glass", 1, 175, 1],
+    ["glass", "vial_empty", 10, "molten_glass", 1, 350, 33],
+    ["glass", "stafforb", 14, "molten_glass", 1, 525, 46],
     ["pottery", "pot_unfired", 0, "softclay", 1, 63, 1],
     ["pottery", "piedish_unfired", 1, "softclay", 1, 150, 7],
     ["pottery", "bowl_unfired", 2, "softclay", 1, 180, 8],
@@ -447,13 +467,16 @@ try {
   ];
   for (const recipe of crafts) {
     const [family, product, selection, input, per, xp, level] = recipe;
+    const root = family === "glass" ? "glass_crafting" : "skillmulti3";
+    const makeTen = `${root}:com_${family === "glass" ? selection + 1 : 6 + selection * 4}`;
     for (const requested of [1, 5, 10, 3, 28, 0, -2]) {
       const p = player();
       const before = p.stats[PlayerStat.CRAFTING];
       const state = beginCraft(p, recipe);
-      assert.equal(state.execution, ScriptState.PAUSEBUTTON, `${family} menu`);
-      assertSkillmulti3Menu(p);
-      quantity(p, "skillmulti3", selection, requested);
+      assert.equal(state.execution, family === "glass" ? ScriptState.FINISHED : ScriptState.PAUSEBUTTON, `${family} menu`);
+      if (family === "glass") assertGlassMenu(p);
+      else assertSkillmulti3Menu(p);
+      quantity(p, root, selection, requested);
       const made = Math.max(0, Math.min(requested, Math.floor(24 / per)));
       assert.equal(inventory(p, product), made, `${product} Make ${requested}`);
       assert.equal(inventory(p, input), 24 - made * per);
@@ -471,7 +494,7 @@ try {
       const p = player();
       beginCraft(p, recipe);
       if (afterFirst) {
-        click(p, `skillmulti3:com_${6 + selection * 4}`);
+        click(p, makeTen);
         for (let i = 0; i < 20 && !inventory(p, product); i++) tick(p);
         assert.equal(inventory(p, product), 1, `${family} first batch action`);
       }
@@ -490,7 +513,7 @@ try {
         : []) {
       const p = player();
       beginCraft(p, recipe);
-      click(p, `skillmulti3:com_${6 + selection * 4}`);
+      click(p, makeTen);
       for (let i = 0; i < 20 && !inventory(p, product); i++) tick(p);
       assert.equal(inventory(p, product), 1);
       p.invDel(InvType.getId("inv"), id(remove), inventory(p, remove));
@@ -503,7 +526,7 @@ try {
       const p = player();
       p.levels[PlayerStat.CRAFTING] = level - 1;
       beginCraft(p, recipe);
-      quantity(p, "skillmulti3", selection, 5);
+      quantity(p, root, selection, 5);
       assert.equal(inventory(p, input), 24, `${product} level refusal`);
       assert.equal(inventory(p, product), 0);
       assert.equal(p.stats[PlayerStat.CRAFTING], 130344310);
@@ -511,7 +534,7 @@ try {
       const threshold = player();
       threshold.levels[PlayerStat.CRAFTING] = level;
       beginCraft(threshold, recipe);
-      quantity(threshold, "skillmulti3", selection, 1);
+      quantity(threshold, root, selection, 1);
       assert.equal(inventory(threshold, product), 1, `${product} threshold`);
       assert.equal(threshold.stats[PlayerStat.CRAFTING] - 130344310, xp);
       checks++;
