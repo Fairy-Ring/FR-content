@@ -178,11 +178,22 @@ await run(async () => {
     tick(wrongPhase);
     assert.equal(high(wrongPhase), 1, 'S13 unpaid callbacks never consume the collapse half');
     assert.equal(queuedHits(wrongPhase).length, 0);
-    const crypt = fixture(); pay(crypt); crypt.level = 3;
-    const cryptBefore = high(crypt); tick(crypt);
+    const crypt = fixture(); pay(crypt);
+    const cryptBefore = high(crypt);
+    runner.procVoid(crypt, 'barrows_prayer_set', [constant('countdown_max')]);
+    crypt.packets.length = 0;
+    assert.equal(runner.procInt(crypt, 'barrows_tunnel_exit'), 1, 'paid player uses the actual tunnel-to-crypt transition');
+    assert.equal(crypt.level, 3, 'the selected ladder returns to a crypt');
+    assert.equal(camera(crypt).filter(packet => packet.constructor.name === 'CamReset').length, 1,
+      'the tunnel-to-crypt state change resets the camera exactly once');
+    const transitionPackets = camera(crypt).length;
+    const twentyTicks = 20;
+    for (let elapsed = 0; elapsed < twentyTicks; elapsed++) tick(crypt);
     assert.equal(high(crypt), cryptBefore, 'S13 paid crypt callbacks do not consume tunnel-collapse ticks');
     assert.equal(queuedHits(crypt).length, 0);
+    assert.equal(camera(crypt).length, transitionPackets, 'twenty paid crypt ticks send no repeated camera reset or shake');
     console.log('PASS S13 exact saved countdown, independent halves, native busy NORMAL access, named chance and every uniform inclusive hit rank, paid/tunnel gates');
+    console.log(`PASS preliminary 3 paid crypt camera: transition resets=1, ticks=${twentyTicks}, repeated camera packets=0`);
 
     const effect = p => ({ levels: [...p.levels], energy: p.runenergy, special: p.getVar(VarPlayerType.getId('sa_energy')), hit: [p.hitmarkSlot, p.hitmarkDamage, p.hitmarkType, p.hitmark2Damage, p.hitmark2Type, p.masks], packets: [...p.packets], death: [...p.queue.all()].filter(request => request.script.name === '[queue,player_death_default]').map(request => request.args) });
     for (let amount = minHit; amount <= maxHit; amount++) {

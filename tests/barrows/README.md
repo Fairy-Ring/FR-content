@@ -208,6 +208,8 @@ The canonical CANDIDATE D9 hook reuses `barrows_leave` before the first ordinary
 
 The 5..6 range is CANDIDATE early-2007 evidence, not exact 377 arithmetic. Interval, chance, uniform amount distribution and inherited shake parameters are UNKNOWN engineering names in `barrows.constant`.
 
+The paid tunnel-to-crypt transition sends one camera reset through the existing presentation cleanup. Twenty subsequent crypt ticks send no camera reset or shake. The saved collapse remainder and queued-hit guards remain unchanged. This preliminary 3 packet-count case fails on the previous per-tick reset, which sent twenty additional resets.
+
 ## Loot then leave (S14)
 
 ```sh

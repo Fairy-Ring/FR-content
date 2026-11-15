@@ -4,10 +4,8 @@ if (~barrows_phase = ^barrows_phase_paid & ~barrows_in_tunnels(coord) = true) ~b
 
 [proc,barrows_collapse_tick]
 if (~barrows_phase ! ^barrows_phase_paid) return;
-if (~barrows_in_tunnels(coord) = false) {
-    cam_reset;
-    return;
-}
+// Tunnel exit and logout already reset the camera at their state transition.
+if (~barrows_in_tunnels(coord) = false) return;
 def_int $remaining = ~barrows_collapse_remaining;
 if ($remaining = 1) {
     ~barrows_collapse_set(^barrows_collapse_interval_ticks);
