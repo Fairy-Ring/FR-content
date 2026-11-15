@@ -1,0 +1,185 @@
+#!/usr/bin/env node
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { createRequire } from 'node:module';
+import { pathToFileURL } from 'node:url';
+import { createRunner, loadPackedRuntime, parseOptions, run } from './packed.mjs';
+
+await run(async () => {
+  const runtime = await loadPackedRuntime(parseOptions());
+  const { World, Player, NpcType, VarPlayerType, VarNpcType, InvType, ObjType, ScriptProvider,
+    ScriptRunner, ScriptState, CoordGrid } = runtime;
+  const eng = relative => import(pathToFileURL(path.join(runtime.engineRoot, relative)).href);
+  const [{ default: ServerTriggerType }, { default: Packet }, { PlayerLoading }, { ScriptOpcode },
+    { default: VarSharedType }] = await Promise.all([
+    eng('src/engine/script/ServerTriggerType.ts'), eng('src/io/Packet.ts'),
+    eng('src/engine/entity/PlayerLoading.ts'), eng('src/engine/script/ScriptOpcode.ts'), eng('src/cache/config/VarSharedType.ts')
+  ]);
+  VarSharedType.load(runtime.packDir);
+  World.vars = new Int32Array(VarSharedType.count);
+  const { unzipSync } = createRequire(path.join(runtime.engineRoot, 'package.json'))('fflate');
+  const maps = unzipSync(fs.readFileSync(path.join(runtime.packDir, '.cache/maps-server.zip')));
+  World.gameMap.zonemap.beginInitialization();
+  const square = Object.fromEntries(['m', 'l', 'n', 'o'].map(kind => [kind, maps[`${kind}55_151`] ?? new Uint8Array()]));
+  World.gameMap.packed.set((55 << 8) | 151, square);
+  World.gameMap.loadPackedMapsquare(square, 55 << 6, 151 << 6);
+  World.gameMap.zonemap.endInitialization();
+
+  const constants = new Map([...fs.readFileSync(path.join(runtime.contentRoot,
+    'scripts/minigames/game_barrows/configs/barrows.constant'), 'utf8').matchAll(/^\^([a-z0-9_]+)\s*=\s*(-?\d+)\s*$/gm)]
+    .map(([, name, value]) => [name, Number(value)]));
+  const c = name => { assert(constants.has(name), `named Barrows constant ${name}`); return constants.get(name); };
+  const vars = Object.fromEntries(['barrows', 'barrows_kills', 'barrows_state', 'barrows_generation', 'barrows_countdowns']
+    .map(name => [name, VarPlayerType.getId(name)]));
+  for (const [name, id] of Object.entries(vars)) assert.notEqual(id, -1, `packed lifecycle var ${name}`);
+  const ownerVar = VarNpcType.getId('npc_barrows_owner');
+  const generationVar = VarNpcType.getId('npc_barrows_generation');
+  const timer = ScriptProvider.getByName('[timer,barrows_timer_tick]');
+  assert(timer, 'compiled one-tick Barrows timer');
+  const runner = createRunner(runtime, { prefix: 'barrows_lifecycle' });
+  const players = [];
+  const inv = InvType.getId('inv');
+  const worn = InvType.getId('worn');
+  const words = p => Object.fromEntries(Object.entries(vars).map(([name, id]) => [name, p.getVar(id) >>> 0]));
+  const range = (word, name) => ((word >>> 0) >>> c(`barrows_${name}_start`))
+    & (2 ** (c(`barrows_${name}_end`) - c(`barrows_${name}_start`) + 1) - 1);
+  const brotherCount = p => {
+    let mask = range(p.getVar(vars.barrows_kills), 'slain');
+    let count = 0;
+    while (mask) { mask &= mask - 1; count++; }
+    return count;
+  };
+  const inventory = p => [...p.invs].map(([id, container]) => [id, Array.from({ length: container.capacity }, (_, slot) => {
+    const item = container.get(slot);
+    return item ? [item.id, item.count] : null;
+  })]).sort(([a], [b]) => a - b);
+  const loopKey = p => 0x7a000000n + BigInt(p.slot);
+  function wire(p) {
+    p.messages = []; p.packets = [];
+    p.write = packet => p.packets.push(packet);
+    p.messageGame = message => p.messages.push(message);
+    p.wrappedMessageGame = message => p.messages.push(message);
+    p.getInventory(worn);
+  }
+  function register(p) {
+    p.isActive = true;
+    World.players[p.slot] = p;
+    World.playerLoop.add(loopKey(p), p);
+    players.push(p);
+    return p;
+  }
+  function makePlayer(label, level = 3, x = 3556, z = 9714) {
+    const serial = players.length + 1;
+    const p = new Player(`barrows_lifecycle_${label}`, BigInt(serial), 0x1b0000000000000n + BigInt(serial));
+    p.slot = p.pid = serial;
+    p.uid = (Number(p.username37 & 0x1fffffn) << 11) | serial;
+    p.baseLevels.fill(99); p.levels.fill(99);
+    p.lastMovement = 0;
+    wire(p);
+    register(p);
+    p.teleport(x, z, level);
+    return p;
+  }
+  function unregister(p) {
+    if (World.players[p.slot] === p) delete World.players[p.slot];
+    if (p.isActive) p.unlink();
+    p.isActive = false;
+  }
+  function restore(source, saved) {
+    const p = PlayerLoading.load(source.username, new Packet(saved), null);
+    p.slot = source.slot; p.pid = source.pid; p.uid = source.uid;
+    wire(p);
+    return register(p);
+  }
+  function lifecycle(p, name) {
+    const type = name === 'login' ? ServerTriggerType.LOGIN : ServerTriggerType.LOGOUT;
+    const script = ScriptProvider.getByTriggerSpecific(type, -1, -1);
+    assert.equal(script?.name, `[${name},_]`, `native shared ${name} trigger lookup`);
+    const state = ScriptRunner.init(script, p);
+    assert.equal(p.runScript(state, true), ScriptState.FINISHED, `native shared ${name} completes`);
+    assert.equal(state.execution, ScriptState.FINISHED);
+    assert.equal(p.activeScript, null);
+    assert.equal(p.protect, false);
+    assert.equal(p.delayed, false);
+  }
+  function noBarrowsRandom(label, action) {
+    const original = ScriptRunner.HANDLERS[ScriptOpcode.RANDOM];
+    const calls = [];
+    ScriptRunner.HANDLERS[ScriptOpcode.RANDOM] = state => {
+      if (/^\[[^,]+,barrows_/.test(state.script.name)) calls.push(state.script.name);
+      original(state);
+    };
+    try {
+      const result = action();
+      assert.deepEqual(calls, [], `${label}: no Barrows identity, topology, encounter or reward draw`);
+      return result;
+    } finally { ScriptRunner.HANDLERS[ScriptOpcode.RANDOM] = original; }
+  }
+  function spawn(p, typeName, x, z) {
+    const handle = runner.procInt(p, 'barrows_actor_spawn', [NpcType.getId(typeName),
+      CoordGrid.packCoord(p.level, x, z), c('barrows_crypt_summon_lifetime')]);
+    const actor = World.getNpcByUid(handle);
+    assert(actor?.isActive, 'real constructor supplies a living crypt actor');
+    assert.equal(actor.getVar(ownerVar), p.uid);
+    assert.equal(actor.getVar(generationVar), p.getVar(vars.barrows_generation));
+    return actor;
+  }
+  function begin(p) {
+    assert.equal(runner.procInt(p, 'barrows_run_begin'), 1);
+    runner.procVoid(p, 'barrows_prayer_set', [c('barrows_prayer_interval_ticks') - 2]);
+    runner.procVoid(p, 'barrows_resume');
+    assert.equal(p.timers.get(timer.id)?.interval, 1, 'native presentation starts one repeating tick');
+  }
+
+  try {
+    const a = makePlayer('crypt');
+    const b = makePlayer('control');
+    begin(a); begin(b);
+    const earnedType = NpcType.getId('barrows_ahrim');
+    const earnedLevel = runner.procInt(a, 'barrows_npc_level', [earnedType]);
+    runner.procVoid(a, 'barrows_credit', [a.getVar(vars.barrows_generation), earnedType, earnedLevel]);
+    assert.equal(brotherCount(a), 1, 'S15 positive control has one earned brother');
+    assert.equal(range(a.getVar(vars.barrows_kills), 'count'), 1, 'S15 positive control has one displayed kill');
+    a.invAdd(inv, ObjType.getId('spade'), 1);
+    const actor = spawn(a, 'barrows_dharok', 3557, 9714);
+    const control = spawn(b, 'barrows_dharok', 3555, 9714);
+    const mapActor = runner.addNpc('barrows_rat', 3, null, 3556, 9716).npc;
+    const savedWords = words(a);
+    const savedInventory = inventory(a);
+    const controlWords = words(b);
+    const tile = [a.level, a.x, a.z];
+    a.packets.length = b.packets.length = 0;
+    noBarrowsRandom('S15 clean crypt logout', () => lifecycle(a, 'logout'));
+    assert.equal(actor.isActive, false, 'S15 shared crypt logout removes the live owned brother');
+    assert.equal(control.isActive, true, 'S15 shared crypt logout keeps the foreign-owner live brother');
+    assert.equal(mapActor.isActive, true, 'S15 ordinary unowned map actor survives');
+    assert.deepEqual(words(a), savedWords, 'S15 crypt logout preserves every durable word, including whole earned credit');
+    assert.deepEqual(inventory(a), savedInventory, 'S15 crypt logout grants no item');
+    assert.deepEqual(words(b), controlWords, 'S15 control owner has no durable mutation');
+    assert.equal(a.timers.has(timer.id), false, 'S15 crypt logout stops the runtime timer');
+    assert(a.packets.some(packet => packet.constructor.name === 'HintArrow' && packet.type === -1), 'S15 logout clears the owner hint');
+    assert.equal(b.packets.length, 0, 'S15 foreign owner receives no cleanup packet');
+    assert(![...a.queue.all()].some(request => request.script.name === '[queue,barrows_credit_kill]'), 'S15 actor removal queues no kill credit');
+    const saved = a.save();
+    unregister(a);
+    World.currentTick += c('barrows_prayer_interval_ticks') * 4;
+    const relog = restore(a, saved);
+    assert.deepEqual(words(relog), savedWords, 'S15 native save/load retains every durable word offline');
+    noBarrowsRandom('S15 shared crypt login', () => lifecycle(relog, 'login'));
+    assert.deepEqual(words(relog), savedWords, 'S15 shared crypt login restores exact identity, phase, generation, layout, credit and remainder');
+    assert.deepEqual([relog.level, relog.x, relog.z], tile, 'S15 clean relog retains the same crypt');
+    assert.deepEqual(inventory(relog), savedInventory, 'S15 clean relog pays nothing');
+    assert.equal(brotherCount(relog), 1, 'S15 B remains one, not the removed live brother');
+    assert.equal(relog.timers.get(timer.id)?.interval, 1, 'S15 shared login rebuilds the one-tick presentation timer');
+    assert.equal(actor.isActive, false, 'S15 login cannot resurrect a session-only actor');
+    assert.equal(control.isActive, true, 'S15 foreign actor remains the positive survival control after login');
+    const retry = spawn(relog, 'barrows_dharok', 3557, 9714);
+    assert.notEqual(retry, actor, 'S15 uncredited actor can be recreated in the same preserved run');
+    assert.deepEqual(words(relog), savedWords, 'S15 actor recreation cannot credit its own removal');
+    console.log('PASS S15 native shared crypt logout/save/load/login: exact durable words and earned B=1, actor-only cleanup, foreign/map controls, no RNG or payment, exact saved remainder and retry');
+  } finally {
+    for (const npc of [...World.npcs]) if (npc.isActive) World.removeNpc(npc, -1);
+    for (const p of players) unregister(p);
+  }
+});

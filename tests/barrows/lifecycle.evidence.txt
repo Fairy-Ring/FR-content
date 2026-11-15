@@ -1,0 +1,37 @@
+Group 4 lifecycle proofs. Evidence root: U-BARROWS-1113/b4 (operator evidence storage).
+Original artifacts with account names or host paths stay outside the repository.
+
+S15 native crypt lifecycle, 2026-11-15. No product change.
+Shared native logout, player save/load and shared native login; earned B=1 and exact five-word preservation; foreign owner and map-actor controls; no Barrows RNG; actor-only cleanup and no-payment retry.
+logs/ci-s15/29-tests_barrows_test_lifecycle.mjs.log
+SHA-256 2fdb2cc4db22abdac712fcdb63dd2430b22d7fb3731a8b44b2942bde17939133
+
+S15 omit owned-actor cleanup mutant:
+logs/s15-mutant-actor-red.log
+SHA-256 96b26e68c930366ba42032b69de644169efe53e90d04b41d4090e8886cb8b2c6
+Fails S15 shared crypt logout removes the live owned brother.
+
+S15 clear earned credit on logout mutant:
+logs/s15-mutant-credit-red.log
+SHA-256 58399bbdcbbd3b7032f95f3353c53382a90fd875055c6d78fc293e8d54027461
+Fails S15 crypt logout preserves every durable word, including whole earned credit.
+
+S15 redraw topology on login mutant:
+logs/s15-mutant-redraw-red.log
+SHA-256 3e097c5277267178489876a687361e302d36e193e214a1491599811139431eb3
+Fails S15 shared crypt login: no Barrows identity, topology, encounter or reward draw.
+Both mutated product files restored exactly: logs/s15-mutants-restored.log.
+
+S15 required gates: logs/s15-gates.log and logs/s15-ci.log.
+Clean pack, build, rs2check, all 99 registered tests, varp transmission and client-byte equality exit 0.
+Client/config SHA-256 b6ec704421650ee5527e77c635b8b3a8036f6eb042c572516ac0696cfbce19a8.
+
+S15 headed natural live: PASS, all 11 checks.
+Content d04ce48a53ebee1ec3f2fc1bb6577ec469c78300; engine 15301127e60ff6ef3d7d2547b084de15fb565338; cell 73c5fd7b897ad91b208b77d1b20b273d78fa5f09.
+live/s15-quiet/S15-new-1794737214307.json
+SHA-256 0b2515fc7e67d433ad804091db9e55ddf7dc25cd107b46bf14e60a449993b5a3.
+Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
+Own-only fixtures: access, spade, hill position, combat stats, equipment and food.
+Natural first Dig; Ahrim killed for earned B=1; different Dharok crypt Search raises a living resident; ordinary Walk behind the real coffin; quiet native hitmark interval; native clean logout/login; preserved credit and same crypt; resident absent; Search recreates that uncredited resident as the positive control. No reward is paid.
+All 18 PNGs viewed. Old-client model defects do not hide the coffin, live actor, hint, combat bar, kill count, or successful logout/retry.
+Two initial fixture failures remain in live/s15 and live/s15-started with their receipts and pictures; both precede the product logout predicate. Exact classes, corrections and hashes are in impl.md.

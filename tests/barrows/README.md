@@ -229,3 +229,14 @@ The merged campaign login retains the published camera clears before `barrows_re
 The first unchanged cell exhausted its own escape food after its relog predicates passed. The approved replacement imports the existing common modules. All eight inherited S13 checks and all four observation helpers remain byte-identical. It adds only the established S14 own-food provision and native Walk/Open/Eat escape.
 
 `merged-login.evidence.txt` identifies both retained receipts. The starting-head build, rs2check, all 98 registered checks, varp transmission and client-byte equality passed. This proof changes no product script.
+
+## Crypt logout lifecycle (S15)
+
+```sh
+node --import tsx ../content/tests/barrows/test_lifecycle.mjs
+```
+
+This proof-only slice executes the real shared logout/login triggers around native player save/load. A crypt owner has earned one brother, a second living uncredited brother and an exact saved timer remainder. Logout removes the live owned actor without credit or payment, stops presentation, preserves every durable word and leaves a foreign owner's fields, actor and packets and an unowned map actor unchanged. Login restores the same crypt and remainder without Barrows RNG; offline time consumes no ticks. Recreating the uncredited actor grants no credit.
+
+Separate mutants omit actor cleanup, erase earned credit and redraw topology on login. Each fails its named new assertion. `lifecycle.evidence.txt` identifies the retained native output, red logs and gates; this adds no product lifecycle policy.
+
