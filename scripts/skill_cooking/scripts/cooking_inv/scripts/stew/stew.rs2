@@ -14,6 +14,7 @@ switch_obj (last_useitem) {
 };
 
 [opheldu,spicespot]
+if (~dt_blood_pot(last_useitem) = true) { ~dt_blood_mix(last_useitem, last_item); return; }
 switch_obj (last_useitem) {
     case uncooked_stew : @make_curry;
 };

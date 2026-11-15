@@ -164,6 +164,7 @@ jobs:
           run_test tests/cfg-npc/test_cfg_npc.mjs node --import tsx ../content/tests/cfg-npc/test_cfg_npc.mjs
           # Built combat vectors and checker self-tests use the native pack; no server or vault.
           run_test tests/npc-combat/test_npc_combat.mjs node --import tsx ../content/tests/npc-combat/test_npc_combat.mjs
+          run_test tests/poison-rule/test_poison_rule.mjs node --import tsx ../content/tests/poison-rule/test_poison_rule.mjs
           run_test tests/spawn-repair/test_spawn_repair.mjs node --import tsx ../content/tests/spawn-repair/test_spawn_repair.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs
           run_test tests/wanted/commorb.mjs node --import tsx ../content/tests/wanted/commorb.mjs
@@ -171,6 +172,7 @@ jobs:
           run_test tests/wanted/records.mjs node --import tsx ../content/tests/wanted/records.mjs
           run_test tests/drop-tables/test_kalphite_queen.mjs node --import tsx ../content/tests/drop-tables/test_kalphite_queen.mjs
           run_test tests/fenkenstrain-completion/test_fenk_handlers.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_handlers.mjs
+          run_test tests/fenkenstrain-completion/test_fenk_head_gate.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_head_gate.mjs
           run_test tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs
           run_test tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs
           run_test tests/fenkenstrain-completion/test_fenk_gardener_move.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
@@ -187,6 +189,8 @@ jobs:
           run_test tests/desert-treasure/test_s5_contract.py python3 ../content/tests/desert-treasure/test_s5_contract.py
           run_test tests/desert-treasure/s5_death_runtime.mts bash ../content/tests/desert-treasure/s5_death_runtime.sh "$PWD"
           run_test tests/desert-treasure/test_s6_contract.py python3 ../content/tests/desert-treasure/test_s6_contract.py
+          run_test tests/desert-treasure/test_s4_contract.py python3 ../content/tests/desert-treasure/test_s4_contract.py
+          run_test tests/desert-treasure/test_s4_effects.mjs node --import tsx ../content/tests/desert-treasure/test_s4_effects.mjs
           run_test tests/desert-treasure/test_s2_contract.py python3 ../content/tests/desert-treasure/test_s2_contract.py
           # CI: real packed elemental attacks, published-bytecode controls and isolated mutants; no server.
           run_test tests/desert-treasure/test_elemental.mjs node --import tsx ../content/tests/desert-treasure/test_elemental.mjs

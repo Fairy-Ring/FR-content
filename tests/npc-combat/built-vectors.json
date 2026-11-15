@@ -307,6 +307,23 @@
             ]
           }
         },
+        "param:poison_without_damage": {
+          "value": 1,
+          "unit": "U-POISONRULE-1114",
+          "evidence": {
+            "facts": [
+              "poison.npc-attack-trigger"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "c80e17aebe61a9b3bfc6b51d6e32a960daf4753d",
+            "sources": [
+              {
+                "id": "src.poison-built-shared-path",
+                "sha256": "00553b101cfd4e22d26adb26e8a1ef13144310d2ecf50c628ce525f6df30e2ef"
+              }
+            ]
+          }
+        },
         "param:poison_severity": {
           "value": 15,
           "evidence": {
