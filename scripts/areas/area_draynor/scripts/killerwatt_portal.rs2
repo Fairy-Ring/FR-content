@@ -45,5 +45,5 @@ if (inv_total(worn, slayer_boots) = 0) {
 p_telejump(2_41_81_53_30);
 
 [oploc1,draynor_killerwatt_portal2]
-// UNKNOWN engineering free tile adjacent to the cache's manor rift.
-p_telejump(2_48_52_38_33);
+// UNKNOWN engineering: north free tile, on the side from which the rift is reachable.
+p_telejump(2_48_52_38_35);
