@@ -646,7 +646,7 @@ val=17,0
 // Stable ranks: Ahrim, Dharok, Guthan, Karil, Torag, Verac; head/body/legs/weapon.
 [barrows_reward_gear]
 inputtype=int
-outputtype=obj
+outputtype=namedobj
 default=null
 val=0,barrows_ahrim_head
 val=1,barrows_ahrim_body

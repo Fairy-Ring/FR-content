@@ -139,7 +139,7 @@ The original main interface renders three prompts and three real answer buttons 
 
 The packed fixture covers all 24 presentations and all 72 native button positions. It checks the measured graph, single visible ladder and sole open ladder-room door after begin, reset and every wrong answer; Search draws nothing. Native main-modal access freezes both halves of the shared saved countdown without replacing its normal timer. A face already displayed can keep pulsing in the client until callbacks resume and clear it at the saved fade remainder. The real incoming NPC melee path cancels the modal and its buttons before queued damage; it retains the layout, selectors, raw puzzle field and timer.
 
-Cancellation clears only challenge activity. Correct answers and ordinary save/load retain solved authorization, family, permutation and the raw client field. Search/payment and the post-Search inward-door policy are not reachable in this prefix.
+Cancellation clears only challenge activity. Correct answers and ordinary save/load retain solved authorization, family, permutation and the raw client field. Paid Search preserves the original layout and raw puzzle field; the central door remains free in both directions after payment.
 
 ## Chest and final brother (S10)
 
@@ -154,7 +154,7 @@ The original closed chest's native Open requires an unlooted, positive-generatio
 
 The forced actor uses the shared owner/generation constructor and targets the owner. Its 1,000-tick lifetime and reused 0-to-2 placement policy are UNKNOWN engineering choices. The exact challenge, "You dare steal from us!", is a CANDIDATE later reconstruction, not verified 377 wording.
 
-`barrows_chest_search_allowed(generation)` supplies the future chest/location/authorization gate. It requires Open, not the final death or all six slain. No Search/payment/grant is attached: clicking the shown open chest's Search or Close gets the engine's unchanged "Nothing interesting happens." refusal, with no reward or state transition. Open-unlooted save/load and clean shared logout/login retain the visual and genuine credit without paying; owner-only cleanup remains the existing encounter contract.
+`barrows_chest_search_allowed(generation)` supplies the chest/location/authorization gate. It requires Open, not the final death or all six slain. Open-unlooted save/load and clean shared logout/login retain the visual and genuine credit without paying; owner-only cleanup remains the existing encounter contract. Search now consumes that authorization in S12. Close keeps the unchanged "Nothing interesting happens." refusal and never closes or pays the chest.
 
 ## Shared login compatibility
 
@@ -177,3 +177,15 @@ node --import tsx ../content/tests/barrows/test_reward.mjs
 The compiled pure reward procedures implement the CANDIDATE D6 reconstruction, not authenticated 2006 quantities. The 24 server-side gear rows join only the fresh unsuffixed original pieces. A chest's pool includes four pieces per credited unique brother, chooses equal conditional ranks and removes only an exact selected piece. B=0 has no equipment branch. Empty gear pools fall through to ordinary rewards.
 
 The quantity proof compares every B=0..6, C=0..1000 and R=1..C+2B with an independent inclusive-band/rational-floor oracle: 3,545,542 native cases plus P=0. Seven seeded Bernoulli samples (including the exact B=0 control) and all 24 conditional rank sizes each use 1,200,000 trials. Seeds and absolute tolerances are those in the accepted plan. All slain masks, every single-piece removal/rank remapping and forced wins through the complete pool are separate exact checks. Pure rolls preserve additive stack quantities; S12 owns consolidation and the protected grant. Search still refuses on the standalone S11 head.
+
+## Atomic reward grant (S12)
+
+```sh
+node --import tsx ../content/tests/barrows/test_grant.mjs
+```
+
+The original shown open child's native Search snapshots the real slain mask and potential, rolls B+1 complete results, then latches phase 2 and advances the generation before granting. One protected, non-suspending invocation removes this owner's old actors, freezes every credit bit and preserves all original layout/puzzle bits. No final kill or all-six requirement is added.
+
+UNKNOWN engineering `barrows_grant_order` names the policy: sum stackable ordinary results and grant coins, mind, chaos, death, blood and bolt racks first; then grant single-item rewards and distinct gear in original roll order. The inherited `inv_add` merges existing stacks and spills the remainder onto the owner's floor in the same order. It does not refuse, open a capacity modal or transfer to another inventory.
+
+The native witness spies on the real grant while retaining its effects. It checks every grant's protected/paid/generation/actor state, exact consolidation and merging, two-slot and full-inventory overflow, repeated keys, distinct gear, all 64 masks, P=0, current and old paid credit, repeat Search and pure guard refusals. The S10 fixture retains the real Open/save/load/logout/login assertions and now proves the reachable Search/Close boundary instead of expecting an obsolete Search refusal.

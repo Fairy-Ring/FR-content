@@ -2,6 +2,9 @@
 [oploc1,barrows_stone_chest_closed]
 ~barrows_chest_open(loc_type, loc_coord);
 
+[oploc1,barrows_stone_chest_open]
+~barrows_chest_search(loc_type, loc_coord);
+
 // The original 2x2 map chest permits these two south-side operating squares.
 [proc,barrows_chest_authorized](int $generation)(boolean)
 if (%barrows_generation <= 0 | ~barrows_search_allowed($generation) = false | testbit(%barrows_state, ^barrows_solved_bit) = 0) return(false);
@@ -24,8 +27,56 @@ if (~barrows_brother_slain($identity) = false & ~barrows_brother_find($brother) 
 }
 %barrows_chest_open = 1;
 
-// S11/S12 attach Search here; neither a final kill nor B=6 is required.
-// No player operation calls this gate or the protected payment latch yet.
+// Open, not a final kill or B=6, authorizes the protected payment.
 [proc,barrows_chest_search_allowed](int $generation)(boolean)
 if (~barrows_chest_authorized($generation) = false | %barrows_chest_open = 0) return(false);
 return(true);
+
+[proc,barrows_chest_search](loc $chest, coord $anchor)
+if ($chest ! barrows_stone_chest | $anchor ! 0_55_151_31_31) return;
+def_int $generation = %barrows_generation;
+if (~barrows_chest_search_allowed($generation) = false) return;
+def_int $mask = getbit_range(%barrows_kills, ^barrows_slain_start, ^barrows_slain_end);
+def_int $brothers = bitcount($mask);
+def_int $potential = getbit_range(%barrows_kills, ^barrows_potential_start, ^barrows_potential_end);
+def_int $pool = ~barrows_reward_pool($mask);
+def_int $rolls = add($brothers, ^barrows_reward_base_rolls);
+def_int $coins = 0;
+def_int $mind = 0;
+def_int $chaos = 0;
+def_int $death = 0;
+def_int $blood = 0;
+def_int $racks = 0;
+// At most seven rolls. Fixed locals retain single-item order without a container.
+def_namedobj $single0 = null;
+def_namedobj $single1 = null;
+def_namedobj $single2 = null;
+def_namedobj $single3 = null;
+def_namedobj $single4 = null;
+def_namedobj $single5 = null;
+def_namedobj $single6 = null;
+def_int $roll = 0;
+def_namedobj $item;
+def_int $quantity;
+while ($roll < $rolls) {
+    $item, $quantity, $pool = ~barrows_reward_roll($brothers, $potential, $pool);
+    if ($item = coins) $coins = add($coins, $quantity);
+    else if ($item = mindrune) $mind = add($mind, $quantity);
+    else if ($item = chaosrune) $chaos = add($chaos, $quantity);
+    else if ($item = deathrune) $death = add($death, $quantity);
+    else if ($item = bloodrune) $blood = add($blood, $quantity);
+    else if ($item = barrows_karil_ammo) $racks = add($racks, $quantity);
+    else if ($item ! null) {
+        if ($roll = 0) $single0 = $item;
+        else if ($roll = 1) $single1 = $item;
+        else if ($roll = 2) $single2 = $item;
+        else if ($roll = 3) $single3 = $item;
+        else if ($roll = 4) $single4 = $item;
+        else if ($roll = 5) $single5 = $item;
+        else $single6 = $item;
+    }
+    $roll = add($roll, 1);
+}
+// No suspension or grant can occur between the snapshot, latch and whole grant.
+if (~barrows_search_latch($generation) = false) return;
+~barrows_reward_grant($coins, $mind, $chaos, $death, $blood, $racks, $single0, $single1, $single2, $single3, $single4, $single5, $single6);

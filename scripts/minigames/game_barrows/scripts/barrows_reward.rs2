@@ -1,5 +1,5 @@
 // CANDIDATE D6: selected later formula, not recovered May 2006 arithmetic.
-// These pure procedures produce data only. Search remains a refusal until S12.
+// Reward-data procedures are pure. Only the post-latch grant mutates inventory.
 [proc,barrows_reward_pool](int $mask)(int)
 def_int $pool = 0;
 def_int $identity = 0;
@@ -35,7 +35,7 @@ if ($pool = 0) return(-1);
 return(~barrows_reward_rank($pool, random(bitcount($pool))));
 
 // Inclusive D6 bands and rational integer floors. R=0 is the P=0 no-item case.
-[proc,barrows_reward_quantity](int $roll)(obj, int)
+[proc,barrows_reward_quantity](int $roll)(namedobj, int)
 if ($roll = 0) return(null, 0);
 if ($roll <= 380) return(coins, multiply(2, $roll));
 if ($roll <= 505) return(mindrune, divide(multiply(2, $roll), 3));
@@ -47,16 +47,33 @@ if ($roll <= 1008) return(keyhalf2, 1);
 if ($roll <= 1011) return(keyhalf1, 1);
 return(dragon_med_helm, 1);
 
-[proc,barrows_reward_roll](int $brothers, int $potential, int $pool)(obj, int, int)
+[proc,barrows_reward_roll](int $brothers, int $potential, int $pool)(namedobj, int, int)
 if ($pool ! 0 & $brothers > 0) {
     if (~barrows_reward_equipment($brothers) = true) {
         def_int $piece = ~barrows_reward_piece($pool);
-        return(enum(int, obj, barrows_reward_gear, $piece), 1, clearbit($pool, $piece));
+        return(enum(int, namedobj, barrows_reward_gear, $piece), 1, clearbit($pool, $piece));
     }
 }
 def_int $maximum = add($potential, multiply(^barrows_reward_potential_per_brother, $brothers));
 if ($maximum = 0) return(null, 0, $pool);
-def_obj $item;
+def_namedobj $item;
 def_int $quantity;
 $item, $quantity = ~barrows_reward_quantity(add(1, random($maximum)));
 return($item, $quantity, $pool);
+
+// UNKNOWN engineering ^barrows_grant_order: summed stacks, then original rolls.
+// Native inv_add merges stacks and retains its inherited owned-floor overflow.
+[proc,barrows_reward_grant](int $coins, int $mind, int $chaos, int $death, int $blood, int $racks, namedobj $single0, namedobj $single1, namedobj $single2, namedobj $single3, namedobj $single4, namedobj $single5, namedobj $single6)
+if ($coins > 0) inv_add(inv, coins, $coins);
+if ($mind > 0) inv_add(inv, mindrune, $mind);
+if ($chaos > 0) inv_add(inv, chaosrune, $chaos);
+if ($death > 0) inv_add(inv, deathrune, $death);
+if ($blood > 0) inv_add(inv, bloodrune, $blood);
+if ($racks > 0) inv_add(inv, barrows_karil_ammo, $racks);
+if ($single0 ! null) inv_add(inv, $single0, 1);
+if ($single1 ! null) inv_add(inv, $single1, 1);
+if ($single2 ! null) inv_add(inv, $single2, 1);
+if ($single3 ! null) inv_add(inv, $single3, 1);
+if ($single4 ! null) inv_add(inv, $single4, 1);
+if ($single5 ! null) inv_add(inv, $single5, 1);
+if ($single6 ! null) inv_add(inv, $single6, 1);

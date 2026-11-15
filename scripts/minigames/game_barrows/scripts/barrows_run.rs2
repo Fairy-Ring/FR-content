@@ -1,5 +1,4 @@
 // CANDIDATE D9 run lifecycle. Search/reset are protected, non-suspending transitions.
-// No player operation reaches the Search latch until the chest/reward slices attach.
 [proc,barrows_phase]()(int)
 return(getbit_range(%barrows_state, ^barrows_phase_start, ^barrows_phase_end));
 

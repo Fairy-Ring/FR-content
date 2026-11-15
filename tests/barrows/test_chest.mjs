@@ -361,6 +361,23 @@ await run(async () => {
     assert.equal(player.activeScript, null, `${label}: native OPLOC1 leaves no continuation`);
     return { trigger, state };
   }
+  function runNativeSearch(player, label) {
+    const before = varSnapshot(player);
+    const inventoryBefore = inventorySnapshot(player);
+    const saved = JavaRandom.nextDouble;
+    let result;
+    JavaRandom.nextDouble = () => 0.5;
+    try { result = nativeOpen(player, label); }
+    finally { JavaRandom.nextDouble = saved; }
+    assert.equal(result.trigger?.name, '[oploc1,barrows_stone_chest_open]', `${label}: native dispatch selects the shown Search child`);
+    assert.equal(result.state.activeLoc, chest, `${label}: Search keeps the original parent active loc`);
+    const expected = [...before];
+    expected[varIds.barrows_state] = u32(setRange(before[varIds.barrows_state], c('barrows_phase_paid'), ranges.phase)
+      & ~rangeMask([c('barrows_solved_bit'), c('barrows_challenge_bit')]));
+    expected[varIds.barrows_generation]++;
+    assert.deepEqual(varSnapshot(player), expected, `${label}: Search pays once without changing layout or credit`);
+    assert.notDeepEqual(inventorySnapshot(player), inventoryBefore, `${label}: native Search grants the real nonzero-potential reward`);
+  }
   function assertClosedChildDispatch(player, result, label) {
     assert(result.trigger, `${label}: actual closed-child Open trigger is present`);
     assert.equal(result.trigger.name, '[oploc1,barrows_stone_chest_closed]', `${label}: native dispatch selects shown child 6774`);
@@ -371,14 +388,12 @@ await run(async () => {
     const parent = LocType.get(parentTypeId);
     return LocType.get(parent.multiloc[player.getVarBit(parent.multivarbit)]);
   }
-  function runNativeDefault(player, op, label) {
-    const expectedTypeId = openChildId;
+  function runNativeClose(player, label) {
     const displayed = displayedChestType(player);
-    assert.equal(displayed.id, expectedTypeId, `${label}: native operation targets the displayed open child`);
-    assert.equal(displayed.op[op - 1], op === 1 ? 'Search' : 'Close', `${label}: original open-child operation text is retained`);
+    assert.equal(displayed.id, openChildId, `${label}: native Close targets the displayed open child`);
+    assert.equal(displayed.op[1], 'Close', `${label}: original open-child operation text is retained`);
     player.messages.length = 0;
-    const trigger = nativeLocTrigger(player, op);
-    assert.equal(trigger, null, `${label}: open-child operation has no Barrows handler`);
+    assert.equal(nativeLocTrigger(player, 2), null, `${label}: Close has no Barrows handler`);
     player.defaultOp();
     assert.equal(player.messages.at(-1), 'Nothing interesting happens.', `${label}: native engine default refuses without payment`);
   }
@@ -561,7 +576,7 @@ await run(async () => {
     assertForcedActor(main, firstActor, 1, 801, 'first forced final');
     assert.equal(mainOwned().length, 1, 'first Open creates exactly one owned encounter');
     assert.equal(gate(main, 'barrows_chest_authorized', 801, 'authorized before Search'), 1, 'shared chest context is authorized for an unlooted solved run');
-    assert.equal(gate(main, 'barrows_chest_search_allowed', 801, 'Search gate after real Open'), 1, 'future Search gate is true while the selected final is alive and B is zero');
+    assert.equal(gate(main, 'barrows_chest_search_allowed', 801, 'Search gate after real Open'), 1, 'Search gate is true while the selected final is alive and B is zero');
     assert.equal(gate(main, 'barrows_chest_search_allowed', 800, 'stale Search generation'), 0, 'stale generation cannot use the Search gate');
 
     const repeatedVars = varSnapshot(main);
@@ -570,10 +585,11 @@ await run(async () => {
     withoutScriptRandom('repeated direct chest Open', () => procVoid(main, 'barrows_chest_open', [parentTypeId, CoordGrid.packCoord(0, 3551, 9695)]));
     assertNoPlayerMutation(main, repeatedVars, repeatedInventory, 'repeated direct chest Open');
     assert.deepEqual(spawnDelta(repeatedNids), [], 'repeated Open cannot duplicate the selected final actor');
-    runNativeDefault(main, 1, 'open-child Search');
-    assertNoPlayerMutation(main, repeatedVars, repeatedInventory, 'open-child Search default');
-    runNativeDefault(main, 2, 'open-child Close');
-    assertNoPlayerMutation(main, repeatedVars, repeatedInventory, 'open-child Close default');
+    runNativeSearch(main, 'open-child Search');
+    const paidVars = varSnapshot(main);
+    const paidInventory = inventorySnapshot(main);
+    runNativeClose(main, 'open-child Close');
+    assertNoPlayerMutation(main, paidVars, paidInventory, 'open-child Close default');
     assert.equal(World.getLoc(chestAnchor.x, chestAnchor.z, chestAnchor.level, parentTypeId), chest, 'Search and Close do not globally replace the shared loc');
 
     const invId = InvType.getId('inv');
@@ -584,7 +600,7 @@ await run(async () => {
     assert.equal(other.invAdd(invId, coinsId, 19), 19, 'second owner receives an independent native inventory marker');
 
     // A valid context authorizes Open before the visual bit is set, but the
-    // future public Search gate additionally requires a real open chest.
+    // public Search gate additionally requires a real open chest.
     clearNpcs();
     setRun(main, { identity: 1, generation: 900, solved: true });
     const gateBefore = varSnapshot(main);
@@ -624,7 +640,7 @@ await run(async () => {
       assert.equal(spawned.length, 1, `identity ${identity} has exactly one forced final actor`);
       const actor = spawned[0];
       assertForcedActor(main, actor, identity, generation, `identity ${identity} final`);
-      assert.equal(gate(main, 'barrows_chest_search_allowed', generation, `identity ${identity} Search after Open`), 1, `identity ${identity} permits future Search without final death or B=6`);
+      assert.equal(gate(main, 'barrows_chest_search_allowed', generation, `identity ${identity} Search after Open`), 1, `identity ${identity} permits Search without final death or B=6`);
       if (foreign) {
         assert.equal(foreign.isActive, true, 'foreign same-generation brother remains a separate living actor');
         assert.equal(foreign.target, null, 'foreign owner control is not retargeted by the opener');
@@ -1007,18 +1023,21 @@ await run(async () => {
     ]));
     assert.deepEqual(spawnDelta(postLoginNids), [], 'already-open post-login repeat cannot replace the cleaned-up final');
     assertNoPlayerMutation(loggedIn, finalVars, finalInventory, 'already-open post-login repeat');
-    runNativeDefault(loggedIn, 1, 'post-login native Search');
-    assertNoPlayerMutation(loggedIn, finalVars, finalInventory, 'post-login native Search');
-    runNativeDefault(loggedIn, 2, 'post-login native Close');
-    assertNoPlayerMutation(loggedIn, finalVars, finalInventory, 'post-login native Close');
-    assert.equal(openFromVarp(loggedIn), 1, 'repeated native Search and Close never pay or close the chest');
-    assert.equal(u32(loggedIn.getVar(varIds.barrows_kills)), savedCredit, 'repeated native Search grants no credit');
+    runNativeSearch(loggedIn, 'post-login native Search');
+    const postSearchVars = varSnapshot(loggedIn);
+    const postSearchInventory = inventorySnapshot(loggedIn);
+    withoutScriptRandom('post-login repeat Search', () => nativeOpen(loggedIn, 'post-login repeat Search'));
+    assertNoPlayerMutation(loggedIn, postSearchVars, postSearchInventory, 'post-login repeat Search');
+    runNativeClose(loggedIn, 'post-login native Close');
+    assertNoPlayerMutation(loggedIn, postSearchVars, postSearchInventory, 'post-login native Close');
+    assert.equal(openFromVarp(loggedIn), 1, 'repeat native Search and Close do not close the chest');
+    assert.equal(u32(loggedIn.getVar(varIds.barrows_kills)), savedCredit, 'paid native Search freezes credit');
     assert.equal(World.getLoc(chestAnchor.x, chestAnchor.z, chestAnchor.level, parentTypeId), chest, 'save/load/login and native Search leave the shared World loc unchanged');
 
     console.log('PASS S10 packed chest Open: native child dispatch, per-player visual, exact six identities, owner/generation and hint');
     console.log('PASS S10 packed chest gates: all 64 slain masks, credited/uncredited final, invalid context and no state/RNG mutation');
     console.log('PASS S10 forced placement: both-level duplicate suppression, negative residents, 11-enemy cap bypass and retry');
-    console.log('PASS S10 no reward path: default Search/Close, native save/load, shared logout/login and no inventory/payment');
+    console.log('PASS S10/S12 boundary: Open never rewards, native save/load and shared logout/login preserve authorization; Search pays once and Close stays a refusal');
   } finally {
     clearNpcs();
     for (const player of activePlayers) unregisterPlayer(player);

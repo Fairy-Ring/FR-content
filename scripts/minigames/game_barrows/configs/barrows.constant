@@ -124,3 +124,6 @@
 ^barrows_reward_pieces_per_brother = 4
 ^barrows_reward_base_rolls = 1
 ^barrows_reward_potential_per_brother = 2
+
+// UNKNOWN engineering BARROWS_GRANT_ORDER, not a historical ordering claim.
+^barrows_grant_order = "coins,mindrune,chaosrune,deathrune,bloodrune,barrows_karil_ammo;singles_in_roll_order"
