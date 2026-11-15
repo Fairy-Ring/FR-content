@@ -203,3 +203,13 @@ The guarded hit queue rechecks generation, paid phase and tunnel location at del
 The canonical CANDIDATE D9 hook reuses `barrows_leave` before the first ordinary death delay. Pre-loot death preserves the whole run and both countdowns; paid death performs the existing protected reset. Native lethal-death controls compare ordinary kept inventory, shared death-tile drops and lifetimes, restored stats/energy and Lumbridge respawn. Shared login resumes exact paid-inside counters and restores shake after its final camera reset; outside paid login resets without shake.
 
 The 5..6 range is CANDIDATE early-2007 evidence, not exact 377 arithmetic. Interval, chance, uniform amount distribution and inherited shake parameters are UNKNOWN engineering names in `barrows.constant`.
+
+## Loot then leave (S14)
+
+```sh
+node --import tsx ../content/tests/barrows/test_leave.mjs
+```
+
+This is an integration-proof slice, not a second reset implementation. Native Search grants treasure once; repeat Search before departure changes neither treasure nor the paid escape run. The original stair exit uses the existing paid reset: generation advancement and owned-actor removal precede field clearing and its one idle-layout redraw, which precedes the stair's surface telejump. Treasure, foreign actors and unowned map actors remain. The retained selectors exclude the completed corner and central entrance at the next begin.
+
+One genuinely captured native NPC credit request is delivered after reset and again inside the next creditable run. Both deliveries leave the run unchanged; a same-generation real producer supplies the positive credit control. Pre-loot stair departure preserves generation, layout, credit and both saved countdowns while removing owned actors and closing the ephemeral challenge and presentation. Separate mutants make the named S14 generation-order, unpaid-no-reset and old-generation rejection cases fail.
