@@ -1,0 +1,89 @@
+// The published OP/AP combat-start order is retained. Only the form changes.
+[opnpc2,slayer_killerwatt_ball]
+@killerwatt_combat_start;
+
+[apnpc2,slayer_killerwatt_ball]
+def_int $attackrange = ~player_attackrange(inv_getobj(worn, ^wearpos_rhand));
+if (($attackrange <= 1 & ~player_in_combat_check = false) | npc_range(coord) > $attackrange) {
+    p_aprange($attackrange);
+    return;
+}
+@killerwatt_combat_start;
+
+[label,killerwatt_combat_start]
+if (~player_in_combat_check = false) return;
+~killerwatt_wake;
+if (~sa_enabled = true) @player_special_attack;
+if (%damagetype = ^ranged_style) @player_ranged_attack;
+if (~player_autocast_enabled = true) @player_magic_attack;
+@player_melee_attack;
+
+// CANDIDATE monster-combat-data.s02-killerwatt-forms. No extra attack delay.
+[proc,killerwatt_wake]
+npc_changetype_keepall(slayer_killerwatt, ^killerwatt_form_lifetime);
+%killerwatt_awake_clock = map_clock;
+npc_queue(19, 0, ^killerwatt_return_interval);
+
+[ai_queue1,slayer_killerwatt] gosub(npc_default_retaliate_ap);
+[ai_applayer2,slayer_killerwatt] ~killerwatt_attack;
+[ai_opplayer2,slayer_killerwatt] ~killerwatt_attack;
+
+// RuneHQ 18 April 2006: melee nearby, magic at range. The boundary is engineering.
+[proc,killerwatt_attack]
+if (%death = ^true) {
+    npc_setmode(null);
+    return;
+}
+if (%npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+def_int $style = ~killerwatt_attack_style;
+def_int $damage = 0;
+// CANDIDATE monster-combat-data.s02-killerwatt-prayer: Magic defence, Missiles protection.
+def_boolean $hit = false;
+if ($style = ^magic_style) {
+    def_int $attack_roll = 0;
+    if (~check_protect_prayer(^ranged_style) = false) $attack_roll = ~npc_magic_attack_roll_no_prot;
+    if (randominc($attack_roll) > randominc(~player_defence_roll_specific(^magic_style))) $hit = true;
+} else {
+    $hit = ~npc_player_hit_roll($style);
+}
+if ($hit = true) $damage = randominc(~killerwatt_maxhit($style));
+// M2: use the published attack/defend animation and sound parameters, unchanged.
+anim(%com_defendanim, 0);
+npc_anim(npc_param(attack_anim), 0);
+if (npc_param(attack_sound) ! null) sound_synth(npc_param(attack_sound), 0, 0);
+~playerhit_n_melee($damage, npc_param(attackrate));
+npc_setmode(applayer2);
+
+[proc,killerwatt_attack_style]()(int)
+if (npc_range(coord) <= ^killerwatt_melee_distance) return(npc_param(damagetype));
+return(^magic_style);
+
+[proc,killerwatt_maxhit](int $style)(int)
+if (inv_total(worn, slayer_boots) = 0) return(^killerwatt_uninsulated_maxhit);
+if ($style = ^magic_style) return(^killerwatt_magic_maxhit);
+return(^killerwatt_melee_maxhit);
+
+// CANDIDATE monster-combat-data.s02-killerwatt-forms.
+// UNKNOWN monster-combat-data.s02-killerwatt-engineering-timing: eight-tick return.
+// A queue checks the form. The native timer remains exclusively the ordinary poison timer.
+[ai_queue19,slayer_killerwatt]
+if (npc_stat(hitpoints) = 0) return;
+~killerwatt_return_check;
+if (npc_type = slayer_killerwatt) npc_queue(19, 0, ^killerwatt_return_interval);
+
+[proc,killerwatt_return_check]
+if (add(%killerwatt_awake_clock, ^killerwatt_revert_delay) > map_clock) return;
+if (add(%npc_lastcombat, ^killerwatt_revert_delay) > map_clock) return;
+if (npc_getmode = applayer2 | npc_getmode = opplayer2) {
+    if (finduid(%npc_attacking_uid) = true) {
+        if (stat(hitpoints) > 0 & coordy(coord) = coordy(npc_coord) & npc_range(coord) <= ^killerwatt_attack_range) return;
+    }
+}
+// The ball's native default is wander. Null would also reset its live poison timer.
+npc_setmode(wander);
+npc_changetype_keepall(slayer_killerwatt_ball, ^killerwatt_form_lifetime);

@@ -1482,3 +1482,15 @@ data=end_message,an oil lantern frame
 data=levelfailmessage,an Oil Lantern Frame
 data=bar,iron_bar
 data=bar_amount,1
+
+// VERIFIED smithing.lantern-frames. Presentation uses the existing sentence templates.
+[bullseye_lantern_nolens]
+table=smithing
+data=ifproduct,bullseye_lantern_nolens
+data=product,bullseye_lantern_nolens
+data=product_amount,1
+data=levelrequired,49
+data=end_message,a bullseye lantern
+data=levelfailmessage,a Bullseye Lantern
+data=bar,steel_bar
+data=bar_amount,1

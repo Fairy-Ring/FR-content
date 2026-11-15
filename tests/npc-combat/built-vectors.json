@@ -332,6 +332,102 @@
           }
         }
       }
+    },
+    {
+      "identity": { "debugname": "slayer_killerwatt", "id": 3201 },
+      "unit": "S02",
+      "evidence": {
+        "facts": ["monster-combat-data.s02-killerwatt-vectors", "monster-combat-data.s02-killerwatt-attack-interval", "monster-combat-data.s02-killerwatt-distance"],
+        "label": "CANDIDATE",
+        "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+        "sources": [
+          { "id": "src.monster-s02-history-corpus", "sha256": "ae9a66c319ab54a13603657a7cdf1a7d7845705ee0876591b6f657f14447ba0c" },
+          { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
+          { "id": "src.monster-s02-cache-unit", "sha256": "511a3c796acb9347541257ede9737d2c7903bb0aada0adc3d046f4f396d90fbd" },
+          { "id": "src.monster-s02-history-diffs", "sha256": "362ddf55dc3a1986e0c8fed0278edcd344b6d2a965b0ec9b5c9d21bde50c2f77" }
+        ]
+      },
+      "fields": {
+        "hitpoints": {
+          "value": 51,
+          "evidence": {
+            "facts": ["monster-combat-data.s02-killerwatt-period-hitpoints-level"],
+            "label": "VERIFIED",
+            "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+            "sources": [
+              { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" }
+            ]
+          }
+        },
+        "attack": { "value": 50 },
+        "strength": { "value": 50 },
+        "defence": { "value": 40 },
+        "magic": { "value": 67 },
+        "ranged": { "value": 67 },
+        "attackrange": { "value": 13 },
+        "param:attackrate": { "value": 2 },
+        "param:slayer_category": {
+          "value": 73,
+          "evidence": {
+            "facts": ["slayer.s02-killerwatt-task"],
+            "label": "VERIFIED",
+            "researchCommit": "ea0969405caec185f498bccd2ef86e768b812a1a",
+            "sources": [
+              { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
+              { "id": "src.monster-s02-tipit-slayer-20060427", "sha256": "eb3cc73876da3c79882e2544aba7eb73321de339ac0c6c8621cc66973db959a2" },
+              { "id": "src.monster-s02-cache-unit", "sha256": "511a3c796acb9347541257ede9737d2c7903bb0aada0adc3d046f4f396d90fbd" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": { "debugname": "slayer_killerwatt_ball", "id": 3202 },
+      "unit": "S02",
+      "evidence": {
+        "facts": ["monster-combat-data.s02-killerwatt-vectors", "monster-combat-data.s02-killerwatt-attack-interval", "monster-combat-data.s02-killerwatt-distance"],
+        "label": "CANDIDATE",
+        "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+        "sources": [
+          { "id": "src.monster-s02-history-corpus", "sha256": "ae9a66c319ab54a13603657a7cdf1a7d7845705ee0876591b6f657f14447ba0c" },
+          { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
+          { "id": "src.monster-s02-cache-unit", "sha256": "511a3c796acb9347541257ede9737d2c7903bb0aada0adc3d046f4f396d90fbd" },
+          { "id": "src.monster-s02-history-diffs", "sha256": "362ddf55dc3a1986e0c8fed0278edcd344b6d2a965b0ec9b5c9d21bde50c2f77" }
+        ]
+      },
+      "fields": {
+        "hitpoints": {
+          "value": 51,
+          "evidence": {
+            "facts": ["monster-combat-data.s02-killerwatt-period-hitpoints-level"],
+            "label": "VERIFIED",
+            "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+            "sources": [
+              { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" }
+            ]
+          }
+        },
+        "attack": { "value": 50 },
+        "strength": { "value": 50 },
+        "defence": { "value": 40 },
+        "magic": { "value": 67 },
+        "ranged": { "value": 67 },
+        "attackrange": { "value": 13 },
+        "param:attackrate": { "value": 2 },
+        "param:slayer_category": {
+          "value": 73,
+          "evidence": {
+            "facts": ["slayer.s02-killerwatt-task"],
+            "label": "VERIFIED",
+            "researchCommit": "ea0969405caec185f498bccd2ef86e768b812a1a",
+            "sources": [
+              { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
+              { "id": "src.monster-s02-tipit-slayer-20060427", "sha256": "eb3cc73876da3c79882e2544aba7eb73321de339ac0c6c8621cc66973db959a2" },
+              { "id": "src.monster-s02-cache-unit", "sha256": "511a3c796acb9347541257ede9737d2c7903bb0aada0adc3d046f4f396d90fbd" }
+            ]
+          }
+        }
+      }
     }
   ]
 }

@@ -8,6 +8,8 @@ const load = async relative => import(pathToFileURL(path.join(engineRoot, 'src',
 const defaultExport = async relative => (await load(relative)).default;
 export const World = await defaultExport('engine/World.ts');
 export const Player = await defaultExport('engine/entity/Player.ts');
+export const Packet = await defaultExport('io/Packet.ts');
+export const { PlayerLoading } = await load('engine/entity/PlayerLoading.ts');
 export const ScriptProvider = await defaultExport('engine/script/ScriptProvider.ts');
 const ScriptRunner = await defaultExport('engine/script/ScriptRunner.ts');
 export const ScriptState = await defaultExport('engine/script/ScriptState.ts');
@@ -32,6 +34,19 @@ const InvButton = await defaultExport('network/game/client/model/InvButton.ts');
 const useHandler = new (await defaultExport('network/game/client/handler/OpHeldUHandler.ts'))();
 const heldHandler = new (await defaultExport('network/game/client/handler/OpHeldHandler.ts'))();
 const removeHandler = new (await defaultExport('network/game/client/handler/InvButtonHandler.ts'))();
+const ResumePauseButton = await defaultExport('network/game/client/model/ResumePauseButton.ts');
+const IfButton = await defaultExport('network/game/client/model/IfButton.ts');
+const pauseHandler = new (await defaultExport('network/game/client/handler/ResumePauseButtonHandler.ts'))();
+const buttonHandler = new (await defaultExport('network/game/client/handler/IfButtonHandler.ts'))();
+const ResumePCountDialog = await defaultExport('network/game/client/model/ResumePCountDialog.ts');
+const countHandler = new (await defaultExport('network/game/client/handler/ResumePCountDialogHandler.ts'))();
+const OpLocU = await defaultExport('network/game/client/model/OpLocU.ts');
+const locUseHandler = new (await defaultExport('network/game/client/handler/OpLocUHandler.ts'))();
+const MoveClick = await defaultExport('network/game/client/model/MoveClick.ts');
+const moveHandler = new (await defaultExport('network/game/client/handler/MoveClickHandler.ts'))();
+const InvButtonD = await defaultExport('network/game/client/model/InvButtonD.ts');
+const dragHandler = new (await defaultExport('network/game/client/handler/InvButtonDHandler.ts'))();
+const { CoordGrid } = await load('engine/CoordGrid.ts');
 export function id(kind, name) {
   const value = types[kind].getId(name);
   assert(value >= 0, `missing packed ${kind} ${name}`);
@@ -106,3 +121,93 @@ export function execute(name, p, args = [], { allowPause = false, target = null 
   return state;
 }
 export const tile = p => [p.level, p.x, p.z];
+
+// Dialogue uses the production pause/choice handlers. Existing delay-only
+// execute() semantics remain unchanged for SC-01.
+export function startDialogue(name, p, target = null) {
+  const script = ScriptProvider.getByName(name);
+  assert(script, `missing packed script ${name}`);
+  p.dialogueMark = p.packets.length;
+  const state = ScriptRunner.init(script, p, target);
+  p.executeScript(state, true, true);
+  assert.equal(state.execution, ScriptState.PAUSEBUTTON, `${name} opens dialogue`);
+  return state;
+}
+export function resumeDialogue(p, option = null) {
+  const state = p.activeScript;
+  assert.equal(state?.execution, ScriptState.PAUSEBUTTON, 'real dialogue is paused');
+  p.dialogueMark = p.packets.length;
+  if (option === null) {
+    assert(!/^multi[2-5]$/.test(types.Component.get(p.modalChat).comName), 'a choice must be selected explicitly');
+    assert(pauseHandler.handle(new ResumePauseButton(0), p), 'Continue accepted');
+  } else {
+    const root = types.Component.get(p.modalChat).comName;
+    assert(/^multi[2-5]$/.test(root), `not a dialogue choice: ${root}`);
+    const component = id('Component', `${root}:com_${option}`);
+    assert(p.resumeButtons.includes(component), `offered ${root} option ${option}`);
+    assert(buttonHandler.handle(new IfButton(component), p), 'choice accepted');
+  }
+  assert.notEqual(state.execution, ScriptState.ABORTED, 'dialogue must not abort');
+  return state;
+}
+export function dialoguePage(p) {
+  return p.packets.slice(p.dialogueMark)
+    .filter(packet => packet.constructor.name === 'IfSetText')
+    .map(packet => packet.text.replaceAll('|', ' ').replace(/\s+/g, ' ').trim());
+}
+
+export function button(p, name) {
+  return buttonHandler.handle(new IfButton(id('Component', name)), p);
+}
+export function inputCount(p, amount) {
+  assert.equal(p.activeScript?.execution, ScriptState.COUNTDIALOG);
+  return countHandler.handle(new ResumePCountDialog(amount), p);
+}
+export function invButton(p, component, item, option = 1, slot = 0) {
+  return removeHandler.handle(new InvButton(option, obj(item), slot, id('Component', component)), p);
+}
+export function useLoc(p, item, loc, clientType = loc.type) {
+  p.originX = p.x; p.originZ = p.z;
+  const accepted = locUseHandler.handle(new OpLocU(loc.x, loc.z, clientType, obj(item), slotOf(p, item), invCom), p);
+  if (accepted) p.processInteraction();
+  return accepted;
+}
+// Unlike useLoc(), leave the interaction armed so input can arrive during its
+// real approach walk, or in the same input phase before adjacent processing.
+export function beginLocUse(p, item, loc, approach) {
+  p.originX = p.x; p.originZ = p.z;
+  if (p.x !== approach.x || p.z !== approach.z) {
+    const route = [...map.findPath(p.level, p.x, p.z, approach.x, approach.z)].map(coord => {
+      const { x, z } = CoordGrid.unpackCoord(coord);
+      return { x, z };
+    });
+    assert(route.length > 0, 'client approach route exists');
+    assert(moveHandler.handle(new MoveClick(route, 0, true), p), 'MOVE_OPCLICK accepted');
+  }
+  return locUseHandler.handle(new OpLocU(loc.x, loc.z, loc.type, obj(item), slotOf(p, item), invCom), p);
+}
+export function dragInventory(p, from, to) {
+  return dragHandler.handle(new InvButtonD(invCom, from, to, 0), p);
+}
+export function interactionTick(p) {
+  tick(p);
+  p.processInteraction();
+  p.resetEntity(false); // World end-of-cycle reset, including movement state.
+}
+export const weakCount = p => [...p.weakQueue.all()].length;
+export function tick(p) {
+  World.currentTick++;
+  if (p.delayed && World.currentTick >= p.delayedUntil) p.delayed = false;
+  if (!p.delayed && p.activeScript?.execution === ScriptState.SUSPENDED) {
+    p.executeScript(p.activeScript, true, true);
+  }
+  p.processQueues();
+}
+export function settle(p, maxTicks = 160) {
+  for (let n = 0; n < maxTicks; n++) {
+    if (!p.activeScript && weakCount(p) === 0) return;
+    if ([ScriptState.PAUSEBUTTON, ScriptState.COUNTDIALOG].includes(p.activeScript?.execution)) return;
+    tick(p);
+  }
+  assert.fail(`player did not settle: active=${p.activeScript?.execution} weak=${weakCount(p)}`);
+}

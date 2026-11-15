@@ -1,0 +1,9 @@
+// UNKNOWN crafting.lantern-assembly-xp-timing: immediate assembly, no extra XP.
+^lantern_assembly_delay = 0
+^lantern_assembly_extra_xp = 0
+// UNKNOWN crafting.lantern-assembly-xp-timing: immediate filling, no extra XP.
+^lantern_fill_delay = 0
+^lantern_fill_extra_xp = 0
+// UNKNOWN crafting.lantern-assembly-xp-timing: immediate lens conversion, no extra XP.
+^lantern_conversion_delay = 0
+^lantern_conversion_extra_xp = 0

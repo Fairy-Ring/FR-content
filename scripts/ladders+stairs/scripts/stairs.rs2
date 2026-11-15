@@ -1156,7 +1156,9 @@ p_telejump(movecoord(coord, 0, -1, -5)); // Draynor manor - level 1
 [oploc1,draynor_spiralstairs]
 // arrive delay?
 switch_coord (loc_coord) {
-    case 1_48_52_32_34 : p_telejump(2_48_52_33_36); // Draynor Manor - level 1
+    case 1_48_52_32_34 :
+        if (%haunted = ^haunted_complete & %slayer_killerwatt_portal_check = 0) %slayer_killerwatt_portal_check = 1;
+        p_telejump(2_48_52_33_36); // Draynor Manor - level 1
     case default : @unhandled_stairs(loc_coord);
 }
 

@@ -1,3 +1,33 @@
+// Original 377 buttons: Make X, 10, 5, 1 for every glass product.
+[if_button,glass_crafting:com_10] @craft_glass_x(vial_empty);
+[if_button,glass_crafting:com_11] @craft_glass(vial_empty, 10);
+[if_button,glass_crafting:com_12] @craft_glass(vial_empty, 5);
+[if_button,glass_crafting:com_13] @craft_glass(vial_empty, 1);
+[if_button,glass_crafting:com_14] @craft_glass_x(stafforb);
+[if_button,glass_crafting:com_15] @craft_glass(stafforb, 10);
+[if_button,glass_crafting:com_16] @craft_glass(stafforb, 5);
+[if_button,glass_crafting:com_17] @craft_glass(stafforb, 1);
+[if_button,glass_crafting:com_18] @craft_glass_x(beer_glass);
+[if_button,glass_crafting:com_19] @craft_glass(beer_glass, 10);
+[if_button,glass_crafting:com_20] @craft_glass(beer_glass, 5);
+[if_button,glass_crafting:com_21] @craft_glass(beer_glass, 1);
+[if_button,glass_crafting:com_22] @craft_glass_x(candle_lantern_empty);
+[if_button,glass_crafting:com_23] @craft_glass(candle_lantern_empty, 10);
+[if_button,glass_crafting:com_24] @craft_glass(candle_lantern_empty, 5);
+[if_button,glass_crafting:com_25] @craft_glass(candle_lantern_empty, 1);
+[if_button,glass_crafting:com_26] @craft_glass_x(oil_lamp_empty);
+[if_button,glass_crafting:com_27] @craft_glass(oil_lamp_empty, 10);
+[if_button,glass_crafting:com_28] @craft_glass(oil_lamp_empty, 5);
+[if_button,glass_crafting:com_29] @craft_glass(oil_lamp_empty, 1);
+[if_button,glass_crafting:com_30] @craft_glass_x(bullseye_lantern_lens);
+[if_button,glass_crafting:com_31] @craft_glass(bullseye_lantern_lens, 10);
+[if_button,glass_crafting:com_32] @craft_glass(bullseye_lantern_lens, 5);
+[if_button,glass_crafting:com_33] @craft_glass(bullseye_lantern_lens, 1);
+[if_button,glass_crafting:com_34] @craft_glass_x(fishbowl_empty);
+[if_button,glass_crafting:com_35] @craft_glass(fishbowl_empty, 10);
+[if_button,glass_crafting:com_36] @craft_glass(fishbowl_empty, 5);
+[if_button,glass_crafting:com_37] @craft_glass(fishbowl_empty, 1);
+
 [oplocu,sandpit]
 if (last_useitem = bucket_empty) @sand_fill;
 ~displaymessage(^dm_default);
@@ -58,22 +88,23 @@ if (map_members = ^false) {
     mes(^mes_members_feature);
     return;
 }
-def_namedobj $item;
-def_int $process_count;
-$item, $process_count = ~skill_multi3(
-    beer_glass, 0, 5, 200, "\\n\\n\\n\\nBeer Glass",
-    vial_empty, 2, 10, 180, "\\n\\n\\n\\nVial",
-    stafforb, 2, -10, 200, "\\n\\n\\n\\nOrb"
-);
+if_openmain(glass_crafting);
+
+[label,craft_glass_x](struct $struct)
+p_countdialog;
+@craft_glass($struct, last_int);
+
+[label,craft_glass](struct $struct, int $process_count)
 if_close;
-if ($item = null) {
-    ~displaymessage(^dm_default);
+if (map_members = ^false) {
+    mes(^mes_members_feature);
     return;
 }
 if ($process_count < 1) {
     return;
 }
-def_struct $struct = oc_param($item, crafting_glass_struct);
+def_namedobj $item = struct_param($struct, product);
+if (~lantern_glass_known($item) = ^false) return;
 def_string $name = struct_param($struct, productmessage);
 def_int $level = struct_param($struct, levelrequire);
 def_int $exp = struct_param($struct, productexp);
@@ -87,6 +118,13 @@ if (inv_total(inv, glassblowingpipe) < 1) {
 }
 @process_glassblowing($item, $name, $level, $exp, $process_count);
 
+// CANDIDATE crafting.lantern-glass-products: knowledge gates lantern parts only.
+[proc,lantern_glass_known](namedobj $item)(boolean)
+if ($item = candle_lantern_empty | $item = oil_lamp_empty | $item = bullseye_lantern_lens) {
+    if (%know_how_to_make_lanterns = 0) return(^false);
+}
+return(^true);
+
 [label,process_glassblowing](namedobj $item, string $name, int $level, int $exp, int $process_count)
 anim(human_glassblowing, 0);
 if (%action_delay < map_clock) {
@@ -97,6 +135,10 @@ weakqueue*(crafting_glass, sub(%action_delay, map_clock))($item, $name, $level, 
 [queue,crafting_glass](namedobj $item, string $name, int $level, int $exp, int $process_count)
 if (map_members = ^false) {
     mes(^mes_members_feature);
+    anim(null, 20);
+    return;
+}
+if (~lantern_glass_known($item) = ^false) {
     anim(null, 20);
     return;
 }

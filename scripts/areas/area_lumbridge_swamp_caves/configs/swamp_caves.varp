@@ -1,0 +1,5 @@
+// Original varp 425 and client readers are unchanged. Learning and the other
+// personal bits persist; login resets only transient brightness and gas state.
+[goblin_caves]
+scope=perm
+transmit=yes
