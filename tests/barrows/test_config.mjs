@@ -223,7 +223,8 @@ const ENUM_SIGNATURES = new Map([
     ['barrows_puzzle_prompt_model', ['int', 'int']],
     ['barrows_puzzle_answer_model', ['int', 'int']],
     ['barrows_puzzle_correct_answer', ['int', 'int']],
-    ['barrows_puzzle_permutation', ['int', 'int']]
+    ['barrows_puzzle_permutation', ['int', 'int']],
+    ['barrows_reward_gear', ['int', 'obj']]
 ]);
 
 

@@ -117,3 +117,10 @@
 ^barrows_puzzle_error_shake_axis = 0
 ^barrows_puzzle_error_shake_random = 5
 ^barrows_puzzle_error_shake_ticks = 1
+
+// CANDIDATE D6 later reconstruction, without diary runes or a clue roll.
+^barrows_reward_gear_base = 450
+^barrows_reward_gear_per_brother = 58
+^barrows_reward_pieces_per_brother = 4
+^barrows_reward_base_rolls = 1
+^barrows_reward_potential_per_brother = 2

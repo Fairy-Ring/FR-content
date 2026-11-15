@@ -1,0 +1,62 @@
+// CANDIDATE D6: selected later formula, not recovered May 2006 arithmetic.
+// These pure procedures produce data only. Search remains a refusal until S12.
+[proc,barrows_reward_pool](int $mask)(int)
+def_int $pool = 0;
+def_int $identity = 0;
+while ($identity < ^barrows_identity_count) {
+    if (testbit($mask, $identity) = 1) {
+        def_int $start = multiply($identity, ^barrows_reward_pieces_per_brother);
+        $pool = setbit_range($pool, $start, sub(add($start, ^barrows_reward_pieces_per_brother), 1));
+    }
+    $identity = add($identity, 1);
+}
+return($pool);
+
+[proc,barrows_reward_equipment](int $brothers)(boolean)
+if ($brothers = 0) return(false);
+if (random(sub(^barrows_reward_gear_base, multiply(^barrows_reward_gear_per_brother, $brothers))) = 0) return(true);
+return(false);
+
+// Zero-based conditional rank among the exact remaining pieces.
+[proc,barrows_reward_rank](int $pool, int $rank)(int)
+while ($rank > 0) {
+    $pool = and($pool, sub($pool, 1));
+    $rank = sub($rank, 1);
+}
+def_int $piece = 0;
+while (and($pool, 1) = 0) {
+    $pool = divide($pool, 2);
+    $piece = add($piece, 1);
+}
+return($piece);
+
+[proc,barrows_reward_piece](int $pool)(int)
+if ($pool = 0) return(-1);
+return(~barrows_reward_rank($pool, random(bitcount($pool))));
+
+// Inclusive D6 bands and rational integer floors. R=0 is the P=0 no-item case.
+[proc,barrows_reward_quantity](int $roll)(obj, int)
+if ($roll = 0) return(null, 0);
+if ($roll <= 380) return(coins, multiply(2, $roll));
+if ($roll <= 505) return(mindrune, divide(multiply(2, $roll), 3));
+if ($roll <= 630) return(chaosrune, divide(multiply(2, $roll), 9));
+if ($roll <= 755) return(deathrune, divide($roll, 9));
+if ($roll <= 880) return(bloodrune, divide($roll, 20));
+if ($roll <= 1005) return(barrows_karil_ammo, divide($roll, 25));
+if ($roll <= 1008) return(keyhalf2, 1);
+if ($roll <= 1011) return(keyhalf1, 1);
+return(dragon_med_helm, 1);
+
+[proc,barrows_reward_roll](int $brothers, int $potential, int $pool)(obj, int, int)
+if ($pool ! 0 & $brothers > 0) {
+    if (~barrows_reward_equipment($brothers) = true) {
+        def_int $piece = ~barrows_reward_piece($pool);
+        return(enum(int, obj, barrows_reward_gear, $piece), 1, clearbit($pool, $piece));
+    }
+}
+def_int $maximum = add($potential, multiply(^barrows_reward_potential_per_brother, $brothers));
+if ($maximum = 0) return(null, 0, $pool);
+def_obj $item;
+def_int $quantity;
+$item, $quantity = ~barrows_reward_quantity(add(1, random($maximum)));
+return($item, $quantity, $pool);

@@ -167,3 +167,13 @@ Optionally compare the head's login with an independently built published pack i
 ```sh
 BARROWS_PUBLISHED_LOGIN_PACK=../reference-engine/data/pack node --import tsx ../content/tests/barrows/test_core.mjs
 ```
+
+## Reward economics (S11)
+
+```sh
+node --import tsx ../content/tests/barrows/test_reward.mjs
+```
+
+The compiled pure reward procedures implement the CANDIDATE D6 reconstruction, not authenticated 2006 quantities. The 24 server-side gear rows join only the fresh unsuffixed original pieces. A chest's pool includes four pieces per credited unique brother, chooses equal conditional ranks and removes only an exact selected piece. B=0 has no equipment branch. Empty gear pools fall through to ordinary rewards.
+
+The quantity proof compares every B=0..6, C=0..1000 and R=1..C+2B with an independent inclusive-band/rational-floor oracle: 3,545,542 native cases plus P=0. Seven seeded Bernoulli samples (including the exact B=0 control) and all 24 conditional rank sizes each use 1,200,000 trials. Seeds and absolute tolerances are those in the accepted plan. All slain masks, every single-piece removal/rank remapping and forced wins through the complete pool are separate exact checks. Pure rolls preserve additive stack quantities; S12 owns consolidation and the protected grant. Search still refuses on the standalone S11 head.

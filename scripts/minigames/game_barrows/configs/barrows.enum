@@ -641,3 +641,34 @@ val=14,1
 val=15,2
 val=16,1
 val=17,0
+
+// D6 VERIFIED fresh unsuffixed original ids; CANDIDATE slain-only gear pool.
+// Stable ranks: Ahrim, Dharok, Guthan, Karil, Torag, Verac; head/body/legs/weapon.
+[barrows_reward_gear]
+inputtype=int
+outputtype=obj
+default=null
+val=0,barrows_ahrim_head
+val=1,barrows_ahrim_body
+val=2,barrows_ahrim_legs
+val=3,barrows_ahrim_weapon
+val=4,barrows_dharok_head
+val=5,barrows_dharok_body
+val=6,barrows_dharok_legs
+val=7,barrows_dharok_weapon
+val=8,barrows_guthan_head
+val=9,barrows_guthan_body
+val=10,barrows_guthan_legs
+val=11,barrows_guthan_weapon
+val=12,barrows_karil_head
+val=13,barrows_karil_body
+val=14,barrows_karil_legs
+val=15,barrows_karil_weapon
+val=16,barrows_torag_head
+val=17,barrows_torag_body
+val=18,barrows_torag_legs
+val=19,barrows_torag_weapon
+val=20,barrows_verac_head
+val=21,barrows_verac_body
+val=22,barrows_verac_legs
+val=23,barrows_verac_weapon
