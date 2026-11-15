@@ -82,7 +82,10 @@ protect=no
 
 [action_delay]
 
-[varp59_unused]
+// DECISION: unused original slot 59; server-only task departure, no client reader.
+[macro_event_origin_coord]
+type=coord
+scope=perm
 
 [goblinquest]
 scope=perm
@@ -707,6 +710,7 @@ scope=perm
 
 [routequestmulti]
 scope=perm
+transmit=yes
 
 [routequest_myreque_bits]
 scope=perm
@@ -834,6 +838,7 @@ transmit=yes
 [varp444_unused]
 
 [ics_little_multi_extra]
+transmit=yes
 
 [follower_npc]
 
@@ -881,6 +886,7 @@ scope=perm
 [varp469_unused]
 
 [keldagrim_temp_var]
+transmit=yes
 
 [varp471_unused]
 
@@ -1294,6 +1300,7 @@ scope=perm
 
 [enakh_varbits]
 scope=perm
+transmit=yes
 
 [boardgames_runesquares_va]
 transmit=yes
@@ -1352,6 +1359,7 @@ transmit=yes
 [spitfire_coord]
 
 [ogre_area_extra]
+transmit=yes
 
 [elenaquest_extra_bits]
 transmit=yes
@@ -1367,6 +1375,7 @@ transmit=yes
 [varp672_bits]
 
 [romeo_juliet_multi]
+transmit=yes
 
 [canoeing_river_lum]
 transmit=yes

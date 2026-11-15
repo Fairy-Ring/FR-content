@@ -12,8 +12,8 @@
   },
   "traces": {
     "[login,_]": { "commands": 3897, "sha256": "2638dcab881e4f100b1815e96d39e6538cc34f269b3a9404c1995901194aee55" },
-    "[queue,macro_event_login]": { "commands": 26, "sha256": "05928a6512a30728322da991caefd9868b0af9bc277e562629fabf71e4d6de8f" },
+    "[queue,macro_event_login]": { "commands": 12, "sha256": "e1908250150d59ad170c1e93284a7774e4eadcda52f68480eed757a3f23d5539" },
     "[oploc1,_mining_rock_normal]": { "commands": 280, "sha256": "ef1644b46bcf4ce8d835e0c5cfe7379cd99347433d20cd87f7f79922bd07ebbf" },
-    "[if_button,magic:lumbridge_teleport]": { "commands": 3701, "sha256": "d51b8651938a3fc39f2d546e45ab914985e9dd89ad635da9b9b7c062ca303ec2" }
+    "[if_button,magic:lumbridge_teleport]": { "commands": 3705, "sha256": "4a8e6e6f2cc6cfaef4e5f22f62e73f854a621f385407da8fcac2ef843030853b" }
   }
 }

@@ -1,5 +1,6 @@
 [haunted]
 scope=perm
+transmit=yes
 
 [ernestlever]
 scope=perm

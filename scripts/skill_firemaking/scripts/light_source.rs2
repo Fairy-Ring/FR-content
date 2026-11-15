@@ -1,4 +1,19 @@
 [label,ignite_light_source](obj $unlit_source)
+// Period levels: lumbridge-swamp-caves.lighting-levels; sapphire and bug gates are CANDIDATE.
+def_int $level;
+switch_obj($unlit_source) {
+    case unlit_candle, unlit_black_candle, torch_unlit : $level = 1;
+    case candle_lantern_unlit, candle_lantern_black_unlit : $level = 4;
+    case oil_lamp_unlit : $level = 12;
+    case oil_lantern_unlit : $level = 26;
+    case bullseye_lantern_unlit, tog_sapphire_lantern_unlit : $level = 49;
+    case cave_goblin_mining_helmet_unlit : $level = 65;
+    case slayer_buglan_off : $level = 33;
+    case default : return;
+}
+if (stat(firemaking) < $level) {
+    return; // Original refusal wording is UNKNOWN.
+}
 def_namedobj $product = oc_param($unlit_source, product);
 if($product = torch_lit & inzone(0_43_51_8_7, 1_43_51_52_63, coord) = true) {
     mes("Your tinderbox is damp from the sea crossing. It won't light here.");
@@ -9,6 +24,22 @@ inv_add(inv, $product, 1);
 if($product ! lit_black_candle & $product ! lit_candle) {
     mes("You light the <lowercase(oc_name($product))>.");
 }
+
+[opheld1,lit_candle] @extinguish_light_source;
+[opheld1,lit_black_candle] @extinguish_light_source;
+[opheld1,torch_lit] @extinguish_light_source;
+[opheld1,tog_sapphire_lantern_lit] @extinguish_light_source;
+[opheld2,candle_lantern_lit] @extinguish_light_source;
+[opheld2,candle_lantern_black_lit] @extinguish_light_source;
+[opheld2,oil_lamp_lit] @extinguish_light_source;
+[opheld2,oil_lantern_lit] @extinguish_light_source;
+[opheld2,bullseye_lantern_lit] @extinguish_light_source;
+[opheld3,cave_goblin_mining_helmet_lit] @extinguish_light_source;
+[opheld3,slayer_buglan_on] @extinguish_light_source;
+
+[label,extinguish_light_source]
+def_obj $source = inv_getobj(inv, last_slot);
+inv_setslot(inv, last_slot, oc_param($source, next_obj_stage), 1);
 
 // Lost City 289 lift-water behavior, using r377 product-pair parameters.
 [proc,extinguish_light_sources]

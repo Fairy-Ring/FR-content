@@ -1,0 +1,22 @@
+// Staff fixture only; ClientCheatHandler admits debugprocs on non-live staff worlds.
+// Fixed own-inventory scope. Object debugnames are split into bounded 40-char parts.
+[debugproc,inv_readback]
+mes("[inv_readback] begin");
+def_int $slot = 0;
+def_int $occupied = 0;
+while ($slot < inv_size(inv)) {
+    def_obj $item = inv_getobj(inv, $slot);
+    if ($item ! null) {
+        mes("[inv_readback] slot=<tostring($slot)> count=<tostring(inv_getnum(inv, $slot))>");
+        def_string $name = oc_debugname($item);
+        def_int $offset = 0;
+        while ($offset < string_length($name)) {
+            def_int $end = min(add($offset, 40), string_length($name));
+            mes("[inv_readback] objpart=<substring($name, $offset, $end)>");
+            $offset = $end;
+        }
+        $occupied = add($occupied, 1);
+    }
+    $slot = add($slot, 1);
+}
+mes("[inv_readback] end=<tostring($occupied)>");
