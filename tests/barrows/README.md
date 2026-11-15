@@ -19,6 +19,17 @@ Each negative control must exit 1. Add `--mutant NAME` to the command:
 
 Mutants change only text in memory. They do not modify content files.
 
+## Verbatim combat configuration move (BC-01)
+
+```sh
+node --import tsx ../content/tests/barrows/test_combat_config.mjs --content-root ../content
+node --import tsx ../content/tests/barrows/test_combat_config.mjs --content-root ../content --baseline-pack "$BASELINE_PACK"
+```
+
+The thirteen original combat blocks now live in `scripts/minigames/game_barrows/configs/barrows_combat.npc`. No combat value or client field changes in this move. The source check requires exactly those thirteen sections, none remaining in the unpacked file, and the original debugname-to-ID assignments. It compares every authored server field with the native packed configuration and checks the owned timer, death and queue bindings.
+
+For the second command, build the campaign base first and retain its pack in `BASELINE_PACK`. The test loads both packs during the same run and compares all decoded NPC fields, parameters and resolved timer/death/queue scripts. No saved server-value fixture or script bytecode supplies that comparison. The unchanged cfg-npc suite retains the complete client NPC hash gate.
+
 ## Durable core (S01)
 
 Build the sibling engine packs, then run:

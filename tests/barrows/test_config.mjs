@@ -397,7 +397,7 @@ assert.deepEqual(enumValues(enums, 'barrows_brother_slain_varbit'), expectedSlai
 assert.deepEqual(enumValues(enums, 'barrows_brother_crypt_entry'), expectedEntryByBrother);
 assert.deepEqual(enumValues(enums, 'barrows_stair_surface_exit'), expectedExitByStair);
 const allLoc = parseSections(readText('scripts/_unpack/377/all.loc'), 'all.loc');
-const allNpcs = parseSections(readText('scripts/_unpack/377/all.npc'), 'all.npc');
+const allNpcs = parseSections(readText('scripts/minigames/game_barrows/configs/barrows_combat.npc'), 'barrows_combat.npc');
 const stairsConfig = parseSections(readText('scripts/ladders+stairs/configs/stairs.loc'), 'stairs.loc');
 
 // VERIFIED original level joins, CANDIDATE draw weights, UNKNOWN class encoding.
@@ -407,7 +407,7 @@ const monsterLevels = new Map([
     ['barrows_skeleton_armed', '77'], ['barrows_giantspider', '79']
 ]);
 assert.deepEqual(enumValues(enums, 'barrows_monster_level'), monsterLevels);
-for (const [name, level] of monsterLevels) assert.equal(one(section(allNpcs, name), 'vislevel', 'all.npc'), level, `${name} original combat level`);
+for (const [name, level] of monsterLevels) assert.equal(one(section(allNpcs, name), 'vislevel', 'barrows_combat.npc'), level, `${name} original combat level`);
 assert.deepEqual(enumValues(enums, 'barrows_door_class_npc'), new Map([
     ['0', '^barrows_door_skeleton_npc'],
     ['1', 'barrows_bloodworm'],
@@ -435,7 +435,7 @@ for (const encounter of ENCOUNTERS) {
     assert.equal(locPack.byId.get(encounter.sarcId), encounter.sarc, `sarcophagus loc id ${encounter.sarcId}`);
     assert.equal(npcPack.byName.get(encounter.brother), encounter.npcId, `${encounter.brother} id`);
     assert.equal(varbitPack.byName.get(encounter.slain), encounter.slainId, `${encounter.slain} id`);
-    section(allNpcs, encounter.brother);
+    section(allNpcs, encounter.brother); // BC-01: exactly one authored block per original brother.
     const sarcFields = section(allLoc, encounter.sarc);
     assert.equal(one(sarcFields, 'op1', 'all.loc'), 'Search', `[${encounter.sarc}] action`);
     const sarcParams = paramValues(sarcFields, `[${encounter.sarc}]`);
