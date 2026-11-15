@@ -95,6 +95,7 @@ function main() {
     const Packet = (await import(pathToFileURL(path.join(runtime.engineRoot, 'src/io/Packet.ts')).href)).default;
     const { PlayerLoading } = await import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/entity/PlayerLoading.ts')).href);
     const { default: VarSharedType } = await import(pathToFileURL(path.join(runtime.engineRoot, 'src/cache/config/VarSharedType.ts')).href);
+    const { ScriptOpcode } = await import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/script/ScriptOpcode.ts')).href);
     VarSharedType.load(runtime.packDir);
     World.vars = new Int32Array(VarSharedType.count);
     activePacket = Packet;
@@ -1073,6 +1074,12 @@ function main() {
     let doorTransferCount = 0;
     let eligibleDoorTransferCount = 0;
     let puzzleRandomCalls = 0;
+    let placementRandomCalls = 0;
+    const originalRankHandler = ScriptRunner.HANDLERS[ScriptOpcode.RANDOM];
+    ScriptRunner.HANDLERS[ScriptOpcode.RANDOM] = state => {
+      if (state.script.name === '[proc,barrows_door_tile]') placementRandomCalls++;
+      originalRankHandler(state);
+    };
     const originalRandom = JavaRandom.nextDouble;
     JavaRandom.nextDouble = function () {
       doorRandomCalls++;
@@ -1157,13 +1164,18 @@ function main() {
           const aBeforeTransfer = snapshotPlayer(doorA);
           const nativeNpcsBefore = Array.from(World.npcs).filter(npc => npc.isActive);
           const randomBeforeTransfer = doorRandomCalls;
+          const placementBeforeTransfer = placementRandomCalls;
           runSelected(doorA, openTrigger, placement.loc, `${placement.name} ${placement.edge}`);
           doorTransferCount++;
           const landed = { level: doorA.level, x: doorA.x, z: doorA.z };
           const destinationOccupants = nativeNpcsBefore.filter(npc => npc.level === landed.level && withinBounds(npc, nodeBounds[other]));
           const eligibleDraw = destinationOccupants.length < 11;
           if (eligibleDraw) eligibleDoorTransferCount++;
-          assert.equal(doorRandomCalls - randomBeforeTransfer, Number(eligibleDraw), `${placement.name}: only a below-cap destination consumes its fixed monster-class draw`);
+          const placementDraws = placementRandomCalls - placementBeforeTransfer;
+          const spawned = Array.from(World.npcs).filter(npc => npc.isActive && !nativeNpcsBefore.includes(npc));
+          assert.equal(placementDraws, spawned.length, `${placement.name}: one placement rank per actual encounter, no retry`);
+          assert.equal(doorRandomCalls - randomBeforeTransfer, Number(eligibleDraw) + placementDraws,
+            `${placement.name}: only a below-cap class draw and the independently counted placement rank`);
           assert.equal(landed.level, placement.level, `${placement.name}: transfer remains on the measured tunnel level`);
           assert.equal(landed[placement.laneAxis], placement[placement.laneAxis], `${placement.name}: transfer preserves the clicked lane`);
           assert(manhattan(landed, source) > 0, `${placement.name}: allowed transfer leaves its source tile`);
@@ -1195,7 +1207,8 @@ function main() {
       assert(lockedPathNegativeChecked, 'one representative locked internal corridor has a native pathfinder negative');
       assert(openPathPositiveChecked, 'one representative unlocked internal transfer has a native walk-positive control');
       assert(eligibleDoorTransferCount > 0 && eligibleDoorTransferCount < doorTransferCount, 'original map rooms exercise both below-cap and full-room traversals');
-      assert.equal(doorRandomCalls, eligibleDoorTransferCount + puzzleRandomCalls, 'only below-cap S08 encounters and S09 presentation choices draw; refusals draw none');
+      assert.equal(doorRandomCalls, eligibleDoorTransferCount + puzzleRandomCalls + placementRandomCalls,
+        'only below-cap S08 classes, valid placement ranks and S09 presentation choices draw; refusals draw none');
       assert.deepEqual(worldMutations, [], 'personal door operations never call World loc add/change/remove/revert');
       assert.equal(World.getTotalNpcs(), npcCountBeforeDoors, 'door encounter cleanup preserves every pre-existing map NPC');
       // Native transfers move PLAYER_OCC too. Return both fixtures to their
@@ -1205,6 +1218,7 @@ function main() {
       assert.deepEqual(collisionSnapshot(), collisionBeforeDoors, 'all original tunnel collision flags remain byte-for-byte equivalent across A/B door operations');
     } finally {
       JavaRandom.nextDouble = originalRandom;
+      ScriptRunner.HANDLERS[ScriptOpcode.RANDOM] = originalRankHandler;
       for (const [name, original] of originalWorldMethods) World[name] = original;
       for (const player of nativeDoorPlayers) {
         player.closeModal();

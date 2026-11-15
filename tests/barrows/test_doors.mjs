@@ -10,8 +10,9 @@ const args = process.argv.slice(2);
 const regressionFlags = args.filter(arg => arg === '--regression');
 assert(regressionFlags.length <= 1, '--regression can be supplied once');
 const regression = regressionFlags.length === 1;
+const placementRegression = args.includes('--placement-regression');
 const options = parseOptions([
-  process.argv[0], process.argv[1], ...args.filter(arg => arg !== '--regression')
+  process.argv[0], process.argv[1], ...args.filter(arg => arg !== '--regression' && arg !== '--placement-regression')
 ]);
 const roots = resolveRoots(options);
 process.chdir(roots.engineRoot);
@@ -309,12 +310,18 @@ await run(async () => {
     return candidates;
   }
 
-  function withSquareChoice(origin, destination, action, label) {
-    const candidates = nativeSquareCandidates(origin);
+  function validTileCandidates(origin, typeId) {
+    const size = NpcType.get(typeId).size;
+    const room = roomOf(origin);
+    return nativeSquareCandidates(origin).filter(candidate =>
+      footprintWalkable(candidate, size, room)
+      && activeNpcs().every(npc => !overlapsFootprint(candidate, size, size, npc)));
+  }
+  function withSquareChoice(origin, typeId, destination, action, label) {
+    const candidates = validTileCandidates(origin, typeId);
     const rank = candidates.findIndex(candidate => pointKey(candidate) === pointKey(destination));
-    assert.notEqual(rank, -1, `${label}: chosen tile is one native MAP_FINDSQUARE candidate`);
-    const draw = (rank + 0.25) / candidates.length;
-    return withMapDraws([draw], action, label);
+    assert.notEqual(rank, -1, `${label}: chosen tile has a fully valid unoccupied footprint`);
+    return withDraws([[rank, candidates.length]], action, label);
   }
   function withOptionalSquareChoice(origin, destination, action, label) {
     const candidates = nativeSquareCandidates(origin, 0, 2);
@@ -469,17 +476,14 @@ await run(async () => {
   }
 
   function withDoorSpawn(landing, typeId, draws, action, label) {
-    const candidates = nativeSquareCandidates(landing);
-    const target = availableSpawnTile(landing, NpcType.get(typeId).size, candidates);
-    assert(target, `${label}: a legal unoccupied destination-side NPC footprint exists`);
-    const rank = candidates.findIndex(candidate => pointKey(candidate) === pointKey(target));
-    assert.notEqual(rank, -1, `${label}: chosen footprint origin is one native MAP_FINDSQUARE candidate`);
-    const mapResult = withMapDraws([(rank + 0.25) / candidates.length], () => withDraws(draws, action, label), label);
+    const candidates = validTileCandidates(landing, typeId);
+    assert(candidates.length > 0, `${label}: a legal unoccupied destination-side NPC footprint exists`);
+    const result = withDraws([...draws, [0, candidates.length]], action, label);
     return {
-      value: mapResult.value.value,
-      scriptCalls: mapResult.value.calls,
-      mapCalls: mapResult.calls,
-      tile: target
+      value: result.value,
+      scriptCalls: draws.length,
+      tileCalls: result.calls - draws.length,
+      tile: candidates[0]
     };
   }
 
@@ -531,6 +535,38 @@ await run(async () => {
     assert(centralCrossing, 'a native central crossing supports the puzzle-refusal control');
     assert(ScriptProvider.getByName('[proc,barrows_door_use]'), 'the previous public barrows_door_use proc is packed');
 
+    if (placementRegression) {
+      const owner = makePlayer('crowded-placement-regression');
+      setRun(owner, { phase: 2, generation: 401, slain: 62, openLock: ordinaryCrossing.lock, position: ordinaryCrossing.source });
+      const typeId = npcId('barrows_ahrim');
+      const size = NpcType.get(typeId).size;
+      const candidates = nativeSquareCandidates(ordinaryCrossing.destination);
+      const occupied = availableSpawnTile(ordinaryCrossing.destination, size, candidates);
+      assert(occupied, 'placement regression has an initially free footprint');
+      const blocker = addFixtureNpc('barrows_rat', occupied);
+      const alternative = availableSpawnTile(ordinaryCrossing.destination, size, candidates);
+      assert(alternative, 'placement regression retains a second fully valid tile');
+      const before = new Set(activeNpcs().map(npc => npc.nid));
+      const rank = candidates.findIndex(tile => pointKey(tile) === pointKey(occupied));
+      const java = JavaRandom.nextDouble;
+      const math = Math.random;
+      JavaRandom.nextDouble = () => 0;
+      Math.random = () => (rank + 0.25) / candidates.length;
+      let state;
+      try { state = runLocAction(owner, ordinaryCrossing); }
+      finally { JavaRandom.nextDouble = java; Math.random = math; }
+      const actors = spawnDelta(before);
+      console.log(JSON.stringify({ case: 'occupied-native-pick-with-free-alternative', commands: state.opcount,
+        occupied, alternative, spawned: actors.map(npc => ({ type: npc.type, x: npc.x, z: npc.z })) }));
+      assert.deepEqual([owner.level, owner.x, owner.z],
+        [ordinaryCrossing.destination.level, ordinaryCrossing.destination.x, ordinaryCrossing.destination.z],
+        'crowded placement does not prevent traversal');
+      assert.equal(actors.length, 1, 'a paid door must summon its eligible brother when another valid tile exists');
+      assert.equal(actors[0].type, typeId, 'the paid guarantee keeps its one uncredited identity');
+      assert(!overlapsFootprint(actors[0], size, size, blocker), 'the brother never overlaps the occupied footprint');
+      console.log('PASS placement regression: an occupied old pick cannot suppress a valid paid encounter');
+      return;
+    }
     if (regression) {
       const redPlayer = makePlayer('regression');
       setRun(redPlayer, { phase: 1, generation: 401, openLock: ordinaryCrossing.lock, position: ordinaryCrossing.source });
@@ -677,12 +713,11 @@ await run(async () => {
       const type = NpcType.get(typeId);
       const origin = roomTiles(destinationRoom, type.size)[0];
       assert(origin, `${name}: original map has a legal room tile for the full NPC footprint`);
-      const originResult = withDraws([], () => withSquareChoice(
-        origin, origin, () => procInt(selector, 'barrows_door_tile', [pack(origin), typeId]), `${name} origin tile`
-      ), `${name} origin-tile script RNG`);
-      assert.equal(originResult.calls, 0, `${name}: native tile search consumes no script RNG`);
-      assert.equal(originResult.value.calls, 1, `${name}: one native map draw selects the controlled origin`);
-      assert.deepEqual(decode(originResult.value.value), origin, `${name}: min radius zero accepts the valid origin`);
+      const originResult = withSquareChoice(
+        origin, typeId, origin, () => procInt(selector, 'barrows_door_tile', [pack(origin), typeId]), `${name} origin tile`
+      );
+      assert.equal(originResult.calls, 1, `${name}: exactly one uniform valid-tile rank draw`);
+      assert.deepEqual(decode(originResult.value), origin, `${name}: min radius zero accepts the valid origin`);
       for (let dx = 0; dx < type.size; dx++) {
         for (let dz = 0; dz < type.size; dz++) {
           const footprint = { level: origin.level, x: origin.x + dx, z: origin.z + dz };
@@ -719,42 +754,122 @@ await run(async () => {
       try {
         assert.equal(mapApi.isMapBlocked(occupiedPoint.x, occupiedPoint.z, occupiedPoint.level), false,
           `${label}: native NPC occupancy is not a static MAP_FINDSQUARE collision`);
-        const rejected = withDraws([], () => withSquareChoice(
-          occupiedLanding,
-          occupiedLanding,
-          () => procInt(selector, 'barrows_door_tile', [pack(occupiedLanding), footprintTypeId]),
-          `${label} placement`
-        ), `${label} script RNG`);
-        assert.equal(rejected.calls, 0, `${label}: footprint validation consumes no script RNG`);
-        assert.equal(rejected.value.calls, 1, `${label}: exactly one native tile draw is attempted`);
-        assert.equal(rejected.value.value, -1, `${label}: occupied NPC footprint is rejected without retry`);
+        const candidates = validTileCandidates(occupiedLanding, footprintTypeId);
+        assert(candidates.every(tile => !overlapsFootprint(tile, footprintType.size, footprintType.size, blocker)),
+          `${label}: independent oracle removes the entire occupied footprint`);
+        if (candidates.length === 0) {
+          assert.equal(withDraws([], () => procInt(selector, 'barrows_door_tile',
+            [pack(occupiedLanding), footprintTypeId]), label).value, -1, `${label}: an empty valid set consumes no draw`);
+        }
+        for (const [rank, expected] of candidates.entries()) {
+          const selected = withDraws([[rank, candidates.length]], () => procInt(selector, 'barrows_door_tile',
+            [pack(occupiedLanding), footprintTypeId]), `${label}, rank ${rank}`);
+          assert.deepEqual(decode(selected.value), expected, `${label}: every rank selects exactly one free full footprint`);
+          assert(!overlapsFootprint(decode(selected.value), footprintType.size, footprintType.size, blocker),
+            `${label}: neither origin nor far footprint tile can overlap an NPC`);
+        }
       } finally {
         if (blocker.isActive) World.removeNpc(blocker, -1);
       }
     }
+    clearNpcs();
+    const crowdedOwner = makePlayer('one-free-footprint');
+    const crowdedTiles = validTileCandidates(ordinaryCrossing.destination, doorNpc.bloodworm);
+    assert(crowdedTiles.length > 1, 'crowded control starts with several valid footprint origins');
+    const onlyFree = crowdedTiles.find(tile => pointKey(tile) === pointKey(ordinaryCrossing.destination));
+    assert(onlyFree, 'the landing itself is the sole-free-tile control, with a zero-length walk line');
+    const crowdedBlocks = [];
+    for (const tile of crowdedTiles.filter(tile => pointKey(tile) !== pointKey(onlyFree))) {
+      mapApi.changeLocCollision(10, 0, false, 1, 1, 0, tile.x, tile.z, tile.level, true);
+      manualBlocks.push(tile);
+      crowdedBlocks.push(tile);
+    }
+    try {
+      addSpreadFixtures(destinationRoom, Array.from({ length: constant('barrows_door_room_cap') - 1 },
+        () => ({ type: 'barrows_rat' })), ordinaryCrossing.destination);
+      for (const [phase, typeId, draws] of [
+        [1, doorNpc.bloodworm, [[64, 128]]],
+        [2, npcId('barrows_ahrim'), [[0, 1]]]
+      ]) {
+        setRun(crowdedOwner, { phase, generation: 430 + phase, slain: 62,
+          openLock: ordinaryCrossing.lock, position: ordinaryCrossing.source });
+        assert.deepEqual(validTileCandidates(ordinaryCrossing.destination, typeId), [onlyFree],
+          `phase ${phase}: exactly one valid full footprint remains below the shared cap`);
+        const before = new Set(activeNpcs().map(npc => npc.nid));
+        const result = withDoorSpawn(ordinaryCrossing.destination, typeId, draws,
+          () => runLocAction(crowdedOwner, ordinaryCrossing), `phase ${phase} one-free-tile traversal`);
+        const spawned = spawnDelta(before);
+        assert.equal(spawned.length, 1, `phase ${phase}: an encounter is not lost while one valid tile exists`);
+        assert.deepEqual({ level: spawned[0].level, x: spawned[0].x, z: spawned[0].z }, onlyFree,
+          `phase ${phase}: the ordinary monster or guaranteed brother uses the sole free tile`);
+        assert.equal(spawned[0].type, typeId, `phase ${phase}: placement never rerolls the selected class`);
+        assert.equal(activeRoomNpcs(destinationRoom).length, constant('barrows_door_room_cap'),
+          `phase ${phase}: ten shared living enemies admit the eleventh`);
+        console.log(JSON.stringify({ case: 'one-free-valid-tile', phase, commands: result.value.opcount, tile: onlyFree }));
+        World.removeNpc(spawned[0], -1);
+      }
+    } finally {
+      restoreBlocks(crowdedBlocks);
+      clearNpcs();
+    }
+
+    // UNKNOWN engineering test policy: deterministic xorshift32 sample, 500
+    // observations per valid origin and an 18% relative tolerance (over 4 sigma).
+    const tileSeed = 0x377b4;
+    const trialsPerTile = 500;
+    const relativeTolerance = 0.18;
+    const uniformTiles = validTileCandidates(ordinaryCrossing.destination, doorNpc.bloodworm);
+    assert(uniformTiles.length > 1, 'uniformity control contains multiple valid origins');
+    const frequencies = new Map(uniformTiles.map(tile => [pointKey(tile), 0]));
+    const samples = uniformTiles.length * trialsPerTile;
+    let randomState = tileSeed;
+    let tileDraws = 0;
+    const originalTileRandom = JavaRandom.nextDouble;
+    JavaRandom.nextDouble = () => {
+      tileDraws++;
+      randomState ^= randomState << 13;
+      randomState ^= randomState >>> 17;
+      randomState ^= randomState << 5;
+      return (randomState >>> 0) / 2 ** 32;
+    };
+    try {
+      for (let trial = 0; trial < samples; trial++) {
+        const selected = decode(procInt(selector, 'barrows_door_tile', [pack(ordinaryCrossing.destination), doorNpc.bloodworm]));
+        const key = pointKey(selected);
+        assert(frequencies.has(key), 'uniform sample selects only independently valid full footprints');
+        frequencies.set(key, frequencies.get(key) + 1);
+      }
+    } finally {
+      JavaRandom.nextDouble = originalTileRandom;
+    }
+    assert.equal(tileDraws, samples, 'one and only one placement rank is drawn per nonempty valid set');
+    for (const [key, count] of frequencies) assert(Math.abs(count - trialsPerTile) <= trialsPerTile * relativeTolerance,
+      `${key}: uniform frequency ${count} is within the stated seeded tolerance`);
+    console.log(JSON.stringify({ case: 'uniform-valid-tiles', seed: tileSeed, samples, trialsPerTile,
+      relativeTolerance, frequencies: [...frequencies] }));
+
 
     const invalidBlocks = blockRoomRadius(ordinaryCrossing.destination, destinationRoom);
     try {
-      const invalidCandidates = nativeSquareCandidates(ordinaryCrossing.destination);
       const invalidTile = withMapDraws(
-        invalidCandidates.length === 0 ? [] : [0.25 / invalidCandidates.length],
+        [],
         () => withDraws([], () => procInt(selector, 'barrows_door_tile', [pack(ordinaryCrossing.destination), doorNpc.bloodworm]), 'no legal tile'),
         'no legal tile'
       );
       assert.equal(invalidTile.value.value, -1, 'no legal destination footprint returns null');
       assert.equal(invalidTile.value.calls, 0, 'failed tile search consumes no script RNG');
-      assert.equal(invalidTile.calls, invalidCandidates.length === 0 ? 0 : 1, 'failed tile search makes at most one native map draw');
+      assert.equal(invalidTile.calls, 0, 'empty valid set consumes no native map draw');
 
       const invalidPlayer = makePlayer('invalid-placement');
       setRun(invalidPlayer, { phase: 1, generation: 404, openLock: ordinaryCrossing.lock, position: ordinaryCrossing.source });
       const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
       const invalidCrossing = withMapDraws(
-        invalidCandidates.length === 0 ? [] : [0.25 / invalidCandidates.length],
+        [],
         () => withDraws([[64, 128]], () => runLocAction(invalidPlayer, ordinaryCrossing), 'crossing with no placement'),
         'crossing with no placement'
       );
       assert.equal(invalidCrossing.value.calls, 1, 'invalid placement performs one class selection attempt');
-      assert.equal(invalidCrossing.calls, invalidCandidates.length === 0 ? 0 : 1, 'invalid placement performs at most one native tile draw');
+      assert.equal(invalidCrossing.calls, 0, 'invalid placement consumes no native map draw or reroll');
       assert.deepEqual(
         [invalidPlayer.level, invalidPlayer.x, invalidPlayer.z],
         [ordinaryCrossing.destination.level, ordinaryCrossing.destination.x, ordinaryCrossing.destination.z],
@@ -782,7 +897,7 @@ await run(async () => {
       'valid monster traversal'
     );
     assert.equal(traversal.scriptCalls, 1, 'one successful door transfer makes one class draw');
-    assert.equal(traversal.mapCalls, 1, 'the native placement makes exactly one map tile draw');
+    assert.equal(traversal.tileCalls, 1, 'placement makes exactly one uniform valid-tile rank draw');
     assert.deepEqual(
       [traversalOwner.level, traversalOwner.x, traversalOwner.z],
       [ordinaryCrossing.destination.level, ordinaryCrossing.destination.x, ordinaryCrossing.destination.z],
@@ -793,7 +908,7 @@ await run(async () => {
     const bloodworm = doorActors[0];
     assert.equal(bloodworm.type, doorNpc.bloodworm, 'draw 64 spawns the configured bloodworm');
     assert.equal(bloodworm.level, ordinaryCrossing.destination.level, 'spawn uses the measured destination plane');
-    assert.equal(`${bloodworm.x},${bloodworm.z}`, `${traversal.tile.x},${traversal.tile.z}`, 'controlled native map draw selects the asserted destination tile');
+    assert.equal(`${bloodworm.x},${bloodworm.z}`, `${traversal.tile.x},${traversal.tile.z}`, 'controlled valid-tile rank selects the asserted destination tile');
     assert(candidateTiles.has(`${bloodworm.x},${bloodworm.z}`), 'spawn tile is native-map legal and within radius two of the destination');
     assert.equal(roomOf(bloodworm), destinationRoom, 'spawn is wholly on the destination side, never the source side');
     assert.equal(bloodworm.width, bloodwormType.size, 'spawn uses the original NPC width');
@@ -899,7 +1014,7 @@ await run(async () => {
       'ten living shared occupants'
     );
     assert.equal(atTen.scriptCalls, 1, 'the tenth living shared occupant permits one class draw');
-    assert.equal(atTen.mapCalls, 1, 'cap-ten spawn uses exactly one native tile draw');
+    assert.equal(atTen.tileCalls, 1, 'cap-ten spawn uses exactly one valid-tile draw');
     const atTenSpawn = spawnDelta(beforeTen);
     assert.equal(atTenSpawn.length, 1, 'ten living NPCs allow the room to grow to eleven');
     assert.equal(atTenSpawn[0].type, doorNpc.crypt_rat, 'draw 96 resolves to the configured crypt rat');
@@ -937,7 +1052,7 @@ await run(async () => {
       'paid guaranteed brother'
     );
     assert.equal(paidTraversal.scriptCalls, 1, 'paid door uses only the unset-brother rank draw');
-    assert.equal(paidTraversal.mapCalls, 1, 'paid brother uses exactly one native tile draw');
+    assert.equal(paidTraversal.tileCalls, 1, 'paid brother uses exactly one valid-tile draw');
     assert.deepEqual(
       [paidOwner.level, paidOwner.x, paidOwner.z],
       [ordinaryCrossing.destination.level, ordinaryCrossing.destination.x, ordinaryCrossing.destination.z],
@@ -981,7 +1096,7 @@ await run(async () => {
       'first Ahrim twin'
     );
     assert.equal(twinA.scriptCalls, 2, 'brother encounter consumes one class draw and one identity-rank draw');
-    assert.equal(twinA.mapCalls, 1, 'first twin uses one native tile draw');
+    assert.equal(twinA.tileCalls, 1, 'first twin uses one valid-tile draw');
     const livingFirstTwin = activeNpcs().find(npc => npc.type === npcId('barrows_ahrim'));
     assert(livingFirstTwin, 'first eligible Ahrim encounter is alive');
     assert.deepEqual([livingFirstTwin.x, livingFirstTwin.z], [twinA.tile.x, twinA.tile.z], 'first twin uses its controlled legal tile');
@@ -995,7 +1110,7 @@ await run(async () => {
       'second Ahrim twin'
     );
     assert.equal(twinB.scriptCalls, 2, 'living twin encounter consumes one class draw and one identity-rank draw');
-    assert.equal(twinB.mapCalls, 1, 'second twin uses one native tile draw');
+    assert.equal(twinB.tileCalls, 1, 'second twin uses one valid-tile draw');
     const twins = activeNpcs().filter(npc => npc.type === npcId('barrows_ahrim'));
     assert.equal(twins.length, 2, 'door encounters allow two living actors of one unset identity');
     const secondTwin = twins.find(npc => npc !== livingFirstTwin);
@@ -1028,7 +1143,7 @@ await run(async () => {
     );
     const foreignActor = spawnDelta(foreignBefore)[0];
     assert.equal(foreignActorSetup.scriptCalls, 1, 'foreign-killer actor setup uses one class draw');
-    assert.equal(foreignActorSetup.mapCalls, 1, 'foreign-killer actor setup uses one native tile draw');
+    assert.equal(foreignActorSetup.tileCalls, 1, 'foreign-killer actor setup uses one valid-tile draw');
     assert(foreignActor, 'door encounter creates an owned actor for the foreign-killer control');
     assert.deepEqual([foreignActor.x, foreignActor.z], [foreignActorSetup.tile.x, foreignActorSetup.tile.z], 'foreign-killer actor uses its controlled tile');
     const ownerCreditBefore = u32(foreignOwner.getVar(vars.barrows_kills));
@@ -1052,7 +1167,7 @@ await run(async () => {
     );
     const cleanupActor = spawnDelta(cleanupBefore)[0];
     assert.equal(cleanupActorSetup.scriptCalls, 1, 'owned cleanup actor setup uses one class draw');
-    assert.equal(cleanupActorSetup.mapCalls, 1, 'owned cleanup actor setup uses one native tile draw');
+    assert.equal(cleanupActorSetup.tileCalls, 1, 'owned cleanup actor setup uses one valid-tile draw');
     assert(cleanupActor && cleanupActor.getVar(npcVars.npc_barrows_owner) === cleanupOwner.uid, 'cleanup control has an owned door actor');
     assert.deepEqual([cleanupActor.x, cleanupActor.z], [cleanupActorSetup.tile.x, cleanupActorSetup.tile.z], 'owner cleanup actor uses its controlled tile');
     const peerBefore = new Set(activeNpcs().map(npc => npc.nid));
@@ -1065,7 +1180,7 @@ await run(async () => {
     );
     const peerActor = spawnDelta(peerBefore)[0];
     assert.equal(peerActorSetup.scriptCalls, 1, 'foreign cleanup actor setup uses one class draw');
-    assert.equal(peerActorSetup.mapCalls, 1, 'foreign cleanup actor setup uses one native tile draw');
+    assert.equal(peerActorSetup.tileCalls, 1, 'foreign cleanup actor setup uses one valid-tile draw');
     assert(peerActor && peerActor.getVar(npcVars.npc_barrows_owner) === cleanupPeer.uid, 'cleanup control has a second owner actor');
     assert.deepEqual([peerActor.x, peerActor.z], [peerActorSetup.tile.x, peerActorSetup.tile.z], 'peer cleanup actor uses its controlled tile');
     assert(cleanupActor.x + cleanupActor.width <= peerActor.x || peerActor.x + peerActor.width <= cleanupActor.x

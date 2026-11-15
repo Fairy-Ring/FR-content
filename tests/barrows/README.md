@@ -127,7 +127,11 @@ node --import tsx ../content/tests/barrows/test_doors.mjs
 
 Each successful traversal attempts one encounter in its destination room. The CANDIDATE table has exactly 12 brother, 52 skeleton, 32 bloodworm and 32 crypt-rat outcomes. Shared living occupancy admits a spawn at 10 enemies and suppresses it at 11. Paid traversals choose an uncredited brother instead of the 128-way table. An empty brother pool gives no spawn for a brother outcome or a paid traversal; ordinary unlooted outcomes still spawn.
 
-Placement uses the measured landing tile, the named 0-to-2 radius and line-of-walk mode. Every tile of the selected NPC's footprint must be unblocked and in the destination room, without overlapping another NPC footprint. The overlap guard preserves native NPC occupancy when the summon is removed. Only one square is drawn: rejecting it can suppress a spawn even when another free square exists. An unsuccessful placement does not undo traversal or repeat the draw. Living twins remain eligible, but their identity credits only once. Owner, generation, killer attribution and cleanup use the existing S03/S04 contract.
+Placement enumerates every valid footprint origin within the named 0-to-2 radius and line of walk. Every footprint square must be unblocked and in the destination room. No square can overlap any NPC footprint. The overlap guard preserves native NPC collision when the summon is removed.
+
+UNKNOWN engineering `barrows_door_tile_distribution` selects one uniform rank from the complete valid set. Placement gives up only when that set is empty. It never repeats traversal or class selection. Living twins remain eligible, but their identity credits only once. Owner, generation, killer attribution and cleanup use the existing S03/S04 contract.
+
+The placement regression first fails on the old occupied single-pick policy, then passes with a free alternative. The full suite covers one free tile, no free tiles, every footprint rank, unchanged caps and the exact 128-way class counts. A 5,500-observation xorshift32 sample uses seed 227252 and an 18% relative tolerance around each origin's expected frequency. The occupied-footprint mutant fails the nonoverlap assertion.
 
 ## Puzzle (S09)
 

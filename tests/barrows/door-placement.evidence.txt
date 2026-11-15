@@ -1,0 +1,32 @@
+Group 4 preliminary 2, complete valid footprint placement, 2026-11-15.
+Evidence root: U-BARROWS-1113/b4 (operator evidence storage, not this repository).
+Policy: UNKNOWN engineering, barrows_door_tile_distribution=uniform_valid_footprints.
+
+Old single-pick red: logs/pre2-old-single-pick-red.log
+SHA-256: 316cfa19f9c32059604c288996774273e2bd8afcf3a672faad589abfbee565e1
+Occupied native pick, free alternative, paid traversal spawned no required brother.
+Commands: 4342.
+
+Corrected regression green: logs/pre2-regression-green.log
+SHA-256: 945c6ab594f5ce231eb10737f160a9c24d00bb17322d2e9babee39261daea207
+Same native paid door action placed one brother on the free alternative.
+Commands: 7988. Increment: 3646 commands (84.0%) in this loaded-map fixture.
+
+Occupied-footprint mutant red: logs/pre2-mutant-under-npc-red.log
+SHA-256: 73487433cb0dd07585467b126b2164fa7dfc3b2494420377262091172906cdf1
+Suppressing overlap-bit removal placed the brother under the NPC and failed the nonoverlap assertion.
+The original bit clearing was restored.
+
+Complete doors suite green: logs/pre2-doors-second.log
+SHA-256: 3d4154add257cd76ed090feed0dc9c7b392351f9c363127981f286f2a524bf34
+One-free-tile pre-loot/paid encounters, empty set without retry, shared caps and 128-way 12/52/32/32 counts pass.
+Seeded uniformity: xorshift32 seed 227252, 5500 observations, 11 origins, expectation 500, relative tolerance 18%.
+Observed frequencies: 546,480,503,493,505,522,481,508,454,493,515.
+Every valid footprint rank has a separate exact mapping assertion.
+
+Required gates green: logs/pre2-gates.log
+SHA-256: 05bd51350905eebe3b80f8b7ed941b28930c4f8357e45a7f49831985d7756ed4
+Clean pack, build, rs2check, 98 registered checks, varp transmission and client-byte equality all exit 0.
+Both edited RuneScript/config language-server diagnostics returned OK.
+Client/config SHA-256: b6ec704421650ee5527e77c635b8b3a8036f6eb042c572516ac0696cfbce19a8
+Original logs remain outside the repository because failing stacks identify host paths.

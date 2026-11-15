@@ -122,6 +122,7 @@ process.chdir(roots.engineRoot);
 await run(async () => {
   const runtime = await loadPackedRuntime(options);
   const enginePath = relative => pathToFileURL(path.join(runtime.engineRoot, relative)).href;
+  const { ScriptOpcode } = await import(enginePath('src/engine/script/ScriptOpcode.ts'));
   const [{ default: VarSharedType }, { default: ServerTriggerType }, { default: Packet }, { PlayerLoading },
     { NpcStatMap }, { default: DbRowType }, { default: DbTableType }, { default: DbTableIndex },
     mapApi, route] = await Promise.all([
@@ -321,25 +322,27 @@ await run(async () => {
     assert.deepEqual(varSnapshot(player), varsBefore, `${label}: no varp changes`);
     assert.deepEqual(inventorySnapshot(player), inventoryBefore, `${label}: no inventory or payment changes`);
   }
-  function withoutScriptRandom(label, action) {
-    const original = JavaRandom.nextDouble;
-    let calls = 0;
-    JavaRandom.nextDouble = function () {
-      calls++;
-      throw new Error(`${label}: unexpected packed-script random draw`);
+  function withoutEncounterRandom(label, action, expectedTileDraws = 0) {
+    const original = ScriptRunner.HANDLERS[ScriptOpcode.RANDOM];
+    let placementCalls = 0;
+    ScriptRunner.HANDLERS[ScriptOpcode.RANDOM] = state => {
+      assert.equal(state.script.name, '[proc,barrows_door_tile]', `${label}: no encounter class, identity or layout draw`);
+      assert(placementCalls < expectedTileDraws, `${label}: no unexpected placement rank or reroll`);
+      placementCalls++;
+      original(state);
     };
     try {
       const result = action();
-      assert.equal(calls, 0, `${label}: packed script consumed no random draw`);
+      assert.equal(placementCalls, expectedTileDraws, `${label}: exact valid-tile draw count`);
       return result;
     } finally {
-      JavaRandom.nextDouble = original;
+      ScriptRunner.HANDLERS[ScriptOpcode.RANDOM] = original;
     }
   }
   function gate(player, name, generation, label) {
     const varsBefore = varSnapshot(player);
     const inventoryBefore = inventorySnapshot(player);
-    const result = withoutScriptRandom(label, () => procInt(player, name, [generation]));
+    const result = withoutEncounterRandom(label, () => procInt(player, name, [generation]));
     assertNoPlayerMutation(player, varsBefore, inventoryBefore, label);
     return result;
   }
@@ -496,7 +499,7 @@ await run(async () => {
     const firstBefore = varSnapshot(main);
     const firstInventory = inventorySnapshot(main);
     main.packets.length = 0;
-    const firstOpen = withoutScriptRandom('first native chest Open', () => nativeOpen(main, 'first native chest Open'));
+    const firstOpen = withoutEncounterRandom('first native chest Open', () => nativeOpen(main, 'first native chest Open'), 1);
     assert.equal(openFromVarp(main), 1, 'native public Open changes the real chest-open bit');
     if (regression) {
       console.log('PASS S10 public Open regression witness: native OPLOC1 sets the real chest bit');
@@ -560,7 +563,7 @@ await run(async () => {
       assert.equal(actor.target, player, `${label}: actor targets its owner, not a bystander`);
       assert.equal(actor.targetOp, NpcMode.OPPLAYER2, `${label}: actor starts native opplayer2 mode`);
       assert.equal(actor.level, 0, `${label}: final encounter stays in tunnels`);
-      assert(chebyshev(actor, player) <= 2, `${label}: native map_findsquare stays within the legal 0..2 ring`);
+      assert(chebyshev(actor, player) <= 2, `${label}: uniform valid-tile placement stays within the legal 0..2 ring`);
       assert.equal(roomOf(actor), 4, `${label}: final brother remains in the central tunnel room`);
       assert(footprintWalkable({ level: actor.level, x: actor.x, z: actor.z }, NpcType.get(actor.type).size, 4), `${label}: complete native NPC footprint is walkable in-room`);
       assert.equal(actor.lifecycle, EntityLifeCycle.DESPAWN, `${label}: the summon uses native despawn lifecycle`);
@@ -584,7 +587,7 @@ await run(async () => {
     const repeatedVars = varSnapshot(main);
     const repeatedInventory = inventorySnapshot(main);
     const repeatedNids = new Set(activeNpcs().map(npc => npc.nid));
-    withoutScriptRandom('repeated direct chest Open', () => procVoid(main, 'barrows_chest_open', [parentTypeId, CoordGrid.packCoord(0, 3551, 9695)]));
+    withoutEncounterRandom('repeated direct chest Open', () => procVoid(main, 'barrows_chest_open', [parentTypeId, CoordGrid.packCoord(0, 3551, 9695)]));
     assertNoPlayerMutation(main, repeatedVars, repeatedInventory, 'repeated direct chest Open');
     assert.deepEqual(spawnDelta(repeatedNids), [], 'repeated Open cannot duplicate the selected final actor');
     runNativeSearch(main, 'open-child Search');
@@ -619,7 +622,7 @@ await run(async () => {
       let foreign = null;
       if (identity === 1) {
         setRun(other, { identity, generation, solved: true, position: { level: 0, x: 3552, z: 9694 } });
-        const handle = withoutScriptRandom('foreign same-generation owner spawn', () => procInt(other, 'barrows_actor_spawn', [
+        const handle = withoutEncounterRandom('foreign same-generation owner spawn', () => procInt(other, 'barrows_actor_spawn', [
           brotherId(identity), CoordGrid.packCoord(controlTile.level, controlTile.x, controlTile.z), c('barrows_chest_summon_lifetime')
         ]));
         foreign = World.getNpcByUid(handle);
@@ -634,7 +637,7 @@ await run(async () => {
       const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
       main.packets.length = 0;
       other.packets.length = 0;
-      const opened = withoutScriptRandom(`identity ${identity} native Open`, () => nativeOpen(main, `identity ${identity} native Open`));
+      const opened = withoutEncounterRandom(`identity ${identity} native Open`, () => nativeOpen(main, `identity ${identity} native Open`), 1);
       assertClosedChildDispatch(main, opened, `identity ${identity} native Open`);
       assertOpenOnlyMutation(main, beforeVars, `identity ${identity} native Open`);
       assert.deepEqual(inventorySnapshot(main), beforeInventory, `identity ${identity} Open changes no inventory, potential, count or reward`);
@@ -663,7 +666,7 @@ await run(async () => {
       const beforeVars = varSnapshot(main);
       const beforeInventory = inventorySnapshot(main);
       const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
-      const opened = withoutScriptRandom(`credited identity ${identity} Open`, () => nativeOpen(main, `credited identity ${identity} Open`));
+      const opened = withoutEncounterRandom(`credited identity ${identity} Open`, () => nativeOpen(main, `credited identity ${identity} Open`));
       assertClosedChildDispatch(main, opened, `credited identity ${identity} Open`);
       assertOpenOnlyMutation(main, beforeVars, `credited identity ${identity} Open`);
       assert.deepEqual(inventorySnapshot(main), beforeInventory, `credited identity ${identity} Open has no item effect`);
@@ -681,7 +684,7 @@ await run(async () => {
       const beforeInventory = inventorySnapshot(main);
       const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
       assert.equal(gate(main, 'barrows_chest_search_allowed', generation, `B mask ${mask} Search before Open`), 0, `B mask ${mask} still needs real Open`);
-      const opened = withoutScriptRandom(`B mask ${mask} native Open`, () => nativeOpen(main, `B mask ${mask} native Open`));
+      const opened = withoutEncounterRandom(`B mask ${mask} native Open`, () => nativeOpen(main, `B mask ${mask} native Open`), (mask & 1) === 0 ? 1 : 0);
       assertClosedChildDispatch(main, opened, `B mask ${mask} native Open`);
       assertOpenOnlyMutation(main, beforeVars, `B mask ${mask} native Open`);
       assert.deepEqual(inventorySnapshot(main), beforeInventory, `B mask ${mask} Open changes no inventory or payment state`);
@@ -706,7 +709,7 @@ await run(async () => {
         const beforeVars = varSnapshot(main);
         const beforeInventory = inventorySnapshot(main);
         const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
-        const opened = withoutScriptRandom(`identity ${identity} resident L${level} Open`, () => nativeOpen(main, `identity ${identity} resident L${level} Open`));
+        const opened = withoutEncounterRandom(`identity ${identity} resident L${level} Open`, () => nativeOpen(main, `identity ${identity} resident L${level} Open`));
         assertClosedChildDispatch(main, opened, `identity ${identity} resident L${level} Open`);
         assertOpenOnlyMutation(main, beforeVars, `identity ${identity} resident L${level} Open`);
         assert.deepEqual(inventorySnapshot(main), beforeInventory, `resident L${level} Open changes no inventory`);
@@ -739,7 +742,7 @@ await run(async () => {
         const beforeVars = varSnapshot(main);
         const beforeInventory = inventorySnapshot(main);
         const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
-        const opened = withoutScriptRandom('pending-death Open', () => nativeOpen(main, 'pending-death Open'));
+        const opened = withoutEncounterRandom('pending-death Open', () => nativeOpen(main, 'pending-death Open'));
         assertClosedChildDispatch(main, opened, 'pending-death Open');
         assertOpenOnlyMutation(main, beforeVars, 'pending-death Open');
         assert.deepEqual(inventorySnapshot(main), beforeInventory, 'pending-death Open grants no item');
@@ -787,7 +790,7 @@ await run(async () => {
       const beforeVars = varSnapshot(main);
       const beforeInventory = inventorySnapshot(main);
       const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
-      const opened = withoutScriptRandom(`${row.label} native Open`, () => nativeOpen(main, `${row.label} native Open`));
+      const opened = withoutEncounterRandom(`${row.label} native Open`, () => nativeOpen(main, `${row.label} native Open`), 1);
       assertClosedChildDispatch(main, opened, `${row.label} native Open`);
       assertOpenOnlyMutation(main, beforeVars, `${row.label} native Open`);
       assert.deepEqual(inventorySnapshot(main), beforeInventory, `${row.label} Open has no inventory effect`);
@@ -807,7 +810,7 @@ await run(async () => {
     const capVars = varSnapshot(main);
     const capInventory = inventorySnapshot(main);
     const capNids = new Set(activeNpcs().map(npc => npc.nid));
-    const capOpen = withoutScriptRandom('eleven-enemy chest Open', () => nativeOpen(main, 'eleven-enemy chest Open'));
+    const capOpen = withoutEncounterRandom('eleven-enemy chest Open', () => nativeOpen(main, 'eleven-enemy chest Open'), 1);
     assertClosedChildDispatch(main, capOpen, 'eleven-enemy chest Open');
     assertOpenOnlyMutation(main, capVars, 'eleven-enemy chest Open');
     assert.deepEqual(inventorySnapshot(main), capInventory, 'eleven-enemy Open changes no inventory');
@@ -824,7 +827,7 @@ await run(async () => {
       const blockedVars = varSnapshot(main);
       const blockedInventory = inventorySnapshot(main);
       const blockedNids = new Set(activeNpcs().map(npc => npc.nid));
-      const failedOpen = withoutScriptRandom('blocked native placement Open', () => nativeOpen(main, 'blocked native placement Open'));
+      const failedOpen = withoutEncounterRandom('blocked native placement Open', () => nativeOpen(main, 'blocked native placement Open'));
       assertClosedChildDispatch(main, failedOpen, 'blocked native placement Open');
       assert.equal(openFromVarp(main), 0, 'native placement refusal leaves the closed chest retryable');
       assertNoPlayerMutation(main, blockedVars, blockedInventory, 'blocked native placement Open');
@@ -835,7 +838,7 @@ await run(async () => {
     const retryVars = varSnapshot(main);
     const retryInventory = inventorySnapshot(main);
     const retryNids = new Set(activeNpcs().map(npc => npc.nid));
-    const retryOpen = withoutScriptRandom('restored native placement retry', () => nativeOpen(main, 'restored native placement retry'));
+    const retryOpen = withoutEncounterRandom('restored native placement retry', () => nativeOpen(main, 'restored native placement retry'), 1);
     assertClosedChildDispatch(main, retryOpen, 'restored native placement retry');
     assertOpenOnlyMutation(main, retryVars, 'restored native placement retry');
     assert.deepEqual(inventorySnapshot(main), retryInventory, 'placement retry changes no inventory');
@@ -854,7 +857,7 @@ await run(async () => {
       const beforeVars = varSnapshot(main);
       const beforeInventory = inventorySnapshot(main);
       const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
-      withoutScriptRandom(`${label} packed guard`, () => procVoid(main, 'barrows_chest_open', [parent, anchor]));
+      withoutEncounterRandom(`${label} packed guard`, () => procVoid(main, 'barrows_chest_open', [parent, anchor]));
       assertNoPlayerMutation(main, beforeVars, beforeInventory, `${label} packed guard`);
       assert.deepEqual(spawnDelta(beforeNids), [], `${label} packed guard creates no encounter`);
       assert.equal(openFromVarp(main), 0, `${label} packed guard leaves chest closed`);
@@ -891,7 +894,7 @@ await run(async () => {
       assert.equal(gate(main, 'barrows_chest_authorized', generation, `${scenario.label} authorization`), 0, `${scenario.label} is not authorized`);
       assert.equal(gate(main, 'barrows_chest_search_allowed', generation, `${scenario.label} Search gate`), 0, `${scenario.label} Search gate remains false`);
       const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
-      const rejected = withoutScriptRandom(`${scenario.label} native Open`, () => nativeOpen(main, `${scenario.label} native Open`));
+      const rejected = withoutEncounterRandom(`${scenario.label} native Open`, () => nativeOpen(main, `${scenario.label} native Open`));
       assertClosedChildDispatch(main, rejected, `${scenario.label} native Open`);
       assert.equal(openFromVarp(main), 0, `${scenario.label} leaves the chest closed`);
       assertNoPlayerMutation(main, beforeVars, beforeInventory, `${scenario.label} native Open`);
@@ -904,7 +907,7 @@ await run(async () => {
     setRun(main, { identity: 6, generation: 2000, solved: true });
     const beforeGateOpenVars = varSnapshot(main);
     const beforeGateOpenInv = inventorySnapshot(main);
-    const validOpen = withoutScriptRandom('gate positive native Open', () => nativeOpen(main, 'gate positive native Open'));
+    const validOpen = withoutEncounterRandom('gate positive native Open', () => nativeOpen(main, 'gate positive native Open'), 1);
     assertClosedChildDispatch(main, validOpen, 'gate positive native Open');
     assertOpenOnlyMutation(main, beforeGateOpenVars, 'gate positive native Open');
     assert.equal(gate(main, 'barrows_chest_search_allowed', 2000, 'valid final identity Search gate'), 1, 'valid identity six can use the open Search gate');
@@ -925,7 +928,7 @@ await run(async () => {
     clearNpcs();
     setRun(main, { identity: 1, generation: 2100, slain: 0x12, solved: true });
     setRun(other, { identity: 1, generation: 2100, slain: 0x08, solved: true, position: { level: 0, x: 3552, z: 9694 } });
-    const controlHandle = withoutScriptRandom('independent owner actor spawn', () => procInt(other, 'barrows_actor_spawn', [
+    const controlHandle = withoutEncounterRandom('independent owner actor spawn', () => procInt(other, 'barrows_actor_spawn', [
       brotherId(1), CoordGrid.packCoord(controlTile.level, controlTile.x, controlTile.z), c('barrows_chest_summon_lifetime')
     ]));
     const otherActor = World.getNpcByUid(controlHandle);
@@ -935,7 +938,7 @@ await run(async () => {
     const lifecycleVars = varSnapshot(main);
     const lifecycleInventory = inventorySnapshot(main);
     const lifecycleNids = new Set(activeNpcs().map(npc => npc.nid));
-    const lifecycleOpen = withoutScriptRandom('logout control native Open', () => nativeOpen(main, 'logout control native Open'));
+    const lifecycleOpen = withoutEncounterRandom('logout control native Open', () => nativeOpen(main, 'logout control native Open'), 1);
     assertClosedChildDispatch(main, lifecycleOpen, 'logout control native Open');
     assertOpenOnlyMutation(main, lifecycleVars, 'logout control native Open');
     assert.deepEqual(inventorySnapshot(main), lifecycleInventory, 'logout control Open pays nothing');
@@ -1020,7 +1023,7 @@ await run(async () => {
     const finalVars = varSnapshot(loggedIn);
     const finalInventory = inventorySnapshot(loggedIn);
     const postLoginNids = new Set(activeNpcs().map(npc => npc.nid));
-    withoutScriptRandom('already-open post-login repeat', () => procVoid(loggedIn, 'barrows_chest_open', [
+    withoutEncounterRandom('already-open post-login repeat', () => procVoid(loggedIn, 'barrows_chest_open', [
       parentTypeId, CoordGrid.packCoord(0, chestAnchor.x, chestAnchor.z)
     ]));
     assert.deepEqual(spawnDelta(postLoginNids), [], 'already-open post-login repeat cannot replace the cleaned-up final');
@@ -1028,7 +1031,7 @@ await run(async () => {
     runNativeSearch(loggedIn, 'post-login native Search');
     const postSearchVars = varSnapshot(loggedIn);
     const postSearchInventory = inventorySnapshot(loggedIn);
-    withoutScriptRandom('post-login repeat Search', () => nativeOpen(loggedIn, 'post-login repeat Search'));
+    withoutEncounterRandom('post-login repeat Search', () => nativeOpen(loggedIn, 'post-login repeat Search'));
     assertNoPlayerMutation(loggedIn, postSearchVars, postSearchInventory, 'post-login repeat Search');
     runNativeClose(loggedIn, 'post-login native Close');
     assertNoPlayerMutation(loggedIn, postSearchVars, postSearchInventory, 'post-login native Close');

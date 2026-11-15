@@ -55,6 +55,7 @@
 ^barrows_door_skeleton_npc = barrows_skeleton_unarmed
 ^barrows_door_spawn_min_radius = 0
 ^barrows_door_spawn_radius = 2
+^barrows_door_tile_distribution = "uniform_valid_footprints"
 ^barrows_door_summon_lifetime = 1000
 ^barrows_door_summon_credit = "owner_and_killer"
 ^barrows_door_class_none = -1

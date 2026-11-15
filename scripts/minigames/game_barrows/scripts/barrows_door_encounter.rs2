@@ -41,38 +41,75 @@ def_int $class = ~barrows_door_class(enum(int, string, barrows_door_draw_class, 
 if ($class = ^barrows_door_class_brother) return(~barrows_door_brother);
 return(enum(int, npc, barrows_door_class_npc, $class));
 
-// map_findsquare searches one legal 1x1 square. Check the complete selected NPC
-// footprint as well. Its origin is a valid result because this rule permits radius 0.
+// UNKNOWN engineering: one uniform rank among all valid footprint origins.
+// The named radius-two policy fits its 25 origins in one local bitset. Static
+// clipping is checked once per origin; one NPC scan removes every overlap.
 [proc,barrows_door_tile](coord $landing, npc $type)(coord)
 def_int $room = ~barrows_door_room($landing);
 if ($room = -1) return(null);
-def_coord $tile = map_findsquare($landing, ^barrows_door_spawn_min_radius, ^barrows_door_spawn_radius, ^map_findsquare_lineofwalk);
 def_int $size = nc_size($type);
+def_int $radius = ^barrows_door_spawn_radius;
+def_int $width = add(multiply($radius, 2), 1);
+def_int $valid = 0;
+def_int $index = 0;
+def_int $x = sub(0, $radius);
+while ($x <= $radius) {
+    def_int $z = sub(0, $radius);
+    while ($z <= $radius) {
+        def_coord $tile = movecoord($landing, $x, 0, $z);
+        if (max(abs($x), abs($z)) >= ^barrows_door_spawn_min_radius & lineofwalk($tile, $landing) = true & ~barrows_door_tile_walkable($tile, $size, $room) = true) $valid = setbit($valid, $index);
+        $index = add($index, 1);
+        $z = add($z, 1);
+    }
+    $x = add($x, 1);
+}
+if ($valid = 0) return(null);
+// Native map_blocked excludes NPC occupancy. Removing an overlapping summon
+// would clear another actor's non-reference-counted collision.
+.npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
+while (.npc_findnext = true) {
+    def_coord $occupied = .npc_coord;
+    def_int $occupied_size = nc_size(.npc_type);
+    def_int $relative_x = sub(coordx($occupied), coordx($landing));
+    def_int $relative_z = sub(coordz($occupied), coordz($landing));
+    def_int $end_x = min($radius, sub(add($relative_x, $occupied_size), 1));
+    def_int $end_z = min($radius, sub(add($relative_z, $occupied_size), 1));
+    $x = max(sub(0, $radius), add(sub($relative_x, $size), 1));
+    while ($x <= $end_x) {
+        def_int $z = max(sub(0, $radius), add(sub($relative_z, $size), 1));
+        while ($z <= $end_z) {
+            $valid = clearbit($valid, add(multiply(add($x, $radius), $width), add($z, $radius)));
+            $z = add($z, 1);
+        }
+        $x = add($x, 1);
+    }
+}
+def_int $count = bitcount($valid);
+if ($count = 0) return(null);
+def_int $rank = random($count);
+$index = 0;
+while ($valid ! 0) {
+    if (testbit($valid, $index) = 1) {
+        if ($rank = 0) return(movecoord($landing, sub(divide($index, $width), $radius), 0, sub(modulo($index, $width), $radius)));
+        $rank = sub($rank, 1);
+        $valid = clearbit($valid, $index);
+    }
+    $index = add($index, 1);
+}
+return(null);
+
+[proc,barrows_door_tile_walkable](coord $tile, int $size, int $room)(boolean)
 def_int $x = 0;
 while ($x < $size) {
     def_int $z = 0;
     while ($z < $size) {
         def_coord $part = movecoord($tile, $x, 0, $z);
-        if (~barrows_door_room($part) ! $room | map_blocked($part) = true) return(null);
+        if (~barrows_door_room($part) ! $room | map_blocked($part) = true) return(false);
         $z = add($z, 1);
     }
     $x = add($x, 1);
 }
-// Native map_blocked excludes NPC occupancy. Do not overlap a second footprint:
-// removing this summon would clear that actor's non-reference-counted collision.
-def_int $tile_x = coordx($tile);
-def_int $tile_z = coordz($tile);
-def_int $end_x = add($tile_x, $size);
-def_int $end_z = add($tile_z, $size);
-.npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
-while (.npc_findnext = true) {
-    def_coord $occupied = .npc_coord;
-    def_int $occupied_x = coordx($occupied);
-    def_int $occupied_z = coordz($occupied);
-    def_int $occupied_size = nc_size(.npc_type);
-    if ($tile_x < add($occupied_x, $occupied_size) & $end_x > $occupied_x & $tile_z < add($occupied_z, $occupied_size) & $end_z > $occupied_z) return(null);
-}
-return($tile);
+return(true);
 
 [proc,barrows_door_encounter](coord $landing)
 if (~barrows_in_tunnels(coord) = false | %barrows_generation <= 0) return;
