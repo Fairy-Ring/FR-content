@@ -2,7 +2,7 @@
 [oploc1,draynor_killerwatt_portal]
 if (map_members = ^false) return;
 if (%slayer_killerwatt_strobe_warning = 0) {
-    ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral><pname> before you go through there I must warn you that there are flashing lights and strobe effects on the other side. If you are an epilepsy sufferer you must NOT enter! Do you still want to go through?");
+    ~chatnpc_specific("Professor Oddenstein", professor_oddenstein, "<p,neutral><displayname> before you go through there I must warn you that there are flashing lights and strobe effects on the other side. If you are an epilepsy sufferer you must NOT enter! Do you still want to go through?");
     def_int $choice = ~p_choice3("Yes I still want to go in.", 1, "Yes I want to go in and don't show me this message again.", 2, "No, I dont want to go in.", 3);
     if ($choice = 3) {
         ~chatplayer("<p,neutral>No, I dont want to go in.");

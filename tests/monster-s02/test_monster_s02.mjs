@@ -340,6 +340,10 @@ for (const [boots, suppressed, choices, enters, remembers] of [
   player.setVarBit(warningBit, Number(suppressed));
   if (boots) wear(player, 'slayer_boots');
   dialogue(player, start('[oploc1,draynor_killerwatt_portal]', player, loc('draynor_killerwatt_portal', 2, 3110, 3362)), [...choices]);
+  if (!suppressed) {
+    const emitted = player.testMessages.filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text).join(' ').replace(/\s+/g, ' ');
+    check('strobe warning emits the native formatted player name', emitted.includes(`${player.displayName} before you go through there I must warn you`), true);
+  }
   check(`portal boots=${boots} suppressed=${suppressed} choices=${choices} destination`, [player.level, player.x, player.z], enters ? [2, 2677, 5214] : [2, 3110, 3363]);
   check('only explicit suppression changes warning choice', player.getVarBit(warningBit), Number(remembers));
   if (enters) {
