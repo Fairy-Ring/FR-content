@@ -698,12 +698,59 @@ await run(async () => {
       }
     }
 
-    // Foreign UID, stale generation, corpse, wrong identity and outside-area
-    // actors are all negative controls for the shared brother lookup.
+    // Open can arrive after lethal damage but before the normal death/credit
+    // queues. Keep that actual pending actor in the duplicate check on both planes.
+    for (let identity = 1; identity <= 6; identity++) {
+      for (const level of [0, 3]) {
+        clearNpcs();
+        const generation = 1470 + identity * 10 + level;
+        setRun(main, { identity, generation, slain: 0, solved: true });
+        const resident = addFixtureNpc(`barrows_${brotherNames[identity - 1]}`, { level, x: 3555, z: 9698 }, {
+          ownerUid: main.uid, generation, hitpoints: 1
+        });
+        resident.heroPoints.addHero(main.hash64, 1);
+        const damage = ScriptProvider.getByName('[proc,npc_default_damage]');
+        assert(damage, 'pending-death witness uses the ordinary compiled damage procedure');
+        const hit = ScriptRunner.init(damage, resident, null, [1]);
+        resident.executeScript(hit);
+        assert.equal(hit.execution, ScriptState.FINISHED, 'native lethal damage completes');
+        assert.equal(resident.levels[hpIndex], 0, 'the selected brother has just taken lethal native damage');
+        assert(Array.from(resident.queue.all()).some(request => request.queueId === ServerTriggerType.AI_QUEUE3),
+          'the genuine native death trigger is pending');
+        assert.equal(procInt(main, 'barrows_brother_slain', [identity]), 0, 'credit has not arrived before Open');
+        const beforeVars = varSnapshot(main);
+        const beforeInventory = inventorySnapshot(main);
+        const beforeNids = new Set(activeNpcs().map(npc => npc.nid));
+        const opened = withoutScriptRandom('pending-death Open', () => nativeOpen(main, 'pending-death Open'));
+        assertClosedChildDispatch(main, opened, 'pending-death Open');
+        assertOpenOnlyMutation(main, beforeVars, 'pending-death Open');
+        assert.deepEqual(inventorySnapshot(main), beforeInventory, 'pending-death Open grants no item');
+        assert.deepEqual(spawnDelta(beforeNids), [], `same-owner selected brother with death pending at L${level} suppresses duplication`);
+        const creditTick = World.currentTick;
+        let turns = 0;
+        while ((resident.isActive || Array.from(main.queue.all()).length > 0) && turns < 12) {
+          World.currentTick++;
+          if (resident.isActive) resident.turn();
+          main.processQueues();
+          turns++;
+        }
+        assert(turns < 12, 'native death and player credit queues finish within their bound');
+        assert.equal(resident.isActive, false, 'ordinary death removes the pending brother');
+        assert.equal(procInt(main, 'barrows_brother_slain', [identity]), 1, 'the original pending death earns the selected credit');
+        assert.equal(main.getVarBit(VarBitType.getId('barrows_killed_count')),
+          Math.min(c('barrows_kill_count_max'), (beforeVars[chestVarp] >>> 17) + 1), 'the pending brother credits exactly one kill');
+        assert.equal(openFromVarp(main), 1, 'credit preserves the open chest');
+        console.log(`PASS S10 pending death: identity=${identity} level=${level} lethalTick=${creditTick} completedTurns=${turns}`);
+      }
+    }
+
+    // Foreign UID, stale generation, wrong identity and outside-area actors
+    // cannot suppress this owner's current final, living or with death pending.
     const negativeResidents = [
       { label: 'foreign owner, same generation', owner: 'other', generation: 'same', hitpoints: 1, level: 0, type: 'barrows_ahrim', point: { level: 0, x: 3555, z: 9698 } },
       { label: 'stale generation', owner: 'main', generation: 'stale', hitpoints: 1, level: 0, type: 'barrows_ahrim', point: { level: 0, x: 3555, z: 9698 } },
-      { label: 'corpse', owner: 'main', generation: 'same', hitpoints: 0, level: 0, type: 'barrows_ahrim', point: { level: 0, x: 3555, z: 9698 } },
+      { label: 'foreign pending death', owner: 'other', generation: 'same', hitpoints: 0, level: 0, type: 'barrows_ahrim', point: { level: 0, x: 3555, z: 9698 } },
+      { label: 'stale pending death', owner: 'main', generation: 'stale', hitpoints: 0, level: 0, type: 'barrows_ahrim', point: { level: 0, x: 3555, z: 9698 } },
       { label: 'out of area', owner: 'main', generation: 'same', hitpoints: 1, level: 0, type: 'barrows_ahrim', point: { level: 0, x: 3200, z: 3200 } },
       { label: 'different brother', owner: 'main', generation: 'same', hitpoints: 1, level: 0, type: 'barrows_dharok', point: { level: 0, x: 3555, z: 9698 } }
     ];
