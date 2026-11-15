@@ -210,6 +210,8 @@ The 5..6 range is CANDIDATE early-2007 evidence, not exact 377 arithmetic. Inter
 
 The paid tunnel-to-crypt transition sends one camera reset through the existing presentation cleanup. Twenty subsequent crypt ticks send no camera reset or shake. The saved collapse remainder and queued-hit guards remain unchanged. This preliminary 3 packet-count case fails on the previous per-tick reset, which sent twenty additional resets.
 
+The ordinary-death checks derive the default respawn anchor, level and search radii from `scripts/player/scripts/death.rs2`. They load that map square and check the native destination against that definition, rather than a second hard-coded Lumbridge rectangle.
+
 ## Loot then leave (S14)
 
 ```sh

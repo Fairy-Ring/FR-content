@@ -1,0 +1,13 @@
+Group 4 preliminary 4, content-derived ordinary respawn, 2026-11-15.
+Evidence root: U-BARROWS-1113/b4 (operator evidence storage, not this repository).
+
+The native ordinary-death checks read the default map_findsquare coordinate and radii from scripts/player/scripts/death.rs2.
+The test loads that map square, checks its level and compares the native respawn's Chebyshev distance with the content-defined radii.
+The ordinary death script and its destination remain unchanged.
+The pre-loot, paid and non-Barrows death comparisons retain ordinary keep/drop/lifetime assertions.
+
+Native suite: logs/ci-pre4/27-tests_barrows_test_collapse.mjs.log
+SHA-256: de961e076bcc203d7fdfdf10d933e84fa539096a56718ae9b4445f0aca1d3089
+Required gates: logs/pre4-gates.log and logs/pre4-ci.log
+Clean pack, build, rs2check, all 98 registered checks, varp transmission and client-byte equality exit 0.
+Client/config SHA-256: b6ec704421650ee5527e77c635b8b3a8036f6eb042c572516ac0696cfbce19a8

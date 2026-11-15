@@ -14,9 +14,17 @@ await run(async () => {
   const { PlayerStat } = await eng('src/engine/entity/PlayerStat.ts');
   const { default: ServerTriggerType } = await eng('src/engine/script/ServerTriggerType.ts');
   const { unzipSync } = createRequire(path.join(runtime.engineRoot, 'package.json'))('fflate');
+  const deathSource = fs.readFileSync(path.join(runtime.contentRoot, 'scripts/player/scripts/death.rs2'), 'utf8');
+  const respawnMatch = deathSource.match(/\bdef_coord\s+\$death_dest\s*=\s*map_findsquare\((\d+(?:_\d+){4}),\s*(\d+),\s*(\d+),/);
+  assert(respawnMatch, 'ordinary death declares its default respawn anchor and search radii');
+  const [respawnLevel, respawnMapX, respawnMapZ, respawnLocalX, respawnLocalZ] = respawnMatch[1].split('_').map(Number);
+  const defaultRespawn = {
+    level: respawnLevel, x: respawnMapX * 64 + respawnLocalX, z: respawnMapZ * 64 + respawnLocalZ,
+    minRadius: Number(respawnMatch[2]), maxRadius: Number(respawnMatch[3])
+  };
   const maps = unzipSync(fs.readFileSync(path.join(runtime.packDir, '.cache/maps-server.zip')));
   World.gameMap.zonemap.beginInitialization();
-  for (const [x, z] of [[55, 151], [50, 50]]) {
+  for (const [x, z] of [[55, 151], [respawnMapX, respawnMapZ]]) {
     const square = Object.fromEntries(['m', 'l', 'n', 'o'].map(kind => [kind, maps[`${kind}${x}_${z}`] ?? new Uint8Array()]));
     World.gameMap.packed.set((x << 8) | z, square);
     World.gameMap.loadPackedMapsquare(square, x << 6, z << 6);
@@ -319,7 +327,10 @@ await run(async () => {
         assert.equal(result.kept.length, 3, 'S13 ordinary unskulled keep-three allocation, not special Barrows protection');
         assert(result.floor.some(row => row[0] === ObjType.getId('bones')));
         assert(result.floor.every(row => row[4] === 0 && row[5] === 3551 && row[6] === 9694), 'S13 ordinary shared death-tile drops, never a recovery destination');
-        assert.equal(p.level, 0); assert(p.x >= 3219 && p.x <= 3223 && p.z >= 3216 && p.z <= 3220, 'S13 normal Lumbridge map_findsquare respawn');
+        assert.equal(p.level, defaultRespawn.level, 'S13 ordinary death uses its content-defined respawn level');
+        const respawnDistance = Math.max(Math.abs(p.x - defaultRespawn.x), Math.abs(p.z - defaultRespawn.z));
+        assert(respawnDistance >= defaultRespawn.minRadius && respawnDistance <= defaultRespawn.maxRadius,
+          'S13 normal map_findsquare respawn lies inside the current ordinary death definition');
         for (const npc of [owned, foreign]) if (npc.isActive) World.removeNpc(npc, -1);
         return result;
       }
