@@ -21,7 +21,7 @@ const routeSeeds = JSON.parse(fs.readFileSync(path.join(here, 'outcome-route-see
 const watched = ['npc_default_attack', 'npc_meleeattack', 'npc_rangeattack', 'npc_cast_spell', 'npc_cast_spell_with_forced_max_hit', 'npc_spell_success', 'playerhit_n_melee', 'playerhit_n_ranged', 'npc_player_hit_roll', 'npc_spell_cast', 'npc_combat_spell_checks', 'npc_freeze_allowed', 'npc_debuff_allowed', 'npc_spell_fail', 'npc_stat_change_effect', 'npc_freeze_effect'];
 const variants = ['hit', 'zero', 'miss', 'protected-hit', 'protected-zero', 'protected-miss', 'pending', 'target-loss', 'npc-busy', 'dead-player'];
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
-const effects = result => ({ snapshot: result.snapshot, settled: result.settled, events: result.events.filter(e => /QUEUE|ANIM|SOUND|^MES|DAMAGE|SETMODE|STAT_(ADD|SUB)|^IF_CLOSE|^RUNENERGY/.test(e.op)), draws: result.draws, randomSources: result.randomSources });
+const effects = result => ({ snapshot: result.snapshot, settled: result.settled, events: result.events.filter(e => /QUEUE|ANIM|SOUND|^MES|DAMAGE|SETMODE|STAT_(ADD|SUB)|^IF_CLOSE|^RUNENERGY|^RANDOM(INC)?$/.test(e.op)), draws: result.draws, randomSources: result.randomSources });
 let checks = 0;
 function check(label, action) { action(); checks++; console.log(`PASS ${label}`); }
 function same(actual, expected, label, full = false) {
@@ -121,6 +121,25 @@ try {
       const explicit = execute(pack, record.npc, `[proc,${style === 'melee' ? 'npc_default_attack' : style === 'ranged' ? 'npc_rangeattack' : 'npc_cast_spell'}_outcome]`, outcomeArgs, variant, style);
       same(explicit, head, `${record.npc} ${style} ${variant} explicit-prefix drift`);
       delivery(explicit, style, maxhit);
+      checks++;
+    }
+    if (paths.has('npc_default_attack')) for (const variant of ['hit', 'pending', 'target-loss', 'npc-busy', 'pvp-busy', 'dead-player', 'dead-player-pending']) {
+      const fixtureVariant = variant === 'dead-player-pending' ? 'dead-player' : variant;
+      const configure = f => {
+        if (variant === 'pvp-busy') f.player.setVar(rt.id(VarPlayerType, 'lastcombat_pvp'), 100);
+        if (variant === 'dead-player-pending') f.npc.setVar(rt.id(VarNpcType, 'npc_action_delay'), 110);
+      };
+      const ordinary = execute(pack, record.npc, '[proc,npc_default_attack]', [], fixtureVariant, 'melee', configure);
+      const ready = execute(pack, record.npc, '[proc,npc_default_attack_ready]', [], fixtureVariant, 'melee', configure);
+      const label = `${record.npc} ${variant} readiness ordered prefix`;
+      assert.deepEqual(ready.events, ordinary.events.slice(0, ready.events.length), label);
+      assert.equal(ready.snapshot.execution, rt.State.FINISHED, label);
+      assert.equal(ready.values.length, 1, label);
+      assert([0, 1].includes(ready.values[0]), label);
+      assert.deepEqual(ready.draws, [], `${label}: no draw`);
+      assert.deepEqual(ready.randomSources, [], `${label}: no random source`);
+      assert.deepEqual(ready.snapshot.queued, [], `${label}: no queue`);
+      if (!ready.values[0]) same(ready, ordinary, `${label}: ordinary refusal`, true);
       checks++;
     }
     const dispatchStyles = new Set(styles);
@@ -300,6 +319,12 @@ try {
       assert.deepEqual(result.snapshot.levels, expected.snapshot.levels, 'standard stat effect, once');
       assert.equal(result.settled.vars[rt.id(VarPlayerType, 'frozen')], expected.settled.vars[rt.id(VarPlayerType, 'frozen')], 'standard freeze, once');
       if (hit) {
+        for (const variable of ['lastcombat', 'aggressive_npc']) {
+          const id = rt.id(VarPlayerType, variable);
+          assert.equal(result.snapshot.playerVars[id], expected.snapshot.playerVars[id], `protected success attack variable ${variable}`);
+        }
+        const attackingUid = rt.id(VarNpcType, 'npc_attacking_uid');
+        assert.equal(result.snapshot.npcVars[attackingUid], expected.snapshot.npcVars[attackingUid], 'protected success attack variable npc_attacking_uid');
         assert.equal(result.events.filter(e => e.op === 'SPOTANIM_PL').length, 1);
         const draws = result.events.flatMap((e, i) => e.op === 'RANDOMINC' ? [i] : []);
         const cast = result.events.findIndex((e, i) => i > draws[1] && e.op === 'SOUND_SYNTH');

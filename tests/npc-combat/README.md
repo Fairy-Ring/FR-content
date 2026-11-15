@@ -200,8 +200,9 @@ closure fails the suite. The inventory does not pin generated IDs, NPC counts,
 old bytecode or unrelated command traces.
 
 For every relevant NPC, the explicit entry with ordinary policy, no requested
-protected roll and strict presentation must match the ordinary wrapper's draws,
-queues, delays, HP/stat effects, modes, variables, messages and presentation.
+protected roll and strict presentation must match the ordinary wrapper's draws
+(each RANDOM/RANDOMINC command, operands and results), queues, delays, HP/stat
+effects, modes, variables, messages and presentation.
 The suite also compiles `outcome_callers.rs2` into a disposable pack. Those callers
 consume all five returned primitives and then apply their own effect. Policy,
 latent protection, curses, freeze, independent null assets and distance-based
@@ -245,7 +246,10 @@ readiness and presentation without accuracy. It returns only `attempted` and
 draws nothing. A policy-selecting caller draws only after it returns true, then
 calls `npc_meleeattack_outcome`. `npc_default_attack_outcome` composes those two
 entries when no pre-accuracy choice is needed. The ordinary `npc_default_attack`
-keeps its original prefix. The melee outcome policies are `0` ordinary, `1`
+keeps its original prefix. For every type reaching that ordinary attack, the full
+ordered readiness events must equal the same-length ordinary prefix in the
+admitted state and each refusal, including player death with an action delay
+still pending. The melee outcome policies are `0` ordinary, `1`
 equipment-free defence retaining
 level/prayer/style, and `2` unconditional accuracy with no accuracy draws.
 For policy 2 the caller supplies the protected maximum; the seam does not zero it.
@@ -258,6 +262,8 @@ uses the native success presentation, retaliation, stat and freeze effects
 exactly once, with the original maximum's one latent magnitude but no damage
 or poison queue. Off retains the native failure splash. A latent miss always
 uses native failure. Neither input is read by the ordinary wrappers.
+Protected successes also retain the ordinary success's `lastcombat`,
+`aggressive_npc` and `npc_attacking_uid` writes.
 Ordinary public void entries remain strict and retain their native inputs.
 
 Admission controls refuse player death, pending delay, player combat/PvP
