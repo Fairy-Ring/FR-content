@@ -1,0 +1,144 @@
+// CANDIDATE: blood-product-contract-1109 / RuneVillage and RuneHQ period guides.
+// Use the existing owner pointer, combat queues and death-credit conventions.
+[oplocu,vampire_big_grave_noblood] ~dt_dessous_pour(last_useitem, last_useslot);
+
+[proc,dt_dessous_pour](obj $pot, int $slot)
+if (~dt_blood_pot($pot) = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if ($pot = fd_silver_pot | $pot = fd_silver_pot_blessed) {
+    ~mesbox("There is nothing in the pot to pour onto the grave.");
+    return;
+}
+if (%deserttreasure < ^dt_stage_hunts | %fdvw_subquest < ^dt_blood_substate_malak_agreed | %fdvw_subquest >= ^dt_blood_substate_dessous_defeated | ~dt_dessous_find = true) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_npc $dessous = blooddiamond_vampirewarrior_unkillable;
+def_namedobj $empty = fd_silver_pot;
+switch_obj ($pot) {
+    case fd_silver_pot_blood_blessed, fd_silver_pot_blood_garlic_blessed, fd_silver_pot_blood_spiced_blessed : $empty = fd_silver_pot_blessed;
+    case fd_silver_pot_blood_garlic_spiced_blessed :
+        $empty = fd_silver_pot_blessed;
+        $dessous = blooddiamond_vampirewarrior;
+}
+inv_setslot(inv, $slot, $empty, 1);
+mes("You pour the blood from the pot onto the tomb.");
+loc_anim(vampire_coffin_open);
+// Exact historical tile/timing UNKNOWN; named reconstruction on mapped clear terrain.
+npc_add(^dt_dessous_spawn, $dessous, ^dt_dessous_lifetime);
+%npc_attacking_uid = uid;
+%npc_int = 0; // successful chase teleports, not persistent branch progress
+%npc_action_delay = map_clock;
+npc_setmode(applayer2);
+npc_settimer(1);
+if ($dessous = blooddiamond_vampirewarrior) %fdvw_subquest = ^dt_blood_substate_dessous_active;
+
+[proc,dt_dessous_find]()(boolean)
+npc_findall(^dt_dessous_grave, blooddiamond_vampirewarrior, ^dt_dessous_leash, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return(true);
+}
+npc_findall(^dt_dessous_grave, blooddiamond_vampirewarrior_unkillable, ^dt_dessous_leash, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return(true);
+}
+return(false);
+
+// Both shared attackability paths call this before their npc_hasop early return.
+[proc,dt_dessous_attackable]()(boolean)
+if (npc_type ! blooddiamond_vampirewarrior & npc_type ! blooddiamond_vampirewarrior_unkillable) return(true);
+if (%npc_attacking_uid = uid) return(true);
+mes("Someone else is fighting that.");
+return(false);
+
+[ai_timer,blooddiamond_vampirewarrior] ~dt_dessous_timer;
+[ai_timer,blooddiamond_vampirewarrior_unkillable] ~dt_dessous_timer;
+
+[proc,dt_dessous_timer]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%death = ^true | distance(^dt_dessous_grave, coord) > ^dt_dessous_leash) {
+    npc_del;
+    return;
+}
+// No queues or retry actions repair a delayed, protected or modal player.
+
+[ai_queue1,blooddiamond_vampirewarrior] ~dt_dessous_retaliate;
+[ai_queue1,blooddiamond_vampirewarrior_unkillable] ~dt_dessous_retaliate;
+
+[proc,dt_dessous_retaliate]
+if (%npc_aggressive_player ! %npc_attacking_uid) return;
+if (finduid(%npc_attacking_uid) = false | ~npc_retal_ready = false) return;
+%npc_action_delay = add(map_clock, divide(npc_param(attackrate), 2));
+npc_setmode(applayer2);
+
+[ai_applayer2,blooddiamond_vampirewarrior] ~dt_dessous_attack;
+[ai_applayer2,blooddiamond_vampirewarrior_unkillable] ~dt_dessous_attack;
+[ai_opplayer2,blooddiamond_vampirewarrior] ~dt_dessous_attack;
+[ai_opplayer2,blooddiamond_vampirewarrior_unkillable] ~dt_dessous_attack;
+
+[proc,dt_dessous_attack]
+if (%death = ^true) {
+    npc_setmode(none);
+    return;
+}
+if (%npc_attacking_uid ! uid | %npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false | ~npc_check_notcombat_self = false) return;
+// CANDIDATE: RuneVillage 2006-02-14 describes missile-prayer teleports.
+if (distance(npc_coord, coord) > ^dt_dessous_chase_distance | (distance(npc_coord, coord) > 1 & ~check_protect_prayer(^ranged_style) = true)) {
+    npc_tele(map_findsquare(coord, 1, 1, 0));
+    %npc_int = add(%npc_int, 1);
+    if (%npc_int > ^dt_dessous_teleports_limit) {
+        // CANDIDATE: RuneHQ 2006-11-28 update: more than three. No exact leaving speech.
+        npc_del;
+        return;
+    }
+}
+// RuneVillage describes the whole mixed fight; RuneHQ describes the moment after a teleport.
+// CANDIDATE: RuneScape wiki Dessous r191085-r194523 (2007-07-12 to 2007-07-18): half melee.
+// Protection from Melee blocks damage, not attack choice.
+if (distance(npc_coord, coord) <= 1 & lineofsight(npc_coord, coord) = true & random(^dt_dessous_melee_rolls) < ^dt_dessous_melee_chances) {
+    ~npc_default_attack;
+    return;
+}
+// CANDIDATE: RuneVillage 2006-02-14 / Zybez 2006-02-20, five per valid bat hit.
+// Exact historical delays UNKNOWN; the two named delays remain reconstruction.
+npc_say("Hssssssssssss");
+npc_anim(vampire_summonbats, 0);
+spotanim_pl(vampire_bats, 0, 0);
+if_close;
+~npc_set_attack_vars;
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $damage = ^dt_dessous_bat_damage;
+if (npc_type = blooddiamond_vampirewarrior_unkillable) $damage = ^dt_dessous_invalid_bat_damage;
+if (~check_protect_prayer(^magic_style) = false) queue(combat_damage_player, ^dt_dessous_bat_first_delay, $damage);
+if (~check_protect_prayer(^ranged_style) = false) queue(combat_damage_player, ^dt_dessous_bat_second_delay, $damage);
+queue*(playerhit_n_retaliate, 0)(npc_uid);
+
+[ai_queue2,blooddiamond_vampirewarrior] ~npc_default_damage(last_int);
+[ai_queue2,blooddiamond_vampirewarrior_unkillable]
+if (npc_stat(hitpoints) = 0) return;
+if (last_int = 0) npc_damage(^hitmark_block, 0);
+else npc_damage(^hitmark_damage, last_int);
+if (npc_stat(hitpoints) = 0) {
+    npc_say("You will never defeat me");
+    npc_statheal(hitpoints, npc_basestat(hitpoints), 0);
+}
+
+[ai_queue3,blooddiamond_vampirewarrior]
+// Only the spawned owner's real valid kill advances; the boss drops no diamond.
+if (npc_findhero = ^true) {
+    if (uid = %npc_attacking_uid & %fdvw_subquest = ^dt_blood_substate_dessous_active) {
+        queue(dt_dessous_defeated, 0, 0);
+    }
+}
+// Shared Slayer death dispatch also requires its secondary NPC pointer.
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+// Existing owned-boss death pattern: commit on the owner's protected player queue.
+[queue,dt_dessous_defeated]
+if (%fdvw_subquest = ^dt_blood_substate_dessous_active) %fdvw_subquest = ^dt_blood_substate_dessous_defeated;

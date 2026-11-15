@@ -239,12 +239,12 @@ for (const protectedMelee of [false, true]) {
   settle(player);
   check('worn facemask receives no fixed fourteen damage', player.levels[PlayerStat.HITPOINTS], 80);
 }
-for (const [label, rolls, expectedPoison] of [['accuracy miss', [0, 0], 0], ['successful zero at damage threshold below one', [0.999999, 0, 0.1], 0], ['positive hit at damage threshold above zero', [0.999999, 0, 0.5], 15]]) {
+for (const [label, rolls, expectedPoison] of [['accuracy miss', [0, 0], 0], ['successful zero at damage threshold below one', [0.999999, 0, 0.1], 15], ['positive hit at damage threshold above zero', [0.999999, 0, 0.5], 15]]) {
   const { player, npc } = fixture('swamp_cave_slime');
   player.setVar(id(VarPlayerType, 'com_stabdef'), 0);
   random(rolls, () => run('[proc,npc_meleeattack]', npc, player));
   settle(player);
-  check(`published poison seam: ${label}`, player.getVar(id(VarPlayerType, 'poison')), expectedPoison);
+  check(`slime poison trigger seam: ${label}`, player.getVar(id(VarPlayerType, 'poison')), expectedPoison);
   if (expectedPoison) {
     const before = player.levels[PlayerStat.HITPOINTS];
     run('[timer,poison]', player);

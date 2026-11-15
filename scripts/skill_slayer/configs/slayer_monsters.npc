@@ -15,6 +15,7 @@ magic=13
 param=slayer_category,^slayer_caveslime
 // slayer.s01-cave-slime-poison-severity: initial poison damage 3.
 param=poison_severity,15
+param=poison_without_damage,yes
 
 [swamp_cave_bug]
 name=Cave Bug
