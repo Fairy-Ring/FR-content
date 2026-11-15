@@ -324,6 +324,12 @@ await run(async () => {
   }
   function withoutEncounterRandom(label, action, expectedTileDraws = 0) {
     const original = ScriptRunner.HANDLERS[ScriptOpcode.RANDOM];
+    const originalRandom = JavaRandom.nextDouble;
+    let randomCalls = 0;
+    JavaRandom.nextDouble = function () {
+      randomCalls++;
+      return originalRandom.call(this);
+    };
     let placementCalls = 0;
     ScriptRunner.HANDLERS[ScriptOpcode.RANDOM] = state => {
       assert.equal(state.script.name, '[proc,barrows_door_tile]', `${label}: no encounter class, identity or layout draw`);
@@ -334,9 +340,11 @@ await run(async () => {
     try {
       const result = action();
       assert.equal(placementCalls, expectedTileDraws, `${label}: exact valid-tile draw count`);
+      assert.equal(randomCalls, placementCalls, `${label}: every JavaRandom draw is a counted placement rank`);
       return result;
     } finally {
       ScriptRunner.HANDLERS[ScriptOpcode.RANDOM] = original;
+      JavaRandom.nextDouble = originalRandom;
     }
   }
   function gate(player, name, generation, label) {

@@ -772,6 +772,30 @@ await run(async () => {
         if (blocker.isActive) World.removeNpc(blocker, -1);
       }
     }
+
+    const giantRatId = npcId('barrows_giantrat');
+    assert.equal(NpcType.get(giantRatId).size, 2, 'the original giant crypt rat occupies four tiles');
+    const giantRat = addFixtureNpc('barrows_giantrat', ordinaryCrossing.destination);
+    try {
+      const occupiedTiles = [];
+      for (let dx = 0; dx < giantRat.width; dx++) {
+        for (let dz = 0; dz < giantRat.length; dz++) {
+          occupiedTiles.push({ level: giantRat.level, x: giantRat.x + dx, z: giantRat.z + dz });
+        }
+      }
+      const candidates = validTileCandidates(ordinaryCrossing.destination, doorNpc.bloodworm);
+      assert(candidates.length > 0, 'a size-2 occupant leaves free placement ranks inside the spawn radius');
+      for (const [rank, expected] of candidates.entries()) {
+        const selected = withDraws([[rank, candidates.length]], () => procInt(selector, 'barrows_door_tile',
+          [pack(ordinaryCrossing.destination), doorNpc.bloodworm]), `size-2 occupant, rank ${rank}`);
+        const tile = decode(selected.value);
+        assert.deepEqual(tile, expected, 'size-2 occupant: every rank selects the independent free footprint');
+        assert(occupiedTiles.every(occupied => pointKey(tile) !== pointKey(occupied)),
+          'size-2 occupant: every rank excludes all four giant crypt rat tiles');
+      }
+    } finally {
+      if (giantRat.isActive) World.removeNpc(giantRat, -1);
+    }
     clearNpcs();
     const crowdedOwner = makePlayer('one-free-footprint');
     const crowdedTiles = validTileCandidates(ordinaryCrossing.destination, doorNpc.bloodworm);
@@ -815,6 +839,10 @@ await run(async () => {
 
     // UNKNOWN engineering test policy: deterministic xorshift32 sample, 500
     // observations per valid origin and an 18% relative tolerance (over 4 sigma).
+    assert.match(fs.readFileSync(path.join(runtime.contentRoot,
+      'scripts/minigames/game_barrows/configs/barrows.constant'), 'utf8'),
+    /^\^barrows_door_tile_distribution\s*=\s*"uniform_valid_footprints"\s*$/m,
+    'the named UNKNOWN distribution policy matches the uniform valid-footprint rank proof');
     const tileSeed = 0x377b4;
     const trialsPerTile = 500;
     const relativeTolerance = 0.18;
