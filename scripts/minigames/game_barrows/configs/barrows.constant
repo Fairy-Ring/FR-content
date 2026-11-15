@@ -127,3 +127,16 @@
 
 // UNKNOWN engineering BARROWS_GRANT_ORDER, not a historical ordering claim.
 ^barrows_grant_order = "coins,mindrune,chaosrune,deathrune,bloodrune,barrows_karil_ammo;singles_in_roll_order"
+
+// CANDIDATE D8 early-2007 range, not an exact May 2006 damage claim.
+^barrows_collapse_min_hit = 5
+^barrows_collapse_max_hit = 6
+// UNKNOWN engineering schedule, chance and uniform inclusive amount policy.
+^barrows_collapse_interval_ticks = 10
+^barrows_collapse_chance_denominator = 2
+^barrows_collapse_hit_distribution = "uniform_inclusive"
+// UNKNOWN engineering parameters, inherited from the tunnel-shake command.
+^barrows_collapse_shake_axis = 0
+^barrows_collapse_shake_random = 5
+^barrows_collapse_shake_amplitude = 0
+^barrows_collapse_shake_rate = 0

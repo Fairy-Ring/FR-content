@@ -79,6 +79,7 @@ p_stopaction;
 %barrows_state = setbit_range_toint(%barrows_state, ^barrows_phase_paid, ^barrows_phase_start, ^barrows_phase_end);
 %barrows_state = clearbit_range(%barrows_state, ^barrows_solved_bit, ^barrows_challenge_bit);
 ~barrows_generation_advance;
+~barrows_collapse_arm;
 ~barrows_timer_resume;
 return(true);
 

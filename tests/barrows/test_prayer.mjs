@@ -525,7 +525,7 @@ await run(async () => {
     tick(control);
     assert.equal(prayerRemaining(control), 1, `phase ${phase}, level ${level} in map55_151 consumes one native tick`);
     assert(timer(control), `phase ${phase}, level ${level} positive control keeps its timer`);
-    assert.equal(countdownHigh(control), 0x82c4, `phase ${phase}, level ${level} positive control retains high half`);
+    assert.equal(countdownHigh(control), 0x82c4 - Number(phase === 2 && level === 0), `phase ${phase}, level ${level} consumes collapse only when paid in tunnels`);
   }
 
   // Each guard is tested against the same eligible native positive control, then an otherwise identical blocked state.
@@ -661,7 +661,7 @@ await run(async () => {
   assert.deepEqual(timer(search).args, [searchGeneration + 1], 'Search timer captures the current post-latch generation');
   assert.equal(timer(search).interval, 1, 'Search uses one native repeat, not self-requeue');
   assert.equal(prayerRemaining(search), 9, 'Search and generation advance preserve Prayer remainder');
-  assert.equal(countdownHigh(search), 0xb3c7, 'Search preserves the unrelated collapse half');
+  assert.equal(countdownHigh(search), Number(constants.get('barrows_collapse_interval_ticks')), 'S13 Search arms the named collapse interval without changing Prayer');
   assertNoQueuedTimer(search, 'Search latch');
 
   const reset = makeRun('paid_reset', { phase: 2, remainder: 11, highHalf: 0xf18d });

@@ -17,6 +17,7 @@ if ($remaining = 1) {
     // The original sequence duration determines cleanup, not a saved face cursor.
     if (sub(^barrows_prayer_interval_ticks, $remaining) = divide(add(seqlength(^barrows_face_fade), sub(^barrows_client_cycles_per_tick, 1)), ^barrows_client_cycles_per_tick)) ~barrows_face_clear;
 }
+~barrows_collapse_tick;
 
 [proc,barrows_timer_resume]
 if (~barrows_inside(coord) = false | (~barrows_phase ! ^barrows_phase_unlooted & ~barrows_phase ! ^barrows_phase_paid)) {
@@ -25,9 +26,11 @@ if (~barrows_inside(coord) = false | (~barrows_phase ! ^barrows_phase_unlooted &
 }
 ~barrows_face_clear;
 if (~barrows_prayer_remaining = 0) ~barrows_prayer_set(^barrows_prayer_interval_ticks);
+if (~barrows_phase = ^barrows_phase_paid & ~barrows_in_tunnels(coord) = true & ~barrows_collapse_remaining > 0) cam_shake(^barrows_collapse_shake_axis, ^barrows_collapse_shake_random, ^barrows_collapse_shake_amplitude, ^barrows_collapse_shake_rate);
 // gettimer is an absolute clock. It is used only to test runtime presence.
 if (gettimer(barrows_timer_tick) = -1) settimer(barrows_timer_tick, 1, %barrows_generation);
 
 [proc,barrows_timer_stop]
 cleartimer(barrows_timer_tick);
 ~barrows_face_clear;
+cam_reset;

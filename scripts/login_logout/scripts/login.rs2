@@ -72,7 +72,6 @@ queue(macro_event_login, 0, 0);
 // Active Recruitment Drive assessments do not survive logout. A completed
 // assessment (marker 2) remains available to Tiffy after relog.
 ~rd_lifecycle_login;
-~barrows_resume;
 
 // A fresh login cannot retain the session timers for saved Smoke torch bits.
 if (%fd_torch_count1 ! 0 | %fd_torch_count2 ! 0 | %fd_torch_count3 ! 0 | %fd_torch_count4 ! 0) ~dt_smoke_logout;
@@ -101,6 +100,7 @@ if (inzone(2_42_42_59_53, 2_43_42_1_54, coord) = true | inzone(1_43_42_6_46, 1_4
 ~initalltabs;
 ~update_all(inv_getobj(worn, ^wearpos_rhand));
 cam_reset;
+~barrows_resume;
 queue(follower_login, 0, 0);
 // CoF gardener: directions is packed perm; follower uid is temp. Restore courtyard multi.
 queue(fenk_on_login_cleanup, 0, 0);

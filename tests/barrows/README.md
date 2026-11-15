@@ -27,7 +27,7 @@ Build the sibling engine packs, then run:
 node --import tsx ../content/tests/barrows/test_core.mjs
 ```
 
-This check executes the packed run procs through the production script runner. It covers masked state, phases, generation changes, owner-only actor removal, the non-suspending Search latch/reset, personal connected layouts and saved countdown fields. The Search latch has no player trigger or reward grant in this build group. S06 and S13 attach their effects to the shared saved-countdown primitives.
+This check executes the packed run procs through the production script runner. It covers masked state, phases, generation changes, owner-only actor removal, the non-suspending Search latch/reset, personal connected layouts and saved countdown fields. S12's native Search owns the complete reward transaction; S06 and S13 attach their effects to the shared saved-countdown primitives.
 
 Reset accepts only a paid run. Idle, unlooted and invalid phases retain every field, actor and presentation state. The paid control still proves generation advancement before actor removal and field clearing.
 
@@ -97,7 +97,7 @@ The UNKNOWN engineering policy is uniform over the complete set that satisfies t
 
 First runs permit all four corners and central doors. Consecutive begin/latch/reset cycles exclude the preceding run's corner and central door, including after save/load and relog. Search preserves the layout and draws nothing. Begin, paid reset and a wrong puzzle answer are the draw events. Original door transforms remain personal; shared wall collision never changes.
 
-Open-door operations transfer between measured room-side tiles in the clicked lane. Pre-loot central access requires the real puzzle's authorization. The topology fixtures retain their lock, movement and shared-collision assertions while allowing S08's encounter draw. Chest Open is separate from the still-unreachable payment.
+Open-door operations transfer between measured room-side tiles in the clicked lane. Pre-loot central access requires the real puzzle's authorization. The topology fixtures retain their lock, movement and shared-collision assertions while allowing S08's encounter draw. Chest Open raises an unmet brother without payment; S12's later Search pays the authorized open chest.
 
 ## Hidden tunnel (S05)
 
@@ -189,3 +189,17 @@ The original shown open child's native Search snapshots the real slain mask and 
 UNKNOWN engineering `barrows_grant_order` names the policy: sum stackable ordinary results and grant coins, mind, chaos, death, blood and bolt racks first; then grant single-item rewards and distinct gear in original roll order. The inherited `inv_add` merges existing stacks and spills the remainder onto the owner's floor in the same order. It does not refuse, open a capacity modal or transfer to another inventory.
 
 The native witness spies on the real grant while retaining its effects. It checks every grant's protected/paid/generation/actor state, exact consolidation and merging, two-slot and full-inventory overflow, repeated keys, distinct gear, all 64 masks, P=0, current and old paid credit, repeat Search and pure guard refusals. The S10 fixture retains the real Open/save/load/logout/login assertions and now proves the reachable Search/Close boundary instead of expecting an obsolete Search refusal.
+
+## Collapse and ordinary death (S13)
+
+```sh
+node --import tsx ../content/tests/barrows/test_collapse.mjs
+```
+
+Successful Search arms the saved high half once and restores the inherited shake. The same one-tick NORMAL timer decrements both independent halves. Paid tunnel callbacks reload the configured collapse interval, draw the named chance and choose a uniform inclusive amount. Unpaid or crypt callbacks cannot consume collapse time. Open, failed Search and repeat Search cannot arm or restart it. Busy access and offline time consume no saved ticks.
+
+The guarded hit queue rechecks generation, paid phase and tunnel location at delivery, then calls `damage_self`, the entire ordinary `damage_player` queue body. Compiled comparisons cover identical hitsplats, HP, sound and death at zero for every configured amount; no floor, protection, non-HP stat drain or energy loss is added. A real queued hit after departure has no effect.
+
+The canonical CANDIDATE D9 hook reuses `barrows_leave` before the first ordinary death delay. Pre-loot death preserves the whole run and both countdowns; paid death performs the existing protected reset. Native lethal-death controls compare ordinary kept inventory, shared death-tile drops and lifetimes, restored stats/energy and Lumbridge respawn. Shared login resumes exact paid-inside counters and restores shake after its final camera reset; outside paid login resets without shake.
+
+The 5..6 range is CANDIDATE early-2007 evidence, not exact 377 arithmetic. Interval, chance, uniform amount distribution and inherited shake parameters are UNKNOWN engineering names in `barrows.constant`.

@@ -4,7 +4,6 @@
 %barrows_state = clearbit(%barrows_state, ^barrows_challenge_bit);
 if_close;
 if_openoverlay(null);
-cam_reset;
 hint_stop;
 
 [proc,barrows_leave]
@@ -19,6 +18,12 @@ if (~barrows_phase = ^barrows_phase_paid) {
 if (~barrows_inside(coord) = false) return;
 ~barrows_remove_owned;
 ~barrows_close_presentation;
+
+// CANDIDATE D9: reuse the departure contract, before ordinary death delays.
+[proc,barrows_player_death]
+if (~barrows_inside(coord) = false) return;
+def_int $phase = ~barrows_phase;
+if ($phase = ^barrows_phase_unlooted | $phase = ^barrows_phase_paid) ~barrows_leave;
 
 [proc,barrows_stair_exit](loc $stairs)
 def_coord $dest = enum(loc, coord, barrows_stair_surface_exit, $stairs);

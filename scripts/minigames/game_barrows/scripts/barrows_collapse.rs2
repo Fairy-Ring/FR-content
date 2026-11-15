@@ -1,0 +1,26 @@
+// CANDIDATE D8 post-loot lifecycle and 5..6 range; schedule and draws are engineering.
+[proc,barrows_collapse_arm]
+if (~barrows_phase = ^barrows_phase_paid & ~barrows_in_tunnels(coord) = true) ~barrows_collapse_set(^barrows_collapse_interval_ticks);
+
+[proc,barrows_collapse_tick]
+if (~barrows_phase ! ^barrows_phase_paid) return;
+if (~barrows_in_tunnels(coord) = false) {
+    cam_reset;
+    return;
+}
+def_int $remaining = ~barrows_collapse_remaining;
+if ($remaining = 1) {
+    ~barrows_collapse_set(^barrows_collapse_interval_ticks);
+    if (random(^barrows_collapse_chance_denominator) = 0) {
+        def_int $amount = add(^barrows_collapse_min_hit, random(add(sub(^barrows_collapse_max_hit, ^barrows_collapse_min_hit), 1)));
+        queue*(barrows_collapse_hit, 0)(%barrows_generation, $amount);
+    }
+} else if ($remaining > 1) {
+    ~barrows_collapse_set(sub($remaining, 1));
+}
+
+// Revalidate at delivery, then run the entire ordinary damage_player body.
+// A second queued damage_player would reopen a stale-delivery window.
+[queue,barrows_collapse_hit](int $generation, int $amount)
+if (%barrows_generation ! $generation | ~barrows_phase ! ^barrows_phase_paid | ~barrows_in_tunnels(coord) = false) return;
+~damage_self($amount);

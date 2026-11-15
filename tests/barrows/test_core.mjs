@@ -682,7 +682,10 @@ async function main() {
     assert.equal(field(searchPlayer.getVar(ids.state), STATE.entranceMask, STATE.entranceShift), searchEntranceBefore, 'Search preserves the selected central entrance');
     assert.equal(((u32(searchPlayer.getVar(ids.clientState)) >>> 10) & 0xffff), searchLocksBefore, 'Search preserves the current personal lock layout');
     assert.equal(u32(searchPlayer.getVar(ids.credit)), searchSeed.credit, 'Search must freeze and retain all 453 credit bits');
-    assert.equal(u32(searchPlayer.getVar(ids.countdowns)), searchSeed.countdowns, 'S01 Search must not change either countdown');
+    const collapseInterval = fs.readFileSync(path.join(CONTENT_ROOT, 'scripts/minigames/game_barrows/configs/barrows.constant'), 'utf8')
+      .match(/^\^barrows_collapse_interval_ticks\s*=\s*(\d+)\s*$/m);
+    assert(collapseInterval, 'S13 declares its named collapse interval');
+    assert.equal(u32(searchPlayer.getVar(ids.countdowns)), u32((Number(collapseInterval[1]) << 16) | (searchSeed.countdowns & 0xffff)), 'Search arms the named collapse interval and preserves Prayer');
     assert.equal(procInt(searchPlayer, 'barrows_search_allowed', [searchGeneration + 1]), 0, 'paid phase must reject Search authorization');
 
     // Owner cleanup covers every authored actor type on both levels. Only the

@@ -375,6 +375,8 @@ await run(async () => {
     expected[varIds.barrows_state] = u32(setRange(before[varIds.barrows_state], c('barrows_phase_paid'), ranges.phase)
       & ~rangeMask([c('barrows_solved_bit'), c('barrows_challenge_bit')]));
     expected[varIds.barrows_generation]++;
+    expected[varIds.barrows_countdowns] = u32((c('barrows_collapse_interval_ticks') << c('barrows_collapse_start'))
+      | (before[varIds.barrows_countdowns] & c('barrows_countdown_max')));
     assert.deepEqual(varSnapshot(player), expected, `${label}: Search pays once without changing layout or credit`);
     assert.notDeepEqual(inventorySnapshot(player), inventoryBefore, `${label}: native Search grants the real nonzero-potential reward`);
   }
