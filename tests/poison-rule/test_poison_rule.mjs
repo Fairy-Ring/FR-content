@@ -37,10 +37,11 @@ const poisonId = id(VarPlayerType, 'poison');
 const timerScript = ScriptProvider.getByName('[timer,poison]');
 const spellTable = DbTableType.getByName('magic_spell_table');
 const windStrike = DbRowType.getByName('magic_spell_wind_strike');
-assert(spellTable && windStrike, 'real named Wind Strike data');
-const spellValue = name => {
+const confuse = DbRowType.getByName('magic_spell_confuse');
+assert(spellTable && windStrike && confuse, 'real named Wind Strike and Confuse data');
+const spellValue = (name, spell = windStrike) => {
   const column = spellTable.columnNames.indexOf(name); assert(column >= 0, name);
-  return windStrike.getValue(column, 0)[0];
+  return spell.getValue(column, 0)[0];
 };
 let serial = 0, checks = 0, hitTape = null;
 const check = (label, actual, expected) => { assert.deepEqual(actual, expected, label); checks++; console.log(`PASS ${label}`); };
@@ -111,7 +112,7 @@ function settle(player, ticks = 5) {
   try { for (let i = 0; i < ticks; i++) { World.currentTick++; player.processQueues(); } }
   finally { JavaRandom.nextDouble = original; }
 }
-function attack(style, outcome, f, prayer = null) {
+function attack(style, outcome, f, prayer = null, spell = windStrike) {
   const protectedStyle = outcome === 'prayer' ? style : prayer;
   if (protectedStyle) f.player.setVar(id(VarPlayerType, protectedStyle === 'melee' ? 'prayer14' : protectedStyle === 'ranged' ? 'prayer13' : 'prayer12'), 1);
   const hiddenPoisonRoll = style !== 'magic' && severityOf(NpcType.get(f.npc.type).debugname) > 0;
@@ -122,7 +123,7 @@ function attack(style, outcome, f, prayer = null) {
   withDelivery(style, f, () => random(rolls, () => {
     if (style === 'melee') run('[proc,npc_meleeattack]', f.npc, f.player);
     else if (style === 'ranged') run('[proc,npc_rangeattack]', f.npc, f.player);
-    else run('[proc,npc_cast_spell]', f.npc, f.player, [spellValue('spell'), 4]);
+    else run('[proc,npc_cast_spell]', f.npc, f.player, [spellValue('spell', spell), 4]);
   }));
 }
 const styles = ['melee', 'ranged', 'magic'];
@@ -182,6 +183,28 @@ for (const style of styles) {
     check(`${style} f2p ${outcome} no poison timer`, f.player.timers.has(timerScript.id), false);
   }
   Environment.NODE_MEMBERS = true;
+}
+// Finished 274 poisons after any successful cast, even without a max-hit field.
+// Use the real Confuse row: no direct damage, but its ordinary attack drain stays.
+for (const type of [...samples, controls.magic]) {
+  for (const outcome of ['zero', 'miss', 'prayer']) {
+    const f = fixture(type), severity = severityOf(type);
+    const expected = severity > 0 && outcome === 'zero' ? severity : 0;
+    hitTape = []; attack('magic', outcome, f, null, confuse);
+    const poisonQueues = [...f.player.queue.all()].filter(q => q.script.name === '[queue,poison_player]');
+    check(`magic ${type} non-damaging ${outcome} poison queue count`, poisonQueues.length, expected ? 1 : 0);
+    check(`magic ${type} non-damaging ${outcome} queued severity`, poisonQueues.map(q => q.args), expected ? [[severity]] : []);
+    settle(f.player);
+    check(`magic ${type} non-damaging ${outcome} has no direct hit`, hitTape, []);
+    hitTape = null;
+    check(`magic ${type} non-damaging ${outcome} Hitpoints`, f.player.levels[PlayerStat.HITPOINTS], 80);
+    check(`magic ${type} non-damaging ${outcome} poison result`, f.player.getVar(poisonId), expected);
+    const messages = outcome === 'zero' ? ['You feel weakened.'] : [];
+    if (expected) messages.push('You have been poisoned!');
+    check(`magic ${type} non-damaging ${outcome} messages`, f.player.testMessages, messages);
+    check(`magic ${type} non-damaging ${outcome} poison timer`, f.player.timers.has(timerScript.id), expected > 0);
+    check(`magic ${type} non-damaging ${outcome} attack drain`, f.player.levels[PlayerStat.ATTACK], outcome === 'zero' ? 75 : 80);
+  }
 }
 // Compare effects within this run. A real non-poisonous cow's published prayed
 // attack is its ordinary accuracy-miss path: one zero hit, two RNG draws, and the
