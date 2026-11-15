@@ -487,7 +487,9 @@ for (const mode of ['melee', 'ranged', 'autocast', 'manual']) for (const continu
       if (mode === 'ranged') assert.equal(count(p, 'bronze_arrow', worn), ammo - 1);
       if (mode === 'autocast' || mode === 'manual') assert.equal(count(p, 'mindrune'), runes - 1);
       if (!lit) assert(held(p, 'lit_candle', 1), 'real extinguish between attacks');
-      if (mode === 'manual') arm(); // A second manual click, while its actual first-cast delay still holds.
+      // Held-item input cancels interaction. Re-arm the genuine attack while
+      // the first attack's actual delay still holds, for every combat style.
+      arm();
     } else arm();
     const before = {
       inv: inventory(p), worn: inventory(p, worn), xp: [...p.stats], npc: [...n.levels],
