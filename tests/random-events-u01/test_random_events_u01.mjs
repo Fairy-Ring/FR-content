@@ -79,7 +79,7 @@ function reload(directory) {
 // projecting expected RuneScript or hashing bytecode. Default-only added varps
 // are absent; every changed varp, packet, queue, tile and inventory stays pinned.
 // Actor inventory must not change across a root, independent of static-map updates.
-const roots = ['[login,_]', '[queue,macro_event_login]', '[proc,p_telejump_safe]', '[queue,player_death_default]', '[if_button,magic:lumbridge_teleport]'];
+const roots = ['[login,_]', '[queue,macro_event_login]', '[timer,general_macro_events]', '[proc,p_telejump_safe]', '[queue,player_death_default]', '[if_button,magic:lumbridge_teleport]'];
 function effects(root) {
   const p = player();
   if (root.includes('death')) for (const item of ['bronze_pickaxe', 'airrune', 'lawrune']) give(p, item);
@@ -102,6 +102,9 @@ if (process.env.U01_CAPTURE_BASELINE) {
   process.exit(0);
 }
 const baseline = JSON.parse(readFileSync(new URL('./inert-effects.json', import.meta.url), 'utf8'));
+// With events off the published timer is inert, like the no-event login queue.
+// Published-pack mode also executes that timer to reproduce this saved projection.
+baseline.effects['[timer,general_macro_events]'] = baseline.effects['[queue,macro_event_login]'];
 for (const root of roots) check(`no-event effects match published pack ${root}`, () => assert.deepEqual(effects(root), baseline.effects[root]));
 if (process.env.U01_PUBLISHED_PACK) {
   reload(process.env.U01_PUBLISHED_PACK);
@@ -148,10 +151,9 @@ function cleared(p) {
   noReward(p);
 }
 const admissionStates = ['free', 'npc combat', 'multiple attackers', 'pvp combat', 'modal', 'delayed', 'unavailable', 'another event active'];
-function admissionEffects(kind, noSquare = false, root = '[timer,general_macro_events]') {
+function admissionEffects(kind, root = '[timer,general_macro_events]') {
   const p = player(), attackers = [];
   const random = JavaRandom.nextDouble, enabled = Environment.NODE_RANDOM_EVENTS;
-  const findSquare = ScriptRunner.HANDLERS[op.MAP_FINDSQUARE];
   // Labelled packed-only readiness/state boundaries. Enable AFK_EVENT only in
   // this process and fix the existing selector's RNG to Genie, not its result.
   Environment.NODE_RANDOM_EVENTS = true;
@@ -174,7 +176,6 @@ function admissionEffects(kind, noSquare = false, root = '[timer,general_macro_e
     if (kind === 'unavailable') p.protect = true;
     if (kind === 'another event active') genie(p);
     p.afkEventReady = true;
-    if (noSquare) ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = state => { state.popInts(4); state.pushInt(-1); };
     run(p, root, root.startsWith('[timer,') ? [] : [2], { protect: false });
     const owned = [...World.npcs].filter(n => n.isActive && n.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')) === (p.uid | 0));
     const result = {
@@ -184,15 +185,8 @@ function admissionEffects(kind, noSquare = false, root = '[timer,general_macro_e
       tile: [p.level, p.x, p.z], modal: p.modalMain, delayed: p.delayed, protect: p.protect,
       inventory: snapshot(p).inventory, queues: snapshot(p).queues
     };
-    if (noSquare) {
-      ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = findSquare;
-      run(p, '[timer,general_macro_events]', [], { protect: false });
-      result.nextIdentity = p.getVar(v('macro_event'));
-      result.nextReady = p.afkEventReady;
-    }
     return result;
   } finally {
-    ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = findSquare;
     JavaRandom.nextDouble = random; Environment.NODE_RANDOM_EVENTS = enabled;
     for (const n of [...World.npcs]) if (n.isActive && (attackers.includes(n) || n.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')) === (p.uid | 0))) World.removeNpc(n, -1);
   }
@@ -200,7 +194,7 @@ function admissionEffects(kind, noSquare = false, root = '[timer,general_macro_e
 const admissionHead = new Map();
 const admissionRoots = ['[timer,general_macro_events]', '[proc,macro_event_general_spawn]'];
 for (const root of admissionRoots) for (const kind of admissionStates) check(`published Genie admission is preserved: ${root} ${kind}`, () => {
-  const result = admissionEffects(kind, false, root);
+  const result = admissionEffects(kind, root);
   admissionHead.set(`${root}:${kind}`, result);
   assert.equal(result.identity, 2);
   assert.deepEqual(result.actors, ['macro_geni']);
@@ -209,15 +203,6 @@ for (const root of admissionRoots) for (const kind of admissionStates) check(`pu
   assert.equal(result.modal, kind === 'modal' ? requiredId(types.Component, 'welcome_screen') : -1);
   assert.equal(result.delayed, kind === 'delayed');
   assert.deepEqual(result.queues, [[], [], []], 'no new retry queue');
-});
-check('no-square timer admission keeps its roll for the next timer without a queue', () => {
-  const result = admissionEffects('free', true);
-  assert.equal(result.identity, 0);
-  assert.deepEqual(result.actors, []);
-  assert.equal(result.ready, true);
-  assert.deepEqual(result.queues, [[], [], []]);
-  assert.equal(result.nextIdentity, 2);
-  assert.equal(result.nextReady, false);
 });
 check('failed NPC allocation writes no event identity or actor state', () => {
   const p = player(), before = snapshot(p);
@@ -290,20 +275,6 @@ check('configured follower logout restoration preserves origin and excludes anot
   run(p, '[proc,macro_event_general_spawn]', [2], { protect: false });
   assert.deepEqual(snapshot(p), before);
   cleanup(p); World.removeNpc(old, -1);
-});
-check('follower login with no free square releases identity and permits a new task', () => {
-  const p = player(); const old = genie(p);
-  run(p, '[proc,macro_event_logout]');
-  p.setVar(v('macro_event_uid'), -1);
-  const findSquare = ScriptRunner.HANDLERS[op.MAP_FINDSQUARE];
-  // Labelled collision intervention for this login only, not a copied login body.
-  ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = state => { state.popInts(4); state.pushInt(-1); };
-  try { run(p, '[queue,macro_event_login]'); }
-  finally { ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = findSquare; }
-  cleared(p);
-  assert.equal([...World.npcs].filter(n => n.isActive && n.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')) === (p.uid | 0)).length, 0);
-  startTask(p); cleanup(p);
-  World.removeNpc(old, -1);
 });
 check('Candlelight relog preserves identity and departure and Pete can still complete', () => {
   const p = player();
@@ -590,8 +561,8 @@ check('real packed Teleother cast and visible consent release only the owned tas
 // Every positive identity in the published constants is exercised, including
 // triffidseed/bigfish's shared value 6. NPC action sentinels are not identities.
 const identityRoots = ['[queue,macro_event_login]', '[proc,macro_event_logout]', '[queue,player_death_default]', '[proc,p_telejump_safe]'];
-function identityEffects(identity, root) {
-  const p = player(identity === 5 ? [0, 1972, 5003] : O);
+function identityEffects(identity, root, tile = identity === 5 ? [0, 1972, 5003] : O) {
+  const p = player(tile);
   p.setVar(v('macro_event'), identity);
   p.setVar(v('macro_event_target_coord'), D);
   p.setVar(v('macro_transmit'), 13);
@@ -617,6 +588,17 @@ for (let identity = 0; identity <= 6; identity++) for (const root of identityRoo
   assert.equal(result.target, D);
   assert.equal(result.progress, 13, 'U01 does not reset another event progress word');
 });
+const castleWars = [0, 2378, 9482];
+const castleWarsHead = new Map();
+for (const identity of [2, 4]) check(`published follower ${identity} Castle Wars login retains stale destination`, () => {
+  const result = identityEffects(identity, '[queue,macro_event_login]', castleWars);
+  castleWarsHead.set(identity, result);
+  assert.equal(result.identity, 0);
+  assert.equal(result.target, D);
+  assert.equal(result.progress, 13);
+  assert.deepEqual(result.tile, castleWars);
+  assert.deepEqual(result.actors, []);
+});
 if (process.env.U01_PUBLISHED_PACK) {
   reload(process.env.U01_PUBLISHED_PACK);
   try {
@@ -627,8 +609,13 @@ if (process.env.U01_PUBLISHED_PACK) {
       console.log(`IDENTITY_COMPARISON ${JSON.stringify({ identity, root, published, actual })}`);
       assert.deepEqual(actual, expected, 'only F1 Candlelight identity retention may differ');
     });
+    for (const identity of [2, 4]) check(`published-pack follower ${identity} Castle Wars login comparison`, () => {
+      const published = identityEffects(identity, '[queue,macro_event_login]', castleWars), actual = castleWarsHead.get(identity);
+      console.log(`CASTLE_WARS_COMPARISON ${JSON.stringify({ identity, published, actual })}`);
+      assert.deepEqual(actual, published);
+    });
     for (const root of admissionRoots) for (const kind of admissionStates) check(`published-pack admission comparison: ${root} ${kind}`, () => {
-      const published = admissionEffects(kind, false, root), actual = admissionHead.get(`${root}:${kind}`);
+      const published = admissionEffects(kind, root), actual = admissionHead.get(`${root}:${kind}`);
       console.log(`ADMISSION_COMPARISON ${JSON.stringify({ root, kind, published, actual })}`);
       assert.deepEqual(actual, published);
     });

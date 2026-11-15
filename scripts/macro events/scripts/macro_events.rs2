@@ -4,15 +4,10 @@
 if (~macro_event_allowed = false) { 
     return;
 }
-// No free square: retain readiness until a later timer, without a retry queue.
-def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
-if ($event_coord = null) {
-    return;
-}
 if (afk_event = ^true) {
     // random events arent restricted in wildy? https://youtu.be/uPKaH7yg4To?t=421
     // Not restricted in banks: https://youtu.be/1Rz9Eg4ZHhA
-    ~macro_event_general_create(~macro_event_set_random, $event_coord);
+    ~macro_event_general_spawn(~macro_event_set_random);
 }
 
 
@@ -118,7 +113,7 @@ if (%macro_event = ^macro_candlelight) {
 if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
     if (~macro_event_area(coord) = false |
         ~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true) {
-        ~macro_event_cleanup(%macro_event, %macro_event_uid);
+        %macro_event = ^no_macro_event;
         return;
     }
     if (npc_finduid(%macro_event_uid) = true) {
@@ -129,8 +124,6 @@ if (nc_param(~macro_event_npc(%macro_event), follow_player_on_logout) = ^true) {
     def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
     if ($event_coord ! null) {
         ~macro_event_general_create(%macro_event, $event_coord);
-    } else {
-        ~macro_event_cleanup(%macro_event, %macro_event_uid);
     }
 } else {
     // Preserve published non-restoring event login: clear only the identity.
