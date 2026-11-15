@@ -240,3 +240,7 @@ This proof-only slice executes the real shared logout/login triggers around nati
 
 Separate mutants omit actor cleanup, erase earned credit and redraw topology on login. Each fails its named new assertion. `lifecycle.evidence.txt` identifies the retained native output, red logs and gates; this adds no product lifecycle policy.
 
+## Tunnel logout lifecycle (S16)
+
+The registered lifecycle suite also executes real selected-tunnel descent, shared logout/login around native save/load, and the real ladder/return control. It independently earns B=2 and count=3 through compiled credit procs, checks all sixteen original locks, the selected ladder's real child, exact corner landing and all five durable words, and proves that offline time and pre-loot ladder departure do not redraw or pay. Three tunnel-only login mutants independently erase the ladder, erase credit or draw a new layout; each fails a named S16 assertion without failing S15 first. The headed single-account case earns B=1 naturally and proves the same ladder, locks, count and no-reset return. `lifecycle.evidence.txt` retains the exact identities and gates.
+

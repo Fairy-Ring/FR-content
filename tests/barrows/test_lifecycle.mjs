@@ -4,11 +4,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
-import { createRunner, loadPackedRuntime, parseOptions, run } from './packed.mjs';
+import { createRunner, loadPackedRuntime, parseEnum, parseOptions, run } from './packed.mjs';
 
 await run(async () => {
   const runtime = await loadPackedRuntime(parseOptions());
-  const { World, Player, NpcType, VarPlayerType, VarNpcType, InvType, ObjType, ScriptProvider,
+  const { World, Player, LocType, NpcType, VarPlayerType, VarBitType, VarNpcType, InvType, ObjType, ScriptProvider,
     ScriptRunner, ScriptState, CoordGrid } = runtime;
   const eng = relative => import(pathToFileURL(path.join(runtime.engineRoot, relative)).href);
   const [{ default: ServerTriggerType }, { default: Packet }, { PlayerLoading }, { ScriptOpcode },
@@ -61,6 +61,7 @@ await run(async () => {
     p.messageGame = message => p.messages.push(message);
     p.wrappedMessageGame = message => p.messages.push(message);
     p.getInventory(worn);
+    p.getInventory(inv);
   }
   function register(p) {
     p.isActive = true;
@@ -178,6 +179,67 @@ await run(async () => {
     assert.notEqual(retry, actor, 'S15 uncredited actor can be recreated in the same preserved run');
     assert.deepEqual(words(relog), savedWords, 'S15 actor recreation cannot credit its own removal');
     console.log('PASS S15 native shared crypt logout/save/load/login: exact durable words and earned B=1, actor-only cleanup, foreign/map controls, no RNG or payment, exact saved remainder and retry');
+
+    const tunnel = makePlayer('tunnel');
+    begin(tunnel);
+    for (const name of ['barrows_ahrim', 'barrows_dharok', 'barrows_rat']) {
+      const type = NpcType.getId(name);
+      runner.procVoid(tunnel, 'barrows_credit', [tunnel.getVar(vars.barrows_generation), type,
+        runner.procInt(tunnel, 'barrows_npc_level', [type])]);
+    }
+    assert.equal(brotherCount(tunnel), 2, 'S16 tunnel fixture has genuine proc-earned partial B=2');
+    assert.equal(range(tunnel.getVar(vars.barrows_kills), 'count'), 3, 'S16 count includes a credited ordinary monster');
+    const corner = runner.procInt(tunnel, 'barrows_ladder_corner');
+    const identity = runner.procInt(tunnel, 'barrows_tunnel_identity');
+    const ladderVars = 'acgi'.split('').map(letter => VarBitType.getId(`barrows_chamber_${letter}`));
+    assert(ladderVars.every(id => id >= 0), 'S16 all four original ladder varbits are packed');
+    const expectedLadder = ladderVars.map((_, index) => Number(index === corner));
+    assert.deepEqual(ladderVars.map(id => tunnel.getVarBit(id)), expectedLadder, 'S16 selected corner has exactly one original visible ladder');
+    const doorVars = 'abcdefghijklmnop'.split('').map(letter => VarBitType.getId(`barrows_door_${letter}`));
+    assert(doorVars.every(id => id >= 0), 'S16 all sixteen original lock varbits are packed');
+    const lockBits = doorVars.map(id => tunnel.getVarBit(id));
+    assert(lockBits.some(Boolean) && lockBits.some(bit => !bit), 'S16 positive layout control has both locked and open original doors');
+    assert.equal(runner.procInt(tunnel, 'barrows_tunnel_enter', [tunnel.getVar(vars.barrows_generation), identity,
+      CoordGrid.packCoord(tunnel.level, tunnel.x, tunnel.z)]), 1, 'S16 native selected-tunnel descent accepts its captured run');
+    const landingText = parseEnum(runtime.contentRoot, 'barrows_ladder_landing').get(String(corner));
+    assert(landingText, 'S16 original landing enum supplies the selected corner coordinate');
+    const [landingLevel, landingMapX, landingMapZ, landingX, landingZ] = landingText.split('_').map(Number);
+    const landing = [landingLevel, landingMapX * 64 + landingX, landingMapZ * 64 + landingZ];
+    assert.deepEqual([tunnel.level, tunnel.x, tunnel.z], landing, 'S16 real descent reaches the original selected ladder landing');
+    const ladderParent = LocType.get(LocType.getId(`barrows_ladder_${'acgi'[corner]}`));
+    assert(ladderParent, 'S16 selected original ladder parent is packed');
+    const visibleLadder = p => LocType.get(ladderParent.multiloc[p.getVarBit(ladderParent.multivarbit)]);
+    assert(visibleLadder(tunnel).op.includes('Climb-up'), 'S16 native ladder selector exposes its Climb-up child');
+    assert.equal(brotherCount(tunnel), 2, 'S16 descent preserves the independently earned B=2');
+    assert.equal(range(tunnel.getVar(vars.barrows_kills), 'count'), 3, 'S16 descent preserves the independently earned count=3');
+    const tunnelWords = words(tunnel), tunnelItems = inventory(tunnel), cryptControlWords = words(b);
+    noBarrowsRandom('S16 clean pre-loot tunnel logout', () => lifecycle(tunnel, 'logout'));
+    assert.deepEqual(words(tunnel), tunnelWords, 'S16 tunnel logout preserves exact topology, corner, count, identity, generation and remainder');
+    assert.deepEqual(words(b), cryptControlWords, 'S16 other crypt owner is unchanged by tunnel logout');
+    assert.equal(control.isActive, true, 'S16 tunnel logout cannot remove the crypt control owner actor');
+    const tunnelSave = tunnel.save();
+    unregister(tunnel);
+    World.currentTick += c('barrows_prayer_interval_ticks') * 4;
+    const tunnelRelog = restore(tunnel, tunnelSave);
+    noBarrowsRandom('S16 shared pre-loot tunnel login', () => lifecycle(tunnelRelog, 'login'));
+    assert.deepEqual(words(tunnelRelog), tunnelWords, 'S16 tunnel native save/load/login retains every durable word without offline consumption');
+    assert.equal(brotherCount(tunnelRelog), 2, 'S16 relog preserves the independently earned B=2');
+    assert.equal(range(tunnelRelog.getVar(vars.barrows_kills), 'count'), 3, 'S16 relog preserves the independently earned count=3');
+    assert.deepEqual([tunnelRelog.level, tunnelRelog.x, tunnelRelog.z], landing, 'S16 tunnel relog restores the exact selected ladder landing');
+    assert.deepEqual(ladderVars.map(id => tunnelRelog.getVarBit(id)), expectedLadder, 'S16 tunnel relog restores the exact original ladder selector');
+    assert.deepEqual(doorVars.map(id => tunnelRelog.getVarBit(id)), lockBits, 'S16 tunnel relog restores all sixteen original locks');
+    assert(visibleLadder(tunnelRelog).op.includes('Climb-up'), 'S16 relog still resolves the real visible Climb-up child');
+    assert.deepEqual(inventory(tunnelRelog), tunnelItems, 'S16 pre-loot tunnel relog grants nothing');
+    noBarrowsRandom('S16 no-reset ladder departure control', () => {
+      assert.equal(runner.procInt(tunnelRelog, 'barrows_tunnel_exit'), 1);
+      assert.equal(tunnelRelog.level, 3, 'S16 original ladder returns to a crypt');
+      assert.deepEqual(words(tunnelRelog), tunnelWords, 'S16 pre-loot real ladder departure cannot reset the saved run');
+      assert.equal(runner.procInt(tunnelRelog, 'barrows_tunnel_enter', [tunnelRelog.getVar(vars.barrows_generation), identity,
+        CoordGrid.packCoord(tunnelRelog.level, tunnelRelog.x, tunnelRelog.z)]), 1);
+    });
+    assert.deepEqual(words(tunnelRelog), tunnelWords, 'S16 natural return preserves the exact unfinished topology/count/remainders');
+    assert.deepEqual([tunnelRelog.level, tunnelRelog.x, tunnelRelog.z], landing, 'S16 natural return uses the same stored corner');
+    console.log('PASS S16 native selected-tunnel descent/shared logout/save/load/login and ladder/return control: exact topology, original corner/locks, B=2/count=3, all durable words, remainder, no new RNG or payment');
   } finally {
     for (const npc of [...World.npcs]) if (npc.isActive) World.removeNpc(npc, -1);
     for (const p of players) unregister(p);

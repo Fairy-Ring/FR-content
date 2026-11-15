@@ -35,3 +35,27 @@ Own-only fixtures: access, spade, hill position, combat stats, equipment and foo
 Natural first Dig; Ahrim killed for earned B=1; different Dharok crypt Search raises a living resident; ordinary Walk behind the real coffin; quiet native hitmark interval; native clean logout/login; preserved credit and same crypt; resident absent; Search recreates that uncredited resident as the positive control. No reward is paid.
 All 18 PNGs viewed. Old-client model defects do not hide the coffin, live actor, hint, combat bar, kill count, or successful logout/retry.
 Two initial fixture failures remain in live/s15 and live/s15-started with their receipts and pictures; both precede the product logout predicate. Exact classes, corrections and hashes are in impl.md.
+
+S16 native pre-loot tunnel lifecycle, 2026-11-15. No product change.
+Actual selected-tunnel descent, all sixteen original locks and four original ladder bits, native shared logout/save/load/login, B=2/count=3 earned by the compiled credit procs, exact corner landing and five-word remainder preservation, real ladder/return no-reset control, no Barrows RNG or payment.
+logs/ci-s16/29-tests_barrows_test_lifecycle.mjs.log
+SHA-256 20b3a64d198f7c8aa11cff628b861ea109610a46de4f172292bffdc61d426ec6.
+Tunnel-only login redraw mutant: logs/s16-mutant-redraw-red.log
+SHA-256 4a4d43c67ab644c046ac858ebeaa18a51c425933a78312463ba19e8a4a8cd969.
+Fails S16 shared pre-loot tunnel login: no Barrows identity, topology, encounter or reward draw.
+Tunnel-only login clears ladder mutant: logs/s16-mutant-ladder-red.log
+SHA-256 47d9e38e49b64eaafa7921d07c317aa48bdfeda12f8256b7fa75e63832935d9e.
+Tunnel-only login clears credit mutant: logs/s16-mutant-credit-red.log
+SHA-256 3ef7b72e958e94447b269c4ed68e4da270c1db203015f4d05a77c579a9e2d860.
+Both fail S16 tunnel native save/load/login retains every durable word without offline consumption.
+Each shared login mutant restored exactly: logs/s16-mutants-restored.log.
+logs/s16-gates.log and logs/s16-ci.log: clean pack, build, rs2check, all 99 registered tests, varp transmission and unchanged client/config exit 0.
+
+S16 headed natural live: PASS all nine checks, no retained live failure.
+Content d04ce48a53ebee1ec3f2fc1bb6577ec469c78300; engine 15301127e60ff6ef3d7d2547b084de15fb565338; cell 8a84aeaf75215bd25965cb5a6b5a2bbea64833c6.
+live/s16/S16-new-1794737958808.json
+SHA-256 6fc7b1d327e2d946eb0417d528988dcd4acc8d721c4cd3165617d66a05266834.
+Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
+Own fixtures: access, spade, hill position, combat stats, equipment and food.
+First real Dig; actual Ahrim kill for B=1; selected crypt Search and Continue; connected saved layout and real SE ladder at 3568,9677,0; clean pre-loot relog; exact four stable words, tile and native ladder child; real Climb-up and another natural descent retain the unfinished run as the no-reset control.
+All sixteen PNGs viewed: paired first Dig, raised/credited resident, descent, clean tunnel relog, ladder return and natural re-entry. Online Prayer remainder may advance normally; no exact live remainder equality is claimed.
