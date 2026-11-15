@@ -16,6 +16,7 @@ await run(async () => {
     eng('src/engine/script/ServerTriggerType.ts'), eng('src/io/Packet.ts'),
     eng('src/engine/entity/PlayerLoading.ts'), eng('src/engine/script/ScriptOpcode.ts'), eng('src/cache/config/VarSharedType.ts')
   ]);
+  const { PlayerTimerType } = await eng('src/engine/entity/EntityTimer.ts');
   VarSharedType.load(runtime.packDir);
   World.vars = new Int32Array(VarSharedType.count);
   const { unzipSync } = createRequire(path.join(runtime.engineRoot, 'package.json'))('fflate');
@@ -322,6 +323,75 @@ await run(async () => {
       assert.deepEqual(inventory(openRelog), paidOpenItems, `${label}: paid repeat Search pays nothing`);
     }
     console.log('PASS S17 all partial B=0..5: native Open distinct from payment, actual open visual/shared relog/exact credit and remainder, closed/generation/square/solved/paid Search gates, real one-time authorized Search without a final-kill prerequisite');
+
+    const paid = makePlayer('paid');
+    begin(paid);
+    for (const name of ['barrows_ahrim', 'barrows_dharok', 'barrows_rat']) {
+      const type = NpcType.getId(name);
+      runner.procVoid(paid, 'barrows_credit', [paid.getVar(vars.barrows_generation), type,
+        runner.procInt(paid, 'barrows_npc_level', [type])]);
+    }
+    paid.teleport(3551, 9694, 0);
+    paid.setVar(vars.barrows_state, paid.getVar(vars.barrows_state) | (1 << c('barrows_solved_bit')));
+    nativeChest(paid, 'closed', 'S18 actual Open');
+    nativeChest(paid, 'open', 'S18 actual paid Search');
+    assert.equal(runner.procInt(paid, 'barrows_phase'), c('barrows_phase_paid'), 'S18 native Search supplies the paid run');
+    assert.equal(brotherCount(paid), 2, 'S18 native payment freezes the independently proc-earned B=2');
+    assert.equal(range(paid.getVar(vars.barrows_kills), 'count'), 3, 'S18 native payment freezes the independently earned count=3');
+    const escapeDoors = doorVars.map(id => paid.getVarBit(id));
+    const escapeLadders = ladderVars.map(id => paid.getVarBit(id));
+    const paidTile = [paid.level, paid.x, paid.z];
+    const expectedShake = Object.fromEntries(['axis', 'random', 'amplitude', 'rate']
+      .map(name => [name, c(`barrows_collapse_shake_${name}`)]));
+    let paidSource = paid, remainderCases = 0;
+    for (let prayer = 1; prayer <= c('barrows_prayer_interval_ticks'); prayer++) {
+      for (let collapse = 1; collapse <= c('barrows_collapse_interval_ticks'); collapse++) {
+        const label = `S18 paid saved remainders ${prayer}/${collapse}`;
+        runner.procVoid(paidSource, 'barrows_prayer_set', [prayer]);
+        runner.procVoid(paidSource, 'barrows_collapse_set', [collapse]);
+        const savedPaidWords = words(paidSource), savedPaidItems = inventory(paidSource);
+        noBarrowsRandom(`${label} shared logout`, () => lifecycle(paidSource, 'logout'));
+        assert.deepEqual(words(paidSource), savedPaidWords, `${label}: logout preserves every paid escape word`);
+        assert.equal(paidSource.timers.has(timer.id), false, `${label}: logout removes the runtime timer, not its remainder`);
+        const paidSave = paidSource.save();
+        unregister(paidSource);
+        World.currentTick += (c('barrows_prayer_interval_ticks') + c('barrows_collapse_interval_ticks')) * 4;
+        const paidRelog = restore(paidSource, paidSave);
+        noBarrowsRandom(`${label} shared login`, () => lifecycle(paidRelog, 'login'));
+        assert.deepEqual(words(paidRelog), savedPaidWords, `${label}: shared native save/load/login preserves phase, frozen mask, escape and exact independent remainders`);
+        assert.deepEqual([paidRelog.level, paidRelog.x, paidRelog.z], paidTile, `${label}: paid-inside tile is unchanged`);
+        assert.deepEqual(doorVars.map(id => paidRelog.getVarBit(id)), escapeDoors, `${label}: every original escape lock survives`);
+        assert.deepEqual(ladderVars.map(id => paidRelog.getVarBit(id)), escapeLadders, `${label}: original escape corner survives`);
+        assert.equal(displayedChest(paidRelog).op[0], 'Search', `${label}: paid visual remains the original Search child`);
+        const lastCamera = paidRelog.packets.filter(packet => ['CamShake', 'CamReset'].includes(packet.constructor.name)).at(-1);
+        assert.equal(lastCamera?.constructor.name, 'CamShake', `${label}: paid shake survives the final shared camera reset`);
+        assert.deepEqual(Object.fromEntries(Object.keys(expectedShake).map(key => [key, lastCamera[key]])), expectedShake,
+          `${label}: restored shake uses every named config parameter`);
+        assert.equal(paidRelog.timers.get(timer.id)?.type, PlayerTimerType.NORMAL, `${label}: resume uses native NORMAL access`);
+        assert.equal(paidRelog.timers.get(timer.id)?.interval, 1, `${label}: one normal tick resumes, never offline replay`);
+        assert.deepEqual(inventory(paidRelog), savedPaidItems, `${label}: paid relog creates no new treasure`);
+        const uncredited = NpcType.getId('barrows_guthan');
+        runner.procVoid(paidRelog, 'barrows_credit', [paidRelog.getVar(vars.barrows_generation), uncredited,
+          runner.procInt(paidRelog, 'barrows_npc_level', [uncredited])]);
+        assert.deepEqual(words(paidRelog), savedPaidWords, `${label}: current-generation post-payment credit remains frozen`);
+        noBarrowsRandom(`${label} repeat Search`, () => nativeChest(paidRelog, 'open', `${label} repeat Search`));
+        assert.deepEqual(words(paidRelog), savedPaidWords, `${label}: repeat Search neither repays nor rearms`);
+        assert.deepEqual(inventory(paidRelog), savedPaidItems, `${label}: repeat Search grants no second treasure`);
+        World.currentTick++;
+        paidRelog.processTimers(PlayerTimerType.NORMAL);
+        assert.equal(runner.procInt(paidRelog, 'barrows_prayer_remaining'),
+          prayer === 1 ? c('barrows_prayer_interval_ticks') : prayer - 1, `${label}: first native callback consumes only the saved Prayer tick`);
+        assert.equal(runner.procInt(paidRelog, 'barrows_collapse_remaining'),
+          collapse === 1 ? c('barrows_collapse_interval_ticks') : collapse - 1, `${label}: first native callback consumes only the saved collapse tick`);
+        assert.equal(paidRelog.getVar(vars.barrows_kills) >>> 0, savedPaidWords.barrows_kills,
+          `${label}: the resumed native callback keeps the frozen whole credit word`);
+        paidRelog.queue.clear();
+        paidSource = paidRelog;
+        remainderCases++;
+      }
+    }
+    assert.equal(remainderCases, c('barrows_prayer_interval_ticks') * c('barrows_collapse_interval_ticks'));
+    console.log(`PASS S18 ${remainderCases} paid-inside shared logout/save/load/login remainder pairs: exact paid phase/frozen whole credit/escape locks and corner, native shake and first resumed callback, no RNG or new treasure, current-generation credit frozen, repeat Search pays nothing`);
   } finally {
     for (const npc of [...World.npcs]) if (npc.isActive) World.removeNpc(npc, -1);
     for (const p of players) unregister(p);

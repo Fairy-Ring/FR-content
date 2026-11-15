@@ -85,3 +85,30 @@ SHA-256 093d8c714e08f08eb0fd37aa9d8b6f7f006fe6e8c60a8cffc0913c14c7048d3d.
 Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
 Own access, spade, hill position, combat stats, equipment and food only. Real Dig, descent, doors, combat and rendered puzzle reach Open. Earned B=2/count=5 survives the clean open-unlooted relog with the same tile, original Search child and all four stable words, without any inventory or floor payment. Explicit partial-B Search then grants 1252 coins and 290 mind runes and transitions to paid exactly once.
 All 28 PNGs viewed, including paired Open, final credit, clean relog and explicit Search. The old-client model fault does not hide the required chest/count and native item readbacks.
+
+S18 native paid-inside lifecycle, 2026-11-15. No product change.
+Native Open and Search establish the paid B=2/count=3 run. Every pair of valid Prayer/collapse remainders (170 pairs from the named config intervals) crosses real shared logout, native save/load, offline ticks and shared login. All five words, frozen credit, original sixteen locks and four ladder selectors, native Search child and exact named shake survive. No Barrows resume draw or new items. The first real NORMAL callback consumes one saved tick per half. Current-generation post-payment credit and repeat Search remain inert.
+logs/ci-s18/29-tests_barrows_test_lifecycle.mjs.log
+SHA-256 46e738a2a9f0850d3c9963847231d566839fda662a9b01fa36e24b6648da720d.
+Five paid-only shared-login mutants pass S15 to S17, then fail a named S18 assertion:
+Erase frozen whole credit: logs/s18-mutant-credit-red.log
+SHA-256 493f004dacfe441b1828ac2e2560f2d446e980853d36664c833f60e08a740431.
+Redraw escape topology: logs/s18-mutant-redraw-red.log
+SHA-256 ca31d9b4b4c7d30691bbead846341cc399d2b1ed796d3bca0a92587e0ff27b49.
+Rearm collapse: logs/s18-mutant-rearm-red.log
+SHA-256 b45612816d2ad43e0d9fefa5b806edbca7100b5bbc4702cc29947cadb8e52829.
+Reset camera after resume: logs/s18-mutant-shake-red.log
+SHA-256 f0a2e9daaa5408ddb9900b3fcb00eaf5f847d530aaef2b0f65f8c4f7f291cd4f.
+Duplicate one coin on relog: logs/s18-mutant-duplicate-red.log
+SHA-256 6174bd60c9becaa0637273a6d971c4247bbfcbcdd0536107cee2926965fb8b23.
+Each temporary product line restored exactly: logs/s18-mutants-restored.log. No permanent shared-file or inert-login-trace change.
+logs/s18-gates.log and logs/s18-ci.log: clean pack, build, rs2check, all 99 registered tests, varp and unchanged client/config exit 0. Required client/config SHA-256 b6ec704421650ee5527e77c635b8b3a8036f6eb042c572516ac0696cfbce19a8.
+
+S18 headed natural live: PASS all 17 checks, no live failure.
+Content d04ce48a53ebee1ec3f2fc1bb6577ec469c78300; engine 15301127e60ff6ef3d7d2547b084de15fb565338; cell 0da22e56fa3dbe856c1a1931acc5a35c889937b4.
+live/s18/S18-new-1794739970676.json
+SHA-256 87b76268cb26a9bd2782d16eb02efac423de848e92f1acf8a4ba352a15742fff.
+Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
+Own access, spade, hill position, combat stats, gear and food only. Natural Dig, selected descent, doors/combat, rendered real puzzle, Open and Search earn B=1/count=4/C=261 and receive 262 coins.
+Real paid-inside clean relog keeps the same tile, four stable words, frozen credit, escape layout, Search visual and every inventory/floor item. Native shake is restored. A fresh native five-point hitsplat reduces Hitpoints 99 to 94. Repeat Search creates no more treasure or changed escape run.
+All 30 PNGs viewed: paired route/combat, puzzle, Open/final credit, Search, paid relog, resumed hit and repeat Search. The known OLD-client model/colour defects do not hide the required scene/count or native item/hit/camera observations. The profile is deleted. Live online remainders advance normally; exact offline retention is compiled-only.
