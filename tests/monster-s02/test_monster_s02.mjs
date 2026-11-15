@@ -280,6 +280,7 @@ for (const [distance, prayer, blocked] of [[1, 'prayer14', true], [2, 'prayer12'
 }
 {
   const { player, npc } = fixture();
+  npc.turn(); // Prime the native regen interval at full health before measuring form-return HP.
   run('[proc,killerwatt_wake]', player, npc);
   npc.levels[NpcStat.HITPOINTS] = 31;
   npc.resetDefaults();

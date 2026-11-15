@@ -353,7 +353,6 @@
     {
       "identity": { "debugname": "slayer_killerwatt", "id": 3201 },
       "unit": "S02",
-      "note": "timer=1 is engineering: monster-combat-data.s02-killerwatt-native-timer-reset is VERIFIED software behavior only; monster-combat-data.s02-killerwatt-engineering-timing remains UNKNOWN historical timing.",
       "evidence": {
         "facts": ["monster-combat-data.s02-killerwatt-vectors", "monster-combat-data.s02-killerwatt-attack-interval", "monster-combat-data.s02-killerwatt-distance"],
         "label": "CANDIDATE",
