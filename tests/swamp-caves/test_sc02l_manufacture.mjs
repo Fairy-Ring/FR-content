@@ -311,15 +311,16 @@ for (const [empty, filled] of [containers[0], containers[3]]) {
       for (let cycles = 0; p.target && cycles < 30; cycles++) interactionTick(p);
       assert.equal(p.target, null, 'interaction finishes within the original bound');
       assert.deepEqual([p.x, p.z], [approach.x, approach.z], 'natural south approach reached');
-      // One tar -> one dose -> one filled container. Object settlement may
-      // relocate that container, but cannot duplicate it or overwrite a swap.
+      // A stale used slot refuses silently: one container and its personal dose
+      // remain available. A later fresh use can spend that dose exactly once.
       const totals = state => state.filter(Boolean).map(({ name, count }) => `${name}:${count}`).sort();
-      assert.deepEqual(totals(inventory(p)), totals(before.items.map(item => item?.name === empty ? { ...item, name: filled } : item)), 'exact inventory multiset: only the empty container becomes filled');
-      assert.equal(count(p, empty), 0); assert.equal(count(p, filled), 1);
+      assert.deepEqual(totals(inventory(p)), totals(before.items), 'exact inventory multiset survives the stale-slot refusal');
+      assert.equal(count(p, empty), 1); assert.equal(count(p, filled), 0);
       assert.equal(count(p, 'sapphire'), 1); assert.equal(count(p, 'swamp_tar'), 0);
-      const vars = [...before.vars]; vars[cave] &= ~(1 << types.VarBitType.get(oil).startbit);
-      assert.deepEqual([...p.vars], vars, 'only the single dose is spent');
+      assert.deepEqual([...p.vars], before.vars, 'stale slot does not spend the dose');
       assert.deepEqual([...p.stats], before.xp); assert.deepEqual(p.messages, []);
+      atStill(p, empty); assert.equal(count(p, empty), 0); assert.equal(count(p, filled), 1);
+      assert.equal(p.getVarBit(oil), 0, 'a fresh use fills once and spends the saved dose');
       seed(p, [empty]); const spent = snapshot(p); atStill(p, empty); conserved(p, spent);
       assert.equal(count(p, filled), 1, 'same dose cannot fill a second container');
     });
