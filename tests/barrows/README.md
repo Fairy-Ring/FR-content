@@ -213,3 +213,11 @@ node --import tsx ../content/tests/barrows/test_leave.mjs
 This is an integration-proof slice, not a second reset implementation. Native Search grants treasure once; repeat Search before departure changes neither treasure nor the paid escape run. The original stair exit uses the existing paid reset: generation advancement and owned-actor removal precede field clearing and its one idle-layout redraw, which precedes the stair's surface telejump. Treasure, foreign actors and unowned map actors remain. The retained selectors exclude the completed corner and central entrance at the next begin.
 
 One genuinely captured native NPC credit request is delivered after reset and again inside the next creditable run. Both deliveries leave the run unchanged; a same-generation real producer supplies the positive credit control. Pre-loot stair departure preserves generation, layout, credit and both saved countdowns while removing owned actors and closing the ephemeral challenge and presentation. Separate mutants make the named S14 generation-order, unpaid-no-reset and old-generation rejection cases fail.
+
+## Merged-login live replay (group 4 preliminary 1)
+
+The merged campaign login retains the published camera clears before `barrows_resume`. The headed S13 replay proves paid-inside clean relog, restored shake, a resumed native hit and an outside no-hit control. The replay also retains its unpaid control and ordinary paid-death witness.
+
+The first unchanged cell exhausted its own escape food after its relog predicates passed. The approved replacement imports the existing common modules. All eight inherited S13 checks and all four observation helpers remain byte-identical. It adds only the established S14 own-food provision and native Walk/Open/Eat escape.
+
+`merged-login.evidence.txt` identifies both retained receipts. The starting-head build, rs2check, all 98 registered checks, varp transmission and client-byte equality passed. This proof changes no product script.
