@@ -19,3 +19,13 @@
 ^swamp_cave_warning_ticks = 15
 ^swamp_cave_bite_ticks = 30
 ^swamp_cave_bite_damage = 1
+
+// UNKNOWN original gas polygons: engineering bounds inside the main dark area.
+^swamp_cave_gas_nw_sw = 0_49_149_9_48
+^swamp_cave_gas_nw_ne = 0_49_150_40_0
+^swamp_cave_gas_south_sw = 0_49_149_63_4
+^swamp_cave_gas_south_ne = 0_50_149_14_24
+// CANDIDATE gas-selected-rule; maximum HP, floor/minimum are Main's ruling.
+^swamp_cave_gas_ticks = 7
+^swamp_cave_gas_hp_divisor = 4
+^swamp_cave_gas_min_damage = 1
