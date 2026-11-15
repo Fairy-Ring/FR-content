@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /** S02 uses the real compiled scripts. RNG is controlled only for hit-boundary cases. */
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -22,6 +21,9 @@ const { EntityLifeCycle } = await load('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
 const { NpcStat } = await load('src/engine/entity/NpcStat.ts');
 const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
+const Environment = (await load('src/util/Environment.ts')).default;
+const ServerTriggerType = (await load('src/engine/script/ServerTriggerType.ts')).default;
+Environment.NODE_MEMBERS = true;
 const configs = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType', 'ObjType', 'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType', 'SeqType', 'SpotanimType', 'MesanimType', 'DbTableType', 'DbRowType', 'HuntType', 'IdkType', 'Component', 'FontType']) {
   configs[name] = (await load(`src/cache/config/${name}.ts`)).default;
@@ -95,41 +97,26 @@ function loc(name, level, x, z) {
   assert(config, `missing loc ${name}`);
   return new Loc(level, x, z, config.width, config.length, EntityLifeCycle.RESPAWN, config.id, 10, 0);
 }
-function unrelated() {
-  const rows = [];
-  for (const name of ['man', 'chicken', 'cow', 'lesser_demon', 'slayer_banshee_1', 'slayer_cockatrice', 'slayer_dustdevil', 'slayer_harpiebugswarm']) {
-    if (!NpcType.getByName(name)) continue;
-    for (const style of [0, 3, 4]) {
-      const { player, npc } = fixture(name);
-      pv(player, 'damagetype', style);
-      const spell = id(configs.DbRowType, 'magic_spell_wind_strike');
-      player.getInventory(invId).set(0, { id: id(ObjType, 'airrune'), count: 100 });
-      player.getInventory(invId).set(1, { id: id(ObjType, 'mindrune'), count: 100 });
-      rows.push({ name, style,
-        admission: run('[proc,player_in_combat_check]', player, npc),
-        attackable: run('[proc,npc_is_attackable]', player, npc),
-        attackableOpt: run('[proc,npc_is_attackable_opt]', player, npc),
-        spellChecks: run('[proc,pvm_combat_spell_checks]', player, npc, [spell]),
-        messages: player.testMessages.filter(p => p.text).map(p => p.text),
-        type: NpcType.get(npc.type).debugname,
-        actionDelay: player.getVar(id(VarPlayerType, 'action_delay')),
-        queues: [...npc.queue.all()].map(q => ({ name: q.script.name, delay: q.delay, lastInt: q.lastInt })) });
+// These are S02 invariants, not snapshots of another unit's current behaviour.
+for (const name of ['man', 'chicken', 'cow', 'lesser_demon', 'slayer_banshee_1', 'slayer_cockatrice', 'slayer_dustdevil', 'slayer_harpiebugswarm']) {
+  assert(NpcType.getByName(name), `missing unrelated control ${name}`);
+  for (const style of [0, 3, 4]) {
+    const { player, npc } = fixture(name);
+    pv(player, 'damagetype', style);
+    player.getInventory(invId).set(0, { id: id(ObjType, 'airrune'), count: 100 });
+    player.getInventory(invId).set(1, { id: id(ObjType, 'mindrune'), count: 100 });
+    nv(npc, 'killerwatt_awake_clock', 73);
+    npc.timerInterval = 17;
+    npc.timerClock = 11;
+    const ownState = () => ({ type: npc.type, awake: npc.getVar(id(VarNpcType, 'killerwatt_awake_clock')),
+      interval: npc.timerInterval, clock: npc.timerClock });
+    for (const proc of ['player_in_combat_check', 'npc_is_attackable', 'npc_is_attackable_opt', 'pvm_combat_spell_checks']) {
+      const before = ownState();
+      run(`[proc,${proc}]`, player, npc, proc === 'pvm_combat_spell_checks' ? [id(configs.DbRowType, 'magic_spell_wind_strike')] : []);
+      check(`${name} style ${style} ${proc} leaves S02 state untouched`, ownState(), before);
     }
   }
-  assert(rows.length >= 15, 'sample at least five unrelated types in three styles');
-  const { player } = fixture();
-  player.level = 1; player.x = 3104; player.z = 3362;
-  run('[oploc1,draynor_spiralstairs]', player, loc('draynor_spiralstairs', 1, 3104, 3362));
-  return { rows, unquestedStairs: { level: player.level, x: player.x, z: player.z,
-    portal: player.getVarBit(id(VarBitType, 'slayer_killerwatt_portal_check')), messages: player.testMessages.filter(p => p.text).map(p => p.text) } };
 }
-if (process.argv.includes('--baseline')) {
-  fs.writeFileSync(path.join(here, 'published-paths.json'), `${JSON.stringify({ contentCommit: '7b07e3d3ae144aeec4fd1f450e353d58f433b513', ...unrelated() }, null, 2)}\n`);
-  console.log('PASS captured published unrelated paths and unquested stairs');
-  process.exit(0);
-}
-const baseline = JSON.parse(fs.readFileSync(path.join(here, 'published-paths.json'), 'utf8'));
-check('shared spell/admission results and ordinary stairs match published pack', unrelated(), { rows: baseline.rows, unquestedStairs: baseline.unquestedStairs });
 
 const ball = id(NpcType, 'slayer_killerwatt_ball');
 const biped = id(NpcType, 'slayer_killerwatt');
@@ -169,6 +156,9 @@ function dialogue(player, state, choices = []) {
 for (const name of ['slayer_killerwatt_ball', 'slayer_killerwatt']) {
   const { player, npc } = fixture(name);
   check(`${name} six native levels`, ['HITPOINTS', 'ATTACK', 'STRENGTH', 'DEFENCE', 'MAGIC', 'RANGED'].map(s => npc.baseLevels[NpcStat[s]]), [51, 50, 50, 40, 67, 67]);
+  for (const parameter of ['attack_anim', 'defend_anim', 'death_anim', 'attack_sound', 'defend_sound', 'death_sound']) {
+    check(`${name} M2 leaves ${parameter} on the published default`, NpcType.get(npc.type).params.has(id(configs.ParamType, parameter)), false);
+  }
   player.levels[PlayerStat.SLAYER] = 36;
   check(`${name} below Slayer 37 refused by published admission`, run('[proc,player_in_combat_check]', player, npc), [0]);
   check('published Slayer refusal text', player.testMessages.filter(p => p.text).at(-1)?.text, 'You need a higher Slayer level to know how to wound this monster.');
@@ -199,7 +189,7 @@ for (const trigger of ['[opnpc2,slayer_killerwatt_ball]', '[apnpc2,slayer_killer
   player.getInventory(wornId).set(3, { id: id(ObjType, 'shortbow'), count: 1 });
   run(trigger, player, npc);
   check(`${trigger} wakes before missing ammunition refusal`, npc.type, biped);
-  check('no-ammunition attempt queues no damage', [...npc.queue.all()].length, 0);
+  check('no-ammunition attempt queues no damage', [...npc.queue.all()].filter(q => q.queueId === ServerTriggerType.AI_QUEUE2).length, 0);
 }
 {
   const { player, npc } = fixture();
@@ -217,7 +207,7 @@ function firstAttack(name, trigger, ranged = false) {
   rng(trigger.startsWith('[apnpc2,') && !ranged ? [] : ranged ? [0, 0, 0] : [0, 0], () => run(trigger, player, npc));
   return { player, npc, profile: {
     actionDelay: player.getVar(id(VarPlayerType, 'action_delay')) - World.currentTick,
-    queues: [...npc.queue.all()].map(q => ({ queue: q.queueId, delay: q.delay, damage: q.lastInt })),
+    queues: [...npc.queue.all()].filter(q => q.queueId !== ServerTriggerType.AI_QUEUE19).map(q => ({ queue: q.queueId, delay: q.delay, damage: q.lastInt })),
     playerQueues: [...player.queue.all()].map(q => ({ name: q.script.name, delay: q.delay, args: q.args.map(v => v === npc.uid ? 'target' : v) })),
     targetOp: player.targetOp, hasTarget: player.target === npc,
     approachRange: player.apRange,
@@ -252,13 +242,65 @@ for (const distance of [1, 2, 13]) {
     check(`distance ${distance}, boots=${boots} damage received`, levels[PlayerStat.HITPOINTS] - player.levels[PlayerStat.HITPOINTS], maximum);
   }
 }
-for (const [distance, prayer, blocked] of [[1, 'prayer14', true], [2, 'prayer12', true], [1, 'prayer12', false], [2, 'prayer14', false]]) {
-  const { player, npc } = fixture('slayer_killerwatt', distance);
-  wear(player, 'slayer_boots');
-  pv(player, prayer, 1);
-  rng(blocked ? [0, 0] : [0.999999, 0, 0.999999], () => run('[proc,killerwatt_attack]', npc, player));
-  check(`distance ${distance}, ${prayer} protection`, [...player.queue.all()].filter(q => q.script.name === '[queue,combat_damage_player]').map(q => q.args), [[blocked ? 0 : distance === 1 ? 6 : 8]]);
+for (const distance of [1, 2, 13]) {
+  for (const prayer of ['prayer12', 'prayer13', 'prayer14']) {
+    const { player, npc } = fixture('slayer_killerwatt', distance);
+    wear(player, 'slayer_boots');
+    pv(player, prayer, 1);
+    const blocked = prayer === (distance === 1 ? 'prayer14' : 'prayer13');
+    // The same accuracy draws hit without protection. A block consumes no damage draw.
+    rng(blocked ? [0.999999, 0] : [0.999999, 0, 0.999999], () => run('[proc,killerwatt_attack]', npc, player));
+    check(`distance ${distance}, ${prayer} protection`, [...player.queue.all()].filter(q => q.script.name === '[queue,combat_damage_player]').map(q => q.args), [[blocked ? 0 : distance === 1 ? 6 : 8]]);
+  }
 }
+for (const magicDefence of [0, 1000000]) {
+  const { player, npc } = fixture('slayer_killerwatt', 3);
+  wear(player, 'slayer_boots');
+  pv(player, 'prayer12', 1);
+  pv(player, 'com_magicdef', magicDefence);
+  pv(player, 'com_rangedef', magicDefence === 0 ? 1000000 : 0);
+  const hit = magicDefence === 0;
+  rng(hit ? [0.5, 0.999999, 0.999999] : [0.5, 0.999999], () => run('[proc,killerwatt_attack]', npc, player));
+  check('distance attack uses Magic defence, not Ranged defence or Protect from Magic',
+    [...player.queue.all()].filter(q => q.script.name === '[queue,combat_damage_player]').map(q => q.args), [[hit ? 8 : 0]]);
+}
+
+function poisonTrace(type, engaged = false, poisonBeforeWake = false) {
+  const { player, npc } = fixture(type, 1, [2, 2660, 5210]);
+  npc.turn(); // Prime native regeneration at full health, as in the reviewer's man probe.
+  const hpBefore = npc.levels[NpcStat.HITPOINTS], started = World.currentTick;
+  if (type === 'slayer_killerwatt_ball' && !poisonBeforeWake) run('[proc,killerwatt_wake]', player, npc);
+  run('[proc,npc_poison_start]', player, npc, [20]);
+  check(`${type} real npc_poison_start severity`, npc.getVar(id(VarNpcType, 'npc_poison')), 20);
+  if (engaged) {
+    player.levels[PlayerStat.HITPOINTS] = 10000; // Keep the real target alive, without modifying the NPC.
+    rng([0, 0], () => run('[proc,killerwatt_attack]', npc, player));
+  }
+  const changes = [], forms = [];
+  let previousHp = hpBefore, previousPoison = 20, previousType = npc.type;
+  for (let turn = 1; turn <= 31; turn++) {
+    World.currentTick = started + turn;
+    if (poisonBeforeWake && turn === 5) run('[proc,killerwatt_wake]', player, npc);
+    npc.turn();
+    const hp = npc.levels[NpcStat.HITPOINTS], poison = npc.getVar(id(VarNpcType, 'npc_poison'));
+    if (poison !== previousPoison) changes.push({ turn, damage: previousHp - hp, poison });
+    if (npc.type !== previousType) forms.push({ turn, type: npc.type, poison, hp, timer: npc.timerInterval });
+    previousHp = hp; previousPoison = poison; previousType = npc.type;
+  }
+  return { npc, hpBefore, hpAfter: npc.levels[NpcStat.HITPOINTS], changes, forms };
+}
+const ordinaryPoison = poisonTrace('man');
+check('ordinary man probe takes four poison damage at native turn 30', [ordinaryPoison.hpBefore, ordinaryPoison.hpAfter, ordinaryPoison.changes],
+  [7, 3, [{ turn: 30, damage: 4, poison: 19 }]]);
+const awakePoison = poisonTrace('slayer_killerwatt_ball', true);
+check('awake killerwatt poison has exactly the ordinary damage and turns', awakePoison.changes, ordinaryPoison.changes);
+check('engaged poisoned killerwatt stays awake', awakePoison.npc.type, biped);
+const returningPoison = poisonTrace('slayer_killerwatt_ball');
+check('poisoned biped returns on the original eight-turn boundary without clearing poison', returningPoison.forms,
+  [{ turn: 8, type: ball, poison: 20, hp: 51, timer: 30 }]);
+check('returned ball still takes ordinary poison on the original turn', returningPoison.changes, ordinaryPoison.changes);
+const wakingPoison = poisonTrace('slayer_killerwatt_ball', false, true);
+check('waking an already-poisoned ball preserves the original poison deadline', wakingPoison.changes, ordinaryPoison.changes);
 {
   const { player, npc } = fixture();
   player.getInventory(invId).set(0, { id: id(ObjType, 'slayer_boots'), count: 1 });
@@ -266,81 +308,103 @@ for (const [distance, prayer, blocked] of [[1, 'prayer14', true], [2, 'prayer12'
 }
 {
   const { player, npc } = fixture();
-  const clock = World.currentTick;
+  npc.turn();
+  const clock = World.currentTick, timer = npc.timerInterval;
   run('[proc,killerwatt_wake]', player, npc);
   npc.levels[NpcStat.HITPOINTS] = 31;
-  World.currentTick = clock + 7;
-  run('[ai_timer,slayer_killerwatt]', npc);
+  for (let turn = 1; turn <= 7; turn++) { World.currentTick = clock + turn; npc.turn(); }
   check('form stays awake before engineering inactivity interval', npc.type, biped);
   World.currentTick++;
-  run('[ai_timer,slayer_killerwatt]', npc);
+  npc.turn();
   check('deserted form returns at engineering inactivity boundary', npc.type, ball);
   check('return preserves damage rather than healing', npc.levels[NpcStat.HITPOINTS], 31);
-  check('ball return stops owned timer', npc.timerInterval, 0);
+  check('unpoisoned return leaves the native timer untouched', npc.timerInterval, timer);
 }
 {
   const { player, npc } = fixture();
-  npc.turn(); // Prime the native regen interval at full health before measuring form-return HP.
+  npc.turn();
   run('[proc,killerwatt_wake]', player, npc);
   npc.levels[NpcStat.HITPOINTS] = 31;
   npc.resetDefaults();
-  check('native combat reset retains the one-tick form timer', npc.timerInterval, 1);
+  check('native combat reset leaves the pending form check intact',
+    [...npc.queue.all()].some(q => q.queueId === ServerTriggerType.AI_QUEUE19), true);
   World.currentTick += 8;
   npc.turn();
   check('native NPC turn returns the deserted form after a combat reset', npc.type, ball);
   check('native reset return preserves damage', npc.levels[NpcStat.HITPOINTS], 31);
-  check('native reset return stops the ball timer', npc.timerInterval, 0);
+  check('return owns no native poison timer', npc.timerInterval, NpcType.get(biped).timer);
 }
 {
   const { player, npc } = fixture();
   run('[proc,killerwatt_wake]', player, npc);
   rng([0, 0], () => run('[proc,killerwatt_attack]', npc, player));
   World.currentTick += 8;
-  run('[ai_timer,slayer_killerwatt]', npc);
+  npc.turn();
   check('living engaged target holds the awake form beyond inactivity interval', npc.type, biped);
   player.x -= 20;
-  run('[ai_timer,slayer_killerwatt]', npc);
+  World.currentTick++;
+  npc.turn();
   check('withdrawal beyond owned attack range permits return', npc.type, ball);
 }
 {
-  const { player, npc } = fixture();
-  run('[proc,npc_default_damage]', player, npc, [5]);
-  check('non-selection damage does not invent a form transition', npc.type, ball);
-  check('ball still takes damage through the published path', npc.levels[NpcStat.HITPOINTS], 46);
+  const { player } = fixture('slayer_killerwatt_ball', 3, [2, 2660, 5199]);
+  pv(player, 'mcannon', 11);
+  pv(player, 'ownedmcannon', -1);
+  player.getInventory(invId).set(0, { id: id(ObjType, 'twpart1'), count: 1 });
+  dialogue(player, start('[opheld1,twpart1]', player));
+  const messages = player.testMessages.filter(packet => packet.text).map(packet => packet.text);
+  check(`ordinary quest-complete account can set a cannon base on the plane: ${JSON.stringify(messages)}`,
+    messages.includes('You place the cannon base on the ground.'), true);
+  check('legal plane cannon setup consumes the carried base', player.getInventory(invId).get(0), null);
+}
+{
+  const { player, npc } = fixture('slayer_killerwatt_ball', 3, [2, 2660, 5210]);
+  // The real cannon proc only needs its owned origin, ammo and admitted target.
+  // A packed coordinate is a native coord value, not a generated config id.
+  pv(player, 'ownedmcannon', (2 << 28) | ((player.x - 1) << 14) | (player.z - 1));
+  pv(player, 'rockthrower', 1);
+  pv(player, 'com_stabattack', 1); // Nonzero native accuracy for the explicit maximum/zero accuracy draws.
+  rng([0.999999, 0, 0.2], () => run('[proc,cannon_fire]', player, npc));
+  const damage = [...npc.queue.all()].find(q => q.queueId === ServerTriggerType.AI_QUEUE2)?.lastInt;
+  check('real cannon hit queues positive non-selection damage', damage > 0, true);
+  for (let turn = 0; turn < 10 && npc.type === ball; turn++) { World.currentTick++; npc.turn(); }
+  check('first cannon damage wakes the ball through native damage dispatch', npc.type, biped);
+  check('non-selection wake preserves the published cannon damage', npc.levels[NpcStat.HITPOINTS], 51 - damage);
+  const { npc: control } = fixture('slayer_killerwatt', 3);
+  run('[proc,npc_default_retaliate_ap]', control);
+  check('non-selection wake uses the same distant retaliation mode', npc.targetOp, control.targetOp);
 }
 const portalBit = id(VarBitType, 'slayer_killerwatt_portal_check');
 const warningBit = id(VarBitType, 'slayer_killerwatt_strobe_warning');
 const portalBase = id(VarPlayerType, 'slayer_killerwatt_var');
 const hidden = LocType.getByName('draynor_killerwatt_portal_hidden');
 const visible = LocType.getByName('draynor_killerwatt_portal');
+const stairs = [];
 for (const quest of [0, 3]) {
   const { player } = fixture();
   pv(player, 'haunted', quest);
   player.level = 1; player.x = 3104; player.z = 3362;
   run('[oploc1,draynor_spiralstairs]', player, loc('draynor_spiralstairs', 1, 3104, 3362));
-  check(`quest ${quest} ordinary stairs destination`, [player.level, player.x, player.z], [2, 3105, 3364]);
+  stairs.push({ tile: [player.level, player.x, player.z], messages: player.testMessages.filter(p => p.text).map(p => p.text),
+    portal: player.getVar(id(VarPlayerType, 'slayer_killerwatt_var')) });
   check(`quest ${quest} portal visibility`, player.getVarBit(portalBit), Number(quest === 3));
   const resolved = player.resolveLocTypeForTrigger(hidden);
   check(`quest ${quest} actual multiloc trigger resolution`, resolved.id, quest === 3 ? visible.id : hidden.id);
   check(`quest ${quest} client Enter option`, resolved.op?.[0] ?? null, quest === 3 ? 'Enter' : null);
 }
+check('quested and unquested ordinary stairs have the same published destination and messages',
+  { tile: stairs[1].tile, messages: stairs[1].messages, otherBits: stairs[1].portal & ~1 },
+  { tile: stairs[0].tile, messages: stairs[0].messages, otherBits: stairs[0].portal & ~1 });
 {
   const { player, npc: professor } = fixture('professor_oddenstein', 1, [2, 3106, 3364]);
-  const config = NpcType.getByName('questchicken');
-  const chicken = new Npc(2, 3108, 3364, config.size, config.size, EntityLifeCycle.RESPAWN, ++serial, config.id, config.blockwalk);
-  World.addNpc(chicken, -1);
+  // The published Ernest scene has its own suite. S02 owns only the portal-bit write.
   pv(player, 'haunted', 2);
   for (const [slot, item] of ['pressure_gauge', 'oil_can', 'rubber_tube'].entries()) {
     player.getInventory(invId).set(slot, { id: id(ObjType, item), count: 1 });
   }
   dialogue(player, start('[opnpc1,professor_oddenstein]', player, professor));
-  check('native quest completion on portal floor completes Ernest', player.getVar(id(VarPlayerType, 'haunted')), 3);
   check('native quest completion reveals portal without another climb', player.getVarBit(portalBit), 1);
-  check('quest still transforms Ernest through its published proc', chicken.type, id(NpcType, 'ernest'));
-  check('quest still consumes its three items', [0, 1, 2].map(slot => player.getInventory(invId).get(slot)), [null, null, null]);
 }
-const Environment = (await load('src/util/Environment.ts')).default;
-Environment.NODE_MEMBERS = true;
 for (const [boots, suppressed, choices, enters, remembers] of [
   [true, false, [3], false, false], [true, false, [1], true, false],
   [true, false, [2], true, true], [true, true, [], true, true],

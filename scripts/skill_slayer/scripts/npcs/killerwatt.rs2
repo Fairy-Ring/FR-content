@@ -22,7 +22,20 @@ if (~player_autocast_enabled = true) @player_magic_attack;
 [proc,killerwatt_wake]
 npc_changetype_keepall(slayer_killerwatt, ^killerwatt_form_lifetime);
 %killerwatt_awake_clock = map_clock;
-npc_settimer(^killerwatt_timer_interval);
+npc_queue(19, 0, ^killerwatt_return_interval);
+
+// CANDIDATE monster-combat-data.s02-killerwatt-forms: damage can arrive without selection.
+[ai_queue2,slayer_killerwatt_ball]
+if (last_int > 0 & npc_stat(hitpoints) > 0) {
+    ~killerwatt_wake;
+    // Queue 1 may already have admitted melee retaliation in this same turn.
+    if (npc_getmode = opplayer2) {
+        if (finduid(%npc_attacking_uid) = true) npc_setmode(applayer2);
+    } else {
+        ~npc_default_retaliate_ap;
+    }
+}
+~npc_default_damage(last_int);
 
 [ai_queue1,slayer_killerwatt] gosub(npc_default_retaliate_ap);
 [ai_applayer2,slayer_killerwatt] ~killerwatt_attack;
@@ -42,7 +55,16 @@ if (~npc_check_notcombat = false) {
 if (~npc_check_notcombat_self = false) return;
 def_int $style = ~killerwatt_attack_style;
 def_int $damage = 0;
-if (~npc_player_hit_roll($style) = true) $damage = randominc(~killerwatt_maxhit($style));
+// CANDIDATE monster-combat-data.s02-killerwatt-damage: Magic defence, Missiles protection.
+def_boolean $hit = false;
+if ($style = ^magic_style) {
+    def_int $attack_roll = 0;
+    if (~check_protect_prayer(^ranged_style) = false) $attack_roll = ~npc_magic_attack_roll_no_prot;
+    if (randominc($attack_roll) > randominc(~player_defence_roll_specific(^magic_style))) $hit = true;
+} else {
+    $hit = ~npc_player_hit_roll($style);
+}
+if ($hit = true) $damage = randominc(~killerwatt_maxhit($style));
 // M2: use the published attack/defend animation and sound parameters, unchanged.
 anim(%com_defendanim, 0);
 npc_anim(npc_param(attack_anim), 0);
@@ -59,9 +81,15 @@ if (inv_total(worn, slayer_boots) = 0) return(^killerwatt_uninsulated_maxhit);
 if ($style = ^magic_style) return(^killerwatt_magic_maxhit);
 return(^killerwatt_melee_maxhit);
 
-// CANDIDATE return rule. Its eight-tick inactivity interval is UNKNOWN engineering.
-[ai_timer,slayer_killerwatt]
+// CANDIDATE monster-combat-data.s02-killerwatt-forms.
+// UNKNOWN monster-combat-data.s02-killerwatt-engineering-timing: eight-tick return.
+// A queue checks the form. The native timer remains exclusively the ordinary poison timer.
+[ai_queue19,slayer_killerwatt]
 if (npc_stat(hitpoints) = 0) return;
+~killerwatt_return_check;
+if (npc_type = slayer_killerwatt) npc_queue(19, 0, ^killerwatt_return_interval);
+
+[proc,killerwatt_return_check]
 if (add(%killerwatt_awake_clock, ^killerwatt_revert_delay) > map_clock) return;
 if (add(%npc_lastcombat, ^killerwatt_revert_delay) > map_clock) return;
 if (npc_getmode = applayer2 | npc_getmode = opplayer2) {
@@ -69,6 +97,6 @@ if (npc_getmode = applayer2 | npc_getmode = opplayer2) {
         if (stat(hitpoints) > 0 & coordy(coord) = coordy(npc_coord) & npc_range(coord) <= ^killerwatt_attack_range) return;
     }
 }
-npc_setmode(null);
+// The ball's native default is wander. Null would also reset its live poison timer.
+npc_setmode(wander);
 npc_changetype_keepall(slayer_killerwatt_ball, ^killerwatt_form_lifetime);
-npc_settimer(0);

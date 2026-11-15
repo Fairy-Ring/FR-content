@@ -1,7 +1,7 @@
 // UNKNOWN engineering: numerical boundaries not stated by period sources.
 ^killerwatt_melee_distance = 1
 ^killerwatt_revert_delay = 8
-^killerwatt_timer_interval = 1
+^killerwatt_return_interval = 1
 ^killerwatt_form_lifetime = 2147483647
 
 // CANDIDATE monster-combat-data.s02-killerwatt-distance: later documented reach.
