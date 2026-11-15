@@ -150,6 +150,7 @@ jobs:
           run_test tests/string-charset/check_string_charset.mjs node ../content/tests/string-charset/check_string_charset.mjs ../content
           run_test tests/string-charset/check_string_charset.test.mjs node --test ../content/tests/string-charset/check_string_charset.test.mjs
           run_test tests/varp-scope/test_varp_scope.mjs node --import tsx ../content/tests/varp-scope/test_varp_scope.mjs
+          run_test 'tests/varp-morph-transmit/test_varp_morph_transmit.mjs + tests/varp-morph-transmit/test_ernest_scene.mjs' node --import tsx --test ../content/tests/varp-morph-transmit/test_varp_morph_transmit.mjs ../content/tests/varp-morph-transmit/test_ernest_scene.mjs
           run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
@@ -203,6 +204,7 @@ jobs:
           run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
           run_test tests/food-drink/test_food_drink.mjs node --import tsx ../content/tests/food-drink/test_food_drink.mjs
           run_test tests/stair-links/test_stair_links.mjs node --import tsx ../content/tests/stair-links/test_stair_links.mjs
+          run_test tests/swamp-caves/test_sc01_lights.mjs node --import tsx ../content/tests/swamp-caves/test_sc01_lights.mjs
           run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
@@ -219,6 +221,7 @@ jobs:
           run_test tests/small-repairs/test_r4_teleport.mjs node --import tsx ../content/tests/small-repairs/test_r4_teleport.mjs
           run_test tests/ana-barrel/test_ana_barrel.mjs node --import tsx ../content/tests/ana-barrel/test_ana_barrel.mjs
           run_test tests/random-events-u00/test_random_events_u00.mjs node --import tsx ../content/tests/random-events-u00/test_random_events_u00.mjs
+          run_test tests/random-events-u01/test_random_events_u01.mjs node --import tsx ../content/tests/random-events-u01/test_random_events_u01.mjs
           run_test tests/elena-fence/runtime.mts bash ../content/tests/elena-fence/runtime.sh "$PWD"
           run_test tests/multiform-guards/test_multiform_guards.mjs node --import tsx ../content/tests/multiform-guards/test_multiform_guards.mjs
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'

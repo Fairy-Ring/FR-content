@@ -61791,6 +61791,7 @@ iop2=Wear
 iop3=Extinguish
 weight=2lb
 wearpos=hat
+param=next_obj_stage,cave_goblin_mining_helmet_unlit
 
 [cave_goblin_mining_helmet_unlit]
 name=Mining helmet

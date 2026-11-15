@@ -37,17 +37,18 @@ const poisonId = id(VarPlayerType, 'poison');
 const timerScript = ScriptProvider.getByName('[timer,poison]');
 const spellTable = DbTableType.getByName('magic_spell_table');
 const windStrike = DbRowType.getByName('magic_spell_wind_strike');
-assert(spellTable && windStrike, 'real named Wind Strike data');
-const spellValue = name => {
+const confuse = DbRowType.getByName('magic_spell_confuse');
+assert(spellTable && windStrike && confuse, 'real named Wind Strike and Confuse data');
+const spellValue = (name, spell = windStrike) => {
   const column = spellTable.columnNames.indexOf(name); assert(column >= 0, name);
-  return windStrike.getValue(column, 0)[0];
+  return spell.getValue(column, 0)[0];
 };
 let serial = 0, checks = 0, hitTape = null;
 const check = (label, actual, expected) => { assert.deepEqual(actual, expected, label); checks++; console.log(`PASS ${label}`); };
 
-// Slime/spider/cow have no natural ranged projectile. Borrow only valid delivery
-// metadata from a real packed ranged NPC to exercise the shared ranged proc.
-// Accuracy, damage stats, poison severity and the selected flag are not changed.
+// Poisonous samples have no natural shared ranged attack. Borrow only valid
+// delivery metadata to exercise that packed proc; do not change accuracy,
+// damage stats, severity, or prayer state.
 const deliveryNames = ['rangeattack_sound', 'proj_launch', 'proj_travel'];
 const deliveryParams = deliveryNames.map(name => ParamType.getByName(name));
 const deliveryDonor = NpcType.getByName('ardougne_archer');
@@ -111,37 +112,35 @@ function settle(player, ticks = 5) {
   try { for (let i = 0; i < ticks; i++) { World.currentTick++; player.processQueues(); } }
   finally { JavaRandom.nextDouble = original; }
 }
-function attack(style, outcome, f) {
-  if (outcome === 'prayer') f.player.setVar(id(VarPlayerType, style === 'melee' ? 'prayer14' : style === 'ranged' ? 'prayer13' : 'prayer12'), 1);
-  const rolls = outcome === 'miss' ? [0, 0] : outcome === 'prayer' ? [0.999999, 0] : [0.999999, 0, outcome === 'zero' ? 0 : 0.999999];
+function attack(style, outcome, f, prayer = null, spell = windStrike) {
+  const protectedStyle = outcome === 'prayer' ? style : prayer;
+  if (protectedStyle) f.player.setVar(id(VarPlayerType, protectedStyle === 'melee' ? 'prayer14' : protectedStyle === 'ranged' ? 'prayer13' : 'prayer12'), 1);
+  const hiddenPoisonRoll = style !== 'magic' && severityOf(NpcType.get(f.npc.type).debugname) > 0;
+  const blockedAtAccuracy = protectedStyle === style && !hiddenPoisonRoll;
+  const rolls = outcome === 'miss' ? [0, 0] : blockedAtAccuracy ? [0.999999, 0] : [0.999999, 0, outcome === 'zero' ? 0 : 0.999999];
+  const ammo = ParamType.getByName('npc_ammo');
+  if (style === 'ranged' && ParamHelper.getIntParam(ammo.id, NpcType.get(f.npc.type), ammo.defaultInt) !== -1) rolls.push(0.999999);
   withDelivery(style, f, () => random(rolls, () => {
     if (style === 'melee') run('[proc,npc_meleeattack]', f.npc, f.player);
     else if (style === 'ranged') run('[proc,npc_rangeattack]', f.npc, f.player);
-    else run('[proc,npc_cast_spell]', f.npc, f.player, [spellValue('spell'), 4]);
+    else run('[proc,npc_cast_spell]', f.npc, f.player, [spellValue('spell', spell), 4]);
   }));
 }
 const styles = ['melee', 'ranged', 'magic'];
 Environment.NODE_MEMBERS = true;
-// Rule assertions replace the one-time published ordered-command comparison.
-// Named poisonous samples exercise each shared style; ranged delivery alone is
-// borrowed for these naturally melee NPCs. This is not a live ranged/magic claim.
-const samples = ['swamp_cave_slime', 'poisonspider', 'tribesman', 'slayer_cave_crawler_1', 'cow'];
+// Rule assertions use pack-local effects, not stored command traces or bytecode.
+// These real positive-severity types naturally reach melee only; ranged/magic
+// use the disclosed shared-style delivery fixture, not a natural-attack claim.
+const samples = ['poisonspider', 'kalphite_soldier', 'swamp_cave_slime', 'tribesman', 'slayer_cave_crawler_1'];
+const controls = { melee: 'cow', ranged: 'ardougne_archer', magic: 'bearded_dark_wizard' };
 const severityParam = ParamType.getByName('poison_severity'); assert(severityParam);
 const severityOf = name => ParamHelper.getIntParam(severityParam.id, NpcType.getByName(name), severityParam.defaultInt);
 const maxHit = (style, f) => style === 'magic' ? spellValue('maxhit') : run(style === 'melee' ? '[proc,npc_melee_maxhit]' : '[proc,npc_ranged_maxhit]', f.npc, f.player)[0];
-const flag = ParamType.getByName('poison_without_damage'); assert(flag, 'server poison flag packed');
-check('zero-damage flag defaults to no', flag.defaultInt, 0);
-check('zero-damage flag is autodisabled when unused', flag.autodisable, true);
-const flagged = [];
-for (let i = 0; i < NpcType.count; i++) {
-  const config = NpcType.get(i);
-  if (ParamHelper.getIntParam(flag.id, config, flag.defaultInt)) flagged.push(config.debugname);
-}
-check('only the named cave slime is flagged', flagged, ['swamp_cave_slime']);
+check('obsolete per-monster poison flag is absent', ParamType.getId('poison_without_damage'), -1);
 for (const style of styles) {
-  for (const type of samples) {
+  for (const type of [...samples, controls[style]]) {
     const severity = severityOf(type);
-    check(`${style} ${type} sample poison severity classification`, severity > 0, type !== 'cow');
+    check(`${style} ${type} sample poison severity classification`, severity > 0, type !== controls[style]);
     for (const outcome of ['zero', 'positive', 'miss', 'prayer']) {
       const f = fixture(type);
       const damage = outcome === 'positive' ? maxHit(style, f) : 0;
@@ -149,7 +148,7 @@ for (const style of styles) {
       if (outcome === 'positive') console.log(`CONFIG ${style} ${type} maxhit=${damage} poison_severity=${severity}`);
       hitTape = []; attack(style, outcome, f);
       const poisonQueues = [...f.player.queue.all()].filter(q => q.script.name === '[queue,poison_player]');
-      const expected = severity > 0 && (outcome === 'positive' || (type === 'swamp_cave_slime' && outcome === 'zero')) ? severity : 0;
+      const expected = severity > 0 && outcome !== 'miss' && !(style === 'magic' && outcome === 'prayer') ? severity : 0;
       check(`${style} ${type} ${outcome} poison queue count`, poisonQueues.length, expected ? 1 : 0);
       check(`${style} ${type} ${outcome} queued poison severity`, poisonQueues.map(q => q.args), expected ? [[severity]] : []);
       settle(f.player);
@@ -185,6 +184,84 @@ for (const style of styles) {
   }
   Environment.NODE_MEMBERS = true;
 }
+// Finished 274 poisons after any successful cast, even without a max-hit field.
+// Use the real Confuse row: no direct damage, but its ordinary attack drain stays.
+for (const type of [...samples, controls.magic]) {
+  for (const outcome of ['zero', 'miss', 'prayer']) {
+    const f = fixture(type), severity = severityOf(type);
+    const expected = severity > 0 && outcome === 'zero' ? severity : 0;
+    hitTape = []; attack('magic', outcome, f, null, confuse);
+    const poisonQueues = [...f.player.queue.all()].filter(q => q.script.name === '[queue,poison_player]');
+    check(`magic ${type} non-damaging ${outcome} poison queue count`, poisonQueues.length, expected ? 1 : 0);
+    check(`magic ${type} non-damaging ${outcome} queued severity`, poisonQueues.map(q => q.args), expected ? [[severity]] : []);
+    settle(f.player);
+    check(`magic ${type} non-damaging ${outcome} has no direct hit`, hitTape, []);
+    hitTape = null;
+    check(`magic ${type} non-damaging ${outcome} Hitpoints`, f.player.levels[PlayerStat.HITPOINTS], 80);
+    check(`magic ${type} non-damaging ${outcome} poison result`, f.player.getVar(poisonId), expected);
+    check(`magic ${type} non-damaging ${outcome} poison messages`,
+      f.player.testMessages.filter(message => message === 'You have been poisoned!'), expected ? ['You have been poisoned!'] : []);
+    check(`magic ${type} non-damaging ${outcome} poison timer`, f.player.timers.has(timerScript.id), expected > 0);
+    check(`magic ${type} non-damaging ${outcome} attack drain`,
+      outcome === 'zero' ? f.player.levels[PlayerStat.ATTACK] < 80 : f.player.levels[PlayerStat.ATTACK] === 80, true);
+  }
+}
+// Compare effects within this run. A real non-poisonous cow's published prayed
+// attack is its ordinary accuracy-miss path: one zero hit, two RNG draws, and the
+// same timing/retaliation. Neither config flags nor handlers are replaced.
+function effects(style, outcome, type, prayer = null) {
+  const f = fixture(type);
+  hitTape = []; attack(style, outcome, f, prayer);
+  const queues = [...f.player.queue.all()].map(q => ({
+    script: q.script.name, args: q.args.map(value => value === f.npc.uid ? 'npc' : value)
+  }));
+  settle(f.player);
+  const result = {
+    hits: hitTape, poison: f.player.getVar(poisonId), messages: [...f.player.testMessages],
+    levels: [...f.player.levels], experience: [...f.player.stats], queues,
+    poisonTimer: f.player.timers.has(timerScript.id),
+    actionDelay: f.npc.getVar(id(VarNpcType, 'npc_action_delay')),
+    attacksPlayer: f.npc.getVar(id(VarNpcType, 'npc_attacking_uid')) === f.player.uid
+  };
+  hitTape = null;
+  return result;
+}
+for (const style of styles) {
+  const control = controls[style];
+  check(`${style} real control has no generic poison`, severityOf(control), 0);
+  for (const outcome of ['positive', 'zero', 'miss']) {
+    check(`${style} real control prayed ${outcome} effects equal its published miss`,
+      effects(style, outcome, control, style), effects(style, 'miss', control));
+  }
+  for (const type of [...samples, control]) {
+    for (const outcome of ['positive', 'zero', 'miss']) {
+      const result = effects(style, outcome, type, style);
+      const expected = style !== 'magic' && severityOf(type) > 0 && outcome !== 'miss' ? severityOf(type) : 0;
+      check(`prayed ${style} ${type} would-be ${outcome} poison`, result.poison, expected);
+      check(`prayed ${style} ${type} would-be ${outcome} visible hit`, result.hits,
+        style === 'magic' ? [] : [{ target: 'player', type: 0, damage: 0 }]);
+      check(`prayed ${style} ${type} would-be ${outcome} hitpoints`, result.levels[PlayerStat.HITPOINTS], 80);
+      check(`prayed ${style} ${type} would-be ${outcome} messages`, result.messages, expected ? ['You have been poisoned!'] : []);
+      check(`prayed ${style} ${type} would-be ${outcome} poison timer`, result.poisonTimer, expected > 0);
+      const wrongPrayer = style === 'magic' ? 'melee' : 'magic';
+      check(`wrong prayer leaves ${style} ${type} ${outcome} effects unchanged`,
+        effects(style, outcome, type, wrongPrayer), effects(style, outcome, type));
+    }
+  }
+}
+for (const initial of [-10, 55]) {
+  const f = fixture('swamp_cave_slime'); f.player.setVar(poisonId, initial);
+  attack('melee', 'zero', f, 'melee'); settle(f.player);
+  check(`prayed slime immunity/stronger poison ${initial} unchanged`, f.player.getVar(poisonId), initial);
+  check(`prayed slime immunity/stronger poison ${initial} no message`, f.player.testMessages, []);
+}
+Environment.NODE_MEMBERS = false;
+{
+  const result = effects('melee', 'positive', 'poisonspider', 'melee');
+  check('prayed positive poison remains members-only', result.poison, 0);
+  check('prayed free-world attack has no poison timer', result.poisonTimer, false);
+}
+Environment.NODE_MEMBERS = true;
 {
   const f = fixture('swamp_cave_slime');
   attack('melee', 'zero', f); settle(f.player);
@@ -202,7 +279,13 @@ for (const style of styles) {
 {
   const f = fixture('swamp_cave_slime'); f.npc.levels[NpcStat.HITPOINTS] = 0;
   attack('melee', 'zero', f); settle(f.player);
-  check('dead melee NPC cannot poison through the additional zero branch', f.player.getVar(poisonId), 0);
+  check('dead melee NPC cannot poison on a successful zero', f.player.getVar(poisonId), 0);
+}
+{
+  const f = fixture('swamp_cave_slime'); f.npc.levels[NpcStat.HITPOINTS] = 0;
+  attack('melee', 'positive', f, 'melee'); settle(f.player);
+  check('dead prayed melee NPC cannot poison', f.player.getVar(poisonId), 0);
+  check('dead prayed melee NPC cannot damage', f.player.levels[PlayerStat.HITPOINTS], 80);
 }
 console.log(`PASS poison rule: ${checks} assertions, real melee/ranged/magic scripts, no server`);
 process.exit(0);

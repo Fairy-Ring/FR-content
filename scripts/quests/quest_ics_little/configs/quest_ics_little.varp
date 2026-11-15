@@ -1,2 +1,3 @@
 [main_ics_var]
 scope=perm
+transmit=yes
