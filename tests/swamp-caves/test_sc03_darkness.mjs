@@ -10,6 +10,7 @@ import {
 } from './runtime.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const { Interaction } = await engineModule('engine/entity/Interaction.ts');
 const { NetworkPlayer } = await engineModule('engine/entity/NetworkPlayer.ts');
 const ClientSocket = (await engineModule('server/ClientSocket.ts')).default;
 const ScriptRunner = (await engineModule('engine/script/ScriptRunner.ts')).default;
@@ -28,7 +29,7 @@ assert(controller, 'build the SC-03 script pack first');
 const roots = ['inter_387', 'inter_248', 'inter_250', 'inter_249'].map(name => id('Component', name));
 const warning = ['You hear tiny insects skittering over the ground...', 'Tiny biting insects swarm all over you!'];
 const transientMask = (3 << 1) | (7 << 6);
-let cases = 0, failures = 0;
+let cases = 0, failures = 0, wireSerial = 1999;
 function test(name, action) {
   cases++;
   try { action(); console.log(`PASS ${name}`); }
@@ -255,6 +256,99 @@ for (const [name, position, expected] of [
   if (expected) release(p); else assert.equal(p.overlay, -1);
 });
 
+// Observe production dispatch without replacing a trigger, movement or queue.
+function traceScripts(action) {
+  const original = ScriptRunner.init, names = [];
+  ScriptRunner.init = function(script, ...args) {
+    names.push(script.name);
+    return original.call(this, script, ...args);
+  };
+  try { action(names); } finally { ScriptRunner.init = original; }
+  return names;
+}
+function engineEntry(position = [0, 3168, 9572]) {
+  const p = wireFixture([], [0, 3220, 3220]);
+  p.teleport(p.x, p.z, p.level); ticks(p, 1);
+  p.packets.length = 0; p.messages.length = 0;
+  p.teleport(position[1], position[2], position[0]);
+  ticks(p, 1); ownership(p); elapsed(p, 0);
+  p.encodeOut();
+  assert.equal(rootPackets(p).length, 1);
+  return p;
+}
+function caveRoute(p, reached) {
+  const queue = [[p.x, p.z]], previous = new Map([[`${p.x},${p.z}`, null]]);
+  for (let i = 0; i < queue.length; i++) {
+    const [x, z] = queue[i], key = `${x},${z}`;
+    if (reached(x, z)) {
+      const route = [];
+      for (let at = key; previous.get(at) !== null; at = previous.get(at)) route.push(at.split(',').map(Number));
+      return route.reverse();
+    }
+    for (const [dx, dz] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+      const next = `${x + dx},${z + dz}`;
+      if (previous.has(next) || !map.canTravel(p.level, x, z, dx, dz, 1, 0, CollisionType.NORMAL)) continue;
+      if (!inside(p, CoordGrid.packCoord(p.level, x + dx, z + dz))) continue;
+      previous.set(next, key); queue.push([x + dx, z + dz]);
+    }
+  }
+  assert.fail('a real cave walking route must reach the requested zone boundary');
+}
+for (const crossing of ['several zones', 'map square']) test(`engine entry and real walk across ${crossing} preserve clocks, pending identity and one root`, () => {
+  traceScripts(names => {
+    const p = engineEntry(), origin = [p.x >> 3, p.z >> 3], mapOrigin = [p.x >> 6, p.z >> 6];
+    ticks(p, 14); pending(p, 14);
+    const route = caveRoute(p, (x, z) => crossing === 'map square'
+      ? (x >> 6) !== mapOrigin[0] || (z >> 6) !== mapOrigin[1]
+      : Math.abs((x >> 3) - origin[0]) + Math.abs((z >> 3) - origin[1]) >= 3);
+    const before = hp(p), pendingArgs = structuredClone(timer(p).args.slice(2));
+    let crossings = 0;
+    for (const [x, z] of route) {
+      const oldZone = [p.x >> 3, p.z >> 3];
+      p.queueWaypoint(x, z); ticks(p, 1);
+      assert.deepEqual(tile(p), [0, x, z], 'engine collision-checked walking reaches each tile');
+      if ((p.x >> 3) !== oldZone[0] || (p.z >> 3) !== oldZone[1]) crossings++;
+    }
+    ticks(p, 1); // The final step queues its zone callbacks for the next engine phase.
+    p.encodeOut();
+    elapsed(p, Math.min(30, 14 + route.length + 1));
+    assert.equal(hp(p), before - Math.max(0, 14 + route.length + 1 - 29));
+    assert.deepEqual(timer(p).args.slice(2), pendingArgs);
+    assert.equal([...p.timers.values()].filter(t => t.script.id === controller.id).length, 1);
+    assert.equal(rootPackets(p).length, 1, 'internal exits must not close and reopen the root');
+    assert(names.some(name => name.startsWith('[zoneexit,')));
+    assert(names.filter(name => name.startsWith('[zone,')).length > 1);
+    if (crossing === 'several zones') assert(crossings >= 3);
+    else {
+      assert(names.includes('[mapzoneexit,0_49_149]'));
+      assert(names.includes('[mapzone,0_50_149]'), 'real hinted map-square crossing');
+    }
+    release(p);
+  });
+});
+for (const [kind, from, to, expected] of [
+  ['same map square', [0, 3168, 9572], [0, 3168, 9538], '[zoneexit,0_49_149_32_32]'],
+  ['plane change', [0, 3168, 9572], [1, 3168, 9572], '[zoneexit,0_49_149_32_32]'],
+  ...[
+    [[0, 3168, 9572], '0_49_149'], [[0, 3225, 9542], '0_50_149'],
+    [[0, 3168, 9600], '0_49_150'], [[0, 3225, 9616], '0_50_150'],
+    [[0, 3318, 9615], '0_51_150'], [[2, 3218, 9532], '0_50_148']
+  ].map(([position, key]) => [`map-square ${key}`, position, [0, 3220, 3220], `[mapzoneexit,${key}]`])
+]) test(`real engine exit ${kind} dispatches the published exit hook`, () => {
+  const p = engineEntry(from); ticks(p, 14); pending(p, 14);
+  const before = hp(p);
+  p.teleport(to[1], to[2], to[0]);
+  assert([...p.engineQueue.all()].some(request => request.script.name === expected));
+  // Drain the actual engine queue independently of the soft-timer fallback,
+  // which normally runs first. This proves that the queued hook itself releases.
+  p.resetEntity(false);
+  const names = traceScripts(() => p.processEngineQueue());
+  assert(names.includes(expected)); ownership(p, false);
+  p.encodeOut();
+  assert.equal(p.overlay, -1); assert.equal(p.getVarBit(gas), 0);
+  ticks(p, 35); assert.equal(hp(p), before); assert.deepEqual(p.messages, []);
+});
+
 test('each actual cave connected component has no ordinary walking edge outside the policy bounds', () => {
   for (const startTile of [[0, 3168, 9572], [0, 3225, 9542], [0, 3318, 9615], [2, 3218, 9532]]) {
     const [level] = startTile, queue = [startTile], seen = new Set([startTile.join(',')]);
@@ -326,7 +420,6 @@ test('worn eligibility rejects a light put into a slot it cannot occupy', () => 
   assert.equal(light(p), 2, 'same helmet in its actual slot is the control');
 });
 
-let wireSerial = 1999;
 function wireFixture(items = [], position = [0, 3168, 9572]) {
   const slot = ++wireSerial, hash = BigInt(slot);
   const p = new NetworkPlayer(`sc03wire${slot}`, hash, hash, new ClientSocket());
@@ -371,10 +464,11 @@ const constant = (file, name) => {
 };
 const damageStyles = 'scripts/skill_combat/configs/combat_damagetypes.constant';
 const windStrike = constant('scripts/skill_combat/configs/magic/spells.constant', 'wind_strike');
-for (const mode of ['melee', 'ranged', 'autocast', 'manual']) for (const continuation of [false, true]) {
-  test(`${mode} ${continuation ? 'continuation' : 'initiation'} without current light: no attack, XP, rune or ammo spend`, () => {
+for (const mode of ['melee', 'ranged', 'autocast', 'manual']) for (const continuation of [false, true]) for (const lit of [false, true]) {
+  test(`${mode} ${continuation ? 'continuation' : 'initiation'} ${lit ? 'with' : 'without'} current light: real attack and resource control`, () => {
     const gear = mode === 'ranged' ? ['shortbow', 'bronze_arrow'] : mode === 'melee' ? ['rune_scimitar'] : ['staff_of_air'];
-    const p = fixture([...gear, 'airrune', 'mindrune']), n = npc(p);
+    const p = fixture([...gear, 'airrune', 'mindrune', ...(lit || continuation ? ['lit_candle'] : [])]), n = npc(p);
+    p.invAdd(inv, obj('bronze_arrow'), 8); p.invAdd(inv, obj('mindrune'), 8);
     for (const item of gear) assert(held(p, item, 2), `equip ${item}`);
     p.setVar(id('VarPlayerType', 'damagetype'), constant(damageStyles, mode === 'ranged' ? 'ranged_style' : mode === 'autocast' ? 'magic_style' : 'stab_style'));
     if (mode === 'autocast') {
@@ -382,20 +476,48 @@ for (const mode of ['melee', 'ranged', 'autocast', 'manual']) for (const continu
       p.setVarBit(id('VarBitType', 'autocast_set'), 1);
       assert.equal(execute('[proc,player_autocast_enabled]', p).popInt(), 1);
     }
-    if (continuation) p.setVar(id('VarPlayerType', 'action_delay'), World.currentTick + 4);
-    const before = { inv: inventory(p), worn: inventory(p, worn), xp: [...p.stats], npc: [...n.levels], delay: p.getVar(id('VarPlayerType', 'action_delay')) };
+    const actionDelay = id('VarPlayerType', 'action_delay');
+    const arm = () => p.setInteraction(Interaction.ENGINE, n, mode === 'manual' ? ServerTriggerType.APNPCT : ServerTriggerType.APNPC2,
+      mode === 'manual' ? id('Component', 'magic:wind_strike') : -1);
+    if (continuation) {
+      const ammo = count(p, 'bronze_arrow', worn), runes = count(p, 'mindrune');
+      arm();
+      for (let i = 0; i < 3 && p.getVar(actionDelay) <= World.currentTick; i++) ticks(p, 1);
+      assert(p.getVar(actionDelay) > World.currentTick, 'first real lit attack establishes its own future action delay');
+      if (mode === 'ranged') assert.equal(count(p, 'bronze_arrow', worn), ammo - 1);
+      if (mode === 'autocast' || mode === 'manual') assert.equal(count(p, 'mindrune'), runes - 1);
+      if (!lit) assert(held(p, 'lit_candle', 1), 'real extinguish between attacks');
+      if (mode === 'manual') arm(); // A second manual click, while its actual first-cast delay still holds.
+    } else arm();
+    const before = {
+      inv: inventory(p), worn: inventory(p, worn), xp: [...p.stats], npc: [...n.levels],
+      delay: p.getVar(actionDelay), queued: [...n.queue.all()].length,
+      ammo: count(p, 'bronze_arrow', worn), runes: count(p, 'mindrune')
+    };
     p.animId = -1; p.packets.length = 0; p.messages.length = 0;
-    execute(mode === 'manual' ? '[apnpct,magic:wind_strike]' : '[opnpc2,_]', p, [], { target: n });
-    assert.deepEqual(inventory(p), before.inv); assert.deepEqual(inventory(p, worn), before.worn);
-    assert.deepEqual([...p.stats], before.xp); assert.deepEqual([...n.levels], before.npc);
-    assert.equal(p.getVar(id('VarPlayerType', 'action_delay')), before.delay);
-    assert.equal(p.animId, -1); assert.deepEqual(p.messages, []);
-    assert(!p.packets.some(packet => /Synth|Spotanim/.test(packet.constructor.name)));
-    assert.equal([...n.queue.all()].length, 0, 'no outgoing damage or retaliation queued');
-    assert.equal(execute('[proc,player_in_combat_check2]', p, [], { target: n }).popInt(), 0);
-    p.invAdd(inv, obj('lit_candle'), 1);
-    assert.equal(execute('[proc,swamp_cave_can_attack]', p).popInt(), 1, 'current held light is a positive control before any timer pass');
-    World.removeNpc(n, -1);
+    const until = Math.max(World.currentTick + 3, before.delay + 2);
+    const names = traceScripts(() => {
+      while (World.currentTick < until) ticks(p, 1);
+    });
+    assert(World.currentTick > before.delay, 'observation passes the genuine action-delay deadline');
+    if (lit) {
+      assert(p.getVar(actionDelay) > before.delay, 'an actual outgoing attack sets a new action delay');
+      assert(p.animId !== -1 || p.packets.some(packet => /Synth|Spotanim/.test(packet.constructor.name)), 'actual attack presentation');
+      if (mode === 'ranged') assert.equal(count(p, 'bronze_arrow', worn), before.ammo - 1, 'one arrow spent');
+      if (mode === 'autocast' || mode === 'manual') {
+        assert(names.includes('[apnpct,magic:wind_strike]'), 'engine executes the real spell follow-up');
+        assert.equal(count(p, 'mindrune'), before.runes - 1, 'one mind rune spent');
+        assert(p.stats[PlayerStat.MAGIC] > before.xp[PlayerStat.MAGIC], 'real cast XP');
+      }
+    } else {
+      assert.deepEqual(inventory(p), before.inv); assert.deepEqual(inventory(p, worn), before.worn);
+      assert.deepEqual([...p.stats], before.xp); assert.deepEqual([...n.levels], before.npc);
+      assert.equal(p.getVar(actionDelay), before.delay, 'no outgoing attack after the deadline');
+      assert.equal(p.animId, -1); assert.deepEqual(p.messages, []);
+      assert(!p.packets.some(packet => /Synth|Spotanim/.test(packet.constructor.name)));
+      assert.equal([...n.queue.all()].length, before.queued, 'no new outgoing damage or retaliation');
+    }
+    p.clearInteraction(); World.removeNpc(n, -1);
   });
 }
 
@@ -429,9 +551,116 @@ test('protected dark-to-dark teleport preserves the single controller and elapse
   assert.deepEqual(timer(p).args, before); assert.equal(p.overlay, roots[0]); release(p);
 });
 
+for (const at of [5, 20, 31]) for (const path of ['raw exit', 'safe teleport']) {
+  test(`${path} after ${at} actual dark ticks cancels warnings/bites and reentry starts fresh`, () => {
+    const p = engineEntry(); ticks(p, at);
+    assert.equal(hp(p), 99 - Math.max(0, at - 29), 'post-threshold case already received real bites');
+    const before = hp(p), messages = p.messages.filter(message => warning.includes(message));
+    if (path === 'safe teleport') execute('[proc,p_telejump_safe]', p, [CoordGrid.packCoord(0, 3220, 3220)]);
+    else p.teleport(3168, 9538, 0);
+    ticks(p, 1); ownership(p, false); assert.equal(p.overlay, -1);
+    ticks(p, 35); assert.equal(hp(p), before);
+    assert.deepEqual(p.messages.filter(message => warning.includes(message)), messages, 'no warning or bite after the exit');
+    p.teleport(3168, 9572, 0); ticks(p, 1); ownership(p); elapsed(p, 0);
+    assert.deepEqual(timer(p).args.slice(2), [-1, -1, 0]);
+    p.messages.length = 0;
+    ticks(p, 14); elapsed(p, 14); assert.deepEqual(p.messages, []); assert.equal(hp(p), before);
+    ticks(p, 1); elapsed(p, 15); assert.deepEqual(p.messages, [warning[0]]);
+    ticks(p, 14); assert.equal(hp(p), before);
+    ticks(p, 1); assert.equal(hp(p), before - 1); assert.deepEqual(p.messages, warning);
+    release(p);
+  });
+}
+
+test('a real insect bite invokes the ordinary ring-of-life rescue, destruction and message', () => {
+  const originalRandom = Math.random;
+  Math.random = () => 0.5;
+  try {
+    const ordinary = fixture(['ring_of_life'], [0, 3220, 3220]);
+    assert(held(ordinary, 'ring_of_life', 2)); ordinary.levels[PlayerStat.HITPOINTS] = 10;
+    execute('[proc,damage_self]', ordinary, [1]);
+    const expected = { destination: tile(ordinary), ring: inventory(ordinary, worn),
+      message: ordinary.messages.filter(message => message.includes('Ring of Life')), hp: hp(ordinary) };
+    assert.equal(count(ordinary, 'ring_of_life', worn), 0);
+    assert.deepEqual(expected.message, ['Your Ring of Life saves you and is destroyed in the process.']);
+    const p = start(fixture(['ring_of_life']));
+    assert(held(p, 'ring_of_life', 2)); p.levels[PlayerStat.HITPOINTS] = 10;
+    ticks(p, 29); assert.equal(hp(p), 10); assert.equal(count(p, 'ring_of_life', worn), 1);
+    ticks(p, 1); assert.equal(hp(p), 9, 'one bite reaches the same ten-percent threshold');
+    assert.equal(count(p, 'ring_of_life', worn), 0, 'published ring check consumes the worn ring');
+    assert(p.delayed, 'the published rescue is a real delayed normal teleport');
+    for (let i = 0; i < 12 && inside(p); i++) {
+      ticks(p, 1); assert.equal(hp(p), 9, 'no second bite during the rescue delay');
+    }
+    assert.deepEqual({ destination: tile(p), ring: inventory(p, worn),
+      message: p.messages.filter(message => message.includes('Ring of Life')), hp: hp(p) }, expected);
+    ownership(p, false); assert.equal(p.overlay, -1);
+    const messages = [...p.messages]; ticks(p, 40);
+    ownership(p, false); assert.equal(hp(p), 9); assert.deepEqual(p.messages, messages);
+  } finally { Math.random = originalRandom; }
+});
+
+test('real ectophial Empty after 31 dark ticks releases before arrival and never bites there', () => {
+  const p = start(fixture(['ectophial'])); ticks(p, 31);
+  assert.equal(hp(p), 97);
+  assert(held(p, 'ectophial', 1));
+  assert.deepEqual(tile(p), [0, 3658, 3517]); ownership(p, false);
+  assert.equal(p.overlay, -1); assert.equal(count(p, 'ectophial'), 0); assert.equal(count(p, 'ectophial_empty'), 1);
+  assert.equal(p.delayed, false, 'the published ectophial has no player delay');
+  const before = hp(p), messages = [...p.messages];
+  ticks(p, 40); ownership(p, false); assert.equal(hp(p), before); assert.deepEqual(p.messages, messages);
+});
+for (const record of [1, 2]) test(`real commorb Playback ${record} after 31 dark ticks releases throughout the scene and returns with fresh clocks`, () => {
+  const p = engineEntry();
+  p.invAdd(inv, obj('wanted_crystal_ball'), 1);
+  p.setVarBit(id('VarBitType', 'wanted_main'), constant('scripts/quests/quest_wanted/configs/wanted.constant', 'wanted_intelligence_open'));
+  p.setVarBit(id('VarBitType', 'wanted_commorb_intel'), 1);
+  ticks(p, 31); assert.equal(hp(p), 97);
+  assert(held(p, 'wanted_crystal_ball', 4)); assert.equal(p.activeScript?.execution, ScriptState.PAUSEBUTTON);
+  resumeDialogue(p, record);
+  assert.equal(inside(p), false); ownership(p, false); assert.equal(p.overlay, -1);
+  assert.equal(p.getVar(id('VarPlayerType', 'wanted_record_active')), record);
+  const before = hp(p), warningsBefore = p.messages.filter(message => warning.includes(message));
+  ticks(p, 35); assert.equal(hp(p), before); ownership(p, false);
+  assert.deepEqual(p.messages.filter(message => warning.includes(message)), warningsBefore);
+  for (let i = 0; i < 100 && p.activeScript; i++) {
+    if (p.activeScript.execution === ScriptState.PAUSEBUTTON) resumeDialogue(p);
+    else {
+      assert.equal(p.activeScript.execution, ScriptState.SUSPENDED);
+      ticks(p, 1);
+    }
+    assert.equal(hp(p), before, 'no cave bite during any scene delay or page');
+  }
+  assert.equal(p.activeScript, null, 'the actual record finishes');
+  assert.deepEqual(tile(p), [0, 3168, 9572]);
+  const names = traceScripts(() => ticks(p, 1));
+  assert(names.some(name => name.startsWith('[zone,')), 'ordinary return hint is actually dispatched');
+  ownership(p); elapsed(p, 0); assert.equal(p.overlay, roots[0]);
+  assert.deepEqual(timer(p).args.slice(2), [-1, -1, 0]);
+  assert.equal([...p.timers.values()].filter(t => t.script.id === controller.id).length, 1);
+  ticks(p, 14); elapsed(p, 14); assert.equal(hp(p), before);
+  release(p);
+});
+test('real Tears up after 31 dark ticks releases synchronously, including its own arrival delay', () => {
+  const p = start(fixture([], [2, 3218, 9532])); ticks(p, 31); assert.equal(hp(p), 97);
+  const loc = World.getLoc(3218, 9533, 2, id('LocType', 'tog_cave_up'));
+  assert(loc);
+  const state = ScriptRunner.init(ScriptProvider.getByName('[oploc1,tog_cave_up]'), p, loc);
+  p.executeScript(state, true, true);
+  for (let i = 0; i < 10 && inside(p); i++) {
+    assert(p.delayed, 'published p_arrivedelay holds the player before moving');
+    ticks(p, 1); assert.equal(hp(p), 97);
+  }
+  assert.deepEqual(tile(p), [0, 3225, 9538], 'keep the published landing for SC-06');
+  ownership(p, false); assert.equal(p.overlay, -1);
+  const messages = [...p.messages]; ticks(p, 40);
+  ownership(p, false); assert.equal(hp(p), 97); assert.deepEqual(p.messages, messages);
+});
+
 test('actual insect death releases before the first death delay and no later hazard reaches the respawn', () => {
-  const p = start(fixture()); p.levels[PlayerStat.HITPOINTS] = 1;
-  ticks(p, 30); assert.equal(hp(p), 0);
+  const p = start(fixture()); p.levels[PlayerStat.HITPOINTS] = 3;
+  ticks(p, 31); assert.equal(hp(p), 1, 'repeated ordinary bites, no survival clamp');
+  ticks(p, 1); assert.equal(hp(p), 0);
   ticks(p, 1); ownership(p, false); assert.equal(p.overlay, -1);
   for (let i = 0; i < 40 && hp(p) === 0; i++) ticks(p, 1);
   assert(hp(p) > 0, 'published death completes its real respawn');
@@ -490,13 +719,14 @@ test('retained generic ladders have no natural dispatch in any selected dark com
     }
   }
 });
-test('published Tears tunnel down retains one controller; defective up landing uses the outside fallback', () => {
+test('published Tears down retains one controller; up synchronously releases before its unchanged landing', () => {
   const p = start(wireFixture([], [0, 3225, 9542])); pending(p, 4);
   travel(p, 'tog_cave_down', 3225, 9539, [2, 3218, 9532]);
   ownership(p); assert(timer(p).args[0] >= 4); assert.equal(timer(p).args[4], 6);
   assert.equal(rootPackets(p).length, 1, 'down does not replace or duplicate its existing cave root');
   travel(p, 'tog_cave_up', 3218, 9533, [0, 3225, 9538]);
   assert.equal(inside(p), false, 'published blocked upper landing is not repaired by SC-03');
+  ownership(p, false); assert.equal(p.overlay, -1, 'release happens inside the up transition, not the fallback');
   const before = hp(p);
   ticks(p, 1); ownership(p, false); assert.equal(p.getVarBit(gas), 0); assert.equal(p.overlay, -1);
   ticks(p, 35); assert.equal(hp(p), before, 'no outside bite from the published tunnel defect');

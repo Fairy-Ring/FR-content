@@ -11,6 +11,7 @@
 inv_del(inv, ectophial, 1);
 inv_add(inv, ectophial_empty, 1);
 anim(ahoy_ecto_teleport, 0);
+if (~swamp_cave_inside(coord) = true & ~swamp_cave_inside(0_57_54_10_61) = false) ~swamp_cave_release;
 p_telejump(0_57_54_10_61); // ectophial 3658,3517 L0
 
 [oplocu,ahoy_ectofunctus]

@@ -104,11 +104,13 @@ if (~swamp_cave_inside(coord) = false) {
             if ($dark_ticks >= ^swamp_cave_bite_ticks) {
                 damage(uid, 1, ^swamp_cave_bite_damage);
                 if (stat(hitpoints) = 0) ~player_die;
+                else ~ring_of_life_check;
             }
         }
     }
 }
-softtimer(swamp_cave_environment, 1, $dark_ticks, $owned_overlay, $gas_slot, $gas_source, $gas_ticks);
+// A protected effect can suspend and release ownership before returning here.
+if (%darkness_level ! 0) softtimer(swamp_cave_environment, 1, $dark_ticks, $owned_overlay, $gas_slot, $gas_source, $gas_ticks);
 
 // Engine zone callbacks are exact 8x8 keys. These cover the inclusive bounds.
 // They are hints: the coordinate predicate, not the square or plane, decides.
