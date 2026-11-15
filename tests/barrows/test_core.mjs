@@ -138,6 +138,7 @@ async function checkInertLogin({ World, Player, ScriptProvider, ScriptRunner, Sc
     'EnumType', 'ParamType', 'CategoryType', 'StructType', 'MesanimType'
   ].map(name => loadDefault(`src/cache/config/${name}.ts`)));
   const DbTableIndex = await loadDefault('src/cache/config/DbTableIndex.ts');
+  const JavaRandom = await loadDefault('src/util/JavaRandom.ts');
   const { ScriptOpcode } = await eng('src/engine/script/ScriptOpcode.ts');
   const previousCwd = process.cwd();
   process.chdir(ENGINE_ROOT);
@@ -173,7 +174,9 @@ async function checkInertLogin({ World, Player, ScriptProvider, ScriptRunner, Sc
       World.players[slot] = player;
       World.currentTick = 100;
       const random = Math.random;
+      const javaRandom = JavaRandom.nextDouble;
       Math.random = () => 0.5;
+      JavaRandom.nextDouble = () => 0.5;
       try {
         const script = ScriptProvider.getByName('[login,_]');
         assert(script, 'the selected pack contains the real login root');
@@ -193,6 +196,7 @@ async function checkInertLogin({ World, Player, ScriptProvider, ScriptRunner, Sc
         };
       } finally {
         Math.random = random;
+        JavaRandom.nextDouble = javaRandom;
         World.players[slot] = null;
       }
     }
