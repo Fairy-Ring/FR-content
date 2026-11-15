@@ -254,3 +254,9 @@ The registered lifecycle suite reaches paid state through native Open and Search
 
 Five paid-only shared-login mutants erase frozen credit, redraw the escape layout, rearm collapse, reset the restored camera or duplicate one coin. Each passes S15 to S17 first, then fails its named new S18 assertion. The headed natural case retains the paid escape run and all treasure through clean relog, receives a fresh resumed native hit, and repeats Search without payment. Exact offline remainder preservation is a compiled claim, not equality between online live observations. `lifecycle.evidence.txt` retains the native, mutant, gate and headed identities.
 
+## Ordinary-death lifecycle (S19)
+
+The collapse suite adds actual surface non-Barrows death and pre-loot deaths in both a crypt and the open-chest tunnel. It executes the unchanged ordinary damage/death queue through its delays, native player save/load, shared outside login and actual crypt/tunnel return. Every saved run field and both countdowns survive before loot. The existing S13 paid-death witness remains the only paid reset policy. All cases compare ordinary loss, keep-three, restored stats/energy, shared floor ownership, content-defined drop lifetime and content-defined respawn.
+
+Separate mutants erase credit at post-death outside login, erase credit at return Dig, advance a non-Barrows death's generation or alter ordinary drop lifetime. Each fails the corresponding assertion. The headed case earns prior credit, receives natural lethal brother damage, retains the whole run through outside relog and real return Dig, and compares a second natural non-Barrows death. No product script, shared hook or stored inert trace changes. `lifecycle.evidence.txt` retains the native, mutant, gate and live identities.
+

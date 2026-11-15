@@ -3,17 +3,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
-import { createRunner, loadPackedRuntime, parseOptions, run } from './packed.mjs';
+import { createRunner, loadPackedRuntime, parseEnum, parseOptions, run } from './packed.mjs';
 
 await run(async () => {
   const runtime = await loadPackedRuntime(parseOptions());
-  const { World, Player, LocType, VarPlayerType, VarNpcType, InvType, ObjType,
+  const { World, Player, LocType, VarPlayerType, VarNpcType, InvType, ObjType, CoordGrid,
     ScriptProvider, ScriptRunner, ScriptState, JavaRandom } = runtime;
   const eng = relative => import(pathToFileURL(path.join(runtime.engineRoot, relative)).href);
   const { PlayerTimerType } = await eng('src/engine/entity/EntityTimer.ts');
   const { PlayerStat } = await eng('src/engine/entity/PlayerStat.ts');
   const { default: ServerTriggerType } = await eng('src/engine/script/ServerTriggerType.ts');
   const { unzipSync } = createRequire(path.join(runtime.engineRoot, 'package.json'))('fflate');
+  const [{ PlayerLoading }, { default: Packet }] = await Promise.all([
+    eng('src/engine/entity/PlayerLoading.ts'), eng('src/io/Packet.ts')
+  ]);
   const deathSource = fs.readFileSync(path.join(runtime.contentRoot, 'scripts/player/scripts/death.rs2'), 'utf8');
   const respawnMatch = deathSource.match(/\bdef_coord\s+\$death_dest\s*=\s*map_findsquare\((\d+(?:_\d+){4}),\s*(\d+),\s*(\d+),/);
   assert(respawnMatch, 'ordinary death declares its default respawn anchor and search radii');
@@ -22,6 +25,15 @@ await run(async () => {
     level: respawnLevel, x: respawnMapX * 64 + respawnLocalX, z: respawnMapZ * 64 + respawnLocalZ,
     minRadius: Number(respawnMatch[2]), maxRadius: Number(respawnMatch[3])
   };
+  const lootDurationMatch = fs.readFileSync(path.join(runtime.contentRoot,
+    'scripts/drop_tables/configs/lootdrop.constant'), 'utf8').match(/^\^lootdrop_duration\s*=\s*(\d+)\s*$/m);
+  assert(lootDurationMatch, 'ordinary death drop lifetime comes from its shared named config');
+  const lootDuration = Number(lootDurationMatch[1]);
+  const cryptEntry = parseEnum(runtime.contentRoot, 'barrows_brother_crypt_entry').get('barrows_ahrim');
+  assert(cryptEntry, 'the actual original Ahrim crypt entry supplies post-death return');
+  const [cryptLevel, cryptMapX, cryptMapZ, cryptLocalX, cryptLocalZ] = cryptEntry.split('_').map(Number);
+  const cryptTile = [cryptLevel, cryptMapX * 64 + cryptLocalX, cryptMapZ * 64 + cryptLocalZ];
+  const cryptCoord = CoordGrid.packCoord(...cryptTile);
   const maps = unzipSync(fs.readFileSync(path.join(runtime.packDir, '.cache/maps-server.zip')));
   World.gameMap.zonemap.beginInitialization();
   for (const [x, z] of [[55, 151], [respawnMapX, respawnMapZ]]) {
@@ -278,17 +290,18 @@ await run(async () => {
       return originalAddObj.call(this, obj, owner, duration);
     };
     try {
-      function death(phase) {
+      function death(phase, { origin = [0, 3551, 9694], postDeathReturn = false } = {}) {
         const p = fixture(phase);
+        [p.level, p.x, p.z] = origin;
         if (phase === 0) for (const key of Object.values(vars)) p.setVar(key, 0);
         p.levels[PlayerStat.HITPOINTS] = minHit;
         p.runenergy = 6000;
         for (const name of ['abyssal_whip', 'dragon_scimitar', 'rune_platebody', 'spade', 'bronze_dagger']) p.invAdd(inv, ObjType.getId(name), 1);
         p.invAdd(worn, ObjType.getId('bronze_med_helm'), 1);
         const before = words(p);
-        const owned = runner.addNpc('barrows_guthan', 0, p.uid, 3554, 9694).npc;
+        const owned = runner.addNpc('barrows_guthan', p.level, p.uid, p.x + 3, p.z).npc;
         owned.setVar(VarNpcType.getId('npc_barrows_generation'), p.getVar(vars.barrows_generation) || 1);
-        const foreign = runner.addNpc('barrows_guthan', 0, p.uid + 10000, 3554, 9693).npc;
+        const foreign = runner.addNpc('barrows_guthan', p.level, p.uid + 10000, p.x + 3, p.z - 1).npc;
         foreign.setVar(VarNpcType.getId('npc_barrows_generation'), 1);
         floor = [];
         withRandom(0.5, () => phase === 2
@@ -326,11 +339,49 @@ await run(async () => {
           worn: p.getInventory(worn).items.filter(Boolean), floor: [...floor].sort((a, b) => a[0] - b[0]) };
         assert.equal(result.kept.length, 3, 'S13 ordinary unskulled keep-three allocation, not special Barrows protection');
         assert(result.floor.some(row => row[0] === ObjType.getId('bones')));
-        assert(result.floor.every(row => row[4] === 0 && row[5] === 3551 && row[6] === 9694), 'S13 ordinary shared death-tile drops, never a recovery destination');
+        assert(result.floor.every(row => row[4] === origin[0] && row[5] === origin[1] && row[6] === origin[2]),
+          'S13 ordinary shared death-tile drops, never a recovery destination');
+        assert(result.floor.every(row => row[2] === '-1' && row[3] === lootDuration),
+          'S19 ordinary death drops stay shared and use the unchanged content-defined lifetime');
         assert.equal(p.level, defaultRespawn.level, 'S13 ordinary death uses its content-defined respawn level');
         const respawnDistance = Math.max(Math.abs(p.x - defaultRespawn.x), Math.abs(p.z - defaultRespawn.z));
         assert(respawnDistance >= defaultRespawn.minRadius && respawnDistance <= defaultRespawn.maxRadius,
           'S13 normal map_findsquare respawn lies inside the current ordinary death definition');
+        if (postDeathReturn) {
+          assert.equal(phase, 1, 'S19 post-death persistence case is pre-loot');
+          assert.deepEqual(words(p), before, 'S19 full ordinary death preserves every pre-loot saved field, not just the slain bits');
+          const savedRun = p.save();
+          p.unlink(); p.isActive = false;
+          delete World.players[p.slot];
+          World.currentTick += constant('prayer_interval_ticks') * 4;
+          const relog = PlayerLoading.load(p.username, new Packet(savedRun), null);
+          relog.slot = p.slot; relog.pid = p.pid; relog.uid = p.uid;
+          relog.isActive = true; relog.lastMovement = 0;
+          relog.messages = []; relog.packets = [];
+          relog.write = packet => relog.packets.push(packet);
+          relog.messageGame = text => relog.messages.push(text);
+          relog.wrappedMessageGame = text => relog.messages.push(text);
+          World.players[relog.slot] = relog;
+          World.playerLoop.add(0x77000000n + BigInt(relog.slot), relog);
+          players.push(relog);
+          login(relog);
+          assert.deepEqual(words(relog), before, 'S19 post-death native save/load/shared outside login preserves the whole pre-loot run and both remainders');
+          assert.equal(relog.timers.has(timer.id), false, 'S19 outside post-death login cannot run a Barrows effect');
+          assert.equal(camera(relog).some(packet => packet.constructor.name === 'CamShake'), false);
+          const dig = ScriptRunner.init(ScriptProvider.getByName('[proc,barrows_dig_dest]'), relog, null, [cryptCoord]);
+          withRandom(() => { assert.fail('S19 unfinished-run return cannot redraw or pay'); }, () => {
+            relog.executeScript(dig, true);
+            finish(relog, dig);
+            if (origin[0] === 0) assert.equal(runner.procInt(relog, 'barrows_tunnel_enter',
+              [before.barrows_generation, runner.procInt(relog, 'barrows_tunnel_identity'), cryptCoord]), 1);
+          });
+          assert.deepEqual(words(relog), before, 'S19 native crypt Dig and selected-tunnel return preserve every original run field and saved remainder');
+          assert.equal(relog.timers.get(timer.id)?.interval, 1, 'S19 return restores only the one native timer');
+          assert.equal(LocType.get(LocType.get(chest.baseType).multiloc[relog.getVarBit(LocType.get(chest.baseType).multivarbit)]).op[0],
+            'Search', 'S19 return retains the original open-unlooted chest state');
+          assert.deepEqual(relog.getInventory(inv).items.filter(Boolean).map(item => [item.id, item.count]).sort((a, b) => a[0] - b[0]),
+            result.kept, 'S19 post-death relog/return creates no recovery items or treasure');
+        }
         for (const npc of [owned, foreign]) if (npc.isActive) World.removeNpc(npc, -1);
         return result;
       }
@@ -338,6 +389,15 @@ await run(async () => {
       assert.deepEqual(death(1), ordinary, 'S13 pre-loot death has exactly ordinary drops, lifetimes, kept items, restored stats/energy and respawn');
       assert.deepEqual(death(2), ordinary, 'S13 paid death has exactly ordinary drops, lifetimes, kept items, restored stats/energy and respawn');
       console.log('PASS S13 native lethal ordinary death: D9 cleanup before first delay, pre-loot whole-run preservation, paid reset, unchanged ordinary keep/drop/lifetime/respawn');
+      const ordinarySurface = death(0, { origin: [defaultRespawn.level, defaultRespawn.x, defaultRespawn.z] });
+      const withoutDropTile = result => ({ ...result, floor: result.floor.map(row => row.slice(0, 4)) });
+      assert.deepEqual(withoutDropTile(ordinarySurface), withoutDropTile(ordinary),
+        'S19 an actual outside non-Barrows death has unchanged ordinary loss, shared lifetime, kept items, stats, energy and respawn');
+      for (const origin of [cryptTile, [0, 3551, 9694]]) {
+        assert.deepEqual(withoutDropTile(death(1, { origin, postDeathReturn: true })), withoutDropTile(ordinarySurface),
+          'S19 pre-loot crypt/tunnel ordinary death has exactly the outside ordinary loss/drop/keep/lifetime/respawn result');
+      }
+      console.log('PASS S19 ordinary outside control, pre-loot crypt and open-tunnel death: whole run and exact countdowns survive the first delay, full ordinary death, native save/load/shared outside login and real Dig/tunnel return; unchanged shared drop lifetime and normal loss/keep/respawn; S13 paid reset remains the single policy');
     } finally { World.addObj = originalAddObj; }
   } finally {
     runner.removeFixtures();

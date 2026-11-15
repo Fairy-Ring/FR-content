@@ -112,3 +112,27 @@ Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a
 Own access, spade, hill position, combat stats, gear and food only. Natural Dig, selected descent, doors/combat, rendered real puzzle, Open and Search earn B=1/count=4/C=261 and receive 262 coins.
 Real paid-inside clean relog keeps the same tile, four stable words, frozen credit, escape layout, Search visual and every inventory/floor item. Native shake is restored. A fresh native five-point hitsplat reduces Hitpoints 99 to 94. Repeat Search creates no more treasure or changed escape run.
 All 30 PNGs viewed: paired route/combat, puzzle, Open/final credit, Search, paid relog, resumed hit and repeat Search. The known OLD-client model/colour defects do not hide the required scene/count or native item/hit/camera observations. The profile is deleted. Live online remainders advance normally; exact offline retention is compiled-only.
+
+S19 native ordinary-death lifecycle, 2026-11-15. No product change.
+Actual outside non-Barrows death and pre-loot crypt/open-tunnel deaths execute ordinary native damage/death and its first delay, full keep/drop/respawn, native save/load/shared outside login and actual Dig/tunnel return. Every pre-loot word and both remainders survive without a draw, payment or recovery items. Ordinary floor ownership and lifetime, loss, keep-three, restored stats/energy and content-defined respawn remain unchanged. S13 supplies the same canonical paid-death/reset witness.
+logs/ci-s19/27-tests_barrows_test_collapse.mjs.log
+SHA-256 95f10400e447280c9da5dc205c004eb085d128643b2c728f53ec3fcb742ead11.
+Post-death outside login erases credit: logs/s19-mutant-relog-red.log
+SHA-256 7a8cfede82881db4111118d68ae277dcad2e473a2da3dc98725941198f5e49bf.
+Return Dig erases credit: logs/s19-mutant-return-red.log
+SHA-256 4167543194147ba8510e0ef0dab54190224769da93280dba94deefbb36c93dee.
+Non-Barrows outside death advances generation: logs/s19-mutant-outside-red.log
+SHA-256 6274004c8d0fb037704bb7547d156149081073d02fbe266c133789326a9df211.
+Ordinary inventory drops gain one lifetime tick: logs/s19-mutant-lifetime-red.log
+SHA-256 473c2efecb8ac1273ae6e17c6a13b956015a2d546b149e5045943715bc3c1f14.
+Every temporary product line restored exactly: logs/s19-mutants-restored.log. Restored shared login, death, entry and area scripts have OK LSP diagnostics. No permanent shared-file or inert-login-trace change.
+logs/s19-gates.log and logs/s19-ci.log: clean pack, build, rs2check, all 99 registered tests, varp transmission and unchanged client/config exit 0. rs2check: zero errors and warnings, 15081 scripts. Required client/config SHA-256 b6ec704421650ee5527e77c635b8b3a8036f6eb042c572516ac0696cfbce19a8.
+
+S19 headed natural live: PASS all 12 checks, no retained live failure.
+Content d04ce48a53ebee1ec3f2fc1bb6577ec469c78300; engine 15301127e60ff6ef3d7d2547b084de15fb565338; cell e73f7c01693dab7c468b7152decb133eb5fd3182.
+live/s19/S19-new-1794740743490.json
+SHA-256 f498a17c37b7caf4d7d861b581502cf86ed76d72b0825080348469fd68c6c2a4.
+Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
+Own access, spade, hill position, stats, equipment and food only. Real Dig and ordinary Ahrim combat earn B=1. Disclosed own low-Hitpoints risk precedes real Dharok Search and natural lethal damage. Ordinary keep-three respawns outside. Whole earned run survives death, outside clean relog and real return Dig. A disclosed replacement spade is solely a return prerequisite, not a recovery or reward claim.
+The separate ordinary non-Barrows account receives natural lethal cow damage, retains the ordinary three highest-value items, respawns normally and leaves all Barrows words zero. No reward or recovery items are supplied by either death.
+All 24 PNGs viewed: paired first Dig, resident encounter/credit, disclosed lethal risk, natural zero-HP/ordinary respawn, outside relog, return Dig and independent ordinary cow control. Known OLD-client model/colour faults do not hide required scenes or native hit/item/run observations. Profiles deleted.
