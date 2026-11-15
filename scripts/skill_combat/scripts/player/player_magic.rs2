@@ -115,6 +115,7 @@ if (~player_in_combat_check = false) {
 if (~npc_is_attackable_opt = false) {
     return(false);
 }
+if (npc_type = slayer_killerwatt_ball) ~killerwatt_wake;
 return(true);
 
 [proc,pvm_freeze_allowed](dbrow $spell_data)(boolean)

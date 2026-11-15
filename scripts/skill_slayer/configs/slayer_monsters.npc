@@ -2140,3 +2140,43 @@ defence=60
 magic=75
 param=damagetype,^magic_style
 param=defend_anim,null
+
+// S02: monster-combat-data.s02-killerwatt-vectors / attack-interval / distance.
+// Original client fields and M2 animation/sound defaults are unchanged.
+[slayer_killerwatt]
+name=Killerwatt
+desc=An angry electrical shock!
+model1=npc_3201
+walkanim=killerwatt_biped_walk
+readyanim=killerwatt_biped_ready
+turnspeed=900
+op2=Attack
+vislevel=55
+hitpoints=51
+attack=50
+strength=50
+defence=40
+magic=67
+ranged=67
+attackrange=13
+param=attackrate,2
+param=slayer_category,^slayer_killerwatt
+
+[slayer_killerwatt_ball]
+name=Killerwatt
+desc=A ball of electrical energy.
+model1=npc_3202
+walkanim=killerwatt_ball_ready
+readyanim=killerwatt_ball_ready
+vislevel=55
+hitpoints=51
+attack=50
+strength=50
+defence=40
+turnspeed=900
+op2=Attack
+magic=67
+ranged=67
+attackrange=13
+param=attackrate,2
+param=slayer_category,^slayer_killerwatt

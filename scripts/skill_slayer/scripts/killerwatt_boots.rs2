@@ -1,0 +1,4 @@
+// CANDIDATE slayer.s02-insulated-boots-item. No sourced refusal wording.
+[opheld2,slayer_boots]
+if (stat_base(slayer) < ^killerwatt_slayer_level) return;
+~equip(last_slot);
