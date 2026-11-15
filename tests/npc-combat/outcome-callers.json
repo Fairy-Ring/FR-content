@@ -1,0 +1,151 @@
+{
+  "schema": 1,
+  "policy": "Enumerate every packed named NPC, resolve both player-attack triggers, traverse every compiled direct edge; reject dynamic calls in an attack closure and reject unregistered external shared-proc callers. No generated ID, NPC count, bytecode or old-pack trace is pinned.",
+  "externalCallers": {
+    "npc_default_attack": [
+      "[ai_applayer2,_macro_event_rock_golem]",
+      "[ai_applayer2,regicide_darkelf2]",
+      "[ai_applayer2,regicide_old_camp_guard]",
+      "[ai_applayer2,regicide_tyras_camp_guard]",
+      "[ai_applayer2,regicide_tyras_guard]",
+      "[ai_opplayer2,_dagannoth_mother]",
+      "[ai_opplayer2,_slayer_basilisk]",
+      "[ai_opplayer2,chaos_druid]",
+      "[ai_opplayer2,chaosmonk1]",
+      "[ai_opplayer2,chaosmonk2]",
+      "[ai_opplayer2,chaosmonk3]",
+      "[ai_opplayer2,druid]",
+      "[ai_opplayer2,elvarg]",
+      "[ai_opplayer2,entrana_monk]",
+      "[ai_opplayer2,firediamond_firewarrior]",
+      "[ai_opplayer2,irvig_senay]",
+      "[ai_opplayer2,melzar_the_mad]",
+      "[ai_opplayer2,monk]",
+      "[ai_opplayer2,ranalph_devere]",
+      "[ai_opplayer2,san_tojalon]",
+      "[ai_opplayer2,skeletonmage]",
+      "[ai_opplayer2,slayer_banshee_1]",
+      "[ai_opplayer2,slayer_cockatrice]",
+      "[ai_opplayer2,slayer_dustdevil]",
+      "[ai_opplayer2,wizard_grayzag]",
+      "[label,barbarian_default_attack]",
+      "[proc,dt_damis_hit]",
+      "[proc,dt_dessous_attack]",
+      "[proc,dt_kamil_attack]",
+      "[proc,invrigar_attack]",
+      "[proc,necro_attack]",
+      "[proc,sarawiz_melee_attack]",
+      "[proc,vampire_attack]"
+    ],
+    "npc_meleeattack": [
+      "[ai_opplayer2,count_draynor]",
+      "[ai_opplayer2,ghast_vis]",
+      "[ai_opplayer2,nezikchened]",
+      "[ai_opplayer2,shadow_spider]",
+      "[ai_opplayer2,slayer_nechryael]",
+      "[ai_opplayer2,troll_champion]",
+      "[proc,blessedspider_attack]",
+      "[proc,dragon_melee]",
+      "[proc,kalphite_flyingqueen_melee_attack]",
+      "[proc,kalphite_melee_attack]"
+    ],
+    "npc_rangeattack": [
+      "[ai_applayer2,_death_archer]",
+      "[ai_applayer2,ardougne_archer]",
+      "[ai_applayer2,browclothedgnome]",
+      "[ai_applayer2,d_skingnomeknight]",
+      "[ai_applayer2,darkskinned_gnome]",
+      "[ai_applayer2,gnome]",
+      "[ai_applayer2,gnomefemale]",
+      "[ai_applayer2,gnomefemale_dskinned]",
+      "[ai_applayer2,gnomeknight]",
+      "[ai_applayer2,guard2]",
+      "[ai_applayer2,guild_towerarcher1]",
+      "[ai_applayer2,guild_towerarcher2]",
+      "[ai_applayer2,guild_towerarcher3]",
+      "[ai_applayer2,guild_towerarcher4]",
+      "[ai_applayer2,ranging_guild_guard]",
+      "[ai_applayer2,regicide_darkelf]"
+    ],
+    "npc_cast_spell": [
+      "[ai_applayer2,_witch]",
+      "[ai_applayer2,koldemon]",
+      "[ai_applayer2,kolethereal]",
+      "[ai_applayer2,kolhuman]",
+      "[ai_applayer2,kologre]",
+      "[ai_applayer2,kolspider]",
+      "[ai_applayer2,melzar_the_mad]",
+      "[ai_applayer2,nezikchened]",
+      "[ai_applayer2,trail_hard2]",
+      "[ai_applayer2,trail_hard]",
+      "[ai_opplayer2,koldemon]",
+      "[ai_opplayer2,kolethereal]",
+      "[ai_opplayer2,kolhuman]",
+      "[ai_opplayer2,kologre]",
+      "[ai_opplayer2,kolspider]",
+      "[ai_opplayer2,melzar_the_mad]",
+      "[ai_opplayer2,skeletonmage]",
+      "[ai_opplayer2,trail_hard2]",
+      "[ai_opplayer2,trail_hard]",
+      "[label,guthix_mage_attack]",
+      "[label,saradomin_mage_attack]",
+      "[label,wizard_elemental_attack]",
+      "[label,zamorak_mage_attack]",
+      "[proc,dark_wizard_earth_attack]",
+      "[proc,dark_wizard_water_attack]",
+      "[proc,invrigar_attack]",
+      "[proc,necro_attack]"
+    ],
+    "npc_cast_spell_with_forced_max_hit": [
+      "[ai_applayer2,_slayer_infernalmage]",
+      "[ai_applayer2,ikov_firewarrior]",
+      "[ai_applayer2,wizard]",
+      "[ai_opplayer2,_slayer_infernalmage]",
+      "[ai_opplayer2,ikov_firewarrior]"
+    ],
+    "npc_spell_success": [
+      "[proc,chaos_druid_spell]",
+      "[proc,dt_fareed_cast]",
+      "[proc,npc_druid_entangle]"
+    ],
+    "playerhit_n_melee": [
+      "[ai_opplayer2,slayer_dustdevil]",
+      "[proc,killerwatt_attack]"
+    ],
+    "playerhit_n_ranged": [
+      "[ai_applayer2,_snail]",
+      "[ai_applayer2,_troll_thrower]"
+    ],
+    "npc_player_hit_roll": [
+      "[proc,aberrant_attack]",
+      "[proc,chaos_druid_spell]",
+      "[proc,dt_fareed_cast]",
+      "[proc,dt_kamil_attack]",
+      "[proc,killerwatt_attack]",
+      "[proc,npc_druid_entangle]",
+      "[proc,npc_zap_attack]"
+    ],
+    "npc_spell_cast": [
+      "[proc,chaos_druid_spell]",
+      "[proc,dt_fareed_cast]",
+      "[proc,npc_druid_entangle]"
+    ],
+    "npc_combat_spell_checks": [
+      "[ai_applayer2,druid]",
+      "[ai_applayer2,wizard]",
+      "[ai_opplayer2,druid]",
+      "[proc,dt_fareed_cast]"
+    ],
+    "npc_debuff_allowed": [
+      "[proc,chaos_druid_spell]"
+    ],
+    "npc_spell_fail": [
+      "[proc,chaos_druid_spell]",
+      "[proc,dt_fareed_cast]",
+      "[proc,npc_druid_entangle]"
+    ],
+    "npc_stat_change_effect": [
+      "[proc,chaos_druid_spell]"
+    ]
+  }
+}

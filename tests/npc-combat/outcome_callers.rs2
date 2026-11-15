@@ -1,0 +1,31 @@
+// Compiled into a temporary test pack only. Each caller uses the returned
+// tuple and then applies a caller-local effect; a label jump cannot pass this.
+[proc,bc00_test_melee](int $maxhit, int $policy, boolean $protected_roll)(boolean, int, int, int, int)
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $ticks;
+$attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_default_attack_outcome($maxhit, $policy, $protected_roll);
+if ($attempted = true) stat_sub(defence, 1, 0);
+return($attempted, $accuracy, $rolled, $delivered, $ticks);
+
+[proc,bc00_test_ranged](int $maxhit, boolean $protected_roll, boolean $allow_null)(boolean, int, int, int, int)
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $ticks;
+$attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_rangeattack_outcome($maxhit, $protected_roll, $allow_null);
+if ($attempted = true) stat_sub(defence, 1, 0);
+return($attempted, $accuracy, $rolled, $delivered, $ticks);
+
+[proc,bc00_test_magic](int $spell, int $interval, int $maxhit, boolean $protected_roll)(boolean, int, int, int, int)
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $ticks;
+$attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_cast_spell_outcome($spell, $interval, $maxhit, $protected_roll);
+if ($attempted = true) stat_sub(defence, 1, 0);
+return($attempted, $accuracy, $rolled, $delivered, $ticks);

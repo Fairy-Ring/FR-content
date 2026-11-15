@@ -184,3 +184,57 @@ At the pinned engine, `Npc.ts:76-93` initializes levels from the spawned type. `
 ## Proof limits
 
 Exact skill and sequence assertions are packed-only. A generic fight proves none of them. The checker does not prove live HP-XP, prayer style, equipment mechanics, natural access, quest transformation, or drop weights. Later units must supply the plan's applicable live and compiled-runtime proofs separately.
+
+## Shared NPC outcome seam
+
+After building, run the registered real-VM suite:
+
+```sh
+node --import tsx ../content/tests/npc-combat/test_outcomes.mjs
+```
+
+It enumerates every named packed NPC's OPPLAYER2 and APPLAYER2 dispatch and
+follows compiled direct calls. `outcome-callers.json` registers external callers
+of shared attack segments. An unregistered caller or a dynamic call in an attack
+closure fails the suite. The inventory does not pin generated IDs, NPC counts,
+old bytecode or unrelated command traces.
+
+For every relevant NPC, the explicit entry with ordinary policy, no requested
+protected roll and strict presentation must match the ordinary wrapper's draws,
+queues, delays, HP/stat effects, modes, variables, messages and presentation.
+The suite also compiles `outcome_callers.rs2` into a disposable pack. Those callers
+consume all five returned primitives and then apply their own effect. Policy,
+latent protection, curses, freeze, independent null assets and distance-based
+delivery have separate cases. No server starts and no product pack is modified.
+
+Acceptance can compare a separately retained base script pack with the current
+pack in the same process. Configs and generated names must match both packs:
+
+```sh
+node --import tsx ../content/tests/npc-combat/test_outcomes.mjs \
+  --base-pack BASE_PACK_DIRECTORY --report EVIDENCE_JSON
+```
+
+The suite executes every resolved native attack entry and shared segment for
+the complete NPC inventory. Runtime-selected styles are checked under all three
+protections. Base-pack mode also compares every ordered non-bookkeeping command
+and its actual arguments/results, RNG cursor, queues and settled effects.
+Only typed script-reference IDs are resolved to compiled names, because clean
+pack builds renumber them; damage, actor IDs and other integers stay exact.
+The report records per-NPC cases and per-attack command costs, not stored expected
+combat values. `--focused` selects named development controls; CI and acceptance
+must omit it.
+
+The outcomes return `(attempted, accuracy, rolled, delivered, ticks)`. Accuracy is
+`-1` when no attempt is made, `0` for a miss and `1` for an accuracy success,
+including a zero magnitude. `ticks` is the native queued damage delay, or zero
+when no damage is queued. Melee readiness and presentation stay in
+`npc_default_attack`; its explicit twin is `npc_default_attack_outcome`.
+`npc_meleeattack_outcome` is the lower-level entry for a caller that already owns
+that boundary. Its policies are `0` ordinary, `1` equipment-free defence retaining
+level/prayer/style, and `2` unconditional accuracy with no accuracy draws.
+For policy 2 the caller supplies the protected maximum; the seam does not zero it.
+`npc_rangeattack_outcome` accepts maximum, request-protected-roll and
+allow-null-presentation. `npc_cast_spell_outcome` accepts spell, interval,
+forced maximum (null means the native spell row) and request-protected-roll.
+Ordinary public void entries remain strict and retain their native inputs.
