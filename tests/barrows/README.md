@@ -260,3 +260,11 @@ The collapse suite adds actual surface non-Barrows death and pre-loot deaths in 
 
 Separate mutants erase credit at post-death outside login, erase credit at return Dig, advance a non-Barrows death's generation or alter ordinary drop lifetime. Each fails the corresponding assertion. The headed case earns prior credit, receives natural lethal brother damage, retains the whole run through outside relog and real return Dig, and compares a second natural non-Barrows death. No product script, shared hook or stored inert trace changes. `lifecycle.evidence.txt` retains the native, mutant, gate and live identities.
 
+## Pre-loot teleport lifecycle (S20)
+
+`teleport-exits.evidence.txt` inventories the published standard and Ancient spells, accepted Teleother, charged jewellery, Ring of Life, enchanted lyre, Ectophial and random-event boundaries. Every successful exit uses the existing native mapzone departure. No tablet handler is invented. Ruling 2 records that the published random-event failure queue cannot reach its declared transport after clearing its own event field. Its repair belongs to the random-events track.
+
+The lifecycle suite executes 136 crypt/tunnel pre-loot cases over every configured Prayer remainder through the real normal spell, Ancient transport tail, portable Ectophial operation and random-event shared transport boundary. It checks exact whole-run and remainder preservation, owned-only cleanup, stopped presentation and timer, no outside or offline effects, native save/load/shared outside login, and genuine return with resumed inside drain. Paid shared-boundary controls from both origins retain actual earned treasure through the one paid reset.
+
+Separate mutants omit departure cleanup, erase earned credit, rearm Prayer at return or omit the paid reset. Each fails its named new S20 assertion. The headed normal-spell case reads ordinary rune costs and XP from current content, then proves departure, outside no-effects, clean outside relog and natural return. No shared file or stored inert-login trace changes. `lifecycle.evidence.txt` retains the native, mutant, gate and live identities.
+

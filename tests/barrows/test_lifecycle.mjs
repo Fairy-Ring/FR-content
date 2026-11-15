@@ -17,6 +17,7 @@ await run(async () => {
     eng('src/engine/entity/PlayerLoading.ts'), eng('src/engine/script/ScriptOpcode.ts'), eng('src/cache/config/VarSharedType.ts')
   ]);
   const { PlayerTimerType } = await eng('src/engine/entity/EntityTimer.ts');
+  const { PlayerStat } = await eng('src/engine/entity/PlayerStat.ts');
   VarSharedType.load(runtime.packDir);
   World.vars = new Int32Array(VarSharedType.count);
   const { unzipSync } = createRequire(path.join(runtime.engineRoot, 'package.json'))('fflate');
@@ -149,6 +150,22 @@ await run(async () => {
     assert.equal(p.activeScript, null, `${label}: no queued continuation`);
     assert.equal(p.delayed, false, `${label}: no delay`);
     assert.equal(state.activeLoc, chest, `${label}: the original native map parent stays active`);
+  }
+  function delayedScript(p, key, args = []) {
+    const script = ScriptProvider.getByName(key);
+    assert(script, `compiled native lifecycle script ${key}`);
+    const state = ScriptRunner.init(script, p, null, args);
+    p.executeScript(state, true);
+    for (let delay = 0; state.execution === ScriptState.SUSPENDED && delay < 20; delay++) {
+      World.currentTick = Math.max(World.currentTick + 1, p.delayedUntil);
+      p.delayed = false;
+      state.execution = ScriptState.RUNNING;
+      p.executeScript(state, true, true);
+    }
+    assert.equal(state.execution, ScriptState.FINISHED, `${key}: ordinary delays finish`);
+    assert.equal(p.activeScript, null, `${key}: no suspended continuation remains`);
+    assert.equal(p.delayed, false, `${key}: ordinary delay releases access`);
+    return state;
   }
 
   try {
@@ -392,6 +409,151 @@ await run(async () => {
     }
     assert.equal(remainderCases, c('barrows_prayer_interval_ticks') * c('barrows_collapse_interval_ticks'));
     console.log(`PASS S18 ${remainderCases} paid-inside shared logout/save/load/login remainder pairs: exact paid phase/frozen whole credit/escape locks and corner, native shake and first resumed callback, no RNG or new treasure, current-generation credit frozen, repeat Search pays nothing`);
+
+    const spellSource = fs.readFileSync(path.join(runtime.contentRoot,
+      'scripts/skill_magic/configs/magic_spells.dbrow'), 'utf8');
+    const lumbridge = spellSource.split('[magic_spell_teleport_lumbridge]')[1]?.split(/\n\[/)[0];
+    assert(lumbridge, 'S20 normal teleport fixture reads the current published spell row');
+    const runeFields = lumbridge.match(/^data=runesrequired,(.+)$/m)?.[1].split(',');
+    assert(runeFields && runeFields.length % 2 === 0, 'S20 normal spell declares rune pairs');
+    const spellRunes = [];
+    for (let i = 0; i < runeFields.length; i += 2) {
+      if (runeFields[i] !== 'null') spellRunes.push([ObjType.getId(runeFields[i]), Number(runeFields[i + 1])]);
+    }
+    const coord = text => {
+      assert.match(text, /^\d+(?:_\d+){4}$/);
+      const [level, mx, mz, x, z] = text.split('_').map(Number);
+      return { level, x: mx * 64 + x, z: mz * 64 + z, packed: CoordGrid.packCoord(level, mx * 64 + x, mz * 64 + z) };
+    };
+    const normalDestination = coord(lumbridge.match(/^data=tele_coord,(.+)$/m)[1]);
+    const ectophialSource = fs.readFileSync(path.join(runtime.contentRoot,
+      'scripts/quests/quest_ahoy/scripts/ahoy_ectophial.rs2'), 'utf8');
+    const portableDestination = coord(ectophialSource.match(/\bp_telejump\((\d+(?:_\d+){4})\)/)[1]);
+    World.gameMap.zonemap.beginInitialization();
+    for (const destination of [normalDestination, portableDestination]) {
+      const mx = destination.x >> 6, mz = destination.z >> 6;
+      const map = Object.fromEntries(['m', 'l', 'n', 'o'].map(kind => [kind, maps[`${kind}${mx}_${mz}`] ?? new Uint8Array()]));
+      World.gameMap.packed.set((mx << 8) | mz, map);
+      World.gameMap.loadPackedMapsquare(map, mx << 6, mz << 6);
+    }
+    World.gameMap.zonemap.endInitialization();
+    const cryptText = parseEnum(runtime.contentRoot, 'barrows_brother_crypt_entry').get('barrows_ahrim');
+    assert(cryptText, 'S20 return uses the original crypt entry');
+    const returnCrypt = coord(cryptText);
+    const transports = [
+      { name: 'normal spell', key: '[if_button,magic:lumbridge_teleport]', args: [],
+        seed: p => { for (const [id, count] of spellRunes) p.invAdd(inv, id, count); } },
+      { name: 'ancient shared transport', key: '[proc,player_teleport_ancient]', args: [normalDestination.packed], seed: () => {} },
+      { name: 'portable ectophial', key: '[opheld1,ectophial]', args: [],
+        seed: p => p.invAdd(inv, ObjType.getId('ectophial'), 1) },
+      // Ruling 2: the published random-event queue cannot reach this transport.
+      // Exercise its actual shared destination boundary without inventing a live event.
+      { name: 'random-event shared boundary', key: '[proc,p_telejump_safe]', args: [normalDestination.packed], seed: () => {} }
+    ];
+    const destinationHook = p => {
+      assert([...p.engineQueue.all()].some(request => request.script.name === '[mapzoneexit,0_55_151]'),
+        'S20 the actual native teleport queues the Barrows mapzone departure');
+      p.processEngineQueue();
+      assert.equal(runner.procInt(p, 'barrows_inside', [CoordGrid.packCoord(p.level, p.x, p.z)]), 0);
+    };
+    let teleportCases = 0;
+    for (const transport of transports) {
+      for (const level of [3, 0]) {
+        for (let remaining = 1; remaining <= c('barrows_prayer_interval_ticks'); remaining++) {
+          const label = `S20 ${transport.name} from level ${level} saved remainder ${remaining}`;
+          const p = makePlayer(`teleport_${teleportCases}`, level, level === 3 ? returnCrypt.x : 3551,
+            level === 3 ? returnCrypt.z : 9694);
+          begin(p);
+          for (const name of ['barrows_ahrim', 'barrows_rat']) {
+            const type = NpcType.getId(name);
+            runner.procVoid(p, 'barrows_credit', [p.getVar(vars.barrows_generation), type,
+              runner.procInt(p, 'barrows_npc_level', [type])]);
+          }
+          transport.seed(p);
+          runner.procVoid(p, 'barrows_prayer_set', [remaining]);
+          const before = words(p);
+          const owned = spawn(p, 'barrows_guthan', p.x + 2, p.z + 2);
+          const foreignBefore = words(b), foreignPackets = b.packets.length;
+          noBarrowsRandom(label, () => {
+            delayedScript(p, transport.key, transport.args);
+            destinationHook(p);
+          });
+          assert.deepEqual(words(p), before, `${label}: native departure preserves the whole unfinished run and both remainders`);
+          assert.equal(owned.isActive, false, `${label}: departure removes only the live owned actor`);
+          assert.equal(control.isActive, true, `${label}: foreign owner's actor remains`);
+          assert.deepEqual(words(b), foreignBefore, `${label}: foreign run is unchanged`);
+          assert.equal(b.packets.length, foreignPackets, `${label}: foreign presentation is unchanged`);
+          assert.equal(p.timers.has(timer.id), false, `${label}: native mapzone departure stops the runtime timer`);
+          assert.equal(p.packets.filter(packet => ['CamShake', 'CamReset'].includes(packet.constructor.name)).at(-1)?.constructor.name,
+            'CamReset', `${label}: native departure clears camera effects`);
+          const outsideItems = inventory(p), outsideLevels = [...p.levels];
+          for (let tick = 0; tick < c('barrows_prayer_interval_ticks') * 2; tick++) {
+            World.currentTick++;
+            p.processTimers(PlayerTimerType.NORMAL);
+            p.processQueues();
+          }
+          assert.deepEqual(words(p), before, `${label}: outside time consumes neither saved half`);
+          assert.deepEqual([...p.levels], outsideLevels, `${label}: outside time causes no damage or Prayer loss`);
+          noBarrowsRandom(`${label} outside logout`, () => lifecycle(p, 'logout'));
+          const save = p.save();
+          unregister(p);
+          World.currentTick += (c('barrows_prayer_interval_ticks') + c('barrows_collapse_interval_ticks')) * 4;
+          const outside = restore(p, save);
+          noBarrowsRandom(`${label} outside login`, () => lifecycle(outside, 'login'));
+          assert.deepEqual(words(outside), before, `${label}: outside save/load/login consumes no offline time or run fields`);
+          assert.equal(outside.timers.has(timer.id), false, `${label}: outside login cannot arm Barrows effects`);
+          assert.deepEqual(inventory(outside), outsideItems, `${label}: outside relog grants no treasure`);
+          assert.equal(outside.levels[PlayerStat.HITPOINTS], outsideLevels[PlayerStat.HITPOINTS]);
+          assert.equal(outside.levels[PlayerStat.PRAYER], outsideLevels[PlayerStat.PRAYER]);
+          noBarrowsRandom(`${label} real return`, () => {
+            delayedScript(outside, '[proc,barrows_dig_dest]', [returnCrypt.packed]);
+            if (level === 0) assert.equal(runner.procInt(outside, 'barrows_tunnel_enter',
+              [before.barrows_generation, runner.procInt(outside, 'barrows_tunnel_identity'), returnCrypt.packed]), 1);
+          });
+          assert.deepEqual(words(outside), before, `${label}: native return retains identity, topology, credit, phase, generation and exact remainders`);
+          assert.deepEqual(inventory(outside), outsideItems, `${label}: returning creates no recovery or reward items`);
+          assert.equal(outside.timers.get(timer.id)?.interval, 1, `${label}: return resumes exactly one NORMAL tick`);
+          World.currentTick++;
+          outside.processTimers(PlayerTimerType.NORMAL);
+          assert.equal(runner.procInt(outside, 'barrows_prayer_remaining'),
+            remaining === 1 ? c('barrows_prayer_interval_ticks') : remaining - 1,
+            `${label}: only the first resumed inside tick consumes the stored remainder`);
+          assert.equal(outside.levels[PlayerStat.PRAYER], outsideLevels[PlayerStat.PRAYER]
+            - (remaining === 1 ? c('barrows_prayer_base_drain') + brotherCount(outside) : 0),
+          `${label}: the resumed drain is the positive inside-only control`);
+          teleportCases++;
+        }
+      }
+    }
+    for (const level of [3, 0]) {
+      const paidBoundary = makePlayer(`paid_transport_${level}`);
+      begin(paidBoundary);
+      const earned = NpcType.getId('barrows_ahrim');
+      runner.procVoid(paidBoundary, 'barrows_credit', [paidBoundary.getVar(vars.barrows_generation), earned,
+        runner.procInt(paidBoundary, 'barrows_npc_level', [earned])]);
+      paidBoundary.teleport(3551, 9694, 0);
+      paidBoundary.setVar(vars.barrows_state, paidBoundary.getVar(vars.barrows_state) | (1 << c('barrows_solved_bit')));
+      nativeChest(paidBoundary, 'closed', 'S20 paid shared-boundary Open');
+      nativeChest(paidBoundary, 'open', 'S20 paid shared-boundary Search');
+      paidBoundary.teleport(level === 3 ? returnCrypt.x : 3551, level === 3 ? returnCrypt.z : 9694, level);
+      runner.procVoid(paidBoundary, 'barrows_prayer_set', [c('barrows_prayer_interval_ticks') - 1]);
+      runner.procVoid(paidBoundary, 'barrows_collapse_set', [c('barrows_collapse_interval_ticks') - 1]);
+      const before = words(paidBoundary), treasure = inventory(paidBoundary);
+      assert(treasure.some(([, items]) => items.some(Boolean)), 'S20 paid shared-boundary preservation has actual earned treasure');
+      const owned = spawn(paidBoundary, 'barrows_guthan', paidBoundary.x + 2, paidBoundary.z + 2);
+      delayedScript(paidBoundary, '[proc,p_telejump_safe]', [normalDestination.packed]);
+      destinationHook(paidBoundary);
+      assert.equal(runner.procInt(paidBoundary, 'barrows_phase'), c('barrows_phase_idle'),
+        `S20 paid shared transport from level ${level} invokes the single paid-departure reset`);
+      assert.equal(paidBoundary.getVar(vars.barrows_generation), before.barrows_generation + 1);
+      assert.equal(paidBoundary.getVar(vars.barrows_kills), 0);
+      assert.equal(paidBoundary.getVar(vars.barrows_countdowns), 0);
+      assert.equal(owned.isActive, false);
+      assert.equal(control.isActive, true);
+      assert.equal(paidBoundary.timers.has(timer.id), false);
+      assert.deepEqual(inventory(paidBoundary), treasure, 'S20 paid shared transport keeps all previously granted treasure');
+    }
+    console.log(`PASS S20 ${teleportCases} crypt/tunnel pre-loot transport/remainder cases: actual normal spell, ancient tail, portable ectophial and random-event shared boundary; native mapzone cleanup, exact whole run and remainders, outside/offline no effects, shared outside relog, real return and resumed inside drain; paid shared boundary resets both origins and keeps treasure`);
   } finally {
     for (const npc of [...World.npcs]) if (npc.isActive) World.removeNpc(npc, -1);
     for (const p of players) unregister(p);

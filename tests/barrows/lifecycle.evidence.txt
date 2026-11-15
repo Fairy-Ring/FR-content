@@ -136,3 +136,29 @@ Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a
 Own access, spade, hill position, stats, equipment and food only. Real Dig and ordinary Ahrim combat earn B=1. Disclosed own low-Hitpoints risk precedes real Dharok Search and natural lethal damage. Ordinary keep-three respawns outside. Whole earned run survives death, outside clean relog and real return Dig. A disclosed replacement spade is solely a return prerequisite, not a recovery or reward claim.
 The separate ordinary non-Barrows account receives natural lethal cow damage, retains the ordinary three highest-value items, respawns normally and leaves all Barrows words zero. No reward or recovery items are supplied by either death.
 All 24 PNGs viewed: paired first Dig, resident encounter/credit, disclosed lethal risk, natural zero-HP/ordinary respawn, outside relog, return Dig and independent ordinary cow control. Known OLD-client model/colour faults do not hide required scenes or native hit/item/run observations. Profiles deleted.
+
+S20 native pre-loot teleport lifecycle, 2026-11-15. No product change.
+The published exit inventory and scope limits are in teleport-exits.evidence.txt.
+136 actual transport/remainder cases span both crypt and tunnel; actual native mapzone cleanup, exact five words and remainders, foreign actor/word/packet controls, outside/offline no effects, shared outside save/load/login, real return and positive inside drain. Two paid shared-boundary cases preserve actual nonzero earned treasure through the canonical reset.
+logs/ci-s20/29-tests_barrows_test_lifecycle.mjs.log
+SHA-256 386e1fbf6b63a141108d133618fa8e5313793511beeb4ddb16ab267d927e070a.
+Omit native departure cleanup: logs/s20-mutant-cleanup-red.log
+SHA-256 60d9c4af0755778735c01852c9947aff5ef78098a8c84dbfcb1854e82ff7f501.
+Erase departure credit: logs/s20-mutant-credit-red.log
+SHA-256 575cd6bbee3d7e835c4855114a0c79b9b28c353dbea087206fdce5d6885d557b.
+Rearm Prayer at return Dig: logs/s20-mutant-return-red.log
+SHA-256 1a6e64de2401c73d6f688e61a2ea4b678f4847031fc7f44b51f2bb38a85dbd1c.
+Skip the paid-departure reset: logs/s20-mutant-paid-red.log
+SHA-256 e8629c2e93f5b90f36dc2141c12e9a57f6f9699a149066ee791ef454dfb5f820.
+The additional direct guarded-reset replacement fails owned-actor cleanup too: logs/s20-mutant-reset-red.log, same output hash as the omitted-cleanup mutant. It never proves an unguarded reset.
+Every temporary product edit restored exactly: logs/s20-mutants-restored.log. Restored area and Dig LSP diagnostics are OK.
+logs/s20-gates.log and logs/s20-ci.log: clean pack, build, rs2check, all 99 registered tests, varp and unchanged client/config exit 0. rs2check: zero errors and warnings, 15081 scripts. Required client/config SHA-256 b6ec704421650ee5527e77c635b8b3a8036f6eb042c572516ac0696cfbce19a8.
+Ruling 2: the published random-event failure teleport does not operate. Its actual p_telejump_safe boundary is proved from both origins pre-loot and paid. No macro_events.rs2 change or fabricated live event.
+
+S20 headed natural live: PASS all 10 checks, no live failure.
+Content d04ce48a53ebee1ec3f2fc1bb6577ec469c78300; engine 15301127e60ff6ef3d7d2547b084de15fb565338; cell 05901ef3a418e47cea92c59375ff6d35f63d109e.
+live/s20/S20-new-1794741887035.json
+SHA-256 edb6394a39398bcd8834316d099962b61739ceb5fbb2eba3f67d7d0ffed2754e.
+Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
+Own access, spade, surface hill position, stats, gear, food and current normal-spell runes only. First Dig and ordinary Ahrim combat earn B=1. Selected descent precedes the genuine normal Lumbridge spell: exact current rune payment, ordinary Magic XP and surface arrival. All four stable words survive. Outside ticks and a clean outside relog cause no damage, Prayer loss, shake, reward or saved-countdown consumption. Real return Dig/descent retains the same earned unfinished run and topology.
+All 22 PNGs viewed: paired first Dig, resident encounter/credit, descent, real spell/arrival, outside control, clean outside relog and real return. Known OLD-client model/colour faults do not hide required scenes or native item/XP/run observations. Profile deleted. Online remainders advance normally.
