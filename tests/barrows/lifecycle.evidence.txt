@@ -59,3 +59,29 @@ Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a
 Own fixtures: access, spade, hill position, combat stats, equipment and food.
 First real Dig; actual Ahrim kill for B=1; selected crypt Search and Continue; connected saved layout and real SE ladder at 3568,9677,0; clean pre-loot relog; exact four stable words, tile and native ladder child; real Climb-up and another natural descent retain the unfinished run as the no-reset control.
 All sixteen PNGs viewed: paired first Dig, raised/credited resident, descent, clean tunnel relog, ladder return and natural re-entry. Online Prayer remainder may advance normally; no exact live remainder equality is claimed.
+
+S17 native open-unlooted lifecycle, 2026-11-15. No product change.
+Every partial B=0..5; actual native Open, shared logout/save/load/login, original Search child, exact five-word credit/layout/remainder preservation without payment or Barrows RNG; closed, generation, square, solved and paid gates; explicit eligible partial-B Search with no final-death prerequisite.
+logs/ci-s17/29-tests_barrows_test_lifecycle.mjs.log
+SHA-256 a2b07ca9900aa0af457ac14c80fe1b3adec129d5ccf4fb2c65c523a2267e74d6.
+Login clears open visual mutant: logs/s17-mutant-closed-red.log
+SHA-256 b551c3c1633ce512aa8c5e9e87316298fc0cab5411fcbd194349ff1d417cadd9.
+Login auto-payment mutant: logs/s17-mutant-autopay-red.log
+SHA-256 94e487450369bc099cc2968684f049f06e1f44aa7533fb25c06c50867148d557.
+Search requires B=6 mutant: logs/s17-mutant-full-B-red.log
+SHA-256 167f9d6d25483d7fc3eaaa58430e2397f8c8781e65d730f63d922b353386cdb0.
+Each fails its named S17 assertion. Temporary shared-login/chest edits restored exactly: logs/s17-mutants-restored.log.
+logs/s17-gates.log and logs/s17-ci.log: clean pack, build, rs2check, all 99 registered tests, varp transmission and unchanged client/config exit 0.
+
+S17 retained first headed failure:
+live/s17/S17-new-1794738740041.json
+SHA-256 5a883f6ed8be42a2244694d5bd90d329a51974cf000701b6a7a13fc43e78f171.
+CELL/OBSERVATION: floor Bones retained object, count and world tile but changed scene-local coordinates after relog. Inventory and all stable run words were identical. All 26 PNGs viewed. Corrected only floor observation identity, retaining object, quantity and world-tile equality; changed-object/count/tile controls each reject.
+
+S17 headed corrected live: PASS all 17 checks.
+Content d04ce48a53ebee1ec3f2fc1bb6577ec469c78300; engine 15301127e60ff6ef3d7d2547b084de15fb565338; cell 43a4970023da3aa3660a17cf8c1b6d661752e469.
+live/s17-world-floor/S17-new-1794739290935.json
+SHA-256 093d8c714e08f08eb0fd37aa9d8b6f7f006fe6e8c60a8cffc0913c14c7048d3d.
+Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
+Own access, spade, hill position, combat stats, equipment and food only. Real Dig, descent, doors, combat and rendered puzzle reach Open. Earned B=2/count=5 survives the clean open-unlooted relog with the same tile, original Search child and all four stable words, without any inventory or floor payment. Explicit partial-B Search then grants 1252 coins and 290 mind runes and transitions to paid exactly once.
+All 28 PNGs viewed, including paired Open, final credit, clean relog and explicit Search. The old-client model fault does not hide the required chest/count and native item readbacks.

@@ -133,6 +133,23 @@ await run(async () => {
     assert.equal(p.timers.get(timer.id)?.interval, 1, 'native presentation starts one repeating tick');
   }
 
+  const chest = World.getLoc(3551, 9695, 0, LocType.getId('barrows_stone_chest'));
+  assert(chest, 'the actual original map chest is loaded for lifecycle dispatch');
+  const chestParent = LocType.get(chest.baseType);
+  const displayedChest = p => LocType.get(chestParent.multiloc[p.getVarBit(chestParent.multivarbit)]);
+  function nativeChest(p, expected, label) {
+    p.target = chest;
+    p.targetOp = ServerTriggerType.OPLOC1 - 7;
+    const script = p.getOpTrigger();
+    assert.equal(script?.name, `[oploc1,barrows_stone_chest_${expected}]`, `${label}: native dispatch selects the real shown child`);
+    const state = ScriptRunner.init(script, p, chest, []);
+    p.executeScript(state, true);
+    assert.equal(state.execution, ScriptState.FINISHED, `${label}: the real chest operation completes synchronously`);
+    assert.equal(p.activeScript, null, `${label}: no queued continuation`);
+    assert.equal(p.delayed, false, `${label}: no delay`);
+    assert.equal(state.activeLoc, chest, `${label}: the original native map parent stays active`);
+  }
+
   try {
     const a = makePlayer('crypt');
     const b = makePlayer('control');
@@ -240,6 +257,71 @@ await run(async () => {
     assert.deepEqual(words(tunnelRelog), tunnelWords, 'S16 natural return preserves the exact unfinished topology/count/remainders');
     assert.deepEqual([tunnelRelog.level, tunnelRelog.x, tunnelRelog.z], landing, 'S16 natural return uses the same stored corner');
     console.log('PASS S16 native selected-tunnel descent/shared logout/save/load/login and ladder/return control: exact topology, original corner/locks, B=2/count=3, all durable words, remainder, no new RNG or payment');
+
+    const identities = ['ahrim', 'dharok', 'guthan', 'karil', 'torag', 'verac'];
+    for (let killed = 0; killed < c('barrows_identity_count'); killed++) {
+      const label = `S17 partial B=${killed}`;
+      const opened = makePlayer(`open_${killed}`);
+      begin(opened);
+      for (const name of identities.slice(0, killed)) {
+        const type = NpcType.getId(`barrows_${name}`);
+        runner.procVoid(opened, 'barrows_credit', [opened.getVar(vars.barrows_generation), type,
+          runner.procInt(opened, 'barrows_npc_level', [type])]);
+      }
+      opened.teleport(3551, 9694, 0);
+      opened.setVar(vars.barrows_state, opened.getVar(vars.barrows_state) | (1 << c('barrows_solved_bit')));
+      assert.equal(brotherCount(opened), killed, `${label}: independently proc-earned brother count`);
+      const closedWords = words(opened), closedItems = inventory(opened);
+      assert.equal(displayedChest(opened).op[0], 'Open', `${label}: starts with the real closed child`);
+      noBarrowsRandom(`${label} closed Search gate`, () => {
+        assert.equal(runner.procInt(opened, 'barrows_chest_search_allowed', [opened.getVar(vars.barrows_generation)]), 0);
+        runner.procVoid(opened, 'barrows_chest_search', [chest.baseType, CoordGrid.packCoord(chest.level, chest.x, chest.z)]);
+      });
+      assert.deepEqual(words(opened), closedWords, `${label}: Search before Open changes no durable word`);
+      assert.deepEqual(inventory(opened), closedItems, `${label}: Search before Open pays nothing`);
+      nativeChest(opened, 'closed', `${label} Open`);
+      assert.equal(displayedChest(opened).op[0], 'Search', `${label}: Open selects the original Search child`);
+      assert.equal(runner.procInt(opened, 'barrows_phase'), c('barrows_phase_unlooted'), `${label}: Open is not payment`);
+      assert.equal(brotherCount(opened), killed, `${label}: Open does not credit its forced final`);
+      assert.equal(range(opened.getVar(vars.barrows_kills), 'count'), killed, `${label}: Open changes no displayed kill count`);
+      assert.equal(range(opened.getVar(vars.barrows_kills), 'potential'),
+        range(closedWords.barrows_kills, 'potential'), `${label}: Open changes no potential`);
+      assert.deepEqual(inventory(opened), closedItems, `${label}: Open grants no treasure`);
+      const openWords = words(opened);
+      noBarrowsRandom(`${label} open-unlooted shared logout`, () => lifecycle(opened, 'logout'));
+      assert.deepEqual(words(opened), openWords, `${label}: logout retains open visual and whole earned run`);
+      const openSave = opened.save();
+      unregister(opened);
+      World.currentTick += c('barrows_prayer_interval_ticks') * 4;
+      const openRelog = restore(opened, openSave);
+      noBarrowsRandom(`${label} open-unlooted shared login`, () => lifecycle(openRelog, 'login'));
+      assert.deepEqual(words(openRelog), openWords, `${label}: native relog retains open visual, whole credit and exact remainder`);
+      assert.equal(displayedChest(openRelog).op[0], 'Search', `${label}: relog resolves the actual open Search child`);
+      assert.deepEqual(inventory(openRelog), closedItems, `${label}: open-unlooted relog pays nothing`);
+      noBarrowsRandom(`${label} Search generation gate`, () => {
+        assert.equal(runner.procInt(openRelog, 'barrows_chest_search_allowed', [openRelog.getVar(vars.barrows_generation) + 1]), 0);
+      });
+      openRelog.teleport(3553, 9694, 0);
+      noBarrowsRandom(`${label} Search operating-square gate`, () => nativeChest(openRelog, 'open', `${label} wrong-square Search`));
+      assert.deepEqual(words(openRelog), openWords, `${label}: wrong-square Search changes no durable word`);
+      assert.deepEqual(inventory(openRelog), closedItems, `${label}: wrong-square Search pays nothing`);
+      openRelog.teleport(3551, 9694, 0);
+      openRelog.setVar(vars.barrows_state, openRelog.getVar(vars.barrows_state) & ~(1 << c('barrows_solved_bit')));
+      noBarrowsRandom(`${label} Search solved gate`, () => nativeChest(openRelog, 'open', `${label} unsolved Search`));
+      assert.deepEqual(inventory(openRelog), closedItems, `${label}: unsolved Search pays nothing`);
+      openRelog.setVar(vars.barrows_state, openWords.barrows_state);
+      assert.equal(runner.procInt(openRelog, 'barrows_chest_search_allowed', [openRelog.getVar(vars.barrows_generation)]), 1,
+        `${label}: partial-B Search remains eligible after relog without a final-kill prerequisite`);
+      nativeChest(openRelog, 'open', `${label} authorized Search`);
+      assert.equal(runner.procInt(openRelog, 'barrows_phase'), c('barrows_phase_paid'), `${label}: explicit Search alone pays the run`);
+      assert.equal(openRelog.getVar(vars.barrows_kills) >>> 0, openWords.barrows_kills, `${label}: payment preserves whole earned credit and open visual`);
+      if (killed > 0) assert.notDeepEqual(inventory(openRelog), closedItems, `${label}: real nonzero-potential Search grants treasure`);
+      const paidOpenWords = words(openRelog), paidOpenItems = inventory(openRelog);
+      noBarrowsRandom(`${label} paid repeat gate`, () => nativeChest(openRelog, 'open', `${label} repeat Search`));
+      assert.deepEqual(words(openRelog), paidOpenWords, `${label}: paid repeat Search changes no durable word`);
+      assert.deepEqual(inventory(openRelog), paidOpenItems, `${label}: paid repeat Search pays nothing`);
+    }
+    console.log('PASS S17 all partial B=0..5: native Open distinct from payment, actual open visual/shared relog/exact credit and remainder, closed/generation/square/solved/paid Search gates, real one-time authorized Search without a final-kill prerequisite');
   } finally {
     for (const npc of [...World.npcs]) if (npc.isActive) World.removeNpc(npc, -1);
     for (const p of players) unregister(p);
