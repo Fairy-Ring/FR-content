@@ -162,3 +162,43 @@ SHA-256 edb6394a39398bcd8834316d099962b61739ceb5fbb2eba3f67d7d0ffed2754e.
 Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
 Own access, spade, surface hill position, stats, gear, food and current normal-spell runes only. First Dig and ordinary Ahrim combat earn B=1. Selected descent precedes the genuine normal Lumbridge spell: exact current rune payment, ordinary Magic XP and surface arrival. All four stable words survive. Outside ticks and a clean outside relog cause no damage, Prayer loss, shake, reward or saved-countdown consumption. Real return Dig/descent retains the same earned unfinished run and topology.
 All 22 PNGs viewed: paired first Dig, resident encounter/credit, descent, real spell/arrival, outside control, clean outside relog and real return. Known OLD-client model/colour faults do not hide required scenes or native item/XP/run observations. Profile deleted. Online remainders advance normally.
+
+S21 native two-player isolation, 2026-11-15. No product change.
+tests/barrows/test_isolation.mjs:193-371 and its registered workflow line.
+Actual matching-generation owners, native actor constructors/attack gates/death producers, mixed-owner/map shared room cap, native personal Open/Search, owned-only paid exit, shared B save/load/login, real private/public Take and captured native stale queues. Five B words, its items, actors at both levels, packets and queue remain isolated. Original global loc handlers retain their effects under observation and record no mutation.
+logs/ci-s21/30-tests_barrows_test_isolation.mjs.log
+SHA-256 80e62a96413a40341c2d9fd9726d494622a38f86ac49bdce66dcaee194397faa.
+The initial native fixture did not rebuild B's scene, so even public Take refused. The corrected fixture uses the real BuildArea.rebuild, not altered pickup behavior.
+logs/s21-native-first.log SHA-256 793fa5bc1e4c7120932bc597226d07957ed82d5d73999c36673ec1a010c31dbc.
+Eight independently rejected product mutants:
+Global resident suppression: logs/s21-mutant-resident-red.log
+SHA-256 652abc802c7e40c1510ed1935ac093296ad7a8f06e2ea37f864a8d0c0079d150.
+Foreign attack admission: logs/s21-mutant-attack-red.log
+SHA-256 93ce18f236d7e0be49762b7865a02a339416071851f4f0920c4570d45577ed4d.
+Foreign credit routing: logs/s21-mutant-recipient-red.log
+SHA-256 0f3f403cd1e362badb83cf1894c2b1e4651dafdea824890cc73b2f34edd57272.
+Foreign cleanup: logs/s21-mutant-cleanup-red.log
+SHA-256 a3a07259b07fac135900114d68dc1fefcc21dfa1f72105f328cbb8d9af2b5220.
+Owner-only room count: logs/s21-mutant-room-red.log
+SHA-256 f4df7aba0047745cb1e234f81802b91fbb129627e1a66062defebe1755d63ca9.
+Stale kill credit: logs/s21-mutant-kill-red.log
+SHA-256 d0bf90c50b685ec9d77c343ad91e23b6a9faa4930f98543d2c0d056b635e1448.
+Stale collapse damage: logs/s21-mutant-hit-red.log
+SHA-256 45a050f2525423f29eca873fe21b775aa14efe52896148d69d1bd2c783b81334.
+Global chest mutation: logs/s21-mutant-global-red.log
+SHA-256 dee7b43492bb34c52aee8a7b7f7cbe5bfdab61c4ff8727c52366fb2f0c3d29dd.
+Every temporary edit restored exactly: logs/s21-mutants-restored.log. All six restored RuneScript files have OK LSP diagnostics. No permanent shared-file or stored inert-login-trace change.
+logs/s21-gates.log and logs/s21-ci.log: clean pack, build, rs2check, all 100 registered tests, varp and unchanged client/config exit 0. rs2check: zero errors and warnings, 15081 scripts. Required client/config SHA-256 b6ec704421650ee5527e77c635b8b3a8036f6eb042c572516ac0696cfbce19a8.
+
+S21 headed natural two-account live: PASS all 43 checks, no live failure.
+Content d04ce48a53ebee1ec3f2fc1bb6577ec469c78300; engine 15301127e60ff6ef3d7d2547b084de15fb565338; executed cell dd20eff9a7f6dc28f6986ffdb96e625fee97c0da.
+live/s21/S21-new-1794743950544.json
+SHA-256 37772d74b877c1af6aded7fab9a992457944251fc465c5ec358e4d96f77fe1d6.
+Served crc: 40 bytes, SHA-256 8e365f8b3eaa75a54cd6bb551d2976f6714978e7ffc8dc3d7a77ce4a79e52714.
+Own access, spade, surface hill position, stats, equipment and food only. Fourteen labelled additional own spades fill A's remaining bag slots before actual Search. No run, layout, actor, RNG or reward is seeded.
+Two naturally raised Ahrims coexist in one crypt. B's foreign attack earns no XP or credit; each real own kill credits only its owner. A's NE and B's NW routes use their own saved doors and rendered real puzzle buttons to reach the same central room. A Open leaves B's personal chest closed.
+A's actual B=2/count=9/C=634 Search puts 694 coins and 315 mind runes on A's private floor. B initially sees neither and receives no grant. A fresh native six-point collapse hit reduces A's HP66 to60 while B has no hit, shake, payment or run change.
+After ordinary engine reveal, B's genuine Take receives the 315 mind runes without a Barrows grant or credit change. A flees by native Walk/Open/Eat, ladder and stair. A alone resets to generation 3 and zero credit. B retains its B=2/count=5/C=394 unfinished run, closed personal chest and ordinary picked-up runes through clean relog and the post-exit no-foreign-callback control.
+All 110 PNGs viewed: paired first Digs, common crypt/residents, foreign refusal, own kills, both descents/routes/combat/puzzles, common room, separate chest children, final credit, full-bag Search/private floor, A-only hit, ordinary public Take, A flight/ladder/stair/surface, B relog and final control. OLD-client faults limit item/model authenticity, not the required scene/count/puzzle and native item/hit/run observations. Profile deleted.
+Post-run observation correction, cell 02d76e4770f7d223d37d62daa746619d3bd7f33e: the floor comparator now reads native row.tile.x/z/level instead of undefined row.x/z/level. The original PASS did compare item and quantity but did not compare actual world coordinates.
+The actual corrected comparator and wait predicate pass against the retained original private/public receipt; independent changed object, quantity, x, z and level controls fail. logs/s21-observation-world-tile.log SHA-256 e94bc86fc218449f53af4d4af91f7f4deb2d1eb9905f9d356abfbcb57137ca29. Node syntax check passed. No second live run or rewritten executed-cell identity is claimed.

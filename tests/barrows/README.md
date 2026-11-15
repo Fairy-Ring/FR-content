@@ -268,3 +268,15 @@ The lifecycle suite executes 136 crypt/tunnel pre-loot cases over every configur
 
 Separate mutants omit departure cleanup, erase earned credit, rearm Prayer at return or omit the paid reset. Each fails its named new S20 assertion. The headed normal-spell case reads ordinary rune costs and XP from current content, then proves departure, outside no-effects, clean outside relog and natural return. No shared file or stored inert-login trace changes. `lifecycle.evidence.txt` retains the native, mutant, gate and live identities.
 
+## Two-player isolation (S21)
+
+```sh
+node --import tsx ../content/tests/barrows/test_isolation.mjs
+```
+
+Two registered native players begin with matching generations. Actual owned actor construction, reciprocal attack admission and NPC death producers keep their residents and credit separate. Mixed-owner and ordinary map occupants share only the room-cap calculation. Native personal Open, full-bag Search and paid stair departure change no unfinished peer word, item, actor or presentation packet. Shared logout/save/load/login preserves B's unfinished run without a Barrows draw. Original global loc handlers retain their effects under observation and record no mutation.
+
+Actual Take refuses the private overflow throughout the engine's first 99 elapsed ticks. The ordinary engine reveals it at tick 100. B's real shared Take then receives exactly the public stack without Barrows credit. This is ordinary floor ownership, not a new Barrows restriction. Captured native old kill and timer-hit requests stay on A and reject after reset and another run. A fresh native hit remains the positive control.
+
+Eight separate mutants fail named assertions: global resident suppression, foreign attack admission, foreign credit routing, foreign cleanup, owner-only room counting, stale kill credit, stale collapse damage and global chest mutation. The headed two-account case reaches the common crypt and chest room naturally, forces A's genuine reward onto a full-bag private floor, lets B take the ordinary public runes, and preserves B's unfinished run through A's paid exit and B's clean relog. `lifecycle.evidence.txt` records the exact heads, all 110 viewed frames, native gates and the post-run world-tile observation correction.
+

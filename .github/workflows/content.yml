@@ -176,6 +176,7 @@ jobs:
           run_test tests/barrows/test_collapse.mjs node --import tsx ../content/tests/barrows/test_collapse.mjs
           run_test tests/barrows/test_leave.mjs node --import tsx ../content/tests/barrows/test_leave.mjs
           run_test tests/barrows/test_lifecycle.mjs node --import tsx ../content/tests/barrows/test_lifecycle.mjs
+          run_test tests/barrows/test_isolation.mjs node --import tsx ../content/tests/barrows/test_isolation.mjs
           run_test tests/citizen-tables/test_citizen_tables.mjs node --import tsx ../content/tests/citizen-tables/test_citizen_tables.mjs
           run_test tests/cfg-other/test_cfg_other.mjs node --import tsx ../content/tests/cfg-other/test_cfg_other.mjs
           run_test tests/npc-death/test_npc_death.mjs node --import tsx ../content/tests/npc-death/test_npc_death.mjs
