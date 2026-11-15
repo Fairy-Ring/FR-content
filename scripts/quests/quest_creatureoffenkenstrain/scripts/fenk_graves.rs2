@@ -24,6 +24,12 @@ if (inv_total(inv, spade) < 1 & inv_total(worn, spade) < 1) {
     mes("You need a spade to dig.");
     return;
 }
+// CANDIDATE started-step gate: operator recollection + original 377 bit 193.
+// Held/handed-in heads retain the published empty-grave commands.
+if (loc_coord = 0_56_54_24_35 & %fenk_spoken_to_gardener = 0 & inv_total(inv, fenk_head_empty) = 0 & inv_total(inv, fenk_head_full) = 0 & %fenk_head = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
 anim(human_dig, 0);
 p_delay(1);
 mes("You start digging...");

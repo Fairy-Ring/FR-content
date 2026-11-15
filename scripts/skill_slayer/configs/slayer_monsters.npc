@@ -6,6 +6,16 @@ walkanim=cave_slime_walks
 readyanim=cave_slime_idle
 op2=Attack
 vislevel=23
+// S01: period HP conflict resolved to 25 by M1; skills CANDIDATE.
+attack=13
+strength=13
+defence=35
+hitpoints=25
+magic=13
+param=slayer_category,^slayer_caveslime
+// slayer.s01-cave-slime-poison-severity: initial poison damage 3.
+param=poison_severity,15
+param=poison_without_damage,yes
 
 [swamp_cave_bug]
 name=Cave Bug
@@ -300,6 +310,12 @@ walkanim=slayer_harpie_swarm
 readyanim=slayer_harpie_swarm
 op2=Attack
 vislevel=46
+// S01: near-target RuneHQ HP 25; individual skills CANDIDATE.
+attack=54
+strength=46
+defence=32
+hitpoints=25
+param=slayer_category,^slayer_harpiebugswarm
 
 [slayer_crawling_hand_1]
 name=Crawling Hand
@@ -1381,6 +1397,12 @@ walkanim=dustdevil_walk
 readyanim=dustdevil_ready
 op2=Attack
 vislevel=93
+// S01: period HP 105 VERIFIED; individual skills CANDIDATE.
+attack=105
+strength=70
+defence=40
+hitpoints=105
+param=slayer_category,^slayer_dustdevil
 
 [smoke_devil]
 name=Smokedevil
