@@ -13,7 +13,7 @@ if ($chest ! barrows_stone_chest | $anchor ! 0_55_151_31_31) return;
 if (~barrows_chest_authorized(%barrows_generation) = false | %barrows_chest_open = 1) return;
 def_int $identity = ~barrows_tunnel_identity;
 def_npc $brother = enum(int, npc, barrows_identity_brother, $identity);
-if (~barrows_brother_slain($identity) = false & ~barrows_chest_brother_find($brother) = false) {
+if (~barrows_brother_slain($identity) = false & ~barrows_brother_find($brother) = false) {
     // Forced final encounters do not draw D4 outcomes or use its room cap.
     def_coord $tile = ~barrows_door_tile(coord, $brother);
     if ($tile = null) return;
@@ -23,19 +23,6 @@ if (~barrows_brother_slain($identity) = false & ~barrows_chest_brother_find($bro
     npc_setmode(opplayer2);
 }
 %barrows_chest_open = 1;
-
-// A lethal hit queues death before its credit arrives. The still-active owned
-// actor suppresses another final, including that pending-death interval.
-[proc,barrows_chest_brother_find](npc $brother)(boolean)
-.npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
-while (.npc_findnext = true) {
-    if (.npc_type = $brother & .%npc_barrows_owner = uid & .%npc_barrows_generation = %barrows_generation & ~barrows_inside(.npc_coord) = true) return(true);
-}
-.npc_findallany(3_55_151_32_32, ^barrows_actor_scan_radius, 0);
-while (.npc_findnext = true) {
-    if (.npc_type = $brother & .%npc_barrows_owner = uid & .%npc_barrows_generation = %barrows_generation & ~barrows_inside(.npc_coord) = true) return(true);
-}
-return(false);
 
 // S11/S12 attach Search here; neither a final kill nor B=6 is required.
 // No player operation calls this gate or the protected payment latch yet.

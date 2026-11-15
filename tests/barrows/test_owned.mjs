@@ -8,6 +8,12 @@ await run(async () => {
   const runtime = await loadPackedRuntime(parseOptions());
   const { World, Loc, LocType, NpcType, VarPlayerType, VarNpcType, ScriptProvider, ScriptRunner, ScriptState, EntityLifeCycle, NpcMode, allocateIfAbsent, CoordGrid } = runtime;
   const { changeLocCollision, isMapBlocked, isLineOfWalk } = await import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/GameMap.ts')).href);
+  const [{ default: ServerTriggerType }, { NpcStatMap }] = await Promise.all([
+    import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/script/ServerTriggerType.ts')).href),
+    import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/entity/NpcStat.ts')).href)
+  ]);
+  const hpIndex = NpcStatMap.get('HITPOINTS');
+  assert.notEqual(hpIndex, undefined, 'native hitpoint identity exists');
   for (const name of ['barrows_sarc_search', 'barrows_brother_identity', 'barrows_brother_slain', 'barrows_brother_find', 'barrows_actor_spawn', 'barrows_actor_attackable', 'barrows_actor_tick']) {
     assert(ScriptProvider.getByName(`[proc,${name}]`), `compiled S03 proc missing [proc,${name}]`);
   }
@@ -33,10 +39,20 @@ await run(async () => {
   const snapshot = player => Object.fromEntries(Object.entries(vars).map(([name, id]) => [name, player.getVar(id) >>> 0]));
   const players = [];
   function player(label, identity = 3, gen = 7) {
-    const p = makePlayer(label, 3, 3556, 9714);
-    p.slot = p.pid = p.uid = players.length + 1;
+    const serial = players.length + 1;
+    const p = new runtime.Player(`barrows_owned_${label}_${serial}`, BigInt(serial), 0x100000000000000n + BigInt(serial));
+    [p.level, p.x, p.z] = [3, 3556, 9714];
+    p.slot = p.pid = serial;
+    p.uid = (Number(p.username37 & 0x1fffffn) << 11) | serial;
+    p.messages = [];
+    p.packets = [];
+    p.write = packet => p.packets.push(packet);
+    p.messageGame = message => p.messages.push(message);
+    p.wrappedMessageGame = message => p.messages.push(message);
     p.isActive = true;
     World.players[p.slot] = p;
+    World.playerLoop.add(0x70000000n + BigInt(serial), p);
+    assert.equal(World.getPlayerByHash64(p.hash64), p, 'normal killer attribution resolves the registered owner');
     players.push(p);
     p.setVar(vars.barrows_state, 0x12340008 | identity);
     p.setVar(vars.barrows_generation, gen);
@@ -141,6 +157,56 @@ await run(async () => {
       search(p, index);
       assert.equal(owned(p).length, 0, 'paid Search never creates a crypt encounter');
     }
+    // Player hits normally enter AI_QUEUE2. This packed witness starts at its
+    // real lethal damage, then uses the one owner-interaction window before
+    // the genuine AI_QUEUE3 and owner-credit queues run.
+    for (let index = 0; index < rows.length; index++) {
+      const identity = index + 1;
+      const p = player(`pending_${identity}`, identity === 6 ? 1 : identity + 1, 400 + identity);
+      approach(p, index);
+      const resident = addNpc(`barrows_${rows[index][0]}`, 3, p.uid, p.x, p.z + 1).npc;
+      resident.setVar(generation, p.getVar(vars.barrows_generation));
+      resident.levels[hpIndex] = 1;
+      resident.heroPoints.addHero(p.hash64, 1);
+      const hit = ScriptRunner.init(ScriptProvider.getByName('[proc,npc_default_damage]'), resident, null, [1]);
+      resident.executeScript(hit);
+      assert.equal(hit.execution, ScriptState.FINISHED, 'compiled ordinary lethal damage completes');
+      assert.equal(resident.levels[hpIndex], 0, 'real lethal damage leaves the resident at zero HP');
+      assert(Array.from(resident.queue.all()).some(request => request.queueId === ServerTriggerType.AI_QUEUE3), 'real death request is pending');
+      assert.equal(procInt(p, 'barrows_brother_slain', [identity]), 0, 'the lethal hit has not yet credited');
+      const before = snapshot(p);
+      const beforeActors = actors();
+      search(p, index);
+      assert.deepEqual(actors(), beforeActors, `S03 repair: crypt ${identity} pending death suppresses a duplicate`);
+      assert.deepEqual(snapshot(p), before, 'the pending-death Search grants and mutates nothing');
+      let turns = 0;
+      while ((resident.isActive || Array.from(p.queue.all()).length) && turns < 12) {
+        World.currentTick++;
+        if (resident.isActive) resident.turn();
+        p.processQueues();
+        turns++;
+      }
+      assert(turns < 12, 'ordinary death and owner credit finish within the fixture bound');
+      assert.equal(resident.isActive, false, 'ordinary death removes the original resident');
+      assert.equal(procInt(p, 'barrows_brother_slain', [identity]), 1, 'only the original death credits the identity');
+      assert.equal(p.getVar(vars.barrows_kills) >>> 17, 1, 'exactly one displayed kill is earned');
+      assert.equal((p.getVar(vars.barrows_kills) >>> 6) & 1023, NpcType.get(resident.type).vislevel, 'exactly one brother level is earned');
+      for (const negative of ['foreign', 'stale']) {
+        p.setVar(vars.barrows_kills, 0);
+        const dead = addNpc(`barrows_${rows[index][0]}`, 3, negative === 'foreign' ? players[0].uid : p.uid, p.x, p.z + 1).npc;
+        dead.setVar(generation, p.getVar(vars.barrows_generation) - (negative === 'stale' ? 1 : 0));
+        dead.levels[hpIndex] = 0;
+        const old = new Set(actors());
+        search(p, index);
+        const spawned = actors().filter(npc => !old.has(npc));
+        assert.equal(spawned.length, 1, `${negative} zero-HP crypt actor does not suppress this owner/current run`);
+        assert.equal(spawned[0].getVar(owner), p.uid);
+        assert.equal(spawned[0].getVar(generation), p.getVar(vars.barrows_generation));
+        World.removeNpc(spawned[0], -1);
+        World.removeNpc(dead, -1);
+      }
+      console.log(`PASS S03 pending death: crypt identity=${identity}, native death/credit turns=${turns}, foreign/stale controls`);
+    }
     const enclosed = player('enclosed_ring', 3, 777);
     approach(enclosed, 1);
     const clippedRing = [];
@@ -232,6 +298,10 @@ await run(async () => {
   } finally {
     for (const loc of sarcs) clipSarc(loc, false);
     for (const npc of Array.from(World.npcs)) if (npc.isActive) World.removeNpc(npc, -1);
-    for (const p of players) delete World.players[p.slot];
+    for (const p of players) {
+      delete World.players[p.slot];
+      p.unlink();
+      p.isActive = false;
+    }
   }
 });

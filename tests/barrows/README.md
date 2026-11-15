@@ -47,6 +47,8 @@ node --import tsx ../content/tests/barrows/test_owned.mjs
 
 This check executes all six packed Search handlers with native loc/NPC fixtures. It covers the original slain joins, selected/credited suppression, private immutable owner and captured generation, both shared attack gates, independent owners, cleanup and uncredited retry. The fixtures apply each packed sarcophagus's real shape, rotation and clipping; native NPC turns must begin ordinary combat. Placement uses an open ring around the owner's legal approach tile, never a line back into the clipped coffin. A sealed-ring control rejects the native origin-return sentinel. Other terrain remains a natural-live concern. Mutable combat targeting does not make a map monster an owned summon. Brother combat styles and special attacks remain outside this group.
 
+The common finder counts active own/current-generation actors, including the one owner interaction between lethal damage and queued credit. All six crypt witnesses execute real lethal damage, native Search, death turns and owner credit. Foreign-owner and stale-generation zero-HP actors remain negative controls. Neither the sarcophagus nor the chest needs a living-only finder.
+
 Each crypt summon says the exact CANDIDATE 2007-base line and immediately targets its searching owner, following the published Rashiliyia minion convention. All six packed handlers prove that a second player on the owner's tile is not targeted. The speech is an OSRS-documentation fallback, not verified 377 wording; the period Tip.It guide separately verifies the immediate-attack statement. S08 uses the same owned constructor for door encounters.
 
 The shared actor constructor returns a native NPC UID, or null on refusal. Presentation callers bind it with `npc_finduid` before reading or changing the active NPC; they do not assume that a proc call exports its pointer state. Its owner/generation admission and the common attackability/timer guards are unchanged.
@@ -148,7 +150,7 @@ node --import tsx ../content/tests/barrows/test_chest.mjs --regression --baselin
 
 Set `BASELINE_PACK` to the saved pre-S10 pack for the second command. It must fail on the unchanged native chest-open bit, before any S10 procedure lookup. The normal command runs the complete encounter, gate and lifecycle cases.
 
-The original closed chest's native Open requires an unlooted, positive-generation run, the solved puzzle and one of its two original south-side approach squares. It sets only the original chest-open bit. An uncredited tunnel identity is forced without the D4 draw or room cap, unless this owner already has that active brother in the same generation, in the crypts or tunnels. That includes the interval between lethal damage and queued credit. Foreign owners and stale generations do not suppress the encounter. This S10 lookup does not change the sarcophagus's living-only rule. Placement reuses the complete native door-tile validation; a failed placement leaves the chest closed for a natural retry. Repeated Open creates no duplicate.
+The original closed chest's native Open requires an unlooted, positive-generation run, the solved puzzle and one of its two original south-side approach squares. It sets only the original chest-open bit. An uncredited tunnel identity is forced without the D4 draw or room cap, unless this owner already has that active brother in the same generation, in the crypts or tunnels. The shared finder includes the interval between lethal damage and queued credit. Foreign owners and stale generations do not suppress the encounter. Placement reuses the complete native door-tile validation; a failed placement leaves the chest closed for a natural retry. Repeated Open creates no duplicate.
 
 The forced actor uses the shared owner/generation constructor and targets the owner. Its 1,000-tick lifetime and reused 0-to-2 placement policy are UNKNOWN engineering choices. The exact challenge, "You dare steal from us!", is a CANDIDATE later reconstruction, not verified 377 wording.
 
@@ -157,6 +159,8 @@ The forced actor uses the shared owner/generation constructor and targets the ow
 ## Shared login compatibility
 
 `test_core.mjs` executes the real protected login twice for identical native accounts with all Barrows fields unset. The first run uses the built pack unchanged. The second replaces only `barrows_resume` in memory with a return-only proc, then restores it. Every varp, outgoing packet, message, interface, tab and final coordinate must match. The registered run reads no frozen published values and imports no other unit's test runtime.
+
+Each login observation pins both `Math.random` and the engine's `JavaRandom.nextDouble`, then restores both in its `finally`. An unrelated shared-login random message must compare equal. A new message in the Barrows hook must still fail.
 
 Optionally compare the head's login with an independently built published pack in the same run:
 

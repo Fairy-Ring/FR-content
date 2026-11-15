@@ -19,17 +19,17 @@ if ($identity < 1 | $identity > ^barrows_identity_count) return(false);
 if (testbit(%barrows_kills, calc(^barrows_slain_start + $identity - 1)) = 1) return(true);
 return(false);
 
-// The primary NPC pointer is preserved. A foreign owner or an old generation
-// never suppresses this owner's current encounter.
+// Preserve the primary pointer. Active owned actors suppress a duplicate even
+// between lethal damage and queued credit; foreign owners and old runs do not.
 [proc,barrows_brother_find](npc $brother)(boolean)
 if (%barrows_generation <= 0) return(false);
 .npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
 while (.npc_findnext = true) {
-    if (.npc_type = $brother & .%npc_barrows_owner = uid & .%npc_barrows_generation = %barrows_generation & .npc_stat(hitpoints) > 0 & ~barrows_inside(.npc_coord) = true) return(true);
+    if (.npc_type = $brother & .%npc_barrows_owner = uid & .%npc_barrows_generation = %barrows_generation & ~barrows_inside(.npc_coord) = true) return(true);
 }
 .npc_findallany(3_55_151_32_32, ^barrows_actor_scan_radius, 0);
 while (.npc_findnext = true) {
-    if (.npc_type = $brother & .%npc_barrows_owner = uid & .%npc_barrows_generation = %barrows_generation & .npc_stat(hitpoints) > 0 & ~barrows_inside(.npc_coord) = true) return(true);
+    if (.npc_type = $brother & .%npc_barrows_owner = uid & .%npc_barrows_generation = %barrows_generation & ~barrows_inside(.npc_coord) = true) return(true);
 }
 return(false);
 
