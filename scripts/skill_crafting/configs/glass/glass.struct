@@ -3,12 +3,14 @@ param=productexp,175
 param=product,beer_glass
 param=productmessage,a beer glass
 
+// CANDIDATE crafting.lantern-glass-products; retain the published 19.5 XP conflict.
 [candle_lantern_empty]
 param=levelrequire,4
 param=productexp,195
 param=product,candle_lantern_empty
 param=productmessage,a candle lantern
 
+// CANDIDATE crafting.lantern-glass-products.
 [oil_lamp_empty]
 param=levelrequire,12
 param=productexp,250
@@ -33,6 +35,7 @@ param=productexp,525
 param=product,stafforb
 param=productmessage,an orb
 
+// CANDIDATE crafting.lantern-glass-products.
 [bullseye_lantern_lens]
 param=levelrequire,49
 param=productexp,550

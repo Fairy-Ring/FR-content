@@ -96,9 +96,11 @@ if (inv_total(inv, hammer) < 1) {
 //set varps
 %smithbars = inv_total(inv, struct_param($struct, namedobj));
 %modified_smith = $player_level;
-// CANDIDATE: use the cache's lantern-label gate for the reconstructed recipe.
+// VERIFIED smithing.lantern-frames; the original label reads if2.
 %if2 = 0;
 if ($last_item = iron_bar & $player_level >= db_getfield(oil_lantern_frame, smithing:levelrequired, 0) & %smithbars >= db_getfield(oil_lantern_frame, smithing:bar_amount, 0)) {
+    %if2 = 1;
+} else if ($last_item = steel_bar & $player_level >= db_getfield(bullseye_lantern_nolens, smithing:levelrequired, 0) & %smithbars >= db_getfield(bullseye_lantern_nolens, smithing:bar_amount, 0)) {
     %if2 = 1;
 }
 // Check if tourist trap is completed before sending white text option on darts
@@ -132,11 +134,15 @@ if ($last_item ! steel_bar) {
 } else {
     if_sethide (smithing:stud_layer, false);
 }
-// hide lantern frame if its not iron
-if ($last_item ! iron_bar) {
-    if_sethide (smithing:com_145, true);
+// The cache's lantern layer serves both original frame inventories.
+if ($last_item = iron_bar) {
+    if_sethide(smithing:com_145, false);
+    if_settext(smithing:com_148, "Oil lantern frame");
+} else if ($last_item = steel_bar) {
+    if_sethide(smithing:com_145, false);
+    if_settext(smithing:com_148, "Bullseye lantern");
 } else {
-    if_sethide (smithing:com_145, false);
+    if_sethide(smithing:com_145, true);
 }
 // hide claws button if death plateau is not complete
 if(%death_equiproom < ^death_complete) {
@@ -177,6 +183,7 @@ switch_obj ($last_item)
         inv_transmit(smithing_steel4, smithing:column4);
         inv_transmit(smithing_steel5, smithing:column5);
         inv_transmit(smithing_steel_claws, smithing:column_claws);
+        inv_transmit(smithing_lamp_steel, smithing:com_147);
     case mithril_bar :
         %modified_smith = calc($player_level - 49);
         inv_transmit(smithing_mithril1, smithing:column1);

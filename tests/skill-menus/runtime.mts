@@ -316,7 +316,7 @@ function openGlass(): { player: Player; state: ScriptState } {
   p.lastItem = requiredId("glassblowingpipe");
   p.lastUseItem = requiredId("molten_glass");
   p.lastUseSlot = 1;
-  return { player: p, state: startMenu(p, "[opheldu,glassblowingpipe]") };
+  return { player: p, state: start(p, "[opheldu,glassblowingpipe]") };
 }
 
 function openDhide(leather: string): { player: Player; state: ScriptState } {
@@ -426,16 +426,29 @@ try {
     assertCrafted(p, menu.log, menu.result, menu.resultCount);
   }
 
-  // Glass-blowing's ordinary held-item trigger and all three published models.
-  const glassProducts: MenuProduct[] = [
-    { object: "beer_glass", x: 0, y: 5, scale: 200, label: labels("Beer Glass") },
-    { object: "vial_empty", x: 2, y: 10, scale: 180, label: labels("Vial") },
-    { object: "stafforb", x: 2, y: -10, scale: 200, label: labels("Orb") },
+  // Glass uses its original seven-product cache interface, not skillmulti3.
+  const glassProducts = [
+    { object: "beer_glass", model: 5, x: 220, y: 73, scale: 338, button: 21, label: labels("Beer Glass") },
+    { object: "vial_empty", model: 3, x: 57, y: 76, scale: 346, button: 13, label: labels("Vial") },
+    { object: "stafforb", model: 4, x: 142, y: 52, scale: 293, button: 17, label: labels("Orb") },
   ];
   const glass = openGlass();
-  assertMenuPackets(glass.player, 0, 3, glassProducts, defaultPrompt);
-  pressMenuButton(glass.player, glass.state, 3, 0, 3, 1, false);
+  assert.equal(glass.state.execution, ScriptState.FINISHED, "glass opens a persistent interface without a paused chooser");
+  const glassRoot = Component.get(requiredComponent("glass_crafting"));
+  assert.equal(glass.player.modalMain, glassRoot.id, "original glass interface is open");
+  for (const product of glassProducts) {
+    const model = Component.get(requiredComponent(`glass_crafting:com_${product.model}`));
+    const index = glassRoot.childId!.indexOf(model.id);
+    assert(index >= 0, "glass model belongs to original interface");
+    assert.deepEqual([glassRoot.childX![index], glassRoot.childY![index]], [product.x, product.y], `${product.object} original position`);
+    assert.equal(model.model, ObjType.get(requiredId(product.object)).model, `${product.object} original display model`);
+    assert.equal(model.zoom, product.scale, `${product.object} original scale`);
+    assert.equal(Component.get(requiredComponent(`glass_crafting:com_${product.button}`)).text, product.label, `${product.object} original label`);
+  }
+  const glassXp = glass.player.stats[PlayerStat.CRAFTING];
+  assert(button.handle(new IfButton(requiredComponent("glass_crafting:com_21")), glass.player), "original glass Make 1 packet accepted");
   assertCrafted(glass.player, "molten_glass", "beer_glass");
+  assert.equal(glass.player.stats[PlayerStat.CRAFTING] - glassXp, 175, "glass experience is unchanged");
 
   // Dragonhide dispatch derives four color-specific product sets from the pack.
   const dhideColors = [
@@ -499,18 +512,18 @@ try {
   assert.equal(retained.resumeButtons.length, 4);
   pressMenuButton(retained, retainedState, 1, 0, 3, 1);
   assertReturnedObject(retainedState, retainedObject);
-  // One shared skillmulti3 client root receives two real caller menus in order.
-  // The second menu must replace all three prior labels rather than inherit any.
+  // Glass's persistent interface must not contaminate the next pottery chooser.
+  // Same-root skillmulti3 resets remain covered by pottery/dhide -> fletching.
   const shared = player();
   add(shared, "glassblowingpipe", 1);
   add(shared, "molten_glass", 1);
   shared.lastItem = requiredId("glassblowingpipe");
   shared.lastUseItem = requiredId("molten_glass");
   shared.lastUseSlot = 1;
-  const firstSharedPacket = packetLog.get(shared)!.length;
-  const firstShared = startMenu(shared, "[opheldu,glassblowingpipe]");
-  assertMenuPackets(shared, firstSharedPacket, 3, glassProducts, defaultPrompt);
-  pressMenuButton(shared, firstShared, 3, 0, 3, 1, false);
+  const firstShared = start(shared, "[opheldu,glassblowingpipe]");
+  assert.equal(firstShared.execution, ScriptState.FINISHED);
+  assert.equal(shared.modalMain, requiredComponent("glass_crafting"));
+  assert(button.handle(new IfButton(requiredComponent("glass_crafting:com_21")), shared));
   assertCrafted(shared, "molten_glass", "beer_glass");
   add(shared, "softclay", 1);
   shared.lastUseItem = requiredId("softclay");
