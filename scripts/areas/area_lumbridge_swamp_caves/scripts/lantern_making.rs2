@@ -55,11 +55,12 @@ switch_obj(last_useitem) {
 if (%lamp_oil_still_state = 0) return;
 // UNKNOWN crafting.lantern-assembly-xp-timing, named engineering defaults.
 def_int $slot = last_useslot;
+def_obj $container = last_useitem;
 def_int $delay = ^lantern_fill_delay;
 def_int $xp = ^lantern_fill_extra_xp;
 if ($delay > 0) p_delay(sub($delay, 1));
 // Inventory drags can move or swap the used container during the approach.
-if (inv_getobj(inv, $slot) ! last_useitem) return;
+if (inv_getobj(inv, $slot) ! $container) return;
 inv_setslot(inv, $slot, $product, 1);
 %lamp_oil_still_state = 0;
 if ($xp > 0) stat_advance(crafting, $xp);
