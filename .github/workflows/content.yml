@@ -172,6 +172,7 @@ jobs:
           run_test tests/wanted/records.mjs node --import tsx ../content/tests/wanted/records.mjs
           run_test tests/drop-tables/test_kalphite_queen.mjs node --import tsx ../content/tests/drop-tables/test_kalphite_queen.mjs
           run_test tests/fenkenstrain-completion/test_fenk_handlers.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_handlers.mjs
+          run_test tests/fenkenstrain-completion/test_fenk_head_gate.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_head_gate.mjs
           run_test tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs
           run_test tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_follower_dialogue_follow.mjs
           run_test tests/fenkenstrain-completion/test_fenk_gardener_move.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_gardener_move.mjs
