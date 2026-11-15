@@ -155,11 +155,6 @@ default=0
 type=int
 default=0
 
-[poison_without_damage]
-type=boolean
-default=no
-autodisable=yes
-
 // npcs that reduces the players max hit. Such as strange plant
 [max_dealt]
 type=int
