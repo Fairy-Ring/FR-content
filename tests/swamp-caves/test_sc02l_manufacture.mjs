@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
-import { World, PlayerLoading, Packet, PlayerStat, ScriptState, ScriptProvider, types, id, obj, inv, player, seed, inventory, count, slotOf, use, held, execute, button, inputCount, invButton, useLoc, weakCount, tick, settle } from './runtime.mjs';
+import { World, PlayerLoading, Packet, PlayerStat, ScriptState, ScriptProvider, types, id, obj, inv, player, seed, inventory, count, slotOf, use, held, execute, button, inputCount, invButton, useLoc, beginLocUse, dragInventory, interactionTick, weakCount, tick, settle } from './runtime.mjs';
 
 const cave = id('VarPlayerType', 'goblin_caves');
 const learned = id('VarBitType', 'know_how_to_make_lanterns');
@@ -203,6 +203,25 @@ test('iron/steel layer label and inventory are refreshed on each opening; other 
   }
 });
 
+for (const [bar, label, frameInv, level, available] of [
+  ['steel_bar', 'Bullseye lantern', 'smithing_lamp_steel', 30, 0],
+  ['steel_bar', 'Bullseye lantern', 'smithing_lamp_steel', 48, 0],
+  ['steel_bar', 'Bullseye lantern', 'smithing_lamp_steel', 49, 1],
+  ['iron_bar', 'Oil lantern frame', 'smithing_lamp_iron', 15, 0],
+  ['iron_bar', 'Oil lantern frame', 'smithing_lamp_iron', 25, 0],
+  ['iron_bar', 'Oil lantern frame', 'smithing_lamp_iron', 26, 1]
+]) test(`${bar}: Smithing ${level} sends the frame label/inventory with if2=${available}`, () => {
+  const p = fixture(['hammer', bar], { smith: level });
+  p.setVar(id('VarPlayerType', 'if2'), 1); // An unavailable opening must reset it.
+  openSmithing(p, bar);
+  assert.equal(p.getVar(id('VarPlayerType', 'if2')), available);
+  const layer = p.packets.find(packet => packet.constructor.name === 'IfSetHide' && packet.component === id('Component', 'smithing:com_145'));
+  assert(layer); assert.equal(Boolean(layer.hidden), false, 'under-level frame remains visible');
+  const text = p.packets.find(packet => packet.constructor.name === 'IfSetText' && packet.component === id('Component', 'smithing:com_148'));
+  assert.equal(text?.text, label, 'label sent even when unavailable');
+  assert(p.invListeners.some(listener => listener.com === id('Component', 'smithing:com_147') && listener.type === id('InvType', frameInv)), 'original frame inventory transmitted even when unavailable');
+});
+
 for (const [part, frame, product, craft, fm] of assemblies) {
   test(`${product}: both input directions, full bag, exact state, immediate zero-XP assembly`, () => {
     for (const reverse of [false, true]) {
@@ -265,6 +284,46 @@ for (const [empty, filled, lit, option] of containers) {
     for (const wrong of [filled, lit]) { const prepared = snapshot(p); atStill(p, wrong); conserved(p, prepared); }
     assert.equal(p.getVarBit(oil), 1);
   });
+}
+
+for (const [empty, filled] of [containers[0], containers[3]]) {
+  for (const adjacent of [false, true]) {
+    for (const swap of [false, true]) test(`${empty}: ${adjacent ? 'adjacent same-tick use/drag' : 'real approach walk/drag'} to ${swap ? 'own sapphire' : 'empty slot'} conserves one container and dose`, () => {
+      const p = fixture(['swamp_tar', empty, 'sapphire']);
+      atStill(p, 'swamp_tar'); assert.equal(p.getVarBit(oil), 1);
+      const before = snapshot(p);
+      const approach = { x: still.x, z: still.z - 1 };
+      if (!adjacent) { p.x = 2933; p.z = 3207; }
+      const start = [p.x, p.z], from = slotOf(p, empty), to = swap ? slotOf(p, 'sapphire') : 20;
+      assert(beginLocUse(p, empty, still, approach));
+      assert(p.target, 'use remains armed before player processing');
+      if (!adjacent) {
+        assert(p.hasWaypoints(), 'production MOVE_OPCLICK path queued');
+        for (let cycles = 0; p.x === start[0] && p.z === start[1] && cycles < 4; cycles++) interactionTick(p);
+        assert.notDeepEqual([p.x, p.z], start, 'real movement before drag');
+        assert.notDeepEqual([p.x, p.z], [approach.x, approach.z], 'drag occurs before arrival');
+        assert.equal(count(p, filled), 0); assert.equal(p.getVarBit(oil), 1);
+      }
+      assert(dragInventory(p, from, to), 'real InvButtonD accepted');
+      assert.equal(inventory(p)[to]?.name, empty, 'container moved by inventory script');
+      assert.equal(inventory(p)[from]?.name ?? null, swap ? 'sapphire' : null);
+      assert(p.target, 'inventory drag does not cancel the armed use');
+      for (let cycles = 0; p.target && cycles < 30; cycles++) interactionTick(p);
+      assert.equal(p.target, null, 'interaction finishes within the original bound');
+      assert.deepEqual([p.x, p.z], [approach.x, approach.z], 'natural south approach reached');
+      // One tar -> one dose -> one filled container. Object settlement may
+      // relocate that container, but cannot duplicate it or overwrite a swap.
+      const totals = state => state.filter(Boolean).map(({ name, count }) => `${name}:${count}`).sort();
+      assert.deepEqual(totals(inventory(p)), totals(before.items.map(item => item?.name === empty ? { ...item, name: filled } : item)), 'exact inventory multiset: only the empty container becomes filled');
+      assert.equal(count(p, empty), 0); assert.equal(count(p, filled), 1);
+      assert.equal(count(p, 'sapphire'), 1); assert.equal(count(p, 'swamp_tar'), 0);
+      const vars = [...before.vars]; vars[cave] &= ~(1 << types.VarBitType.get(oil).startbit);
+      assert.deepEqual([...p.vars], vars, 'only the single dose is spent');
+      assert.deepEqual([...p.stats], before.xp); assert.deepEqual(p.messages, []);
+      seed(p, [empty]); const spent = snapshot(p); atStill(p, empty); conserved(p, spent);
+      assert.equal(count(p, filled), 1, 'same dose cannot fill a second container');
+    });
+  }
 }
 test('wrong material or Regicide still consumes neither tar, prepared oil nor containers', () => {
   const p = fixture(['swamp_tar', 'hammer', 'regicide_barrel_tar', 'oil_lamp_empty']);

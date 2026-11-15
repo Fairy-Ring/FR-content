@@ -42,6 +42,11 @@ const ResumePCountDialog = await defaultExport('network/game/client/model/Resume
 const countHandler = new (await defaultExport('network/game/client/handler/ResumePCountDialogHandler.ts'))();
 const OpLocU = await defaultExport('network/game/client/model/OpLocU.ts');
 const locUseHandler = new (await defaultExport('network/game/client/handler/OpLocUHandler.ts'))();
+const MoveClick = await defaultExport('network/game/client/model/MoveClick.ts');
+const moveHandler = new (await defaultExport('network/game/client/handler/MoveClickHandler.ts'))();
+const InvButtonD = await defaultExport('network/game/client/model/InvButtonD.ts');
+const dragHandler = new (await defaultExport('network/game/client/handler/InvButtonDHandler.ts'))();
+const { CoordGrid } = await load('engine/CoordGrid.ts');
 export function id(kind, name) {
   const value = types[kind].getId(name);
   assert(value >= 0, `missing packed ${kind} ${name}`);
@@ -166,6 +171,28 @@ export function useLoc(p, item, loc, clientType = loc.type) {
   const accepted = locUseHandler.handle(new OpLocU(loc.x, loc.z, clientType, obj(item), slotOf(p, item), invCom), p);
   if (accepted) p.processInteraction();
   return accepted;
+}
+// Unlike useLoc(), leave the interaction armed so input can arrive during its
+// real approach walk, or in the same input phase before adjacent processing.
+export function beginLocUse(p, item, loc, approach) {
+  p.originX = p.x; p.originZ = p.z;
+  if (p.x !== approach.x || p.z !== approach.z) {
+    const route = [...map.findPath(p.level, p.x, p.z, approach.x, approach.z)].map(coord => {
+      const { x, z } = CoordGrid.unpackCoord(coord);
+      return { x, z };
+    });
+    assert(route.length > 0, 'client approach route exists');
+    assert(moveHandler.handle(new MoveClick(route, 0, true), p), 'MOVE_OPCLICK accepted');
+  }
+  return locUseHandler.handle(new OpLocU(loc.x, loc.z, loc.type, obj(item), slotOf(p, item), invCom), p);
+}
+export function dragInventory(p, from, to) {
+  return dragHandler.handle(new InvButtonD(invCom, from, to, 0), p);
+}
+export function interactionTick(p) {
+  tick(p);
+  p.processInteraction();
+  p.resetEntity(false); // World end-of-cycle reset, including movement state.
 }
 export const weakCount = p => [...p.weakQueue.all()].length;
 export function tick(p) {
