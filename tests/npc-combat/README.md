@@ -184,3 +184,90 @@ At the pinned engine, `Npc.ts:76-93` initializes levels from the spawned type. `
 ## Proof limits
 
 Exact skill and sequence assertions are packed-only. A generic fight proves none of them. The checker does not prove live HP-XP, prayer style, equipment mechanics, natural access, quest transformation, or drop weights. Later units must supply the plan's applicable live and compiled-runtime proofs separately.
+
+## Shared NPC outcome seam
+
+After building, run the registered real-VM suite:
+
+```sh
+node --import tsx ../content/tests/npc-combat/test_outcomes.mjs
+```
+
+It enumerates every named packed NPC's OPPLAYER2 and APPLAYER2 dispatch and
+follows compiled direct calls. `outcome-callers.json` registers external callers
+of shared attack segments. An unregistered caller or a dynamic call in an attack
+closure fails the suite. The inventory does not pin generated IDs, NPC counts,
+old bytecode or unrelated command traces.
+
+For every relevant NPC, the explicit entry with ordinary policy, no requested
+protected roll and strict presentation must match the ordinary wrapper's draws
+(each RANDOM/RANDOMINC command, operands and results), queues, delays, HP/stat
+effects, modes, variables, messages and presentation.
+The suite also compiles `outcome_callers.rs2` into a disposable pack. Those callers
+consume all five returned primitives and then apply their own effect. Policy,
+latent protection, curses, freeze, independent null assets and distance-based
+delivery have separate cases. No server starts and no product pack is modified.
+
+Acceptance can compare a separately retained base script pack with the current
+pack in the same process. Configs and generated names must match both packs:
+
+```sh
+node --import tsx ../content/tests/npc-combat/test_outcomes.mjs \
+  --base-pack BASE_PACK_DIRECTORY --report EVIDENCE_JSON
+```
+
+The suite executes every resolved native attack entry and shared segment for
+the complete NPC inventory. Runtime-selected styles are checked under all three
+protections. Base-pack mode also compares every ordered non-bookkeeping command
+and its actual arguments/results, RNG cursor, queues and settled effects.
+Only typed script-reference IDs are resolved to compiled names, because clean
+pack builds renumber them; damage, actor IDs and other integers stay exact.
+The report records per-NPC cases and per-attack command costs, not stored expected
+combat values. `--focused` selects named development controls; CI and acceptance
+must omit it.
+
+The positional hit/zero/miss vectors above are input controls, not proof that
+each dispatch route reached the named branch. `outcome-route-seeds.json` adds
+uninterrupted RNG seeds for every unique compiled dispatch route, including
+routes that first draw a spell or style. Its fixtures use native equipment and
+quest state, then compute the player's cached defence with `player_combat_stat`.
+Each seed asserts the actual reached accuracy/damage branch. Base-pack mode
+compares these executions too. The manifest lists why a branch cannot exist:
+strict null ranged presentation for guard2, a missing native magic row for
+Nezikchened's AP route, non-damaging Bind/Confuse for chaos druid's AP route,
+and no accuracy roll for the troll thrower and snail routes. These native
+limitations are preserved, not repaired by the seam.
+
+The outcomes return `(attempted, accuracy, rolled, delivered, ticks)`. Accuracy is
+`-1` when no attempt is made, `0` for a miss and `1` for an accuracy success,
+including a zero magnitude. `ticks` is the native queued damage delay, or zero
+when no damage is queued. `npc_default_attack_ready()` exposes the native melee
+readiness and presentation without accuracy. It returns only `attempted` and
+draws nothing. A policy-selecting caller draws only after it returns true, then
+calls `npc_meleeattack_outcome`. `npc_default_attack_outcome` composes those two
+entries when no pre-accuracy choice is needed. The ordinary `npc_default_attack`
+keeps its original prefix. For every type reaching that ordinary attack, the full
+ordered readiness events must equal the same-length ordinary prefix in the
+admitted state and each refusal, including player death with an action delay
+still pending. The melee outcome policies are `0` ordinary, `1`
+equipment-free defence retaining
+level/prayer/style, and `2` unconditional accuracy with no accuracy draws.
+For policy 2 the caller supplies the protected maximum; the seam does not zero it.
+`npc_rangeattack_outcome` accepts maximum, request-protected-roll and
+allow-null-presentation. `npc_cast_spell_outcome` accepts spell, interval,
+forced maximum (null means the native spell row), request-protected-roll and
+protected-success-effects. Both booleans default to false at each caller.
+The latter also requests latent accuracy. On protected accuracy success it
+uses the native success presentation, retaliation, stat and freeze effects
+exactly once, with the original maximum's one latent magnitude but no damage
+or poison queue. Off retains the native failure splash. A latent miss always
+uses native failure. Neither input is read by the ordinary wrappers.
+Protected successes also retain the ordinary success's `lastcombat`,
+`aggressive_npc` and `npc_attacking_uid` writes.
+Ordinary public void entries remain strict and retain their native inputs.
+
+Admission controls refuse player death, pending delay, player combat/PvP
+ownership, NPC combat ownership, existing freeze and each existing debuff.
+Armour-only controls include defensive stance and Defence prayer. The compiled
+Verac consumer proves the readiness → chance → accuracy boundary and protected
+special cap independently of any published NPC.
