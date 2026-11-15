@@ -4,6 +4,10 @@ cam_reset;
 
 %musicplay = 1; // set to auto on login
 %currentsong = null;
+
+// Original cave state is permanent. Brightness and gas are session state only.
+%darkness_level = 0;
+%swamp_gas_turns = 0;
 if (%option_brightness = 0) {
     // sane defaults for game controls
     %option_brightness = 2;

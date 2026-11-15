@@ -73,6 +73,12 @@ for (const name of policy.inheritedPermanent) {
   requirePermanent(policy.renamed[name] ?? name, `origin/289 ${policy.referenceCommit}`);
 }
 
+// This original declaration moved out of all.varp, but remains in this policy.
+requirePermanent('goblin_caves', 'durable personal cave learning, rope and oil state');
+const caves = VarPlayerType.getByName('goblin_caves');
+assert.equal(caves?.id, 425, 'the original goblin_caves slot must not move');
+assert.equal(caves.transmit, true, 'retain the original cave client readers');
+
 // Inspect packed POP instructions, not a source-assignment regex: tuple
 // assignments, secondary player pointers and varbit writes all count.
 const names = new Set([...fs.readFileSync(path.join(CONTENT_ROOT, 'scripts/_unpack/377/all.varp'), 'utf8').matchAll(/^\[([^\]\r\n]+)\]/gm)].map(match => match[1]));

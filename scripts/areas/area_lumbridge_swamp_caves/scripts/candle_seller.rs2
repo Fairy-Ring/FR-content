@@ -1,0 +1,81 @@
+// CANDIDATE speech: lumbridge-swamp-caves.dlg.candle-seller.
+// Period price/service VERIFIED. The fourth opening choice is the labelled
+// 2022 repeat-transcript candidate. Bit 284 has no authenticated semantics.
+[opnpc1,swamp_candle_guy]
+~chatnpc("<p,neutral>Do you want a lit candle for 1000 gold?");
+def_int $choice;
+if (%know_how_to_make_lanterns = 0) {
+    $choice = ~p_choice3("Yes please.", 1, "One thousand gold?!", 2, "No thanks, I'd rather curse the darkness.", 3);
+} else {
+    $choice = ~p_choice4("Yes please.", 1, "One thousand gold?!", 2, "No thanks, I'd rather curse the darkness.", 3, "How do you make lanterns?", 4);
+}
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Yes please.");
+    @swamp_candle_purchase;
+} else if ($choice = 2) {
+    @swamp_candle_price;
+} else if ($choice = 4) {
+    @swamp_candle_teaching;
+}
+@swamp_candle_decline;
+
+[label,swamp_candle_price]
+~chatplayer("<p,neutral>One thousand gold?!");
+~chatnpc("<p,neutral>Look, you're not going to be able to survive down that hole without a light source.");
+~chatnpc("<p,neutral>So you could go off to the candle shop to buy one more cheaply. You could even make your own lantern which is a lot better.");
+~chatnpc("<p,neutral>But I bet you want to find out what's down there right now, don't you? And you can pay me 1000 gold for the privilege!");
+def_int $choice = ~p_choice3("All right, you win, I'll buy a candle.", 1, "No way.", 2, "How do you make lanterns?", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>All right, you win, I'll buy a candle.");
+    @swamp_candle_purchase;
+} else if ($choice = 3) {
+    @swamp_candle_teaching;
+}
+~chatplayer("<p,neutral>No way.");
+
+[label,swamp_candle_purchase]
+// Check the complete exchange before changing either item. Removing the final
+// coin stack can free the candle's slot. Unknown full-bag wording prints nothing.
+def_int $coins = inv_total(inv, coins);
+if ($coins < 1000) {
+    ~chatplayer("<p,neutral>But I don't have that kind of money on me.");
+    ~chatnpc("<p,neutral>Well then, no candle for you!");
+    return;
+}
+if (inv_freespace(inv) = 0 & $coins > 1000) {
+    return;
+}
+inv_del(inv, coins, 1000);
+inv_add(inv, lit_candle, 1);
+~chatnpc("<p,neutral>Here you go then.");
+~chatnpc("<p,neutral>I should warn you, though, it can be dangerous to take a naked flame down there. You'd be better off making a lantern.");
+def_int $choice = ~p_choice3("What's so dangerous about a naked flame?", 1, "How do you make lanterns?", 2, "Thanks, bye.", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>What's so dangerous about a naked flame?");
+    ~chatnpc("<p,neutral>Heh heh... You'll find out.");
+} else if ($choice = 2) {
+    @swamp_candle_teaching;
+} else {
+    ~chatplayer("<p,neutral>Thanks, bye.");
+}
+
+[label,swamp_candle_teaching]
+~chatplayer("<p,neutral>How do you make lanterns?");
+~chatnpc("<p,neutral>Out of glass. The more advanced lanterns have a metal component as well.");
+~chatnpc("<p,neutral>Firstly you can make a simple candle lantern out of glass. It's just like a candle, but the flame isn't exposed, so it's safer.");
+~chatnpc("<p,neutral>Then you can make an oil lamp, which is brighter but has an exposed flame. But if you make an iron frame for it you can turn it into an oil lantern.");
+~chatnpc("<p,neutral>Finally there's the bullseye lantern. You'll need to make a frame out of steel and add a glass lens.");
+~chatnpc("<p,neutral>Once you've made your lamp or lantern, you'll need to make lamp oil for it. The chemist near Rimmington has a machine for that.");
+~chatnpc("<p,neutral>For any light source, you'll need a tinderbox to light it. Keep your tinderbox handy in case it goes out!");
+~chatnpc("<p,neutral>But if all that's too complicated you can buy a candle right here for 1000 gold!");
+// A lesson is complete only after the player continues past its final page.
+%know_how_to_make_lanterns = 1;
+def_int $choice = ~p_choice2("All right, you win, I'll buy a candle.", 1, "No thanks, I'd rather curse the darkness.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>All right, you win, I'll buy a candle.");
+    @swamp_candle_purchase;
+}
+@swamp_candle_decline;
+
+[label,swamp_candle_decline]
+~chatplayer("<p,neutral>No thanks, I'd rather curse the darkness.");

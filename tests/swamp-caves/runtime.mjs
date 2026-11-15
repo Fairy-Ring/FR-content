@@ -8,6 +8,8 @@ const load = async relative => import(pathToFileURL(path.join(engineRoot, 'src',
 const defaultExport = async relative => (await load(relative)).default;
 export const World = await defaultExport('engine/World.ts');
 export const Player = await defaultExport('engine/entity/Player.ts');
+export const Packet = await defaultExport('io/Packet.ts');
+export const { PlayerLoading } = await load('engine/entity/PlayerLoading.ts');
 export const ScriptProvider = await defaultExport('engine/script/ScriptProvider.ts');
 const ScriptRunner = await defaultExport('engine/script/ScriptRunner.ts');
 export const ScriptState = await defaultExport('engine/script/ScriptState.ts');
@@ -32,6 +34,10 @@ const InvButton = await defaultExport('network/game/client/model/InvButton.ts');
 const useHandler = new (await defaultExport('network/game/client/handler/OpHeldUHandler.ts'))();
 const heldHandler = new (await defaultExport('network/game/client/handler/OpHeldHandler.ts'))();
 const removeHandler = new (await defaultExport('network/game/client/handler/InvButtonHandler.ts'))();
+const ResumePauseButton = await defaultExport('network/game/client/model/ResumePauseButton.ts');
+const IfButton = await defaultExport('network/game/client/model/IfButton.ts');
+const pauseHandler = new (await defaultExport('network/game/client/handler/ResumePauseButtonHandler.ts'))();
+const buttonHandler = new (await defaultExport('network/game/client/handler/IfButtonHandler.ts'))();
 export function id(kind, name) {
   const value = types[kind].getId(name);
   assert(value >= 0, `missing packed ${kind} ${name}`);
@@ -106,3 +112,37 @@ export function execute(name, p, args = [], { allowPause = false, target = null 
   return state;
 }
 export const tile = p => [p.level, p.x, p.z];
+
+// Dialogue uses the production pause/choice handlers. Existing delay-only
+// execute() semantics remain unchanged for SC-01.
+export function startDialogue(name, p, target = null) {
+  const script = ScriptProvider.getByName(name);
+  assert(script, `missing packed script ${name}`);
+  p.dialogueMark = p.packets.length;
+  const state = ScriptRunner.init(script, p, target);
+  p.executeScript(state, true, true);
+  assert.equal(state.execution, ScriptState.PAUSEBUTTON, `${name} opens dialogue`);
+  return state;
+}
+export function resumeDialogue(p, option = null) {
+  const state = p.activeScript;
+  assert.equal(state?.execution, ScriptState.PAUSEBUTTON, 'real dialogue is paused');
+  p.dialogueMark = p.packets.length;
+  if (option === null) {
+    assert(!/^multi[2-5]$/.test(types.Component.get(p.modalChat).comName), 'a choice must be selected explicitly');
+    assert(pauseHandler.handle(new ResumePauseButton(0), p), 'Continue accepted');
+  } else {
+    const root = types.Component.get(p.modalChat).comName;
+    assert(/^multi[2-5]$/.test(root), `not a dialogue choice: ${root}`);
+    const component = id('Component', `${root}:com_${option}`);
+    assert(p.resumeButtons.includes(component), `offered ${root} option ${option}`);
+    assert(buttonHandler.handle(new IfButton(component), p), 'choice accepted');
+  }
+  assert.notEqual(state.execution, ScriptState.ABORTED, 'dialogue must not abort');
+  return state;
+}
+export function dialoguePage(p) {
+  return p.packets.slice(p.dialogueMark)
+    .filter(packet => packet.constructor.name === 'IfSetText')
+    .map(packet => packet.text.replaceAll('|', ' ').replace(/\s+/g, ' ').trim());
+}
