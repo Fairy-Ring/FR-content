@@ -296,14 +296,41 @@ function caveRoute(p, reached) {
   }
   assert.fail('a real cave walking route must reach the requested zone boundary');
 }
+// SC-04 ruling 1: prove plumbing with an actual source in gas, not an
+// impossible pending candle outside gas with no corresponding inventory item.
+function realGasPending() {
+  const q = start(fixture(['lit_candle'], [0, 3152, 9584]));
+  ticks(q, 1);
+  assert.deepEqual(timer(q).args.slice(2), [0, obj('lit_candle'), 1]);
+  ticks(q, 1);
+  assert.deepEqual(timer(q).args.slice(2), [0, obj('lit_candle'), 2]);
+  q.openMainModal(id('Component', 'trademain'));
+  const args = structuredClone(timer(q).args.slice(2));
+  ticks(q, 3);
+  q.teleport(3152, 9585, 0); ticks(q, 1);
+  assert.deepEqual(tile(q), [0, 3152, 9585]);
+  assert.deepEqual(timer(q).args.slice(2), args, 'busy internal move preserves real pending identity/count');
+  q.closeModal(); ticks(q, 1);
+  assert.deepEqual(timer(q).args.slice(2), [0, obj('lit_candle'), 3]);
+  return q;
+}
 for (const crossing of ['several zones', 'map square']) test(`engine entry and real walk across ${crossing} preserve clocks, pending identity and one root`, () => {
   traceScripts(names => {
+    const q = realGasPending();
+    q.z = 9583; ticks(q, 1);
+    assert.deepEqual(timer(q).args.slice(2), [-1, -1, 0], 'leaving gas cancels the real exposure');
+    q.z = 9584; ticks(q, 1);
+    assert.deepEqual(timer(q).args.slice(2), [0, obj('lit_candle'), 1], 're-entry starts a new real exposure');
+    q.invSet(inv, obj('hammer'), 1, 0); ticks(q, 1);
+    assert.deepEqual(timer(q).args.slice(2), [-1, -1, 0], 'replacing the actual pending source cancels it');
+    release(q);
+    assert.equal(q.getVarBit(gas), 0, 'release leaves no pending gas state');
     const p = engineEntry(), origin = [p.x >> 3, p.z >> 3], mapOrigin = [p.x >> 6, p.z >> 6];
     ticks(p, 14); pending(p, 14);
     const route = caveRoute(p, (x, z) => crossing === 'map square'
       ? (x >> 6) !== mapOrigin[0] || (z >> 6) !== mapOrigin[1]
       : Math.abs((x >> 3) - origin[0]) + Math.abs((z >> 3) - origin[1]) >= 3);
-    const before = hp(p), pendingArgs = structuredClone(timer(p).args.slice(2));
+    const before = hp(p);
     let crossings = 0;
     for (const [x, z] of route) {
       const oldZone = [p.x >> 3, p.z >> 3];
@@ -315,7 +342,7 @@ for (const crossing of ['several zones', 'map square']) test(`engine entry and r
     p.encodeOut();
     elapsed(p, Math.min(30, 14 + route.length + 1));
     assert.equal(hp(p), before - Math.max(0, 14 + route.length + 1 - 29));
-    assert.deepEqual(timer(p).args.slice(2), pendingArgs);
+    assert.deepEqual(timer(p).args.slice(2), [-1, -1, 0], 'non-gas/source-less synthetic state is cancelled');
     assert.equal([...p.timers.values()].filter(t => t.script.id === controller.id).length, 1);
     assert.equal(rootPackets(p).length, 1, 'internal exits must not close and reopen the root');
     assert(names.some(name => name.startsWith('[zoneexit,')));
@@ -801,9 +828,15 @@ test('retained generic ladders have no natural dispatch in any selected dark com
   }
 });
 test('published Tears down retains one controller; up synchronously releases before its unchanged landing', () => {
+  const q = realGasPending();
+  assert(held(q, 'lit_candle', 5)); ticks(q, 1);
+  assert.deepEqual(timer(q).args.slice(2), [-1, -1, 0], 'losing the actual pending source cancels it');
+  release(q);
   const p = start(wireFixture([], [0, 3225, 9542])); pending(p, 4);
   travel(p, 'tog_cave_down', 3225, 9539, [2, 3218, 9532]);
-  ownership(p); assert(timer(p).args[0] >= 4); assert.equal(timer(p).args[4], 6);
+  ownership(p); assert(timer(p).args[0] >= 4);
+  ticks(p, 1); // Gas cancellation is polled, not a dark-to-dark travel hook.
+  assert.deepEqual(timer(p).args.slice(2), [-1, -1, 0], 'Tears travel is dark-to-dark, not gas-to-gas');
   assert.equal(rootPackets(p).length, 1, 'down does not replace or duplicate its existing cave root');
   travel(p, 'tog_cave_up', 3218, 9533, [0, 3225, 9538]);
   assert.equal(inside(p), false, 'published blocked upper landing is not repaired by SC-03');

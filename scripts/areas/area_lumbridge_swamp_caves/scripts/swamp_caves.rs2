@@ -9,6 +9,26 @@ switch_int (coordy($tile)) {
 }
 return(false);
 
+[proc,swamp_cave_gas_inside](coord $tile)(boolean)
+if (coordy($tile) ! 0) return(false);
+if (inzone(^swamp_cave_gas_nw_sw, ^swamp_cave_gas_nw_ne, $tile) = true | inzone(^swamp_cave_gas_south_sw, ^swamp_cave_gas_south_ne, $tile) = true) return(true);
+return(false);
+
+// CANDIDATE gas-selected-rule: covered lights never provoke gas.
+[proc,swamp_cave_open_light](obj $source)(boolean)
+switch_obj ($source) {
+    case lit_candle, lit_black_candle, torch_lit, oil_lamp_lit : return(true);
+}
+return(false);
+
+[proc,swamp_cave_gas_slot]()(int)
+def_int $slot = 0;
+while ($slot < inv_size(inv)) {
+    if (~swamp_cave_open_light(inv_getobj(inv, $slot)) = true) return($slot);
+    $slot = add($slot, 1);
+}
+return(-1);
+
 [proc,swamp_cave_light_value](obj $source)(int)
 switch_obj ($source) {
     case lit_candle, lit_black_candle, torch_lit, candle_lantern_lit, candle_lantern_black_lit : return(1);
@@ -74,11 +94,18 @@ if_openoverlay(null);
 [proc,swamp_cave_exit]
 if (%darkness_level ! 0 & ~swamp_cave_inside(coord) = false) ~swamp_cave_release;
 
-// The gas arguments carry pending-source identity across the shared controller.
-// SC-04 owns their countdown and effects; SC-03 preserves/discards them with it.
+// Both clocks and the captured gas source belong to this one soft timer.
 [softtimer,swamp_cave_environment](int $dark_ticks, interface $owned_overlay, int $gas_slot, obj $gas_source, int $gas_ticks)
 // No outside hazard action, even when a missed exit leaves the player busy.
 // Ruling 7: retain ownership until protected access permits the one release.
+// Coordinate cancellation precedes the busy pause. Transmitted state waits
+// for protected access, but a busy excursion never resumes an old exposure.
+def_boolean $in_gas = ~swamp_cave_gas_inside(coord);
+if ($in_gas = false) {
+    $gas_slot = -1;
+    $gas_source = null;
+    $gas_ticks = 0;
+}
 if (~swamp_cave_inside(coord) = false) {
     $dark_ticks = 0;
     $gas_slot = -1;
@@ -91,9 +118,55 @@ if (~swamp_cave_inside(coord) = false) {
 } else if (busy() = false) {
     // Engineering clock: both clocks pause without catch-up when unavailable.
     if (p_finduid(uid) = true) {
+        def_boolean $hit = false;
+        if ($in_gas = true) {
+            if ($gas_slot < 0 | $gas_slot >= inv_size(inv) | inv_getobj(inv, $gas_slot) ! $gas_source | ~swamp_cave_open_light($gas_source) = false) {
+                // UNKNOWN engineering identity: carrying the captured type.
+                // A move or identical replacement follows its lowest slot.
+                // Preserve both the count and the original warning.
+                $gas_slot = -1;
+                if (~swamp_cave_open_light($gas_source) = true) {
+                    def_int $slot = 0;
+                    while ($slot < inv_size(inv) & $gas_slot = -1) {
+                        if (inv_getobj(inv, $slot) = $gas_source) {
+                            $gas_slot = $slot;
+                        }
+                        $slot = add($slot, 1);
+                    }
+                }
+                if ($gas_slot = -1) {
+                    $gas_slot = ~swamp_cave_gas_slot;
+                    $gas_source = null;
+                    $gas_ticks = 0;
+                    if ($gas_slot ! -1) {
+                        $gas_source = inv_getobj(inv, $gas_slot);
+                        // CANDIDATE 2017 wording. No extra explosion sentence.
+                        mes("Your <lowercase(oc_name(oc_param($gas_source, next_obj_stage)))> flares brightly!");
+                    }
+                }
+            }
+            if ($gas_slot ! -1) {
+                $gas_ticks = add($gas_ticks, 1);
+                if ($gas_ticks = ^swamp_cave_gas_ticks) {
+                    // Revalidate immediately before the only inventory write.
+                    if (~extinguish_light_source_slot($gas_slot, $gas_source) = true) {
+                        def_int $damage = divide(stat_base(hitpoints), ^swamp_cave_gas_hp_divisor);
+                        if ($damage < ^swamp_cave_gas_min_damage) $damage = ^swamp_cave_gas_min_damage;
+                        damage(uid, 1, $damage);
+                        $hit = true;
+                    }
+                    $gas_slot = -1;
+                    $gas_source = null;
+                    $gas_ticks = 0;
+                }
+            }
+        }
+        if (%swamp_gas_turns ! $gas_ticks) %swamp_gas_turns = $gas_ticks;
         def_int $light = ~swamp_cave_light;
         $owned_overlay = ~swamp_cave_overlay($light, $owned_overlay);
-        if ($light > 0) {
+        if ($hit = true & stat(hitpoints) = 0) {
+            ~player_die;
+        } else if ($light > 0) {
             $dark_ticks = 0;
         } else {
             if ($dark_ticks < ^swamp_cave_bite_ticks) {
@@ -103,9 +176,15 @@ if (~swamp_cave_inside(coord) = false) {
             }
             if ($dark_ticks >= ^swamp_cave_bite_ticks) {
                 damage(uid, 1, ^swamp_cave_bite_damage);
+                $hit = true;
                 if (stat(hitpoints) = 0) ~player_die;
-                else ~ring_of_life_check;
             }
+        }
+        if ($hit = true & stat(hitpoints) > 0) {
+            // Save settled effects before any rescue delay or modal can discard
+            // this pass. The final guard still decides ownership on return.
+            if (%darkness_level ! 0) softtimer(swamp_cave_environment, 1, $dark_ticks, $owned_overlay, $gas_slot, $gas_source, $gas_ticks);
+            ~ring_of_life_check;
         }
     }
 }
