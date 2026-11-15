@@ -3,11 +3,13 @@
 import assert from 'node:assert/strict';
 import { World, PlayerLoading, Packet, PlayerStat, PlayerTimerType, ScriptProvider, ScriptState,
   types, map, CollisionType, engineModule, id, obj, inv, worn, player, seed, inventory, count,
-  slotOf, use, held, execute, tile, environmentTick } from './runtime.mjs';
+  slotOf, use, held, execute, tile, environmentTick, dragInventory, resumeDialogue } from './runtime.mjs';
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const { NetworkPlayer } = await engineModule('engine/entity/NetworkPlayer.ts');
 const { getExpByLevel } = await engineModule('engine/entity/Player.ts');
 const ClientSocket = (await engineModule('server/ClientSocket.ts')).default;
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const moveHandler = new ((await engineModule('network/game/client/handler/MoveClickHandler.ts')).default)();
 let serial = 1099;
 const controller = ScriptProvider.getByName('[softtimer,swamp_cave_environment]');
 assert(controller, 'build the real pack first');
@@ -122,6 +124,64 @@ for(const replacement of ['hammer','candle_lantern_lit','torch_lit',null]) test(
   else {clear(p);ticks(p,6);assert.equal(hp(p),100);}
   release(p);
 });
+test('real backpack drag preserves the captured exposure and its single warning through pass seven',()=>{
+  const p=start(fixture(['lit_candle','hammer']));ticks(p,3);
+  assert(dragInventory(p,0,20));assert.equal(p.invGetSlot(inv,0),null);
+  ticks(p,1);assert.deepEqual(pending(p),[20,obj('lit_candle'),4]);
+  assert.deepEqual(p.messages,[warning('candle')]);ticks(p,2);assert.equal(hp(p),100);
+  ticks(p,1);assert.equal(hp(p),75);assert.equal(p.invGetSlot(inv,20).id,obj('unlit_candle'));
+  assert.equal(count(p,'hammer'),1);assert.deepEqual(p.messages,[warning('candle')]);clear(p);release(p);
+});
+test('six real backpack moves over 42 eligible passes cannot postpone the six scheduled explosions',()=>{
+  const p=start(fixture(['lit_candle','hammer','tinderbox','candle_lantern_lit'],undefined,7));
+  let moves=0;
+  for(let pass=1;pass<=42;pass++){
+    ticks(p,1);
+    assert.equal(p.damageRequests.length,Math.floor(pass/7),`scheduled hits at pass ${pass}`);
+    assert.equal(hp(p),7-Math.floor(pass/7));
+    assert.equal(p.messages.filter(m=>m===warning('candle')).length,Math.ceil(pass/7),`one warning per exposure at pass ${pass}`);
+    if(pass%7===0&&pass<42)assert(use(p,'tinderbox','unlit_candle'),'real relight after each spent exposure');
+    if(pass%6===0&&pass<42){
+      const from=slotOf(p,'lit_candle');assert(dragInventory(p,from,from===0?1:0));moves++;
+    }
+  }
+  assert.equal(moves,6);assert.deepEqual(p.damageRequests.map(d=>d.amount),Array(6).fill(1));clear(p);release(p);
+});
+test('real swap with an identical lit candle keeps the captured slot, count and warning',()=>{
+  const p=start(fixture(['lit_candle','lit_candle']));ticks(p,3);assert(dragInventory(p,0,1));ticks(p,3);
+  assert.deepEqual(pending(p),[0,obj('lit_candle'),6]);assert.equal(hp(p),100);assert.deepEqual(p.messages,[warning('candle')]);
+  ticks(p,1);assert.equal(hp(p),75);assert.equal(p.invGetSlot(inv,0).id,obj('unlit_candle'));
+  assert.equal(p.invGetSlot(inv,1).id,obj('lit_candle'));release(p);
+});
+test('real swap with another open type follows the candle instead of extinguishing the replacement',()=>{
+  const p=start(fixture(['lit_candle','torch_lit']));ticks(p,6);assert(dragInventory(p,0,1));ticks(p,1);
+  assert.equal(hp(p),75);assert.equal(p.invGetSlot(inv,0).id,obj('torch_lit'));
+  assert.equal(p.invGetSlot(inv,1).id,obj('unlit_candle'));assert.deepEqual(p.messages,[warning('candle')]);release(p);
+});
+test('real drop then different-open swap with no captured type left starts a fresh warned seven',()=>{
+  const p=start(fixture(['lit_candle','torch_lit','hammer']));ticks(p,6);
+  assert(held(p,'lit_candle',5));assert(dragInventory(p,1,0));ticks(p,1);
+  assert.deepEqual(pending(p),[0,obj('torch_lit'),1]);assert.equal(hp(p),100);
+  assert.deepEqual(p.messages,[warning('candle'),warning('torch')]);ticks(p,5);assert.equal(hp(p),100);
+  ticks(p,1);assert.equal(hp(p),75);assert.equal(count(p,'torch_unlit'),1);assert.equal(count(p,'unlit_candle'),0);release(p);
+});
+test('real drop of the captured candle follows the lowest remaining identical type without a new warning',()=>{
+  const p=start(fixture(['lit_candle','hammer','lit_candle','lit_candle']));ticks(p,6);
+  assert(held(p,'lit_candle',5,0));ticks(p,1);assert.equal(hp(p),75);
+  assert.equal(p.invGetSlot(inv,0),null);assert.equal(p.invGetSlot(inv,2).id,obj('unlit_candle'));
+  assert.equal(p.invGetSlot(inv,3).id,obj('lit_candle'));assert.deepEqual(p.messages,[warning('candle')]);release(p);
+});
+test('real drag re-points to the lowest identical source rather than its moved destination',()=>{
+  const p=start(fixture(['lit_candle','lit_candle']));ticks(p,3);assert(dragInventory(p,0,20));ticks(p,1);
+  assert.deepEqual(pending(p),[1,obj('lit_candle'),4]);ticks(p,3);
+  assert.equal(p.invGetSlot(inv,1).id,obj('unlit_candle'));assert.equal(p.invGetSlot(inv,20).id,obj('lit_candle'));
+  assert.equal(hp(p),75);assert.deepEqual(p.messages,[warning('candle')]);release(p);
+});
+test('real drop with no captured candle remaining cancels without a stale write or hit',()=>{
+  const p=start(fixture(['lit_candle','hammer']));ticks(p,6);assert(held(p,'lit_candle',5));ticks(p,7);
+  clear(p);assert.equal(hp(p),100);assert.equal(count(p,'unlit_candle'),0);assert.equal(count(p,'hammer'),1);
+  assert.deepEqual(p.messages,[warning('candle')]);release(p);
+});
 test('captured-slot transformation refuses invalid or replaced slots and conserves count',()=>{
   const p=fixture(['hammer','lit_candle']);const before=inventory(p);
   for(const slot of [-1,0,28]) assert.equal(execute('[proc,extinguish_light_source_slot]',p,[slot,obj('lit_candle')]).popInt(),0);
@@ -193,6 +253,44 @@ test('Ana page after gas may be dismissed without resurrecting a spent exposure'
   const p=start(fixture(['lit_candle','ring_of_life','thanainabarrel'],undefined,100,30));assert(held(p,'ring_of_life',2));ticks(p,7);
   assert.equal(hp(p),5);assert.equal(p.activeScript?.execution,ScriptState.PAUSEBUTTON);assert.equal(count(p,'unlit_candle'),1);
   p.closeModal();ticks(p,1);ownership(p);clear(p);assert.equal(hp(p),5);release(p);
+});
+for(const dismissal of ['relight','drag'])test(`Ana gas page dismissed by real ${dismissal}: spent exposure cannot replay before a fresh warned seven`,()=>{
+  const items=dismissal==='relight'?['tinderbox','lit_candle','ring_of_life','thanainabarrel']:['lit_candle','ring_of_life','thanainabarrel','lit_candle'];
+  const p=start(fixture(items,undefined,100,30));assert(held(p,'ring_of_life',2));ticks(p,7);
+  assert.equal(hp(p),5);assert.equal(p.activeScript?.execution,ScriptState.PAUSEBUTTON);
+  assert.equal(count(p,'unlit_candle'),1);ownership(p);
+  if(dismissal==='relight')assert(use(p,'tinderbox','unlit_candle'));else assert(dragInventory(p,3,0));
+  assert.equal(p.activeScript,null,'production input discards the paused page');ticks(p,1);
+  assert.equal(hp(p),5,'no immediate unwarned second hit');assert.equal(p.damageRequests.length,1);
+  assert.equal(timer(p).args[4],1);assert.deepEqual(p.messages.filter(m=>m===warning('candle')),[warning('candle'),warning('candle')]);
+  ticks(p,5);assert.equal(hp(p),5);assert.equal(p.damageRequests.length,1);
+  ticks(p,1);assert.equal(hp(p),0);assert.deepEqual(p.damageRequests.map(d=>d.amount),[25,25]);finishDeath(p);
+});
+test('Ana gas page Continue completes the real ring rescue and releases the early saved timer',()=>{
+  const p=start(fixture(['lit_candle','ring_of_life','thanainabarrel'],undefined,100,30));
+  assert(held(p,'ring_of_life',2));ticks(p,7);assert.equal(p.activeScript?.execution,ScriptState.PAUSEBUTTON);
+  clear(p);ownership(p);assert.equal(timer(p).args[0],1);assert.equal(timer(p).args[1],roots[0]);
+  resumeDialogue(p);assert(p.delayed,'ordinary ring teleport really suspends');
+  for(let i=0;i<12&&p.z>9000;i++){ticks(p,1);ownership(p,p.z>9000);}
+  ownership(p,false);assert.equal(p.overlay,-1);assert.equal(count(p,'ring_of_life',worn),0);
+  assert.equal(count(p,'thanainabarrel'),0);ticks(p,40);ownership(p,false);assert.equal(hp(p),5);
+  assert.deepEqual(p.damageRequests.map(d=>d.amount),[25]);
+});
+test('Ana gas page real walking dismissal cancels spent state and a later relight still gets warned seven',()=>{
+  const p=start(fixture(['tinderbox','lit_candle','ring_of_life','thanainabarrel'],[0,3152,9585],100,30));
+  assert(held(p,'ring_of_life',2));ticks(p,7);assert.equal(p.activeScript?.execution,ScriptState.PAUSEBUTTON);
+  assert(moveHandler.handle(new MoveClick([{x:3152,z:9586}],0,false),p));assert.equal(p.activeScript,null);
+  ticks(p,2);assert.deepEqual(tile(p),[0,3152,9586]);clear(p);assert.equal(hp(p),5);
+  assert(use(p,'tinderbox','unlit_candle'));ticks(p,6);assert.equal(hp(p),5);
+  assert.equal(p.messages.filter(m=>m===warning('candle')).length,2);
+  ticks(p,1);assert.equal(hp(p),0);finishDeath(p);
+});
+test('Ana gas page Continue after ownership release cannot recreate even an early saved controller',()=>{
+  const p=start(fixture(['lit_candle','ring_of_life','thanainabarrel'],undefined,100,30));
+  assert(held(p,'ring_of_life',2));ticks(p,7);assert.equal(p.activeScript?.execution,ScriptState.PAUSEBUTTON);
+  const paused=p.activeScript;release(p);assert.equal(p.activeScript,paused);
+  resumeDialogue(p);for(let i=0;i<12&&p.z>9000;i++)ticks(p,1);
+  ticks(p,40);ownership(p,false);assert.equal(hp(p),5);assert.equal(p.overlay,-1);
 });
 test('gas varbit transmits only changed countdown values, including one clear',()=>{
   const p=start(fixture(['lit_candle']));const durable=2;

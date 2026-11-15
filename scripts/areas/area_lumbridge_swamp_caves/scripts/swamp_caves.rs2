@@ -121,13 +121,28 @@ if (~swamp_cave_inside(coord) = false) {
         def_boolean $hit = false;
         if ($in_gas = true) {
             if ($gas_slot < 0 | $gas_slot >= inv_size(inv) | inv_getobj(inv, $gas_slot) ! $gas_source | ~swamp_cave_open_light($gas_source) = false) {
-                $gas_slot = ~swamp_cave_gas_slot;
-                $gas_source = null;
-                $gas_ticks = 0;
-                if ($gas_slot ! -1) {
-                    $gas_source = inv_getobj(inv, $gas_slot);
-                    // CANDIDATE 2017 wording. No extra explosion sentence.
-                    mes("Your <lowercase(oc_name(oc_param($gas_source, next_obj_stage)))> flares brightly!");
+                // UNKNOWN engineering identity: carrying the captured type.
+                // A move or identical replacement follows its lowest slot.
+                // Preserve both the count and the original warning.
+                $gas_slot = -1;
+                if (~swamp_cave_open_light($gas_source) = true) {
+                    def_int $slot = 0;
+                    while ($slot < inv_size(inv) & $gas_slot = -1) {
+                        if (inv_getobj(inv, $slot) = $gas_source) {
+                            $gas_slot = $slot;
+                        }
+                        $slot = add($slot, 1);
+                    }
+                }
+                if ($gas_slot = -1) {
+                    $gas_slot = ~swamp_cave_gas_slot;
+                    $gas_source = null;
+                    $gas_ticks = 0;
+                    if ($gas_slot ! -1) {
+                        $gas_source = inv_getobj(inv, $gas_slot);
+                        // CANDIDATE 2017 wording. No extra explosion sentence.
+                        mes("Your <lowercase(oc_name(oc_param($gas_source, next_obj_stage)))> flares brightly!");
+                    }
                 }
             }
             if ($gas_slot ! -1) {
@@ -165,8 +180,12 @@ if (~swamp_cave_inside(coord) = false) {
                 if (stat(hitpoints) = 0) ~player_die;
             }
         }
-        // This may suspend for rescue or Ana's page. No cave effect follows it.
-        if ($hit = true & stat(hitpoints) > 0) ~ring_of_life_check;
+        if ($hit = true & stat(hitpoints) > 0) {
+            // Save settled effects before any rescue delay or modal can discard
+            // this pass. The final guard still decides ownership on return.
+            if (%darkness_level ! 0) softtimer(swamp_cave_environment, 1, $dark_ticks, $owned_overlay, $gas_slot, $gas_source, $gas_ticks);
+            ~ring_of_life_check;
+        }
     }
 }
 // A protected effect can suspend and release ownership before returning here.
