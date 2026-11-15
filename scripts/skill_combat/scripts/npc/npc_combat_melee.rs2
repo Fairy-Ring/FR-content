@@ -34,6 +34,22 @@ def_int $attack_roll = ~npc_melee_attack_roll;
 def_int $defence_roll = ~player_defence_roll_specific(npc_param(damagetype));
 def_int $maxhit = ~npc_melee_maxhit;
 
+// CANDIDATE poison.protection-prayer-period-behaviour: only poison uses the
+// unprotected outcome. Keep the published zero hit, delay and retaliation.
+if (npc_param(poison_severity) > 0 & ~check_protect_prayer(^melee_style) = true) {
+    $attack_roll = ~npc_melee_attack_roll_typeless;
+    if (randominc($attack_roll) > randominc($defence_roll)) {
+        def_int $prayer_damage = randominc($maxhit);
+        ~playerhit_n_melee(0, npc_param(attackrate));
+        if (npc_stat(hitpoints) > 0 & ($prayer_damage > 0 | npc_param(poison_without_damage) = true)) {
+            ~npc_poison_player;
+        }
+        return;
+    }
+    ~playerhit_n_melee(0, npc_param(attackrate));
+    return;
+}
+
 // npc_say("Clock: <tostring(map_clock)>, NPC A: <tostring($attack_roll)>, Player D: <tostring($defence_roll)>, NPC Max: <tostring($maxhit)>");
 
 if (randominc($attack_roll) > randominc($defence_roll)) {
