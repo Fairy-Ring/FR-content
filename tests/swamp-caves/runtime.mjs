@@ -38,6 +38,10 @@ const ResumePauseButton = await defaultExport('network/game/client/model/ResumeP
 const IfButton = await defaultExport('network/game/client/model/IfButton.ts');
 const pauseHandler = new (await defaultExport('network/game/client/handler/ResumePauseButtonHandler.ts'))();
 const buttonHandler = new (await defaultExport('network/game/client/handler/IfButtonHandler.ts'))();
+const ResumePCountDialog = await defaultExport('network/game/client/model/ResumePCountDialog.ts');
+const countHandler = new (await defaultExport('network/game/client/handler/ResumePCountDialogHandler.ts'))();
+const OpLocU = await defaultExport('network/game/client/model/OpLocU.ts');
+const locUseHandler = new (await defaultExport('network/game/client/handler/OpLocUHandler.ts'))();
 export function id(kind, name) {
   const value = types[kind].getId(name);
   assert(value >= 0, `missing packed ${kind} ${name}`);
@@ -145,4 +149,38 @@ export function dialoguePage(p) {
   return p.packets.slice(p.dialogueMark)
     .filter(packet => packet.constructor.name === 'IfSetText')
     .map(packet => packet.text.replaceAll('|', ' ').replace(/\s+/g, ' ').trim());
+}
+
+export function button(p, name) {
+  return buttonHandler.handle(new IfButton(id('Component', name)), p);
+}
+export function inputCount(p, amount) {
+  assert.equal(p.activeScript?.execution, ScriptState.COUNTDIALOG);
+  return countHandler.handle(new ResumePCountDialog(amount), p);
+}
+export function invButton(p, component, item, option = 1, slot = 0) {
+  return removeHandler.handle(new InvButton(option, obj(item), slot, id('Component', component)), p);
+}
+export function useLoc(p, item, loc, clientType = loc.type) {
+  p.originX = p.x; p.originZ = p.z;
+  const accepted = locUseHandler.handle(new OpLocU(loc.x, loc.z, clientType, obj(item), slotOf(p, item), invCom), p);
+  if (accepted) p.processInteraction();
+  return accepted;
+}
+export const weakCount = p => [...p.weakQueue.all()].length;
+export function tick(p) {
+  World.currentTick++;
+  if (p.delayed && World.currentTick >= p.delayedUntil) p.delayed = false;
+  if (!p.delayed && p.activeScript?.execution === ScriptState.SUSPENDED) {
+    p.executeScript(p.activeScript, true, true);
+  }
+  p.processQueues();
+}
+export function settle(p, maxTicks = 160) {
+  for (let n = 0; n < maxTicks; n++) {
+    if (!p.activeScript && weakCount(p) === 0) return;
+    if ([ScriptState.PAUSEBUTTON, ScriptState.COUNTDIALOG].includes(p.activeScript?.execution)) return;
+    tick(p);
+  }
+  assert.fail(`player did not settle: active=${p.activeScript?.execution} weak=${weakCount(p)}`);
 }

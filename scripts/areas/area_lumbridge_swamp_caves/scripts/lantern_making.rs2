@@ -1,0 +1,82 @@
+// CANDIDATE crafting.lantern-assembly. Only lit candles have a sourced lit-input rule.
+[opheldu,candle_lantern_empty]
+switch_obj(last_useitem) {
+    case unlit_candle : @assemble_lantern(candle_lantern_unlit, 1, 1);
+    case unlit_black_candle : @assemble_lantern(candle_lantern_black_unlit, 1, 1);
+    case lit_candle : @assemble_lantern(candle_lantern_lit, 1, 4);
+    case lit_black_candle : @assemble_lantern(candle_lantern_black_lit, 1, 4);
+}
+~displaymessage(^dm_default);
+
+[opheldu,oil_lantern_frame]
+switch_obj(last_useitem) {
+    case oil_lamp_empty : @assemble_lantern(oil_lantern_empty, 26, 1);
+    case oil_lamp_unlit : @assemble_lantern(oil_lantern_unlit, 26, 1);
+}
+// Lit-oil-lamp assembly is UNKNOWN. Preserve the unsupported-pair response.
+~displaymessage(^dm_default);
+
+[opheldu,bullseye_lantern_nolens]
+if (last_useitem = bullseye_lantern_lens) @assemble_lantern(bullseye_lantern_empty, 49, 1);
+~displaymessage(^dm_default);
+
+[label,assemble_lantern](namedobj $product, int $crafting, int $firemaking)
+if (%know_how_to_make_lanterns = 0 | stat(crafting) < $crafting | stat(firemaking) < $firemaking) return;
+// UNKNOWN crafting.lantern-assembly-xp-timing, named engineering defaults.
+def_obj $part = last_useitem;
+def_int $slot = last_slot;
+def_int $delay = ^lantern_assembly_delay;
+def_int $xp = ^lantern_assembly_extra_xp;
+if ($delay > 0) p_delay(sub($delay, 1));
+inv_del(inv, $part, 1);
+inv_setslot(inv, $slot, $product, 1);
+if ($xp > 0) stat_advance(crafting, $xp);
+
+// VERIFIED lumbridge-swamp-caves.fuel-and-tinderbox; original personal morph bit 281.
+[oplocu,lamp_oil_still] @lantern_oil_still;
+[oplocu,lamp_oil_still_0] @lantern_oil_still;
+[oplocu,lamp_oil_still_1] @lantern_oil_still;
+
+[label,lantern_oil_still]
+if (last_useitem = swamp_tar) {
+    if (%lamp_oil_still_state = 1) return;
+    inv_del(inv, swamp_tar, 1);
+    %lamp_oil_still_state = 1;
+    return;
+}
+def_namedobj $product;
+switch_obj(last_useitem) {
+    case oil_lamp_empty : $product = oil_lamp_unlit;
+    case oil_lantern_empty : $product = oil_lantern_unlit;
+    case bullseye_lantern_empty : $product = bullseye_lantern_unlit;
+    case tog_sapphire_lantern_empty : $product = tog_sapphire_lantern_unlit;
+    case default : ~displaymessage(^dm_default); return;
+}
+if (%lamp_oil_still_state = 0) return;
+// UNKNOWN crafting.lantern-assembly-xp-timing, named engineering defaults.
+def_int $slot = last_useslot;
+def_int $delay = ^lantern_fill_delay;
+def_int $xp = ^lantern_fill_extra_xp;
+if ($delay > 0) p_delay(sub($delay, 1));
+inv_setslot(inv, $slot, $product, 1);
+%lamp_oil_still_state = 0;
+if ($xp > 0) stat_advance(crafting, $xp);
+
+// CANDIDATE lumbridge-swamp-caves.sapphire-lighting-level. Explicit unlit pairs only.
+[opheldu,sapphire]
+switch_obj(last_useitem) {
+    case bullseye_lantern_empty : @lantern_sapphire(tog_sapphire_lantern_empty);
+    case bullseye_lantern_unlit : @lantern_sapphire(tog_sapphire_lantern_unlit);
+}
+~displaymessage(^dm_default);
+
+[label,lantern_sapphire](namedobj $product)
+// UNKNOWN crafting.lantern-assembly-xp-timing. Conversion has no inferred Crafting gate.
+def_int $slot = last_useslot;
+def_int $delay = ^lantern_conversion_delay;
+def_int $xp = ^lantern_conversion_extra_xp;
+if ($delay > 0) p_delay(sub($delay, 1));
+inv_del(inv, sapphire, 1);
+inv_setslot(inv, $slot, $product, 1);
+inv_add(inv, bullseye_lantern_lens, 1);
+if ($xp > 0) stat_advance(crafting, $xp);
