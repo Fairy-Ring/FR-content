@@ -70,6 +70,9 @@ export async function runtime(engine, pack) {
             const target = Provider.get(event.out[0]);
             if (target) event.out[0] = target.name;
           }
+          if (name.startsWith('BRANCH_') && active.events.at(-2)?.op === 'RANDOMINC' && active.events.at(-1)?.op === 'RANDOMINC') {
+            active.accuracy?.push(active.events.at(-2).out[0] > active.events.at(-1).out[0]);
+          }
           active.events.push(event);
         }
         active.current = null;
@@ -112,6 +115,10 @@ export async function runtime(engine, pack) {
       player.setVar(id(VarPlayerType, 'lastcombat'), 100);
       player.setVar(id(VarPlayerType, 'aggressive_npc'), npc.uid + 1);
     }
+    if (variant === 'npc-busy') {
+      npc.setVar(id(VarNpcType, 'npc_lastcombat'), 100);
+      npc.setVar(id(VarNpcType, 'npc_aggressive_player'), player.uid + 1);
+    }
     if (variant === 'dead-npc') npc.levels[3] = 0;
     if (variant === 'dead-player') { player.levels[3] = 0; player.setVar(id(VarPlayerType, 'death'), 1); }
     return { player, npc };
@@ -123,9 +130,9 @@ export async function runtime(engine, pack) {
     f.npc.executeScript(state);
     return { state, values: state.intStack.slice(0, state.isp) };
   }
-  function observe(name, f, args = [], variant = 'hit') {
-    const tape = { events: [], draws: [], randomSources: [], commands: {}, visited: new Set(), error: null, current: null };
-    let cursor = 0, seed = 0x377bc00;
+  function observe(name, f, args = [], variant = 'hit', rng = null) {
+    const tape = { events: [], draws: [], randomSources: [], commands: {}, accuracy: [], visited: new Set(), error: null, current: null };
+    let cursor = 0, seed = rng?.seed ?? 0x377bc00;
     const originalRandom = JavaRandom.nextDouble;
     const originalMathRandom = Math.random;
     let engineSeed = 0x377bc01;
@@ -137,7 +144,10 @@ export async function runtime(engine, pack) {
     };
     JavaRandom.nextDouble = () => {
       let value;
-      if (cursor === 0) value = variant.endsWith('miss') ? 0 : 0.999999;
+      if (rng?.draws && cursor < rng.draws.length) value = rng.draws[cursor];
+      else if (rng?.seed !== undefined || rng?.draws) {
+        seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; value = (seed >>> 0) / 4294967296;
+      } else if (cursor === 0) value = variant.endsWith('miss') ? 0 : 0.999999;
       else if (cursor === 1) value = variant.endsWith('miss') ? 0.999999 : 0;
       else if (cursor === 2) value = variant.endsWith('zero') ? 0 : 0.999999;
       else { seed ^= seed << 13; seed ^= seed >>> 17; seed ^= seed << 5; value = (seed >>> 0) / 4294967296; }
@@ -157,7 +167,7 @@ export async function runtime(engine, pack) {
       mode: f.npc.mode, npcLifeCycle: f.npc.lifeCycle, playerProtected: f.player.protect,
       pointers: result.state.pointers, queued, messages: [...f.player.testMessages]
     };
-    return { values: result.values, snapshot, events: tape.events, draws: tape.draws, randomSources: tape.randomSources, commands: tape.commands, opcount: result.state.opcount, visited: [...tape.visited], errors };
+    return { values: result.values, snapshot, events: tape.events, draws: tape.draws, randomSources: tape.randomSources, accuracy: tape.accuracy, commands: tape.commands, opcount: result.state.opcount, visited: [...tape.visited], errors };
   }
   function settle(f, ticks = 6) {
     const tape = { events: [], draws: [], randomSources: [], commands: {}, visited: new Set(), error: null, current: null };

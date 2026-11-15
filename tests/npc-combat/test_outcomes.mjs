@@ -17,8 +17,9 @@ const base = option('--base-pack');
 const reportFile = option('--report');
 const focused = process.argv.includes('--focused');
 const registered = JSON.parse(fs.readFileSync(path.join(here, 'outcome-callers.json'), 'utf8'));
+const routeSeeds = JSON.parse(fs.readFileSync(path.join(here, 'outcome-route-seeds.json'), 'utf8'));
 const watched = ['npc_default_attack', 'npc_meleeattack', 'npc_rangeattack', 'npc_cast_spell', 'npc_cast_spell_with_forced_max_hit', 'npc_spell_success', 'playerhit_n_melee', 'playerhit_n_ranged', 'npc_player_hit_roll', 'npc_spell_cast', 'npc_combat_spell_checks', 'npc_freeze_allowed', 'npc_debuff_allowed', 'npc_spell_fail', 'npc_stat_change_effect', 'npc_freeze_effect'];
-const variants = ['hit', 'zero', 'miss', 'protected-hit', 'protected-zero', 'protected-miss', 'pending', 'target-loss'];
+const variants = ['hit', 'zero', 'miss', 'protected-hit', 'protected-zero', 'protected-miss', 'pending', 'target-loss', 'npc-busy', 'dead-player'];
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const effects = result => ({ snapshot: result.snapshot, settled: result.settled, events: result.events.filter(e => /QUEUE|ANIM|SOUND|^MES|DAMAGE|SETMODE|STAT_(ADD|SUB)|^IF_CLOSE|^RUNENERGY/.test(e.op)), draws: result.draws, randomSources: result.randomSources });
 let checks = 0;
@@ -28,7 +29,7 @@ function same(actual, expected, label, full = false) {
   if (full) assert.deepEqual(actual.events, expected.events, `${label}: ordered reads, computations and effects`);
 }
 const temporary = fs.mkdtempSync(path.join(process.env.RUNNER_TEMP ?? os.tmpdir(), 'npc-outcomes-'));
-const report = { schema: 1, callerManifest: registered.policy, basePack: Boolean(base), cases: [], costs: [], externalCallers: {}, observedCallers: [], summary: {} };
+const report = { schema: 1, callerManifest: registered.policy, basePack: Boolean(base), cases: [], costs: [], routeCoverage: [], externalCallers: {}, observedCallers: [], summary: {} };
 try {
   const compiled = spawnSync(process.execPath, ['--import', 'tsx', path.join(here, 'compile_outcome_fixture.mjs'), temporary], { cwd: engine, env: process.env, encoding: 'utf8' });
   process.stdout.write(compiled.stdout ?? ''); process.stderr.write(compiled.stderr ?? '');
@@ -50,13 +51,13 @@ try {
     }
     for (const name of ['npc_meleeattack_outcome', 'npc_default_attack_outcome', 'npc_rangeattack_outcome', 'npc_cast_spell_outcome']) assert(namedProcs.has(`[proc,${name}]`), name);
   });
-  function execute(directory, type, name, args, variant, style, configure = null, distance = 1) {
+  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null) {
     rt.select(directory);
     const f = rt.fixture(type, variant, style, distance);
     try {
       if (configure) configure(f);
       const actualArgs = typeof args === 'function' ? args(f) : args;
-      const result = rt.observe(name, f, actualArgs, variant);
+      const result = rt.observe(name, f, actualArgs, variant, rng);
       result.settled = rt.settle(f);
       for (const caller of result.visited) observed.add(caller);
       return result;
@@ -67,10 +68,10 @@ try {
     const added = Object.fromEntries([...new Set([...Object.keys(before.commands), ...Object.keys(after.commands)])].map(op => [op, (after.commands[op] ?? 0) - (before.commands[op] ?? 0)]).filter(([, count]) => count));
     report.costs.push({ ...metadata, before: before.opcount, after: after.opcount, added });
   }
-  function differential(type, name, args, variant, style, metadata = {}) {
-    const head = execute(pack, type, name, args, variant, style);
+  function differential(type, name, args, variant, style, metadata = {}, configure = null, distance = 1, rng = null) {
+    const head = execute(pack, type, name, args, variant, style, configure, distance, rng);
     if (base) {
-      const before = execute(base, type, name, args, variant, style);
+      const before = execute(base, type, name, args, variant, style, configure, distance, rng);
       same(head, before, `${type} ${name} ${variant}`, true);
       cost(before, head, { npc: type, entry: name, variant, style, ...metadata });
     }
@@ -115,7 +116,7 @@ try {
       let maxhit;
       const outcomeArgs = f => {
         maxhit = style === 'magic' ? rt.field(wind, 'maxhit') : maximum(style, f);
-        return style === 'melee' ? [maxhit, 0, 0] : style === 'ranged' ? [maxhit, 0, 0] : [spellId(wind), 4, -1, 0];
+        return style === 'melee' ? [maxhit, 0, 0] : style === 'ranged' ? [maxhit, 0, 0] : [spellId(wind), 4, -1, 0, 0];
       };
       const explicit = execute(pack, record.npc, `[proc,${style === 'melee' ? 'npc_default_attack' : style === 'ranged' ? 'npc_rangeattack' : 'npc_cast_spell'}_outcome]`, outcomeArgs, variant, style);
       same(explicit, head, `${record.npc} ${style} ${variant} explicit-prefix drift`);
@@ -142,6 +143,94 @@ try {
     }
   }
   check(`complete packed NPC prefix matrix (${npcs.length} types)`, () => assert(npcs.length > 0));
+  // Dispatch fixtures use uninterrupted seeded streams, not positional forcing:
+  // a route may draw a spell/style choice before its accuracy roll.
+  const routes = new Map();
+  for (const record of inventory.npcs) for (const entry of record.entries) {
+    if (!routes.has(entry.script)) routes.set(entry.script, record.npc);
+  }
+  check('every unique dispatch route has reachable branch seeds', () => {
+    assert.equal(routeSeeds.schema, 1); assert.equal(routeSeeds.rng, 'xorshift32');
+    assert.deepEqual(routeSeeds.routes.map(r => r.script).sort(), [...routes.keys()].sort());
+    for (const route of routeSeeds.routes) {
+      assert.equal(route.npc, routes.get(route.script), route.script);
+      for (const branch of ['hit', 'zero', 'miss']) {
+        assert(Number.isInteger(route.seeds[branch]) || route.unsupportedBranches?.[branch]?.length > 0, `${route.script} lacks ${branch} coverage or a reason`);
+      }
+    }
+  });
+  function configureRoute(f, route) {
+    for (const stat of [1, 6]) { f.player.levels[stat] = 20; f.player.baseLevels[stat] = 20; }
+    if (route.equipment) f.player.invAdd(rt.id(rt.configs.InvType, 'worn'), rt.id(rt.configs.ObjType, route.equipment), 1);
+    for (const [name, value] of Object.entries(route.playerVars ?? {})) {
+      const id = VarPlayerType.getId(name);
+      if (id >= 0) f.player.setVar(id, value);
+      else f.player.setVarBit(rt.id(rt.configs.VarBitType, name), value);
+    }
+    for (const [name, value] of Object.entries(route.npcVars ?? {})) f.npc.setVar(rt.id(VarNpcType, name), value === 'target' ? f.player.uid : value);
+    rt.run('[proc,player_combat_stat]', f);
+  }
+  function dispatchBranch(result) {
+    const hits = result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]');
+    if (hits.some(hit => hit.args[0] > 0)) return 'hit';
+    if (result.accuracy.includes(true)) return hits.length ? 'zero' : 'success';
+    if (result.accuracy.includes(false)) return 'miss';
+    return hits.length ? 'zero' : 'no-accuracy';
+  }
+  for (const route of routeSeeds.routes.filter(r => !focused || npcs.some(n => n.npc === r.npc))) {
+    const branches = [];
+    for (const [branch, seed] of Object.entries(route.seeds)) check(`${route.script} seeded ${branch}`, () => {
+      const result = differential(route.npc, route.script, [], 'seeded', 'melee', { routeBranch: branch, seed }, f => configureRoute(f, route), route.distance ?? 1, { seed });
+      assert.equal(dispatchBranch(result), branch, `${route.script} seed=${seed}`);
+      branches.push({ branch, seed, accuracy: result.accuracy, queued: result.snapshot.queued, error: result.snapshot.error });
+    });
+    report.routeCoverage.push({ script: route.script, npc: route.npc, branches, unsupportedBranches: route.unsupportedBranches ?? {} });
+  }
+  // Every readiness/admission has a refusing fixture as well as an admission.
+  for (const [style, type] of [['melee', 'cow'], ['ranged', 'ardougne_archer'], ['magic', 'bearded_dark_wizard']]) {
+    const ordinaryName = style === 'melee' ? 'npc_default_attack' : style === 'ranged' ? 'npc_rangeattack' : 'npc_cast_spell';
+    for (const variant of ['hit', 'pending', 'target-loss', 'npc-busy', 'pvp-busy', ...(style === 'ranged' ? [] : ['dead-player'])]) check(`${style} ${variant} admission drift and attempted state`, () => {
+      const configure = variant === 'pvp-busy' ? f => f.player.setVar(rt.id(VarPlayerType, 'lastcombat_pvp'), 100) : null;
+      const ordinary = execute(pack, type, `[proc,${ordinaryName}]`, style === 'magic' ? [spellId(wind), 4] : [], variant, style, configure);
+      const explicit = execute(pack, type, `[proc,${ordinaryName}_outcome]`, style === 'magic' ? [spellId(wind), 4, -1, 0, 0] : f => [maximum(style, f), 0, 0], variant, style, configure);
+      same(explicit, ordinary, `${style} ${variant} admission prefix`);
+      assert.equal(explicit.values[0], Number(variant === 'hit'));
+      if (variant !== 'hit') { assert.deepEqual(explicit.values, [0, -1, 0, 0, 0]); assert.equal(explicit.draws.length, 0); }
+      if (style === 'melee') {
+        const ready = execute(fixturePack, type, '[proc,bc00_test_ready]', [], variant, style, configure);
+        same(ready, ordinary, `${variant} readiness-only entry followed by ordinary policy`);
+        assert.equal(ready.values[0], explicit.values[0]);
+      }
+    });
+  }
+  for (const [row, variable, stat] of [[freeze, 'frozen', null], [curse, null, 0], [rt.spell('weaken'), null, 2], [rt.spell('curse'), null, 1]]) {
+    for (const admitted of [false, true]) check(`${row.debugname} ${admitted ? 'admitted' : 'refused'} magic admission drift`, () => {
+      const configure = f => {
+        if (variable) f.player.setVar(rt.id(VarPlayerType, variable), admitted ? 0 : 110);
+        else if (!admitted) f.player.levels[stat]--;
+      };
+      const ordinary = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell]', [spellId(row), 4], 'hit', 'magic', configure);
+      const explicit = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell_outcome]', [spellId(row), 4, -1, 0, 0], 'hit', 'magic', configure);
+      same(explicit, ordinary, `${row.debugname} explicit spell admission`);
+      assert.equal(explicit.values[0], Number(admitted));
+      if (!admitted) { assert.deepEqual(explicit.values, [0, -1, 0, 0, 0]); assert.equal(explicit.draws.length, 0); }
+    });
+  }
+  check('Verac test caller draws once after readiness and before accuracy', () => {
+    for (const variant of ['pending', 'target-loss', 'npc-busy', 'dead-player']) {
+      const refused = execute(fixturePack, 'cow', '[proc,bc00_test_verac]', [], variant, 'melee');
+      assert.deepEqual(refused.values, [0, -1, 0, 0, 0]); assert.equal(refused.draws.length, 0);
+    }
+    for (const protectedTrial of [false, true]) for (const proc of [false, true]) {
+      const result = execute(fixturePack, 'cow', '[proc,bc00_test_verac]', [], protectedTrial ? 'protected-hit' : 'hit', 'melee', null, 1, { draws: [proc ? 0 : 0.9, 0.999999, 0, 0.999999] });
+      const random = result.events.filter(e => e.op === 'RANDOM' || e.op === 'RANDOMINC');
+      assert.equal(random[0].op, 'RANDOM'); assert.deepEqual(random[0].in, [4]);
+      assert.equal(result.draws.length, proc ? 2 : protectedTrial ? 3 : 4);
+      assert.equal(result.values[3], proc ? protectedTrial ? 15 : 23 : protectedTrial ? 0 : 23);
+      assert(result.events.findIndex(e => e.op === 'NPC_ANIM') < result.events.findIndex(e => e.op === 'RANDOM'));
+      delivery(result, 'melee', proc && protectedTrial ? 15 : 23);
+    }
+  });
   check('typed queue references use compiled names after pack regeneration', () => {
     const result = execute(pack, 'cow', '[proc,npc_default_attack]', [], 'hit', 'melee');
     const queues = result.events.filter(event => event.op === 'QUEUE' || event.op === 'QUEUE*');
@@ -150,7 +239,7 @@ try {
   });
   for (const [style, type] of [['melee', 'cow'], ['ranged', 'ardougne_archer'], ['magic', 'bearded_dark_wizard']]) {
     const entry = `[proc,bc00_test_${style}]`;
-    const args = style === 'melee' ? [7, 2, 0] : style === 'ranged' ? [7, 0, 0] : [spellId(wind), 4, 7, 0];
+    const args = style === 'melee' ? [7, 2, 0] : style === 'ranged' ? [7, 0, 0] : [spellId(wind), 4, 7, 0, 0];
     const result = execute(fixturePack, type, entry, args, 'hit', style);
     check(`${style} compiled caller receives tuple and applies its own effect`, () => { assert.deepEqual(result.values.slice(0, 4), [1, 1, 7, 7]); assert.equal(result.snapshot.levels[1], 79); delivery(result, style, 7); });
     check(`${style} pending compiled caller has no special`, () => {
@@ -163,8 +252,14 @@ try {
     assert.deepEqual(result.values, [1, 1, 15, 15, 0]); assert.equal(result.draws.length, 1); delivery(result, 'melee', 15);
   });
   check('armour-only policy retains native level/prayer/style but ignores equipment defence', () => {
-    for (const level of [30, 80]) {
-      const prepare = f => { f.player.levels[1] = level; f.player.baseLevels[1] = level; rt.run('[proc,player_combat_stat]', f); };
+    for (const level of [30, 80]) for (const stance of [0, 2]) for (const prayer of [false, true]) {
+      const prepare = f => {
+        f.player.levels[1] = level; f.player.baseLevels[1] = level;
+        // Native unarmed mode 2 selects defensive stance and its +3 bonus.
+        f.player.setVar(rt.id(VarPlayerType, 'com_mode'), stance);
+        f.player.setVar(rt.id(VarPlayerType, 'prayer9'), Number(prayer));
+        rt.run('[proc,player_combat_stat]', f);
+      };
       const ordinary = execute(pack, 'cow', '[proc,npc_meleeattack_outcome]', [7, 0, 0], 'hit', 'melee', prepare);
       const unarmoured = execute(pack, 'cow', '[proc,npc_meleeattack_outcome]', [7, 1, 0], 'hit', 'melee', prepare);
       same(unarmoured, ordinary, 'no equipment is exactly the native defence');
@@ -181,8 +276,8 @@ try {
     assert.deepEqual(result.values.slice(0, 4), [1, 1, 7, 0]); assert.equal(result.draws.length, 3); delivery(result, style, 7);
   });
   for (const row of [wind, curse, freeze]) for (const variant of ['protected-hit', 'protected-miss']) check(`magic ${row.debugname} ${variant} retains one splash and no protected stat/freeze success`, () => {
-    const native = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell_outcome]', [spellId(row), 4, -1, 0], variant, 'magic');
-    const latent = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell_outcome]', [spellId(row), 4, -1, 1], variant, 'magic');
+    const native = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell_outcome]', [spellId(row), 4, -1, 0, 0], variant, 'magic');
+    const latent = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell_outcome]', [spellId(row), 4, -1, 1, 0], variant, 'magic');
     assert.deepEqual(latent.snapshot, native.snapshot); assert.deepEqual(latent.settled, native.settled);
     assert.equal(latent.events.filter(e => e.op === 'SPOTANIM_PL').length, 1, 'exactly the native failed impact');
     assert.equal(latent.snapshot.queued.filter(q => q.script === '[queue,npc_freeze_player]').length, 0);
@@ -190,6 +285,34 @@ try {
     assert.deepEqual(latent.values.slice(0, 2), [1, variant.endsWith('miss') ? 0 : 1]);
     assert.equal(latent.values[3], 0); assert.equal(latent.draws.length, variant.endsWith('miss') ? 2 : 3);
   });
+  for (const row of [wind, rt.spell('fire_wave'), curse, rt.spell('weaken'), rt.spell('curse'), freeze]) {
+    for (const latentRequest of [0, 1]) for (const variant of ['protected-hit', 'protected-zero', 'protected-miss']) check(`${row.debugname} protected success-effects request=${latentRequest} ${variant}`, () => {
+      const args = [spellId(row), 6, -1, latentRequest, 1];
+      const result = execute(fixturePack, 'bearded_dark_wizard', '[proc,bc00_test_magic]', args, variant, 'magic');
+      const hit = !variant.endsWith('miss');
+      assert.deepEqual(result.values.slice(0, 2), [1, Number(hit)]);
+      assert.equal(result.values[3], 0); assert.equal(result.values[4], 0);
+      assert.equal(result.draws.length, hit ? 3 : 2);
+      assert.equal(result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]' || q.script === '[queue,poison_player]').length, 0);
+      const expected = execute(fixturePack, 'bearded_dark_wizard', '[proc,bc00_test_magic]', [spellId(row), 6, -1, 1, 0], hit ? variant.replace('protected-', '') : variant, 'magic');
+      const nonDamage = r => r.events.filter(e => /SOUND|SPOTANIM_PL|^IF_CLOSE|^MES|STAT_(ADD|SUB)/.test(e.op) || e.op.startsWith('QUEUE') && ['[queue,playerhit_n_retaliate]', '[queue,npc_freeze_player]'].includes(e.in.at(-1)));
+      assert.deepEqual(nonDamage(result), nonDamage(expected), 'one native success/failure presentation, retaliation and standard effects');
+      assert.deepEqual(result.snapshot.levels, expected.snapshot.levels, 'standard stat effect, once');
+      assert.equal(result.settled.vars[rt.id(VarPlayerType, 'frozen')], expected.settled.vars[rt.id(VarPlayerType, 'frozen')], 'standard freeze, once');
+      if (hit) {
+        assert.equal(result.events.filter(e => e.op === 'SPOTANIM_PL').length, 1);
+        const draws = result.events.flatMap((e, i) => e.op === 'RANDOMINC' ? [i] : []);
+        const cast = result.events.findIndex((e, i) => i > draws[1] && e.op === 'SOUND_SYNTH');
+        assert(cast > draws[1] && cast < draws[2], 'cast sound before the single magnitude');
+        assert.equal(result.values[2], rt.field(row, 'maxhit') < 0 || variant.endsWith('zero') ? 0 : rt.field(row, 'maxhit'));
+      }
+    });
+    check(`${row.debugname} success-effects input does not change an unprotected attack`, () => {
+      const disabled = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell_outcome]', [spellId(row), 6, -1, 0, 0], 'hit', 'magic');
+      const enabled = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell_outcome]', [spellId(row), 6, -1, 0, 1], 'hit', 'magic');
+      same(enabled, disabled, 'unprotected flag is inert'); assert.deepEqual(enabled.values, disabled.values);
+    });
+  }
   for (const [style, type] of [['melee', 'poisonspider'], ['ranged', 'ardougne_archer']]) check(`${style} poisonous protected native attack retains its three draws and one poison queue`, () => {
     const npc = NpcType.getByName(type), original = npc.params, severity = rt.param(NpcType.getByName('poisonspider'), 'poison_severity');
     try {
@@ -254,7 +377,7 @@ try {
     for (const row of report.costs) for (const opcode of Object.keys(row.added)) assert(allowed.has(opcode), `${row.npc} ${row.entry} ${row.variant}: ${opcode}`);
   });
   report.observedCallers = [...observed].sort();
-  report.summary = { checks, npcTypes: npcs.length, routes: npcs.reduce((n, r) => n + r.entries.length, 0), differentialCases: report.costs.length, passed: true };
+  report.summary = { checks, npcTypes: npcs.length, routes: npcs.reduce((n, r) => n + r.entries.length, 0), uniqueDispatchRoutes: report.routeCoverage.length, seededRouteCases: report.routeCoverage.reduce((n, r) => n + r.branches.length, 0), differentialCases: report.costs.length, passed: true };
   console.log(`RESULT PASS npc-combat-outcomes checks=${checks} npcTypes=${npcs.length} sameRunCases=${report.costs.length}`);
 } catch (error) {
   report.summary = { checks, passed: false, error: error.stack };

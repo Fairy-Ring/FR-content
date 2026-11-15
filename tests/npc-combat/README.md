@@ -225,16 +225,43 @@ The report records per-NPC cases and per-attack command costs, not stored expect
 combat values. `--focused` selects named development controls; CI and acceptance
 must omit it.
 
+The positional hit/zero/miss vectors above are input controls, not proof that
+each dispatch route reached the named branch. `outcome-route-seeds.json` adds
+uninterrupted RNG seeds for every unique compiled dispatch route, including
+routes that first draw a spell or style. Its fixtures use native equipment and
+quest state, then compute the player's cached defence with `player_combat_stat`.
+Each seed asserts the actual reached accuracy/damage branch. Base-pack mode
+compares these executions too. The manifest lists why a branch cannot exist:
+strict null ranged presentation for guard2, a missing native magic row for
+Nezikchened's AP route, non-damaging Bind/Confuse for chaos druid's AP route,
+and no accuracy roll for the troll thrower and snail routes. These native
+limitations are preserved, not repaired by the seam.
+
 The outcomes return `(attempted, accuracy, rolled, delivered, ticks)`. Accuracy is
 `-1` when no attempt is made, `0` for a miss and `1` for an accuracy success,
 including a zero magnitude. `ticks` is the native queued damage delay, or zero
-when no damage is queued. Melee readiness and presentation stay in
-`npc_default_attack`; its explicit twin is `npc_default_attack_outcome`.
-`npc_meleeattack_outcome` is the lower-level entry for a caller that already owns
-that boundary. Its policies are `0` ordinary, `1` equipment-free defence retaining
+when no damage is queued. `npc_default_attack_ready()` exposes the native melee
+readiness and presentation without accuracy. It returns only `attempted` and
+draws nothing. A policy-selecting caller draws only after it returns true, then
+calls `npc_meleeattack_outcome`. `npc_default_attack_outcome` composes those two
+entries when no pre-accuracy choice is needed. The ordinary `npc_default_attack`
+keeps its original prefix. The melee outcome policies are `0` ordinary, `1`
+equipment-free defence retaining
 level/prayer/style, and `2` unconditional accuracy with no accuracy draws.
 For policy 2 the caller supplies the protected maximum; the seam does not zero it.
 `npc_rangeattack_outcome` accepts maximum, request-protected-roll and
 allow-null-presentation. `npc_cast_spell_outcome` accepts spell, interval,
-forced maximum (null means the native spell row) and request-protected-roll.
+forced maximum (null means the native spell row), request-protected-roll and
+protected-success-effects. Both booleans default to false at each caller.
+The latter also requests latent accuracy. On protected accuracy success it
+uses the native success presentation, retaliation, stat and freeze effects
+exactly once, with the original maximum's one latent magnitude but no damage
+or poison queue. Off retains the native failure splash. A latent miss always
+uses native failure. Neither input is read by the ordinary wrappers.
 Ordinary public void entries remain strict and retain their native inputs.
+
+Admission controls refuse player death, pending delay, player combat/PvP
+ownership, NPC combat ownership, existing freeze and each existing debuff.
+Armour-only controls include defensive stance and Defence prayer. The compiled
+Verac consumer proves the readiness → chance → accuracy boundary and protected
+special cap independently of any published NPC.

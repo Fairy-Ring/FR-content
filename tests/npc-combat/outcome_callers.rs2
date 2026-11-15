@@ -20,12 +20,32 @@ $attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_rangeattack_outcome($m
 if ($attempted = true) stat_sub(defence, 1, 0);
 return($attempted, $accuracy, $rolled, $delivered, $ticks);
 
-[proc,bc00_test_magic](int $spell, int $interval, int $maxhit, boolean $protected_roll)(boolean, int, int, int, int)
+[proc,bc00_test_magic](int $spell, int $interval, int $maxhit, boolean $protected_roll, boolean $protected_effects)(boolean, int, int, int, int)
 def_boolean $attempted;
 def_int $accuracy;
 def_int $rolled;
 def_int $delivered;
 def_int $ticks;
-$attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_cast_spell_outcome($spell, $interval, $maxhit, $protected_roll);
+$attempted, $accuracy, $rolled, $delivered, $ticks = ~npc_cast_spell_outcome($spell, $interval, $maxhit, $protected_roll, $protected_effects);
 if ($attempted = true) stat_sub(defence, 1, 0);
 return($attempted, $accuracy, $rolled, $delivered, $ticks);
+
+// Verac's policy draw belongs after native readiness/presentation and before
+// accuracy. This test consumer adds no Barrows code to the published pack.
+[proc,bc00_test_verac]()(boolean, int, int, int, int)
+if (~npc_default_attack_ready = false) {
+    return(false, -1, 0, 0, 0);
+}
+def_int $policy = 0;
+def_int $maxhit = 23;
+if (random(4) = 0) {
+    $policy = 2;
+    if (~check_protect_prayer(^melee_style) = true) $maxhit = 15;
+}
+return(~npc_meleeattack_outcome($maxhit, $policy, false));
+
+[proc,bc00_test_ready]()(boolean, int, int, int, int)
+if (~npc_default_attack_ready = false) {
+    return(false, -1, 0, 0, 0);
+}
+return(~npc_meleeattack_outcome(~npc_melee_maxhit, 0, false));
