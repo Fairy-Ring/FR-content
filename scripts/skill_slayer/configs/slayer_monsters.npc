@@ -2160,6 +2160,8 @@ defence=40
 magic=67
 ranged=67
 attackrange=13
+// UNKNOWN engineering check interval; the native type timer survives combat reset.
+timer=1
 param=attackrate,2
 param=slayer_category,^slayer_killerwatt
 

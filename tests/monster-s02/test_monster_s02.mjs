@@ -281,6 +281,18 @@ for (const [distance, prayer, blocked] of [[1, 'prayer14', true], [2, 'prayer12'
 {
   const { player, npc } = fixture();
   run('[proc,killerwatt_wake]', player, npc);
+  npc.levels[NpcStat.HITPOINTS] = 31;
+  npc.resetDefaults();
+  check('native combat reset retains the one-tick form timer', npc.timerInterval, 1);
+  World.currentTick += 8;
+  npc.turn();
+  check('native NPC turn returns the deserted form after a combat reset', npc.type, ball);
+  check('native reset return preserves damage', npc.levels[NpcStat.HITPOINTS], 31);
+  check('native reset return stops the ball timer', npc.timerInterval, 0);
+}
+{
+  const { player, npc } = fixture();
+  run('[proc,killerwatt_wake]', player, npc);
   rng([0, 0], () => run('[proc,killerwatt_attack]', npc, player));
   World.currentTick += 8;
   run('[ai_timer,slayer_killerwatt]', npc);

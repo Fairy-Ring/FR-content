@@ -353,6 +353,7 @@
     {
       "identity": { "debugname": "slayer_killerwatt", "id": 3201 },
       "unit": "S02",
+      "note": "timer=1 is engineering: monster-combat-data.s02-killerwatt-native-timer-reset is VERIFIED software behavior only; monster-combat-data.s02-killerwatt-engineering-timing remains UNKNOWN historical timing.",
       "evidence": {
         "facts": ["monster-combat-data.s02-killerwatt-vectors", "monster-combat-data.s02-killerwatt-attack-interval", "monster-combat-data.s02-killerwatt-distance"],
         "label": "CANDIDATE",
@@ -372,6 +373,18 @@
         "magic": { "value": 67 },
         "ranged": { "value": 67 },
         "attackrange": { "value": 13 },
+        "timer": {
+          "value": 1,
+          "unit": "S02",
+          "evidence": {
+            "facts": ["monster-combat-data.s02-killerwatt-native-timer-reset"],
+            "label": "VERIFIED",
+            "researchCommit": "a56be5e883140f437225d8f420cd18a9798acc07",
+            "sources": [
+              { "id": "src.monster-s02-native-timer-reset", "sha256": "d4abe4da18d7b1ed855ecf809b78bb62497fd6531b7ca3aeed8b48b3e36ec7c3" }
+            ]
+          }
+        },
         "param:attackrate": { "value": 2 },
         "param:slayer_category": {
           "value": 73,
