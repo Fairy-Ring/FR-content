@@ -71,7 +71,7 @@ if (~inzone_coord_pair_table(dwarf_zones, coord) = true) {
     mes("The dwarves won't be happy if you set up a cannon here."); // osrs
     return;
 }
-// CANDIDATE monster-combat-data.s02-killerwatt-forms: Old School plane r195522/r5636140. Plane-specific refusal wording UNKNOWN.
+// CANDIDATE monster-combat-data.s02-killerwatt-plane-no-cannon: no dwarf multicannon on the Killerwatt plane (the last zone below; Old School plane r195522/r5636140). Plane-specific refusal wording UNKNOWN.
 if (~inzone_coord_pair_table(bank_zones, coord) = true | ~in_duel_arena(coord) = true | ~in_castlewars_game(coord) = true | ~in_castlewars_waitingroom(coord) = true | inzone(2_41_81_0_0, 2_41_81_63_63, coord) = true) { // guessing they dont let u set up at duel arena at all, esp with nomovement duels
     mes("You can't set up a cannon here."); // osrs
     return;
