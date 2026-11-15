@@ -21,6 +21,8 @@ const OpObj = (await engineModule('network/game/client/model/OpObj.ts')).default
 const pickupHandler = new (await engineModule('network/game/client/handler/OpObjHandler.ts')).default();
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
 const locHandler = new (await engineModule('network/game/client/handler/OpLocHandler.ts')).default();
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const moveHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
 const flag = id('VarBitType', 'darkness_level');
 const gas = id('VarBitType', 'swamp_gas_turns');
 const parent = id('VarPlayerType', 'goblin_caves');
@@ -523,6 +525,30 @@ for (const mode of ['melee', 'ranged', 'autocast', 'manual']) for (const continu
   });
 }
 
+for (const lit of [false, true]) test(`Crumble Undead ${lit ? 'with' : 'without'} current light: check2 and real cast control`, () => {
+  const p = fixture(['staff_of_air', 'chaosrune', ...(lit ? ['lit_candle'] : [])]), n = npc(p, 'zombie_unarmed');
+  p.invAdd(inv, obj('earthrune'), 8);
+  assert(held(p, 'staff_of_air', 2));
+  assert.equal(execute('[proc,player_in_combat_check2]', p, [], { target: n }).popInt(), Number(lit),
+    'the compiled check2 light guard refuses unlit players and allows the lit control');
+  const before = { inv: inventory(p), xp: [...p.stats], delay: p.getVar(id('VarPlayerType', 'action_delay')) };
+  p.setInteraction(Interaction.ENGINE, n, ServerTriggerType.APNPCT, id('Component', 'magic:crumble_undead'));
+  const names = traceScripts(() => ticks(p, 3));
+  assert(names.some(name => name === '[apnpct,magic:crumble_undead]' || name === '[opnpct,magic:crumble_undead]'),
+    'engine runs the real Crumble Undead approach or adjacent operation');
+  if (lit) {
+    assert.equal(count(p, 'chaosrune'), 0, 'one chaos rune spent');
+    assert.equal(count(p, 'earthrune'), 6, 'two earth runes spent');
+    assert(p.stats[PlayerStat.MAGIC] > before.xp[PlayerStat.MAGIC], 'real Crumble Undead cast XP');
+    assert(p.getVar(id('VarPlayerType', 'action_delay')) > before.delay);
+  } else {
+    assert.deepEqual(inventory(p), before.inv); assert.deepEqual([...p.stats], before.xp);
+    assert.equal(p.getVar(id('VarPlayerType', 'action_delay')), before.delay);
+    assert.equal([...n.queue.all()].length, 0, 'no unlit outgoing spell damage');
+  }
+  p.clearInteraction(); World.removeNpc(n, -1);
+});
+
 test('incoming NPC melee still queues and applies its real damage while the player is unlit', () => {
   const p = start(fixture()), n = npc(p), before = hp(p);
   // Execute the real attack and consume its real damage queue; no substituted
@@ -643,20 +669,73 @@ for (const record of [1, 2]) test(`real commorb Playback ${record} after 31 dark
   ticks(p, 14); elapsed(p, 14); assert.equal(hp(p), before);
   release(p);
 });
-test('real Tears up after 31 dark ticks releases synchronously, including its own arrival delay', () => {
+test('unwalked Tears up after 31 dark ticks releases before its immediate move', () => {
   const p = start(fixture([], [2, 3218, 9532])); ticks(p, 31); assert.equal(hp(p), 97);
   const loc = World.getLoc(3218, 9533, 2, id('LocType', 'tog_cave_up'));
   assert(loc);
   const state = ScriptRunner.init(ScriptProvider.getByName('[oploc1,tog_cave_up]'), p, loc);
   p.executeScript(state, true, true);
-  for (let i = 0; i < 10 && inside(p); i++) {
-    assert(p.delayed, 'published p_arrivedelay holds the player before moving');
-    ticks(p, 1); assert.equal(hp(p), 97);
-  }
+  assert.equal(p.delayed, false, 'without a same-tick walk p_arrivedelay does not hold');
   assert.deepEqual(tile(p), [0, 3225, 9538], 'keep the published landing for SC-06');
   ownership(p, false); assert.equal(p.overlay, -1);
   const messages = [...p.messages]; ticks(p, 40);
   ownership(p, false); assert.equal(hp(p), 97); assert.deepEqual(p.messages, messages);
+});
+
+test('walked Tears up holds one arrival tick without a bite, then releases with the move', () => {
+  // On this walked path O2 (release after movement) is masked by the same-tick
+  // outside fallback. The unwalked cases above and below prove release ordering.
+  const target = [3219, 9532], p = fixture([], [2, ...target]);
+  const approach = caveRoute(p, (x, z) => Math.abs(x - target[0]) + Math.abs(z - target[1]) >= 5);
+  [p.x, p.z] = approach.at(-1);
+  start(p); ticks(p, 31); assert.equal(hp(p), 97);
+  const loc = World.getLoc(3218, 9533, 2, id('LocType', 'tog_cave_up'));
+  assert(loc);
+  const route = [...map.findPath(2, p.x, p.z, target[0], target[1])]
+    .map(coord => { const { x, z } = CoordGrid.unpackCoord(coord); return { x, z }; });
+  assert(route.length > 0, 'collision-checked approach has real walking steps');
+  p.originX = p.x; p.originZ = p.z;
+  assert(moveHandler.handle(new MoveClick(route, 0, true), p), 'real move packet accepted');
+  assert(locHandler.handle(new OpLoc(1, loc.x, loc.z, loc.type), p), 'real Tears operation accepted');
+  for (let i = 0; i < 15 && !p.delayed && inside(p); i++) ticks(p, 1);
+  assert(p.delayed, 'the walked arrival must enter p_arrivedelay, not skip the hold');
+  assert.equal(p.activeScript?.script.name, '[oploc1,tog_cave_up]');
+  assert.equal(p.activeScript.execution, ScriptState.SUSPENDED);
+  assert(p.lastMovement >= World.currentTick - 1, 'the hold follows actual recent walking');
+  assert.deepEqual(tile(p), [2, ...target]); ownership(p); assert.equal(p.overlay, roots[0]);
+  const heldTick = World.currentTick, before = hp(p), messages = [...p.messages];
+  ticks(p, 1);
+  assert.equal(World.currentTick, heldTick + 1);
+  assert.equal(p.delayed, false); assert.equal(p.activeScript, null);
+  assert.deepEqual(tile(p), [0, 3225, 9538], 'release and published move complete on the next tick');
+  ownership(p, false); assert.equal(p.overlay, -1);
+  assert.equal(hp(p), before, 'no bite while the arrival delay holds the player');
+  assert.deepEqual(p.messages, messages);
+  ticks(p, 40); ownership(p, false); assert.equal(hp(p), before); assert.deepEqual(p.messages, messages);
+});
+
+for (const path of ['ectophial Empty', 'Tears up']) test(`outside ${path} completes without changing darkness state`, () => {
+  const p = fixture(path === 'ectophial Empty' ? ['ectophial'] : [], [0, 3220, 3220]);
+  execute('[proc,tog_hud_enter]', p);
+  const before = { parent: p.getVar(parent), overlay: p.overlay, packets: rootPackets(p).length, hp: hp(p) };
+  if (path === 'ectophial Empty') {
+    assert(held(p, 'ectophial', 1));
+    assert.deepEqual(tile(p), [0, 3658, 3517]);
+    assert.equal(count(p, 'ectophial'), 0); assert.equal(count(p, 'ectophial_empty'), 1);
+  } else {
+    // Direct packed operation at a non-dark origin tests the guard, not a new route.
+    const loc = World.getLoc(3218, 9533, 2, id('LocType', 'tog_cave_up'));
+    assert(loc);
+    p.executeScript(ScriptRunner.init(ScriptProvider.getByName('[oploc1,tog_cave_up]'), p, loc), true, true);
+    assert.deepEqual(tile(p), [0, 3225, 9538]);
+  }
+  ownership(p, false); assert.equal(p.getVarBit(gas), 0); assert.equal(p.getVar(parent), before.parent);
+  assert.equal(p.overlay, before.overlay, 'the non-dark caller retains its competing HUD');
+  assert.equal(rootPackets(p).length, before.packets);
+  const messages = [...p.messages]; ticks(p, 35);
+  ownership(p, false); assert.equal(p.getVar(parent), before.parent); assert.equal(hp(p), before.hp);
+  assert.equal(p.overlay, before.overlay); assert.equal(rootPackets(p).length, before.packets);
+  assert.deepEqual(p.messages, messages);
 });
 
 test('actual insect death releases before the first death delay and no later hazard reaches the respawn', () => {
