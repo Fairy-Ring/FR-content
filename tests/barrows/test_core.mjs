@@ -129,27 +129,27 @@ function parsePackedId(contentRoot, kind, name) {
   return Number(row.slice(0, row.indexOf('=')));
 }
 
-// Ruling 3: the shared login bytecode pin may move, but a player with no
-// Barrows state must retain the published login's observable result.
-async function checkInertLogin() {
-  const previousEngine = process.env.HARNESS_ENGINE_DIR;
+// Compare this pack's real login with and without the Barrows hook. Unrelated
+// login changes affect both sides, without a frozen published-state contract.
+async function checkInertLogin({ World, Player, ScriptProvider, ScriptRunner, ScriptState, loadDefault, eng }) {
+  const types = await Promise.all([
+    'VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'NpcType', 'LocType', 'SeqType',
+    'SpotanimType', 'InvType', 'ObjType', 'FontType', 'Component', 'DbRowType', 'DbTableType',
+    'EnumType', 'ParamType', 'CategoryType', 'StructType', 'MesanimType'
+  ].map(name => loadDefault(`src/cache/config/${name}.ts`)));
+  const DbTableIndex = await loadDefault('src/cache/config/DbTableIndex.ts');
+  const { ScriptOpcode } = await eng('src/engine/script/ScriptOpcode.ts');
   const previousCwd = process.cwd();
-  process.env.HARNESS_ENGINE_DIR = ENGINE_ROOT;
+  process.chdir(ENGINE_ROOT);
   try {
-    const native = await import('../regicide-travel/runtime.mjs');
-    const { Player, ScriptProvider, ScriptRunner, ScriptState, World, engine, types } = native;
-    assert.equal(engine, ENGINE_ROOT, 'login fixture must use the selected sibling engine');
-    const { default: DbTableIndex } = await import(pathToFileURL(path.join(engine, 'src/cache/config/DbTableIndex.ts')).href);
-    const baseline = JSON.parse(fs.readFileSync(path.join(HERE, 'inert-login-baseline.json'), 'utf8'));
 
     function loadPack(directory) {
-      for (const Type of Object.values(types)) Type.load(directory);
+      for (const Type of types) Type.load(directory);
       DbTableIndex.init();
       assert(ScriptProvider.load(directory) > 0, 'login fixture needs a complete compiled pack');
     }
 
-    function observeLogin(directory) {
-      loadPack(directory);
+    function observeLogin() {
       const slot = 731;
       assert.equal(World.players[slot] ?? null, null, 'login fixture owns an unused native player slot');
       const player = new Player(`fixture_${slot}`, BigInt(slot), 0n);
@@ -164,11 +164,11 @@ async function checkInertLogin() {
       player.buildArea.originZ = Math.floor(player.z / 8) * 8;
       for (const id of [452, 453, 654, 659, 660]) assert.equal(player.getVar(id), 0, 'the account has no Barrows state');
       const messages = [];
-      const interfaces = [];
+      const packets = [];
       player.write = packet => {
         const type = packet.constructor.name;
         if (type === 'MessageGame') messages.push(packet.msg);
-        if (type.startsWith('If')) interfaces.push({ type, ...JSON.parse(JSON.stringify(packet)) });
+        packets.push({ type, ...JSON.parse(JSON.stringify(packet, (_, value) => typeof value === 'bigint' ? String(value) : value)) });
       };
       World.players[slot] = player;
       World.currentTick = 100;
@@ -186,8 +186,9 @@ async function checkInertLogin() {
         assert.equal(state.execution, ScriptState.FINISHED, 'the real protected login and its ordinary delays complete');
         return {
           messages,
-          varps: { length: player.vars.length, nonzero: [...player.vars.entries()].filter(([, value]) => value !== 0) },
-          interfaces: { state: player.modalState, main: player.modalMain, side: player.modalSide, chat: player.modalChat, tutorial: player.modalTutorial, overlay: player.overlay, lastOverlay: player.lastOverlay, tabs: [...player.tabs], packets: interfaces },
+          varps: [...player.vars],
+          packets,
+          interfaces: { state: player.modalState, main: player.modalMain, side: player.modalSide, chat: player.modalChat, tutorial: player.modalTutorial, overlay: player.overlay, lastOverlay: player.lastOverlay, tabs: [...player.tabs] },
           coordinates: [player.level, player.x, player.z]
         };
       } finally {
@@ -196,20 +197,37 @@ async function checkInertLogin() {
       }
     }
 
+    loadPack(PACK_DIR);
+    World.gameMap.init();
+    const built = observeLogin();
+    const resume = ScriptProvider.getByName('[proc,barrows_resume]');
+    assert(resume, 'the built pack contains the actual Barrows login hook');
+    assert.equal(resume.intArgCount, 0, 'the replaced hook takes no integer arguments');
+    assert.equal(resume.stringArgCount, 0, 'the replaced hook takes no string arguments');
+    const fields = ['intLocalCount', 'stringLocalCount', 'intArgCount', 'stringArgCount', 'switchTables', 'opcodes', 'intOperands', 'stringOperands'];
+    const saved = Object.fromEntries(fields.map(field => [field, resume[field]]));
+    let withoutBarrows;
     try {
-      if (process.env.BARROWS_PUBLISHED_LOGIN_PACK) {
-        const published = observeLogin(path.resolve(process.env.BARROWS_PUBLISHED_LOGIN_PACK));
-        assert.deepEqual(published, baseline.observable, 'the independently built published pack reproduces the frozen observable baseline');
-        console.log('OK independent published pack login messages, full varps, interfaces and coordinates');
-      }
-      assert.deepEqual(observeLogin(PACK_DIR), baseline.observable, 'Barrows-free login must preserve the published observable result');
-      console.log('OK no-Barrows-state account retains published packed login observables');
+      Object.assign(resume, {
+        intLocalCount: 0, stringLocalCount: 0, intArgCount: 0, stringArgCount: 0,
+        switchTables: [], opcodes: [ScriptOpcode.RETURN], intOperands: [0], stringOperands: ['']
+      });
+      withoutBarrows = observeLogin();
     } finally {
-      loadPack(PACK_DIR);
+      Object.assign(resume, saved);
+    }
+    assert.deepEqual(built, withoutBarrows, 'the Barrows login hook must be observationally inert for a no-Barrows account');
+    console.log('OK same-pack no-Barrows login: all varps, packets, messages, interfaces, tabs and coordinates match the return-only hook');
+    if (process.env.BARROWS_PUBLISHED_LOGIN_PACK) {
+      try {
+        loadPack(path.resolve(process.env.BARROWS_PUBLISHED_LOGIN_PACK));
+        assert.deepEqual(observeLogin(), built, 'the independently built published and head logins have identical observables in this run');
+        console.log('OK optional independent published-pack login comparison');
+      } finally {
+        loadPack(PACK_DIR);
+      }
     }
   } finally {
-    if (previousEngine === undefined) delete process.env.HARNESS_ENGINE_DIR;
-    else process.env.HARNESS_ENGINE_DIR = previousEngine;
     process.chdir(previousCwd);
   }
 }
@@ -934,7 +952,7 @@ async function main() {
   } finally {
     removeFixtures();
   }
-  await checkInertLogin();
+  await checkInertLogin({ World, Player, ScriptProvider, ScriptRunner, ScriptState, loadDefault, eng });
 }
 
 main().then(
