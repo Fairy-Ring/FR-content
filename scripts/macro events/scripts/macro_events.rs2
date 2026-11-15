@@ -4,10 +4,15 @@
 if (~macro_event_allowed = false) { 
     return;
 }
+// A blocked allocation keeps this roll for the next timer, without a retry queue.
+def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+if ($event_coord = null) {
+    return;
+}
 if (afk_event = ^true) {
     // random events arent restricted in wildy? https://youtu.be/uPKaH7yg4To?t=421
     // Not restricted in banks: https://youtu.be/1Rz9Eg4ZHhA
-    ~macro_event_general_spawn(~macro_event_set_random);
+    ~macro_event_general_create(~macro_event_set_random, $event_coord);
 }
 
 
@@ -24,15 +29,7 @@ if (afk_event = ^true) {
 // - smithing at furnace. Confirmed? https://youtu.be/a6NobmSGBYw
 // - crafting at furnace. Confirmed: https://youtu.be/7pS6s5rvvEY
 [proc,macro_event_general_spawn](int $event)
-// DECISION: acquire before allocating either an actor or encounter state.
-if (p_finduid(uid) = false) {
-    return;
-}
 if (~macro_event_allowed = false) { 
-    return;
-}
-// Hostile Swarm/Plant retain their existing combat entry.
-if ($event ! ^macro_swarm & $event ! ^macro_triffidseed & ~macro_event_in_combat = true) {
     return;
 }
 def_coord $event_coord = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
@@ -41,11 +38,11 @@ if ($event_coord = null) {
 }
 ~macro_event_general_create($event, $event_coord);
 
-// Both initial admission and configured reconnect restoration already own the player.
+// The actor must exist before either encounter token is published.
 [proc,macro_event_general_create](int $event, coord $event_coord)
-%macro_event = $event;
 def_npc $event_npc = ~macro_event_npc($event);
 npc_add($event_coord, $event_npc, 1000);
+%macro_event = $event;
 %macro_event_uid = npc_uid;
 session_log(^log_moderator, "Random event spawned: <nc_debugname(npc_type)>");
 // A lot of people say candlelight was rarer but maybe just bias since it didn't last long
@@ -311,9 +308,3 @@ if ($event = ^macro_lost_and_found) {
 %macro_event_origin_coord = null;
 %macro_event_uid = null;
 
-// No active NPC is needed: admission precedes allocation, unlike combat targeting.
-[proc,macro_event_in_combat]()(boolean)
-if (add(%lastcombat_pvp, 8) > map_clock | add(%lastcombat, 8) > map_clock) {
-    return(true);
-}
-return(false);

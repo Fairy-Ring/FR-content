@@ -18,7 +18,7 @@ if (%macro_event = ^macro_lost_and_found) {
 if (p_finduid(uid) = false) {
     return;
 }
-if (~macro_event_allowed = false | ~macro_event_in_combat = true) {
+if (~macro_event_allowed = false) {
     return;
 }
 %macro_event = ^macro_lost_and_found;

@@ -2,13 +2,15 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
-import { Player, ResumePauseButtonHandler, ResumePauseButton, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType, World, engine, pack, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
+import { Npc, EntityLifeCycle, Player, ResumePauseButtonHandler, ResumePauseButton, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType, World, engine, pack, packed, requiredId, types } from '../regicide-travel/runtime.mjs';
 
 const { default: DbTableIndex } = await import(pathToFileURL(`${engine}/src/cache/config/DbTableIndex.ts`).href);
 const { ScriptOpcode: op } = await import(pathToFileURL(`${engine}/src/engine/script/ScriptOpcode.ts`).href);
 const { default: IfButtonHandler } = await import(pathToFileURL(`${engine}/src/network/game/client/handler/IfButtonHandler.ts`).href);
 const { default: IfButton } = await import(pathToFileURL(`${engine}/src/network/game/client/model/IfButton.ts`).href);
 const { PlayerStat } = await import(pathToFileURL(`${engine}/src/engine/entity/PlayerStat.ts`).href);
+const { default: JavaRandom } = await import(pathToFileURL(`${engine}/src/util/JavaRandom.ts`).href);
+const { default: Environment } = await import(pathToFileURL(`${engine}/src/util/Environment.ts`).href);
 const inv = requiredId(types.InvType, 'inv');
 const v = name => requiredId(types.VarPlayerType, name);
 const coord = (level, x, z) => (level << 28) | (x << 14) | z;
@@ -145,23 +147,97 @@ function cleared(p) {
   for (const name of ['macro_event_uid', 'macro_event_origin_coord', 'macro_event_target_coord']) assert.equal(p.getVar(v(name)), -1, name);
   noReward(p);
 }
-for (const kind of ['modal', 'unavailable', 'delayed', 'npc combat', 'pvp combat']) check(`production Genie atomic refusal: ${kind}`, () => {
-  const p = player();
-  if (kind === 'modal') p.openMainModal(requiredId(types.Component, 'welcome_screen'));
-  if (kind === 'unavailable') p.protect = true;
-  if (kind === 'delayed') p.delayed = true;
-  if (kind === 'npc combat') p.setVar(v('lastcombat'), World.currentTick);
-  if (kind === 'pvp combat') p.setVar(v('lastcombat_pvp'), World.currentTick);
-  const before = snapshot(p);
-  run(p, '[proc,macro_event_general_spawn]', [2], { protect: false });
-  assert.deepEqual(snapshot(p), before, 'no actor, state, queue, packet or action mutation before admission');
-  p.processQueues(); p.processWeakQueue(); p.processEngineQueue();
-  assert.deepEqual(snapshot(p), before, 'refusal must not leave a later spawn or queued retry');
-  p.closeModal(); p.protect = false; p.delayed = false;
-  p.setVar(v('lastcombat'), 0); p.setVar(v('lastcombat_pvp'), 0);
-  const n = genie(p);
-  cleanup(p);
-  assert.equal(World.getNpcByUid(n.uid), null);
+const admissionStates = ['free', 'npc combat', 'multiple attackers', 'pvp combat', 'modal', 'delayed', 'unavailable', 'another event active'];
+function admissionEffects(kind, noSquare = false) {
+  const p = player(), attackers = [];
+  const random = JavaRandom.nextDouble, enabled = Environment.NODE_RANDOM_EVENTS;
+  const findSquare = ScriptRunner.HANDLERS[op.MAP_FINDSQUARE];
+  // Labelled packed-only readiness/state boundaries. Enable AFK_EVENT only in
+  // this process and fix the existing selector's RNG to Genie, not its result.
+  Environment.NODE_RANDOM_EVENTS = true;
+  JavaRandom.nextDouble = () => 0.2;
+  try {
+    if (kind === 'npc combat' || kind === 'multiple attackers') {
+      p.setVar(v('lastcombat'), World.currentTick);
+      for (let i = 0; i < (kind === 'multiple attackers' ? 2 : 1); i++) {
+        const type = types.NpcType.get(81);
+        const n = new Npc(p.level, p.x + i + 1, p.z, type.size, type.size, EntityLifeCycle.DESPAWN, World.getNextNid(), type.id, type.blockwalk);
+        World.addNpc(n, 100);
+        n.setVar(requiredId(types.VarNpcType, 'npc_aggressive_player'), p.uid);
+        attackers.push(n);
+      }
+      p.setVar(v('aggressive_npc'), attackers[0].uid);
+    }
+    if (kind === 'pvp combat') p.setVar(v('lastcombat_pvp'), World.currentTick);
+    if (kind === 'modal') p.openMainModal(requiredId(types.Component, 'welcome_screen'));
+    if (kind === 'delayed') p.delayed = true;
+    if (kind === 'unavailable') p.protect = true;
+    if (kind === 'another event active') genie(p);
+    p.afkEventReady = true;
+    if (noSquare) ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = state => { state.popInts(4); state.pushInt(-1); };
+    run(p, '[timer,general_macro_events]', [], { protect: false });
+    const owned = [...World.npcs].filter(n => n.isActive && n.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')) === (p.uid | 0));
+    const result = {
+      identity: p.getVar(v('macro_event')), ready: p.afkEventReady,
+      actors: owned.map(n => types.NpcType.get(n.type).debugname).sort(),
+      uidMatches: owned.length === 1 && owned[0].uid === p.getVar(v('macro_event_uid')),
+      tile: [p.level, p.x, p.z], modal: p.modalMain, delayed: p.delayed, protect: p.protect,
+      inventory: snapshot(p).inventory, queues: snapshot(p).queues
+    };
+    if (noSquare) {
+      ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = findSquare;
+      run(p, '[timer,general_macro_events]', [], { protect: false });
+      result.nextIdentity = p.getVar(v('macro_event'));
+      result.nextReady = p.afkEventReady;
+    }
+    return result;
+  } finally {
+    ScriptRunner.HANDLERS[op.MAP_FINDSQUARE] = findSquare;
+    JavaRandom.nextDouble = random; Environment.NODE_RANDOM_EVENTS = enabled;
+    for (const n of [...World.npcs]) if (n.isActive && (attackers.includes(n) || n.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')) === (p.uid | 0))) World.removeNpc(n, -1);
+  }
+}
+const admissionHead = new Map();
+for (const kind of admissionStates) check(`published Genie admission is preserved: ${kind}`, () => {
+  const result = admissionEffects(kind);
+  admissionHead.set(kind, result);
+  assert.equal(result.identity, 2);
+  assert.deepEqual(result.actors, ['macro_geni']);
+  assert.equal(result.uidMatches, true);
+  assert.equal(result.ready, kind === 'another event active', 'an existing event keeps readiness before AFK_EVENT');
+  assert.equal(result.modal, kind === 'modal' ? requiredId(types.Component, 'welcome_screen') : -1);
+  assert.equal(result.delayed, kind === 'delayed');
+  assert.deepEqual(result.queues, [[], [], []], 'no new retry queue');
+});
+check('no-square timer admission keeps its roll for the next timer without a queue', () => {
+  const result = admissionEffects('free', true);
+  assert.equal(result.identity, 0);
+  assert.deepEqual(result.actors, []);
+  assert.equal(result.ready, true);
+  assert.deepEqual(result.queues, [[], [], []]);
+  assert.equal(result.nextIdentity, 2);
+  assert.equal(result.nextReady, false);
+});
+check('failed NPC allocation writes no event identity or actor state', () => {
+  const p = player(), before = snapshot(p);
+  const add = ScriptRunner.HANDLERS[op.NPC_ADD];
+  // The real allocator throws when its pool is exhausted. This seam makes that
+  // same failure deterministic without allocating every slot in the world.
+  ScriptRunner.HANDLERS[op.NPC_ADD] = state => { state.popInts(3); throw new Error('labelled packed-only allocation failure'); };
+  try {
+    const state = ScriptRunner.init(packed('[proc,macro_event_general_spawn]'), p, null, [2]);
+    p.runScript(state, false);
+    assert.equal(state.execution, ScriptState.ABORTED);
+    const after = snapshot(p);
+    assert.equal(after.messages.length, 5, 'only the VM allocation-error diagnostic is emitted');
+    assert.deepEqual(after.messages.slice(0, 3), [
+      { msg: 'script error: npc_add labelled packed-only allocation failure' },
+      { msg: 'file: macro_events.rs2' }, { msg: 'stack backtrace:' }
+    ]);
+    assert.match(after.messages[3].msg, /^    1: \[proc,macro_event_general_create\] - macro_events\.rs2:\d+$/);
+    assert.match(after.messages[4].msg, /^    2: \[proc,macro_event_general_spawn\] - macro_events\.rs2:\d+$/);
+    assert.deepEqual({ ...after, messages: before.messages }, before, 'NPC_ADD must precede every encounter-state write');
+  } finally { ScriptRunner.HANDLERS[op.NPC_ADD] = add; }
 });
 for (const [tile, area] of [[[0, 2000, 4740], 'Mime'], [[0, 2900, 4550], 'Maze'], [[0, 2338, 4747], 'Lost and Found']]) check(`event-area admission uses packed zone row: ${area}`, () => {
   const p = player(tile);
@@ -177,6 +253,12 @@ function startTask(p) {
   assert.deepEqual([p.level, p.x, p.z], [0, 2338, 4747]);
   p.closeModal();
 }
+for (const combatVar of ['lastcombat', 'lastcombat_pvp']) check(`owned task retains published combat admission: ${combatVar}`, () => {
+  const p = player();
+  p.setVar(v(combatVar), World.currentTick);
+  startTask(p);
+  cleanup(p);
+});
 check('genuine task entry keeps O/D and survives logout/login without overwrite', () => {
   const p = player(); startTask(p);
   const identity = [p.getVar(v('macro_event')), p.getVar(v('macro_event_origin_coord')), p.getVar(v('macro_event_target_coord')), p.getVar(v('macro_transmit'))];
@@ -297,19 +379,43 @@ check('logout cannot detach a different owner even with a stale actor reference'
   assert.equal(bn.getVar(requiredId(types.VarNpcType, 'npc_macro_event_target')), b.uid | 0);
   cleanup(b);
 });
-check('death releases only the owned follower and cannot leave its lamp claim', () => {
-  const a = player(); const b = player(); const an = genie(a); const bn = genie(b);
-  run(a, '[queue,player_death_default]');
-  cleared(a);
-  assert.equal(World.getNpcByUid(an.uid), null);
-  assert(World.getNpcByUid(bn.uid));
-  assert.equal(b.getVar(v('macro_event_uid')), bn.uid);
-  run(a, '[queue,macro_event_login]'); cleared(a);
-  cleanup(b);
+function followerDeathEffects() {
+  const p = player([0, 3252, 3288]), n = genie(p);
+  for (const item of ['bronze_pickaxe', 'airrune', 'lawrune']) give(p, item);
+  const random = Math.random; Math.random = () => 0.5;
+  try { run(p, '[queue,player_death_default]'); }
+  finally { Math.random = random; }
+  assert.equal(p.getVar(v('macro_event')), 2, 'death leaves the follower identity to its own logic');
+  assert.equal(World.getNpcByUid(n.uid)?.isActive, true);
+  const timer = ScriptRunner.init(packed('[ai_timer,macro_geni]'), n);
+  ScriptRunner.execute(timer);
+  assert.equal(timer.execution, ScriptState.FINISHED);
+  assert.equal(p.getVar(v('macro_event_uid')), n.uid);
+  assert.equal(n.level, p.level);
+  assert(Math.max(Math.abs(n.x - p.x), Math.abs(n.z - p.z)) <= 1, 'published macro_event_lost follows to respawn');
+  noReward(p);
+  const talk = ScriptRunner.init(packed('[opnpc1,macro_geni]'), p, n);
+  p.executeScript(talk, true);
+  assert.equal(talk.execution, ScriptState.PAUSEBUTTON);
+  assert(new ResumePauseButtonHandler().handle(new ResumePauseButton(0), p));
+  assert.equal(talk.execution, ScriptState.FINISHED);
+  const result = {
+    tile: [p.level, p.x, p.z], identity: p.getVar(v('macro_event')),
+    actor: types.NpcType.get(n.type).debugname, warning: n.getVar(requiredId(types.VarNpcType, 'npc_int')),
+    inventory: snapshot(p).inventory
+  };
+  assert.equal(result.identity, 0);
+  assert.equal(p.invTotal(inv, requiredId(types.ObjType, 'macro_genilamp')), 1);
+  World.removeNpc(n, -1);
+  return result;
+}
+let followerDeathHead;
+check('published follower survives owner death, follows respawn and grants its lamp', () => {
+  followerDeathHead = followerDeathEffects();
 });
-check('death with an owned identity and a reused uid cannot delete another owner actor', () => {
-  const a = player(); const b = player(); const an = genie(a); const bn = genie(b);
-  World.removeNpc(an, -1);
+check('task death with a reused uid cannot delete another owner actor', () => {
+  const a = player(); const b = player(); const bn = genie(b);
+  startTask(a);
   // Labelled reused-slot boundary, matching the reviewer's stale-UID scenario.
   a.setVar(v('macro_event_uid'), bn.uid);
   const otherBefore = snapshot(b);
@@ -506,9 +612,8 @@ for (let identity = 0; identity <= 6; identity++) for (const root of identityRoo
   const result = identityEffects(identity, root);
   identityHead.set(`${identity}:${root}`, result);
   const afterLogin = root.includes('login') && ![0, 2, 4, 5].includes(identity);
-  const afterDeath = root.includes('death') && identity > 0;
-  assert.equal(result.identity, afterLogin || afterDeath ? 0 : identity);
-  assert.equal(result.target, afterDeath ? -1 : D);
+  assert.equal(result.identity, afterLogin ? 0 : identity);
+  assert.equal(result.target, D);
   assert.equal(result.progress, 13, 'U01 does not reset another event progress word');
 });
 if (process.env.U01_PUBLISHED_PACK) {
@@ -518,11 +623,18 @@ if (process.env.U01_PUBLISHED_PACK) {
       const published = identityEffects(identity, root), actual = identityHead.get(`${identity}:${root}`);
       const expected = { ...published };
       if (identity === 5 && root.includes('login')) expected.identity = 5; // plan 1332, F1
-      if (identity > 0 && root.includes('death')) {
-        expected.identity = 0; expected.target = -1; // plan 83/255, F1
-      }
       console.log(`IDENTITY_COMPARISON ${JSON.stringify({ identity, root, published, actual })}`);
-      assert.deepEqual(actual, expected, 'only the cited identity-retention/death decisions may differ');
+      assert.deepEqual(actual, expected, 'only F1 Candlelight identity retention may differ');
+    });
+    for (const kind of admissionStates) check(`published-pack admission comparison: ${kind}`, () => {
+      const published = admissionEffects(kind), actual = admissionHead.get(kind);
+      console.log(`ADMISSION_COMPARISON ${JSON.stringify({ kind, published, actual })}`);
+      assert.deepEqual(actual, published);
+    });
+    check('published-pack follower death, respawn and lamp comparison', () => {
+      const published = followerDeathEffects();
+      console.log(`FOLLOWER_DEATH_COMPARISON ${JSON.stringify({ published, actual: followerDeathHead })}`);
+      assert.deepEqual(followerDeathHead, published);
     });
   } finally { reload(pack); }
 }

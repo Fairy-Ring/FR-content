@@ -11,8 +11,8 @@ p_delay(3);
 %death = ^false;
 
 [queue,player_death_default]
-// DECISION: release only this player's owned encounter before any death delay.
-if (%macro_event ! ^no_macro_event) {
+// Only the owned task needs death cleanup; followers keep their published logic.
+if (%macro_event = ^macro_lost_and_found) {
     ~macro_event_cleanup(%macro_event, %macro_event_uid);
 }
 // The queue owns protected player access; snapshot before any death delay.
