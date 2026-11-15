@@ -532,6 +532,30 @@
         "ranged": {
           "value": 1
         },
+        "param:death_drop": {
+          "value": -1,
+          "evidence": {
+            "facts": [
+              "slayer.wall-beast-no-guaranteed-drop"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "e1e0938e6cb4037523b1328d2c887cbea45e780b",
+            "sources": [
+              {
+                "id": "src.swampcaves-rhq-wall",
+                "sha256": "c23f09c243f915d4bf98eaf3a99822f772d61678d0f85cc6b0127726e172e277"
+              },
+              {
+                "id": "src.swampcaves-osw-histories",
+                "sha256": "176ef0c370b6cb2ebce957d803bb36e0684f0cf8c5e520555079f7cfa799f97a"
+              },
+              {
+                "id": "src.swampcaves-wall-current",
+                "sha256": "01bd7f3aaac7433f52592bb004ea257dda2aa7a24a4bbe47c1ae5d5f068889ee"
+              }
+            ]
+          }
+        },
         "param:attackrate": {
           "value": 6
         },

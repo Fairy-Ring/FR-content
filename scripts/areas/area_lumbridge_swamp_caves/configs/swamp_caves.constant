@@ -30,14 +30,15 @@
 ^swamp_cave_gas_hp_divisor = 4
 ^swamp_cave_gas_min_damage = 1
 
-// SC-05 UNKNOWN engineering: exact activation anchors, locks and reset.
-^swamp_wallbeast_1 = 0_49_149_25_11
-^swamp_wallbeast_2 = 0_49_149_26_38
-^swamp_wallbeast_3 = 0_49_149_28_20
-^swamp_wallbeast_4 = 0_49_149_62_18
-^swamp_wallbeast_5 = 0_49_149_62_36
-^swamp_wallbeast_6 = 0_50_149_15_24
-^swamp_wallbeast_7 = 0_50_149_16_52
+// SC-05 CANDIDATE engineering from r130190: passage tiles in front of the holes.
+^swamp_wallbeast_1 = 0_49_149_25_10
+^swamp_wallbeast_2 = 0_49_149_26_37
+^swamp_wallbeast_3 = 0_49_149_28_19
+^swamp_wallbeast_4 = 0_49_149_62_17
+^swamp_wallbeast_5 = 0_49_149_62_35
+^swamp_wallbeast_6 = 0_50_149_15_23
+^swamp_wallbeast_7 = 0_50_149_16_51
+// UNKNOWN original durations: engineering hold, cooldown, leash and reset.
 ^swamp_wallbeast_hold_ticks = 6
 ^swamp_wallbeast_hit_tick = 5
 ^swamp_wallbeast_cooldown_ticks = 10

@@ -43523,12 +43523,13 @@ param=stabdefence,0
 param=slashdefence,0
 param=crushdefence,0
 param=magicdefence,0
-param=rangedefence,0
 // Numeric original sequences VERIFIED; server bindings are engineering.
 param=attack_anim,wall_beast_specialattack_attack
 param=defend_anim,wall_beast_specialattack_defend
 param=death_anim,wall_beast_specialattack_death
 param=slayer_category,^slayer_wallbeast
+// CANDIDATE empty period 100% Drop field, corroborated by early Old School.
+param=death_drop,null
 // SC-05 UNKNOWN engineering: combat cannot move or chase away from the hole.
 wanderrange=0
 moverestrict=nomove
