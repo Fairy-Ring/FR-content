@@ -1,0 +1,1402 @@
+{
+  "content": "c75218775e46b0086e62d6e573713ebd4d2f7e49",
+  "engine": "046689cecc9c1a84c6a0ec1ac3cc86434eb8bcf0",
+  "clientConfigs": {
+    "config": "b6ec704421650ee5527e77c635b8b3a8036f6eb042c572516ac0696cfbce19a8"
+  },
+  "effects": {
+    "[login,_]": {
+      "tile": [
+        0,
+        3222,
+        3218
+      ],
+      "vars": {
+        "musicplay": 1,
+        "damagetype": 2,
+        "com_stabattack": 7040,
+        "com_stabdef": 6848,
+        "com_slashattack": 7040,
+        "com_slashdef": 6848,
+        "com_crushattack": 7040,
+        "com_crushdef": 6848,
+        "com_magicattack": 6912,
+        "com_magicdef": 6848,
+        "com_rangeattack": 6848,
+        "com_rangedef": 6848,
+        "com_attackanim": 422,
+        "com_defendanim": 424,
+        "com_attacksound": 417,
+        "com_maxhit": 11,
+        "option_brightness": 2,
+        "option_music": 2,
+        "option_sounds": 2,
+        "bankpin_delay_days": 7,
+        "prayer_drain_resistance": 60
+      },
+      "inventory": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "messages": [
+        {
+          "msg": "Welcome to RuneScape."
+        },
+        {},
+        {
+          "varp": 18,
+          "value": 1
+        },
+        {
+          "varp": 166,
+          "value": 2
+        },
+        {
+          "varp": 168,
+          "value": 2
+        },
+        {
+          "varp": 169,
+          "value": 2
+        },
+        {
+          "op": 2,
+          "value": "null",
+          "primary": 0
+        },
+        {
+          "op": 2,
+          "value": "null",
+          "primary": 0
+        },
+        {
+          "op": 3,
+          "value": "Follow",
+          "primary": 0
+        },
+        {
+          "op": 4,
+          "value": "Trade with",
+          "primary": 0
+        },
+        {
+          "op": 5,
+          "value": "null",
+          "primary": 0
+        },
+        {
+          "minimapType": 0
+        },
+        {
+          "varp": 108,
+          "value": 0
+        },
+        {
+          "varp": 108,
+          "value": 0
+        },
+        {
+          "component": 5857,
+          "text": "unarmed"
+        },
+        {
+          "component": 5855,
+          "tab": 0
+        },
+        {
+          "component": 3917,
+          "tab": 1
+        },
+        {
+          "component": 638,
+          "tab": 2
+        },
+        {
+          "component": 7335,
+          "colour": 31744
+        },
+        {
+          "component": 7336,
+          "colour": 31744
+        },
+        {
+          "component": 7333,
+          "colour": 31744
+        },
+        {
+          "component": 7343,
+          "colour": 31744
+        },
+        {
+          "component": 7348,
+          "colour": 31744
+        },
+        {
+          "component": 673,
+          "colour": 31744
+        },
+        {
+          "component": 7337,
+          "colour": 31744
+        },
+        {
+          "component": 7346,
+          "colour": 31744
+        },
+        {
+          "component": 7340,
+          "colour": 31744
+        },
+        {
+          "component": 7355,
+          "colour": 31744
+        },
+        {
+          "component": 8137,
+          "colour": 31744
+        },
+        {
+          "component": 7338,
+          "colour": 31744
+        },
+        {
+          "component": 7344,
+          "colour": 31744
+        },
+        {
+          "component": 7360,
+          "colour": 31744
+        },
+        {
+          "component": 7334,
+          "colour": 31744
+        },
+        {
+          "component": 7342,
+          "colour": 31744
+        },
+        {
+          "component": 7332,
+          "colour": 31744
+        },
+        {
+          "component": 7339,
+          "colour": 31744
+        },
+        {
+          "component": 7341,
+          "colour": 31744
+        },
+        {
+          "component": 7369,
+          "colour": 31744
+        },
+        {
+          "component": 7347,
+          "colour": 31744
+        },
+        {
+          "component": 7381,
+          "colour": 31744
+        },
+        {
+          "component": 7359,
+          "colour": 31744
+        },
+        {
+          "component": 7373,
+          "colour": 31744
+        },
+        {
+          "component": 7367,
+          "colour": 31744
+        },
+        {
+          "component": 7383,
+          "colour": 31744
+        },
+        {
+          "component": 7345,
+          "colour": 31744
+        },
+        {
+          "component": 7372,
+          "colour": 31744
+        },
+        {
+          "component": 7374,
+          "colour": 31744
+        },
+        {
+          "component": 7368,
+          "colour": 31744
+        },
+        {
+          "component": 7380,
+          "colour": 31744
+        },
+        {
+          "component": 7350,
+          "colour": 31744
+        },
+        {
+          "component": 7364,
+          "colour": 31744
+        },
+        {
+          "component": 7351,
+          "colour": 31744
+        },
+        {
+          "component": 7370,
+          "colour": 31744
+        },
+        {
+          "component": 7354,
+          "colour": 31744
+        },
+        {
+          "component": 7362,
+          "colour": 31744
+        },
+        {
+          "component": 7363,
+          "colour": 31744
+        },
+        {
+          "component": 7371,
+          "colour": 31744
+        },
+        {
+          "component": 7358,
+          "colour": 31744
+        },
+        {
+          "component": 7365,
+          "colour": 31744
+        },
+        {
+          "component": 1740,
+          "colour": 31744
+        },
+        {
+          "component": 10135,
+          "colour": 31744
+        },
+        {
+          "component": 8969,
+          "colour": 31744
+        },
+        {
+          "component": 8679,
+          "colour": 31744
+        },
+        {
+          "component": 10115,
+          "colour": 31744
+        },
+        {
+          "component": 8576,
+          "colour": 31744
+        },
+        {
+          "component": 11907,
+          "colour": 31744
+        },
+        {
+          "component": 6518,
+          "colour": 31744
+        },
+        {
+          "component": 7378,
+          "colour": 31744
+        },
+        {
+          "component": 7352,
+          "colour": 31744
+        },
+        {
+          "component": 7375,
+          "colour": 31744
+        },
+        {
+          "component": 7356,
+          "colour": 31744
+        },
+        {
+          "component": 7353,
+          "colour": 31744
+        },
+        {
+          "component": 7361,
+          "colour": 31744
+        },
+        {
+          "component": 11132,
+          "colour": 31744
+        },
+        {
+          "component": 9927,
+          "colour": 31744
+        },
+        {
+          "component": 7376,
+          "colour": 31744
+        },
+        {
+          "component": 7357,
+          "colour": 31744
+        },
+        {
+          "component": 7379,
+          "colour": 31744
+        },
+        {
+          "component": 7349,
+          "colour": 31744
+        },
+        {
+          "component": 7366,
+          "colour": 31744
+        },
+        {
+          "component": 7459,
+          "colour": 31744
+        },
+        {
+          "component": 8115,
+          "colour": 31744
+        },
+        {
+          "component": 8438,
+          "colour": 31744
+        },
+        {
+          "component": 191,
+          "colour": 31744
+        },
+        {
+          "component": 11858,
+          "colour": 31744
+        },
+        {
+          "component": 12839,
+          "colour": 31744
+        },
+        {
+          "component": 668,
+          "colour": 31744
+        },
+        {
+          "component": 11857,
+          "colour": 31744
+        },
+        {
+          "component": 12129,
+          "colour": 31744
+        },
+        {
+          "component": 6024,
+          "colour": 31744
+        },
+        {
+          "component": 12852,
+          "colour": 31744
+        },
+        {
+          "component": 638,
+          "tab": 2
+        },
+        {
+          "component": 3213,
+          "tab": 3
+        },
+        {
+          "component": 1644,
+          "tab": 4
+        },
+        {
+          "component": 5608,
+          "tab": 5
+        },
+        {
+          "component": 1151,
+          "tab": 6
+        },
+        {
+          "component": 5065,
+          "tab": 8
+        },
+        {
+          "component": 5715,
+          "tab": 9
+        },
+        {
+          "component": 2449,
+          "tab": 10
+        },
+        {
+          "component": 147,
+          "tab": 12
+        },
+        {
+          "component": 904,
+          "tab": 11
+        },
+        {
+          "component": 962,
+          "tab": 13
+        },
+        {
+          "component": 1675,
+          "text": "Stab: +0"
+        },
+        {
+          "component": 1676,
+          "text": "Slash: +0"
+        },
+        {
+          "component": 1677,
+          "text": "Crush: +0"
+        },
+        {
+          "component": 1678,
+          "text": "Magic: +0"
+        },
+        {
+          "component": 1679,
+          "text": "Range: +0"
+        },
+        {
+          "component": 1680,
+          "text": "Stab: +0"
+        },
+        {
+          "component": 1681,
+          "text": "Slash: +0"
+        },
+        {
+          "component": 1682,
+          "text": "Crush: +0"
+        },
+        {
+          "component": 1683,
+          "text": "Magic: +0"
+        },
+        {
+          "component": 1684,
+          "text": "Range: +0"
+        },
+        {
+          "component": 1686,
+          "text": "Strength: +0"
+        },
+        {
+          "component": 1687,
+          "text": "Prayer: +0"
+        },
+        {
+          "varp": 43,
+          "value": 0
+        },
+        {}
+      ],
+      "tabs": [
+        5855,
+        3917,
+        638,
+        3213,
+        1644,
+        5608,
+        1151,
+        -1,
+        5065,
+        5715,
+        2449,
+        904,
+        147,
+        962
+      ],
+      "modals": [
+        -1,
+        -1,
+        -1
+      ],
+      "queues": [
+        [
+          [
+            "[queue,macro_event_login]",
+            0,
+            0,
+            [
+              0
+            ]
+          ],
+          [
+            "[queue,follower_login]",
+            0,
+            0,
+            [
+              0
+            ]
+          ],
+          [
+            "[queue,fenk_on_login_cleanup]",
+            0,
+            0,
+            [
+              0
+            ]
+          ]
+        ],
+        [],
+        []
+      ]
+    },
+    "[queue,macro_event_login]": {
+      "tile": [
+        0,
+        3222,
+        3218
+      ],
+      "vars": {},
+      "inventory": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "messages": [],
+      "tabs": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "modals": [
+        -1,
+        -1,
+        -1
+      ],
+      "queues": [
+        [],
+        [],
+        []
+      ]
+    },
+    "[proc,p_telejump_safe]": {
+      "tile": [
+        0,
+        3213,
+        3424
+      ],
+      "vars": {},
+      "inventory": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "messages": [
+        {},
+        {
+          "varp": 668,
+          "value": 0
+        },
+        {
+          "varp": 33,
+          "value": 0
+        }
+      ],
+      "tabs": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "modals": [
+        -1,
+        -1,
+        -1
+      ],
+      "queues": [
+        [],
+        [],
+        [
+          [
+            "[mapzone,0_50_53]",
+            2,
+            0,
+            []
+          ]
+        ]
+      ]
+    },
+    "[queue,player_death_default]": {
+      "tile": [
+        0,
+        3221,
+        3220
+      ],
+      "vars": {
+        "damagetype": 2,
+        "com_stabattack": 7040,
+        "com_stabdef": 6848,
+        "com_slashattack": 7040,
+        "com_slashdef": 6848,
+        "com_crushattack": 7040,
+        "com_crushdef": 6848,
+        "com_magicattack": 6912,
+        "com_magicdef": 6848,
+        "com_rangeattack": 6848,
+        "com_rangedef": 6848,
+        "com_attackanim": 422,
+        "com_defendanim": 424,
+        "com_attacksound": 417,
+        "com_maxhit": 11,
+        "prayer_drain_resistance": 60
+      },
+      "inventory": [
+        [
+          "lawrune",
+          1
+        ],
+        [
+          "airrune",
+          1
+        ],
+        [
+          "bronze_pickaxe",
+          1
+        ],
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "messages": [
+        {},
+        {
+          "id": 203,
+          "delay": 0
+        },
+        {
+          "msg": "Oh dear you are dead!"
+        },
+        {
+          "varp": 83,
+          "value": 0
+        },
+        {
+          "varp": 84,
+          "value": 0
+        },
+        {
+          "varp": 85,
+          "value": 0
+        },
+        {
+          "varp": 86,
+          "value": 0
+        },
+        {
+          "varp": 87,
+          "value": 0
+        },
+        {
+          "varp": 88,
+          "value": 0
+        },
+        {
+          "varp": 89,
+          "value": 0
+        },
+        {
+          "varp": 90,
+          "value": 0
+        },
+        {
+          "varp": 91,
+          "value": 0
+        },
+        {
+          "varp": 92,
+          "value": 0
+        },
+        {
+          "varp": 93,
+          "value": 0
+        },
+        {
+          "varp": 94,
+          "value": 0
+        },
+        {
+          "varp": 95,
+          "value": 0
+        },
+        {
+          "varp": 96,
+          "value": 0
+        },
+        {
+          "varp": 97,
+          "value": 0
+        },
+        {
+          "varp": 400,
+          "value": 0
+        },
+        {},
+        {
+          "component": 1675,
+          "text": "Stab: +0"
+        },
+        {
+          "component": 1676,
+          "text": "Slash: +0"
+        },
+        {
+          "component": 1677,
+          "text": "Crush: +0"
+        },
+        {
+          "component": 1678,
+          "text": "Magic: +0"
+        },
+        {
+          "component": 1679,
+          "text": "Range: +0"
+        },
+        {
+          "component": 1680,
+          "text": "Stab: +0"
+        },
+        {
+          "component": 1681,
+          "text": "Slash: +0"
+        },
+        {
+          "component": 1682,
+          "text": "Crush: +0"
+        },
+        {
+          "component": 1683,
+          "text": "Magic: +0"
+        },
+        {
+          "component": 1684,
+          "text": "Range: +0"
+        },
+        {
+          "component": 1686,
+          "text": "Strength: +0"
+        },
+        {
+          "component": 1687,
+          "text": "Prayer: +0"
+        },
+        {
+          "varp": 43,
+          "value": 0
+        },
+        {
+          "varp": 108,
+          "value": 0
+        },
+        {
+          "varp": 108,
+          "value": 0
+        },
+        {
+          "component": 5857,
+          "text": "unarmed"
+        },
+        {
+          "component": 5855,
+          "tab": 0
+        },
+        {
+          "component": 3917,
+          "tab": 1
+        },
+        {
+          "component": 638,
+          "tab": 2
+        },
+        {
+          "component": 7335,
+          "colour": 31744
+        },
+        {
+          "component": 7336,
+          "colour": 31744
+        },
+        {
+          "component": 7333,
+          "colour": 31744
+        },
+        {
+          "component": 7343,
+          "colour": 31744
+        },
+        {
+          "component": 7348,
+          "colour": 31744
+        },
+        {
+          "component": 673,
+          "colour": 31744
+        },
+        {
+          "component": 7337,
+          "colour": 31744
+        },
+        {
+          "component": 7346,
+          "colour": 31744
+        },
+        {
+          "component": 7340,
+          "colour": 31744
+        },
+        {
+          "component": 7355,
+          "colour": 31744
+        },
+        {
+          "component": 8137,
+          "colour": 31744
+        },
+        {
+          "component": 7338,
+          "colour": 31744
+        },
+        {
+          "component": 7344,
+          "colour": 31744
+        },
+        {
+          "component": 7360,
+          "colour": 31744
+        },
+        {
+          "component": 7334,
+          "colour": 31744
+        },
+        {
+          "component": 7342,
+          "colour": 31744
+        },
+        {
+          "component": 7332,
+          "colour": 31744
+        },
+        {
+          "component": 7339,
+          "colour": 31744
+        },
+        {
+          "component": 7341,
+          "colour": 31744
+        },
+        {
+          "component": 7369,
+          "colour": 31744
+        },
+        {
+          "component": 7347,
+          "colour": 31744
+        },
+        {
+          "component": 7381,
+          "colour": 31744
+        },
+        {
+          "component": 7359,
+          "colour": 31744
+        },
+        {
+          "component": 7373,
+          "colour": 31744
+        },
+        {
+          "component": 7367,
+          "colour": 31744
+        },
+        {
+          "component": 7383,
+          "colour": 31744
+        },
+        {
+          "component": 7345,
+          "colour": 31744
+        },
+        {
+          "component": 7372,
+          "colour": 31744
+        },
+        {
+          "component": 7374,
+          "colour": 31744
+        },
+        {
+          "component": 7368,
+          "colour": 31744
+        },
+        {
+          "component": 7380,
+          "colour": 31744
+        },
+        {
+          "component": 7350,
+          "colour": 31744
+        },
+        {
+          "component": 7364,
+          "colour": 31744
+        },
+        {
+          "component": 7351,
+          "colour": 31744
+        },
+        {
+          "component": 7370,
+          "colour": 31744
+        },
+        {
+          "component": 7354,
+          "colour": 31744
+        },
+        {
+          "component": 7362,
+          "colour": 31744
+        },
+        {
+          "component": 7363,
+          "colour": 31744
+        },
+        {
+          "component": 7371,
+          "colour": 31744
+        },
+        {
+          "component": 7358,
+          "colour": 31744
+        },
+        {
+          "component": 7365,
+          "colour": 31744
+        },
+        {
+          "component": 1740,
+          "colour": 31744
+        },
+        {
+          "component": 10135,
+          "colour": 31744
+        },
+        {
+          "component": 8969,
+          "colour": 31744
+        },
+        {
+          "component": 8679,
+          "colour": 31744
+        },
+        {
+          "component": 10115,
+          "colour": 31744
+        },
+        {
+          "component": 8576,
+          "colour": 31744
+        },
+        {
+          "component": 11907,
+          "colour": 31744
+        },
+        {
+          "component": 6518,
+          "colour": 31744
+        },
+        {
+          "component": 7378,
+          "colour": 31744
+        },
+        {
+          "component": 7352,
+          "colour": 31744
+        },
+        {
+          "component": 7375,
+          "colour": 31744
+        },
+        {
+          "component": 7356,
+          "colour": 31744
+        },
+        {
+          "component": 7353,
+          "colour": 31744
+        },
+        {
+          "component": 7361,
+          "colour": 31744
+        },
+        {
+          "component": 11132,
+          "colour": 31744
+        },
+        {
+          "component": 9927,
+          "colour": 31744
+        },
+        {
+          "component": 7376,
+          "colour": 31744
+        },
+        {
+          "component": 7357,
+          "colour": 31744
+        },
+        {
+          "component": 7379,
+          "colour": 31744
+        },
+        {
+          "component": 7349,
+          "colour": 31744
+        },
+        {
+          "component": 7366,
+          "colour": 31744
+        },
+        {
+          "component": 7459,
+          "colour": 31744
+        },
+        {
+          "component": 8115,
+          "colour": 31744
+        },
+        {
+          "component": 8438,
+          "colour": 31744
+        },
+        {
+          "component": 191,
+          "colour": 31744
+        },
+        {
+          "component": 11858,
+          "colour": 31744
+        },
+        {
+          "component": 12839,
+          "colour": 31744
+        },
+        {
+          "component": 668,
+          "colour": 31744
+        },
+        {
+          "component": 11857,
+          "colour": 31744
+        },
+        {
+          "component": 12129,
+          "colour": 31744
+        },
+        {
+          "component": 6024,
+          "colour": 31744
+        },
+        {
+          "component": 12852,
+          "colour": 31744
+        },
+        {
+          "component": 638,
+          "tab": 2
+        },
+        {
+          "component": 3213,
+          "tab": 3
+        },
+        {
+          "component": 1644,
+          "tab": 4
+        },
+        {
+          "component": 5608,
+          "tab": 5
+        },
+        {
+          "component": 1151,
+          "tab": 6
+        },
+        {
+          "component": 5065,
+          "tab": 8
+        },
+        {
+          "component": 5715,
+          "tab": 9
+        },
+        {
+          "component": 2449,
+          "tab": 10
+        },
+        {
+          "component": 147,
+          "tab": 12
+        },
+        {
+          "component": 904,
+          "tab": 11
+        },
+        {
+          "component": 962,
+          "tab": 13
+        }
+      ],
+      "tabs": [
+        5855,
+        3917,
+        638,
+        3213,
+        1644,
+        5608,
+        1151,
+        -1,
+        5065,
+        5715,
+        2449,
+        904,
+        147,
+        962
+      ],
+      "modals": [
+        -1,
+        -1,
+        -1
+      ],
+      "queues": [
+        [],
+        [],
+        [
+          [
+            "[mapzone,0_50_50]",
+            2,
+            0,
+            []
+          ]
+        ]
+      ]
+    },
+    "[if_button,magic:lumbridge_teleport]": {
+      "tile": [
+        0,
+        3221,
+        3220
+      ],
+      "vars": {},
+      "inventory": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "messages": [
+        {},
+        {
+          "synth": 202,
+          "loops": 1,
+          "delay": 0
+        },
+        {},
+        {
+          "varp": 668,
+          "value": 0
+        },
+        {
+          "varp": 33,
+          "value": 0
+        }
+      ],
+      "tabs": [
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "modals": [
+        -1,
+        -1,
+        -1
+      ],
+      "queues": [
+        [],
+        [],
+        [
+          [
+            "[mapzone,0_50_50]",
+            2,
+            0,
+            []
+          ]
+        ]
+      ]
+    }
+  }
+}

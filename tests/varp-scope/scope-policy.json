@@ -1,5 +1,8 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
+  "permanentDecisions": {
+    "macro_event_origin_coord": "U01 lifecycle departure O reuses unused original slot 59; no client reader or varbit base. Kept separately from intended destination D across reconnect."
+  },
   "inheritedPermanent": [
     "bunny_ears_unlocked",
     "scythe_unlocked",

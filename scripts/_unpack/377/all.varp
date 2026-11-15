@@ -82,7 +82,10 @@ protect=no
 
 [action_delay]
 
-[varp59_unused]
+// DECISION: unused original slot 59; server-only task departure, no client reader.
+[macro_event_origin_coord]
+type=coord
+scope=perm
 
 [goblinquest]
 scope=perm
