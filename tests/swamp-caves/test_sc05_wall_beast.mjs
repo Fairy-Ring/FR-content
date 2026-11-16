@@ -135,6 +135,30 @@ for(let index=0;index<7;index++)for(const headwear of ['bare','bag','worn'])for(
   assert.deepEqual([n.x,n.z],spawns[index]);
   console.log(`MOVEMENT ${JSON.stringify({index,headwear,journey,samples})}`);finish(p);
 });
+test('the unchanged SC03 westward walk grabs a bare passer; a worn helmet preserves the walk and the beast resets',()=>{
+  const route=[[3167,9572],[3166,9572],[3166,9573],[3165,9573],[3164,9573],[3163,9573],[3162,9573],[3161,9573],[3160,9573],[3159,9573],[3158,9573],[3157,9573],[3156,9573],[3155,9573],[3154,9573],[3153,9573],[3152,9573],[3151,9573]];
+  for(const headwear of ['bare','worn']){
+    reset();const p=fixture(1,headwear==='worn'?['wallbeast_spike_helmet']:[]),n=natural(1);
+    [p.x,p.z]=[3168,9572];if(headwear==='worn')assert(held(p,'wallbeast_spike_helmet',2));start(p);ticks(p,14);
+    const before=hp(p),shade=p.overlay,samples=[];
+    assert.equal(shade,id('Component','inter_387'));
+    assert(moveHandler.handle(new MoveClick([{x:p.x,z:p.z},...route.map(([x,z])=>({x,z}))],0,false),p));
+    for(let elapsed=0;elapsed<route.length+1&&!p.delayed;elapsed++){ticks(p,1);samples.push({tile:[p.x,p.z],type:n.type,delayed:p.delayed});}
+    if(headwear==='bare'){
+      assert(p.delayed);assert.deepEqual([p.x,p.z],[3162,9573]);assert.equal(n.getVar(own),p.uid);
+      ticks(p,6);assert.deepEqual(p.damageRequests.map(hit=>hit.amount),[13]);assert.deepEqual([p.x,p.z],[3162,9573]);assert(!p.delayed);
+    }else{
+      assert(samples.some(sample=>sample.type===exposed),'the worn passer really exposes the natural beast');
+      assert.deepEqual([p.x,p.z],route.at(-1));assert(!p.delayed);assert.equal(hp(p),before-Math.max(0,14+route.length+1-29));
+      assert(p.damageRequests.every(hit=>hit.amount===1),'only the unchanged insect bites, no wall-beast hit');
+      assert.equal(p.overlay,shade);assert.equal(n.target,null);
+      const resetClock=n.getVar(id('VarNpcType','npc_int2'));assert(resetClock>0&&resetClock<10);
+      ticks(p,9-resetClock);assert.equal(n.type,exposed);ticks(p,1);
+      assert.equal(n.type,dormant,'the departed walker leaves an ordinary ten-tick reset');assert.equal(n.timerInterval,0);assert.deepEqual([n.x,n.z],spawns[1]);
+    }
+    console.log(`LEGACY_WALK ${JSON.stringify({headwear,hits:p.damageRequests,shade,samples})}`);finish(p);
+  }
+});
 for(const [label,item,equip]of [['bag','wallbeast_spike_helmet',false],['wrong helm','steel_med_helm',true]])test(`${label}: not protected by a carried or wrong item`,()=>{
   reset();const p=fixture(0,['bullseye_lantern_lit',item]),n=natural(0);if(equip)assert(held(p,item,2));grab(p,n);ticks(p,6);assert.equal(p.damageRequests.length,1);assert.equal(n.type,dormant);finish(p);
 });

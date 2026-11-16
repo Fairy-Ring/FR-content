@@ -326,6 +326,9 @@ for (const crossing of ['several zones', 'map square']) test(`engine entry and r
     release(q);
     assert.equal(q.getVarBit(gas), 0, 'release leaves no pending gas state');
     const p = engineEntry(), origin = [p.x >> 3, p.z >> 3], mapOrigin = [p.x >> 6, p.z >> 6];
+    seed(p, ['wallbeast_spike_helmet']);
+    assert(held(p, 'wallbeast_spike_helmet', 2));
+    assert.equal(count(p, 'wallbeast_spike_helmet', worn), 1);
     ticks(p, 14); pending(p, 14);
     const route = caveRoute(p, (x, z) => crossing === 'map square'
       ? (x >> 6) !== mapOrigin[0] || (z >> 6) !== mapOrigin[1]
