@@ -189,7 +189,8 @@ const PARAM_TYPES = new Map([
     ['barrows_surface_exit', 'coord'],
     ['barrows_room_edge_lock', 'int'],
     ['barrows_door_open_state', 'int'],
-    ['barrows_door_locked_state', 'int']
+    ['barrows_door_locked_state', 'int'],
+    ['barrows_maxhit', 'int']
 ]);
 const PARAM_DEFAULTS = new Map([
     ['barrows_brother', 'null'],
@@ -198,7 +199,8 @@ const PARAM_DEFAULTS = new Map([
     ['barrows_surface_exit', 'null'],
     ['barrows_room_edge_lock', 'null'],
     ['barrows_door_open_state', '0'],
-    ['barrows_door_locked_state', '1']
+    ['barrows_door_locked_state', '1'],
+    ['barrows_maxhit', '0']
 ]);
 
 
