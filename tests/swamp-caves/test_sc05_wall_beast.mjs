@@ -172,7 +172,8 @@ for(const [seedValue,expected]of [[4096,11],[1024,12],[0,13]])test(`native RNG s
   reset();const p=fixture(),n=natural(0);JavaRandom.setSeed(seedValue);grab(p,n);ticks(p,6);assert.deepEqual(p.damageRequests.map(x=>x.amount),[expected]);noExtra(p);finish(p);
 });
 test('current headwear is read at activation, not when the controller started',()=>{
-  reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,1);assert.equal(n.type,exposed);assert.equal(n.levels[3],105);assert.equal(p.animations.filter(x=>playerAnims.includes(x.seq)).length,0);finish(p);
+  reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,1);assert.equal(n.type,exposed);assert.equal(n.levels[3],105);assert.equal(p.animations.filter(x=>playerAnims.includes(x.seq)).length,0);
+  assert.deepEqual([p.faceSquareX,p.faceSquareZ],spawns[0].map(v=>v*2+1),'protected player faces the hole, not their own tile');finish(p);
 });
 for(const keep of [true,false])test(`exposed form: ${keep?'keeping':'removing'} the helmet never causes another grab or exposure`,()=>{
   reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,1);assert.equal(n.type,exposed);const uid=n.uid;
@@ -185,10 +186,24 @@ test('stationary bare-headed player is grabbed again after release plus ten cool
 test('one NPC reserves one victim even with two eligible players on the anchor in one pass',()=>{
   reset();const a=start(fixture()),b=start(fixture()),n=natural(0);frame([a,b]);assert.equal(n.getVar(own),a.uid);frame([a,b]);assert(a.delayed);assert(!b.delayed);ticks([a,b],6);assert.equal(a.damageRequests.length,1);assert.equal(b.damageRequests.length,0);finish(a);finish(b);
 });
-test('a second bare-headed passer remains free while the stationary victim owns the front-tile grab',()=>{
-  reset();const a=start(fixture()),b=fixture(),n=natural(0);b.x--;ticks(a,2);assert(a.delayed);start(b);assert(walk(b,...anchors[0]));
-  ticks([a,b],5);assert.deepEqual([b.x,b.z],anchors[0]);assert(!b.delayed);assert.equal(b.damageRequests.length,0);assert.equal(n.getVar(own),a.uid);
-  ticks([a,b],1);assert.equal(n.getVar(own),-1);assert.equal(a.damageRequests.length,1);assert.equal(b.damageRequests.length,0);finish(a);finish(b);
+for(const phase of ['hold','cooldown'])test(`a second bare-headed passer walks through the front tile during another victim's ${phase}`,()=>{
+  reset();const a=start(fixture(4)),b=fixture(4),n=natural(4),[x,z]=anchors[4];
+  ticks(a,phase==='hold'?2:8);
+  assert.equal(a.delayed,phase==='hold');assert.equal(n.getVar(own),phase==='hold'?a.uid:-1);
+  const lock=n.getVar(cooldown);assert(lock>World.currentTick);
+  b.x=x-1;start(b);assert(walk(b,x+2,z));const samples=[];
+  for(let elapsed=0;elapsed<4;elapsed++){
+    ticks([a,b],1);samples.push([b.x,b.z]);
+    assert(!b.delayed,'the passer is never held');assert.equal(n.getVar(own),phase==='hold'?a.uid:-1);
+    assert.equal(n.getVar(cooldown),lock,'the passer does not reserve or extend the lock');
+    assert.deepEqual(b.damageRequests,[]);assert.equal(hp(b),100);
+    assert(!b.animations.some(animation=>playerAnims.includes(animation.seq)),'the passer is never grabbed');
+  }
+  assert.deepEqual(samples,[[x-1,z],[x,z],[x+1,z],[x+2,z]],'real walking enters and leaves the front without stopping');
+  assert.deepEqual([b.x,b.z],[x+2,z],'the destination is beyond the front tile');
+  console.log(`SECOND_PASSER ${JSON.stringify({phase,samples,hits:b.damageRequests})}`);
+  if(phase==='hold')ticks([a,b],2);
+  assert.equal(a.damageRequests.length,1);assert.equal(n.getVar(own),-1);finish(a);finish(b);
 });
 test('native engagement inside three tiles pauses reset; leaving seven tiles starts ten ticks',()=>{
   reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));poll(p);assert.equal(n.type,exposed);
