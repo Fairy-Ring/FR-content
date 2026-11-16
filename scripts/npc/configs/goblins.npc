@@ -176,6 +176,9 @@ op1=Talk-to
 resizev=126
 resizeh=126
 vislevel=5
+hitpoints=12
+attack=3
+defence=4
 
 [goblin_green_soldier_1]
 name=Goblin
@@ -196,6 +199,9 @@ op2=Attack
 resizev=125
 resizeh=125
 vislevel=5
+hitpoints=12
+attack=3
+defence=4
 
 [goblin_guard]
 name=Goblin guard
@@ -569,6 +575,7 @@ op1=Talk-to
 op2=Attack
 vislevel=3
 head1=npc_1822_head
+hitpoints=10
 
 [cave_goblin2]
 name=Cave goblin
@@ -589,6 +596,7 @@ op1=Talk-to
 op2=Attack
 vislevel=3
 head1=npc_1822_head
+hitpoints=10
 
 [cave_goblin3]
 name=Cave goblin
@@ -611,6 +619,7 @@ op1=Talk-to
 op2=Attack
 vislevel=3
 head1=npc_1822_head
+hitpoints=10
 
 [cave_goblin4]
 name=Cave goblin
@@ -635,6 +644,7 @@ op1=Talk-to
 op2=Attack
 vislevel=3
 head1=npc_1822_head
+hitpoints=10
 
 [cave_goblin_miner]
 name=Cave goblin miner
@@ -654,6 +664,10 @@ op1=Talk-to
 op2=Attack
 vislevel=11
 head1=npc_2069_head
+hitpoints=10
+attack=10
+strength=12
+defence=7
 
 [cave_goblin_miner2]
 name=Cave goblin miner
@@ -675,6 +689,10 @@ op1=Talk-to
 op2=Attack
 vislevel=11
 head1=npc_2069_head
+hitpoints=10
+attack=10
+strength=12
+defence=7
 
 [cave_goblin_miner3]
 name=Cave goblin miner
@@ -698,6 +716,10 @@ op1=Talk-to
 op2=Attack
 vislevel=11
 head1=npc_2069_head
+hitpoints=10
+attack=10
+strength=12
+defence=7
 
 [cave_goblin_miner4]
 name=Cave goblin miner
@@ -723,6 +745,10 @@ op1=Talk-to
 op2=Attack
 vislevel=11
 head1=npc_2069_head
+hitpoints=10
+attack=10
+strength=12
+defence=7
 
 [cave_goblin_guard1]
 name=Cave goblin guard
@@ -742,6 +768,10 @@ op1=Talk-to
 op2=Attack
 vislevel=26
 head1=npc_2073_head
+hitpoints=26
+attack=25
+strength=18
+defence=25
 
 [cave_goblin_guard2]
 name=Cave goblin guard
@@ -761,6 +791,10 @@ op1=Talk-to
 op2=Attack
 vislevel=24
 head1=npc_2073_head
+hitpoints=26
+attack=22
+strength=16
+defence=22
 
 [cave_goblin_miner_mining]
 name=Cave goblin miner
@@ -801,6 +835,10 @@ op1=Talk-to
 op2=Attack
 vislevel=11
 head1=npc_2069_head
+hitpoints=10
+attack=10
+strength=12
+defence=7
 
 [cave_goblin_miner3_mining]
 name=Cave goblin miner
@@ -849,6 +887,10 @@ op1=Talk-to
 op2=Attack
 vislevel=11
 head1=npc_2069_head
+hitpoints=10
+attack=10
+strength=12
+defence=7
 
 [goblin_unarmed_melee_in_1]
 name=Goblin
