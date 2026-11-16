@@ -59,3 +59,7 @@
 ^swamp_stone_high = 252
 ^swamp_stone_success_xp = 30
 ^swamp_stone_failure_xp = 10
+
+// CANDIDATE destinations from original maps; UNKNOWN original arrival/motion.
+^swamp_cave_rope_bottom = 0_49_149_32_36
+^swamp_cave_rope_top = 0_49_49_32_36

@@ -859,12 +859,44 @@ test('published Tears down retains one controller; up synchronously releases bef
   ticks(p, 35); assert(hp(p) < before, 'the retained dark clock still bites at its ordinary threshold');
   assert.equal(rootPackets(p).length, 1);
 });
+// Main rulings 1 and 2 (SC-07): only the two rope cases changed; both Tears slopes stay future travel.
+const sc07RopeCases = {
+  goblin_cave_entrance: 'SC-07 goblin_cave_entrance has real Climb-down and rope-use dispatch, no other option, and no travel, state or text for a fresh account',
+  swamp_cave_climbing_rope: 'SC-07 swamp_cave_climbing_rope has real Climb dispatch that releases before its surface landing, and no other option'
+};
 for (const name of ['goblin_cave_entrance', 'swamp_cave_climbing_rope', 'tog_climbing_rocks_up', 'tog_climbing_rocks_down']) {
-  test(`future travel ${name} has no published approach or operation dispatch`, () => {
+  test(sc07RopeCases[name] ?? `future travel ${name} has no published approach or operation dispatch`, () => {
     const type = types.LocType.get(id('LocType', name));
-    for (const trigger of [ServerTriggerType.APLOC1, ServerTriggerType.OPLOC1]) {
-      assert.equal(ScriptProvider.getByTrigger(trigger, type.id, type.category), undefined);
+    if (!sc07RopeCases[name]) {
+      for (const trigger of [ServerTriggerType.APLOC1, ServerTriggerType.OPLOC1]) {
+        assert.equal(ScriptProvider.getByTrigger(trigger, type.id, type.category), undefined);
+      }
+      return;
     }
+    const dispatch = trigger => ScriptProvider.getByTrigger(trigger, type.id, type.category)?.name;
+    assert.equal(dispatch(ServerTriggerType.OPLOC1), `[oploc1,${name}]`, 'the real SC-07 operation');
+    assert.equal(dispatch(ServerTriggerType.OPLOCU), name === 'goblin_cave_entrance' ? '[oplocu,goblin_cave_entrance]' : undefined);
+    for (const trigger of [ServerTriggerType.APLOC1, ServerTriggerType.APLOCU]) assert.equal(dispatch(trigger), undefined);
+    assert.deepEqual(type.op.slice(1), [null, null, null, null], 'no other visible option');
+    for (let option = 1; option < 5; option++) {
+      assert.equal(dispatch(ServerTriggerType.APLOC1 + option), undefined);
+      assert.equal(dispatch(ServerTriggerType.OPLOC1 + option), undefined);
+    }
+    if (name === 'goblin_cave_entrance') {
+      const p = wireFixture([], [0, 3168, 3172]);
+      const before = [...p.vars];
+      travel(p, name, 3169, 3172, [0, 3168, 3172]);
+      ticks(p, 3); p.encodeOut();
+      assert.deepEqual(tile(p), [0, 3168, 3172], 'no travel');
+      assert.deepEqual([...p.vars], before, 'no state written');
+      assert.deepEqual(p.messages, [], 'the presentation table gives no text');
+      ownership(p, false);
+      return;
+    }
+    const p = start(wireFixture([], [0, 3168, 9572])); pending(p);
+    travel(p, name, 3169, 9572, [0, 3168, 3172]);
+    ownership(p, false); assert.equal(p.overlay, -1); assert.equal(p.getVarBit(gas), 0);
+    const before = hp(p); ticks(p, 35); assert.equal(hp(p), before, 'no cave hit after the real exit'); ownership(p, false);
   });
 }
 for (const lit of [false, true]) test(`protected SC-07 rope contract ${lit ? 'lit' : 'unlit'}: release before exit, restart fresh on entry`, () => {
