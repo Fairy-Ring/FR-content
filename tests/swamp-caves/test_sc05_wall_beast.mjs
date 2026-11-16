@@ -289,6 +289,28 @@ test('native engagement inside three tiles pauses reset; leaving seven tiles sta
   reachable(p,n.x+2,n.z-1);ticks(p,12);assert.equal(n.type,exposed);assert.equal(n.target,p);reachable(p,n.x+7,n.z-1);assert.equal(n.target,null);const clock=id('VarNpcType','npc_int2');assert(n.getVar(clock)>0);ticks(p,9-n.getVar(clock));assert.equal(n.type,exposed);ticks(p,1);assert.equal(n.type,dormant);assert.equal(n.timerInterval,0);assert.equal(n.targetOp,NpcMode.NONE);
   [p.x,p.z]=anchors[0];repel(p,n);assert(!p.delayed);finish(p);
 });
+for(let index=0;index<spawns.length;index++)test(`exposed reach ${spawns[index]}: only its original front is hittable and no phase moves the beast`,()=>{
+  const [x,z]=spawns[index],rows=[];
+  for(let dz=-2;dz<=2;dz++)for(let dx=-2;dx<=2;dx++){
+    if(map.isMapBlocked(x+dx,z+dz,0)){rows.push({dx,dz,blocked:true});continue;}
+    reset();const p=fixture(index,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(index);
+    p.setVar(id('VarPlayerType','option_nodef'),1);assert(held(p,'wallbeast_spike_helmet',2));repel(p,n);
+    // Own-position fixture after a real repelled lunge; every following NPC turn
+    // is ordinary packed combat, including failed-accuracy attack attempts.
+    p.teleport(x+dx,z+dz,0);p.damageRequests=[];
+    const animate=n.playAnimation,attacks=[];
+    n.playAnimation=function(seq,delay){if(seq===param(n,'attack_anim'))attacks.push(World.currentTick);return animate.call(this,seq,delay);};
+    try{
+      for(let elapsed=0;elapsed<12;elapsed++){ticks(p,1);assert.deepEqual([n.x,n.z],[x,z],'the exposed beast never leaves its original notch');assert.deepEqual([p.x,p.z],[x+dx,z+dz]);}
+      const inReach=dx===0&&dz===-1;
+      assert.equal(attacks.length,inReach?2:0,'only the south/front tile admits ordinary melee');
+      assert.equal(p.damageRequests.length,inReach?2:0);assert(p.damageRequests.every(hit=>hit.amount>=0&&hit.amount<=4));
+      assert.equal(hp(p),100-p.damageRequests.reduce((sum,hit)=>sum+hit.amount,0));
+      rows.push({dx,dz,attacks:attacks.length,hits:p.damageRequests.map(hit=>hit.amount)});
+    }finally{n.playAnimation=animate;finish(p);}
+  }
+  console.log(`EXPOSED_REACH ${JSON.stringify({hole:[x,z],front:[x,z-1],rows})}`);
+});
 test('complete ordinary row: six skills, crush, zero native bonuses, max four and unchanged Slayer 35 enum',()=>{
   reset();const n=natural(0);n.changeType(exposed,1000);assert.deepEqual([...n.levels],[30,16,30,105,1,1]);
   assert.equal(param(n,'attackrate'),6);assert.equal(param(n,'damagetype'),2);for(const key of ['attackbonus','strengthbonus','magicattack','rangeattack','rangebonus','stabdefence','slashdefence','crushdefence','magicdefence','rangedefence'])assert.equal(param(n,key),0,key);
