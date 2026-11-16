@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { World, ScriptProvider, ScriptState, ServerTriggerType, PlayerStat, PlayerTimerType,
   types, map, CollisionType, engineModule, id, obj, inv, worn, player, seed, inventory,
-  count, held, execute, tile, dragInventory, slotOf, invButton } from './runtime.mjs';
+  count, held, use, execute, tile, dragInventory, slotOf, invButton } from './runtime.mjs';
 const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
@@ -167,6 +167,22 @@ test('a real gas explosion during the client approach changes the source before 
   assert(walk(p,stones[1].banks[0]));assert(locHandler.handle(new OpLoc(1,stones[1].x,stones[1].z,id('LocType',stones[1].name)),p));JavaRandom.setSeed(seedFor(1,false));ticks(p,1);
   assert.equal(count(p,'lit_candle'),0);assert.equal(count(p,'unlit_candle'),1);assert.equal(p.damageRequests.length,1);const health=hp(p);
   for(let i=0;i<60 && xp(p)===0;i++)ticks(p,1);assert.equal(xp(p),10);assert.equal(count(p,'unlit_candle'),1);assert.equal(hp(p),health);assert.equal(p.damageRequests.length,1);ownership(p);finish(p);
+});
+for(const approach of [true,false])test(`native firecracker long-queue transformation ${approach?'during cancellable approach':'waits through owned settlement'}`,()=>{
+  const p=fixture(approach?[0,3192,9571]:stones[0].banks[0],['candle_lantern_lit','bullseye_lantern_lit','tinderbox','viking_firecracker','viking_firecracker','wallbeast_spike_helmet']);
+  assert(held(p,'wallbeast_spike_helmet',2));assert(use(p,'tinderbox','viking_firecracker'));assert(use(p,'tinderbox','viking_firecracker'));
+  assert.equal(count(p,'viking_firecracker_lit'),2);const fuses=[...p.queue.all()].filter(q=>q.script.name==='[queue,firecracker_explode]');assert.equal(fuses.length,2);
+  ticks(p,Math.min(...fuses.map(q=>q.delay))-1);assert.equal(count(p,'viking_firecracker_lit'),2);
+  if(approach){
+    assert(walk(p,stones[0].banks[0]));assert(locHandler.handle(new OpLoc(1,stones[0].x,stones[0].z,id('LocType',stones[0].name)),p));ticks(p,2);
+    assert(!p.delayed);assert(p.target);assert.equal(xp(p),0);assert.equal(count(p,'viking_firecracker_lit'),0);assert.equal(count(p,'viking_firecracker'),1);
+    JavaRandom.setSeed(seedFor(1,false));for(let i=0;i<50 && xp(p)===0;i++)ticks(p,1);
+  }else{
+    begin(p,stones[0],false);ticks(p,2);assert.equal(count(p,'viking_firecracker_lit'),2);assert.equal(count(p,'viking_firecracker'),0);
+    assert.equal(count(p,'unlit_candle'),1);assert.equal(p.damageRequests.length,0);ticks(p,2);
+  }
+  ticks(p,1);assert.equal(xp(p),10);assert.equal(count(p,'viking_firecracker_lit'),0);assert.equal(count(p,'viking_firecracker'),1);
+  assert.equal(count(p,'unlit_candle'),1);assert.equal(count(p,'bullseye_lantern_lit'),1);assert.deepEqual(p.damageRequests.map(hit=>hit.amount),[3]);ownership(p);finish(p);
 });
 test('duplicate stone, walk and inventory operation cannot replace a held crossing or duplicate XP',()=>{
   const p=fixture(stones[0].banks[0],['bullseye_lantern_lit','shark']);const before=xp(p);begin(p,stones[0],true);const continuation=p.activeScript;
