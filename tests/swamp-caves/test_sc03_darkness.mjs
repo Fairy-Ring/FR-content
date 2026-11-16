@@ -706,15 +706,15 @@ test('unwalked Tears up after 31 dark ticks releases before its immediate move',
   const state = ScriptRunner.init(ScriptProvider.getByName('[oploc1,tog_cave_up]'), p, loc);
   p.executeScript(state, true, true);
   assert.equal(p.delayed, false, 'without a same-tick walk p_arrivedelay does not hold');
-  assert.deepEqual(tile(p), [0, 3225, 9538], 'keep the published landing for SC-06');
-  ownership(p, false); assert.equal(p.overlay, -1);
+  assert.deepEqual(tile(p), [0, 3225, 9542], 'SC-06 repairs the upper landing inside darkness');
+  ownership(p); assert.equal(p.overlay, roots[0]); elapsed(p, 30);
   const messages = [...p.messages]; ticks(p, 40);
-  ownership(p, false); assert.equal(hp(p), 97); assert.deepEqual(p.messages, messages);
+  ownership(p); assert.equal(hp(p), 57); assert.deepEqual(p.messages, messages);
 });
 
 test('walked Tears up holds one arrival tick without a bite, then releases with the move', () => {
-  // On this walked path O2 (release after movement) is masked by the same-tick
-  // outside fallback. The unwalked cases above and below prove release ordering.
+  // SC-06 keeps this pair dark-to-dark. The ectophial and commorb cases above
+  // retain the synchronous outside release proof; this arrival still pauses.
   const target = [3219, 9532], p = fixture([], [2, ...target]);
   const approach = caveRoute(p, (x, z) => Math.abs(x - target[0]) + Math.abs(z - target[1]) >= 5);
   [p.x, p.z] = approach.at(-1);
@@ -737,16 +737,17 @@ test('walked Tears up holds one arrival tick without a bite, then releases with 
   ticks(p, 1);
   assert.equal(World.currentTick, heldTick + 1);
   assert.equal(p.delayed, false); assert.equal(p.activeScript, null);
-  assert.deepEqual(tile(p), [0, 3225, 9538], 'release and published move complete on the next tick');
-  ownership(p, false); assert.equal(p.overlay, -1);
-  assert.equal(hp(p), before, 'no bite while the arrival delay holds the player');
+  assert.deepEqual(tile(p), [0, 3225, 9542], 'corrected dark-to-dark move completes on the next tick');
+  ownership(p); assert.equal(p.overlay, roots[0]);
+  assert.equal(hp(p), before - 1, 'the arrival resumes before this now-eligible controller pass');
   assert.deepEqual(p.messages, messages);
-  ticks(p, 40); ownership(p, false); assert.equal(hp(p), before); assert.deepEqual(p.messages, messages);
+  ticks(p, 40); ownership(p); assert.equal(hp(p), before - 41); assert.deepEqual(p.messages, messages);
 });
 
 for (const path of ['ectophial Empty', 'Tears up']) test(`outside ${path} completes without changing darkness state`, () => {
-  const p = fixture(path === 'ectophial Empty' ? ['ectophial'] : [], [0, 3220, 3220]);
+  const p = path === 'Tears up' ? wireFixture([], [0, 3220, 3220]) : fixture(['ectophial'], [0, 3220, 3220]);
   execute('[proc,tog_hud_enter]', p);
+  if (path === 'Tears up') p.encodeOut();
   const before = { parent: p.getVar(parent), overlay: p.overlay, packets: rootPackets(p).length, hp: hp(p) };
   if (path === 'ectophial Empty') {
     assert(held(p, 'ectophial', 1));
@@ -757,15 +758,23 @@ for (const path of ['ectophial Empty', 'Tears up']) test(`outside ${path} comple
     const loc = World.getLoc(3218, 9533, 2, id('LocType', 'tog_cave_up'));
     assert(loc);
     p.executeScript(ScriptRunner.init(ScriptProvider.getByName('[oploc1,tog_cave_up]'), p, loc), true, true);
-    assert.deepEqual(tile(p), [0, 3225, 9538]);
+    assert.deepEqual(tile(p), [0, 3225, 9542]);
   }
   ownership(p, false); assert.equal(p.getVarBit(gas), 0); assert.equal(p.getVar(parent), before.parent);
   assert.equal(p.overlay, before.overlay, 'the non-dark caller retains its competing HUD');
   assert.equal(rootPackets(p).length, before.packets);
   const messages = [...p.messages]; ticks(p, 35);
-  ownership(p, false); assert.equal(p.getVar(parent), before.parent); assert.equal(hp(p), before.hp);
-  assert.equal(p.overlay, before.overlay); assert.equal(rootPackets(p).length, before.packets);
-  assert.deepEqual(p.messages, messages);
+  if (path === 'ectophial Empty') {
+    ownership(p, false); assert.equal(p.getVar(parent), before.parent); assert.equal(hp(p), before.hp);
+    assert.equal(p.overlay, before.overlay); assert.equal(rootPackets(p).length, before.packets);
+    assert.deepEqual(p.messages, messages);
+  } else {
+    p.encodeOut();
+    // The corrected destination is dark, so the ordinary destination hint starts it.
+    ownership(p); assert.equal(p.overlay, roots[0]); assert.equal(timer(p).args[0], 30);
+    assert(hp(p) < before.hp); assert.equal(rootPackets(p).length, before.packets + 1);
+    assert.deepEqual(p.messages.slice(messages.length), warning);
+  }
 });
 
 test('actual insect death releases before the first death delay and no later hazard reaches the respawn', () => {
@@ -841,12 +850,14 @@ test('published Tears down retains one controller; up synchronously releases bef
   ticks(p, 1); // Gas cancellation is polled, not a dark-to-dark travel hook.
   assert.deepEqual(timer(p).args.slice(2), [-1, -1, 0], 'Tears travel is dark-to-dark, not gas-to-gas');
   assert.equal(rootPackets(p).length, 1, 'down does not replace or duplicate its existing cave root');
-  travel(p, 'tog_cave_up', 3218, 9533, [0, 3225, 9538]);
-  assert.equal(inside(p), false, 'published blocked upper landing is not repaired by SC-03');
-  ownership(p, false); assert.equal(p.overlay, -1, 'release happens inside the up transition, not the fallback');
-  const before = hp(p);
-  ticks(p, 1); ownership(p, false); assert.equal(p.getVarBit(gas), 0); assert.equal(p.overlay, -1);
-  ticks(p, 35); assert.equal(hp(p), before, 'no outside bite from the published tunnel defect');
+  travel(p, 'tog_cave_up', 3218, 9533, [0, 3225, 9542]);
+  assert.equal(inside(p), true, 'SC-06 corrected upper landing remains inside darkness');
+  ownership(p); assert.equal(p.overlay, roots[0], 'dark-to-dark travel does not release');
+  const before = hp(p), dark = timer(p).args[0];
+  ticks(p, 1); ownership(p); assert.equal(p.getVarBit(gas), 0); assert.equal(p.overlay, roots[0]);
+  assert.equal(timer(p).args[0], dark + 1);
+  ticks(p, 35); assert(hp(p) < before, 'the retained dark clock still bites at its ordinary threshold');
+  assert.equal(rootPackets(p).length, 1);
 });
 for (const name of ['goblin_cave_entrance', 'swamp_cave_climbing_rope', 'tog_climbing_rocks_up', 'tog_climbing_rocks_down']) {
   test(`future travel ${name} has no published approach or operation dispatch`, () => {

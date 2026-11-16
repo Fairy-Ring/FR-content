@@ -1,0 +1,60 @@
+// VERIFIED original locs; CANDIDATE stone-rule/chance and form-specific water rules.
+// UNKNOWN original motion: four engineering ticks, settlement halfway, no fall hit.
+[aploc1,swamp_cave_steppingstone_a]
+if (coordx(coord) < coordx(loc_coord)) {
+    ~swamp_cave_stone(^swamp_stone_west, ^swamp_stone_east);
+} else if (coordx(coord) > coordx(loc_coord)) {
+    ~swamp_cave_stone(^swamp_stone_east, ^swamp_stone_west);
+}
+
+[aploc1,swamp_cave_steppingstone_b]
+if (coordz(coord) > coordz(loc_coord)) {
+    ~swamp_cave_stone(^swamp_stone_north, ^swamp_stone_south);
+} else if (coordz(coord) < coordz(loc_coord)) {
+    ~swamp_cave_stone(^swamp_stone_south, ^swamp_stone_north);
+}
+
+[proc,swamp_cave_stone](coord $start, coord $landing)
+if (coord ! $start) ~forcewalk2($start);
+// The clipped approach can stop short. Never jump from the wrong bank.
+if (coord ! $start) return;
+facesquare($landing);
+anim(human_steppingstonejump, 0);
+def_boolean $success = stat_random(agility, ^swamp_stone_low, ^swamp_stone_high);
+p_delay(calc(^swamp_stone_half_ticks - 1));
+if ($success = true) {
+    p_teleport($landing);
+} else {
+    anim(human_climbing_fall, 0);
+    p_teleport($start);
+    ~swamp_stone_water;
+}
+// The existing single controller recomputes after this busy action, not here.
+p_delay(calc(^swamp_stone_half_ticks - 1));
+anim(null, 0);
+if ($success = true) {
+    stat_advance(agility, ^swamp_stone_success_xp);
+} else {
+    stat_advance(agility, ^swamp_stone_failure_xp);
+}
+
+[proc,swamp_stone_water]
+def_int $slot = 0;
+while ($slot < inv_size(inv)) {
+    // Read at settlement, not before the approach or either delay.
+    def_obj $source = inv_getobj(inv, $slot);
+    def_namedobj $candle = null;
+    switch_obj ($source) {
+        case candle_lantern_lit, candle_lantern_unlit : $candle = unlit_candle;
+        case candle_lantern_black_lit, candle_lantern_black_unlit : $candle = unlit_black_candle;
+        case lit_candle, lit_black_candle, torch_lit, oil_lamp_lit, oil_lantern_lit :
+            ~extinguish_light_source_slot($slot, $source);
+    }
+    // Engineering remainder: lose the glass, keep the corresponding unlit candle.
+    if ($candle ! null & inv_getobj(inv, $slot) = $source) {
+        inv_setslot(inv, $slot, $candle, inv_getnum(inv, $slot));
+    }
+    // Bullseye/helmet resist; sapphire inherits bullseye resistance (CANDIDATE).
+    // Empty containers, bug lanterns and unrelated items are not water-light losses.
+    $slot = add($slot, 1);
+}

@@ -47,3 +47,15 @@
 // SC-05 Q3: CANDIDATE overlap bounds; UNKNOWN uniform distribution.
 ^swamp_wallbeast_grab_min = 11
 ^swamp_wallbeast_grab_max = 13
+
+// UNKNOWN original arrivals/motion: collision-checked banks and four engineering ticks.
+^swamp_stone_west = 0_50_149_4_36
+^swamp_stone_east = 0_50_149_8_36
+^swamp_stone_north = 0_50_149_21_20
+^swamp_stone_south = 0_50_149_21_16
+^swamp_stone_half_ticks = 2
+// CANDIDATE later measured chart, through the published Agility stat_random.
+^swamp_stone_low = 51
+^swamp_stone_high = 252
+^swamp_stone_success_xp = 30
+^swamp_stone_failure_xp = 10
