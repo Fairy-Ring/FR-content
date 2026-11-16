@@ -167,6 +167,12 @@ param=slashdefence,0
 param=crushdefence,0
 param=magicdefence,0
 param=rangedefence,0
+// CANDIDATE (operator decision 2026-11-16 12:00Z, own family): no published monster binds a
+// bloodworm sequence; these share bloodworm_walk/bloodworm_ready's prefix and frame base and
+// move only labels the model has. The pack names no bloodworm sound: sounds stay default.
+param=attack_anim,bloodworm_attack
+param=defend_anim,bloodworm_block
+param=death_anim,bloodworm_death
 
 [barrows_rat]
 name=Crypt rat
@@ -202,6 +208,15 @@ param=slashdefence,0
 param=crushdefence,0
 param=magicdefence,0
 param=rangedefence,0
+// CANDIDATE (operator rule 2026-11-16): same-model witchrat binds rat_death; rat_attack, rat_block
+// and the rat sounds are the own rat_* family, as the published rat binds them. All share
+// rat_walk/rat_ready's frame base.
+param=attack_anim,rat_attack
+param=defend_anim,rat_block
+param=death_anim,rat_death
+param=attack_sound,rat_attack
+param=defend_sound,rat_hit
+param=death_sound,rat_death
 
 [barrows_giantrat]
 name=Giant crypt rat
@@ -243,6 +258,14 @@ param=slashdefence,0
 param=crushdefence,0
 param=magicdefence,0
 param=rangedefence,0
+// CANDIDATE (operator rule 2026-11-16): same-model published giantrat; its sequences share
+// giantrat_walk/giantrat_ready's frame base.
+param=attack_anim,giantrat_attack
+param=defend_anim,giantrat_block
+param=death_anim,giantrat_death
+param=attack_sound,rat_attack
+param=defend_sound,rat_hit
+param=death_sound,rat_death
 
 [barrows_spider]
 name=Crypt spider
@@ -273,6 +296,14 @@ param=slashdefence,20
 param=crushdefence,10
 param=magicdefence,17
 param=rangedefence,20
+// CANDIDATE (operator rule 2026-11-16): same-model published spider; its sequences share
+// spider_walk's frame base.
+param=attack_anim,spider_attack
+param=defend_anim,spider_block
+param=death_anim,spider_death
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
 
 [barrows_giantspider]
 name=Giant crypt spider
@@ -308,6 +339,14 @@ param=slashdefence,20
 param=crushdefence,10
 param=magicdefence,17
 param=rangedefence,20
+// CANDIDATE (operator rule 2026-11-16): same-model published giantspider1; its sequences share
+// giantspider_walk/giantspider_ready's frame base.
+param=attack_anim,giantspider_attack
+param=defend_anim,giantspider_block
+param=death_anim,giantspider_death
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
 
 [barrows_skeleton_unarmed]
 name=Skeleton
@@ -343,6 +382,11 @@ param=crushdefence,-5
 param=magicdefence,0
 param=rangedefence,5
 param=barrows_maxhit,10
+// CANDIDATE (operator rule 2026-11-16): sounds of the same-model published dragonslayer_skeleton.
+// Its skeleton_* sequences use another frame base than human_ready, so none is bound.
+param=attack_sound,skeleton_attack
+param=defend_sound,skelly_hit
+param=death_sound,skeleton_death
 
 [barrows_skeleton_armed]
 name=Skeleton
@@ -383,4 +427,9 @@ param=crushdefence,-5
 param=magicdefence,0
 param=rangedefence,5
 param=barrows_maxhit,10
+// CANDIDATE (operator rule 2026-11-16): sounds of the same-model published dragonslayer_skeleton.
+// Its skeleton_* sequences use another frame base than human_ready, so none is bound.
+param=attack_sound,skeleton_attack
+param=defend_sound,skelly_hit
+param=death_sound,skeleton_death
 

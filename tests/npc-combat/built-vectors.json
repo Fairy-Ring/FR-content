@@ -910,6 +910,90 @@
         "param:magicdefence": {
           "value": 0
         },
+        "param:attack_anim": {
+          "value": { "ref": "seq", "name": "bloodworm_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-bloodworm-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "f8026debbcb82581a27c09bd3a45b9f07af1646a",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-own-family-rule",
+                "sha256": "1367a63973abf3151828365f882562a85d9659745a85e52fa18eac2ed6050b86"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-moved-labels",
+                "sha256": "201cc0c807feb997c2af6765332d7502c67ad089d0a5742e865fa13e03a65bb8"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": { "ref": "seq", "name": "bloodworm_block" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-bloodworm-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "f8026debbcb82581a27c09bd3a45b9f07af1646a",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-own-family-rule",
+                "sha256": "1367a63973abf3151828365f882562a85d9659745a85e52fa18eac2ed6050b86"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-moved-labels",
+                "sha256": "201cc0c807feb997c2af6765332d7502c67ad089d0a5742e865fa13e03a65bb8"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": { "ref": "seq", "name": "bloodworm_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-bloodworm-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "f8026debbcb82581a27c09bd3a45b9f07af1646a",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-own-family-rule",
+                "sha256": "1367a63973abf3151828365f882562a85d9659745a85e52fa18eac2ed6050b86"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-moved-labels",
+                "sha256": "201cc0c807feb997c2af6765332d7502c67ad089d0a5742e865fa13e03a65bb8"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              }
+            ]
+          }
+        },
         "param:rangedefence": {
           "value": 0
         }
@@ -1058,6 +1142,150 @@
         "param:magicdefence": {
           "value": 0
         },
+        "param:attack_anim": {
+          "value": { "ref": "seq", "name": "rat_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-rat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": { "ref": "seq", "name": "rat_block" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-rat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": { "ref": "seq", "name": "rat_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-rat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": { "ref": "synth", "name": "rat_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-rat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": { "ref": "synth", "name": "rat_hit" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-rat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": { "ref": "synth", "name": "rat_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-rat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
         "param:rangedefence": {
           "value": 0
         }
@@ -1193,6 +1421,150 @@
         },
         "param:magicdefence": {
           "value": 0
+        },
+        "param:attack_anim": {
+          "value": { "ref": "seq", "name": "giantrat_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantrat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": { "ref": "seq", "name": "giantrat_block" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantrat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": { "ref": "seq", "name": "giantrat_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantrat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": { "ref": "synth", "name": "rat_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantrat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": { "ref": "synth", "name": "rat_hit" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantrat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": { "ref": "synth", "name": "rat_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantrat-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
         },
         "param:rangedefence": {
           "value": 0
@@ -1330,6 +1702,150 @@
         "param:magicdefence": {
           "value": 17
         },
+        "param:attack_anim": {
+          "value": { "ref": "seq", "name": "spider_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-spider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": { "ref": "seq", "name": "spider_block" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-spider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": { "ref": "seq", "name": "spider_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-spider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": { "ref": "synth", "name": "insect_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-spider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": { "ref": "synth", "name": "insect_hit" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-spider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": { "ref": "synth", "name": "insect_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-spider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
         "param:rangedefence": {
           "value": 20
         }
@@ -1465,6 +1981,150 @@
         },
         "param:magicdefence": {
           "value": 17
+        },
+        "param:attack_anim": {
+          "value": { "ref": "seq", "name": "giantspider_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantspider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": { "ref": "seq", "name": "giantspider_block" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantspider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": { "ref": "seq", "name": "giantspider_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantspider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:attack_sound": {
+          "value": { "ref": "synth", "name": "insect_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantspider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": { "ref": "synth", "name": "insect_hit" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantspider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": { "ref": "synth", "name": "insect_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-giantspider-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
         },
         "param:rangedefence": {
           "value": 20
@@ -1605,6 +2265,78 @@
         },
         "param:magicdefence": {
           "value": 0
+        },
+        "param:attack_sound": {
+          "value": { "ref": "synth", "name": "skeleton_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-skeleton-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": { "ref": "synth", "name": "skelly_hit" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-skeleton-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": { "ref": "synth", "name": "skeleton_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-skeleton-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
         },
         "param:rangedefence": {
           "value": 5
@@ -1748,6 +2480,78 @@
         },
         "param:magicdefence": {
           "value": 0
+        },
+        "param:attack_sound": {
+          "value": { "ref": "synth", "name": "skeleton_attack" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-skeleton-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:defend_sound": {
+          "value": { "ref": "synth", "name": "skelly_hit" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-skeleton-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
+        },
+        "param:death_sound": {
+          "value": { "ref": "synth", "name": "skeleton_death" },
+          "evidence": {
+            "facts": [
+              "barrows.bc02-skeleton-presentation-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-presentation-rule",
+                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-donors",
+                "sha256": "651e46a46d053569be526937f6b48d337d859130dd283d6d4f37102099423ecc"
+              },
+              {
+                "id": "src.barrows-bc02-presentation-frame-bases",
+                "sha256": "3eb0d99bc96a9426b302512ede89c068546b5a45b097eff0b71f1d048107c155"
+              }
+            ]
+          }
         },
         "param:rangedefence": {
           "value": 5

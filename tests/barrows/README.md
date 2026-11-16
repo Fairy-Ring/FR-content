@@ -44,6 +44,8 @@ The config suite checks each selected server value explicitly. The tunnel suite 
 
 Acceptance only: with a separately built pre-BC-02 campaign pack, `--base-pack BASE_PACK` also runs the same owned lifetimes on both packs in one process and requires the same per-tick targets, modes and attacks; static placements differ only by acquisition.
 
+Combat animations and sounds follow the operator's rule of 16 November: a published same-model donor first (witchrat's rat_death, giantrat, spider, giantspider1, dragonslayer_skeleton's sounds), otherwise the type's own family (the bloodworm's sequences, the crypt rat's attack and block). The config suite checks every bound value explicitly, its donor or own-family prefix, that each bound sequence has the frame base of the type's own walk/ready sequences, and that it moves only labels the type's models carry. It also proves the unbound cases: skeleton_* sequences do not share the skeletons' human base, no published type supplies a bloodworm donor, and the human defaults move labels the crypt rat lacks. These are server parameters; the client config bytes are unchanged.
+
 ## Durable core (S01)
 
 Build the sibling engine packs, then run:

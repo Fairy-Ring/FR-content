@@ -17,6 +17,25 @@ const TUNNELS = {
   barrows_skeleton_unarmed: { stats: [72, 72, 72, 50, 1, 1], style: 2, defence: [5, 5, -5, 0, 5], maximum: 10 },
   barrows_skeleton_armed: { stats: [72, 72, 72, 50, 1, 1], style: 1, defence: [5, 5, -5, 0, 5], maximum: 10 }
 };
+// Operator decisions 2026-11-16: a compatible published same-model donor supplies combat
+// animations and sounds first; where none carries a field, the type's own family does (the
+// prefix and frame base of its own walk/ready, moving only labels its model has), a weaker
+// CANDIDATE basis. The skeletons' own family is human_*: only donor sounds are bound. The pack
+// names no bloodworm sound. An absent key resolves the native default.
+const PRESENTATION = {
+  barrows_bloodworm: { attack_anim: 'bloodworm_attack', defend_anim: 'bloodworm_block', death_anim: 'bloodworm_death' },
+  barrows_rat: { attack_anim: 'rat_attack', defend_anim: 'rat_block', death_anim: 'rat_death', attack_sound: 'rat_attack', defend_sound: 'rat_hit', death_sound: 'rat_death' },
+  barrows_giantrat: { attack_anim: 'giantrat_attack', defend_anim: 'giantrat_block', death_anim: 'giantrat_death', attack_sound: 'rat_attack', defend_sound: 'rat_hit', death_sound: 'rat_death' },
+  barrows_spider: { attack_anim: 'spider_attack', defend_anim: 'spider_block', death_anim: 'spider_death', attack_sound: 'insect_attack', defend_sound: 'insect_hit', death_sound: 'insect_death' },
+  barrows_giantspider: { attack_anim: 'giantspider_attack', defend_anim: 'giantspider_block', death_anim: 'giantspider_death', attack_sound: 'insect_attack', defend_sound: 'insect_hit', death_sound: 'insect_death' },
+  barrows_skeleton_unarmed: { attack_sound: 'skeleton_attack', defend_sound: 'skelly_hit', death_sound: 'skeleton_death' },
+  barrows_skeleton_armed: { attack_sound: 'skeleton_attack', defend_sound: 'skelly_hit', death_sound: 'skeleton_death' }
+};
+// Published same-model donors; keys listed in FAMILY have none and use the own family.
+const DONORS = { barrows_bloodworm: [], barrows_rat: ['witchrat'], barrows_giantrat: ['giantrat'], barrows_spider: ['spider'], barrows_giantspider: ['giantspider1'],
+  barrows_skeleton_unarmed: ['dragonslayer_skeleton'], barrows_skeleton_armed: ['dragonslayer_skeleton'] };
+const FAMILY = { barrows_bloodworm: ['attack_anim', 'defend_anim', 'death_anim'], barrows_rat: ['attack_anim', 'defend_anim', 'attack_sound', 'defend_sound'] };
+const PRESENTATION_KEYS = ['attack_anim', 'defend_anim', 'death_anim', 'attack_sound', 'defend_sound', 'death_sound'];
 
 await run(async () => {
   const args = [...process.argv];
@@ -31,10 +50,50 @@ await run(async () => {
   const runtime = await loadPackedRuntime(options);
   const { contentRoot, engineRoot, packDir, NpcType, ParamType, ScriptProvider } = runtime;
   const eng = relative => import(pathToFileURL(path.join(engineRoot, relative)).href);
-  const [{ default: ServerTriggerType }, { default: SeqType }] = await Promise.all([
-    eng('src/engine/script/ServerTriggerType.ts'), eng('src/cache/config/SeqType.ts')
+  const [{ default: ServerTriggerType }, { default: SeqType }, { default: AnimFrame }, { default: AnimBase }, { default: Model }] = await Promise.all([
+    eng('src/engine/script/ServerTriggerType.ts'), eng('src/cache/config/SeqType.ts'), eng('src/cache/graphics/AnimFrame.ts'), eng('src/cache/graphics/AnimBase.ts'),
+    eng('src/cache/graphics/Model.ts')
   ]);
   SeqType.load(packDir);
+  // Frame bases are decoded from the authored animation sets, as the client applies them.
+  const modelsDir = path.join(contentRoot, 'models');
+  for (const file of fs.readdirSync(modelsDir).filter(file => /^anim_\d+\.anim$/.test(file))) AnimFrame.unpack(fs.readFileSync(path.join(modelsDir, file)));
+  const frameBase = frame => {
+    const base = AnimBase.instances[AnimFrame.instances[frame].base];
+    return JSON.stringify({ types: Array.from(base.types), labels: base.labels.map(labels => Array.from(labels)) });
+  };
+  const sequenceBases = seq => [...new Set([...SeqType.get(seq).frames].filter(frame => frame >= 0).map(frameBase))];
+  const presentationValue = (key, value) => key.endsWith('_anim') ? SeqType.getId(value) : packedId(contentRoot, 'synth', value);
+  // Moved-label test (BC-M2): every non-identity transform group of every frame must move at
+  // least one vertex label (face label for alpha) that the type's own models carry.
+  const modelFiles = new Map();
+  const walkModels = dir => { for (const entry of fs.readdirSync(dir, { withFileTypes: true })) { const full = path.join(dir, entry.name); if (entry.isDirectory()) walkModels(full); else if (entry.name.endsWith('.ob2')) modelFiles.set(entry.name.slice(0, -4), full); } };
+  walkModels(modelsDir);
+  const modelNames = new Map(fs.readFileSync(path.join(contentRoot, 'pack/model.pack'), 'utf8').split('\n').map(line => /^(\d+)=(.+)$/.exec(line)).filter(Boolean).map(match => [Number(match[1]), match[2]]));
+  const carriedLabels = npc => {
+    const vertex = new Set(), face = new Set();
+    for (const id of npc.models) {
+      Model.unpack(id, fs.readFileSync(modelFiles.get(modelNames.get(id))));
+      const model = Model.fromId(id);
+      for (let i = 0; i < model.vertexCount; i++) if ((model.vertexLabel?.[i] ?? -1) >= 0) vertex.add(model.vertexLabel[i]);
+      for (let i = 0; i < model.faceCount; i++) if ((model.faceLabel?.[i] ?? -1) >= 0) face.add(model.faceLabel[i]);
+    }
+    return { vertex, face };
+  };
+  const identityTransform = (type, x, y, z) => type === 2 ? [x, y, z].every(value => (value & 255) === 0) : type === 3 ? x === 128 && y === 128 && z === 128 : type === 5 ? x === 0 : x === 0 && y === 0 && z === 0;
+  const lostGroups = (npc, seq) => {
+    const carried = carriedLabels(npc);
+    let lost = 0;
+    for (const id of [...SeqType.get(seq).frames].filter(frame => frame >= 0)) {
+      const frame = AnimFrame.instances[id], base = AnimBase.instances[frame.base];
+      for (let i = 0; i < frame.groups.length; i++) {
+        const group = frame.groups[i], type = base.types[group];
+        if (type === 0 || identityTransform(type, frame.x[i], frame.y[i], frame.z[i])) continue;
+        if (![...base.labels[group]].some(label => (type === 5 ? carried.face : carried.vertex).has(label))) lost++;
+      }
+    }
+    return lost;
+  };
   const text = fs.readFileSync(path.join(contentRoot, CONFIG), 'utf8');
   const sections = [...text.matchAll(/^\[([^\]]+)\]\n([\s\S]*?)(?=^\[|(?![\s\S]))/gm)];
   assert.deepEqual(sections.map(match => match[1]), NAMES, 'exactly thirteen ordered, nonduplicated authored combat blocks');
@@ -80,8 +139,8 @@ await run(async () => {
         const constant = [...constants.matchAll(new RegExp(`^\\^${value.slice(1)}\\s*=\\s*(-?\\d+)\\s*$`, 'gm'))];
         assert.equal(constant.length, 1, `${name} named native constant ${value}`);
         expected = Number(constant[0][1]);
-      } else if (['attack_anim', 'defend_anim'].includes(param)) expected = SeqType.getId(value);
-      else if (param === 'attack_sound') expected = packedId(contentRoot, 'synth', value);
+      } else if (['attack_anim', 'defend_anim', 'death_anim'].includes(param)) expected = SeqType.getId(value);
+      else if (['attack_sound', 'defend_sound', 'death_sound'].includes(param)) expected = packedId(contentRoot, 'synth', value);
       else expected = Number(value);
       assert(Number.isInteger(expected), `${name} supported authored server parameter ${param}`);
       assert.equal(npc.params.get(paramId), expected, `${name} source/packed parameter ${param}`);
@@ -110,6 +169,37 @@ await run(async () => {
         assert.equal(npc.params.get(param.id) ?? param.defaultInt, value, `${name} native ${key}`);
       }
       assert(!params.has('magicdamage'), `${name} zero magic-damage ledger adds no unused NPC parameter`);
+      const presentation = PRESENTATION[name];
+      assert(presentation, `${name} explicit presentation decision`);
+      const ownBases = [npc.walkanim, npc.readyanim].filter(seq => seq >= 0).flatMap(sequenceBases);
+      assert.equal(new Set(ownBases).size, 1, `${name} walk and ready sequences share one frame base`);
+      // The own family is the name prefix shared by the type's own walk and ready sequences.
+      const ownNames = [npc.walkanim, npc.readyanim].filter(seq => seq >= 0).map(seq => SeqType.get(seq).debugname);
+      const prefix = ownNames.map(name => name.slice(0, name.indexOf('_') + 1)).reduce((a, b) => a === b ? a : '');
+      for (const key of PRESENTATION_KEYS) {
+        const param = ParamType.getByName(key);
+        if (!(key in presentation)) {
+          assert(!params.has(key), `${name} binds no ${key} without a compatible published donor`);
+          continue;
+        }
+        const value = presentationValue(key, presentation[key]);
+        assert(Number.isInteger(value) && value >= 0, `${name} packed ${key} ${presentation[key]}`);
+        assert(params.has(key), `${name} explicit ${key}`);
+        assert.equal(npc.params.get(param.id), value, `${name} selected ${key} ${presentation[key]}`);
+        const sameModel = DONORS[name].map(donor => NpcType.get(NpcType.getId(donor))).filter(donor => donor.models[0] === npc.models[0]);
+        assert.equal(sameModel.length, DONORS[name].length, `${name} donors share its model`);
+        if ((FAMILY[name] ?? []).includes(key)) {
+          // Own family: no published same-model donor carries this field; the value has the family prefix.
+          assert(!sameModel.some(donor => donor.params?.has(param.id)), `${name} ${key}: a published same-model donor comes first`);
+          assert(prefix && presentation[key].startsWith(prefix), `${name} ${key} ${presentation[key]} is of the own ${prefix} family`);
+        } else {
+          assert(sameModel.some(donor => donor.params?.get(param.id) === value), `${name} ${key} ${presentation[key]} is bound by a published same-model donor`);
+        }
+        if (key.endsWith('_anim')) {
+          assert.deepEqual(sequenceBases(value), [ownBases[0]], `${name} ${key} ${presentation[key]} frame base equals its walk/ready base`);
+          assert.equal(lostGroups(npc, value), 0, `${name} ${key} ${presentation[key]} moves only labels its models carry`);
+        }
+      }
     }
     for (const trigger of ['AI_TIMER', 'AI_QUEUE1', 'AI_QUEUE3']) {
       const script = ScriptProvider.getByTrigger(ServerTriggerType[trigger], id, npc.category);
@@ -121,6 +211,25 @@ await run(async () => {
   }
   console.log('PASS BC-01 thirteen authored blocks, no unpack duplicates, original IDs, source/packed server fields and timer/death/queue bindings');
   console.log('PASS BC-02 explicit seven-type skills, HP, bonuses, subtypes, caps, hunt policy/radius and retained native server values');
+  // Compatibility proofs behind the unbound keys.
+  const humanBase = sequenceBases(SeqType.getId('human_ready'));
+  for (const seq of ['skeleton_attack', 'skeleton_block', 'skeleton_death']) {
+    assert.notDeepEqual(sequenceBases(SeqType.getId(seq)), humanBase, `${seq} uses another frame base than the skeletons' human_ready`);
+  }
+  const bloodworm = NpcType.get(NpcType.getId('barrows_bloodworm'));
+  const bloodwormSeqs = ['bloodworm_attack', 'bloodworm_block', 'bloodworm_death'].map(seq => SeqType.getId(seq));
+  for (let id = 0; id < NpcType.count; id++) {
+    const other = NpcType.get(id);
+    if (!other || other.debugname === 'barrows_bloodworm') continue;
+    assert(!(other.models ?? []).includes(bloodworm.models[0]), `no published ${other.debugname} shares the bloodworm model`);
+    for (const key of ['attack_anim', 'defend_anim', 'death_anim']) {
+      assert(!bloodwormSeqs.includes(other.params?.get(ParamType.getByName(key).id)), `no published ${other.debugname} binds a bloodworm sequence`);
+    }
+  }
+  // The moved-label test separates: the human defaults move labels the crypt rat lacks.
+  const rat = NpcType.get(NpcType.getId('barrows_rat'));
+  for (const seq of ['human_unarmedpunch', 'human_unarmed_def', 'human_death']) assert(lostGroups(rat, SeqType.getId(seq)) > 0, `${seq} moves labels the crypt rat model lacks`);
+  console.log('PASS BC-02 animations/sounds: explicit packed values, same-model donors first, own-family prefix otherwise, equal frame bases and moved-label tests; skeleton sequences and bloodworm donors absent');
 
   if (baselinePack) {
     // Decode both actual packs in this process. Never register frozen old server values or script bytecode.
