@@ -901,17 +901,45 @@ test('published Tears down retains one controller; up synchronously releases bef
   ticks(p, 35); assert(hp(p) < before, 'the retained dark clock still bites at its ordinary threshold');
   assert.equal(rootPackets(p).length, 1);
 });
-// Main rulings 1 and 2 (SC-07): only the two rope cases changed; both Tears slopes stay future travel.
+// SC-07 rope cases are unchanged; SC-10 ruling 1 migrates only the two slopes.
 const sc07RopeCases = {
   goblin_cave_entrance: 'SC-07 goblin_cave_entrance has real Climb-down and rope-use dispatch, no other option, and no travel, state or text for a fresh account',
   swamp_cave_climbing_rope: 'SC-07 swamp_cave_climbing_rope has real Climb dispatch that releases before its surface landing, and no other option'
 };
 for (const name of ['goblin_cave_entrance', 'swamp_cave_climbing_rope', 'tog_climbing_rocks_up', 'tog_climbing_rocks_down']) {
-  test(sc07RopeCases[name] ?? `future travel ${name} has no published approach or operation dispatch`, () => {
+  test(sc07RopeCases[name] ?? `SC-10 ${name} has real slope dispatch and correct cave-root handoff`, () => {
     const type = types.LocType.get(id('LocType', name));
     if (!sc07RopeCases[name]) {
-      for (const trigger of [ServerTriggerType.APLOC1, ServerTriggerType.OPLOC1]) {
-        assert.equal(ScriptProvider.getByTrigger(trigger, type.id, type.category), undefined);
+      assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.APLOC1, type.id, type.category)?.name, `[aploc1,${name}]`);
+      assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, type.id, type.category), undefined);
+      const ledge = name === 'tog_climbing_rocks_down';
+      const from = ledge ? [2, 3238, 9498] : [2, 3239, 9524];
+      const to = ledge ? [2, 3240, 9498] : [2, 3241, 9524];
+      const p = wireFixture([], from);
+      if (ledge) execute('[proc,tog_hud_enter]', p);
+      else { start(p); pending(p); }
+      const hud = id('Component', 'water_collected'), before = hp(p);
+      const teleport = p.teleport;
+      p.teleport = function (x, z, level) {
+        ownership(p, false);
+        assert.equal(p.overlay, ledge ? hud : -1, 'release precedes the actual crossing; the ledge never owns a root');
+        return teleport.call(this, x, z, level);
+      };
+      travel(p, name, ledge ? 3239 : 3240, ledge ? 9498 : 9524, to);
+      p.teleport = teleport;
+      ticks(p, 4); ownership(p, false); assert.equal(hp(p), before);
+      execute('[proc,tog_hud_enter]', p); assert.equal(p.overlay, hud);
+      if (ledge) {
+        const vars = [...p.vars], packets = rootPackets(p).length;
+        travel(p, name, 3239, 9498, to);
+        ticks(p, 35); assert.deepEqual(tile(p), to); assert.deepEqual([...p.vars], vars);
+        ownership(p, false); assert.equal(p.overlay, hud); assert.equal(rootPackets(p).length, packets);
+        assert.deepEqual(p.messages, []);
+      } else {
+        ticks(p, 35); ownership(p, false); assert.equal(p.overlay, hud); assert.equal(hp(p), before);
+        travel(p, name, 3240, 9524, from); ownership(p);
+        assert.equal(p.overlay, roots[0]); assert.equal(timer(p).args[0], 0, 'dark return starts fresh');
+        ticks(p, 4); ownership(p); release(p);
       }
       return;
     }

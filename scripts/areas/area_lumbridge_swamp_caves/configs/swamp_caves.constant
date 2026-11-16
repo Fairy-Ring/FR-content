@@ -64,3 +64,13 @@
 // CANDIDATE destinations from original maps; UNKNOWN original arrival/motion.
 ^swamp_cave_rope_bottom = 0_49_149_32_36
 ^swamp_cave_rope_top = 0_49_49_32_36
+
+// SC-10 UNKNOWN original arrivals/motion: collision-checked engineering ends.
+^tog_approach_dark = 2_50_148_39_52
+^tog_approach_juna = 2_50_148_41_52
+^tog_ledge = 2_50_148_38_26
+^tog_ledge_juna = 2_50_148_40_26
+^tog_slope_half_ticks = 2
+^tog_ferry_half_ticks = 3
+// Published engine default approach range, not a new line-of-sight requirement.
+^tog_ferry_range = 10

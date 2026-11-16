@@ -1,0 +1,53 @@
+// VERIFIED original connections; CANDIDATE r28332 direction and lit-sapphire rule.
+// UNKNOWN original arrivals/motion: collision-checked ends and engineering delays.
+[aploc1,tog_climbing_rocks_up]
+if (distance(coord, loc_coord) > 2) {
+    p_aprange(2);
+    return;
+}
+if (coordx(coord) < coordx(loc_coord)) {
+    ~tog_slope(^tog_approach_dark, ^tog_approach_juna, tog_climb_slope_down);
+} else {
+    ~tog_slope(^tog_approach_juna, ^tog_approach_dark, tog_climb_slope_up);
+}
+
+[aploc1,tog_climbing_rocks_down]
+if (distance(coord, loc_coord) > 2) {
+    p_aprange(2);
+    return;
+}
+// Juna cannot climb back onto the ledge and bypass the sapphire ferry.
+if (coordx(coord) < coordx(loc_coord)) {
+    ~tog_slope(^tog_ledge, ^tog_ledge_juna, tog_climb_slope_down);
+}
+
+[proc,tog_slope](coord $start, coord $landing, seq $motion)
+// Native walking and its weak continuation remain cancellable before the hold.
+if (coord ! $start) {
+    p_walk($start);
+    weakqueue*(tog_slope_approach, 0)($start, $landing, $motion);
+    return;
+}
+facesquare($landing);
+anim($motion, 0);
+p_delay(calc(^tog_slope_half_ticks - 1));
+if (~swamp_cave_inside(coord) = true & ~swamp_cave_inside($landing) = false) ~swamp_cave_release;
+p_teleport($landing);
+if (~swamp_cave_inside($landing) = true) ~swamp_cave_start;
+p_delay(calc(^tog_slope_half_ticks - 1));
+anim(null, 0);
+
+[queue,tog_slope_approach](coord $start, coord $landing, seq $motion)
+~tog_slope($start, $landing, $motion);
+
+[apnpcu,tog_light_creature]
+if (last_useitem ! tog_sapphire_lantern_lit) return;
+if (inzone(^swamp_cave_tears_sw, ^swamp_cave_tears_ne, coord) = false) return;
+// The native approach uses its default range; this is not adjacent OPNPCU.
+if (distance(coord, npc_coord) > ^tog_ferry_range) return;
+facesquare(npc_coord);
+p_delay(calc(^tog_ferry_half_ticks - 1));
+~swamp_cave_release;
+p_teleport(^tog_ledge);
+p_delay(calc(^tog_ferry_half_ticks - 1));
+// No item, quest, QP, reward or weekly state is changed. No invented words.
