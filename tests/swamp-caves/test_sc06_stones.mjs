@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { World, ScriptProvider, ScriptState, ServerTriggerType, PlayerStat, PlayerTimerType,
   types, map, CollisionType, engineModule, id, obj, inv, worn, player, seed, inventory,
   count, held, use, execute, tile, dragInventory, slotOf, invButton, button,
-  resetWallBeasts, exposeWallBeasts, passWallBeast } from './runtime.mjs';
+  resetWallBeasts, passWallBeast } from './runtime.mjs';
 const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
@@ -157,7 +157,7 @@ test('a real inventory drag during the delay rolls back and settlement keeps bot
   ticks(p,4);assert.equal(p.invGetSlot(inv,0)?.id,obj('unlit_candle'));assert.equal(p.invGetSlot(inv,1)?.id,obj('hammer'));assert.equal(count(p,'candle_lantern_empty'),0);finish(p);
 });
 test('a real drag during the cancellable approach moves the lantern and settlement uses its current slot',()=>{
-  resetWallBeasts(); exposeWallBeasts([[3198,9571]]);
+  resetWallBeasts();const passer=passWallBeast([3198,9571],q=>frame(q));finish(passer);
   const p=fixture([0,3192,9571],['candle_lantern_lit','hammer','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));
   assert(walk(p,stones[0].banks[0]));assert(locHandler.handle(new OpLoc(1,stones[0].x,stones[0].z,id('LocType',stones[0].name)),p));ticks(p,1);
   assert(!p.delayed);assert(p.target);assert(dragInventory(p,0,1));assert.equal(slotOf(p,'candle_lantern_lit'),1);JavaRandom.setSeed(seedFor(1,false));
@@ -192,9 +192,9 @@ test('another player cannot give a cracker prize or open trade while the crossin
   assert(q.messages.some(text=>/busy/.test(text)));ticks(p,4);assert.equal(count(p,'unlit_candle'),1);finish(p);finish(q);
 });
 test('a real gas explosion during the client approach changes the source before water reads the backpack',()=>{
-  resetWallBeasts();
-  const p=fixture([0,3214,9560],['lit_candle','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,6);assert.equal(timer(p).args[4],6);
-  exposeWallBeasts([[3215,9559]]);
+  resetWallBeasts();const passer=passWallBeast([3215,9559],q=>frame(q));
+  const p=fixture([0,3214,9560],['lit_candle','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,6,passer);assert.equal(timer(p).args[4],6);
+  finish(passer);
   assert(walk(p,stones[1].banks[0]));assert(locHandler.handle(new OpLoc(1,stones[1].x,stones[1].z,id('LocType',stones[1].name)),p));JavaRandom.setSeed(seedFor(1,false));ticks(p,1);
   assert.equal(count(p,'lit_candle'),0);assert.equal(count(p,'unlit_candle'),1);assert.equal(p.damageRequests.length,1);const health=hp(p);
   for(let i=0;i<60 && xp(p)===0;i++)ticks(p,1);assert.equal(xp(p),10);assert.equal(count(p,'unlit_candle'),1);assert.equal(hp(p),health);assert.equal(p.damageRequests.length,1);ownership(p);finish(p);
@@ -291,9 +291,9 @@ test('water loss reaches one controller recomputation at unlock, with no brightn
   ticks(p,1);p.encodeOut();assert.equal(roots(p).length,original);ticks(p,1);p.encodeOut();assert.equal(p.overlay,id('Component','inter_387'));assert.equal(roots(p).length,original+1);assert.equal(timer(p).args[0],1);ownership(p);finish(p);
 });
 test('real walk from a running gas count into a stone crossing cancels gas without disabling either hazard',()=>{
-  resetWallBeasts();
-  const p=fixture([0,3214,9560],['lit_candle','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,3);assert.equal(timer(p).args[4],3);assert.equal(p.getVarBit(gas),3);
-  exposeWallBeasts([[3215,9559]]);
+  resetWallBeasts();const passer=passWallBeast([3215,9559],q=>frame(q));
+  const p=fixture([0,3214,9560],['lit_candle','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,3,passer);assert.equal(timer(p).args[4],3);assert.equal(p.getVarBit(gas),3);
+  finish(passer);
   arrive(p,stones[1].banks[0]);assert.deepEqual(timer(p).args.slice(2),[-1,-1,0]);assert.equal(p.getVarBit(gas),0);assert.equal(count(p,'lit_candle'),1);
   cross(p,stones[1],false);assert.equal(count(p,'unlit_candle'),1);assert.equal(p.damageRequests.length,0);ownership(p);finish(p);
 });

@@ -7,7 +7,7 @@ import {
   PlayerStat, PlayerTimerType, types, map, CollisionType, engineModule, contentRoot,
   id, obj, inv, worn, player, seed, inventory, count, slotOf, use, held, remove,
   execute, tile, environmentTick, button, invButton, startDialogue, resumeDialogue, dialoguePage,
-  resetWallBeasts, exposeWallBeasts
+  resetWallBeasts, passWallBeast
 } from './runtime.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
@@ -56,7 +56,28 @@ function fixture(items = [], position = [0, 3168, 9572]) {
 }
 function start(p) { execute('[proc,swamp_cave_start]', p); ownership(p); return p; }
 function release(p) { execute('[proc,swamp_cave_release]', p); ownership(p, false); }
-function ticks(p, n, others = []) { for (let i = 0; i < n; i++) environmentTick(p, ...others); }
+let earlierPassers = null;
+function routeFrame(...players) {
+  const actors = [...new Set([...players, ...earlierPassers])];
+  const holes = [...World.npcs].filter(n => n.baseType === id('NpcType', 'swamp_wallbeast'));
+  for (const actor of actors) actor.resetEntity(false);
+  for (const n of holes) n.resetEntity(false);
+  World.currentTick++;
+  for (const n of holes) n.turn();
+  for (const actor of actors) {
+    if (actor.delayed && World.currentTick >= actor.delayedUntil) actor.delayed = false;
+    if (!actor.delayed && actor.activeScript?.execution === ScriptState.SUSPENDED) actor.executeScript(actor.activeScript, true, true);
+    actor.processQueues();
+    if (!actor.loggingOut) { actor.processTimers(PlayerTimerType.NORMAL); actor.processTimers(PlayerTimerType.SOFT); }
+    actor.processEngineQueue(); actor.processInteraction();
+  }
+}
+function ticks(p, n, others = []) {
+  for (let i = 0; i < n; i++) {
+    if (earlierPassers) routeFrame(p, ...others);
+    else environmentTick(p, ...others);
+  }
+}
 function elapsed(p, value) { ownership(p); assert.equal(timer(p).args[0], value, 'elapsed darkness is a timer argument'); }
 function pending(p, darkTicks = 29) {
   const t = timer(p);
@@ -316,8 +337,20 @@ function realGasPending() {
   return q;
 }
 for (const crossing of ['several zones', 'map square']) test(`engine entry and real walk across ${crossing} preserve clocks, pending identity and one root`, () => {
-  resetWallBeasts(); exposeWallBeasts();
-  try { traceScripts(names => {
+  resetWallBeasts(); earlierPassers = [];
+  try {
+    // Keep real earlier wearers beside their holes, within native target range.
+    // Both setup and the subject turn NPCs; no exposed type/target is written.
+    for (const n of World.npcs) {
+      if (n.baseType !== id('NpcType', 'swamp_wallbeast')) continue;
+      const q = passWallBeast([n.x, n.z - 1], actor => routeFrame(actor));
+      earlierPassers.push(q);
+      const dx = map.canTravel(0, q.x, q.z, 1, 0, 1, 0, CollisionType.NORMAL) ? 1 : -1;
+      q.queueWaypoint(q.x + dx, q.z);
+      routeFrame();
+      assert.deepEqual(tile(q), [0, n.x + dx, n.z - 1]);
+    }
+    traceScripts(names => {
     const q = realGasPending();
     q.z = 9583; ticks(q, 1);
     assert.deepEqual(timer(q).args.slice(2), [-1, -1, 0], 'leaving gas cancels the real exposure');
@@ -358,7 +391,14 @@ for (const crossing of ['several zones', 'map square']) test(`engine entry and r
       assert(names.includes('[mapzone,0_50_149]'), 'real hinted map-square crossing');
     }
     release(p);
-  }); } finally { resetWallBeasts(); }
+    });
+  } finally {
+    for (const q of earlierPassers) {
+      release(q); q.clearInteraction(); q.isActive = false;
+      World.players[q.pid] = null; q.unlink();
+    }
+    earlierPassers = null; resetWallBeasts();
+  }
 });
 for (const [kind, from, to, expected] of [
   ['same map square', [0, 3168, 9572], [0, 3168, 9538], '[zoneexit,0_49_149_32_32]'],

@@ -245,17 +245,6 @@ export function resetWallBeasts() {
   }
 }
 
-// A recently disengaged beast is exposed, with its native ten-tick reset active.
-export function exposeWallBeasts(fronts = null) {
-  for (const n of World.npcs) {
-    if (n.baseType !== id('NpcType', 'swamp_wallbeast')) continue;
-    if (fronts && !fronts.some(([x, z]) => n.x === x && n.z === z + 1)) continue;
-    n.changeType(id('NpcType', 'swamp_wallbeast_combat'), 0x7fffffff);
-    n.resetDefaults();
-    n.timerClock = 0;
-  }
-}
-
 // Expose a natural hole by another wearer's actual movement, poll and release.
 // The caller keeps this passer in the world until the subject's approach ends.
 export function passWallBeast(front, advance) {
