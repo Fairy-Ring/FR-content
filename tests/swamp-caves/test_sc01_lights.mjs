@@ -159,7 +159,7 @@ test('Watchtower real cave reader: helmet-plus-map fails, candle-plus-map passes
 test('lit mining helmet stays outside the global carried-light category', () => {
   assert.notEqual(types.ObjType.get(obj('cave_goblin_mining_helmet_lit')).category, id('CategoryType', 'light_source_lit'));
 });
-test('public natural Dark hole remains closed on original packed collision', () => {
+test('public natural Dark hole retains packed walkable approaches and real SC-07 dispatch', () => {
   const type = types.LocType.get(id('LocType', 'goblin_cave_entrance'));
   const loc = World.getLoc(3169, 3172, 0, type.id);
   assert(loc, 'original natural exterior Dark hole');
@@ -173,8 +173,8 @@ test('public natural Dark hole remains closed on original packed collision', () 
   assert(approaches.length > 0, 'real packed shape/rotation has an ordinary walkable approach');
   assert(approaches.some(([x, z]) => [[-1, 0], [1, 0], [0, -1], [0, 1]].some(([dx, dz]) => map.canTravel(0, x, z, dx, dz, 1, 0, CollisionType.NORMAL))), 'real exterior approach supports ordinary travel');
   console.log(`DARK_HOLE_APPROACHES ${JSON.stringify(approaches)}`);
-  assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, type.id, type.category), undefined);
-  assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOCU, type.id, type.category), undefined);
+  assert(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, type.id, type.category));
+  assert(ScriptProvider.getByTrigger(ServerTriggerType.OPLOCU, type.id, type.category));
 });
 console.log(`SC01 cases=${cases} pass=${cases - failures} fail=${failures}`);
 console.log(failures ? 'RESULT FAIL' : 'RESULT PASS');
