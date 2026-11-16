@@ -36,9 +36,13 @@ For the second command, build the campaign base first and retain its pack in `BA
 node --import tsx ../content/tests/barrows/test_combat_tunnels.mjs
 ```
 
-The seven original tunnel types acquire players of every combat level through native `aggressive_melee`, with the named engineering radius 4. Native wander 5, maxrange 7, contact clipping and tolerance expiry remain unchanged. The field selections are later CANDIDATE reconstructions, except the separately sourced Hitpoints and period aggression facts. Crypt rat Hitpoints stay 35. Both skeletons use 50 Hitpoints and a local explicit maximum 10 without fitting Strength. No client field changes.
+The 34 static tunnel placements acquire players of every combat level through native `aggressive_melee`, with the named engineering radius 4. Native wander 5, maxrange 7, contact clipping and tolerance expiry remain unchanged. The field selections are later CANDIDATE reconstructions, except the separately sourced Hitpoints and period aggression facts. Crypt rat Hitpoints stay 35. Both skeletons use 50 Hitpoints and a local explicit maximum 10 without fitting Strength. No client field changes.
 
-The config suite checks each selected server value explicitly. The tunnel suite executes actual packed dispatch, queues, protection, retaliation, hunt and tolerance paths. The existing poison, death/credit, owned-removal and D4 suites remain registered. Built-vector additions contain only these seven types and retain their pre-build native snapshots.
+Owned door actors (the D4 skeleton, bloodworm and crypt rat) are not aggressive. The door spawn clears the actor's instance hunt. The owned timer pre-empts the native target resets that would restore the type hunt (owner out of range or on another level, owner dead or engaged by another NPC, retreat mode): the actor targets only its owner. Without its owner it stays passive, as before BC-02, and the owner re-engages it by attacking.
+
+The config suite checks each selected server value explicitly. The tunnel suite executes actual packed dispatch, queues, protection, retaliation, hunt and tolerance paths. It also runs each door monster's lifetime with two players through the real door spawn and owned timer: the owner walks away, crosses a door, logs out, dies or is engaged by another NPC, and the second player is never targeted. The existing poison, death/credit, owned-removal and D4 suites remain registered. Built-vector additions contain only these seven types and retain their pre-build native snapshots.
+
+Acceptance only: with a separately built pre-BC-02 campaign pack, `--base-pack BASE_PACK` also runs the same owned lifetimes on both packs in one process and requires the same per-tick targets, modes and attacks; static placements differ only by acquisition.
 
 ## Durable core (S01)
 

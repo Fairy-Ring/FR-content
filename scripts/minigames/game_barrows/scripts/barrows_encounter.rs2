@@ -72,6 +72,7 @@ if (~barrows_inside(coord) = false | ~barrows_inside(npc_coord) = false | %npc_b
     npc_del;
     return;
 }
+~barrows_owned_tunnel_guard;
 ~npc_poison_counted_timer(^barrows_owner_check_ticks);
 
 [ai_timer,barrows_ahrim] ~barrows_actor_tick;
