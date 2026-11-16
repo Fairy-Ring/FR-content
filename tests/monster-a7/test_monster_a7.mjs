@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
  * A7 goblins and cave goblins: exact packed combat rows, spawned levels and the real compiled
- * melee label's XP cap. Reads only the native pack; starts no server. Approved values are the
- * monster-combat-data A7 facts; skill order in the pack is attack, defence, strength, hitpoints,
- * ranged, magic.
+ * melee label's XP cap. Reads the checked-out name tables and native pack; starts no server.
+ * Approved values are the monster-combat-data A7 facts and CANDIDATE same-family presentation.
+ * Skill order in the pack is attack, defence, strength, hitpoints, ranged, magic.
  */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -52,14 +53,43 @@ const FAMILIES = [
   { family: 'goblin soldier', level: 5, attack: 3, defence: 4, strength: 1, hitpoints: 12,
     types: [['goblin_green_soldier_1', 445], ['goblin_red_soldier_1', 444]] }
 ];
+// The operator authorizes compatible published-family reuse for the soldiers.
+// His 16 November extension also authorizes the cave types' own named family.
+// These assertions read the packed joins, not the human parameter defaults.
+const SOLDIER_PRESENTATION = {
+  attack_anim: 'goblin_attack_armed', defend_anim: 'goblin_block', death_anim: 'goblin_death',
+  attack_sound: 'goblin_attack', defend_sound: 'goblin_hit', death_sound: 'goblin_death'
+};
+const CAVE_PRESENTATION = {
+  attack_anim: 'cave_goblin_attack', defend_anim: 'cave_goblin_defend', death_anim: 'cave_goblin_death',
+  attack_sound: 'cave_goblin_attack', defend_sound: 'cave_goblin_hit', death_sound: 'cave_goblin_death'
+};
+const presentationFor = name => {
+  if (name.startsWith('goblin_')) return SOLDIER_PRESENTATION;
+  if (name === 'cave_goblin_guard1' || name === 'cave_goblin_guard2') return {
+    ...CAVE_PRESENTATION,
+    attack_anim: name === 'cave_goblin_guard1' ? 'cave_goblin_bone_spear_attack' : 'cave_goblin_bone_club_attack',
+    defend_anim: 'cave_goblin_bone_spear_block'
+  };
+  return CAVE_PRESENTATION;
+};
+const synthIds = new Map(readFileSync(path.resolve(here, '../../pack/synth.pack'), 'utf8').trim().split(/\r?\n/).map(line => {
+  const separator = line.indexOf('=');
+  return [line.slice(separator + 1), Number(line.slice(0, separator))];
+}));
+const presentationId = (field, name) => {
+  const value = field.endsWith('_anim') ? id(configs.SeqType, name) : synthIds.get(name);
+  assert(Number.isSafeInteger(value), `missing packed presentation ${field} ${name}`);
+  return value;
+};
 // Ranged and magic are 1 in every selected form and stay at the packed default.
 const RANGED = 1, MAGIC = 1;
-// A7 sets skills only: these server fields keep the engine's own defaults (no block is copied).
+// Presentation is checked separately; these server fields keep the engine's own defaults.
 const SERVER_FIELDS = ['regenrate', 'category', 'wanderrange', 'maxrange', 'huntrange', 'timer', 'respawnrate', 'moverestrict',
   'attackrange', 'huntmode', 'defaultmode', 'members', 'blockwalk', 'givechase', 'patrolCoord', 'patrolDelay'];
-// M2(b) and unchanged timing, style and bonuses: each effective parameter is the parameter's own default.
+// Unchanged timing, style and bonuses keep each parameter's own default.
 const DEFAULT_PARAMS = ['attackrate', 'damagetype', 'attackbonus', 'strengthbonus', 'stabdefence', 'slashdefence', 'crushdefence',
-  'rangedefence', 'magicdefence', 'attack_anim', 'defend_anim', 'death_anim', 'attack_sound', 'defend_sound', 'death_sound', 'combat_xp_multiplier'];
+  'rangedefence', 'magicdefence', 'combat_xp_multiplier'];
 const blank = new NpcType(-1);
 blank.postDecode();
 
@@ -128,7 +158,14 @@ for (const family of FAMILIES) {
     check(`${name} original id`, type.id, original);
     check(`${name} packed skills attack/defence/strength/hitpoints/ranged/magic`, Array.from(type.stats), expected);
     check(`${name} visible level`, type.vislevel, family.level);
-    check(`${name} explicit parameters`, [...type.params.keys()], []);
+    const presentation = presentationFor(name);
+    check(`${name} explicit parameters`, [...type.params.keys()].sort((a, b) => a - b),
+      Object.keys(presentation).map(field => id(ParamType, field)).sort((a, b) => a - b));
+    for (const [field, sequenceOrSound] of Object.entries(presentation)) {
+      const param = ParamType.getByName(field);
+      check(`${name} explicit ${field} binding`, type.params.has(param.id), true);
+      check(`${name} effective ${field}`, paramInt(type, field), presentationId(field, sequenceOrSound));
+    }
     for (const field of SERVER_FIELDS) check(`${name} ${field} keeps the engine default`, type[field], blank[field]);
     for (const param of DEFAULT_PARAMS) check(`${name} effective ${param} is the parameter default`, paramInt(type, param), ParamType.getByName(param).defaultInt);
     const { player, npc } = fixture(type);
