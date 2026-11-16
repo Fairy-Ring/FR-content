@@ -81,3 +81,14 @@ param=productexp,690
 
 [fishing_struct_seaturtle]
 param=productexp,570
+
+[fishing_struct_swamp_frogspawn]
+param=productexp,750
+param=success_low,16
+param=success_high,96
+
+[fishing_struct_swamp_cave_eel]
+param=productexp,800
+param=productmessage,You catch a cave eel.
+param=success_low,10
+param=success_high,80

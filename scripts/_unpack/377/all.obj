@@ -61643,6 +61643,7 @@ members=yes
 2dxan=296
 cost=15
 weight=500g
+param=fishing_struct,fishing_struct_swamp_cave_eel
 
 [burnt_cave_eel]
 name=Burnt cave eel
@@ -61696,6 +61697,7 @@ members=yes
 iop1=Eat
 cost=5
 weight=500g
+param=fishing_struct,fishing_struct_swamp_frogspawn
 
 [cert_raw_cave_eel]
 certlink=raw_cave_eel
