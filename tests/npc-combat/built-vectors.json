@@ -339,7 +339,7 @@
       "evidence": {
         "facts": ["monster-combat-data.s02-killerwatt-vectors", "monster-combat-data.s02-killerwatt-attack-interval", "monster-combat-data.s02-killerwatt-distance"],
         "label": "CANDIDATE",
-        "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+        "researchCommit": "b5748d37ccbc262a14e54ad73c9e2987ae2d9023",
         "sources": [
           { "id": "src.monster-s02-history-corpus", "sha256": "ae9a66c319ab54a13603657a7cdf1a7d7845705ee0876591b6f657f14447ba0c" },
           { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
@@ -353,7 +353,7 @@
           "evidence": {
             "facts": ["monster-combat-data.s02-killerwatt-period-hitpoints-level"],
             "label": "VERIFIED",
-            "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+            "researchCommit": "b5748d37ccbc262a14e54ad73c9e2987ae2d9023",
             "sources": [
               { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" }
             ]
@@ -371,7 +371,7 @@
           "evidence": {
             "facts": ["slayer.s02-killerwatt-task"],
             "label": "VERIFIED",
-            "researchCommit": "ea0969405caec185f498bccd2ef86e768b812a1a",
+            "researchCommit": "b5748d37ccbc262a14e54ad73c9e2987ae2d9023",
             "sources": [
               { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
               { "id": "src.monster-s02-tipit-slayer-20060427", "sha256": "eb3cc73876da3c79882e2544aba7eb73321de339ac0c6c8621cc66973db959a2" },
@@ -387,7 +387,7 @@
       "evidence": {
         "facts": ["monster-combat-data.s02-killerwatt-vectors", "monster-combat-data.s02-killerwatt-attack-interval", "monster-combat-data.s02-killerwatt-distance"],
         "label": "CANDIDATE",
-        "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+        "researchCommit": "b5748d37ccbc262a14e54ad73c9e2987ae2d9023",
         "sources": [
           { "id": "src.monster-s02-history-corpus", "sha256": "ae9a66c319ab54a13603657a7cdf1a7d7845705ee0876591b6f657f14447ba0c" },
           { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
@@ -401,7 +401,7 @@
           "evidence": {
             "facts": ["monster-combat-data.s02-killerwatt-period-hitpoints-level"],
             "label": "VERIFIED",
-            "researchCommit": "c2439892f2d6779153c324ec4a5054718af0b7d2",
+            "researchCommit": "b5748d37ccbc262a14e54ad73c9e2987ae2d9023",
             "sources": [
               { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" }
             ]
@@ -419,11 +419,361 @@
           "evidence": {
             "facts": ["slayer.s02-killerwatt-task"],
             "label": "VERIFIED",
-            "researchCommit": "ea0969405caec185f498bccd2ef86e768b812a1a",
+            "researchCommit": "b5748d37ccbc262a14e54ad73c9e2987ae2d9023",
             "sources": [
               { "id": "src.monster-s02-rhq-20060418", "sha256": "b43b90af7c64595cb6c5af9315ff2df595193fbbfeb6e208c54bee1edc8a4656" },
               { "id": "src.monster-s02-tipit-slayer-20060427", "sha256": "eb3cc73876da3c79882e2544aba7eb73321de339ac0c6c8621cc66973db959a2" },
               { "id": "src.monster-s02-cache-unit", "sha256": "511a3c796acb9347541257ede9737d2c7903bb0aada0adc3d046f4f396d90fbd" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "swamp_wallbeast",
+        "id": 1826
+      },
+      "unit": "SC-05",
+      "evidence": {
+        "facts": [
+          "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+        ],
+        "label": "VERIFIED",
+        "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+        "sources": [
+          {
+            "id": "src.swampcaves-sc05-accepted-plan",
+            "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+          }
+        ]
+      },
+      "fields": {
+        "wanderrange": {
+          "value": 0
+        },
+        "maxrange": {
+          "value": 2
+        },
+        "moverestrict": {
+          "value": 5
+        },
+        "defaultmode": {
+          "value": 0
+        },
+        "givechase": {
+          "value": false
+        },
+        "respawnrate": {
+          "value": 100
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "swamp_wallbeast_combat",
+        "id": 1827
+      },
+      "unit": "SC-05",
+      "evidence": {
+        "facts": [
+          "monster-combat-data.wall-beast-combat-candidate"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "87ac6166c9661d69c564e4f0389c4e6b8d462fbd",
+        "sources": [
+          {
+            "id": "src.swampcaves-r2-value-review",
+            "sha256": "c33da9eacb5f6495d946b5ec1aac6b1e3f5d1d8a95822f5d11511325ea288475"
+          },
+          {
+            "id": "src.swampcaves-wall-current",
+            "sha256": "01bd7f3aaac7433f52592bb004ea257dda2aa7a24a4bbe47c1ae5d5f068889ee"
+          },
+          {
+            "id": "src.swampcaves-osw-histories",
+            "sha256": "176ef0c370b6cb2ebce957d803bb36e0684f0cf8c5e520555079f7cfa799f97a"
+          }
+        ]
+      },
+      "fields": {
+        "hitpoints": {
+          "value": 105,
+          "evidence": {
+            "facts": [
+              "monster-combat-data.wall-beast-period-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "87ac6166c9661d69c564e4f0389c4e6b8d462fbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-rhq-wall",
+                "sha256": "c23f09c243f915d4bf98eaf3a99822f772d61678d0f85cc6b0127726e172e277"
+              },
+              {
+                "id": "src.swampcaves-original-cache",
+                "sha256": "35ed2b90f2312396aae6a52f37b9b1913d4791c16244d8ae6389d86812f16719"
+              }
+            ]
+          }
+        },
+        "attack": {
+          "value": 30
+        },
+        "strength": {
+          "value": 30
+        },
+        "defence": {
+          "value": 16
+        },
+        "magic": {
+          "value": 1
+        },
+        "ranged": {
+          "value": 1
+        },
+        "param:death_drop": {
+          "value": -1,
+          "evidence": {
+            "facts": [
+              "slayer.wall-beast-no-guaranteed-drop"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "e1e0938e6cb4037523b1328d2c887cbea45e780b",
+            "sources": [
+              {
+                "id": "src.swampcaves-rhq-wall",
+                "sha256": "c23f09c243f915d4bf98eaf3a99822f772d61678d0f85cc6b0127726e172e277"
+              },
+              {
+                "id": "src.swampcaves-osw-histories",
+                "sha256": "176ef0c370b6cb2ebce957d803bb36e0684f0cf8c5e520555079f7cfa799f97a"
+              },
+              {
+                "id": "src.swampcaves-wall-current",
+                "sha256": "01bd7f3aaac7433f52592bb004ea257dda2aa7a24a4bbe47c1ae5d5f068889ee"
+              }
+            ]
+          }
+        },
+        "param:attackrate": {
+          "value": 6
+        },
+        "param:damagetype": {
+          "value": 2
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 0
+        },
+        "param:magicattack": {
+          "value": 0
+        },
+        "param:rangeattack": {
+          "value": 0
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 0
+        },
+        "param:slashdefence": {
+          "value": 0
+        },
+        "param:crushdefence": {
+          "value": 0
+        },
+        "param:magicdefence": {
+          "value": 0
+        },
+        "param:rangedefence": {
+          "value": 0
+        },
+        "param:attack_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "wall_beast_specialattack_attack"
+          },
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "param:defend_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "wall_beast_specialattack_defend"
+          },
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "param:death_anim": {
+          "value": {
+            "ref": "seq",
+            "name": "wall_beast_specialattack_death"
+          },
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "param:slayer_category": {
+          "value": 61,
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "wanderrange": {
+          "value": 0,
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "maxrange": {
+          "value": 2,
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "moverestrict": {
+          "value": 5,
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "defaultmode": {
+          "value": 0,
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "givechase": {
+          "value": false,
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "respawnrate": {
+          "value": 100,
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
+            ]
+          }
+        },
+        "timer": {
+          "value": 1,
+          "evidence": {
+            "facts": [
+              "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
+            "sources": [
+              {
+                "id": "src.swampcaves-sc05-accepted-plan",
+                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
+              }
             ]
           }
         }
