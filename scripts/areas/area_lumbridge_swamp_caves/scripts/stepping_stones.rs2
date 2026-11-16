@@ -1,6 +1,11 @@
 // VERIFIED original locs; CANDIDATE stone-rule/chance and form-specific water rules.
 // UNKNOWN original motion: four engineering ticks, settlement halfway, no fall hit.
 [aploc1,swamp_cave_steppingstone_a]
+// Let the ordinary loc route reach the bank's neighbourhood first.
+if (distance(coord, loc_coord) > 2) {
+    p_aprange(2);
+    return;
+}
 if (coordx(coord) < coordx(loc_coord)) {
     ~swamp_cave_stone(^swamp_stone_west, ^swamp_stone_east);
 } else if (coordx(coord) > coordx(loc_coord)) {
@@ -8,6 +13,10 @@ if (coordx(coord) < coordx(loc_coord)) {
 }
 
 [aploc1,swamp_cave_steppingstone_b]
+if (distance(coord, loc_coord) > 2) {
+    p_aprange(2);
+    return;
+}
 if (coordz(coord) > coordz(loc_coord)) {
     ~swamp_cave_stone(^swamp_stone_north, ^swamp_stone_south);
 } else if (coordz(coord) < coordz(loc_coord)) {
@@ -15,9 +24,13 @@ if (coordz(coord) > coordz(loc_coord)) {
 }
 
 [proc,swamp_cave_stone](coord $start, coord $landing)
-if (coord ! $start) ~forcewalk2($start);
-// The clipped approach can stop short. Never jump from the wrong bank.
-if (coord ! $start) return;
+// Shape 22 can finish its loc route diagonally beside the bank. This native
+// walk and weak continuation remain cancellable, with both cave clocks running.
+if (coord ! $start) {
+    p_walk($start);
+    weakqueue*(swamp_cave_stone_approach, 0)($start, $landing);
+    return;
+}
 facesquare($landing);
 anim(human_steppingstonejump, 0);
 def_boolean $success = stat_random(agility, ^swamp_stone_low, ^swamp_stone_high);
@@ -37,6 +50,9 @@ if ($success = true) {
 } else {
     stat_advance(agility, ^swamp_stone_failure_xp);
 }
+
+[queue,swamp_cave_stone_approach](coord $start, coord $landing)
+~swamp_cave_stone($start, $landing);
 
 [proc,swamp_stone_water]
 def_int $slot = 0;

@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { World, ScriptProvider, ScriptState, ServerTriggerType, PlayerStat, PlayerTimerType,
   types, map, CollisionType, engineModule, id, obj, inv, worn, player, seed, inventory,
-  count, held, use, execute, tile, dragInventory, slotOf, invButton } from './runtime.mjs';
+  count, held, use, execute, tile, dragInventory, slotOf, invButton, button } from './runtime.mjs';
 const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
@@ -67,6 +67,13 @@ function walk(p,to){
   assert(route.length,'native client route exists');p.originX=p.x;p.originZ=p.z;
   return moveHandler.handle(new MoveClick(route,0,false),p);
 }
+function approach(p,stone){
+  const l=loc(stone),type=types.LocType.get(l.type);
+  const route=Array.from(map.findPathToLoc(p.level,p.x,p.z,l.x,l.z,1,type.width,type.length,l.angle,l.shape,type.forceapproach),value=>{const c=CoordGrid.unpackCoord(value);return{x:c.x,z:c.z};});
+  p.originX=p.x;p.originZ=p.z;
+  if(route.length)assert(moveHandler.handle(new MoveClick(route,0,true),p));
+  assert(locHandler.handle(new OpLoc(1,l.x,l.z,l.type),p));
+}
 function arrive(p,to,max=150){assert(walk(p,to));for(let i=0;i<max && tile(p).some((v,j)=>v!==to[j]);i++)ticks(p,1);assert.deepEqual(tile(p),to);}
 function seedFor(level,success){
   const cutoff=Math.floor(51*(99-Math.min(level,99))/98)+Math.floor(252*(Math.min(level,99)-1)/98)+1;
@@ -107,6 +114,15 @@ for(const stone of stones)for(const bank of [0,1])for(const level of [1,50,99,12
     assert.deepEqual(p.messages,[]);assert(!p.packets.some(packet=>/Synth|Spotanim/.test(packet.constructor.name)));ownership(p);
     assert.equal(p.animations.some(a=>a.seq===id('SeqType','human_climbing_fall')),!success);
   }finally{Runner.HANDLERS[ScriptOpcode.STAT_RANDOM]=original;finish(p);}
+});
+// Pin actual native draws, not merely a seed that happens to select an outcome.
+for(const [level,lastSuccess,firstFailure]of [[1,51,52],[50,151,152],[99,252,253]])for(const [draw,success]of [[lastSuccess,true],[firstFailure,false]])test(`chart level ${level}: native draw ${draw}/256 ${success?'succeeds':'fails'} at required level 1`,()=>{
+  let selected;
+  for(let candidate=0;candidate<200000;candidate++){JavaRandom.setSeed(candidate);if(Math.floor(JavaRandom.nextDouble()*256)===draw){selected=candidate;break;}}
+  assert.notEqual(selected,undefined,'boundary draw has a native seed');
+  const p=fixture();p.baseLevels[PlayerStat.AGILITY]=level;p.levels[PlayerStat.AGILITY]=level;p.stats[PlayerStat.AGILITY]=getExpByLevel(level);
+  const before=xp(p);JavaRandom.setSeed(selected);assert(click(p,stones[0]));assert(p.delayed);ticks(p,4);
+  assert.equal(xp(p)-before,success?30:10);assert.deepEqual(tile(p),stones[0].banks[success?1:0]);assert.deepEqual(p.damageRequests,[]);finish(p);
 });
 for(const [source,result]of [...water,...unchanged.map(name=>[name,name])])for(const success of [false,true])test(`${success?'success retains':'failure settles'} carried ${source}`,()=>{
   const p=fixture(stones[0].banks[0],[source]);const expected=success?source:result;
@@ -189,20 +205,59 @@ test('duplicate stone, walk and inventory operation cannot replace a held crossi
   assert.equal(click(p,stones[0]),false);assert.equal(held(p,'shark',1),false);assert.equal(walk(p,[0,3204,9573]),false);assert.equal(p.activeScript,continuation);
   ticks(p,4);assert.equal(xp(p)-before,30);assert.equal(count(p,'shark'),1);ticks(p,8);assert.equal(xp(p)-before,30);finish(p);
 });
-for(const [stone,position]of [[stones[0],[0,3206,9575]],[stones[1],[0,3218,9554]]])test(`${stone.name}: sideways wrong bank never jumps, rolls or awards`,()=>{
-  const p=fixture(position);const before=xp(p);assert(click(p,stone));ticks(p,8);assert.equal(xp(p),before);assert.equal(p.animations.length,0);assert.equal(p.moves.length,0);finish(p);
+for(const [stone,position]of [[stones[0],[0,3208,9573]],[stones[1],[0,3222,9553]]])test(`${stone.name}: reachable off-bank tile walks to its exact bank before the first draw`,()=>{
+  const p=fixture(position);assert(!map.isMapBlocked(p.x,p.z,p.level));const bank=stone.banks[1],original=Runner.HANDLERS[ScriptOpcode.STAT_RANDOM];let draws=0;
+  Runner.HANDLERS[ScriptOpcode.STAT_RANDOM]=state=>{if(state.script.name==='[proc,swamp_cave_stone]'){draws++;assert.deepEqual(tile(p),bank,'no off-bank roll');}return original(state);};
+  try{approach(p,stone);JavaRandom.setSeed(seedFor(1,true));for(let i=0;i<30&&xp(p)===0;i++)ticks(p,1);assert.equal(draws,1);assert.equal(xp(p),30);assert.deepEqual(tile(p),stone.banks[0]);assert.equal(p.moves.length,1,'only settlement teleports');}finally{Runner.HANDLERS[ScriptOpcode.STAT_RANDOM]=original;finish(p);}
 });
-test('opposite-bank clipped setup cannot jump through the water from the wrong start',()=>{
-  const p=fixture(stones[1].banks[1]);const before=xp(p);execute('[proc,swamp_cave_stone]',p,stones[1].banks.map(c=>CoordGrid.packCoord(...c)));assert.equal(xp(p),before);assert.deepEqual(tile(p),stones[1].banks[1]);assert.equal(p.animations.length,0);finish(p);
+test('the final ordinary bank walk is cancellable by native input and does not pause darkness',()=>{
+  const p=fixture([0,3222,9553],[]);ticks(p,29);assert(click(p,stones[1]));assert(!p.delayed);assert([...p.weakQueue.all()].some(q=>q.script.name==='[queue,swamp_cave_stone_approach]'));ticks(p,1);
+  assert(!p.delayed);assert.equal(timer(p).args[0],30);assert.deepEqual(p.damageRequests.map(d=>d.amount),[1]);assert(walk(p,[0,3223,9553]));assert.equal([...p.weakQueue.all()].length,0);ticks(p,8);assert.equal(xp(p),0);assert.equal(p.animations.length,0);finish(p);
 });
-test('native distant approach can be cancelled by another real walk without landing or XP',()=>{
-  const p=fixture([0,3192,9571],['bullseye_lantern_lit','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));const before=xp(p);
-  assert(walk(p,stones[0].banks[0]));assert(locHandler.handle(new OpLoc(1,stones[0].x,stones[0].z,id('LocType',stones[0].name)),p));
-  assert(walk(p,[0,3191,9571]));ticks(p,8);assert.equal(xp(p),before);assert.equal(p.animations.length,0);finish(p);
+test('native distant approach remains cancellable even within the former ten-tile owned range',()=>{
+  const p=fixture([0,3216,9570]);approach(p,stones[0]);ticks(p,2);assert(!p.delayed);assert(p.target);assert.equal(p.moves.length,0);assert.equal(xp(p),0);
+  assert(walk(p,[0,3216,9571]));assert.equal(p.target,null);ticks(p,15);assert.equal(xp(p),0);assert.equal(p.animations.length,0);assert.equal(p.moves.length,0);finish(p);
 });
-for(const stone of stones)test(`${stone.name}: clipped native approach from the same bank settles at the bank before rolling`,()=>{
-  const bank=stone.banks[0],position=stone.angle===1?[bank[0],bank[1]-1,bank[2]]:[bank[0],bank[1],bank[2]+1],p=fixture(position);assert(!map.isMapBlocked(p.x,p.z,p.level));const before=xp(p);JavaRandom.setSeed(seedFor(1,true));assert(click(p,stone));
-  for(let i=0;i<20 && xp(p)===before;i++)ticks(p,1);assert.equal(xp(p)-before,30);assert.deepEqual(tile(p),stone.banks[1]);assert(p.moves.some(m=>m.tile.every((v,j)=>v===bank[j])));finish(p);
+for(const [stone,position,bank]of [[stones[0],[0,3216,9570],1],[stones[1],[0,3231,9544],1]])test(`${stone.name}: distant native op-click walks unlocked and only owns four ticks on its bank`,()=>{
+  const p=fixture(position);approach(p,stone);JavaRandom.setSeed(seedFor(1,true));let walking=0,heldTicks=0;
+  for(let i=0;i<40&&xp(p)===0;i++){ticks(p,1);if(p.delayed){heldTicks++;assert.deepEqual(tile(p),stone.banks[p.moves.length?1-bank:bank]);}else if(xp(p)===0){walking++;assert(p.canAccess());assert(p.target||[...p.weakQueue.all()].some(q=>q.script.name==='[queue,swamp_cave_stone_approach]'));assert.equal(p.moves.length,0);}}
+  assert(walking>=5,'ordinary approach spans multiple ticks');assert.equal(heldTicks,4);assert.equal(p.moves.length,1,'no protected approach teleports');assert.equal(xp(p),30);assert.deepEqual(tile(p),stone.banks[1-bank]);finish(p);
+});
+test('a stone in the other collision component cannot be reached and gives only the native refusal',()=>{
+  const p=fixture([0,3225,9542]);approach(p,stones[0]);ticks(p,30);assert.equal(xp(p),0);assert.equal(p.moves.length,0);assert.equal(p.animations.length,0);assert.equal(p.target,null);assert.deepEqual(p.messages,["I can't reach that!"]);finish(p);
+});
+test('an insect bite becomes due during the ordinary approach, before any crossing owns the player',()=>{
+  const p=fixture([0,3216,9570],[]);ticks(p,28);assert.equal(timer(p).args[0],28);approach(p,stones[0]);ticks(p,2);
+  assert(!p.delayed);assert(p.canAccess());assert.equal(xp(p),0);assert.equal(timer(p).args[0],30);assert.deepEqual(p.damageRequests.map(d=>d.amount),[1]);assert.equal(p.moves.length,0);finish(p);
+});
+test('a running gas count progresses during a native stone approach before leaving its rectangle',()=>{
+  const p=fixture([0,3208,9554],['lit_candle','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,2);assert.equal(timer(p).args[4],2);
+  approach(p,stones[1]);ticks(p,1);assert(!p.delayed);assert(p.canAccess());assert.equal(xp(p),0);assert.equal(timer(p).args[4],3);assert.equal(p.getVarBit(gas),3);assert.equal(p.moves.length,0);finish(p);
+});
+test('a bare-headed ordinary stone approach still permits the natural wall-beast grab',()=>{
+  const p=fixture([0,3197,9571]);approach(p,stones[0]);for(let i=0;i<8&&!p.delayed;i++)ticks(p,1);
+  assert(p.delayed);assert.equal(p.activeScript?.script.name,'[ai_queue4,swamp_wallbeast]');assert.deepEqual(tile(p),[0,3198,9571]);assert.equal(xp(p),0);ticks(p,6);assert.equal(p.damageRequests.length,1);assert(p.damageRequests[0].amount>=11&&p.damageRequests[0].amount<=13);finish(p);
+});
+test('native teleport and logout buttons are refused during the four-tick crossing and work after unlock',()=>{
+  const p=fixture(stones[0].banks[0],['bullseye_lantern_lit','lawrune','airrune','airrune','airrune','firerune']);
+  p.tabs[6]=types.Component.get(id('Component','magic:varrock_teleport')).rootLayer;p.tabs[10]=types.Component.get(id('Component','logout:try_logout')).rootLayer;
+  begin(p,stones[0],true);const continuation=p.activeScript;
+  assert(button(p,'magic:varrock_teleport'));assert.equal(count(p,'lawrune'),1);assert(button(p,'logout:try_logout'));assert.equal(p.requestLogout,false);assert.equal(p.activeScript,continuation);
+  for(let i=0;i<3;i++){ticks(p,1);assert.equal(p.canAccess(),false);assert.equal(p.requestLogout,false);}
+  ticks(p,1);assert.equal(p.canAccess(),true);assert.equal(xp(p),30);assert(button(p,'magic:varrock_teleport'));ticks(p,12);assert.equal(count(p,'lawrune'),0);assert.notDeepEqual(tile(p),stones[0].banks[1]);
+  assert(button(p,'logout:try_logout'));assert(p.requestLogout);p.lastResponse=World.currentTick;p.lastConnected=World.currentTick;World.processLogouts();assert.equal(World.getPlayerByUid(p.uid),null);World.logoutRequests.delete(p.username);
+});
+test('a forced disconnect logout waits for the four-tick action and then removes the real player',()=>{
+  const p=fixture();begin(p,stones[0],true);p.lastResponse=World.currentTick-World.TIMEOUT_NO_RESPONSE;
+  for(let i=0;i<4;i++){World.processLogouts();assert.equal(World.getPlayerByUid(p.uid),p);assert(p.loggingOut);assert.equal(p.canAccess(),false);ticks(p,1);}
+  assert.equal(xp(p),30);assert(!p.delayed);World.processLogouts();assert.equal(World.getPlayerByUid(p.uid),null);assert(!timer(p));World.logoutRequests.delete(p.username);
+});
+test('a real lethal firecracker hit due during the crossing waits until unlock, then the real death runs',()=>{
+  const p=fixture(stones[0].banks[0],['bullseye_lantern_lit','tinderbox','viking_firecracker','viking_firecracker']);
+  assert(use(p,'tinderbox','viking_firecracker'));assert(use(p,'tinderbox','viking_firecracker'));const fuses=[...p.queue.all()].filter(q=>q.script.name==='[queue,firecracker_explode]');assert.equal(fuses.length,2);
+  ticks(p,Math.min(...fuses.map(q=>q.delay))-1);p.levels[PlayerStat.HITPOINTS]=2;begin(p,stones[0],true);
+  ticks(p,3);assert.equal(hp(p),2);assert.equal(p.damageRequests.length,0);assert(p.delayed);ticks(p,2);assert.equal(xp(p),30);assert.deepEqual(p.damageRequests.map(d=>d.amount),[2]);assert.equal(hp(p),0);
+  ticks(p,20);assert(hp(p)>0);assert.equal(execute('[proc,swamp_cave_inside]',p,[CoordGrid.packCoord(...tile(p))]).popInt(),0);assert(!timer(p));finish(p);
 });
 test('insect bite due during four-tick crossing waits until unlock with no catch-up or controller restart',()=>{
   const p=fixture(stones[0].banks[0],[]);ticks(p,29);assert.equal(timer(p).args[0],29);const health=hp(p);begin(p,stones[0],true);
