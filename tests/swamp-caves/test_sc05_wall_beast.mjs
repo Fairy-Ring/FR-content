@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { World, PlayerStat, PlayerTimerType, ScriptProvider, ScriptState, ServerTriggerType,
   types, engineModule, id, obj, inv, worn, player, seed, count, held, remove, execute,
-  tile, contentRoot, map, CollisionType, button } from './runtime.mjs';
+  tile, contentRoot, map, CollisionType, button, use } from './runtime.mjs';
 const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
 const Pointer = (await engineModule('engine/script/ScriptPointer.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -26,6 +26,7 @@ const timer = p => p.timers.get(controller.id);
 const names = ['wall_beast_specialattack_start','wall_beast_specialattack_ready','wall_beast_specialattack_end'];
 const playerAnims = ['human_wall_beast_specialattack_start','human_wall_beast_specialattack_ready','human_wall_beast_specialattack_end'].map(n=>id('SeqType',n));
 const holes = [...World.npcs].filter(n=>n.baseType===dormant);
+const repelMessage = 'Your helmet repels the wall beast!';
 let cases=0, failures=0;
 function test(name, run) { cases++; try { JavaRandom.setSeed(0); run(); console.log(`PASS ${name}`); } catch(e) { failures++; console.error(`FAIL ${name}: ${e.stack??e}`); } }
 function reset() {
@@ -37,10 +38,11 @@ function reset() {
 function fixture(index=0, items=['bullseye_lantern_lit']) {
   const p=seed(player(),items); [p.x,p.z]=anchors[index]; p.baseLevels[PlayerStat.HITPOINTS]=100;p.levels[PlayerStat.HITPOINTS]=100;
   execute('[proc,update_bas]',p);
-  p.damageRequests=[];p.animations=[];
-  const damage=p.applyDamage, animation=p.playAnimation;
+  p.damageRequests=[];p.animations=[];p.messageEvents=[];
+  const damage=p.applyDamage, animation=p.playAnimation, message=p.messageGame;
   p.applyDamage=function(amount,type){p.damageRequests.push({tick:World.currentTick,amount,type});return damage.call(this,amount,type);};
   p.playAnimation=function(seq,delay){p.animations.push({tick:World.currentTick,seq,delay});return animation.call(this,seq,delay);};
+  p.messageGame=function(text){p.messageEvents.push({tick:World.currentTick,text:String(text)});return message.call(this,text);};
   return p;
 }
 function finish(p) { if(p.timers.has(controller.id)) execute('[proc,swamp_cave_release]',p); p.clearInteraction();p.isActive=false;World.players[p.pid]=null;p.unlink(); }
@@ -67,6 +69,7 @@ function npcRun(name,n,p=null,args=[]) {
 function param(n,name){const t=types.ParamType.getByName(name);assert(t,name);return ParamHelper.getIntParam(t.id,types.NpcType.get(n.type),t.defaultInt);}
 function natural(index){return holes.find(n=>n.startX===spawns[index][0]&&n.startZ===spawns[index][1]);}
 function grab(p,n){poll(p);ticks(p,1);assert(p.delayed,'NPC queue holds the actual player');return World.currentTick;}
+function repel(p,n){const begin=grab(p,n);ticks(p,6);assert(!p.delayed);assert.equal(n.type,exposed);return begin;}
 function noExtra(p){assert.equal(p.getVar(id('VarPlayerType','poison')),0);assert(!p.packets.some(x=>/Synth|Spotanim/.test(x.constructor.name)));}
 function walk(p,x,z,run=false) {
   p.run=run?1:0;
@@ -127,8 +130,9 @@ for(let index=0;index<7;index++)for(const headwear of ['bare','bag','worn'])for(
   for(let elapsed=0;elapsed<12;elapsed++){ticks(p,1);samples.push({tile:[p.x,p.z],owner:n.getVar(own),delayed:p.delayed,type:n.type});}
   const grabbed=p.animations.some(a=>a.seq===playerAnims[0]),eligible=!skips;
   assert.equal(samples.some(s=>s.tile[0]===x&&s.tile[1]===z),eligible,'only a tick-ending front tile is observed');
-  assert.equal(grabbed,eligible&&headwear!=='worn');
-  assert.deepEqual([p.x,p.z],eligible&&headwear!=='worn'?[x,z]:destination,'only an unprotected eligible passer is stopped');
+  assert.equal(grabbed,eligible,'a repelled lunge uses the same protected hold');
+  assert.deepEqual([p.x,p.z],eligible?[x,z]:destination,'every eligible passer stops, including the wearer');
+  if(skips){assert(samples.every(s=>s.owner===-1&&!s.delayed));assert.deepEqual(p.messages,[]);assert.equal(n.levels[3],1);}
   assert.equal(n.type,eligible&&headwear==='worn'?exposed:dormant);
   if(eligible&&headwear!=='worn')assert.deepEqual(p.damageRequests.map(d=>d.amount),[13]);
   if(skips)assert.deepEqual(p.damageRequests,[]);
@@ -148,10 +152,12 @@ test('the unchanged SC03 westward walk grabs a bare passer; a worn helmet preser
       assert(p.delayed);assert.deepEqual([p.x,p.z],[3162,9573]);assert.equal(n.getVar(own),p.uid);
       ticks(p,6);assert.deepEqual(p.damageRequests.map(hit=>hit.amount),[13]);assert.deepEqual([p.x,p.z],[3162,9573]);assert(!p.delayed);
     }else{
-      assert(samples.some(sample=>sample.type===exposed),'the worn passer really exposes the natural beast');
-      assert.deepEqual([p.x,p.z],route.at(-1));assert(!p.delayed);assert.equal(hp(p),before-Math.max(0,14+route.length+1-29));
-      assert(p.damageRequests.every(hit=>hit.amount===1),'only the unchanged insect bites, no wall-beast hit');
-      assert.equal(p.overlay,shade);assert.equal(n.target,null);
+      assert(p.delayed);assert.deepEqual([p.x,p.z],[3162,9573]);
+      ticks(p,6);assert(!p.delayed);assert.equal(n.type,exposed);assert.equal(hp(p),before);
+      assert.deepEqual(p.messages,['You hear tiny insects skittering over the ground...',repelMessage]);assert.equal(p.overlay,shade);
+      reachable(p,...route.at(-1));assert.equal(n.target,null);
+      assert.equal(hp(p),before-p.damageRequests.reduce((sum,hit)=>sum+hit.amount,0));
+      assert(p.damageRequests.every(hit=>hit.amount<=4),'only ordinary melee or insect bites after the six-tick release, never another grab');
       const resetClock=n.getVar(id('VarNpcType','npc_int2'));assert(resetClock>0&&resetClock<10);
       ticks(p,9-resetClock);assert.equal(n.type,exposed);ticks(p,1);
       assert.equal(n.type,dormant,'the departed walker leaves an ordinary ten-tick reset');assert.equal(n.timerInterval,0);assert.deepEqual([n.x,n.z],spawns[1]);
@@ -171,13 +177,86 @@ test('Defence four receives the two exact refusals; five equips even with Slayer
 for(const [seedValue,expected]of [[4096,11],[1024,12],[0,13]])test(`native RNG seed ${seedValue}: one uniform grab delivers ${expected}`,()=>{
   reset();const p=fixture(),n=natural(0);JavaRandom.setSeed(seedValue);grab(p,n);ticks(p,6);assert.deepEqual(p.damageRequests.map(x=>x.amount),[expected]);noExtra(p);finish(p);
 });
+for(let index=0;index<7;index++)test(`helmet front ${anchors[index]}: one six-tick hold, no damage to either side, one release message`,()=>{
+  reset();const p=fixture(index,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(index);
+  assert(held(p,'wallbeast_spike_helmet',2));assert(walk(p,p.x+2,p.z));
+  const damage=n.applyDamage,received=[];n.applyDamage=function(...args){received.push(args);return damage.apply(this,args);};
+  try{
+    poll(p);assert.equal(n.getVar(own),p.uid);assert(!p.hasWaypoints(),'reservation clears the original walk');
+    ticks(p,1);const begin=World.currentTick;assert(p.delayed);assert.equal(p.animId,playerAnims[0]);assert.equal(n.animId,id('SeqType',names[0]));
+    for(let elapsed=0;elapsed<6;elapsed++){
+      assert.deepEqual([p.x,p.z],anchors[index]);assert.equal(hp(p),100);assert.equal(n.levels[3],1);
+      assert.deepEqual(p.damageRequests,[]);assert.deepEqual(received,[]);assert.deepEqual(p.messages,[]);assert.equal(n.type,dormant);
+      assert.equal(walk(p,p.x+1,p.z),false);ticks(p,1);
+      if(elapsed<5)assert(p.delayed);
+    }
+    assert.equal(World.currentTick-begin,6);assert(!p.delayed);assert.equal(n.type,exposed);assert.equal(n.levels[3],105);
+    assert.equal(p.animId,playerAnims[2]);assert.equal(n.animId,id('SeqType','wall_beast_specialattack_appear'));
+    assert.deepEqual(p.messageEvents,[{tick:begin+6,text:repelMessage}]);assert.deepEqual(p.damageRequests,[]);assert.deepEqual(received,[]);
+    poll(p);assert.deepEqual(p.messages,[repelMessage]);assert(p.inOperableDistance(n));noExtra(p);
+    assert(walk(p,p.x+2,p.z));ticks(p,3);assert.deepEqual([p.x,p.z],[anchors[index][0]+2,anchors[index][1]],'a fresh walk is admitted after release');
+  }finally{n.applyDamage=damage;finish(p);}
+});
+for(const wornAtStart of [false,true])test(`helmet ${wornAtStart?'removal':'wear'} during the native protected hold is refused`,()=>{
+  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(0);
+  if(wornAtStart)assert(held(p,'wallbeast_spike_helmet',2));grab(p,n);ticks(p,2);
+  assert.equal(wornAtStart?remove(p,'wallbeast_spike_helmet'):held(p,'wallbeast_spike_helmet',2),false);
+  assert.equal(count(p,'wallbeast_spike_helmet',worn),wornAtStart?1:0);ticks(p,4);
+  assert.equal(n.type,wornAtStart?exposed:dormant);assert.deepEqual(p.damageRequests.map(hit=>hit.amount),wornAtStart?[]:[13]);
+  assert.deepEqual(p.messages,wornAtStart?[repelMessage]:[]);
+  assert(wornAtStart?remove(p,'wallbeast_spike_helmet'):held(p,'wallbeast_spike_helmet',2));finish(p);
+});
+for(const startsWorn of [false,true])test(`current headwear can ${startsWorn?'leave':'enter'} the worn slot between reservation and lunge`,()=>{
+  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(0);
+  if(startsWorn)assert(held(p,'wallbeast_spike_helmet',2));poll(p);
+  assert(startsWorn?remove(p,'wallbeast_spike_helmet'):held(p,'wallbeast_spike_helmet',2));ticks(p,1);assert(p.delayed);ticks(p,6);
+  assert.equal(n.type,startsWorn?dormant:exposed);assert.deepEqual(p.damageRequests.map(hit=>hit.amount),startsWorn?[13]:[]);
+  assert.deepEqual(p.messages,startsWorn?[]:[repelMessage]);finish(p);
+});
+for(const wearerFirst of [true,false])test(`one mixed-headwear reservation: ${wearerFirst?'wearer':'bare player'} arrives first`,()=>{
+  reset();const a=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),b=start(fixture()),n=natural(0);
+  assert(held(a,'wallbeast_spike_helmet',2));const players=wearerFirst?[a,b]:[b,a],victim=players[0],passer=players[1];
+  frame(players);assert.equal(n.getVar(own),victim.uid);frame(players);assert(victim.delayed);assert(!passer.delayed);
+  ticks(players,6);assert(!victim.delayed);assert.equal(n.type,wearerFirst?exposed:dormant);
+  assert.deepEqual(a.damageRequests,[]);assert.deepEqual(b.damageRequests.map(hit=>hit.amount),wearerFirst?[]:[13]);
+  assert.deepEqual(a.messages,wearerFirst?[repelMessage]:[]);assert.deepEqual(b.messages,[]);finish(a);finish(b);
+});
+test('helmet hold refuses real walk, food, teleport and logout until release, then a real teleport leaves no remote attack',()=>{
+  reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet','shark','lawrune','airrune','airrune','airrune','firerune'])),n=natural(0);
+  assert(held(p,'wallbeast_spike_helmet',2));p.tabs[6]=types.Component.get(id('Component','magic:varrock_teleport')).rootLayer;
+  p.tabs[10]=types.Component.get(id('Component','logout:try_logout')).rootLayer;ticks(p,2);assert(p.delayed);
+  const continuation=p.activeScript;assert.equal(walk(p,p.x+1,p.z),false);assert.equal(held(p,'shark',1),false);
+  assert(button(p,'magic:varrock_teleport'));assert.equal(count(p,'lawrune'),1);assert(button(p,'logout:try_logout'));assert.equal(p.requestLogout,false);
+  assert.equal(p.activeScript,continuation);ticks(p,6);assert(!p.delayed);assert.deepEqual(p.damageRequests,[]);assert.deepEqual(p.messages,[repelMessage]);
+  assert(button(p,'magic:varrock_teleport'));ticks(p,14);assert.equal(count(p,'lawrune'),0);assert.notDeepEqual([p.x,p.z],anchors[0]);
+  assert.equal(n.type,dormant);assert(!p.timers.has(controller.id));assert.deepEqual(p.messages,[repelMessage,'The gardener ghost stops following you.']);finish(p);
+});
+test('helmet hold retains a forced x-log through release, then native logout leaves the beast to reset',()=>{
+  reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,2);assert(p.delayed);
+  p.lastResponse=World.currentTick-World.TIMEOUT_NO_RESPONSE;
+  for(let elapsed=0;elapsed<6;elapsed++){logouts();assert.equal(World.getPlayerByUid(p.uid),p);assert(p.loggingOut);ticks(p,1);}
+  assert(!p.delayed);assert.deepEqual(p.damageRequests,[]);assert.deepEqual(p.messages,[repelMessage]);logouts();
+  assert.equal(World.getPlayerByUid(p.uid),null);assert(!p.timers.has(controller.id));ticks([],10);assert.equal(n.type,dormant);World.logoutRequests.delete(p.username);
+});
+test('a lethal native firecracker due during the helmet stall waits until release, then death releases the cave and beast resets',()=>{
+  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet','tinderbox','viking_firecracker','viking_firecracker']),n=natural(0);
+  assert(held(p,'wallbeast_spike_helmet',2));assert(use(p,'tinderbox','viking_firecracker'));assert(use(p,'tinderbox','viking_firecracker'));
+  const fuses=[...p.queue.all()].filter(q=>q.script.name==='[queue,firecracker_explode]');assert.equal(fuses.length,2);
+  const lighting=p.messages.slice();assert.deepEqual(lighting,Array(2).fill('You light the string of the strange object. It starts to hiss slightly.'));
+  ticks(p,Math.min(...fuses.map(q=>q.delay))-1);p.levels[PlayerStat.HITPOINTS]=2;start(p);const begin=grab(p,n);
+  ticks(p,5);assert(p.delayed);assert.equal(hp(p),2);assert.deepEqual(p.damageRequests,[]);assert.deepEqual(p.messages,lighting);
+  ticks(p,1);assert.equal(World.currentTick-begin,6);assert.deepEqual(p.messages,[...lighting,repelMessage,'The strange object you lit earlier explodes in your inventory!']);assert.deepEqual(p.damageRequests,[]);assert.equal(hp(p),2);
+  ticks(p,1);assert.deepEqual(p.damageRequests.map(hit=>hit.amount),[2]);assert.equal(hp(p),0);
+  ticks(p,20);assert(hp(p)>0);assert(!p.timers.has(controller.id));assert.equal(n.type,dormant);assert.equal(execute('[proc,swamp_cave_inside]',p,[CoordGrid.packCoord(...tile(p))]).popInt(),0);finish(p);
+});
 test('current headwear is read at activation, not when the controller started',()=>{
-  reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,1);assert.equal(n.type,exposed);assert.equal(n.levels[3],105);assert.equal(p.animations.filter(x=>playerAnims.includes(x.seq)).length,0);
-  assert.deepEqual([p.faceSquareX,p.faceSquareZ],spawns[0].map(v=>v*2+1),'protected player faces the hole, not their own tile');finish(p);
+  reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,2);assert(p.delayed);assert.equal(n.type,dormant);
+  assert.deepEqual([p.faceSquareX,p.faceSquareZ],spawns[0].map(v=>v*2+1),'protected player faces the hole, not their own tile');
+  ticks(p,6);assert.equal(n.type,exposed);assert.equal(n.levels[3],105);assert.equal(p.animations.filter(x=>x.seq===playerAnims[0]).length,1);finish(p);
 });
 for(const keep of [true,false])test(`exposed form: ${keep?'keeping':'removing'} the helmet never causes another grab or exposure`,()=>{
-  reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,1);assert.equal(n.type,exposed);const uid=n.uid;
-  if(!keep)assert(remove(p,'wallbeast_spike_helmet'));ticks(p,60);assert.equal(n.type,exposed);assert.equal(n.uid,uid);assert.equal(n.target,p);assert.equal(p.animations.filter(x=>playerAnims.includes(x.seq)).length,0);assert(p.damageRequests.length>0,'exposed beast attacks the stationary front-tile player');assert(p.damageRequests.every(x=>x.amount<=4));assert.equal(p.getVar(id('VarPlayerType','poison')),0);assert.deepEqual([p.x,p.z],anchors[0]);assert.deepEqual([n.x,n.z],spawns[0]);finish(p);
+  reset();const p=start(fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet'])),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,2);assert(p.delayed);ticks(p,6);assert.equal(n.type,exposed);const uid=n.uid;
+  if(!keep)assert(remove(p,'wallbeast_spike_helmet'));ticks(p,60);assert.equal(n.type,exposed);assert.equal(n.uid,uid);assert.equal(n.target,p);assert.equal(p.animations.filter(x=>x.seq===playerAnims[0]).length,1);assert.deepEqual(p.messages,[repelMessage]);assert(p.damageRequests.length>0,'exposed beast attacks the stationary front-tile player');assert(p.damageRequests.every(x=>x.amount<=4));assert.equal(p.getVar(id('VarPlayerType','poison')),0);assert.deepEqual([p.x,p.z],anchors[0]);assert.deepEqual([n.x,n.z],spawns[0]);finish(p);
 });
 test('stationary bare-headed player is grabbed again after release plus ten cooldown ticks',()=>{
   reset();const p=start(fixture()),n=natural(0);ticks(p,2);assert(p.delayed);ticks(p,6);assert(!p.delayed);const release=World.currentTick;assert.equal(n.getVar(cooldown),release+10);
@@ -206,9 +285,9 @@ for(const phase of ['hold','cooldown'])test(`a second bare-headed passer walks t
   assert.equal(a.damageRequests.length,1);assert.equal(n.getVar(own),-1);finish(a);finish(b);
 });
 test('native engagement inside three tiles pauses reset; leaving seven tiles starts ten ticks',()=>{
-  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));poll(p);assert.equal(n.type,exposed);
+  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));repel(p,n);
   reachable(p,n.x+2,n.z-1);ticks(p,12);assert.equal(n.type,exposed);assert.equal(n.target,p);reachable(p,n.x+7,n.z-1);assert.equal(n.target,null);const clock=id('VarNpcType','npc_int2');assert(n.getVar(clock)>0);ticks(p,9-n.getVar(clock));assert.equal(n.type,exposed);ticks(p,1);assert.equal(n.type,dormant);assert.equal(n.timerInterval,0);assert.equal(n.targetOp,NpcMode.NONE);
-  [p.x,p.z]=anchors[0];poll(p);assert.equal(n.type,exposed);assert(!p.delayed);finish(p);
+  [p.x,p.z]=anchors[0];repel(p,n);assert(!p.delayed);finish(p);
 });
 test('complete ordinary row: six skills, crush, zero native bonuses, max four and unchanged Slayer 35 enum',()=>{
   reset();const n=natural(0);n.changeType(exposed,1000);assert.deepEqual([...n.levels],[30,16,30,105,1,1]);
@@ -253,7 +332,7 @@ test('real forced x-log stays connected to the hold until the hit and release, t
   ticks(p,1);assert(!p.delayed);logouts();assert.equal(World.getPlayerByUid(p.uid),null);assert(!p.timers.has(controller.id));assert.equal(n.getVar(own),-1);World.logoutRequests.delete(p.username);
 });
 for(const departure of ['walk-away','logout','death','teleport'])test(`exposed ${departure}: native disengagement retains the timer and returns after ten reset ticks`,()=>{
-  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));poll(p);ticks(p,1);assert.equal(n.type,exposed);
+  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet']),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));repel(p,n);ticks(p,1);assert.equal(n.type,exposed);
   if(departure==='walk-away')p.teleport(n.x+7,n.z,0);
   if(departure==='logout'){execute('[logout,_]',p);p.loggingOut=true;p.isActive=false;World.players[p.pid]=null;}
   if(departure==='death'){p.applyDamage(hp(p),1);execute('[proc,player_die]',p);}
@@ -262,7 +341,7 @@ for(const departure of ['walk-away','logout','death','teleport'])test(`exposed $
 });
 test('a real spell from four tiles spends a rune but the stationary beast drops that target and resets',()=>{
   reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet','staff_of_air','mindrune']),n=natural(0);
-  assert(held(p,'staff_of_air',2));assert(held(p,'wallbeast_spike_helmet',2));poll(p);reachable(p,3165,9544);assert(p.inApproachDistance(10,n),'real natural-map casting line at distance four');
+  assert(held(p,'staff_of_air',2));assert(held(p,'wallbeast_spike_helmet',2));repel(p,n);reachable(p,3165,9544);assert(p.inApproachDistance(10,n),'real natural-map casting line at distance four');
   const before=p.stats[PlayerStat.MAGIC];execute('[apnpct,magic:wind_strike]',p,[],{target:n});
   assert.equal(count(p,'mindrune'),0);assert(p.stats[PlayerStat.MAGIC]>before);p.clearInteraction();
   const clock=id('VarNpcType','npc_int2'),transitions=[];for(let i=0;i<20;i++){ticks(p,1);transitions.push({tick:World.currentTick,mode:n.targetOp,target:n.target?.uid??null,clock:n.getVar(clock)});assert.deepEqual([n.x,n.z],spawns[0]);if(!n.target&&[...n.queue.all()].length===0&&n.getVar(clock)>0)break;}
@@ -274,7 +353,7 @@ for(const distance of [3,4,5,6])for(const style of ['ranged','magic'])test(`${st
   const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet',...gear]),n=natural(0);
   p.invAdd(inv,obj(gear[1]),499);assert(held(p,'wallbeast_spike_helmet',2));assert(held(p,gear[0],2));if(style==='ranged')assert(held(p,'rune_arrow',2));
   const firingTile={3:[3164,9545],4:[3165,9544],5:[3166,9544],6:[3167,9543]}[distance];
-  poll(p);reachable(p,...firingTile);assert.equal(CoordGrid.distanceToSW(p,n),distance);assert(p.inApproachDistance(10,n));
+  repel(p,n);reachable(p,...firingTile);assert.equal(CoordGrid.distanceToSW(p,n),distance);assert(p.inApproachDistance(10,n));
   const spot=[p.x,p.z],before=p.stats[style==='ranged'?PlayerStat.RANGED:PlayerStat.MAGIC];p.damageRequests=[];
   if(style==='ranged')p.setInteraction(Interaction.ENGINE,n,ServerTriggerType.APNPC2);
   for(let elapsed=0;n.isActive&&elapsed<1000;elapsed++){
@@ -299,7 +378,7 @@ test('a real logout between reservation and the queue reaches the missing-player
   logouts();assert.equal(World.getPlayerByUid(p.uid),null);ticks([],1);assert.deepEqual(p.damageRequests,[]);assert.equal(n.type,dormant);World.logoutRequests.delete(p.username);
 });
 for(const level of [34,35])test(`Slayer ${level}: real outgoing attack ${level===34?'is refused':'is admitted'} by the existing category gate`,()=>{
-  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet','rune_scimitar']),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));assert(held(p,'rune_scimitar',2));poll(p);assert(!map.isMapBlocked(p.x,p.z,p.level));assert(p.inOperableDistance(n));
+  reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet','rune_scimitar']),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));assert(held(p,'rune_scimitar',2));repel(p,n);assert(!map.isMapBlocked(p.x,p.z,p.level));assert(p.inOperableDistance(n));
   p.levels[PlayerStat.SLAYER]=level;p.baseLevels[PlayerStat.SLAYER]=level;
   const before=p.stats[PlayerStat.ATTACK];p.setInteraction(Interaction.ENGINE,n,ServerTriggerType.APNPC2);ticks(p,3);
   assert.equal(p.messages.includes('You need a higher Slayer level to know how to wound this monster.'),level===34);assert.equal(p.stats[PlayerStat.ATTACK]>before,level===35);finish(p);
@@ -308,7 +387,7 @@ test('ordinary packed combat repeatedly uses authored 100 and the engine-scaled 
   reset();const p=fixture(0,['bullseye_lantern_lit','wallbeast_spike_helmet','rune_scimitar']),n=natural(0);assert(held(p,'wallbeast_spike_helmet',2));assert(held(p,'rune_scimitar',2));
   const drops=[],deletes=[],add=World.addObj,del=World.removeNpc;World.addObj=function(...args){drops.push(args);return add.apply(this,args);};World.removeNpc=function(npc,duration){if(npc===n)deletes.push({tick:World.currentTick,duration,scaled:this.scaleByPlayerCount(duration)});return del.call(this,npc,duration);};
   try{for(let kill=0;kill<3;kill++){
-    [p.x,p.z]=anchors[0];poll(p);assert.equal(n.type,exposed);assert(!map.isMapBlocked(p.x,p.z,p.level));assert(p.inOperableDistance(n));p.setInteraction(Interaction.ENGINE,n,ServerTriggerType.APNPC2);
+    [p.x,p.z]=anchors[0];repel(p,n);assert.equal(n.type,exposed);assert(!map.isMapBlocked(p.x,p.z,p.level));assert(p.inOperableDistance(n));p.setInteraction(Interaction.ENGINE,n,ServerTriggerType.APNPC2);
     let elapsed=0;while(n.isActive&&elapsed++<400)ticks(p,1);assert(!n.isActive,'actual weapon damage reaches the real death/delete queue');p.clearInteraction();
     const deletion=deletes.at(-1);assert.equal(deletion.duration,100);assert.equal(n.lifecycleTick,deletion.scaled-1,'native population scaling and removal-turn decrement');assert.deepEqual(drops,[],'actual kills leave no ground object; no optional loot table is built');const remaining=n.lifecycleTick;ticks(p,remaining-1);assert(!n.isActive);ticks(p,1);assert(n.isActive);assert.equal(n.type,dormant);assert.equal(n.levels[3],1);assert.deepEqual([n.x,n.z],spawns[0]);
     assert.equal([...World.npcs].filter(other=>other.baseType===dormant).length,7);
