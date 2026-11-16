@@ -6,7 +6,8 @@ import {
   World, PlayerLoading, Packet, ScriptProvider, ScriptState, ServerTriggerType,
   PlayerStat, PlayerTimerType, types, map, CollisionType, engineModule, contentRoot,
   id, obj, inv, worn, player, seed, inventory, count, slotOf, use, held, remove,
-  execute, tile, environmentTick, button, invButton, startDialogue, resumeDialogue, dialoguePage
+  execute, tile, environmentTick, button, invButton, startDialogue, resumeDialogue, dialoguePage,
+  resetWallBeasts, exposeWallBeasts
 } from './runtime.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
@@ -315,7 +316,8 @@ function realGasPending() {
   return q;
 }
 for (const crossing of ['several zones', 'map square']) test(`engine entry and real walk across ${crossing} preserve clocks, pending identity and one root`, () => {
-  traceScripts(names => {
+  resetWallBeasts(); exposeWallBeasts();
+  try { traceScripts(names => {
     const q = realGasPending();
     q.z = 9583; ticks(q, 1);
     assert.deepEqual(timer(q).args.slice(2), [-1, -1, 0], 'leaving gas cancels the real exposure');
@@ -356,7 +358,7 @@ for (const crossing of ['several zones', 'map square']) test(`engine entry and r
       assert(names.includes('[mapzone,0_50_149]'), 'real hinted map-square crossing');
     }
     release(p);
-  });
+  }); } finally { resetWallBeasts(); }
 });
 for (const [kind, from, to, expected] of [
   ['same map square', [0, 3168, 9572], [0, 3168, 9538], '[zoneexit,0_49_149_32_32]'],

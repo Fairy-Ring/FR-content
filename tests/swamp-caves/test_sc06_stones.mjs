@@ -3,7 +3,8 @@
 import assert from 'node:assert/strict';
 import { World, ScriptProvider, ScriptState, ServerTriggerType, PlayerStat, PlayerTimerType,
   types, map, CollisionType, engineModule, id, obj, inv, worn, player, seed, inventory,
-  count, held, use, execute, tile, dragInventory, slotOf, invButton, button } from './runtime.mjs';
+  count, held, use, execute, tile, dragInventory, slotOf, invButton, button,
+  resetWallBeasts, exposeWallBeasts, passWallBeast } from './runtime.mjs';
 const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
@@ -27,16 +28,19 @@ const stones = [
 const holes = [...World.npcs].filter(n => n.baseType === id('NpcType','swamp_wallbeast'));
 let cases=0, failures=0, wireSerial=1499;
 function test(name,run){cases++;try{JavaRandom.setSeed(0);run();console.log(`PASS ${name}`);}catch(error){failures++;console.error(`FAIL ${name}: ${error.stack??error}`);}}
-function frame(p){
-  p.resetEntity(false); for(const n of holes)n.resetEntity(false); World.currentTick++;
+function frame(p,other=null){
+  const actors=other?[p,other]:[p];
+  for(const actor of actors)actor.resetEntity(false);for(const n of holes)n.resetEntity(false);World.currentTick++;
   for(const n of holes)n.turn();
-  if(p.delayed && World.currentTick>=p.delayedUntil)p.delayed=false;
-  if(!p.delayed && p.activeScript?.execution===ScriptState.SUSPENDED)p.executeScript(p.activeScript,true,true);
-  p.processQueues();
-  if(!p.loggingOut){p.processTimers(PlayerTimerType.NORMAL);p.processTimers(PlayerTimerType.SOFT);}
-  p.processEngineQueue();p.processInteraction();
+  for(const actor of actors){
+    if(actor.delayed&&World.currentTick>=actor.delayedUntil)actor.delayed=false;
+    if(!actor.delayed&&actor.activeScript?.execution===ScriptState.SUSPENDED)actor.executeScript(actor.activeScript,true,true);
+    actor.processQueues();
+    if(!actor.loggingOut){actor.processTimers(PlayerTimerType.NORMAL);actor.processTimers(PlayerTimerType.SOFT);}
+    actor.processEngineQueue();actor.processInteraction();
+  }
 }
-function ticks(p,n){for(let i=0;i<n;i++)frame(p);}
+function ticks(p,n,other=null){for(let i=0;i<n;i++)frame(p,other);}
 function wirePlayer(){
   const slot=++wireSerial,hash=BigInt(slot),p=new NetworkPlayer(`sc06wire${slot}`,hash,hash,new ClientSocket());
   p.pid=slot;p.slot=slot;p.uid=((slot<<11)|slot)>>>0;p.isActive=true;
@@ -74,7 +78,14 @@ function approach(p,stone){
   if(route.length)assert(moveHandler.handle(new MoveClick(route,0,true),p));
   assert(locHandler.handle(new OpLoc(1,l.x,l.z,l.type),p));
 }
-function arrive(p,to,max=150){assert(walk(p,to));for(let i=0;i<max && tile(p).some((v,j)=>v!==to[j]);i++)ticks(p,1);assert.deepEqual(tile(p),to);}
+function arrive(p,to,max=150,afterWallHold=false){
+  assert(walk(p,to));let releases=p.messages.filter(m=>m==='Your helmet repels the wall beast!').length;
+  for(let i=0;i<max&&tile(p).some((v,j)=>v!==to[j]);i++){
+    ticks(p,1);
+    if(afterWallHold){const next=p.messages.filter(m=>m==='Your helmet repels the wall beast!').length;if(next>releases){assert(walk(p,to));releases=next;}}
+  }
+  assert.deepEqual(tile(p),to);
+}
 function seedFor(level,success){
   const cutoff=Math.floor(51*(99-Math.min(level,99))/98)+Math.floor(252*(Math.min(level,99)-1)/98)+1;
   for(let seedValue=0;seedValue<200000;seedValue++){JavaRandom.setSeed(seedValue);if((Math.floor(JavaRandom.nextDouble()*256)<cutoff)===success)return seedValue;}
@@ -146,6 +157,7 @@ test('a real inventory drag during the delay rolls back and settlement keeps bot
   ticks(p,4);assert.equal(p.invGetSlot(inv,0)?.id,obj('unlit_candle'));assert.equal(p.invGetSlot(inv,1)?.id,obj('hammer'));assert.equal(count(p,'candle_lantern_empty'),0);finish(p);
 });
 test('a real drag during the cancellable approach moves the lantern and settlement uses its current slot',()=>{
+  resetWallBeasts(); exposeWallBeasts([[3198,9571]]);
   const p=fixture([0,3192,9571],['candle_lantern_lit','hammer','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));
   assert(walk(p,stones[0].banks[0]));assert(locHandler.handle(new OpLoc(1,stones[0].x,stones[0].z,id('LocType',stones[0].name)),p));ticks(p,1);
   assert(!p.delayed);assert(p.target);assert(dragInventory(p,0,1));assert.equal(slotOf(p,'candle_lantern_lit'),1);JavaRandom.setSeed(seedFor(1,false));
@@ -165,6 +177,7 @@ test('a real trade closed by the stone click restores its offered lantern before
   ticks(p,4);assert.equal(count(p,'unlit_candle'),1);assert.equal(count(p,'candle_lantern_empty'),0);finish(p);finish(q);
 });
 test('a normal other-player cracker gift during approach is retained by current-inventory settlement',()=>{
+  resetWallBeasts();const passer=passWallBeast([3198,9571],q=>frame(q));finish(passer);
   const p=fixture([0,3192,9571],['candle_lantern_lit','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));assert(walk(p,stones[0].banks[0]));
   assert(locHandler.handle(new OpLoc(1,stones[0].x,stones[0].z,id('LocType',stones[0].name)),p));ticks(p,1);assert(!p.delayed);assert(p.target);
   const q=fixture(tile(p),['christmas_cracker']);JavaRandom.setSeed(seedFor(1,true));q.executeScript(Runner.init(ScriptProvider.getByName('[opplayeru,christmas_cracker]'),q,p),true);
@@ -179,17 +192,22 @@ test('another player cannot give a cracker prize or open trade while the crossin
   assert(q.messages.some(text=>/busy/.test(text)));ticks(p,4);assert.equal(count(p,'unlit_candle'),1);finish(p);finish(q);
 });
 test('a real gas explosion during the client approach changes the source before water reads the backpack',()=>{
+  resetWallBeasts();
   const p=fixture([0,3214,9560],['lit_candle','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,6);assert.equal(timer(p).args[4],6);
+  exposeWallBeasts([[3215,9559]]);
   assert(walk(p,stones[1].banks[0]));assert(locHandler.handle(new OpLoc(1,stones[1].x,stones[1].z,id('LocType',stones[1].name)),p));JavaRandom.setSeed(seedFor(1,false));ticks(p,1);
   assert.equal(count(p,'lit_candle'),0);assert.equal(count(p,'unlit_candle'),1);assert.equal(p.damageRequests.length,1);const health=hp(p);
   for(let i=0;i<60 && xp(p)===0;i++)ticks(p,1);assert.equal(xp(p),10);assert.equal(count(p,'unlit_candle'),1);assert.equal(hp(p),health);assert.equal(p.damageRequests.length,1);ownership(p);finish(p);
 });
 for(const approach of [true,false])test(`native firecracker long-queue transformation ${approach?'during cancellable approach':'waits through owned settlement'}`,()=>{
+  if(approach)resetWallBeasts();
+  const passer=approach?passWallBeast([3198,9571],q=>frame(q)):null;
   const p=fixture(approach?[0,3192,9571]:stones[0].banks[0],['candle_lantern_lit','bullseye_lantern_lit','tinderbox','viking_firecracker','viking_firecracker','wallbeast_spike_helmet']);
   assert(held(p,'wallbeast_spike_helmet',2));assert(use(p,'tinderbox','viking_firecracker'));assert(use(p,'tinderbox','viking_firecracker'));
   assert.equal(count(p,'viking_firecracker_lit'),2);const fuses=[...p.queue.all()].filter(q=>q.script.name==='[queue,firecracker_explode]');assert.equal(fuses.length,2);
-  ticks(p,Math.min(...fuses.map(q=>q.delay))-1);assert.equal(count(p,'viking_firecracker_lit'),2);
+  ticks(p,Math.min(...fuses.map(q=>q.delay))-1,passer);assert.equal(count(p,'viking_firecracker_lit'),2);
   if(approach){
+    assert(hp(passer)>0,'earlier wearer is still engaged');finish(passer);
     assert(walk(p,stones[0].banks[0]));assert(locHandler.handle(new OpLoc(1,stones[0].x,stones[0].z,id('LocType',stones[0].name)),p));ticks(p,2);
     assert(!p.delayed);assert(p.target);assert.equal(xp(p),0);assert.equal(count(p,'viking_firecracker_lit'),0);assert.equal(count(p,'viking_firecracker'),1);
     JavaRandom.setSeed(seedFor(1,false));for(let i=0;i<50 && xp(p)===0;i++)ticks(p,1);
@@ -206,6 +224,7 @@ test('duplicate stone, walk and inventory operation cannot replace a held crossi
   ticks(p,4);assert.equal(xp(p)-before,30);assert.equal(count(p,'shark'),1);ticks(p,8);assert.equal(xp(p)-before,30);finish(p);
 });
 for(const [stone,position]of [[stones[0],[0,3208,9573]],[stones[1],[0,3222,9553]]])test(`${stone.name}: reachable off-bank tile walks to its exact bank before the first draw`,()=>{
+  resetWallBeasts();
   const p=fixture(position);assert(!map.isMapBlocked(p.x,p.z,p.level));const bank=stone.banks[1],original=Runner.HANDLERS[ScriptOpcode.STAT_RANDOM];let draws=0;
   Runner.HANDLERS[ScriptOpcode.STAT_RANDOM]=state=>{if(state.script.name==='[proc,swamp_cave_stone]'){draws++;assert.deepEqual(tile(p),bank,'no off-bank roll');}return original(state);};
   try{approach(p,stone);JavaRandom.setSeed(seedFor(1,true));for(let i=0;i<30&&xp(p)===0;i++)ticks(p,1);assert.equal(draws,1);assert.equal(xp(p),30);assert.deepEqual(tile(p),stone.banks[0]);assert.equal(p.moves.length,1,'only settlement teleports');}finally{Runner.HANDLERS[ScriptOpcode.STAT_RANDOM]=original;finish(p);}
@@ -219,6 +238,7 @@ test('native distant approach remains cancellable even within the former ten-til
   assert(walk(p,[0,3216,9571]));assert.equal(p.target,null);ticks(p,15);assert.equal(xp(p),0);assert.equal(p.animations.length,0);assert.equal(p.moves.length,0);finish(p);
 });
 for(const [stone,position,bank]of [[stones[0],[0,3216,9570],1],[stones[1],[0,3231,9544],1]])test(`${stone.name}: distant native op-click walks unlocked and only owns four ticks on its bank`,()=>{
+  if(stone===stones[0])resetWallBeasts();
   const p=fixture(position);approach(p,stone);JavaRandom.setSeed(seedFor(1,true));let walking=0,heldTicks=0;
   for(let i=0;i<40&&xp(p)===0;i++){ticks(p,1);if(p.delayed){heldTicks++;assert.deepEqual(tile(p),stone.banks[p.moves.length?1-bank:bank]);}else if(xp(p)===0){walking++;assert(p.canAccess());assert(p.target||[...p.weakQueue.all()].some(q=>q.script.name==='[queue,swamp_cave_stone_approach]'));assert.equal(p.moves.length,0);}}
   assert(walking>=5,'ordinary approach spans multiple ticks');assert.equal(heldTicks,4);assert.equal(p.moves.length,1,'no protected approach teleports');assert.equal(xp(p),30);assert.deepEqual(tile(p),stone.banks[1-bank]);finish(p);
@@ -235,6 +255,7 @@ test('a running gas count progresses during a native stone approach before leavi
   approach(p,stones[1]);ticks(p,1);assert(!p.delayed);assert(p.canAccess());assert.equal(xp(p),0);assert.equal(timer(p).args[4],3);assert.equal(p.getVarBit(gas),3);assert.equal(p.moves.length,0);finish(p);
 });
 test('a bare-headed ordinary stone approach still permits the natural wall-beast grab',()=>{
+  resetWallBeasts();
   const p=fixture([0,3197,9571]);approach(p,stones[0]);for(let i=0;i<8&&!p.delayed;i++)ticks(p,1);
   assert(p.delayed);assert.equal(p.activeScript?.script.name,'[ai_queue4,swamp_wallbeast]');assert.deepEqual(tile(p),[0,3198,9571]);assert.equal(xp(p),0);ticks(p,6);assert.equal(p.damageRequests.length,1);assert(p.damageRequests[0].amount>=11&&p.damageRequests[0].amount<=13);finish(p);
 });
@@ -270,7 +291,9 @@ test('water loss reaches one controller recomputation at unlock, with no brightn
   ticks(p,1);p.encodeOut();assert.equal(roots(p).length,original);ticks(p,1);p.encodeOut();assert.equal(p.overlay,id('Component','inter_387'));assert.equal(roots(p).length,original+1);assert.equal(timer(p).args[0],1);ownership(p);finish(p);
 });
 test('real walk from a running gas count into a stone crossing cancels gas without disabling either hazard',()=>{
+  resetWallBeasts();
   const p=fixture([0,3214,9560],['lit_candle','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));ticks(p,3);assert.equal(timer(p).args[4],3);assert.equal(p.getVarBit(gas),3);
+  exposeWallBeasts([[3215,9559]]);
   arrive(p,stones[1].banks[0]);assert.deepEqual(timer(p).args.slice(2),[-1,-1,0]);assert.equal(p.getVarBit(gas),0);assert.equal(count(p,'lit_candle'),1);
   cross(p,stones[1],false);assert.equal(count(p,'unlit_candle'),1);assert.equal(p.damageRequests.length,0);ownership(p);finish(p);
 });
@@ -284,8 +307,9 @@ test('a stone click during a natural wall-beast hold is refused and never replac
   assert.equal(click(p,stones[0]),false);assert.equal(p.activeScript,continuation);ticks(p,6);assert.equal(xp(p),before);assert.deepEqual(tile(p),[0,3198,9571]);assert.equal(p.damageRequests.length,1);assert(p.damageRequests[0].amount>=11&&p.damageRequests[0].amount<=13);finish(p);
 });
 test('normal routes to both stones wear the real spiny helmet without suppressing the wall controller',()=>{
+  resetWallBeasts();
   for(const to of [stones[0].banks[0],stones[1].banks[0]]){
-    const p=fixture([0,3168,9572],['bullseye_lantern_lit','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));arrive(p,to);assert.equal(count(p,'wallbeast_spike_helmet',worn),1);assert(!p.animations.some(a=>a.seq===id('SeqType','human_wall_beast_specialattack_start')));ownership(p);finish(p);
+    const p=fixture([0,3168,9572],['bullseye_lantern_lit','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));arrive(p,to,150,true);assert.equal(count(p,'wallbeast_spike_helmet',worn),1);assert(p.messages.includes('Your helmet repels the wall beast!'));ownership(p);finish(p);
   }
 });
 test('both native tunnel options round-trip with one root, one controller and walkable northward escape',()=>{
