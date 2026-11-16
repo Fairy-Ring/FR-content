@@ -8,7 +8,7 @@ if (distance(coord, loc_coord) > 2) {
 }
 if (coordx(coord) < coordx(loc_coord)) {
     ~swamp_cave_stone(^swamp_stone_west, ^swamp_stone_east);
-} else if (coordx(coord) > coordx(loc_coord)) {
+} else {
     ~swamp_cave_stone(^swamp_stone_east, ^swamp_stone_west);
 }
 
@@ -19,7 +19,7 @@ if (distance(coord, loc_coord) > 2) {
 }
 if (coordz(coord) > coordz(loc_coord)) {
     ~swamp_cave_stone(^swamp_stone_north, ^swamp_stone_south);
-} else if (coordz(coord) < coordz(loc_coord)) {
+} else {
     ~swamp_cave_stone(^swamp_stone_south, ^swamp_stone_north);
 }
 
@@ -67,7 +67,7 @@ while ($slot < inv_size(inv)) {
             ~extinguish_light_source_slot($slot, $source);
     }
     // Engineering remainder: lose the glass, keep the corresponding unlit candle.
-    if ($candle ! null & inv_getobj(inv, $slot) = $source) {
+    if ($candle ! null) {
         inv_setslot(inv, $slot, $candle, inv_getnum(inv, $slot));
     }
     // Bullseye/helmet resist; sapphire inherits bullseye resistance (CANDIDATE).
