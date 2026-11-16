@@ -1,0 +1,26 @@
+// VERIFIED rope-once; CANDIDATE personal-rope-state. No shared loc change.
+[oplocu,goblin_cave_entrance]
+if (last_useitem ! rope | inv_getobj(inv, last_useslot) ! rope) return;
+// Validate before consuming the player's rope or writing permanent state.
+if (map_blocked(^swamp_cave_rope_bottom) = true) return;
+if (%swamp_caves_roped_entrance = 0) {
+    inv_del(inv, rope, 1);
+    %swamp_caves_roped_entrance = 1;
+}
+@swamp_cave_descend;
+
+[oploc1,goblin_cave_entrance]
+if (%swamp_caves_roped_entrance = 0) return;
+if (map_blocked(^swamp_cave_rope_bottom) = true) return;
+@swamp_cave_descend;
+
+[label,swamp_cave_descend]
+// UNKNOWN original motion/wording: immediate travel, no new presentation.
+p_telejump(^swamp_cave_rope_bottom);
+%entered_goblin_caves = 1;
+~swamp_cave_start;
+
+[oploc1,swamp_cave_climbing_rope]
+if (map_blocked(^swamp_cave_rope_top) = true) return;
+~swamp_cave_release;
+p_telejump(^swamp_cave_rope_top);

@@ -860,10 +860,27 @@ test('published Tears down retains one controller; up synchronously releases bef
   assert.equal(rootPackets(p).length, 1);
 });
 for (const name of ['goblin_cave_entrance', 'swamp_cave_climbing_rope', 'tog_climbing_rocks_up', 'tog_climbing_rocks_down']) {
-  test(`future travel ${name} has no published approach or operation dispatch`, () => {
+  const ropeTravel = name === 'goblin_cave_entrance' || name === 'swamp_cave_climbing_rope';
+  test(ropeTravel ? `SC-07 ${name} has real option-one dispatch and no other option` : `future travel ${name} has no published approach or operation dispatch`, () => {
     const type = types.LocType.get(id('LocType', name));
-    for (const trigger of [ServerTriggerType.APLOC1, ServerTriggerType.OPLOC1]) {
-      assert.equal(ScriptProvider.getByTrigger(trigger, type.id, type.category), undefined);
+    assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.APLOC1, type.id, type.category), undefined);
+    if (!ropeTravel) {
+      assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, type.id, type.category), undefined);
+      return;
+    }
+    assert(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, type.id, type.category));
+    assert.deepEqual(type.op.slice(1), [null, null, null, null]);
+    for (let option = 1; option < 5; option++) {
+      assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.APLOC1 + option, type.id, type.category), undefined);
+      assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1 + option, type.id, type.category), undefined);
+    }
+    if (name === 'goblin_cave_entrance') {
+      const p = wireFixture([], [0, 3168, 3172]);
+      const before = [...p.vars];
+      travel(p, name, 3169, 3172, [0, 3168, 3172]);
+      assert.deepEqual([...p.vars], before);
+      assert.deepEqual(p.messages, []);
+      ownership(p, false);
     }
   });
 }
