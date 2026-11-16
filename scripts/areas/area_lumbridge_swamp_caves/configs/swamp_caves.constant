@@ -39,6 +39,7 @@
 ^swamp_wallbeast_6 = 0_50_149_15_23
 ^swamp_wallbeast_7 = 0_50_149_16_51
 // UNKNOWN original durations: engineering hold, cooldown, leash and reset.
+// SC-05H: the same UNKNOWN engineering hold also stalls a repelled lunge.
 ^swamp_wallbeast_hold_ticks = 6
 ^swamp_wallbeast_hit_tick = 5
 ^swamp_wallbeast_cooldown_ticks = 10

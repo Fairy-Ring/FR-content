@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { World, ScriptProvider, ScriptState, ServerTriggerType, PlayerStat, PlayerTimerType,
   types, map, CollisionType, engineModule, id, obj, inv, worn, player, seed, inventory,
-  count, held, execute, tile } from './runtime.mjs';
+  count, held, execute, tile, resetWallBeasts, passWallBeast } from './runtime.mjs';
 const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
@@ -39,14 +39,16 @@ function fixture(spot=spots[0],level=99,items=['net','fishing_rod','fishing_bait
   return p;
 }
 function finish(p){p.delayed=false;p.activeScript=null;execute('[proc,swamp_cave_release]',p);p.clearInteraction();p.isActive=false;World.players[p.pid]=null;p.unlink();}
-function frame(p,environment=false){
-  p.resetEntity(false);World.currentTick++;
+function frame(p,environment=false,others=[]){
+  const actors=[p,...others];for(const actor of actors)actor.resetEntity(false);World.currentTick++;
   if(environment){for(const n of holes){n.resetEntity(false);n.turn();}}
-  if(p.delayed&&World.currentTick>=p.delayedUntil)p.delayed=false;
-  if(!p.delayed&&p.activeScript?.execution===ScriptState.SUSPENDED)p.executeScript(p.activeScript,true,true);
-  p.processQueues();
-  if(environment&&!p.loggingOut){p.processTimers(PlayerTimerType.NORMAL);p.processTimers(PlayerTimerType.SOFT);}
-  p.processEngineQueue();p.processInteraction();
+  for(const actor of actors){
+    if(actor.delayed&&World.currentTick>=actor.delayedUntil)actor.delayed=false;
+    if(!actor.delayed&&actor.activeScript?.execution===ScriptState.SUSPENDED)actor.executeScript(actor.activeScript,true,true);
+    actor.processQueues();
+    if(environment&&!actor.loggingOut){actor.processTimers(PlayerTimerType.NORMAL);actor.processTimers(PlayerTimerType.SOFT);}
+    actor.processEngineQueue();actor.processInteraction();
+  }
 }
 function ticks(p,n,environment=false){for(let i=0;i<n;i++)frame(p,environment);}
 function begin(p,n,option){p.clearPendingAction();p.originX=p.x;p.originZ=p.z;p.setInteraction(Interaction.ENGINE,n,ServerTriggerType.APNPC1+option-1);p.opcalled=true;p.processInteraction();}
@@ -143,15 +145,20 @@ function ordinaryRoute(){
   assert(parents.has(end.join(',')),'both banks in the ordinary main-cave component');const route=[];for(let at=end;at;at=parents.get(at.join(',')))route.push(at);return route.reverse();
 }
 test('both natural banks are joined by native ordinary walking, without stones or position writes',()=>{
+  resetWallBeasts();
   const route=ordinaryRoute(),p=fixture(spots[0],99,['bullseye_lantern_lit','wallbeast_spike_helmet']);assert(held(p,'wallbeast_spike_helmet',2));execute('[proc,swamp_cave_start]',p);
   const visited=[tile(p)],teleport=p.teleport;let teleports=0;p.teleport=function(...args){teleports++;return teleport.apply(this,args);};
-  try{for(let i=16;i<route.length+16;i+=16){const [x,z]=route[Math.min(i,route.length-1)],to=[0,x,z];walk(p,to);for(let t=0;t<100&&tile(p).some((v,j)=>v!==to[j]);t++){frame(p,true);visited.push(tile(p));}assert.deepEqual(tile(p),to);}assert.deepEqual(tile(p),spots[1].bank);assert.equal(teleports,0);assert.equal(hp(p),99);assert(visited.some(([,x,z])=>fronts.some(f=>f[0]===x&&f[1]===z)));assert(route.some(([x,z])=>inGas(x,z)));assert.equal(count(p,'wallbeast_spike_helmet',worn),1);console.log(`ORDINARY_ROUTE ${JSON.stringify({route,visited,fronts:route.filter(([x,z])=>fronts.some(f=>f[0]===x&&f[1]===z)),gas:route.filter(([x,z])=>inGas(x,z))})}`);}finally{finish(p);}
+  try{for(let i=16;i<route.length+16;i+=16){const [x,z]=route[Math.min(i,route.length-1)],to=[0,x,z],segment=route.slice(i-15,Math.min(i+1,route.length)),passers=[];
+    for(const front of fronts.filter(f=>segment.some(([x,z])=>f[0]===x&&f[1]===z)))passers.push(passWallBeast(front,q=>frame(q,true,[p,...passers])));
+    try{walk(p,to);for(let t=0;t<100&&tile(p).some((v,j)=>v!==to[j]);t++){frame(p,true,passers);visited.push(tile(p));}assert.deepEqual(tile(p),to);}finally{for(const q of passers)finish(q);}
+  }assert.deepEqual(tile(p),spots[1].bank);assert.equal(teleports,0);assert.equal(hp(p),99);assert(visited.some(([,x,z])=>fronts.some(f=>f[0]===x&&f[1]===z)));assert(route.some(([x,z])=>inGas(x,z)));assert.equal(count(p,'wallbeast_spike_helmet',worn),1);console.log(`ORDINARY_ROUTE ${JSON.stringify({route,visited,fronts:route.filter(([x,z])=>fronts.some(f=>f[0]===x&&f[1]===z)),gas:route.filter(([x,z])=>inGas(x,z))})}`);}finally{finish(p);}
 });
 test('gas on the actual east-spot approach extinguishes its open light but damage does not clear the queued fishing target',()=>{
   const p=fixture(spots[0],99,['net','lit_candle','wallbeast_spike_helmet']);[p.x,p.z]=[3203,9553];assert(held(p,'wallbeast_spike_helmet',2));execute('[proc,swamp_cave_start]',p);
   try{begin(p,natural(spots[1]),1);const before=hp(p);for(let i=0;i<8;i++)frame(p,true);assert(hp(p)<before);assert.equal(count(p,'unlit_candle'),1);assert.equal(p.target,natural(spots[1]));assert(p.messages.some(m=>m.includes('flares brightly!')));console.log(`GAS_APPROACH ${JSON.stringify({tile:tile(p),hits:p.damageRequests,target:p.target.type})}`);}finally{finish(p);}
 });
 test('a natural front on the west-bank approach grabs and clears fishing intent by ordinary p_stopaction',()=>{
+  resetWallBeasts();
   const p=fixture(spots[0],99,['net','bullseye_lantern_lit']);[p.x,p.z]=fronts[0];execute('[proc,swamp_cave_start]',p);
   try{begin(p,natural(spots[0]),1);execute('[proc,swamp_wallbeast_poll]',p);for(let i=0;i<8;i++)frame(p,true);assert(p.damageRequests.some(d=>d.amount>=11));assert.equal(p.target,null);assert.equal(count(p,'giant_frogspawn'),0);}finally{finish(p);}
 });

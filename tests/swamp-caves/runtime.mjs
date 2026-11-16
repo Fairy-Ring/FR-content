@@ -231,3 +231,41 @@ export function environmentTick(...players) {
     p.processInteraction();
   }
 }
+
+// Restore the seven natural holes between independent cave-route fixtures.
+export function resetWallBeasts() {
+  for (const n of World.npcs) {
+    if (n.baseType !== id('NpcType', 'swamp_wallbeast')) continue;
+    if (n.isActive) World.removeNpc(n, -1);
+    World.addNpc(n, -1, false);
+    n.timerInterval = 0;
+    n.timerClock = 0;
+    const spawn = ScriptProvider.getByTrigger(ServerTriggerType.AI_SPAWN, n.type, types.NpcType.get(n.type).category);
+    if (spawn) n.executeScript(ScriptRunner.init(spawn, n));
+  }
+}
+
+// Expose a natural hole by another wearer's actual movement, poll and release.
+// The caller keeps this passer in the world until the subject's approach ends.
+export function passWallBeast(front, advance) {
+  const [x, z] = front;
+  const offset = [[1, 0], [-1, 0], [0, -1]].find(([dx, dz]) => map.canTravel(0, x, z, dx, dz, 1, 0, CollisionType.NORMAL));
+  assert(offset, 'walkable tile beside the natural front');
+  const q = seed(player(), ['bullseye_lantern_lit', 'wallbeast_spike_helmet']);
+  [q.level, q.x, q.z] = [0, x + offset[0], z + offset[1]];
+  assert(held(q, 'wallbeast_spike_helmet', 2));
+  execute('[proc,swamp_cave_start]', q);
+  q.originX = q.x; q.originZ = q.z;
+  const route = Array.from(map.findPath(0, q.x, q.z, x, z), value => {
+    const coord = CoordGrid.unpackCoord(value);
+    return { x: coord.x, z: coord.z };
+  });
+  assert(route.length, 'native earlier-passer route');
+  assert(moveHandler.handle(new MoveClick(route, 0, false), q));
+  for (let ticks = 0; ticks < 20 && !q.messages.includes('Your helmet repels the wall beast!'); ticks++) advance(q);
+  assert.deepEqual(tile(q), [0, x, z]);
+  assert.equal(q.messages.filter(message => message === 'Your helmet repels the wall beast!').length, 1);
+  assert.equal(q.levels[PlayerStat.HITPOINTS], 99, 'earlier wearer takes no lunge damage');
+  assert([...World.npcs].some(n => n.type === id('NpcType', 'swamp_wallbeast_combat') && n.x === x && n.z === z + 1));
+  return q;
+}
