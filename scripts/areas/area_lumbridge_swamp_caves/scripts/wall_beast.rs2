@@ -1,0 +1,80 @@
+// VERIFIED original forms and worn-spiny protection; exposure is CANDIDATE.
+// Exact anchors, locks and reset are product selections, not period facts.
+[proc,swamp_wallbeast_poll]
+if (coordy(coord) ! 0) return;
+def_coord $tile = coord;
+if ($tile = ^swamp_wallbeast_1 | $tile = ^swamp_wallbeast_2 | $tile = ^swamp_wallbeast_3 | $tile = ^swamp_wallbeast_4 | $tile = ^swamp_wallbeast_5 | $tile = ^swamp_wallbeast_6 | $tile = ^swamp_wallbeast_7) {
+    if (npc_findexact(movecoord($tile, 0, 0, 1), swamp_wallbeast) = true) {
+        if (%npc_int > map_clock) return;
+        // This read is at activation, not cached across an approach or queue.
+        if (inv_getobj(worn, ^wearpos_hat) = wallbeast_spike_helmet) {
+            facesquare(npc_coord);
+            npc_changetype(swamp_wallbeast_combat, ^max_32bit_int);
+            npc_statheal(hitpoints, 0, 100);
+            npc_anim(wall_beast_specialattack_appear, 0);
+            %npc_attacking_uid = uid;
+            %npc_aggressive_player = uid;
+            %npc_int2 = 0;
+            npc_settimer(1);
+            npc_setmode(opplayer2);
+        } else {
+            // Reserve synchronously: two players cannot queue the same hole.
+            %npc_attacking_uid = uid;
+            %npc_int = add(map_clock, ^swamp_wallbeast_hold_ticks);
+            // CANDIDATE engineering: a front-tile passer stops at reservation.
+            // p_stopaction clears the interaction and its ordinary walk queue.
+            p_stopaction;
+            npc_queue(4, 0, 0);
+        }
+    }
+}
+
+// The NPC owns this queue and its reservation. Delays suspend the held player,
+// never the cave controller. Its five hazard arguments remain settled.
+[ai_queue4,swamp_wallbeast]
+if (p_finduid(%npc_attacking_uid) = false) return;
+%npc_int = add(map_clock, add(^swamp_wallbeast_hold_ticks, ^swamp_wallbeast_cooldown_ticks));
+p_stopaction;
+facesquare(npc_coord);
+anim(human_wall_beast_specialattack_start, 0);
+npc_anim(wall_beast_specialattack_start, 0);
+p_delay(0);
+// The delayed player owns this continuation. Native actions and logout cannot
+// move, damage or disconnect them before it resumes with the same NPC pointer.
+anim(human_wall_beast_specialattack_ready, 0);
+npc_anim(wall_beast_specialattack_ready, 0);
+p_delay(sub(^swamp_wallbeast_hit_tick, 2));
+// Q3: uniform 11..13. No accuracy, prayer reduction, poison or extra roll.
+damage(uid, ^hitmark_damage, add(^swamp_wallbeast_grab_min, randominc(sub(^swamp_wallbeast_grab_max, ^swamp_wallbeast_grab_min))));
+if (stat(hitpoints) = 0) ~player_die;
+p_delay(sub(sub(^swamp_wallbeast_hold_ticks, ^swamp_wallbeast_hit_tick), 1));
+if (stat(hitpoints) = 0) {
+    %npc_attacking_uid = null;
+    return;
+}
+anim(human_wall_beast_specialattack_end, 0);
+npc_anim(wall_beast_specialattack_end, 0);
+%npc_attacking_uid = null;
+%npc_int = add(map_clock, ^swamp_wallbeast_cooldown_ticks);
+// All encounter state is settled before a rescue can pause or teleport.
+~ring_of_life_check;
+
+[ai_timer,swamp_wallbeast_combat]
+if (npc_stat(hitpoints) = 0) return;
+if (npc_getmode ! none & finduid(%npc_attacking_uid) = true) {
+    if (coordy(coord) = coordy(npc_coord) & npc_range(coord) <= ^swamp_wallbeast_leash & stat(hitpoints) > 0) {
+        %npc_int2 = 0;
+        return;
+    }
+}
+%npc_int2 = add(%npc_int2, 1);
+if (%npc_int2 < ^swamp_wallbeast_reset_ticks) return;
+npc_anim(wall_beast_specialattack_disappear, 0);
+npc_changetype(swamp_wallbeast, ^max_32bit_int);
+npc_statheal(hitpoints, 0, 100);
+npc_setmode(none);
+npc_settimer(0);
+%npc_attacking_uid = null;
+%npc_aggressive_player = null;
+%npc_int = 0;
+%npc_int2 = 0;

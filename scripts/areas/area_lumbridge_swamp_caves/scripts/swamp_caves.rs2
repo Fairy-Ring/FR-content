@@ -180,6 +180,7 @@ if (~swamp_cave_inside(coord) = false) {
                 if (stat(hitpoints) = 0) ~player_die;
             }
         }
+        if (stat(hitpoints) > 0) ~swamp_wallbeast_poll;
         if ($hit = true & stat(hitpoints) > 0) {
             // Save settled effects before any rescue delay or modal can discard
             // this pass. The final guard still decides ownership on return.
