@@ -173,8 +173,8 @@ test('public natural Dark hole retains packed walkable approaches and real SC-07
   assert(approaches.length > 0, 'real packed shape/rotation has an ordinary walkable approach');
   assert(approaches.some(([x, z]) => [[-1, 0], [1, 0], [0, -1], [0, 1]].some(([dx, dz]) => map.canTravel(0, x, z, dx, dz, 1, 0, CollisionType.NORMAL))), 'real exterior approach supports ordinary travel');
   console.log(`DARK_HOLE_APPROACHES ${JSON.stringify(approaches)}`);
-  assert(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, type.id, type.category));
-  assert(ScriptProvider.getByTrigger(ServerTriggerType.OPLOCU, type.id, type.category));
+  assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, type.id, type.category)?.name, '[oploc1,goblin_cave_entrance]');
+  assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.OPLOCU, type.id, type.category)?.name, '[oplocu,goblin_cave_entrance]');
 });
 console.log(`SC01 cases=${cases} pass=${cases - failures} fail=${failures}`);
 console.log(failures ? 'RESULT FAIL' : 'RESULT PASS');
