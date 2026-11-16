@@ -25,3 +25,8 @@ default=0
 [barrows_door_locked_state]
 type=int
 default=1
+
+// CANDIDATE sourced cap, independent of native Strength and strengthbonus.
+[barrows_maxhit]
+type=int
+default=0

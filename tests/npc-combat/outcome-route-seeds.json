@@ -1230,6 +1230,24 @@
         "hit": 1013904242,
         "zero": 1309757500
       }
+    },
+    {
+      "script": "[ai_opplayer2,barrows_skeleton_unarmed]",
+      "npc": "barrows_skeleton_unarmed",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
+      "script": "[ai_opplayer2,barrows_skeleton_armed]",
+      "npc": "barrows_skeleton_armed",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
     }
   ]
 }

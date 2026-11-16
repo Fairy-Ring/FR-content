@@ -778,6 +778,984 @@
           }
         }
       }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_bloodworm",
+        "id": 2031
+      },
+      "unit": "BC02",
+      "evidence": {
+        "facts": [
+          "barrows.bc-bloodworm-skills",
+          "barrows.bc-bloodworm-bonuses",
+          "barrows.bc-bloodworm-attack",
+          "barrows.bc-bloodworm-maxhit",
+          "barrows.bc-tunnel-poison-susceptible"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 80
+        },
+        "defence": {
+          "value": 35
+        },
+        "strength": {
+          "value": 20
+        },
+        "hitpoints": {
+          "value": 45,
+          "evidence": {
+            "facts": [
+              "barrows.bc-bloodworm-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-period-bestiaries",
+                "sha256": "72715a21e70b382949bbb7b6a7919844e65de5cf841a1ba42d1d1bf40565905c"
+              }
+            ]
+          }
+        },
+        "ranged": {
+          "value": 1
+        },
+        "magic": {
+          "value": 1
+        },
+        "huntmode": {
+          "value": {
+            "ref": "hunt",
+            "name": "aggressive_melee"
+          },
+          "evidence": {
+            "facts": [
+              "barrows.bc-tunnel-aggression-level-policy"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ]
+          }
+        },
+        "huntrange": {
+          "value": 4,
+          "evidence": {
+            "facts": [
+              "barrows.bc02-native-acquisition-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-engineering-selection",
+                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
+              },
+              {
+                "id": "src.barrows-bc02-operator-health-regen",
+                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
+              }
+            ]
+          }
+        },
+        "param:attackrate": {
+          "value": 4
+        },
+        "param:damagetype": {
+          "value": 0
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 0
+        },
+        "param:magicattack": {
+          "value": 0
+        },
+        "param:rangeattack": {
+          "value": 0
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 0
+        },
+        "param:slashdefence": {
+          "value": 0
+        },
+        "param:crushdefence": {
+          "value": 0
+        },
+        "param:magicdefence": {
+          "value": 0
+        },
+        "param:rangedefence": {
+          "value": 0
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_rat",
+        "id": 2032
+      },
+      "unit": "BC02",
+      "evidence": {
+        "facts": [
+          "barrows.bc-rat-skills",
+          "barrows.bc-rat-bonuses",
+          "barrows.bc-rat-attack",
+          "barrows.bc-rat-maxhit",
+          "barrows.bc-tunnel-poison-susceptible"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 70
+        },
+        "defence": {
+          "value": 20
+        },
+        "strength": {
+          "value": 20
+        },
+        "hitpoints": {
+          "value": 35,
+          "evidence": {
+            "facts": [
+              "barrows.bc02-rat-hitpoints-selection"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-operator-health-regen",
+                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
+              },
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ],
+            "sourcePriorityException": {
+              "kind": "source-priority",
+              "preferred": "src.barrows-bc02-operator-health-regen",
+              "overridden": [
+                "src.barrows-bc-period-bestiaries"
+              ],
+              "reason": "Binding Q2 selects unchanged 35 over the retained pre-target 45 conflict; no formula fitting or level exception."
+            }
+          }
+        },
+        "ranged": {
+          "value": 1
+        },
+        "magic": {
+          "value": 1
+        },
+        "huntmode": {
+          "value": {
+            "ref": "hunt",
+            "name": "aggressive_melee"
+          },
+          "evidence": {
+            "facts": [
+              "barrows.bc-tunnel-aggression-level-policy"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ]
+          }
+        },
+        "huntrange": {
+          "value": 4,
+          "evidence": {
+            "facts": [
+              "barrows.bc02-native-acquisition-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-engineering-selection",
+                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
+              },
+              {
+                "id": "src.barrows-bc02-operator-health-regen",
+                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
+              }
+            ]
+          }
+        },
+        "param:attackrate": {
+          "value": 4
+        },
+        "param:damagetype": {
+          "value": 0
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 0
+        },
+        "param:magicattack": {
+          "value": 0
+        },
+        "param:rangeattack": {
+          "value": 0
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 0
+        },
+        "param:slashdefence": {
+          "value": 0
+        },
+        "param:crushdefence": {
+          "value": 0
+        },
+        "param:magicdefence": {
+          "value": 0
+        },
+        "param:rangedefence": {
+          "value": 0
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_giantrat",
+        "id": 2033
+      },
+      "unit": "BC02",
+      "evidence": {
+        "facts": [
+          "barrows.bc-giantrat-skills",
+          "barrows.bc-giantrat-bonuses",
+          "barrows.bc-giantrat-attack",
+          "barrows.bc-giantrat-maxhit",
+          "barrows.bc-tunnel-poison-susceptible"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 80
+        },
+        "defence": {
+          "value": 65
+        },
+        "strength": {
+          "value": 50
+        },
+        "hitpoints": {
+          "value": 70,
+          "evidence": {
+            "facts": [
+              "barrows.bc-giantrat-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-period-bestiaries",
+                "sha256": "72715a21e70b382949bbb7b6a7919844e65de5cf841a1ba42d1d1bf40565905c"
+              }
+            ]
+          }
+        },
+        "ranged": {
+          "value": 1
+        },
+        "magic": {
+          "value": 1
+        },
+        "huntmode": {
+          "value": {
+            "ref": "hunt",
+            "name": "aggressive_melee"
+          },
+          "evidence": {
+            "facts": [
+              "barrows.bc-tunnel-aggression-level-policy"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ]
+          }
+        },
+        "huntrange": {
+          "value": 4,
+          "evidence": {
+            "facts": [
+              "barrows.bc02-native-acquisition-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-engineering-selection",
+                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
+              },
+              {
+                "id": "src.barrows-bc02-operator-health-regen",
+                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
+              }
+            ]
+          }
+        },
+        "param:attackrate": {
+          "value": 4
+        },
+        "param:damagetype": {
+          "value": 0
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 0
+        },
+        "param:magicattack": {
+          "value": 0
+        },
+        "param:rangeattack": {
+          "value": 0
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 0
+        },
+        "param:slashdefence": {
+          "value": 0
+        },
+        "param:crushdefence": {
+          "value": 0
+        },
+        "param:magicdefence": {
+          "value": 0
+        },
+        "param:rangedefence": {
+          "value": 0
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_spider",
+        "id": 2034
+      },
+      "unit": "BC02",
+      "evidence": {
+        "facts": [
+          "barrows.bc-spider-skills",
+          "barrows.bc-spider-bonuses",
+          "barrows.bc-spider-attack",
+          "barrows.bc-spider-maxhit",
+          "barrows.bc-tunnel-poison-susceptible"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 45
+        },
+        "defence": {
+          "value": 45
+        },
+        "strength": {
+          "value": 47
+        },
+        "hitpoints": {
+          "value": 60,
+          "evidence": {
+            "facts": [
+              "barrows.bc-spider-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-period-bestiaries",
+                "sha256": "72715a21e70b382949bbb7b6a7919844e65de5cf841a1ba42d1d1bf40565905c"
+              }
+            ]
+          }
+        },
+        "ranged": {
+          "value": 1
+        },
+        "magic": {
+          "value": 1
+        },
+        "huntmode": {
+          "value": {
+            "ref": "hunt",
+            "name": "aggressive_melee"
+          },
+          "evidence": {
+            "facts": [
+              "barrows.bc-tunnel-aggression-level-policy"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ]
+          }
+        },
+        "huntrange": {
+          "value": 4,
+          "evidence": {
+            "facts": [
+              "barrows.bc02-native-acquisition-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-engineering-selection",
+                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
+              },
+              {
+                "id": "src.barrows-bc02-operator-health-regen",
+                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
+              }
+            ]
+          }
+        },
+        "param:attackrate": {
+          "value": 4
+        },
+        "param:damagetype": {
+          "value": 0
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 0
+        },
+        "param:magicattack": {
+          "value": 0
+        },
+        "param:rangeattack": {
+          "value": 0
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 20
+        },
+        "param:slashdefence": {
+          "value": 20
+        },
+        "param:crushdefence": {
+          "value": 10
+        },
+        "param:magicdefence": {
+          "value": 17
+        },
+        "param:rangedefence": {
+          "value": 20
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_giantspider",
+        "id": 2035
+      },
+      "unit": "BC02",
+      "evidence": {
+        "facts": [
+          "barrows.bc-giantspider-skills",
+          "barrows.bc-giantspider-bonuses",
+          "barrows.bc-giantspider-attack",
+          "barrows.bc-giantspider-maxhit",
+          "barrows.bc-tunnel-poison-susceptible"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 65
+        },
+        "defence": {
+          "value": 65
+        },
+        "strength": {
+          "value": 67
+        },
+        "hitpoints": {
+          "value": 80,
+          "evidence": {
+            "facts": [
+              "barrows.bc-giantspider-hitpoints"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-period-bestiaries",
+                "sha256": "72715a21e70b382949bbb7b6a7919844e65de5cf841a1ba42d1d1bf40565905c"
+              }
+            ]
+          }
+        },
+        "ranged": {
+          "value": 1
+        },
+        "magic": {
+          "value": 1
+        },
+        "huntmode": {
+          "value": {
+            "ref": "hunt",
+            "name": "aggressive_melee"
+          },
+          "evidence": {
+            "facts": [
+              "barrows.bc-tunnel-aggression-level-policy"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ]
+          }
+        },
+        "huntrange": {
+          "value": 4,
+          "evidence": {
+            "facts": [
+              "barrows.bc02-native-acquisition-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-engineering-selection",
+                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
+              },
+              {
+                "id": "src.barrows-bc02-operator-health-regen",
+                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
+              }
+            ]
+          }
+        },
+        "param:attackrate": {
+          "value": 4
+        },
+        "param:damagetype": {
+          "value": 0
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 0
+        },
+        "param:magicattack": {
+          "value": 0
+        },
+        "param:rangeattack": {
+          "value": 0
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 20
+        },
+        "param:slashdefence": {
+          "value": 20
+        },
+        "param:crushdefence": {
+          "value": 10
+        },
+        "param:magicdefence": {
+          "value": 17
+        },
+        "param:rangedefence": {
+          "value": 20
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_skeleton_unarmed",
+        "id": 2036
+      },
+      "unit": "BC02",
+      "evidence": {
+        "facts": [
+          "barrows.bc-skeleton-unarmed-skills",
+          "barrows.bc-skeleton-unarmed-bonuses",
+          "barrows.bc-skeleton-unarmed-attack",
+          "barrows.bc-skeleton-unarmed-maxhit",
+          "barrows.bc-tunnel-poison-susceptible"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 72
+        },
+        "defence": {
+          "value": 72
+        },
+        "strength": {
+          "value": 72
+        },
+        "hitpoints": {
+          "value": 50,
+          "evidence": {
+            "facts": [
+              "barrows.bc-skeleton-unarmed-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-period-bestiaries",
+                "sha256": "72715a21e70b382949bbb7b6a7919844e65de5cf841a1ba42d1d1bf40565905c"
+              },
+              {
+                "id": "src.barrows-bc-r1-conflicts",
+                "sha256": "9d013327e4487bde32867115a6bf289d4c25c15962e88792e59cc0dc29e4c71f"
+              }
+            ]
+          }
+        },
+        "ranged": {
+          "value": 1
+        },
+        "magic": {
+          "value": 1
+        },
+        "huntmode": {
+          "value": {
+            "ref": "hunt",
+            "name": "aggressive_melee"
+          },
+          "evidence": {
+            "facts": [
+              "barrows.bc-tunnel-aggression-level-policy"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ]
+          }
+        },
+        "huntrange": {
+          "value": 4,
+          "evidence": {
+            "facts": [
+              "barrows.bc02-native-acquisition-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-engineering-selection",
+                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
+              },
+              {
+                "id": "src.barrows-bc02-operator-health-regen",
+                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
+              }
+            ]
+          }
+        },
+        "param:attackrate": {
+          "value": 4
+        },
+        "param:damagetype": {
+          "value": 2
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 0
+        },
+        "param:magicattack": {
+          "value": 0
+        },
+        "param:rangeattack": {
+          "value": 0
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 5
+        },
+        "param:slashdefence": {
+          "value": 5
+        },
+        "param:crushdefence": {
+          "value": -5
+        },
+        "param:magicdefence": {
+          "value": 0
+        },
+        "param:rangedefence": {
+          "value": 5
+        },
+        "param:barrows_maxhit": {
+          "value": 10
+        }
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_skeleton_armed",
+        "id": 2037
+      },
+      "unit": "BC02",
+      "evidence": {
+        "facts": [
+          "barrows.bc-skeleton-armed-skills",
+          "barrows.bc-skeleton-armed-bonuses",
+          "barrows.bc-skeleton-armed-attack",
+          "barrows.bc-skeleton-armed-maxhit",
+          "barrows.bc-tunnel-poison-susceptible"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": {
+          "value": 72
+        },
+        "defence": {
+          "value": 72
+        },
+        "strength": {
+          "value": 72
+        },
+        "hitpoints": {
+          "value": 50,
+          "evidence": {
+            "facts": [
+              "barrows.bc-skeleton-armed-hitpoints"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-period-bestiaries",
+                "sha256": "72715a21e70b382949bbb7b6a7919844e65de5cf841a1ba42d1d1bf40565905c"
+              },
+              {
+                "id": "src.barrows-bc-r1-conflicts",
+                "sha256": "9d013327e4487bde32867115a6bf289d4c25c15962e88792e59cc0dc29e4c71f"
+              }
+            ]
+          }
+        },
+        "ranged": {
+          "value": 1
+        },
+        "magic": {
+          "value": 1
+        },
+        "huntmode": {
+          "value": {
+            "ref": "hunt",
+            "name": "aggressive_melee"
+          },
+          "evidence": {
+            "facts": [
+              "barrows.bc-tunnel-aggression-level-policy"
+            ],
+            "label": "CANDIDATE",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc-osrs-history",
+                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+              }
+            ]
+          }
+        },
+        "huntrange": {
+          "value": 4,
+          "evidence": {
+            "facts": [
+              "barrows.bc02-native-acquisition-selection"
+            ],
+            "label": "VERIFIED",
+            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
+            "sources": [
+              {
+                "id": "src.barrows-bc02-engineering-selection",
+                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
+              },
+              {
+                "id": "src.barrows-bc02-operator-health-regen",
+                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
+              }
+            ]
+          }
+        },
+        "param:attackrate": {
+          "value": 4
+        },
+        "param:damagetype": {
+          "value": 1
+        },
+        "param:attackbonus": {
+          "value": 0
+        },
+        "param:strengthbonus": {
+          "value": 0
+        },
+        "param:magicattack": {
+          "value": 0
+        },
+        "param:rangeattack": {
+          "value": 0
+        },
+        "param:rangebonus": {
+          "value": 0
+        },
+        "param:stabdefence": {
+          "value": 5
+        },
+        "param:slashdefence": {
+          "value": 5
+        },
+        "param:crushdefence": {
+          "value": -5
+        },
+        "param:magicdefence": {
+          "value": 0
+        },
+        "param:rangedefence": {
+          "value": 5
+        },
+        "param:barrows_maxhit": {
+          "value": 10
+        }
+      }
     }
   ]
 }

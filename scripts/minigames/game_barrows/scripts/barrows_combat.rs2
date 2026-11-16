@@ -1,0 +1,7 @@
+// CANDIDATE: the two level-77 skeletons cap at 10 without fitting Strength.
+// Keep native contact readiness, accuracy, prayer, delivery and retaliation.
+[ai_opplayer2,barrows_skeleton_unarmed] gosub(barrows_skeleton_attack);
+[ai_opplayer2,barrows_skeleton_armed] gosub(barrows_skeleton_attack);
+
+[proc,barrows_skeleton_attack]
+~npc_default_attack_outcome(npc_param(barrows_maxhit), 0, false);

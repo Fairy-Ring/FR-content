@@ -30,6 +30,16 @@ The thirteen original combat blocks now live in `scripts/minigames/game_barrows/
 
 For the second command, build the campaign base first and retain its pack in `BASELINE_PACK`. The test loads both packs during the same run and compares all decoded NPC fields, parameters and resolved timer/death/queue scripts. No saved server-value fixture or script bytecode supplies that comparison. The unchanged cfg-npc suite retains the complete client NPC hash gate.
 
+## Tunnel combat (BC-02)
+
+```sh
+node --import tsx ../content/tests/barrows/test_combat_tunnels.mjs
+```
+
+The seven original tunnel types acquire players of every combat level through native `aggressive_melee`, with the named engineering radius 4. Native wander 5, maxrange 7, contact clipping and tolerance expiry remain unchanged. The field selections are later CANDIDATE reconstructions, except the separately sourced Hitpoints and period aggression facts. Crypt rat Hitpoints stay 35. Both skeletons use 50 Hitpoints and a local explicit maximum 10 without fitting Strength. No client field changes.
+
+The config suite checks each selected server value explicitly. The tunnel suite executes actual packed dispatch, queues, protection, retaliation, hunt and tolerance paths. The existing poison, death/credit, owned-removal and D4 suites remain registered. Built-vector additions contain only these seven types and retain their pre-build native snapshots.
+
 ## Durable core (S01)
 
 Build the sibling engine packs, then run:

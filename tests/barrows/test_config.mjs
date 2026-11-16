@@ -398,6 +398,11 @@ assert.deepEqual(enumValues(enums, 'barrows_brother_crypt_entry'), expectedEntry
 assert.deepEqual(enumValues(enums, 'barrows_stair_surface_exit'), expectedExitByStair);
 const allLoc = parseSections(readText('scripts/_unpack/377/all.loc'), 'all.loc');
 const allNpcs = parseSections(readText('scripts/minigames/game_barrows/configs/barrows_combat.npc'), 'barrows_combat.npc');
+const combatScript = readText('scripts/minigames/game_barrows/scripts/barrows_combat.rs2');
+for (const name of ['barrows_skeleton_unarmed', 'barrows_skeleton_armed']) {
+    assert(combatScript.includes(`[ai_opplayer2,${name}] gosub(barrows_skeleton_attack);`), `${name} local native-cap dispatch`);
+}
+assert(combatScript.includes('[proc,barrows_skeleton_attack]'), 'authored skeleton maximum consumer exists at the new path');
 const stairsConfig = parseSections(readText('scripts/ladders+stairs/configs/stairs.loc'), 'stairs.loc');
 
 // VERIFIED original level joins, CANDIDATE draw weights, UNKNOWN class encoding.

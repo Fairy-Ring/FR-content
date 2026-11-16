@@ -7,6 +7,16 @@ import { loadPackedRuntime, packedId, parseOptions, run } from './packed.mjs';
 
 const CONFIG = 'scripts/minigames/game_barrows/configs/barrows_combat.npc';
 const NAMES = ['ahrim', 'dharok', 'guthan', 'karil', 'torag', 'verac', 'bloodworm', 'rat', 'giantrat', 'spider', 'giantspider', 'skeleton_unarmed', 'skeleton_armed'].map(name => `barrows_${name}`);
+// Native stat order: Attack, Defence, Strength, Hitpoints, Ranged, Magic.
+const TUNNELS = {
+  barrows_bloodworm: { stats: [80, 35, 20, 45, 1, 1], style: 0, defence: [0, 0, 0, 0, 0] },
+  barrows_rat: { stats: [70, 20, 20, 35, 1, 1], style: 0, defence: [0, 0, 0, 0, 0] },
+  barrows_giantrat: { stats: [80, 65, 50, 70, 1, 1], style: 0, defence: [0, 0, 0, 0, 0] },
+  barrows_spider: { stats: [45, 45, 47, 60, 1, 1], style: 0, defence: [20, 20, 10, 17, 20] },
+  barrows_giantspider: { stats: [65, 65, 67, 80, 1, 1], style: 0, defence: [20, 20, 10, 17, 20] },
+  barrows_skeleton_unarmed: { stats: [72, 72, 72, 50, 1, 1], style: 2, defence: [5, 5, -5, 0, 5], maximum: 10 },
+  barrows_skeleton_armed: { stats: [72, 72, 72, 50, 1, 1], style: 1, defence: [5, 5, -5, 0, 5], maximum: 10 }
+};
 
 await run(async () => {
   const args = [...process.argv];
@@ -76,6 +86,31 @@ await run(async () => {
       assert(Number.isInteger(expected), `${name} supported authored server parameter ${param}`);
       assert.equal(npc.params.get(paramId), expected, `${name} source/packed parameter ${param}`);
     }
+    const expected = TUNNELS[name];
+    if (expected) {
+      for (const [field, stat] of Object.entries(stats)) {
+        assert(fields.has(field), `${name} explicit ${field}`);
+        assert.equal(npc.stats[stat], expected.stats[stat], `${name} selected ${field}`);
+      }
+      assert.equal(fields.get('huntmode'), 'aggressive_melee', `${name} authored all-level hunt policy`);
+      assert.equal(npc.huntmode, packedId(contentRoot, 'hunt', 'aggressive_melee'), `${name} selected huntmode`);
+      assert.equal(npc.huntrange, 4, `${name} BARROWS_HUNT_RADIUS`);
+      for (const [field, value] of Object.entries({ defaultmode: 1, wanderrange: 5, maxrange: 7, attackrange: 0, regenrate: 100, givechase: true })) {
+        assert.equal(npc[field], value, `${name} retained native ${field}`);
+      }
+      const selected = { attackrate: 4, damagetype: expected.style, attackbonus: 0, strengthbonus: 0, magicattack: 0, rangeattack: 0, rangebonus: 0,
+        ...Object.fromEntries(['stabdefence', 'slashdefence', 'crushdefence', 'magicdefence', 'rangedefence'].map((key, index) => [key, expected.defence[index]])),
+        ...(expected.maximum === undefined ? {} : { barrows_maxhit: expected.maximum }) };
+      for (const [key, value] of Object.entries(selected)) {
+        assert(params.has(key), `${name} explicit ${key}`);
+        assert.equal(npc.params.get(ParamType.getId(key)), value, `${name} selected ${key}`);
+      }
+      for (const [key, value] of Object.entries({ retreat: -1, poison_severity: 0 })) {
+        const param = ParamType.getByName(key);
+        assert.equal(npc.params.get(param.id) ?? param.defaultInt, value, `${name} native ${key}`);
+      }
+      assert(!params.has('magicdamage'), `${name} zero magic-damage ledger adds no unused NPC parameter`);
+    }
     for (const trigger of ['AI_TIMER', 'AI_QUEUE1', 'AI_QUEUE3']) {
       const script = ScriptProvider.getByTrigger(ServerTriggerType[trigger], id, npc.category);
       assert(script, `${name} resolved ${trigger}`);
@@ -85,6 +120,7 @@ await run(async () => {
     }
   }
   console.log('PASS BC-01 thirteen authored blocks, no unpack duplicates, original IDs, source/packed server fields and timer/death/queue bindings');
+  console.log('PASS BC-02 explicit seven-type skills, HP, bonuses, subtypes, caps, hunt policy/radius and retained native server values');
 
   if (baselinePack) {
     // Decode both actual packs in this process. Never register frozen old server values or script bytecode.
