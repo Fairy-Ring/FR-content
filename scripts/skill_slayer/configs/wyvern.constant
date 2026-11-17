@@ -3,6 +3,7 @@
 ^wyvern_ranged_maxhit = 13
 ^wyvern_breath_maxhit = 50
 ^wyvern_shield_maxhit = 10
+^wyvern_magic_prayer_maxhit = 20
 ^wyvern_granite_roll = 512
 // CANDIDATE: modern icy breath freezes for 6.6 seconds (eleven ticks).
 ^wyvern_freeze_ticks = 11

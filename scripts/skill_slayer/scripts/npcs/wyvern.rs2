@@ -61,6 +61,9 @@ def_int $maxhit = ^wyvern_breath_maxhit;
 if (inv_total(worn, elemental_shield) > 0) {
     $maxhit = ^wyvern_shield_maxhit;
 } else {
+    // VERIFIED qualitative reduction: period RuneVillage and official July2007.
+    // CANDIDATE cap20: Old School; weaker than the elemental shield's cap10.
+    if (~check_protect_prayer(^magic_style) = true) $maxhit = ^wyvern_magic_prayer_maxhit;
     // CANDIDATE stat loss: Old School revision 241128. UNKNOWN engineering:
     // which stats and how much were not stated; use ten percent of these five.
     stat_drain(attack, 0, ^wyvern_stat_drain_percent);
@@ -71,7 +74,7 @@ if (inv_total(worn, elemental_shield) > 0) {
 }
 // VERIFIED: official 3 July 2007 note fixed Melee prayer blocking ice breath.
 // Keep that period fault on purpose. UNKNOWN engineering: full rather than
-// partial blocking. Magic prayer has no effect under Main's period ruling.
+// partial blocking. The shield takes precedence over Magic-prayer mitigation.
 if (~check_protect_prayer(^melee_style) = true) $maxhit = 0;
 def_int $ticks = ~playerhit_n_ranged(randominc($maxhit), $duration, npc_param(attackrate));
 // CANDIDATE: breath can freeze even through an elemental shield. The chance
