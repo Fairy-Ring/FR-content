@@ -15,6 +15,7 @@ const TYPES = {
   barrows_skeleton_unarmed: { id: 2036, hp: 50, maximum: 10, style: 2, tiles: [[3548,9709],[3549,9713],[3553,9707]] },
   barrows_skeleton_armed: { id: 2037, hp: 50, maximum: 10, style: 1, tiles: [[3551,9714],[3554,9713],[3555,9709]] }
 };
+const BROTHERS = ['barrows_ahrim', 'barrows_dharok', 'barrows_guthan', 'barrows_karil', 'barrows_torag', 'barrows_verac'];
 
 await run(async () => {
   // Acceptance only: --base-pack DIR also runs the owned door-actor lifetime on the
@@ -541,6 +542,64 @@ await run(async () => {
         rt.dispose();
       }
     }
+    function brotherTimeline(name, owned) {
+      rt.dispose();
+      const owner = tunnelPlayer(2, 'brother_poison', LANDING);
+      beginRun(owner, 41);
+      let npc;
+      try {
+        const type = NpcType.getByName(name);
+        if (owned) {
+          const handle = playerProc(owner, 'barrows_actor_spawn', [type.id, CoordGrid.packCoord(0, owner.x+1, owner.z), 1000]).popInt();
+          npc = World.getNpcByUid(handle);
+        } else {
+          npc = new Npc(0, owner.x+1, owner.z, type.size, type.size, EntityLifeCycle.DESPAWN, World.getNextNid(), type.id, type.blockwalk);
+          World.addNpc(npc, -1);
+        }
+        assert(npc?.isActive, `${name} ${owned ? 'owned' : 'unowned'} native constructor`);
+        spawnEvents();
+        const flag = VarNpcType.getId('npc_poison_preserve_phase');
+        if (flag >= 0) assert.equal(npc.getVar(flag), 0, `${name} never opts into static tunnel poison`);
+        npc.baseLevels[3] = 255; npc.levels[3] = 255;
+        npc.regenInterval = 100000; npc.regenClock = 0;
+        const f = { player:owner, npc }, trace = [];
+        const call = (proc, args = []) => {
+          const result = rt.observe(`[proc,${proc}]`, f, args);
+          assert.equal(result.snapshot.execution, State.FINISHED);
+          assert.equal(result.snapshot.error, null);
+        };
+        const record = (tick, action) => trace.push({ tick, action, hp:npc.levels[3],
+          severity:npc.getVar(nv('npc_poison')), timer:npc.timerInterval,
+          clock:npc.timerClock, hunt:npc.huntMode, counter:npc.getVar(nv('npc_poison_timer_runs')) });
+        call('npc_poison_start', [20]);
+        assert.equal(npc.timerInterval, owned ? 1 : 30, `${name} original brother poison mechanism`);
+        record(0, 'apply 20');
+        let expectedHp = 255, expectedSeverity = 20;
+        for (let tick = 1; tick <= 850; tick++) {
+          if (tick === 620) { npc.resetDefaults(); record(tick, 'native resetDefaults'); }
+          if ([625,642,669,725].includes(tick)) {
+            const severity = tick === 625 ? 4 : tick === 642 ? 7 : tick === 669 ? 2 : 3;
+            call('npc_poison_start', [severity]); record(tick, `apply ${severity}`);
+          }
+          if (tick === 710) { call('npc_poison_clear'); record(tick, 'cure'); }
+          World.currentTick++;
+          npc.processTimers();
+          if (tick <= 600) {
+            if (tick % 30 === 0) {
+              expectedSeverity--;
+              if (expectedSeverity > 0) expectedHp -= Math.floor((expectedSeverity+4)/5);
+            }
+            assert.equal(npc.getVar(nv('npc_poison')), expectedSeverity, `${name} brother countdown at ${tick}`);
+            assert.equal(npc.levels[3], expectedHp, `${name} brother damage at ${tick}`);
+          }
+          record(tick, 'timer');
+        }
+        return trace;
+      } finally {
+        removePlayer(owner);
+        rt.dispose();
+      }
+    }
     function staticTimeline(name) {
       const [x,z] = TYPES[name].tiles[0], config = NpcType.get(TYPES[name].id);
       const npc = new Npc(0,x,z,config.size,config.size,EntityLifeCycle.RESPAWN,World.getNextNid(),config.id,config.blockwalk);
@@ -621,6 +680,17 @@ await run(async () => {
         assert(old.reset !== null && now.reset !== null && now.reset >= old.reset && now.reset <= old.reset+1, `${name}: ${JSON.stringify({old,now})}`);
       });
       console.log(`PASS BC-02 static timing comparison ${JSON.stringify(report.new.statics)}`);
+    }
+    for (const name of BROTHERS) for (const owned of [false,true]) {
+      check(`${name} ${owned ? 'owned' : 'unowned'} full brother poison, timer, hunt and native reset parity`, () => {
+        const current = brotherTimeline(name, owned);
+        if (compatPack) {
+          try {
+            usePack(compatPack);
+            assert.deepEqual(current, brotherTimeline(name,owned), `${name} brother path is unchanged from the pre-fix pack`);
+          } finally { rt.dispose(); usePack(packDir); }
+        }
+      });
     }
     for (const name of Object.keys(TYPES)) check(`${name} each immediate ownership guard predicate`, () => guardCases(name));
     rt.dispose();
