@@ -18,6 +18,8 @@ const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/
 const { EntityLifeCycle } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/EntityLifeCycle.ts')).href);
 const ServerTriggerType = await load('engine/script/ServerTriggerType.ts');
 const { NpcStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NpcStat.ts')).href);
+const ScriptPointer = await load('engine/script/ScriptPointer.ts');
+const JavaRandom = await load('util/JavaRandom.ts');
 const map = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
 const { CollisionType } = await import(pathToFileURL(path.join(engine, 'src/engine/routefinder/index.ts')).href);
 const types = {};
@@ -193,29 +195,66 @@ assert.equal(p.levels[PlayerStat.PRAYER], p.baseLevels[PlayerStat.PRAYER]);
 assert.equal(p.levels[PlayerStat.HITPOINTS], p.baseLevels[PlayerStat.HITPOINTS] + 7);
 const parent = types.VarPlayerType.get(id('varp', 'elid_main'));
 assert.equal(parent.scope, types.VarPlayerType.SCOPE_PERM, 'stages and flags persist');
+// Use the production melee label, not fixture-applied damage. Pin only its
+// accuracy/damage RNG; spawn location, collision and hit handling stay packed.
+function meleeHit(p, actor, style) {
+    p.baseLevels.fill(99); p.levels.fill(99);
+    p.setVar(id('varp', 'tutorial'), 1000);
+    p.setVar(id('varp', 'action_delay'), 0);
+    p.setVar(id('varp', 'damagestyle'), 0);
+    p.setVar(id('varp', 'damagetype'), { stab: 0, slash: 1, crush: 2 }[style]);
+    p.setVar(id('varp', `com_${style}attack`), 1000000);
+    p.setVar(id('varp', 'com_maxhit'), 1);
+    const attack = ScriptProvider.getByName('[label,player_melee_attack]');
+    assert(attack, 'production melee attack label is packed');
+    const state = ScriptRunner.init(attack, actor, p, []);
+    state.pointerAdd(ScriptPointer.ProtectedActivePlayer);
+    const before = actor.levels[NpcStat.HITPOINTS];
+    const random = JavaRandom.nextDouble;
+    const draws = [0.999999, 0, 0.999999];
+    let draw = 0;
+    JavaRandom.nextDouble = () => { assert(draw < draws.length, 'bounded melee RNG'); return draws[draw++]; };
+    try { p.executeScript(state, true, true); } finally { JavaRandom.nextDouble = random; }
+    assert.equal(state.execution, ScriptState.FINISHED, 'production melee attack finishes');
+    assert.equal(draw, draws.length, 'production melee consumes accuracy and damage rolls');
+    World.currentTick++;
+    actor.turn(); // the production melee label delivers its zero-delay AI_QUEUE2 hit on the NPC turn
+    assert.equal(before - actor.levels[NpcStat.HITPOINTS], 1, `${style} production melee hit damages the door-spawned golem`);
+}
 const golems = [
-    { colour: 'white', door: [3365, 9542], room: [3365, 9541], hall: [3365, 9543] },
-    { colour: 'black', door: [3372, 9556], room: [3373, 9556], hall: [3371, 9556] },
-    { colour: 'grey', door: [3374, 9547], room: [3375, 9547], hall: [3373, 9547] }
+    { colour: 'white', style: 'stab', door: [3365, 9542], room: [3365, 9541], hall: [3365, 9543] },
+    { colour: 'black', style: 'crush', door: [3372, 9556], room: [3373, 9556], hall: [3371, 9556] },
+    { colour: 'grey', style: 'slash', door: [3374, 9547], room: [3375, 9547], hall: [3373, 9547] }
 ];
-for (const { colour, door, room, hall } of golems) {
+for (const { colour, style, door, room, hall } of golems) {
     const q = player(20);
     q.isActive = true;
     World.players[q.slot] = q; World.playerLoop.add(q.hash64, q);
     const type = types.NpcType.getByName(`elid_golem_${colour}`);
     const loc = World.getLoc(...door, 0, id('loc', `elid_${colour}golem_door`));
     assert(loc, `${colour} original door is placed`);
-    const actor = new Npc(0, ...door, type.size, type.size, EntityLifeCycle.RESPAWN, World.getNextNid(), type.id, type.blockwalk);
-    World.addNpc(actor, -1); World.processNpcEventQueue();
-    const spawned = ScriptRunner.init(ScriptProvider.getByTrigger(ServerTriggerType.AI_SPAWN, type.id, type.category), actor);
-    actor.executeScript(spawned);
-    assert.equal(spawned.execution, ScriptState.FINISHED);
+    let actor;
     for (const [from, stop] of [[hall, hall], [room, door]]) {
+        if (actor) {
+            World.removeNpc(actor, -1); World.processNpcEventQueue();
+            if (World.npcs.get(actor.nid) === actor) { World.npcs.remove(actor.nid); actor.cleanup(); }
+        }
         [q.x, q.z] = from;
         approachDoor(q, loc, stop);
         run(`[oploc1,elid_${colour}golem_door]`, q, loc);
         assert.deepEqual([q.x, q.z], stop, `${colour} refuses crossing before its golem dies`);
         assert.equal(q.getVarBit(bit(`elid_${colour}golem`)), 0, 'opening never grants kill credit');
+        World.processNpcEventQueue();
+        const matches = [...World.npcs].filter(n => n.isActive && n.type === type.id && Math.max(Math.abs(n.x - door[0]), Math.abs(n.z - door[1])) <= 4);
+        assert.equal(matches.length, 1, `${colour} handler spawns exactly one normal golem`);
+        actor = matches[0];
+        const expected = colour === 'white'
+            ? [q.x, q.z + (q.z <= door[1] ? -1 : 1)]
+            : [q.x + (q.x < door[0] ? -1 : 1), q.z];
+        assert.deepEqual([actor.x, actor.z], expected, `${colour} UNKNOWN engineering spawn stays behind the opener on the same side`);
+        assert(map.canTravel(0, q.x, q.z, actor.x - q.x, actor.z - q.z, 1, 0, CollisionType.NORMAL), `${colour} spawned tile is walkable from the opening tile`);
+        assert(map.reachedEntity(0, q.x, q.z, actor.x, actor.z, type.size, type.size, 1), `${colour} door-opening tile has packed melee reach to its spawn`);
+        meleeHit(q, actor, style);
     }
     actor.setVar(id('varn', 'npc_aggressive_player'), q.uid);
     actor.heroPoints.addHero(q.hash64, actor.levels[NpcStat.HITPOINTS]);

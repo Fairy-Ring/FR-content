@@ -6,6 +6,9 @@
 // numeric style modifiers are UNKNOWN and none are added.
 // Each unset bit spawns its golem only if one is not nearby. Range 4 is an
 // UNKNOWN local guard value copied from the established Restless Ghost pattern.
+// UNKNOWN engineering spawn offsets: one tile back from the opener, on the
+// opener's side of the closed wall. The period guide gives no precise tiles.
+// Packed collision and real melee-hit tests cover all three on both sides.
 // After the golem bit is set, each door telejumps both ways using map-derived
 // CANDIDATE hall/room destinations. Death credit keeps the Feud p_finduid guard.
 // This script writes only the color bit; it never writes elidquest.
@@ -15,7 +18,11 @@
 [oploc1,elid_whitegolem_door]
 if (%elid_whitegolem < 1) {
     if (npc_find(loc_coord, elid_golem_white, 4, 0) = false) {
-        npc_add(loc_coord, elid_golem_white, 500); // UNKNOWN duration; retained from existing handler
+        def_coord $golem_spawn = movecoord(coord, 0, 0, 1);
+        if (coordz(coord) <= coordz(loc_coord)) {
+            $golem_spawn = movecoord(coord, 0, 0, -1);
+        }
+        npc_add($golem_spawn, elid_golem_white, 500); // UNKNOWN duration; retained from existing handler
         npc_setmode(opplayer2);
     }
     return;
@@ -29,7 +36,11 @@ p_telejump(0_52_149_37_5); // CANDIDATE room side 3365,9541
 [oploc1,elid_blackgolem_door]
 if (%elid_blackgolem < 1) {
     if (npc_find(loc_coord, elid_golem_black, 4, 0) = false) {
-        npc_add(loc_coord, elid_golem_black, 500); // UNKNOWN duration; retained from existing handler
+        def_coord $golem_spawn = movecoord(coord, -1, 0, 0);
+        if (coordx(coord) >= coordx(loc_coord)) {
+            $golem_spawn = movecoord(coord, 1, 0, 0);
+        }
+        npc_add($golem_spawn, elid_golem_black, 500); // UNKNOWN duration; retained from existing handler
         npc_setmode(opplayer2);
     }
     return;
@@ -43,7 +54,11 @@ p_telejump(0_52_149_43_20); // CANDIDATE hall side 3371,9556
 [oploc1,elid_greygolem_door]
 if (%elid_greygolem < 1) {
     if (npc_find(loc_coord, elid_golem_grey, 4, 0) = false) {
-        npc_add(loc_coord, elid_golem_grey, 500); // UNKNOWN duration; retained from existing handler
+        def_coord $golem_spawn = movecoord(coord, -1, 0, 0);
+        if (coordx(coord) >= coordx(loc_coord)) {
+            $golem_spawn = movecoord(coord, 1, 0, 0);
+        }
+        npc_add($golem_spawn, elid_golem_grey, 500); // UNKNOWN duration; retained from existing handler
         npc_setmode(opplayer2);
     }
     return;
