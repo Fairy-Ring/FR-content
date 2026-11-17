@@ -15,27 +15,35 @@ if (~farming_veg_is_parent = false) {
     return;
 }
 def_int $stage = ~farming_veg_stage;
+def_dbrow $crop = ~farming_allotment_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $first = db_getfield($crop, farming_allotment:first, 0);
+def_int $mature = db_getfield($crop, farming_allotment:mature, 0);
+def_string $plant = db_getfield($crop, farming_allotment:singular, 0);
 if (oc_category(last_useitem) = watering_can & last_useitem ! watering_can_0
-    & $stage >= ^farming_potato_seed & $stage < ^farming_potato_fullygrown) {
+    & $stage >= $first & $stage < $mature) {
     inv_setslot(inv, last_useslot, oc_param(last_useitem, next_obj_stage), 1);
     ~farming_veg_set_stage(add($stage, ^farming_watered_offset));
     // UNKNOWN functional wording: no retained period message transcript.
-    mes("You water the potato plants.");
+    mes("You water the <$plant> plants.");
     return;
 }
-if (last_useitem = plant_cure & $stage > add(^farming_potato_seed, ^farming_diseased_offset)
-    & $stage < add(^farming_potato_fullygrown, ^farming_diseased_offset)) {
+if (last_useitem = plant_cure & $stage > add($first, ^farming_diseased_offset)
+    & $stage < add($mature, ^farming_diseased_offset)) {
     inv_setslot(inv, last_useslot, vial_empty, 1);
     ~farming_veg_set_stage(sub($stage, ^farming_diseased_offset));
     // UNKNOWN functional wording: no retained period message transcript.
-    mes("You cure the potato plants.");
+    mes("You cure the <$plant> plants.");
     return;
 }
-if (last_useitem = spade & $stage > add(^farming_potato_seed, ^farming_dead_offset)
-    & $stage < add(^farming_potato_fullygrown, ^farming_dead_offset)) {
+if (last_useitem = spade & $stage > add($first, ^farming_dead_offset)
+    & $stage < add($mature, ^farming_dead_offset)) {
     ~farming_veg_set_stage(^farming_veg_weeded);
     // UNKNOWN functional wording: no retained period message transcript.
-    mes("You dig up the dead potato plants.");
+    mes("You dig up the dead <$plant> plants.");
     return;
 }
 if (last_useitem = rake) {

@@ -31,8 +31,16 @@
 // CANDIDATE pre-rework OSRS: 500 game ticks, reset on login/logout.
 ^farming_growth_poll_ticks = 500
 ^farming_growth_window_minutes = 5
-// UNKNOWN engineering values: no cited source gives potato-specific chances.
+// UNKNOWN engineering values shared by all allotments, not recovered rates.
 // Ash (16 December 2019) says watering reduces, rather than eliminates, risk.
 ^farming_disease_denominator = 128
-^farming_potato_disease_dry = 20
-^farming_potato_disease_watered = 10
+^farming_allotment_disease_dry = 20
+^farming_allotment_disease_watered = 10
+
+// CANDIDATE OSRS: three harvest lives, one item per pick, level-interpolated
+// life-saving chance. Potato keeps its inherited fixed three-item harvest.
+^farming_harvest_denominator = 256
+// UNKNOWN engineering endpoints shared by the six new allotment crops.
+// Retained OSRS revision 15402033 gives the formula but not these crop CTS.
+^farming_allotment_save_low = 64
+^farming_allotment_save_high = 128
