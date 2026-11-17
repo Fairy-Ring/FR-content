@@ -103,10 +103,14 @@ switch_int($target) {
 }
 return (true);
 
-// Unfinished exclusions. Each quest owner supplies its authentic predicate.
+// CANDIDATE: use Drezel's Morytania access grant, not quest completion at 60.
 [proc,slayer_priestperil_unlocked]()(boolean)
-return (false);
+if (%priestperil < ^priestperil_access_holy_barrier) {
+    return (false);
+}
+return (true);
 
+// Unfinished exclusions. Each quest owner supplies its authentic predicate.
 [proc,slayer_horror_unlocked]()(boolean)
 return (false);
 
