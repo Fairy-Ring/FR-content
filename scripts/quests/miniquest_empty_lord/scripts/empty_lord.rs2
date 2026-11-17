@@ -33,7 +33,10 @@ def_int $story_bit = calc(^empty_lord_first_story_bit + $stage - 1);
 if (testbit(%dagganoth_area_project, $story_bit) = ^true) {
     // Banked and worn pieces count. Ground items do not: the period drop trick works.
     if (~obj_gettotal($piece) = 0) {
-        if (inv_freespace(inv) = 0) @empty_lord_no_space;
+        if (inv_freespace(inv) = 0) {
+            ~empty_lord_no_space;
+            return;
+        }
         inv_add(inv, $piece, 1);
     }
     ~empty_lord_repeat($stage);
@@ -51,12 +54,15 @@ if ($stage = 1 & $route = 0) {
     %dagganoth_area_project = setbit_range_toint(%dagganoth_area_project, $route, ^empty_lord_route_start, ^empty_lord_route_end);
 }
 ~empty_lord_story($stage);
-if (inv_freespace(inv) = 0) @empty_lord_no_space;
+if (inv_freespace(inv) = 0) {
+    ~empty_lord_no_space;
+    return;
+}
 inv_add(inv, $piece, 1);
 %dagganoth_area_project = setbit(%dagganoth_area_project, $story_bit);
 if ($stage < ^empty_lord_ghost_count) ~empty_lord_hint($stage);
 
-[label,empty_lord_no_space]
+[proc,empty_lord_no_space]
 // UNKNOWN: plain functional fallback; no miniquest-specific full-inventory wording survived the bounded pass.
 mes("You need a free inventory space.");
 
