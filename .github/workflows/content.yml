@@ -200,6 +200,7 @@ jobs:
           run_test tests/teleother/test_teleother.mjs node --import tsx ../content/tests/teleother/test_teleother.mjs
           run_test tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs node --import tsx ../content/tests/mortton-sanctity-drain/test_mortton_sanctity_drain.mjs
           run_test tests/rowboat/test_rowboat.mjs node --import tsx ../content/tests/rowboat/test_rowboat.mjs
+          run_test tests/canoes/test_canoes.mjs node --import tsx ../content/tests/canoes/test_canoes.mjs
           run_test tests/misc-services/test_misc_services.mjs node --import tsx ../content/tests/misc-services/test_misc_services.mjs
           run_test tests/regicide-travel/test_regicide_travel.mjs node --import tsx ../content/tests/regicide-travel/test_regicide_travel.mjs
           run_test tests/slimy-eel/test_slimy_eel.mjs node --import tsx ../content/tests/slimy-eel/test_slimy_eel.mjs
