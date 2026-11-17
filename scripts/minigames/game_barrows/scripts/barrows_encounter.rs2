@@ -1,5 +1,5 @@
-// Original slain-name joins define the six run identities. Ownership, lifetime
-// and cleanup scheduling are UNKNOWN engineering policy, not recovered combat.
+// Original slain-name joins define the six run identities. Ordinary door
+// abandonment is CANDIDATE operator policy. Lifetime remains UNKNOWN engineering.
 [proc,barrows_brother_identity](npc $brother)(int)
 // Missing string-enum keys use the engine's int fallback; admit only the finite
 // brother domain established by the original typed crypt-entry join.
@@ -42,16 +42,48 @@ if (%barrows_generation <= 0 | $tile = null | ~barrows_inside(coord) = false | ~
 npc_add($tile, $type, $lifetime);
 %npc_barrows_owner = uid;
 %npc_barrows_generation = %barrows_generation;
+%npc_barrows_origin = $tile;
 %npc_owned_timer_interval = ^barrows_owner_check_ticks;
 npc_settimer(^barrows_owner_check_ticks);
 // CANDIDATE appearance: the published hint command targets this owner's client.
 if (~barrows_brother_identity($type) > 0) hint_npc;
 return(npc_uid);
 
+// Preserve the attacker's primary player pointer while inspecting the owner.
+[proc,barrows_door_owner_coord]()(coord)
+if (.finduid(%npc_barrows_owner) = false) return(null);
+def_int $phase = getbit_range(.%barrows_state, ^barrows_phase_start, ^barrows_phase_end);
+if (%npc_barrows_generation ! .%barrows_generation) return(null);
+if (~barrows_inside(.coord) = false | .%death = ^true | ($phase ! ^barrows_phase_unlooted & $phase ! ^barrows_phase_paid)) return(null);
+return(.coord);
+
+// Mirrors native melee OPPLAYER reach from the captured spawn, not the actor.
+[proc,barrows_door_owner_inrange](coord $owner)(boolean)
+if (coordy($owner) ! coordy(%npc_barrows_origin)) return(false);
+def_int $x = abs(sub(coordx($owner), coordx(%npc_barrows_origin)));
+def_int $z = abs(sub(coordz($owner), coordz(%npc_barrows_origin)));
+if (max($x, $z) > ^barrows_door_owner_reach) return(false);
+if ($x = ^barrows_door_owner_reach & $z = ^barrows_door_owner_reach) return(false);
+return(true);
+
 // Shared melee/ranged/autocast and opted-magic gates call the same narrow guard.
 [proc,barrows_actor_attackable]()(boolean)
 if (%npc_barrows_generation <= 0) return(true);
 if (~barrows_actor_type(npc_type) = false) return(true);
+if (~barrows_door_actor_type(npc_type) = true) {
+    if (%npc_barrows_public = ^true) return(true);
+    def_coord $owner = ~barrows_door_owner_coord;
+    if ($owner = null) {
+        %npc_barrows_public = ^true;
+        npc_setmode(wander);
+        return(true);
+    }
+    if (%npc_barrows_owner ! uid & (npc_getmode = wander | npc_getmode = none) & ~barrows_door_owner_inrange($owner) = false) {
+        // An accepted stranger attack makes abandonment permanent.
+        %npc_barrows_public = ^true;
+        return(true);
+    }
+}
 def_int $phase = ~barrows_phase;
 if (%npc_barrows_owner = uid & %npc_barrows_generation = %barrows_generation & ~barrows_inside(coord) = true & ~barrows_inside(npc_coord) = true & ($phase = ^barrows_phase_unlooted | $phase = ^barrows_phase_paid)) return(true);
 mes("Someone else is fighting that.");
@@ -61,6 +93,18 @@ return(false);
 if (%npc_barrows_generation <= 0) {
     ~npc_poison_timer;
     return;
+}
+if (~barrows_door_actor_type(npc_type) = true) {
+    if (%npc_barrows_public = ^true) {
+        ~npc_poison_counted_timer(^barrows_owner_check_ticks);
+        return;
+    }
+    if (~barrows_door_owner_coord = null) {
+        %npc_barrows_public = ^true;
+        npc_setmode(wander);
+        ~npc_poison_counted_timer(^barrows_owner_check_ticks);
+        return;
+    }
 }
 if (finduid(%npc_barrows_owner) = false) {
     npc_del;

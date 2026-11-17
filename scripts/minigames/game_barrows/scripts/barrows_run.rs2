@@ -36,7 +36,7 @@ return(true);
 [proc,barrows_generation_advance]
 ~barrows_timer_stop;
 if (%barrows_generation = ^barrows_generation_max) {
-    // Actor deletion completes before the wrapped generation can be used by a new encounter.
+    // Brother deletion and door release complete before the wrapped generation is reused.
     ~barrows_remove_owned;
     %barrows_generation = 1;
 } else {
@@ -44,25 +44,44 @@ if (%barrows_generation = ^barrows_generation_max) {
     ~barrows_remove_owned;
 }
 
+// Only these three ordinary types occur in the door encounter draw.
+[proc,barrows_door_actor_type](npc $type)(boolean)
+if ($type = barrows_rat | $type = barrows_bloodworm | $type = barrows_skeleton_unarmed) return(true);
+return(false);
+
 [proc,barrows_actor_type](npc $type)(boolean)
 if ($type = barrows_ahrim | $type = barrows_dharok | $type = barrows_guthan | $type = barrows_karil | $type = barrows_torag | $type = barrows_verac | $type = barrows_rat | $type = barrows_bloodworm | $type = barrows_spider | $type = barrows_giantrat | $type = barrows_skeleton_unarmed | $type = barrows_skeleton_armed | $type = barrows_giantspider) return(true);
 return(false);
 
 // Use the secondary NPC pointer so shared death processing retains its active actor.
-// Ordinary unowned map placements and every other player's summons remain untouched.
+// Door actors retain original owner/generation for credit, but never reclaim ownership.
 [proc,barrows_remove_owned]
 .npc_findallany(0_55_151_32_32, ^barrows_actor_scan_radius, 0);
 while (.npc_findnext = true) {
     if (.%npc_barrows_owner = uid & .%npc_barrows_generation > 0 & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) {
-        if (~barrows_brother_identity(.npc_type) > 0) hint_stop;
-        .npc_del;
+        if (~barrows_door_actor_type(.npc_type) = true) {
+            if (.%npc_barrows_public ! ^true) {
+                .%npc_barrows_public = ^true;
+                .npc_setmode(wander);
+            }
+        } else {
+            if (~barrows_brother_identity(.npc_type) > 0) hint_stop;
+            .npc_del;
+        }
     }
 }
 .npc_findallany(3_55_151_32_32, ^barrows_actor_scan_radius, 0);
 while (.npc_findnext = true) {
     if (.%npc_barrows_owner = uid & .%npc_barrows_generation > 0 & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) {
-        if (~barrows_brother_identity(.npc_type) > 0) hint_stop;
-        .npc_del;
+        if (~barrows_door_actor_type(.npc_type) = true) {
+            if (.%npc_barrows_public ! ^true) {
+                .%npc_barrows_public = ^true;
+                .npc_setmode(wander);
+            }
+        } else {
+            if (~barrows_brother_identity(.npc_type) > 0) hint_stop;
+            .npc_del;
+        }
     }
 }
 

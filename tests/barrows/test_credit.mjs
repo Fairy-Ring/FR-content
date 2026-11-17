@@ -45,6 +45,8 @@ await run(async () => {
     import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/script/ServerTriggerType.ts')).href),
     import(pathToFileURL(path.join(runtime.engineRoot, 'src/engine/entity/NpcStat.ts')).href)
   ]);
+  const { default:HuntType } = await import(pathToFileURL(path.join(runtime.engineRoot, 'src/cache/config/HuntType.ts')).href);
+  HuntType.load(runtime.packDir);
   const hitpointsIndex = NpcStatMap.get('HITPOINTS');
   assert.notEqual(hitpointsIndex, undefined, 'native NPC hitpoint index is available');
 
@@ -56,7 +58,7 @@ await run(async () => {
     return [name, id];
   }));
   const npcVarIds = Object.fromEntries([
-    'npc_barrows_owner', 'npc_barrows_generation', 'npc_attacking_uid', 'npc_aggressive_player'
+    'npc_barrows_owner', 'npc_barrows_generation', 'npc_barrows_public', 'npc_attacking_uid', 'npc_aggressive_player'
   ].map(name => {
     const id = VarNpcType.getId(name);
     assert.notEqual(id, -1, `missing NPC var ${name}`);
@@ -384,7 +386,8 @@ await run(async () => {
     seedActor(despawnNpc, { owner: despawnOwner.uid, generation: 151, aggressor: despawnOwner.uid, hp: 9 });
     const beforeDespawn = creditSnapshot(despawnOwner);
     procVoid(despawnOwner, 'barrows_remove_owned', [], despawnNpc);
-    assert.equal(despawnNpc.isActive, false, 'real Barrows removal removes the living actor');
+    assert.equal(despawnNpc.isActive, true, 'ordinary door-type cleanup releases rather than removes the living actor');
+    assert.equal(despawnNpc.getVar(npcVarIds.npc_barrows_public), 1, 'ordinary cleanup makes public access permanent');
     assertNoCreditRequest(despawnOwner, 'real Barrows actor removal');
     assert.deepEqual(creditSnapshot(despawnOwner), beforeDespawn, 'departure/despawn itself never grants credit');
 
@@ -402,7 +405,8 @@ await run(async () => {
 
     staleOwner.setVar(playerVarIds.barrows_state, stateWord({ phase: 2, identity: 1 }));
     procVoid(staleOwner, 'barrows_run_reset', [], staleNpc);
-    assert.equal(staleNpc.isActive, false, 'real run reset removes the owned actor before clearing the run');
+    assert.equal(staleNpc.isActive, true, 'real run reset retains the ordinary actor for its original lifetime');
+    assert.equal(staleNpc.getVar(npcVarIds.npc_barrows_public), 1, 'real run reset permanently releases the old actor');
     assert.equal(u32(staleOwner.getVar(playerVarIds.barrows_generation)), resetGeneration + 1, 'reset advances the captured generation');
     assert.equal(procInt(staleOwner, 'barrows_phase'), 0, 'reset leaves the player idle');
     assert.equal(getCredit(staleOwner), 0, 'reset clears credit before replay');
@@ -503,6 +507,53 @@ await run(async () => {
     assert.equal(noHeroNpc.activeScript, null, 'completed ordinary death leaves no suspended script');
     assert.deepEqual(creditSnapshot(noHero), noHeroBefore, 'no-hero death gives no Barrows credit');
     assertNoCreditRequest(noHero, 'completed no-hero ordinary death');
+
+    for (const [name, level] of ORDINARY.filter(([name]) => ['barrows_rat', 'barrows_bloodworm', 'barrows_skeleton_unarmed'].includes(name))) {
+      for (const outcome of ['owner hero', 'stranger hero', 'offline hero']) {
+        const owner = makePlayer(`${name}_${outcome}_a`, { level:0 });
+        const finisher = makePlayer(`${name}_${outcome}_b`, { level:0 });
+        setRun(owner, { generation:181, phase:1, level:0, credit:0 });
+        setRun(finisher, { generation:182, phase:1, level:0, credit:0 });
+        const npc = actor(name, 0, owner.uid);
+        seedActor(npc, { owner:owner.uid, generation:181, aggressor:finisher.uid, hp:1 });
+        npc.setVar(npcVarIds.npc_barrows_public, 1); // Native fixture: an already abandoned door actor.
+        npc.heroPoints.addHero(owner.hash64, outcome === 'stranger hero' ? 13 : 31);
+        npc.heroPoints.addHero(finisher.hash64, outcome === 'stranger hero' ? 31 : 13);
+        npc.heroPoints.addHero(finisher.hash64, 1); // B's real final damage below.
+        const hero = outcome === 'stranger hero' ? finisher : owner;
+        assert.equal(npc.heroPoints.findHero(), hero.hash64, 'the normal damage ledger selects the highest-damage hero');
+        if (outcome === 'offline hero') {
+          delete World.players[owner.slot]; owner.unlink(); owner.isActive = false;
+          assert.equal(World.getPlayerByHash64(owner.hash64), undefined, 'the original highest-damage hero is genuinely offline');
+        }
+        const zone = World.gameMap.getZone(npc.x, npc.z, npc.level);
+        const tile = runtime.CoordGrid.packZoneCoord(npc.x, npc.z);
+        const before = new Set(zone.getObjsUnsafe(tile));
+        npcProc(npc, 'npc_default_damage', [1]);
+        assert([...npc.queue.all()].some(q => q.queueId === ServerTriggerType.AI_QUEUE3), 'B final damage queues the real death trigger');
+        let turns = 0;
+        while ((npc.isActive || capturedCreditRequests(owner).length || capturedCreditRequests(finisher).length) && turns < 1024) {
+          World.currentTick++;
+          if (npc.isActive) npc.turn();
+          if (owner.isActive) owner.processQueues();
+          finisher.processQueues();
+          turns++;
+        }
+        assert(turns < 1024 && !npc.isActive, `${name}: native death completes for ${outcome}`);
+        assert.equal(getCredit(owner), outcome === 'owner hero' ? creditWord({ potential:level, count:1 }) : 0,
+          `${name}: A credit follows original ownership and the native hero, not B's lethal damage`);
+        assert.equal(getCredit(finisher), 0, `${name}: B never earns Barrows credit for a foreign door actor`);
+        const drops = [...zone.getObjsUnsafe(tile)].filter(obj => !before.has(obj) && obj.isActive);
+        assert.equal(drops.length, outcome === 'offline hero' ? 0 : 1, `${name}: ${outcome} preserves native drop lookup`);
+        if (drops.length) {
+          assert.equal(drops[0].type, runtime.ObjType.getId('bones'), 'the configured ordinary default drop remains bones');
+          assert.equal(drops[0].count, 1);
+          assert.equal(drops[0].receiver64, hero.hash64, 'the ordinary drop belongs to the same native combat hero');
+          World.removeObj(drops[0], 0);
+        }
+        console.log(`PASS BC-02 ${name}: ${outcome}, unchanged native credit and ordinary drop`);
+      }
+    }
 
     console.log('PASS S04 packed NPC levels, unique and ordinary credit, native killer/queue attribution, caps, phase/location/generation guards, replay and secondary-pointer death');
   } finally {

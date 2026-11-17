@@ -1220,8 +1220,10 @@ await run(async () => {
     assert(mapTile, 'native map has an unoccupied tile for the unrelated map actor control');
     const mapActor = addFixtureNpc('barrows_spider', mapTile);
     const cleanupCredit = u32(cleanupOwner.getVar(vars.barrows_kills));
+    const cleanupLifetime = cleanupActor.lifecycleTick;
     procVoid(cleanupOwner, 'barrows_remove_owned');
-    assert.equal(cleanupActor.isActive, false, 'owner cleanup removes the caller’s door summon');
+    assert.deepEqual([cleanupActor.isActive, cleanupActor.isActive && cleanupActor.getVar(VarNpcType.getId('npc_barrows_public')), cleanupActor.lifecycleTick],
+      [true, 1, cleanupLifetime], 'owner cleanup releases the caller’s door summon publicly for its original lifetime');
     assert.equal(peerActor.isActive, true, 'owner cleanup preserves another player’s door summon');
     assert.equal(mapActor.isActive, true, 'owner cleanup preserves an unrelated map placement');
     assert.equal(u32(cleanupOwner.getVar(vars.barrows_kills)), cleanupCredit, 'owner cleanup grants no death credit');

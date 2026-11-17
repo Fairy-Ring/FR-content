@@ -6,13 +6,11 @@
 [proc,barrows_skeleton_attack]
 ~npc_default_attack_outcome(npc_param(barrows_maxhit), 0, false);
 
-// Engineering ownership rule: an owned door actor attacks only its owner.
-// Huntless TYPE defaults and TYPE timer 1 preserve that invariant through every
-// native reset, including resets after this timer in the queue/movement phases.
-// This guard clears a departing owner's interaction before movement; it is not
-// the reset-safety mechanism. The owner is active (barrows_actor_tick found it).
-// After losing its owner the actor is passive until its timer removes it.
-// The owner re-engages through native retaliation, by attacking it again.
+// Huntless defaults never initiate against a stranger. A private actor clears
+// pursuit before movement when its owner leaves reach or starts another fight.
+// WANDER permits a stranger attack only outside the owner's spawn-relative reach.
+// The owner may return before that attack, but must attack for native retaliation.
+// Public actors bypass this owner guard and retain native attacker retaliation.
 [proc,barrows_owned_tunnel_guard]
 if (npc_getmode = wander | npc_getmode = none) return;
 if (npc_type = barrows_ahrim | npc_type = barrows_dharok | npc_type = barrows_guthan | npc_type = barrows_karil | npc_type = barrows_torag | npc_type = barrows_verac) return;

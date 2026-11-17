@@ -405,7 +405,7 @@ async function main() {
     npc.setVar(ids.actorOwner, ownerUid);
     npc.setVar(ids.actorGeneration, ownerUid > 0 ? 1 : 0);
     assert(npc.isActive, `World.addNpc did not activate ${typeName} at L${level}`);
-    const record = { npc, nid: npc.nid, typeName, level, ownerUid };
+    const record = { npc, nid: npc.nid, typeName, level, ownerUid, lifetime:npc.lifecycleTick };
     spawnedActors.push(record);
     return record;
   }
@@ -418,7 +418,12 @@ async function main() {
   }
 
   function assertDeleted(records, label) {
-    for (const { npc, nid, typeName, level } of records) {
+    for (const { npc, nid, typeName, level, lifetime } of records) {
+      if (['barrows_rat', 'barrows_bloodworm', 'barrows_skeleton_unarmed'].includes(typeName)) {
+        assert.deepEqual([World.getNpc(nid), npc.isActive, npc.isActive && npc.getVar(VarNpcType.getId('npc_barrows_public')), npc.lifecycleTick],
+          [npc, true, 1, lifetime], `${label} releases ${typeName} on L${level} publicly for its original lifetime`);
+        continue;
+      }
       assert.notEqual(World.getNpc(nid), npc, `${label} left ${typeName} active on L${level}`);
       assert.equal(npc.isActive, false, `${label} did not deactivate ${typeName} on L${level}`);
     }
@@ -454,6 +459,7 @@ async function main() {
   }
 
   function assertDeleteOrder(observations, records, expected, label) {
+    records = records.filter(row => !['barrows_rat', 'barrows_bloodworm', 'barrows_skeleton_unarmed'].includes(row.typeName));
     assert.equal(observations.length, records.length, `${label} must delete every watched owner actor through World.removeNpc`);
     assert.deepEqual(
       [...observations.map(row => row.nid)].sort((left, right) => left - right),

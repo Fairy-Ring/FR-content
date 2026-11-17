@@ -3,3 +3,10 @@
 type=player_uid
 
 [npc_barrows_generation]
+
+// CANDIDATE operator rule: permanent public access preserves original credit.
+[npc_barrows_public]
+
+// UNKNOWN engineering: native spawn-relative chase boundary for owner return.
+[npc_barrows_origin]
+type=coord

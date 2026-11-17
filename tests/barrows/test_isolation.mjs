@@ -299,8 +299,11 @@ await run(async () => {
     console.log('PASS S21 same tunnel: native personal Open/Search, real full-bag reward, own paid reset and owned cleanup leave every B word, item, actor and presentation untouched');
 
     const preRelog = words(b);
+    const tunnelLifetime = bTunnelActor.lifecycleTick;
     lifecycle(b, 'logout');
-    assert.equal(bTunnelActor.isActive || bLiving.isActive, false, 'S21 B logout removes only its transient actors');
+    assert.equal(bLiving.isActive, false, 'S21 B logout removes its transient brother actor');
+    assert.deepEqual([bTunnelActor.isActive, bTunnelActor.isActive && bTunnelActor.getVar(runtime.VarNpcType.getId('npc_barrows_public')), bTunnelActor.lifecycleTick],
+      [true, 1, tunnelLifetime], 'S21 B logout releases its ordinary door actor publicly for its original lifetime');
     const saved = b.save(), oldB = b;
     unregister(oldB);
     b = PlayerLoading.load(oldB.username, new Packet(saved), null);

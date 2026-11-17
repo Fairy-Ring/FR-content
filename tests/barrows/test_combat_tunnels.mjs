@@ -381,6 +381,114 @@ await run(async () => {
         for (const n of [...World.npcs]) if (n.isActive && n.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(n, -1);
       }
     }
+    function playerNpc(p, npc, scriptName) {
+      const script = Provider.getByName(scriptName);
+      assert(script, `packed ${scriptName}`);
+      const state = Runner.init(script, p, npc);
+      assert.equal(p.runScript(state, true), State.FINISHED, `${scriptName} finishes`);
+      assert.equal(state.activePlayer, p, 'owner lookup preserves the attacking player pointer');
+      return state;
+    }
+    function attackGate(p, npc, expected) {
+      for (const name of ['npc_is_attackable', 'npc_is_attackable_opt']) {
+        assert.equal(playerNpc(p, npc, `[proc,${name}]`).popInt(), expected, `${name}: ${p.username}`);
+      }
+    }
+    function abandonment(name, draws, release) {
+      const owner = tunnelPlayer(2, 'abandon_a', LANDING);
+      const other = tunnelPlayer(3, 'abandon_b', LANDING);
+      const idle = tunnelPlayer(5, 'abandon_c', LANDING);
+      beginRun(owner, release === 'generation wrap' ? 2147483647 : 41);
+      beginRun(other, 42); beginRun(idle, 43);
+      Math.random = () => 0.999;
+      try {
+        const npc = doorActor(owner, name, draws);
+        const generation = npc.getVar(nv('npc_barrows_generation'));
+        const start = { x:npc.startX, z:npc.startZ };
+        const step = ticks => {
+          for (let i = 0; i < ticks && npc.isActive; i++) {
+            const [, , idleHits] = worldTick(npc, [owner, other, idle]);
+            assert.equal(idleHits, 0, 'idle C is never hit');
+            assert.notEqual(npc.target, idle, 'idle C is never targeted');
+            assert.equal(npc.huntMode, -1, 'no public or private turn hunts a stranger');
+            if (npc.isActive) assert.equal(npc.timerInterval, 1, 'native resets retain the poison timer');
+          }
+        };
+        step(8);
+        attackGate(other, npc, 0);
+        assert(other.testMessages.includes('Someone else is fighting that.'), 'fresh native foreign refusal');
+        const beforeRelease = npc.lifecycleTick;
+        if (release === 'walk away' || release === 'door crossing') {
+          place(owner, release === 'walk away' ? AWAY : ACROSS);
+          step(12);
+          assert.equal(npc.targetOp, NpcMode.WANDER, 'native owner guard has abandoned pursuit');
+          assert.equal(npc.getVar(nv('npc_barrows_public')), 0, 'mere flight is still reversible');
+          place(owner, LANDING);
+          attackGate(other, npc, 0);
+          attackGate(owner, npc, 1);
+          step(12);
+          assert.equal(npc.target, null, 'return alone never restarts an attack');
+          ownerAttacks(npc, owner); step(1);
+          assert.equal(npc.target, owner, 'returning owner re-engages through native retaliation');
+          place(owner, release === 'walk away' ? AWAY : ACROSS);
+          step(12);
+        } else if (release === 'exit') {
+          place(owner, { x:3565, z:3313 });
+          playerProc(owner, 'barrows_leave');
+        } else if (release === 'death') {
+          owner.setVar(pv('death'), 1); owner.levels[3] = 0;
+          playerProc(owner, 'barrows_player_death');
+        } else if (release === 'logout') {
+          playerProc(owner, 'barrows_logout'); removePlayer(owner);
+        } else if (release === 'paid reset') {
+          owner.setVar(pv('barrows_state'), 1 | (2 << 3));
+          playerProc(owner, 'barrows_run_reset');
+        } else {
+          playerProc(owner, 'barrows_generation_advance');
+        }
+        assert.equal(npc.isActive, true, `${release} preserves the ordinary actor`);
+        assert(npc.lifecycleTick <= beforeRelease, 'release never restarts the original lifetime');
+        assert.equal(npc.getVar(nv('npc_barrows_owner')), owner.uid, 'original hero ownership is retained');
+        assert.equal(npc.getVar(nv('npc_barrows_generation')), generation, 'original credit generation is retained');
+        step(12);
+        place(other, { x:npc.x + 1, z:npc.z });
+        place(idle, { x:npc.x, z:npc.z + 1 });
+        const idleHp = idle.levels[3];
+        const remaining = npc.lifecycleTick;
+        attackGate(other, npc, 1);
+        assert.equal(npc.getVar(nv('npc_barrows_public')), 1, 'stranger engagement permanently releases ownership');
+        assert.equal(npc.lifecycleTick, remaining, 'attack gate never restarts the original lifetime');
+        playerNpc(other, npc, '[opnpc2,_]');
+        assert([...npc.queue.all()].some(q => q.queueId === Trigger.AI_QUEUE1), 'real player Attack queues ordinary retaliation');
+        step(1);
+        assert.equal(npc.target, other, 'native retaliation selects attacking B');
+        assert.equal(npc.targetOp, NpcMode.OPPLAYER2);
+        step(16);
+        assert(other.getVar(pv('aggressive_npc')) === npc.uid, 'ordinary retaliation establishes B combat');
+        if (owner.isActive) {
+          owner.setVar(pv('death'), 0); owner.levels[3] = 99;
+          place(owner, LANDING);
+          beginRun(owner, generation === 2147483647 ? 1 : generation + 1);
+          playerProc(owner, 'barrows_generation_advance');
+          assert.equal(npc.isActive, true, 'a later run cannot remove a public actor');
+          assert.equal(npc.target, other, 'later-run cleanup cannot interrupt B combat');
+        }
+        attackGate(other, npc, 1);
+        npc.resetDefaults();
+        assert.equal(npc.getVar(nv('npc_barrows_public')), 1, 'native reset cannot reclaim a public actor');
+        attackGate(other, npc, 1);
+        place(other, AWAY);
+        step(npc.lifecycleTick + 1);
+        assert.equal(npc.isActive, false, 'the original native lifetime still removes the public actor');
+        assert.equal(idle.levels[3], idleHp, 'idle C retains all Hitpoints throughout the public lifetime');
+        assert.deepEqual({ x:npc.startX, z:npc.startZ }, start, 'owner reach retains the real native spawn origin');
+      } finally {
+        Math.random = mathRandom;
+        removePlayer(owner); removePlayer(other); removePlayer(idle);
+        for (const npc of [...World.npcs]) if (npc.isActive && npc.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(npc, -1);
+      }
+    }
+
     function lifetime(name, draws, leave) {
       const owner = tunnelPlayer(2, 'owner', LANDING), other = tunnelPlayer(3, 'other', LANDING);
       beginRun(owner, 41); beginRun(other, 42);
@@ -406,10 +514,10 @@ await run(async () => {
           ownerAttacks(npc, owner); step(16, 'owner attacks');
           place(owner, away); step(1100, 'owner gone again');
         } else if (leave === 'logs out') {
-          playerProc(owner, 'barrows_logout'); removePlayer(owner); step(20, 'owner logged out');
+          playerProc(owner, 'barrows_logout'); removePlayer(owner); step(1100, 'owner logged out');
         } else if (leave === 'dies') {
           owner.levels[3] = 0; owner.setVar(pv('death'), 1);
-          playerProc(owner, 'barrows_player_death'); step(20, 'owner died');
+          playerProc(owner, 'barrows_player_death'); step(1100, 'owner died');
         } else {
           step(30, 'engaged');
           step(20, 'owner returns');
@@ -723,6 +831,33 @@ await run(async () => {
       check(`${name} reset-safe ownership: ${kind}`, () => ownershipRegression(kind, name, draws));
     }
     if (ownershipCase) return;
+    for (const name of draws.keys()) check(`${name} public gate matches native spawn-relative chase boundary`, () => {
+      const owner = tunnelPlayer(2, 'reach_a', LANDING), other = tunnelPlayer(3, 'reach_b', LANDING);
+      beginRun(owner, 41); beginRun(other, 42);
+      Math.random = () => 0.999;
+      try {
+        const npc = doorActor(owner, name, draws), reach = NpcType.get(npc.type).maxrange + 1;
+        const origin = { x:npc.startX, z:npc.startZ };
+        for (let x = -reach - 1; x <= reach + 1; x++) for (let z = -reach - 1; z <= reach + 1; z++) {
+          place(owner, { x:origin.x + x, z:origin.z + z });
+          npc.setInteraction(Interaction.SCRIPT, owner, NpcMode.OPPLAYER2);
+          const nativeInRange = npc.targetWithinMaxRange();
+          npc.resetInteraction();
+          npc.targetOp = NpcMode.WANDER;
+          npc.setVar(nv('npc_barrows_public'), 0);
+          assert.equal(playerNpc(other, npc, '[proc,barrows_actor_attackable]').popInt(), Number(!nativeInRange),
+            `${name} stranger gate equals native maxrange+1 including excluded corners at ${x},${z}`);
+        }
+        assert.deepEqual({ x:npc.startX, z:npc.startZ }, origin, 'native boundary fixture does not move the spawn');
+      } finally {
+        Math.random = mathRandom;
+        removePlayer(owner); removePlayer(other);
+        for (const npc of [...World.npcs]) if (npc.isActive && npc.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(npc, -1);
+      }
+    });
+    for (const name of draws.keys()) for (const release of ['walk away', 'door crossing', 'exit', 'death', 'logout', 'generation advance', 'generation wrap', 'paid reset']) {
+      check(`${name} abandoned door: ${release}, native B retaliation, idle C and original lifetime`, () => abandonment(name, draws, release));
+    }
     for (const name of draws.keys()) check(`${name} per-event whole-life hunt/timer invariants`, () => ownedEvents(name, draws));
     for (const name of draws.keys()) check(`${name} owned timer passivates before following an owner fought by another NPC`, () => {
       const owner = tunnelPlayer(2, 'single_way_owner', LANDING);
@@ -764,7 +899,7 @@ await run(async () => {
           }
           const attacks = trace.filter(entry => entry.phase === 'owner attacks');
           if (attacks.length) assert(attacks.every(entry => entry.target === 'owner') && attacks.some(entry => entry.ownerHits > 0), 'the owner re-engages it by attacking: native retaliation');
-          assert.equal(trace.at(-1).active, false, 'the actor is removed by its owned lifetime or the owner hooks');
+          assert.equal(trace.at(-1).active, false, 'the original native lifetime removes the actor, including after owner hooks');
         });
       }
       check(`${name} static placement acquires either player with its static timer`, () => {
@@ -823,7 +958,7 @@ await run(async () => {
     });
     const poison = fs.readFileSync(path.join(contentRoot, 'tests/barrows/test_poison.mjs'), 'utf8');
     assert(poison.includes('[35, 31]'), 'S04 crypt-rat fixture remains exactly [35,31]');
-    console.log(`PASS BC-02 ${count} native tunnel cases; unchanged static/removal/credit/D4/poison suites remain registered`);
+    console.log(`PASS BC-02 ${count} native tunnel cases; unchanged static/brother/credit/D4/poison suites remain registered`);
   } finally {
     if (zone) zone.leave(World.players[1]);
     rt.dispose();

@@ -132,8 +132,8 @@ async function main() {
     assert.equal(phase(player.getVar(ids.state)), 0, `${stairName} exit leaves paid phase`);
   }
 
-  // Paid exit: every owned actor is removed through World, before durable state reset;
-  // other owners and unowned map placements stay active.
+  // Paid exit removes owned brothers and releases ordinary door actors before reset.
+  // Other owners and unowned map placements stay active.
   const paid = makePlayer('paid_exit');
   const paidSeed = { client: 0xa5a5a5a5, credit: 0xfedcba98, state: 0x5a5a8012, generation: 91, countdowns: 0x87654321 };
   const paidPreviousCorner = (paidSeed.state >>> 5) & 3;
@@ -143,6 +143,7 @@ async function main() {
     addNpc('barrows_ahrim', 0, paid.uid, 3548, 9695),
     addNpc('barrows_rat', 3, paid.uid, 3550, 9698)
   ];
+  const ordinaryLifetime = owned[1].npc.lifecycleTick;
   const other = addNpc('barrows_dharok', 3, paid.uid + 1, 3554, 9698);
   const unowned = addNpc('barrows_spider', 0, null, 3556, 9698);
   paid.openMainModal(activityModal);
@@ -157,9 +158,11 @@ async function main() {
     const random = measureRandom(() => procVoid(paid, 'barrows_leave'));
     assert.equal(random.calls, 1, 'paid leave redraws one idle layout rank');
   } finally { World.removeNpc = removeNpc; }
-  assert.equal(deletionRows.length, owned.length, 'leave removes each owned actor using World.removeNpc');
+  assert.equal(deletionRows.length, owned.length - 1, 'leave removes the owned brother, not the ordinary door actor');
   for (const row of deletionRows) assert.deepEqual(row, { ...paidSeed, generation: paidSeed.generation + 1 }, 'paid reset advances generation before removing actors and clearing durable fields');
-  for (const row of owned) assert.equal(row.npc.isActive, false, 'owned actor deleted');
+  assert.equal(owned[0].npc.isActive, false, 'owned actor deleted');
+  assert.deepEqual([owned[1].npc.isActive, owned[1].npc.isActive && owned[1].npc.getVar(runtime.VarNpcType.getId('npc_barrows_public')), owned[1].npc.lifecycleTick],
+    [true, 1, ordinaryLifetime], 'paid leave releases the ordinary door actor publicly for its original lifetime');
   for (const row of [other, unowned]) assert.equal(row.npc.isActive, true, 'foreign or unowned actor retained');
   assert.equal(phase(paid.getVar(ids.state)), 0, 'paid exit resets phase to idle');
   assert.equal(paid.getVar(ids.credit) >>> 0, 0, 'paid exit clears credit');
@@ -176,17 +179,19 @@ async function main() {
   assert.equal(paid.overlay, -1, 'paid leave closes Barrows HUD overlay');
   removeFixtures([other, unowned]);
 
-  // Leave in phase 1 preserves durable fields, removes its actors and consumes no RNG.
+  // Leave in phase 1 preserves durable fields, releases ordinary actors and consumes no RNG.
   const preloot = makePlayer('preloot_exit');
   const prelootSeed = { client: 0x5a5aa5a5, credit: 0xdeadbeef, state: 0xcafe800a, generation: 123, countdowns: 0x80004321 };
   set(preloot, prelootSeed);
   const prelootActor = addNpc('barrows_bloodworm', 0, preloot.uid, 3550, 9697);
+  const prelootLifetime = prelootActor.npc.lifecycleTick;
   preloot.openMainModal(activityModal);
   preloot.openMainOverlay(activityModal);
   const prelootRandom = measureRandom(() => procVoid(preloot, 'barrows_leave'));
   assert.equal(prelootRandom.calls, 0, 'phase-1 leave must not redraw random state');
   assert.deepEqual(snapshot(preloot), { ...prelootSeed, state: u32(prelootSeed.state & ~0x8000) }, 'phase-1 leave preserves durable fields and clears only the challenge');
-  assert.equal(prelootActor.npc.isActive, false, 'phase-1 leave removes its live actor without credit');
+  assert.deepEqual([prelootActor.npc.isActive, prelootActor.npc.isActive && prelootActor.npc.getVar(runtime.VarNpcType.getId('npc_barrows_public')), prelootActor.npc.lifecycleTick],
+    [true, 1, prelootLifetime], 'phase-1 leave releases its ordinary door actor publicly for its original lifetime without credit');
   assert.equal(preloot.modalMain, -1, 'leave closes active modal presentation');
   assert.equal(preloot.pendingModalClose, true, 'disconnected preloot fixture retains its real pending close');
   assert.equal(preloot.overlay, -1, 'phase-1 leave closes Barrows HUD overlay');
@@ -335,6 +340,7 @@ async function main() {
   };
   set(logoutNoRun, logoutNoRunSeed);
   const logoutNoRunActor = addNpc('barrows_bloodworm', 3, logoutNoRun.uid, 3550, 9697);
+  const logoutNoRunLifetime = logoutNoRunActor.npc.lifecycleTick;
   const logoutNoRunForeignActor = addNpc('barrows_ahrim', 3, logoutNoRun.uid + 1_000_000, 3553, 9698);
   logoutNoRun.openMainModal(activityModal);
   logoutNoRun.openMainOverlay(killCountOverlay);
@@ -342,7 +348,8 @@ async function main() {
   runLifecycleTrigger(logoutNoRun, 'logout');
   assert.deepEqual(snapshot(logoutNoRun), { ...logoutNoRunSeed, state: u32(logoutNoRunSeed.state & ~0x8000) }, '[logout,_] does not invent or reset a run');
   assert.equal(phase(logoutNoRun.getVar(ids.state)), 0, '[logout,_] keeps a no-run player idle');
-  assert.equal(logoutNoRunActor.npc.isActive, false, '[logout,_] removes only the no-run player’s own actor');
+  assert.deepEqual([logoutNoRunActor.npc.isActive, logoutNoRunActor.npc.isActive && logoutNoRunActor.npc.getVar(runtime.VarNpcType.getId('npc_barrows_public')), logoutNoRunActor.npc.lifecycleTick],
+    [true, 1, logoutNoRunLifetime], '[logout,_] releases only the no-run player’s ordinary door actor publicly for its original lifetime');
   assert.equal(logoutNoRunForeignActor.npc.isActive, true, '[logout,_] retains a foreign actor without a run');
   assert.equal(logoutNoRun.modalMain, -1, '[logout,_] closes no-run modal presentation');
   assert.equal(logoutNoRun.pendingModalClose, true, '[logout,_] records no-run modal close');
