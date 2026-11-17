@@ -347,6 +347,14 @@ await run(async () => {
         };
         step(8, 'owner present');
         if (kind === 'edge-return-attack') {
+          assert.equal(npc.getVar(nv('npc_barrows_released')), 0, 'the real owner shot starts in private combat');
+          const initialWorn = owner.getInventory(rt.id(rt.configs.InvType, 'worn'));
+          initialWorn.set(3, { id:rt.id(rt.configs.ObjType, 'longbow'), count:1 });
+          initialWorn.set(13, { id:rt.id(rt.configs.ObjType, 'bronze_arrow'), count:2 });
+          owner.setVar(pv('damagetype'), 3);
+          playerNpc(owner, npc, '[apnpc2,_]');
+          assert.equal(initialWorn.get(13).count, 1, 'the private owner real Attack consumes an arrow');
+          assert([...npc.queue.all()].some(q => q.queueId === Trigger.AI_QUEUE1), 'the private owner real Attack queues native retaliation');
           for (let i = 0; i < 12 && owner.x < 3557; i++) { place(owner, { x: owner.x + 1, z: owner.z }); step(1, 'owner flees'); }
           const sides = [[1,0],[1,1],[1,-1],[0,1],[0,-1]].map(([dx,dz]) => ({ x:npc.x+dx, z:npc.z+dz }))
             .filter(t => t.x <= 3557 && t.x >= 3546 && t.z >= 9707 && t.z <= 9716).sort((a,b) => cheb(b,start)-cheb(a,start));
@@ -872,6 +880,10 @@ await run(async () => {
       } finally { rt.dispose(); }
     }
     const usePack = dir => { for (const config of Object.values(rt.configs)) config.load(dir); DbTableIndex.init(); rt.select(dir); };
+    const draws = doorDraws();
+    for (const name of draws.keys()) for (const kind of ownershipCase ? [ownershipCase] : ['edge-return-attack', 'deferred-logout']) {
+      check(`${name} reset-safe ownership: ${kind}`, () => ownershipRegression(kind, name, draws));
+    }
     for (const name of Object.keys(TYPES)) check(`${name} first acquisition follows native startup and respawn phase order`, () => {
       const timing = staticTimeline(name);
       assert.equal(timing.spawn, 1, `${name} acquires on the first cycle after login`);
@@ -918,10 +930,6 @@ await run(async () => {
     }
     for (const name of Object.keys(TYPES)) check(`${name} each immediate ownership guard predicate`, () => guardCases(name));
     rt.dispose();
-    const draws = doorDraws();
-    for (const name of draws.keys()) for (const kind of ownershipCase ? [ownershipCase] : ['edge-return-attack', 'deferred-logout']) {
-      check(`${name} reset-safe ownership: ${kind}`, () => ownershipRegression(kind, name, draws));
-    }
     if (ownershipCase) return;
     for (const name of draws.keys()) for (const release of ['walk away', 'door crossing', 'exit', 'death', 'logout', 'generation advance', 'generation wrap', 'paid reset']) {
       check(`${name} abandoned door: ${release}, native B retaliation, idle C and original lifetime`, () => abandonment(name, draws, release));
