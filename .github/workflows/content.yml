@@ -216,6 +216,7 @@ jobs:
           run_test tests/swamp-caves/test_sc07_entrance.mjs node --import tsx ../content/tests/swamp-caves/test_sc07_entrance.mjs
           run_test tests/swamp-caves/test_sc10_tears_traversal.mjs node --import tsx ../content/tests/swamp-caves/test_sc10_tears_traversal.mjs
           run_test tests/music/test_m01_swamp_caves.mjs node --import tsx ../content/tests/music/test_m01_swamp_caves.mjs
+          run_test tests/music/test_mg_gnomeball.mjs node --import tsx ../content/tests/music/test_mg_gnomeball.mjs
           run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
