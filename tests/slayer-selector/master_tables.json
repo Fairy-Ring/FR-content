@@ -11,6 +11,7 @@
         ["scorpions", "scorpion", 7, 15, 50],
         ["zombies", "zombie", 7, 15, 50],
         ["bats", "bat", 7, 15, 50],
+        ["bears", "bear", 7, 10, 50],
         ["ghosts", "ghost", 7, 15, 50],
         ["cavecrawlers", "cavecrawler", 8, 15, 50],
         ["icefiends", "icefiend", 8, 15, 20],
