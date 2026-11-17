@@ -2,35 +2,22 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
-const content = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const engine = process.env.HARNESS_ENGINE_DIR ?? path.resolve(content, '../engine');
-const pack = path.join(engine, 'data/pack');
+import { pathToFileURL } from 'node:url';
+import { content, engine, World, Player, Npc, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType, EntityLifeCycle, types, map, nativeLocRows, nativeNpcRows, floorTiles, locFor } from '../regicide-travel/runtime.mjs';
 const load = async file => (await import(pathToFileURL(path.join(engine, 'src', file)).href)).default;
-const World = await load('engine/World.ts');
-const Player = await load('engine/entity/Player.ts');
-const Npc = await load('engine/entity/Npc.ts');
-const ScriptProvider = await load('engine/script/ScriptProvider.ts');
-const ScriptRunner = await load('engine/script/ScriptRunner.ts');
-const ScriptState = await load('engine/script/ScriptState.ts');
 const Environment = await load('util/Environment.ts');
 const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
-const { EntityLifeCycle } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/EntityLifeCycle.ts')).href);
-const ServerTriggerType = await load('engine/script/ServerTriggerType.ts');
 const { NpcStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NpcStat.ts')).href);
 const ScriptPointer = await load('engine/script/ScriptPointer.ts');
 const JavaRandom = await load('util/JavaRandom.ts');
-const map = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
 const { CollisionType } = await import(pathToFileURL(path.join(engine, 'src/engine/routefinder/index.ts')).href);
-const types = {};
-for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'NpcType', 'LocType', 'SeqType', 'SpotanimType', 'InvType', 'ObjType', 'FontType', 'Component', 'DbRowType', 'DbTableType', 'EnumType', 'ParamType', 'CategoryType', 'StructType', 'MesanimType']) {
-    types[name] = await load(`cache/config/${name}.ts`);
-    types[name].load(pack);
-}
-(await load('cache/config/DbTableIndex.ts')).init();
-assert(ScriptProvider.load(pack) > 0, 'full compiled pack required');
-World.currentTick = 100;
-World.gameMap.init();
+const OpLoc = await load('network/game/client/model/OpLoc.ts');
+const OpLocHandler = await load('network/game/client/handler/OpLocHandler.ts');
+const OpNpc = await load('network/game/client/model/OpNpc.ts');
+const OpNpcHandler = await load('network/game/client/handler/OpNpcHandler.ts');
+const ClientCheat = await load('network/game/client/model/ClientCheat.ts');
+const ClientCheatHandler = await load('network/game/client/handler/ClientCheatHandler.ts');
+const rsbuf = await import(pathToFileURL(path.join(engine, 'src/network/rsbuf/index.ts')).href);
 function id(kind, name) {
     const row = fs.readFileSync(path.join(content, 'pack', `${kind}.pack`), 'utf8').split('\n').find(line => line.slice(line.indexOf('=') + 1) === name);
     assert(row, `missing ${kind} ${name}`);
@@ -119,6 +106,63 @@ function approachDoor(p, loc, expected) {
     assert.deepEqual(tile, expected, `${type.debugname} actual engine approach tile`);
     walk(p, tile);
     assert(map.reachedLoc(p.level, p.x, p.z, loc.x, loc.z, width, length, 1, loc.angle, loc.shape, type.forceapproach));
+}
+// Take channel handlers from the same visible-form dispatch as a real click.
+function nativeChannelLoc(name) {
+    const rows = nativeLocRows(name);
+    assert.equal(rows.length, 1, `${name} has one original placement`);
+    return locFor(rows[0]);
+}
+function registerChannelPlayer(p) {
+    p.isActive = true;
+    World.players[p.slot] = p;
+    rsbuf.addPlayer(p.slot);
+}
+function approachChannel(p, loc) {
+    const candidates = [];
+    for (let x = loc.x - 4; x <= loc.x + 4; x++) for (let z = loc.z - 4; z <= loc.z + 4; z++) {
+        if (!floorTiles.has(`${loc.level},${x},${z}`) || map.isMapBlocked(x, z, loc.level)) continue;
+        p.level = loc.level; p.x = x; p.z = z;
+        if (p.inOperableDistance(loc)) candidates.push([x, z]);
+    }
+    candidates.sort((a, b) => Math.abs(a[0] - loc.x) + Math.abs(a[1] - loc.z) - Math.abs(b[0] - loc.x) - Math.abs(b[1] - loc.z));
+    assert(candidates.length, 'original channel has an operable floor approach');
+    [p.x, p.z] = candidates[0];
+    p.buildArea.rebuild();
+}
+function showChannelNpc(p, actor) {
+    const appearance = p.generateAppearance();
+    rsbuf.computePlayer(p.x, p.level, p.z, p.originX, p.originZ, p.slot, p.tele, p.jump, p.runDir, p.walkDir, p.visibility, p.isActive, p.masks, appearance, p.lastAppearance, p.faceEntity, p.faceSquareX, p.faceSquareZ, p.faceAngleX, p.faceAngleZ, p.hitmarkDamage, p.hitmarkType, p.hitmark2Damage, p.hitmark2Type, p.levels[3], p.baseLevels[3], p.animId, p.animDelay, p.sayMessage, p.chatMessage, p.chatColour ?? -1, p.chatEffect ?? -1, p.chatRights ?? 0, p.spotanimId, p.spotanimHeight, p.spotanimTime);
+    rsbuf.computeNpc(actor.x, actor.level, actor.z, actor.nid, actor.type, actor.tele, actor.jump, actor.runDir, actor.walkDir, actor.isActive, actor.masks, actor.faceEntity, actor.faceSquareX, actor.faceSquareZ, actor.faceAngleX, actor.faceAngleZ, actor.hitmarkDamage, actor.hitmarkType, actor.hitmark2Damage, actor.hitmark2Type, actor.levels[3], actor.baseLevels[3], actor.animId, actor.animDelay, actor.sayMessage, actor.spotanimId, actor.spotanimHeight, actor.spotanimTime);
+    rsbuf.npcInfo(0, p.slot, 0, 0, true);
+    assert(rsbuf.hasNpc(p.slot, actor.nid), 'native ranging target is client-visible');
+}
+function clickChannel(p, target, expected) {
+    if (target instanceof Npc) {
+        showChannelNpc(p, target);
+        assert(new OpNpcHandler().handle(new OpNpc(2, target.nid), p), 'production Shoot click accepted');
+    } else {
+        assert(new OpLocHandler().handle(new OpLoc(1, target.x, target.z, target.type), p), 'production Clear click accepted');
+    }
+    assert.equal(p.target, target);
+    assert(p.validateTarget(), 'original channel target is valid');
+    const selected = p.inOperableDistance(target) ? p.getOpTrigger() : p.getApTrigger();
+    assert.equal(selected?.name, expected, 'engine dispatch selects the visible form handler');
+    const executions = [];
+    const execute = p.executeScript;
+    p.executeScript = function(state, ...args) {
+        executions.push({ name: state.script.name, state });
+        return execute.call(this, state, ...args);
+    };
+    try {
+        assert(p.tryInteract(true), 'production channel interaction reaches its handler');
+    } finally {
+        p.executeScript = execute;
+    }
+    assert.equal(executions.length, 1);
+    assert.equal(executions[0].name, expected, 'selected handler actually ran');
+    assert.equal(executions[0].state.execution, ScriptState.FINISHED, 'selected handler finishes');
+    p.clearInteraction();
 }
 const p = player();
 run('[opnpc1,elid_mayor]', p, npc('elid_mayor'), [2]);
@@ -288,45 +332,80 @@ for (const { colour, style, door, room, hall } of golems) {
     World.players[q.slot] = null; q.unlink();
 }
 const channels = player(20);
-run('[oploc1,elid_water_channel_blocked_rocks]', channels);
+registerChannelPlayer(channels);
+const miningLoc = nativeChannelLoc('elid_waterchannel_mining_multiloc');
+const thievingLoc = nativeChannelLoc('elid_waterchannel_thieving_multiloc');
+approachChannel(channels, miningLoc);
+const mine = () => clickChannel(channels, miningLoc, '[oploc1,elid_water_channel_blocked_rocks]');
+mine();
 assert.equal(channels.getVarBit(bit('elid_miningchannel')), 0, 'low level does not clear rubble');
 channels.baseLevels[PlayerStat.MINING] = channels.levels[PlayerStat.MINING] = 37;
-run('[oploc1,elid_water_channel_blocked_rocks]', channels);
+mine();
 assert.equal(channels.getVarBit(bit('elid_miningchannel')), 0, 'rubble requires a usable pickaxe');
 give(channels, 'bronze_pickaxe');
 channels.baseLevels[PlayerStat.MINING] = channels.levels[PlayerStat.MINING] = 36;
 let messageCount = channels.messages.length;
-run('[oploc1,elid_water_channel_blocked_rocks]', channels);
+mine();
 assert.equal(channels.getVarBit(bit('elid_miningchannel')), 0, 'Mining 36 is refused even with a usable pickaxe');
 assert.equal(channels.messages.length, messageCount, 'no invented low-Mining refusal line');
 channels.baseLevels[PlayerStat.MINING] = channels.levels[PlayerStat.MINING] = 37;
-run('[oploc1,elid_water_channel_blocked_rocks]', channels);
+mine();
 assert.equal(channels.getVarBit(bit('elid_miningchannel')), 1);
+approachChannel(channels, thievingLoc);
+const thieve = () => clickChannel(channels, thievingLoc, '[oploc1,elid_water_channel_spiketrap]');
 channels.baseLevels[PlayerStat.THIEVING] = channels.levels[PlayerStat.THIEVING] = 36;
 messageCount = channels.messages.length;
-run('[oploc1,elid_water_channel_spiketrap]', channels);
+thieve();
 assert.equal(channels.getVarBit(bit('elid_thievingchannel')), 0, 'Thieving 36 is refused');
 assert.equal(channels.messages.length, messageCount, 'no invented low-Thieving refusal line');
 channels.baseLevels[PlayerStat.THIEVING] = channels.levels[PlayerStat.THIEVING] = 37;
-run('[oploc1,elid_water_channel_spiketrap]', channels);
+thieve();
 assert.equal(channels.getVarBit(bit('elid_thievingchannel')), 1);
+const targetRows = nativeNpcRows('elid_ranging_target_multinpc');
+assert.equal(targetRows.length, 1);
+const targetRow = targetRows[0];
+const rangingTarget = [...World.npcs].find(n => n.type === targetRow.id && n.level === targetRow.level && n.x === targetRow.x && n.z === targetRow.z);
+assert(rangingTarget, 'original packed ranging target is present');
+[channels.x, channels.z] = golems.find(golem => golem.colour === 'black').room;
+channels.buildArea.rebuild();
+const shoot = () => clickChannel(channels, rangingTarget, '[apnpc2,elid_ranging_target]');
 channels.baseLevels[PlayerStat.RANGED] = channels.levels[PlayerStat.RANGED] = 37;
-run('[opnpc2,elid_ranging_target]', channels, npc('elid_ranging_target'));
+shoot();
 assert.equal(channels.getVarBit(bit('elid_rangingchannel')), 0, 'target needs equipment');
 const worn = types.InvType.getId('worn');
 channels.getInventory(worn).set(3, { id: item('shortbow'), count: 1 });
 channels.getInventory(worn).set(13, { id: item('bronze_arrow'), count: 2 });
 channels.baseLevels[PlayerStat.RANGED] = channels.levels[PlayerStat.RANGED] = 36;
 messageCount = channels.messages.length;
-run('[opnpc2,elid_ranging_target]', channels, npc('elid_ranging_target'));
+shoot();
 assert.equal(channels.getVarBit(bit('elid_rangingchannel')), 0, 'Ranged 36 is refused with bow and ammunition');
 assert.equal(channels.invTotal(worn, item('bronze_arrow')), 2, 'low level consumes no ammunition');
 assert.equal(channels.messages.length, messageCount, 'no invented low-Ranged refusal line');
 channels.baseLevels[PlayerStat.RANGED] = channels.levels[PlayerStat.RANGED] = 37;
-run('[opnpc2,elid_ranging_target]', channels, npc('elid_ranging_target'));
+shoot();
 assert.equal(channels.getVarBit(bit('elid_rangingchannel')), 1);
 assert.equal(channels.invTotal(worn, item('bronze_arrow')), 1, 'target consumes one arrow');
 assert.equal(stage(channels), 20, 'channel bits are independent of quest stage');
+const cancelled = player(20);
+registerChannelPlayer(cancelled);
+cancelled.staffModLevel = 3;
+cancelled.baseLevels[PlayerStat.MINING] = cancelled.levels[PlayerStat.MINING] = 37;
+give(cancelled, 'bronze_pickaxe');
+[cancelled.x, cancelled.z] = golems.find(golem => golem.colour === 'grey').room;
+cancelled.buildArea.rebuild();
+const base = types.VarPlayerType.get(types.VarBitType.get(bit('elid_miningchannel')).basevar);
+assert.equal(base.protect, true, 'channel selector has a protected base');
+assert(new OpLocHandler().handle(new OpLoc(1, miningLoc.x, miningLoc.z, miningLoc.type), cancelled));
+assert.equal(cancelled.getOpTrigger()?.name, '[oploc1,elid_water_channel_blocked_rocks]', 'pending approach already has the correct visible-form handler');
+assert.equal(cancelled.inOperableDistance(miningLoc), false, 'Clear starts before the normal walk reaches the channel');
+assert.equal(cancelled.target, miningLoc);
+new ClientCheatHandler().handle(new ClientCheat('getvar elid_miningchannel'), cancelled);
+assert.equal(cancelled.target, null, 'protected getvar cancels the pending Clear approach');
+assert.equal(cancelled.getVarBit(bit('elid_miningchannel')), 0, 'cancelled approach never writes the channel bit');
+assert(cancelled.messages.some(message => message === 'get elid_miningchannel: 0'), 'cancelling observer still returns a fresh zero reply');
+World.players[cancelled.slot] = null;
+cancelled.unlink();
+console.log('PASS native visible-form Clear/Shoot dispatch at levels 36/37; protected getvar cancels a pending channel approach');
 const lake = World.getLoc(3354, 9558, 0, id('loc', 'elid_underground_lake_door'));
 assert(lake);
 for (const missing of ['elid_miningchannel', 'elid_thievingchannel', 'elid_rangingchannel']) {
