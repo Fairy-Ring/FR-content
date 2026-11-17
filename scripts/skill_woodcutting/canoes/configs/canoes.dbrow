@@ -1,0 +1,29 @@
+// CANDIDATE: canoe hull requirements, shaping XP and station reach; see canoes research.
+// XP is stored in tenths, as required by stat_advance.
+[canoe_log]
+table=canoe_hulls
+data=hull,1
+data=level,12
+data=xp,300
+data=reach,1
+
+[canoe_dugout]
+table=canoe_hulls
+data=hull,2
+data=level,27
+data=xp,600
+data=reach,2
+
+[canoe_stable_dugout]
+table=canoe_hulls
+data=hull,3
+data=level,42
+data=xp,900
+data=reach,3
+
+[canoe_waka]
+table=canoe_hulls
+data=hull,4
+data=level,57
+data=xp,1500
+data=reach,4

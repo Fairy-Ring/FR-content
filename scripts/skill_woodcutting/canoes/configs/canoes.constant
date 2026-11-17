@@ -1,0 +1,6 @@
+// UNKNOWN engineering durations in server ticks; no period timing source retained.
+^canoe_chop_delay=3
+^canoe_fall_delay=1
+^canoe_shape_delay=3
+^canoe_float_delay=3
+^canoe_travel_delay=4

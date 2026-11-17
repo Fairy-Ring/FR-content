@@ -1,0 +1,180 @@
+// Native 377 locs/varbits/interfaces remain in _unpack and interfaces.
+// Station states are defined by the cache multilocs: tree=0, hull=1..4,
+// floated hull=5..8, falling=9, fallen=10. Only this player's tree changes.
+[oploc1,canoeing_canoestation_lumbridge] @canoe_station(1);
+[oploc1,canoeing_canoestation_championsguild] @canoe_station(2);
+[oploc1,canoeing_canoestation_barbarianvillage] @canoe_station(3);
+[oploc1,canoeing_canoestation_edgeville] @canoe_station(4);
+
+[label,canoe_station](int $station)
+%canoe_startfrom = $station;
+def_int $state = ~canoe_state($station);
+if ($state = 0) {
+    if (~canoe_level(1) > stat(woodcutting)) {
+        // UNKNOWN functional wording; no period refusal transcript retained.
+        mes("You need a Woodcutting level of 12 to make a canoe.");
+        return;
+    }
+    def_obj $axe = ~woodcutting_axe_checker(true);
+    if ($axe = null) { return; }
+    anim(struct_param(oc_param($axe, woodcutting_struct), skill_anim), 0);
+    p_delay(^canoe_chop_delay);
+    anim(null, 0);
+    ~canoe_set_state($station, 9);
+    p_delay(^canoe_fall_delay);
+    ~canoe_set_state($station, 10);
+    return;
+}
+if ($state = 10) {
+    if_openmain(canoeing);
+    if_sethide(canoeing:com_6, false);
+    if_sethide(canoeing:com_3, false);
+    if_sethide(canoeing:com_14, false);
+    if_sethide(canoeing:com_33, true);
+    if_sethide(canoeing:com_36, true);
+    if_sethide(canoeing:com_30, true);
+    return;
+}
+if ($state >= 1 & $state <= 4) {
+    anim(canoeing_pushing_into_water, 0);
+    p_delay(^canoe_float_delay);
+    anim(null, 0);
+    ~canoe_set_state($station, calc($state + 4));
+    return;
+}
+if ($state >= 5 & $state <= 8) {
+    %canoe_type = calc($state - 4);
+    ~canoe_open_map($station, %canoe_type);
+}
+
+[if_button,canoeing:com_8] @canoe_shape(1);
+[if_button,canoeing:com_25] @canoe_shape(1);
+[if_button,canoeing:com_6] @canoe_shape(2);
+[if_button,canoeing:com_26] @canoe_shape(2);
+[if_button,canoeing:com_3] @canoe_shape(3);
+[if_button,canoeing:com_27] @canoe_shape(3);
+[if_button,canoeing:com_14] @canoe_shape(4);
+[if_button,canoeing:com_28] @canoe_shape(4);
+
+[label,canoe_shape](int $hull)
+def_int $station = %canoe_startfrom;
+if (~canoe_state($station) ! 10) { return; }
+def_int $level = ~canoe_level($hull);
+if (stat(woodcutting) < $level) {
+    // UNKNOWN functional wording; the original interface supplies the hull names.
+    mes("You need a Woodcutting level of <tostring($level)> to make this canoe.");
+    return;
+}
+def_obj $axe = ~woodcutting_axe_checker(true);
+if ($axe = null) { return; }
+if_close;
+anim(~canoe_carve_anim($axe), 0);
+p_delay(^canoe_shape_delay);
+anim(null, 0);
+~canoe_set_state($station, $hull);
+db_find(canoe_hulls:hull, $hull);
+def_dbrow $row = db_findnext;
+stat_advance(woodcutting, db_getfield($row, canoe_hulls:xp, 0));
+
+[proc,canoe_level](int $hull)(int)
+db_find(canoe_hulls:hull, $hull);
+def_dbrow $row = db_findnext;
+return(db_getfield($row, canoe_hulls:level, 0));
+
+[proc,canoe_can_travel](int $hull, int $from, int $to)(boolean)
+if ($from < 1 | $from > 4 | $to < 1 | $to > 5 | $from = $to) { return(false); }
+// Wilderness has no return station; only a waka may enter it.
+if ($to = 5) {
+    if ($hull = 4) { return(true); }
+    return(false);
+}
+db_find(canoe_hulls:hull, $hull);
+def_dbrow $row = db_findnext;
+if ($row = null) { return(false); }
+if (abs(calc($from - $to)) <= db_getfield($row, canoe_hulls:reach, 0)) { return(true); }
+return(false);
+
+[proc,canoe_open_map](int $station, int $hull)
+if_openmain(canoe_map);
+if_sethide(canoe_map:com_13, true);
+if_sethide(canoe_map:com_15, true);
+if_sethide(canoe_map:com_17, true);
+if_sethide(canoe_map:com_40, true);
+if_sethide(canoe_map:com_33, true);
+if (~canoe_can_travel($hull, $station, 1) = true) { if_sethide(canoe_map:com_13, false); }
+if (~canoe_can_travel($hull, $station, 2) = true) { if_sethide(canoe_map:com_15, false); }
+if (~canoe_can_travel($hull, $station, 3) = true) { if_sethide(canoe_map:com_17, false); }
+if (~canoe_can_travel($hull, $station, 4) = true) { if_sethide(canoe_map:com_40, false); }
+if (~canoe_can_travel($hull, $station, 5) = true) { if_sethide(canoe_map:com_33, false); }
+if_sethide(canoe_map:com_52, true);
+if_sethide(canoe_map:com_49, true);
+if_sethide(canoe_map:com_46, true);
+if_sethide(canoe_map:com_38, true);
+if ($station = 1) { if_sethide(canoe_map:com_52, false); }
+if ($station = 2) { if_sethide(canoe_map:com_49, false); }
+if ($station = 3) { if_sethide(canoe_map:com_46, false); }
+if ($station = 4) { if_sethide(canoe_map:com_38, false); }
+
+[if_button,canoe_map:com_13] @canoe_travel(1);
+[if_button,canoe_map:com_34] @canoe_travel(1);
+[if_button,canoe_map:com_15] @canoe_travel(2);
+[if_button,canoe_map:com_35] @canoe_travel(2);
+[if_button,canoe_map:com_17] @canoe_travel(3);
+[if_button,canoe_map:com_36] @canoe_travel(3);
+[if_button,canoe_map:com_40] @canoe_travel(4);
+[if_button,canoe_map:com_41] @canoe_travel(4);
+[if_button,canoe_map:com_37] @canoe_travel(5);
+
+[label,canoe_travel](int $destination)
+def_int $station = %canoe_startfrom;
+def_int $hull = calc(~canoe_state($station) - 4);
+if (~canoe_can_travel($hull, $station, $destination) = false) { return; }
+if_close;
+// CANDIDATE: canoes are single-use. Consume before suspension, not after arrival.
+~canoe_set_state($station, 0);
+anim(canoeing_getting_in, 0);
+p_delay(^canoe_travel_delay);
+anim(null, 0);
+p_telejump(~canoe_arrival($destination));
+%canoe_type = 0;
+
+[proc,canoe_state](int $station)(int)
+switch_int($station) {
+    case 1 : return(%canoestation_state_lumbridge);
+    case 2 : return(%canoestation_state_championsguild);
+    case 3 : return(%canoestation_state_barbarianvillage);
+    case 4 : return(%canoestation_state_edgeville);
+}
+return(-1);
+
+[proc,canoe_set_state](int $station, int $state)
+switch_int($station) {
+    case 1 : %canoestation_state_lumbridge = $state;
+    case 2 : %canoestation_state_championsguild = $state;
+    case 3 : %canoestation_state_barbarianvillage = $state;
+    case 4 : %canoestation_state_edgeville = $state;
+}
+
+[proc,canoe_arrival](int $station)(coord)
+// UNKNOWN engineering landing tiles beside the original cache stations.
+switch_int($station) {
+    case 1 : return(0_50_50_43_35);
+    case 2 : return(0_50_52_2_16);
+    case 3 : return(0_48_53_40_17);
+    case 4 : return(0_48_54_60_51);
+    case 5 : return(0_49_59_12_18);
+}
+return(null);
+
+[proc,canoe_carve_anim](obj $axe)(seq)
+// VERIFIED 377 sequence names; axe-to-animation pairing follows those names.
+switch_obj($axe) {
+    case dragon_axe : return(human_canoeing_carve_dragon_axe);
+    case rune_axe : return(human_canoeing_carve_rune_axe);
+    case adamant_axe : return(human_canoeing_carve_adamant_axe);
+    case mithril_axe : return(human_canoeing_carve_mithril_axe);
+    case black_axe : return(human_canoeing_carve_black_axe);
+    case steel_axe : return(human_canoeing_carve_steel_axe);
+    case iron_axe : return(human_canoeing_carve_iron_axe);
+}
+return(human_canoeing_carve_bronze_axe);
