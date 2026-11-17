@@ -69663,24 +69663,6 @@ recol3d=26623
 hillskew=yes
 active=no
 
-[wyvern_snow_cave_exit]
-name=Icy Cavern
-desc=Emergency exit.
-model=wyvern_snow_cave_exit
-width=3
-length=2
-sharelight=yes
-op1=Enter
-
-[wyvern_snow_cave_entrance]
-name=Icy Cavern
-desc=Enter if you dare...
-model=wyvern_snow_cave_exit
-width=3
-length=2
-sharelight=yes
-op1=Enter
-
 [wyvern_underground_top]
 model=cavewall_top
 recol1s=12580
