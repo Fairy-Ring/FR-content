@@ -22,6 +22,7 @@ const ScriptRunner = (await load('engine/script/ScriptRunner.ts')).default;
 const ScriptState = (await load('engine/script/ScriptState.ts')).default;
 const Trigger = (await load('engine/script/ServerTriggerType.ts')).default;
 const JavaRandom = (await load('util/JavaRandom.ts')).default;
+const ScriptVarType = (await load('cache/config/ScriptVarType.ts')).default;
 const PauseHandler = (await load('network/game/client/handler/ResumePauseButtonHandler.ts')).default;
 const ResumePauseButton = (await load('network/game/client/model/ResumePauseButton.ts')).default;
 const types = {};
@@ -55,13 +56,13 @@ const pieces = [
 ];
 const routes = [
   ['secret_ghost1', 'secret_ghost2', 'secret_ghost8', 'secret_ghost11', 'secret_ghost5', 'secret_ghost14'],
-  ['secret_ghost1', 'secret_ghost3', 'secret_ghost10', 'secret_ghost12', 'secret_ghost6', 'secret_ghost15'],
-  ['secret_ghost1', 'secret_ghost4', 'secret_ghost9', 'secret_ghost13', 'secret_ghost7', 'secret_ghost16']
+  ['secret_ghost1', 'secret_ghost3', 'secret_ghost9', 'secret_ghost12', 'secret_ghost6', 'secret_ghost15'],
+  ['secret_ghost1', 'secret_ghost4', 'secret_ghost10', 'secret_ghost13', 'secret_ghost7', 'secret_ghost16']
 ];
 const locations = [
   '0_39_53_59_52', '0_47_61_14_42', '0_47_57_26_53', '0_49_46_26_38',
   '0_48_49_40_22', '1_47_54_44_40', '1_42_54_49_8', '0_46_59_6_44',
-  '0_47_60_60_18', '0_50_57_17_29', '0_44_52_34_20', '0_47_50_36_4',
+  '0_50_57_17_29', '0_47_60_60_18', '0_44_52_34_20', '0_47_50_36_4',
   '0_37_54_28_25', '1_51_61_30_30', '1_53_55_56_30', '0_48_156_47_12'
 ].map(value => {
   const [level, regionX, regionZ, localX, localZ] = value.split('_').map(Number);
@@ -116,7 +117,7 @@ function equip(p, name) {
 
 function enableGhosts(p) {
   equip(p, 'fd_ring_visibility');
-  equip(p, 'ghostspeak_amulet');
+  equip(p, 'amulet_of_ghostspeak');
   p.setVar(varp, unrelatedBits);
   assert.equal(readRoute(p), 0);
   assert.equal(readProgress(p), 0);
@@ -240,7 +241,8 @@ function runProc(p, name, args = []) {
   const script = ScriptProvider.getByName(name);
   assert(script, `compiled procedure ${name}`);
   const state = ScriptRunner.init(script, p, null, args);
-  p.executeScript(state, true);
+  // Read-only compiled accessors must not contend with an intentionally paused conversation.
+  ScriptRunner.execute(state);
   assert.equal(state.execution, ScriptState.FINISHED, `${name} finishes`);
   assert(state.isp > 0, `${name} returns its declared value`);
   return state.intStack[state.isp - 1];
@@ -358,7 +360,7 @@ function assertWearableGhostPieces() {
     assert.equal(type.wearpos2, secondarySlot ? types.ObjType.getWearPosId(secondarySlot) : -1,
       `${name} secondary wearable slot`);
   }
-  for (const [name, slot] of [['fd_ring_visibility', 'ring'], ['ghostspeak_amulet', 'front']]) {
+  for (const [name, slot] of [['fd_ring_visibility', 'ring'], ['amulet_of_ghostspeak', 'front']]) {
     const type = types.ObjType.get(id('ObjType', name));
     assert.equal(type.iop[1], 'Wear', `${name} can be worn for the dialogue gate`);
     assert.equal(type.wearpos, types.ObjType.getWearPosId(slot), `${name} uses the original worn slot`);
@@ -493,9 +495,8 @@ function testCompletedGhostReclaims(p, route) {
   const packedMaps = unzipSync(fs.readFileSync(path.join(pack, '.cache/maps-server.zip')),
     { filter: entry => entry.name === mapName || entry.name === landName });
   assert(packedMaps[mapName] && packedMaps[landName], 'native pack has the original Valdez mapsquare');
-  const scriptVarType = (await load('cache/config/ScriptVarType.ts')).default;
   World.vars = Int32Array.from({ length: types.VarSharedType.count }, (_, index) =>
-    types.VarSharedType.get(index).type === scriptVarType.INT ? 0 : -1);
+    types.VarSharedType.get(index).type === ScriptVarType.INT ? 0 : -1);
   World.varsString = new Array(types.VarSharedType.count);
   World.gameMap.loadPackedMapsquare({
     m: packedMaps[mapName], l: packedMaps[landName], n: new Uint8Array(), o: new Uint8Array()
@@ -510,7 +511,7 @@ function testCompletedGhostReclaims(p, route) {
     talkOptional(p, ghost, 1);
     assertPieceDelta(p, before, ownPiece);
     assert.equal(totalOwned(p, ownPiece), 1, 'a floor item does not count as inventory, worn or bank ownership');
-    assert(World.gameMap.getZone(x, z, where.level).getAllObjsSafe().includes(floor),
+    assert([...World.gameMap.getZone(x, z, where.level).getAllObjsSafe()].includes(floor),
       'the original floor item remains while the ghost grants its own piece');
   } finally {
     World.removeObj(floor, 0);
@@ -527,7 +528,7 @@ function testRefusalAndEquipmentGates() {
   assertUnrelatedBits(refused);
 
   const ring = pieceId('fd_ring_visibility');
-  const ghostspeak = pieceId('ghostspeak_amulet');
+  const ghostspeak = pieceId('amulet_of_ghostspeak');
   const gateCases = [
     { ring: 'carried', amulet: 'worn' },
     { ring: 'worn', amulet: 'carried' },
@@ -537,7 +538,7 @@ function testRefusalAndEquipmentGates() {
     const p = player();
     if (fixture.ring === 'worn') equip(p, 'fd_ring_visibility');
     else p.invAdd(inv, ring, 1);
-    if (fixture.amulet === 'worn') equip(p, 'ghostspeak_amulet');
+    if (fixture.amulet === 'worn') equip(p, 'amulet_of_ghostspeak');
     else p.invAdd(inv, ghostspeak, 1);
     p.setVar(varp, unrelatedBits);
     const conversation = talkOptional(p, 'secret_ghost1', 1);
@@ -545,7 +546,11 @@ function testRefusalAndEquipmentGates() {
     assert.equal(readProgress(p), 0, `ring ${fixture.ring}, amulet ${fixture.amulet}: no story progress`);
     assertOnlyPiece(p, null, 0);
     assertUnrelatedBits(p);
-    assert(conversation.text.length > 0, 'equipment gate gives a response');
+    if (fixture.ring === 'worn') {
+      assert(conversation.text.length > 0, 'visible ghost gives its sourced no-amulet response');
+    } else {
+      assert.equal(conversation.text.length, 0, 'an invisible ghost cannot begin a conversation');
+    }
   }
 }
 
@@ -601,3 +606,5 @@ for (let route = 1; route <= 3; route++) {
   if (route === 1) testCompletedGhostReclaims(completed.player, completed.route);
 }
 console.log('PASS compiled Empty Lord routes, dialogue choices, equipment gates, ordered rewards, persistence, inventory settlement and reclaim');
+// Engine imports retain background handles; all assertions above are synchronous.
+process.exit(0);
