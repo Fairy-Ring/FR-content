@@ -1,5 +1,5 @@
 // VERIFIED: 377 cache stage bands; Tip.It 28 April 2006 levels and XP.
-// Three seeds per patch are VERIFIED period-guide data. Potato yield stays
+// Three seeds per patch are CANDIDATE Old School data. Potato yield stays
 // at its inherited fixed three items; this row does not change that rule.
 [farming_allotment_potato]
 table=farming_allotment

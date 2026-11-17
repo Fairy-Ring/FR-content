@@ -15,7 +15,7 @@
 // Last harvest-band index (loc repeats fullygrown at 10, 11, 12).
 ^farming_potato_harvest_last = 12
 
-// Seeds per allotment plant (period guides)
+// CANDIDATE Old School: three seeds per ordinary allotment.
 ^farming_allotment_seed_count = 3
 
 // VERIFIED period-guide XP tenths (Tip.It: plant 8 / harvest 9).
