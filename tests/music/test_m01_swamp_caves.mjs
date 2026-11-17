@@ -72,6 +72,9 @@ function firstUnlock(p, mode, lowMemory=false) {
   assert.equal(target(p),1,'original 414:16 changes 0 to 1');
   const expected=before.slice(); expected[9]|=1<<targetBit;
   assert.deepEqual(musicBits(p),expected,'only the original target music bit changes, never Faerie or Crystal Cave');
+  // Absolute original-cache controls also reject pollution from the surface login.
+  assert.equal((p.vars[21] >>> 11) & 1,0,'first rope arrival never unlocks Faerie (original 21:11)');
+  assert.equal((p.vars[20] >>> 28) & 1,0,'first rope arrival never unlocks Crystal Cave (original 20:28)');
   if(mode && !lowMemory) {
     expectMusic(p,mark,389,[5,1]); assert.deepEqual(musicText(p,mark),['Cave of the Goblins']);
   } else assert.deepEqual(musicPackets(p,mark),[],'Manual/low-memory emits zero area packets');
