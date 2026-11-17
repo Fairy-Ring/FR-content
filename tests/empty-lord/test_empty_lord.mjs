@@ -113,6 +113,9 @@ function equip(p, name) {
   const object = types.ObjType.get(pieceId(name));
   assert(object.wearpos >= 0, `${name} must have a wearable slot`);
   p.invSet(worn, object.id, 1, object.wearpos);
+  // The native appearance hook selects the visible multinpc when this ring is worn.
+  // Direct inventory fixtures must reproduce that own-equipment state as well.
+  if (name === 'fd_ring_visibility') p.setVarBit(id('VarBitType', 'fd_ladder_present'), 1);
 }
 
 function enableGhosts(p) {
@@ -237,10 +240,10 @@ function talkOptional(p, ghost, optionalChoice = 1) {
   return { state, choices, text: output(p) };
 }
 
-function runProc(p, name, args = []) {
+function runProc(p, name, args = [], npc = null) {
   const script = ScriptProvider.getByName(name);
   assert(script, `compiled procedure ${name}`);
-  const state = ScriptRunner.init(script, p, null, args);
+  const state = ScriptRunner.init(script, p, npc, args);
   // Read-only compiled accessors must not contend with an intentionally paused conversation.
   ScriptRunner.execute(state);
   assert.equal(state.execution, ScriptState.FINISHED, `${name} finishes`);
@@ -343,6 +346,29 @@ function assertOriginalNpcLocations() {
       `${ghost} base spawn remains at ${level}_${regionX}_${regionZ}_${localX}_${localZ}`);
   }
 }
+function assertVisibleGhostBaseIdentity() {
+  const p = enableGhosts(player());
+  const visibility = id('VarBitType', 'fd_ladder_present');
+  assert.equal(p.getVarBit(visibility), 1, 'probe uses the native worn-ring visible form');
+  for (const ghost of ghosts) {
+    const npc = npcAt(ghost);
+    const base = types.NpcType.get(npc.type);
+    const visible = types.NpcType.get(base.multinpc[p.getVarBit(visibility)]);
+    assert.equal(base.walkanim, id('SeqType', 'human_secret_ghost_transwalk_f'), `${ghost}: native walk animation kept`);
+    assert.equal(base.readyanim, id('SeqType', 'human_secret_ghost_transready'), `${ghost}: native ready animation kept`);
+    assert.equal(base.vislevel, 1, `${ghost}: native visibility level kept`);
+    assert.equal(base.multivarbit, visibility, `${ghost}: native visibility varbit kept`);
+    assert.equal(visible.op[0], 'Talk-To', `${ghost}: native visible form has Talk-To`);
+    p.target = npc;
+    p.targetOp = Trigger.OPNPC1 - 7;
+    assert.equal(p.getOpTrigger()?.name, `[opnpc1,${visible.debugname}]`,
+      `${ghost}: actual dispatch uses the visible form's thin handler`);
+    assert.equal(runProc(p, '[proc,empty_lord_base]', [], npc), npc.type,
+      `${ghost}: compiled npc_param returns the original BASE row while its visible form is selected`);
+  }
+  console.log('PASS compiled visible-form dispatch and base-row npc_param probe for all sixteen native ghosts');
+}
+
 
 function assertWearableGhostPieces() {
   const slots = [
@@ -541,7 +567,15 @@ function testRefusalAndEquipmentGates() {
     if (fixture.amulet === 'worn') equip(p, 'amulet_of_ghostspeak');
     else p.invAdd(inv, ghostspeak, 1);
     p.setVar(varp, unrelatedBits);
-    const conversation = talkOptional(p, 'secret_ghost1', 1);
+    let conversation = null;
+    if (fixture.ring === 'worn') {
+      conversation = talkOptional(p, 'secret_ghost1', 1);
+    } else {
+      const base = types.NpcType.get(id('NpcType', 'secret_ghost1'));
+      assert.equal(base.multinpc[p.getVarBit(base.multivarbit)], -1,
+        'without the worn ring the native map NPC has no visible form to click');
+      assert.equal(base.op?.[0] ?? null, null, 'the invisible base itself has no Talk-To option');
+    }
     assert.equal(readRoute(p), 0, `ring ${fixture.ring}, amulet ${fixture.amulet}: no route without both worn`);
     assert.equal(readProgress(p), 0, `ring ${fixture.ring}, amulet ${fixture.amulet}: no story progress`);
     assertOnlyPiece(p, null, 0);
@@ -549,7 +583,7 @@ function testRefusalAndEquipmentGates() {
     if (fixture.ring === 'worn') {
       assert(conversation.text.length > 0, 'visible ghost gives its sourced no-amulet response');
     } else {
-      assert.equal(conversation.text.length, 0, 'an invisible ghost cannot begin a conversation');
+      assert.equal(p.activeScript, null, 'an invisible ghost cannot begin a conversation');
     }
   }
 }
@@ -598,6 +632,7 @@ function testRouteAndProgressProcedures() {
 
 assertOriginalNpcLocations();
 assertWearableGhostPieces();
+assertVisibleGhostBaseIdentity();
 testRouteAndProgressProcedures();
 testRefusalAndEquipmentGates();
 testFullInventorySettlement();

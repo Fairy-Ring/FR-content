@@ -1,26 +1,16 @@
 // VERIFIED: three routes, worn ring + amulet, six ordered gifts: Tip.It, 28 April 2006.
 // CANDIDATE: missing pieces come from their original ghost; Tip.It 2013 drop-trick advice.
 // The later all-piece reclaim interface (Old School, August 2018) is not used.
-[opnpc1,secret_ghost1] @empty_lord_talk;
-[opnpc1,secret_ghost2] @empty_lord_talk;
-[opnpc1,secret_ghost3] @empty_lord_talk;
-[opnpc1,secret_ghost4] @empty_lord_talk;
-[opnpc1,secret_ghost5] @empty_lord_talk;
-[opnpc1,secret_ghost6] @empty_lord_talk;
-[opnpc1,secret_ghost7] @empty_lord_talk;
-[opnpc1,secret_ghost8] @empty_lord_talk;
-[opnpc1,secret_ghost9] @empty_lord_talk;
-[opnpc1,secret_ghost10] @empty_lord_talk;
-[opnpc1,secret_ghost11] @empty_lord_talk;
-[opnpc1,secret_ghost12] @empty_lord_talk;
-[opnpc1,secret_ghost13] @empty_lord_talk;
-[opnpc1,secret_ghost14] @empty_lord_talk;
-[opnpc1,secret_ghost15] @empty_lord_talk;
-[opnpc1,secret_ghost16] @empty_lord_talk;
+[opnpc1,secret_ghost_explorer] ~empty_lord_talk;
+[opnpc1,secret_ghost_thief] ~empty_lord_talk;
+[opnpc1,secret_ghost_messenger] ~empty_lord_talk;
+[opnpc1,secret_ghost_spy] ~empty_lord_talk;
+[opnpc1,secret_ghost_mage] ~empty_lord_talk;
+[opnpc1,secret_ghost_swordsman] ~empty_lord_talk;
 
-[label,empty_lord_talk]
+[proc,empty_lord_talk]
 // The existing Desert Treasure appearance hook writes fd_ladder_present when
-// the ring is worn/removed. Native ghost multinpcs already read that varp.
+// the ring is worn/removed. Native ghost multinpcs already read that varbit.
 if (inv_total(worn, fd_ring_visibility) = 0) return;
 npc_setmode(playerfaceclose);
 facesquare(npc_coord);
@@ -28,10 +18,12 @@ if (inv_total(worn, amulet_of_ghostspeak) = 0 & inv_total(worn, amulet_of_ghosts
     ~empty_lord_no_amulet;
     return;
 }
-def_int $stage = ~empty_lord_stage(npc_type);
+// npc_type is the shared visible form; npc_param reads the original map base.
+def_npc $ghost = ~empty_lord_base;
+def_int $stage = ~empty_lord_stage($ghost);
 def_int $route = ~empty_lord_route;
 if ($stage ! 1) {
-    if (npc_type ! ~empty_lord_expected($stage, $route) | testbit(%dagganoth_area_project, calc($stage + 3)) = ^false) {
+    if ($ghost ! ~empty_lord_expected($stage, $route) | testbit(%dagganoth_area_project, calc($stage + 3)) = ^false) {
         ~empty_lord_wrong;
         return;
     }
@@ -78,6 +70,9 @@ while ($stage < ^empty_lord_ghost_count) {
     $stage = calc($stage + 1);
 }
 return($stage);
+
+[proc,empty_lord_base]()(npc)
+return(npc_param(empty_lord_base_type));
 
 [proc,empty_lord_stage](npc $ghost)(int)
 switch_npc ($ghost) {

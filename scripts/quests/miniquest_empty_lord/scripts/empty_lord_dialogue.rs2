@@ -448,63 +448,63 @@ if ($stage < ^empty_lord_ghost_count) ~empty_lord_hint($stage);
 
 [proc,empty_lord_no_amulet]
 ~chatplayer("Hello there.");
-~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooo?  Woooo woo woooooo wooooo woooowooo wooo woooooo woo!");
+~chatnpc_specific("Mysterious ghost", npc_type, "Wooo?  Woooo woo woooooo wooooo woooowooo wooo woooooo woo!");
 // UNKNOWN: equal weights for the eight sourced responses are an engineering choice.
 switch_int (random(8)) {
     case 0 :
         ~chatplayer("Yeah, I heard about that, ha-ha-ha!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
         ~chatplayer("With a MACKEREL? Ouch!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
         ~chatplayer("Well, it was fun. Let's do it again sometime.");
     case 1 :
         ~chatplayer("Hey, don't think you can talk to me like that!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
         ~chatplayer("Are you threatening me?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
         ~chatplayer("Just because you're already dead, doesn't mean I can't find a way to hurt you ghosty!");
     case 2 :
         ~chatplayer("Why, thank you very much!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
         ~chatplayer("I know, but what are you going to do?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
         ~chatplayer("Well, I guess that's always true in the long run. See you around, weird invisible dead person!");
     case 3 :
         ~chatplayer("We get signal!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
         ~chatplayer("Somebody set up us the bomb!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
         ~chatplayer("You have no chance to survive make your time.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo?");
         ~chatplayer("All your base are belong to us.");
     case 4 :
         ~chatplayer("No, I've never been there in my life and CERTAINLY didn't steal anything when I was!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
         ~chatplayer("Are you calling me a liar?!?! I have never stolen a thing in my life, and I resent the implication that I am the kind of morally depraved individual that would steal someone else's hard earned");
         ~chatplayer("money from their very pockets!");
         ~chatplayer("Or cakes. Or fur. Repeatedly. For long periods at a time.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
         ~chatplayer("Well if you are going to take that attitude, then I have nothing further to say on the matter, and bid you good day!");
     case 5 :
         ~chatplayer("Yeah, I don't want to brag, but seriously: I am SOOOO rich....");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
         ~chatplayer("Yeah, I know they say money doesn't bring you happiness, but sometimes I just like to open my bank account and look at all of the stuff I own and just think to myself:");
         ~chatplayer("Wow. I am soooooo rich.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
         ~chatplayer("Well, us rich alive people don't want to waste all day spending time with you poor dead people, because I'm just sooooo rich I have to go now, and very possibly make myself even richer.");
         ~chatplayer("See ya around ghosty!");
     case 6 :
         ~chatplayer("You don't say?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
         ~chatplayer("You don't say!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
         ~chatplayer("Well, I guess you didn't say.");
     case 7 :
         ~chatplayer("Yeah it's not bad, but I prefer cooked chicken.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
         ~chatplayer("Maybe, but nothing beats a home cooked pie!");
         ~chatplayer("Man, I love pie!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
         ~chatplayer("You don't say? I never knew that. Well, I must be going, see you around.");
 }
 
@@ -514,73 +514,62 @@ switch_int (random(8)) {
 switch_int (random(8)) {
     case 0 :
         ~chatplayer("Hello there.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Hello.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Hello.");
         ~chatplayer("So you're a ghost, huh?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Apparently.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Apparently.");
         ~chatplayer("In which case I only have one thing to say to you:");
         ~chatplayer("Woooo! Woowooooowoo, wooo WOOOOOOOOOOO woowoo woowoowoo woo!");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "...what?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "...what?");
         ~chatplayer("Guess you don't have the amulet of humanspeak, huh?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "...huh?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "...huh?");
         ~chatplayer("Yeah, that's right. WOO! WOOOWOOO WOO WOOOOWOO! Got no comeback for that, have you?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "You are very strange...");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "You are very strange...");
     case 1 :
         ~chatplayer("Hello there.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Mortal... Take heed of my example, and waste not your life, lest you may suffer the same fate as myself...");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Mortal... Take heed of my example, and waste not your life, lest you may suffer the same fate as myself...");
         ~chatplayer("Huh? You mean someone did this to you?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "You have ascertained the truth in my words...");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "You have ascertained the truth in my words...");
         ~chatplayer("So who did it to you? And why?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Events of moons past, I remember not clearly...");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Events of moons past, I remember not clearly...");
         ~chatplayer("Fine help you are then.");
     case 2 :
         ~chatplayer("Hello there.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Please... Leave me to my fate. I have been here so long that I scarce remember aught else...");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Please... Leave me to my fate. I have been here so long that I scarce remember aught else...");
         ~chatplayer("Uh.... huh.");
     case 3 :
         ~chatplayer("Hello there.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "You can see me?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "You can see me?");
         ~chatplayer("Uh... yes?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "And you understand my words?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "And you understand my words?");
         ~chatplayer("Well, most of them...");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "This is incredible! How can such a thing have come to pass?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "This is incredible! How can such a thing have come to pass?");
         ~chatplayer("What can I say? I'm a professional.");
     case 4 :
         ~chatplayer("Hello there.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Hello back at you.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Hello back at you.");
         ~chatplayer("So what's a nice ghost like you doing in a place like this?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "I suppose you think that's funny?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "I suppose you think that's funny?");
         ~chatplayer("Well... Mildly amusing I guess.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "I don't think I want to talk to you anymore.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "I don't think I want to talk to you anymore.");
     case 5 :
         ~chatplayer("Hello there.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Hello stranger.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Hello stranger.");
         ~chatplayer("So.... Invisible ghost haunting the same place for thousands of years, huh?");
         ~chatplayer("That's got to be a pretty rubbish way to spend your life. Er, death.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "You have no idea...");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "You have no idea...");
         ~chatplayer("Well, bad luck and all that. See ya around!");
     case 6 :
         ~chatplayer("Hello there.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Hello stranger. It is rare indeed that I meet one who can see my presence, let alone one who can understand my words.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Hello stranger. It is rare indeed that I meet one who can see my presence, let alone one who can understand my words.");
         ~chatplayer("Soooo.... Is it fun being a ghost?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Does it look like fun to you?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Does it look like fun to you?");
         ~chatplayer("Erm... Well, yes actually.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "Then you are a fool, and I will waste no more words upon you.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Then you are a fool, and I will waste no more words upon you.");
         ~chatplayer("What, not even 'goodbye'?");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), " ");
+        ~chatnpc_specific("Mysterious ghost", npc_type, " ");
         ~chatplayer("Sheesh, what a grouch. You'd think you'd have more of a sense of humour being dead and all.");
     case 7 :
         ~chatplayer("Hello there.");
-        ~chatnpc_specific("Mysterious ghost", ~empty_lord_form(~empty_lord_stage(npc_type)), "The endless tragedy of fate... Why must you torment me so?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "The endless tragedy of fate... Why must you torment me so?");
         ~chatplayer("Alright, alright, calm down, calm down. All I said was 'hello'!");
 }
-
-[proc,empty_lord_form](int $stage)(npc)
-switch_int ($stage) {
-    case 1 : return(secret_ghost_explorer);
-    case 2 : return(secret_ghost_thief);
-    case 3 : return(secret_ghost_messenger);
-    case 4 : return(secret_ghost_spy);
-    case 5 : return(secret_ghost_mage);
-    case 6 : return(secret_ghost_swordsman);
-}
-return(null);
