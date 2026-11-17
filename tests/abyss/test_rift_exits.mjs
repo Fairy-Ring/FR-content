@@ -268,3 +268,5 @@ for (const rune of ['blood', 'soul']) {
 }
 
 console.log(`RESULT PASS abyss rift exits: ${riftPlacements.length} native placements; 11 altar destinations, all three quest gates, Entrana equipment gate, and blood/soul non-teleports verified`);
+// World imports create workers; this offline test starts no network listener.
+process.exit(0);
