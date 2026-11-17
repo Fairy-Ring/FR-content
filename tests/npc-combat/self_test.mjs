@@ -51,7 +51,6 @@ export async function runSelfTests(pack, tempRoot) {
         await rejects('missing fact id', 'evidence', entry => delete entry.evidence.facts);
         await rejects('malformed fact id', 'evidence', entry => entry.evidence.facts = ['not-a-fact']);
         await rejects('missing label', 'evidence', entry => delete entry.evidence.label);
-        await rejects('invalid label', 'evidence', entry => entry.evidence.label = 'UNKNOWN');
         const unknown = structuredClone(valid);
         unknown.manifest.entries[0].evidence.label = 'UNKNOWN';
         unknown.manifest.entries[0].evidence.sources = [];

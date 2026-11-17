@@ -439,14 +439,9 @@
         "facts": [
           "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
         ],
-        "label": "VERIFIED",
+        "label": "UNKNOWN",
         "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-        "sources": [
-          {
-            "id": "src.swampcaves-sc05-accepted-plan",
-            "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-          }
-        ]
+        "sources": []
       },
       "fields": {
         "wanderrange": {
@@ -601,14 +596,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "param:defend_anim": {
@@ -620,14 +610,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "param:death_anim": {
@@ -639,14 +624,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "param:slayer_category": {
@@ -655,14 +635,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "wanderrange": {
@@ -671,14 +646,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "maxrange": {
@@ -687,14 +657,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "moverestrict": {
@@ -703,14 +668,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "defaultmode": {
@@ -719,14 +679,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "givechase": {
@@ -735,14 +690,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "respawnrate": {
@@ -751,14 +701,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         },
         "timer": {
@@ -767,14 +712,9 @@
             "facts": [
               "lumbridge-swamp-caves.sc05-wall-beast-product-selection"
             ],
-            "label": "VERIFIED",
+            "label": "UNKNOWN",
             "researchCommit": "b8f63c2d6be8cffcbee0ba2ca9c017f35aaadfbd",
-            "sources": [
-              {
-                "id": "src.swampcaves-sc05-accepted-plan",
-                "sha256": "a7bae048eac08907e93939df27f4e90d57473e584cc447289ba7df89f197959c"
-              }
-            ]
+            "sources": []
           }
         }
       }

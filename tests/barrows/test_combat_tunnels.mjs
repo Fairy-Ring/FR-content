@@ -67,6 +67,8 @@ await run(async () => {
     const f = rt.fixture(name, variant, 'melee', distance);
     for (let x = 3480; x <= 3520; x++) for (let z = 3480; z <= 3520; z++) routefinder.__set(x, z, 0, 0);
     spawnEvents();
+    // The timer phase precedes the first possible player action.
+    f.npc.processTimers();
     return f;
   };
   const observed = (f, variant = 'hit', rng = null) => {
@@ -81,7 +83,15 @@ await run(async () => {
   };
   try {
     World.gameMap.init();
-    spawnEvents(); // Native startup delivers map spawn events before clients arrive.
+    spawnEvents();
+    // World startup: event queue, NPC turns, then logins. No player can hunt
+    // or poison a map actor between its spawn event and this first timer turn.
+    World.currentTick++;
+    const startupRandom = Math.random;
+    Math.random = () => 0.999;
+    try {
+      for (const npc of World.npcs) if (Object.values(TYPES).some(spec => spec.id === npc.type)) npc.turn();
+    } finally { Math.random = startupRandom; }
     check('all 34 Lost City static placements and non-owned actor bindings', () => {
       for (const [name, spec] of Object.entries(TYPES)) {
         const npcs = [...World.npcs].filter(npc => npc.type === spec.id);
@@ -91,7 +101,7 @@ await run(async () => {
           assert.equal(npc.level, 0);
           assert.equal(npc.getVar(nv('npc_barrows_owner')), -1);
           assert.equal(npc.huntrange, BARROWS_HUNT_RADIUS);
-          assert.equal(npc.huntMode, HuntType.getId('aggressive_melee'));
+          assert.equal(npc.huntMode, HuntType.getId('aggressive_melee'), `${name} static hunt is armed after the first native timer turn`);
           assert.equal(npc.baseLevels[3], spec.hp);
         }
       }
@@ -291,7 +301,7 @@ await run(async () => {
       assert.equal(spawned[0].type, TYPES[name].id);
       assert.equal(spawned[0].getVar(nv('npc_barrows_owner')), owner.uid, `${name} door actor is owned`);
       assert.equal(spawned[0].target, owner, `${name} door actor starts on its owner`);
-      assert.equal(spawned[0].huntMode, -1, `${name} door spawn clears the actor's instance hunt`);
+      assert.equal(spawned[0].huntMode, -1, `${name} door actor inherits its huntless type default`);
       return spawned[0];
     }
     function worldTick(npc, people) {
@@ -604,10 +614,11 @@ await run(async () => {
     function staticTimeline(name) {
       const [x,z] = TYPES[name].tiles[0], config = NpcType.get(TYPES[name].id);
       const npc = new Npc(0,x,z,config.size,config.size,EntityLifeCycle.RESPAWN,World.getNextNid(),config.id,config.blockwalk);
-      World.addNpc(npc,-1); spawnEvents(); // Native startup: before any player arrives.
-      const p = tunnelPlayer(2,'timing',{x:x+1,z});
       World.currentTick = 1000;
       const real = Math.random; Math.random = () => 0.999;
+      World.addNpc(npc,-1);
+      worldTick(npc,[]); // Event queue and the first NPC turn precede logins.
+      const p = tunnelPlayer(2,'timing',{x:x+1,z});
       const report = { hits:[], spawn:null, respawn:null, reset:null, wander:[] };
       try {
         const steps = (ticks, field) => {
@@ -661,6 +672,18 @@ await run(async () => {
       } finally { rt.dispose(); }
     }
     const usePack = dir => { for (const config of Object.values(rt.configs)) config.load(dir); DbTableIndex.init(); rt.select(dir); };
+    for (const name of Object.keys(TYPES)) check(`${name} first acquisition follows native startup and respawn phase order`, () => {
+      const timing = staticTimeline(name);
+      assert.equal(timing.spawn, 1, `${name} acquires on the first cycle after login`);
+      assert.equal(timing.respawn, 1, `${name} acquires on the cycle after its respawning turn`);
+      assert.equal(timing.reset, 2, `${name} reset re-arms before the next hunt phase`);
+    });
+    check('owned poison reapplication restarts the unflagged counted phase', () => {
+      const trace = poisonTimeline('unflagged');
+      assert.equal(trace.find(row => row.tick === 17 && row.action === 'apply 7').phase, 0);
+      assert.equal(trace.find(row => row.tick === 30 && row.action === 'timer').hp, 255);
+      assert.equal(trace.find(row => row.tick === 47 && row.action === 'timer').hp, 253);
+    });
     if (compatPack) {
       const report = {};
       try {

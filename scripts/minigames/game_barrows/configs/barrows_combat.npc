@@ -388,7 +388,7 @@ param=crushdefence,-5
 param=magicdefence,0
 param=rangedefence,5
 param=barrows_maxhit,10
-// CANDIDATE (operator rule 2026-11-16): sounds of the same-model published dragonslayer_skeleton.
+// CANDIDATE (operator rule 2026-11-16): dragonslayer_skeleton sounds; only the first model is shared.
 // Its skeleton_* sequences use another frame base than human_ready, so none is bound.
 param=attack_sound,skeleton_attack
 param=defend_sound,skelly_hit
@@ -434,7 +434,7 @@ param=crushdefence,-5
 param=magicdefence,0
 param=rangedefence,5
 param=barrows_maxhit,10
-// CANDIDATE (operator rule 2026-11-16): sounds of the same-model published dragonslayer_skeleton.
+// CANDIDATE (operator rule 2026-11-16): dragonslayer_skeleton sounds; only the first model is shared.
 // Its skeleton_* sequences use another frame base than human_ready, so none is bound.
 param=attack_sound,skeleton_attack
 param=defend_sound,skelly_hit

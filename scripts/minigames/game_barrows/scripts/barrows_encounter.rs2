@@ -101,14 +101,12 @@ if (%npc_barrows_generation <= 0) {
 }
 ~barrows_actor_tick;
 
-// Initial map actors are armed before players arrive. Respawns also run their
-// type timer in the respawning turn; this spawn event preserves the same policy.
+// Static poison preserves its phase. The type timer arms hunting and marks the
+// counted interval before any player can act, including the respawning turn.
 // Owned door actors already have their generation when the queued event runs.
 [proc,barrows_tunnel_spawn]
 if (%npc_barrows_generation > 0) return;
-%npc_owned_timer_interval = ^barrows_owner_check_ticks;
 %npc_poison_preserve_phase = ^true;
-npc_sethuntmode(aggressive_melee);
 
 [ai_spawn,barrows_rat] ~barrows_tunnel_spawn;
 [ai_spawn,barrows_bloodworm] ~barrows_tunnel_spawn;

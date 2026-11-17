@@ -130,6 +130,3 @@ def_coord $tile = ~barrows_door_tile($landing, $type);
 if ($tile = null) return;
 if (npc_finduid(~barrows_actor_spawn($type, $tile, ^barrows_door_summon_lifetime)) = false) return;
 npc_setmode(opplayer2);
-// An owned actor never runs the native hunt: the BC-02 type hunt is for the
-// static tunnel placements only. barrows_owned_tunnel_guard keeps it so.
-npc_sethuntmode(null);

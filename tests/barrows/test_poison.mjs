@@ -45,7 +45,10 @@ await run(async () => {
       for (const name of [...tunnels, 'barrows_ahrim', 'barrows_dharok', 'barrows_guthan', 'barrows_karil', 'barrows_torag', 'barrows_verac', 'goblin']) {
         const npc = runner.addNpc(name, 3, null, 3557, 9714).npc;
         const staticTunnel = tunnels.includes(name);
-        if (staticTunnel) spawnEvents(npc);
+        if (staticTunnel) {
+          spawnEvents(npc);
+          turn(npc); // The first native timer turn precedes any player's poison.
+        }
         const interval = staticTunnel ? 1 : 30;
         assert.equal(npc.getVar(VarNpcType.getId('npc_poison_preserve_phase')), Number(staticTunnel), `${name} only static tunnels opt into preserving poison phase`);
         freezeRegen(npc);
