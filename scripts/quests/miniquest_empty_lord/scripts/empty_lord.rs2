@@ -1,0 +1,136 @@
+// VERIFIED: three routes, worn ring + amulet, six ordered gifts: Tip.It, 28 April 2006.
+// CANDIDATE: missing pieces come from their original ghost; Tip.It 2013 drop-trick advice.
+// The later all-piece reclaim interface (Old School, August 2018) is not used.
+[opnpc1,secret_ghost1] @empty_lord_talk;
+[opnpc1,secret_ghost2] @empty_lord_talk;
+[opnpc1,secret_ghost3] @empty_lord_talk;
+[opnpc1,secret_ghost4] @empty_lord_talk;
+[opnpc1,secret_ghost5] @empty_lord_talk;
+[opnpc1,secret_ghost6] @empty_lord_talk;
+[opnpc1,secret_ghost7] @empty_lord_talk;
+[opnpc1,secret_ghost8] @empty_lord_talk;
+[opnpc1,secret_ghost9] @empty_lord_talk;
+[opnpc1,secret_ghost10] @empty_lord_talk;
+[opnpc1,secret_ghost11] @empty_lord_talk;
+[opnpc1,secret_ghost12] @empty_lord_talk;
+[opnpc1,secret_ghost13] @empty_lord_talk;
+[opnpc1,secret_ghost14] @empty_lord_talk;
+[opnpc1,secret_ghost15] @empty_lord_talk;
+[opnpc1,secret_ghost16] @empty_lord_talk;
+
+[label,empty_lord_talk]
+// The existing Desert Treasure appearance hook writes fd_ladder_present when
+// the ring is worn/removed. Native ghost multinpcs already read that varp.
+if (inv_total(worn, fd_ring_visibility) = 0) return;
+npc_setmode(playerfaceclose);
+facesquare(npc_coord);
+if (inv_total(worn, amulet_of_ghostspeak) = 0 & inv_total(worn, amulet_of_ghostspeak_enchanted) = 0) {
+    ~empty_lord_no_amulet;
+    return;
+}
+def_int $stage = ~empty_lord_stage(npc_type);
+def_int $route = ~empty_lord_route;
+if ($stage ! 1) {
+    if (npc_type ! ~empty_lord_expected($stage, $route) | testbit(%dagganoth_area_project, calc($stage + 3)) = ^false) {
+        ~empty_lord_wrong;
+        return;
+    }
+}
+def_namedobj $piece = ~empty_lord_piece($stage);
+def_int $story_bit = calc(^empty_lord_first_story_bit + $stage - 1);
+if (testbit(%dagganoth_area_project, $story_bit) = ^true) {
+    // Banked and worn pieces count. Ground items do not: the period drop trick works.
+    if (~obj_gettotal($piece) = 0) {
+        if (inv_freespace(inv) = 0) @empty_lord_no_space;
+        inv_add(inv, $piece, 1);
+    }
+    ~empty_lord_repeat($stage);
+    return;
+}
+~empty_lord_intro($stage);
+if (~p_choice2("Tell me your story", 1, "Goodbye then", 2) = 2) {
+    ~chatplayer("Well, that's all fascinating, but I just don't particularly care. Bye-bye.");
+    return;
+}
+if ($stage = 1 & $route = 0) {
+    // UNKNOWN: equal weighting and selection on first accepted story are engineering choices.
+    // Route identity is permanent, including if the story is interrupted before its gift.
+    $route = calc(random(^empty_lord_route_count) + 1);
+    %dagganoth_area_project = setbit_range_toint(%dagganoth_area_project, $route, ^empty_lord_route_start, ^empty_lord_route_end);
+}
+~empty_lord_story($stage);
+if (inv_freespace(inv) = 0) @empty_lord_no_space;
+inv_add(inv, $piece, 1);
+%dagganoth_area_project = setbit(%dagganoth_area_project, $story_bit);
+if ($stage < ^empty_lord_ghost_count) ~empty_lord_hint($stage);
+
+[label,empty_lord_no_space]
+// UNKNOWN: plain functional fallback; no miniquest-specific full-inventory wording survived the bounded pass.
+mes("You need a free inventory space.");
+
+[proc,empty_lord_route]()(int)
+return(getbit_range(%dagganoth_area_project, ^empty_lord_route_start, ^empty_lord_route_end));
+
+[proc,empty_lord_progress]()(int)
+def_int $stage = 0;
+while ($stage < ^empty_lord_ghost_count) {
+    if (testbit(%dagganoth_area_project, calc(^empty_lord_first_story_bit + $stage)) = ^false) return($stage);
+    $stage = calc($stage + 1);
+}
+return($stage);
+
+[proc,empty_lord_stage](npc $ghost)(int)
+switch_npc ($ghost) {
+    case secret_ghost1 : return(1);
+    case secret_ghost2, secret_ghost3, secret_ghost4 : return(2);
+    case secret_ghost8, secret_ghost9, secret_ghost10 : return(3);
+    case secret_ghost11, secret_ghost12, secret_ghost13 : return(4);
+    case secret_ghost5, secret_ghost6, secret_ghost7 : return(5);
+    case secret_ghost14, secret_ghost15, secret_ghost16 : return(6);
+}
+return(0);
+
+[proc,empty_lord_piece](int $stage)(namedobj)
+switch_int ($stage) {
+    case 1 : return(secret_ghost_top);
+    case 2 : return(secret_ghost_gloves);
+    case 3 : return(secret_ghost_boots);
+    case 4 : return(secret_ghost_bottom);
+    case 5 : return(secret_ghost_hat);
+    case 6 : return(secret_ghost_cloak);
+}
+return(null);
+
+// VERIFIED: route locations and order, Tip.It 28 April 2006.
+// Native base NPC identities/spawns are in the 377 maps. In particular ghost7
+// is upstairs at the Seers' Village party room, not its post-2007 Falador site.
+// UNKNOWN: route numbers are a local encoding, not recovered server values.
+[proc,empty_lord_expected](int $stage, int $route)(npc)
+if ($stage = 1) return(secret_ghost1);
+switch_int ($route) {
+    case 1 :
+        switch_int ($stage) {
+            case 2 : return(secret_ghost2);
+            case 3 : return(secret_ghost8);
+            case 4 : return(secret_ghost11);
+            case 5 : return(secret_ghost5);
+            case 6 : return(secret_ghost14);
+        }
+    case 2 :
+        switch_int ($stage) {
+            case 2 : return(secret_ghost3);
+            case 3 : return(secret_ghost10);
+            case 4 : return(secret_ghost12);
+            case 5 : return(secret_ghost6);
+            case 6 : return(secret_ghost15);
+        }
+    case 3 :
+        switch_int ($stage) {
+            case 2 : return(secret_ghost4);
+            case 3 : return(secret_ghost9);
+            case 4 : return(secret_ghost13);
+            case 5 : return(secret_ghost7);
+            case 6 : return(secret_ghost16);
+        }
+}
+return(null);
