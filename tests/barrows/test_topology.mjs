@@ -83,7 +83,7 @@ function main() {
     const runtime = await loadPackedRuntime(options);
     activeRuntime = runtime;
     const {
-      World, LocType, VarPlayerType, VarBitType, ParamType, ScriptProvider, ScriptRunner, ScriptState,
+      World, LocType, NpcType, VarNpcType, VarPlayerType, VarBitType, ParamType, ScriptProvider, ScriptRunner, ScriptState,
       JavaRandom, CoordGrid
     } = runtime;
     const runner = createRunner(runtime, { prefix: 'barrows_topology', firstUid: 19000 });
@@ -1067,6 +1067,9 @@ function main() {
     setPosition(doorB, doorHome);
     const collisionBeforeDoors = collisionSnapshot();
     const npcCountBeforeDoors = World.getTotalNpcs();
+    const npcsBeforeDoors = Array.from(World.npcs);
+    const ordinaryDoorTypes = new Set(['barrows_bloodworm', 'barrows_rat', 'barrows_skeleton_unarmed'].map(name => NpcType.getId(name)));
+    const retainedDoorActors = [];
     const coverage = new Map();
     let lockedPathNegativeChecked = false;
     let openPathPositiveChecked = false;
@@ -1189,8 +1192,9 @@ function main() {
           assert.deepEqual(snapshotPlayer(doorA), aBeforeTransfer, `${placement.name}: door use changes no stored topology or generation`);
           assert.deepEqual(snapshotPlayer(doorB), bOpenBefore, `${placement.name}: A's allowed transfer cannot alter B's same-generation layout`);
           assert.equal(doorA.getVarBit(lockVarbit), 0, `${placement.name}: A retains its own unlocked door visual`);
-          // S08 owns encounter assertions in test_doors. Remove only A's summons
-          // between these map-lane fixtures so their collision snapshots stay local.
+          // S08 owns encounter selection. Retain each real ordinary summon so
+          // cleanup, original-lifetime expiry and collision restoration are checked.
+          retainedDoorActors.push(...spawned.filter(npc => ordinaryDoorTypes.has(npc.type)).map(npc => ({ npc, lifetime: npc.lifecycleTick })));
           procVoid(doorA, 'barrows_remove_owned');
           assert.equal(doorB.getVarBit(lockVarbit), 1, `${placement.name}: B retains its own locked door visual`);
         }
@@ -1210,7 +1214,25 @@ function main() {
       assert.equal(doorRandomCalls, eligibleDoorTransferCount + puzzleRandomCalls + placementRandomCalls,
         'only below-cap S08 classes, valid placement ranks and S09 presentation choices draw; refusals draw none');
       assert.deepEqual(worldMutations, [], 'personal door operations never call World loc add/change/remove/revert');
-      assert.equal(World.getTotalNpcs(), npcCountBeforeDoors, 'door encounter cleanup preserves every pre-existing map NPC');
+      assert.equal(World.getTotalNpcs(), npcCountBeforeDoors + retainedDoorActors.length,
+        'door encounter cleanup retains exactly its ordinary summons and every pre-existing map NPC');
+      assert.deepEqual(retainedDoorActors.map(({ npc }) => [npc.isActive, npc.isActive && npc.getVar(VarNpcType.getId('npc_barrows_public')), npc.lifecycleTick]),
+        retainedDoorActors.map(({ lifetime }) => [true, 1, lifetime]), 'every ordinary door actor is public with its original lifetime');
+      // Execute native turns for the retained actors, with the world clock
+      // advancing normally. Unrelated static map occupants do not take turns in
+      // this bounded fixture, so their original occupancy is still comparable.
+      const removedAt = retainedDoorActors.map(({ npc }) => npc.isActive ? null : 0);
+      const lastTurn = Math.max(0, ...retainedDoorActors.map(({ lifetime }) => lifetime));
+      for (let turn = 1; turn <= lastTurn; turn++) {
+        World.currentTick++;
+        for (const [index, { npc }] of retainedDoorActors.entries()) {
+          if (npc.isActive) npc.turn();
+          if (!npc.isActive && removedAt[index] === null) removedAt[index] = turn;
+        }
+      }
+      assert.deepEqual(removedAt, retainedDoorActors.map(({ lifetime }) => lifetime), 'each abandoned actor expires at its original native lifetime');
+      assert.equal(World.getTotalNpcs(), npcCountBeforeDoors, 'native expiry restores the pre-existing NPC count');
+      assert.deepEqual(new Set(World.npcs), new Set(npcsBeforeDoors), 'native expiry preserves the exact pre-existing NPC set');
       // Native transfers move PLAYER_OCC too. Return both fixtures to their
       // initial tile before comparing every collision bit, including occupancy.
       setPosition(doorA, doorHome);

@@ -105,6 +105,7 @@ await run(async () => {
     assert.deepEqual(contents(paid), paidItems, 'S14 repeat Search before exit pays nothing');
 
     const owned = [actor(paid, 'barrows_rat', 0), actor(paid, 'barrows_ahrim', 3)];
+    const ordinaryLifetime = owned[0].lifecycleTick;
     const foreign = actor(paid, 'barrows_dharok', 0, paid.uid + 10000);
     const unowned = actor(paid, 'barrows_spider', 0, null);
     const oldKill = capture(paid, owned[0]);
@@ -117,15 +118,21 @@ await run(async () => {
     };
     try {
       random(() => {
-        draws.push({ words: snapshot(paid), actorsGone: owned.every(npc => !npc.isActive), tile: [paid.level, paid.x, paid.z] });
+        draws.push({
+          words: snapshot(paid), actorsGone: !owned[1].isActive, tile: [paid.level, paid.x, paid.z],
+          ordinary: [owned[0].isActive, owned[0].isActive && owned[0].getVar(VarNpcType.getId('npc_barrows_public')), owned[0].lifecycleTick]
+        });
         return 0.25;
       }, () => runner.procVoid(paid, 'barrows_stair_exit', [stairId]));
     } finally { World.removeNpc = removeNpc; }
-    assert.equal(deletion.length, owned.length, 'S14 paid reset removes every owned actor through World');
+    assert.equal(deletion.length, owned.length - 1, 'S14 paid reset removes only the transient brother through World');
+    assert.deepEqual([owned[0].isActive, owned[0].isActive && owned[0].getVar(VarNpcType.getId('npc_barrows_public')), owned[0].lifecycleTick],
+      [true, 1, ordinaryLifetime], 'S14 paid reset releases the ordinary door actor with its original lifetime');
     for (const words of deletion) assert.deepEqual(words, { ...paidWords, barrows_generation: paidWords.barrows_generation + 1 },
       'S14 paid reset advances the generation and removes actors before clearing or drawing');
     assert.equal(draws.length, 1, 'S14 paid reset makes exactly one idle-layout rank draw');
-    assert.equal(draws[0].actorsGone, true, 'S14 idle redraw follows owned actor removal');
+    assert.equal(draws[0].actorsGone, true, 'S14 idle redraw follows brother removal');
+    assert.deepEqual(draws[0].ordinary, [true, 1, ordinaryLifetime], 'S14 idle redraw follows ordinary door actor release with its original lifetime');
     assert.equal(draws[0].words.barrows_kills, 0, 'S14 idle redraw follows credit clearing');
     assert.equal(draws[0].words.barrows_countdowns, 0, 'S14 idle redraw follows both countdown clears');
     assert.equal((draws[0].words.barrows_state >>> 3) & 3, 0, 'S14 idle redraw follows the paid-to-idle transition');
@@ -139,7 +146,7 @@ await run(async () => {
     assert.deepEqual(contents(paid), paidItems, 'S14 the paid reset never removes the granted inventory');
     const [, level, mapX, mapZ, localX, localZ] = destination.match(/^(\d+)_(\d+)_(\d+)_(\d+)_(\d+)$/).map(Number);
     assert.deepEqual([paid.level, paid.x, paid.z], [level, mapX * 64 + localX, mapZ * 64 + localZ], 'S14 original stair reaches its exact surface destination');
-    console.log('PASS S14 native Search/repeat and paid stair exit: generation/removal before clearing/draw, one idle redraw, preserved reward and selectors, foreign actors untouched');
+    console.log('PASS S14 native Search/repeat and paid stair exit: generation/brother removal and ordinary release before clearing/draw, one idle redraw, preserved reward and selectors, foreign actors untouched');
 
     const resetWords = snapshot(paid);
     deliver(paid, oldKill);
@@ -166,15 +173,17 @@ await run(async () => {
     unpaid.setVar(vars.barrows_countdowns, (31 << 16) | 17);
     unpaid.setVar(vars.barrows_state, unpaid.getVar(vars.barrows_state) | (1 << 15));
     const unpaidActor = actor(unpaid, 'barrows_bloodworm', 0);
+    const unpaidLifetime = unpaidActor.lifecycleTick;
     const beforeUnpaid = snapshot(unpaid), unpaidItems = contents(unpaid);
     random(() => { assert.fail('S14 pre-loot departure must never reset or redraw'); }, () => runner.procVoid(unpaid, 'barrows_stair_exit', [stairId]));
     assert.deepEqual(snapshot(unpaid), { ...beforeUnpaid, barrows_state: (beforeUnpaid.barrows_state & ~(1 << 15)) >>> 0 },
       'S14 pre-loot departure preserves every run field and saved countdown; only the ephemeral challenge closes');
-    assert.equal(unpaidActor.isActive, false, 'S14 pre-loot departure still removes its owned actor');
+    assert.deepEqual([unpaidActor.isActive, unpaidActor.isActive && unpaidActor.getVar(VarNpcType.getId('npc_barrows_public')), unpaidActor.lifecycleTick],
+      [true, 1, unpaidLifetime], 'S14 pre-loot departure releases its ordinary door actor with its original lifetime');
     assert.deepEqual(contents(unpaid), unpaidItems);
     assert.equal(unpaid.timers.size, 0);
     assert.equal(unpaid.packets.filter(packet => packet.constructor.name === 'CamReset').length > 0, true);
-    console.log('PASS S14 unpaid stair departure does not run the paid reset: same generation/layout/credit/countdowns, owned actors and presentation closed');
+    console.log('PASS S14 unpaid stair departure does not run the paid reset: same generation/layout/credit/countdowns, ordinary actor released and presentation closed');
   } finally {
     runner.removeFixtures();
     for (const p of players) {
