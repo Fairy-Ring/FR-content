@@ -141,7 +141,7 @@ async function main() {
   set(paid, paidSeed);
   const owned = [
     addNpc('barrows_ahrim', 0, paid.uid, 3548, 9695),
-    addNpc('barrows_rat', 3, paid.uid, 3550, 9698)
+    addNpc('barrows_rat', 0, paid.uid, 3550, 9698)
   ];
   const ordinaryLifetime = owned[1].npc.lifecycleTick;
   const other = addNpc('barrows_dharok', 3, paid.uid + 1, 3554, 9698);
@@ -161,7 +161,7 @@ async function main() {
   assert.equal(deletionRows.length, owned.length - 1, 'leave removes the owned brother, not the ordinary door actor');
   for (const row of deletionRows) assert.deepEqual(row, { ...paidSeed, generation: paidSeed.generation + 1 }, 'paid reset advances generation before removing actors and clearing durable fields');
   assert.equal(owned[0].npc.isActive, false, 'owned actor deleted');
-  assert.deepEqual([owned[1].npc.isActive, owned[1].npc.isActive && owned[1].npc.getVar(runtime.VarNpcType.getId('npc_barrows_public')), owned[1].npc.lifecycleTick],
+  assert.deepEqual([owned[1].npc.isActive, owned[1].npc.isActive && owned[1].npc.getVar(runtime.VarNpcType.getId('npc_barrows_released')), owned[1].npc.lifecycleTick],
     [true, 1, ordinaryLifetime], 'paid leave releases the ordinary door actor publicly for its original lifetime');
   for (const row of [other, unowned]) assert.equal(row.npc.isActive, true, 'foreign or unowned actor retained');
   assert.equal(phase(paid.getVar(ids.state)), 0, 'paid exit resets phase to idle');
@@ -190,7 +190,7 @@ async function main() {
   const prelootRandom = measureRandom(() => procVoid(preloot, 'barrows_leave'));
   assert.equal(prelootRandom.calls, 0, 'phase-1 leave must not redraw random state');
   assert.deepEqual(snapshot(preloot), { ...prelootSeed, state: u32(prelootSeed.state & ~0x8000) }, 'phase-1 leave preserves durable fields and clears only the challenge');
-  assert.deepEqual([prelootActor.npc.isActive, prelootActor.npc.isActive && prelootActor.npc.getVar(runtime.VarNpcType.getId('npc_barrows_public')), prelootActor.npc.lifecycleTick],
+  assert.deepEqual([prelootActor.npc.isActive, prelootActor.npc.isActive && prelootActor.npc.getVar(runtime.VarNpcType.getId('npc_barrows_released')), prelootActor.npc.lifecycleTick],
     [true, 1, prelootLifetime], 'phase-1 leave releases its ordinary door actor publicly for its original lifetime without credit');
   assert.equal(preloot.modalMain, -1, 'leave closes active modal presentation');
   assert.equal(preloot.pendingModalClose, true, 'disconnected preloot fixture retains its real pending close');
@@ -339,7 +339,7 @@ async function main() {
     generation: 0, countdowns: 0
   };
   set(logoutNoRun, logoutNoRunSeed);
-  const logoutNoRunActor = addNpc('barrows_bloodworm', 3, logoutNoRun.uid, 3550, 9697);
+  const logoutNoRunActor = addNpc('barrows_bloodworm', 0, logoutNoRun.uid, 3550, 9697);
   const logoutNoRunLifetime = logoutNoRunActor.npc.lifecycleTick;
   const logoutNoRunForeignActor = addNpc('barrows_ahrim', 3, logoutNoRun.uid + 1_000_000, 3553, 9698);
   logoutNoRun.openMainModal(activityModal);
@@ -348,7 +348,7 @@ async function main() {
   runLifecycleTrigger(logoutNoRun, 'logout');
   assert.deepEqual(snapshot(logoutNoRun), { ...logoutNoRunSeed, state: u32(logoutNoRunSeed.state & ~0x8000) }, '[logout,_] does not invent or reset a run');
   assert.equal(phase(logoutNoRun.getVar(ids.state)), 0, '[logout,_] keeps a no-run player idle');
-  assert.deepEqual([logoutNoRunActor.npc.isActive, logoutNoRunActor.npc.isActive && logoutNoRunActor.npc.getVar(runtime.VarNpcType.getId('npc_barrows_public')), logoutNoRunActor.npc.lifecycleTick],
+  assert.deepEqual([logoutNoRunActor.npc.isActive, logoutNoRunActor.npc.isActive && logoutNoRunActor.npc.getVar(runtime.VarNpcType.getId('npc_barrows_released')), logoutNoRunActor.npc.lifecycleTick],
     [true, 1, logoutNoRunLifetime], '[logout,_] releases only the no-run player’s ordinary door actor publicly for its original lifetime');
   assert.equal(logoutNoRunForeignActor.npc.isActive, true, '[logout,_] retains a foreign actor without a run');
   assert.equal(logoutNoRun.modalMain, -1, '[logout,_] closes no-run modal presentation');

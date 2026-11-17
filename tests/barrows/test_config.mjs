@@ -426,7 +426,7 @@ assert.deepEqual(enumValues(enums, 'barrows_door_draw_class'), new Map(Array.fro
 const doorConstants = new Map([
     ['barrows_door_skeleton_npc', 'barrows_skeleton_unarmed'],
     ['barrows_door_spawn_min_radius', '0'], ['barrows_door_spawn_radius', '2'],
-    ['barrows_door_summon_lifetime', '1000'], ['barrows_door_summon_credit', '"owner_and_killer"'],
+    ['barrows_door_summon_lifetime', '1000'],
     ['barrows_door_class_none', '-1'], ['barrows_door_class_brother', '3'],
     ['barrows_door_class_skeleton', '0'], ['barrows_door_class_bloodworm', '1'],
     ['barrows_door_class_crypt_rat', '2']

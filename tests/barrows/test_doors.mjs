@@ -1222,7 +1222,7 @@ await run(async () => {
     const cleanupCredit = u32(cleanupOwner.getVar(vars.barrows_kills));
     const cleanupLifetime = cleanupActor.lifecycleTick;
     procVoid(cleanupOwner, 'barrows_remove_owned');
-    assert.deepEqual([cleanupActor.isActive, cleanupActor.isActive && cleanupActor.getVar(VarNpcType.getId('npc_barrows_public')), cleanupActor.lifecycleTick],
+    assert.deepEqual([cleanupActor.isActive, cleanupActor.isActive && cleanupActor.getVar(VarNpcType.getId('npc_barrows_released')), cleanupActor.lifecycleTick],
       [true, 1, cleanupLifetime], 'owner cleanup releases the caller’s door summon publicly for its original lifetime');
     assert.equal(peerActor.isActive, true, 'owner cleanup preserves another player’s door summon');
     assert.equal(mapActor.isActive, true, 'owner cleanup preserves an unrelated map placement');

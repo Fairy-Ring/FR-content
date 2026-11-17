@@ -60,8 +60,8 @@ return(false);
 while (.npc_findnext = true) {
     if (.%npc_barrows_owner = uid & .%npc_barrows_generation > 0 & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) {
         if (~barrows_door_actor_type(.npc_type) = true) {
-            if (.%npc_barrows_public ! ^true) {
-                .%npc_barrows_public = ^true;
+            if (.%npc_barrows_released ! ^true) {
+                .%npc_barrows_released = ^true;
                 .npc_setmode(wander);
             }
         } else {
@@ -73,15 +73,8 @@ while (.npc_findnext = true) {
 .npc_findallany(3_55_151_32_32, ^barrows_actor_scan_radius, 0);
 while (.npc_findnext = true) {
     if (.%npc_barrows_owner = uid & .%npc_barrows_generation > 0 & ~barrows_actor_type(.npc_type) = true & ~barrows_inside(.npc_coord) = true) {
-        if (~barrows_door_actor_type(.npc_type) = true) {
-            if (.%npc_barrows_public ! ^true) {
-                .%npc_barrows_public = ^true;
-                .npc_setmode(wander);
-            }
-        } else {
-            if (~barrows_brother_identity(.npc_type) > 0) hint_stop;
-            .npc_del;
-        }
+        if (~barrows_brother_identity(.npc_type) > 0) hint_stop;
+        .npc_del;
     }
 }
 

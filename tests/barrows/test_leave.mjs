@@ -120,13 +120,13 @@ await run(async () => {
       random(() => {
         draws.push({
           words: snapshot(paid), actorsGone: !owned[1].isActive, tile: [paid.level, paid.x, paid.z],
-          ordinary: [owned[0].isActive, owned[0].isActive && owned[0].getVar(VarNpcType.getId('npc_barrows_public')), owned[0].lifecycleTick]
+          ordinary: [owned[0].isActive, owned[0].isActive && owned[0].getVar(VarNpcType.getId('npc_barrows_released')), owned[0].lifecycleTick]
         });
         return 0.25;
       }, () => runner.procVoid(paid, 'barrows_stair_exit', [stairId]));
     } finally { World.removeNpc = removeNpc; }
     assert.equal(deletion.length, owned.length - 1, 'S14 paid reset removes only the transient brother through World');
-    assert.deepEqual([owned[0].isActive, owned[0].isActive && owned[0].getVar(VarNpcType.getId('npc_barrows_public')), owned[0].lifecycleTick],
+    assert.deepEqual([owned[0].isActive, owned[0].isActive && owned[0].getVar(VarNpcType.getId('npc_barrows_released')), owned[0].lifecycleTick],
       [true, 1, ordinaryLifetime], 'S14 paid reset releases the ordinary door actor with its original lifetime');
     for (const words of deletion) assert.deepEqual(words, { ...paidWords, barrows_generation: paidWords.barrows_generation + 1 },
       'S14 paid reset advances the generation and removes actors before clearing or drawing');
@@ -178,7 +178,7 @@ await run(async () => {
     random(() => { assert.fail('S14 pre-loot departure must never reset or redraw'); }, () => runner.procVoid(unpaid, 'barrows_stair_exit', [stairId]));
     assert.deepEqual(snapshot(unpaid), { ...beforeUnpaid, barrows_state: (beforeUnpaid.barrows_state & ~(1 << 15)) >>> 0 },
       'S14 pre-loot departure preserves every run field and saved countdown; only the ephemeral challenge closes');
-    assert.deepEqual([unpaidActor.isActive, unpaidActor.isActive && unpaidActor.getVar(VarNpcType.getId('npc_barrows_public')), unpaidActor.lifecycleTick],
+    assert.deepEqual([unpaidActor.isActive, unpaidActor.isActive && unpaidActor.getVar(VarNpcType.getId('npc_barrows_released')), unpaidActor.lifecycleTick],
       [true, 1, unpaidLifetime], 'S14 pre-loot departure releases its ordinary door actor with its original lifetime');
     assert.deepEqual(contents(unpaid), unpaidItems);
     assert.equal(unpaid.timers.size, 0);

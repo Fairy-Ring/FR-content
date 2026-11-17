@@ -1216,7 +1216,7 @@ function main() {
       assert.deepEqual(worldMutations, [], 'personal door operations never call World loc add/change/remove/revert');
       assert.equal(World.getTotalNpcs(), npcCountBeforeDoors + retainedDoorActors.length,
         'door encounter cleanup retains exactly its ordinary summons and every pre-existing map NPC');
-      assert.deepEqual(retainedDoorActors.map(({ npc }) => [npc.isActive, npc.isActive && npc.getVar(VarNpcType.getId('npc_barrows_public')), npc.lifecycleTick]),
+      assert.deepEqual(retainedDoorActors.map(({ npc }) => [npc.isActive, npc.isActive && npc.getVar(VarNpcType.getId('npc_barrows_released')), npc.lifecycleTick]),
         retainedDoorActors.map(({ lifetime }) => [true, 1, lifetime]), 'every ordinary door actor is public with its original lifetime');
       // Execute native turns for the retained actors, with the world clock
       // advancing normally. Unrelated static map occupants do not take turns in

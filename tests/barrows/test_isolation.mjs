@@ -302,7 +302,7 @@ await run(async () => {
     const tunnelLifetime = bTunnelActor.lifecycleTick;
     lifecycle(b, 'logout');
     assert.equal(bLiving.isActive, false, 'S21 B logout removes its transient brother actor');
-    assert.deepEqual([bTunnelActor.isActive, bTunnelActor.isActive && bTunnelActor.getVar(runtime.VarNpcType.getId('npc_barrows_public')), bTunnelActor.lifecycleTick],
+    assert.deepEqual([bTunnelActor.isActive, bTunnelActor.isActive && bTunnelActor.getVar(runtime.VarNpcType.getId('npc_barrows_released')), bTunnelActor.lifecycleTick],
       [true, 1, tunnelLifetime], 'S21 B logout releases its ordinary door actor publicly for its original lifetime');
     const saved = b.save(), oldB = b;
     unregister(oldB);

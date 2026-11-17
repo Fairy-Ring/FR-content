@@ -6,11 +6,8 @@
 [proc,barrows_skeleton_attack]
 ~npc_default_attack_outcome(npc_param(barrows_maxhit), 0, false);
 
-// Huntless defaults never initiate against a stranger. A private actor clears
-// pursuit before movement when its owner leaves reach or starts another fight.
-// WANDER permits a stranger attack only outside the owner's spawn-relative reach.
-// The owner may return before that attack, but must attack for native retaliation.
-// Public actors bypass this owner guard and retain native attacker retaliation.
+// Huntless defaults never initiate against a stranger. The native owner guard
+// ends pursuit; the timer latches release on WANDER without changing retaliation.
 [proc,barrows_owned_tunnel_guard]
 if (npc_getmode = wander | npc_getmode = none) return;
 if (npc_type = barrows_ahrim | npc_type = barrows_dharok | npc_type = barrows_guthan | npc_type = barrows_karil | npc_type = barrows_torag | npc_type = barrows_verac) return;

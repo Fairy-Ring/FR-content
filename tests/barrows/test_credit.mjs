@@ -58,7 +58,7 @@ await run(async () => {
     return [name, id];
   }));
   const npcVarIds = Object.fromEntries([
-    'npc_barrows_owner', 'npc_barrows_generation', 'npc_barrows_public', 'npc_attacking_uid', 'npc_aggressive_player'
+    'npc_barrows_owner', 'npc_barrows_generation', 'npc_barrows_released', 'npc_attacking_uid', 'npc_aggressive_player'
   ].map(name => {
     const id = VarNpcType.getId(name);
     assert.notEqual(id, -1, `missing NPC var ${name}`);
@@ -328,7 +328,7 @@ await run(async () => {
     const foreignKiller = makePlayer('owned_foreign_killer');
     setRun(ownedOwner, { generation: 121, phase: 1, credit: 0 });
     setRun(foreignKiller, { generation: 122, phase: 1, credit: 0 });
-    const foreignOwnedNpc = actor('barrows_rat', 3, ownedOwner.uid);
+    const foreignOwnedNpc = actor('barrows_rat', 0, ownedOwner.uid);
     seedActor(foreignOwnedNpc, { owner: ownedOwner.uid, generation: 121, aggressor: foreignKiller.uid, hp: 0 });
     foreignOwnedNpc.target = foreignKiller;
     foreignOwnedNpc.heroPoints.addHero(ownedOwner.hash64, 13);
@@ -366,7 +366,7 @@ await run(async () => {
 
     const departingOwner = makePlayer('departing_owner');
     setRun(departingOwner, { generation: 141, phase: 1, credit: 0 });
-    const departureNpc = actor('barrows_rat', 3, departingOwner.uid);
+    const departureNpc = actor('barrows_rat', 0, departingOwner.uid);
     seedActor(departureNpc, { owner: departingOwner.uid, generation: 141, aggressor: departingOwner.uid, hp: 0 });
     departureNpc.heroPoints.addHero(departingOwner.hash64, 10);
     npcProc(departureNpc, 'barrows_npc_credit');
@@ -382,19 +382,19 @@ await run(async () => {
 
     const despawnOwner = makePlayer('despawn_owner');
     setRun(despawnOwner, { generation: 151, phase: 1, credit: 0 });
-    const despawnNpc = actor('barrows_rat', 3, despawnOwner.uid);
+    const despawnNpc = actor('barrows_rat', 0, despawnOwner.uid);
     seedActor(despawnNpc, { owner: despawnOwner.uid, generation: 151, aggressor: despawnOwner.uid, hp: 9 });
     const beforeDespawn = creditSnapshot(despawnOwner);
     procVoid(despawnOwner, 'barrows_remove_owned', [], despawnNpc);
     assert.equal(despawnNpc.isActive, true, 'ordinary door-type cleanup releases rather than removes the living actor');
-    assert.equal(despawnNpc.getVar(npcVarIds.npc_barrows_public), 1, 'ordinary cleanup makes public access permanent');
+    assert.equal(despawnNpc.getVar(npcVarIds.npc_barrows_released), 1, 'ordinary cleanup permanently releases the actor');
     assertNoCreditRequest(despawnOwner, 'real Barrows actor removal');
     assert.deepEqual(creditSnapshot(despawnOwner), beforeDespawn, 'departure/despawn itself never grants credit');
 
     const staleOwner = makePlayer('stale_replay_owner');
     const resetGeneration = 161;
     setRun(staleOwner, { generation: resetGeneration, phase: 1, credit: 0 });
-    const staleNpc = actor('barrows_rat', 3, staleOwner.uid);
+    const staleNpc = actor('barrows_rat', 0, staleOwner.uid);
     seedActor(staleNpc, { owner: staleOwner.uid, generation: resetGeneration, aggressor: staleOwner.uid, hp: 0 });
     staleNpc.heroPoints.addHero(staleOwner.hash64, 17);
     npcProc(staleNpc, 'barrows_npc_credit');
@@ -406,7 +406,7 @@ await run(async () => {
     staleOwner.setVar(playerVarIds.barrows_state, stateWord({ phase: 2, identity: 1 }));
     procVoid(staleOwner, 'barrows_run_reset', [], staleNpc);
     assert.equal(staleNpc.isActive, true, 'real run reset retains the ordinary actor for its original lifetime');
-    assert.equal(staleNpc.getVar(npcVarIds.npc_barrows_public), 1, 'real run reset permanently releases the old actor');
+    assert.equal(staleNpc.getVar(npcVarIds.npc_barrows_released), 1, 'real run reset permanently releases the old actor');
     assert.equal(u32(staleOwner.getVar(playerVarIds.barrows_generation)), resetGeneration + 1, 'reset advances the captured generation');
     assert.equal(procInt(staleOwner, 'barrows_phase'), 0, 'reset leaves the player idle');
     assert.equal(getCredit(staleOwner), 0, 'reset clears credit before replay');
@@ -516,7 +516,7 @@ await run(async () => {
         setRun(finisher, { generation:182, phase:1, level:0, credit:0 });
         const npc = actor(name, 0, owner.uid);
         seedActor(npc, { owner:owner.uid, generation:181, aggressor:finisher.uid, hp:1 });
-        npc.setVar(npcVarIds.npc_barrows_public, 1); // Native fixture: an already abandoned door actor.
+        npc.setVar(npcVarIds.npc_barrows_released, 1); // Native fixture: an already abandoned door actor.
         npc.heroPoints.addHero(owner.hash64, outcome === 'stranger hero' ? 13 : 31);
         npc.heroPoints.addHero(finisher.hash64, outcome === 'stranger hero' ? 31 : 13);
         npc.heroPoints.addHero(finisher.hash64, 1); // B's real final damage below.

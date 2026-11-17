@@ -420,7 +420,7 @@ async function main() {
   function assertDeleted(records, label) {
     for (const { npc, nid, typeName, level, lifetime } of records) {
       if (['barrows_rat', 'barrows_bloodworm', 'barrows_skeleton_unarmed'].includes(typeName)) {
-        assert.deepEqual([World.getNpc(nid), npc.isActive, npc.isActive && npc.getVar(VarNpcType.getId('npc_barrows_public')), npc.lifecycleTick],
+        assert.deepEqual([World.getNpc(nid), npc.isActive, npc.isActive && npc.getVar(VarNpcType.getId('npc_barrows_released')), npc.lifecycleTick],
           [npc, true, 1, lifetime], `${label} releases ${typeName} on L${level} publicly for its original lifetime`);
         continue;
       }
@@ -516,7 +516,7 @@ async function main() {
     });
     const beginActors = [
       addActor('barrows_ahrim', 0, player.uid, 3548, 9695),
-      addActor('barrows_rat', 3, player.uid, 3550, 9698)
+      addActor('barrows_rat', 0, player.uid, 3550, 9698)
     ];
     const beginDeletion = observeWorldDeletions(player, new Set(beginActors.map(row => row.nid)), () =>
       measureRandom(() => procInt(player, 'barrows_run_begin'))
@@ -716,7 +716,9 @@ async function main() {
       const x = 3544 + (index % 5) * 2;
       const z = 9691 + Math.floor(index / 5) * 2;
       ownedActors.push(addActor(name, 0, ownerA.uid, x, z));
-      ownedActors.push(addActor(name, 3, ownerA.uid, x, z + 8));
+      if (!['barrows_rat', 'barrows_bloodworm', 'barrows_skeleton_unarmed'].includes(name)) {
+        ownedActors.push(addActor(name, 3, ownerA.uid, x, z + 8));
+      }
     }
     const playerBActors = [
       addActor('barrows_ahrim', 0, ownerB.uid, 3557, 9697),

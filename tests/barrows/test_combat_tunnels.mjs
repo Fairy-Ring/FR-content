@@ -353,9 +353,20 @@ await run(async () => {
           assert(sides.length, 'native N-room far-side attack tile');
           place(owner, sides[0]);
           assert(cheb(owner, start) > NpcType.get(npc.type).maxrange, 'the returning owner hits from beyond the native maxrange');
-          ownerAttacks(npc, owner); step(1, 'owner hits from outside range');
+          const worn = owner.getInventory(rt.id(rt.configs.InvType, 'worn'));
+          worn.set(3, { id:rt.id(rt.configs.ObjType, 'longbow'), count:1 });
+          worn.set(13, { id:rt.id(rt.configs.ObjType, 'bronze_arrow'), count:2 });
+          owner.setVar(pv('damagetype'), 3);
+          assert(playerProc(owner, 'player_attackrange', [rt.id(rt.configs.ObjType, 'longbow')]).popInt() >= CoordGrid.distanceToSW(npc, owner),
+            'the beyond-origin shot is within the real bow approach range');
+          playerNpc(owner, npc, '[apnpc2,_]');
+          assert.equal(worn.get(13).count, 1, 'the real owner shot consumes an arrow');
+          assert([...npc.queue.all()].some(q => q.queueId === Trigger.AI_QUEUE1), 'the real owner shot queues native retaliation');
+          step(1, 'owner shoots from outside range');
+          assert.equal(npc.getVar(nv('npc_barrows_released')), 1, 'combat already ended; the real owner shot cannot reverse release');
           place(owner, { x:3546, z:9708 }); place(other, { x:npc.x-1, z:npc.z });
           step(60, 'B idle beside the actor');
+          assert.equal(npc.getVar(nv('npc_barrows_released')), 1, 'returning inside native reach never reclaims the actor');
         } else {
           place(other, { x:npc.x+1 <= 3540 ? npc.x+1 : npc.x-1, z:npc.z <= 9716 ? npc.z+1 : npc.z-1 });
           // Native combat prevents menu logout. Connection loss is the reachable
@@ -422,16 +433,12 @@ await run(async () => {
           place(owner, release === 'walk away' ? AWAY : ACROSS);
           step(12);
           assert.equal(npc.targetOp, NpcMode.WANDER, 'native owner guard has abandoned pursuit');
-          assert.equal(npc.getVar(nv('npc_barrows_public')), 0, 'mere flight is still reversible');
+          assert.equal(npc.getVar(nv('npc_barrows_released')), 1, 'the native guard releases at the end of owner pursuit');
           place(owner, LANDING);
-          attackGate(other, npc, 0);
+          attackGate(other, npc, 1);
           attackGate(owner, npc, 1);
           step(12);
-          assert.equal(npc.target, null, 'return alone never restarts an attack');
-          ownerAttacks(npc, owner); step(1);
-          assert.equal(npc.target, owner, 'returning owner re-engages through native retaliation');
-          place(owner, release === 'walk away' ? AWAY : ACROSS);
-          step(12);
+          assert.equal(npc.target, null, 'return alone never restarts an attack or reverses release');
         } else if (release === 'exit') {
           place(owner, { x:3565, z:3313 });
           playerProc(owner, 'barrows_leave');
@@ -456,7 +463,7 @@ await run(async () => {
         const idleHp = idle.levels[3];
         const remaining = npc.lifecycleTick;
         attackGate(other, npc, 1);
-        assert.equal(npc.getVar(nv('npc_barrows_public')), 1, 'stranger engagement permanently releases ownership');
+        assert.equal(npc.getVar(nv('npc_barrows_released')), 1, 'release precedes any stranger attack');
         assert.equal(npc.lifecycleTick, remaining, 'attack gate never restarts the original lifetime');
         playerNpc(other, npc, '[opnpc2,_]');
         assert([...npc.queue.all()].some(q => q.queueId === Trigger.AI_QUEUE1), 'real player Attack queues ordinary retaliation');
@@ -473,18 +480,103 @@ await run(async () => {
           assert.equal(npc.isActive, true, 'a later run cannot remove a public actor');
           assert.equal(npc.target, other, 'later-run cleanup cannot interrupt B combat');
         }
+        if (owner.isActive) {
+          place(owner, { x:npc.x - 1, z:npc.z });
+          assert.equal(npc.target, other, 'returning A does not draw the actor away from B');
+          playerNpc(owner, npc, '[opnpc2,_]');
+          assert([...npc.queue.all()].some(q => q.queueId === Trigger.AI_QUEUE1), 'former owner A may really attack like anyone after the native single-way window');
+          step(1);
+          assert.equal(npc.target, other, 'native npc_retal_ready keeps B while the actor is already fighting; A’s accepted Attack adds no Barrows retarget rule');
+          place(owner, AWAY);
+        }
         attackGate(other, npc, 1);
         npc.resetDefaults();
-        assert.equal(npc.getVar(nv('npc_barrows_public')), 1, 'native reset cannot reclaim a public actor');
+        assert.equal(npc.getVar(nv('npc_barrows_released')), 1, 'native reset cannot reclaim a released actor');
         attackGate(other, npc, 1);
         place(other, AWAY);
         step(npc.lifecycleTick + 1);
         assert.equal(npc.isActive, false, 'the original native lifetime still removes the public actor');
         assert.equal(idle.levels[3], idleHp, 'idle C retains all Hitpoints throughout the public lifetime');
-        assert.deepEqual({ x:npc.startX, z:npc.startZ }, start, 'owner reach retains the real native spawn origin');
+        assert.deepEqual({ x:npc.startX, z:npc.startZ }, start, 'release retains the real native spawn origin');
       } finally {
         Math.random = mathRandom;
         removePlayer(owner); removePlayer(other); removePlayer(idle);
+        for (const npc of [...World.npcs]) if (npc.isActive && npc.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(npc, -1);
+      }
+    }
+
+    function failedStrangerAttack(name, draws, kind) {
+      const owner = tunnelPlayer(2, 'failed_a', LANDING), other = tunnelPlayer(3, 'failed_b', LANDING);
+      beginRun(owner, 41); beginRun(other, 42);
+      Math.random = () => 0.999;
+      try {
+        const npc = doorActor(owner, name, draws);
+        const step = ticks => { for (let i = 0; i < ticks; i++) worldTick(npc, [owner, other]); };
+        const worn = other.getInventory(rt.id(rt.configs.InvType, 'worn'));
+        const prepareFailedAttack = () => {
+          if (kind === 'empty quiver') {
+            worn.set(3, { id:rt.id(rt.configs.ObjType, 'shortbow'), count:1 });
+            other.setVar(pv('damagetype'), 3);
+          } else {
+            // Select and enable a real spell with runes, then remove only B's own runes.
+            worn.set(3, { id:rt.id(rt.configs.ObjType, 'battlestaff'), count:1 });
+            const bag = other.getInventory(rt.id(rt.configs.InvType, 'inv'));
+            bag.set(0, { id:rt.id(rt.configs.ObjType, 'mindrune'), count:1 });
+            bag.set(1, { id:rt.id(rt.configs.ObjType, 'airrune'), count:1 });
+            playerNpc(other, npc, '[if_button,staff_spells:ssb0]');
+            playerNpc(other, npc, '[if_button,combat_staff_2:auto_toggle]');
+            assert.equal(playerProc(other, 'player_autocast_enabled').popInt(), 1, 'the native spell controls enable autocast');
+            bag.set(0, null); bag.set(1, null);
+          }
+        };
+        prepareFailedAttack();
+        step(8);
+        assert.equal(npc.target, owner, 'A is still fighting the private door actor');
+        assert.equal(npc.getVar(nv('npc_barrows_released')), 0);
+        place(other, { x:npc.x + 1, z:npc.z });
+        const combat = () => [
+          npc.getVar(nv('npc_barrows_released')), npc.getVar(nv('npc_aggressive_player')),
+          npc.getVar(nv('npc_lastcombat')), npc.targetOp, npc.target === owner,
+          [...npc.queue.all()].filter(q => q.queueId === Trigger.AI_QUEUE1).length
+        ];
+        const before = combat(), messages = other.testMessages.length;
+        playerNpc(other, npc, '[opnpc2,_]');
+        assert(other.testMessages.slice(messages).includes('Someone else is fighting that.'), `${kind}: private Attack is refused`);
+        assert.deepEqual(combat(), before, `${kind}: an unsuccessful private Attack changes no actor combat or release state`);
+        const resetWeapon = () => {
+          worn.set(3, null);
+          other.setVar(pv('damagetype'), 0);
+          playerProc(other, 'player_autocast_reset');
+        };
+        resetWeapon();
+        playerNpc(other, npc, '[opnpc2,_]');
+        assert.deepEqual(combat(), before, `${kind}: a following real melee remains refused while A fights`);
+        place(owner, AWAY); step(12);
+        assert.equal(npc.targetOp, NpcMode.WANDER, 'the existing native guard ends owner pursuit');
+        assert.equal(npc.getVar(nv('npc_barrows_released')), 1, 'owner combat ends before any stranger can attack');
+        prepareFailedAttack();
+        place(other, { x:npc.x + 1, z:npc.z });
+        const releasedMessages = other.testMessages.length;
+        playerNpc(other, npc, '[opnpc2,_]');
+        assert(other.testMessages.slice(releasedMessages).some(text => kind === 'empty quiver'
+          ? text.includes('There is no ammo left in your quiver.')
+          : text.includes('Runes to cast this spell.')), `${kind}: the released actor reaches the native supply refusal`);
+        assert(![...npc.queue.all()].some(q => q.queueId === Trigger.AI_QUEUE1), `${kind}: no attack or retaliation is invented`);
+        assert.equal(npc.getVar(nv('npc_barrows_released')), 1, `${kind}: a failed Attack cannot change the completed release`);
+        resetWeapon();
+        // The ordinary empty-quiver path starts its weapon cooldown before refusing.
+        step(Math.max(0, other.getVar(pv('action_delay')) - World.currentTick));
+        place(owner, LANDING); step(1);
+        assert.equal(npc.target, null, 'A’s return alone has no effect');
+        place(other, { x:npc.x + 1, z:npc.z });
+        playerNpc(other, npc, '[opnpc2,_]');
+        assert([...npc.queue.all()].some(q => q.queueId === Trigger.AI_QUEUE1), `${kind}: B’s following real melee is accepted even after A returns`);
+        step(1);
+        assert.equal(npc.target, other, `${kind}: retaliation is the type’s native retaliation`);
+        assert.equal(npc.getVar(nv('npc_barrows_released')), 1);
+      } finally {
+        Math.random = mathRandom;
+        removePlayer(owner); removePlayer(other);
         for (const npc of [...World.npcs]) if (npc.isActive && npc.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(npc, -1);
       }
     }
@@ -831,32 +923,11 @@ await run(async () => {
       check(`${name} reset-safe ownership: ${kind}`, () => ownershipRegression(kind, name, draws));
     }
     if (ownershipCase) return;
-    for (const name of draws.keys()) check(`${name} public gate matches native spawn-relative chase boundary`, () => {
-      const owner = tunnelPlayer(2, 'reach_a', LANDING), other = tunnelPlayer(3, 'reach_b', LANDING);
-      beginRun(owner, 41); beginRun(other, 42);
-      Math.random = () => 0.999;
-      try {
-        const npc = doorActor(owner, name, draws), reach = NpcType.get(npc.type).maxrange + 1;
-        const origin = { x:npc.startX, z:npc.startZ };
-        for (let x = -reach - 1; x <= reach + 1; x++) for (let z = -reach - 1; z <= reach + 1; z++) {
-          place(owner, { x:origin.x + x, z:origin.z + z });
-          npc.setInteraction(Interaction.SCRIPT, owner, NpcMode.OPPLAYER2);
-          const nativeInRange = npc.targetWithinMaxRange();
-          npc.clearInteraction();
-          npc.targetOp = NpcMode.WANDER;
-          npc.setVar(nv('npc_barrows_public'), 0);
-          assert.equal(playerNpc(other, npc, '[proc,barrows_actor_attackable]').popInt(), Number(!nativeInRange),
-            `${name} stranger gate equals native maxrange+1 including excluded corners at ${x},${z}`);
-        }
-        assert.deepEqual({ x:npc.startX, z:npc.startZ }, origin, 'native boundary fixture does not move the spawn');
-      } finally {
-        Math.random = mathRandom;
-        removePlayer(owner); removePlayer(other);
-        for (const npc of [...World.npcs]) if (npc.isActive && npc.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(npc, -1);
-      }
-    });
     for (const name of draws.keys()) for (const release of ['walk away', 'door crossing', 'exit', 'death', 'logout', 'generation advance', 'generation wrap', 'paid reset']) {
       check(`${name} abandoned door: ${release}, native B retaliation, idle C and original lifetime`, () => abandonment(name, draws, release));
+    }
+    for (const name of draws.keys()) for (const kind of ['empty quiver', 'no runes']) {
+      check(`${name} private and released native Attack with ${kind}`, () => failedStrangerAttack(name, draws, kind));
     }
     for (const name of draws.keys()) check(`${name} per-event whole-life hunt/timer invariants`, () => ownedEvents(name, draws));
     for (const name of draws.keys()) check(`${name} owned timer passivates before following an owner fought by another NPC`, () => {
