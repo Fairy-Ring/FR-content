@@ -7,6 +7,8 @@
 [oploc1,canoeing_canoestation_edgeville] @canoe_station(4);
 
 [label,canoe_station](int $station)
+// CANDIDATE members-only: official Knowledge Base, 25 August 2006.
+if (map_members = ^false) { mes(^mes_members_feature); return; }
 %canoe_startfrom = $station;
 def_int $state = ~canoe_state($station);
 if ($state = 0) {
@@ -23,6 +25,7 @@ if ($state = 0) {
     ~canoe_set_state($station, 9);
     p_delay(^canoe_fall_delay);
     ~canoe_set_state($station, 10);
+    // UNKNOWN engineering default: chopping itself grants no XP.
     return;
 }
 if ($state = 10) {
@@ -130,7 +133,7 @@ def_int $station = %canoe_startfrom;
 def_int $hull = calc(~canoe_state($station) - 4);
 if (~canoe_can_travel($hull, $station, $destination) = false) { return; }
 if_close;
-// CANDIDATE: canoes are single-use. Consume before suspension, not after arrival.
+// UNKNOWN engineering default: canoes are single-use; consume before suspension.
 ~canoe_set_state($station, 0);
 anim(canoeing_getting_in, 0);
 p_delay(^canoe_travel_delay);

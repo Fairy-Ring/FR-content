@@ -1,29 +1,34 @@
-// CANDIDATE: canoe hull requirements, shaping XP and station reach; see canoes research.
+// CANDIDATE levels and shaping XP: official Knowledge Base, 21 July 2006.
+// Assumption: no intervening change since 2 May 2006; see canoes research.
 // XP is stored in tenths, as required by stat_advance.
 [canoe_log]
 table=canoe_hulls
 data=hull,1
 data=level,12
-data=xp,300
+data=xp,0
+// UNKNOWN engineering reach: maximum mainland station distance.
 data=reach,1
 
 [canoe_dugout]
 table=canoe_hulls
 data=hull,2
 data=level,27
-data=xp,600
+data=xp,300
+// UNKNOWN engineering reach: maximum mainland station distance.
 data=reach,2
 
 [canoe_stable_dugout]
 table=canoe_hulls
 data=hull,3
 data=level,42
-data=xp,900
+data=xp,600
+// UNKNOWN engineering reach: maximum mainland station distance.
 data=reach,3
 
 [canoe_waka]
 table=canoe_hulls
 data=hull,4
 data=level,57
-data=xp,1500
+data=xp,1200
+// UNKNOWN engineering reach: all mainland stations; Wilderness handled separately.
 data=reach,4
