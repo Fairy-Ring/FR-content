@@ -284,6 +284,8 @@
     "skill_anim": "Current skilling animation selection.",
     "score_gnomeball_game": "Current Gnome Ball match score, not an earned persistent total.",
     "pilot_journey": "Current glider journey interface selection.",
+    "canoeing_menu": "Current canoe station and hull menu context; deliberately not saved so login cannot resume a stale shaping or travel selection after the stations reset.",
+    "canoeing_river_lum": "Current canoe construction and launch states for the four stations; deliberately not saved so every station is a plain tree again at login and cannot leave the player stuck in an unfinished canoe state.",
     "open_book": "Currently open book object.",
     "book_page": "Currently open book page.",
     "option_run": "Current run toggle; 289 deliberately keeps it temporary.",
