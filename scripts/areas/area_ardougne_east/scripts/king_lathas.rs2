@@ -1,4 +1,9 @@
 [opnpc1,kinglathas]
+if (%makinghistory_prog = 2 | %makinghistory_prog = 3) {
+    if (~p_choice2("Talk about the outpost.", 1, "Talk about something else.", 2) = 1) {
+        @mh_lathas;
+    }
+}
 // Regicide branches (274 kinglathas → 377 king_lathas). Start-gate: stage 1 → 2.
 if(%regicide_quest > ^regicide_not_started) {
     switch_int(%regicide_quest) {

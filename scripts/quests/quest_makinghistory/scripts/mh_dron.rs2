@@ -1,8 +1,6 @@
-// Making History mid — Dron / Blanin warrior track (after licensed Jorral).
-// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Dron / Blanin
-// minus Overview / Jorral receive / last-person wrap. Hunt 289? no.
-// Bounce writes warr_prog 0→1. Quiz pass 1→2. Oral only — no obj.
-// Cite making-history-dron-first-slice-377.md.
+// CANDIDATE wording: OSRS Making History transcript revision 15263331.
+// Quiz answers are also listed by period Tip.It (2 May 2006).
+// UNKNOWN engineering encoding: 1 ready, 2 learned, 3 reported to Jorral.
 
 [opnpc1,makinghistory_dron]
 if (%makinghistory_prog < 1) {
@@ -42,6 +40,9 @@ if (%makinghistory_prog < 1) {
 ~chatnpc("<p,neutral>His favorite drink is red spider blood, he's 36 years, 8 months and 21 days old, studies famous battles of the Fourth and Fifth ages, lives on the North East side of town and his, erm... pet cat is called Fluffy.");
 ~chatplayer("<p,confused>O..K....");
 ~chatnpc("<p,neutral>I know this sounds strange but Dron won't talk to anyone unless they know him well - he's a secretive guy.");
+if (%makinghistory_warr_prog = 0) {
+    %makinghistory_warr_prog = 1;
+}
 return;
 
 [label,mh_dron_quiz]

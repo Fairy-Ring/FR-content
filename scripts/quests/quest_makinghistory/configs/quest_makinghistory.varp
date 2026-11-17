@@ -1,3 +1,10 @@
 [makinghistory]
 scope=perm
 transmit=yes
+
+// UNKNOWN engineering state: last Feel distance plus one, zero means no reading.
+// Server-only. The existing cache Making History varp remains unchanged.
+[makinghistory_key_distance]
+type=int
+scope=perm
+transmit=no

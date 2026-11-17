@@ -73,6 +73,7 @@ if(map_members = ^true & ~trail_hasclue_inv = true) {
 if (~barrows_dig() = true) {
     return;
 }
+if (~mh_dig() = true) return;
 ~displaymessage(^dm_default);
 
 
