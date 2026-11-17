@@ -1,0 +1,40 @@
+// CANDIDATE speech: desert-treasure.dlg.azzanadra-completion (r15343078).
+// VERIFIED reward amounts: period-requirements; product stages are CANDIDATE.
+[opnpc1,azzanadra] @dt_azzanadra_talk;
+[opnpc1,azzanadra_real] @dt_azzanadra_talk;
+
+[label,dt_azzanadra_talk]
+if (%deserttreasure ! ^dt_stage_inside_pyramid & %deserttreasure ! ^dt_stage_reward_pending) return;
+if (%deserttreasure = ^dt_stage_inside_pyramid) {
+    ~chatnpc("<p,neutral>I knew they could not trap me here for long! Well done, friend. Tell me, how goes the war?");
+    ~chatplayer("<p,neutral>War?");
+    ~chatnpc("<p,neutral>You do not know of the war for our survival? More time must have passed than I had thought...");
+    ~chatnpc("<p,neutral>Tell me, what news of great Paddewwa? Do the shining spires of Lassar still stand? And what of glorious Annakarl? The fortress is still intact?");
+    ~chatplayer("<p,neutral>Er... sorry, I've never heard of them...");
+    ~chatnpc("<p,neutral>No! My lord... what has become of you? I cannot hear your voice anymore!");
+    ~chatnpc("<p,neutral>My thanks to you friend for your help in freeing me from this accursed place, but it seems I have much to do to make amends. If our empire no longer stands, it means that we must have failed my lord...");
+    ~chatnpc("<p,neutral>How long have I been trapped here? Master... have you truly been dispatched from this world?");
+    ~dt_azzanadra_pending;
+}
+~chatnpc("<p,neutral>My friend, for your efforts in freeing me, I offer you the gift of knowledge. We Mahjarrat were once granted powerful ancient magicks by our lord. I now bestow their power upon you.");
+~chatnpc("<p,neutral>They will replace the knowledge you previously had, but you may switch between them by praying at the altar in this room at any time. May you use them well.");
+~chatnpc("<p,neutral>I trust that we shall meet again, but now I must leave you. Feel free to use the portal I shall create to return here easily in the future!");
+~chatplayer("<p,neutral>I should go and let Eblis know what's happened here...");
+~dt_azzanadra_complete;
+
+[proc,dt_azzanadra_pending]
+if (%deserttreasure ! ^dt_stage_inside_pyramid) return;
+%deserttreasure = ^dt_stage_reward_pending;
+~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
+
+[proc,dt_azzanadra_complete]
+// No yield between the guard, durable writer and rewards. Interrupted speech
+// remains stage 14 and can be resumed through the original visible NPC multi.
+if (%deserttreasure ! ^dt_stage_reward_pending) return;
+%deserttreasure = ^dt_stage_complete;
+stat_advance(magic, ^dt_pyramid_magic_reward);
+%alternate_spells = ^dt_spellbook_ancient;
+~dt_restore_spellbook;
+session_log(^log_adventure, "Quest complete: Desert Treasure");
+// UNKNOWN historical scroll wording: use the shared functional reward scroll.
+~send_quest_complete(questlist:deserttreasure, fd_blood_diamond, 250, ^deserttreasure_questpoints, "You have completed the\\nDesert Treasure Quest!", "20,000 Magic XP|Access to Ancient Magicks");
