@@ -18,8 +18,8 @@ const Environment = (await engineModule('util/Environment.ts')).default;
 assert.equal(Environment.NODE_XPRATE, 1, 'set NODE_XPRATE=1 to measure exact script XP');
 
 const questConstants = fs.readFileSync(path.join(contentRoot, 'scripts/general/configs/quest.constant'), 'utf8');
-function questConstant(name) {
-  const match = questConstants.match(new RegExp(`^\\^${name}\\s*=\\s*(\\d+)`, 'm'));
+function questConstant(name, source = questConstants) {
+  const match = source.match(new RegExp(`^\\^${name}\\s*=\\s*(\\d+)`, 'm'));
   assert(match, `missing source quest constant ^${name}`);
   return Number(match[1]);
 }
@@ -252,6 +252,34 @@ for (const [restlessGhost, priestperil] of [[0, PRIESTPERIL_COMPLETE], [PRIEST_C
   talk(player, 'silver_merchant', [2]);
   assert.equal(stage(player, 'makinghistory_trader_prog'), 0, 'trader does not start the quest');
   assert.equal(count(player, 'makinghistory_key'), 0);
+}
+
+// Shared actors retain their original services while Making History is active.
+{
+  const player = qualifiedPlayer();
+  startQuest(player);
+  talk(player, 'silver_merchant', [1]);
+  const merchant = types.NpcType.getByName('silver_merchant');
+  assert.equal(varp(player, 'shop'), merchant.params.get(id('ParamType', 'owned_shop')), 'the original silver shop still opens');
+  assert.equal(stage(player, 'makinghistory_prog'), STAGE.gathering);
+  assert.equal(stage(player, 'makinghistory_trader_prog'), 0, 'shopping does not take the outpost branch');
+  assert.equal(count(player, 'makinghistory_key'), 0);
+}
+{
+  const player = qualifiedPlayer();
+  stage(player, 'makinghistory_prog', STAGE.letter);
+  seed(player, ['makinghistory_letter1']);
+  const regicideConstants = fs.readFileSync(path.join(contentRoot, 'scripts/quests/quest_regicide/configs/quest_regicide.constant'), 'utf8');
+  const received = questConstant('regicide_received_message', regicideConstants);
+  const spoken = questConstant('regicide_spoken_lathas', regicideConstants);
+  varp(player, 'regicide_quest', received);
+  talk(player, 'kinglathas', [2]);
+  assert.equal(varp(player, 'regicide_quest'), spoken, 'the original royal Regicide stage still advances');
+  assert.equal(stage(player, 'makinghistory_prog'), STAGE.letter, 'the other conversation does not consume Jorral’s letter');
+  assert.equal(count(player, 'makinghistory_letter1'), 1);
+  talk(player, 'kinglathas', [1]);
+  assert.equal(stage(player, 'makinghistory_prog'), STAGE.reply, 'the outpost branch remains available alongside Regicide');
+  assert.equal(varp(player, 'regicide_quest'), spoken, 'the outpost conversation does not change Regicide');
 }
 
 // Spade/key gates, the key recovery route, distance tool, chest combination and key retention.
