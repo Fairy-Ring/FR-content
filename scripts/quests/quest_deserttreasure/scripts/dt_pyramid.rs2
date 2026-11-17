@@ -42,6 +42,9 @@ else cleartimer(dt_pyramid_hazards);
 // UNKNOWN engineering crossing tiles, adjacent to the original door pair.
 if (coordz(coord) > 9324) p_teleport(0_50_145_34_43);
 else p_teleport(0_50_145_34_45);
+// Completed players can arrive through the existing safe-chamber portal.
+// Crossing back into the corridor must resume hazards without a music hook.
+~dt_pyramid_start;
 
 
 [proc,dt_pyramid_inside](coord $tile)(boolean)
