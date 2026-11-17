@@ -111,7 +111,12 @@ const OWNER_PREDICATES = [
     { proc: 'slayer_regicide_unlocked', categories: ['slayer_elf'] },
     { proc: 'slayer_deserttreasure_unlocked', categories: ['slayer_dustdevil'] },
     { proc: 'slayer_mourning2_unlocked', categories: ['slayer_darkbeast'] },
-    { proc: 'slayer_skippy_unlocked', categories: ['slayer_mogre'] }
+    {
+        proc: 'slayer_skippy_unlocked',
+        categories: ['slayer_mogre'],
+        // VERIFIED 377: skippy_state is bits 0-2 of this varp; CANDIDATE completion is 3.
+        gate: { variable: 'rimmington_extras_var', threshold: 3 }
+    }
 ];
 
 function parseArgs(argv) {
@@ -1494,6 +1499,49 @@ function testPriestperilAccess() {
     return { stageVariable: 'priestperil', completion: 60, access: 61, stages, assignments };
 }
 
+function testSkippyAccess() {
+    const owner = OWNER_PREDICATES.find(entry => entry.proc === 'slayer_skippy_unlocked');
+    const target = Number(ORACLE.constants.get('slayer_mogre'));
+    const masters = ORACLE.masters.filter(master => master.rows.some(row => row.target === target));
+    assert(masters.length > 0, 'mogres need a real master row');
+    const player = makePlayer();
+    const assignments = [];
+    for (let stage = 0; stage <= owner.gate.threshold; stage++) {
+        const expected = stage === owner.gate.threshold;
+        for (const master of masters) {
+            const fixture = {
+                key: `${master.key}_skippy_${stage}`, combat: 126, level: 99, baseSlayer: 99, currentSlayer: 99,
+                questValues: { ...completedQuestValues(), [owner.gate.variable]: stage }
+            };
+            applyFixture(player, fixture);
+            const npc = makeNpc(IDS.masters[master.key]);
+            assert.equal(runInt(player, `[proc,${owner.proc}]`, npc).value, Number(expected), `Skippy stage ${stage}: access predicate`);
+            assert.equal(validatorAccepts(player, npc, target), expected, `Skippy stage ${stage}: mogre category access`);
+            const index = master.rows.findIndex(row => row.target === target);
+            const fallback = master.rows.findIndex(row => row.target !== target && expectedRowEligibility(row, fixture));
+            assert(fallback >= 0, `${master.key}: below-gate control needs an eligible non-mogre row`);
+            const selected = expected ? index : fallback;
+            // Offer the forbidden mogre row a winning roll before assigning a control on the next pass.
+            const stream = expected ? [] : master.rows.map((_, rowIndex) => rowIndex === index ? 0 : 1 - Number.EPSILON);
+            stream.push(...Array(selected).fill(1 - Number.EPSILON), 0, 0);
+            const trace = traceWrites(player);
+            let draw;
+            try {
+                draw = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id]));
+            } finally {
+                trace.restore();
+            }
+            assert.equal(draw.result.value, 1, `${master.key}: real table must assign at Skippy stage ${stage}`);
+            assert.equal(player.getVar(IDS.target), master.rows[selected].target, `${master.key}: Skippy gate must affect the real draw`);
+            assert.equal(player.getVar(IDS.count), master.rows[selected].min, 'real assignment must retain its amount bound');
+            assert.deepEqual(trace.events, [{ kind: 'target', value: master.rows[selected].target }, { kind: 'count', value: master.rows[selected].min }], 'only the permitted task may be written');
+            assert.equal(player.getVar(QUEST_VAR_IDS[owner.gate.variable]), stage, 'assignment must not change Skippy state');
+            assignments.push({ master: master.key, stage, mogresAccepted: expected, after: taskSnapshot(player), randomValues: draw.observed });
+        }
+    }
+    return { stageVariable: owner.gate.variable, completion: owner.gate.threshold, assignments };
+}
+
 function testDispatchAndOneShotOrder(packedRows) {
     const results = [];
     for (const master of ORACLE.masters) {
@@ -2324,6 +2372,7 @@ function testCurrentSuite() {
     const currentStatSource = testCurrentSlayerDoesNotGateAssignment();
     const ownerPredicateDispatch = testOwnerPredicateDispatch();
     const priestperilAccess = testPriestperilAccess();
+    const skippyAccess = testSkippyAccess();
     const fixtureValidatorCaches = new Map();
     const emptyMinimumFailures = [];
     for (const master of ORACLE.masters) {
@@ -2365,7 +2414,7 @@ function testCurrentSuite() {
     const dispatch = testDispatchAndOneShotOrder(packedRows);
     const teachingAdmission = testCurrentTeachingAdmission();
     const teachingSuccess = testCurrentTeachingSuccess();
-    return { packedRows, masterSnapshots, turaelPredicate, d1Bears, ernest, chaeldarRetargets, duradelTables, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, priestperilAccess, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+    return { packedRows, masterSnapshots, turaelPredicate, d1Bears, ernest, chaeldarRetargets, duradelTables, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, priestperilAccess, skippyAccess, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
 }
 
 function fixtureSourceRows() {
@@ -2736,6 +2785,7 @@ try {
             currentStatSource: current.currentStatSource,
             ownerPredicateDispatch: current.ownerPredicateDispatch,
             priestperilAccess: current.priestperilAccess,
+            skippyAccess: current.skippyAccess,
             dispatch: current.dispatch,
             emptyMinimumFailures: current.emptyMinimumFailures,
             teaching: current.teaching
