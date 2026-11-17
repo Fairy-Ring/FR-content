@@ -74125,6 +74125,9 @@ cost=300
 members=yes
 wearpos=feet
 weight=1g
+// VERIFIED: Tip.It Ghostly Robes, capture 28 April 2006, rewards table.
+param=magicattack,2
+param=magicdefence,2
 
 [secret_ghost_top]
 name=Ghostly robe
@@ -74141,6 +74144,9 @@ members=yes
 wearpos=torso
 wearpos2=arms
 weight=1g
+// VERIFIED: Tip.It Ghostly Robes, capture 28 April 2006, rewards table.
+param=magicattack,5
+param=magicdefence,5
 
 [secret_ghost_bottom]
 name=Ghostly robe
@@ -74155,6 +74161,9 @@ womanwear=obj_secret_ghost_bottom_womanwear,0
 members=yes
 wearpos=legs
 weight=1g
+// VERIFIED: Tip.It Ghostly Robes, capture 28 April 2006, rewards table.
+param=magicattack,4
+param=magicdefence,4
 
 [secret_ghost_hat]
 name=Ghostly hood
@@ -74176,6 +74185,9 @@ members=yes
 weight=1g
 wearpos=hat
 wearpos2=head
+// VERIFIED: Tip.It Ghostly Robes, capture 28 April 2006, rewards table.
+param=magicattack,3
+param=magicdefence,3
 
 [secret_ghost_gloves]
 name=Ghostly gloves
@@ -74191,6 +74203,9 @@ womanwear=obj_secret_ghost_gloves_womanwear,0
 members=yes
 wearpos=hands
 weight=1g
+// VERIFIED: Tip.It Ghostly Robes, capture 28 April 2006, rewards table.
+param=magicattack,2
+param=magicdefence,2
 
 [secret_ghost_cloak]
 name=Ghostly cloak
@@ -74207,6 +74222,9 @@ womanwear=obj_secret_ghost_cloak_womanwear,0
 members=yes
 wearpos=back
 weight=1g
+// VERIFIED: Tip.It Ghostly Robes, capture 28 April 2006, rewards table.
+param=magicattack,5
+param=magicdefence,5
 
 [kelda_hop_seed]
 name=Kelda seed
