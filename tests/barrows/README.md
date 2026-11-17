@@ -19,16 +19,15 @@ Each negative control must exit 1. Add `--mutant NAME` to the command:
 
 Mutants change only text in memory. They do not modify content files.
 
-## Verbatim combat configuration move (BC-01)
+## Combat configuration (BC-01 and BC-02)
 
 ```sh
 node --import tsx ../content/tests/barrows/test_combat_config.mjs --content-root ../content
-node --import tsx ../content/tests/barrows/test_combat_config.mjs --content-root ../content --baseline-pack "$BASELINE_PACK"
 ```
 
-The thirteen original combat blocks now live in `scripts/minigames/game_barrows/configs/barrows_combat.npc`. No combat value or client field changes in this move. The source check requires exactly those thirteen sections, none remaining in the unpacked file, and the original debugname-to-ID assignments. It compares every authored server field with the native packed configuration and checks the owned timer, death and queue bindings.
+BC-01 moved the thirteen original blocks into `scripts/minigames/game_barrows/configs/barrows_combat.npc` without changing them. BC-02 changes the seven tunnel groups below. The current source check requires exactly those thirteen sections, none remaining in the unpacked file, and the original debugname-to-ID assignments. It checks every selected server value, the native packed configuration, and the timer, death and queue bindings.
 
-For the second command, build the campaign base first and retain its pack in `BASELINE_PACK`. The test loads both packs during the same run and compares all decoded NPC fields, parameters and resolved timer/death/queue scripts. No saved server-value fixture or script bytecode supplies that comparison. The unchanged cfg-npc suite retains the complete client NPC hash gate.
+The test's historical `--baseline-pack` mode compares every field and binding with a separately built BC-01 base. Run that equality check only at BC-01: it intentionally fails on BC-02's changed server fields. The current BC-02 compatibility checks are the tunnel suite's `--base-pack` and `--compat-pack` modes below. The unchanged cfg-npc suite retains the complete client NPC hash gate.
 
 ## Tunnel combat (BC-02)
 
@@ -36,15 +35,15 @@ For the second command, build the campaign base first and retain its pack in `BA
 node --import tsx ../content/tests/barrows/test_combat_tunnels.mjs
 ```
 
-The 34 static tunnel placements acquire players of every combat level through native `aggressive_melee`, with the named engineering radius 4. Native wander 5, maxrange 7, contact clipping and tolerance expiry remain unchanged. The field selections are later CANDIDATE reconstructions, except the separately sourced Hitpoints and period aggression facts. Crypt rat Hitpoints stay 35. Both skeletons use 50 Hitpoints and a local explicit maximum 10 without fitting Strength. No client field changes.
+The 34 Lost City static tunnel placements acquire players of every combat level through native `aggressive_melee`. `BARROWS_HUNT_RADIUS=4` is as built; engineering choice; period value UNKNOWN. Native wander 5, maxrange 7, contact clipping and tolerance expiry remain unchanged. The field selections are later CANDIDATE reconstructions, except the separately sourced Hitpoints and period aggression facts. Crypt rat Hitpoints stay 35. Both skeletons use 50 Hitpoints and a local explicit maximum 10 without fitting Strength. No client field changes.
 
-Owned door actors (the D4 skeleton, bloodworm and crypt rat) are not aggressive. The door spawn clears the actor's instance hunt. The owned timer pre-empts the native target resets that would restore the type hunt (owner out of range or on another level, owner dead or engaged by another NPC, retreat mode): the actor targets only its owner. Without its owner it stays passive, as before BC-02, and the owner re-engages it by attacking.
+An owned door monster attacks only its owner for its whole life. If the owner is gone, it stays passive until its owned timer removes it. The seven types default to no hunt and timer one, so every native target reset retains those owned defaults. A positive generation identifies an owned actor even after reset. Static actors alone arm their aggressive hunt at spawn and from the type timer. Their first spawn/respawn acquisition is unchanged; reacquisition after a target reset may be one world tick later. This reset scheduling is as built; engineering choice; period UNKNOWN.
 
-The config suite checks each selected server value explicitly. The tunnel suite executes actual packed dispatch, queues, protection, retaliation, hunt and tolerance paths. It also runs each door monster's lifetime with two players through the real door spawn and owned timer: the owner walks away, crosses a door, logs out, dies or is engaged by another NPC, and the second player is never targeted. The existing poison, death/credit, owned-removal and D4 suites remain registered. Built-vector additions contain only these seven types and retain their pre-build native snapshots.
+The config suite checks each selected server value explicitly. The tunnel suite executes packed dispatch, queues, protection, retaliation, hunt and tolerance paths. Its native two-player regressions cover an owner returning and attacking from outside the monster's range, and accepted lost-connection logout with deferred removal. Every ownership-guard clause has an isolated negative control. Native event cases retain the no-hunt/owned-timer invariant through retaliation, target reset, death, departure and foreign attacks.
 
-Acceptance only: with a separately built pre-BC-02 campaign pack, `--base-pack BASE_PACK` also runs the same owned lifetimes on both packs in one process and requires the same per-tick targets, modes and attacks; static placements differ only by acquisition.
+Acceptance only: `--base-pack BASE_PACK` compares the two named owned lifetimes with a separately built pre-BC-02 pack in the same process. `--compat-pack PRE_FIX_PACK` compares static first spawn, real respawn, attack ticks, wander, bounded reset reacquisition and complete static/owned poison timelines with the pre-fix BC-02 pack. It does not claim every owned input was unchanged before BC-02. Built-vector changes remain restricted to the seven tunnel types and retain their pre-build snapshots.
 
-Combat animations and sounds follow the operator's rule of 16 November: a published same-model donor first (witchrat's rat_death, giantrat, spider, giantspider1, dragonslayer_skeleton's sounds), otherwise the type's own family (the bloodworm's sequences, the crypt rat's attack and block). The config suite checks every bound value explicitly, its donor or own-family prefix, that each bound sequence has the frame base of the type's own walk/ready sequences, and that it moves only labels the type's models carry. It also proves the unbound cases: skeleton_* sequences do not share the skeletons' human base, no published type supplies a bloodworm donor, and the human defaults move labels the crypt rat lacks. These are server parameters; the client config bytes are unchanged.
+Combat animations and sounds follow the operator's rule of 16 November: a compatible published donor first (witchrat's rat_death, giantrat, spider and giantspider1; dragonslayer_skeleton shares the tunnel skeletons' first model and supplies sounds only), otherwise the type's own family (the bloodworm's sequences and the crypt rat's attack/block and remaining sounds). These server bindings are Lost City reconstructions, not original cache metadata. The config suite checks each binding, its donor or own-family prefix, the frame base against the type's walk/ready, and the model's moved labels. Skeleton_* sequences do not share the tunnel skeletons' human base; no published type supplies a bloodworm donor; human defaults move labels the crypt rat lacks. Client config bytes remain unchanged.
 
 ## Durable core (S01)
 
@@ -89,7 +88,7 @@ node --import tsx ../content/tests/barrows/test_poison.mjs
 node --import tsx ../content/tests/barrows/test_hint.mjs
 ```
 
-Unowned tunnel monsters retain the published default poison timer, including the rat's first 35-to-31 hitpoint step. Owned actors use the shared counted poison helper without interrupting their one-tick owner check. Native turns cover the whole poison countdown and removal within one tick of departure, before and after poison ends. Poison is the published combat rule; counting timer runs is engineering.
+Static tunnel monsters use the one-tick counted poison helper with an opt-in that preserves their original poison phase through stronger applications, cure/restart and natural ending/restart. Their complete HP/severity/phase sequence matches the pre-fix native timer, including the rat's unchanged first 35-to-31 hitpoint step. Owned actors keep the shared helper's original counter-reset semantics and their one-tick owner check. Unflagged callers retain the shared script's previous behaviour. Poison is the published combat rule; counting and preserving the timer phase are engineering.
 
 Each awakened brother sends the existing `hint_npc` command only to its owner. The packed checks read the real hint packets at spawn, death, removal, timer departure and logout, with a second-player negative control. Ordinary tunnel monsters get no brother hint. This CANDIDATE appearance follows the near-target video and official picture; it changes no client cache bytes. The command precedent is the Haunted Mine ghost's appearance in `hauntedmine_boss_ghost.rs2`.
 Both players are registered in the world's player slots and native zone list, so the second-player control also detects an accidental area broadcast.

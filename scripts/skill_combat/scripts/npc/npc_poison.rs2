@@ -23,7 +23,7 @@ if (%npc_poison > 0) {
 %npc_owned_timer_interval = $interval;
 npc_settimer($interval);
 if (%npc_poison <= 0) {
-    %npc_poison_timer_runs = 0;
+    if (%npc_poison_preserve_phase ! ^true) %npc_poison_timer_runs = 0;
     return;
 }
 %npc_poison_timer_runs = add(%npc_poison_timer_runs, 1);
@@ -39,7 +39,7 @@ if (modulo(%npc_poison_timer_runs, 30) ! 0) return;
 %npc_poison = 0;
 if (%npc_owned_timer_interval > 0) {
     npc_settimer(%npc_owned_timer_interval);
-    %npc_poison_timer_runs = 0;
+    if (%npc_poison_preserve_phase ! ^true) %npc_poison_timer_runs = 0;
 } else {
     npc_settimer(0); // npc_cleartimer?
 }
@@ -56,7 +56,7 @@ if (map_members = ^false) {
 if ($severity > %npc_poison) {
     if (%npc_owned_timer_interval > 0) {
         npc_settimer(%npc_owned_timer_interval);
-        %npc_poison_timer_runs = 0;
+        if (%npc_poison_preserve_phase ! ^true) %npc_poison_timer_runs = 0;
     } else {
         npc_settimer(30);
     }

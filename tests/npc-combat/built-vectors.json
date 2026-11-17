@@ -839,42 +839,30 @@
           "value": 1
         },
         "huntmode": {
-          "value": {
-            "ref": "hunt",
-            "name": "aggressive_melee"
-          },
+          "value": -1,
           "evidence": {
-            "facts": [
-              "barrows.bc-tunnel-aggression-level-policy"
-            ],
-            "label": "CANDIDATE",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc-osrs-history",
-                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
-              }
-            ]
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
+          }
+        },
+        "timer": {
+          "value": 1,
+          "evidence": {
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "huntrange": {
           "value": 4,
           "evidence": {
-            "facts": [
-              "barrows.bc02-native-acquisition-selection"
-            ],
-            "label": "VERIFIED",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc02-engineering-selection",
-                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
-              },
-              {
-                "id": "src.barrows-bc02-operator-health-regen",
-                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
-              }
-            ]
+            "facts": ["barrows.bc02-hunt-radius-engineering-choice"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "param:attackrate": {
@@ -1071,42 +1059,30 @@
           "value": 1
         },
         "huntmode": {
-          "value": {
-            "ref": "hunt",
-            "name": "aggressive_melee"
-          },
+          "value": -1,
           "evidence": {
-            "facts": [
-              "barrows.bc-tunnel-aggression-level-policy"
-            ],
-            "label": "CANDIDATE",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc-osrs-history",
-                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
-              }
-            ]
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
+          }
+        },
+        "timer": {
+          "value": 1,
+          "evidence": {
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "huntrange": {
           "value": 4,
           "evidence": {
-            "facts": [
-              "barrows.bc02-native-acquisition-selection"
-            ],
-            "label": "VERIFIED",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc02-engineering-selection",
-                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
-              },
-              {
-                "id": "src.barrows-bc02-operator-health-regen",
-                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
-              }
-            ]
+            "facts": ["barrows.bc02-hunt-radius-engineering-choice"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "param:attackrate": {
@@ -1351,42 +1327,30 @@
           "value": 1
         },
         "huntmode": {
-          "value": {
-            "ref": "hunt",
-            "name": "aggressive_melee"
-          },
+          "value": -1,
           "evidence": {
-            "facts": [
-              "barrows.bc-tunnel-aggression-level-policy"
-            ],
-            "label": "CANDIDATE",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc-osrs-history",
-                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
-              }
-            ]
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
+          }
+        },
+        "timer": {
+          "value": 1,
+          "evidence": {
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "huntrange": {
           "value": 4,
           "evidence": {
-            "facts": [
-              "barrows.bc02-native-acquisition-selection"
-            ],
-            "label": "VERIFIED",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc02-engineering-selection",
-                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
-              },
-              {
-                "id": "src.barrows-bc02-operator-health-regen",
-                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
-              }
-            ]
+            "facts": ["barrows.bc02-hunt-radius-engineering-choice"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "param:attackrate": {
@@ -1631,42 +1595,30 @@
           "value": 1
         },
         "huntmode": {
-          "value": {
-            "ref": "hunt",
-            "name": "aggressive_melee"
-          },
+          "value": -1,
           "evidence": {
-            "facts": [
-              "barrows.bc-tunnel-aggression-level-policy"
-            ],
-            "label": "CANDIDATE",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc-osrs-history",
-                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
-              }
-            ]
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
+          }
+        },
+        "timer": {
+          "value": 1,
+          "evidence": {
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "huntrange": {
           "value": 4,
           "evidence": {
-            "facts": [
-              "barrows.bc02-native-acquisition-selection"
-            ],
-            "label": "VERIFIED",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc02-engineering-selection",
-                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
-              },
-              {
-                "id": "src.barrows-bc02-operator-health-regen",
-                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
-              }
-            ]
+            "facts": ["barrows.bc02-hunt-radius-engineering-choice"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "param:attackrate": {
@@ -1911,42 +1863,30 @@
           "value": 1
         },
         "huntmode": {
-          "value": {
-            "ref": "hunt",
-            "name": "aggressive_melee"
-          },
+          "value": -1,
           "evidence": {
-            "facts": [
-              "barrows.bc-tunnel-aggression-level-policy"
-            ],
-            "label": "CANDIDATE",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc-osrs-history",
-                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
-              }
-            ]
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
+          }
+        },
+        "timer": {
+          "value": 1,
+          "evidence": {
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "huntrange": {
           "value": 4,
           "evidence": {
-            "facts": [
-              "barrows.bc02-native-acquisition-selection"
-            ],
-            "label": "VERIFIED",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc02-engineering-selection",
-                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
-              },
-              {
-                "id": "src.barrows-bc02-operator-health-regen",
-                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
-              }
-            ]
+            "facts": ["barrows.bc02-hunt-radius-engineering-choice"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "param:attackrate": {
@@ -2195,42 +2135,30 @@
           "value": 1
         },
         "huntmode": {
-          "value": {
-            "ref": "hunt",
-            "name": "aggressive_melee"
-          },
+          "value": -1,
           "evidence": {
-            "facts": [
-              "barrows.bc-tunnel-aggression-level-policy"
-            ],
-            "label": "CANDIDATE",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc-osrs-history",
-                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
-              }
-            ]
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
+          }
+        },
+        "timer": {
+          "value": 1,
+          "evidence": {
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "huntrange": {
           "value": 4,
           "evidence": {
-            "facts": [
-              "barrows.bc02-native-acquisition-selection"
-            ],
-            "label": "VERIFIED",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc02-engineering-selection",
-                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
-              },
-              {
-                "id": "src.barrows-bc02-operator-health-regen",
-                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
-              }
-            ]
+            "facts": ["barrows.bc02-hunt-radius-engineering-choice"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "param:attackrate": {
@@ -2410,42 +2338,30 @@
           "value": 1
         },
         "huntmode": {
-          "value": {
-            "ref": "hunt",
-            "name": "aggressive_melee"
-          },
+          "value": -1,
           "evidence": {
-            "facts": [
-              "barrows.bc-tunnel-aggression-level-policy"
-            ],
-            "label": "CANDIDATE",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc-osrs-history",
-                "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
-              }
-            ]
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
+          }
+        },
+        "timer": {
+          "value": 1,
+          "evidence": {
+            "facts": ["barrows.bc02-reset-safe-static-scheduling"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "huntrange": {
           "value": 4,
           "evidence": {
-            "facts": [
-              "barrows.bc02-native-acquisition-selection"
-            ],
-            "label": "VERIFIED",
-            "researchCommit": "19593875c2956f163a7007da40dac728f445f4e6",
-            "sources": [
-              {
-                "id": "src.barrows-bc02-engineering-selection",
-                "sha256": "e3073b605687d30f877ee8b37c87938e7d7ea01f8b4043d903e6cf4c39dee215"
-              },
-              {
-                "id": "src.barrows-bc02-operator-health-regen",
-                "sha256": "2b4e7d02f91f6888f62af759f638d70392cf65293529ee745233580087e693ac"
-              }
-            ]
+            "facts": ["barrows.bc02-hunt-radius-engineering-choice"],
+            "label": "UNKNOWN",
+            "researchCommit": "ae44153e81bce7562add1b8a597a0974eb892049",
+            "sources": []
           }
         },
         "param:attackrate": {

@@ -45,12 +45,17 @@ function evidence(value, context) {
     need(Array.isArray(value.facts) && value.facts.length > 0 && value.facts.every(id =>
         typeof id === 'string' && factPattern.test(id)), 'evidence', `${context}: missing or malformed fact id in ${JSON.stringify(value.facts)}`);
     need(new Set(value.facts).size === value.facts.length, 'evidence', `${context}: duplicate fact id`);
-    need(['VERIFIED', 'CANDIDATE'].includes(value.label), 'evidence', `${context}: missing or invalid label`);
+    need(['VERIFIED', 'CANDIDATE', 'UNKNOWN'].includes(value.label), 'evidence', `${context}: missing or invalid label`);
     need(typeof value.researchCommit === 'string' && commitPattern.test(value.researchCommit),
         'evidence', `${context}: researchCommit must be a full lowercase commit`);
-    need(Array.isArray(value.sources) && value.sources.length > 0, 'evidence', `${context}: missing source hashes`);
+    if (value.label === 'UNKNOWN') {
+        need(value.sources === undefined || (Array.isArray(value.sources) && value.sources.length === 0),
+            'evidence', `${context}: UNKNOWN engineering values must have no sources`);
+    } else {
+        need(Array.isArray(value.sources) && value.sources.length > 0, 'evidence', `${context}: missing source hashes`);
+    }
     const sources = new Set();
-    for (const source of value.sources) {
+    for (const source of value.sources ?? []) {
         keys(source, ['id', 'sha256'], `${context} source`);
         need(typeof source.id === 'string' && sourcePattern.test(source.id), 'evidence', `${context}: malformed source id`);
         need(typeof source.sha256 === 'string' && hashPattern.test(source.sha256), 'evidence', `${context}: malformed source hash`);

@@ -59,7 +59,10 @@ return(false);
 
 [proc,barrows_actor_tick]
 if (%npc_barrows_generation <= 0) {
-    ~npc_poison_timer;
+    // as built; engineering choice; period UNKNOWN: re-arm static hunting after
+    // reset. World hunting precedes this timer, so reacquisition may be one tick later.
+    if (npc_getmode = wander | npc_getmode = none) npc_sethuntmode(aggressive_melee);
+    ~npc_poison_counted_timer(^barrows_owner_check_ticks);
     return;
 }
 if (finduid(%npc_barrows_owner) = false) {
@@ -88,3 +91,20 @@ if (~barrows_inside(coord) = false | ~barrows_inside(npc_coord) = false | %npc_b
 [ai_timer,barrows_skeleton_unarmed] ~barrows_actor_tick;
 [ai_timer,barrows_skeleton_armed] ~barrows_actor_tick;
 [ai_timer,barrows_giantspider] ~barrows_actor_tick;
+
+// Initial map actors are armed before players arrive. Respawns also run their
+// type timer in the respawning turn; this spawn event preserves the same policy.
+// Owned door actors already have their generation when the queued event runs.
+[proc,barrows_tunnel_spawn]
+if (%npc_barrows_generation > 0) return;
+%npc_owned_timer_interval = ^barrows_owner_check_ticks;
+%npc_poison_preserve_phase = ^true;
+npc_sethuntmode(aggressive_melee);
+
+[ai_spawn,barrows_rat] ~barrows_tunnel_spawn;
+[ai_spawn,barrows_bloodworm] ~barrows_tunnel_spawn;
+[ai_spawn,barrows_spider] ~barrows_tunnel_spawn;
+[ai_spawn,barrows_giantrat] ~barrows_tunnel_spawn;
+[ai_spawn,barrows_skeleton_unarmed] ~barrows_tunnel_spawn;
+[ai_spawn,barrows_skeleton_armed] ~barrows_tunnel_spawn;
+[ai_spawn,barrows_giantspider] ~barrows_tunnel_spawn;

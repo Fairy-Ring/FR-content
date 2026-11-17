@@ -151,8 +151,10 @@ await run(async () => {
         assert(fields.has(field), `${name} explicit ${field}`);
         assert.equal(npc.stats[stat], expected.stats[stat], `${name} selected ${field}`);
       }
-      assert.equal(fields.get('huntmode'), 'aggressive_melee', `${name} authored all-level hunt policy`);
-      assert.equal(npc.huntmode, packedId(contentRoot, 'hunt', 'aggressive_melee'), `${name} selected huntmode`);
+      assert(!fields.has('huntmode'), `${name} authored huntless type default`);
+      assert.equal(npc.huntmode, -1, `${name} reset-safe huntmode`);
+      assert.equal(fields.get('timer'), '1', `${name} authored reset-safe timer`);
+      assert.equal(npc.timer, 1, `${name} reset-safe timer`);
       assert.equal(npc.huntrange, 4, `${name} BARROWS_HUNT_RADIUS`);
       for (const [field, value] of Object.entries({ defaultmode: 1, wanderrange: 5, maxrange: 7, attackrange: 0, regenrate: 100, givechase: true })) {
         assert.equal(npc[field], value, `${name} retained native ${field}`);

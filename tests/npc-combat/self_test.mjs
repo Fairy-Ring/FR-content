@@ -52,6 +52,19 @@ export async function runSelfTests(pack, tempRoot) {
         await rejects('malformed fact id', 'evidence', entry => entry.evidence.facts = ['not-a-fact']);
         await rejects('missing label', 'evidence', entry => delete entry.evidence.label);
         await rejects('invalid label', 'evidence', entry => entry.evidence.label = 'UNKNOWN');
+        const unknown = structuredClone(valid);
+        unknown.manifest.entries[0].evidence.label = 'UNKNOWN';
+        unknown.manifest.entries[0].evidence.sources = [];
+        await checkFiles(unknown);
+        delete unknown.manifest.entries[0].evidence.sources;
+        await checkFiles(unknown);
+        console.log('PASS self-test accepts UNKNOWN engineering fact with empty or absent sources');
+        cases++;
+        await rejects('UNKNOWN without fact', 'evidence', entry => {
+            entry.evidence = { label: 'UNKNOWN', researchCommit: fixtureEvidence.researchCommit, sources: [] };
+        });
+        await rejects('UNKNOWN with source', 'evidence', entry => entry.evidence.label = 'UNKNOWN');
+        await rejects('unknown fourth label', 'evidence', entry => entry.evidence.label = 'UNPROVEN');
         await rejects('missing research commit', 'evidence', entry => delete entry.evidence.researchCommit);
         await rejects('missing source hashes', 'evidence', entry => entry.evidence.sources = []);
         await rejects('malformed source hash', 'evidence', entry => entry.evidence.sources[0].sha256 = 'bad');

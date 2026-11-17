@@ -6,14 +6,13 @@
 [proc,barrows_skeleton_attack]
 ~npc_default_attack_outcome(npc_param(barrows_maxhit), 0, false);
 
-// Ruling 2026-11-16: an owned actor of the tunnel types never targets a player
-// other than its owner. Owned non-brothers are the D4 door monsters (skeleton,
-// bloodworm, crypt rat). The door spawn clears its instance hunt. The native
-// target reset would restore the type hunt and stop this timer, so the owned
-// timer pre-empts it here, before movement and attack in the same turn:
-// npc_setmode(wander) clears the interaction without that reset. The owner is
-// the active player (barrows_actor_tick found it). Without its owner the actor
-// stays passive, as before BC-02; the owner re-engages it by attacking.
+// Engineering ownership rule: an owned door actor attacks only its owner.
+// Huntless TYPE defaults and TYPE timer 1 preserve that invariant through every
+// native reset, including resets after this timer in the queue/movement phases.
+// This guard clears a departing owner's interaction before movement; it is not
+// the reset-safety mechanism. The owner is active (barrows_actor_tick found it).
+// After losing its owner the actor is passive until its timer removes it.
+// The owner re-engages through native retaliation, by attacking it again.
 [proc,barrows_owned_tunnel_guard]
 if (npc_getmode = wander | npc_getmode = none) return;
 if (npc_type = barrows_ahrim | npc_type = barrows_dharok | npc_type = barrows_guthan | npc_type = barrows_karil | npc_type = barrows_torag | npc_type = barrows_verac) return;

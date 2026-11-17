@@ -19,6 +19,9 @@ type=player_uid
 
 [npc_poison_timer_runs]
 
+// Opt-in: retain the native timer phase when stronger poison replaces poison.
+[npc_poison_preserve_phase]
+
 [npc_trawler_flood_status]
 
 [npc_trawler_fish_caught]

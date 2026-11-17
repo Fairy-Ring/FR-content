@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseOptions, resolveRoots, run } from './packed.mjs';
 import { runtime } from '../npc-combat/outcome_runtime.mjs';
 
-const BARROWS_HUNT_RADIUS = 4; // UNKNOWN historical distance; selected engineering value.
+const BARROWS_HUNT_RADIUS = 4; // as built; engineering choice; period value UNKNOWN.
 const TYPES = {
   barrows_bloodworm: { id: 2031, hp: 45, maximum: 3, style: 0, tiles: [[3548,9675],[3549,9679],[3551,9676],[3552,9679],[3552,9682],[3555,9675],[3555,9679]] },
   barrows_rat: { id: 2032, hp: 35, maximum: 3, style: 0, tiles: [[3531,9694],[3534,9690],[3534,9698],[3535,9695],[3537,9692],[3539,9695]] },
@@ -24,12 +23,19 @@ await run(async () => {
   const baseIndex = args.indexOf('--base-pack');
   const basePack = baseIndex === -1 ? null : args.splice(baseIndex, 2)[1];
   assert(baseIndex === -1 || (basePack && !basePack.startsWith('--')), '--base-pack requires a pack directory');
-  const { contentRoot, engineRoot, packDir } = resolveRoots(parseOptions(args));
+  const compatIndex = args.indexOf('--compat-pack');
+  const compatPack = compatIndex === -1 ? null : args.splice(compatIndex, 2)[1];
+  assert(compatIndex === -1 || (compatPack && !compatPack.startsWith('--')), '--compat-pack requires the pre-fix pack directory');
+  const caseIndex = args.indexOf('--ownership-case');
+  const ownershipCase = caseIndex === -1 ? null : args.splice(caseIndex, 2)[1];
+  assert(ownershipCase === null || ['edge-return-attack', 'deferred-logout'].includes(ownershipCase), '--ownership-case names a native regression');
+  const { engineRoot, packDir } = resolveRoots(parseOptions(args));
   const rt = await runtime(engineRoot, packDir);
   const load = file => import(pathToFileURL(path.join(engineRoot, file)).href);
-  const [{ default: Trigger }, { NpcMode }, { Interaction }, { CoordGrid }, routefinder] = await Promise.all([
+  const [{ default: Trigger }, { NpcMode }, { Interaction }, { CoordGrid }, routefinder, { default: Runner }] = await Promise.all([
     load('src/engine/script/ServerTriggerType.ts'), load('src/engine/entity/NpcMode.ts'),
-    load('src/engine/entity/Interaction.ts'), load('src/engine/CoordGrid.ts'), load('src/engine/routefinder/index.ts')
+    load('src/engine/entity/Interaction.ts'), load('src/engine/CoordGrid.ts'), load('src/engine/routefinder/index.ts'),
+    load('src/engine/script/ScriptRunner.ts')
   ]);
   const { World, Provider, State, Pointer, configs: { NpcType, VarNpcType, VarPlayerType, HuntType } } = rt;
   const nv = name => rt.id(VarNpcType, name);
@@ -45,12 +51,20 @@ await run(async () => {
   };
   let count = 0;
   const check = (name, body) => { body(); count++; console.log(`PASS BC-02 ${name}`); };
+  function spawnEvents() {
+    for (const request of World.npcEventQueue.all()) {
+      if (request.npc.delayed) continue;
+      request.unlink();
+      request.npc.executeScript(Runner.init(request.script, request.npc));
+    }
+  }
   let zone = null;
   const fixture = (name, variant = 'hit', distance = 1) => {
     if (zone) { zone.leave(World.players[1]); zone = null; }
     rt.dispose();
     const f = rt.fixture(name, variant, 'melee', distance);
     for (let x = 3480; x <= 3520; x++) for (let z = 3480; z <= 3520; z++) routefinder.__set(x, z, 0, 0);
+    spawnEvents();
     return f;
   };
   const observed = (f, variant = 'hit', rng = null) => {
@@ -65,11 +79,12 @@ await run(async () => {
   };
   try {
     World.gameMap.init();
-    check('all 34 original native static placements and non-owned actor bindings', () => {
+    spawnEvents(); // Native startup delivers map spawn events before clients arrive.
+    check('all 34 Lost City static placements and non-owned actor bindings', () => {
       for (const [name, spec] of Object.entries(TYPES)) {
         const npcs = [...World.npcs].filter(npc => npc.type === spec.id);
         assert.equal(NpcType.getId(name), spec.id, `${name} original type`);
-        assert.deepEqual(npcs.map(npc => [npc.startX, npc.startZ]).sort(), [...spec.tiles].sort(), `${name} original placements`);
+        assert.deepEqual(npcs.map(npc => [npc.startX, npc.startZ]).sort(), [...spec.tiles].sort(), `${name} Lost City placements (first 69bbbd28b, equal to OSRS wiki spawn pins)`);
         for (const npc of npcs) {
           assert.equal(npc.level, 0);
           assert.equal(npc.getVar(nv('npc_barrows_owner')), -1);
@@ -182,7 +197,9 @@ await run(async () => {
         assert.equal(f.npc.targetOp, NpcMode.OPPLAYER2);
         assert.equal(f.npc.huntMode, -1, 'native policy stops seeking a different target during this interaction');
         f.npc.resetDefaults();
-        assert.equal(f.npc.huntMode, HuntType.getId('aggressive_melee'), 'native reset restores configured acquisition');
+        assert.equal(f.npc.huntMode, NpcType.get(f.npc.type).huntmode, 'native reset restores its type default');
+        f.npc.processTimers();
+        assert.equal(f.npc.huntMode, HuntType.getId('aggressive_melee'), 'static timer re-arms the unchanged hunt by the next turn');
       });
       check(`${name} native regeneration remains exactly 100 ticks for all six skills`, () => {
         const { npc } = fixture(name);
@@ -198,13 +215,11 @@ await run(async () => {
         assert.deepEqual([...npc.levels], [...npc.baseLevels], 'full actor never over-heals');
       });
     }
-    // Ruling 2026-11-16T10:16Z/10:25Z: an owned door actor of the seven types never
-    // targets a player who is not its owner. Without its owner it stays passive, as
-    // before BC-02, and the owner re-engages it by attacking. Real door-spawn and
-    // owned-timer scripts in the native World order: player hunt, then NPC turn.
-    const [{ default: Player }, { default: Npc }, { EntityLifeCycle }, { default: Runner }, { default: JavaRandom }, { HuntModeType }, { default: DbTableIndex }] = await Promise.all([
+    // Owned D4 actors never hunt another player. These native tests run the real
+    // timer, then the queued retaliation, then movement in the World order.
+    const [{ default: Player }, { default: Npc }, { EntityLifeCycle }, { default: JavaRandom }, { HuntModeType }, { default: DbTableIndex }] = await Promise.all([
       load('src/engine/entity/Player.ts'), load('src/engine/entity/Npc.ts'), load('src/engine/entity/EntityLifeCycle.ts'),
-      load('src/engine/script/ScriptRunner.ts'), load('src/util/JavaRandom.ts'), load('src/engine/entity/hunt/HuntModeType.ts'),
+      load('src/util/JavaRandom.ts'), load('src/engine/entity/hunt/HuntModeType.ts'),
       load('src/cache/config/DbTableIndex.ts')
     ]);
     const LANDING = { x: 3534, z: 9706 }; // native W-to-NW door destination; the NW corner has no static placement
@@ -285,12 +300,8 @@ await run(async () => {
         if (hunt && hunt.type === HuntModeType.PLAYER) npc.huntAll(hunt);
       }
       // World.processNpcEventQueue: spawn and despawn triggers run before the NPC turns.
-      for (const request of World.npcEventQueue.all()) {
-        if (request.npc.delayed) continue;
-        request.unlink();
-        request.npc.executeScript(Runner.init(request.script, request.npc));
-      }
-      if (npc.isActive) {
+      spawnEvents();
+      if (npc.nid >= 0) {
         npc.lastTickX = npc.x; npc.lastTickZ = npc.z; npc.moveSpeed = npc.defaultMoveSpeed(); npc.walkDir = -1; npc.runDir = -1;
         npc.turn();
       }
@@ -299,13 +310,64 @@ await run(async () => {
       return hits;
     }
     function ownerAttacks(npc, owner) {
-      // A landed player hit names the attacker and starts the native retaliation queue.
+      // A landed hit queues retaliation; it must run AFTER the timer in the NPC turn.
       npc.setVar(nv('npc_aggressive_player'), owner.uid);
-      const script = Provider.getByTrigger(Trigger.AI_QUEUE1, npc.type, NpcType.get(npc.type).category);
-      assert(script, 'native retaliation entry');
-      const state = Runner.init(script, npc, owner, []);
-      state.pointerAdd(Pointer.ProtectedActivePlayer);
-      npc.executeScript(state);
+      npc.enqueueScript(Trigger.AI_QUEUE1, 0, 0);
+    }
+    function ownershipRegression(kind, name, draws) {
+      const edge = { x: 3546, z: 9711 };
+      const owner = tunnelPlayer(2, 'owner', kind === 'edge-return-attack' ? edge : LANDING);
+      const other = tunnelPlayer(3, 'other', AWAY);
+      beginRun(owner, 41); beginRun(other, 42);
+      Math.random = () => 0.999;
+      const trace = [];
+      const cheb = (a, b) => Math.max(Math.abs(a.x - b.x), Math.abs(a.z - b.z));
+      try {
+        const npc = doorActor(owner, name, draws);
+        const start = { x: npc.startX, z: npc.startZ };
+        const step = (ticks, phase) => {
+          for (let i = 0; i < ticks && npc.isActive; i++) {
+            const [ownerHits, otherHits] = worldTick(npc, [owner, other]);
+            trace.push({ phase, tick: World.currentTick, hunt: npc.huntMode, timer: npc.timerInterval,
+              target: npc.target === owner ? 'owner' : npc.target === other ? 'other' : npc.target ? 'unexpected' : null,
+              mode: npc.targetOp, ownerHits, otherHits, active: npc.isActive });
+          }
+        };
+        step(8, 'owner present');
+        if (kind === 'edge-return-attack') {
+          for (let i = 0; i < 12 && owner.x < 3557; i++) { place(owner, { x: owner.x + 1, z: owner.z }); step(1, 'owner flees'); }
+          const sides = [[1,0],[1,1],[1,-1],[0,1],[0,-1]].map(([dx,dz]) => ({ x:npc.x+dx, z:npc.z+dz }))
+            .filter(t => t.x <= 3557 && t.x >= 3546 && t.z >= 9707 && t.z <= 9716).sort((a,b) => cheb(b,start)-cheb(a,start));
+          assert(sides.length, 'native N-room far-side attack tile');
+          place(owner, sides[0]);
+          assert(cheb(owner, start) > NpcType.get(npc.type).maxrange, 'the returning owner hits from beyond the native maxrange');
+          ownerAttacks(npc, owner); step(1, 'owner hits from outside range');
+          place(owner, { x:3546, z:9708 }); place(other, { x:npc.x-1, z:npc.z });
+          step(60, 'B idle beside the actor');
+        } else {
+          place(other, { x:npc.x+1 <= 3540 ? npc.x+1 : npc.x-1, z:npc.z <= 9716 ? npc.z+1 : npc.z-1 });
+          // Native combat prevents menu logout. Connection loss is the reachable
+          // forced-logout path that accepts logout while an existing delay runs.
+          for (const p of World.playerLoop.all()) { p.lastResponse = World.currentTick; p.lastConnected = World.currentTick; }
+          owner.lastResponse = World.currentTick - World.constructor.TIMEOUT_NO_RESPONSE;
+          owner.delayed = true; owner.delayedUntil = World.currentTick + 3;
+          World.processLogouts();
+          assert.equal(owner.loggingOut, true, 'native processLogouts accepts the forced timeout');
+          assert.equal(World.players[owner.slot], owner, 'native processLogouts defers removal while busy');
+          step(3, 'accepted logout, removal deferred');
+          owner.delayed = false;
+          playerProc(owner, 'barrows_logout'); removePlayer(owner);
+          step(20, 'owner removed');
+        }
+        assert(trace.every(e => e.hunt === -1 && (!e.active || e.timer === 1)), `${kind}: reset-safe hunt/timer invariant: ${JSON.stringify(trace.find(e => e.hunt !== -1 || (e.active && e.timer !== 1)))}`);
+        assert(trace.every(e => e.target !== 'other' && e.target !== 'unexpected' && e.otherHits === 0), `${kind}: B is never targeted or hit: ${JSON.stringify(trace.find(e => e.target === 'other' || e.otherHits))}`);
+        assert.equal(other.levels[3], 99, 'B keeps full Hitpoints');
+        return trace;
+      } finally {
+        Math.random = mathRandom;
+        removePlayer(owner); removePlayer(other);
+        for (const n of [...World.npcs]) if (n.isActive && n.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(n, -1);
+      }
     }
     function lifetime(name, draws, leave) {
       const owner = tunnelPlayer(2, 'owner', LANDING), other = tunnelPlayer(3, 'other', LANDING);
@@ -321,7 +383,7 @@ await run(async () => {
           for (let i = 0; i < ticks && (npc.isActive || i === 0); i++) {
             if (phase === 'engaged') { owner.setVar(pv('lastcombat'), World.currentTick + 1); owner.setVar(pv('aggressive_npc'), npc.uid + 1); }
             const [ownerHits, otherHits] = worldTick(npc, [owner, other]);
-            trace.push({ phase, mode: npc.targetOp, target: who(npc.target), active: npc.isActive, hunt: npc.huntMode, ownerHits, otherHits, x: npc.x, z: npc.z });
+            trace.push({ phase, mode: npc.targetOp, target: who(npc.target), active: npc.isActive, hunt: npc.huntMode, timer:npc.timerInterval, ownerHits, otherHits, x: npc.x, z: npc.z });
           }
         };
         step(8, 'owner present');
@@ -354,6 +416,7 @@ await run(async () => {
       const config = NpcType.get(TYPES[name].id);
       const npc = new Npc(0, x, z, config.size, config.size, EntityLifeCycle.RESPAWN, World.getNextNid(), config.id, config.blockwalk);
       World.addNpc(npc, -1);
+      spawnEvents();
       const a = tunnelPlayer(2, 'static_a', hunted === 'owner' ? { x, z } : { x: x + 20, z });
       const b = tunnelPlayer(3, 'static_b', hunted === 'other' ? { x, z } : { x: x + 20, z });
       Math.random = () => 0.999;
@@ -382,8 +445,191 @@ await run(async () => {
         for (const npc of [...World.npcs]) if (npc.isActive && npc.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(npc, -1);
       }
     }
+    function guardCases(name) {
+      for (const condition of ['playerescape', 'outside range', 'owner level', 'owner death', 'other combat']) {
+        const f = fixture(name);
+        f.npc.setInteraction(Interaction.SCRIPT, f.player, NpcMode.OPPLAYER2);
+        if (condition === 'playerescape') f.npc.targetOp = NpcMode.PLAYERESCAPE;
+        if (condition === 'outside range') f.player.x = f.npc.startX + NpcType.get(f.npc.type).maxrange + 2;
+        if (condition === 'owner level') f.player.level = 3; // A crypt ladder changes level within Barrows.
+        if (condition === 'owner death') f.player.setVar(pv('death'), 1); // Before the death cleanup queue.
+        if (condition === 'other combat') {
+          f.player.setVar(pv('lastcombat'), World.currentTick);
+          f.player.setVar(pv('aggressive_npc'), f.npc.uid + 1);
+        }
+        const result = rt.observe('[proc,barrows_owned_tunnel_guard]', f);
+        assert.equal(result.snapshot.execution, State.FINISHED);
+        assert.equal(f.npc.target, null, `${condition}: guard clears the interaction before movement`);
+        assert.equal(f.npc.targetOp, NpcMode.WANDER, `${condition}: guard passivates before movement`);
+      }
+    }
+    function ownedEvents(name, draws) {
+      for (const event of ['retaliation', 'outside-range hit', 'playerescape', 'owner death', 'owner level', 'explicit reset', 'second-player hit']) {
+        const owner = tunnelPlayer(2, 'events_a', LANDING), other = tunnelPlayer(3, 'events_b', LANDING);
+        beginRun(owner, 41); beginRun(other, 42);
+        try {
+          const npc = doorActor(owner, name, draws);
+          worldTick(npc, [owner, other]);
+          if (event === 'outside-range hit') place(owner, { x:npc.startX+10, z:npc.startZ });
+          if (event === 'retaliation' || event === 'outside-range hit') ownerAttacks(npc, owner);
+          if (event === 'playerescape') npc.setInteraction(Interaction.SCRIPT, owner, NpcMode.PLAYERESCAPE);
+          if (event === 'owner death') owner.setVar(pv('death'), 1);
+          if (event === 'owner level') {
+            World.gameMap.getZone(owner.x, owner.z, owner.level).leave(owner); owner.level = 3;
+            World.gameMap.getZone(owner.x, owner.z, owner.level).enter(owner);
+          }
+          if (event === 'explicit reset') npc.resetDefaults();
+          if (event === 'second-player hit') {
+            const blocked = rt.observe('[proc,barrows_actor_attackable]', { npc, player:other });
+            assert.deepEqual(blocked.values, [0], 'a second player cannot land a hit on an owned actor');
+          }
+          for (let tick = 0; tick < 4; tick++) {
+            worldTick(npc, [owner, other]);
+            assert.equal(npc.huntMode, -1, `${event}: owned hunt remains none after every turn`);
+            if (npc.isActive) assert.equal(npc.timerInterval, 1, `${event}: owned timer survives every reset`);
+            assert(npc.target === null || npc.target === owner, `${event}: no foreign target`);
+          }
+        } finally {
+          removePlayer(owner); removePlayer(other);
+          for (const n of [...World.npcs]) if (n.isActive && n.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(n, -1);
+        }
+      }
+    }
+    function poisonTimeline(kind) {
+      let ownedOwner = null, f;
+      if (kind === 'unflagged') {
+        rt.dispose();
+        const draws = doorDraws();
+        ownedOwner = tunnelPlayer(2, 'poison_owner', LANDING); beginRun(ownedOwner, 41);
+        f = { player:ownedOwner, npc:doorActor(ownedOwner, 'barrows_rat', draws) };
+        spawnEvents();
+        const flag = VarNpcType.getId('npc_poison_preserve_phase');
+        if (flag >= 0) assert.equal(f.npc.getVar(flag), 0, 'owned spawn never opts into static poison phase');
+      } else f = fixture('barrows_rat');
+      f.npc.baseLevels[3] = 255; f.npc.levels[3] = 255;
+      const trace = [];
+      const call = (name, args = []) => {
+        const result = rt.observe(`[proc,${name}]`, f, args);
+        assert.equal(result.snapshot.execution, State.FINISHED);
+      };
+      const phase = () => f.npc.getVar(nv('npc_owned_timer_interval')) > 0
+        ? f.npc.getVar(nv('npc_poison_timer_runs')) % 30 : f.npc.timerClock;
+      const record = (tick, action) => trace.push({ tick, action, hp:f.npc.levels[3], severity:f.npc.getVar(nv('npc_poison')), phase:phase() });
+      try {
+        for (let tick = 0; tick <= 350; tick++) {
+          // At 95 poison is cured part-way through its native period, then applied
+          // again at 110. The final application follows its natural ending.
+          if ([0,17,54,110,270].includes(tick)) {
+            const severity = tick === 0 ? 4 : tick === 17 ? 7 : tick === 54 ? 2 : 3;
+            call('npc_poison_start', [severity]); record(tick, `apply ${severity}`);
+          }
+          if (tick === 95) { call('npc_poison_clear'); record(tick, 'cure'); }
+          World.currentTick++;
+          f.npc.processTimers();
+          record(tick+1, 'timer');
+        }
+        if (kind === 'unflagged') {
+          // Primitive compatibility input: even an idle counted call clears an
+          // existing counter, as the published helper specifies.
+          f.npc.setVar(nv('npc_poison'), 0); f.npc.setVar(nv('npc_poison_timer_runs'), 17);
+          call('npc_poison_counted_timer', [1]);
+          record(352, 'idle primitive');
+        }
+        return trace;
+      } finally {
+        if (ownedOwner) removePlayer(ownedOwner);
+        rt.dispose();
+      }
+    }
+    function staticTimeline(name) {
+      const [x,z] = TYPES[name].tiles[0], config = NpcType.get(TYPES[name].id);
+      const npc = new Npc(0,x,z,config.size,config.size,EntityLifeCycle.RESPAWN,World.getNextNid(),config.id,config.blockwalk);
+      World.addNpc(npc,-1); spawnEvents(); // Native startup: before any player arrives.
+      const p = tunnelPlayer(2,'timing',{x:x+1,z});
+      World.currentTick = 1000;
+      const real = Math.random; Math.random = () => 0.999;
+      const report = { hits:[], spawn:null, respawn:null, reset:null, wander:[] };
+      try {
+        const steps = (ticks, field) => {
+          for (let tick=1; tick<=ticks; tick++) {
+            const [hits] = worldTick(npc,[p]);
+            if (npc.target === p && report[field] === null) report[field] = tick;
+            if (field === 'spawn' && hits) report.hits.push(tick);
+          }
+        };
+        scripted([], () => steps(16,'spawn'));
+        World.removeNpc(npc,1);
+        worldTick(npc,[p]); // Native respawn runs in the inactive actor's own turn.
+        p.setVar(pv('lastcombat'),0); npc.setVar(nv('npc_lastcombat'),0);
+        scripted([], () => steps(4,'respawn'));
+        npc.resetDefaults(); p.setVar(pv('lastcombat'),0); npc.setVar(nv('npc_lastcombat'),0);
+        scripted([], () => steps(3,'reset'));
+        place(p,{x:x+20,z}); npc.resetDefaults();
+        Math.random = () => 0;
+        for (let tick=0;tick<12;tick++) { worldTick(npc,[p]); report.wander.push([npc.x,npc.z]); }
+        return report;
+      } finally {
+        Math.random = real; removePlayer(p);
+        World.removeNpc(npc,-1); World.npcs.remove(npc.nid); npc.cleanup();
+      }
+    }
+    function staticTimerCost() {
+      rt.dispose();
+      const actors = [];
+      try {
+        for (const [name,spec] of Object.entries(TYPES)) {
+          const config = NpcType.get(spec.id);
+          for (const [x,z] of spec.tiles) {
+            const npc = new Npc(0,x,z,config.size,config.size,EntityLifeCycle.RESPAWN,World.getNextNid(),config.id,config.blockwalk);
+            World.addNpc(npc,-1); actors.push({name,npc});
+          }
+        }
+        spawnEvents();
+        assert.equal(actors.length,34);
+        const commands = Object.fromEntries(actors.map(({name,npc}) => {
+          const script = Provider.getByTrigger(Trigger.AI_TIMER,npc.type,NpcType.get(npc.type).category);
+          const state = Runner.init(script,npc); npc.executeScript(state);
+          assert.equal(state.execution,State.FINISHED);
+          return [name,state.opcount];
+        }));
+        for (let tick=0;tick<100;tick++) for (const {npc} of actors) npc.processTimers();
+        const ticks=1000, start=process.hrtime.bigint();
+        for (let tick=0;tick<ticks;tick++) for (const {npc} of actors) npc.processTimers();
+        return { actors:actors.length, commandsPerType:commands,
+          commandsPerTick:actors.reduce((sum,{name}) => sum+commands[name],0), measuredTicks:ticks,
+          nanosecondsPerTick:Number(process.hrtime.bigint()-start)/ticks };
+      } finally { rt.dispose(); }
+    }
+    const usePack = dir => { for (const config of Object.values(rt.configs)) config.load(dir); DbTableIndex.init(); rt.select(dir); };
+    if (compatPack) {
+      const report = {};
+      try {
+        for (const [label,dir] of [['old',compatPack],['new',packDir]]) {
+          rt.dispose(); usePack(dir);
+          report[label] = { poison:Object.fromEntries(['static','unflagged'].map(kind => [kind,poisonTimeline(kind)])),
+            statics:Object.fromEntries(Object.keys(TYPES).map(name => [name,staticTimeline(name)])) };
+        }
+      } finally { rt.dispose(); usePack(packDir); }
+      for (const kind of ['static','unflagged']) check(`${kind} native poison old-head parity, including replacement, cure/restart and ending/restart`, () => {
+        assert.deepEqual(report.new.poison[kind],report.old.poison[kind]);
+      });
+      for (const name of Object.keys(TYPES)) check(`${name} old-head first spawn/respawn, attack speed, wander and bounded reset parity`, () => {
+        const old = report.old.statics[name], now = report.new.statics[name];
+        assert(old.spawn !== null && old.respawn !== null && old.hits.length > 0, `${name}: baseline reaches real acquisition, respawn and attacks ${JSON.stringify(old)}`);
+        assert.equal(now.spawn,old.spawn); assert.equal(now.respawn,old.respawn);
+        assert.deepEqual(now.hits,old.hits); assert.deepEqual(now.wander,old.wander);
+        assert(old.reset !== null && now.reset !== null && now.reset >= old.reset && now.reset <= old.reset+1, `${name}: ${JSON.stringify({old,now})}`);
+      });
+      console.log(`PASS BC-02 static timing comparison ${JSON.stringify(report.new.statics)}`);
+    }
+    for (const name of Object.keys(TYPES)) check(`${name} each immediate ownership guard predicate`, () => guardCases(name));
     rt.dispose();
     const draws = doorDraws();
+    for (const name of draws.keys()) for (const kind of ownershipCase ? [ownershipCase] : ['edge-return-attack', 'deferred-logout']) {
+      check(`${name} reset-safe ownership: ${kind}`, () => ownershipRegression(kind, name, draws));
+    }
+    if (ownershipCase) return;
+    for (const name of draws.keys()) check(`${name} per-event whole-life hunt/timer invariants`, () => ownedEvents(name, draws));
     for (const name of Object.keys(TYPES)) {
       for (const leave of draws.has(name) ? LEAVES : []) {
         check(`${name} owned door actor: the owner ${leave}; the second player is never targeted until removal`, () => {
@@ -392,7 +638,7 @@ await run(async () => {
           assert.notEqual(otherAggressor, npc.uid, 'the second player is never the actor’s single-way combat');
           assert.equal(otherHp, 99, 'the second player loses no Hitpoints');
           assert(trace.filter(entry => entry.phase === 'owner present').every(entry => entry.target === 'owner'), 'the owner keeps its door actor');
-          assert(trace.every(entry => entry.hunt === -1), 'an owned actor never runs the native hunt');
+          assert(trace.every(entry => entry.hunt === -1 && (!entry.active || entry.timer === 1)), 'every owned turn retains hunt none and timer 1');
           for (const phase of ['owner gone', 'owner returns', 'owner gone again', 'engaged']) {
             assert(trace.filter(entry => entry.phase === phase && entry.active).every(entry => entry.target === null && entry.mode === NpcMode.WANDER && entry.ownerHits === 0), `${phase}: passive, as before BC-02`);
           }
@@ -401,18 +647,19 @@ await run(async () => {
           assert.equal(trace.at(-1).active, false, 'the actor is removed by its owned lifetime or the owner hooks');
         });
       }
-      check(`${name} static placement acquires either player, without the owned timer`, () => {
+      check(`${name} static placement acquires either player with its static timer`, () => {
         for (const hunted of ['owner', 'other']) {
           const result = staticAcquisition(name, hunted);
-          assert.deepEqual(result, { owned: -1, timer: -1, hunt: -1, target: hunted }, JSON.stringify(result));
+          assert.deepEqual(result, { owned: -1, timer: 1, hunt: -1, target: hunted }, JSON.stringify(result));
         }
       });
     }
     const cost = ownedTimerCommands('barrows_bloodworm', draws);
     console.log(`PASS BC-02 owned-timer commands per tick per owned tunnel actor: ${JSON.stringify(cost)}`);
+    console.log(`PASS BC-02 34 static timers per tick: ${JSON.stringify(staticTimerCost())}`);
     if (basePack) {
       // Acceptance comparison in this process: the same inputs on the pre-BC-02 pack.
-      const usePack = dir => { for (const config of Object.values(rt.configs)) config.load(dir); DbTableIndex.init(); rt.select(dir); };
+      // Pack selection reloads generated config references as well as scripts.
       const behaviour = trace => trace.map(({ phase, mode, target, active, hunt, ownerHits, otherHits }) => ({ phase, mode, target, active, hunt, ownerHits, otherHits }));
       const report = {};
       try {
@@ -440,10 +687,8 @@ await run(async () => {
         assert.deepEqual(report.base.types[name].statics, [null, null], `${name} static placement was passive before BC-02`);
         assert.deepEqual(report.head.types[name].statics, ['owner', 'other'], `${name} static placement now acquires either player`);
       }
-      console.log(`PASS BC-02 base comparison: owned door actors behave as before BC-02 for the same inputs; only static placements gained aggression ${JSON.stringify({ base: report.base.cost, head: report.head.cost, ticksWithDifferentPosition: moved })}`);
+      console.log(`PASS BC-02 pre-BC-02 comparison for the two named owned-lifetime inputs only; static acquisition changed ${JSON.stringify({ base: report.base.cost, head: report.head.cost, ownedTicksWithDifferentPosition: moved })}`);
     }
-    const poison = fs.readFileSync(path.join(contentRoot, 'tests/barrows/test_poison.mjs'), 'utf8');
-    assert(poison.includes('[35, 31]'), 'S04 crypt-rat fixture remains exactly [35,31]');
     console.log(`PASS BC-02 ${count} native tunnel cases; unchanged static/removal/credit/D4/poison suites remain registered`);
   } finally {
     if (zone) zone.leave(World.players[1]);
