@@ -960,8 +960,6 @@ transmit=yes
 [magic_carpet_var]
 transmit=yes
 
-[varp500_unused]
-
 [varp501_bits]
 transmit=yes
 

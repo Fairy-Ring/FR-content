@@ -1,0 +1,575 @@
+// CANDIDATE: Old School transcript 13986940 (5 January 2021), main story and clues.
+// Later all-piece reclaim and relocated party-room references are excluded.
+[proc,empty_lord_intro](int $stage)
+switch_int ($stage) {
+    case 1 :
+        ~chatplayer("Hello.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "H-hello!");
+        ~chatplayer("So what's up?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "I cannot believe it! You can see me? You understand my words?");
+        ~chatplayer("Sure can. So why are you hanging around here?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "My tale is one of woe... No doubt you will have little interest in hearing it...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "Though it has been so many moons since last I had company in this endless non-life...");
+    case 2 :
+        ~chatplayer("Hello.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "What be this? You both see me and hear me, and also know my name?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Tell me what devilry brings you here, and be quick about it afore I gut you like a fish!");
+        ~chatplayer("Well, apart from the fact I ain't scared of no ghost, I am here because I have spoken to Valdez.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Valdez? Who be that? Some foul necromancer?");
+        ~chatplayer("No, he was a ghost I met near Glarial's tomb.");
+        ~chatplayer("He seems convinced that the artefact you stole from him is responsible for him becoming cursed to be an invisible ghost.");
+        ~chatplayer("Seems like he might be onto something too, given the state of you.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "A curse ye say... Aye, that makes sense...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "And there was I thinking my fate be the fault of the thieving and murdering I spent me life a-doing...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "So it all began the day I stole that staff, ye say? Aye, that be a story I have never told another soul...");
+    case 3 :
+        ~chatplayer("Hello. So you must be Kharrim the messenger.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "How do you know my name, stranger?");
+        ~chatplayer("Well now... I had a very interesting chat with Rennard the thief.");
+        ~chatplayer("It seems you redirected his message regarding a certain god-weapon for your own ends.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "So THAT is what this is about... I should have known the deal was too good to have no repercussions...");
+        ~chatplayer("It seems as though you might be responsible for this curse that has befallen you by not delivering Rennard's message to the correct person.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Ha! That is not a truthful assessment of the story... You might think differently if you had heard my side of events.");
+    case 4 :
+        ~chatplayer("Hello. You would be Lennissa, I take it?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Who are you? Where did you hear that name? How comes it that you can see and speak to me?");
+        ~chatplayer("Well, a ghost called Kharrim directed me towards you.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "So that weasel Kharrim has been blighted by this curse too?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Ha, a good thing too. If anybody deserved such a fate it would be one such as him.");
+        ~chatplayer("I guess you didn't get along then?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "No, evil scum such as he should never have been allowed to walk this world.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "What lies has he told you to come here? Have you come to try and kill me?");
+        ~chatplayer("Well, I'm not sure I could if I tried, but that is not why I have come to you.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Then speak, and speak well, for I may yet be dead, but am still a danger to those who cross me.");
+        ~chatplayer("Actually, I'm trying to work out why all of you invisible ghosts seem to have been cursed.");
+        ~chatplayer("I'm not sure how exactly, but the trail seems to have led me to you...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "That makes no sense... I served Saradomin faithfully my entire life, then all of a sudden I find myself reduced to this state!");
+        ~chatplayer("Well, it seems as though that may have been the cause...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "What? Explain yourself.");
+        ~chatplayer("As I understand it, it was something to do with the Staff of Armadyl, and your refusal to tell Saradomin that it had been stolen...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "What? But... But that is not how it happened at all!");
+    case 5 :
+        ~chatplayer("Hello Dhalak.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "You see my form, hear my words, and know my name, yet your face I recognise not...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Be you some mighty sorcerer to bind me so?");
+        if (stat_base(magic) >= 99) ~chatplayer("Well, I don't mean to brag, but I guess I am with my level 99 magic...");
+        else ~chatplayer("Um... Well, not really...");
+        ~chatplayer("But that is besides the point. It is not I who has trapped you here as a ghost.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Then how comes it to be that you know my name stranger?");
+        ~chatplayer("Lennissa told me about you, and where to find you?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Lennissa? Oh that poor sweet girl... Has my foolishness cursed her as well as myself???");
+        ~chatplayer("Your foolishness?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "The story shames me stranger, I wouldst rather keep it unto myself.");
+    case 6 :
+        ~chatplayer("So... You must be the infamous Viggora.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Hold thy tongue varlet! Speak fast, how come you to find me here, and how doth you understand mine speech?");
+        ~chatplayer("You want me to hold my tongue and tell you how I found you?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Cease thy chatter and respond to my demand!");
+        ~chatplayer("Cease my chatter AND respond to your demand?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "I warn thee knave, this curse upon me hath not improved my temper, these centuries past...");
+        ~chatplayer("Well, it's actually about that curse that I have come to speak to you.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Oh, be that so? Then forgive my swift anger, and speak to me of how you plan to break this curse.");
+        ~chatplayer("Erm... I didn't actually mention anything about breaking the curse...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Then what lets you dare speak to me?");
+        ~chatplayer("Well, I heard of your name from a mage called Dhalak, and I'm trying to find out what exactly caused the curse to befall him, and you as well apparently.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Ha! So the weak-willed mage was cursed along with me?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Well now, that is an interesting turn of events... Then am I to assume that Valdez, Rennard, Kharrim and Lennissa were also cursed along with me?");
+        ~chatplayer("...How did you know that?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Ha ha ha! Oh, the curse cut deeper than I had previously thought!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Stranger, this news has brought me a ray of sunshine in an otherwise dreary millennium! Please, ask any question you wish!");
+}
+
+[proc,empty_lord_story](int $stage)
+switch_int ($stage) {
+    case 1 :
+        ~chatplayer("Well, actually I would like to know what happened to you to turn you into an invisible ghost.");
+        ~chatplayer("If only so I can make sure it doesn't happen to me...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "My name is Valdez. I served my Lord Saradomin faithfully for many years, as an explorer of this strange land we had been brought to.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "I remember the day this curse fell upon me clearly... I had just discovered a huge temple, hidden below the ground, of one of Saradomin's compatriots.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "I am unsure who had built it, or why they had left it seemingly abandoned, but inside I located a great treasure...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "It was the godstaff of Armadyl. Oh, how I rue my choice that day!");
+        ~chatplayer("Choice?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "Aye, stranger. I chose that day to take it so that my Lord Saradomin's power and prestige could be increased by its possession.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "A god-weapon! Do you have any comprehension of the difficulty and rarity in obtaining such a thing?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "To find such an artefact of power just lying around, it is almost incomprehensible...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "So it was there in that deserted temple that I made my choice. I took the staff, and left that temple for Entrana immediately.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "This was the cause of my cursed state.");
+        ~chatplayer("What, you mean you gave it to Saradomin and in return he cursed you???");
+        ~chatplayer("Seems kind of ungrateful if you ask me...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "No stranger, you misunderstand completely... Firstly my gracious Lord would never treat anyone in such a manner; If he felt it was beyond my bounds as a mere mortal");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "to hold such an artefact, he would simply have commanded me to return it to whence I had claimed it, and I being eternally loyal would have obeyed without question...");
+        ~chatplayer("And secondly?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "And secondly, I never managed to pass the artefact on to my Lord...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "The vile thief Rennard accosted me as I made my way to Entrana, and after defeating me with a sneak attack, plundered the staff from my person, and left me for dead...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "I do not know what became of the staff, but I can feel in my very bones that whatever its final fate was, it is somehow related to this curse upon me...");
+        ~chatplayer("Wow. Tough break.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "I am sorry to bore you with my tale stranger, please allow me to compound my rudeness by asking you for one favour, small to perform?");
+        ~chatplayer("Eh, I won't make any promises, but if it's nothing too annoying I guess I can help you out.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "Many thanks stranger, this existence tortures me...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "I need you to find Rennard and if he has the staff yet reclaim it, or find out what hideous deed he performed to curse me so!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "I have nothing I may offer you save this piece of clothing, please take it as payment...");
+        ~chatplayer("Where can I find this Rennard then?");
+    case 2 :
+        ~chatplayer("Why don't you tell me what happened? I might be able to help...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Well, I was making me merry way along, having just pulled off a glorious jewellery heist from a bunch of stinking dwarves...");
+        ~chatplayer("Hey, that's no way to talk about dwarves! Some of my best friends are short!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Ah, yer misunderstand me <text_gender("lad", "lass")>, I wasn't generalising about the whole dwarf species, I had just stolen a bundle of jewels from a very specific group of dwarves who happened to have an odious stench about them!");
+        ~chatplayer("Oh. Well I guess that's okay then. Please continue.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Well, as I headed on me merry way, hoping the foul odours that lingered in me nostrils would soon pass, I see in front of me this explorer fella, all decked out in in his fine clothing, and carrying some long package");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "bundled in rags.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "So I says to meself, 'Rennard', I says, 'Rennard, why would some fella all dressed in his finery be carrying something wrapped in dirty rags?'.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "So I thinks to meself a little more, 'Rennard', I thinks, 'Rennard, maybe that fella has something valuable in there, and he covered it in dirty rags so it don't look so valuable'.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "So I coshed this fella round the back of his head with me bag of jewels, picked up his package and was on me merry way afore he comes to.");
+        ~chatplayer("So what happened then?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Well, I makes me way to the closest tavern I knew of that catered to my sort of people...");
+        ~chatplayer("You mean thieves?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Right ye are, so I makes me way to the nearest friendly tavern, and unwraps the bundle to see what it had inside.");
+        ~chatplayer("The Staff of Armadyl?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Was it? Ah, I never knew that...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Anysways, I unwraps this staff, and sees it be a god- weapon; I may be just a common thief, but I recognises a weapon not made by mortal hands when I sees one.");
+        ~chatplayer("So what did you do then?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Well, I knew such a weapon would be of great value to...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Now that's funny. Can't remember his name, now. The powerful god, lived in the North-east. Took the Mahjarrat away from under Icthlarin's");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "control.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Anyway, I hired me a messenger to go off and let him know I had something I was prepared to sell that I thought he'd be interested in...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Now WHY can't I remember his name? Very odd that...");
+        ~chatplayer("So you sold the staff to this god you can't remember?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Well, that's the other funny thing... He never showed up, he sent some General or other instead.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Hmmm... You know... Thinking back on that, I'm getting the feeling that messenger did a little doublecross of his own, and took");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "me message to the wrong fella.");
+        ~chatplayer("So what was this General's name?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "His name was Zamorak. I remember thinking at the time it was odd, because the fella was a mighty powerful warrior, but was never fully trusted by...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "WHY can't I remember his name???");
+        ~chatplayer("So you suspect the messenger might have taken the message to the wrong person? So you think it was an accident or deliberate?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Well that I can't tell ya, but if something happened to get me cursed, it's likely the messenger would know what more than me.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "His name was Kharrim, and if he caused me to be stuck like this, I'm gonna fillet him like a dog, ghost or no!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "I tell ye what, you've given me much to think about so I'd like to offer yer a gift; Here, take these, they were the gloves I stole me first cake with, they might bring yer some luck.");
+        ~chatplayer("Where can I find this Kharrim then?");
+    case 3 :
+        ~chatplayer("Please let me hear your side of the story then...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Well, if you have spoken to Rennard, then you will know that he had somehow managed to obtain a very valuable weapon, and was looking for buyers.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "What he probably didn't tell you, was that he met me in a drunken stupor in some smoke filled tavern, and I offered to arrange a purchaser for his item, in exchange for a small finders fee.");
+        ~chatplayer("So you knew what the staff was?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "The god-staff of Armadyl? Well, of course I did.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Honestly, you would have to be pretty slow-witted to not recognise a legendary artefact such as that.");
+        ~chatplayer("Wait, I don't understand, Rennard said that he had a buyer already in mind, and that you diverted his message to a General Zamorak instead?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Ha! Here is a word of advice for you adventurer; Never trust the words of a drunk.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Whatever he might have thought he was doing with it, in the end all that happened was he left me to arrange a purchaser for the item.");
+        ~chatplayer("So you thought you would offer it to General Zamorak?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Ah yes, Lord Zamorak. He was merely a mortal back then, you know?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Yet I could see great things in store for him even then. He had a kind of brilliant ruthlessness... And that special kind of vicious streak you see so rarely...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Well anyway, when given the task of selling a weapon forged by the very gods themselves, I naturally thought of Zamorak as a potential buyer.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "I was a messenger in his employ anyway, so it was a mere trifle to find him and deliver the news, and I knew of his particular interest in armour and weaponry of all kinds.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Yes, he was always quite the connoisseur when it came to weaponry...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "But I digress. I let Lord Zamorak know that there was some drunken fool with an artefact of incredible power that could probably be bought off with a few jewels and trinkets,");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "and he escorted me to the tavern and made the purchase there and then.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "It was a satisfactory deal all around, I got a share of the sale price from Rennard, and I greatly increased my prestige amongst Zamorak and his followers.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "But maybe... Perhaps the events that followed were responsible for my cursed state...");
+        ~chatplayer("Events that followed?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "I can not tell you of them precisely, for I myself was not there to witness them.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "I am after all, simply a messenger. When... 'it' happened, I was busy elsewhere delivering a message from Zamorak to the rest of his Mahjarrat ilk.");
+        ~chatplayer("When 'it' happened? What was 'it'?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "As I have explained, I was not there, and I do not know what Zamorak did with the staff, but whatever it was resulted in his banishment by the other gods for many years.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "The very strange thing was that Saradomin must have known about it, whatever it was, before it even happened...");
+        ~chatplayer("Really? Why do you say that?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Well, it was the contents of the message I was returning to Zamorak;");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Lucien seemed quite certain that there was a spy for Saradomin somewhere amongst his followers named Lennissa.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "If whatever happened to the staff caused this curse to befall me, then it is certain that she too would have been afflicted, because she would have been in the very heart of the action.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Hmmm....");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "You have given me much to think on adventurer. I would like to reward you with my sturdy messenger boots, may they aid you in your travels.");
+        ~chatplayer("But where can I find this Lennissa?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Ah yes, the whereabouts of the treacherous Lennissa...");
+    case 4 :
+        ~chatplayer("Then please, go ahead and tell me the events of that day in your own words...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Let me see... I had been working as a spy for my Lord Saradomin, amongst the forces of... the Empty Lord.");
+        ~chatplayer("'The Empty Lord'? Who is that?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "I will not give you his name, for to do so would give him power here.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Let us just say that he was a fearsome deity, whose strength was greater than all the gods we knew of on this realm at the time.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "It is probably worth mentioning that at this time we had no knowledge of the mysterious nature god Guthix.");
+        ~chatplayer("So he was stronger than Saradomin?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "As Saradomin was, yes. As Saradomin is now? Who can say?");
+        ~chatplayer("I see... Please, continue.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "As I say, I was working as a spy within the very camp of my Lord's enemies.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "I knew that should I have been caught, I risked being killed upon the spot, but my combat skills were always formidable, and if truth be told, there was a fair amount of dissent amongst... 'his' followers anyway.");
+        ~chatplayer("How do you mean 'dissent'?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Ah, to not understand this, you must have led a sheltered life...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Let me tell you this: Evil will always breed more evil, and will never be satisfied with what it has.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "The Empty Lord chose to ally himself with the dark creatures of this world, fully aware that their own natures would cause them to rally against his rule, and take every opportunity they could to betray him.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "This has always been the nature of evil. Perhaps he thought his power could prevent such treachery?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "This allowed me freedom amongst their camp, for it was always easy to point the finger of suspicion at some unsuspecting necromancer or foolish Mahjarrat if it seemed as though my activities had been discovered.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Similarly, should I ever be caught in the act of my sabotage, it was all too easy to bribe whoever found me or persuade them into believing it was just some minor treachery of my own, rather than my work for my");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Lord Saradomin.");
+        ~chatplayer("Okay... Well, that makes sense, but I don't understand what the Staff of Armadyl had to do with this...?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "As I have told you, the Empty Lord was extremely powerful, but not so powerful that he could rule over the other deities of this world without opposition.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Should he have made a move against any other god, then he could still have been easily brought down by the combined efforts of the others.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "The theft of Armadyl's staff changed this however.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "If he had taken possession of this god-weapon, then his power would have been so great that he could have overthrown all on this world, and made it into his own image!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "I could not allow such a thing to happen!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "I went immediately to my comrade Dhalak, the mage, and told him that a message had come to the lair offering this weapon for sale!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "I knew that as soon as my Lord Saradomin heard this, he would contact Armadyl to inform them of the theft, and the matter would have been resolved quickly and discreetly.");
+        ~chatplayer("So you passed this information to Dhalak instead of taking it to Saradomin yourself?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "To my eternal shame, I indeed failed my Lord Saradomin...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "I could not risk taking the message directly, for I feared my disguise had been uncovered.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Lucien particularly had been taking an unhealthy interest in my activities, and I had a gut feeling that to make any obvious moves against the Empty Lord would have been my undoing.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "But Dhalak was a noble man! I cannot believe that he would not have taken my message immediately to Lord Saradomin!");
+        ~chatplayer("Well, it seems like he didn't, but I don't know why not...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Please adventurer, discover what foul fate must have befallen him for him to have neglected his duty!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "I have not much to offer as reward, but for these spare robes I wore while on assignment...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Please find him and discover why I am cursed like this!");
+        ~chatplayer("Where would I be able to find this Dhalak then?");
+    case 5 :
+        ~chatplayer("Look, I don't want to force you into telling me, but perhaps sharing it with someone might relieve your guilt?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Aye... Perhaps it might at that.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "So what has Lennissa told you of the events of the day this curse befell me?");
+        ~chatplayer("Well, she told me that she was working as an undercover agent of Saradomin amongst the followers of some 'Empty Lord', and when news of the theft of a god-weapon reached her, she passed the message on to");
+        ~chatplayer("you instead of taking it to Saradomin because she was scared her cover might be blown.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Aye, that is a fair account of events...");
+        ~chatplayer("But I don't understand why you didn't take her message to Saradomin?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Stranger, my foolishness was a result of my respect for Saradomin, not as a result of any attempted treachery!");
+        ~chatplayer("So why didn't you pass on Lennissa's message? As I understand it something happened with that staff that could have been avoided if you had passed her message on!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "(sigh) I know not what occurred with that god-weapon, but I have my suspicions...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Let me explain myself. I was Lennissa's immediate superior, and I was often her contact for missions.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Because of this role, I had access to a larger picture of what was happening than she herself did, and I was not only well aware that her presence amongst the enemy camp had been detected, but I was also well aware that");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "there was a growing faction amongst them who were plotting to overthrow their master.");
+        ~chatplayer("Their master being...?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "That I will not tell you. I will tempt the fates no more than I already have done.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "But anyway, it had come to my attention that the Mahjarrat who had been liberated from the control of Icthlarin did not much appreciate one form of slavery to another, and under the leadership of the mighty");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Zamorak were making plans to overthrow their master and take his power for themselves.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Now, as powerful, long-lived and evil as they were, they were still just mortal, and I made the decision that it would be of benefit to my Lord Saradomin for his mightiest rival to be distracted by such internal conflicts.");
+        ~chatplayer("So that is why you decided not to pass the report from Lennissa on?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Yes, but my guilt is more than simply inaction...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "I knew that with such a weapon, Zamorak would be capable of launching an attack that could actually stand a chance of success, but I also knew that he would never be able to get a chance to use it in a battle for");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "being a god-weapon its very presence would have sung out to their leader.");
+        ~chatplayer("I'm guessing you did something about that, then?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Indeed I did. To my eternal shame, I decided that I would assist Zamorak and his henchmen in their battle, by secretly casting a spell of concealment upon the staff so that");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "they might use it secretly against their master.");
+        ~chatplayer("So Zamorak knew about this?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "No, nobody except myself, and now you, knew that I cast such a spell....");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Had I known what a threat to my Lord Saradomin Zamorak would later become, I wouldst have taken the message to Saradomin immediately! Alas, it is all too easy to see your mistakes after you");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "have made them...");
+        ~chatplayer("I'm confused. What exactly happened with this staff anyway? And why have all these various random people been cursed because of it?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "I cannot answer your question with anything other than my own suppositions, but I do know of one who might be able to, and if any man deserved to be cursed for their actions that day, it was he!");
+        ~chatplayer("Who are you speaking of?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "His name was Viggora. He was an evil man, brutal and vicious, and deadly with a blade.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "He was one of the few humans Zamorak allowed to rise to a position of power amongst his rebels, possibly because he imitated those same qualities of Zamorak.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "If anyone knows what Zamorak did with that god- weapon to have caused this curse to have befallen us, it would have been he, for he would have been fighting on Zamorak's very right hand side in their rebellion.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Please, if this curse can be lifted, find Viggora and find out what he has wrought upon us! I have no wealth nor magic to aid you, but take my hood as reward;");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "it has served me well these centuries past, and may bring you luck.");
+        ~chatplayer("Where would you suggest I look for Viggora?");
+    case 6 :
+        ~chatplayer("Erm... Thanks, I think. So what exactly happened on that day you were all cursed?");
+        ~chatplayer("I know that Valdez discovered the Staff of Armadyl, was robbed by Rennard, who then sent Kharrim to tell Zamorak of it.");
+        ~chatplayer("Meanwhile Lennissa heard of the sale, and informed Dhalak who placed an enchantment upon it so that its power would be hidden.");
+        ~chatplayer("I still don't know what happened with the staff to cause this curse, or what you had to do with it though...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Well stranger, rest yourself awhile, and I will recount a tale of the events of that day, for I was one of the few actually there when it happened...");
+        ~chatplayer("When what happened?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "When my Lord Zamorak first got his taste of godhood!");
+        ~chatplayer("Wow. Sounds like quite the dinner party anecdote.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "You can take the snide venom out of your voice whelp, you came to me; 'twas not the other way round.");
+        ~chatplayer("Okay, okay. Please continue.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Well now, let us see... As you may have heard tell, my affiliation lay with General Zamorak, a mighty warrior of the Mahjarrat tribe, and my skill on the battlefield had quickly brought");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "me to his attention.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "So pleased was he with my bloodlust that he promoted me on the battlefield once to serve in his honour guard, and let me tell you, this was a rare honour indeed, for I was the only human chosen to take such a position.");
+        ~chatplayer("Really?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Oh yes, the dragon riders, Mahjarrat, demons and vampyre warriors made up the bulk of the force, but I wager I was their equal in all ways of combat.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Ha, when I think of someone like Lucien struggling to lift a blade, in some ways I was even their better!");
+        ~chatplayer("Please continue.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Well anyway... Myself and the rest of Zamoraks honour guard were formulating stratagems in our battle-tent, when that sneaky messenger Kharrim came in offering to sell us");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "the god-staff of Armadyl!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Naturally, we suspected that this was some trick by our Lord to test our loyalty...");
+        ~chatplayer("Yes, who was your lord? Everyone has been very evasive about that...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Quiet fool, all things in their course; You are disrupting my train of thought!");
+        ~chatplayer("Sorry...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Well anyway, we thought it was too good to be true, yet when we visited this scummy tavern we were amazed to discover there was no trick, no test of loyalty, no hidden trap:");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Somehow this fool had actually managed to obtain the god-staff of Armadyl!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Its power was incredible, you could almost feel the energies crackling around it in the air!");
+        ~chatplayer("So what happened then?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Well, with such a weapon, the plans we had been developing for a rebellion against our lord could finally be put into action, but we knew that we would have to act swiftly, before he heard that we had a weapon");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "capable of defeating him, and we would have to act decisively, for even amongst our group there were still those loyal to the lord - such as that pathetic fool Azzanadra.");
+        ~chatplayer("So JUST WHO WAS this lord you speak of?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "And I tell thee again, I will say when it is appropriate, now do not disrupt my tale!");
+        ~chatplayer("Okay, carry on then...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "So anyway, Lord Zamorak and his most trusted compatriots, namely myself, Hazeel, Drakan, Thammaron and Zemouregal made plans to overthrow our lord using the god-weapon, and by pledging");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "allegiance to Zamorak as our master, were each to be given a large piece of land as our own in return.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "We decided to move immediately, before anyone got cold feet, or any other parties could interfere in our work, and made haste towards the castle where our Lord lived.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "If Lucien had not been otherwise occupied, he would have probably accompanied us with his magicks, but it turned out the foolish Dhalak had made his involvement unnecessary with some spells of his own allowing us to");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "get close enough to the castle with the staff without the Empty Lord being able to sense its presence.");
+        ~chatplayer("So your lord was the one that cursed you?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "I am coming to that... So anyway, we made our way to the castle, under the pretense that we had war plans against Saradomin and the other deities to discuss.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "As usual, our lord was guarded well, but this was why Zamorak had brought his most trusted fighters with him.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "While we distracted the Empty Lord with our feints and attacks, and kept his bodyguards busy, Lord Zamorak outflanked him, unsheathed the staff and plunged it into his back!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Ah, it was a glorious sight... At that moment I was reminded for whom I fought, and why General Zamorak had earned his nickname 'the scourge' upon the battlefield...");
+        ~chatplayer("And the next thing you know you were cursed?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "No, it was not quite that simple... The Empty Lord turned away from our battle, eyes burning with hatred, and towards Zamorak instead. Seeing this, we all fought with extra vigour, so that");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "General Zamorak would not face our lord alone, but we were outnumbered by many hundreds of warriors and demons, and could not reach him to assist him!");
+        ~chatplayer("So what then?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Why, it was the Empty Lord versus Zamorak, in single combat! And the sight of the battle will be with me forever more...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "The Empty Lord was a powerful god, stronger than any of the others awake at that time, possibly even as strong as Guthix is, and Zamorak was but a mortal: A Mahjarrat warrior all the same, with all of the");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "strength and power that that entails, but mortal nonetheless, but to see him fight, you would not think of him as a 'mere' anything...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "He was war itself! Flurry after flurry of blows he rained upon the Empty Lord, and the very castle walls shook and quivered with their power, but the Empty Lord would not fall!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Even with the weapon of a god embedded in his back, he fought on, and with each blow our victory seemed less and less certain...");
+        ~chatplayer("So what then?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Well, then a miracle happened. Or luck. Or natural justice.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "You can call it what you want, but as the Empty Lords hands wrapped tightly around Zamorak's throat, Lord Zamorak, kicking and screaming defiantly and radiant in his anger until the very last, plunged towards the");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Empty Lord, who seemed to lose his footing slightly, and fell in such a way so that the staff plunged deeper into his body, but also impaled Lord Zamorak with it at the same time...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "And then...");
+        ~chatplayer("And then what?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "And then nothing. There was a sudden flash of bright light, and then a sudden blink of cold darkness, and it was over.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Zamorak stood over the Empty Lord who was slowly... fading from existence... And as he faded, it seemed as though... It almost seemed as though Zamorak became more real,");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "more solid than he had been before...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "And as the Empty Lord faded from this world completely, I heard his voice, almost a whisper upon the wind, cursing all who had helped Zamorak in his victory, which as you now tell me seems to have been all who");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "were responsible for the staff ending up in Zamorak's hands at the castle.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "As I heard it, I saw that I too was fading, just as the Empty Lord had, and I called to my brethren for their assistance, but they could no longer hear my words, nor see my form.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "It was then that the other gods appeared and banished Zamorak from the world completely for daring to kill one of their kind, although as it turned out it didn't quite work out that way for them, when he returned");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "stronger than ever, a god himself.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "But the god wars were another story entirely...");
+        ~chatplayer("But... I don't understand... If it was Zamorak who used the weapon, then why was it only you who were cursed?");
+        ~chatplayer("And the other people who were cursed, why them? Why not the other Mahjarrat for example?");
+        ~chatplayer("And just who was this 'Empty Lord' you keep speaking of?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Well, in my life I was nothing but a warrior. I had no hidden knowledge, I didn't especially care about the gods or their magics, and I certainly didn't respect them.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Now in my... I suppose this is my death. I am but a shade on the wind, unnoticed by all who pass me, until today anyway, and the only answer I can give you is that the others who were with me, the");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Mahjarrats and the Vampyre, they were beings of magic.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "It runs through their very veins, and ebbs through their bones.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Who knows why the curse fell as it did? Perhaps as a mere human I was more susceptible to it, when they were not. Perhaps they too are cursed, but their life spans are so");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "long that it will be millennia before they feel it upon them. Perhaps because it did not affect them, it extended backwards through time, to the moment the staff was");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "taken from its rightful place, and all who had known of its theft were cursed too. Perhaps there are others also cursed, who played no part in this tale, and were merely unlucky enough to be");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "in the wrong place at the wrong time...");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "I don't know. Things do not always happen for a reason, just as tales do not always end with all of the loose ends neatly tied up and all answers supplied.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "I have simply told you the events I was witness to, for I can do no more.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "You have cheered me no end to let me know that this curse that has afflicted me has not left me alone here, in this void between worlds.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Perhaps I will hunt down these others who have also been cursed as I was, but I feel I must reward you for your efforts; Here, take my cloak, it is drenched in the blood of a");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "thousand foes, and may bring you luck in battle.");
+        ~chatplayer("So how can I break this curse?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Who knows? If it was the death curse of the Empty Lord, there may be no way to break it.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "If it was not his death curse, and he is still alive but not on this world, then the only way to break it may be to bring him back here;");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "But I would rather stay cursed than suffer under his rule again...");
+        ~chatplayer("But WHO was this 'Empty Lord'? WHAT was his NAME?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "You do not know? You have not guessed yet?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "He was Zaros.");
+}
+
+[proc,empty_lord_hint](int $stage)
+switch_int ($stage) {
+    case 1 :
+        switch_int (~empty_lord_route) {
+            case 1 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "Ah, the infamous Rennard... The last I had heard of him, he had sought passage on a ship crewed by none but the most dastardly lowly pirates...");
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "I also heard that this ship had been caught in a violent storm, and stranded upon rocks, where the pirates then made their home...");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 2 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "Ah, the infamous Rennard... The last I had heard of that vile thief, he had joined a group of bandits in an evil land to the North-east of here, where they had made their home living outside of");
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "the reach of the authorities that pursued them...");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 3 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "Ah, the infamous Rennard... The last I had heard of that vile thief, he had joined a group of bandits in a barren land to the South-east of here, where they prey upon the unsuspecting visitors to");
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "the desert awaiting the return of their dark master...");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+        }
+    case 2 :
+        switch_int (~empty_lord_route) {
+            case 1 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Kharrim the messenger... Well, he was always a devoted follower of old General Zamorak, and if I remember rightly Zamorak set up a small base in an old temple near Dareeyak...");
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "You might want to check around there.");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 2 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Kharrim the messenger... Last I'd heard of him, he'd headed off to Carrallagar to seek his fortune. Ya might want to check around there somewhere.");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 3 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Kharrim the messenger... The last I'd heard of that weasel he was claiming he'd found some underground deposit of runite ore guarded by demons and dragons.");
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "I suspect he was pulling some scam or other, but if you know of such a place, that might be a good place to start checking.");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+        }
+    case 3 :
+        switch_int (~empty_lord_route) {
+            case 1 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Well, she was always sickeningly obedient to Saradomin, so I would expect her to have run to some great place of worship of him if she was affected by the curse to try and gain his blessing.");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 2 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "According to Lucien's intelligence report, she had been uncovered as a spy by her constant use of ships to ferry information...");
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "It is entirely possible she would be located somewhere coastal to this day!");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 3 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Well, we knew little about her or she would have been caught and exposed as a traitor and a spy, but Lucien did mention that he had evidence that she was a great fan of ball games...");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+        }
+    case 4 :
+        switch_int (~empty_lord_route) {
+            case 1 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Dhalak? Well, he was always a knowlegeable mage, so if this curse has befallen him as well, I would suspect he would be researching how to free himself of it.");
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "I would look for a library to find him if I were you.");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 2 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Dhalak? He was always a loyal follower of Saradomin... I think he would have found an altar to Saradomin so that he may pray for this curse to be lifted.");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 3 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_spy, "Dhalak? I know not where, but he would try and make the most of his situation if he has been cursed, and find a place to lift his spirits!");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+        }
+    case 5 :
+        switch_int (~empty_lord_route) {
+            case 1 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Ah, the evil swordsman Viggora... A rogue like him would probably flock to his own kind.");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 2 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Ah, the evil swordsman Viggora... Perhaps he has returned to his castle in the dark lands?");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+            case 3 :
+                ~chatnpc_specific("Mysterious ghost", secret_ghost_mage, "Ah, the evil swordsman Viggora... Paddewwa was where he fought many battles, perhaps he has returned to one of his old haunts?");
+                ~chatplayer("Okay, well I'll try and find him for you then.");
+        }
+}
+
+[proc,empty_lord_repeat](int $stage)
+switch_int ($stage) {
+    case 1 :
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "Thank you for hearing my tale... It has been so lonely here...");
+        ~chatplayer("Can you remind me where to find the thief Rennard who caused this curse to befall you again?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_explorer, "Of course...");
+    case 2 :
+        ~chatplayer("Hello again Rennard.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_thief, "Ah, it be you again! What can I do fer ya?");
+        ~chatplayer("Can you tell me where I can find Kharrim again?");
+    case 3 :
+        ~chatplayer("Hello again Kharrim.");
+        ~chatplayer("Can you remind me where to find Lennissa?");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_messenger, "Ah yes, the whereabouts of the treacherous Lennissa...");
+    case 4 :
+        ~chatplayer("Hello Lennissa. Can you remind me where to find Dhalak?");
+    case 5 :
+        ~chatplayer("Dhalak, where can I find the swordsman Viggora?");
+    case 6 :
+        ~chatplayer("Hello.");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "Hello yourself.");
+        ~chatplayer("I really liked your little story. Can you tell me another one?");
+        ~chatplayer("Preferably something with a big fight and lots of explosions!");
+        ~chatnpc_specific("Mysterious ghost", secret_ghost_swordsman, "...You are a very strange young man.");
+}
+if ($stage < ^empty_lord_ghost_count) ~empty_lord_hint($stage);
+
+[proc,empty_lord_no_amulet]
+~chatplayer("Hello there.");
+~chatnpc_specific("Mysterious ghost", npc_type, "Wooo?  Woooo woo woooooo wooooo woooowooo wooo woooooo woo!");
+// UNKNOWN: equal weights for the eight sourced responses are an engineering choice.
+switch_int (random(8)) {
+    case 0 :
+        ~chatplayer("Yeah, I heard about that, ha-ha-ha!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatplayer("With a MACKEREL? Ouch!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatplayer("Well, it was fun. Let's do it again sometime.");
+    case 1 :
+        ~chatplayer("Hey, don't think you can talk to me like that!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatplayer("Are you threatening me?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatplayer("Just because you're already dead, doesn't mean I can't find a way to hurt you ghosty!");
+    case 2 :
+        ~chatplayer("Why, thank you very much!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatplayer("I know, but what are you going to do?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatplayer("Well, I guess that's always true in the long run. See you around, weird invisible dead person!");
+    case 3 :
+        ~chatplayer("We get signal!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatplayer("Somebody set up us the bomb!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatplayer("You have no chance to survive make your time.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo?");
+        ~chatplayer("All your base are belong to us.");
+    case 4 :
+        ~chatplayer("No, I've never been there in my life and CERTAINLY didn't steal anything when I was!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatplayer("Are you calling me a liar?!?! I have never stolen a thing in my life, and I resent the implication that I am the kind of morally depraved individual that would steal someone else's hard earned");
+        ~chatplayer("money from their very pockets!");
+        ~chatplayer("Or cakes. Or fur. Repeatedly. For long periods at a time.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatplayer("Well if you are going to take that attitude, then I have nothing further to say on the matter, and bid you good day!");
+    case 5 :
+        ~chatplayer("Yeah, I don't want to brag, but seriously: I am SOOOO rich....");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatplayer("Yeah, I know they say money doesn't bring you happiness, but sometimes I just like to open my bank account and look at all of the stuff I own and just think to myself:");
+        ~chatplayer("Wow. I am soooooo rich.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatplayer("Well, us rich alive people don't want to waste all day spending time with you poor dead people, because I'm just sooooo rich I have to go now, and very possibly make myself even richer.");
+        ~chatplayer("See ya around ghosty!");
+    case 6 :
+        ~chatplayer("You don't say?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatplayer("You don't say!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatplayer("Well, I guess you didn't say.");
+    case 7 :
+        ~chatplayer("Yeah it's not bad, but I prefer cooked chicken.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Woo! WOO WOOOOO WOOWOOWOO WOO WOOOOO!");
+        ~chatplayer("Maybe, but nothing beats a home cooked pie!");
+        ~chatplayer("Man, I love pie!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Wooowoowoooooo.... Woowoowoo? Woooo, wooowoo wooowooowooo!");
+        ~chatplayer("You don't say? I never knew that. Well, I must be going, see you around.");
+}
+
+// CANDIDATE: wrong-location branches documented in transcript 15354024.
+[proc,empty_lord_wrong]
+// UNKNOWN: equal weights and using these responses before an earlier story are engineering choices.
+switch_int (random(8)) {
+    case 0 :
+        ~chatplayer("Hello there.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Hello.");
+        ~chatplayer("So you're a ghost, huh?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Apparently.");
+        ~chatplayer("In which case I only have one thing to say to you:");
+        ~chatplayer("Woooo! Woowooooowoo, wooo WOOOOOOOOOOO woowoo woowoowoo woo!");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "...what?");
+        ~chatplayer("Guess you don't have the amulet of humanspeak, huh?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "...huh?");
+        ~chatplayer("Yeah, that's right. WOO! WOOOWOOO WOO WOOOOWOO! Got no comeback for that, have you?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "You are very strange...");
+    case 1 :
+        ~chatplayer("Hello there.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Mortal... Take heed of my example, and waste not your life, lest you may suffer the same fate as myself...");
+        ~chatplayer("Huh? You mean someone did this to you?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "You have ascertained the truth in my words...");
+        ~chatplayer("So who did it to you? And why?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Events of moons past, I remember not clearly...");
+        ~chatplayer("Fine help you are then.");
+    case 2 :
+        ~chatplayer("Hello there.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Please... Leave me to my fate. I have been here so long that I scarce remember aught else...");
+        ~chatplayer("Uh.... huh.");
+    case 3 :
+        ~chatplayer("Hello there.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "You can see me?");
+        ~chatplayer("Uh... yes?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "And you understand my words?");
+        ~chatplayer("Well, most of them...");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "This is incredible! How can such a thing have come to pass?");
+        ~chatplayer("What can I say? I'm a professional.");
+    case 4 :
+        ~chatplayer("Hello there.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Hello back at you.");
+        ~chatplayer("So what's a nice ghost like you doing in a place like this?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "I suppose you think that's funny?");
+        ~chatplayer("Well... Mildly amusing I guess.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "I don't think I want to talk to you anymore.");
+    case 5 :
+        ~chatplayer("Hello there.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Hello stranger.");
+        ~chatplayer("So.... Invisible ghost haunting the same place for thousands of years, huh?");
+        ~chatplayer("That's got to be a pretty rubbish way to spend your life. Er, death.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "You have no idea...");
+        ~chatplayer("Well, bad luck and all that. See ya around!");
+    case 6 :
+        ~chatplayer("Hello there.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Hello stranger. It is rare indeed that I meet one who can see my presence, let alone one who can understand my words.");
+        ~chatplayer("Soooo.... Is it fun being a ghost?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Does it look like fun to you?");
+        ~chatplayer("Erm... Well, yes actually.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "Then you are a fool, and I will waste no more words upon you.");
+        ~chatplayer("What, not even 'goodbye'?");
+        ~chatnpc_specific("Mysterious ghost", npc_type, " ");
+        ~chatplayer("Sheesh, what a grouch. You'd think you'd have more of a sense of humour being dead and all.");
+    case 7 :
+        ~chatplayer("Hello there.");
+        ~chatnpc_specific("Mysterious ghost", npc_type, "The endless tragedy of fate... Why must you torment me so?");
+        ~chatplayer("Alright, alright, calm down, calm down. All I said was 'hello'!");
+}

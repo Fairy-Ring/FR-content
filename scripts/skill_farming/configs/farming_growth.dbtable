@@ -1,0 +1,3 @@
+[farming_growth]
+column=period,int,REQUIRED
+column=handler,int,REQUIRED

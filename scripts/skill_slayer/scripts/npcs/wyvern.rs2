@@ -1,0 +1,118 @@
+// N101. Research: slayer.n101-* in the vault. All four visible cache forms
+// dispatch through the same category, including natural retaliation and death.
+[ai_queue1,_slayer_wyvern] ~npc_default_retaliate_ap;
+[ai_applayer2,_slayer_wyvern] ~wyvern_attack;
+[ai_opplayer2,_slayer_wyvern] ~wyvern_attack;
+
+[proc,wyvern_attack]
+if (%death = ^true) {
+    npc_setmode(null);
+    return;
+}
+if (%npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+def_int $style = ~wyvern_attack_style;
+if ($style = ^wyvern_breath_style) {
+    ~wyvern_breath;
+} else if ($style = ^wyvern_ranged_style) {
+    ~wyvern_ranged;
+} else {
+    ~wyvern_melee;
+}
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+npc_setmode(applayer2);
+
+[proc,wyvern_attack_style]()(int)
+// UNKNOWN engineering: equal style chances within reach, no distant melee.
+if (npc_range(coord) > 1) return(add(random(^wyvern_distant_styles), 1));
+return(random(^wyvern_close_styles));
+
+[proc,wyvern_melee]
+if (random(2) = 0) npc_anim(wyvern_skeleton_bite, 0);
+else npc_anim(wyvern_skeleton_tail_swipe, 0);
+anim(%com_defendanim, 0);
+def_int $damage = 0;
+if (~npc_attack_accuracy(~npc_melee_attack_roll, ~player_defence_roll_specific(^slash_style)) = true) {
+    $damage = randominc(^wyvern_melee_maxhit);
+}
+~playerhit_n_melee($damage, npc_param(attackrate));
+
+[proc,wyvern_ranged]
+npc_anim(wyvern_skeleton_iceball, 0);
+spotanim_npc(wyvern_skeleton_launch_iceball, ^wyvern_projectile_height, 0);
+def_int $duration = ~player_projectile(npc_coord, coord, uid, wyvern_skeleton_travel_iceball, ^wyvern_projectile_height, ^wyvern_projectile_endheight, ^wyvern_projectile_delay, ^wyvern_projectile_angle, 0, ^wyvern_projectile_offset, ^wyvern_projectile_step);
+def_int $damage = 0;
+if (~npc_attack_accuracy(~npc_ranged_attack_roll, ~player_defence_roll_specific(^ranged_style)) = true) {
+    $damage = randominc(^wyvern_ranged_maxhit);
+}
+def_int $ticks = ~playerhit_n_ranged($damage, $duration, npc_param(attackrate));
+
+[proc,wyvern_breath]
+npc_anim(wyvern_skeleton_ice_breath, 0);
+def_int $duration = ~player_projectile(npc_coord, coord, uid, wyvern_skeleton_travel_breath, ^wyvern_projectile_height, ^wyvern_projectile_endheight, ^wyvern_projectile_delay, 0, 0, ^wyvern_projectile_offset, ^wyvern_projectile_step);
+spotanim_pl(wyvern_skeleton_impact_breath, ^wyvern_projectile_endheight, $duration);
+def_int $maxhit = ^wyvern_breath_maxhit;
+// VERIFIED period equipment: anti-dragon shield does not protect. Mind shield
+// arrived October 2006; dragonfire and later shields are after this cutoff.
+if (inv_total(worn, elemental_shield) > 0) {
+    $maxhit = ^wyvern_shield_maxhit;
+} else {
+    // VERIFIED qualitative reduction: period RuneVillage and official July2007.
+    // CANDIDATE cap20: Old School; weaker than the elemental shield's cap10.
+    if (~check_protect_prayer(^magic_style) = true) $maxhit = ^wyvern_magic_prayer_maxhit;
+    // CANDIDATE stat loss: Old School revision 241128. UNKNOWN engineering:
+    // which stats and how much were not stated; use ten percent of these five.
+    stat_drain(attack, 0, ^wyvern_stat_drain_percent);
+    stat_drain(strength, 0, ^wyvern_stat_drain_percent);
+    stat_drain(defence, 0, ^wyvern_stat_drain_percent);
+    stat_drain(ranged, 0, ^wyvern_stat_drain_percent);
+    stat_drain(magic, 0, ^wyvern_stat_drain_percent);
+}
+// VERIFIED: official 3 July 2007 note fixed Melee prayer blocking ice breath.
+// Keep that period fault on purpose. UNKNOWN engineering: full rather than
+// partial blocking. The shield takes precedence over Magic-prayer mitigation.
+if (~check_protect_prayer(^melee_style) = true) $maxhit = 0;
+def_int $ticks = ~playerhit_n_ranged(randominc($maxhit), $duration, npc_param(attackrate));
+// CANDIDATE: breath can freeze even through an elemental shield. The chance
+// is UNKNOWN engineering; the existing freeze queue enforces walking refusal.
+if (%frozen < map_clock & random(^wyvern_freeze_roll) = 0) {
+    queue(npc_freeze_player, $ticks, sub(^wyvern_freeze_ticks, 1));
+}
+
+[ai_queue3,_slayer_wyvern]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, wyvern_bones, 1, ^lootdrop_duration);
+~wyvern_drop;
+
+[proc,wyvern_drop]
+// CANDIDATE granite rarity: Old School revision 241128. Item existed in 2005.
+if (random(^wyvern_granite_roll) = 0) {
+    obj_add(npc_coord, granite_legs, 1, ^lootdrop_duration);
+    return;
+}
+// CANDIDATE membership/amounts: RuneScape wiki revision 172244, 12 June 2007,
+// before the 18 June 2007 and September 2014 drop boosts. Period RuneVillage
+// corroborates bones, granite, coins, runes, gems, herbs, key and shield halves.
+// UNKNOWN engineering weights: no numerical common-table rates recovered.
+// Pure essence existed April 2006. No visage, metal bolts, crossbow, elite
+// clue, later keys, boosted rune gear, battlestaves or resource stacks.
+def_int $roll = random(^wyvern_drop_slots);
+if ($roll < 20) { obj_add(npc_coord, coins, 30, ^lootdrop_duration); }
+else if ($roll < 40) { obj_add(npc_coord, coins, 44, ^lootdrop_duration); }
+else if ($roll < 52) { obj_add(npc_coord, coins, 132, ^lootdrop_duration); }
+else if ($roll < 56) { obj_add(npc_coord, coins, 220, ^lootdrop_duration); }
+else if ($roll < 66) { obj_add(npc_coord, airrune, 30, ^lootdrop_duration); }
+else if ($roll < 76) { obj_add(npc_coord, waterrune, 30, ^lootdrop_duration); }
+else if ($roll < 84) { obj_add(npc_coord, chaosrune, 10, ^lootdrop_duration); }
+else if ($roll < 90) { obj_add(npc_coord, lawrune, 3, ^lootdrop_duration); }
+else if ($roll < 96) { obj_add(npc_coord, bloodrune, 7, ^lootdrop_duration); }
+else if ($roll < 100) { obj_add(npc_coord, cert_blankrune_high, 60, ^lootdrop_duration); }
+else if ($roll < 104) { obj_add(npc_coord, black_sword, 1, ^lootdrop_duration); }
+else if ($roll < 108) { obj_add(npc_coord, black_axe, 1, ^lootdrop_duration); }
+else if ($roll < 120) { obj_add(npc_coord, ~randomherb, ^lootdrop_duration); }
+else { obj_add(npc_coord, ~randomjewel, ^lootdrop_duration); }

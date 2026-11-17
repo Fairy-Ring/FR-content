@@ -1,0 +1,45 @@
+[oplocu,potato_seed_watered] @farming_potato_use;
+[oplocu,potato_1_watered] @farming_potato_use;
+[oplocu,potato_2_watered] @farming_potato_use;
+[oplocu,potato_3_watered] @farming_potato_use;
+[oplocu,potato_1_diseased] @farming_potato_use;
+[oplocu,potato_2_diseased] @farming_potato_use;
+[oplocu,potato_3_diseased] @farming_potato_use;
+[oplocu,potato_1_dead] @farming_potato_use;
+[oplocu,potato_2_dead] @farming_potato_use;
+[oplocu,potato_3_dead] @farming_potato_use;
+
+[label,farming_potato_use]
+if (~farming_veg_is_parent = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~farming_veg_stage;
+if (oc_category(last_useitem) = watering_can & last_useitem ! watering_can_0
+    & $stage >= ^farming_potato_seed & $stage < ^farming_potato_fullygrown) {
+    inv_setslot(inv, last_useslot, oc_param(last_useitem, next_obj_stage), 1);
+    ~farming_veg_set_stage(add($stage, ^farming_watered_offset));
+    // UNKNOWN functional wording: no retained period message transcript.
+    mes("You water the potato plants.");
+    return;
+}
+if (last_useitem = plant_cure & $stage > add(^farming_potato_seed, ^farming_diseased_offset)
+    & $stage < add(^farming_potato_fullygrown, ^farming_diseased_offset)) {
+    inv_setslot(inv, last_useslot, vial_empty, 1);
+    ~farming_veg_set_stage(sub($stage, ^farming_diseased_offset));
+    // UNKNOWN functional wording: no retained period message transcript.
+    mes("You cure the potato plants.");
+    return;
+}
+if (last_useitem = spade & $stage > add(^farming_potato_seed, ^farming_dead_offset)
+    & $stage < add(^farming_potato_fullygrown, ^farming_dead_offset)) {
+    ~farming_veg_set_stage(^farming_veg_weeded);
+    // UNKNOWN functional wording: no retained period message transcript.
+    mes("You dig up the dead potato plants.");
+    return;
+}
+if (last_useitem = rake) {
+    ~displaymessage(^dm_farming_patch_planted);
+    return;
+}
+~displaymessage(^dm_default);

@@ -1,7 +1,6 @@
-// Farming F1 — potato on farming_veg_patch_* (allotment).
-// Greenfield: no 274/289 script port. Growth ticks + XP are CANDIDATE (deviations).
-// F1 scope: rake weeds → plant 3 potato seeds (dibber) → softtimer growth → harvest.
-// No watering requirement, disease, compost, farmer pay, or multi-life yield math.
+// Potato allotments: permanent cache bytes, shared global growth and care.
+// Period Tip.It supplies planting/harvest XP. Timing and disease rules follow
+// the labelled Old School reconstruction in farming_growth/farming_potato_growth.
 
 // ---------------------------------------------------------------------------
 // Patch stage via parent multivarbit (farming_allotment_varp_1_0_7…715)
@@ -88,11 +87,10 @@ if (last_useitem = potato_seed | last_useitem = potato_seed_2 | last_useitem = p
     @farming_plant_use;
     return;
 }
-~displaymessage(^dm_default);
+@farming_potato_use;
 
 [proc,farming_rake_step]
 def_int $stage = ~farming_veg_stage;
-// Always announce so smoke can see the trigger fired even if stage write fails.
 mes("You use the rake on the allotment.");
 if ($stage > ^farming_veg_weeds_1) {
     // Already weeded or planted — not a rake target (wrong stage ops usually).
@@ -152,58 +150,9 @@ if (stat_base(farming) < 1) {
 }
 inv_del(inv, potato_seed, ^farming_allotment_seed_count);
 ~farming_veg_set_stage(^farming_potato_seed);
-// CANDIDATE plant XP (community); see deviations.
+// VERIFIED period Tip.It planting XP.
 stat_advance(farming, ^farming_potato_plant_xp);
 mes("You plant three potato seeds in the allotment.");
-// Start growth timer (CANDIDATE interval). softtimer cannot touch player varbits
-// in this compiler (p_active_player); hard timer matches wine ferment pattern.
-cleartimer(farming_potato_grow);
-settimer(farming_potato_grow, ^farming_potato_stage_ticks);
-
-// ---------------------------------------------------------------------------
-// Growth timer — advances all patches in potato growth band one step.
-// F1: single timer; multi-patch same tick is OK for smoke scale.
-// ---------------------------------------------------------------------------
-
-[timer,farming_potato_grow]
-def_boolean $any_growing = false;
-if (%farming_allotment_varp_1_0_7 >= ^farming_potato_seed & %farming_allotment_varp_1_0_7 < ^farming_potato_fullygrown) {
-    %farming_allotment_varp_1_0_7 = add(%farming_allotment_varp_1_0_7, 1);
-    if (%farming_allotment_varp_1_0_7 < ^farming_potato_fullygrown) $any_growing = true;
-}
-if (%farming_allotment_varp_1_8_15 >= ^farming_potato_seed & %farming_allotment_varp_1_8_15 < ^farming_potato_fullygrown) {
-    %farming_allotment_varp_1_8_15 = add(%farming_allotment_varp_1_8_15, 1);
-    if (%farming_allotment_varp_1_8_15 < ^farming_potato_fullygrown) $any_growing = true;
-}
-if (%farming_allotment_varp_1_16_23 >= ^farming_potato_seed & %farming_allotment_varp_1_16_23 < ^farming_potato_fullygrown) {
-    %farming_allotment_varp_1_16_23 = add(%farming_allotment_varp_1_16_23, 1);
-    if (%farming_allotment_varp_1_16_23 < ^farming_potato_fullygrown) $any_growing = true;
-}
-if (%farming_allotment_varp_1_24_31 >= ^farming_potato_seed & %farming_allotment_varp_1_24_31 < ^farming_potato_fullygrown) {
-    %farming_allotment_varp_1_24_31 = add(%farming_allotment_varp_1_24_31, 1);
-    if (%farming_allotment_varp_1_24_31 < ^farming_potato_fullygrown) $any_growing = true;
-}
-if (%farming_allotment_varp_2_0_7 >= ^farming_potato_seed & %farming_allotment_varp_2_0_7 < ^farming_potato_fullygrown) {
-    %farming_allotment_varp_2_0_7 = add(%farming_allotment_varp_2_0_7, 1);
-    if (%farming_allotment_varp_2_0_7 < ^farming_potato_fullygrown) $any_growing = true;
-}
-if (%farming_allotment_varp_2_8_15 >= ^farming_potato_seed & %farming_allotment_varp_2_8_15 < ^farming_potato_fullygrown) {
-    %farming_allotment_varp_2_8_15 = add(%farming_allotment_varp_2_8_15, 1);
-    if (%farming_allotment_varp_2_8_15 < ^farming_potato_fullygrown) $any_growing = true;
-}
-if (%farming_allotment_varp_2_16_23 >= ^farming_potato_seed & %farming_allotment_varp_2_16_23 < ^farming_potato_fullygrown) {
-    %farming_allotment_varp_2_16_23 = add(%farming_allotment_varp_2_16_23, 1);
-    if (%farming_allotment_varp_2_16_23 < ^farming_potato_fullygrown) $any_growing = true;
-}
-if (%farming_allotment_varp_2_24_31 >= ^farming_potato_seed & %farming_allotment_varp_2_24_31 < ^farming_potato_fullygrown) {
-    %farming_allotment_varp_2_24_31 = add(%farming_allotment_varp_2_24_31, 1);
-    if (%farming_allotment_varp_2_24_31 < ^farming_potato_fullygrown) $any_growing = true;
-}
-if ($any_growing = true) {
-    settimer(farming_potato_grow, ^farming_potato_stage_ticks);
-} else {
-    cleartimer(farming_potato_grow);
-}
 
 // ---------------------------------------------------------------------------
 // Harvest — OPLOC1 Harvest on potato_fullygrown
@@ -223,7 +172,7 @@ if ($stage < ^farming_potato_fullygrown | $stage > ^farming_potato_harvest_last)
     ~displaymessage(^dm_farming_patch_no_crops);
     return;
 }
-// Spade required? OPEN research — prefer check (displaymessage exists).
+// Existing potato harvest tool requirement is unchanged.
 if (inv_total(inv, spade) < 1) {
     ~displaymessage(^dm_farming_spade);
     return;
@@ -233,7 +182,7 @@ if (inv_freespace(inv) < 1) {
     return;
 }
 inv_add(inv, potato, 1);
-// CANDIDATE harvest XP (community).
+// VERIFIED period Tip.It harvest XP.
 stat_advance(farming, ^farming_potato_harvest_xp);
 if ($stage < ^farming_potato_harvest_last) {
     ~farming_veg_set_stage(add($stage, 1));
@@ -246,16 +195,9 @@ mes("You harvest a potato from the allotment.");
 // Fail paths — wrong tool on patch stages
 // ---------------------------------------------------------------------------
 
-[oplocu,potato_seed]
-[oplocu,potato_1]
-[oplocu,potato_2]
-[oplocu,potato_3]
-[oplocu,potato_fullygrown]
-@farming_potato_wrong_use;
+[oplocu,potato_seed] @farming_potato_use;
+[oplocu,potato_1] @farming_potato_use;
+[oplocu,potato_2] @farming_potato_use;
+[oplocu,potato_3] @farming_potato_use;
+[oplocu,potato_fullygrown] @farming_potato_use;
 
-[label,farming_potato_wrong_use]
-if (last_useitem = rake) {
-    ~displaymessage(^dm_farming_patch_planted);
-    return;
-}
-~displaymessage(^dm_default);

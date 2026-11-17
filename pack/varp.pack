@@ -498,7 +498,7 @@
 497=rd_rooms_tempvar
 498=rd_rooms_tempvar2
 499=magic_carpet_var
-500=varp500_unused
+500=farming_growth_minute
 501=varp501_bits
 502=farming_tree_varp
 503=farming_fruit_tree_varp

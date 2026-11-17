@@ -70,6 +70,7 @@ queue(macro_event_login, 0, 0);
 ~update_weight_equipment;
 ~ferment_wines_login;
 ~thieving_stall_timers_login;
+~farming_login;
 ~stat_boost_login; // f2p boost reset
 ~sa_login; // start timer if low sa energy
 
