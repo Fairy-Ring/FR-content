@@ -1230,6 +1230,24 @@
         "hit": 1013904242,
         "zero": 1309757500
       }
+    },
+    {
+      "script": "[ai_opplayer2,_slayer_zygomite]",
+      "npc": "slayer_mutated_zygomite_adolescent",
+      "seeds": {
+        "miss": 1,
+        "hit": 9,
+        "zero": 17
+      }
+    },
+    {
+      "script": "[ai_applayer2,_slayer_zygomite]",
+      "npc": "slayer_mutated_zygomite_adolescent",
+      "seeds": {
+        "miss": 1,
+        "hit": 9,
+        "zero": 17
+      }
     }
   ]
 }
