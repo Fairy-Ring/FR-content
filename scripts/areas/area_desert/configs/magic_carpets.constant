@@ -1,0 +1,14 @@
+// CANDIDATE fares: OSRS Magic carpet and Rogue Trader; both discount systems predate May 2006.
+^magic_carpet_fare = 200
+^magic_carpet_discount_fare = 100
+^magic_carpet_combined_fare = 75
+
+// UNKNOWN arrival tiles: engineering offsets beside the VERIFIED 377 mapped merchants.
+^magic_carpet_shantay = 0_51_48_46_37
+^magic_carpet_bedabin = 0_49_47_45_35
+^magic_carpet_poll_south = 0_52_45_20_63
+^magic_carpet_poll_north = 0_52_46_22_58
+^magic_carpet_uzer = 0_54_48_12_38
+^magic_carpet_sophanem = 0_51_43_22_61
+^magic_carpet_menaphos = 0_50_43_44_61
+^magic_carpet_nardah = 0_53_45_8_38
