@@ -42,9 +42,6 @@ anim(null, 0);
 
 [apnpcu,tog_light_creature]
 if (last_useitem ! tog_sapphire_lantern_lit) return;
-if (inzone(^swamp_cave_tears_sw, ^swamp_cave_tears_ne, coord) = false) return;
-// The native approach uses its default range; this is not adjacent OPNPCU.
-if (distance(coord, npc_coord) > ^tog_ferry_range) return;
 facesquare(npc_coord);
 p_delay(calc(^tog_ferry_half_ticks - 1));
 ~swamp_cave_release;

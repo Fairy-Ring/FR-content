@@ -72,5 +72,3 @@
 ^tog_ledge_juna = 2_50_148_40_26
 ^tog_slope_half_ticks = 2
 ^tog_ferry_half_ticks = 3
-// Published engine default approach range, not a new line-of-sight requirement.
-^tog_ferry_range = 10

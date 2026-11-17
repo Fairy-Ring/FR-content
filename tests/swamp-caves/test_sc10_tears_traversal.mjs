@@ -178,21 +178,40 @@ try {
     for (let option = 1; option <= 5; option++) assert.equal(npcHandler.handle(new OpNpc(option, creature.nid), p), false);
     assert.deepEqual(creatures.map(n => n.type), Array(9).fill(type.id)); finish(p);
   });
-  test('all collision-reachable natural wander tiles remain at least fifteen from every Juna-side walkable tile', () => {
-    const junaTiles = flood([3241, 9524], (x, z) => x > 3175 && x < 3285 && z > 9450 && z < 9560,
-      (x, z, dx, dz) => map.canTravel(2, x, z, dx, dz, 1, 0, CollisionType.NORMAL));
+  test('full entry, ledge and Juna floods admit only 52 entry-pocket firing tiles; each creature is isolated', () => {
+    const bounded = (x, z) => x > 3175 && x < 3285 && z > 9450 && z < 9560;
+    const playerStep = (x, z, dx, dz) => map.canTravel(2, x, z, dx, dz, 1, 0, CollisionType.NORMAL);
+    const entryTiles = flood([3217, 9526], bounded, playerStep);
+    const ledgeTiles = flood([3238, 9498], bounded, playerStep);
+    const junaTiles = flood([3241, 9524], bounded, playerStep);
+    assert.equal(entryTiles.length, 125); assert.equal(ledgeTiles.length, 188);
     assert.equal(junaTiles.length, 129); assert(junaTiles.some(([x, z]) => x === 3244 && z === 9500));
-    assert(!junaTiles.some(([x, z]) => x === 3176 || x === 3284 || z === 9451 || z === 9559), 'the full component is not clipped by audit bounds');
-    let minimum = Infinity, occurrences = 0;
+    for (const tiles of [entryTiles, ledgeTiles, junaTiles]) {
+      assert(!tiles.some(([x, z]) => x === 3176 || x === 3284 || z === 9451 || z === 9559), 'the full component is not clipped by audit bounds');
+    }
+    const entry = new Set(entryTiles.map(tile => tile.join(',')));
+    let junaMinimum = Infinity, ledgeMinimum = Infinity, occurrences = 0;
+    const firing = new Set();
     for (const n of creatures) {
       const range = types.NpcType.get(n.type).wanderrange;
       const tiles = flood([n.startX, n.startZ], (x, z) => Math.max(Math.abs(x - n.startX), Math.abs(z - n.startZ)) <= range,
         (x, z, dx, dz) => map.canTravel(n.level, x, z, dx, dz, n.width, n.blockWalkFlag(), n.getCollisionStrategy() ?? CollisionType.NORMAL));
       assert.deepEqual(tiles, [[n.startX, n.startZ]], 'native collision blocks every first wander step, despite configured range five');
       occurrences += tiles.length;
-      for (const [x, z] of tiles) for (const [px, pz] of junaTiles) minimum = Math.min(minimum, Math.max(Math.abs(x - px), Math.abs(z - pz)));
+      for (const [x, z] of tiles) {
+        for (const [px, pz] of junaTiles) junaMinimum = Math.min(junaMinimum, Math.max(Math.abs(x - px), Math.abs(z - pz)));
+        for (const [px, pz] of ledgeTiles) ledgeMinimum = Math.min(ledgeMinimum, Math.max(Math.abs(x - px), Math.abs(z - pz)));
+        // This covers every tile within the native range, not only the three floods.
+        for (let px = x - 10; px <= x + 10; px++) for (let pz = z - 10; pz <= z + 10; pz++) {
+          if (map.isMapBlocked(px, pz, 2) || !map.isApproached(2, px, pz, x, z, 1, 1, n.width, n.length)) continue;
+          assert(entry.has(`${px},${pz}`), 'every possible native firing tile belongs to the entry component');
+          assert(px >= 3212 && px <= 3239 && pz >= 9523 && pz <= 9532, 'every firing tile is inside the dark entry pocket');
+          firing.add(`${px},${pz}`);
+        }
+      }
     }
-    assert.equal(occurrences, 9); assert.equal(minimum, 15); assert(minimum > 10);
+    assert.equal(occurrences, 9); assert.equal(junaMinimum, 15); assert.equal(ledgeMinimum, 11);
+    assert.equal(firing.size, 52);
   });
   test('four hundred real native seeded wander turns cannot leave any of the nine isolated natural tiles', () => {
     for (let turn = 0; turn < 400; turn++) {
@@ -216,6 +235,14 @@ try {
       unchanged(p, before); silent(p); owner(p, true); finish(p);
     });
   }
+  for (const item of ['bullseye_lantern_lit', 'hammer']) {
+    test(`${item} used while carrying a lit sapphire: no ferry, movement, wording or durable change`, () => {
+      const p = fixture(stand, ['tog_sapphire_lantern_lit', item]); const before = stable(p);
+      assert.equal(p.invTotal(inv, obj('tog_sapphire_lantern_lit')), 1); assert(useCreature(p, item));
+      assert(!p.delayed); ticks(p, 8); assert.deepEqual(tile(p), stand); assert.deepEqual(p.moves, []);
+      unchanged(p, before); silent(p); owner(p, true); finish(p);
+    });
+  }
   for (const item of ['tog_sapphire_lantern_lit', 'tog_sapphire_lantern_unlit', 'bullseye_lantern_lit', 'hammer']) {
     test(`${item}: former Juna stand has no native target and never ferries (20 to selected, 18 to closest spawn)`, () => {
       const p = fixture([2, 3244, 9500], [item]); const before = stable(p); assert.equal(distance(p, creature), 20);
@@ -224,14 +251,6 @@ try {
       unchanged(p, before); silent(p); owner(p, false); assert.deepEqual(p.moves, []); finish(p);
     });
   }
-  test('protected runner bound from Juna cannot invent a ferry outside the entry pocket', () => {
-    const p = fixture([2, 3244, 9500]); const before = stable(p);
-    p.lastUseItem = obj('tog_sapphire_lantern_lit'); p.lastUseSlot = slotOf(p, 'tog_sapphire_lantern_lit');
-    const state = Runner.init(ferry, p, creature); p.executeScript(state, true, true);
-    assert.equal(state.execution, ScriptState.FINISHED); ticks(p, 8);
-    assert.deepEqual(tile(p), [2, 3244, 9500]); assert.deepEqual(p.moves, []);
-    unchanged(p, before); silent(p); owner(p, false); finish(p);
-  });
   for (const position of [[2, 3212, 9532], [2, 3213, 9532]]) {
     test(`farther entry tile ${position}: no out-of-range ferry; ordinary approach walks within ten then fires`, () => {
       const p = fixture(position); assert(distance(p, creature) > 10); const before = stable(p);
@@ -243,14 +262,6 @@ try {
       unchanged(p, before); silent(p); finish(p);
     });
   }
-  test('the actual compiled range bound refuses a natural target beyond ten even when runner-bound', () => {
-    const p = fixture([2, 3212, 9532]); p.lastUseItem = obj('tog_sapphire_lantern_lit');
-    p.lastUseSlot = slotOf(p, 'tog_sapphire_lantern_lit'); assert(distance(p, creature) > 10);
-    // Like SC-03's protected handoff checks, this is a runner bound, not fabricated client visibility.
-    const state = Runner.init(ferry, p, creature); p.executeScript(state, true, true);
-    assert.equal(state.execution, ScriptState.FINISHED); ticks(p, 8); assert.deepEqual(p.moves, []);
-    assert.deepEqual(tile(p), [2, 3212, 9532]); silent(p); finish(p);
-  });
   test('full backpack and unrelated carried/worn items survive the complete ferry unchanged', () => {
     const p = fixture(stand, ['tog_sapphire_lantern_lit', ...Array(26).fill('hammer'), 'wallbeast_spike_helmet']);
     assert(held(p, 'wallbeast_spike_helmet', 2)); p.invAdd(inv, obj('hammer'), 1);
