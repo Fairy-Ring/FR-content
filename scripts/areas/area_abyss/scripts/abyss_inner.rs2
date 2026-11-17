@@ -1,5 +1,5 @@
 // VERIFIED: altar-specific exits without talismans, Tip.It capture 2006-04-27.
-// UNKNOWN exact historical landing tiles: retain reconstructed air-nature defaults on the 377 maps.
+// UNKNOWN exact historical landing tiles: retain reconstructed defaults except blocked/wrong destinations.
 [oploc1,abyss_exit_to_air]
 p_telejump(0_44_75_30_36);
 
@@ -16,7 +16,8 @@ p_telejump(0_41_75_36_43);
 p_telejump(0_40_75_27_36);
 
 [oploc1,abyss_exit_to_body]
-p_telejump(0_39_75_24_46);
+// UNKNOWN exact historical landing: use the existing body altar entrance, not the blocked northern tile.
+p_telejump(0_39_75_27_38);
 
 [oploc1,abyss_exit_to_cosmic]
 // CANDIDATE: retained Abyss revision 10429 (2006-07-26), before later access changes.
@@ -55,8 +56,8 @@ if (%mourning_quest_main < ^mourning2_complete) {
     mes("A strange power blocks your exit.");
     return;
 }
-// UNKNOWN exact historical landing: use the existing death altar entrance on the 377 map.
-p_telejump(0_34_75_32_29);
+// UNKNOWN exact historical landing: use the tile north of the existing death altar exit portal.
+p_telejump(0_34_75_32_30);
 
 [oploc1,abyss_exit_to_blood]
 // CANDIDATE: blood altar released 22 April 2008; historical rift transcript supplies refusal.

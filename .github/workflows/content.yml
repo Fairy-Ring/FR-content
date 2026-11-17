@@ -208,6 +208,7 @@ jobs:
           run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
           run_test tests/food-drink/test_food_drink.mjs node --import tsx ../content/tests/food-drink/test_food_drink.mjs
           run_test tests/stair-links/test_stair_links.mjs node --import tsx ../content/tests/stair-links/test_stair_links.mjs
+          run_test tests/abyss/test_rift_exits.mjs node --import tsx ../content/tests/abyss/test_rift_exits.mjs
           run_test tests/swamp-caves/test_sc01_lights.mjs node --import tsx ../content/tests/swamp-caves/test_sc01_lights.mjs
           run_test tests/swamp-caves/test_sc02_seller.mjs node --import tsx ../content/tests/swamp-caves/test_sc02_seller.mjs
           run_test tests/swamp-caves/test_sc02l_manufacture.mjs node --import tsx ../content/tests/swamp-caves/test_sc02l_manufacture.mjs
