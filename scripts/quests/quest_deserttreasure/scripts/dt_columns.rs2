@@ -79,6 +79,4 @@ if (~dt_columns_full = false) {
     mes("This passage doesn't seem to lead anywhere...");
     return;
 }
-// S6 boundary: remain outside at stage 12. S7 owns opening, traversal and stage 13.
-// No invented success speech, destination or historical door animation.
-return;
+~dt_pyramid_enter;

@@ -1,0 +1,84 @@
+// VERIFIED route: src.dt-zybez-20060220, steps 41-45; original 377 ladders.
+// UNKNOWN engineering arrivals, hazard odds and timing: dt_pyramid.constant.
+[proc,dt_pyramid_enter]
+if (~dt_columns_full = false | %deserttreasure < ^dt_stage_four_columns) return;
+if (%deserttreasure = ^dt_stage_four_columns) {
+    %deserttreasure = ^dt_stage_inside_pyramid;
+    ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
+}
+p_teleport(^dt_pyramid_floor1);
+~dt_pyramid_start;
+
+[oploc1,desert_laddertop]
+~dt_pyramid_enter;
+
+[oploc1,desert_laddertop3_2] @dt_pyramid_down(^dt_pyramid_floor2);
+[oploc1,desert_laddertop2_1] @dt_pyramid_down(^dt_pyramid_floor3);
+[oploc1,desert_laddertop1_0] @dt_pyramid_down(^dt_pyramid_floor4);
+
+[label,dt_pyramid_down](coord $arrival)
+anim(human_climbing_down, 0);
+p_delay(^dt_pyramid_climb_delay);
+p_teleport($arrival);
+~dt_pyramid_start;
+
+[oploc1,desert_ladder0_1] @dt_pyramid_up(^dt_pyramid_up1);
+[oploc1,desert_ladder1_2] @dt_pyramid_up(^dt_pyramid_up2);
+[oploc1,desert_ladder2_3] @dt_pyramid_up(^dt_pyramid_up3);
+[oploc1,desert_ladder] @dt_pyramid_up(^dt_pyramid_surface);
+
+[label,dt_pyramid_up](coord $arrival)
+anim(human_climbing, 0);
+p_delay(^dt_pyramid_climb_delay);
+p_teleport($arrival);
+if (~dt_pyramid_inside(coord) = true) ~dt_pyramid_start;
+else cleartimer(dt_pyramid_hazards);
+
+[oploc1,dt_ancient_temple_door_open] @dt_pyramid_chamber;
+[oploc1,dt_ancient_temple_door_open_mirror] @dt_pyramid_chamber;
+
+[label,dt_pyramid_chamber]
+// Only this mapped doorway separates the walked final corridor from Azzanadra.
+// UNKNOWN engineering crossing tiles, adjacent to the original door pair.
+if (coordz(coord) > 9324) p_teleport(0_50_145_34_43);
+else p_teleport(0_50_145_34_45);
+// Completed players can arrive through the existing safe-chamber portal.
+// Crossing back into the corridor must resume hazards without a music hook.
+~dt_pyramid_start;
+
+
+[proc,dt_pyramid_inside](coord $tile)(boolean)
+if (inzone(3_45_77_0_0, 3_45_77_63_63, $tile) = true) return(true);
+if (inzone(2_44_77_0_0, 2_44_77_63_63, $tile) = true) return(true);
+if (inzone(1_43_77_0_0, 1_43_77_63_63, $tile) = true) return(true);
+if (inzone(0_50_145_0_0, 0_50_145_63_63, $tile) = true) return(true);
+return(false);
+
+[proc,dt_pyramid_start]
+if (~dt_pyramid_inside(coord) = true & gettimer(dt_pyramid_hazards) = -1) {
+    settimer(dt_pyramid_hazards, ^dt_pyramid_hazard_interval);
+}
+
+[timer,dt_pyramid_hazards]
+if (~dt_pyramid_inside(coord) = false) {
+    cleartimer(dt_pyramid_hazards);
+    return;
+}
+// The final chamber is safe for dialogue. The original transient timer bit is
+// deliberately unused; a saved clock never becomes quest progress on login.
+if (inzone(0_50_145_30_29, 0_50_145_38_43, coord) = true) return;
+def_int $roll = random(^dt_pyramid_hazard_rolls);
+if ($roll = ^dt_pyramid_trap_roll & coordy(coord) > 0) {
+    // Period guides support pitfalls returning outside, not a retry teleport.
+    loc_add(coord, deserttreasure_pitfall, 0, centrepiece_straight, ^dt_pyramid_climb_delay);
+    p_delay(^dt_pyramid_climb_delay);
+    p_teleport(^dt_pyramid_fall_exit);
+    cleartimer(dt_pyramid_hazards);
+} else if ($roll = ^dt_pyramid_scarab_roll) {
+    // One short-lived swarm per nearby player, never an unbounded spawn pile.
+    npc_findall(coord, scarab_swarm, 8, 0);
+    if (npc_findnext = true) return;
+    npc_add(coord, scarab_swarm, ^dt_pyramid_scarab_lifetime);
+    npc_setmode(opplayer2);
+    p_delay(^dt_pyramid_scarab_stun);
+}
