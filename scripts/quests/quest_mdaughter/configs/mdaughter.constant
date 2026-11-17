@@ -1,0 +1,12 @@
+// UNKNOWN: engineering stage integers; historical intermediate values are not retained.
+// Complete=70 and two quest points use the existing quest registry.
+^mdaughter_search = 1
+^mdaughter_tasks = 10
+^mdaughter_remains = 20
+^mdaughter_kendal_dead = 30
+^mdaughter_burial = 40
+^mdaughter_buried = 50
+// VERIFIED: Tip.It guide, 27 April 2006, Rewards and The burial.
+^mdaughter_attack_xp = 10000
+^mdaughter_prayer_xp = 20000
+^mdaughter_cairn_rocks = 5

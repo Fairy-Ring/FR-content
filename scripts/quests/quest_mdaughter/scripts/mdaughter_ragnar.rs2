@@ -1,11 +1,10 @@
-// Mountain Daughter — Ragnar (1808) first Talk-to after Hamal=1.
-// CANDIDATE last-resort 2007-base: OSRS Transcript post-accept minus
-// Overview / Agility overlay / necklace / Listen-to. Pre-start refuse
-// is RS3 gap-fill (OSRS dump silent). Hunt 289? no. Prefer 0 write.
-// Do not rewrite Hamal. No pool / Kendal / invent stage 2.
-// Cite: docs/research/mountain-daughter-ragnar-first-slice-377.md §4.
+// CANDIDATE wording: retained OSRS Transcript:Mountain Daughter.
+// VERIFIED necklace/burial chain: Tip.It guide, 27 April 2006.
 
 [opnpc1,mdaughter_ragnar]
+if (%mdaughter_quest_var >= ^mdaughter_burial & %mdaughter_quest_var < ^mdaughter_buried) {
+    @mdaughter_ragnar_necklace;
+}
 if (%mdaughter_quest_var >= 1) {
     @md_ragnar_started;
 }
@@ -45,4 +44,27 @@ if (%viking >= ^viking_complete) {
 ~chatplayer("<p,quiz>What do you mean, my kind?");
 ~chatnpc("<p,neutral>You outerlanders with your fancy armour and your runestones and all your convenient little tools.");
 ~chatplayer("<p,neutral>Oh, that kind...");
+return;
+
+[label,mdaughter_ragnar_necklace]
+if (~obj_gettotal(mdaughter_necklace) > 0) {
+    ~chatnpc("<p,neutral>Take it, outerlander, and bury it with her. It will be my parting gift.");
+    return;
+}
+// UNKNOWN: functional inventory-space message, absent from retained transcript.
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space.");
+    return;
+}
+~chatnpc("<p,sad>I heard the news from Hamal, outerlander. Alas, I have known this had to be so for a long time, but Hamal just didn't want to listen.");
+~chatplayer("<p,neutral>Uh huh.");
+~chatplayer("<p,neutral>Well, Hamal asked me to bury her with some of her possessions. But he doesn't have any anymore.");
+~chatplayer("<p,quiz>Do you have anything that may help?");
+~chatnpc("<p,neutral>I'm not altogether sure... I do have one thing that may be appropriate.");
+~chatnpc("<p,sad>I was going to give her a necklace, when we were supposed to meet here many years ago.");
+~chatnpc("<p,neutral>I still have it, and since it was a gift for Asleif, technically it's hers.");
+~chatnpc("<p,sad>Take it, outerlander, and bury it with her. It will be my parting gift.");
+inv_add(inv, mdaughter_necklace, 1);
+%mdaughter_ragnar_gavenecklace = 1;
+~chatplayer("<p,neutral>Thank you. I will make sure she's given a proper burial now.");
 return;
