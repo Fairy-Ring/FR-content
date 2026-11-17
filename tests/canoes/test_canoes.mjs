@@ -16,6 +16,8 @@ const ScriptRunner = await load('engine/script/ScriptRunner.ts');
 const ScriptState = await load('engine/script/ScriptState.ts');
 const map = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
 const ServerTriggerType = await load('engine/script/ServerTriggerType.ts');
+const Environment = await load('util/Environment.ts');
+Environment.NODE_MEMBERS = true;
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'NpcType', 'LocType', 'SeqType', 'SpotanimType', 'InvType', 'ObjType', 'FontType', 'Component', 'DbRowType', 'DbTableType', 'EnumType', 'ParamType', 'CategoryType', 'StructType', 'MesanimType']) {
   types[name] = await load(`cache/config/${name}.ts`);
@@ -34,7 +36,7 @@ const landings = [[3243, 3235], [3202, 3344], [3112, 3409], [3132, 3507], [3148,
 const hullButtons = [25, 26, 27, 28];
 const destinationButtons = [34, 35, 36, 41, 37];
 const levels = [12, 27, 42, 57];
-const xp = [300, 600, 900, 1500];
+const xp = [0, 300, 600, 1200];
 const bits = stationNames.map(name => types.VarBitType.getId(`canoestation_state_${name}`));
 const startBit = types.VarBitType.getId('canoe_startfrom');
 assert.ok(bits.every(id => id >= 0) && startBit >= 0, 'native 377 canoe state must exist');
@@ -84,6 +86,15 @@ function trip(p, destination) { run(p, `[if_button,canoe_map:com_${destinationBu
 let cases = 0;
 function check(name, fn) { fn(); cases++; console.log(`PASS ${name}`); }
 
+check('free worlds cannot start canoe construction', () => {
+  Environment.NODE_MEMBERS = false;
+  try {
+    const p = fixture();
+    station(p, 0);
+    assert.equal(p.getVarBit(bits[0]), 0);
+    assert.equal(p.getVarBit(startBit), 0);
+  } finally { Environment.NODE_MEMBERS = true; }
+});
 check('chop level and axe gates leave the tree and XP unchanged', () => {
   for (const [level, axe] of [[11, 'bronze_axe'], [12, null], [12, 'rune_axe']]) {
     const p = fixture(level, axe);
