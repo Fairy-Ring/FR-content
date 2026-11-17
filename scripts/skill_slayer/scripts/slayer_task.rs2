@@ -120,6 +120,8 @@ return (false);
 return (false);
 
 [proc,slayer_skippy_unlocked]()(boolean)
+// CANDIDATE: Skippy's cure unlocks mogres; 377 morph slot 3 is sober Skippy.
+if (%skippy_state = ^skippy_complete) return (true);
 return (false);
 
 [proc,slayer_taskname]()(string)
