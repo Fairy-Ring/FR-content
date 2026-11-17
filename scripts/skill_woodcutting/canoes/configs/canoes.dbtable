@@ -1,0 +1,5 @@
+[canoe_hulls]
+column=hull,int,INDEXED,REQUIRED
+column=level,int
+column=xp,int
+column=reach,int

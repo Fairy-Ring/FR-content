@@ -228,7 +228,7 @@
       ],
       "moveSpeed": 4,
       "npcId": -1,
-      "packetCount": 122,
+      "packetCount": 123,
       "packets": [
         {
           "$type": "UnsetMapFlag",
@@ -999,6 +999,13 @@
           "fields": {
             "colour": 31744,
             "component": 12852
+          }
+        },
+        {
+          "$type": "IfSetColour",
+          "fields": {
+            "colour": 31744,
+            "component": 12345
           }
         },
         {

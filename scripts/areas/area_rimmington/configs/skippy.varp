@@ -1,0 +1,5 @@
+// VERIFIED: original 377 varp 597; skippy_state bits 0-2 drive the NPC morph.
+// Permanent server state. Retains the existing client reader and transmit flag.
+[rimmington_extras_var]
+scope=perm
+transmit=yes

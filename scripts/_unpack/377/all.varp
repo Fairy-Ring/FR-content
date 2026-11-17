@@ -1203,8 +1203,6 @@ transmit=yes
 
 [varp596_unused]
 
-[rimmington_extras_var]
-transmit=yes
 
 [desert]
 transmit=yes
