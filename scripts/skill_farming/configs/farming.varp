@@ -1,0 +1,3 @@
+// Original unused 377 slot 500. Server checkpoint, not a client selector.
+[farming_growth_minute]
+scope=perm

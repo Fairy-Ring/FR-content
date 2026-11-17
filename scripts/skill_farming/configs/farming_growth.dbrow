@@ -1,0 +1,7 @@
+// CANDIDATE: pre-rework Farming revision 5658331 (26 January 2018).
+// Zero-offset global :00/:10/:20/:30/:40/:50 windows. The period Tip.It guide
+// supports shared ticks but describes five-minute allotment ticks instead.
+[farming_growth_potato]
+table=farming_growth
+data=period,10
+data=handler,1
