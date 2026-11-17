@@ -1,0 +1,142 @@
+// N092. Cache identities are VERIFIED. Reconstruction: research subject slayer.
+[opnpc1,_slayer_zygomite_fungus]
+// Reuse the published Slayer refusal. The requirement itself is period-verified.
+if (stat(slayer) < enum(int, int, slayer_req, ^slayer_mutatedzygomite)) {
+    mes("You need a higher Slayer level to know how to wound this monster.");
+    return;
+}
+anim(human_fungicide_pick_zygomite, 0);
+if (npc_type = slayer_mutated_zygomite_adolescent_cap) {
+    npc_changetype_keepall(slayer_mutated_zygomite_adolescent, ^zygomite_form_lifetime);
+} else {
+    npc_changetype_keepall(slayer_mutated_zygomite_adult, ^zygomite_form_lifetime);
+}
+npc_anim(zygomite_leap_out, 0);
+npc_delay(^zygomite_pick_delay);
+~npc_retaliate(0);
+
+[ai_queue1,_slayer_zygomite] ~npc_default_retaliate_ap;
+[ai_applayer2,_slayer_zygomite] ~zygomite_attack;
+[ai_opplayer2,_slayer_zygomite] ~zygomite_attack;
+
+// CANDIDATE: magic accuracy/defence, but Melee or Missiles protection by delivery style.
+// The existing killerwatt uses the same separation of accuracy and protection.
+[proc,zygomite_attack]
+if (%death = ^true) {
+    npc_setmode(null);
+    return;
+}
+if (%npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+def_int $style = ~zygomite_attack_style;
+def_int $attack_roll = 0;
+if (~check_protect_prayer($style) = false) $attack_roll = ~npc_magic_attack_roll_no_prot;
+def_int $damage = 0;
+if (~npc_attack_accuracy($attack_roll, ~player_defence_roll_specific(^magic_style)) = true) {
+    $damage = randominc(~zygomite_maxhit($style));
+}
+npc_anim(npc_param(attack_anim), 0);
+sound_synth(npc_param(attack_sound), 1, 0);
+if ($style = ^ranged_style) {
+    // CANDIDATE: named 377 spore effects. No unrelated projectile is substituted.
+    spotanim_npc(slayer_zygomite_spores_spotanim, ^zygomite_spore_height, 0);
+    spotanim_pl(player_human_zygomite_spores_spotanim, ^zygomite_spore_height, 0);
+    def_int $ticks = ~playerhit_n_ranged($damage, ^zygomite_spore_duration, npc_param(attackrate));
+} else {
+    anim(%com_defendanim, 0);
+    ~playerhit_n_melee($damage, npc_param(attackrate));
+}
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+npc_setmode(applayer2);
+
+[proc,zygomite_attack_style]()(int)
+if (npc_range(coord) > 1) return(^ranged_style);
+if (random(^zygomite_spore_roll) = 0) return(^ranged_style);
+return(^crush_style);
+
+[proc,zygomite_maxhit](int $style)(int)
+if ($style = ^ranged_style) {
+    if (npc_type = slayer_mutated_zygomite_adult) return(^zygomite_adult_ranged_maxhit);
+    return(^zygomite_young_ranged_maxhit);
+}
+if (npc_type = slayer_mutated_zygomite_adult) return(^zygomite_adult_melee_maxhit);
+return(^zygomite_young_melee_maxhit);
+
+// Same finish-off lifecycle as gargoyles and desert lizards: ordinary death heals one.
+[ai_queue3,_slayer_zygomite]
+npc_statheal(hitpoints, 1, 0);
+
+[opnpcu,_slayer_zygomite]
+def_int $charges = enum(obj, int, slayer_spray_charges, last_useitem);
+if ($charges <= 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_setslot(inv, last_useslot, enum(int, namedobj, slayer_spray_forms, sub($charges, 1)), 1);
+anim(human_fungicide_pump_attack, 0);
+if (npc_stat(hitpoints) > ^zygomite_finish_hitpoints) return;
+npc_queue(4, 0, 0);
+
+[ai_queue4,_slayer_zygomite]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, ashes, 1, ^lootdrop_duration);
+if (npc_type = slayer_mutated_zygomite_adult) {
+    ~zygomite_adult_drop;
+} else {
+    ~zygomite_young_drop;
+}
+
+// CANDIDATE: Old School wiki revision 14828339, before the 2025 drop additions.
+// Grimy herbs map to this era's unidentified forms. No later key or weakness is added.
+[proc,zygomite_young_drop]
+def_int $roll = random(137);
+if ($roll < 3) { obj_add(npc_coord, steel_axe, 1, ^lootdrop_duration); }
+else if ($roll < 6) { obj_add(npc_coord, steel_2h_sword, 1, ^lootdrop_duration); }
+else if ($roll < 7) { obj_add(npc_coord, mithril_full_helm, 1, ^lootdrop_duration); }
+else if ($roll < 37) { obj_add(npc_coord, naturerune, 2, ^lootdrop_duration); }
+else if ($roll < 42) { obj_add(npc_coord, earthrune, 15, ^lootdrop_duration); }
+else if ($roll < 44) { obj_add(npc_coord, unidentified_tarromin, 1, ^lootdrop_duration); }
+else if ($roll < 45) { obj_add(npc_coord, unidentified_harralander, 1, ^lootdrop_duration); }
+else if ($roll < 56) { obj_add(npc_coord, strawberry_seed, 4, ^lootdrop_duration); }
+else if ($roll < 57) { obj_add(npc_coord, potato_seed, 4, ^lootdrop_duration); }
+else if ($roll < 65) {
+    switch_int (random(3)) {
+        case 0 : obj_add(npc_coord, mushroom_seed, 1, ^lootdrop_duration);
+        case 1 : obj_add(npc_coord, mortmyremushroom, 1, ^lootdrop_duration);
+        case 2 : obj_add(npc_coord, slayer_fungicide, 1, ^lootdrop_duration);
+    }
+}
+else if ($roll < 68) { obj_add(npc_coord, coins, 24, ^lootdrop_duration); }
+else if ($roll < 107) { obj_add(npc_coord, coins, 64, ^lootdrop_duration); }
+else if ($roll < 117) { obj_add(npc_coord, coins, 120, ^lootdrop_duration); }
+else if ($roll < 119) { obj_add(npc_coord, coins, 250, ^lootdrop_duration); }
+else if ($roll < 125) { obj_add(npc_coord, cert_bucket_supercompost, 1, ^lootdrop_duration); }
+else if ($roll < 132) { obj_add(npc_coord, clay, 1, ^lootdrop_duration); }
+else { obj_add(npc_coord, ~randomjewel, ^lootdrop_duration); }
+
+[proc,zygomite_adult_drop]
+def_int $roll = random(140);
+if ($roll < 3) { obj_add(npc_coord, steel_axe, 1, ^lootdrop_duration); }
+else if ($roll < 9) { obj_add(npc_coord, steel_2h_sword, 1, ^lootdrop_duration); }
+else if ($roll < 10) { obj_add(npc_coord, rune_full_helm, 1, ^lootdrop_duration); }
+else if ($roll < 13) { obj_add(npc_coord, naturerune, 2, ^lootdrop_duration); }
+else if ($roll < 18) { obj_add(npc_coord, earthrune, 15, ^lootdrop_duration); }
+else if ($roll < 20) { obj_add(npc_coord, unidentified_tarromin, 1, ^lootdrop_duration); }
+else if ($roll < 21) { obj_add(npc_coord, unidentified_harralander, 1, ^lootdrop_duration); }
+else if ($roll < 32) { obj_add(npc_coord, strawberry_seed, 4, ^lootdrop_duration); }
+else if ($roll < 33) { obj_add(npc_coord, potato_seed, 4, ^lootdrop_duration); }
+else if ($roll < 37) { obj_add(npc_coord, mushroom_seed, 1, ^lootdrop_duration); }
+else if ($roll < 67) { obj_add(npc_coord, coins, 44, ^lootdrop_duration); }
+else if ($roll < 106) { obj_add(npc_coord, coins, 102, ^lootdrop_duration); }
+else if ($roll < 113) { obj_add(npc_coord, coins, 220, ^lootdrop_duration); }
+else if ($roll < 115) { obj_add(npc_coord, coins, 460, ^lootdrop_duration); }
+else if ($roll < 121) { obj_add(npc_coord, cert_bucket_supercompost, add(random(3), 1), ^lootdrop_duration); }
+else if ($roll < 125) { obj_add(npc_coord, mortmyremushroom, 1, ^lootdrop_duration); }
+else if ($roll < 132) { obj_add(npc_coord, clay, 1, ^lootdrop_duration); }
+else if ($roll < 136) { obj_add(npc_coord, slayer_fungicide, 1, ^lootdrop_duration); }
+else { obj_add(npc_coord, ~randomjewel, ^lootdrop_duration); }
