@@ -106,6 +106,7 @@ if (inzone(2_42_42_59_53, 2_43_42_1_54, coord) = true | inzone(1_43_42_6_46, 1_4
 ~update_all(inv_getobj(worn, ^wearpos_rhand));
 cam_reset;
 if (~swamp_cave_inside(coord) = true) ~swamp_cave_start;
+~giant_mole_environment_start;
 ~dt_pyramid_start;
 queue(follower_login, 0, 0);
 // CoF gardener: directions is packed perm; follower uid is temp. Restore courtyard multi.

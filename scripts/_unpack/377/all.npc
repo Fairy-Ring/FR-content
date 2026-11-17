@@ -75258,26 +75258,6 @@ wanderrange=0
 moverestrict=nomove
 defaultmode=none
 
-[mole_giant]
-name=Giant Mole
-desc=Holy Mole-y!
-model1=npc_3340
-model2=npc_3340i2
-model3=npc_3340i3
-model4=npc_3340i4
-size=3
-readyanim=mole_ready
-walkanim=mole_walk
-op2=Attack
-resizeh=118
-resizev=118
-alwaysontop=yes
-vislevel=230
-hitpoints=200
-attack=200
-strength=200
-defence=200
-
 [mole_baby_01]
 name=Baby Mole
 desc=I will call him, Mini Mole.

@@ -1,0 +1,13 @@
+// VERIFIED qualitative half-health trigger: Tip.It forum, 8 March 2006.
+// CANDIDATE Old School one-in-four burrow chance.
+^giant_mole_burrow_chance = 4
+// UNKNOWN engineering animation delays and dirt chance.
+^giant_mole_burrow_down_ticks = 2
+^giant_mole_burrow_up_ticks = 1
+^giant_mole_dirt_chance = 2
+// CANDIDATE approximately ten seconds before darkness damage in period guide.
+// UNKNOWN engineering tick boundary; one damage each following tick is VERIFIED.
+^giant_mole_dark_ticks = 17
+^giant_mole_entrance = 0_27_81_8_43
+// UNKNOWN landing tile beside the original Falador well (11793 at 2985,3314).
+^giant_mole_exit = 0_46_51_42_51

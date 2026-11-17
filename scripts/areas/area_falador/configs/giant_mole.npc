@@ -1,0 +1,42 @@
+// Original 377 block moved intact from all.npc; skill values are CANDIDATE.
+[mole_giant]
+name=Giant Mole
+desc=Holy Mole-y!
+model1=npc_3340
+model2=npc_3340i2
+model3=npc_3340i3
+model4=npc_3340i4
+size=3
+readyanim=mole_ready
+walkanim=mole_walk
+op2=Attack
+resizeh=118
+resizev=118
+alwaysontop=yes
+vislevel=230
+hitpoints=200
+attack=200
+strength=200
+defence=200
+// CANDIDATE Old School skills and bonuses, no later elemental weakness.
+magic=200
+ranged=1
+param=stabdefence,60
+param=slashdefence,80
+param=crushdefence,100
+param=magicdefence,80
+param=rangedefence,60
+param=damagetype,2
+param=attackrate,4
+// CANDIDATE own 377 named animation family, not recovered server bindings.
+param=attack_anim,mole_attack
+param=defend_anim,mole_defend
+param=death_anim,mole_death
+param=attack_sound,null
+param=defend_sound,null
+param=death_sound,null
+param=death_drop,big_bones
+// UNKNOWN engineering leash and respawn interval; no later ten-second respawn.
+maxrange=128
+wanderrange=5
+respawnrate=100
