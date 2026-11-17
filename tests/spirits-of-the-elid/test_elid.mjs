@@ -18,6 +18,8 @@ const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/
 const { EntityLifeCycle } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/EntityLifeCycle.ts')).href);
 const ServerTriggerType = await load('engine/script/ServerTriggerType.ts');
 const { NpcStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NpcStat.ts')).href);
+const map = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
+const { CollisionType } = await import(pathToFileURL(path.join(engine, 'src/engine/routefinder/index.ts')).href);
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'NpcType', 'LocType', 'SeqType', 'SpotanimType', 'InvType', 'ObjType', 'FontType', 'Component', 'DbRowType', 'DbTableType', 'EnumType', 'ParamType', 'CategoryType', 'StructType', 'MesanimType']) {
     types[name] = await load(`cache/config/${name}.ts`);
@@ -82,6 +84,40 @@ const count = (p, name) => p.invTotal(inv, item(name));
 const give = (p, name) => p.invAdd(inv, item(name), 1);
 const text = p => p.packets.filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text).join(' ');
 const use = (name, p, used, target) => { p.lastUseItem = item(used); return run(name, p, target); };
+// Walk every step on the packed collision map, including the wall's true approach
+// tile. Calling a handler directly from its telejump destination missed the exits.
+function walk(p, destination) {
+    const start = [p.x, p.z];
+    const key = ([x, z]) => `${x},${z}`;
+    const queue = [start], previous = new Map([[key(start), null]]);
+    for (let next = 0; next < queue.length && !previous.has(key(destination)); next++) {
+        const from = queue[next];
+        for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+            const to = [from[0] + dx, from[1] + dz];
+            if (Math.max(Math.abs(to[0] - start[0]), Math.abs(to[1] - start[1])) > 32 || previous.has(key(to))) continue;
+            if (!map.canTravel(p.level, ...from, dx, dz, 1, 0, CollisionType.NORMAL)) continue;
+            previous.set(key(to), from); queue.push(to);
+        }
+    }
+    assert(previous.has(key(destination)), `packed collision walk ${start} → ${destination}`);
+    const route = [];
+    for (let tile = destination; previous.get(key(tile)); tile = previous.get(key(tile))) route.push(tile);
+    for (const [x, z] of route.reverse()) {
+        assert(map.canTravel(p.level, p.x, p.z, x - p.x, z - p.z, 1, 0, CollisionType.NORMAL));
+        p.x = x; p.z = z;
+    }
+}
+function approachDoor(p, loc, expected) {
+    const type = types.LocType.get(loc.type);
+    const width = loc.angle & 1 ? type.length : type.width;
+    const length = loc.angle & 1 ? type.width : type.length;
+    const waypoints = map.findPathToLoc(p.level, p.x, p.z, loc.x, loc.z, 1, width, length, loc.angle, loc.shape, type.forceapproach);
+    const last = waypoints.at(-1);
+    const tile = last === undefined ? [p.x, p.z] : [(last >> 14) & 0x3fff, last & 0x3fff];
+    assert.deepEqual(tile, expected, `${type.debugname} actual engine approach tile`);
+    walk(p, tile);
+    assert(map.reachedLoc(p.level, p.x, p.z, loc.x, loc.z, width, length, 1, loc.angle, loc.shape, type.forceapproach));
+}
 const p = player();
 run('[opnpc1,elid_mayor]', p, npc('elid_mayor'), [2]);
 assert.equal(stage(p), 0, 'declining does not start');
@@ -167,11 +203,20 @@ for (const { colour, door, room, hall } of golems) {
     q.isActive = true;
     World.players[q.slot] = q; World.playerLoop.add(q.hash64, q);
     const type = types.NpcType.getByName(`elid_golem_${colour}`);
+    const loc = World.getLoc(...door, 0, id('loc', `elid_${colour}golem_door`));
+    assert(loc, `${colour} original door is placed`);
     const actor = new Npc(0, ...door, type.size, type.size, EntityLifeCycle.RESPAWN, World.getNextNid(), type.id, type.blockwalk);
     World.addNpc(actor, -1); World.processNpcEventQueue();
     const spawned = ScriptRunner.init(ScriptProvider.getByTrigger(ServerTriggerType.AI_SPAWN, type.id, type.category), actor);
     actor.executeScript(spawned);
     assert.equal(spawned.execution, ScriptState.FINISHED);
+    for (const [from, stop] of [[hall, hall], [room, door]]) {
+        [q.x, q.z] = from;
+        approachDoor(q, loc, stop);
+        run(`[oploc1,elid_${colour}golem_door]`, q, loc);
+        assert.deepEqual([q.x, q.z], stop, `${colour} refuses crossing before its golem dies`);
+        assert.equal(q.getVarBit(bit(`elid_${colour}golem`)), 0, 'opening never grants kill credit');
+    }
     actor.setVar(id('varn', 'npc_aggressive_player'), q.uid);
     actor.heroPoints.addHero(q.hash64, actor.levels[NpcStat.HITPOINTS]);
     actor.applyDamage(actor.levels[NpcStat.HITPOINTS], 1);
@@ -185,11 +230,11 @@ for (const { colour, door, room, hall } of golems) {
     q.processQueues();
     assert.equal(death.execution, ScriptState.FINISHED, `${colour} death finishes with no secondary NPC`);
     for (const other of golems) assert.equal(q.getVarBit(bit(`elid_${other.colour}golem`)), Number(other.colour === colour), 'only matching death bit is credited');
-    const loc = World.getLoc(...door, 0, id('loc', `elid_${colour}golem_door`));
-    assert(loc, `${colour} original door is placed`);
     [q.x, q.z] = hall;
+    approachDoor(q, loc, hall);
     run(`[oploc1,elid_${colour}golem_door]`, q, loc);
     assert.deepEqual([q.x, q.z], room, `${colour} hall to room`);
+    approachDoor(q, loc, door);
     run(`[oploc1,elid_${colour}golem_door]`, q, loc);
     assert.deepEqual([q.x, q.z], hall, `${colour} room to hall`);
     assert.equal(stage(q), 20, 'golem credit and crossing do not change quest stage');
@@ -205,17 +250,40 @@ for (const { colour, door, room, hall } of golems) {
 }
 const channels = player(20);
 run('[oploc1,elid_water_channel_blocked_rocks]', channels);
+assert.equal(channels.getVarBit(bit('elid_miningchannel')), 0, 'low level does not clear rubble');
+channels.baseLevels[PlayerStat.MINING] = channels.levels[PlayerStat.MINING] = 37;
+run('[oploc1,elid_water_channel_blocked_rocks]', channels);
 assert.equal(channels.getVarBit(bit('elid_miningchannel')), 0, 'rubble requires a usable pickaxe');
 give(channels, 'bronze_pickaxe');
+channels.baseLevels[PlayerStat.MINING] = channels.levels[PlayerStat.MINING] = 36;
+let messageCount = channels.messages.length;
+run('[oploc1,elid_water_channel_blocked_rocks]', channels);
+assert.equal(channels.getVarBit(bit('elid_miningchannel')), 0, 'Mining 36 is refused even with a usable pickaxe');
+assert.equal(channels.messages.length, messageCount, 'no invented low-Mining refusal line');
+channels.baseLevels[PlayerStat.MINING] = channels.levels[PlayerStat.MINING] = 37;
 run('[oploc1,elid_water_channel_blocked_rocks]', channels);
 assert.equal(channels.getVarBit(bit('elid_miningchannel')), 1);
+channels.baseLevels[PlayerStat.THIEVING] = channels.levels[PlayerStat.THIEVING] = 36;
+messageCount = channels.messages.length;
+run('[oploc1,elid_water_channel_spiketrap]', channels);
+assert.equal(channels.getVarBit(bit('elid_thievingchannel')), 0, 'Thieving 36 is refused');
+assert.equal(channels.messages.length, messageCount, 'no invented low-Thieving refusal line');
+channels.baseLevels[PlayerStat.THIEVING] = channels.levels[PlayerStat.THIEVING] = 37;
 run('[oploc1,elid_water_channel_spiketrap]', channels);
 assert.equal(channels.getVarBit(bit('elid_thievingchannel')), 1);
+channels.baseLevels[PlayerStat.RANGED] = channels.levels[PlayerStat.RANGED] = 37;
 run('[opnpc2,elid_ranging_target]', channels, npc('elid_ranging_target'));
 assert.equal(channels.getVarBit(bit('elid_rangingchannel')), 0, 'target needs equipment');
 const worn = types.InvType.getId('worn');
 channels.getInventory(worn).set(3, { id: item('shortbow'), count: 1 });
 channels.getInventory(worn).set(13, { id: item('bronze_arrow'), count: 2 });
+channels.baseLevels[PlayerStat.RANGED] = channels.levels[PlayerStat.RANGED] = 36;
+messageCount = channels.messages.length;
+run('[opnpc2,elid_ranging_target]', channels, npc('elid_ranging_target'));
+assert.equal(channels.getVarBit(bit('elid_rangingchannel')), 0, 'Ranged 36 is refused with bow and ammunition');
+assert.equal(channels.invTotal(worn, item('bronze_arrow')), 2, 'low level consumes no ammunition');
+assert.equal(channels.messages.length, messageCount, 'no invented low-Ranged refusal line');
+channels.baseLevels[PlayerStat.RANGED] = channels.levels[PlayerStat.RANGED] = 37;
 run('[opnpc2,elid_ranging_target]', channels, npc('elid_ranging_target'));
 assert.equal(channels.getVarBit(bit('elid_rangingchannel')), 1);
 assert.equal(channels.invTotal(worn, item('bronze_arrow')), 1, 'target consumes one arrow');
@@ -232,5 +300,23 @@ run('[oploc1,elid_underground_lake_door]', channels, lake);
 assert.deepEqual([channels.x, channels.z], [3354, 9559], 'all channels permit lake entry');
 run('[oploc1,elid_underground_lake_door]', channels, lake);
 assert.deepEqual([channels.x, channels.z], [3354, 9557], 'lake return remains usable');
-console.log('PASS compiled stage ladder 0→10→20→25→30→40→50→60; once-only XP/QP/scroll, gates, login colours and shrine');
+const cave = player(30);
+const genieDoor = World.getLoc(3371, 9312, 0, id('loc', 'elid_genie_door'));
+assert(genieDoor, 'original genie cave door is placed');
+const genieDoorType = types.LocType.get(genieDoor.type);
+const genieOpen = ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, genieDoorType.id, genieDoorType.category);
+assert.equal(genieOpen?.name, '[oploc1,elid_genie_door]', 'cache door resolves to the real packed handler');
+[cave.x, cave.z] = [3373, 9304]; // Original crevice landing, not the genie room.
+approachDoor(cave, genieDoor, [3371, 9312]);
+run(genieOpen.name, cave, genieDoor);
+assert.deepEqual([cave.x, cave.z], [3371, 9313], 'genie door enters the separate room');
+walk(cave, [3371, 9319]);
+assert(map.reachedEntity(0, cave.x, cave.z, 3371, 9320, 1, 1, 1), 'packed walk reaches the original genie');
+approachDoor(cave, genieDoor, [3371, 9313]);
+run(genieOpen.name, cave, genieDoor);
+assert.deepEqual([cave.x, cave.z], [3371, 9312], 'genie door returns to crevice side');
+walk(cave, [3373, 9304]);
+assert.deepEqual([cave.x, cave.z], [3373, 9304], 'packed walk returns to the original crevice landing');
+assert.equal(stage(cave), 30, 'door and walking do not skip the genie deal or trade');
+console.log('PASS compiled stage ladder and rewards; true-approach golem crossings/refusals; packed genie round trip; channel levels 36 refused / 37 accepted');
 process.exit(0);

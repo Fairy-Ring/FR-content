@@ -1,0 +1,10 @@
+// CANDIDATE map-derived crossing of the 377 genie cave door at 3371,9312.
+// The period walkthrough requires passing the door to reach the genie, but does
+// not establish its original animation/timing. No item or quest gate is added.
+// Research: spirits-of-the-elid.genie-door-crossing-candidate.
+[oploc1,elid_genie_door]
+if (coordz(coord) <= coordz(loc_coord)) {
+    p_telejump(0_52_145_43_33); // CANDIDATE room side 3371,9313
+    return;
+}
+p_telejump(0_52_145_43_32); // CANDIDATE crevice side 3371,9312

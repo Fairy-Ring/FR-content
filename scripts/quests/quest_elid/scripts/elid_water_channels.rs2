@@ -1,7 +1,7 @@
 // Spirits of the Elid — water channels (thieving / mining / ranged).
-// The period guide (VERIFIED) says to use a pickaxe on rubble and range the
-// target. It gives overall quest requirements, not separate channel levels;
-// no per-channel numeric skill gates are invented here.
+// VERIFIED quest requirements: Thieving, Mining and Ranged 37, Tip.It
+// 20060502085633. UNKNOWN engineering choice: enforce effective levels at the
+// matching channels; the source does not establish boostability or check location.
 // Cache channel bits 14-16 are separate from elidquest bits 0-6. Mining uses
 // the shared usable-pickaxe checker; ranging requires a bow and worn ammunition.
 // Success text from the OSRS transcript is CANDIDATE. No quest stage writes.
@@ -12,12 +12,20 @@
 if (%elid_thievingchannel > 0) {
     return;
 }
+// VERIFIED requirement; UNKNOWN gate placement/effective-level policy. No sourced refusal line.
+if (stat(thieving) < 37) {
+    return;
+}
 mes("You use your your Thieving skills to remove the block without triggering the spikes."); // CANDIDATE
 mes("The water flows into the hole."); // CANDIDATE
 %elid_thievingchannel = 1;
 
 [oploc1,elid_water_channel_blocked_rocks]
 if (%elid_miningchannel > 0) {
+    return;
+}
+// VERIFIED requirement; UNKNOWN gate placement/effective-level policy. No sourced refusal line.
+if (stat(mining) < 37) {
     return;
 }
 def_obj $pickaxe = ~pickaxe_checker;
@@ -37,6 +45,10 @@ mes("The water flows into the hole."); // CANDIDATE
 
 [label,elid_ranging_shoot]
 if (%elid_rangingchannel > 0) {
+    return;
+}
+// VERIFIED requirement; UNKNOWN gate placement/effective-level policy. No sourced refusal line.
+if (stat(ranged) < 37) {
     return;
 }
 def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
