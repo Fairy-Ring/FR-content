@@ -1,0 +1,8 @@
+// VERIFIED: native secret_ghost varbits in the 377 cache share dagganoth_area_project.
+^empty_lord_route_start = 1
+^empty_lord_route_end = 4
+^empty_lord_first_story_bit = 5
+^empty_lord_last_story_bit = 10
+// VERIFIED: Tip.It capture 28 April 2006 describes three fixed routes and six ghosts.
+^empty_lord_route_count = 3
+^empty_lord_ghost_count = 6
