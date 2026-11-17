@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseOptions, resolveRoots, run } from './packed.mjs';
@@ -30,7 +31,7 @@ await run(async () => {
   const caseIndex = args.indexOf('--ownership-case');
   const ownershipCase = caseIndex === -1 ? null : args.splice(caseIndex, 2)[1];
   assert(ownershipCase === null || ['edge-return-attack', 'deferred-logout'].includes(ownershipCase), '--ownership-case names a native regression');
-  const { engineRoot, packDir } = resolveRoots(parseOptions(args));
+  const { contentRoot, engineRoot, packDir } = resolveRoots(parseOptions(args));
   const rt = await runtime(engineRoot, packDir);
   const load = file => import(pathToFileURL(path.join(engineRoot, file)).href);
   const [{ default: Trigger }, { NpcMode }, { Interaction }, { CoordGrid }, routefinder, { default: Runner }] = await Promise.all([
@@ -700,6 +701,32 @@ await run(async () => {
     }
     if (ownershipCase) return;
     for (const name of draws.keys()) check(`${name} per-event whole-life hunt/timer invariants`, () => ownedEvents(name, draws));
+    for (const name of draws.keys()) check(`${name} owned timer passivates before following an owner fought by another NPC`, () => {
+      const owner = tunnelPlayer(2, 'single_way_owner', LANDING);
+      beginRun(owner, 41);
+      Math.random = () => 0.999;
+      try {
+        const npc = doorActor(owner, name, draws);
+        const rival = doorActor(owner, 'barrows_rat', draws);
+        place(owner, { x:rival.x + 1, z:rival.z + 1 });
+        assert(CoordGrid.distanceToSW(npc, owner) > 1, 'the first door actor has not reached melee contact');
+        assert(CoordGrid.distanceToSW(npc, owner) <= NpcType.get(npc.type).maxrange, 'the owner remains within its native chase range');
+        const attack = rt.observe(dispatch(rival), { npc:rival, player:owner });
+        assert.equal(attack.snapshot.execution, State.FINISHED);
+        assert.deepEqual(attack.errors, []);
+        assert.equal(owner.getVar(pv('aggressive_npc')), rival.uid, 'the second door actor really starts the single-way fight');
+        assert.equal(owner.getVar(pv('lastcombat')), World.currentTick);
+        const before = { x:npc.x, z:npc.z };
+        worldTick(npc, [owner]);
+        assert.deepEqual({ x:npc.x, z:npc.z }, before, 'owned timer cancels pursuit before movement when another NPC fights the owner');
+        assert.equal(npc.target, null, 'owned timer immediately clears the contested owner');
+        assert.equal(npc.targetOp, NpcMode.WANDER);
+      } finally {
+        Math.random = mathRandom;
+        removePlayer(owner);
+        for (const npc of [...World.npcs]) if (npc.isActive && npc.getVar(nv('npc_barrows_owner')) !== -1) World.removeNpc(npc, -1);
+      }
+    });
     for (const name of Object.keys(TYPES)) {
       for (const leave of draws.has(name) ? LEAVES : []) {
         check(`${name} owned door actor: the owner ${leave}; the second player is never targeted until removal`, () => {
@@ -759,6 +786,20 @@ await run(async () => {
       }
       console.log(`PASS BC-02 pre-BC-02 comparison for the two named owned-lifetime inputs only; static acquisition changed ${JSON.stringify({ base: report.base.cost, head: report.head.cost, ownedTicksWithDifferentPosition: moved })}`);
     }
+    check('S04 packed crypt-rat poison witness', () => {
+      const f = fixture('barrows_rat');
+      const before = f.npc.levels[3];
+      const result = rt.observe('[proc,npc_poison_start]', f, [20]);
+      assert.equal(result.snapshot.execution, State.FINISHED);
+      assert.deepEqual(result.errors, []);
+      for (let tick = 1; tick <= 30; tick++) {
+        World.currentTick++;
+        f.npc.processTimers();
+      }
+      assert.deepEqual([before, f.npc.levels[3]], [35, 31], 'S04 packed crypt-rat remains exactly [35,31]');
+    });
+    const poison = fs.readFileSync(path.join(contentRoot, 'tests/barrows/test_poison.mjs'), 'utf8');
+    assert(poison.includes('[35, 31]'), 'S04 crypt-rat fixture remains exactly [35,31]');
     console.log(`PASS BC-02 ${count} native tunnel cases; unchanged static/removal/credit/D4/poison suites remain registered`);
   } finally {
     if (zone) zone.leave(World.players[1]);
