@@ -96,6 +96,17 @@ function withPublished(fn) {
       assert(name, `${original.info.scriptName}:${pc} has a recorded parameter identity`);
       current.intOperands[pc - 1] = id('ParamType', name);
     }
+    // These recorded DB reads all belong to magic_spell_table. Resolve its
+    // identity, not the old generated table id; rows are supplied by the live
+    // get_spell_data lookup and therefore already have current identities.
+    for (let pc = 0; pc < original.opcodes.length; pc++) {
+      const opcode = ScriptOpcodeNameMap.get(original.opcodes[pc]);
+      if (!['DB_GETFIELD', 'DB_GETFIELDCOUNT'].includes(opcode)) continue;
+      assert.equal(original.info.scriptName, '[proc,pvm_spell_success]', 'record the table name for any additional published DB user');
+      const operand = pc - (opcode === 'DB_GETFIELD' ? 2 : 1);
+      assert.equal(ScriptOpcodeNameMap.get(original.opcodes[operand]), 'PUSH_CONSTANT_INT');
+      current.intOperands[operand] = (id('DbTableType', 'magic_spell_table') << 12) | (original.intOperands[operand] & 0xfff);
+    }
   }
   try { return fn(); } finally { for (const [current, fields] of saved) Object.assign(current, fields); }
 }

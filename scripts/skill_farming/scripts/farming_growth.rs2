@@ -30,6 +30,7 @@ while ($row ! null) {
 }
 
 [proc,farming_growth_dispatch](int $handler, int $steps)
+if ($steps = 0) return;
 switch_int ($handler) {
     case ^farming_handler_potato : ~farming_potato_advance_all($steps);
 }

@@ -32,6 +32,7 @@
         "option_music": 2,
         "option_sounds": 2,
         "bankpin_delay_days": 7,
+        "farming_growth_minute": 30000000,
         "prayer_drain_resistance": 60
       },
       "inventory": [

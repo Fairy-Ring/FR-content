@@ -58,6 +58,17 @@ try {
     assert.equal(types.VarPlayerType.get(clock).transmit, false);
     for (const bit of bits) assert.equal(types.VarPlayerType.get(types.VarBitType.get(bit).basevar).scope, types.VarPlayerType.SCOPE_PERM);
   });
+  test('zero elapsed cycles never rewrite or retransmit patch words', () => {
+    const p = fresh(605); setStage(p, 6);
+    const writes = [], nativeSetVar = p.setVar;
+    p.setVar = function (id, value) {
+      writes.push(id);
+      return nativeSetVar.call(this, id, value);
+    };
+    minute = 606; proc(p, 'farming_reconcile', 0);
+    assert.deepEqual(writes, [clock], 'observer delegates every production write');
+    assert.equal(stage(p), 6);
+  });
   for (const period of [5, 10, 20, 40, 80, 160, 320]) {
     test(`${period}-minute family: online first tick in five-minute UTC window only`, () => {
       const boundary = period * 1000;

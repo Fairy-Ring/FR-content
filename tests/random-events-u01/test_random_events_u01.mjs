@@ -86,6 +86,9 @@ function effects(root) {
   if (root.includes('if_button')) for (const [item, quantity] of [['lawrune', 1], ['airrune', 3], ['earthrune', 1]]) give(p, item, quantity);
   const random = Math.random;
   Math.random = () => 0.5;
+  // A fixed clock makes the new permanent Farming checkpoint reproducible.
+  const dateMinutes = ScriptRunner.HANDLERS[op.DATE_MINUTES];
+  ScriptRunner.HANDLERS[op.DATE_MINUTES] = state => state.pushInt(30000000);
   try {
     const beforeActors = actorInventory();
     run(p, root, root.includes('p_telejump_safe') ? [D] : []);
@@ -94,7 +97,10 @@ function effects(root) {
     assert.equal(p.getVar(v('macro_event')), 0);
     delete after.actors;
     return after;
-  } finally { Math.random = random; }
+  } finally {
+    Math.random = random;
+    ScriptRunner.HANDLERS[op.DATE_MINUTES] = dateMinutes;
+  }
 }
 if (process.env.U01_CAPTURE_BASELINE) {
   if (process.env.U01_PUBLISHED_PACK) reload(process.env.U01_PUBLISHED_PACK);
