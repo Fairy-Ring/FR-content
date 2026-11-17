@@ -111,12 +111,15 @@
     "playerhit_n_melee": [
       "[ai_opplayer2,slayer_dustdevil]",
       "[proc,killerwatt_attack]",
-      "[proc,zygomite_attack]"
+      "[proc,zygomite_attack]",
+      "[proc,wyvern_melee]"
     ],
     "playerhit_n_ranged": [
       "[ai_applayer2,_snail]",
       "[ai_applayer2,_troll_thrower]",
-      "[proc,zygomite_attack]"
+      "[proc,zygomite_attack]",
+      "[proc,wyvern_breath]",
+      "[proc,wyvern_ranged]"
     ],
     "npc_player_hit_roll": [
       "[proc,aberrant_attack]",
