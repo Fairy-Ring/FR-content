@@ -842,7 +842,7 @@ await run(async () => {
           place(owner, { x:origin.x + x, z:origin.z + z });
           npc.setInteraction(Interaction.SCRIPT, owner, NpcMode.OPPLAYER2);
           const nativeInRange = npc.targetWithinMaxRange();
-          npc.resetInteraction();
+          npc.clearInteraction();
           npc.targetOp = NpcMode.WANDER;
           npc.setVar(nv('npc_barrows_public'), 0);
           assert.equal(playerNpc(other, npc, '[proc,barrows_actor_attackable]').popInt(), Number(!nativeInRange),
