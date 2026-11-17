@@ -186,6 +186,24 @@ if (%deserttreasure = ^dt_stage_hunts) {
     return;
 }
 
+// UNKNOWN historical journal prose: plain functional summaries, not quotations.
+if (%deserttreasure = ^dt_stage_inside_pyramid) {
+    $x = append($x, "@dbl@I should find Azzanadra at the bottom of the pyramid.");
+    ~quest_journal($n, $x);
+    return;
+}
+if (%deserttreasure = ^dt_stage_reward_pending) {
+    $x = append($x, "@dbl@I should finish speaking to Azzanadra.");
+    ~quest_journal($n, $x);
+    return;
+}
+if (%deserttreasure = ^dt_stage_complete) {
+    $x = append($x, "@str@I have freed Azzanadra and learned Ancient Magicks.|");
+    $x = append($x, "@dbl@I can change spellbooks by praying at the pyramid altar.");
+    ~quest_journal($n, $x);
+    return;
+}
+
 [proc,dt_column_journal]()(string)
 // Project-authored per-bit summaries: desert-treasure.presentation-unknown-1109.
 def_string $columns;
