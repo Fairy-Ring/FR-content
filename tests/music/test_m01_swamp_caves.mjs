@@ -116,8 +116,14 @@ test('real Tears descent and return preserve 397 then 389 and darkness zones',()
   assert.deepEqual(tile(p),[0,3225,9542]); expectMusic(p,mark,389,[5,1]);
 }));
 // These are generic static lookup controls on supported remnants, NOT ordinary entrances.
-for(const [mx,mz,midi,payload] of [[49,149,389,[5,1]],[50,149,389,[5,1]],[51,150,407,[23,1]]]) for(const level of [0,1,2]) {
-  test(`static generic supported-remnant control m${mx}_${mz} plane ${level}`,()=>withPlayer([level,mx*64,mz*64],p=>{
+// Supported/collision-open witnesses from the independent map census, not entry seeds.
+for(const [mx,mz,midi,payload,positions] of [
+  [49,149,389,[5,1],[[0,3136,9536],[1,3141,9570],[2,3139,9574]]],
+  [50,149,389,[5,1],[[0,3200,9536],[1,3200,9574],[2,3200,9548]]],
+  [51,150,407,[23,1],[[0,3264,9610],[1,3265,9621],[2,3264,9603]]]
+]) for(const position of positions) {
+  const level=position[0];
+  test(`static generic supported-remnant control m${mx}_${mz} plane ${level}`,()=>withPlayer(position,p=>{
     const mark=musicMark(p); execute('[proc,music_playbycoord]',p,[CoordGrid.packCoord(level,p.x,p.z)]);
     expectMusic(p,mark,midi,payload);
   },{login:false}));
