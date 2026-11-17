@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 /** SC-10: original map, native item/NPC and loc packets, runner and world phases. */
 import assert from 'node:assert/strict';
-import { World, PlayerLoading, Packet, ScriptProvider, ScriptState, ServerTriggerType,
+import { World, PlayerLoading, Packet, ScriptProvider, ServerTriggerType,
   PlayerStat, PlayerTimerType, types, map, CollisionType, engineModule, id, obj, inv,
   invCom, worn, player, seed, inventory, slotOf, held, use, button, execute, tile,
   environmentTick, startDialogue, resumeDialogue, dialoguePage } from './runtime.mjs';
-const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const ScriptVarType = (await engineModule('cache/config/ScriptVarType.ts')).default;
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
