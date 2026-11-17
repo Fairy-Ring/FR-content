@@ -81,7 +81,10 @@ assert.equal(caves.transmit, true, 'retain the original cave client readers');
 
 // Inspect packed POP instructions, not a source-assignment regex: tuple
 // assignments, secondary player pointers and varbit writes all count.
-const names = new Set([...fs.readFileSync(path.join(CONTENT_ROOT, 'scripts/_unpack/377/all.varp'), 'utf8').matchAll(/^\[([^\]\r\n]+)\]/gm)].map(match => match[1]));
+const names = new Set([
+  ...[...fs.readFileSync(path.join(CONTENT_ROOT, 'scripts/_unpack/377/all.varp'), 'utf8').matchAll(/^\[([^\]\r\n]+)\]/gm)].map(match => match[1]),
+  ...Object.keys(policy.deliberatelyTemporary)
+]);
 const written = new Set();
 for (const line of fs.readFileSync(path.join(CONTENT_ROOT, 'pack/script.pack'), 'utf8').split('\n')) {
   const match = /^(\d+)=/.exec(line);
@@ -93,7 +96,7 @@ for (const line of fs.readFileSync(path.join(CONTENT_ROOT, 'pack/script.pack'), 
     if (opcode !== ScriptOpcode.POP_VARP && opcode !== ScriptOpcode.POP_VARBIT) continue;
     const varp = baseVarp(opcode, script.intOperands[pc]);
     assert(varp?.debugname, `${script.name}: missing written varp at ${pc}`);
-    if (!names.has(varp.debugname)) continue; // This policy owns the unpacked 377 table.
+    if (!names.has(varp.debugname)) continue; // Unpacked declarations and classified moved values.
     written.add(varp.debugname);
     if (varp.scope !== VarPlayerType.SCOPE_PERM && !Object.hasOwn(policy.deliberatelyTemporary, varp.debugname)) {
       failures.push(`unclassified temporary written varp: ${varp.debugname} (${varp.id}), ${script.info.sourceFilePath}:${script.lineNumber(pc)}`);
