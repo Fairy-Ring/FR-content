@@ -1,3 +1,5 @@
+// VERIFIED: altar-specific exits without talismans, Tip.It capture 2006-04-27.
+// UNKNOWN exact historical landing tiles: retain reconstructed air-nature defaults on the 377 maps.
 [oploc1,abyss_exit_to_air]
 p_telejump(0_44_75_30_36);
 
@@ -17,6 +19,12 @@ p_telejump(0_40_75_27_36);
 p_telejump(0_39_75_24_46);
 
 [oploc1,abyss_exit_to_cosmic]
+// CANDIDATE: retained Abyss revision 10429 (2006-07-26), before later access changes.
+if (%zanaris < ^zanaris_complete) {
+    // CANDIDATE wording: OSRS Transcript:Cosmic_rift, no period transcript recovered.
+    mes("You need to have completed the Lost City Quest to use this rift.");
+    return;
+}
 p_telejump(0_33_75_30_36);
 
 [oploc1,abyss_exit_to_chaos]
@@ -26,14 +34,34 @@ p_telejump(0_35_75_29_40);
 p_telejump(0_37_75_32_44);
 
 [oploc1,abyss_exit_to_law]
-// TODO: Entrana gear check
-p_telejump(0_37_75_32_44);
+// CANDIDATE: Law_rift access requirement; subtract the November 2026 equipment relaxation.
+if (%troll_quest < ^troll_complete) {
+    mes("You need to have completed Troll Stronghold to use this rift.");
+    return;
+}
+// CANDIDATE: 2006-07-26 Abyss guide explicitly retains Entrana's equipment rule.
+if (~has_entrana_restricted_items = true) {
+    // CANDIDATE wording: OSRS Transcript:Law_rift.
+    mes("The power of Saradomin prevents you taking armour or weaponry to Entrana.");
+    return;
+}
+// UNKNOWN exact historical landing: use the existing law altar entrance on the 377 map.
+p_telejump(0_38_75_32_19);
 
 [oploc1,abyss_exit_to_death]
-p_telejump(0_50_50_0_0);
+// CANDIDATE: Death_rift requires MEP2; reuse the registry's candidate completion predicate.
+if (%mourning_quest_main < ^mourning2_complete) {
+    // CANDIDATE wording: OSRS Transcript:Death_rift.
+    mes("A strange power blocks your exit.");
+    return;
+}
+// UNKNOWN exact historical landing: use the existing death altar entrance on the 377 map.
+p_telejump(0_34_75_32_29);
 
 [oploc1,abyss_exit_to_blood]
+// CANDIDATE: blood altar released 22 April 2008; historical rift transcript supplies refusal.
 mes("A strange power blocks your exit.");
 
 [oploc1,abyss_exit_to_soul]
+// CANDIDATE: historical Soul_rift transcript; no transport before the later altar.
 mes("A strange power blocks your exit.");
