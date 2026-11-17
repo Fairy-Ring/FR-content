@@ -249,6 +249,7 @@ jobs:
           run_test tests/monster-s02/test_monster_s02.mjs node --import tsx ../content/tests/monster-s02/test_monster_s02.mjs
           run_test tests/monster-a7/test_monster_a7.mjs node --import tsx ../content/tests/monster-a7/test_monster_a7.mjs
           run_test tests/zygomite/test_zygomite.mjs node --import tsx ../content/tests/zygomite/test_zygomite.mjs
+          run_test tests/wyvern/test_wyvern.mjs node --import tsx ../content/tests/wyvern/test_wyvern.mjs
           exit "$failed"
 
       - name: Write job summary
