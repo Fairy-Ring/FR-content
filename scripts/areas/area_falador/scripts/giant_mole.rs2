@@ -59,6 +59,7 @@ if (busy() = false & p_finduid(uid) = true) {
         if ($dark_ticks >= ^giant_mole_dark_ticks) {
             damage(uid, 1, 1);
             if (stat(hitpoints) = 0) {
+                ~giant_mole_environment_release;
                 ~player_die;
                 return;
             }
@@ -75,7 +76,7 @@ else npc_damage(^hitmark_damage, $damage);
 if (npc_stat(hitpoints) = 0) {
     npc_queue(3, 0, 0);
 } else if (npc_stat(hitpoints) <= divide(npc_basestat(hitpoints), 2)) {
-    // UNKNOWN engineering chance. No <=10 HP immunity: added in 2016.
+    // CANDIDATE one-in-four roll. No <=10 HP immunity: added in 2016.
     if (random(^giant_mole_burrow_chance) = 0) npc_queue(5, 0, 0);
 }
 

@@ -35,7 +35,6 @@ param=death_anim,mole_death
 param=attack_sound,null
 param=defend_sound,null
 param=death_sound,null
-param=death_drop,big_bones
 // UNKNOWN engineering leash and respawn interval; no later ten-second respawn.
 maxrange=128
 wanderrange=5
