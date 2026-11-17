@@ -270,8 +270,8 @@ for (const form of FORMS) {
 for (const [distance, expected] of [[1, [0, 1, 2]], [5, [1, 2]]]) {
   const { player, npc } = fixture(FORMS[0].name, { distance });
   const seen = new Set();
+  JavaRandom.setSeed(0);
   for (let seed = 0; seed < 256 && seen.size < expected.length; seed++) {
-    JavaRandom.setSeed(seed);
     const state = run('[proc,wyvern_attack_style]', npc, player);
     expectFinished(state, `style selector at reach ${distance}, seed ${seed}`);
     seen.add(state.intStack[0]);
@@ -284,9 +284,9 @@ function maxPhysicalDamage(proc, defenceVar) {
   const { player, npc } = fixture(FORMS[0].name);
   pv(player, defenceVar, 0);
   let maximum = 0;
+  JavaRandom.setSeed(0);
   for (let seed = 0; seed < 512 && maximum < 13; seed++) {
     const prior = queuedDamage(player).length;
-    JavaRandom.setSeed(seed);
     expectFinished(run(`[proc,${proc}]`, npc, player), `${proc} seed ${seed}`);
     const queued = queuedDamage(player).slice(prior);
     for (const args of queued) maximum = Math.max(maximum, args[0]);
@@ -389,7 +389,7 @@ for (const form of FORMS) {
   const death = requiredTrigger(ServerTriggerType.AI_QUEUE3, type.id, type.category, `${form.name} ai_queue3`);
   check(`${form.name} death dispatches through wyvern category`, death.name, '[ai_queue3,_slayer_wyvern]');
   const slayerXpBefore = player.stats[PlayerStat.SLAYER];
-  npc.applyDamage(npc.levels[NpcStat.HITPOINTS], 1);
+  expectFinished(run('[proc,npc_default_damage]', npc, player, [npc.levels[NpcStat.HITPOINTS]]), `${form.name} real lethal damage`);
   check(`${form.name} lethal damage queues real queue3`, [...npc.queue.all()].some(request => request.queueId === ServerTriggerType.AI_QUEUE3), true);
   JavaRandom.setSeed(0);
   const drops = withCapturedDrops(() => drainNpc(npc, [player]));
