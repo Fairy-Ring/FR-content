@@ -2130,15 +2130,15 @@ data=musicdata,music_Vision
 [musicregion_49_149]
 table=musicregion
 data=mapsquare,0_49_149_0_0
-data=name,Faerie
-data=musicdata,music_Faerie
+data=name,Cave of the Goblins
+data=musicdata,music_Cave_of_the_Goblins
 
 
 [musicregion_50_149]
 table=musicregion
 data=mapsquare,0_50_149_0_0
-data=name,Crystal Cave
-data=musicdata,music_Crystal_Cave
+data=name,Cave of the Goblins
+data=musicdata,music_Cave_of_the_Goblins
 
 
 [musicregion_37_150]
