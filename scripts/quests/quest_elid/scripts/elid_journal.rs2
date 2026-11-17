@@ -1,0 +1,21 @@
+// UNKNOWN functional journal wording, summarising Tip.It capture 20060502085633.
+[if_button,questlist:elid]
+def_string $text;
+if (%elidquest = 0) {
+    $text = "@dbl@Speak to @dre@Awusah the Mayor@dbl@ in @dre@Nardah@dbl@.|Requirements: 33 Magic, 37 Ranged, 37 Mining, 37 Thieving.";
+} else if (%elidquest < ^elid_ballad_received) {
+    $text = "@dbl@I should ask @dre@Ghaslor the Elder@dbl@ about Nardah's curse.";
+} else if (%elidquest < ^elid_spirits_explained) {
+    $text = "@dbl@I should read the Ballad of Jareesh and find the river spirits.|The shrine's ancestral key and repaired robes will help.|I need a rope, weapons, a pickaxe, a bow and arrows.|I must defeat the three golems and clear the water channels.";
+} else if (%elidquest < ^elid_crevice_known) {
+    $text = "@dbl@The spirits want the statuette of Elidinis returned.|I should ask @dre@Awusah@dbl@ where it was thrown away.";
+} else if (%elidquest < ^elid_sole_requested) {
+    $text = "@dbl@The statuette was thrown down a crevice west of Nardah.|I should take a rope and investigate.";
+} else if (%elidquest < ^elid_statuette_recovered) {
+    $text = "@dbl@The genie wants the mayor's sole.|I should try using a knife on the mayor's shoes.";
+} else if (%elidquest < ^elid_complete) {
+    $text = "@dbl@I should return the statuette to its plinth in Nardah's shrine.|If I lose it, I can trade another sole with the genie.";
+} else {
+    $text = "@str@I returned the statuette and restored Nardah's water.||@red@QUEST COMPLETE!";
+}
+~quest_journal("Spirits of the Elid", $text);

@@ -1,23 +1,41 @@
 // Spirits of the Elid — water channels (thieving / mining / ranged).
-// Official day 5 Dec 2005. CANDIDATE 2007-base (research
-// elid-water-channels-leftover-377.md — 0 dump lines; wiki walk only).
-// Clear elid_water_channel_spiketrap 10407 (op1=Clear) ->
-// %elid_thievingchannel 15 = 1. Clear elid_water_channel_blocked_rocks
-// 10405 (op1=Clear) -> %elid_miningchannel 14 = 1. Shoot elid_ranging_target
-// _multinpc 3049 (world pin, multivar=elid_rangingchannel, vis face 3047
-// name Target, op2=Shoot) — opnpc2 + apnpc2 pair on both -> @elid_ranging_shoot
-// (combat AP eats Shoot) — fires the leftover (UPass / ranging-guild shape):
-// worn rhand bow (weapon_bow cat) + worn quiver ammo, consume 1, anim
-// human_bow + ~coord_projectile, then %elid_rangingchannel 16 = 1. No miss
-// % (dump silent). Done faces / water multilocs flip on the bits (no
-// loc_change). Stay %elidquest 1. No dest. No golem-door retouch. No
-// tool/level % invent. No && / ||.
-// Cite elid-water-channels-leftover-377.md · _unpack/377/all.varbit.
+// VERIFIED quest requirements: Thieving, Mining and Ranged 37, Tip.It
+// 20060502085633. UNKNOWN engineering choice: enforce effective levels at the
+// matching channels; the source does not establish boostability or check location.
+// Cache channel bits 14-16 are separate from elidquest bits 0-6. Mining uses
+// the shared usable-pickaxe checker; ranging requires a bow and worn ammunition.
+// Success text from the OSRS transcript is CANDIDATE. No quest stage writes.
+// Research: spirits-of-the-elid.period-channel-methods,
+// .channel-levels-unknown, .channel-product-effects.
 
 [oploc1,elid_water_channel_spiketrap]
+if (%elid_thievingchannel > 0) {
+    return;
+}
+// VERIFIED requirement; UNKNOWN gate placement/effective-level policy. No sourced refusal line.
+if (stat(thieving) < 37) {
+    return;
+}
+mes("You use your your Thieving skills to remove the block without triggering the spikes."); // CANDIDATE
+mes("The water flows into the hole."); // CANDIDATE
 %elid_thievingchannel = 1;
 
 [oploc1,elid_water_channel_blocked_rocks]
+if (%elid_miningchannel > 0) {
+    return;
+}
+// VERIFIED requirement; UNKNOWN gate placement/effective-level policy. No sourced refusal line.
+if (stat(mining) < 37) {
+    return;
+}
+def_obj $pickaxe = ~pickaxe_checker;
+if ($pickaxe = null) {
+    mes("You need a pickaxe to clear the rubble."); // UNKNOWN functional wording
+    return;
+}
+anim(oc_param($pickaxe, mining_animation), 0);
+mes("You manage to clear the channel of rocks."); // CANDIDATE
+mes("The water flows into the hole."); // CANDIDATE
 %elid_miningchannel = 1;
 
 [opnpc2,elid_ranging_target] @elid_ranging_shoot;
@@ -26,6 +44,13 @@
 [apnpc2,elid_ranging_target_multinpc] @elid_ranging_shoot;
 
 [label,elid_ranging_shoot]
+if (%elid_rangingchannel > 0) {
+    return;
+}
+// VERIFIED requirement; UNKNOWN gate placement/effective-level policy. No sourced refusal line.
+if (stat(ranged) < 37) {
+    return;
+}
 def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
 def_obj $worn_ammo = inv_getobj(worn, ^wearpos_quiver);
 if ($weapon = null) {
@@ -42,7 +67,8 @@ if ($weapon_cat ! weapon_bow) {
     return;
 }
 inv_del(worn, $worn_ammo, 1);
-mes("You fire your arrow at the target..."); // CANDIDATE
 anim(human_bow, 0);
 ~coord_projectile(coord, npc_coord, oc_param($worn_ammo, proj_travel), 40, 36, 41, 15, 5, 11, 5); // opnpc2 ctx: loc_coord invalid
+mes("You manage to shoot down the target."); // CANDIDATE
+mes("The water flows into the hole."); // CANDIDATE
 %elid_rangingchannel = 1;
