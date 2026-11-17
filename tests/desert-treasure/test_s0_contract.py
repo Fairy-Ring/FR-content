@@ -455,6 +455,29 @@ def check_original_entity_configs() -> None:
         if name in expected_npcs or not (DT_ENTITY.fullmatch(name) or name in s5_behaviour):
             continue
         current_values = strip_s5_behaviour(name, npcs.get(name, {}))
+        if name in {f"deserttreasure_mummy_{n}" for n in range(2, 6)}:
+            # S7 arms the original mapped mummies. Values remain UNKNOWN;
+            # assert each addition, then retain the full inherited-data freeze.
+            for field, expected in {
+                "wanderrange": ["3"], "maxrange": ["8"], "attackrange": ["1"],
+                "huntmode": ["aggressive_melee"], "huntrange": ["5"],
+            }.items():
+                require(field not in base_values, f"[{name}] baseline has no S7 field {field}")
+                require(current_values.pop(field, None) == expected,
+                        f"[{name}] exact S7 field {field}={expected[0]}")
+            params = current_values.pop("param", [])
+            for expected in (
+                "attackrate,4", "damagetype,^crush_style",
+                "attack_anim,deserttreasure_mummy_attack",
+                "defend_anim,deserttreasure_mummy_block",
+                "death_anim,deserttreasure_mummy_death",
+            ):
+                require(params.count(expected) == 1, f"[{name}] exact S7 param {expected}")
+                require(expected not in base_values.get("param", []),
+                        f"[{name}] baseline has no S7 param {expected}")
+                params = [value for value in params if value != expected]
+            if params:
+                current_values["param"] = params
         if name.startswith("fourdiamonds_sword_bandit_sit"):
             # Published S1 fixes the four seated, non-wandering bandits.
             for field, expected in seated_fields.items():

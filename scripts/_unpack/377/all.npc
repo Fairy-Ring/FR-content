@@ -46418,6 +46418,17 @@ hitpoints=90
 attack=90
 strength=90
 defence=90
+// UNKNOWN engineering combat cadence/ranges; retain inherited server stats.
+wanderrange=3
+maxrange=8
+attackrange=1
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^crush_style
+param=attack_anim,deserttreasure_mummy_attack
+param=defend_anim,deserttreasure_mummy_block
+param=death_anim,deserttreasure_mummy_death
 
 [deserttreasure_mummy_3]
 name=Mummy
@@ -46441,6 +46452,17 @@ hitpoints=90
 attack=90
 strength=90
 defence=90
+// UNKNOWN engineering combat cadence/ranges; retain inherited server stats.
+wanderrange=3
+maxrange=8
+attackrange=1
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^crush_style
+param=attack_anim,deserttreasure_mummy_attack
+param=defend_anim,deserttreasure_mummy_block
+param=death_anim,deserttreasure_mummy_death
 
 [deserttreasure_mummy_4]
 name=Mummy
@@ -46464,6 +46486,17 @@ hitpoints=90
 attack=90
 strength=90
 defence=90
+// UNKNOWN engineering combat cadence/ranges; retain inherited server stats.
+wanderrange=3
+maxrange=8
+attackrange=1
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^crush_style
+param=attack_anim,deserttreasure_mummy_attack
+param=defend_anim,deserttreasure_mummy_block
+param=death_anim,deserttreasure_mummy_death
 
 [deserttreasure_mummy_5]
 name=Mummy
@@ -46487,6 +46520,17 @@ hitpoints=90
 attack=90
 strength=90
 defence=90
+// UNKNOWN engineering combat cadence/ranges; retain inherited server stats.
+wanderrange=3
+maxrange=8
+attackrange=1
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^crush_style
+param=attack_anim,deserttreasure_mummy_attack
+param=defend_anim,deserttreasure_mummy_block
+param=death_anim,deserttreasure_mummy_death
 
 [deserttreasure_mummy_2_on_fire]
 name=Mummy
@@ -46604,6 +46648,18 @@ hitpoints=25
 attack=255
 strength=2
 defence=10
+// VERIFIED period scarabs poison; severity/cadence/ranges are UNKNOWN engineering.
+wanderrange=2
+maxrange=8
+attackrange=1
+huntmode=aggressive_melee
+huntrange=5
+param=attackrate,4
+param=damagetype,^stab_style
+param=attack_anim,scarab_attack
+param=defend_anim,scarab_parry
+param=death_anim,scarab_spiral
+param=poison_severity,15
 
 [azzanadra]
 walkanim=ghost_walk
@@ -75557,85 +75613,6 @@ walkanim=mole_walk
 resizeh=108
 resizev=108
 minimap=no
-
-[slayer_mutated_zygomite_adolescent_cap]
-name=Fungi
-desc=A fun guy. No wait, that's awful. Plus it doesn't even make sense.
-model1=npc_3344
-walkanim=zygomite_wiggle
-readyanim=zygomite_wiggle
-turnspeed=0
-turnspeed=900
-op1=Pick
-op3=Hidden
-vislevel=74
-wanderrange=0
-moverestrict=nomove
-defaultmode=none
-
-[slayer_mutated_zygomite_adult_capt]
-name=Fungi
-desc=A fun guy. No wait, that's awful. Plus it doesn't even make sense.
-model1=npc_3344
-resizeh=220
-resizev=220
-walkanim=zygomite_wiggle
-readyanim=zygomite_wiggle
-turnspeed=0
-turnspeed=900
-op1=Pick
-op3=Hidden
-vislevel=86
-wanderrange=0
-moverestrict=nomove
-defaultmode=none
-
-[slayer_mutated_zygomite_adolescent]
-name=Zygomite
-desc=A bouncy fungus.
-model1=spot_slayer_zygomite_jump_out_spotanim
-recol1s=29492
-recol1d=22194
-recol2s=26355
-recol2d=19057
-recol3s=22162
-recol3d=13837
-recol4s=16910
-recol4d=10667
-recol5s=12517
-recol5d=22691
-walkanim=zygomite_adolescent_walk
-readyanim=zygomite_ready
-turnspeed=900
-op2=Attack
-op3=Hidden
-ambient=10
-contrast=10
-vislevel=74
-hitpoints=65
-attack=65
-strength=65
-defence=65
-
-[slayer_mutated_zygomite_adult]
-name=Zygomite
-desc=A fun guy. No wait, that's awful..
-model1=spot_slayer_zygomite_jump_out_spotanim
-size=2
-resizeh=220
-resizev=220
-walkanim=zygomite_adult_walk
-readyanim=zygomite_ready
-turnspeed=900
-op2=Attack
-op3=Hidden
-ambient=10
-contrast=10
-vislevel=86
-hitpoints=65
-attack=65
-strength=65
-defence=65
 
 [white_knight_yellow_plumes_f]
 name=White Knight

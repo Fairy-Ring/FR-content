@@ -192,6 +192,7 @@ jobs:
           run_test tests/desert-treasure/test_s5_contract.py python3 ../content/tests/desert-treasure/test_s5_contract.py
           run_test tests/desert-treasure/s5_death_runtime.mts bash ../content/tests/desert-treasure/s5_death_runtime.sh "$PWD"
           run_test tests/desert-treasure/test_s6_contract.py python3 ../content/tests/desert-treasure/test_s6_contract.py
+          run_test tests/desert-treasure/test_s7_effects.mjs bash -c 'node --import tsx ../content/tests/desert-treasure/test_s7_effects.mjs && node --import tsx ../content/tests/desert-treasure/test_s7_topology.mjs'
           run_test tests/desert-treasure/test_s4_contract.py python3 ../content/tests/desert-treasure/test_s4_contract.py
           run_test tests/desert-treasure/test_s4_effects.mjs node --import tsx ../content/tests/desert-treasure/test_s4_effects.mjs
           run_test tests/desert-treasure/test_s2_contract.py python3 ../content/tests/desert-treasure/test_s2_contract.py
@@ -222,6 +223,7 @@ jobs:
           run_test tests/desert-treasure/test_s8_contract.py python3 ../content/tests/desert-treasure/test_s8_contract.py
           run_test tests/giantdwarf-intro/test_giantdwarf_intro.mjs node --import tsx ../content/tests/giantdwarf-intro/test_giantdwarf_intro.mjs
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
+          run_test tests/onesmallfavour/test_completion.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/onesmallfavour/test_completion.mjs
           run_test tests/spirits-of-the-elid/test_elid.mjs node --import tsx ../content/tests/spirits-of-the-elid/test_elid.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
@@ -243,6 +245,7 @@ jobs:
           run_test tests/monster-s01/test_monster_s01.mjs node --import tsx ../content/tests/monster-s01/test_monster_s01.mjs
           run_test tests/monster-s02/test_monster_s02.mjs node --import tsx ../content/tests/monster-s02/test_monster_s02.mjs
           run_test tests/monster-a7/test_monster_a7.mjs node --import tsx ../content/tests/monster-a7/test_monster_a7.mjs
+          run_test tests/zygomite/test_zygomite.mjs node --import tsx ../content/tests/zygomite/test_zygomite.mjs
           exit "$failed"
 
       - name: Write job summary
