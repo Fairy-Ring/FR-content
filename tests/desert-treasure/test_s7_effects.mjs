@@ -182,6 +182,15 @@ for (const [stage, missing] of [[stageFourColumns - 1, null], [stageFourColumns,
   }
   assertMainFieldsPreserved(p, before, 'pyramid entry');
 }
+for (const [startZ, endZ] of [[9325, 9323], [9323, 9325]]) {
+  const p = player();
+  setBit(p, 'deserttreasure', stageComplete);
+  p.level = 0; p.x = 3234; p.z = startZ;
+  runPlayer(p, '[oploc1,dt_ancient_temple_door_open]');
+  assert.deepEqual([p.level, p.x, p.z], [0, 3234, endZ], 'the mapped chamber door crosses only its local doorway');
+  assert(p.timers.has(hazard.id), 'door traversal arms hazards for a completed safe-portal arrival');
+  assert.equal(getBit(p, 'deserttreasure'), stageComplete, 'door traversal does not write quest progress');
+}
 for (const [level, x, z] of [[3, 2913, 4952], [2, 2845, 4963], [1, 2782, 4972], [0, 3232, 9292]]) {
   const p = player();
   p.level = level; p.x = x; p.z = z;
