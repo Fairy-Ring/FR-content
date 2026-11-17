@@ -11,3 +11,6 @@
 ^zygomite_form_lifetime = 1000000000
 // UNKNOWN engineering: native pick/leap presentation takes two ticks.
 ^zygomite_pick_delay = 2
+// UNKNOWN engineering: effect height and travel duration (client cycles) are not recovered.
+^zygomite_spore_height = 92
+^zygomite_spore_duration = 32

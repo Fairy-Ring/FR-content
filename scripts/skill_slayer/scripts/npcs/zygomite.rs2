@@ -43,9 +43,9 @@ npc_anim(npc_param(attack_anim), 0);
 sound_synth(npc_param(attack_sound), 1, 0);
 if ($style = ^ranged_style) {
     // CANDIDATE: named 377 spore effects. No unrelated projectile is substituted.
-    spotanim_npc(slayer_zygomite_spores_spotanim, 92, 0);
-    spotanim_pl(player_human_zygomite_spores_spotanim, 92, 0);
-    def_int $ticks = ~playerhit_n_ranged($damage, 32, npc_param(attackrate));
+    spotanim_npc(slayer_zygomite_spores_spotanim, ^zygomite_spore_height, 0);
+    spotanim_pl(player_human_zygomite_spores_spotanim, ^zygomite_spore_height, 0);
+    def_int $ticks = ~playerhit_n_ranged($damage, ^zygomite_spore_duration, npc_param(attackrate));
 } else {
     anim(%com_defendanim, 0);
     ~playerhit_n_melee($damage, npc_param(attackrate));
