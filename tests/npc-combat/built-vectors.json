@@ -905,7 +905,7 @@
               "barrows.bc02-bloodworm-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "f8026debbcb82581a27c09bd3a45b9f07af1646a",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-own-family-rule",
@@ -933,7 +933,7 @@
               "barrows.bc02-bloodworm-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "f8026debbcb82581a27c09bd3a45b9f07af1646a",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-own-family-rule",
@@ -961,7 +961,7 @@
               "barrows.bc02-bloodworm-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "f8026debbcb82581a27c09bd3a45b9f07af1646a",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-own-family-rule",
@@ -1125,11 +1125,11 @@
               "barrows.bc02-rat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1149,11 +1149,11 @@
               "barrows.bc02-rat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1173,11 +1173,11 @@
               "barrows.bc02-rat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1197,11 +1197,11 @@
               "barrows.bc02-rat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1221,11 +1221,11 @@
               "barrows.bc02-rat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1245,11 +1245,11 @@
               "barrows.bc02-rat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1393,11 +1393,11 @@
               "barrows.bc02-giantrat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1417,11 +1417,11 @@
               "barrows.bc02-giantrat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1441,11 +1441,11 @@
               "barrows.bc02-giantrat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1465,11 +1465,11 @@
               "barrows.bc02-giantrat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1489,11 +1489,11 @@
               "barrows.bc02-giantrat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1513,11 +1513,11 @@
               "barrows.bc02-giantrat-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1661,11 +1661,11 @@
               "barrows.bc02-spider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1685,11 +1685,11 @@
               "barrows.bc02-spider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1709,11 +1709,11 @@
               "barrows.bc02-spider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1733,11 +1733,11 @@
               "barrows.bc02-spider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1757,11 +1757,11 @@
               "barrows.bc02-spider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1781,11 +1781,11 @@
               "barrows.bc02-spider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1929,11 +1929,11 @@
               "barrows.bc02-giantspider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1953,11 +1953,11 @@
               "barrows.bc02-giantspider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -1977,11 +1977,11 @@
               "barrows.bc02-giantspider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2001,11 +2001,11 @@
               "barrows.bc02-giantspider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2025,11 +2025,11 @@
               "barrows.bc02-giantspider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2049,11 +2049,11 @@
               "barrows.bc02-giantspider-presentation-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2198,14 +2198,14 @@
           "value": { "ref": "synth", "name": "skeleton_attack" },
           "evidence": {
             "facts": [
-              "barrows.bc02-skeleton-presentation-selection"
+              "barrows.bc02-skeleton-first-model-sound-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2222,14 +2222,14 @@
           "value": { "ref": "synth", "name": "skelly_hit" },
           "evidence": {
             "facts": [
-              "barrows.bc02-skeleton-presentation-selection"
+              "barrows.bc02-skeleton-first-model-sound-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2246,14 +2246,14 @@
           "value": { "ref": "synth", "name": "skeleton_death" },
           "evidence": {
             "facts": [
-              "barrows.bc02-skeleton-presentation-selection"
+              "barrows.bc02-skeleton-first-model-sound-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2401,14 +2401,14 @@
           "value": { "ref": "synth", "name": "skeleton_attack" },
           "evidence": {
             "facts": [
-              "barrows.bc02-skeleton-presentation-selection"
+              "barrows.bc02-skeleton-first-model-sound-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2425,14 +2425,14 @@
           "value": { "ref": "synth", "name": "skelly_hit" },
           "evidence": {
             "facts": [
-              "barrows.bc02-skeleton-presentation-selection"
+              "barrows.bc02-skeleton-first-model-sound-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
@@ -2449,14 +2449,14 @@
           "value": { "ref": "synth", "name": "skeleton_death" },
           "evidence": {
             "facts": [
-              "barrows.bc02-skeleton-presentation-selection"
+              "barrows.bc02-skeleton-first-model-sound-selection"
             ],
             "label": "CANDIDATE",
-            "researchCommit": "ee584545ab10c9a6a57c8b09c16ce59dfc6dc192",
+            "researchCommit": "bdfdd38d4a0eeb3dc10c0f4cbacfd91636728f1f",
             "sources": [
               {
                 "id": "src.barrows-bc02-operator-presentation-rule",
-                "sha256": "cc2185aaeab10eaed7eb25caa64a6f782bea492e204edf5ff379e6c95f5dcb7d"
+                "sha256": "8b8285a68147f53406c41257da0ac596705090aed2bfc7f62a5795f1f8e6ba15"
               },
               {
                 "id": "src.barrows-bc02-presentation-donors",
