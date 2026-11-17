@@ -9,6 +9,7 @@
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-pack <pre-S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode table-old-discriminator --base-pack <published S2 pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode replacement [--base-pack <published full pack>]
+ *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode priestperil [--base-pack <published full pack>]
  * Artifacts go to --artifact-dir, else SLAYER_SELECTOR_EVIDENCE_DIR, else RUNNER_TEMP or the system temporary directory.
  *
  * No server or live client is started. The adversarial DBRows are compiled in
@@ -102,7 +103,9 @@ const OUT_OF_S1 = [
 const OWNER_PREDICATES = [
     {
         proc: 'slayer_priestperil_unlocked',
-        categories: ['slayer_crawlinghand', 'slayer_banshee', 'slayer_infernalmage', 'slayer_bloodveld', 'slayer_aberrantspecter', 'slayer_gargoyle', 'slayer_nechryael', 'slayer_abyssaldemon', 'slayer_ghoul', 'slayer_werewolf', 'slayer_vampire']
+        categories: ['slayer_crawlinghand', 'slayer_banshee', 'slayer_infernalmage', 'slayer_bloodveld', 'slayer_aberrantspecter', 'slayer_gargoyle', 'slayer_nechryael', 'slayer_abyssaldemon', 'slayer_ghoul', 'slayer_werewolf', 'slayer_vampire'],
+        // CANDIDATE assignment reconstruction: Drezel grants Morytania access at 61, after completion at 60.
+        gate: { variable: 'priestperil', threshold: 61 }
     },
     { proc: 'slayer_horror_unlocked', categories: ['slayer_dagannoth'] },
     { proc: 'slayer_regicide_unlocked', categories: ['slayer_elf'] },
@@ -120,7 +123,7 @@ function parseArgs(argv) {
         else if (token === '--base-pack' && argv[i + 1]) result.basePack = path.resolve(argv[++i]);
         else throw new Error(`Unknown or incomplete argument: ${token}`);
     }
-    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator', 'replacement'].includes(result.mode), `unsupported --mode ${result.mode}`);
+    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator', 'replacement', 'priestperil'].includes(result.mode), `unsupported --mode ${result.mode}`);
     if (['old-regressions', 'old-discriminator', 'table-old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
     return result;
 }
@@ -352,7 +355,10 @@ function loadOracle() {
     const taskSource = fs.readFileSync(SOURCES.taskScript, 'utf8');
     const masterSource = fs.readFileSync(SOURCES.masterScript, 'utf8');
     const recommendationSource = fs.readFileSync(SOURCES.recommendationScript, 'utf8');
-    const questNames = [...new Set([...extractValidatorBody(taskSource).matchAll(/%([A-Za-z0-9_]+)\s*</g)].map(match => match[1]))];
+    const questNames = [...new Set([
+        ...[...extractValidatorBody(taskSource).matchAll(/%([A-Za-z0-9_]+)\s*</g)].map(match => match[1]),
+        ...OWNER_PREDICATES.filter(owner => owner.gate).map(owner => owner.gate.variable)
+    ])];
     const questValues = Object.fromEntries(questNames.map(name => [name, 0]));
     const validatorRoutes = parseValidatorRoutes(taskSource, constants);
     const reverseConstants = new Map();
@@ -433,10 +439,14 @@ function expectedValidator(target, fixture) {
     const combatRequirement = ORACLE.combatReq.get(target) ?? 0;
     const questGate = ORACLE.questGates.get(target);
     const questValue = questGate ? (fixture.questValues?.[questGate.variable] ?? ORACLE.questValues[questGate.variable] ?? 0) : 0;
+    const ownerProc = ORACLE.ownerProcByTarget.get(target);
+    const owner = OWNER_PREDICATES.find(entry => entry.proc === ownerProc);
+    const ownerAccepts = !ownerProc || (owner?.gate
+        && (fixture.questValues?.[owner.gate.variable] ?? 0) >= owner.gate.threshold);
     return fixture.baseSlayer >= slayerRequirement
         && fixture.combat >= combatRequirement
         && !ORACLE.alwaysBlockedTargets.has(target)
-        && !ORACLE.ownerProcByTarget.has(target)
+        && Boolean(ownerAccepts)
         && (!questGate || questValue >= questGate.threshold);
 }
 
@@ -601,7 +611,7 @@ function compileFixturePack(fixtureMode = 'standard') {
     return result;
 }
 
-const FIXTURE_PACK_RESULT = OPTIONS.mode === 'replacement' ? null : compileFixturePack();
+const FIXTURE_PACK_RESULT = ['replacement', 'priestperil'].includes(OPTIONS.mode) ? null : compileFixturePack();
 const FIXTURE_PACK_DIR = FIXTURE_PACK_RESULT?.directory ?? null;
 
 async function importEngine(relative) {
@@ -758,6 +768,9 @@ function completedQuestValues() {
     const values = { ...ORACLE.questValues };
     for (const gate of ORACLE.questGates.values()) {
         values[gate.variable] = Math.max(values[gate.variable] ?? 0, gate.threshold);
+    }
+    for (const owner of OWNER_PREDICATES) {
+        if (owner.gate) values[owner.gate.variable] = owner.gate.threshold;
     }
     return values;
 }
@@ -1296,7 +1309,7 @@ function testThresholds() {
                 assert.equal(traced.result, expected, `${fixture.key}: packed validator must use base Slayer threshold ${requirement}`);
                 if (ownerProc) {
                     const expectedCalls = baseSlayer >= requirement ? [`[proc,${ownerProc}]`] : [];
-                    assert.deepEqual(traced.calls, expectedCalls, `${fixture.key}: packed threshold must run before its unfinished owner gate`);
+                    assert.deepEqual(traced.calls, expectedCalls, `${fixture.key}: packed threshold must run before its owner gate`);
                 }
                 targets.push(target);
                 observations.push({
@@ -1389,10 +1402,12 @@ function testOwnerPredicateDispatch() {
             assert(!expectedRoutes.has(target), `category ^${category} has multiple owner predicates`);
             expectedRoutes.set(target, owner.proc);
         }
-        const body = extractProcSource(ORACLE.taskSource, owner.proc).replace(/\/\/[^\n]*/g, '').replace(/\s+/g, '');
-        assert.equal(body, `[proc,${owner.proc}]()(boolean)return(false);`, `${owner.proc} must remain an unfinished false body`);
+        if (!owner.gate) {
+            const body = extractProcSource(ORACLE.taskSource, owner.proc).replace(/\/\/[^\n]*/g, '').replace(/\s+/g, '');
+            assert.equal(body, `[proc,${owner.proc}]()(boolean)return(false);`, `${owner.proc} must remain an unfinished false body`);
+        }
     }
-    assert.equal(ORACLE.ownerProcByTarget.size, expectedRoutes.size, 'validator source must route exactly the six planned unfinished owner contracts');
+    assert.equal(ORACLE.ownerProcByTarget.size, expectedRoutes.size, 'validator source must route exactly the six planned owner contracts');
     for (const [target, proc] of expectedRoutes) {
         assert.equal(ORACLE.ownerProcByTarget.get(target), proc, `${ORACLE.reverseConstants.get(target)} must route to ${proc}`);
     }
@@ -1404,16 +1419,79 @@ function testOwnerPredicateDispatch() {
     const results = [];
     for (const owner of OWNER_PREDICATES) {
         const direct = runInt(player, `[proc,${owner.proc}]`, npc);
-        assert.equal(direct.value, 0, `${owner.proc}: compiled unfinished predicate must return false`);
+        assert.equal(direct.value, owner.gate ? 1 : 0, `${owner.proc}: compiled predicate must match its completed-state contract`);
         for (const category of owner.categories) {
             const target = Number(ORACLE.constants.get(category));
             const traced = tracePackedCalls([owner.proc], () => validatorAccepts(player, npc, target));
-            assert.equal(traced.result, false, `${category}: unfinished owner gate must exclude the target`);
+            assert.equal(traced.result, Boolean(owner.gate), `${category}: owner gate must match its completed-state contract`);
             assert.deepEqual(traced.calls, [`[proc,${owner.proc}]`], `${category}: packed validator did not dispatch to ${owner.proc}`);
             results.push({ category, target, ownerProc: owner.proc, predicateResult: direct.value, validatorResult: traced.result, packedCalls: traced.calls });
         }
     }
     return { fixture, routes: results };
+}
+
+function testPriestperilAccess() {
+    const owner = OWNER_PREDICATES.find(entry => entry.proc === 'slayer_priestperil_unlocked');
+    assert.equal(Number(ORACLE.constants.get('priestperil_complete')), 60, 'quest completion is not the Morytania access grant');
+    assert.equal(owner.categories.length, 11, 'Priest in Peril must retain all eleven routed categories');
+    const targets = new Set(owner.categories.map(category => Number(ORACLE.constants.get(category))));
+    const player = makePlayer();
+    const validatorNpc = makeNpc(IDS.masters.turael);
+    const stages = [];
+    // Every pre-access stage rejects every category, including completed-but-not-admitted stage 60.
+    for (let stage = 0; stage <= 61; stage++) {
+        const fixture = {
+            key: `priestperil_${stage}`, combat: 126, level: 99, baseSlayer: 99, currentSlayer: 99,
+            questValues: { ...completedQuestValues(), priestperil: stage }
+        };
+        applyFixture(player, fixture);
+        const expected = stage === 61;
+        assert.equal(runInt(player, `[proc,${owner.proc}]`, validatorNpc).value, Number(expected), `Priest in Peril stage ${stage}: access predicate`);
+        const categories = owner.categories.map(category => {
+            const target = Number(ORACLE.constants.get(category));
+            assert.equal(validatorAccepts(player, validatorNpc, target), expected, `${category}: stage ${stage} must ${expected ? 'admit' : 'reject'} the category`);
+            return { category, target, accepted: expected };
+        });
+        assert.equal(player.getVar(QUEST_VAR_IDS.priestperil), stage, 'eligibility must not change quest state');
+        stages.push({ stage, accepted: expected, categories });
+    }
+
+    const assignments = [];
+    for (const target of targets) {
+        const master = ORACLE.masters.find(entry => entry.rows.some(row => row.target === target));
+        assert(master, `Priest in Peril target ${target} needs a real master row`);
+        const index = master.rows.findIndex(row => row.target === target);
+        const npc = makeNpc(IDS.masters[master.key]);
+        for (const stage of [60, 61]) {
+            const fixture = {
+                key: `${master.key}_priestperil_${stage}`, combat: 126, level: 99, baseSlayer: 99, currentSlayer: 99,
+                questValues: { ...completedQuestValues(), priestperil: stage }
+            };
+            applyFixture(player, fixture);
+            assert.equal(combatLevel(player), 126, 'Priest in Peril assignment fixture combat');
+            const fallback = master.rows.findIndex(row => !targets.has(row.target) && expectedRowEligibility(row, fixture));
+            assert(fallback >= 0, `${master.key}: below-gate control needs an eligible non-Priest-in-Peril row`);
+            const selected = stage === 61 ? index : fallback;
+            // Below the gate, offer the forbidden row a successful roll, then assign a control on the next pass.
+            const stream = stage === 61 ? [] : master.rows.map((_, rowIndex) => rowIndex === index ? 0 : 1 - Number.EPSILON);
+            stream.push(...Array(selected).fill(1 - Number.EPSILON), 0, 0);
+            const trace = traceWrites(player);
+            let draw;
+            try {
+                draw = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id]));
+            } finally {
+                trace.restore();
+            }
+            assert.equal(draw.result.value, 1, `${master.key}: real table must assign at stage ${stage}`);
+            assert.equal(player.getVar(IDS.target), master.rows[selected].target, `${master.key}: Priest in Peril gate must affect the real draw`);
+            assert.equal(player.getVar(IDS.count), master.rows[selected].min, 'real assignment must retain its amount bound');
+            assert.deepEqual(trace.events, [{ kind: 'target', value: master.rows[selected].target }, { kind: 'count', value: master.rows[selected].min }], 'only the permitted task may be written');
+            assert.equal(player.getVar(QUEST_VAR_IDS.priestperil), stage, 'assignment must not change quest state');
+            assignments.push({ target, master: master.key, stage, after: taskSnapshot(player), randomValues: draw.observed });
+        }
+    }
+    return { stageVariable: 'priestperil', completion: 60, access: 61, stages, assignments };
 }
 
 function testDispatchAndOneShotOrder(packedRows) {
@@ -2245,6 +2323,7 @@ function testCurrentSuite() {
     const thresholds = testThresholds();
     const currentStatSource = testCurrentSlayerDoesNotGateAssignment();
     const ownerPredicateDispatch = testOwnerPredicateDispatch();
+    const priestperilAccess = testPriestperilAccess();
     const fixtureValidatorCaches = new Map();
     const emptyMinimumFailures = [];
     for (const master of ORACLE.masters) {
@@ -2286,7 +2365,7 @@ function testCurrentSuite() {
     const dispatch = testDispatchAndOneShotOrder(packedRows);
     const teachingAdmission = testCurrentTeachingAdmission();
     const teachingSuccess = testCurrentTeachingSuccess();
-    return { packedRows, masterSnapshots, turaelPredicate, d1Bears, ernest, chaeldarRetargets, duradelTables, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
+    return { packedRows, masterSnapshots, turaelPredicate, d1Bears, ernest, chaeldarRetargets, duradelTables, admission, harpieThreshold, thresholds, currentStatSource, ownerPredicateDispatch, priestperilAccess, dispatch, teaching: { admission: teachingAdmission, success: teachingSuccess }, emptyMinimumFailures, fixtureValidatorCaches };
 }
 
 function fixtureSourceRows() {
@@ -2656,6 +2735,7 @@ try {
             thresholds: current.thresholds,
             currentStatSource: current.currentStatSource,
             ownerPredicateDispatch: current.ownerPredicateDispatch,
+            priestperilAccess: current.priestperilAccess,
             dispatch: current.dispatch,
             emptyMinimumFailures: current.emptyMinimumFailures,
             teaching: current.teaching
@@ -2701,6 +2781,10 @@ try {
     } else if (OPTIONS.mode === 'replacement') {
         const basePack = OPTIONS.basePack ? findBasePackDirectory(OPTIONS.basePack) : findBasePackDirectory(ACTIVE_PACK_DIR);
         metadata.checks.s8 = testS8DialogueCases(basePack, basePack);
+    } else if (OPTIONS.mode === 'priestperil') {
+        loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
+        assertPackedLiveRows();
+        metadata.checks.priestperilAccess = testPriestperilAccess();
     } else {
         const basePack = findBasePackDirectory(OPTIONS.basePack);
         metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(basePack);
