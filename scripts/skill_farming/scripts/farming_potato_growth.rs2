@@ -9,7 +9,8 @@ if (($stage >= ^farming_potato_seed & $stage < ^farming_potato_fullygrown)
 return(false);
 
 [proc,farming_potato_advance](int $stage, int $steps)(int)
-// Four is the longest remaining potato path. Never loop over elapsed minutes.
+// Cap catch-up at four steps; disease can make the full potato path five steps.
+// Late disease can remain curable after catch-up. Never loop over elapsed minutes.
 $steps = min($steps, sub(^farming_potato_fullygrown, ^farming_potato_seed));
 while ($steps > 0 & ~farming_potato_growing($stage) = true) {
     if ($stage > add(^farming_potato_seed, ^farming_diseased_offset)) {
