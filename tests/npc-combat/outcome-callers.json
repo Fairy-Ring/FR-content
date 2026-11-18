@@ -100,6 +100,8 @@
     ],
     "npc_cast_spell_with_forced_max_hit": [
       "[ai_applayer2,_slayer_infernalmage]",
+      "[ai_applayer2,dungeon_dagganoth_magic_monster]",
+      "[ai_applayer2,dungeon_dagganoth_magic_monster_deeper]",
       "[ai_applayer2,ikov_firewarrior]",
       "[ai_applayer2,wizard]",
       "[ai_opplayer2,_slayer_infernalmage]",

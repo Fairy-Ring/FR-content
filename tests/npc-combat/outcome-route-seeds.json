@@ -1335,6 +1335,24 @@
         "enter": "[proc,soulbane_enter]",
         "leave": "[proc,soulbane_leave]"
       }
+    },
+    {
+      "script": "[ai_applayer2,dungeon_dagganoth_magic_monster]",
+      "npc": "dungeon_dagganoth_magic_monster",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_applayer2,dungeon_dagganoth_magic_monster_deeper]",
+      "npc": "dungeon_dagganoth_magic_monster_deeper",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
     }
   ]
 }
