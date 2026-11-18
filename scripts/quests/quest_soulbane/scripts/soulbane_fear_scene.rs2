@@ -1,0 +1,31 @@
+// VERIFIED period: the fifth reaper is followed by a short cutscene.
+// CANDIDATE later transcript: Tolna falls into the rift before it fully opens.
+// UNKNOWN original staging, camera composition and interruption policy.
+[queue,soulbane_fear_complete]
+if (~soulbane_owned = false | %soulbane_prog ! 4 | %soulbane_fear_killedtally ! 5) return;
+p_stopaction;
+walktrigger(soulbane_fear_resume);
+~soulbane_clear_room_npcs;
+~chatplayer("<p,neutral>Phew, I don't feel so scared now. This feels like the figment of someone's imagination!");
+p_teleport(~soulbane_room_coord(^soulbane_fear_scene_player));
+~soulbane_rage_add(soulbane_tolnaboy, ^soulbane_fear_scene_tolna);
+npc_anim(tolna_hole, 0);
+cam_moveto(movecoord(~soulbane_room_coord(^soulbane_fear_scene_player), -1, 0, -2), 400, 232, 232);
+cam_lookat(~soulbane_room_coord(^soulbane_fear_scene_tolna), 120, 232, 232);
+// seqlength is in client cycles; one server tick is 30 cycles.
+p_delay(calc((seqlength(tolna_hole) + 29) / 30));
+~soulbane_clear_room_npcs;
+cam_reset;
+p_teleport(~soulbane_room_coord(^soulbane_fear_entry));
+walktrigger(null);
+%soulbane_fear_exitlit = 1;
+%soulbane_prog = 5;
+~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+mes("What's that?");
+
+// A walk restarts the uncommitted memory, not its combat or a partial reward.
+[walktrigger,soulbane_fear_resume]
+if (~soulbane_owned = false | %soulbane_prog ! 4 | %soulbane_fear_killedtally ! 5) return;
+p_stopaction;
+walktrigger(soulbane_fear_resume);
+if (getqueue(soulbane_fear_complete) = 0) queue(soulbane_fear_complete, 0, 0);

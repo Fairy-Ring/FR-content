@@ -23,6 +23,16 @@ switch_int (%soulbane_prog) {
         ~chatnpc("<p,neutral>Have you found him then?");
         ~chatplayer("<p,neutral>Sorry, I've yet to enter the next room.");
         ~chatnpc("<p,neutral>Please hurry!");
+    case 4 :
+        ~chatplayer("<p,neutral>Hi. I've made my way into a second room. I heard your son's voice again as well.");
+        ~chatnpc("<p,neutral>What did he say? What did he say?");
+        ~chatplayer("<p,neutral>'It's so quiet and dark. I FEAR I may never escape this horrid place. Mum, help me!'");
+        ~chatnpc("<p,neutral>You must save him! Help him get over his fear!");
+    case 5 :
+        ~chatplayer("<p,neutral>I've overcome fear in the second room and an exit has been illuminated.");
+        ~chatnpc("<p,neutral>What can you see?");
+        ~chatplayer("<p,neutral>Erm, I haven't actually ventured through yet.");
+        ~chatnpc("<p,neutral>What are you waiting for? He must be so afraid in that place.");
 }
 
 [label,soulbane_launa_start]

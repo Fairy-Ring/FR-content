@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// First-unit Soul's Bane regression: native rift/Rage dispatch, owned region,
-// combat meter, family scene and the permanent stage-3 boundary.
+// Native rift, Rage, and saved Fear boundary regression coverage.
+// Every progression step uses the registered engine dispatch and cleanup paths.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -41,7 +41,27 @@ const RAGE_TYPES = [
   'soulbane_anger_bear', 'soulbane_anger_unicorn',
   'soulbane_anger_rat', 'soulbane_anger_goblin'
 ];
-const RAGE_IDS = new Set(RAGE_TYPES.map(name => requiredId('NpcType', name)));
+const RAGE_IDS = new Set(RAGE_TYPES.map(type => requiredId('NpcType', type)));
+const FEAR_NPC = requiredId('NpcType', 'soulbane_fear_reaper');
+const FEAR_HOLES = [
+  'soul_bane_fwall_void',
+  'soul_bane_fwall_void2',
+  'soul_bane_fwall_void3',
+  'soul_bane_fwall_void4',
+  'soul_bane_fwall_void5',
+  'soul_bane_fwall_void6'
+];
+const FEAR_REAPER_SPAWNS = [
+  'soulbane_fear_reaper1',
+  'soulbane_fear_reaper2',
+  'soulbane_fear_reaper3',
+  'soulbane_fear_reaper4',
+  'soulbane_fear_reaper5',
+  'soulbane_fear_reaper6'
+];
+// UNKNOWN engineering values; the original cache does not encode quest stages.
+const FEAR_STAGE = 4;
+const FEAR_COMPLETE_STAGE = 5;
 const WEAPON_IDS = new Set(WEAPONS.map(weapon => requiredId('ObjType', weapon.name)));
 const NPC_INSTANCE = requiredId('VarNpcType', 'npc_int');
 const NPC_OWNER = requiredId('VarNpcType', 'npc_attacking_uid');
@@ -301,6 +321,18 @@ function goToStand(p, target, label) {
   assert(p.inOperableDistance(target), `${label} ends within native operation distance`);
   return stand;
 }
+function findStandFrom(p, origin, target, label) {
+  const previous = { level: p.level, x: p.x, z: p.z };
+  p.level = origin.level; p.x = origin.x; p.z = origin.z;
+  let stand;
+  try {
+    stand = findStand(p, target);
+  } finally {
+    p.level = previous.level; p.x = previous.x; p.z = previous.z;
+  }
+  nativeRouteFrom(origin, stand, `${label}: exact ordinary path from room origin`);
+  return stand;
+}
 function assertFootprintOpen(level, x, z, width, length, label) {
   assert(Number.isInteger(width) && width > 0 && Number.isInteger(length) && length > 0,
     `${label} has a defined actor footprint`);
@@ -321,10 +353,51 @@ function activeNpc(name, position = null) {
 function rageNpcsFor(p) {
   const uid = instanceUid(p);
   return [...World.npcs].filter(npc => npc?.isActive && RAGE_IDS.has(npc.type) &&
-    npc.vars[NPC_INSTANCE] === uid && npc.vars[NPC_OWNER] === p.uid);
+    npc.vars[NPC_INSTANCE] === uid && (npc.vars[NPC_OWNER] >>> 0) === p.uid);
 }
 function rageNpcsWithInstance(uid) {
   return [...World.npcs].filter(npc => npc?.isActive && RAGE_IDS.has(npc.type) && npc.vars[NPC_INSTANCE] === uid);
+}
+function fearNpcsFor(p) {
+  const uid = instanceUid(p);
+  return [...World.npcs].filter(npc => npc?.isActive &&
+    (npc.baseType === FEAR_NPC || npc.type === FEAR_NPC) &&
+    npc.vars[NPC_INSTANCE] === uid && (npc.vars[NPC_OWNER] >>> 0) === p.uid);
+}
+function fearNpcsWithInstance(uid) {
+  return [...World.npcs].filter(npc => npc?.isActive &&
+    (npc.baseType === FEAR_NPC || npc.type === FEAR_NPC) && npc.vars[NPC_INSTANCE] === uid);
+}
+function fearHoleLocs(p) {
+  const matches = nearbyLocs(p, /^soul_bane_fwall_void(?:[2-6])?$/);
+  assert.equal(matches.length, FEAR_HOLES.length, 'the copied Fear room has exactly six packed dark holes');
+  const byName = new Map(matches.map(loc => [types.LocType.get(loc.type)?.debugname, loc]));
+  return FEAR_HOLES.map(name => {
+    const loc = byName.get(name);
+    assert(loc, `packed Fear hole ${name} is present in the copied room`);
+    return loc;
+  });
+}
+function fearWestExitLoc(p) {
+  const matches = nearbyLocs(p, /^soulbane_fwall_exit_multi$/);
+  assert.equal(matches.length, 1, 'the copied Fear room has exactly one western exit multiloc');
+  return matches[0];
+}
+function fearSurfaceExitLoc(p) {
+  const matches = nearbyLocs(p, /^soul_bane_fwall_void_small$/);
+  assert.equal(matches.length, 1, 'the copied Fear room has exactly one packed surface Exit');
+  return matches[0];
+}
+function fearReaperSpawn(p, door) {
+  assert(Number.isInteger(door) && door >= 1 && door <= FEAR_REAPER_SPAWNS.length,
+    `Fear door ${door} names one of six packed reaper points`);
+  return roomCoord(p, FEAR_REAPER_SPAWNS[door - 1]);
+}
+function assertFearReset(p, label) {
+  for (const name of ['soulbane_fear_enemydoor', 'soulbane_fear_enemydoor_old', 'soulbane_fear_monspres',
+    'soulbane_fear_killedtally', 'soulbane_fear_exitlit']) {
+    assert.equal(readVar(p, name), 0, `${label}: ${name} resets to zero`);
+  }
 }
 function locAt(level, x, z, name) {
   const type = requiredId('LocType', name);
@@ -354,7 +427,7 @@ function quitLoc(p) {
   const { level, x, z } = templateCoord(p, CoordGrid.packCoord(0, 3015, 5245));
   return locAt(level, x, z, 'soul_bane_awall_void_small');
 }
-function fearExitLoc(p) {
+function rageFearBoundaryLoc(p) {
   // Cache map receipt: loc 13882 at m47_81 local (30,44) => 3038,5228.
   const { level, x, z } = templateCoord(p, CoordGrid.packCoord(0, 3038, 5228));
   return locAt(level, x, z, 'soul_bane_awall_void_exit');
@@ -403,11 +476,44 @@ function checkRoomRoutes(p) {
       const actor = activeNpc(actorType, destination);
       assertFootprintOpen(destination.level, destination.x, destination.z, actor.width, actor.length, `${name} NPC`);
       assert.equal(actor.vars[NPC_INSTANCE], instanceUid(p), `${name} is assigned to this private copy`);
-      assert.equal(actor.vars[NPC_OWNER], p.uid, `${name} belongs to the entering account`);
+      assert.equal(actor.vars[NPC_OWNER] >>> 0, p.uid, `${name} belongs to the entering account`);
       assert.equal(actor.vars[NPC_XP_MULTIPLIER], 0, `${name} disables normal combat XP at spawn`);
     }
   }
   return entry;
+}
+function checkFearRoomRoutes(p) {
+  const entry = roomCoord(p, 'soulbane_fear_entry');
+  assertFootprintOpen(entry.level, entry.x, entry.z, 1, 1, 'Fear player entry');
+  for (const name of FEAR_REAPER_SPAWNS) {
+    const spawn = roomCoord(p, name);
+    assertFootprintOpen(spawn.level, spawn.x, spawn.z, 2, 2, `${name} size-2 reaper spawn`);
+    nativeRouteFrom(entry, spawn, `Fear entry reaches exact ${name} spawn on foot`);
+  }
+
+  const holes = fearHoleLocs(p);
+  for (const hole of holes) {
+    const name = types.LocType.get(hole.type)?.debugname;
+    const stand = findStandFrom(p, entry, hole, `Fear Look-inside ${name}`);
+    assertFootprintOpen(stand.level, stand.x, stand.z, 1, 1, `Fear ${name} interaction stand`);
+  }
+  const westExit = fearWestExitLoc(p);
+  const westStand = findStandFrom(p, entry, westExit, 'Fear western black-hole entry');
+  assertFootprintOpen(westStand.level, westStand.x, westStand.z, 1, 1, 'Fear western black-hole stand');
+  const surfaceExit = fearSurfaceExitLoc(p);
+  const surfaceStand = findStandFrom(p, entry, surfaceExit, 'Fear surface Exit');
+  assertFootprintOpen(surfaceStand.level, surfaceStand.x, surfaceStand.z, 1, 1, 'Fear surface Exit stand');
+
+  const scenePlayer = roomCoord(p, 'soulbane_fear_scene_player');
+  const sceneTolna = roomCoord(p, 'soulbane_fear_scene_tolna');
+  assertFootprintOpen(scenePlayer.level, scenePlayer.x, scenePlayer.z, 1, 1, 'Fear cutscene player stand');
+  assertFootprintOpen(sceneTolna.level, sceneTolna.x, sceneTolna.z, 1, 1, 'Fear cutscene Tolna footprint');
+  // The memory is teleported to the separate copied surface page, not walked
+  // into from the Fear dungeon. Prove both stands from that page's real entry.
+  const sceneEntry = roomCoord(p, 'soulbane_surface');
+  nativeRouteFrom(sceneEntry, scenePlayer, 'copied surface entry reaches the Fear cutscene player tile on foot');
+  nativeRouteFrom(sceneEntry, sceneTolna, 'copied surface entry reaches the Fear cutscene Tolna tile on foot');
+  return { entry, holes, westExit, surfaceExit, scenePlayer, sceneTolna };
 }
 function observeRageScene(p) {
   const playerStand = roomCoord(p, 'soulbane_scene_player');
@@ -513,6 +619,7 @@ function assertJournal(p, expected, excluded, label) {
     .map(packet => packet.text ?? '').join(' ').replace(/@[a-z]{3}@/g, '').replace(/\s+/g, ' ');
   for (const phrase of expected) assert(text.includes(phrase), `${label}: journal includes truthful text ${JSON.stringify(phrase)}; rendered ${JSON.stringify(text)}`);
   for (const phrase of excluded) assert(!text.includes(phrase), `${label}: journal does not claim ${JSON.stringify(phrase)}`);
+  p.closeModal();
   return text;
 }
 function assertNoAngerItems(p, label) {
@@ -659,7 +766,7 @@ function stableHitRandom(run) {
     JavaRandom.nextDouble = previousJavaRandom;
   }
 }
-function runNativeAttack(p, npc, label, maxTicks = 80) {
+function runNativeAttack(p, npc, label, maxTicks = 80, stopOnHit = false) {
   const beforeHp = npc.levels[HP_STAT];
   const beforeMeter = readVar(p, 'soulbane_anger_damagedealt');
   World.processInfo();
@@ -689,10 +796,117 @@ function runNativeAttack(p, npc, label, maxTicks = 80) {
   assert.match(trigger?.name ?? '', /^\[opnpc2,/i, `${label}: native attack dispatch resolves opnpc2`);
   for (let tick = 0; tick < maxTicks; tick++) {
     worldTick();
-    if (stage(p) === 3 || readVar(p, 'soulbane_anger_donespecial') === 1 || !npc.isActive) break;
+    if (stopOnHit && npc.levels[HP_STAT] < beforeHp) {
+      p.clearInteraction();
+      break;
+    }
+    if (stage(p) === 3 || stage(p) === FEAR_COMPLETE_STAGE ||
+      readVar(p, 'soulbane_anger_donespecial') === 1 || !npc.isActive) break;
   }
-  assert(!npc.isActive || readVar(p, 'soulbane_anger_donespecial') === 1 || stage(p) === 3,
-    `${label}: real native attack/AI queue lands a hit; ${JSON.stringify({ player: { tile: tile(p), hp: p.levels[PlayerStat.HITPOINTS], stage: stage(p), uid: instanceUid(p), delayed: p.delayed, interaction: p.target?.nid, script: p.activeScript?.script?.name, execution: p.activeScript?.execution, messages: p.messages.slice(-8) }, npc: { tile: [npc.level, npc.x, npc.z], hp: npc.levels[HP_STAT], beforeHp, mode: npc.mode, owner: npc.vars[NPC_OWNER], instance: npc.vars[NPC_INSTANCE] }, meter: readVar(p, 'soulbane_anger_damagedealt'), beforeMeter })}`);
+  assert(stopOnHit
+    ? npc.levels[HP_STAT] < beforeHp || !npc.isActive
+    : !npc.isActive || readVar(p, 'soulbane_anger_donespecial') === 1 ||
+      stage(p) === 3 || stage(p) === FEAR_COMPLETE_STAGE,
+  `${label}: real native attack/AI queue ${stopOnHit ? 'lands a hit' : 'settles'}; ${JSON.stringify({ player: { tile: tile(p), hp: p.levels[PlayerStat.HITPOINTS], stage: stage(p), uid: instanceUid(p), delayed: p.delayed, interaction: p.target?.nid, script: p.activeScript?.script?.name, execution: p.activeScript?.execution, messages: p.messages.slice(-8) }, npc: { tile: [npc.level, npc.x, npc.z], hp: npc.levels[HP_STAT], beforeHp, mode: npc.mode, owner: npc.vars[NPC_OWNER], instance: npc.vars[NPC_INSTANCE] }, meter: readVar(p, 'soulbane_anger_damagedealt'), beforeMeter })}`);
+}
+function assertOrdinaryMeleeXp(p, before, damage, multiplier, label) {
+  assert.equal(multiplier, 1000, `${label}: the packed Fear Reaper keeps the ordinary 1000 combat-XP multiplier`);
+  const after = xpSnapshot(p);
+  const delta = after.map((value, skill) => value - before[skill]);
+  const base = damage * 10;
+  const scaled = value => Math.floor(value * multiplier / 1000);
+  const shared = scaled(Math.floor(base * 133 / 100));
+  const singleStyle = scaled(Math.floor(base * 400 / 100));
+  const combat = [PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE].map(skill => delta[skill]);
+  const oneStyle = combat.filter(value => value !== 0).length === 1 && combat.includes(singleStyle);
+  const controlledStyle = combat.every(value => value === shared);
+  assert(oneStyle || controlledStyle,
+    `${label}: real damage ${damage} follows the ordinary melee style XP split; got ${JSON.stringify(combat)}`);
+  assert.equal(delta[PlayerStat.HITPOINTS], shared, `${label}: real damage ${damage} awards ordinary 133% Hitpoints XP`);
+  const combatSkills = new Set([PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE, PlayerStat.HITPOINTS]);
+  for (let skill = 0; skill < delta.length; skill++) {
+    if (!combatSkills.has(skill)) assert.equal(delta[skill], 0, `${label}: ordinary Fear damage awards no XP to stat ${skill}`);
+  }
+}
+function attackFearOnce(p, npc, label) {
+  const beforeHp = npc.levels[HP_STAT];
+  const beforeXp = xpSnapshot(p);
+  const multiplier = npc.vars[NPC_XP_MULTIPLIER];
+  stableHitRandom(() => runNativeAttack(p, npc, label, 120, true));
+  const damage = beforeHp - npc.levels[HP_STAT];
+  assert(damage > 0, `${label}: native Attack delivers positive ordinary damage`);
+  assertOrdinaryMeleeXp(p, beforeXp, damage, multiplier, label);
+  return damage;
+}
+function searchFearHole(p, hole, label) {
+  const name = types.LocType.get(hole.type)?.debugname;
+  assert(FEAR_HOLES.includes(name), `${label}: target is one of the six original Fear holes`);
+  goToStand(p, hole, `${label}: walk to packed ${name}`);
+  const result = operateLoc(p, hole, 1, [], label);
+  assert.equal(result.trigger.name, `[oploc1,${name}]`, `${label}: OpLoc resolves the actual visible hole form`);
+  return result;
+}
+function fearDoor(p) {
+  const door = readVar(p, 'soulbane_fear_enemydoor');
+  assert(Number.isInteger(door) && door >= 1 && door <= FEAR_HOLES.length,
+    `Fear active door ${door} is one of the six holes`);
+  return door;
+}
+function ensureFearReaper(p, label) {
+  let actors = fearNpcsFor(p);
+  assert(actors.length <= 1, `${label}: the owner has at most one live Fear Reaper`);
+  if (actors.length === 0) {
+    assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, `${label}: no encounter marker is left without its actor`);
+    const door = fearDoor(p);
+    const hole = fearHoleLocs(p)[door - 1];
+    searchFearHole(p, hole, `${label}: search the active hole ${door}`);
+    for (let tick = 0; tick < 32 && fearNpcsFor(p).length === 0; tick++) worldTick();
+    actors = fearNpcsFor(p);
+  }
+  assert.equal(actors.length, 1, `${label}: a real owned Fear Reaper is present after searching its active hole`);
+  const npc = actors[0];
+  const door = fearDoor(p);
+  const spawn = fearReaperSpawn(p, door);
+  assert.deepEqual({ level: npc.level, x: npc.x, z: npc.z }, spawn,
+    `${label}: the active door selects its exact packed size-2 reaper point`);
+  assertFootprintOpen(npc.level, npc.x, npc.z, npc.width, npc.length, `${label}: active Fear Reaper footprint`);
+  assert.equal(npc.vars[NPC_INSTANCE], instanceUid(p), `${label}: Fear Reaper carries the current instance marker`);
+  assert.equal(npc.vars[NPC_OWNER] >>> 0, p.uid, `${label}: Fear Reaper carries the current player owner`);
+  assert.equal(readVar(p, 'soulbane_fear_monspres'), 1, `${label}: the live/pending encounter marker is set`);
+  for (let tick = 0; tick < 32 && npc.vars[NPC_XP_MULTIPLIER] !== 1000; tick++) worldTick();
+  assert.equal(npc.vars[NPC_XP_MULTIPLIER], 1000, `${label}: Fear Reaper uses the normal combat-XP multiplier`);
+  return npc;
+}
+function killFearReaper(p, npc, expectedTally, label) {
+  const previousDoor = fearDoor(p);
+  let hits = 0;
+  while (npc.isActive && npc.levels[HP_STAT] > 0) {
+    assert(hits < 32, `${label}: ordinary native combat can finish this 25-HP reaper`);
+    attackFearOnce(p, npc, `${label}: native melee hit ${hits + 1}`);
+    hits++;
+  }
+  assert(hits > 0, `${label}: the reaper dies only after real player attacks`);
+  for (let tick = 0; tick < 256 && readVar(p, 'soulbane_fear_killedtally') !== expectedTally + 1; tick++) worldTick();
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), expectedTally + 1,
+    `${label}: the production NPC death/credit queues add exactly one kill`);
+  for (let tick = 0; tick < 16; tick++) worldTick();
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), expectedTally + 1,
+    `${label}: settled and later death queues cannot duplicate credit`);
+  assert.equal(npc.vars[NPC_INSTANCE], 0, `${label}: real death consumes the reaper owner marker before credit`);
+  assert.equal(stage(p), FEAR_STAGE, `${label}: the fifth reaper's cutscene, not the death queue, commits boundary 5`);
+  const actors = fearNpcsFor(p);
+  assert(actors.length <= 1, `${label}: death and relocation never leave duplicate owned reapers`);
+  if (expectedTally < 4) {
+    const nextDoor = fearDoor(p);
+    assert.notEqual(nextDoor, previousDoor, `${label}: next active hole relocates away from the just-cleared one`);
+    assert.equal(readVar(p, 'soulbane_fear_enemydoor_old'), previousDoor,
+      `${label}: the previous active hole is retained as the no-repeat exclusion`);
+    assert.equal(readVar(p, 'soulbane_fear_exitlit'), 0, `${label}: Fear exit remains closed before the fifth-death scene`);
+  } else {
+    assert.equal(readVar(p, 'soulbane_fear_enemydoor'), 0, `${label}: no hole remains active after the fifth death`);
+    assert.equal(readVar(p, 'soulbane_fear_exitlit'), 0, `${label}: the fifth death has not lit the exit before its scene`);
+  }
+  return { hits, previousDoor };
 }
 function testForeignInteractions(owner, intruder) {
   const ownerUid = instanceUid(owner);
@@ -771,11 +985,103 @@ function testForeignInteractions(owner, intruder) {
   assert.equal(readVar(intruder, 'soulbane_anger_damagedealt'), meterBefore, 'foreign use/cast attempts cannot earn anger credit');
   assert.equal(instanceUid(owner), ownerUid, 'foreign target attempts leave the real owner\'s UID unchanged');
 }
+function testForeignFearInteractions(owner, intruder, ownerNpc) {
+  const ownerUid = instanceUid(owner);
+  const hpBefore = ownerNpc.levels[HP_STAT];
+  const tallyBefore = readVar(owner, 'soulbane_fear_killedtally');
+  const xpBefore = xpSnapshot(intruder);
+  assert(runProcInt('npc_max_dealt', owner, [100, 0], ownerNpc) > 0,
+    'eligible owner Fear target keeps a positive ordinary melee/ranged max hit');
+  assert.equal(runProcInt('npc_max_dealt', intruder, [100, 0], ownerNpc), 0,
+    'foreign Fear target is capped at zero before melee/ranged damage XP');
+  assert(runProcInt('npc_max_dealt', owner, [100, 1], ownerNpc) > 0,
+    'eligible owner Fear target keeps a positive spell max hit');
+  assert.equal(runProcInt('npc_max_dealt', intruder, [100, 1], ownerNpc), 0,
+    'foreign Fear spell target is capped at zero before damage XP');
+  assert.equal(ownerNpc.vars[NPC_INSTANCE], ownerUid, 'foreign Fear target belongs to the other private copy');
+  assert.equal(ownerNpc.vars[NPC_OWNER] >>> 0, owner.uid, 'foreign Fear target belongs to the other player');
+  World.processInfo();
+  rsbuf.npcInfo(0, intruder.slot, 0, 0, true);
+  assert.equal(rsbuf.hasNpc(intruder.slot, ownerNpc.nid), false,
+    'native NPC updates never render another owner\'s Fear Reaper');
+  assert.equal(intruder.inOperableDistance(ownerNpc), false,
+    'a different-stage outside player is not in operation distance to the Fear Reaper');
+
+  intruder.clearInteraction();
+  assert.equal(OpNpcHandler.handle(new OpNpc(2, ownerNpc.nid), intruder), false,
+    'native APNPC2 refuses a foreign Fear Reaper');
+  seed(intruder, ['airrune', 'mindrune']);
+  const inventoryBefore = inventory(intruder);
+  assert.equal(OpNpcUHandler.handle(
+    new OpNpcU(ownerNpc.nid, obj('airrune'), slotOf(intruder, 'airrune'), invCom), intruder), false,
+  'native APNPCU refuses item use on a foreign Fear Reaper');
+  const windStrike = requiredId('Component', 'magic:wind_strike');
+  assert(intruder.isComponentVisible(types.Component.get(windStrike)),
+    'Wind Strike is visible to the native spell-target handler');
+  assert.equal(OpNpcTHandler.handle(new OpNpcT(ownerNpc.nid, windStrike), intruder), false,
+    'native APNPCT refuses a spell on a foreign Fear Reaper');
+
+  assert.equal(ownerNpc.levels[HP_STAT], hpBefore, 'foreign Attack/Use/Spell packets cannot damage the owner\'s Fear Reaper');
+  assert.equal(readVar(owner, 'soulbane_fear_killedtally'), tallyBefore, 'foreign Attack/Use/Spell packets cannot earn Fear credit');
+  assert.deepEqual(inventory(intruder), inventoryBefore, 'foreign item/spell target packets cannot consume the intruder\'s ordinary runes');
+  assert.deepEqual(xpSnapshot(intruder), xpBefore, 'rejected foreign combat packets award no ordinary XP');
+  assert.equal(instanceUid(owner), ownerUid, 'foreign Fear packets preserve the real owner\'s instance');
+}
+function castFearSpellOnce(p, npc, label) {
+  const windStrike = requiredId('Component', 'magic:wind_strike');
+  assert(button(p, 'controls:com_3'), `${label}: native combat controls turn off automatic melee retaliation`);
+  assert.equal(readVar(p, 'option_nodef'), 1, `${label}: a one-spell fixture has auto-retaliate off`);
+  const displaced = [];
+  for (const rune of ['airrune', 'mindrune']) {
+    if (count(p, rune) !== 0) continue;
+    if (inventory(p).every(Boolean)) {
+      const item = inventory(p).find(item => item && !WEAPON_IDS.has(obj(item.name)) &&
+        !types.ObjType.get(obj(item.name)).stackable);
+      assert(item, `${label}: a disclosed ordinary full-bag fixture can make room for the rune`);
+      assert(p.invDel(inv, obj(item.name), item.count), `${label}: temporarily remove only ordinary fixture gear`);
+      displaced.push(item);
+    }
+    assert.equal(p.invAdd(inv, obj(rune), 1), 1, `${label}: seed one standard ${rune}`);
+  }
+  World.processInfo();
+  rsbuf.npcInfo(0, p.slot, 0, 0, true);
+  assert(rsbuf.hasNpc(p.slot, npc.nid), `${label}: native NPC update renders the owned Fear Reaper`);
+  assert(p.isComponentVisible(types.Component.get(windStrike)), `${label}: Wind Strike is visible to the owner`);
+  const hpBefore = npc.levels[HP_STAT];
+  const tallyBefore = readVar(p, 'soulbane_fear_killedtally');
+  const xpBefore = xpSnapshot(p);
+  const airBefore = count(p, 'airrune');
+  const mindBefore = count(p, 'mindrune');
+  p.clearInteraction();
+  if (!p.inOperableDistance(npc)) {
+    const route = [...map.findPathToEntity(p.level, p.x, p.z, npc.x, npc.z, p.width, npc.width, npc.length)]
+      .map(value => unpackWorld(value));
+    assert(route.length > 0, `${label}: moving spell target has a packed entity approach route`);
+    assert(MoveClickHandler.handle(new MoveClick(route.map(({ x, z }) => ({ x, z })), 0, true), p),
+      `${label}: paired native MOVE_OPCLICK approaches the live spell target`);
+  }
+  assert(OpNpcTHandler.handle(new OpNpcT(npc.nid, windStrike), p),
+    `${label}: native APNPCT accepts the eligible owner's spell target`);
+  assert.match(p.getApTrigger()?.name ?? '', /^\[apnpct,/i,
+    `${label}: owner spell dispatch reaches the common APNPCT combat path`);
+  p.processInteraction();
+  for (let tick = 0; tick < 64; tick++) worldTick();
+  assert(xpSnapshot(p)[PlayerStat.MAGIC] > xpBefore[PlayerStat.MAGIC],
+    `${label}: eligible owner receives ordinary spell XP`);
+  assert.equal(count(p, 'airrune'), airBefore - 1, `${label}: real Wind Strike consumes one air rune`);
+  assert.equal(count(p, 'mindrune'), mindBefore - 1, `${label}: real Wind Strike consumes one mind rune`);
+  for (const item of displaced) {
+    assert.equal(p.invAdd(inv, obj(item.name), item.count), item.count,
+      `${label}: restore the exact ordinary fixture item after the rune is consumed`);
+  }
+  assert(npc.levels[HP_STAT] <= hpBefore, `${label}: ordinary spell resolution never heals the Fear Reaper`);
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), tallyBefore,
+    `${label}: a spell cast without death cannot award Fear credit`);
+}
 
 function nativeLogoutAndReload(p, label) {
   const oldPid = p.pid;
   const oldSlot = p.slot;
-  const oldUid = p.uid;
   const username = p.username;
   p.clearInteraction();
   for (let tick = 0; tick < 128 && World.currentTick < p.preventLogoutUntil; tick++) worldTick();
@@ -789,7 +1095,11 @@ function nativeLogoutAndReload(p, label) {
   // Stand in for the successful login-server save acknowledgement before relog.
   World.logoutRequests.delete(username);
   const loaded = PlayerLoading.load(username, new Packet(request.save), null);
-  loaded.pid = oldPid; loaded.slot = oldSlot; loaded.uid = oldUid; loaded.isActive = true;
+  loaded.pid = oldPid; loaded.slot = oldSlot;
+  // Loading reconstructs username37 from the saved username. Use its real
+  // identity, not makePlayer's synthetic pre-save hash, for native UID lookups.
+  loaded.uid = ((Number(loaded.username37 & 0x1fffffn) << 11) | oldSlot) >>> 0;
+  loaded.isActive = true;
   loaded.packets = []; loaded.messages = [];
   loaded.write = packet => loaded.packets.push(packet);
   loaded.messageGame = text => loaded.messages.push(String(text));
@@ -917,7 +1227,7 @@ function assertPrivateCopyHasNoEscapeAccess(p, label) {
   assert.equal(npcs.length, 8, `${label}: the copy contains only its eight Rage actors`);
   assert(npcs.every(npc => RAGE_IDS.has(npc.type)
     && npc.vars[NPC_INSTANCE] === instanceUid(p)
-    && npc.vars[NPC_OWNER] === p.uid), `${label}: no familiar or foreign NPC occupies the copy`);
+    && (npc.vars[NPC_OWNER] >>> 0) === p.uid), `${label}: no familiar or foreign NPC occupies the copy`);
 
   const objects = zones.flatMap(zone => [...zone.getAllObjsUnsafe()]);
   assert.equal(objects.length, 0, `${label}: no other player's ground item is present in the copy`);
@@ -965,6 +1275,378 @@ function surfaceTile() {
   assert(declaration, 'Soulbane declares the surface exit coordinate');
   const { level, x, z } = unpackWorld(packedTemplate(declaration));
   return [level, x, z];
+}
+function ensureFearCombatWeapon(p, label) {
+  const worn = types.InvType.getId('worn');
+  const hasScimitar = count(p, 'rune_scimitar') + count(p, 'rune_scimitar', worn) > 0;
+  if (!hasScimitar) {
+    let added = p.invAdd(inv, obj('rune_scimitar'), 1);
+    if (added !== 1) {
+      const filler = inventory(p).find(item => item && !WEAPON_IDS.has(obj(item.name)) &&
+        types.ObjType.get(obj(item.name))?.stackable === false);
+      assert(filler, `${label}: one ordinary non-stackable item can make room for test combat gear`);
+      assert(p.invDel(inv, obj(filler.name), filler.count), `${label}: remove only disclosed fixture gear`);
+      added = p.invAdd(inv, obj('rune_scimitar'), 1);
+    }
+    assert.equal(added, 1, `${label}: one ordinary rune scimitar is seeded for authentic Fear combat`);
+  }
+  if (count(p, 'rune_scimitar', worn) === 0) {
+    assert(held(p, 'rune_scimitar', 2), `${label}: native Wield inventory action accepted`);
+  }
+  assert.equal(count(p, 'rune_scimitar', worn), 1, `${label}: ordinary rune scimitar is equipped`);
+}
+function seedFearCombatFixture(p, label) {
+  for (const stat of [PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE,
+    PlayerStat.HITPOINTS, PlayerStat.MAGIC]) p.setLevel(stat, 99);
+  ensureFearCombatWeapon(p, label);
+  assert.equal(angerWeaponTotal(p), 0, `${label}: Fear combat does not use a Rage weapon`);
+}
+function assertFearFreshEntry(p, label) {
+  assert.equal(stage(p), FEAR_STAGE, `${label}: permanent progress remains in active Fear`);
+  assert(instanceUid(p) > 0, `${label}: a fresh private region owns Fear`);
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), `${label}: re-entry lands at the packed Fear entry`);
+  assert.equal(fearNpcsFor(p).length, 0, `${label}: an incomplete Fear room does not resume a stale reaper`);
+  fearDoor(p);
+  for (const [name, value] of [
+    ['soulbane_fear_enemydoor_old', 0], ['soulbane_fear_monspres', 0],
+    ['soulbane_fear_killedtally', 0], ['soulbane_fear_exitlit', 0]
+  ]) assert.equal(readVar(p, name), value, `${label}: ${name} resets for incomplete Fear`);
+  assertNoAngerItems(p, label);
+}
+function enterFearAfterRift(p, label) {
+  chooseRiftWithRope(p, label);
+  assertFearFreshEntry(p, label);
+  assert.equal(rageNpcsFor(p).length, 0, `${label}: Fear re-entry never respawns Rage actors`);
+}
+function searchEveryFearHole(p, label) {
+  const activeDoor = fearDoor(p);
+  const holes = fearHoleLocs(p);
+  const tallyBefore = readVar(p, 'soulbane_fear_killedtally');
+  for (const [index, hole] of holes.entries()) {
+    const ordinal = index + 1;
+    if (ordinal === activeDoor) continue;
+    searchFearHole(p, hole, `${label}: wrong hole ${ordinal}`);
+    assert.equal(fearNpcsFor(p).length, 0, `${label}: wrong hole ${ordinal} cannot spawn a reaper`);
+    assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, `${label}: wrong hole ${ordinal} leaves no encounter marker`);
+    assert.equal(readVar(p, 'soulbane_fear_killedtally'), tallyBefore, `${label}: wrong hole ${ordinal} earns no kill`);
+  }
+  searchFearHole(p, holes[activeDoor - 1], `${label}: active hole ${activeDoor}`);
+  for (let tick = 0; tick < 32 && fearNpcsFor(p).length === 0; tick++) worldTick();
+  return ensureFearReaper(p, `${label}: sole active hole ${activeDoor}`);
+}
+function fearSceneTolnas() {
+  return [...World.npcs].filter(npc => npc?.isActive &&
+    (npc.baseType === TOLNA_SCENE || npc.type === TOLNA_SCENE));
+}
+function observeFearScene(p) {
+  const playerStand = roomCoord(p, 'soulbane_fear_scene_player');
+  const tolnaStand = roomCoord(p, 'soulbane_fear_scene_tolna');
+  const tolna = fearSceneTolnas().filter(npc =>
+    npc.level === tolnaStand.level && npc.x === tolnaStand.x && npc.z === tolnaStand.z);
+  if (tolna.length === 0 || p.level !== playerStand.level ||
+    p.x !== playerStand.x || p.z !== playerStand.z) return false;
+  assert.equal(tolna.length, 1, 'Fear scene stages exactly one Tolna at the packed memory tile');
+  assertFootprintOpen(playerStand.level, playerStand.x, playerStand.z, 1, 1, 'Fear scene player footprint');
+  assertFootprintOpen(tolna[0].level, tolna[0].x, tolna[0].z, tolna[0].width, tolna[0].length,
+    'Fear scene Tolna footprint');
+  nativeRouteFrom(playerStand, { level: tolna[0].level, x: tolna[0].x, z: tolna[0].z },
+    'Fear scene player can reach staged Tolna on foot');
+  return true;
+}
+function finishFearScene(p) {
+  let sawFearStaging = false;
+  const pages = [];
+  const messageStart = p.messages.length;
+  for (let tick = 0; tick < 1200; tick++) {
+    if (observeFearScene(p)) sawFearStaging = true;
+    const state = p.activeScript;
+    if (state?.execution === ScriptState.PAUSEBUTTON) {
+      const root = types.Component.get(p.modalChat)?.comName ?? '';
+      assert(!/^multi[2-5]$/.test(root), 'the compiled Fear scene has no unanswered choices');
+      pages.push(...dialoguePage(p));
+      resumeDialogue(p);
+      continue;
+    }
+    worldTick();
+    if (observeFearScene(p)) sawFearStaging = true;
+    if (stage(p) === FEAR_COMPLETE_STAGE && p.queue.head() === null &&
+      (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
+  }
+  assert(sawFearStaging, 'the fifth-death scene stages the player and Tolna before returning');
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, 'the Fear scene, not the fifth death queue, commits stage 5');
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), 'the Fear scene returns to its room entry');
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, 'the completed five-kill tally is preserved');
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, 'the western exit lights only when the scene commits');
+  assert.equal(fearNpcsFor(p).length, 0, 'the completed Fear scene leaves no reaper');
+  assert.equal(fearSceneTolnas().length, 0, 'the completed Fear scene removes staged Tolna');
+  return { pages: pages.join(' '), messages: p.messages.slice(messageStart).join(' ') };
+}
+function leaveFearToSurface(p, label, choices = [1]) {
+  const exit = fearSurfaceExitLoc(p);
+  goToStand(p, exit, `${label}: walk to the original surface Exit`);
+  const result = operateLoc(p, exit, 1, choices, label);
+  assert.match(result.trigger.name, /^\[oploc1,soul_bane_fwall_void_small\]$/,
+    `${label}: uses the original Fear surface Exit loc`);
+  return result;
+}
+function assertFearExitCleanup(p, oldUid, expectedTile, ordinaryBefore, label) {
+  assert.equal(stage(p), FEAR_STAGE, `${label}: cleanup preserves unfinished Fear`);
+  assert.equal(instanceUid(p), 0, `${label}: cleanup releases the private copy`);
+  assert.deepEqual(tile(p), expectedTile, `${label}: cleanup reaches the observed outside tile`);
+  assertFearReset(p, label);
+  assertNoAngerItems(p, label);
+  assert.equal(fearNpcsWithInstance(oldUid).length, 0, `${label}: no reaper survives in the old copy`);
+  assert.deepEqual(normalInventory(p), ordinaryBefore, `${label}: cleanup preserves ordinary bag inventory`);
+  assert.equal(count(p, 'rune_scimitar', types.InvType.getId('worn')), 1,
+    `${label}: cleanup preserves the ordinary equipped weapon`);
+  for (let tick = 0; tick < 16; tick++) worldTick();
+  assertFearReset(p, label);
+  assert.equal(stage(p), FEAR_STAGE, `${label}: settled stale queues cannot complete Fear`);
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 0, `${label}: settled stale queues cannot restore partial kills`);
+}
+function assertFearCompleteEntry(p, label) {
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, `${label}: completed Fear progress persists`);
+  assert(instanceUid(p) > 0, `${label}: completed progress owns a fresh private region`);
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), `${label}: completed re-entry lands in Fear`);
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, `${label}: all five kills survive re-entry`);
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, `${label}: the illuminated exit survives re-entry`);
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor'), 0, `${label}: completed Fear has no active hole`);
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor_old'), 0, `${label}: completed Fear has no stale exclusion`);
+  assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, `${label}: completed Fear has no encounter marker`);
+  assert.equal(fearNpcsFor(p).length, 0, `${label}: completed re-entry cannot respawn a Reaper`);
+  assert.equal(fearSceneTolnas().length, 0, `${label}: completed re-entry cannot respawn scene Tolna`);
+  assertNoAngerItems(p, label);
+}
+function assertFearCompleteExit(p, oldUid, expectedTile, ordinaryBefore, label) {
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, `${label}: cleanup preserves completed Fear`);
+  assert.equal(instanceUid(p), 0, `${label}: cleanup releases the completed private copy`);
+  assert.deepEqual(tile(p), expectedTile, `${label}: cleanup reaches the outside tile`);
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, `${label}: completed kill count is permanent`);
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, `${label}: completed exit remains lit`);
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor'), 0, `${label}: cleanup clears completed active-hole state`);
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor_old'), 0, `${label}: cleanup clears completed previous-hole state`);
+  assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, `${label}: cleanup clears completed encounter state`);
+  assertNoAngerItems(p, label);
+  assert.equal(fearNpcsWithInstance(oldUid).length, 0, `${label}: no Reaper survives in the old completed copy`);
+  assert.deepEqual(normalInventory(p), ordinaryBefore, `${label}: cleanup preserves ordinary bag inventory`);
+  assert.equal(count(p, 'rune_scimitar', types.InvType.getId('worn')), 1,
+    `${label}: cleanup preserves the ordinary equipped weapon`);
+  for (let tick = 0; tick < 16; tick++) worldTick();
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, `${label}: stale queues cannot erase completed Fear`);
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, `${label}: stale queues cannot close the completed exit`);
+}
+function testFearProgression(p, stageThreeColor) {
+  const qpBeforeFear = readVar(p, 'qp');
+  const coinsBeforeFear = count(p, 'coins');
+  const xpBeforeFear = xpSnapshot(p);
+  chooseRiftWithRope(p, 'completed Rage re-entry before Fear');
+  assert.equal(stage(p), 3, 'Rage completion survives the real rift re-entry before the next room');
+  assert.equal(rageNpcsFor(p).length, 0, 'completed Rage re-entry does not respawn its monsters');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'completed Rage remains the active quest before Fear');
+
+  const rageUid = instanceUid(p);
+  const boundary = rageFearBoundaryLoc(p);
+  goToStand(p, boundary, 'stage-3 transition: walk to the original eastern Fear exit');
+  const transition = operateLoc(p, boundary, 1, [], 'stage-3 transition into Fear');
+  assert.equal(transition.trigger.name, '[oploc1,soul_bane_awall_void_exit]',
+    'Rage-to-Fear transition uses the original eastern boundary loc');
+  assert.equal(stage(p), FEAR_STAGE, 'the real next-room exit enters active Fear stage 4');
+  assert.equal(instanceUid(p), rageUid, 'Rage-to-Fear transition stays inside the owner\'s private copy');
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), 'the eastern boundary lands at the packed Fear entry');
+  assertNoAngerItems(p, 'stage-3 Fear transition strips the Rage weapon');
+  assert.equal(rageNpcsFor(p).length, 0, 'Fear entry removes every Rage actor');
+  assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'Fear entry clears the completed Rage meter');
+  assert.equal(readVar(p, 'soulbane_anger_donespecial'), 0, 'Fear entry clears the completed Rage scene flag');
+  fearDoor(p);
+  for (const [name, value] of [
+    ['soulbane_fear_enemydoor_old', 0], ['soulbane_fear_monspres', 0],
+    ['soulbane_fear_killedtally', 0], ['soulbane_fear_exitlit', 0]
+  ]) assert.equal(readVar(p, name), value, `first Fear entry initializes ${name}`);
+  assert.deepEqual(xpSnapshot(p), xpBeforeFear, 'entering Fear awards no quest or combat XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeFear, 'entering Fear awards no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeFear, 'entering Fear awards no coins');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'active Fear remains an incomplete quest row');
+  assertJournal(p, ['second room', 'your son\'s voice again', 'Help him get over his fear!'],
+    ['exit has been illuminated', 'Soulbane is complete'], 'stage-4 Fear journal');
+
+  const routes = checkFearRoomRoutes(p);
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, routes.entry, 'route auditing leaves the owner at the real Fear entry');
+  seedFearCombatFixture(p, 'Fear ordinary-combat fixture');
+
+  goToStand(p, routes.westExit, 'stage-4 closed west exit: walk to the western black hole');
+  const closedMark = p.messages.length;
+  const closed = operateLoc(p, routes.westExit, 1, [], 'stage-4 closed western black-hole refusal');
+  assert.equal(closed.trigger.name, '[oploc1,soul_bane_fwall_exit_closed]',
+    'unlit west exit dispatches its original closed visible form');
+  assert(p.messages.slice(closedMark).join(' ').includes("There's no way I'm going in there!"),
+    'stage-4 closed west exit refuses entry without changing progress');
+  assert.equal(stage(p), FEAR_STAGE, 'closed exit does not fabricate Fear completion');
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 0, 'closed exit earns no Fear kills');
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 0, 'closed exit remains unlit before the fifth-death scene');
+
+  const firstReaper = searchEveryFearHole(p, 'Fear six-hole dispatch');
+  const intruder = playerFixture();
+  testForeignFearInteractions(p, intruder, firstReaper);
+  castFearSpellOnce(p, firstReaper, 'eligible-owner Wind Strike against Fear');
+  killFearReaper(p, firstReaper, 0, 'Fear partial kill before surface exit');
+  const firstPartialXp = xpSnapshot(p);
+  const firstOldUid = instanceUid(p);
+  const firstOrdinaryInventory = normalInventory(p);
+  leaveFearToSurface(p, 'Fear incomplete surface exit');
+  assertFearExitCleanup(p, firstOldUid, surfaceTile(), firstOrdinaryInventory,
+    'Fear incomplete surface exit');
+  assert.deepEqual(xpSnapshot(p), firstPartialXp, 'surface cleanup does not award extra XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeFear, 'unfinished Fear exit grants no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeFear, 'unfinished Fear exit grants no coins');
+
+  enterFearAfterRift(p, 'Fear re-entry after confirmed surface exit');
+  let liveReaper = ensureFearReaper(p, 'Fear safe-teleport cleanup setup');
+  const teleportUid = instanceUid(p);
+  const teleportInventory = normalInventory(p);
+  const teleportXp = xpSnapshot(p);
+  const teleportTile = { level: 0, x: 3213, z: 3424 };
+  safeTeleport(p, teleportTile, 'Fear owner safe-teleports out with a live Reaper');
+  assertFearExitCleanup(p, teleportUid, [teleportTile.level, teleportTile.x, teleportTile.z],
+    teleportInventory, 'Fear outside-teleport cleanup');
+  assert.deepEqual(xpSnapshot(p), teleportXp, 'outside-teleport cleanup awards no XP');
+  safeTeleport(p, { level: surfaceTile()[0], x: surfaceTile()[1], z: surfaceTile()[2] },
+    'Fear lifecycle returns to the disclosed surface travel fixture');
+  enterFearAfterRift(p, 'Fear re-entry after outside teleport');
+
+  liveReaper = ensureFearReaper(p, 'Fear logout cleanup partial-kill setup');
+  killFearReaper(p, liveReaper, 0, 'Fear partial kill before logout');
+  liveReaper = ensureFearReaper(p, 'Fear logout cleanup live-actor setup');
+  const logoutUid = instanceUid(p);
+  const logoutInventory = normalInventory(p);
+  const logoutXp = xpSnapshot(p);
+  p = nativeLogoutAndReload(p, 'unfinished Fear logout with a live Reaper');
+  assertFearExitCleanup(p, logoutUid, surfaceTile(), logoutInventory,
+    'unfinished Fear logout cleanup');
+  assert.deepEqual(xpSnapshot(p), logoutXp, 'unfinished Fear logout/relogin preserves earned ordinary XP only');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'unfinished Fear login keeps the active quest-row color');
+  assertJournal(p, ['second room', 'your son\'s voice again', 'Help him get over his fear!'],
+    ['exit has been illuminated', 'Soulbane is complete'], 'post-login stage-4 Fear journal');
+  enterFearAfterRift(p, 'Fear re-entry after incomplete logout');
+
+  liveReaper = ensureFearReaper(p, 'Fear death cleanup partial-kill setup');
+  killFearReaper(p, liveReaper, 0, 'Fear partial kill before death');
+  liveReaper = ensureFearReaper(p, 'Fear death cleanup live-actor setup');
+  const deathUid = instanceUid(p);
+  const deathXp = xpSnapshot(p);
+  const deathQp = readVar(p, 'qp');
+  const deathTile = tile(p);
+  p.levels[PlayerStat.HITPOINTS] = 0;
+  assert(ScriptProvider.getByName('[proc,player_die]'), 'ordinary player_die procedure is packed for Fear cleanup');
+  runProc('player_die', p);
+  for (let tick = 0; tick < 80 && (p.activeScript || p.queue.head() !== null); tick++) worldTick();
+  for (let tick = 0; tick < 3; tick++) worldTick();
+  assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED,
+    'ordinary Fear death/respawn animation and cleanup settle');
+  assert.equal(stage(p), FEAR_STAGE, 'death preserves the unfinished Fear stage');
+  assert.equal(instanceUid(p), 0, 'death cleanup releases the Fear instance');
+  assert(!CoordGrid.isInstanceX(p.x), 'death respawns outside the Fear copy');
+  assert.equal(World.instances.findInstanceByUid(deathUid - 1), null, 'death deletes the old Fear copy');
+  assert.equal(fearNpcsWithInstance(deathUid).length, 0, 'death removes every old Fear Reaper');
+  assertFearReset(p, 'Fear death cleanup');
+  assertNoAngerItems(p, 'Fear death cleanup');
+  assert.deepEqual(xpSnapshot(p), deathXp, 'ordinary death grants neither Fear nor quest XP');
+  assert.equal(readVar(p, 'qp'), deathQp, 'death grants no Fear quest points');
+  assert.notDeepEqual(tile(p), deathTile, 'ordinary death moves the player out of the Fear death tile');
+
+  const surface = surfaceTile();
+  safeTeleport(p, { level: surface[0], x: surface[1], z: surface[2] },
+    'Fear death lifecycle returns to the disclosed surface travel fixture');
+  enterFearAfterRift(p, 'Fear re-entry after ordinary death');
+  ensureFearCombatWeapon(p, 'Fear post-death combat fixture');
+
+  for (let ordinal = 0; ordinal < 5; ordinal++) {
+    const reaper = ensureFearReaper(p, `Fear five-kill run reaper ${ordinal + 1}`);
+    killFearReaper(p, reaper, ordinal, `Fear five-kill run death ${ordinal + 1}`);
+  }
+  const xpBeforeScene = xpSnapshot(p);
+  const qpBeforeScene = readVar(p, 'qp');
+  const coinsBeforeScene = count(p, 'coins');
+  const scene = finishFearScene(p);
+  assert(scene.pages.includes('Phew, I don\'t feel so scared now.'),
+    'the fifth real death reaches the Fear scene before its completion boundary');
+  assert(scene.messages.includes("What's that?"), 'the Fear scene returns through its authored final game message');
+  assert.deepEqual(xpSnapshot(p), xpBeforeScene, 'the Fear scene awards no terminal quest XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeScene, 'the Fear scene grants no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeScene, 'the Fear scene grants no coins');
+  assert.equal(qpBeforeScene, qpBeforeFear, 'all of Fear grants no quest points');
+  assert.equal(coinsBeforeScene, coinsBeforeFear, 'all of Fear grants no coins');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'stage 5 remains an active quest, not full completion');
+  assertJournal(p, ['overcome fear in the second room', 'exit has been illuminated',
+    'haven\'t actually ventured through yet.'], ['Tolna has been rescued', 'Soulbane is complete'],
+  'stage-5 Fear journal');
+
+  const westExit = fearWestExitLoc(p);
+  goToStand(p, westExit, 'stage-5 open west exit: walk to the western black hole');
+  const openMark = p.messages.length;
+  const open = operateLoc(p, westExit, 1, [], 'stage-5 Confusion boundary refusal');
+  assert.equal(open.trigger.name, '[oploc1,soul_bane_fwall_exit]',
+    'lit west exit dispatches its original open visible form');
+  assert(p.messages.slice(openMark).join(' ').includes('That way is not available yet.'),
+    'the not-yet-implemented Confusion room remains a functional refusal');
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, 'the Confusion boundary does not advance beyond Fear');
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, 'Confusion refusal preserves all five Fear kills');
+
+  const completeUid = instanceUid(p);
+  const completeInventory = normalInventory(p);
+  const completeXp = xpSnapshot(p);
+  const completedSurface = fearSurfaceExitLoc(p);
+  goToStand(p, completedSurface, 'stage-5 leave: walk from the black-hole side to the surface Exit');
+  const leave = operateLoc(p, completedSurface, 1, [], 'stage-5 completed surface exit');
+  assert.equal(leave.trigger.name, '[oploc1,soul_bane_fwall_void_small]',
+    'completed Fear leaves through the original surface Exit loc');
+  assertFearCompleteExit(p, completeUid, surfaceTile(), completeInventory, 'completed Fear surface exit');
+  assert.deepEqual(xpSnapshot(p), completeXp, 'completed surface exit awards no terminal XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeFear, 'completed Fear still grants no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeFear, 'completed Fear still grants no coins');
+
+  const completeXpBeforeReentry = xpSnapshot(p);
+  chooseRiftWithRope(p, 'completed Fear surface-descent re-entry');
+  assertFearCompleteEntry(p, 'completed Fear surface-descent re-entry');
+  for (let tick = 0; tick < 32; tick++) worldTick();
+  assert.equal(p.queue.head(), null, 'completed Fear re-entry queues no duplicate scene');
+  assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED,
+    'completed Fear re-entry starts no duplicate scene script');
+  assert.deepEqual(xpSnapshot(p), completeXpBeforeReentry, 'completed Fear re-entry awards no duplicate XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeFear, 'completed Fear re-entry grants no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeFear, 'completed Fear re-entry grants no coins');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'completed Fear re-entry keeps the active quest-row color');
+
+  const completeLogoutUid = instanceUid(p);
+  const completeLogoutInventory = normalInventory(p);
+  const completeLogoutXp = xpSnapshot(p);
+  p = nativeLogoutAndReload(p, 'completed Fear logout inside its copy');
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, 'completed Fear logout preserves stage 5');
+  assert.equal(instanceUid(p), 0, 'completed Fear login clears its temporary instance UID');
+  assert.deepEqual(tile(p), surfaceTile(), 'completed Fear logout lands at the saved surface exit');
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, 'completed Fear logout preserves its five kills');
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, 'completed Fear logout preserves the illuminated exit');
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor'), 0, 'completed Fear login clears the active-hole state');
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor_old'), 0, 'completed Fear login clears the old-hole state');
+  assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, 'completed Fear login clears the encounter marker');
+  assertNoAngerItems(p, 'completed Fear logout/relogin');
+  assert.equal(fearNpcsWithInstance(completeLogoutUid).length, 0, 'completed logout removes all old Reapers');
+  assert.deepEqual(normalInventory(p), completeLogoutInventory, 'completed logout preserves ordinary bag inventory');
+  assert.deepEqual(xpSnapshot(p), completeLogoutXp, 'completed logout preserves exactly the earned ordinary XP');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'completed Fear login keeps the active quest-row color');
+  assertJournal(p, ['overcome fear in the second room', 'exit has been illuminated',
+    'haven\'t actually ventured through yet.'], ['Tolna has been rescued', 'Soulbane is complete'],
+  'post-login stage-5 Fear journal');
+  chooseRiftWithRope(p, 'completed Fear re-entry after logout');
+  assertFearCompleteEntry(p, 'completed Fear re-entry after logout');
+  for (let tick = 0; tick < 32; tick++) worldTick();
+  assert.equal(p.queue.head(), null, 'completed post-logout re-entry does not replay the Fear scene');
+  assert.deepEqual(xpSnapshot(p), completeLogoutXp, 'completed post-logout re-entry does not award repeat XP');
+  console.log(`Fear saved boundary ${JSON.stringify({
+    stage: stage(p), kills: readVar(p, 'soulbane_fear_killedtally'),
+    exitLit: readVar(p, 'soulbane_fear_exitlit'), liveReapers: fearNpcsFor(p).length,
+    sceneActors: fearSceneTolnas().length, questColor: latestQuestColor(p)
+  })}`);
+  return { player: p, completed: p, stageThreeColor };
 }
 
 function testPrivateCopyAccess() {
@@ -1337,15 +2019,6 @@ function testMainPath() {
   assertJournal(p, ['managed to defeat the monsters in the room', "Sorry, I've yet to enter the next room"],
     ['Tolna has been rescued', 'Soulbane is complete'], 'stage-3 journal');
 
-  const fear = fearExitLoc(p);
-  goToStand(p, fear, 'stage-3 closed boundary: walk to packed Fear exit');
-  const fearMessageMark = p.messages.length;
-  const fearResult = operateLoc(p, fear, 1, [], 'stage-3 next-room boundary Use');
-  assert.match(fearResult.trigger.name, /^\[oploc1,soul_bane_awall_void_exit\]$/);
-  assert(p.messages.slice(fearMessageMark).join(' ').includes('not available yet'),
-    'next-room way truthfully refuses to open the unimplemented Fear room');
-  assert.equal(stage(p), 3, 'next-room refusal preserves the permanent stage-3 boundary');
-  assert.equal(instanceUid(p) !== 0, true, 'refusing the next room does not strand or evict the completed player');
 
   const completedActorsBeforeLeave = rageNpcsFor(p).length;
   assert(completedActorsBeforeLeave === 0, 'completed room removes its Rage attackers');
@@ -1374,7 +2047,8 @@ function testMainPath() {
   assertJournal(completed, ['managed to defeat the monsters in the room', "Sorry, I've yet to enter the next room"],
     ['Tolna has been rescued', 'Soulbane is complete'], 'post-login stage-3 journal');
   assert.equal(rageNpcsWithInstance(completedUid).length, 0, 'completed logout removes all actors from its old copy');
-  return { player: p, completed, stageTwoColor, stageThreeColor, reward };
+  const fearRun = testFearProgression(completed, stageThreeColor);
+  return { player: fearRun.player, completed: fearRun.completed, stageTwoColor, stageThreeColor, reward };
 }
 
 function run() {
@@ -1414,7 +2088,7 @@ function run() {
   testTradeEscapeRoute();
   testDropEscapeRoute();
   testRoomExitRemovesAngerWeapon();
-  console.log('PASS Soulbane compiled first-unit regression: entry, Rage combat, ownership, lifecycle, safe teleports and escape routes');
+  console.log('PASS Soulbane compiled regression: Rage and Fear progression, native combat, ownership, saved boundaries, lifecycle and escape routes');
   console.log(JSON.stringify({ stageTwoColor: main.stageTwoColor, stageThreeColor: main.stageThreeColor, attackXp: main.reward }));
 }
 

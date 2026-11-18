@@ -1,0 +1,108 @@
+// VERIFIED period rule: search the holes, defeat five reapers, then watch a memory.
+// CANDIDATE random-hole mechanics and speeches: retained Old School sources.
+// UNKNOWN original numeric stages, random distribution and exact staging.
+[proc,soulbane_fear_enter]
+// Both callers select the copy; surface admission is not inside it yet.
+if (%soulbane_instance = 0 | %soulbane_prog < 3 | %soulbane_prog > 5) return;
+if (add(region_uid, 1) ! %soulbane_instance) return;
+def_boolean $first = false;
+if (%soulbane_prog = 3) $first = true;
+p_teleport(~soulbane_room_coord(^soulbane_fear_entry));
+~soulbane_clear_room_npcs;
+~soulbane_clear_weapons;
+%soulbane_anger_weaponmulti = 0;
+if ($first = true) {
+    %soulbane_prog = 4;
+    ~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+}
+~soulbane_fear_reset;
+if (%soulbane_prog = 4) {
+    ~soulbane_fear_choose;
+    if ($first = true) {
+        mes("It's so quiet and dark. I FEAR I may never escape this horrid place.");
+        mes("Mum, Dad, help me!");
+    }
+    mes("Hmmm, no light sources. So why can I still see down here? This can't just be a simple dungeon.");
+}
+
+[proc,soulbane_fear_reset]
+%soulbane_fear_monspres = 0;
+%soulbane_fear_enemydoor = 0;
+%soulbane_fear_enemydoor_old = 0;
+if (%soulbane_prog = 4) {
+    %soulbane_fear_killedtally = 0;
+    %soulbane_fear_exitlit = 0;
+}
+
+// A uniform reconstruction choice, excluding the just-cleared hole after a kill.
+[proc,soulbane_fear_choose]
+if (%soulbane_fear_enemydoor_old = 0) {
+    %soulbane_fear_enemydoor = add(random(6), 1);
+} else {
+    %soulbane_fear_enemydoor = add(random(5), 1);
+    if (%soulbane_fear_enemydoor >= %soulbane_fear_enemydoor_old) {
+        %soulbane_fear_enemydoor = add(%soulbane_fear_enemydoor, 1);
+    }
+}
+
+[oploc1,soul_bane_fwall_void] @soulbane_fear_look;
+[oploc1,soul_bane_fwall_void2] @soulbane_fear_look;
+[oploc1,soul_bane_fwall_void3] @soulbane_fear_look;
+[oploc1,soul_bane_fwall_void4] @soulbane_fear_look;
+[oploc1,soul_bane_fwall_void5] @soulbane_fear_look;
+[oploc1,soul_bane_fwall_void6] @soulbane_fear_look;
+[label,soulbane_fear_look]
+if (~soulbane_owned = false | %soulbane_prog ! 4 | %soulbane_fear_monspres ! 0 | %soulbane_fear_killedtally >= 5) return;
+def_int $hole = 0;
+switch_loc (loc_type) {
+    case soul_bane_fwall_void : $hole = 1;
+    case soul_bane_fwall_void2 : $hole = 2;
+    case soul_bane_fwall_void3 : $hole = 3;
+    case soul_bane_fwall_void4 : $hole = 4;
+    case soul_bane_fwall_void5 : $hole = 5;
+    case soul_bane_fwall_void6 : $hole = 6;
+}
+if ($hole ! %soulbane_fear_enemydoor) {
+    say("Hello?");
+    return;
+}
+~soulbane_fear_spawn;
+
+[proc,soulbane_fear_spawn]
+if (~soulbane_owned = false | %soulbane_prog ! 4 | %soulbane_fear_monspres ! 0 | %soulbane_fear_killedtally >= 5) return;
+def_int $hole = %soulbane_fear_enemydoor;
+say("Ahhhh");
+def_coord $spawn = null;
+switch_int ($hole) {
+    case 1 : $spawn = ^soulbane_fear_reaper1;
+    case 2 : $spawn = ^soulbane_fear_reaper2;
+    case 3 : $spawn = ^soulbane_fear_reaper3;
+    case 4 : $spawn = ^soulbane_fear_reaper4;
+    case 5 : $spawn = ^soulbane_fear_reaper5;
+    case 6 : $spawn = ^soulbane_fear_reaper6;
+}
+%soulbane_fear_monspres = 1;
+~soulbane_rage_add(soulbane_fear_reaper, $spawn);
+npc_sethunt(0);
+npc_setmode(none);
+// The original fear_cut sequence ends in a long held frame. Release the
+// reconstruction scare after its first 60 cycles, not after that final hold.
+npc_anim(fear_cut, 0);
+npc_queue(4, ^soulbane_fear_scare_ticks, 0);
+
+[oploc1,soulbane_fwall_exit_multi] @soulbane_fear_west;
+[oploc1,soul_bane_fwall_exit_closed] @soulbane_fear_west;
+[oploc1,soul_bane_fwall_exit] @soulbane_fear_west;
+[label,soulbane_fear_west]
+if (~soulbane_owned = false) return;
+if (%soulbane_prog ! 5) {
+    // Original closed-form examine wording, reused as a functional refusal.
+    mes("There's no way I'm going in there!");
+    return;
+}
+// UNKNOWN beta boundary: never enter the still-unimplemented Confusion room.
+mes("That way is not available yet.");
+
+[proc,soulbane_fear_attackable]()(boolean)
+if (%soulbane_prog ! 4 | %soulbane_fear_monspres ! 1 | %soulbane_fear_killedtally >= 5) return(false);
+return(~soulbane_npc_owned);

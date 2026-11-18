@@ -21,3 +21,15 @@
 // CANDIDATE Old School behaviour, first documented in wiki r3247935 (2017-01-20).
 // No dated game update introducing this was found; period guides are silent.
 ^soulbane_rage_attack_xp = 40
+// UNKNOWN Fear staging/spawn/presentation values; original server tiles are lost.
+^soulbane_fear_entry = 0_47_81_50_48
+^soulbane_fear_reaper1 = 0_47_81_57_58
+^soulbane_fear_reaper2 = 0_47_81_57_43
+^soulbane_fear_reaper3 = 0_47_81_54_38
+^soulbane_fear_reaper4 = 0_47_81_44_38
+^soulbane_fear_reaper5 = 0_47_81_41_45
+^soulbane_fear_reaper6 = 0_47_81_41_55
+^soulbane_fear_scene_player = 0_51_53_45_63
+^soulbane_fear_scene_tolna = 0_51_53_46_63
+// fear_cut has 60 presentation cycles before its 20001-cycle final hold.
+^soulbane_fear_scare_ticks = 2

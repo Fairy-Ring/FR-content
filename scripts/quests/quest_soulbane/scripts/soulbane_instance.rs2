@@ -3,7 +3,7 @@
 // UNKNOWN: exact geometry-copy layout, owner encoding and session UID.
 // Original 377 client maps/locs are copied; the engine copies no template NPCs.
 [proc,soulbane_enter]
-if (%soulbane_prog < 1 | %soulbane_prog > 3) return;
+if (%soulbane_prog < 1 | %soulbane_prog > 5) return;
 ~soulbane_cleanup;
 def_coord $sw = region_create(1, 16, 8);
 def_int $x = 0;
@@ -18,6 +18,10 @@ while ($x < 8) {
 }
 region_setexitcoord(^soulbane_surface);
 %soulbane_instance = add(region_uid, 1);
+if (%soulbane_prog >= 4) {
+    ~soulbane_fear_enter;
+    return;
+}
 p_teleport(~soulbane_room_coord(^soulbane_rage_entry));
 if (%soulbane_prog = 1) {
     %soulbane_prog = 2;
@@ -49,9 +53,11 @@ return(false);
 if (%npc_attacking_uid ! uid | %npc_int ! %soulbane_instance) return(false);
 return(~soulbane_owned);
 
-[oploc1,soul_bane_awall_void_small]
+[oploc1,soul_bane_awall_void_small] @soulbane_exit;
+[oploc1,soul_bane_fwall_void_small] @soulbane_exit;
+[label,soulbane_exit]
 if (~soulbane_owned = false) return;
-if (%soulbane_prog = 2) {
+if (%soulbane_prog = 2 | %soulbane_prog = 4) {
     if (~p_choice2_header("Yes, I don't mind starting this room again.", 1, "No, I'll finish this room first.", 2, "Do you wish to leave?") ! 1) return;
 }
 ~soulbane_leave;
@@ -74,11 +80,14 @@ if (region_findbycoord($destination) = true) {
 [proc,soulbane_cleanup]
 clearqueue(soulbane_rage_complete);
 clearqueue(soulbane_rage_credit);
+clearqueue(soulbane_fear_credit);
+clearqueue(soulbane_fear_complete);
 walktrigger(null);
 ~soulbane_clear_weapons;
 %soulbane_anger_damagedealt = 0;
 %soulbane_anger_donespecial = 0;
 %soulbane_anger_weaponmulti = 0;
+~soulbane_fear_reset;
 %soulbane_instance = 0;
 if_openoverlay(null);
 cam_reset;
@@ -88,6 +97,7 @@ cam_reset;
 [proc,soulbane_login]
 ~soulbane_clear_weapons;
 %soulbane_anger_weaponmulti = 0;
+~soulbane_fear_reset;
 
 [proc,soulbane_clear_weapons]
 def_obj $old = inv_getobj(worn, ^wearpos_rhand);
