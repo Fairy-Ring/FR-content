@@ -316,7 +316,7 @@ if (%elidquest >= ^elid_complete) {
 if (%enakh_quest >= ^enakh_complete) {
     $questpoints = add($questpoints, ^enakh_questpoints);
 }
-if (%fairy_farmers_quest = ^fairy_farmers_complete) {
+if (%fairy_farmers_quest >= ^fairy_farmers_complete) {
     $questpoints = add($questpoints, ^fairy_farmers_questpoints);
 }
 if (%feud_var >= ^feud_complete) {

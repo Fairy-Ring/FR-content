@@ -730,6 +730,8 @@ assert.equal(cap(slashStyle), 0, 'another player cannot damage this owned encoun
 boss.setVar(npcAggressivePlayer, p.uid);
 
 // The Tanglefoot's actual AI attack is capped at the packed quest max hit.
+assert.equal(runScript('[proc,npc_melee_maxhit]', boss, p)[0], ft1Constant('ft1_tanglefoot_maxhit'),
+  'the normal melee formula reaches the sourced maximum without an outcome opt-in');
 p.setVar(aggressiveNpc, boss.uid);
 boss.setVar(attackingUid, p.uid);
 boss.setVar(npcActionDelay, 0);
@@ -737,7 +739,7 @@ const hpQueueStart = [...p.queue.all()].filter(request => request.script.name ==
 withRandom([0.999999, 0, 0.999999], () => runScript('[ai_opplayer2,fairy_tanglefoot]', boss, p));
 const attackQueue = [...p.queue.all()].filter(request => request.script.name === '[queue,combat_damage_player]').slice(hpQueueStart);
 assert.equal(attackQueue.length, 1, 'the visible Tanglefoot AI produces one real player-damage queue');
-assert(attackQueue[0].args[0] > 0 && attackQueue[0].args[0] <= ft1Constant('ft1_tanglefoot_maxhit'), 'Tanglefoot damage does not exceed its quest max-hit bound');
+assert.equal(attackQueue[0].args[0], ft1Constant('ft1_tanglefoot_maxhit'), 'the maximum RNG draw delivers the sourced Tanglefoot maximum');
 attackQueue[0].unlink();
 
 // The poison timer clears poison rather than damaging the boss.

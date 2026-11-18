@@ -52,8 +52,8 @@ if (%npc_aggressive_player ! uid | %fairy_farmers_quest ! ^ft1_enchanted) return
 @player_combat_start_ap;
 
 [ai_opplayer2,fairy_tanglefoot]
-// CANDIDATE OSRS quest-form max hit; retain shared readiness and melee accuracy.
-~npc_default_attack_outcome(^ft1_tanglefoot_maxhit, 0, false);
+// CANDIDATE OSRS quest maximum is calibrated in this NPC's own strength bonus.
+gosub(npc_default_attack);
 
 [proc,ft1_tanglefoot_max_dealt](int $maxhit, int $spell)(int)
 // VERIFIED period enchanted-secateurs rule; also the object's original examine.

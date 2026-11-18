@@ -17,6 +17,8 @@
 ^ft1_damage_blend_divisor = 2
 // CANDIDATE OSRS quest-form damage bound, not its Nightmare Zone variant.
 ^ft1_tanglefoot_maxhit = 12
+// UNKNOWN engineering bonus: native melee at Strength 97 must reach max hit 12.
+^ft1_tanglefoot_strengthbonus = 6
 // VERIFIED original gravestone tile; UNKNOWN engineering adjacent dig reach.
 ^ft1_skull_grave = 0_48_52_34_56
 ^ft1_skull_dig_range = 1

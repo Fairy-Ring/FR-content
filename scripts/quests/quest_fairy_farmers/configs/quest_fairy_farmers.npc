@@ -30,3 +30,5 @@ param=damagetype,^slash_style
 param=attack_anim,tanglefoot_attack
 param=defend_anim,tanglefoot_block
 param=death_anim,tanglefoot_death
+// UNKNOWN native-melee calibration for the sourced maximum, not a historic bonus.
+param=strengthbonus,^ft1_tanglefoot_strengthbonus
