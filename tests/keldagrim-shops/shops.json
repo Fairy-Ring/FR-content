@@ -1,0 +1,1296 @@
+[
+  {
+    "npc": "smithing_guild_ore_seller",
+    "inventory": "smithing_guild_ore_seller",
+    "title": "Ore seller.",
+    "map": [
+      30,
+      77
+    ],
+    "sellMultiplier": 1500,
+    "buyMultiplier": 400,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "UNKNOWN",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-ordan-pre-2023",
+      "src.keldagrim-shop-tipit-furnace-2005"
+    ],
+    "choices": [
+      "Yes please."
+    ],
+    "stock": [
+      {
+        "item": "copper_ore",
+        "count": 100,
+        "restock": 200,
+        "cost": 3,
+        "buy": 4,
+        "sell": 1,
+        "buyAfterSale": 4
+      },
+      {
+        "item": "tin_ore",
+        "count": 100,
+        "restock": 200,
+        "cost": 3,
+        "buy": 4,
+        "sell": 1,
+        "buyAfterSale": 4
+      },
+      {
+        "item": "iron_ore",
+        "count": 100,
+        "restock": 200,
+        "cost": 17,
+        "buy": 25,
+        "sell": 6,
+        "buyAfterSale": 24
+      },
+      {
+        "item": "mithril_ore",
+        "count": 100,
+        "restock": 200,
+        "cost": 162,
+        "buy": 243,
+        "sell": 64,
+        "buyAfterSale": 238
+      },
+      {
+        "item": "silver_ore",
+        "count": 100,
+        "restock": 200,
+        "cost": 75,
+        "buy": 112,
+        "sell": 30,
+        "buyAfterSale": 110
+      },
+      {
+        "item": "gold_ore",
+        "count": 100,
+        "restock": 200,
+        "cost": 150,
+        "buy": 225,
+        "sell": 60,
+        "buyAfterSale": 220
+      },
+      {
+        "item": "coal",
+        "count": 100,
+        "restock": 200,
+        "cost": 45,
+        "buy": 67,
+        "sell": 18,
+        "buyAfterSale": 66
+      }
+    ]
+  },
+  {
+    "npc": "smithing_guild_buyer",
+    "inventory": "smithing_guild_buyer",
+    "title": "Armour store.",
+    "map": [
+      30,
+      77
+    ],
+    "sellMultiplier": 1000,
+    "buyMultiplier": 600,
+    "delta": 20,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "UNKNOWN",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "What are you selling?",
+      "Let's have a look then."
+    ],
+    "stock": [
+      {
+        "item": "rune_med_helm",
+        "count": 0,
+        "restock": 500,
+        "cost": 19200,
+        "buy": 19200,
+        "sell": 11520,
+        "buyAfterSale": 18816
+      },
+      {
+        "item": "rune_full_helm",
+        "count": 0,
+        "restock": 500,
+        "cost": 35200,
+        "buy": 35200,
+        "sell": 21120,
+        "buyAfterSale": 34496
+      },
+      {
+        "item": "rune_platebody",
+        "count": 0,
+        "restock": 500,
+        "cost": 65000,
+        "buy": 65000,
+        "sell": 39000,
+        "buyAfterSale": 63700
+      },
+      {
+        "item": "rune_platelegs",
+        "count": 0,
+        "restock": 500,
+        "cost": 64000,
+        "buy": 64000,
+        "sell": 38400,
+        "buyAfterSale": 62720
+      },
+      {
+        "item": "rune_plateskirt",
+        "count": 0,
+        "restock": 500,
+        "cost": 64000,
+        "buy": 64000,
+        "sell": 38400,
+        "buyAfterSale": 62720
+      },
+      {
+        "item": "rune_sq_shield",
+        "count": 0,
+        "restock": 500,
+        "cost": 38400,
+        "buy": 38400,
+        "sell": 23040,
+        "buyAfterSale": 37632
+      },
+      {
+        "item": "rune_kiteshield",
+        "count": 0,
+        "restock": 500,
+        "cost": 54400,
+        "buy": 54400,
+        "sell": 32640,
+        "buyAfterSale": 53312
+      },
+      {
+        "item": "rune_chainbody",
+        "count": 0,
+        "restock": 500,
+        "cost": 50000,
+        "buy": 50000,
+        "sell": 30000,
+        "buyAfterSale": 49000
+      },
+      {
+        "item": "adamant_med_helm",
+        "count": 0,
+        "restock": 500,
+        "cost": 1920,
+        "buy": 1920,
+        "sell": 1152,
+        "buyAfterSale": 1881
+      },
+      {
+        "item": "adamant_full_helm",
+        "count": 0,
+        "restock": 500,
+        "cost": 3520,
+        "buy": 3520,
+        "sell": 2112,
+        "buyAfterSale": 3449
+      },
+      {
+        "item": "adamant_platebody",
+        "count": 0,
+        "restock": 500,
+        "cost": 12800,
+        "buy": 12800,
+        "sell": 7680,
+        "buyAfterSale": 12544
+      },
+      {
+        "item": "adamant_platelegs",
+        "count": 0,
+        "restock": 500,
+        "cost": 6400,
+        "buy": 6400,
+        "sell": 3840,
+        "buyAfterSale": 6272
+      },
+      {
+        "item": "adamant_plateskirt",
+        "count": 0,
+        "restock": 500,
+        "cost": 6400,
+        "buy": 6400,
+        "sell": 3840,
+        "buyAfterSale": 6272
+      },
+      {
+        "item": "adamant_sq_shield",
+        "count": 0,
+        "restock": 500,
+        "cost": 3840,
+        "buy": 3840,
+        "sell": 2304,
+        "buyAfterSale": 3763
+      },
+      {
+        "item": "adamant_kiteshield",
+        "count": 0,
+        "restock": 500,
+        "cost": 5440,
+        "buy": 5440,
+        "sell": 3264,
+        "buyAfterSale": 5331
+      },
+      {
+        "item": "adamant_chainbody",
+        "count": 0,
+        "restock": 500,
+        "cost": 4800,
+        "buy": 4800,
+        "sell": 2880,
+        "buyAfterSale": 4704
+      },
+      {
+        "item": "mithril_med_helm",
+        "count": 0,
+        "restock": 500,
+        "cost": 780,
+        "buy": 780,
+        "sell": 468,
+        "buyAfterSale": 764
+      },
+      {
+        "item": "mithril_full_helm",
+        "count": 0,
+        "restock": 500,
+        "cost": 1430,
+        "buy": 1430,
+        "sell": 858,
+        "buyAfterSale": 1401
+      },
+      {
+        "item": "mithril_platebody",
+        "count": 0,
+        "restock": 500,
+        "cost": 5200,
+        "buy": 5200,
+        "sell": 3120,
+        "buyAfterSale": 5096
+      },
+      {
+        "item": "mithril_platelegs",
+        "count": 0,
+        "restock": 500,
+        "cost": 2600,
+        "buy": 2600,
+        "sell": 1560,
+        "buyAfterSale": 2548
+      },
+      {
+        "item": "mithril_plateskirt",
+        "count": 0,
+        "restock": 500,
+        "cost": 2600,
+        "buy": 2600,
+        "sell": 1560,
+        "buyAfterSale": 2548
+      },
+      {
+        "item": "mithril_sq_shield",
+        "count": 0,
+        "restock": 500,
+        "cost": 1560,
+        "buy": 1560,
+        "sell": 936,
+        "buyAfterSale": 1528
+      },
+      {
+        "item": "mithril_kiteshield",
+        "count": 0,
+        "restock": 500,
+        "cost": 2210,
+        "buy": 2210,
+        "sell": 1326,
+        "buyAfterSale": 2165
+      },
+      {
+        "item": "mithril_chainbody",
+        "count": 0,
+        "restock": 500,
+        "cost": 1950,
+        "buy": 1950,
+        "sell": 1170,
+        "buyAfterSale": 1911
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_warhammer",
+    "inventory": "keldagrim_warhammer_shop",
+    "title": "Vigr's Warhammers",
+    "map": [
+      44,
+      159
+    ],
+    "sellMultiplier": 1300,
+    "buyMultiplier": 550,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Of course I can."
+    ],
+    "stock": [
+      {
+        "item": "bronze_warhammer",
+        "count": 5,
+        "restock": 100,
+        "cost": 47,
+        "buy": 61,
+        "sell": 25,
+        "buyAfterSale": 59
+      },
+      {
+        "item": "iron_warhammer",
+        "count": 4,
+        "restock": 200,
+        "cost": 173,
+        "buy": 224,
+        "sell": 95,
+        "buyAfterSale": 219
+      },
+      {
+        "item": "steel_warhammer",
+        "count": 3,
+        "restock": 400,
+        "cost": 640,
+        "buy": 832,
+        "sell": 352,
+        "buyAfterSale": 812
+      },
+      {
+        "item": "black_warhammer",
+        "count": 3,
+        "restock": 600,
+        "cost": 980,
+        "buy": 1274,
+        "sell": 539,
+        "buyAfterSale": 1244
+      },
+      {
+        "item": "mithril_warhammer",
+        "count": 2,
+        "restock": 800,
+        "cost": 1660,
+        "buy": 2158,
+        "sell": 913,
+        "buyAfterSale": 2108
+      },
+      {
+        "item": "adamnt_warhammer",
+        "count": 1,
+        "restock": 1000,
+        "cost": 4120,
+        "buy": 5356,
+        "sell": 2266,
+        "buyAfterSale": 5232
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_weapons",
+    "inventory": "keldagrim_quality_weapons_shop",
+    "title": "Quality Weapons Shop",
+    "map": [
+      44,
+      159
+    ],
+    "sellMultiplier": 1300,
+    "buyMultiplier": 550,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Yes, I'm looking for some weapons."
+    ],
+    "stock": [
+      {
+        "item": "steel_battleaxe",
+        "count": 2,
+        "restock": 200,
+        "cost": 650,
+        "buy": 845,
+        "sell": 357,
+        "buyAfterSale": 825
+      },
+      {
+        "item": "mithril_battleaxe",
+        "count": 1,
+        "restock": 3000,
+        "cost": 1690,
+        "buy": 2197,
+        "sell": 929,
+        "buyAfterSale": 2146
+      },
+      {
+        "item": "mithril_sword",
+        "count": 3,
+        "restock": 3000,
+        "cost": 845,
+        "buy": 1098,
+        "sell": 464,
+        "buyAfterSale": 1073
+      },
+      {
+        "item": "adamant_sword",
+        "count": 2,
+        "restock": 12000,
+        "cost": 2080,
+        "buy": 2704,
+        "sell": 1144,
+        "buyAfterSale": 2641
+      },
+      {
+        "item": "steel_scimitar",
+        "count": 2,
+        "restock": 600,
+        "cost": 400,
+        "buy": 520,
+        "sell": 220,
+        "buyAfterSale": 508
+      },
+      {
+        "item": "black_longsword",
+        "count": 2,
+        "restock": 1500,
+        "cost": 960,
+        "buy": 1248,
+        "sell": 528,
+        "buyAfterSale": 1219
+      },
+      {
+        "item": "rune_longsword",
+        "count": 1,
+        "restock": 4000,
+        "cost": 32000,
+        "buy": 41600,
+        "sell": 17600,
+        "buyAfterSale": 40640
+      },
+      {
+        "item": "maple_shortbow",
+        "count": 1,
+        "restock": 100,
+        "cost": 400,
+        "buy": 520,
+        "sell": 220,
+        "buyAfterSale": 508
+      },
+      {
+        "item": "maple_longbow",
+        "count": 1,
+        "restock": 100,
+        "cost": 640,
+        "buy": 832,
+        "sell": 352,
+        "buyAfterSale": 812
+      },
+      {
+        "item": "mithril_arrow",
+        "count": 800,
+        "restock": 15,
+        "cost": 32,
+        "buy": 41,
+        "sell": 17,
+        "buyAfterSale": 40
+      },
+      {
+        "item": "adamant_arrow",
+        "count": 600,
+        "restock": 20,
+        "cost": 80,
+        "buy": 104,
+        "sell": 44,
+        "buyAfterSale": 101
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_armour",
+    "inventory": "keldagrim_quality_armour_shop",
+    "title": "Quality Armour Shop",
+    "map": [
+      44,
+      159
+    ],
+    "sellMultiplier": 1300,
+    "buyMultiplier": 550,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Yes, I'm looking for some armour."
+    ],
+    "stock": [
+      {
+        "item": "steel_chainbody",
+        "count": 3,
+        "restock": 400,
+        "cost": 750,
+        "buy": 975,
+        "sell": 412,
+        "buyAfterSale": 952
+      },
+      {
+        "item": "mithril_chainbody",
+        "count": 1,
+        "restock": 3000,
+        "cost": 1950,
+        "buy": 2535,
+        "sell": 1072,
+        "buyAfterSale": 2476
+      },
+      {
+        "item": "black_chainbody",
+        "count": 1,
+        "restock": 2500,
+        "cost": 1440,
+        "buy": 1872,
+        "sell": 792,
+        "buyAfterSale": 1828
+      },
+      {
+        "item": "adamant_chainbody",
+        "count": 1,
+        "restock": 9000,
+        "cost": 4800,
+        "buy": 6240,
+        "sell": 2640,
+        "buyAfterSale": 6096
+      },
+      {
+        "item": "steel_med_helm",
+        "count": 3,
+        "restock": 400,
+        "cost": 300,
+        "buy": 390,
+        "sell": 165,
+        "buyAfterSale": 381
+      },
+      {
+        "item": "mithril_med_helm",
+        "count": 1,
+        "restock": 3000,
+        "cost": 780,
+        "buy": 1014,
+        "sell": 429,
+        "buyAfterSale": 990
+      },
+      {
+        "item": "adamant_med_helm",
+        "count": 1,
+        "restock": 12000,
+        "cost": 1920,
+        "buy": 2496,
+        "sell": 1056,
+        "buyAfterSale": 2438
+      },
+      {
+        "item": "steel_sq_shield",
+        "count": 0,
+        "restock": 1500,
+        "cost": 600,
+        "buy": 780,
+        "sell": 330,
+        "buyAfterSale": 762
+      },
+      {
+        "item": "black_kiteshield",
+        "count": 0,
+        "restock": 1500,
+        "cost": 1632,
+        "buy": 2121,
+        "sell": 897,
+        "buyAfterSale": 2072
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_general_store",
+    "inventory": "keldagrim_general_shop",
+    "title": "Gunslik's Assorted Items",
+    "map": [
+      44,
+      159
+    ],
+    "sellMultiplier": 1000,
+    "buyMultiplier": 350,
+    "delta": 30,
+    "allstock": true,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "UNKNOWN",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "unknownStock": ["charcoal"],
+    "sources": [
+      "src.keldagrim-shop-gunslik-pre-2017",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Oh good!"
+    ],
+    "stock": [
+      {
+        "item": "jug_empty",
+        "count": 2,
+        "restock": 100,
+        "cost": 1,
+        "buy": 1,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "bucket_empty",
+        "count": 2,
+        "restock": 100,
+        "cost": 2,
+        "buy": 2,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "tinderbox",
+        "count": 2,
+        "restock": 100,
+        "cost": 1,
+        "buy": 1,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "chisel",
+        "count": 2,
+        "restock": 100,
+        "cost": 1,
+        "buy": 1,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "hammer",
+        "count": 5,
+        "restock": 100,
+        "cost": 1,
+        "buy": 1,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "unlit_candle",
+        "count": 10,
+        "restock": 500,
+        "cost": 3,
+        "buy": 3,
+        "sell": 1,
+        "buyAfterSale": 2
+      },
+      {
+        "item": "torch_unlit",
+        "count": 10,
+        "restock": 500,
+        "cost": 4,
+        "buy": 4,
+        "sell": 1,
+        "buyAfterSale": 3
+      },
+      {
+        "item": "charcoal",
+        "count": 2,
+        "restock": 200,
+        "cost": 45,
+        "buy": 45,
+        "sell": 15,
+        "buyAfterSale": 43
+      },
+      {
+        "item": "leather_gloves",
+        "count": 10,
+        "restock": 500,
+        "cost": 6,
+        "buy": 6,
+        "sell": 2,
+        "buyAfterSale": 5
+      },
+      {
+        "item": "vial_empty",
+        "count": 10,
+        "restock": 500,
+        "cost": 2,
+        "buy": 2,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "pestle_and_mortar",
+        "count": 3,
+        "restock": 500,
+        "cost": 4,
+        "buy": 4,
+        "sell": 1,
+        "buyAfterSale": 3
+      },
+      {
+        "item": "rope",
+        "count": 10,
+        "restock": 200,
+        "cost": 18,
+        "buy": 18,
+        "sell": 6,
+        "buyAfterSale": 17
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_cloth",
+    "inventory": "keldagrim_clothes_shop",
+    "title": "Agmundi Quality Clothes",
+    "map": [
+      44,
+      159
+    ],
+    "sellMultiplier": 1300,
+    "buyMultiplier": 550,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "I still want to buy your clothes."
+    ],
+    "stock": [
+      {
+        "item": "dwarf_skirt2",
+        "count": 3,
+        "restock": 50,
+        "cost": 550,
+        "buy": 715,
+        "sell": 302,
+        "buyAfterSale": 698
+      },
+      {
+        "item": "dwarf_skirt3",
+        "count": 3,
+        "restock": 50,
+        "cost": 625,
+        "buy": 812,
+        "sell": 343,
+        "buyAfterSale": 793
+      },
+      {
+        "item": "dwarf_trousers2",
+        "count": 3,
+        "restock": 40,
+        "cost": 700,
+        "buy": 910,
+        "sell": 385,
+        "buyAfterSale": 889
+      },
+      {
+        "item": "dwarf_trousers3",
+        "count": 3,
+        "restock": 40,
+        "cost": 750,
+        "buy": 975,
+        "sell": 412,
+        "buyAfterSale": 952
+      },
+      {
+        "item": "dwarf_shorts2",
+        "count": 3,
+        "restock": 35,
+        "cost": 360,
+        "buy": 468,
+        "sell": 198,
+        "buyAfterSale": 457
+      },
+      {
+        "item": "dwarf_shorts3",
+        "count": 3,
+        "restock": 35,
+        "cost": 390,
+        "buy": 507,
+        "sell": 214,
+        "buyAfterSale": 495
+      },
+      {
+        "item": "dwarf_jumper2",
+        "count": 3,
+        "restock": 55,
+        "cost": 625,
+        "buy": 812,
+        "sell": 343,
+        "buyAfterSale": 793
+      },
+      {
+        "item": "dwarf_jumper3",
+        "count": 3,
+        "restock": 55,
+        "cost": 650,
+        "buy": 845,
+        "sell": 357,
+        "buyAfterSale": 825
+      },
+      {
+        "item": "dwarf_shirt2",
+        "count": 3,
+        "restock": 50,
+        "cost": 600,
+        "buy": 780,
+        "sell": 330,
+        "buyAfterSale": 762
+      },
+      {
+        "item": "dwarf_shirt3",
+        "count": 3,
+        "restock": 50,
+        "cost": 625,
+        "buy": 812,
+        "sell": 343,
+        "buyAfterSale": 793
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_bakery",
+    "inventory": "keldagrim_bread_stall",
+    "title": "Keldagrim's Best Bread",
+    "map": [
+      45,
+      159
+    ],
+    "sellMultiplier": 1500,
+    "buyMultiplier": 800,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Sounds delicious!"
+    ],
+    "stock": [
+      {
+        "item": "bread",
+        "count": 10,
+        "restock": 100,
+        "cost": 12,
+        "buy": 18,
+        "sell": 9,
+        "buyAfterSale": 17
+      },
+      {
+        "item": "cake",
+        "count": 3,
+        "restock": 800,
+        "cost": 50,
+        "buy": 75,
+        "sell": 40,
+        "buyAfterSale": 73
+      },
+      {
+        "item": "chocolate_slice",
+        "count": 8,
+        "restock": 200,
+        "cost": 30,
+        "buy": 45,
+        "sell": 24,
+        "buyAfterSale": 44
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_gems",
+    "inventory": "keldagrim_gem_stall",
+    "title": "Green Gemstone Gems",
+    "map": [
+      45,
+      159
+    ],
+    "sellMultiplier": 1500,
+    "buyMultiplier": 800,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Show me the wares!"
+    ],
+    "stock": [
+      {
+        "item": "sapphire",
+        "count": 3,
+        "restock": 15000,
+        "cost": 250,
+        "buy": 375,
+        "sell": 200,
+        "buyAfterSale": 367
+      },
+      {
+        "item": "emerald",
+        "count": 1,
+        "restock": 1000,
+        "cost": 500,
+        "buy": 750,
+        "sell": 400,
+        "buyAfterSale": 735
+      },
+      {
+        "item": "ruby",
+        "count": 1,
+        "restock": 2000,
+        "cost": 1000,
+        "buy": 1500,
+        "sell": 800,
+        "buyAfterSale": 1470
+      },
+      {
+        "item": "diamond",
+        "count": 0,
+        "restock": 4000,
+        "cost": 2000,
+        "buy": 3000,
+        "sell": 1600,
+        "buyAfterSale": 2940
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_craft",
+    "inventory": "keldagrim_crafting_stall",
+    "title": "Carefree Crafting Stall",
+    "map": [
+      45,
+      159
+    ],
+    "sellMultiplier": 1500,
+    "buyMultiplier": 800,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Yes please!"
+    ],
+    "stock": [
+      {
+        "item": "chisel",
+        "count": 2,
+        "restock": 100,
+        "cost": 1,
+        "buy": 1,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "ring_mould",
+        "count": 4,
+        "restock": 100,
+        "cost": 5,
+        "buy": 7,
+        "sell": 4,
+        "buyAfterSale": 7
+      },
+      {
+        "item": "necklace_mould",
+        "count": 2,
+        "restock": 100,
+        "cost": 5,
+        "buy": 7,
+        "sell": 4,
+        "buyAfterSale": 7
+      },
+      {
+        "item": "needle",
+        "count": 3,
+        "restock": 100,
+        "cost": 1,
+        "buy": 1,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "thread",
+        "count": 100,
+        "restock": 5,
+        "cost": 1,
+        "buy": 1,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "ball_of_wool",
+        "count": 100,
+        "restock": 5,
+        "cost": 2,
+        "buy": 3,
+        "sell": 1,
+        "buyAfterSale": 2
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_silver",
+    "inventory": "keldagrim_silver_stall",
+    "title": "Silver Cog Silver Stall",
+    "map": [
+      45,
+      159
+    ],
+    "sellMultiplier": 1500,
+    "buyMultiplier": 800,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Right, what do you have?"
+    ],
+    "stock": [
+      {
+        "item": "nostringstar",
+        "count": 2,
+        "restock": 100,
+        "cost": 200,
+        "buy": 300,
+        "sell": 160,
+        "buyAfterSale": 294
+      },
+      {
+        "item": "silver_ore",
+        "count": 1,
+        "restock": 2000,
+        "cost": 75,
+        "buy": 112,
+        "sell": 60,
+        "buyAfterSale": 110
+      },
+      {
+        "item": "silver_bar",
+        "count": 1,
+        "restock": 1000,
+        "cost": 150,
+        "buy": 225,
+        "sell": 120,
+        "buyAfterSale": 220
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_pickaxe",
+    "inventory": "keldagrim_pickaxe_shop",
+    "title": "Pickaxe-Is-Mine",
+    "map": [
+      45,
+      159
+    ],
+    "sellMultiplier": 1300,
+    "buyMultiplier": 550,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Do you have any pickaxes?"
+    ],
+    "stock": [
+      {
+        "item": "bronze_pickaxe",
+        "count": 6,
+        "restock": 50,
+        "cost": 1,
+        "buy": 1,
+        "sell": 0,
+        "buyAfterSale": 1
+      },
+      {
+        "item": "steel_pickaxe",
+        "count": 4,
+        "restock": 200,
+        "cost": 500,
+        "buy": 650,
+        "sell": 275,
+        "buyAfterSale": 635
+      },
+      {
+        "item": "mithril_pickaxe",
+        "count": 3,
+        "restock": 300,
+        "cost": 1300,
+        "buy": 1690,
+        "sell": 715,
+        "buyAfterSale": 1651
+      },
+      {
+        "item": "adamant_pickaxe",
+        "count": 2,
+        "restock": 500,
+        "cost": 3200,
+        "buy": 4160,
+        "sell": 1760,
+        "buyAfterSale": 4064
+      },
+      {
+        "item": "rune_pickaxe",
+        "count": 1,
+        "restock": 600,
+        "cost": 32000,
+        "buy": 41600,
+        "sell": 17600,
+        "buyAfterSale": 40640
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_cloth_poor",
+    "inventory": "keldagrim_clothes_stall",
+    "title": "Vermundi's Clothes Stall",
+    "map": [
+      45,
+      159
+    ],
+    "sellMultiplier": 1300,
+    "buyMultiplier": 550,
+    "delta": 30,
+    "allstock": false,
+    "priceLabel": "CANDIDATE",
+    "deltaLabel": "CANDIDATE",
+    "restockLabel": "CANDIDATE",
+    "stockLabel": "CANDIDATE",
+    "sources": [
+      "src.keldagrim-shop-current-stock",
+      "src.content-unpack-obj"
+    ],
+    "choices": [
+      "Yes, what clothes do you have in stock?"
+    ],
+    "stock": [
+      {
+        "item": "dwarf_skirt1",
+        "count": 3,
+        "restock": 40,
+        "cost": 350,
+        "buy": 455,
+        "sell": 192,
+        "buyAfterSale": 444
+      },
+      {
+        "item": "dwarf_trousers1",
+        "count": 3,
+        "restock": 30,
+        "cost": 550,
+        "buy": 715,
+        "sell": 302,
+        "buyAfterSale": 698
+      },
+      {
+        "item": "dwarf_shorts1",
+        "count": 3,
+        "restock": 25,
+        "cost": 280,
+        "buy": 364,
+        "sell": 154,
+        "buyAfterSale": 355
+      },
+      {
+        "item": "dwarf_jumper1",
+        "count": 3,
+        "restock": 45,
+        "cost": 500,
+        "buy": 650,
+        "sell": 275,
+        "buyAfterSale": 635
+      },
+      {
+        "item": "dwarf_shirt1",
+        "count": 3,
+        "restock": 40,
+        "cost": 450,
+        "buy": 585,
+        "sell": 247,
+        "buyAfterSale": 571
+      },
+      {
+        "item": "silk",
+        "count": 5,
+        "restock": 100,
+        "cost": 30,
+        "buy": 39,
+        "sell": 16,
+        "buyAfterSale": 38
+      }
+    ]
+  }
+]
