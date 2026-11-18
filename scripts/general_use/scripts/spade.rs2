@@ -75,6 +75,7 @@ if (~barrows_dig() = true) {
     return;
 }
 if (~mh_dig() = true) return;
+if (~ek_dig() = true) return;
 ~displaymessage(^dm_default);
 
 
