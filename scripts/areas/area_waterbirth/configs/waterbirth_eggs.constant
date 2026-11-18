@@ -1,0 +1,7 @@
+// UNKNOWN engineering one-tile radius shared by the egg proximity hunt and Spawn melee hunt.
+^waterbirth_egg_hunt_radius = 1
+// UNKNOWN engineering presentation time: ceil(96 delay units * 20ms / 600ms world tick) = 4 ticks.
+^waterbirth_egg_hatch_display_ticks = 4
+// CANDIDATE later Egg source gives a five-minute reset: 500 native 600ms ticks.
+// UNKNOWN Spawn lifetime uses the same bound; native expiry removes it even during combat.
+^waterbirth_egg_reset_ticks = 500

@@ -335,7 +335,7 @@ async function run() {
     };
   }
 
-  function testAttack(spec, protectedStyle) {
+  function testAttack(spec, protectedStyle, armouredRanged = false) {
     const family = families[spec.family];
     const style = spec.family === 'melee' ? 'melee' : spec.family === 'ranged' ? 'ranged' : 'magic';
     const prayerName = style === 'melee' ? 'prayer14' : style === 'ranged' ? 'prayer13' : 'prayer12';
@@ -349,6 +349,10 @@ async function run() {
     try {
       actor = addPlayer(x + 1, 3200);
       actor.setVar(id(configs.VarPlayerType, 'com_defendanim'), id(configs.SeqType, 'human_unarmedblock'));
+      if (spec.family === 'ranged') {
+        // Fixture computed defence roll, not a selected period stat or bonus.
+        actor.setVar(id(configs.VarPlayerType, 'com_rangedef'), armouredRanged ? 10_000 : 0);
+      }
       if (protectedStyle) actor.setVar(id(configs.VarPlayerType, prayerName), 1);
       npc = addNpc(spec.name, x, 3200);
       restoreAnimation = observeMethod(npc, 'playAnimation', animations);
@@ -359,7 +363,8 @@ async function run() {
         return originalMapProjAnim.apply(this, args);
       };
       const expectedAnim = id(configs.SeqType, family.attackAnimation);
-      const tape = Array.from({ length: 256 }, (_, index) => index % 3 === 1 ? 0 : 127);
+      const tape = Array.from({ length: 256 }, (_, index) =>
+        spec.family === 'ranged' || index % 3 !== 1 ? 127 : 0);
       withRandomValues(tape, () => {
         npc.turn();
         assert.strictEqual(npc.target, actor, `${spec.name}: retaliation did not retain player`);
@@ -393,8 +398,8 @@ async function run() {
       actor.processQueues();
       assert(!actor.queue.all().some(request => request.script?.name === '[queue,combat_damage_player]'),
         `${spec.name}: damage queue did not finish`);
-      assert.equal(before - actor.levels[PlayerStat.HITPOINTS], protectedStyle ? 0 : family.maxHit,
-        `${spec.name}: damage/protection maximum`);
+      assert.equal(before - actor.levels[PlayerStat.HITPOINTS], protectedStyle || armouredRanged ? 0 : family.maxHit,
+        `${spec.name}: damage/protection/ranged-defence maximum`);
       checks.attacks++;
     } finally {
       World.mapProjAnim = originalMapProjAnim;
@@ -473,7 +478,8 @@ async function run() {
       }
       checks.drops++;
       const respawnTicks = npc.lifecycleTick;
-      assert.equal(type.respawnrate, 60, `${spec.name}: labelled engineering respawn config`);
+      const expectedRespawn = spec.family === 'magic' ? 25 : 30;
+      assert.equal(type.respawnrate, expectedRespawn, `${spec.name}: candidate Old School respawn config`);
       assert.equal(respawnTicks, World.scaleByPlayerCount(type.respawnrate),
         `${spec.name}: native population-scaled respawn schedule`);
       for (let tick = 1; tick < respawnTicks; tick++) {
@@ -502,6 +508,7 @@ async function run() {
     for (const spec of definitions) {
       testAttack(spec, false);
       testAttack(spec, true);
+      if (spec.family === 'ranged') testAttack(spec, false, true);
     }
     for (const spec of definitions) {
       testDrop(spec, 0);

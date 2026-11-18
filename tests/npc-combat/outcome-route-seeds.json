@@ -1337,6 +1337,24 @@
       }
     },
     {
+      "script": "[ai_applayer2,dungeon_dagganoth_lighter]",
+      "npc": "dungeon_dagganoth_lighter",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
+      "script": "[ai_applayer2,dungeon_dagganoth_lighter_deeper]",
+      "npc": "dungeon_dagganoth_lighter_deeper",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
+    },
+    {
       "script": "[ai_applayer2,dungeon_dagganoth_magic_monster]",
       "npc": "dungeon_dagganoth_magic_monster",
       "seeds": {

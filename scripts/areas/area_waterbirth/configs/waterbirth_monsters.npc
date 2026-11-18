@@ -43,11 +43,12 @@ param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
 huntmode=aggressive_melee
-// UNKNOWN engineering radii and respawn; no recovered period numbers.
+// UNKNOWN engineering radii; no recovered period numbers.
 huntrange=5
 wanderrange=5
 maxrange=16
-respawnrate=60
+// CANDIDATE Old School respawn interval.
+respawnrate=30
 
 [dungeon_dagganoth_lighter]
 name=Dagannoth
@@ -91,11 +92,12 @@ param=death_sound,dagganoth_death
 param=rangeattack_sound,dagganoth_spines
 param=proj_travel,horror_spines_travel
 huntmode=aggressive_ranged
-// UNKNOWN engineering hunt/leash/wander/respawn numbers.
+// UNKNOWN engineering hunt/leash/wander numbers.
 huntrange=4
 wanderrange=5
 maxrange=16
-respawnrate=60
+// CANDIDATE Old School respawn interval.
+respawnrate=30
 
 [dungeon_dagganoth_magic_monster]
 name=Wallasalki
@@ -126,12 +128,13 @@ param=magicattack_anim,wallasalki_attack
 param=defend_anim,wallasalki_defend
 param=death_anim,wallasalki_death
 huntmode=aggressive_ranged
-// UNKNOWN engineering hunt/attack/leash/wander/respawn numbers.
+// UNKNOWN engineering hunt/attack/leash/wander numbers.
 attackrange=6
 huntrange=6
 wanderrange=5
 maxrange=16
-respawnrate=60
+// CANDIDATE Old School respawn interval.
+respawnrate=25
 
 [dungeon_dagganoth_magic_monster_deeper]
 name=Wallasalki
@@ -162,12 +165,13 @@ param=magicattack_anim,wallasalki_attack
 param=defend_anim,wallasalki_defend
 param=death_anim,wallasalki_death
 huntmode=aggressive_ranged
-// UNKNOWN engineering hunt/attack/leash/wander/respawn numbers.
+// UNKNOWN engineering hunt/attack/leash/wander numbers.
 attackrange=6
 huntrange=6
 wanderrange=5
 maxrange=16
-respawnrate=60
+// CANDIDATE Old School respawn interval.
+respawnrate=25
 
 [dungeon_dagganoth_lighter_deeper]
 name=Dagannoth
@@ -211,11 +215,12 @@ param=death_sound,dagganoth_death
 param=rangeattack_sound,dagganoth_spines
 param=proj_travel,horror_spines_travel
 huntmode=aggressive_ranged
-// UNKNOWN engineering hunt/leash/wander/respawn numbers.
+// UNKNOWN engineering hunt/leash/wander numbers.
 huntrange=4
 wanderrange=5
 maxrange=16
-respawnrate=60
+// CANDIDATE Old School respawn interval.
+respawnrate=30
 
 [dungeon_dagganoth_mainroom_deeper]
 name=Dagannoth
@@ -260,8 +265,9 @@ param=attack_sound,dagganoth_attack
 param=defend_sound,dagganoth_hit
 param=death_sound,dagganoth_death
 huntmode=aggressive_melee
-// UNKNOWN engineering radii and respawn; no recovered period numbers.
+// UNKNOWN engineering radii; no recovered period numbers.
 huntrange=5
 wanderrange=5
 maxrange=16
-respawnrate=60
+// CANDIDATE Old School respawn interval.
+respawnrate=30
