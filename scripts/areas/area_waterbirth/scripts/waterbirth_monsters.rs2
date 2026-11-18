@@ -1,0 +1,17 @@
+// VERIFIED styles: Sal's Waterbirth Island guide, 29 April 2006.
+// CANDIDATE max hits: exact Waterbirth Old School forms, later weakness omitted.
+[ai_queue1,dungeon_dagganoth_lighter] ~npc_default_retaliate_ap;
+[ai_queue1,dungeon_dagganoth_lighter_deeper] ~npc_default_retaliate_ap;
+[ai_opplayer2,dungeon_dagganoth_lighter] npc_setmode(applayer2);
+[ai_opplayer2,dungeon_dagganoth_lighter_deeper] npc_setmode(applayer2);
+[ai_applayer2,dungeon_dagganoth_lighter] ~dagannoth_rangeattack(^wbmon_ranged_maxhit, ^false);
+[ai_applayer2,dungeon_dagganoth_lighter_deeper] ~dagannoth_rangeattack(^wbmon_ranged_maxhit, ^false);
+
+[ai_queue1,dungeon_dagganoth_magic_monster] ~npc_default_retaliate_ap;
+[ai_queue1,dungeon_dagganoth_magic_monster_deeper] ~npc_default_retaliate_ap;
+[ai_opplayer2,dungeon_dagganoth_magic_monster] npc_setmode(applayer2);
+[ai_opplayer2,dungeon_dagganoth_magic_monster_deeper] npc_setmode(applayer2);
+[ai_applayer2,dungeon_dagganoth_magic_monster]
+~npc_cast_spell_with_forced_max_hit(^water_wave, npc_param(attackrate), ^wbmon_magic_maxhit);
+[ai_applayer2,dungeon_dagganoth_magic_monster_deeper]
+~npc_cast_spell_with_forced_max_hit(^water_wave, npc_param(attackrate), ^wbmon_magic_maxhit);

@@ -56293,69 +56293,6 @@ strength=35
 defence=25
 param=slayer_category,^slayer_dagannoth
 
-[dungeon_dagganoth_mainroom]
-name=Dagannoth
-desc=A darkened horror from the ocean depths...
-model1=poh_dagganoth_8
-recol1s=13740
-recol1d=12650
-recol2s=12683
-recol2d=11593
-recol3s=11626
-recol3d=10536
-recol4s=10569
-recol4d=9479
-resizeh=69
-resizev=69
-walkanim=horror_dagannoth_walk
-readyanim=horror_dagannoth_ready
-op2=Attack
-vislevel=90
-hitpoints=95
-attack=76
-strength=78
-defence=65
-param=slayer_category,^slayer_dagannoth
-
-[dungeon_dagganoth_lighter]
-name=Dagannoth
-desc=A spiney horror from the ocean depths...
-model1=poh_dagganoth_8
-recol1s=13740
-recol1d=14796
-recol2s=12683
-recol2d=13739
-recol3s=11626
-recol3d=13706
-recol4s=10569
-recol4d=12649
-resizeh=69
-resizev=69
-walkanim=horror_dagannoth_walk
-readyanim=horror_dagannoth_ready
-op2=Attack
-vislevel=88
-hitpoints=85
-attack=10
-strength=10
-defence=75
-param=slayer_category,^slayer_dagannoth
-
-[dungeon_dagganoth_magic_monster]
-name=Wallasalki
-desc=A fearsome magical water creature.
-model1=npc_2457
-walkanim=wallasalki_walk
-readyanim=wallasalki_ready
-resizeh=110
-resizev=110
-op2=Attack
-vislevel=98
-hitpoints=120
-attack=1
-strength=1
-defence=80
-
 [agilityarena_non_combat_bat]
 name=Giant bat
 desc=Annoying flappy thing.
@@ -65031,21 +64968,6 @@ readyanim=dagannoth_meganoth_ready
 op2=Attack
 param=slayer_category,^slayer_dagannoth
 
-[dungeon_dagganoth_magic_monster_deeper]
-name=Wallasalki
-desc=A fearsome magical water creature.
-model1=npc_2457
-walkanim=wallasalki_walk
-readyanim=wallasalki_ready
-resizeh=110
-resizev=110
-op2=Attack
-vislevel=98
-hitpoints=120
-attack=1
-strength=1
-defence=80
-
 [giant_rockcrab_deeper]
 name=Giant Rock Crab
 desc=No one likes crabs... especially really big ones!
@@ -65076,53 +64998,6 @@ wanderrange=0
 moverestrict=nomove
 defaultmode=none
 
-[dungeon_dagganoth_lighter_deeper]
-name=Dagannoth
-desc=A spiney horror from the ocean depths...
-model1=poh_dagganoth_8
-recol1s=13740
-recol1d=14796
-recol2s=12683
-recol2d=13739
-recol3s=11626
-recol3d=13706
-recol4s=10569
-recol4d=12649
-resizeh=69
-resizev=69
-walkanim=horror_dagannoth_walk
-readyanim=horror_dagannoth_ready
-op2=Attack
-vislevel=88
-hitpoints=85
-attack=10
-strength=10
-defence=75
-param=slayer_category,^slayer_dagannoth
-
-[dungeon_dagganoth_mainroom_deeper]
-name=Dagannoth
-desc=A darkened horror from the ocean depths...
-model1=poh_dagganoth_8
-recol1s=13740
-recol1d=12650
-recol2s=12683
-recol2d=11593
-recol3s=11626
-recol3d=10536
-recol4s=10569
-recol4d=9479
-resizeh=69
-resizev=69
-walkanim=horror_dagannoth_walk
-readyanim=horror_dagannoth_ready
-op2=Attack
-vislevel=90
-hitpoints=95
-attack=76
-strength=78
-defence=65
-param=slayer_category,^slayer_dagannoth
 
 [dagannoth_rock_lobster_2x2]
 name=Rock lobster
