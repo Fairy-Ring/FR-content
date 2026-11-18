@@ -3,9 +3,8 @@
 // minus Skillcape / overlay / FT2 / look-after tables. Hunt 289? no.
 // Theories are ordinal (rain / insects / adventurers / seasons / fairies),
 // not bound to Elstan/Taria/…. Any five distinct placed gardeners count.
-// Writes %fairy_farmers_quest 1→2→3→4→5→6 only. NEVER 10.
-// Distinctness: %npc_int=1 on that gardener instance (CANDIDATE; lost on respawn).
-// No Farming look-after / Garden branch / symptoms / Nuff / Godfather / Tanglefoot.
+// UNKNOWN engineering storage: a permanent, per-player visited-gardener bit mask.
+// No NPC-local state: another player or an NPC respawn must not change the chase.
 
 [opnpc1,elstan] @ft1_gag_talk;
 [opnpc1,dantaera] @ft1_gag_talk;
@@ -56,7 +55,7 @@ if (%fairy_farmers_quest < 1) {
     return;
 }
 ~chatplayer("<p,neutral>Martin has asked me to investigate why all the crops are failing.");
-if (%npc_int = 1) {
+if (testbit(%fairy_gardeners_visited, ~ft1_gardener_index(npc_type)) = ^true) {
     ~chatnpc("<p,neutral>I've already told you everything I suspect.");
     return;
 }
@@ -83,13 +82,13 @@ if (%fairy_farmers_quest = 4) {
 ~chatnpc("<p,quiz>We need more rain. I don't suppose you can do anything about that?");
 ~chatplayer("<p,sad>No, I'm afraid not.");
 ~chatnpc("<p,neutral>Well there you go then. Until you find out how to make it rain you're going to have a hard time solving our problems.");
-%npc_int = 1;
+%fairy_gardeners_visited = setbit(%fairy_gardeners_visited, ~ft1_gardener_index(npc_type));
 %fairy_farmers_quest = 2;
 return;
 
 [label,ft1_gag_insects]
 ~chatnpc("<p,angry>Insects! That's what you can tell him! Insects! Stop the insects from eating so many of our crops and we'd get maximum yield, I tell you!");
-%npc_int = 1;
+%fairy_gardeners_visited = setbit(%fairy_gardeners_visited, ~ft1_gardener_index(npc_type));
 %fairy_farmers_quest = 3;
 return;
 
@@ -101,7 +100,7 @@ return;
 ~chatplayer("<p,confused>No, I mean yes. There is a heroes guild, but ...!");
 ~chatnpc("<p,shock>Aha, so you admit it then! You should be ashamed of yourselves!");
 ~chatplayer("<p,sad>Oh, I give up!");
-%npc_int = 1;
+%fairy_gardeners_visited = setbit(%fairy_gardeners_visited, ~ft1_gardener_index(npc_type));
 %fairy_farmers_quest = 4;
 return;
 
@@ -110,7 +109,7 @@ return;
 ~chatnpc("<p,neutral>If you find out what is upsetting the seasons you'll find out what is causing the harvest to fail.");
 ~chatplayer("<p,quiz>I don't suppose you have any ideas about what could cause the seasons to be mixed up?");
 ~chatnpc("<p,sad>No, sorry, but find that out and you'll get to the root of our problems.");
-%npc_int = 1;
+%fairy_gardeners_visited = setbit(%fairy_gardeners_visited, ~ft1_gardener_index(npc_type));
 %fairy_farmers_quest = 5;
 return;
 
@@ -125,7 +124,7 @@ return;
 ~chatnpc("<p,angry>I'm serious!");
 ~chatnpc("<p,neutral>Think it through. There are fairies who control everything natural from the weather to the seasons.");
 ~chatplayer("<p,neutral>Right, well thanks for your input. I'll think over what you said.");
-%npc_int = 1;
+%fairy_gardeners_visited = setbit(%fairy_gardeners_visited, ~ft1_gardener_index(npc_type));
 %fairy_farmers_quest = 6;
 return;
 
@@ -174,3 +173,28 @@ if (npc_type = kragen) {
 }
 ~chatnpc("<p,neutral>You will need a shoot from the dying White Tree.");
 return;
+
+[proc,ft1_gardener_index](npc $gardener)(int)
+switch_npc ($gardener) {
+    case elstan : return(0);
+    case dantaera : return(1);
+    case kragen : return(2);
+    case lyra : return(3);
+    case francis : return(4);
+    case farming_gardener_fruit_3 : return(5);
+    case farming_gardener_fruit_4 : return(6);
+    case farming_gardener_hops_1 : return(7);
+    case farming_gardener_hops_3 : return(8);
+    case farming_gardener_hops_4 : return(9);
+    case farming_gardener_bush_1 : return(10);
+    case farming_gardener_bush_2 : return(11);
+    case farming_gardener_bush_3 : return(12);
+    case farming_gardener_bush_4 : return(13);
+    case farming_gardener_tree_1 : return(14);
+    case farming_gardener_tree_2 : return(15);
+    case farming_gardener_tree_3 : return(16);
+    case farming_gardener_tree_4 : return(17);
+    case farming_gardener_fruit_1 : return(18);
+    case farming_gardener_fruit_2 : return(19);
+}
+return(-1);

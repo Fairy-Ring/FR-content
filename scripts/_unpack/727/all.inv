@@ -2935,6 +2935,9 @@ size=40
 restock=yes
 stackall=yes
 allstock=no
+// CANDIDATE: all sixteen stock counts match Old School market revision 15365049.
+// Non-hops rows: farming.osrs-market-other-stock; no retained period stock counts.
+// Revision 215783 instead gives Cabbage stock 10; the inherited value 5 is retained.
 stock1=potato_seed,20,100
 stock2=onion_seed,10,100
 stock3=cabbage_seed,5,100
@@ -2948,7 +2951,9 @@ stock10=rosemary_seed,20,100
 stock11=marigold_seed,20,100
 stock12=hammerstone_hop_seed,20,100
 stock13=asgarnian_hop_seed,10,100
-stock14=yanillian_hop_seed,0,100
+// CANDIDATE: Old School Draynor Seed Market revisions 215783 and 15365049.
+// The imported later-revision zero differs from both retained stock tables.
+stock14=yanillian_hop_seed,5,100
 stock15=krandorian_hop_seed,0,100
 stock16=wildblood_hop_seed,0,100
 

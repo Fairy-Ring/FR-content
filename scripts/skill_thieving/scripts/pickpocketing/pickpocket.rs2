@@ -22,6 +22,12 @@
 [opnpc3,farmer1] // Farmer
 @attempt_pick_pocket(npc_type);
 
+[opnpc3,farmer2]
+@attempt_pick_pocket(npc_type);
+
+[opnpc3,farmer3]
+@attempt_pick_pocket(npc_type);
+
 [opnpc3,guard1] // Guard
 @attempt_pick_pocket(npc_type);
 

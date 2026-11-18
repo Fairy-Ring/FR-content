@@ -325,13 +325,14 @@
     "tutorial_progress_overlay": "Tutorial progress-bar display is rebuilt from saved tutorial progress and cleared at tutorial exit.",
     "rd_rooms_tempvar": "Active Recruitment Drive assessment room answers and chemistry state are deliberately abandoned on logout.",
     "rd_rooms_tempvar2": "Active Recruitment Drive assessment fox puzzle and chemistry state are deliberately abandoned on logout.",
-    "tai_bwo_cleanup": "Villager visibility initialization guard is rebuilt on village entry or login; no earned value is written.",
-    "tai_bwo_villagerchat": "Village-entry initialization selects default villager faces; no player-earned dialogue progress is written.",
-    "tbw_cleanup_temp": "mixed saved and session bits; follow-up unit",
+    "tbw_cleanup_temp": "Session Tai Bwo HUD, event chance and combat flags; favour is rebuilt from permanent vill_comm_points on entry and login.",
     "prayer_drain_counter": "Current prayer drain accumulator.",
     "prayer_drain_effect": "Current active-prayer drain strength.",
     "prayer_drain_resistance": "Derived equipment prayer-drain resistance.",
     "desert": "Current desert-heat timer; the inherited name is temporary.",
+    "soulbane_instance": "Owned emotion-room region UID plus one; leaving, logout and death discard the encounter, not completed-room progress.",
+    "soulbane_unprotected": "Current emotion-room fear encounter, anger meter and illusion hit counters; unfinished rooms restart after leaving or logout.",
+    "soulbane_unprotected2": "Current emotion-room dialogue and anger-special presentation flags; rebuilt on room entry.",
     "swansong_temp": "Explicit temporary ambush/colony state; current bits 8 and 9 are repeat-dialogue cursors, not a quest stage or consumed-item count."
   }
 }

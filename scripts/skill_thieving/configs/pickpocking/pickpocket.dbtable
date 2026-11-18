@@ -7,3 +7,5 @@ column=stun_damage,int
 column=success_chance,int,int
 column=loot,namedobj,int,int,int,LIST
 column=pocket,string
+// Zero preserves the legacy multi-reward rule; positive totals select one weighted reward.
+column=loot_total,int,REQUIRED

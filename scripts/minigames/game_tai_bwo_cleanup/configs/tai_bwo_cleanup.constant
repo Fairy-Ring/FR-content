@@ -1,15 +1,32 @@
-// CANDIDATE last-resort 2007-base (OSRS wiki Light/Medium/Dense Jungle) + leftover CS1 %1 %.
-// Favour leftover varbit is 10 bits (0–1023); leftover HUD prints "%1 %". Store 0–100.
-^tbw_favour_cap = 100
-^tbw_favour_hack = 1
+// UNKNOWN engineering cap: 100%; no retained 377 cap rule.
+^tbw_favour_cap = 1000
+// CANDIDATE: OSRS Cleanup tables. Points are tenths of one percent.
+^tbw_favour_hack_light = 3
+^tbw_favour_hack_med = 5
+^tbw_favour_hack_dense = 10
 ^tbw_hack_level_light = 10
 ^tbw_hack_level_med = 20
 ^tbw_hack_level_dense = 35
 ^tbw_hack_xp_light = 320
 ^tbw_hack_xp_med = 550
 ^tbw_hack_xp_dense = 800
-^tbw_jungle_respawn = 200
-// CANDIDATE persist: leftover fence stages stay (Cleanup), no period hold.
+// CANDIDATE: OSRS Jungle pages, 90 seconds.
+^tbw_jungle_respawn = 150
+// UNKNOWN retained engineering hold; no source establishes this decay interval.
 ^tbw_fence_hold = 10000
 // CANDIDATE last-resort (Tip.it cleanup page + 2007-base): 10 sticks per item.
 ^tbw_parcel_fee = 10
+// CANDIDATE: OSRS Light Jungle, counter out of 101, at most seven.
+^tbw_event_counter_max = 7
+^tbw_event_roll_size = 101
+// UNKNOWN engineering lifetime: enough to fight, no retained expiry rule.
+^tbw_mosquito_lifetime = 1000
+// CANDIDATE: OSRS Cleanup table, one percent for each mosquito form.
+^tbw_favour_mosquito = 10
+// CANDIDATE rate: about ten sticks per 1% (one per stored tenth).
+^tbw_sticks_per_favour_point = 1
+// UNKNOWN arithmetic: capture a batch, ceil(batch/3) per villager, last takes remainder.
+// This makes three successive payments empty favour, as Sal's 10 April 2006 says.
+^tbw_payout_parts = 3
+// UNKNOWN: each worn village-clothing piece raises that fraction by 10%.
+^tbw_clothing_fraction_bonus = 10

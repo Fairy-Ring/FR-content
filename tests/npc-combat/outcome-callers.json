@@ -17,6 +17,7 @@
       "[ai_opplayer2,druid]",
       "[ai_opplayer2,elvarg]",
       "[ai_opplayer2,entrana_monk]",
+      "[ai_opplayer2,fairy_tanglefoot]",
       "[ai_opplayer2,firediamond_firewarrior]",
       "[ai_opplayer2,irvig_senay]",
       "[ai_opplayer2,melzar_the_mad]",
@@ -35,6 +36,7 @@
       "[proc,invrigar_attack]",
       "[proc,necro_attack]",
       "[proc,sarawiz_melee_attack]",
+      "[proc,soulbane_rage_npc_attack]",
       "[proc,vampire_attack]"
     ],
     "npc_meleeattack": [

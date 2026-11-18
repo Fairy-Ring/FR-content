@@ -79,6 +79,7 @@ if (~champions_current > 0 | ~champions_scroll_escrow = 1 | ~champions_in_arena 
 // Active Recruitment Drive assessments do not survive logout. A completed
 // assessment (marker 2) remains available to Tiffy after relog.
 ~rd_lifecycle_login;
+if (%soulbane_prog = 2 | %soulbane_prog = 3) ~soulbane_login;
 
 // A fresh login cannot retain the session timers for saved Smoke torch bits.
 if (%fd_torch_count1 ! 0 | %fd_torch_count2 ! 0 | %fd_torch_count3 ! 0 | %fd_torch_count4 ! 0) ~dt_smoke_logout;

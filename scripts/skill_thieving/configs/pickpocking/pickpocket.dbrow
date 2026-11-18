@@ -16,6 +16,7 @@ data=stun_damage,1
 data=success_chance,180,240
 data=loot,coins,3,3,128
 data=pocket,man's pocket
+data=loot_total,0
 
 [pickpocket_woman]
 table=pickpocket
@@ -32,16 +33,22 @@ data=stun_damage,1
 data=success_chance,180,240
 data=loot,coins,3,3,128
 data=pocket,woman's pocket
+data=loot_total,0
 
 [pickpocket_farmer]
 table=pickpocket
 data=npc,farmer1
+data=npc,farmer2
+data=npc,farmer3
 data=level,10
 data=experience,145
 data=stun_ticks,8
 data=stun_damage,1
 data=success_chance,150,240
 data=loot,coins,9,9,123
+// VERIFIED seed reward: Tip.It Thieving, 27 April 2006; CANDIDATE weight: OSRS Farmer.
+data=loot,potato_seed,1,1,5
+data=loot_total,128
 data=pocket,farmer's pocket
 
 [pickpocket_warrior]
@@ -55,6 +62,7 @@ data=stun_damage,2
 data=success_chance,100,240
 data=loot,coins,18,18,128
 data=pocket,warrior's pocket
+data=loot_total,0
 
 [pickpocket_rogue]
 table=pickpocket
@@ -70,6 +78,7 @@ data=loot,jug_wine,1,1,6
 data=loot,lockpick,1,1,5
 data=loot,iron_dagger_p,1,1,1
 data=pocket,rogue's pocket
+data=loot_total,0
 
 [pickpocket_guard]
 table=pickpocket
@@ -89,6 +98,7 @@ data=stun_damage,2
 data=success_chance,50,240
 data=loot,coins,30,30,128
 data=pocket,guard's pocket
+data=loot_total,0
 
 [pickpocket_knight_of_ardougne]
 table=pickpocket
@@ -101,6 +111,7 @@ data=stun_damage,3
 data=success_chance,50,240
 data=loot,coins,50,50,128
 data=pocket,knight's pocket
+data=loot_total,0
 
 [pickpocket_watchman]
 table=pickpocket
@@ -113,6 +124,7 @@ data=success_chance,15,160
 data=loot,coins,60,60,128
 data=loot,bread,1,1,128
 data=pocket,watchman's pocket
+data=loot_total,0
 
 [pickpocket_paladin]
 table=pickpocket
@@ -125,6 +137,7 @@ data=success_chance,50,150
 data=loot,coins,80,80,128
 data=loot,chaosrune,2,2,128
 data=pocket,paladin's pocket
+data=loot_total,0
 
 [pickpocket_gnome]
 table=pickpocket
@@ -148,6 +161,7 @@ data=loot,gold_ore,1,1,8
 data=loot,earthrune,1,1,5
 data=loot,fire_orb,1,1,2
 data=pocket,gnome's pocket
+data=loot_total,0
 
 [pickpocket_hero]
 table=pickpocket
@@ -165,3 +179,4 @@ data=loot,fire_orb,1,1,2
 data=loot,diamond,1,1,1
 data=loot,gold_ore,1,1,1
 data=pocket,hero's pocket
+data=loot_total,0

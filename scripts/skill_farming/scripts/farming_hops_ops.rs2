@@ -1,0 +1,294 @@
+// VERIFIED four original selectors of permanent transmitted varp 506.
+[proc,farming_hops_stage]()(int)
+switch_loc (loc_type) {
+    case farming_hops_patch_1 : return(%farming_hops_varp_0_7);
+    case farming_hops_patch_2 : return(%farming_hops_varp_8_15);
+    case farming_hops_patch_3 : return(%farming_hops_varp_16_23);
+    case farming_hops_patch_4 : return(%farming_hops_varp_24_31);
+    case default : return(-1);
+}
+
+[proc,farming_hops_set_stage](int $stage)
+switch_loc (loc_type) {
+    case farming_hops_patch_1 : %farming_hops_varp_0_7 = $stage;
+    case farming_hops_patch_2 : %farming_hops_varp_8_15 = $stage;
+    case farming_hops_patch_3 : %farming_hops_varp_16_23 = $stage;
+    case farming_hops_patch_4 : %farming_hops_varp_24_31 = $stage;
+}
+
+// Dispatch binds the form the player sees; loc_type retains the map parent.
+[oplocu,farming_hops_patch_1] @farming_hops_use;
+[oplocu,farming_hops_patch_2] @farming_hops_use;
+[oplocu,farming_hops_patch_3] @farming_hops_use;
+[oplocu,farming_hops_patch_4] @farming_hops_use;
+[oplocu,hop_patch_weeds_3] @farming_hops_use;
+[oplocu,hop_patch_weeds_2] @farming_hops_use;
+[oplocu,hop_patch_weeds_1] @farming_hops_use;
+[oplocu,hop_patch_weeded] @farming_hops_use;
+[oploc3,hop_patch_weeds_3] @farming_rake_continue;
+[oploc3,hop_patch_weeds_2] @farming_rake_continue;
+[oploc3,hop_patch_weeds_1] @farming_rake_continue;
+
+[oplocu,hammer_hops_seed] @farming_hops_use;
+[oplocu,hammer_hops_1] @farming_hops_use;
+[oplocu,hammer_hops_2] @farming_hops_use;
+[oplocu,hammer_hops_3] @farming_hops_use;
+[oplocu,hammer_hops_fullygrown] @farming_hops_use;
+[oplocu,hammer_hops_seed_watered] @farming_hops_use;
+[oplocu,hammer_hops_1_watered] @farming_hops_use;
+[oplocu,hammer_hops_2_watered] @farming_hops_use;
+[oplocu,hammer_hops_3_watered] @farming_hops_use;
+[oplocu,hammer_hops_1_diseased] @farming_hops_use;
+[oplocu,hammer_hops_2_diseased] @farming_hops_use;
+[oplocu,hammer_hops_3_diseased] @farming_hops_use;
+[oplocu,hammer_hops_1_dead] @farming_hops_use;
+[oplocu,hammer_hops_2_dead] @farming_hops_use;
+[oplocu,hammer_hops_3_dead] @farming_hops_use;
+[oploc1,hammer_hops_fullygrown] @farming_hops_harvest(false);
+[oploc3,hammer_hops_fullygrown] @farming_hops_harvest(true);
+
+[oplocu,asgarnian_hops_seed] @farming_hops_use;
+[oplocu,asgarnian_hops_1] @farming_hops_use;
+[oplocu,asgarnian_hops_2] @farming_hops_use;
+[oplocu,asgarnian_hops_3] @farming_hops_use;
+[oplocu,asgarnian_hops_4] @farming_hops_use;
+[oplocu,asgarnian_hops_fullygrown] @farming_hops_use;
+[oplocu,asgarnian_hops_seed_watered] @farming_hops_use;
+[oplocu,asgarnian_hops_1_watered] @farming_hops_use;
+[oplocu,asgarnian_hops_2_watered] @farming_hops_use;
+[oplocu,asgarnian_hops_3_watered] @farming_hops_use;
+[oplocu,asgarnian_hops_4_watered] @farming_hops_use;
+[oplocu,asgarnian_hops_1_diseased] @farming_hops_use;
+[oplocu,asgarnian_hops_2_diseased] @farming_hops_use;
+[oplocu,asgarnian_hops_3_diseased] @farming_hops_use;
+[oplocu,asgarnian_hops_4_diseased] @farming_hops_use;
+[oplocu,asgarnian_hops_1_dead] @farming_hops_use;
+[oplocu,asgarnian_hops_2_dead] @farming_hops_use;
+[oplocu,asgarnian_hops_3_dead] @farming_hops_use;
+[oplocu,asgarnian_hops_4_dead] @farming_hops_use;
+[oploc1,asgarnian_hops_fullygrown] @farming_hops_harvest(false);
+[oploc3,asgarnian_hops_fullygrown] @farming_hops_harvest(true);
+
+[oplocu,yanillian_hops_seed] @farming_hops_use;
+[oplocu,yanillian_hops_1] @farming_hops_use;
+[oplocu,yanillian_hops_2] @farming_hops_use;
+[oplocu,yanillian_hops_3] @farming_hops_use;
+[oplocu,yanillian_hops_4] @farming_hops_use;
+[oplocu,yanillian_hops_5] @farming_hops_use;
+[oplocu,yanillian_hops_fullygrown] @farming_hops_use;
+[oplocu,yanillian_hops_seed_watered] @farming_hops_use;
+[oplocu,yanillian_hops_1_watered] @farming_hops_use;
+[oplocu,yanillian_hops_2_watered] @farming_hops_use;
+[oplocu,yanillian_hops_3_watered] @farming_hops_use;
+[oplocu,yanillian_hops_4_watered] @farming_hops_use;
+[oplocu,yanillian_hops_5_watered] @farming_hops_use;
+[oplocu,yanillian_hops_1_diseased] @farming_hops_use;
+[oplocu,yanillian_hops_2_diseased] @farming_hops_use;
+[oplocu,yanillian_hops_3_diseased] @farming_hops_use;
+[oplocu,yanillian_hops_4_diseased] @farming_hops_use;
+[oplocu,yanillian_hops_5_diseased] @farming_hops_use;
+[oplocu,yanillian_hops_1_dead] @farming_hops_use;
+[oplocu,yanillian_hops_2_dead] @farming_hops_use;
+[oplocu,yanillian_hops_3_dead] @farming_hops_use;
+[oplocu,yanillian_hops_4_dead] @farming_hops_use;
+[oplocu,yanillian_hops_5_dead] @farming_hops_use;
+[oploc1,yanillian_hops_fullygrown] @farming_hops_harvest(false);
+[oploc3,yanillian_hops_fullygrown] @farming_hops_harvest(true);
+
+[oplocu,krandorian_hops_seed] @farming_hops_use;
+[oplocu,krandorian_hops_1] @farming_hops_use;
+[oplocu,krandorian_hops_2] @farming_hops_use;
+[oplocu,krandorian_hops_3] @farming_hops_use;
+[oplocu,krandorian_hops_4] @farming_hops_use;
+[oplocu,krandorian_hops_5] @farming_hops_use;
+[oplocu,krandorian_hops_6] @farming_hops_use;
+[oplocu,krandorian_hops_fullygrown] @farming_hops_use;
+[oplocu,krandorian_hops_seed_watered] @farming_hops_use;
+[oplocu,krandorian_hops_1_watered] @farming_hops_use;
+[oplocu,krandorian_hops_2_watered] @farming_hops_use;
+[oplocu,krandorian_hops_3_watered] @farming_hops_use;
+[oplocu,krandorian_hops_4_watered] @farming_hops_use;
+[oplocu,krandorian_hops_5_watered] @farming_hops_use;
+[oplocu,krandorian_hops_6_watered] @farming_hops_use;
+[oplocu,krandorian_hops_1_diseased] @farming_hops_use;
+[oplocu,krandorian_hops_2_diseased] @farming_hops_use;
+[oplocu,krandorian_hops_3_diseased] @farming_hops_use;
+[oplocu,krandorian_hops_4_diseased] @farming_hops_use;
+[oplocu,krandorian_hops_5_diseased] @farming_hops_use;
+[oplocu,krandorian_hops_6_diseased] @farming_hops_use;
+[oplocu,krandorian_hops_1_dead] @farming_hops_use;
+[oplocu,krandorian_hops_2_dead] @farming_hops_use;
+[oplocu,krandorian_hops_3_dead] @farming_hops_use;
+[oplocu,krandorian_hops_4_dead] @farming_hops_use;
+[oplocu,krandorian_hops_5_dead] @farming_hops_use;
+[oplocu,krandorian_hops_6_dead] @farming_hops_use;
+[oploc1,krandorian_hops_fullygrown] @farming_hops_harvest(false);
+[oploc3,krandorian_hops_fullygrown] @farming_hops_harvest(true);
+
+[oplocu,wildblood_hops_seed] @farming_hops_use;
+[oplocu,wildblood_hops_1] @farming_hops_use;
+[oplocu,wildblood_hops_2] @farming_hops_use;
+[oplocu,wildblood_hops_3] @farming_hops_use;
+[oplocu,wildblood_hops_4] @farming_hops_use;
+[oplocu,wildblood_hops_5] @farming_hops_use;
+[oplocu,wildblood_hops_6] @farming_hops_use;
+[oplocu,wildblood_hops_7] @farming_hops_use;
+[oplocu,wildblood_hops_fullygrown] @farming_hops_use;
+[oplocu,wildblood_hops_seed_watered] @farming_hops_use;
+[oplocu,wildblood_hops_1_watered] @farming_hops_use;
+[oplocu,wildblood_hops_2_watered] @farming_hops_use;
+[oplocu,wildblood_hops_3_watered] @farming_hops_use;
+[oplocu,wildblood_hops_4_watered] @farming_hops_use;
+[oplocu,wildblood_hops_5_watered] @farming_hops_use;
+[oplocu,wildblood_hops_6_watered] @farming_hops_use;
+[oplocu,wildblood_hops_7_watered] @farming_hops_use;
+[oplocu,wildblood_hops_1_diseased] @farming_hops_use;
+[oplocu,wildblood_hops_2_diseased] @farming_hops_use;
+[oplocu,wildblood_hops_3_diseased] @farming_hops_use;
+[oplocu,wildblood_hops_4_diseased] @farming_hops_use;
+[oplocu,wildblood_hops_5_diseased] @farming_hops_use;
+[oplocu,wildblood_hops_6_diseased] @farming_hops_use;
+[oplocu,wildblood_hops_7_diseased] @farming_hops_use;
+[oplocu,wildblood_hops_1_dead] @farming_hops_use;
+[oplocu,wildblood_hops_2_dead] @farming_hops_use;
+[oplocu,wildblood_hops_3_dead] @farming_hops_use;
+[oplocu,wildblood_hops_4_dead] @farming_hops_use;
+[oplocu,wildblood_hops_5_dead] @farming_hops_use;
+[oplocu,wildblood_hops_6_dead] @farming_hops_use;
+[oplocu,wildblood_hops_7_dead] @farming_hops_use;
+[oploc1,wildblood_hops_fullygrown] @farming_hops_harvest(false);
+[oploc3,wildblood_hops_fullygrown] @farming_hops_harvest(true);
+
+[oplocu,barley_seed] @farming_hops_use;
+[oplocu,barley_1] @farming_hops_use;
+[oplocu,barley_2] @farming_hops_use;
+[oplocu,barley_3] @farming_hops_use;
+[oplocu,barley_fullygrown] @farming_hops_use;
+[oplocu,barley_seed_watered] @farming_hops_use;
+[oplocu,barley_1_watered] @farming_hops_use;
+[oplocu,barley_2_watered] @farming_hops_use;
+[oplocu,barley_3_watered] @farming_hops_use;
+[oplocu,barley_1_diseased] @farming_hops_use;
+[oplocu,barley_2_diseased] @farming_hops_use;
+[oplocu,barley_3_diseased] @farming_hops_use;
+[oplocu,barley_1_dead] @farming_hops_use;
+[oplocu,barley_2_dead] @farming_hops_use;
+[oplocu,barley_3_dead] @farming_hops_use;
+[oploc1,barley_fullygrown] @farming_hops_harvest(false);
+[oploc3,barley_fullygrown] @farming_hops_harvest(true);
+
+[oplocu,jute_seed] @farming_hops_use;
+[oplocu,jute_1] @farming_hops_use;
+[oplocu,jute_2] @farming_hops_use;
+[oplocu,jute_3] @farming_hops_use;
+[oplocu,jute_4] @farming_hops_use;
+[oplocu,jute_fullygrown] @farming_hops_use;
+[oplocu,jute_seed_watered] @farming_hops_use;
+[oplocu,jute_1_watered] @farming_hops_use;
+[oplocu,jute_2_watered] @farming_hops_use;
+[oplocu,jute_3_watered] @farming_hops_use;
+[oplocu,jute_4_watered] @farming_hops_use;
+[oplocu,jute_1_diseased] @farming_hops_use;
+[oplocu,jute_2_diseased] @farming_hops_use;
+[oplocu,jute_3_diseased] @farming_hops_use;
+[oplocu,jute_4_diseased] @farming_hops_use;
+[oplocu,jute_1_dead] @farming_hops_use;
+[oplocu,jute_2_dead] @farming_hops_use;
+[oplocu,jute_3_dead] @farming_hops_use;
+[oplocu,jute_4_dead] @farming_hops_use;
+[oploc1,jute_fullygrown] @farming_hops_harvest(false);
+[oploc3,jute_fullygrown] @farming_hops_harvest(true);
+
+[label,farming_hops_use]
+def_int $stage = ~farming_hops_stage;
+if ($stage = -1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = rake & $stage >= 0 & $stage < ^farming_veg_weeded) {
+    ~farming_rake_step(false);
+    return;
+}
+def_dbrow $crop;
+if ($stage = ^farming_veg_weeded) {
+    $crop = ~farming_hops_seed(last_useitem);
+    if ($crop = null) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, dibber) < 1) {
+        ~displaymessage(^dm_farming_dibber);
+        return;
+    }
+    def_obj $seed = db_getfield($crop, farming_hops:seed, 0);
+    def_int $seeds = db_getfield($crop, farming_hops:seed_count, 0);
+    if (inv_total(inv, $seed) < $seeds) {
+        // UNKNOWN functional wording; period guide establishes the seed count.
+        mes("You need <tostring($seeds)> seeds to plant this patch.");
+        return;
+    }
+    def_int $level = db_getfield($crop, farming_hops:level, 0);
+    if (stat_base(farming) < $level) {
+        // UNKNOWN functional wording.
+        mes("You need a Farming level of <tostring($level)> to plant this crop.");
+        return;
+    }
+    // CANDIDATE cache-tool animation attribution, as in the published families.
+    anim(farming_seed_dibbing, 0);
+    inv_del(inv, $seed, $seeds);
+    ~farming_hops_set_stage(db_getfield($crop, farming_hops:first, 0));
+    stat_advance(farming, db_getfield($crop, farming_hops:plant_xp, 0));
+    // UNKNOWN functional wording.
+    mes("You plant the seeds in the hops patch.");
+    return;
+}
+$crop = ~farming_hops_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $after = ~farming_crop_care($stage, db_getfield($crop, farming_hops:first, 0), db_getfield($crop, farming_hops:mature, 0), "hops", true);
+if ($after ! $stage) ~farming_hops_set_stage($after);
+
+[label,farming_hops_harvest](boolean $automatic)
+def_int $stage = ~farming_hops_stage;
+def_dbrow $crop = ~farming_hops_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+def_int $mature = db_getfield($crop, farming_hops:mature, 0);
+def_int $last = db_getfield($crop, farming_hops:last, 0);
+if ($stage < $mature | $stage > $last) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+// UNKNOWN hops-specific spade gate; period guide says only some harvests need it.
+if (inv_total(inv, spade) < 1) {
+    ~displaymessage(^dm_farming_spade);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    // UNKNOWN functional wording, shared with the published allotments.
+    mes("You don't have enough inventory space.");
+    return;
+}
+// UNKNOWN hops cadence/binding: reuse published 3/2-tick picking convention.
+if (~farming_harvest_ready($automatic) = false) return;
+anim(picking_low, 0);
+inv_add(inv, db_getfield($crop, farming_hops:produce, 0), 1);
+// VERIFIED period per-item XP. CANDIDATE three lives, with a life-saving roll.
+stat_advance(farming, db_getfield($crop, farming_hops:harvest_xp, 0));
+if (random(^farming_harvest_denominator) < ~farming_hops_life_loss) {
+    if ($stage < $last) {
+        $stage = add($stage, 1);
+    } else {
+        $stage = ^farming_veg_weeded;
+    }
+    ~farming_hops_set_stage($stage);
+}
+%action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
+if ($stage >= $mature) p_oploc(3);
+// UNKNOWN functional wording.
+def_string $plants = db_getfield($crop, farming_hops:plural, 0);
+mes("You harvest some <$plants> from the hops patch.");

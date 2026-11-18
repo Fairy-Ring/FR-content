@@ -1,0 +1,15 @@
+// CANDIDATE wording: soulbane.dlg.journal. These are conversation quotations,
+// not recovered original journal prose. Layout is UNKNOWN engineering work.
+[if_button,questlist:soulbane]
+def_string $text = "";
+switch_int (%soulbane_prog) {
+    case 0 :
+        $text = "@dbl@I'm waiting to see my son Tolna.";
+    case 1 :
+        $text = "@dbl@Go into the rift beside me and find my husband and son!||@dbl@Thank you. You can use a rope to get into the rift, just attach it at the edge.";
+    case 2 :
+        $text = "@dbl@It's a very aggressive room. I think I need to defeat the monsters in there.";
+    case 3 :
+        $text = "@str@I managed to defeat the monsters in the room!||@dbl@Sorry, I've yet to enter the next room.";
+}
+~quest_journal("A Soul's Bane", $text);

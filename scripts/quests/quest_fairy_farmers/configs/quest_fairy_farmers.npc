@@ -1,0 +1,34 @@
+// Original 377 block moved verbatim; server combat parameters follow it.
+[fairy_tanglefoot]
+name=Tanglefoot
+desc=A walking thorn bush!
+model1=npc_3313
+recol1s=24172
+recol1d=10436
+recol2s=15785
+recol2d=9379
+recol3s=14728
+recol3d=8322
+recol4s=12614
+recol4d=7265
+resizev=150
+op2=Attack
+walkanim=tanglefoot_walk
+readyanim=tanglefoot_ready
+vislevel=111
+hitpoints=102
+attack=97
+strength=97
+defence=91
+head1=npc_3313_head
+// CANDIDATE OSRS Tanglefoot: HP102/97/97/91, slash, four-tick attacks, max12.
+// UNKNOWN engineering leash; no period spawn or wander radius survives.
+wanderrange=0
+maxrange=20
+param=attackrate,4
+param=damagetype,^slash_style
+param=attack_anim,tanglefoot_attack
+param=defend_anim,tanglefoot_block
+param=death_anim,tanglefoot_death
+// UNKNOWN native-melee calibration for the sourced maximum, not a historic bonus.
+param=strengthbonus,^ft1_tanglefoot_strengthbonus

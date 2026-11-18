@@ -89390,29 +89390,6 @@ members=yes
 iop5=Destroy
 weight=80g
 
-[fairy_enchanted_secateurs]
-name=Magic secateurs
-desc=The only way to kill a Tanglefoot.
-recol1s=15855
-recol1d=704
-recol2s=10570
-recol2d=352
-recol3s=5217
-recol3d=608
-model=obj_secateurs
-manwear=obj_secateurs_manwear,0
-womanwear=obj_secateurs_manwear,6
-2dxof=-1
-2dyof=11
-2dzoom=710
-2dyan=320
-2dxan=312
-members=yes
-iop2=Wield
-iop5=Destroy
-wearpos=righthand
-weight=1lb
-
 [fairy_queen_secateurs]
 name=Queen's secateurs
 desc=Contains the Fairy Queen's magic essence.
@@ -94203,74 +94180,6 @@ weight=5lb
 [cert_soulbane_zaros_spear]
 certlink=soulbane_zaros_spear
 certtemplate=template_for_cert
-
-[soulbane_anger_swordq]
-name=Anger sword
-desc=A heavy duty sword.
-cost=26
-model=obj_soulbane_anger_swordq
-2dyof=3
-2dzoom=2128
-2dyan=6
-2dxan=498
-iop2=Wield
-manwear=obj_soulbane_anger_swordq_manwear,0
-womanwear=obj_soulbane_anger_swordq_manwear,6
-members=yes
-wearpos=righthand
-weight=4lb
-
-[soulbane_anger_axeq]
-name=Anger battleaxe
-desc=A heavy duty axe.
-cost=182
-model=obj_soulbane_anger_axeq
-2dxof=-1
-2dyof=1
-2dzoom=2256
-2dyan=519
-2dxan=1646
-iop2=Wield
-manwear=obj_soulbane_anger_axeq_manwear,0
-womanwear=obj_soulbane_anger_axeq_manwear,6
-members=yes
-wearpos=righthand
-weight=6lb
-
-[soulbane_anger_maceq]
-name=Anger mace
-desc=A heavy duty mace.
-cost=18
-iop2=Wield
-manwear=obj_soulbane_anger_maceq_manwear,0
-womanwear=obj_soulbane_anger_maceq_manwear,6
-model=obj_soulbane_anger_maceq
-2dxof=1
-2dyof=98
-2dzoom=1872
-2dyan=1994
-2dxan=294
-members=yes
-wearpos=righthand
-weight=4lb
-
-[soulbane_anger_spearq]
-name=Anger spear
-desc=A heavy duty spear.
-members=yes
-cost=26
-model=obj_soulbane_anger_spearq
-iop2=Wield
-manwear=obj_soulbane_anger_spearq_manwear,0
-womanwear=obj_soulbane_anger_spearq_manwear,6
-2dxof=1
-2dyof=1
-2dyan=2042
-2dxan=504
-members=yes
-wearpos=righthand
-wearpos2=lefthand
-weight=3g
 
 [rag_vinegar]
 name=Jug of vinegar

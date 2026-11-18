@@ -30,7 +30,8 @@ const extraCases = [
 ];
 const specs = [
   { name: 'rift-unroped', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2', state: 0, refused: true },
-  { name: 'rift-roped', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2_rope', state: 1 },
+  { name: 'rift-roped-unstarted', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2_rope', state: 1, stage: 0, refused: true },
+  { name: 'rift-roped', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2_rope', state: 1, stage: 1 },
   { name: 'plinth-placed', parent: 'elid_statuette_multiloc', child: 'elid_statuette_placed', state: 60, item: 'elid_statuette', refused: true },
   ...[0, 10, 20, 25, 27, 30, 35, 40, 50, 55].map(state => ({ name: `plinth-base-${state}`, parent: 'elid_statuette_multiloc', child: 'elid_statuette_base', state, item: 'elid_statuette', gated: state < 50, nextState: 60 })),
   { name: 'altar-pouch', parent: 'devious_altar', child: 'devious_altar_pouch', state: 1, item: 'devious_glowingpouch', refused: true },
@@ -67,6 +68,7 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
   [p.level, p.x, p.z] = approaches[0];
   p.buildArea.rebuild();
   p.setVarBit(root.multivarbit, spec.state);
+  if (spec.stage !== undefined) p.setVarBit(types.VarBitType.getId('soulbane_prog'), spec.stage);
   assert.equal(types.LocType.get(root.multiloc[spec.state]).debugname, spec.child, 'fixture shown form');
   const invId = types.InvType.getId('inv');
   const inv = p.getInventory(invId);
@@ -93,7 +95,8 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
   // The published engine selects no handler for refused forms. The repaired
   // engine selects the guarded parent. Assert identical player outcomes below.
   if (!spec.refused) assert(selected, 'working child-bound handler');
-  if (spec.refused) dispatchPath(selected, `[${spec.item ? 'oplocu' : 'oploc1'},${spec.parent}]`);
+  if (spec.refused && spec.stage === 0) assert.equal(selected, '[oploc1,soulbane_falloff2_rope]', 'unstarted quest reaches the native roped-rift gate');
+  else if (spec.refused) dispatchPath(selected, `[${spec.item ? 'oplocu' : 'oploc1'},${spec.parent}]`);
   let reached = false;
   for (let i = 0; i < 3 && !reached; i++) reached = p.tryInteract(true);
   assert(reached, 'click processed');
@@ -132,10 +135,14 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
       }
     } else assert.equal(executions.length, 0, 'published missing-handler path');
   } else if (!spec.item) {
-    assert.deepEqual(after.coordinates, [0, 3013, 5243]);
-    assert.equal(after.state, 1);
+    const instance = World.instances.findInstanceByCoord(p);
+    assert(instance, 'accepted quest descent creates its native private region');
+    assert.deepEqual([p.level, p.x - instance.sw.x + 3008, p.z - instance.sw.z + 5184], [0, 3013, 5243], 'descent uses the original cache-room destination');
+    assert.equal(after.state, 1, 'descent preserves the attached-rope form');
+    assert.equal(p.getVarBit(types.VarBitType.getId('soulbane_prog')), 2, 'accepted stage-1 descent starts Rage');
+    assert.equal(p.getVar(types.VarPlayerType.getId('soulbane_instance')), instance.uid + 1, 'descent binds the created region');
     assert.equal(p.overlay, types.Component.getId('rage_level'));
-    assert.deepEqual(changedVars, []);
+    assert.deepEqual(changedVars.map(change => change.id).sort((a, b) => a - b), ['soulbane', 'soulbane_instance'].map(name => types.VarPlayerType.getId(name)).sort((a, b) => a - b), 'descent writes only its quest progress and temporary region handle');
   } else {
     assert.deepEqual(after.coordinates, before.coordinates);
     assert.equal(after.itemCount, before.itemCount - 1);

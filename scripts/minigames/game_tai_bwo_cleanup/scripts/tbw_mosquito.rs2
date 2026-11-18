@@ -1,0 +1,60 @@
+// CANDIDATE: OSRS Light Jungle 15203654 and Cleanup 15359755.
+// The pre-4 June 2025 table has 1% gout and 8/7/6% mosquito forms.
+// Only mosquito outcomes belong to this unit. Other event outcomes are not built.
+[proc,tbw_jungle_mosquito_event]()(boolean)
+if (random(^tbw_event_roll_size) >= %eventchance) return (false);
+def_int $roll = random(100);
+%eventchance = 0;
+def_npc $mosquito = null;
+if ($roll >= 64 & $roll < 72) {
+    $mosquito = tbwcu_mosquito_single;
+} else if ($roll >= 72 & $roll < 79) {
+    $mosquito = tbwcu_mosquito_swarm3;
+} else if ($roll >= 79 & $roll < 85) {
+    $mosquito = tbwcu_mosquito_swarm5;
+}
+if ($mosquito = null) return (false);
+// Use a walkable square reachable from the hacker, never the blocked bush tile.
+def_coord $spawn = map_findsquare(coord, 1, 1, ^map_findsquare_lineofwalk);
+if ($spawn = null) return (false);
+npc_add($spawn, $mosquito, ^tbw_mosquito_lifetime);
+npc_setmode(opplayer2);
+return (true);
+
+[ai_queue3,tbwcu_mosquito_single] @tbw_mosquito_death(1, 175);
+[ai_queue3,tbwcu_mosquito_swarm3] @tbw_mosquito_death(3, 350);
+[ai_queue3,tbwcu_mosquito_swarm5] @tbw_mosquito_death(5, 750);
+
+// CANDIDATE: Large mosquito 15216710 / Mosquito swarm 15216711.
+// Anyone can kill another player's mosquito, including before Jungle Potion.
+[label,tbw_mosquito_death](int $quantity, int $agility_xp)
+gosub(npc_death);
+if (npc_findhero = 1) {
+    obj_add(npc_coord, mosquito_proboscis, $quantity, ^lootdrop_duration);
+    stat_advance(agility, $agility_xp);
+    // A favour write needs protected access; do not queue rewards for busy players.
+    if (p_finduid(uid) = true) {
+        if (~tbw_in_village = true & %cleanup_progress > 0) {
+            ~tbw_add_favour(^tbw_favour_mosquito);
+        }
+    }
+}
+
+[opnpcu,tbwcu_mosquito_single] @tbw_mosquito_repellent;
+[opnpcu,tbwcu_mosquito_swarm3] @tbw_mosquito_repellent;
+[opnpcu,tbwcu_mosquito_swarm5] @tbw_mosquito_repellent;
+
+[label,tbw_mosquito_repellent]
+if (last_useitem ! insect_repellent) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// CANDIDATE: reusable repellent halves combat stats (floor one), stops attacks 6s.
+npc_statsub(attack, min(sub(npc_stat(attack), 1), divide(add(npc_stat(attack), 1), 2)), 0);
+npc_statsub(strength, min(sub(npc_stat(strength), 1), divide(add(npc_stat(strength), 1), 2)), 0);
+npc_statsub(defence, min(sub(npc_stat(defence), 1), divide(add(npc_stat(defence), 1), 2)), 0);
+npc_statsub(magic, min(sub(npc_stat(magic), 1), divide(add(npc_stat(magic), 1), 2)), 0);
+npc_statsub(ranged, min(sub(npc_stat(ranged), 1), divide(add(npc_stat(ranged), 1), 2)), 0);
+%npc_action_delay = add(map_clock, 10);
+// UNKNOWN functional message, no retained transcript supplies this line.
+mes("You use the insect repellent on the mosquitoes.");

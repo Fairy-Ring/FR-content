@@ -242,8 +242,6 @@ scope=perm
 
 [itdigsitemulti]
 
-[varp137_unused]
-
 [thieving_stall_timer]
 scope=perm
 
@@ -286,8 +284,6 @@ clientcode=7
 [marketthief]
 scope=perm
 transmit=yes
-
-[varp190_unused]
 
 [varp191_unused]
 
@@ -1047,10 +1043,6 @@ transmit=yes
 
 [varp532_unused]
 
-[tai_bwo_cleanup]
-
-[tai_bwo_villagerchat]
-transmit=yes
 
 [tbw_cleanup_temp]
 transmit=yes
