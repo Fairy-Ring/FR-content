@@ -2,7 +2,7 @@
 [opnpc1,elemental_wizard_boss]
 if (%fairy_farmers_quest < ^ft1_zandar) return;
 if (%fairy_farmers_quest >= ^ft1_enchanted) {
-    if (~obj_gettotal(fairy_enchanted_secateurs) = 0) {
+    if (~obj_gettotal(fairy_enchanted_secateurs) = 0 & %farming_tools_fairysecateurs = 0) {
         // VERIFIED period replacement price; UNKNOWN plain functional menu wording.
         def_int $replace = ~p_choice2("Buy replacement magic secateurs for 40,000 coins.", 1, "No thanks.", 2);
         if ($replace = 2) return;
