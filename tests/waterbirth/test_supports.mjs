@@ -6,7 +6,6 @@ import { proveFootpath } from './footpath.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { NpcStat } = await engineModule('engine/entity/NpcStat.ts');
-const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const constants = readFileSync(path.join(contentRoot, 'scripts/areas/area_waterbirth/configs/waterbirth_puzzle.constant'), 'utf8');
 const reset = Number(constants.match(/\^waterbirth_support_reset\s*=\s*(\d+)/)?.[1]);
 const hp = Number(constants.match(/\^waterbirth_support_hitpoints\s*=\s*(\d+)/)?.[1]);
@@ -31,10 +30,10 @@ function equip(name, count = 1) {
   p.clearInteraction();
 }
 for (const name of ['airrune', 'mindrune', 'firerune', 'bloodrune']) p.invAdd(inv, id('ObjType', name), 1000);
-function dispatch(n, trigger = ServerTriggerType.OPNPC2) {
+function dispatch(n, actor = p, trigger = ServerTriggerType.OPNPC2) {
   const script = ScriptProvider.getByTrigger(trigger, n.type, types.NpcType.get(n.type).category);
   assert(script, 'the visible support Destroy operation dispatches into compiled combat');
-  return execute(script.name, p, [], { target: n });
+  return execute(script.name, actor, [], { target: n });
 }
 function advance(ticks = 1) {
   for (let i = 0; i < ticks; i++) {
@@ -71,88 +70,127 @@ p.teleport(2545, 10148, 0);
 const remoteRoute = map.findPathToEntity(0, p.x, p.z, supports[1].x, supports[1].z, 1, 1, 1);
 const remoteEnd = remoteRoute.at(-1);
 assert(remoteEnd === undefined || !map.reachedEntity(0, (remoteEnd >>> 14) & 0x3fff, remoteEnd & 0x3fff, supports[1].x, supports[1].z, 1, 1, 1), 'closed barriers prevent outside melee approach to the opposite prop');
-p.teleport(2545, 10142, 0);
+p.teleport(2544, 10143, 0);
 equip('rune_scimitar');
-JavaRandom.setSeed(1);
-dispatch(supports[0]);
-assert(queues()[0].some(q => q.lastInt > 0), 'a real interior melee attack schedules positive damage');
-advance(10);
-assert.equal(barrier(supports[0]).type, id('LocType', 'trollrescue_blankmodel_8968'));
-proveFootpath(2545, 10142);
-advance(reset);
-restored();
-console.log('PASS interior melee works, while packed barriers prevent outside melee reach');
-
-// Native Ranged damage and native queue2 -> custom queue3. No direct HP write,
-// test-only damage script or fake death trigger is used to open a barrier.
-equip('rune_thrownaxe', 100);
-p.teleport(2545, 10148, 0);
-proveFootpath(2545, 10148);
-proveFootpath(2545, 10149);
-// A native poison-start control exercises destruction cleanup. Poison does not
-// open the barrier: the following ordinary Ranged hit still has to kill it.
 execute('[proc,npc_poison_start]', p, [1], { target: supports[1] });
 assert(supports[1].vars[id('VarNpcType', 'npc_poison')] > 0);
 JavaRandom.setSeed(1);
 dispatch(supports[1]);
-assert(queues()[1].some(q => q.lastInt > 0), 'real ranged attack schedules positive damage');
+assert(queues()[1].some(q => q.lastInt > 0), 'a real interior melee attack schedules positive damage');
 advance(10);
-assert.equal(supports[1].type, id('NpcType', 'dagannoth_weak_door_fallen_west'));
 assert.equal(barrier(supports[1]).type, id('LocType', 'trollrescue_blankmodel_8968'));
-for (const n of [supports[0], supports[2]]) assert.equal(barrier(n).type, id('LocType', 'dagcave_invisibleblocking'), 'one death opens only its own barrier');
-assert.equal(types.NpcType.get(supports[1].type).op?.some(Boolean) ?? false, false, 'fallen prop is not attackable');
 assert.equal(supports[1].vars[id('VarNpcType', 'npc_poison')], 0, 'normal destruction clears native poison state');
 assert.equal(supports[1].timerInterval, poll, 'normal destruction restores the pressure-controller timer');
+proveFootpath(2544, 10143);
+advance(reset);
+restored();
+console.log('PASS interior melee works, clears poison and preserves the pressure timer; packed barriers prevent outside melee reach');
+
+// Native Ranged damage and native queue2 -> custom queue3. No direct HP write,
+// test-only damage script or fake death trigger is used to open a barrier.
+equip('rune_thrownaxe', 100);
+p.teleport(2545, 10147, 0);
+proveFootpath(2545, 10147);
+execute('[if_button,combat_thrown:thrown2]', p);
+assert(map.isLineOfSight(0, p.x, p.z, supports[0].x, supports[0].z), 'the actual north approach has native projectile sight to the opposite south support');
+JavaRandom.setSeed(1);
+dispatch(supports[0]);
+assert(queues()[0].some(q => q.lastInt > 0), 'real ranged attack schedules positive damage');
+advance(10);
+assert.equal(supports[0].type, id('NpcType', 'dagannoth_weak_door_fallen_south'));
+assert.equal(barrier(supports[0]).type, id('LocType', 'trollrescue_blankmodel_8968'));
+for (const n of [supports[1], supports[2]]) assert.equal(barrier(n).type, id('LocType', 'dagcave_invisibleblocking'), 'one death opens only its own barrier');
+assert.equal(types.NpcType.get(supports[0].type).op?.some(Boolean) ?? false, false, 'fallen prop is not attackable');
 advance(reset);
 restored();
 console.log('PASS real ranged damage opens only the matching barrier and native lifetimes reset it');
 
-// A native magic attack from another path can also destroy the same prop.
+// A native magic attack from the south approach destroys the north prop.
+p.teleport(2545, 10139, 0);
+proveFootpath(2545, 10139);
+assert(map.isLineOfSight(0, p.x, p.z, supports[2].x, supports[2].z), 'the actual south approach has native projectile sight to the opposite north support');
 set('action_delay', 0);
 JavaRandom.setSeed(1);
-execute('[apnpct,magic:fire_wave]', p, [], { target: supports[1] });
-assert(queues()[1].some(q => q.lastInt > 0), 'real manual magic schedules positive damage');
+execute('[apnpct,magic:fire_wave]', p, [], { target: supports[2] });
+assert(queues()[2].some(q => q.lastInt > 0), 'real manual magic schedules positive damage');
 advance(10);
-assert.equal(barrier(supports[1]).type, id('LocType', 'trollrescue_blankmodel_8968'));
+assert.equal(barrier(supports[2]).type, id('LocType', 'trollrescue_blankmodel_8968'));
 advance(reset);
 restored();
-console.log('PASS real manual Magic damage and own-side cast refusal');
+console.log('PASS real manual Magic damage from the opposite approach and own-side cast refusal');
 
-// Toggle the actual packed special button, then the ordinary Destroy dispatch.
-// The player remains outside the north prop, so its destruction must be a
-// native chain hit rather than an initial attack which bypasses the side gate.
+// Three real World players split into the north and south paths. Only starting
+// positions outside the pressure doors are fixture seeds; every subsequent
+// position is an individually collision-checked native pathfinder step.
+const magician = player(), padHelper = player();
+for (const name of ['airrune', 'firerune', 'bloodrune']) magician.invAdd(inv, id('ObjType', name), 1000);
+const staff = id('ObjType', 'staff_of_air');
+magician.invSet(worn, staff, 1, types.ObjType.get(staff).wearpos);
+execute('[proc,player_combat_stat]', magician);
+execute('[if_button,combat_staff_2:auto_choose]', magician);
+execute('[if_button,staff_spells:ssb15]', magician);
+execute('[if_button,combat_staff_2:auto_toggle]', magician);
+function walkPlayer(actor, x, z) {
+  const route = map.findPath(0, actor.x, actor.z, x, z);
+  const last = route.at(-1);
+  assert(last !== undefined && ((last >>> 14) & 0x3fff) === x && (last & 0x3fff) === z, 'the cooperative route has an exact native walking path');
+  for (const packed of route) {
+    const tx = (packed >>> 14) & 0x3fff, tz = packed & 0x3fff;
+    while (actor.x !== tx || actor.z !== tz) {
+      const dx = Math.sign(tx - actor.x), dz = Math.sign(tz - actor.z);
+      assert(map.canTravel(0, actor.x, actor.z, dx, dz, 1, 0, CollisionType.NORMAL), 'the cooperative player never steps through closed packed collision');
+      actor.teleport(actor.x + dx, actor.z + dz, 0);
+      advance();
+    }
+  }
+}
+const pressure = (z, name) => World.getLoc(2491, z, 0, id('LocType', name));
+for (const [actor, x, z] of [[p, 2489, 10162], [magician, 2489, 10130], [padHelper, 2489, 10164]]) {
+  proveFootpath(x, z);
+  actor.teleport(x, z, 0);
+}
+walkPlayer(p, 2490, 10162);
+assert(pressure(10162, 'dagannoth_pressure_door'), 'one occupied north stone does not open the door');
+walkPlayer(padHelper, 2490, 10164);
+assert(pressure(10162, 'dagannoth_pressure_open'), 'two real players open the north door');
+walkPlayer(p, 2493, 10163);
+walkPlayer(padHelper, 2489, 10164);
+walkPlayer(p, 2545, 10147);
+assert(pressure(10162, 'dagannoth_pressure_door'), 'the vacated north door resets behind the first attacker');
+walkPlayer(padHelper, 2490, 10132);
+walkPlayer(magician, 2490, 10130);
+assert(pressure(10130, 'dagannoth_pressure_open'), 'the remaining two real players open the south door');
+walkPlayer(magician, 2493, 10131);
+walkPlayer(padHelper, 2489, 10132);
+walkPlayer(magician, 2545, 10139);
+assert(pressure(10130, 'dagannoth_pressure_door3'), 'the vacated south door resets behind the second attacker');
+assert(map.isLineOfSight(0, p.x, p.z, supports[0].x, supports[0].z));
+assert(map.isLineOfSight(0, magician.x, magician.z, supports[2].x, supports[2].z));
 equip('rune_thrownaxe', 100);
-p.teleport(2545, 10148, 0);
-set('sa_energy', 1000);
-set('sa_attack', 0);
-execute('[if_button,combat_thrown:specbar]', p);
-assert.equal(p.getVar(id('VarPlayerType', 'sa_attack')), 1);
+execute('[if_button,combat_thrown:thrown2]', p);
+JavaRandom.setSeed(1);
+dispatch(supports[0]);
+assert(queues()[0].some(q => q.lastInt > 0));
+JavaRandom.setSeed(1);
+dispatch(supports[2], magician);
+assert(queues()[2].some(q => q.lastInt > 0));
+advance(10);
+assert.equal(barrier(supports[0]).type, id('LocType', 'trollrescue_blankmodel_8968'));
+assert.equal(barrier(supports[2]).type, id('LocType', 'trollrescue_blankmodel_8968'));
+walkPlayer(p, 2545, 10143);
+walkPlayer(magician, 2545, 10142);
+walkPlayer(p, 2544, 10143);
+equip('rune_scimitar');
 JavaRandom.setSeed(1);
 dispatch(supports[1]);
-const hits = queues();
-assert(hits.every(q => q.some(hit => hit.lastInt > 0)), 'unmodified rune thrownaxe special chains real positive hits onto all three mapped supports');
-assert(p.getVar(id('VarPlayerType', 'sa_energy')) < 1000, 'native special consumes energy');
-assert(p.invTotal(worn, id('ObjType', 'rune_thrownaxe')) < 100, 'native special consumes actual ammunition');
+assert(queues()[1].some(q => q.lastInt > 0));
 advance(10);
-assert(supports.every(n => n.type === id('NpcType', `dagannoth_weak_door_fallen_${names[supports.indexOf(n)]}`)), 'all three supports visibly fall');
-assert(supports.every(n => barrier(n)?.type === id('LocType', 'trollrescue_blankmodel_8968')), 'the native chain opens every original barrier');
-// The unchanged chain above spans the x=2544 and z=10144 zone boundaries.
-// Check both ends of every approved zone without constraining later units'
-// decisions about any neighboring zone's period classification.
-for (const x of [2536, 2543, 2544, 2551]) for (const z of [10136, 10143, 10144, 10151]) {
-  assert(World.gameMap.isMulti(CoordGrid.packCoord(0, x, z)), 'all four approved support-room zones consistently permit multi-combat');
-}
-for (const [x, z, dx, dz] of [[2543, 10143, 1, 0], [2544, 10143, -1, 0], [2545, 10143, 0, 1], [2545, 10144, 0, -1]]) {
-  assert(map.canTravel(0, x, z, dx, dz, 1, 0, CollisionType.NORMAL), 'an opened support fight is physically crossable in both directions at each zone boundary');
-}
-assert(map.isLineOfWalk(0, 2541, 10143, 2545, 10143), 'the cleared western corridor crosses the x-zone boundary');
-assert(map.isLineOfWalk(0, 2545, 10143, 2541, 10143), 'the western boundary cannot trap a player returning from the ladder room');
-assert(map.isLineOfWalk(0, 2545, 10148, 2545, 10143), 'the player can physically enter through the cleared north barrier');
+assert(supports.every(n => barrier(n)?.type === id('LocType', 'trollrescue_blankmodel_8968')), 'three ordinary attacks open all three matching barriers without a special or multi-combat addition');
 proveFootpath(2545, 10143);
 for (const support of supports) proveFootpath(support.x, support.z, support.level);
 advance(reset);
 restored();
-console.log('PASS unchanged rune thrownaxe special, three real hits, three barriers, physical entry and reset');
+console.log('PASS three real players cross both first doors, ordinary Ranged and Magic open each other’s barriers, interior Melee clears the last support and every barrier resets');
 
 // World owns workers, but this transport-free suite starts no server.
 process.exit(0);
