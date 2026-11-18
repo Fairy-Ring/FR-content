@@ -39,6 +39,32 @@ const crops = [
 ];
 let checks = 0;
 function test(name, action) { action(); checks++; console.log(`PASS ${name}`); }
+// The same period table retains later-family fees without enabling their care.
+const futurePayments = [
+  ['bush_redberry', 'sack_cabbage_10', 4], ['bush_cadavaberry', 'basket_tomato_5', 3],
+  ['bush_dwellberry', 'basket_strawberry_5', 3], ['bush_jangerberry', 'watermelon', 6],
+  ['bush_whiteberry', 'bittercap_mushroom', 8], ['bush_poison_ivy', 'coconut', 15],
+  ['wood_oak', 'basket_tomato_5', 1], ['wood_willow', 'basket_apple_5', 1],
+  ['wood_maple', 'basket_orange_5', 1], ['wood_yew', 'cactus_spine', 10], ['wood_magic', 'coconut', 25],
+  ['fruit_apple', 'sweetcorn', 9], ['fruit_banana', 'basket_apple_5', 4],
+  ['fruit_orange', 'basket_strawberry_5', 3], ['fruit_curry', 'basket_banana_5', 5],
+  ['fruit_pineapple', 'watermelon', 10], ['fruit_papaya', 'pineapple', 10], ['fruit_palm', 'papaya', 15]
+];
+test('all eighteen future-family fees are compiled data, not enabled crop costs', () => {
+  const p = player();
+  let table;
+  for (const [name, payment, quantity] of futurePayments) {
+    const rowId = id('DbRowType', `farming_protection_future_${name}`), row = types.DbRowType.get(rowId);
+    table ??= row.tableId;
+    assert.equal(row.tableId, table);
+    assert.deepEqual(row.getValue(0, 0), [id('ObjType', payment)]);
+    assert.deepEqual(row.getValue(1, 0), [quantity]);
+    const unavailable = proc(p, 'farming_protection_cost', rowId);
+    assert.deepEqual(unavailable.intStack.slice(0, unavailable.isp), [-1, 0]);
+  }
+  assert.equal(types.DbRowType.getInTable(table).length, futurePayments.length);
+  p.unlink();
+});
 for (const [name, first, mature, last, payment, quantity] of crops) {
   const patch = name.startsWith('hops_') ? 8 : 0;
   test(`${name}: exact full-item cost and atomic missing/duplicate payment`, () => {
