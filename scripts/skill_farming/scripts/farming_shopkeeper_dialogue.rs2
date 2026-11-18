@@ -1,0 +1,50 @@
+// CANDIDATE: dialogue is recorded in farming.dlg.shopkeepers.
+[opnpc1,farming_shopkeeper_1] @farming_shopkeeper_talk;
+[opnpc1,farming_shopkeeper_2] @farming_shopkeeper_talk;
+[opnpc1,farming_shopkeeper_3] @farming_shopkeeper_talk;
+[opnpc1,farming_shopkeeper_4] @farming_shopkeeper_talk;
+
+[label,farming_shopkeeper_talk]
+~chatnpc("Hello. How can I help you?");
+if (npc_type = farming_shopkeeper_1) {
+    def_int $option = ~p_choice4("What are you selling?", 1, "Can you give me any Farming advice?", 2, "Can you tell me how to use the loom?", 3, "I'm okay, thank you.", 4);
+    while ($option = 2) {
+        ~chatplayer("Can you give me any Farming advice?");
+        ~chatnpc("Yes - ask a gardener.");
+        $option = ~p_choice4("What are you selling?", 1, "Can you give me any Farming advice?", 2, "Can you tell me how to use the loom?", 3, "I'm okay, thank you.", 4);
+    }
+    if ($option = 1) {
+        ~chatplayer("What are you selling?");
+        ~openshop_activenpc;
+    } else if ($option = 3) {
+        ~chatplayer("Can you tell me how to use the loom?");
+        ~chatnpc("Well, it's actually my loom, but I don't mind you using it, if you like. You can use it to weave sacks and baskets in which you can put vegetables and fruit.");
+        def_int $loom_option = ~p_choice3("What do I need to weave sacks?", 1, "What do I need to weave baskets?", 2, "Thank you, that's very kind.", 3);
+        if ($loom_option = 1) {
+            ~chatplayer("What do I need to weave sacks?");
+            ~chatnpc("Well, the best sacks are made with jute fibres; you can grow jute yourself in a hops patch. I'd say about 4 jute fibres should be enough to weave a sack.");
+            ~chatplayer("Thank you, that's very kind.");
+        } else if ($loom_option = 2) {
+            ~chatplayer("What do I need to weave baskets?");
+            ~chatnpc("Well, the best baskets are made with young branches cut from a willow tree. You'll need a very young willow tree; otherwise, the branches will have grown too thick to be able to weave. I suggest growing your own.");
+            ~chatnpc("You can cut the branches with a standard pair of secateurs. You will probably need about 6 willow branches to weave a complete basket.");
+            ~chatplayer("Thank you, that's very kind.");
+        } else if ($loom_option = 3) {
+            ~chatplayer("Thank you, that's very kind.");
+        }
+    } else if ($option = 4) {
+        ~chatplayer("I'm okay, thank you.");
+    }
+} else {
+    def_int $option = ~p_choice3("What are you selling?", 1, "Can you give me any Farming advice?", 2, "I'm okay, thank you.", 3);
+    if ($option = 1) {
+        ~openshop_activenpc;
+    } else if ($option = 2) {
+        ~chatplayer("Can you give me any Farming advice?");
+        ~chatnpc("Yes - ask a gardener.");
+    } else if ($option = 3) {
+        // CANDIDATE: the sole Vanessa transcript attributes this reply to Vanessa.
+        if (npc_type = farming_shopkeeper_2) ~chatnpc("I'm okay, thank you.");
+        else ~chatplayer("I'm okay, thank you.");
+    }
+}
