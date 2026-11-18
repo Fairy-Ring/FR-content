@@ -227,6 +227,7 @@ jobs:
           run_test tests/dwarven-transport/test_dwarven_transport.mjs node --import tsx ../content/tests/dwarven-transport/test_dwarven_transport.mjs
           run_test tests/waterbirth/test_waterbirth.mjs node --import tsx ../content/tests/waterbirth/test_waterbirth.mjs
           run_test tests/slimy-eel/test_slimy_eel.mjs node --import tsx ../content/tests/slimy-eel/test_slimy_eel.mjs
+          run_test tests/fishing-spots/test_fishing_spots.mjs node --import tsx ../content/tests/fishing-spots/test_fishing_spots.mjs
           run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
           run_test tests/magic-carpets/test_magic_carpets.mjs node --import tsx ../content/tests/magic-carpets/test_magic_carpets.mjs
           run_test tests/food-drink/test_food_drink.mjs node --import tsx ../content/tests/food-drink/test_food_drink.mjs
