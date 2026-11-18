@@ -67,6 +67,9 @@ type MapLabel = {
 type Area = {
   label: string;
   distance: number | null;
+  projectedZ: number;
+  projection: 'surface' | 'below';
+  nearestLabel: string;
 };
 
 type Route = {
@@ -81,6 +84,13 @@ type Dispatch = {
   slot: number;
   ap: Route;
   op: Route;
+};
+
+type MissingOption = {
+  slot: number;
+  option: string;
+  apRoutes: Route[];
+  opRoutes: Route[];
 };
 
 type FormReport = {
@@ -229,22 +239,32 @@ function readMapLabels(contentRoot: string): MapLabel[] {
   return labels;
 }
 
-function nearestArea(labels: MapLabel[], x: number, z: number): Area {
-  if (!labels.length) return { label: 'UNLABELED', distance: null };
+// UNKNOWN engineering grouping radius: one map-square width, not a place boundary.
+const MAX_LABEL_DISTANCE_TILES = 64;
+// Current map pairs and ladders.rs2:86-97 establish the conventional +6400 layout.
+const UNDERGROUND_Z_OFFSET = 6400;
+
+function nearestArea(labels: MapLabel[], x: number, z: number, mapFile: string): Area {
+  const projection = z >= UNDERGROUND_Z_OFFSET ? 'below' : 'surface';
+  const projectedZ = projection === 'below' ? z - UNDERGROUND_Z_OFFSET : z;
+  const unlabelled = `unlabelled (${mapFile.replace(/\.jm2$/, '')})`;
+  if (!labels.length) return { label: unlabelled, distance: null, projectedZ, projection, nearestLabel: '' };
   let nearest = labels[0];
   let nearestDistanceSquared = Number.POSITIVE_INFINITY;
   for (const label of labels) {
-    const dx = label.x - x;
-    const dz = label.z - z;
-    const distanceSquared = dx * dx + dz * dz;
+    const distanceSquared = (label.x - x) ** 2 + (label.z - projectedZ) ** 2;
     if (distanceSquared < nearestDistanceSquared || (distanceSquared === nearestDistanceSquared && label.id < nearest.id)) {
       nearest = label;
       nearestDistanceSquared = distanceSquared;
     }
   }
   return {
-    label: nearest.name,
+    label: nearestDistanceSquared <= MAX_LABEL_DISTANCE_TILES ** 2
+      ? `${nearest.name}${projection === 'below' ? ' (below)' : ''}` : unlabelled,
     distance: Math.round(Math.sqrt(nearestDistanceSquared) * 10) / 10,
+    projectedZ,
+    projection,
+    nearestLabel: nearest.name,
   };
 }
 
@@ -659,6 +679,12 @@ export type NoRouteTalkWitness = {
   talkSlot: number;
 };
 
+export function isTalkOption(option: string | null | undefined): boolean {
+  // Observed packed spellings are Talk-to, Talk-To, Talk and Talk to.
+  const key = option?.toLowerCase().replace(/\s+/g, '-');
+  return key === 'talk' || key === 'talk-to';
+}
+
 export function findNoRouteTalkWitnesses(contentRoot: string, count: number): NoRouteTalkWitness[] {
   assert(Number.isInteger(count) && count > 0, `invalid witness count ${count}`);
   const rootIds = new Set(readMapNpcPlacements(contentRoot).placements.map(placement => placement.npcId));
@@ -672,7 +698,7 @@ export function findNoRouteTalkWitnesses(contentRoot: string, count: number): No
     nextNpcId += Math.max(1, npcFormStates(root).length);
 
     for (const form of forms.values()) {
-      const talkSlots = (form.visible.op ?? []).map((option, index) => option === 'Talk-to' ? index + 1 : 0).filter(Boolean);
+      const talkSlots = (form.visible.op ?? []).map((option, index) => isTalkOption(option) ? index + 1 : 0).filter(Boolean);
       for (const talkSlot of talkSlots) {
         const routes = [...routeForState(form, talkSlot, 'ap'), ...routeForState(form, talkSlot, 'op')];
         if (!routes.length || routes.some(route => route.script)) continue;
@@ -699,13 +725,58 @@ function routeForState(form: FormReport, slot: number, phase: 'ap' | 'op'): Rout
   return [...routes.values()];
 }
 
+function missingOptionsForForm(form: FormReport): MissingOption[] {
+  const missing: MissingOption[] = [];
+  for (let index = 0; index < 5; index++) {
+    const option = form.visible.op?.[index] ?? '';
+    if (!option || ['attack', 'hidden'].includes(option.toLowerCase())) continue;
+    const slot = index + 1;
+    const apRoutes = routeForState(form, slot, 'ap');
+    const opRoutes = routeForState(form, slot, 'op');
+    if ([...apRoutes, ...opRoutes].some(route => route.script)) continue;
+    missing.push({ slot, option, apRoutes, opRoutes });
+  }
+  return missing;
+}
+
+function selfTestMissingOptions(outDir: string): void {
+  const visible = new NpcType(-1);
+  visible.op = ['Synthetic missing first action', 'Attack', null, 'hidden', 'Synthetic missing fifth action'];
+  const dispatches = new Map<number, Map<string, Dispatch>>();
+  for (const slot of [1, 5]) {
+    dispatches.set(slot, new Map([['synthetic', {
+      state: 'synthetic', option: visible.op[slot - 1]!, slot,
+      ap: { trigger: enumTrigger(`APNPC${slot}`), script: null, rule: 'none' },
+      op: { trigger: enumTrigger(`OPNPC${slot}`), script: null, rule: 'none' },
+    }]]));
+  }
+  const form: FormReport = { root: visible, visible, states: new Set(['synthetic']), dispatches };
+  const rows = missingOptionsForForm(form).map(row => ({ optionSlot: row.slot, optionText: row.option }));
+  const name = `audit-options-selftest-${process.pid}.csv`;
+  const file = path.join(outDir, name);
+  assert(!fs.existsSync(file), 'refusing to overwrite a pre-existing self-test file');
+  try {
+    writeCsv(outDir, name, ['optionSlot', 'optionText'], rows);
+    assert.equal(fs.readFileSync(file, 'utf8'), 'optionSlot,optionText\n1,Synthetic missing first action\n5,Synthetic missing fifth action\n');
+  } finally {
+    fs.rmSync(file, { force: true });
+  }
+  assert(isTalkOption('Talk-to') && isTalkOption('Talk-To') && isTalkOption('Talk') && isTalkOption('Talk to'));
+  assert(!isTalkOption('Listen-to') && !isTalkOption('Attack'));
+  const labels: MapLabel[] = [{ id: 0, name: 'Synthetic label', x: 10, z: 10 }];
+  assert.equal(nearestArea(labels, 10, 6410, 'm0_100.jm2').label, 'Synthetic label (below)');
+  assert.equal(nearestArea(labels, 500, 500, 'm7_7.jm2').label, 'unlabelled (m7_7)');
+  console.log('AUDIT_SELFTEST missing first/fifth actions appear in CSV; talk spellings and bounded underground labels pass');
+}
+
 function allRouteStates(form: FormReport, slot: number): Dispatch[] {
   return [...(form.dispatches.get(slot)?.values() ?? [])];
 }
 
 type QuestStages = { terminals: Map<string, number>; values: Map<string, Set<number>>; constants: Map<string, number> };
+type EntryGuard = { guard: string; defects: string[] };
 
-function questEntryGuard(script: ScriptFile, contentRoot: string, stages: QuestStages): string | null {
+function questEntryGuard(script: ScriptFile, contentRoot: string, stages: QuestStages): EntryGuard | null {
   if (!sourcePath(script).startsWith('scripts/quests/')) return null;
   const lines = sourceLines(contentRoot, sourcePath(script));
   let first = Math.min(script.lineNumber(0) - 1, lines.length - 1);
@@ -726,6 +797,9 @@ function questEntryGuard(script: ScriptFile, contentRoot: string, stages: QuestS
   let cursor = 0;
   const skip = (): void => { while (/\s/.test(mask[cursor] ?? '') && cursor < mask.length) cursor++; };
   const conditions: string[] = [];
+  const defects: string[] = [];
+  const earlierAlternatives = new Set<string>();
+  let elseIf = false;
   while (true) {
     skip();
     if (!/^if\b/.test(mask.slice(cursor))) return null;
@@ -734,7 +808,15 @@ function questEntryGuard(script: ScriptFile, contentRoot: string, stages: QuestS
     if (mask[cursor] !== '(') return null;
     const conditionEnd = close(cursor, '(', ')');
     if (conditionEnd < 0) return null;
-    conditions.push(body.slice(cursor + 1, conditionEnd).trim());
+    const condition = body.slice(cursor + 1, conditionEnd).trim();
+    const alternatives = condition.replace(/\s+/g, '').split('|');
+    if (!elseIf) earlierAlternatives.clear();
+    else if (alternatives.every(alternative => earlierAlternatives.has(alternative))) {
+      const line = first + 2 + (mask.slice(0, cursor).match(/\n/g)?.length ?? 0);
+      defects.push(`${sourcePath(script)}:${line}: unreachable else-if (${condition}); every alternative already occurs in an earlier branch of this chain`);
+    }
+    for (const alternative of alternatives) earlierAlternatives.add(alternative);
+    conditions.push(condition);
     cursor = conditionEnd + 1;
     skip();
     if (mask[cursor] !== '{') return null;
@@ -745,14 +827,20 @@ function questEntryGuard(script: ScriptFile, contentRoot: string, stages: QuestS
     if (/^else\b/.test(mask.slice(cursor))) {
       cursor += 4;
       skip();
-      if (/^if\b/.test(mask.slice(cursor))) continue;
+      if (/^if\b/.test(mask.slice(cursor))) {
+        elseIf = true;
+        continue;
+      }
       if (mask[cursor] !== '{') return null;
       const otherwiseEnd = close(cursor, '{', '}');
       if (otherwiseEnd < 0 || !/^\s*(?:return\s*;)?\s*$/.test(mask.slice(cursor + 1, otherwiseEnd))) return null;
       cursor = otherwiseEnd + 1;
       skip();
     }
-    if (/^if\b/.test(mask.slice(cursor))) continue;
+    if (/^if\b/.test(mask.slice(cursor))) {
+      elseIf = false;
+      continue;
+    }
     if (!/^\s*(?:return\s*;)?\s*$/.test(mask.slice(cursor))) return null;
     break;
   }
@@ -789,7 +877,7 @@ function questEntryGuard(script: ScriptFile, contentRoot: string, stages: QuestS
     }
   })));
   if (![...samples].some(matches) || [...samples].every(matches)) return null;
-  return conditions.map(condition => `(${condition})`).join(' OR ');
+  return { guard: conditions.map(condition => `(${condition})`).join(' OR '), defects };
 }
 
 const messageOnlyOpcodes = new Set([...genericSafeOpcodes, 'MES', 'NPC_SAY', 'NPC_NAME', 'P_NAME', 'DISPLAYNAME']);
@@ -810,7 +898,7 @@ function talkClassification(
   chatTypeUse: Map<string, Set<number>>,
   stages: QuestStages,
   npcType: NpcType,
-): { classification: string; analysis: ScriptAnalysis | null; outsideStageOutcome: string } {
+): { classification: string; analysis: ScriptAnalysis | null; outsideStageOutcome: string; contentDefect?: string } {
   const scripts = [...new Map(routes.filter(route => route.script).map(route => [route.script!.id, route.script!])).values()];
   if (!scripts.length) {
     return {
@@ -829,13 +917,17 @@ function talkClassification(
   const silentApproach = analyses.every(analysis => analysis.chatSites.length > 0
     || (!analysis.incomplete && !analysis.deferredCalls.length && analysis.opcodeNames.every(name =>
       genericSafeOpcodes.has(name) || ['NPC_RANGE', 'P_APRANGE', 'COORD'].includes(name))));
-  const questOnly = answering.length > 0 && guards.every(Boolean) && silentApproach;
-  const questOutsideStageOutcome = `nothing: the existing handler returns without dialogue outside ${guards.filter(Boolean).join(' AND ')}; candidate source-stage guard, using new-player zero, registry completion and literal source assignments`;
+  const silentInSomeQuestStages = answering.length > 0 && guards.every(Boolean) && silentApproach;
+  const entryGuards = guards.filter((guard): guard is EntryGuard => Boolean(guard));
+  const questOutsideStageOutcome = `nothing: the existing handler returns without dialogue outside ${entryGuards.map(guard => guard.guard).join(' AND ')}; candidate source-stage guard, using new-player zero, registry completion and literal source assignments`;
 
-  if (questOnly) {
+  if (silentInSomeQuestStages) {
+    const contentDefect = uniqueStrings(entryGuards.flatMap(guard => guard.defects)).join('; ');
+    const details = [incomplete || deferred ? 'partial closure' : '', contentDefect ? 'content defect' : ''].filter(Boolean).join('; ');
     return {
-      classification: incomplete || deferred ? 'quest-only handler (partial closure)' : 'quest-only handler',
+      classification: `silent in some quest stages${details ? ` (${details})` : ''}`,
       analysis: combined,
+      contentDefect,
       outsideStageOutcome: questOutsideStageOutcome,
     };
   }
@@ -966,6 +1058,13 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   assert(fs.existsSync('data/pack/server/npc.dat'), 'missing built engine data/pack; run the final engine build first');
   fs.mkdirSync(outDir, { recursive: true });
   loadPackedConfigs('data/pack');
+  selfTestMissingOptions(outDir);
+  const op1Spellings = new Map<string, number>();
+  for (const type of NpcType.configs) {
+    if (!type) continue;
+    const spelling = type.op?.[0] || '<none>';
+    op1Spellings.set(spelling, (op1Spellings.get(spelling) ?? 0) + 1);
+  }
   const registry = await import(pathToFileURL(path.join(contentRoot, 'tests/quest-points/registry.mjs')).href) as {
     constants: Map<string, number>;
     quests: { fixture: [string, number][]; colours: { progress: string }[]; blocks: { condition: string }[] }[];
@@ -1008,7 +1107,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   const scan = readMapNpcPlacements(contentRoot);
   const labels = readMapLabels(contentRoot);
   const areaForPlacement = new Map<MapNpcPlacement, Area>();
-  for (const placement of scan.placements) areaForPlacement.set(placement, nearestArea(labels, placement.worldX, placement.worldZ));
+  for (const placement of scan.placements) areaForPlacement.set(placement, nearestArea(labels, placement.worldX, placement.worldZ, placement.mapFile));
   const placementsByRoot = new Map<number, MapNpcPlacement[]>();
   const missingNpcConfigs = new Set<number>();
   for (const placement of scan.placements) {
@@ -1051,7 +1150,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   }
 
   const talkEntries: { rootId: number; form: FormReport; talkSlot: number; routes: Route[]; area: string; placements: MapNpcPlacement[] }[] = [];
-  const op1MissingEntries: { rootId: number; form: FormReport; option: string; area: string; placements: MapNpcPlacement[]; apRoutes: Route[]; opRoutes: Route[] }[] = [];
+  const missingOptionEntries: (MissingOption & { rootId: number; form: FormReport; area: string; placements: MapNpcPlacement[] })[] = [];
   const byRootArea = new Map<number, Map<string, MapNpcPlacement[]>>();
   for (const [rootId, rootPlacements] of placementsByRoot) {
     const areas = new Map<string, MapNpcPlacement[]>();
@@ -1066,7 +1165,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     const forms = rootReports.get(rootId);
     if (!forms) continue;
     for (const form of forms.values()) {
-      const talkSlots = (form.visible.op ?? []).map((option, index) => option === 'Talk-to' ? index + 1 : 0).filter(Boolean);
+      const talkSlots = (form.visible.op ?? []).map((option, index) => isTalkOption(option) ? index + 1 : 0).filter(Boolean);
       const slotsToReport = talkSlots.length ? talkSlots : [0];
       for (const talkSlot of slotsToReport) {
         for (const [area, areaPlacements] of areas) {
@@ -1075,14 +1174,9 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
         }
       }
 
-      const op1 = form.visible.op?.[0] ?? '';
-      if (op1 && op1 !== 'Attack' && op1 !== 'Talk-to' && op1 !== 'hidden') {
-        const opRoutes = routeForState(form, 1, 'op');
-        if (!opRoutes.length) {
-          const apRoutes = routeForState(form, 1, 'ap');
-          for (const [area, areaPlacements] of areas) {
-            op1MissingEntries.push({ rootId, form, option: op1, area, placements: areaPlacements, apRoutes, opRoutes });
-          }
+      for (const missing of missingOptionsForForm(form)) {
+        for (const [area, areaPlacements] of areas) {
+          missingOptionEntries.push({ ...missing, rootId, form, area, placements: areaPlacements });
         }
       }
     }
@@ -1110,9 +1204,9 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     const root = NpcType.get(entry.rootId);
     const dispatchRoutes = entry.routes;
     const talkResult = entry.talkSlot === 0
-      ? { classification: 'no Talk-to option (no client dispatch)', analysis: null, outsideStageOutcome: '' }
+      ? { classification: 'no Talk-to option (no client dispatch)', analysis: null, outsideStageOutcome: '', contentDefect: '' }
       : talkClassification(dispatchRoutes, contentRoot, analysisCache, chatTypeUse, stages, root!);
-    const { classification, analysis, outsideStageOutcome } = talkResult;
+    const { classification, analysis, outsideStageOutcome, contentDefect = '' } = talkResult;
     const area = entry.area;
     const areaTiles = entry.placements.slice().sort((a, b) => numericMapSquareCompare(a.mapFile, b.mapFile) || a.line - b.line);
     const sample = areaTiles[0];
@@ -1139,6 +1233,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       categoryId: entry.form.visible.category,
       categoryName: getCategoryName(entry.form.visible),
       talkSlot: entry.talkSlot,
+      talkOption: entry.talkSlot ? entry.form.visible.op?.[entry.talkSlot - 1] ?? '' : '',
       ops: describeOps(entry.form.visible),
       op1Option,
       op1ApproachDispatch: op1Ap,
@@ -1147,6 +1242,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       talkOperationDispatch: entry.talkSlot ? exactStateRouteLabel(entry.form, entry.talkSlot, 'op') : 'not exposed by packed NPC options',
       outsideStageOutcome,
       classification,
+      contentDefect,
       otherResponseKind: classification.startsWith('other handler response: ') ? classification.slice('other handler response: '.length) : '',
       chatHeadProcCount: analysis?.chatSites.length ?? 0,
       chatHeadProcNames: uniqueStrings(analysis?.chatSites.map(site => site.procedure) ?? []).join('; '),
@@ -1155,7 +1251,10 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       reachableOpcodes: analysis?.opcodeNames.join('; ') ?? '',
       staticClosureComplete: analysis ? !analysis.incomplete && !analysis.deferredCalls.length : true,
       area,
-      nearestLabelDistanceTiles: areaTiles.map(placement => areaForPlacement.get(placement)?.distance).filter(distance => distance !== null && distance !== undefined).sort((a, b) => a - b)[0] ?? '',
+      nearestLabelDistanceTiles: sample ? areaForPlacement.get(sample)?.distance ?? '' : '',
+      projectedZ: sample ? areaForPlacement.get(sample)?.projectedZ ?? '' : '',
+      labelProjection: sample ? areaForPlacement.get(sample)?.projection ?? '' : '',
+      nearestLabel: sample ? areaForPlacement.get(sample)?.nearestLabel ?? '' : '',
       placementCount: areaTiles.length,
       mapSquaresInArea: formatMapSquares(areaTiles),
       allMapSquaresForPlacedType: rootAllMapSquares.get(entry.rootId) ?? '',
@@ -1168,9 +1267,14 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     });
   }
 
-  const op1MissingRows: Record<string, unknown>[] = op1MissingEntries.map(entry => {
+  const missingOptionRows: Record<string, unknown>[] = missingOptionEntries.map(entry => {
     const root = NpcType.get(entry.rootId);
-    const optionPriority = priorityForOption(entry.option, 1);
+    const servicePriority = priorityForOptions(entry.form.visible.op ?? []);
+    const optionPriority = servicePriority ?? priorityForOption(entry.option, entry.slot);
+    const triggers = [enumTrigger(`APNPC${entry.slot}`), enumTrigger(`OPNPC${entry.slot}`)];
+    const categories = [...new Set([root.category, entry.form.visible.category])].filter(category => category !== -1);
+    const categoryHandlerExists = categories.some(category => triggers.some(trigger => Boolean(ScriptProvider.getByTriggerSpecific(trigger, -1, category))));
+    const globalHandlerExists = triggers.some(trigger => Boolean(ScriptProvider.getByTriggerSpecific(trigger)));
     const sample = entry.placements.slice().sort((a, b) => numericMapSquareCompare(a.mapFile, b.mapFile) || a.line - b.line)[0];
     return {
       placedTypeId: entry.rootId,
@@ -1182,9 +1286,13 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       visibleStates: uniqueStrings(entry.form.states).join('; '),
       categoryId: entry.form.visible.category,
       categoryName: getCategoryName(entry.form.visible),
-      op1Option: entry.option,
+      optionSlot: entry.slot,
+      optionText: entry.option,
+      categoryHandlerExists,
+      globalHandlerExists,
+      categoryOrGlobalHandlerExists: categoryHandlerExists || globalHandlerExists,
       ops: describeOps(entry.form.visible),
-      operationDispatch: 'none',
+      operationDispatch: entry.opRoutes.map(routeLabel).join(' | ') || 'none',
       approachDispatch: entry.apRoutes.map(routeLabel).join(' | ') || 'none',
       placementCount: entry.placements.length,
       area: entry.area,
@@ -1194,6 +1302,8 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       priorityRank: optionPriority.rank,
       priorityBucket: optionPriority.bucket,
       priorityEvidence: optionPriority.basis,
+      serviceOption: servicePriority?.option ?? '',
+      serviceOptionSlot: servicePriority?.slot ?? '',
     };
   });
 
@@ -1309,7 +1419,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     || Number(right.placementCount) - Number(left.placementCount)
     || Number(left.placedTypeId) - Number(right.placedTypeId)
     || Number(left.visibleTypeId) - Number(right.visibleTypeId));
-  op1MissingRows.sort((left, right) => Number(left.priorityRank) - Number(right.priorityRank)
+  missingOptionRows.sort((left, right) => Number(left.priorityRank) - Number(right.priorityRank)
     || String(left.area).localeCompare(String(right.area))
     || Number(right.placementCount) - Number(left.placementCount)
     || Number(left.visibleTypeId) - Number(right.visibleTypeId));
@@ -1396,46 +1506,52 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       categoryName: root ? getCategoryName(root) : '',
       possibleVisibleForms: visibleForms.join('; '),
       nearestAreaLabel: area.label,
+      projectedZ: area.projectedZ,
+      labelProjection: area.projection,
+      nearestLabel: area.nearestLabel,
       nearestLabelDistanceTiles: area.distance ?? '',
     };
   });
 
   const areaSummary = new Map<string, {
     spawnKeys: Set<string>;
+    mapSquares: Set<string>;
     roots: Set<number>;
     talkRows: Record<string, unknown>[];
-    op1Rows: Record<string, unknown>[];
+    missingOptions: Record<string, unknown>[];
   }>();
   for (const placement of scan.placements) {
     const area = areaForPlacement.get(placement)!.label;
-    const summary = areaSummary.get(area) ?? { spawnKeys: new Set<string>(), roots: new Set<number>(), talkRows: [], op1Rows: [] };
+    const summary = areaSummary.get(area) ?? { spawnKeys: new Set<string>(), mapSquares: new Set<string>(), roots: new Set<number>(), talkRows: [], missingOptions: [] };
     summary.spawnKeys.add(`${placement.mapFile}:${placement.line}`);
+    summary.mapSquares.add(placement.mapFile);
     summary.roots.add(placement.npcId);
     areaSummary.set(area, summary);
   }
   for (const row of talkRows) {
     const area = String(row.area);
-    const summary = areaSummary.get(area) ?? { spawnKeys: new Set<string>(), roots: new Set<number>(), talkRows: [], op1Rows: [] };
+    const summary = areaSummary.get(area) ?? { spawnKeys: new Set<string>(), mapSquares: new Set<string>(), roots: new Set<number>(), talkRows: [], missingOptions: [] };
     summary.talkRows.push(row);
     areaSummary.set(area, summary);
   }
-  for (const row of op1MissingRows) {
+  for (const row of missingOptionRows) {
     const area = String(row.area);
-    const summary = areaSummary.get(area) ?? { spawnKeys: new Set<string>(), roots: new Set<number>(), talkRows: [], op1Rows: [] };
-    summary.op1Rows.push(row);
+    const summary = areaSummary.get(area) ?? { spawnKeys: new Set<string>(), mapSquares: new Set<string>(), roots: new Set<number>(), talkRows: [], missingOptions: [] };
+    summary.missingOptions.push(row);
     areaSummary.set(area, summary);
   }
   const areaRows: Record<string, unknown>[] = [...areaSummary.entries()].map(([area, summary]) => ({
     area,
+    mapSquares: [...summary.mapSquares].sort(numericMapSquareCompare).join('; '),
     spawnCount: summary.spawnKeys.size,
     placedNpcTypeCount: summary.roots.size,
     talkFormAreaRows: summary.talkRows.length,
     noTalkHandlerFormPlacements: summary.talkRows.filter(row => row.classification === 'no handler (engine default refusal)').reduce((sum, row) => sum + Number(row.placementCount), 0),
     noTalkOptionFormPlacements: summary.talkRows.filter(row => row.classification === 'no Talk-to option (no client dispatch)').reduce((sum, row) => sum + Number(row.placementCount), 0),
     genericOnlyFormPlacements: summary.talkRows.filter(row => String(row.classification).startsWith('generic only')).reduce((sum, row) => sum + Number(row.placementCount), 0),
-    questOnlyFormPlacements: summary.talkRows.filter(row => String(row.classification).startsWith('quest-only handler')).reduce((sum, row) => sum + Number(row.placementCount), 0),
+    silentQuestStageFormPlacements: summary.talkRows.filter(row => String(row.classification).startsWith('silent in some quest stages')).reduce((sum, row) => sum + Number(row.placementCount), 0),
     ordinaryDialogueFormPlacements: summary.talkRows.filter(row => /^(?:ordinary dialogue|generic only)/.test(String(row.classification))).reduce((sum, row) => sum + Number(row.placementCount), 0),
-    otherNonAttackOp1MissingPlacements: summary.op1Rows.reduce((sum, row) => sum + Number(row.placementCount), 0),
+    missingOptionFormPlacements: summary.missingOptions.reduce((sum, row) => sum + Number(row.placementCount), 0),
     unresolvedContinuationFormPlacements: summary.talkRows.filter(row => Boolean(row.unresolvedContinuationEdges)).reduce((sum, row) => sum + Number(row.placementCount), 0),
   })).sort((left, right) => String(left.area).localeCompare(String(right.area))
     || Number(right.spawnCount) - Number(left.spawnCount));
@@ -1447,22 +1563,13 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     mapSquares: formatMapSquares(placementsByRoot.get(id) ?? []),
   }));
 
-  const topServiceGaps: Record<string, unknown>[] = [
-    ...op1MissingRows.filter(row => Number(row.priorityRank) === 0).map(row => ({
+  const topServiceGaps = missingOptionRows
+    .filter(row => Number(row.priorityRank) === 0)
+    .map(row => ({
       ...row,
-      missingRoute: 'op1 (no OPNPC1 handler)',
-      missingOption: String(row.op1Option),
-      serviceOption: String(row.op1Option),
-      serviceOptionSlot: 1,
-    })),
-    ...talkRows
-      .filter(row => row.classification === 'no handler (engine default refusal)' && Number(row.priorityRank) === 0)
-      .map(row => ({
-        ...row,
-        missingRoute: 'Talk-to (no handler)',
-        missingOption: 'Talk-to',
-      })),
-  ]
+      missingRoute: `op${row.optionSlot} (no AP/OP handler)`,
+      missingOption: String(row.optionText),
+    }))
     .sort((left, right) => Number(left.priorityRank) - Number(right.priorityRank)
       || Number(right.placementCount) - Number(left.placementCount)
       || String(left.area).localeCompare(String(right.area))
@@ -1472,33 +1579,31 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   writeCsv(outDir, 'audit-npc-spawns.csv', [
     'mapFile', 'sourceLine', 'regionX', 'regionZ', 'plane', 'localX', 'localZ', 'worldX', 'worldZ', 'cacheCoord',
     'placedTypeId', 'placedInternalName', 'placedDisplayName', 'categoryId', 'categoryName', 'possibleVisibleForms',
-    'nearestAreaLabel', 'nearestLabelDistanceTiles',
+    'nearestAreaLabel', 'nearestLabelDistanceTiles', 'projectedZ', 'labelProjection', 'nearestLabel',
   ], spawnRows);
   writeCsv(outDir, 'audit-npc-talk.csv', [
     'placedTypeId', 'placedInternalName', 'placedDisplayName', 'visibleTypeId', 'visibleInternalName', 'visibleDisplayName',
-    'visibleStates', 'categoryId', 'categoryName', 'talkSlot', 'ops', 'op1Option', 'op1ApproachDispatch', 'op1OperationDispatch',
-    'talkApproachDispatch', 'talkOperationDispatch', 'outsideStageOutcome', 'classification', 'otherResponseKind', 'chatHeadProcCount',
+    'visibleStates', 'categoryId', 'categoryName', 'talkSlot', 'talkOption', 'ops', 'op1Option', 'op1ApproachDispatch', 'op1OperationDispatch',
+    'talkApproachDispatch', 'talkOperationDispatch', 'outsideStageOutcome', 'classification', 'contentDefect', 'otherResponseKind', 'chatHeadProcCount',
     'chatHeadProcNames', 'chatHeadProcEvidence', 'unresolvedContinuationEdges',
-    'reachableOpcodes', 'staticClosureComplete', 'area', 'nearestLabelDistanceTiles', 'placementCount', 'mapSquaresInArea',
+    'reachableOpcodes', 'staticClosureComplete', 'area', 'nearestLabelDistanceTiles', 'projectedZ', 'labelProjection', 'nearestLabel', 'placementCount', 'mapSquaresInArea',
     'allMapSquaresForPlacedType', 'sampleTile', 'priorityRank', 'priorityBucket', 'priorityEvidence', 'serviceOption',
     'serviceOptionSlot',
   ], talkRows);
-  writeCsv(outDir, 'audit-npc-op1-missing.csv', [
+  writeCsv(outDir, 'audit-npc-options-missing.csv', [
     'placedTypeId', 'placedInternalName', 'placedDisplayName', 'visibleTypeId', 'visibleInternalName', 'visibleDisplayName',
-    'visibleStates', 'categoryId', 'categoryName', 'op1Option', 'ops', 'operationDispatch', 'approachDispatch',
+    'visibleStates', 'categoryId', 'categoryName', 'optionSlot', 'optionText', 'ops', 'operationDispatch', 'approachDispatch',
+    'categoryHandlerExists', 'globalHandlerExists', 'categoryOrGlobalHandlerExists',
     'placementCount', 'area', 'mapSquaresInArea', 'allMapSquaresForPlacedType', 'sampleTile', 'priorityRank',
     'priorityBucket', 'priorityEvidence',
-  ], op1MissingRows);
+  ], missingOptionRows);
   writeCsv(outDir, 'audit-npc-area-summary.csv', [
-    'area', 'spawnCount', 'placedNpcTypeCount', 'talkFormAreaRows', 'noTalkHandlerFormPlacements',
-    'genericOnlyFormPlacements', 'questOnlyFormPlacements', 'ordinaryDialogueFormPlacements', 'otherNonAttackOp1MissingPlacements',
+    'area', 'mapSquares', 'spawnCount', 'placedNpcTypeCount', 'talkFormAreaRows', 'noTalkHandlerFormPlacements',
+    'genericOnlyFormPlacements', 'silentQuestStageFormPlacements', 'ordinaryDialogueFormPlacements', 'missingOptionFormPlacements',
     'noTalkOptionFormPlacements',
     'unresolvedContinuationFormPlacements',
   ], areaRows);
   writeCsv(outDir, 'audit-npc-no-handler-by-name.csv', [
-    'visibleDisplayName', 'spawnCount', 'visibleTypeIds', 'placedTypeIds', 'areas', 'mapSquares', 'sampleTiles',
-  ], noHandlerByNameRows);
-  writeCsv(outDir, 'audit-npc-no-response-by-name.csv', [
     'visibleDisplayName', 'spawnCount', 'responseKind', 'visibleTypeIds', 'placedTypeIds', 'areas', 'mapSquares', 'sampleTiles',
   ], noResponseByNameRows);
   writeCsv(outDir, 'audit-npc-other-responses.csv', [
@@ -1506,6 +1611,10 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     'area', 'placementCount', 'otherResponseKind', 'talkApproachDispatch', 'talkOperationDispatch',
     'reachableOpcodes', 'staticClosureComplete', 'unresolvedContinuationEdges', 'mapSquaresInArea', 'sampleTile',
   ], otherResponseRows);
+  writeCsv(outDir, 'audit-npc-content-defects.csv', [
+    'placedTypeId', 'visibleTypeId', 'visibleDisplayName', 'classification', 'contentDefect',
+    'area', 'placementCount', 'mapSquaresInArea', 'sampleTile',
+  ], talkRows.filter(row => Boolean(row.contentDefect)));
   writeCsv(outDir, 'audit-npc-service-gaps.csv', [
     'missingRoute', 'missingOption', 'serviceOption', 'serviceOptionSlot', 'priorityBucket', 'priorityEvidence',
     'placedTypeId', 'placedInternalName', 'placedDisplayName', 'visibleTypeId', 'visibleDisplayName',
@@ -1538,8 +1647,11 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       placedNpcInstances: scan.placements.length,
       distinctPlacedNpcConfigIds: placementsByRoot.size,
       distinctTalkFormAreaRows: talkRows.length,
-      otherNonAttackOp1MissingRows: op1MissingRows.length,
-      otherNonAttackOp1MissingPlacements: op1MissingRows.reduce((sum, row) => sum + Number(row.placementCount), 0),
+      packedOp1Spellings: [...op1Spellings].sort(([left], [right]) => left.localeCompare(right)).map(([optionText, configCount]) => ({ optionText, configCount })),
+      missingOptionRows: missingOptionRows.length,
+      missingOptionFormPlacements: missingOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0),
+      missingNonTalkOp1Forms: new Set(missingOptionRows.filter(row => Number(row.optionSlot) === 1 && !isTalkOption(String(row.optionText))).map(row => `${row.placedTypeId}:${row.visibleTypeId}`)).size,
+      missingNonTalkOp1FormPlacements: missingOptionRows.filter(row => Number(row.optionSlot) === 1 && !isTalkOption(String(row.optionText))).reduce((sum, row) => sum + Number(row.placementCount), 0),
       unresolvedNpcConfigIds: missingConfigsRows,
       malformedMapNpcRows: scan.malformedRows,
       dispatchRuleConflicts: dispatchErrors,
@@ -1557,29 +1669,38 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
         'engine/src/engine/entity/Player.ts:1213-1237,1313-1322',
       ],
     },
-    areaMethod: 'Nearest x/z coordinate in maps/labels.txt; label trailing field is ignored because its meaning is not established. Distance is reported; this is a map label, not an area-boundary claim.',
+    areaMethod: {
+      surfaceLabels: 'maps/labels.txt; trailing field ignored because its meaning is not established',
+      undergroundProjection: 'subtract 6400 from z once; label a nearby surface coordinate with (below)',
+      projectionSource: 'scripts/ladders+stairs/scripts/ladders.rs2:86-97; paired 1754/1755 map placements',
+      maxLabelDistanceTiles: MAX_LABEL_DISTANCE_TILES,
+      radiusStatus: 'UNKNOWN engineering grouping radius, not a place boundary',
+      farOrMissingLabel: 'unlabelled (actual map square)',
+      mapSquares: 'retained on every placement, grouped talk/option row, name list and area row',
+    },
     talkClassificationMethod: [
+      'Talk spellings: the built pack contains Talk-to, Talk-To, Talk and Talk to. Case and whitespace separators are normalised by one shared predicate.',
       'No handler: actual Player AP and OP dispatch both return no ScriptFile; the engine fallback is reported separately.',
       'No Talk-to option: the packed visible form has no Talk-to action, so no player dispatch or default refusal is inferred.',
-      'Quest-only requires a source entry-stage guard with no outside dialogue branch; the guard and silent outside outcome are retained. Quest-directory membership alone is not a stage guard.',
+      'Silent in some quest stages requires a source entry-stage guard with no outside dialogue branch; the guard and silent outcome are retained. Quest-directory membership alone is not a stage guard. Identical alternatives shadowed within an else-if chain are recorded as content defects, not fixed.',
       'Generic only: one literal chat-head call site shared by multiple visible types, with a complete closure and no non-text/control effects outside the chat-head implementation.',
       'Ordinary dialogue: the compiled closure reaches the chat-head procedures and variants in scripts/interface_chat/scripts/chat.rs2; this establishes dialogue presence, not every quest-state branch.',
       'Other handler response: a present handler without an observed chat-head path, subdivided into return-only, message-only, opens an interface, or other. Unresolved closure stays explicit; this is not forced into the three area counts.',
       'Direct GOSUB/JUMP and recoverable queue/timer targets contribute to closure. Unresolved targets and handlers without an observed chat-head path remain explicit.',
     ],
     priorityMethod: {
-      highPriority: 'Missing Talk-to or non-Attack op1 dispatch with a literal bank/shop/trade/transport/quest token in any packed option; the missing route, service option and matched token are retained.',
+      highPriority: 'A missing non-Attack option in any slot with a literal bank/shop/trade/transport/quest token in any packed option; the missing route, service option and matched token are retained.',
       questIntentLimit: 'No quest-start role is inferred from NPC names or an absent handler. A blank Talk-to dispatch alone cannot identify a quest starter.',
       topExplicitServiceGaps: topServiceGaps,
     },
     outputs: [
       'audit-npc-spawns.csv',
       'audit-npc-talk.csv',
-      'audit-npc-op1-missing.csv',
+      'audit-npc-options-missing.csv',
       'audit-npc-area-summary.csv',
       'audit-npc-no-handler-by-name.csv',
-      'audit-npc-no-response-by-name.csv',
       'audit-npc-other-responses.csv',
+      'audit-npc-content-defects.csv',
       'audit-npc-service-gaps.csv',
       'audit-npc-handlers.csv',
       'audit-npc-defaults.csv',
@@ -1591,8 +1712,8 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       'Chat-head call sites are structural evidence, not proof of every state branch or wording authenticity. Ordinary-dialogue classification means presence in the closure, not an unconditional answer in every state.',
       'GOSUB/JUMP, WALKTRIGGER, NPC_QUEUE, NPC_SETTIMER and recoverable queue/timer calls contribute to closure; dynamic targets remain explicit and queued behavior is not executed.',
       'Each placed root type is resolved across packed multinpc selector slots; quest state and other player varps are not exhaustively explored.',
-      'Quest-only is a structural inference for simple complete entry guards on a canonical stage variable, with an answering and a silent state among new-player zero, registry completion or literal assignments in the checked-out RuneScript. No hypothetical intermediate stage is added. Unsupported or deeper guards remain dialogue-presence results; ordinary does not assert unconditional availability.',
-      'Map labels are nearest-coordinate annotations only; no polygon or semantic region boundaries are inferred.',
+      'Silent in some quest stages is a structural inference for simple complete entry guards on a canonical stage variable, with an answering and a silent state among new-player zero, registry completion or literal assignments in the checked-out RuneScript. No hypothetical intermediate stage is added. Unsupported or deeper guards remain dialogue-presence results; ordinary does not assert unconditional availability.',
+      'Map labels are bounded nearest-coordinate annotations. Below labels use one conventional -6400 z projection; far or unmatched rows retain the actual map square without an invented place name.',
       'Only the checked-out maps/*.jm2 placements and matching final built pack are in scope; dynamic spawns and instanced runtime NPCs are excluded.',
     ],
   };
@@ -1601,7 +1722,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   const classificationLines = Object.entries(countsByClassification).map(([name, count]) => `- ${name}: ${count} placed-form/area rows`).join('\n');
   const serviceLines = topServiceGaps.length
     ? topServiceGaps.map(row => `- ${row.area}: ${row.visibleDisplayName || row.placedInternalName} (${row.visibleTypeId}), missing ${row.missingOption}; service op${row.serviceOptionSlot} '${row.serviceOption}', ${row.placementCount} form placements; ${row.priorityEvidence}.`).join('\n')
-    : '- No missing Talk-to/non-Attack op1 route with an explicit packed service option was found.';
+    : '- No missing non-Attack option with an explicit packed service option was found.';
   const globalLines = defaultRows.map(row => `- ${row.trigger}: ${row.registeredGlobalScript}; ${row.classification}; ${row.exampleResponse || 'no literal response recorded'}`).join('\n');
   const report = [
     '# Compiled NPC Talk-to audit',
@@ -1616,7 +1737,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     '',
     `Read ${scan.mapFiles.length} map squares, ${scan.npcSections} with an NPC section, and ${scan.placements.length} placed NPC rows across ${placementsByRoot.size} distinct placed config ids. ${missingConfigsRows.length} placed config ids are unresolved in the built pack.`,
     '',
-    'The complete placement inventory is `audit-npc-spawns.csv`. `audit-npc-talk.csv` groups each placed root/form and approximate area, includes every map square for that placed root id, area-local map squares, sample tile, packed operations, actual AP/OP dispatch matches, and unresolved continuation edges. `audit-npc-op1-missing.csv` separately lists non-Attack, non-Talk-to op1 options with no OPNPC1 handler.',
+    'The complete placement inventory is `audit-npc-spawns.csv`. `audit-npc-talk.csv` retains every root/form and area, actual map squares, the sample tile, visible operations, AP/OP dispatch and unresolved continuations. `audit-npc-options-missing.csv` is the single gap inventory for every exposed non-Attack option in slots 1–5, including Talk variants. A gap requires both AP and OP routes to lack a script. Category/global-handler checks are explicit columns.',
     '',
     '## Talk classifications',
     '',
@@ -1626,9 +1747,9 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     '',
     '## Per-area triage',
     '',
-    '| Nearest map label | No handler | Quest-only | Ordinary dialogue |',
+    '| Map-label group | No handler | Silent in some quest stages | Ordinary dialogue |',
     '| --- | ---: | ---: | ---: |',
-    ...areaRows.map(row => `| ${String(row.area).replaceAll('|', '/')} | ${row.noTalkHandlerFormPlacements} | ${row.questOnlyFormPlacements} | ${row.ordinaryDialogueFormPlacements} |`),
+    ...areaRows.map(row => `| ${String(row.area).replaceAll('|', '/')} | ${row.noTalkHandlerFormPlacements} | ${row.silentQuestStageFormPlacements} | ${row.ordinaryDialogueFormPlacements} |`),
     '',
     'Counts are placed-form occurrences, not necessarily simultaneous NPCs. Ordinary includes the separately marked generic-only subtype. No-Talk-to forms and other handler responses are not forced into these three columns. Nearest labels are annotations, not town boundaries.',
     '',
@@ -1636,7 +1757,12 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     '',
     '`audit-npc-other-responses.csv` separates return-only handlers, message-only replies, interface openers and other effects. Each row retains actual dispatch and closure completeness. An unresolved continuation is not proof that no later dialogue exists.',
     '',
-    '`audit-npc-no-response-by-name.csv` lists return-only handlers beside names with no handler, sorted by physical placement count and distinguished by response kind. `audit-npc-no-handler-by-name.csv` remains the strict absent-dispatch subset. Each name deduplicates map-file/source-line placements across forms and areas.',
+    '`audit-npc-no-handler-by-name.csv` counts return-only handlers beside absent handlers, sorted by physical placement count and distinguished by response kind. Each name deduplicates map-file/source-line placements across forms and areas. The Talk CSV retains the strict absent-dispatch classification separately.',
+    '',
+    '## Source content defects',
+    '',
+    '`audit-npc-content-defects.csv` records shadowed source branches without changing gameplay. Silence can occur during a quest as well as before it.',
+    ...talkRows.filter(row => Boolean(row.contentDefect)).map(row => `- ${row.visibleDisplayName} (${row.visibleTypeId}): ${row.contentDefect}.`),
     '',
     '## Default handlers',
     '',
@@ -1646,8 +1772,8 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     '',
     '- Source placement dispatch is observed by calling production `OpNpcHandler.handle`, then `Player.getApTrigger()` and `Player.getOpTrigger()` on each packed visible NPC form; those Player methods own exact/category/global lookup and parent-form fallback.',
     '- Dialogue presence follows compiled calls to the chat-head procedures in `scripts/interface_chat/scripts/chat.rs2`, including direct label jumps and recoverable continuations. Ordinary means a dialogue path exists in the closure, not that every quest state answers.',
-    '- `maps/labels.txt` is used as a nearest-coordinate label index; the trailing numeric label field is ignored and distance is retained. Labels are not asserted as region boundaries.',
-    '- The ten-witness runtime command is `bash tests/npc-talk-audit/runtime.sh <engine-dir> [content-root]`; it selects from the current maps and pack, calls production OpNpcHandler, checks absent AP/OP routes, then records production Player.defaultOp response packets.',
+    `- Surface labels are used only within ${MAX_LABEL_DISTANCE_TILES} tiles. Conventional underground rows project z - ${UNDERGROUND_Z_OFFSET} and add (below). Other rows read unlabelled (their map square). This UNKNOWN engineering radius does not define a town boundary.`,
+    '- The up-to-ten-witness runtime command is `bash tests/npc-talk-audit/runtime.sh <engine-dir> [content-root]`. It selects only current gaps and passes with fewer or none, calls production OpNpcHandler, checks absent AP/OP routes, then records production Player.defaultOp response packets.',
     '- Dynamic continuation targets, dynamic spawns, instanced runtime NPCs, and text authenticity are not proven by this census; unresolved continuation edges are listed instead of omitted.',
     '',
     '## Output files',
@@ -1657,7 +1783,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   ].join('\n');
   fs.writeFileSync(path.join(outDir, 'audit-npc-talk.md'), report);
 
-  console.log(`AUDIT maps=${scan.mapFiles.length} npcSections=${scan.npcSections} placements=${scan.placements.length} placedTypes=${placementsByRoot.size} talkRows=${talkRows.length} op1Missing=${op1MissingRows.length} unresolvedConfigs=${missingConfigsRows.length}`);
+  console.log(`AUDIT maps=${scan.mapFiles.length} npcSections=${scan.npcSections} placements=${scan.placements.length} placedTypes=${placementsByRoot.size} talkRows=${talkRows.length} missingOptions=${missingOptionRows.length} unresolvedConfigs=${missingConfigsRows.length}`);
   console.log(`AUDIT outputs=${manifest.outputs.join(',')}`);
   if (scan.malformedRows.length || dispatchErrors.length || missingConfigsRows.length) {
     throw new Error(`audit is partial: malformed map rows=${scan.malformedRows.length}, unresolved dispatch rules=${dispatchErrors.length}, missing NPC configs=${missingConfigsRows.length}`);

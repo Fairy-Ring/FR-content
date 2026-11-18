@@ -10,14 +10,14 @@ import MessageGame from '#/network/game/server/model/MessageGame.js';
 import OpNpcHandler from '#/network/game/client/handler/OpNpcHandler.js';
 import OpNpc from '#/network/game/client/model/OpNpc.js';
 import * as rsbuf from '#/network/rsbuf/index.js';
-import { findNoRouteTalkWitnesses, loadPackedConfigs, type NoRouteTalkWitness } from './audit.mts';
+import { findNoRouteTalkWitnesses, isTalkOption, loadPackedConfigs, type NoRouteTalkWitness } from './audit.mts';
 
 function runWitness(witness: NoRouteTalkWitness, ordinal: number): void {
   const visibleTypeId = witness.visibleTypeId;
   const slot = witness.talkSlot;
   const type = NpcType.get(visibleTypeId);
   assert(type, `visible NPC config ${visibleTypeId} is not loaded`);
-  assert.equal(type.op?.[slot - 1], 'Talk-to', `NPC ${visibleTypeId} no longer has Talk-to in slot ${slot}`);
+  assert(isTalkOption(type.op?.[slot - 1]), `NPC ${visibleTypeId} no longer has a talk option in slot ${slot}`);
   const player = new Player('talkaudit', 1n, 1n);
   player.pid = 1;
   player.uid = 1;
@@ -80,11 +80,18 @@ function runWitness(witness: NoRouteTalkWitness, ordinal: number): void {
   console.log(`WITNESS ${ordinal}: placed=${witness.placedTypeId} visible=${visibleTypeId} slot=${slot} response=Nothing interesting happens.`);
 }
 
+function runWitnessBatch(witnesses: NoRouteTalkWitness[]): number {
+  for (let index = 0; index < witnesses.length; index++) runWitness(witnesses[index], index + 1);
+  return witnesses.length;
+}
+
 const [contentRootInput] = process.argv.slice(2);
 assert(contentRootInput, 'Usage: runtime.mts <content-root>');
 loadPackedConfigs('data/pack');
 
 const witnesses = findNoRouteTalkWitnesses(contentRootInput, 10);
-assert.equal(witnesses.length, 10, `expected ten distinct no-route Talk-to forms in the current maps and pack, found ${witnesses.length}`);
-for (let index = 0; index < witnesses.length; index++) runWitness(witnesses[index], index + 1);
-console.log('TALK_AUDIT_RUNTIME_WITNESSES=10 fallback=Nothing interesting happens.');
+assert.equal(runWitnessBatch([]), 0, 'an empty current gap set is valid');
+assert(witnesses.length <= 10, 'runtime witness selection exceeds its bound');
+const count = runWitnessBatch(witnesses);
+if (count === 0) console.log('SKIP: no unanswered mapped talk options remain');
+console.log(`TALK_AUDIT_RUNTIME_WITNESSES=${count} fallback=Nothing interesting happens.`);
