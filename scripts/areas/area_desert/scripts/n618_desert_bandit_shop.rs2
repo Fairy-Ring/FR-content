@@ -1,0 +1,13 @@
+[opnpc1,dt_bandit_shopkeeper]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>Stuff for sale. You buying?");
+def_int $choice = ~p_choice2("Yes", 1, "No", 2);
+if ($choice = 1) {
+    ~openshop(dt_bandit_shop, 700, 1000, 10, "Bandit Bargains");
+    return;
+}
+~chatnpc("<p,neutral>No? 'Bye then.");
+return;
+
+[opnpc3,dt_bandit_shopkeeper]
+~openshop(dt_bandit_shop, 700, 1000, 10, "Bandit Bargains");
