@@ -1,3 +1,7 @@
 [fairytale_multi]
 scope=perm
 transmit=yes
+
+[fairy_gardeners_visited]
+// UNKNOWN engineering storage: original unused slot 137, one bit per gardener.
+scope=perm

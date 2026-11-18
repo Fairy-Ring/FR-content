@@ -3,6 +3,10 @@
 // CANDIDATE exact tile: OSRS Making History map (2442,3139); the period image
 // shows the same east-bank site north of the bridge. Travel from north/east.
 [opheld1,makinghistory_key]
+if (%makinghistory_prog >= ^makinghistory_complete) {
+    ~ek_feel;
+    return;
+}
 if (%makinghistory_trader_prog >= 4) {
     mes("You've already delivered the journal");
     return;
@@ -21,23 +25,50 @@ if ($distance = 0) {
     %makinghistory_key_distance = 1;
     return;
 }
+~mh_key_reading($distance, false);
+
+// Share the existing comparison state and wording with the postquest hunt.
+// CANDIDATE hunt bands: OSRS Enchanted key revision 152529 and hunt revision 15336907.
+[proc,mh_key_reading](int $distance, boolean $hunt)
 def_string $temperature;
-if ($distance <= 50) {
-    $temperature = "Ouch! It's burning hot";
-} else if ($distance <= 100) {
-    $temperature = "It's hot";
-} else if ($distance <= 150) {
-    $temperature = "It's warm";
-} else if ($distance <= 200) {
-    $temperature = "It's cold";
+if ($hunt = true) {
+    if ($distance <= 4) {
+        $temperature = "The key is steaming";
+    } else if ($distance <= 30) {
+        $temperature = "Ouch! It's burning hot";
+    } else if ($distance <= 60) {
+        $temperature = "It's very hot";
+    } else if ($distance <= 100) {
+        $temperature = "It's hot";
+    } else if ($distance <= 400) {
+        $temperature = "It's warm";
+    } else if ($distance <= 700) {
+        $temperature = "It's cold";
+    } else if ($distance <= 1000) {
+        $temperature = "It's very cold";
+    } else {
+        $temperature = "It's freezing";
+    }
 } else {
-    $temperature = "It's freezing";
+    if ($distance <= 50) {
+        $temperature = "Ouch! It's burning hot";
+    } else if ($distance <= 100) {
+        $temperature = "It's hot";
+    } else if ($distance <= 150) {
+        $temperature = "It's warm";
+    } else if ($distance <= 200) {
+        $temperature = "It's cold";
+    } else {
+        $temperature = "It's freezing";
+    }
 }
 if (%makinghistory_key_distance > 0) {
     if ($distance < sub(%makinghistory_key_distance, 1)) {
         $temperature = "<($temperature)> and warmer than last time";
     } else if ($distance > sub(%makinghistory_key_distance, 1)) {
         $temperature = "<($temperature)> but colder than last time";
+    } else if ($hunt = true) {
+        $temperature = "<($temperature)> and the same temperature as last time";
     }
 }
 %makinghistory_key_distance = add($distance, 1);
