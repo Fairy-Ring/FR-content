@@ -1,17 +1,14 @@
-// Spirits of the Elid — waterfall root Use-rope dest (surface -> cave).
-// CANDIDATE dest-side (Research: subject spirits-of-the-elid): 3349,9536 L0
-// = 0_52_149_21_0, first walkable N of Leave loc 10417. Surface root 6382
-// @ 3369,3132 has 0 op* — leftover Use-rope is this hop. Gate rope 954.
-// Mes CANDIDATE one line from leftover root desc (swing); dump silent.
-// Consume 1 rope via last_useslot. Stay %elidquest. No fountain dest.
-// No loc overlay (packer won't merge [desert_water_cave_root]).
-// Research: subject spirits-of-the-elid · _unpack/377/all.loc [desert_water_cave_root].
+// Spirits of the Elid — use a rope on the waterfall root (surface -> cave).
+// The 3349,9536,0 destination is map-derived CANDIDATE evidence. Keep the
+// rope for repeat entry: this is an UNKNOWN engineering choice, not a period
+// claim about consumption. The swing line is CANDIDATE leftover wording.
+// No elidquest stage write. Research: spirits-of-the-elid.waterfall-entry-destination.
 
 [oplocu,desert_water_cave_root]
 if (last_useitem ! rope) {
     ~displaymessage(^dm_default);
     return;
 }
-inv_delslot(inv, last_useslot);
-mes("Maybe I could swing on this somehow..."); // CANDIDATE leftover desc line
+mes("Maybe I could swing on this somehow..."); // CANDIDATE
+// UNKNOWN engineering choice: retaining the rope keeps the route reusable.
 p_telejump(0_52_149_21_0); // CANDIDATE dest-side 3349,9536 L0

@@ -1,25 +1,33 @@
-// Spirits of the Elid — plinth place (statuette on plinth = quest done).
-// Official day 5 Dec 2005. CANDIDATE 2007-base (research
-// elid-plinth-place-377.md — %elidquest 60 = elid_statuette_placed face,
-// pack-cited via multivar). Use elid_statuette 6785 on elid_statuette_base
-// 10438 (name Statuette Plinth @ 3426,2930) / multi 10389 (multivar
-// elidquest, multiloc 0 -> base) -> consume 6785 + %elidquest = 60. Wrong
-// item -> ~displaymessage(^dm_default). No dest. No fountain Look invent.
-// No && / ||.
-// Cite elid-plinth-place-377.md · _unpack/377/all.loc 10389/10438.
+// VERIFIED completion and rewards: Tip.It capture 20060502085633.
+// The stage 60 cache face restores both the statuette and Nardah's fountain.
 
 [oplocu,elid_statuette_base] @elid_plinth_place;
 [oplocu,elid_statuette_multiloc] @elid_plinth_place;
 
 [label,elid_plinth_place]
 // A placed statuette must not consume another through parent fallback.
-if (%elidquest >= 60) {
+if (%elidquest >= ^elid_complete | %elidquest < ^elid_statuette_recovered) {
     ~displaymessage(^dm_default);
     return;
 }
-if (last_useitem ! elid_statuette) {
+if (last_useitem ! elid_statuette | inv_total(inv, elid_statuette) < 1) {
     ~displaymessage(^dm_default);
     return;
 }
 inv_del(inv, elid_statuette, 1);
-%elidquest = 60;
+%elidquest = ^elid_complete;
+stat_advance(prayer, ^elid_prayer_xp);
+stat_advance(thieving, ^elid_thieving_xp);
+stat_advance(magic, ^elid_magic_xp);
+// UNKNOWN scroll layout/title text, generated from the verified reward list.
+~send_quest_complete(questlist:elid, elid_statuette, ^elid_reward_model_scale, ^elid_questpoints, "You have completed Spirits of the Elid.", "8,000 Prayer XP|1,000 Thieving XP|1,000 Magic XP|Access to the shrine of Elidinis");
+
+[oploc1,elid_statuette_placed]
+if (%elidquest < ^elid_complete) {
+    return;
+}
+// VERIFIED healing/overheal exists in the period guide; +7 is CANDIDATE OSRS.
+if (stat(hitpoints) < add(stat_base(hitpoints), ^elid_shrine_hitpoints_boost)) {
+    stat_add(hitpoints, calc(stat_base(hitpoints) + ^elid_shrine_hitpoints_boost - stat(hitpoints)), 0);
+}
+@pray_at_altar(stat_base(prayer));

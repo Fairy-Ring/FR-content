@@ -1,0 +1,29 @@
+// CANDIDATE wording/letter IDs: OSRS transcript revision 15263331.
+// VERIFIED exchange beat: Tip.It guide, 2 May 2006.
+[label,mh_lathas]
+if (%makinghistory_prog = 3) {
+    if (inv_total(inv, makinghistory_letter2) = 0) {
+        ~chatplayer("<p,sad>Excuse me sire, but I seem to have lost that letter you gave me.");
+        ~chatnpc("<p,neutral>Very well, take another.");
+        ~mh_give(makinghistory_letter2, 1);
+        return;
+    }
+    ~chatnpc("<p,quiz>Have you taken that letter to Jorral yet?");
+    ~chatplayer("<p,neutral>I'm working on it!");
+    return;
+}
+if (inv_total(inv, makinghistory_letter1) = 0) {
+    ~chatplayer("<p,neutral>Excuse me. I have been asked to give you from Jorral... Ooops, I had a letter, but I don't have it with me - be right back!");
+    return;
+}
+~chatplayer("<p,neutral>Excuse me. I have been asked to hand you this from Jorral at the outpost.");
+~chatnpc("<p,neutral>I see.");
+~mesbox("The King reads the letter.");
+~chatnpc("<p,neutral>I had no idea that place had any value at all! All this about my Great Grandfather and Jorral's plans to make it into a museum makes for a convincing case.");
+~chatplayer("<p,neutral>I am sure he only wants what is best.");
+~chatnpc("<p,neutral>Very well, I will comply with his request. Take this letter back to him with my kind regards.");
+inv_del(inv, makinghistory_letter1, 1);
+inv_add(inv, makinghistory_letter2, 1);
+%makinghistory_prog = 3;
+~chatplayer("<p,happy>Thank you.");
+return;
