@@ -2948,7 +2948,9 @@ stock10=rosemary_seed,20,100
 stock11=marigold_seed,20,100
 stock12=hammerstone_hop_seed,20,100
 stock13=asgarnian_hop_seed,10,100
-stock14=yanillian_hop_seed,0,100
+// CANDIDATE: Old School Draynor Seed Market revisions 215783 and 15365049.
+// The imported later-revision zero differs from both retained stock tables.
+stock14=yanillian_hop_seed,5,100
 stock15=krandorian_hop_seed,0,100
 stock16=wildblood_hop_seed,0,100
 

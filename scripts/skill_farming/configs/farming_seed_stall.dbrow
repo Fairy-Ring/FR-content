@@ -1,0 +1,37 @@
+[stealing_seed_stall]
+table=stealing
+data=loc,seed_stall
+// CANDIDATE: Old School Seed Stall revision 15328061 names Olivia and the
+// Draynor Market Guard. These are their original 377 cache NPC definitions.
+data=owner,seed_merchant
+data=guard,farming_market_guard
+// VERIFIED: retained Tip.It Farming guide, 28 April 2006: level 27, 10 XP.
+data=level,27
+data=experience,100
+// CANDIDATE: pre-8-May-2024 nine-second timer in Seed Stall revision 15328061.
+// Fifteen 600-ms ticks; the existing shared player-count scaling is retained.
+// UNKNOWN: whether that inherited scaling reproduces the 2006 seed-stall timer.
+data=respawn_ticks,15
+// CANDIDATE: complete primary table in revision 15328061, qty one, total 1000.
+// All seventeen seeds occur in the 377 cache and retained period Farming guide.
+// The later tertiary Rocky pet is excluded; no primary weight is redistributed.
+// Item-name wording uses the published stall success-message template.
+data=loot,hammerstone_hop_seed,1,1,120,a hammerstone seed
+data=loot,potato_seed,1,1,119,a potato seed
+data=loot,marigold_seed,1,1,119,a marigold seed
+data=loot,barley_seed,1,1,118,a barley seed
+data=loot,onion_seed,1,1,89,an onion seed
+data=loot,asgarnian_hop_seed,1,1,83,an asgarnian seed
+data=loot,cabbage_seed,1,1,71,a cabbage seed
+data=loot,yanillian_hop_seed,1,1,47,a yanillian seed
+data=loot,rosemary_seed,1,1,36,a rosemary seed
+data=loot,nasturtium_seed,1,1,35,a nasturtium seed
+data=loot,tomato_seed,1,1,35,a tomato seed
+data=loot,jute_seed,1,1,35,a jute seed
+data=loot,sweetcorn_seed,1,1,30,a sweetcorn seed
+data=loot,krandorian_hop_seed,1,1,24,a krandorian seed
+data=loot,strawberry_seed,1,1,18,a strawberry seed
+data=loot,wildblood_hop_seed,1,1,12,a wildblood seed
+data=loot,watermelon_seed,1,1,9,a watermelon seed
+data=loot_total,1000
+data=stall,seed stall
