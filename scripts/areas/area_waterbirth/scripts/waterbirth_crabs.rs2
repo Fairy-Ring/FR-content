@@ -8,9 +8,8 @@ npc_setmode(opplayer2);
 npc_changetype(giant_rockcrab_deeper, ^wbcrab_giant_awake_ticks);
 npc_setmode(opplayer2);
 
-[ai_queue3,giant_rockcrab]
-[ai_queue3,giant_rockcrab_deeper]
-gosub(wbcrab_giant_death);
+[ai_queue3,giant_rockcrab] @wbcrab_giant_death;
+[ai_queue3,giant_rockcrab_deeper] @wbcrab_giant_death;
 
 [label,wbcrab_giant_death]
 gosub(npc_death);
