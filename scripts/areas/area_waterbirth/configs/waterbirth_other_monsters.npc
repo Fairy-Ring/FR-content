@@ -134,8 +134,8 @@ param=defend_anim,dagannoth_water_creature_defend
 param=death_anim,dagannoth_water_creature_death
 param=death_drop,bones
 huntmode=waterbirth_other_approach
-huntrange=^waterbirth_other_spinolyp_approach_radius
-attackrange=1
+huntrange=^waterbirth_other_spinolyp_hidden_attack_radius
+attackrange=^waterbirth_other_spinolyp_hidden_attack_radius
 respawnrate=^waterbirth_other_spinolyp_hidden_respawn_ticks
 
 [dagannoth_water_creature_1x1]
@@ -213,8 +213,8 @@ param=defend_anim,dagannoth_water_creature_defend
 param=death_anim,dagannoth_water_creature_death
 param=death_drop,bones
 huntmode=waterbirth_other_approach
-huntrange=^waterbirth_other_spinolyp_approach_radius
-attackrange=1
+huntrange=^waterbirth_other_spinolyp_hidden_attack_radius
+attackrange=^waterbirth_other_spinolyp_hidden_attack_radius
 respawnrate=^waterbirth_other_spinolyp_hidden_respawn_ticks
 
 [dagannoth_water_creature_1x12]
@@ -290,8 +290,8 @@ param=defend_anim,dagannoth_water_creature_defend
 param=death_anim,dagannoth_water_creature_death
 param=death_drop,bones
 huntmode=waterbirth_other_approach
-huntrange=^waterbirth_other_spinolyp_approach_radius
-attackrange=1
+huntrange=^waterbirth_other_spinolyp_hidden_attack_radius
+attackrange=^waterbirth_other_spinolyp_hidden_attack_radius
 respawnrate=^waterbirth_other_spinolyp_hidden_respawn_ticks
 
 [dagannoth_water_creature_1x13]

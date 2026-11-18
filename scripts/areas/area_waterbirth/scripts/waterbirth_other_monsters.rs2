@@ -4,40 +4,22 @@ npc_changetype(dagannoth_rock_lobster_2x2, ^max_32bit_int);
 npc_anim(dagannoth_rock_lobster_spring_up, 0);
 npc_setmode(null);
 
-// CANDIDATE: hidden water may melee adjacent players; visible Spinolyps are aggressive.
-// UNKNOWN: the outer approach tile reveals the paired visible type.
-[ai_opplayer2,dagannoth_water_creature_1x1_invisible]
-if (npc_inrange = true) {
-    ~npc_default_attack();
-} else {
-    npc_changetype(dagannoth_water_creature_1x1, ^waterbirth_other_spinolyp_form_ticks);
-    npc_anim(dagannoth_water_creature_spring_up, 0);
-    npc_setmode(null);
-    npc_sethuntmode(aggressive_ranged);
-    npc_sethunt(1);
-}
+// CANDIDATE: hidden water emerges "after a while"; no retained source gives proximity as the cause.
+// UNKNOWN: first emergence and later hidden intervals share the same selected native-turn duration.
+[ai_spawn,dagannoth_water_creature_1x1_invisible] @waterbirth_other_spinolyp_spawn;
+[ai_spawn,dagannoth_water_creature_1x1_invisible2] @waterbirth_other_spinolyp_spawn;
+[ai_spawn,dagannoth_water_creature_1x1_invisible3] @waterbirth_other_spinolyp_spawn;
 
-[ai_opplayer2,dagannoth_water_creature_1x1_invisible2]
-if (npc_inrange = true) {
-    ~npc_default_attack();
-} else {
-    npc_changetype(dagannoth_water_creature_1x12, ^waterbirth_other_spinolyp_form_ticks);
-    npc_anim(dagannoth_water_creature_spring_up, 0);
-    npc_setmode(null);
-    npc_sethuntmode(aggressive_ranged);
-    npc_sethunt(1);
-}
+[label,waterbirth_other_spinolyp_spawn]
+// Preserve the native default spawn initialization before scheduling autonomous emergence.
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+%npc_start_coord = npc_coord;
+npc_queue(4, 0, ^waterbirth_other_spinolyp_form_ticks);
 
-[ai_opplayer2,dagannoth_water_creature_1x1_invisible3]
-if (npc_inrange = true) {
-    ~npc_default_attack();
-} else {
-    npc_changetype(dagannoth_water_creature_1x13, ^waterbirth_other_spinolyp_form_ticks);
-    npc_anim(dagannoth_water_creature_spring_up, 0);
-    npc_setmode(null);
-    npc_sethuntmode(aggressive_ranged);
-    npc_sethunt(1);
-}
+// CANDIDATE: native adjacent OPPLAYER2 dispatch permits rapid inaccurate hidden melee, not emergence.
+[ai_opplayer2,dagannoth_water_creature_1x1_invisible] ~npc_default_attack();
+[ai_opplayer2,dagannoth_water_creature_1x1_invisible2] ~npc_default_attack();
+[ai_opplayer2,dagannoth_water_creature_1x1_invisible3] ~npc_default_attack();
 [ai_queue4,dagannoth_water_creature_1x1_invisible]
 ~waterbirth_other_spinolyp_reemerge();
 
@@ -140,18 +122,18 @@ if (npc_type = dagannoth_water_creature_1x1) {
 if (npc_type = dagannoth_water_creature_1x1_invisible | npc_type = dagannoth_water_creature_1x1_invisible2 | npc_type = dagannoth_water_creature_1x1_invisible3) {
     npc_anim(dagannoth_water_creature_go_down, 0);
     npc_setmode(null);
-    npc_sethuntmode(aggressive_melee);
+    npc_sethuntmode(waterbirth_other_approach);
     npc_sethunt(1);
     npc_queue(4, 0, ^waterbirth_other_spinolyp_form_ticks);
 }
 
 [proc,waterbirth_other_spinolyp_reemerge]
 if (npc_type = dagannoth_water_creature_1x1_invisible) {
-    npc_changetype(dagannoth_water_creature_1x1, ^waterbirth_other_spinolyp_form_ticks);
+    npc_changetype(dagannoth_water_creature_1x1, ^max_32bit_int);
 } else if (npc_type = dagannoth_water_creature_1x1_invisible2) {
-    npc_changetype(dagannoth_water_creature_1x12, ^waterbirth_other_spinolyp_form_ticks);
+    npc_changetype(dagannoth_water_creature_1x12, ^max_32bit_int);
 } else if (npc_type = dagannoth_water_creature_1x1_invisible3) {
-    npc_changetype(dagannoth_water_creature_1x13, ^waterbirth_other_spinolyp_form_ticks);
+    npc_changetype(dagannoth_water_creature_1x13, ^max_32bit_int);
 } else {
     return;
 }

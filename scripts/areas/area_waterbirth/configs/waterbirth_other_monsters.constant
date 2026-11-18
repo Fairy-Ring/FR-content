@@ -3,10 +3,10 @@
 ^waterbirth_other_rock_active_radius = 1
 ^waterbirth_other_rock_pursuit_radius = 16
 ^waterbirth_other_rock_respawn_ticks = 30
-^waterbirth_other_spinolyp_approach_radius = 2
 ^waterbirth_other_spinolyp_active_radius = 5
 ^waterbirth_other_spinolyp_attack_radius = 5
 ^waterbirth_other_spinolyp_pursuit_radius = 16
+^waterbirth_other_spinolyp_hidden_attack_radius = 1
 ^waterbirth_other_spinolyp_hidden_attack_ticks = 1
 
 // CANDIDATE exact-variant OSRS page gives respawn1=10 and respawn2=500 after death; it does not time form changes.

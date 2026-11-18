@@ -112,7 +112,7 @@ async function run() {
   const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
   const { NpcMode } = await load('src/engine/entity/NpcMode.ts');
   const { Interaction } = await load('src/engine/entity/Interaction.ts');
-  const { isLineOfSight, isLineOfWalk, isMapBlocked } = await load('src/engine/GameMap.ts');
+  const { isLineOfSight, isLineOfWalk, isMapBlocked, reachedEntity } = await load('src/engine/GameMap.ts');
   const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
   const Environment = (await load('src/util/Environment.ts')).default;
   const { ParamHelper } = await load('src/cache/config/ParamHelper.ts');
@@ -230,10 +230,11 @@ async function run() {
     assert.equal(type.vislevel, 34);
     assert.equal(type.stats[NpcStat.HITPOINTS], 100);
     assert.equal(type.stats[NpcStat.RANGED], 1, `${hiddenName}: hidden source ranged stat remains exact`);
-    assert.equal(type.huntrange, readConstant('scripts/areas/area_waterbirth/configs/waterbirth_other_monsters.constant', 'waterbirth_other_spinolyp_approach_radius'));
+    assert.equal(type.huntrange, readConstant('scripts/areas/area_waterbirth/configs/waterbirth_other_monsters.constant', 'waterbirth_other_spinolyp_hidden_attack_radius'));
     assert.equal(type.attackrange, 1, `${hiddenName}: only adjacent players can be hit while submerged`);
     assert.equal(param(type, 'death_drop'), id(configs.ObjType, 'bones'));
-    assert(exact(ServerTriggerType.AI_OPPLAYER2, type), `${hiddenName}: hidden water has an adjacent melee/reveal route`);
+    assert(exact(ServerTriggerType.AI_OPPLAYER2, type), `${hiddenName}: hidden water retains its adjacent melee route`);
+    assert(exact(ServerTriggerType.AI_SPAWN, type), `${hiddenName}: map spawn schedules autonomous timed emergence`);
     assert(exact(ServerTriggerType.AI_QUEUE4, type), `${hiddenName}: hidden form handles the native re-emergence queue`);
     const reveal = types.get(visibleForHidden.get(hiddenName));
     assert.equal(param(reveal, 'death_anim'), id(configs.SeqType, 'dagannoth_water_creature_death'));
@@ -292,7 +293,7 @@ async function run() {
     for (const { dx, dz, side } of directions) {
       const x = side === 'west' ? npc.x - distance : side === 'east' ? npc.x + npc.width - 1 + distance : npc.x;
       const z = side === 'south' ? npc.z - distance : side === 'north' ? npc.z + npc.length - 1 + distance : npc.z;
-      if (isLineOfWalk(npc.level, npc.x, npc.z, x, z) && isLineOfSight(npc.level, npc.x, npc.z, x, z)) {
+      if (!isMapBlocked(x, z, npc.level) && reachedEntity(npc.level, npc.x, npc.z, x, z, 1, 1, npc.width) && isLineOfSight(npc.level, npc.x, npc.z, x, z)) {
         return { level: npc.level, x, z };
       }
     }
@@ -428,7 +429,7 @@ async function run() {
     actor.setVar(id(configs.VarPlayerType, 'damagetype'), 0);
     actor.setVar(id(configs.VarPlayerType, 'com_stabattack'), 1_000_000);
     actor.setVar(id(configs.VarPlayerType, 'com_maxhit'), 6);
-    firstFledge.setVar(id(configs.VarNpcType, 'npc_combat_xp_multiplier'), param(fledge, 'combat_xp_multiplier'));
+    assert.equal(firstFledge.getVar(id(configs.VarNpcType, 'npc_combat_xp_multiplier')), 0, 'native map-spawn initialization supplies the Fledgeling zero-XP multiplier');
     const fledgeXpBefore = Array.from(actor.stats);
     // The preceding native incoming hit imposed an action delay; let it expire without resetting it.
     const meleeReadyTick = actor.getVar(id(configs.VarPlayerType, 'action_delay'));
@@ -542,24 +543,58 @@ async function run() {
       submergeAndReemerge(npc, visibleName, hiddenName);
     }
 
-    const hidden1 = [...World.npcs].find(npc => npc.isActive && npc.type === types.get(hiddenNames[0]).id);
-    const hidden2 = [...World.npcs].find(npc => npc.isActive && npc.type === types.get(hiddenNames[1]).id);
-    const hidden3 = [...World.npcs].find(npc => npc.isActive && npc.type === types.get(hiddenNames[2]).id);
-    assert(hidden1 && hidden2 && hidden3, 'each original hidden Spinolyp form is placed');
-    for (const [hiddenName, npc] of [[hiddenNames[0], hidden1], [hiddenNames[1], hidden2], [hiddenNames[2], hidden3]]) {
-      const surfaceSite = waterPlayerSite(npc, 2, configs.NpcType.get(npc.type).huntrange);
-      assert(surfaceSite, `${hiddenName}: native collision map provides the edge-of-approach tile`);
-      movePlayer(surfaceSite);
+    const hiddenIds = new Set(hiddenNames.map(name => types.get(name).id));
+    // The placed water tiles have no native adjacent land reach. Probe the sourced melee mechanic
+    // with an explicit offline NPC fixture on land; the untouched map forms below prove autonomous emergence.
+    const meleeType = types.get(hiddenNames[0]);
+    let meleeNid = 1;
+    while (World.npcs.get(meleeNid)) meleeNid++;
+    const meleeWater = new Npc(fledgeSite.level, fledgeSite.x, fledgeSite.z, meleeType.size, meleeType.size, EntityLifeCycle.DESPAWN, meleeNid, meleeType.id, meleeType.blockwalk);
+    World.addNpc(meleeWater, -1);
+    try {
+      World.processNpcEventQueue();
+      const meleeSite = playerSite(meleeWater, 1);
+      assert(meleeSite, 'the explicit offline melee fixture has a native reachable adjacent land tile');
+      movePlayer(meleeSite);
+      actor.levels[PlayerStat.HITPOINTS] = 99;
+      actor.setVar(poisonVar, 0);
+      const maxhitScript = ScriptProvider.getByName('[proc,npc_melee_maxhit]');
+      assert(maxhitScript, 'packed native melee maximum is available');
+      const maxhitState = ScriptRunner.init(maxhitScript, meleeWater, null, []);
+      ScriptRunner.execute(maxhitState);
+      assert.equal(maxhitState.execution, ScriptState.FINISHED);
+      const hiddenMaxhit = maxhitState.popInt();
+      assert(hiddenMaxhit > 0, 'the native hidden-melee positive control has a positive calculated maximum');
+      const hiddenHp = actorHp();
+      withRandomTape([0.999999, 0, 0.999999], () => stepNpc(meleeWater));
+      for (let tick = 0; tick < 4 && actorHp() === hiddenHp; tick++) stepNpc(meleeWater);
+      assert.equal(hiddenHp - actorHp(), hiddenMaxhit, 'native adjacent hidden melee lands its calculated maximum');
+      assert(hiddenIds.has(meleeWater.type), 'player adjacency does not cause hidden-water emergence');
+    } finally {
+      if (meleeWater.isActive) World.removeNpc(meleeWater, -1);
+      if (World.npcs.get(meleeNid) === meleeWater) {
+        World.npcs.remove(meleeNid);
+        meleeWater.cleanup();
+      }
+    }
+
+    for (const hiddenName of hiddenNames) {
+      const npc = [...World.npcs].find(npc => npc.isActive && npc.type === types.get(hiddenName).id);
+      assert(npc, `${hiddenName}: an untouched originally placed hidden form remains for the first-emergence case`);
+      const initial = [...npc.queue.all()].find(request => request.queueId === ServerTriggerType.AI_QUEUE4);
+      assert.equal(initial?.delay, formTicks, `${hiddenName}: native map spawn schedules the named UNKNOWN hidden interval`);
+      movePlayer(fledgeSite);
+      assert.equal(npc.inOperableDistance(actor), false, 'the only player is away from the water during autonomous emergence');
+      const start = World.currentTick;
+      for (let tick = 0; tick < formTicks - 1; tick++) stepNpc(npc);
+      assert.equal(npc.type, types.get(hiddenName).id, `${hiddenName}: no premature timed emergence`);
       stepNpc(npc);
       const visibleName = visibleForHidden.get(hiddenName);
-      assert.equal(npc.type, types.get(visibleName).id, `${hiddenName}: native player approach surfaces its exact visible pair`);
-      assert.equal(npc.baseType, types.get(hiddenName).id, `${hiddenName}: native form retains its original cache base`);
-      movePlayer({ level: npc.level, x: npc.x + 32, z: npc.z + 32 });
+      assert.equal(World.currentTick - start, formTicks);
+      assert.equal(npc.type, types.get(visibleName).id, `${hiddenName}: first emergence needs no nearby player`);
+      assert.equal(npc.baseType, types.get(hiddenName).id, `${hiddenName}: emergence preserves its original map base`);
       for (let tick = 0; tick < formTicks; tick++) stepNpc(npc, false);
-      assert.equal(npc.type, types.get(hiddenName).id, `${hiddenName}: native type timer returns to its original base water form`);
-      movePlayer(surfaceSite);
-      stepNpc(npc);
-      assert.equal(npc.type, types.get(visibleName).id, `${hiddenName}: native approach surfaces the family before its attack cycle`);
+      assert.equal(npc.type, types.get(visibleName).id, `${hiddenName}: no unsourced fixed visible-form lifetime is imposed`);
       submergeAndReemerge(npc, visibleName, hiddenName);
     }
 
@@ -577,7 +612,7 @@ async function run() {
       assert(tile, `${type.name} has a collision-grounded hero tile`);
       movePlayer(tile);
       const before = drops.length;
-      const originalType = npc.type;
+      const originalBase = npc.baseType;
       npc.heroPoints.addHero(actor.hash64, npc.levels[NpcStat.HITPOINTS]);
       npc.enqueueScript(ServerTriggerType.AI_QUEUE2, 0, npc.levels[NpcStat.HITPOINTS]);
       for (let tick = 0; tick < 10 && npc.isActive; tick++) stepNpc(npc, false);
@@ -592,7 +627,7 @@ async function run() {
       for (let tick = 0; tick < respawnTicks; tick++) stepNpc(npc, false);
       assert.equal(npc.isActive, true, `${type.name} returns through native respawn`);
       assert.equal(npc.type, npc.baseType, `${type.name} respawns in its original cache form`);
-      assert.equal(npc.baseType, originalType === lobster.id ? hiddenRock.id : originalType, `${type.name} reset preserves its original placed form`);
+      assert.equal(npc.baseType, originalBase, `${type.name} reset preserves its original placed base, including a visible form originally placed as water`);
     }
 
     assert.equal(drops.length, expectedDrops.size, 'no hidden Rock or later unfiltered item loot is introduced');
