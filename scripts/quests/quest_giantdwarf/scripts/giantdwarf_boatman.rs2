@@ -20,10 +20,7 @@
 
 [opnpc1,dwarf_city_boatman_mines_prequest]
 if (%giantdwarf_quest >= 1) {
-    ~chatnpc("<p,neutral>There she is! All aboard for Keldagrim!");
-    p_telejump(0_44_159_11_39); // 2827,10215 L0 — E of Veldaban 2129
-    p_delay(2);
-    ~music_playbycoord(coord); // HQ = west, Land of the Dwarves
+    ~dwarven_boat_repeat;
     return;
 }
 ~chatnpc("<p,neutral>Ho there, human!");
