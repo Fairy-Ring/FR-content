@@ -34,6 +34,7 @@ if ($steps = 0) return;
 switch_int ($handler) {
     case ^farming_handler_potato : ~farming_potato_advance_all($steps);
     case ^farming_handler_herb : ~farming_herb_advance_all($steps);
+    case ^farming_handler_flower : ~farming_flower_advance_all($steps);
 }
 
 [proc,farming_login]

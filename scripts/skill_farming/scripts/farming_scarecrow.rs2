@@ -1,0 +1,76 @@
+// VERIFIED Tip.It Farming guide, captured 28 April 2006, Scarecrows:
+// empty sack + hay bale; hay sack + bronze spear; watermelon for the head.
+// The original object declarations and patch bytes are reused unchanged.
+[oplocu,haystack] @farming_scarecrow_hay;
+[oplocu,haystack2] @farming_scarecrow_hay;
+[oplocu,haystack3] @farming_scarecrow_hay;
+[oplocu,haybail] @farming_scarecrow_hay;
+[oplocu,hay_bale] @farming_scarecrow_hay;
+[oplocu,hay_bale_stack] @farming_scarecrow_hay;
+[oplocu,hay_bale_thin] @farming_scarecrow_hay;
+[oplocu,hay_bale_stack_thin] @farming_scarecrow_hay;
+[oplocu,hay_bales] @farming_scarecrow_hay;
+[oplocu,hay_bales_10085] @farming_scarecrow_hay;
+[oplocu,haystack_10086] @farming_scarecrow_hay;
+[oplocu,vc_haystack2] @farming_scarecrow_hay;
+
+[label,farming_scarecrow_hay]
+if (last_useitem ! sack_empty) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// CANDIDATE cache pickup motion; no new action timing is inferred.
+anim(human_pickupfloor, 0);
+inv_setslot(inv, last_useslot, scarecrow_torso, 1);
+// UNKNOWN functional wording.
+mes("You fill the sack with hay.");
+
+[opheldu,scarecrow_torso]
+if (last_useitem ! bronze_spear) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, bronze_spear, 1);
+inv_setslot(inv, last_slot, scarecrow_torso_spear, 1);
+// UNKNOWN functional wording.
+mes("You put the hay sack on the bronze spear.");
+
+[opheldu,scarecrow_torso_spear]
+if (last_useitem ! watermelon) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// VERIFIED period level gate; apply when the final assembly makes a scarecrow.
+if (stat_base(farming) < ^farming_scarecrow_level) {
+    // UNKNOWN functional wording.
+    mes("You need a Farming level of <tostring(^farming_scarecrow_level)> to make a scarecrow.");
+    return;
+}
+inv_del(inv, watermelon, 1);
+inv_setslot(inv, last_slot, scarecrow_complete, 1);
+stat_advance(farming, ^farming_scarecrow_make_xp);
+// UNKNOWN functional wording.
+mes("You add the watermelon head to the scarecrow.");
+
+[proc,farming_scarecrow_install](int $stage)
+inv_del(inv, scarecrow_complete, 1);
+// VERIFIED cache: 33..36 retain the corresponding 0..3 weed state.
+~farming_flower_set_stage(add($stage, 33));
+// UNKNOWN functional wording.
+mes("You put the scarecrow in the flower patch.");
+
+[proc,farming_scarecrow_remove](int $stage)
+if (last_useitem ! spade) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+// VERIFIED RuneHQ spade removal/reuse; CANDIDATE cache motion.
+anim(human_dig, 0);
+inv_add(inv, scarecrow_complete, 1);
+~farming_flower_set_stage(sub($stage, 33));
+// UNKNOWN functional wording.
+mes("You remove the scarecrow from the flower patch.");

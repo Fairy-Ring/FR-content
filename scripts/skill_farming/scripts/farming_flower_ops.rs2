@@ -1,0 +1,216 @@
+// VERIFIED: four original selectors in permanent transmitted varp 508.
+[proc,farming_flower_stage]()(int)
+switch_loc (loc_type) {
+    case farming_flower_patch_1 : return(%farming_flower_varp_0_7);
+    case farming_flower_patch_2 : return(%farming_flower_varp_8_15);
+    case farming_flower_patch_3 : return(%farming_flower_varp_16_23);
+    case farming_flower_patch_4 : return(%farming_flower_varp_24_31);
+    case default : return(-1);
+}
+
+[proc,farming_flower_set_stage](int $stage)
+switch_loc (loc_type) {
+    case farming_flower_patch_1 : %farming_flower_varp_0_7 = $stage;
+    case farming_flower_patch_2 : %farming_flower_varp_8_15 = $stage;
+    case farming_flower_patch_3 : %farming_flower_varp_16_23 = $stage;
+    case farming_flower_patch_4 : %farming_flower_varp_24_31 = $stage;
+}
+
+// Native dispatch selects the visible form; loc_type retains the map parent.
+[oplocu,farming_flower_patch_1] @farming_flower_use;
+[oplocu,farming_flower_patch_2] @farming_flower_use;
+[oplocu,farming_flower_patch_3] @farming_flower_use;
+[oplocu,farming_flower_patch_4] @farming_flower_use;
+[oplocu,flower_patch_weeded] @farming_flower_use;
+[oplocu,flower_patch_weeds_1] @farming_flower_use;
+[oplocu,flower_patch_weeds_2] @farming_flower_use;
+[oplocu,flower_patch_weeds_3] @farming_flower_use;
+[oplocu,flower_patch_weeds_1_mory] @farming_flower_use;
+[oplocu,flower_patch_weeds_2_mory] @farming_flower_use;
+[oplocu,flower_patch_weeds_3_mory] @farming_flower_use;
+[oplocu,farming_scarecrow] @farming_flower_use;
+[oplocu,farming_scarecrow_weeds_1] @farming_flower_use;
+[oplocu,farming_scarecrow_weeds_2] @farming_flower_use;
+[oplocu,farming_scarecrow_weeds_3] @farming_flower_use;
+[oploc3,flower_patch_weeds_1] @farming_rake_continue;
+[oploc3,flower_patch_weeds_2] @farming_rake_continue;
+[oploc3,flower_patch_weeds_3] @farming_rake_continue;
+[oploc3,flower_patch_weeds_1_mory] @farming_rake_continue;
+[oploc3,flower_patch_weeds_2_mory] @farming_rake_continue;
+[oploc3,flower_patch_weeds_3_mory] @farming_rake_continue;
+[oploc3,farming_scarecrow_weeds_1] @farming_rake_continue;
+[oploc3,farming_scarecrow_weeds_2] @farming_rake_continue;
+[oploc3,farming_scarecrow_weeds_3] @farming_rake_continue;
+[oplocu,marigold_seed] @farming_flower_use;
+[oplocu,marigold_1] @farming_flower_use;
+[oplocu,marigold_2] @farming_flower_use;
+[oplocu,marigold_3] @farming_flower_use;
+[oplocu,marigold_fullygrown] @farming_flower_use;
+[oplocu,marigold_seed_watered] @farming_flower_use;
+[oplocu,marigold_1_watered] @farming_flower_use;
+[oplocu,marigold_2_watered] @farming_flower_use;
+[oplocu,marigold_3_watered] @farming_flower_use;
+[oplocu,marigold_1_diseased] @farming_flower_use;
+[oplocu,marigold_2_diseased] @farming_flower_use;
+[oplocu,marigold_3_diseased] @farming_flower_use;
+[oplocu,marigold_1_dead] @farming_flower_use;
+[oplocu,marigold_2_dead] @farming_flower_use;
+[oplocu,marigold_3_dead] @farming_flower_use;
+[oplocu,marigold_fullygrown_dead] @farming_flower_use;
+[oploc1,marigold_fullygrown] @farming_flower_pick;
+[oplocu,rosemary_seed] @farming_flower_use;
+[oplocu,rosemary_1] @farming_flower_use;
+[oplocu,rosemary_2] @farming_flower_use;
+[oplocu,rosemary_3] @farming_flower_use;
+[oplocu,rosemary_fullygrown] @farming_flower_use;
+[oplocu,rosemary_seed_watered] @farming_flower_use;
+[oplocu,rosemary_1_watered] @farming_flower_use;
+[oplocu,rosemary_2_watered] @farming_flower_use;
+[oplocu,rosemary_3_watered] @farming_flower_use;
+[oplocu,rosemary_1_diseased] @farming_flower_use;
+[oplocu,rosemary_2_diseased] @farming_flower_use;
+[oplocu,rosemary_3_diseased] @farming_flower_use;
+[oplocu,rosemary_1_dead] @farming_flower_use;
+[oplocu,rosemary_2_dead] @farming_flower_use;
+[oplocu,rosemary_3_dead] @farming_flower_use;
+[oplocu,rosemary_fullygrown_dead] @farming_flower_use;
+[oploc1,rosemary_fullygrown] @farming_flower_pick;
+[oplocu,nasturtium_seed] @farming_flower_use;
+[oplocu,nasturtium_1] @farming_flower_use;
+[oplocu,nasturtium_2] @farming_flower_use;
+[oplocu,nasturtium_3] @farming_flower_use;
+[oplocu,nasturtium_fullygrown] @farming_flower_use;
+[oplocu,nasturtium_seed_watered] @farming_flower_use;
+[oplocu,nasturtium_1_watered] @farming_flower_use;
+[oplocu,nasturtium_2_watered] @farming_flower_use;
+[oplocu,nasturtium_3_watered] @farming_flower_use;
+[oplocu,nasturtium_1_diseased] @farming_flower_use;
+[oplocu,nasturtium_2_diseased] @farming_flower_use;
+[oplocu,nasturtium_3_diseased] @farming_flower_use;
+[oplocu,nasturtium_1_dead] @farming_flower_use;
+[oplocu,nasturtium_2_dead] @farming_flower_use;
+[oplocu,nasturtium_3_dead] @farming_flower_use;
+[oplocu,nasturtium_fullygrown_dead] @farming_flower_use;
+[oploc1,nasturtium_fullygrown] @farming_flower_pick;
+[oplocu,woad_seed] @farming_flower_use;
+[oplocu,woad_1] @farming_flower_use;
+[oplocu,woad_2] @farming_flower_use;
+[oplocu,woad_3] @farming_flower_use;
+[oplocu,woad_fullygrown] @farming_flower_use;
+[oplocu,woad_seed_watered] @farming_flower_use;
+[oplocu,woad_1_watered] @farming_flower_use;
+[oplocu,woad_2_watered] @farming_flower_use;
+[oplocu,woad_3_watered] @farming_flower_use;
+[oplocu,woad_1_diseased] @farming_flower_use;
+[oplocu,woad_2_diseased] @farming_flower_use;
+[oplocu,woad_3_diseased] @farming_flower_use;
+[oplocu,woad_1_dead] @farming_flower_use;
+[oplocu,woad_2_dead] @farming_flower_use;
+[oplocu,woad_3_dead] @farming_flower_use;
+[oplocu,woad_fullygrown_dead] @farming_flower_use;
+[oploc1,woad_fullygrown] @farming_flower_pick;
+[oplocu,limpwurt_seed] @farming_flower_use;
+[oplocu,limpwurt_1] @farming_flower_use;
+[oplocu,limpwurt_2] @farming_flower_use;
+[oplocu,limpwurt_3] @farming_flower_use;
+[oplocu,limpwurt_fullygrown] @farming_flower_use;
+[oplocu,limpwurt_seed_watered] @farming_flower_use;
+[oplocu,limpwurt_1_watered] @farming_flower_use;
+[oplocu,limpwurt_2_watered] @farming_flower_use;
+[oplocu,limpwurt_3_watered] @farming_flower_use;
+[oplocu,limpwurt_1_diseased] @farming_flower_use;
+[oplocu,limpwurt_2_diseased] @farming_flower_use;
+[oplocu,limpwurt_3_diseased] @farming_flower_use;
+[oplocu,limpwurt_1_dead] @farming_flower_use;
+[oplocu,limpwurt_2_dead] @farming_flower_use;
+[oplocu,limpwurt_3_dead] @farming_flower_use;
+[oplocu,limpwurt_fullygrown_dead] @farming_flower_use;
+[oploc1,limpwurt_fullygrown] @farming_flower_pick;
+
+[label,farming_flower_use]
+def_int $stage = ~farming_flower_stage;
+if ($stage = -1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = rake & (($stage >= 0 & $stage < ^farming_veg_weeded) | ($stage >= 33 & $stage < 36))) {
+    ~farming_rake_step(false);
+    return;
+}
+if (last_useitem = scarecrow_complete & $stage >= 0 & $stage <= ^farming_veg_weeded) {
+    ~farming_scarecrow_install($stage);
+    return;
+}
+if ($stage >= 33 & $stage <= 36) {
+    ~farming_scarecrow_remove($stage);
+    return;
+}
+def_dbrow $crop;
+if ($stage = ^farming_veg_weeded) {
+    $crop = ~farming_flower_seed(last_useitem);
+    if ($crop = null) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, dibber) < 1) {
+        ~displaymessage(^dm_farming_dibber);
+        return;
+    }
+    def_obj $seed = db_getfield($crop, farming_flower:seed, 0);
+    if (inv_total(inv, $seed) < 1) return;
+    def_int $level = db_getfield($crop, farming_flower:level, 0);
+    if (stat_base(farming) < $level) {
+        // UNKNOWN functional wording.
+        mes("You need a Farming level of <tostring($level)> to plant this flower.");
+        return;
+    }
+    // CANDIDATE cache animation attribution. VERIFIED period one-seed cost.
+    anim(farming_seed_dibbing, 0);
+    inv_del(inv, $seed, 1);
+    ~farming_flower_set_stage(db_getfield($crop, farming_flower:first, 0));
+    stat_advance(farming, db_getfield($crop, farming_flower:plant_xp, 0));
+    // UNKNOWN functional wording.
+    mes("You plant the flower seed in the patch.");
+    return;
+}
+$crop = ~farming_flower_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $first = db_getfield($crop, farming_flower:first, 0);
+def_int $mature = db_getfield($crop, farming_flower:mature, 0);
+// The cache also maps a dead mature form; allow its ordinary spade clearing.
+if ($stage = add($mature, ^farming_dead_offset)) $mature = add($mature, 1);
+def_int $after = ~farming_crop_care($stage, $first, $mature, "flower", true);
+if ($after ! $stage) ~farming_flower_set_stage($after);
+
+[label,farming_flower_pick]
+def_int $stage = ~farming_flower_stage;
+def_dbrow $crop = ~farming_flower_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+if ($stage ! db_getfield($crop, farming_flower:mature, 0)) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+// CANDIDATE inference from period general spade guidance; flower-specific gate unconfirmed.
+if (inv_total(inv, spade) < 1) {
+    ~displaymessage(^dm_farming_spade);
+    return;
+}
+def_int $yield = db_getfield($crop, farming_flower:yield, 0);
+if (inv_freespace(inv) < $yield) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+// VERIFIED period fixed yield, with picking XP awarded once, not per item.
+// CANDIDATE cache animation attribution, shared with the published picking.
+anim(picking_low, 0);
+inv_add(inv, db_getfield($crop, farming_flower:produce, 0), $yield);
+stat_advance(farming, db_getfield($crop, farming_flower:harvest_xp, 0));
+~farming_flower_set_stage(^farming_veg_weeded);
+// UNKNOWN functional wording.
+mes("You pick the flowers from the patch.");
