@@ -1,0 +1,11 @@
+[farming_herb]
+column=seed,obj
+column=produce,namedobj
+column=first,int
+column=mature,int
+column=last,int
+column=diseased,int
+column=level,int
+column=plant_xp,int
+column=harvest_xp,int
+column=name,string

@@ -1,0 +1,18 @@
+// UNKNOWN: engineering stage integers; historical intermediate values are not retained.
+// Complete=70 and two quest points use the existing quest registry.
+^mdaughter_search = 1
+^mdaughter_tasks = 10
+^mdaughter_remains = 20
+^mdaughter_kendal_dead = 30
+^mdaughter_burial = 40
+^mdaughter_buried = 50
+// VERIFIED: Tip.It guide, 27 April 2006, Rewards and The burial.
+^mdaughter_attack_xp = 10000
+^mdaughter_prayer_xp = 20000
+^mdaughter_cairn_rocks = 5
+// UNKNOWN engineering cap: 500 server ticks (five minutes); attacks never extend it.
+// The later transcript supports exclusive ownership, not its original lifetime.
+^mdaughter_kendal_hold_ticks = 500
+// UNKNOWN engineering encounter bounds: the packed cavern's map square.
+^mdaughter_cavern_sw = 0_43_157_0_0
+^mdaughter_cavern_ne = 0_43_157_63_63

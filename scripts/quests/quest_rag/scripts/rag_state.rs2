@@ -1,0 +1,81 @@
+// VERIFIED: RuneHQ 2006-04-24 and Tip.It 2006-05-02 list these eight bones.
+// UNKNOWN: server encoding, not a claim about the original stage numbers.
+// 714 has no original varbits or raw cache readers. Stage: bits 0..1;
+// first-part hand-ins: bits 2..9. Reserve 10..31 for a future wish-list unit.
+// Its remaining five flags can use original 716's unused bits 0..4.
+[proc,rag_stage]()(int)
+return(getbit_range(%rag_quest, 0, 1));
+
+[proc,rag_handed](int $bone)(boolean)
+if (testbit(%rag_quest, add($bone, 1)) = ^true) return(true);
+return(false);
+
+[proc,rag_raw](int $bone)(namedobj)
+switch_int($bone) {
+    case 1 : return(rag_goblin_bone);
+    case 2 : return(rag_bear_bone);
+    case 3 : return(rag_medium_frog_bone);
+    case 4 : return(rag_ram_bone);
+    case 5 : return(rag_unicorn_bone);
+    case 6 : return(rag_monkey_bone);
+    case 7 : return(rag_giant_rat_bone);
+    case 8 : return(rag_giant_bat_bone);
+}
+return(null);
+
+[proc,rag_potted](int $bone)(namedobj)
+switch_int($bone) {
+    case 1 : return(rag_pot_goblin_bone);
+    case 2 : return(rag_pot_bear_bone);
+    case 3 : return(rag_pot_medium_frog_bone);
+    case 4 : return(rag_pot_ram_bone);
+    case 5 : return(rag_pot_unicorn_bone);
+    case 6 : return(rag_pot_monkey_bone);
+    case 7 : return(rag_pot_giant_rat_bone);
+    case 8 : return(rag_pot_giant_bat_bone);
+}
+return(null);
+
+[proc,rag_polished](int $bone)(namedobj)
+switch_int($bone) {
+    case 1 : return(rag_polished_goblin_bone);
+    case 2 : return(rag_polished_bear_bone);
+    case 3 : return(rag_polished_medium_frog_bone);
+    case 4 : return(rag_polished_ram_bone);
+    case 5 : return(rag_polished_unicorn_bone);
+    case 6 : return(rag_polished_monkey_bone);
+    case 7 : return(rag_polished_giant_rat_bone);
+    case 8 : return(rag_polished_giant_bat_bone);
+}
+return(null);
+
+[proc,rag_bone_index](obj $item)(int)
+def_int $bone = 1;
+while ($bone <= 8) {
+    if ($item = ~rag_raw($bone) | $item = ~rag_potted($bone) | $item = ~rag_polished($bone)) return($bone);
+    $bone = add($bone, 1);
+}
+return(0);
+
+// CANDIDATE: OSRS initial-eight drops are guaranteed, unlike wish-list drops.
+// UNKNOWN possession policy: include bank and own boiler, not other players.
+[proc,rag_drop](int $bone)
+if (~rag_stage ! 1 | ~rag_handed($bone) = true) return;
+if (~obj_gettotal(~rag_raw($bone)) > 0 | ~obj_gettotal(~rag_potted($bone)) > 0 | ~obj_gettotal(~rag_polished($bone)) > 0) return;
+if (%rag_inv_check = $bone & %rag_boiler >= 2) return;
+obj_add(npc_coord, ~rag_raw($bone), 1, ^lootdrop_duration);
+
+// Default animal deaths retain their ordinary bones, timing and credit rules.
+[ai_queue3,ramsheered] @rag_ram_death;
+[ai_queue3,ramunsheered] @rag_ram_death;
+[label,rag_ram_death]
+gosub(npc_default_death);
+if (npc_findhero = ^true) ~rag_drop(4);
+
+[ai_queue3,medium_frog]
+gosub(npc_default_death);
+if (npc_findhero = ^true) ~rag_drop(3);
+
+[ai_queue3,bat]
+gosub(npc_default_death);
+if (npc_findhero = ^true) ~rag_drop(8);

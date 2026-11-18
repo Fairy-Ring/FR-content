@@ -1,4 +1,12 @@
 [opnpc1,viking_brundt]
+// Mountain Daughter offers a separate topic, never replaces a Trials branch.
+// UNKNOWN: functional topic-selector captions; the retained sources do not give them.
+if (%mdaughter_quest_var >= ^mdaughter_tasks & %mdaughter_quest_var < ^mdaughter_complete & %mdaughter_relations_var >= 2) {
+    if (~p_choice2("Ask about the mountain camp.", 1, "Ask about anything else.", 2) = 1) {
+        ~mdaughter_brundt;
+        return;
+    }
+}
 def_int $op;
 def_int $votes = max(0, sub(%viking, 1));
 switch_int(%viking) {
