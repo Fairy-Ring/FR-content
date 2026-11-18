@@ -299,17 +299,19 @@ try {
   });
 
   for (const herb of herbs) {
-    test(`${herb.name}: native Pick yields three unidentified herbs and XP per pick without a tool`, () => {
+    test(`${herb.name}: native Pick requires a spade and yields three unidentified herbs with XP per pick`, () => {
       const p = fixture({ level: 1, stage: herb.mature });
+      add(p, 'spade');
       for (let pick = 0; pick < 3; pick++) {
+        World.currentTick += 2; // CANDIDATE OSRS manual harvest interval.
         JavaRandom.setSeed(draws256.get(0));
         assert(click(p, patchLocs[0], 1));
         assert.equal(count(p, herb.produce), pick + 1, `pick ${pick + 1} gives one ${herb.produce}`);
         assert.equal(farmingXp(p), herb.harvestXp * (pick + 1), `pick ${pick + 1} grants its own XP`);
         assert.equal(stage(p), pick < 2 ? herb.mature + pick + 1 : 3, `pick ${pick + 1} spends one life`);
       }
-      assert.equal(count(p, 'spade'), 0, 'hand picking does not require a spade');
-      assert.equal(count(p, 'dibber'), 0, 'hand picking does not require a dibber');
+      assert.equal(count(p, 'spade'), 1, 'harvesting retains the required spade');
+      assert.equal(count(p, 'dibber'), 0, 'harvesting does not require a dibber');
     });
   }
 
@@ -324,17 +326,20 @@ try {
       [99, 174, herbs[0].mature + 1], [99, 175, herbs[0].mature],
     ]) {
       const p = fixture({ level, stage: herbs[0].mature });
+      add(p, 'spade');
       JavaRandom.setSeed(draws256.get(draw));
       assert(click(p, patchLocs[0], 1));
       assert.equal(stage(p), expected, `life loss boundary at level ${level}, draw ${draw}`);
     }
     const p = fixture({ level: 99, stage: herbs[0].mature });
+    add(p, 'spade');
     JavaRandom.setSeed(draws256.get(255));
     assert(click(p, patchLocs[0], 1));
     assert.equal(stage(p), herbs[0].mature, 'a high random draw saves the life');
     assert.equal(count(p, herbs[0].produce), 1);
     assert.equal(farmingXp(p), herbs[0].harvestXp);
     for (let pick = 0; pick < 3; pick++) {
+      World.currentTick += 2;
       JavaRandom.setSeed(draws256.get(0));
       assert(click(p, patchLocs[0], 1));
     }

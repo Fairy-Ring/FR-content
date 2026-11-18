@@ -14,7 +14,8 @@
 [oplocu,onion_1_dead] @farming_potato_use;
 [oplocu,onion_2_dead] @farming_potato_use;
 [oplocu,onion_3_dead] @farming_potato_use;
-[oploc1,onion_fullygrown] @farming_allotment_harvest;
+[oploc1,onion_fullygrown] @farming_allotment_harvest(false);
+[oploc3,onion_fullygrown] @farming_allotment_harvest(true);
 
 [oplocu,cabbage_seed] @farming_potato_use;
 [oplocu,cabbage_1] @farming_potato_use;
@@ -31,7 +32,8 @@
 [oplocu,cabbage_1_dead] @farming_potato_use;
 [oplocu,cabbage_2_dead] @farming_potato_use;
 [oplocu,cabbage_3_dead] @farming_potato_use;
-[oploc1,cabbage_fullygrown] @farming_allotment_harvest;
+[oploc1,cabbage_fullygrown] @farming_allotment_harvest(false);
+[oploc3,cabbage_fullygrown] @farming_allotment_harvest(true);
 
 [oplocu,tomato_seed] @farming_potato_use;
 [oplocu,tomato_1] @farming_potato_use;
@@ -48,7 +50,8 @@
 [oplocu,tomato_1_dead] @farming_potato_use;
 [oplocu,tomato_2_dead] @farming_potato_use;
 [oplocu,tomato_3_dead] @farming_potato_use;
-[oploc1,tomato_fullygrown] @farming_allotment_harvest;
+[oploc1,tomato_fullygrown] @farming_allotment_harvest(false);
+[oploc3,tomato_fullygrown] @farming_allotment_harvest(true);
 
 [oplocu,sweetcorn_seed] @farming_potato_use;
 [oplocu,sweetcorn_1] @farming_potato_use;
@@ -73,7 +76,8 @@
 [oplocu,sweetcorn_3_dead] @farming_potato_use;
 [oplocu,sweetcorn_4_dead] @farming_potato_use;
 [oplocu,sweetcorn_5_dead] @farming_potato_use;
-[oploc1,sweetcorn_fullygrown] @farming_allotment_harvest;
+[oploc1,sweetcorn_fullygrown] @farming_allotment_harvest(false);
+[oploc3,sweetcorn_fullygrown] @farming_allotment_harvest(true);
 
 [oplocu,strawberry_seed] @farming_potato_use;
 [oplocu,strawberry_1] @farming_potato_use;
@@ -98,7 +102,8 @@
 [oplocu,strawberry_3_dead] @farming_potato_use;
 [oplocu,strawberry_4_dead] @farming_potato_use;
 [oplocu,strawberry_5_dead] @farming_potato_use;
-[oploc1,strawberry_fullygrown] @farming_allotment_harvest;
+[oploc1,strawberry_fullygrown] @farming_allotment_harvest(false);
+[oploc3,strawberry_fullygrown] @farming_allotment_harvest(true);
 
 [oplocu,watermelon_seed] @farming_potato_use;
 [oplocu,watermelon_1] @farming_potato_use;
@@ -131,5 +136,6 @@
 [oplocu,watermelon_5_dead] @farming_potato_use;
 [oplocu,watermelon_6_dead] @farming_potato_use;
 [oplocu,watermelon_7_dead] @farming_potato_use;
-[oploc1,watermelon_fullygrown] @farming_allotment_harvest;
+[oploc1,watermelon_fullygrown] @farming_allotment_harvest(false);
+[oploc3,watermelon_fullygrown] @farming_allotment_harvest(true);
 

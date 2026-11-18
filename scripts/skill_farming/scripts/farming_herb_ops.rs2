@@ -27,6 +27,12 @@ switch_loc (loc_type) {
 [oplocu,herb_patch_weeds_3_mory] @farming_herb_use;
 [oplocu,herb_patch_weeds_2_mory] @farming_herb_use;
 [oplocu,herb_patch_weeds_1_mory] @farming_herb_use;
+[oploc3,herb_patch_weeds_3] @farming_rake_continue;
+[oploc3,herb_patch_weeds_2] @farming_rake_continue;
+[oploc3,herb_patch_weeds_1] @farming_rake_continue;
+[oploc3,herb_patch_weeds_3_mory] @farming_rake_continue;
+[oploc3,herb_patch_weeds_2_mory] @farming_rake_continue;
+[oploc3,herb_patch_weeds_1_mory] @farming_rake_continue;
 [oplocu,herb_patch_weeded] @farming_herb_use;
 [oplocu,herb_seed] @farming_herb_use;
 [oplocu,herb_1] @farming_herb_use;
@@ -47,14 +53,7 @@ if ($stage = -1) {
     return;
 }
 if (last_useitem = rake & $stage >= 0 & $stage < ^farming_veg_weeded) {
-    if (inv_freespace(inv) < 1) {
-        mes("You don't have enough inventory space.");
-        return;
-    }
-    inv_add(inv, weeds, 1);
-    ~farming_herb_set_stage(add($stage, 1));
-    // UNKNOWN functional wording: no retained period herb message transcript.
-    mes("You rake the weeds from the herb patch.");
+    ~farming_rake_step(false);
     return;
 }
 def_dbrow $crop;
@@ -76,6 +75,8 @@ if ($stage = ^farming_veg_weeded) {
         mes("You need a Farming level of <tostring($level)> to plant this herb.");
         return;
     }
+    // CANDIDATE cache-tool attribution; repetition remains UNKNOWN and is not built.
+    anim(farming_seed_dibbing, 0);
     inv_del(inv, $seed, 1);
     ~farming_herb_set_stage(db_getfield($crop, farming_herb:first, 0));
     stat_advance(farming, db_getfield($crop, farming_herb:plant_xp, 0));
@@ -100,6 +101,10 @@ def_int $after = ~farming_crop_care($normal, ^farming_herb_normal_first, ^farmin
 if ($after ! $normal) ~farming_herb_set_stage(~farming_herb_encode($after, $crop));
 
 [oploc1,herb_fullygrown]
+@farming_herb_harvest(false);
+[oploc3,herb_fullygrown] @farming_herb_harvest(true);
+
+[label,farming_herb_harvest](boolean $automatic)
 def_int $stage = ~farming_herb_stage;
 def_dbrow $crop = ~farming_herb_crop($stage);
 if ($crop = null) {
@@ -112,19 +117,27 @@ if ($stage < $mature | $stage > $last) {
     ~displaymessage(^dm_farming_patch_no_crops);
     return;
 }
-// CANDIDATE Old School: herbs are picked by hand, spade clears dead plants.
+// VERIFIED period Tip.It: a spade is needed to harvest crops.
+// UNKNOWN refusal wording: leave this new missing-tool refusal silent.
+if (inv_total(inv, spade) < 1) return;
 if (inv_freespace(inv) < 1) {
     mes("You don't have enough inventory space.");
     return;
 }
+if (~farming_harvest_ready($automatic) = false) return;
+// CANDIDATE cache-tool attribution.
+anim(picking_low, 0);
 inv_add(inv, db_getfield($crop, farming_herb:produce, 0), 1);
 stat_advance(farming, db_getfield($crop, farming_herb:harvest_xp, 0));
 if (random(^farming_harvest_denominator) < ~farming_herb_life_loss) {
     if ($stage < $last) {
-        ~farming_herb_set_stage(add($stage, 1));
+        $stage = add($stage, 1);
     } else {
-        ~farming_herb_set_stage(^farming_veg_weeded);
+        $stage = ^farming_veg_weeded;
     }
+    ~farming_herb_set_stage($stage);
 }
+%action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
+if ($stage >= $mature) p_oploc(3);
 // UNKNOWN functional wording; object names remain the revision's unidentified.
 mes("You pick a herb from the patch.");

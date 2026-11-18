@@ -129,10 +129,12 @@ for (const [name, first, mature, last, level, plantXp, harvestXp] of crops) {
     // The native zero draw loses a life. The three cache mature states encode
     // remaining lives, not a cap of three successful harvests.
     for (let value = mature; value <= last; value++) {
+      World.currentTick += 2; // CANDIDATE OSRS manual harvest interval.
       JavaRandom.setSeed(draws.get(0)); assert(click(p, patch));
       assert.equal(stage(p), value === last ? 3 : value + 1);
     }
     assert.equal(count(p, name), 3); assert.equal(xp(p), harvestXp * 3);
+    World.currentTick += 2;
     set(p, mature); JavaRandom.setSeed(draws.get(127)); assert(click(p, patch)); assert.equal(stage(p), mature, 'successful life save permits more than three items');
     const loaded = player(p.save()); assert.equal(stage(loaded), mature);
     const noTool = player(); noTool.setLevel(PlayerStat.FARMING, level); set(noTool, mature);

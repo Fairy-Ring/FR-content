@@ -34,7 +34,7 @@ switch_obj ($seed) {
 [proc,farming_allotment_life_loss]()(int)
 return(~farming_crop_life_loss(^farming_allotment_save_low, ^farming_allotment_save_high));
 
-[label,farming_allotment_harvest]
+[label,farming_allotment_harvest](boolean $automatic)
 if (~farming_veg_is_parent = false) {
     ~displaymessage(^dm_default);
     return;
@@ -59,16 +59,22 @@ if (inv_freespace(inv) < 1) {
     mes("You don't have enough inventory space.");
     return;
 }
+if (~farming_harvest_ready($automatic) = false) return;
+// CANDIDATE cache-tool attribution.
+anim(picking_low, 0);
 inv_add(inv, db_getfield($crop, farming_allotment:produce, 0), 1);
 // VERIFIED period Tip.It per-item harvest XP.
 stat_advance(farming, db_getfield($crop, farming_allotment:harvest_xp, 0));
 if (random(^farming_harvest_denominator) < ~farming_allotment_life_loss) {
     if ($stage < $last) {
-        ~farming_veg_set_stage(add($stage, 1));
+        $stage = add($stage, 1);
     } else {
-        ~farming_veg_set_stage(^farming_veg_weeded);
+        $stage = ^farming_veg_weeded;
     }
+    ~farming_veg_set_stage($stage);
 }
+%action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
+if ($stage >= $mature) p_oploc(3);
 // UNKNOWN functional wording, no retained period message transcript.
 def_string $plants = db_getfield($crop, farming_allotment:plural, 0);
 mes("You harvest some <$plants> from the allotment.");

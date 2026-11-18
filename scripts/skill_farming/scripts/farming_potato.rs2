@@ -1,5 +1,5 @@
 // Allotment interactions: permanent cache bytes, shared global growth and care.
-// Period Tip.It supplies levels and XP. The potato harvest stays unchanged.
+// Period Tip.It supplies levels and XP. The potato's three-item yield is unchanged.
 // The six other crops use farming_allotment's labelled harvest-life rule.
 
 // ---------------------------------------------------------------------------
@@ -57,6 +57,14 @@ switch_loc (loc_type) {
 [oplocu,veg_patch_weeds_2_mory] @farming_rake_use;
 [oplocu,veg_patch_weeds_1_mory] @farming_rake_use;
 
+// Slot 3 is absent from the original visible menu and continues a pending action.
+[oploc3,veg_patch_weeds_3] @farming_rake_continue;
+[oploc3,veg_patch_weeds_2] @farming_rake_continue;
+[oploc3,veg_patch_weeds_1] @farming_rake_continue;
+[oploc3,veg_patch_weeds_3_mory] @farming_rake_continue;
+[oploc3,veg_patch_weeds_2_mory] @farming_rake_continue;
+[oploc3,veg_patch_weeds_1_mory] @farming_rake_continue;
+
 // Parent fallback if multi resolve falls through
 [oplocu,farming_veg_patch_1] @farming_parent_use;
 [oplocu,farming_veg_patch_2] @farming_parent_use;
@@ -76,11 +84,11 @@ if (~farming_veg_is_parent = false) {
     ~displaymessage(^dm_default);
     return;
 }
-~farming_rake_step;
+~farming_rake_step(false);
 
 [label,farming_parent_use]
 if (last_useitem = rake) {
-    ~farming_rake_step;
+    ~farming_rake_step(false);
     return;
 }
 if (~farming_allotment_seed(last_useitem) ! null) {
@@ -89,30 +97,49 @@ if (~farming_allotment_seed(last_useitem) ! null) {
 }
 @farming_potato_use;
 
-[proc,farming_rake_step]
-def_int $stage = ~farming_veg_stage;
-mes("You use the rake on the allotment.");
-if ($stage > ^farming_veg_weeds_1) {
-    // Already weeded or planted — not a rake target (wrong stage ops usually).
-    mes("This allotment does not need weeding.");
-    return;
+[label,farming_rake_continue]
+~farming_rake_step(true);
+
+// UNKNOWN ordinary continuation: operator's recollection of Old School.
+// The pending interaction uses the engine's normal movement/interruption rules.
+[proc,farming_rake_step](boolean $repeat)
+def_int $stage = ~farming_herb_stage;
+def_boolean $herb = true;
+if ($stage = -1) {
+    $herb = false;
+    $stage = ~farming_veg_stage;
 }
-// Packed obj `weeds` (6055). One handful per rake step — compost later.
+if ($stage > ^farming_veg_weeds_1 | inv_total(inv, rake) < 1) return;
 if (inv_freespace(inv) < 1) {
     mes("You don't have enough inventory space.");
     return;
 }
-inv_add(inv, weeds, 1);
-// One rake use clears one weed band: 0→1→2→3 (weeded).
-~farming_veg_set_stage(add($stage, 1));
-// Read back via same proc (parent loc still active)
-def_int $after = ~farming_veg_stage;
-if ($after = ^farming_veg_weeded) {
-    mes("You clear the weeds from the allotment.");
-} else {
-    mes("You rake the weeds from the allotment.");
+if ($repeat = true & %action_delay > map_clock) {
+    p_oploc(3);
+    return;
 }
-// Avoid p_delay before stage write was the old order; no delay required for F1 smoke.
+// CANDIDATE tool attribution; the sequence itself is in the original cache.
+anim(farming_raking, 0);
+inv_add(inv, weeds, 1);
+stat_advance(farming, ^farming_weed_xp);
+$stage = add($stage, 1);
+if ($herb = true) {
+    ~farming_herb_set_stage($stage);
+    // UNKNOWN functional wording, retained from the herb interaction.
+    mes("You rake the weeds from the herb patch.");
+} else {
+    ~farming_veg_set_stage($stage);
+    mes("You use the rake on the allotment.");
+    if ($stage = ^farming_veg_weeded) {
+        mes("You clear the weeds from the allotment.");
+    } else {
+        mes("You rake the weeds from the allotment.");
+    }
+}
+if ($stage < ^farming_veg_weeded) {
+    %action_delay = calc(map_clock + ^farming_rake_step_ticks);
+    p_oploc(3);
+}
 
 // ---------------------------------------------------------------------------
 // Plant — OPLOCU allotment seeds (+ stack graphic types) on weeded patch
@@ -153,6 +180,8 @@ if (stat_base(farming) < $level) {
     mes("You need a Farming level of <tostring($level)> to plant <$plants>.");
     return;
 }
+// CANDIDATE cache-tool attribution; repetition remains UNKNOWN and is not built.
+anim(farming_seed_dibbing, 0);
 inv_del(inv, $seed, ^farming_allotment_seed_count);
 ~farming_veg_set_stage(db_getfield($crop, farming_allotment:first, 0));
 // VERIFIED period Tip.It planting XP.
@@ -165,9 +194,10 @@ mes("You plant three <$name> seeds in the allotment.");
 // ---------------------------------------------------------------------------
 
 [oploc1,potato_fullygrown]
-@farming_potato_harvest;
+@farming_potato_harvest(false);
+[oploc3,potato_fullygrown] @farming_potato_harvest(true);
 
-[label,farming_potato_harvest]
+[label,farming_potato_harvest](boolean $automatic)
 if (~farming_veg_is_parent = false) {
     ~displaymessage(^dm_default);
     return;
@@ -186,14 +216,17 @@ if (inv_freespace(inv) < 1) {
     mes("You don't have enough inventory space.");
     return;
 }
+if (~farming_harvest_ready($automatic) = false) return;
+// CANDIDATE cache-tool attribution.
+anim(picking_low, 0);
 inv_add(inv, potato, 1);
 // VERIFIED period Tip.It harvest XP.
 stat_advance(farming, ^farming_potato_harvest_xp);
-if ($stage < ^farming_potato_harvest_last) {
-    ~farming_veg_set_stage(add($stage, 1));
-} else {
-    ~farming_veg_set_stage(^farming_veg_weeded);
-}
+$stage = add($stage, 1);
+if ($stage > ^farming_potato_harvest_last) $stage = ^farming_veg_weeded;
+~farming_veg_set_stage($stage);
+%action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
+if ($stage >= ^farming_potato_fullygrown) p_oploc(3);
 mes("You harvest a potato from the allotment.");
 
 // ---------------------------------------------------------------------------
