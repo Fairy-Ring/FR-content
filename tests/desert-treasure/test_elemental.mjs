@@ -230,13 +230,10 @@ function outcome(type, attack, seed, { original = false, successOnly = false, mi
   return original ? withPublished(action) : action();
 }
 function withoutGuard(commands) {
-  // Champions admission adds one empty-stack type read before native
-  // attackability (UID), or before cannon's two existing target-type checks.
-  const emptyType = c => c?.command === 'NPC_TYPE' && c.ints.length === 0 && c.strings.length === 0;
-  const uid = c => c?.command === 'UID' && c.ints.length === 1 && c.strings.length === 0;
-  const leadingAdmission = emptyType(commands[0]) &&
-    (uid(commands[1]) || (emptyType(commands[1]) && emptyType(commands[2]) && uid(commands[3])));
-  return commands.filter((c, i) => !(leadingAdmission && i === 0) &&
+  // Only the Champions guard's leading empty-stack type lookup is new.
+  // Preserve every later NPC_TYPE, including native attackability checks.
+  return commands.filter((c, i) =>
+    !(i === 0 && c.command === 'NPC_TYPE' && c.ints.length === 0 && c.strings.length === 0) &&
     !(c.command === 'NPC_PARAM' && [magicParam, ammoParam].includes(c.ints.at(-1))));
 }
 function assertIdentical(current, original, label) {
