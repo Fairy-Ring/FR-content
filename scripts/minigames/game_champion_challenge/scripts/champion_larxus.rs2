@@ -50,6 +50,7 @@ if ($id = 11) {
 }
 ~champions_set_current($id);
 if (loc_find(^champions_statue, champions_statue_trap) = true) {
+    // UNKNOWN engineering open duration: retain the inherited 1000 ticks.
     loc_change(champions_statue_trap_open, 1000);
 }
 ~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");

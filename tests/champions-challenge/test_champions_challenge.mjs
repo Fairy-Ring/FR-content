@@ -22,6 +22,7 @@ const { default: OpLocHandler } = await engineModule('network/game/client/handle
 const { PlayerLoading } = await engineModule('engine/entity/PlayerLoading.ts');
 const { default: Packet } = await engineModule('io/Packet.ts');
 const { CollisionType } = await engineModule('engine/routefinder/index.ts');
+const { default: JavaRandom } = await engineModule('util/JavaRandom.ts');
 
 const raceNames = [
   'earthwarrior', 'ghoul', 'giant', 'goblin', 'hobgoblin', 'imp',
@@ -73,6 +74,28 @@ const style = Object.fromEntries(['stab_style', 'slash_style', 'crush_style', 'r
 const windStrike = readConstant(spellFile, 'wind_strike');
 const windStrikeComponent = id('Component', 'magic:wind_strike');
 const hp = PlayerStat.HITPOINTS;
+
+// Each family has an independent expected scroll, including every published
+// producer's visible aliases. Do not infer the expected item from drop code.
+const scrollDropFamilies = [
+  ['earthwarrior', ['earthwarrior']],
+  ['ghoul', ['ghoul']],
+  ['giant', ['giant', 'firegiant', 'icegiant', 'mossgiant', 'mossgiant2', 'mossgiant3']],
+  ['goblin', [
+    'goblin', 'goblin_armed', 'goblin_helmet', 'goblin_guard',
+    ...Array.from({ length: 8 }, (_, i) => `goblin_unarmed_melee_${i + 1}`),
+    ...Array.from({ length: 8 }, (_, i) => `goblin_unarmed_melee_in_${i + 1}`),
+    ...Array.from({ length: 4 }, (_, i) => `goblin_armed_melee_${i + 1}`),
+    ...Array.from({ length: 4 }, (_, i) => `fai_barbarian_goblin_armed_${i + 1}`),
+    'goblin_greenarmour', 'goblin_redarmour'
+  ]],
+  ['hobgoblin', ['hobgoblin_unarmed', 'hobgoblin_armed']],
+  ['imp', ['imp']],
+  ['jogre', ['jogre']],
+  ['lesserdemon', ['lesser_demon']],
+  ['skeleton', ['skeleton_unagressive', 'skeleton_unarmed', 'skeleton_armed', 'giantskeleton']],
+  ['zombie', ['zombie_unarmed', 'zombie2', 'zombie_entranan']]
+];
 const player = makePlayer(surfaceApproach);
 
 let passed = 0;
@@ -576,6 +599,32 @@ test('a shared open statue cannot admit another player without their own eligibl
   }
 });
 
+test('refused statue entry uses sourced defeated-Champion wording and preserves silent gaps', () => {
+  for (const [label, challenge, wins, expected] of [
+    ['already defeated', 1, 1, "You've already defeated this Champion. The challenge is void."],
+    ['accepted scroll missing', 2, 0, null],
+    ['Leon not unlocked', 11, 0, null]
+  ]) {
+    setChallenge(challenge, gallery, wins);
+    const trap = locByBase('champions_statue_trap', statue);
+    assert(trap, 'real packed statue is present');
+    standNearLoc(trap);
+    const before = [player.level, player.x, player.z];
+    assert(locHandler.handle(new OpLoc(1, trap.x, trap.z, trap.type), player), `${label}: native statue action accepted`);
+    player.processInteraction();
+    if (player.activeScript) advanceDialogue(player.activeScript, label);
+    assert.deepEqual([player.level, player.x, player.z], before, `${label}: entrant stays outside`);
+    assert.equal(current(), challenge, `${label}: no accepted challenge state changes`);
+    assert.equal([...World.npcs].filter(npc => championNpcIds.has(npc.type)).length, 0, `${label}: no opponent spawns`);
+    const text = player.packets.filter(packet => typeof packet.text === 'string').map(packet => packet.text).join(' ').replace(/\s+/g, ' ');
+    if (expected) assert(text.includes(expected), `${label}: native dialogue contains the sourced refusal`);
+    else {
+      assert.equal(text, '', `${label}: no invented dialogue`);
+      assert.deepEqual(player.messages, [], `${label}: no invented game message`);
+    }
+  }
+});
+
 test('all fixed travel and champion footprints use connected packed floor', () => {
   fresh(gallery);
   const ladder = locByBase('champions_arenaladder', arenaLadder);
@@ -777,6 +826,78 @@ test('special toggle and cannon ranged entrypoint obey the same fight restrictio
   assert.deepEqual(player.messages, [], 'Skeleton ranged cannon path passes the challenge guard');
   removeNpc(skeleton);
 });
+
+for (const [family, monsters] of scrollDropFamilies) {
+  test(`${family} scroll drops only on a winning roll for an undefeated killing player`, () => {
+    const position = { level: 0, x: 3222, z: 3222 };
+    const killer = makePlayer(position);
+    const bystander = makePlayer(position);
+    const expected = objectId(`champions_challenge_${family}`);
+    const victoryBit = 1 << raceNames.indexOf(family);
+    const otherVictoryBit = 1 << ((raceNames.indexOf(family) + 1) % 10);
+    const random = JavaRandom.nextDouble;
+    const handlers = { ...ScriptRunner.HANDLERS };
+    const visited = new Set();
+    for (const [code, handler] of Object.entries(handlers)) {
+      ScriptRunner.HANDLERS[code] = state => {
+        visited.add(state.script.name);
+        handler(state);
+      };
+    }
+    try {
+      for (const monster of monsters) {
+        for (const [scenario, roll, wins, winning] of [
+          ['winning', 0, 0, true],
+          ['high losing', 0.99999, 0, false],
+          ['old 1/500 rate loses', 0.001, 0, false],
+          ['already defeated', 0, victoryBit, false],
+          ['different champion defeated', 0, otherVictoryBit, true]
+        ]) {
+          resetPlayer(killer, position);
+          killer.setVar(defeatedVarp, wins);
+          resetPlayer(bystander, position);
+          bystander.setVar(defeatedVarp, wins === victoryBit ? 0 : victoryBit);
+          visited.clear();
+          JavaRandom.nextDouble = () => roll;
+          const npc = makeNpc(monster, position);
+          npc.levels[hp] = 0;
+          npc.heroPoints.addHero(killer.hash64, 10);
+          npc.heroPoints.addHero(bystander.hash64, 1);
+          const label = `${monster} ${scenario} roll=${roll}`;
+          try {
+            // Start with the other player active: the real death dispatcher must
+            // select the hero, not award the active player or a public drop.
+            dispatchNpcTrigger(ServerTriggerType.AI_QUEUE3, npc, bystander);
+            for (const scroll of scrollIds) {
+              const drop = World.getObj(position.x, position.z, position.level, scroll, killer.hash64);
+              assert.equal(drop?.count ?? 0, winning && scroll === expected ? 1 : 0, `${label}: correct scroll and quantity at NPC square`);
+              if (drop) assert.equal(drop.receiver64, killer.hash64, `${label}: drop belongs only to the killer`);
+              assert.equal(World.getObj(position.x, position.z, position.level, scroll, bystander.hash64), null, `${label}: no scroll for another player`);
+            }
+            if (monster === 'ghoul') {
+              assert(visited.has('[proc,npc_default_death]'), `${label}: published default death still executes`);
+              const bones = World.getObj(position.x, position.z, position.level, objectId('bones'), killer.hash64);
+              assert.equal(bones?.count, 1, `${label}: default Ghoul bones still drop`);
+            }
+          } finally {
+            removeNpc(npc);
+            const zone = World.gameMap.getZone(position.x, position.z, position.level);
+            for (const drop of [...zone.getObjsSafe(CoordGrid.packZoneCoord(position.x, position.z))]) World.removeObj(drop, -1);
+          }
+        }
+      }
+    } finally {
+      JavaRandom.nextDouble = random;
+      Object.assign(ScriptRunner.HANDLERS, handlers);
+      for (const actor of [killer, bystander]) {
+        actor.clearInteraction();
+        actor.isActive = false;
+        World.players[actor.slot] = null;
+        actor.unlink();
+      }
+    }
+  });
+}
 
 test('all champion death triggers award exact tenths, set permanent bits and consume their scroll once', () => {
   let wins = 0;

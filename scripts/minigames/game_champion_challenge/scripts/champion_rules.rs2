@@ -30,6 +30,8 @@ if ($id = 1 & ~prayers_are_active = true) {
     return(false);
 }
 if ($id = 2 | $id = 8) {
+    // UNKNOWN interpretation of the VERIFIED rules: every worn slot except
+    // Ghoul's weapon hand is prohibited, including jewellery and ammunition.
     def_int $slot = 0;
     while ($slot < inv_size(worn)) {
         if (inv_getobj(worn, $slot) ! null & ($id = 8 | $slot ! ^wearpos_rhand)) {
@@ -79,6 +81,7 @@ switch_npc(npc_type) {
     case default : return(true);
 }
 if (~champions_current ! $id | %npc_macro_event_target ! uid | ~champions_in_arena = false) {
+    // UNKNOWN functional wording; Lost City's wizard refusal uses an ellipsis instead.
     mes("It's not after you.");
     return(false);
 }

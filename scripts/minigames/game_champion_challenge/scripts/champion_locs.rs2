@@ -32,10 +32,16 @@ if ($id = 0) {
     ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>You need to arrange a challenge with me before you enter the arena.");
     return;
 }
-if (~champions_won($id) = true) return;
+if (~champions_won($id) = true) {
+    // CANDIDATE wording: OSRS Transcript:Larxus, reused from the defeated-scroll refusal.
+    ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>You've already defeated this Champion. The challenge is void.");
+    return;
+}
 if ($id = 11) {
+    // No sourced refusal wording for Leon no longer being unlocked: remain silent.
     if (~champions_ready_for_leon = false) return;
 } else {
+    // No sourced refusal wording for losing an already accepted scroll: remain silent.
     if (inv_total(inv, enum(int, obj, champions_scroll, $id)) = 0) return;
 }
 if (~champions_entry_check($id) = false) return;
@@ -58,6 +64,7 @@ mes("You climb down through the trapdoor...");
 anim(human_pickupfloor, 0);
 p_telejump(^champions_arena_ladder);
 // UNKNOWN engineering spawn square: inside the packed arena, not a cache dest.
+// UNKNOWN engineering lifetime: retain the inherited 1000 ticks.
 npc_add(^champions_imp_spawn, enum(int, npc, champions_npc, $id), 1000);
 %npc_macro_event_target = uid;
 

@@ -79,8 +79,10 @@ if (~champions_current > 0 & ~champions_in_arena = true) ~champions_leave;
 [ai_queue3,ghoul]
 // Preserve the published generic ghoul death and ordinary drop unchanged.
 gosub(npc_default_death);
-if (npc_findhero = ^true & random(^champion_scroll_chance) = 0) {
-    // CANDIDATE: OSRS Ghoul champion scroll; same inherited rate as the races.
+if (npc_findhero = ^true) {
+    // CANDIDATE: OSRS Ghoul scroll and no scroll after this Champion's defeat.
     // The period rate is UNKNOWN; retain this unit's inherited 1/5000.
-    obj_add(npc_coord, champions_challenge_ghoul, 1, ^lootdrop_duration);
+    if (~champions_won(2) = false & random(^champion_scroll_chance) = 0) {
+        obj_add(npc_coord, champions_challenge_ghoul, 1, ^lootdrop_duration);
+    }
 }

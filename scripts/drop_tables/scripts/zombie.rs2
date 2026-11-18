@@ -47,7 +47,8 @@ if ($dropint < 4) {
     obj_add(npc_coord, copper_ore, 1, ^lootdrop_duration);
 }
 
-if (random(^champion_scroll_chance) = 0) {
+// CANDIDATE: OSRS Champion's scroll, no further scroll after this Champion's defeat.
+if (~champions_won(10) = false & random(^champion_scroll_chance) = 0) {
 obj_add(npc_coord, champions_challenge_zombie, 1, ^lootdrop_duration);
 }
 
@@ -135,6 +136,7 @@ if ($dropint < 50) {
 }
 // Nothing - 8/128
 
-if (random(^champion_scroll_chance) = 0) {
+// CANDIDATE: OSRS Champion's scroll, no further scroll after this Champion's defeat.
+if (~champions_won(10) = false & random(^champion_scroll_chance) = 0) {
 obj_add(npc_coord, champions_challenge_zombie, 1, ^lootdrop_duration);
 }
