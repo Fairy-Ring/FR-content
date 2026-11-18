@@ -11,3 +11,10 @@ data=handler,1
 table=farming_growth
 data=period,20
 data=handler,2
+
+// CANDIDATE pre-rework Old School family interval. Period Tip.It estimates
+// 17.5 minutes total; four full five-minute windows are not that estimate.
+[farming_growth_flower]
+table=farming_growth
+data=period,5
+data=handler,3

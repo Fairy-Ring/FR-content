@@ -7,16 +7,23 @@
 // Preserve the inherited potato catch-up cap and its compiled contract.
 return(~farming_allotment_advance($stage, min($steps, sub(^farming_potato_fullygrown, ^farming_potato_seed)), farming_allotment_potato));
 
-[proc,farming_potato_advance_word](int $word, int $steps)(int)
+[proc,farming_potato_advance_word](int $word, int $steps, int $flowerbit)(int)
 def_int $bit = 0;
 while ($bit < 32) {
     def_int $end = add($bit, 7);
     def_int $before = getbit_range($word, $bit, $end);
+    def_dbrow $crop = ~farming_allotment_crop($before);
+    def_int $flowerstart = add($flowerbit, multiply(divide($bit, 16), 8));
+    def_int $flower = getbit_range(%farming_flower_varp, $flowerstart, add($flowerstart, 7));
     def_int $stage;
-    if (modulo($before, ^farming_watered_offset) >= ^farming_potato_seed & modulo($before, ^farming_watered_offset) <= ^farming_potato_harvest_last) {
+    if ($crop ! null & ~farming_flower_protects($flower, $before) = true) {
+        def_int $protectedsteps = $steps;
+        if ($crop = farming_allotment_potato) $protectedsteps = min($steps, sub(^farming_potato_fullygrown, ^farming_potato_seed));
+        $stage = ~farming_flower_advance_protected($before, $protectedsteps, $crop);
+    } else if (modulo($before, ^farming_watered_offset) >= ^farming_potato_seed & modulo($before, ^farming_watered_offset) <= ^farming_potato_harvest_last) {
         $stage = ~farming_potato_advance($before, $steps);
     } else {
-        $stage = ~farming_allotment_advance($before, $steps, ~farming_allotment_crop($before));
+        $stage = ~farming_allotment_advance($before, $steps, $crop);
     }
     $word = setbit_range_toint($word, $stage, $bit, $end);
     $bit = add($bit, 8);
@@ -24,7 +31,7 @@ while ($bit < 32) {
 return($word);
 
 [proc,farming_potato_advance_all](int $steps)
-def_int $first = ~farming_potato_advance_word(%farming_allotment_varp_1, $steps);
-def_int $second = ~farming_potato_advance_word(%farming_allotment_varp_2, $steps);
+def_int $first = ~farming_potato_advance_word(%farming_allotment_varp_1, $steps, 0);
+def_int $second = ~farming_potato_advance_word(%farming_allotment_varp_2, $steps, 16);
 %farming_allotment_varp_1 = $first;
 %farming_allotment_varp_2 = $second;
