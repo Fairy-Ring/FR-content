@@ -213,6 +213,7 @@ jobs:
           run_test tests/rowboat/test_rowboat.mjs node --import tsx ../content/tests/rowboat/test_rowboat.mjs
           run_test tests/canoes/test_canoes.mjs node --import tsx ../content/tests/canoes/test_canoes.mjs
           run_test tests/misc-services/test_misc_services.mjs node --import tsx ../content/tests/misc-services/test_misc_services.mjs
+          run_test 'tests/tai-bwo-cleanup/test_cleanup.mjs + tests/tai-bwo-cleanup/test_fence.mjs' node --import tsx --test --test-concurrency=1 ../content/tests/tai-bwo-cleanup/test_cleanup.mjs ../content/tests/tai-bwo-cleanup/test_fence.mjs
           run_test tests/regicide-travel/test_regicide_travel.mjs node --import tsx ../content/tests/regicide-travel/test_regicide_travel.mjs
           run_test tests/slimy-eel/test_slimy_eel.mjs node --import tsx ../content/tests/slimy-eel/test_slimy_eel.mjs
           run_test tests/shantay/test_shantay.mjs node --import tsx ../content/tests/shantay/test_shantay.mjs
