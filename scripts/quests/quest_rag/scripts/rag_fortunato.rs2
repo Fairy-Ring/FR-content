@@ -3,6 +3,7 @@
 [opnpc1,rag_wine_merchant]
 ~chatnpc("<p,neutral>Can I help you at all?");
 if (~rag_stage = 0) {
+    // UNKNOWN: the pre-quest greeting is sourced, but opening the wine shop here is not.
     ~openshop_fortunato;
     return;
 }
