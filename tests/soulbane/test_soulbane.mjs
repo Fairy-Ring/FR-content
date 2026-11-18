@@ -928,6 +928,7 @@ function testMainPath() {
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, entry, 'descent lands on the exact packed Rage entry tile');
   assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'new Rage room starts with zero temporary meter');
   assert.equal(rageNpcsFor(p).length, 8, 'entry creates eight owner-tagged Rage NPCs');
+  worldTick(); // First ordinary post-entry tick runs the queued NPC spawn hooks.
   checkRoomRoutes(p);
   assertJournal(p, ['very aggressive room', 'defeat the monsters'], ['Tolna has been rescued', 'Soulbane is complete'],
     'stage-2 journal');

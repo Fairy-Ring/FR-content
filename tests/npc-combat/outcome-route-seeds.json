@@ -1266,6 +1266,66 @@
         "zero": 8,
         "miss": 11
       }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_anger_bear]",
+      "npc": "soulbane_anger_bear",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 1 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_anger_goblin]",
+      "npc": "soulbane_anger_goblin",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 1 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_anger_rat]",
+      "npc": "soulbane_anger_rat",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 1 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_anger_unicorn]",
+      "npc": "soulbane_anger_unicorn",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 1 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
     }
   ]
 }

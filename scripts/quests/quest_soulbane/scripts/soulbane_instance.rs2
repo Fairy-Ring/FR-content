@@ -1,4 +1,6 @@
-// UNKNOWN reconstruction: private geometry copies, one owner and one session UID.
+// CANDIDATE: Old School r15359515 says the entire quest is instanced.
+// No introducing update note found; period guides are silent. May postdate 2006.
+// UNKNOWN: exact geometry-copy layout, owner encoding and session UID.
 // Original 377 client maps/locs are copied; the engine copies no template NPCs.
 [proc,soulbane_enter]
 if (%soulbane_prog < 1 | %soulbane_prog > 3) return;
