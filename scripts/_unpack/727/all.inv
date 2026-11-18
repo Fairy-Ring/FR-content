@@ -2935,6 +2935,9 @@ size=40
 restock=yes
 stackall=yes
 allstock=no
+// CANDIDATE: all sixteen stock counts match Old School market revision 15365049.
+// Non-hops rows: farming.osrs-market-other-stock; no retained period stock counts.
+// Revision 215783 instead gives Cabbage stock 10; the inherited value 5 is retained.
 stock1=potato_seed,20,100
 stock2=onion_seed,10,100
 stock3=cabbage_seed,5,100
