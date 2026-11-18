@@ -64,6 +64,11 @@ function playerAt(tile) {
   player.pid = slot;
   player.uid = ((Number(player.username37 & 0x1fffffn) << 11) | slot) >>> 0;
   player.vars.fill(0);
+  // Fixture: all music is already unlocked. Native region music must not make
+  // the stronger all-varps-unchanged assertion mistake a song unlock for quest progress.
+  for (let group = 1; group <= 14; group++) {
+    player.setVar(requiredId(types.VarPlayerType, `musicmulti_${group}`), -1);
+  }
   player.baseLevels.fill(99);
   player.levels.fill(99);
   [player.level, player.x, player.z] = tile;
@@ -145,7 +150,9 @@ function dispatchLoc(player, row) {
 function menuOptions(player) {
   const latestText = new Map();
   for (const [component, value] of packetTexts(player)) latestText.set(component, value);
-  return (player.resumeButtons ?? []).map(component => ({ component, label: latestText.get(component) }))
+  return [...new Set(player.resumeButtons ?? [])]
+    .filter(component => types.Component.get(component)?.rootLayer === player.modalChat)
+    .map(component => ({ component, label: latestText.get(component) }))
     .filter(option => typeof option.label === 'string' && option.label.length > 0);
 }
 
@@ -824,7 +831,7 @@ check('north ferry charges two coins normally, but the 2023 return exception wai
 console.log(`RESULT ${failures.length ? 'FAIL' : 'PASS'} dwarven-transport: ${passed} passed, ${failures.length} failed`);
 if (failures.length) {
   for (const failure of failures) console.error(`FAIL DETAIL ${failure.name}: ${failure.message}`);
-  process.exitCode = 1;
-} else {
-  process.exitCode = 0;
 }
+// The shared map runtime owns worker threads; follow the other compiled tests'
+// explicit shutdown rather than leaving a completed fixture process alive.
+process.exit(failures.length ? 1 : 0);
