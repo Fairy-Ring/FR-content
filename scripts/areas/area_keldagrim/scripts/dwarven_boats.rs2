@@ -1,0 +1,88 @@
+// CANDIDATE wording: OSRS Transcript:Dwarven Boatman (2020-2026 history).
+// Initial Giant Dwarf voyage is owned by the quest and is not changed here.
+[proc,dwarven_boat_repeat]()
+~chatnpc("<p,neutral>Hello again, <displayname>! Want to go back to Keldagrim?");
+if (~p_choice2("Yes, please take me.", 1, "What, on your ship? No way.", 2) = 2) {
+    ~chatplayer("<p,neutral>What, on your ship? No way.");
+    ~chatnpc("<p,neutral>Hey, it was only a little accident! Calm down!");
+    return;
+}
+~chatplayer("<p,neutral>Yes, please take me.");
+~dwarven_transport_fade(^dwarven_boat_city);
+
+[opnpc1,dwarf_city_boatman_city]
+~chatnpc("<p,neutral>Want me to take you back to the mines?");
+if (~p_choice2("Yes, please take me.", 1, "What, on your ship! No thanks!", 2) = 2) {
+    ~chatplayer("<p,neutral>What, on your ship? No thanks! I don't want to crash into any more things!");
+    ~chatnpc("<p,neutral>Hey now, it was only a slight accident!");
+    // The quest currently implements only its opening stages, not completion.
+    ~chatplayer("<p,neutral>A slight accident?? Thanks to you I have to rebuild this statue you so carelessly knocked over!");
+    ~chatnpc("<p,neutral>Calm down, calm down! You got what you paid for the trip, didn't you?");
+    return;
+}
+~chatplayer("<p,neutral>Yes, please take me.");
+~dwarven_transport_fade(^dwarven_boat_mines);
+
+// CANDIDATE: 2023 historical transcript. No quest requirement is stated.
+// The north ferryman waives an unaffordable return fare. The 2026 shortened
+// dialogue, Charos option and single-coin confiscation are not imported.
+[opnpc1,dwarfrock_ferryman1] ~dwarven_ferry(false);
+[opnpc1,dwarfrock_ferryman2] ~dwarven_ferry(true);
+
+[proc,dwarven_ferry](boolean $returning)
+~chatnpc("<p,neutral>Hello there, want a ride?");
+~chatplayer("<p,neutral>A ride, where to?");
+~chatnpc("<p,neutral>Across the river, across the river! It's just a short ride!");
+~chatplayer("<p,neutral>How much will that cost me?");
+~chatnpc("<p,neutral>Haha, you understand us dwarves well, human!");
+~chatnpc("<p,neutral>It's just 2 gold pieces! Want to go?");
+def_int $choice;
+if ($returning = true) {
+    $choice = ~p_choice2("Yes please.", 1, "No thanks.", 2);
+} else {
+    $choice = ~p_choice3("I'd like to go further downstream.", 3, "Yes please.", 1, "No thanks.", 2);
+}
+if ($choice = 3) {
+    ~chatplayer("<p,neutral>I'd like to go further downstream.");
+    ~chatnpc("<p,neutral>You mean to the city of Keldagrim?");
+    ~chatplayer("<p,neutral>Ehm, yes, I think so.");
+    ~chatnpc("<p,neutral>Sorry, I'm just a simple ferryman, I only go across.");
+    ~chatnpc("<p,neutral>But talk to my friend here, he sometimes goes to the city in his ship.");
+    ~chatplayer("<p,neutral>Thanks.");
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>No thanks.");
+    return;
+}
+if (inv_total(inv, coins) >= ^dwarven_ferry_fare) {
+    inv_del(inv, coins, ^dwarven_ferry_fare);
+} else if ($returning = false) {
+    ~chatnpc("<p,neutral>You don't even have 2 gold coins, humans!");
+    ~chatnpc("<p,neutral>Come back later.");
+    return;
+} else {
+    ~chatnpc("<p,neutral>You don't even have 2 gold coins, human!");
+    ~chatnpc("<p,neutral>Come back later.");
+    ~chatplayer("<p,neutral>But... that means I'm stuck here.");
+    ~chatnpc("<p,neutral>Hmm. I suppose I could make an exception for you this time.");
+    ~chatplayer("<p,neutral>Thanks a lot!");
+}
+if ($returning = true) {
+    ~dwarven_transport_fade(^dwarven_ferry_entrance);
+} else {
+    ~dwarven_transport_fade(^dwarven_ferry_mine);
+}
+
+[proc,dwarven_transport_fade](coord $destination)
+// UNKNOWN engineering presentation: the fade_to_black/seq_3541 then
+// inter_379/seq_2115 pair follows quest_rd/scripts/rd_tiffy.rs2:148-156.
+// No original repeat-voyage schedule is recovered; do not reuse the crash.
+if_close;
+if_openoverlay(fade_to_black);
+p_delay(~seqlength20ms(seq_3541));
+p_telejump($destination);
+~music_playbycoord(coord);
+if_openoverlay(inter_379);
+p_delay(~seqlength20ms(seq_2115));
+if_openoverlay(null);

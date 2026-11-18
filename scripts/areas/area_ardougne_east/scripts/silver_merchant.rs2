@@ -3,6 +3,7 @@ if (getqueue(stolen_from_stall_silver) > 0) {
     npc_say("You stole from me. Talk to me when you've considered your actions!");
     return;
 }
+if (%makinghistory_prog >= ^makinghistory_complete) @ek_erin;
 ~chatnpc("<p,happy>Silver! Silver!|Best prices for buying and selling in all Kandarin!");
 
 def_int $option;

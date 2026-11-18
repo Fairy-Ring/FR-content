@@ -1,0 +1,19 @@
+// VERIFIED count/order: Sal's EnchantedKey.html, capture 29 April 2006.
+^ek_site_count = 11
+// UNKNOWN engineering encoding: one saved bit for each of the eleven treasures.
+^ek_found_all = 2047
+// CANDIDATE exact centres: OSRS The Enchanted Key revision 15336907 map pins.
+// The period guide independently names all eleven regions. No Grand Exchange is added.
+^ek_site_0 = 0_42_56_28_22 // Rellekka
+^ek_site_1 = 0_47_53_25_45 // Body altar
+^ek_site_2 = 0_51_52_35_21 // Digsite
+^ek_site_3 = 0_46_51_28_40 // South of Falador, near the Air altar
+^ek_site_4 = 0_49_49_25_40 // Lumbridge swamp
+^ek_site_5 = 0_51_50_27_20 // Al Kharid ponds
+^ek_site_6 = 0_40_50_61_39 // Ardougne monastery
+^ek_site_7 = 0_49_54_24_34 // Varrock spirit tree area before the Grand Exchange
+^ek_site_8 = 0_37_52_49_54 // North-west of the outpost
+^ek_site_9 = 0_47_49_8_30 // Mudskipper Point
+^ek_site_10 = 0_38_53_16_51 // Tree Gnome Stronghold
+// CANDIDATE replacement price: OSRS Enchanted key, first revision 152529 (2013).
+^ek_replacement_price = 500

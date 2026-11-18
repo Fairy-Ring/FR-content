@@ -1,0 +1,151 @@
+// VERIFIED eleven sites, first Fremennik then random, once-only rewards and melting:
+// Sal's EnchantedKey.html, 29 April 2006. Exact centres/bands are CANDIDATE.
+[proc,ek_target]()(int)
+if (%makinghistory_prog < ^makinghistory_complete) return(-1);
+def_int $found = getbit_range(%enchanted_key_hunt, 0, 10);
+if ($found = ^ek_found_all) return(-1);
+def_int $stored = getbit_range(%enchanted_key_hunt, 11, 14);
+if ($stored > 0) return(sub($stored, 1));
+def_int $target = 0;
+if ($found > 0) {
+    // UNKNOWN uniform selection algorithm. The period guide only says random order.
+    def_int $pick = random(sub(^ek_site_count, bitcount($found)));
+    while ($pick > 0 | testbit($found, $target) = 1) {
+        if (testbit($found, $target) = 0) $pick = sub($pick, 1);
+        $target = add($target, 1);
+    }
+}
+%enchanted_key_hunt = setbit_range_toint(%enchanted_key_hunt, add($target, 1), 11, 14);
+%makinghistory_key_distance = 0;
+return($target);
+
+[proc,ek_site_coord](int $site)(coord)
+switch_int ($site) {
+    case 0 : return(^ek_site_0);
+    case 1 : return(^ek_site_1);
+    case 2 : return(^ek_site_2);
+    case 3 : return(^ek_site_3);
+    case 4 : return(^ek_site_4);
+    case 5 : return(^ek_site_5);
+    case 6 : return(^ek_site_6);
+    case 7 : return(^ek_site_7);
+    case 8 : return(^ek_site_8);
+    case 9 : return(^ek_site_9);
+    case 10 : return(^ek_site_10);
+}
+return(null);
+
+[proc,ek_feel]
+if (%makinghistory_prog < ^makinghistory_complete | inv_total(inv, makinghistory_key) = 0) return;
+def_int $target = ~ek_target;
+if ($target = -1) return;
+~mh_key_reading(distance(coord, ~ek_site_coord($target)), true);
+
+[proc,ek_dig]()(boolean)
+if (%makinghistory_prog < ^makinghistory_complete | inv_total(inv, makinghistory_key) = 0 | inv_total(inv, spade) = 0) return(false);
+def_int $target = ~ek_target;
+if ($target = -1) return(false);
+def_coord $site = ~ek_site_coord($target);
+// CANDIDATE postquest dig region: the modern guide permits a 9 by 9 square.
+if (coordy(coord) ! coordy($site) | distance(coord, $site) > 4) return(false);
+p_arrivedelay;
+p_stopaction;
+anim(human_dig, 0);
+%enchanted_key_hunt = setbit(%enchanted_key_hunt, $target);
+%enchanted_key_hunt = setbit_range_toint(%enchanted_key_hunt, 0, 11, 14);
+%makinghistory_key_distance = 0;
+~ek_reward($target);
+// UNKNOWN functional wording. No retained source quotes the treasure-opening message.
+mes("You find the treasure and take its contents.");
+if (getbit_range(%enchanted_key_hunt, 0, 10) = ^ek_found_all) {
+    inv_del(inv, makinghistory_key, 1);
+    // VERIFIED melting event, UNKNOWN functional wording: Sal's 29 April 2006.
+    mes("The enchanted key melts away.");
+}
+return(true);
+
+[proc,ek_reward](int $site)
+// VERIFIED per-location items and quantities: Sal's 29 April 2006, not its inconsistent total.
+// UNKNOWN packaging: ore and rune essence are notes so a normal inventory holds each reward.
+// The period guide calls the essence Rune Essence. Do not substitute modern Pure essence.
+switch_int ($site) {
+    case 0 :
+        ~mh_give(cert_mithril_ore, 10);
+        ~mh_give(steel_arrow, 20);
+        ~mh_give(lawrune, 15);
+    case 1 :
+        ~mh_give(cert_mithril_ore, 10);
+        ~mh_give(cert_iron_ore, 15);
+        ~mh_give(airrune, 5);
+    case 2 :
+        ~mh_give(cert_blankrune, 40);
+        ~mh_give(cert_iron_ore, 15);
+        ~mh_give(makinghistory_guthix_polestaff, 1);
+    case 3 :
+        ~mh_give(earthrune, 5);
+        ~mh_give(iron_arrow, 20);
+        ~mh_give(makinghistory_saradomin_polestaff, 1);
+    case 4 :
+        ~mh_give(cert_blankrune, 29);
+        ~mh_give(mindrune, 20);
+        ~mh_give(lawrune, 15);
+    case 5 :
+        ~mh_give(cert_blankrune, 40);
+        ~mh_give(cert_mithril_ore, 10);
+        ~mh_give(makinghistory_zamorak_polestaff, 1);
+    case 6 :
+        ~mh_give(cert_blankrune, 36);
+        ~mh_give(cert_iron_ore, 15);
+        ~mh_give(airrune, 5);
+    case 7 :
+        ~mh_give(cert_blankrune, 36);
+        ~mh_give(mithril_arrow, 10);
+        ~mh_give(airrune, 5);
+    case 8 :
+        ~mh_give(cert_blankrune, 40);
+        ~mh_give(iron_arrowheads, 20);
+        ~mh_give(firerune, 20);
+    case 9 :
+        ~mh_give(cert_iron_ore, 15);
+        ~mh_give(mithril_arrow, 20);
+        ~mh_give(deathrune, 15);
+    case 10 :
+        ~mh_give(cert_blankrune, 39);
+        ~mh_give(iron_arrowheads, 20);
+        ~mh_give(waterrune, 30);
+}
+
+[label,ek_erin]
+// UNKNOWN menu/recovery wording. The normal shop options and greeting remain unchanged.
+~chatnpc("<p,happy>Silver! Silver!|Best prices for buying and selling in all Kandarin!");
+def_int $option = ~p_choice3("Yes please.", 1, "Ask about the enchanted key.", 3, "No thank you.", 2);
+if ($option = 1) {
+    ~openshop_activenpc;
+    return;
+}
+if ($option = 2) {
+    ~chatplayer("<p,neutral>No thank you.");
+    return;
+}
+if (getbit_range(%enchanted_key_hunt, 0, 10) = ^ek_found_all) {
+    ~chatnpc("<p,neutral>You have found all the treasure. I cannot replace the key.");
+    return;
+}
+if (inv_total(inv, makinghistory_key) > 0 | inv_total(bank, makinghistory_key) > 0) {
+    ~chatnpc("<p,neutral>Feel the key to find more buried treasure.");
+    return;
+}
+// UNKNOWN: lost-ring recovery is not built, so only a held or banked ring blocks replacement.
+if (testbit(%favour_key_ring, ~osf_key_ring_store_bit(makinghistory_key)) = 1 & (inv_total(inv, favour_key_ring) > 0 | inv_total(bank, favour_key_ring) > 0)) {
+    ~chatnpc("<p,neutral>Your enchanted key is on your steel key ring.");
+    return;
+}
+~chatnpc("<p,neutral>I can replace a lost enchanted key for 500 coins.");
+if (~p_choice2("Pay 500 coins.", 1, "No thank you.", 2) = 2) return;
+if (inv_total(inv, coins) < ^ek_replacement_price) {
+    ~chatnpc("<p,neutral>You need 500 coins.");
+    return;
+}
+inv_del(inv, coins, ^ek_replacement_price);
+~mh_give(makinghistory_key, 1);
+return;
