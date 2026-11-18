@@ -3545,12 +3545,3 @@
 0_37_148_56_40
 0_37_148_56_48
 0_37_148_56_56
-
-// Waterbirth support room and adjacent attack corridors only.
-// CANDIDATE: Tip.It (10 May 2006) says most of the dungeon is multi-combat;
-// the history-checked Old School support bypass also requires this room to be.
-// Exact period zone boundaries are UNKNOWN. Other Waterbirth zones stay open.
-0_39_158_40_24
-0_39_158_40_32
-0_39_158_48_24
-0_39_158_48_32
