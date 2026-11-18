@@ -46,6 +46,7 @@ const TARGETS = [
     ['41_58', 'OBJ', 0, 48, 26, 461, 561, 2],
     ['41_41', 'NPC', 0, 61, 61, 1318, null],
     ['41_41', 'NPC', 0, 11, 11, 1324, null],
+    // VERIFIED note identity; UNKNOWN cause. A corpse-model/object ID mix-up is an inference.
     ['43_157', 'OBJ', 0, 32, 30, 5685, null]
 ];
 const key = (map, section, level, x, z) => `${map}|${section}|${level} ${x} ${z}`;

@@ -8,6 +8,36 @@
 %npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
 %npc_start_coord = npc_coord;
 %npc_attacking_uid = null;
+%npc_aggressive_player = null;
+%npc_int = 0;
+npc_settimer(0);
+
+// CANDIDATE later transcript: one player owns the shared Kendal at a time.
+// UNKNOWN engineering release policy; npc_int is this encounter's absolute deadline.
+[ai_timer,mdaughter_multi_bear] ~mdaughter_kendal_release_stale;
+[ai_timer,mdaughter_bearman] ~mdaughter_kendal_release_stale;
+[ai_timer,mdaughter_bearman_fighter] ~mdaughter_kendal_release_stale;
+[proc,mdaughter_kendal_release_stale]
+if (%npc_attacking_uid = null | npc_stat(hitpoints) = 0) return;
+if (%npc_int > map_clock & .finduid(%npc_attacking_uid) = true) {
+    if (inzone(^mdaughter_cavern_sw, ^mdaughter_cavern_ne, .coord) = true & .stat(hitpoints) > 0) {
+        if ((npc_getmode = opplayer2 | npc_getmode = applayer2) & %npc_aggressive_player = %npc_attacking_uid) return;
+        if (npc_getmode = playerfaceclose & .busy = true) return;
+    }
+}
+%npc_attacking_uid = null;
+%npc_aggressive_player = null;
+%npc_lastcombat = 0;
+%npc_int = 0;
+npc_setmode(none);
+npc_settimer(0);
+
+[proc,mdaughter_kendal_claim]
+if (%npc_attacking_uid ! uid | %npc_int = 0) {
+    %npc_attacking_uid = uid;
+    %npc_int = add(map_clock, ^mdaughter_kendal_hold_ticks);
+    npc_settimer(1);
+}
 
 [opnpc1,mdaughter_bearman] @mdaughter_kendal_talk;
 [opnpc1,mdaughter_multi_bear] @mdaughter_kendal_talk;
@@ -19,6 +49,7 @@ if (%mdaughter_quest_var < ^mdaughter_remains) {
     return;
 }
 if (%mdaughter_quest_var >= ^mdaughter_kendal_dead) return;
+~mdaughter_kendal_release_stale;
 if (%npc_attacking_uid ! null & %npc_attacking_uid ! uid & .finduid(%npc_attacking_uid) = true) {
     mes("This bear has no quarrel with you.");
     return;
@@ -95,7 +126,7 @@ if (~p_choice2("Hand the body over to me!", 1, "I humbly request to be given the
     }
 }
 %mdaughter_bear_mayattack = 1;
-%npc_attacking_uid = uid;
+~mdaughter_kendal_claim;
 %npc_aggressive_player = uid;
 npc_setmode(opplayer2);
 
@@ -118,11 +149,12 @@ if (%mdaughter_quest_var ! ^mdaughter_remains | %mdaughter_bear_mayattack = 0) {
     mes("Do not attack me, puny mortal <displayname>!");
     return(false);
 }
+~mdaughter_kendal_release_stale;
 if (%npc_attacking_uid ! null & %npc_attacking_uid ! uid & .finduid(%npc_attacking_uid) = true) {
     mes("This bear has no quarrel with you.");
     return(false);
 }
-%npc_attacking_uid = uid;
+~mdaughter_kendal_claim;
 return(true);
 
 // Queue dispatch uses the placed root; visible forms also bind their own handlers.

@@ -764,6 +764,71 @@ function proveFullInventoryTrophy(root) {
   assert.equal(stage(owner), 30);
 }
 
+function proveKendalHoldRelease(root) {
+  const ownerVar = id('VarNpcType', 'npc_attacking_uid');
+  const deadlineVar = id('VarNpcType', 'npc_int');
+  for (const form of ['mdaughter_multi_bear', 'mdaughter_bearman']) {
+    for (const reason of ['leave cavern', 'stop engaging', 'deadline']) {
+      // Disclosed two-player stage fixtures; neither receives discovery or attack permission.
+      const first = player();
+      const second = player();
+      for (const p of [first, second]) writeVar(p, 'mdaughter_quest_var', 20);
+      const n = new Npc(root.level, root.x, root.z, root.width, root.length,
+        EntityLifeCycle.RESPAWN, World.getNextNid(), id('NpcType', form), BlockWalk.NONE);
+      World.addNpc(n, -1);
+      spawnScript(n);
+      placeAtStand(first, n);
+      operate(first, n, 'npc', 1, [1, 2, 3, 2, 1], `${form}: first player reveals the Kendal`);
+      assert.equal(n.vars[ownerVar], first.uid);
+      const deadline = n.vars[deadlineVar];
+      assert.equal(deadline, World.currentTick + questConstant('mdaughter_kendal_hold_ticks'));
+      assert.equal(n.timerInterval, 1, 'an owned Kendal arms its native watchdog');
+      placeAtStand(second, n);
+      operate(second, n, 'npc', 1, [], `${form}: second player cannot steal an engaged Kendal`);
+      assert.equal(readVar(second, 'mdaughter_bear_discovery'), 0);
+      assert.equal(n.vars[ownerVar], first.uid);
+
+      if (reason === 'leave cavern') {
+        const exit = scanLoc('mdaughter_caveexit', MAP.cave)[0];
+        goToStand(first, exit);
+        operate(first, exit, 'loc', 1, [], 'First player leaves through the cave exit', true);
+        assert.deepEqual(tile(first), [0, 2808, 3702]);
+        assert.equal(World.players[first.slot], first, 'the departed owner remains online');
+      } else if (reason === 'stop engaging') {
+        first.clearInteraction();
+        n.clearInteraction(); // Native loss of the combat target, without leaving the cavern.
+      } else {
+        operate(first, n, 'npc', 2, [], 'The owner starts ordinary combat before expiry');
+        damageNpc(n, 0);
+        assert.equal(n.vars[deadlineVar], deadline, 'attacks do not extend the absolute hold');
+        World.currentTick = deadline - 1;
+        n.processTimers(); // The engine timer phase resolves AI_TIMER through production dispatch.
+        assert.equal(n.vars[ownerVar], first.uid, 'active combat retains ownership before the bound');
+      }
+      World.currentTick++;
+      n.processTimers();
+      assert.equal(n.vars[ownerVar], -1, `${form}: ${reason} releases the first player's hold`);
+      assert.equal(n.timerInterval, 0, 'an unowned Kendal has no polling timer');
+      placeAtStand(second, n);
+      operate(second, n, 'npc', 1, [1, 2, 3, 2, 1], `${form}: second player can now talk`);
+      assert.equal(n.vars[ownerVar], second.uid);
+      assert.equal(readVar(second, 'mdaughter_bear_mayattack'), 1);
+      operate(second, n, 'npc', 2, [], `${form}: second player can now fight`);
+      damageNpc(n, 0);
+      const hp = n.levels[NpcStat.HITPOINTS];
+      damageNpc(n, 7);
+      assert.equal(n.levels[NpcStat.HITPOINTS], hp - 7);
+      n.heroPoints.addHero(second.hash64, hp);
+      damageNpc(n, n.levels[NpcStat.HITPOINTS]);
+      for (let turn = 0; turn < 40 && stage(second) !== 30; turn++) tick(second);
+      assert.equal(stage(second), 30, `${form}: the second player's owned kill advances`);
+      assert.equal(count(second, 'mdaughter_bear_helmet'), 1);
+      assert.equal(stage(first), 20, 'the former owner gets no other-player kill credit');
+      assert.equal(count(first, 'mdaughter_bear_helmet'), 0);
+    }
+  }
+}
+
 function defeatKendal(p) {
   [p.level, p.x, p.z] = [0, 2808, 3702]; // Disclosed travel to the real cave approach.
   assert(!blocked(p.level, p.x, p.z));
@@ -813,6 +878,7 @@ function defeatKendal(p) {
   assert.equal(kendal.vars[id('VarNpcType', 'npc_attacking_uid')], p.uid);
   proveForeignHeroDoesNotCredit(p, other, kendal);
   proveFullInventoryTrophy(kendal);
+  proveKendalHoldRelease(kendal);
   goToStand(p, kendal);
   operate(p, kendal, 'npc', 2, [], 'Attack after revealing the murderer');
   damageNpc(kendal, 0); // Drain the actual combat-start damage queue before the deterministic damage probe.

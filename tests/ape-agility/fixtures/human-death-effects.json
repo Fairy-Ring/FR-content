@@ -2006,6 +2006,15 @@
     },
     {
       "ints": [
+        12389,
+        16711680
+      ],
+      "name": "IF_SETCOLOUR",
+      "pointer": 0,
+      "strings": []
+    },
+    {
+      "ints": [
         "questlist",
         2
       ],

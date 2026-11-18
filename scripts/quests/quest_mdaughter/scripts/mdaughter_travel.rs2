@@ -13,6 +13,7 @@ if (%mdaughter_mud_var ! 1 | stat(agility) < 20) {
     return;
 }
 if (coordx(coord) >= coordx(^mdaughter_tree_island) & coordz(coord) >= coordz(^mdaughter_tree_island)) {
+    // UNKNOWN engineering return route: no checked source describes a reverse tree climb.
     ~mdaughter_travel_cross(^mdaughter_tree_island, ^mdaughter_tree_shore, ^mdaughter_cross_tree);
 } else {
     ~mdaughter_travel_cross(^mdaughter_tree_shore, ^mdaughter_tree_island, ^mdaughter_cross_tree);
@@ -39,6 +40,7 @@ if (distance(coord, loc_coord) > 3) {
 @mdaughter_crossing_failed;
 
 [label,mdaughter_use_pole]
+// CANDIDATE 2013 Pole page and 2016 guide: a staff substitutes for the pole.
 if (last_useitem ! mdaughter_stick & oc_category(last_useitem) ! weapon_staff) {
     ~displaymessage(^dm_default);
     return;
@@ -47,6 +49,7 @@ if (last_useitem ! mdaughter_stick & oc_category(last_useitem) ! weapon_staff) {
 
 [label,mdaughter_cross_pole]
 if (coordz(coord) >= coordz(^mdaughter_pole_second_island)) {
+    // UNKNOWN engineering return route: no checked source describes a reverse pole vault.
     ~mdaughter_travel_cross(^mdaughter_pole_second_island, ^mdaughter_pole_first_island, ^mdaughter_cross_pole);
 } else {
     ~mdaughter_travel_cross(^mdaughter_pole_first_island, ^mdaughter_pole_second_island, ^mdaughter_cross_pole);
