@@ -103,6 +103,7 @@ if(%druidspirit < ^druidspirit_performed_ritual) {
     if(%druidspirit = ^druidspirit_complete) p_teleport(1_53_152_50_6);
     else p_teleport(0_53_152_50_6);
     if(%druidspirit = ^druidspirit_performed_ritual) %druidspirit = ^druidspirit_entered_grotto;
+    if (%druidspirit = ^druidspirit_complete & %fairy_farmers_quest = ^ft1_components) queue(ft1_nature_arrive, 0, 0);
 }
 
 [oploc1,underground_rootwall_door] @leave_grotto;

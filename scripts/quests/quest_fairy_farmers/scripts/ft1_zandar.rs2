@@ -1,0 +1,31 @@
+// CANDIDATE wording: fairytale-1.dlg.zandar-horfyre.
+[opnpc1,zandar_horfyre]
+if (%fairy_farmers_quest < ^ft1_symptoms | %fairy_farmers_quest >= ^ft1_zandar) return;
+~chatplayer("<p,neutral>Hello, I need your help.");
+~chatnpc("<p,angry>And why should I help you, fool? You attack my brethren and I, and then you demand my help! I think not!");
+~chatplayer("<p,neutral>But Fairy Nuff said you would help me!");
+~chatnpc("<p,shock>Fairy Nuff sent you!");
+~chatplayer("<p,neutral>The Fairy Queen is extremely ill. She was in a battle with a Tanglefoot and her injuries have resulted in her being in a coma.");
+~chatnpc("<p,sad>This is grave news indeed!");
+~chatnpc("<p,quiz>You think the Tanglefoot is responsible? I don't see how that could be. A Tanglefoot will normally kill its victim outright...unless...hmmmm...I wonder...");
+if (inv_total(inv, fairy_symptoms_list) = 0) {
+    ~chatplayer("<p,sad>Fairy Nuff gave me a list of her symptoms, but I don't have it with me.");
+    ~chatnpc("<p,neutral>Well, I can't diagnose the problem without knowing the symptoms. You'd better go and find that list, or get Fairy Nuff to give you another one.");
+    return;
+}
+~chatplayer("<p,neutral>Fairy Nuff gave me a list of her symptoms. Here, have a look at it.");
+~chatnpc("<p,neutral>Hmm...yes...slow discorporation of ethreal body, eh? Hmm...I think I know what the problem might be.");
+~chatplayer("<p,happy>You do? That's great! What is it?");
+~chatnpc("<p,neutral>From what I know about fairies, their basic lifeforce is pure magic. Much as we humans would refer to our souls as our life essence, so too does a fairy have a life essence of pure magic.");
+~chatnpc("<p,neutral>You could actually refer to fairies as magic embodied and not be wrong.");
+~chatplayer("<p,quiz>Yes, but about the Fairy Queen?");
+~chatnpc("<p,neutral>Patience, I'm getting to that. It appears the Fairy Queen has lost a large part, indeed the majority, of her life essence. Either it was drained from her by the Tanglefoot or she did it voluntarily.");
+~chatnpc("<p,neutral>Although why she would do that is beyond me.");
+~chatplayer("<p,quiz>So I guess I need to go and kill this Tanglefoot and get back her magic essence if I am to help her?");
+~chatnpc("<p,neutral>Yes, but if I were you I would seek out a necromancer by the name of Malignus Mortifer. I believe that he once fought a Tanglefoot, many years ago.");
+~chatnpc("<p,neutral>You should probably ask him for advice on how to combat it.");
+~chatplayer("<p,quiz>Malignus Mortifer. Any idea where I can find him?");
+~chatnpc("<p,neutral>He's rumoured to have been seen near Port Sarim with his followers recently. Rumour has it that he's working on a spell that has something to do with fungus!");
+~chatplayer("<p,neutral>Ok, thanks very much.");
+~chatnpc("<p,neutral>Don't mention it, and give my regards to Nuff, when you see her next.");
+%fairy_farmers_quest = ^ft1_zandar;

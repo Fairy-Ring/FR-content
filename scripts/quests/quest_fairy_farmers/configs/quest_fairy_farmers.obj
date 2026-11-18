@@ -1,0 +1,26 @@
+// Original 377 block moved verbatim; the combat category follows it.
+[fairy_enchanted_secateurs]
+name=Magic secateurs
+desc=The only way to kill a Tanglefoot.
+recol1s=15855
+recol1d=704
+recol2s=10570
+recol2d=352
+recol3s=5217
+recol3d=608
+model=obj_secateurs
+manwear=obj_secateurs_manwear,0
+womanwear=obj_secateurs_manwear,6
+2dxof=-1
+2dyof=11
+2dzoom=710
+2dyan=320
+2dxan=312
+members=yes
+iop2=Wield
+iop5=Destroy
+wearpos=righthand
+weight=1lb
+// UNKNOWN engineering melee stance: use the existing slash-weapon style table.
+category=weapon_slash
+param=attackrate,4

@@ -244,8 +244,6 @@ scope=perm
 
 [varp136_unused]
 
-[varp137_unused]
-
 [thieving_stall_timer]
 scope=perm
 

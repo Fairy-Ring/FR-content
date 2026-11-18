@@ -1,0 +1,33 @@
+// UNKNOWN engineering stage integers; 1..6 retain the existing gardener ladder.
+// Decades from 10 onward match the original gap/Gate Keeper visibility table.
+^ft1_martin_reported = 7
+^ft1_godfather = 8
+^ft1_symptoms = 9
+^ft1_zandar = 10
+^ft1_skull = 20
+^ft1_components = 30
+^ft1_enchanted = 40
+^ft1_defeated = 50
+// Complete=90 and 2 quest points already live in general/configs/quest.constant.
+// UNKNOWN engineering indices: alphabetical 2 May 2006 Tip.It pool, 1..31.
+^ft1_item_count = 31
+// UNKNOWN engineering lifetime (ticks), not a historical respawn claim.
+^ft1_boss_lifetime = 1000
+// UNKNOWN engineering blend; CANDIDATE OSRS backs both skills, not their weights.
+^ft1_damage_blend_divisor = 2
+// CANDIDATE OSRS quest-form damage bound, not its Nightmare Zone variant.
+^ft1_tanglefoot_maxhit = 12
+// VERIFIED original gravestone tile; UNKNOWN engineering adjacent dig reach.
+^ft1_skull_grave = 0_48_52_34_56
+^ft1_skull_dig_range = 1
+// UNKNOWN engineering cave landings/spawn; require packed-collision reach.
+^ft1_grove_split_x = 2398
+^ft1_grove_east_side = 0_37_68_32_27
+^ft1_grove_west_side = 0_37_68_28_27
+^ft1_boss_spawn = 0_37_68_2_6
+^ft1_owned_search_range = 64
+// UNKNOWN engineering summon search, reachable-square bounds and lifetime.
+^ft1_spirit_search_range = 10
+^ft1_spirit_min_range = 1
+^ft1_spirit_max_range = 5
+^ft1_spirit_lifetime = 1000

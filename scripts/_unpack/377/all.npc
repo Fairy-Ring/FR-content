@@ -74542,29 +74542,6 @@ op1=Talk-to
 vislevel=hide
 head1=npc_3312_head
 
-[fairy_tanglefoot]
-name=Tanglefoot
-desc=A walking thorn bush!
-model1=npc_3313
-recol1s=24172
-recol1d=10436
-recol2s=15785
-recol2d=9379
-recol3s=14728
-recol3d=8322
-recol4s=12614
-recol4d=7265
-resizev=150
-op2=Attack
-walkanim=tanglefoot_walk
-readyanim=tanglefoot_ready
-vislevel=111
-hitpoints=102
-attack=97
-strength=97
-defence=91
-head1=npc_3313_head
-
 [fairy_queen_multi]
 walkanim=fairy_walk
 readyanim=fairy_ready

@@ -1,0 +1,80 @@
+// VERIFIED route: hole in the western wall of the Cosmic Temple, then tunnel.
+// CANDIDATE dialogue: fairytale-1.dlg.shady-grove. Concrete visible loc forms.
+[oploc1,fairy_wall_tangle_door_open]
+@ft1_grove_gap;
+[oploc1,fairy_wall_tangle_door_open1]
+@ft1_grove_gap;
+
+[label,ft1_grove_gap]
+if (%fairy_farmers_quest < ^ft1_enchanted) return;
+if (coordx(coord) < ^ft1_grove_split_x) {
+    // UNKNOWN engineering landing tiles on the two sides of the original gap.
+    p_telejump(^ft1_grove_east_side);
+    return;
+}
+if (%fairy_farmers_quest >= ^ft1_defeated) {
+    ~chatnpc_specific("Gate Keeper", fairy_mindslayer_guard, "<p,neutral>Be careful in there, there are still some of those baby Tanglefootii around.");
+    p_telejump(^ft1_grove_west_side);
+    if (%fairy_farmers_quest = ^ft1_defeated & ~obj_gettotal(fairy_queen_secateurs) = 0) {
+        if (inv_freespace(inv) = 0) {
+            mes("Your inventory is too full to take that.");
+            return;
+        }
+        // UNKNOWN functional lost-drop recovery and wording, not a period claim.
+        inv_add(inv, fairy_queen_secateurs, 1);
+        ~mesbox("You find the Fairy Queen's secateurs!");
+    }
+    return;
+}
+~chatnpc_specific("Gate Keeper", fairy_mindslayer_guard, "<p,neutral>I've received orders to let you through if you want. Good luck.");
+p_telejump(^ft1_grove_west_side);
+~ft1_spawn_tanglefoot;
+
+[opnpc1,fairy_mindslayer_guard]
+~chatplayer("<p,quiz>What are you doing all the way over here? Shouldn't you be at the market door?");
+~chatnpc("<p,neutral>Yes, that's my usual spot, but the Godfather said I should be here, so here I am.");
+
+[proc,ft1_spawn_tanglefoot]
+// UNKNOWN engineering spawn/lifetime: one owned encounter per player, on cave floor.
+npc_huntall(coord, ^ft1_owned_search_range, 0);
+while (npc_findnext = true) {
+    if (npc_type = fairy_tanglefoot & %npc_aggressive_player = uid) return;
+}
+npc_add(^ft1_boss_spawn, fairy_tanglefoot, ^ft1_boss_lifetime);
+%npc_aggressive_player = uid;
+
+[opnpc2,fairy_tanglefoot]
+if (%npc_aggressive_player ! uid | %fairy_farmers_quest ! ^ft1_enchanted) return;
+@player_combat_start;
+
+[apnpc2,fairy_tanglefoot]
+if (%npc_aggressive_player ! uid | %fairy_farmers_quest ! ^ft1_enchanted) return;
+@player_combat_start_ap;
+
+[ai_opplayer2,fairy_tanglefoot]
+// CANDIDATE OSRS quest-form max hit; retain shared readiness and melee accuracy.
+~npc_default_attack_outcome(^ft1_tanglefoot_maxhit, 0, false);
+
+[proc,ft1_tanglefoot_max_dealt](int $maxhit, int $spell)(int)
+// VERIFIED period enchanted-secateurs rule; also the object's original examine.
+if (inv_total(worn, fairy_enchanted_secateurs) = 0 | $spell ! 0 | %damagetype >= ^ranged_style | %npc_aggressive_player ! uid | %fairy_farmers_quest ! ^ft1_enchanted) return(0);
+// CANDIDATE OSRS: both Farming and Strength affect damage. UNKNOWN engineering
+// equal blend: no surviving source gives the coefficients; retain gear/style scaling.
+def_int $blend = divide(add(stat(farming), stat(strength)), ^ft1_damage_blend_divisor);
+return(min(scale(add($blend, 8), add(stat(strength), 8), $maxhit), npc_param(max_dealt)));
+
+[ai_timer,fairy_tanglefoot]
+// CANDIDATE OSRS poison immunity: never run the generic poison damage timer.
+~npc_poison_clear;
+
+[ai_queue3,fairy_tanglefoot]
+if (npc_findhero = ^true) {
+    if (%fairy_farmers_quest = ^ft1_enchanted & %npc_aggressive_player = uid) {
+        obj_add(npc_coord, fairy_queen_secateurs, 1, ^lootdrop_duration);
+        queue(ft1_tanglefoot_defeated, 0, 0);
+    }
+}
+gosub(npc_death);
+
+[queue,ft1_tanglefoot_defeated]
+if (%fairy_farmers_quest = ^ft1_enchanted) %fairy_farmers_quest = ^ft1_defeated;

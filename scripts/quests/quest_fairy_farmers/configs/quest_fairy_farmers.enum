@@ -1,0 +1,37 @@
+// VERIFIED pool: Tip.It, captured 2 May 2006. Bunch of Grapes is grapes (1987),
+// explicitly its Cooking Guild respawn, not a second later grape object.
+// UNKNOWN engineering encoding: 1..31 in guide order in the original 5-bit slots.
+[ft1_nature_items]
+inputtype=int
+outputtype=namedobj
+val=1,avantoe
+val=2,babydragon_bones
+val=3,blue_dragon_scale
+val=4,bucket_supercompost
+val=5,grapes
+val=6,cave_eel
+val=7,charcoal
+val=8,crushed_gemstone
+val=9,edible_seaweed
+val=10,snail_corpse3
+val=11,irit_leaf
+val=12,jangerberries
+val=13,tbwt_jogre_bones
+val=14,king_worm
+val=15,lime
+val=16,mortmyremushroom
+val=17,mortmyrepear
+val=18,mortmyrebuddingstem
+val=19,nature_talisman
+val=20,cactus_potato
+val=21,mosquito_proboscis
+val=22,red_spiders_eggs
+val=23,red_vine_worm
+val=24,mort_slimey_eel
+val=25,snapdragon
+val=26,snape_grass
+val=27,uncut_diamond
+val=28,uncut_ruby
+val=29,oystershell
+val=30,volencia_moss
+val=31,white_berries
