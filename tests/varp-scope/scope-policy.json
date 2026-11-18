@@ -287,6 +287,7 @@
     "canoeing_menu": "Current canoe station and hull menu context; deliberately not saved so login cannot resume a stale shaping or travel selection after the stations reset.",
     "canoeing_river_lum": "Current canoe construction and launch states for the four stations; deliberately not saved so every station is a plain tree again at login and cannot leave the player stuck in an unfinished canoe state.",
     "open_book": "Currently open book object.",
+    "makinghistory_key_distance": "Original unused cache slot 136 holds only the previous key Feel distance. No inspected source requires the comparison to survive logout; a new session starts without an earlier reading.",
     "book_page": "Currently open book page.",
     "option_run": "Current run toggle; 289 deliberately keeps it temporary.",
     "smithbars": "Bar selected for the current smithing interface.",

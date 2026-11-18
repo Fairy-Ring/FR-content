@@ -1,4 +1,21 @@
 [opnpc1,wyson] 
+// CANDIDATE Old School exchange branch; remove later noted parts and nest boxes.
+if (inv_total(inv, mole_claw) > 0 | inv_total(inv, mole_skin) > 0) {
+    ~chatnpc("<p,neutral>If I'm not mistaken, you've got some body parts from a big mole there! I'll trade it for bird nests if ye likes. Or was ye wantin' some woad leaves instead?");
+    def_int $trade = ~p_choice3("Okay, I will trade the mole parts.", 1, "Yes please, I need woad leaves.", 2, "Sorry, but I'm not interested.", 3);
+    if ($trade = 1) {
+        ~chatplayer("<p,neutral>Okay, I will trade the mole parts.");
+        while (inv_total(inv, mole_claw) > 0) ~wyson_mole_exchange(mole_claw);
+        while (inv_total(inv, mole_skin) > 0) ~wyson_mole_exchange(mole_skin);
+        return;
+    }
+    if ($trade = 3) {
+        ~chatplayer("<p,neutral>Sorry, but I'm not interested.");
+        ~chatnpc("<p,neutral>Fair enough.");
+        return;
+    }
+    ~chatplayer("<p,neutral>Yes please, I need woad leaves.");
+}
 ~chatnpc("<p,neutral>I'm the gardener around here.|Do you have any gardening that needs doing?");
 def_int $option = ~p_choice2("I'm looking for woad leaves.", 1, "Not right now, thanks.", 2);
 if($option = 1) {
@@ -38,3 +55,24 @@ if($option = 1) {
 } else if($option = 2) {
     ~chatplayer("<p,neutral>Not right now, thanks.");
 }
+
+[opnpcu,wyson]
+if (last_useitem ! mole_claw & last_useitem ! mole_skin) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_getobj(inv, last_useslot) ! last_useitem) return;
+~wyson_mole_exchange(last_useitem);
+
+[proc,wyson_mole_exchange](obj $part)
+if ($part ! mole_claw & $part ! mole_skin) return;
+if (inv_total(inv, $part) = 0) return;
+// VERIFIED one nest per part, 8 March 2006 guide. Nonstackable input frees
+// the output's slot even with a full inventory. Noted acceptance is 2014.
+inv_del(inv, $part, 1);
+// CANDIDATE Old School nest ratio. Period news replaces eggs with vegetables,
+// retaining tree seeds. No egg nests, modern seed nests or nest boxes.
+def_int $roll = random(100);
+if ($roll < 72) inv_add(inv, bird_nest_cheapseeds, 1);
+else if ($roll < 92) inv_add(inv, bird_nest_ring, 1);
+else inv_add(inv, bird_nest_empty, 1);

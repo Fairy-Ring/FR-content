@@ -1,10 +1,6 @@
-// Making History mid — Droalak / Melina / outpost scroll.
-// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Droalak /
-// Melina / Droalak again minus wiki Droklak typo / post-quest fade /
-// Jorral receive. Hunt 289? no. Prerequisite: licensed Jorral
-// %makinghistory_prog >= 1. Cite making-history-droalak-first-slice-377.md.
-// ghost_prog CANDIDATE 0→1 first accept · 1→2 Melina fade · 2→3 scroll.
-// Never write makinghistory_prog / droalak_pres / Erin / Dron / 15.
+// CANDIDATE dialogue: OSRS Making History transcript revision 15263331.
+// VERIFIED progression beat: period Tip.It guide, 2 May 2006.
+// UNKNOWN engineering encoding: ghost 1 asked, 2 reconciled, 3 scroll, 4 reported.
 
 [opnpc1,makinghistory_droalak]
 if (%makinghistory_prog < 1) {
@@ -13,6 +9,14 @@ if (%makinghistory_prog < 1) {
 }
 if (inv_total(worn, amulet_of_ghostspeak) = 0) {
     ~chatnpc("<p,neutral>wooo wooo");
+    return;
+}
+if (%makinghistory_ghost_prog = 4) {
+    ~chatplayer("<p,happy>I have delivered the scroll, you can rest in peace now.");
+    ~chatnpc("<p,happy>Thanks for telling me! I've been waiting for ages!");
+    ~chatplayer("<p,neutral>Good bye.");
+    ~chatnpc("<p,happy>Bye!");
+    %makinghistory_droalak_pres = 1;
     return;
 }
 if (%makinghistory_melina_pres = 1) {
@@ -80,11 +84,7 @@ if (%makinghistory_ghost_prog < 3) {
 @mh_droalak_give_scroll;
 
 [label,mh_droalak_give_scroll]
-if (inv_freespace(inv) < 1) {
-    obj_add(coord, makinghistory_scroll1, 1, 200);
-} else {
-    inv_add(inv, makinghistory_scroll1, 1);
-}
+~mh_give(makinghistory_scroll1, 1);
 ~chatplayer("<p,happy>Thank you.");
 return;
 
@@ -101,7 +101,7 @@ if (%makinghistory_melina_pres = 1) {
     ~displaymessage(^dm_default);
     return;
 }
-if (inv_total(inv, strung_sapphire_amulet) > 0) {
+if (%makinghistory_ghost_prog = 1 & inv_total(inv, strung_sapphire_amulet) > 0) {
     @mh_melina_amulet;
 }
 ~chatplayer("<p,neutral>Hi.");

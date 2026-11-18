@@ -7,6 +7,7 @@ if (%open_book = rd_chem_book) {
     return;
 }
 switch_obj (%open_book) {
+    case makinghistory_journal : @book_flip_page(^book_direction_backward, 0, 5, mh_journal_page);
     case baxtorian_book_waterfall_quest : @book_flip_page(^book_direction_backward, 0, 4, book_on_baxtorian_page);
     case witches_diary : @book_flip_page(^book_direction_backward, 0, 3, witches_diary);
     case ardougne_book : @book_flip_page(^book_direction_backward, 0, 3, guide_ardougne);
@@ -39,6 +40,7 @@ if (%open_book = rd_chem_book) {
     return;
 }
 switch_obj (%open_book) {
+    case makinghistory_journal : @book_flip_page(^book_direction_forward, 0, 5, mh_journal_page);
     case baxtorian_book_waterfall_quest : @book_flip_page(^book_direction_forward, 0, 4, book_on_baxtorian_page);
     case witches_diary : @book_flip_page(^book_direction_forward, 0, 3, witches_diary);
     case ardougne_book : @book_flip_page(^book_direction_forward, 0, 3, guide_ardougne);

@@ -1019,7 +1019,7 @@
           "$type": "IfSetColour",
           "fields": {
             "colour": 31744,
-            "component": 18684
+            "component": 15487
           }
         },
         {

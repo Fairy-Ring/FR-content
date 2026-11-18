@@ -1,0 +1,196 @@
+// N174. Period mechanics: Tip.It forum 34309, 8 March 2006.
+// Later data and cutoff exclusions: research monster-combat-data.
+[oplocu,mole_hill]
+if (last_useitem ! spade) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_getobj(inv, last_useslot) ! spade) return;
+~giant_mole_enter;
+
+[proc,giant_mole_dig]()(boolean)
+if (loc_find(coord, mole_hill) = false) return(false);
+~giant_mole_enter;
+return(true);
+
+[proc,giant_mole_enter]
+if (inv_total(inv, spade) = 0) return;
+if (~swamp_cave_light = 0 | inv_total(inv, tinderbox) = 0) {
+    // UNKNOWN functional wording; the period guide describes this refusal.
+    mes("You need a lit light source and a tinderbox to enter the mole tunnels.");
+    return;
+}
+p_stopaction;
+anim(human_dig, 0);
+p_delay(2);
+p_teleport(^giant_mole_entrance);
+~giant_mole_environment_start;
+
+[oploc1,mole_rope_02]
+p_stopaction;
+~giant_mole_environment_release;
+p_teleport(^giant_mole_exit);
+
+[proc,giant_mole_inside](coord $tile)(boolean)
+return(inzone(0_27_80_0_0, 0_27_81_63_63, $tile));
+
+[proc,giant_mole_environment_start]
+if (~giant_mole_inside(coord) = false) return;
+def_interface $overlay = null;
+softtimer(giant_mole_environment, 1, 0, $overlay);
+
+[proc,giant_mole_environment_release]
+clearsofttimer(giant_mole_environment);
+cleartimer(giant_mole_mud);
+if_openoverlay(null);
+
+[softtimer,giant_mole_environment](int $dark_ticks, interface $overlay)
+if (~giant_mole_inside(coord) = false) {
+    if (p_finduid(uid) = true) ~giant_mole_environment_release;
+    else softtimer(giant_mole_environment, 1, 0, $overlay);
+    return;
+}
+if (busy() = false & p_finduid(uid) = true) {
+    def_int $light = ~swamp_cave_light;
+    if (gettimer(giant_mole_mud) = -1) $overlay = ~swamp_cave_overlay($light, $overlay);
+    if ($light > 0) {
+        $dark_ticks = 0;
+    } else {
+        $dark_ticks = min(add($dark_ticks, 1), ^giant_mole_dark_ticks);
+        if ($dark_ticks >= ^giant_mole_dark_ticks) {
+            damage(uid, 1, 1);
+            if (stat(hitpoints) = 0) {
+                ~giant_mole_environment_release;
+                ~player_die;
+                return;
+            }
+        }
+    }
+}
+softtimer(giant_mole_environment, 1, $dark_ticks, $overlay);
+
+[ai_queue2,mole_giant]
+if (npc_stat(hitpoints) = 0) return;
+def_int $damage = last_int;
+if ($damage = 0) npc_damage(^hitmark_block, 0);
+else npc_damage(^hitmark_damage, $damage);
+if (npc_stat(hitpoints) = 0) {
+    npc_queue(3, 0, 0);
+} else if (npc_stat(hitpoints) <= divide(npc_basestat(hitpoints), 2)) {
+    // CANDIDATE one-in-four roll. No <=10 HP immunity: added in 2016.
+    if (random(^giant_mole_burrow_chance) = 0) npc_queue(5, 0, 0);
+}
+
+[ai_queue5,mole_giant]
+if (npc_stat(hitpoints) = 0) return;
+~giant_mole_burrow;
+
+[proc,giant_mole_burrow]
+npc_setmode(none);
+npc_anim(mole_burrow_down, 0);
+spotanim_map(mole_mud_cloud_spotanim, movecoord(npc_coord, 1, 0, 1), 0, 0);
+// CANDIDATE Old School open/covered rule, reusing the existing light classifier.
+// UNKNOWN engineering dirt chance and one-tile melee perimeter.
+if (random(^giant_mole_dirt_chance) = 0) {
+    def_coord $origin = npc_coord;
+    huntall(movecoord($origin, 1, 0, 1), 3, 1);
+    while (huntnext = true) {
+        if (inzone(movecoord($origin, -1, 0, -1), movecoord($origin, 3, 0, 3), coord) = true) queue*(giant_mole_dirt, 0)($origin);
+    }
+}
+// npc_delay includes the following server tick.
+npc_delay(calc((seqlength(mole_burrow_down) + 29) / 30 - 1));
+spotanim_map(mole_mude_hole_spotanim, movecoord(npc_coord, 1, 0, 1), 0, 0);
+// Never choose the current destination: a burrow always changes area.
+def_int $index = random(enum_getoutputcount(giant_mole_burrow_coords));
+def_coord $destination = enum(int, coord, giant_mole_burrow_coords, $index);
+if (distance(npc_coord, $destination) < 4) {
+    $index = modulo(add($index, 1), enum_getoutputcount(giant_mole_burrow_coords));
+    $destination = enum(int, coord, giant_mole_burrow_coords, $index);
+}
+npc_telejump($destination);
+%npc_aggressive_player = null;
+%npc_attacking_uid = null;
+npc_setmode(null);
+npc_anim(mole_burrow_up, 0);
+spotanim_map(mole_mud_hole_up_spotanim, movecoord(npc_coord, 1, 0, 1), 0, 0);
+npc_delay(calc((seqlength(mole_burrow_up) + 29) / 30 - 1));
+
+[queue,giant_mole_dirt](coord $origin)
+if (inzone(movecoord($origin, -1, 0, -1), movecoord($origin, 3, 0, 3), coord) = false) return;
+// VERIFIED cache presentation; UNKNOWN audience shared with the dirt event.
+spotanim_pl(mole_mud_splat_spotanim, 0, 0);
+if_openoverlay(inter_365);
+settimer(giant_mole_mud, calc((seqlength(mole_mud_splat_interface) + 29) / 30));
+def_int $slot = 0;
+while ($slot < inv_size(inv)) {
+    def_obj $light = inv_getobj(inv, $slot);
+    if (~swamp_cave_open_light($light) = true) ~extinguish_light_source_slot($slot, $light);
+    $slot = add($slot, 1);
+}
+
+[timer,giant_mole_mud]
+cleartimer(giant_mole_mud);
+if (~giant_mole_inside(coord) = true) {
+    def_interface $overlay = ~swamp_cave_overlay(~swamp_cave_light, inter_365);
+} else if_openoverlay(null);
+
+[ai_queue3,mole_giant]
+~npc_death;
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, big_bones, 1, ^lootdrop_duration);
+obj_add(npc_coord, mole_claw, 1, ^lootdrop_duration);
+obj_add(npc_coord, mole_skin, add(random(3), 1), ^lootdrop_duration);
+~giant_mole_drop;
+
+// CANDIDATE Old School table. Every item exists before 2 May 2006.
+// Remove 2025 ranarr-seed weight3, restoring denominator128. No later tertiary
+// bones, clues, keys, pets or immaculate skin. Reuse period shared rare tables.
+[proc,giant_mole_drop]
+def_int $roll = random(128);
+if ($roll < 10) obj_add(npc_coord, adamant_longsword, 1, ^lootdrop_duration);
+else if ($roll < 19) obj_add(npc_coord, mithril_platebody, 1, ^lootdrop_duration);
+else if ($roll < 26) obj_add(npc_coord, amulet_of_strength, 1, ^lootdrop_duration);
+else if ($roll < 28) obj_add(npc_coord, mithril_axe, 1, ^lootdrop_duration);
+else if ($roll < 29) obj_add(npc_coord, mithril_battleaxe, 1, ^lootdrop_duration);
+else if ($roll < 30) obj_add(npc_coord, rune_med_helm, 1, ^lootdrop_duration);
+else if ($roll < 50) obj_add(npc_coord, airrune, 105, ^lootdrop_duration);
+else if ($roll < 69) obj_add(npc_coord, bloodrune, 15, ^lootdrop_duration);
+else if ($roll < 80) obj_add(npc_coord, firerune, 105, ^lootdrop_duration);
+else if ($roll < 90) obj_add(npc_coord, iron_arrow, 690, ^lootdrop_duration);
+else if ($roll < 95) obj_add(npc_coord, lawrune, 15, ^lootdrop_duration);
+else if ($roll < 98) obj_add(npc_coord, deathrune, 50, ^lootdrop_duration);
+else if ($roll < 108) obj_add(npc_coord, cert_yew_logs, 100, ^lootdrop_duration);
+else if ($roll < 112) obj_add(npc_coord, shark, 4, ^lootdrop_duration);
+else if ($roll < 115) obj_add(npc_coord, mithril_bar, 1, ^lootdrop_duration);
+else if ($roll < 117) obj_add(npc_coord, cert_iron_ore, 100, ^lootdrop_duration);
+else if ($roll < 118) obj_add(npc_coord, bigoysterpearls, 1, ^lootdrop_duration);
+else if ($roll < 122) obj_add(npc_coord, ~ultrarare_getitem, ^lootdrop_duration);
+else obj_add(npc_coord, ~randomjewel, ^lootdrop_duration);
+
+// CANDIDATE original Wyson nest table, explicitly discontinued in 2016.
+[opheld1,bird_nest_cheapseeds]
+if (inv_freespace(inv) = 0) {
+    ~mesbox("Your inventory is too full to take anything out of the bird's nest.");
+    return;
+}
+def_namedobj $seed = potato_seed;
+def_int $count = 14;
+def_int $roll = random(1000);
+if ($roll < 100) { $seed = cabbage_seed; $count = 9; }
+else if ($roll < 200) { $seed = limpwurt_seed; $count = 2; }
+else if ($roll < 300) { $seed = onion_seed; $count = 11; }
+else if ($roll < 500) { $seed = potato_seed; $count = 14; }
+else if ($roll < 590) { $seed = strawberry_seed; $count = 3; }
+else if ($roll < 710) { $seed = sweetcorn_seed; $count = 3; }
+else if ($roll < 820) { $seed = tomato_seed; $count = 6; }
+else if ($roll < 910) { $seed = watermelon_seed; $count = 2; }
+else if ($roll < 940) { $seed = acorn; $count = 1; }
+else if ($roll < 960) { $seed = ranarr_seed; $count = 1; }
+else if ($roll < 980) { $seed = willow_seed; $count = 1; }
+else if ($roll < 990) { $seed = maple_seed; $count = 1; }
+else if ($roll < 998) { $seed = yew_seed; $count = 1; }
+else if ($roll < 999) { $seed = magic_tree_seed; $count = 1; }
+else { $seed = spirit_tree_seed; $count = 1; }
+inv_setslot(inv, last_slot, bird_nest_empty, 1);
+inv_add(inv, $seed, $count);

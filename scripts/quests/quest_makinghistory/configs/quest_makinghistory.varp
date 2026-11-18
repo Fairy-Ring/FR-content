@@ -1,3 +1,9 @@
 [makinghistory]
 scope=perm
 transmit=yes
+
+// UNKNOWN engineering state: last Feel distance plus one, zero means no reading.
+// Original unused slot 136; temporary because no source requires a saved reading.
+[makinghistory_key_distance]
+type=int
+scope=temp
