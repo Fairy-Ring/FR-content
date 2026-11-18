@@ -62,6 +62,7 @@ const additions = [
 
 function prepare(spec, entry, level) {
   const p = prepared(entry, level);
+  assert.equal(p.levels[PlayerStat.THIEVING], level, 'native fixture retains the requested legal level');
   if (spec.quest) p.setVar(id('VarPlayerType', spec.quest.name), spec.quest.complete);
   return p;
 }
@@ -142,7 +143,8 @@ function exercise(spec) {
         assert(p.messages.some(text => text.includes('Fremennik Trials')));
       } finally { dispose(p); }
     });
-    test(`${form}: native level refusal`, () => {
+    // Native setLevel clamps at one; a normal account cannot be below level one.
+    if (spec.level > 1) test(`${form}: native level refusal`, () => {
       const p = prepare(spec, entry, spec.level - 1);
       const xp = p.stats[PlayerStat.THIEVING];
       try {
