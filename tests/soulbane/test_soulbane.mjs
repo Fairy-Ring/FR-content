@@ -12,6 +12,9 @@ import {
 } from '../swamp-caves/runtime.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const InstanceZone = (await engineModule('engine/zone/InstanceZone.ts')).default;
+const { CollisionType } = await engineModule('engine/routefinder/flags.ts');
+const RebuildRegion = (await engineModule('network/game/server/model/RebuildRegion.ts')).default;
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const MoveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
@@ -263,20 +266,63 @@ function unpackWorld(packed) {
   const { level, x, z } = CoordGrid.unpackCoord(packed);
   return { level, x, z };
 }
-// Derive the expected two-page layout independently of the compiled helper's
-// caller-owned region pointer; real entry/spawn/scene positions are checked below.
+function sourceCoordForName(name) {
+  const declaration = questCoordinateDeclarations().get(name);
+  assert(declaration, `source declares ^${name}`);
+  return unpackWorld(packedTemplate(declaration));
+}
+function sourceSquareKey(coord) {
+  return `${coord.level}_${coord.x >> 6}_${coord.z >> 6}`;
+}
+function sourceSquareKeyForZone(zone) {
+  return `${zone.source.level}_${zone.source.x >> 3}_${zone.source.z >> 3}`;
+}
+function sourceZoneKey(coord) {
+  return `${coord.level}:${coord.x >> 3}:${coord.z >> 3}`;
+}
+function destinationZoneKey(zone) {
+  return `${zone.level}:${zone.x}:${zone.z}`;
+}
+function instanceForOwner(p, label) {
+  const uid = instanceUid(p);
+  assert(uid > 0, `${label}: owner has a live instance handle`);
+  const instance = World.instances.findInstanceByUid(uid - 1);
+  assert(instance, `${label}: owner handle resolves to a live instance`);
+  assert.equal(World.instances.findInstanceByCoord(p)?.uid, instance.uid,
+    `${label}: player stands in the resolved owner instance`);
+  return instance;
+}
+function assignedInstanceZones(instance) {
+  const zones = [];
+  for (let floor = 0; floor < instance.floors; floor++) {
+    for (let east = 0; east < instance.zonesEast; east++) {
+      for (let north = 0; north < instance.zonesNorth; north++) {
+        const zone = World.gameMap.getZoneIfExists(
+          instance.sw.x + (east << 3), instance.sw.z + (north << 3), instance.sw.level + floor);
+        if (zone instanceof InstanceZone && zone.hasAssignedTemplate) zones.push(zone);
+      }
+    }
+  }
+  return zones;
+}
+function instanceZoneForSource(instance, source, label) {
+  const key = sourceZoneKey(source);
+  const matches = assignedInstanceZones(instance).filter(zone =>
+    `${zone.source.level}:${zone.source.x}:${zone.source.z}` === key);
+  assert.equal(matches.length, 1, `${label}: source zone ${key} has one actual owner mapping`);
+  return matches[0];
+}
+// Resolve packed source coordinates through this owner's actual native
+// InstanceZone metadata. The allocation slot and destination offset are never
+// inferred from a generated handle or assumed source-square adjacency.
 function templateCoord(p, packed) {
-  const instance = World.instances.findInstanceByCoord(p);
-  assert(instance && instance.uid + 1 === instanceUid(p), 'coordinate query uses the player-owned region');
-  const template = unpackWorld(packed);
-  const squareX = template.x >> 6;
-  const squareZ = template.z >> 6;
-  assert((squareX === 47 && squareZ === 81) || (squareX === 51 && squareZ === 53),
-    'room template belongs to one of the two copied cache squares');
+  const instance = instanceForOwner(p, 'template coordinate');
+  const source = unpackWorld(packed);
+  const zone = instanceZoneForSource(instance, source, 'template coordinate');
   return {
-    level: instance.sw.level + template.level,
-    x: instance.sw.x + (squareX === 51 ? 64 : 0) + (template.x & 63),
-    z: instance.sw.z + (template.z & 63)
+    level: zone.level,
+    x: (zone.x << 3) + (source.x & 7),
+    z: (zone.z << 3) + (source.z & 7)
   };
 }
 function roomCoord(p, name) {
@@ -672,10 +718,16 @@ function observeRageScene(p) {
 function finishRageScene(p) {
   let sawFamilyStaging = false;
   const pages = [];
+  const recordFamilyStaging = () => {
+    if (sawFamilyStaging || stage(p) !== 2 || readVar(p, 'soulbane_anger_donespecial') !== 1 ||
+      !observeRageScene(p)) return;
+    const instance = instanceForOwner(p, 'Rage memory scene');
+    const { rageZones } = assertInstanceTemplateInventory(instance, 'Rage memory scene');
+    assertMemorySceneVisibility(p, rageZones, 'Rage memory scene', true);
+    sawFamilyStaging = true;
+  };
   for (let tick = 0; tick < 1200; tick++) {
-    if (stage(p) === 2 && readVar(p, 'soulbane_anger_donespecial') === 1 && observeRageScene(p)) {
-      sawFamilyStaging = true;
-    }
+    recordFamilyStaging();
     const state = p.activeScript;
     if (state?.execution === ScriptState.PAUSEBUTTON) {
       const root = types.Component.get(p.modalChat)?.comName ?? '';
@@ -697,15 +749,11 @@ function finishRageScene(p) {
           'the first post-animation Continue shows the authored reaction');
         console.log(`PASS Rage burst timing: ${cycleCount} client cycles -> ${expectedDelay} server ticks; first Continue ready`);
       }
-      if (stage(p) === 2 && readVar(p, 'soulbane_anger_donespecial') === 1 && observeRageScene(p)) {
-        sawFamilyStaging = true;
-      }
+      recordFamilyStaging();
       continue;
     }
     worldTick();
-    if (stage(p) === 2 && readVar(p, 'soulbane_anger_donespecial') === 1 && observeRageScene(p)) {
-      sawFamilyStaging = true;
-    }
+    recordFamilyStaging();
     if (stage(p) === 3 && p.queue.head() === null &&
       (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
   }
@@ -1363,21 +1411,386 @@ function testDeath(mainOwner) {
 
 
 function privateInstanceZones(p, label) {
-  const uid = instanceUid(p);
-  assert(uid > 0, `${label}: owner has an instance handle`);
-  const instance = World.instances.findInstanceByUid(uid - 1);
-  assert(instance, `${label}: instance handle resolves to a live private copy`);
-  assert.equal(World.instances.findInstanceByCoord(p)?.uid, uid - 1, `${label}: player stands inside the resolved copy`);
+  const instance = instanceForOwner(p, label);
   const zones = [];
   for (let floor = 0; floor < instance.floors; floor++) {
     for (let east = 0; east < instance.zonesEast; east++) {
       for (let north = 0; north < instance.zonesNorth; north++) {
-        zones.push(World.gameMap.getZone(
-          instance.sw.x + (east << 3), instance.sw.z + (north << 3), instance.sw.level + floor));
+        const zone = World.gameMap.getZoneIfExists(
+          instance.sw.x + (east << 3), instance.sw.z + (north << 3), instance.sw.level + floor);
+        if (zone) zones.push(zone);
       }
     }
   }
   return { instance, zones };
+}
+function instanceDestinationOffset(instance, zone) {
+  return { east: zone.x - (instance.sw.x >> 3), north: zone.z - (instance.sw.z >> 3) };
+}
+function roomSourceSquares() {
+  const roomSource = sourceCoordForName('soulbane_rage_entry');
+  const x = roomSource.x >> 6;
+  const z = roomSource.z >> 6;
+  return new Set([`${roomSource.level}_${x}_${z}`, `${roomSource.level}_${x + 1}_${z}`]);
+}
+function roomSourceZones(instance, label) {
+  const roomSource = sourceCoordForName('soulbane_rage_entry');
+  const roomSquares = roomSourceSquares();
+  const zones = assignedInstanceZones(instance)
+    .filter(zone => roomSquares.has(sourceSquareKeyForZone(zone)));
+  assert.equal(zones.length, 128, `${label}: full 47+48 room footprint maps 128 zones`);
+  for (const zone of zones) {
+    const { east, north } = instanceDestinationOffset(instance, zone);
+    assert(east >= 0 && east < 16 && north >= 0 && north < 8,
+      `${label}: room source zone maps into the contiguous local 16×8 room rectangle`);
+    assert.equal(zone.source.level, roomSource.level, `${label}: room source floor is unchanged`);
+    assert.equal(zone.source.x, (roomSource.x >> 6) * 8 + east,
+      `${label}: full room x-zones map east without rotation or translation`);
+    assert.equal(zone.source.z, (roomSource.z >> 6) * 8 + north,
+      `${label}: room source z-zone maps without rotation or translation`);
+    assert.equal(zone.rotation, 0, `${label}: room source zone keeps its original orientation`);
+  }
+  return zones;
+}
+function connectedZoneComponents(zones) {
+  const remaining = new Map(zones.map(zone => [destinationZoneKey(zone), zone]));
+  const components = [];
+  while (remaining.size > 0) {
+    const first = remaining.values().next().value;
+    const pending = [first];
+    const component = [];
+    remaining.delete(destinationZoneKey(first));
+    while (pending.length > 0) {
+      const zone = pending.pop();
+      component.push(zone);
+      for (const [dx, dz] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+        const key = `${zone.level}:${zone.x + dx}:${zone.z + dz}`;
+        const adjacent = remaining.get(key);
+        if (!adjacent) continue;
+        remaining.delete(key);
+        pending.push(adjacent);
+      }
+    }
+    components.push(component);
+  }
+  return components;
+}
+function memoryPatchComponents(instance, roomZones, label) {
+  const rageSource = sourceCoordForName('soulbane_scene_player');
+  const fearSource = sourceCoordForName('soulbane_fear_scene_player');
+  const memorySquare = sourceSquareKey(rageSource);
+  assert.equal(sourceSquareKey(fearSource), memorySquare, `${label}: both scene memories use their packed source square`);
+  assert.notEqual(memorySquare, sourceSquareKey(sourceCoordForName('soulbane_rage_entry')),
+    `${label}: scene memory source is distinct from the room source square`);
+  const memoryZones = assignedInstanceZones(instance)
+    .filter(zone => sourceSquareKeyForZone(zone) === memorySquare);
+  assert(memoryZones.length > 0, `${label}: actual memory-source InstanceZones are present`);
+  const components = connectedZoneComponents(memoryZones);
+  assert.equal(components.length, 2, `${label}: Rage and Fear form separate copied memory patches`);
+  const rageAnchor = instanceZoneForSource(instance, rageSource, `${label}: Rage scene anchor`);
+  const fearAnchor = instanceZoneForSource(instance, fearSource, `${label}: Fear scene anchor`);
+  const rageZones = components.find(component => component.includes(rageAnchor));
+  const fearZones = components.find(component => component.includes(fearAnchor));
+  assert(rageZones && fearZones && rageZones !== fearZones,
+    `${label}: the two actual scene anchors identify distinct memory patches`);
+  for (const [kind, component] of [['Rage', rageZones], ['Fear', fearZones]]) {
+    for (const zone of component) {
+      const { north } = instanceDestinationOffset(instance, zone);
+      assert(north >= 14,
+        `${label}: ${kind} memory remains at least seven zones north of both source squares`);
+      for (const roomZone of roomZones) {
+        assert(Math.max(Math.abs(zone.x - roomZone.x), Math.abs(zone.z - roomZone.z)) >= 7,
+          `${label}: ${kind} memory stays at least seven zones from every room zone`);
+      }
+    }
+  }
+  assert(Math.abs(rageAnchor.x - fearAnchor.x) >= 13,
+    `${label}: the scene-memory standing zones remain at least thirteen zones apart horizontally`);
+  for (const rageZone of rageZones) {
+    for (const fearZone of fearZones) {
+      assert(Math.max(Math.abs(rageZone.x - fearZone.x), Math.abs(rageZone.z - fearZone.z)) >= 7,
+        `${label}: Rage and Fear patches stay seven zones apart in both directions`);
+    }
+  }
+  for (const name of ['soulbane_scene_launa', 'soulbane_scene_tolna']) {
+    const zone = instanceZoneForSource(instance, sourceCoordForName(name), `${label}: ${name}`);
+    assert(rageZones.includes(zone), `${label}: ${name} maps into the Rage memory patch`);
+  }
+  const fearTolna = instanceZoneForSource(
+    instance, sourceCoordForName('soulbane_fear_scene_tolna'), `${label}: Fear scene Tolna`);
+  assert(fearZones.includes(fearTolna), `${label}: Fear scene Tolna maps into the Fear memory patch`);
+  return { rageZones, fearZones };
+}
+function assertInstanceTemplateInventory(instance, label) {
+  const roomZones = roomSourceZones(instance, label);
+  const { rageZones, fearZones } = memoryPatchComponents(instance, roomZones, label);
+  const allowed = new Set([...roomZones, ...rageZones, ...fearZones].map(destinationZoneKey));
+  const assigned = assignedInstanceZones(instance);
+  assert.equal(assigned.length, allowed.size, `${label}: all assigned zones belong to the room or one memory patch`);
+  for (const zone of assigned) {
+    assert(allowed.has(destinationZoneKey(zone)),
+      `${label}: no unassigned source template enters the owner's copy`);
+  }
+  return { roomZones, rageZones, fearZones };
+}
+function instanceNativeFloodfill(p, instance, label) {
+  const minX = instance.sw.x;
+  const maxX = minX + (instance.zonesEast << 3);
+  const minZ = instance.sw.z;
+  const maxZ = minZ + (instance.zonesNorth << 3);
+  const start = { level: p.level, x: p.x, z: p.z };
+  assert(start.level >= instance.sw.level && start.level < instance.sw.level + instance.floors,
+    `${label}: floodfill starts on an owner instance floor`);
+  assert(start.x >= minX && start.x < maxX && start.z >= minZ && start.z < maxZ,
+    `${label}: floodfill starts inside the private instance bounds`);
+  const key = (x, z) => `${start.level}:${x}:${z}`;
+  const seen = new Set([key(start.x, start.z)]);
+  const tiles = [start];
+  const steps = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+  // Explore every native-traversable coordinate in the instance bounds; do not seed/filter by map floors.
+  for (let index = 0; index < tiles.length; index++) {
+    const current = tiles[index];
+    for (const [dx, dz] of steps) {
+      const x = current.x + dx;
+      const z = current.z + dz;
+      if (x < minX || x >= maxX || z < minZ || z >= maxZ) continue;
+      const nextKey = key(x, z);
+      if (seen.has(nextKey)) continue;
+      if (!map.canTravel(start.level, current.x, current.z, dx, dz, p.width, 0, CollisionType.NORMAL)) continue;
+      seen.add(nextKey);
+      tiles.push({ level: start.level, x, z });
+    }
+  }
+  return { start, tiles };
+}
+function effectiveLocType(p, loc) {
+  const base = types.LocType.get(loc.type);
+  if (!base.multiloc || base.multiloc.length === 0) return base;
+  let state = -1;
+  if (base.multivarp !== -1) state = p.getVar(base.multivarp);
+  else if (base.multivarbit !== -1) state = p.getVarBit(base.multivarbit);
+  if (state >= 0 && state < base.multiloc.length && base.multiloc[state] !== -1) {
+    return types.LocType.get(base.multiloc[state]);
+  }
+  return base;
+}
+function assertPrivateInstanceIsolation(p, label, requireRoomPacket = false) {
+  assert([2, 3, 4, 5].includes(stage(p)),
+    `${label}: native isolation is measured in quest stages 2–5`);
+  const instance = instanceForOwner(p, label);
+  const roomScene = assertRoomSceneVisibility(p, label, requireRoomPacket);
+  const { roomZones, rageZones, fearZones } = assertInstanceTemplateInventory(instance, label);
+  assertMemorySceneVisibility(null, rageZones, `${label}: Rage scene`, false);
+  assertMemorySceneVisibility(null, fearZones, `${label}: Fear scene`, false);
+  assertNoBlankPaddingShortcut(p, instance, assignedInstanceZones(instance), label);
+
+  const roomSource = sourceCoordForName('soulbane_rage_entry');
+  const neighborSquare = `${roomSource.level}_${(roomSource.x >> 6) + 1}_${roomSource.z >> 6}`;
+  const neighborZones = assignedInstanceZones(instance)
+    .filter(zone => sourceSquareKeyForZone(zone) === neighborSquare);
+  assert.equal(neighborZones.length, 64, `${label}: the full east neighbor source square is copied`);
+  const neighborTiles = mappedWalkableTiles(neighborZones, `${label}: east neighbor collision`);
+  const neighborZoneKeys = new Set(neighborZones.map(destinationZoneKey));
+  const flood = instanceNativeFloodfill(p, instance, label);
+  const reachableNeighborTiles = flood.tiles.filter(tile =>
+    neighborZoneKeys.has(`${tile.level}:${tile.x >> 3}:${tile.z >> 3}`)).length;
+
+  const neighborLocs = neighborZones.flatMap(zone => [...zone.getAllLocsSafe()])
+    .filter(loc => loc.isActive);
+  assert.equal(neighborLocs.length, 719,
+    `${label}: all 719 active locs in the copied east neighbor are inspected`);
+  const operableForms = new Set();
+  let reachedLocForms = 0;
+  let reachedOperationForms = 0;
+  for (const loc of neighborLocs) {
+    const form = effectiveLocType(p, loc);
+    const operations = (form.op ?? []).filter(option => option !== null && option !== 'hidden');
+    if (operations.length > 0) operableForms.add(form.id);
+    assert.equal(loc.level, flood.start.level, `${label}: neighbor loc ${loc.baseType} shares the room plane`);
+    const base = types.LocType.get(loc.type);
+    const reached = flood.tiles.some(tile => map.reachedLoc(
+      tile.level, tile.x, tile.z, loc.x, loc.z,
+      loc.width, loc.length, p.width, loc.angle, loc.shape, base.forceapproach));
+    if (reached) {
+      reachedLocForms++;
+      if (operations.length > 0) reachedOperationForms++;
+    }
+  }
+  assert.equal(operableForms.size, 2,
+    `${label}: both non-vacuous effective neighbor operation forms are inspected`);
+  assert.equal(reachableNeighborTiles, 0,
+    `${label}: native floodfill reaches no collision-open tile in the east neighbor (${neighborTiles.length} native tiles checked)`);
+  assert.equal(reachedLocForms, 0, `${label}: no active neighbor loc is in native operation reach`);
+  assert.equal(reachedOperationForms, 0, `${label}: no effective neighbor operation is in native operation reach`);
+  console.log(`PASS private-instance scene isolation ${JSON.stringify({
+    stage: stage(p),
+    label,
+    standableSceneTiles: roomScene.standableTiles,
+    reachableTiles: flood.tiles.length,
+    neighborTiles: neighborTiles.length,
+    neighborLocs: neighborLocs.length,
+    operableForms: operableForms.size,
+    reachableNeighborTiles,
+    reachedLocForms,
+    reachedOperationForms
+  })}`);
+  return { instance, roomZones, rageZones, fearZones, flood, neighborTiles, neighborLocs };
+}
+function collisionOpenTiles(zones) {
+  const tiles = [];
+  for (const zone of zones) {
+    const baseX = zone.x << 3;
+    const baseZ = zone.z << 3;
+    for (let dx = 0; dx < 8; dx++) {
+      for (let dz = 0; dz < 8; dz++) {
+        const x = baseX + dx;
+        const z = baseZ + dz;
+        if (map.isZoneAllocated(zone.level, x, z) && !map.isMapBlocked(x, z, zone.level)) {
+          tiles.push({ level: zone.level, x, z });
+        }
+      }
+    }
+  }
+  return tiles;
+}
+function mappedWalkableTiles(zones, label) {
+  const tiles = collisionOpenTiles(zones);
+  assert(tiles.length > 0,
+    `${label}: packed collision contains non-vacuous collision-open tiles, including blank tiles`);
+  return tiles;
+}
+function mappedZonesInSceneWindow(tile) {
+  const centerX = tile.x >> 3;
+  const centerZ = tile.z >> 3;
+  const zones = [];
+  for (let level = 0; level < 4; level++) {
+    for (let zoneX = centerX - 6; zoneX <= centerX + 6; zoneX++) {
+      for (let zoneZ = centerZ - 6; zoneZ <= centerZ + 6; zoneZ++) {
+        const zone = World.gameMap.getZoneIfExists(zoneX << 3, zoneZ << 3, level);
+        if (zone instanceof InstanceZone && zone.hasAssignedTemplate) zones.push(zone);
+      }
+    }
+  }
+  return zones;
+}
+function instanceTemplateTuple(zone) {
+  return [zone.level, zone.x, zone.z, zone.source.level, zone.source.x, zone.source.z, zone.rotation].join(':');
+}
+function packetTemplateTuple(template) {
+  return [template.level, template.zoneX, template.zoneZ,
+    template.sourceLevel, template.sourceZoneX, template.sourceZoneZ, template.rotation].join(':');
+}
+function assertSceneMappingWindow(p, tileAt, allowedSourceSquares, label, requirePacket = false, allowedZoneKeys = null) {
+  const visible = mappedZonesInSceneWindow(tileAt);
+  const centerKey = `${tileAt.level}:${tileAt.x >> 3}:${tileAt.z >> 3}`;
+  assert(visible.some(zone => destinationZoneKey(zone) === centerKey),
+    `${label}: current mapped tile is present in its 13×13 scene window`);
+  for (const zone of visible) {
+    assert(allowedSourceSquares.has(sourceSquareKeyForZone(zone)),
+      `${label}: scene uses only its allowlisted source squares; found ${instanceTemplateTuple(zone)}`);
+    if (allowedZoneKeys) {
+      assert(allowedZoneKeys.has(destinationZoneKey(zone)),
+        `${label}: memory scene uses only its own patch; found ${instanceTemplateTuple(zone)}`);
+    }
+  }
+  if (requirePacket) {
+    const centerX = tileAt.x >> 3;
+    const centerZ = tileAt.z >> 3;
+    const packet = [...p.packets].reverse().find(value => value instanceof RebuildRegion
+      && value.zoneX === centerX && value.zoneZ === centerZ);
+    assert(packet, `${label}: the real scene emitted a centered RebuildRegion packet`);
+    const actual = packet.templates.map(packetTemplateTuple).sort();
+    const expected = visible.map(instanceTemplateTuple).sort();
+    assert.deepEqual(actual, expected,
+      `${label}: emitted RebuildRegion templates match the actual native four-level scene mapping`);
+  }
+  return visible.length;
+}
+function assertRoomSceneVisibility(p, label, requirePacket = false) {
+  const instance = instanceForOwner(p, label);
+  const assigned = assignedInstanceZones(instance);
+  const memorySquare = sourceSquareKey(sourceCoordForName('soulbane_scene_player'));
+  const memoryZones = assigned.filter(zone => sourceSquareKeyForZone(zone) === memorySquare);
+  const memoryComponents = connectedZoneComponents(memoryZones);
+  const anchorZone = name => {
+    const source = sourceCoordForName(name);
+    const sourceKey = `${source.level}:${source.x >> 3}:${source.z >> 3}`;
+    return memoryZones.find(zone =>
+      `${zone.source.level}:${zone.source.x}:${zone.source.z}` === sourceKey);
+  };
+  const rageAnchor = anchorZone('soulbane_scene_player');
+  const fearAnchor = anchorZone('soulbane_fear_scene_player');
+  const knownMemoryZones = new Set([
+    ...(memoryComponents.find(component => component.includes(rageAnchor)) ?? []),
+    ...(memoryComponents.find(component => component.includes(fearAnchor)) ?? [])
+  ].map(destinationZoneKey));
+  const roomCandidateZones = assigned.filter(zone => !knownMemoryZones.has(destinationZoneKey(zone)));
+  const roomTiles = collisionOpenTiles(roomCandidateZones);
+  const allowedSourceSquares = roomSourceSquares();
+  for (const tileAt of roomTiles) {
+    assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: all room standable tiles`);
+  }
+  assert(roomTiles.length > 0,
+    `${label}: scene isolation checks all non-memory collision-open tiles, including blank tiles`);
+  const currentTile = { level: p.level, x: p.x, z: p.z };
+  assertSceneMappingWindow(p, currentTile, allowedSourceSquares, `${label}: real room scene`,
+    requirePacket);
+  return { standableTiles: roomTiles.length, memorySquare, memoryComponents };
+}
+function assertMemorySceneVisibility(p, zones, label, requirePacket = false) {
+  const tiles = collisionOpenTiles(zones);
+  const allowedSourceSquares = new Set(zones.length > 0
+    ? [sourceSquareKeyForZone(zones[0])]
+    : [sourceSquareKey(sourceCoordForName('soulbane_scene_player'))]);
+  const allowedZoneKeys = new Set(zones.map(destinationZoneKey));
+  for (const tileAt of tiles) {
+    assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: all memory standable tiles`,
+      false, allowedZoneKeys);
+  }
+  assert(tiles.length > 0, `${label}: all-standable memory scene predicate is non-vacuous`);
+  if (p) {
+    assertSceneMappingWindow(p, { level: p.level, x: p.x, z: p.z }, allowedSourceSquares,
+      `${label}: real memory scene`, requirePacket, allowedZoneKeys);
+  }
+  return tiles.length;
+}
+function hasExactNativeRoute(start, destination) {
+  if (start.level !== destination.level) return false;
+  const route = [...map.findPath(start.level, start.x, start.z, destination.x, destination.z)];
+  if (route.length === 0) return false;
+  const end = unpackWorld(route.at(-1));
+  return end.level === destination.level && end.x === destination.x && end.z === destination.z;
+}
+function assertNoBlankPaddingShortcut(p, instance, assignedZones, label) {
+  const assigned = new Set(assignedZones.map(destinationZoneKey));
+  const baseZoneX = instance.sw.x >> 3;
+  const baseZoneZ = instance.sw.z >> 3;
+  let interiorBlankZones = 0;
+  for (let floor = 0; floor < instance.floors; floor++) {
+    const level = instance.sw.level + floor;
+    for (let east = 0; east < instance.zonesEast; east++) {
+      for (let north = 0; north < instance.zonesNorth; north++) {
+        const zoneX = baseZoneX + east;
+        const zoneZ = baseZoneZ + north;
+        if (assigned.has(`${level}:${zoneX}:${zoneZ}`)) continue;
+        const distance = Math.min(...assignedZones.map(zone =>
+          Math.max(Math.abs(zone.x - zoneX), Math.abs(zone.z - zoneZ))));
+        if (distance <= 1) continue;
+        interiorBlankZones++;
+        assert.equal(map.isZoneAllocated(level, zoneX << 3, zoneZ << 3), false,
+          `${label}: unassigned blank padding has no native collision allocation`);
+      }
+    }
+  }
+  assert(interiorBlankZones > 0, `${label}: mapped islands leave non-vacuous blank padding`);
+  for (const entryName of ['soulbane_rage_entry', 'soulbane_fear_entry']) {
+    const start = roomCoord(p, entryName);
+    for (const sceneName of ['soulbane_scene_player', 'soulbane_fear_scene_player']) {
+      const destination = roomCoord(p, sceneName);
+      assert(!hasExactNativeRoute(start, destination),
+        `${label}: ${entryName} cannot walk through blank padding into ${sceneName}`);
+    }
+  }
 }
 
 function assertPrivateCopyHasNoEscapeAccess(p, label) {
@@ -1523,8 +1936,15 @@ function finishFearScene(p) {
   let sawFearStaging = false;
   const pages = [];
   const messageStart = p.messages.length;
+  const recordFearStaging = () => {
+    if (sawFearStaging || !observeFearScene(p)) return;
+    const instance = instanceForOwner(p, 'Fear memory scene');
+    const { fearZones } = assertInstanceTemplateInventory(instance, 'Fear memory scene');
+    assertMemorySceneVisibility(p, fearZones, 'Fear memory scene', true);
+    sawFearStaging = true;
+  };
   for (let tick = 0; tick < 1200; tick++) {
-    if (observeFearScene(p)) sawFearStaging = true;
+    recordFearStaging();
     const state = p.activeScript;
     if (state?.execution === ScriptState.PAUSEBUTTON) {
       const root = types.Component.get(p.modalChat)?.comName ?? '';
@@ -1534,7 +1954,7 @@ function finishFearScene(p) {
       continue;
     }
     worldTick();
-    if (observeFearScene(p)) sawFearStaging = true;
+    recordFearStaging();
     if (stage(p) === FEAR_COMPLETE_STAGE && p.queue.head() === null &&
       (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
   }
@@ -1572,6 +1992,7 @@ function assertFearExitCleanup(p, oldUid, expectedTile, ordinaryBefore, label) {
 function assertFearCompleteEntry(p, label) {
   assert.equal(stage(p), FEAR_COMPLETE_STAGE, `${label}: completed Fear progress persists`);
   assert(instanceUid(p) > 0, `${label}: completed progress owns a fresh private region`);
+  assertPrivateInstanceIsolation(p, label);
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), `${label}: completed re-entry lands in Fear`);
   assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, `${label}: all five kills survive re-entry`);
   assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, `${label}: the illuminated exit survives re-entry`);
@@ -1606,6 +2027,7 @@ function testFearProgression(p, stageThreeColor) {
   const xpBeforeFear = xpSnapshot(p);
   chooseRiftWithRope(p, 'completed Rage re-entry before Fear', { requireUnlocked: true });
   assert.equal(stage(p), 3, 'Rage completion survives the real rift re-entry before the next room');
+  assertPrivateInstanceIsolation(p, 'stage-3 completed Rage re-entry');
   assert.equal(rageNpcsFor(p).length, 0, 'completed Rage re-entry does not respawn its monsters');
   assert.equal(latestQuestColor(p), stageThreeColor, 'completed Rage remains the active quest before Fear');
 
@@ -1620,6 +2042,7 @@ function testFearProgression(p, stageThreeColor) {
   assertRoomMusicObservation(p, fearMusicObservation, 'first Fear room entry');
   assert.equal(stage(p), FEAR_STAGE, 'the real next-room exit enters active Fear stage 4');
   assert.equal(instanceUid(p), rageUid, 'Rage-to-Fear transition stays inside the owner\'s private copy');
+  assertPrivateInstanceIsolation(p, 'stage-4 Fear entry');
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), 'the eastern boundary lands at the packed Fear entry');
   assertNoAngerItems(p, 'stage-3 Fear transition strips the Rage weapon');
   assert.equal(rageNpcsFor(p).length, 0, 'Fear entry removes every Rage actor');
@@ -2101,6 +2524,7 @@ function testMainPath() {
   chooseRiftWithRope(p, 'main compiled descent', { requireLocked: true });
   assert.equal(stage(p), 2, 'native descent advances accepted quest to Rage stage 2');
   assert.notEqual(instanceUid(p), 0, 'native descent stores a temporary region UID');
+  assertPrivateInstanceIsolation(p, 'stage-2 Rage entry', true);
   const entry = roomCoord(p, 'soulbane_rage_entry');
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, entry, 'descent lands on the exact packed Rage entry tile');
   assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'new Rage room starts with zero temporary meter');
