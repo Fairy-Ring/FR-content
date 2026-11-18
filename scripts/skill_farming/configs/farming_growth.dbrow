@@ -18,3 +18,10 @@ data=handler,2
 table=farming_growth
 data=period,5
 data=handler,3
+
+// CANDIDATE pre-rework Old School hops family: ten-minute windows.
+// Period Tip.It totals are 35/45/55/65/75 minutes, inside the phase ranges.
+[farming_growth_hops]
+table=farming_growth
+data=period,10
+data=handler,4

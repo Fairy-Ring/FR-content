@@ -40,6 +40,7 @@
 ^farming_handler_potato = 1
 ^farming_handler_herb = 2
 ^farming_handler_flower = 3
+^farming_handler_hops = 4
 // CANDIDATE pre-rework OSRS: 500 game ticks, reset on login/logout.
 ^farming_growth_poll_ticks = 500
 ^farming_growth_window_minutes = 5
@@ -72,3 +73,8 @@
 ^farming_scarecrow_level = 23
 // CANDIDATE Old School Scarecrow: oldest retained revision 218671 (2014).
 ^farming_scarecrow_make_xp = 250
+
+// UNKNOWN hops CTS endpoints; no retained source recovers the original values.
+// Reuse the published allotment endpoints without claiming authentic yields.
+^farming_hops_save_low = 64
+^farming_hops_save_high = 128

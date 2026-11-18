@@ -1,0 +1,93 @@
+// VERIFIED: 377 named stage bands and Tip.It Farming guide, 28 April 2006.
+// Levels and plant/per-item harvest XP follow that period table, not later XP.
+// Four seeds follows its general hops instruction, including jute.
+[farming_hops_hammerstone]
+table=farming_hops
+data=seed,hammerstone_hop_seed
+data=produce,hammerstone_hops
+data=first,4
+data=mature,8
+data=last,10
+data=level,4
+data=seed_count,4
+data=plant_xp,90
+data=harvest_xp,100
+data=plural,"Hammerstone Hops"
+
+[farming_hops_asgarnian]
+table=farming_hops
+data=seed,asgarnian_hop_seed
+data=produce,asgarnian_hops
+data=first,11
+data=mature,16
+data=last,18
+data=level,8
+data=seed_count,4
+data=plant_xp,110
+data=harvest_xp,120
+data=plural,"Asgarnian Hops"
+
+[farming_hops_yanillian]
+table=farming_hops
+data=seed,yanillian_hop_seed
+data=produce,yanillian_hops
+data=first,19
+data=mature,25
+data=last,27
+data=level,16
+data=seed_count,4
+data=plant_xp,145
+data=harvest_xp,160
+data=plural,"Yanillian Hops"
+
+[farming_hops_krandorian]
+table=farming_hops
+data=seed,krandorian_hop_seed
+data=produce,krandorian_hops
+data=first,28
+data=mature,35
+data=last,37
+data=level,21
+data=seed_count,4
+data=plant_xp,170
+data=harvest_xp,195
+data=plural,"Krandorian Hops"
+
+[farming_hops_wildblood]
+table=farming_hops
+data=seed,wildblood_hop_seed
+data=produce,wildblood_hops
+data=first,38
+data=mature,46
+data=last,48
+data=level,28
+data=seed_count,4
+data=plant_xp,230
+data=harvest_xp,260
+data=plural,"Wildblood Hops"
+
+[farming_hops_barley]
+table=farming_hops
+data=seed,barley_seed
+data=produce,barley
+data=first,49
+data=mature,53
+data=last,55
+data=level,3
+data=seed_count,4
+data=plant_xp,110
+data=harvest_xp,95
+data=plural,"barley"
+
+[farming_hops_jute]
+table=farming_hops
+data=seed,jute_seed
+data=produce,jute_fibre
+data=first,56
+data=mature,61
+data=last,63
+data=level,13
+data=seed_count,4
+data=plant_xp,130
+data=harvest_xp,145
+data=plural,"jute fibres"
