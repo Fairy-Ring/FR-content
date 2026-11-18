@@ -251,5 +251,34 @@ test('supplier inventory failure is atomic and new work starts a new fractional 
   execute('[proc,tbw_add_favour]', p, [3]); assert.equal(get(p, 'vill_comm_max'), 0);
   claim(p, suppliers[0]); assert.equal(count(p, 'village_trade_sticks'), 501); assert.equal(get(p, 'vill_comm_points'), 402);
 });
+test('cooldowns start with a claim, keep their phase, stop when ready and resume outside the village', () => {
+  const timerId = ScriptProvider.getByName('[timer,tbw_villager_cooldown]').id;
+  let outside;
+  search: for (let offset = -32; offset <= 32; offset++) {
+    for (const [x, z] of [[home[1] + offset, 3136], [2751, home[2] + offset], [2880, home[2] + offset]]) {
+      if (map.isMapBlocked(x, z, home[0])) continue;
+      const route = Array.from(map.findPath(home[0], home[1], home[2], x, z));
+      if (!route.length) continue;
+      const end = CoordGrid.unpackCoord(route.at(-1));
+      if (end.x === x && end.z === z) { outside = [home[0], x, z]; break search; }
+    }
+  }
+  assert(outside, 'outside-village test tile is collision-clear and foot-reachable');
+  const unvisited = player(); [unvisited.level, unvisited.x, unvisited.z] = outside;
+  execute('[proc,tbw_cleanup_login]', unvisited);
+  assert.equal(get(unvisited, 'tai_bwo_villagerchat'), 0); assert.equal(unvisited.timers.has(timerId), false);
+  const p = fixture(); execute('[proc,tbw_cleanup_login]', p); assert.equal(p.timers.has(timerId), false);
+  set(p, 'cleanup_progress', 2); execute('[proc,tbw_add_favour]', p, [900]); claim(p);
+  assert.equal(p.timers.has(timerId), true); const firstClock = p.timers.get(timerId).clock;
+  for (let ticks = 0; ticks < 20; ticks++) environmentTick(p);
+  claim(p, suppliers[0]); assert.equal(p.timers.get(timerId).clock, firstClock, 'second claim does not restart another supplier clock');
+  for (let ticks = 20; ticks < 1800; ticks++) environmentTick(p);
+  assert.equal(get(p, 'chat_murc'), 1); assert.equal(p.timers.has(timerId), false);
+  claim(p); assert.equal(get(p, 'vill_comm_points'), 0); assert.equal(p.timers.has(timerId), true);
+  const q = reload(p); [q.level, q.x, q.z] = outside;
+  execute('[proc,tbw_cleanup_login]', q); assert.equal(q.timers.has(timerId), true);
+  for (let ticks = 0; ticks < 300; ticks++) environmentTick(q);
+  assert.equal(get(q, 'chat_murc'), 6); assert.equal(get(q, 'vill_comm_points'), 0);
+});
 console.log(`Tai Bwo Cleanup: ${cases} compiled cases passed`);
 process.exit(0);

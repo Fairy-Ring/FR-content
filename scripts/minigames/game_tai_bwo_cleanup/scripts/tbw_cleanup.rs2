@@ -59,8 +59,11 @@ if (%tbw_overlayopen = 1) {
 if (~tbw_in_village = true) {
     ~tbw_cleanup_enter;
 }
-// CANDIDATE: cooldown advances only while logged in, including outside the village.
-settimer(tbw_villager_cooldown, 300);
+// CANDIDATE: claimed suppliers recover during all logged-in time, not just visits.
+// Unvisited players have zero supplier state and need no recurring timer.
+if (%tai_bwo_villagerchat ! 0) {
+    if (~tbw_villager_has_cooldown = true) settimer(tbw_villager_cooldown, 300);
+}
 
 [mapzoneexit,0_43_47] ~tbw_cleanup_try_exit;
 [mapzoneexit,0_43_48] ~tbw_cleanup_try_exit;

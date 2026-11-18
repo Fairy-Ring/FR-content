@@ -1,5 +1,6 @@
-// CANDIDATE: OSRS Cleanup tables. Points are tenths of one percent.
+// UNKNOWN engineering cap: 100%; no retained 377 cap rule.
 ^tbw_favour_cap = 1000
+// CANDIDATE: OSRS Cleanup tables. Points are tenths of one percent.
 ^tbw_favour_hack_light = 3
 ^tbw_favour_hack_med = 5
 ^tbw_favour_hack_dense = 10
@@ -11,7 +12,7 @@
 ^tbw_hack_xp_dense = 800
 // CANDIDATE: OSRS Jungle pages, 90 seconds.
 ^tbw_jungle_respawn = 150
-// CANDIDATE persist: leftover fence stages stay (Cleanup), no period hold.
+// UNKNOWN retained engineering hold; no source establishes this decay interval.
 ^tbw_fence_hold = 10000
 // CANDIDATE last-resort (Tip.it cleanup page + 2007-base): 10 sticks per item.
 ^tbw_parcel_fee = 10

@@ -9,6 +9,15 @@ while ($start < 30) {
     }
     $start = add($start, 3);
 }
+if (~tbw_villager_has_cooldown = false) cleartimer(tbw_villager_cooldown);
+
+[proc,tbw_villager_has_cooldown]()(boolean)
+def_int $start = 0;
+while ($start < 30) {
+    if (getbit_range(%tai_bwo_villagerchat, $start, add($start, 2)) > 1) return (true);
+    $start = add($start, 3);
+}
+return (false);
 
 // Use the visible forms, not the client-hidden multi NPC.
 [proc,tbw_villager_chat_start](npc $villager)(int)
@@ -81,6 +90,8 @@ def_int $sticks = multiply($slice, ^tbw_sticks_per_favour_point);
 inv_add(inv, village_trade_sticks, $sticks);
 %vill_comm_points = sub(%vill_comm_points, $slice);
 %favour_percentage = divide(%vill_comm_points, 10);
+// Start once: another supplier's claim must not reset an existing cooldown clock.
+if (~tbw_villager_has_cooldown = false) settimer(tbw_villager_cooldown, 300);
 %tai_bwo_villagerchat = setbit_range_toint(%tai_bwo_villagerchat, 7, $start, add($start, 2));
 %cleanup_progress = 3;
 mes("You receive <tostring($sticks)> trading sticks.");
