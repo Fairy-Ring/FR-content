@@ -687,6 +687,108 @@ const noTaskSummon = assertSummon(locations[0], { distance: 3, explosives: 2 });
   World.removeNpc(cow, -1);
 }
 
+// Keep cache-derived pricing while the inconsistent period guide prices remain
+// unresolved. Exercise the packed formula and a real buy, not an inventory seed.
+const InvButton = (await load('src/network/game/client/model/InvButton.ts')).default;
+const InvButtonHandler = (await load('src/network/game/client/handler/InvButtonHandler.ts')).default;
+{
+  const shopId = id('InvType', 'slayershop'), shopType = InvType.get(shopId);
+  const stocked = name => {
+    const item = id('ObjType', name), index = Array.from(shopType.stockobj).indexOf(item);
+    assert(index >= 0 && shopType.stockcount[index] > 0, `${name} has positive packed Slayer stock`);
+    return { item, base: shopType.stockcount[index] };
+  };
+  const { item: explosive, base: explosiveBase } = stocked('fishing_explosive');
+  const { item: gem, base: gemBase } = stocked('slayer_gem');
+  const masterType = NpcType.getByName('slayer_master_3');
+  assert(masterType, 'packed Vannaka NPC type');
+  const sell = masterType.params.get(id('ParamType', 'shop_sell_multiplier'));
+  const haggle = masterType.params.get(id('ParamType', 'shop_delta'));
+  check('Vannaka Slayer shop keeps its 1000 buy-price multiplier', sell, 1000);
+  check('Vannaka Slayer shop keeps its one-step stock delta', haggle, 1);
+  const atFullStock = (item, base) => {
+    const stockDelta = runPureProc('[proc,price_mod]', [shopId, base, item])[0];
+    check(`${ObjType.get(item).debugname} full-stock price modifier`, stockDelta, 0);
+    return runPureProc('[proc,calc_shop_value]', [ObjType.get(item).cost, haggle, sell, stockDelta])[0];
+  };
+  const explosivePrice = atFullStock(explosive, explosiveBase);
+  const gemPrice = atFullStock(gem, gemBase);
+  check('control Slayer gem full-stock price is unchanged', gemPrice, ObjType.get(gem).cost);
+  const buyer = makePlayer();
+  const master = addFixtureNpc('slayer_master_3', locations[0].loc.x + 8, locations[0].loc.z + 8);
+  runPlayerScript(buyer, '[opnpc4,_slayer_master]', master);
+  const shop = buyer.getInventory(shopId), coins = id('ObjType', 'coins');
+  check('real Slayer-master trade opens both items at full stock',
+    [shop.getItemCount(explosive), shop.getItemCount(gem)], [explosiveBase, gemBase]);
+  give(buyer, coins, explosivePrice + gemPrice);
+  const shopComponent = id('Component', 'shop_template:inv');
+  const buyOne = (types.Component.get(shopComponent).iop ?? [])
+    .findIndex(option => typeof option === 'string' && /buy[^\d]*1\b/i.test(option)) + 1;
+  assert(buyOne > 0, 'shop interface has a Buy 1 option');
+  const handler = new InvButtonHandler();
+  const buy = item => assert(handler.handle(new InvButton(buyOne, item, shop.getItemIndex(item), shopComponent), buyer),
+    `production Buy 1 accepts ${ObjType.get(item).debugname}`);
+  buy(explosive);
+  const paid = explosivePrice + gemPrice - count(buyer, coins);
+  check('production explosive purchase pays the compiled full-stock price', paid, explosivePrice);
+  check('production explosive purchase transfers one item', count(buyer, explosive), 1);
+  buy(gem);
+  check('control purchase pays only its unchanged base price', count(buyer, coins), 0);
+  check('production control purchase transfers one gem', count(buyer, gem), 1);
+  shop.add(explosive, 1); shop.add(gem, 1);
+  check('price probe restores shared Slayer shop stock',
+    [shop.getItemCount(explosive), shop.getItemCount(gem)], [explosiveBase, gemBase]);
+  World.removeNpc(master, -1);
+  console.log('MOGRE_PRICE_PROBE', JSON.stringify({ calculated: explosivePrice, paid, controlGem: gemPrice }));
+  check('retained cache-derived fishing explosive full-stock price', explosivePrice, 60);
+  check('retained fishing explosive actual coins paid', paid, 60);
+}
+
+// Manual combat spells must use the packed APNPCT route, not the melee predicate.
+// Both players have the Slayer level, spell level and runes, so only Skippy differs.
+for (const skippy of [skippyComplete - 1, skippyComplete]) {
+  const p = makePlayer({ slayer: 32, combat: 70, skippy });
+  const npc = addFixtureNpc('mudskipper_ogre', locations[1].landing.x, locations[1].landing.z);
+  p.level = npc.level; p.x = npc.x + npc.width; p.z = npc.z;
+  const runes = ['airrune', 'waterrune', 'mindrune'].map(name => id('ObjType', name));
+  for (const rune of runes) give(p, rune, 10);
+  runPlayerScript(p, '[proc,player_combat_stat]');
+  const before = runes.map(rune => count(p, rune));
+  const hp = npc.levels[NpcStat.HITPOINTS];
+  p.setInteraction(Interaction.ENGINE, npc, ServerTriggerType.APNPCT, id('Component', 'magic:water_strike'));
+  JavaRandom.setSeed(0);
+  const executed = watchPlayerScripts(p, () => p.processInteraction());
+  check(`Skippy ${skippy} direct spell executes the packed APNPCT handler`,
+    executed.includes('[apnpct,magic:water_strike]'), true);
+  check(`Skippy ${skippy} direct spell queued damage`, attackQueue(npc).length, skippy === skippyComplete ? 1 : 0);
+  check(`Skippy ${skippy} direct spell rune settlement`, runes.map(rune => count(p, rune)),
+    skippy === skippyComplete ? before.map(value => value - 1) : before);
+  check(`Skippy ${skippy} direct spell leaves HP for the queued hit`, npc.levels[NpcStat.HITPOINTS], hp);
+  World.removeNpc(npc, -1);
+}
+
+// The merged Champions guard precedes the normal ranged Skippy check. A completed
+// player outside its arena must still reach the real ranged hit and ammo settlement.
+const damageTypes = readConstants(path.join(content, 'scripts/skill_combat/configs/combat_damagetypes.constant'));
+const damageStyles = readConstants(path.join(content, 'scripts/skill_combat/configs/combat_damagestyles.constant'));
+for (const skippy of [skippyComplete - 1, skippyComplete]) {
+  const p = makePlayer({ slayer: 32, combat: 70, skippy });
+  const npc = addFixtureNpc('mudskipper_ogre', locations[1].landing.x, locations[1].landing.z);
+  const worn = id('InvType', 'worn'), arrows = id('ObjType', 'bronze_arrow');
+  p.getInventory(worn).set(3, { id: id('ObjType', 'shortbow'), count: 1 });
+  p.getInventory(worn).set(13, { id: arrows, count: 10 });
+  p.setVar(id('VarPlayerType', 'damagetype'), numericConstant(damageTypes, 'ranged_style'));
+  p.setVar(id('VarPlayerType', 'damagestyle'), numericConstant(damageStyles, 'style_ranged_accurate'));
+  runPlayerScript(p, '[proc,player_combat_stat]');
+  const hp = npc.levels[NpcStat.HITPOINTS];
+  JavaRandom.setSeed(0);
+  productionAttack(p, npc);
+  check(`Skippy ${skippy} ranged Attack queued damage`, attackQueue(npc).length, skippy === skippyComplete ? 1 : 0);
+  check(`Skippy ${skippy} ranged Attack ammunition settlement`, p.invTotal(worn, arrows), skippy === skippyComplete ? 9 : 10);
+  check(`Skippy ${skippy} ranged Attack leaves HP for the queued hit`, npc.levels[NpcStat.HITPOINTS], hp);
+  World.removeNpc(npc, -1);
+}
+
 // Production Attack checks both the normal combat level and the Mogre Slayer level.
 for (const slayer of [31, 32]) {
   const p = makePlayer({ slayer, combat: 24, skippy: skippyComplete });
