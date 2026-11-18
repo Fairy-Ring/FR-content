@@ -60,6 +60,15 @@ if (%soulbane_prog = 2) {
 ~soulbane_cleanup;
 p_teleport(^soulbane_surface);
 
+// UNKNOWN: teleport exit policy; neither retained guide nor instance banner blocks it.
+// Keep same-copy teleports (including combat fixtures), but release every departure.
+[proc,soulbane_teleport_release](coord $destination)
+if (~soulbane_owned = false) return;
+if (region_findbycoord($destination) = true) {
+    if (add(region_uid, 1) = %soulbane_instance) return;
+}
+~soulbane_cleanup;
+
 // Ordinary death calls this AFTER its ordinary item/death/respawn handling.
 // The engine deletes the empty instance and all its NPCs/objects on departure.
 [proc,soulbane_cleanup]
@@ -93,6 +102,14 @@ if ($quantity > 0) inv_del(inv, soulbane_anger_axeq, $quantity);
 if (~soulbane_anger_weapon($old) = true) {
     inv_del(worn, $old, 1);
     ~update_all($old);
+}
+// Remove weapons banked through the earlier escape defect. A never-started
+// account cannot obtain one, and must not allocate a bank for this cleanup.
+if (%soulbane_prog > 0) {
+    inv_del(bank, soulbane_anger_swordq, ^max_32bit_int);
+    inv_del(bank, soulbane_anger_spearq, ^max_32bit_int);
+    inv_del(bank, soulbane_anger_maceq, ^max_32bit_int);
+    inv_del(bank, soulbane_anger_axeq, ^max_32bit_int);
 }
 
 [proc,soulbane_anger_weapon](obj $weapon)(boolean)

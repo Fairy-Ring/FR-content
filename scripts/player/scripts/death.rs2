@@ -87,6 +87,8 @@ healenergy(10000);
 ~initalltabs;
 ~player_end_poison;
 ~rd_lifecycle_death_cleanup;
+// CANDIDATE: OSRS r8237745 warns that unkept death drops are permanently lost.
+// Ordinary drops stay in the quest copy; deleting its empty region removes them.
 if (%soulbane_instance > 0) ~soulbane_cleanup;
 
 [proc,player_death_lose_items]

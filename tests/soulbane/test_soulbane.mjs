@@ -7,7 +7,7 @@ import path from 'node:path';
 import {
   Packet, PlayerLoading, PlayerStat, ScriptProvider, ScriptState,
   World, button, contentRoot, count, dialoguePage, engineModule, execute, held, id,
-  inv, invCom, inventory, map, obj, player as makePlayer, remove, resumeDialogue,
+  inv, invButton, invCom, inventory, map, obj, player as makePlayer, remove, resumeDialogue,
   seed, slotOf, tile, types, useLoc
 } from '../swamp-caves/runtime.mjs';
 
@@ -25,6 +25,9 @@ const OpNpcTHandler = new (await engineModule('network/game/client/handler/OpNpc
 const NpcStat = (await engineModule('engine/entity/NpcStat.ts')).NpcStat;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const rsbuf = await engineModule('network/rsbuf/index.ts');
+const { PlayerInfoProt } = await engineModule('network/rsbuf/prot.ts');
+const OpPlayer = (await engineModule('network/game/client/model/OpPlayer.ts')).default;
+const OpPlayerHandler = new (await engineModule('network/game/client/handler/OpPlayerHandler.ts')).default();
 
 
 const QUEST_CONFIG = path.join(contentRoot, 'scripts/quests/quest_soulbane/configs/soulbane.constant');
@@ -848,27 +851,337 @@ function testStageTwoLeaveAndLogout(mainOwner) {
 }
 function testDeath(mainOwner) {
   const p = playerFixture();
+  seed(p, ['rune_chainbody', 'rune_platelegs', 'bronze_platebody', 'shortbow']);
+  assert.equal(p.invAdd(inv, obj('coins'), 5000), 5000, 'disclosed ordinary death fixture carries 5000 coins');
   seedStageOneOwner(p, 'disclosed isolated death fixture');
   equipAngerWeapon(p, 'soulbane_anger_spearq', 'death fixture weapon');
   const xpBefore = xpSnapshot(p);
   const qpBefore = readVar(p, 'qp');
   const oldUid = instanceUid(p);
+  const deathTile = tile(p);
   // Disclosed test-only lethal HP seed; player_die enqueues the ordinary death queue.
   p.levels[PlayerStat.HITPOINTS] = 0;
   assert(ScriptProvider.getByName('[proc,player_die]'), 'packed ordinary player_die procedure exists');
   runProc('player_die', p);
   for (let tick = 0; tick < 80 && (p.activeScript || p.queue.head() !== null); tick++) worldTick();
+  for (let tick = 0; tick < 3; tick++) worldTick();
   assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED, 'ordinary death animation/queue settles');
   assert.equal(stage(p), 2, 'death during Rage cannot complete the quest');
   assert.equal(instanceUid(p), 0, 'ordinary post-respawn Soulbane cleanup releases the instance UID');
   assert(!CoordGrid.isInstanceX(p.x), 'ordinary death respawns the player outside the instance');
+  assert.equal(World.instances.findInstanceByUid(oldUid - 1), null, 'ordinary death deletes the copy that held lost items');
   assert.equal(rageNpcsWithInstance(oldUid).length, 0, 'ordinary death and cleanup remove every old Rage actor');
+  for (const name of ['rune_chainbody', 'rune_platelegs', 'bronze_platebody']) {
+    assert.equal(count(p, name), 1, `ordinary death keeps ${name} in inventory`);
+  }
+  for (const name of ['coins', 'shortbow']) {
+    assert.equal(count(p, name), 0, `ordinary death permanently loses ${name}`);
+    assert.equal(World.getObj(p.x, p.z, p.level, obj(name), p.hash64), null,
+      `lost ${name} is not recoverable at the respawn tile`);
+  }
+  assertNoAngerItems(p, 'ordinary death and deleted-copy cleanup');
   assert.deepEqual(xpSnapshot(p), xpBefore, 'death grants neither the Rage reward nor normal combat XP');
   assert.equal(readVar(p, 'qp'), qpBefore, 'death grants no quest points');
+  console.log(`R1 death-copy outcome ${JSON.stringify({ deathTile, kept: ['rune_chainbody', 'rune_platelegs', 'bronze_platebody'], lost: ['coins', 'shortbow'], angerWeaponsAfterDeath: angerWeaponTotal(p), deleted: true })}`);
 }
 
-function countGroundWeapons(p) {
-  return WEAPONS.reduce((sum, weapon) => sum + (World.getObj(p.x, p.z, p.level, obj(weapon.name), p.hash64) ? 1 : 0), 0);
+
+function privateInstanceZones(p, label) {
+  const uid = instanceUid(p);
+  assert(uid > 0, `${label}: owner has an instance handle`);
+  const instance = World.instances.findInstanceByUid(uid - 1);
+  assert(instance, `${label}: instance handle resolves to a live private copy`);
+  assert.equal(World.instances.findInstanceByCoord(p)?.uid, uid - 1, `${label}: player stands inside the resolved copy`);
+  const zones = [];
+  for (let floor = 0; floor < instance.floors; floor++) {
+    for (let east = 0; east < instance.zonesEast; east++) {
+      for (let north = 0; north < instance.zonesNorth; north++) {
+        zones.push(World.gameMap.getZone(
+          instance.sw.x + (east << 3), instance.sw.z + (north << 3), instance.sw.level + floor));
+      }
+    }
+  }
+  return { instance, zones };
+}
+
+function assertPrivateCopyHasNoEscapeAccess(p, label) {
+  const { zones } = privateInstanceZones(p, label);
+  const locs = zones.flatMap(zone => [...zone.getAllLocsSafe()]);
+  const bankLocs = locs.filter(loc => /bank|deposit/i.test(types.LocType.get(loc.type)?.debugname ?? ''));
+  assert.equal(bankLocs.length, 0, `${label}: copied room has no bank booth or deposit box loc`);
+
+  const players = [...new Set(zones.flatMap(zone => [...zone.getAllPlayersUnsafe()]).filter(other => other?.isActive))];
+  assert.deepEqual(players, [p], `${label}: only the owner can occupy this private copy`);
+
+  const npcs = zones.flatMap(zone => [...zone.getAllNpcsUnsafe()]).filter(npc => npc?.isActive);
+  assert.equal(npcs.length, 8, `${label}: the copy contains only its eight Rage actors`);
+  assert(npcs.every(npc => RAGE_IDS.has(npc.type)
+    && npc.vars[NPC_INSTANCE] === instanceUid(p)
+    && npc.vars[NPC_OWNER] === p.uid), `${label}: no familiar or foreign NPC occupies the copy`);
+
+  const objects = zones.flatMap(zone => [...zone.getAllObjsUnsafe()]);
+  assert.equal(objects.length, 0, `${label}: no other player's ground item is present in the copy`);
+}
+
+function nearbyLocs(p, pattern, radius = 52) {
+  const found = new Map();
+  const minZoneX = Math.floor((p.x - radius) / 8);
+  const maxZoneX = Math.floor((p.x + radius) / 8);
+  const minZoneZ = Math.floor((p.z - radius) / 8);
+  const maxZoneZ = Math.floor((p.z + radius) / 8);
+  for (let zoneX = minZoneX; zoneX <= maxZoneX; zoneX++) {
+    for (let zoneZ = minZoneZ; zoneZ <= maxZoneZ; zoneZ++) {
+      const zone = World.gameMap.getZoneIfExists(zoneX << 3, zoneZ << 3, p.level);
+      if (!zone) continue;
+      for (const loc of zone.getAllLocsSafe()) {
+        const name = types.LocType.get(loc.type)?.debugname ?? '';
+        if (pattern.test(name) && Math.abs(loc.x - p.x) <= radius && Math.abs(loc.z - p.z) <= radius) {
+          found.set(`${loc.type}:${loc.x}:${loc.z}:${loc.level}`, loc);
+        }
+      }
+    }
+  }
+  return [...found.values()].sort((a, b) =>
+    Math.abs(a.x - p.x) + Math.abs(a.z - p.z) - Math.abs(b.x - p.x) - Math.abs(b.z - p.z));
+}
+
+function componentOption(componentName, pattern) {
+  const component = types.Component.get(id('Component', componentName));
+  const index = (component?.iop ?? []).findIndex(option => typeof option === 'string' && pattern.test(option));
+  assert(index >= 0, `${componentName} exposes option ${pattern}`);
+  return index + 1;
+}
+
+function safeTeleport(p, destination, label) {
+  assertFootprintOpen(destination.level, destination.x, destination.z, 1, 1, `${label}: landing collision`);
+  runProc('p_telejump_safe', p, [CoordGrid.packCoord(destination.level, destination.x, destination.z)]);
+  for (let tick = 0; tick < 3; tick++) worldTick();
+  assert.deepEqual(tile(p), [destination.level, destination.x, destination.z], `${label}: production safe teleport reaches its exact destination`);
+}
+
+
+function surfaceTile() {
+  const declaration = questCoordinateDeclarations().get('soulbane_surface');
+  assert(declaration, 'Soulbane declares the surface exit coordinate');
+  const { level, x, z } = unpackWorld(packedTemplate(declaration));
+  return [level, x, z];
+}
+
+function testPrivateCopyAccess() {
+  const p = playerFixture();
+  seedStageOneOwner(p, 'R1 private-copy access boundary');
+  assertPrivateCopyHasNoEscapeAccess(p, 'R1 private-copy access boundary');
+  console.log('R1 private-copy access is unreachable: no bank/deposit loc, familiar, other player, or foreign ground object');
+}
+
+function testSafeTeleportInsideCopy() {
+  const p = playerFixture();
+  seedStageOneOwner(p, 'R1 safe teleport within owner copy');
+  equipAngerWeapon(p, 'soulbane_anger_spearq', 'R1 in-copy safe teleport');
+  const uid = instanceUid(p);
+  const destination = roomCoord(p, 'soulbane_scene_player');
+  assert.equal(World.instances.findInstanceByCoord(destination)?.uid, uid - 1,
+    'R1 in-copy destination resolves to the same private instance');
+  safeTeleport(p, destination, 'R1 p_telejump_safe inside the owned copy');
+  assert.equal(instanceUid(p), uid, 'R1 in-copy teleport preserves the owner instance handle');
+  assert.equal(World.instances.findInstanceByUid(uid - 1) !== null, true,
+    'R1 in-copy teleport does not delete the active private copy');
+  assert.equal(count(p, 'soulbane_anger_spearq', types.InvType.getId('worn')), 1,
+    'R1 in-copy teleport preserves the wielded anger weapon');
+  assert.equal(angerWeaponTotal(p), 1, 'R1 in-copy teleport preserves exactly one anger weapon');
+  assert.equal(rageNpcsFor(p).length, 8, 'R1 in-copy teleport leaves the owned NPC outcome fixture intact');
+  console.log('R1 in-copy p_telejump_safe preserves owner, weapon, and Rage NPC fixture (expected old-head pass)');
+}
+
+function testSafeTeleportOutAndDestinationLogout() {
+  const p = playerFixture();
+  seedStageOneOwner(p, 'R1 safe teleport out');
+  equipAngerWeapon(p, 'soulbane_anger_spearq', 'R1 safe teleport out');
+  const oldUid = instanceUid(p);
+  const destination = { level: 0, x: 3213, z: 3424 };
+  safeTeleport(p, destination, 'R1 p_telejump_safe out of the owned copy');
+  const afterTeleport = {
+    tile: tile(p),
+    instanceUid: instanceUid(p),
+    angerWeapons: angerWeaponTotal(p),
+    regionStillExists: World.instances.findInstanceByUid(oldUid - 1) !== null
+  };
+  const reloaded = nativeLogoutAndReload(p, 'R1 logout after safe teleport out');
+  const observed = { afterTeleport, savedTile: tile(reloaded), instanceUidAfterLogin: instanceUid(reloaded), angerWeaponsAfterLogin: angerWeaponTotal(reloaded) };
+  console.log(`R1 teleport-out/logout observation ${JSON.stringify(observed)}`);
+  assert.equal(afterTeleport.instanceUid, 0, 'R1 teleport out clears the Soulbane instance handle immediately');
+  assert.equal(afterTeleport.angerWeapons, 0, 'R1 teleport out removes the worn anger weapon immediately');
+  assert.equal(afterTeleport.regionStillExists, false, 'R1 teleport out deletes the now-empty private copy');
+  assert.deepEqual(tile(reloaded), [destination.level, destination.x, destination.z],
+    'R1 destination logout saves the actual teleport destination, not the rift surface');
+  assert.equal(instanceUid(reloaded), 0, 'R1 destination login has no stale Soulbane instance handle');
+  assertNoAngerItems(reloaded, 'R1 destination logout/relogin');
+  assert.equal(stage(reloaded), 2, 'R1 external travel and logout preserve unfinished permanent progress');
+}
+
+function testLogoutInsideSavesRegionExit() {
+  const p = playerFixture();
+  seedStageOneOwner(p, 'R1 logout inside owner copy');
+  equipAngerWeapon(p, 'soulbane_anger_spearq', 'R1 logout inside owner copy');
+  const oldUid = instanceUid(p);
+  const expectedExit = surfaceTile();
+  const reloaded = nativeLogoutAndReload(p, 'R1 logout inside the owned copy');
+  const observed = { savedTile: tile(reloaded), expectedExit, stage: stage(reloaded), angerWeapons: angerWeaponTotal(reloaded) };
+  console.log(`R1 in-copy logout observation ${JSON.stringify(observed)}`);
+  assert.deepEqual(tile(reloaded), expectedExit, 'R1 in-copy logout saves the instance exit coordinate');
+  assert.equal(stage(reloaded), 2, 'R1 in-copy logout keeps unfinished permanent progress');
+  assert.equal(instanceUid(reloaded), 0, 'R1 in-copy login does not retain a temporary instance handle');
+  assertNoAngerItems(reloaded, 'R1 in-copy logout/relogin');
+  assert.equal(rageNpcsWithInstance(oldUid).length, 0, 'R1 in-copy logout deletes all old Rage actors');
+}
+
+function testBankEscapeRoute() {
+  const p = playerFixture();
+  seedStageOneOwner(p, 'R1 bank escape route');
+  equipAngerWeapon(p, 'soulbane_anger_spearq', 'R1 bank escape route');
+  const anger = 'soulbane_anger_spearq';
+  const worn = types.InvType.getId('worn');
+  safeTeleport(p, { level: 0, x: 3213, z: 3424 }, 'R1 teleport to reachable Varrock bank');
+  if (count(p, anger, worn) > 0) assert(remove(p, anger), 'R1 bank route removes the worn anger spear through the native handler');
+  const [booth] = nearbyLocs(p, /bank.*booth|booth.*bank/i);
+  assert(booth, 'R1 outside route finds a packed bank booth near the Varrock teleport destination');
+  goToStand(p, booth, 'R1 outside route walks to the actual packed bank booth');
+  const opened = operateLoc(p, booth, 2, [], 'R1 bank booth Use-quickly');
+  assert.match(opened.trigger.name, /^\[oploc2,bank_?booth\]$/i, 'R1 bank opens through the packed bank loc operation');
+  assert.equal(p.modalMain, id('Component', 'bank_main'), 'R1 bank booth opens the native bank interface');
+  assert.equal(p.modalSide, id('Component', 'bank_side'), 'R1 bank booth opens the native player inventory side');
+  const bankType = id('InvType', 'bank');
+  const depositOp = componentOption('bank_side:inv', /deposit[^\d]*1\b/i);
+  seed(p, ['shortbow']);
+  assert(invButton(p, 'bank_side:inv', 'shortbow', depositOp, slotOf(p, 'shortbow')),
+    'R1 outside bank uses the native inventory-button deposit handler');
+  assert.equal(count(p, 'shortbow'), 0, 'R1 ordinary positive-control item leaves inventory');
+  assert.equal(count(p, 'shortbow', bankType), 1, 'R1 ordinary positive-control item reaches the bank');
+
+  if (count(p, anger) > 0) {
+    assert(invButton(p, 'bank_side:inv', anger, depositOp, slotOf(p, anger)),
+      'R1 old-head teleport-then-bank route uses the native deposit handler');
+  }
+  const routeBanked = count(p, anger, bankType);
+
+  // This models a previously escaped, saved bank item from the old route. It is
+  // seeded only after the player has reached a real external bank, never inside
+  // the private copy; the live route above remains the primary regression.
+  for (const weapon of WEAPONS) {
+    assert.equal(p.invAdd(bankType, obj(weapon.name), 1), 1,
+      `R1 valid legacy bank-save fixture contains ${weapon.name}`);
+  }
+  p.closeModal();
+  const reloaded = nativeLogoutAndReload(p, 'R1 legacy banked anger cleanup');
+  const bankAfterLogin = WEAPONS.map(weapon => [weapon.name, count(reloaded, weapon.name, bankType)]);
+  console.log(`R1 bank route observation ${JSON.stringify({ angerInBankAfterNativeRoute: routeBanked, bankAfterLogin })}`);
+  assert.equal(routeBanked, 0, 'R1 teleport-then-bank route cannot bank an anger weapon');
+  assert.deepEqual(bankAfterLogin, WEAPONS.map(weapon => [weapon.name, 0]),
+    'R1 login cleanup permanently removes all previously escaped anger weapons from the bank');
+  assert.equal(count(reloaded, 'shortbow', bankType), 1, 'R1 login cleanup preserves an ordinary banked item');
+  assertNoAngerItems(reloaded, 'R1 bank route and login cleanup');
+}
+
+function testTradeEscapeRoute() {
+  const destination = { level: 0, x: 3213, z: 3424 };
+  const p = playerFixture();
+  const otherTile = { ...destination, x: destination.x + 1 };
+  assertFootprintOpen(otherTile.level, otherTile.x, otherTile.z, 1, 1, 'R1 trade recipient collision');
+  nativeRouteFrom(destination, otherTile, 'R1 trade recipient is reachable on foot from the teleport landing');
+  const q = playerFixture(otherTile);
+  seedStageOneOwner(p, 'R1 trade escape route');
+  equipAngerWeapon(p, 'soulbane_anger_spearq', 'R1 trade escape route');
+  safeTeleport(p, destination, 'R1 teleport to reachable player trade');
+  const anger = 'soulbane_anger_spearq';
+  const worn = types.InvType.getId('worn');
+  if (count(p, anger, worn) > 0) assert(remove(p, anger), 'R1 trade route removes the worn anger spear through the native handler');
+
+  // Offline sessions need the ordinary login appearance bit before visibility encoding.
+  p.masks |= PlayerInfoProt.APPEARANCE;
+  q.masks |= PlayerInfoProt.APPEARANCE;
+  World.processInfo();
+  rsbuf.playerInfo(0, p.slot, 0, 0, true);
+  rsbuf.playerInfo(0, q.slot, 0, 0, true);
+  assert(rsbuf.hasPlayer(p.slot, q.slot) && rsbuf.hasPlayer(q.slot, p.slot),
+    'R1 trade participants are actually visible to each other outside the private copy');
+  p.resetEntity(false);
+  q.resetEntity(false);
+  assert(OpPlayerHandler.handle(new OpPlayer(4, q.slot), p), 'R1 native Trade-with packet is accepted by the production handler');
+  p.processInteraction();
+  p.resetEntity(false);
+  q.resetEntity(false);
+  assert(OpPlayerHandler.handle(new OpPlayer(4, p.slot), q), 'R1 reciprocal native Trade-with packet is accepted');
+  q.processInteraction();
+  assert.equal(p.modalMain, id('Component', 'trademain'), 'R1 trade route opens the real trade interface for the owner');
+  assert.equal(q.modalMain, id('Component', 'trademain'), 'R1 trade route opens the real trade interface for the recipient');
+
+  const tradeOffer = id('InvType', 'tradeoffer');
+  for (const weapon of WEAPONS) {
+    assert.equal(types.ObjType.get(obj(weapon.name)).tradeable, false, `${weapon.name} is untradeable in the built pack`);
+  }
+  if (count(p, anger) > 0) {
+    assert(invButton(p, 'tradeside:inv', anger, 1, slotOf(p, anger)),
+      'R1 anger-weapon offer reaches the native trade inventory-button handler');
+    assert.equal(count(p, anger, tradeOffer), 0, 'native trade refuses the untradeable anger weapon');
+    assert.equal(count(p, anger), 1, 'refused anger trade leaves the item with its owner');
+  }
+  seed(p, ['shortbow']);
+  assert(invButton(p, 'tradeside:inv', 'shortbow', 1, slotOf(p, 'shortbow')),
+    'R1 trade positive control offers an ordinary item through the native handler');
+  assert.equal(count(p, 'shortbow', tradeOffer), 1, 'R1 ordinary item enters the actual trade offer');
+  for (const [who, component] of [
+    [p, 'trademain:accept'], [q, 'trademain:accept'],
+    [p, 'tradeconfirm:accept'], [q, 'tradeconfirm:accept']
+  ]) {
+    p.resetEntity(false);
+    q.resetEntity(false);
+    assert(button(who, component), `R1 native trade accepts ${component}`);
+  }
+  assert.equal(count(q, 'shortbow'), 1, 'R1 real trade transfers the ordinary positive-control item');
+  assert.equal(count(q, anger), 0, 'R1 real trade never transfers an anger weapon');
+  assert.equal(instanceUid(p), 0, 'R1 teleport-then-trade releases the departed copy handle');
+  assertNoAngerItems(p, 'R1 teleport-then-trade owner cleanup');
+  console.log('R1 trade refuses anger weapons; teleport cleanup also removes them and releases ownership');
+}
+
+function testDropEscapeRoute() {
+  const p = playerFixture();
+  seedStageOneOwner(p, 'R1 Drop escape route');
+  const anger = 'soulbane_anger_spearq';
+  takeRackWeapon(p, anger, 'R1 in-copy Drop route');
+  const roomTile = tile(p);
+  assert(held(p, anger, 5), 'R1 in-copy Drop reaches the native held-item handler');
+  assertNoAngerItems(p, 'R1 in-copy Drop');
+  assert.equal(World.getObj(roomTile[1], roomTile[2], roomTile[0], obj(anger), p.hash64), null,
+    'R1 in-copy Drop does not create a ground anger weapon');
+
+  takeRackWeapon(p, anger, 'R1 teleport-then-Drop route');
+  safeTeleport(p, { level: 0, x: 3213, z: 3424 }, 'R1 teleport before native Drop');
+  if (count(p, anger, types.InvType.getId('worn')) > 0) assert(remove(p, anger), 'R1 outside Drop removes a worn anger weapon natively');
+  if (count(p, anger) > 0) assert(held(p, anger, 5), 'R1 outside Drop reaches the native held-item handler');
+  assertNoAngerItems(p, 'R1 teleport-then-Drop');
+  assert.equal(World.getObj(p.x, p.z, p.level, obj(anger), p.hash64), null,
+    'R1 native Drop never creates an anger weapon on the outside ground');
+  assert.equal(instanceUid(p), 0, 'R1 teleport-then-Drop releases the departed copy handle');
+  console.log('R1 Drop returns weapons without a ground object; teleport cleanup also releases ownership');
+}
+
+function testRoomExitRemovesAngerWeapon() {
+  const p = playerFixture();
+  seedStageOneOwner(p, 'R1 ordinary room exit');
+  equipAngerWeapon(p, 'soulbane_anger_spearq', 'R1 ordinary room exit');
+  const oldUid = instanceUid(p);
+  const quit = quitLoc(p);
+  goToStand(p, quit, 'R1 ordinary room exit walks to the packed quit loc');
+  const result = operateLoc(p, quit, 1, [1], 'R1 ordinary room exit confirms Yes');
+  assert.match(result.trigger.name, /^\[oploc1,soul_bane_awall_void_small\]$/);
+  worldTick();
+  assert.equal(stage(p), 2, 'R1 ordinary room exit does not complete unfinished Rage');
+  assert.equal(instanceUid(p), 0, 'R1 ordinary room exit releases the instance handle');
+  assert.deepEqual(tile(p), surfaceTile(), 'R1 ordinary room exit returns to the declared surface');
+  assert.equal(World.instances.findInstanceByUid(oldUid - 1), null, 'R1 ordinary room exit deletes the empty copy');
+  assertNoAngerItems(p, 'R1 ordinary room exit cleanup');
+  console.log('R1 ordinary room exit removes the weapon and private copy (expected old-head pass)');
 }
 
 function testMainPath() {
@@ -1066,13 +1379,42 @@ function testMainPath() {
 
 function run() {
   checkVarpMetadata();
+  const r1Cases = new Map([
+    ['teleport-out', testSafeTeleportOutAndDestinationLogout],
+    ['teleport-in', testSafeTeleportInsideCopy],
+    ['logout-inside', testLogoutInsideSavesRegionExit],
+    ['death-items', () => testDeath(null)],
+    ['bank', testBankEscapeRoute],
+    ['trade', testTradeEscapeRoute],
+    ['drop', testDropEscapeRoute],
+    ['room-exit', testRoomExitRemovesAngerWeapon],
+    ['copy-access', testPrivateCopyAccess]
+  ]);
+  const selector = process.argv.find(argument => argument.startsWith('--r1-case='));
+  if (selector) {
+    const name = selector.slice('--r1-case='.length);
+    const selected = r1Cases.get(name);
+    assert(selected, `unknown --r1-case=${name}; choose ${[...r1Cases.keys()].join(', ')}`);
+    selected();
+    console.log(`PASS Soulbane isolated R1 case: ${name}`);
+    return;
+  }
+
   const main = testMainPath();
   const stageTwo = testStageTwoLeaveAndLogout(main.player);
   assert.equal(latestQuestColor(stageTwo.reloaded), main.stageTwoColor, 'mid-Rage login reconstruction preserves the active-stage quest color');
   assertJournal(stageTwo.reloaded, ['very aggressive room', 'defeat the monsters'], ['Soulbane is complete'],
     'post-login stage-2 journal');
   testDeath(main.player);
-  console.log('PASS Soulbane compiled first-unit regression: entry, Rage combat, ownership, lifecycle, stage-3 boundary');
+  testPrivateCopyAccess();
+  testSafeTeleportInsideCopy();
+  testSafeTeleportOutAndDestinationLogout();
+  testLogoutInsideSavesRegionExit();
+  testBankEscapeRoute();
+  testTradeEscapeRoute();
+  testDropEscapeRoute();
+  testRoomExitRemovesAngerWeapon();
+  console.log('PASS Soulbane compiled first-unit regression: entry, Rage combat, ownership, lifecycle, safe teleports and escape routes');
   console.log(JSON.stringify({ stageTwoColor: main.stageTwoColor, stageThreeColor: main.stageThreeColor, attackXp: main.reward }));
 }
 
