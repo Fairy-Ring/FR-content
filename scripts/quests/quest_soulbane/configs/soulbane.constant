@@ -45,7 +45,8 @@
 ^soulbane_fear_reaper2 = 0_47_81_57_43
 ^soulbane_fear_reaper3 = 0_47_81_54_38
 ^soulbane_fear_reaper4 = 0_47_81_44_38
-^soulbane_fear_reaper5 = 0_47_81_41_45
+// UNKNOWN: nearest open 2-by-2 footprint to the old stand, one tile west.
+^soulbane_fear_reaper5 = 0_47_81_40_45
 ^soulbane_fear_reaper6 = 0_47_81_41_55
 ^soulbane_fear_scene_player = 0_51_53_45_63
 ^soulbane_fear_scene_tolna = 0_51_53_46_63
