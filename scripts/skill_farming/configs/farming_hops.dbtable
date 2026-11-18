@@ -1,0 +1,11 @@
+[farming_hops]
+column=seed,obj
+column=produce,namedobj
+column=first,int
+column=mature,int
+column=last,int
+column=level,int
+column=seed_count,int
+column=plant_xp,int
+column=harvest_xp,int
+column=plural,string
