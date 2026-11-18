@@ -1,0 +1,4 @@
+// UNKNOWN: server-only identity metadata, not a recovered period parameter.
+[empty_lord_base_type]
+type=npc
+default=null

@@ -1,15 +1,34 @@
-// Spirits of the Elid — Awusah the Mayor (Nardah) start Talk-to + after-start.
-// CANDIDATE lines (OSRS Transcript:Spirits of the Elid minus overlay/fairy-ring).
-// First write %elidquest 0 -> 1. Chat + write only — no river dest,
-// no ancestral-key dest, do not retouch elid_ballad.rs2 (already residual).
-// After-start (%elidquest >= 1): @elid_mayor_after — greeting keeps "sir"
-// period voice; three opts (working / meant to do / haven't had the time),
-// each returns. Stay 1. No dest.
-// Review: Yes uses ~chatplayer (same as Agrith / Two Cats).
-// Cite red-19-start-impl-377.md §12 · Transcript:Spirits of the Elid
-// (after-start section).
+// CANDIDATE wording: OSRS Transcript:Spirits of the Elid, Awusah sections.
+// VERIFIED sequence: Tip.It capture 20060502085633. Completion is at the plinth.
 
 [opnpc1,elid_mayor]
+if (%elidquest >= ^elid_complete) {
+    ~chatnpc("<p,neutral>Thank you for restoring our water."); // UNKNOWN functional post-quest thanks.
+    return;
+}
+if (inv_total(inv, elid_statuette) > 0 & %elidquest >= ^elid_spirits_explained) {
+    ~chatnpc("<p,neutral>Have you had any luck retrieving our statuette yet?");
+    ~chatplayer("<p,neutral>Yes I finally got it. I had to destroy a pair of your shoes though. A crazy genie wanted a sole off your shoe in return for the statuette. I think he got souls and soles confused.");
+    ~chatnpc("<p,neutral>I suppose sacrificing a pair of shoes for the greater good of the town is reasonable. I don't begin to understand the ways of genies.");
+    ~chatplayer("<p,neutral>Yes I thought it best not to correct him. He's somewhat less dangerous than he might be if he's a collector of shoe soles.");
+    ~chatnpc("<p,neutral>Anyway thanks for getting the statue back. You should take it to our temple and then we can see if our fountain starts working again.");
+    return;
+}
+if (%elidquest = ^elid_spirits_explained) {
+    @elid_mayor_statuette;
+}
+if (%elidquest >= ^elid_crevice_known) {
+    ~chatnpc("<p,neutral>Have you had any luck retrieving our statuette yet?");
+    def_int $where = ~p_choice2("Not yet, but don't give up hope yet.", 1, "Where did you say you threw it again?", 2);
+    if ($where = 2) {
+        ~chatplayer("<p,neutral>Where did you say you threw it again?");
+        ~chatnpc("<p,neutral>In a deep crevice to the west of this village.");
+    } else {
+        ~chatplayer("<p,neutral>Not yet, but don't give up hope yet.");
+        ~chatnpc("<p,neutral>Good luck, may Sarad.. errm I mean Elidinis guide you.");
+    }
+    return;
+}
 if (%elidquest >= 1) {
     @elid_mayor_after;
     return;
@@ -25,7 +44,9 @@ if ($go = 2) {
 }
 ~chatplayer("<p,neutral>Ok I will have a look around and see what I can do.");
 ~chatnpc("<p,neutral>Good luck to you.");
-%elidquest = 1;
+// UNKNOWN engineering start value: stage 1 has no fountain/plinth face in 377.
+%elidquest = ^elid_started;
+~send_quest_progress(questlist:elid, %elidquest, ^elid_complete);
 
 [label,elid_mayor_after]
 ~chatnpc("<p,neutral>Many salutations to you sir, have you made any progress in uncovering the reasons for our curse yet?");
@@ -44,3 +65,25 @@ if ($m = 2) {
 ~chatplayer("<p,neutral>I haven't really had the time to investigate.");
 ~chatnpc("<p,neutral>Well I hope somebody can find the time soon, the despair of the people of this town increases daily.");
 return;
+
+[label,elid_mayor_statuette]
+~chatnpc("<p,neutral>Many salutations to you sir, have you made any progress in uncovering the reasons for our curse yet?");
+~chatplayer("<p,neutral>Yes I have made some progress. It is the doing of the water spirits at the source of the river.");
+~chatnpc("<p,neutral>The Spirits of the Elid? I wasn't even sure if they weren't some old wives tale. Why would they do such a thing?");
+~chatplayer("<p,neutral>Did you by any chance throw away a statuette of the goddess Elidinis recently?");
+~chatnpc("<p,neutral>Oh that old thing. Yeah, the priest of Saradomin said we should get rid of that. He said we should become followers of Saradomin, and therefore we wouldn't need it.");
+~chatplayer("<p,neutral>Well the spirits killed him for imparting that piece of advice about the statuette.");
+~chatnpc("<p,neutral>Gasps!");
+~chatplayer("<p,neutral>Apparently this town was brought about by Elidinis on the promise that its people would follow her. People here have been waning in their belief of Elidinis for a while now.");
+~chatplayer("<p,neutral>It seems the casting away of the statue was the final straw.");
+~chatnpc("<p,neutral>Ohh that's not so good if only we hadn't thrown the statue away, we wouldn't have this water problem then. He was a very convincing priest though. He worked many wonders, for example if he prayed hard enough");
+~chatnpc("<p,neutral>he became impervious to arrows. The way of Saradomin did seem very appealing.");
+if (stat_base(prayer) >= 40) {
+    ~chatplayer("<p,neutral>Oh but that's easy, I can pray to protect myself from arrows too.");
+    ~chatnpc("<p,neutral>Then truly you are very powerful too!");
+}
+~chatplayer("<p,neutral>Where did you throw the statuette?");
+~chatnpc("<p,neutral>Ohh there's a strange deep crevice in the desert to the west of here. We threw it down there. I don't know if it's lost forever or not.");
+~chatplayer("<p,neutral>Well it's worth a look anyway.");
+~chatnpc("<p,neutral>If you could retrieve it for us we'll be very grateful. Even if it doesn't give us our water back, maybe it'll calm Shiratti down, she was not pleased at it being thrown away and she's been grumpy ever since.");
+%elidquest = ^elid_crevice_known;

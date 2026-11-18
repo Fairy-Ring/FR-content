@@ -5,14 +5,21 @@
 // ([opnpcu] + [apnpcu] -> shared label, barmaid pattern) -> dump tree
 // verbatim + tbox "You trade the sole for the statuette." + consume sole +
 // elid_statuette 6785. Wrong item -> ~displaymessage(^dm_default).
-// Stay %elidquest 1. No dest. No fountain. No && / ||.
+// Stage and inventory checks keep the one-for-one exchange and reward replay-safe.
 // Cite elid-genie-sole-trade-377.md · Transcript:Spirits of the Elid.
 
-[opnpcu,elid_genie] @elid_genie_sole_trade;
-[apnpcu,elid_genie] @elid_genie_sole_trade;
+[opnpcu,elid_genie] @elid_genie_used;
+[apnpcu,elid_genie] @elid_genie_used;
+
+[label,elid_genie_used]
+if (last_useitem ! elid_sole) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@elid_genie_sole_trade;
 
 [label,elid_genie_sole_trade]
-if (last_useitem ! elid_sole) {
+if (%elidquest < ^elid_sole_requested | %elidquest >= ^elid_complete | inv_total(inv, elid_sole) < 1) {
     ~displaymessage(^dm_default);
     return;
 }
@@ -22,6 +29,7 @@ if (last_useitem ! elid_sole) {
 ~mesbox("You trade the sole for the statuette."); // CANDIDATE dump tbox
 inv_del(inv, elid_sole, 1);
 inv_add(inv, elid_statuette, 1);
+%elidquest = ^elid_statuette_recovered;
 ~chatplayer("<p,neutral>So um, why do you need part of Awusah's footwear anyway? I hope you're not going to do some nasty magic on his feet or something.");
 ~chatnpc("<p,neutral>I hadn't thought of that. I just read that a lot of the most powerful beings are collecting soles these days. I haven't really got many yet though. You provided me with an opportunity to expand my collection.");
 return;

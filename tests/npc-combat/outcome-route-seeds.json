@@ -1248,6 +1248,24 @@
         "hit": 9,
         "zero": 17
       }
+    },
+    {
+      "script": "[ai_opplayer2,_slayer_wyvern]",
+      "npc": "skeletal_wyvern1",
+      "seeds": {
+        "hit": 5376,
+        "zero": 8,
+        "miss": 11
+      }
+    },
+    {
+      "script": "[ai_applayer2,_slayer_wyvern]",
+      "npc": "skeletal_wyvern1",
+      "seeds": {
+        "hit": 5376,
+        "zero": 8,
+        "miss": 11
+      }
     }
   ]
 }

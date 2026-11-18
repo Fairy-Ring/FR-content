@@ -4,6 +4,8 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { engine, World, Player, ScriptState, ScriptProvider, types, floorTiles, map, locFor, nativeLocRows, nativeNpcRows, ResumePauseButtonHandler, ResumePauseButton, IfSetText } from '../regicide-travel/runtime.mjs';
 const load = async file => (await import(pathToFileURL(path.join(engine, 'src', file)).href)).default;
+const Environment = await load('util/Environment.ts');
+const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
 const OpLoc = await load('network/game/client/model/OpLoc.ts');
 const OpLocHandler = await load('network/game/client/handler/OpLocHandler.ts');
 const OpLocU = await load('network/game/client/model/OpLocU.ts');
@@ -30,7 +32,7 @@ const specs = [
   { name: 'rift-unroped', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2', state: 0, refused: true },
   { name: 'rift-roped', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2_rope', state: 1 },
   { name: 'plinth-placed', parent: 'elid_statuette_multiloc', child: 'elid_statuette_placed', state: 60, item: 'elid_statuette', refused: true },
-  ...[0, 10, 20, 25, 27, 30, 35, 40, 50, 55].map(state => ({ name: `plinth-base-${state}`, parent: 'elid_statuette_multiloc', child: 'elid_statuette_base', state, item: 'elid_statuette', nextState: 60 })),
+  ...[0, 10, 20, 25, 27, 30, 35, 40, 50, 55].map(state => ({ name: `plinth-base-${state}`, parent: 'elid_statuette_multiloc', child: 'elid_statuette_base', state, item: 'elid_statuette', gated: state < 50, nextState: 60 })),
   { name: 'altar-pouch', parent: 'devious_altar', child: 'devious_altar_pouch', state: 1, item: 'devious_glowingpouch', refused: true },
   { name: 'altar-scorched', parent: 'devious_altar', child: 'devious_altar_scorched', state: 2, item: 'devious_glowingpouch', refused: true },
   { name: 'altar-empty', parent: 'devious_altar', child: 'altar', state: 0, item: 'devious_glowingpouch', nextState: 1 }
@@ -80,6 +82,7 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
   const snapshot = () => ({ coordinates: [p.level, p.x, p.z], itemCount: spec.item ? inv.getItemCount(item) : null, state: p.getVarBit(root.multivarbit) });
   const before = snapshot();
   const beforeVars = Array.from(p.vars);
+  const beforeStats = Array.from(p.stats);
   const accepted = spec.item
     ? new OpLocUHandler().handle(new OpLocU(entity.x, entity.z, root.id, item, 0, 3214), p)
     : new OpLocHandler().handle(new OpLoc(1, entity.x, entity.z, root.id), p);
@@ -108,7 +111,7 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
   const changedVars = Array.from(p.vars).flatMap((value, id) => value !== beforeVars[id] ? [{ id, before: beforeVars[id], after: value }] : []);
   const observed = { case: spec.name, native, selected, before, after, messages, overlays, overlay: p.overlay, changedVars, executions: executions.map(({ state, ...e }) => ({ ...e, execution: state.execution })) };
   console.log('OBSERVED ' + JSON.stringify(observed));
-  if (spec.refused) {
+  if (spec.refused || spec.gated) {
     assert.deepEqual(after, before, `${spec.name}: no movement, item loss or selector change`);
     assert.deepEqual(changedVars, [], `${spec.name}: no varp write`);
     assert.equal(p.overlay, -1, `${spec.name}: no deferred overlay`);
@@ -117,6 +120,10 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
     // Debug servers additionally diagnose a missing handler. It is not a
     // player-facing content message and is absent when a guard executes.
     assert(messages.every(m => m === 'Nothing interesting happens.' || m.startsWith('No trigger for ')), 'no new content wording');
+    if (spec.parent === 'elid_statuette_multiloc') {
+      assert.deepEqual(Array.from(p.stats), beforeStats, 'unearned/replayed placement grants no XP');
+      assert.equal(p.modalMain, -1, 'unearned/replayed placement opens no scroll');
+    }
     if (selected) {
       assert(executions.length > 0, 'guarded handler executed, not bypassed');
       for (const e of executions) {
@@ -133,9 +140,22 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
     assert.deepEqual(after.coordinates, before.coordinates);
     assert.equal(after.itemCount, before.itemCount - 1);
     assert.equal(after.state, spec.nextState);
-    assert.deepEqual(messages, []);
+    if (spec.parent === 'elid_statuette_multiloc') {
+      for (const [stat, reward] of [[PlayerStat.PRAYER, 80000], [PlayerStat.THIEVING, 10000], [PlayerStat.MAGIC, 10000]]) {
+        assert.equal(p.stats[stat] - beforeStats[stat], reward * Environment.NODE_XPRATE, 'earned placement grants the period XP');
+      }
+      const qp = types.VarPlayerType.getId('qp');
+      assert.equal(p.getVar(qp), 2, 'earned placement recounts two quest points');
+      assert.equal(p.modalMain, types.Component.getId('questscroll_death'), 'earned placement opens the real scroll');
+      assert(packets.some(packet => packet instanceof IfSetText && packet.text === 'You have completed Spirits of the Elid.'));
+      assert.deepEqual(messages, ['Congratulations! Quest complete!']);
+      assert.equal(changedVars.length, 2, 'placement writes only its selector base and quest-point recount');
+      assert(changedVars.some(change => change.id === qp && change.before === 0 && change.after === 2));
+    } else {
+      assert.deepEqual(messages, []);
+      assert.equal(changedVars.length, 1, 'placement writes only its selector base');
+    }
     assert.deepEqual(overlays, []);
-    assert.equal(changedVars.length, 1, 'placement writes only its selector base');
   }
   for (const execution of executions) assert.equal(execution.activeLoc, root.id, 'original parent context');
   passed++;

@@ -199,13 +199,13 @@ try {
   });
   test('all eight selector bytes advance independently; unsupported family and unrelated varps remain exact', () => {
     const p = fresh(605);
-    const values = [6, 70, 135, 199, 13, 74, 198, 255];
+    const values = [6, 70, 135, 199, 63, 74, 198, 255];
     values.forEach((value, index) => setStage(p, value, index));
     const unrelated = id('VarPlayerType', 'option_music'); p.setVar(unrelated, 3);
     tick(p, 610);
-    assert.deepEqual(bits.map(bit => p.getVarBit(bit)), [7, 7, 199, 199, 13, 74, 198, 255]);
+    assert.deepEqual(bits.map(bit => p.getVarBit(bit)), [7, 7, 199, 199, 63, 74, 198, 255]);
     assert.equal(p.getVar(unrelated), 3);
-    const saved = player(p.save()); assert.deepEqual(bits.map(bit => saved.getVarBit(bit)), [7, 7, 199, 199, 13, 74, 198, 255]);
+    const saved = player(p.save()); assert.deepEqual(bits.map(bit => saved.getVarBit(bit)), [7, 7, 199, 199, 63, 74, 198, 255]);
   });
 } finally {
   Runner.HANDLERS[ScriptOpcode.DATE_MINUTES] = dateHandler;

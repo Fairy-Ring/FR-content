@@ -5,16 +5,18 @@
 // Greeting + 4 top opts verbatim: statue (deal / not-sure sub-menu with
 // 4-option deal menu) · wish (scary sub-menu) · dark (pleasant sub-menu) ·
 // looking. Cross-jumps (statue/wish/dark) re-enter the branch labels;
-// previous = the calling sub-menu. Again-after-deal + Sole Use = later hop.
-// Chat only. Stay %elidquest 1. No dest. No lake door retouch. No fountain.
-// No && / ||.
+// The agreed sole trade unlocks recovery after the mayor identifies the crevice.
 // Cite elid-genie-talk-leftover-377.md · Transcript:Spirits of the Elid
 // (Talking to the Genie).
 
 [opnpc1,elid_genie] @elid_genie_talk;
 
 [label,elid_genie_talk]
+if (%elidquest >= ^elid_sole_requested & %elidquest < ^elid_complete & inv_total(inv, elid_sole) > 0) {
+    @elid_genie_sole_trade;
+}
 ~chatnpc("<p,neutral>I am a mighty and powerful genie. Why do you come here? Speak now or I'll have to think of something exceedingly nasty to do to you.");
+@elid_genie_menu;
 [label,elid_genie_menu]
 def_int $g = ~p_choice4("I'm after a statue that was thrown down here.", 1, "You're a genie, grant me a wish.", 2, "Why are you sitting here in the dark?", 3, "I'm just looking around.", 4);
 if ($g = 1) {
@@ -36,6 +38,7 @@ return;
 ~chatplayer("<p,neutral>I'm after a statue that was thrown down here.");
 ~chatnpc("<p,neutral>Ahh yes someone did drop a statue on my head recently. Very nice workmanship, looks quite old and valuable too. I'm surprised someone threw it away!");
 ~chatnpc("<p,neutral>I have accepted it as a gift as they clearly respect my terrible powers. They seek to keep me at bay by giving me valuables.");
+@elid_genie_statue_menu;
 [label,elid_genie_statue_menu]
 def_int $gs = ~p_choice2("Maybe I can make a deal for it?", 1, "I'm not sure they know you're down here.", 2);
 if ($gs = 1) {
@@ -50,6 +53,7 @@ if ($gs = 1) {
 ~chatplayer("<p,neutral>Maybe I can make a deal for the statuette?");
 ~chatnpc("<p,neutral>Hmm a deal eh? I think we can come to some sort of arrangement. I'll give you the valuable statuette in return for, let me think ....");
 ~chatnpc("<p,neutral>How about I give you the statue in exchange for the sole of the mayor of Nardah?");
+@elid_genie_deal_menu;
 [label,elid_genie_deal_menu]
 def_int $gd = ~p_choice4("Isn't that a little harsh?", 1, "How am I meant to remove someone's soul?", 2, "Ok I agree to the deal.", 3, "No way am I agreeing to that.", 4);
 if ($gd = 1) {
@@ -64,6 +68,9 @@ if ($gd = 2) {
 }
 if ($gd = 3) {
     ~chatplayer("<p,neutral>Ok I agree to the deal.");
+    if (%elidquest >= ^elid_crevice_known & %elidquest < ^elid_sole_requested) {
+        %elidquest = ^elid_sole_requested;
+    }
     return;
 }
 ~chatplayer("<p,neutral>No way am I agreeing to that.");
@@ -74,6 +81,7 @@ return;
 ~chatplayer("<p,neutral>You're a genie, grant me a wish.");
 ~chatnpc("<p,neutral>Not all genies are goody two shoes who go round granting wishes. It's something that my pathetic brother does to make people like him, but that's not my style.");
 ~chatnpc("<p,neutral>I like to think of myself more as an evil and scary sort of genie, who people talk about in hushed and fearful tones.");
+@elid_genie_wish_menu;
 [label,elid_genie_wish_menu]
 def_int $gw = ~p_choice4("Well you seem quite scary.", 1, "I'm after a statue that was thrown down here.", 2, "Why are you sitting here in the dark.", 3, "Well I must be off now.", 4);
 if ($gw = 1) {
@@ -97,6 +105,7 @@ return;
 ~chatplayer("<p,neutral>Why are you sitting here in the dark?");
 ~chatnpc("<p,neutral>Two reasons really. Firstly, I can see in the dark, so light or dark makes little difference to me.");
 ~chatnpc("<p,neutral>Lastly, I gather it's normal for powerful terrifying creatures to lurk around in dark caves, so I found this one to lurk in myself, nice isn't it?");
+@elid_genie_dark_menu;
 [label,elid_genie_dark_menu]
 def_int $gd2 = ~p_choice4("Very pleasant, the snakes are a nice touch.", 1, "I'm after a statue that was thrown down here.", 2, "You're a genie, grant me a wish.", 3, "Well I must be off now.", 4);
 if ($gd2 = 1) {
