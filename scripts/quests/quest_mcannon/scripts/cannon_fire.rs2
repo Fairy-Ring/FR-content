@@ -91,6 +91,7 @@ loc_anim($seq);
 if(gettimer(cannon_rotate) > 0) settimer(cannon_rotate, 1, modulo(add($dir, 1), 8));
 
 [proc,cannon_fire]
+if (~champions_combat_check(^ranged_style) = false) return;
 if (%rockthrower < 1) {
     return;
 }

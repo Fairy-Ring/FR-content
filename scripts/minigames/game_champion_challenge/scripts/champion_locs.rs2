@@ -1,8 +1,4 @@
-// Champions’ Challenge leftover locs.
-// Surface dest = period trapdoor z±6400 (trapdoors.rs2).
-// Pit dest CANDIDATE leftover pit-loc centroid m49_152.
-// Do not open leftover 15831 / 2804.
-
+// CANDIDATE travel: original 377 trapdoor/ladder pairs, not z +/- 6400.
 [oploc1,champions_trap_door_closed]
 mes("The trapdoor opens...");
 sound_synth(door_open, 1, 0);
@@ -12,7 +8,7 @@ loc_change(champions_trap_door_open, 500);
 mes("You climb down through the trapdoor...");
 anim(human_pickupfloor, 0);
 p_delay(0);
-p_telejump(movecoord(coord(), 0, 0, 6400));
+p_telejump(^champions_basement_ladder);
 
 [oploc2,champions_trap_door_open]
 mes("You close the trapdoor.");
@@ -23,56 +19,58 @@ loc_change(champions_trap_door_closed, 500);
 mes("You climb up the ladder...");
 anim(human_reachforladder, 0);
 p_delay(0);
-p_telejump(movecoord(coord(), 0, 0, -6400));
+~champions_leave;
+p_telejump(^champions_surface);
 
-[oploc1,champions_statue_trap]
-~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>You need to arrange a challenge with me before you enter the arena.");
+[oploc1,champions_statue_trap] ~champions_enter;
+[oploc1,champions_statue_trap_open] ~champions_enter;
 
-[oploc1,champions_statue_trap_open]
+[proc,champions_enter]
+def_int $id = ~champions_current;
+if ($id = 0) {
+    ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>You need to arrange a challenge with me before you enter the arena.");
+    return;
+}
+if (~champions_won($id) = true) return;
+if ($id = 11) {
+    if (~champions_ready_for_leon = false) return;
+} else {
+    if (inv_total(inv, enum(int, obj, champions_scroll, $id)) = 0) return;
+}
+if (~champions_entry_check($id) = false) return;
+p_delay(0);
+def_int $other = 1;
+while ($other <= 11) {
+    if (npc_find(^champions_imp_spawn, enum(int, npc, champions_npc, $other), 24, 0) = true) {
+        ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>You've already got a champion waiting for you.");
+        return;
+    }
+    $other = add($other, 1);
+}
+if ($id = 2) {
+    inv_del(inv, champions_challenge_ghoul, 1);
+    ~champions_set_scroll_escrow(1);
+}
+if ($id = 6) %sa_attack = ^false;
 mes("You climb down through the trapdoor...");
 anim(human_pickupfloor, 0);
-p_delay(0);
-p_telejump(^champions_imp_spawn);
-if (inv_total(inv, champions_challenge_goblin) > 0) {
-    @champions_spawn_goblin;
-    return;
+p_telejump(^champions_arena_ladder);
+// UNKNOWN engineering spawn square: inside the packed arena, not a cache dest.
+npc_add(^champions_imp_spawn, enum(int, npc, champions_npc, $id), 1000);
+%npc_macro_event_target = uid;
+
+[oploc1,champions_portcullis]
+sound_synth(bigdoor_open, 1, 0);
+// UNKNOWN exact crossing animation; use the gate's two adjacent floor squares.
+if (coordx(coord) >= coordx(loc_coord)) {
+    p_telejump(movecoord(loc_coord, -1, 0, 0));
+} else {
+    p_telejump(movecoord(loc_coord, 1, 0, 0));
 }
-if (inv_total(inv, champions_challenge_skeleton) > 0) {
-    @champions_spawn_skeleton;
-    return;
-}
-if (inv_total(inv, champions_challenge_zombie) > 0) {
-    @champions_spawn_zombie;
-    return;
-}
-if (inv_total(inv, champions_challenge_giant) > 0) {
-    @champions_spawn_giant;
-    return;
-}
-if (inv_total(inv, champions_challenge_hobgoblin) > 0) {
-    @champions_spawn_hobgoblin;
-    return;
-}
-if (inv_total(inv, champions_challenge_ghoul) > 0) {
-    @champions_spawn_ghoul;
-    return;
-}
-if (inv_total(inv, champions_challenge_earthwarrior) > 0) {
-    @champions_spawn_earthwarrior;
-    return;
-}
-if (inv_total(inv, champions_challenge_jogre) > 0) {
-    @champions_spawn_jogre;
-    return;
-}
-if (inv_total(inv, champions_challenge_lesserdemon) > 0) {
-    @champions_spawn_lesserdemon;
-    return;
-}
-@champions_spawn_imp;
 
 [oploc1,champions_arenaladder]
 mes("You climb up the ladder...");
 anim(human_reachforladder, 0);
 p_delay(0);
+~champions_leave;
 p_telejump(^champions_gallery_stand);

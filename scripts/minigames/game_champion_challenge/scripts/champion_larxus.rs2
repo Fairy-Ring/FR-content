@@ -1,304 +1,59 @@
-// Champions’ Challenge leftover — Larxus Talk-to + Use-scroll.
-// Lines CANDIDATE last-resort 2007-base minus Changes
-// (OSRS Transcript:Larxus). Do not open leftover 15831 / 2804.
+// CANDIDATE wording: OSRS Transcript:Larxus, without later lamps or cape.
+// The ten restrictions and Leon progression are VERIFIED by Tip.it, 30 Apr 2006.
 
 [opnpc1,champions_doorman]
-if (%champions_defeated_imp = 1 & inv_total(inv, champions_challenge_imp) > 0) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    inv_del(inv, champions_challenge_imp, 1);
+if (~champions_ready_for_leon = true) {
+    ~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. <enum(int, string, champions_rule, 11)> Do you still want to proceed?");
+    if (~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2) = 1) {
+        ~champions_accept(11);
+    }
     return;
 }
-if (~champions_statue_is_open = true) {
+if (~champions_current > 0) {
     ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
     return;
 }
-if (inv_total(inv, champions_challenge_imp) > 0) {
-    def_int $c = ~p_choice3("I was given a challenge, what now?", 1, "What is this place?", 2, "Nothing thanks.", 3);
-    if ($c = 1) {
-        ~chatnpc("<p,neutral>Hand it to me, and we'll get you started.");
-        return;
-    }
-    if ($c = 2) {
-        @champions_larxus_place;
-        return;
-    }
+def_int $choice = ~p_choice2("What is this place?", 1, "Nothing thanks.", 2);
+if ($choice = 1) {
+    ~chatnpc("<p,neutral>This is the champions' arena. The champions of various races use it to duel those they deem worthy of the honour. If you find a challenge scroll in your travels, bring it here to face your challenger.");
+} else {
     ~chatplayer("<p,neutral>Nothing thanks.");
-    return;
 }
-def_int $p = ~p_choice2("What is this place?", 1, "Nothing thanks.", 2);
-if ($p = 1) {
-    @champions_larxus_place;
-    return;
-}
-~chatplayer("<p,neutral>Nothing thanks.");
-
-[label,champions_larxus_place]
-~chatnpc("<p,neutral>This is the champions' arena. The champions of various races use it to duel those they deem worthy of the honour. If you find a challenge scroll in your travels, bring it here to face your challenger.");
 
 [opnpcu,champions_doorman]
-def_obj $used = last_useitem;
-if ($used = champions_challenge_imp) {
-    @champions_accept_imp;
-    return;
-}
-if ($used = champions_challenge_goblin) {
-    @champions_accept_goblin;
-    return;
-}
-if ($used = champions_challenge_skeleton) {
-    @champions_accept_skeleton;
-    return;
-}
-if ($used = champions_challenge_zombie) {
-    @champions_accept_zombie;
-    return;
-}
-if ($used = champions_challenge_giant) {
-    @champions_accept_giant;
-    return;
-}
-if ($used = champions_challenge_hobgoblin) {
-    @champions_accept_hobgoblin;
-    return;
-}
-if ($used = champions_challenge_ghoul) {
-    @champions_accept_ghoul;
-    return;
-}
-if ($used = champions_challenge_earthwarrior) {
-    @champions_accept_earthwarrior;
-    return;
-}
-if ($used = champions_challenge_jogre) {
-    @champions_accept_jogre;
-    return;
-}
-if ($used = champions_challenge_lesserdemon) {
-    @champions_accept_lesserdemon;
-    return;
+def_int $id = 1;
+while ($id <= 10) {
+    if (last_useitem = enum(int, obj, champions_scroll, $id)) {
+        if (~champions_won($id) = true) {
+            ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
+            inv_del(inv, enum(int, obj, champions_scroll, $id), 1);
+            return;
+        }
+        if (~champions_current > 0) {
+            ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
+            return;
+        }
+        ~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. <enum(int, string, champions_rule, $id)> Do you still want to proceed?");
+        if (~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2) = 1) {
+            ~champions_accept($id);
+        } else {
+            ~chatplayer("<p,neutral>No thanks, I'll pass.");
+        }
+        return;
+    }
+    $id = add($id, 1);
 }
 ~chatnpc("<p,neutral>That's great, now go show who's interested.");
 
-[label,champions_accept_imp]
-if (%champions_defeated_imp = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_imp) > 0) {
-        inv_del(inv, champions_challenge_imp, 1);
-    }
-    return;
+[proc,champions_accept](int $id)
+if (~champions_won($id) = true) return;
+if ($id = 11) {
+    if (~champions_ready_for_leon = false) return;
+} else {
+    if (inv_total(inv, enum(int, obj, champions_scroll, $id)) = 0) return;
 }
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're not allowed to use any Special Attacks. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_goblin]
-if (%champions_defeated_goblin = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_goblin) > 0) {
-        inv_del(inv, champions_challenge_goblin, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're only allowed to use Magic attacks, no Melee or Ranged. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_skeleton]
-if (%champions_defeated_skeleton = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_skeleton) > 0) {
-        inv_del(inv, champions_challenge_skeleton, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're only allowed to use Ranged attacks, no Melee or Magic. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_zombie]
-if (%champions_defeated_zombie = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_zombie) > 0) {
-        inv_del(inv, champions_challenge_zombie, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're not allowed to use any Magic attacks. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_giant]
-if (%champions_defeated_giant = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_giant) > 0) {
-        inv_del(inv, champions_challenge_giant, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're only allowed to use Melee attacks, no Ranged or Magic. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_hobgoblin]
-if (%champions_defeated_hobgoblin = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_hobgoblin) > 0) {
-        inv_del(inv, champions_challenge_hobgoblin, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're not allowed to use any Melee attacks. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_ghoul]
-if (%champions_defeated_ghoul = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_ghoul) > 0) {
-        inv_del(inv, champions_challenge_ghoul, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're only allowed to take Weapons, no other items are allowed. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_earthwarrior]
-if (%champions_defeated_earthwarrior = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_earthwarrior) > 0) {
-        inv_del(inv, champions_challenge_earthwarrior, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're not allowed to use any Prayers. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_jogre]
-if (%champions_defeated_jogre = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_jogre) > 0) {
-        inv_del(inv, champions_challenge_jogre, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're not allowed to use any Ranged attacks. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[label,champions_accept_lesserdemon]
-if (%champions_defeated_lesserdemon = 1) {
-    ~chatnpc("<p,neutral>You've already defeated this Champion. The challenge is void.");
-    if (inv_total(inv, champions_challenge_lesserdemon) > 0) {
-        inv_del(inv, champions_challenge_lesserdemon, 1);
-    }
-    return;
-}
-if (~champions_statue_is_open = true) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
-    return;
-}
-~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. For this fight you're not allowed any Weapons or Armour. Do you still want to proceed?");
-def_int $go = ~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>No thanks, I'll pass.");
-    return;
-}
-~champions_open_statue;
-~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");
-
-[proc,champions_statue_is_open]()(boolean)
-if (loc_find(^champions_statue, champions_statue_trap_open) = true) return(true);
-if (loc_find(^champions_statue_l1, champions_statue_trap_open) = true) return(true);
-return(false);
-
-[proc,champions_open_statue]
+~champions_set_current($id);
 if (loc_find(^champions_statue, champions_statue_trap) = true) {
     loc_change(champions_statue_trap_open, 1000);
-    return;
 }
-if (loc_find(^champions_statue_l1, champions_statue_trap) = true) {
-    loc_change(champions_statue_trap_open, 1000);
-}
+~chatnpc("<p,neutral>Your challenger is ready! Please go down through the trapdoor when you're ready.");

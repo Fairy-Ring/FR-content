@@ -1,0 +1,86 @@
+[ai_queue3,champions_earthwarrior] ~champions_death(1);
+[ai_queue3,champions_ghoul] ~champions_death(2);
+[ai_queue3,champions_giant] ~champions_death(3);
+[ai_queue3,champions_goblin] ~champions_death(4);
+[ai_queue3,champions_hobgoblin] ~champions_death(5);
+[ai_queue3,champions_imp] ~champions_death(6);
+[ai_queue3,champions_jogre] ~champions_death(7);
+[ai_queue3,champions_lesserdemon] ~champions_death(8);
+[ai_queue3,champions_skeleton] ~champions_death(9);
+[ai_queue3,champions_zombie] ~champions_death(10);
+[ai_queue3,champions_human] ~champions_death(11);
+
+[proc,champions_death](int $id)
+def_player_uid $owner = %npc_macro_event_target;
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+if (uid ! $owner) return;
+if (p_finduid($owner) = true) {
+    ~champions_victory($id);
+} else {
+    queue(champions_victory_queue, 0, $id);
+}
+
+[queue,champions_victory_queue](int $id)
+~champions_victory($id);
+
+[proc,champions_victory](int $id)
+if (~champions_current ! $id | ~champions_in_arena = false | stat(hitpoints) = 0 | ~champions_won($id) = true) return;
+%champions_defeated = setbit(%champions_defeated, sub($id, 1));
+if ($id < 11 & ~champions_scroll_escrow = 0) {
+    def_obj $scroll = enum(int, obj, champions_scroll, $id);
+    if (inv_total(inv, $scroll) > 0) inv_del(inv, $scroll, 1);
+}
+~champions_set_scroll_escrow(0);
+~champions_set_current(0);
+def_int $xp = enum(int, int, champions_xp, $id);
+stat_advance(slayer, $xp);
+stat_advance(hitpoints, $xp);
+// Original 377 victory parchment. Set text directly, without borrowed XP varps.
+if_settext(defeated_the_champion:com_7, "<tostring(divide($xp, 10))> Slayer Xp");
+if_settext(defeated_the_champion:com_8, "<tostring(divide($xp, 10))> Hitpoint Xp");
+if_openmain(defeated_the_champion);
+if (~champions_ready_for_leon = true) {
+    // CANDIDATE wording: OSRS Transcript:Leon d'Cour. No later cape branch.
+    mes("You have done well brave adventurer, but I would test your mettle now. You may arrange the fight with Larxus at your leisure.");
+}
+
+[proc,champions_remove_opponent]
+if (~champions_current = 0) return;
+if (npc_find(^champions_imp_spawn, enum(int, npc, champions_npc, ~champions_current), 24, 0) = true) {
+    if (%npc_macro_event_target = uid) npc_del;
+}
+
+[proc,champions_leave]
+~champions_remove_opponent;
+if (~champions_scroll_escrow = 1) {
+    // CANDIDATE: retreat does not consume the scroll (OSRS Challenge rules).
+    // Returning before ordinary death allocation gives it no item protection.
+    if (inv_freespace(inv) > 0) {
+        inv_add(inv, champions_challenge_ghoul, 1);
+    } else {
+        obj_add(coord, champions_challenge_ghoul, 1, ^lootdrop_duration);
+    }
+    ~champions_set_scroll_escrow(0);
+}
+~champions_set_current(0);
+clearqueue(champions_victory_queue);
+
+[proc,champions_login]
+// An interrupted fight cannot resume against a missing opponent.
+if (~champions_in_arena = true) p_telejump(^champions_gallery_stand);
+~champions_leave;
+
+[proc,champions_player_death]
+// VERIFIED High Risk: Tip.it 30 April 2006. Exact death allocation UNKNOWN:
+// retain the revision's ordinary keep/drop rule, with no safe death or grave.
+if (~champions_current > 0 & ~champions_in_arena = true) ~champions_leave;
+
+[ai_queue3,ghoul]
+// Preserve the published generic ghoul death and ordinary drop unchanged.
+gosub(npc_default_death);
+if (npc_findhero = ^true & random(^champion_scroll_chance) = 0) {
+    // CANDIDATE: OSRS Ghoul champion scroll; same inherited rate as the races.
+    // The period rate is UNKNOWN; retain this unit's inherited 1/5000.
+    obj_add(npc_coord, champions_challenge_ghoul, 1, ^lootdrop_duration);
+}

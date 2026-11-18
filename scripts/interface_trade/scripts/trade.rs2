@@ -260,6 +260,7 @@ if (.finduid(%tradepartner) = true) {
 %tradepartner = null;
 
 [if_button,tradeconfirm:accept]
+if (~champions_inventory_check = false) return;
 %tradestatus = ^tradestatus_pending_confirm;
 
 if (.finduid(%tradepartner) = true) {

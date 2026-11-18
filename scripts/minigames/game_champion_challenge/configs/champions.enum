@@ -1,0 +1,63 @@
+// Index = original banner bit + 1. The human scroll is not an entry item.
+[champions_npc]
+inputtype=int
+outputtype=npc
+val=1,champions_earthwarrior
+val=2,champions_ghoul
+val=3,champions_giant
+val=4,champions_goblin
+val=5,champions_hobgoblin
+val=6,champions_imp
+val=7,champions_jogre
+val=8,champions_lesserdemon
+val=9,champions_skeleton
+val=10,champions_zombie
+val=11,champions_human
+
+[champions_scroll]
+inputtype=int
+outputtype=obj
+val=1,champions_challenge_earthwarrior
+val=2,champions_challenge_ghoul
+val=3,champions_challenge_giant
+val=4,champions_challenge_goblin
+val=5,champions_challenge_hobgoblin
+val=6,champions_challenge_imp
+val=7,champions_challenge_jogre
+val=8,champions_challenge_lesserdemon
+val=9,champions_challenge_skeleton
+val=10,champions_challenge_zombie
+
+// VERIFIED: Tip.it capture 30 April 2006, updated 1 March 2006.
+// Both skills receive this amount. Engine stat_advance uses tenths of XP.
+[champions_xp]
+inputtype=int
+outputtype=int
+val=1,4320
+val=2,4000
+val=3,2800
+val=4,1280
+val=5,2320
+val=6,1600
+val=7,4800
+val=8,5920
+val=9,2320
+val=10,2400
+val=11,4420
+
+// CANDIDATE wording: OSRS Transcript:Larxus, excluding later lamp/cape branches.
+// The restrictions themselves are VERIFIED by the retained 2006 Tip.it guide.
+[champions_rule]
+inputtype=int
+outputtype=string
+val=1,For this fight you're not allowed to use any Prayers.
+val=2,For this fight you're only allowed to take Weapons, no other items are allowed.
+val=3,For this fight you're only allowed to use Melee attacks, no Ranged or Magic.
+val=4,For this fight you're only allowed to use Magic attacks, no Melee or Ranged.
+val=5,For this fight you're not allowed to use any Melee attacks.
+val=6,For this fight you're not allowed to use any Special Attacks.
+val=7,For this fight you're not allowed to use any Ranged attacks.
+val=8,For this fight you're not allowed any Weapons or Armour.
+val=9,For this fight you're only allowed to use Ranged attacks, no Melee or Magic.
+val=10,For this fight you're not allowed to use any Magic attacks.
+val=11,For this fight you're only allowed to use items that you have equipped, nothing from your inventory.
