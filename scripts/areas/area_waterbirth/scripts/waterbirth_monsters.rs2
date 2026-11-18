@@ -1,5 +1,7 @@
-// VERIFIED styles: Sal's Waterbirth Island guide, 29 April 2006.
+// VERIFIED styles: Sal's Dagannoth Hunting guide, 29 April 2006.
 // CANDIDATE max hits: exact Waterbirth Old School forms, later weakness omitted.
+// UNKNOWN original projectile bindings: retain borrowed horror_spines_travel
+// and Water Wave presentation; cache effects 473-477 have no clear NPC match.
 [ai_queue1,dungeon_dagganoth_lighter] ~npc_default_retaliate_ap;
 [ai_queue1,dungeon_dagganoth_lighter_deeper] ~npc_default_retaliate_ap;
 [ai_opplayer2,dungeon_dagganoth_lighter] npc_setmode(applayer2);
@@ -8,7 +10,6 @@
 [ai_applayer2,dungeon_dagganoth_lighter_deeper] ~waterbirth_dagannoth_rangeattack;
 
 // Ordinary forms use native ranged accuracy, not the quest's unconditional roll.
-// UNKNOWN projectile provenance: presentation is still borrowed from Horror.
 [proc,waterbirth_dagannoth_rangeattack]
 if (%npc_action_delay > map_clock) {
     npc_setmode(applayer2);

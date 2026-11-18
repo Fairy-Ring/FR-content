@@ -1,0 +1,6 @@
+// Proximity is a native player hunt; do not replace its normal player/combat policy.
+[waterbirth_egg_proximity]
+type=player
+check_vis=lineofsight
+find_keephunting=off
+find_newmode=queue4
