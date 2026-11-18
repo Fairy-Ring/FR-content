@@ -171,6 +171,7 @@ data=loot,diamond,1,1,1
 data=loot,fire_orb,1,1,2
 data=loot,gold_ore,1,1,1
 data=loot,unicorn_horn,1,1,1
+// CANDIDATE identity: the period guide's dark wizard robe maps to cache black_robe.
 data=loot,black_robe,1,1,1
 data=pocket,elf's pocket
 data=loot_total,130
