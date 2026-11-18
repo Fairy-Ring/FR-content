@@ -28,6 +28,9 @@ const rsbuf = await engineModule('network/rsbuf/index.ts');
 const { PlayerInfoProt } = await engineModule('network/rsbuf/prot.ts');
 const OpPlayer = (await engineModule('network/game/client/model/OpPlayer.ts')).default;
 const OpPlayerHandler = new (await engineModule('network/game/client/handler/OpPlayerHandler.ts')).default();
+const MidiSong = (await engineModule('network/game/server/model/MidiSong.ts')).default;
+const DbTableIndex = (await engineModule('cache/config/DbTableIndex.ts')).default;
+
 
 
 const QUEST_CONFIG = path.join(contentRoot, 'scripts/quests/quest_soulbane/configs/soulbane.constant');
@@ -81,6 +84,140 @@ function requiredId(kind, name) {
   const value = id(kind, name);
   assert(value >= 0, `packed ${kind} contains ${name}`);
   return value;
+}
+
+const MUSIC_TABLE = types.DbTableType.get(requiredId('DbTableType', 'music'));
+const MUSIC_REGION_TABLE = types.DbTableType.get(requiredId('DbTableType', 'musicregion'));
+const MUSIC_UNLOCK_VARS = Array.from({ length: types.VarPlayerType.count }, (_, id) =>
+  types.VarPlayerType.get(id)?.debugname ?? '')
+  .map(name => ({ name, match: name.match(/^musicmulti_(\d+)$/) }))
+  .filter(({ match }) => match)
+  .map(({ name, match }) => ({ name, slot: Number(match[1]) }))
+  .sort((a, b) => a.slot - b.slot);
+assert(MUSIC_UNLOCK_VARS.length > 0, 'built cache exposes original music unlock varps');
+
+function dbField(row, table, name) {
+  const index = table.columnNames.indexOf(name);
+  assert(index >= 0, `built ${table.debugname ?? 'database'} table declares ${name}`);
+  return row.columnValues[index];
+}
+function musicSongFromRow(row, label) {
+  assert(row, `${label}: built music dbrow exists`);
+  const name = dbField(row, MUSIC_TABLE, 'name')?.[0];
+  const track = dbField(row, MUSIC_TABLE, 'track')?.[0];
+  assert.equal(typeof name, 'string', `${label}: music dbrow has its authored name`);
+  assert(Number.isInteger(track), `${label}: music dbrow supplies a compiled MIDI track`);
+  const unlock = dbField(row, MUSIC_TABLE, 'unlock');
+  const [slot, bit] = Array.isArray(unlock) ? unlock : [];
+  let unlockVar = null;
+  if (slot != null || bit != null) {
+    assert(Number.isInteger(slot) && Number.isInteger(bit) && bit >= 0 && bit < 32,
+      `${label}: music dbrow unlock is a valid original music slot/bit`);
+    unlockVar = `musicmulti_${slot}`;
+    assert(MUSIC_UNLOCK_VARS.some(variable => variable.name === unlockVar),
+      `${label}: built cache exposes ${unlockVar}`);
+  }
+  return { name, track, unlockVar, unlockBit: bit ?? null };
+}
+function musicSongByName(name) {
+  return musicSongFromRow(types.DbRowType.get(requiredId('DbRowType', name)), name);
+}
+function musicSongForRowId(rowId, label) {
+  assert(Number.isInteger(rowId) && rowId >= 0, `${label}: music row reference exists`);
+  return musicSongFromRow(types.DbRowType.get(rowId), label);
+}
+const RAGE_SONG = musicSongByName('music_Wrath_and_Ruin');
+const FEAR_SONG = musicSongByName('music_Fear_and_Loathing');
+const MANUAL_PREVIOUS_SONG = musicSongByName('music_Book_Of_Spells');
+assert.equal(RAGE_SONG.name, 'Wrath and Ruin', 'Rage music row names the source-backed track');
+assert.equal(FEAR_SONG.name, 'Fear and Loathing', 'Fear music row names the source-backed track');
+
+function musicUnlockSnapshot(p) {
+  return MUSIC_UNLOCK_VARS.map(({ name }) => readVar(p, name) >>> 0);
+}
+function musicUnlockBit(snapshot, song) {
+  assert(song.unlockVar, `${song.name}: built music row defines an original unlock bit`);
+  const index = MUSIC_UNLOCK_VARS.findIndex(variable => variable.name === song.unlockVar);
+  assert(index >= 0, `${song.name}: original unlock varp is inventoried`);
+  return (snapshot[index] >>> song.unlockBit) & 1;
+}
+function assertMusicUnlockTransition(p, before, song, label) {
+  const expected = before.slice();
+  if (song.unlockVar) {
+    const index = MUSIC_UNLOCK_VARS.findIndex(variable => variable.name === song.unlockVar);
+    assert(index >= 0, `${label}: ${song.name} unlock varp is inventoried`);
+    expected[index] = (expected[index] | (1 << song.unlockBit)) >>> 0;
+  }
+  assert.deepEqual(musicUnlockSnapshot(p), expected,
+    `${label}: only the music dbrow's original cache bit is unlocked`);
+  if (song.unlockVar) assert.equal(musicUnlockBit(expected, song), 1, `${label}: ${song.name} is unlocked`);
+}
+function musicTracksSince(p, mark) {
+  return p.packets.slice(mark).filter(packet => packet instanceof MidiSong).map(packet => packet.id);
+}
+function beginRoomMusicObservation(p, song, mode, label, {
+  requireLocked = false, requireUnlocked = false, previousTrack = null
+} = {}) {
+  assert(mode === 0 || mode === 1, `${label}: native music mode is Auto or Manual`);
+  writeVar(p, 'musicplay', mode);
+  if (previousTrack != null) {
+    assert.notEqual(previousTrack, song.track, `${label}: manual prior playback differs from the room song`);
+    runProc('music_play', p, [previousTrack]);
+  }
+  const before = musicUnlockSnapshot(p);
+  if (requireLocked) assert.equal(musicUnlockBit(before, song), 0, `${label}: target cache bit begins locked`);
+  if (requireUnlocked) assert.equal(musicUnlockBit(before, song), 1, `${label}: target cache bit was already unlocked`);
+  return {
+    song,
+    mode,
+    before,
+    mark: p.packets.length,
+    previousTrack: readVar(p, 'currentsong')
+  };
+}
+function assertRoomMusicObservation(p, observed, label) {
+  const expectedTracks = observed.mode === 1 ? [observed.song.track] : [];
+  assert.deepEqual(musicTracksSince(p, observed.mark), expectedTracks,
+    `${label}: compiled entry obeys ${observed.mode === 1 ? 'Auto' : 'Manual'} music mode`);
+  assert.equal(readVar(p, 'currentsong'),
+    observed.mode === 1 ? observed.song.track : observed.previousTrack,
+  `${label}: current song follows the mode without changing Manual playback`);
+  assert.equal(readVar(p, 'musicplay'), observed.mode, `${label}: entry preserves Auto/Manual mode`);
+  assertMusicUnlockTransition(p, observed.before, observed.song, label);
+}
+function musicRegionSongAt(level, x, z) {
+  const mapX = (x >> 6) << 6;
+  const mapZ = (z >> 6) << 6;
+  const key = CoordGrid.packCoord(0, mapX, mapZ);
+  const mapsquare = MUSIC_REGION_TABLE.columnNames.indexOf('mapsquare');
+  assert(mapsquare >= 0, 'built musicregion table indexes mapsquare');
+  const rowIds = DbTableIndex.find(key, (MUSIC_REGION_TABLE.id << 12) | (mapsquare << 4));
+  assert.equal(rowIds.length, 1, `surface map square ${mapX >> 6}_${mapZ >> 6} has one compiled musicregion row`);
+  const region = types.DbRowType.get(rowIds[0]);
+  const songRowId = dbField(region, MUSIC_REGION_TABLE, 'musicdata')?.[0];
+  return musicSongForRowId(songRowId, `surface musicregion ${mapX >> 6}_${mapZ >> 6}`);
+}
+function assertSurfaceMapzoneMusic(p, mark, before, label) {
+  const song = musicRegionSongAt(p.level, p.x, p.z);
+  assert.deepEqual(musicTracksSince(p, mark), [song.track],
+    `${label}: ordinary surface mapzone sends the region dbrow's MIDI command`);
+  assert.equal(readVar(p, 'currentsong'), song.track,
+    `${label}: ordinary surface mapzone sets the region dbrow's song`);
+  assertMusicUnlockTransition(p, before, song, `${label}: ordinary surface mapzone`);
+  return song;
+}
+function operateSurfaceExit(p, exit, choices, label) {
+  goToStand(p, exit, `${label}: walk to the original surface Exit`);
+  writeVar(p, 'musicplay', 1);
+  const exitMark = p.packets.length;
+  const result = operateLoc(p, exit, 1, choices, label);
+  assert.deepEqual(musicTracksSince(p, exitMark), [],
+    `${label}: quest exit leaves song selection to the ordinary mapzone phase`);
+  const mapzoneMark = p.packets.length;
+  const unlocksBeforeMapzone = musicUnlockSnapshot(p);
+  worldTick();
+  assertSurfaceMapzoneMusic(p, mapzoneMark, unlocksBeforeMapzone, label);
+  return result;
 }
 function variable(name) {
   const bit = types.VarBitType.getId(name);
@@ -582,14 +719,20 @@ function finishRageScene(p) {
   return pages.join(' ');
 }
 
-function chooseRiftWithRope(p, label) {
+function chooseRiftWithRope(p, label, {
+  musicMode = 1, requireLocked = false, requireUnlocked = false, previousTrack = null
+} = {}) {
+  const song = stage(p) >= FEAR_STAGE ? FEAR_SONG : RAGE_SONG;
   const rift = riftLoc();
   goToStand(p, rift, `${label}: walk to actual rift floor`);
+  const observation = beginRoomMusicObservation(p, song, musicMode, label,
+    { requireLocked, requireUnlocked, previousTrack });
   const result = operateLoc(p, rift, 1, [], `${label}: use Climb-down on rift`);
   assert.match(result.trigger.name, /^\[oploc1,soulbane_falloff2_rope(?:_multi)?\]$/,
     `${label}: descent dispatch uses the rope-visible floor form`);
   assert(stage(p) >= 2, `${label}: descent runs the compiled Rage admission`);
   assert.notEqual(instanceUid(p), 0, `${label}: descent creates a private region`);
+  assertRoomMusicObservation(p, observation, label);
   return result;
 }
 function seedStageOneOwner(p, label) {
@@ -600,6 +743,30 @@ function seedStageOneOwner(p, label) {
   assert.equal(readVar(p, 'soulbane_riftrope_pres'), 1, `${label}: disclosed attached-rope seed is present`);
   chooseRiftWithRope(p, label);
   assert.equal(stage(p), 2, `${label}: native descent creates Rage stage 2`);
+}
+function testManualRoomMusicEntries() {
+  for (const fixture of [
+    { stage: 1, song: RAGE_SONG, label: 'manual first Rage entry' },
+    { stage: FEAR_STAGE, song: FEAR_SONG, label: 'manual first Fear entry' }
+  ]) {
+    const p = playerFixture();
+    writeVar(p, 'soulbane_prog', fixture.stage);
+    writeVar(p, 'soulbane_riftrope_pres', 1);
+    assert.equal(stage(p), fixture.stage, `${fixture.label}: disclosed entry-boundary seed`);
+    assert.equal(readVar(p, 'soulbane_riftrope_pres'), 1, `${fixture.label}: attached-rope seed`);
+    assert.notEqual(fixture.song.track, MANUAL_PREVIOUS_SONG.track,
+      `${fixture.label}: the prior real track differs from the room song`);
+    chooseRiftWithRope(p, fixture.label, {
+      musicMode: 0,
+      requireLocked: true,
+      previousTrack: MANUAL_PREVIOUS_SONG.track
+    });
+    if (fixture.stage === 1) {
+      assert.equal(stage(p), 2, `${fixture.label}: native Rage admission advances stage 1`);
+    } else {
+      assertFearFreshEntry(p, fixture.label);
+    }
+  }
 }
 
 function latestQuestColor(p) {
@@ -1128,9 +1295,8 @@ function testStageTwoLeaveAndLogout(mainOwner) {
   assert.equal(instanceUid(p), originalUid, 'No leaves the current owned copy active');
   assert.equal(rageNpcsFor(p).length, 8, 'No does not remove the current owner\'s NPCs');
 
-  goToStand(p, quit, 'stage-2 quit Yes: return to actual exit loc');
-  operateLoc(p, quit, 1, [1], 'stage-2 quit Yes choice');
-  worldTick();
+  const yes = operateSurfaceExit(p, quit, [1], 'stage-2 quit Yes choice');
+  assert.match(yes.trigger.name, /^\[oploc1,soul_bane_awall_void_small\]$/);
   assert.equal(stage(p), 2, 'leaving Rage does not fabricate completion');
   assert.equal(instanceUid(p), 0, 'Yes closes the unfinished private region');
   assertNoAngerItems(p, 'stage-2 leave cleanup');
@@ -1138,7 +1304,7 @@ function testStageTwoLeaveAndLogout(mainOwner) {
   assert.equal(rageNpcsWithInstance(originalUid).length, 0, 'stage-2 leave removes every owned Rage actor');
   assert(!CoordGrid.isInstanceX(p.x), 'stage-2 leave returns to an overworld coordinate');
 
-  chooseRiftWithRope(p, 'stage-2 re-entry after confirmed leave');
+  chooseRiftWithRope(p, 'stage-2 re-entry after confirmed leave', { requireUnlocked: true });
   assert.equal(stage(p), 2, 'stage-2 re-entry preserves unfinished progress');
   assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'stage-2 re-entry starts a fresh temporary meter');
   assert.equal(rageNpcsFor(p).length, 8, 'stage-2 re-entry owns a fresh set of Rage actors');
@@ -1314,7 +1480,7 @@ function assertFearFreshEntry(p, label) {
   assertNoAngerItems(p, label);
 }
 function enterFearAfterRift(p, label) {
-  chooseRiftWithRope(p, label);
+  chooseRiftWithRope(p, label, { requireUnlocked: true });
   assertFearFreshEntry(p, label);
   assert.equal(rageNpcsFor(p).length, 0, `${label}: Fear re-entry never respawns Rage actors`);
 }
@@ -1383,8 +1549,7 @@ function finishFearScene(p) {
 }
 function leaveFearToSurface(p, label, choices = [1]) {
   const exit = fearSurfaceExitLoc(p);
-  goToStand(p, exit, `${label}: walk to the original surface Exit`);
-  const result = operateLoc(p, exit, 1, choices, label);
+  const result = operateSurfaceExit(p, exit, choices, label);
   assert.match(result.trigger.name, /^\[oploc1,soul_bane_fwall_void_small\]$/,
     `${label}: uses the original Fear surface Exit loc`);
   return result;
@@ -1439,7 +1604,7 @@ function testFearProgression(p, stageThreeColor) {
   const qpBeforeFear = readVar(p, 'qp');
   const coinsBeforeFear = count(p, 'coins');
   const xpBeforeFear = xpSnapshot(p);
-  chooseRiftWithRope(p, 'completed Rage re-entry before Fear');
+  chooseRiftWithRope(p, 'completed Rage re-entry before Fear', { requireUnlocked: true });
   assert.equal(stage(p), 3, 'Rage completion survives the real rift re-entry before the next room');
   assert.equal(rageNpcsFor(p).length, 0, 'completed Rage re-entry does not respawn its monsters');
   assert.equal(latestQuestColor(p), stageThreeColor, 'completed Rage remains the active quest before Fear');
@@ -1447,9 +1612,12 @@ function testFearProgression(p, stageThreeColor) {
   const rageUid = instanceUid(p);
   const boundary = rageFearBoundaryLoc(p);
   goToStand(p, boundary, 'stage-3 transition: walk to the original eastern Fear exit');
+  const fearMusicObservation = beginRoomMusicObservation(p, FEAR_SONG, 1,
+    'first Fear room entry', { requireLocked: true });
   const transition = operateLoc(p, boundary, 1, [], 'stage-3 transition into Fear');
   assert.equal(transition.trigger.name, '[oploc1,soul_bane_awall_void_exit]',
     'Rage-to-Fear transition uses the original eastern boundary loc');
+  assertRoomMusicObservation(p, fearMusicObservation, 'first Fear room entry');
   assert.equal(stage(p), FEAR_STAGE, 'the real next-room exit enters active Fear stage 4');
   assert.equal(instanceUid(p), rageUid, 'Rage-to-Fear transition stays inside the owner\'s private copy');
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), 'the eastern boundary lands at the packed Fear entry');
@@ -1595,8 +1763,7 @@ function testFearProgression(p, stageThreeColor) {
   const completeInventory = normalInventory(p);
   const completeXp = xpSnapshot(p);
   const completedSurface = fearSurfaceExitLoc(p);
-  goToStand(p, completedSurface, 'stage-5 leave: walk from the black-hole side to the surface Exit');
-  const leave = operateLoc(p, completedSurface, 1, [], 'stage-5 completed surface exit');
+  const leave = operateSurfaceExit(p, completedSurface, [], 'stage-5 completed surface exit');
   assert.equal(leave.trigger.name, '[oploc1,soul_bane_fwall_void_small]',
     'completed Fear leaves through the original surface Exit loc');
   assertFearCompleteExit(p, completeUid, surfaceTile(), completeInventory, 'completed Fear surface exit');
@@ -1605,7 +1772,7 @@ function testFearProgression(p, stageThreeColor) {
   assert.equal(count(p, 'coins'), coinsBeforeFear, 'completed Fear still grants no coins');
 
   const completeXpBeforeReentry = xpSnapshot(p);
-  chooseRiftWithRope(p, 'completed Fear surface-descent re-entry');
+  chooseRiftWithRope(p, 'completed Fear surface-descent re-entry', { requireUnlocked: true });
   assertFearCompleteEntry(p, 'completed Fear surface-descent re-entry');
   for (let tick = 0; tick < 32; tick++) worldTick();
   assert.equal(p.queue.head(), null, 'completed Fear re-entry queues no duplicate scene');
@@ -1636,7 +1803,7 @@ function testFearProgression(p, stageThreeColor) {
   assertJournal(p, ['overcome fear in the second room', 'exit has been illuminated',
     'haven\'t actually ventured through yet.'], ['Tolna has been rescued', 'Soulbane is complete'],
   'post-login stage-5 Fear journal');
-  chooseRiftWithRope(p, 'completed Fear re-entry after logout');
+  chooseRiftWithRope(p, 'completed Fear re-entry after logout', { requireUnlocked: true });
   assertFearCompleteEntry(p, 'completed Fear re-entry after logout');
   for (let tick = 0; tick < 32; tick++) worldTick();
   assert.equal(p.queue.head(), null, 'completed post-logout re-entry does not replay the Fear scene');
@@ -1931,7 +2098,7 @@ function testMainPath() {
   finishInteraction(p, [], 'attach the purchased rope at the real rift');
   assert.equal(count(p, 'rope'), 0, 'compiled rope attachment consumes the purchased rope');
   assert.equal(readVar(p, 'soulbane_riftrope_pres'), 1, 'compiled rope attachment writes the permanent rift state');
-  chooseRiftWithRope(p, 'main compiled descent');
+  chooseRiftWithRope(p, 'main compiled descent', { requireLocked: true });
   assert.equal(stage(p), 2, 'native descent advances accepted quest to Rage stage 2');
   assert.notEqual(instanceUid(p), 0, 'native descent stores a temporary region UID');
   const entry = roomCoord(p, 'soulbane_rage_entry');
@@ -2023,14 +2190,13 @@ function testMainPath() {
   const completedActorsBeforeLeave = rageNpcsFor(p).length;
   assert(completedActorsBeforeLeave === 0, 'completed room removes its Rage attackers');
   const quit = quitLoc(p);
-  goToStand(p, quit, 'stage-3 leave: walk to the actual room-exit loc');
-  const leave = operateLoc(p, quit, 1, [], 'stage-3 direct exit without a restart prompt');
+  const leave = operateSurfaceExit(p, quit, [], 'stage-3 direct exit without a restart prompt');
   assert.match(leave.trigger.name, /^\[oploc1,soul_bane_awall_void_small\]$/);
   assert.equal(stage(p), 3, 'stage-3 leave preserves completed progress');
   assert.equal(instanceUid(p), 0, 'stage-3 leave closes the private region');
   assert(!CoordGrid.isInstanceX(p.x), 'stage-3 leave returns to the overworld');
 
-  chooseRiftWithRope(p, 'stage-3 completed-room re-entry');
+  chooseRiftWithRope(p, 'stage-3 completed-room re-entry', { requireUnlocked: true });
   assert.equal(stage(p), 3, 'completed stage remains complete after re-entry');
   assert.equal(rageNpcsFor(p).length, 0, 'stage-3 re-entry does not respawn empty Rage attackers');
   assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'stage-3 re-entry does not restore an unfinished Rage meter');
@@ -2088,6 +2254,7 @@ function run() {
   testTradeEscapeRoute();
   testDropEscapeRoute();
   testRoomExitRemovesAngerWeapon();
+  testManualRoomMusicEntries();
   console.log('PASS Soulbane compiled regression: Rage and Fear progression, native combat, ownership, saved boundaries, lifecycle and escape routes');
   console.log(JSON.stringify({ stageTwoColor: main.stageTwoColor, stageThreeColor: main.stageThreeColor, attackXp: main.reward }));
 }

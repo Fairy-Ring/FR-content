@@ -23,6 +23,7 @@ if (%soulbane_prog >= 4) {
     return;
 }
 p_teleport(~soulbane_room_coord(^soulbane_rage_entry));
+~music_playbyrow(music_Wrath_and_Ruin);
 if (%soulbane_prog = 1) {
     %soulbane_prog = 2;
     ~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);

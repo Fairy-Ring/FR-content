@@ -8,6 +8,7 @@ if (add(region_uid, 1) ! %soulbane_instance) return;
 def_boolean $first = false;
 if (%soulbane_prog = 3) $first = true;
 p_teleport(~soulbane_room_coord(^soulbane_fear_entry));
+~music_playbyrow(music_Fear_and_Loathing);
 ~soulbane_clear_room_npcs;
 ~soulbane_clear_weapons;
 %soulbane_anger_weaponmulti = 0;
