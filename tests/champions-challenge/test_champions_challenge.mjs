@@ -13,6 +13,8 @@ import {
 const { Interaction } = await engineModule('engine/entity/Interaction.ts');
 const { default: IfButton } = await engineModule('network/game/client/model/IfButton.ts');
 const { default: IfButtonHandler } = await engineModule('network/game/client/handler/IfButtonHandler.ts');
+const { default: ResumePauseButton } = await engineModule('network/game/client/model/ResumePauseButton.ts');
+const { default: ResumePauseButtonHandler } = await engineModule('network/game/client/handler/ResumePauseButtonHandler.ts');
 const { default: OpObj } = await engineModule('network/game/client/model/OpObj.ts');
 const { default: OpObjHandler } = await engineModule('network/game/client/handler/OpObjHandler.ts');
 const { default: OpLoc } = await engineModule('network/game/client/model/OpLoc.ts');
@@ -47,10 +49,11 @@ const arenaSpawn = { level: 0, x: arenaOriginX + 32, z: arenaOriginZ + 30 };
 const arenaEntry = { level: 0, x: arenaOriginX + 47, z: arenaOriginZ + 29 };
 const gallery = { level: 0, x: arenaOriginX + 49, z: arenaOriginZ + 30 };
 const statue = { level: 0, x: arenaOriginX + 48, z: arenaOriginZ + 30 };
-const basementLadder = { level: 0, x: arenaOriginX + 54, z: arenaOriginZ + 29 };
+const arenaLadder = { level: 0, x: arenaOriginX + 47, z: arenaOriginZ + 30 };
 const larxus = { level: 0, x: 49 * 64 + 51, z: 52 * 64 + 30 };
 const surfaceApproach = { level: 0, x: 49 * 64 + 50, z: 52 * 64 + 30 };
 const dialogue = new IfButtonHandler();
+const continueDialogue = new ResumePauseButtonHandler();
 const locHandler = new OpLocHandler();
 const styleFile = path.join(contentRoot, 'scripts/skill_combat/configs/combat_damagetypes.constant');
 const spellFile = path.join(contentRoot, 'scripts/skill_combat/configs/magic/spells.constant');
@@ -112,6 +115,12 @@ function setChallenge(challenge, position = arenaSpawn, raw = 0) {
   setCurrent(challenge);
 }
 function addItem(itemId, amount = 1, inv = inventory) {
+  if (inv === worn) {
+    const type = types.ObjType.get(itemId);
+    assert(type.wearpos >= 0, `${type.debugname} has a worn slot`);
+    player.getInventory(worn).set(type.wearpos, { id: itemId, count: amount });
+    return;
+  }
   assert.equal(player.invAdd(inv, itemId, amount), amount, `add ${types.ObjType.get(itemId).debugname}`);
 }
 function standNear(entity) {
@@ -147,8 +156,29 @@ function standNearLoc(loc) {
 function mapBlocked(x, z, level) {
   return map.isMapBlocked(x, z, level);
 }
+function advanceDialogue(state, label) {
+  assert(state, `${label} has an active script`);
+  for (let page = 0; page < 20; page++) {
+    assert.notEqual(state.execution, ScriptState.ABORTED, `${label} did not abort`);
+    if (state.execution === ScriptState.FINISHED) return;
+    if (state.execution !== ScriptState.PAUSEBUTTON) {
+      finishPlayer(player, state, label);
+      return;
+    }
+    const root = types.Component.get(player.modalChat);
+    if (/^multi[2-5]$/.test(root.comName)) return;
+    const buttons = Array.from(root.childId ?? []).filter(com =>
+      types.Component.get(com).buttonType === types.Component.PAUSE_BUTTON
+    );
+    assert.equal(buttons.length, 1, `${label} has one native Continue button`);
+    assert(player.isComponentVisible(types.Component.get(buttons[0])), `${label} Continue is visible`);
+    assert(continueDialogue.handle(new ResumePauseButton(buttons[0]), player), `${label} continues through the real packet handler`);
+  }
+  assert.fail(`${label} exceeded the bounded dialogue pages`);
+}
 function chooseDialogue(option) {
   const state = player.activeScript;
+  advanceDialogue(state, 'before choice');
   assert.equal(state?.execution, ScriptState.PAUSEBUTTON, 'production dialogue is awaiting a choice');
   const root = types.Component.get(player.modalChat).comName;
   assert.match(root, /^multi[2-5]$/, `choice component ${root}`);
@@ -156,9 +186,7 @@ function chooseDialogue(option) {
   assert(player.resumeButtons.includes(buttonId), `${root} offered option ${option}`);
   assert(dialogue.handle(new IfButton(buttonId), player), 'choice is accepted by the real component handler');
   assert.notEqual(state.execution, ScriptState.ABORTED, 'dialogue choice did not abort');
-  if (state.execution !== ScriptState.FINISHED && state.execution !== ScriptState.PAUSEBUTTON) {
-    finishPlayer(player, state, `choice ${option}`);
-  }
+  advanceDialogue(state, `after choice ${option}`);
   assert.equal(state.execution, ScriptState.FINISHED, `choice ${option} completes the production trigger`);
 }
 function locByBase(name, position) {
@@ -374,7 +402,7 @@ test('real item-on-Larxus, packed trapdoor and ladder preserve the Ghoul scroll 
   assert.equal(spawned.length, 1, 'the packed entry trigger creates the Ghoul at the configured spawn');
 
   const ladder = findWorldLoc('champions_arenaladder', arenaArea).find(loc =>
-    loc.level === basementLadder.level && loc.x === basementLadder.x && loc.z === basementLadder.z
+    loc.level === arenaLadder.level && loc.x === arenaLadder.x && loc.z === arenaLadder.z
   );
   assert(ladder, 'native basement ladder is present at the effective level-0 tile');
   clickLoc(ladder);
@@ -458,7 +486,14 @@ test('equipment, pickup, food, prayer and teleport shared hooks refuse only thei
   assert.equal(booleanProc('champions_entry_check', [1]), false, 'active prayer blocks Earth Warrior entry');
 
   const arenaCoord = CoordGrid.packCoord(arenaSpawn.level, arenaSpawn.x, arenaSpawn.z);
-  assert.equal(booleanProc('pre_tele_checks_no_ana', [arenaCoord]), false, 'real shared teleport precheck refuses arena departure');
+  const teleportScript = ScriptProvider.getByName('[proc,pre_tele_checks_no_ana]');
+  assert(teleportScript, 'real shared teleport precheck exists');
+  const teleportState = ScriptRunner.init(teleportScript, player, null, [arenaCoord]);
+  player.executeScript(teleportState, true, true);
+  assert.equal(teleportState.execution, ScriptState.PAUSEBUTTON, 'arena teleport refusal opens Larxus dialogue');
+  advanceDialogue(teleportState, 'arena teleport refusal');
+  finishPlayer(player, teleportState, 'arena teleport refusal');
+  assert.equal(stack(teleportState).at(-1), 0, 'real shared teleport precheck refuses arena departure');
   fresh(surfaceApproach);
   const outsideCoord = CoordGrid.packCoord(surfaceApproach.level, surfaceApproach.x, surfaceApproach.z);
   assert.equal(booleanProc('pre_tele_checks_no_ana', [outsideCoord]), true, 'the same teleport guard is inert outside the arena');
@@ -646,5 +681,5 @@ player.clearInteraction();
 console.log(`CHAMPIONS_CHALLENGE_PASS=${passed}`);
 if (failures.length > 0) {
   console.error(`CHAMPIONS_CHALLENGE_FAIL=${failures.length}`);
-  process.exitCode = 1;
 }
+process.exit(failures.length ? 1 : 0);

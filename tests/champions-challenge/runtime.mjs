@@ -66,7 +66,6 @@ export const inventoryComponent = id('Component', 'inventory:inv');
 export const wornComponent = id('Component', 'wornitems:worn');
 
 let nextPlayerSlot = 1;
-let nextNpcId = 1;
 export function makePlayer(position = { level: 0, x: 3168, z: 9758 }) {
   const slot = nextPlayerSlot++;
   const player = new Player(`championvm${slot}`, BigInt(slot), BigInt(slot));
@@ -149,7 +148,7 @@ export function makeNpc(name, position = { level: 0, x: 3168, z: 9758 }) {
   assert(type, `missing packed npc ${name}`);
   const npc = new Npc(
     position.level, position.x, position.z, type.size, type.size,
-    EntityLifeCycle.RESPAWN, nextNpcId++, type.id, type.blockwalk
+    EntityLifeCycle.RESPAWN, World.npcs.next(), type.id, type.blockwalk
   );
   npc.isActive = true;
   npc.lastMovement = -100;
