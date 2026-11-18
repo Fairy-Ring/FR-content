@@ -1,0 +1,150 @@
+// UNKNOWN ENGINEERING: no retained revision-377 Farming page bindings or original row strings.
+// The ten page labels/order, the combined Specials page, and the Tools grouping are functional
+// choices for the shared ten-operation/forty-row interface. Row summaries use period guide facts;
+// they are not claimed as authentic 377 wording. See farming.skill-guide-category-binding.
+[skill_guide_farming]
+table=skill_guide_ops
+data=lookup,farming
+data=op,Allotments,skill_guide_farming_allotments
+data=op,Flowers,skill_guide_farming_flowers
+data=op,Hops,skill_guide_farming_hops
+data=op,Herbs,skill_guide_farming_herbs
+data=op,Bushes,skill_guide_farming_bushes
+data=op,Trees,skill_guide_farming_trees
+data=op,Fruit Trees,skill_guide_farming_fruit_trees
+data=op,Specials,skill_guide_farming_special
+data=op,Scarecrows,skill_guide_farming_scarecrow
+data=op,Tools,skill_guide_farming_tools
+
+[skill_guide_farming_allotments]
+table=skill_guides
+data=name,Farming - Allotments
+data=advancement,Three seeds per planting.
+data=inv,skill_guide_farming_veg
+data=unlock,1,Potatoes
+data=unlock,5,Onions
+data=unlock,7,Cabbage
+data=unlock,12,Tomatoes
+data=unlock,20,Sweetcorn
+data=unlock,31,Strawberries
+data=unlock,47,Watermelon
+
+[skill_guide_farming_flowers]
+table=skill_guides
+data=name,Farming - Flowers
+data=advancement,One seed per planting.
+data=inv,skill_guide_farming_flowers
+data=unlock,2,Marigold
+data=unlock,11,Rosemary
+data=unlock,24,Nasturtium
+data=unlock,25,Woad
+data=unlock,26,Limpwurt
+
+[skill_guide_farming_hops]
+table=skill_guides
+data=name,Farming - Hops
+data=advancement,Four hop seeds per field.
+data=inv,skill_guide_farming_hops
+data=unlock,3,Barley
+data=unlock,4,Hammerstone
+data=unlock,8,Asgarnian
+data=unlock,13,Jute
+data=unlock,16,Yanillian
+data=unlock,21,Krandorian
+data=unlock,28,Wildblood
+
+[skill_guide_farming_herbs]
+table=skill_guides
+data=name,Farming - Herbs
+data=advancement,Herb patches need no water.
+data=inv,skill_guide_farming_herbs
+data=unlock,9,Guam
+data=unlock,14,Marrentill
+data=unlock,19,Tarromin
+data=unlock,26,Harralander
+data=unlock,29,Goutweed
+data=unlock,32,Ranarr Weed
+data=unlock,38,Toadflax
+data=unlock,44,Irit Leaf
+data=unlock,50,Avantoe
+data=unlock,56,Kwuarm
+data=unlock,62,Snapdragon
+data=unlock,67,Cadantine
+data=unlock,73,Lantadyme
+data=unlock,79,Dwarf Weed
+data=unlock,85,Torstol
+
+[skill_guide_farming_bushes]
+table=skill_guides
+data=name,Farming - Bushes
+data=advancement,Each bush yields four berries.
+data=inv,skill_guide_farming_bushes
+data=unlock,10,Redberries
+data=unlock,22,Cadavaberries
+data=unlock,36,Dwellberries
+data=unlock,48,Jangerberries
+data=unlock,59,Whiteberries
+data=unlock,70,Poison Ivy
+
+[skill_guide_farming_trees]
+table=skill_guides
+data=name,Farming - Trees
+data=advancement,Tree patches do not need watering.
+data=inv,skill_guide_farming_trees
+data=unlock,15,Oak trees
+data=unlock,30,Willow trees
+data=unlock,45,Maple trees
+data=unlock,60,Yew trees
+data=unlock,75,Magic trees
+
+[skill_guide_farming_fruit_trees]
+table=skill_guides
+data=name,Farming - Fruit Trees
+data=advancement,Each tree produces six fruits.
+data=inv,skill_guide_farming_fruit_trees
+data=unlock,27,Apple trees
+data=unlock,33,Banana trees
+data=unlock,39,Orange trees
+data=unlock,42,Curry trees
+data=unlock,51,Pineapple trees
+data=unlock,57,Papaya trees
+data=unlock,68,Palm trees
+
+[skill_guide_farming_special]
+table=skill_guides
+data=name,Farming - Specials
+data=advancement,Special patches.
+data=inv,skill_guide_farming_special
+data=unlock,53,Bittercap mushroom
+data=unlock,55,Cactus
+data=unlock,63,Belladonna\nWear gloves to harvest.
+data=unlock,72,Calquat tree
+data=unlock,83,Spirit tree\nOnly one at a time.
+
+[skill_guide_farming_scarecrow]
+table=skill_guides
+data=name,Farming - Scarecrows
+data=advancement,Protect sweetcorn.
+data=inv,skill_guide_farming_scarecrow
+data=unlock,23,Empty sack + straw bale\n+ bronze spear + watermelon
+
+[skill_guide_farming_tools]
+table=skill_guides
+data=name,Farming - Tools
+data=advancement,Farming tools.
+data=inv,skill_guide_farming_tools
+// UNKNOWN: -1 is the renderer's existing sentinel for an instruction without a skill requirement.
+data=unlock,-1,Rake
+data=unlock,-1,Spade
+data=unlock,-1,Watering can
+data=unlock,-1,Seed dibber
+data=unlock,-1,Gardening trowel
+data=unlock,-1,Secateurs
+data=unlock,-1,Gardening boots
+data=unlock,-1,Basket\nStores up to 5 fruits.
+data=unlock,-1,Sack\nStores up to 10 vegetables.
+data=unlock,-1,Plant pot
+data=unlock,-1,Plant cure
+data=unlock,-1,Compost\n15 organic items
+data=unlock,-1,Supercompost\n15 higher organic items
+data=unlock,75,Magic roots\nUsed for an Amulet of Nature.

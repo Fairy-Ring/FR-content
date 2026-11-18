@@ -17,9 +17,7 @@
 [if_button,stats:fletching] @skill_guide(fletching, 0);
 [if_button,stats:woodcutting] @skill_guide(woodcutting, 0);
 [if_button,stats:runecrafting] @skill_guide(runecraft, 0);
-// 377 stats tab already shows Slayer/Farming — wire guides, gate on engine PlayerStatEnabled.
-// When Wave 2 flips PlayerStatEnabled[18/19]=true, guides open with no content change here
-// (still need skill_guide_ops rows for full unlock lists — research separately).
+// Both member skills use the shared guide renderer and their period row tables.
 [if_button,stats:slayer] @skill_guide(slayer, 0);
 [if_button,stats:farming] @skill_guide(farming, 0);
 
