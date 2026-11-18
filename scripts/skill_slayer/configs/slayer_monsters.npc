@@ -299,7 +299,26 @@ walkanim=ogre_walk
 readyanim=ogre_ready
 op2=Attack
 vislevel=60
-param=slayer_category,^slayer_ogre
+// N098 CANDIDATE Old School combat reconstruction; cache client fields above unchanged.
+hitpoints=48
+attack=58
+strength=55
+defence=48
+magic=1
+ranged=1
+param=slayer_category,^slayer_mogre
+param=attackbonus,22
+param=strengthbonus,20
+param=attackrate,6
+param=damagetype,^crush_style
+// UNKNOWN bindings: reuse this model family's named Ogre combat animations.
+param=attack_anim,ogre_attack
+param=defend_anim,ogre_block
+param=death_anim,ogre_death
+// UNKNOWN bindings: no original Mogre sounds recovered. Avoid inherited human sounds.
+param=attack_sound,null
+param=defend_sound,null
+param=death_sound,null
 
 [slayer_harpiebugswarm]
 name=Harpie Bug Swarm

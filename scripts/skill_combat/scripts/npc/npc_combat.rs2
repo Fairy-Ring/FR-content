@@ -141,6 +141,7 @@ return(false);
 
 // allows any npc with op2 defined to be attacked
 [proc,npc_is_attackable]()(boolean)
+if (npc_type = mudskipper_ogre) return(~slayer_skippy_unlocked);
 if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
 if (npc_type = icediamond_icewarrior) return(~dt_kamil_attackable);
 // TODO 377: re-enable these!!

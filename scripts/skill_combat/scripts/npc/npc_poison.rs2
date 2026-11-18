@@ -28,6 +28,7 @@ npc_settimer(0); // npc_cleartimer?
 
 
 [proc,npc_poison_start](int $severity)
+if (npc_type = mudskipper_ogre) return; // CANDIDATE: Old School Mogre poison immunity.
 if (~npc_is_attackable() = false) {
     return;
 }

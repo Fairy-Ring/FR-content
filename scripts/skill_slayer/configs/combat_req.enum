@@ -23,6 +23,7 @@ val=^slayer_pyrefiend,25
 val=^slayer_ghoul,25
 val=^slayer_hillgiant,25
 val=^slayer_shade,30
+// UNKNOWN retained project assignment threshold; slayer.combat-level-values.
 val=^slayer_mogre,30
 val=^slayer_wallbeast,30
 val=^slayer_vampire,35
