@@ -74,6 +74,12 @@ const aiDeath = ScriptProvider.getByTrigger(ServerTriggerType.AI_QUEUE3, moleId,
 const aiBurrow = ScriptProvider.getByTrigger(ServerTriggerType.AI_QUEUE5, moleId, moleType.category);
 const downAnim = id('SeqType', 'mole_burrow_down');
 const upAnim = id('SeqType', 'mole_burrow_up');
+const mudTimer = ScriptProvider.getByName('[timer,giant_mole_mud]');
+const mudOverlay = id('Component', 'inter_365');
+const mudSpot = id('SpotanimType', 'mole_mud_splat_spotanim');
+const mudTicks = Math.ceil(types.SeqType.get(id('SeqType', 'mole_mud_splat_interface')).duration / 30);
+const downTicks = Math.ceil(types.SeqType.get(downAnim).duration / 30);
+assert(mudTimer && mudTicks > 0, 'packed mud overlay animation and expiry script exist');
 
 assert(World.gameMap.getTotalLocs() > 0, 'load the real packed world map');
 assert(moleType && environmentTimer && aiDamage && aiDeath && aiBurrow, 'compiled mole scripts/configs are present');
@@ -220,6 +226,21 @@ for (const destination of burrows) {
   caveStandByBurrow.set(destination.key, stand);
 }
 const naturalStand = caveStandByBurrow.get(0);
+// UNKNOWN fixture search stands, not product destinations. WANDER remains tied
+// to the original spawn after telejump, so searching only the four holes is incomplete.
+const searchTiles = JSON.parse(readFileSync(path.join(contentRoot, 'tests/giant-mole/search-tiles.json'), 'utf8'));
+for (const stand of searchTiles) {
+  allocatedWalkable(stand, 'headed whole-lair search');
+  assert(pathExists(entry, stand), `headed search stand ${coordKey(stand)} is reachable from the real entrance`);
+}
+for (let x = 1728; x < 1792; x++) for (let z = 5120; z < 5248; z++) {
+  let footprintWalkable = true;
+  for (let dx = 0; dx < 3; dx++) for (let dz = 0; dz < 3; dz++) {
+    if (!map.isZoneAllocated(0, x + dx, z + dz) || map.isMapBlocked(x + dx, z + dz, 0)) footprintWalkable = false;
+  }
+  if (footprintWalkable) assert(searchTiles.some(stand => Math.max(Math.abs(stand.x - x), Math.abs(stand.z - z)) <= 13),
+    `headed search covers the packed 3x3 NPC origin ${x},${z} inside the receive radius`);
+}
 
 const players = new Set();
 const huntZones = new Map();
@@ -349,6 +370,15 @@ function withDrops(action) {
   };
   try { action(); return drops; } finally { World.addObj = original; }
 }
+function withMapAnimations(action) {
+  const effects = [];
+  const original = World.animMap;
+  World.animMap = function (level, x, z, spotanim, height, delay) {
+    effects.push({ tick: World.currentTick, level, x, z, spotanim, height, delay });
+    return original.call(this, level, x, z, spotanim, height, delay);
+  };
+  try { action(); return effects; } finally { World.animMap = original; }
+}
 function finishPlayer(p) {
   const huntZone = huntZones.get(p);
   if (huntZone) { huntZone.leave(p); huntZones.delete(p); }
@@ -422,11 +452,15 @@ try {
     environmentTick(p);
     assert.notEqual(p.overlay, -1, 'lit cave opens the real overlay before exit');
     p.level = ropeStand.level; p.x = ropeStand.x; p.z = ropeStand.z;
+    execute('[queue,giant_mole_dirt]', p, [CoordGrid.packCoord(ropeStand.level, ropeStand.x, ropeStand.z)]);
+    assert.equal(p.overlay, mudOverlay, 'the real dirt queue opens the cached screen effect');
+    assert(p.timers.has(mudTimer.id), 'mud owns its real animation expiry timer');
     assert(clickLoc(p, rope), 'OPLOC1 on the runtime-plane rope is accepted from the real adjacent stand');
     settle(p);
     assert.deepEqual(tile(p), [exit.level, exit.x, exit.z], 'rope exit uses the packed surface landing');
     assert.equal(p.timers.has(environmentTimer.id), false, 'exit clears the cave timer');
     assert.equal(p.overlay, -1, 'exit closes the cave overlay');
+    assert.equal(p.timers.has(mudTimer.id), false, 'rope exit cancels pending mud expiry');
     finishPlayer(p);
   }
 
@@ -461,16 +495,26 @@ try {
     npc.levels[hitpoint] = npc.baseLevels[hitpoint];
     npc.setVar(aggressivePlayer, 321);
     npc.setVar(attackingUid, 654);
-    withRandom([0, 0.75, 0.25], () => {
+    const effects = withMapAnimations(() => withRandom([0, 0.75, 0.25], () => {
       npc.enqueueScript(ServerTriggerType.AI_QUEUE2, 0, 100);
       driveNpc(npc, () => npc.delayed && npc.animId === downAnim);
       assert.equal(npc.levels[hitpoint], npc.baseLevels[hitpoint] / 2, 'exactly half HP is eligible');
       assert.equal(npc.animId, downAnim, 'burrow-down animation plays before relocation');
       driveNpc(npc, () => npc.level !== start.level || npc.x !== start.x || npc.z !== start.z);
-    });
+    }));
+    assert.deepEqual(effects.map(effect => effect.spotanim), [
+      id('SpotanimType', 'mole_mud_cloud_spotanim'),
+      id('SpotanimType', 'mole_mude_hole_spotanim'),
+      id('SpotanimType', 'mole_mud_hole_up_spotanim')
+    ], 'native map animation dispatch emits the original cloud, departure hole and arrival hole');
+    assert.deepEqual(effects.slice(0, 2).map(effect => [effect.level, effect.x, effect.z]),
+      Array(2).fill([start.level, start.x + 1, start.z + 1]), 'departure effects use the real 3x3 footprint centre');
+    assert.equal(effects[1].tick - effects[0].tick, downTicks, 'departure animation runs for its cache-derived tick duration');
     const chosen = burrows.find(destination => destination.level === npc.level && destination.x === npc.x && destination.z === npc.z);
     assert(chosen, 'burrow relocation selects a packed enum destination');
     assert.notEqual(chosen.key, start.key, 'burrow never selects its current destination');
+    assert.deepEqual([effects[2].level, effects[2].x, effects[2].z],
+      [chosen.level, chosen.x + 1, chosen.z + 1], 'arrival effect uses the chosen packed destination');
     assert.equal(npc.animId, upAnim, 'burrow-up animation plays after relocation');
     assert.equal(npc.getVar(aggressivePlayer), -1, 'burrow resets aggressive player');
     assert.equal(npc.getVar(attackingUid), -1, 'burrow resets attacking uid');
@@ -506,6 +550,7 @@ try {
     const open = makePlayer(['lit_candle'], standTiles[0]);
     const covered = makePlayer(['bullseye_lantern_lit'], standTiles[1]);
     assert(open.inOperableDistance(npc) && covered.inOperableDistance(npc));
+    for (const p of [open, covered]) execute('[proc,giant_mole_environment_start]', p);
     for (const p of [open, covered]) {
       const zone = World.gameMap.getZone(p.x, p.z, p.level);
       zone.enter(p);
@@ -520,6 +565,22 @@ try {
     assert.equal(count(open, 'lit_candle'), 0, 'nearby open candle is extinguished');
     assert.equal(count(open, 'unlit_candle'), 1, 'extinguishing conserves the candle');
     assert.equal(count(covered, 'bullseye_lantern_lit'), 1, 'covered lantern remains lit');
+    for (const p of [open, covered]) {
+      assert.equal(p.overlay, mudOverlay, 'both affected players receive the original mud interface');
+      assert.equal(p.spotanimId, mudSpot, 'both affected players receive the original mud splat spotanim');
+      assert.equal(p.timers.get(mudTimer.id)?.interval, mudTicks, 'overlay lifetime rounds its cache duration up to server ticks');
+    }
+    const mudEnds = open.timers.get(mudTimer.id).clock + mudTicks;
+    while (World.currentTick < mudEnds) {
+      environmentTick(open, covered);
+      if (World.currentTick < mudEnds) {
+        assert.equal(open.overlay, mudOverlay, 'darkness does not replace an active mud animation');
+        assert.equal(covered.overlay, mudOverlay, 'covered-light overlay does not replace an active mud animation');
+      }
+    }
+    assert.equal(open.overlay, id('Component', 'inter_387'), 'expiry restores darkness after the candle went out');
+    assert.equal(covered.overlay, id('Component', 'inter_249'), 'expiry restores the covered light overlay');
+    for (const p of [open, covered]) assert.equal(p.timers.has(mudTimer.id), false, 'expiry clears itself');
     finishPlayer(open); finishPlayer(covered); finishNpc(npc);
   }
 

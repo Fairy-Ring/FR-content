@@ -41,6 +41,7 @@ softtimer(giant_mole_environment, 1, 0, $overlay);
 
 [proc,giant_mole_environment_release]
 clearsofttimer(giant_mole_environment);
+cleartimer(giant_mole_mud);
 if_openoverlay(null);
 
 [softtimer,giant_mole_environment](int $dark_ticks, interface $overlay)
@@ -51,7 +52,7 @@ if (~giant_mole_inside(coord) = false) {
 }
 if (busy() = false & p_finduid(uid) = true) {
     def_int $light = ~swamp_cave_light;
-    $overlay = ~swamp_cave_overlay($light, $overlay);
+    if (gettimer(giant_mole_mud) = -1) $overlay = ~swamp_cave_overlay($light, $overlay);
     if ($light > 0) {
         $dark_ticks = 0;
     } else {
@@ -87,6 +88,7 @@ if (npc_stat(hitpoints) = 0) return;
 [proc,giant_mole_burrow]
 npc_setmode(none);
 npc_anim(mole_burrow_down, 0);
+spotanim_map(mole_mud_cloud_spotanim, movecoord(npc_coord, 1, 0, 1), 0, 0);
 // CANDIDATE Old School open/covered rule, reusing the existing light classifier.
 // UNKNOWN engineering dirt chance and one-tile melee perimeter.
 if (random(^giant_mole_dirt_chance) = 0) {
@@ -96,7 +98,9 @@ if (random(^giant_mole_dirt_chance) = 0) {
         if (inzone(movecoord($origin, -1, 0, -1), movecoord($origin, 3, 0, 3), coord) = true) queue*(giant_mole_dirt, 0)($origin);
     }
 }
-npc_delay(^giant_mole_burrow_down_ticks);
+// npc_delay includes the following server tick.
+npc_delay(calc((seqlength(mole_burrow_down) + 29) / 30 - 1));
+spotanim_map(mole_mude_hole_spotanim, movecoord(npc_coord, 1, 0, 1), 0, 0);
 // Never choose the current destination: a burrow always changes area.
 def_int $index = random(enum_getoutputcount(giant_mole_burrow_coords));
 def_coord $destination = enum(int, coord, giant_mole_burrow_coords, $index);
@@ -109,16 +113,27 @@ npc_telejump($destination);
 %npc_attacking_uid = null;
 npc_setmode(null);
 npc_anim(mole_burrow_up, 0);
-npc_delay(^giant_mole_burrow_up_ticks);
+spotanim_map(mole_mud_hole_up_spotanim, movecoord(npc_coord, 1, 0, 1), 0, 0);
+npc_delay(calc((seqlength(mole_burrow_up) + 29) / 30 - 1));
 
 [queue,giant_mole_dirt](coord $origin)
 if (inzone(movecoord($origin, -1, 0, -1), movecoord($origin, 3, 0, 3), coord) = false) return;
+// VERIFIED cache presentation; UNKNOWN audience shared with the dirt event.
+spotanim_pl(mole_mud_splat_spotanim, 0, 0);
+if_openoverlay(inter_365);
+settimer(giant_mole_mud, calc((seqlength(mole_mud_splat_interface) + 29) / 30));
 def_int $slot = 0;
 while ($slot < inv_size(inv)) {
     def_obj $light = inv_getobj(inv, $slot);
     if (~swamp_cave_open_light($light) = true) ~extinguish_light_source_slot($slot, $light);
     $slot = add($slot, 1);
 }
+
+[timer,giant_mole_mud]
+cleartimer(giant_mole_mud);
+if (~giant_mole_inside(coord) = true) {
+    def_interface $overlay = ~swamp_cave_overlay(~swamp_cave_light, inter_365);
+} else if_openoverlay(null);
 
 [ai_queue3,mole_giant]
 ~npc_death;
