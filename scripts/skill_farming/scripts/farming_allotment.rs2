@@ -17,30 +17,7 @@ return(null);
 if ($crop = null) return($stage);
 def_int $first = db_getfield($crop, farming_allotment:first, 0);
 def_int $mature = db_getfield($crop, farming_allotment:mature, 0);
-// Finite lifetime, including a disease on the final growing stage.
-$steps = min($steps, add(sub($mature, $first), 1));
-while ($steps > 0) {
-    if ($stage > add($first, ^farming_diseased_offset) & $stage < add($mature, ^farming_diseased_offset)) {
-        return(add($stage, sub(^farming_dead_offset, ^farming_diseased_offset)));
-    }
-    def_int $chance = ^farming_allotment_disease_dry;
-    if ($stage >= add($first, ^farming_watered_offset) & $stage < add($mature, ^farming_watered_offset)) {
-        $stage = sub($stage, ^farming_watered_offset);
-        $chance = ^farming_allotment_disease_watered;
-    }
-    if ($stage < $first | $stage >= $mature) return($stage);
-    if ($stage = $first) {
-        $stage = add($stage, 1);
-    } else {
-        if (random(^farming_disease_denominator) < $chance) {
-            $stage = add($stage, ^farming_diseased_offset);
-        } else {
-            $stage = add($stage, 1);
-        }
-    }
-    $steps = sub($steps, 1);
-}
-return($stage);
+return(~farming_crop_advance($stage, $steps, $first, $mature, true));
 
 [proc,farming_allotment_seed](obj $seed)(dbrow)
 switch_obj ($seed) {
@@ -55,10 +32,7 @@ switch_obj ($seed) {
 }
 
 [proc,farming_allotment_life_loss]()(int)
-def_int $level = min(99, stat(farming));
-// CANDIDATE OSRS interpolation with UNKNOWN engineering CTS endpoints.
-def_int $save = calc((^farming_allotment_save_low * (99 - $level) + ^farming_allotment_save_high * ($level - 1) + 49) / 98 + 1);
-return(sub(^farming_harvest_denominator, $save));
+return(~farming_crop_life_loss(^farming_allotment_save_low, ^farming_allotment_save_high));
 
 [label,farming_allotment_harvest]
 if (~farming_veg_is_parent = false) {

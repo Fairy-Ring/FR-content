@@ -1,0 +1,130 @@
+// Original four herb selectors, independent of all eight allotments.
+[proc,farming_herb_stage]()(int)
+switch_loc (loc_type) {
+    case farming_herb_patch_1 : return(%bits_780_varp515_bits_0_7);
+    case farming_herb_patch_2 : return(%bits_781_varp515_bits_8_15);
+    case farming_herb_patch_3 : return(%bits_782_varp515_bits_16_23);
+    case farming_herb_patch_4 : return(%bits_783_varp515_bits_24_31);
+    case default : return(-1);
+}
+
+[proc,farming_herb_set_stage](int $stage)
+switch_loc (loc_type) {
+    case farming_herb_patch_1 : %bits_780_varp515_bits_0_7 = $stage;
+    case farming_herb_patch_2 : %bits_781_varp515_bits_8_15 = $stage;
+    case farming_herb_patch_3 : %bits_782_varp515_bits_16_23 = $stage;
+    case farming_herb_patch_4 : %bits_783_varp515_bits_24_31 = $stage;
+}
+
+// Native dispatch resolves the visible form, while loc_type stays the parent.
+[oplocu,farming_herb_patch_1] @farming_herb_use;
+[oplocu,farming_herb_patch_2] @farming_herb_use;
+[oplocu,farming_herb_patch_3] @farming_herb_use;
+[oplocu,farming_herb_patch_4] @farming_herb_use;
+[oplocu,herb_patch_weeds_3] @farming_herb_use;
+[oplocu,herb_patch_weeds_2] @farming_herb_use;
+[oplocu,herb_patch_weeds_1] @farming_herb_use;
+[oplocu,herb_patch_weeds_3_mory] @farming_herb_use;
+[oplocu,herb_patch_weeds_2_mory] @farming_herb_use;
+[oplocu,herb_patch_weeds_1_mory] @farming_herb_use;
+[oplocu,herb_patch_weeded] @farming_herb_use;
+[oplocu,herb_seed] @farming_herb_use;
+[oplocu,herb_1] @farming_herb_use;
+[oplocu,herb_2] @farming_herb_use;
+[oplocu,herb_3] @farming_herb_use;
+[oplocu,herb_fullygrown] @farming_herb_use;
+[oplocu,herb_1_diseased] @farming_herb_use;
+[oplocu,herb_2_diseased] @farming_herb_use;
+[oplocu,herb_3_diseased] @farming_herb_use;
+[oplocu,herb_1_dead] @farming_herb_use;
+[oplocu,herb_2_dead] @farming_herb_use;
+[oplocu,herb_3_dead] @farming_herb_use;
+
+[label,farming_herb_use]
+def_int $stage = ~farming_herb_stage;
+if ($stage = -1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = rake & $stage >= 0 & $stage < ^farming_veg_weeded) {
+    if (inv_freespace(inv) < 1) {
+        mes("You don't have enough inventory space.");
+        return;
+    }
+    inv_add(inv, weeds, 1);
+    ~farming_herb_set_stage(add($stage, 1));
+    // UNKNOWN functional wording: no retained period herb message transcript.
+    mes("You rake the weeds from the herb patch.");
+    return;
+}
+def_dbrow $crop;
+if ($stage = ^farming_veg_weeded) {
+    $crop = ~farming_herb_seed(last_useitem);
+    if ($crop = null) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, dibber) < 1) {
+        ~displaymessage(^dm_farming_dibber);
+        return;
+    }
+    def_obj $seed = db_getfield($crop, farming_herb:seed, 0);
+    if (inv_total(inv, $seed) < 1) return;
+    def_int $level = db_getfield($crop, farming_herb:level, 0);
+    if (stat_base(farming) < $level) {
+        // UNKNOWN functional wording.
+        mes("You need a Farming level of <tostring($level)> to plant this herb.");
+        return;
+    }
+    inv_del(inv, $seed, 1);
+    ~farming_herb_set_stage(db_getfield($crop, farming_herb:first, 0));
+    stat_advance(farming, db_getfield($crop, farming_herb:plant_xp, 0));
+    // UNKNOWN wording. CANDIDATE 2007 Jagex article: one herb seed.
+    mes("You plant the herb seed in the patch.");
+    return;
+}
+// Dead herbs use shared visual bytes and no longer need species metadata.
+if ($stage >= ^farming_herb_dead_first & $stage <= add(^farming_herb_dead_first, 2)) {
+    def_int $dead = calc(^farming_herb_normal_first + ^farming_dead_offset + 1 + $stage - ^farming_herb_dead_first);
+    def_int $cleared = ~farming_crop_care($dead, ^farming_herb_normal_first, ^farming_herb_normal_mature, "herb", false);
+    if ($cleared = ^farming_veg_weeded) ~farming_herb_set_stage($cleared);
+    return;
+}
+$crop = ~farming_herb_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $normal = ~farming_herb_normalize($stage, $crop);
+def_int $after = ~farming_crop_care($normal, ^farming_herb_normal_first, ^farming_herb_normal_mature, "herb", false);
+if ($after ! $normal) ~farming_herb_set_stage(~farming_herb_encode($after, $crop));
+
+[oploc1,herb_fullygrown]
+def_int $stage = ~farming_herb_stage;
+def_dbrow $crop = ~farming_herb_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+def_int $mature = db_getfield($crop, farming_herb:mature, 0);
+def_int $last = db_getfield($crop, farming_herb:last, 0);
+if ($stage < $mature | $stage > $last) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+// CANDIDATE Old School: herbs are picked by hand, spade clears dead plants.
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, db_getfield($crop, farming_herb:produce, 0), 1);
+stat_advance(farming, db_getfield($crop, farming_herb:harvest_xp, 0));
+if (random(^farming_harvest_denominator) < ~farming_herb_life_loss) {
+    if ($stage < $last) {
+        ~farming_herb_set_stage(add($stage, 1));
+    } else {
+        ~farming_herb_set_stage(^farming_veg_weeded);
+    }
+}
+// UNKNOWN functional wording; object names remain the revision's unidentified.
+mes("You pick a herb from the patch.");

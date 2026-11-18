@@ -28,10 +28,11 @@
 ^farming_dead_offset = 192
 
 ^farming_handler_potato = 1
+^farming_handler_herb = 2
 // CANDIDATE pre-rework OSRS: 500 game ticks, reset on login/logout.
 ^farming_growth_poll_ticks = 500
 ^farming_growth_window_minutes = 5
-// UNKNOWN engineering values shared by all allotments, not recovered rates.
+// UNKNOWN engineering values shared by ordinary crops, not recovered rates.
 // Ash (16 December 2019) says watering reduces, rather than eliminates, risk.
 ^farming_disease_denominator = 128
 ^farming_allotment_disease_dry = 20
@@ -44,3 +45,14 @@
 // Retained OSRS revision 15402033 gives the formula but not these crop CTS.
 ^farming_allotment_save_low = 64
 ^farming_allotment_save_high = 128
+
+// CANDIDATE seed-pack order assigns species to the generic herb cache bands.
+// VERIFIED cache: four growth advances and three mature harvest-life bytes.
+^farming_herb_normal_first = 4
+^farming_herb_normal_mature = 8
+^farming_herb_dead_first = 170
+
+// UNKNOWN engineering herb CTS_low; original per-herb endpoints unavailable.
+^farming_herb_save_low = 64
+// CANDIDATE OSRS Farming revision 15402033: CTS_high=80 for every herb.
+^farming_herb_save_high = 80
