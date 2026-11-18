@@ -332,6 +332,9 @@
     "prayer_drain_effect": "Current active-prayer drain strength.",
     "prayer_drain_resistance": "Derived equipment prayer-drain resistance.",
     "desert": "Current desert-heat timer; the inherited name is temporary.",
+    "soulbane_instance": "Owned emotion-room region UID plus one; leaving, logout and death discard the encounter, not completed-room progress.",
+    "soulbane_unprotected": "Current emotion-room fear encounter, anger meter and illusion hit counters; unfinished rooms restart after leaving or logout.",
+    "soulbane_unprotected2": "Current emotion-room dialogue and anger-special presentation flags; rebuilt on room entry.",
     "swansong_temp": "Explicit temporary ambush/colony state; current bits 8 and 9 are repeat-dialogue cursors, not a quest stage or consumed-item count."
   }
 }

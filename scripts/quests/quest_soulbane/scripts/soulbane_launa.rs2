@@ -1,21 +1,57 @@
-// A Soul's Bane — Launa (rift) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:A Soul's Bane minus overlay).
-// First write %soulbane_prog 0 -> 1. Chat + write only — no rift dest
-// (rope-on enter is the other residual file), no overlay 15100, no XP.
-// Cite red-19-start-impl-377.md §16.
+// CANDIDATE wording: soulbane.dlg.launa in the research registry.
+// UNKNOWN engineering encoding: even stages enter a room, odd stages finish it.
+[opnpc1,soulbane_launa] @soulbane_launa;
+[opnpc1,soulbane_launa_multi] @soulbane_launa;
+[label,soulbane_launa]
+switch_int (%soulbane_prog) {
+    case 0 : @soulbane_launa_start;
+    case 1 :
+        ~chatplayer("<p,neutral>Hi.");
+        ~chatnpc("<p,neutral>Have you discovered anything yet?");
+        ~chatplayer("<p,neutral>Sorry, what am I supposed to do again?");
+        ~chatnpc("<p,neutral>Go into the rift beside me and find my husband and son!");
+        ~chatplayer("<p,neutral>Ah, I'm on my way!");
+    case 2 :
+        ~chatplayer("<p,neutral>Hi, I've been down into the rift and I found a strange room. I also heard a voice claiming to be called Tolna.");
+        ~chatnpc("<p,neutral>My son! What did he say?");
+        ~chatplayer("<p,neutral>He said, 'Why should I, Tolna, be trapped in such a wretched place? Feel my ANGER!'.");
+        ~chatnpc("<p,neutral>Who can be surprised at his frustration?");
+        ~chatplayer("<p,neutral>It's a very aggressive room. I think I need to defeat the monsters in there.");
+        ~chatnpc("<p,neutral>Don't waste any time, his life could depend on you.");
+    case 3 :
+        ~chatplayer("<p,neutral>I managed to defeat the monsters in the room!");
+        ~chatnpc("<p,neutral>Have you found him then?");
+        ~chatplayer("<p,neutral>Sorry, I've yet to enter the next room.");
+        ~chatnpc("<p,neutral>Please hurry!");
+}
 
-[opnpc1,soulbane_launa]
+[label,soulbane_launa_start]
 ~chatplayer("<p,neutral>Hi there.");
 ~chatnpc("<p,neutral>Hello.");
 ~chatplayer("<p,neutral>What's this big hole in the ground all about?");
-~chatnpc("<p,neutral>I'm waiting to see my son Tolna.");
+~chatnpc("<p,neutral>Oh I wish I knew for sure... All I do know is that it opened seemingly by itself a few months ago. It was first discovered by the students over at the digsite, a few of which have gone down there but never returned.");
+~chatnpc("<p,neutral>They told me about it straight away.");
+~chatplayer("<p,neutral>So why is it important to you?");
+~chatnpc("<p,neutral>A few reasons, but I think the situation is beyond help now.");
+~chatplayer("<p,neutral>What situation? Maybe I can help.");
+~chatnpc("<p,neutral>I suppose it wouldn't hurt to tell you. I'm waiting to see my son Tolna. Don't suppose you've seen him?");
+~chatplayer("<p,neutral>Your son, Tolna? I don't know, what does he look like?");
+~chatnpc("<p,neutral>I don't really know.");
+~chatplayer("<p,neutral>You don't know what your own son looks like?");
+~chatnpc("<p,neutral>No. You see, I haven't seen him for... for... 25 years now. He just ran away one day and never returned. I'm hoping he's down this rift as I know he headed in this direction. My husband went to look, but he hasn't returned for days.");
 def_int $go = ~p_choice2("Would you like me to go down to look for your husband and son?", 1, "Surely by now they'd both be dead?", 2);
 if ($go = 2) {
     ~chatplayer("<p,neutral>Surely by now they'd both be dead?");
-    ~chatnpc("<p,angry>Get away from me!");
+    ~chatnpc("<p,angry>What?!?!");
+    ~chatplayer("<p,neutral>Oops.");
+    ~chatnpc("<p,angry>How could you say such a thing? Get away from me!");
     return;
 }
 ~chatplayer("<p,neutral>Would you like me to go down to look for your husband and son?");
 ~chatnpc("<p,happy>You would do that? Oh thank you so much!");
-~chatnpc("<p,neutral>You can use a rope to get into the rift, just attach it at the edge.");
+~chatplayer("<p,neutral>Don't worry. I'll investigate.");
+~chatnpc("<p,neutral>Thank you. You can use a rope to get into the rift, just attach it at the edge.");
+~chatplayer("<p,neutral>No problem.");
+~chatnpc("<p,neutral>Be careful.");
 %soulbane_prog = 1;
+~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);

@@ -1,3 +1,7 @@
 [soulbane]
 scope=perm
 transmit=yes
+
+// UNKNOWN engineering state: original slot 190, active owned region UID + 1.
+// It is discarded on logout; completed rooms remain in the original quest bits.
+[soulbane_instance]

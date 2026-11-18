@@ -1,0 +1,98 @@
+// UNKNOWN reconstruction: private geometry copies, one owner and one session UID.
+// Original 377 client maps/locs are copied; the engine copies no template NPCs.
+[proc,soulbane_enter]
+if (%soulbane_prog < 1 | %soulbane_prog > 3) return;
+~soulbane_cleanup;
+def_coord $sw = region_create(1, 16, 8);
+def_int $x = 0;
+while ($x < 8) {
+    def_int $z = 0;
+    while ($z < 8) {
+        region_set(0, $x, $z, movecoord(0_47_81_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
+        region_set(0, add($x, 8), $z, movecoord(0_51_53_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
+        $z = add($z, 1);
+    }
+    $x = add($x, 1);
+}
+region_setexitcoord(^soulbane_surface);
+%soulbane_instance = add(region_uid, 1);
+p_teleport(~soulbane_room_coord(^soulbane_rage_entry));
+if (%soulbane_prog = 1) {
+    %soulbane_prog = 2;
+    ~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+}
+if (%soulbane_prog = 2) {
+    ~soulbane_rage_spawn;
+    ~soulbane_rage_meter;
+    // UNKNOWN presentation: unnamed voices use nonmodal game messages so
+    // aggressive NPCs cannot cancel an unfinished entry script.
+    mes("Why should I, Tolna, be trapped in such a wretched place?");
+    mes("Arrghh, It's not fair! Feel my ANGER!");
+}
+
+// The two original map squares have distinct offsets in the private copy.
+[proc,soulbane_room_coord](coord $template)(coord)
+if (coordx($template) >= 3264) {
+    return(region_getcoord(0, add(64, sub(coordx($template), 3264)), sub(coordz($template), 3392)));
+}
+return(region_getcoord(0, sub(coordx($template), 3008), sub(coordz($template), 5184)));
+
+[proc,soulbane_owned]()(boolean)
+if (%soulbane_instance = 0) return(false);
+if (region_findbycoord(coord) = false) return(false);
+if (add(region_uid, 1) = %soulbane_instance) return(true);
+return(false);
+
+[proc,soulbane_npc_owned]()(boolean)
+if (%npc_attacking_uid ! uid | %npc_int ! %soulbane_instance) return(false);
+return(~soulbane_owned);
+
+[oploc1,soul_bane_awall_void_small]
+if (~soulbane_owned = false) return;
+if (%soulbane_prog = 2) {
+    if (~p_choice2_header("Yes, I don't mind starting this room again.", 1, "No, I'll finish this room first.", 2, "Do you wish to leave?") ! 1) return;
+}
+~soulbane_leave;
+
+[proc,soulbane_leave]
+~soulbane_cleanup;
+p_teleport(^soulbane_surface);
+
+// Ordinary death calls this AFTER its ordinary item/death/respawn handling.
+// The engine deletes the empty instance and all its NPCs/objects on departure.
+[proc,soulbane_cleanup]
+clearqueue(soulbane_rage_complete);
+clearqueue(soulbane_rage_credit);
+walktrigger(null);
+~soulbane_clear_weapons;
+%soulbane_anger_damagedealt = 0;
+%soulbane_anger_donespecial = 0;
+%soulbane_anger_weaponmulti = 0;
+%soulbane_instance = 0;
+if_openoverlay(null);
+cam_reset;
+
+// Unexpected disconnects use the instance's saved surface exit. Temporary
+// state is not saved; remove a saved anger weapon without closing login modals.
+[proc,soulbane_login]
+~soulbane_clear_weapons;
+%soulbane_anger_weaponmulti = 0;
+
+[proc,soulbane_clear_weapons]
+def_obj $old = inv_getobj(worn, ^wearpos_rhand);
+def_int $quantity = inv_total(inv, soulbane_anger_swordq);
+if ($quantity > 0) inv_del(inv, soulbane_anger_swordq, $quantity);
+$quantity = inv_total(inv, soulbane_anger_spearq);
+if ($quantity > 0) inv_del(inv, soulbane_anger_spearq, $quantity);
+$quantity = inv_total(inv, soulbane_anger_maceq);
+if ($quantity > 0) inv_del(inv, soulbane_anger_maceq, $quantity);
+$quantity = inv_total(inv, soulbane_anger_axeq);
+if ($quantity > 0) inv_del(inv, soulbane_anger_axeq, $quantity);
+if (~soulbane_anger_weapon($old) = true) {
+    inv_del(worn, $old, 1);
+    ~update_all($old);
+}
+
+[proc,soulbane_anger_weapon](obj $weapon)(boolean)
+if ($weapon = soulbane_anger_swordq | $weapon = soulbane_anger_spearq | $weapon = soulbane_anger_maceq | $weapon = soulbane_anger_axeq) return(true);
+return(false);

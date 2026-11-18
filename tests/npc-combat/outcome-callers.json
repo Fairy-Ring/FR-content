@@ -35,6 +35,7 @@
       "[proc,invrigar_attack]",
       "[proc,necro_attack]",
       "[proc,sarawiz_melee_attack]",
+      "[proc,soulbane_rage_npc_attack]",
       "[proc,vampire_attack]"
     ],
     "npc_meleeattack": [

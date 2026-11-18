@@ -1,0 +1,67 @@
+// CANDIDATE speeches: retained transcript, already present in its first revision.
+// UNKNOWN staging: copied Varrock geometry, actor stands and camera composition.
+[queue,soulbane_rage_complete]
+if (~soulbane_owned = false | %soulbane_prog ! 2 | %soulbane_anger_donespecial ! 1) return;
+p_stopaction;
+walktrigger(soulbane_scene_resume);
+~chatplayer("<p,angry>Arrrgghhh!");
+// VERIFIED cache assets; their use for this reconstruction is UNKNOWN.
+anim(anger_special_play, 0);
+spotanim_pl(anger_special_spotanim, 0, 0);
+~soulbane_rage_burst;
+p_delay(seqlength(anger_special_play));
+~chatplayer("<p,shock>Wow! How did I do that? There's something truly mental about this place!");
+~soulbane_clear_room_npcs;
+if_openoverlay(null);
+p_teleport(~soulbane_room_coord(^soulbane_scene_player));
+~soulbane_rage_add(soulbane_launa_young, ^soulbane_scene_launa);
+npc_facesquare(~soulbane_room_coord(^soulbane_scene_tolna));
+~soulbane_rage_add(soulbane_tolnaboy, ^soulbane_scene_tolna);
+npc_facesquare(~soulbane_room_coord(^soulbane_scene_launa));
+p_delay(1);
+cam_moveto(movecoord(~soulbane_room_coord(^soulbane_scene_player), -1, 0, -2), 400, 232, 232);
+cam_lookat(~soulbane_room_coord(^soulbane_scene_launa), 160, 232, 232);
+~chatnpc_specific("Launa", soulbane_launa_young, "<p,quiz>Where are you going?");
+~chatnpc_specific("Tolna", soulbane_tolnaboy, "<p,angry>I can't live with your rules any more, Mother.");
+~chatnpc_specific("Tolna", soulbane_tolnaboy, "<p,angry>I'm tired of working hard for very little money. There's great wealth that's mine for the taking!");
+~chatnpc_specific("Launa", soulbane_launa_young, "<p,quiz>But why? We're surviving perfectly fine on what we're earning.");
+~chatnpc_specific("Tolna", soulbane_tolnaboy, "<p,angry>I'm tired of your pathetic outlook. Good bye.");
+~chatnpc_specific("Launa", soulbane_launa_young, "<p,quiz>Tolna?");
+~chatnpc_specific("Launa", soulbane_launa_young, "<p,shock>TOLNA !!!");
+if_close;
+~soulbane_clear_room_npcs;
+cam_reset;
+p_teleport(~soulbane_room_coord(^soulbane_rage_entry));
+walktrigger(null);
+%soulbane_prog = 3;
+%soulbane_anger_donespecial = 0;
+// Engine XP is stored in tenths. The single named source candidate is in XP.
+stat_advance(attack, multiply(^soulbane_rage_attack_xp, 10));
+~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+
+// UNKNOWN interruption policy: a walk cancels and restarts the uncommitted
+// memory, never leaves the player in the scenery or awards partial rewards.
+[walktrigger,soulbane_scene_resume]
+if (%soulbane_prog ! 2 | %soulbane_anger_donespecial ! 1 | ~soulbane_owned = false) return;
+p_stopaction;
+walktrigger(soulbane_scene_resume);
+if (getqueue(soulbane_rage_complete) = 0) queue(soulbane_rage_complete, 0, 0);
+
+[proc,soulbane_rage_burst]
+npc_findallany(region_getcoord(0, 64, 32), 64, 0);
+while (npc_findnext = true) {
+    if (~soulbane_rage_npc = true & %npc_attacking_uid = uid) {
+        npc_setmode(none);
+        npc_sethunt(0);
+        if (npc_stat(hitpoints) > 0) {
+            npc_damage(^hitmark_damage, npc_stat(hitpoints));
+            npc_queue(3, 0, 0);
+        }
+    }
+}
+
+[proc,soulbane_clear_room_npcs]
+npc_findallany(region_getcoord(0, 64, 32), 64, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & %npc_int = %soulbane_instance) npc_del;
+}

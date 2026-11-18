@@ -87,6 +87,7 @@ healenergy(10000);
 ~initalltabs;
 ~player_end_poison;
 ~rd_lifecycle_death_cleanup;
+if (%soulbane_instance > 0) ~soulbane_cleanup;
 
 [proc,player_death_lose_items]
 if (staffmodlevel > 1 & map_live = true) { return; }
