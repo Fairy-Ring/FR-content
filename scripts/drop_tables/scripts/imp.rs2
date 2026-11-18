@@ -75,6 +75,7 @@ if ($random < 5) {
     obj_add(npc_coord, acne_potion, 1, ^lootdrop_duration);
 }
 
-if (random(^champion_scroll_chance) = 0) {
+// CANDIDATE: OSRS Champion's scroll, no further scroll after this Champion's defeat.
+if (~champions_won(6) = false & random(^champion_scroll_chance) = 0) {
 obj_add(npc_coord, champions_challenge_imp, 1, ^lootdrop_duration);
 }

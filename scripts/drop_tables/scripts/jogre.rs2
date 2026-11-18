@@ -50,6 +50,7 @@ if ($random < 30) {
     obj_add(npc_coord, unidentified_rogues_purse, 1, ^lootdrop_duration);
 }
 
-if (random(^champion_scroll_chance) = 0) {
+// CANDIDATE: OSRS Champion's scroll, no further scroll after this Champion's defeat.
+if (~champions_won(7) = false & random(^champion_scroll_chance) = 0) {
 obj_add(npc_coord, champions_challenge_jogre, 1, ^lootdrop_duration);
 }
