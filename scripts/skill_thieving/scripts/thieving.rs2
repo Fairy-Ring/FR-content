@@ -12,6 +12,9 @@ if(npc_stat(hitpoints) = 0) {
 if (~check_if_success_pick_pocket($data) = false) {
     def_int $stun_ticks = db_getfield($data, pickpocket:stun_ticks, 0);
     def_int $stun_damage = db_getfield($data, pickpocket:stun_damage, 0);
+    if (db_getfieldcount($data, pickpocket:stun_damage_max) > 0) {
+        $stun_damage = ~random_range($stun_damage, db_getfield($data, pickpocket:stun_damage_max, 0));
+    }
     ~fail_pick_pocket($stun_damage, $stun_ticks, $pocket);
     return;
 }
@@ -153,8 +156,15 @@ while ($count >= 0) {
     $reward_rarity_denominator = sub($reward_rarity_denominator, $reward_rarity_numerator);
     if ($roll >= $reward_rarity_denominator) {
         def_int $quantity_roll = ~random_range($reward_quantity_min, $reward_quantity_max);
-        // Pickpocketing can reward more than 1.
-        inv_add(inv, $reward, $quantity_roll);
+        if ($reward = trail_clue_easy_map001) {
+            // The representative row uses the existing random clue and one-clue rule.
+            if (~trail_geteasyclue = true) {
+                return;
+            }
+        } else {
+            // Pickpocketing can reward more than 1.
+            inv_add(inv, $reward, $quantity_roll);
+        }
         if ($loot_total > 0) {
             return;
         }
