@@ -316,6 +316,7 @@ data=max_amount,70
 [mazchna_mogres]
 table=slayer_master_task
 data=task,^slayer_mogre
+// UNKNOWN retained project weight/range; slayer.task-weights. Do not retune for N098.
 data=weight,8
 data=min_amount,40
 data=max_amount,70
@@ -582,6 +583,7 @@ data=max_amount,120
 [vannaka_mogres]
 table=slayer_master_task
 data=task,^slayer_mogre
+// UNKNOWN retained project weight/range; slayer.task-weights. Do not retune for N098.
 data=weight,7
 data=min_amount,60
 data=max_amount,120
@@ -897,6 +899,7 @@ data=max_amount,170
 [chaeldar_mogres]
 table=slayer_master_task
 data=task,^slayer_mogre
+// UNKNOWN retained project weight/range; slayer.task-weights. Do not retune for N098.
 data=weight,6
 data=min_amount,110
 data=max_amount,170
@@ -1128,6 +1131,7 @@ data=max_amount,200
 [duradel_mogre]
 table=slayer_master_task
 data=task,^slayer_mogre
+// UNKNOWN retained project weight/range; slayer.task-weights. Do not retune for N098.
 data=weight,2
 data=min_amount,130
 data=max_amount,200

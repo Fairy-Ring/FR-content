@@ -1,0 +1,71 @@
+// VERIFIED 377 flower bands. Direct lookup preserves the shared growth cursor.
+[proc,farming_flower_crop](int $stage)(dbrow)
+def_int $base = modulo($stage, ^farming_watered_offset);
+if ($base < 8 | $base > 32) return(null);
+def_int $offset = modulo(sub($base, 8), 5);
+// Only mapped cache forms: wet seed/growth, diseased growth, dead growth/mature.
+if ($stage >= ^farming_dead_offset) {
+    if ($offset = 0) return(null);
+} else if ($stage >= ^farming_diseased_offset) {
+    if ($offset = 0 | $offset = 4) return(null);
+} else if ($stage >= ^farming_watered_offset & $offset = 4) return(null);
+switch_int (divide(sub($base, 8), 5)) {
+    case 0 : return(farming_flower_marigold);
+    case 1 : return(farming_flower_rosemary);
+    case 2 : return(farming_flower_nasturtium);
+    case 3 : return(farming_flower_woad);
+    case 4 : return(farming_flower_limpwurt);
+}
+return(null);
+
+[proc,farming_flower_seed](obj $seed)(dbrow)
+switch_obj ($seed) {
+    case marigold_seed, marigold_seed_2, marigold_seed_3, marigold_seed_4, marigold_seed_5 : return(farming_flower_marigold);
+    case rosemary_seed, rosemary_seed_2, rosemary_seed_3, rosemary_seed_4, rosemary_seed_5 : return(farming_flower_rosemary);
+    case nasturtium_seed, nasturtium_seed_2, nasturtium_seed_3, nasturtium_seed_4, nasturtium_seed_5 : return(farming_flower_nasturtium);
+    case woad_seed, woad_seed_2, woad_seed_3, woad_seed_4, woad_seed_5 : return(farming_flower_woad);
+    case limpwurt_seed, limpwurt_seed_2, limpwurt_seed_3, limpwurt_seed_4, limpwurt_seed_5 : return(farming_flower_limpwurt);
+    case default : return(null);
+}
+
+[proc,farming_flower_advance](int $stage, int $steps)(int)
+def_dbrow $crop = ~farming_flower_crop($stage);
+if ($crop = null) return($stage);
+return(~farming_crop_advance($stage, $steps, db_getfield($crop, farming_flower:first, 0), db_getfield($crop, farming_flower:mature, 0), true));
+
+[proc,farming_flower_advance_all](int $steps)
+def_int $word = %farming_flower_varp;
+def_int $bit = 0;
+while ($bit < 32) {
+    def_int $end = add($bit, 7);
+    def_int $stage = ~farming_flower_advance(getbit_range($word, $bit, $end), $steps);
+    $word = setbit_range_toint($word, $stage, $bit, $end);
+    $bit = add($bit, 8);
+}
+%farming_flower_varp = $word;
+
+// VERIFIED period Tip.It protection pairs. CANDIDATE maturity requirement:
+// flowers protect while fully grown, not while growing or after picking.
+// UNKNOWN whether protection consumes a flower; the product leaves it in place.
+[proc,farming_flower_protects](int $flower, int $stage)(boolean)
+def_int $base = modulo($stage, ^farming_watered_offset);
+if ($flower = 12 & $base >= 6 & $base <= 19) return(true);
+if ($flower = 12 & $base >= 27 & $base <= 33) return(true);
+if ($flower = 17 & $base >= 20 & $base <= 26) return(true);
+if ($flower = 22 & $base >= 52 & $base <= 62) return(true);
+// UNKNOWN protection while a placed scarecrow has weeds around it.
+if ($flower >= 33 & $flower <= 36 & $base >= 34 & $base <= 42) return(true);
+return(false);
+
+// VERIFIED period wording: protection prevents new disease.
+// UNKNOWN whether protection cures existing disease; the product does not.
+// UNKNOWN catch-up: use the saved flower state for this elapsed reconciliation,
+// just as the shared clock uses the saved crop state, without inventing history.
+[proc,farming_flower_advance_protected](int $stage, int $steps, dbrow $crop)(int)
+def_int $first = db_getfield($crop, farming_allotment:first, 0);
+def_int $mature = db_getfield($crop, farming_allotment:mature, 0);
+if ($stage >= add($first, ^farming_watered_offset) & $stage < add($mature, ^farming_watered_offset) & $steps > 0) {
+    $stage = sub($stage, ^farming_watered_offset);
+}
+if ($stage >= $first & $stage < $mature) return(min($mature, add($stage, max(0, $steps))));
+return(~farming_crop_advance($stage, $steps, $first, $mature, true));

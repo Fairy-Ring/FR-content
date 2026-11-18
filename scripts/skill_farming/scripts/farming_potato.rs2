@@ -105,9 +105,20 @@ if (~farming_allotment_seed(last_useitem) ! null) {
 [proc,farming_rake_step](boolean $repeat)
 def_int $stage = ~farming_herb_stage;
 def_boolean $herb = true;
+def_boolean $flower = false;
+def_boolean $scarecrow = false;
 if ($stage = -1) {
     $herb = false;
-    $stage = ~farming_veg_stage;
+    $stage = ~farming_flower_stage;
+    if ($stage = -1) {
+        $stage = ~farming_veg_stage;
+    } else {
+        $flower = true;
+        if ($stage >= 33 & $stage <= 36) {
+            $scarecrow = true;
+            $stage = sub($stage, 33);
+        }
+    }
 }
 if ($stage > ^farming_veg_weeds_1 | inv_total(inv, rake) < 1) return;
 if (inv_freespace(inv) < 1) {
@@ -127,6 +138,12 @@ if ($herb = true) {
     ~farming_herb_set_stage($stage);
     // UNKNOWN functional wording, retained from the herb interaction.
     mes("You rake the weeds from the herb patch.");
+} else if ($flower = true) {
+    def_int $written = $stage;
+    if ($scarecrow = true) $written = add($stage, 33);
+    ~farming_flower_set_stage($written);
+    // UNKNOWN functional wording.
+    mes("You rake the weeds from the flower patch.");
 } else {
     ~farming_veg_set_stage($stage);
     mes("You use the rake on the allotment.");

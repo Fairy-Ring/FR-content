@@ -1,0 +1,101 @@
+// N098: period Sal's 24 April 2006 verifies explosive luring at Mudskipper Point.
+// CANDIDATE details: Old School Fishing explosive 180579, Mogre 4566343/15346116,
+// Ominous Fishing Spot 15007325 and Transcript:Mogre 14331245. Research subject slayer.
+[oplocu,ominous_fishing_spot_a] @mogre_throw;
+[oplocu,ominous_fishing_spot_b] @mogre_throw;
+[oplocu,ominous_fishing_spot_c] @mogre_throw;
+[aplocu,ominous_fishing_spot_a] @mogre_throw_approach;
+[aplocu,ominous_fishing_spot_b] @mogre_throw_approach;
+[aplocu,ominous_fishing_spot_c] @mogre_throw_approach;
+
+[label,mogre_throw_approach]
+if (distance(coord, loc_coord) > ^mogre_throw_range) {
+    p_aprange(^mogre_throw_range);
+    return;
+}
+@mogre_throw;
+
+[label,mogre_throw]
+if (last_useitem ! fishing_explosive) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~slayer_skippy_unlocked = false) {
+    ~chatplayer("Sinister as that fishing spot is, why would I want to explode it?");
+    return;
+}
+if (stat(slayer) < enum(int, int, slayer_req, ^slayer_mogre)) {
+    mes("You need a higher Slayer level to know how to wound this monster.");
+    return;
+}
+if (distance(coord, loc_coord) <= ^mogre_unsafe_range) {
+    ~chatplayer("If this thing explodes, I think I should stand a liiiiittle further away...");
+    return;
+}
+if (inv_total(inv, fishing_explosive) < 1) return;
+def_coord $landing = ^mogre_west_landing;
+switch_loc(loc_type) {
+    case ominous_fishing_spot_b : $landing = ^mogre_south_landing;
+    case ominous_fishing_spot_c : $landing = ^mogre_east_landing;
+}
+inv_del(inv, fishing_explosive, 1);
+// UNKNOWN presentation: no authenticated throw/projectile/splash binding or delay recovered.
+// Appear plainly rather than borrow a different activity's effects.
+npc_add($landing, mudskipper_ogre, ^mogre_lifetime);
+// UNKNOWN equal choice: transcript gives seven lines but no original probabilities.
+switch_int(random(7)) {
+    case 0 : npc_say("Human scare all da fishies!");
+    case 1 : npc_say("I smack you good!");
+    case 2 : npc_say("Da boom-boom kill all da fishies!");
+    case 3 : npc_say("Tasty human!");
+    case 4 : npc_say("Smash stupid human!");
+    case 5 : npc_say("I get you!");
+    case 6 : npc_say("Human hit me on the head!");
+}
+npc_setmode(opplayer2);
+
+[oploc1,ominous_fishing_spot_a] @mogre_fishing_empty;
+[oploc2,ominous_fishing_spot_a] @mogre_fishing_empty;
+[oploc1,ominous_fishing_spot_b] @mogre_fishing_empty;
+[oploc2,ominous_fishing_spot_b] @mogre_fishing_empty;
+[oploc1,ominous_fishing_spot_c] @mogre_fishing_empty;
+[oploc2,ominous_fishing_spot_c] @mogre_fishing_empty;
+[aploc1,ominous_fishing_spot_a] @mogre_fishing_empty;
+[aploc2,ominous_fishing_spot_a] @mogre_fishing_empty;
+[aploc1,ominous_fishing_spot_b] @mogre_fishing_empty;
+[aploc2,ominous_fishing_spot_b] @mogre_fishing_empty;
+[aploc1,ominous_fishing_spot_c] @mogre_fishing_empty;
+[aploc2,ominous_fishing_spot_c] @mogre_fishing_empty;
+[label,mogre_fishing_empty]
+mes("Something seems to have scared all the fishes away...");
+
+[ai_queue3,mudskipper_ogre]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, big_bones, 1, ^lootdrop_duration);
+~mogre_drop;
+
+// CANDIDATE current Old School common table, with the documented 2017 extra flipper slot
+// removed. Leave that slot empty, not redistributed. No long/curved bone exists in the 377 pack.
+// rag_mogre_bone is the wish-list unit's conditional drop; its state is not implemented here.
+[proc,mogre_drop]
+def_int $roll = random(128);
+if ($roll < 4) { obj_add(npc_coord, waterrune, 5, ^lootdrop_duration); }
+else if ($roll < 8) { obj_add(npc_coord, waterrune, 7, ^lootdrop_duration); }
+else if ($roll < 12) { obj_add(npc_coord, waterrune, 14, ^lootdrop_duration); }
+else if ($roll < 25) { obj_add(npc_coord, ~roll_uncommon_seed_table, ^lootdrop_duration); }
+else if ($roll < 45) { obj_add(npc_coord, raw_swordfish, 1, ^lootdrop_duration); }
+else if ($roll < 54) { obj_add(npc_coord, raw_tuna, 1, ^lootdrop_duration); }
+else if ($roll < 61) { obj_add(npc_coord, raw_pike, 1, ^lootdrop_duration); }
+else if ($roll < 65) { obj_add(npc_coord, raw_salmon, 1, ^lootdrop_duration); }
+else if ($roll < 68) { obj_add(npc_coord, raw_herring, 1, ^lootdrop_duration); }
+else if ($roll < 71) { obj_add(npc_coord, raw_sardine, 1, ^lootdrop_duration); }
+else if ($roll < 74) { obj_add(npc_coord, raw_shark, 1, ^lootdrop_duration); }
+else if ($roll < 104) { obj_add(npc_coord, fishing_bait, 5, ^lootdrop_duration); }
+else if ($roll < 114) { obj_add(npc_coord, fishing_bait, 15, ^lootdrop_duration); }
+else if ($roll < 119) { obj_add(npc_coord, mudskipper_hat, 1, ^lootdrop_duration); }
+else if ($roll < 122) { obj_add(npc_coord, oystershell, 1, ^lootdrop_duration); }
+else if ($roll < 123) { obj_add(npc_coord, mudskipper_flippers, 1, ^lootdrop_duration); }
+else if ($roll < 125) { obj_add(npc_coord, seaweed, 1, ^lootdrop_duration); }
+else if ($roll < 126) { obj_add(npc_coord, staff_of_water, 1, ^lootdrop_duration); }
+else if ($roll < 127) { obj_add(npc_coord, fishbowl_water, 1, ^lootdrop_duration); }

@@ -1,0 +1,9 @@
+// N098 UNKNOWN engineering geometry: open 2x2 shore tiles, not recovered spawn coordinates.
+^mogre_west_landing = 0_46_48_41_41
+^mogre_south_landing = 0_46_48_52_37
+^mogre_east_landing = 0_46_48_58_45
+// UNKNOWN engineering reach and lifetime. No original delay or dedicated throw effect recovered.
+^mogre_throw_range = 6
+^mogre_lifetime = 1000
+// CANDIDATE: 2013 Fishing explosive page refuses use within two tiles.
+^mogre_unsafe_range = 2

@@ -160,8 +160,10 @@ jobs:
           run_test tests/farming/test_allotments.mjs node --import tsx ../content/tests/farming/test_allotments.mjs
           run_test tests/farming/test_herbs.mjs node --import tsx ../content/tests/farming/test_herbs.mjs
           run_test tests/farming/test_tool_actions.mjs node --import tsx ../content/tests/farming/test_tool_actions.mjs
+          run_test tests/farming/test_flowers.mjs node --import tsx ../content/tests/farming/test_flowers.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
           run_test tests/skippy/test_skippy.mjs node --import tsx ../content/tests/skippy/test_skippy.mjs
+          run_test tests/mogre/test_mogre.mjs node --import tsx ../content/tests/mogre/test_mogre.mjs
           run_test tests/empty-lord/test_empty_lord.mjs node --import tsx ../content/tests/empty-lord/test_empty_lord.mjs
           run_test tests/barrows/test_config.mjs node ../content/tests/barrows/test_config.mjs --content-root ../content
           run_test tests/citizen-tables/test_citizen_tables.mjs node --import tsx ../content/tests/citizen-tables/test_citizen_tables.mjs
