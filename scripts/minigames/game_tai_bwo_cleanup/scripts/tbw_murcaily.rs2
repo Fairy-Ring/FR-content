@@ -10,8 +10,13 @@
 @tbw_murcaily_talk;
 
 [label,tbw_murcaily_talk]
+if (%junglepotion < ^junglepotion_complete) {
+    // UNKNOWN functional refusal, no retained pre-quest transcript.
+    mes("You need to complete Jungle Potion before helping the village.");
+    return;
+}
 ~chatnpc("<p,happy>Hello there...thanks for helping out Trufitus commune with the gods Bwana. We've been able to return to the village thanks to your help.");
-switch_int(~p_choice3("What do you do here?", 1, "Is there anything interesting to do here?", 2, "Ok, thanks.", 3)) {
+switch_int(~p_choice4("What do you do here?", 1, "Is there anything interesting to do here?", 2, "Ok, thanks.", 3, "Can I have some trading sticks?", 4)) {
     case 1 :
         ~chatplayer("<p,quiz>What do you do here?");
         ~chatnpc("<p,neutral>Well, I tend the hardwood grove nearby, you can enter if you like and harvest some of the very fine hardwood that grows within.");
@@ -21,6 +26,11 @@ switch_int(~p_choice3("What do you do here?", 1, "Is there anything interesting 
         ~chatplayer("<p,quiz>Is there anything interesting to do here?");
         ~chatnpc("<p,neutral>Well Bwana, if you're stuck for something to do, you could always do a bit of handymanship about the village and cut away the jungle that lies here about.");
         ~chatnpc("<p,neutral>If you's is good with da machete Bwana, you's can get's some thatching spars and put them to use repairing the run-down village fence.");
+        if (%cleanup_progress < 1) %cleanup_progress = 1;
+        return;
+    case 4 :
+        // UNKNOWN functional option text, shared with the other suppliers.
+        ~tbw_claim_sticks;
         return;
     case 3 :
         ~chatplayer("<p,neutral>Ok, thanks.");

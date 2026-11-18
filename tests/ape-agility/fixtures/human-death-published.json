@@ -1,6 +1,6 @@
 {
   "marker": "APE_ATOLL_HUMAN_DEATH_BASELINE_V1",
-  "deathSourceSha256": "dafeb65b895abec0888b94a4a9b0a72eda3708f4c259f22aaef3de3322141f85",
+  "deathSourceSha256": "486ef86eb32c165c40db7d78a09de833fe642388d4b2c5a64aff911e0a2987b0",
   "observation": {
     "player": {
       "activeScript": null,
@@ -1040,7 +1040,7 @@
           "$type": "IfSetColour",
           "fields": {
             "colour": 31744,
-            "component": 15098
+            "component": 6987
           }
         },
         {

@@ -1,0 +1,4 @@
+// UNKNOWN server encoding, assigned original slot 189. No client reader or transmission.
+// Bits 0-10: found treasures. Bits 11-14: current target plus one, zero means unset.
+[enchanted_key_hunt]
+scope=perm

@@ -316,7 +316,7 @@ if (%elidquest >= ^elid_complete) {
 if (%enakh_quest >= ^enakh_complete) {
     $questpoints = add($questpoints, ^enakh_questpoints);
 }
-if (%fairy_farmers_quest = ^fairy_farmers_complete) {
+if (%fairy_farmers_quest >= ^fairy_farmers_complete) {
     $questpoints = add($questpoints, ^fairy_farmers_questpoints);
 }
 if (%feud_var >= ^feud_complete) {
@@ -472,6 +472,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:makinghistory, %makinghistory_prog, ^makinghistory_complete);
 ~send_quest_progress_colour(questlist:rag, ~rag_stage, ^rag_complete);
 ~send_quest_progress_colour(questlist:mdaughter, %mdaughter_quest_var, ^mdaughter_complete);
+~send_quest_progress_colour(questlist:fairy_farmers, %fairy_farmers_quest, ^fairy_farmers_complete);
 ~send_quest_progress_colour(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
 if_settab(questlist, ^tab_quest_journal);
 

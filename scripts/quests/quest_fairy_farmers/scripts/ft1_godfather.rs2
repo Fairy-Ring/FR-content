@@ -1,0 +1,72 @@
+// CANDIDATE wording: fairytale-1.dlg.godfather-first-talk and godfather-quest-end.
+// Bind the concrete form seen by the client, not the invisible multi NPC.
+[opnpc1,fairy_godfather]
+if (%fairy_farmers_quest < ^ft1_martin_reported | %fairy_farmers_quest >= ^fairy_farmers_complete) {
+    return;
+}
+if (%fairy_farmers_quest = ^ft1_defeated) {
+    if (inv_total(inv, fairy_queen_secateurs) = 0) {
+        // UNKNOWN functional reminder; the period guide requires the dropped item.
+        mes("Bring the Queen's secateurs to the Fairy Godfather.");
+        return;
+    }
+    ~chatnpc("<p,happy>Ciao <displayname()>. I am-a glad to see-a yous back! I was-a worried that the Tanglefoot would-a kill-a you too.");
+    ~chatplayer("<p,happy>You needn't have worried I managed to kill it!");
+    ~chatnpc("<p,happy>Ben fatto, my friend! Da folk-a dey owe yous a great-a deal! So did-a youss getta back da Queen Bee's magic power?");
+    ~chatplayer("<p,neutral>I retrieved this pair of Enchanted secateurs, I think they must contain the Queen's missing magic.");
+    ~chatnpc("<p,happy>Grazie infinite! I will give-a dem to da healing fairy. Da Queen Bee, she will-a soon be strong again!");
+    inv_del(inv, fairy_queen_secateurs, 1);
+    %fairy_farmers_quest = ^fairy_farmers_complete;
+    // VERIFIED: 2 May 2006 Tip.It reward table; XP is in tenths.
+    stat_advance(farming, 35000);
+    stat_advance(attack, 20000);
+    stat_advance(magic, 10000);
+    ~send_quest_complete(questlist:fairy_farmers, fairy_enchanted_secateurs, 250, ^fairy_farmers_questpoints, "You have completed A Fairy Tale Pt. 1!", "3,500 Farming XP|2,000 Attack XP|1,000 Magic XP|Magic secateurs");
+    return;
+}
+~chatplayer("<p,quiz>Who are you? Where's the Fairy Queen? What's going on here? Where's the Fairy Queen's throne gone?");
+~chatnpc("<p,neutral>Ciao esploratore! So many questions. Whicha one would you hava me answer first?");
+@ft1_godfather_menu;
+
+[label,ft1_godfather_menu]
+def_int $choice = ~p_choice5("Who are you?", 1, "Where's the Fairy Queen?", 2, "What's going on here?", 3, "Where's the Fairy Queen's throne gone?", 4, "That's all, thanks.", 5);
+switch_int ($choice) {
+    case 1 :
+        ~chatplayer("<p,quiz>Who are you?");
+        ~chatnpc("<p,neutral>Me?! I am-a da Fairy Godfather.");
+        ~chatplayer("<p,confused>...?");
+        ~chatnpc("<p,neutral>I see-a by your face dat you have-a not-a heard of-a me. Irrispettoso, eet iz of no eemportance. You weesh-a to know sometheeng else or no?");
+        @ft1_godfather_menu;
+    case 2 : @ft1_godfather_queen;
+    case 3 :
+        ~chatplayer("<p,quiz>What's going on here?");
+        ~chatnpc("<p,neutral>Hmm, an eenteresting question, my friend. I am-a trying to run-a da fairy kingdom, and youz iz-a being da irritating adventurer.");
+        ~chatplayer("<p,angry>That's not what I mean!");
+        ~chatnpc("<p,neutral>No, but-a dat iz da question I answered. Now iz-a dere anything else?");
+        @ft1_godfather_menu;
+    case 4 :
+        ~chatplayer("<p,quiz>Where's the Fairy Queen's throne gone?");
+        ~chatnpc("<p,neutral>An eenteresting place to start... I am-a here, ze Queen Bee iz not. So my chair - eet iz-a here, her throne - eet iz- a not. Eez there anytheeng else? I ama a bizy fairy.");
+        @ft1_godfather_menu;
+    case default :
+        ~chatplayer("<p,neutral>That's all, thanks.");
+        ~chatnpc("<p,neutral>Eef there iz anytheeng I can-a help you weeth whilst you are-a veesiting Zanaris, plsi, do not-a trouble to bother me.");
+}
+return;
+
+[label,ft1_godfather_queen]
+~chatnpc("<p,sad>Ah, eet iz a trageec-a tale. Da Queen Bee she iz-a, how-you-say, seek?");
+~chatplayer("<p,quiz>You mean sick. What happened?");
+~chatnpc("<p,sad>Ah, a tragedy to be-a struck-a down so young.");
+~chatnpc("<p,quiz>How-a much do ya know about-a da fairy folk, my beeg friend?");
+~chatplayer("<p,neutral>Not actually a whole deal, I'm afraid.");
+~chatnpc("<p,neutral>Well, let-a me enlighten yous. Zanaris iz-a a nexus of-a da worlds. Da Queen Bee, she iz-a da guardian of-a all da folk dat live-a in Zanaris.");
+~chatnpc("<p,neutral>So when-a thees Tanglefoot arrives, da Queen Bee she-a goes to da Cosmic Temple area to kill-a eet, but someting goes-a wrong. Da Queen Bee, she gets-a hurt and is-a now inna da magic sleep.");
+~chatplayer("<p,neutral>Thanks, I'll go see her then. Goodbye.");
+~chatnpc("<p,neutral>Ciao. Oh, and <displayname()>...");
+~chatplayer("<p,quiz>Yes?");
+~chatnpc("<p,neutral>A word-a of advice. You be-a careful not to cause da trouble for da folk while you are Zanaris. Ciao.");
+~chatplayer("<p,confused>?");
+if (%fairy_farmers_quest = ^ft1_martin_reported) {
+    %fairy_farmers_quest = ^ft1_godfather;
+}

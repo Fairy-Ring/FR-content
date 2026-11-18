@@ -332,6 +332,15 @@
       }
     },
     {
+      "script": "[ai_opplayer2,fairy_tanglefoot]",
+      "npc": "fairy_tanglefoot",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1309757500
+      }
+    },
+    {
       "script": "[ai_opplayer2,ikov_firewarrior]",
       "npc": "ikov_firewarrior",
       "seeds": {

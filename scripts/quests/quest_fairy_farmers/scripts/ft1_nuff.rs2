@@ -1,10 +1,64 @@
-// A Fairy Tale Part I — Fairy Nuff (3303) clinic Talk-to after Martin #5 / GAG=6.
-// CANDIDATE last-resort 2007-base: OSRS Transcript:Fairytale I first Nuff line only
-// (minus Godfather-send / Tanglefoot / leftover-list award / FT2 / RS3 Overview).
-// Hunt 289? no. 0 stage write. NEVER 10. Do not flip fairy_*_check.
-// Do not inv_add fairy_symptoms_list or if_open leftover 18164.
-// Cite: docs/research/fairy-tale-i-nuff-first-slice-377.md §5.1 / §8.
-
+// CANDIDATE wording: fairytale-1.dlg.nuff-busy and nuff-rest.
 [opnpc1,fairy_nuff]
-~chatnpc("<p,neutral>Sorry, I'm very busy and can't chat. If you want to know something go and talk to the Godfather.");
-return;
+if (%fairy_farmers_quest < ^ft1_godfather) {
+    ~chatnpc("<p,neutral>Sorry, I'm very busy and can't chat. If you want to know something go and talk to the Godfather.");
+    return;
+}
+if (%fairy_farmers_quest >= ^fairy_farmers_complete) {
+    ~chatplayer("<p,quiz>How is the Fairy Queen doing?");
+    ~chatnpc("<p,sad>Not too well; the Godfather hasn't given me those secateurs yet.");
+    return;
+}
+if (%fairy_farmers_quest = ^ft1_defeated & inv_total(inv, fairy_queen_secateurs) > 0) {
+    ~chatplayer("<p,happy>I did it! I've got the Fairy Queens' enchanted secateurs!");
+    ~chatnpc("<p,happy>That's fantastic! You'd better take them to the Fairy Godfather though; he'd be cross if he knew you brought them to me first. But, come back to me once the queen has had a chance to recover. I'm sure she'll want to thank you personally.");
+    return;
+}
+if (%fairy_farmers_quest >= ^ft1_symptoms) {
+    if (inv_total(inv, fairy_symptoms_list) = 0 & %fairy_farmers_quest < ^ft1_zandar) {
+        ~chatnpc("<p,quiz>You're back soon! Did you find out what ails the Fairy Queen?");
+        ~chatplayer("<p,sad>No, I'm afraid I've lost the list of symptoms you gave me.");
+        ~chatnpc("<p,neutral>Well not to worry, I have a copy of it here.");
+        if (inv_freespace(inv) = 0) {
+            mes("Your inventory is too full to take that.");
+            return;
+        }
+        inv_add(inv, fairy_symptoms_list, 1);
+    }
+    return;
+}
+~chatplayer("<p,neutral>I did, he said I should come and talk to you!");
+~chatnpc("<p,shock>Oh!");
+~chatnpc("<p,neutral>Sorry, I didn't realise.");
+~chatplayer("<p,neutral>Actually it's more a case of what I can help you with? I told the Fairy Godfather that I would help you find a cure for the Queen.");
+~chatnpc("<p,happy>Oh, thank you! I really need help, I have no idea what ails the Queen. You must be a mighty healer!");
+~chatplayer("<p,neutral>Err...no, not me.");
+~chatnpc("<p,quiz>A great druid then?");
+~chatplayer("<p,neutral>Umm...'fraid not.");
+~chatnpc("<p,quiz>A shaman?");
+~chatplayer("<p,neutral>No.");
+~chatnpc("<p,quiz>A surgeon?");
+~chatplayer("<p,neutral>No.");
+~chatnpc("<p,quiz>A doctor, medic, nurse?");
+~chatplayer("<p,neutral>No, no and no.");
+~chatnpc("<p,quiz>So what are you then?");
+~chatplayer("<p,happy>I'm a mighty adventurer!");
+~chatnpc("<p,shock>A what?!");
+~chatplayer("<p,happy>A mighty adventurer!");
+~chatnpc("<p,neutral>Yes, I heard. It's just not what I was expecting to hear.");
+~chatnpc("<p,happy>But hang on, you might be just the sort of person I need to help me!");
+~chatplayer("<p,quiz>How is that then?");
+~chatnpc("<p,quiz>I'm sure the Godfather told you that the Queen is in an enchanted sleep?");
+~chatplayer("<p,neutral>Well sort of, I couldn't really understand everything he was talking about.");
+~chatnpc("<p,neutral>Shhh, somebody might hear. Look you're a visitor, so I'll tell you this much; it doesn't pay to talk about the Godfather behind his back.");
+~chatnpc("<p,neutral>But back to the problem at hand - the Fairy Queen. She was brought here after her battle with the Tanglefoot in a terrible state, extremely weak and barely able to fly!");
+~chatnpc("<p,sad>When the Queen got back here, she was clearly weakening fast. It appears as if the magic force that is her life essence is slowly unravelling.");
+~chatnpc("<p,neutral>Now, what I need you to do is find a mage by the name of Zandar Horfyre. He has spent many years studying magical illness. Take the list to him and ask him if he knows what ails the Queen, please.");
+~chatplayer("<p,quiz>That doesn't sound too difficult, where will I find him.");
+~chatnpc("<p,sad>I believe he now resides in the Dark Wizard's tower near Falador, and <displayname()>, please hurry. I fear the Queen doesn't have much time left!");
+if (inv_freespace(inv) = 0) {
+    mes("Your inventory is too full to take that.");
+    return;
+}
+inv_add(inv, fairy_symptoms_list, 1);
+%fairy_farmers_quest = ^ft1_symptoms;

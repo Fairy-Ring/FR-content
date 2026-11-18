@@ -1,0 +1,38 @@
+// CANDIDATE wording: fairytale-1.dlg.nature-spirit.
+// UNKNOWN engineering summon: entering the completed quest's grotto recalls him.
+[queue,ft1_nature_arrive]
+if (%druidspirit ! ^druidspirit_complete | %fairy_farmers_quest ! ^ft1_components) return;
+if (npc_find(coord, filliman_tarlock_ns, ^ft1_spirit_search_range, 0) = false) {
+    npc_add(map_findsquare(coord, ^ft1_spirit_min_range, ^ft1_spirit_max_range, ^map_findsquare_lineofwalk), filliman_tarlock_ns, ^ft1_spirit_lifetime);
+    npc_setmode(playerface);
+}
+
+[label,ft1_nature_bless]
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    @filliman_ghost;
+}
+~chatnpc("<p,neutral>Welcome back, my friend. I sensed that you require my help and so I have once more returned.");
+~chatplayer("<p,neutral>Thank you! I need your help in enchanting a pair of secateurs.");
+~chatnpc("<p,quiz>Secateurs? That's a strange thing to enchant. Would you care to inform me why you need them?");
+~chatplayer("<p,neutral>Sure. A Tanglefoot has invaded the fairy kingdom of Zanaris and the only way I can fight it is with a pair of enchanted secateurs, apparently.");
+~chatnpc("<p,neutral>Ah, a Tanglefoot! Your information is correct, secateurs that have been blessed by a Nature Spirit are the only weapons that can harm such a terrible creature.");
+~chatnpc("<p,quiz>I shall be glad to help you. Do you have all of the required items for the ceremony?");
+def_namedobj $first = enum(int, namedobj, ft1_nature_items, %fairy_nature_item1);
+def_namedobj $second = enum(int, namedobj, ft1_nature_items, %fairy_nature_item2);
+def_namedobj $third = enum(int, namedobj, ft1_nature_items, %fairy_nature_item3);
+if (inv_total(inv, secateurs) = 0 | inv_total(inv, $first) = 0 | inv_total(inv, $second) = 0 | inv_total(inv, $third) = 0) {
+    ~chatplayer("<p,neutral>No, I still need to collect some things.");
+    ~chatnpc("<p,neutral>Alright, my friend. Return to me when you have all that is required. I shall be waiting.");
+    return;
+}
+~chatplayer("<p,neutral>Yes, I have everything right here.");
+~chatnpc("<p,neutral>Then let us begin...");
+// Inputs contain a nonstackable pair of secateurs, so the output always has room.
+inv_del(inv, secateurs, 1);
+inv_del(inv, $first, 1);
+inv_del(inv, $second, 1);
+inv_del(inv, $third, 1);
+inv_add(inv, fairy_enchanted_secateurs, 1);
+%fairy_farmers_quest = ^ft1_enchanted;
+~chatnpc("<p,happy>It is done!");
+~chatnpc("<p,neutral>Farewell, <displayname()> and good luck with your coming battle.");

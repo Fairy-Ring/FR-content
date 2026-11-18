@@ -107,11 +107,17 @@ def_int $stage = ~farming_herb_stage;
 def_boolean $herb = true;
 def_boolean $flower = false;
 def_boolean $scarecrow = false;
+def_boolean $hops = false;
 if ($stage = -1) {
     $herb = false;
     $stage = ~farming_flower_stage;
     if ($stage = -1) {
-        $stage = ~farming_veg_stage;
+        $stage = ~farming_hops_stage;
+        if ($stage = -1) {
+            $stage = ~farming_veg_stage;
+        } else {
+            $hops = true;
+        }
     } else {
         $flower = true;
         if ($stage >= 33 & $stage <= 36) {
@@ -144,6 +150,10 @@ if ($herb = true) {
     ~farming_flower_set_stage($written);
     // UNKNOWN functional wording.
     mes("You rake the weeds from the flower patch.");
+} else if ($hops = true) {
+    ~farming_hops_set_stage($stage);
+    // UNKNOWN functional wording.
+    mes("You rake the weeds from the hops patch.");
 } else {
     ~farming_veg_set_stage($stage);
     mes("You use the rake on the allotment.");

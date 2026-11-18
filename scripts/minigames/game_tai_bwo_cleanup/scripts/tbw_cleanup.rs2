@@ -1,13 +1,24 @@
-// Tai Bwo Wannai Cleanup — first product slice (CANDIDATE).
-// Leftover Favour HUD 14206 + Gabooty leftover inv names + jungle loc ops.
-// Official Update:Tai Bwo Wannai Clean-Up 9 Aug 2005. Hunt 289? no.
-// Trio quest_tbwt/ is a different surface — do not steal.
+// Tai Bwo Wannai Cleanup, original 377 HUD and villagers.
+// CANDIDATE mechanics: OSRS Cleanup; period/cache authority is in the subject note.
 
 [proc,tbw_in_village]()(boolean)
 if (inzone(0_43_47_0_0, 0_44_48_63_63, coord) = true) {
     return (true);
 }
 return (false);
+
+// CANDIDATE access: Jungle Potion complete and Murcaily's explanation.
+[proc,tbw_cleanup_can_work]()(boolean)
+// UNKNOWN functional refusals: no retained source supplies these exact lines.
+if (%junglepotion < ^junglepotion_complete) {
+    mes("You need to complete Jungle Potion before helping the village.");
+    return (false);
+}
+if (%cleanup_progress = 0) {
+    mes("Speak to Murcaily about helping the village first.");
+    return (false);
+}
+return (true);
 
 [proc,tbw_cleanup_show_villagers]
 if (%villagers_visible = 1) {
@@ -29,6 +40,7 @@ if (%villagers_visible = 1) {
 
 [proc,tbw_cleanup_enter]
 ~tbw_cleanup_show_villagers;
+%favour_percentage = divide(%vill_comm_points, 10);
 if (%tbw_overlayopen = 0) {
     if_openoverlay(tai_bwo_favour);
     %tbw_overlayopen = 1;
@@ -46,6 +58,11 @@ if (%tbw_overlayopen = 1) {
 [proc,tbw_cleanup_login]
 if (~tbw_in_village = true) {
     ~tbw_cleanup_enter;
+}
+// CANDIDATE: claimed suppliers recover during all logged-in time, not just visits.
+// Unvisited players have zero supplier state and need no recurring timer.
+if (%tai_bwo_villagerchat ! 0) {
+    if (~tbw_villager_has_cooldown = true) settimer(tbw_villager_cooldown, 300);
 }
 
 [mapzoneexit,0_43_47] ~tbw_cleanup_try_exit;
