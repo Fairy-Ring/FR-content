@@ -1,0 +1,137 @@
+// Rules VERIFIED: Tip.it, archived 30 April 2006 (updated 1 March 2006).
+// Enforcement hooks are shared, but they are no-ops outside this arena.
+// Direct bit access avoids adding client varbit records or changing cache CRCs.
+[proc,champions_current]()(int)
+return(getbit_range(%champions_defeated, 11, 14));
+
+[proc,champions_set_current](int $id)
+%champions_defeated = setbit_range_toint(%champions_defeated, $id, 11, 14);
+
+[proc,champions_scroll_escrow]()(int)
+return(getbit_range(%champions_defeated, 15, 15));
+
+[proc,champions_set_scroll_escrow](int $held)
+%champions_defeated = setbit_range_toint(%champions_defeated, $held, 15, 15);
+
+[proc,champions_in_arena]()(boolean)
+return(inzone(0_49_152_17_17, 0_49_152_48_43, coord));
+
+[proc,champions_won](int $id)(boolean)
+if (testbit(%champions_defeated, sub($id, 1)) = 1) return(true);
+return(false);
+
+[proc,champions_ready_for_leon]()(boolean)
+if (getbit_range(%champions_defeated, 0, 9) = 1023 & %champions_defeated_human = 0) return(true);
+return(false);
+
+[proc,champions_entry_check](int $id)(boolean)
+if ($id = 1 & ~prayers_are_active = true) {
+    mes(enum(int, string, champions_rule, $id));
+    return(false);
+}
+if ($id = 2 | $id = 8) {
+    // UNKNOWN interpretation of the VERIFIED rules: every worn slot except
+    // Ghoul's weapon hand is prohibited, including jewellery and ammunition.
+    def_int $slot = 0;
+    while ($slot < inv_size(worn)) {
+        if (inv_getobj(worn, $slot) ! null & ($id = 8 | $slot ! ^wearpos_rhand)) {
+            mes(enum(int, string, champions_rule, $id));
+            return(false);
+        }
+        $slot = add($slot, 1);
+    }
+}
+if ($id = 2) {
+    // The scroll is required for entry but is held by Larxus during this fight.
+    // It is not consumed until victory. This escrow is engineering, not a reward.
+    if (inv_total(inv, champions_challenge_ghoul) > 1) {
+        mes(enum(int, string, champions_rule, $id));
+        return(false);
+    }
+    def_int $slot = 0;
+    while ($slot < inv_size(inv)) {
+        if (inv_getobj(inv, $slot) ! null & inv_getobj(inv, $slot) ! champions_challenge_ghoul) {
+            mes(enum(int, string, champions_rule, $id));
+            return(false);
+        }
+        $slot = add($slot, 1);
+    }
+}
+if ($id = 11 & inv_freespace(inv) ! inv_size(inv)) {
+    mes(enum(int, string, champions_rule, $id));
+    return(false);
+}
+return(true);
+
+[proc,champions_combat_check](int $style)(boolean)
+// Typed dispatch keeps unrelated NPC attacks a no-op, including outside here.
+def_int $id;
+switch_npc(npc_type) {
+    case champions_earthwarrior : $id = 1;
+    case champions_ghoul : $id = 2;
+    case champions_giant : $id = 3;
+    case champions_goblin : $id = 4;
+    case champions_hobgoblin : $id = 5;
+    case champions_imp : $id = 6;
+    case champions_jogre : $id = 7;
+    case champions_lesserdemon : $id = 8;
+    case champions_skeleton : $id = 9;
+    case champions_zombie : $id = 10;
+    case champions_human : $id = 11;
+    case default : return(true);
+}
+if (~champions_current ! $id | %npc_macro_event_target ! uid | ~champions_in_arena = false) {
+    // UNKNOWN functional wording; Lost City's wizard refusal uses an ellipsis instead.
+    mes("It's not after you.");
+    return(false);
+}
+if (~champions_entry_check($id) = false) return(false);
+if (($id = 2 | $id = 11) & inv_freespace(inv) ! inv_size(inv)) {
+    mes(enum(int, string, champions_rule, $id));
+    return(false);
+}
+if (($id = 4 & $style ! ^magic_style) | ($id = 9 & $style ! ^ranged_style) |
+    ($id = 10 & $style = ^magic_style) | ($id = 3 & ($style = ^magic_style | $style = ^ranged_style)) |
+    ($id = 5 & $style ! ^magic_style & $style ! ^ranged_style) | ($id = 7 & $style = ^ranged_style)) {
+    mes(enum(int, string, champions_rule, $id));
+    return(false);
+}
+if ($id = 6 & %sa_attack = ^true) return(~champions_special_check);
+return(true);
+
+[proc,champions_prayer_check]()(boolean)
+if (~champions_current = 1 & ~champions_in_arena = true) {
+    mes(enum(int, string, champions_rule, 1));
+    return(false);
+}
+return(true);
+
+[proc,champions_special_check]()(boolean)
+if (~champions_current = 6 & ~champions_in_arena = true) {
+    // Called by toggle buttons as well as actual special attack execution.
+    mes(enum(int, string, champions_rule, 6));
+    return(false);
+}
+return(true);
+
+[proc,champions_equip_check](obj $obj)(boolean)
+if (~champions_in_arena = true & (~champions_current = 8 | (~champions_current = 2 & oc_wearpos($obj) ! ^wearpos_rhand))) {
+    mes(enum(int, string, champions_rule, ~champions_current));
+    return(false);
+}
+return(true);
+
+[proc,champions_inventory_check]()(boolean)
+if (~champions_in_arena = true & (~champions_current = 2 | ~champions_current = 11)) {
+    mes(enum(int, string, champions_rule, ~champions_current));
+    return(false);
+}
+return(true);
+
+[proc,champions_teleport_check](coord $from)(boolean)
+if (inzone(0_49_152_17_17, 0_49_152_55_43, $from) = true | inzone(1_49_152_17_17, 1_49_152_55_43, $from) = true) {
+    // CANDIDATE OSRS rule/wording; first documented in the wiki in December 2022.
+    ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>There's a ladder for a reason.");
+    return(false);
+}
+return(true);

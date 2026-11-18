@@ -1,4 +1,5 @@
 [label,player_ranged_attack]
+if (~champions_combat_check(^ranged_style) = false) return;
 if (~npc_is_attackable = false) {
     return;
 }
