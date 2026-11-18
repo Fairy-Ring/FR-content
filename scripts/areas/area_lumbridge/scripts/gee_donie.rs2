@@ -1,0 +1,249 @@
+// CANDIDATE wording throughout: OSRS Transcript:Gee r15398479 and
+// Transcript:Donie r15398478, full histories retained by subject lumbridge-advisers.
+// The earlier transcript's gypsy wording is retained, not its 2023 replacement.
+// No RS3 Jobs, Battle of Lumbridge, Xenia, replacement quests or later tutorials.
+[opnpc1,lumbridge_guide2_man]
+@adviser_talk;
+
+[opnpc1,lumbridge_guide2_woman]
+@adviser_talk;
+
+[label,adviser_talk]
+~chatnpc("Hello there, can I help you?");
+// CANDIDATE: Lost Tribe transcript, Asking Donie or Gee. Existing stage 1
+// means Sigmund asked the player to question the town. No quest state is written.
+if (%lost_tribe_quest = 1) {
+    @multi5("Where am I?", adviser_where, "How are you today?", adviser_weather, "Are there any quests I can do here?", adviser_quests, "Your shoe lace is untied.", adviser_lace, "Do you know what happened in the castle cellar?", adviser_cellar);
+}
+// UNKNOWN engineering value: equal weights for the four sourced menus.
+// The transcript gives random selection, not its probabilities.
+def_int $menu = random(4);
+switch_int ($menu) {
+    case 0 : @multi4("Where am I?", adviser_where, "How are you today?", adviser_weather, "Are there any quests I can do here?", adviser_quests, "Where can I get a haircut like yours?", adviser_hair);
+    case 1 : @multi3("What's up?", adviser_up, "Are there any quests I can do here?", adviser_quests, "Can I buy your stick?", adviser_stick);
+    case 2 : @multi3("Do you have anything of value which I can have?", adviser_free, "Are there any quests I can do here?", adviser_quests, "Can I buy your stick?", adviser_stick);
+    case 3 : @multi4("Where am I?", adviser_where, "How are you today?", adviser_weather, "Are there any quests I can do here?", adviser_quests, "Your shoe lace is untied.", adviser_lace);
+}
+
+[label,adviser_where]
+~chatplayer("Where am I?");
+~chatnpc("This is the town of Lumbridge my friend.");
+@multi3("How are you today?", adviser_weather, "Do you know of any quests I can do?", adviser_quests, "Your shoe lace is untied.", adviser_lace);
+
+[label,adviser_weather]
+~chatplayer("How are you today?");
+~chatnpc("Aye, not too bad thank you. Lovely weather in Gielinor this fine day.");
+~chatplayer("Weather?");
+~chatnpc("Yes weather, you know.");
+~chatnpc("The state or condition of the atmosphere at a time and place, with respect to variables such as temperature, moisture, wind velocity, and barometric pressure.");
+~chatplayer("...");
+~chatnpc("Not just a pretty face eh? Ha ha ha.");
+
+[label,adviser_up]
+~chatplayer("What's up?");
+~chatnpc("I assume the sky is up..");
+~chatplayer("You assume?");
+~chatnpc("Yeah, unfortunately I don't seem to be able to look up.");
+
+[label,adviser_free]
+~chatplayer("Do you have anything of value which I can have?");
+~chatnpc("Are you asking for free stuff?");
+~chatplayer("Well... er... yes.");
+~chatnpc("No I do not have anything I can give you. If I did have anything of value I wouldn't want to give it away.");
+
+[label,adviser_stick]
+~chatplayer("Can I buy your stick?");
+~chatnpc("It's not a stick! I'll have you know it's a very powerful staff!");
+~chatplayer("Really? Show me what it can do!");
+~chatnpc("Um..It's a bit low on power at the moment..");
+~chatplayer("It's a stick isn't it?");
+~chatnpc("...Ok it's a stick.. But only while I save up for a staff. Zaff in Varrock square sells them in his shop.");
+~chatplayer("Well good luck with that.");
+
+[label,adviser_hair]
+~chatplayer("Where can I get a haircut like yours?");
+~chatnpc("Yes, it does look like you need a hairdresser.");
+~chatplayer("Oh thanks!");
+~chatnpc("No problem. The hairdresser in Falador will probably be able to sort you out.");
+~chatnpc("The Lumbridge general store sells useful maps if you don't know the way.");
+
+[label,adviser_lace]
+~chatplayer("Your shoe lace is untied.");
+~chatnpc("No it's not!");
+~chatplayer("No you're right. I have nothing to back that up.");
+~chatnpc("Fool! Leave me alone!");
+
+[label,adviser_cellar]
+~chatplayer("Do you know what happened in the castle cellar?");
+~chatnpc("I heard the wall collapsed or something. I don't know why. Perhaps you could get to the bottom of this mystery!");
+
+[label,adviser_quests]
+~chatplayer("Do you know of any quests I can do?");
+~chatnpc("What kind of quest are you looking for?");
+@multi5("I fancy a bit of a fight, anything dangerous?", adviser_fight, "Something easy please, I'm new here.", adviser_easy, "I'm a thinker rather than fighter, anything skill oriented?", adviser_skills, "I want to do all kinds of things, do you know of anything like that?", adviser_all, "Maybe another time.", adviser_bye);
+
+[label,adviser_bye]
+~chatplayer("Maybe another time.");
+
+[label,adviser_fight]
+~chatnpc("Hmm.. dangerous you say? What sort of creatures are you looking to fight?");
+@multi4("Big scary demons!", adviser_demon, "Vampyres!", adviser_vampire, "Small.. something small would be good.", adviser_imp, "Maybe another time.", adviser_bye);
+
+[label,adviser_demon]
+~chatplayer("Big scary demons!");
+~chatnpc("You are a brave soul indeed.");
+~chatnpc("Now that you mention it, I heard a rumour about a gypsy in Varrock who is rambling about some kind of greater evil.. sounds demon-like if you ask me.");
+~chatnpc("Perhaps you could check it out if you are as brave as you say?");
+if (%demonstart = ^demon_complete) {
+    ~chatplayer("I've already killed the demon Delrith. He was merely a stain on my sword when I was finished with him!");
+    ~chatnpc("Well done! However I'm sure if you search around the world you will find more challenging foes to slay.");
+} else {
+    ~chatplayer("Thanks for the tip, perhaps I will.");
+}
+
+[label,adviser_vampire]
+~chatplayer("Vampyres!");
+~chatnpc("Ha ha. I personally don't believe in such things. However, there is a man in Draynor Village who has been scaring the village folk with stories of vampyres.");
+~chatnpc("He's named Morgan and can be found in one of the village houses. Perhaps you could see what the matter is?");
+if (%vampire = ^vampire_complete) {
+    ~chatplayer("Oh I have already killed that nasty blood-sucking vampyre. Draynor will be safe now.");
+    ~chatnpc("Yeah, yeah of course you did. Everyone knows vampyres are not real....");
+    ~chatplayer("What! I did slay the beast..I really did.");
+    ~chatnpc("You're not fooling anyone you know.");
+    ~chatplayer("..Huh.. But... Hey! I did... believe what you like.");
+} else {
+    ~chatplayer("Thanks for the tip.");
+}
+
+[label,adviser_imp]
+~chatplayer("Small.. something small would be good.");
+~chatnpc("Small? Small isn't really that dangerous though is it?");
+~chatplayer("Yes it can be! There could be anything from an evil chicken to a poisonous spider. They attack in numbers you know!");
+~chatnpc("Yes ok, point taken. Speaking of small monsters, I hear old Wizard Mizgog in the wizards' tower has just had all his beads taken by a gang of mischievous imps.");
+~chatnpc("Sounds like it could be a quest for you?");
+if (%imp = ^imp_complete) {
+    ~chatplayer("Yes I know of Mizgog and have already helped him with his imp problem. It took me ages to find those beads!");
+    ~chatnpc("Imps will be imps!");
+} else {
+    ~chatplayer("Thanks for your help.");
+}
+
+[label,adviser_easy]
+~chatplayer("Something easy please, I'm new here.");
+~chatnpc("I can tell you about plenty of small easy tasks.");
+~chatnpc("The Lumbridge cook has been having problems, the Duke is confused over some strange talisman and on top of all that, poor lad Romeo in Varrock has girlfriend problems.");
+@multi4("The Lumbridge cook.", adviser_cook, "The Duke's strange talisman.", adviser_runes, "Romeo and his girlfriend.", adviser_romeo, "Maybe another time.", adviser_bye);
+
+[label,adviser_cook]
+~chatplayer("Tell me about the Lumbridge cook.");
+~chatnpc("It's funny really, the cook would forget his head if it wasn't screwed on. This time he forgot to get ingredients for the Duke's birthday cake.");
+~chatnpc("Perhaps you could help him? You will probably find him in the Lumbridge Castle kitchen.");
+if (%cookquest = ^cook_complete) {
+    ~chatplayer("I have already helped the cook in Lumbridge.");
+    ~chatnpc("Oh yes, so you have. I am sure the Duke will be pleased.");
+} else {
+    ~chatplayer("Thank you. I shall go speak with him.");
+}
+
+[label,adviser_runes]
+~chatplayer("Tell me about the Duke's strange talisman.");
+~chatnpc("Well the Duke of Lumbridge has found a strange talisman that no one seems to understand. Perhaps you could help him? You can probably find him upstairs in Lumbridge Castle.");
+if (%runemysteries = ^runemysteries_complete) {
+    ~chatplayer("Yes, I have already solved the Rune mysteries.");
+    ~chatnpc("Ah excellent. Thank you very much adventurer.");
+} else {
+    ~chatplayer("Sounds mysterious. I may just do that. Thanks.");
+}
+
+[label,adviser_romeo]
+~chatplayer("Tell me about Romeo and his girlfriend please.");
+~chatnpc("Romeo in Varrock needs help with finding his beloved Juliet, you may be able to help him out.");
+~chatnpc("Unless of course you manage to find Juliet first in which case she has probably lost Romeo.");
+if (%rjquest = ^romeojuliet_complete) {
+    ~chatplayer("Oh yes, I've already helped Romeo in the best possible way I can...");
+    ~chatnpc("Really?");
+    ~chatplayer("Yup.");
+    ~chatnpc("...How?");
+    ~chatplayer("He thinks Juliet is dead...");
+    ~chatnpc("Well.. ok.. well done... I think...");
+} else {
+    ~chatplayer("Right, ok. Romeo is in Varrock?");
+    ~chatnpc("Yes you can't miss him, he's wandering aimlessly in the square.");
+}
+
+[label,adviser_skills]
+~chatplayer("I'm a thinker rather than fighter, anything skill orientated?");
+~chatnpc("Skills play a big part when you want to progress in knowledge throughout Gielinor. I know of a few skill- related quests that can get you started.");
+~chatnpc("You may be able to help out Fred the farmer who is in need of someones crafting expertise.");
+~chatnpc("Or, there's always Doric the dwarf who needs an errand running for him?");
+@multi3("Fred the farmer.", adviser_sheep, "Doric the dwarf.", adviser_doric, "Maybe another time.", adviser_bye);
+
+[label,adviser_sheep]
+~chatplayer("Tell me about Fred the farmer please.");
+~chatnpc("You can find Fred next to the field of sheep in Lumbridge. Perhaps you should go and speak with him.");
+if (%sheep = ^sheep_complete) {
+    ~chatplayer("I have already helped Fred the farmer. I sheared his sheep and made 20 balls of wool for him.");
+    ~chatplayer("He wouldn't let me kill his chickens though.");
+    ~chatnpc("Lumbridge chickens do make good target practice.");
+    ~chatnpc("You will have to wait until he isn't looking.");
+} else {
+    ~chatplayer("Thanks, maybe I will.");
+}
+
+[label,adviser_doric]
+~chatplayer("Tell me about Doric the dwarf.");
+~chatnpc("Doric the dwarf is located north of Falador. He might be able to help you with smithing. You should speak to him. He may let you use his anvils.");
+if (%doricquest = ^doric_complete) {
+    ~chatplayer("Yes, I've been to see Doric already. He was happy to let me use his anvils after I ran a small errand for him.");
+    ~chatnpc("Oh good, Thank you <displayname>!");
+} else {
+    ~chatplayer("Thanks for the tip.");
+}
+
+[label,adviser_all]
+~chatplayer("I want to do all kinds of things, do you know of anything like that?");
+~chatnpc("Of course I do. Gielinor is a huge place you know, now let me think...");
+~chatnpc("Hetty the witch in Rimmington might be able to offer help in the ways of magical abilities..");
+~chatnpc("Also, pirates are currently docked in Port Sarim, Where pirates are, treasure is never far away...");
+~chatnpc("Or you could go help out Ernest who got lost in Draynor Manor, spooky place that.");
+@multi4("Hetty the Witch.", adviser_hetty, "Pirate's treasure.", adviser_pirate, "Ernest and Draynor Manor.", adviser_ernest, "Maybe another time.", adviser_bye);
+
+[label,adviser_hetty]
+~chatplayer("Tell me about Hetty the witch.");
+~chatnpc("Hetty the witch can be found in Rimmington, south of Falador. She's currently working on some new potions. Perhaps you could give her a hand? She might be able to offer help with your magical abilities.");
+if (%hetty = ^hetty_complete) {
+    ~chatplayer("Yes, I have already been to see Hetty, she gave me super cosmic powers after I helped out with her potion! I could probably destroy you with a single thought!");
+    ~chatnpc("Did she really?");
+    ~chatplayer("No not really...");
+    ~chatnpc("Right.....");
+} else {
+    ~chatplayer("Ok thanks, let's hope she doesn't turn me into a potato or something..");
+}
+
+[label,adviser_pirate]
+~chatplayer("Tell me about Pirate's Treasure.");
+~chatnpc("RedBeard Frank in Port Sarim's bar, the Rusty Anchor, might be able to tell you about the rumored treasure that is buried somewhere in Gielinor.");
+if (%hunt = ^hunt_complete) {
+    ~chatplayer("Yarr! I already found the booty!");
+    ~chatnpc("Yarr indeed my friend. A most excellent find.");
+    ~chatplayer("Yarr!");
+    ~chatnpc("Yarrr!");
+    ~chatplayer("YARRR!");
+    ~chatnpc("Right, that's enough of that!");
+    ~chatplayer("..Sorry.");
+} else {
+    ~chatplayer("Sounds adventurous, I may have to check that out. Thank you.");
+}
+
+[label,adviser_ernest]
+~chatplayer("Tell me about Ernest please.");
+~chatnpc("The best place to start would be at the gate to Draynor Manor. There you will find Veronica who will be able to tell you more.");
+~chatnpc("I suggest you tread carefully in that place; it's haunted.");
+if (%haunted = ^haunted_complete) {
+    ~chatplayer("Yeah, I found Ernest already. Professor Oddenstein had turned him into a chicken!");
+    ~chatnpc("A chicken!?");
+    ~chatplayer("Yeah a chicken. It could have been worse though.");
+    ~chatnpc("Very true, poor guy.");
+} else {
+    ~chatplayer("Sounds like fun. I've never been to a Haunted Manor before.");
+}
