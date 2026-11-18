@@ -62,6 +62,6 @@ defence=25
 param=slayer_category,^slayer_dagannoth
 // CANDIDATE current exact-variant aggression and Stab attack use ordinary combat.
 huntmode=aggressive_melee
-huntrange=^waterbirth_egg_hunt_radius
+huntrange=^waterbirth_spawn_hunt_radius
 param=damagetype,^stab_style
 param=attackrate,4
