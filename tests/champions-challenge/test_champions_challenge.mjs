@@ -21,6 +21,7 @@ const { default: OpLoc } = await engineModule('network/game/client/model/OpLoc.t
 const { default: OpLocHandler } = await engineModule('network/game/client/handler/OpLocHandler.ts');
 const { PlayerLoading } = await engineModule('engine/entity/PlayerLoading.ts');
 const { default: Packet } = await engineModule('io/Packet.ts');
+const { CollisionType } = await engineModule('engine/routefinder/index.ts');
 
 const raceNames = [
   'earthwarrior', 'ghoul', 'giant', 'goblin', 'hobgoblin', 'imp',
@@ -46,12 +47,16 @@ const arenaOriginX = 49 * 64;
 const arenaOriginZ = 152 * 64;
 const arenaArea = [{ level: 0, minX: arenaOriginX, maxX: arenaOriginX + 63, minZ: arenaOriginZ, maxZ: arenaOriginZ + 63 }];
 const arenaSpawn = { level: 0, x: arenaOriginX + 32, z: arenaOriginZ + 30 };
-const arenaEntry = { level: 0, x: arenaOriginX + 47, z: arenaOriginZ + 29 };
+const arenaEntry = { level: 0, x: arenaOriginX + 46, z: arenaOriginZ + 30 };
 const gallery = { level: 0, x: arenaOriginX + 49, z: arenaOriginZ + 30 };
 const statue = { level: 0, x: arenaOriginX + 48, z: arenaOriginZ + 30 };
 const arenaLadder = { level: 0, x: arenaOriginX + 47, z: arenaOriginZ + 30 };
 const larxus = { level: 0, x: 49 * 64 + 51, z: 52 * 64 + 30 };
 const surfaceApproach = { level: 0, x: 49 * 64 + 50, z: 52 * 64 + 30 };
+const basementEntry = { level: 0, x: arenaOriginX + 53, z: arenaOriginZ + 30 };
+const surfaceLanding = { level: 0, x: 49 * 64 + 54, z: 52 * 64 + 28 };
+const arenaGateSquare = { level: 0, x: arenaOriginX + 44, z: arenaOriginZ + 30 };
+const pitGateSquare = { level: 0, x: arenaOriginX + 46, z: arenaOriginZ + 30 };
 const dialogue = new IfButtonHandler();
 const continueDialogue = new ResumePauseButtonHandler();
 const locHandler = new OpLocHandler();
@@ -155,6 +160,45 @@ function standNearLoc(loc) {
 }
 function mapBlocked(x, z, level) {
   return map.isMapBlocked(x, z, level);
+}
+function assertWalkable(position, label, size = 1) {
+  for (let dx = 0; dx < size; dx++) {
+    for (let dz = 0; dz < size; dz++) {
+      assert.equal(mapBlocked(position.x + dx, position.z + dz, position.level), false,
+        `${label} footprint tile ${position.x + dx},${position.z + dz},${position.level} is walkable`);
+    }
+  }
+}
+function routeEnd(start, route, label) {
+  const end = { level: start.level, x: start.x, z: start.z };
+  assertWalkable(end, `${label} origin`);
+  for (const packed of route) {
+    const waypoint = CoordGrid.unpackCoord(packed);
+    assert.equal(waypoint.level, start.level, `${label} stays on its logical floor`);
+    while (end.x !== waypoint.x || end.z !== waypoint.z) {
+      const dx = Math.sign(waypoint.x - end.x);
+      const dz = Math.sign(waypoint.z - end.z);
+      assert.equal(map.canTravel(end.level, end.x, end.z, dx, dz, 1, 0, CollisionType.NORMAL), true,
+        `${label} can step from ${end.x},${end.z} by ${dx},${dz}`);
+      end.x += dx;
+      end.z += dz;
+      assertWalkable(end, label);
+    }
+  }
+  return end;
+}
+function assertTileRoute(start, destination, label) {
+  assertWalkable(destination, `${label} destination`);
+  const route = map.findPath(start.level, start.x, start.z, destination.x, destination.z);
+  assert.deepEqual(routeEnd(start, route, label), destination, `${label} reaches the exact destination, not a nearby fallback`);
+}
+function assertLocRoute(start, loc, label) {
+  const access = types.LocType.get(loc.type).forceapproach;
+  const route = map.findPathToLoc(start.level, start.x, start.z, loc.x, loc.z, 1, loc.width, loc.length, loc.angle, loc.shape, access);
+  const end = routeEnd(start, route, label);
+  assert.equal(map.reachedLoc(end.level, end.x, end.z, loc.x, loc.z, loc.width, loc.length, 1, loc.angle, loc.shape, access), true,
+    `${label} reaches an operable loc side`);
+  return end;
 }
 function advanceDialogue(state, label) {
   assert(state, `${label} has an active script`);
@@ -394,6 +438,7 @@ test('real item-on-Larxus, packed trapdoor and ladder preserve the Ghoul scroll 
   player.z = gallery.z;
   clickLoc(trap);
   assert.deepEqual([player.level, player.x, player.z], [arenaEntry.level, arenaEntry.x, arenaEntry.z], 'trapdoor reaches the packed arena landing tile');
+  assertWalkable(player, 'actual compiled arena landing');
   assert.equal(current(), 2);
   assert.equal(escrow(), 1, 'entry moves the held scroll into the shared-varp escrow bit');
   assert.equal(count(player, scrollNames[1]), 0, 'the escrowed Ghoul scroll is absent from inventory');
@@ -401,16 +446,86 @@ test('real item-on-Larxus, packed trapdoor and ladder preserve the Ghoul scroll 
   const spawned = [...World.npcs].filter(npc => npc.type === id('NpcType', championNpcNames[1]) && npc.level === arenaSpawn.level && npc.x === arenaSpawn.x && npc.z === arenaSpawn.z);
   assert.equal(spawned.length, 1, 'the packed entry trigger creates the Ghoul at the configured spawn');
 
+  const gate = findWorldLoc('champions_portcullis', arenaArea)[0];
+  assert(gate, 'native arena portcullis exists');
+  assertLocRoute(player, gate, 'landing to arena gate');
+  runLocOption(player, gate, locHandler, OpLoc);
+  assert.deepEqual([player.level, player.x, player.z], [arenaGateSquare.level, arenaGateSquare.x, arenaGateSquare.z], 'real gate crosses to the arena floor');
+  assertWalkable(player, 'actual inward gate destination');
+  tickPlayer(player);
+  assertTileRoute(arenaGateSquare, arenaSpawn, 'arena gate to champion floor');
+  assertTileRoute(arenaSpawn, arenaGateSquare, 'champion floor back to arena gate');
+  const returnApproach = assertLocRoute(arenaGateSquare, gate, 'arena floor to the native gate approach');
+  // The offline fixture starts at the checked endpoint; the headed cell walks it.
+  player.x = returnApproach.x;
+  player.z = returnApproach.z;
+  runLocOption(player, gate, locHandler, OpLoc);
+  assert.deepEqual([player.level, player.x, player.z], [pitGateSquare.level, pitGateSquare.x, pitGateSquare.z], 'real gate returns to the ladder pit');
+  assertWalkable(player, 'actual outward gate destination');
+  tickPlayer(player);
   const ladder = findWorldLoc('champions_arenaladder', arenaArea).find(loc =>
     loc.level === arenaLadder.level && loc.x === arenaLadder.x && loc.z === arenaLadder.z
   );
   assert(ladder, 'native basement ladder is present at the effective level-0 tile');
-  clickLoc(ladder);
+  assertLocRoute(player, ladder, 'gate return to arena exit ladder');
+  runLocOption(player, ladder, locHandler, OpLoc);
   assert.deepEqual([player.level, player.x, player.z], [gallery.level, gallery.x, gallery.z], 'real ladder action returns to the gallery');
   assert.equal(current(), 0, 'leaving clears the active challenger');
   assert.equal(escrow(), 0, 'leaving clears escrow');
   assert.equal(count(player, scrollNames[1]), 1, 'leaving returns the unconsumed Ghoul scroll');
   assert.equal([...World.npcs].filter(npc => npc.type === id('NpcType', championNpcNames[1])).length, 0, 'leaving removes the owned challenger');
+});
+
+test('all fixed travel and champion footprints use connected packed floor', () => {
+  fresh(gallery);
+  const ladder = locByBase('champions_arenaladder', arenaLadder);
+  assert(ladder, 'cache arena ladder exists');
+  const walkableFeet = [];
+  for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+    if ((dx || dz) && !mapBlocked(ladder.x + dx, ladder.z + dz, ladder.level)) {
+      walkableFeet.push({ level: ladder.level, x: ladder.x + dx, z: ladder.z + dz });
+    }
+  }
+  assert.deepEqual(walkableFeet, [arenaEntry], 'arrival is the cache ladder’s only adjacent walkable foot tile');
+  for (const [name, position] of Object.entries({ arenaEntry, gallery, basementEntry, surfaceLanding, arenaGateSquare, pitGateSquare })) {
+    assertWalkable(position, name);
+  }
+  for (const name of championNpcNames) {
+    assertWalkable(arenaSpawn, `${name} spawn`, types.NpcType.getByName(name).size);
+  }
+  const gate = findWorldLoc('champions_portcullis', arenaArea)[0];
+  assert(gate, 'cache portcullis exists');
+  assertLocRoute(arenaEntry, gate, 'arrival to portcullis');
+  assertTileRoute(arenaGateSquare, arenaSpawn, 'arena gate to every champion spawn');
+  assertTileRoute(arenaSpawn, arenaGateSquare, 'every champion spawn back to gate');
+  assertLocRoute(pitGateSquare, ladder, 'returned gate side to exit ladder');
+  assertTileRoute(gallery, basementEntry, 'gallery to basement exit approach');
+
+  tickPlayer(player);
+  const trap = findWorldLoc('champions_trap_door_closed').find(loc => loc.z < arenaOriginZ);
+  assert(trap, 'cache surface trapdoor exists');
+  if (trap.type === id('LocType', 'champions_trap_door_closed')) clickLoc(trap);
+  const openTrap = findWorldLoc('champions_trap_door_closed').find(loc => loc.x === trap.x && loc.z === trap.z);
+  assert.equal(openTrap?.type, id('LocType', 'champions_trap_door_open'), 'surface trapdoor opens');
+  tickPlayer(player);
+  clickLoc(openTrap);
+  assert.deepEqual([player.level, player.x, player.z], [basementEntry.level, basementEntry.x, basementEntry.z], 'compiled surface trapdoor reaches its basement foot');
+  assertWalkable(player, 'actual basement landing');
+  const basementLadder = findWorldLoc('champions_ladderup').find(loc => loc.z >= arenaOriginZ);
+  assert(basementLadder, 'cache basement exit ladder exists');
+  assert.equal(ladder.angle, 1, 'cache arena ladder faces west');
+  assert.equal(basementLadder.angle, ladder.angle, 'both cache ladders share the same orientation');
+  assert.deepEqual(basementEntry, { level: basementLadder.level, x: basementLadder.x - 1, z: basementLadder.z },
+    'basement arrival is the matching ladder’s cardinal west foot');
+  tickPlayer(player);
+  assertLocRoute(player, basementLadder, 'basement landing to exit ladder');
+  runLocOption(player, basementLadder, locHandler, OpLoc);
+  assert.deepEqual([player.level, player.x, player.z], [surfaceLanding.level, surfaceLanding.x, surfaceLanding.z], 'compiled basement ladder reaches its surface landing');
+  assertWalkable(player, 'actual surface landing');
+  const surfaceFloor = { level: trap.level, x: trap.x + 1, z: trap.z + 1 };
+  assertTileRoute(surfaceLanding, surfaceFloor, 'surface landing to neighboring mapped floor');
+  assertTileRoute(surfaceFloor, surfaceLanding, 'neighboring surface floor back to landing');
+  assertLocRoute(surfaceLanding, openTrap, 'surface landing back to its trapdoor');
 });
 
 test('equipment, pickup, food, prayer and teleport shared hooks refuse only their guarded actions', () => {

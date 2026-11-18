@@ -4,6 +4,9 @@
 ^champions_statue = 0_49_152_48_30
 ^champions_imp_spawn = 0_49_152_32_30
 ^champions_gallery_stand = 0_49_152_49_30
-^champions_basement_ladder = 0_49_152_54_29
-^champions_arena_ladder = 0_49_152_47_29
-^champions_surface = 0_49_52_54_26
+// UNKNOWN period basement landing: use the original ladder's walkable west foot.
+^champions_basement_ladder = 0_49_152_53_30
+// UNKNOWN period landing: the cache arena ladder's only adjacent walkable tile.
+^champions_arena_ladder = 0_49_152_46_30
+// UNKNOWN period surface landing: use the trapdoor's walkable north approach.
+^champions_surface = 0_49_52_54_28

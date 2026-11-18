@@ -64,7 +64,8 @@ npc_add(^champions_imp_spawn, enum(int, npc, champions_npc, $id), 1000);
 [oploc1,champions_portcullis]
 sound_synth(bigdoor_open, 1, 0);
 // UNKNOWN exact crossing animation; use the gate's two adjacent floor squares.
-if (coordx(coord) >= coordx(loc_coord)) {
+// The cache wall's west approach is its anchor tile; east is x > anchor.
+if (coordx(coord) > coordx(loc_coord)) {
     p_telejump(movecoord(loc_coord, -1, 0, 0));
 } else {
     p_telejump(movecoord(loc_coord, 1, 0, 0));
