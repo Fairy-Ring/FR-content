@@ -1,0 +1,10 @@
+[farming_flower]
+column=seed,obj
+column=produce,namedobj
+column=first,int
+column=mature,int
+column=level,int
+column=plant_xp,int
+column=harvest_xp,int
+column=yield,int
+column=name,string
