@@ -2,6 +2,11 @@
 // The original 377 NPC definitions stay unchanged, including their stationarity.
 // Quest-owned deal_squid and swan_fishingspot are not ordinary fishing spots.
 
+[opnpc1,0_52_149_freshfish] @attempt_fish_trout_salmon;
+[opnpc3,0_52_149_freshfish] @attempt_fish_pike;
+[opnpc4,0_52_149_freshfish] @fish_trout_salmon;
+[opnpc5,0_52_149_freshfish] @fish_pike;
+
 [opnpc1,52_59_rarefish] @attempt_fish_lobster;
 [opnpc3,52_59_rarefish] @attempt_fish_swordfish;
 [opnpc4,52_59_rarefish] @fish_lobster;

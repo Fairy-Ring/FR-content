@@ -14,6 +14,10 @@ const { EntityLifeCycle } = await engineModule('engine/entity/EntityLifeCycle.ts
 const actionDelay = id('VarPlayerType', 'action_delay');
 const xp = p => p.stats[PlayerStat.FISHING];
 const methods = {
+  freshfish: [
+    { option: 1, level: 20, tool: 'fly_fishing_rod', bait: 'feather', products: [['raw_trout', 500], ['raw_salmon', 700]], secondary: 30, message: 'You need at least 20 Fishing to lure these fish.' },
+    { option: 3, level: 25, tool: 'fishing_rod', bait: 'fishing_bait', products: [['raw_pike', 600]], message: 'You need at least 25 Fishing to bait these fish.' }
+  ],
   rarefish: [
     { option: 1, level: 40, tool: 'lobster_pot', products: [['raw_lobster', 900]], message: 'You need at least 40 Fishing to catch Lobsters.' },
     { option: 3, level: 35, tool: 'harpoon', products: [['raw_tuna', 800], ['raw_swordfish', 1000]], secondary: 50, message: 'You need at least 35 Fishing to harpoon these fish.' }
@@ -24,10 +28,12 @@ const methods = {
   ]
 };
 const spots = [
+  { name: '0_52_149_freshfish', category: 'freshfish', placements: 7, options: ['Lure', null, 'Bait', 'hidden', 'hidden'] },
   { name: '52_59_rarefish', category: 'rarefish', placements: 3, options: ['Cage', null, 'Harpoon', 'hidden', 'hidden'] },
   { name: '0_54_49_memberfish', category: 'memberfish', placements: 12, options: ['Net', null, 'Harpoon', 'hidden', 'hidden'] },
   { name: '0_55_49_memberfish', category: 'memberfish', placements: 9, options: ['Net', null, 'Harpoon', 'hidden', 'hidden'] }
 ];
+const equipment = method => [method.tool, ...(method.bait ? [method.bait] : [])];
 let cases = 0, failures = 0;
 function test(name, body) {
   cases++;
@@ -40,7 +46,7 @@ function fixture(type, level, items = []) {
   p.baseLevels[PlayerStat.FISHING] = level;
   p.levels[PlayerStat.FISHING] = level;
   p.stats[PlayerStat.FISHING] = getExpByLevel(level);
-  for (const item of items) p.invAdd(inv, obj(item), 1);
+  for (const item of items) p.invAdd(inv, obj(item), ['fishing_bait', 'feather'].includes(item) ? 100 : 1);
   const t = types.NpcType.get(type);
   const n = new Npc(0, p.x - 1, p.z, t.size, t.size, EntityLifeCycle.DESPAWN, World.npcs.next(), type, t.blockwalk);
   World.addNpc(n, -1);
@@ -122,12 +128,16 @@ try {
       console.log(`BANKS ${spot.name} ${JSON.stringify(fishable)}`);
     });
     for (const method of methods[spot.category]) {
-      test(`${spot.name} op${method.option}: level boundary refusal`, () => refusal(spot, method, method.level - 1, [method.tool], method.message));
+      test(`${spot.name} op${method.option}: level boundary refusal`, () => refusal(spot, method, method.level - 1, equipment(method), method.message));
       test(`${spot.name} op${method.option}: missing tool refusal`, () => refusal(spot, method, 99, [], equipmentMessage(method.tool)));
+      if (method.bait) test(`${spot.name} op${method.option}: missing bait refusal`, () => refusal(spot, method, 99, [method.tool], method.bait === 'feather' ? "You don't have any feathers left." : "You don't have any fishing bait left."));
       for (const level of new Set([method.level, method.secondary ? method.secondary - 1 : 99, method.secondary ?? 99])) {
         test(`${spot.name} op${method.option}: exact published behavioral control at ${level}`, () => {
-          const f = fixture(type, level, [method.tool]), control = fixture(reference(spot.category), level, [method.tool]);
-          try { assert.deepEqual(run(f, method), run(control, method)); }
+          const f = fixture(type, level, equipment(method)), control = fixture(reference(spot.category), level, equipment(method));
+          try {
+            assert.deepEqual(run(f, method), run(control, method));
+            if (method.secondary && level < method.secondary) assert.equal(count(f.p, method.products[1][0]), 0);
+          }
           finally { dispose(f); dispose(control); }
         });
       }
@@ -145,18 +155,21 @@ try {
       } else {
         for (const [index, [fish, experience]] of method.products.entries()) {
           test(`${spot.name} op${method.option}: ${fish} catch, exact XP and continuation`, () => {
-            const f = fixture(type, 99, [method.tool]), beforeXp = xp(f.p);
+            const f = fixture(type, 99, equipment(method)), beforeXp = xp(f.p);
             try {
               run(f, method, 5, method.products.length === 2 && index === 0 ? 'fallback' : 'success');
               assert.equal(count(f.p, fish), 1); assert.equal(xp(f.p) - beforeXp, experience);
+              if (method.bait) assert.equal(count(f.p, method.bait), 99, 'one bait per successful catch');
               for (const [other] of method.products) if (other !== fish) assert.equal(count(f.p, other), 0);
-              assert.equal(f.p.target, f.n); assert.equal(f.p.targetOp, ServerTriggerType.APNPC1 + (method.option === 1 ? 3 : 4));
+              assert.equal(f.p.target, f.n);
+              const hidden = ServerTriggerType.APNPC1 + (method.option === 1 ? 3 : 4);
+              assert([hidden, ...(spot.category === 'freshfish' && method.option === 3 ? [ServerTriggerType.APNPC3] : [])].includes(f.p.targetOp));
             } finally { dispose(f); }
           });
         }
       }
       test(`${spot.name} op${method.option}: failed catch consumes and awards nothing`, () => {
-        const f = fixture(type, 99, [method.tool]), before = inventory(f.p), beforeXp = xp(f.p);
+        const f = fixture(type, 99, equipment(method)), before = inventory(f.p), beforeXp = xp(f.p);
         try { run(f, method, 18, 'failure'); assert.deepEqual(inventory(f.p), before); assert.equal(xp(f.p), beforeXp); }
         finally { dispose(f); }
       });
@@ -164,4 +177,4 @@ try {
   }
 } finally { Runner.HANDLERS[ScriptOpcode.STAT_RANDOM] = nativeStatRandom; }
 console.log(`N617 ${cases - failures}/${cases} cases passed`);
-process.exitCode = failures ? 1 : 0;
+process.exit(failures ? 1 : 0);
