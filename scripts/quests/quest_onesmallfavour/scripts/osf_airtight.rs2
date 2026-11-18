@@ -29,6 +29,10 @@ if (last_useitem = pot_empty) {
 if (last_useitem = potlid) {
     @osf_lid_on_pot;
 }
+if (last_useitem = rag_vinegar) {
+    ~rag_fill_vinegar;
+    return;
+}
 ~displaymessage(^dm_default);
 
 [label,osf_lid_on_pot]

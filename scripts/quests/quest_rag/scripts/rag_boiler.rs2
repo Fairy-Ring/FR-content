@@ -6,6 +6,9 @@ if (last_useitem ! pot_empty) {
     ~displaymessage(^dm_default);
     return;
 }
+~rag_fill_vinegar;
+
+[proc,rag_fill_vinegar]
 inv_del(inv, rag_vinegar, 1);
 inv_del(inv, pot_empty, 1);
 inv_add(inv, jug_empty, 1);
