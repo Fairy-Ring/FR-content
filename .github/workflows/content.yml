@@ -250,6 +250,8 @@ jobs:
           run_test tests/enchanted-key/test_enchanted_key.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/enchanted-key/test_enchanted_key.mjs
           run_test tests/fairytale-1/test_fairytale1.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/fairytale-1/test_fairytale1.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
+          run_test tests/lumbridge-advisers/test_advisers.mjs node --import tsx ../content/tests/lumbridge-advisers/test_advisers.mjs
+          run_test tests/npc-talk-audit/runtime.mts bash ../content/tests/npc-talk-audit/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
           run_test tests/skill-menus/runtime.mts bash ../content/tests/skill-menus/runtime.sh "$PWD"
           run_test tests/skill-guides/test_skill_guides.mjs node --import tsx ../content/tests/skill-guides/test_skill_guides.mjs
