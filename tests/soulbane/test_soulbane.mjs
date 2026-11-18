@@ -434,8 +434,23 @@ function finishRageScene(p) {
     if (state?.execution === ScriptState.PAUSEBUTTON) {
       const root = types.Component.get(p.modalChat)?.comName ?? '';
       assert(!/^multi[2-5]$/.test(root), 'the compiled family scene has no unanswered choices');
-      pages.push(...dialoguePage(p));
+      const page = dialoguePage(p);
+      pages.push(...page);
+      const outburst = page.some(text => text.includes('Arrrgghhh!'));
       resumeDialogue(p);
+      if (outburst) {
+        const cycleCount = types.SeqType.get(requiredId('SeqType', 'anger_special_play')).duration;
+        const expectedDelay = Math.ceil(cycleCount / 30);
+        assert(cycleCount > 0 && expectedDelay > 0, 'the packed Rage sequence defines a positive duration');
+        assert.equal(p.delayedUntil - World.currentTick - 1, expectedDelay,
+          'Rage burst delay converts packed client cycles to server ticks, rounded up');
+        for (let elapsed = 0; elapsed <= expectedDelay + 1; elapsed++) worldTick();
+        assert.equal(p.activeScript?.execution, ScriptState.PAUSEBUTTON,
+          'Rage reaches the first Continue after its animation delay');
+        assert(dialoguePage(p).some(text => text.includes('Wow! How did I do that?')),
+          'the first post-animation Continue shows the authored reaction');
+        console.log(`PASS Rage burst timing: ${cycleCount} client cycles -> ${expectedDelay} server ticks; first Continue ready`);
+      }
       if (stage(p) === 2 && readVar(p, 'soulbane_anger_donespecial') === 1 && observeRageScene(p)) {
         sawFamilyStaging = true;
       }

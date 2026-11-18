@@ -9,7 +9,8 @@ walktrigger(soulbane_scene_resume);
 anim(anger_special_play, 0);
 spotanim_pl(anger_special_spotanim, 0, 0);
 ~soulbane_rage_burst;
-p_delay(seqlength(anger_special_play));
+// seqlength returns client cycles; p_delay takes server ticks (30 cycles/tick).
+p_delay(calc((seqlength(anger_special_play) + 29) / 30));
 ~chatplayer("<p,shock>Wow! How did I do that? There's something truly mental about this place!");
 ~soulbane_clear_room_npcs;
 if_openoverlay(null);
