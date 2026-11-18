@@ -59453,48 +59453,6 @@ hillskew=yes
 active=yes
 op1=Squeeze-through
 
-[farming_scarecrow_weeds_1_mory]
-name=Scarecrow
-desc=Should scare off the birds...
-model=belladonna_patch_weeds1
-model2=farming_scarecrow
-model3=belladonna_patch_weededi2
-recol1s=10658
-recol1d=5346
-recol2s=8544
-recol2d=4289
-ambient=25
-op2=Inspect
-op4=Guide
-
-[farming_scarecrow_weeds_2_mory]
-name=Scarecrow
-desc=Should scare off the birds...
-model=belladonna_patch_weeds2
-model2=farming_scarecrow
-model3=belladonna_patch_weededi2
-recol1s=10658
-recol1d=5346
-recol2s=8544
-recol2d=4289
-ambient=25
-op2=Inspect
-op4=Guide
-
-[farming_scarecrow_weeds_3_mory]
-name=Scarecrow
-desc=Should scare off the birds...
-model=belladonna_patch_weeds3
-model2=farming_scarecrow
-model3=belladonna_patch_weededi2
-recol1s=10658
-recol1d=5346
-recol2s=8544
-recol2d=4289
-ambient=25
-op2=Inspect
-op4=Guide
-
 [scenery_9341]
 model=loc_9341
 recol1s=198
