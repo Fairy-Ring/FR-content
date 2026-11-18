@@ -55,7 +55,7 @@ const definitions = [
   { name: 'dungeon_dagganoth_lighter', family: 'ranged', hitpoints: 85, rangeDefence: 150 },
   { name: 'dungeon_dagganoth_lighter_deeper', family: 'ranged', hitpoints: 85, rangeDefence: 150 },
   { name: 'dungeon_dagganoth_magic_monster', family: 'magic', hitpoints: 130, rangeDefence: -10 },
-  { name: 'dungeon_dagganoth_magic_monster_deeper', family: 'magic', hitpoints: 130, rangeDefence: 10 }
+  { name: 'dungeon_dagganoth_magic_monster_deeper', family: 'magic', hitpoints: 130, rangeDefence: 10, stats: { ATTACK: 10, STRENGTH: 10 } }
 ];
 
 const families = {
@@ -155,7 +155,7 @@ async function run() {
     const family = families[spec.family];
     same(type.name, family.name, `${spec.name}: display name`);
     same(type.stats[NpcStat.HITPOINTS], spec.hitpoints, `${spec.name}: HP`);
-    for (const [stat, value] of Object.entries(family.stats)) {
+    for (const [stat, value] of Object.entries({ ...family.stats, ...spec.stats })) {
       same(type.stats[NpcStat[stat]], value, `${spec.name}: ${stat.toLowerCase()} level`);
     }
     const expectedParams = { ...family.params, rangedefence: spec.rangeDefence };

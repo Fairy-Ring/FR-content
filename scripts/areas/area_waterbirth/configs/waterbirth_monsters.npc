@@ -145,8 +145,8 @@ op2=Attack
 vislevel=98
 // CANDIDATE WBMON_MAGIC_HITPOINTS: same period selection as the first-room form.
 hitpoints=130
-attack=1
-strength=1
+attack=10
+strength=10
 defence=80
 // CANDIDATE same kind as the first-room Wallasalki; preserve this cache form.
 magic=100
