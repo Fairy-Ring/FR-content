@@ -1,0 +1,15 @@
+// UNKNOWN engineering landing tiles beside the original 377 NPCs/stations.
+// tests/dwarven-transport checks packed collision and an exit from every tile.
+^dwarven_boat_city = 0_45_159_8_51
+^dwarven_boat_mines = 0_44_158_26_17
+^dwarven_ferry_entrance = 0_44_158_23_16
+^dwarven_ferry_mine = 0_44_158_39_32
+^dwarven_train_city = 0_45_159_47_4
+^dwarven_train_ice = 0_46_153_50_53
+^dwarven_train_whitewolf = 0_44_154_58_17
+// UNKNOWN engineering divider between the west and east parked hub carts.
+^dwarven_train_berth_split_x = 2925
+// CANDIDATE: OSRS conductor transcripts, with post-2006 GE service removed.
+^dwarven_ferry_fare = 2
+^dwarven_train_ice_fare = 150
+^dwarven_train_whitewolf_fare = 100
