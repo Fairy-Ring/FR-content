@@ -1,0 +1,18 @@
+// UNKNOWN engineering radii and timers for the placed Rock lobster and Spinolyp forms.
+^waterbirth_other_rock_approach_radius = 1
+^waterbirth_other_rock_active_radius = 1
+^waterbirth_other_rock_pursuit_radius = 16
+^waterbirth_other_rock_respawn_ticks = 30
+^waterbirth_other_spinolyp_approach_radius = 2
+^waterbirth_other_spinolyp_active_radius = 5
+^waterbirth_other_spinolyp_attack_radius = 5
+^waterbirth_other_spinolyp_pursuit_radius = 16
+^waterbirth_other_spinolyp_hidden_attack_ticks = 1
+
+// CANDIDATE exact-variant OSRS page gives respawn1=10 and respawn2=500 after death; it does not time form changes.
+^waterbirth_other_spinolyp_hidden_respawn_ticks = 500
+^waterbirth_other_spinolyp_form_ticks = 500 // UNKNOWN engineering interval; “on occasion” and “after a while” have no duration.
+^waterbirth_other_spinolyp_maxhit = 10 // CANDIDATE exact-variant OSRS maximum hit.
+// UNKNOWN one-in-eight transition chance selected to encode the sourced “on occasion” state change.
+^waterbirth_other_spinolyp_submerge_denominator = 8
+^waterbirth_other_spinolyp_style_count = 2 // UNKNOWN equal style weight; page lists two attacks but gives no frequency.

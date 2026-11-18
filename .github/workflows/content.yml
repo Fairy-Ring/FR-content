@@ -190,6 +190,8 @@ jobs:
           run_test tests/drop-tables/test_kalphite_queen.mjs node --import tsx ../content/tests/drop-tables/test_kalphite_queen.mjs
           run_test tests/waterbirth-monsters/test_waterbirth_monsters.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_monsters.mjs
           run_test tests/waterbirth-monsters/test_waterbirth_eggs.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_eggs.mjs
+          run_test tests/waterbirth-monsters/test_waterbirth_crabs.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_crabs.mjs
+          run_test tests/waterbirth-monsters/test_waterbirth_other_monsters.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_other_monsters.mjs
           run_test tests/fenkenstrain-completion/test_fenk_handlers.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_handlers.mjs
           run_test tests/fenkenstrain-completion/test_fenk_head_gate.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_head_gate.mjs
           run_test tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs node --import tsx ../content/tests/fenkenstrain-completion/test_fenk_s3_rewards.mjs
