@@ -9,6 +9,14 @@ data=npc,falador_man1
 data=npc,falador_man2
 data=npc,falador_man3
 data=npc,falador_man4
+// CANDIDATE: ordinary-man aliases; values below remain the published sibling values.
+data=npc,man4_for_musa_point
+data=npc,death_man_indoors1
+data=npc,falador_doric_area_man1
+data=npc,falador_doric_area_man2
+data=npc,falador_doric_area_man3
+data=npc,falador_doric_area_man4
+data=npc,rimmington_hengel
 data=level,1
 data=experience,80
 data=stun_ticks,8
@@ -26,6 +34,8 @@ data=npc,woman3
 data=npc,ardougnian_female1
 data=npc,falador_woman
 data=npc,falador_woman2
+// CANDIDATE: named ordinary-woman alias; published sibling values are unchanged.
+data=npc,rimmington_anja
 data=level,1
 data=experience,80
 data=stun_ticks,8
@@ -91,6 +101,13 @@ data=npc,fai_falador_guard3
 data=npc,fai_falador_guard4
 data=npc,fai_falador_guard5
 data=npc,fai_falador_guard6
+// CANDIDATE: visible Guard aliases; published sibling values are unchanged.
+data=npc,falador_doric_area_guard
+data=npc,jail_guard_1
+data=npc,jail_guard_2
+data=npc,jail_guard_3
+data=npc,jail_guard_4
+data=npc,jail_guard_5
 data=level,40
 data=experience,468
 data=stun_ticks,8
@@ -129,6 +146,8 @@ data=loot_total,0
 [pickpocket_paladin]
 table=pickpocket
 data=npc,paladin
+// CANDIDATE: alternate Paladin model; published sibling values are unchanged.
+data=npc,paladin2
 data=level,70
 data=experience,1518
 data=stun_ticks,8
