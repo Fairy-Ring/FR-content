@@ -4,8 +4,8 @@
 // Pack fee 10 village_trade_sticks / item (Tip.it + 2007-base). Send-parcel
 // right-click is 31 Jul 2006 — OOS. Hunt 289? no.
 
-[opnpc1,tbwcu_rionasta] @tbw_open_parcel;
-[opnpc1,tbwcu_rionasta_nosticks] @tbw_open_parcel;
+[opnpc1,tbwcu_rionasta] @tbw_rionasta_talk;
+[opnpc1,tbwcu_rionasta_nosticks] @tbw_rionasta_talk;
 
 [label,tbw_open_parcel]
 inv_transmit(inv, tai_bwo_wannai_parcel_service:com_2);
@@ -73,3 +73,10 @@ if (inv_total(inv, village_trade_sticks) < $fee) {
 }
 inv_del(inv, village_trade_sticks, $fee);
 ~bank_deposit_request(inv, $item, $n, $slot);
+
+// UNKNOWN functional menu; the existing parcel service remains a separate branch.
+[label,tbw_rionasta_talk]
+if (~p_choice2("Can you send a parcel for me?", 1, "Can I have some trading sticks?", 2) = 1) {
+    @tbw_open_parcel;
+}
+~tbw_claim_sticks;

@@ -1,5 +1,7 @@
-// Leftover village_fence_* Repair. Official Update:Tai Bwo Wannai Clean-Up 9 Aug 2005.
-// Hunt 289? no. Leftover loc chain only. No spar cost / favour / Reinforce fill.
+// Tai Bwo Wannai Cleanup fence Repair / Reinforce.
+// CANDIDATE: 2007rshelp requires a wielded machete and any thatching spar;
+// OSRS Cleanup history-checked page supplies type-specific rewards and decay.
+// UNKNOWN wording below is kept plain and functional; no exact fence lines found.
 
 [oploc1,village_fence_rotten]
 @tbw_repair_fence;
@@ -14,18 +16,100 @@
 @tbw_repair_fence;
 
 [oploc1,village_fence_fixedcomplete]
-p_arrivedelay;
+@tbw_reinforce_fence;
+
+[proc,tbw_fence_has_wielded_machete]()(boolean)
+if (inv_total(worn, machette) > 0 | inv_total(worn, machette_opal) > 0 | inv_total(worn, machette_jade) > 0 | inv_total(worn, machette_redtopaz) > 0) {
+    return (true);
+}
+return (false);
+
+[proc,tbw_fence_available_spar]()(namedobj)
+// UNKNOWN: when several spar types are held, use the lightest first.
+if (inv_total(inv, thatching_spar_light) > 0) {
+    return (thatching_spar_light);
+}
+if (inv_total(inv, thatching_spar_med) > 0) {
+    return (thatching_spar_med);
+}
+if (inv_total(inv, thatching_spar_dense) > 0) {
+    return (thatching_spar_dense);
+}
+return (null);
 
 [label,tbw_repair_fence]
 p_arrivedelay;
+def_loc $stage = loc_type;
+def_loc $next = loc_param(next_loc_stage);
+if ($next = null) {
+    return;
+}
+~tbw_fence_work($stage, $next);
+
+[label,tbw_reinforce_fence]
+p_arrivedelay;
+def_loc $stage = loc_type;
+~tbw_fence_work($stage, $stage);
+
+[proc,tbw_fence_work](loc $stage, loc $next)
+def_int $stage_matches = 0;
+if (~tbw_cleanup_can_work = false) {
+    return;
+}
+if (~tbw_fence_has_wielded_machete = false) {
+    mes("You need to wield a machete.");
+    return;
+}
+def_namedobj $available = ~tbw_fence_available_spar;
+if ($available = null) {
+    mes("You need a thatching spar.");
+    return;
+}
 anim(tbw_cleanup_player_fixfence_start, 0);
 p_delay(2);
 anim(tbw_cleanup_player_fixfence_mid, 0);
 p_delay(2);
-def_loc $next = loc_param(next_loc_stage);
-if ($next = null) {
+if (loc_type = $stage) {
+    $stage_matches = 1;
+}
+if ($stage_matches = 0) {
+    anim(null, 0);
+    mes("The fence has changed; try again.");
+    return;
+}
+if (~tbw_cleanup_can_work = false) {
     anim(null, 0);
     return;
 }
+if (~tbw_fence_has_wielded_machete = false) {
+    anim(null, 0);
+    mes("You need to wield a machete.");
+    return;
+}
+def_namedobj $spar = ~tbw_fence_available_spar;
+if ($spar = null) {
+    anim(null, 0);
+    mes("You need a thatching spar.");
+    return;
+}
+inv_del(inv, $spar, ^tbw_fence_spar_cost);
 loc_change($next, ^tbw_fence_hold);
+if ($spar = thatching_spar_light) {
+    stat_advance(woodcutting, ^tbw_fence_xp_light);
+    ~tbw_add_favour(^tbw_fence_favour_light);
+} else if ($spar = thatching_spar_med) {
+    stat_advance(woodcutting, ^tbw_fence_xp_med);
+    ~tbw_add_favour(^tbw_fence_favour_med);
+} else {
+    stat_advance(woodcutting, ^tbw_fence_xp_dense);
+    ~tbw_add_favour(^tbw_fence_favour_dense);
+}
+if (%cleanup_progress < ^tbw_fence_progress_repaired) {
+    %cleanup_progress = ^tbw_fence_progress_repaired;
+}
 anim(tbw_cleanup_player_fixfence_end, 0);
+if ($stage = $next) {
+    mes("You reinforce the fence.");
+} else {
+    mes("You repair the fence.");
+}

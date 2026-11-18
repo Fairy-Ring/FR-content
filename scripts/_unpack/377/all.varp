@@ -1049,10 +1049,6 @@ transmit=yes
 
 [varp532_unused]
 
-[tai_bwo_cleanup]
-
-[tai_bwo_villagerchat]
-transmit=yes
 
 [tbw_cleanup_temp]
 transmit=yes

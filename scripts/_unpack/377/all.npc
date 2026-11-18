@@ -56483,45 +56483,6 @@ attack=35
 strength=37
 defence=35
 
-[tbwcu_mosquito_single]
-name=Large mosquito
-desc=A flying blood sucker.
-model1=npc_2493
-walkanim=tbw_mosquito_walk
-readyanim=tbw_mosquito_ready
-op2=Attack
-vislevel=13
-hitpoints=3
-attack=5
-strength=1
-defence=45
-
-[tbwcu_mosquito_swarm3]
-name=Mosquito swarm
-desc=A swarm of three highly agile mosquitoes.
-model1=npc_2494
-walkanim=tbw_mosquito_walk
-readyanim=tbw_mosquito_ready
-op2=Attack
-vislevel=17
-hitpoints=9
-attack=10
-strength=1
-defence=45
-
-[tbwcu_mosquito_swarm5]
-name=Mosquito swarm
-desc=A swarm of five highly agile mosquitoes.
-model1=npc_2495
-walkanim=tbw_mosquito_walk
-readyanim=tbw_mosquito_ready
-op2=Attack
-vislevel=20
-hitpoints=15
-attack=15
-strength=1
-defence=45
-
 [tbwcu_tribesman_instant]
 name=Tribesman
 desc=A vicious warrior.
