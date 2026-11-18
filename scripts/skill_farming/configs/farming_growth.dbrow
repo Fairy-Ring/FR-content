@@ -5,3 +5,9 @@
 table=farming_growth
 data=period,10
 data=handler,1
+
+// CANDIDATE: operator-adopted Old School herb family period; legacy windows.
+[farming_growth_herb]
+table=farming_growth
+data=period,20
+data=handler,2

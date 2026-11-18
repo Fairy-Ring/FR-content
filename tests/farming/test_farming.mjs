@@ -144,7 +144,7 @@ try {
     assert.equal(timer(p).clock, arm);
     tick(p, 610); assert.equal(stage(p), 7); assert.equal(stage(p, 1), 7);
     assert.equal(count(p, 'potato_seed'), 0);
-    assert.equal(p.stats[PlayerStat.FARMING], 80);
+    assert.equal(p.stats[PlayerStat.FARMING], 200, 'three weeds at 4 XP plus potato planting at 8 XP');
   });
   test('seed immunity, mature immunity, disease stasis and next-cycle death use real compiled paths', () => {
     assert.equal(advance(6, 1, 0), 7);
@@ -193,7 +193,10 @@ try {
     assert(use(p, 'potato_seed', patch)); assert.equal(stage(p), 6);
     for (const at of [610, 620, 630, 640]) tick(p, at);
     assert.equal(stage(p), 10);
-    for (let i = 0; i < 3; i++) assert(click(p, patch));
+    for (let i = 0; i < 3; i++) {
+      World.currentTick += 2; // CANDIDATE OSRS manual harvest interval.
+      assert(click(p, patch));
+    }
     assert.equal(stage(p), 3); assert.equal(count(p, 'potato'), 3);
     assert.equal(p.stats[PlayerStat.FARMING], 350);
   });

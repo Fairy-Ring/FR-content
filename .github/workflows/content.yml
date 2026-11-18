@@ -158,6 +158,8 @@ jobs:
           run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
           run_test tests/farming/test_farming.mjs node --import tsx ../content/tests/farming/test_farming.mjs
           run_test tests/farming/test_allotments.mjs node --import tsx ../content/tests/farming/test_allotments.mjs
+          run_test tests/farming/test_herbs.mjs node --import tsx ../content/tests/farming/test_herbs.mjs
+          run_test tests/farming/test_tool_actions.mjs node --import tsx ../content/tests/farming/test_tool_actions.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
           run_test tests/skippy/test_skippy.mjs node --import tsx ../content/tests/skippy/test_skippy.mjs
           run_test tests/empty-lord/test_empty_lord.mjs node --import tsx ../content/tests/empty-lord/test_empty_lord.mjs
