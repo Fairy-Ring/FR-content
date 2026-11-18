@@ -20,7 +20,7 @@ npc_facesquare(~soulbane_room_coord(^soulbane_scene_tolna));
 ~soulbane_rage_add(soulbane_tolnaboy, ^soulbane_scene_tolna);
 npc_facesquare(~soulbane_room_coord(^soulbane_scene_launa));
 p_delay(1);
-cam_moveto(movecoord(~soulbane_room_coord(^soulbane_scene_player), -1, 0, -2), 400, 232, 232);
+cam_moveto(~soulbane_room_coord(^soulbane_scene_camera), 400, 232, 232);
 cam_lookat(~soulbane_room_coord(^soulbane_scene_launa), 160, 232, 232);
 ~chatnpc_specific("Launa", soulbane_launa_young, "<p,quiz>Where are you going?");
 ~chatnpc_specific("Tolna", soulbane_tolnaboy, "<p,angry>I can't live with your rules any more, Mother.");
@@ -49,7 +49,7 @@ walktrigger(soulbane_scene_resume);
 if (getqueue(soulbane_rage_complete) = 0) queue(soulbane_rage_complete, 0, 0);
 
 [proc,soulbane_rage_burst]
-npc_findallany(region_getcoord(0, 64, 32), 64, 0);
+npc_findallany(region_getcoord(0, ^soulbane_region_midpoint, ^soulbane_region_midpoint), ^soulbane_region_midpoint, 0);
 while (npc_findnext = true) {
     if (~soulbane_rage_npc = true & %npc_attacking_uid = uid) {
         npc_setmode(none);
@@ -62,7 +62,7 @@ while (npc_findnext = true) {
 }
 
 [proc,soulbane_clear_room_npcs]
-npc_findallany(region_getcoord(0, 64, 32), 64, 0);
+npc_findallany(region_getcoord(0, ^soulbane_region_midpoint, ^soulbane_region_midpoint), ^soulbane_region_midpoint, 0);
 while (npc_findnext = true) {
     if (%npc_attacking_uid = uid & %npc_int = %soulbane_instance) npc_del;
 }

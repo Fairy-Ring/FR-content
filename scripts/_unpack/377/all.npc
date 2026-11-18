@@ -80287,22 +80287,6 @@ readyanim=midget_ready
 alwaysontop=yes
 head1=npc_3644_head
 
-[soulbane_fear_reaper]
-name=Fear reaper
-desc=AHHHHH!
-model1=npc_3649
-size=2
-walkanim=fear_walk
-readyanim=fear_ready
-op2=Attack
-ambient=60
-contrast=60
-vislevel=42
-hitpoints=25
-attack=39
-strength=41
-defence=40
-
 [soulbane_confu_creeper]
 name=Confusion beast
 desc=What on RuneScape is that?!?

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// First-unit Soul's Bane regression: native rift/Rage dispatch, owned region,
-// combat meter, family scene and the permanent stage-3 boundary.
+// Native rift, Rage, and saved Fear boundary regression coverage.
+// Every progression step uses the registered engine dispatch and cleanup paths.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,8 +12,15 @@ import {
 } from '../swamp-caves/runtime.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const InstanceZone = (await engineModule('engine/zone/InstanceZone.ts')).default;
+const { CollisionType } = await engineModule('engine/routefinder/flags.ts');
+const RebuildRegion = (await engineModule('network/game/server/model/RebuildRegion.ts')).default;
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const MoveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
+const MoveClickDecoder = (await engineModule('network/game/client/codec/MoveClickDecoder.ts')).default;
+const ClientGameProt = (await engineModule('network/game/client/ClientGameProt.ts')).default;
+const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
+const CloseModalHandler = new (await engineModule('network/game/client/handler/CloseModalHandler.ts')).default();
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
 const OpLocHandler = new (await engineModule('network/game/client/handler/OpLocHandler.ts')).default();
 const OpNpc = (await engineModule('network/game/client/model/OpNpc.ts')).default;
@@ -28,6 +35,12 @@ const rsbuf = await engineModule('network/rsbuf/index.ts');
 const { PlayerInfoProt } = await engineModule('network/rsbuf/prot.ts');
 const OpPlayer = (await engineModule('network/game/client/model/OpPlayer.ts')).default;
 const OpPlayerHandler = new (await engineModule('network/game/client/handler/OpPlayerHandler.ts')).default();
+const MidiSong = (await engineModule('network/game/server/model/MidiSong.ts')).default;
+const DbTableIndex = (await engineModule('cache/config/DbTableIndex.ts')).default;
+
+const memoryCameraPackets = new WeakMap();
+const heldMemoryStandingTiles = new Map();
+
 
 
 const QUEST_CONFIG = path.join(contentRoot, 'scripts/quests/quest_soulbane/configs/soulbane.constant');
@@ -41,7 +54,27 @@ const RAGE_TYPES = [
   'soulbane_anger_bear', 'soulbane_anger_unicorn',
   'soulbane_anger_rat', 'soulbane_anger_goblin'
 ];
-const RAGE_IDS = new Set(RAGE_TYPES.map(name => requiredId('NpcType', name)));
+const RAGE_IDS = new Set(RAGE_TYPES.map(type => requiredId('NpcType', type)));
+const FEAR_NPC = requiredId('NpcType', 'soulbane_fear_reaper');
+const FEAR_HOLES = [
+  'soul_bane_fwall_void',
+  'soul_bane_fwall_void2',
+  'soul_bane_fwall_void3',
+  'soul_bane_fwall_void4',
+  'soul_bane_fwall_void5',
+  'soul_bane_fwall_void6'
+];
+const FEAR_REAPER_SPAWNS = [
+  'soulbane_fear_reaper1',
+  'soulbane_fear_reaper2',
+  'soulbane_fear_reaper3',
+  'soulbane_fear_reaper4',
+  'soulbane_fear_reaper5',
+  'soulbane_fear_reaper6'
+];
+// UNKNOWN engineering values; the original cache does not encode quest stages.
+const FEAR_STAGE = 4;
+const FEAR_COMPLETE_STAGE = 5;
 const WEAPON_IDS = new Set(WEAPONS.map(weapon => requiredId('ObjType', weapon.name)));
 const NPC_INSTANCE = requiredId('VarNpcType', 'npc_int');
 const NPC_OWNER = requiredId('VarNpcType', 'npc_attacking_uid');
@@ -51,6 +84,9 @@ const HP_STAT = NpcStat.HITPOINTS;
 const LAUNA_SCENE = requiredId('NpcType', 'soulbane_launa_young');
 const TOLNA_SCENE = requiredId('NpcType', 'soulbane_tolnaboy');
 const QUEST_ROW = requiredId('Component', 'questlist:soulbane');
+const LOGOUT_TAB = Number(/^\^tab_logout\s*=\s*(\d+)\s*$/m.exec(fs.readFileSync(
+  path.join(contentRoot, 'scripts/general/configs/tabs.constant'), 'utf8'))?.[1]);
+assert(Number.isInteger(LOGOUT_TAB), 'the checked-out login tab constant defines the logout tab');
 const STAGE_VARBIT = requiredId('VarBitType', 'soulbane_prog');
 const STAGE_VARP = types.VarBitType.get(STAGE_VARBIT).basevar;
 const INSTANCE_VARP = requiredId('VarPlayerType', 'soulbane_instance');
@@ -61,6 +97,140 @@ function requiredId(kind, name) {
   const value = id(kind, name);
   assert(value >= 0, `packed ${kind} contains ${name}`);
   return value;
+}
+
+const MUSIC_TABLE = types.DbTableType.get(requiredId('DbTableType', 'music'));
+const MUSIC_REGION_TABLE = types.DbTableType.get(requiredId('DbTableType', 'musicregion'));
+const MUSIC_UNLOCK_VARS = Array.from({ length: types.VarPlayerType.count }, (_, id) =>
+  types.VarPlayerType.get(id)?.debugname ?? '')
+  .map(name => ({ name, match: name.match(/^musicmulti_(\d+)$/) }))
+  .filter(({ match }) => match)
+  .map(({ name, match }) => ({ name, slot: Number(match[1]) }))
+  .sort((a, b) => a.slot - b.slot);
+assert(MUSIC_UNLOCK_VARS.length > 0, 'built cache exposes original music unlock varps');
+
+function dbField(row, table, name) {
+  const index = table.columnNames.indexOf(name);
+  assert(index >= 0, `built ${table.debugname ?? 'database'} table declares ${name}`);
+  return row.columnValues[index];
+}
+function musicSongFromRow(row, label) {
+  assert(row, `${label}: built music dbrow exists`);
+  const name = dbField(row, MUSIC_TABLE, 'name')?.[0];
+  const track = dbField(row, MUSIC_TABLE, 'track')?.[0];
+  assert.equal(typeof name, 'string', `${label}: music dbrow has its authored name`);
+  assert(Number.isInteger(track), `${label}: music dbrow supplies a compiled MIDI track`);
+  const unlock = dbField(row, MUSIC_TABLE, 'unlock');
+  const [slot, bit] = Array.isArray(unlock) ? unlock : [];
+  let unlockVar = null;
+  if (slot != null || bit != null) {
+    assert(Number.isInteger(slot) && Number.isInteger(bit) && bit >= 0 && bit < 32,
+      `${label}: music dbrow unlock is a valid original music slot/bit`);
+    unlockVar = `musicmulti_${slot}`;
+    assert(MUSIC_UNLOCK_VARS.some(variable => variable.name === unlockVar),
+      `${label}: built cache exposes ${unlockVar}`);
+  }
+  return { name, track, unlockVar, unlockBit: bit ?? null };
+}
+function musicSongByName(name) {
+  return musicSongFromRow(types.DbRowType.get(requiredId('DbRowType', name)), name);
+}
+function musicSongForRowId(rowId, label) {
+  assert(Number.isInteger(rowId) && rowId >= 0, `${label}: music row reference exists`);
+  return musicSongFromRow(types.DbRowType.get(rowId), label);
+}
+const RAGE_SONG = musicSongByName('music_Wrath_and_Ruin');
+const FEAR_SONG = musicSongByName('music_Fear_and_Loathing');
+const MANUAL_PREVIOUS_SONG = musicSongByName('music_Book_Of_Spells');
+assert.equal(RAGE_SONG.name, 'Wrath and Ruin', 'Rage music row names the source-backed track');
+assert.equal(FEAR_SONG.name, 'Fear and Loathing', 'Fear music row names the source-backed track');
+
+function musicUnlockSnapshot(p) {
+  return MUSIC_UNLOCK_VARS.map(({ name }) => readVar(p, name) >>> 0);
+}
+function musicUnlockBit(snapshot, song) {
+  assert(song.unlockVar, `${song.name}: built music row defines an original unlock bit`);
+  const index = MUSIC_UNLOCK_VARS.findIndex(variable => variable.name === song.unlockVar);
+  assert(index >= 0, `${song.name}: original unlock varp is inventoried`);
+  return (snapshot[index] >>> song.unlockBit) & 1;
+}
+function assertMusicUnlockTransition(p, before, song, label) {
+  const expected = before.slice();
+  if (song.unlockVar) {
+    const index = MUSIC_UNLOCK_VARS.findIndex(variable => variable.name === song.unlockVar);
+    assert(index >= 0, `${label}: ${song.name} unlock varp is inventoried`);
+    expected[index] = (expected[index] | (1 << song.unlockBit)) >>> 0;
+  }
+  assert.deepEqual(musicUnlockSnapshot(p), expected,
+    `${label}: only the music dbrow's original cache bit is unlocked`);
+  if (song.unlockVar) assert.equal(musicUnlockBit(expected, song), 1, `${label}: ${song.name} is unlocked`);
+}
+function musicTracksSince(p, mark) {
+  return p.packets.slice(mark).filter(packet => packet instanceof MidiSong).map(packet => packet.id);
+}
+function beginRoomMusicObservation(p, song, mode, label, {
+  requireLocked = false, requireUnlocked = false, previousTrack = null
+} = {}) {
+  assert(mode === 0 || mode === 1, `${label}: native music mode is Auto or Manual`);
+  writeVar(p, 'musicplay', mode);
+  if (previousTrack != null) {
+    assert.notEqual(previousTrack, song.track, `${label}: manual prior playback differs from the room song`);
+    runProc('music_play', p, [previousTrack]);
+  }
+  const before = musicUnlockSnapshot(p);
+  if (requireLocked) assert.equal(musicUnlockBit(before, song), 0, `${label}: target cache bit begins locked`);
+  if (requireUnlocked) assert.equal(musicUnlockBit(before, song), 1, `${label}: target cache bit was already unlocked`);
+  return {
+    song,
+    mode,
+    before,
+    mark: p.packets.length,
+    previousTrack: readVar(p, 'currentsong')
+  };
+}
+function assertRoomMusicObservation(p, observed, label) {
+  const expectedTracks = observed.mode === 1 ? [observed.song.track] : [];
+  assert.deepEqual(musicTracksSince(p, observed.mark), expectedTracks,
+    `${label}: compiled entry obeys ${observed.mode === 1 ? 'Auto' : 'Manual'} music mode`);
+  assert.equal(readVar(p, 'currentsong'),
+    observed.mode === 1 ? observed.song.track : observed.previousTrack,
+  `${label}: current song follows the mode without changing Manual playback`);
+  assert.equal(readVar(p, 'musicplay'), observed.mode, `${label}: entry preserves Auto/Manual mode`);
+  assertMusicUnlockTransition(p, observed.before, observed.song, label);
+}
+function musicRegionSongAt(level, x, z) {
+  const mapX = (x >> 6) << 6;
+  const mapZ = (z >> 6) << 6;
+  const key = CoordGrid.packCoord(0, mapX, mapZ);
+  const mapsquare = MUSIC_REGION_TABLE.columnNames.indexOf('mapsquare');
+  assert(mapsquare >= 0, 'built musicregion table indexes mapsquare');
+  const rowIds = DbTableIndex.find(key, (MUSIC_REGION_TABLE.id << 12) | (mapsquare << 4));
+  assert.equal(rowIds.length, 1, `surface map square ${mapX >> 6}_${mapZ >> 6} has one compiled musicregion row`);
+  const region = types.DbRowType.get(rowIds[0]);
+  const songRowId = dbField(region, MUSIC_REGION_TABLE, 'musicdata')?.[0];
+  return musicSongForRowId(songRowId, `surface musicregion ${mapX >> 6}_${mapZ >> 6}`);
+}
+function assertSurfaceMapzoneMusic(p, mark, before, label) {
+  const song = musicRegionSongAt(p.level, p.x, p.z);
+  assert.deepEqual(musicTracksSince(p, mark), [song.track],
+    `${label}: ordinary surface mapzone sends the region dbrow's MIDI command`);
+  assert.equal(readVar(p, 'currentsong'), song.track,
+    `${label}: ordinary surface mapzone sets the region dbrow's song`);
+  assertMusicUnlockTransition(p, before, song, `${label}: ordinary surface mapzone`);
+  return song;
+}
+function operateSurfaceExit(p, exit, choices, label) {
+  goToStand(p, exit, `${label}: walk to the original surface Exit`);
+  writeVar(p, 'musicplay', 1);
+  const exitMark = p.packets.length;
+  const result = operateLoc(p, exit, 1, choices, label);
+  assert.deepEqual(musicTracksSince(p, exitMark), [],
+    `${label}: quest exit leaves song selection to the ordinary mapzone phase`);
+  const mapzoneMark = p.packets.length;
+  const unlocksBeforeMapzone = musicUnlockSnapshot(p);
+  worldTick();
+  assertSurfaceMapzoneMusic(p, mapzoneMark, unlocksBeforeMapzone, label);
+  return result;
 }
 function variable(name) {
   const bit = types.VarBitType.getId(name);
@@ -106,20 +276,63 @@ function unpackWorld(packed) {
   const { level, x, z } = CoordGrid.unpackCoord(packed);
   return { level, x, z };
 }
-// Derive the expected two-page layout independently of the compiled helper's
-// caller-owned region pointer; real entry/spawn/scene positions are checked below.
+function sourceCoordForName(name) {
+  const declaration = questCoordinateDeclarations().get(name);
+  assert(declaration, `source declares ^${name}`);
+  return unpackWorld(packedTemplate(declaration));
+}
+function sourceSquareKey(coord) {
+  return `${coord.level}_${coord.x >> 6}_${coord.z >> 6}`;
+}
+function sourceSquareKeyForZone(zone) {
+  return `${zone.source.level}_${zone.source.x >> 3}_${zone.source.z >> 3}`;
+}
+function sourceZoneKey(coord) {
+  return `${coord.level}:${coord.x >> 3}:${coord.z >> 3}`;
+}
+function destinationZoneKey(zone) {
+  return `${zone.level}:${zone.x}:${zone.z}`;
+}
+function instanceForOwner(p, label) {
+  const uid = instanceUid(p);
+  assert(uid > 0, `${label}: owner has a live instance handle`);
+  const instance = World.instances.findInstanceByUid(uid - 1);
+  assert(instance, `${label}: owner handle resolves to a live instance`);
+  assert.equal(World.instances.findInstanceByCoord(p)?.uid, instance.uid,
+    `${label}: player stands in the resolved owner instance`);
+  return instance;
+}
+function assignedInstanceZones(instance) {
+  const zones = [];
+  for (let floor = 0; floor < instance.floors; floor++) {
+    for (let east = 0; east < instance.zonesEast; east++) {
+      for (let north = 0; north < instance.zonesNorth; north++) {
+        const zone = World.gameMap.getZoneIfExists(
+          instance.sw.x + (east << 3), instance.sw.z + (north << 3), instance.sw.level + floor);
+        if (zone instanceof InstanceZone && zone.hasAssignedTemplate) zones.push(zone);
+      }
+    }
+  }
+  return zones;
+}
+function instanceZoneForSource(instance, source, label) {
+  const key = sourceZoneKey(source);
+  const matches = assignedInstanceZones(instance).filter(zone =>
+    `${zone.source.level}:${zone.source.x}:${zone.source.z}` === key);
+  assert.equal(matches.length, 1, `${label}: source zone ${key} has one actual owner mapping`);
+  return matches[0];
+}
+// Resolve packed source coordinates through this owner's actual native
+// InstanceZone metadata. The allocation slot and destination offset are never
+// inferred from a generated handle or assumed source-square adjacency.
 function templateCoord(p, packed) {
-  const instance = World.instances.findInstanceByCoord(p);
-  assert(instance && instance.uid + 1 === instanceUid(p), 'coordinate query uses the player-owned region');
-  const template = unpackWorld(packed);
-  const squareX = template.x >> 6;
-  const squareZ = template.z >> 6;
-  assert((squareX === 47 && squareZ === 81) || (squareX === 51 && squareZ === 53),
-    'room template belongs to one of the two copied cache squares');
+  const instance = instanceForOwner(p, 'template coordinate');
+  const source = unpackWorld(packed);
+  const zone = instanceZoneForSource(instance, source, 'template coordinate');
   return {
-    level: instance.sw.level + template.level,
-    x: instance.sw.x + (squareX === 51 ? 64 : 0) + (template.x & 63),
-    z: instance.sw.z + (template.z & 63)
+    level: zone.level,
+    x: (zone.x << 3) + (source.x & 7),
+    z: (zone.z << 3) + (source.z & 7)
   };
 }
 function roomCoord(p, name) {
@@ -301,6 +514,18 @@ function goToStand(p, target, label) {
   assert(p.inOperableDistance(target), `${label} ends within native operation distance`);
   return stand;
 }
+function findStandFrom(p, origin, target, label) {
+  const previous = { level: p.level, x: p.x, z: p.z };
+  p.level = origin.level; p.x = origin.x; p.z = origin.z;
+  let stand;
+  try {
+    stand = findStand(p, target);
+  } finally {
+    p.level = previous.level; p.x = previous.x; p.z = previous.z;
+  }
+  nativeRouteFrom(origin, stand, `${label}: exact ordinary path from room origin`);
+  return stand;
+}
 function assertFootprintOpen(level, x, z, width, length, label) {
   assert(Number.isInteger(width) && width > 0 && Number.isInteger(length) && length > 0,
     `${label} has a defined actor footprint`);
@@ -321,10 +546,51 @@ function activeNpc(name, position = null) {
 function rageNpcsFor(p) {
   const uid = instanceUid(p);
   return [...World.npcs].filter(npc => npc?.isActive && RAGE_IDS.has(npc.type) &&
-    npc.vars[NPC_INSTANCE] === uid && npc.vars[NPC_OWNER] === p.uid);
+    npc.vars[NPC_INSTANCE] === uid && (npc.vars[NPC_OWNER] >>> 0) === p.uid);
 }
 function rageNpcsWithInstance(uid) {
   return [...World.npcs].filter(npc => npc?.isActive && RAGE_IDS.has(npc.type) && npc.vars[NPC_INSTANCE] === uid);
+}
+function fearNpcsFor(p) {
+  const uid = instanceUid(p);
+  return [...World.npcs].filter(npc => npc?.isActive &&
+    (npc.baseType === FEAR_NPC || npc.type === FEAR_NPC) &&
+    npc.vars[NPC_INSTANCE] === uid && (npc.vars[NPC_OWNER] >>> 0) === p.uid);
+}
+function fearNpcsWithInstance(uid) {
+  return [...World.npcs].filter(npc => npc?.isActive &&
+    (npc.baseType === FEAR_NPC || npc.type === FEAR_NPC) && npc.vars[NPC_INSTANCE] === uid);
+}
+function fearHoleLocs(p) {
+  const matches = nearbyLocs(p, /^soul_bane_fwall_void(?:[2-6])?$/);
+  assert.equal(matches.length, FEAR_HOLES.length, 'the copied Fear room has exactly six packed dark holes');
+  const byName = new Map(matches.map(loc => [types.LocType.get(loc.type)?.debugname, loc]));
+  return FEAR_HOLES.map(name => {
+    const loc = byName.get(name);
+    assert(loc, `packed Fear hole ${name} is present in the copied room`);
+    return loc;
+  });
+}
+function fearWestExitLoc(p) {
+  const matches = nearbyLocs(p, /^soulbane_fwall_exit_multi$/);
+  assert.equal(matches.length, 1, 'the copied Fear room has exactly one western exit multiloc');
+  return matches[0];
+}
+function fearSurfaceExitLoc(p) {
+  const matches = nearbyLocs(p, /^soul_bane_fwall_void_small$/);
+  assert.equal(matches.length, 1, 'the copied Fear room has exactly one packed surface Exit');
+  return matches[0];
+}
+function fearReaperSpawn(p, door) {
+  assert(Number.isInteger(door) && door >= 1 && door <= FEAR_REAPER_SPAWNS.length,
+    `Fear door ${door} names one of six packed reaper points`);
+  return roomCoord(p, FEAR_REAPER_SPAWNS[door - 1]);
+}
+function assertFearReset(p, label) {
+  for (const name of ['soulbane_fear_enemydoor', 'soulbane_fear_enemydoor_old', 'soulbane_fear_monspres',
+    'soulbane_fear_killedtally', 'soulbane_fear_exitlit']) {
+    assert.equal(readVar(p, name), 0, `${label}: ${name} resets to zero`);
+  }
 }
 function locAt(level, x, z, name) {
   const type = requiredId('LocType', name);
@@ -354,7 +620,7 @@ function quitLoc(p) {
   const { level, x, z } = templateCoord(p, CoordGrid.packCoord(0, 3015, 5245));
   return locAt(level, x, z, 'soul_bane_awall_void_small');
 }
-function fearExitLoc(p) {
+function rageFearBoundaryLoc(p) {
   // Cache map receipt: loc 13882 at m47_81 local (30,44) => 3038,5228.
   const { level, x, z } = templateCoord(p, CoordGrid.packCoord(0, 3038, 5228));
   return locAt(level, x, z, 'soul_bane_awall_void_exit');
@@ -403,11 +669,44 @@ function checkRoomRoutes(p) {
       const actor = activeNpc(actorType, destination);
       assertFootprintOpen(destination.level, destination.x, destination.z, actor.width, actor.length, `${name} NPC`);
       assert.equal(actor.vars[NPC_INSTANCE], instanceUid(p), `${name} is assigned to this private copy`);
-      assert.equal(actor.vars[NPC_OWNER], p.uid, `${name} belongs to the entering account`);
+      assert.equal(actor.vars[NPC_OWNER] >>> 0, p.uid, `${name} belongs to the entering account`);
       assert.equal(actor.vars[NPC_XP_MULTIPLIER], 0, `${name} disables normal combat XP at spawn`);
     }
   }
   return entry;
+}
+function checkFearRoomRoutes(p) {
+  const entry = roomCoord(p, 'soulbane_fear_entry');
+  assertFootprintOpen(entry.level, entry.x, entry.z, 1, 1, 'Fear player entry');
+  for (const name of FEAR_REAPER_SPAWNS) {
+    const spawn = roomCoord(p, name);
+    assertFootprintOpen(spawn.level, spawn.x, spawn.z, 2, 2, `${name} size-2 reaper spawn`);
+    nativeRouteFrom(entry, spawn, `Fear entry reaches exact ${name} spawn on foot`);
+  }
+
+  const holes = fearHoleLocs(p);
+  for (const hole of holes) {
+    const name = types.LocType.get(hole.type)?.debugname;
+    const stand = findStandFrom(p, entry, hole, `Fear Look-inside ${name}`);
+    assertFootprintOpen(stand.level, stand.x, stand.z, 1, 1, `Fear ${name} interaction stand`);
+  }
+  const westExit = fearWestExitLoc(p);
+  const westStand = findStandFrom(p, entry, westExit, 'Fear western black-hole entry');
+  assertFootprintOpen(westStand.level, westStand.x, westStand.z, 1, 1, 'Fear western black-hole stand');
+  const surfaceExit = fearSurfaceExitLoc(p);
+  const surfaceStand = findStandFrom(p, entry, surfaceExit, 'Fear surface Exit');
+  assertFootprintOpen(surfaceStand.level, surfaceStand.x, surfaceStand.z, 1, 1, 'Fear surface Exit stand');
+
+  const scenePlayer = roomCoord(p, 'soulbane_fear_scene_player');
+  const sceneTolna = roomCoord(p, 'soulbane_fear_scene_tolna');
+  assertFootprintOpen(scenePlayer.level, scenePlayer.x, scenePlayer.z, 1, 1, 'Fear cutscene player stand');
+  assertFootprintOpen(sceneTolna.level, sceneTolna.x, sceneTolna.z, 1, 1, 'Fear cutscene Tolna footprint');
+  // Teleport into the copied memory strip; it is not walked to from the dungeon.
+  // Prove both stands from the copied original surface coordinate.
+  const sceneEntry = roomCoord(p, 'soulbane_surface');
+  nativeRouteFrom(sceneEntry, scenePlayer, 'copied surface entry reaches the Fear cutscene player tile on foot');
+  nativeRouteFrom(sceneEntry, sceneTolna, 'copied surface entry reaches the Fear cutscene Tolna tile on foot');
+  return { entry, holes, westExit, surfaceExit, scenePlayer, sceneTolna };
 }
 function observeRageScene(p) {
   const playerStand = roomCoord(p, 'soulbane_scene_player');
@@ -429,10 +728,17 @@ function observeRageScene(p) {
 function finishRageScene(p) {
   let sawFamilyStaging = false;
   const pages = [];
+  const recordFamilyStaging = () => {
+    assertMemoryCameraGround(p, 'Rage');
+    if (sawFamilyStaging || stage(p) !== 2 || readVar(p, 'soulbane_anger_donespecial') !== 1 ||
+      !observeRageScene(p)) return;
+    const instance = instanceForOwner(p, 'Rage memory scene');
+    const { rageZones } = assertInstanceTemplateInventory(instance, 'Rage memory scene');
+    assertMemorySceneVisibility(p, rageZones, 'Rage', 'Rage memory scene', true);
+    sawFamilyStaging = true;
+  };
   for (let tick = 0; tick < 1200; tick++) {
-    if (stage(p) === 2 && readVar(p, 'soulbane_anger_donespecial') === 1 && observeRageScene(p)) {
-      sawFamilyStaging = true;
-    }
+    recordFamilyStaging();
     const state = p.activeScript;
     if (state?.execution === ScriptState.PAUSEBUTTON) {
       const root = types.Component.get(p.modalChat)?.comName ?? '';
@@ -454,19 +760,16 @@ function finishRageScene(p) {
           'the first post-animation Continue shows the authored reaction');
         console.log(`PASS Rage burst timing: ${cycleCount} client cycles -> ${expectedDelay} server ticks; first Continue ready`);
       }
-      if (stage(p) === 2 && readVar(p, 'soulbane_anger_donespecial') === 1 && observeRageScene(p)) {
-        sawFamilyStaging = true;
-      }
+      recordFamilyStaging();
       continue;
     }
     worldTick();
-    if (stage(p) === 2 && readVar(p, 'soulbane_anger_donespecial') === 1 && observeRageScene(p)) {
-      sawFamilyStaging = true;
-    }
+    recordFamilyStaging();
     if (stage(p) === 3 && p.queue.head() === null &&
       (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
   }
   assert(sawFamilyStaging, 'Rage special runs the authored player/Launa/Tolna staging before returning');
+  assertMemoryCameraCoverage(p, 'Rage');
   assert.equal(stage(p), 3, 'family scene commits the permanent stage-3 boundary');
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_rage_entry'),
     'family scene returns the player to the Rage entry tile');
@@ -476,14 +779,20 @@ function finishRageScene(p) {
   return pages.join(' ');
 }
 
-function chooseRiftWithRope(p, label) {
+function chooseRiftWithRope(p, label, {
+  musicMode = 1, requireLocked = false, requireUnlocked = false, previousTrack = null
+} = {}) {
+  const song = stage(p) >= FEAR_STAGE ? FEAR_SONG : RAGE_SONG;
   const rift = riftLoc();
   goToStand(p, rift, `${label}: walk to actual rift floor`);
+  const observation = beginRoomMusicObservation(p, song, musicMode, label,
+    { requireLocked, requireUnlocked, previousTrack });
   const result = operateLoc(p, rift, 1, [], `${label}: use Climb-down on rift`);
   assert.match(result.trigger.name, /^\[oploc1,soulbane_falloff2_rope(?:_multi)?\]$/,
     `${label}: descent dispatch uses the rope-visible floor form`);
   assert(stage(p) >= 2, `${label}: descent runs the compiled Rage admission`);
   assert.notEqual(instanceUid(p), 0, `${label}: descent creates a private region`);
+  assertRoomMusicObservation(p, observation, label);
   return result;
 }
 function seedStageOneOwner(p, label) {
@@ -494,6 +803,217 @@ function seedStageOneOwner(p, label) {
   assert.equal(readVar(p, 'soulbane_riftrope_pres'), 1, `${label}: disclosed attached-rope seed is present`);
   chooseRiftWithRope(p, label);
   assert.equal(stage(p), 2, `${label}: native descent creates Rage stage 2`);
+}
+
+// Disclosed pre-memory fixtures test input admission, not quest progression.
+// Every checkpoint is a real scheduling boundary of the compiled scene.
+const MEMORY_PROBES = [
+  { name: 'Rage', stage: 2, complete: 3, player: 'soulbane_scene_player',
+    entry: 'soulbane_rage_entry', ready: 'soulbane_anger_donespecial', value: 1,
+    queue: 'soulbane_rage_complete' },
+  { name: 'Fear', stage: FEAR_STAGE, complete: FEAR_COMPLETE_STAGE,
+    player: 'soulbane_fear_scene_player', entry: 'soulbane_fear_entry',
+    ready: 'soulbane_fear_killedtally', value: 5, queue: 'soulbane_fear_complete' }
+];
+function beginMemoryProbe(memory) {
+  const p = playerFixture();
+  writeVar(p, 'soulbane_prog', memory.name === 'Rage' ? 1 : memory.stage);
+  writeVar(p, 'soulbane_riftrope_pres', 1);
+  chooseRiftWithRope(p, `disclosed ${memory.name} input-admission fixture`);
+  p.tabs[LOGOUT_TAB] = types.Component.get(requiredId('Component', 'logout:try_logout')).rootLayer;
+  writeVar(p, memory.ready, memory.value);
+  const instance = instanceForOwner(p, `${memory.name} input fixture`);
+  const anchor = instanceZoneForSource(instance, sourceCoordForName(memory.player), memory.name);
+  const memoryZones = assignedInstanceZones(instance)
+    .filter(zone => !roomSourceSquares().has(sourceSquareKeyForZone(zone)));
+  const component = connectedZoneComponents(memoryZones).find(zones => zones.includes(anchor));
+  assert(component, `${memory.name}: actual memory anchor has a native copied patch`);
+  const script = ScriptProvider.getByName(`[queue,${memory.queue}]`);
+  assert(script, `${memory.name}: compiled completion queue exists`);
+  p.enqueueScript(script);
+  return {
+    p, memory, instance, standing: roomCoord(p, memory.player),
+    zoneKeys: new Set(component.map(destinationZoneKey))
+  };
+}
+function inProbeMemory(probe) {
+  const { p } = probe;
+  return probe.zoneKeys.has(`${p.level}:${p.x >> 3}:${p.z >> 3}`);
+}
+function advanceMemoryProbe(p) {
+  assert.notEqual(p.activeScript?.execution, ScriptState.ABORTED, 'memory probe script never aborts');
+  if (p.activeScript?.execution === ScriptState.PAUSEBUTTON) resumeDialogue(p);
+  else worldTick();
+}
+function observeHeldMemoryTile(probe) {
+  const { p, memory } = probe;
+  const zone = World.gameMap.getZoneIfExists(p.x, p.z, p.level);
+  assert(zone instanceof InstanceZone && zone.hasAssignedTemplate,
+    `${memory.name}: observed script placement has a real source mapping`);
+  const source = {
+    level: zone.source.level,
+    x: (zone.source.x << 3) + (p.x & 7),
+    z: (zone.source.z << 3) + (p.z & 7)
+  };
+  let positions = heldMemoryStandingTiles.get(memory.name);
+  if (!positions) {
+    positions = new Map();
+    heldMemoryStandingTiles.set(memory.name, positions);
+  }
+  positions.set(`${source.level}:${source.x}:${source.z}`, source);
+}
+function memoryCheckpoints(memory) {
+  const probe = beginMemoryProbe(memory);
+  const checkpoints = [];
+  let finished = false;
+  for (let boundary = 0; boundary < 256; boundary++) {
+    if (inProbeMemory(probe)) {
+      observeHeldMemoryTile(probe);
+      checkpoints.push({
+        boundary, execution: probe.p.activeScript?.execution,
+        delayed: probe.p.delayed, remainingDelay: probe.p.delayedUntil - World.currentTick
+      });
+    }
+    if (stage(probe.p) === memory.complete) {
+      finished = true;
+      break;
+    }
+    advanceMemoryProbe(probe.p);
+  }
+  assert(finished, `${memory.name}: baseline visits the entire memory and its real return`);
+  assert(checkpoints.some(point => point.delayed), `${memory.name}: delay boundaries are exercised`);
+  if (memory.name === 'Rage') {
+    assert(checkpoints.filter(point => point.execution === ScriptState.PAUSEBUTTON).length >= 7,
+      'Rage: all seven family dialogue pages are scheduling checkpoints');
+  }
+  runProc('soulbane_leave', probe.p);
+  return checkpoints;
+}
+function sendProbeWalk(p, minimap, label) {
+  const start = { level: p.level, x: p.x, z: p.z };
+  const destination = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1]]
+    .map(([dx, dz]) => ({ level: p.level, x: p.x + dx, z: p.z + dz }))
+    .find(candidate => hasExactNativeRoute(start, candidate));
+  assert(destination, `${label}: the walk request has a genuinely reachable different endpoint`);
+  nativeRouteFrom(start, destination, `${label}: exact collision route`);
+  const length = 5 + (minimap ? 14 : 0);
+  const packet = new Packet(new Uint8Array(length));
+  packet.p2_alt3(destination.x);
+  packet.p1(0);
+  packet.p2_alt3(destination.z);
+  packet.pos = 0;
+  const protocol = minimap ? ClientGameProt.MOVE_MINIMAPCLICK : ClientGameProt.MOVE_GAMECLICK;
+  const message = new MoveClickDecoder(protocol).decode(packet, length);
+  assert.deepEqual(message.path, [{ x: destination.x, z: destination.z }],
+    `${label}: the actual ground/minimap decoder retains the requested destination`);
+  MoveClickHandler.handle(message, p);
+  return destination;
+}
+function assertProbeHeldOrReturned(probe, label) {
+  const { p, memory, standing } = probe;
+  if (![...World.playerLoop.all()].includes(p)) return false;
+  const expected = stage(p) === memory.complete ? roomCoord(p, memory.entry) : standing;
+  assert.deepEqual(tile(p), [expected.level, expected.x, expected.z],
+    `${label}: input never moves the player off the script's placement tile`);
+  if (inProbeMemory(probe)) observeHeldMemoryTile(probe);
+  return true;
+}
+function testMemoryInputHold() {
+  for (const memory of MEMORY_PROBES) {
+    const checkpoints = memoryCheckpoints(memory);
+    const logoutSaves = [];
+    for (const point of checkpoints) {
+      for (const channel of ['ground', 'minimap', 'close-ground', 'close-minimap', 'logout', 'logout-button']) {
+        const probe = beginMemoryProbe(memory);
+        const { p } = probe;
+        const label = `${memory.name} boundary ${point.boundary} ${channel}`;
+        for (let boundary = 0; boundary < point.boundary; boundary++) advanceMemoryProbe(p);
+        assert(inProbeMemory(probe), `${label}: replay reaches the actual memory`);
+        assert.equal(p.activeScript?.execution, point.execution, `${label}: replay reaches the same script boundary`);
+        assert.equal(p.delayed, point.delayed, `${label}: replay reaches the same delay state`);
+        observeHeldMemoryTile(probe);
+        if (channel.startsWith('close-')) {
+          assert(CloseModalHandler.handle(new CloseModal(), p), `${label}: native close request is admitted`);
+          worldTick();
+          assertProbeHeldOrReturned(probe, label);
+        }
+        if (channel === 'logout') p.requestLogout = true;
+        else if (channel === 'logout-button') {
+          assert(button(p, 'logout:try_logout'), `${label}: the real visible logout button is admitted`);
+        } else if (stage(p) !== memory.complete) sendProbeWalk(p, channel.endsWith('minimap'), label);
+        const expectsLogout = channel === 'logout' || p.requestLogout || p.loggingOut;
+        if (channel === 'logout-button' && !expectsLogout && stage(p) !== memory.complete) {
+          sendProbeWalk(p, false, `${label}: ground request after rejected logout`);
+        }
+        assertProbeHeldOrReturned(probe, label);
+        let settled = false;
+        for (let boundary = 0; boundary < 256; boundary++) {
+          if (!assertProbeHeldOrReturned(probe, label)) {
+            assert(expectsLogout, `${label}: only an admitted logout removes the session`);
+            const request = World.logoutRequests.get(p.username);
+            assert(request?.save, `${label}: ordinary logout writes a genuine save`);
+            const loaded = PlayerLoading.load(p.username, new Packet(request.save), null);
+            World.logoutRequests.delete(p.username);
+            logoutSaves.push(p.username);
+            const surface = sourceCoordForName('soulbane_surface');
+            assert.deepEqual(tile(loaded), [surface.level, surface.x, surface.z],
+              `${label}: logout saves only the configured surface exit`);
+            assert.equal(instanceUid(loaded), 0, `${label}: saved state contains no runtime instance`);
+            settled = true;
+            break;
+          }
+          if (!expectsLogout && stage(p) === memory.complete) {
+            settled = true;
+            runProc('soulbane_leave', p);
+            break;
+          }
+          if (expectsLogout) worldTick();
+          else advanceMemoryProbe(p);
+        }
+        assert(settled, `${label}: actual scene return or logout settles without a forced runtime restoration`);
+      }
+    }
+    assert(heldMemoryStandingTiles.get(memory.name)?.size > 0,
+      `${memory.name}: input proof supplies a nonempty observed standing set`);
+    console.log(`PASS entire native memory input hold ${JSON.stringify({
+      memory: memory.name, checkpoints, channels: 6, logoutSaves,
+      standingTiles: [...heldMemoryStandingTiles.get(memory.name).values()]
+    })}`);
+  }
+  // The same decoded packets must move a free player: rejected or inert packet
+  // construction cannot accidentally make the memory admission proof pass.
+  for (const minimap of [false, true]) {
+    const p = playerFixture();
+    const destination = sendProbeWalk(p, minimap, 'free-player packet control');
+    for (let tick = 0; tick < 16 && (p.x !== destination.x || p.z !== destination.z); tick++) worldTick();
+    assert.deepEqual(tile(p), [destination.level, destination.x, destination.z],
+      `the decoded ${minimap ? 'minimap' : 'ground'} control really moves a free player`);
+    console.log(`PASS decoded ${minimap ? 'minimap' : 'ground'} free-player movement control`);
+  }
+}
+function testManualRoomMusicEntries() {
+  for (const fixture of [
+    { stage: 1, song: RAGE_SONG, label: 'manual first Rage entry' },
+    { stage: FEAR_STAGE, song: FEAR_SONG, label: 'manual first Fear entry' }
+  ]) {
+    const p = playerFixture();
+    writeVar(p, 'soulbane_prog', fixture.stage);
+    writeVar(p, 'soulbane_riftrope_pres', 1);
+    assert.equal(stage(p), fixture.stage, `${fixture.label}: disclosed entry-boundary seed`);
+    assert.equal(readVar(p, 'soulbane_riftrope_pres'), 1, `${fixture.label}: attached-rope seed`);
+    assert.notEqual(fixture.song.track, MANUAL_PREVIOUS_SONG.track,
+      `${fixture.label}: the prior real track differs from the room song`);
+    chooseRiftWithRope(p, fixture.label, {
+      musicMode: 0,
+      requireLocked: true,
+      previousTrack: MANUAL_PREVIOUS_SONG.track
+    });
+    if (fixture.stage === 1) {
+      assert.equal(stage(p), 2, `${fixture.label}: native Rage admission advances stage 1`);
+    } else {
+      assertFearFreshEntry(p, fixture.label);
+    }
+  }
 }
 
 function latestQuestColor(p) {
@@ -513,6 +1033,7 @@ function assertJournal(p, expected, excluded, label) {
     .map(packet => packet.text ?? '').join(' ').replace(/@[a-z]{3}@/g, '').replace(/\s+/g, ' ');
   for (const phrase of expected) assert(text.includes(phrase), `${label}: journal includes truthful text ${JSON.stringify(phrase)}; rendered ${JSON.stringify(text)}`);
   for (const phrase of excluded) assert(!text.includes(phrase), `${label}: journal does not claim ${JSON.stringify(phrase)}`);
+  p.closeModal();
   return text;
 }
 function assertNoAngerItems(p, label) {
@@ -659,7 +1180,7 @@ function stableHitRandom(run) {
     JavaRandom.nextDouble = previousJavaRandom;
   }
 }
-function runNativeAttack(p, npc, label, maxTicks = 80) {
+function runNativeAttack(p, npc, label, maxTicks = 80, stopOnHit = false) {
   const beforeHp = npc.levels[HP_STAT];
   const beforeMeter = readVar(p, 'soulbane_anger_damagedealt');
   World.processInfo();
@@ -689,10 +1210,117 @@ function runNativeAttack(p, npc, label, maxTicks = 80) {
   assert.match(trigger?.name ?? '', /^\[opnpc2,/i, `${label}: native attack dispatch resolves opnpc2`);
   for (let tick = 0; tick < maxTicks; tick++) {
     worldTick();
-    if (stage(p) === 3 || readVar(p, 'soulbane_anger_donespecial') === 1 || !npc.isActive) break;
+    if (stopOnHit && npc.levels[HP_STAT] < beforeHp) {
+      p.clearInteraction();
+      break;
+    }
+    if (stage(p) === 3 || stage(p) === FEAR_COMPLETE_STAGE ||
+      readVar(p, 'soulbane_anger_donespecial') === 1 || !npc.isActive) break;
   }
-  assert(!npc.isActive || readVar(p, 'soulbane_anger_donespecial') === 1 || stage(p) === 3,
-    `${label}: real native attack/AI queue lands a hit; ${JSON.stringify({ player: { tile: tile(p), hp: p.levels[PlayerStat.HITPOINTS], stage: stage(p), uid: instanceUid(p), delayed: p.delayed, interaction: p.target?.nid, script: p.activeScript?.script?.name, execution: p.activeScript?.execution, messages: p.messages.slice(-8) }, npc: { tile: [npc.level, npc.x, npc.z], hp: npc.levels[HP_STAT], beforeHp, mode: npc.mode, owner: npc.vars[NPC_OWNER], instance: npc.vars[NPC_INSTANCE] }, meter: readVar(p, 'soulbane_anger_damagedealt'), beforeMeter })}`);
+  assert(stopOnHit
+    ? npc.levels[HP_STAT] < beforeHp || !npc.isActive
+    : !npc.isActive || readVar(p, 'soulbane_anger_donespecial') === 1 ||
+      stage(p) === 3 || stage(p) === FEAR_COMPLETE_STAGE,
+  `${label}: real native attack/AI queue ${stopOnHit ? 'lands a hit' : 'settles'}; ${JSON.stringify({ player: { tile: tile(p), hp: p.levels[PlayerStat.HITPOINTS], stage: stage(p), uid: instanceUid(p), delayed: p.delayed, interaction: p.target?.nid, script: p.activeScript?.script?.name, execution: p.activeScript?.execution, messages: p.messages.slice(-8) }, npc: { tile: [npc.level, npc.x, npc.z], hp: npc.levels[HP_STAT], beforeHp, mode: npc.mode, owner: npc.vars[NPC_OWNER], instance: npc.vars[NPC_INSTANCE] }, meter: readVar(p, 'soulbane_anger_damagedealt'), beforeMeter })}`);
+}
+function assertOrdinaryMeleeXp(p, before, damage, multiplier, label) {
+  assert.equal(multiplier, 1000, `${label}: the packed Fear Reaper keeps the ordinary 1000 combat-XP multiplier`);
+  const after = xpSnapshot(p);
+  const delta = after.map((value, skill) => value - before[skill]);
+  const base = damage * 10;
+  const scaled = value => Math.floor(value * multiplier / 1000);
+  const shared = scaled(Math.floor(base * 133 / 100));
+  const singleStyle = scaled(Math.floor(base * 400 / 100));
+  const combat = [PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE].map(skill => delta[skill]);
+  const oneStyle = combat.filter(value => value !== 0).length === 1 && combat.includes(singleStyle);
+  const controlledStyle = combat.every(value => value === shared);
+  assert(oneStyle || controlledStyle,
+    `${label}: real damage ${damage} follows the ordinary melee style XP split; got ${JSON.stringify(combat)}`);
+  assert.equal(delta[PlayerStat.HITPOINTS], shared, `${label}: real damage ${damage} awards ordinary 133% Hitpoints XP`);
+  const combatSkills = new Set([PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE, PlayerStat.HITPOINTS]);
+  for (let skill = 0; skill < delta.length; skill++) {
+    if (!combatSkills.has(skill)) assert.equal(delta[skill], 0, `${label}: ordinary Fear damage awards no XP to stat ${skill}`);
+  }
+}
+function attackFearOnce(p, npc, label) {
+  const beforeHp = npc.levels[HP_STAT];
+  const beforeXp = xpSnapshot(p);
+  const multiplier = npc.vars[NPC_XP_MULTIPLIER];
+  stableHitRandom(() => runNativeAttack(p, npc, label, 120, true));
+  const damage = beforeHp - npc.levels[HP_STAT];
+  assert(damage > 0, `${label}: native Attack delivers positive ordinary damage`);
+  assertOrdinaryMeleeXp(p, beforeXp, damage, multiplier, label);
+  return damage;
+}
+function searchFearHole(p, hole, label) {
+  const name = types.LocType.get(hole.type)?.debugname;
+  assert(FEAR_HOLES.includes(name), `${label}: target is one of the six original Fear holes`);
+  goToStand(p, hole, `${label}: walk to packed ${name}`);
+  const result = operateLoc(p, hole, 1, [], label);
+  assert.equal(result.trigger.name, `[oploc1,${name}]`, `${label}: OpLoc resolves the actual visible hole form`);
+  return result;
+}
+function fearDoor(p) {
+  const door = readVar(p, 'soulbane_fear_enemydoor');
+  assert(Number.isInteger(door) && door >= 1 && door <= FEAR_HOLES.length,
+    `Fear active door ${door} is one of the six holes`);
+  return door;
+}
+function ensureFearReaper(p, label) {
+  let actors = fearNpcsFor(p);
+  assert(actors.length <= 1, `${label}: the owner has at most one live Fear Reaper`);
+  if (actors.length === 0) {
+    assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, `${label}: no encounter marker is left without its actor`);
+    const door = fearDoor(p);
+    const hole = fearHoleLocs(p)[door - 1];
+    searchFearHole(p, hole, `${label}: search the active hole ${door}`);
+    for (let tick = 0; tick < 32 && fearNpcsFor(p).length === 0; tick++) worldTick();
+    actors = fearNpcsFor(p);
+  }
+  assert.equal(actors.length, 1, `${label}: a real owned Fear Reaper is present after searching its active hole`);
+  const npc = actors[0];
+  const door = fearDoor(p);
+  const spawn = fearReaperSpawn(p, door);
+  assert.deepEqual({ level: npc.level, x: npc.x, z: npc.z }, spawn,
+    `${label}: the active door selects its exact packed size-2 reaper point`);
+  assertFootprintOpen(npc.level, npc.x, npc.z, npc.width, npc.length, `${label}: active Fear Reaper footprint`);
+  assert.equal(npc.vars[NPC_INSTANCE], instanceUid(p), `${label}: Fear Reaper carries the current instance marker`);
+  assert.equal(npc.vars[NPC_OWNER] >>> 0, p.uid, `${label}: Fear Reaper carries the current player owner`);
+  assert.equal(readVar(p, 'soulbane_fear_monspres'), 1, `${label}: the live/pending encounter marker is set`);
+  for (let tick = 0; tick < 32 && npc.vars[NPC_XP_MULTIPLIER] !== 1000; tick++) worldTick();
+  assert.equal(npc.vars[NPC_XP_MULTIPLIER], 1000, `${label}: Fear Reaper uses the normal combat-XP multiplier`);
+  return npc;
+}
+function killFearReaper(p, npc, expectedTally, label) {
+  const previousDoor = fearDoor(p);
+  let hits = 0;
+  while (npc.isActive && npc.levels[HP_STAT] > 0) {
+    assert(hits < 32, `${label}: ordinary native combat can finish this 25-HP reaper`);
+    attackFearOnce(p, npc, `${label}: native melee hit ${hits + 1}`);
+    hits++;
+  }
+  assert(hits > 0, `${label}: the reaper dies only after real player attacks`);
+  for (let tick = 0; tick < 256 && readVar(p, 'soulbane_fear_killedtally') !== expectedTally + 1; tick++) worldTick();
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), expectedTally + 1,
+    `${label}: the production NPC death/credit queues add exactly one kill`);
+  for (let tick = 0; tick < 16; tick++) worldTick();
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), expectedTally + 1,
+    `${label}: settled and later death queues cannot duplicate credit`);
+  assert.equal(npc.vars[NPC_INSTANCE], 0, `${label}: real death consumes the reaper owner marker before credit`);
+  assert.equal(stage(p), FEAR_STAGE, `${label}: the fifth reaper's cutscene, not the death queue, commits boundary 5`);
+  const actors = fearNpcsFor(p);
+  assert(actors.length <= 1, `${label}: death and relocation never leave duplicate owned reapers`);
+  if (expectedTally < 4) {
+    const nextDoor = fearDoor(p);
+    assert.notEqual(nextDoor, previousDoor, `${label}: next active hole relocates away from the just-cleared one`);
+    assert.equal(readVar(p, 'soulbane_fear_enemydoor_old'), previousDoor,
+      `${label}: the previous active hole is retained as the no-repeat exclusion`);
+    assert.equal(readVar(p, 'soulbane_fear_exitlit'), 0, `${label}: Fear exit remains closed before the fifth-death scene`);
+  } else {
+    assert.equal(readVar(p, 'soulbane_fear_enemydoor'), 0, `${label}: no hole remains active after the fifth death`);
+    assert.equal(readVar(p, 'soulbane_fear_exitlit'), 0, `${label}: the fifth death has not lit the exit before its scene`);
+  }
+  return { hits, previousDoor };
 }
 function testForeignInteractions(owner, intruder) {
   const ownerUid = instanceUid(owner);
@@ -771,11 +1399,103 @@ function testForeignInteractions(owner, intruder) {
   assert.equal(readVar(intruder, 'soulbane_anger_damagedealt'), meterBefore, 'foreign use/cast attempts cannot earn anger credit');
   assert.equal(instanceUid(owner), ownerUid, 'foreign target attempts leave the real owner\'s UID unchanged');
 }
+function testForeignFearInteractions(owner, intruder, ownerNpc) {
+  const ownerUid = instanceUid(owner);
+  const hpBefore = ownerNpc.levels[HP_STAT];
+  const tallyBefore = readVar(owner, 'soulbane_fear_killedtally');
+  const xpBefore = xpSnapshot(intruder);
+  assert(runProcInt('npc_max_dealt', owner, [100, 0], ownerNpc) > 0,
+    'eligible owner Fear target keeps a positive ordinary melee/ranged max hit');
+  assert.equal(runProcInt('npc_max_dealt', intruder, [100, 0], ownerNpc), 0,
+    'foreign Fear target is capped at zero before melee/ranged damage XP');
+  assert(runProcInt('npc_max_dealt', owner, [100, 1], ownerNpc) > 0,
+    'eligible owner Fear target keeps a positive spell max hit');
+  assert.equal(runProcInt('npc_max_dealt', intruder, [100, 1], ownerNpc), 0,
+    'foreign Fear spell target is capped at zero before damage XP');
+  assert.equal(ownerNpc.vars[NPC_INSTANCE], ownerUid, 'foreign Fear target belongs to the other private copy');
+  assert.equal(ownerNpc.vars[NPC_OWNER] >>> 0, owner.uid, 'foreign Fear target belongs to the other player');
+  World.processInfo();
+  rsbuf.npcInfo(0, intruder.slot, 0, 0, true);
+  assert.equal(rsbuf.hasNpc(intruder.slot, ownerNpc.nid), false,
+    'native NPC updates never render another owner\'s Fear Reaper');
+  assert.equal(intruder.inOperableDistance(ownerNpc), false,
+    'a different-stage outside player is not in operation distance to the Fear Reaper');
+
+  intruder.clearInteraction();
+  assert.equal(OpNpcHandler.handle(new OpNpc(2, ownerNpc.nid), intruder), false,
+    'native APNPC2 refuses a foreign Fear Reaper');
+  seed(intruder, ['airrune', 'mindrune']);
+  const inventoryBefore = inventory(intruder);
+  assert.equal(OpNpcUHandler.handle(
+    new OpNpcU(ownerNpc.nid, obj('airrune'), slotOf(intruder, 'airrune'), invCom), intruder), false,
+  'native APNPCU refuses item use on a foreign Fear Reaper');
+  const windStrike = requiredId('Component', 'magic:wind_strike');
+  assert(intruder.isComponentVisible(types.Component.get(windStrike)),
+    'Wind Strike is visible to the native spell-target handler');
+  assert.equal(OpNpcTHandler.handle(new OpNpcT(ownerNpc.nid, windStrike), intruder), false,
+    'native APNPCT refuses a spell on a foreign Fear Reaper');
+
+  assert.equal(ownerNpc.levels[HP_STAT], hpBefore, 'foreign Attack/Use/Spell packets cannot damage the owner\'s Fear Reaper');
+  assert.equal(readVar(owner, 'soulbane_fear_killedtally'), tallyBefore, 'foreign Attack/Use/Spell packets cannot earn Fear credit');
+  assert.deepEqual(inventory(intruder), inventoryBefore, 'foreign item/spell target packets cannot consume the intruder\'s ordinary runes');
+  assert.deepEqual(xpSnapshot(intruder), xpBefore, 'rejected foreign combat packets award no ordinary XP');
+  assert.equal(instanceUid(owner), ownerUid, 'foreign Fear packets preserve the real owner\'s instance');
+}
+function castFearSpellOnce(p, npc, label) {
+  const windStrike = requiredId('Component', 'magic:wind_strike');
+  assert(button(p, 'controls:com_3'), `${label}: native combat controls turn off automatic melee retaliation`);
+  assert.equal(readVar(p, 'option_nodef'), 1, `${label}: a one-spell fixture has auto-retaliate off`);
+  const displaced = [];
+  for (const rune of ['airrune', 'mindrune']) {
+    if (count(p, rune) !== 0) continue;
+    if (inventory(p).every(Boolean)) {
+      const item = inventory(p).find(item => item && !WEAPON_IDS.has(obj(item.name)) &&
+        !types.ObjType.get(obj(item.name)).stackable);
+      assert(item, `${label}: a disclosed ordinary full-bag fixture can make room for the rune`);
+      assert(p.invDel(inv, obj(item.name), item.count), `${label}: temporarily remove only ordinary fixture gear`);
+      displaced.push(item);
+    }
+    assert.equal(p.invAdd(inv, obj(rune), 1), 1, `${label}: seed one standard ${rune}`);
+  }
+  World.processInfo();
+  rsbuf.npcInfo(0, p.slot, 0, 0, true);
+  assert(rsbuf.hasNpc(p.slot, npc.nid), `${label}: native NPC update renders the owned Fear Reaper`);
+  assert(p.isComponentVisible(types.Component.get(windStrike)), `${label}: Wind Strike is visible to the owner`);
+  const hpBefore = npc.levels[HP_STAT];
+  const tallyBefore = readVar(p, 'soulbane_fear_killedtally');
+  const xpBefore = xpSnapshot(p);
+  const airBefore = count(p, 'airrune');
+  const mindBefore = count(p, 'mindrune');
+  p.clearInteraction();
+  if (!p.inOperableDistance(npc)) {
+    const route = [...map.findPathToEntity(p.level, p.x, p.z, npc.x, npc.z, p.width, npc.width, npc.length)]
+      .map(value => unpackWorld(value));
+    assert(route.length > 0, `${label}: moving spell target has a packed entity approach route`);
+    assert(MoveClickHandler.handle(new MoveClick(route.map(({ x, z }) => ({ x, z })), 0, true), p),
+      `${label}: paired native MOVE_OPCLICK approaches the live spell target`);
+  }
+  assert(OpNpcTHandler.handle(new OpNpcT(npc.nid, windStrike), p),
+    `${label}: native APNPCT accepts the eligible owner's spell target`);
+  assert.match(p.getApTrigger()?.name ?? '', /^\[apnpct,/i,
+    `${label}: owner spell dispatch reaches the common APNPCT combat path`);
+  p.processInteraction();
+  for (let tick = 0; tick < 64; tick++) worldTick();
+  assert(xpSnapshot(p)[PlayerStat.MAGIC] > xpBefore[PlayerStat.MAGIC],
+    `${label}: eligible owner receives ordinary spell XP`);
+  assert.equal(count(p, 'airrune'), airBefore - 1, `${label}: real Wind Strike consumes one air rune`);
+  assert.equal(count(p, 'mindrune'), mindBefore - 1, `${label}: real Wind Strike consumes one mind rune`);
+  for (const item of displaced) {
+    assert.equal(p.invAdd(inv, obj(item.name), item.count), item.count,
+      `${label}: restore the exact ordinary fixture item after the rune is consumed`);
+  }
+  assert(npc.levels[HP_STAT] <= hpBefore, `${label}: ordinary spell resolution never heals the Fear Reaper`);
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), tallyBefore,
+    `${label}: a spell cast without death cannot award Fear credit`);
+}
 
 function nativeLogoutAndReload(p, label) {
   const oldPid = p.pid;
   const oldSlot = p.slot;
-  const oldUid = p.uid;
   const username = p.username;
   p.clearInteraction();
   for (let tick = 0; tick < 128 && World.currentTick < p.preventLogoutUntil; tick++) worldTick();
@@ -789,7 +1509,11 @@ function nativeLogoutAndReload(p, label) {
   // Stand in for the successful login-server save acknowledgement before relog.
   World.logoutRequests.delete(username);
   const loaded = PlayerLoading.load(username, new Packet(request.save), null);
-  loaded.pid = oldPid; loaded.slot = oldSlot; loaded.uid = oldUid; loaded.isActive = true;
+  loaded.pid = oldPid; loaded.slot = oldSlot;
+  // Loading reconstructs username37 from the saved username. Use its real
+  // identity, not makePlayer's synthetic pre-save hash, for native UID lookups.
+  loaded.uid = ((Number(loaded.username37 & 0x1fffffn) << 11) | oldSlot) >>> 0;
+  loaded.isActive = true;
   loaded.packets = []; loaded.messages = [];
   loaded.write = packet => loaded.packets.push(packet);
   loaded.messageGame = text => loaded.messages.push(String(text));
@@ -818,9 +1542,8 @@ function testStageTwoLeaveAndLogout(mainOwner) {
   assert.equal(instanceUid(p), originalUid, 'No leaves the current owned copy active');
   assert.equal(rageNpcsFor(p).length, 8, 'No does not remove the current owner\'s NPCs');
 
-  goToStand(p, quit, 'stage-2 quit Yes: return to actual exit loc');
-  operateLoc(p, quit, 1, [1], 'stage-2 quit Yes choice');
-  worldTick();
+  const yes = operateSurfaceExit(p, quit, [1], 'stage-2 quit Yes choice');
+  assert.match(yes.trigger.name, /^\[oploc1,soul_bane_awall_void_small\]$/);
   assert.equal(stage(p), 2, 'leaving Rage does not fabricate completion');
   assert.equal(instanceUid(p), 0, 'Yes closes the unfinished private region');
   assertNoAngerItems(p, 'stage-2 leave cleanup');
@@ -828,7 +1551,7 @@ function testStageTwoLeaveAndLogout(mainOwner) {
   assert.equal(rageNpcsWithInstance(originalUid).length, 0, 'stage-2 leave removes every owned Rage actor');
   assert(!CoordGrid.isInstanceX(p.x), 'stage-2 leave returns to an overworld coordinate');
 
-  chooseRiftWithRope(p, 'stage-2 re-entry after confirmed leave');
+  chooseRiftWithRope(p, 'stage-2 re-entry after confirmed leave', { requireUnlocked: true });
   assert.equal(stage(p), 2, 'stage-2 re-entry preserves unfinished progress');
   assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'stage-2 re-entry starts a fresh temporary meter');
   assert.equal(rageNpcsFor(p).length, 8, 'stage-2 re-entry owns a fresh set of Rage actors');
@@ -887,21 +1610,498 @@ function testDeath(mainOwner) {
 
 
 function privateInstanceZones(p, label) {
-  const uid = instanceUid(p);
-  assert(uid > 0, `${label}: owner has an instance handle`);
-  const instance = World.instances.findInstanceByUid(uid - 1);
-  assert(instance, `${label}: instance handle resolves to a live private copy`);
-  assert.equal(World.instances.findInstanceByCoord(p)?.uid, uid - 1, `${label}: player stands inside the resolved copy`);
+  const instance = instanceForOwner(p, label);
   const zones = [];
   for (let floor = 0; floor < instance.floors; floor++) {
     for (let east = 0; east < instance.zonesEast; east++) {
       for (let north = 0; north < instance.zonesNorth; north++) {
-        zones.push(World.gameMap.getZone(
-          instance.sw.x + (east << 3), instance.sw.z + (north << 3), instance.sw.level + floor));
+        const zone = World.gameMap.getZoneIfExists(
+          instance.sw.x + (east << 3), instance.sw.z + (north << 3), instance.sw.level + floor);
+        if (zone) zones.push(zone);
       }
     }
   }
   return { instance, zones };
+}
+function instanceDestinationOffset(instance, zone) {
+  return { east: zone.x - (instance.sw.x >> 3), north: zone.z - (instance.sw.z >> 3) };
+}
+function roomSourceSquares() {
+  const roomSource = sourceCoordForName('soulbane_rage_entry');
+  const x = roomSource.x >> 6;
+  const z = roomSource.z >> 6;
+  return new Set([`${roomSource.level}_${x}_${z}`, `${roomSource.level}_${x + 1}_${z}`]);
+}
+function roomSourceZones(instance, label) {
+  const roomSource = sourceCoordForName('soulbane_rage_entry');
+  const roomSquares = roomSourceSquares();
+  const zones = assignedInstanceZones(instance)
+    .filter(zone => roomSquares.has(sourceSquareKeyForZone(zone)));
+  const eastZones = zones.filter(zone => sourceSquareKeyForZone(zone) !== sourceSquareKey(roomSource));
+  assert([0, 64].includes(eastZones.length),
+    `${label}: the east reserve is unmapped or contains its complete source square`);
+  assert.equal(zones.length, 64 + eastZones.length,
+    `${label}: the original room square always maps all 64 zones`);
+  for (const zone of zones) {
+    const { east, north } = instanceDestinationOffset(instance, zone);
+    assert(east >= 0 && east < 16 && north >= 0 && north < 8,
+      `${label}: room source zone maps into the contiguous local 16×8 room rectangle`);
+    assert.equal(zone.source.level, roomSource.level, `${label}: room source floor is unchanged`);
+    assert.equal(zone.source.x, (roomSource.x >> 6) * 8 + east,
+      `${label}: full room x-zones map east without rotation or translation`);
+    assert.equal(zone.source.z, (roomSource.z >> 6) * 8 + north,
+      `${label}: room source z-zone maps without rotation or translation`);
+    assert.equal(zone.rotation, 0, `${label}: room source zone keeps its original orientation`);
+  }
+  return zones;
+}
+function connectedZoneComponents(zones) {
+  const remaining = new Map(zones.map(zone => [destinationZoneKey(zone), zone]));
+  const components = [];
+  while (remaining.size > 0) {
+    const first = remaining.values().next().value;
+    const pending = [first];
+    const component = [];
+    remaining.delete(destinationZoneKey(first));
+    while (pending.length > 0) {
+      const zone = pending.pop();
+      component.push(zone);
+      for (const [dx, dz] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+        const key = `${zone.level}:${zone.x + dx}:${zone.z + dz}`;
+        const adjacent = remaining.get(key);
+        if (!adjacent) continue;
+        remaining.delete(key);
+        pending.push(adjacent);
+      }
+    }
+    components.push(component);
+  }
+  return components;
+}
+function memoryPatchComponents(instance, roomZones, label) {
+  const rageSource = sourceCoordForName('soulbane_scene_player');
+  const fearSource = sourceCoordForName('soulbane_fear_scene_player');
+  const memorySquare = sourceSquareKey(rageSource);
+  assert.equal(sourceSquareKey(fearSource), memorySquare, `${label}: both scene memories use their packed source square`);
+  assert.notEqual(memorySquare, sourceSquareKey(sourceCoordForName('soulbane_rage_entry')),
+    `${label}: scene memory source is distinct from the room source square`);
+  const memoryZones = assignedInstanceZones(instance)
+    .filter(zone => !roomSourceSquares().has(sourceSquareKeyForZone(zone)));
+  assert(memoryZones.length > 0, `${label}: actual memory-source InstanceZones are present`);
+  const components = connectedZoneComponents(memoryZones);
+  assert.equal(components.length, 2, `${label}: Rage and Fear form separate copied memory patches`);
+  const rageAnchor = instanceZoneForSource(instance, rageSource, `${label}: Rage scene anchor`);
+  const fearAnchor = instanceZoneForSource(instance, fearSource, `${label}: Fear scene anchor`);
+  const rageZones = components.find(component => component.includes(rageAnchor));
+  const fearZones = components.find(component => component.includes(fearAnchor));
+  assert(rageZones && fearZones && rageZones !== fearZones,
+    `${label}: the two actual scene anchors identify distinct memory patches`);
+  for (const [kind, component] of [['Rage', rageZones], ['Fear', fearZones]]) {
+    for (const zone of component) {
+      const { north } = instanceDestinationOffset(instance, zone);
+      assert(north >= 14,
+        `${label}: ${kind} memory remains at least seven zones north of both source squares`);
+      for (const roomZone of roomZones) {
+        assert(Math.max(Math.abs(zone.x - roomZone.x), Math.abs(zone.z - roomZone.z)) >= 7,
+          `${label}: ${kind} memory stays at least seven zones from every room zone`);
+      }
+    }
+  }
+  assert(Math.abs(rageAnchor.x - fearAnchor.x) >= 13,
+    `${label}: the scene-memory standing zones remain at least thirteen zones apart horizontally`);
+  for (const rageZone of rageZones) {
+    for (const fearZone of fearZones) {
+      assert(Math.max(Math.abs(rageZone.x - fearZone.x), Math.abs(rageZone.z - fearZone.z)) >= 7,
+        `${label}: Rage and Fear patches stay seven zones apart in both directions`);
+    }
+  }
+  for (const name of ['soulbane_scene_launa', 'soulbane_scene_tolna']) {
+    const zone = instanceZoneForSource(instance, sourceCoordForName(name), `${label}: ${name}`);
+    assert(rageZones.includes(zone), `${label}: ${name} maps into the Rage memory patch`);
+  }
+  const fearTolna = instanceZoneForSource(
+    instance, sourceCoordForName('soulbane_fear_scene_tolna'), `${label}: Fear scene Tolna`);
+  assert(fearZones.includes(fearTolna), `${label}: Fear scene Tolna maps into the Fear memory patch`);
+  return { rageZones, fearZones };
+}
+function assertInstanceTemplateInventory(instance, label) {
+  const roomZones = roomSourceZones(instance, label);
+  const { rageZones, fearZones } = memoryPatchComponents(instance, roomZones, label);
+  const allowed = new Set([...roomZones, ...rageZones, ...fearZones].map(destinationZoneKey));
+  const assigned = assignedInstanceZones(instance);
+  assert.equal(assigned.length, allowed.size, `${label}: all assigned zones belong to the room or one memory patch`);
+  for (const zone of assigned) {
+    assert(allowed.has(destinationZoneKey(zone)),
+      `${label}: no unassigned source template enters the owner's copy`);
+  }
+  return { roomZones, rageZones, fearZones };
+}
+function instanceNativeFloodfill(p, instance, label, seedTiles = null) {
+  const minX = instance.sw.x;
+  const maxX = minX + (instance.zonesEast << 3);
+  const minZ = instance.sw.z;
+  const maxZ = minZ + (instance.zonesNorth << 3);
+  const start = { level: p.level, x: p.x, z: p.z };
+  assert(start.level >= instance.sw.level && start.level < instance.sw.level + instance.floors,
+    `${label}: floodfill starts on an owner instance floor`);
+  assert(start.x >= minX && start.x < maxX && start.z >= minZ && start.z < maxZ,
+    `${label}: floodfill starts inside the private instance bounds`);
+  const key = (x, z) => `${start.level}:${x}:${z}`;
+  const tiles = seedTiles ? [...seedTiles] : [start];
+  const seen = new Set(tiles.map(tile => key(tile.x, tile.z)));
+  const steps = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+  // Follow native movement to exhaustion, including padding beyond the owner footprint.
+  for (let index = 0; index < tiles.length; index++) {
+    const current = tiles[index];
+    for (const [dx, dz] of steps) {
+      const x = current.x + dx;
+      const z = current.z + dz;
+      const nextKey = key(x, z);
+      if (seen.has(nextKey)) continue;
+      if (!map.canTravel(start.level, current.x, current.z, dx, dz, p.width, 0, CollisionType.NORMAL)) continue;
+      seen.add(nextKey);
+      tiles.push({ level: start.level, x, z });
+    }
+  }
+  return { start, tiles };
+}
+function effectiveLocType(p, loc) {
+  const base = types.LocType.get(loc.type);
+  if (!base.multiloc || base.multiloc.length === 0) return base;
+  let state = -1;
+  if (base.multivarp !== -1) state = p.getVar(base.multivarp);
+  else if (base.multivarbit !== -1) state = p.getVarBit(base.multivarbit);
+  if (state >= 0 && state < base.multiloc.length && base.multiloc[state] !== -1) {
+    return types.LocType.get(base.multiloc[state]);
+  }
+  return base;
+}
+function mappedNeighborSourceLocs(zones, label) {
+  const sourceZones = new Map(zones.map(zone =>
+    [`${zone.source.level}:${zone.source.x}:${zone.source.z}`, zone]));
+  const squares = new Set(zones.map(zone => `${zone.source.x >> 3}_${zone.source.z >> 3}`));
+  const locs = [];
+  for (const square of squares) {
+    const [mapX, mapZ] = square.split('_').map(Number);
+    const groundFlags = new Map();
+    let section = '';
+    for (const line of fs.readFileSync(path.join(contentRoot, 'maps', `m${square}.jm2`), 'utf8').split(/\r?\n/)) {
+      if (line.startsWith('====')) {
+        section = line.split(/\s+/)[1];
+        continue;
+      }
+      const row = /^([0-3]) (\d+) (\d+): (.*)$/.exec(line);
+      if (!row) continue;
+      const [level, localX, localZ] = row.slice(1, 4).map(Number);
+      if (section === 'MAP') {
+        const flags = /(?:^| )f(\d+)(?: |$)/.exec(row[4]);
+        groundFlags.set(`${level}:${localX}:${localZ}`, flags ? Number(flags[1]) : 0);
+        continue;
+      }
+      if (section !== 'LOC') continue;
+      const [typeId, shape = 10, angle = 0] = row[4].trim().split(/\s+/).map(Number);
+      const bridged = ((groundFlags.get(`1:${localX}:${localZ}`) ?? 0) & 2) !== 0;
+      const source = { level: bridged ? level - 1 : level, x: mapX * 64 + localX, z: mapZ * 64 + localZ };
+      const zone = sourceZones.get(sourceZoneKey(source));
+      if (!zone) continue;
+      assert.equal(zone.rotation, 0, `${label}: source loc mapping preserves the neighbor's rotation`);
+      const type = types.LocType.get(typeId);
+      locs.push({
+        level: zone.level, x: (zone.x << 3) + (source.x & 7), z: (zone.z << 3) + (source.z & 7),
+        type: typeId, baseType: typeId, shape, angle, width: type.width, length: type.length
+      });
+    }
+  }
+  // Native zones retain only active loc entities; inactive scenery is still
+  // rendered by the source template and contributes copied collision.
+  const key = loc => [loc.level, loc.x, loc.z, loc.baseType, loc.shape, loc.angle].join(':');
+  assert.deepEqual(zones.flatMap(zone => [...zone.getAllLocsSafe()]).map(key).sort(),
+    locs.filter(loc => types.LocType.get(loc.baseType).active).map(key).sort(),
+    `${label}: every active native neighbor loc matches its actual source mapping`);
+  return locs;
+}
+function assertPrivateInstanceIsolation(p, label, requireRoomPacket = false) {
+  assert([2, 3, 4, 5].includes(stage(p)),
+    `${label}: native isolation is measured in quest stages 2–5`);
+  const instance = instanceForOwner(p, label);
+  const roomScene = assertRoomSceneVisibility(p, label, requireRoomPacket);
+  const { roomZones, rageZones, fearZones } = assertInstanceTemplateInventory(instance, label);
+  assertMemorySceneVisibility(null, rageZones, 'Rage', `${label}: Rage scene`, false);
+  assertMemorySceneVisibility(null, fearZones, 'Fear', `${label}: Fear scene`, false);
+  assertNoBlankPaddingShortcut(p, instance, assignedInstanceZones(instance), label);
+
+  const roomSource = sourceCoordForName('soulbane_rage_entry');
+  const neighborSquare = `${roomSource.level}_${(roomSource.x >> 6) + 1}_${roomSource.z >> 6}`;
+  const neighborZones = assignedInstanceZones(instance)
+    .filter(zone => sourceSquareKeyForZone(zone) === neighborSquare);
+  const flood = instanceNativeFloodfill(p, instance, label);
+  const allowedRoomSources = roomSourceSquares();
+  for (const tileAt of flood.tiles) {
+    assertSceneMappingWindow(null, tileAt, allowedRoomSources, `${label}: every native-reachable room tile`);
+  }
+  if (neighborZones.length === 0) {
+    console.log(`PASS private-instance scene isolation ${JSON.stringify({
+      stage: stage(p), label, standableSceneTiles: roomScene.standableTiles,
+      reachableTiles: flood.tiles.length, neighborCopied: false,
+      limit: 'east-neighbor geometry is intentionally absent because the copied variant is reachable in Fear'
+    })}`);
+    return { instance, roomZones, rageZones, fearZones, flood, neighborTiles: [], neighborLocs: [] };
+  }
+  assert.equal(neighborZones.length, 64, `${label}: the full east neighbor source square is copied`);
+  const neighborTiles = mappedWalkableTiles(neighborZones, `${label}: east neighbor collision`);
+  const neighborZoneKeys = new Set(neighborZones.map(destinationZoneKey));
+  const reachableNeighborTiles = flood.tiles.filter(tile =>
+    neighborZoneKeys.has(`${tile.level}:${tile.x >> 3}:${tile.z >> 3}`)).length;
+
+  const neighborLocs = mappedNeighborSourceLocs(neighborZones, label);
+  assert.equal(neighborLocs.length, 719,
+    `${label}: all 719 cached locs in the copied east neighbor are inspected`);
+  const operableForms = new Set();
+  let reachedLocForms = 0;
+  let reachedOperationForms = 0;
+  for (const loc of neighborLocs) {
+    const form = effectiveLocType(p, loc);
+    const operations = (form.op ?? []).filter(option => option !== null && option !== 'hidden');
+    if (operations.length > 0) operableForms.add(form.id);
+    assert.equal(loc.level, flood.start.level, `${label}: neighbor loc ${loc.baseType} shares the room plane`);
+    const base = types.LocType.get(loc.type);
+    const reached = flood.tiles.some(tile => map.reachedLoc(
+      tile.level, tile.x, tile.z, loc.x, loc.z,
+      loc.width, loc.length, p.width, loc.angle, loc.shape, base.forceapproach));
+    if (reached) {
+      reachedLocForms++;
+      if (operations.length > 0) reachedOperationForms++;
+    }
+  }
+  assert.equal(operableForms.size, 2,
+    `${label}: both non-vacuous effective neighbor operation forms are inspected`);
+  assert.equal(reachableNeighborTiles, 0,
+    `${label}: native floodfill reaches no collision-open tile in the east neighbor (${neighborTiles.length} native tiles checked)`);
+  assert.equal(reachedLocForms, 0, `${label}: no cached neighbor loc is in native operation reach`);
+  assert.equal(reachedOperationForms, 0, `${label}: no effective neighbor operation is in native operation reach`);
+  console.log(`PASS private-instance scene isolation ${JSON.stringify({
+    stage: stage(p),
+    label,
+    standableSceneTiles: roomScene.standableTiles,
+    reachableTiles: flood.tiles.length,
+    neighborTiles: neighborTiles.length,
+    neighborLocs: neighborLocs.length,
+    operableForms: operableForms.size,
+    reachableNeighborTiles,
+    reachedLocForms,
+    reachedOperationForms
+  })}`);
+  return { instance, roomZones, rageZones, fearZones, flood, neighborTiles, neighborLocs };
+}
+function collisionOpenTiles(zones) {
+  const tiles = [];
+  for (const zone of zones) {
+    const baseX = zone.x << 3;
+    const baseZ = zone.z << 3;
+    for (let dx = 0; dx < 8; dx++) {
+      for (let dz = 0; dz < 8; dz++) {
+        const x = baseX + dx;
+        const z = baseZ + dz;
+        if (map.isZoneAllocated(zone.level, x, z) && !map.isMapBlocked(x, z, zone.level)) {
+          tiles.push({ level: zone.level, x, z });
+        }
+      }
+    }
+  }
+  return tiles;
+}
+function mappedWalkableTiles(zones, label) {
+  const tiles = collisionOpenTiles(zones);
+  assert(tiles.length > 0,
+    `${label}: packed collision contains non-vacuous collision-open tiles, including blank tiles`);
+  return tiles;
+}
+function mappedZonesInSceneWindow(tile) {
+  const centerX = tile.x >> 3;
+  const centerZ = tile.z >> 3;
+  const zones = [];
+  for (let level = 0; level < 4; level++) {
+    for (let zoneX = centerX - 6; zoneX <= centerX + 6; zoneX++) {
+      for (let zoneZ = centerZ - 6; zoneZ <= centerZ + 6; zoneZ++) {
+        const zone = World.gameMap.getZoneIfExists(zoneX << 3, zoneZ << 3, level);
+        if (zone instanceof InstanceZone && zone.hasAssignedTemplate) zones.push(zone);
+      }
+    }
+  }
+  return zones;
+}
+function instanceTemplateTuple(zone) {
+  return [zone.level, zone.x, zone.z, zone.source.level, zone.source.x, zone.source.z, zone.rotation].join(':');
+}
+function packetTemplateTuple(template) {
+  return [template.level, template.zoneX, template.zoneZ,
+    template.sourceLevel, template.sourceZoneX, template.sourceZoneZ, template.rotation].join(':');
+}
+function assertSceneMappingWindow(p, tileAt, allowedSourceSquares, label, requirePacket = false, allowedZoneKeys = null) {
+  const visible = mappedZonesInSceneWindow(tileAt);
+  const center = World.gameMap.getZoneIfExists(tileAt.x, tileAt.z, tileAt.level);
+  assert(center instanceof InstanceZone, `${label}: the stand tile remains in a native instance zone`);
+  if (center.hasAssignedTemplate) {
+    assert(visible.includes(center), `${label}: current mapped tile is present in its 13×13 scene window`);
+  } else {
+    assert(map.isZoneAllocated(tileAt.level, tileAt.x, tileAt.z)
+      && !map.isMapBlocked(tileAt.x, tileAt.z, tileAt.level),
+    `${label}: an unmapped stand tile is genuinely collision-open native padding`);
+  }
+  for (const zone of visible) {
+    assert(allowedSourceSquares.has(sourceSquareKeyForZone(zone)),
+      `${label}: scene from native tile ${tileAt.level}:${tileAt.x}:${tileAt.z} uses only its allowlisted source squares; found ${instanceTemplateTuple(zone)}`);
+    if (allowedZoneKeys) {
+      assert(allowedZoneKeys.has(destinationZoneKey(zone)),
+        `${label}: memory scene uses only its own patch; found ${instanceTemplateTuple(zone)}`);
+    }
+  }
+  if (requirePacket) {
+    // A dialogue resume can teleport before the next processInfo phase.
+    // Run that phase's unforced native rebuild before observing its packet.
+    p.buildArea.rebuild();
+    const centerX = tileAt.x >> 3;
+    const centerZ = tileAt.z >> 3;
+    const packet = [...p.packets].reverse().find(value => value instanceof RebuildRegion
+      && value.zoneX === centerX && value.zoneZ === centerZ);
+    assert(packet, `${label}: the real scene emitted a centered RebuildRegion packet`);
+    const actual = packet.templates.map(packetTemplateTuple).sort();
+    const expected = visible.map(instanceTemplateTuple).sort();
+    assert.deepEqual(actual, expected,
+      `${label}: emitted RebuildRegion templates match the actual native four-level scene mapping`);
+  }
+  return visible.length;
+}
+function assertRoomSceneVisibility(p, label, requirePacket = false) {
+  const instance = instanceForOwner(p, label);
+  const assigned = assignedInstanceZones(instance);
+  const memorySquare = sourceSquareKey(sourceCoordForName('soulbane_scene_player'));
+  const memoryZones = assigned.filter(zone => !roomSourceSquares().has(sourceSquareKeyForZone(zone)));
+  const memoryComponents = connectedZoneComponents(memoryZones);
+  const anchorZone = name => {
+    const source = sourceCoordForName(name);
+    const sourceKey = `${source.level}:${source.x >> 3}:${source.z >> 3}`;
+    return memoryZones.find(zone =>
+      `${zone.source.level}:${zone.source.x}:${zone.source.z}` === sourceKey);
+  };
+  const rageAnchor = anchorZone('soulbane_scene_player');
+  const fearAnchor = anchorZone('soulbane_fear_scene_player');
+  const knownMemoryZones = new Set([
+    ...(memoryComponents.find(component => component.includes(rageAnchor)) ?? []),
+    ...(memoryComponents.find(component => component.includes(fearAnchor)) ?? [])
+  ].map(destinationZoneKey));
+  const roomCandidateZones = assigned.filter(zone => !knownMemoryZones.has(destinationZoneKey(zone)));
+  const roomTiles = collisionOpenTiles(roomCandidateZones);
+  const allowedSourceSquares = roomSourceSquares();
+  for (const tileAt of roomTiles) {
+    assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: all room standable tiles`);
+  }
+  assert(roomTiles.length > 0,
+    `${label}: scene isolation checks all non-memory collision-open tiles, including blank tiles`);
+  const currentTile = { level: p.level, x: p.x, z: p.z };
+  assertSceneMappingWindow(p, currentTile, allowedSourceSquares, `${label}: real room scene`,
+    requirePacket);
+  return { standableTiles: roomTiles.length, memorySquare, memoryComponents };
+}
+function assertMemoryCameraGround(p, memory) {
+  let checked = memoryCameraPackets.get(p);
+  if (!checked) {
+    checked = new Map();
+    memoryCameraPackets.set(p, checked);
+  }
+  const pending = [...p.cameraPackets.all()].filter(info =>
+    (info.type === 0 || info.type === 1) && !checked.has(info));
+  if (pending.length === 0) return;
+  const label = `${memory} memory camera`;
+  const instance = instanceForOwner(p, label);
+  const { rageZones, fearZones } = assertInstanceTemplateInventory(instance, label);
+  const ground = new Set((memory === 'Rage' ? rageZones : fearZones).map(destinationZoneKey));
+  const visible = new Set(mappedZonesInSceneWindow(p).map(destinationZoneKey));
+  for (const info of pending) {
+    const role = info.type === 0 ? 'eye' : 'look-at';
+    const key = `${p.level}:${info.camX >> 3}:${info.camZ >> 3}`;
+    assert(ground.has(key),
+      `${label}: every issued ${role} tile ${p.level}:${info.camX}:${info.camZ} has copied ground in its own memory patch`);
+    assert(visible.has(key), `${label}: every issued ${role} tile is in the player's memory scene window`);
+    checked.set(info, { memory, role, level: p.level, x: info.camX, z: info.camZ });
+  }
+}
+function assertMemoryCameraCoverage(p, memory) {
+  const commands = [...(memoryCameraPackets.get(p)?.values() ?? [])].filter(info => info.memory === memory);
+  assert(commands.some(info => info.role === 'eye'), `${memory} memory issues an actual camera eye command`);
+  assert(commands.some(info => info.role === 'look-at'), `${memory} memory issues an actual camera look-at command`);
+  console.log(`PASS every issued native memory camera has its own copied ground ${JSON.stringify({ memory, commands })}`);
+}
+// The native input proof supplies the actual reachable standing set: collision-
+// open padding is not reachable while the compiled memory holds every input.
+function assertMemorySceneVisibility(p, zones, memory, label, requirePacket = false) {
+  const sources = [...(heldMemoryStandingTiles.get(memory)?.values() ?? [])];
+  assert(sources.length > 0, `${label}: the completed native input proof supplies standing tiles`);
+  const instance = World.instances.findInstanceByCoord({
+    level: zones[0].level, x: zones[0].x << 3, z: zones[0].z << 3
+  });
+  assert(instance, `${label}: native memory tiles belong to a live instance`);
+  const tiles = sources.map(source => {
+    const zone = instanceZoneForSource(instance, source, label);
+    assert(zones.includes(zone), `${label}: the proved script placement maps into this memory`);
+    return {
+      level: zone.level, x: (zone.x << 3) + (source.x & 7), z: (zone.z << 3) + (source.z & 7)
+    };
+  });
+  const allowedSourceSquares = new Set(zones.map(sourceSquareKeyForZone));
+  const allowedZoneKeys = new Set(zones.map(destinationZoneKey));
+  for (const tileAt of tiles) {
+    assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: every proved standing tile`,
+      false, allowedZoneKeys);
+  }
+  if (p) {
+    assert(tiles.some(tileAt => tileAt.level === p.level && tileAt.x === p.x && tileAt.z === p.z),
+      `${label}: the real player is at a standing tile established by the native input proof`);
+    assertSceneMappingWindow(p, { level: p.level, x: p.x, z: p.z }, allowedSourceSquares,
+      `${label}: real memory scene`, requirePacket, allowedZoneKeys);
+  }
+  console.log(`PASS proved held-memory standing-set isolation ${JSON.stringify({
+    memory, label, sourceStandingTiles: sources, nativeStandingTiles: tiles
+  })}`);
+  return tiles.length;
+}
+function hasExactNativeRoute(start, destination) {
+  if (start.level !== destination.level) return false;
+  const route = [...map.findPath(start.level, start.x, start.z, destination.x, destination.z)];
+  if (route.length === 0) return false;
+  const end = unpackWorld(route.at(-1));
+  return end.level === destination.level && end.x === destination.x && end.z === destination.z;
+}
+function assertNoBlankPaddingShortcut(p, instance, assignedZones, label) {
+  const assigned = new Set(assignedZones.map(destinationZoneKey));
+  const baseZoneX = instance.sw.x >> 3;
+  const baseZoneZ = instance.sw.z >> 3;
+  let interiorBlankZones = 0;
+  for (let floor = 0; floor < instance.floors; floor++) {
+    const level = instance.sw.level + floor;
+    for (let east = 0; east < instance.zonesEast; east++) {
+      for (let north = 0; north < instance.zonesNorth; north++) {
+        const zoneX = baseZoneX + east;
+        const zoneZ = baseZoneZ + north;
+        if (assigned.has(`${level}:${zoneX}:${zoneZ}`)) continue;
+        const distance = Math.min(...assignedZones.map(zone =>
+          Math.max(Math.abs(zone.x - zoneX), Math.abs(zone.z - zoneZ))));
+        if (distance <= 1) continue;
+        interiorBlankZones++;
+        assert.equal(map.isZoneAllocated(level, zoneX << 3, zoneZ << 3), false,
+          `${label}: unassigned blank padding has no native collision allocation`);
+      }
+    }
+  }
+  assert(interiorBlankZones > 0, `${label}: mapped islands leave non-vacuous blank padding`);
+  for (const entryName of ['soulbane_rage_entry', 'soulbane_fear_entry']) {
+    const start = roomCoord(p, entryName);
+    for (const sceneName of ['soulbane_scene_player', 'soulbane_fear_scene_player']) {
+      const destination = roomCoord(p, sceneName);
+      assert(!hasExactNativeRoute(start, destination),
+        `${label}: ${entryName} cannot walk through blank padding into ${sceneName}`);
+    }
+  }
 }
 
 function assertPrivateCopyHasNoEscapeAccess(p, label) {
@@ -917,7 +2117,7 @@ function assertPrivateCopyHasNoEscapeAccess(p, label) {
   assert.equal(npcs.length, 8, `${label}: the copy contains only its eight Rage actors`);
   assert(npcs.every(npc => RAGE_IDS.has(npc.type)
     && npc.vars[NPC_INSTANCE] === instanceUid(p)
-    && npc.vars[NPC_OWNER] === p.uid), `${label}: no familiar or foreign NPC occupies the copy`);
+    && (npc.vars[NPC_OWNER] >>> 0) === p.uid), `${label}: no familiar or foreign NPC occupies the copy`);
 
   const objects = zones.flatMap(zone => [...zone.getAllObjsUnsafe()]);
   assert.equal(objects.length, 0, `${label}: no other player's ground item is present in the copy`);
@@ -965,6 +2165,391 @@ function surfaceTile() {
   assert(declaration, 'Soulbane declares the surface exit coordinate');
   const { level, x, z } = unpackWorld(packedTemplate(declaration));
   return [level, x, z];
+}
+function ensureFearCombatWeapon(p, label) {
+  const worn = types.InvType.getId('worn');
+  const hasScimitar = count(p, 'rune_scimitar') + count(p, 'rune_scimitar', worn) > 0;
+  if (!hasScimitar) {
+    let added = p.invAdd(inv, obj('rune_scimitar'), 1);
+    if (added !== 1) {
+      const filler = inventory(p).find(item => item && !WEAPON_IDS.has(obj(item.name)) &&
+        types.ObjType.get(obj(item.name))?.stackable === false);
+      assert(filler, `${label}: one ordinary non-stackable item can make room for test combat gear`);
+      assert(p.invDel(inv, obj(filler.name), filler.count), `${label}: remove only disclosed fixture gear`);
+      added = p.invAdd(inv, obj('rune_scimitar'), 1);
+    }
+    assert.equal(added, 1, `${label}: one ordinary rune scimitar is seeded for authentic Fear combat`);
+  }
+  if (count(p, 'rune_scimitar', worn) === 0) {
+    assert(held(p, 'rune_scimitar', 2), `${label}: native Wield inventory action accepted`);
+  }
+  assert.equal(count(p, 'rune_scimitar', worn), 1, `${label}: ordinary rune scimitar is equipped`);
+}
+function seedFearCombatFixture(p, label) {
+  for (const stat of [PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE,
+    PlayerStat.HITPOINTS, PlayerStat.MAGIC]) p.setLevel(stat, 99);
+  ensureFearCombatWeapon(p, label);
+  assert.equal(angerWeaponTotal(p), 0, `${label}: Fear combat does not use a Rage weapon`);
+}
+function assertFearFreshEntry(p, label) {
+  assert.equal(stage(p), FEAR_STAGE, `${label}: permanent progress remains in active Fear`);
+  assert(instanceUid(p) > 0, `${label}: a fresh private region owns Fear`);
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), `${label}: re-entry lands at the packed Fear entry`);
+  assert.equal(fearNpcsFor(p).length, 0, `${label}: an incomplete Fear room does not resume a stale reaper`);
+  fearDoor(p);
+  for (const [name, value] of [
+    ['soulbane_fear_enemydoor_old', 0], ['soulbane_fear_monspres', 0],
+    ['soulbane_fear_killedtally', 0], ['soulbane_fear_exitlit', 0]
+  ]) assert.equal(readVar(p, name), value, `${label}: ${name} resets for incomplete Fear`);
+  assertNoAngerItems(p, label);
+}
+function enterFearAfterRift(p, label) {
+  chooseRiftWithRope(p, label, { requireUnlocked: true });
+  assertFearFreshEntry(p, label);
+  assert.equal(rageNpcsFor(p).length, 0, `${label}: Fear re-entry never respawns Rage actors`);
+}
+function searchEveryFearHole(p, label) {
+  const activeDoor = fearDoor(p);
+  const holes = fearHoleLocs(p);
+  const tallyBefore = readVar(p, 'soulbane_fear_killedtally');
+  for (const [index, hole] of holes.entries()) {
+    const ordinal = index + 1;
+    if (ordinal === activeDoor) continue;
+    searchFearHole(p, hole, `${label}: wrong hole ${ordinal}`);
+    assert.equal(fearNpcsFor(p).length, 0, `${label}: wrong hole ${ordinal} cannot spawn a reaper`);
+    assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, `${label}: wrong hole ${ordinal} leaves no encounter marker`);
+    assert.equal(readVar(p, 'soulbane_fear_killedtally'), tallyBefore, `${label}: wrong hole ${ordinal} earns no kill`);
+  }
+  searchFearHole(p, holes[activeDoor - 1], `${label}: active hole ${activeDoor}`);
+  for (let tick = 0; tick < 32 && fearNpcsFor(p).length === 0; tick++) worldTick();
+  return ensureFearReaper(p, `${label}: sole active hole ${activeDoor}`);
+}
+function fearSceneTolnas() {
+  return [...World.npcs].filter(npc => npc?.isActive &&
+    (npc.baseType === TOLNA_SCENE || npc.type === TOLNA_SCENE));
+}
+function observeFearScene(p) {
+  const playerStand = roomCoord(p, 'soulbane_fear_scene_player');
+  const tolnaStand = roomCoord(p, 'soulbane_fear_scene_tolna');
+  const tolna = fearSceneTolnas().filter(npc =>
+    npc.level === tolnaStand.level && npc.x === tolnaStand.x && npc.z === tolnaStand.z);
+  if (tolna.length === 0 || p.level !== playerStand.level ||
+    p.x !== playerStand.x || p.z !== playerStand.z) return false;
+  assert.equal(tolna.length, 1, 'Fear scene stages exactly one Tolna at the packed memory tile');
+  assertFootprintOpen(playerStand.level, playerStand.x, playerStand.z, 1, 1, 'Fear scene player footprint');
+  assertFootprintOpen(tolna[0].level, tolna[0].x, tolna[0].z, tolna[0].width, tolna[0].length,
+    'Fear scene Tolna footprint');
+  nativeRouteFrom(playerStand, { level: tolna[0].level, x: tolna[0].x, z: tolna[0].z },
+    'Fear scene player can reach staged Tolna on foot');
+  return true;
+}
+function finishFearScene(p) {
+  let sawFearStaging = false;
+  const pages = [];
+  const messageStart = p.messages.length;
+  const recordFearStaging = () => {
+    assertMemoryCameraGround(p, 'Fear');
+    if (sawFearStaging || !observeFearScene(p)) return;
+    const instance = instanceForOwner(p, 'Fear memory scene');
+    const { fearZones } = assertInstanceTemplateInventory(instance, 'Fear memory scene');
+    assertMemorySceneVisibility(p, fearZones, 'Fear', 'Fear memory scene', true);
+    sawFearStaging = true;
+  };
+  for (let tick = 0; tick < 1200; tick++) {
+    recordFearStaging();
+    const state = p.activeScript;
+    if (state?.execution === ScriptState.PAUSEBUTTON) {
+      const root = types.Component.get(p.modalChat)?.comName ?? '';
+      assert(!/^multi[2-5]$/.test(root), 'the compiled Fear scene has no unanswered choices');
+      pages.push(...dialoguePage(p));
+      resumeDialogue(p);
+      continue;
+    }
+    worldTick();
+    recordFearStaging();
+    if (stage(p) === FEAR_COMPLETE_STAGE && p.queue.head() === null &&
+      (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
+  }
+  assert(sawFearStaging, 'the fifth-death scene stages the player and Tolna before returning');
+  assertMemoryCameraCoverage(p, 'Fear');
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, 'the Fear scene, not the fifth death queue, commits stage 5');
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), 'the Fear scene returns to its room entry');
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, 'the completed five-kill tally is preserved');
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, 'the western exit lights only when the scene commits');
+  assert.equal(fearNpcsFor(p).length, 0, 'the completed Fear scene leaves no reaper');
+  assert.equal(fearSceneTolnas().length, 0, 'the completed Fear scene removes staged Tolna');
+  return { pages: pages.join(' '), messages: p.messages.slice(messageStart).join(' ') };
+}
+function leaveFearToSurface(p, label, choices = [1]) {
+  const exit = fearSurfaceExitLoc(p);
+  const result = operateSurfaceExit(p, exit, choices, label);
+  assert.match(result.trigger.name, /^\[oploc1,soul_bane_fwall_void_small\]$/,
+    `${label}: uses the original Fear surface Exit loc`);
+  return result;
+}
+function assertFearExitCleanup(p, oldUid, expectedTile, ordinaryBefore, label) {
+  assert.equal(stage(p), FEAR_STAGE, `${label}: cleanup preserves unfinished Fear`);
+  assert.equal(instanceUid(p), 0, `${label}: cleanup releases the private copy`);
+  assert.deepEqual(tile(p), expectedTile, `${label}: cleanup reaches the observed outside tile`);
+  assertFearReset(p, label);
+  assertNoAngerItems(p, label);
+  assert.equal(fearNpcsWithInstance(oldUid).length, 0, `${label}: no reaper survives in the old copy`);
+  assert.deepEqual(normalInventory(p), ordinaryBefore, `${label}: cleanup preserves ordinary bag inventory`);
+  assert.equal(count(p, 'rune_scimitar', types.InvType.getId('worn')), 1,
+    `${label}: cleanup preserves the ordinary equipped weapon`);
+  for (let tick = 0; tick < 16; tick++) worldTick();
+  assertFearReset(p, label);
+  assert.equal(stage(p), FEAR_STAGE, `${label}: settled stale queues cannot complete Fear`);
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 0, `${label}: settled stale queues cannot restore partial kills`);
+}
+function assertFearCompleteEntry(p, label) {
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, `${label}: completed Fear progress persists`);
+  assert(instanceUid(p) > 0, `${label}: completed progress owns a fresh private region`);
+  assertPrivateInstanceIsolation(p, label);
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), `${label}: completed re-entry lands in Fear`);
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, `${label}: all five kills survive re-entry`);
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, `${label}: the illuminated exit survives re-entry`);
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor'), 0, `${label}: completed Fear has no active hole`);
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor_old'), 0, `${label}: completed Fear has no stale exclusion`);
+  assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, `${label}: completed Fear has no encounter marker`);
+  assert.equal(fearNpcsFor(p).length, 0, `${label}: completed re-entry cannot respawn a Reaper`);
+  assert.equal(fearSceneTolnas().length, 0, `${label}: completed re-entry cannot respawn scene Tolna`);
+  assertNoAngerItems(p, label);
+}
+function assertFearCompleteExit(p, oldUid, expectedTile, ordinaryBefore, label) {
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, `${label}: cleanup preserves completed Fear`);
+  assert.equal(instanceUid(p), 0, `${label}: cleanup releases the completed private copy`);
+  assert.deepEqual(tile(p), expectedTile, `${label}: cleanup reaches the outside tile`);
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, `${label}: completed kill count is permanent`);
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, `${label}: completed exit remains lit`);
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor'), 0, `${label}: cleanup clears completed active-hole state`);
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor_old'), 0, `${label}: cleanup clears completed previous-hole state`);
+  assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, `${label}: cleanup clears completed encounter state`);
+  assertNoAngerItems(p, label);
+  assert.equal(fearNpcsWithInstance(oldUid).length, 0, `${label}: no Reaper survives in the old completed copy`);
+  assert.deepEqual(normalInventory(p), ordinaryBefore, `${label}: cleanup preserves ordinary bag inventory`);
+  assert.equal(count(p, 'rune_scimitar', types.InvType.getId('worn')), 1,
+    `${label}: cleanup preserves the ordinary equipped weapon`);
+  for (let tick = 0; tick < 16; tick++) worldTick();
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, `${label}: stale queues cannot erase completed Fear`);
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, `${label}: stale queues cannot close the completed exit`);
+}
+function testFearProgression(p, stageThreeColor) {
+  const qpBeforeFear = readVar(p, 'qp');
+  const coinsBeforeFear = count(p, 'coins');
+  const xpBeforeFear = xpSnapshot(p);
+  chooseRiftWithRope(p, 'completed Rage re-entry before Fear', { requireUnlocked: true });
+  assert.equal(stage(p), 3, 'Rage completion survives the real rift re-entry before the next room');
+  assertPrivateInstanceIsolation(p, 'stage-3 completed Rage re-entry');
+  assert.equal(rageNpcsFor(p).length, 0, 'completed Rage re-entry does not respawn its monsters');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'completed Rage remains the active quest before Fear');
+
+  const rageUid = instanceUid(p);
+  const boundary = rageFearBoundaryLoc(p);
+  goToStand(p, boundary, 'stage-3 transition: walk to the original eastern Fear exit');
+  const fearMusicObservation = beginRoomMusicObservation(p, FEAR_SONG, 1,
+    'first Fear room entry', { requireLocked: true });
+  const transition = operateLoc(p, boundary, 1, [], 'stage-3 transition into Fear');
+  assert.equal(transition.trigger.name, '[oploc1,soul_bane_awall_void_exit]',
+    'Rage-to-Fear transition uses the original eastern boundary loc');
+  assertRoomMusicObservation(p, fearMusicObservation, 'first Fear room entry');
+  assert.equal(stage(p), FEAR_STAGE, 'the real next-room exit enters active Fear stage 4');
+  assert.equal(instanceUid(p), rageUid, 'Rage-to-Fear transition stays inside the owner\'s private copy');
+  assertPrivateInstanceIsolation(p, 'stage-4 Fear entry');
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), 'the eastern boundary lands at the packed Fear entry');
+  assertNoAngerItems(p, 'stage-3 Fear transition strips the Rage weapon');
+  assert.equal(rageNpcsFor(p).length, 0, 'Fear entry removes every Rage actor');
+  assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'Fear entry clears the completed Rage meter');
+  assert.equal(readVar(p, 'soulbane_anger_donespecial'), 0, 'Fear entry clears the completed Rage scene flag');
+  fearDoor(p);
+  for (const [name, value] of [
+    ['soulbane_fear_enemydoor_old', 0], ['soulbane_fear_monspres', 0],
+    ['soulbane_fear_killedtally', 0], ['soulbane_fear_exitlit', 0]
+  ]) assert.equal(readVar(p, name), value, `first Fear entry initializes ${name}`);
+  assert.deepEqual(xpSnapshot(p), xpBeforeFear, 'entering Fear awards no quest or combat XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeFear, 'entering Fear awards no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeFear, 'entering Fear awards no coins');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'active Fear remains an incomplete quest row');
+  assertJournal(p, ['second room', 'your son\'s voice again', 'Help him get over his fear!'],
+    ['exit has been illuminated', 'Soulbane is complete'], 'stage-4 Fear journal');
+
+  const routes = checkFearRoomRoutes(p);
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z }, routes.entry, 'route auditing leaves the owner at the real Fear entry');
+  seedFearCombatFixture(p, 'Fear ordinary-combat fixture');
+
+  goToStand(p, routes.westExit, 'stage-4 closed west exit: walk to the western black hole');
+  const closedMark = p.messages.length;
+  const closed = operateLoc(p, routes.westExit, 1, [], 'stage-4 closed western black-hole refusal');
+  assert.equal(closed.trigger.name, '[oploc1,soul_bane_fwall_exit_closed]',
+    'unlit west exit dispatches its original closed visible form');
+  assert(p.messages.slice(closedMark).join(' ').includes("There's no way I'm going in there!"),
+    'stage-4 closed west exit refuses entry without changing progress');
+  assert.equal(stage(p), FEAR_STAGE, 'closed exit does not fabricate Fear completion');
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 0, 'closed exit earns no Fear kills');
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 0, 'closed exit remains unlit before the fifth-death scene');
+
+  const firstReaper = searchEveryFearHole(p, 'Fear six-hole dispatch');
+  const intruder = playerFixture();
+  testForeignFearInteractions(p, intruder, firstReaper);
+  castFearSpellOnce(p, firstReaper, 'eligible-owner Wind Strike against Fear');
+  killFearReaper(p, firstReaper, 0, 'Fear partial kill before surface exit');
+  const firstPartialXp = xpSnapshot(p);
+  const firstOldUid = instanceUid(p);
+  const firstOrdinaryInventory = normalInventory(p);
+  leaveFearToSurface(p, 'Fear incomplete surface exit');
+  assertFearExitCleanup(p, firstOldUid, surfaceTile(), firstOrdinaryInventory,
+    'Fear incomplete surface exit');
+  assert.deepEqual(xpSnapshot(p), firstPartialXp, 'surface cleanup does not award extra XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeFear, 'unfinished Fear exit grants no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeFear, 'unfinished Fear exit grants no coins');
+
+  enterFearAfterRift(p, 'Fear re-entry after confirmed surface exit');
+  let liveReaper = ensureFearReaper(p, 'Fear safe-teleport cleanup setup');
+  const teleportUid = instanceUid(p);
+  const teleportInventory = normalInventory(p);
+  const teleportXp = xpSnapshot(p);
+  const teleportTile = { level: 0, x: 3213, z: 3424 };
+  safeTeleport(p, teleportTile, 'Fear owner safe-teleports out with a live Reaper');
+  assertFearExitCleanup(p, teleportUid, [teleportTile.level, teleportTile.x, teleportTile.z],
+    teleportInventory, 'Fear outside-teleport cleanup');
+  assert.deepEqual(xpSnapshot(p), teleportXp, 'outside-teleport cleanup awards no XP');
+  safeTeleport(p, { level: surfaceTile()[0], x: surfaceTile()[1], z: surfaceTile()[2] },
+    'Fear lifecycle returns to the disclosed surface travel fixture');
+  enterFearAfterRift(p, 'Fear re-entry after outside teleport');
+
+  liveReaper = ensureFearReaper(p, 'Fear logout cleanup partial-kill setup');
+  killFearReaper(p, liveReaper, 0, 'Fear partial kill before logout');
+  liveReaper = ensureFearReaper(p, 'Fear logout cleanup live-actor setup');
+  const logoutUid = instanceUid(p);
+  const logoutInventory = normalInventory(p);
+  const logoutXp = xpSnapshot(p);
+  p = nativeLogoutAndReload(p, 'unfinished Fear logout with a live Reaper');
+  assertFearExitCleanup(p, logoutUid, surfaceTile(), logoutInventory,
+    'unfinished Fear logout cleanup');
+  assert.deepEqual(xpSnapshot(p), logoutXp, 'unfinished Fear logout/relogin preserves earned ordinary XP only');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'unfinished Fear login keeps the active quest-row color');
+  assertJournal(p, ['second room', 'your son\'s voice again', 'Help him get over his fear!'],
+    ['exit has been illuminated', 'Soulbane is complete'], 'post-login stage-4 Fear journal');
+  enterFearAfterRift(p, 'Fear re-entry after incomplete logout');
+
+  liveReaper = ensureFearReaper(p, 'Fear death cleanup partial-kill setup');
+  killFearReaper(p, liveReaper, 0, 'Fear partial kill before death');
+  liveReaper = ensureFearReaper(p, 'Fear death cleanup live-actor setup');
+  const deathUid = instanceUid(p);
+  const deathXp = xpSnapshot(p);
+  const deathQp = readVar(p, 'qp');
+  const deathTile = tile(p);
+  p.levels[PlayerStat.HITPOINTS] = 0;
+  assert(ScriptProvider.getByName('[proc,player_die]'), 'ordinary player_die procedure is packed for Fear cleanup');
+  runProc('player_die', p);
+  for (let tick = 0; tick < 80 && (p.activeScript || p.queue.head() !== null); tick++) worldTick();
+  for (let tick = 0; tick < 3; tick++) worldTick();
+  assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED,
+    'ordinary Fear death/respawn animation and cleanup settle');
+  assert.equal(stage(p), FEAR_STAGE, 'death preserves the unfinished Fear stage');
+  assert.equal(instanceUid(p), 0, 'death cleanup releases the Fear instance');
+  assert(!CoordGrid.isInstanceX(p.x), 'death respawns outside the Fear copy');
+  assert.equal(World.instances.findInstanceByUid(deathUid - 1), null, 'death deletes the old Fear copy');
+  assert.equal(fearNpcsWithInstance(deathUid).length, 0, 'death removes every old Fear Reaper');
+  assertFearReset(p, 'Fear death cleanup');
+  assertNoAngerItems(p, 'Fear death cleanup');
+  assert.deepEqual(xpSnapshot(p), deathXp, 'ordinary death grants neither Fear nor quest XP');
+  assert.equal(readVar(p, 'qp'), deathQp, 'death grants no Fear quest points');
+  assert.notDeepEqual(tile(p), deathTile, 'ordinary death moves the player out of the Fear death tile');
+
+  const surface = surfaceTile();
+  safeTeleport(p, { level: surface[0], x: surface[1], z: surface[2] },
+    'Fear death lifecycle returns to the disclosed surface travel fixture');
+  enterFearAfterRift(p, 'Fear re-entry after ordinary death');
+  ensureFearCombatWeapon(p, 'Fear post-death combat fixture');
+
+  for (let ordinal = 0; ordinal < 5; ordinal++) {
+    const reaper = ensureFearReaper(p, `Fear five-kill run reaper ${ordinal + 1}`);
+    killFearReaper(p, reaper, ordinal, `Fear five-kill run death ${ordinal + 1}`);
+  }
+  const xpBeforeScene = xpSnapshot(p);
+  const qpBeforeScene = readVar(p, 'qp');
+  const coinsBeforeScene = count(p, 'coins');
+  const scene = finishFearScene(p);
+  assert(scene.pages.includes('Phew, I don\'t feel so scared now.'),
+    'the fifth real death reaches the Fear scene before its completion boundary');
+  assert(scene.messages.includes("What's that?"), 'the Fear scene returns through its authored final game message');
+  assert.deepEqual(xpSnapshot(p), xpBeforeScene, 'the Fear scene awards no terminal quest XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeScene, 'the Fear scene grants no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeScene, 'the Fear scene grants no coins');
+  assert.equal(qpBeforeScene, qpBeforeFear, 'all of Fear grants no quest points');
+  assert.equal(coinsBeforeScene, coinsBeforeFear, 'all of Fear grants no coins');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'stage 5 remains an active quest, not full completion');
+  assertJournal(p, ['overcome fear in the second room', 'exit has been illuminated',
+    'haven\'t actually ventured through yet.'], ['Tolna has been rescued', 'Soulbane is complete'],
+  'stage-5 Fear journal');
+
+  const westExit = fearWestExitLoc(p);
+  goToStand(p, westExit, 'stage-5 open west exit: walk to the western black hole');
+  const openMark = p.messages.length;
+  const open = operateLoc(p, westExit, 1, [], 'stage-5 Confusion boundary refusal');
+  assert.equal(open.trigger.name, '[oploc1,soul_bane_fwall_exit]',
+    'lit west exit dispatches its original open visible form');
+  assert(p.messages.slice(openMark).join(' ').includes('That way is not available yet.'),
+    'the not-yet-implemented Confusion room remains a functional refusal');
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, 'the Confusion boundary does not advance beyond Fear');
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, 'Confusion refusal preserves all five Fear kills');
+
+  const completeUid = instanceUid(p);
+  const completeInventory = normalInventory(p);
+  const completeXp = xpSnapshot(p);
+  const completedSurface = fearSurfaceExitLoc(p);
+  const leave = operateSurfaceExit(p, completedSurface, [], 'stage-5 completed surface exit');
+  assert.equal(leave.trigger.name, '[oploc1,soul_bane_fwall_void_small]',
+    'completed Fear leaves through the original surface Exit loc');
+  assertFearCompleteExit(p, completeUid, surfaceTile(), completeInventory, 'completed Fear surface exit');
+  assert.deepEqual(xpSnapshot(p), completeXp, 'completed surface exit awards no terminal XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeFear, 'completed Fear still grants no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeFear, 'completed Fear still grants no coins');
+
+  const completeXpBeforeReentry = xpSnapshot(p);
+  chooseRiftWithRope(p, 'completed Fear surface-descent re-entry', { requireUnlocked: true });
+  assertFearCompleteEntry(p, 'completed Fear surface-descent re-entry');
+  for (let tick = 0; tick < 32; tick++) worldTick();
+  assert.equal(p.queue.head(), null, 'completed Fear re-entry queues no duplicate scene');
+  assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED,
+    'completed Fear re-entry starts no duplicate scene script');
+  assert.deepEqual(xpSnapshot(p), completeXpBeforeReentry, 'completed Fear re-entry awards no duplicate XP');
+  assert.equal(readVar(p, 'qp'), qpBeforeFear, 'completed Fear re-entry grants no quest points');
+  assert.equal(count(p, 'coins'), coinsBeforeFear, 'completed Fear re-entry grants no coins');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'completed Fear re-entry keeps the active quest-row color');
+
+  const completeLogoutUid = instanceUid(p);
+  const completeLogoutInventory = normalInventory(p);
+  const completeLogoutXp = xpSnapshot(p);
+  p = nativeLogoutAndReload(p, 'completed Fear logout inside its copy');
+  assert.equal(stage(p), FEAR_COMPLETE_STAGE, 'completed Fear logout preserves stage 5');
+  assert.equal(instanceUid(p), 0, 'completed Fear login clears its temporary instance UID');
+  assert.deepEqual(tile(p), surfaceTile(), 'completed Fear logout lands at the saved surface exit');
+  assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, 'completed Fear logout preserves its five kills');
+  assert.equal(readVar(p, 'soulbane_fear_exitlit'), 1, 'completed Fear logout preserves the illuminated exit');
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor'), 0, 'completed Fear login clears the active-hole state');
+  assert.equal(readVar(p, 'soulbane_fear_enemydoor_old'), 0, 'completed Fear login clears the old-hole state');
+  assert.equal(readVar(p, 'soulbane_fear_monspres'), 0, 'completed Fear login clears the encounter marker');
+  assertNoAngerItems(p, 'completed Fear logout/relogin');
+  assert.equal(fearNpcsWithInstance(completeLogoutUid).length, 0, 'completed logout removes all old Reapers');
+  assert.deepEqual(normalInventory(p), completeLogoutInventory, 'completed logout preserves ordinary bag inventory');
+  assert.deepEqual(xpSnapshot(p), completeLogoutXp, 'completed logout preserves exactly the earned ordinary XP');
+  assert.equal(latestQuestColor(p), stageThreeColor, 'completed Fear login keeps the active quest-row color');
+  assertJournal(p, ['overcome fear in the second room', 'exit has been illuminated',
+    'haven\'t actually ventured through yet.'], ['Tolna has been rescued', 'Soulbane is complete'],
+  'post-login stage-5 Fear journal');
+  chooseRiftWithRope(p, 'completed Fear re-entry after logout', { requireUnlocked: true });
+  assertFearCompleteEntry(p, 'completed Fear re-entry after logout');
+  for (let tick = 0; tick < 32; tick++) worldTick();
+  assert.equal(p.queue.head(), null, 'completed post-logout re-entry does not replay the Fear scene');
+  assert.deepEqual(xpSnapshot(p), completeLogoutXp, 'completed post-logout re-entry does not award repeat XP');
+  console.log(`Fear saved boundary ${JSON.stringify({
+    stage: stage(p), kills: readVar(p, 'soulbane_fear_killedtally'),
+    exitLit: readVar(p, 'soulbane_fear_exitlit'), liveReapers: fearNpcsFor(p).length,
+    sceneActors: fearSceneTolnas().length, questColor: latestQuestColor(p)
+  })}`);
+  return { player: p, completed: p, stageThreeColor };
 }
 
 function testPrivateCopyAccess() {
@@ -1249,9 +2834,10 @@ function testMainPath() {
   finishInteraction(p, [], 'attach the purchased rope at the real rift');
   assert.equal(count(p, 'rope'), 0, 'compiled rope attachment consumes the purchased rope');
   assert.equal(readVar(p, 'soulbane_riftrope_pres'), 1, 'compiled rope attachment writes the permanent rift state');
-  chooseRiftWithRope(p, 'main compiled descent');
+  chooseRiftWithRope(p, 'main compiled descent', { requireLocked: true });
   assert.equal(stage(p), 2, 'native descent advances accepted quest to Rage stage 2');
   assert.notEqual(instanceUid(p), 0, 'native descent stores a temporary region UID');
+  assertPrivateInstanceIsolation(p, 'stage-2 Rage entry', true);
   const entry = roomCoord(p, 'soulbane_rage_entry');
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, entry, 'descent lands on the exact packed Rage entry tile');
   assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'new Rage room starts with zero temporary meter');
@@ -1337,27 +2923,17 @@ function testMainPath() {
   assertJournal(p, ['managed to defeat the monsters in the room', "Sorry, I've yet to enter the next room"],
     ['Tolna has been rescued', 'Soulbane is complete'], 'stage-3 journal');
 
-  const fear = fearExitLoc(p);
-  goToStand(p, fear, 'stage-3 closed boundary: walk to packed Fear exit');
-  const fearMessageMark = p.messages.length;
-  const fearResult = operateLoc(p, fear, 1, [], 'stage-3 next-room boundary Use');
-  assert.match(fearResult.trigger.name, /^\[oploc1,soul_bane_awall_void_exit\]$/);
-  assert(p.messages.slice(fearMessageMark).join(' ').includes('not available yet'),
-    'next-room way truthfully refuses to open the unimplemented Fear room');
-  assert.equal(stage(p), 3, 'next-room refusal preserves the permanent stage-3 boundary');
-  assert.equal(instanceUid(p) !== 0, true, 'refusing the next room does not strand or evict the completed player');
 
   const completedActorsBeforeLeave = rageNpcsFor(p).length;
   assert(completedActorsBeforeLeave === 0, 'completed room removes its Rage attackers');
   const quit = quitLoc(p);
-  goToStand(p, quit, 'stage-3 leave: walk to the actual room-exit loc');
-  const leave = operateLoc(p, quit, 1, [], 'stage-3 direct exit without a restart prompt');
+  const leave = operateSurfaceExit(p, quit, [], 'stage-3 direct exit without a restart prompt');
   assert.match(leave.trigger.name, /^\[oploc1,soul_bane_awall_void_small\]$/);
   assert.equal(stage(p), 3, 'stage-3 leave preserves completed progress');
   assert.equal(instanceUid(p), 0, 'stage-3 leave closes the private region');
   assert(!CoordGrid.isInstanceX(p.x), 'stage-3 leave returns to the overworld');
 
-  chooseRiftWithRope(p, 'stage-3 completed-room re-entry');
+  chooseRiftWithRope(p, 'stage-3 completed-room re-entry', { requireUnlocked: true });
   assert.equal(stage(p), 3, 'completed stage remains complete after re-entry');
   assert.equal(rageNpcsFor(p).length, 0, 'stage-3 re-entry does not respawn empty Rage attackers');
   assert.equal(readVar(p, 'soulbane_anger_damagedealt'), 0, 'stage-3 re-entry does not restore an unfinished Rage meter');
@@ -1374,11 +2950,16 @@ function testMainPath() {
   assertJournal(completed, ['managed to defeat the monsters in the room', "Sorry, I've yet to enter the next room"],
     ['Tolna has been rescued', 'Soulbane is complete'], 'post-login stage-3 journal');
   assert.equal(rageNpcsWithInstance(completedUid).length, 0, 'completed logout removes all actors from its old copy');
-  return { player: p, completed, stageTwoColor, stageThreeColor, reward };
+  const fearRun = testFearProgression(completed, stageThreeColor);
+  return { player: fearRun.player, completed: fearRun.completed, stageTwoColor, stageThreeColor, reward };
 }
 
 function run() {
   checkVarpMetadata();
+  if (process.argv.includes('--memory-hold-only')) {
+    testMemoryInputHold();
+    return;
+  }
   const r1Cases = new Map([
     ['teleport-out', testSafeTeleportOutAndDestinationLogout],
     ['teleport-in', testSafeTeleportInsideCopy],
@@ -1395,11 +2976,13 @@ function run() {
     const name = selector.slice('--r1-case='.length);
     const selected = r1Cases.get(name);
     assert(selected, `unknown --r1-case=${name}; choose ${[...r1Cases.keys()].join(', ')}`);
+    if (name === 'copy-access') testMemoryInputHold();
     selected();
     console.log(`PASS Soulbane isolated R1 case: ${name}`);
     return;
   }
 
+  testMemoryInputHold();
   const main = testMainPath();
   const stageTwo = testStageTwoLeaveAndLogout(main.player);
   assert.equal(latestQuestColor(stageTwo.reloaded), main.stageTwoColor, 'mid-Rage login reconstruction preserves the active-stage quest color');
@@ -1414,7 +2997,8 @@ function run() {
   testTradeEscapeRoute();
   testDropEscapeRoute();
   testRoomExitRemovesAngerWeapon();
-  console.log('PASS Soulbane compiled first-unit regression: entry, Rage combat, ownership, lifecycle, safe teleports and escape routes');
+  testManualRoomMusicEntries();
+  console.log('PASS Soulbane compiled regression: Rage and Fear progression, native combat, ownership, saved boundaries, lifecycle and escape routes');
   console.log(JSON.stringify({ stageTwoColor: main.stageTwoColor, stageThreeColor: main.stageThreeColor, attackXp: main.reward }));
 }
 

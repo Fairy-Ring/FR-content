@@ -10,10 +10,10 @@ if (%soulbane_riftrope_pres ! 1 | %soulbane_prog < 1) {
 p_arrivedelay;
 ~soulbane_enter;
 
-// UNKNOWN functional boundary: the next room is not part of this unit.
+// VERIFIED period order: completed Rage leads into the room of Fear.
 [oploc1,soul_bane_awall_void_exit]
-if (~soulbane_owned = false) return;
-mes("That way is not available yet.");
+if (~soulbane_owned = false | %soulbane_prog ! 3) return;
+~soulbane_fear_enter;
 
 [oploc1,soulbane_rack_multi] @soulbane_rage_rack;
 [oploc1,soulbane_rack_all] @soulbane_rage_rack;

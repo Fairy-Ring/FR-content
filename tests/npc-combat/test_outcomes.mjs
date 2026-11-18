@@ -222,6 +222,10 @@ try {
           assert.equal(rt.World.instances.findInstanceByUid(instance.uid), null, 'route region is torn down');
           assert.equal(rt.World.instances.instances.length, before, 'route leaks no region');
         };
+        if (route.privateRegion.spawn) {
+          const spawned = rt.run(route.privateRegion.spawn, f);
+          assert.equal(spawned.state.execution, rt.State.FINISHED, `${route.privateRegion.spawn} creates the native encounter`);
+        }
         f.npc = [...rt.World.npcs].find(npc => npc.type === f.npc.type && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
         assert(f.npc, `${enter} spawns the route's native NPC`);
         const tile = (f.npc.level << 28) | ((f.npc.x - 1) << 14) | f.npc.z;

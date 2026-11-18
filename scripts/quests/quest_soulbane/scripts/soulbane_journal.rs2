@@ -11,5 +11,9 @@ switch_int (%soulbane_prog) {
         $text = "@dbl@It's a very aggressive room. I think I need to defeat the monsters in there.";
     case 3 :
         $text = "@str@I managed to defeat the monsters in the room!||@dbl@Sorry, I've yet to enter the next room.";
+    case 4 :
+        $text = "@str@I managed to defeat the monsters in the room!||@dbl@I've made my way into a second room. I heard your son's voice again as well.||@dbl@You must save him! Help him get over his fear!";
+    case 5 :
+        $text = "@str@I managed to defeat the monsters in the room!||@str@I've overcome fear in the second room and an exit has been illuminated.||@dbl@Erm, I haven't actually ventured through yet.";
 }
 ~quest_journal("A Soul's Bane", $text);

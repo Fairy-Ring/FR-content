@@ -152,3 +152,30 @@ param=attack_anim,goblin_attack_unarmed
 param=defend_anim,goblin_block
 param=death_anim,goblin_death
 param=death_drop,null
+
+// Original client fields unchanged. VERIFIED period HP; CANDIDATE server stats,
+// slash style and four-tick attacks. UNKNOWN roaming and sequence bindings.
+[soulbane_fear_reaper]
+name=Fear reaper
+desc=AHHHHH!
+model1=npc_3649
+size=2
+walkanim=fear_walk
+readyanim=fear_ready
+op2=Attack
+ambient=60
+contrast=60
+vislevel=42
+hitpoints=25
+attack=39
+strength=41
+defence=40
+wanderrange=0
+maxrange=40
+param=attackrate,4
+param=damagetype,^slash_style
+param=attack_anim,fear_attack
+param=defend_anim,fear_parry
+param=death_anim,fear_death
+param=death_drop,null
+

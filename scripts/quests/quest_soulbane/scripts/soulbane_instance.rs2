@@ -3,22 +3,39 @@
 // UNKNOWN: exact geometry-copy layout, owner encoding and session UID.
 // Original 377 client maps/locs are copied; the engine copies no template NPCs.
 [proc,soulbane_enter]
-if (%soulbane_prog < 1 | %soulbane_prog > 3) return;
+if (%soulbane_prog < 1 | %soulbane_prog > 5) return;
 ~soulbane_cleanup;
-def_coord $sw = region_create(1, 16, 8);
+def_coord $sw = region_create(1, ^soulbane_region_zones, ^soulbane_region_zones);
+// Keep the east-square reserve unmapped: compiled Fear movement reaches its copy.
+// Missing eastern neighbour scenery remains a limit of this room boundary.
 def_int $x = 0;
 while ($x < 8) {
     def_int $z = 0;
     while ($z < 8) {
         region_set(0, $x, $z, movecoord(0_47_81_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
-        region_set(0, add($x, 8), $z, movecoord(0_51_53_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
         $z = add($z, 1);
     }
     $x = add($x, 1);
 }
+// Native input proofs hold both memories at their script-placed standing tiles.
+def_int $scene_x = 0;
+while ($scene_x < ^soulbane_memory_zones_east) {
+    def_int $scene_z = 0;
+    while ($scene_z < ^soulbane_memory_zones_north) {
+        region_set(0, $scene_x, add($scene_z, ^soulbane_memory_zone_north), movecoord(^soulbane_scene_source, multiply($scene_x, 8), 0, multiply($scene_z, 8)), 0);
+        region_set(0, add($scene_x, ^soulbane_memory_zone_east), add($scene_z, ^soulbane_memory_zone_north), movecoord(^soulbane_fear_scene_source, multiply($scene_x, 8), 0, multiply($scene_z, 8)), 0);
+        $scene_z = add($scene_z, 1);
+    }
+    $scene_x = add($scene_x, 1);
+}
 region_setexitcoord(^soulbane_surface);
 %soulbane_instance = add(region_uid, 1);
+if (%soulbane_prog >= 4) {
+    ~soulbane_fear_enter;
+    return;
+}
 p_teleport(~soulbane_room_coord(^soulbane_rage_entry));
+~music_playbyrow(music_Wrath_and_Ruin);
 if (%soulbane_prog = 1) {
     %soulbane_prog = 2;
     ~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
@@ -32,10 +49,13 @@ if (%soulbane_prog = 2) {
     mes("Arrghh, It's not fair! Feel my ANGER!");
 }
 
-// The two original map squares have distinct offsets in the private copy.
+// Only the selected original memory patches are copied, at isolated offsets.
 [proc,soulbane_room_coord](coord $template)(coord)
-if (coordx($template) >= 3264) {
-    return(region_getcoord(0, add(64, sub(coordx($template), 3264)), sub(coordz($template), 3392)));
+if (coordx($template) >= coordx(^soulbane_scene_source)) {
+    if (coordz($template) >= coordz(^soulbane_fear_scene_source)) {
+        return(region_getcoord(0, add(^soulbane_memory_tile_east, sub(coordx($template), coordx(^soulbane_fear_scene_source))), add(^soulbane_memory_tile_north, sub(coordz($template), coordz(^soulbane_fear_scene_source)))));
+    }
+    return(region_getcoord(0, sub(coordx($template), coordx(^soulbane_scene_source)), add(^soulbane_memory_tile_north, sub(coordz($template), coordz(^soulbane_scene_source)))));
 }
 return(region_getcoord(0, sub(coordx($template), 3008), sub(coordz($template), 5184)));
 
@@ -49,9 +69,11 @@ return(false);
 if (%npc_attacking_uid ! uid | %npc_int ! %soulbane_instance) return(false);
 return(~soulbane_owned);
 
-[oploc1,soul_bane_awall_void_small]
+[oploc1,soul_bane_awall_void_small] @soulbane_exit;
+[oploc1,soul_bane_fwall_void_small] @soulbane_exit;
+[label,soulbane_exit]
 if (~soulbane_owned = false) return;
-if (%soulbane_prog = 2) {
+if (%soulbane_prog = 2 | %soulbane_prog = 4) {
     if (~p_choice2_header("Yes, I don't mind starting this room again.", 1, "No, I'll finish this room first.", 2, "Do you wish to leave?") ! 1) return;
 }
 ~soulbane_leave;
@@ -74,11 +96,14 @@ if (region_findbycoord($destination) = true) {
 [proc,soulbane_cleanup]
 clearqueue(soulbane_rage_complete);
 clearqueue(soulbane_rage_credit);
+clearqueue(soulbane_fear_credit);
+clearqueue(soulbane_fear_complete);
 walktrigger(null);
 ~soulbane_clear_weapons;
 %soulbane_anger_damagedealt = 0;
 %soulbane_anger_donespecial = 0;
 %soulbane_anger_weaponmulti = 0;
+~soulbane_fear_reset;
 %soulbane_instance = 0;
 if_openoverlay(null);
 cam_reset;
@@ -88,6 +113,7 @@ cam_reset;
 [proc,soulbane_login]
 ~soulbane_clear_weapons;
 %soulbane_anger_weaponmulti = 0;
+~soulbane_fear_reset;
 
 [proc,soulbane_clear_weapons]
 def_obj $old = inv_getobj(worn, ^wearpos_rhand);

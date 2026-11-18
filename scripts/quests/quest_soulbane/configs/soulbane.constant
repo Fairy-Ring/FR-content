@@ -3,9 +3,23 @@
 ^soulbane_rage_target = 1500
 // Maximum duration admitted by this engine; region teardown owns entity cleanup.
 ^soulbane_npc_lifetime = 2147483647
+// UNKNOWN engineering layout: separated memory patches, not period server tiles.
+// Zone and tile offsets correspond; registered native scene tests check both.
+^soulbane_region_zones = 16
+^soulbane_region_midpoint = 64
+^soulbane_memory_zones_east = 4
+^soulbane_memory_zones_north = 2
+^soulbane_memory_zone_east = 12
+^soulbane_memory_tile_east = 96
+^soulbane_memory_zone_north = 14
+^soulbane_memory_tile_north = 112
+^soulbane_scene_source = 0_51_53_0_32
+^soulbane_fear_scene_source = 0_51_53_32_56
 ^soulbane_surface = 0_51_53_46_63
 // CANDIDATE existing descent endpoint, subject to registered packed path tests.
 ^soulbane_rage_entry = 0_47_81_5_59
+// UNKNOWN observation stand, selected from the packed reachable eastern edge.
+^soulbane_rage_east_edge = 0_47_81_30_51
 ^soulbane_rage_bear1 = 0_47_81_11_54
 ^soulbane_rage_bear2 = 0_47_81_10_49
 ^soulbane_rage_unicorn1 = 0_47_81_16_56
@@ -16,8 +30,24 @@
 ^soulbane_rage_goblin2 = 0_47_81_28_49
 // UNKNOWN reconstruction stands for the sourced Varrock family scene.
 ^soulbane_scene_player = 0_51_53_7_40
+// UNKNOWN camera eye: it must stand on ground inside the copied memory strip.
+^soulbane_scene_camera = 0_51_53_6_38
 ^soulbane_scene_launa = 0_51_53_7_42
 ^soulbane_scene_tolna = 0_51_53_8_42
 // CANDIDATE Old School behaviour, first documented in wiki r3247935 (2017-01-20).
 // No dated game update introducing this was found; period guides are silent.
 ^soulbane_rage_attack_xp = 40
+// UNKNOWN Fear staging/spawn/presentation values; original server tiles are lost.
+^soulbane_fear_entry = 0_47_81_50_48
+// UNKNOWN observation stand, selected from the packed reachable eastern edge.
+^soulbane_fear_east_edge = 0_47_81_61_47
+^soulbane_fear_reaper1 = 0_47_81_57_58
+^soulbane_fear_reaper2 = 0_47_81_57_43
+^soulbane_fear_reaper3 = 0_47_81_54_38
+^soulbane_fear_reaper4 = 0_47_81_44_38
+^soulbane_fear_reaper5 = 0_47_81_41_45
+^soulbane_fear_reaper6 = 0_47_81_41_55
+^soulbane_fear_scene_player = 0_51_53_45_63
+^soulbane_fear_scene_tolna = 0_51_53_46_63
+// fear_cut has 60 presentation cycles before its 20001-cycle final hold.
+^soulbane_fear_scare_ticks = 2

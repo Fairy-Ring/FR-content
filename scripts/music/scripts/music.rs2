@@ -102,6 +102,9 @@ if ($region = null) {
 }
 
 def_dbrow $song = db_getfield($region, musicregion:musicdata, 0);
+~music_playbyrow($song);
+
+[proc,music_playbyrow](dbrow $song)
 def_int $unlock;
 def_int $bit;
 $unlock, $bit = db_getfield($song, music:unlock, 0);

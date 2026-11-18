@@ -1371,6 +1371,22 @@
         "miss": 2415085441,
         "zero": 1992887715
       }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_fear_reaper]",
+      "npc": "soulbane_fear_reaper",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 1013904242,
+        "zero": 1309757500
+      },
+      "playerVars": { "soulbane_prog": 4 },
+      "privateRegion": {
+        "maps": ["47_81", "51_53"],
+        "enter": "[proc,soulbane_enter]",
+        "spawn": "[proc,soulbane_fear_spawn]",
+        "leave": "[proc,soulbane_leave]"
+      }
     }
   ]
 }
