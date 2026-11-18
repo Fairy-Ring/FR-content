@@ -942,7 +942,8 @@ data=unlock,75,Rune arrows.
 table=skill_guides
 data=name,Fletching - Darts
 data=inv,skill_guide_fletching_darts
-data=unlock,10,Bronze darts.
+// VERIFIED: Tip.It 2006-05-01 and RuneHQ 2005-12-02 dart tables.
+data=unlock,1,Bronze darts.
 data=unlock,22,Iron darts.
 data=unlock,37,Steel darts.
 data=unlock,52,Mithril darts.
@@ -954,6 +955,7 @@ data=unlock,81,Rune darts.
 table=skill_guides
 data=name,Fletching - Bolts
 data=inv,skill_guide_fletching_bolts
-data=unlock,11,Opal-tipped bolts.
-data=unlock,41,Pearl-tipped bolts.
+// VERIFIED: Tip.It 2006-05-01 and RuneHQ 2005-12-02 bolt tables.
+data=unlock,17,Opal-tipped bolts.
+data=unlock,33,Pearl-tipped bolts.
 data=unlock,51,Barbed-tipped bolts.

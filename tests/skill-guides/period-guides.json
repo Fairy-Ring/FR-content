@@ -1,0 +1,195 @@
+{
+  "farming": {
+    "sources": ["src.farmgrowth-r1-tipit-20060428#crop tables and Scarecrows", "src.skill-guides-original-inventory-map#287-300", "src.skill-guides-original-object-map"],
+    "labels": "VERIFIED period crop requirements and original objects; UNKNOWN page grouping, row formatting and icon associations",
+    "categories": [
+      {
+        "op":"Allotments", "guide":"skill_guide_farming_allotments", "inventory":"skill_guide_farming_veg", "title":"Farming - Allotments",
+        "rows": [
+          {"level":1,"text":"Potatoes","obj":"potato_seed"},
+          {"level":5,"text":"Onions","obj":"onion_seed"},
+          {"level":7,"text":"Cabbage","obj":"cabbage_seed"},
+          {"level":12,"text":"Tomatoes","obj":"tomato_seed"},
+          {"level":20,"text":"Sweetcorn","obj":"sweetcorn_seed"},
+          {"level":31,"text":"Strawberries","obj":"strawberry_seed"},
+          {"level":47,"text":"Watermelon","obj":"watermelon_seed"}
+        ]
+      },
+      {
+        "op":"Flowers", "guide":"skill_guide_farming_flowers", "inventory":"skill_guide_farming_flowers", "title":"Farming - Flowers",
+        "rows": [
+          {"level":2,"text":"Marigold","obj":"marigold_seed"},
+          {"level":11,"text":"Rosemary","obj":"rosemary_seed"},
+          {"level":24,"text":"Nasturtium","obj":"nasturtium_seed"},
+          {"level":25,"text":"Woad","obj":"woad_seed"},
+          {"level":26,"text":"Limpwurt","obj":"limpwurt_seed"}
+        ]
+      },
+      {
+        "op":"Hops", "guide":"skill_guide_farming_hops", "inventory":"skill_guide_farming_hops", "title":"Farming - Hops",
+        "rows": [
+          {"level":3,"text":"Barley","obj":"barley_seed"},
+          {"level":4,"text":"Hammerstone","obj":"hammerstone_hop_seed"},
+          {"level":8,"text":"Asgarnian","obj":"asgarnian_hop_seed"},
+          {"level":13,"text":"Jute","obj":"jute_seed"},
+          {"level":16,"text":"Yanillian","obj":"yanillian_hop_seed"},
+          {"level":21,"text":"Krandorian","obj":"krandorian_hop_seed"},
+          {"level":28,"text":"Wildblood","obj":"wildblood_hop_seed"}
+        ]
+      },
+      {
+        "op":"Herbs", "guide":"skill_guide_farming_herbs", "inventory":"skill_guide_farming_herbs", "title":"Farming - Herbs",
+        "rows": [
+          {"level":9,"text":"Guam","obj":"guam_seed"},
+          {"level":14,"text":"Marrentill","obj":"marrentill_seed"},
+          {"level":19,"text":"Tarromin","obj":"tarromin_seed"},
+          {"level":26,"text":"Harralander","obj":"harralander_seed"},
+          {"level":29,"text":"Goutweed","obj":"village_rare_tuber"},
+          {"level":32,"text":"Ranarr Weed","obj":"ranarr_seed"},
+          {"level":38,"text":"Toadflax","obj":"toadflax_seed"},
+          {"level":44,"text":"Irit Leaf","obj":"irit_seed"},
+          {"level":50,"text":"Avantoe","obj":"avantoe_seed"},
+          {"level":56,"text":"Kwuarm","obj":"kwuarm_seed"},
+          {"level":62,"text":"Snapdragon","obj":"snapdragon_seed"},
+          {"level":67,"text":"Cadantine","obj":"cadantine_seed"},
+          {"level":73,"text":"Lantadyme","obj":"lantadyme_seed"},
+          {"level":79,"text":"Dwarf Weed","obj":"dwarf_weed_seed"},
+          {"level":85,"text":"Torstol","obj":"torstol_seed"}
+        ]
+      },
+      {
+        "op":"Bushes", "guide":"skill_guide_farming_bushes", "inventory":"skill_guide_farming_bushes", "title":"Farming - Bushes",
+        "rows": [
+          {"level":10,"text":"Redberries","obj":"redberry_bush_seed"},
+          {"level":22,"text":"Cadavaberries","obj":"cadavaberry_bush_seed"},
+          {"level":36,"text":"Dwellberries","obj":"dwellberry_bush_seed"},
+          {"level":48,"text":"Jangerberries","obj":"jangerberry_bush_seed"},
+          {"level":59,"text":"Whiteberries","obj":"whiteberry_bush_seed"},
+          {"level":70,"text":"Poison Ivy","obj":"poisonivy_bush_seed"}
+        ]
+      },
+      {
+        "op":"Trees", "guide":"skill_guide_farming_trees", "inventory":"skill_guide_farming_trees", "title":"Farming - Trees",
+        "rows": [
+          {"level":15,"text":"Oak trees","obj":"acorn"},
+          {"level":30,"text":"Willow trees","obj":"willow_seed"},
+          {"level":45,"text":"Maple trees","obj":"maple_seed"},
+          {"level":60,"text":"Yew trees","obj":"yew_seed"},
+          {"level":75,"text":"Magic trees","obj":"magic_tree_seed"}
+        ]
+      },
+      {
+        "op":"Fruit Trees", "guide":"skill_guide_farming_fruit_trees", "inventory":"skill_guide_farming_fruit_trees", "title":"Farming - Fruit Trees",
+        "rows": [
+          {"level":27,"text":"Apple trees","obj":"apple_tree_seed"},
+          {"level":33,"text":"Banana trees","obj":"banana_tree_seed"},
+          {"level":39,"text":"Orange trees","obj":"orange_tree_seed"},
+          {"level":42,"text":"Curry trees","obj":"curry_tree_seed"},
+          {"level":51,"text":"Pineapple trees","obj":"pineapple_tree_seed"},
+          {"level":57,"text":"Papaya trees","obj":"papaya_tree_seed"},
+          {"level":68,"text":"Palm trees","obj":"palm_tree_seed"}
+        ]
+      },
+      {
+        "op":"Specials", "guide":"skill_guide_farming_special", "inventory":"skill_guide_farming_special", "title":"Farming - Specials",
+        "rows": [
+          {"level":53,"text":"Bittercap mushroom","obj":"mushroom_seed"},
+          {"level":55,"text":"Cactus","obj":"cactus_seed"},
+          {"level":63,"text":"Belladonna\\nWear gloves to harvest.","obj":"belladonna_seed"},
+          {"level":72,"text":"Calquat tree","obj":"calquat_tree_seed"},
+          {"level":83,"text":"Spirit tree\\nOnly one at a time.","obj":"spirit_tree_seed"}
+        ]
+      },
+      {
+        "op":"Scarecrows", "guide":"skill_guide_farming_scarecrow", "inventory":"skill_guide_farming_scarecrow", "title":"Farming - Scarecrows",
+        "rows": [
+          {"level":23,"text":"Empty sack + straw bale\\n+ bronze spear + watermelon","obj":"scarecrow_complete"}
+        ]
+      },
+      {
+        "op":"Tools", "guide":"skill_guide_farming_tools", "inventory":"skill_guide_farming_tools", "title":"Farming - Tools",
+        "rows": [
+          {"level":-1,"text":"Rake","obj":"rake"},
+          {"level":-1,"text":"Spade","obj":"spade"},
+          {"level":-1,"text":"Watering can","obj":"watering_can_0"},
+          {"level":-1,"text":"Seed dibber","obj":"dibber"},
+          {"level":-1,"text":"Gardening trowel","obj":"gardening_trowel"},
+          {"level":-1,"text":"Secateurs","obj":"secateurs"},
+          {"level":-1,"text":"Magic secateurs","obj":"fairy_queen_secateurs"},
+          {"level":-1,"text":"Gardening boots","obj":"gardening_boots"},
+          {"level":-1,"text":"Basket\\nStores up to 5 fruits.","obj":"basket_empty"},
+          {"level":-1,"text":"Sack\\nStores up to 10 vegetables.","obj":"sack_empty"},
+          {"level":-1,"text":"Plant pot","obj":"plantpot_empty"},
+          {"level":-1,"text":"Plant cure","obj":"plant_cure"},
+          {"level":-1,"text":"Compost\\n15 organic items","obj":"bucket_compost"},
+          {"level":-1,"text":"Supercompost\\n15 higher organic items","obj":"bucket_supercompost"},
+          {"level":75,"text":"Magic roots\\nUsed for an Amulet of Nature.","obj":"magic_roots"}
+        ]
+      }
+    ],
+    "exclusions": ["Snape grass seed", "Potato cactus seed", "Seaweed spore", "Rocky", "All additions absent from the retained pre-cutoff crop tables"],
+    "foldedInventories": ["skill_guide_farming_mushroom", "skill_guide_farming_cactus", "skill_guide_farming_calquat", "skill_guide_farming_spirit_tree", "skill_guide_farming_belladonna"]
+  },
+  "slayer": {
+    "sources": ["src.slayer-tipit-guide-20060427#Slayer creatures and Equipment table", "src.slayer-runehq-guide-20060428#Contents", "src.content-inv-pack#229-230", "src.content-obj-pack#slayerguide icons"],
+    "labels": "VERIFIED period requirements and original icon existence; CANDIDATE guide row reconstruction; UNKNOWN original titles, formatting and order",
+    "categories": [
+      {
+        "op": "Monsters", "guide": "skill_guide_slayer_monsters", "inventory": "skill_guide_slayer_monsters", "title": "Slayer - Monsters",
+        "rows": [
+          {"level":5,"text":"Crawling hands","obj":"slayerguide_crawlinghand"},
+          {"level":7,"text":"Cave bugs","obj":"swamp_cave_bug"},
+          {"level":10,"text":"Cave crawler","obj":"slayerguide_cavecrawler"},
+          {"level":15,"text":"Banshee","obj":"slayerguide_banshee"},
+          {"level":17,"text":"Cave slime","obj":"swamp_cave_slime"},
+          {"level":20,"text":"Rockslug","obj":"slayerguide_rockslug"},
+          {"level":22,"text":"Desert Lizard","obj":"slayerguide_lizard"},
+          {"level":25,"text":"Cockatrice","obj":"slayerguide_cockatrice"},
+          {"level":30,"text":"Pyrefiend","obj":"slayerguide_pyrfiend"},
+          {"level":32,"text":"Mogre","obj":"slayerguide_mogre"},
+          {"level":33,"text":"Harpie Bug Swarm","obj":"slayerguide_swarm"},
+          {"level":35,"text":"Wall Beast","obj":"swamp_wallbeast"},
+          {"level":37,"text":"Killerwatt","obj":"slayerguide_killerwatt"},
+          {"level":40,"text":"Basilisk","obj":"slayerguide_basilisk"},
+          {"level":42,"text":"Fever Spider","obj":"slayerguide_fever_spider"},
+          {"level":45,"text":"Infernal Mage","obj":"slayerguide_infernalmage"},
+          {"level":50,"text":"Bloodveld","obj":"slayerguide_bloodveld"},
+          {"level":52,"text":"Jelly","obj":"slayerguide_jelly"},
+          {"level":55,"text":"Turoth","obj":"slayerguide_turoth"},
+          {"level":57,"text":"Zygomite","obj":"slayer_zygomite_object"},
+          {"level":60,"text":"Aberrant Specter","obj":"slayerguide_aberrantspecter"},
+          {"level":65,"text":"Dust Devil","obj":"slayerguide_dustdevil"},
+          {"level":70,"text":"Kurask","obj":"slayerguide_kurask"},
+          {"level":72,"text":"Skeletal Wyverns","obj":"slayerguide_skeletalwyvern"},
+          {"level":75,"text":"Gargoyle","obj":"slayerguide_gargoyle"},
+          {"level":80,"text":"Nechryael","obj":"slayerguide_nechryael"},
+          {"level":85,"text":"Abyssal Demon","obj":"slayerguide_abyssaldemon"},
+          {"level":90,"text":"Dark Beast","obj":"slayerguide_dark_beast"}
+        ]
+      },
+      {
+        "op":"Equipment", "guide":"skill_guide_slayer_equipment", "inventory":"skill_guide_slayer_equipment", "title":"Slayer - Equipment",
+        "rows": [
+          {"level":1,"text":"Bag of salt","obj":"slayer_bag_of_salt"},
+          {"level":1,"text":"Rock Hammer","obj":"slayer_rock_hammer"},
+          {"level":1,"text":"Spiney Helmet\\n5 Defense","obj":"wallbeast_spike_helmet"},
+          {"level":10,"text":"Facemask","obj":"slayer_facemask"},
+          {"level":15,"text":"Earmuffs","obj":"slayer_earmuffs"},
+          {"level":17,"text":"Slayer Gloves","obj":"slayerguide_slayer_gloves"},
+          {"level":22,"text":"Ice Cooler","obj":"slayer_icy_water"},
+          {"level":25,"text":"Mirror Shield\\n20 Defense","obj":"slayer_mirror_shield"},
+          {"level":32,"text":"Fishing Explosive","obj":"slayerguide_fishing_explosive"},
+          {"level":33,"text":"Bug Lantern","obj":"slayer_buglan_off"},
+          {"level":37,"text":"Insulated Boots","obj":"slayer_boots"},
+          {"level":55,"text":"Leaf-Bladed Spear\\n50 Attack","obj":"slayer_leafbladed_spear"},
+          {"level":55,"text":"Broad Arrows\\n50 range","obj":"slayerguide_broad_arrows"},
+          {"level":55,"text":"Slayer's Staff\\n50 magic","obj":"slayer_staff"},
+          {"level":57,"text":"Fungicide","obj":"slayer_fungicide"},
+          {"level":60,"text":"Nosepeg","obj":"slayer_nosepeg"}
+        ]
+      }
+    ],
+    "exclusions": ["Later reward-system categories and post-cutoff creatures", "No invented Slayer Masters category: original cache has only monster/equipment guide inventories"],
+    "iconGaps": ["Cave bugs", "Cave slime", "Wall Beast", "Zygomite"]
+  }
+}

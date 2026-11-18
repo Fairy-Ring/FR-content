@@ -1,0 +1,65 @@
+// CANDIDATE category labels and row values follow the pre-tip period guides and revision 377 cache.
+// UNKNOWN: the engineering page titles below are not recovered original client titles; row rendering and row order are also unknown.
+// UNKNOWN: original advancement header not recovered; no advancement text is added.
+
+[skill_guide_slayer]
+table=skill_guide_ops
+data=lookup,slayer
+data=op,Monsters,skill_guide_slayer_monsters
+data=op,Equipment,skill_guide_slayer_equipment
+
+[skill_guide_slayer_monsters]
+table=skill_guides
+data=name,Slayer - Monsters
+data=inv,skill_guide_slayer_monsters
+data=unlock,5,Crawling hands
+data=unlock,7,Cave bugs
+data=unlock,10,Cave crawler
+data=unlock,15,Banshee
+data=unlock,17,Cave slime
+data=unlock,20,Rockslug
+data=unlock,22,Desert Lizard
+data=unlock,25,Cockatrice
+data=unlock,30,Pyrefiend
+data=unlock,32,Mogre
+data=unlock,33,Harpie Bug Swarm
+data=unlock,35,Wall Beast
+data=unlock,37,Killerwatt
+data=unlock,40,Basilisk
+data=unlock,42,Fever Spider
+data=unlock,45,Infernal Mage
+data=unlock,50,Bloodveld
+data=unlock,52,Jelly
+data=unlock,55,Turoth
+data=unlock,57,Zygomite
+data=unlock,60,Aberrant Specter
+data=unlock,65,Dust Devil
+data=unlock,70,Kurask
+data=unlock,72,Skeletal Wyverns
+data=unlock,75,Gargoyle
+data=unlock,80,Nechryael
+data=unlock,85,Abyssal Demon
+data=unlock,90,Dark Beast
+
+[skill_guide_slayer_equipment]
+table=skill_guides
+data=name,Slayer - Equipment
+data=inv,skill_guide_slayer_equipment
+data=unlock,1,Bag of salt
+data=unlock,1,Rock Hammer
+// VERIFIED additional requirements quote the period table's Other required column.
+// UNKNOWN: their two-line placement is an engineering rendering, not a recovered guide layout.
+data=unlock,1,Spiney Helmet\n5 Defense
+data=unlock,10,Facemask
+data=unlock,15,Earmuffs
+data=unlock,17,Slayer Gloves
+data=unlock,22,Ice Cooler
+data=unlock,25,Mirror Shield\n20 Defense
+data=unlock,32,Fishing Explosive
+data=unlock,33,Bug Lantern
+data=unlock,37,Insulated Boots
+data=unlock,55,Leaf-Bladed Spear\n50 Attack
+data=unlock,55,Broad Arrows\n50 range
+data=unlock,55,Slayer's Staff\n50 magic
+data=unlock,57,Fungicide
+data=unlock,60,Nosepeg
