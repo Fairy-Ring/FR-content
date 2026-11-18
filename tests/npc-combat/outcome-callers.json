@@ -14,6 +14,9 @@
       "[ai_opplayer2,chaosmonk1]",
       "[ai_opplayer2,chaosmonk2]",
       "[ai_opplayer2,chaosmonk3]",
+      "[ai_opplayer2,dagannoth_water_creature_1x1_invisible2]",
+      "[ai_opplayer2,dagannoth_water_creature_1x1_invisible3]",
+      "[ai_opplayer2,dagannoth_water_creature_1x1_invisible]",
       "[ai_opplayer2,druid]",
       "[ai_opplayer2,elvarg]",
       "[ai_opplayer2,entrana_monk]",
@@ -138,13 +141,15 @@
     "npc_spell_cast": [
       "[proc,chaos_druid_spell]",
       "[proc,dt_fareed_cast]",
-      "[proc,npc_druid_entangle]"
+      "[proc,npc_druid_entangle]",
+      "[proc,waterbirth_other_spinolyp_magic_attack]"
     ],
     "npc_combat_spell_checks": [
       "[ai_applayer2,druid]",
       "[ai_applayer2,wizard]",
       "[ai_opplayer2,druid]",
-      "[proc,dt_fareed_cast]"
+      "[proc,dt_fareed_cast]",
+      "[proc,waterbirth_other_spinolyp_magic_attack]"
     ],
     "npc_debuff_allowed": [
       "[proc,chaos_druid_spell]"
@@ -152,7 +157,8 @@
     "npc_spell_fail": [
       "[proc,chaos_druid_spell]",
       "[proc,dt_fareed_cast]",
-      "[proc,npc_druid_entangle]"
+      "[proc,npc_druid_entangle]",
+      "[proc,waterbirth_other_spinolyp_magic_attack]"
     ],
     "npc_stat_change_effect": [
       "[proc,chaos_druid_spell]"

@@ -1,0 +1,225 @@
+// Waterbirth rock crab forms. Original 377 fields below are preserved verbatim.
+
+[horror_rockcrab]
+name=Rock Crab
+desc=No one likes crabs...
+model1=npc_1265
+model2=npc_1265i2
+walkanim=horror_crab_walk
+readyanim=horror_crab_ready
+minimap=no
+op2=Attack
+vislevel=13
+wanderrange=7
+hitpoints=50
+respawnrate=100
+param=death_drop,null
+param=damagetype,^crush_style
+param=attack_anim,horror_crab_attack
+param=defend_anim,horror_crab_defend
+param=death_anim,horror_crab_hide
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
+maxrange=9
+
+[horror_rockcrab_inactive]
+name=Rocks
+desc=A rocky outcrop.
+model1=npc_1265
+model2=npc_1265i2
+vislevel=hide
+walkanim=horror_crab_walk
+readyanim=horror_crab_hide_ready
+minimap=no
+wanderrange=0
+hitpoints=50
+huntrange=1
+respawnrate=100
+huntmode=aggressive_ranged
+param=death_drop,null
+param=attack_anim,horror_crab_attack
+param=defend_anim,horror_crab_defend
+param=death_anim,horror_crab_hide
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
+maxrange=9
+attackrange=1
+moverestrict=nomove
+defaultmode=none
+
+[horror_rockcrab_small]
+name=Rock Crab
+desc=No one likes crabs...
+model1=npc_1265
+model2=npc_1265i2
+walkanim=horror_crab_walk
+readyanim=horror_crab_ready
+resizeh=84
+resizev=84
+minimap=no
+op2=Attack
+vislevel=13
+wanderrange=7
+hitpoints=50
+respawnrate=100
+param=death_drop,null
+param=damagetype,^crush_style
+param=attack_anim,horror_crab_attack
+param=defend_anim,horror_crab_defend
+param=death_anim,horror_crab_hide
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
+maxrange=9
+
+[horror_rockcrab_small_inactive]
+name=Rocks
+desc=A rocky outcrop.
+model1=npc_1265
+model2=npc_1265i2
+vislevel=hide
+walkanim=horror_crab_walk
+readyanim=horror_crab_hide_ready
+resizeh=84
+resizev=84
+minimap=no
+wanderrange=0
+hitpoints=50
+huntrange=1
+respawnrate=100
+huntmode=aggressive_ranged
+param=death_drop,null
+param=attack_anim,horror_crab_attack
+param=defend_anim,horror_crab_defend
+param=death_anim,horror_crab_hide
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
+maxrange=9
+attackrange=1
+moverestrict=nomove
+defaultmode=none
+
+[giant_rockcrab]
+name=Giant Rock Crab
+desc=No one likes crabs... especially really big ones!
+model1=npc_2452
+model2=npc_2452i2
+size=2
+resizeh=250
+resizev=250
+walkanim=horror_crab_walk
+readyanim=horror_crab_ready
+op2=Attack
+vislevel=137
+// CANDIDATE server HP/attack/strength/defence copied from the old all.npc row; those values are not cache authority.
+hitpoints=180
+attack=50
+strength=80
+defence=200
+// CANDIDATE exact-variant OSRS/retained Lost City combat stats; 2025 earth weakness and heavy-defence reduction excluded.
+magic=1
+ranged=1
+param=attackbonus,0
+param=strengthbonus,0
+param=stabdefence,225
+param=slashdefence,200
+param=crushdefence,175
+param=magicdefence,-10
+param=rangedefence,250
+param=damagetype,^crush_style
+param=attackrate,4
+param=retreat,^wbmon_giant_retreat_hp
+// CANDIDATE same crab animation/sound family as the original 377 regular forms.
+param=attack_anim,horror_crab_attack
+param=defend_anim,horror_crab_defend
+param=death_anim,horror_crab_hide
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
+// CANDIDATE exact-variant melee aggression and 50-tick respawn; UNKNOWN 2-tile hunt radius covers 2x2 edge contacts from native SW-origin distance.
+huntmode=aggressive_melee
+huntrange=^wbcrab_giant_hunt_radius
+attackrange=1
+respawnrate=50
+
+[giant_rockcrab_hidden]
+name=Boulder
+desc=Heavy rock!
+model1=npc_2453
+vislevel=hide
+size=2
+resizeh=250
+resizev=250
+turnspeed=0
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+// CANDIDATE 50-tick respawn; UNKNOWN 2-tile hunt radius covers 2x2 edge contacts from native SW-origin distance.
+respawnrate=50
+huntmode=aggressive_ranged
+huntrange=^wbcrab_giant_hunt_radius
+attackrange=1
+
+[giant_rockcrab_deeper]
+name=Giant Rock Crab
+desc=No one likes crabs... especially really big ones!
+model1=npc_2452
+model2=npc_2452i2
+size=2
+resizeh=250
+resizev=250
+walkanim=horror_crab_walk
+readyanim=horror_crab_ready
+op2=Attack
+vislevel=137
+// CANDIDATE server HP/attack/strength/defence copied from the old all.npc row; those values are not cache authority.
+hitpoints=180
+attack=50
+strength=80
+defence=200
+// CANDIDATE exact-variant OSRS/retained Lost City combat stats; 2025 earth weakness and heavy-defence reduction excluded.
+magic=1
+ranged=1
+param=attackbonus,0
+param=strengthbonus,0
+param=stabdefence,225
+param=slashdefence,200
+param=crushdefence,175
+param=magicdefence,10
+param=rangedefence,250
+param=damagetype,^crush_style
+param=attackrate,4
+param=retreat,^wbmon_giant_retreat_hp
+// CANDIDATE same crab animation/sound family as the original 377 regular forms.
+param=attack_anim,horror_crab_attack
+param=defend_anim,horror_crab_defend
+param=death_anim,horror_crab_hide
+param=attack_sound,insect_attack
+param=defend_sound,insect_hit
+param=death_sound,insect_death
+// CANDIDATE exact-variant melee aggression and 50-tick respawn; UNKNOWN 2-tile hunt radius covers 2x2 edge contacts from native SW-origin distance.
+huntmode=aggressive_melee
+huntrange=^wbcrab_giant_hunt_radius
+attackrange=1
+respawnrate=50
+
+[giant_rockcrab_hidden_deeper]
+name=Boulder
+desc=Heavy rock!
+model1=npc_2453
+vislevel=hide
+size=2
+resizeh=250
+resizev=250
+turnspeed=0
+wanderrange=0
+moverestrict=nomove
+defaultmode=none
+// CANDIDATE 50-tick respawn; UNKNOWN 2-tile hunt radius covers 2x2 edge contacts from native SW-origin distance.
+respawnrate=50
+huntmode=aggressive_ranged
+huntrange=^wbcrab_giant_hunt_radius
+attackrange=1

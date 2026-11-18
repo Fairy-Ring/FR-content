@@ -1387,6 +1387,60 @@
         "spawn": "[proc,soulbane_fear_spawn]",
         "leave": "[proc,soulbane_leave]"
       }
+    },
+    {
+      "script": "[ai_opplayer2,dagannoth_water_creature_1x1_invisible]",
+      "npc": "dagannoth_water_creature_1x1_invisible",
+      "seeds": {
+        "hit": 3668340011,
+        "miss": 2654435769,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_opplayer2,dagannoth_water_creature_1x1_invisible2]",
+      "npc": "dagannoth_water_creature_1x1_invisible2",
+      "seeds": {
+        "hit": 3668340011,
+        "miss": 2654435769,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_opplayer2,dagannoth_water_creature_1x1_invisible3]",
+      "npc": "dagannoth_water_creature_1x1_invisible3",
+      "seeds": {
+        "hit": 3668340011,
+        "miss": 2654435769,
+        "zero": 535203586
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagannoth_water_creature_1x1]",
+      "npc": "dagannoth_water_creature_1x1",
+      "seeds": {
+        "hit": 1013904242,
+        "miss": 4055616968,
+        "zero": 2654435769
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagannoth_water_creature_1x12]",
+      "npc": "dagannoth_water_creature_1x12",
+      "seeds": {
+        "hit": 1013904242,
+        "miss": 4055616968,
+        "zero": 2654435769
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagannoth_water_creature_1x13]",
+      "npc": "dagannoth_water_creature_1x13",
+      "seeds": {
+        "hit": 1013904242,
+        "miss": 4055616968,
+        "zero": 2654435769
+      }
     }
   ]
 }

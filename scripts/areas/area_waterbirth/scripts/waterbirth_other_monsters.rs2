@@ -1,0 +1,143 @@
+// A hidden Rock is not clickable. Native player hunting turns it into the matching attackable type.
+[ai_opplayer2,dagannoth_rock_lobster_2x2_loc]
+npc_changetype(dagannoth_rock_lobster_2x2, ^max_32bit_int);
+npc_anim(dagannoth_rock_lobster_spring_up, 0);
+npc_setmode(null);
+
+// CANDIDATE: hidden water emerges "after a while"; no retained source gives proximity as the cause.
+// UNKNOWN: first emergence and later hidden intervals share the same selected native-turn duration.
+[ai_spawn,dagannoth_water_creature_1x1_invisible] @waterbirth_other_spinolyp_spawn;
+[ai_spawn,dagannoth_water_creature_1x1_invisible2] @waterbirth_other_spinolyp_spawn;
+[ai_spawn,dagannoth_water_creature_1x1_invisible3] @waterbirth_other_spinolyp_spawn;
+
+[label,waterbirth_other_spinolyp_spawn]
+// Preserve the native default spawn initialization before scheduling autonomous emergence.
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+%npc_start_coord = npc_coord;
+npc_queue(4, 0, ^waterbirth_other_spinolyp_form_ticks);
+
+// CANDIDATE: native adjacent OPPLAYER2 dispatch permits rapid inaccurate hidden melee, not emergence.
+[ai_opplayer2,dagannoth_water_creature_1x1_invisible] ~npc_default_attack();
+[ai_opplayer2,dagannoth_water_creature_1x1_invisible2] ~npc_default_attack();
+[ai_opplayer2,dagannoth_water_creature_1x1_invisible3] ~npc_default_attack();
+[ai_queue4,dagannoth_water_creature_1x1_invisible]
+~waterbirth_other_spinolyp_reemerge();
+
+[ai_queue4,dagannoth_water_creature_1x1_invisible2]
+~waterbirth_other_spinolyp_reemerge();
+
+[ai_queue4,dagannoth_water_creature_1x1_invisible3]
+~waterbirth_other_spinolyp_reemerge();
+
+[ai_opplayer2,dagannoth_water_creature_1x1]
+npc_setmode(applayer2);
+
+[ai_opplayer2,dagannoth_water_creature_1x12]
+npc_setmode(applayer2);
+
+[ai_opplayer2,dagannoth_water_creature_1x13]
+npc_setmode(applayer2);
+
+[ai_applayer2,dagannoth_water_creature_1x1]
+~waterbirth_other_spinolyp_attack();
+
+[ai_applayer2,dagannoth_water_creature_1x12]
+~waterbirth_other_spinolyp_attack();
+
+[ai_applayer2,dagannoth_water_creature_1x13]
+~waterbirth_other_spinolyp_attack();
+
+[proc,waterbirth_other_spinolyp_attack]
+def_int $previous_action_delay = %npc_action_delay;
+if (random(^waterbirth_other_spinolyp_style_count) = 0) {
+    ~waterbirth_other_spinolyp_range_attack();
+} else {
+    ~waterbirth_other_spinolyp_magic_attack();
+}
+if (%npc_action_delay ! $previous_action_delay & random(^waterbirth_other_spinolyp_submerge_denominator) = 0) {
+    gosub(waterbirth_other_spinolyp_submerge);
+}
+
+// Preserve native ranged hit, protection, poison, projectile, and delayed-damage behavior.
+// Cap the calculated native hit at the source-backed exact-variant maximum.
+[proc,waterbirth_other_spinolyp_range_attack]
+if (%npc_action_delay > map_clock) {
+    npc_setmode(applayer2);
+    return;
+}
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+
+def_int $attack_roll = ~npc_ranged_attack_roll;
+def_int $defence_roll = ~player_defence_roll_specific(npc_param(damagetype));
+def_int $maxhit = min(^waterbirth_other_spinolyp_maxhit, ~npc_ranged_maxhit);
+
+def_int $poison_prayer = 0;
+if (npc_param(poison_severity) > 0 & ~check_protect_prayer(^ranged_style) = true) {
+    $attack_roll = ~npc_ranged_attack_roll_no_prot;
+    $poison_prayer = 1;
+}
+
+npc_anim(npc_param(attack_anim), 0);
+def_synth $sound = npc_param(rangeattack_sound);
+if ($sound ! null) sound_synth($sound, 0, 0);
+def_spotanim $launch = npc_param(proj_launch);
+if ($launch ! null) spotanim_npc($launch, npc_param(proj_height), 0);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration = 64;
+$duration = ~player_projectile(npc_coord, coord, uid, npc_param(proj_travel), ^waterbirth_other_spinolyp_proj_start_height, ^waterbirth_other_spinolyp_proj_end_height, ^waterbirth_other_spinolyp_proj_delay, ^waterbirth_other_spinolyp_proj_angle, ^waterbirth_other_spinolyp_proj_flight_length, ^waterbirth_other_spinolyp_proj_offset, ^waterbirth_other_spinolyp_proj_distance_step);
+~npc_rangeattack_resolve($attack_roll, $defence_roll, $maxhit, $poison_prayer, $duration);
+
+// CANDIDATE: the source assigns poison to the Ranged attack; this Magic branch does not inherit it.
+[proc,waterbirth_other_spinolyp_magic_attack]
+def_dbrow $spell_data = ~get_spell_data(^water_strike);
+if (~npc_combat_spell_checks = false) return;
+def_int $duration = ~npc_spell_cast($spell_data, npc_param(attackrate));
+def_int $attack_roll = ~npc_ranged_attack_roll_no_prot;
+def_int $defence_roll = ~player_defence_roll_specific(^ranged_style);
+if (~npc_attack_accuracy($attack_roll, $defence_roll) = true & ~check_protect_prayer(^magic_style) = false) {
+    ~npc_spell_success_head($spell_data);
+    def_int $damage = ~npc_spell_magnitude(^waterbirth_other_spinolyp_maxhit);
+    def_int $ticks = calc($duration / 30);
+    queue(combat_damage_player, $ticks, $damage);
+    ~npc_spell_success_tail($spell_data, $duration);
+    stat_sub(prayer, 1, 0);
+} else {
+    ~npc_spell_fail($spell_data, $duration);
+}
+~npc_set_attack_vars;
+
+// Submerge the current Spinolyp without leaving a competing type-revert timer.
+[proc,waterbirth_other_spinolyp_submerge]
+if (npc_type = dagannoth_water_creature_1x1) {
+    npc_changetype(dagannoth_water_creature_1x1_invisible, ^max_32bit_int);
+} else if (npc_type = dagannoth_water_creature_1x12) {
+    npc_changetype(dagannoth_water_creature_1x1_invisible2, ^max_32bit_int);
+} else if (npc_type = dagannoth_water_creature_1x13) {
+    npc_changetype(dagannoth_water_creature_1x1_invisible3, ^max_32bit_int);
+}
+if (npc_type = dagannoth_water_creature_1x1_invisible | npc_type = dagannoth_water_creature_1x1_invisible2 | npc_type = dagannoth_water_creature_1x1_invisible3) {
+    npc_anim(dagannoth_water_creature_go_down, 0);
+    npc_setmode(null);
+    npc_sethuntmode(waterbirth_other_approach);
+    npc_sethunt(1);
+    npc_queue(4, 0, ^waterbirth_other_spinolyp_form_ticks);
+}
+
+[proc,waterbirth_other_spinolyp_reemerge]
+if (npc_type = dagannoth_water_creature_1x1_invisible) {
+    npc_changetype(dagannoth_water_creature_1x1, ^max_32bit_int);
+} else if (npc_type = dagannoth_water_creature_1x1_invisible2) {
+    npc_changetype(dagannoth_water_creature_1x12, ^max_32bit_int);
+} else if (npc_type = dagannoth_water_creature_1x1_invisible3) {
+    npc_changetype(dagannoth_water_creature_1x13, ^max_32bit_int);
+} else {
+    return;
+}
+npc_anim(dagannoth_water_creature_spring_up, 0);
+npc_setmode(null);
+npc_sethuntmode(aggressive_ranged);
+npc_sethunt(1);

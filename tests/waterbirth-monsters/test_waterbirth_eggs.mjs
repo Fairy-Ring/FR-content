@@ -177,7 +177,8 @@ async function run() {
 
   const resetTicks = readConstant('scripts/areas/area_waterbirth/configs/waterbirth_eggs.constant', 'waterbirth_egg_reset_ticks');
   assert.equal(resetTicks, 500, 'later five-minute candidate is 500 native ticks');
-  assert.equal(spawnType.huntrange, egg1Type.huntrange, 'candidate Spawn shares the named UNKNOWN one-tile hunt radius');
+  assert.equal(spawnType.huntrange, readConstant('scripts/areas/area_waterbirth/configs/waterbirth_eggs.constant', 'waterbirth_spawn_hunt_radius'),
+    'Spawn aggression uses its own named UNKNOWN engineering radius');
   assert.equal(spawnType.stats[NpcStat.HITPOINTS], 35, 'CANDIDATE current exact-variant HP');
   assert.equal(spawnType.stats[NpcStat.ATTACK], 50, 'CANDIDATE current exact-variant attack');
   assert.equal(spawnType.stats[NpcStat.STRENGTH], 35, 'CANDIDATE current exact-variant strength');
@@ -204,8 +205,10 @@ async function run() {
   assert.strictEqual(ScriptProvider.getByTrigger(ServerTriggerType.AI_QUEUE1, egg2Type.id, egg2Type.category), egg2Queue1);
   const generic = (trigger, type) => ScriptProvider.getByTriggerSpecific(trigger, -1, type.category);
   assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.AI_OPPLAYER2, spawnType.id, spawnType.category), generic(ServerTriggerType.AI_OPPLAYER2, spawnType), 'Spawn keeps generic native melee attacks');
-  assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.AI_QUEUE3, spawnType.id, spawnType.category), generic(ServerTriggerType.AI_QUEUE3, spawnType), 'Spawn keeps generic native death handling');
-  assert(!ScriptProvider.getByTriggerSpecific(ServerTriggerType.AI_QUEUE3, spawnType.id), 'egg slice adds no Spawn-specific drop/death trigger');
+  const spawnDeath = ScriptProvider.getByTriggerSpecific(ServerTriggerType.AI_QUEUE3, spawnType.id);
+  assert(spawnDeath, 'Spawn has a packed native death-and-Bones trigger');
+  assert.strictEqual(ScriptProvider.getByTrigger(ServerTriggerType.AI_QUEUE3, spawnType.id, spawnType.category), spawnDeath,
+    'native death dispatch selects the Spawn Bones trigger');
 
   World.currentTick = 1000;
   World.gameMap.init();
@@ -287,6 +290,12 @@ async function run() {
     removals.push({ id: npc.nid, duration, lifecycle: npc.lifecycle, tick: World.currentTick });
     return originalRemoveNpc.call(this, npc, duration);
   };
+  const originalAddObj = World.addObj;
+  const drops = [];
+  World.addObj = function (object, receiver, duration) {
+    drops.push({ object, receiver, duration, tick: World.currentTick });
+    return originalAddObj.call(this, object, receiver, duration);
+  };
   const movePlayer = coord => {
     World.gameMap.getZone(actor.x, actor.z, actor.level).leave(actor);
     actor.level = coord.level;
@@ -358,11 +367,16 @@ async function run() {
 
     // Exercise the ordinary packed damage and death queues; the egg hatch itself is never called manually.
     const childId = child.nid;
+    child.heroPoints.addHero(actor.hash64, child.levels[NpcStat.HITPOINTS]);
     child.enqueueScript(ServerTriggerType.AI_QUEUE2, 0, child.levels[NpcStat.HITPOINTS]);
     for (let tick = 0; tick < 8 && child.isActive; tick++) step();
     assert.equal(child.isActive, false, 'ordinary NPC damage/death queue removes a killed temporary Spawn');
     assert.equal(World.npcs.get(childId), undefined, 'native death cleanup releases the Spawn list entry');
     assert.equal(activeSpawnAtEgg().length, 0, 'a killed Spawn does not leave a duplicate child');
+    assert.equal(drops.length, 1, 'a credited Spawn kill creates exactly one selected reward');
+    assert.equal(drops[0].object.type, id(configs.ObjType, 'bones'), 'candidate guaranteed Spawn reward is Bones');
+    assert.equal(drops[0].object.count, 1, 'Spawn kill drops one Bones');
+    assert.strictEqual(drops[0].receiver, actor.hash64, 'native hero owns the Bones drop');
 
     movePlayer(site.outside);
     const elapsedBeforeLeaving = World.currentTick - firstHatch.hatchCompleteTick;
@@ -420,6 +434,7 @@ async function run() {
     assert.equal(expiry.lifecycle, EntityLifeCycle.DESPAWN);
     assert.equal(expiry.tick, secondHatchTick + resetTicks, 'removal is on the exact egg reset boundary');
     assert(!deathQueues.includes(ServerTriggerType.AI_QUEUE3), 'native expiry does not invoke the NPC death trigger');
+    assert.equal(drops.length, 1, 'native lifetime expiry creates no death loot');
     assert.equal(egg.type, egg1Type.id, 'closed Egg returns at 500 ticks before the next world hunt phase');
     assert.equal(activeSpawnAtEgg().length, 0, 'expiry is removal, not a death-trigger duplicate');
     step();
@@ -460,9 +475,17 @@ async function run() {
       }
     }
 
+    const uncredited = activeSpawnAtEgg()[0];
+    assert(uncredited, 'final reset provides a naturally hatched no-hero death control');
+    uncredited.enqueueScript(ServerTriggerType.AI_QUEUE2, 0, uncredited.levels[NpcStat.HITPOINTS]);
+    for (let tick = 0; tick < 8 && uncredited.isActive; tick++) step();
+    assert.equal(uncredited.isActive, false, 'uncredited Spawn still follows native death');
+    assert.equal(drops.length, 1, 'no Bones reward is created without a native hero');
     console.log('RESULT PASS waterbirth-eggs native proximity, staged hatch, combat and lifecycle');
   } finally {
     JavaRandom.nextDouble = originalRandom;
+    World.addObj = originalAddObj;
+    for (const drop of drops) if (drop.object.isActive) World.removeObj(drop.object, -1);
     for (const spawn of activeSpawnAtEgg()) World.removeNpc(spawn, -1);
     if (egg.isActive) World.removeNpc(egg, -1);
     World.gameMap.getZone(actor.x, actor.z, actor.level).leave(actor);

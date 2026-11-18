@@ -1,0 +1,23 @@
+// Source-backed candidate values and explicitly labelled hunt geometry for Waterbirth crabs.
+// UNKNOWN: native HuntIterator measures from the 2x2 southwest origin.
+^wbcrab_giant_hunt_radius=2
+// CANDIDATE: adjacent melee range.
+^wbcrab_giant_attack_range=1
+// UNKNOWN: ordinary handler is an implementation donor, not a giant duration source.
+^wbcrab_giant_awake_ticks=1000
+// CANDIDATE: exact-variant OSRS respawn.
+^wbcrab_giant_respawn_ticks=50
+// CANDIDATE: exact-variant OSRS attack speed.
+^wbcrab_giant_attack_ticks=4
+// CANDIDATE: exact-variant OSRS max hit; native strength formula agrees.
+^wbcrab_giant_max_hit=9
+// CANDIDATE: exact-variant OSRS main drop-table denominator.
+^wbcrab_giant_primary_rolls=128
+// CANDIDATE: exact-variant OSRS medium clue rate.
+^wbcrab_giant_clue_rarity=128
+// UNKNOWN: one-fifth HP Lost City Ghoul precedent; not a crab-authentic threshold.
+^wbmon_giant_retreat_hp=36
+// CANDIDATE: normalized 377-cache seed table after excluding 2019 seeds.
+^wbcrab_rare_seed_rolls=1000
+// CANDIDATE: exact-variant OSRS talisman subtable weights.
+^wbcrab_talisman_rolls=70

@@ -10,3 +10,10 @@ npc_changetype(dungeon_dagganoth_egg3, ^waterbirth_egg_reset_ticks);
 // npc_add's new NPC can receive its first World turn in this same tick. The extra countdown
 // unit keeps its 500 future-turn lifetime aligned with the shell's native type-revert boundary.
 npc_add(npc_coord, dagganoth_critter, add(^waterbirth_egg_reset_ticks, 1));
+
+// CANDIDATE Bones, Always: Dagannoth spawn, all retained 2014-2026 revisions.
+// The later ribs/elemental-weakness changes do not establish a 377 loot table.
+[ai_queue3,dagganoth_critter]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, bones, 1, ^lootdrop_duration);

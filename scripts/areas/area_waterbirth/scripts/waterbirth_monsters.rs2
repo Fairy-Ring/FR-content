@@ -28,7 +28,9 @@ def_int $defence_roll = ~player_defence_roll_specific(^ranged_style);
 npc_anim(horror_dagannoth_rangeattack, 0);
 ~.sound_area(dagganoth_spines, 0, npc_coord, 10);
 %npc_action_delay = add(map_clock, npc_param(attackrate));
-def_int $duration = ~player_projectile(npc_coord, coord, uid, horror_spines_travel, 52, 28, 10, 25, 36, 50, 5);
+def_int $duration = ~player_projectile(npc_coord, coord, uid, horror_spines_travel,
+    ^wbmon_spines_start_height, ^wbmon_spines_end_height, ^wbmon_spines_delay,
+    ^wbmon_spines_angle, ^wbmon_spines_flight_length, ^wbmon_spines_offset, ^wbmon_spines_distance_step);
 ~npc_rangeattack_resolve($attack_roll, $defence_roll, ^wbmon_ranged_maxhit, 0, $duration);
 anim(%com_defendanim, $duration);
 
