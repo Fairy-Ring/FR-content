@@ -35,6 +35,7 @@ function nativeNpc(row) {
   World.addNpc(npc, -1); return npc;
 }
 function texts(p) { return logs.get(p).filter(packet => packet instanceof IfSetText).map(packet => packet.text.replace(/[|\s]+/g, ' ')); }
+function transcript(p) { return texts(p).join(' ').replace(/\s+/g, ' ').trim(); }
 function run(p, script, target = null, choices = [], args = []) {
   assert(script, 'production dispatch must select a packed script');
   const state = ScriptRunner.init(script, p, target, args); p.executeScript(state, true);
@@ -212,11 +213,11 @@ check('each placed cape seller opens the original shop from Trade and Talk and t
     }
     const talk = fixture(npc); op(talk, npc, 1, [2]);
     openShop(talk, shopName, title);
-    assert(texts(talk).includes('Hello there, are you interested in buying one of my special capes?'));
+    assert(transcript(talk).includes('Hello there, are you interested in buying one of my special capes?'), transcript(talk));
     const explained = fixture(npc); op(explained, npc, 1, [1, 2]);
     openShop(explained, shopName, title);
     assert(texts(explained).includes('So would you like to buy one?'));
-    assert(texts(explained).join(' ').includes("They're very useful when out in the wilderness with friends or anyone else you don't want to harm."));
+    assert(transcript(explained).includes("They're very useful when out in the wilderness with friends or anyone else you don't want to harm."));
     const decline = fixture(npc); op(decline, npc, 1, [3]);
     assert.notEqual(decline.modalMain, id('Component', 'shop_template'), 'declining the dialogue offer does not open a shop');
     assert(texts(decline).includes('No thanks.'));
@@ -225,58 +226,58 @@ check('each placed cape seller opens the original shop from Trade and Talk and t
 
 check('bartender Trade sells the sourced drink through dialogue without opening an invented shop or changing later quest stages', () => {
   const npc = nativeNpc(nativeNpcRows('fourdiamonds_bartender')[0]);
-  const stage = id('VarPlayerType', 'deserttreasure'), brew = id('ObjType', 'bandit_brew');
+  const stage = id('VarBitType', 'deserttreasure'), brew = id('ObjType', 'bandit_brew');
   for (const before of [1, 5, 6, 7, 14]) {
-    const p = fixture(npc, 650); p.setVar(stage, before);
+    const p = fixture(npc, 650); p.setVarBit(stage, before);
     op(p, npc, 3, [1]);
-    assert(texts(p).includes("What's that? You wanna buy a beer? It'll cost ya 650 coins."));
-    assert(!texts(p).includes("If you're not buying anything, I have nothing to say to you."), 'Trade skips the Talk-only greeting and first menu');
+    assert(transcript(p).includes("What's that? You wanna buy a beer? It'll cost ya 650 coins."));
+    assert(!transcript(p).includes("If you're not buying anything, I have nothing to say to you."), 'Trade skips the Talk-only greeting and first menu');
     assert.equal(p.invTotal(inv, coins), 0); assert.equal(p.invTotal(inv, brew), 1);
-    assert.equal(p.getVar(stage), before === 5 ? 6 : before);
+    assert.equal(p.getVarBit(stage), before === 5 ? 6 : before);
     assert.notEqual(p.modalMain, id('Component', 'shop_template'), 'the bar uses dialogue, not a stock interface');
   }
   for (const [money, choices] of [[649, [1]], [650, [2]]]) {
-    const p = fixture(npc, money); p.setVar(stage, 1); op(p, npc, 3, choices);
+    const p = fixture(npc, money); p.setVarBit(stage, 1); op(p, npc, 3, choices);
     assert.equal(p.invTotal(inv, coins), money); assert.equal(p.invTotal(inv, brew), 0);
     assert.notEqual(p.modalMain, id('Component', 'shop_template'));
   }
-  const full = fixture(npc, 650); full.setVar(stage, 1); full.invAdd(inv, id('ObjType', 'pot'), 27);
+  const full = fixture(npc, 650); full.setVarBit(stage, 1); full.invAdd(inv, id('ObjType', 'pot_empty'), 27);
   op(full, npc, 3, [1]);
   assert.equal(full.invTotal(inv, coins), 650); assert.equal(full.invTotal(inv, brew), 0);
 });
 
 check('bartender refuses unstarted accounts and exposes the sourced bar only after genuine quest completion', () => {
-  const npc = nativeNpc(nativeNpcRows('fourdiamonds_bartender')[0]), stage = id('VarPlayerType', 'deserttreasure');
+  const npc = nativeNpc(nativeNpcRows('fourdiamonds_bartender')[0]), stage = id('VarBitType', 'deserttreasure');
   for (const [option, line] of [[1, 'Get out of here. I have nothing to say to the likes of you.'], [3, "Get out of here, we don't like your sort in these parts."]]) {
     const p = fixture(npc, 650); op(p, npc, option);
-    assert(texts(p).includes(line)); assert.equal(p.invTotal(inv, coins), 650);
+    assert(transcript(p).includes(line)); assert.equal(p.invTotal(inv, coins), 650);
     assert.equal(p.invTotal(inv, id('ObjType', 'bandit_brew')), 0);
     assert.notEqual(p.modalMain, id('Component', 'shop_template'));
   }
   const type = types.InvType.get(id('InvType', 'fd_bandit_bar')), brew = id('ObjType', 'bandit_brew');
   assert.deepEqual([...type.stockobj], [brew]); assert.deepEqual([...type.stockcount], [10]); assert.deepEqual([...type.stockrate], [100]);
-  const trade = fixture(npc); trade.setVar(stage, 15); op(trade, npc, 3);
+  const trade = fixture(npc); trade.setVarBit(stage, 15); op(trade, npc, 3);
   const shop = openShop(trade, 'fd_bandit_bar', 'The Big Heist Lodge');
   purchaseAndSale(trade, shop, brew, 10, 100, 650, 350);
-  assert.equal(trade.getVar(stage), 15);
+  assert.equal(trade.getVarBit(stage), 15);
   for (const [gender, word] of [[0, 'fella'], [1, 'lass']]) {
-    const p = fixture(npc); p.gender = gender; p.setVar(stage, 15); op(p, npc, 1, [1]);
+    const p = fixture(npc); p.gender = gender; p.setVarBit(stage, 15); op(p, npc, 1, [1]);
     openShop(p, 'fd_bandit_bar', 'The Big Heist Lodge');
-    assert(texts(p).includes(`So you're the ${word} that freed Azzanadra, huh? Fair play to ya. What will you have?`));
+    assert(transcript(p).includes(`So you're the ${word} that freed Azzanadra, huh? Fair play to ya. What will you have?`));
   }
-  const decline = fixture(npc); decline.setVar(stage, 15); op(decline, npc, 1, [2]);
-  assert(texts(decline).includes("Didn't feel like a drink after all, huh? Well, stop by anytime, hero."));
+  const decline = fixture(npc); decline.setVarBit(stage, 15); op(decline, npc, 1, [2]);
+  assert(transcript(decline).includes("Didn't feel like a drink after all, huh? Well, stop by anytime, hero."));
   assert.notEqual(decline.modalMain, id('Component', 'shop_template'));
 });
 
 check('existing bartender Talk purchase and four-diamonds progression remain intact', () => {
   const row = nativeNpcRows('fourdiamonds_bartender')[0]; assert(row, 'native desert bartender');
-  const npc = nativeNpc(row), brew = id('ObjType', 'bandit_brew'), stage = id('VarPlayerType', 'deserttreasure');
+  const npc = nativeNpc(row), brew = id('ObjType', 'bandit_brew'), stage = id('VarBitType', 'deserttreasure');
   assert.equal(row.mx, 49); assert.equal(row.mz, 46);
   for (const [before, money, choices, after, drinks] of [[0, 649, [], 0, 0], [1, 649, [1], 1, 0], [5, 650, [1, 1], 6, 1], [6, 0, [2], 7, 0]]) {
-    const p = fixture(npc, money); p.setVar(stage, before);
+    const p = fixture(npc, money); p.setVarBit(stage, before);
     op(p, npc, 1, choices);
-    assert.equal(p.getVar(stage), after, 'only existing successful purchase or rumor advances the quest');
+    assert.equal(p.getVarBit(stage), after, 'only existing successful purchase or rumor advances the quest');
     assert.equal(p.invTotal(inv, brew), drinks);
     assert.equal(p.invTotal(inv, coins), drinks ? money - 650 : money);
   }
