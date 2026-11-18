@@ -142,7 +142,19 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
     assert.equal(p.getVarBit(types.VarBitType.getId('soulbane_prog')), 2, 'accepted stage-1 descent starts Rage');
     assert.equal(p.getVar(types.VarPlayerType.getId('soulbane_instance')), instance.uid + 1, 'descent binds the created region');
     assert.equal(p.overlay, types.Component.getId('rage_level'));
-    assert.deepEqual(changedVars.map(change => change.id).sort((a, b) => a - b), ['soulbane', 'soulbane_instance'].map(name => types.VarPlayerType.getId(name)).sort((a, b) => a - b), 'descent writes only its quest progress and temporary region handle');
+    const musicTable = types.DbTableType.get(types.DbTableType.getId('music'));
+    const wrath = types.DbRowType.get(types.DbRowType.getId('music_Wrath_and_Ruin'));
+    const unlockColumn = musicTable.columnNames.indexOf('unlock');
+    assert(unlockColumn >= 0, 'built music table declares its unlock field');
+    const unlock = wrath.columnValues[unlockColumn];
+    assert(Array.isArray(unlock) && unlock.length === 2, 'built Wrath row declares its unlock slot and bit');
+    const [slot, bit] = unlock;
+    assert(Number.isInteger(slot) && Number.isInteger(bit) && bit >= 0 && bit < 32, 'built Wrath unlock is valid');
+    const musicVarp = types.VarPlayerType.getId(`musicmulti_${slot}`);
+    assert(musicVarp >= 0, 'built Wrath unlock varp exists');
+    assert.equal(p.getVar(musicVarp) >>> 0, (beforeVars[musicVarp] | (1 << bit)) >>> 0, 'descent sets only the built Wrath unlock bit');
+    const expectedVarps = ['soulbane', 'soulbane_instance'].map(name => types.VarPlayerType.getId(name)).concat(musicVarp);
+    assert.deepEqual(changedVars.map(change => change.id).sort((a, b) => a - b), expectedVarps.sort((a, b) => a - b), 'descent writes only its quest progress, temporary region handle and Wrath unlock');
   } else {
     assert.deepEqual(after.coordinates, before.coordinates);
     assert.equal(after.itemCount, before.itemCount - 1);
