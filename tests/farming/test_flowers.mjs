@@ -280,6 +280,14 @@ try {
     });
 
     test(`${flower.name}: native Pick is one fixed-yield transaction with one XP award`, () => {
+      const noSpade = fixture({ level: 1, stage: flower.mature });
+      assert(click(noSpade, patchLocs[0], 1), 'native Pick reaches the UNKNOWN spade gate');
+      assert.equal(stage(noSpade), flower.mature, 'missing-spade Pick leaves the mature crop intact');
+      assert.equal(count(noSpade, flower.produce), 0, 'missing-spade Pick gives no produce');
+      assert.equal(farmingXp(noSpade), 0, 'missing-spade Pick gives no XP');
+      assert.deepEqual(noSpade.messages, ['You need a spade to do that.'],
+        'missing-spade Pick uses the published shared refusal line');
+
       const p = fixture({ level: 1, stage: flower.mature });
       add(p, 'spade');
       const xpBefore = farmingXp(p);

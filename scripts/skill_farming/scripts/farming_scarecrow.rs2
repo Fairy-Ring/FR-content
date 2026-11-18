@@ -1,6 +1,7 @@
 // VERIFIED Tip.It Farming guide, captured 28 April 2006, Scarecrows:
 // empty sack + hay bale; hay sack + bronze spear; watermelon for the head.
 // The original object declarations and patch bytes are reused unchanged.
+// UNKNOWN extension from period bales to haystacks; no cited source gives it.
 [oplocu,haystack] @farming_scarecrow_hay;
 [oplocu,haystack2] @farming_scarecrow_hay;
 [oplocu,haystack3] @farming_scarecrow_hay;
@@ -65,6 +66,7 @@ if (last_useitem ! spade) {
     return;
 }
 if (inv_freespace(inv) < 1) {
+    // UNKNOWN functional inventory-full wording.
     mes("You don't have enough inventory space.");
     return;
 }

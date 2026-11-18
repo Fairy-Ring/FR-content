@@ -137,6 +137,7 @@ if (last_useitem = rake & (($stage >= 0 & $stage < ^farming_veg_weeded) | ($stag
     ~farming_rake_step(false);
     return;
 }
+// UNKNOWN placement on a weedy patch; cache weed forms do not prove the gate.
 if (last_useitem = scarecrow_complete & $stage >= 0 & $stage <= ^farming_veg_weeded) {
     ~farming_scarecrow_install($stage);
     return;
@@ -196,13 +197,14 @@ if ($stage ! db_getfield($crop, farming_flower:mature, 0)) {
     ~displaymessage(^dm_farming_patch_no_crops);
     return;
 }
-// CANDIDATE inference from period general spade guidance; flower-specific gate unconfirmed.
+// UNKNOWN flower-specific spade gate; general period wording does not establish it.
 if (inv_total(inv, spade) < 1) {
     ~displaymessage(^dm_farming_spade);
     return;
 }
 def_int $yield = db_getfield($crop, farming_flower:yield, 0);
 if (inv_freespace(inv) < $yield) {
+    // UNKNOWN functional inventory-full wording.
     mes("You don't have enough inventory space.");
     return;
 }
