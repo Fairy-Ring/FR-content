@@ -11,5 +11,9 @@
 ^mdaughter_cave_tree = 0_43_57_57_54
 ^mdaughter_cave_surface = 0_43_57_56_54
 ^mdaughter_cave_inside = 0_43_157_56_56
-// UNKNOWN dynamic-location lifetime; used only for temporary tree/bridge/rock states.
+// UNKNOWN dynamic-location lifetime; used only for temporary tree/rock states.
 ^mdaughter_travel_loc_lifetime = 6000
+// Internal crossing-motion selectors, not historical values.
+^mdaughter_cross_tree = 0
+^mdaughter_cross_pole = 1
+^mdaughter_cross_plank = 2

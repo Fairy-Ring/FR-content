@@ -429,12 +429,48 @@ function collectMudAtCellStand(p) {
   assert.equal(count(p, 'mdaughter_mud'), 1, 'the compiled supply operation produces mud');
 }
 
-function useLocFromStand(p, item, target, start, label) {
+function crossWithItem(p, item, target, start, landing, label) {
   moveToTile(p, start, `${label} native walk to the island edge`);
-  const before = count(p, item);
-  assert(useLoc(p, item, target), `${label} item-on-location client action accepted`);
-  for (let step = 0; step < 256 && (count(p, item) === before || weakCount(p) > 0); step++) interactionTick(p);
-  assert.equal(count(p, item), before - 1, `${label} consumes its input through production dispatch`);
+  const before = count(p, item), moves = [], exactMoves = [];
+  const bridge = travelConstants().get('mdaughter_plank_bridge');
+  const teleport = p.teleport, exactMove = p.exactMove;
+  p.teleport = function(...args) {
+    const from = tile(this);
+    const result = teleport.apply(this, args);
+    moves.push({ from, to: tile(this), bridge: !!World.getLoc(bridge.x, bridge.z, bridge.level, id('LocType', 'mdaughter_short_plank')) });
+    return result;
+  };
+  p.exactMove = function(...args) {
+    exactMoves.push({ args, animation: this.animId });
+    return exactMove.apply(this, args);
+  };
+  try {
+    assert(useLoc(p, item, target), `${label} item-on-location client action accepted`);
+    for (let step = 0; step < 256; step++) {
+      if (p.level === landing.level && p.x === landing.x && p.z === landing.z && weakCount(p) === 0
+        && (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
+      interactionTick(p);
+    }
+  } finally {
+    p.teleport = teleport;
+    p.exactMove = exactMove;
+  }
+  assert.deepEqual(tile(p), [landing.level, landing.x, landing.z], `${label} reaches its actual packed-map landing`);
+  assert.equal(count(p, item), before, `${label} retains its crossing item`);
+  if (item === 'mdaughter_stick') {
+    const sequence = id('SeqType', 'mdaughter_pole_vault');
+    assert.deepEqual(exactMoves, [{ args: [start.x, start.z, landing.x, landing.z, 0,
+      types.SeqType.get(sequence).duration, landing.z > start.z ? 0 : 2], animation: sequence }],
+    `${label} sends the named pole-vault animation and a full-sequence exact movement`);
+  } else {
+    assert.equal(exactMoves.length, 0, `${label} uses ordinary walking, not a borrowed obstacle animation`);
+    assert.deepEqual(moves.map(move => move.to), Array.from({ length: Math.abs(landing.x - start.x) }, (_, i) =>
+      [start.level, start.x + Math.sign(landing.x - start.x) * (i + 1), start.z]),
+    `${label} walks every tile across the gap instead of teleporting to its endpoint`);
+    assert(moves.every(move => move.bridge), `${label} displays the laid plank throughout the walk`);
+    assert(!World.getLoc(bridge.x, bridge.z, bridge.level, id('LocType', 'mdaughter_short_plank')),
+      `${label} removes the temporary bridge after crossing`);
+  }
 }
 
 function travelToCenter(p) {
@@ -442,7 +478,8 @@ function travelToCenter(p) {
   const tree = scanLoc('mdaughter_lake_tree', MAP.camp)[0];
   const pole = scanLoc('mdaughter_polerocks', MAP.camp)[0];
   const flatstone = scanLoc('mdaughter_flatstone1', MAP.camp)[0];
-  assert(tree && pole && flatstone, 'packed tree, pole rocks, and west flatstone exist');
+  const flatstoneReturn = scanLoc('mdaughter_flatstone2', MAP.camp)[0];
+  assert(tree && pole && flatstone && flatstoneReturn, 'both visible flatstone forms and the tree/pole rocks exist');
 
   collectMudAtCellStand(p);
   goToStand(p, tree);
@@ -468,13 +505,12 @@ function travelToCenter(p) {
 
   crossBoundedTravel(p, tree, 3, 'mdaughter_tree_shore', 'mdaughter_tree_island', 5, 'Lake-tree bounded native approach');
   moveToTile(p, endpoints.get('mdaughter_pole_first_island'), 'walk to goat-pen pole start');
-  const poleStart = tile(p);
-  operate(p, pole, 'loc', 1, [], 'Pole crossing without the stick', true);
-  assert.deepEqual(tile(p), poleStart, 'pole crossing refuses without mdaughter_stick');
+  operate(p, pole, 'loc', 1, [], 'Jump-across pole rocks without using the stick', true);
+  const shore = endpoints.get('mdaughter_tree_shore');
+  assert.deepEqual(tile(p), [shore.level, shore.x, shore.z], 'unaided pole-rock Jump-across returns to shore');
+  assert(p.messages.includes('You slip and fall into the water!'));
+  assert(p.messages.includes('You only just manage to get to shore!'));
   assert.equal(count(p, 'mdaughter_stick'), 0);
-
-  moveToTile(p, endpoints.get('mdaughter_tree_island'), 'return to lake-tree island');
-  crossTravel(p, tree, 3, 'mdaughter_tree_island', 'mdaughter_tree_shore', 5, 'Return across lake tree');
   const sticks = scanObj('mdaughter_stick', MAP.camp, p.hash64);
   assert(sticks.length > 0, 'the static mdaughter_stick ground object exists');
   goToStand(p, sticks[0]);
@@ -484,26 +520,23 @@ function travelToCenter(p) {
 
   crossTravel(p, tree, 3, 'mdaughter_tree_shore', 'mdaughter_tree_island', 5, 'Lake-tree crossing with mud and Agility');
   moveToTile(p, endpoints.get('mdaughter_pole_first_island'), 'walk to pole start with stick');
-  crossTravel(p, pole, 1, 'mdaughter_pole_first_island', 'mdaughter_pole_second_island', 3, 'Pole crossing with stick');
+  crossWithItem(p, 'mdaughter_stick', pole, endpoints.get('mdaughter_pole_first_island'), endpoints.get('mdaughter_pole_second_island'), 'Pole crossing with stick');
   moveToTile(p, endpoints.get('mdaughter_stone_west_island'), 'walk to west flatstone');
-  const westTile = tile(p);
-  operate(p, flatstone, 'loc', 1, [], 'Flatstone crossing before bridge', true);
-  assert.deepEqual(tile(p), westTile, 'flatstone crossing refuses before the plank bridge exists');
-
-  useLocFromStand(p, 'woodplank', flatstone, endpoints.get('mdaughter_stone_west_island'), 'Place the temporary plank');
-  const bridgePoint = endpoints.get('mdaughter_plank_bridge');
-  assert(World.getLoc(bridgePoint.x, bridgePoint.z, bridgePoint.level, id('LocType', 'mdaughter_short_plank')),
-    'item-on-flatstone creates the packed temporary bridge loc');
-  assert.deepEqual(tile(p), [0, 2779, 3691], 'placing the plank crosses to the actual center-island landing');
-  crossTravel(p, flatstone, 1, 'mdaughter_stone_center_island', 'mdaughter_stone_west_island', 4, 'Return across the placed plank');
-  crossTravel(p, flatstone, 1, 'mdaughter_stone_west_island', 'mdaughter_stone_center_island', 4, 'Flatstone crossing with plank');
-  return { endpoints, tree, pole, flatstone };
+  operate(p, flatstone, 'loc', 1, [], 'Jump-across flatstone without using a plank', true);
+  assert.deepEqual(tile(p), [shore.level, shore.x, shore.z], 'unaided flatstone Jump-across returns to shore');
+  assert.equal(count(p, 'woodplank'), 1, 'a failed unaided jump does not consume a carried plank');
+  crossTravel(p, tree, 3, 'mdaughter_tree_shore', 'mdaughter_tree_island', 5, 'Tree crossing after the unaided jump');
+  crossWithItem(p, 'mdaughter_stick', pole, endpoints.get('mdaughter_pole_first_island'), endpoints.get('mdaughter_pole_second_island'), 'Pole crossing after the unaided jump');
+  crossWithItem(p, 'woodplank', flatstone, endpoints.get('mdaughter_stone_west_island'), endpoints.get('mdaughter_stone_center_island'), 'Place and cross the temporary plank');
+  crossWithItem(p, 'woodplank', flatstoneReturn, endpoints.get('mdaughter_stone_center_island'), endpoints.get('mdaughter_stone_west_island'), 'Return with the same plank');
+  crossWithItem(p, 'woodplank', flatstone, endpoints.get('mdaughter_stone_west_island'), endpoints.get('mdaughter_stone_center_island'), 'Cross again with the same plank');
+  return { endpoints, tree, pole, flatstone, flatstoneReturn };
 }
 
-function returnToCamp(p, { endpoints, tree, pole, flatstone }) {
-  crossTravel(p, flatstone, 1, 'mdaughter_stone_center_island', 'mdaughter_stone_west_island', 4, 'Return across flatstones');
+function returnToCamp(p, { endpoints, tree, pole, flatstoneReturn }) {
+  crossWithItem(p, 'woodplank', flatstoneReturn, endpoints.get('mdaughter_stone_center_island'), endpoints.get('mdaughter_stone_west_island'), 'Return across flatstones');
   moveToTile(p, endpoints.get('mdaughter_pole_second_island'), 'walk to pole return start');
-  crossTravel(p, pole, 1, 'mdaughter_pole_second_island', 'mdaughter_pole_first_island', 3, 'Return across pole');
+  crossWithItem(p, 'mdaughter_stick', pole, endpoints.get('mdaughter_pole_second_island'), endpoints.get('mdaughter_pole_first_island'), 'Return across pole');
   moveToTile(p, endpoints.get('mdaughter_tree_island'), 'walk to lake-tree return start');
   crossTravel(p, tree, 3, 'mdaughter_tree_island', 'mdaughter_tree_shore', 5, 'Return across lake tree to camp');
 }
@@ -566,8 +599,8 @@ function visitPool(p, travel, expected) {
   const { tree, pole, flatstone } = travel;
   moveToTile(p, travel.endpoints.get('mdaughter_tree_shore'), 'walk back to the pool route');
   crossTravel(p, tree, 3, 'mdaughter_tree_shore', 'mdaughter_tree_island', 5, 'Revisit tree crossing');
-  crossTravel(p, pole, 1, 'mdaughter_pole_first_island', 'mdaughter_pole_second_island', 3, 'Revisit pole crossing');
-  crossTravel(p, flatstone, 1, 'mdaughter_stone_west_island', 'mdaughter_stone_center_island', 4, 'Revisit plank crossing');
+  crossWithItem(p, 'mdaughter_stick', pole, travel.endpoints.get('mdaughter_pole_first_island'), travel.endpoints.get('mdaughter_pole_second_island'), 'Revisit pole crossing');
+  crossWithItem(p, 'woodplank', flatstone, travel.endpoints.get('mdaughter_stone_west_island'), travel.endpoints.get('mdaughter_stone_center_island'), 'Revisit plank crossing');
   const gas = scanLoc('mdaughter_sulphar_gas').sort((a, b) => Math.abs(a.x - p.x) + Math.abs(a.z - p.z) - Math.abs(b.x - p.x) - Math.abs(b.z - p.z))[0];
   goToStand(p, gas, { minX: 2779, maxX: 2786, minZ: 3690, maxZ: 3696 });
   operate(p, gas, 'loc', 1, [], 'Return to Asleif');

@@ -13,9 +13,9 @@ if (%mdaughter_mud_var ! 1 | stat(agility) < 20) {
     return;
 }
 if (coordx(coord) >= coordx(^mdaughter_tree_island) & coordz(coord) >= coordz(^mdaughter_tree_island)) {
-    ~mdaughter_travel_cross(^mdaughter_tree_island, ^mdaughter_tree_shore);
+    ~mdaughter_travel_cross(^mdaughter_tree_island, ^mdaughter_tree_shore, ^mdaughter_cross_tree);
 } else {
-    ~mdaughter_travel_cross(^mdaughter_tree_shore, ^mdaughter_tree_island);
+    ~mdaughter_travel_cross(^mdaughter_tree_shore, ^mdaughter_tree_island, ^mdaughter_cross_tree);
 }
 
 // The visible Jump-across operation also works from the packed dry approach tiles.
@@ -35,11 +35,8 @@ if (distance(coord, loc_coord) > 3) {
 @mdaughter_use_pole;
 
 [label,mdaughter_try_pole]
-if (inv_total(inv, mdaughter_stick) = 0 & inv_total(worn, mdaughter_stick) = 0 & inv_totalcat(inv, weapon_staff) = 0 & inv_totalcat(worn, weapon_staff) = 0) {
-    ~displaymessage(^dm_default);
-    return;
-}
-@mdaughter_cross_pole;
+// CANDIDATE later transcript: Jump-across without using a suitable item fails.
+@mdaughter_crossing_failed;
 
 [label,mdaughter_use_pole]
 if (last_useitem ! mdaughter_stick & oc_category(last_useitem) ! weapon_staff) {
@@ -50,12 +47,12 @@ if (last_useitem ! mdaughter_stick & oc_category(last_useitem) ! weapon_staff) {
 
 [label,mdaughter_cross_pole]
 if (coordz(coord) >= coordz(^mdaughter_pole_second_island)) {
-    ~mdaughter_travel_cross(^mdaughter_pole_second_island, ^mdaughter_pole_first_island);
+    ~mdaughter_travel_cross(^mdaughter_pole_second_island, ^mdaughter_pole_first_island, ^mdaughter_cross_pole);
 } else {
-    ~mdaughter_travel_cross(^mdaughter_pole_first_island, ^mdaughter_pole_second_island);
+    ~mdaughter_travel_cross(^mdaughter_pole_first_island, ^mdaughter_pole_second_island, ^mdaughter_cross_pole);
 }
 
-// The plank is a temporary bridge loc; keep both original Jump-across ops visible.
+// CANDIDATE later guide: use and retain the plank on each crossing, in either direction.
 [oplocu,mdaughter_flatstone1] @mdaughter_place_plank;
 [aplocu,mdaughter_flatstone1] @mdaughter_place_plank_ap;
 [oplocu,mdaughter_flatstone2] @mdaughter_place_plank;
@@ -80,36 +77,50 @@ if (distance(coord, loc_coord) > 4) {
 @mdaughter_cross_flatstones;
 
 [label,mdaughter_place_plank]
-if (last_useitem ! woodplank | loc_find(^mdaughter_plank_bridge, mdaughter_short_plank) = true) {
-    ~displaymessage(^dm_default);
-    return;
-}
-// VERIFIED grounddecor (22), matching the packed flatstone rows.
-loc_add(^mdaughter_plank_bridge, mdaughter_short_plank, 0, grounddecor, ^mdaughter_travel_loc_lifetime);
-inv_del(inv, woodplank, 1);
-@mdaughter_cross_flatstones;
-
-[label,mdaughter_cross_flatstones]
-if (loc_find(^mdaughter_plank_bridge, mdaughter_short_plank) = false) {
+if (last_useitem ! woodplank) {
     ~displaymessage(^dm_default);
     return;
 }
 if (coordx(coord) >= coordx(^mdaughter_stone_center_island)) {
-    ~mdaughter_travel_cross(^mdaughter_stone_center_island, ^mdaughter_stone_west_island);
+    ~mdaughter_travel_cross(^mdaughter_stone_center_island, ^mdaughter_stone_west_island, ^mdaughter_cross_plank);
 } else {
-    ~mdaughter_travel_cross(^mdaughter_stone_west_island, ^mdaughter_stone_center_island);
+    ~mdaughter_travel_cross(^mdaughter_stone_west_island, ^mdaughter_stone_center_island, ^mdaughter_cross_plank);
 }
 
-[proc,mdaughter_travel_cross](coord $start, coord $landing)
+[label,mdaughter_cross_flatstones]
+@mdaughter_crossing_failed;
+
+[label,mdaughter_crossing_failed]
+// CANDIDATE transcript wording; UNKNOWN exact shore tile. No sourced damage or chance.
+mes("You slip and fall into the water!");
+p_telejump(^mdaughter_tree_shore);
+mes("You only just manage to get to shore!");
+
+[proc,mdaughter_travel_cross](coord $start, coord $landing, int $crossing)
 if (coord ! $start) {
     p_walk($start);
-    weakqueue*(mdaughter_travel_approach, 0)($start, $landing);
+    weakqueue*(mdaughter_travel_approach, 0)($start, $landing, $crossing);
     return;
 }
-p_telejump($landing);
+switch_int($crossing) {
+    case ^mdaughter_cross_tree :
+        p_telejump($landing);
+    case ^mdaughter_cross_pole :
+        // VERIFIED named cache sequence/held-pole override; CANDIDATE crossing assignment.
+        def_int $direction = ^exact_north;
+        if (coordz($landing) < coordz($start)) $direction = ^exact_south;
+        anim(mdaughter_pole_vault, 0);
+        p_exactmove($start, $landing, 0, seqlength(mdaughter_pole_vault), $direction);
+        p_delay(calc((seqlength(mdaughter_pole_vault) + 29) / 30));
+    case ^mdaughter_cross_plank :
+        // The cache supplies the laid plank, but no identified lay/retrieve sequence.
+        // Its lifetime follows the ordinary one-tile-per-tick forced walk.
+        loc_add(^mdaughter_plank_bridge, mdaughter_short_plank, 0, grounddecor, distance($start, $landing));
+        ~forcemove($landing);
+}
 
-[queue,mdaughter_travel_approach](coord $start, coord $landing)
-~mdaughter_travel_cross($start, $landing);
+[queue,mdaughter_travel_approach](coord $start, coord $landing, int $crossing)
+~mdaughter_travel_cross($start, $landing, $crossing);
 
 // Chop the path tree with the ordinary woodcutting axe checker; it returns to cache state later.
 [oploc1,mdaughter_impassable_tree2] @mdaughter_chop_cave_tree;
