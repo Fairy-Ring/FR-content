@@ -117,9 +117,12 @@ if ($stage < $mature | $stage > $last) {
     ~displaymessage(^dm_farming_patch_no_crops);
     return;
 }
-// VERIFIED period Tip.It: a spade is needed to harvest crops.
-// UNKNOWN refusal wording: leave this new missing-tool refusal silent.
-if (inv_total(inv, spade) < 1) return;
+// CANDIDATE herb spade gate: Old School Herb patch; period Tip.It says "some patches".
+// CANDIDATE Lost City wording, shared with potato and allotment harvests.
+if (inv_total(inv, spade) < 1) {
+    ~displaymessage(^dm_farming_spade);
+    return;
+}
 if (inv_freespace(inv) < 1) {
     mes("You don't have enough inventory space.");
     return;

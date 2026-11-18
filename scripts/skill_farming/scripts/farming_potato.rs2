@@ -217,7 +217,8 @@ if (inv_freespace(inv) < 1) {
     return;
 }
 if (~farming_harvest_ready($automatic) = false) return;
-// CANDIDATE cache-tool attribution.
+// CANDIDATE: herb picking sequence chosen by its low-picking motion.
+// UNKNOWN allotment binding: human_dig is the open spade-animation alternative.
 anim(picking_low, 0);
 inv_add(inv, potato, 1);
 // VERIFIED period Tip.It harvest XP.

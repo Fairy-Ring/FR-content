@@ -378,6 +378,8 @@ test('herb Pick requires a spade and a full inventory refuses without rewards or
   const herb = herbs[0];
   const mature = fixture(loc, herb.mature);
   withPlayerTick(mature, () => assertRefused(mature, loc, () => click(mature, loc, 1), { [herb.produce]: 0, spade: 0 }));
+  // CANDIDATE Lost City display-message wording, shared by the other harvests.
+  assert.deepEqual(mature.messages, ['You need a spade to do that.'], 'missing-spade Pick gives the existing harvest hint');
 
   const full = fixture(loc, herb.mature);
   const capacity = types.InvType.get(inv).size;
