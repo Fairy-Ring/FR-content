@@ -49,7 +49,7 @@ walktrigger(soulbane_scene_resume);
 if (getqueue(soulbane_rage_complete) = 0) queue(soulbane_rage_complete, 0, 0);
 
 [proc,soulbane_rage_burst]
-npc_findallany(region_getcoord(0, 64, 32), 64, 0);
+npc_findallany(region_getcoord(0, ^soulbane_region_midpoint, ^soulbane_region_midpoint), ^soulbane_region_midpoint, 0);
 while (npc_findnext = true) {
     if (~soulbane_rage_npc = true & %npc_attacking_uid = uid) {
         npc_setmode(none);
@@ -62,7 +62,7 @@ while (npc_findnext = true) {
 }
 
 [proc,soulbane_clear_room_npcs]
-npc_findallany(region_getcoord(0, 64, 32), 64, 0);
+npc_findallany(region_getcoord(0, ^soulbane_region_midpoint, ^soulbane_region_midpoint), ^soulbane_region_midpoint, 0);
 while (npc_findnext = true) {
     if (%npc_attacking_uid = uid & %npc_int = %soulbane_instance) npc_del;
 }

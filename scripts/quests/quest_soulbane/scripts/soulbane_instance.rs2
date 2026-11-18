@@ -5,16 +5,28 @@
 [proc,soulbane_enter]
 if (%soulbane_prog < 1 | %soulbane_prog > 5) return;
 ~soulbane_cleanup;
-def_coord $sw = region_create(1, 16, 8);
+def_coord $sw = region_create(1, ^soulbane_region_zones, ^soulbane_region_zones);
 def_int $x = 0;
 while ($x < 8) {
     def_int $z = 0;
     while ($z < 8) {
         region_set(0, $x, $z, movecoord(0_47_81_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
-        region_set(0, add($x, 8), $z, movecoord(0_51_53_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
+        // Map only: native path/reach tests keep this neighbouring variant inaccessible.
+        region_set(0, add($x, 8), $z, movecoord(0_48_81_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
         $z = add($z, 1);
     }
     $x = add($x, 1);
+}
+// Leave six blank zones between every room zone and the memory copies.
+def_int $scene_x = 0;
+while ($scene_x < ^soulbane_memory_zones) {
+    def_int $scene_z = 0;
+    while ($scene_z < ^soulbane_memory_zones) {
+        region_set(0, $scene_x, add($scene_z, ^soulbane_memory_zone_north), movecoord(^soulbane_scene_source, multiply($scene_x, 8), 0, multiply($scene_z, 8)), 0);
+        region_set(0, add($scene_x, ^soulbane_memory_zone_east), add($scene_z, ^soulbane_memory_zone_north), movecoord(^soulbane_fear_scene_source, multiply($scene_x, 8), 0, multiply($scene_z, 8)), 0);
+        $scene_z = add($scene_z, 1);
+    }
+    $scene_x = add($scene_x, 1);
 }
 region_setexitcoord(^soulbane_surface);
 %soulbane_instance = add(region_uid, 1);
@@ -37,10 +49,13 @@ if (%soulbane_prog = 2) {
     mes("Arrghh, It's not fair! Feel my ANGER!");
 }
 
-// The two original map squares have distinct offsets in the private copy.
+// Only the selected original memory patches are copied, at isolated offsets.
 [proc,soulbane_room_coord](coord $template)(coord)
-if (coordx($template) >= 3264) {
-    return(region_getcoord(0, add(64, sub(coordx($template), 3264)), sub(coordz($template), 3392)));
+if (coordx($template) >= coordx(^soulbane_scene_source)) {
+    if (coordz($template) >= coordz(^soulbane_fear_scene_source)) {
+        return(region_getcoord(0, add(^soulbane_memory_tile_east, sub(coordx($template), coordx(^soulbane_fear_scene_source))), add(^soulbane_memory_tile_north, sub(coordz($template), coordz(^soulbane_fear_scene_source)))));
+    }
+    return(region_getcoord(0, sub(coordx($template), coordx(^soulbane_scene_source)), add(^soulbane_memory_tile_north, sub(coordz($template), coordz(^soulbane_scene_source)))));
 }
 return(region_getcoord(0, sub(coordx($template), 3008), sub(coordz($template), 5184)));
 
