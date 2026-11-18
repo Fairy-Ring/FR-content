@@ -445,5 +445,76 @@ for (const [name, first, , , payment, quantity] of crops) test(`${name}: compile
   }
   assert.equal(p.getVar(care), 0); p.unlink();
 });
+// Six-item/page oracle: retained Dantaera RS3 2021 layout, Old School quote wording.
+const sales = [
+  ['plant_cure', 25, [1], 'Some plant cure.', "Plant cure, eh? I might have some put aside for myself. Tell you what, I'll sell you some plant cure for 25 coins if you like."],
+  ['bucket_compost', 35, [2], 'A bucket of compost.', "A bucket of compost, eh? I might have one spare... tell you what, I'll sell it to you for 35 coins if you like."],
+  ['rake', 15, [3], 'A rake.', "A rake, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like."],
+  ['watering_can_0', 25, [4, 1], 'A watering can.', "A watering can, eh? I might have one spare... tell you what, I'll sell it to you for 25 coins if you like."],
+  ['gardening_trowel', 15, [4, 2], 'A gardening trowel.', "A gardening trowel, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like."],
+  ['dibber', 15, [4, 3], 'A seed dibber.', "A seed dibber, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like."]
+];
+const yesSale = 'Yes, that sounds like a fair price.', noSale = 'No thanks, I can get that much cheaper elsewhere.';
+test('native sale pages retain six-item order and never offer the later plant pot', () => {
+  const p = player(), packets = [];
+  talk(p, 'kragen', [5, 4, 5], packets);
+  const options = (root, length) => Array.from({ length }, (_, index) =>
+    packets.filter(packet => packet.component === id('Component', `${root}:com_${index + 1}`)).at(-1)?.text);
+  assert.deepEqual(options('multi4', 4), ['Some plant cure.', 'A bucket of compost.', 'A rake.', '(See more items)']);
+  assert.deepEqual(options('multi5', 5), ['A watering can.', 'A gardening trowel.', 'A seed dibber.', '(See previous items)', 'Forget it.']);
+  assert(!packets.some(packet => packet.text === 'A plant pot.'));
+  assert.equal(count(p, 'plantpot_empty'), 0); p.unlink();
+});
+for (const [item, price, route, request, offer] of sales) {
+  test(`${item}: native dialogue buys one plain item for exactly ${price} coins`, () => {
+    const p = player(); add(p, 'coins', price);
+    const text = talk(p, 'kragen', [5, ...route, 1]);
+    assert(text.includes("That depends on whether I have it to sell. What is it that you're looking for?"));
+    assert(text.includes(request)); assert(text.includes(offer)); assert(text.includes(yesSale));
+    assert(text.includes('Kragen hands over your purchase.'));
+    assert.equal(count(p, 'coins'), 0); assert.equal(count(p, item), 1);
+    assert.equal(count(p, `cert_${item}`), 0);
+    for (const [other] of sales) if (other !== item) assert.equal(count(p, other), 0);
+    assert.equal(p.getVar(care), 0); p.unlink();
+  });
+  test(`${item}: insufficient funds, decline and full inventory preserve the exchange`, () => {
+    for (const money of [0, price - 1]) {
+      const p = player(); if (money) add(p, 'coins', money);
+      const text = talk(p, 'kragen', [5, ...route]);
+      assert(text.includes(offer)); assert(text.includes("I don't have enough money for that, I'm afraid."));
+      assert(!text.includes('Kragen hands over your purchase.'));
+      assert.equal(count(p, 'coins'), money); assert.equal(count(p, item), 0); p.unlink();
+    }
+    const p = player(); add(p, 'coins', price);
+    const declined = talk(p, 'kragen', [5, ...route, 2]);
+    assert(declined.includes(noSale)); assert.equal(count(p, 'coins'), price); assert.equal(count(p, item), 0); p.unlink();
+    const full = player(); add(full, 'coins', price + 1); add(full, 'rake', 27);
+    const before = count(full, item), refused = talk(full, 'kragen', [5, ...route]);
+    assert(refused.includes("Actually, I don't think I'd be able to carry it."));
+    assert.equal(count(full, 'coins'), price + 1); assert.equal(count(full, item), before); full.unlink();
+  });
+}
+for (const name of gardeners) test(`${name}: native sell option preserves quest and care state`, () => {
+  const p = player(); p.setVarBit(fairy, 1); p.setVarBit(garden, 1); p.setVar(care, 0x555);
+  add(p, 'coins', 50);
+  const actor = types.NpcType.getByName(name);
+  for (let purchase = 1; purchase <= 2; purchase++) {
+    assert(talk(p, name, [5, 1, 1]).includes(`${actor.name} hands over your purchase.`));
+    assert.equal(count(p, 'coins'), 50 - 25 * purchase); assert.equal(count(p, 'plant_cure'), purchase);
+  }
+  assert.equal(p.getVarBit(fairy), 1); assert.equal(p.getVarBit(garden), 1);
+  assert.equal(p.getVar(visited), 0); assert.equal(p.getVar(care), 0x555); p.unlink();
+});
+test('native sale previous-items and forget branches do not make a purchase', () => {
+  const p = player(); add(p, 'coins', 25);
+  const text = talk(p, 'kragen', [5, 4, 4, 4, 5]);
+  assert(text.includes("Forget it, you don't have anything I need."));
+  assert.equal(count(p, 'coins'), 25); assert.equal(count(p, 'plant_cure'), 0); p.unlink();
+});
+test('native sale previous-items branch returns to the original purchase menu', () => {
+  const p = player(); add(p, 'coins', 25);
+  assert(talk(p, 'kragen', [5, 4, 4, 1, 1]).includes('Kragen hands over your purchase.'));
+  assert.equal(count(p, 'coins'), 0); assert.equal(count(p, 'plant_cure'), 1); p.unlink();
+});
 console.log(`${checks} gardener compiled checks passed`);
 process.exit(0);
