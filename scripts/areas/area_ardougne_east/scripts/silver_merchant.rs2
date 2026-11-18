@@ -6,6 +6,7 @@ if (getqueue(stolen_from_stall_silver) > 0) {
 ~chatnpc("<p,happy>Silver! Silver!|Best prices for buying and selling in all Kandarin!");
 
 def_int $option;
+// CANDIDATE quest option: OSRS transcript revision 15263331.
 if (%makinghistory_prog = 1) {
     $option = ~p_choice3("Yes please.", 1, "Ask about the outpost.", 3, "No thank you.", 2);
 } else {

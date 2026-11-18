@@ -1,4 +1,5 @@
 [opnpc1,kinglathas]
+// CANDIDATE quest options: OSRS transcript revision 15263331.
 if (%makinghistory_prog = 2 | %makinghistory_prog = 3) {
     if (~p_choice2("Talk about the outpost.", 1, "Talk about something else.", 2) = 1) {
         @mh_lathas;

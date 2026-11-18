@@ -321,6 +321,14 @@ for (const [restlessGhost, priestperil] of [[0, PRIESTPERIL_COMPLETE], [PRIEST_C
   assert.equal(count(player, 'makinghistory_chest'), 0);
   assert.equal(count(player, 'makinghistory_journal'), 1);
   assert.equal(count(player, 'makinghistory_key'), 1, 'the enchanted key is retained after opening the chest');
+
+  talk(player, 'makinghistory_jorral', [4]);
+  assert.equal(stage(player, 'makinghistory_trader_prog'), 4, 'Jorral accepts the journal before the repeated dig');
+  assert.equal(count(player, 'makinghistory_journal'), 0, 'the reported journal is no longer held');
+  held(player, 'spade', 1);
+  assert.equal(stage(player, 'makinghistory_trader_prog'), 4, 'digging after the journal report cannot reopen the trader track');
+  assert.equal(count(player, 'makinghistory_chest'), 0, 'digging after the journal report cannot recover another chest');
+  assert.equal(count(player, 'makinghistory_journal'), 0, 'digging after the journal report cannot recover another journal');
 }
 
 // Ghost-speak must be worn, and Melina rejects gifts until Droalak asks and rejects an unstrung amulet.
