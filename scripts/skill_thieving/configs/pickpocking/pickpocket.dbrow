@@ -36,12 +36,17 @@ data=pocket,woman's pocket
 [pickpocket_farmer]
 table=pickpocket
 data=npc,farmer1
+data=npc,farmer2
+data=npc,farmer3
 data=level,10
 data=experience,145
 data=stun_ticks,8
 data=stun_damage,1
 data=success_chance,150,240
 data=loot,coins,9,9,123
+// VERIFIED seed reward: Tip.It Thieving, 27 April 2006; CANDIDATE weight: OSRS Farmer.
+data=loot,potato_seed,1,1,5
+data=loot_total,128
 data=pocket,farmer's pocket
 
 [pickpocket_warrior]
