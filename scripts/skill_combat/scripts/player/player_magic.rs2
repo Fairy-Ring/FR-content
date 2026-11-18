@@ -96,6 +96,7 @@ if (~player_npc_hit_roll(^magic_style) = true) {
 
 // no 0 hp check for magic: you can attack slayer npcs when they're at 0 hp
 [proc,pvm_combat_spell_checks](dbrow $spell_data)(boolean)
+if (~champions_combat_check(^magic_style) = false) return(false);
 if (~swamp_cave_can_attack = false) return(false);
 if_close;
 p_stopaction;

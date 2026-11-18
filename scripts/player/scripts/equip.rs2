@@ -14,6 +14,7 @@ if (p_finduid(uid) = true) {
         mes("[DEBUG]: No wearpos set on <oc_debugname($obj)>");
         return;
     }
+    if (~champions_equip_check($obj) = false) return;
     if (~duel_arena_equip_check($obj) = false) {
         return;
     }
@@ -73,6 +74,7 @@ if (p_finduid(uid) = true) {
 
 [proc,unequip](int $slot)
 if (p_finduid(uid) = true) {
+    if (~champions_inventory_check = false) return;
     def_obj $obj = inv_getobj(worn, $slot);
     if (~duel_arena_flower_power_unequip_check($slot) = false) {
         return;

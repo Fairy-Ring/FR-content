@@ -230,7 +230,12 @@ function outcome(type, attack, seed, { original = false, successOnly = false, mi
   return original ? withPublished(action) : action();
 }
 function withoutGuard(commands) {
-  return commands.filter(c => !(c.command === 'NPC_PARAM' && [magicParam, ammoParam].includes(c.ints.at(-1))));
+  // Published ranged/cannon overrides lack the new guard before native type
+  // checks. Melee shares its guard in both controls, followed by P_STOPACTION.
+  const emptyType = c => c?.command === 'NPC_TYPE' && c.ints.length === 0 && c.strings.length === 0;
+  const leadingGuard = emptyType(commands[0]) && emptyType(commands[1]);
+  return commands.filter((c, i) => !(leadingGuard && i === 0) &&
+    !(c.command === 'NPC_PARAM' && [magicParam, ammoParam].includes(c.ints.at(-1))));
 }
 function assertIdentical(current, original, label) {
   const normalized = { ...current, commands: withoutGuard(current.commands) };
