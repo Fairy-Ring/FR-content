@@ -1,0 +1,104 @@
+// VERIFIED original 377 Rage exit/fire and rack blocks, moved without field changes.
+[soulbane_firewall_multi]
+active=yes
+anim=firewall
+blockwalk=no
+multivar=soulbane_anger_flamepres
+multiloc=0,soulbane_firewall
+
+[soulbane_firewall]
+name=Fire
+desc=Very hot!
+model=soulbane_firewall
+anim=firewall
+ambient=100
+contrast=100
+resizey=200
+mapscene=22
+blockwalk=no
+
+[soul_bane_awall_void_exit]
+name=Exit
+desc=To the next area!
+model=soul_bane_awall_void_exit
+recol1s=66
+recol1d=12288
+recol2s=4261
+recol2d=10240
+recol3s=3204
+recol3d=8192
+recol4s=2147
+recol4d=6144
+recol5s=1090
+recol5d=4096
+recol6s=33
+recol6d=2048
+sharelight=yes
+hillskew=yes
+length=2
+ambient=40
+op1=Enter
+
+[soulbane_rack_multi]
+length=2
+active=yes
+op1=Take-from
+multivar=soulbane_anger_weaponmulti
+multiloc=0,soulbane_rack_all
+multiloc=1,soulbane_rack_no_sword
+multiloc=2,soulbane_rack_no_spear
+multiloc=3,soulbane_rack_no_mace
+multiloc=4,soulbane_rack_no_axe
+
+[soulbane_rack_all]
+name=Weapon rack
+desc=Oooo, sharp, pointy things!
+model=soulbane_rack_all
+model2=soulbane_rack_alli2
+model3=soulbane_rack_alli3
+model4=soulbane_rack_alli4
+length=2
+offsetx=-40
+op1=Take-from
+
+[soulbane_rack_no_sword]
+name=Weapon rack
+desc=Oooo, sharp, pointy things!
+model=soulbane_rack_all
+model2=soulbane_rack_alli2
+model3=soulbane_rack_alli4
+length=2
+offsetx=-40
+op1=Take-from
+
+[soulbane_rack_no_spear]
+name=Weapon rack
+desc=Oooo, sharp, pointy things!
+model=soulbane_rack_all
+model2=soulbane_rack_alli3
+model3=soulbane_rack_alli4
+length=2
+offsetx=-40
+op1=Take-from
+
+[soulbane_rack_no_mace]
+name=Weapon rack
+desc=Oooo, sharp, pointy things!
+model=soulbane_rack_alli3
+model2=soulbane_rack_alli2
+model3=soulbane_rack_alli4
+length=2
+offsetx=-40
+op1=Take-from
+
+[soulbane_rack_no_axe]
+name=Weapon rack
+desc=Oooo, sharp, pointy things!
+model=soulbane_rack_all
+model2=soulbane_rack_alli3
+model3=soulbane_rack_alli2
+model4=soulbane_rack_no_axe
+length=2
+offsetx=-40
+op1=Take-from
+

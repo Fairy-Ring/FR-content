@@ -1,0 +1,77 @@
+[ai_spawn,soulbane_anger_bear] ~soulbane_rage_npc_spawn;
+[ai_spawn,soulbane_anger_unicorn] ~soulbane_rage_npc_spawn;
+[ai_spawn,soulbane_anger_rat] ~soulbane_rage_npc_spawn;
+[ai_spawn,soulbane_anger_goblin] ~soulbane_rage_npc_spawn;
+[proc,soulbane_rage_npc_spawn]
+// CANDIDATE: Rage weapon combat gives no ordinary combat experience.
+%npc_combat_xp_multiplier = 0;
+%npc_start_coord = npc_coord;
+npc_settimer(0);
+
+[opnpc2,soulbane_anger_bear] @soulbane_rage_attack;
+[opnpc2,soulbane_anger_unicorn] @soulbane_rage_attack;
+[opnpc2,soulbane_anger_rat] @soulbane_rage_attack;
+[opnpc2,soulbane_anger_goblin] @soulbane_rage_attack;
+[label,soulbane_rage_attack]
+if (~soulbane_rage_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,soulbane_anger_bear] @soulbane_rage_attack_ap;
+[apnpc2,soulbane_anger_unicorn] @soulbane_rage_attack_ap;
+[apnpc2,soulbane_anger_rat] @soulbane_rage_attack_ap;
+[apnpc2,soulbane_anger_goblin] @soulbane_rage_attack_ap;
+[label,soulbane_rage_attack_ap]
+if (~soulbane_rage_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_queue1,soulbane_anger_bear] ~soulbane_rage_retaliate;
+[ai_queue1,soulbane_anger_unicorn] ~soulbane_rage_retaliate;
+[ai_queue1,soulbane_anger_rat] ~soulbane_rage_retaliate;
+[ai_queue1,soulbane_anger_goblin] ~soulbane_rage_retaliate;
+[proc,soulbane_rage_retaliate]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_rage_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_retaliate;
+
+[ai_opplayer2,soulbane_anger_bear] ~soulbane_rage_npc_attack;
+[ai_opplayer2,soulbane_anger_unicorn] ~soulbane_rage_npc_attack;
+[ai_opplayer2,soulbane_anger_rat] ~soulbane_rage_npc_attack;
+[ai_opplayer2,soulbane_anger_goblin] ~soulbane_rage_npc_attack;
+[proc,soulbane_rage_npc_attack]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_setmode(none);
+    return;
+}
+if (~soulbane_rage_attackable = false) {
+    npc_setmode(none);
+    return;
+}
+%npc_aggressive_player = uid;
+~npc_default_attack;
+
+[ai_queue2,soulbane_anger_bear] ~soulbane_rage_damage(last_int);
+[ai_queue2,soulbane_anger_unicorn] ~soulbane_rage_damage(last_int);
+[ai_queue2,soulbane_anger_rat] ~soulbane_rage_damage(last_int);
+[ai_queue2,soulbane_anger_goblin] ~soulbane_rage_damage(last_int);
+[proc,soulbane_rage_damage](int $damage)
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_rage_attackable = false | %npc_aggressive_player ! uid) return;
+def_int $actual = min($damage, npc_stat(hitpoints));
+~npc_default_damage($damage);
+// The NPC owns no protected player pointer. Credit under a real player queue,
+// after damage has landed, and only for HP actually removed by that hit.
+if ($actual > 0) queue*(soulbane_rage_credit, 0)($actual);
+
+[ai_queue3,soulbane_anger_bear] ~npc_death;
+[ai_queue3,soulbane_anger_unicorn] ~npc_death;
+[ai_queue3,soulbane_anger_rat] ~npc_death;
+[ai_queue3,soulbane_anger_goblin] ~npc_death;
+
+[queue,soulbane_rage_credit](int $damage)
+if (~soulbane_owned = false | %soulbane_prog ! 2 | %soulbane_anger_donespecial ! 0) return;
+%soulbane_anger_damagedealt = min(^soulbane_rage_target, add(%soulbane_anger_damagedealt, $damage));
+~soulbane_rage_meter;
+if (%soulbane_anger_damagedealt = ^soulbane_rage_target) {
+    %soulbane_anger_donespecial = 1;
+    queue(soulbane_rage_complete, 0, 0);
+}

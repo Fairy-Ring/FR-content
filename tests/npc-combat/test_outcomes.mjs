@@ -6,6 +6,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { runtime } from './outcome_runtime.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -54,14 +55,21 @@ try {
   function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null) {
     rt.select(directory);
     const f = rt.fixture(type, variant, style, distance);
+    let cleanup;
     try {
-      if (configure) configure(f);
+      if (configure) {
+        const configured = configure(f);
+        if (typeof configured === 'function') cleanup = configured;
+      }
       const actualArgs = typeof args === 'function' ? args(f) : args;
       const result = rt.observe(name, f, actualArgs, variant, rng);
       result.settled = rt.settle(f);
       for (const caller of result.visited) observed.add(caller);
       return result;
-    } finally { rt.dispose(); }
+    } finally {
+      try { cleanup?.(); }
+      finally { rt.dispose(); }
+    }
   }
   function maximum(style, f) { return rt.run(`[proc,npc_${style === 'melee' ? 'melee' : 'ranged'}_maxhit]`, f).values[0]; }
   function cost(before, after, metadata) {
@@ -178,6 +186,8 @@ try {
       }
     }
   });
+  let regionMapEntries;
+  const loadedRegionMaps = new Set();
   function configureRoute(f, route) {
     for (const stat of [1, 6]) { f.player.levels[stat] = 20; f.player.baseLevels[stat] = 20; }
     if (route.equipment) f.player.invAdd(rt.id(rt.configs.InvType, 'worn'), rt.id(rt.configs.ObjType, route.equipment), 1);
@@ -186,8 +196,45 @@ try {
       if (id >= 0) f.player.setVar(id, value);
       else f.player.setVarBit(rt.id(rt.configs.VarBitType, name), value);
     }
-    for (const [name, value] of Object.entries(route.npcVars ?? {})) f.npc.setVar(rt.id(VarNpcType, name), value === 'target' ? f.player.uid : value);
-    rt.run('[proc,player_combat_stat]', f);
+    let cleanup;
+    try {
+      if (route.privateRegion) {
+        const { enter, leave } = route.privateRegion;
+        // The ordinary combat fixture loads no maps. Load only the requested
+        // real packed squares so both region copying and its exit are native.
+        regionMapEntries ??= createRequire(path.join(engine, 'package.json'))('fflate').unzipSync(fs.readFileSync(path.join(pack, '.cache/maps-server.zip')));
+        for (const mapsquare of route.privateRegion.maps) {
+          if (loadedRegionMaps.has(mapsquare)) continue;
+          const [x, z] = mapsquare.split('_').map(Number);
+          const packed = Object.fromEntries(['m', 'l', 'n', 'o'].map(kind => [kind, regionMapEntries[`${kind}${mapsquare}`] ?? new Uint8Array()]));
+          assert(packed.m.length && packed.l.length, `packed region source ${mapsquare}`);
+          rt.World.gameMap.loadPackedMapsquare(packed, x << 6, z << 6);
+          loadedRegionMaps.add(mapsquare);
+        }
+        const before = rt.World.instances.instances.length;
+        const entered = rt.run(enter, f);
+        assert.equal(entered.state.execution, rt.State.FINISHED, `${enter} creates the native quest region`);
+        const instance = rt.World.instances.findInstanceByCoord(f.player);
+        assert(instance, `${enter} puts the player in its region`);
+        cleanup = () => {
+          const left = rt.run(leave, f);
+          assert.equal(left.state.execution, rt.State.FINISHED, `${leave} finishes`);
+          assert.equal(rt.World.instances.findInstanceByUid(instance.uid), null, 'route region is torn down');
+          assert.equal(rt.World.instances.instances.length, before, 'route leaks no region');
+        };
+        f.npc = [...rt.World.npcs].find(npc => npc.type === f.npc.type && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
+        assert(f.npc, `${enter} spawns the route's native NPC`);
+        const tile = (f.npc.level << 28) | ((f.npc.x - 1) << 14) | f.npc.z;
+        const moved = rt.run('[proc,p_telejump_safe]', f, [tile]);
+        assert.equal(moved.state.execution, rt.State.FINISHED, 'native teleport places the combat fixture adjacent');
+      }
+      for (const [name, value] of Object.entries(route.npcVars ?? {})) f.npc.setVar(rt.id(VarNpcType, name), value === 'target' ? f.player.uid : value);
+      rt.run('[proc,player_combat_stat]', f);
+      return cleanup;
+    } catch (error) {
+      cleanup?.();
+      throw error;
+    }
   }
   function dispatchBranch(result) {
     const hits = result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]');

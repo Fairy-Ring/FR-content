@@ -1,6 +1,6 @@
 {
   "marker": "APE_ATOLL_HUMAN_DEATH_BASELINE_V1",
-  "deathSourceSha256": "486ef86eb32c165c40db7d78a09de833fe642388d4b2c5a64aff911e0a2987b0",
+  "deathSourceSha256": "8fde75ac90f3636ec768b698782418baeb8721b9bcadcb5dcc5da94ec170e080",
   "observation": {
     "player": {
       "activeScript": null,
@@ -228,7 +228,7 @@
       ],
       "moveSpeed": 4,
       "npcId": -1,
-      "packetCount": 128,
+      "packetCount": 129,
       "packets": [
         {
           "$type": "UnsetMapFlag",
@@ -1041,6 +1041,13 @@
           "fields": {
             "colour": 31744,
             "component": 6987
+          }
+        },
+        {
+          "$type": "IfSetColour",
+          "fields": {
+            "colour": 31744,
+            "component": 15098
           }
         },
         {

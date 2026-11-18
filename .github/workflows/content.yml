@@ -269,6 +269,7 @@ jobs:
           run_test tests/zygomite/test_zygomite.mjs node --import tsx ../content/tests/zygomite/test_zygomite.mjs
           run_test tests/wyvern/test_wyvern.mjs node --import tsx ../content/tests/wyvern/test_wyvern.mjs
           run_test tests/giant-mole/test_giant_mole.mjs node --import tsx ../content/tests/giant-mole/test_giant_mole.mjs
+          run_test tests/soulbane/test_soulbane.mjs node --import tsx ../content/tests/soulbane/test_soulbane.mjs
           exit "$failed"
 
       - name: Write job summary
