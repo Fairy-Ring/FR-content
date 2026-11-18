@@ -23,6 +23,23 @@ wearpos=righthand
 weight=1lb
 // UNKNOWN engineering melee stance: use the existing slash-weapon style table.
 category=weapon_slash
+// CANDIDATE bonuses: OSRS Wiki Magic secateurs, revision 14965052 (2025-08-13).
+// History shows these values by 2014, but does not establish the original 2006 stats.
+// https://oldschool.runescape.wiki/w/Magic_secateurs?oldid=14965052
+param=stabattack,7
+param=slashattack,9
+param=crushattack,-5
+param=magicattack,1
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,0
+param=magicdefence,1
+param=rangedefence,0
+param=strengthbonus,1
+param=rangebonus,0
+param=prayerbonus,0
+// The source's mdmg=0 has no equivalent in skill_combat/configs/combat.param.
 param=attackrate,4
 // UNKNOWN engineering motion/sound bindings, using existing 377 assets.
 param=slashattack_anim,human_sword_slash

@@ -719,6 +719,19 @@ const cap = (style, spell = 0, maxhit = 99) => {
   return runScript('[proc,npc_max_dealt]', p, boss, [maxhit, spell])[0];
 };
 wear(p, 'fairy_enchanted_secateurs');
+const wornSecateurs = p.getInventory(wornId).items.find(item => item?.id === obj('fairy_enchanted_secateurs'));
+assert(wornSecateurs, 'the combat control wears the actual packed magic secateurs');
+const wornSecateursType = types.ObjType.get(wornSecateurs.id);
+// CANDIDATE equipment table, retained Magic secateurs revision 14965052.
+// These remain in place for every weapon gate, recoil and final fight below.
+for (const [name, expected] of Object.entries({
+  stabattack: 7, slashattack: 9, crushattack: -5, magicattack: 1, rangeattack: 0,
+  stabdefence: 0, slashdefence: 1, crushdefence: 0, magicdefence: 1, rangedefence: 0,
+  strengthbonus: 1, rangebonus: 0, prayerbonus: 0
+})) {
+  assert.equal(wornSecateursType.params?.get(id(types.ParamType, name)), expected,
+    `worn magic secateurs carry the candidate ${name} bonus`);
+}
 p.setVarBit(questStageBit, ft1Constant('ft1_enchanted'));
 boss.setVar(npcAggressivePlayer, p.uid);
 assert(cap(slashStyle) > 0, 'wielded magic secateurs permit melee damage');
@@ -860,5 +873,5 @@ assert.equal(stage(p), completeStage, 'completed quest cannot re-enter an earlie
 assert.deepEqual(p.stats, completedStats, 'replay grants no duplicate XP');
 assert.equal(p.getVar(questPoints) - qpBefore, 2, 'replay grants no duplicate quest points');
 assert.equal(count(p, 'fairy_enchanted_secateurs', wornId), 1, 'replay leaves the magic secateurs equipped');
-console.log(`PASS Fairytale I packed quest stages, real visible-form/map dispatch, 31 item choices, combat and completion`);
+console.log('PASS Fairytale I packed quest stages, real visible-form/map dispatch, 31-entry item table, 30 eligible choices, combat and completion');
 process.exit(0);
