@@ -1,0 +1,9 @@
+// Original 377 slot 714. Client does not read the raw value or any varbit.
+[rag_quest]
+scope=perm
+
+// Original 377 slot 716. Preserve transmit for the existing pot-boiler multi.
+// Saved: the logs, pot/bone identity and vinegar access must survive logout.
+[rag_bone_2]
+transmit=yes
+scope=perm

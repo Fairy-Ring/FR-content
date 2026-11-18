@@ -67,6 +67,7 @@ gosub(npc_death);
 if (npc_findhero = ^false) {
     return;
 }
+~rag_drop(6);
 
 // Drop monkey corpse only if TBWT is started, otherwise bones
 if (%tbwt_main >= ^tbwt_started & %tbwt_main < ^tbwt_complete & map_members = ^true) {
