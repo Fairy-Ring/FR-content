@@ -24,7 +24,7 @@
 ^ft1_grove_split_x = 2398
 ^ft1_grove_east_side = 0_37_68_32_27
 ^ft1_grove_west_side = 0_37_68_28_27
-^ft1_boss_spawn = 0_37_68_2_6
+^ft1_boss_spawn = 0_37_68_28_6
 ^ft1_owned_search_range = 64
 // UNKNOWN engineering summon search, reachable-square bounds and lifetime.
 ^ft1_spirit_search_range = 10
