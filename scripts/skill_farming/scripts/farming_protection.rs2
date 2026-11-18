@@ -105,7 +105,7 @@ if ($plain < $quantity) inv_del(inv, $noted, sub($quantity, $plain));
 %farming_protection = setbit_range_toint(%farming_protection, 1, $patch, $patch);
 return(true);
 
-// CANDIDATE dialogue templates: Old School Taria and later Elstan transcripts.
+// CANDIDATE dialogue: Taria and each allotment gardener's retained transcript.
 // The charge numbers/items above are VERIFIED by the pre-cache Tip.It guide.
 [label,farming_gardener_pay]
 ~chatplayer("Would you look after my crops for me?");
@@ -116,11 +116,19 @@ if ($patch = -1) {
     return;
 }
 if ($patch < 8) {
-    ~chatnpc("I might. Which one were you thinking of?");
-    def_int $option = ~p_choice2("The north-western allotment.", 1, "The south-eastern allotment.", 2);
-    if ($option = 1) ~chatplayer("The north-western allotment.");
+    if (npc_type = kragen) ~chatnpc("I might - which one were you thinking of?");
+    else ~chatnpc("I might. Which one were you thinking of?");
+    def_string $north = "The north-western allotment.";
+    def_string $south = "The south-eastern allotment.";
+    switch_npc (npc_type) {
+        case dantaera, kragen :
+            $north = "The northern allotment.";
+            $south = "The southern allotment.";
+    }
+    def_int $option = ~p_choice2($north, 1, $south, 2);
+    if ($option = 1) ~chatplayer($north);
     else {
-        ~chatplayer("The south-eastern allotment.");
+        ~chatplayer($south);
         $patch = add($patch, 1);
     }
 }
@@ -154,7 +162,10 @@ def_obj $payment;
 def_int $quantity;
 $payment, $quantity = ~farming_protection_cost($crop);
 def_string $payment_name = ~farming_protection_payment_name($payment);
-~chatnpc("If you like, but I want <tostring($quantity)> <$payment_name> for that.");
+def_string $amount;
+if ($quantity = 1) $amount = "one";
+else $amount = tostring($quantity);
+~chatnpc("If you like, but I want <$amount> <$payment_name> for that.");
 def_int $available = inv_total(inv, $payment);
 def_obj $noted = oc_cert($payment);
 if ($noted ! $payment) $available = add($available, inv_total(inv, $noted));

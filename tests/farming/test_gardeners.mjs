@@ -234,7 +234,7 @@ test('all twelve paid plantings survive save/load and the real online/offline sc
 
 const component = name => id('Component', name);
 const normalize = text => text.replace(/[|\s]+/g, ' ').trim();
-function talk(p, name, choices) {
+function talk(p, name, choices, textPackets) {
   const at = placements.npc.get(name)?.[0];
   assert(at, `original map places ${name}`);
   const npc = [...World.npcs].find(npc => npc.type === at.type && npc.level === at.level && npc.x === at.x && npc.z === at.z);
@@ -263,7 +263,9 @@ function talk(p, name, choices) {
   }
   assert.equal(state.execution, State.FINISHED, `${script.name} finishes in 500 steps`);
   assert.equal(choices.length, 0, `${script.name} consumed every expected choice`);
-  return normalize(packets.filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text).join(' '));
+  const texts = packets.filter(packet => packet.constructor.name === 'IfSetText');
+  if (textPackets) textPackets.push(...texts);
+  return normalize(texts.map(packet => packet.text).join(' '));
 }
 for (let number = 1; number <= 4; number++) {
   const name = `farming_shopkeeper_${number}`;
@@ -343,8 +345,24 @@ for (const name of gardeners) test(`${name}: ordinary advice and preserved GAG/e
 for (let index = 0; index < advice.length; index++) test(`sourced random advice ${index + 1}`, () => {
   const p = player(); assert(adviceTalk(p, 'elstan', index).includes(advice[index])); p.unlink();
 });
+// Independent caption oracle: each original plot pair and its retained transcript.
+const allotmentCaptions = new Map([
+  ['elstan', ['The north-western allotment.', 'The south-eastern allotment.']],
+  ['dantaera', ['The northern allotment.', 'The southern allotment.']],
+  ['kragen', ['The northern allotment.', 'The southern allotment.']],
+  ['lyra', ['The north-western allotment.', 'The south-eastern allotment.']]
+]);
 const owners = [['elstan', 0], ['dantaera', 2], ['kragen', 4], ['lyra', 6],
   ['farming_gardener_hops_1', 8], ['francis', 9], ['farming_gardener_hops_3', 10], ['farming_gardener_hops_4', 11]];
+for (const [name, base] of owners.filter(([, base]) => base < 8)) test(`${name}: caption directions match both original map plots`, () => {
+  const north = placements.loc.get(`farming_veg_patch_${base + 1}`);
+  const south = placements.loc.get(`farming_veg_patch_${base + 2}`);
+  const range = (plots, axis) => [Math.min(...plots.map(plot => plot[axis])), Math.max(...plots.map(plot => plot[axis]))];
+  const [northX, southX, northZ, southZ] = [range(north, 'x'), range(south, 'x'), range(north, 'z'), range(south, 'z')];
+  assert(northZ[0] + northZ[1] > southZ[0] + southZ[1], 'option 1 is north of option 2');
+  if (['elstan', 'lyra'].includes(name)) assert(northX[1] < southX[0], 'option 1 is west of option 2');
+  else assert.deepEqual(northX, southX, 'the north/south plots share their east/west extent');
+});
 for (const [name, base] of owners) for (let offset = 0; offset < (base < 8 ? 2 : 1); offset++) {
   const patch = base + offset, choices = base < 8 ? [3, offset + 1] : [3];
   test(`${name}: native menu buys only mapped patch ${patch}`, () => {
@@ -352,7 +370,19 @@ for (const [name, base] of owners) for (let offset = 0; offset < (base < 8 ? 2 :
     setStage(p, patch, patch < 8 ? 6 : 4);
     const payment = patch < 8 ? 'bucket_compost' : 'marigold', quantity = patch < 8 ? 2 : 1;
     add(p, payment, quantity);
-    assert(talk(p, name, [...choices, 1]).includes("Leave it with me - I'll make sure that patch grows for you."));
+    const textPackets = [], text = talk(p, name, [...choices, 1], textPackets);
+    assert(text.includes("Leave it with me - I'll make sure that patch grows for you."));
+    if (base < 8) {
+      const captions = allotmentCaptions.get(name);
+      const menu = [component('multi2:com_1'), component('multi2:com_2')];
+      for (let option = 0; option < 2; option++) {
+        assert(textPackets.some(packet => packet.component === menu[option] && normalize(packet.text) === captions[option]),
+          `${name} visibly names mapped plot ${base + option}`);
+      }
+      const echoes = textPackets.filter(packet => !menu.includes(packet.component)).map(packet => normalize(packet.text));
+      assert(echoes.includes(captions[offset]), 'player echoes the selected plot');
+      assert(!echoes.includes(captions[1 - offset]), 'player does not echo the other plot');
+    }
     assert.equal(count(p, payment), 0); assert.equal(p.getVar(care), 1 << patch);
     assert.equal(p.getVarBit(fairy), 1); assert.equal(p.getVarBit(garden), 1); assert.equal(p.getVar(visited), 0);
     for (let other = 0; other < 12; other++) assert.equal(stage(p, other), other === patch ? (patch < 8 ? 6 : 4) : 0);
@@ -383,15 +413,30 @@ for (const name of gardeners.filter(name => !owners.some(([owner]) => owner === 
     assert.equal(p.getVar(care), 0); assert.equal(count(p, 'bucket_compost'), 2); p.unlink();
   });
 }
-const nouns = { bucket_compost: 'buckets of compost', sack_potato_10: 'sack of potatoes', sack_onion_10: 'sack of onions',
-  sack_cabbage_10: 'sacks of cabbages', jute_fibre: 'jute fibres', basket_apple_5: 'basket of apples', curry_leaf: 'curry leaves',
-  marigold: 'marigold', basket_tomato_5: 'basket of tomatoes', nasturtium: 'nasturtium', barley_malt: 'barley malt' };
+// Kragen's concrete allotment invoices retain "one"; the shared invoice template
+// expands the same singular form and the period fee table for the seven hops.
+const invoices = new Map([
+  ['allotment_potato', 'If you like, but I want 2 buckets of compost for that.'],
+  ['allotment_onion', 'If you like, but I want one sack of potatoes for that.'],
+  ['allotment_cabbage', 'If you like, but I want one sack of onions for that.'],
+  ['allotment_tomato', 'If you like, but I want 2 sacks of cabbages for that.'],
+  ['allotment_sweetcorn', 'If you like, but I want 10 jute fibres for that.'],
+  ['allotment_strawberry', 'If you like, but I want one basket of apples for that.'],
+  ['allotment_watermelon', 'If you like, but I want 10 curry leaves for that.'],
+  ['hops_hammerstone', 'If you like, but I want one marigold for that.'],
+  ['hops_asgarnian', 'If you like, but I want one sack of onions for that.'],
+  ['hops_yanillian', 'If you like, but I want one basket of tomatoes for that.'],
+  ['hops_krandorian', 'If you like, but I want 3 sacks of cabbages for that.'],
+  ['hops_wildblood', 'If you like, but I want one nasturtium for that.'],
+  ['hops_barley', 'If you like, but I want 3 buckets of compost for that.'],
+  ['hops_jute', 'If you like, but I want 6 barley malt for that.']
+]);
 for (const [name, first, , , payment, quantity] of crops) test(`${name}: compiled invoice, missing and partial payment wording`, () => {
   const hops = name.startsWith('hops_'), p = player(), choices = hops ? [3] : [3, 1];
   const actor = hops ? 'farming_gardener_hops_1' : 'elstan';
   setStage(p, hops ? 8 : 0, first);
   let text = talk(p, actor, [...choices]);
-  assert(text.includes(`If you like, but I want ${quantity} ${nouns[payment]} for that.`));
+  assert(text.includes(invoices.get(name)));
   assert(text.includes("I'm afraid I don't have any of those at the moment."));
   if (quantity > 1) {
     add(p, payment, quantity - 1); text = talk(p, actor, [...choices]);
