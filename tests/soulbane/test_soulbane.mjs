@@ -691,8 +691,8 @@ function checkFearRoomRoutes(p) {
   const sceneTolna = roomCoord(p, 'soulbane_fear_scene_tolna');
   assertFootprintOpen(scenePlayer.level, scenePlayer.x, scenePlayer.z, 1, 1, 'Fear cutscene player stand');
   assertFootprintOpen(sceneTolna.level, sceneTolna.x, sceneTolna.z, 1, 1, 'Fear cutscene Tolna footprint');
-  // The memory is teleported to the separate copied surface page, not walked
-  // into from the Fear dungeon. Prove both stands from that page's real entry.
+  // Teleport into the copied memory strip; it is not walked to from the dungeon.
+  // Prove both stands from the copied original surface coordinate.
   const sceneEntry = roomCoord(p, 'soulbane_surface');
   nativeRouteFrom(sceneEntry, scenePlayer, 'copied surface entry reaches the Fear cutscene player tile on foot');
   nativeRouteFrom(sceneEntry, sceneTolna, 'copied surface entry reaches the Fear cutscene Tolna tile on foot');
@@ -1551,13 +1551,12 @@ function instanceNativeFloodfill(p, instance, label, seedTiles = null) {
   const tiles = seedTiles ? [...seedTiles] : [start];
   const seen = new Set(tiles.map(tile => key(tile.x, tile.z)));
   const steps = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
-  // Explore every native-traversable coordinate in the instance bounds; do not seed/filter by map floors.
+  // Follow native movement to exhaustion, including padding beyond the owner footprint.
   for (let index = 0; index < tiles.length; index++) {
     const current = tiles[index];
     for (const [dx, dz] of steps) {
       const x = current.x + dx;
       const z = current.z + dz;
-      if (x < minX || x >= maxX || z < minZ || z >= maxZ) continue;
       const nextKey = key(x, z);
       if (seen.has(nextKey)) continue;
       if (!map.canTravel(start.level, current.x, current.z, dx, dz, p.width, 0, CollisionType.NORMAL)) continue;
@@ -1813,7 +1812,12 @@ function assertMemorySceneVisibility(p, zones, label, requirePacket = false) {
   const flood = instanceNativeFloodfill({ ...tiles[0], width: p?.width ?? 1 }, instance, label, tiles);
   const allowedSourceSquares = new Set([sourceSquareKeyForZone(zones[0])]);
   const allowedZoneKeys = new Set(zones.map(destinationZoneKey));
+  let minNorth = Infinity;
+  let maxNorth = -Infinity;
   for (const tileAt of flood.tiles) {
+    const north = (tileAt.z - instance.sw.z) >> 3;
+    minNorth = Math.min(minNorth, north);
+    maxNorth = Math.max(maxNorth, north);
     assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: all native-walkable memory tiles`,
       false, allowedZoneKeys);
   }
@@ -1821,6 +1825,9 @@ function assertMemorySceneVisibility(p, zones, label, requirePacket = false) {
     assertSceneMappingWindow(p, { level: p.level, x: p.x, z: p.z }, allowedSourceSquares,
       `${label}: real memory scene`, requirePacket, allowedZoneKeys);
   }
+  console.log(`PASS complete native memory floodfill ${JSON.stringify({
+    label, seedTiles: tiles.length, reachableTiles: flood.tiles.length, minNorth, maxNorth
+  })}`);
   return flood.tiles.length;
 }
 function hasExactNativeRoute(start, destination) {

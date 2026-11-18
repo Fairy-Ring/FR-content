@@ -17,11 +17,11 @@ while ($x < 8) {
     }
     $x = add($x, 1);
 }
-// Leave six blank zones between every room zone and the memory copies.
+// Use the north-edge strip; native scene tests follow every collision-open exit.
 def_int $scene_x = 0;
-while ($scene_x < ^soulbane_memory_zones) {
+while ($scene_x < ^soulbane_memory_zones_east) {
     def_int $scene_z = 0;
-    while ($scene_z < ^soulbane_memory_zones) {
+    while ($scene_z < ^soulbane_memory_zones_north) {
         region_set(0, $scene_x, add($scene_z, ^soulbane_memory_zone_north), movecoord(^soulbane_scene_source, multiply($scene_x, 8), 0, multiply($scene_z, 8)), 0);
         region_set(0, add($scene_x, ^soulbane_memory_zone_east), add($scene_z, ^soulbane_memory_zone_north), movecoord(^soulbane_fear_scene_source, multiply($scene_x, 8), 0, multiply($scene_z, 8)), 0);
         $scene_z = add($scene_z, 1);
