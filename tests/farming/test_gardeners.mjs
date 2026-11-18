@@ -445,17 +445,26 @@ for (const [name, first, , , payment, quantity] of crops) test(`${name}: compile
   }
   assert.equal(p.getVar(care), 0); p.unlink();
 });
-// Independent purchase oracle: ordinary Kragen transcript branches, not shop stock.
+// Six-item/page oracle: retained Dantaera RS3 2021 layout, Old School quote wording.
 const sales = [
   ['plant_cure', 25, [1], 'Some plant cure.', "Plant cure, eh? I might have some put aside for myself. Tell you what, I'll sell you some plant cure for 25 coins if you like."],
   ['bucket_compost', 35, [2], 'A bucket of compost.', "A bucket of compost, eh? I might have one spare... tell you what, I'll sell it to you for 35 coins if you like."],
   ['rake', 15, [3], 'A rake.', "A rake, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like."],
-  ['plantpot_empty', 40, [4], 'A plant pot.', "Eh, I suppose I can spare you a plant pot, but I'll want 40 coins for it."],
-  ['watering_can_0', 25, [5, 1], 'A watering can.', "A watering can, eh? I might have one spare... tell you what, I'll sell it to you for 25 coins if you like."],
-  ['gardening_trowel', 15, [5, 2], 'A gardening trowel.', "A gardening trowel, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like."],
-  ['dibber', 15, [5, 3], 'A seed dibber.', "A seed dibber, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like."]
+  ['watering_can_0', 25, [4, 1], 'A watering can.', "A watering can, eh? I might have one spare... tell you what, I'll sell it to you for 25 coins if you like."],
+  ['gardening_trowel', 15, [4, 2], 'A gardening trowel.', "A gardening trowel, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like."],
+  ['dibber', 15, [4, 3], 'A seed dibber.', "A seed dibber, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like."]
 ];
 const yesSale = 'Yes, that sounds like a fair price.', noSale = 'No thanks, I can get that much cheaper elsewhere.';
+test('native sale pages retain six-item order and never offer the later plant pot', () => {
+  const p = player(), packets = [];
+  talk(p, 'kragen', [5, 4, 5], packets);
+  const options = (root, length) => Array.from({ length }, (_, index) =>
+    packets.filter(packet => packet.component === id('Component', `${root}:com_${index + 1}`)).at(-1)?.text);
+  assert.deepEqual(options('multi4', 4), ['Some plant cure.', 'A bucket of compost.', 'A rake.', '(See more items)']);
+  assert.deepEqual(options('multi5', 5), ['A watering can.', 'A gardening trowel.', 'A seed dibber.', '(See previous items)', 'Forget it.']);
+  assert(!packets.some(packet => packet.text === 'A plant pot.'));
+  assert.equal(count(p, 'plantpot_empty'), 0); p.unlink();
+});
 for (const [item, price, route, request, offer] of sales) {
   test(`${item}: native dialogue buys one plain item for exactly ${price} coins`, () => {
     const p = player(); add(p, 'coins', price);
@@ -498,13 +507,13 @@ for (const name of gardeners) test(`${name}: native sell option preserves quest 
 });
 test('native sale previous-items and forget branches do not make a purchase', () => {
   const p = player(); add(p, 'coins', 25);
-  const text = talk(p, 'kragen', [5, 5, 4, 5, 5]);
+  const text = talk(p, 'kragen', [5, 4, 4, 4, 5]);
   assert(text.includes("Forget it, you don't have anything I need."));
   assert.equal(count(p, 'coins'), 25); assert.equal(count(p, 'plant_cure'), 0); p.unlink();
 });
 test('native sale previous-items branch returns to the original purchase menu', () => {
   const p = player(); add(p, 'coins', 25);
-  assert(talk(p, 'kragen', [5, 5, 4, 1, 1]).includes('Kragen hands over your purchase.'));
+  assert(talk(p, 'kragen', [5, 4, 4, 1, 1]).includes('Kragen hands over your purchase.'));
   assert.equal(count(p, 'coins'), 0); assert.equal(count(p, 'plant_cure'), 1); p.unlink();
 });
 console.log(`${checks} gardener compiled checks passed`);
