@@ -9,3 +9,5 @@ column=loot,namedobj,int,int,int,LIST
 column=pocket,string
 // Zero preserves the legacy multi-reward rule; positive totals select one weighted reward.
 column=loot_total,int,REQUIRED
+// Optional inclusive upper bound. Absent on every published fixed-damage row.
+column=stun_damage_max,int
