@@ -96,7 +96,7 @@ const completeText = 'You have completed A Fairy Tale Pt. 1!';
 
 const itemNames = [
   'avantoe', 'babydragon_bones', 'blue_dragon_scale', 'bucket_supercompost', 'grapes',
-  'cave_eel', 'charcoal', 'crushed_gemstone', 'edible_seaweed', 'snail_corpse3', 'irit_leaf',
+  'raw_cave_eel', 'charcoal', 'crushed_gemstone', 'edible_seaweed', 'snail_corpse3', 'irit_leaf',
   'jangerberries', 'tbwt_jogre_bones', 'king_worm', 'lime', 'mortmyremushroom', 'mortmyrepear',
   'mortmyrebuddingstem', 'nature_talisman', 'cactus_potato', 'mosquito_proboscis', 'red_spiders_eggs',
   'red_vine_worm', 'mort_slimey_eel', 'snapdragon', 'snape_grass', 'uncut_diamond', 'uncut_ruby',

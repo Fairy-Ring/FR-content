@@ -1,5 +1,6 @@
 // VERIFIED pool: Tip.It, captured 2 May 2006. Bunch of Grapes is grapes (1987),
 // explicitly its Cooking Guild respawn, not a second later grape object.
+// CANDIDATE raw cave eel identity: fairytale-1.raw-cave-eel-identity.
 // UNKNOWN engineering encoding: 1..31 in guide order in the original 5-bit slots.
 [ft1_nature_items]
 inputtype=int
@@ -9,7 +10,7 @@ val=2,babydragon_bones
 val=3,blue_dragon_scale
 val=4,bucket_supercompost
 val=5,grapes
-val=6,cave_eel
+val=6,raw_cave_eel
 val=7,charcoal
 val=8,crushed_gemstone
 val=9,edible_seaweed
