@@ -15,7 +15,7 @@ const logs = new WeakMap();
 let serial = 0, assertions = 0;
 function fixture(npc, amount = 10000) {
   const p = new Player(`n618_test_${++serial}`, BigInt(serial), 0n);
-  p.slot = serial; p.pid = serial; p.uid = serial; p.vars.fill(0);
+  p.slot = serial; p.pid = serial; p.uid = (Number(p.username37 & 0x1fffffn) << 11) | serial; p.vars.fill(0);
   const candidates = [];
   for (let x = npc.x - 1; x <= npc.x + npc.width; x++) for (let z = npc.z - 1; z <= npc.z + npc.length; z++) {
     if (floorTiles.has(`${npc.level},${x},${z}`) && !map.isMapBlocked(x, z, npc.level) &&
@@ -76,6 +76,7 @@ function openShop(p, name, title) {
   assert(listener, 'shop transmits a real inventory');
   const playerListener = p.invListeners.find(listener => listener.type === inv && listener.com === id('Component', 'shop_template_side:inv'));
   assert(playerListener, 'shop transmits the real player inventory');
+  assert.equal(p.getInventoryFromListener(playerListener), p.getInventory(inv), 'native UID resolves the transmitted player inventory');
   return p.getInventoryFromListener(listener);
 }
 function buttonIndex(component, option) {
@@ -84,7 +85,8 @@ function buttonIndex(component, option) {
 }
 function transact(p, container, item, component, option) {
   const slot = container.getItemIndex(item); assert(slot >= 0, 'item exists in the transmitted container');
-  assert(button.handle(new InvButton(buttonIndex(component, option), item, slot, id('Component', component)), p), 'production inventory button accepted');
+  assert(button.handle(new InvButton(buttonIndex(component, option), item, slot, id('Component', component)), p),
+    `production inventory button accepted: ${JSON.stringify({ component, item, slot, delayed: p.delayed, main: p.modalMain, side: p.modalSide, root: types.Component.get(id('Component', component)).rootLayer, listeners: p.invListeners.map(listener => ({ type: listener.type, com: listener.com })) })}`);
 }
 function purchaseAndSale(p, shop, item, quantity, rate, buyPrice, sellPrice) {
   assert.equal(shop.getItemCount(item), quantity, 'stock starts at the configured base quantity');
@@ -201,6 +203,10 @@ check('each placed cape seller opens the original shop from Trade and Talk and t
     const title = `${types.NpcType.get(npc.type).name}'s Wilderness Cape Shop.`;
     const trade = fixture(npc); op(trade, npc, 3);
     const stock = openShop(trade, shopName, title);
+    assert.equal(trade.getVar(id('VarPlayerType', 'shop_buy')), 600);
+    assert.equal(trade.getVar(id('VarPlayerType', 'shop_sell')), 1000);
+    assert.equal(trade.getVar(id('VarPlayerType', 'shop_haggle')), 10);
+    assert.equal(proc(trade, 'adjusted_item_cost_buying', [id('ObjType', `wilderness_cape_${suffix}`), 90]), 55, 'ten missing capes produce the sourced 1% adjustment per item');
     for (let number = suffix; number <= 50; number += 10) {
       purchaseAndSale(trade, stock, id('ObjType', `wilderness_cape_${number}`), 100, 100, 50, 30);
     }
