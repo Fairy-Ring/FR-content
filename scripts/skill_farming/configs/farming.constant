@@ -78,3 +78,8 @@
 // Reuse the published allotment endpoints without claiming authentic yields.
 ^farming_hops_save_low = 64
 ^farming_hops_save_high = 128
+
+// CANDIDATE: the 2024 OSRS change note states a previous nine-second base.
+// It does not establish that base for 2006; a 2007-2024 change is not excluded.
+// Fifteen 600-ms ticks, before the published shared player-count scaling.
+^farming_seed_stall_respawn_ticks = 15

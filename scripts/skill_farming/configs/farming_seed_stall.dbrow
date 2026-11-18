@@ -8,10 +8,9 @@ data=guard,farming_market_guard
 // VERIFIED: retained Tip.It Farming guide, 28 April 2006: level 27, 10 XP.
 data=level,27
 data=experience,100
-// CANDIDATE: pre-8-May-2024 nine-second timer in Seed Stall revision 15328061.
-// Fifteen 600-ms ticks; the existing shared player-count scaling is retained.
-// UNKNOWN: whether that inherited scaling reproduces the 2006 seed-stall timer.
-data=respawn_ticks,15
+// CANDIDATE: pre-8-May-2024 base; see the named constant's era limitation.
+// UNKNOWN: whether the inherited player-count scaling matches the 2006 stall.
+data=respawn_ticks,^farming_seed_stall_respawn_ticks
 // CANDIDATE: complete primary table in revision 15328061, qty one, total 1000.
 // All seventeen seeds occur in the 377 cache and retained period Farming guide.
 // The later tertiary Rocky pet is excluded; no primary weight is redistributed.
