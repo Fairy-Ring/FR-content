@@ -39,7 +39,7 @@ function sourcePath(script, content) {
 export async function verifyIngredientSources(context) {
   const {
     content, engine, World, types, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType,
-    nativeNpcRows, nativeLocRows, player, withRandom, add, count, obj, driveDialogue, JavaRandom, druidComplete, integerConstant
+    nativeNpcRows, nativeLocRows, player, withRandom, add, count, obj, driveDialogue, JavaRandom, druidComplete, integerConstant, setNearLoc
   } = context;
   const { default: ScriptPointer } = await import(pathToFileURL(path.join(engine, 'src/engine/script/ScriptPointer.ts')).href);
   const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
@@ -48,9 +48,8 @@ export async function verifyIngredientSources(context) {
   const bank = types.InvType.getId('bank');
   const witnesses = new Map();
   const items = [...types.EnumType.getByName('ft1_nature_items').values]
-    .filter(([index]) => index !== 21)
     .map(([index, id]) => ({ index, id, item: itemNames[index - 1] }));
-  assert.equal(items.length, 30, 'all 30 eligible ingredients need a native producer');
+  assert.equal(items.length, 31, 'all 31 period-pool ingredients need a native producer');
   for (const entry of items) assert.equal(entry.id, obj(entry.item), `nature item ${entry.index} identity`);
 
   function packed(name) {
@@ -216,6 +215,38 @@ export async function verifyIngredientSources(context) {
     const root = death(actor, p, item);
     record(item, 'native-NPC-death-Take', [mapPathFor(row), sourcePath(root, content), 'scripts/player/scripts/pickup.rs2'],
       `native ${name} death creates ${item}; packed Take receives it`);
+  }
+
+  // Build the encounter through actual Hack handlers, starting at eventchance 0.
+  // Only the unrelated Jungle Potion/introduction prerequisites and tool are seeded.
+  {
+    const { loc, row } = placedLoc('tai_bwo_jungle_vegetation_easy_1',
+      row => row.mx >= 43 && row.mx <= 44 && row.mz >= 47 && row.mz <= 48);
+    const p = player();
+    p.setVar(types.VarPlayerType.getId('junglepotion'),
+      integerConstant('scripts/general/configs/quest.constant', 'junglepotion_complete'));
+    p.setVarBit(types.VarBitType.getId('cleanup_progress'), 1);
+    const machete = types.ObjType.get(obj('machette'));
+    p.getInventory(types.InvType.getId('worn')).set(machete.wearpos, { id: machete.id, count: 1 });
+    setNearLoc(p, loc);
+    const hack = dispatch(ServerTriggerType.OPLOC4, loc, types.LocType);
+    assert.equal(p.getVarBit(types.VarBitType.getId('eventchance')), 0, 'event counter starts at its native default');
+    constantRoll(0, () => execute(hack, p, loc));
+    assert.equal(p.getVarBit(types.VarBitType.getId('eventchance')), 1, 'an actual first hack earns the event counter');
+    const next = World.getLoc(loc.x, loc.z, loc.level, types.LocType.getId('tai_bwo_jungle_vegetation_easy_2'));
+    assert(next, 'the first hack leaves the next real jungle section');
+    const before = new Set([...World.npcs]);
+    withRandom([0, 0.64], () => execute(dispatch(ServerTriggerType.OPLOC4, next, types.LocType), p, next));
+    World.processNpcEventQueue();
+    const actor = [...World.npcs].find(npc => !before.has(npc) && npc.isActive &&
+      npc.type === types.NpcType.getId('tbwcu_mosquito_single'));
+    assert(actor, 'the second native Hack actually spawns its selected mosquito');
+    assert.equal(count(p, 'mosquito_proboscis'), 0, 'no proboscis exists before the mosquito dies');
+    const root = death(actor, p, 'mosquito_proboscis');
+    assert.equal(count(p, 'mosquito_proboscis'), 1, 'the real single-mosquito death and Take yield one proboscis');
+    record('mosquito_proboscis', 'native-jungle-mosquito-death-Take',
+      [mapPathFor(row), sourcePath(hack, content), sourcePath(root, content), 'scripts/player/scripts/pickup.rs2'],
+      'actual jungle Hack earns the event counter and spawns a mosquito; its native death drops a proboscis and packed Take receives it');
   }
 
   // The sinister chest supplies both unidentified herbs before their ordinary

@@ -62,22 +62,12 @@ if (inv_total(inv, fairy_skull) = 0) {
 // CANDIDATE three random, distinct items per player; UNKNOWN uniform algorithm.
 // Choose and persist once at the skull hand-off, never reroll on a reminder/logout.
 inv_del(inv, fairy_skull, 1);
-// Draw distinct ranks uniformly, then skip the unavailable original pool index.
-// DEVIATION PENDING authorization: fairytale-1.proboscis-unavailable-draw.
-def_int $count = ^ft1_item_count;
-def_int $excluded = ^ft1_unavailable_item;
-if ($excluded > 0) $count = sub($count, 1);
-def_int $first = add(random($count), 1);
-def_int $second = add(random(sub($count, 1)), 1);
+def_int $first = add(random(^ft1_item_count), 1);
+def_int $second = add(random(sub(^ft1_item_count, 1)), 1);
 if ($second >= $first) $second = add($second, 1);
-def_int $third = add(random(sub($count, 2)), 1);
+def_int $third = add(random(sub(^ft1_item_count, 2)), 1);
 if ($third >= min($first, $second)) $third = add($third, 1);
 if ($third >= max($first, $second)) $third = add($third, 1);
-if ($excluded > 0) {
-    if ($first >= $excluded) $first = add($first, 1);
-    if ($second >= $excluded) $second = add($second, 1);
-    if ($third >= $excluded) $third = add($third, 1);
-}
 %fairy_nature_item1 = $first;
 %fairy_nature_item2 = $second;
 %fairy_nature_item3 = $third;

@@ -107,12 +107,7 @@ assert.equal(natureItems.values.size, itemNames.length, 'the compiled nature-ite
 for (const [index, name] of itemNames.entries()) {
   assert.equal(natureItems.values.get(index + 1), obj(name), `nature item ${index + 1} resolves to ${name}`);
 }
-// DEVIATION PENDING authorization: keep the period table and its stored indices,
-// but exclude its unobtainable proboscis until Cleanup supplies a real producer.
-const unavailableNatureItem = ft1Constant('ft1_unavailable_item');
-assert.equal(unavailableNatureItem, 21, 'the pending deviation excludes only mosquito proboscis');
-const availableNatureIndices = itemNames.map((_, index) => index + 1)
-  .filter(index => index !== unavailableNatureItem);
+const availableNatureIndices = itemNames.map((_, index) => index + 1);
 
 let serial = 0;
 function register(p) {
@@ -546,7 +541,7 @@ talk(p, 'zandar_horfyre', [], { actor: zandar });
 assert.equal(stage(p), ft1Constant('ft1_zandar'), 'Zandar reads the carried symptoms and directs the player to Mortifer');
 assert.equal(count(p, 'fairy_symptoms_list'), 1, 'Zandar reads rather than consumes the list');
 
-// Each available entry occupies each pick position once through native Mortifer
+// Each period-pool entry occupies each pick position once through native Mortifer
 // dispatch. Three bounded RNG draws select distinct ranks without reroll bias.
 const mortifer = placedNpc('elemental_wizard_boss');
 const pickCoverage = [new Set(), new Set(), new Set()];
@@ -564,18 +559,17 @@ for (let choice = 0; choice < availableNatureIndices.length; choice++) {
   withRandom([(choice + 0.25) / poolSize, (secondRaw - 0.25) / (poolSize - 1),
     (thirdRaw - 0.25) / (poolSize - 2)],
   () => talk(candidate, 'elemental_wizard_boss', [], { actor: mortifer }));
-  assert.equal(stage(candidate), ft1Constant('ft1_components'), `Mortifer stores available pick set ${choice + 1}`);
+  assert.equal(stage(candidate), ft1Constant('ft1_components'), `Mortifer stores pick set ${choice + 1}`);
   assert.equal(count(candidate, 'fairy_skull'), 0, 'Mortifer consumes the Draynor skull once');
   const picks = [1, 2, 3].map(index => candidate.getVarBit(varbit(`fairy_nature_item${index}`)));
-  assert.deepEqual(picks, [firstRank, secondRank, thirdRank].map(rank => availableNatureIndices[rank - 1]),
-    'bounded ranks map bijectively to the eligible original table indices');
-  assert(!picks.includes(21), 'mosquito proboscis is never chosen in any pick position');
+  assert.deepEqual(picks, [firstRank, secondRank, thirdRank],
+    'bounded ranks map bijectively to all 31 original table indices');
   assert.equal(new Set(picks).size, 3, 'all three persisted picks are distinct');
   picks.forEach((value, index) => pickCoverage[index].add(value));
 }
 for (const coverage of pickCoverage) {
   assert.deepEqual([...coverage].sort((a, b) => a - b), availableNatureIndices,
-    'every eligible item occurs in each of the three persisted pick positions');
+    'every period-pool item occurs in each of the three persisted pick positions');
 }
 
 // Main path: the grave is selected from its named source coordinate, and the
@@ -589,12 +583,32 @@ const graveRow = nativeLocInventory().find(row => row.level === graveCoord[0] &&
 assert(graveRow, 'the original Draynor gravestone is present at the source coordinate');
 const grave = locFor(graveRow);
 fillInventory(p);
+// Keep the earlier enchanted-key hook eligible while digging at the FT1 grave.
+p.setVarBit(varbit('makinghistory_prog'), integerConstant('scripts/general/configs/quest.constant', 'makinghistory_complete'));
+p.getInventory(invId).set(26, { id: obj('makinghistory_key'), count: 1 });
 digAtGrave(p, grave);
 assert.equal(stage(p), ft1Constant('ft1_skull'));
 assert.equal(count(p, 'fairy_skull'), 0, 'a full inventory cannot take the skull');
 freeInventorySlot(p);
 digAtGrave(p, grave);
 assert.equal(count(p, 'fairy_skull'), 1, 'the reachable grave approach yields one skull');
+assert.equal(count(p, 'makinghistory_key'), 1, 'the earlier key hook leaves the held key intact at the skull grave');
+assert.equal(p.getVar(varp('enchanted_key_hunt')), 1 << 11,
+  'the key hook selects its first target but awards no off-site treasure or completion bit');
+// Conversely, an active FT1 skull request cannot pre-empt a real key treasure.
+const keyDigger = player(ft1Constant('ft1_skull'));
+keyDigger.setVarBit(varbit('makinghistory_prog'), integerConstant('scripts/general/configs/quest.constant', 'makinghistory_complete'));
+add(keyDigger, 'makinghistory_key');
+add(keyDigger, 'spade');
+[keyDigger.level, keyDigger.x, keyDigger.z] = tileFromCoord(readConstant(
+  'scripts/quests/miniquest_enchanted_key/configs/enchanted_key.constant', 'ek_site_0'));
+runScript('[opheld1,spade]', keyDigger);
+assert.equal(keyDigger.getVar(varp('enchanted_key_hunt')), 1, 'the shared Dig awards the first key treasure');
+assert.equal(count(keyDigger, 'cert_mithril_ore'), 10);
+assert.equal(count(keyDigger, 'steel_arrow'), 20);
+assert.equal(count(keyDigger, 'lawrune'), 15);
+assert.equal(count(keyDigger, 'fairy_skull'), 0, 'the FT1 skull hook does not award a skull at a key treasure');
+assert.equal(stage(keyDigger), ft1Constant('ft1_skull'), 'the key treasure does not change the FT1 request');
 withRandom([0.25 / availableNatureIndices.length, 0.75 / (availableNatureIndices.length - 1),
   0.75 / (availableNatureIndices.length - 2)],
 () => talk(p, 'elemental_wizard_boss', [], { actor: mortifer }));
@@ -876,7 +890,7 @@ assert.equal(p.getVar(questPoints) - qpBefore, 2, 'replay grants no duplicate qu
 assert.equal(count(p, 'fairy_enchanted_secateurs', wornId), 1, 'replay leaves the magic secateurs equipped');
 await verifyIngredientSources({
   content, engine, World, types, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType,
-  nativeNpcRows, nativeLocRows, player, withRandom, add, count, obj, driveDialogue, JavaRandom, druidComplete, integerConstant
+  nativeNpcRows, nativeLocRows, player, withRandom, add, count, obj, driveDialogue, JavaRandom, druidComplete, integerConstant, setNearLoc
 });
-console.log('PASS Fairytale I packed quest stages, real visible-form/map dispatch, 31-entry item table, 30 eligible choices, combat and completion');
+console.log('PASS Fairytale I packed quest stages, real visible-form/map dispatch, all 31 item choices and producers, combat and completion');
 process.exit(0);

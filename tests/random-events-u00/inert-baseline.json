@@ -11,7 +11,7 @@
     "appendages": [8994, 8995, 8996, 8997]
   },
   "traces": {
-    "[login,_]": { "commands": 4163, "sha256": "8475e7fded40be681ed91536e1e5ab4c9aaf64c2fbe530f2a7b82f6628f5a21b" },
+    "[login,_]": { "commands": 4175, "sha256": "12b3080182106580c79371119b645eedd63ed13c6489cf39eda5bd0c4613ebfd" },
     "[queue,macro_event_login]": { "commands": 12, "sha256": "e1908250150d59ad170c1e93284a7774e4eadcda52f68480eed757a3f23d5539" },
     "[oploc1,_mining_rock_normal]": { "commands": 280, "sha256": "ef1644b46bcf4ce8d835e0c5cfe7379cd99347433d20cd87f7f79922bd07ebbf" },
     "[if_button,magic:lumbridge_teleport]": { "commands": 3751, "sha256": "880bab1d06978e9ca048559ed622ef1d4cccf53a398cd4efbd88dc95536a50f9" }

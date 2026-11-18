@@ -11,9 +11,6 @@
 // Complete=90 and 2 quest points already live in general/configs/quest.constant.
 // UNKNOWN engineering indices: alphabetical 2 May 2006 Tip.It pool, 1..31.
 ^ft1_item_count = 31
-// DEVIATION PENDING operator authorization: no proboscis producer in this tree.
-// Restore this one line to 0 when Tai Bwo Wannai Cleanup (N605) supplies it.
-^ft1_unavailable_item = 21
 // UNKNOWN engineering lifetime (ticks), not a historical respawn claim.
 ^ft1_boss_lifetime = 1000
 // UNKNOWN engineering blend; CANDIDATE OSRS backs both skills, not their weights.
