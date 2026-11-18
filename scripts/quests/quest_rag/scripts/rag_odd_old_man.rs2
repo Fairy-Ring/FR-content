@@ -1,7 +1,7 @@
 // CANDIDATE wording: OSRS Transcript:Rag and Bone Man I, revision 15330894.
 // Subtract the later start overlay and restore the recorded pre-2022 sack line.
 [opnpc1,rag_odd_old_man]
-if (~rag_stage >= 2) {
+if (~rag_stage >= ^rag_complete) {
     ~chatnpc("<p,neutral>I'm always on the lookout for fresh bones, so if you see some bring them right over.");
     return;
 }
@@ -51,7 +51,7 @@ if (~p_choice2("Yes. I'll give you a hand.", 1, "No.", 2) = 2) {
 }
 ~chatplayer("<p,neutral>Yes. I'll give you a hand.");
 %rag_quest = setbit_range_toint(%rag_quest, 1, 0, 1);
-~send_quest_progress(questlist:rag, 1, 2);
+~send_quest_progress(questlist:rag, 1, ^rag_complete);
 ~chatnpc("<p,neutral>You will? Excellent!");
 ~rag_sack("Sniggersnigger");
 ~chatplayer("<p,neutral>Where do you need me to dig?");
@@ -102,11 +102,12 @@ if (getbit_range(%rag_quest, 2, 9) = 255) {
     ~chatnpc("<p,neutral>I'm always on the lookout for fresh bones, so if you see some bring them right over.");
     ~chatplayer("<p,neutral>No problem, I'll be sure to bring anything you might like over if I find something.");
     ~chatplayer("<p,neutral>I can't wait to see the displays once they are finished.");
-    %rag_quest = setbit_range_toint(%rag_quest, 2, 0, 1);
+    %rag_quest = setbit_range_toint(%rag_quest, ^rag_complete, 0, 1);
     // VERIFIED rewards: RuneHQ 2006-04-24, first part only.
     stat_advance(cooking, 5000);
     stat_advance(prayer, 5000);
-    ~send_quest_complete(questlist:rag, rag_polished_goblin_bone, 200, 1, "You have completed Rag and Bone Man!", "500 Cooking XP|500 Prayer XP");
+    // UNKNOWN: generic scroll layout, model scale 200 and functional title.
+    ~send_quest_complete(questlist:rag, rag_polished_goblin_bone, 200, ^rag_questpoints, "You have completed Rag and Bone Man!", "500 Cooking XP|500 Prayer XP");
     return;
 }
 if ($given = true) {

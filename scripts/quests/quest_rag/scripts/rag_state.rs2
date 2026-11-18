@@ -58,7 +58,7 @@ while ($bone <= 8) {
 return(0);
 
 // CANDIDATE: OSRS initial-eight drops are guaranteed, unlike wish-list drops.
-// Possession includes the bank and the player's own pot-boiler, not other players.
+// UNKNOWN possession policy: include bank and own boiler, not other players.
 [proc,rag_drop](int $bone)
 if (~rag_stage ! 1 | ~rag_handed($bone) = true) return;
 if (~obj_gettotal(~rag_raw($bone)) > 0 | ~obj_gettotal(~rag_potted($bone)) > 0 | ~obj_gettotal(~rag_polished($bone)) > 0) return;
