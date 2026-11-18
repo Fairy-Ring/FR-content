@@ -1,6 +1,6 @@
 // Potato cache selectors and period Tip.It XP (28 April 2006).
-// Shared timing is CANDIDATE Old School behavior. Numerical disease chances
-// below are UNKNOWN engineering values, not recovered 377 probabilities.
+// Shared growth/harvest timing is CANDIDATE Old School behavior. Rake cadence
+// and numerical disease chances are UNKNOWN engineering values, not history.
 
 // --- multiloc stages (farming_veg_patch_* shared table) ---
 ^farming_veg_weeds_3 = 0
@@ -15,8 +15,18 @@
 // Last harvest-band index (loc repeats fullygrown at 10, 11, 12).
 ^farming_potato_harvest_last = 12
 
-// Seeds per allotment plant (period guides)
+// CANDIDATE Old School: three seeds per ordinary allotment.
 ^farming_allotment_seed_count = 3
+
+// UNKNOWN engineering cadence, authorized with ordinary rake continuation:
+// farming_raking has 56 client cycles; 30 cycles per game tick gives ceil(56/30)=2.
+// All 52 OSRS Weeds revisions searched; none states ordinary rake cadence.
+^farming_rake_step_ticks = 2
+// CANDIDATE OSRS Weeds, including first revision 166373: 4 XP per weed.
+^farming_weed_xp = 40
+// CANDIDATE OSRS Game tick revision 14757687; retained history has no change note.
+^farming_harvest_auto_ticks = 3
+^farming_harvest_manual_ticks = 2
 
 // VERIFIED period-guide XP tenths (Tip.It: plant 8 / harvest 9).
 ^farming_potato_plant_xp = 80
@@ -28,11 +38,31 @@
 ^farming_dead_offset = 192
 
 ^farming_handler_potato = 1
+^farming_handler_herb = 2
 // CANDIDATE pre-rework OSRS: 500 game ticks, reset on login/logout.
 ^farming_growth_poll_ticks = 500
 ^farming_growth_window_minutes = 5
-// UNKNOWN engineering values: no cited source gives potato-specific chances.
+// UNKNOWN engineering values shared by ordinary crops, not recovered rates.
 // Ash (16 December 2019) says watering reduces, rather than eliminates, risk.
 ^farming_disease_denominator = 128
-^farming_potato_disease_dry = 20
-^farming_potato_disease_watered = 10
+^farming_allotment_disease_dry = 20
+^farming_allotment_disease_watered = 10
+
+// CANDIDATE OSRS: three harvest lives, one item per pick, level-interpolated
+// life-saving chance. Potato keeps its inherited fixed three-item harvest.
+^farming_harvest_denominator = 256
+// UNKNOWN engineering endpoints shared by the six new allotment crops.
+// Retained OSRS revision 15402033 gives the formula but not these crop CTS.
+^farming_allotment_save_low = 64
+^farming_allotment_save_high = 128
+
+// CANDIDATE seed-pack order assigns species to the generic herb cache bands.
+// VERIFIED cache: four growth advances and three mature harvest-life bytes.
+^farming_herb_normal_first = 4
+^farming_herb_normal_mature = 8
+^farming_herb_dead_first = 170
+
+// UNKNOWN engineering herb CTS_low; original per-herb endpoints unavailable.
+^farming_herb_save_low = 64
+// CANDIDATE OSRS Farming revision 15402033: CTS_high=80 for every herb.
+^farming_herb_save_high = 80

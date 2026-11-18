@@ -1,10 +1,18 @@
-// Making History start — Jorral (makinghistory_jorral 2932) @ 2437,3347.
-// CANDIDATE last-resort 2007-base: OSRS Transcript Starting off minus
-// master-clue / Overview / req toast / cutscene dest.
-// Hunt 289? no. No Lathas splice. Accept: %makinghistory_prog 0→1 only.
-// Cite making-history-first-product-slice-377.md §4.
+// Making History. Progression/rewards: period Tip.It guide (2 May 2006).
+// Dialogue: CANDIDATE OSRS transcript revision 15263331, without later content.
+// Main stages and report markers are UNKNOWN engineering state encodings.
 
 [opnpc1,makinghistory_jorral]
+if (%makinghistory_prog = ^makinghistory_complete) {
+    ~chatnpc("<p,happy>Take a look at the artefacts in the new museum room. You may find something of interest.");
+    return;
+}
+if (%makinghistory_prog = 3) {
+    @mh_jorral_reply;
+}
+if (%makinghistory_prog = 2) {
+    @mh_jorral_letter;
+}
 if (%makinghistory_prog >= 1) {
     @mh_jorral_started;
 }
@@ -14,6 +22,10 @@ if (%makinghistory_prog >= 1) {
 ~chatplayer("<p,happy>Hi there.");
 ~chatnpc("<p,shock>All is lost!");
 ~chatplayer("<p,confused>Sorry?");
+if (%prieststart < ^priest_complete | %priestperil < ^priestperil_complete) {
+    ~chatnpc("<p,sad>Don't bother, you're not experienced enough to help me!");
+    return;
+}
 ~chatnpc("<p,sad>Just look around you! This great building will soon be in ruin.");
 ~chatplayer("<p,quiz>Great building?");
 ~chatnpc("<p,happy>Of course! This building has a history spanning generations!");
@@ -39,6 +51,7 @@ if ($yes = 2) {
 ~chatnpc("<p,happy>Oh thank you so much, you really are my saviour!");
 if (%makinghistory_prog = 0) {
     %makinghistory_prog = 1;
+    ~send_quest_progress(questlist:makinghistory, %makinghistory_prog, ^makinghistory_complete);
 }
 ~chatplayer("<p,quiz>But where should I start?");
 @mh_jorral_need;
@@ -51,16 +64,41 @@ return;
 [label,mh_jorral_started]
 ~chatplayer("<p,happy>Hi there.");
 ~chatnpc("<p,quiz>How's it going?");
-if (inv_total(inv, makinghistory_scroll1) > 0 & %makinghistory_ghost_prog >= 3) {
-    @mh_jorral_scroll;
+if (%makinghistory_trader_prog = 3 & inv_total(inv, makinghistory_journal) > 0) {
+    ~chatplayer("<p,happy>I found a journal!");
+    ~chatnpc("<p,happy>Good work. Let's see what it says.");
+    ~mesbox("Jorral reads through the journal.");
+    ~chatnpc("<p,neutral>The person who wrote the journal spent time living in the outpost, following the order of Zamorak.");
+    ~chatplayer("<p,neutral>I see.");
+    ~chatnpc("<p,neutral>He talks of all the nasty things they did to the people of Ardougne, which I don't care to mention! It looks like they were stopped by someone. But it doesn't say who.");
+    ~chatplayer("<p,quiz>Interesting.");
+    inv_del(inv, makinghistory_journal, 1);
+    %makinghistory_trader_prog = 4;
+}
+if (%makinghistory_ghost_prog = 3 & inv_total(inv, makinghistory_scroll1) > 0) {
+    ~chatplayer("<p,neutral>I have been in contact with the ghost you suggested, and I've recovered this:");
+    ~mesbox("Jorral skims over the contents of the scroll.");
+    ~chatnpc("<p,happy>Very interesting. So there was a great battle at the outpost. Then one of the survivors became king, and the other started the market place. Good work.");
+    inv_del(inv, makinghistory_scroll1, 1);
+    %makinghistory_ghost_prog = 4;
+}
+if (%makinghistory_warr_prog = 2) {
+    ~chatplayer("<p,neutral>I've talked to the warrior.");
+    ~chatnpc("<p,happy>Excellent! What did he say?");
+    ~chatplayer("<p,neutral>Well...");
+    ~chatplayer("<p,neutral>And then I asked him about getting the blood stains out of his clothes, but he didn't like that!");
+    ~chatnpc("<p,happy>It seems you're lucky he didn't beat you up! Well done, that's another piece of the puzzle.");
+    %makinghistory_warr_prog = 3;
+}
+if (%makinghistory_trader_prog = 4 & %makinghistory_ghost_prog = 4 & %makinghistory_warr_prog = 3) {
+    @mh_jorral_history;
+}
+if (inv_total(inv, makinghistory_chest) > 0) {
+    ~chatplayer("<p,neutral>Hi. I found a chest.");
+    ~chatnpc("<p,neutral>Best you look inside then.");
+    return;
 }
 @mh_jorral_need;
-
-[label,mh_jorral_scroll]
-~chatplayer("<p,neutral>I have been in contact with the ghost you suggested, and I've recovered this:");
-~mesbox("Jorral skims over the contents of the scroll.");
-~chatnpc("<p,happy>Very interesting. So there was a great battle at the outpost. Then one of the survivors became king, and the other started the market place. Good work.");
-return;
 
 [label,mh_jorral_need]
 ~chatnpc("<p,neutral>There are three people that may be able to help:");
@@ -94,3 +132,78 @@ if ($w = 2) {
 ~chatplayer("<p,neutral>That sounds simple enough.");
 ~chatnpc("<p,neutral>He isn't the easiest person to talk to, so you may need to speak to his brother, Blanin, first.");
 return;
+
+[label,mh_jorral_history]
+~chatnpc("<p,happy>It all makes sense now, I never realised there was quite so much history to this place, it was more than I could have hoped.");
+~chatplayer("<p,happy>I'm glad to hear. What's the whole story?");
+~chatnpc("<p,neutral>Many years ago, there were two friends who fell out over their difference of opinion in religion. One decided to dedicate his life to Saradomin, the other to Zamorak.");
+~chatnpc("<p,neutral>Years passed and the follower of Zamorak moved into this outpost with a group of others to cause havoc for the city of Ardougne.");
+~chatnpc("<p,neutral>The people of the city called upon some Saradomin followers, who happened to be led by the other friend. A battle ensued that ended with the two ex-friends at the top of the outpost as the sole survivors.");
+~chatnpc("<p,neutral>Realising their mistakes they made friends again. One decided to become King and spread the word of equality, and the other chose to start up a market where all could trade their wares equally and fairly.");
+~chatnpc("<p,neutral>The one that became king is the great grandfather of the King Lathas that we know!");
+~chatplayer("<p,quiz>So what should I do now?");
+~chatnpc("<p,neutral>Well, what I'll do is write down the details you have provided in a more easy to digest manner, along with my plans for using this building as a museum.");
+if (inv_freespace(inv) = 0) {
+    ~chatnpc("<p,neutral>Well I would give you the letter if you had space to carry it.");
+    return;
+}
+inv_add(inv, makinghistory_letter1, 1);
+%makinghistory_prog = 2;
+~chatplayer("<p,quiz>Then I suppose you want ME to deliver it to the king?");
+~chatnpc("<p,happy>You've got that right!");
+return;
+
+[label,mh_jorral_letter]
+if (inv_total(inv, makinghistory_letter1) = 0) {
+    ~chatplayer("<p,quiz>Don't suppose you could give me the letter again?");
+    ~chatnpc("<p,neutral>Ok. Just don't lose it again!");
+    ~mh_give(makinghistory_letter1, 1);
+    return;
+}
+~chatnpc("<p,quiz>Have you taken that letter to King Lathas in Ardougne yet?");
+~chatplayer("<p,neutral>No, sorry.");
+~chatnpc("<p,neutral>Any time soon would be great.");
+return;
+
+[label,mh_jorral_reply]
+if (inv_total(inv, makinghistory_letter2) = 0) {
+    ~chatplayer("<p,sad>I was given a letter to give to you from the king! But I seem to have lost it!");
+    ~chatnpc("<p,neutral>Perhaps he will give you another one.");
+    return;
+}
+~chatplayer("<p,happy>I've been to see the king and he gave me this letter.");
+~chatnpc("<p,happy>Quick, let me see.");
+~mesbox("Jorral reads the letter.");
+~chatnpc("<p,happy>Hurrah! Good work, you've done it. You've saved the outpost!");
+~chatplayer("<p,happy>My pleasure.");
+~chatnpc("<p,happy>I can now continue with my plans for this place. Thank you.");
+~chatnpc("<p,happy>Take a look at the artefacts in the new museum room. You may find something of interest.");
+~mh_complete;
+return;
+
+[proc,mh_complete]
+if (%makinghistory_prog ! 3 | inv_total(inv, makinghistory_letter2) = 0) {
+    return;
+}
+inv_del(inv, makinghistory_letter2, 1);
+%makinghistory_prog = ^makinghistory_complete;
+%makinghistory_objloc = 1;
+// VERIFIED amounts: Tip.It 2 May 2006. XP opcode units are tenths.
+stat_advance(prayer, 10000);
+stat_advance(crafting, 10000);
+~mh_give(coins, 750);
+if (inv_total(inv, makinghistory_key) = 0 & inv_total(bank, makinghistory_key) = 0) {
+    ~mh_give(makinghistory_key, 1);
+}
+// UNKNOWN layout: use the common 377 completion scroll with sourced rewards.
+~send_quest_complete(questlist:makinghistory, makinghistory_key, 200, ^makinghistory_questpoints, "You have completed Making History!", "1,000 Prayer XP|1,000 Crafting XP|750 coins|An enchanted key");
+
+[proc,mh_give](namedobj $item, int $count)
+// UNKNOWN overflow lifetime: the existing Droalak hand-off uses 200 ticks.
+if (inv_total(inv, $item) > 0 & oc_stackable($item) = true) {
+    inv_add(inv, $item, $count);
+} else if (inv_freespace(inv) > 0) {
+    inv_add(inv, $item, $count);
+} else {
+    obj_add(coord, $item, $count, 200);
+}

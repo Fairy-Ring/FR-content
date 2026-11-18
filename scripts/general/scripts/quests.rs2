@@ -374,6 +374,9 @@ if (%zogre >= ^zogre_complete) {
 if (%wanted_main = ^wanted_complete) {
     $questpoints = add($questpoints, ^wanted_questpoints);
 }
+if (~rag_stage >= ^rag_complete) {
+    $questpoints = add($questpoints, ^rag_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -466,6 +469,9 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 ~send_quest_progress_colour(questlist:onesmallfavour, %onesmallfavour, ^onesmallfavour_complete);
 ~send_quest_progress_colour(questlist:elid, %elidquest, ^elid_complete);
+~send_quest_progress_colour(questlist:makinghistory, %makinghistory_prog, ^makinghistory_complete);
+~send_quest_progress_colour(questlist:rag, ~rag_stage, ^rag_complete);
+~send_quest_progress_colour(questlist:mdaughter, %mdaughter_quest_var, ^mdaughter_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {

@@ -1,0 +1,90 @@
+// Original 377 fields retained when moving these three blocks from all.npc.
+[mdaughter_multi_bear]
+readyanim=bearsuit_ready
+walkanim=bearsuit_walk
+size=2
+op1=Talk-to
+op2=Attack
+vislevel=1
+multivar=mdaughter_bear_multi_state
+multinpc=0,mdaughter_bearman
+// VERIFIED: original 377 child stats, copied to the placed root for entity initialization.
+hitpoints=50
+attack=65
+strength=65
+defence=60
+// UNKNOWN: engineering stationary spawn and respawn delay, not period behavior.
+wanderrange=0
+respawnrate=50
+// CANDIDATE: OSRS melee combat, four-tick speed, bonuses; 377 bearsuit animations.
+param=attackrate,4
+param=attackbonus,5
+param=strengthbonus,10
+param=stabdefence,10
+param=slashdefence,10
+param=crushdefence,10
+param=magicdefence,-10
+param=rangedefence,20
+param=damagetype,^crush_style
+param=attack_anim,bearsuit_attack
+param=defend_anim,bearsuit_defend
+param=death_anim,bearsuit_death
+
+[mdaughter_bearman]
+name=The Kendal
+desc=Is that a bear... or a man?
+model1=npc_1812
+model2=npc_1812i2
+size=2
+readyanim=bearsuit_ready
+walkanim=bearsuit_walk
+vislevel=70
+hitpoints=50
+attack=65
+strength=65
+defence=60
+op1=Talk-to
+op2=Attack
+head1=npc_1812_head
+// CANDIDATE: same combat data as the root, since npc_param resolves the visible form.
+param=attackrate,4
+param=attackbonus,5
+param=strengthbonus,10
+param=stabdefence,10
+param=slashdefence,10
+param=crushdefence,10
+param=magicdefence,-10
+param=rangedefence,20
+param=damagetype,^crush_style
+param=attack_anim,bearsuit_attack
+param=defend_anim,bearsuit_defend
+param=death_anim,bearsuit_death
+
+[mdaughter_bearman_fighter]
+name=The Kendal
+desc=Is that a bear... or a man?
+model1=npc_1812
+model2=npc_1812i2
+size=2
+readyanim=bearsuit_ready
+walkanim=bearsuit_walk
+vislevel=70
+hitpoints=50
+attack=65
+strength=65
+defence=60
+op2=Attack
+head1=npc_1812_head
+// CANDIDATE: OSRS The Kendal combat data, using the original 377 animations.
+param=attackrate,4
+param=attackbonus,5
+param=strengthbonus,10
+param=stabdefence,10
+param=slashdefence,10
+param=crushdefence,10
+param=magicdefence,-10
+param=rangedefence,20
+param=damagetype,^crush_style
+param=attack_anim,bearsuit_attack
+param=defend_anim,bearsuit_defend
+param=death_anim,bearsuit_death

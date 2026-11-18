@@ -153,9 +153,13 @@ jobs:
           run_test 'tests/varp-morph-transmit/test_varp_morph_transmit.mjs + tests/varp-morph-transmit/test_ernest_scene.mjs' node --import tsx --test ../content/tests/varp-morph-transmit/test_varp_morph_transmit.mjs ../content/tests/varp-morph-transmit/test_ernest_scene.mjs
           run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
+          run_test tests/mountain-daughter/test_mountain_daughter.mjs node --import tsx ../content/tests/mountain-daughter/test_mountain_daughter.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
           run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
           run_test tests/farming/test_farming.mjs node --import tsx ../content/tests/farming/test_farming.mjs
+          run_test tests/farming/test_allotments.mjs node --import tsx ../content/tests/farming/test_allotments.mjs
+          run_test tests/farming/test_herbs.mjs node --import tsx ../content/tests/farming/test_herbs.mjs
+          run_test tests/farming/test_tool_actions.mjs node --import tsx ../content/tests/farming/test_tool_actions.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
           run_test tests/skippy/test_skippy.mjs node --import tsx ../content/tests/skippy/test_skippy.mjs
           run_test tests/empty-lord/test_empty_lord.mjs node --import tsx ../content/tests/empty-lord/test_empty_lord.mjs
@@ -163,6 +167,7 @@ jobs:
           run_test tests/citizen-tables/test_citizen_tables.mjs node --import tsx ../content/tests/citizen-tables/test_citizen_tables.mjs
           run_test tests/cfg-other/test_cfg_other.mjs node --import tsx ../content/tests/cfg-other/test_cfg_other.mjs
           run_test tests/npc-death/test_npc_death.mjs node --import tsx ../content/tests/npc-death/test_npc_death.mjs
+          run_test tests/rag-and-bone-man/test_rag_and_bone.mjs node --import tsx ../content/tests/rag-and-bone-man/test_rag_and_bone.mjs
           run_test tests/elf-viking-drops/test_elf_viking_drops.mjs node --import tsx ../content/tests/elf-viking-drops/test_elf_viking_drops.mjs
           run_test tests/mortmyre-creatures/test_mortmyre_creatures.mjs node --import tsx ../content/tests/mortmyre-creatures/test_mortmyre_creatures.mjs
           run_test tests/cfg-npc/test_cfg_npc.mjs node --import tsx ../content/tests/cfg-npc/test_cfg_npc.mjs
@@ -230,6 +235,7 @@ jobs:
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
           run_test tests/onesmallfavour/test_completion.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/onesmallfavour/test_completion.mjs
           run_test tests/spirits-of-the-elid/test_elid.mjs node --import tsx ../content/tests/spirits-of-the-elid/test_elid.mjs
+          run_test tests/making-history/test_making_history.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/making-history/test_making_history.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
           run_test tests/skill-menus/runtime.mts bash ../content/tests/skill-menus/runtime.sh "$PWD"
@@ -252,6 +258,7 @@ jobs:
           run_test tests/monster-a7/test_monster_a7.mjs node --import tsx ../content/tests/monster-a7/test_monster_a7.mjs
           run_test tests/zygomite/test_zygomite.mjs node --import tsx ../content/tests/zygomite/test_zygomite.mjs
           run_test tests/wyvern/test_wyvern.mjs node --import tsx ../content/tests/wyvern/test_wyvern.mjs
+          run_test tests/giant-mole/test_giant_mole.mjs node --import tsx ../content/tests/giant-mole/test_giant_mole.mjs
           exit "$failed"
 
       - name: Write job summary

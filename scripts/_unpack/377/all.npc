@@ -43290,49 +43290,6 @@ op1=Talk-to
 head1=idk_man_hair_spikes_head
 head2=idk_man_jaw_long_head
 
-[mdaughter_multi_bear]
-readyanim=bearsuit_ready
-walkanim=bearsuit_walk
-size=2
-op1=Talk-to
-op2=Attack
-vislevel=1
-multivar=mdaughter_bear_multi_state
-multinpc=0,mdaughter_bearman
-
-[mdaughter_bearman]
-name=The Kendal
-desc=Is that a bear... or a man?
-model1=npc_1812
-model2=npc_1812i2
-size=2
-readyanim=bearsuit_ready
-walkanim=bearsuit_walk
-vislevel=70
-hitpoints=50
-attack=65
-strength=65
-defence=60
-op1=Talk-to
-op2=Attack
-head1=npc_1812_head
-
-[mdaughter_bearman_fighter]
-name=The Kendal
-desc=Is that a bear... or a man?
-model1=npc_1812
-model2=npc_1812i2
-size=2
-readyanim=bearsuit_ready
-walkanim=bearsuit_walk
-vislevel=70
-hitpoints=50
-attack=65
-strength=65
-defence=60
-op2=Attack
-head1=npc_1812_head
-
 [mdaughter_camp_male1]
 name=Camp dweller
 desc=One of the inhabitants of the camp.
@@ -75012,26 +74969,6 @@ vislevel=hide
 wanderrange=0
 moverestrict=nomove
 defaultmode=none
-
-[mole_giant]
-name=Giant Mole
-desc=Holy Mole-y!
-model1=npc_3340
-model2=npc_3340i2
-model3=npc_3340i3
-model4=npc_3340i4
-size=3
-readyanim=mole_ready
-walkanim=mole_walk
-op2=Attack
-resizeh=118
-resizev=118
-alwaysontop=yes
-vislevel=230
-hitpoints=200
-attack=200
-strength=200
-defence=200
 
 [mole_baby_01]
 name=Baby Mole

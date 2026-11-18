@@ -1,18 +1,139 @@
-// Rag and Bone Man — Odd Old Man (Silvarea/East Varrock dig site) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:Rag and Bone Man I minus "I" / overlay).
-// First write %rag_quest 0 -> 1. Chat + write only — bone list / Fortunato
-// vinegar = later. No II wishlist, no pot-boiler dest, no wine-shop dest.
-// Cite red-19-start-impl-377.md §17.
-
+// CANDIDATE wording: OSRS Transcript:Rag and Bone Man I, revision 15330894.
+// Subtract the later start overlay and restore the recorded pre-2022 sack line.
 [opnpc1,rag_odd_old_man]
+if (~rag_stage >= ^rag_complete) {
+    ~chatnpc("<p,neutral>I'm always on the lookout for fresh bones, so if you see some bring them right over.");
+    return;
+}
+if (~rag_stage = 1) {
+    ~rag_handin;
+    return;
+}
 ~chatnpc("<p,neutral>Can I help you with something?");
 ~chatplayer("<p,neutral>Well, err...who are you, and what are all these bones doing here?");
+~chatnpc("<p,neutral>Errr...");
+~rag_sack("Mumblemumble");
 ~chatnpc("<p,neutral>I'm an archaeologist. I work with the museum.");
+~chatplayer("<p,neutral>An archaeologist?");
+~chatnpc("<p,neutral>Yes.");
+~chatplayer("<p,neutral>Well that explains the bones...sort of...but what are you doing all the way out here?");
+~rag_sack("Mumblemumble. Mumblemumblemumble.");
+~chatnpc("<p,neutral>I'm collecting bones for the museum.");
+~chatnpc("<p,neutral>They have asked me to rig up some displays of second and third age creatures using their bones, so that people can come and...well, look at them.");
+~chatnpc("<p,neutral>I need to get them into some sort of order before I begin, but I've run into a bit of a snag.");
+~chatplayer("<p,neutral>What sort of a snag?");
+~chatnpc("<p,neutral>Well, I need to have all the bones I'm going to use here, and placed into some sort of order.");
+~chatnpc("<p,neutral>However, I seem to have discovered I am a few short.");
+def_int $choice = ~p_choice3("Anything I can do to help?", 1, "Well, good luck with that.", 2, "Where is that mumbling coming from?", 3);
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>Well good luck with that!");
+    ~chatnpc("<p,neutral>Thanks stranger!");
+    return;
+}
+if ($choice = 3) {
+    ~chatplayer("<p,neutral>Where is that mumbling coming from?");
+    ~rag_sack("Mumblemumble");
+    ~chatnpc("<p,neutral>What mumbling?");
+    ~chatnpc("<p,neutral>Anyway, I have enough problems of my own without dealing with a delusional adventurer.");
+    return;
+}
+~chatplayer("<p,neutral>Anything I can do to help?");
+~chatnpc("<p,neutral>There is something you could do for me. I'm going to be busy...err...");
+~rag_sack("Mumble");
+~chatnpc("<p,neutral>Sorting, yes, sorting these bones out ready for the museum, but I need a few more.");
 ~chatnpc("<p,neutral>Will you help me out by grabbing some?");
-def_int $go = ~p_choice2("Yes. I'll give you a hand.", 1, "Well, never mind me young man...", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>Well, never mind me young man...");
+if (~p_choice2("Yes. I'll give you a hand.", 1, "No.", 2) = 2) {
+    ~chatplayer("<p,neutral>No.");
+    ~chatnpc("<p,neutral>Oh...I see.");
+    ~chatnpc("<p,neutral>Well, never mind me young man, I'll just stagger over here under my massive burden, and continue my thankless task.");
+    ~chatnpc("<p,neutral>Unaided and alone...");
     return;
 }
 ~chatplayer("<p,neutral>Yes. I'll give you a hand.");
-%rag_quest = 1;
+%rag_quest = setbit_range_toint(%rag_quest, 1, 0, 1);
+~send_quest_progress(questlist:rag, 1, ^rag_complete);
+~chatnpc("<p,neutral>You will? Excellent!");
+~rag_sack("Sniggersnigger");
+~chatplayer("<p,neutral>Where do you need me to dig?");
+~chatnpc("<p,neutral>Dig?");
+~rag_sack("Mumblemumble");
+~chatnpc("<p,neutral>Oh, you must have got the wrong end of the stick.");
+~chatnpc("<p,neutral>I need some fresh, whole bones to replace ones that have become damaged.");
+~rag_sack("Mumblemumblemumblemumblemumble. Mumblemumblemumblemumble. Mumble.");
+~chatnpc("<p,neutral>Ok, got it.");
+~chatnpc("<p,neutral>Ok, here is the thing. While sorting out what bones I do have I managed to lose or damage a few. If you can get me some fresh, unbroken bones to use as replacements then I can get on with things.");
+~rag_instructions;
+
+[proc,rag_sack](string $text)
+~chatnpc_specific("Sack", talking_sack, "<p,neutral><$text>");
+
+[proc,rag_instructions]
+~chatnpc("<p,neutral>Great. If you can get me a bone from a Goblin, a Bear, a Big Frog, a Ram, a Unicorn, a Monkey, a Giant rat and a Giant Bat then I'll be able to move on with the...");
+~chatnpc("<p,neutral>Displays...");
+~chatnpc("<p,neutral>Well, I wouldn't mind you sticking them in a pot and boiling them in vinegar first, if you don't mind.");
+~chatnpc("<p,neutral>There is a Wine Merchant in Draynor called Fortunato that sells the stuff you'll need.");
+~chatnpc("<p,neutral>You can even use my pot-boiler if you want.");
+~chatnpc("<p,neutral>It gets them bright and sparking white.");
+~chatnpc("<p,neutral>It's an archaeologist thing.");
+~chatnpc("<p,neutral>Just put the bone in a pot of vinegar, throw some logs on the fire, put the pot in the holder and light the logs.");
+~chatnpc("<p,neutral>It takes a while for the vinegar to evaporate, but the bone will be nice and clean in the end.");
+
+[proc,rag_handin]
+if (~rag_stage ! 1) return;
+def_int $bone = 1;
+def_boolean $given = false;
+while ($bone <= 8) {
+    if (~rag_handed($bone) = false & inv_total(inv, ~rag_polished($bone)) > 0) {
+        inv_del(inv, ~rag_polished($bone), 1);
+        %rag_quest = setbit(%rag_quest, add($bone, 1));
+        $given = true;
+    }
+    $bone = add($bone, 1);
+}
+// A dialogue interruption after the final hand-in cannot lose the reward.
+if (getbit_range(%rag_quest, 2, 9) = 255) {
+    ~chatplayer("<p,neutral>I have some bones for you.");
+    ~chatnpc("<p,neutral>Great! Let me take a look at them.");
+    ~chatnpc("<p,neutral>That's the last of them!");
+    ~chatnpc("<p,neutral>The museum will be thrilled to know I've completed the collection.");
+    ~chatplayer("<p,neutral>Well I'm just glad I could help.");
+    ~rag_sack("Mumblemumble");
+    ~chatnpc("<p,neutral>Well you've been a big help and no mistake.");
+    ~chatnpc("<p,neutral>I'm always on the lookout for fresh bones, so if you see some bring them right over.");
+    ~chatplayer("<p,neutral>No problem, I'll be sure to bring anything you might like over if I find something.");
+    ~chatplayer("<p,neutral>I can't wait to see the displays once they are finished.");
+    %rag_quest = setbit_range_toint(%rag_quest, ^rag_complete, 0, 1);
+    // VERIFIED rewards: RuneHQ 2006-04-24, first part only.
+    stat_advance(cooking, 5000);
+    stat_advance(prayer, 5000);
+    // UNKNOWN: generic scroll layout, model scale 200 and functional title.
+    ~send_quest_complete(questlist:rag, rag_polished_goblin_bone, 200, ^rag_questpoints, "You have completed Rag and Bone Man!", "500 Cooking XP|500 Prayer XP");
+    return;
+}
+if ($given = true) {
+    ~chatplayer("<p,neutral>I have some bones for you.");
+    ~chatnpc("<p,neutral>Great! Let me take a look at them.");
+    ~chatnpc("<p,neutral>Wonderful! I'll put this with the rest.");
+    ~chatplayer("<p,neutral>No problem. I'll be back if I find some more.");
+    return;
+}
+~chatnpc("<p,neutral>Have you brought me any bones?");
+$bone = 1;
+while ($bone <= 8) {
+    if (~rag_handed($bone) = false) {
+        switch_int($bone) {
+            case 1 : ~chatnpc("<p,neutral>You still need to bring me a Goblin bone.");
+            case 2 : ~chatnpc("<p,neutral>You still need to bring me a Bear bone.");
+            case 3 :
+                ~chatnpc("<p,neutral>You still need to bring me a Big Frog bone.");
+                ~chatnpc("<p,neutral>This might be a little tricky as you will need to go into the Lumbridge Swamp caves. You will need a light source! Never forget your light source down there!");
+            case 4 : ~chatnpc("<p,neutral>You still need to bring me a Ram bone.");
+            case 5 : ~chatnpc("<p,neutral>You still need to bring me a Unicorn bone.");
+            case 6 : ~chatnpc("<p,neutral>You still need to bring me a Monkey bone.");
+            case 7 : ~chatnpc("<p,neutral>You still need to bring me a Giant Rat bone.");
+            case 8 : ~chatnpc("<p,neutral>You still need to bring me a Giant Bat bone.");
+        }
+    }
+    $bone = add($bone, 1);
+}
+~chatnpc("<p,neutral>Don't forget to boil them in vinegar first.");

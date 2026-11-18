@@ -144,7 +144,7 @@ try {
     assert.equal(timer(p).clock, arm);
     tick(p, 610); assert.equal(stage(p), 7); assert.equal(stage(p, 1), 7);
     assert.equal(count(p, 'potato_seed'), 0);
-    assert.equal(p.stats[PlayerStat.FARMING], 80);
+    assert.equal(p.stats[PlayerStat.FARMING], 200, 'three weeds at 4 XP plus potato planting at 8 XP');
   });
   test('seed immunity, mature immunity, disease stasis and next-cycle death use real compiled paths', () => {
     assert.equal(advance(6, 1, 0), 7);
@@ -193,19 +193,22 @@ try {
     assert(use(p, 'potato_seed', patch)); assert.equal(stage(p), 6);
     for (const at of [610, 620, 630, 640]) tick(p, at);
     assert.equal(stage(p), 10);
-    for (let i = 0; i < 3; i++) assert(click(p, patch));
+    for (let i = 0; i < 3; i++) {
+      World.currentTick += 2; // CANDIDATE OSRS manual harvest interval.
+      assert(click(p, patch));
+    }
     assert.equal(stage(p), 3); assert.equal(count(p, 'potato'), 3);
     assert.equal(p.stats[PlayerStat.FARMING], 350);
   });
   test('all eight selector bytes advance independently; unsupported family and unrelated varps remain exact', () => {
     const p = fresh(605);
-    const values = [6, 70, 135, 199, 13, 74, 198, 255];
+    const values = [6, 70, 135, 199, 63, 74, 198, 255];
     values.forEach((value, index) => setStage(p, value, index));
     const unrelated = id('VarPlayerType', 'option_music'); p.setVar(unrelated, 3);
     tick(p, 610);
-    assert.deepEqual(bits.map(bit => p.getVarBit(bit)), [7, 7, 199, 199, 13, 74, 198, 255]);
+    assert.deepEqual(bits.map(bit => p.getVarBit(bit)), [7, 7, 199, 199, 63, 74, 198, 255]);
     assert.equal(p.getVar(unrelated), 3);
-    const saved = player(p.save()); assert.deepEqual(bits.map(bit => saved.getVarBit(bit)), [7, 7, 199, 199, 13, 74, 198, 255]);
+    const saved = player(p.save()); assert.deepEqual(bits.map(bit => saved.getVarBit(bit)), [7, 7, 199, 199, 63, 74, 198, 255]);
   });
 } finally {
   Runner.HANDLERS[ScriptOpcode.DATE_MINUTES] = dateHandler;

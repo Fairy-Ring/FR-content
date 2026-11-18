@@ -1,0 +1,61 @@
+// VERIFIED cache actions: Dig-up/Dig-below, Pick-from, Eat, and item-on-location.
+[oploc1,mdaughter_swampbubbles1] @mdaughter_get_mud;
+[oploc1,mdaughter_roots_1] @mdaughter_get_mud;
+[oploc1,mdaughter_roots_2] @mdaughter_get_mud;
+
+[label,mdaughter_get_mud]
+if (%mdaughter_mud_var = 1 | inv_total(inv, mdaughter_mud) > 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_add(inv, mdaughter_mud, 1);
+
+[oplocu,mdaughter_lake_tree] @mdaughter_apply_mud;
+[aplocu,mdaughter_lake_tree]
+// UNKNOWN native admission radius: the first shore stands beside the tree.
+if (distance(coord, loc_coord) > 1) {
+    p_aprange(1);
+    return;
+}
+@mdaughter_apply_mud;
+
+[label,mdaughter_apply_mud]
+if (last_useitem ! mdaughter_mud | %mdaughter_mud_var = 1 | inv_total(inv, mdaughter_mud) = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, mdaughter_mud, 1);
+%mdaughter_mud_var = 1;
+
+[oploc3,mdaughter_white_pearl_bush]
+def_obj $hands = inv_getobj(worn, ^wearpos_hands);
+if ($hands = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_add(inv, mdaughter_white_pearl_fruit, 1);
+
+[opheld3,mdaughter_white_pearl_fruit]
+inv_del(inv, mdaughter_white_pearl_fruit, 1);
+inv_add(inv, mdaughter_white_pearl_seed, 1);
+
+[oplocu,mdaughter_ancient_rock] @mdaughter_take_ancient_rock;
+[oplocu,mdaughter_ancient_rock_splitting] @mdaughter_take_ancient_rock;
+[aplocu,mdaughter_ancient_rock] @mdaughter_take_ancient_rock_ap;
+[aplocu,mdaughter_ancient_rock_splitting] @mdaughter_take_ancient_rock_ap;
+
+[label,mdaughter_take_ancient_rock_ap]
+// UNKNOWN native admission radius covers the packed rock's accessible edge.
+if (distance(coord, loc_coord) > 2) {
+    p_aprange(2);
+    return;
+}
+@mdaughter_take_ancient_rock;
+
+[label,mdaughter_take_ancient_rock]
+if (oc_category(last_useitem) ! weapon_pickaxe | %mdaughter_relations_var < 3 | inv_total(inv, mdaughter_half_rock) > 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+loc_change(mdaughter_ancient_rock_splitting, ^mdaughter_travel_loc_lifetime);
+inv_add(inv, mdaughter_half_rock, 1);

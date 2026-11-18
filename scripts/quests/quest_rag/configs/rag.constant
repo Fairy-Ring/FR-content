@@ -1,0 +1,4 @@
+// UNKNOWN: server completion encoding, not an original stage-number claim.
+^rag_complete = 2
+// VERIFIED: RuneHQ 2006-04-24, first-part reward only.
+^rag_questpoints = 1

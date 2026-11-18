@@ -1,0 +1,95 @@
+// VERIFIED cache bands; CANDIDATE species assignment follows seed-pack order.
+// Direct row lookup preserves the outer shared growth database cursor.
+[proc,farming_herb_crop](int $stage)(dbrow)
+if ($stage >= 128 & $stage <= 169) {
+    switch_int (divide(sub($stage, 128), 3)) {
+        case 0 : return(farming_herb_guam);
+        case 1 : return(farming_herb_marrentill);
+        case 2 : return(farming_herb_tarromin);
+        case 3 : return(farming_herb_harralander);
+        case 4 : return(farming_herb_ranarr);
+        case 5 : return(farming_herb_toadflax);
+        case 6 : return(farming_herb_irit);
+        case 7 : return(farming_herb_avantoe);
+        case 8 : return(farming_herb_kwuarm);
+        case 9 : return(farming_herb_snapdragon);
+        case 10 : return(farming_herb_cadantine);
+        case 11 : return(farming_herb_lantadyme);
+        case 12 : return(farming_herb_dwarf_weed);
+        case 13 : return(farming_herb_torstol);
+    }
+}
+if ($stage >= 4 & $stage <= 10) return(farming_herb_guam);
+if ($stage >= 11 & $stage <= 17) return(farming_herb_marrentill);
+if ($stage >= 18 & $stage <= 24) return(farming_herb_tarromin);
+if ($stage >= 25 & $stage <= 31) return(farming_herb_harralander);
+if ($stage >= 32 & $stage <= 38) return(farming_herb_ranarr);
+if ($stage >= 39 & $stage <= 45) return(farming_herb_toadflax);
+if ($stage >= 46 & $stage <= 52) return(farming_herb_irit);
+if ($stage >= 53 & $stage <= 59) return(farming_herb_avantoe);
+if ($stage >= 68 & $stage <= 74) return(farming_herb_kwuarm);
+if ($stage >= 75 & $stage <= 81) return(farming_herb_snapdragon);
+if ($stage >= 82 & $stage <= 88) return(farming_herb_cadantine);
+if ($stage >= 89 & $stage <= 95) return(farming_herb_lantadyme);
+if ($stage >= 96 & $stage <= 102) return(farming_herb_dwarf_weed);
+if ($stage >= 103 & $stage <= 109) return(farming_herb_torstol);
+return(null);
+
+[proc,farming_herb_seed](obj $seed)(dbrow)
+switch_obj ($seed) {
+    case guam_seed : return(farming_herb_guam);
+    case marrentill_seed : return(farming_herb_marrentill);
+    case tarromin_seed : return(farming_herb_tarromin);
+    case harralander_seed : return(farming_herb_harralander);
+    case ranarr_seed : return(farming_herb_ranarr);
+    case toadflax_seed : return(farming_herb_toadflax);
+    case irit_seed : return(farming_herb_irit);
+    case avantoe_seed : return(farming_herb_avantoe);
+    case kwuarm_seed : return(farming_herb_kwuarm);
+    case snapdragon_seed : return(farming_herb_snapdragon);
+    case cadantine_seed : return(farming_herb_cadantine);
+    case lantadyme_seed : return(farming_herb_lantadyme);
+    case dwarf_weed_seed : return(farming_herb_dwarf_weed);
+    case torstol_seed : return(farming_herb_torstol);
+    case default : return(null);
+}
+
+// Translate only at the family boundary. Internal first/mature bytes 4/8
+// let herbs share the allotment disease/cure algorithm without watered bands.
+[proc,farming_herb_normalize](int $stage, dbrow $crop)(int)
+if ($stage >= 128 & $stage <= 169) {
+    return(calc(^farming_herb_normal_first + 1 + $stage - db_getfield($crop, farming_herb:diseased, 0) + ^farming_diseased_offset));
+}
+return(calc($stage - db_getfield($crop, farming_herb:first, 0) + ^farming_herb_normal_first));
+
+[proc,farming_herb_encode](int $stage, dbrow $crop)(int)
+if ($stage > add(^farming_herb_normal_first, ^farming_dead_offset)) {
+    return(calc(^farming_herb_dead_first + $stage - ^farming_dead_offset - ^farming_herb_normal_first - 1));
+}
+if ($stage > add(^farming_herb_normal_first, ^farming_diseased_offset)) {
+    return(calc(db_getfield($crop, farming_herb:diseased, 0) + $stage - ^farming_diseased_offset - ^farming_herb_normal_first - 1));
+}
+if ($stage = ^farming_veg_weeded) return($stage);
+return(calc(db_getfield($crop, farming_herb:first, 0) + $stage - ^farming_herb_normal_first));
+
+[proc,farming_herb_advance](int $stage, int $steps)(int)
+def_dbrow $crop = ~farming_herb_crop($stage);
+if ($crop = null) return($stage);
+def_int $normal = ~farming_herb_normalize($stage, $crop);
+$normal = ~farming_crop_advance($normal, $steps, ^farming_herb_normal_first, ^farming_herb_normal_mature, false);
+return(~farming_herb_encode($normal, $crop));
+
+[proc,farming_herb_advance_all](int $steps)
+def_int $word = %varp515_bits;
+def_int $bit = 0;
+while ($bit < 32) {
+    def_int $end = add($bit, 7);
+    def_int $stage = ~farming_herb_advance(getbit_range($word, $bit, $end), $steps);
+    $word = setbit_range_toint($word, $stage, $bit, $end);
+    $bit = add($bit, 8);
+}
+%varp515_bits = $word;
+
+// CANDIDATE OSRS harvest lives, shared interpolation, herb-specific endpoints.
+[proc,farming_herb_life_loss]()(int)
+return(~farming_crop_life_loss(^farming_herb_save_low, ^farming_herb_save_high));

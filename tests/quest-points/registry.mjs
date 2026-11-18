@@ -64,6 +64,8 @@ function pointsForColour(row) {
 function progressFixture(progress, terminal) {
   const direct = progress.match(/^%(\w+)$/);
   if (direct) return [[direct[1], terminal]];
+  // Rag's first-part stage occupies bits 0..1; upper bits hold hand-ins.
+  if (progress === '~rag_stage') return [['rag_quest', terminal]];
   const proc = progress.match(/^~(\w+)$/);
   assert(proc, `unsupported progress fixture ${progress}`);
   for (const file of scripts) {

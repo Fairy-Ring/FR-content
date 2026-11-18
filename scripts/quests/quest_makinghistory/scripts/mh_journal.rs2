@@ -1,0 +1,16 @@
+// CANDIDATE body: OSRS Journal (Making History), revision 15342881.
+// Subtract the post-target POH recovery. UNKNOWN page layout uses common book UI.
+[opheld1,makinghistory_journal]
+%book_page = 0;
+%open_book = makinghistory_journal;
+@book_flip_page(0, 0, 5, mh_journal_page);
+
+[proc,mh_journal_page]
+switch_int (%book_page) {
+    case 0 : ~book("Journal", "1st Bennath||My life is full of changes at the moment. I've met a great and powerful follower of Zamorak, whom has offered me the chance to join him and others in the quest for ultimate power and desolation of others. This is just the opportunity I've been looking for! I move into the old outpost (North of Ardougne) at the end of this week.||I can hardly wait!");
+    case 1 : ~book("Journal", "15th Bennath||Been here a few days now. I'm overwhelmed on just how evil the other 8 are. I suppose this is amplified by living in such a small building.");
+    case 2 : ~book("Journal", "20th Bennath||Started causing havoc to the people of Ardougne today. We poisoned the water supply with a strange concoction which caused everyone to break out in boils! Very funny. The others have been stealthily setting fire to some people and laughing at their conclusion of spontaneous combustion.||I think I shall have to come up with something more evil for tomorrow.");
+    case 3 : ~book("Journal", "32nd Bennath||Following my genius plan to make all the children invisible, the city is now in total chaos as the kids test their freedom by putting adults into a panic.||Honestly, some of the tricks the kids play are better than anything I could invent.");
+    case 4 : ~book("Journal", "20th Raktuber||Sadly things have calmed down in the city, and they've started to realise that we're the cause of all the tragedy. Luckily, the people don't have enough power to get past our defences, and even if they did, they would wish they hadn't thought of such an attack.");
+    case 5 : ~book("Journal", "28th Raktuber||We have been told to 'beware for your days are numbered' by the people of Ardougne. It seems the city has asked for some external help, which will be upon us some time soon. I'm sure we will eliminate such a threat though.");
+}

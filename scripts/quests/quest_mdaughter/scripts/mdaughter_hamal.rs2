@@ -1,9 +1,16 @@
-// Mountain Daughter start-gate — Hamal the Chieftain (mdaughter_hamal 1807) @ 2811,3673.
-// CANDIDATE last-resort 2007-base: OSRS Transcript:Mountain Daughter (Hamal's Daughter)
-// minus RS3 Overview / Agility overlay / option collapse. Hunt 289? no.
-// Accept: %mdaughter_quest_var 0→1 only. No Ragnar / pool / rockslide / Kendal.
+// CANDIDATE wording: retained OSRS Transcript:Mountain Daughter.
+// VERIFIED task order and rewards: Tip.It guide, 27 April 2006.
 
 [opnpc1,mdaughter_hamal]
+if (%mdaughter_quest_var >= ^mdaughter_complete) {
+    @mdaughter_hamal_complete;
+}
+if (%mdaughter_quest_var >= ^mdaughter_kendal_dead) {
+    @mdaughter_hamal_body;
+}
+if (%mdaughter_quest_var >= ^mdaughter_tasks) {
+    @mdaughter_hamal_tasks;
+}
 if (%mdaughter_quest_var > 0) {
     @mdaughter_hamal_progress;
 }
@@ -96,7 +103,8 @@ if (%viking >= ^viking_complete) {
 ~chatnpc("<p,neutral>I will instruct my people to let you roam about the area freely, and give limited consent to them to talk to you.");
 ~chatplayer("<p,happy>Great! I'll be back with her soon. Just wait here.");
 ~chatnpc("<p,neutral>Oh, I'll be waiting here alright.");
-%mdaughter_quest_var = 1;
+%mdaughter_quest_var = ^mdaughter_search;
+~send_quest_progress(questlist:mdaughter, %mdaughter_quest_var, ^mdaughter_complete);
 return;
 
 [label,mdaughter_hamal_quest_joke]
@@ -131,4 +139,148 @@ if ($look = 1) {
     ~chatnpc("<p,neutral>Perhaps you should speak to the man she is to marry, tribesman Ragnar. He can probably tell you more.");
     ~chatnpc("<p,neutral>You can find him out by the pool beyond the camp, where my daughter used to go so often.");
 }
+return;
+
+[label,mdaughter_hamal_tasks]
+if (%mdaughter_hamal_heardofdeath = 0) {
+    ~chatplayer("<p,happy>I have found your daughter!");
+    ~chatnpc("<p,quiz>Where is she? Tell me, outerlander!");
+    ~chatplayer("<p,sad>Well, er, she is dead.");
+    ~chatnpc("<p,angry>Do not play games with me. I gave you leave to walk about our camp, not to trick us.");
+    %mdaughter_hamal_heardofdeath = 1;
+} else {
+    ~chatnpc("<p,quiz>What is it, outerlander?");
+}
+def_int $task = ~p_choice3("Never mind.", 1, "About the people of Rellekka...", 2, "About your food supplies...", 3);
+if ($task = 1) return;
+if ($task = 2) @mdaughter_hamal_relations;
+@mdaughter_hamal_food;
+
+[label,mdaughter_hamal_relations]
+~chatplayer("<p,neutral>About the people of Rellekka...");
+if (%mdaughter_relations_var >= 5) {
+    ~chatplayer("<p,happy>I did it, I persuaded Brundt to speak to your representative!");
+    ~chatnpc("<p,quiz>Indeed, outerlander, and how did you accomplish that without giving him our rock?");
+    ~chatplayer("<p,neutral>Well, yeah, I need to talk to you about that...");
+    ~chatnpc("<p,happy>Worry not, you made a wise decision and your boldness is impressive.");
+    ~chatnpc("<p,neutral>It does not matter, after all, how large the rock is, or what its shape is. And perhaps the two halves of the rock will have extra symbolism now, representing the two halves of the Fremennik culture.");
+    ~chatnpc("<p,happy>I understand that Svidi's meeting with Brundt went quite well. I must thank you for your assistance, outerlander.");
+    %mdaughter_hamal_relations_done = 1;
+    return;
+}
+if (%mdaughter_relations_var >= 3) {
+    ~chatplayer("<p,neutral>Chieftain Brundt says that he won't meet with Svidi unless you give him back some rock or other.");
+    ~chatnpc("<p,quiz>What, do you mean our ancient rock that our fathers took with them when they left the ignorants of Rellekka?");
+    ~chatplayer("<p,neutral>Yes, that's the one.");
+    ~chatnpc("<p,angry>Out of the question. That rock belongs to us. It symbolises what we stand for. What would Brundt want with it anyway?");
+    ~chatplayer("<p,quiz>So I can't persuade you to part with the rock?");
+    ~chatnpc("<p,angry>Did you not hear me the first time, outerlander? It belongs to us, we will not part with it.");
+    return;
+}
+~chatplayer("<p,quiz>Why do you hate them so much?");
+~chatnpc("<p,neutral>We do not hate them, outerlander, but we do not approve of their ways either.");
+~chatplayer("<p,quiz>But don't you basically believe in the same things?");
+~chatnpc("<p,neutral>It is true that our beliefs are not all that different, but we have a different way of applying them, a stricter way.");
+~chatplayer("<p,quiz>So you've never considered, say, making peace with them?");
+~chatnpc("<p,neutral>We are not at war with them, outerlander, but we try to ignore each other.");
+~chatnpc("<p,neutral>But I must admit that I have, in fact, sent out a representative to Rellekka to talk about improving relations and perhaps setting up a basic trade route.");
+~chatplayer("<p,happy>Great! Well, that was easy.");
+~chatnpc("<p,neutral>Unfortunately we have not heard from Svidi, our representative, for a few days.");
+~chatplayer("<p,quiz>Shall I go looking for him as well then?");
+~chatnpc("<p,neutral>Do as you wish, outerlander.");
+if (%mdaughter_relations_var = 0) %mdaughter_relations_var = 1;
+return;
+
+[label,mdaughter_hamal_food]
+~chatplayer("<p,neutral>About your food supplies...");
+if (%mdaughter_food_var >= 3) {
+    ~chatnpc("<p,happy>This is a great gift, <displayname>, which I humbly accept.");
+    return;
+}
+if (inv_total(inv, mdaughter_white_pearl_seed) > 0) {
+    ~chatplayer("<p,happy>I've found this seed that may be of interest to you.");
+    ~chatnpc("<p,quiz>Interesting, what is it?");
+    ~chatplayer("<p,neutral>It's the seed of the White Pearl fruit. It grows on White Wolf mountain, even in the snow.");
+    ~chatplayer("<p,happy>With luck, you'll be able to grow it here as well.");
+    ~chatnpc("<p,happy>This is a great gift, <displayname>, which I humbly accept.");
+    inv_del(inv, mdaughter_white_pearl_seed, 1);
+    %mdaughter_food_var = 3;
+    return;
+}
+if (inv_total(inv, mdaughter_white_pearl_fruit) > 0) {
+    ~chatplayer("<p,happy>Here, I have something that might interest you.");
+    ~chatplayer("<p,neutral>It's White Pearl fruit, which grows in even the hardiest circumstances. I found this growing on White Wolf Mountain.");
+    ~chatnpc("<p,quiz>And what use is one piece of fruit to us, outerlander? It won't feed our tribe for even a day.");
+    ~chatplayer("<p,neutral>Oops, I hadn't thought of that.");
+    return;
+}
+~chatplayer("<p,quiz>From what I understand you're starting to run out?");
+~chatnpc("<p,quiz>Where did you get that idea from, outerlander?");
+~chatplayer("<p,neutral>Er, I just happened to overhear it.");
+~chatnpc("<p,neutral>There is some truth to it, yes. If it were not for my missing daughter, we would have moved on already, and finding food would be easier again for a while.");
+~chatplayer("<p,quiz>Can I help you with finding a new supply of food?");
+~chatnpc("<p,neutral>I would be interested to see how you would manage that, outerlander. But if you insist on trying, go ahead.");
+if (%mdaughter_food_var = 0) %mdaughter_food_var = 1;
+return;
+
+[label,mdaughter_hamal_body]
+if (%mdaughter_quest_var >= ^mdaughter_burial) {
+    ~chatnpc("<p,neutral>Only then are the burial rites complete.");
+    return;
+}
+~chatplayer("<p,neutral>I killed the bearman! He really was just a man after all, like I said!");
+~chatnpc("<p,shock>You have? Then we made an enormous mistake.");
+~chatnpc("<p,neutral>As did he. Impersonating a god bears the highest penalty imaginable, but I did not think that kind of justice would be delivered by the hand of an outerlander.");
+~chatplayer("<p,sad>I also found your daughter. The bearman killed her.");
+~chatnpc("<p,sad>So it is true then, after all? Let me see her body please.");
+if (inv_total(inv, mdaughter_daughter_corpse) = 0) {
+    ~chatplayer("<p,neutral>I didn't bring it with me, I'll go and look for it.");
+    return;
+}
+~chatplayer("<p,neutral>Of course.");
+~chatnpc("<p,sad>Yes, I see it is her. So it is also true that you spoke to her spirit at the pool?");
+~chatplayer("<p,neutral>Yes, it's true.");
+~chatnpc("<p,neutral>Then she must be buried there, on the island at the center of the pool... to bring peace to her spirit. This is a most unusual situation, but will you bury her, <displayname>?");
+def_int $bury = ~p_choice2("I will.", 1, "I won't.", 2);
+if ($bury = 2) {
+    ~chatplayer("<p,neutral>I won't.");
+    ~chatplayer("<p,neutral>I... ehm...");
+    ~chatplayer("<p,neutral>Errr...");
+}
+~chatplayer("<p,neutral>I will.");
+~chatnpc("<p,neutral>Then please listen closely. If she is given a proper burial, she is to be buried with some of her possessions. I see she's still wearing her dress, so you will need one more item.");
+~chatnpc("<p,neutral>When she has been buried, you must build a cairn on top. It is our tradition to build these cairns in the shape of our longboats that we use when we need to cross the seas. You can use rocks for this purpose, about five or so should be enough.");
+~chatnpc("<p,neutral>Only then are the burial rites complete.");
+~chatplayer("<p,quiz>So I need to bury her with one of her possessions, and build a cairn on top made out of rocks. So where do I get another one of her possessions?");
+~chatnpc("<p,neutral>Asleif had little possessions in life and none that have survived the years. I do not know where you might find such a thing, but perhaps Ragnar does, out by the pool.");
+%mdaughter_hamal_heardofbear = 1;
+%mdaughter_hamal_heardofburial = 1;
+%mdaughter_quest_var = ^mdaughter_burial;
+return;
+
+[label,mdaughter_hamal_complete]
+~chatnpc("<p,happy>You have my thanks, in any case.");
+~chatplayer("<p,quiz>So what are you all going to do now? Are you finally going to move to another location?");
+~chatnpc("<p,neutral>No, I've decided to set up a permanent camp here.");
+~chatnpc("<p,neutral>There is no need to move now with our new supply of food. Also, there is a protective spirit looking after us now.");
+// CANDIDATE: Transcript:Hamal_the_Chieftain, revision 15024962, lost-bearhead branch.
+// UNKNOWN engineering choice (reclaim-availability): offer only if no Bearhead
+// exists in inventory, bank or worn, and inventory has a free slot. The source
+// defines neither ownership-container eligibility nor full-inventory behavior.
+if (~obj_gettotal(mdaughter_bear_helmet) > 0) return;
+if (inv_freespace(inv) = 0) return;
+def_int $helmet = ~p_choice2("Excuse me, have you seen my helmet?", 1, "Well, I must be off again.", 2);
+if ($helmet = 2) {
+    ~chatplayer("<p,neutral>That's all very interesting but I must be off again.");
+    ~chatnpc("<p,neutral>Safe journey, outerlander.");
+    return;
+}
+~chatplayer("<p,quiz>Excuse me, have you seen my helmet?");
+~chatnpc("<p,quiz>And what helmet would that be?");
+~chatplayer("<p,neutral>The one from the bear man thing person... you know!");
+~chatnpc("<p,neutral>Oh, yes... as a matter of fact we did find such a helmet inside the cave.");
+~chatnpc("<p,neutral>We had a look in there after you killed the abomination that used to live inside.");
+~chatnpc("<p,neutral>Here, take it. You should take proper care of this, trophies from your enemy are an important keepsake.");
+inv_add(inv, mdaughter_bear_helmet, 1);
+~mesbox("You take back your helmet of the bearman.");
 return;
