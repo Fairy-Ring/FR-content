@@ -42,7 +42,19 @@ def_int $word = %farming_hops_varp;
 def_int $bit = 0;
 while ($bit < 32) {
     def_int $end = add($bit, 7);
-    def_int $stage = ~farming_hops_advance(getbit_range($word, $bit, $end), $steps);
+    def_int $before = getbit_range($word, $bit, $end);
+    def_int $stage = $before;
+    if (~farming_protection_watched(add(8, divide($bit, 8))) = true
+        & $before < ^farming_diseased_offset & $steps > 0) {
+        def_dbrow $crop = ~farming_hops_crop($before);
+        if ($crop ! null) {
+            def_int $mature = db_getfield($crop, farming_hops:mature, 0);
+            $stage = min($mature, add(modulo($before, ^farming_watered_offset), $steps));
+            if ($before >= $mature & $before < ^farming_watered_offset) $stage = $before;
+        }
+    } else {
+        $stage = ~farming_hops_advance($before, $steps);
+    }
     $word = setbit_range_toint($word, $stage, $bit, $end);
     $bit = add($bit, 8);
 }

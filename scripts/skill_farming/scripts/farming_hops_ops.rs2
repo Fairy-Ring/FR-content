@@ -9,6 +9,7 @@ switch_loc (loc_type) {
 }
 
 [proc,farming_hops_set_stage](int $stage)
+if ($stage = ^farming_veg_weeded) ~farming_protection_clear(~farming_protection_loc_bit);
 switch_loc (loc_type) {
     case farming_hops_patch_1 : %farming_hops_varp_0_7 = $stage;
     case farming_hops_patch_2 : %farming_hops_varp_8_15 = $stage;

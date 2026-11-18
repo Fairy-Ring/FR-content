@@ -1,3 +1,12 @@
 // Original unused 377 slot 500. Server checkpoint, not a client selector.
 [farming_growth_minute]
 scope=perm
+
+// Original unused 377 slot 519, assigned by Main. Server-only saved care flags.
+// UNKNOWN engineering layout: 0–7 allotments, 8–11 hops, 12–15 bushes reserved,
+// 16–19 wood trees reserved, 20–23 fruit trees reserved, 24–31 unused.
+// VERIFIED map census: four bush, four wood-tree and four fruit-tree patches,
+// each with its gardener. This agrees with Tip.It, captured 28 April 2006.
+// No original cache varbit covers slot 519. Do not add a client varbit.
+[farming_protection]
+scope=perm

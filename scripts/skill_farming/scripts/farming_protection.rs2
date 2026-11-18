@@ -1,0 +1,193 @@
+// VERIFIED 377 map selectors. Bits follow patch-number order, not NPC id order.
+[proc,farming_protection_loc_bit]()(int)
+switch_loc (loc_type) {
+    case farming_veg_patch_1 : return(0);
+    case farming_veg_patch_2 : return(1);
+    case farming_veg_patch_3 : return(2);
+    case farming_veg_patch_4 : return(3);
+    case farming_veg_patch_5 : return(4);
+    case farming_veg_patch_6 : return(5);
+    case farming_veg_patch_7 : return(6);
+    case farming_veg_patch_8 : return(7);
+    case farming_hops_patch_1 : return(8);
+    case farming_hops_patch_2 : return(9);
+    case farming_hops_patch_3 : return(10);
+    case farming_hops_patch_4 : return(11);
+    case default : return(-1);
+}
+
+[proc,farming_protection_watched](int $bit)(boolean)
+if (getbit_range(%farming_protection, $bit, $bit) = 1) return(true);
+return(false);
+
+[proc,farming_protection_clear](int $bit)
+if ($bit = -1) return;
+%farming_protection = setbit_range_toint(%farming_protection, 0, $bit, $bit);
+
+// Allotment gardeners own the north/south pair. Hop gardeners own one patch.
+[proc,farming_gardener_patch]()(int)
+switch_npc (npc_type) {
+    case elstan : return(0);
+    case dantaera : return(2);
+    case kragen : return(4);
+    case lyra : return(6);
+    case farming_gardener_hops_1 : return(8);
+    case francis : return(9);
+    case farming_gardener_hops_3 : return(10);
+    case farming_gardener_hops_4 : return(11);
+    case default : return(-1);
+}
+
+[proc,farming_protection_stage](int $patch)(int)
+if ($patch < 4) {
+    def_int $bit = multiply($patch, 8);
+    return(getbit_range(%farming_allotment_varp_1, $bit, add($bit, 7)));
+}
+if ($patch < 8) {
+    def_int $bit = multiply(sub($patch, 4), 8);
+    return(getbit_range(%farming_allotment_varp_2, $bit, add($bit, 7)));
+}
+def_int $bit = multiply(sub($patch, 8), 8);
+return(getbit_range(%farming_hops_varp, $bit, add($bit, 7)));
+
+[proc,farming_protection_crop](int $patch)(dbrow, int, int)
+def_int $stage = ~farming_protection_stage($patch);
+def_dbrow $crop;
+if ($patch < 8) {
+    $crop = ~farming_allotment_crop($stage);
+    if ($crop = null) return(null, 0, 0);
+    return($crop, db_getfield($crop, farming_allotment:first, 0), db_getfield($crop, farming_allotment:mature, 0));
+}
+$crop = ~farming_hops_crop($stage);
+if ($crop = null) return(null, 0, 0);
+return($crop, db_getfield($crop, farming_hops:first, 0), db_getfield($crop, farming_hops:mature, 0));
+
+// VERIFIED Tip.It Farming guide, captured 28 April 2006: Farmer charge tables.
+// Full sacks/baskets are payment items, not a loose-produce equivalent.
+[proc,farming_protection_cost](dbrow $crop)(obj, int)
+if ($crop = farming_allotment_potato) return(bucket_compost, 2);
+if ($crop = farming_allotment_onion) return(sack_potato_10, 1);
+if ($crop = farming_allotment_cabbage) return(sack_onion_10, 1);
+if ($crop = farming_allotment_tomato) return(sack_cabbage_10, 2);
+if ($crop = farming_allotment_sweetcorn) return(jute_fibre, 10);
+if ($crop = farming_allotment_strawberry) return(basket_apple_5, 1);
+if ($crop = farming_allotment_watermelon) return(curry_leaf, 10);
+if ($crop = farming_hops_hammerstone) return(marigold, 1);
+if ($crop = farming_hops_asgarnian) return(sack_onion_10, 1);
+if ($crop = farming_hops_yanillian) return(basket_tomato_5, 1);
+if ($crop = farming_hops_krandorian) return(sack_cabbage_10, 3);
+if ($crop = farming_hops_wildblood) return(nasturtium, 1);
+if ($crop = farming_hops_barley) return(bucket_compost, 3);
+if ($crop = farming_hops_jute) return(barley_malt, 6);
+return(null, 0);
+
+// CANDIDATE later gardener account: one payment per planting, notes accepted.
+// The final inventory check precedes every mutation. A refusal consumes nothing.
+[proc,farming_protection_hire](int $patch)(boolean)
+if (~farming_protection_watched($patch) = true) return(false);
+def_dbrow $crop;
+def_int $first;
+def_int $mature;
+$crop, $first, $mature = ~farming_protection_crop($patch);
+if ($crop = null) return(false);
+def_int $stage = ~farming_protection_stage($patch);
+if ($stage >= ^farming_diseased_offset | modulo($stage, ^farming_watered_offset) >= $mature) return(false);
+def_obj $payment;
+def_int $quantity;
+$payment, $quantity = ~farming_protection_cost($crop);
+def_obj $noted = oc_cert($payment);
+def_int $plain = min($quantity, inv_total(inv, $payment));
+def_int $available = $plain;
+if ($noted ! $payment) $available = add($available, inv_total(inv, $noted));
+if ($available < $quantity) return(false);
+if ($plain > 0) inv_del(inv, $payment, $plain);
+if ($plain < $quantity) inv_del(inv, $noted, sub($quantity, $plain));
+%farming_protection = setbit_range_toint(%farming_protection, 1, $patch, $patch);
+return(true);
+
+// CANDIDATE dialogue templates: Old School Taria and later Elstan transcripts.
+// The charge numbers/items above are VERIFIED by the pre-cache Tip.It guide.
+[label,farming_gardener_pay]
+~chatplayer("Would you look after my crops for me?");
+def_int $patch = ~farming_gardener_patch;
+if ($patch = -1) {
+    // Later families are not planted by this unit; no care flag is allocated here.
+    ~chatnpc("You don't have any seeds planted in that patch. Plant some and I might agree to look after it for you.");
+    return;
+}
+if ($patch < 8) {
+    ~chatnpc("I might. Which one were you thinking of?");
+    def_int $option = ~p_choice2("The north-western allotment.", 1, "The south-eastern allotment.", 2);
+    if ($option = 1) ~chatplayer("The north-western allotment.");
+    else {
+        ~chatplayer("The south-eastern allotment.");
+        $patch = add($patch, 1);
+    }
+}
+if (~farming_protection_watched($patch) = true) {
+    ~chatnpc("I don't know what you're talking about - I'm already looking after that patch for you.");
+    ~chatplayer("Oh sorry, I forgot.");
+    return;
+}
+def_int $stage = ~farming_protection_stage($patch);
+if ($stage >= ^farming_dead_offset) {
+    ~chatnpc("That patch is dead - it's too late for me to do anything about it now.");
+    return;
+}
+if ($stage >= ^farming_diseased_offset) {
+    ~chatnpc("That patch is diseased - you should cure it before asking me to be responsible for it!");
+    return;
+}
+def_dbrow $crop;
+def_int $first;
+def_int $mature;
+$crop, $first, $mature = ~farming_protection_crop($patch);
+if ($crop = null) {
+    ~chatnpc("You don't have any seeds planted in that patch. Plant some and I might agree to look after it for you.");
+    return;
+}
+if (modulo($stage, ^farming_watered_offset) >= $mature) {
+    ~chatnpc("That patch is already fully grown! I don't know what you want me to do with it!");
+    return;
+}
+def_obj $payment;
+def_int $quantity;
+$payment, $quantity = ~farming_protection_cost($crop);
+def_string $payment_name = ~farming_protection_payment_name($payment);
+~chatnpc("If you like, but I want <tostring($quantity)> <$payment_name> for that.");
+def_int $available = inv_total(inv, $payment);
+def_obj $noted = oc_cert($payment);
+if ($noted ! $payment) $available = add($available, inv_total(inv, $noted));
+if ($available < $quantity) {
+    if ($available = 0) ~chatplayer("I'm afraid I don't have any of those at the moment.");
+    else ~chatplayer("I'm afraid I don't have enough of those at the moment.");
+    ~chatnpc("Well, I'm not wasting my time for free.");
+    return;
+}
+def_int $confirm = ~p_choice2("Okay, it's a deal.", 1, "No, that's too much.", 2);
+if ($confirm = 2) {
+    ~chatplayer("No, that's too much.");
+    ~chatnpc("Well, I'm not wasting my time for free.");
+    return;
+}
+~chatplayer("Okay, it's a deal.");
+if (~farming_protection_hire($patch) = true) {
+    ~chatnpc("That'll do nicely, <text_gender("sir", "madam")>. Leave it with me - I'll make sure that patch grows for you.");
+}
+
+// Nouns expand the transcript's [number] [item] template with the period charges.
+[proc,farming_protection_payment_name](obj $payment)(string)
+switch_obj ($payment) {
+    case bucket_compost : return("buckets of compost");
+    case sack_potato_10 : return("sack of potatoes");
+    case sack_onion_10 : return("sack of onions");
+    case sack_cabbage_10 : return("sacks of cabbages");
+    case jute_fibre : return("jute fibres");
+    case basket_apple_5 : return("basket of apples");
+    case curry_leaf : return("curry leaves");
+    case marigold : return("marigold");
+    case basket_tomato_5 : return("basket of tomatoes");
+    case nasturtium : return("nasturtium");
+    case barley_malt : return("barley malt");
+    case default : return(oc_name($payment));
+}
