@@ -229,6 +229,7 @@ jobs:
           run_test tests/priestperil-completion/test_priestperil_reward.mjs node --import tsx ../content/tests/priestperil-completion/test_priestperil_reward.mjs
           run_test tests/onesmallfavour/test_completion.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/onesmallfavour/test_completion.mjs
           run_test tests/spirits-of-the-elid/test_elid.mjs node --import tsx ../content/tests/spirits-of-the-elid/test_elid.mjs
+          run_test tests/fairytale-1/test_fairytale1.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/fairytale-1/test_fairytale1.mjs
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
           run_test tests/skill-menus/runtime.mts bash ../content/tests/skill-menus/runtime.sh "$PWD"

@@ -24,3 +24,9 @@ weight=1lb
 // UNKNOWN engineering melee stance: use the existing slash-weapon style table.
 category=weapon_slash
 param=attackrate,4
+// UNKNOWN engineering motion/sound bindings, using existing 377 assets.
+param=slashattack_anim,human_sword_slash
+param=stabattack_anim,human_sword_stab
+param=defend_anim,human_sword_def
+param=slash_sound,FT_secateurs
+param=stab_sound,FT_secateurs
