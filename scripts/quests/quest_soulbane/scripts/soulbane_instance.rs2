@@ -6,13 +6,13 @@
 if (%soulbane_prog < 1 | %soulbane_prog > 5) return;
 ~soulbane_cleanup;
 def_coord $sw = region_create(1, ^soulbane_region_zones, ^soulbane_region_zones);
+// Keep the east-square reserve unmapped: compiled Fear movement reaches its copy.
+// Missing eastern neighbour scenery remains a limit of this room boundary.
 def_int $x = 0;
 while ($x < 8) {
     def_int $z = 0;
     while ($z < 8) {
         region_set(0, $x, $z, movecoord(0_47_81_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
-        // Map only: native path/reach tests keep this neighbouring variant inaccessible.
-        region_set(0, add($x, 8), $z, movecoord(0_48_81_0_0, multiply($x, 8), 0, multiply($z, 8)), 0);
         $z = add($z, 1);
     }
     $x = add($x, 1);

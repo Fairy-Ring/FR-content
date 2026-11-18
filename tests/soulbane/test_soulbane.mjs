@@ -1438,7 +1438,11 @@ function roomSourceZones(instance, label) {
   const roomSquares = roomSourceSquares();
   const zones = assignedInstanceZones(instance)
     .filter(zone => roomSquares.has(sourceSquareKeyForZone(zone)));
-  assert.equal(zones.length, 128, `${label}: full 47+48 room footprint maps 128 zones`);
+  const eastZones = zones.filter(zone => sourceSquareKeyForZone(zone) !== sourceSquareKey(roomSource));
+  assert([0, 64].includes(eastZones.length),
+    `${label}: the east reserve is unmapped or contains its complete source square`);
+  assert.equal(zones.length, 64 + eastZones.length,
+    `${label}: the original room square always maps all 64 zones`);
   for (const zone of zones) {
     const { east, north } = instanceDestinationOffset(instance, zone);
     assert(east >= 0 && east < 16 && north >= 0 && north < 8,
@@ -1533,7 +1537,7 @@ function assertInstanceTemplateInventory(instance, label) {
   }
   return { roomZones, rageZones, fearZones };
 }
-function instanceNativeFloodfill(p, instance, label) {
+function instanceNativeFloodfill(p, instance, label, seedTiles = null) {
   const minX = instance.sw.x;
   const maxX = minX + (instance.zonesEast << 3);
   const minZ = instance.sw.z;
@@ -1544,8 +1548,8 @@ function instanceNativeFloodfill(p, instance, label) {
   assert(start.x >= minX && start.x < maxX && start.z >= minZ && start.z < maxZ,
     `${label}: floodfill starts inside the private instance bounds`);
   const key = (x, z) => `${start.level}:${x}:${z}`;
-  const seen = new Set([key(start.x, start.z)]);
-  const tiles = [start];
+  const tiles = seedTiles ? [...seedTiles] : [start];
+  const seen = new Set(tiles.map(tile => key(tile.x, tile.z)));
   const steps = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
   // Explore every native-traversable coordinate in the instance bounds; do not seed/filter by map floors.
   for (let index = 0; index < tiles.length; index++) {
@@ -1574,6 +1578,50 @@ function effectiveLocType(p, loc) {
   }
   return base;
 }
+function mappedNeighborSourceLocs(zones, label) {
+  const sourceZones = new Map(zones.map(zone =>
+    [`${zone.source.level}:${zone.source.x}:${zone.source.z}`, zone]));
+  const squares = new Set(zones.map(zone => `${zone.source.x >> 3}_${zone.source.z >> 3}`));
+  const locs = [];
+  for (const square of squares) {
+    const [mapX, mapZ] = square.split('_').map(Number);
+    const groundFlags = new Map();
+    let section = '';
+    for (const line of fs.readFileSync(path.join(contentRoot, 'maps', `m${square}.jm2`), 'utf8').split(/\r?\n/)) {
+      if (line.startsWith('====')) {
+        section = line.split(/\s+/)[1];
+        continue;
+      }
+      const row = /^([0-3]) (\d+) (\d+): (.*)$/.exec(line);
+      if (!row) continue;
+      const [level, localX, localZ] = row.slice(1, 4).map(Number);
+      if (section === 'MAP') {
+        const flags = /(?:^| )f(\d+)(?: |$)/.exec(row[4]);
+        groundFlags.set(`${level}:${localX}:${localZ}`, flags ? Number(flags[1]) : 0);
+        continue;
+      }
+      if (section !== 'LOC') continue;
+      const [typeId, shape = 10, angle = 0] = row[4].trim().split(/\s+/).map(Number);
+      const bridged = ((groundFlags.get(`1:${localX}:${localZ}`) ?? 0) & 2) !== 0;
+      const source = { level: bridged ? level - 1 : level, x: mapX * 64 + localX, z: mapZ * 64 + localZ };
+      const zone = sourceZones.get(sourceZoneKey(source));
+      if (!zone) continue;
+      assert.equal(zone.rotation, 0, `${label}: source loc mapping preserves the neighbor's rotation`);
+      const type = types.LocType.get(typeId);
+      locs.push({
+        level: zone.level, x: (zone.x << 3) + (source.x & 7), z: (zone.z << 3) + (source.z & 7),
+        type: typeId, baseType: typeId, shape, angle, width: type.width, length: type.length
+      });
+    }
+  }
+  // Native zones retain only active loc entities; inactive scenery is still
+  // rendered by the source template and contributes copied collision.
+  const key = loc => [loc.level, loc.x, loc.z, loc.baseType, loc.shape, loc.angle].join(':');
+  assert.deepEqual(zones.flatMap(zone => [...zone.getAllLocsSafe()]).map(key).sort(),
+    locs.filter(loc => types.LocType.get(loc.baseType).active).map(key).sort(),
+    `${label}: every active native neighbor loc matches its actual source mapping`);
+  return locs;
+}
 function assertPrivateInstanceIsolation(p, label, requireRoomPacket = false) {
   assert([2, 3, 4, 5].includes(stage(p)),
     `${label}: native isolation is measured in quest stages 2–5`);
@@ -1588,17 +1636,28 @@ function assertPrivateInstanceIsolation(p, label, requireRoomPacket = false) {
   const neighborSquare = `${roomSource.level}_${(roomSource.x >> 6) + 1}_${roomSource.z >> 6}`;
   const neighborZones = assignedInstanceZones(instance)
     .filter(zone => sourceSquareKeyForZone(zone) === neighborSquare);
+  const flood = instanceNativeFloodfill(p, instance, label);
+  const allowedRoomSources = roomSourceSquares();
+  for (const tileAt of flood.tiles) {
+    assertSceneMappingWindow(null, tileAt, allowedRoomSources, `${label}: every native-reachable room tile`);
+  }
+  if (neighborZones.length === 0) {
+    console.log(`PASS private-instance scene isolation ${JSON.stringify({
+      stage: stage(p), label, standableSceneTiles: roomScene.standableTiles,
+      reachableTiles: flood.tiles.length, neighborCopied: false,
+      limit: 'east-neighbor geometry is intentionally absent because the copied variant is reachable in Fear'
+    })}`);
+    return { instance, roomZones, rageZones, fearZones, flood, neighborTiles: [], neighborLocs: [] };
+  }
   assert.equal(neighborZones.length, 64, `${label}: the full east neighbor source square is copied`);
   const neighborTiles = mappedWalkableTiles(neighborZones, `${label}: east neighbor collision`);
   const neighborZoneKeys = new Set(neighborZones.map(destinationZoneKey));
-  const flood = instanceNativeFloodfill(p, instance, label);
   const reachableNeighborTiles = flood.tiles.filter(tile =>
     neighborZoneKeys.has(`${tile.level}:${tile.x >> 3}:${tile.z >> 3}`)).length;
 
-  const neighborLocs = neighborZones.flatMap(zone => [...zone.getAllLocsSafe()])
-    .filter(loc => loc.isActive);
+  const neighborLocs = mappedNeighborSourceLocs(neighborZones, label);
   assert.equal(neighborLocs.length, 719,
-    `${label}: all 719 active locs in the copied east neighbor are inspected`);
+    `${label}: all 719 cached locs in the copied east neighbor are inspected`);
   const operableForms = new Set();
   let reachedLocForms = 0;
   let reachedOperationForms = 0;
@@ -1620,7 +1679,7 @@ function assertPrivateInstanceIsolation(p, label, requireRoomPacket = false) {
     `${label}: both non-vacuous effective neighbor operation forms are inspected`);
   assert.equal(reachableNeighborTiles, 0,
     `${label}: native floodfill reaches no collision-open tile in the east neighbor (${neighborTiles.length} native tiles checked)`);
-  assert.equal(reachedLocForms, 0, `${label}: no active neighbor loc is in native operation reach`);
+  assert.equal(reachedLocForms, 0, `${label}: no cached neighbor loc is in native operation reach`);
   assert.equal(reachedOperationForms, 0, `${label}: no effective neighbor operation is in native operation reach`);
   console.log(`PASS private-instance scene isolation ${JSON.stringify({
     stage: stage(p),
@@ -1682,18 +1741,27 @@ function packetTemplateTuple(template) {
 }
 function assertSceneMappingWindow(p, tileAt, allowedSourceSquares, label, requirePacket = false, allowedZoneKeys = null) {
   const visible = mappedZonesInSceneWindow(tileAt);
-  const centerKey = `${tileAt.level}:${tileAt.x >> 3}:${tileAt.z >> 3}`;
-  assert(visible.some(zone => destinationZoneKey(zone) === centerKey),
-    `${label}: current mapped tile is present in its 13×13 scene window`);
+  const center = World.gameMap.getZoneIfExists(tileAt.x, tileAt.z, tileAt.level);
+  assert(center instanceof InstanceZone, `${label}: the stand tile remains in a native instance zone`);
+  if (center.hasAssignedTemplate) {
+    assert(visible.includes(center), `${label}: current mapped tile is present in its 13×13 scene window`);
+  } else {
+    assert(map.isZoneAllocated(tileAt.level, tileAt.x, tileAt.z)
+      && !map.isMapBlocked(tileAt.x, tileAt.z, tileAt.level),
+    `${label}: an unmapped stand tile is genuinely collision-open native padding`);
+  }
   for (const zone of visible) {
     assert(allowedSourceSquares.has(sourceSquareKeyForZone(zone)),
-      `${label}: scene uses only its allowlisted source squares; found ${instanceTemplateTuple(zone)}`);
+      `${label}: scene from native tile ${tileAt.level}:${tileAt.x}:${tileAt.z} uses only its allowlisted source squares; found ${instanceTemplateTuple(zone)}`);
     if (allowedZoneKeys) {
       assert(allowedZoneKeys.has(destinationZoneKey(zone)),
         `${label}: memory scene uses only its own patch; found ${instanceTemplateTuple(zone)}`);
     }
   }
   if (requirePacket) {
+    // A dialogue resume can teleport before the next processInfo phase.
+    // Run that phase's unforced native rebuild before observing its packet.
+    p.buildArea.rebuild();
     const centerX = tileAt.x >> 3;
     const centerZ = tileAt.z >> 3;
     const packet = [...p.packets].reverse().find(value => value instanceof RebuildRegion
@@ -1739,20 +1807,21 @@ function assertRoomSceneVisibility(p, label, requirePacket = false) {
 }
 function assertMemorySceneVisibility(p, zones, label, requirePacket = false) {
   const tiles = collisionOpenTiles(zones);
-  const allowedSourceSquares = new Set(zones.length > 0
-    ? [sourceSquareKeyForZone(zones[0])]
-    : [sourceSquareKey(sourceCoordForName('soulbane_scene_player'))]);
+  assert(tiles.length > 0, `${label}: all-standable memory scene predicate is non-vacuous`);
+  const instance = World.instances.findInstanceByCoord(tiles[0]);
+  assert(instance, `${label}: native memory tiles belong to a live instance`);
+  const flood = instanceNativeFloodfill({ ...tiles[0], width: p?.width ?? 1 }, instance, label, tiles);
+  const allowedSourceSquares = new Set([sourceSquareKeyForZone(zones[0])]);
   const allowedZoneKeys = new Set(zones.map(destinationZoneKey));
-  for (const tileAt of tiles) {
-    assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: all memory standable tiles`,
+  for (const tileAt of flood.tiles) {
+    assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: all native-walkable memory tiles`,
       false, allowedZoneKeys);
   }
-  assert(tiles.length > 0, `${label}: all-standable memory scene predicate is non-vacuous`);
   if (p) {
     assertSceneMappingWindow(p, { level: p.level, x: p.x, z: p.z }, allowedSourceSquares,
       `${label}: real memory scene`, requirePacket, allowedZoneKeys);
   }
-  return tiles.length;
+  return flood.tiles.length;
 }
 function hasExactNativeRoute(start, destination) {
   if (start.level !== destination.level) return false;
