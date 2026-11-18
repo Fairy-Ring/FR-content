@@ -30,6 +30,8 @@
 ^soulbane_rage_goblin2 = 0_47_81_28_49
 // UNKNOWN reconstruction stands for the sourced Varrock family scene.
 ^soulbane_scene_player = 0_51_53_7_40
+// UNKNOWN camera eye: it must stand on ground inside the copied memory strip.
+^soulbane_scene_camera = 0_51_53_6_40
 ^soulbane_scene_launa = 0_51_53_7_42
 ^soulbane_scene_tolna = 0_51_53_8_42
 // CANDIDATE Old School behaviour, first documented in wiki r3247935 (2017-01-20).

@@ -34,6 +34,8 @@ const OpPlayerHandler = new (await engineModule('network/game/client/handler/OpP
 const MidiSong = (await engineModule('network/game/server/model/MidiSong.ts')).default;
 const DbTableIndex = (await engineModule('cache/config/DbTableIndex.ts')).default;
 
+const memoryCameraPackets = new WeakMap();
+
 
 
 const QUEST_CONFIG = path.join(contentRoot, 'scripts/quests/quest_soulbane/configs/soulbane.constant');
@@ -719,6 +721,7 @@ function finishRageScene(p) {
   let sawFamilyStaging = false;
   const pages = [];
   const recordFamilyStaging = () => {
+    assertMemoryCameraGround(p, 'Rage');
     if (sawFamilyStaging || stage(p) !== 2 || readVar(p, 'soulbane_anger_donespecial') !== 1 ||
       !observeRageScene(p)) return;
     const instance = instanceForOwner(p, 'Rage memory scene');
@@ -758,6 +761,7 @@ function finishRageScene(p) {
       (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
   }
   assert(sawFamilyStaging, 'Rage special runs the authored player/Launa/Tolna staging before returning');
+  assertMemoryCameraCoverage(p, 'Rage');
   assert.equal(stage(p), 3, 'family scene commits the permanent stage-3 boundary');
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_rage_entry'),
     'family scene returns the player to the Rage entry tile');
@@ -1804,6 +1808,35 @@ function assertRoomSceneVisibility(p, label, requirePacket = false) {
     requirePacket);
   return { standableTiles: roomTiles.length, memorySquare, memoryComponents };
 }
+function assertMemoryCameraGround(p, memory) {
+  let checked = memoryCameraPackets.get(p);
+  if (!checked) {
+    checked = new Map();
+    memoryCameraPackets.set(p, checked);
+  }
+  const pending = [...p.cameraPackets.all()].filter(info =>
+    (info.type === 0 || info.type === 1) && !checked.has(info));
+  if (pending.length === 0) return;
+  const label = `${memory} memory camera`;
+  const instance = instanceForOwner(p, label);
+  const { rageZones, fearZones } = assertInstanceTemplateInventory(instance, label);
+  const ground = new Set((memory === 'Rage' ? rageZones : fearZones).map(destinationZoneKey));
+  const visible = new Set(mappedZonesInSceneWindow(p).map(destinationZoneKey));
+  for (const info of pending) {
+    const role = info.type === 0 ? 'eye' : 'look-at';
+    const key = `${p.level}:${info.camX >> 3}:${info.camZ >> 3}`;
+    assert(ground.has(key),
+      `${label}: every issued ${role} tile ${p.level}:${info.camX}:${info.camZ} has copied ground in its own memory patch`);
+    assert(visible.has(key), `${label}: every issued ${role} tile is in the player's memory scene window`);
+    checked.set(info, { memory, role, level: p.level, x: info.camX, z: info.camZ });
+  }
+}
+function assertMemoryCameraCoverage(p, memory) {
+  const commands = [...(memoryCameraPackets.get(p)?.values() ?? [])].filter(info => info.memory === memory);
+  assert(commands.some(info => info.role === 'eye'), `${memory} memory issues an actual camera eye command`);
+  assert(commands.some(info => info.role === 'look-at'), `${memory} memory issues an actual camera look-at command`);
+  console.log(`PASS every issued native memory camera has its own copied ground ${JSON.stringify({ memory, commands })}`);
+}
 function assertMemorySceneVisibility(p, zones, label, requirePacket = false) {
   const tiles = collisionOpenTiles(zones);
   assert(tiles.length > 0, `${label}: all-standable memory scene predicate is non-vacuous`);
@@ -2013,6 +2046,7 @@ function finishFearScene(p) {
   const pages = [];
   const messageStart = p.messages.length;
   const recordFearStaging = () => {
+    assertMemoryCameraGround(p, 'Fear');
     if (sawFearStaging || !observeFearScene(p)) return;
     const instance = instanceForOwner(p, 'Fear memory scene');
     const { fearZones } = assertInstanceTemplateInventory(instance, 'Fear memory scene');
@@ -2035,6 +2069,7 @@ function finishFearScene(p) {
       (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
   }
   assert(sawFearStaging, 'the fifth-death scene stages the player and Tolna before returning');
+  assertMemoryCameraCoverage(p, 'Fear');
   assert.equal(stage(p), FEAR_COMPLETE_STAGE, 'the Fear scene, not the fifth death queue, commits stage 5');
   assert.deepEqual({ level: p.level, x: p.x, z: p.z }, roomCoord(p, 'soulbane_fear_entry'), 'the Fear scene returns to its room entry');
   assert.equal(readVar(p, 'soulbane_fear_killedtally'), 5, 'the completed five-kill tally is preserved');
