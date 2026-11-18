@@ -156,13 +156,13 @@ function summedRewardInventory() {
   return Object.fromEntries([...Object.entries(rewardTotals), ['spade', 1]].sort(([left], [right]) => left.localeCompare(right)));
 }
 
-// Check that each packed center is walkable and the production pathfinder reaches it.
+// Reach each exact center from a packed walkable tile 20-60 tiles away, not its dig square.
 for (const site of sites) {
   assert.equal(map.isMapBlocked(site.x, site.z, site.level), false, `site ${site.index} exact dig center is not blocked`);
   let reachable = null;
-  for (let radius = 1; radius <= 4 && !reachable; radius++) {
-    for (let dx = -radius; dx <= radius && !reachable; dx++) {
-      for (let dz = -radius; dz <= radius && !reachable; dz++) {
+  for (let radius = 20; radius <= 60 && !reachable; radius += 20) {
+    for (let dx = -radius; dx <= radius && !reachable; dx += radius) {
+      for (let dz = -radius; dz <= radius && !reachable; dz += radius) {
         if (Math.max(Math.abs(dx), Math.abs(dz)) !== radius) continue;
         const x = site.x + dx;
         const z = site.z + dz;
@@ -174,8 +174,9 @@ for (const site of sites) {
       }
     }
   }
-  assert(reachable, `site ${site.index} packed pathfinder reaches its exact center from a nearby walkable tile`);
+  assert(reachable, `site ${site.index} packed pathfinder reaches its exact center from a walkable tile 20-60 tiles away`);
   assert(reachable.route.length > 0);
+  console.log(`site ${site.index} packed foot route: ${reachable.x},${reachable.z} -> ${site.x},${site.z}, plane ${site.level}`);
 }
 const firstSiteStaging = { level: 0, x: 2708, z: 3606 };
 assert.equal(map.isMapBlocked(firstSiteStaging.x, firstSiteStaging.z, firstSiteStaging.level), false, 'the headed first-site staging tile is walkable');
@@ -338,6 +339,39 @@ function reload(p) {
   assertInventoryExactly(p, { makinghistory_key: 1 }, 'spadeless dig procedure awards nothing');
 }
 
+// A coordinate clue without its instruments must not swallow the hunt's earlier dig hook.
+{
+  const clue = 'trail_clue_medium_sextant001';
+  const p = postQuestPlayer(['makinghistory_key', 'spade', clue]);
+  for (const tool of ['trail_watch', 'trail_chart', 'trail_sextant']) assert.equal(count(p, tool), 0);
+  setPosition(p, sites[0]);
+  const lootBefore = lootSnapshot(p);
+  held(p, 'spade', 1);
+  assert.equal(foundMask(p), 1, 'coordinate clue without tools cannot swallow a treasure dig');
+  assertRewardDelta(p, 0, lootBefore, 'coordinate clue without tools');
+  assert.equal(count(p, clue), 1, 'hunt dig leaves the coordinate clue untouched');
+  assert.equal(p.animId, id('SeqType', 'human_dig'), 'the early hunt hook retains the spade dig animation');
+}
+
+// Away from its selected treasure, the early hunt hook must leave an ordinary clue dig intact.
+{
+  const clue = 'trail_clue_medium_sextant001';
+  const p = postQuestPlayer(['makinghistory_key', 'spade', clue, 'trail_watch', 'trail_chart', 'trail_sextant']);
+  const clueType = types.ObjType.get(obj(clue));
+  const clueCoord = clueType.params.get(id('ParamType', 'trail_coord'));
+  assert(Number.isInteger(clueCoord), 'the coordinate clue has a packed target');
+  setPosition(p, CoordGrid.unpackCoord(clueCoord));
+  assert(Math.max(Math.abs(p.x - sites[0].x), Math.abs(p.z - sites[0].z)) > 4, 'clue target is outside the selected treasure square');
+  setHunt(p, 0, 0);
+  const before = p.getVar(huntVar);
+  assert.equal(execute('[proc,ek_dig]', p).popInt(), 0, 'hunt hook immediately refuses the distant clue tile');
+  held(p, 'spade', 1);
+  assert.equal(count(p, clue), 0, 'coordinate clue is consumed by its own dig');
+  assert.equal(count(p, 'trail_clue_medium_sextant001_casket'), 1, 'ordinary clue dig still gives its casket');
+  assert.equal(p.getVar(huntVar), before, 'ordinary clue dig does not change the selected hunt target');
+  for (const name of allLootNames) assert.equal(count(p, name), 0, 'ordinary clue dig gives no hunt reward');
+}
+
 // Every unselected site and every already-found site refuses the selected target.
 const refusalPlayer = postQuestPlayer();
 const noRewardItems = { makinghistory_key: 1, spade: 1 };
@@ -488,6 +522,26 @@ assert.equal(count(ringKeyPlayer, 'makinghistory_key'), 0);
 talkToSilverMerchant(ringKeyPlayer, [2]);
 assert.equal(count(ringKeyPlayer, 'makinghistory_key'), 0, 'ring-stored key is not duplicated');
 assert.equal(count(ringKeyPlayer, 'coins'), replacementPrice, 'ring-key refusal does not spend coins');
+
+ringKeyPlayer.invDel(inv, obj('favour_key_ring'), 1);
+ringKeyPlayer.invAdd(bankInv, obj('favour_key_ring'), 1);
+talkToSilverMerchant(ringKeyPlayer, [2]);
+assert.equal(count(ringKeyPlayer, 'makinghistory_key'), 0, 'banked ring-stored key is not duplicated');
+assert.equal(count(ringKeyPlayer, 'coins'), replacementPrice, 'banked-ring refusal does not spend coins');
+
+// UNKNOWN recovery rule: an unrecoverable lost ring must not prevent the hunt from continuing.
+const storedRingKeys = ringKeyPlayer.getVar(id('VarPlayerType', 'favour_key_ring'));
+assert(storedRingKeys > 0, 'real key storage has set the key-ring bit');
+ringKeyPlayer.invDel(bankInv, obj('favour_key_ring'), 1);
+assert.equal(count(ringKeyPlayer, 'favour_key_ring'), 0);
+assert.equal(count(ringKeyPlayer, 'favour_key_ring', bankInv), 0);
+setHunt(ringKeyPlayer, 1, 1);
+const lostRingHunt = ringKeyPlayer.getVar(huntVar);
+talkToSilverMerchant(ringKeyPlayer, [2, 1]);
+assert.equal(count(ringKeyPlayer, 'makinghistory_key'), 1, 'Erin sells the key when its stored bit remains but the ring is lost');
+assert.equal(count(ringKeyPlayer, 'coins'), 0, 'lost-ring replacement spends the configured price');
+assert.equal(ringKeyPlayer.getVar(huntVar), lostRingHunt, 'lost-ring replacement preserves found treasures and the selected target');
+assert.equal(ringKeyPlayer.getVar(id('VarPlayerType', 'favour_key_ring')), storedRingKeys, 'replacement does not rewrite the ring key flags');
 
 runner.messages.length = 0;
 const finalQuestStage = runner.getVarBit(makingHistoryProgress);

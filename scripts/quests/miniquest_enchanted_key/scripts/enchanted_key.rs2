@@ -48,6 +48,9 @@ if ($target = -1) return(false);
 def_coord $site = ~ek_site_coord($target);
 // CANDIDATE postquest dig region: the modern guide permits a 9 by 9 square.
 if (coordy(coord) ! coordy($site) | distance(coord, $site) > 4) return(false);
+p_arrivedelay;
+p_stopaction;
+anim(human_dig, 0);
 %enchanted_key_hunt = setbit(%enchanted_key_hunt, $target);
 %enchanted_key_hunt = setbit_range_toint(%enchanted_key_hunt, 0, 11, 14);
 %makinghistory_key_distance = 0;
@@ -132,8 +135,8 @@ if (inv_total(inv, makinghistory_key) > 0 | inv_total(bank, makinghistory_key) >
     ~chatnpc("<p,neutral>Feel the key to find more buried treasure.");
     return;
 }
-// CANDIDATE recovery must not duplicate a key stored on a lost or banked ring.
-if (testbit(%favour_key_ring, ~osf_key_ring_store_bit(makinghistory_key)) = 1) {
+// UNKNOWN: lost-ring recovery is not built, so only a held or banked ring blocks replacement.
+if (testbit(%favour_key_ring, ~osf_key_ring_store_bit(makinghistory_key)) = 1 & (inv_total(inv, favour_key_ring) > 0 | inv_total(bank, favour_key_ring) > 0)) {
     ~chatnpc("<p,neutral>Your enchanted key is on your steel key ring.");
     return;
 }
