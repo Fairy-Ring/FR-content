@@ -60,4 +60,4 @@ val=7,For this fight you're not allowed to use any Ranged attacks.
 val=8,For this fight you're not allowed any Weapons or Armour.
 val=9,For this fight you're only allowed to use Ranged attacks, no Melee or Magic.
 val=10,For this fight you're not allowed to use any Magic attacks.
-val=11,For this fight you're only allowed to use items that you have equipped, nothing from your inventory.
+val=11,He has stated there will be no items allowed except those you're wearing.

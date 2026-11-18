@@ -3,14 +3,10 @@
 
 [opnpc1,champions_doorman]
 if (~champions_ready_for_leon = true) {
-    ~chatnpc("<p,neutral>So you want to accept the challenge huh? Well there are some specific rules for these Champion fights. <enum(int, string, champions_rule, 11)> Do you still want to proceed?");
+    ~chatnpc("<p,neutral>Leon d'Cour has issued you a challenge. <enum(int, string, champions_rule, 11)> Do you want to accept the challenge?");
     if (~p_choice2("Yes, let me at him!", 1, "No thanks, I'll pass.", 2) = 1) {
         ~champions_accept(11);
     }
-    return;
-}
-if (~champions_current > 0) {
-    ~chatnpc("<p,neutral>You've already got a champion waiting for you.");
     return;
 }
 def_int $choice = ~p_choice2("What is this place?", 1, "Nothing thanks.", 2);

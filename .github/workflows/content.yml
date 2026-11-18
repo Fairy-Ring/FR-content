@@ -169,6 +169,7 @@ jobs:
           # Built combat vectors and checker self-tests use the native pack; no server or vault.
           run_test tests/npc-combat/test_npc_combat.mjs node --import tsx ../content/tests/npc-combat/test_npc_combat.mjs
           run_test tests/npc-combat/test_outcomes.mjs node --import tsx ../content/tests/npc-combat/test_outcomes.mjs
+          run_test tests/champions-challenge/test_champions_challenge.mjs node --import tsx ../content/tests/champions-challenge/test_champions_challenge.mjs
           run_test tests/poison-rule/test_poison_rule.mjs node --import tsx ../content/tests/poison-rule/test_poison_rule.mjs
           run_test tests/spawn-repair/test_spawn_repair.mjs node --import tsx ../content/tests/spawn-repair/test_spawn_repair.mjs
           run_test tests/wanted/start.mjs node --import tsx ../content/tests/wanted/start.mjs

@@ -127,7 +127,7 @@ return(true);
 
 [proc,champions_teleport_check](coord $from)(boolean)
 if (inzone(0_49_152_17_17, 0_49_152_55_43, $from) = true | inzone(1_49_152_17_17, 1_49_152_55_43, $from) = true) {
-    // CANDIDATE: OSRS Transcript:Larxus, no later-change indication.
+    // CANDIDATE OSRS rule/wording; first documented in the wiki in December 2022.
     ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>There's a ladder for a reason.");
     return(false);
 }

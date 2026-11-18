@@ -72,8 +72,8 @@ if (~champions_in_arena = true) p_telejump(^champions_gallery_stand);
 ~champions_leave;
 
 [proc,champions_player_death]
-// VERIFIED High Risk: Tip.it 30 April 2006. Exact death allocation UNKNOWN:
-// retain the revision's ordinary keep/drop rule, with no safe death or grave.
+// CANDIDATE normal death: official KB 11 May 2006, supported by Tip.it 2007.
+// Exact cutoff item allocation UNKNOWN: retain ordinary keep/drop, no safe death.
 if (~champions_current > 0 & ~champions_in_arena = true) ~champions_leave;
 
 [ai_queue3,ghoul]

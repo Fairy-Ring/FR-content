@@ -28,6 +28,7 @@ p_telejump(^champions_surface);
 [proc,champions_enter]
 def_int $id = ~champions_current;
 if ($id = 0) {
+    // UNKNOWN functional refusal: no period wording is retained.
     ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>You need to arrange a challenge with me before you enter the arena.");
     return;
 }
@@ -42,7 +43,8 @@ p_delay(0);
 def_int $other = 1;
 while ($other <= 11) {
     if (npc_find(^champions_imp_spawn, enum(int, npc, champions_npc, $other), 24, 0) = true) {
-        ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>You've already got a champion waiting for you.");
+        // UNKNOWN functional refusal for the arena's single shared floor.
+        mes("The arena is in use.");
         return;
     }
     $other = add($other, 1);
