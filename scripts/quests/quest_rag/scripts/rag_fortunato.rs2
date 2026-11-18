@@ -1,0 +1,34 @@
+// CANDIDATE wording: OSRS transcript revision 15330894, unchanged core scene.
+// VERIFIED: RuneHQ 2006-04-24 requires speaking before buying eight vinegar.
+[opnpc1,rag_wine_merchant]
+~chatnpc("<p,neutral>Can I help you at all?");
+if (~rag_stage = 0) {
+    ~openshop_fortunato;
+    return;
+}
+if (%rag_wine = 0) {
+    ~chatplayer("<p,neutral>Have you got any vinegar?");
+    ~chatnpc("<p,neutral>Vinegar?");
+    ~chatnpc("<p,angry>Vinegar!");
+    ~chatnpc("<p,angry>The very idea! My wines are the finest in the district!");
+    ~chatplayer("<p,neutral>Sorry! I was told to come and speak with a wine merchant about getting some vinegar, I must have the wrong person.");
+    ~chatnpc("<p,neutral>Wait...did HE send you?");
+    ~chatplayer("<p,neutral>If by HE you mean the old man with the sack of bones, then yes.");
+    ~chatnpc("<p,neutral>Aaaah...say no more sir, I have some in specially.");
+    %rag_wine = 1;
+} else {
+    ~chatnpc("<p,neutral>Ah! Good afternoon your lordship. I take it you have come for a refill?");
+    if (~p_choice2("Yes", 1, "Not today", 2) = 2) {
+        ~chatplayer("<p,neutral>Not today.");
+        ~chatnpc("<p,neutral>Well, just remember I have some in stock for you when you want it.");
+        return;
+    }
+    ~chatplayer("<p,neutral>Yes.");
+}
+~openshop_fortunato;
+
+[proc,rag_wine_shop]()(boolean)
+if (map_members = ^false | %rag_wine = 0) return(false);
+// CANDIDATE stock: retained wine_vinegar_merchant inventory, no stock rebalance.
+~openshop(wine_vinegar_merchant, 600, 1000, 20, "Wine Shop.");
+return(true);

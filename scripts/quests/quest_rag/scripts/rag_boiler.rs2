@@ -1,0 +1,110 @@
+// VERIFIED sequence: RuneHQ 2006-04-24 and Tip.It 2006-05-02.
+// CANDIDATE: OSRS guide gives twelve seconds, emptying destroys the bone,
+// and relogging finishes a lit pot. Original 377 multi-loc supplies all forms.
+[opheldu,rag_vinegar]
+if (last_useitem ! pot_empty) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, rag_vinegar, 1);
+inv_del(inv, pot_empty, 1);
+inv_add(inv, jug_empty, 1);
+inv_add(inv, rag_pot_vinegar, 1);
+
+[opheldu,rag_pot_vinegar]
+def_int $bone = ~rag_bone_index(last_useitem);
+if ($bone = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem ! ~rag_raw($bone)) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, last_useitem, 1);
+inv_del(inv, rag_pot_vinegar, 1);
+inv_add(inv, ~rag_potted($bone), 1);
+
+[opheld4,rag_vinegar]
+inv_del(inv, rag_vinegar, 1);
+inv_add(inv, jug_empty, 1);
+
+[opheld4,rag_pot_vinegar]
+inv_del(inv, rag_pot_vinegar, 1);
+inv_add(inv, pot_empty, 1);
+
+[opheld4,rag_pot_goblin_bone] @rag_empty_bone;
+[opheld4,rag_pot_bear_bone] @rag_empty_bone;
+[opheld4,rag_pot_medium_frog_bone] @rag_empty_bone;
+[opheld4,rag_pot_ram_bone] @rag_empty_bone;
+[opheld4,rag_pot_unicorn_bone] @rag_empty_bone;
+[opheld4,rag_pot_monkey_bone] @rag_empty_bone;
+[opheld4,rag_pot_giant_rat_bone] @rag_empty_bone;
+[opheld4,rag_pot_giant_bat_bone] @rag_empty_bone;
+[label,rag_empty_bone]
+inv_del(inv, last_item, 1);
+inv_add(inv, pot_empty, 1);
+
+[oplocu,rag_potboiler_nologs] @rag_use_boiler;
+[oplocu,rag_potboiler_nopot] @rag_use_boiler;
+[oplocu,rag_potboiler_with_pot] @rag_use_boiler;
+[oplocu,rag_potboiler_onfire] @rag_use_boiler;
+[oplocu,rag_potboiler_with_pot_boiled] @rag_use_boiler;
+[label,rag_use_boiler]
+if (~rag_stage ! 1) return;
+if (%rag_boiler = 0 & oc_category(last_useitem) = category_22) {
+    // CANDIDATE: the OSRS guide requires the log's Firemaking level.
+    if (stat(firemaking) < oc_param(last_useitem, levelrequire)) {
+        mes("You need a Firemaking level of <tostring(oc_param(last_useitem, levelrequire))> to burn <oc_name(last_useitem)>.");
+        return;
+    }
+    inv_del(inv, last_useitem, 1);
+    %rag_boiler = 1;
+    return;
+}
+if (%rag_boiler = 1) {
+    def_int $bone = ~rag_bone_index(last_useitem);
+    if ($bone > 0) {
+        if (last_useitem = ~rag_potted($bone)) {
+            inv_del(inv, last_useitem, 1);
+            %rag_inv_check = $bone;
+            %rag_boiler = 2;
+            return;
+        }
+    }
+}
+if (%rag_boiler = 2 & last_useitem = tinderbox) {
+    %rag_boiler = 3;
+    settimer(rag_boil, 20); // CANDIDATE: twelve seconds at 600ms per tick.
+    return;
+}
+~displaymessage(^dm_default);
+
+[timer,rag_boil]
+cleartimer(rag_boil);
+if (%rag_boiler = 3) %rag_boiler = 4;
+
+[oploc1,rag_potboiler_with_pot]
+if (%rag_boiler ! 2) return;
+if (inv_freespace(inv) < 1) {
+    ~displaymessage(^dm_invspace);
+    return;
+}
+inv_add(inv, ~rag_potted(%rag_inv_check), 1);
+%rag_inv_check = 0;
+%rag_boiler = 1;
+
+[oploc1,rag_potboiler_with_pot_boiled]
+if (%rag_boiler ! 4) return;
+if (inv_freespace(inv) < 2) {
+    ~displaymessage(^dm_invspace);
+    return;
+}
+inv_add(inv, ~rag_polished(%rag_inv_check), 1);
+inv_add(inv, pot_empty, 1);
+%rag_inv_check = 0;
+%rag_boiler = 0;
+
+[proc,rag_login]
+// CANDIDATE OSRS hop behaviour. The saved pot and its bone remain recoverable.
+if (%rag_boiler = 3) %rag_boiler = 4;
