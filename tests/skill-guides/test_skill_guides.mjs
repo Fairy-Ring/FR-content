@@ -13,6 +13,8 @@ const defaultExport = async relative => (await load(relative)).default;
 const World = await defaultExport('engine/World.ts');
 const Player = await defaultExport('engine/entity/Player.ts');
 const ScriptProvider = await defaultExport('engine/script/ScriptProvider.ts');
+const ScriptRunner = await defaultExport('engine/script/ScriptRunner.ts');
+const ServerTriggerType = await defaultExport('engine/script/ServerTriggerType.ts');
 const { PlayerStat } = await load('engine/entity/PlayerStat.ts');
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType', 'ObjType', 'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType', 'SeqType', 'SpotanimType', 'MesanimType', 'DbTableType', 'DbRowType', 'Component', 'FontType']) {
@@ -152,5 +154,45 @@ for (const [skill, guide] of Object.entries(expected)) {
   assertPage(p, guide.categories[0]);
   console.log(`PASS ${skill}: stats-tab dispatch, all ${guide.categories.length} categories, exact row levels/text/icons, clear and reopen`);
 }
+// The original cache has 1,065 Guide forms. Goutweed is not plantable in this
+// build; Main explicitly excludes those eleven forms until that gameplay exists.
+const unplantableGoutweed = new Set([
+  'goutweed_seed', 'goutweed_1', 'goutweed_2', 'goutweed_3', 'goutweed_fullygrown',
+  'goutweed_1_diseased', 'goutweed_2_diseased', 'goutweed_3_diseased',
+  'goutweed_1_dead', 'goutweed_2_dead', 'goutweed_3_dead'
+]);
+const originalLocIds = fs.readFileSync(path.join(content, 'pack/loc.pack'), 'utf8').trim().split('\n').map(line => Number(line.slice(0, line.indexOf('='))));
+const patchPlayer = player();
+patchPlayer.tabs[1] = types.Component.get(id('Component', 'stats:farming')).rootLayer;
+const patchScript = ScriptProvider.getByName('[oploc4,_farming_patch_guide]');
+assert(patchScript, 'shared Farming patch Guide handler exists (fails on the old pack)');
+let guideForms = 0;
+let excludedForms = 0;
+for (const locId of originalLocIds) {
+  const loc = types.LocType.get(locId);
+  if (loc.op?.[3] !== 'Guide') continue;
+  guideForms++;
+  const dispatched = ScriptProvider.getByTrigger(ServerTriggerType.OPLOC4, locId, loc.category);
+  if (unplantableGoutweed.has(loc.debugname)) {
+    assert.equal(dispatched, undefined, `${loc.debugname}: unreachable Goutweed remains outside this unit`);
+    excludedForms++;
+    continue;
+  }
+  assert.equal(loc.category, id('CategoryType', 'farming_patch_guide'), `${loc.debugname}: shared server-only category`);
+  assert.equal(dispatched, patchScript, `${loc.debugname}: real loc/category dispatch selects the shared handler`);
+  // Start from Herbs each time: Guide must select the first section, not retain
+  // the previous page or route to the modern patch-specific section.
+  press(patchPlayer, 'stats:farming');
+  press(patchPlayer, 'skill_guide:op4');
+  assertPage(patchPlayer, expected.farming.categories[3]);
+  patchPlayer.packets.length = 0;
+  patchPlayer.executeScript(ScriptRunner.init(dispatched, patchPlayer), true);
+  assert.equal(patchPlayer.activeScript, null, `${loc.debugname}: Guide completes without suspending`);
+  assertPage(patchPlayer, expected.farming.categories[0]);
+}
+assert.equal(guideForms, 1065, 'complete original-cache Guide option census');
+assert.equal(excludedForms, unplantableGoutweed.size, 'only the eleven explicitly excluded Goutweed forms');
+console.log(`PASS patch Guide: all ${guideForms - excludedForms} supported forms open the first Farming section; ${excludedForms} unplantable Goutweed forms excluded`);
+
 console.log('RESULT PASS revision-377 skill guides');
 process.exit(0);
