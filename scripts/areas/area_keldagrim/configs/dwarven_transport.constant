@@ -7,8 +7,10 @@
 ^dwarven_train_city = 0_45_159_47_4
 ^dwarven_train_ice = 0_46_153_50_53
 ^dwarven_train_whitewolf = 0_44_154_58_17
-// UNKNOWN engineering divider between the west and east parked hub carts.
-^dwarven_train_berth_split_x = 2925
+// UNKNOWN engineering hub berths: front of the four parallel original tracks,
+// numbered north to south; original buffers and tracks fix the east-west axis.
+^dwarven_train_track1 = 0_45_158_31_63
+^dwarven_train_track4 = 0_45_158_31_57
 // CANDIDATE: OSRS conductor transcripts, with post-2006 GE service removed.
 ^dwarven_ferry_fare = 2
 ^dwarven_train_ice_fare = 150

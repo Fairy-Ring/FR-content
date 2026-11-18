@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   BlockWalk, EntityLifeCycle, IfSetText, MessageGame, Npc, Player, ResumePauseButton,
-  ResumePauseButtonHandler, ScriptRunner, ScriptState, ServerTriggerType, World, content,
+  ResumePauseButtonHandler, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType, World, content,
   floorTiles, locFor, map, nativeLocRows, nativeNpcRows, reachable, requiredId, tileOf,
   types, walkable
 } from '../regicide-travel/runtime.mjs';
@@ -228,6 +228,68 @@ function adjacentLocTile(row) {
   assert.fail(`no collision-free approach to native cart ${row.name} ${row.coord}`);
 }
 
+// Follow the real routefinder's compressed waypoints, checking each walking
+// step against packed collision rather than moving through a closed wall.
+function walkPath(player, route) {
+  for (const packed of route) {
+    const x = (packed >>> 14) & 0x3fff;
+    const z = packed & 0x3fff;
+    while (player.x !== x || player.z !== z) {
+      const dx = Math.sign(x - player.x), dz = Math.sign(z - player.z);
+      assert.ok(map.canTravel(player.level, player.x, player.z, dx, dz, 1, 0, 0), 'each pathfinder step is walkable');
+      player.x += dx;
+      player.z += dz;
+    }
+  }
+}
+
+function pathToLoc(player, row) {
+  const type = types.LocType.get(row.id);
+  return map.findPathToLoc(player.level, player.x, player.z, row.x, row.z, 1,
+    type.width, type.length, row.angle, row.shape, type.forceapproach);
+}
+
+function walkToLoc(player, row) {
+  walkPath(player, pathToLoc(player, row));
+  assert.ok(reachable(tileOf(player), row), `engine pathfinder reaches ${row.name} at ${row.x},${row.z}`);
+}
+
+function walkToNpc(player, row) {
+  const size = types.NpcType.get(row.id).size;
+  walkPath(player, map.findPathToEntity(player.level, player.x, player.z, row.x, row.z, 1, size, size));
+  assert.ok(map.reachedEntity(player.level, player.x, player.z, row.x, row.z, size, size, 1),
+    `engine pathfinder reaches ${row.name} at ${row.x},${row.z}`);
+}
+
+function operateDoor(player, loc) {
+  player.target = loc;
+  player.targetOp = ServerTriggerType.OPLOC1 - 7;
+  const selected = player.getOpTrigger();
+  assert.ok(selected, 'the real visible door dispatch has an Open/Close handler');
+  const state = ScriptRunner.init(selected, player, loc);
+  player.executeScript(state, true);
+  finishScript(player, state);
+  return state.activeLoc;
+}
+
+function throughDoor(start, door, visit) {
+  const player = playerAt(start);
+  walkToLoc(player, door);
+  const original = locFor(door);
+  const opened = operateDoor(player, original);
+  assert.notEqual(opened.type, original.type, 'Open installs the cache open form');
+  try {
+    visit(player);
+  } finally {
+    // Restore packed collision for the next independent landing/state case.
+    const openRow = { ...door, id: opened.type, name: types.LocType.get(opened.type).debugname,
+      x: opened.x, z: opened.z, shape: opened.shape, angle: opened.angle };
+    walkToLoc(player, openRow);
+    operateDoor(player, opened);
+    assert.ok(World.getLoc(door.x, door.z, door.level, door.id), 'Close restores the original door');
+  }
+}
+
 function bag(player) {
   return player.getInventory(inventoryId);
 }
@@ -360,7 +422,7 @@ for (const [label, tile] of destinations) {
 // UNKNOWN cell-entry fixture tiles; both are checked against the compiled map before use.
 const liveEntryFixtures = [
   ['city boatman entry', [0, 2888, 10227]],
-  ['Track 1 conductor entry', [0, 2918, 10180]]
+  ['train platform entry', [0, 2927, 10180]]
 ];
 for (const [label, tile] of liveEntryFixtures) {
   check(`${label} has a packed walkable entry tile and exit`, () => {
@@ -372,6 +434,77 @@ const conductorRows = new Map();
 for (let number = 1; number <= 8; number++) {
   const name = `dwarf_city_train_conductor${number}`;
   conductorRows.set(number, nativeNpcRows(name));
+}
+
+const hubCartRows = [
+  { name: 'keldagrim_train_cart', id: requiredId(types.LocType, 'keldagrim_train_cart'),
+    level: 0, x: 2911, z: 10175, shape: 10, angle: 0, coord: '0_45_158_31_63' },
+  { name: 'keldagrim_train_cart', id: requiredId(types.LocType, 'keldagrim_train_cart'),
+    level: 0, x: 2911, z: 10169, shape: 10, angle: 0, coord: '0_45_158_31_57' }
+];
+check('native conductor spawn creates shared front carts without changing the client map, and respawn is idempotent', () => {
+  assert.deepEqual(nativeLocRows('keldagrim_train_cart'), [], 'no client-map hub carts are added');
+  assert.deepEqual(nativeLocRows('keldagrim_train_cart_unridable'), [], 'unridable carts are not invented');
+  const row = conductorRows.get(1)[0];
+  const npc = spawnNativeNpc(row);
+  const spawn = ScriptProvider.getByTrigger(ServerTriggerType.AI_SPAWN, row.id, types.NpcType.get(row.id).category);
+  assert.equal(spawn?.name, '[ai_spawn,dwarf_city_train_conductor1]');
+  const runSpawn = () => {
+    const state = ScriptRunner.init(spawn, npc);
+    npc.executeScript(state);
+    assert.equal(state.execution, ScriptState.FINISHED, 'production conductor spawn finishes');
+  };
+  runSpawn();
+  const first = hubCartRows.map(locFor);
+  runSpawn();
+  assert.deepEqual(hubCartRows.map(locFor), first, 'respawn preserves both shared cart instances');
+  for (const cart of hubCartRows) {
+    const track = nativeLocRows('ridable_trackstraight_gdecor').find(r => r.level === cart.level && r.x === cart.x && r.z === cart.z);
+    assert.ok(track, 'cart stands on an original track');
+    assert.equal(track.angle, cart.angle, 'cart faces along the original track');
+  }
+});
+
+const doorFamilies = [
+  'dwarf_keldagrim_door_interior_palace', 'dwarf_keldagrim_door_interior_poor',
+  'dwarf_keldagrim_door_interior', 'dwarf_keldagrim_door', 'dwarf_keldagrim_door_poor',
+  'dwarf_keldagrim_door_ornate', 'dwarf_keldagrim_door_ornate_mirror',
+  'dwarf_keldagrim_door_palace', 'dwarf_keldagrim_door_interior_factory', 'dwarf_keldagrim_factory_door'
+];
+check('all ten interactive Keldagrim door families register their original open and closed forms', () => {
+  const nextStage = requiredId(types.ParamType, 'next_loc_stage');
+  for (const name of doorFamilies) {
+    const closed = types.LocType.get(requiredId(types.LocType, name));
+    const opened = types.LocType.get(requiredId(types.LocType, `${name}_open`));
+    assert.equal(closed.params.get(nextStage), opened.id, `${name} opens to its own cache form`);
+    assert.equal(opened.params.get(nextStage), closed.id, `${name} closes to its own cache form`);
+    for (const form of [closed, opened]) {
+      assert.ok(ScriptProvider.getByTrigger(ServerTriggerType.OPLOC1, form.id, form.category), `${form.debugname} dispatches`);
+    }
+  }
+});
+
+for (const start of [[0, 2888, 10227], [0, 2927, 10180]]) {
+  check(`engine pathfinder reaches both server carts from landing ${start.join(',')}`, () => {
+    for (const row of hubCartRows) walkToLoc(playerAt(start), row);
+  });
+  check(`player walks through the conductor room's real door from landing ${start.join(',')}`, () => {
+    const door = nativeLocRows('dwarf_keldagrim_door').find(r => r.x === 2924 && r.z === 10180);
+    assert.ok(door, 'original conductor-room door is packed');
+    throughDoor(start, door, player => {
+      walkToNpc(player, conductorRows.get(1)[0]);
+      // Leave through the opened door, then reach both front carts on foot.
+      for (const cart of hubCartRows) walkToLoc(player, cart);
+    });
+  });
+}
+for (const [name, start] of [
+  ['icemountain_train_cart', [0, 2994, 9845]],
+  ['whitewolfmountain_train_cart', [0, 2874, 9873]]
+]) {
+  check(`engine pathfinder reaches each ${name} from its landing`, () => {
+    for (const row of nativeLocRows(name)) walkToLoc(playerAt(start), row);
+  });
 }
 
 check('every placed conductor type uses its real visible map form; conductor 4 tests both placements', () => {
@@ -601,20 +734,17 @@ for (const ringCase of [
   });
 }
 
-// UNKNOWN engineering track placements; assert the native map rows and dispatch each fixed track directly.
-check('native train cart placements encode Track 1 Ice and Track 4 White Wolf without a cart destination menu', () => {
-  const cityRows = nativeLocRows('keldagrim_train_cart');
-  assert.equal(cityRows.length, 2, 'both native Keldagrim train carts are present');
-  const byX = [...cityRows].sort((left, right) => left.x - right.x);
-  assert.deepEqual(byX.map(row => row.coord), ['0_45_159_39_3', '0_45_159_52_4']);
-  assert.deepEqual(byX.map(row => [row.level, row.x, row.z]), [[0, 2919, 10179], [0, 2932, 10180]]);
+// UNKNOWN engineering fronts on original track geometry, created by NPC spawn.
+check('server train cart fronts encode Track 1 Ice and Track 4 White Wolf without a cart destination menu', () => {
+  assert.equal(hubCartRows.length, 2);
+  assert.deepEqual(hubCartRows.map(row => row.coord), ['0_45_158_31_63', '0_45_158_31_57']);
+  for (const row of hubCartRows) locFor(row);
   for (const name of ['icemountain_train_cart', 'whitewolfmountain_train_cart']) {
     assert.ok(nativeLocRows(name).length > 0, `native return cart placement exists: ${name}`);
   }
 });
 
-const westCart = nativeLocRows('keldagrim_train_cart').find(row => row.x === 2919);
-const eastCart = nativeLocRows('keldagrim_train_cart').find(row => row.x === 2932);
+const [westCart, eastCart] = hubCartRows;
 const iceReturnCarts = nativeLocRows('icemountain_train_cart');
 const wolfReturnCarts = nativeLocRows('whitewolfmountain_train_cart');
 
@@ -734,14 +864,37 @@ function boatTalk(row, stage, yes, start = [row.level, row.x, row.z]) {
   return { player, before, result };
 }
 
-check('mines boat prequest remains the original dispatched intro; only the >=1 repeat branch is exercised', () => {
+check('stage zero executes the original introduction and offers the original deal, not repeat travel', () => {
   const row = findNpcRow('dwarf_city_boatman_mines_prequest');
   const player = playerAt([row.level, row.x, row.z]);
   setGiantDwarfStage(player, 0);
-  const { selected } = dispatchNpc(player, row);
-  assert.equal(selected.name, '[opnpc1,dwarf_city_boatman_mines_prequest]');
-  // Deliberately do not run the initial voyage; it belongs to the Giant Dwarf intro.
+  const { npc, selected } = dispatchNpc(player, row);
+  const { menus } = runSelectedInteraction(player, selected, npc, [/I prefer the mines to the city\./]);
+  assert.match(tileText(player), /Ho there, human!/);
+  assert.ok(menus.some(options => options.includes("That's a deal!")), 'original deal is offered');
+  assert.doesNotMatch(tileText(player), /Hello again/);
+  assert.equal(player.getVarBit(giantDwarfQuestBit), 0, 'declining the original voyage does not start the quest');
 });
+
+for (const introduced of [0, 1]) {
+  check(`stage-one boat return leaves Veldaban reachable with briefing flag ${introduced}`, () => {
+    const row = findNpcRow('dwarf_city_boatman_mines_prequest');
+    const start = [row.level, row.x, row.z];
+    const player = playerAt(start);
+    setGiantDwarfStage(player, 1);
+    player.setVarBit(requiredId(types.VarBitType, 'giantdwarf_veldaban_introduced'), introduced);
+    const { npc, selected } = dispatchNpc(player, row);
+    runSelectedInteraction(player, selected, npc, [/Yes, please take me\./]);
+    assert.deepEqual(tileOf(player), [0, 2888, 10227]);
+    const door = nativeLocRows('dwarf_keldagrim_door').find(r => r.x === 2827 && r.z === 10218);
+    assert.ok(door, 'original headquarters door exists');
+    throughDoor(tileOf(player), door, walker => {
+      walkToNpc(walker, findNpcRow('dwarf_city_black_guard_leader'));
+    });
+    assert.equal(player.getVarBit(giantDwarfQuestBit), 1);
+    assert.equal(player.getVarBit(requiredId(types.VarBitType, 'giantdwarf_veldaban_introduced')), introduced);
+  });
+}
 
 for (const stage of [1, 2]) {
   check(`mines boatman repeat at Giant Dwarf value ${stage} returns to the city dock on consent`, () => {

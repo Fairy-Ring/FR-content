@@ -203,9 +203,23 @@ if (%fishingcompo ! ^fishingcompo_complete) {
 }
 return(true);
 
+// UNKNOWN engineering placement/lifetime: permanently present front carts, no
+// queue or timetable. AI_SPAWN follows mdaughter_kendal.rs2; global loc_add with
+// max duration follows castlewars_rocks.rs2. The native conductor respawns on
+// every server start, and repeats do not duplicate or expire an existing cart.
+[ai_spawn,dwarf_city_train_conductor1]
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+%npc_start_coord = npc_coord;
+if (loc_find(^dwarven_train_track1, keldagrim_train_cart) = false) {
+    loc_add(^dwarven_train_track1, keldagrim_train_cart, 0, centrepiece_straight, ^max_32bit_int);
+}
+if (loc_find(^dwarven_train_track4, keldagrim_train_cart) = false) {
+    loc_add(^dwarven_train_track4, keldagrim_train_cart, 0, centrepiece_straight, ^max_32bit_int);
+}
+
 [oploc1,keldagrim_train_cart]
-// UNKNOWN engineering berth mapping: original Ride loc on tracks 1 and 4.
-if (coordx(loc_coord) < ^dwarven_train_berth_split_x) {
+// CANDIDATE: click the front cart on the track named by the ticket seller.
+if (loc_coord = ^dwarven_train_track1) {
     ~dwarven_train_ride(dwarf_minecart_ticket_kelda_ice, ^dwarven_train_ice, false);
 } else {
     ~dwarven_train_ride(dwarf_minecart_ticket_kelda_whitewolf, ^dwarven_train_whitewolf, true);

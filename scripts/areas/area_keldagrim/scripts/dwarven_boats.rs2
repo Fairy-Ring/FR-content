@@ -75,9 +75,9 @@ if ($returning = true) {
 }
 
 [proc,dwarven_transport_fade](coord $destination)
-// UNKNOWN engineering presentation: original fade assets, no recovered voyage
-// packet schedule or complete cart cutscene. The sitting animation alone is not
-// a journey. Do not repurpose the Giant Dwarf's statue-crash miniature.
+// UNKNOWN engineering presentation: the fade_to_black/seq_3541 then
+// inter_379/seq_2115 pair follows quest_rd/scripts/rd_tiffy.rs2:148-156.
+// No original repeat-voyage schedule is recovered; do not reuse the crash.
 if_close;
 if_openoverlay(fade_to_black);
 p_delay(~seqlength20ms(seq_3541));
