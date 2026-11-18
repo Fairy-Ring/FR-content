@@ -402,15 +402,28 @@ try {
 assert.equal(uncommonStart, 998, 'all existing uncommon table bands are covered');
 console.log(`PASS: ${uncommonSeeds.length} actual Mogre-helper native RNG ground/pickup witnesses; AI_QUEUE3 binding checked, full death is covered by tests/mogre/test_mogre.mjs`);
 const nativeInventory = new Set([...bought, ...BIRD_NEST_SEEDS.map(([name]) => name), ...uncommonSeeds.map(([name]) => name)]);
-const theftFixture = new Set([...cropGroups.allotment, ...cropGroups.hops, 'marigold_seed', 'rosemary_seed', 'nasturtium_seed']);
-const noProducerFound = new Set(['woad_seed', 'guam_seed', 'redberry_bush_seed', 'cadavaberry_bush_seed',
-  'dwellberry_bush_seed', 'deal_blindweed_seed', 'village_rare_tuber']);
-assert.deepEqual(cropNames.filter(name => !nativeInventory.has(name) && !theftFixture.has(name)).sort(),
-  Array.from(noProducerFound).sort(), 'every standard identity has a native witness or an explicit no-producer result');
+const seedStallTheft = new Set([...cropGroups.allotment, ...cropGroups.hops, 'marigold_seed', 'rosemary_seed', 'nasturtium_seed']);
+const masterFarmerPickpocket = new Set([
+  ...cropGroups.allotment, ...cropGroups.hops, ...cropGroups.flower, ...cropGroups.bush, ...cropGroups.herb,
+  'mushroom_seed', 'belladonna_seed', 'cactus_seed'
+]);
+assert.equal(seedStallTheft.size, 17, 'native seed-stall tests cover the seventeen original primary outcomes');
+assert.equal(masterFarmerPickpocket.size, 42, 'native Master Farmer tests cover the forty-two candidate source rows');
+const noProducerFound = new Set(['deal_blindweed_seed', 'village_rare_tuber']);
+assert.deepEqual(cropNames.filter(name => !nativeInventory.has(name) && !seedStallTheft.has(name) &&
+  !masterFarmerPickpocket.has(name)).sort(), Array.from(noProducerFound).sort(),
+  'every standard identity has a native fixture witness or an explicit no-producer result');
+const merchantWitness = new Set(bought);
+const birdNestWitness = new Set(BIRD_NEST_SEEDS.map(([name]) => name));
+const mogreDropHelperWitness = new Set(uncommonSeeds.map(([name]) => name));
 console.log('SEED_SOURCE_AUDIT', JSON.stringify(Object.entries(cropGroups).flatMap(([group, names]) => names.map(name => ({
   group, name, countAliases: Object.entries(cacheObjects.get(name)).filter(([key]) => /^count\d+$/.test(key)).map(([, value]) => value.split(',')[0]),
   nativeInventoryWitness: nativeInventory.has(name),
-  registeredTheftWitness: theftFixture.has(name) ? 'tests/farming/test_seed_stall.mjs' : null,
+  merchantTradeWitness: merchantWitness.has(name) ? 'tests/farming/test_seed_sources.mjs' : null,
+  birdNestTransferWitness: birdNestWitness.has(name) ? 'tests/farming/test_seed_sources.mjs' : null,
+  mogreDropHelperWitness: mogreDropHelperWitness.has(name) ? 'tests/farming/test_seed_sources.mjs' : null,
+  registeredTheftWitness: seedStallTheft.has(name) ? 'tests/farming/test_seed_stall.mjs' : null,
+  masterFarmerPickpocketWitness: masterFarmerPickpocket.has(name) ? 'tests/farming/test_master_farmer.mjs' : null,
   otherProducer: noProducerFound.has(name) ? 'UNKNOWN: no producing path established' : null,
   normalEntry: 'UNKNOWN: local approaches only'
 })))));

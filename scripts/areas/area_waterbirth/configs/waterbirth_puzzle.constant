@@ -1,0 +1,11 @@
+// UNKNOWN engineering polling interval for real player occupancy.
+^waterbirth_pressure_poll = 1
+
+// UNKNOWN engineering duration passed to the native changed-loc lifecycle.
+// Historical timing was not recovered. The compiled fixture observes closure
+// nine cycles after departure because the normal cycle has already advanced.
+^waterbirth_pressure_grace = 10
+
+// UNKNOWN engineering support durability and reset. Sources give neither value.
+^waterbirth_support_hitpoints = 1
+^waterbirth_support_reset = 100
