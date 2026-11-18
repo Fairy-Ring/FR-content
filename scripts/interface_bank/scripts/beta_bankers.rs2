@@ -1,0 +1,85 @@
+// CANDIDATE: OSRS regional banker transcripts, retained with complete histories
+// and NPC change notes for N614. Collect (2015) is not a revision-377 option.
+[apnpc1,mourning_elf_bankerm] @beta_elf_banker;
+[apnpc1,mourning_elf_bankerf] @beta_elf_banker;
+
+[label,beta_elf_banker]
+if (npc_range(coord) > 2) {
+    p_aprange(2);
+    return;
+}
+~chatnpcrange("<p,quiz>Good day, how may I help you?");
+def_int $option = ~p_choice3("I'd like to access my bank account, please.", 1, "I'd like to check my PIN settings.", 2, "What is this place?", 3);
+switch_int ($option) {
+    case 1 : @openbank;
+    case 2 : @open_bank_pin_setting;
+    case 3 :
+        ~chatplayer("<p,quiz>What is this place?");
+        ~chatnpcrange("<p,neutral>This is an elven bank. The magic in this place allows you to access your account here in the western lands.");
+}
+
+[apnpc1,fever_banker_01] @beta_pirate_banker;
+[apnpc1,fever_banker_02] @beta_pirate_banker;
+
+[label,beta_pirate_banker]
+if (npc_range(coord) > 2) {
+    p_aprange(2);
+    return;
+}
+~chatnpcrange("<p,quiz>Aye? Ye got some stuff te stash?");
+def_int $option = ~p_choice3("I'd like to access my bank account, please.", 1, "I'd like to check my PIN settings.", 2, "What is this place?", 3);
+switch_int ($option) {
+    case 1 : @openbank;
+    case 2 : @open_bank_pin_setting;
+    case 3 :
+        ~chatplayer("<p,quiz>What is this place?");
+        // The shared period-era branch name replaces the later Gielinor name.
+        ~chatnpcrange("<p,neutral>This be a branch of the Bank of RuneScape. Ye may have heard of us.");
+        $option = ~p_choice2("And what do you do?", 1, "How secure is this place?", 2);
+        switch_int ($option) {
+            case 1 :
+                ~chatplayer("<p,quiz>And what do you do?");
+                ~chatnpcrange("<p,neutral>We keep an eye on yer loot for ye. Leave yer valuables with us if ye want to keep 'em nice and safe.");
+            case 2 :
+                ~chatplayer("<p,quiz>How secure is this place?");
+                ~chatnpcrange("<p,neutral>Real secure. Before we got here, people were just dumpin' stuff into a bucket guarded by a man with an iron bar.");
+                ~chatnpcrange("<p,neutral>Since we arrived, we can get all the stuff organised nice and civil like, and with only half as many kneecappins.");
+        }
+}
+
+[apnpc1,dwarf_city_banker1]
+if (npc_range(coord) > 2) {
+    p_aprange(2);
+    return;
+}
+~chatnpcrange("<p,quiz>Welcome to the Keldagrim bank! Anything I can help you with?");
+@beta_dwarf_banker_menu;
+
+[label,beta_dwarf_banker_menu]
+// The 2018 standard transcript retains the Bank of RuneScape name.
+def_int $option = ~p_choice4("Are you with the Bank of RuneScape?", 1, "How is business?", 2, "I'd like to check my PIN settings.", 3, "I'd like to access my bank account please.", 4);
+switch_int ($option) {
+    case 1 :
+        ~chatplayer("<p,quiz>Are you with the Bank of RuneScape?");
+        ~chatnpcrange("<p,neutral>Oh yes, we are a branch, but an independent branch.");
+        ~chatnpcrange("<p,neutral>We have liaised with the Bank of RuneScape. It's healthy to keep a bit of trade going with the human population, you know.");
+        ~chatnpcrange("<p,quiz>Was there something else you wanted?");
+        @beta_dwarf_banker_menu;
+    case 2 :
+        ~chatnpcrange("<p,neutral>Business has always gone well here, but now more than ever. We are getting a constant supply of gold from the new gold mine south of the city.");
+        ~chatplayer("<p,happy>Oh yes, I helped to open that up you know!");
+        ~chatnpcrange("<p,neutral>Sure, sure.");
+        ~chatnpcrange("<p,quiz>Was there anything else I can help you with?");
+        @beta_dwarf_banker_menu;
+    case 3 : @open_bank_pin_setting;
+    case 4 :
+        ~chatplayer("<p,neutral>I'd like to access my bank account please.");
+        // UNKNOWN engineering distribution: both acknowledgements are sourced,
+        // but the transcript gives no weight for either one.
+        if (random(^beta_banker_acknowledgements) = 0) {
+            ~chatnpcrange("<p,neutral>Of course.");
+        } else {
+            ~chatnpcrange("<p,neutral>Naturally.");
+        }
+        @openbank;
+}
