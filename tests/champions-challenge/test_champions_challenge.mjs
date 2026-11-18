@@ -128,17 +128,17 @@ function addItem(itemId, amount = 1, inv = inventory) {
   }
   assert.equal(player.invAdd(inv, itemId, amount), amount, `add ${types.ObjType.get(itemId).debugname}`);
 }
-function standNear(entity) {
+function standNear(entity, actor = player) {
   const candidates = [
     [-1, 0], [1, 0], [0, -1], [0, 1], [-1, -1], [-1, 1], [1, -1], [1, 1]
   ];
   for (const [dx, dz] of candidates) {
-    player.level = entity.level;
-    player.x = entity.x + dx;
-    player.z = entity.z + dz;
-    player.originX = player.x;
-    player.originZ = player.z;
-    if (player.inOperableDistance(entity)) return;
+    actor.level = entity.level;
+    actor.x = entity.x + dx;
+    actor.z = entity.z + dz;
+    actor.originX = actor.x;
+    actor.originZ = actor.z;
+    if (actor.inOperableDistance(entity)) return;
   }
   assert.fail(`no adjacent player tile can operate ${types.NpcType.get(entity.type)?.debugname ?? entity.type}`);
 }
@@ -200,37 +200,37 @@ function assertLocRoute(start, loc, label) {
     `${label} reaches an operable loc side`);
   return end;
 }
-function advanceDialogue(state, label) {
+function advanceDialogue(state, label, actor = player) {
   assert(state, `${label} has an active script`);
   for (let page = 0; page < 20; page++) {
     assert.notEqual(state.execution, ScriptState.ABORTED, `${label} did not abort`);
     if (state.execution === ScriptState.FINISHED) return;
     if (state.execution !== ScriptState.PAUSEBUTTON) {
-      finishPlayer(player, state, label);
+      finishPlayer(actor, state, label);
       return;
     }
-    const root = types.Component.get(player.modalChat);
+    const root = types.Component.get(actor.modalChat);
     if (/^multi[2-5]$/.test(root.comName)) return;
     const buttons = Array.from(root.childId ?? []).filter(com =>
       types.Component.get(com).buttonType === types.Component.PAUSE_BUTTON
     );
     assert.equal(buttons.length, 1, `${label} has one native Continue button`);
-    assert(player.isComponentVisible(types.Component.get(buttons[0])), `${label} Continue is visible`);
-    assert(continueDialogue.handle(new ResumePauseButton(buttons[0]), player), `${label} continues through the real packet handler`);
+    assert(actor.isComponentVisible(types.Component.get(buttons[0])), `${label} Continue is visible`);
+    assert(continueDialogue.handle(new ResumePauseButton(buttons[0]), actor), `${label} continues through the real packet handler`);
   }
   assert.fail(`${label} exceeded the bounded dialogue pages`);
 }
-function chooseDialogue(option) {
-  const state = player.activeScript;
-  advanceDialogue(state, 'before choice');
+function chooseDialogue(option, actor = player) {
+  const state = actor.activeScript;
+  advanceDialogue(state, 'before choice', actor);
   assert.equal(state?.execution, ScriptState.PAUSEBUTTON, 'production dialogue is awaiting a choice');
-  const root = types.Component.get(player.modalChat).comName;
+  const root = types.Component.get(actor.modalChat).comName;
   assert.match(root, /^multi[2-5]$/, `choice component ${root}`);
   const buttonId = id('Component', `${root}:com_${option}`);
-  assert(player.resumeButtons.includes(buttonId), `${root} offered option ${option}`);
-  assert(dialogue.handle(new IfButton(buttonId), player), 'choice is accepted by the real component handler');
+  assert(actor.resumeButtons.includes(buttonId), `${root} offered option ${option}`);
+  assert(dialogue.handle(new IfButton(buttonId), actor), 'choice is accepted by the real component handler');
   assert.notEqual(state.execution, ScriptState.ABORTED, 'dialogue choice did not abort');
-  advanceDialogue(state, `after choice ${option}`);
+  advanceDialogue(state, `after choice ${option}`, actor);
   assert.equal(state.execution, ScriptState.FINISHED, `choice ${option} completes the production trigger`);
 }
 function locByBase(name, position) {
@@ -474,6 +474,106 @@ test('real item-on-Larxus, packed trapdoor and ladder preserve the Ghoul scroll 
   assert.equal(escrow(), 0, 'leaving clears escrow');
   assert.equal(count(player, scrollNames[1]), 1, 'leaving returns the unconsumed Ghoul scroll');
   assert.equal([...World.npcs].filter(npc => npc.type === id('NpcType', championNpcNames[1])).length, 0, 'leaving removes the owned challenger');
+});
+
+test('a shared open statue cannot admit another player without their own eligible challenge', () => {
+  fresh(gallery);
+  addItem(scrollIds[0]);
+  const doorman = makeNpc('champions_doorman', larxus);
+  const entrant = makePlayer(gallery);
+  const champions = () => [...World.npcs].filter(npc => championNpcIds.has(npc.type));
+  const championState = () => champions().map(npc =>
+    [npc.nid, npc.type, npc.getVar(ownerVarn), npc.level, npc.x, npc.z, npc.levels[hp]]
+  );
+  try {
+    standNear(doorman);
+    player.lastUseItem = scrollIds[0];
+    player.lastUseSlot = player.getInventory(inventory).getItemIndex(scrollIds[0]);
+    dispatchPlayerNpc(ServerTriggerType.OPNPCU, player, doorman);
+    chooseDialogue(1);
+    assert.equal(current(), 1, 'first player accepts their own Earth Warrior scroll');
+    const trap = locByBase('champions_statue_trap', statue);
+    const openTrapId = id('LocType', 'champions_statue_trap_open');
+    assert.equal(trap?.type, openTrapId, 'first selection opens the actual shared statue');
+    assert.equal(champions().length, 0, 'acceptance alone has not spawned a champion');
+
+    const refuseEntrant = label => {
+      entrant.level = gallery.level;
+      entrant.x = gallery.x;
+      entrant.z = gallery.z;
+      entrant.originX = entrant.x;
+      entrant.originZ = entrant.z;
+      const before = {
+        raw: entrant.getVar(defeatedVarp), stats: [...entrant.stats],
+        scrolls: scrollIds.map(scroll => entrant.invTotal(inventory, scroll)),
+        ownerRaw: player.getVar(defeatedVarp), champions: championState()
+      };
+      assert.equal(trap.type, openTrapId, `${label}: the shared statue is still open`);
+      assert(locHandler.handle(new OpLoc(1, trap.x, trap.z, trap.type), entrant), `${label}: real open-statue option accepted`);
+      entrant.processInteraction();
+      if (entrant.activeScript) advanceDialogue(entrant.activeScript, label, entrant);
+      assert.deepEqual([entrant.level, entrant.x, entrant.z], [gallery.level, gallery.x, gallery.z], `${label}: entrant remains outside`);
+      assert.deepEqual({
+        raw: entrant.getVar(defeatedVarp), stats: [...entrant.stats],
+        scrolls: scrollIds.map(scroll => entrant.invTotal(inventory, scroll)),
+        ownerRaw: player.getVar(defeatedVarp), champions: championState()
+      }, before, `${label}: no challenge, scroll, XP, opponent or owner state changes`);
+      tickPlayer(player, entrant);
+    };
+    refuseEntrant('no accepted challenge and no scroll, before the first fight exists');
+    entrant.invAdd(inventory, scrollIds[1], 1);
+    refuseEntrant('different scroll held but not presented to Larxus');
+
+    player.level = gallery.level;
+    player.x = gallery.x;
+    player.z = gallery.z;
+    clickLoc(trap);
+    assert.deepEqual([player.level, player.x, player.z], [arenaEntry.level, arenaEntry.x, arenaEntry.z], 'first player enters their own accepted fight');
+    assert.equal(champions().length, 1, 'first entry creates exactly one champion');
+    assert.equal(champions()[0].type, id('NpcType', championNpcNames[0]));
+    assert.equal(champions()[0].getVar(ownerVarn), player.uid, 'first player owns that champion');
+
+    for (const challenge of [2, 1]) {
+      resetPlayer(entrant, gallery);
+      entrant.invAdd(inventory, scrollIds[challenge - 1], 1);
+      entrant.lastUseItem = scrollIds[challenge - 1];
+      entrant.lastUseSlot = entrant.getInventory(inventory).getItemIndex(entrant.lastUseItem);
+      standNear(doorman, entrant);
+      dispatchPlayerNpc(ServerTriggerType.OPNPCU, entrant, doorman);
+      chooseDialogue(1, entrant);
+      assert.equal(stack(runProc('champions_current', entrant)).at(-1), challenge, 'second player accepts only their own scroll');
+      refuseEntrant(`accepted challenge ${challenge} while the first player's champion occupies the arena`);
+      assert(entrant.messages.includes('The arena is in use.'), 'occupied arena refuses the second eligible player');
+    }
+
+    runProc('champions_leave', player);
+    assert.equal(champions().length, 0, 'first player leaving removes only their own opponent');
+    resetPlayer(entrant, gallery);
+    entrant.invAdd(inventory, scrollIds[1], 1);
+    entrant.lastUseItem = scrollIds[1];
+    entrant.lastUseSlot = entrant.getInventory(inventory).getItemIndex(entrant.lastUseItem);
+    standNear(doorman, entrant);
+    dispatchPlayerNpc(ServerTriggerType.OPNPCU, entrant, doorman);
+    chooseDialogue(1, entrant);
+    entrant.getInventory(inventory).removeAll();
+    refuseEntrant('accepted challenge but its own scroll is missing, with an empty arena');
+    entrant.invAdd(inventory, scrollIds[1], 1);
+    runLocOption(entrant, trap, locHandler, OpLoc);
+    assert.deepEqual([entrant.level, entrant.x, entrant.z], [arenaEntry.level, arenaEntry.x, arenaEntry.z], 'second player can enter their own eligible challenge once the arena is free');
+    assert.equal(champions().length, 1);
+    assert.equal(champions()[0].type, id('NpcType', championNpcNames[1]), 'second entry creates their Ghoul, not the first player\'s Earth Warrior');
+    assert.equal(champions()[0].getVar(ownerVarn), entrant.uid, 'second player owns only their own spawned champion');
+    assert.equal(count(entrant, scrollNames[1]), 0, 'Ghoul entry escrows the second player\'s own scroll');
+    assert.equal(stack(runProc('champions_scroll_escrow', entrant)).at(-1), 1);
+    runProc('champions_leave', entrant);
+    assert.equal(count(entrant, scrollNames[1]), 1, 'ordinary retreat returns that same unconsumed scroll');
+  } finally {
+    cleanNpcs();
+    entrant.clearInteraction();
+    entrant.isActive = false;
+    World.players[entrant.slot] = null;
+    entrant.unlink();
+  }
 });
 
 test('all fixed travel and champion footprints use connected packed floor', () => {

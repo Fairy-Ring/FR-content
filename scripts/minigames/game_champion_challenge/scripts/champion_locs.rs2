@@ -28,7 +28,7 @@ p_telejump(^champions_surface);
 [proc,champions_enter]
 def_int $id = ~champions_current;
 if ($id = 0) {
-    // UNKNOWN functional refusal: no period wording is retained.
+    // CANDIDATE wording: current OSRS Transcript:Larxus; exact period wording UNKNOWN.
     ~chatnpc_specific("Larxus", champions_doorman, "<p,neutral>You need to arrange a challenge with me before you enter the arena.");
     return;
 }
