@@ -1,0 +1,198 @@
+// VERIFIED 377 interface and original permanent varp 615. No new client state.
+// VERIFIED capacities: farming.period-tool-shed-capacities, Tip.It 28 April 2006.
+// VERIFIED Talk-to outcome: Tip.It Farming guide, captured 28 April 2006.
+// No contemporaneous speech survives; do not import the later chat tree.
+[opnpc1,farming_tools_leprechaun]
+@farming_tools_open;
+
+// CANDIDATE Exchange outcome: farming.tool-shed-exchange-outcome.
+[opnpc3,farming_tools_leprechaun]
+@farming_tools_open;
+
+[label,farming_tools_open]
+~farming_tools_refresh;
+inv_transmit(farming_leprechaun_tools, tool_leprechaun:com_67);
+inv_transmit(farming_leprechaun_compost, tool_leprechaun:com_68);
+inv_transmit(farming_inventory_tools, tool_leprechaun_side:com_0);
+inv_transmit(farming_inventory_compost, tool_leprechaun_side:com_1);
+if_openmain_side(tool_leprechaun, tool_leprechaun_side);
+
+[if_close,tool_leprechaun]
+inv_stoptransmit(tool_leprechaun:com_67);
+inv_stoptransmit(tool_leprechaun:com_68);
+inv_stoptransmit(tool_leprechaun_side:com_0);
+inv_stoptransmit(tool_leprechaun_side:com_1);
+
+[inv_button1,tool_leprechaun:com_67] @farming_tools_remove(last_slot, 1);
+[inv_button1,tool_leprechaun:com_68] @farming_tools_remove(add(last_slot, 6), 1);
+[inv_button2,tool_leprechaun:com_68] @farming_tools_remove(add(last_slot, 6), 5);
+[inv_button3,tool_leprechaun:com_68] @farming_tools_remove(add(last_slot, 6), ^max_32bit_int);
+[inv_button4,tool_leprechaun:com_68] @farming_tools_remove(add(last_slot, 6), 0);
+[inv_button1,tool_leprechaun_side:com_0] @farming_tools_store(last_slot, 1);
+[inv_button1,tool_leprechaun_side:com_1] @farming_tools_store(add(last_slot, 6), 1);
+[inv_button2,tool_leprechaun_side:com_1] @farming_tools_store(add(last_slot, 6), 5);
+[inv_button3,tool_leprechaun_side:com_1] @farming_tools_store(add(last_slot, 6), ^max_32bit_int);
+[inv_button4,tool_leprechaun_side:com_1] @farming_tools_store(add(last_slot, 6), 0);
+
+[label,farming_tools_store](int $tool, int $amount)
+if ($amount = 0) {
+    p_countdialog;
+    $amount = last_int;
+    if ($amount <= 0) return;
+}
+def_namedobj $item = ~farming_tools_held($tool);
+~farming_tools_deposit($tool, $item, $amount);
+~farming_tools_refresh;
+
+[label,farming_tools_remove](int $tool, int $amount)
+if ($amount = 0) {
+    p_countdialog;
+    $amount = last_int;
+    if ($amount <= 0) return;
+}
+~farming_tools_withdraw($tool, $amount);
+~farming_tools_refresh;
+
+[proc,farming_tools_count](int $tool)(int)
+switch_int ($tool) {
+    case 0 : return(%farming_tools_rake);
+    case 1 : return(%farming_tools_dibber);
+    case 2 : return(%farming_tools_spade);
+    case 3 : return(%farming_tools_secateurs);
+    case 4 : return(min(1, %farming_tools_wateringcan));
+    case 5 : return(%farming_tools_trowel);
+    case 6 : return(%farming_tools_buckets);
+    case 7 : return(%farming_tools_compost);
+    case 8 : return(%farming_tools_supercompost);
+}
+return(0);
+
+[proc,farming_tools_set](int $tool, int $count)
+switch_int ($tool) {
+    case 0 : %farming_tools_rake = $count;
+    case 1 : %farming_tools_dibber = $count;
+    case 2 : %farming_tools_spade = $count;
+    case 3 : %farming_tools_secateurs = $count;
+    case 4 : %farming_tools_wateringcan = $count;
+    case 5 : %farming_tools_trowel = $count;
+    case 6 : %farming_tools_buckets = $count;
+    case 7 : %farming_tools_compost = $count;
+    case 8 : %farming_tools_supercompost = $count;
+}
+
+[proc,farming_tools_item](int $tool)(namedobj)
+switch_int ($tool) {
+    case 0 : return(rake);
+    case 1 : return(dibber);
+    case 2 : return(spade);
+    case 3 :
+        if (%farming_tools_fairysecateurs = 1) return(fairy_enchanted_secateurs);
+        return(secateurs);
+    // CANDIDATE dose preservation inferred from the original dose-minus-one UI.
+    case 4 : return(~farming_tools_can(max(0, sub(%farming_tools_wateringcan, 1))));
+    case 5 : return(gardening_trowel);
+    case 6 : return(bucket_empty);
+    case 7 : return(bucket_compost);
+    case 8 : return(bucket_supercompost);
+}
+return(null);
+
+[proc,farming_tools_can](int $water)(namedobj)
+switch_int ($water) {
+    case 0 : return(watering_can_0);
+    case 1 : return(watering_can_1);
+    case 2 : return(watering_can_2);
+    case 3 : return(watering_can_3);
+    case 4 : return(watering_can_4);
+    case 5 : return(watering_can_5);
+    case 6 : return(watering_can_6);
+    case 7 : return(watering_can_7);
+    case 8 : return(watering_can_8);
+}
+return(null);
+
+[proc,farming_tools_held](int $tool)(namedobj)
+// UNKNOWN selection order: first watering-can variant in inventory order.
+// A side-panel icon names that exact variant, so one Store never mixes doses.
+if ($tool = 4) {
+    def_int $slot = 0;
+    while ($slot < inv_size(inv)) {
+        def_obj $held = inv_getobj(inv, $slot);
+        def_int $water = 0;
+        while ($water <= 8) {
+            if ($held = ~farming_tools_can($water)) return(~farming_tools_can($water));
+            $water = add($water, 1);
+        }
+        $slot = add($slot, 1);
+    }
+    return(watering_can_0);
+}
+if ($tool = 3) {
+    // UNKNOWN selection priority when both forms are held: magic first.
+    if (inv_total(inv, fairy_enchanted_secateurs) > 0) return(fairy_enchanted_secateurs);
+    return(secateurs);
+}
+return(~farming_tools_item($tool));
+
+[proc,farming_tools_deposit](int $tool, obj $item, int $requested)
+def_int $held = inv_total(inv, $item);
+if ($held = 0) {
+    // UNKNOWN functional wording.
+    mes("You do not have that item to store.");
+    return;
+}
+def_int $limit = 1;
+if ($tool = 6) $limit = 31;
+if ($tool > 6) $limit = 255;
+def_int $stored = ~farming_tools_count($tool);
+def_int $amount = min($requested, min($held, sub($limit, $stored)));
+if ($amount <= 0) {
+    // UNKNOWN functional wording.
+    mes("The leprechaun cannot store any more of that item.");
+    return;
+}
+inv_del(inv, $item, $amount);
+~farming_tools_set($tool, add($stored, $amount));
+if ($tool = 3) {
+    %farming_tools_fairysecateurs = 0;
+    if ($item = fairy_enchanted_secateurs) %farming_tools_fairysecateurs = 1;
+}
+if ($tool = 4) {
+    def_int $water = 0;
+    while ($item ! ~farming_tools_can($water)) $water = add($water, 1);
+    %farming_tools_wateringcan = add($water, 1);
+}
+
+[proc,farming_tools_withdraw](int $tool, int $requested)
+def_int $stored = ~farming_tools_count($tool);
+if ($stored = 0) {
+    // UNKNOWN functional wording.
+    mes("The leprechaun has none of that item stored.");
+    return;
+}
+def_int $amount = min($requested, min($stored, inv_freespace(inv)));
+if ($amount <= 0) {
+    // UNKNOWN functional wording; farming.tool-shed-functional-refusals.
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, ~farming_tools_item($tool), $amount);
+~farming_tools_set($tool, sub($stored, $amount));
+if ($tool = 3) %farming_tools_fairysecateurs = 0;
+
+[proc,farming_tools_refresh]
+// These four original server inventories are display selectors, not custody.
+// Only farming_tools is saved. Client scripts read counts directly from it.
+def_int $tool = 0;
+while ($tool < 6) {
+    inv_setslot(farming_leprechaun_tools, $tool, ~farming_tools_item($tool), 1);
+    inv_setslot(farming_inventory_tools, $tool, ~farming_tools_held($tool), 1);
+    $tool = add($tool, 1);
+}
+if_settext(tool_leprechaun:com_79, "Secateurs");
+if (%farming_tools_fairysecateurs = 1) if_settext(tool_leprechaun:com_79, "Magic secateurs");
+
+[opnpcu,farming_tools_leprechaun]
+// The interface owns storage. Other item uses must not consume an item.
+// UNKNOWN 2006 produce noting: the dated 2013 OSRS addition is not backported.
+~displaymessage(^dm_default);
