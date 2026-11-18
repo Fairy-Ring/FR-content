@@ -17,6 +17,10 @@ const { CollisionType } = await engineModule('engine/routefinder/flags.ts');
 const RebuildRegion = (await engineModule('network/game/server/model/RebuildRegion.ts')).default;
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const MoveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
+const MoveClickDecoder = (await engineModule('network/game/client/codec/MoveClickDecoder.ts')).default;
+const ClientGameProt = (await engineModule('network/game/client/ClientGameProt.ts')).default;
+const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
+const CloseModalHandler = new (await engineModule('network/game/client/handler/CloseModalHandler.ts')).default();
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
 const OpLocHandler = new (await engineModule('network/game/client/handler/OpLocHandler.ts')).default();
 const OpNpc = (await engineModule('network/game/client/model/OpNpc.ts')).default;
@@ -35,6 +39,7 @@ const MidiSong = (await engineModule('network/game/server/model/MidiSong.ts')).d
 const DbTableIndex = (await engineModule('cache/config/DbTableIndex.ts')).default;
 
 const memoryCameraPackets = new WeakMap();
+const heldMemoryStandingTiles = new Map();
 
 
 
@@ -79,6 +84,9 @@ const HP_STAT = NpcStat.HITPOINTS;
 const LAUNA_SCENE = requiredId('NpcType', 'soulbane_launa_young');
 const TOLNA_SCENE = requiredId('NpcType', 'soulbane_tolnaboy');
 const QUEST_ROW = requiredId('Component', 'questlist:soulbane');
+const LOGOUT_TAB = Number(/^\^tab_logout\s*=\s*(\d+)\s*$/m.exec(fs.readFileSync(
+  path.join(contentRoot, 'scripts/general/configs/tabs.constant'), 'utf8'))?.[1]);
+assert(Number.isInteger(LOGOUT_TAB), 'the checked-out login tab constant defines the logout tab');
 const STAGE_VARBIT = requiredId('VarBitType', 'soulbane_prog');
 const STAGE_VARP = types.VarBitType.get(STAGE_VARBIT).basevar;
 const INSTANCE_VARP = requiredId('VarPlayerType', 'soulbane_instance');
@@ -726,7 +734,7 @@ function finishRageScene(p) {
       !observeRageScene(p)) return;
     const instance = instanceForOwner(p, 'Rage memory scene');
     const { rageZones } = assertInstanceTemplateInventory(instance, 'Rage memory scene');
-    assertMemorySceneVisibility(p, rageZones, 'Rage memory scene', true);
+    assertMemorySceneVisibility(p, rageZones, 'Rage', 'Rage memory scene', true);
     sawFamilyStaging = true;
   };
   for (let tick = 0; tick < 1200; tick++) {
@@ -795,6 +803,193 @@ function seedStageOneOwner(p, label) {
   assert.equal(readVar(p, 'soulbane_riftrope_pres'), 1, `${label}: disclosed attached-rope seed is present`);
   chooseRiftWithRope(p, label);
   assert.equal(stage(p), 2, `${label}: native descent creates Rage stage 2`);
+}
+
+// Disclosed pre-memory fixtures test input admission, not quest progression.
+// Every checkpoint is a real scheduling boundary of the compiled scene.
+const MEMORY_PROBES = [
+  { name: 'Rage', stage: 2, complete: 3, player: 'soulbane_scene_player',
+    entry: 'soulbane_rage_entry', ready: 'soulbane_anger_donespecial', value: 1,
+    queue: 'soulbane_rage_complete' },
+  { name: 'Fear', stage: FEAR_STAGE, complete: FEAR_COMPLETE_STAGE,
+    player: 'soulbane_fear_scene_player', entry: 'soulbane_fear_entry',
+    ready: 'soulbane_fear_killedtally', value: 5, queue: 'soulbane_fear_complete' }
+];
+function beginMemoryProbe(memory) {
+  const p = playerFixture();
+  writeVar(p, 'soulbane_prog', memory.name === 'Rage' ? 1 : memory.stage);
+  writeVar(p, 'soulbane_riftrope_pres', 1);
+  chooseRiftWithRope(p, `disclosed ${memory.name} input-admission fixture`);
+  p.tabs[LOGOUT_TAB] = types.Component.get(requiredId('Component', 'logout:try_logout')).rootLayer;
+  writeVar(p, memory.ready, memory.value);
+  const instance = instanceForOwner(p, `${memory.name} input fixture`);
+  const anchor = instanceZoneForSource(instance, sourceCoordForName(memory.player), memory.name);
+  const memoryZones = assignedInstanceZones(instance)
+    .filter(zone => !roomSourceSquares().has(sourceSquareKeyForZone(zone)));
+  const component = connectedZoneComponents(memoryZones).find(zones => zones.includes(anchor));
+  assert(component, `${memory.name}: actual memory anchor has a native copied patch`);
+  const script = ScriptProvider.getByName(`[queue,${memory.queue}]`);
+  assert(script, `${memory.name}: compiled completion queue exists`);
+  p.enqueueScript(script);
+  return {
+    p, memory, instance, standing: roomCoord(p, memory.player),
+    zoneKeys: new Set(component.map(destinationZoneKey))
+  };
+}
+function inProbeMemory(probe) {
+  const { p } = probe;
+  return probe.zoneKeys.has(`${p.level}:${p.x >> 3}:${p.z >> 3}`);
+}
+function advanceMemoryProbe(p) {
+  assert.notEqual(p.activeScript?.execution, ScriptState.ABORTED, 'memory probe script never aborts');
+  if (p.activeScript?.execution === ScriptState.PAUSEBUTTON) resumeDialogue(p);
+  else worldTick();
+}
+function observeHeldMemoryTile(probe) {
+  const { p, memory } = probe;
+  const zone = World.gameMap.getZoneIfExists(p.x, p.z, p.level);
+  assert(zone instanceof InstanceZone && zone.hasAssignedTemplate,
+    `${memory.name}: observed script placement has a real source mapping`);
+  const source = {
+    level: zone.source.level,
+    x: (zone.source.x << 3) + (p.x & 7),
+    z: (zone.source.z << 3) + (p.z & 7)
+  };
+  let positions = heldMemoryStandingTiles.get(memory.name);
+  if (!positions) {
+    positions = new Map();
+    heldMemoryStandingTiles.set(memory.name, positions);
+  }
+  positions.set(`${source.level}:${source.x}:${source.z}`, source);
+}
+function memoryCheckpoints(memory) {
+  const probe = beginMemoryProbe(memory);
+  const checkpoints = [];
+  let finished = false;
+  for (let boundary = 0; boundary < 256; boundary++) {
+    if (inProbeMemory(probe)) {
+      observeHeldMemoryTile(probe);
+      checkpoints.push({
+        boundary, execution: probe.p.activeScript?.execution,
+        delayed: probe.p.delayed, remainingDelay: probe.p.delayedUntil - World.currentTick
+      });
+    }
+    if (stage(probe.p) === memory.complete) {
+      finished = true;
+      break;
+    }
+    advanceMemoryProbe(probe.p);
+  }
+  assert(finished, `${memory.name}: baseline visits the entire memory and its real return`);
+  assert(checkpoints.some(point => point.delayed), `${memory.name}: delay boundaries are exercised`);
+  if (memory.name === 'Rage') {
+    assert(checkpoints.filter(point => point.execution === ScriptState.PAUSEBUTTON).length >= 7,
+      'Rage: all seven family dialogue pages are scheduling checkpoints');
+  }
+  runProc('soulbane_leave', probe.p);
+  return checkpoints;
+}
+function sendProbeWalk(p, minimap, label) {
+  const start = { level: p.level, x: p.x, z: p.z };
+  const destination = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1]]
+    .map(([dx, dz]) => ({ level: p.level, x: p.x + dx, z: p.z + dz }))
+    .find(candidate => hasExactNativeRoute(start, candidate));
+  assert(destination, `${label}: the walk request has a genuinely reachable different endpoint`);
+  nativeRouteFrom(start, destination, `${label}: exact collision route`);
+  const length = 5 + (minimap ? 14 : 0);
+  const packet = new Packet(new Uint8Array(length));
+  packet.p2_alt3(destination.x);
+  packet.p1(0);
+  packet.p2_alt3(destination.z);
+  packet.pos = 0;
+  const protocol = minimap ? ClientGameProt.MOVE_MINIMAPCLICK : ClientGameProt.MOVE_GAMECLICK;
+  const message = new MoveClickDecoder(protocol).decode(packet, length);
+  assert.deepEqual(message.path, [{ x: destination.x, z: destination.z }],
+    `${label}: the actual ground/minimap decoder retains the requested destination`);
+  MoveClickHandler.handle(message, p);
+  return destination;
+}
+function assertProbeHeldOrReturned(probe, label) {
+  const { p, memory, standing } = probe;
+  if (![...World.playerLoop.all()].includes(p)) return false;
+  const expected = stage(p) === memory.complete ? roomCoord(p, memory.entry) : standing;
+  assert.deepEqual(tile(p), [expected.level, expected.x, expected.z],
+    `${label}: input never moves the player off the script's placement tile`);
+  if (inProbeMemory(probe)) observeHeldMemoryTile(probe);
+  return true;
+}
+function testMemoryInputHold() {
+  for (const memory of MEMORY_PROBES) {
+    const checkpoints = memoryCheckpoints(memory);
+    const logoutSaves = [];
+    for (const point of checkpoints) {
+      for (const channel of ['ground', 'minimap', 'close-ground', 'close-minimap', 'logout', 'logout-button']) {
+        const probe = beginMemoryProbe(memory);
+        const { p } = probe;
+        const label = `${memory.name} boundary ${point.boundary} ${channel}`;
+        for (let boundary = 0; boundary < point.boundary; boundary++) advanceMemoryProbe(p);
+        assert(inProbeMemory(probe), `${label}: replay reaches the actual memory`);
+        assert.equal(p.activeScript?.execution, point.execution, `${label}: replay reaches the same script boundary`);
+        assert.equal(p.delayed, point.delayed, `${label}: replay reaches the same delay state`);
+        observeHeldMemoryTile(probe);
+        if (channel.startsWith('close-')) {
+          assert(CloseModalHandler.handle(new CloseModal(), p), `${label}: native close request is admitted`);
+          worldTick();
+          assertProbeHeldOrReturned(probe, label);
+        }
+        if (channel === 'logout') p.requestLogout = true;
+        else if (channel === 'logout-button') {
+          assert(button(p, 'logout:try_logout'), `${label}: the real visible logout button is admitted`);
+        } else if (stage(p) !== memory.complete) sendProbeWalk(p, channel.endsWith('minimap'), label);
+        const expectsLogout = channel === 'logout' || p.requestLogout || p.loggingOut;
+        if (channel === 'logout-button' && !expectsLogout && stage(p) !== memory.complete) {
+          sendProbeWalk(p, false, `${label}: ground request after rejected logout`);
+        }
+        assertProbeHeldOrReturned(probe, label);
+        let settled = false;
+        for (let boundary = 0; boundary < 256; boundary++) {
+          if (!assertProbeHeldOrReturned(probe, label)) {
+            assert(expectsLogout, `${label}: only an admitted logout removes the session`);
+            const request = World.logoutRequests.get(p.username);
+            assert(request?.save, `${label}: ordinary logout writes a genuine save`);
+            const loaded = PlayerLoading.load(p.username, new Packet(request.save), null);
+            World.logoutRequests.delete(p.username);
+            logoutSaves.push(p.username);
+            const surface = sourceCoordForName('soulbane_surface');
+            assert.deepEqual(tile(loaded), [surface.level, surface.x, surface.z],
+              `${label}: logout saves only the configured surface exit`);
+            assert.equal(instanceUid(loaded), 0, `${label}: saved state contains no runtime instance`);
+            settled = true;
+            break;
+          }
+          if (!expectsLogout && stage(p) === memory.complete) {
+            settled = true;
+            runProc('soulbane_leave', p);
+            break;
+          }
+          if (expectsLogout) worldTick();
+          else advanceMemoryProbe(p);
+        }
+        assert(settled, `${label}: actual scene return or logout settles without a forced runtime restoration`);
+      }
+    }
+    assert(heldMemoryStandingTiles.get(memory.name)?.size > 0,
+      `${memory.name}: input proof supplies a nonempty observed standing set`);
+    console.log(`PASS entire native memory input hold ${JSON.stringify({
+      memory: memory.name, checkpoints, channels: 6, logoutSaves,
+      standingTiles: [...heldMemoryStandingTiles.get(memory.name).values()]
+    })}`);
+  }
+  // The same decoded packets must move a free player: rejected or inert packet
+  // construction cannot accidentally make the memory admission proof pass.
+  for (const minimap of [false, true]) {
+    const p = playerFixture();
+    const destination = sendProbeWalk(p, minimap, 'free-player packet control');
+    for (let tick = 0; tick < 16 && (p.x !== destination.x || p.z !== destination.z); tick++) worldTick();
+    assert.deepEqual(tile(p), [destination.level, destination.x, destination.z],
+      `the decoded ${minimap ? 'minimap' : 'ground'} control really moves a free player`);
+    console.log(`PASS decoded ${minimap ? 'minimap' : 'ground'} free-player movement control`);
+  }
 }
 function testManualRoomMusicEntries() {
   for (const fixture of [
@@ -1491,7 +1686,7 @@ function memoryPatchComponents(instance, roomZones, label) {
   assert.notEqual(memorySquare, sourceSquareKey(sourceCoordForName('soulbane_rage_entry')),
     `${label}: scene memory source is distinct from the room source square`);
   const memoryZones = assignedInstanceZones(instance)
-    .filter(zone => sourceSquareKeyForZone(zone) === memorySquare);
+    .filter(zone => !roomSourceSquares().has(sourceSquareKeyForZone(zone)));
   assert(memoryZones.length > 0, `${label}: actual memory-source InstanceZones are present`);
   const components = connectedZoneComponents(memoryZones);
   assert.equal(components.length, 2, `${label}: Rage and Fear form separate copied memory patches`);
@@ -1631,8 +1826,8 @@ function assertPrivateInstanceIsolation(p, label, requireRoomPacket = false) {
   const instance = instanceForOwner(p, label);
   const roomScene = assertRoomSceneVisibility(p, label, requireRoomPacket);
   const { roomZones, rageZones, fearZones } = assertInstanceTemplateInventory(instance, label);
-  assertMemorySceneVisibility(null, rageZones, `${label}: Rage scene`, false);
-  assertMemorySceneVisibility(null, fearZones, `${label}: Fear scene`, false);
+  assertMemorySceneVisibility(null, rageZones, 'Rage', `${label}: Rage scene`, false);
+  assertMemorySceneVisibility(null, fearZones, 'Fear', `${label}: Fear scene`, false);
   assertNoBlankPaddingShortcut(p, instance, assignedInstanceZones(instance), label);
 
   const roomSource = sourceCoordForName('soulbane_rage_entry');
@@ -1781,7 +1976,7 @@ function assertRoomSceneVisibility(p, label, requirePacket = false) {
   const instance = instanceForOwner(p, label);
   const assigned = assignedInstanceZones(instance);
   const memorySquare = sourceSquareKey(sourceCoordForName('soulbane_scene_player'));
-  const memoryZones = assigned.filter(zone => sourceSquareKeyForZone(zone) === memorySquare);
+  const memoryZones = assigned.filter(zone => !roomSourceSquares().has(sourceSquareKeyForZone(zone)));
   const memoryComponents = connectedZoneComponents(memoryZones);
   const anchorZone = name => {
     const source = sourceCoordForName(name);
@@ -1837,31 +2032,38 @@ function assertMemoryCameraCoverage(p, memory) {
   assert(commands.some(info => info.role === 'look-at'), `${memory} memory issues an actual camera look-at command`);
   console.log(`PASS every issued native memory camera has its own copied ground ${JSON.stringify({ memory, commands })}`);
 }
-function assertMemorySceneVisibility(p, zones, label, requirePacket = false) {
-  const tiles = collisionOpenTiles(zones);
-  assert(tiles.length > 0, `${label}: all-standable memory scene predicate is non-vacuous`);
-  const instance = World.instances.findInstanceByCoord(tiles[0]);
+// The native input proof supplies the actual reachable standing set: collision-
+// open padding is not reachable while the compiled memory holds every input.
+function assertMemorySceneVisibility(p, zones, memory, label, requirePacket = false) {
+  const sources = [...(heldMemoryStandingTiles.get(memory)?.values() ?? [])];
+  assert(sources.length > 0, `${label}: the completed native input proof supplies standing tiles`);
+  const instance = World.instances.findInstanceByCoord({
+    level: zones[0].level, x: zones[0].x << 3, z: zones[0].z << 3
+  });
   assert(instance, `${label}: native memory tiles belong to a live instance`);
-  const flood = instanceNativeFloodfill({ ...tiles[0], width: p?.width ?? 1 }, instance, label, tiles);
-  const allowedSourceSquares = new Set([sourceSquareKeyForZone(zones[0])]);
+  const tiles = sources.map(source => {
+    const zone = instanceZoneForSource(instance, source, label);
+    assert(zones.includes(zone), `${label}: the proved script placement maps into this memory`);
+    return {
+      level: zone.level, x: (zone.x << 3) + (source.x & 7), z: (zone.z << 3) + (source.z & 7)
+    };
+  });
+  const allowedSourceSquares = new Set(zones.map(sourceSquareKeyForZone));
   const allowedZoneKeys = new Set(zones.map(destinationZoneKey));
-  let minNorth = Infinity;
-  let maxNorth = -Infinity;
-  for (const tileAt of flood.tiles) {
-    const north = (tileAt.z - instance.sw.z) >> 3;
-    minNorth = Math.min(minNorth, north);
-    maxNorth = Math.max(maxNorth, north);
-    assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: all native-walkable memory tiles`,
+  for (const tileAt of tiles) {
+    assertSceneMappingWindow(null, tileAt, allowedSourceSquares, `${label}: every proved standing tile`,
       false, allowedZoneKeys);
   }
   if (p) {
+    assert(tiles.some(tileAt => tileAt.level === p.level && tileAt.x === p.x && tileAt.z === p.z),
+      `${label}: the real player is at a standing tile established by the native input proof`);
     assertSceneMappingWindow(p, { level: p.level, x: p.x, z: p.z }, allowedSourceSquares,
       `${label}: real memory scene`, requirePacket, allowedZoneKeys);
   }
-  console.log(`PASS complete native memory floodfill ${JSON.stringify({
-    label, seedTiles: tiles.length, reachableTiles: flood.tiles.length, minNorth, maxNorth
+  console.log(`PASS proved held-memory standing-set isolation ${JSON.stringify({
+    memory, label, sourceStandingTiles: sources, nativeStandingTiles: tiles
   })}`);
-  return flood.tiles.length;
+  return tiles.length;
 }
 function hasExactNativeRoute(start, destination) {
   if (start.level !== destination.level) return false;
@@ -2050,7 +2252,7 @@ function finishFearScene(p) {
     if (sawFearStaging || !observeFearScene(p)) return;
     const instance = instanceForOwner(p, 'Fear memory scene');
     const { fearZones } = assertInstanceTemplateInventory(instance, 'Fear memory scene');
-    assertMemorySceneVisibility(p, fearZones, 'Fear memory scene', true);
+    assertMemorySceneVisibility(p, fearZones, 'Fear', 'Fear memory scene', true);
     sawFearStaging = true;
   };
   for (let tick = 0; tick < 1200; tick++) {
@@ -2754,6 +2956,10 @@ function testMainPath() {
 
 function run() {
   checkVarpMetadata();
+  if (process.argv.includes('--memory-hold-only')) {
+    testMemoryInputHold();
+    return;
+  }
   const r1Cases = new Map([
     ['teleport-out', testSafeTeleportOutAndDestinationLogout],
     ['teleport-in', testSafeTeleportInsideCopy],
@@ -2770,11 +2976,13 @@ function run() {
     const name = selector.slice('--r1-case='.length);
     const selected = r1Cases.get(name);
     assert(selected, `unknown --r1-case=${name}; choose ${[...r1Cases.keys()].join(', ')}`);
+    if (name === 'copy-access') testMemoryInputHold();
     selected();
     console.log(`PASS Soulbane isolated R1 case: ${name}`);
     return;
   }
 
+  testMemoryInputHold();
   const main = testMainPath();
   const stageTwo = testStageTwoLeaveAndLogout(main.player);
   assert.equal(latestQuestColor(stageTwo.reloaded), main.stageTwoColor, 'mid-Rage login reconstruction preserves the active-stage quest color');

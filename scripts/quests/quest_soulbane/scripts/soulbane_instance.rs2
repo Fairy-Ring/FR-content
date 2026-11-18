@@ -17,7 +17,7 @@ while ($x < 8) {
     }
     $x = add($x, 1);
 }
-// Use the north-edge strip; native scene tests follow every collision-open exit.
+// Native input proofs hold both memories at their script-placed standing tiles.
 def_int $scene_x = 0;
 while ($scene_x < ^soulbane_memory_zones_east) {
     def_int $scene_z = 0;

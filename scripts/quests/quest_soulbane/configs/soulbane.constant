@@ -8,12 +8,12 @@
 ^soulbane_region_zones = 16
 ^soulbane_region_midpoint = 64
 ^soulbane_memory_zones_east = 4
-^soulbane_memory_zones_north = 1
+^soulbane_memory_zones_north = 2
 ^soulbane_memory_zone_east = 12
 ^soulbane_memory_tile_east = 96
-^soulbane_memory_zone_north = 15
-^soulbane_memory_tile_north = 120
-^soulbane_scene_source = 0_51_53_0_40
+^soulbane_memory_zone_north = 14
+^soulbane_memory_tile_north = 112
+^soulbane_scene_source = 0_51_53_0_32
 ^soulbane_fear_scene_source = 0_51_53_32_56
 ^soulbane_surface = 0_51_53_46_63
 // CANDIDATE existing descent endpoint, subject to registered packed path tests.
@@ -31,7 +31,7 @@
 // UNKNOWN reconstruction stands for the sourced Varrock family scene.
 ^soulbane_scene_player = 0_51_53_7_40
 // UNKNOWN camera eye: it must stand on ground inside the copied memory strip.
-^soulbane_scene_camera = 0_51_53_6_40
+^soulbane_scene_camera = 0_51_53_6_38
 ^soulbane_scene_launa = 0_51_53_7_42
 ^soulbane_scene_tolna = 0_51_53_8_42
 // CANDIDATE Old School behaviour, first documented in wiki r3247935 (2017-01-20).
