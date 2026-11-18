@@ -327,7 +327,7 @@ async function run() {
   }
   for (const name of [
     'bones', 'unidentified_guam', 'unidentified_dwarf_weed', 'toadflax_seed', 'torstol_seed',
-    'air_talisman', 'nature_talisman', 'medium_clue_scroll'
+    'air_talisman', 'nature_talisman', 'trail_clue_medium_map001'
   ]) itemNames.add(name);
   for (const name of itemNames) id(configs.ObjType, name);
   const dropSource = crabScript;
@@ -366,7 +366,7 @@ async function run() {
     actor.baseLevels[PlayerStat.HITPOINTS] = 100;
     actor.levels[PlayerStat.HITPOINTS] = 100;
     actor.getInventory(id(configs.InvType, 'worn'));
-    actor.getInventory(id(configs.InvType, 'inventory'));
+    actor.getInventory(id(configs.InvType, 'inv'));
     actor.write = () => {};
     actor.messageGame = () => {};
     World.players[slot] = actor;
@@ -630,7 +630,6 @@ async function run() {
       npc.target = null;
       npc.targetOp = mode('NONE');
       npc.huntMode = -1;
-      const aggressivePlayer = id(configs.VarNpcType, 'npc_aggressive_player');
       npc.setVar(aggressivePlayer, actor.uid);
       npc.heroPoints.addHero(actor.hash64, npc.levels[NpcStat.HITPOINTS]);
       const queueHistory = [];
@@ -669,7 +668,9 @@ async function run() {
       checks.deaths++;
 
       const actualRespawn = npc.lifecycleTick;
-      assert.equal(actualRespawn, World.scaleByPlayerCount(active.respawnrate), `${activeName}: native population-scaled respawn`);
+      // npc.turn resumes native death, then decrements its newly installed lifecycle timer in that same turn.
+      assert.equal(actualRespawn, World.scaleByPlayerCount(active.respawnrate) - 1,
+        `${activeName}: native population-scaled respawn after the removal-turn decrement`);
       for (let tick = 1; tick < actualRespawn; tick++) {
         World.currentTick++;
         npc.turn();

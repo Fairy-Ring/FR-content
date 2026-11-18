@@ -112,7 +112,7 @@ async function run() {
   const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
   const { NpcMode } = await load('src/engine/entity/NpcMode.ts');
   const { Interaction } = await load('src/engine/entity/Interaction.ts');
-  const { isLineOfSight, isLineOfWalk } = await load('src/engine/GameMap.ts');
+  const { isLineOfSight, isLineOfWalk, isMapBlocked } = await load('src/engine/GameMap.ts');
   const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
   const Environment = (await load('src/util/Environment.ts')).default;
   const { ParamHelper } = await load('src/cache/config/ParamHelper.ts');
@@ -204,7 +204,7 @@ async function run() {
   assert.equal(param(lobster, 'damagetype'), readConstant('scripts/skill_combat/configs/combat_damagetypes.constant', 'crush_style'));
   assert.equal(param(lobster, 'attackrate'), 2);
   assert.equal(param(lobster, 'death_drop'), id(configs.ObjType, 'raw_lobster'));
-  assert(hiddenRock.vislevel < 0, 'hidden Rock remains non-visible until its native approach trigger');
+  assert.equal(hiddenRock.vislevel, 0, 'Rock disguise hides its combat level until the native approach trigger');
   const approach = configs.HuntType.get(hiddenRock.huntmode);
   assert(approach, 'hidden-form approach hunt compiles');
   assert.equal(approach.findNewMode, NpcMode.OPPLAYER2, 'native hunt selects the approaching player as the operation target');
@@ -298,6 +298,21 @@ async function run() {
     }
     return null;
   }
+  function waterPlayerSite(npc, minDistance, maxDistance) {
+    // Water NPCs need sight to walkable land, not a walking path out of their blocked water tile.
+    for (let distance = minDistance; distance <= maxDistance; distance++) {
+      for (let dx = -distance; dx <= distance; dx++) {
+        for (let dz = -distance; dz <= distance; dz++) {
+          if (Math.max(Math.abs(dx), Math.abs(dz)) !== distance) continue;
+          const x = npc.x + dx, z = npc.z + dz;
+          if (!isMapBlocked(x, z, npc.level) &&
+              directions.some(direction => isLineOfWalk(npc.level, x + direction.dx, z + direction.dz, x, z)) &&
+              isLineOfSight(npc.level, npc.x, npc.z, x, z)) return { level: npc.level, x, z };
+        }
+      }
+    }
+    return null;
+  }
   let serial = 0;
   const slot = 1;
   const hash = BigInt(7000 + ++serial);
@@ -315,7 +330,7 @@ async function run() {
   actor.baseLevels[PlayerStat.PRAYER] = 10;
   actor.levels[PlayerStat.PRAYER] = 10;
   actor.getInventory(configs.InvType.getId('worn'));
-  actor.getInventory(configs.InvType.getId('inventory'));
+  actor.getInventory(configs.InvType.getId('inv'));
   actor.write = () => {};
   actor.messageGame = () => {};
   const attachPlayer = coord => {
@@ -365,7 +380,7 @@ async function run() {
   const submergeAndReemerge = (npc, visibleName, hiddenName) => {
     const originalBase = npc.baseType;
     const hidden = types.get(hiddenName);
-    const attackSite = playerSite(npc, 1);
+    const attackSite = waterPlayerSite(npc, 1, configs.NpcType.get(npc.type).attackrange);
     assert(attackSite, `${hiddenName}: native collision map provides the attack tile`);
     movePlayer(attackSite);
     actor.levels[PlayerStat.HITPOINTS] = 99;
@@ -415,9 +430,12 @@ async function run() {
     actor.setVar(id(configs.VarPlayerType, 'com_maxhit'), 6);
     firstFledge.setVar(id(configs.VarNpcType, 'npc_combat_xp_multiplier'), param(fledge, 'combat_xp_multiplier'));
     const fledgeXpBefore = Array.from(actor.stats);
+    // The preceding native incoming hit imposed an action delay; let it expire without resetting it.
+    const meleeReadyTick = actor.getVar(id(configs.VarPlayerType, 'action_delay'));
+    while (World.currentTick < meleeReadyTick) stepNpc(firstFledge, false);
     withRandomTape([0.999999, 0, 0.999999], () => runNativePlayerMelee(firstFledge));
     const fledgeHit = [...firstFledge.queue.all()].findLast(request => request.queueId === ServerTriggerType.AI_QUEUE2);
-    assert.equal(fledgeHit?.lastInt, 6, 'native player_melee_attack lands its maximum Stab hit');
+    assert.equal(fledgeHit?.lastInt, 6, `native player_melee_attack lands its maximum Stab hit (${JSON.stringify({ tick: World.currentTick, actionDelay: actor.getVar(id(configs.VarPlayerType, 'action_delay')), queues: [...firstFledge.queue.all()].map(request => ({ id: request.queueId, damage: request.lastInt, delay: request.delay })) })})`);
     assert.deepEqual(Array.from(actor.stats), fledgeXpBefore, 'native player_melee_attack gives no combat or Slayer XP');
     firstFledge.queue.clear();
 
@@ -444,8 +462,8 @@ async function run() {
     const submergedControl = [...World.npcs].find(npc => npc.isActive && npc.type === visible3.id);
     assert(magicSpinolyp && rangedSpinolyp && submergedControl, 'each original visible Spinolyp cache form is placed');
 
-    const magicSite = playerSite(magicSpinolyp, 1);
-    assert(magicSite, 'native collision map provides a reachable Spinolyp attack tile');
+    const magicSite = waterPlayerSite(magicSpinolyp, 1, visible1.attackrange);
+    assert(magicSite, 'native collision map provides a walkable land attack tile within Spinolyp range');
     movePlayer(magicSite);
     actor.setVar(protectMagic, 1);
     actor.setVar(protectMissiles, 0);
@@ -482,7 +500,7 @@ async function run() {
     assert.equal(actor.levels[PlayerStat.PRAYER], magicMissilesPrayer - 1, 'successful Magic-style attack drains one Prayer point');
     assert.equal(actor.getVar(poisonVar), 0, 'CANDIDATE source attribution: Protect from Missiles does not alter Magic-style poison');
 
-    const rangeSite = playerSite(rangedSpinolyp, 1);
+    const rangeSite = waterPlayerSite(rangedSpinolyp, 1, visible2.attackrange);
     assert(rangeSite, 'native collision map provides a reachable second Spinolyp attack tile');
     movePlayer(rangeSite);
     actor.setVar(protectMagic, 1);
@@ -513,7 +531,7 @@ async function run() {
       actor.processQueues();
     }
     assert.equal(rangeMissilesHp - actorHp(), 0, 'Protect from Missiles blocks the native Ranged-style attack');
-    assert.equal(actor.getVar(poisonVar), 0, 'Protect from Missiles also blocks poison from the protected Ranged-style attack');
+    assert.equal(actor.getVar(poisonVar), 6, 'CANDIDATE poison.successful-roll-trigger: matching Ranged protection removes damage, not successful-roll poison');
 
     const visibleCycles = [
       [visibleNames[0], hiddenNames[0], magicSpinolyp],
@@ -529,7 +547,7 @@ async function run() {
     const hidden3 = [...World.npcs].find(npc => npc.isActive && npc.type === types.get(hiddenNames[2]).id);
     assert(hidden1 && hidden2 && hidden3, 'each original hidden Spinolyp form is placed');
     for (const [hiddenName, npc] of [[hiddenNames[0], hidden1], [hiddenNames[1], hidden2], [hiddenNames[2], hidden3]]) {
-      const surfaceSite = playerSite(npc, 2);
+      const surfaceSite = waterPlayerSite(npc, 2, configs.NpcType.get(npc.type).huntrange);
       assert(surfaceSite, `${hiddenName}: native collision map provides the edge-of-approach tile`);
       movePlayer(surfaceSite);
       stepNpc(npc);
@@ -555,7 +573,7 @@ async function run() {
       const type = configs.NpcType.get(npcId);
       const npc = [...World.npcs].find(candidate => candidate.isActive && candidate.type === npcId);
       assert(npc, `${type.name} cache form remains available for native death test`);
-      const tile = playerSite(npc, 1);
+      const tile = npcId === fledge.id || npcId === lobster.id ? playerSite(npc, 1) : waterPlayerSite(npc, 1, visible1.attackrange);
       assert(tile, `${type.name} has a collision-grounded hero tile`);
       movePlayer(tile);
       const before = drops.length;
@@ -567,7 +585,7 @@ async function run() {
       assert.equal(drops.length, before + 1, `${type.name} produces exactly one native hero-attributed guaranteed drop`);
       assert.equal(drops.at(-1).object.type, expectedObj, `${type.name} selects only its dated guaranteed drop`);
       assert.equal(drops.at(-1).object.count, 1);
-      assert.strictEqual(drops.at(-1).receiver, actor);
+      assert.strictEqual(drops.at(-1).receiver, actor.hash64);
       assert.equal(npc.lifecycle, EntityLifeCycle.RESPAWN, `${type.name} uses native respawn lifecycle`);
       const respawnTicks = type.respawnrate;
       assert(respawnTicks > 0, `${type.name} has an explicit selected respawn interval`);

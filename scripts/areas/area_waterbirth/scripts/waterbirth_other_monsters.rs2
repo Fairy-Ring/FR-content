@@ -100,11 +100,13 @@ if (npc_param(poison_severity) > 0 & ~check_protect_prayer(^ranged_style) = true
 }
 
 npc_anim(npc_param(attack_anim), 0);
-sound_synth(npc_param(rangeattack_sound), 0, 0);
-spotanim_npc(npc_param(proj_launch), npc_param(proj_height), 0);
+def_synth $sound = npc_param(rangeattack_sound);
+if ($sound ! null) sound_synth($sound, 0, 0);
+def_spotanim $launch = npc_param(proj_launch);
+if ($launch ! null) spotanim_npc($launch, npc_param(proj_height), 0);
 %npc_action_delay = add(map_clock, npc_param(attackrate));
 def_int $duration = 64;
-$duration = ~player_projectile(npc_coord, coord, uid, npc_param(proj_travel), 40, 36, 32, 15, 0, 11, 5);
+$duration = ~player_projectile(npc_coord, coord, uid, npc_param(proj_travel), ^waterbirth_other_spinolyp_proj_start_height, ^waterbirth_other_spinolyp_proj_end_height, ^waterbirth_other_spinolyp_proj_delay, ^waterbirth_other_spinolyp_proj_angle, ^waterbirth_other_spinolyp_proj_flight_length, ^waterbirth_other_spinolyp_proj_offset, ^waterbirth_other_spinolyp_proj_distance_step);
 ~npc_rangeattack_resolve($attack_roll, $defence_roll, $maxhit, $poison_prayer, $duration);
 
 // CANDIDATE: the source assigns poison to the Ranged attack; this Magic branch does not inherit it.
@@ -140,7 +142,7 @@ if (npc_type = dagannoth_water_creature_1x1_invisible | npc_type = dagannoth_wat
     npc_setmode(null);
     npc_sethuntmode(aggressive_melee);
     npc_sethunt(1);
-    npc_queue(4, ^waterbirth_other_spinolyp_form_ticks, 0);
+    npc_queue(4, 0, ^waterbirth_other_spinolyp_form_ticks);
 }
 
 [proc,waterbirth_other_spinolyp_reemerge]

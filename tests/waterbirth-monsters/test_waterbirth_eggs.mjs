@@ -376,7 +376,7 @@ async function run() {
     assert.equal(drops.length, 1, 'a credited Spawn kill creates exactly one selected reward');
     assert.equal(drops[0].object.type, id(configs.ObjType, 'bones'), 'candidate guaranteed Spawn reward is Bones');
     assert.equal(drops[0].object.count, 1, 'Spawn kill drops one Bones');
-    assert.strictEqual(drops[0].receiver, actor, 'native hero owns the Bones drop');
+    assert.strictEqual(drops[0].receiver, actor.hash64, 'native hero owns the Bones drop');
 
     movePlayer(site.outside);
     const elapsedBeforeLeaving = World.currentTick - firstHatch.hatchCompleteTick;
