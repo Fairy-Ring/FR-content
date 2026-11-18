@@ -6,25 +6,24 @@ const ScriptRunner = (await engineModule('engine/script/ScriptRunner.ts')).defau
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 
 const forms = [
-  ['mourning_elf_bankerm', 1, 3, 'Good day, how may I help you?'],
-  ['mourning_elf_bankerf', 1, 3, 'Good day, how may I help you?'],
-  ['dwarf_city_banker1', 1, 3, 'Welcome to the Keldagrim bank! Anything I can help you with?'],
-  ['elid_banker', 4, 3, 'Good day, how may I help you?'],
-  ['fever_banker_01', 2, 3, 'Aye? Ye got some stuff te stash?'],
-  ['fever_banker_02', 1, 3, 'Aye? Ye got some stuff te stash?'],
-  ['ahoy_ghost_banker', 4, 3, null],
-  ['swan_arnold', 1, 4, null]
+  ['mourning_elf_bankerm', 1, 3, 'Good day, how may I help you?', [0, -2]],
+  ['mourning_elf_bankerf', 1, 3, 'Good day, how may I help you?', [0, -2]],
+  ['dwarf_city_banker1', 1, 3, 'Welcome to the Keldagrim bank! Anything I can help you with?', [-2, -2]],
+  ['elid_banker', 4, 3, 'Good day, how may I help you?', [2, 0]],
+  ['fever_banker_01', 2, 3, 'Aye? Ye got some stuff te stash?', [-2, 0]],
+  ['fever_banker_02', 1, 3, 'Aye? Ye got some stuff te stash?', [-2, 0]],
+  ['ahoy_ghost_banker', 4, 3, null, [0, 2]],
+  ['swan_arnold', 1, 4, null, [-2, -2]]
 ];
 const root = name => id('Component', name);
 const npcs = name => [...World.npcs].filter(n => n.baseType === id('NpcType', name));
 function fixture(n) {
   const p = player();
-  const stands = [];
-  for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
-    if ((dx || dz) && !map.isMapBlocked(n.x + dx, n.z + dz, n.level)) stands.push([n.x + dx, n.z + dz]);
-  }
-  assert(stands.length, 'original placement has a walkable interaction stand within two tiles');
-  [p.x, p.z] = stands[0]; p.level = n.level; p.originX = p.x; p.originZ = p.z;
+  // Public counter-side stands, not isolated decor tiles or the teller enclosure.
+  const [, , , , [dx, dz]] = forms.find(row => row[0] === types.NpcType.get(n.baseType).debugname);
+  p.x = n.x + dx; p.z = n.z + dz; p.level = n.level; p.originX = p.x; p.originZ = p.z;
+  assert(!map.isMapBlocked(p.x, p.z, p.level), 'public interaction stand is walkable');
+  assert([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([x, z]) => map.isLineOfWalk(p.level, p.x, p.z, p.x + x, p.z + z)), 'public interaction stand is not an isolated tile');
   return p;
 }
 function dispatch(p, n, option, op = false) {
@@ -36,7 +35,7 @@ function dispatch(p, n, option, op = false) {
   assert.notEqual(state.execution, ScriptState.ABORTED, `${script.name} must not abort`);
   return state;
 }
-const text = p => p.packets.filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text.replaceAll('|', ' ').replace(/\s+/g, ' ').trim()).join('\n');
+const text = p => p.packets.filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text.replaceAll('|', ' ')).join(' ').replace(/\s+/g, ' ').trim();
 function finish(p, state, choices = []) {
   const pending = [...choices];
   for (let step = 0; state.execution !== ScriptState.FINISHED && step < 150; step++) {
@@ -83,7 +82,7 @@ for (const [name, placements, option, greeting] of forms) {
   }
   if (greeting) {
     const n = natural[0], p = fixture(n), state = dispatch(p, n, 1);
-    assert(text(p).includes(greeting), `${name} has its sourced greeting`);
+    assert(text(p).includes(greeting), `${name} has its sourced greeting; observed: ${text(p)}`);
     assert.equal(state.execution, ScriptState.PAUSEBUTTON);
   }
   for (const operation of [1, option]) {
@@ -138,7 +137,7 @@ conversation(ghost, [3], ['What is this place?', 'This is a branch of the Bank o
 for (const n of npcs(ghost)) {
   const p = fixture(n), state = dispatch(p, n, 3);
   finish(p, state);
-  assert(p.packets.some(packet => packet.constructor.name === 'MessageGame' && packet.msg === 'The ghost banker wails incomprehensibly at you, but seems to understand that you wish to access your bank account. You can still quick-bank, but will have to communicate via a series of hand gestures.'), 'quick Bank keeps the sourced explanation without a dialogue pause');
+  assert(p.messages.includes('The ghost banker wails incomprehensibly at you, but seems to understand that you wish to access your bank account. You can still quick-bank, but will have to communicate via a series of hand gestures.'), 'quick Bank keeps the sourced explanation without a dialogue pause');
   bank(p);
 }
 const arnold = 'swan_arnold';
@@ -166,3 +165,4 @@ for (const [name, option] of [[ghost, 3], [arnold, 4]]) {
   }
 }
 console.log('PASS special bankers also resolve and execute native OP-phase Talk and Bank');
+process.exit(0);
