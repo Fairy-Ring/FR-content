@@ -9,6 +9,7 @@ import {
   types, map, nativeLocRows, nativeNpcRows, nativeLocInventory, locFor,
   tileFromCoord, floorTiles
 } from '../regicide-travel/runtime.mjs';
+import { verifyIngredientSources } from './ingredient-sources.mjs';
 
 const load = async relative => (await import(pathToFileURL(path.join(engine, 'src', relative)).href)).default;
 const engine = process.env.HARNESS_ENGINE_DIR ?? path.resolve(content, '../engine');
@@ -873,5 +874,9 @@ assert.equal(stage(p), completeStage, 'completed quest cannot re-enter an earlie
 assert.deepEqual(p.stats, completedStats, 'replay grants no duplicate XP');
 assert.equal(p.getVar(questPoints) - qpBefore, 2, 'replay grants no duplicate quest points');
 assert.equal(count(p, 'fairy_enchanted_secateurs', wornId), 1, 'replay leaves the magic secateurs equipped');
+await verifyIngredientSources({
+  content, engine, World, types, ScriptProvider, ScriptRunner, ScriptState, ServerTriggerType,
+  nativeNpcRows, nativeLocRows, player, withRandom, add, count, obj, driveDialogue, JavaRandom, druidComplete, integerConstant
+});
 console.log('PASS Fairytale I packed quest stages, real visible-form/map dispatch, 31-entry item table, 30 eligible choices, combat and completion');
 process.exit(0);
