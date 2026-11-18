@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import './test_audited_spawns.mjs';
 
 const CONTENT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const ENGINE = process.env.HARNESS_ENGINE_DIR ?? path.resolve(CONTENT, '../engine');
