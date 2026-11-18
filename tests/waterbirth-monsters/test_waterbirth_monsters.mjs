@@ -473,7 +473,8 @@ async function run() {
       }
       checks.drops++;
       const respawnTicks = npc.lifecycleTick;
-      assert.equal(type.respawnrate, 60, `${spec.name}: labelled engineering respawn config`);
+      const expectedRespawn = spec.family === 'magic' ? 25 : 30;
+      assert.equal(type.respawnrate, expectedRespawn, `${spec.name}: candidate Old School respawn config`);
       assert.equal(respawnTicks, World.scaleByPlayerCount(type.respawnrate),
         `${spec.name}: native population-scaled respawn schedule`);
       for (let tick = 1; tick < respawnTicks; tick++) {
