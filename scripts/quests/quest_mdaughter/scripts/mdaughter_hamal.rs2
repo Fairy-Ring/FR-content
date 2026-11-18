@@ -263,4 +263,24 @@ return;
 ~chatplayer("<p,quiz>So what are you all going to do now? Are you finally going to move to another location?");
 ~chatnpc("<p,neutral>No, I've decided to set up a permanent camp here.");
 ~chatnpc("<p,neutral>There is no need to move now with our new supply of food. Also, there is a protective spirit looking after us now.");
+// CANDIDATE: Transcript:Hamal_the_Chieftain, revision 15024962, lost-bearhead branch.
+// UNKNOWN engineering choice (reclaim-availability): offer only if no Bearhead
+// exists in inventory, bank or worn, and inventory has a free slot. The source
+// defines neither ownership-container eligibility nor full-inventory behavior.
+if (~obj_gettotal(mdaughter_bear_helmet) > 0) return;
+if (inv_freespace(inv) = 0) return;
+def_int $helmet = ~p_choice2("Excuse me, have you seen my helmet?", 1, "Well, I must be off again.", 2);
+if ($helmet = 2) {
+    ~chatplayer("<p,neutral>That's all very interesting but I must be off again.");
+    ~chatnpc("<p,neutral>Safe journey, outerlander.");
+    return;
+}
+~chatplayer("<p,quiz>Excuse me, have you seen my helmet?");
+~chatnpc("<p,quiz>And what helmet would that be?");
+~chatplayer("<p,neutral>The one from the bear man thing person... you know!");
+~chatnpc("<p,neutral>Oh, yes... as a matter of fact we did find such a helmet inside the cave.");
+~chatnpc("<p,neutral>We had a look in there after you killed the abomination that used to live inside.");
+~chatnpc("<p,neutral>Here, take it. You should take proper care of this, trophies from your enemy are an important keepsake.");
+inv_add(inv, mdaughter_bear_helmet, 1);
+~mesbox("You take back your helmet of the bearman.");
 return;

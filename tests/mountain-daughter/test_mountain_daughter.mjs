@@ -92,6 +92,19 @@ function scanObj(name, squares, receiver) {
   return found;
 }
 
+function assertCaveGroundObjects(p) {
+  const source = fs.readFileSync(path.join(contentRoot, 'maps/m43_157.jm2'), 'utf8')
+    .split('==== OBJ ====')[1].trim().split(/\r?\n/).map(line => line.trim());
+  assert.deepEqual(source, ['0 19 33: 865 1', '0 26 31: 1351 1', '0 34 32: 4488 1'],
+    'the server cave spawn list retains its knife and axe, adds the real corpse, and contains no model-ID-as-object-ID note');
+  assert(!World.getObj(2784, 10078, 0, 5685, p.hash64),
+    'the erroneous noted poisoned dagger is absent from its old packed cave tile');
+  for (const [x, z, type] of [[2771, 10081, 865], [2778, 10079, 1351], [2786, 10080, obj('mdaughter_daughter_corpse')]]) {
+    assert(World.getObj(x, z, 0, type, p.hash64), `expected packed cave ground object ${type} at ${x},${z}`);
+    assert.equal(types.ObjType.get(type).certtemplate, -1, `cave ground object ${type} is not a note`);
+  }
+}
+
 function npc(name) {
   const type = id('NpcType', name);
   const found = World.npcs.filter(actor => actor?.baseType === type || actor?.type === type);
@@ -726,6 +739,31 @@ function proveForeignHeroDoesNotCredit(owner, other, root) {
   }
 }
 
+function proveFullInventoryTrophy(root) {
+  const owner = player();
+  writeVar(owner, 'mdaughter_quest_var', 20);
+  writeVar(owner, 'mdaughter_bear_mayattack', 1);
+  const n = new Npc(root.level, root.x, root.z, root.width, root.length,
+    EntityLifeCycle.RESPAWN, World.getNextNid(), root.baseType, BlockWalk.NONE);
+  World.addNpc(n, -1);
+  spawnScript(n);
+  placeAtStand(owner, n);
+  n.vars[id('VarNpcType', 'npc_attacking_uid')] = owner.uid;
+  n.vars[id('VarNpcType', 'npc_aggressive_player')] = owner.uid;
+  n.heroPoints.addHero(owner.hash64, n.levels[NpcStat.HITPOINTS]);
+  while (owner.invFreeSpace(inv)) owner.invAdd(inv, obj('knife'), 1);
+  damageNpc(n, n.levels[NpcStat.HITPOINTS]);
+  for (let turn = 0; turn < 40 && stage(owner) !== 30; turn++) tick(owner);
+  assert.equal(stage(owner), 30, 'a full inventory does not discard kill credit');
+  assert.equal(count(owner, 'mdaughter_bear_helmet'), 0, 'the trophy cannot enter a full inventory');
+  const trophy = World.getObj(owner.x, owner.z, owner.level, obj('mdaughter_bear_helmet'), owner.hash64);
+  assert(trophy, 'a full inventory drops the Bearhead at the owning player, not the NPC');
+  owner.invDel(inv, obj('knife'), 1);
+  operate(owner, trophy, 'obj', 3, [], 'Recover the owned trophy after freeing one slot');
+  assert.equal(count(owner, 'mdaughter_bear_helmet'), 1, 'the dropped trophy is recoverable through native ground pickup');
+  assert.equal(stage(owner), 30);
+}
+
 function defeatKendal(p) {
   [p.level, p.x, p.z] = [0, 2808, 3702]; // Disclosed travel to the real cave approach.
   assert(!blocked(p.level, p.x, p.z));
@@ -774,6 +812,7 @@ function defeatKendal(p) {
   operate(other, kendal, 'npc', 2, [], 'Another player attacks an owned Kendal');
   assert.equal(kendal.vars[id('VarNpcType', 'npc_attacking_uid')], p.uid);
   proveForeignHeroDoesNotCredit(p, other, kendal);
+  proveFullInventoryTrophy(kendal);
   goToStand(p, kendal);
   operate(p, kendal, 'npc', 2, [], 'Attack after revealing the murderer');
   damageNpc(kendal, 0); // Drain the actual combat-start damage queue before the deterministic damage probe.
@@ -868,9 +907,49 @@ function completeBurial(p, travel, qpBefore) {
   assert.deepEqual([p.stats[PlayerStat.ATTACK], p.stats[PlayerStat.PRAYER], readVar(p, 'qp')], paid, 'a replay awards no XP or quest points');
 }
 
+function provePostQuestReplacement(p) {
+  assert.equal(stage(p), 70);
+  assert.equal(count(p, 'mdaughter_bear_helmet'), 0, 'the player finished the quest without carrying the lost trophy');
+  const before = [p.stats[PlayerStat.ATTACK], p.stats[PlayerStat.PRAYER], readVar(p, 'qp')];
+  const claim = talkTo(p, 'mdaughter_hamal', [1]);
+  assert.match(claim.text, /You take back your helmet of the bearman/);
+  assert.equal(count(p, 'mdaughter_bear_helmet'), 1, 'post-completion Hamal gives one replacement without a fee');
+  const existing = talkTo(p, 'mdaughter_hamal');
+  assert.doesNotMatch(existing.text, /Excuse me, have you seen my helmet/);
+  assert.equal(count(p, 'mdaughter_bear_helmet'), 1, 'a carried Bearhead suppresses another offer');
+
+  // Negative ownership fixtures exercise the named UNKNOWN container choice.
+  const head = obj('mdaughter_bear_helmet');
+  for (const container of ['bank', 'worn']) {
+    const which = id('InvType', container);
+    p.invDel(inv, head, 1);
+    assert.equal(p.invAdd(which, head, 1), 1);
+    const owned = talkTo(p, 'mdaughter_hamal');
+    assert.doesNotMatch(owned.text, /Excuse me, have you seen my helmet/);
+    assert.equal(count(p, 'mdaughter_bear_helmet'), 0, `${container} ownership suppresses another offer`);
+    assert.equal(p.invTotal(which, head), 1);
+    p.invDel(which, head, 1);
+    p.invAdd(inv, head, 1);
+  }
+  p.invDel(inv, head, 1);
+  while (p.invFreeSpace(inv)) p.invAdd(inv, obj('knife'), 1);
+  const full = talkTo(p, 'mdaughter_hamal');
+  assert.doesNotMatch(full.text, /Excuse me, have you seen my helmet/);
+  assert.equal(count(p, 'mdaughter_bear_helmet'), 0, 'the named free-slot choice does not lose a replacement into a full bag');
+  p.invDel(inv, obj('knife'), 1);
+  talkTo(p, 'mdaughter_hamal', [2]);
+  assert.equal(count(p, 'mdaughter_bear_helmet'), 0, 'declining the replacement gives nothing');
+  talkTo(p, 'mdaughter_hamal', [1]);
+  assert.equal(count(p, 'mdaughter_bear_helmet'), 1, 'freeing one slot makes the replacement available');
+  assert.equal(stage(p), 70);
+  assert.deepEqual([p.stats[PlayerStat.ATTACK], p.stats[PlayerStat.PRAYER], readVar(p, 'qp')], before,
+    'reclaiming does not repeat quest rewards');
+}
+
 async function main() {
   assert.equal(contentRoot.endsWith('/content'), true);
   const p = player();
+  assertCaveGroundObjects(p);
   const qpVar = ['questpoints', 'qp'].find(name => types.VarPlayerType.getId(name) >= 0);
   assert(qpVar, 'packed quest-point varp exists');
   const qpBefore = readVar(p, qpVar);
@@ -894,8 +973,12 @@ async function main() {
   testBrundtRoutes();
   completeTasks(p, travel);
   defeatKendal(p);
+  assert(held(p, 'mdaughter_bear_helmet', 5), 'the native Drop operation is available');
+  finishInteraction(p, [], 'Lose the trophy before finishing the quest');
+  assert.equal(count(p, 'mdaughter_bear_helmet'), 0);
   completeBurial(p, travel, qpBefore);
-  console.log('PASS Mountain Daughter: native packed start, tasks, visible Kendal, owned death, burial, five-rock cairn, exact rewards, login row, and Trials coexistence.');
+  provePostQuestReplacement(p);
+  console.log('PASS Mountain Daughter: native packed start, tasks, visible Kendal, owned death, full-inventory trophy, corrected cave spawns, headless burial, five-rock cairn, exact rewards, Hamal replacement, login row, and Trials coexistence.');
 }
 
 await main();

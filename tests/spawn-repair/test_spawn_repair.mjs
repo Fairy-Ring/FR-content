@@ -45,7 +45,8 @@ const TARGETS = [
     ['41_58', 'OBJ', 0, 47, 25, 461, 561, 2],
     ['41_58', 'OBJ', 0, 48, 26, 461, 561, 2],
     ['41_41', 'NPC', 0, 61, 61, 1318, null],
-    ['41_41', 'NPC', 0, 11, 11, 1324, null]
+    ['41_41', 'NPC', 0, 11, 11, 1324, null],
+    ['43_157', 'OBJ', 0, 32, 30, 5685, null]
 ];
 const key = (map, section, level, x, z) => `${map}|${section}|${level} ${x} ${z}`;
 const source = [];
@@ -115,4 +116,4 @@ check('runtime packed spawns equal source records', () => assert.deepEqual(canon
 if (failures.length) {
     console.error(failures.join('\n'));
     process.exitCode = 1;
-} else console.log('PASS spawn repair: 23 audited entities, including Piglet relocation, three Nardah citizens, all quantities, source conservation and runtime packed data');
+} else console.log(`PASS spawn repair: ${TARGETS.length} audited entities, including the Kendal cave note removal, Piglet relocation, three Nardah citizens, all quantities and runtime packed data`);
