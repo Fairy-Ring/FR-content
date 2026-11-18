@@ -140,6 +140,7 @@ data=unlock,-1,Watering can
 data=unlock,-1,Seed dibber
 data=unlock,-1,Gardening trowel
 data=unlock,-1,Secateurs
+data=unlock,-1,Magic secateurs
 data=unlock,-1,Gardening boots
 data=unlock,-1,Basket\nStores up to 5 fruits.
 data=unlock,-1,Sack\nStores up to 10 vegetables.

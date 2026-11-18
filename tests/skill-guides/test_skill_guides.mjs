@@ -134,8 +134,9 @@ for (const [skill, guide] of Object.entries(expected)) {
     const inventory = types.InvType.get(id('InvType', category.inventory));
     assert.equal(value(packed, 'inv')[0], inventory.id);
     for (const [slot, row] of category.rows.entries()) {
-      if (row.obj !== null) assert.equal(inventory.stockobj[slot], id('ObjType', row.obj), `${category.guide}: row ${slot} original icon`);
-      assert.equal(inventory.stockcount[slot], row.obj === null ? 0 : 1);
+      assert.equal(typeof row.obj, 'string', `${category.guide}: row ${slot} requires an original icon`);
+      assert.equal(inventory.stockobj[slot], id('ObjType', row.obj), `${category.guide}: row ${slot} original icon`);
+      assert.equal(inventory.stockcount[slot], 1, `${category.guide}: row ${slot} icon must not be blank`);
     }
   }
   const p = player();
