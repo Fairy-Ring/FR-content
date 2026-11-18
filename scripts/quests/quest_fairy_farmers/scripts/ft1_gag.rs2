@@ -28,7 +28,7 @@
 [opnpc1,farming_gardener_fruit_2] @ft1_gag_talk;
 
 [label,ft1_gag_talk]
-def_int $opt = ~p_choice4("Are you a member of the Group of Advanced Gardeners?", 1, "I'll come back another time.", 2, "Would you look after my crops for me?", 3, "Can you give me any farming advice?", 4);
+def_int $opt = ~p_choice5("Are you a member of the Group of Advanced Gardeners?", 1, "I'll come back another time.", 2, "Would you look after my crops for me?", 3, "Can you give me any farming advice?", 4, "Can you sell me something?", 5);
 if ($opt = 2) {
     ~chatplayer("<p,neutral>I'll come back another time.");
     return;
@@ -39,6 +39,10 @@ if ($opt = 3) {
 }
 if ($opt = 4) {
     @farming_gardener_dialogue;
+    return;
+}
+if ($opt = 5) {
+    @farming_gardener_sales;
     return;
 }
 ~chatplayer("<p,quiz>Are you a member of the Group of Advanced Gardeners?");

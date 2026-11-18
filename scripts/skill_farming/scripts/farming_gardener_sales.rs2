@@ -1,0 +1,81 @@
+// CANDIDATE ordinary sales: retained Old School Transcript:Kragen history.
+// No shop window, stock mutation, quick action or client definition is added.
+[label,farming_gardener_sales]
+~chatplayer("Can you sell me something?");
+~chatnpc("That depends on whether I have it to sell. What is it that you're looking for?");
+def_int $option = 0;
+while ($option = 0) {
+    $option = ~p_choice5("Some plant cure.", 1, "A bucket of compost.", 2, "A rake.", 3, "A plant pot.", 4, "(See more items)", 5);
+    if ($option = 5) {
+        def_int $more = ~p_choice5("A watering can.", 1, "A gardening trowel.", 2, "A seed dibber.", 3, "(See previous items)", 4, "Forget it.", 5);
+        if ($more = 4) $option = 0;
+        else if ($more = 5) {
+            ~chatplayer("Forget it, you don't have anything I need.");
+            return;
+        } else $option = add($more, 4);
+    }
+}
+def_namedobj $purchase;
+def_int $price;
+switch_int ($option) {
+    case 1 :
+        $purchase = plant_cure;
+        $price = 25;
+        ~chatplayer("Some plant cure.");
+        ~chatnpc("Plant cure, eh? I might have some put aside for myself. Tell you what, I'll sell you some plant cure for 25 coins if you like.");
+    case 2 :
+        $purchase = bucket_compost;
+        $price = 35;
+        ~chatplayer("A bucket of compost.");
+        ~chatnpc("A bucket of compost, eh? I might have one spare... tell you what, I'll sell it to you for 35 coins if you like.");
+    case 3 :
+        $purchase = rake;
+        $price = 15;
+        ~chatplayer("A rake.");
+        ~chatnpc("A rake, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like.");
+    case 4 :
+        $purchase = plantpot_empty;
+        $price = 40;
+        ~chatplayer("A plant pot.");
+        ~chatnpc("Eh, I suppose I can spare you a plant pot, but I'll want 40 coins for it.");
+    case 5 :
+        $purchase = watering_can_0;
+        $price = 25;
+        ~chatplayer("A watering can.");
+        ~chatnpc("A watering can, eh? I might have one spare... tell you what, I'll sell it to you for 25 coins if you like.");
+    case 6 :
+        $purchase = gardening_trowel;
+        $price = 15;
+        ~chatplayer("A gardening trowel.");
+        ~chatnpc("A gardening trowel, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like.");
+    case 7 :
+        $purchase = dibber;
+        $price = 15;
+        ~chatplayer("A seed dibber.");
+        ~chatnpc("A seed dibber, eh? I might have one spare... tell you what, I'll sell it to you for 15 coins if you like.");
+}
+if (~farming_gardener_sale_check($price) = false) return;
+def_int $confirm = ~p_choice2("Yes, that sounds like a fair price.", 1, "No thanks, I can get that much cheaper elsewhere.", 2);
+if ($confirm = 2) {
+    ~chatplayer("No thanks, I can get that much cheaper elsewhere.");
+    return;
+}
+~chatplayer("Yes, that sounds like a fair price.");
+// A dialogue page yields. Recheck before the uninterrupted exchange.
+if (~farming_gardener_sale_check($price) = false) return;
+inv_del(inv, coins, $price);
+inv_add(inv, $purchase, 1);
+def_string $name = npc_name;
+// Presentation follows the existing Shantay purchase objbox convention.
+~objbox($purchase, "<$name> hands over your purchase.", 250, 0, divide(^objbox_height, 2));
+
+[proc,farming_gardener_sale_check](int $price)(boolean)
+if (inv_total(inv, coins) < $price) {
+    ~chatplayer("I don't have enough money for that, I'm afraid.");
+    return(false);
+}
+if (inv_freespace(inv) = 0) {
+    ~chatplayer("Actually, I don't think I'd be able to carry it.");
+    return(false);
+}
+return(true);
