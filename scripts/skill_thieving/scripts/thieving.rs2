@@ -138,10 +138,9 @@ loc_change(chest_2572, $respawn_ticks); //looted chest
 [proc,pick_pocket_check_for_reward](dbrow $data)
 def_int $count = calc(db_getfieldcount($data, pickpocket:loot) - 1);
 def_int $reward_rarity_denominator = 128;
-def_boolean $exclusive = false;
-if (db_getfieldcount($data, pickpocket:loot_total) > 0) {
-    $exclusive = true;
-    $reward_rarity_denominator = db_getfield($data, pickpocket:loot_total, 0);
+def_int $loot_total = db_getfield($data, pickpocket:loot_total, 0);
+if ($loot_total > 0) {
+    $reward_rarity_denominator = $loot_total;
 }
 while ($count >= 0) {
     def_namedobj $reward;
@@ -156,7 +155,7 @@ while ($count >= 0) {
         def_int $quantity_roll = ~random_range($reward_quantity_min, $reward_quantity_max);
         // Pickpocketing can reward more than 1.
         inv_add(inv, $reward, $quantity_roll);
-        if ($exclusive = true) {
+        if ($loot_total > 0) {
             return;
         }
     }

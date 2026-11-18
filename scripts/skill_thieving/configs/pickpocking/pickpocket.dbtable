@@ -7,5 +7,5 @@ column=stun_damage,int
 column=success_chance,int,int
 column=loot,namedobj,int,int,int,LIST
 column=pocket,string
-// Optional: exclusive weighted loot. Absent rows retain the existing multi-reward rule.
-column=loot_total,int
+// Zero preserves the legacy multi-reward rule; positive totals select one weighted reward.
+column=loot_total,int,REQUIRED
