@@ -1,0 +1,105 @@
+// Special banker forms whose Talk-to or Bank options need NPC-specific behavior.
+// The NPC ids/options are from the 377 cache; dialogue is CANDIDATE from the
+// cited OSRS transcripts. Collect was added after 377 and is intentionally absent.
+
+[opnpc1,ahoy_ghost_banker]
+@special_ghost_banker_talk;
+
+[opnpc3,ahoy_ghost_banker]
+@special_ghost_banker_quickbank;
+
+[apnpc1,ahoy_ghost_banker]
+if (npc_range(coord) > 2) {
+    p_aprange(2);
+    return;
+}
+@special_ghost_banker_talk;
+
+[apnpc3,ahoy_ghost_banker]
+if (npc_range(coord) > 2) {
+    p_aprange(2);
+    return;
+}
+@special_ghost_banker_quickbank;
+
+[label,special_ghost_banker_talk]
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    ~chatnpcrange("<p,shock>Woooo wooo wooooo woooo");
+    return;
+}
+
+~chatnpcrange("<p,quiz>Good day, how may I help you?");
+def_int $option = ~p_choice3("I'd like to access my bank account, please.", 1, "I'd like to check my PIN settings.", 2, "What is this place?", 3);
+switch_int ($option) {
+    case 1 :
+        ~chatplayer("<p,quiz>I'd like to access my bank account, please.");
+        @openbank;
+    case 2 :
+        @open_bank_pin_setting;
+    case 3 :
+        ~chatplayer("<p,quiz>What is this place?");
+        ~chatnpcrange("<p,happy>This is a branch of the Bank of RuneScape. We have branches in many towns.");
+        ~chatplayer("<p,quiz>And what do you do?");
+        ~chatnpcrange("<p,happy>We will look after your items and money for you. Leave your valuables with us if you want to keep them safe.");
+}
+return;
+
+[label,special_ghost_banker_quickbank]
+if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+    mes("The ghost banker wails incomprehensibly at you, but seems to understand that you wish to access your bank account. You can still quick-bank, but will have to communicate via a series of hand gestures.");
+}
+@openbank;
+
+// Arnold's post-completion ordinary dialogue is CANDIDATE from
+// https://oldschool.runescape.wiki/w/Transcript:Arnold_Lydspor?oldid=14385742.
+// His bank is only available after Swan Song; ^swansong_complete is 200.
+[opnpc1,swan_arnold]
+if (%swansong < ^swansong_complete) {
+    return;
+}
+@special_arnold_talk;
+
+[opnpc4,swan_arnold]
+if (%swansong < ^swansong_complete) {
+    return;
+}
+@openbank;
+
+[apnpc1,swan_arnold]
+if (npc_range(coord) > 2) {
+    p_aprange(2);
+    return;
+}
+if (%swansong < ^swansong_complete) {
+    return;
+}
+@special_arnold_talk;
+
+[apnpc4,swan_arnold]
+if (npc_range(coord) > 2) {
+    p_aprange(2);
+    return;
+}
+if (%swansong < ^swansong_complete) {
+    return;
+}
+@openbank;
+
+[label,special_arnold_talk]
+~chatnpcrange("<p,quiz>Ah, you come back! What you want from Arnold, heh?");
+def_int $option = ~p_choice3("Can you open my bank account, please?", 1, "I'd like to check my Bank PIN settings.", 2, "Nothing, I just came to chat.", 3);
+switch_int ($option) {
+    case 1 :
+        ~chatplayer("<p,quiz>Can you open my bank account, please?");
+        @openbank;
+    case 2 :
+        @open_bank_pin_setting;
+    case 3 :
+        ~chatplayer("<p,neutral>Nothing, I just came to chat.");
+        ~chatnpcrange("<p,neutral>Ah, that is nice - always I like to chat, but Herr Caranos tell me to get back to work! Here, you been nice, so have a present:");
+        inv_add(inv, cabbage, 1);
+        ~chatplayer("<p,quiz>A cabbage?");
+        ~chatnpcrange("<p,happy>Ja, cabbage is good for you!");
+        ~chatplayer("<p,neutral>Um... thanks!");
+}
+return;
