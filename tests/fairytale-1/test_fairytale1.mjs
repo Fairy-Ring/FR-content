@@ -106,6 +106,12 @@ assert.equal(natureItems.values.size, itemNames.length, 'the compiled nature-ite
 for (const [index, name] of itemNames.entries()) {
   assert.equal(natureItems.values.get(index + 1), obj(name), `nature item ${index + 1} resolves to ${name}`);
 }
+// DEVIATION PENDING authorization: keep the period table and its stored indices,
+// but exclude its unobtainable proboscis until Cleanup supplies a real producer.
+const unavailableNatureItem = ft1Constant('ft1_unavailable_item');
+assert.equal(unavailableNatureItem, 21, 'the pending deviation excludes only mosquito proboscis');
+const availableNatureIndices = itemNames.map((_, index) => index + 1)
+  .filter(index => index !== unavailableNatureItem);
 
 let serial = 0;
 function register(p) {
@@ -539,28 +545,36 @@ talk(p, 'zandar_horfyre', [], { actor: zandar });
 assert.equal(stage(p), ft1Constant('ft1_zandar'), 'Zandar reads the carried symptoms and directs the player to Mortifer');
 assert.equal(count(p, 'fairy_symptoms_list'), 1, 'Zandar reads rather than consumes the list');
 
-// Every entry in the three-pick pool is reached through the packed Mortifer
-// visible form. The only controlled input is the three production RNG draws.
+// Each available entry occupies each pick position once through native Mortifer
+// dispatch. Three bounded RNG draws select distinct ranks without reroll bias.
 const mortifer = placedNpc('elemental_wizard_boss');
-for (let choice = 0; choice < itemNames.length; choice++) {
+const pickCoverage = [new Set(), new Set(), new Set()];
+for (let choice = 0; choice < availableNatureIndices.length; choice++) {
   const candidate = player(ft1Constant('ft1_skull'));
   add(candidate, 'fairy_skull');
-  const firstChoice = choice + 1;
-  const secondChoice = (choice + 1) % itemNames.length + 1;
-  const thirdChoice = (choice + 2) % itemNames.length + 1;
-  const secondRaw = secondChoice > firstChoice ? secondChoice - 1 : secondChoice;
-  const minChoice = Math.min(firstChoice, secondChoice);
-  const maxChoice = Math.max(firstChoice, secondChoice);
-  const thirdRaw = thirdChoice > maxChoice ? thirdChoice - 2 : thirdChoice > minChoice ? thirdChoice - 1 : thirdChoice;
-  withRandom([(choice + 0.25) / itemNames.length, (secondRaw - 0.25) / (itemNames.length - 1),
-    (thirdRaw - 0.25) / (itemNames.length - 2)],
+  const poolSize = availableNatureIndices.length;
+  const firstRank = choice + 1;
+  const secondRank = (choice + 1) % poolSize + 1;
+  const thirdRank = (choice + 2) % poolSize + 1;
+  const secondRaw = secondRank > firstRank ? secondRank - 1 : secondRank;
+  const minRank = Math.min(firstRank, secondRank);
+  const maxRank = Math.max(firstRank, secondRank);
+  const thirdRaw = thirdRank > maxRank ? thirdRank - 2 : thirdRank > minRank ? thirdRank - 1 : thirdRank;
+  withRandom([(choice + 0.25) / poolSize, (secondRaw - 0.25) / (poolSize - 1),
+    (thirdRaw - 0.25) / (poolSize - 2)],
   () => talk(candidate, 'elemental_wizard_boss', [], { actor: mortifer }));
-  assert.equal(stage(candidate), ft1Constant('ft1_components'), `Mortifer stores pick set for entry ${choice + 1}`);
+  assert.equal(stage(candidate), ft1Constant('ft1_components'), `Mortifer stores available pick set ${choice + 1}`);
   assert.equal(count(candidate, 'fairy_skull'), 0, 'Mortifer consumes the Draynor skull once');
   const picks = [1, 2, 3].map(index => candidate.getVarBit(varbit(`fairy_nature_item${index}`)));
-  assert.equal(picks[0], choice + 1, 'first pick covers each of the 31 source-table indices');
-  assert(picks.every(value => value >= 1 && value <= itemNames.length));
+  assert.deepEqual(picks, [firstRank, secondRank, thirdRank].map(rank => availableNatureIndices[rank - 1]),
+    'bounded ranks map bijectively to the eligible original table indices');
+  assert(!picks.includes(21), 'mosquito proboscis is never chosen in any pick position');
   assert.equal(new Set(picks).size, 3, 'all three persisted picks are distinct');
+  picks.forEach((value, index) => pickCoverage[index].add(value));
+}
+for (const coverage of pickCoverage) {
+  assert.deepEqual([...coverage].sort((a, b) => a - b), availableNatureIndices,
+    'every eligible item occurs in each of the three persisted pick positions');
 }
 
 // Main path: the grave is selected from its named source coordinate, and the
@@ -580,8 +594,9 @@ assert.equal(count(p, 'fairy_skull'), 0, 'a full inventory cannot take the skull
 freeInventorySlot(p);
 digAtGrave(p, grave);
 assert.equal(count(p, 'fairy_skull'), 1, 'the reachable grave approach yields one skull');
-withRandom([0.25 / itemNames.length, 0.75 / (itemNames.length - 1), 0.75 / (itemNames.length - 2)],
-  () => talk(p, 'elemental_wizard_boss', [], { actor: mortifer }));
+withRandom([0.25 / availableNatureIndices.length, 0.75 / (availableNatureIndices.length - 1),
+  0.75 / (availableNatureIndices.length - 2)],
+() => talk(p, 'elemental_wizard_boss', [], { actor: mortifer }));
 assert.equal(stage(p), ft1Constant('ft1_components'), 'Mortifer consumes the skull and saves the component indices');
 assert.equal(count(p, 'fairy_skull'), 0);
 let picks = [1, 2, 3].map(index => p.getVarBit(varbit(`fairy_nature_item${index}`)));
