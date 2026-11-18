@@ -1,7 +1,5 @@
-// Light / Medium / Dense Jungle leftover op4=Hack.
-// CANDIDATE WC floors + XP tenths from last-resort 2007-base Jungle pages.
-// 1–4 leftover names are the same "Light/Medium/Dense Jungle" (visual variants);
-// next_loc_stage goes to the leftover chopped loc (_5).
+// CANDIDATE: OSRS Jungle pages, four sections per bush.
+// The original client fields and loc ids are unchanged.
 
 [oploc4,tai_bwo_jungle_vegetation_easy_1] @tbw_hack_jungle(^tbw_hack_level_light, ^tbw_hack_xp_light, thatching_spar_light);
 [oploc4,tai_bwo_jungle_vegetation_easy_2] @tbw_hack_jungle(^tbw_hack_level_light, ^tbw_hack_xp_light, thatching_spar_light);
@@ -17,20 +15,18 @@
 [oploc4,tai_bwo_jungle_vegetation_hard_4] @tbw_hack_jungle(^tbw_hack_level_dense, ^tbw_hack_xp_dense, thatching_spar_dense);
 
 [proc,tbw_has_machete]()(boolean)
-if (inv_total(inv, machette) > 0 | inv_total(inv, machette_opal) > 0 | inv_total(inv, machette_jade) > 0 | inv_total(inv, machette_redtopaz) > 0) {
-    return (true);
-}
 if (inv_total(worn, machette) > 0 | inv_total(worn, machette_opal) > 0 | inv_total(worn, machette_jade) > 0 | inv_total(worn, machette_redtopaz) > 0) {
     return (true);
 }
 return (false);
 
+// CANDIDATE: OSRS cleanup rates use tenths of one percent.
+// The original 10-bit vill_comm_points field holds 0–1000.
 [proc,tbw_add_favour](int $amt)
-def_int $next = add(%favour_percentage, $amt);
-if ($next > ^tbw_favour_cap) {
-    $next = ^tbw_favour_cap;
-}
-%favour_percentage = $next;
+%vill_comm_points = min(^tbw_favour_cap, add(%vill_comm_points, $amt));
+%favour_percentage = divide(%vill_comm_points, 10);
+// New work begins a fresh conversion batch rather than inheriting an old slice.
+%vill_comm_max = 0;
 
 [label,tbw_hack_jungle](int $level, int $xp, namedobj $spar)
 p_arrivedelay;
@@ -46,10 +42,33 @@ if (inv_freespace(inv) < 1) {
     mes("You don't have enough inventory space.");
     return;
 }
+if (~tbw_cleanup_can_work = false) return;
 anim(tbw_cleanup_player_hack, 0);
 mes("You swing your machete at the jungle.");
-p_delay(2);
-def_loc $next = loc_param(next_loc_stage);
+// CANDIDATE: 16 ticks at WC10, one fewer each ten levels, minimum eight.
+def_int $cycle = max(8, sub(17, divide(stat(woodcutting), 10)));
+p_delay(1);
+def_int $tick = 2;
+while ($tick < sub($cycle, 3)) {
+    if (~tbw_jungle_mosquito_event = true) {
+        anim(null, 0);
+        return;
+    }
+    p_delay(1);
+    $tick = add($tick, 1);
+}
+%eventchance = min(^tbw_event_counter_max, add(%eventchance, 1));
+def_int $low;
+def_int $high;
+$low, $high = ~tbw_jungle_cut_chance($level);
+if (stat_random(woodcutting, $low, $high) = false) {
+    // CANDIDATE: OSRS Cleanup, failures grant one Woodcutting experience.
+    stat_advance(woodcutting, 10);
+    anim(tbw_cleanup_player_hack_fail, 0);
+    p_delay(3);
+    return;
+}
+def_loc $next = ~tbw_jungle_next(loc_type);
 if ($next = null) {
     anim(null, 0);
     return;
@@ -57,6 +76,52 @@ if ($next = null) {
 loc_change($next, ^tbw_jungle_respawn);
 inv_add(inv, $spar, 1);
 stat_advance(woodcutting, $xp);
-~tbw_add_favour(^tbw_favour_hack);
+if ($spar = thatching_spar_light) {
+    ~tbw_add_favour(^tbw_favour_hack_light);
+} else if ($spar = thatching_spar_med) {
+    ~tbw_add_favour(^tbw_favour_hack_med);
+} else {
+    ~tbw_add_favour(^tbw_favour_hack_dense);
+}
 anim(tbw_cleanup_player_hack_success, 0);
 mes("You hack away some of the jungle.");
+p_delay(3);
+
+[proc,tbw_jungle_next](loc $stage)(loc)
+switch_loc($stage) {
+    case tai_bwo_jungle_vegetation_easy_1 : return (tai_bwo_jungle_vegetation_easy_2);
+    case tai_bwo_jungle_vegetation_easy_2 : return (tai_bwo_jungle_vegetation_easy_3);
+    case tai_bwo_jungle_vegetation_easy_3 : return (tai_bwo_jungle_vegetation_easy_4);
+    case tai_bwo_jungle_vegetation_easy_4 : return (tai_bwo_jungle_vegetation_easy_5);
+    case tai_bwo_jungle_vegetation_med_1 : return (tai_bwo_jungle_vegetation_med_2);
+    case tai_bwo_jungle_vegetation_med_2 : return (tai_bwo_jungle_vegetation_med_3);
+    case tai_bwo_jungle_vegetation_med_3 : return (tai_bwo_jungle_vegetation_med_4);
+    case tai_bwo_jungle_vegetation_med_4 : return (tai_bwo_jungle_vegetation_med_5);
+    case tai_bwo_jungle_vegetation_hard_1 : return (tai_bwo_jungle_vegetation_hard_2);
+    case tai_bwo_jungle_vegetation_hard_2 : return (tai_bwo_jungle_vegetation_hard_3);
+    case tai_bwo_jungle_vegetation_hard_3 : return (tai_bwo_jungle_vegetation_hard_4);
+    case tai_bwo_jungle_vegetation_hard_4 : return (tai_bwo_jungle_vegetation_hard_5);
+}
+return (null);
+
+// CANDIDATE: pre-June-2025 OSRS Jungle charts 14770547/14770548/14770549.
+[proc,tbw_jungle_cut_chance](int $requirement)(int, int)
+def_int $low = 49;
+def_int $high = 169;
+if ($requirement = ^tbw_hack_level_med) {
+    $low = 34;
+    $high = 85;
+} else if ($requirement = ^tbw_hack_level_dense) {
+    $low = 16;
+    $high = 44;
+}
+def_int $bonus = 0;
+if (inv_total(worn, machette_redtopaz) > 0) {
+    $bonus = 36;
+} else if (inv_total(worn, machette_jade) > 0) {
+    $bonus = 20;
+    if ($requirement = ^tbw_hack_level_light) $bonus = 21;
+} else if (inv_total(worn, machette_opal) > 0) {
+    $bonus = 5;
+}
+return (add($low, $bonus), add($high, $bonus));

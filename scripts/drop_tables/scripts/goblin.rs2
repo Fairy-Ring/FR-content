@@ -81,7 +81,8 @@ if ($dropint < 1) {
     obj_add(npc_coord, coins, 5, ^lootdrop_duration);
 }
 
-if (random(^champion_scroll_chance) = 0) {
+// CANDIDATE: OSRS Champion's scroll, no further scroll after this Champion's defeat.
+if (~champions_won(4) = false & random(^champion_scroll_chance) = 0) {
 obj_add(npc_coord, champions_challenge_goblin, 1, ^lootdrop_duration);
 }
 
@@ -153,6 +154,7 @@ if ($dropint < 3) {
     obj_add(npc_coord, tin_ore, 1, ^lootdrop_duration);
 }
 
-if (random(^champion_scroll_chance) = 0) {
+// CANDIDATE: OSRS Champion's scroll, no further scroll after this Champion's defeat.
+if (~champions_won(4) = false & random(^champion_scroll_chance) = 0) {
 obj_add(npc_coord, champions_challenge_goblin, 1, ^lootdrop_duration);
 }

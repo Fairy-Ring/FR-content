@@ -56483,45 +56483,6 @@ attack=35
 strength=37
 defence=35
 
-[tbwcu_mosquito_single]
-name=Large mosquito
-desc=A flying blood sucker.
-model1=npc_2493
-walkanim=tbw_mosquito_walk
-readyanim=tbw_mosquito_ready
-op2=Attack
-vislevel=13
-hitpoints=3
-attack=5
-strength=1
-defence=45
-
-[tbwcu_mosquito_swarm3]
-name=Mosquito swarm
-desc=A swarm of three highly agile mosquitoes.
-model1=npc_2494
-walkanim=tbw_mosquito_walk
-readyanim=tbw_mosquito_ready
-op2=Attack
-vislevel=17
-hitpoints=9
-attack=10
-strength=1
-defence=45
-
-[tbwcu_mosquito_swarm5]
-name=Mosquito swarm
-desc=A swarm of five highly agile mosquitoes.
-model1=npc_2495
-walkanim=tbw_mosquito_walk
-readyanim=tbw_mosquito_ready
-op2=Attack
-vislevel=20
-hitpoints=15
-attack=15
-strength=1
-defence=45
-
 [tbwcu_tribesman_instant]
 name=Tribesman
 desc=A vicious warrior.
@@ -68595,35 +68556,6 @@ param=attack_anim,champions_giant_attack_vertical
 param=defend_anim,champions_giant_defend
 param=death_anim,champions_giant_death
 
-[champions_ghoul]
-name=Ghoul Champion
-desc=Champion of the Ghouls!
-model1=npc_3059
-model2=npc_3059i2
-model3=npc_3059i3
-model4=idk_man_legs_tatty
-model5=idk_42
-model6=npc_3059i4
-recol1s=7298
-recol1d=26420
-recol2s=24075
-recol2d=26420
-recol3s=2340
-recol3d=9511
-recol4s=6144
-recol4d=7365
-recol5s=17441
-recol5d=22193
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=ghoul_ready
-op2=Attack
-vislevel=85
-hitpoints=100
-attack=0
-strength=0
-defence=0
-param=attack_anim,champions_ghoul_club
-param=attack_sound,ghoul_champion_attack
 
 [champions_goblin]
 name=Goblin Champion

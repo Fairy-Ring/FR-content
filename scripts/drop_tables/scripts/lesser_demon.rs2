@@ -51,6 +51,8 @@ if ($random < 4) {
     obj_add(npc_coord, coins, 10, ^lootdrop_duration);
 }
 
-if (random(500) = 0) {
+// CANDIDATE uniform OSRS rate. The imported 1/500 row had no citation.
+// CANDIDATE: OSRS Champion's scroll, no further scroll after this Champion's defeat.
+if (~champions_won(8) = false & random(^champion_scroll_chance) = 0) {
 obj_add(npc_coord, champions_challenge_lesserdemon, 1, ^lootdrop_duration);
 }

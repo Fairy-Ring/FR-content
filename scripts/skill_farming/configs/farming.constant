@@ -39,6 +39,7 @@
 
 ^farming_handler_potato = 1
 ^farming_handler_herb = 2
+^farming_handler_flower = 3
 // CANDIDATE pre-rework OSRS: 500 game ticks, reset on login/logout.
 ^farming_growth_poll_ticks = 500
 ^farming_growth_window_minutes = 5
@@ -66,3 +67,8 @@
 ^farming_herb_save_low = 64
 // CANDIDATE OSRS Farming revision 15402033: CTS_high=80 for every herb.
 ^farming_herb_save_high = 80
+
+// VERIFIED RuneHQ Farming guide, 27 April 2006: level required to make one.
+^farming_scarecrow_level = 23
+// CANDIDATE Old School Scarecrow: oldest retained revision 218671 (2014).
+^farming_scarecrow_make_xp = 250

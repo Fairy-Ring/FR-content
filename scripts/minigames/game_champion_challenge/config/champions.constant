@@ -1,16 +1,12 @@
-// Champions’ Challenge leftover coords. jm2 m49_152 / m49_52.
-// Pit centroid CANDIDATE from leftover pit locs (local ~32,30).
+// CANDIDATE destinations: adjacent floor squares of original 377 loc pairs.
+// UNKNOWN engineering champion spawn: the arena's central floor.
+// Map layer 1 has LINK_BELOW here; GameMap loads these locs at logical level 0.
 ^champions_statue = 0_49_152_48_30
-^champions_statue_l1 = 1_49_152_48_30
 ^champions_imp_spawn = 0_49_152_32_30
-^champions_gallery_stand = 0_49_152_50_30
-^champions_imp_xp = 1600
-^champions_goblin_xp = 1280
-^champions_skeleton_xp = 2320
-^champions_zombie_xp = 2400
-^champions_giant_xp = 2800
-^champions_hobgoblin_xp = 2320
-^champions_ghoul_xp = 4000
-^champions_earthwarrior_xp = 4320
-^champions_jogre_xp = 4800
-^champions_lesserdemon_xp = 5920
+^champions_gallery_stand = 0_49_152_49_30
+// UNKNOWN period basement landing: use the original ladder's walkable west foot.
+^champions_basement_ladder = 0_49_152_53_30
+// UNKNOWN period landing: the cache arena ladder's only adjacent walkable tile.
+^champions_arena_ladder = 0_49_152_46_30
+// UNKNOWN period surface landing: use the trapdoor's walkable north approach.
+^champions_surface = 0_49_52_54_28

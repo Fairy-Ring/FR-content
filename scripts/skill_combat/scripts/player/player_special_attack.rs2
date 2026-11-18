@@ -1,4 +1,5 @@
 [label,player_special_attack]
+if (~champions_special_check = false | ~champions_combat_check(%damagetype) = false) return;
 // order of checks is from osrs
 if (~npc_is_attackable() = false) {
     return;
