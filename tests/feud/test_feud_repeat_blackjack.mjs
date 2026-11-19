@@ -10,7 +10,7 @@ import {
 import { player } from './player.mjs';
 import {
   actors, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
-  nativeNpcTriggerName, operate, operateHere, operationStand, read, stand, stage, talk, tickThrough, wield
+  nativeNpcTriggerName, operate, operateHere, operationStand, read, stand, stage, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 import { followToSeclusion } from './follow.mjs';
 
@@ -45,9 +45,9 @@ function withRandom(value, action) {
   try { return action(); } finally { JavaRandom.nextDouble = previous; }
 }
 
-function startOperation(p, npc, option) {
+function startOperation(p, npc, option, atCurrentPosition = false) {
   p.clearInteraction();
-  stand(p, npc);
+  if (!atCurrentPosition) stand(p, npc);
   assert(p.setInteraction(1, npc, ServerTriggerType.APNPC1 + option - 1),
     'ordinary engine interaction is accepted');
   assert(p.inOperableDistance(npc), 'the player can operate from the current native position');
@@ -227,7 +227,8 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   const beforeWakePick = { coins: count(p, 'coins'), xp: xp(p) };
   assert(wakeDeadline > World.currentTick);
   tickThrough(wakeDeadline - 1);
-  const woke = operate(p, target, 3);
+  const woke = { trigger: worldTick(() => startOperation(p, target, 3, true)) };
+  finish(p);
   assert.equal(woke.trigger, nativeNpcTriggerName(p, target, 3));
   assert.equal(target.getVar(stateVar), 0);
   assert.equal(target.getVar(aggressiveVar), p.uid, 'picking as the villager wakes schedules its attack');

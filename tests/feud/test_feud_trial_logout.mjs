@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import './timeout-safety.mjs';
 import {
   Packet, PlayerLoading, PlayerStat, World, count, engineModule, id, inv, inventory, obj, seed
 } from '../swamp-caves/runtime.mjs';

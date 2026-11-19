@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
+import { afterEach } from 'node:test';
 import {
   Packet, PlayerLoading, ScriptState, ServerTriggerType, World, contentRoot, count, dialoguePage,
   engineModule, held, id, inv, invButton, map, obj, resumeDialogue, tile, types, useLoc, worn
@@ -162,7 +163,9 @@ function stand(p, n) {
   return destination;
 }
 
-export function worldTick() {
+export function worldTick(beforeNpcInput = null) {
+  World.currentTick++;
+  let inputResult;
   for (const p of World.playerLoop.all()) {
     if (p?.isActive) p.lastResponse = p.lastConnected = World.currentTick;
   }
@@ -171,17 +174,35 @@ export function worldTick() {
     'processLogouts', 'processLogins', 'processZones', 'processInfo', 'processCleanup'
   ]) {
     assert.equal(typeof World[phase], 'function', `native World.${phase} phase is available`);
+    if (phase === 'processNpcEventQueue') inputResult = beforeNpcInput?.();
     World[phase]();
   }
-  World.currentTick++;
+  return inputResult;
 }
 
 export function tickThrough(deadline) {
   assert(Number.isInteger(deadline), 'the native NPC deadline is an integer tick');
   assert(deadline >= World.currentTick, 'the native NPC deadline has not already passed');
-  while (World.currentTick <= deadline) worldTick();
-  assert.equal(World.currentTick, deadline + 1, 'native world phases ran once through the exact deadline');
+  while (World.currentTick < deadline) worldTick();
+  assert.equal(World.currentTick, deadline, 'native world phases ran once through the exact deadline');
 }
+
+afterEach(() => {
+  const stateVar = id('VarNpcType', 'feud_villager_state');
+  const deadlineVar = id('VarNpcType', 'feud_villager_deadline');
+  let deadline = World.currentTick + 1;
+  for (const npc of World.npcs) {
+    if (npc.isActive && npc.getVar(stateVar) !== 0) deadline = Math.max(deadline, npc.getVar(deadlineVar));
+  }
+  for (const p of [...World.playerLoop.all()]) {
+    const username = p.username;
+    World.removePlayer(p);
+    // These process-local compiled fixtures have no persistence worker.
+    World.logoutRequests.delete(username);
+  }
+  tickThrough(deadline);
+});
+
 function finish(p, choices = []) {
   const options = [...choices], pages = [];
   for (let step = 0; step < 240 && p.activeScript; step++) {
