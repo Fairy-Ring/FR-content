@@ -1,0 +1,9 @@
+// CANDIDATE: finished Lost City 274 stealing.rs2, 65b754f768b79b941b21b2a1eb3b0d1ecae3cdfe.
+// Match the published seven stall bits: reconnect restarts the same full queue duration.
+[proc,regional_stall_timers_login]
+if (testbit(%thieving_stall_timer, ^vikingfur_stall_index) = ^true) {
+    longqueue(stolen_from_stall_vikingfur, ^vikingfur_stall_timer, ^discard, 0);
+}
+if (testbit(%thieving_stall_timer, ^vikingfish_stall_index) = ^true) {
+    longqueue(stolen_from_stall_vikingfish, ^vikingfish_stall_timer, ^discard, 0);
+}

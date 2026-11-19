@@ -101,7 +101,8 @@ data=guard,knight_of_ardougne2
 data=guard,paladin
 data=guard,ardougne_paladin2
 data=level,75
-data=experience,1600
+// VERIFIED: Tip.It (27 April 2006); 160 XP was introduced on 29 May 2014.
+data=experience,160
 data=respawn_ticks,600
 data=loot,uncut_sapphire,1,1,105,an uncut sapphire
 data=loot,uncut_emerald,1,1,17,an uncut emerald
