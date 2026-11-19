@@ -8,6 +8,7 @@ import { World, Runner, Scripts, State, PlayerStat, JavaRandom, types, id, inv, 
 const map = await load('engine/GameMap.ts');
 const { NpcMode } = await load('engine/entity/NpcMode.ts');
 const { PlayerQueueType } = await load('engine/entity/PlayerQueueRequest.ts');
+const Trigger = (await load('engine/script/ServerTriggerType.ts')).default;
 const content = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 // Published native outcomes are the compatibility oracle, except the period gem-XP correction.
 const published = [
@@ -193,6 +194,161 @@ function test(name, action) {
     }
   }
 }
+function dispatchMarketOption(p, npc, slot) {
+  p.target = npc; p.targetOp = Trigger[`OPNPC${slot}`] - 7;
+  const script = p.getOpTrigger();
+  assert(script, `native NPC dispatch resolves opnpc${slot}`);
+  assert.equal(script.name, `[opnpc${slot},${types.NpcType.get(npc.type).debugname}]`);
+  const state = Runner.init(script, p, npc);
+  p.executeScript(state, true);
+  return state;
+}
+function finishMarketOption(p, state) {
+  for (let step = 0; state.execution === State.SUSPENDED && step < 4; step++) {
+    World.currentTick = Math.max(World.currentTick + 1, p.delayedUntil);
+    p.delayed = false;
+    p.executeScript(state, true, true);
+  }
+  assert.equal(state.execution, State.FINISHED, 'native NPC option completes through its bounded delay');
+}
+function marketApproach(p, owner, guards) {
+  const size = Math.max(1, types.NpcType.get(owner.type).size ?? 1);
+  for (let x = owner.x - 1; x <= owner.x + size; x++) {
+    for (let z = owner.z - 1; z <= owner.z + size; z++) {
+      if (x >= owner.x && x < owner.x + size && z >= owner.z && z < owner.z + size) continue;
+      if (map.isMapBlocked(x, z, owner.level) || !map.findPath(owner.level, p.x, p.z, x, z).length) continue;
+      const visible = guards.find(npc => map.isLineOfSight(owner.level, npc.x, npc.z, x, z));
+      if (visible) return { x, z, guard: visible };
+    }
+  }
+  assert.fail('an original reachable merchant approach is visible to a free local viking_guard');
+}
+for (const spec of [
+  {
+    key: 'viking_fish_market', owner: 'viking_fish_monger', queue: 'stolen_from_stall_vikingfish',
+    first: [1, /^It is .+ the thief!$/, 'Guards! Guards!'],
+    second: [3, "You're the one who stole something from me!", 'Guards guards!']
+  },
+  {
+    key: 'viking_fur_market', owner: 'viking_fur_monger', queue: 'stolen_from_stall_vikingfur',
+    first: [3, "You're the one who stole something from me!", 'Guards guards!'],
+    second: [1, /^You think me stupid .+\?$/, 'Guards! Guards!']
+  }
+]) {
+  test(`${spec.key}: actual theft locks both owner options to local guards until expiry`, () => {
+    const profile = profiles.find(([, key]) => key === spec.key);
+    assert(profile, `published native profile ${spec.key} exists`);
+    const [kind, key, level, xp, , , , emptyName] = profile;
+    const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+    const original = id('LocType', key), empty = id('LocType', emptyName);
+    const { p, loc, xp: before } = fixture(row, placements.filter(loc => loc.type === original), level);
+    p.setLevel(PlayerStat.HITPOINTS, 99); // Seed: enough health to observe the local alert, not written by theft.
+    const ownerType = id('NpcType', spec.owner);
+    const owner = [...World.npcs].filter(npc => npc.isActive && npc.type === ownerType && npc.level === loc.level)
+      .sort((a, b) => Math.max(Math.abs(a.x - loc.x), Math.abs(a.z - loc.z)) -
+        Math.max(Math.abs(b.x - loc.x), Math.abs(b.z - loc.z)))[0];
+    assert(owner, 'the original market owner is present');
+    const guardType = id('NpcType', 'viking_guard');
+    const alertVar = id('VarNpcType', 'npc_aggressive_player');
+    const guards = [...World.npcs].filter(npc => npc.isActive && npc.type === guardType && npc.level === owner.level &&
+      Math.max(Math.abs(npc.x - owner.x), Math.abs(npc.z - owner.z)) <= 5 &&
+      npc.targetOp !== NpcMode.OPPLAYER2);
+    const shopMain = id('Component', 'shop_template'), shopSide = id('Component', 'shop_template_side');
+    const shopVar = id('VarPlayerType', 'shop'), shopBefore = p.getVar(shopVar);
+    try {
+      execute(p, loc);
+      assert.equal(p.stats[PlayerStat.THIEVING] - before, xp, 'the real original stall click succeeds');
+      assert.equal(loc.type, empty, 'the successful click empties the original stall');
+      const queueName = `[queue,${spec.queue}]`;
+      const queue = () => [...p.queue.all()].find(entry => entry.script.name === queueName);
+      assert(queue()?.delay > 0, 'the theft writes its existing native owner lockout');
+      restore(loc, emptyName, original);
+      World.playerLoop.add(BigInt(p.pid), p);
+      const point = marketApproach(p, owner, guards);
+      p.x = point.x; p.z = point.z; p.level = owner.level;
+      assert(guards.some(npc => map.isLineOfSight(owner.level, npc.x, npc.z, point.x, point.z)),
+        'the walked-to merchant approach has local guard line of sight');
+      const assertClosed = () => {
+        assert.notEqual(p.modalMain, shopMain, 'an active lockout never opens the shop');
+        assert.notEqual(p.modalSide, shopSide, 'an active lockout never opens the shop side panel');
+        assert.equal(p.getVar(shopVar), shopBefore, 'an active lockout preserves the closed-shop state');
+      };
+      const runLockedOption = (slot, opening, response) => {
+        const state = dispatchMarketOption(p, owner, slot);
+        if (opening instanceof RegExp) assert.match(owner.sayMessage, opening);
+        else assert.equal(owner.sayMessage, opening);
+        assert.equal(state.execution, State.SUSPENDED, 'the refusal retains its existing one-tick pause');
+        finishMarketOption(p, state);
+        assert.equal(owner.sayMessage, response);
+        assertClosed();
+      };
+      runLockedOption(...spec.first);
+      const alerted = guards.filter(npc => npc.getVar(alertVar) === p.uid);
+      assert(alerted.length, 'the locked native option alerts an original local viking_guard');
+      for (let turn = 0; alerted.every(npc => npc.targetOp !== NpcMode.OPPLAYER2) && turn < 4; turn++) nativeNpcTurn();
+      assert(alerted.some(npc => npc.targetOp === NpcMode.OPPLAYER2),
+        'a local viking_guard takes the native retaliation path');
+      runLockedOption(...spec.second);
+      const alertedBeforeExpiry = guards.filter(npc => npc.getVar(alertVar) === p.uid);
+      const ownerOverheadBeforeExpiry = owner.sayMessage;
+      const remaining = queue()?.delay;
+      assert(remaining > 0, 'both owner options leave the same theft lockout active');
+      for (let turn = 0; turn <= remaining + 1 && queue(); turn++) {
+        World.currentTick++;
+        p.processQueues();
+      }
+      assert.equal(queue(), undefined, 'the existing queue expires through native player queue processing');
+      const state = dispatchMarketOption(p, owner, 3);
+      assert.equal(state.execution, State.FINISHED);
+      assert.equal(p.modalMain, shopMain, 'the original shop opens when the lockout has expired');
+      assert.equal(p.modalSide, shopSide);
+      assert.equal(owner.sayMessage, ownerOverheadBeforeExpiry, 'expired Trade adds no refusal or guard-alert line');
+      assert.deepEqual(guards.filter(npc => npc.getVar(alertVar) === p.uid), alertedBeforeExpiry,
+        'expired Trade does not alert another local guard');
+    } finally {
+      if (loc.type === empty) restore(loc, emptyName, original);
+      p.isActive = false;
+      p.unlink();
+      World.players[p.pid] = null;
+    }
+  });
+}
+for (const [kind, key, ownerName] of [
+  ['viking_fur', 'viking_fur_market', 'viking_fur_monger'],
+  ['viking_fish', 'viking_fish_market', 'viking_fish_monger'],
+  ['dwarf_gem', 'dwarf_market_gems', 'dwarf_city_shop_gems'],
+  ['dwarf_silver', 'dwarf_market_silver', 'dwarf_city_shop_silver'],
+  ['dwarf_bakery', 'dwarf_market_bakery', 'dwarf_city_shop_bakery'],
+  ['wine', 'rag_market_stall', 'rag_wine_merchant'],
+  ['dwarf_crafting', 'dwarf_market_crafting', 'dwarf_city_shop_craft']
+]) {
+  test(`${key}: the original local owner remains a catcher outside Ape Atoll`, () => {
+    const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+    const owner = id('NpcType', ownerName), locs = placements.filter(loc => loc.type === id('LocType', key));
+    assert.deepEqual(row.getValue(1, 0), [owner]);
+    assert([...World.npcs].some(npc => npc.type === owner && locs.some(loc => npc.startLevel === loc.level &&
+      approaches(loc).some(point => Math.max(Math.abs(npc.startX - point.x), Math.abs(npc.startZ - point.z)) <= 5 &&
+        map.isLineOfSight(loc.level, npc.startX, npc.startZ, point.x, point.z)))),
+    'the unchanged original owner placement can see an original legal interaction side');
+  });
+}
+test('dwarf_market_crafting: Nolar alone notices theft without a guard attack', () => {
+  const row = types.DbRowType.getByName('stealing_dwarf_crafting_stall');
+  const original = id('LocType', 'dwarf_market_crafting'), owner = id('NpcType', 'dwarf_city_shop_craft');
+  assert.deepEqual(Array.from({ length: row.columnValues[2].length }, (_, index) => row.getValue(2, index)[0]),
+    [1, 2, 3, 4].map(index => id('NpcType', `dwarf_city_black_guard${index}`)));
+  const { p, loc, xp: before } = fixture(row, placements.filter(loc => loc.type === original), 5, true,
+    watching => watching.every(npc => npc.type === owner));
+  const watching = catchers(row, p, p.level);
+  assert(watching.length && watching.every(npc => npc.type === owner));
+  execute(p, loc);
+  assert.equal(p.stats[PlayerStat.THIEVING], before);
+  assert.equal(snapshot(p).filter(Boolean).length, 0);
+  assert.equal(loc.type, original);
+  assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), 0);
+  assert(watching.every(npc => npc.getVar(id('VarNpcType', 'npc_aggressive_player')) !== p.uid),
+    'the non-combat owner path does not make Nolar retaliate');
+});
 for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profiles) {
   const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
   assert(row, `missing compiled ${kind} row`);
@@ -224,7 +380,8 @@ for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profile
   });
   test(`${key}: native steal, published lockout bit, empty and automatic return`, () => {
     const { p, loc, xp: before } = fixture(row, locs, level);
-    const duration = Math.trunc(ticks * (4000 - Math.min(World.getTotalPlayers() + 1, 2000)) / 4000);
+    // player() already registers the fixture player in World.players.
+    const duration = Math.trunc(ticks * (4000 - Math.min(World.getTotalPlayers(), 2000)) / 4000);
     execute(p, loc);
     assert.equal(p.stats[PlayerStat.THIEVING] - before, xp);
     const produced = snapshot(p).filter(Boolean);

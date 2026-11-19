@@ -67,7 +67,6 @@ function run(name, op, fixture = {}) {
   }
   for (const [key, value] of Object.entries(fixture.bank ?? {})) player.invAdd(InvType.getId('bank'), ObjType.getId(key), value);
   for (const key of fixture.worn ?? []) player.invAdd(InvType.getId('worn'), ObjType.getId(key), 1);
-  const before = { vars: player.vars.slice(), inv: items(player, 'inv'), worn: items(player, 'worn'), xp: player.stats.slice() };
   const packets = [], npcs = [];
   player.write = packet => packets.push(packet);
   for (const key of [name, ...(fixture.nearby ?? [])]) {
@@ -77,6 +76,10 @@ function run(name, op, fixture = {}) {
     npc.isActive = true; npc.lastMovement = -100; npcs.push(npc);
     World.gameMap.getZone(npc.x, npc.z, npc.level).enter(npc);
   }
+  const before = {
+    vars: player.vars.slice(), inv: items(player, 'inv'), worn: items(player, 'worn'), xp: player.stats.slice(),
+    tile: [player.level, player.x, player.z], npcs: npcs.map(npc => [npc.type, npc.level, npc.x, npc.z])
+  };
   player.target = npcs[0]; player.targetOp = Trigger[`OPNPC${op}`] - 7;
   const item = fixture.readItem ? ObjType.getByName(fixture.readItem) : null;
   const script = item ? ScriptProvider.getByTrigger(Trigger.OPHELD1, item.id, item.category) : player.getOpTrigger();
@@ -91,10 +94,13 @@ function run(name, op, fixture = {}) {
       assert.notEqual(state.execution, ScriptState.ABORTED, `${name}: VM aborted`);
       if (state.execution === ScriptState.FINISHED) {
         assert.equal(choice, (fixture.choices ?? []).length);
+        const textMessages = packets.filter(packet => packet instanceof IfSetText || packet instanceof MessageGame)
+          .map(packet => ({ type: packet.constructor.name, text: normalize(packet.text ?? packet.msg) }))
+          .filter(message => Boolean(message.text));
         return {
           before, vars: player.vars.slice(), inv: items(player, 'inv'), worn: items(player, 'worn'), xp: player.stats.slice(),
           tile: [player.level, player.x, player.z], npcs: npcs.map(npc => [npc.type, npc.level, npc.x, npc.z]),
-          text: packets.filter(packet => packet instanceof IfSetText || packet instanceof MessageGame).map(packet => normalize(packet.text ?? packet.msg)).filter(Boolean)
+          text: textMessages.map(message => message.text), textMessages
         };
       }
       if (state.execution === ScriptState.SUSPENDED) {
@@ -141,7 +147,15 @@ for (const coins of [0, 4, 5, 19]) for (const garlic of [0, 1]) for (const paid 
 for (const stage of [2, 3, 4, 5]) {
   const result = run('bonzo', 3, { vars: { fishingcompo: stage, hemenster_comp_stage: 1 }, inventory: { coins: 19 } });
   unchanged(result); assert.deepEqual(result.inv, result.before.inv, 'no repeat fee or reward');
-  assert(result.text.join(' ').includes(stage < 4 ? "You've already paid, you don't need to pay me again!" : "You've already won the Fishing Competition and don't need to enter again."));
+  const expected = stage < 4 ? "You've already paid, you don't need to pay me again!" : "You've already won the Fishing Competition and don't need to enter again.";
+  assert(result.text.join(' ').includes(expected));
+  if (stage >= 4) {
+    assert.deepEqual(result.textMessages.filter(message => message.text === expected), [
+      { type: 'MessageGame', text: expected }
+    ], 'won/completed submits the native game message rather than dialogue text');
+    assert.deepEqual(result.tile, result.before.tile, 'won/completed position unchanged');
+    assert.deepEqual(result.npcs, result.before.npcs, 'won/completed NPC state unchanged');
+  }
 }
 // Ali the Camel transcript. Seeds only drive the engine's actual JavaRandom.
 const camelLines = [
@@ -175,6 +189,8 @@ for (const name of ['ics_little_plague_cow1', 'ics_little_plague_cow2', 'ics_lit
   }
 }
 assert.equal(cowSeen.size, 2, 'both sourced cow responses exercised');
+// CANDIDATE item-page property, loaded from the compiled server object config.
+assert.equal(ObjType.getByName('leaflet_dropper_flyer').tradeable, false, 'flyer is not tradeable');
 // Direct Take-flyer transcript: one free held copy, no bank-wide claim flag.
 for (const [inventory, bank, expected, line] of [
   [{ coins: 19 }, {}, 1, 'Here! Take one and let me get back to work.'],
@@ -190,6 +206,9 @@ for (const [inventory, bank, expected, line] of [
   if (!inventory.leaflet_dropper_flyer && expected) expectedItems.push({ id: ObjType.getId('leaflet_dropper_flyer'), count: 1 });
   assert.deepEqual(result.inv.filter(Boolean).sort((a, b) => a.id - b.id), expectedItems.sort((a, b) => a.id - b.id), 'only the sourced flyer transfer');
 }
+const handout = run('ali_leaflet_dropper', 3, { inventory: { coins: 19 } });
+assert(handout.text.join(' ').includes('Here! Take one and let me get back to work. I still have hundreds of these flyers to hand out, I wonder if Ali would notice if I quietly dumped them somewhere?'),
+  'direct Take-flyer preserves its own transcript, not the different Old School Talk-to branch');
 const read = run('ali_leaflet_dropper', 3, { readItem: 'leaflet_dropper_flyer', inventory: { leaflet_dropper_flyer: 1 } });
 unchanged(read); assert.deepEqual(read.inv, read.before.inv, 'Read preserves the flyer');
 assert(read.text.join(' ').includes('Come to the Al Kharid Market place! High quality produce at low, low prices! Show this flyer to a merchant for money off your next purchase, courtesy of Ali Morrisane!'));

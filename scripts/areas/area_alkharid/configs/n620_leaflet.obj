@@ -1,0 +1,13 @@
+[leaflet_dropper_flyer]
+name=Al kharid flyer
+desc=The money off voucher has expired.
+model=obj_leaflet_dropper_flyer
+2dxof=3
+2dyof=-77
+2dzoom=724
+2dyan=138
+2dzan=194
+2dxan=263
+iop1=Read
+weight=1g
+tradeable=no

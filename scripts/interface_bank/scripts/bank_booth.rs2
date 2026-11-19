@@ -11,6 +11,9 @@ if (npc_findcat(loc_coord, bank_teller, 2, 0) = true) {
 // Only ordinary booths with no unbuilt service prerequisite join this category.
 [oploc1,_bank_booth]
 if (npc_findcat(loc_coord, bank_teller, 2, 0) = true) {
+    if (npc_type = dwarf_city_banker1 | npc_type = dwarf_city_banker2) {
+        @beta_dwarf_banker;
+    }
     @talk_to_banker;
 }
 @openbank;
@@ -28,9 +31,6 @@ if (npc_find(loc_coord, ahoy_ghost_banker, 2, 0) = true) {
 // CANDIDATE: use the published pirate banker conversation without new words.
 [oploc1,fever_bankbooth]
 if (npc_find(loc_coord, fever_banker_01, 2, 0) = true) {
-    @beta_pirate_banker;
-}
-if (npc_find(loc_coord, fever_banker_02, 2, 0) = true) {
     @beta_pirate_banker;
 }
 
