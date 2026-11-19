@@ -179,7 +179,21 @@ routing = {
 
 The entry must name one endpoint. The selector must select the other declared form. `stats`, `params`, and `hasop` assert what native opcodes read from a fresh spawned parent. `resolvedOptions` asserts the selected form's complete options separately. These expectations use the same exact values and reference syntax as fields.
 
-At the pinned engine, `Npc.ts:76-93` initializes levels from the spawned type. `NpcOps.ts:281-285` reads those levels for `NPC_STAT`. `NpcOps.ts:178-187` reads params from `activeNpc.type`. `NpcOps.ts:579-591` reads that type's options for `NPC_HASOP`. `resolveNpcType.ts:4-17` selects a visual form, and `OpNpcHandler.ts:40-45` checks its options. The checker executes the real resolver and three opcode handlers offline. It changes no routing. Explicit `changeType` can change the runtime type and levels (`Npc.ts:444-461`). This check does not prove a quest's natural transformation or access route.
+`Npc.ts:76-93` initializes levels from the spawned type. `NpcOps.ts:281-285` reads those levels for `NPC_STAT`. `NpcOps.ts:178-187` reads params from `activeNpc.type`. `NPC_HASOP` reads the player's visible form when a player is active, and the base type otherwise. This checker deliberately supplies no player for its `hasop` assertions. `resolveNpcType.ts:4-17` selects a visual form, and `OpNpcHandler.ts:40-45` checks its options. The checker executes the real resolver and three opcode handlers offline. It changes no routing. Explicit `changeType` can change the runtime type and levels (`Npc.ts:444-461`). This check does not prove a quest's natural transformation or access route.
+
+### Nonattack multi-NPC guards
+
+After building the pack, run:
+
+```sh
+node --import tsx ../content/tests/npc-combat/test_nonattack_multi.mjs
+```
+
+The real-VM test reads every packed selector for the 12 named bases. It checks both attack guards, generic attacks, poison, recoil, salve, and Crumble Undead.
+It also dispatches the original Desert Treasure Smash-ice and Elid Shoot handlers. The Feud controls follow the observed native `NPC_HASOP` result.
+An engine that reads only the Feud base must reject its op-less base. An engine that resolves its selected Attack form must accept it.
+
+This test does not prove map placement, natural quest progression, live packet delivery, or the quest-gated DT smash success branch.
 
 ## Proof limits
 

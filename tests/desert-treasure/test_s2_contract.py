@@ -67,10 +67,14 @@ def main() -> int:
     for needle in ("%npc_attacking_uid ! uid", "~dt_fareed_inside(coord) = false", "%fd_killed_firewarrior = ^dt_flag_on"):
         require(needle in guard, f"actor admission contains {needle}")
     shared = text(ROOT / "scripts/skill_combat/scripts/npc/npc_combat.rs2")
+    helper = block(shared, "proc", "npc_combat_hasop")
+    require("npc_hasop(2)" in helper or "npc_param(npc_noncombat_multi)" in helper,
+            "shared combat admission helper still reads the Attack option or base compatibility param")
     for proc in ("npc_is_attackable", "npc_is_attackable_opt"):
         body = block(shared, "proc", proc)
         needle = "if (npc_type = firediamond_firewarrior & ~dt_fareed_attackable = false) return(false);"
-        require(needle in body and body.index(needle) < body.index("npc_hasop(2)"), f"{proc} rejects a spectator before generic Attack admission")
+        admission = "~npc_combat_hasop"
+        require(needle in body and admission in body and body.index(needle) < body.index(admission), f"{proc} rejects a spectator before generic Attack admission")
     require("skill_magic" not in active and "npc_max_dealt" not in active and "rune_payment" not in active, "S2 uses shared spell resolution and payment without a new player-damage or elemental rule")
     journal = text(QUEST / "scripts/dt_journal.rs2")
     require(journal.count("$x = append($x, ~dt_smoke_journal);") == 2, "one Smoke journal call in each shared stage block")

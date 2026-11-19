@@ -266,6 +266,19 @@ def check_original_entity_configs() -> None:
         )
 
     npcs = configs["all.npc"]
+    moved_bases = ("troll_block_1", "troll_block_2")
+    moved_counts = dict.fromkeys(moved_bases, 0)
+    for path in sorted((ROOT / "scripts").rglob("*.npc")):
+        text = path.read_text(encoding="utf-8")
+        names = section_names(text)
+        for name in moved_bases:
+            count = names.count(name)
+            if count:
+                moved_counts[name] += count
+                sections, _ = parse_sections_text(text, str(path))
+                npcs[name] = sections[name]
+    for name in moved_bases:
+        require(moved_counts[name] == 1, f"[{name}] must have exactly one NPC definition")
     base_npcs = base_configs["all.npc"]
     expected_npcs = {
         "icediamond_icewarrior": (130, 190, 80, 135, 4, "obj_khazard_helmet_manwear", "154"),
@@ -308,6 +321,8 @@ def check_original_entity_configs() -> None:
         }
     for name in ("troll_block_1", "fd_trollblock1", "troll_block_2", "fd_trollblock2"):
         s5_behaviour[name] = {"hitpoints": "10", "wanderrange": "0", "defaultmode": "none"}
+    for name in moved_bases:
+        s5_behaviour[name]["param"] = ("npc_noncombat_multi,yes",)
 
     def strip_s5_behaviour(name, values):
         result = {key: list(items) for key, items in values.items()}
