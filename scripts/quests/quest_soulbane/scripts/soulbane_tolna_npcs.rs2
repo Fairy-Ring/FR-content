@@ -1,0 +1,180 @@
+// CANDIDATE selected r15392739: south 8-tick melee/7-tick ranged,
+// east 5-tick ranged only, north 3-tick melee/20-tick ranged. Magic-looking
+// attacks use Ranged accuracy, Ranged defence and Protect from Missiles.
+[proc,soulbane_tolna_npc]()(boolean)
+if (npc_type = soulbane_final_tolna1 | npc_type = soulbane_final_tolna2 | npc_type = soulbane_final_tolna3) return(true);
+return(false);
+
+[proc,soulbane_tolna_attackable]()(boolean)
+if (%soulbane_prog ! ^soulbane_tolna_active) return(false);
+return(~soulbane_npc_owned);
+
+[ai_spawn,soulbane_final_tolna1] ~soulbane_tolna_npc_spawn;
+[ai_spawn,soulbane_final_tolna2] ~soulbane_tolna_npc_spawn;
+[ai_spawn,soulbane_final_tolna3] ~soulbane_tolna_npc_spawn;
+[proc,soulbane_tolna_npc_spawn]
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+%npc_start_coord = npc_coord;
+
+[opnpc2,soulbane_final_tolna1] @soulbane_tolna_attack;
+[opnpc2,soulbane_final_tolna2] @soulbane_tolna_attack;
+[opnpc2,soulbane_final_tolna3] @soulbane_tolna_attack;
+[label,soulbane_tolna_attack]
+if (~soulbane_tolna_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,soulbane_final_tolna1] @soulbane_tolna_attack_ap;
+[apnpc2,soulbane_final_tolna2] @soulbane_tolna_attack_ap;
+[apnpc2,soulbane_final_tolna3] @soulbane_tolna_attack_ap;
+[label,soulbane_tolna_attack_ap]
+if (~soulbane_tolna_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_queue1,soulbane_final_tolna1] ~soulbane_tolna_retaliate;
+[ai_queue1,soulbane_final_tolna2] ~soulbane_tolna_retaliate;
+[ai_queue1,soulbane_final_tolna3] ~soulbane_tolna_retaliate;
+[proc,soulbane_tolna_retaliate]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_tolna_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_retaliate_ap;
+
+[ai_opplayer2,soulbane_final_tolna1] ~soulbane_tolna_npc_attack;
+[ai_opplayer2,soulbane_final_tolna2] ~soulbane_tolna_npc_attack;
+[ai_opplayer2,soulbane_final_tolna3] ~soulbane_tolna_npc_attack;
+[ai_applayer2,soulbane_final_tolna1] ~soulbane_tolna_npc_attack;
+[ai_applayer2,soulbane_final_tolna2] ~soulbane_tolna_npc_attack;
+[ai_applayer2,soulbane_final_tolna3] ~soulbane_tolna_npc_attack;
+[proc,soulbane_tolna_npc_attack]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_setmode(none);
+    return;
+}
+if (~soulbane_tolna_attackable = false | %death = ^true) {
+    npc_setmode(none);
+    return;
+}
+if (%npc_action_delay > map_clock) return;
+%npc_aggressive_player = uid;
+def_dbrow $profile = ~soulbane_tolna_headrow;
+def_int $melee_ticks = db_getfield($profile, soulbane_tolna_heads:melee_ticks, 0);
+if ($melee_ticks > ^soulbane_tolna_no_melee & ~soulbane_tolna_melee_range = true) {
+    // The native melee boundary retains readiness, accuracy, damage and poison.
+    // Its NPC attackrate is the same named interval used by this head's row.
+    ~npc_default_attack;
+    return;
+}
+~soulbane_tolna_ranged(db_getfield($profile, soulbane_tolna_heads:ranged_ticks, 0));
+
+// Immutable typed binding: the compiler does not support dbrow NPC params.
+[proc,soulbane_tolna_headrow]()(dbrow)
+switch_npc (npc_type) {
+    case soulbane_final_tolna1 : return(soulbane_tolna_south);
+    case soulbane_final_tolna2 : return(soulbane_tolna_east);
+    case soulbane_final_tolna3 : return(soulbane_tolna_north);
+    case default : return(null);
+}
+
+// Match native reachedEntity(shape -2): cardinal rectangle faces, not corners
+// or overlapping tiles. Check the nearest edge with native packed collision.
+[proc,soulbane_tolna_melee_range]()(boolean)
+def_int $size = nc_size(npc_type);
+def_int $x = sub(coordx(coord), coordx(npc_coord));
+def_int $z = sub(coordz(coord), coordz(npc_coord));
+if ($z >= 0 & $z < $size) {
+    if ($x = -1) return(lineofwalk(coord, movecoord(npc_coord, 0, 0, $z)));
+    if ($x = $size) return(lineofwalk(coord, movecoord(npc_coord, sub($size, 1), 0, $z)));
+}
+if ($x >= 0 & $x < $size) {
+    if ($z = -1) return(lineofwalk(coord, movecoord(npc_coord, $x, 0, 0)));
+    if ($z = $size) return(lineofwalk(coord, movecoord(npc_coord, $x, 0, sub($size, 1))));
+}
+return(false);
+
+[proc,soulbane_tolna_ranged](int $interval)
+if (~npc_check_notcombat = false) {
+    npc_setmode(none);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+def_int $attack_roll = ~npc_ranged_attack_roll;
+def_int $defence_roll = ~player_defence_roll_specific(^ranged_style);
+def_int $poison_prayer = 0;
+if (npc_param(poison_severity) > 0 & ~check_protect_prayer(^ranged_style) = true) {
+    $attack_roll = ~npc_ranged_attack_roll_no_prot;
+    $poison_prayer = 1;
+}
+// VERIFIED original assets; their exact original server bindings are UNKNOWN.
+npc_anim(neckrange, 0);
+spotanim_npc(soulbane_tolna_launch, ^soulbane_tolna_projectile_height, 0);
+def_int $duration = ~player_projectile(npc_coord, coord, uid, soulbane_tolna_travel, ^soulbane_tolna_projectile_height, ^soulbane_tolna_projectile_endheight, ^soulbane_tolna_projectile_delay, ^soulbane_tolna_projectile_angle, 0, ^soulbane_tolna_projectile_offset, ^soulbane_tolna_projectile_step);
+spotanim_pl(soulbane_tolna_impact, ^soulbane_tolna_projectile_endheight, $duration);
+// playerhit_n_ranged schedules damage but does not advance npc_action_delay.
+%npc_action_delay = add(map_clock, $interval);
+~npc_rangeattack_resolve($attack_roll, $defence_roll, ^soulbane_tolna_maxhit, $poison_prayer, $duration);
+
+[ai_queue2,soulbane_final_tolna1] ~soulbane_tolna_damage(last_int);
+[ai_queue2,soulbane_final_tolna2] ~soulbane_tolna_damage(last_int);
+[ai_queue2,soulbane_final_tolna3] ~soulbane_tolna_damage(last_int);
+[proc,soulbane_tolna_damage](int $damage)
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_tolna_attackable = false | %npc_aggressive_player ! uid) return;
+// Native poison admission needs the owner's protected player-queue context.
+if (%npc_poison > 0) queue*(soulbane_tolna_poison, 0)(%soulbane_instance, %npc_poison);
+~npc_default_damage($damage);
+
+[queue,soulbane_tolna_poison](int $instance, int $severity)
+if (~soulbane_owned = false | %soulbane_instance ! $instance | %soulbane_prog ! ^soulbane_tolna_active) return;
+// Snapshot the three UIDs before native poison checks can replace a finder.
+def_npc_uid $south = null;
+def_npc_uid $east = null;
+def_npc_uid $north = null;
+npc_findallany(region_getcoord(coordy(^soulbane_tolna_source), ^soulbane_tolna_region_midpoint, ^soulbane_tolna_region_midpoint), ^soulbane_tolna_region_midpoint, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid & %npc_int = $instance & npc_stat(hitpoints) > 0) {
+        switch_npc (npc_type) {
+            case soulbane_final_tolna1 : $south = npc_uid;
+            case soulbane_final_tolna2 : $east = npc_uid;
+            case soulbane_final_tolna3 : $north = npc_uid;
+        }
+    }
+}
+~soulbane_tolna_poison_head($south, $severity);
+~soulbane_tolna_poison_head($east, $severity);
+~soulbane_tolna_poison_head($north, $severity);
+
+[proc,soulbane_tolna_poison_head](npc_uid $head, int $severity)
+if (npc_finduid($head) = false) return;
+if (~soulbane_tolna_attackable = false | npc_stat(hitpoints) = 0) return;
+~npc_poison_start($severity);
+
+[ai_queue3,soulbane_final_tolna1] ~soulbane_tolna_death;
+[ai_queue3,soulbane_final_tolna2] ~soulbane_tolna_death;
+[ai_queue3,soulbane_final_tolna3] ~soulbane_tolna_death;
+[proc,soulbane_tolna_death]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (~soulbane_tolna_attackable = false) {
+    npc_del;
+    return;
+}
+if (npc_stat(hitpoints) ! 0) return;
+def_npc $type = npc_type;
+def_int $instance = %npc_int;
+%npc_int = 0;
+queue*(soulbane_tolna_credit, 0)($instance, $type);
+~npc_death;
+
+[queue,soulbane_tolna_credit](int $instance, npc $type)
+if (~soulbane_owned = false | %soulbane_instance ! $instance | %soulbane_prog ! ^soulbane_tolna_active) return;
+switch_npc ($type) {
+    case soulbane_final_tolna1 : %soulbane_final_tol1dead = 1;
+    case soulbane_final_tolna2 : %soulbane_final_tol2dead = 1;
+    case soulbane_final_tolna3 : %soulbane_final_tol3dead = 1;
+}
+if (%soulbane_final_tol1dead = 1 & %soulbane_final_tol2dead = 1 & %soulbane_final_tol3dead = 1) {
+    %soulbane_prog = ^soulbane_tolna_clear;
+    ~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+    ~soulbane_tolna_add(soulbane_tolna_top, ^soulbane_tolna_human);
+}

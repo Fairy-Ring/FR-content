@@ -1484,6 +1484,96 @@
         "enter": "[proc,soulbane_enter]",
         "leave": "[proc,soulbane_leave]"
       }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_final_tolna1]",
+      "npc": "soulbane_final_tolna1",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_south",
+      "style": "melee",
+      "stand": "melee",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_final_tolna1]",
+      "npc": "soulbane_final_tolna1",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_south",
+      "style": "ranged",
+      "stand": "ranged",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_final_tolna2]",
+      "npc": "soulbane_final_tolna2",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_east",
+      "style": "ranged",
+      "stand": "ranged",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_final_tolna2]",
+      "npc": "soulbane_final_tolna2",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_east",
+      "style": "ranged",
+      "stand": "ranged",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_opplayer2,soulbane_final_tolna3]",
+      "npc": "soulbane_final_tolna3",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_north",
+      "style": "melee",
+      "stand": "melee",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
+    },
+    {
+      "script": "[ai_applayer2,soulbane_final_tolna3]",
+      "npc": "soulbane_final_tolna3",
+      "seeds": { "miss": 1, "hit": 67634689, "zero": 12324 },
+      "playerVars": { "soulbane_prog": 9 },
+      "prelude": "soulbane-tolna-intro",
+      "profile": "soulbane_tolna_north",
+      "style": "ranged",
+      "stand": "ranged",
+      "privateRegion": {
+        "maps": ["46_81", "47_81", "48_81", "51_53", "51_54"],
+        "enter": "[proc,soulbane_enter]",
+        "leave": "[proc,soulbane_leave]"
+      }
     }
   ]
 }

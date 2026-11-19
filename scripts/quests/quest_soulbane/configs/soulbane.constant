@@ -53,14 +53,14 @@
 // fear_cut has 60 presentation cycles before its 20001-cycle final hold.
 ^soulbane_fear_scare_ticks = 2
 
-// UNKNOWN server stage encodings; the original cache defines four stage bits.
+// UNKNOWN server stage encodings within the original quest-progress field.
 ^soulbane_confusion_active = 6
 ^soulbane_confusion_clear = 7
 ^soulbane_hope_active = 8
 ^soulbane_hope_clear = 9
-^soulbane_arena_active = 10
-^soulbane_arena_clear = 11
-^soulbane_surface_reward = 12
+^soulbane_tolna_intro = 10
+^soulbane_tolna_active = 11
+^soulbane_tolna_clear = 12
 // VERIFIED period counts: soulbane.period-confusion-rule and period-hopeless-rule.
 ^soulbane_confusion_real_kills = 5
 ^soulbane_confusion_zero_hits = 8
@@ -121,3 +121,41 @@
 ^soulbane_hope_projectile_angle = 5
 ^soulbane_hope_projectile_offset = 4
 ^soulbane_hope_projectile_step = 10
+
+// UNKNOWN arena staging on original 377 ground, not recovered actor placements.
+// Registered tests require complete footprints and native paths from the entry.
+^soulbane_tolna_source = 1_46_81_0_0
+^soulbane_tolna_map_source = 0_46_81_0_0
+^soulbane_tolna_region_zones = 8
+^soulbane_tolna_region_midpoint = 32
+^soulbane_tolna_entry = 1_46_81_24_28
+^soulbane_tolna_player = 1_46_81_28_28
+^soulbane_tolna_camera = 1_46_81_25_26
+^soulbane_tolna_brana = 1_46_81_30_27
+^soulbane_tolna_human = 1_46_81_30_28
+^soulbane_tolna_south = 1_46_81_27_23
+^soulbane_tolna_east = 1_46_81_27_30
+^soulbane_tolna_north = 1_46_81_26_34
+// UNKNOWN native AP admission range; exact attack intervals live in the rows.
+^soulbane_tolna_attackrange = 10
+// CANDIDATE selected Old School Tolna r15392739 combat profile.
+^soulbane_tolna_maxhit = 5
+^soulbane_tolna_south_melee_ticks = 8
+^soulbane_tolna_south_ranged_ticks = 7
+^soulbane_tolna_east_ranged_ticks = 5
+^soulbane_tolna_north_melee_ticks = 3
+^soulbane_tolna_north_ranged_ticks = 20
+// UNKNOWN row sentinel: the eastern head has no melee attack.
+^soulbane_tolna_no_melee = 0
+// UNKNOWN native duration binding for the sourced one-point player poison.
+^soulbane_tolna_poison_severity = 1
+// UNKNOWN projectile bindings, using the published native ranged defaults.
+^soulbane_tolna_projectile_height = 40
+^soulbane_tolna_projectile_endheight = 36
+^soulbane_tolna_projectile_delay = 32
+^soulbane_tolna_projectile_angle = 15
+^soulbane_tolna_projectile_offset = 11
+^soulbane_tolna_projectile_step = 5
+// VERIFIED period rewards. Native experience helpers take tenths of XP.
+^soulbane_reward_xp_tenths = 5000
+^soulbane_reward_coins = 500

@@ -99,6 +99,7 @@ if (~soulbane_hope_npc = true) {
     if (~soulbane_hope_attackable = false) return(0);
     return(min($maxhit, npc_param(max_dealt)));
 }
+if (~soulbane_tolna_npc = true & ~soulbane_tolna_attackable = false) return(0);
 if (npc_type = rd_combat_npc_room_3 & gender() = 0) {
     return(0);
 }
@@ -153,6 +154,7 @@ if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
 if (~soulbane_confusion_npc = true) return(~soulbane_confusion_attackable);
 if (~soulbane_hope_npc = true) return(~soulbane_hope_attackable);
+if (~soulbane_tolna_npc = true) return(~soulbane_tolna_attackable);
 if (npc_type = mudskipper_ogre) return(~slayer_skippy_unlocked);
 if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
 if (npc_type = icediamond_icewarrior) return(~dt_kamil_attackable);
@@ -269,6 +271,7 @@ if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
 if (~soulbane_confusion_npc = true) return(~soulbane_confusion_attackable);
 if (~soulbane_hope_npc = true) return(~soulbane_hope_attackable);
+if (~soulbane_tolna_npc = true) return(~soulbane_tolna_attackable);
 if (npc_type = mudskipper_ogre) return(~slayer_skippy_unlocked);
 if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
 if (npc_type = icediamond_icewarrior) return(~dt_kamil_attackable);

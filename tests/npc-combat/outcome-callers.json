@@ -40,6 +40,7 @@
       "[proc,soulbane_confusion_npc_attack]",
       "[proc,soulbane_hope_npc_attack]",
       "[proc,soulbane_rage_npc_attack]",
+      "[proc,soulbane_tolna_npc_attack]",
       "[proc,vampire_attack]"
     ],
     "npc_meleeattack": [

@@ -1,8 +1,26 @@
 // CANDIDATE wording: soulbane.dlg.launa in the research registry.
-// UNKNOWN engineering encoding: even stages enter a room, odd stages finish it.
+// UNKNOWN server stage encoding; final-room stages use the named constants.
 [opnpc1,soulbane_launa] @soulbane_launa;
 [opnpc1,soulbane_launa_multi] @soulbane_launa;
 [label,soulbane_launa]
+if (~soulbane_owned = false & (%soulbane_prog = ^soulbane_tolna_intro | %soulbane_prog = ^soulbane_tolna_active)) {
+    // CANDIDATE: sourced lines 41–46, while Tolna's fight is not yet complete.
+    ~chatplayer("<p,neutral>I've found your son.");
+    ~chatnpc("<p,neutral>You have?");
+    ~chatplayer("<p,neutral>And your husband, but I'm afraid your son is no longer physically what he once was.");
+    ~chatnpc("<p,neutral>Can you save them?");
+    ~chatplayer("<p,neutral>I will try.");
+    ~chatnpc("<p,neutral>Thank you.");
+    return;
+}
+if (~soulbane_owned = false & %soulbane_prog = ^soulbane_tolna_clear & %soulbane_tolna_pres ! 1) {
+    // CANDIDATE: sourced lines 55–58, before the human Tolna conversation.
+    ~chatplayer("<p,neutral>I have returned your son to his normal state!");
+    ~chatnpc("<p,neutral>And you've spoken to him?!?");
+    ~chatplayer("<p,neutral>Er, no, sorry. I just came back here to tell you.");
+    ~chatnpc("<p,neutral>What are you waiting for, bring him back to me!");
+    return;
+}
 switch_int (%soulbane_prog) {
     case 0 : @soulbane_launa_start;
     case 1 :

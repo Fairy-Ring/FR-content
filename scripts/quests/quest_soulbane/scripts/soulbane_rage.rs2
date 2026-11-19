@@ -3,6 +3,8 @@
 [oploc1,soulbane_falloff2_rope] @soulbane_rage_enter;
 [oploc1,soulbane_falloff2_rope_multi] @soulbane_rage_enter;
 [label,soulbane_rage_enter]
+// The separately scoped postquest dungeon is not a recycled quest room.
+if (%soulbane_prog = ^soulbane_complete) return;
 if (%soulbane_riftrope_pres ! 1 | %soulbane_prog < 1) {
     ~displaymessage(^dm_default);
     return;

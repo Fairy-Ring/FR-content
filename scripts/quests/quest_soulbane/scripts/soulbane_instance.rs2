@@ -3,7 +3,11 @@
 // UNKNOWN: exact geometry-copy layout, owner encoding and session UID.
 // Original 377 client maps/locs are copied; the engine copies no template NPCs.
 [proc,soulbane_enter]
-if (%soulbane_prog < 1 | %soulbane_prog > ^soulbane_hope_clear) return;
+if (%soulbane_prog < 1 | %soulbane_prog > ^soulbane_tolna_clear) return;
+if (%soulbane_prog >= ^soulbane_tolna_intro) {
+    ~soulbane_tolna_enter;
+    return;
+}
 ~soulbane_cleanup;
 def_coord $sw = region_create(^soulbane_region_levels, ^soulbane_region_zones, ^soulbane_region_zones);
 // Original four room quarters on level zero.
@@ -99,7 +103,7 @@ return(~soulbane_owned);
 [oploc1,soul_bane_hwall_void_small] @soulbane_hope_exit;
 [label,soulbane_exit]
 if (~soulbane_owned = false) return;
-if (%soulbane_prog = 2 | %soulbane_prog = 4 | %soulbane_prog = ^soulbane_confusion_active | %soulbane_prog = ^soulbane_hope_active) {
+if (%soulbane_prog = 2 | %soulbane_prog = 4 | %soulbane_prog = ^soulbane_confusion_active | %soulbane_prog = ^soulbane_hope_active | %soulbane_prog = ^soulbane_tolna_active) {
     if (~p_choice2_header("Yes, I don't mind starting this room again.", 1, "No, I'll finish this room first.", 2, "Do you wish to leave?") ! 1) return;
 }
 ~soulbane_leave;
@@ -128,6 +132,10 @@ clearqueue(soulbane_confusion_credit);
 clearqueue(soulbane_confusion_complete);
 clearqueue(soulbane_hope_credit);
 clearqueue(soulbane_hope_complete);
+clearqueue(soulbane_tolna_intro);
+clearqueue(soulbane_tolna_credit);
+clearqueue(soulbane_tolna_poison);
+~soulbane_tolna_clear_npcs;
 walktrigger(null);
 ~soulbane_clear_weapons;
 %soulbane_anger_damagedealt = 0;
@@ -136,6 +144,7 @@ walktrigger(null);
 ~soulbane_fear_reset;
 ~soulbane_confusion_reset;
 ~soulbane_hope_reset;
+~soulbane_tolna_reset;
 %soulbane_instance = 0;
 if_openoverlay(null);
 cam_reset;
@@ -148,6 +157,7 @@ cam_reset;
 ~soulbane_fear_reset;
 ~soulbane_confusion_reset;
 ~soulbane_hope_reset;
+~soulbane_tolna_reset;
 
 [proc,soulbane_clear_weapons]
 def_obj $old = inv_getobj(worn, ^wearpos_rhand);

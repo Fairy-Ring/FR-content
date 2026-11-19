@@ -84,7 +84,9 @@ npc_anim(lesspoisen, 0);
 spotanim_npc(soulbane_hope_launch, ^soulbane_hope_projectile_height, 0);
 def_int $duration = ~player_projectile(npc_coord, coord, uid, soulbane_hope_travel, ^soulbane_hope_projectile_height, ^soulbane_hope_projectile_endheight, ^soulbane_hope_projectile_delay, ^soulbane_hope_projectile_angle, 0, ^soulbane_hope_projectile_offset, ^soulbane_hope_projectile_step);
 spotanim_pl(soulbane_hope_impact, ^soulbane_hope_projectile_endheight, $duration);
-def_int $ticks = ~playerhit_n_ranged(^soulbane_hope_ranged_damage, $duration, npc_param(attackrate));
+// The native hit helper queues impact but leaves the attack cooldown to callers.
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+~playerhit_n_ranged(^soulbane_hope_ranged_damage, $duration, npc_param(attackrate));
 npc_setmode(applayer2);
 
 [ai_queue2,soulbane_hope_monst3] ~soulbane_hope_damage(last_int);

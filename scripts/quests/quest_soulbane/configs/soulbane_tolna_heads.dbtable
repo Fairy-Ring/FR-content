@@ -1,0 +1,6 @@
+// CANDIDATE selected later profile; UNKNOWN original stands and row encoding.
+[soulbane_tolna_heads]
+column=head,npc,INDEXED,REQUIRED
+column=stand,coord,REQUIRED
+column=melee_ticks,int,REQUIRED
+column=ranged_ticks,int,REQUIRED

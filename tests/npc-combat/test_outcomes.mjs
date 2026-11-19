@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createRequire } from 'node:module';
 import { runtime } from './outcome_runtime.mjs';
 
@@ -17,6 +17,7 @@ const option = name => { const i = process.argv.indexOf(name); return i < 0 ? nu
 const base = option('--base-pack');
 const reportFile = option('--report');
 const focused = process.argv.includes('--focused');
+const loadEngineModule = relative => import(pathToFileURL(path.join(engine, 'src', relative)).href);
 const registered = JSON.parse(fs.readFileSync(path.join(here, 'outcome-callers.json'), 'utf8'));
 const routeSeeds = JSON.parse(fs.readFileSync(path.join(here, 'outcome-route-seeds.json'), 'utf8'));
 const watched = ['npc_default_attack', 'npc_meleeattack', 'npc_rangeattack', 'npc_cast_spell', 'npc_cast_spell_with_forced_max_hit', 'npc_spell_success', 'playerhit_n_melee', 'playerhit_n_ranged', 'npc_player_hit_roll', 'npc_spell_cast', 'npc_combat_spell_checks', 'npc_freeze_allowed', 'npc_debuff_allowed', 'npc_spell_fail', 'npc_stat_change_effect', 'npc_freeze_effect'];
@@ -38,6 +39,15 @@ try {
   const fixturePack = path.join(temporary, 'engine/data/pack');
   const rt = await runtime(engine, pack);
   const { NpcType, VarPlayerType, VarNpcType } = rt.configs;
+  // Initialize World through runtime first; direct runner-first loading cycles
+  // through the engine's entity modules before NonPathingEntity is ready.
+  const ResumePauseButton = (await loadEngineModule('network/game/client/model/ResumePauseButton.ts')).default;
+  const ResumePauseButtonHandler = (await loadEngineModule('network/game/client/handler/ResumePauseButtonHandler.ts')).default;
+  const resumePauseButtonHandler = new ResumePauseButtonHandler();
+  const ScriptRunner = (await loadEngineModule('engine/script/ScriptRunner.ts')).default;
+  const ScriptPointer = (await loadEngineModule('engine/script/ScriptPointer.ts')).default;
+  const ServerTriggerType = (await loadEngineModule('engine/script/ServerTriggerType.ts')).default;
+  const JavaRandom = (await loadEngineModule('util/JavaRandom.ts')).default;
   const wind = rt.spell('wind_strike'), curse = rt.spell('confuse'), freeze = rt.spell('bind');
   const spellId = row => rt.field(row, 'spell');
   const inventory = rt.inventory(content, watched);
@@ -52,9 +62,9 @@ try {
     }
     for (const name of ['npc_meleeattack_outcome', 'npc_default_attack_outcome', 'npc_rangeattack_outcome', 'npc_cast_spell_outcome']) assert(namedProcs.has(`[proc,${name}]`), name);
   });
-  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null) {
+  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null, fixtureType = type) {
     rt.select(directory);
-    const f = rt.fixture(type, variant, style, distance);
+    const f = rt.fixture(fixtureType, variant, style, distance);
     let cleanup;
     try {
       if (configure) {
@@ -76,15 +86,15 @@ try {
     const added = Object.fromEntries([...new Set([...Object.keys(before.commands), ...Object.keys(after.commands)])].map(op => [op, (after.commands[op] ?? 0) - (before.commands[op] ?? 0)]).filter(([, count]) => count));
     report.costs.push({ ...metadata, before: before.opcount, after: after.opcount, added });
   }
-  function differential(type, name, args, variant, style, metadata = {}, configure = null, distance = 1, rng = null) {
-    const head = execute(pack, type, name, args, variant, style, configure, distance, rng);
-    if (base) {
-      const before = execute(base, type, name, args, variant, style, configure, distance, rng);
+  function differential(type, name, args, variant, style, metadata = {}, configure = null, distance = 1, rng = null, compareBase = true, fixtureType = type) {
+    const head = execute(pack, type, name, args, variant, style, configure, distance, rng, fixtureType);
+    if (base && compareBase) {
+      const before = execute(base, type, name, args, variant, style, configure, distance, rng, fixtureType);
       same(head, before, `${type} ${name} ${variant}`, true);
       cost(before, head, { npc: type, entry: name, variant, style, ...metadata });
     }
     report.cases.push({
-      npc: type, entry: name, variant, style, comparison: base ? 'base=head' : 'current-pack',
+      npc: type, entry: name, variant, style, comparison: base && compareBase ? 'base=head' : 'current-pack',
       draws: head.draws.length, randomSources: [...head.randomSources, ...head.settled.randomSources], randomCommands: [...head.events, ...head.settled.events].filter(e => e.op === 'RANDOM' || e.op === 'RANDOMINC'),
       queued: head.snapshot.queued, receivedHP: head.settled.levels[3],
       effects: head.events.filter(e => /QUEUE|^MES|STAT_(ADD|SUB)|^IF_CLOSE|^RUNENERGY|^NPC_SETMODE/.test(e.op)),
@@ -239,6 +249,12 @@ try {
     for (const stat of [1, 6]) { f.player.levels[stat] = 20; f.player.baseLevels[stat] = 20; }
     if (route.equipment) f.player.invAdd(rt.id(rt.configs.InvType, 'worn'), rt.id(rt.configs.ObjType, route.equipment), 1);
     for (const [name, value] of Object.entries(route.playerVars ?? {})) {
+      if (route.prelude === 'soulbane-tolna-intro' && name === 'soulbane_prog') {
+        assert.equal(value, 9, `${route.script}: only the disclosed stage-9 prerequisite is seeded`);
+        // stage 9 seeded as a prerequisite; not a progression proof
+        f.player.setVarBit(rt.id(rt.configs.VarBitType, 'soulbane_prog'), value);
+        continue;
+      }
       const id = VarPlayerType.getId(name);
       if (id >= 0) f.player.setVar(id, value);
       else f.player.setVarBit(rt.id(rt.configs.VarBitType, name), value);
@@ -259,26 +275,39 @@ try {
           loadedRegionMaps.add(mapsquare);
         }
         const before = rt.World.instances.instances.length;
+        const beforeNpcCount = [...rt.World.npcs].length;
+        const createdInstances = [];
         const entered = rt.run(enter, f);
         assert.equal(entered.state.execution, rt.State.FINISHED, `${enter} creates the native quest region`);
         const instance = rt.World.instances.findInstanceByCoord(f.player);
         assert(instance, `${enter} puts the player in its region`);
+        createdInstances.push(instance);
         cleanup = () => {
-          const left = rt.run(leave, f);
-          assert.equal(left.state.execution, rt.State.FINISHED, `${leave} finishes`);
-          assert.equal(rt.World.instances.findInstanceByUid(instance.uid), null, 'route region is torn down');
+          const activeInstance = rt.World.instances.findInstanceByCoord(f.player);
+          if (activeInstance) {
+            const left = rt.run(leave, f);
+            assert.equal(left.state.execution, rt.State.FINISHED, `${leave} finishes`);
+          }
+          for (const created of createdInstances) {
+            assert(!rt.World.instances.instances.includes(created), 'every native route region is torn down');
+          }
           assert.equal(rt.World.instances.instances.length, before, 'route leaks no region');
+          if (route.prelude === 'soulbane-tolna-intro') assert.equal([...rt.World.npcs].length, beforeNpcCount, 'Tolna route teardown preserves the NPC count');
         };
         if (route.privateRegion.spawn) {
           const spawned = rt.run(route.privateRegion.spawn, f);
           assert.equal(spawned.state.execution, rt.State.FINISHED, `${route.privateRegion.spawn} creates the native encounter`);
         }
-        if (route.prelude) advanceHopeLives(f, route, instance);
-        f.npc = [...rt.World.npcs].find(npc => npc.type === f.npc.type && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
-        assert(f.npc, `${enter} spawns the route's native NPC`);
-        const tile = (f.npc.level << 28) | ((f.npc.x - 1) << 14) | f.npc.z;
-        const moved = rt.run('[proc,p_telejump_safe]', f, [tile]);
-        assert.equal(moved.state.execution, rt.State.FINISHED, 'native teleport places the combat fixture adjacent');
+        if (route.prelude === 'soulbane-hope-lives') advanceHopeLives(f, route, instance);
+        else if (route.prelude === 'soulbane-tolna-intro') advanceTolnaIntro(f, route, instance, createdInstances, before);
+        else assert.equal(route.prelude, undefined, `${route.script}: known native route prelude`);
+        if (route.prelude !== 'soulbane-tolna-intro') {
+          f.npc = [...rt.World.npcs].find(npc => npc.type === f.npc.type && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
+          assert(f.npc, `${enter} spawns the route's native NPC`);
+          const tile = (f.npc.level << 28) | ((f.npc.x - 1) << 14) | f.npc.z;
+          const moved = rt.run('[proc,p_telejump_safe]', f, [tile]);
+          assert.equal(moved.state.execution, rt.State.FINISHED, 'native teleport places the combat fixture adjacent');
+        }
       }
       for (const [name, value] of Object.entries(route.npcVars ?? {})) f.npc.setVar(rt.id(VarNpcType, name), value === 'target' ? f.player.uid : value);
       rt.run('[proc,player_combat_stat]', f);
@@ -287,6 +316,287 @@ try {
       cleanup?.();
       throw error;
     }
+  }
+  const tolnaProfiles = {
+    soulbane_tolna_south: { head: 'soulbane_final_tolna1', meleeTicks: 8, rangedTicks: 7, attackRate: 8, damageType: 1 },
+    soulbane_tolna_east: { head: 'soulbane_final_tolna2', meleeTicks: 0, rangedTicks: 5, attackRate: 5, damageType: null },
+    soulbane_tolna_north: { head: 'soulbane_final_tolna3', meleeTicks: 3, rangedTicks: 20, attackRate: 3, damageType: 0 }
+  };
+  function tolnaRowValue(row, name) {
+    const table = rt.configs.DbTableType.getByName('soulbane_tolna_heads');
+    assert(table, 'packed Tolna head profile table');
+    const column = table.columnNames.indexOf(name);
+    assert(column >= 0, `Tolna profile column ${name}`);
+    return row.getValue(column, 0)[0];
+  }
+  function assertTolnaSourceProfile(f, head, profileName) {
+    const expected = tolnaProfiles[profileName];
+    assert(expected, `source profile ${profileName}`);
+    const config = NpcType.getByName(expected.head);
+    assert(config, `packed head ${expected.head}`);
+    assert.equal(head.type, config.id, `${profileName} native head type`);
+    assert.deepEqual(Array.from(config.stats), [42, 40, 41, 37, 1, 1], `${profileName} source combat levels`);
+    assert.deepEqual(Array.from(head.levels), [42, 40, 41, 37, 1, 1], `${profileName} spawned combat levels`);
+    assert.equal(head.levels[3], 37, `${profileName} starts at its native 37 HP`);
+    assert.equal(rt.param(config, 'attackrate'), expected.attackRate, `${profileName} native attack interval`);
+    for (const [name, value] of Object.entries({
+      attackbonus: 0, strengthbonus: 0, rangeattack: 0, rangebonus: 0,
+      stabdefence: 0, slashdefence: 0, crushdefence: 0, magicdefence: 50, rangedefence: 50
+    })) assert.equal(rt.param(config, name), value, `${profileName} source ${name}`);
+    if (expected.damageType !== null) assert.equal(rt.param(config, 'damagetype'), expected.damageType, `${profileName} source melee damage style`);
+
+    const row = rt.configs.DbRowType.getByName(profileName);
+    assert(row, `packed profile row ${profileName}`);
+    assert.equal(tolnaRowValue(row, 'head'), config.id, `${profileName} maps to its head`);
+    assert.equal(tolnaRowValue(row, 'melee_ticks'), expected.meleeTicks, `${profileName} source melee interval`);
+    assert.equal(tolnaRowValue(row, 'ranged_ticks'), expected.rangedTicks, `${profileName} source ranged interval`);
+    const resolved = rt.run('[proc,soulbane_tolna_headrow]', { npc: head, player: f.player });
+    assert.equal(resolved.state.execution, rt.State.FINISHED, `${profileName} typed native profile lookup`);
+    assert.deepEqual(resolved.values, [row.id], `${profileName} is selected by the native typed lookup`);
+  }
+  function finishQueuedTolnaIntro(player) {
+    const intro = '[queue,soulbane_tolna_intro]';
+    const queued = () => [...player.queue.all()].filter(request => request.script.name === intro);
+    assert.equal(queued().length, 1, 'native forward exit queues the intro once');
+    for (let boundary = 0; boundary < 256; boundary++) {
+      const state = player.activeScript;
+      if (!state) {
+        if (queued().length === 0) break;
+        rt.World.currentTick++;
+        player.processQueues();
+        continue;
+      }
+      if (state.execution === rt.State.PAUSEBUTTON) {
+        assert(resumePauseButtonHandler.handle(new ResumePauseButton(0), player), 'native Continue resumes the Tolna intro');
+        continue;
+      }
+      if (state.execution === rt.State.SUSPENDED) {
+        rt.World.currentTick = Math.max(rt.World.currentTick + 1, player.delayedUntil);
+        player.delayed = false;
+        player.executeScript(state, true, true);
+        continue;
+      }
+      assert.fail(`native Tolna intro stopped at execution state ${state.execution}`);
+    }
+    assert.equal(player.activeScript, null, 'native Tolna intro continuation completes');
+    assert.equal(queued().length, 0, 'native Tolna intro queue drains');
+  }
+  function advanceTolnaIntro(f, route, primary, createdInstances, regionCountBefore) {
+    assert.equal(route.prelude, 'soulbane-tolna-intro', 'known native Tolna route prelude');
+    const stage = rt.id(rt.configs.VarBitType, 'soulbane_prog');
+    assert.equal(f.player.getVarBit(stage), 9, 'the disclosed prerequisite enters the native final-hole boundary');
+    const transition = rt.run('[oploc1,soul_bane_hwall_void_exit]', f);
+    assert.equal(transition.state.execution, rt.State.FINISHED, 'compiled stage-9 forward-hole handler runs');
+    assert.equal(f.player.getVarBit(stage), 10, 'native forward-hole handler writes the intro stage');
+    const arena = rt.World.instances.findInstanceByCoord(f.player);
+    assert(arena, 'native forward-hole handler enters the final arena instance');
+    assert.notEqual(arena, primary, 'native forward-hole handler replaces the primary instance');
+    createdInstances.push(arena);
+    assert(!rt.World.instances.instances.includes(primary), 'native forward-hole replacement tears down the primary instance');
+    assert(rt.World.instances.instances.includes(arena), 'the final arena remains live for its native intro');
+    assert.equal(rt.World.instances.instances.length, regionCountBefore + 1, 'native replacement retains one route region');
+
+    const instanceVar = rt.id(VarPlayerType, 'soulbane_instance');
+    const owner = rt.id(VarNpcType, 'npc_attacking_uid');
+    const marker = rt.id(VarNpcType, 'npc_int');
+    const handle = f.player.getVar(instanceVar);
+    assert.equal(handle, arena.uid + 1, 'native final arena publishes its one-based owner handle');
+    const heads = new Map();
+    for (const [profile, expected] of Object.entries(tolnaProfiles)) {
+      const type = rt.id(NpcType, expected.head);
+      const matches = [...rt.World.npcs].filter(npc => npc.isActive && npc.type === type
+        && (npc.getVar(owner) >>> 0) === f.player.uid
+        && npc.getVar(marker) === handle
+        && rt.World.instances.findInstanceByCoord(npc) === arena);
+      assert.equal(matches.length, 1, `${expected.head} is spawned once and owner-bound in the final arena`);
+      heads.set(expected.head, matches[0]);
+      assertTolnaSourceProfile(f, matches[0], profile);
+    }
+    const branaType = rt.id(NpcType, 'soulbane_brana');
+    const brana = [...rt.World.npcs].filter(npc => npc.isActive && npc.type === branaType
+      && (npc.getVar(owner) >>> 0) === f.player.uid
+      && npc.getVar(marker) === handle
+      && rt.World.instances.findInstanceByCoord(npc) === arena);
+    assert.equal(brana.length, 1, 'native intro Brana is spawned and owner-bound in the final arena');
+
+    finishQueuedTolnaIntro(f.player);
+    assert.equal(f.player.getVarBit(stage), 11, 'native intro continuations activate the actual fight');
+    assert.equal(f.player.getVarBit(rt.id(rt.configs.VarBitType, 'soulbane_final_seencut')), 1, 'native intro records its own scene completion');
+    const aggressivePlayer = rt.id(VarNpcType, 'npc_aggressive_player');
+    for (const head of heads.values()) assert.equal(head.getVar(aggressivePlayer) >>> 0, f.player.uid, 'native intro starts each actual head');
+
+    assert.equal(route.profile, Object.keys(tolnaProfiles).find(profile => tolnaProfiles[profile].head === route.npc), `${route.script} selects its source profile`);
+    assert.equal(route.stand, route.style, `${route.script} uses its declared combat stand`);
+    const head = heads.get(route.npc);
+    assert(head, `${route.script} selects a native spawned head`);
+    f.npc = head;
+    assert.equal(head.width, 3, `${route.npc} retains its source 3-tile width`);
+    assert.equal(head.length, 3, `${route.npc} retains its source 3-tile length`);
+    const stand = route.stand === 'melee'
+      ? { x: head.x, z: head.z - 1 }
+      : { x: f.player.x, z: f.player.z };
+    assert(['melee', 'ranged'].includes(route.stand), `${route.script} selects a supported declared stand`);
+    const tile = (head.level << 28) | (stand.x << 14) | stand.z;
+    const moved = rt.run('[proc,p_telejump_safe]', f, [tile]);
+    assert.equal(moved.state.execution, rt.State.FINISHED, `${route.script} places the player on its declared combat stand`);
+    assert.deepEqual([f.player.level, f.player.x, f.player.z], [head.level, stand.x, stand.z], `${route.script} reaches the exact declared combat stand`);
+    const inMeleeRange = rt.run('[proc,soulbane_tolna_melee_range]', f);
+    assert.equal(inMeleeRange.state.execution, rt.State.FINISHED, `${route.script} evaluates the native melee predicate`);
+    assert.deepEqual(inMeleeRange.values, [Number(route.style === 'melee')], `${route.script} stand selects the intended native style`);
+  }
+  function assertTolnaRouteStyle(result, route, branch) {
+    const visited = new Set(result.visited);
+    assert(visited.has('[proc,soulbane_tolna_npc_attack]'), `${route.script} enters the native head attack`);
+    if (route.style === 'melee') {
+      assert(visited.has('[proc,npc_default_attack]'), `${route.script} uses native melee attack`);
+      assert(visited.has('[proc,npc_meleeattack]'), `${route.script} uses the native npc_meleeattack resolver`);
+      assert(!visited.has('[proc,soulbane_tolna_ranged]'), `${route.script} does not fall through to Ranged`);
+      return;
+    }
+    assert(visited.has('[proc,soulbane_tolna_ranged]'), `${route.script} uses the native Tolna Ranged path`);
+    assert(visited.has('[proc,npc_ranged_attack_roll]'), `${route.script} uses native Ranged accuracy`);
+    assert(visited.has('[proc,player_defence_roll_specific]'), `${route.script} uses native style-specific defence`);
+    const rolls = result.events.filter(event => event.op === 'RANDOMINC');
+    assert.equal(rolls.length, branch === 'miss' ? 2 : 3, `${route.script} retains the native accuracy and damage draws`);
+    if (branch !== 'miss') assert.equal(rolls[2].in[0], 5, `${route.script} retains the native five-point Ranged maximum`);
+  }
+  function runNativePlayerTrigger(name, f, values) {
+    const script = rt.Provider.getByName(name);
+    assert(script, `packed native player trigger ${name}`);
+    const state = ScriptRunner.init(script, f.player, f.npc);
+    state.pointerAdd(ScriptPointer.ProtectedActivePlayer);
+    const originalRandom = JavaRandom.nextDouble;
+    let cursor = 0;
+    JavaRandom.nextDouble = () => {
+      assert(cursor < values.length, `${name}: no unplanned random draws`);
+      return values[cursor++];
+    };
+    try { f.player.executeScript(state, true, true); }
+    finally { JavaRandom.nextDouble = originalRandom; }
+    assert.equal(state.execution, rt.State.FINISHED, `${name} finishes as a native player attack`);
+    assert.equal(cursor, values.length, `${name} consumes the expected native attack draws`);
+    return state;
+  }
+  function pumpTolnaNpcQueues(f, head, complete, limit = 64) {
+    const originalRandom = JavaRandom.nextDouble;
+    const originalMathRandom = Math.random;
+    JavaRandom.nextDouble = () => 0;
+    Math.random = () => 0;
+    try {
+      for (let tick = 0; tick < limit; tick++) {
+        rt.World.processNpcEventQueue();
+        if (head.isActive) head.turn();
+        f.player.processQueues();
+        if (complete()) return;
+        rt.World.currentTick++;
+      }
+      assert(complete(), 'native Tolna queue drains within its ordinary event boundaries');
+    } finally {
+      JavaRandom.nextDouble = originalRandom;
+      Math.random = originalMathRandom;
+    }
+  }
+  function exerciseTolnaNativePoison(f, route) {
+    const instance = rt.World.instances.findInstanceByCoord(f.player);
+    assert(instance, 'native poison fixture remains in its actual arena');
+    const owner = rt.id(VarNpcType, 'npc_attacking_uid');
+    const marker = rt.id(VarNpcType, 'npc_int');
+    const handle = f.player.getVar(rt.id(VarPlayerType, 'soulbane_instance'));
+    const heads = [...rt.World.npcs].filter(npc => npc.isActive
+      && Object.values(tolnaProfiles).some(profile => npc.type === rt.id(NpcType, profile.head))
+      && (npc.getVar(owner) >>> 0) === f.player.uid
+      && npc.getVar(marker) === handle
+      && rt.World.instances.findInstanceByCoord(npc) === instance);
+    assert.equal(heads.length, 3, 'native poison fixture retains all three actual heads');
+    const head = heads.find(npc => npc.type === rt.id(NpcType, route.npc));
+    assert(head, 'native melee target is one of the actual spawned heads');
+    assert.equal(f.npc, head, 'native player trigger targets the route-selected head');
+
+    const weapon = rt.configs.ObjType.getByName('rune_dagger_p');
+    assert(weapon, 'packed poisonous Rune dagger');
+    const severity = rt.param(weapon, 'poison_severity');
+    assert(severity > 0, 'packed weapon has native poison severity');
+    const worn = rt.id(rt.configs.InvType, 'worn');
+    f.player.invSet(worn, weapon.id, 1, weapon.wearpos);
+    assert.equal(f.player.invGetSlot(worn, weapon.wearpos)?.id, weapon.id, 'fixture equips the real poisoned melee weapon');
+    rt.run('[proc,player_combat_stat]', f);
+
+    const poison = rt.id(VarNpcType, 'npc_poison');
+    const hpBefore = new Map(heads.map(npc => [npc, npc.levels[3]]));
+    assert.equal(head.getVar(poison), 0, 'native poison starts absent on the actual target');
+    assert.equal(head.levels[3], 37, 'actual target keeps source HP until its ordinary queued hit');
+    const trigger = `[opnpc2,${route.npc}]`;
+    runNativePlayerTrigger(trigger, f, [0.999999, 0, 0.999999, 0]);
+    const damageQueue = [...head.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE2);
+    assert.equal(damageQueue.length, 1, 'real player attack queues exactly one native AI_QUEUE2 damage input');
+    assert(damageQueue[0].lastInt > 0, 'real player attack queues positive damage');
+    assert.equal(head.getVar(poison), severity, 'real weapon poison enters through native npc_poison_start');
+
+    const poisonQueueName = '[queue,soulbane_tolna_poison]';
+    const poisonRequests = () => [...f.player.queue.all()].filter(request => request.script.name === poisonQueueName);
+    const originalRandom = JavaRandom.nextDouble;
+    const originalMathRandom = Math.random;
+    JavaRandom.nextDouble = () => 0;
+    Math.random = () => 0;
+    try {
+      let queued = false;
+      for (let tick = 0; tick < 32 && !queued; tick++) {
+        rt.World.processNpcEventQueue();
+        if (head.isActive) head.turn();
+        queued = poisonRequests().length > 0;
+        if (!queued) rt.World.currentTick++;
+      }
+      assert.equal(poisonRequests().length, 1, 'native AI_QUEUE2 damage hands poison to the owner player queue');
+      assert(head.levels[3] < hpBefore.get(head), 'native queued damage reduces the actual head HP');
+      f.player.processQueues();
+      assert.equal(poisonRequests().length, 0, 'native owner poison queue drains');
+    } finally {
+      JavaRandom.nextDouble = originalRandom;
+      Math.random = originalMathRandom;
+    }
+    for (const npc of heads) {
+      assert.equal(npc.getVar(poison), severity, 'native owner queue poisons every live owner-bound head');
+      assert.equal(npc.timerInterval, 30, 'native poison uses the published NPC timer');
+    }
+    for (const npc of heads.filter(actor => actor !== head)) {
+      assert.equal(npc.levels[3], hpBefore.get(npc), 'poison admission does not directly alter a second head HP');
+    }
+
+    const poisonDamage = Math.floor((severity - 1 + 4) / 5);
+    for (const npc of heads) {
+      const before = npc.levels[3];
+      const ticksUntilTimer = Math.max(1, npc.timerInterval - npc.timerClock);
+      const timerRandom = JavaRandom.nextDouble;
+      const timerMathRandom = Math.random;
+      JavaRandom.nextDouble = () => 0;
+      Math.random = () => 0;
+      try {
+        for (let tick = 0; tick < ticksUntilTimer; tick++) {
+          rt.World.currentTick++;
+          rt.World.processNpcEventQueue();
+          npc.turn();
+          f.player.processQueues();
+        }
+      } finally {
+        JavaRandom.nextDouble = timerRandom;
+        Math.random = timerMathRandom;
+      }
+      assert.equal(npc.getVar(poison), severity - 1, 'native poison timer decrements its own status');
+      assert.equal(npc.levels[3], before - poisonDamage, 'native poison timer applies its ordinary damage');
+    }
+
+    const stage = rt.id(rt.configs.VarBitType, 'soulbane_prog');
+    const deathBit = rt.id(rt.configs.VarBitType, 'soulbane_final_tol1dead');
+    assert.equal(f.player.getVarBit(stage), 11, 'native combat remains active before the queued death input');
+    assert.equal(f.player.getVarBit(deathBit), 0, 'native death credit starts unset');
+    head.enqueueScript(ServerTriggerType.AI_QUEUE2, 0, head.levels[3]);
+    pumpTolnaNpcQueues(f, head, () => f.player.getVarBit(deathBit) === 1);
+    assert.equal(head.levels[3], 0, 'native queued damage actually kills the selected head');
+    assert.equal(f.player.getVarBit(deathBit), 1, 'native death queue records only its own head');
+    for (const name of ['soulbane_final_tol2dead', 'soulbane_final_tol3dead']) {
+      assert.equal(f.player.getVarBit(rt.id(rt.configs.VarBitType, name)), 0, 'native death does not credit another head');
+    }
+    assert.equal(f.player.getVarBit(stage), 11, 'one native death does not clear the fight');
   }
   function dispatchBranch(result) {
     const hits = result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]');
@@ -297,13 +607,47 @@ try {
   }
   for (const route of routeSeeds.routes.filter(r => !focused || npcs.some(n => n.npc === r.npc))) {
     const branches = [];
+    const style = route.style ?? 'melee';
+    const nativeTolna = route.prelude === 'soulbane-tolna-intro';
     for (const [branch, seed] of Object.entries(route.seeds)) check(`${route.script} seeded ${branch}`, () => {
-      const result = differential(route.npc, route.script, [], 'seeded', 'melee', { routeBranch: branch, seed }, f => configureRoute(f, route), route.distance ?? 1, { seed });
+      const result = differential(route.npc, route.script, [], 'seeded', style,
+        { routeBranch: branch, seed, profile: route.profile, stand: route.stand },
+        f => configureRoute(f, route), route.distance ?? 1, { seed }, !nativeTolna, nativeTolna ? 'cow' : route.npc);
       assert.equal(dispatchBranch(result), branch, `${route.script} seed=${seed}`);
+      if (nativeTolna) assertTolnaRouteStyle(result, route, branch);
       branches.push({ branch, seed, accuracy: result.accuracy, queued: result.snapshot.queued, error: result.snapshot.error });
     });
-    report.routeCoverage.push({ script: route.script, npc: route.npc, branches, unsupportedBranches: route.unsupportedBranches ?? {} });
+    report.routeCoverage.push({ script: route.script, npc: route.npc, style, profile: route.profile, stand: route.stand, branches, unsupportedBranches: route.unsupportedBranches ?? {} });
   }
+  check('Tolna native route manifest covers the five source styles', () => {
+    const tolnaRoutes = routeSeeds.routes.filter(route => route.prelude === 'soulbane-tolna-intro');
+    const expected = {
+      soulbane_final_tolna1: ['melee', 'ranged'],
+      soulbane_final_tolna2: ['ranged'],
+      soulbane_final_tolna3: ['melee', 'ranged']
+    };
+    assert.equal(tolnaRoutes.length, 6, 'both native player attack triggers are registered for each head');
+    for (const [head, styles] of Object.entries(expected)) {
+      const routes = tolnaRoutes.filter(route => route.npc === head);
+      assert.deepEqual([...new Set(routes.map(route => route.style))].sort(), [...styles].sort(), `${head} retains only its source-backed styles`);
+      assert.deepEqual(routes.map(route => route.script).sort(), [`[ai_applayer2,${head}]`, `[ai_opplayer2,${head}]`], `${head} covers both native dispatch triggers`);
+      for (const route of routes) assert.equal(route.stand, route.style, `${route.script} pairs its production style with its disclosed stand`);
+    }
+  });
+  const poisonRoute = routeSeeds.routes.find(route => route.npc === 'soulbane_final_tolna1' && route.style === 'melee');
+  assert(poisonRoute, 'native South melee route anchors the ordinary poison fixture');
+  check('Tolna ordinary queued hit shares native poison and retains HP/death', () => {
+    rt.select(pack);
+    const f = rt.fixture('cow', 'seeded', 'melee');
+    let cleanup;
+    try {
+      cleanup = configureRoute(f, poisonRoute);
+      exerciseTolnaNativePoison(f, poisonRoute);
+    } finally {
+      try { cleanup?.(); }
+      finally { rt.dispose(); }
+    }
+  });
   // Every readiness/admission has a refusing fixture as well as an admission.
   for (const [style, type] of [['melee', 'cow'], ['ranged', 'ardougne_archer'], ['magic', 'bearded_dark_wizard']]) {
     const ordinaryName = style === 'melee' ? 'npc_default_attack' : style === 'ranged' ? 'npc_rangeattack' : 'npc_cast_spell';

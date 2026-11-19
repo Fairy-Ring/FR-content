@@ -80551,37 +80551,6 @@ vislevel=hide
 op1=Talk-to
 head1=obj_pickpocket_guide_fham
 
-[soulbane_brana]
-name=Brana
-desc=An old man.
-model1=npc_1918
-model2=obj_feud_desert_disguise_manwear
-model3=idk_man_jaw_goatee
-model4=obj_macro_prince_torso_manwear
-model5=npc_1805i3
-model6=obj_leather_vambraces_manwear
-model7=npc_1071i2
-model8=obj_macro_mime_legs_manwear
-model9=idk_42
-recol1s=6273
-recol1d=29596
-recol2s=2340
-recol2d=21003
-recol3s=7298
-recol3d=5285
-recol4s=14724
-recol4d=13605
-recol5s=2472
-recol5d=11490
-recol6s=30618
-recol6d=16881
-vislevel=hide
-walkanim=walk_walkingstick,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_staffready
-op1=Talk-to
-head1=obj_leather_cowl_manhead2
-head2=idk_man_jaw_goatee_head
-head3=npc_1918_head
 
 [soulbane_tolna_multi]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -80591,32 +80560,6 @@ op1=Talk-to
 multivar=soulbane_tolna_pres
 multinpc=1,soulbane_tolna_top
 
-[soulbane_tolna_top]
-name=Tolna
-desc=Where did his boot go?
-model1=idk_man_hair_medium
-model2=npc_harlow
-model3=obj_priest_gown_manwear
-model4=obj_doctor_gown_manwear2
-model5=obj_leather_vambraces_manwear
-model6=idk_man_legs_tatty
-model7=npc_2796
-recol1s=14724
-recol1d=266
-recol2s=2340
-recol2d=22050
-recol3s=7298
-recol3d=3138
-recol4s=14801
-recol4d=3138
-recol5s=6273
-recol5d=10469
-vislevel=hide
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_ready
-op1=Talk-to
-head1=obj_pickpocket_guide_farmer
-head2=npc_harlow_head
 
 [soulbane_tolnaboy]
 name=Tolna
@@ -80639,47 +80582,8 @@ readyanim=midget_ready
 alwaysontop=yes
 head1=npc_3644_head
 
-[soulbane_final_tolna1]
-name=Tolna
-desc=Is that really Tolna?
-model1=spot_neck_death_spot
-size=3
-walkanim=neckready
-readyanim=neckready
-op2=Attack
-vislevel=46
-hitpoints=37
-attack=42
-strength=41
-defence=40
 
-[soulbane_final_tolna2]
-name=Tolna
-desc=Is that really Tolna?
-model1=spot_neck_death_spot
-size=3
-walkanim=neckready
-readyanim=neckready
-op2=Attack
-vislevel=46
-hitpoints=37
-attack=42
-strength=41
-defence=40
 
-[soulbane_final_tolna3]
-name=Tolna
-desc=Is that really Tolna?
-model1=spot_neck_death_spot
-size=3
-walkanim=neckready
-readyanim=neckready
-op2=Attack
-vislevel=46
-hitpoints=37
-attack=42
-strength=41
-defence=40
 
 [soulbane_unicorn]
 name=Angry unicorn
