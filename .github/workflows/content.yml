@@ -246,6 +246,7 @@ jobs:
           run_test tests/ordinary-traversal/test_doors.mjs env NODE_PRODUCTION=true NODE_MEMBERS=true NODE_XPRATE=1 bash -c 'node --import tsx ../content/tests/ordinary-traversal/test_doors.mjs && node --import tsx ../content/tests/ordinary-traversal/test_vertical.mjs && node --import tsx ../content/tests/ordinary-traversal/test_picklock_rate.mjs'
           run_test tests/ordinary-search/test_ordinary_search.mjs env NODE_PRODUCTION=true NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/ordinary-search/test_ordinary_search.mjs
           run_test tests/ordinary-scenery/test_ordinary_scenery.mjs env NODE_PRODUCTION=true NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/ordinary-scenery/test_ordinary_scenery.mjs
+          run_test tests/ordinary-proposals/test_ordinary_proposals.mjs env NODE_PRODUCTION=true NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/ordinary-proposals/test_ordinary_proposals.mjs
           run_test tests/abyss/test_rift_exits.mjs node --import tsx ../content/tests/abyss/test_rift_exits.mjs
           run_test tests/swamp-caves/test_sc01_lights.mjs node --import tsx ../content/tests/swamp-caves/test_sc01_lights.mjs
           run_test tests/swamp-caves/test_sc02_seller.mjs node --import tsx ../content/tests/swamp-caves/test_sc02_seller.mjs
