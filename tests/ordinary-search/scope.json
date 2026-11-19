@@ -1,16 +1,6 @@
 {
   "search": [
     {
-      "name": "mm_bookcase",
-      "slot": 2,
-      "family": "bookcase",
-      "x": 2771,
-      "z": 2788,
-      "level": 0,
-      "shape": 10,
-      "angle": 2
-    },
-    {
       "name": "ahoy_boxes_1",
       "slot": 1,
       "family": "empty_boxes",
@@ -132,6 +122,18 @@
     }
   ],
   "specific": [
+    {
+      "name": "mm_bookcase",
+      "slot": 2,
+      "placements": [
+        {"level": 0, "x": 2771, "z": 2788, "shape": 10, "angle": 2},
+        {"level": 0, "x": 2776, "z": 2766, "shape": 10, "angle": 3},
+        {"level": 0, "x": 2779, "z": 2792, "shape": 10, "angle": 0},
+        {"level": 0, "x": 3656, "z": 2978, "shape": 10, "angle": 1},
+        {"level": 0, "x": 3674, "z": 2988, "shape": 10, "angle": 0},
+        {"level": 1, "x": 3701, "z": 2993, "shape": 10, "angle": 3}
+      ]
+    },
     {
       "name": "fai_wiztower_bookcase",
       "slot": 1,

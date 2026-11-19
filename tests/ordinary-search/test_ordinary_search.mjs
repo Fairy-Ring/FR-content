@@ -141,7 +141,22 @@ for (const row of manifest.specific ?? []) {
       }
     }
     assert(approaches.length, `${row.name} has an original collision-clear approach on floor ${placement.level}`);
+    if (row.name === 'mm_bookcase') {
+      for (const random of [0, 0.3, 0.6, 0.9]) {
+        const f = fixture({ ...placement, name: row.name });
+        const script = select(f, row.slot);
+        assert.equal(script?.name, '[oploc2,mm_bookcase]', 'bamboo bookcases select their own Search, never the generic family');
+        const inventory = [...f.p.getInventory(id(InvType, 'inv')).items];
+        const vars = [...f.p.vars];
+        execute(f, script, random);
+        assert.deepEqual(f.messages, ['You find nothing to suit your reading tastes here.'], 'bamboo Search gives only its sourced message, never a generic line');
+        assert.deepEqual([...f.p.getInventory(id(InvType, 'inv')).items], inventory, 'bamboo Search gives no item');
+        assert.deepEqual([...f.p.vars], vars, 'bamboo Search writes no quest state');
+      }
+      console.log(`PASS bamboo Search ${placement.x},${placement.z},L${placement.level}`);
+    }
   }
+  if (row.name === 'mm_bookcase') continue;
   for (let index = 0; index < wizardTitles.length; index++) {
     const f = fixture({ ...row.placements[0], name: row.name });
     const script = select(f, row.slot);
