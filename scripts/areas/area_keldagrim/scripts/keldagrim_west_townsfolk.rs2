@@ -284,8 +284,8 @@ if ($menu_stage = 0) {
     if ($choice = 1) {
         ~chatplayer("<p,neutral>What's down this river?");
         ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Oh, you don't know?");
-        ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral><text_gender(\"He\", \"She\")> doesn't know?");
-        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral><text_gender(\"He\", \"She\")> doesn't know!");
+        ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral><text_gender("He", "She")> doesn't know?");
+        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral><text_gender("He", "She")> doesn't know!");
         ~chatplayer("<p,neutral>Can't you just tell me?");
         ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>It is our glorious city!");
         ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>The grand city of the dwarves!");
@@ -297,8 +297,8 @@ if ($menu_stage = 0) {
         ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>You have to keep busy, you see.");
         ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Always keep busy, is what our good father used to say.");
         ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Besides, there's been some weird going ons in the city.");
-        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Don't tell <text_gender(\"him\", \"her\")> that! None of <text_gender(\"his\", \"her\")> business!");
-        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Only fair if <text_gender(\"he\", \"she\")> wants to go into the city.");
+        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Don't tell <text_gender("him", "her")> that! None of <text_gender("his", "her")> business!");
+        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Only fair if <text_gender("he", "she")> wants to go into the city.");
         ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Oh yes, they only just cleaned up the mess from the last little incident.");
         ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>So watch out if you ever do manage to travel to the city! Weird things could happen!");
         @keldagrim_west_boatmen_menu;
@@ -374,7 +374,7 @@ if (%fishingcompo = ^fishingcompo_complete) {
 ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>But they're not all small! Some can be large!");
 ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>And they don't breathe air.");
 if (%fishingcompo = ^fishingcompo_complete) {
-    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>But <displayname> could tell you all about it! After all, <text_gender(\"he's\", \"she's\")> the Fishing Champion!");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>But <displayname> could tell you all about it! After all, <text_gender("he's", "she's")> the Fishing Champion!");
     ~chatplayer("<p,neutral>Maybe later...");
 }
 @keldagrim_west_boatmen_menu;
@@ -389,7 +389,7 @@ if (%giantdwarf_quest = 0) {
     ~chatplayer("<p,neutral>Mining companies? Where are they at then?");
     ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Oh, they all have their headquarters in the city.");
     ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>First floor of the palace.");
-    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>No need to give <text_gender(\"him\", \"her\")> directions.");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>No need to give <text_gender("him", "her")> directions.");
 }
 ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>We haul all our goods to the city by ship, you see.");
 ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Since the mine carts don't come here.");

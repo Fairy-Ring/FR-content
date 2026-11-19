@@ -10,7 +10,7 @@
 // Preserve sir/madam wording before the later transcript's friend wording.
 [opnpc1,dwarf_city_barman_rich]
 if (inv_total(inv, coins) > ^keldagrim_barman_rich_coins) {
-    ~chatnpc("<p,neutral>And what will it be for you, fine <text_gender(\"sir\", \"madam\")>?");
+    ~chatnpc("<p,neutral>And what will it be for you, fine <text_gender("sir", "madam")>?");
 } else {
     ~chatnpc("<p,neutral>Yes? Can I help you with something?");
 }
@@ -25,8 +25,8 @@ if ($choice = 1) {
     ~keldagrim_barman_buy(dwarven_stout, ^keldagrim_barman_stout_price, "<p,neutral>One dwarven stout, best in all of Keldagrim!");
 } else if ($choice = 3) {
     ~chatplayer("<p,neutral>A fine wine please.");
-    ~chatnpc("<p,neutral>Ah, <text_gender(\"sir\", \"madam\")> has taste! A jug of wine will cost you 10 gold coins.");
-    ~keldagrim_barman_buy(wine, ^keldagrim_barman_wine_price, "<p,neutral>I hope <text_gender(\"sir\", \"madam\")> will enjoy it!");
+    ~chatnpc("<p,neutral>Ah, <text_gender("sir", "madam")> has taste! A jug of wine will cost you 10 gold coins.");
+    ~keldagrim_barman_buy(wine, ^keldagrim_barman_wine_price, "<p,neutral>I hope <text_gender("sir", "madam")> will enjoy it!");
 } else {
     ~chatplayer("<p,neutral>Nothing, thanks.");
 }

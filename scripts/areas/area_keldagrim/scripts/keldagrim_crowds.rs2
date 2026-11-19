@@ -133,4 +133,4 @@ switch_int (random(^keldagrim_library_assistant_dialogue_count)) {
 ~chatplayer("<p,neutral>Indeed!");
 ~chatnpc("<p,neutral>And what brings you to this city? Come to seek knowledge as well?");
 ~chatplayer("<p,neutral>I think it's mostly fame and riches I'm after.");
-~chatnpc("<p,neutral>To each <text_gender(\"his\", \"her\")> own, I suppose.");
+~chatnpc("<p,neutral>To each <text_gender("his", "her")> own, I suppose.");
