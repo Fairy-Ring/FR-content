@@ -30,6 +30,9 @@ while ($level < ^soulbane_region_levels) {
 region_setexitcoord(^soulbane_surface);
 %soulbane_instance = add(region_uid, 1);
 p_teleport(~soulbane_tolna_coord(^soulbane_tolna_entry));
+// CANDIDATE: musicregion_46_81 and the operator, 2026-11-18T14:28Z:
+// "Wrath and Ruin (anger room, battle with Tolna)" (operator-answers-1117.md).
+~music_playbyrow(music_Wrath_and_Ruin);
 // Native teleport may select the departing region. Reselect this copy first.
 if (~soulbane_owned = false) return;
 if (%soulbane_prog = ^soulbane_tolna_clear) {
