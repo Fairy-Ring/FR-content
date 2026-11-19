@@ -81,7 +81,7 @@ if (%feud_villager_state ! ^feud_villager_state_idle) { return(false); }
 %feud_villager_deadline = calc(map_clock + ^feud_villager_follow_timeout);
 %npc_attacking_uid = uid;
 npc_setmode(playerfollow);
-npc_queue(19, 0, ^feud_villager_follow_timeout);
+~feud_repeat_schedule_timeout(false);
 return(true);
 
 [proc,feud_repeat_villager_ko]
@@ -119,7 +119,7 @@ if (stat_random(thieving, ^feud_villager_ko_success_low, ^feud_villager_ko_succe
 %npc_attacking_uid = null;
 npc_setmode(null);
 npc_anim(human_unconscious, 0);
-npc_queue(19, 0, ^feud_villager_short_state_ticks);
+~feud_repeat_schedule_timeout(true);
 stat_advance(thieving, $experience);
 return(true);
 
@@ -140,31 +140,85 @@ walktrigger(stunned);
 ~npc_retaliate(0);
 return;
 
-// Shared engine timeout/reset procedures are reused; these entrypoints cover all
-// original Feud Bandit and Thug forms which can hold a lure or KO timer.
+// Preserve the published 30-tick poison timer on attackable Bandit/Thug forms.
+// A nonzero kind deadline owns exactly ONE pending callback; a new action moves
+// that deadline without adding a callback. There are at most two per NPC.
+// Villagers instead use the published wall-beast timer and never enter this queue.
+[proc,feud_repeat_schedule_timeout](boolean $knockout)
+if (~feud_villager_uses_timer = true) {
+    npc_settimer(1);
+    return;
+}
+def_int $pending;
+def_int $kind = 0;
+if ($knockout = true) {
+    $pending = %feud_repeat_ko_deadline;
+    %feud_repeat_ko_deadline = %feud_villager_deadline;
+    $kind = 1;
+} else {
+    $pending = %feud_repeat_follow_deadline;
+    %feud_repeat_follow_deadline = %feud_villager_deadline;
+}
+if ($pending ! 0) return;
+def_int $remaining = calc(%feud_villager_deadline - map_clock);
+if ($remaining < ^feud_repeat_timeout_min_delay) $remaining = ^feud_repeat_timeout_min_delay;
+npc_queue(19, $kind, $remaining);
+
+[proc,feud_repeat_timeout]
+def_int $kind = last_int;
+def_int $deadline;
+def_int $condition;
+if ($kind = 0) {
+    $deadline = %feud_repeat_follow_deadline;
+    %feud_repeat_follow_deadline = 0;
+    $condition = ^feud_villager_state_following;
+} else {
+    $deadline = %feud_repeat_ko_deadline;
+    %feud_repeat_ko_deadline = 0;
+    $condition = ^feud_villager_state_unconscious;
+}
+// An obsolete condition ends without requeueing or changing the newer condition.
+if (%feud_villager_state ! $condition) return;
+if (p_finduid(%feud_villager_owner) = false | map_clock >= $deadline) {
+    ~feud_villager_reset;
+    return;
+}
+if ($kind = 0) {
+    %feud_repeat_follow_deadline = $deadline;
+} else {
+    %feud_repeat_ko_deadline = $deadline;
+}
+// Npc.processQueue predecrements a newly visited request once. Delay 2 cannot
+// execute in this same pass; delay 1 can. UNKNOWN FEUD-TIMEOUT-REARM-01:
+// remaining=1 uses 2, so cleanup can be at most one tick late, never early.
+def_int $remaining = calc($deadline - map_clock);
+if ($remaining < ^feud_repeat_timeout_min_delay) $remaining = ^feud_repeat_timeout_min_delay;
+npc_queue(19, $kind, $remaining);
+
+// Cover every original form, including an ordinary saved-stage morph change.
 [ai_queue19,feud_arabian_guard_multi]
-~feud_villager_timeout;
+~feud_repeat_timeout;
 
 [ai_queue19,feud_arabian_guard1_1]
-~feud_villager_timeout;
+~feud_repeat_timeout;
 
 [ai_queue19,feud_arabian_guard1_2]
-~feud_villager_timeout;
+~feud_repeat_timeout;
 
 [ai_queue19,feud_arabian_guard2_multi]
-~feud_villager_timeout;
+~feud_repeat_timeout;
 
 [ai_queue19,feud_arabian_guard2_1]
-~feud_villager_timeout;
+~feud_repeat_timeout;
 
 [ai_queue19,feud_arabian_guard2_2]
-~feud_villager_timeout;
+~feud_repeat_timeout;
 
 [ai_queue19,feud_egyptian_doorman_multi]
-~feud_villager_timeout;
+~feud_repeat_timeout;
 
 [ai_queue19,feud_egyptian_doorman_1]
-~feud_villager_timeout;
+~feud_repeat_timeout;
 
 [ai_queue19,feud_egyptian_doorman_2]
-~feud_villager_timeout;
+~feud_repeat_timeout;

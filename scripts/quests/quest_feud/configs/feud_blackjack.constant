@@ -20,6 +20,10 @@
 // ordinary-man pickpocket stun (8 ticks), not a Feud distraction or unconscious duration.
 ^feud_villager_short_state_ticks = 8
 
+// UNKNOWN FEUD-TIMEOUT-REARM-01: native same-pass-safe queue delay, not a game duration.
+// Main approved remaining=1 using this minimum, making cleanup at most one tick late.
+^feud_repeat_timeout_min_delay = 2
+
 // UNKNOWN engineering choice: the closest local witness precedent uses radius 5 plus
 // line-of-sight for a stall theft; it is not a sourced Feud visibility radius.
 ^feud_villager_witness_radius = 5

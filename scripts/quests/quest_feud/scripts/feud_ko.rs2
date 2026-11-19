@@ -52,7 +52,7 @@ if (stat_random(thieving, ^feud_villager_ko_success_low, ^feud_villager_ko_succe
 %npc_attacking_uid = null;
 npc_setmode(null);
 npc_anim(human_unconscious, 0);
-npc_queue(19, 0, ^feud_villager_short_state_ticks);
+npc_settimer(1);
 if (%feud_var = ^feud_villager_lured) {
     %feud_var = ^feud_villager_knocked_out;
     stat_advance(thieving, ^feud_villager_ko_xp);

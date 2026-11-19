@@ -65,7 +65,7 @@ if (%feud_villager_state ! ^feud_villager_state_idle) {
 %feud_villager_owner = uid;
 %feud_villager_deadline = calc(map_clock + ^feud_villager_short_state_ticks);
 npc_setmode(null);
-npc_queue(19, 0, ^feud_villager_short_state_ticks);
+npc_settimer(1);
 if (npc_finduid($u) = false) {
     if (npc_finduid($v) = true) {
         ~feud_villager_reset;

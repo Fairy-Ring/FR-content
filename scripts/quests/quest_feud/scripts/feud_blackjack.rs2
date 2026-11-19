@@ -1,57 +1,68 @@
-// Server-only Feud villager state cleanup for distraction, lure, and knock-out.
+// Villagers use the published wall-beast NPC-timer pattern, not a self-rearming queue.
+// All twelve original forms are non-attackable and cannot acquire the global poison timer.
+// Poisonable Bandit/Thug forms instead keep one-shot deadline callbacks in repeat_blackjack.
 
-[ai_queue19,feud_villager_multi_1]
+[ai_timer,feud_villager_multi_1]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_multi_2]
+[ai_timer,feud_villager_multi_2]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_multi_3]
+[ai_timer,feud_villager_multi_3]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_1_1]
+[ai_timer,feud_villager_1_1]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_1_2]
+[ai_timer,feud_villager_1_2]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_1_3]
+[ai_timer,feud_villager_1_3]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_2_1]
+[ai_timer,feud_villager_2_1]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_2_2]
+[ai_timer,feud_villager_2_2]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_2_3]
+[ai_timer,feud_villager_2_3]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_3_1]
+[ai_timer,feud_villager_3_1]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_3_2]
+[ai_timer,feud_villager_3_2]
 ~feud_villager_timeout;
 
-[ai_queue19,feud_villager_3_3]
+[ai_timer,feud_villager_3_3]
 ~feud_villager_timeout;
 
 [proc,feud_villager_timeout]
-if (%feud_villager_state = ^feud_villager_state_idle) { return; }
+if (%feud_villager_state = ^feud_villager_state_idle) {
+    npc_settimer(0);
+    return;
+}
 if (p_finduid(%feud_villager_owner) = false) {
     ~feud_villager_reset;
     return;
 }
-if (map_clock < %feud_villager_deadline) {
-    def_int $remaining = calc(%feud_villager_deadline - map_clock);
-    npc_queue(19, 0, $remaining);
-    return;
-}
+if (map_clock < %feud_villager_deadline) return;
 ~feud_villager_reset;
+
+[proc,feud_villager_uses_timer]()(boolean)
+def_npc $kind = npc_type;
+if ($kind = feud_villager_multi_1 | $kind = feud_villager_multi_2 | $kind = feud_villager_multi_3 |
+    $kind = feud_villager_1_1 | $kind = feud_villager_1_2 | $kind = feud_villager_1_3 |
+    $kind = feud_villager_2_1 | $kind = feud_villager_2_2 | $kind = feud_villager_2_3 |
+    $kind = feud_villager_3_1 | $kind = feud_villager_3_2 | $kind = feud_villager_3_3) return(true);
+return(false);
 
 [proc,feud_villager_reset]
 def_player_uid $owner = %feud_villager_owner;
 def_npc_uid $target = npc_uid;
+// Never clear the independent published poison timer on a Bandit or Thug.
+if (~feud_villager_uses_timer = true) npc_settimer(0);
 if (%feud_villager_state = ^feud_villager_state_unconscious) {
     npc_anim(human_ready, 0);
 }
@@ -86,7 +97,7 @@ if (npc_finduid($actor) = false) return(false);
 return(true);
 
 // Safe for ordinary logout, including every player without an active trial target.
-// The NPC's own bounded queue remains the independent orphan/expiry cleanup path.
+// The NPC's timer remains the independent orphan/expiry cleanup path.
 [proc,feud_trial_release]
 if (%feud_trial_villager = null) return;
 if (npc_finduid(%feud_trial_villager) = true) {

@@ -50,6 +50,6 @@ if (%feud_villager_state ! ^feud_villager_state_idle) { return; }
 %feud_villager_deadline = calc(map_clock + ^feud_villager_follow_timeout);
 %npc_attacking_uid = uid;
 npc_setmode(playerfollow);
-npc_queue(19, 0, ^feud_villager_follow_timeout);
+npc_settimer(1);
 if (%feud_var = ^feud_second_pick) %feud_var = ^feud_villager_lured;
 return;
