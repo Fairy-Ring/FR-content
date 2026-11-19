@@ -10,6 +10,7 @@ switch_loc (loc_type) {
 
 [proc,farming_hops_set_stage](int $stage)
 if ($stage = ^farming_veg_weeded) ~farming_protection_clear(~farming_protection_loc_bit);
+if ($stage = ^farming_veg_weeded & ~farming_hops_crop(~farming_hops_stage) ! null) ~farming_soil_clear(~farming_soil_index);
 switch_loc (loc_type) {
     case farming_hops_patch_1 : %farming_hops_varp_0_7 = $stage;
     case farming_hops_patch_2 : %farming_hops_varp_8_15 = $stage;
@@ -206,6 +207,10 @@ if ($stage = -1) {
     ~displaymessage(^dm_default);
     return;
 }
+if (last_useitem = bucket_compost | last_useitem = bucket_supercompost) {
+    ~farming_soil_apply($stage);
+    return;
+}
 if (last_useitem = rake & $stage >= 0 & $stage < ^farming_veg_weeded) {
     ~farming_rake_step(false);
     return;
@@ -281,12 +286,14 @@ inv_add(inv, db_getfield($crop, farming_hops:produce, 0), 1);
 // VERIFIED period per-item XP. CANDIDATE three lives, with a life-saving roll.
 stat_advance(farming, db_getfield($crop, farming_hops:harvest_xp, 0));
 if (random(^farming_harvest_denominator) < ~farming_hops_life_loss) {
-    if ($stage < $last) {
-        $stage = add($stage, 1);
-    } else {
-        $stage = ^farming_veg_weeded;
+    if (~farming_soil_consume(~farming_soil_index) = false) {
+        if ($stage < $last) {
+            $stage = add($stage, 1);
+        } else {
+            $stage = ^farming_veg_weeded;
+        }
+        ~farming_hops_set_stage($stage);
     }
-    ~farming_hops_set_stage($stage);
 }
 %action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
 if ($stage >= $mature) p_oploc(3);

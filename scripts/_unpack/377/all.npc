@@ -44965,19 +44965,6 @@ param=attack_anim,troll_attack
 param=defend_anim,troll_block
 param=death_anim,troll_death
 
-[troll_block_1]
-turnspeed=0
-size=2
-turnspeed=0
-vislevel=34
-multivar=fd_icewarrior_dadfree
-multinpc=0,fd_trollblock1
-multinpc=1,fd_troll_dad
-
-// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
-hitpoints=10
-wanderrange=0
-defaultmode=none
 [fd_trollblock1]
 name=Ice block
 desc=A troll frozen in a block of ice.
@@ -44987,19 +44974,6 @@ size=2
 op1=Talk-to
 op2=Smash-ice
 turnspeed=0
-
-// CANDIDATE: original native block, ten hitpoints, no attack or wandering.
-hitpoints=10
-wanderrange=0
-defaultmode=none
-[troll_block_2]
-turnspeed=0
-size=2
-turnspeed=0
-vislevel=34
-multivar=fd_icewarrior_mumfree
-multinpc=0,fd_trollblock2
-multinpc=1,fd_troll_mum
 
 // CANDIDATE: original native block, ten hitpoints, no attack or wandering.
 hitpoints=10
@@ -63147,81 +63121,6 @@ head1=obj_pickpocket_guide_fremennik_citizen
 head2=idk_man_jaw_split_head
 
 
-[dagcave_ranged_boss]
-name=Dagannoth Supreme
-desc=The dagannoth king responsible for the death of the Bukalla.
-model1=npc_2881
-model2=npc_2881i2
-vislevel=303
-hitpoints=255
-attack=255
-strength=255
-defence=128
-size=3
-walkanim=dagannoth_meganoth_walk
-readyanim=dagannoth_meganoth_ready
-resizeh=167
-resizev=165
-contrast=30
-ambient=30
-op2=Attack
-param=slayer_category,^slayer_dagannoth
-
-[dagcave_magic_boss]
-name=Dagannoth Prime
-desc=A legendary dagannoth king, rumoured to fly on the North winds.
-model1=npc_2882
-model2=npc_2881i2
-model3=npc_2882i2
-recol1s=10594
-recol1d=19778
-recol2s=1122
-recol2d=10338
-recol3s=6373
-recol3d=6374
-recol4s=7430
-recol4d=7431
-vislevel=303
-hitpoints=255
-attack=255
-strength=255
-defence=255
-size=3
-resizeh=175
-resizev=180
-contrast=30
-ambient=30
-walkanim=dagannoth_meganoth_walk
-readyanim=dagannoth_meganoth_ready
-op2=Attack
-param=slayer_category,^slayer_dagannoth
-
-[dagcave_melee_boss]
-name=Dagannoth Rex
-desc=Firstborn of the legendary dagannoth kings.
-model1=npc_2881
-recol1s=6373
-recol1d=8421
-recol2s=7430
-recol2d=9478
-recol3s=1122
-recol3d=10567
-recol4s=16646
-recol4d=13508
-vislevel=303
-hitpoints=255
-attack=255
-strength=255
-defence=255
-size=3
-resizeh=220
-resizev=190
-contrast=30
-ambient=30
-walkanim=dagannoth_meganoth_walk
-readyanim=dagannoth_meganoth_ready
-op2=Attack
-param=slayer_category,^slayer_dagannoth
 
 
 [agrith_reen_alkharid]
@@ -64813,48 +64712,6 @@ vislevel=hide
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
 readyanim=human_ready
 
-[vc_partyrat_multi1]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off1
-multinpc=0,vc_party_rat
-
-[vc_partyrat_multi2]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off2
-multinpc=0,vc_party_rat
-
-[vc_partyrat_multi3]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off3
-multinpc=0,vc_party_rat
-
-[vc_partyrat_multi4]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off4
-multinpc=0,vc_party_rat
-
-[vc_partyrat_multi5]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off5
-multinpc=0,vc_party_rat
-
-[vc_partyrat_multi6]
-readyanim=mouse_ready
-walkanim=mouse_walk
-vislevel=1
-multivar=vc_raton_off6
-multinpc=0,vc_party_rat
-
 [vc_party_rat]
 name=Rat
 desc=A popular dwarven delicacy.
@@ -66331,13 +66188,6 @@ turnspeed=0
 minimap=no
 vislevel=hide
 
-[elid_ranging_target_multinpc]
-turnspeed=0
-vislevel=1
-multivar=elid_rangingchannel
-multinpc=0,elid_ranging_target
-multinpc=1,elid_ranging_target_done
-
 [champions_doorman]
 name=Larxus
 desc=Not the smartest of butlers.
@@ -67715,21 +67565,6 @@ op1=Talk-to
 head1=obj_leather_cowl_manhead2
 head2=idk_man_jaw_pointy_head
 
-[enakh_boneguard_multinpc]
-turnspeed=0
-readyanim=enakh_boneguard_ready
-vislevel=13
-multivar=enakh_quest
-multinpc=0,enakh_boneguard
-multinpc=10,enakh_boneguard
-multinpc=20,enakh_boneguard
-multinpc=30,enakh_boneguard
-multinpc=40,enakh_boneguard
-multinpc=50,enakh_bone_pile
-multinpc=60,enakh_bone_pile
-multinpc=65,enakh_bone_pile
-multinpc=70,enakh_bone_pile
-
 [enakh_boneguard]
 name=Boneguard
 desc=A spirit is trapped within it.
@@ -67778,14 +67613,6 @@ readyanim=human_secret_ghost_transready
 op1=Talk-to
 head1=npc_3131_head
 
-[enakh_dummy_fountain_multinpc]
-vislevel=hide
-size=2
-minimap=no
-turnspeed=0
-multivar=enakh_ice_room
-multinpc=0,enakh_dummy_fountain
-
 [enakh_dummy_fountain]
 name=Crust of ice
 desc=Very thick, and very cold.
@@ -67795,14 +67622,6 @@ size=2
 turnspeed=0
 op2=Melt
 minimap=no
-
-[enakh_dummy_furnace_multinpc]
-vislevel=hide
-size=2
-minimap=no
-turnspeed=0
-multivar=enakh_smoke_room
-multinpc=0,enakh_dummy_furnace
 
 [enakh_dummy_furnace]
 name=Furnace grate
@@ -78460,37 +78279,6 @@ vislevel=hide
 op1=Talk-to
 head1=obj_pickpocket_guide_fham
 
-[soulbane_brana]
-name=Brana
-desc=An old man.
-model1=npc_1918
-model2=obj_feud_desert_disguise_manwear
-model3=idk_man_jaw_goatee
-model4=obj_macro_prince_torso_manwear
-model5=npc_1805i3
-model6=obj_leather_vambraces_manwear
-model7=npc_1071i2
-model8=obj_macro_mime_legs_manwear
-model9=idk_42
-recol1s=6273
-recol1d=29596
-recol2s=2340
-recol2d=21003
-recol3s=7298
-recol3d=5285
-recol4s=14724
-recol4d=13605
-recol5s=2472
-recol5d=11490
-recol6s=30618
-recol6d=16881
-vislevel=hide
-walkanim=walk_walkingstick,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_staffready
-op1=Talk-to
-head1=obj_leather_cowl_manhead2
-head2=idk_man_jaw_goatee_head
-head3=npc_1918_head
 
 [soulbane_tolna_multi]
 walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
@@ -78500,32 +78288,6 @@ op1=Talk-to
 multivar=soulbane_tolna_pres
 multinpc=1,soulbane_tolna_top
 
-[soulbane_tolna_top]
-name=Tolna
-desc=Where did his boot go?
-model1=idk_man_hair_medium
-model2=npc_harlow
-model3=obj_priest_gown_manwear
-model4=obj_doctor_gown_manwear2
-model5=obj_leather_vambraces_manwear
-model6=idk_man_legs_tatty
-model7=npc_2796
-recol1s=14724
-recol1d=266
-recol2s=2340
-recol2d=22050
-recol3s=7298
-recol3d=3138
-recol4s=14801
-recol4d=3138
-recol5s=6273
-recol5d=10469
-vislevel=hide
-walkanim=human_walk_f,human_walk_b,human_walk_l,human_walk_r
-readyanim=human_ready
-op1=Talk-to
-head1=obj_pickpocket_guide_farmer
-head2=npc_harlow_head
 
 [soulbane_tolnaboy]
 name=Tolna
@@ -78548,173 +78310,8 @@ readyanim=midget_ready
 alwaysontop=yes
 head1=npc_3644_head
 
-[soulbane_confu_creeper]
-name=Confusion beast
-desc=What on RuneScape is that?!?
-model1=npc_3650
-size=2
-resizev=60
-resizeh=60
-walkanim=confwalk
-readyanim=confready
-op2=Attack
-vislevel=43
-hitpoints=28
-attack=42
-strength=41
-defence=40
 
-[soulbane_confu_creeper_fake1]
-name=Confusion beast
-desc=What on RuneScape is that?!?
-model1=npc_3650
-size=2
-resizev=60
-resizeh=60
-walkanim=confwalk
-readyanim=confready
-op2=Attack
-vislevel=43
-hitpoints=28
-attack=42
-strength=41
-defence=40
 
-[soulbane_confu_creeper_fake2]
-name=Confusion beast
-desc=What on RuneScape is that?!?
-model1=npc_3650
-size=2
-resizev=60
-resizeh=60
-walkanim=confwalk
-readyanim=confready
-op2=Attack
-vislevel=43
-hitpoints=28
-attack=42
-strength=41
-defence=40
-
-[soulbane_confu_creeper_fake3]
-name=Confusion beast
-desc=What on RuneScape is that?!?
-model1=npc_3650
-size=2
-resizev=60
-resizeh=60
-walkanim=confwalk
-readyanim=confready
-op2=Attack
-vislevel=43
-hitpoints=28
-attack=42
-strength=41
-defence=40
-
-[soulbane_confu_creeper_fake4]
-name=Confusion beast
-desc=What on RuneScape is that?!?
-model1=npc_3650
-size=2
-resizev=60
-resizeh=60
-walkanim=confwalk
-readyanim=confready
-op2=Attack
-vislevel=43
-hitpoints=28
-attack=42
-strength=41
-defence=40
-
-[soulbane_hope_monst3]
-name=Hopeless creature
-desc=A hopeless poor creature.
-model1=npc_3655
-size=2
-walkanim=lesswalk
-readyanim=lessready
-op2=Attack
-vislevel=40
-hitpoints=25
-attack=38
-strength=36
-defence=39
-
-[soulbane_hope_monst2]
-name=Hopeless creature
-desc=A hopeless poor creature.
-model1=npc_3655
-size=2
-resizev=106
-resizeh=106
-walkanim=lesswalk
-readyanim=lessready
-op2=Attack
-vislevel=40
-hitpoints=25
-attack=38
-strength=36
-defence=39
-
-[soulbane_hope_monst1]
-name=Hopeless creature
-desc=A hopeless poor creature.
-model1=npc_3655
-size=2
-resizev=80
-resizeh=80
-walkanim=lesswalk
-readyanim=lessready
-op2=Attack
-vislevel=40
-hitpoints=25
-attack=38
-strength=36
-defence=39
-
-[soulbane_final_tolna1]
-name=Tolna
-desc=Is that really Tolna?
-model1=spot_neck_death_spot
-size=3
-walkanim=neckready
-readyanim=neckready
-op2=Attack
-vislevel=46
-hitpoints=37
-attack=42
-strength=41
-defence=40
-
-[soulbane_final_tolna2]
-name=Tolna
-desc=Is that really Tolna?
-model1=spot_neck_death_spot
-size=3
-walkanim=neckready
-readyanim=neckready
-op2=Attack
-vislevel=46
-hitpoints=37
-attack=42
-strength=41
-defence=40
-
-[soulbane_final_tolna3]
-name=Tolna
-desc=Is that really Tolna?
-model1=spot_neck_death_spot
-size=3
-walkanim=neckready
-readyanim=neckready
-op2=Attack
-vislevel=46
-hitpoints=37
-attack=42
-strength=41
-defence=40
 
 [soulbane_unicorn]
 name=Angry unicorn

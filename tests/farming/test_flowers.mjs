@@ -358,30 +358,30 @@ try {
     const probe = player();
     for (const flower of flowers) {
       JavaRandom.setSeed(draws128.get(0));
-      assert.equal(proc(probe, 'farming_flower_advance', flower.first, 1).popInt(), flower.first + 1,
+      assert.equal(proc(probe, 'farming_flower_advance', flower.first, 1, 0, 0).popInt(), flower.first + 1,
         `${flower.name} seed advances without a disease roll`);
       for (let value = flower.first + 1; value < flower.mature; value++) {
         JavaRandom.setSeed(draws128.get(19));
-        assert.equal(proc(probe, 'farming_flower_advance', value, 1).popInt(), value + 128,
+        assert.equal(proc(probe, 'farming_flower_advance', value, 1, 0, 0).popInt(), value + 128,
           `${flower.name} dry disease maps to stage byte ${value + 128}`);
         JavaRandom.setSeed(draws128.get(20));
-        assert.equal(proc(probe, 'farming_flower_advance', value, 1).popInt(), value + 1,
+        assert.equal(proc(probe, 'farming_flower_advance', value, 1, 0, 0).popInt(), value + 1,
           `${flower.name} dry healthy boundary advances to the next byte`);
         JavaRandom.setSeed(draws128.get(9));
-        assert.equal(proc(probe, 'farming_flower_advance', value + 64, 1).popInt(), value + 128,
+        assert.equal(proc(probe, 'farming_flower_advance', value + 64, 1, 0, 0).popInt(), value + 128,
           `${flower.name} watered disease maps back to its unwatered base`);
         JavaRandom.setSeed(draws128.get(10));
-        assert.equal(proc(probe, 'farming_flower_advance', value + 64, 1).popInt(), value + 1,
+        assert.equal(proc(probe, 'farming_flower_advance', value + 64, 1, 0, 0).popInt(), value + 1,
           `${flower.name} watered healthy boundary advances once`);
         JavaRandom.setSeed(draws128.get(127));
-        assert.equal(proc(probe, 'farming_flower_advance', value + 128, 1).popInt(), value + 192,
+        assert.equal(proc(probe, 'farming_flower_advance', value + 128, 1, 0, 0).popInt(), value + 192,
           `${flower.name} uncured disease dies on its next cycle`);
       }
       JavaRandom.setSeed(healthySeed);
-      assert.equal(proc(probe, 'farming_flower_advance', flower.first, 1000000).popInt(), flower.mature,
+      assert.equal(proc(probe, 'farming_flower_advance', flower.first, 1000000, 0, 0).popInt(), flower.mature,
         `${flower.name} bounded catch-up stops at maturity`);
       for (const value of [flower.mature, flower.mature + 64, flower.mature + 192]) {
-        assert.equal(proc(probe, 'farming_flower_advance', value, 1000000).popInt(), value,
+        assert.equal(proc(probe, 'farming_flower_advance', value, 1000000, 0, 0).popInt(), value,
           `${flower.name} terminal or mature byte ${value} is stable`);
       }
     }
@@ -435,7 +435,7 @@ try {
     p.setVar(unrelated, 3);
     const before = p.getVar(flowerVarp);
     JavaRandom.setSeed(healthySeed);
-    proc(p, 'farming_flower_advance_all', 1);
+    proc(p, 'farming_flower_advance_all', 1, 0);
     assert.deepEqual(patchNames.map((_, index) => stage(p, index)),
       flowers.slice(0, 4).map(flower => flower.first + 2));
     assert.equal(p.getVar(flowerVarp), flowerWord(flowers.slice(0, 4).map(flower => flower.first + 2)),
@@ -517,7 +517,7 @@ try {
         selectors.forEach(bit => p.setVarBit(bit, 3));
         setStage(p, 12, protectedPair ? nearest : (nearest + 1) % patchLocs.length);
         JavaRandom.setSeed(draws128.get(0));
-        proc(p, 'farming_potato_advance_all', 1);
+        proc(p, 'farming_potato_advance_all', 1, 0);
         assert.equal(p.getVarBit(allotmentBits[index]), protectedPair ? 8 : 135,
           `${allotmentNames[index]} receives only its own mature marigold protection`);
         allotmentBits.forEach((bit, other) => {
@@ -543,20 +543,20 @@ try {
     setStage(p, 12, 0); setStage(p, 17, 1); setStage(p, 34, 2); setStage(p, 22, 3);
     const firstWord = flowerWord([7, 14, 0, 0]);
     JavaRandom.setSeed(draws128.get(0));
-    const first = proc(p, 'farming_potato_advance_word', firstWord, 1, 0).popInt();
+    const first = proc(p, 'farming_potato_advance_word', firstWord, 1, 0, 0).popInt();
     const byte = (word, index) => (word >>> (index * 8)) & 255;
     assert.deepEqual([0, 1, 2, 3].map(index => byte(first, index)), [8, 15, 0, 0],
       'mature marigold protects its paired potato and onion bytes');
 
     const secondWord = flowerWord([35, 35, 53, 53]);
     JavaRandom.setSeed(draws128.get(0));
-    const second = proc(p, 'farming_potato_advance_word', secondWord, 1, 16).popInt();
+    const second = proc(p, 'farming_potato_advance_word', secondWord, 1, 16, 0).popInt();
     assert.deepEqual([0, 1, 2, 3].map(index => byte(second, index)), [36, 36, 54, 54],
       'scarecrow and nasturtium protect their corresponding sweetcorn and watermelon bytes');
 
     setStage(p, 12, 0);
     JavaRandom.setSeed(draws128.get(127));
-    const alreadyDiseased = proc(p, 'farming_potato_advance_word', flowerWord([135, 0, 0, 0]), 1, 0).popInt();
+    const alreadyDiseased = proc(p, 'farming_potato_advance_word', flowerWord([135, 0, 0, 0]), 1, 0, 0).popInt();
     assert.equal(byte(alreadyDiseased, 0), 199, 'protection does not cure an already-diseased crop');
     assert.deepEqual(selectors.map((_, index) => stage(p, index)), [12, 17, 34, 22],
       'crop advancement does not change flower protection state');

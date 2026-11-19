@@ -1,0 +1,143 @@
+// CANDIDATE dialogue: soulbane.dlg.tolna; modern transcript wording is not 2006 proof.
+// UNKNOWN camera parameters reuse the existing Soulbane cutscene pattern.
+
+[queue,soulbane_tolna_intro]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_tolna_intro) return;
+p_stopaction;
+walktrigger(soulbane_tolna_intro_resume);
+cam_moveto(~soulbane_tolna_coord(^soulbane_tolna_camera), 400, 232, 232);
+cam_lookat(~soulbane_tolna_coord(^soulbane_tolna_brana), 160, 232, 232);
+
+// Brana speaks overhead; each bubble uses the inherited hold duration.
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+npc_say("Son! Is that you?");
+p_delay(^soulbane_scene_overhead_ticks);
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+npc_say("Please speak to me! Tolna?");
+p_delay(^soulbane_scene_overhead_ticks);
+
+// Tolna uses the native headless statement interface, not a fabricated chathead.
+~mesbox("Why should I speak to you? Besides, I'm no longer the boy you once knew.");
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+npc_say("What do you mean?");
+p_delay(^soulbane_scene_overhead_ticks);
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+npc_say("You'll always be my son!");
+p_delay(^soulbane_scene_overhead_ticks);
+~mesbox("No. Something evil in this dungeon has morphed my body and mind.");
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+npc_say("There must be a way.");
+p_delay(^soulbane_scene_overhead_ticks);
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+npc_say("Don't give up so easily!");
+p_delay(^soulbane_scene_overhead_ticks);
+~mesbox("Don't give up? You had your chance to help me, 25 years it's taken you!");
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+npc_say("Sorry, but your mother and I...");
+p_delay(^soulbane_scene_overhead_ticks);
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+npc_say("tried so hard to find you!");
+p_delay(^soulbane_scene_overhead_ticks);
+~mesbox("Lies!");
+~mesbox("Ah, we have a visitor!");
+~chatplayer("<p,neutral>Your father isn't lying.");
+~mesbox("Hah! If that's the way you think, then you shall both die!");
+
+walktrigger(null);
+cam_reset;
+%soulbane_final_seencut = 1;
+%soulbane_prog = ^soulbane_tolna_active;
+~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+~soulbane_tolna_start_attacks;
+
+[walktrigger,soulbane_tolna_intro_resume]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_tolna_intro) return;
+p_stopaction;
+walktrigger(soulbane_tolna_intro_resume);
+if (getqueue(soulbane_tolna_intro) = 0) queue(soulbane_tolna_intro, 0, 0);
+
+[opnpc1,soulbane_brana]
+if (~soulbane_npc_owned = false) return;
+if (%soulbane_prog = ^soulbane_tolna_active) {
+    // CANDIDATE sourced dialogue: Tolna transcript lines 29–38.
+    ~chatplayer("<p,neutral>Are you ok?");
+    ~chatnpc("<p,neutral>Please! You must help my son! He's beyond sense.");
+    ~chatplayer("<p,neutral>But how can I help?");
+    ~chatnpc("<p,neutral>I take it you have travelled through the mental dilemmas of my son, as I have.");
+    ~chatplayer("<p,neutral>That's correct.");
+    ~chatnpc("<p,neutral>Now you must do what I cannot, conquer the physical dilemma!");
+    ~chatplayer("<p,neutral>I will try.");
+    ~chatnpc("<p,neutral>Thank you stranger.");
+} else if (%soulbane_prog = ^soulbane_tolna_clear) {
+    // CANDIDATE sourced dialogue: Tolna transcript lines 49–52.
+    ~chatplayer("<p,neutral>I think I've saved your son.");
+    ~chatnpc("<p,neutral>Please talk to him, make sure he's OK!");
+}
+
+[opnpc1,soulbane_tolna_top] @soulbane_tolna_talk;
+[opnpc1,soulbane_tolna_multi] @soulbane_tolna_talk;
+[label,soulbane_tolna_talk]
+if (~soulbane_owned = true) {
+    if (~soulbane_npc_owned = false | %soulbane_prog ! ^soulbane_tolna_clear) return;
+    @soulbane_tolna_human;
+    return;
+}
+if (%soulbane_tolna_pres ! 1 | %soulbane_launa_pres ! 1) return;
+if (%soulbane_prog = ^soulbane_tolna_clear) {
+    @soulbane_tolna_surface_reward;
+} else if (%soulbane_prog = ^soulbane_complete) {
+    @soulbane_tolna_surface_repeat;
+}
+
+[label,soulbane_tolna_human]
+// CANDIDATE sourced dialogue: Tolna transcript lines 62–75.
+~chatplayer("<p,neutral>Tolna?");
+~chatnpc_specific("Tolna", soulbane_tolna_top, "<p,neutral>Sorry? What happened?");
+~chatplayer("<p,neutral>You've been trapped down here for years. I've come to rescue you on behalf of your parents.");
+~chatnpc_specific("Tolna", soulbane_tolna_top, "<p,neutral>Oh yeah. I was looking for the legacy of a civilisation that used to live down here.");
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+~chatnpc_specific("Brana", soulbane_brana, "<p,neutral>Son!");
+~chatnpc_specific("Tolna", soulbane_tolna_top, "<p,neutral>Father? Oh, I'm so sorry, can you ever forgive me?");
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+~chatnpc_specific("Brana", soulbane_brana, "<p,neutral>Don't worry, I'm just glad you're back to yourself. Are you OK?");
+~chatnpc_specific("Tolna", soulbane_tolna_top, "<p,neutral>I'm fine, my memories are slowly returning. How's mother?");
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+~chatnpc_specific("Brana", soulbane_brana, "<p,neutral>She misses you dearly!");
+~chatnpc_specific("Tolna", soulbane_tolna_top, "<p,neutral>Where is she?");
+~chatplayer("<p,neutral>She's up at the surface waiting for you.");
+if (npc_finduid(~soulbane_tolna_finduid(soulbane_brana)) = false) return;
+~chatnpc_specific("Brana", soulbane_brana, "<p,neutral>Thank you traveller, I'm glad my wife and I never gave up hope. We should return to her and tell her the good news.");
+~chatnpc_specific("Tolna", soulbane_tolna_top, "<p,neutral>Thank you so much. I truly owe you for your help.");
+~chatplayer("<p,neutral>I'm just glad I could help.");
+if (%soulbane_prog ! ^soulbane_tolna_clear) return;
+%soulbane_tolna_pres = 1;
+%soulbane_launa_pres = 1;
+~soulbane_leave;
+return;
+
+[label,soulbane_tolna_surface_reward]
+// RECONSTRUCTION: sourced subset 79–84 plus 87–88; omit 85–86 and postquest training.
+~chatplayer("<p,neutral>Hello Tolna.");
+~chatnpc("<p,neutral>Hi. Thanks again for saving me, I'm so glad to be out of that horrible place. I was foolish to ignore my parents' warnings when I ran away that day. Luckily I've been able to patch things up with them so they've returned home with peace of mind.");
+~chatplayer("<p,neutral>What exactly happened to you down there?");
+~chatnpc("<p,neutral>I managed to find the remnants of the ancient civilisation that the stories talked about. It seems people used to worship a god there years ago in numbers far greater than a simple cult following. Sadly there is little remaining so I have nothing else to tell. As soon as I entered this area the ground swallowed me whole. I felt there was something watching, waiting. It's like there is some evil power under the ground that wanted me to suffer. As if it got some sort of empowerment from it. At least what ever it is, it doesn't want to reveal itself to the world yet...");
+~chatplayer("<p,neutral>At least we have a warning. Did you manage to retrieve anything?");
+~chatnpc("<p,neutral>Not really, just a few coins, which you're welcome to have.");
+~chatplayer("<p,neutral>Thanks.");
+if (%soulbane_prog ! ^soulbane_tolna_clear) return;
+// Durable completion mark precedes XP, coins, quest points, log and completion UI.
+%soulbane_prog = ^soulbane_complete;
+stat_advance(defence, ^soulbane_reward_xp_tenths);
+stat_advance(hitpoints, ^soulbane_reward_xp_tenths);
+inv_add(inv, coins, ^soulbane_reward_coins);
+session_log(^log_adventure, "Quest complete: A Soul's Bane");
+~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+~send_quest_complete(questlist:soulbane, coins, 250, ^soulbane_questpoints, "Congratulations! Quest complete!", "500 Defence XP|500 Hitpoints XP|500 Coins");
+return;
+
+[label,soulbane_tolna_surface_repeat]
+// CANDIDATE repeat talk reuses a nonreward subset; it cannot grant rewards again.
+~chatplayer("<p,neutral>Hello Tolna.");
+~chatnpc("<p,neutral>Hi. Thanks again for saving me, I'm so glad to be out of that horrible place. I was foolish to ignore my parents' warnings when I ran away that day. Luckily I've been able to patch things up with them so they've returned home with peace of mind.");
+~chatplayer("<p,neutral>What exactly happened to you down there?");
+~chatnpc("<p,neutral>I managed to find the remnants of the ancient civilisation that the stories talked about. It seems people used to worship a god there years ago in numbers far greater than a simple cult following. Sadly there is little remaining so I have nothing else to tell. As soon as I entered this area the ground swallowed me whole. I felt there was something watching, waiting. It's like there is some evil power under the ground that wanted me to suffer. As if it got some sort of empowerment from it. At least what ever it is, it doesn't want to reveal itself to the world yet...");

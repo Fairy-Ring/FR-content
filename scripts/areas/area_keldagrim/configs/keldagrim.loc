@@ -273,6 +273,7 @@ resizey=100
 resizez=128
 
 [dwarf_keldagrim_bankbooth]
+category=bank_booth
 name=Bank booth
 desc=The bank teller will serve you from here.
 model=loc_2213
@@ -290,6 +291,7 @@ resizey=100
 resizez=128
 
 [dwarf_keldagrim_bookcase]
+category=bookcase
 name=Bookcase
 desc=A treasure trove of knowledge.
 model=dwarf_keldagrim_bookcase

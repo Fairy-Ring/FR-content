@@ -1,0 +1,32 @@
+// VERIFIED period scene after five real kills; CANDIDATE retained transcript.
+// UNKNOWN camera, pose binding, timing and walk-interruption presentation.
+[queue,soulbane_confusion_complete]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_confusion_active | ~soulbane_confusion_kills ! ^soulbane_confusion_real_kills) return;
+p_stopaction;
+walktrigger(soulbane_confusion_resume);
+~soulbane_clear_room_npcs;
+~chatplayer("<p,neutral>Aha! The exit is now clear! This Tolna's mind really is a mess.");
+p_teleport(~soulbane_room_coord(^soulbane_confusion_scene_player));
+~soulbane_rage_add(soulbane_tolnaboy, ^soulbane_confusion_scene_tolna);
+// Original 377 emotional sequence; its use here is reconstruction staging.
+npc_anim(tolna_scared, 0);
+p_delay(1);
+cam_moveto(~soulbane_room_coord(^soulbane_confusion_scene_camera), 400, 232, 232);
+cam_lookat(~soulbane_room_coord(^soulbane_confusion_scene_tolna), 120, 232, 232);
+npc_say("Leave me... But I don't want to... How can you say that...");
+p_delay(^soulbane_scene_overhead_ticks);
+npc_say("I've done nothing wrong... Arrrghhh...");
+p_delay(^soulbane_scene_overhead_ticks);
+~soulbane_clear_room_npcs;
+cam_reset;
+p_teleport(~soulbane_room_coord(^soulbane_confusion_entry));
+walktrigger(null);
+%soulbane_confu_door6open = 1;
+%soulbane_prog = ^soulbane_confusion_clear;
+~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+
+[walktrigger,soulbane_confusion_resume]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_confusion_active | ~soulbane_confusion_kills ! ^soulbane_confusion_real_kills) return;
+p_stopaction;
+walktrigger(soulbane_confusion_resume);
+if (getqueue(soulbane_confusion_complete) = 0) queue(soulbane_confusion_complete, 0, 0);

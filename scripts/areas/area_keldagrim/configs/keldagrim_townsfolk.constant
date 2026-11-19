@@ -1,0 +1,11 @@
+// UNKNOWN engineering distribution: transcripts list these outcomes, not weights.
+^keldagrim_director_greetings = 10
+^keldagrim_referee_greetings = 5
+
+// CANDIDATE: retained 2022 King's Axe Inn transcript and current Barmaid transcript.
+^keldagrim_barman_rich_coins = 2000
+^keldagrim_barman_beer_price = 1
+^keldagrim_barman_stout_price = 2
+^keldagrim_barman_wine_price = 10
+^keldagrim_barmaid_beer_price = 2
+^keldagrim_barmaid_stew_price = 20

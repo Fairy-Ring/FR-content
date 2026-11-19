@@ -31,6 +31,9 @@ if(inv_freespace(inv) = 0) {
 [oploc2,wheat_smallest]
 @pick_wheat;
 
+[oploc2,wheat_tall]
+@pick_wheat;
+
 // Pickable Onion
 [oploc2,onion]
 p_arrivedelay;

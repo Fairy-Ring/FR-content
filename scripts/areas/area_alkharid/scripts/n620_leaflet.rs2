@@ -1,0 +1,19 @@
+// CANDIDATE: RuneScape Transcript:Waseem the Leaflet Dropper, Take-flyer.
+// Restore the 377 cache's Ali header; do not import later directions or names.
+[opnpc3,ali_leaflet_dropper]
+if (inv_total(inv, leaflet_dropper_flyer) > 0) {
+    ~chatnpc("Are you trying to be funny or has age turned your brain to mush? You already have a flyer!");
+    return;
+}
+// CANDIDATE capacity refusal: Old School Transcript:Ali the Leaflet Dropper.
+if (inv_freespace(inv) = 0) {
+    ~chatnpc("I'd give you a flyer but it looks like your hands are full. Come back when you have space for my flyer.");
+    return;
+}
+inv_add(inv, leaflet_dropper_flyer, 1);
+~chatnpc("Here! Take one and let me get back to work. I still have hundreds of these flyers to hand out, I wonder if Ali would notice if I quietly dumped them somewhere?");
+
+// CANDIDATE: Old School Transcript:Al kharid flyer, Reading.
+[opheld1,leaflet_dropper_flyer]
+~objbox(leaflet_dropper_flyer, "Come to the Al Kharid Market place! High quality produce at low, low prices! Show this flyer to a merchant for money off your next purchase, courtesy of Ali Morrisane!", ^n620_flyer_display_zoom, 0, 0);
+~mesbox("You notice that the money off voucher is out of date.");

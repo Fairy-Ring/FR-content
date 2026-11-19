@@ -9,6 +9,7 @@ switch_loc (loc_type) {
 }
 
 [proc,farming_herb_set_stage](int $stage)
+if ($stage = ^farming_veg_weeded & ~farming_herb_stage > ^farming_veg_weeded) ~farming_soil_clear(~farming_soil_index);
 switch_loc (loc_type) {
     case farming_herb_patch_1 : %bits_780_varp515_bits_0_7 = $stage;
     case farming_herb_patch_2 : %bits_781_varp515_bits_8_15 = $stage;
@@ -50,6 +51,10 @@ switch_loc (loc_type) {
 def_int $stage = ~farming_herb_stage;
 if ($stage = -1) {
     ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = bucket_compost | last_useitem = bucket_supercompost) {
+    ~farming_soil_apply($stage);
     return;
 }
 if (last_useitem = rake & $stage >= 0 & $stage < ^farming_veg_weeded) {
@@ -133,12 +138,14 @@ anim(picking_low, 0);
 inv_add(inv, db_getfield($crop, farming_herb:produce, 0), 1);
 stat_advance(farming, db_getfield($crop, farming_herb:harvest_xp, 0));
 if (random(^farming_harvest_denominator) < ~farming_herb_life_loss) {
-    if ($stage < $last) {
-        $stage = add($stage, 1);
-    } else {
-        $stage = ^farming_veg_weeded;
+    if (~farming_soil_consume(~farming_soil_index) = false) {
+        if ($stage < $last) {
+            $stage = add($stage, 1);
+        } else {
+            $stage = ^farming_veg_weeded;
+        }
+        ~farming_herb_set_stage($stage);
     }
-    ~farming_herb_set_stage($stage);
 }
 %action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
 if ($stage >= $mature) p_oploc(3);

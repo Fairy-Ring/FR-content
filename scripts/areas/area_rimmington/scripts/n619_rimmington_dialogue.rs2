@@ -1,0 +1,68 @@
+// CANDIDATE wording from the retained Old School transcript revisions cited in west-east-source.md.
+
+[opnpc1,rimmington_hengel]
+~chatplayer("<p,happy>Hello.");
+~chatnpc("<p,quiz>What are you doing here?");
+def_int $option = ~p_choice3("I'm just wandering around.", 1, "I was hoping you'd give me some free stuff.", 2, "I've come to kill you.", 3);
+if ($option = 1) {
+    ~chatplayer("<p,neutral>I'm just wandering around.");
+    ~chatnpc("<p,quiz>You do realise you're wandering around in my house?");
+    ~chatplayer("<p,happy>Yep.");
+    ~chatnpc("<p,angry>Well please get out!");
+    ~chatplayer("<p,angry>Sheesh, keep your wig on!");
+} else if ($option = 2) {
+    ~chatplayer("<p,quiz>I was hoping you'd give me some free stuff.");
+    ~chatnpc("<p,angry>No, I jolly well wouldn't! Get out of my house!");
+    ~chatplayer("<p,angry>Meanie!");
+} else {
+    npc_say("Aaaarrgh!");
+    // UNKNOWN engineering search radius, following lady_keli.rs2's nearby-speaker pattern.
+    if (npc_find(coord, rimmington_anja, 7, 0) = true) npc_say("Eeeek!");
+}
+
+[opnpc1,rimmington_anja]
+~chatplayer("<p,happy>Hello.");
+~chatnpc("<p,quiz>Hello sir. What are you doing in my house?");
+def_int $option = ~p_choice3("I'm just wandering around.", 1, "I was hoping you'd give me some free stuff.", 2, "I've come to kill you.", 3);
+if ($option = 1) {
+    ~chatplayer("<p,neutral>I'm just wandering around.");
+    ~chatnpc("<p,quiz>Oh dear, are you lost?");
+    def_int $lost = ~p_choice2("Yes, I'm lost.", 1, "No, I know where I am.", 2);
+    if ($lost = 1) {
+        ~chatplayer("<p,neutral>Yes, I'm lost.");
+        ~chatnpc("<p,happy>Okay, just walk north-east when you leave this house, and soon you'll reach the big city of Falador.");
+        ~chatplayer("<p,happy>Thanks a lot.");
+    } else {
+        ~chatplayer("<p,neutral>No, I know where I am.");
+        ~chatnpc("<p,quiz>Oh? Well, would you mind wandering somewhere else? This is my house.");
+        ~chatplayer("<p,bored>Meh!");
+    }
+} else if ($option = 2) {
+    ~chatplayer("<p,neutral>I was hoping you'd give me some free stuff.");
+    def_int $reply = random(4); // UNKNOWN engineering uniform reply weights.
+    if ($reply = 0) {
+        ~chatnpc("<p,quiz>Do you REALLY need it?");
+    } else if ($reply = 1) {
+        ~chatnpc("<p,quiz>Er...");
+    } else if ($reply = 2) {
+        ~chatnpc("<p,quiz>I don't have much on me...");
+    } else {
+        ~chatnpc("<p,quiz>I don't know...");
+    }
+    def_int $plea = random(4); // UNKNOWN engineering independent uniform plea weights.
+    if ($plea = 0) {
+        ~chatplayer("<p,happy>(beg beg beg beg beg beg)");
+    } else if ($plea = 1) {
+        ~chatplayer("<p,happy>I promise I'll stop bothering you!");
+    } else if ($plea = 2) {
+        ~chatplayer("<p,happy>Pleeease!");
+    } else {
+        ~chatplayer("<p,happy>Pwetty pleathe wiv thugar on top!");
+    }
+    ~chatnpc("<p,happy>Oh, alright. Here you go.");
+    inv_add(inv, coins, calc(random(3) + 1)); // UNKNOWN engineering uniform weights within the sourced 1-3 range.
+} else {
+    npc_say("Eeeek!");
+    // UNKNOWN engineering search radius, following lady_keli.rs2's nearby-speaker pattern.
+    if (npc_find(coord, rimmington_hengel, 7, 0) = true) npc_say("Aaaarrgh!");
+}

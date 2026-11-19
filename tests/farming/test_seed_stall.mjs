@@ -193,5 +193,13 @@ test('a real original owner or market guard seeing the thief prevents the reward
   assert.equal(p.stats[PlayerStat.THIEVING], p.thievingStartXp);
   assert.equal(loc.type, stallId);
 });
+test('the kept published catcher model has one owner and does not make Master Farmer a guard', () => {
+  // The period table's Master Farmer conflicts with the published row. Keep the
+  // operator's owner-plus-guards decision; farming.seed-stall-catcher-disagreement records it.
+  assert.equal(row.columnValues[1].length, 1);
+  assert.equal(row.columnValues[2].length, 1);
+  assert(!types.NpcType.get(id('NpcType', 'master_farmer_1')).op[1],
+    'Master Farmer is not attackable and the published guard iterator excludes him');
+});
 console.log(`${cases} seed-stall checks passed`);
 process.exit(0);

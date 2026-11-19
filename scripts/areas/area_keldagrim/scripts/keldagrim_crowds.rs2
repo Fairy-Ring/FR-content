@@ -1,0 +1,136 @@
+// CANDIDATE: modern OSRS Talk transcripts; the 377 forms and Talk-to options are retained.
+// Random transcript alternatives have no sourced probability distribution.
+[opnpc1,dwarf_city_black_guard1]
+~keldagrim_black_guard_dialogue();
+[opnpc1,dwarf_city_black_guard2]
+~keldagrim_black_guard_dialogue();
+[opnpc1,dwarf_city_black_guard3]
+~keldagrim_black_guard_dialogue();
+[opnpc1,dwarf_city_black_guard4]
+~keldagrim_black_guard_dialogue();
+
+[proc,keldagrim_black_guard_dialogue]
+switch_int (random(^keldagrim_black_guard_dialogue_count)) {
+    case 0 : ~chatnpc("<p,neutral>Obey the law!");
+    case 1 : ~chatnpc("<p,neutral>Stay out of trouble!");
+    case 2 : ~chatnpc("<p,neutral>Out of the way, human!");
+    case 3 : ~chatnpc("<p,neutral>I'm keeping an eye on you!");
+    case 4 : ~mesbox("The guard ignores you.");
+}
+
+[opnpc1,dwarf_city_berserker1]
+~keldagrim_berserker_dialogue();
+[opnpc1,dwarf_city_berserker2]
+~keldagrim_berserker_dialogue();
+[opnpc1,dwarf_city_berserker3]
+~keldagrim_berserker_dialogue();
+
+[proc,keldagrim_berserker_dialogue]
+switch_int (random(^keldagrim_berserker_dialogue_count)) {
+    case 0 : ~chatnpc("<p,neutral>Obey the law!");
+    case 1 : ~chatnpc("<p,neutral>Stay out of trouble!");
+    case 2 : ~chatnpc("<p,neutral>Out of the way, human!");
+    case 3 : ~chatnpc("<p,neutral>I'm keeping an eye on you!");
+    case 4 : ~mesbox("The guard ignores you.");
+}
+
+[opnpc1,dwarf_city_gnome_emissary]
+~chatnpc("<p,neutral>Don't bother us, can't you see we're busy here?");
+
+[opnpc1,dwarf_city_gnome_male_emissary]
+~chatplayer("<p,neutral>Hello there! What're you doing in the city?");
+~chatnpc("<p,neutral>Why do you want to know?");
+~chatplayer("<p,neutral>I was just wondering, I thought this was a dwarven city, not a gnome city.");
+~chatnpc("<p,neutral>It's not a human city either, but you're here all the same.");
+~chatplayer("<p,neutral>Fair point.");
+~chatnpc("<p,neutral>Anyway, we're here to do some business with one of the companies of the Consortium. Getting supplies for our people back at, er, the Grand Tree.");
+~chatplayer("<p,neutral>What kind of special supplies do the dwarves have that you need then?");
+~chatnpc("<p,neutral>Oh, nothing special, nothing special I assure you... it's just that the dwarves have everything in large supplies.");
+
+[opnpc1,dwarf_city_gnome_female_emissary]
+~chatplayer("<p,neutral>Hello there mister gnome!");
+~chatnpc("<p,neutral>Miss gnome to you, thank you.");
+~chatplayer("<p,neutral>Oh, sorry about that... So what are you doing in fair Keldagrim?");
+~chatnpc("<p,neutral>Fair? Hardly...");
+~chatnpc("<p,neutral>We are the companions of the leader of our expedition. We have come here to bargain for much needed supplies for our people.");
+~chatplayer("<p,neutral>Oh yes, where are you from?");
+~chatnpc("<p,neutral>Ehm... from Tree Gnome Village.");
+~chatnpc_specific("Gnome traveller", dwarf_city_gnome_male_emissary, "<p,neutral>The Grand Tree!");
+~chatnpc("<p,neutral>Oh yes, sorry, that's what I meant to say.");
+
+[opnpc1,dwarf_city_factory_guard]
+~chatnpc("<p,neutral>Don't bother me, can't you see I'm busy?");
+~chatplayer("<p,neutral>No, I can't... can I go into the factory?");
+~chatnpc("<p,neutral>You can go in. The Consortium, in their infinite wisdom, has decided to open up the factory to all and sundry.");
+~chatplayer("<p,neutral>How come?");
+~chatnpc("<p,neutral>We've built a new blast furnace and always have a shortage of people to work on it.");
+~chatplayer("<p,neutral>I'll have a look, thanks.");
+~chatnpc("<p,neutral>Just don't go causing any trouble, I still run this factory!");
+
+[opnpc1,dwarf_city_factory_worker1]
+~chatplayer("<p,neutral>I'm sorry, I'm looking for the blast furnace?");
+~chatnpc("<p,neutral>Do I look like a guide to you?");
+~chatplayer("<p,neutral>No, you look like a hard-working dwarf, but can you please tell me where the blast furnace is?");
+~chatnpc("<p,neutral>Alright, just head down the stairs, it's easy to find.");
+~chatplayer("<p,neutral>Thanks.");
+
+[opnpc1,dwarf_city_factory_worker2]
+~chatplayer("<p,neutral>Are you okay?");
+~chatnpc("<p,neutral>Don't I look okay?");
+~chatplayer("<p,neutral>If you were any shorter you wouldn't exist.");
+~chatnpc("<p,neutral>Very funny, human.");
+
+[opnpc1,dwarf_city_factory_worker3]
+~chatplayer("<p,neutral>What are you dwarves doing in this factory?");
+~chatnpc("<p,neutral>Working of course, can't you see that?");
+~chatplayer("<p,neutral>But working on what?");
+~chatnpc("<p,neutral>Refining the ore that is being brought into the factory, of course.");
+~chatplayer("<p,neutral>And what does that mean?");
+~chatnpc("<p,neutral>It means you should stop asking so many questions and get back to work!");
+
+[opnpc1,dwarf_city_factory_worker4]
+~chatplayer("<p,neutral>Who owns this factory?");
+~chatnpc("<p,neutral>The Consortium does and that's all you need to know.");
+~chatplayer("<p,neutral>But what company? I thought there were all these different companies?");
+~chatnpc("<p,neutral>Oh yes, all the major companies own this plant. It's too vital to be in the hands of one company alone.");
+~chatplayer("<p,neutral>And what exactly are you doing here?");
+~chatnpc("<p,neutral>I tire of these questions. Let me get back to work!");
+
+[opnpc1,dwarf_city_library_assistant]
+~keldagrim_library_assistant_dialogue();
+
+[proc,keldagrim_library_assistant_dialogue]
+switch_int (random(^keldagrim_library_assistant_dialogue_count)) {
+    case 0 :
+        ~chatnpc("<p,neutral>And where do you come from, traveller?");
+        ~chatplayer("<p,neutral>From... out of town.");
+        ~chatnpc("<p,neutral>That I could have guessed.");
+        ~chatnpc("<p,neutral>We've been having more human visitors in the city recently, there is another one over there. Perhaps you'll want to talk to her.");
+    case 1 :
+        ~chatnpc("<p,neutral>Ssshhhh...");
+    case 2 :
+        ~chatnpc("<p,neutral>There is a lot of knowledge stored in this library, you know.");
+        ~chatplayer("<p,neutral>Oh, I'm sure.");
+    case 3 :
+        ~chatnpc("<p,neutral>What can I help you with?");
+        ~chatplayer("<p,neutral>Help? What kind of help do you mean?");
+        ~chatnpc("<p,neutral>Looking for a book? A manuscript? Knowledge?");
+        ~chatplayer("<p,neutral>Oh, nothing in specific really.");
+        ~chatnpc("<p,neutral>I'll leave you to your browsing, then.");
+}
+
+[opnpc1,dwarf_city_library_customer]
+~chatplayer("<p,neutral>Hello, can you help me?");
+~chatnpc("<p,neutral>Ssshhh, don't talk...");
+~chatplayer("<p,neutral>But I just want to ask you something.");
+~chatnpc("<p,neutral>Ssshhhh! Can't you read the sign?");
+~chatplayer("<p,neutral>What sign??");
+~chatnpc("<p,neutral>Don't be a cheeky human!");
+~chatplayer("<p,neutral>Ssshhhh.");
+
+[opnpc1,dwarf_city_library_customer_human]
+~chatnpc("<p,neutral>Oh, that's nice, another human visitor to Keldagrim!");
+~chatplayer("<p,neutral>Indeed!");
+~chatnpc("<p,neutral>And what brings you to this city? Come to seek knowledge as well?");
+~chatplayer("<p,neutral>I think it's mostly fame and riches I'm after.");
+~chatnpc("<p,neutral>To each <text_gender("his", "her")> own, I suppose.");

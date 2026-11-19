@@ -245,11 +245,22 @@ def main() -> int:
     require("[opnpc1,fourdiamonds_troll_child]" not in without_comments(child) and
             "[opnpcu,fourdiamonds_troll_child]" not in without_comments(child),
             "non-visible child parent has no obsolete interactive dispatch bindings")
+    frozen_names = ("troll_block_1", "fd_trollblock1", "troll_block_2", "fd_trollblock2")
+    frozen_counts = dict.fromkeys(frozen_names, 0)
+    frozen_config = {}
+    for path in sorted((ROOT / "scripts").rglob("*.npc")):
+        source = without_comments(text(path))
+        for name in frozen_names:
+            count = len(re.findall(rf"(?m)^\s*\[{re.escape(name)}\]\s*$", source))
+            if count:
+                frozen_counts[name] += count
+                frozen_config[name] = config_sections(source).get(name, {})
     for identifier, name in ((1943, "troll_block_1"), (1944, "fd_trollblock1"),
                              (1945, "troll_block_2"), (1946, "fd_trollblock2")):
         require(re.search(rf"(?m)^{identifier}={name}$", npc_pack) is not None,
                 f"frozen parent retains original NPC identity {identifier} [{name}]")
-        require(block_config.get(name, {}).get("hitpoints") == ["10"],
+        require(frozen_counts[name] == 1, f"frozen parent block [{name}] is defined exactly once")
+        require(frozen_config.get(name, {}).get("hitpoints") == ["10"],
                 f"original frozen parent block [{name}] remains 10 HP")
     require("%npc_macro_event_target ! uid" in attackable and "%fd_icewarrior_subquest ! ^dt_ice_substate_agreed" in attackable,
             "Kamil admission is restricted to his owned native instance and agreed hunt")

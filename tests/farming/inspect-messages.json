@@ -1,0 +1,1093 @@
+{
+  "nativeCases": 2904,
+  "supportedForms": 436,
+  "leftForms": {
+    "N031-unreachable-mature-dead": 5,
+    "N034-goutweed": 11,
+    "N026": 162,
+    "N044": 135,
+    "N032": 189,
+    "N027": 24,
+    "N025": 11,
+    "N038": 22,
+    "N028": 31,
+    "N043": 37,
+    "Q085-kelda": 5
+  },
+  "rejectedWords": [
+    "ultracompost",
+    "bottomless"
+  ],
+  "families": [
+    {
+      "key": "allotment",
+      "parents": [
+        "farming_veg_patch_1",
+        "farming_veg_patch_2",
+        "farming_veg_patch_3",
+        "farming_veg_patch_4",
+        "farming_veg_patch_5",
+        "farming_veg_patch_6",
+        "farming_veg_patch_7",
+        "farming_veg_patch_8"
+      ],
+      "messages": {
+        "weeds": ["This is an allotment.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is an allotment.","The soil has not been treated.","The patch is empty and weeded."],
+        "growing": ["This is an allotment.","The soil has not been treated.","The patch has something growing in it."],
+        "mature": ["This is an allotment.","The soil has not been treated.","The patch is fully grown."],
+        "watered": ["This is an allotment.","The soil has not been treated.","The patch has something growing in it."],
+        "diseased": ["This is an allotment.","The soil has not been treated.","The patch is diseased and needs attending to."],
+        "dead": ["This is an allotment.","The soil has not been treated."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        },
+        {
+          "from": 6,
+          "to": 9,
+          "kind": "growing"
+        },
+        {
+          "from": 13,
+          "to": 16,
+          "kind": "growing"
+        },
+        {
+          "from": 20,
+          "to": 23,
+          "kind": "growing"
+        },
+        {
+          "from": 27,
+          "to": 30,
+          "kind": "growing"
+        },
+        {
+          "from": 34,
+          "to": 39,
+          "kind": "growing"
+        },
+        {
+          "from": 43,
+          "to": 48,
+          "kind": "growing"
+        },
+        {
+          "from": 52,
+          "to": 59,
+          "kind": "growing"
+        },
+        {
+          "from": 10,
+          "to": 12,
+          "kind": "mature"
+        },
+        {
+          "from": 17,
+          "to": 19,
+          "kind": "mature"
+        },
+        {
+          "from": 24,
+          "to": 26,
+          "kind": "mature"
+        },
+        {
+          "from": 31,
+          "to": 33,
+          "kind": "mature"
+        },
+        {
+          "from": 40,
+          "to": 42,
+          "kind": "mature"
+        },
+        {
+          "from": 49,
+          "to": 51,
+          "kind": "mature"
+        },
+        {
+          "from": 60,
+          "to": 62,
+          "kind": "mature"
+        },
+        {
+          "from": 70,
+          "to": 73,
+          "kind": "watered"
+        },
+        {
+          "from": 77,
+          "to": 80,
+          "kind": "watered"
+        },
+        {
+          "from": 84,
+          "to": 87,
+          "kind": "watered"
+        },
+        {
+          "from": 91,
+          "to": 94,
+          "kind": "watered"
+        },
+        {
+          "from": 98,
+          "to": 103,
+          "kind": "watered"
+        },
+        {
+          "from": 107,
+          "to": 112,
+          "kind": "watered"
+        },
+        {
+          "from": 116,
+          "to": 123,
+          "kind": "watered"
+        },
+        {
+          "from": 135,
+          "to": 137,
+          "kind": "diseased"
+        },
+        {
+          "from": 142,
+          "to": 144,
+          "kind": "diseased"
+        },
+        {
+          "from": 149,
+          "to": 151,
+          "kind": "diseased"
+        },
+        {
+          "from": 156,
+          "to": 158,
+          "kind": "diseased"
+        },
+        {
+          "from": 163,
+          "to": 167,
+          "kind": "diseased"
+        },
+        {
+          "from": 172,
+          "to": 176,
+          "kind": "diseased"
+        },
+        {
+          "from": 181,
+          "to": 187,
+          "kind": "diseased"
+        },
+        {
+          "from": 199,
+          "to": 201,
+          "kind": "dead"
+        },
+        {
+          "from": 206,
+          "to": 208,
+          "kind": "dead"
+        },
+        {
+          "from": 213,
+          "to": 215,
+          "kind": "dead"
+        },
+        {
+          "from": 220,
+          "to": 222,
+          "kind": "dead"
+        },
+        {
+          "from": 227,
+          "to": 231,
+          "kind": "dead"
+        },
+        {
+          "from": 236,
+          "to": 240,
+          "kind": "dead"
+        },
+        {
+          "from": 245,
+          "to": 251,
+          "kind": "dead"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "flower",
+      "parents": [
+        "farming_flower_patch_1",
+        "farming_flower_patch_2",
+        "farming_flower_patch_3",
+        "farming_flower_patch_4"
+      ],
+      "owner": "N031-unreachable-mature-dead",
+      "messages": {
+        "weeds": ["This is a flower patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a flower patch.","The soil has not been treated.","The patch is empty and weeded."],
+        "growing": ["This is a flower patch.","The soil has not been treated.","The patch has something growing in it."],
+        "mature": ["This is a flower patch.","The soil has not been treated.","The patch is fully grown."],
+        "scarecrowWeeds": ["This is a flower patch.","The soil has not been treated.","The patch needs weeding."],
+        "scarecrowEmpty": ["This is a flower patch.","The soil has not been treated.","The patch is empty and weeded."],
+        "watered": ["This is a flower patch.","The soil has not been treated.","The patch has something growing in it."],
+        "diseased": ["This is a flower patch.","The soil has not been treated.","The patch is diseased and needs attending to."],
+        "dead": ["This is a flower patch.","The soil has not been treated."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        },
+        {
+          "from": 8,
+          "to": 11,
+          "kind": "growing"
+        },
+        {
+          "from": 13,
+          "to": 16,
+          "kind": "growing"
+        },
+        {
+          "from": 18,
+          "to": 21,
+          "kind": "growing"
+        },
+        {
+          "from": 23,
+          "to": 26,
+          "kind": "growing"
+        },
+        {
+          "from": 28,
+          "to": 31,
+          "kind": "growing"
+        },
+        {
+          "from": 12,
+          "to": 12,
+          "kind": "mature"
+        },
+        {
+          "from": 17,
+          "to": 17,
+          "kind": "mature"
+        },
+        {
+          "from": 22,
+          "to": 22,
+          "kind": "mature"
+        },
+        {
+          "from": 27,
+          "to": 27,
+          "kind": "mature"
+        },
+        {
+          "from": 32,
+          "to": 32,
+          "kind": "mature"
+        },
+        {
+          "from": 33,
+          "to": 35,
+          "kind": "scarecrowWeeds"
+        },
+        {
+          "from": 36,
+          "to": 36,
+          "kind": "scarecrowEmpty"
+        },
+        {
+          "from": 72,
+          "to": 75,
+          "kind": "watered"
+        },
+        {
+          "from": 77,
+          "to": 80,
+          "kind": "watered"
+        },
+        {
+          "from": 82,
+          "to": 85,
+          "kind": "watered"
+        },
+        {
+          "from": 87,
+          "to": 90,
+          "kind": "watered"
+        },
+        {
+          "from": 92,
+          "to": 95,
+          "kind": "watered"
+        },
+        {
+          "from": 137,
+          "to": 139,
+          "kind": "diseased"
+        },
+        {
+          "from": 142,
+          "to": 144,
+          "kind": "diseased"
+        },
+        {
+          "from": 147,
+          "to": 149,
+          "kind": "diseased"
+        },
+        {
+          "from": 152,
+          "to": 154,
+          "kind": "diseased"
+        },
+        {
+          "from": 157,
+          "to": 159,
+          "kind": "diseased"
+        },
+        {
+          "from": 201,
+          "to": 203,
+          "kind": "dead"
+        },
+        {
+          "from": 206,
+          "to": 208,
+          "kind": "dead"
+        },
+        {
+          "from": 211,
+          "to": 213,
+          "kind": "dead"
+        },
+        {
+          "from": 216,
+          "to": 218,
+          "kind": "dead"
+        },
+        {
+          "from": 221,
+          "to": 223,
+          "kind": "dead"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "herb",
+      "parents": [
+        "farming_herb_patch_1",
+        "farming_herb_patch_2",
+        "farming_herb_patch_3",
+        "farming_herb_patch_4"
+      ],
+      "owner": "N034-goutweed",
+      "messages": {
+        "weeds": ["This is a herb patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a herb patch.","The soil has not been treated.","The patch is empty and weeded."],
+        "growing": ["This is a herb patch.","The soil has not been treated.","The patch has something growing in it."],
+        "mature": ["This is a herb patch.","The soil has not been treated.","The patch is fully grown."],
+        "diseased": ["This is a herb patch.","The soil has not been treated.","The patch is diseased and needs attending to."],
+        "dead": ["This is a herb patch.","The soil has not been treated."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        },
+        {
+          "from": 4,
+          "to": 7,
+          "kind": "growing"
+        },
+        {
+          "from": 11,
+          "to": 14,
+          "kind": "growing"
+        },
+        {
+          "from": 18,
+          "to": 21,
+          "kind": "growing"
+        },
+        {
+          "from": 25,
+          "to": 28,
+          "kind": "growing"
+        },
+        {
+          "from": 32,
+          "to": 35,
+          "kind": "growing"
+        },
+        {
+          "from": 39,
+          "to": 42,
+          "kind": "growing"
+        },
+        {
+          "from": 46,
+          "to": 49,
+          "kind": "growing"
+        },
+        {
+          "from": 53,
+          "to": 56,
+          "kind": "growing"
+        },
+        {
+          "from": 68,
+          "to": 71,
+          "kind": "growing"
+        },
+        {
+          "from": 75,
+          "to": 78,
+          "kind": "growing"
+        },
+        {
+          "from": 82,
+          "to": 85,
+          "kind": "growing"
+        },
+        {
+          "from": 89,
+          "to": 92,
+          "kind": "growing"
+        },
+        {
+          "from": 96,
+          "to": 99,
+          "kind": "growing"
+        },
+        {
+          "from": 103,
+          "to": 106,
+          "kind": "growing"
+        },
+        {
+          "from": 8,
+          "to": 10,
+          "kind": "mature"
+        },
+        {
+          "from": 15,
+          "to": 17,
+          "kind": "mature"
+        },
+        {
+          "from": 22,
+          "to": 24,
+          "kind": "mature"
+        },
+        {
+          "from": 29,
+          "to": 31,
+          "kind": "mature"
+        },
+        {
+          "from": 36,
+          "to": 38,
+          "kind": "mature"
+        },
+        {
+          "from": 43,
+          "to": 45,
+          "kind": "mature"
+        },
+        {
+          "from": 50,
+          "to": 52,
+          "kind": "mature"
+        },
+        {
+          "from": 57,
+          "to": 59,
+          "kind": "mature"
+        },
+        {
+          "from": 72,
+          "to": 74,
+          "kind": "mature"
+        },
+        {
+          "from": 79,
+          "to": 81,
+          "kind": "mature"
+        },
+        {
+          "from": 86,
+          "to": 88,
+          "kind": "mature"
+        },
+        {
+          "from": 93,
+          "to": 95,
+          "kind": "mature"
+        },
+        {
+          "from": 100,
+          "to": 102,
+          "kind": "mature"
+        },
+        {
+          "from": 107,
+          "to": 109,
+          "kind": "mature"
+        },
+        {
+          "from": 128,
+          "to": 169,
+          "kind": "diseased"
+        },
+        {
+          "from": 170,
+          "to": 172,
+          "kind": "dead"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "hops",
+      "parents": [
+        "farming_hops_patch_1",
+        "farming_hops_patch_2",
+        "farming_hops_patch_3",
+        "farming_hops_patch_4"
+      ],
+      "messages": {
+        "weeds": ["This is a hops patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a hops patch.","The soil has not been treated.","The patch is empty and weeded."],
+        "growing": ["This is a hops patch.","The soil has not been treated.","The patch has something growing in it."],
+        "mature": ["This is a hops patch.","The soil has not been treated.","The patch is fully grown."],
+        "watered": ["This is a hops patch.","The soil has not been treated.","The patch has something growing in it."],
+        "diseased": ["This is a hops patch.","The soil has not been treated.","The patch is diseased and needs attending to."],
+        "dead": ["This is a hops patch.","The soil has not been treated."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        },
+        {
+          "from": 4,
+          "to": 7,
+          "kind": "growing"
+        },
+        {
+          "from": 11,
+          "to": 15,
+          "kind": "growing"
+        },
+        {
+          "from": 19,
+          "to": 24,
+          "kind": "growing"
+        },
+        {
+          "from": 28,
+          "to": 34,
+          "kind": "growing"
+        },
+        {
+          "from": 38,
+          "to": 45,
+          "kind": "growing"
+        },
+        {
+          "from": 49,
+          "to": 52,
+          "kind": "growing"
+        },
+        {
+          "from": 56,
+          "to": 60,
+          "kind": "growing"
+        },
+        {
+          "from": 8,
+          "to": 10,
+          "kind": "mature"
+        },
+        {
+          "from": 16,
+          "to": 18,
+          "kind": "mature"
+        },
+        {
+          "from": 25,
+          "to": 27,
+          "kind": "mature"
+        },
+        {
+          "from": 35,
+          "to": 37,
+          "kind": "mature"
+        },
+        {
+          "from": 46,
+          "to": 48,
+          "kind": "mature"
+        },
+        {
+          "from": 53,
+          "to": 55,
+          "kind": "mature"
+        },
+        {
+          "from": 61,
+          "to": 63,
+          "kind": "mature"
+        },
+        {
+          "from": 68,
+          "to": 71,
+          "kind": "watered"
+        },
+        {
+          "from": 75,
+          "to": 79,
+          "kind": "watered"
+        },
+        {
+          "from": 83,
+          "to": 88,
+          "kind": "watered"
+        },
+        {
+          "from": 92,
+          "to": 98,
+          "kind": "watered"
+        },
+        {
+          "from": 102,
+          "to": 109,
+          "kind": "watered"
+        },
+        {
+          "from": 113,
+          "to": 116,
+          "kind": "watered"
+        },
+        {
+          "from": 120,
+          "to": 124,
+          "kind": "watered"
+        },
+        {
+          "from": 133,
+          "to": 135,
+          "kind": "diseased"
+        },
+        {
+          "from": 140,
+          "to": 143,
+          "kind": "diseased"
+        },
+        {
+          "from": 148,
+          "to": 152,
+          "kind": "diseased"
+        },
+        {
+          "from": 157,
+          "to": 162,
+          "kind": "diseased"
+        },
+        {
+          "from": 167,
+          "to": 173,
+          "kind": "diseased"
+        },
+        {
+          "from": 178,
+          "to": 180,
+          "kind": "diseased"
+        },
+        {
+          "from": 185,
+          "to": 188,
+          "kind": "diseased"
+        },
+        {
+          "from": 197,
+          "to": 199,
+          "kind": "dead"
+        },
+        {
+          "from": 204,
+          "to": 207,
+          "kind": "dead"
+        },
+        {
+          "from": 212,
+          "to": 216,
+          "kind": "dead"
+        },
+        {
+          "from": 221,
+          "to": 226,
+          "kind": "dead"
+        },
+        {
+          "from": 231,
+          "to": 237,
+          "kind": "dead"
+        },
+        {
+          "from": 242,
+          "to": 244,
+          "kind": "dead"
+        },
+        {
+          "from": 249,
+          "to": 252,
+          "kind": "dead"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "bush",
+      "parents": [
+        "farming_bush_patch_1",
+        "farming_bush_patch_2",
+        "farming_bush_patch_3",
+        "farming_bush_patch_4"
+      ],
+      "owner": "N026",
+      "messages": {
+        "weeds": ["This is a bush patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a bush patch.","The soil has not been treated.","The patch is empty and weeded."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "tree",
+      "parents": [
+        "farming_tree_patch_1",
+        "farming_tree_patch_2",
+        "farming_tree_patch_3",
+        "farming_tree_patch_4"
+      ],
+      "owner": "N044",
+      "messages": {
+        "weeds": ["This is a tree patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a tree patch.","The soil has not been treated.","The patch is empty and weeded."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "fruit_tree",
+      "parents": [
+        "farming_fruit_tree_patch_1",
+        "farming_fruit_tree_patch_2",
+        "farming_fruit_tree_patch_3",
+        "farming_fruit_tree_patch_4"
+      ],
+      "owner": "N032",
+      "messages": {
+        "weeds": ["This is a fruit tree patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a fruit tree patch.","The soil has not been treated.","The patch is empty and weeded."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "cactus",
+      "parents": [
+        "farming_cactus_patch"
+      ],
+      "owner": "N027",
+      "messages": {
+        "weeds": ["This is a cactus patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a cactus patch.","The soil has not been treated.","The patch is empty and weeded."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "belladonna",
+      "parents": [
+        "farming_belladonna_patch"
+      ],
+      "owner": "N025",
+      "messages": {
+        "weeds": ["This is a belladonna patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a belladonna patch.","The soil has not been treated.","The patch is empty and weeded."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "mushroom",
+      "parents": [
+        "farming_mushroom_patch"
+      ],
+      "owner": "N038",
+      "messages": {
+        "weeds": ["This is a mushroom patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a mushroom patch.","The soil has not been treated.","The patch is empty and weeded."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "calquat",
+      "parents": [
+        "farming_calquat_tree_patch"
+      ],
+      "owner": "N028",
+      "messages": {
+        "weeds": ["This is a calquat patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a calquat patch.","The soil has not been treated.","The patch is empty and weeded."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "spirit_tree",
+      "parents": [
+        "farming_spirit_tree_patch_1",
+        "farming_spirit_tree_patch_2",
+        "farming_spirit_tree_patch_3"
+      ],
+      "owner": "N043",
+      "messages": {
+        "weeds": ["This is a spirit tree patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a spirit tree patch.","The soil has not been treated.","The patch is empty and weeded."]
+      },
+      "states": [
+        {
+          "from": 0,
+          "to": 2,
+          "kind": "weeds"
+        },
+        {
+          "from": 3,
+          "to": 3,
+          "kind": "empty"
+        }
+      ],
+      "built": true
+    },
+    {
+      "key": "kelda",
+      "parents": [
+        "farming_hops_patch_keldagrim"
+      ],
+      "owner": "Q085-kelda",
+      "messages": {},
+      "states": [],
+      "built": false
+    }
+  ],
+  "liveCases": [
+    {
+      "state": 0,
+      "kind": "weeds",
+      "messages": [
+        "This is an allotment.",
+        "The soil has not been treated.",
+        "The patch needs weeding."
+      ]
+    },
+    {
+      "state": 3,
+      "kind": "empty",
+      "messages": [
+        "This is an allotment.",
+        "The soil has not been treated.",
+        "The patch is empty and weeded."
+      ]
+    },
+    {
+      "state": 6,
+      "kind": "growing",
+      "messages": [
+        "This is an allotment.",
+        "The soil has not been treated.",
+        "The patch has something growing in it."
+      ]
+    },
+    {
+      "state": 10,
+      "kind": "mature",
+      "messages": [
+        "This is an allotment.",
+        "The soil has not been treated.",
+        "The patch is fully grown."
+      ]
+    }
+  ],
+  "confirmedSentences": [
+    "This is an allotment.",
+    "This is a flower patch.",
+    "This is a herb patch.",
+    "This is a hops patch.",
+    "The soil has not been treated.",
+    "The soil has been treated with compost.",
+    "The soil has been treated with supercompost.",
+    "The patch needs weeding.",
+    "The patch is empty and weeded.",
+    "The patch has something growing in it.",
+    "The patch is fully grown.",
+    "The patch is diseased and needs attending to.",
+    "Your scarecrow is protecting these crops from disease.",
+    "This is a bush patch.",
+    "This is a tree patch.",
+    "This is a fruit tree patch.",
+    "This is a cactus patch.",
+    "This is a belladonna patch.",
+    "This is a mushroom patch.",
+    "This is a calquat patch.",
+    "This is a spirit tree patch."
+  ],
+  "soils": {
+    "untreated": "The soil has not been treated.",
+    "compost": "The soil has been treated with compost.",
+    "supercompost": "The soil has been treated with supercompost."
+  },
+  "patchTypes": {
+    "allotment": "This is an allotment.",
+    "flower": "This is a flower patch.",
+    "herb": "This is a herb patch.",
+    "hops": "This is a hops patch.",
+    "bush": "This is a bush patch.",
+    "tree": "This is a tree patch.",
+    "fruit_tree": "This is a fruit tree patch.",
+    "cactus": "This is a cactus patch.",
+    "belladonna": "This is a belladonna patch.",
+    "mushroom": "This is a mushroom patch.",
+    "calquat": "This is a calquat patch.",
+    "spirit_tree": "This is a spirit tree patch."
+  },
+  "stateSentences": {
+    "weeds": "The patch needs weeding.",
+    "empty": "The patch is empty and weeded.",
+    "growing": "The patch has something growing in it.",
+    "mature": "The patch is fully grown.",
+    "diseased": "The patch is diseased and needs attending to.",
+    "watered": "The patch has something growing in it.",
+    "scarecrowWeeds": "The patch needs weeding.",
+    "scarecrowEmpty": "The patch is empty and weeded."
+  },
+  "scarecrow": "Your scarecrow is protecting these crops from disease."
+}

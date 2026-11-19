@@ -1,0 +1,64 @@
+// N619 Al Kharid ordinary Talk-to slice.
+// Candidate wording is recorded in alkharid-old-town-dialogue; Camulet/late-MMII gates are excluded.
+
+[opnpc1,al_the_camel] @n619_alkharid_camel;
+[opnpc1,elly_the_camel] @n619_alkharid_camel;
+[opnpc1,ollie_the_camel] @n619_alkharid_camel;
+[opnpc1,cam_the_camel] @n619_alkharid_camel;
+[opnpc1,ugthanki] @n619_alkharid_ugthanki;
+[opnpc1,magic_carpet_monkey] @n619_alkharid_magic_carpet_monkey;
+
+[label,n619_alkharid_camel]
+def_int $choice = ~p_choice3("Ask the camel about its dung.", 1, "Say something unpleasant.", 2, "Neither - I'm a polite person.", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>I'm sorry to bother you, but could you spare me a little dung?");
+    ~mesbox("The camel didn't seem to appreciate that question.");
+    return;
+}
+if ($choice = 2) {
+    def_int $insult = random(3); // UNKNOWN engineering uniform insult weights.
+    if ($insult = 0) ~chatplayer("<p,neutral>If I go near that camel, it'll probably bite my hand off.");
+    if ($insult = 1) ~chatplayer("<p,neutral>Mmm... looks like that camel would make a nice kebab.");
+    if ($insult = 2) ~chatplayer("<p,neutral>I wonder if that camel has fleas...");
+    return;
+}
+return;
+
+[label,n619_alkharid_ugthanki]
+def_int $insult = random(3); // UNKNOWN engineering uniform insult weights.
+if ($insult = 0) ~chatplayer("<p,neutral>Mmm... looks like that camel would make a nice kebab.");
+if ($insult = 1) ~chatplayer("<p,neutral>If I go near that camel, it'll probably bite my hand off.");
+if ($insult = 2) ~chatplayer("<p,neutral>I wonder if that camel has fleas...");
+
+def_int $reaction = random(3); // UNKNOWN engineering independent uniform reaction weights.
+if ($reaction = 0) mes("The camel tries to stamp on your foot, but you pull it back quickly.");
+if ($reaction = 1) mes("The camel turns its head and glares at you.");
+if ($reaction = 2) mes("The camel spits at you, and you jump back hurriedly.");
+return;
+
+[label,n619_alkharid_magic_carpet_monkey]
+~chatplayer("<p,neutral>Who's a cute little monkey?");
+if (inv_total(worn, mm_amulet_of_monkey_speak) > 0) {
+    ~chatnpc("<p,neutral>Who's an ugly human? Give me a banana!");
+    ~chatplayer("<p,neutral>What's up with you?");
+    ~chatnpc("<p,neutral>Stupid human! Give monkey a banana!");
+    if (inv_total(inv, banana) = 0) {
+        ~chatplayer("<p,neutral>Sorry monkey, I don't have any bananas.");
+        ~chatnpc("<p,neutral>Aghhh. You're a rubbish human, get monkey a banana now.");
+        return;
+    }
+    def_int $choice = ~p_choice2("Give the monkey a banana.", 1, "Don't give it a banana.", 2);
+    if ($choice = 1) {
+        inv_del(inv, banana, 1);
+        ~chatnpc("<p,neutral>Ha ha! Smelly human gave monkey a banana.");
+        ~chatplayer("<p,neutral>Wow you're one nasty piece of work. Have you ever heard of gratitude?");
+        ~chatnpc("<p,neutral>Hey baldy, give monkey another banana!");
+        ~chatplayer("<p,neutral>Just because I'm not covered in fur doesn't make me bald, you cheeky monkey.");
+        ~chatnpc("<p,neutral>Monkey wants another banana now! Give me, give me!");
+        ~chatplayer("<p,neutral>Look I've had it with you, you little degenerate.");
+        return;
+    }
+    ~chatplayer("<p,neutral>I'll not give you a banana until you learn manners.");
+    return;
+}
+~chatnpc("<p,neutral>Ukkuk oook! Eeek aka, ahh aka gonk.");

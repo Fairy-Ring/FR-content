@@ -285,7 +285,6 @@ clientcode=7
 scope=perm
 transmit=yes
 
-[varp191_unused]
 
 [varp199_unused]
 
@@ -1045,8 +1044,6 @@ transmit=yes
 scope=perm
 
 [varp537_bits]
-
-[varp538_unused]
 
 [varp539_unused]
 

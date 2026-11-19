@@ -380,7 +380,7 @@ queue*(playerhit_n_retaliate, 0)(npc_uid);
 
 //  this should be strong queued. Some damage is queued, some isnt
 [queue,combat_viking_damage_player](int $damage, npc_uid $uid)
-if (inv_getobj(worn, ^wearpos_ring) = ring_of_recoil & map_members = ^true & npc_finduid(%aggressive_npc) = true & npc_hasop(2) = true & %npc_attacking_uid = uid & $damage > 0 & stat(hitpoints) > 0) {
+if (inv_getobj(worn, ^wearpos_ring) = ring_of_recoil & map_members = ^true & npc_finduid(%aggressive_npc) = true & ~npc_combat_hasop = true & %npc_attacking_uid = uid & $damage > 0 & stat(hitpoints) > 0) {
     // https://oldschool.runescape.wiki/w/Update:Clue_Scroll_Step_Counter
     // - "Recoil damage will now always target the entity that caused the initial damage, rather than the most recent entity to deal damage."
     def_int $recoil_damage = add(scale(10, 100, $damage), 1);

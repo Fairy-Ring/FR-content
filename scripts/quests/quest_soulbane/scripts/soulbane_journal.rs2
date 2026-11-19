@@ -1,5 +1,6 @@
-// CANDIDATE wording: soulbane.dlg.journal. These are conversation quotations,
-// not recovered original journal prose. Layout is UNKNOWN engineering work.
+// CANDIDATE wording: soulbane.dlg.journal and soulbane.dlg.tolna.
+// These are conversation quotations, not recovered original journal prose.
+// Layout is UNKNOWN engineering work.
 [if_button,questlist:soulbane]
 def_string $text = "";
 switch_int (%soulbane_prog) {
@@ -15,5 +16,23 @@ switch_int (%soulbane_prog) {
         $text = "@str@I managed to defeat the monsters in the room!||@dbl@I've made my way into a second room. I heard your son's voice again as well.||@dbl@You must save him! Help him get over his fear!";
     case 5 :
         $text = "@str@I managed to defeat the monsters in the room!||@str@I've overcome fear in the second room and an exit has been illuminated.||@dbl@Erm, I haven't actually ventured through yet.";
+    case ^soulbane_confusion_active :
+        $text = "@str@I've overcome fear in the second room and an exit has been illuminated.||@dbl@Hi, I've journeyed through to a third room. Your son's voice spoke as I entered.||@dbl@You have to help him overcome his confusion!";
+    case ^soulbane_confusion_clear :
+        $text = "@str@Hi. I have prevailed over a third room.||@dbl@I think I may be getting closer.";
+    case ^soulbane_hope_active :
+        $text = "@str@Hi. I have prevailed over a third room.||@dbl@I have travelled through to a fourth room. As I entered your son's voice spoke to me!||@dbl@You must fight to give him back his hope!";
+    case ^soulbane_hope_clear :
+        $text = "@str@I have endured against hopelessness to finish the fourth room.||@dbl@You must find him and bring him back to me. Please, I beg you.||@dbl@Don't worry, I will find him!";
+    case ^soulbane_tolna_intro, ^soulbane_tolna_active :
+        $text = "@str@I have endured against hopelessness to finish the fourth room.||@dbl@I've found your son.||@dbl@Now you must do what I cannot, conquer the physical dilemma!";
+    case ^soulbane_tolna_clear :
+        if (%soulbane_tolna_pres = 0) {
+            $text = "@str@I have returned your son to his normal state!||@dbl@Please talk to him, make sure he's OK!";
+        } else {
+            $text = "@str@Thank you so much. I truly owe you for your help.||@dbl@Hello Tolna.";
+        }
+    case ^soulbane_complete :
+        $text = "@str@Thank you so much. I truly owe you for your help.||@str@I'm just glad I could help.";
 }
 ~quest_journal("A Soul's Bane", $text);

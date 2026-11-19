@@ -28,17 +28,17 @@ switch_obj ($seed) {
     case default : return(null);
 }
 
-[proc,farming_flower_advance](int $stage, int $steps)(int)
+[proc,farming_flower_advance](int $stage, int $steps, int $treatment, int $window)(int)
 def_dbrow $crop = ~farming_flower_crop($stage);
 if ($crop = null) return($stage);
-return(~farming_crop_advance($stage, $steps, db_getfield($crop, farming_flower:first, 0), db_getfield($crop, farming_flower:mature, 0), true));
+return(~farming_crop_advance($stage, $steps, db_getfield($crop, farming_flower:first, 0), db_getfield($crop, farming_flower:mature, 0), true, $treatment, farming_growth_flower, $window));
 
-[proc,farming_flower_advance_all](int $steps)
+[proc,farming_flower_advance_all](int $steps, int $window)
 def_int $word = %farming_flower_varp;
 def_int $bit = 0;
 while ($bit < 32) {
     def_int $end = add($bit, 7);
-    def_int $stage = ~farming_flower_advance(getbit_range($word, $bit, $end), $steps);
+    def_int $stage = ~farming_flower_advance(getbit_range($word, $bit, $end), $steps, ~farming_soil_treatment(add(12, divide($bit, 8))), $window);
     $word = setbit_range_toint($word, $stage, $bit, $end);
     $bit = add($bit, 8);
 }
@@ -61,11 +61,11 @@ return(false);
 // UNKNOWN whether protection cures existing disease; the product does not.
 // UNKNOWN catch-up: use the saved flower state for this elapsed reconciliation,
 // just as the shared clock uses the saved crop state, without inventing history.
-[proc,farming_flower_advance_protected](int $stage, int $steps, dbrow $crop)(int)
+[proc,farming_flower_advance_protected](int $stage, int $steps, dbrow $crop, int $window)(int)
 def_int $first = db_getfield($crop, farming_allotment:first, 0);
 def_int $mature = db_getfield($crop, farming_allotment:mature, 0);
 if ($stage >= add($first, ^farming_watered_offset) & $stage < add($mature, ^farming_watered_offset) & $steps > 0) {
     $stage = sub($stage, ^farming_watered_offset);
 }
 if ($stage >= $first & $stage < $mature) return(min($mature, add($stage, max(0, $steps))));
-return(~farming_crop_advance($stage, $steps, $first, $mature, true));
+return(~farming_crop_advance($stage, $steps, $first, $mature, true, 0, farming_growth_potato, $window));

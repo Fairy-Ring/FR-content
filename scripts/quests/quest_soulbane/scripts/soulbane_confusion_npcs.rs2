@@ -1,0 +1,147 @@
+// VERIFIED: five real kills; illusions take eight zero hits and can poison.
+// CANDIDATE: normal rolled-hit XP, poison immunity and later messages.
+[proc,soulbane_confusion_npc]()(boolean)
+if (npc_type = soulbane_confu_creeper | npc_type = soulbane_confu_creeper_fake1 | npc_type = soulbane_confu_creeper_fake2 | npc_type = soulbane_confu_creeper_fake3 | npc_type = soulbane_confu_creeper_fake4) return(true);
+return(false);
+
+[proc,soulbane_confusion_attackable]()(boolean)
+if (%soulbane_prog ! ^soulbane_confusion_active | %soulbane_confu_door5pres ! 0) return(false);
+return(~soulbane_npc_owned);
+
+// Shared admission cap rejects foreign/stale hits before ordinary combat XP.
+[proc,soulbane_confusion_max](int $maximum)(int)
+if (~soulbane_confusion_attackable = false) return(0);
+return($maximum);
+
+[ai_spawn,soulbane_confu_creeper] ~soulbane_confusion_npc_spawn;
+[ai_spawn,soulbane_confu_creeper_fake1] ~soulbane_confusion_npc_spawn;
+[ai_spawn,soulbane_confu_creeper_fake2] ~soulbane_confusion_npc_spawn;
+[ai_spawn,soulbane_confu_creeper_fake3] ~soulbane_confusion_npc_spawn;
+[ai_spawn,soulbane_confu_creeper_fake4] ~soulbane_confusion_npc_spawn;
+[proc,soulbane_confusion_npc_spawn]
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+%npc_start_coord = npc_coord;
+
+[opnpc2,soulbane_confu_creeper] @soulbane_confusion_attack;
+[opnpc2,soulbane_confu_creeper_fake1] @soulbane_confusion_attack;
+[opnpc2,soulbane_confu_creeper_fake2] @soulbane_confusion_attack;
+[opnpc2,soulbane_confu_creeper_fake3] @soulbane_confusion_attack;
+[opnpc2,soulbane_confu_creeper_fake4] @soulbane_confusion_attack;
+[label,soulbane_confusion_attack]
+if (~soulbane_confusion_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,soulbane_confu_creeper] @soulbane_confusion_attack_ap;
+[apnpc2,soulbane_confu_creeper_fake1] @soulbane_confusion_attack_ap;
+[apnpc2,soulbane_confu_creeper_fake2] @soulbane_confusion_attack_ap;
+[apnpc2,soulbane_confu_creeper_fake3] @soulbane_confusion_attack_ap;
+[apnpc2,soulbane_confu_creeper_fake4] @soulbane_confusion_attack_ap;
+[label,soulbane_confusion_attack_ap]
+if (~soulbane_confusion_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_queue1,soulbane_confu_creeper] ~soulbane_confusion_retaliate;
+[ai_queue1,soulbane_confu_creeper_fake1] ~soulbane_confusion_retaliate;
+[ai_queue1,soulbane_confu_creeper_fake2] ~soulbane_confusion_retaliate;
+[ai_queue1,soulbane_confu_creeper_fake3] ~soulbane_confusion_retaliate;
+[ai_queue1,soulbane_confu_creeper_fake4] ~soulbane_confusion_retaliate;
+[proc,soulbane_confusion_retaliate]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_confusion_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_retaliate;
+
+[ai_opplayer2,soulbane_confu_creeper] ~soulbane_confusion_npc_attack;
+[ai_opplayer2,soulbane_confu_creeper_fake1] ~soulbane_confusion_npc_attack;
+[ai_opplayer2,soulbane_confu_creeper_fake2] ~soulbane_confusion_npc_attack;
+[ai_opplayer2,soulbane_confu_creeper_fake3] ~soulbane_confusion_npc_attack;
+[ai_opplayer2,soulbane_confu_creeper_fake4] ~soulbane_confusion_npc_attack;
+[proc,soulbane_confusion_npc_attack]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_setmode(none);
+    return;
+}
+if (~soulbane_confusion_attackable = false) {
+    npc_setmode(none);
+    return;
+}
+%npc_aggressive_player = uid;
+~npc_default_attack;
+
+[ai_queue2,soulbane_confu_creeper] ~soulbane_confusion_damage(last_int);
+[ai_queue2,soulbane_confu_creeper_fake1] ~soulbane_confusion_damage(last_int);
+[ai_queue2,soulbane_confu_creeper_fake2] ~soulbane_confusion_damage(last_int);
+[ai_queue2,soulbane_confu_creeper_fake3] ~soulbane_confusion_damage(last_int);
+[ai_queue2,soulbane_confu_creeper_fake4] ~soulbane_confusion_damage(last_int);
+
+// CANDIDATE quest-form poison resistance; do not apply the later venom rule.
+[ai_timer,soulbane_confu_creeper] ~npc_poison_clear;
+[ai_timer,soulbane_confu_creeper_fake1] ~npc_poison_clear;
+[ai_timer,soulbane_confu_creeper_fake2] ~npc_poison_clear;
+[ai_timer,soulbane_confu_creeper_fake3] ~npc_poison_clear;
+[ai_timer,soulbane_confu_creeper_fake4] ~npc_poison_clear;
+[proc,soulbane_confusion_damage](int $damage)
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_confusion_attackable = false | %npc_aggressive_player ! uid) return;
+if (npc_type = soulbane_confu_creeper) {
+    ~npc_default_damage($damage);
+    return;
+}
+// UNKNOWN server binding: one transient counter per illusion, reset by despawn.
+// The original named player counters have protected authored defaults; leave
+// their metadata untouched rather than acquiring a busy player's write pointer.
+// Keep the ordinary rolled-hit XP; only displayed/applied damage becomes zero.
+~npc_default_damage(0);
+def_int $hits = add(%soulbane_confusion_hits, 1);
+%soulbane_confusion_hits = $hits;
+if ($hits = ^soulbane_confusion_zero_hits) {
+    %npc_int = 0;
+    npc_setmode(none);
+    // Keep the eighth hitsplat in NPC info, as the published npc_death does.
+    npc_delay(^soulbane_confusion_removal_ticks);
+    npc_del;
+    // UNKNOWN equal weighting between the transcript's two random alternatives.
+    if (random(2) = 0) mes("Does this creature really exist?");
+    else mes("That monster wasn't even real!");
+}
+
+[ai_queue3,soulbane_confu_creeper]
+if (finduid(%npc_attacking_uid) = true) {
+    if (~soulbane_confusion_attackable = true & npc_stat(hitpoints) = 0) {
+        %npc_int = 0;
+        queue*(soulbane_confusion_credit, 0)(%soulbane_instance, add(~soulbane_confusion_kills, 1));
+    }
+}
+~npc_death;
+
+[queue,soulbane_confusion_credit](int $instance, int $ordinal)
+if (~soulbane_owned = false | %soulbane_instance ! $instance | %soulbane_prog ! ^soulbane_confusion_active) return;
+if ($ordinal ! add(~soulbane_confusion_kills, 1) | $ordinal > ^soulbane_confusion_real_kills) return;
+switch_int ($ordinal) {
+    case 1 : %soulbane_confu_door1pres = 1;
+    case 2 : %soulbane_confu_door2pres = 1;
+    case 3 : %soulbane_confu_door3pres = 1;
+    case 4 : %soulbane_confu_door4pres = 1;
+    case 5 : %soulbane_confu_door5pres = 1;
+}
+~soulbane_clear_room_npcs;
+// CANDIDATE transcript: "Killing the last confusion beast each time", game message.
+mes("Those other monsters were just hallucinations!");
+if ($ordinal = ^soulbane_confusion_real_kills) {
+    queue(soulbane_confusion_complete, 0, 0);
+    return;
+}
+// CANDIDATE later guide: reset the other beasts after each real kill.
+~soulbane_confusion_spawn;
+
+[proc,soulbane_confusion_kills]()(int)
+return(calc(%soulbane_confu_door1pres + %soulbane_confu_door2pres + %soulbane_confu_door3pres + %soulbane_confu_door4pres + %soulbane_confu_door5pres));
+
+[proc,soulbane_confusion_reset]
+if (%soulbane_prog = ^soulbane_confusion_active) {
+    %soulbane_confu_door1pres = 0;
+    %soulbane_confu_door2pres = 0;
+    %soulbane_confu_door3pres = 0;
+    %soulbane_confu_door4pres = 0;
+    %soulbane_confu_door5pres = 0;
+    %soulbane_confu_door6open = 0;
+}

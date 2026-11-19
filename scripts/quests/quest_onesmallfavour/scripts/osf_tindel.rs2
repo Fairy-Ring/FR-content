@@ -6,7 +6,7 @@
 
 [opnpc1,tindel_marchant]
 if (%onesmallfavour < 18) {
-    ~displaymessage(^dm_default);
+    @tindel_appraisal_talk;
     return;
 }
 if (%onesmallfavour >= 23) {

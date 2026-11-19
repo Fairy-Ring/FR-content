@@ -338,7 +338,7 @@ try {
     p.setVar(unrelated, 3);
     const before = p.getVar(hopsVarp);
     JavaRandom.setSeed(healthyAdvanceSeed);
-    proc(p, 'farming_hops_advance_all', 4);
+    proc(p, 'farming_hops_advance_all', 4, 0);
     const expected = starts.map(value => value + 4);
     assert.deepEqual(selectors.map((_, index) => stage(p, index)), expected);
     assert.equal(expected[0], 53, 'four native hops growth advances write barley mature value 53');
@@ -385,20 +385,20 @@ try {
     const probe = player();
     for (const crop of crops) {
       JavaRandom.setSeed(draws128.get(0));
-      assert.equal(proc(probe, 'farming_hops_advance', crop.first, 1).popInt(), crop.first + 1,
+      assert.equal(proc(probe, 'farming_hops_advance', crop.first, 1, 0, 0).popInt(), crop.first + 1,
         `${crop.name} first stage advances without a disease roll`);
       JavaRandom.setSeed(draws128.get(0));
-      assert.equal(proc(probe, 'farming_hops_advance', crop.first + 1, 1).popInt(), crop.first + 129,
+      assert.equal(proc(probe, 'farming_hops_advance', crop.first + 1, 1, 0, 0).popInt(), crop.first + 129,
         `${crop.name} dry growing stage can become diseased at the shared low boundary`);
       JavaRandom.setSeed(draws128.get(127));
-      assert.equal(proc(probe, 'farming_hops_advance', crop.first + 1, 1).popInt(), crop.first + 2,
+      assert.equal(proc(probe, 'farming_hops_advance', crop.first + 1, 1, 0, 0).popInt(), crop.first + 2,
         `${crop.name} dry stage advances without disease above the shared threshold`);
       JavaRandom.setSeed(draws128.get(127));
-      assert.equal(proc(probe, 'farming_hops_advance', crop.first + 1 + 64, 1).popInt(), crop.first + 2,
+      assert.equal(proc(probe, 'farming_hops_advance', crop.first + 1 + 64, 1, 0, 0).popInt(), crop.first + 2,
         `${crop.name} watered growth advances from the base cache byte`);
-      assert.equal(proc(probe, 'farming_hops_advance', crop.mature, 1000).popInt(), crop.mature,
+      assert.equal(proc(probe, 'farming_hops_advance', crop.mature, 1000, 0, 0).popInt(), crop.mature,
         `${crop.name} mature plants never grow beyond their mature stage`);
-      assert.equal(proc(probe, 'farming_hops_advance', crop.first + 1 + 128, 1).popInt(), crop.first + 1 + 192,
+      assert.equal(proc(probe, 'farming_hops_advance', crop.first + 1 + 128, 1, 0, 0).popInt(), crop.first + 1 + 192,
         `${crop.name} disease becomes the corresponding dead stage`);
 
       const watered = fixture({ level: crop.level, stage: crop.first + 1 });

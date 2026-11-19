@@ -1,0 +1,77 @@
+// VERIFIED room order and five real kills; CANDIDATE voices and reset cycle.
+// UNKNOWN original stages, spawn permutation and fixed actor stands.
+[proc,soulbane_confusion_enter]
+if (%soulbane_instance = 0 | %soulbane_prog < 5 | %soulbane_prog > ^soulbane_confusion_clear) return;
+if (add(region_uid, 1) ! %soulbane_instance) return;
+def_boolean $first = false;
+if (%soulbane_prog = 5) {
+    $first = true;
+    %soulbane_prog = ^soulbane_confusion_active;
+    ~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+}
+~soulbane_clear_room_npcs;
+~soulbane_confusion_reset;
+p_teleport(~soulbane_room_coord(^soulbane_confusion_entry));
+// CANDIDATE: retained Old School Method of Madness history maps Confusion.
+~music_playbyrow(music_Method_of_Madness);
+if (%soulbane_prog = ^soulbane_confusion_active) {
+    ~soulbane_confusion_spawn;
+    if ($first = true) {
+        mes("Where am I? How long have I been here? Am I still the person I once was?");
+        mes("Oh why am I so CONFUSED?");
+    }
+}
+
+[proc,soulbane_confusion_spawn]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_confusion_active | ~soulbane_confusion_kills >= ^soulbane_confusion_real_kills) return;
+// UNKNOWN uniform real-beast position among the five later-candidate spawns.
+def_int $real = random(^soulbane_confusion_group_size);
+def_int $slot = 0;
+def_int $fake = 1;
+while ($slot < ^soulbane_confusion_group_size) {
+    def_npc $type = soulbane_confu_creeper;
+    if ($slot ! $real) {
+        switch_int ($fake) {
+            case 1 : $type = soulbane_confu_creeper_fake1;
+            case 2 : $type = soulbane_confu_creeper_fake2;
+            case 3 : $type = soulbane_confu_creeper_fake3;
+            case 4 : $type = soulbane_confu_creeper_fake4;
+        }
+        $fake = add($fake, 1);
+    }
+    def_coord $stand = null;
+    switch_int ($slot) {
+        case 0 : $stand = ^soulbane_confusion_spawn1;
+        case 1 : $stand = ^soulbane_confusion_spawn2;
+        case 2 : $stand = ^soulbane_confusion_spawn3;
+        case 3 : $stand = ^soulbane_confusion_spawn4;
+        case 4 : $stand = ^soulbane_confusion_spawn5;
+    }
+    ~soulbane_rage_add($type, $stand);
+    $slot = add($slot, 1);
+}
+
+[oploc1,soulbane_door_multi1] @soulbane_confusion_door;
+[oploc1,soulbane_door_multi2] @soulbane_confusion_door;
+[oploc1,soulbane_door_multi3] @soulbane_confusion_door;
+[oploc1,soulbane_door_multi4] @soulbane_confusion_door;
+[oploc1,soulbane_door_multi5] @soulbane_confusion_door;
+[oploc1,soulbane_door_multi6] @soulbane_confusion_door;
+[oploc1,soul_bane_con_door1_closed] @soulbane_confusion_door;
+[oploc1,soul_bane_con_door2_closed] @soulbane_confusion_door;
+[oploc1,soul_bane_con_door3_closed] @soulbane_confusion_door;
+[oploc1,soul_bane_con_door4_closed] @soulbane_confusion_door;
+[oploc1,soul_bane_con_door5_closed] @soulbane_confusion_door;
+[oploc1,soul_bane_con_door6_closed] @soulbane_confusion_door;
+[oploc1,soul_bane_con_door6_open1] @soulbane_confusion_door;
+[label,soulbane_confusion_door]
+if (~soulbane_owned = false) return;
+if (%soulbane_prog ! ^soulbane_confusion_active & %soulbane_prog ! ^soulbane_confusion_clear) return;
+if (loc_type = soulbane_door_multi6 | loc_type = soul_bane_con_door6_open1 | loc_type = soul_bane_con_door6_closed) {
+    if (%soulbane_prog = ^soulbane_confusion_clear & %soulbane_confu_door6open = 1) {
+        ~soulbane_hope_enter;
+        return;
+    }
+}
+// Original 377 examine wording reused without inventing a quest refusal.
+mes("Where does it lead?");

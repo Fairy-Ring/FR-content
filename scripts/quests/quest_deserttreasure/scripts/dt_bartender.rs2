@@ -40,10 +40,9 @@ if (%deserttreasure >= ^deserttreasure_complete) {
 
 [label,dt_bart_buy_gate]
 ~chatnpc("<p,angry>If you're not buying anything, I have nothing to say to you.");
-def_int $opt = ~p_choice2("Buy a drink", 1, "Nothing thanks.", 2);
+def_int $opt = ~p_choice2("Buy a drink", 1, "Ask about Desert Treasure", 2);
 if ($opt = 2) {
-    ~chatnpc("<p,angry>Get out of my bar then! We don't like your sort round here!");
-    return;
+    @dt_bart_treasure;
 }
 if (inv_total(inv, coins) < 650) {
     ~chatnpc("<p,angry>You ain't got the 650 coins it costs to buy it, and I'm glad 'cos I didn't want to serve you anyway.");
@@ -67,11 +66,12 @@ if (inv_itemspace(inv, bandit_brew, 1, inv_size(inv)) = false) {
 }
 inv_del(inv, coins, 650);
 inv_add(inv, bandit_brew, 1);
-~chatnpc("<p,angry>There you go. Now get out, we don't like your sort around here.");
+// Buying the brew unlocks the next conversation, even if its closing page is dismissed.
 if (%deserttreasure = 5) {
     %deserttreasure = 6;
     ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 }
+~chatnpc("<p,angry>There you go. Now get out, we don't like your sort around here.");
 return;
 
 [label,dt_bart_after_drink]
@@ -81,10 +81,7 @@ return;
 ~chatnpc("<p,quiz>Oh really? Our inheritance is only sand and death. What do you expect to find out here in this desert forsaken by the gods?");
 def_int $ask = ~p_choice3("I heard about treasure...", 1, "I heard about four diamonds...", 2, "I heard about a fortress...", 3);
 if ($ask = 1) {
-    ~chatplayer("<p,quiz>As I understand it there's some kind of hidden treasure in these parts...");
-    ~chatnpc("<p,angry>Look around pal. Does it looks like there's any treasure near here?");
-    ~chatnpc("<p,angry>If I were you I'd get lost before someone takes a dislike to your face and removes it for you.");
-    return;
+    @dt_bart_treasure;
 }
 if ($ask = 3) {
     ~chatplayer("<p,quiz>Certain things have led me to believe there may be some kind of ruined fortress around here...");
@@ -102,3 +99,8 @@ if (%deserttreasure = 6) {
     ~send_quest_progress(questlist:deserttreasure, %deserttreasure, ^deserttreasure_complete);
 }
 return;
+
+[label,dt_bart_treasure]
+~chatplayer("<p,quiz>As I understand it there's some kind of hidden treasure in these parts...");
+~chatnpc("<p,angry>Look around pal. Does it looks like there's any treasure near here?");
+~chatnpc("<p,angry>If I were you I'd get lost before someone takes a dislike to your face and removes it for you.");

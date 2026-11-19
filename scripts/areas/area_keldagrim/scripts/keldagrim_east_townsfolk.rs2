@@ -1,0 +1,131 @@
+// CANDIDATE: modern OSRS standard Talk transcripts; revision-377 wording is not independently proved.
+// Keldagrim tasks, later-quest branches, overhead chores, and non-Talk services are excluded.
+
+[opnpc1,dwarf_city_rowdy_dwarf]
+~chatnpc("<p,neutral>Get OUT of my WAY!");
+
+[opnpc1,dwarf_city_old_dwarf3]
+~chatnpc("<p,neutral>Oh, leave an old dwarf in peace will you?");
+~chatplayer("<p,neutral>Why, what's wrong?");
+~chatnpc("<p,neutral>Ninenty years down in the mines, and this is all I got out of it. All my life wasted away.");
+~chatplayer("<p,neutral>You've still got a nice house, don't you?");
+~chatnpc("<p,neutral>A crummy old house in East, that's all my life amounts to.");
+~chatplayer("<p,neutral>I'll leave you alone then.");
+
+[opnpc1,dwarf_city_dwarf_man1]
+// UNKNOWN engineering: select the sourced chores variant, not the sourced at-home variant.
+~chatnpc("<p,neutral>Sorry, I'm busy!");
+
+[opnpc1,dwarf_city_dwarf_man2]
+~chatnpc("<p,neutral>Do you mind? You're in my home.");
+~chatplayer("<p,neutral>I'm sorry, should I have knocked?");
+~chatnpc("<p,neutral>Very funny, human.");
+~chatnpc("<p,neutral>We can't all live in plush houses, you know. But that doesn't mean us mining dwarves don't work hard.");
+~chatplayer("<p,neutral>Where do you do your mining?");
+~chatnpc("<p,neutral>Normally the coal mine to the north. We need a lot of coal to keep our steam engines going, you know.");
+~chatplayer("<p,neutral>Can I do a bit of mining there as well?");
+~chatnpc("<p,neutral>I'm not sure, but as long as no one notices I don't think anyone is going to care.");
+
+[opnpc1,dwarf_city_dwarf_man3]
+~chatnpc("<p,neutral>Say, aren't you the human who got arrested here the other day, by the boat?");
+~chatplayer("<p,neutral>Yes, but we cleared up the whole situation.");
+~chatnpc("<p,neutral>Right, right.");
+
+[opnpc1,dwarf_city_dwarf_man4]
+~chatnpc("<p,neutral>Welcome to my home. Is there anything you wanted?");
+~chatplayer("<p,neutral>Nothing in particular. Got any sightseeing tips?");
+~chatnpc("<p,neutral>No, I'm just a factory worker. Don't do tours.");
+~chatplayer("<p,neutral>This doesn't look like a factory.");
+~chatnpc("<p,neutral>This is my home. I'm off-duty.");
+
+[opnpc1,dwarf_city_dwarf_man5]
+~chatnpc("<p,neutral>Hello there, human! Come in, come in!");
+~chatplayer("<p,neutral>Hi, nice to see you!");
+~chatnpc("<p,neutral>Tell me, what brings you here?");
+~chatplayer("<p,neutral>Well, first I came to this city just for the adventure and excitement, but then I knocked over this statue, you see. Well, I didn't really knock it over myself, I was on this boat.");
+~chatnpc("<p,neutral>A boat! Fascinating, go on!");
+~chatplayer("<p,neutral>Yes, well, this boatman was a bit rubbish, or there was something wrong with the ship, I don't know. And then I got arrested by the Black Guard.");
+~chatnpc("<p,neutral>Not the Black Guard!");
+~chatplayer("<p,neutral>Yes, and they took me to this Veldaban person, who pretended to be really angry but actually he was really nice and he asked me for my help.");
+~chatplayer("<p,neutral>So here I am, helping to rebuild the statue.");
+~chatnpc("<p,neutral>Such an interesting tale!");
+~chatnpc("<p,neutral>Now how did you come to be in Keldagrim again?");
+~chatplayer("<p,neutral>Never mind.");
+
+[opnpc1,dwarf_city_dwarf_man8]
+~chatnpc("<p,neutral>Kebabs! Get your kebabs here! One gold each!");
+def_int $choice = ~p_choice3("Sure, one kebab please.", 1, "I'm looking for a drunken dwarf.", 2, "Do you have any quests?", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Sure, one kebab please.");
+    if (inv_total(inv, coins) < 1) {
+        ~chatnpc("<p,neutral>Yes? Are you going to give me that one gold coin then?");
+        ~chatplayer("<p,neutral>Sorry, I don't seem to have any money on me.");
+        ~chatnpc("<p,neutral>The bank is Keldagrim-West. Hurry back!");
+        return;
+    }
+    inv_del(inv, coins, 1);
+    inv_add(inv, kebab, 1);
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>I'm looking for a drunken dwarf.");
+    ~chatnpc("<p,neutral>Just go out in the streets, they can't be hard to find!");
+    ~chatplayer("<p,neutral>No, a specific drunken dwarf, he keeps harassing me.");
+    ~chatnpc("<p,neutral>That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.");
+    ~chatnpc("<p,neutral>He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.");
+    ~chatplayer("<p,neutral>I don't think that's who I mean.");
+    ~chatnpc("<p,neutral>Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.");
+    ~chatplayer("<p,neutral>Do you think I'll have any chance of catching him here?");
+    ~chatnpc("<p,neutral>I think he was back here quite recently, so I doubt he'll be back any time soon.");
+    return;
+}
+~chatplayer("<p,neutral>Do you have any quests?");
+~chatnpc("<p,neutral>Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!");
+
+[opnpc1,dwarf_city_drunken_dwarf]
+~keldagrim_drunken_dwarf_talk();
+
+[opnpc1,dwarf_city_drunken_kebab]
+~keldagrim_drunken_dwarf_talk();
+
+[proc,keldagrim_drunken_dwarf_talk]
+if (testbit(%ordinary_dialogue_bits, ^keldagrim_drunken_dwarf_talked) = ^false) {
+    ~chatplayer("<p,neutral>Hello there! Are you alright?");
+    ~chatnpc("<p,neutral>Of courshe! Why why why *hic* why shouldn't I be?");
+    ~chatplayer("<p,neutral>Hey, you look vaguely familiar... haven't I seen you somewhere before?");
+    ~chatnpc("<p,neutral>That'sh not likely... I've been here for eh...");
+    ~chatnpc("<p,neutral>I've been here for...");
+    ~chatnpc("<p,neutral>Yearsh!");
+    ~chatnpc("<p,neutral>I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.");
+    ~chatplayer("<p,neutral>And where is this... family member of yours?");
+    ~chatnpc("<p,neutral>All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.");
+    ~chatplayer("<p,neutral>Hmm... I wonder, I may have met him...");
+    ~chatnpc("<p,neutral>He comesh back sometimesh... saysh he needsh more kebabsh.");
+    ~chatnpc("<p,neutral>Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.");
+    ~chatnpc("<p,neutral>When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!");
+    ~chatplayer("<p,neutral>Er, yes, well, I think I should be off now.");
+    ~chatnpc("<p,neutral>THE KEBABSH WILL COME FOR YOU!");
+    %ordinary_dialogue_bits = setbit(%ordinary_dialogue_bits, ^keldagrim_drunken_dwarf_talked);
+    // UNKNOWN engineering: remember only a completed initial conversation, so closing it cannot lose it.
+}
+else {
+    ~chatplayer("<p,neutral>Hello there! Are you alright?");
+    ~chatnpc("<p,neutral>Of courshe! Why why why *hic* why shouldn't I be?");
+    ~chatplayer("<p,neutral>What are you doing here anyway?");
+    ~chatnpc("<p,neutral>I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.");
+    ~chatplayer("<p,neutral>And where is this... family member of yours?");
+    ~chatnpc("<p,neutral>All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.");
+    ~chatplayer("<p,neutral>Hmm... I wonder, I may have met him...");
+    ~chatnpc("<p,neutral>He comesh back sometimesh... saysh he needsh more kebabsh.");
+    ~chatnpc("<p,neutral>Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.");
+    ~chatnpc("<p,neutral>When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!");
+    ~chatplayer("<p,neutral>Er, yes, well, I think I should be off now.");
+    ~chatnpc("<p,neutral>THE KEBABSH WILL COME FOR YOU!");
+}
+
+// CANDIDATE: Transcript:Smokin' Joe 14429469, before the 26 June 2024 Ratcatchers rewrite.
+[opnpc1,vc_smokin_joe]
+~chatplayer("<p,neutral>Hello!");
+~chatplayer("<p,neutral>Hey!");
+~chatplayer("<p,neutral>Yo, shortstuff!");
+~mesbox("Despite your wild articulations and gesticulations you fail to catch Joe's attention.");

@@ -1,0 +1,110 @@
+// CANDIDATE later guide: three simultaneous heads and an instanced final fight.
+// UNKNOWN private layout and actor stands; original client terrain is unchanged.
+[oploc1,soul_bane_hwall_void_exit]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_hope_clear) return;
+%soulbane_prog = ^soulbane_tolna_intro;
+~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+~soulbane_tolna_enter;
+
+// The original final-room hole remains a real, reachable surface exit.
+[oploc1,soul_bane_tolna_void_small] @soulbane_exit;
+
+[proc,soulbane_tolna_enter]
+~soulbane_cleanup;
+// Copy all original planes, including the upper decoration/roof flags.
+// There is still exactly one owned handle; departure releases the old copy.
+def_coord $sw = region_create(^soulbane_region_levels, ^soulbane_tolna_region_zones, ^soulbane_tolna_region_zones);
+def_int $level = 0;
+while ($level < ^soulbane_region_levels) {
+    def_int $x = 0;
+    while ($x < ^soulbane_tolna_region_zones) {
+        def_int $z = 0;
+        while ($z < ^soulbane_tolna_region_zones) {
+            region_set($level, $x, $z, movecoord(^soulbane_tolna_map_source, multiply($x, 8), $level, multiply($z, 8)), 0);
+            $z = add($z, 1);
+        }
+        $x = add($x, 1);
+    }
+    $level = add($level, 1);
+}
+region_setexitcoord(^soulbane_surface);
+%soulbane_instance = add(region_uid, 1);
+p_teleport(~soulbane_tolna_coord(^soulbane_tolna_entry));
+// CANDIDATE: musicregion_46_81 and the operator, 2026-11-18T14:28Z:
+// "Wrath and Ruin (anger room, battle with Tolna)" (operator-answers-1117.md).
+~music_playbyrow(music_Wrath_and_Ruin);
+// Native teleport may select the departing region. Reselect this copy first.
+if (~soulbane_owned = false) return;
+if (%soulbane_prog = ^soulbane_tolna_clear) {
+    if (%soulbane_tolna_pres = 0) {
+        ~soulbane_tolna_add(soulbane_brana, ^soulbane_tolna_brana);
+        ~soulbane_tolna_add(soulbane_tolna_top, ^soulbane_tolna_human);
+    }
+    return;
+}
+~soulbane_tolna_add(soulbane_brana, ^soulbane_tolna_brana);
+~soulbane_tolna_add_head(soulbane_tolna_south);
+~soulbane_tolna_add_head(soulbane_tolna_east);
+~soulbane_tolna_add_head(soulbane_tolna_north);
+if (%soulbane_prog = ^soulbane_tolna_intro) {
+    p_teleport(~soulbane_tolna_coord(^soulbane_tolna_player));
+    queue(soulbane_tolna_intro, 0, 0);
+} else {
+    ~soulbane_tolna_start_attacks;
+}
+
+[proc,soulbane_tolna_coord](coord $template)(coord)
+return(region_getcoord(coordy($template), sub(coordx($template), coordx(^soulbane_tolna_source)), sub(coordz($template), coordz(^soulbane_tolna_source))));
+
+[proc,soulbane_tolna_add](npc $type, coord $template)
+npc_add(~soulbane_tolna_coord($template), $type, ^soulbane_npc_lifetime);
+%npc_attacking_uid = uid;
+%npc_aggressive_player = null;
+%npc_int = %soulbane_instance;
+npc_sethunt(0);
+npc_setmode(none);
+
+[proc,soulbane_tolna_add_head](dbrow $profile)
+def_npc $type = db_getfield($profile, soulbane_tolna_heads:head, 0);
+def_coord $stand = db_getfield($profile, soulbane_tolna_heads:stand, 0);
+~soulbane_tolna_add($type, $stand);
+
+// Return the actual owned actor UID for explicit native pointer admission.
+[proc,soulbane_tolna_finduid](npc $type)(npc_uid)
+if (~soulbane_owned = false) return(null);
+npc_findallany(region_getcoord(coordy(^soulbane_tolna_source), ^soulbane_tolna_region_midpoint, ^soulbane_tolna_region_midpoint), ^soulbane_tolna_region_midpoint, 0);
+while (npc_findnext = true) {
+    if (npc_type = $type & %npc_attacking_uid = uid & %npc_int = %soulbane_instance) return(npc_uid);
+}
+return(null);
+
+[proc,soulbane_tolna_start_attacks]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_tolna_active) return;
+npc_findallany(region_getcoord(coordy(^soulbane_tolna_source), ^soulbane_tolna_region_midpoint, ^soulbane_tolna_region_midpoint), ^soulbane_tolna_region_midpoint, 0);
+while (npc_findnext = true) {
+    if (~soulbane_tolna_npc = true & %npc_attacking_uid = uid & %npc_int = %soulbane_instance & npc_stat(hitpoints) > 0) {
+        %npc_aggressive_player = uid;
+        npc_setmode(applayer2);
+    }
+}
+
+// Completed bodies stay completed; an unfinished fight starts with three lives.
+[proc,soulbane_tolna_reset]
+if (%soulbane_prog = ^soulbane_tolna_intro | %soulbane_prog = ^soulbane_tolna_active) {
+    %soulbane_final_tol1dead = 0;
+    %soulbane_final_tol2dead = 0;
+    %soulbane_final_tol3dead = 0;
+}
+
+// Also remove inert one-tick corpses, which have already consumed npc_int.
+[proc,soulbane_tolna_clear_npcs]
+if (~soulbane_owned = false) return;
+def_int $instance = sub(%soulbane_instance, 1);
+npc_findallany(region_getcoord(coordy(^soulbane_tolna_source), ^soulbane_tolna_region_midpoint, ^soulbane_tolna_region_midpoint), ^soulbane_tolna_region_midpoint, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) {
+        if (%npc_int = %soulbane_instance | (%npc_int = 0 & ~soulbane_tolna_npc = true)) {
+            if (region_findbycoord(npc_coord) = true & region_uid = $instance) npc_del;
+        }
+    }
+}
