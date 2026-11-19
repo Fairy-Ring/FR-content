@@ -415,7 +415,7 @@ function playerFixture(position = { level: 0, x: 3310, z: 3455 }) {
 
 // Use the production server phases (including NPC queues, player queues,
 // movement, logouts, zones, and cleanup), but omit sockets and packet output.
-function worldTick(beforeNpcInfo = null) {
+function worldTick(beforeNpcInfo = null, afterNpcInfo = null) {
   for (const p of World.playerLoop.all()) {
     if (p?.isActive) {
       p.lastResponse = World.currentTick;
@@ -429,6 +429,7 @@ function worldTick(beforeNpcInfo = null) {
     assert.equal(typeof World[phase], 'function', `production World.${phase} phase is available`);
     if (phase === 'processInfo' && beforeNpcInfo) beforeNpcInfo();
     World[phase]();
+    if (phase === 'processInfo' && afterNpcInfo) afterNpcInfo();
   }
   World.currentTick++;
 }
@@ -1441,7 +1442,7 @@ function withCombatRandom(value, run) {
 function stableHitRandom(run) {
   return withCombatRandom(0.999999999999, run);
 }
-function runNativeAttack(p, npc, label, maxTicks = 80, stopOnHit = false, stopWhen = null) {
+function runNativeAttack(p, npc, label, maxTicks = 80, stopOnHit = false, stopWhen = null, afterNpcInfo = null) {
   const beforeHp = npc.levels[HP_STAT];
   const beforeMeter = readVar(p, 'soulbane_anger_damagedealt');
   World.processInfo();
@@ -1470,7 +1471,7 @@ function runNativeAttack(p, npc, label, maxTicks = 80, stopOnHit = false, stopWh
   const trigger = p.getOpTrigger();
   assert.match(trigger?.name ?? '', /^\[opnpc2,/i, `${label}: native attack dispatch resolves opnpc2`);
   for (let tick = 0; tick < maxTicks; tick++) {
-    worldTick();
+    worldTick(null, afterNpcInfo);
     if ((stopWhen && stopWhen()) || (stopOnHit && npc.levels[HP_STAT] < beforeHp)) {
       p.clearInteraction();
       break;
@@ -3239,26 +3240,86 @@ function testConfusionIllusion(p, fake) {
   assert.equal(fake.vars[CONFUSION_HITS], 0, 'an untested illusion begins with no produced hit count');
   assertConfusionNativeGates(p, real, 'real Confusion beast');
   assertConfusionNativeGates(p, fake, 'Confusion illusion', true);
-  const creditsBefore = confusionKillCount(p);
-
-  for (let hit = 0; hit < questConstant('soulbane_confusion_zero_hits'); hit++) {
-    const previous = fake.vars[CONFUSION_HITS];
-    const xpBefore = xpSnapshot(p);
-    stableHitRandom(() => runNativeAttack(p, fake, `Confusion illusion zero hit ${hit + 1}`, 120, false,
-      () => !fake.isActive || fake.vars[CONFUSION_HITS] > previous));
-    assert.equal(fake.vars[CONFUSION_HITS], previous + 1,
-      `illusion hit ${hit + 1} reaches the native per-NPC zero-damage counter`);
-    assert.equal(fake.levels[HP_STAT], 28, `illusion hit ${hit + 1} leaves its 28 HP untouched`);
-    assert(xpSnapshot(p).some((value, skill) => value > xpBefore[skill]),
-      `illusion hit ${hit + 1} grants ordinary rolled-hit experience while applying zero damage`);
-    assert.equal(stage(p), CONFUSION_STAGE, `illusion hit ${hit + 1} cannot advance stage 6`);
-    assert.equal(confusionKillCount(p), creditsBefore, `illusion hit ${hit + 1} earns no real-kill credit`);
-    if (hit < questConstant('soulbane_confusion_zero_hits') - 1) {
-      assert(fake.isActive, `illusion remains through zero-damage hit ${hit + 1}`);
+  const creditsBefore = confusionKillCount(p), messageMark = p.messages.length;
+  const visibleHits = [];
+  const disappearanceMessages = () => p.messages.slice(messageMark)
+    .filter(text => text === 'Does this creature really exist?' || text === "That monster wasn't even real!");
+  const observeNpcInfo = () => {
+    if (!fake.isActive) return;
+    const damages = [];
+    if (fake.masks & rsbuf.NpcInfoProt.DAMAGE) damages.push(fake.hitmarkDamage);
+    if (fake.masks & rsbuf.NpcInfoProt.DAMAGE2) damages.push(fake.hitmark2Damage);
+    if (!damages.length) return;
+    const packet = rsbuf.npcInfo(0, p.slot, 0, 0, true);
+    assert(packet.length > 0 && rsbuf.hasNpc(p.slot, fake.nid),
+      'native NPC info retains the illusion while serializing each zero hit');
+    assert.deepEqual(damages, [0], 'each native illusion update contains exactly one zero-damage hit');
+    visibleHits.push({ tick: World.currentTick, hits: fake.vars[CONFUSION_HITS] });
+  };
+  const removeNpc = World.removeNpc;
+  let removals = 0;
+  World.removeNpc = function (npc, ...args) {
+    if (npc === fake) {
+      assert.equal(disappearanceMessages().length, 0, 'the disappearance message follows native removal');
+      removals++;
     }
+    return removeNpc.call(this, npc, ...args);
+  };
+  try {
+    for (let hit = 0; hit < questConstant('soulbane_confusion_zero_hits'); hit++) {
+      const previous = fake.vars[CONFUSION_HITS];
+      const xpBefore = xpSnapshot(p);
+      stableHitRandom(() => runNativeAttack(p, fake, `Confusion illusion zero hit ${hit + 1}`, 120, false,
+        () => !fake.isActive || fake.vars[CONFUSION_HITS] > previous, observeNpcInfo));
+      assert.equal(fake.vars[CONFUSION_HITS], previous + 1,
+        `illusion hit ${hit + 1} reaches the native per-NPC zero-damage counter`);
+      assert.equal(fake.levels[HP_STAT], 28, `illusion hit ${hit + 1} leaves its 28 HP untouched`);
+      assert(xpSnapshot(p).some((value, skill) => value > xpBefore[skill]),
+        `illusion hit ${hit + 1} grants ordinary rolled-hit experience while applying zero damage`);
+      assert.equal(stage(p), CONFUSION_STAGE, `illusion hit ${hit + 1} cannot advance stage 6`);
+      assert.equal(confusionKillCount(p), creditsBefore, `illusion hit ${hit + 1} earns no real-kill credit`);
+      assert(fake.isActive, `illusion remains in native NPC info through zero-damage hit ${hit + 1}`);
+    }
+    assert.deepEqual(visibleHits.map(hit => hit.hits), [1, 2, 3, 4, 5, 6, 7, 8],
+      'all eight native zero hits reach NPC info before the illusion is removed');
+    const deathSource = fs.readFileSync(path.join(contentRoot, 'scripts/skill_combat/scripts/npc/npc_death.rs2'), 'utf8');
+    const deathDelay = /npc_delay\((\d+)\)/.exec(deathSource);
+    assert(deathDelay, 'the published NPC death path supplies its final-hit removal delay');
+    const removalTicks = questConstant('soulbane_confusion_removal_ticks');
+    assert.equal(removalTicks, Number(deathDelay[1]), 'illusion removal uses the published NPC death delay');
+    assert.equal(fake.delayed, true, 'the eighth-hit illusion is suspended until its final update is delivered');
+    assert.equal(fake.delayedUntil - visibleHits.at(-1).tick, removalTicks,
+      'only removal is deferred by the named engineering interval');
+    assert.equal(fake.vars[NPC_INSTANCE], 0, 'the eighth hit consumes admission before the delivery delay');
+    assert.equal(removals, 0, 'the eighth-hit update precedes the one native removal');
+    assert.equal(disappearanceMessages().length, 0, 'the message still follows removal rather than the eighth hit');
+    for (const gate of ['soulbane_confusion_attackable', 'npc_is_attackable', 'npc_is_attackable_opt']) {
+      assert.equal(runProcInt(gate, p, [], fake), 0, `${gate} rejects the suspended eighth-hit illusion`);
+    }
+    const xpAfterEight = xpSnapshot(p), hpAfterEight = p.levels[PlayerStat.HITPOINTS];
+    p.clearInteraction();
+    assert(OpNpcHandler.handle(new OpNpc(2, fake.nid), p), 'a ninth Attack packet targets the still-visible illusion');
+    p.processInteraction();
+    assert.deepEqual(xpSnapshot(p), xpAfterEight, 'the rejected ninth attack grants no XP');
+    assert.equal(fake.vars[CONFUSION_HITS], 8, 'the rejected ninth attack produces no extra hit');
+    for (let tick = 0; tick < removalTicks; tick++) worldTick(null, observeNpcInfo);
+    assert.equal(fake.isActive, false, 'native resume removes the illusion after the final-hit delivery interval');
+    assert.equal(p.levels[PlayerStat.HITPOINTS], hpAfterEight, 'the suspended illusion never attacks during its delay');
+    assert.equal(removals, 1, 'the illusion is removed exactly once');
+    assert.equal(disappearanceMessages().length, 1, 'the illusion emits exactly one sourced disappearance message');
+    assert.equal(confusionNpcsFor(p).length, actors.length - 1,
+      'illusion removal removes only that actor without a group respawn');
+    p.clearInteraction();
+    worldTick(null, observeNpcInfo);
+    assert.equal(fake.vars[CONFUSION_HITS], 8, 'native resume cannot count a ninth hit');
+    assert.equal(visibleHits.length, 8, 'no extra hit update is emitted during or after the removal delay');
+    assert.equal(removals, 1, 'later native processing cannot remove the illusion twice');
+    assert.equal(disappearanceMessages().length, 1, 'later native processing cannot repeat its message');
+    assert.deepEqual(xpSnapshot(p), xpAfterEight, 'the removal interval awards no further combat XP');
+    assert.equal(confusionKillCount(p), creditsBefore, 'delayed removal still earns no real-kill credit');
+  } finally {
+    World.removeNpc = removeNpc;
   }
-  assert.equal(fake.isActive, false, 'the eighth real zero-damage hit despawns only its illusion');
-  assert.equal(confusionNpcsFor(p).length, actors.length - 1, 'illusion despawn removes only that actor without a group respawn');
 }
 function killConfusionReal(p, npc, ordinal) {
   assert.equal(npc.type, requiredId('NpcType', 'soulbane_confu_creeper'),

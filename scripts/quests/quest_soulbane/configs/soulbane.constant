@@ -68,6 +68,8 @@
 // CANDIDATE later guide r15359515: five simultaneous beasts and five creatures.
 ^soulbane_confusion_group_size = 5
 ^soulbane_hope_creatures = 5
+// UNKNOWN engineering: the published npc_death final-hit removal delay.
+^soulbane_confusion_removal_ticks = 1
 
 // UNKNOWN stands: nearest open source footprint to disclosed reconstruction
 // seeds, Manhattan distance then x/z, with exact native paths from each entry.

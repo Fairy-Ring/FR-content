@@ -95,6 +95,9 @@ def_int $hits = add(%soulbane_confusion_hits, 1);
 %soulbane_confusion_hits = $hits;
 if ($hits = ^soulbane_confusion_zero_hits) {
     %npc_int = 0;
+    npc_setmode(none);
+    // Keep the eighth hitsplat in NPC info, as the published npc_death does.
+    npc_delay(^soulbane_confusion_removal_ticks);
     npc_del;
     // UNKNOWN equal weighting between the transcript's two random alternatives.
     if (random(2) = 0) mes("Does this creature really exist?");
