@@ -1,32 +1,5 @@
 [
   {
-    "npc": "smithing_guild_ore_seller",
-    "source": "src.keldagrim-shop-dialogue-ordan",
-    "label": "CANDIDATE",
-    "paths": [
-      {
-        "choices": [
-          "Yes please."
-        ],
-        "lines": [
-          "Are you here to smith? Do you want to buy some ore?"
-        ],
-        "opens": true
-      },
-      {
-        "choices": [
-          "No thanks."
-        ],
-        "lines": [
-          "Are you here to smith? Do you want to buy some ore?",
-          "No thanks.",
-          "Well don't waste my time then!"
-        ],
-        "opens": false
-      }
-    ]
-  },
-  {
     "npc": "smithing_guild_buyer",
     "source": "src.keldagrim-shop-dialogue-jorzik",
     "label": "CANDIDATE",

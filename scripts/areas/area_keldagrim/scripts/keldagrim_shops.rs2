@@ -2,19 +2,6 @@
 // Transcript histories begin in 2020-2023 and do not prove revision-377 wording.
 // Keldagrim task exchanges and named quest or non-NPC interactions are excluded.
 
-[opnpc1,smithing_guild_ore_seller]
-~chatnpc("<p,neutral>Are you here to smith? Do you want to buy some ore?");
-def_int $choice = ~p_choice2("Yes please.", 1, "No thanks.", 2);
-if ($choice = 1) {
-    ~openshop_activenpc;
-    return;
-}
-~chatplayer("<p,neutral>No thanks.");
-~chatnpc("<p,neutral>Well don't waste my time then!");
-
-[opnpc3,smithing_guild_ore_seller]
-~openshop_activenpc;
-
 [opnpc1,smithing_guild_buyer]
 ~chatnpc("<p,neutral>Do you want to trade?");
 def_int $choice = ~p_choice2("What are you selling?", 1, "No thanks.", 2);

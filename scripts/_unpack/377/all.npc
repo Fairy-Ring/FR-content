@@ -56960,6 +56960,27 @@ recol2d=31393
 vislevel=hide
 size=3
 
+[smithing_guild_ore_seller]
+name=Ordan
+desc=He smells of rock dust.
+model1=npc_mcannonguard
+model2=npc_2141
+model3=npc_dwarf_normali3
+model4=npc_dorici2
+model5=npc_dwarf_normali5
+recol1s=7266
+recol1d=12615
+recol2s=15855
+recol2d=17900
+recol3s=9475
+recol3d=9410
+op1=Talk-to
+walkanim=dwarf_walk
+readyanim=dwarf_ready
+vislevel=hide
+op3=Trade
+head1=npc_mcannonguard_head
+
 [wom_cutscene_1]
 name=Wise Old Man
 desc=A venerable sage.

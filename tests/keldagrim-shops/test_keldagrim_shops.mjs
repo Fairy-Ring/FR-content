@@ -12,8 +12,8 @@ const dialogue = JSON.parse(readFileSync(new URL('./dialogue.json', import.meta.
 const handlers = [...readFileSync(new URL('../../scripts/areas/area_keldagrim/scripts/keldagrim_shops.rs2', import.meta.url), 'utf8')
   .matchAll(/^\[(opnpc[1-5]),([^\]]+)\]/gm)].map(match => `${match[1]},${match[2]}`).sort();
 assert.deepEqual(handlers, shops.flatMap(shop => [`opnpc1,${shop.npc}`, `opnpc3,${shop.npc}`]).sort(),
-  'only the twenty-six assigned exact NPC option dispatches are added');
-assert.equal(shops.length, 13, 'the assigned census unit contains thirteen shopkeepers');
+  'only the twenty-four assigned exact NPC option dispatches are added');
+assert.equal(shops.length, 12, 'twelve shopkeepers ship; Ordan is deferred to the Blast Furnace unit');
 assert.deepEqual(dialogue.map(entry => entry.npc).sort(), shops.map(shop => shop.npc).sort());
 const packets = new WeakMap();
 const pause = new ResumePauseButtonHandler();
