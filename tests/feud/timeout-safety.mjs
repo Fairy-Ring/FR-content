@@ -358,16 +358,20 @@ test('the original distracted Villager turn returns at clock 109 with deadline 1
   assert(first, 'an original reachable Villager can earn the first theft');
   operate(p, first, 3);
   assert.equal(stage(p), 7);
-  // Test-only clock anchor; the real urchin conversation creates every NPC condition.
-  World.currentTick = 102;
-  talk(p, 'feud_street_urchin');
+  // Test-only clock anchor; dispatch the real conversation before the NPC phase at 102.
+  World.currentTick = 101;
+  const tracked = new Set();
+  let target;
+  countedWorldTick(tracked, () => {
+    talk(p, 'feud_street_urchin');
+    [target] = owned(p);
+    assert(target);
+    tracked.add(target);
+  });
   assert.equal(World.currentTick, 102);
   assert.equal(stage(p), 8);
-  const [target] = owned(p);
-  assert(target);
   assert.equal(target.getVar(stateVar), 1);
   assert.equal(target.getVar(deadlineVar), 110);
-  const tracked = new Set([target]);
   const expected = resultSnapshot(p);
   boundedTicksThrough(tracked, 108);
   assert.equal(countedWorldTick(tracked), 1, 'the original clock-109 native turn returns after one callback');
