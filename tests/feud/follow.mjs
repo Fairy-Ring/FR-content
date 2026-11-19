@@ -72,7 +72,18 @@ export function followToSeclusion(p, target) {
       projectedWitnesses(p, target, p.x, p.z).length === 0 &&
       occludedOriginalWitness(p, originalWitnesses, p.x, p.z)) break;
   }
-  assert(ticks < nativeFollowWaitTicks, 'native player movement and NPC follow reach the screened destination');
+  assert(ticks < nativeFollowWaitTicks, `native player movement and NPC follow reach the screened destination: ${JSON.stringify({
+    tick: World.currentTick, destination, player: [p.level, p.x, p.z],
+    npc: [target.level, target.x, target.z], followMode: target.targetOp,
+    followsOwner: target.target === p, operable: p.inOperableDistance(target),
+    npcWitnesses: projectedWitnesses(p, target, target.x, target.z).map(npc => [npc.uid, npc.x, npc.z]),
+    playerWitnesses: projectedWitnesses(p, target, p.x, p.z).map(npc => [npc.uid, npc.x, npc.z]),
+    originalWitnesses: originalWitnesses.map(npc => ({
+      uid: npc.uid, tile: [npc.level, npc.x, npc.z], active: npc.isActive,
+      screensNpc: occludedOriginalWitness(target, [npc], target.x, target.z),
+      screensPlayer: occludedOriginalWitness(p, [npc], p.x, p.z)
+    }))
+  })}`);
   assert.deepEqual([p.level, p.x, p.z], [destination.level, destination.x, destination.z],
     'the player reaches the exact MoveClick destination');
   assert.notDeepEqual([target.level, target.x, target.z], startingNpcTile,
