@@ -7,7 +7,7 @@ import { World, State, PlayerStat, JavaRandom, types, id, inv, player, proc, cou
 
 const map = await load('engine/GameMap.ts');
 const content = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-// Published native outcomes are the compatibility oracle, not a historical claim.
+// Published native outcomes are the compatibility oracle, except the period gem-XP correction.
 const published = [
   ['bakery', 'bakers_stall_stealing', 5, 160, 8, [['cake', 13], ['bread', 5], ['chocolate_slice', 2]], 1],
   ['tea', 'tea_stall', 5, 160, 16, [['cup_of_tea', 128]], 7],
@@ -15,7 +15,7 @@ const published = [
   ['fur', 'fur_stall_stealing', 35, 360, 32, [['grey_wolf_fur', 128]], 3],
   ['silver', 'silver_stall_stealing', 50, 540, 100, [['silver_ore', 128]], 4],
   ['spice', 'spice_stall_stealing', 65, 810, 166, [['spicespot', 128]], 5],
-  ['gem', 'gem_stall_stealing', 75, 1600, 600, [['uncut_sapphire', 105], ['uncut_emerald', 17], ['uncut_ruby', 5], ['uncut_diamond', 1]], 6]
+  ['gem', 'gem_stall_stealing', 75, 160, 600, [['uncut_sapphire', 105], ['uncut_emerald', 17], ['uncut_ruby', 5], ['uncut_diamond', 1]], 6]
 ];
 const selectedIds = new Set(published.map(([, key]) => id('LocType', key)));
 const placements = [];
