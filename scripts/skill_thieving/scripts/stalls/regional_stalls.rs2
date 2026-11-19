@@ -12,6 +12,52 @@ if (%viking < ^viking_complete) {
 [oploc2,dwarf_market_silver]
 @attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
 
+[oploc2,viking_fish_market]
+if (%viking < ^viking_complete) {
+    ~mesbox("The fishmonger is staring at you suspiciously. You cannot steal from his stall while he distrusts you.");
+    return;
+}
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,dwarf_market_bakery]
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,dwarf_market_crafting]
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+// VERIFIED no theft: Tip.It, 27 April 2006. CANDIDATE exact line: OSRS rev 14196263.
+[oploc2,dwarf_market_clothes]
+mes("You don't really see anything you'd want to steal from this stall.");
+
+[oploc2,mm_stall_crafting]
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,mm_stall_general]
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+// VERIFIED: Sal's, 5 April 2006, requires Monkey Madness completion for these three.
+// Use the published quest list/count predicate; no monkey-form requirement is sourced.
+[oploc2,mm_stall_food]
+if (%mm_main < ^mm_complete) {
+    return;
+}
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,mm_stall_magic]
+if (%mm_main < ^mm_complete) {
+    return;
+}
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,mm_stall_scimitar]
+if (%mm_main < ^mm_complete) {
+    return;
+}
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
+[oploc2,rag_market_stall]
+@attempt_steal_from_stall(loc_type, loc_coord, loc_angle, loc_shape);
+
 // CANDIDATE: the same reference's successful Rellekka theft hooks and existing constants.
 // Every published stall falls through without changing state or starting a queue.
 [proc,regional_stall_stolen]

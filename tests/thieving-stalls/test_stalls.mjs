@@ -1,12 +1,13 @@
-/** Native packed stall dispatch, reward and lifecycle checks. Run from the sibling engine. */
+/** Native packed stall checks. Run from the sibling engine with node --random-seed=377 --import tsx. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { World, State, PlayerStat, JavaRandom, types, id, inv, player, proc, count, click, load } from '../farming/runtime.mjs';
+import { World, Runner, Scripts, State, PlayerStat, JavaRandom, types, id, inv, player, proc, count, click, load } from '../farming/runtime.mjs';
 
 const map = await load('engine/GameMap.ts');
 const { NpcMode } = await load('engine/entity/NpcMode.ts');
+const { PlayerQueueType } = await load('engine/entity/PlayerQueueRequest.ts');
 const content = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 // Published native outcomes are the compatibility oracle, except the period gem-XP correction.
 const published = [
@@ -21,10 +22,20 @@ const published = [
 const regional = [
   ['viking_fur', 'viking_fur_market', 35, 360, 32, [['grey_wolf_fur', 128]], 8, 'viking_market'],
   ['dwarf_gem', 'dwarf_market_gems', 75, 160, 600, [['uncut_sapphire', 105], ['uncut_emerald', 17], ['uncut_ruby', 5], ['uncut_diamond', 1]], 0, 'dwarf_market_empty_stall'],
-  ['dwarf_silver', 'dwarf_market_silver', 50, 540, 100, [['silver_ore', 128]], 0, 'dwarf_market_empty_stall']
+  ['dwarf_silver', 'dwarf_market_silver', 50, 540, 100, [['silver_ore', 128]], 0, 'dwarf_market_empty_stall'],
+  ['viking_fish', 'viking_fish_market', 42, 420, 50, [['raw_salmon', 14], ['raw_tuna', 5], ['raw_lobster', 1]], 9, 'viking_market'],
+  ['dwarf_bakery', 'dwarf_market_bakery', 5, 160, 32, [['cake', 13], ['bread', 5], ['chocolate_slice', 2]], 0, 'dwarf_market_empty_stall'],
+  ['dwarf_crafting', 'dwarf_market_crafting', 5, 160, 34, [['chisel', 1], ['necklace_mould', 1], ['ring_mould', 1]], 0, 'dwarf_market_empty_stall'],
+  ['monkey_crafting', 'mm_stall_crafting', 5, 160, 34, [['chisel', 1], ['necklace_mould', 1], ['ring_mould', 1]], 0, 'mm_desk'],
+  ['monkey_food', 'mm_stall_food', 5, 160, 34, [['banana', 1]], 0, 'mm_desk'],
+  ['monkey_general', 'mm_stall_general', 5, 160, 34, [['hammer', 1], ['pot_empty', 1], ['tinderbox', 1]], 0, 'mm_desk'],
+  ['monkey_magic', 'mm_stall_magic', 65, 1000, 200, [['earthrune', 1], ['firerune', 1], ['waterrune', 1]], 0, 'mm_desk'],
+  ['monkey_scimitar', 'mm_stall_scimitar', 65, 1600, 200, [['iron_scimitar', 1]], 0, 'mm_desk'],
+  ['wine', 'rag_market_stall', 22, 270, 34, [['rag_bottle_wine', 11], ['grapes', 17], ['jug_empty', 39], ['jug_water', 20], ['jug_wine', 13]], 0, 'rag_market_stall_empty']
 ];
 const profiles = [...published, ...regional];
-const selectedIds = new Set(profiles.map(([, key]) => id('LocType', key)));
+const left = ['misc_fish_market', 'misc_veg_market', 'etc_fish_market', 'etc_veg_market'];
+const selectedIds = new Set([...profiles.map(([, key]) => key), ...left, 'dwarf_market_clothes', 'seed_stall'].map(key => id('LocType', key)));
 const placements = [];
 for (const filename of fs.readdirSync(path.join(content, 'maps')).filter(name => /^m\d+_\d+\.jm2$/.test(name))) {
   const [, mx, mz] = /^m(\d+)_(\d+)\.jm2$/.exec(filename).map(Number);
@@ -55,7 +66,7 @@ function approaches(loc) {
   return points;
 }
 function catchers(row, point, level) {
-  const owner = row.getValue(1, 0)[0];
+  const owner = row.columnValues[1]?.length ? row.getValue(1, 0)[0] : -1;
   const guards = new Set(Array.from({ length: row.columnValues[2]?.length ?? 0 }, (_, index) => row.getValue(2, index)[0]));
   return [...World.npcs].filter(npc => npc.isActive && npc.level === level &&
     (npc.type === owner || (guards.has(npc.type) && npc.targetOp !== NpcMode.OPPLAYER2)) &&
@@ -76,21 +87,29 @@ function reachable(loc, point) {
       map.findPath(loc.level, start.x, start.z, point.x, point.z).length > 0;
   });
 }
-function fixture(row, locs, level, caught = false) {
+function fixture(row, locs, level, caught = false, observer = () => true) {
+  if (!caught && ['stealing_monkey_general_stall', 'stealing_monkey_scimitar_stall'].includes(row.debugname)) {
+    distractPostedArchers(row, locs);
+  }
   // Guards genuinely wander. Advance native NPC turns rather than removing or moving a catcher.
   for (let turn = 0; turn <= 100; turn++) {
     for (const loc of locs) {
-      const point = approaches(loc).find(point => Boolean(catchers(row, point, loc.level).length) === caught && reachable(loc, point));
+      const point = approaches(loc).find(point => {
+        const watching = catchers(row, point, loc.level);
+        return Boolean(watching.length) === caught && observer(watching) && reachable(loc, point);
+      });
       if (!point) continue;
       const p = player();
       p.x = point.x; p.z = point.z; p.level = loc.level;
       p.setLevel(PlayerStat.THIEVING, level);
       p.setVar(id('VarPlayerType', 'viking'), 10); // Seed: prerequisite quest, not written by theft.
+      p.setVar(id('VarPlayerType', 'mm_main'), 9); // Seed: the quest registry's completion stage.
       return { p, loc, xp: p.stats[PlayerStat.THIEVING] };
     }
     World.currentTick++;
     World.processNpcs();
     World.processZones();
+    World.processCleanup();
   }
   assert.fail(`${row.debugname} has an original reachable ${caught ? 'observed' : 'unobserved'} interaction side`);
 }
@@ -104,6 +123,39 @@ function execute(p, loc) {
     }
     assert.notEqual(p.activeScript?.execution, State.SUSPENDED, 'bounded native scheduler finishes the attempt');
   } finally { p.unlink(); }
+}
+const baitPlayers = [];
+function nativeNpcTurn() {
+  World.currentTick++;
+  World.processNpcs();
+  World.processZones();
+  World.processCleanup();
+}
+function distractPostedArchers(row, locs) {
+  // These original fixed archers see every legal side. Other player accounts
+  // distract them by real failed thefts; no NPC state or product var is seeded.
+  assert(!row.columnValues[1]?.length);
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const loc = locs[0];
+    const point = approaches(loc).find(point => catchers(row, point, loc.level).length && reachable(loc, point));
+    if (!point) return;
+    const bait = player();
+    bait.x = point.x; bait.z = point.z; bait.level = loc.level;
+    bait.setLevel(PlayerStat.THIEVING, 99);
+    bait.setLevel(PlayerStat.HITPOINTS, 99);
+    bait.setVar(id('VarPlayerType', 'mm_main'), 9);
+    baitPlayers.push(bait);
+    const before = bait.stats[PlayerStat.THIEVING];
+    const watching = catchers(row, bait, bait.level);
+    execute(bait, loc);
+    assert.equal(bait.stats[PlayerStat.THIEVING], before);
+    assert.equal(snapshot(bait).filter(Boolean).length, 0);
+    const guard = watching.find(npc => npc.getVar(id('VarNpcType', 'npc_aggressive_player')) === bait.uid);
+    assert(guard, 'an original archer notices the bait account theft');
+    for (let turn = 0; guard.targetOp !== NpcMode.OPPLAYER2 && turn < 4; turn++) nativeNpcTurn();
+    assert.equal(guard.targetOp, NpcMode.OPPLAYER2, 'native retaliation occupies the archer');
+  }
+  assert.fail('bounded real theft distractions occupy the posted archers');
 }
 function restore(loc, empty, original) {
   assert.equal(loc.type, id('LocType', empty));
@@ -128,7 +180,19 @@ function expectedReward(seed, loot) {
   assert.fail('complete loot table has no empty outcome');
 }
 let cases = 0;
-function test(name, action) { action(); cases++; console.log(`PASS ${name}`); }
+function test(name, action) {
+  try { action(); cases++; console.log(`PASS ${name}`); }
+  finally {
+    if (baitPlayers.length) {
+      for (const bait of baitPlayers.splice(0)) {
+        bait.isActive = false;
+        bait.unlink();
+        World.players[bait.pid] = null;
+      }
+      nativeNpcTurn();
+    }
+  }
+}
 for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profiles) {
   const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
   assert(row, `missing compiled ${kind} row`);
@@ -187,13 +251,192 @@ for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profile
     assert.equal(p.stats[PlayerStat.THIEVING], before);
     assert.equal(loc.type, original);
   });
-  test(`${key}: original owner/guard seeing theft prevents reward and depletion`, () => {
-    const { p, loc, xp: before } = fixture(row, locs, level, true);
+  if (key === 'mm_stall_crafting' || key === 'mm_stall_magic') {
+    test(`${key}: theft from every legal side is not observed by the original posted archer`, () => {
+      assert(!row.columnValues[1]?.length, 'period table names only Monkey Archers for this Ape stall');
+      const loc = locs[0], points = approaches(loc);
+      assert.equal(points.length, key === 'mm_stall_crafting' ? 4 : 3);
+      for (const point of points) {
+        assert(reachable(loc, point));
+        assert.equal(catchers(row, point, loc.level).length, 0);
+        const p = player();
+        p.x = point.x; p.z = point.z; p.level = loc.level;
+        p.setLevel(PlayerStat.THIEVING, level);
+        p.setVar(id('VarPlayerType', 'mm_main'), 9); // Seed: period quest prerequisite for Magic.
+        const before = p.stats[PlayerStat.THIEVING];
+        execute(p, loc);
+        assert.equal(p.stats[PlayerStat.THIEVING] - before, xp);
+        assert.equal(snapshot(p).filter(Boolean).length, 1);
+        restore(loc, empty, original);
+      }
+    });
+    test(`${key}: guard path with an ownerless row; position not a legal interaction side of this stall`, () => {
+      const loc = locs[0];
+      const guards = new Set(Array.from({ length: row.columnValues[2].length }, (_, index) => row.getValue(2, index)[0]));
+      const guard = [...World.npcs].filter(npc => npc.isActive && npc.level === loc.level && guards.has(npc.type) &&
+        npc.targetOp !== NpcMode.OPPLAYER2 && !map.isMapBlocked(npc.x, npc.z, npc.level))
+        .sort((a, b) => Math.max(Math.abs(a.x - loc.x), Math.abs(a.z - loc.z)) - Math.max(Math.abs(b.x - loc.x), Math.abs(b.z - loc.z)))[0];
+      assert(guard);
+      assert(!approaches(loc).some(point => point.x === guard.x && point.z === guard.z));
+      assert(map.isLineOfSight(loc.level, guard.x, guard.z, guard.x, guard.z));
+      const p = player();
+      p.x = guard.x; p.z = guard.z; p.level = guard.level;
+      p.setLevel(PlayerStat.THIEVING, level);
+      const visibleGuards = catchers(row, p, p.level);
+      assert(visibleGuards.includes(guard));
+      const before = p.stats[PlayerStat.THIEVING];
+      const script = Scripts.getByName('[proc,steal_from_stall]');
+      assert(script);
+      const state = Runner.init(script, p, loc, [row.id, (loc.level << 28) | (loc.x << 14) | loc.z, loc.angle, loc.shape]);
+      assert.equal(p.runScript(state, true, true), State.FINISHED);
+      const retaliating = visibleGuards.filter(npc => npc.getVar(id('VarNpcType', 'npc_aggressive_player')) === p.uid);
+      assert.equal(retaliating.length, 1, 'one original guard takes the published retaliation path');
+      assert.equal(retaliating[0].getVar(id('VarNpcType', 'npc_lastcombat')), World.currentTick);
+      assert.equal(p.stats[PlayerStat.THIEVING], before);
+      assert.equal(snapshot(p).filter(Boolean).length, 0);
+      assert.equal(loc.type, original);
+    });
+  } else if (row.columnValues[1]?.length || row.columnValues[2]?.length) {
+    test(`${key}: original owner/guard seeing theft prevents reward and depletion`, () => {
+      const { p, loc, xp: before } = fixture(row, locs, level, true);
+      execute(p, loc);
+      assert.equal(p.stats[PlayerStat.THIEVING], before);
+      assert.equal(snapshot(p).filter(Boolean).length, 0);
+      assert.equal(loc.type, original);
+    });
+  } else {
+    test(`${key}: period None-to-elude row has no owner or guard`, () => {
+      assert(!row.columnValues[1]?.length);
+      assert(!row.columnValues[2]?.length);
+    });
+  }
+}
+for (const ownerOnly of [true, false]) {
+  test(`seed_stall: ${ownerOnly ? 'Olivia alone notices' : 'the original market guard retaliates against'} the theft`, () => {
+    const row = types.DbRowType.getByName('stealing_seed_stall');
+    const original = id('LocType', 'seed_stall');
+    const owner = id('NpcType', 'seed_merchant'), guard = id('NpcType', 'farming_market_guard');
+    assert.deepEqual(row.getValue(1, 0), [owner]);
+    assert.deepEqual(row.getValue(2, 0), [guard]);
+    const { p, loc, xp: before } = fixture(row, placements.filter(loc => loc.type === original), 27, true,
+      watching => ownerOnly ? watching.every(npc => npc.type === owner) : watching.some(npc => npc.type === guard));
+    const watching = catchers(row, p, p.level);
     execute(p, loc);
     assert.equal(p.stats[PlayerStat.THIEVING], before);
     assert.equal(snapshot(p).filter(Boolean).length, 0);
     assert.equal(loc.type, original);
+    assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), 0);
+    if (!ownerOnly) {
+      assert(watching.some(npc => npc.type === guard && npc.getVar(id('VarNpcType', 'npc_aggressive_player')) === p.uid));
+    }
   });
 }
+for (const key of ['mm_stall_food', 'mm_stall_magic', 'mm_stall_scimitar', 'viking_fish_market', 'viking_fur_market']) {
+  test(`${key}: uncompleted period quest blocks theft`, () => {
+    const [kind, , level] = profiles.find(([, name]) => name === key);
+    const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+    const original = id('LocType', key);
+    const { p, loc, xp: before } = fixture(row, placements.filter(loc => loc.type === original), level);
+    const ape = key.startsWith('mm_');
+    p.setVar(id('VarPlayerType', ape ? 'mm_main' : 'viking'), ape ? 8 : 9);
+    execute(p, loc);
+    assert.equal(p.stats[PlayerStat.THIEVING], before);
+    assert.equal(snapshot(p).filter(Boolean).length, 0);
+    assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), 0);
+    assert.equal(loc.type, original);
+  });
+}
+for (const key of ['mm_stall_general', 'mm_stall_crafting']) {
+  test(`${key}: no invented quest-completion gate`, () => {
+    const [kind, , level, xp, , , , empty] = profiles.find(([, name]) => name === key);
+    const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+    const original = id('LocType', key);
+    const { p, loc, xp: before } = fixture(row, placements.filter(loc => loc.type === original), level);
+    p.setVar(id('VarPlayerType', 'mm_main'), 0);
+    execute(p, loc);
+    assert.equal(p.stats[PlayerStat.THIEVING] - before, xp);
+    assert.equal(snapshot(p).filter(Boolean).length, 1);
+    restore(loc, empty, original);
+  });
+}
+for (const key of [...left, 'dwarf_market_clothes']) {
+  test(`${key}: no theft, XP, depletion or kingdom-state invention`, () => {
+    const original = id('LocType', key);
+    const locs = placements.filter(loc => loc.type === original);
+    assert(locs.length);
+    assert(!types.DbRowType.getInTable(id('DbTableType', 'stealing')).some(row => row.getValue(0, 0)[0] === original));
+    for (const loc of locs) {
+      const point = approaches(loc).find(point => reachable(loc, point));
+      assert(point, `${key} has an original reachable interaction side`);
+      const p = player();
+      p.x = point.x; p.z = point.z; p.level = loc.level;
+      p.setLevel(PlayerStat.THIEVING, 99);
+      const before = p.stats[PlayerStat.THIEVING];
+      const beforeVars = Array.from(p.vars);
+      execute(p, loc);
+      assert.equal(p.stats[PlayerStat.THIEVING], before);
+      assert.equal(snapshot(p).filter(Boolean).length, 0);
+      assert.deepEqual(Array.from(p.vars), beforeVars);
+      assert.equal(loc.type, original);
+      if (key === 'dwarf_market_clothes') assert(p.messages.includes("You don't really see anything you'd want to steal from this stall."));
+    }
+  });
+}
+const lockouts = [
+  ['bakery', 'baker', 1, 1500], ['tea', 'tea', 2, 1000], ['silk', 'silk', 3, 1000],
+  ['fur', 'fur', 4, 1000], ['silver', 'silver', 5, 1000], ['spice', 'spice', 6, 600],
+  ['gem', 'gem', 7, 1000], ['viking_fur', 'vikingfur', 8, 1000], ['viking_fish', 'vikingfish', 9, 1500]
+];
+for (const [kind, queueName, bit, timer] of lockouts) {
+  test(`${kind}: native theft save/load restores the complete lockout and native expiry clears it`, () => {
+    const [, key, level, , , , , empty = 'market'] = profiles.find(([name]) => name === kind);
+    const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+    const original = id('LocType', key);
+    const { p, loc } = fixture(row, placements.filter(loc => loc.type === original), level);
+    execute(p, loc);
+    assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), 1 << bit);
+    const initial = [...p.queue.all()];
+    assert.equal(initial.length, 1);
+    assert.equal(initial[0].script.name, `[queue,stolen_from_stall_${queueName}]`);
+    assert.equal(initial[0].type, PlayerQueueType.LONG);
+    assert.deepEqual(initial[0].args, [0, 1]); // Native argument order, shared by the published queues.
+    assert.equal(initial[0].delay, timer - 1); // The click's native player turn already counts down once.
+    restore(loc, empty, original);
+    for (let turn = 0; turn < 23; turn++) {
+      World.currentTick++;
+      p.processQueues();
+    }
+    assert.equal(initial[0].delay, timer - 24);
+    const saved = p.save();
+    const joined = player(saved);
+    assert.equal(joined.getVar(id('VarPlayerType', 'thieving_stall_timer')), 1 << bit);
+    assert.deepEqual(snapshot(joined), snapshot(p));
+    assert.equal([...joined.queue.all()].length, 0, 'the save contains permanent state, not an old live queue');
+    proc(joined, 'thieving_stall_timers_login');
+    const restored = [...joined.queue.all()];
+    assert.equal(restored.length, 1);
+    assert.equal(restored[0].script.name, initial[0].script.name);
+    assert.equal(restored[0].type, PlayerQueueType.LONG);
+    assert.deepEqual(restored[0].args, initial[0].args);
+    assert.equal(restored[0].delay, timer, 'login follows the published full-timer restart rule');
+    for (let turn = 0; turn < timer; turn++) {
+      World.currentTick++;
+      joined.processQueues();
+      assert.equal(joined.getVar(id('VarPlayerType', 'thieving_stall_timer')), 1 << bit);
+    }
+    World.currentTick++;
+    joined.processQueues();
+    assert.equal(joined.getVar(id('VarPlayerType', 'thieving_stall_timer')), 0);
+    assert.equal([...joined.queue.all()].length, 0);
+  });
+}
+test('a save without a stall lockout gains no regional state or queue at login', () => {
+  const original = player();
+  const joined = player(original.save());
+  const before = Array.from(joined.vars);
+  proc(joined, 'thieving_stall_timers_login');
+  assert.deepEqual(Array.from(joined.vars), before);
+  assert.equal([...joined.queue.all()].length, 0);
+});
 console.log(`${cases} native stall checks passed`);
 process.exit(0);

@@ -51,3 +51,158 @@ data=loot_total,128
 data=stall,silver stall
 data=stall,some silver
 data=empty,dwarf_market_empty_stall
+
+// VERIFIED identities, level and XP: Tip.It, 27 April 2006.
+// CANDIDATE quantities/weights: finished Lost City 274 and checked OSRS history.
+[stealing_viking_fish_stall]
+table=stealing
+data=loc,viking_fish_market
+data=owner,viking_fish_monger
+data=guard,viking_guard
+data=level,42
+data=experience,420
+data=respawn_ticks,^regional_fish_respawn_ticks
+data=loot,raw_salmon,1,1,14,a salmon
+data=loot,raw_tuna,1,1,5,a tuna
+data=loot,raw_lobster,1,1,1,a lobster
+data=loot_total,20
+data=stall,fish stall
+data=stall,some fish
+data=empty,viking_market
+
+// CANDIDATE: same three-item bakery table as the published stall and period Sal's.
+// Tip.It additionally names meat pie; that conflicting fourth item is not added.
+[stealing_dwarf_bakery_stall]
+table=stealing
+data=loc,dwarf_market_bakery
+data=owner,dwarf_city_shop_bakery
+data=guard,dwarf_city_black_guard1
+data=guard,dwarf_city_black_guard2
+data=guard,dwarf_city_black_guard3
+data=guard,dwarf_city_black_guard4
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_dwarf_bakery_respawn_ticks
+data=loot,cake,1,1,13,a cake
+data=loot,bread,1,1,5,some bread
+data=loot,chocolate_slice,1,1,2,a chocolate slice
+data=loot_total,20
+data=stall,baker's stall
+data=empty,dwarf_market_empty_stall
+
+// VERIFIED level, XP and identities: period guides. CANDIDATE qty/odds: pre-2024 OSRS.
+[stealing_dwarf_crafting_stall]
+table=stealing
+data=loc,dwarf_market_crafting
+data=guard,dwarf_city_black_guard1
+data=guard,dwarf_city_black_guard2
+data=guard,dwarf_city_black_guard3
+data=guard,dwarf_city_black_guard4
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_crafting_respawn_ticks
+data=loot,chisel,1,1,1,a chisel
+data=loot,necklace_mould,1,1,1,a necklace mould
+data=loot,ring_mould,1,1,1,a ring mould
+data=loot_total,3
+data=stall,crafting stall
+data=empty,dwarf_market_empty_stall
+
+// VERIFIED catcher kinds: period Tip.It's per-stall "NPCs to elude" column.
+// Ape Crafting/General/Magic/Scimitar name Monkey Archers; Food names None.
+// Keldagrim Crafting names Black Guards, not the shop owner.
+// CANDIDATE quantities/odds and bamboo-desk empty form: checked OSRS history.
+[stealing_monkey_crafting_stall]
+table=stealing
+data=loc,mm_stall_crafting
+data=guard,mm_monkey_archer
+data=guard,mm_ravine_archer
+data=guard,mm_posted_archer
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_crafting_respawn_ticks
+data=loot,chisel,1,1,1,a chisel
+data=loot,necklace_mould,1,1,1,a necklace mould
+data=loot,ring_mould,1,1,1,a ring mould
+data=loot_total,3
+data=stall,crafting stall
+data=empty,mm_desk
+
+[stealing_monkey_food_stall]
+table=stealing
+data=loc,mm_stall_food
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_food_respawn_ticks
+data=loot,banana,1,1,1,a banana
+data=loot_total,1
+data=stall,food stall
+data=empty,mm_desk
+
+[stealing_monkey_general_stall]
+table=stealing
+data=loc,mm_stall_general
+data=guard,mm_monkey_archer
+data=guard,mm_ravine_archer
+data=guard,mm_posted_archer
+data=level,5
+data=experience,160
+data=respawn_ticks,^regional_general_respawn_ticks
+data=loot,hammer,1,1,1,a hammer
+data=loot,pot_empty,1,1,1,a pot
+data=loot,tinderbox,1,1,1,a tinderbox
+data=loot_total,3
+data=stall,general stall
+data=empty,mm_desk
+
+// CANDIDATE interpretation: Tip.It's comma-separated items are alternatives,
+// each x1, as in its other loot rows. Sal's additionally lists Law runes.
+// UNKNOWN odds: equal weights, the nearest three-item General/Crafting precedent.
+[stealing_monkey_magic_stall]
+table=stealing
+data=loc,mm_stall_magic
+data=guard,mm_monkey_archer
+data=guard,mm_ravine_archer
+data=guard,mm_posted_archer
+data=level,65
+data=experience,1000
+data=respawn_ticks,^regional_magic_respawn_ticks
+data=loot,earthrune,1,1,1,an earth rune
+data=loot,firerune,1,1,1,a fire rune
+data=loot,waterrune,1,1,1,a water rune
+data=loot_total,3
+data=stall,magic stall
+data=empty,mm_desk
+
+[stealing_monkey_scimitar_stall]
+table=stealing
+data=loc,mm_stall_scimitar
+data=guard,mm_monkey_archer
+data=guard,mm_ravine_archer
+data=guard,mm_posted_archer
+data=level,65
+data=experience,1600
+data=respawn_ticks,^regional_scimitar_respawn_ticks
+data=loot,iron_scimitar,1,1,1,an iron scimitar
+data=loot_total,1
+data=stall,scimitar stall
+data=empty,mm_desk
+
+// CANDIDATE level, XP, quantities and odds: checked Wine stall OSRS history.
+// All five objects and both stall forms exist in the unchanged 377 cache.
+[stealing_wine_stall]
+table=stealing
+data=loc,rag_market_stall
+data=owner,rag_wine_merchant
+data=guard,farming_market_guard
+data=level,22
+data=experience,270
+data=respawn_ticks,^regional_wine_respawn_ticks
+data=loot,rag_bottle_wine,1,1,11,a bottle of wine
+data=loot,grapes,1,1,17,some grapes
+data=loot,jug_empty,1,1,39,a jug
+data=loot,jug_water,1,1,20,a jug of water
+data=loot,jug_wine,1,1,13,a jug of wine
+data=loot_total,100
+data=stall,wine stall
+data=empty,rag_market_stall_empty
