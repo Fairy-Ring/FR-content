@@ -23,7 +23,7 @@ const regional = [
   ['viking_fur', 'viking_fur_market', 35, 360, 32, [['grey_wolf_fur', 128]], 8, 'viking_market'],
   ['dwarf_gem', 'dwarf_market_gems', 75, 160, 600, [['uncut_sapphire', 105], ['uncut_emerald', 17], ['uncut_ruby', 5], ['uncut_diamond', 1]], 0, 'dwarf_market_empty_stall'],
   ['dwarf_silver', 'dwarf_market_silver', 50, 540, 100, [['silver_ore', 128]], 0, 'dwarf_market_empty_stall'],
-  ['viking_fish', 'viking_fish_market', 42, 420, 50, [['raw_salmon', 14], ['raw_tuna', 5], ['raw_lobster', 1]], 9, 'viking_market'],
+  ['viking_fish', 'viking_fish_market', 42, 420, 32, [['raw_salmon', 14], ['raw_tuna', 5], ['raw_lobster', 1]], 9, 'viking_market'],
   ['dwarf_bakery', 'dwarf_market_bakery', 5, 160, 32, [['cake', 13], ['bread', 5], ['chocolate_slice', 2]], 0, 'dwarf_market_empty_stall'],
   ['dwarf_crafting', 'dwarf_market_crafting', 5, 160, 34, [['chisel', 1], ['necklace_mould', 1], ['ring_mould', 1]], 0, 'dwarf_market_empty_stall'],
   ['monkey_crafting', 'mm_stall_crafting', 5, 160, 34, [['chisel', 1], ['necklace_mould', 1], ['ring_mould', 1]], 0, 'mm_desk'],

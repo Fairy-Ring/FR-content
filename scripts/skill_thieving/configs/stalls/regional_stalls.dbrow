@@ -61,7 +61,9 @@ data=owner,viking_fish_monger
 data=guard,viking_guard
 data=level,42
 data=experience,420
-data=respawn_ticks,^regional_fish_respawn_ticks
+// CANDIDATE respawn: Lost City 274 at 65b754f768b79b941b21b2a1eb3b0d1ecae3cdfe,
+// stealing.dbrow:129-136, recorded as src.stalls-lc274-tables.
+data=respawn_ticks,32
 data=loot,raw_salmon,1,1,14,a salmon
 data=loot,raw_tuna,1,1,5,a tuna
 data=loot,raw_lobster,1,1,1,a lobster
