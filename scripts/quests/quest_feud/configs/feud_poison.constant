@@ -4,8 +4,11 @@
 // CANDIDATE: current OSRS walkthrough says a coin; period guides say some coins.
 ^feud_charmer_coin_cost = 1
 
-// UNKNOWN: nearest mapped camel is two tiles from the original trough.
-^feud_camel_trough_range = 2
+// UNKNOWN FEUD-TROUGH-CAMEL-SEARCH-01: identifies the reacting camel, not a nearness gate.
+// Original trough (3339,2962); original camels (3342,2962) and (3343,2964):
+// southwest-coordinate distances 3 and 4, plus published default wanderrange 5.
+// max(3 + 5, 4 + 5) = 9 covers both complete original wander rectangles.
+^feud_camel_trough_range = 9
 
 // UNKNOWN: adjacent range for using the flute on a desert snake.
 ^feud_snake_use_range = 1

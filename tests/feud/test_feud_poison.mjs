@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  World, count, engineModule, id, inv, obj, types
+  CollisionType, World, count, engineModule, id, inv, map, obj, types
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
@@ -180,4 +180,64 @@ test('Feud poison preparation advances through snake, dung, Hag recovery, and th
   const alreadyPoisoned = operateLoc(p, beerTable, { item: 'poison_from_hag' });
   assert.match(alreadyPoisoned.text, /I've poisoned the drink\. I'd better leave it alone now/);
   assert.equal(count(p, 'poison_from_hag'), 1, 'later item use does not consume another vial');
+});
+
+test('the trough feeds when both original camels occupy their farthest reachable wander tiles', () => {
+  const feeder = player(), originalTrough = trough();
+  feeder.invAdd(inv, obj('superhot_kebab_sauce'), 1);
+  const camels = actors('feud_camel');
+  assert.equal(camels.length, 2, 'the original map supplies both reacting camels');
+  const original = camels.map(camel => ({ camel, x: camel.x, z: camel.z, level: camel.level,
+    playAnimation: camel.playAnimation }));
+  const animations = [];
+  const previousRandom = Math.random;
+  Math.random = () => 0.5; // Boundary input setup must not choose a fresh wandering destination.
+  try {
+    for (const camel of camels) {
+      const range = types.NpcType.get(camel.type).wanderrange;
+      const reachable = [{ x: camel.startX, z: camel.startZ }];
+      const seen = new Set([`${camel.startX},${camel.startZ}`]);
+      for (let index = 0; index < reachable.length; index++) {
+        const from = reachable[index];
+        for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+          if (dx === 0 && dz === 0) continue;
+          const x = from.x + dx, z = from.z + dz, key = `${x},${z}`;
+          if (seen.has(key) || Math.abs(x - camel.startX) > range || Math.abs(z - camel.startZ) > range) continue;
+          if (!map.canTravel(camel.startLevel, from.x, from.z, dx, dz, camel.width, 0, CollisionType.NORMAL)) continue;
+          seen.add(key); reachable.push({ x, z });
+        }
+      }
+      const distance = point => Math.max(Math.abs(point.x - originalTrough.x), Math.abs(point.z - originalTrough.z));
+      const farthest = reachable.reduce((best, point) => distance(point) > distance(best) ? point : best);
+      assert(distance(farthest) > 2, 'this reachable boundary is outside the defective two-tile search');
+      // Disclosed compiled boundary-position input, not a change to either original map placement.
+      camel.teleport(farthest.x, farthest.z, camel.startLevel);
+      camel.turn();
+      assert.equal(camel.x, farthest.x); assert.equal(camel.z, farthest.z);
+      assert([...World.gameMap.getZone(camel.x, camel.z, camel.level).getAllNpcsSafe(true)].includes(camel),
+        'the native turn publishes the original camel in its actual boundary zone');
+      const playAnimation = camel.playAnimation;
+      camel.playAnimation = function (seq, delay) {
+        animations.push({ uid: this.uid, seq, tick: World.currentTick });
+        return playAnimation.call(this, seq, delay);
+      };
+    }
+    const before = World.currentTick;
+    withDraw(0.08, () => operateLoc(feeder, originalTrough, { item: 'superhot_kebab_sauce' }));
+    assert(placedAt(originalTrough, 'feud_ugthanki_pooh'), 'the real item-on-trough action creates brown dung at the trough');
+    assert.deepEqual(animations.map(event => event.seq), [
+      id('SeqType', 'camel_eats_from_trough'), id('SeqType', 'camel_eat_from_trough')
+    ], 'one original camel performs both native eating reactions');
+    assert.equal(animations[0].uid, animations[1].uid);
+    assert.equal(animations[0].tick, before);
+    assert(animations[1].tick > animations[0].tick, 'the dung follows the eating delay, not an immediate substitute');
+    assert.equal(count(feeder, 'superhot_kebab_sauce'), 1, 'the sourced reusable sauce remains held');
+  } finally {
+    for (const { camel, x, z, level, playAnimation } of original) {
+      camel.playAnimation = playAnimation;
+      camel.teleport(x, z, level);
+      camel.turn();
+    }
+    Math.random = previousRandom;
+  }
 });
