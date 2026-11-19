@@ -1,26 +1,16 @@
-// The Feud — Drunken Ali (Pollnivneach) Talk-to + beer Use.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Talking to Drunken Ali minus
-// the 27 Apr 2022 lore pass). %feud_var (stage) >= 1 gate — Ali M start
-// (feud_ali_m.rs2) wrote 1; do not rewrite it. Beer count = %feud_var_drink
-// (pack varbit 316, bits 7-8 of feud_var_multi) 0->1->2->3; low stage bits
-// untouched — do not write 28 (blackjack seller vis is a later hop).
-// Talk-to: canned line by count (0/1/2/3+). Use beer: inv_del 1 then the
-// Use-1/2/3 trees verbatim (nephew tease -> too kind -> gangs), count caps
-// at 3. Other objs: "Eh? What's this?...". No dest / p_tele.
-// Cite osrs-wiki-changes-crawl-377.md feud row · Transcript:The Feud.
+// Three beers: VERIFIED period guides. Wording: CANDIDATE RuneScape transcript
+// revision 18411641, before the dated Old School lore rewrite.
 
 [opnpc1,feud_drunken_ali]
 if (%feud_var < 1) {
     return;
 }
 if (%feud_var_drink = 0) {
-    ~chatnpc("<p,neutral>Ahh, a kind stranger. Get this old man a drink so that he may wet his throat and tell you of the strange happenings in this town.");
-} else if (%feud_var_drink = 1) {
-    ~chatnpc("<p,neutral>Get this poor, thirsty old man another drink so that he may wet his lips and continue.");
-} else if (%feud_var_drink = 2) {
-    ~chatnpc("<p,neutral>Alas, my throat has dried up, and I cannot speak... perhaps another drink would help?");
+    ~chatnpc("<p,neutral>Ahh, a kind stranger. Get this old man a drink, so that he may wet his throat and tell you of strange happenings in this town.");
+} else if (%feud_var_drink < 3) {
+    ~chatnpc("<p,neutral>It's yourself again, isn't it? Get this old man another drink so that he may wet his lips and continue.");
 } else {
-    ~chatnpc("<p,neutral>What were we talking about again? Yes yes, when I was a boy... no, that's not it.");
+    ~chatnpc("<p,neutral>It's yourself again, isn't it?");
 }
 return;
 
@@ -32,41 +22,36 @@ def_obj $used = last_useitem;
 if ($used = beer) {
     inv_del(inv, beer, 1);
     if (%feud_var_drink = 0) {
-        ~chatnpc("<p,neutral>Now where were we? Ah yes, Ali Morrisane's wayward nephew.");
-        ~chatplayer("<p,shock>What?! How did you know that's who I was looking for?");
-        ~chatnpc("<p,neutral>Er... well, he's a real scamp, that lad! I can't imagine a stranger would be asking after anyone else.");
-        ~chatplayer("<p,neutral>Hmm. Well go on then, where is he?");
-        ~chatnpc("<p,neutral>I'd tell you more, but my throat is drying up. This desert climate is an inhospitable one. Get me another beer so that I can continue my tale.");
+        ~chatnpc("<p,neutral>I happen to know that you are looking for somebody.");
+        ~chatplayer("<p,neutral>How do you know that?");
+        ~chatnpc("<p,neutral>Well, you're not here sightseeing, that's for certain. Anyway it's not really important how I know what I know. What is important is that I know all about the person you're looking for.");
+        ~chatplayer("<p,neutral>You do? How do you know I'm looking for Ali Morrisane's nephew, Ali?");
+        ~chatnpc("<p,neutral>I'd tell you more, but my throat is drying up and my lips are dry. This desert climate is an inhospitable one. Get me another beer so that I can continue.");
         %feud_var_drink = 1;
         return;
     }
     if (%feud_var_drink = 1) {
         ~chatnpc("<p,neutral>You are too kind, now what were we talking about?");
         ~chatplayer("<p,neutral>Ali Morrisane's nephew.");
-        ~chatnpc("<p,neutral>Of course! I've known him since he was a wee lad. A right little mischievous beggar...");
-        ~chatplayer("<p,neutral>Yes, I can imagine. Do you have any more recent information about him? Where is he?");
-        ~chatnpc("<p,neutral>Well now, if you had just asked me that in the first place I would have told you directly!");
-        ~chatplayer("<p,neutral>You're right, I'm sorry for beating around the bush. Do you know where Ali's nephew is now, though?");
-        ~chatnpc("<p,neutral>I'd tell you more, but my throat is drying up. This desert climate is an inhospitable one. Get me another beer so that I can continue my tale.");
+        ~chatnpc("<p,neutral>I've known him since he was a wee lad. A right little mischievous beggar......");
+        ~chatplayer("<p,neutral>That's all fine and well, but do you know any more useful information about him, such as his whereabouts?");
+        ~chatnpc("<p,neutral>Well now, if you had just asked me about that in the first place I would have told you directly.");
+        ~chatplayer("<p,neutral>I'm sorry if I was a little sharp with you, but do you know where he is?");
+        ~chatnpc("<p,neutral>I'd tell you more, but my throat is drying up and my lips are dry. This desert climate is an inhospitable one. Get me another beer so that I can continue.");
         %feud_var_drink = 2;
         return;
     }
-    // third beer (count 2 or 3) — the gangs info; count stays 3
-    ~chatnpc("<p,neutral>Ahh, that hits the spot.");
-    ~chatnpc("<p,neutral>Now which of you two adventurers wanted to know where Ali's nephew is?");
-    ~chatplayer("<p,neutral>I think you're seeing double.");
-    ~chatnpc("<p,neutral>Is this a double? No wonder I feel sick...");
-    ~chatplayer("<p,neutral>Look, all I want to know is the whereabouts of Ali Morrisane's nephew.");
-    ~chatnpc("<p,neutral>Now is that his nephew from his side or his wife's? They have a huge family you see. I remember...");
-    ~chatplayer("<p,neutral>No, no, no. Stop right there. You are not going to fool me into buying you another beer without first giving me some useful information.");
-    ~chatnpc("<p,neutral>But my lips are so dry, how can I possibly continue?");
-    ~chatplayer("<p,neutral>Well if your lips are dry, I'll have to wring you like a wet cloth and squeeze out enough booze to fill another tankard. I'd reckon it would hurt though.");
+    ~chatnpc("<p,neutral>It's yourself again, isn't it?");
+    ~chatplayer("<p,neutral>Well it would have to be, who else could I possibly be other than myself?");
+    ~chatnpc("<p,neutral>That's kind of getting a little deep for me, existential reasoning or justification was never my strong suit. So what can I do for you?");
+    ~chatplayer("<p,neutral>Um, what? Look, all I want to know is the whereabouts of Ali Morrisane's nephew.");
+    ~chatnpc("<p,neutral>Now is that his nephew from his side or his wife's? They have a huge family you see. I remember........");
+    ~chatplayer("<p,neutral>No no no stop. You are not going to fool me into buying you another beer without first giving me some useful information.");
+    ~chatnpc("<p,neutral>But my lips are dry, how can I possibly continue?");
+    ~chatplayer("<p,neutral>Well if you can't continue, I will just have to wring you like a wet cloth and squeeze out enough booze to fill another tankard. I'd reckon it would hurt though.");
     ~chatnpc("<p,neutral>I see. Don't worry about me, I'll just have to soldier on. Now what do you want to know?");
     ~chatplayer("<p,neutral>For the last time, where is Ali Morrisane's nephew?");
-    ~chatnpc("<p,neutral>Oh, I don't know.");
-    ~chatplayer("<p,shock>Seriously?");
-    ~chatnpc("<p,neutral>Wait, wait! The last I heard he was in trouble with those gangs hanging around town. You won't get any answers out of them, though, not while they're feuding. Maybe if you were to solve that little problem...");
-    ~chatnpc("<p,neutral>Anyway, is there any chance of another beer?");
+    ~chatnpc("<p,neutral>I don't know exactly, he disappeared last week, either those Bandits or Menaphites have something to do with it. Perhaps their feuding has something to do with it, perhaps if you were to solve that problem... Anyway is there any chance of another beer?");
     ~chatplayer("<p,quiz>What do you think?");
     %feud_var_drink = 3;
     return;

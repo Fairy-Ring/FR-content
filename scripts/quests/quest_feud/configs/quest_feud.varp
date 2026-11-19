@@ -1,3 +1,7 @@
 [main_feud_var]
 scope=perm
 transmit=yes
+
+[feud_var_multi]
+scope=perm
+

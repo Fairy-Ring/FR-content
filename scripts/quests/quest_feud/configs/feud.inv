@@ -1,0 +1,35 @@
+// Beer availability is VERIFIED by the period Feud guides.
+// Stock size and restock rate are UNKNOWN named engineering constants.
+[feud_alispub]
+scope=shared
+size=^feud_shop_capacity
+restock=yes
+stackall=yes
+allstock=no
+stock1=beer,^feud_pub_beer_stock,^feud_pub_beer_restock
+
+// CANDIDATE Old School store table, revisions 214374 and 15351865.
+// The later jug and bucket packs are excluded. All retained objects exist in 377.
+// The earliest table has no stock counts and omits orange; original quantities
+// and orange's original presence remain uncertain. See the-feud research facts.
+[pollnivneach_generalstore]
+scope=shared
+size=^feud_shop_capacity
+restock=yes
+stackall=yes
+allstock=yes
+stock1=pot_empty,3,100
+stock2=jug_empty,2,100
+stock3=water_skin3,20,10
+stock4=desert_shirt,3,12
+stock5=desert_boots,2,100
+stock6=bucket_empty,12,400
+stock7=feud_karidian_fakebeard,11,10
+stock8=feud_karidian_turban,12,10
+stock9=cheese,5,200
+stock10=lime,5,200
+stock11=orange,5,200
+stock12=tomato,5,200
+stock13=jug_water,5,10
+stock14=bowl_water,7,10
+stock15=bucket_water,8,10

@@ -1,63 +1,17 @@
-// The Feud — Ali the Operator Talk-to, chat only. Four trees:
-// (a) join a gang (shipped, PASS feudosxtiyip), (b) after the first
-// pickpocket, the progress advice tree (dump § Picking another pocket:
-// "How is the pickpocketing going? Need a hand?" -> "Yeah, I could do with a
-// bit of advice." -> distraction hint, then the help sub-menu; "Nah, no
-// problems here..." goes straight to the flavour menu — no extra Yes line),
-// (c) after the second pickpocket, the oak blackjack tree (dump §
-// Pickpocketing part three / Talking to Ali the Operator: "Having problems?"
-// -> "Yeah, I could do with a bit of advice." -> distraction failing ->
-// award blackjack_oak 4599; full-inv decline / already-has branches), and
-// (d) after the third pickpocket, the report tree (dump § Welcome to the
-// Menaphites: "Well done! You have finished your first trial." -> burglary
-// briefing -> award feud_mayors_house_keys 4589; full-inv branch), and
-// (e) after the mayor-villa jewels, the jewels handoff tree (dump § Now
-// you've stolen the jewels / Talking to Ali the Operator: "I've completed
-// your task." -> crack that safe / hints lying around -> "Now give me the
-// jewels." -> mes hand-over, inv_del 4590, %feud_given_jewels 1 CANDIDATE ->
-// traitor briefing through "Well then get to it."), and (f) after the thug
-// names Traitorous Ali, the traitor report tree (dump § Talking to Ali the
-// Operator again: "I have discovered the identity of the traitor. It was..."
-// / "Traitorous Ali!" -> sandpit and an umbrella -> "Find him and then kill
-// him" -> help menu; %feud_found_trait 1 CANDIDATE), and (g) after the
-// drink is poisoned, the deed report tree (dump §17.2 Reporting the deed /
-// Talking to Ali the Operator: "Is the deed done?" -> "Almost, his drink is
-// poisoned. As soon as he gets back, he'll be done for." -> "Excellent work!
-// Now, go speak with our boss." -> "He wants to discuss the future direction
-// of the gang."; gate %feud_var_drink_found 1 CANDIDATE), and (h) while
-// still working, the deed-wait tree (dump §15.1 Planning a murder / Talking
-// to Ali the Operator: "Is the deed done?" -> "I'm still working on it." ->
-// "Well don't waste time talking to me. Get on with it."; gate
-// %feud_found_trait 1 CANDIDATE), and (i) after the Menaphite Leader is
-// gone, the ruin tree (dump §19.6 Celebrating your victory / Talking to Ali
-// the Operator: "Why did you have to go and ruin everything? We had a
-// beautiful future ahead of us, the town would have been ours!" ->
-// ~p_choice3 -> "Maybe I wanted to make it MY town!" / "Evil megalomaniacs
-// set on destruction should be opposed." / "I'm sorry, I didn't mean to
-// upset you. Can we still be friends?" -> each close verbatim then return;
-// gate %feud_var_menaboss 1 CANDIDATE, dispatched FIRST after the gates,
-// before jewels/deed/traitor).
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Joining a gang / Picking
-// another pocket / Pickpocketing part three / Welcome to the Menaphites /
-// Now you've stolen the jewels / Talking to Ali the Operator again /
-// Celebrating your victory minus the 27 Apr 2022 lore pass). Gate:
-// %feud_var >= 1 AND %feud_var_drink >= 3 AND %feud_var_comp_gangs = 3 else
-// return. Ruin when %feud_var_menaboss >= 1 (dispatched first). Jewels tree
-// when the player holds feud_mayors_jewels; deed report when
-// %feud_var_drink_found >= 1; deed-wait when %feud_found_trait >= 1;
-// traitor report when %feud_given_jewels >= 1; report when
-// %feud_talk_villager >= 3; oak when >= 2; progress when >= 1; else the
-// join tree.
-// No stage write — %feud_var stays 1, %feud_talk_villager stays 1 (report
-// keeps count 3), no 28 (28 = blackjack seller vis, not complete). No
-// %feud_npc_multi (lure/KO vis already shipped in the pickpocket file). No
-// willow. No dest / p_tele. No && / ||.
-// Cite feud-operator-blackjack-377.md §7.4 §7.5 §7.6 · osrs-wiki-changes-crawl-377.md.
+// Operator trial sequence: VERIFIED period quest guides.
+// Wording is CANDIDATE from RuneScape transcript revision 18411641, before 2022.
+// Existing stage-1 saves retain their receipt and trial progress.
 
 [opnpc1,feud_egyptian_minder]
 if (%feud_var < 1) { return; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var < ^feud_camels_delivered) {
+    %feud_var = ^feud_camels_delivered;
+}
+if (%feud_talk_villager >= 1 & %feud_var < ^feud_recruited) {
+    %feud_var = ^feud_recruited;
+}
 if (%feud_var_menaboss >= 1) {
     @feud_operator_ruin;
 }
@@ -82,25 +36,26 @@ if (%feud_talk_villager >= 2) {
 if (%feud_talk_villager >= 1) {
     @feud_operator_progress;
 }
-~chatnpc("<p,neutral>You seem to be a man of action. We could do with more people like you to sort those despicable bandits out.");
+if (%feud_var >= ^feud_recruited) {
+    @feud_operator_progress;
+}
+~chatnpc("<p,neutral>You seem to be a <text_gender("man", "woman")> of action. We could do with more people like you to sort those despicable bandits out.");
 ~chatplayer("<p,neutral>Yeah, those pesky bandits!");
 ~chatnpc("<p,quiz>So will you join us in our fight to wipe them out?");
 def_int $join = ~p_choice2("Yes, of course, those bandits should be taught a lesson.", 1, "Perhaps later, I'm quite busy at the moment.", 2);
 if ($join = 2) {
     @feud_operator_notyet;
 }
-~chatplayer("<p,happy>Yes, of course, those pesky bandits should be taught a lesson.");
+~chatplayer("<p,happy>Yes, of course, those bandits should be taught a lesson.");
 ~chatnpc("<p,happy>Good choice my friend, together we will crush them.");
 ~chatplayer("<p,quiz>So when do we start?");
 ~chatnpc("<p,neutral>Slow down, slow down. First you must prove yourself capable and trustworthy.");
 ~chatplayer("<p,quiz>How will I manage that?");
-~chatnpc("<p,neutral>Don't worry about that, I'll just set you a few jobs to do.");
-~chatnpc("<p,neutral>As you might have gathered we have a less-than- sparkling reputation around here.");
-~chatnpc("<p,neutral>So I want you to foster this reputation and grow it.");
+~chatnpc("<p,neutral>Don't worry about that, I'll just set you a few jobs to do. As you might have gathered we have the reputation for being less than scrupulous, something with good foundation. So I want you to foster this reputation and grow it.");
 ~chatplayer("<p,quiz>What exactly does that mean?");
-~chatnpc("<p,neutral>It means that I want you to go out into the town and pickpocket three villagers, then report back to me.");
-~chatnpc("<p,neutral>If you have any problems don't be afraid to ask for some advice.");
+~chatnpc("<p,neutral>It means that I want you to go out into the town and pickpocket 3 villagers and then report back to me. IF you have any problems don't be afraid to ask for some advice.");
 ~chatplayer("<p,neutral>Oh right, thanks.");
+%feud_var = ^feud_recruited;
 @feud_operator_help;
 
 [label,feud_operator_progress]
@@ -118,7 +73,6 @@ if ($pp = 1) {
 
 [label,feud_operator_notyet]
 ~chatplayer("<p,neutral>Perhaps later, I'm quite busy at the moment.");
-~chatnpc("<p,neutral>Tell me when you are ready. This deed should not be undertaken lightly.");
 @feud_operator_help;
 
 [label,feud_operator_help]

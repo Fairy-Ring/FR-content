@@ -1,0 +1,71 @@
+// Feud town service slice. Text is CANDIDATE from Transcript:The Feud
+// revisions 15325427 (OSRS) and 18411641 (RS3); the sauce retrieval mechanic
+// is VERIFIED by Sal's Realm's 29 Apr 2006 quest guide. Full source manifest
+// and capture digests are in the task evidence directory.
+// The report-drink value is UNKNOWN engineering state, named in feud.constant.
+
+[opnpc1,feud_ali_the_barman]
+def_int $choice = 0;
+def_int $followup = 0;
+jump(feud_barman_menu);
+
+[label,feud_barman_menu]
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,neutral>Good day. Can I help you with anything?");
+if (%feud_found_trait >= 1) {
+    $choice = ~p_choice3("Yes, I'd like a drink please.", 1, "What's going on in town?", 2, "I'm looking for Traitorous Ali.", 3);
+} else {
+    $choice = ~p_choice2("Yes, I'd like a drink please.", 1, "What's going on in town?", 2);
+}
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Yes, I'd like a drink please.");
+    ~chatnpc("<p,happy>Take a look.");
+    ~openshop_activenpc;
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>What's going on in town?");
+    ~chatnpc("<p,neutral>Nothing much really. About what you'd expect from a sleepy little town like ours.");
+    ~chatplayer("<p,neutral>What about those two gangs? That seems exciting.");
+    ~chatnpc("<p,neutral>They're paying customers, so I won't rock the boat if you don't mind.");
+    ~chatnpc("<p,neutral>Is there anything else I can help you with?");
+    jump(feud_barman_followup);
+}
+if ($choice = 3) {
+    ~chatplayer("<p,neutral>I'm looking for Traitorous Ali.");
+    ~chatnpc("<p,neutral>He is here, actually he was here! He's just nipped out to go to the toilet a few minutes ago. His drink is over there on the table by those barrels. The only problem is that no one has ever actually seen a toilet in RuneScape so he may take a little while. Is there anything else I can help you with?");
+    if (%feud_found_trait >= 1) {
+        if (%feud_report_drink = 0) {
+            %feud_report_drink = ^feud_report_drink_reported;
+        }
+    }
+    jump(feud_barman_followup);
+}
+return;
+
+[label,feud_barman_followup]
+$followup = ~p_choice2("No thanks, I'm ok.", 1, "Yes, I'd like to talk about something else.", 2);
+if ($followup = 1) {
+    ~chatplayer("<p,neutral>No thanks, I'm ok. Thanks for your time.");
+    return;
+}
+~chatplayer("<p,neutral>Yes, I'd like to talk about something else.");
+jump(feud_barman_menu);
+
+[opnpc1,feud_marketseller] @generalshop_help;
+[opnpc3,feud_marketseller] ~openshop_activenpc;
+
+[opnpc1,feud_kebabman]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>Hello. What can I do for you?");
+~chatplayer("<p,neutral>Would you sell me that bottle of special kebab sauce?");
+~chatnpc("<p,neutral>Well, that depends on what you have in mind.");
+~chatplayer("<p,neutral>Set yourself at ease, I have no intention of setting up a rival kebab shop.");
+~chatnpc("<p,neutral>Well then, what do you want it for?");
+~chatplayer("<p,neutral>I don't know, but I think I could have a bit of fun with it.");
+~chatnpc("<p,neutral>You're not going to put it in drunken Ali's drink now, are you? That's what happened the last time I gave someone the sauce.");
+~chatplayer("<p,neutral>No, that would be a bit cliché. I think I'll come up with something more original.");
+~chatnpc("<p,neutral>Just be careful with it, it's potent enough to give a camel the runs.");
+~chatplayer("<p,neutral>Thank you very much.");
+inv_add(inv, superhot_kebab_sauce, 1);
+return;

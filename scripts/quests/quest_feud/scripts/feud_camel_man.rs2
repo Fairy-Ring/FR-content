@@ -1,10 +1,6 @@
-// The Feud — Ali the Camel Man receipts (chat + coins).
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Acquiring some camels minus
-// the 27 Apr 2022 lore pass). Gate: %feud_var >= 1 AND %feud_var_drink >= 3.
-// Buy: 200 insult / 500 give two receipts / 1000 also two (half-price line);
-// need two inv slots. inv_del coins + inv_add feud_camel_receipt x2 is the
-// dump (no shop IF). "I'm looking for Ali" is flavour. No dest / p_tele / 28.
-// No && / ||. Cite osrs-wiki-changes-crawl-377.md feud row.
+// CANDIDATE camel offer: Sal's period guide says 500 gp for two camels;
+// RuneHQ says offer 500, then 1,000 if refused. Tip.It says 500 each.
+// The retained transcript also accepts the 500 gp pair offer.
 
 [opnpc1,feud_ali_the_discount_camel_seller]
 if (%feud_var < 1) { return; }
@@ -109,9 +105,8 @@ if ($t2 = 1) {
 
 [label,feud_camel_buy]
 ~chatplayer("<p,quiz>Are those camels around the side for sale?");
-~chatnpc("<p,neutral>Those two camels around the side are already sold.");
-~chatnpc("<p,neutral>But you are in luck - I have another two beautiful camels arriving soon from the best stable in all of Al Kharid.");
-~chatplayer("<p,happy>Excellent! Although another two ugly camels would have been fine, I think.");
+~chatnpc("<p,neutral>Those two camels around the side are already sold. But you are in luck - I have another two beautiful camels arriving in soon from the best stable in all of Al Kharid.");
+~chatplayer("<p,neutral>Camels, beautiful? I worry about you.");
 def_int $b = ~p_choice2("Can you tell me a little about them?", 1, "What price do you want for both of them?", 2);
 if ($b = 1) {
     ~chatplayer("<p,neutral>Can you tell me a little about them?");
@@ -126,7 +121,7 @@ if ($b = 1) {
 
 [label,feud_camel_price]
 ~chatplayer("<p,quiz>What price do you want for both of them?");
-~chatnpc("<p,neutral>One cannot put a price on these beauties, they are precious beyond the worth of the crass value of gold coins!");
+~chatnpc("<p,neutral>One cannot put a price on life, they are precious beyond the worth of the crass value of gold coins!");
 @feud_camel_price_menu;
 
 [label,feud_camel_price_menu]
@@ -149,15 +144,13 @@ if ($p = 3) {
         ~chatnpc("<p,neutral>I would consider giving them to you if you were able to look after them. But it is abundantly clear that you've got your hands - and your inventory - full at the moment.");
         return;
     }
-    if (inv_total(inv, coins) < 500) {
+    if (inv_total(inv, coins) < ^feud_camel_pair_price) {
         ~chatnpc("<p,neutral>You don't even have that much money do you? Come back when you're able to make a proper offer and stop wasting my time.");
         return;
     }
-    ~chatnpc("<p,neutral>I suppose I can silence my moral objections for that.");
-    inv_del(inv, coins, 500);
+    inv_del(inv, coins, ^feud_camel_pair_price);
     inv_add(inv, feud_camel_receipt, 2);
-    ~chatnpc("<p,neutral>Here are the receipts for the camels, so that you can pick them up as soon as I get them in.");
-    ~chatnpc("<p,neutral>Is there anything else I can help you with?");
+    ~chatnpc("<p,neutral>Here are the receipts for the camels so that you can pick them up as soon as I get them in. Is there anything else I can help you with?");
     @feud_camel_menu;
 }
 ~chatplayer("<p,neutral>Would 1000 gold coins for the pair of them do?");
@@ -165,15 +158,14 @@ if (inv_freespace(inv) < 2) {
     ~chatnpc("<p,neutral>I would consider giving them to you if you were able to look after them. But it is abundantly clear that you've got your hands - and your inventory - full at the moment.");
     return;
 }
-if (inv_total(inv, coins) < 1000) {
+if (inv_total(inv, coins) < calc(^feud_camel_pair_price * 2)) {
     ~chatnpc("<p,neutral>You don't even have that much money do you? Come back when you're able to make a proper offer and stop wasting my time.");
     return;
 }
-~chatnpc("<p,neutral>You are too generous. I would have sold them for half of that!");
-inv_del(inv, coins, 1000);
+~chatnpc("<p,neutral>You are too generous, I would have sold for half of that!");
+inv_del(inv, coins, calc(^feud_camel_pair_price * 2));
 inv_add(inv, feud_camel_receipt, 2);
-~chatnpc("<p,neutral>Here are the receipts for the camels, so that you can pick them up as soon as I get them in.");
-~chatnpc("<p,neutral>Is there anything else I can help you with?");
+~chatnpc("<p,neutral>Here are the receipts for the camels so that you can pick them up as soon as I get them in. Is there anything else I can help you with?");
 @feud_camel_menu;
 
 [label,feud_camel_ali]

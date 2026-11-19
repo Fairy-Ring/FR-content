@@ -1,21 +1,14 @@
-// The Feud — Ali Morrisane start Talk-to + report (§22.5).
-// Start: CANDIDATE lines (OSRS Transcript:The Feud minus overlay / combat-40
-// toast / Rogue Trader shop). First write %feud_var 0 -> 1. Do not open
-// Ali's Discount Wares. No dest / Pollnivneach / stair dest.
-// Cite red-19-start-impl-377.md §3.
-// Report: once the Bandit champion is dead (%feud_var_banditboss 1, §20.4
-// PASS d478d3333 — CANDIDATE leftover flag) the start tree is skipped and
-// §22.5 Talking to Ali Morrisane plays verbatim — nephew the salesman /
-// proud of young Baba / 500 coins (inv_add + ~objbox, dump tbox; %feud_ali_money
-// 1 CANDIDATE leftover 331 — Ali paid the reward) / parallels + tourism
-// reveal / greatest salesman / wares offer (~p_choice2; both options return
-// — do NOT open the shop). No 28 / dest / p_tele. Quest-complete vis later.
+// Opening actions: VERIFIED period quest guides; wording: CANDIDATE transcript.
+// Stage integers are UNKNOWN engineering checkpoints, not original server values.
 
 [opnpc1,feud_ali_m]
 if (%feud_var_banditboss >= 1) {
     @feud_ali_m_report;
 }
 ~chatnpc("<p,neutral>Good day and welcome back to Al Kharid.");
+if (%feud_var > ^feud_not_started) {
+    return;
+}
 ~chatnpc("<p,neutral>My name is Ali Morrisane - the greatest salesman in the world.");
 ~chatnpc("<p,neutral>A nephew of mine lives not too far from here in a little town called Pollnivneach.");
 def_int $go = ~p_choice2("I'll find your nephew.", 1, "I'm too busy to help.", 2);
@@ -26,7 +19,7 @@ if ($go = 2) {
 }
 ~chatplayer("<p,happy>I'll find your nephew.");
 ~chatnpc("<p,neutral>Tell him his uncle Ali M needs his help up in Al Kharid.");
-%feud_var = 1;
+%feud_var = ^feud_started;
 
 [label,feud_ali_m_report]
 ~chatnpc("<p,neutral>Hello again my friend. I have heard nothing from my troublesome nephew. Have you any news of his whereabouts?");

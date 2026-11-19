@@ -1,0 +1,41 @@
+// UNKNOWN engineering checkpoints. Original 377 varbit feud_var is retained.
+// Stage 1 remains the published start. These numbers are not period claims.
+^feud_not_started = 0
+^feud_started = 1
+^feud_camels_delivered = 2
+^feud_recruited = 3
+^feud_first_pick = 4
+^feud_second_pick = 5
+^feud_blackjack_training = 6
+^feud_third_pick = 7
+^feud_burglary = 8
+^feud_staked_out = 9
+^feud_jewels_taken = 10
+^feud_traitor_inquiry = 11
+^feud_traitor_identified = 12
+^feud_poison_task = 13
+^feud_poisoned_drink = 19
+^feud_leader_summons = 20
+^feud_toughguy_fight = 21
+^feud_menaphites_defeated = 22
+^feud_bandits_challenged = 23
+^feud_champion_fight = 24
+^feud_bandits_defeated = 25
+^feud_villager_reveal = 26
+^feud_mayor_reveal = 27
+// Completion uses the existing ^feud_complete (28) registry constant.
+// The 377 cache independently makes the blackjack seller visible at 28.
+
+// CANDIDATE period pair offer; conflicting Tip.It wording is recorded in the facts.
+^feud_camel_pair_price = 500
+
+// UNKNOWN engineering stock settings, using the existing Burthorpe pub precedent.
+^feud_shop_capacity = 40
+^feud_pub_beer_stock = 12
+^feud_pub_beer_restock = 10
+^feud_pub_shop_sell = 1000
+^feud_pub_shop_buy = 0
+^feud_pub_shop_delta = 10
+
+// UNKNOWN engineering marker after the sourced traitor-drink explanation.
+^feud_report_drink_reported = 1
