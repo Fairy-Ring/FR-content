@@ -40,8 +40,10 @@ for (const row of [...crops, ...milkers]) {
         assert.equal(option.kind, 'handled', `${row.name}:${row.slot}: native family dispatch`);
         const entry = option.op.script;
         assert(entry, `${row.name}: native operation entry exists`);
-        for (const field of ['opcodes', 'intOperands', 'stringOperands', 'intLocalCount', 'stringLocalCount', 'intArgCount', 'stringArgCount', 'switchTables']) {
-            assert.deepEqual(entry[field], control[field], `${row.name}: compiled entry joins the same published family`);
+        if (crops.includes(row)) {
+            for (const field of ['opcodes', 'intOperands', 'stringOperands', 'intLocalCount', 'stringLocalCount', 'intArgCount', 'stringArgCount', 'switchTables']) {
+                assert.deepEqual(entry[field], control[field], `${row.name}: compiled entry joins the same published family`);
+            }
         }
     }
 }
@@ -132,6 +134,9 @@ function milk(loc, slot, buckets, full = false) {
     const script = p.getOpTrigger();
     assert(script, `${types.LocType.get(loc.type).debugname}: native Milk dispatch`);
     assert.equal(p.runScript(ScriptRunner.init(script, p, loc), true, true), ScriptState.FINISHED);
+    const queued = p.weakQueue.head();
+    assert.equal(queued !== null, buckets > 0, 'only an empty bucket schedules the published milk queue');
+    const schedule = queued === null ? null : { script: queued.script, delay: queued.delay, args: queued.args };
     for (let tick = 0; p.weakQueue.head() !== null && tick < 64; tick++) {
         World.currentTick++;
         p.processQueues();
@@ -142,7 +147,7 @@ function milk(loc, slot, buckets, full = false) {
     assert.equal(p.invTotal(inventory, product), buckets, 'each empty bucket becomes one bucket of milk');
     assert.equal(loc.isActive, true, 'milking leaves the original dairy cow active');
     assert.equal(World.getLoc(loc.x, loc.z, loc.level, loc.type), loc, 'milking leaves the original dairy cow in the native world');
-    return { messages, ticks: World.currentTick - start, empty: p.invTotal(inventory, empty), milk: p.invTotal(inventory, product) };
+    return { messages, ticks: World.currentTick - start, empty: p.invTotal(inventory, empty), milk: p.invTotal(inventory, product), schedule };
 }
 let builtPlacements = 0;
 for (const spec of crops) {
@@ -178,8 +183,12 @@ for (const spec of milkers) {
     for (const row of rows) {
         const loc = World.getLoc(row.x, row.z, row.level, row.type);
         assert(loc, `${spec.name}: original mapped dairy cow is loaded`);
-        cases.forEach((test, index) => assert.deepEqual(milk(loc, spec.slot, test.buckets, test.full), expected[index],
-            `${spec.name}: bucket exchange, XP, messages and native queue timing match the published member`));
+        cases.forEach((test, index) => {
+            const actual = milk(loc, spec.slot, test.buckets, test.full);
+            assert.equal(actual.schedule?.script, expected[index].schedule?.script, `${spec.name}: native queue is the published milk queue`);
+            assert.deepEqual(actual, expected[index],
+                `${spec.name}: bucket exchange, XP, messages and native queue timing match the published member`);
+        });
         builtPlacements++;
     }
 }

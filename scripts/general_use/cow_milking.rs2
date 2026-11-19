@@ -17,12 +17,6 @@ switch_obj(last_useitem) {
 }
 
 [oploc1,fat_cow]
-@milk_cow_start;
-
-[oploc2,fairy_fat_cow]
-@milk_cow_start;
-
-[label,milk_cow_start]
 if(inv_total(inv, bucket_empty) = 0) {
     if(inzone(0_50_51_48_8, 0_50_51_55_15, loc_coord) = true) {
         ~chatnpc_specific("Gillie Groats the Milkmaid", gillie_the_milkmaid, "<p,laugh>Tee hee! You've never milked a cow before, have you?");
@@ -33,6 +27,13 @@ if(inv_total(inv, bucket_empty) = 0) {
         ~chatplayer("<p,neutral>Right, I'll do that.");
         return;
     }
+    mes("You'll need an empty bucket to collect the milk.");
+    return;
+}
+weakqueue(milk_cow, 2, 0);
+
+[oploc2,fairy_fat_cow]
+if(inv_total(inv, bucket_empty) = 0) {
     mes("You'll need an empty bucket to collect the milk.");
     return;
 }
