@@ -175,6 +175,8 @@ for (const name of ['ics_little_plague_cow1', 'ics_little_plague_cow2', 'ics_lit
   }
 }
 assert.equal(cowSeen.size, 2, 'both sourced cow responses exercised');
+// CANDIDATE item-page property, loaded from the compiled server object config.
+assert.equal(ObjType.getByName('leaflet_dropper_flyer').tradeable, false, 'flyer is not tradeable');
 // Direct Take-flyer transcript: one free held copy, no bank-wide claim flag.
 for (const [inventory, bank, expected, line] of [
   [{ coins: 19 }, {}, 1, 'Here! Take one and let me get back to work.'],
