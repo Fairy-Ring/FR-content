@@ -136,7 +136,8 @@
       "[proc,dt_kamil_attack]",
       "[proc,killerwatt_attack]",
       "[proc,npc_druid_entangle]",
-      "[proc,npc_zap_attack]"
+      "[proc,npc_zap_attack]",
+      "[proc,waterbirth_prime_attack]"
     ],
     "npc_spell_cast": [
       "[proc,chaos_druid_spell]",
@@ -149,7 +150,8 @@
       "[ai_applayer2,wizard]",
       "[ai_opplayer2,druid]",
       "[proc,dt_fareed_cast]",
-      "[proc,waterbirth_other_spinolyp_magic_attack]"
+      "[proc,waterbirth_other_spinolyp_magic_attack]",
+      "[proc,waterbirth_prime_attack]"
     ],
     "npc_debuff_allowed": [
       "[proc,chaos_druid_spell]"
@@ -158,7 +160,8 @@
       "[proc,chaos_druid_spell]",
       "[proc,dt_fareed_cast]",
       "[proc,npc_druid_entangle]",
-      "[proc,waterbirth_other_spinolyp_magic_attack]"
+      "[proc,waterbirth_other_spinolyp_magic_attack]",
+      "[proc,waterbirth_prime_attack]"
     ],
     "npc_stat_change_effect": [
       "[proc,chaos_druid_spell]"

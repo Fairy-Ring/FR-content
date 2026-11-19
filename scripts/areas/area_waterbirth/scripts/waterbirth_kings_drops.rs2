@@ -1,0 +1,465 @@
+// Rex: VERIFIED whole 27 April 2006 Tip.It list and stated quantities.
+// Prime/Supreme: CANDIDATE own 27 June 2006 lists, eight weeks after the cutoff.
+// Rex retains Mud Staff and Seercull: the later per-King unique split is not imported.
+// All items are original 377 objects; no later pet, elite clue, key, head or limb.
+// UNKNOWN weights and unstated singleton quantities live only in waterbirth_kings_loot.constant.
+// Certificates explicitly stated in the period lists are preserved. For Rex steel bars
+// and Prime essence, notation is CANDIDATE from the exact later King, not given by Tip.It.
+[ai_queue3,dagcave_ranged_boss] @waterbirth_kings_death;
+[ai_queue3,dagcave_magic_boss] @waterbirth_kings_death;
+[ai_queue3,dagcave_melee_boss] @waterbirth_kings_death;
+
+[label,waterbirth_kings_death]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+obj_add(npc_coord, dagannoth_king_bones, 1, ^lootdrop_duration);
+obj_add(npc_coord, dagganoth_hide, 1, ^lootdrop_duration);
+def_namedobj $item;
+def_int $count;
+if (npc_type = dagcave_ranged_boss) {
+    $item, $count = ~waterbirth_supreme_loot;
+} else if (npc_type = dagcave_magic_boss) {
+    $item, $count = ~waterbirth_prime_loot;
+} else {
+    $item, $count = ~waterbirth_rex_loot;
+}
+if ($count = -1) {
+    // The slot already won; native eligibility chooses/suppresses the actual hard clue.
+    ~trail_hardcluedrop(1, npc_coord);
+} else if ($item ! null) {
+    obj_add(npc_coord, $item, $count, ^lootdrop_duration);
+}
+
+[proc,waterbirth_rex_loot]()(namedobj, int)
+def_int $roll = random(^wbk_rex_loot_total_weight);
+if ($roll < ^wbk_rex_loot_end_dragon_axe) {
+    return(dragon_axe, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_mud_battlestaff) {
+    return(mud_battlestaff, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_dragon_spear) {
+    return(dragon_spear, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_mithril_axe) {
+    return(mithril_axe, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_mithril_pickaxe) {
+    return(mithril_pickaxe, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_mithril_warhammer) {
+    return(mithril_warhammer, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_adamant_axe) {
+    return(adamant_axe, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_rune_axe) {
+    return(rune_axe, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_rune_javelin) {
+    return(rune_javelin, 5);
+}
+if ($roll < ^wbk_rex_loot_end_viking_sword) {
+    return(viking_sword, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_daganoth_cave_magic_shortbow) {
+    return(daganoth_cave_magic_shortbow, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_dragon_med_helm) {
+    return(dragon_med_helm, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_dagganoth_melee_legs) {
+    return(dagganoth_melee_legs, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_dagganoth_melee_body) {
+    return(dagganoth_melee_body, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_adamant_platebody) {
+    return(adamant_platebody, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_steel_kiteshield) {
+    return(steel_kiteshield, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_steel_platebody) {
+    return(steel_platebody, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_viking_helmet) {
+    return(viking_helmet, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_viking_shield) {
+    return(viking_shield, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_steel_arrow) {
+    return(steel_arrow, 93);
+}
+if ($roll < ^wbk_rex_loot_end_naturerune) {
+    return(naturerune, 67);
+}
+if ($roll < ^wbk_rex_loot_end_unidentified_ranarr) {
+    return(unidentified_ranarr, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_cert_mithril_ore) {
+    return(cert_mithril_ore, 25);
+}
+if ($roll < ^wbk_rex_loot_end_cert_coal) {
+    return(cert_coal, 100);
+}
+if ($roll < ^wbk_rex_loot_end_cert_iron_ore) {
+    return(cert_iron_ore, 150);
+}
+if ($roll < ^wbk_rex_loot_end_adamantite_bar) {
+    return(adamantite_bar, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_cert_steel_bar) {
+    return(cert_steel_bar, 16);
+}
+if ($roll < ^wbk_rex_loot_end_willow_logs) {
+    return(willow_logs, 17);
+}
+if ($roll < ^wbk_rex_loot_end_cert_maple_logs) {
+    return(cert_maple_logs, 59);
+}
+if ($roll < ^wbk_rex_loot_end_cert_yew_logs) {
+    return(cert_yew_logs, 101);
+}
+if ($roll < ^wbk_rex_loot_end_bass) {
+    return(bass, 5);
+}
+if ($roll < ^wbk_rex_loot_end_swordfish) {
+    return(swordfish, 5);
+}
+if ($roll < ^wbk_rex_loot_end_shark) {
+    return(shark, 5);
+}
+if ($roll < ^wbk_rex_loot_end_2dosepotionofzamorak) {
+    return(2dosepotionofzamorak, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_2doseprayerrestore) {
+    return(2doseprayerrestore, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_2dose2attack) {
+    return(2dose2attack, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_2dose2defense) {
+    return(2dose2defense, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_2dose1antidragon) {
+    return(2dose1antidragon, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_2dose2strength) {
+    return(2dose2strength, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_warrior_ring) {
+    return(warrior_ring, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_berzerker_ring) {
+    return(berzerker_ring, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_gems) {
+    return(~waterbirth_king_uncut_gem);
+}
+if ($roll < ^wbk_rex_loot_end_keys) {
+    return(~waterbirth_king_key_half);
+}
+if ($roll < ^wbk_rex_loot_end_dragonshield_a) {
+    return(dragonshield_a, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_rex_loot_end_coins) {
+    return(coins, add(random(6701), 300));
+}
+return(null, -1);
+
+[proc,waterbirth_prime_loot]()(namedobj, int)
+def_int $roll = random(^wbk_prime_loot_total_weight);
+if ($roll < ^wbk_prime_loot_end_dragon_axe) {
+    return(dragon_axe, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_mud_battlestaff) {
+    return(mud_battlestaff, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_staff_of_air) {
+    return(staff_of_air, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_staff_of_earth) {
+    return(staff_of_earth, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_water_battlestaff) {
+    return(water_battlestaff, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_air_battlestaff) {
+    return(air_battlestaff, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_earth_battlestaff) {
+    return(earth_battlestaff, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_cert_battlestaff) {
+    switch_int (random(2)) {
+        case 0 : return(cert_battlestaff, 9);
+        case default : return(cert_battlestaff, 10);
+    }
+}
+if ($roll < ^wbk_prime_loot_end_dragon_spear) {
+    return(dragon_spear, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_daganoth_cave_magic_shortbow) {
+    return(daganoth_cave_magic_shortbow, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_steel_kiteshield) {
+    return(steel_kiteshield, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_dagganoth_mage_body) {
+    return(dagganoth_mage_body, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_dagganoth_mage_legs) {
+    return(dagganoth_mage_legs, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_rune_kiteshield) {
+    return(rune_kiteshield, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_dragon_med_helm) {
+    return(dragon_med_helm, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_airrune) {
+    return(airrune, 155);
+}
+if ($roll < ^wbk_prime_loot_end_earthrune) {
+    return(earthrune, 67);
+}
+if ($roll < ^wbk_prime_loot_end_deathrune) {
+    switch_int (random(2)) {
+        case 0 : return(deathrune, 60);
+        case default : return(deathrune, 77);
+    }
+}
+if ($roll < ^wbk_prime_loot_end_naturerune) {
+    return(naturerune, 67);
+}
+if ($roll < ^wbk_prime_loot_end_bloodrune) {
+    return(bloodrune, 97);
+}
+if ($roll < ^wbk_prime_loot_end_mudrune) {
+    return(mudrune, 32);
+}
+if ($roll < ^wbk_prime_loot_end_unidentified_ranarr) {
+    return(unidentified_ranarr, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_seeds) {
+    return(~waterbirth_king_herb_seed);
+}
+if ($roll < ^wbk_prime_loot_end_cert_blankrune_high) {
+    switch_int (random(3)) {
+        case 0 : return(cert_blankrune_high, 134);
+        case 1 : return(cert_blankrune_high, 188);
+        case default : return(cert_blankrune_high, 194);
+    }
+}
+if ($roll < ^wbk_prime_loot_end_bigoysterpearls) {
+    return(bigoysterpearls, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_cert_air_talisman) {
+    switch_int (random(7)) {
+        case 0 : return(cert_air_talisman, 29);
+        case 1 : return(cert_air_talisman, 36);
+        case 2 : return(cert_air_talisman, 38);
+        case 3 : return(cert_air_talisman, 53);
+        case 4 : return(cert_air_talisman, 54);
+        case 5 : return(cert_air_talisman, 58);
+        case default : return(cert_air_talisman, 66);
+    }
+}
+if ($roll < ^wbk_prime_loot_end_cert_earth_talisman) {
+    switch_int (random(4)) {
+        case 0 : return(cert_earth_talisman, 46);
+        case 1 : return(cert_earth_talisman, 48);
+        case 2 : return(cert_earth_talisman, 68);
+        case default : return(cert_earth_talisman, 74);
+    }
+}
+if ($roll < ^wbk_prime_loot_end_cert_water_talisman) {
+    switch_int (random(2)) {
+        case 0 : return(cert_water_talisman, 12);
+        case default : return(cert_water_talisman, 50);
+    }
+}
+if ($roll < ^wbk_prime_loot_end_shark) {
+    return(shark, 5);
+}
+if ($roll < ^wbk_prime_loot_end_gems) {
+    return(~waterbirth_king_uncut_gem);
+}
+if ($roll < ^wbk_prime_loot_end_keys) {
+    return(~waterbirth_king_key_half);
+}
+if ($roll < ^wbk_prime_loot_end_dragonshield_a) {
+    return(dragonshield_a, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_seer_ring) {
+    return(seer_ring, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_prime_loot_end_coins) {
+    switch_int (random(2)) {
+        case 0 : return(coins, 976);
+        case default : return(coins, 1000);
+    }
+}
+return(null, -1);
+
+[proc,waterbirth_supreme_loot]()(namedobj, int)
+def_int $roll = random(^wbk_supreme_loot_total_weight);
+if ($roll < ^wbk_supreme_loot_end_dragon_axe) {
+    return(dragon_axe, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_daganoth_cave_magic_shortbow) {
+    return(daganoth_cave_magic_shortbow, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_rune_2h_sword) {
+    return(rune_2h_sword, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_rune_battleaxe) {
+    return(rune_battleaxe, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_iron_knife) {
+    switch_int (random(6)) {
+        case 0 : return(iron_knife, 259);
+        case 1 : return(iron_knife, 275);
+        case 2 : return(iron_knife, 284);
+        case 3 : return(iron_knife, 343);
+        case 4 : return(iron_knife, 359);
+        case default : return(iron_knife, 492);
+    }
+}
+if ($roll < ^wbk_supreme_loot_end_steel_knife) {
+    switch_int (random(3)) {
+        case 0 : return(steel_knife, 141);
+        case 1 : return(steel_knife, 144);
+        case default : return(steel_knife, 145);
+    }
+}
+if ($roll < ^wbk_supreme_loot_end_mithril_knife) {
+    switch_int (random(4)) {
+        case 0 : return(mithril_knife, 27);
+        case 1 : return(mithril_knife, 34);
+        case 2 : return(mithril_knife, 38);
+        case default : return(mithril_knife, 48);
+    }
+}
+if ($roll < ^wbk_supreme_loot_end_rune_thrownaxe) {
+    return(rune_thrownaxe, add(random(3), 7));
+}
+if ($roll < ^wbk_supreme_loot_end_rune_javelin) {
+    return(rune_javelin, 5);
+}
+if ($roll < ^wbk_supreme_loot_end_viking_sword) {
+    return(viking_sword, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_red_dragon_vambraces) {
+    return(red_dragon_vambraces, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_dagganoth_ranged_body) {
+    return(dagganoth_ranged_body, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_dagganoth_ranged_legs) {
+    return(dagganoth_ranged_legs, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_dragon_med_helm) {
+    return(dragon_med_helm, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_viking_shield) {
+    return(viking_shield, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_lawrune) {
+    return(lawrune, 514);
+}
+if ($roll < ^wbk_supreme_loot_end_iron_arrow) {
+    switch_int (random(2)) {
+        case 0 : return(iron_arrow, 417);
+        case default : return(iron_arrow, 502);
+    }
+}
+if ($roll < ^wbk_supreme_loot_end_steel_arrow) {
+    switch_int (random(4)) {
+        case 0 : return(steel_arrow, 123);
+        case 1 : return(steel_arrow, 215);
+        case 2 : return(steel_arrow, 221);
+        case default : return(steel_arrow, 240);
+    }
+}
+if ($roll < ^wbk_supreme_loot_end_adamant_dart) {
+    switch_int (random(3)) {
+        case 0 : return(adamant_dart, 11);
+        case 1 : return(adamant_dart, 14);
+        case default : return(adamant_dart, 18);
+    }
+}
+if ($roll < ^wbk_supreme_loot_end_unidentified_ranarr) {
+    return(unidentified_ranarr, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_ranger_ring) {
+    return(ranger_ring, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_nature_talisman) {
+    return(nature_talisman, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_ring_of_life) {
+    return(ring_of_life, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_cert_yew_logs) {
+    switch_int (random(3)) {
+        case 0 : return(cert_yew_logs, 75);
+        case 1 : return(cert_yew_logs, 77);
+        case default : return(cert_yew_logs, 122);
+    }
+}
+if ($roll < ^wbk_supreme_loot_end_cert_maple_logs) {
+    return(cert_maple_logs, add(random(11), 15));
+}
+if ($roll < ^wbk_supreme_loot_end_shark) {
+    return(shark, 5);
+}
+if ($roll < ^wbk_supreme_loot_end_bigoysterpearls) {
+    return(bigoysterpearls, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_opal_bolttips) {
+    return(opal_bolttips, 18);
+}
+if ($roll < ^wbk_supreme_loot_end_gems) {
+    return(~waterbirth_king_uncut_gem);
+}
+if ($roll < ^wbk_supreme_loot_end_keys) {
+    return(~waterbirth_king_key_half);
+}
+if ($roll < ^wbk_supreme_loot_end_dragonshield_a) {
+    return(dragonshield_a, ^wbk_unstated_loot_quantity);
+}
+if ($roll < ^wbk_supreme_loot_end_coins) {
+    switch_int (random(4)) {
+        case 0 : return(coins, 972);
+        case 1 : return(coins, 1040);
+        case 2 : return(coins, 1172);
+        case default : return(coins, 3000);
+    }
+}
+return(null, -1);
+
+[proc,waterbirth_king_uncut_gem]()(namedobj, int)
+def_int $roll = random(^wbk_uncut_gem_total_weight);
+if ($roll < ^wbk_uncut_sapphire_end) return(uncut_sapphire, ^wbk_unstated_loot_quantity);
+else if ($roll < ^wbk_uncut_emerald_end) return(uncut_emerald, ^wbk_unstated_loot_quantity);
+else if ($roll < ^wbk_uncut_ruby_end) return(uncut_ruby, ^wbk_unstated_loot_quantity);
+return(uncut_diamond, ^wbk_unstated_loot_quantity);
+
+[proc,waterbirth_king_key_half]()(namedobj, int)
+if (random(2) = 0) return(keyhalf1, ^wbk_unstated_loot_quantity);
+return(keyhalf2, ^wbk_unstated_loot_quantity);
+
+[proc,waterbirth_king_herb_seed]()(namedobj, int)
+def_int $roll = random(^wbk_herb_seed_total_weight);
+if ($roll < ^wbk_herb_seed_end_toadflax_seed) return(toadflax_seed, ^wbk_unstated_loot_quantity);
+if ($roll < ^wbk_herb_seed_end_irit_seed) return(irit_seed, ^wbk_unstated_loot_quantity);
+if ($roll < ^wbk_herb_seed_end_avantoe_seed) return(avantoe_seed, ^wbk_unstated_loot_quantity);
+if ($roll < ^wbk_herb_seed_end_kwuarm_seed) return(kwuarm_seed, ^wbk_unstated_loot_quantity);
+if ($roll < ^wbk_herb_seed_end_snapdragon_seed) return(snapdragon_seed, ^wbk_unstated_loot_quantity);
+if ($roll < ^wbk_herb_seed_end_cadantine_seed) return(cadantine_seed, ^wbk_unstated_loot_quantity);
+if ($roll < ^wbk_herb_seed_end_lantadyme_seed) return(lantadyme_seed, ^wbk_unstated_loot_quantity);
+if ($roll < ^wbk_herb_seed_end_dwarf_weed_seed) return(dwarf_weed_seed, ^wbk_unstated_loot_quantity);
+return(torstol_seed, ^wbk_unstated_loot_quantity);

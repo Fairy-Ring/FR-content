@@ -1,5 +1,8 @@
 // UNKNOWN engineering radii and timers for the placed Rock lobster and Spinolyp forms.
-^waterbirth_other_rock_approach_radius = 1
+// UNKNOWN: 2 covers all 12 neighboring tiles of the 2x2 Rock, measured from its southwest origin.
+^waterbirth_other_rock_approach_radius = 2
+// UNKNOWN: retained current and first sources do not establish a disguise return; keep the existing max-int delay.
+^waterbirth_other_rock_no_return_ticks = 2147483647
 ^waterbirth_other_rock_active_radius = 1
 ^waterbirth_other_rock_pursuit_radius = 16
 ^waterbirth_other_rock_respawn_ticks = 30

@@ -1441,6 +1441,24 @@
         "miss": 4055616968,
         "zero": 2654435769
       }
+    },
+    {
+      "script": "[ai_applayer2,dagcave_ranged_boss]",
+      "npc": "dagcave_ranged_boss",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
+    },
+    {
+      "script": "[ai_applayer2,dagcave_magic_boss]",
+      "npc": "dagcave_magic_boss",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 1992887715
+      }
     }
   ]
 }
