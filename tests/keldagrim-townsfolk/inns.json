@@ -258,7 +258,7 @@
           ],
           "afterItems": {
             "coins": 0,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -288,7 +288,7 @@
           ],
           "afterItems": {
             "coins": 0,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -503,7 +503,7 @@
           ],
           "afterItems": {
             "coins": 1,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -533,7 +533,7 @@
           ],
           "afterItems": {
             "coins": 1,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -748,7 +748,7 @@
           ],
           "afterItems": {
             "coins": 2,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -778,7 +778,7 @@
           ],
           "afterItems": {
             "coins": 2,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -993,7 +993,7 @@
           ],
           "afterItems": {
             "coins": 9,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -1023,7 +1023,7 @@
           ],
           "afterItems": {
             "coins": 9,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -1238,7 +1238,7 @@
           ],
           "afterItems": {
             "coins": 0,
-            "wine": 1
+            "jug_wine": 1
           }
         },
         {
@@ -1268,7 +1268,7 @@
           ],
           "afterItems": {
             "coins": 10,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -1483,7 +1483,7 @@
           ],
           "afterItems": {
             "coins": 1990,
-            "wine": 1
+            "jug_wine": 1
           }
         },
         {
@@ -1513,7 +1513,7 @@
           ],
           "afterItems": {
             "coins": 2000,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -1728,7 +1728,7 @@
           ],
           "afterItems": {
             "coins": 1991,
-            "wine": 1
+            "jug_wine": 1
           }
         },
         {
@@ -1758,7 +1758,7 @@
           ],
           "afterItems": {
             "coins": 2001,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {
@@ -1973,7 +1973,7 @@
           ],
           "afterItems": {
             "coins": 1991,
-            "wine": 1
+            "jug_wine": 1
           }
         },
         {
@@ -2003,7 +2003,7 @@
           ],
           "afterItems": {
             "coins": 2001,
-            "wine": 0
+            "jug_wine": 0
           }
         },
         {

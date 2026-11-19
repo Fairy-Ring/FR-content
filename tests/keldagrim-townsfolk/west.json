@@ -998,7 +998,7 @@
           "afterItems": {
             "beer": 0,
             "dwarven_stout": 0,
-            "wine": 0,
+            "jug_wine": 0,
             "beer_glass": 0
           }
         }
@@ -1047,12 +1047,12 @@
           ],
           "menus": [],
           "items": {
-            "wine": 1
+            "jug_wine": 1
           },
           "afterItems": {
             "beer": 0,
             "dwarven_stout": 0,
-            "wine": 1,
+            "jug_wine": 1,
             "beer_glass": 0
           }
         }
@@ -1102,12 +1102,12 @@
           "menus": [],
           "items": {
             "dwarven_stout": 1,
-            "wine": 1
+            "jug_wine": 1
           },
           "afterItems": {
             "beer": 0,
             "dwarven_stout": 0,
-            "wine": 1,
+            "jug_wine": 1,
             "beer_glass": 1
           }
         }
@@ -1158,12 +1158,12 @@
           "items": {
             "beer": 1,
             "dwarven_stout": 1,
-            "wine": 1
+            "jug_wine": 1
           },
           "afterItems": {
             "beer": 0,
             "dwarven_stout": 1,
-            "wine": 1,
+            "jug_wine": 1,
             "beer_glass": 1
           }
         }
@@ -1217,7 +1217,7 @@
           "afterItems": {
             "beer": 0,
             "dwarven_stout": 0,
-            "wine": 0,
+            "jug_wine": 0,
             "beer_glass": 1
           }
         }
@@ -5843,9 +5843,9 @@
         "src.keldagrim-townsfolk-crowds-forgettable-tale-release"
       ]
     },
-    {"npc": "dwarf_city_dwarf_man6", "state": "giantdwarf-2-beer-only", "vars": {"giantdwarf_quest": 2}, "allowed": {"npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "options": [], "game": []}, "branches": [{"choices": [], "npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "menus": [], "items": {"beer": 1}, "afterItems": {"beer": 0, "dwarven_stout": 0, "wine": 0, "beer_glass": 1}}], "sourceIds": ["src.keldagrim-townsfolk-west-gauss-transcript", "src.keldagrim-townsfolk-npc-articles", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-crowds-keldagrim-release", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-items-and-updates", "src.keldagrim-townsfolk-toast-sequences"]},
-    {"npc": "dwarf_city_dwarf_man6", "state": "giantdwarf-2-beer-wine", "vars": {"giantdwarf_quest": 2}, "allowed": {"npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "options": [], "game": []}, "branches": [{"choices": [], "npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "menus": [], "items": {"beer": 1, "wine": 1}, "afterItems": {"beer": 0, "dwarven_stout": 0, "wine": 1, "beer_glass": 1}}], "sourceIds": ["src.keldagrim-townsfolk-west-gauss-transcript", "src.keldagrim-townsfolk-npc-articles", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-crowds-keldagrim-release", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-items-and-updates", "src.keldagrim-townsfolk-toast-sequences"]},
-    {"npc": "dwarf_city_dwarf_man6", "state": "giantdwarf-2-beer-stout", "vars": {"giantdwarf_quest": 2}, "allowed": {"npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "options": [], "game": []}, "branches": [{"choices": [], "npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "menus": [], "items": {"beer": 1, "dwarven_stout": 1}, "afterItems": {"beer": 0, "dwarven_stout": 1, "wine": 0, "beer_glass": 1}}], "sourceIds": ["src.keldagrim-townsfolk-west-gauss-transcript", "src.keldagrim-townsfolk-npc-articles", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-crowds-keldagrim-release", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-items-and-updates", "src.keldagrim-townsfolk-toast-sequences"]}
+    {"npc": "dwarf_city_dwarf_man6", "state": "giantdwarf-2-beer-only", "vars": {"giantdwarf_quest": 2}, "allowed": {"npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "options": [], "game": []}, "branches": [{"choices": [], "npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "menus": [], "items": {"beer": 1}, "afterItems": {"beer": 0, "dwarven_stout": 0, "jug_wine": 0, "beer_glass": 1}}], "sourceIds": ["src.keldagrim-townsfolk-west-gauss-transcript", "src.keldagrim-townsfolk-npc-articles", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-crowds-keldagrim-release", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-items-and-updates", "src.keldagrim-townsfolk-toast-sequences"]},
+    {"npc": "dwarf_city_dwarf_man6", "state": "giantdwarf-2-beer-wine", "vars": {"giantdwarf_quest": 2}, "allowed": {"npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "options": [], "game": []}, "branches": [{"choices": [], "npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "menus": [], "items": {"beer": 1, "jug_wine": 1}, "afterItems": {"beer": 0, "dwarven_stout": 0, "jug_wine": 1, "beer_glass": 1}}], "sourceIds": ["src.keldagrim-townsfolk-west-gauss-transcript", "src.keldagrim-townsfolk-npc-articles", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-crowds-keldagrim-release", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-items-and-updates", "src.keldagrim-townsfolk-toast-sequences"]},
+    {"npc": "dwarf_city_dwarf_man6", "state": "giantdwarf-2-beer-stout", "vars": {"giantdwarf_quest": 2}, "allowed": {"npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "options": [], "game": []}, "branches": [{"choices": [], "npc": ["I say, I say, a toast to this fine human!", "Why not!", "Cheers!"], "player": ["What? I mean, err... why?", "Why not indeed! Cheers!"], "menus": [], "items": {"beer": 1, "dwarven_stout": 1}, "afterItems": {"beer": 0, "dwarven_stout": 1, "jug_wine": 0, "beer_glass": 1}}], "sourceIds": ["src.keldagrim-townsfolk-west-gauss-transcript", "src.keldagrim-townsfolk-npc-articles", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-crowds-keldagrim-release", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-items-and-updates", "src.keldagrim-townsfolk-toast-sequences"]}
   ],
   "deferred": [
     {

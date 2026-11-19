@@ -26,12 +26,12 @@ if ($choice = 1) {
 } else if ($choice = 3) {
     ~chatplayer("<p,neutral>A fine wine please.");
     ~chatnpc("<p,neutral>Ah, <text_gender("sir", "madam")> has taste! A jug of wine will cost you 10 gold coins.");
-    ~keldagrim_barman_buy(wine, ^keldagrim_barman_wine_price, "<p,neutral>I hope <text_gender("sir", "madam")> will enjoy it!");
+    ~keldagrim_barman_buy(jug_wine, ^keldagrim_barman_wine_price, "<p,neutral>I hope <text_gender("sir", "madam")> will enjoy it!");
 } else {
     ~chatplayer("<p,neutral>Nothing, thanks.");
 }
 
-[proc,keldagrim_barman_buy](obj $drink, int $price, string $acknowledgement)
+[proc,keldagrim_barman_buy](namedobj $drink, int $price, string $acknowledgement)
 if (~p_choice2("Pay.", 1, "Don't pay.", 2) = 2) {
     ~chatplayer("<p,neutral>Sorry, I changed my mind.");
     return;
@@ -74,7 +74,7 @@ if ($choice = 1) {
     ~chatplayer("<p,neutral>I have to go.");
 }
 
-[proc,keldagrim_barmaid_buy](obj $food, int $price, string $insufficient)
+[proc,keldagrim_barmaid_buy](namedobj $food, int $price, string $insufficient)
 if (~p_choice2("Pay.", 1, "Don't pay.", 2) = 2) {
     ~chatplayer("<p,neutral>Sorry, I changed my mind.");
     return;

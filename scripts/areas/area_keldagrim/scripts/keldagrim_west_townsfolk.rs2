@@ -136,7 +136,7 @@ if (inv_total(inv, dwarven_stout) > 0) {
     inv_add(inv, beer_glass, 1);
     return;
 }
-if (inv_total(inv, wine) > 0) {
+if (inv_total(inv, jug_wine) > 0) {
     ~chatplayer("<p,neutral>Well, I have this jug of wine...");
     ~chatnpc("<p,neutral>No no, get a pint of beer, jugs of wine aren't good to toast with! Wine stains are terribly hard to wash out of a beard.");
     return;
@@ -230,16 +230,17 @@ if ($choice = 4) {
 
 [opnpc1,dwarfrock_boatman_bruv1]
 ~keldagrim_west_boatmen_talk();
+@keldagrim_west_boatmen_menu;
 
 [opnpc1,dwarfrock_boatman_bruv2]
 ~keldagrim_west_boatmen_talk();
+@keldagrim_west_boatmen_menu;
 
 [opnpc1,dwarfrock_boatman_bruv3]
 ~keldagrim_west_boatmen_talk();
+@keldagrim_west_boatmen_menu;
 
 [proc,keldagrim_west_boatmen_talk]
-def_int $menu_stage = %giantdwarf_quest;
-def_int $choice = 0;
 if (testbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked) = ^false) {
     %ordinary_dialogue_bits = setbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked);
     ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Oh look, a human!");
@@ -271,10 +272,10 @@ if (testbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked) = ^false) {
     ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Or were you just stopping by for a chat?");
     ~chatplayer("<p,neutral>Just stopping by for a chat.");
 }
-@keldagrim_west_boatmen_menu;
 
 [label,keldagrim_west_boatmen_menu]
-$choice = 0;
+def_int $menu_stage = %giantdwarf_quest;
+def_int $choice = 0;
 if ($menu_stage = 0) {
     if (%forget_quest = 1) {
         $choice = ~p_choice5("What's down this river?", 1, "Any good spots to fish around here?", 2, "What are these mines used for?", 3, "Do you know about this drunken dwarf...?", 4, "I must be off now.", 5);
