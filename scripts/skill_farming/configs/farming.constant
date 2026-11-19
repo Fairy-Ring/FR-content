@@ -41,6 +41,7 @@
 ^farming_handler_herb = 2
 ^farming_handler_flower = 3
 ^farming_handler_hops = 4
+^farming_handler_compost = 5
 // CANDIDATE pre-rework OSRS: 500 game ticks, reset on login/logout.
 ^farming_growth_poll_ticks = 500
 ^farming_growth_window_minutes = 5

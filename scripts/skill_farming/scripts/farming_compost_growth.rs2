@@ -1,0 +1,24 @@
+// UNKNOWN encoding: three consecutive nine-step bands inside the original
+// closed visual range. The ready values stay closed until the player opens.
+[proc,farming_compost_advance](int $stage, int $steps)(int)
+if ($stage < ^farming_compost_countdown_first | $stage >= ^farming_compost_rotted_first) return($stage);
+def_int $batch = divide(sub($stage, ^farming_compost_countdown_first), ^farming_compost_rot_steps);
+def_int $first = add(^farming_compost_countdown_first, multiply($batch, ^farming_compost_rot_steps));
+if (add(sub($stage, $first), $steps) >= ^farming_compost_rot_steps) {
+    return(add(^farming_compost_rotted_first, $batch));
+}
+return(add($stage, $steps));
+
+// The four original selectors are independent bytes of permanent varp 511.
+// One shared dispatch reconciles all four, writing the word only if it changes.
+[proc,farming_compost_growth](int $steps)
+def_int $before = %varp511_bits;
+def_int $word = $before;
+def_int $bit = 0;
+while ($bit < 32) {
+    def_int $stage = getbit_range($word, $bit, add($bit, 7));
+    def_int $after = ~farming_compost_advance($stage, $steps);
+    if ($after ! $stage) $word = setbit_range_toint($word, $after, $bit, add($bit, 7));
+    $bit = add($bit, 8);
+}
+if ($word ! $before) %varp511_bits = $word;
