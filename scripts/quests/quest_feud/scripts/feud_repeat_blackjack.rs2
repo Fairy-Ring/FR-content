@@ -117,6 +117,7 @@ if (stat_random(thieving, ^feud_villager_ko_success_low, ^feud_villager_ko_succe
 %feud_villager_owner = uid;
 %feud_villager_deadline = calc(map_clock + ^feud_villager_short_state_ticks);
 %npc_attacking_uid = null;
+npc_walk(npc_coord);
 npc_setmode(none);
 npc_anim(human_unconscious, 0);
 ~feud_repeat_schedule_timeout(true);
