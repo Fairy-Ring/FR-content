@@ -4,13 +4,39 @@
 // Hunt 289? no. Display stays Bartender.
 // Buy Bandit's brew 650 coins. Stage 5→6 on first buy while Partners-yes.
 // After drink: four-diamonds rumor 6→7. No Eblis / mirrors / AM.
-// Trade op3 unhooked (no owned_shop on unpack).
+// CANDIDATE state routes: OSRS Bartender transcript r14716233; 727 bar stock.
 
 [opnpc1,fourdiamonds_bartender]
+if (%deserttreasure = 0) {
+    ~chatnpc("<p,angry>Get out of here. I have nothing to say to the likes of you.");
+    return;
+}
+if (%deserttreasure >= ^deserttreasure_complete) {
+    ~chatnpc("<p,neutral>So you're the <text_gender("fella", "lass")> that freed Azzanadra, huh? Fair play to ya. What will you have?");
+    def_int $drink = ~p_choice2("Buy a beer", 1, "Don't buy anything", 2);
+    if ($drink = 1) {
+        @dt_bart_open_bar;
+    }
+    ~chatnpc("<p,neutral>Didn't feel like a drink after all, huh? Well, stop by anytime, hero.");
+    return;
+}
 if (%deserttreasure >= 6) {
     @dt_bart_after_drink;
 }
 @dt_bart_buy_gate;
+
+[opnpc3,fourdiamonds_bartender]
+if (%deserttreasure = 0) {
+    ~chatnpc("<p,angry>Get out of here, we don't like your sort in these parts.");
+    return;
+}
+if (%deserttreasure >= ^deserttreasure_complete) {
+    @dt_bart_open_bar;
+}
+@dt_bart_buy_beer;
+
+[label,dt_bart_open_bar]
+~openshop(fd_bandit_bar, 700, 1300, 30, "The Big Heist Lodge");
 
 [label,dt_bart_buy_gate]
 ~chatnpc("<p,angry>If you're not buying anything, I have nothing to say to you.");
@@ -23,10 +49,17 @@ if (inv_total(inv, coins) < 650) {
     ~chatnpc("<p,angry>You ain't got the 650 coins it costs to buy it, and I'm glad 'cos I didn't want to serve you anyway.");
     return;
 }
+@dt_bart_buy_beer;
+
+[label,dt_bart_buy_beer]
 ~chatnpc("<p,quiz>What's that? You wanna buy a beer? It'll cost ya 650 coins.");
 def_int $beer = ~p_choice2("Buy a beer", 1, "Don't buy anything", 2);
 if ($beer = 2) {
     ~chatnpc("<p,angry>Get out of my bar then! We don't like your sort round here!");
+    return;
+}
+if (inv_total(inv, coins) < 650) {
+    ~chatnpc("<p,angry>You ain't got the 650 coins it costs to buy it, and I'm glad 'cos I didn't want to serve you anyway.");
     return;
 }
 if (inv_itemspace(inv, bandit_brew, 1, inv_size(inv)) = false) {
