@@ -206,6 +206,9 @@ for (const [inventory, bank, expected, line] of [
   if (!inventory.leaflet_dropper_flyer && expected) expectedItems.push({ id: ObjType.getId('leaflet_dropper_flyer'), count: 1 });
   assert.deepEqual(result.inv.filter(Boolean).sort((a, b) => a.id - b.id), expectedItems.sort((a, b) => a.id - b.id), 'only the sourced flyer transfer');
 }
+const handout = run('ali_leaflet_dropper', 3, { inventory: { coins: 19 } });
+assert(handout.text.join(' ').includes('Here! Take one and let me get back to work. I still have hundreds of these flyers to hand out, I wonder if Ali would notice if I quietly dumped them somewhere?'),
+  'direct Take-flyer preserves its own transcript, not the different Old School Talk-to branch');
 const read = run('ali_leaflet_dropper', 3, { readItem: 'leaflet_dropper_flyer', inventory: { leaflet_dropper_flyer: 1 } });
 unchanged(read); assert.deepEqual(read.inv, read.before.inv, 'Read preserves the flyer');
 assert(read.text.join(' ').includes('Come to the Al Kharid Market place! High quality produce at low, low prices! Show this flyer to a merchant for money off your next purchase, courtesy of Ali Morrisane!'));
