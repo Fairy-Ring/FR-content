@@ -5,11 +5,10 @@
 // The report-drink value is UNKNOWN engineering state, named in feud.constant.
 
 [opnpc1,feud_ali_the_barman]
-def_int $choice = 0;
-def_int $followup = 0;
 jump(feud_barman_menu);
 
 [label,feud_barman_menu]
+def_int $choice = 0;
 ~chatplayer("<p,neutral>Hello there.");
 ~chatnpc("<p,neutral>Good day. Can I help you with anything?");
 if (%feud_found_trait >= 1) {
@@ -19,7 +18,6 @@ if (%feud_found_trait >= 1) {
 }
 if ($choice = 1) {
     ~chatplayer("<p,neutral>Yes, I'd like a drink please.");
-    ~chatnpc("<p,happy>Take a look.");
     ~openshop_activenpc;
     return;
 }
@@ -44,7 +42,7 @@ if ($choice = 3) {
 return;
 
 [label,feud_barman_followup]
-$followup = ~p_choice2("No thanks, I'm ok.", 1, "Yes, I'd like to talk about something else.", 2);
+def_int $followup = ~p_choice2("No thanks, I'm ok.", 1, "Yes, I'd like to talk about something else.", 2);
 if ($followup = 1) {
     ~chatplayer("<p,neutral>No thanks, I'm ok. Thanks for your time.");
     return;

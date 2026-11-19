@@ -186,6 +186,22 @@ test('the original market Trade option supplies both required disguise items bef
     assert(count(p, 'coins') < money, 'the required item is not awarded for free');
   }
   p.closeModal();
+  assert.match(talk(p, 'feud_marketseller', [2]).text, /No thanks\./);
+  assert.notEqual(p.modalMain, id('Component', 'shop_template'), 'declining the existing Talk route leaves the shop closed');
+  talk(p, 'feud_marketseller', [1]);
+  assert.equal(p.modalMain, id('Component', 'shop_template'), 'Talk and Trade open the same real shop');
+  const talkStock = p.getInventoryFromListener(p.invListeners.find(entry => entry.com === component));
+  assert.equal(talkStock, stock, 'both visible options share one inventory');
+  p.closeModal();
+});
+
+test('barman small-talk remains available without producing quest progress', () => {
+  const p = player(), result = talk(p, 'feud_ali_the_barman', [2, 1]);
+  assert.match(result.text, /Nothing much really\. About what you'd expect from a sleepy little town like ours\./);
+  assert.match(result.text, /They're paying customers, so I won't rock the boat if you don't mind\./);
+  assert.equal(stage(p), 0);
+  assert.equal(read(p, 'feud_report_drink'), 0, 'ordinary small-talk cannot identify the traitor drink');
+  assert.notEqual(p.modalMain, id('Component', 'shop_template'), 'the non-trading branch opens no shop');
 });
 
 test('start refusal, early item use, and compatible acceptance use native dispatch', () => {
