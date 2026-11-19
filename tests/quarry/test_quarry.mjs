@@ -2,8 +2,8 @@ import assert from 'node:assert/strict';
 import { World, types, id, inv, actionDelay, native, player, execute, continueMining, restore, runProc, JavaRandom, PlayerStat, ScriptState, param } from './runtime.mjs';
 
 // Independent expectations from the retained cache and checked source tables.
-// Requirements/XP/low-high/respawn are CANDIDATE except the period granite level;
-// these sweeps verify the built older rule, not authentic May 2006 probabilities.
+// Requirements/XP/low-high/respawn are CANDIDATE, with a period granite-level
+// statement; these sweeps prove the built rule, not authentic May 2006 odds.
 const stones = [
   { rock: 'rocks_10946', row: 'quarry_sandstone_rock', name: 'sandstone', level: 35, empty: 'rocks_10944', blocks: [
     ['enakh_sandstone_large', 600, 4, 50], ['enakh_sandstone_medium', 500, 8, 75],
