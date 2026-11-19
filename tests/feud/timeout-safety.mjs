@@ -353,20 +353,32 @@ test('all twelve original Villager forms own an unset, type-specific timer and c
 });
 
 test('the original distracted Villager turn returns at clock 109 with deadline 110', () => {
+  const previousOwner = trialFixture();
   const p = trialFixture();
-  const first = villagers().find(npc => availableIdle(npc) && operationStand(p, npc));
-  assert(first, 'an original reachable Villager can earn the first theft');
-  operate(p, first, 3);
-  assert.equal(stage(p), 7);
-  // Test-only clock anchor; dispatch the real conversation before the NPC phase at 102.
-  World.currentTick = 101;
+  for (const account of [previousOwner, p]) {
+    const first = villagers().find(npc => availableIdle(npc) && operationStand(account, npc));
+    assert(first, 'an original reachable Villager can earn the first theft');
+    operate(account, first, 3);
+    assert.equal(stage(account), 7);
+  }
+  // Test-only clock anchor. Two real account actions expose a stale queued timeout
+  // without injecting requests: the old implementation kept the first owner's queue.
+  World.currentTick = 99;
   const tracked = new Set();
   let target;
   countedWorldTick(tracked, () => {
-    talk(p, 'feud_street_urchin');
-    [target] = owned(p);
+    talk(previousOwner, 'feud_street_urchin');
+    [target] = owned(previousOwner);
     assert(target);
     tracked.add(target);
+  });
+  assert.equal(World.currentTick, 100);
+  nativeLogout(previousOwner, () => countedWorldTick(tracked));
+  assert.equal(World.currentTick, 101);
+  assert.equal(target.getVar(stateVar), 0, 'ordinary logout releases the first earned distraction');
+  countedWorldTick(tracked, () => {
+    talk(p, 'feud_street_urchin');
+    assert.equal(owned(p)[0], target, 'the second real conversation selects the same original placement');
   });
   assert.equal(World.currentTick, 102);
   assert.equal(stage(p), 8);
