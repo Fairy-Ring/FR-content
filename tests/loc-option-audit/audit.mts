@@ -8,6 +8,7 @@ import LocType from '#/cache/config/LocType.js';
 import VarBitType from '#/cache/config/VarBitType.js';
 import VarPlayerType from '#/cache/config/VarPlayerType.js';
 import { EntityLifeCycle } from '#/engine/entity/EntityLifeCycle.js';
+import { Interaction } from '#/engine/entity/Interaction.js';
 import Loc from '#/engine/entity/Loc.js';
 import Player from '#/engine/entity/Player.js';
 import ScriptFile from '#/engine/script/ScriptFile.js';
@@ -31,6 +32,10 @@ const compare = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0;
 const typeName = (id: number) => LocType.get(id).debugname ?? String(id);
 const tile = (p: Placement) => `${p.x},${p.z},L${p.level}`;
 const trigger = (phase: 'AP' | 'OP', slot: number) => (ServerTriggerType as unknown as Record<string, number>)[`${phase}LOC${slot}`] as ServerTriggerType;
+const HIDDEN_KIND = 'not shown by the client (hidden)';
+// Java LocType.java:470-472 drops this sentinel with equalsIgnoreCase.
+const isHidden = (text: string | null | undefined) => text?.toLowerCase() === 'hidden';
+const isShown = (text: string | null | undefined) => text !== null && text !== undefined && !isHidden(text);
 
 export function loadPack(pack = 'data/pack'): Map<number, LocType> {
   for (const config of [VarPlayerType, VarBitType, CategoryType, LocType]) config.load(pack);
@@ -113,13 +118,12 @@ export function forms(root: LocType, client: Map<number, LocType>, limits: Set<s
     assert(config.multivarp >= 0 && config.multivarp < VarPlayerType.count, `invalid multiloc varp: ${root.id}`);
   }
   const result = new Map<number, Form>();
+  const outside = config.multiloc.flatMap((id, state) => id !== -1 && state > maxState ? [state] : []);
+  if (outside.length) limits.add(`${typeName(root.id)}: ${outside.length} non-null indices in ${outside[0]}..${outside[outside.length - 1]} exceed controller range 0..${maxState}`);
   for (let state = 0; state < config.multiloc.length; state++) {
     const id = config.multiloc[state];
     if (id === -1) continue; // The client shows no loc for this state, not the base fallback used by the server.
-    if (state > maxState) {
-      limits.add(`${typeName(root.id)}: state ${state} exceeds the controller bit range`);
-      continue;
-    }
+    if (state > maxState) continue;
     assert(client.has(id) && LocType.get(id), `missing multiloc form ${id}`);
     if (client.get(id)!.multiloc.length) limits.add(`${typeName(root.id)} -> ${typeName(id)}: nested multiloc; only the immediate form is enumerated, as in server dispatch`);
     const form = result.get(id) ?? { type: id, states: [] };
@@ -172,17 +176,22 @@ export function probe(root: LocType, form: Form, client: Map<number, LocType>): 
     World.getLoc = (() => loc) as typeof World.getLoc;
     for (let index = 0; index < 5; index++) {
       const text = client.get(form.type)!.op?.[index];
-      if (text === null || text === undefined) continue; // All client strings count, regardless of spelling or case.
-      assert.notEqual(text, 'hidden', `client gives an option the server rejects: ${typeName(form.type)} slot ${index + 1}`);
+      if (text === null || text === undefined) continue;
+      const hidden = isHidden(text);
       let selected: Option | null = null;
       for (const state of form.states) {
         setState(player, root, state);
-        assert.equal(new OpLocHandler().handle(new OpLoc(index + 1, 8, 8, root.id), player), true, `OpLocHandler rejected ${typeName(form.type)} slot ${index + 1}`);
+        if (hidden) {
+          // No client menu click exists. Inspect script-trigger dispatch separately from packet validation.
+          assert(player.setInteraction(Interaction.ENGINE, loc, trigger('AP', index + 1)));
+        } else {
+          assert.equal(new OpLocHandler().handle(new OpLoc(index + 1, 8, 8, root.id), player), true, `OpLocHandler rejected ${typeName(form.type)} slot ${index + 1}`);
+        }
         assert.equal(player.target, loc, 'production handler must establish the interaction');
         const ap = actualRoute(root.id, form.type, 'AP', index + 1, player.getApTrigger());
         const op = actualRoute(root.id, form.type, 'OP', index + 1, player.getOpTrigger());
         const scripts = [ap.script, op.script].filter((s): s is ScriptFile => s !== null);
-        const kind = !root.active ? 'inactive type' : !scripts.length ? 'no handler' : scripts.every(onlyReturns) ? 'handler that only returns' : 'handled';
+        const kind = hidden ? HIDDEN_KIND : !root.active ? 'inactive type' : !scripts.length ? 'no handler' : scripts.every(onlyReturns) ? 'handler that only returns' : 'handled';
         const current = { root: root.id, form, slot: index + 1, text, ap, op, kind };
         if (selected) assert.deepEqual([ap.script, op.script, kind], [selected.ap.script, selected.op.script, selected.kind], 'equivalent visible states must dispatch equally');
         selected = current;
@@ -229,7 +238,7 @@ export function scan(placements: Placement[], client: Map<number, LocType>): { o
     for (const form of forms(root, client, limits)) {
       for (const option of probe(root, form, client)) {
         options.push(option);
-        if (option.kind === 'handled') continue;
+        if (option.kind === 'handled' || option.kind === HIDDEN_KIND) continue;
         const key = JSON.stringify([form.type, option.slot, option.text, option.kind]);
         const gap = missing.get(key) ?? { type: form.type, slot: option.slot, text: option.text, kind: option.kind, roots: new Set(), placements: new Map(), options: [] };
         gap.roots.add(rootId);
@@ -283,7 +292,7 @@ function sample(gap: Gap): Placement { return gap.placements.values().next().val
 function maps(gap: Gap): string { return [...new Set([...gap.placements.values()].map(p => p.map))].sort(compare).join(';'); }
 const descriptions = (gap: Gap, phase: 'ap' | 'op') => [...new Set(gap.options.map(o => scriptDescription(o[phase])).filter(Boolean))].sort(compare).join(' | ');
 
-export function selfChecks(client: Map<number, LocType>, placements: Placement[]): string[] {
+export function selfChecks(client: Map<number, LocType>, placements: Placement[], output?: string): string[] {
   const results: string[] = [];
   const provider = ScriptProvider as unknown as { scriptLookup: Map<number, ScriptFile> };
   const originalLookup = provider.scriptLookup;
@@ -312,13 +321,39 @@ export function selfChecks(client: Map<number, LocType>, placements: Placement[]
     silent.info.scriptName = '[aploc1,locaudit_fixture_2]';
     silent.opcodes = [ScriptOpcode.RETURN];
     provider.scriptLookup.set(trigger('AP', 1) | (2 << 8) | (ids[2] << 10), silent);
+    LocType.get(ids[0]).op = ['Synthetic odd Spelling', 'hidden', 'HIDDEN', 'HiDdEn', null];
+    const hiddenHandler = new ScriptFile(-3);
+    hiddenHandler.info.scriptName = '[oploc2,locaudit_fixture_0]';
+    hiddenHandler.opcodes = handled.opcodes;
+    provider.scriptLookup.set(trigger('OP', 2) | (2 << 8) | (ids[0] << 10), hiddenHandler);
     const test = scan(fixture, synthetic);
     assert(test.gaps.some(g => g.type === ids[0] && g.kind === 'no handler' && g.placements.size === 1), 'synthetic placed no-handler option must appear');
     assert(!test.gaps.some(g => g.type === ids[1]), 'synthetic handled option must not appear');
     assert(test.gaps.some(g => g.type === ids[2] && g.kind === 'handler that only returns'), 'bare-return handler must be separate');
+    assert.equal(test.options.filter(o => o.kind === HIDDEN_KIND).length, 3, 'hidden is case-insensitive');
+    assert(!test.gaps.some(g => g.type === ids[0] && g.slot !== 1), 'hidden slots never become gaps');
+    assert.equal(test.options.find(o => o.root === ids[0] && o.slot === 2)?.op.script, hiddenHandler, 'hidden script dispatch is still recorded');
+    if (output) {
+      const file = path.join(output, 'self-check-fixtures.csv');
+      csv(file, ['config_name', 'option_slot', 'option_text', 'kind', 'placement_count'], test.gaps.map(g => [typeName(g.type), g.slot, g.text, g.kind, g.placements.size]));
+      const written = fs.readFileSync(file, 'utf8');
+      assert(written.includes('locaudit_fixture_0,1,Synthetic odd Spelling,no handler,1'));
+      assert(!written.includes('locaudit_fixture_1'), 'handled fixture must not reach CSV output');
+      assert(!/hidden/i.test(written), 'hidden slots must not reach missing CSV output');
+    }
     results.push('PASS synthetic placed option without a handler appears, with arbitrary option spelling');
     results.push('PASS synthetic placed option with a handler is absent from gaps');
     results.push('PASS bare RETURN handler is a separate gap kind');
+    results.push('PASS hidden, HIDDEN and HiDdEn are not menu gaps, and a hidden-slot trigger remains recorded');
+    provider.scriptLookup.set(trigger('OP', 1), handled);
+    const globalRoute = scan([fixture[0]], synthetic);
+    assert.equal(globalRoute.gaps.length, 0, 'a global handler is not a missing route');
+    assert.equal(globalRoute.options[0].op.rule, 'global');
+    provider.scriptLookup.delete(trigger('OP', 1));
+    LocType.get(ids[0]).category = 1;
+    provider.scriptLookup.set(trigger('OP', 1) | (1 << 8) | (1 << 10), handled);
+    assert.equal(scan([fixture[0]], synthetic).gaps.length, 0, 'a category handler is not a missing route');
+    results.push('PASS global and category handlers count as handlers, without speech analysis');
     fixture[0].type = ids[1];
     LocType.get(ids[1]).active = 0;
     assert.equal(scan([fixture[0]], synthetic).gaps[0]?.kind, 'inactive type', 'inactive placement overrides an existing handler');
@@ -341,7 +376,7 @@ export function runAudit(content: string, output: string): void {
   assert(!path.resolve(output).startsWith(path.resolve(content) + path.sep), 'outputs must be outside the repository');
   const client = loadPack();
   const inventory = readPlacements();
-  const checks = selfChecks(client, inventory.placements);
+  const checks = selfChecks(client, inventory.placements, output);
   const audit = scan(inventory.placements, client);
   const names = labels(content);
   const byRoot = new Map<number, Placement[]>();
@@ -373,14 +408,16 @@ export function runAudit(content: string, output: string): void {
   csv(path.join(output, 'loc-options-by-option.csv'), ['option_text', ...groupHeader.slice(1)], groupRows(optionTotals));
   csv(path.join(output, 'loc-options-by-mapsquare.csv'), ['map_square', ...groupHeader.slice(1)], groupRows(mapTotals));
   csv(path.join(output, 'loc-options-by-mechanism.csv'), ['mechanism_lead', ...groupHeader.slice(1)], groupRows(aggregate(g => lead(g))));
-  const inactiveConfigs = [...client.values()].filter(c => !LocType.get(c.id).active && c.op?.some(o => o !== null));
+  const inactiveConfigs = [...client.values()].filter(c => !LocType.get(c.id).active && c.op?.some(isShown));
   csv(path.join(output, 'inactive-loc-types.csv'), ['loc_type', 'config_name', 'options', 'direct_placements'], inactiveConfigs.map(c => [c.id, typeName(c.id), c.op?.map((o, i) => o === null ? '' : `${i + 1}:${o}`).filter(Boolean).join(';'), byRoot.get(c.id)?.length ?? 0]));
   const gapPlacements = new Set(audit.gaps.flatMap(g => [...g.placements.keys()]));
   const kinds = Object.fromEntries(['no handler', 'handler that only returns', 'inactive type'].map(kind => {
     const rows = audit.gaps.filter(g => g.kind === kind);
     return [kind, { rows: rows.length, forms: new Set(rows.map(g => g.type)).size, placements: new Set(rows.flatMap(g => [...g.placements.keys()])).size, associations: rows.reduce((n, g) => n + g.placements.size, 0) }];
   }));
-  const summary = { maps: inventory.maps, placements: inventory.placements.length, placedTypes: byRoot.size, clientLocTypes: client.size, enumeratedRootFormOptions: audit.options.length, visibleOptionForms: new Set(audit.options.map(o => o.form.type)).size, gapRows: audit.gaps.length, gapForms: new Set(audit.gaps.map(g => g.type)).size, gapPlacements: gapPlacements.size, gapAssociations: audit.gaps.reduce((n, g) => n + g.placements.size, 0), kinds, inactiveConfigs: inactiveConfigs.length, inactivePlacedConfigs: inactiveConfigs.filter(c => byRoot.has(c.id)).length, limits: audit.limits };
+  const hiddenOptions = audit.options.filter(o => o.kind === HIDDEN_KIND);
+  const hidden = { kind: HIDDEN_KIND, rootFormSlots: hiddenOptions.length, formSlots: new Set(hiddenOptions.map(o => `${o.form.type}:${o.slot}`)).size, withHandler: hiddenOptions.filter(o => o.ap.script || o.op.script).length, associations: hiddenOptions.reduce((n, o) => n + byRoot.get(o.root)!.length, 0) };
+  const summary = { maps: inventory.maps, placements: inventory.placements.length, placedTypes: byRoot.size, clientLocTypes: client.size, enumeratedRootFormOptions: audit.options.length, visibleOptionForms: new Set(audit.options.filter(o => o.kind !== HIDDEN_KIND).map(o => o.form.type)).size, gapRows: audit.gaps.length, gapForms: new Set(audit.gaps.map(g => g.type)).size, gapPlacements: gapPlacements.size, gapAssociations: audit.gaps.reduce((n, g) => n + g.placements.size, 0), kinds, hidden, inactiveConfigs: inactiveConfigs.length, inactivePlacedConfigs: inactiveConfigs.filter(c => byRoot.has(c.id)).length, limits: audit.limits };
   fs.writeFileSync(path.join(output, 'loc-summary.json'), JSON.stringify(summary, null, 2) + '\n');
   fs.writeFileSync(path.join(output, 'self-checks.log'), checks.join('\n') + '\n');
   const md = (s: unknown) => String(s).replaceAll('|', '\\|').replaceAll('\n', ' ');
@@ -388,7 +425,12 @@ export function runAudit(content: string, output: string): void {
     'This is a compiled-pack inventory, not a gameplay change or a claim that each handler completes its mechanism.',
     'VERIFIED inputs: the checked-out 377 map pack and built client loc.dat/loc.idx. No later-game source supplies options or placements.',
     'The tool decodes every built static location placement, then every non-null client op1–op5 string. It uses no option-name whitelist.',
-    'The client hides no option string supplied by this loc config. Options are not inferred from display names or script source.',
+    'Java client LocType.java:470-472 reads each option, then replaces equalsIgnoreCase("hidden") with null. Client.java:4148-4151 adds only non-null loc options to the menu.',
+    'These slots are not shown by the client (hidden), not gaps. Their totals are separate. loc-options-all.csv retains any script-trigger dispatch despite no menu entry.',
+    'Engine OpLocHandler.ts:52 also rejects the exact lowercase hidden sentinel. Hidden-slot trigger probes establish a script interaction, not a client click.',
+    'The same case-insensitive filter exists for NPC options (NpcType.java:157-159) and object ground options (ObjType.java:389-391).',
+    'Object inventory options are read separately without that filter (ObjType.java:393-397). The NPC census should exclude hidden sentinels from exposed-option counts.',
+    'Client source paths above are relative to vendor/client-java/src/main/java/jagex2, config/ for type files and client/ for Client.java.',
     'For each root and immediate multiloc form, each representable non-null form index is set in a fixture player.',
     'OpLocHandler.handle establishes the interaction. Player.getApTrigger/getOpTrigger decide dispatch from the built ScriptProvider.',
     'Exact, category and global lookup are retained, including production base fallback only when both child phases are absent.',
