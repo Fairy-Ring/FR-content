@@ -8,12 +8,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   World, Runner, ScriptOpcode, PlayerStat, PlayerTimerType, Scripts,
-  types, id, player, proc, add, count, use, click, load,
+  types, id, player, proc, add, count, click, load,
 } from './runtime.mjs';
 
 const gameMap = await load('engine/GameMap.ts');
 const ServerTriggerType = (await load('engine/script/ServerTriggerType.ts')).default;
 const ScriptVarType = (await load('cache/config/ScriptVarType.ts')).default;
+const OpLocU = (await load('network/game/client/model/OpLocU.ts')).default;
+const useHandler = new ((await load('network/game/client/handler/OpLocUHandler.ts')).default)();
 const content = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const binNames = [
   'farming_compost_bin_1',
@@ -176,10 +178,14 @@ function assertVisibleTrigger(p, bin, trigger) {
   return form;
 }
 
-function nativeUse(p, bin, item) {
+function nativeUse(p, bin, item, itemSlot = inventoryIds(p).indexOf(id('ObjType', item))) {
   assertVisibleTrigger(p, bin, ServerTriggerType.OPLOCU);
   setPosition(p, bin);
-  assert(use(p, item, bin.loc), `native ${item}-on-${bin.name} packet is accepted`);
+  p.originX = p.x; p.originZ = p.z;
+  const packet = new OpLocU(bin.loc.x, bin.loc.z, bin.loc.type,
+    id('ObjType', item), itemSlot, id('Component', 'inventory:inv'));
+  assert(useHandler.handle(packet, p), `native ${item}-on-${bin.name} packet is accepted`);
+  p.processInteraction();
 }
 
 function nativeClick(p, bin, option) {
@@ -651,7 +657,7 @@ try {
     });
   }
 
-  test('normal and super output refuse no-bucket and full-inventory collection unchanged', () => {
+  test('normal and super output refuse collection without a bucket, including a full inventory', () => {
     for (const batch of batches.filter(candidate => candidate.kind !== 'tomato')) {
       const bin = batch.bin;
       const state = batchState(batch.kind).output;
@@ -662,8 +668,7 @@ try {
         try {
           setBinState(p, bin, state);
           if (full) {
-            add(p, 'spade', 27);
-            add(p, 'bucket_empty');
+            add(p, 'spade', types.InvType.get(inv).size);
             assertInventoryFull(p);
           } else {
             add(p, 'spade'); // A valid native item-on-loc attempt, but no empty bucket.
@@ -672,11 +677,51 @@ try {
             states: stateVector(p), inventory: inventoryIds(p), xp: farmingXp(p),
             writes: audit.writes.length,
           };
-          nativeUse(p, bin, full ? 'bucket_empty' : 'spade');
+          nativeUse(p, bin, 'spade');
           assertStateVector(p, before.states, `${batch.label} refusal preserves all bin slices`);
           assert.deepEqual(inventoryIds(p), before.inventory, `${batch.label} refusal preserves inventory`);
           assert.equal(farmingXp(p), before.xp, `${batch.label} refusal grants no XP`);
           assert.equal(audit.writes.length, before.writes, `${batch.label} refusal writes no varp511 state`);
+          assertSafeVarp511Writes(audits);
+        } finally {
+          audit.close();
+          discard(p);
+        }
+      }
+    }
+  });
+
+  test('normal and super collection replaces the selected bucket slot, including a full inventory', () => {
+    for (const batch of batches.filter(candidate => candidate.kind !== 'tomato')) {
+      for (const full of [false, true]) {
+        const bin = batch.bin;
+        const p = fixture(bin);
+        const audits = [];
+        const audit = watchVarp511(p, audits);
+        try {
+          setBinState(p, bin, batchState(batch.kind).output);
+          const capacity = types.InvType.get(inv).size;
+          const usedSlot = capacity - 1;
+          add(p, 'spade', capacity);
+          p.invSet(inv, id('ObjType', 'bucket_empty'), 1, 2);
+          p.invSet(inv, id('ObjType', 'bucket_empty'), 1, usedSlot);
+          if (full) assertInventoryFull(p);
+          else p.invDel(inv, id('ObjType', 'spade'), 1, 0);
+          const expectedInventory = inventoryIds(p);
+          expectedInventory[usedSlot] = id('ObjType', batch.result);
+          const expectedStates = stateVector(p);
+          expectedStates[bin.index]--;
+          const beforeXp = farmingXp(p);
+          const beforeWrites = audit.writes.length;
+          nativeUse(p, bin, 'bucket_empty', usedSlot);
+          assert.deepEqual(inventoryIds(p), expectedInventory,
+            `${batch.label} replaces the used slot, not the first bucket or first free slot`);
+          assert.equal(count(p, 'bucket_empty'), 1, 'the other empty bucket remains');
+          assert.equal(count(p, batch.result), 1, 'exactly one filled bucket is supplied');
+          assertStateVector(p, expectedStates, 'only the selected output byte decrements once');
+          assert.equal(farmingXp(p) - beforeXp, batch.xp, 'one collection grants the exact output XP');
+          assert.equal(audit.writes.length, beforeWrites + 1, 'one successful transfer writes once');
+          if (full) assertInventoryFull(p);
           assertSafeVarp511Writes(audits);
         } finally {
           audit.close();

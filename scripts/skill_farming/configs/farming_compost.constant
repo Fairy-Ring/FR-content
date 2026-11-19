@@ -11,10 +11,13 @@
 ^farming_compost_super_xp = 85
 ^farming_compost_tomato_xp = 85
 
-// UNKNOWN class/state encoding and single-action transfer count.
+// UNKNOWN class/state encoding.
 ^farming_compost_normal = 1
 ^farming_compost_super = 2
 ^farming_compost_tomato = 3
 ^farming_compost_super_base = 32
 ^farming_compost_tomato_base = 128
+
+// UNKNOWN one-item manual boundary: replace the used bucket in its own slot,
+// even in a full inventory. Take-tomato adds an item and needs a free slot.
 ^farming_compost_transfer_count = 1
