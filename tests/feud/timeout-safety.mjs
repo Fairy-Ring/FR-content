@@ -776,8 +776,18 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assert.equal([...target.queue.all()].length, 1, 'Lure owns exactly one native follow timeout request');
 
     const events = [];
+    const preparationDeadline = World.currentTick + nativeSetupWaitTicks;
+    let previousPoisonTick = null;
     const observeQueueAndPoison = event => {
       assertAttackableQueueBound(event.npc);
+      if (event.before.poison > event.after.poison) {
+        assert.equal(event.before.poison - event.after.poison, 1);
+        if (previousPoisonTick !== null) {
+          assert.equal(event.tick - previousPoisonTick, poisonTimerTicks,
+            'every observed native poison hit remains thirty ticks apart during preparation');
+        }
+        previousPoisonTick = event.tick;
+      }
       events.push(event);
     };
     if (hasWitness(p, target)) {
@@ -803,37 +813,42 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assert.equal(followingHit.before.poison - followingHit.after.poison, 1);
     assert.equal(followingHit.before.hp - followingHit.after.hp, 4);
 
-    let nextPoisonTick = nextNpcTimerTick(target);
-    while (nextPoisonTick - World.currentTick <= knockoutTicks) {
-      boundedTicksThrough(tracked, nextPoisonTick, null, observeQueueAndPoison);
-      const nextHit = events.find(event => event.tick === nextPoisonTick &&
-        event.before.poison > event.after.poison && event.before.state === 2 && event.after.state === 2);
-      assert(nextHit, 'the next native poison callback lands during ordinary Lure');
-      assert.equal(nextHit.tick - followingHit.tick, poisonTimerTicks);
-      followingHit = nextHit;
+    let nextPoisonTick, koInputTick, koDeadline, koInput;
+    while (koDeadline === undefined) {
+      assert(World.currentTick < preparationDeadline, 'native poison/KO preparation stays within 512 turns');
+      walkRepeatToSeclusion(p, target,
+        () => countedWorldTick(tracked, null, observeQueueAndPoison), preparationDeadline);
+      assert.equal(target.getVar(stateVar), 2, 'preparation preserves the actual earned Lure');
+      followingHit = events.filter(event => event.before.poison > event.after.poison &&
+        event.before.state === 2 && event.after.state === 2).at(-1);
+      assert(followingHit, 'preparation retains a real following-state poison hit');
       nextPoisonTick = nextNpcTimerTick(target);
+      assert.equal(nextPoisonTick - followingHit.tick, poisonTimerTicks,
+        'the next native poison callback remains exactly 30 ticks after the preceding hit');
+      if (nextPoisonTick - World.currentTick <= knockoutTicks) {
+        assert(nextPoisonTick <= preparationDeadline, 'the next phase fits the unchanged preparation bound');
+        boundedTicksThrough(tracked, nextPoisonTick, null, observeQueueAndPoison);
+        continue;
+      }
+      koInputTick = nextPoisonTick - knockoutTicks;
+      assert(koInputTick > World.currentTick && koInputTick <= preparationDeadline);
+      boundedTicksThrough(tracked, koInputTick - 1, null, observeQueueAndPoison);
+      assert.equal(target.getVar(stateVar), 2);
+      assert.equal(target.timerClock, poisonTimerTicks - knockoutTicks - 1);
+      countedWorldTick(tracked, () => {
+        // Admit the real input on this frame, not from a witness check made before the phase wait.
+        if (hasWitness(p, target) || !p.inOperableDistance(target)) return;
+        koInput = { tick: World.currentTick, name, player: [p.level, p.x, p.z],
+          target: [target.level, target.x, target.z], hp: target.levels[NpcStat.HITPOINTS],
+          witnesses: [...World.npcs].filter(npc => isWitness(p, target, npc))
+            .map(npc => [npc.uid, npc.x, npc.z]) };
+        withRandom(0, () => {
+          selectVisibleNpc(p, target, 5, `[opnpc5,${visibleForm}]`);
+          processSelectedInteraction(p);
+        });
+        koDeadline = target.getVar(deadlineVar);
+      }, observeQueueAndPoison);
     }
-    assert.equal(nextPoisonTick - followingHit.tick, poisonTimerTicks,
-      'the next native poison callback remains exactly 30 ticks after the preceding hit');
-
-    const koInputTick = nextPoisonTick - knockoutTicks;
-    assert(koInputTick > World.currentTick);
-    boundedTicksThrough(tracked, koInputTick - 1, null, observeQueueAndPoison);
-    assert.equal(target.getVar(stateVar), 2);
-    assert.equal(target.timerClock, poisonTimerTicks - knockoutTicks - 1);
-
-    let koDeadline, koInput;
-    countedWorldTick(tracked, () => {
-      koInput = { tick: World.currentTick, name, player: [p.level, p.x, p.z],
-        target: [target.level, target.x, target.z], hp: target.levels[NpcStat.HITPOINTS],
-        witnesses: [...World.npcs].filter(npc => isWitness(p, target, npc))
-          .map(npc => [npc.uid, npc.x, npc.z]) };
-      withRandom(0, () => {
-        selectVisibleNpc(p, target, 5, `[opnpc5,${visibleForm}]`);
-        processSelectedInteraction(p);
-      });
-      koDeadline = target.getVar(deadlineVar);
-    }, ({ npc }) => assertAttackableQueueBound(npc));
     assert.equal(JavaRandom.nextDouble, originalRandom, 'native Knock-Out restores the process RNG');
     assert.equal(World.currentTick, koInputTick);
     assert.equal(target.getVar(stateVar), 3, 'the native KO succeeds: ' + JSON.stringify({
@@ -886,15 +901,15 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
   }
 });
 
-function walkRepeatToSeclusion(p, target, tick) {
-  const setupStart = World.currentTick;
+function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTick + nativeSetupWaitTicks) {
   const searchRadius = 32; // UNKNOWN test geometry bound, reused from follow.mjs, not a gameplay distance.
   const destinations = [];
   let destination = null;
-  for (; World.currentTick - setupStart < nativeSetupWaitTicks;) {
+  for (; World.currentTick < setupDeadline;) {
     if (!hasWitness(p, target) && p.inOperableDistance(target) &&
       (!destination || (p.x === destination.x && p.z === destination.z))) return;
-    if (!destination || (p.x === destination.x && p.z === destination.z)) {
+    if (!destination || ((p.x === destination.x && p.z === destination.z) &&
+      (!target.hasWaypoints() || hasWitness(p, { uid: target.uid, level: p.level, x: p.x, z: p.z })))) {
       // Five witness tiles plus the follower's one-tile finishing neighborhood.
       const nearby = [...World.npcs].filter(npc => npc.isActive && npc.level === target.level &&
         CoordGrid.distanceToSW(target, npc) <= searchRadius + 6);
