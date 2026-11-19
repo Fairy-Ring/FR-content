@@ -1,8 +1,26 @@
 // CANDIDATE wording: soulbane.dlg.launa in the research registry.
-// UNKNOWN engineering encoding: even stages enter a room, odd stages finish it.
+// UNKNOWN server stage encoding; final-room stages use the named constants.
 [opnpc1,soulbane_launa] @soulbane_launa;
 [opnpc1,soulbane_launa_multi] @soulbane_launa;
 [label,soulbane_launa]
+if (~soulbane_owned = false & (%soulbane_prog = ^soulbane_tolna_intro | %soulbane_prog = ^soulbane_tolna_active)) {
+    // CANDIDATE: sourced lines 41–46, while Tolna's fight is not yet complete.
+    ~chatplayer("<p,neutral>I've found your son.");
+    ~chatnpc("<p,neutral>You have?");
+    ~chatplayer("<p,neutral>And your husband, but I'm afraid your son is no longer physically what he once was.");
+    ~chatnpc("<p,neutral>Can you save them?");
+    ~chatplayer("<p,neutral>I will try.");
+    ~chatnpc("<p,neutral>Thank you.");
+    return;
+}
+if (~soulbane_owned = false & %soulbane_prog = ^soulbane_tolna_clear & %soulbane_tolna_pres ! 1) {
+    // CANDIDATE: sourced lines 55–58, before the human Tolna conversation.
+    ~chatplayer("<p,neutral>I have returned your son to his normal state!");
+    ~chatnpc("<p,neutral>And you've spoken to him?!?");
+    ~chatplayer("<p,neutral>Er, no, sorry. I just came back here to tell you.");
+    ~chatnpc("<p,neutral>What are you waiting for, bring him back to me!");
+    return;
+}
 switch_int (%soulbane_prog) {
     case 0 : @soulbane_launa_start;
     case 1 :
@@ -33,6 +51,29 @@ switch_int (%soulbane_prog) {
         ~chatnpc("<p,neutral>What can you see?");
         ~chatplayer("<p,neutral>Erm, I haven't actually ventured through yet.");
         ~chatnpc("<p,neutral>What are you waiting for? He must be so afraid in that place.");
+    case ^soulbane_confusion_active :
+        ~chatplayer("<p,neutral>Hi, I've journeyed through to a third room. Your son's voice spoke as I entered.");
+        ~chatnpc("<p,neutral>Really? What did he say?");
+        ~chatplayer("<p,neutral>Simply, 'Where am I? How long have I been here? Am I still the person I once was? I hate my CONFUSION'.");
+        ~chatnpc("<p,neutral>You have to help him overcome his confusion!");
+    case ^soulbane_confusion_clear :
+        ~chatplayer("<p,neutral>Hi. I have prevailed over a third room.");
+        ~chatnpc("<p,neutral>Are you any closer to finding my son?");
+        ~chatplayer("<p,neutral>I think I may be getting closer.");
+        ~chatnpc("<p,neutral>Please don't waste any time.");
+    case ^soulbane_hope_active :
+        ~chatplayer("<p,neutral>I have travelled through to a fourth room. As I entered your son's voice spoke to me!");
+        ~chatnpc("<p,neutral>Oh my! What did he say?");
+        ~chatplayer("<p,neutral>He said, 'What's the point? Why do I defy such HOPELESSNESS? No-one will ever help me'.");
+        ~chatnpc("<p,neutral>You must fight to give him back his hope!");
+        ~chatplayer("<p,neutral>Can I succeed?");
+        ~chatnpc("<p,neutral>Of course you can!");
+    case ^soulbane_hope_clear :
+        ~chatplayer("<p,neutral>I have endured against hopelessness to finish the fourth room.");
+        ~chatnpc("<p,neutral>Any sight of my son?");
+        ~chatplayer("<p,neutral>Only his voice. So far he has said to me, 'Why should I, Tolna, be trapped in such a wretched place? Feel my ANGER!', 'It's so quiet and dark. I FEAR I may never escape this horrid place. Mum, help me!', 'Where am I? How long have I been here? Am I still the person I once was? I hate my CONFUSION' and 'What's the point? Why do I defy such HOPELESSNESS? No-one will ever help me'.");
+        ~chatnpc("<p,neutral>You must find him and bring him back to me. Please, I beg you.");
+        ~chatplayer("<p,neutral>Don't worry, I will find him!");
 }
 
 [label,soulbane_launa_start]

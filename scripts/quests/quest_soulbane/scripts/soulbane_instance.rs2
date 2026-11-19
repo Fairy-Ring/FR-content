@@ -3,11 +3,14 @@
 // UNKNOWN: exact geometry-copy layout, owner encoding and session UID.
 // Original 377 client maps/locs are copied; the engine copies no template NPCs.
 [proc,soulbane_enter]
-if (%soulbane_prog < 1 | %soulbane_prog > 5) return;
+if (%soulbane_prog < 1 | %soulbane_prog > ^soulbane_tolna_clear) return;
+if (%soulbane_prog >= ^soulbane_tolna_intro) {
+    ~soulbane_tolna_enter;
+    return;
+}
 ~soulbane_cleanup;
-def_coord $sw = region_create(1, ^soulbane_region_zones, ^soulbane_region_zones);
-// Keep the east-square reserve unmapped: compiled Fear movement reaches its copy.
-// Missing eastern neighbour scenery remains a limit of this room boundary.
+def_coord $sw = region_create(^soulbane_region_levels, ^soulbane_region_zones, ^soulbane_region_zones);
+// Original four room quarters on level zero.
 def_int $x = 0;
 while ($x < 8) {
     def_int $z = 0;
@@ -16,6 +19,22 @@ while ($x < 8) {
         $z = add($z, 1);
     }
     $x = add($x, 1);
+}
+// The bridged southwest quarter retains all original upper-plane bridge flags.
+// Its unbridged variant coexists directly east, at the original 64-tile offset.
+def_int $quarter_x = 0;
+while ($quarter_x < ^soulbane_room_zones) {
+    def_int $quarter_z = 0;
+    while ($quarter_z < ^soulbane_room_zones) {
+        region_set(0, add($quarter_x, 8), $quarter_z, movecoord(^soulbane_hope_source, multiply($quarter_x, 8), 0, multiply($quarter_z, 8)), 0);
+        def_int $level = 1;
+        while ($level < ^soulbane_region_levels) {
+            region_set($level, $quarter_x, $quarter_z, movecoord(0_47_81_0_0, multiply($quarter_x, 8), $level, multiply($quarter_z, 8)), 0);
+            $level = add($level, 1);
+        }
+        $quarter_z = add($quarter_z, 1);
+    }
+    $quarter_x = add($quarter_x, 1);
 }
 // Native input proofs hold both memories at their script-placed standing tiles.
 def_int $scene_x = 0;
@@ -30,11 +49,20 @@ while ($scene_x < ^soulbane_memory_zones_east) {
 }
 region_setexitcoord(^soulbane_surface);
 %soulbane_instance = add(region_uid, 1);
+if (%soulbane_prog >= ^soulbane_hope_active) {
+    ~soulbane_hope_enter;
+    return;
+}
+if (%soulbane_prog >= ^soulbane_confusion_active) {
+    ~soulbane_confusion_enter;
+    return;
+}
 if (%soulbane_prog >= 4) {
     ~soulbane_fear_enter;
     return;
 }
 p_teleport(~soulbane_room_coord(^soulbane_rage_entry));
+// CANDIDATE: Old School Wrath and Ruin r3860917 maps this track to the Anger room.
 ~music_playbyrow(music_Wrath_and_Ruin);
 if (%soulbane_prog = 1) {
     %soulbane_prog = 2;
@@ -57,7 +85,7 @@ if (coordx($template) >= coordx(^soulbane_scene_source)) {
     }
     return(region_getcoord(0, sub(coordx($template), coordx(^soulbane_scene_source)), add(^soulbane_memory_tile_north, sub(coordz($template), coordz(^soulbane_scene_source)))));
 }
-return(region_getcoord(0, sub(coordx($template), 3008), sub(coordz($template), 5184)));
+return(region_getcoord(coordy($template), sub(coordx($template), 3008), sub(coordz($template), 5184)));
 
 [proc,soulbane_owned]()(boolean)
 if (%soulbane_instance = 0) return(false);
@@ -71,9 +99,11 @@ return(~soulbane_owned);
 
 [oploc1,soul_bane_awall_void_small] @soulbane_exit;
 [oploc1,soul_bane_fwall_void_small] @soulbane_exit;
+[oploc1,soul_bane_cwall_void_small] @soulbane_exit;
+[oploc1,soul_bane_hwall_void_small] @soulbane_hope_exit;
 [label,soulbane_exit]
 if (~soulbane_owned = false) return;
-if (%soulbane_prog = 2 | %soulbane_prog = 4) {
+if (%soulbane_prog = 2 | %soulbane_prog = 4 | %soulbane_prog = ^soulbane_confusion_active | %soulbane_prog = ^soulbane_hope_active | %soulbane_prog = ^soulbane_tolna_active) {
     if (~p_choice2_header("Yes, I don't mind starting this room again.", 1, "No, I'll finish this room first.", 2, "Do you wish to leave?") ! 1) return;
 }
 ~soulbane_leave;
@@ -98,12 +128,23 @@ clearqueue(soulbane_rage_complete);
 clearqueue(soulbane_rage_credit);
 clearqueue(soulbane_fear_credit);
 clearqueue(soulbane_fear_complete);
+clearqueue(soulbane_confusion_credit);
+clearqueue(soulbane_confusion_complete);
+clearqueue(soulbane_hope_credit);
+clearqueue(soulbane_hope_complete);
+clearqueue(soulbane_tolna_intro);
+clearqueue(soulbane_tolna_credit);
+clearqueue(soulbane_tolna_poison);
+~soulbane_tolna_clear_npcs;
 walktrigger(null);
 ~soulbane_clear_weapons;
 %soulbane_anger_damagedealt = 0;
 %soulbane_anger_donespecial = 0;
 %soulbane_anger_weaponmulti = 0;
 ~soulbane_fear_reset;
+~soulbane_confusion_reset;
+~soulbane_hope_reset;
+~soulbane_tolna_reset;
 %soulbane_instance = 0;
 if_openoverlay(null);
 cam_reset;
@@ -114,6 +155,9 @@ cam_reset;
 ~soulbane_clear_weapons;
 %soulbane_anger_weaponmulti = 0;
 ~soulbane_fear_reset;
+~soulbane_confusion_reset;
+~soulbane_hope_reset;
+~soulbane_tolna_reset;
 
 [proc,soulbane_clear_weapons]
 def_obj $old = inv_getobj(worn, ^wearpos_rhand);
