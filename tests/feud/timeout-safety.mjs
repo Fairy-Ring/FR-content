@@ -60,7 +60,7 @@ function repeatFixture() {
 }
 
 function availableIdle(npc) {
-  return npc.getVar(stateVar) === 0 && npc.queue.all().length === 0 && npc.timerInterval <= 0;
+  return npc.getVar(stateVar) === 0 && [...npc.queue.all()].length === 0 && npc.timerInterval <= 0;
 }
 
 function reachDistraction(p) {
@@ -132,12 +132,12 @@ function dispatchSynchronousKnockOut(p, target) {
 }
 
 function attackableTarget(p, name, requireNoWitness = false) {
-  return actors(name).find(npc => npc.getVar(stateVar) === 0 && npc.queue.all().length === 0 &&
+  return actors(name).find(npc => npc.getVar(stateVar) === 0 && [...npc.queue.all()].length === 0 &&
     npc.timerInterval <= 0 && (!requireNoWitness || !hasWitness(p, npc)) && operationStand(p, npc));
 }
 
 function assertAttackableQueueBound(npc) {
-  const requests = npc.queue.all();
+  const requests = [...npc.queue.all()];
   const timeoutRequests = requests.filter(request => request.queueId === ServerTriggerType.AI_QUEUE19);
   assert.equal(requests.length, timeoutRequests.length, 'the repeat target has no unrelated native queue requests');
   const followCount = timeoutRequests.filter(request => request.lastInt === 0).length;
@@ -271,10 +271,10 @@ function assertReleased(p, target, expectedResults) {
 }
 
 function drainTargetQueues(targets) {
-  const queued = [...targets].flatMap(npc => npc.queue.all().map(request => request.delay));
+  const queued = [...targets].flatMap(npc => [...npc.queue.all()].map(request => request.delay));
   if (!queued.length) return;
   boundedTicksThrough(targets, World.currentTick + Math.max(1, ...queued));
-  for (const npc of targets) assert.equal(npc.queue.all().length, 0, 'native timeout callbacks drain without residual queue growth');
+  for (const npc of targets) assert.equal([...npc.queue.all()].length, 0, 'native timeout callbacks drain without residual queue growth');
 }
 
 function nativeLogout(p, tick = worldTick) {
@@ -362,7 +362,7 @@ test('all twelve original Villager forms own an unset, type-specific timer and c
   for (const npc of placed) {
     const initialTimer = types.NpcType.get(npc.baseType).timer;
     assert.equal(npc.timerInterval, initialTimer, 'an original placed Villager retains its unarmed config timer');
-    assert.equal(npc.queue.all().length, 0, 'an original placed Villager starts without a timeout queue');
+    assert.equal([...npc.queue.all()].length, 0, 'an original placed Villager starts without a timeout queue');
     execute('[proc,npc_poison_start]', p, [20], { target: npc });
     assert.equal(npc.getVar(poisonVar), 0, 'the native poison guard refuses a non-attackable Villager');
     assert.equal(npc.timerInterval, initialTimer, 'refused poison does not arm or change the global poison timer');
@@ -412,7 +412,7 @@ test('a distracted Villager expires in one bounded native callback at its exact 
   assert(deadline > World.currentTick);
   countedDeadlineTick(new Set([target]), deadline);
   assertReleased(p, target, expected);
-  assert.equal(target.queue.all().length, 0);
+  assert.equal([...target.queue.all()].length, 0);
 });
 
 test('a lured Villager expires in one bounded native callback at its exact deadline', () => {
@@ -427,7 +427,7 @@ test('a lured Villager expires in one bounded native callback at its exact deadl
   const expected = resultSnapshot(p);
   countedDeadlineTick(new Set([target]), deadline);
   assertReleased(p, target, expected);
-  assert.equal(target.queue.all().length, 0);
+  assert.equal([...target.queue.all()].length, 0);
 });
 
 test('a real KO replaces the Villager timer deadline and clears its timer when waking', () => {
@@ -447,7 +447,7 @@ test('a real KO replaces the Villager timer deadline and clears its timer when w
   const staleCallbacks = boundedTicksThrough(new Set([target]), lureDeadline);
   assert.equal(staleCallbacks, 0, 'the cleared NPC timer has no stale Lure callback at its former deadline');
   assertReleased(p, target, expected);
-  assert.equal(target.queue.all().length, 0);
+  assert.equal([...target.queue.all()].length, 0);
 });
 
 test('a second native action updates the timer deadline before the earlier deadline', () => {
@@ -506,7 +506,7 @@ test('ordinary native logout clears a Villager owner and its armed timer', () =>
   assert(logoutCallbacks > 0, 'the real timer callback runs during the ordinary logout frame');
   assert(deadline > World.currentTick);
   assert.deepEqual(resultSnapshot(p), expected);
-  assert.equal(target.queue.all().length, 0);
+  assert.equal([...target.queue.all()].length, 0);
   assert.equal(receipt.expected.stage, expected.stage);
 });
 
@@ -525,7 +525,7 @@ test('clearing only the owner session reference does not change the native timeo
   const expected = resultSnapshot(p);
   countedDeadlineTick(new Set([target]), deadline);
   assertReleased(p, target, expected);
-  assert.equal(target.queue.all().length, 0);
+  assert.equal([...target.queue.all()].length, 0);
 });
 
 test('a real theft changes the lured Villager form and clears only the released target timer', () => {
@@ -696,12 +696,12 @@ test('four real attackable Lure/KO cycles survive ordinary logout with bounded q
   assert(maxCallbacksInOneTick <= MAX_NPC_CALLBACKS_PER_TICK);
   assert(maxQueueDepth <= 2);
   assert(totalCallbacks > 0, 'the soak observed real native timeout callbacks');
-  const queued = target.queue.all().map(request => request.delay);
+  const queued = [...target.queue.all()].map(request => request.delay);
   if (queued.length) {
     const end = World.currentTick + Math.max(1, ...queued);
     boundedTicksThrough(tracked, end, callbacks => accountTick(callbacks), observeCallback);
   }
-  assert.equal(target.queue.all().length, 0, 'the final stale follow callback drains without rearming');
+  assert.equal([...target.queue.all()].length, 0, 'the final stale follow callback drains without rearming');
   assert(maxCallbacksInOneTick <= MAX_NPC_CALLBACKS_PER_TICK);
   assert(maxQueueDepth <= 2);
 });
