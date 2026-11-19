@@ -46,7 +46,7 @@ function run(trigger, fixture = {}) {
   player.x = 2678; player.z = 3152; player.buildArea.originX = 2646; player.buildArea.originZ = 3120;
   player.setVar(quest, fixture.stage ?? 0);
   for (const [key, count] of Object.entries(fixture.items ?? {})) player.invAdd(inv, id(key), count);
-  if (fixture.full) while (player.getInventory(inv).freeSlotCount > 0) player.invAdd(inv, id('bucket'), 1);
+  if (fixture.full) while (player.getInventory(inv).freeSlotCount > 0) player.invAdd(inv, id('bucket_empty'), 1);
   const npc = new Npc(0, 2678, 3153, type.size, type.size, EntityLifeCycle.RESPAWN, 1, type.id, BlockWalk.NONE);
   npc.isActive = true; npc.lastMovement = -100;
   World.gameMap.getZone(npc.x, npc.z, npc.level).enter(npc);
@@ -102,7 +102,7 @@ const outcomeNames = new Set(outcomes.map(([key]) => key));
 const count = (result, name) => totals(result.inv)[name] ?? 0;
 function unchanged(result) { assert.deepEqual(result.vars, result.before.vars, 'all saved state unchanged'); assert.deepEqual(result.xp, result.before.xp, 'no player XP awarded'); }
 function refusal(result, line) {
-  unchanged(result); assert.deepEqual(result.inv, result.before.inv, 'refusal preserves every item'); assert(result.text.includes(line), line);
+  unchanged(result); assert.deepEqual(result.inv, result.before.inv, 'refusal preserves every item'); assert(result.text.join(' ').includes(line), `${line}: ${JSON.stringify(result.text)}`);
 }
 for (const choices of [[1, 5], [2, 5], [3, 5], [5]]) {
   const result = run('OPNPC1', { items: { digsitesword: 2, coins: 1000 }, choices });
@@ -118,17 +118,30 @@ for (const trigger of ['OPNPC1', 'OPNPC3', 'OPNPCU']) {
 function outcome(result, { rusty = 2, coins = 1000 } = {}) {
   unchanged(result);
   assert.equal(count(result, 'digsitesword'), rusty - 1, 'exactly one rusty sword consumed');
-  const received = Object.entries(totals(result.inv)).filter(([name]) => !['digsitesword', 'coins', 'bucket'].includes(name));
+  const received = Object.entries(totals(result.inv)).filter(([name]) => !['digsitesword', 'coins', 'bucket_empty'].includes(name));
   assert(received.length <= 1 && received.every(([, quantity]) => quantity === 1), 'at most one result sword');
   let key;
   if (received.length) { key = received[0][0]; assert.equal(count(result, 'coins'), coins - 100, 'fee exactly once'); }
   else if (count(result, 'coins') > coins - 100) { key = 'antique'; assert(count(result, 'coins') >= coins - 100 + 1500 && count(result, 'coins') <= coins - 100 + 1999, 'sourced antique bounds'); }
   else { key = 'nothing'; assert.equal(count(result, 'coins'), coins - 100, 'failure still charges fee'); }
+  const text = result.text.join(' ');
+  assert(text.includes('You hand Tindel 100 coins plus the rusty sword.'), 'sourced transfer wording');
+  if (key === 'antique') {
+    assert(text.includes("Wow! The item you gave me was a very rare antique...no real use...but hey, it's worth some money!"));
+    assert(text.includes(`Tindel gives you ${count(result, 'coins') - coins + 100} coins.`));
+    assert(text.includes("That's a fair price for the item! I'll add it to my collection!"));
+  } else if (key === 'nothing') {
+    assert(text.includes("Sorry my friend, but the item wasn't worth anything. I've disposed of it for you."));
+  } else {
+    const description = { iron_sword: 'an iron shortsword', iron_longsword: 'a long sword', bronze_sword: 'a bronze shortsword', bronze_longsword: 'a bronze long sword', steel_sword: 'a steel shortsword', steel_longsword: 'a steel long sword', mithril_sword: 'a mithril shortsword', mithril_longsword: 'a mithril long sword', black_sword: 'a black shortsword', black_longsword: 'a black longsword' }[key];
+    assert(text.includes(`There you go my friend, it turned out to be ${description}.`));
+    assert(text.includes(`Tindel gives you ${description}.`));
+  }
   assert(outcomeNames.has(key), `only sourced outcome ${key}`);
   for (const frame of result.frames) {
     const before = (frame.digsitesword ?? 0) === rusty;
     assert(before ? (frame.coins ?? 0) === coins : (frame.digsitesword ?? 0) === rusty - 1, 'no suspension between input debits');
-    if (before) assert(Object.keys(frame).every(name => ['digsitesword', 'coins', 'bucket'].includes(name)), 'no result before payment');
+    if (before) assert(Object.keys(frame).every(name => ['digsitesword', 'coins', 'bucket_empty'].includes(name)), 'no result before payment');
     else assert.deepEqual(frame, totals(result.inv), 'complete transaction before next suspension');
   }
   return key;
@@ -159,6 +172,9 @@ const approach = JSON.parse(fs.readFileSync(path.join(content, 'tests/tindel-app
 const x = 2678 + approach.offset[0], z = 3153 + approach.offset[1];
 assert(!packedMap.isMapBlocked(x, z, 0), 'headed approach is not floor/loc blocked');
 assert(packedMap.reachedEntity(0, x, z, 2678, 3153, type.size, type.size, 1), 'headed approach reaches natural Tindel');
+const startX = 2678 + approach.start_offset[0], startZ = 3153 + approach.start_offset[1];
+assert(!packedMap.isMapBlocked(startX, startZ, 0), 'headed walk start is not floor/loc blocked');
+assert(packedMap.isLineOfWalk(0, startX, startZ, x, z), 'headed native walk has a clear approach segment');
 console.log(`APPROACH tindel_marchant 0,${x},${z}`);
 console.log(`PASS tindel-appraisal: native Talk/Sword give/item use; no-sword/no-coins; 12 outcomes; 10000-seed odds; atomic single fee/sword; full backpack replacement; ${questResults.length} quest dialogue controls; frequencies=${JSON.stringify(Object.fromEntries(frequencies))}`);
 process.exit(0);
