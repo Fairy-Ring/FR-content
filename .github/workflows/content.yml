@@ -198,6 +198,7 @@ jobs:
           run_test tests/feud/test_feud_poison.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_poison.mjs
           run_test tests/feud/test_feud_finale.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_finale.mjs
           run_test tests/feud/test_feud_repeat_blackjack.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_repeat_blackjack.mjs
+          run_test tests/feud/test_feud_trial_logout.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_trial_logout.mjs
           run_test tests/drop-tables/test_kalphite_queen.mjs node --import tsx ../content/tests/drop-tables/test_kalphite_queen.mjs
           run_test tests/waterbirth-monsters/test_waterbirth_monsters.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_monsters.mjs
           run_test tests/waterbirth-monsters/test_waterbirth_eggs.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_eggs.mjs
