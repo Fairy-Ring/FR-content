@@ -203,10 +203,7 @@ function dispatch(row) {
 }
 
 function passageEdges(bases, angle) {
-    let [dx, dz] = openDelta(bases[0].shape, angle);
-    // Shape 9 clips a ground square, not a straight-wall edge. Its leaf moves
-    // along openDelta; test crossing the vacated square perpendicular to it.
-    if (bases[0].shape === 9) [dx, dz] = [-dz, dx];
+    const [dx, dz] = openDelta(bases[0].shape, angle);
     const tangent = [-dz, dx];
     const edges = new Map();
     for (const base of bases) {
@@ -234,7 +231,49 @@ function canStep(edge, reverse = false) {
 const blockedBothWays = edge => !canStep(edge) && !canStep(edge, true);
 const passableBothWays = edge => canStep(edge) && canStep(edge, true);
 
+// Shape 9 clips a ground square. A single edge can leave a blocked square,
+// so test complete routes between originally walkable tiles on its two sides.
+function groundRoute(row, from, to) {
+    const pending = [from], seen = new Set([from.join(',')]);
+    for (let i = 0; i < pending.length; i++) {
+        const [x, z] = pending[i];
+        if (x === to[0] && z === to[1]) return true;
+        for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+            if (dx === 0 && dz === 0) continue;
+            const next = [x + dx, z + dz], key = next.join(',');
+            if (Math.max(Math.abs(next[0] - row.x), Math.abs(next[1] - row.z)) > 2 || seen.has(key)) continue;
+            if (!floors.has(`${row.level},${key}`) || !map.canTravel(row.level, x, z, dx, dz, 1, 0, CollisionType.NORMAL)) continue;
+            seen.add(key); pending.push(next);
+        }
+    }
+    return false;
+}
+function runGroundDoor(row, binding) {
+    const points = [];
+    for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+        const [x, z] = [row.x + dx, row.z + dz];
+        if (floors.has(`${row.level},${x},${z}`) && !map.isMapBlocked(x, z, row.level)) points.push([x, z]);
+    }
+    const blocked = [];
+    for (let i = 0; i < points.length; i++) for (let j = i + 1; j < points.length; j++) {
+        if (!groundRoute(row, points[i], points[j]) && !groundRoute(row, points[j], points[i])) blocked.push([points[i], points[j]]);
+    }
+    assert.ok(blocked.length, `${row.name}@${row.x},${row.z}: native diagonal doorway separates two walkable sides`);
+    const opened = openStage(row, binding);
+    dispatch(row);
+    assertPresent(opened, `${row.name}: open diagonal stage`);
+    assertAbsent(row, `${row.name}: old closed diagonal stage`);
+    const passage = blocked.find(([a, b]) => groundRoute(row, a, b) && groundRoute(row, b, a));
+    assert.ok(passage, `${row.name}@${row.x},${row.z}: opening connects both sides through the vacated ground square`);
+    dispatch(opened);
+    assertPresent(row, `${row.name}: restored diagonal stage`);
+    assertAbsent(opened, `${row.name}: stale open diagonal stage`);
+    assert.equal(groundRoute(row, passage[0], passage[1]), false, 'closing blocks the complete forward route');
+    assert.equal(groundRoute(row, passage[1], passage[0]), false, 'closing blocks the complete reverse route');
+}
+
 function runSingle(row, binding) {
+    if (row.shape === 9) return runGroundDoor(row, binding);
     const edges = passageEdges([row], row.angle);
     const blocked = edges.filter(blockedBothWays);
     assert.ok(blocked.length, `${row.name}: native closed doorway blocks map travel from both sides`);
