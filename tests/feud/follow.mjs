@@ -58,7 +58,7 @@ function secludedDestination(p, target, witnesses, visited) {
       }
     }
   }
-  assert.fail('no native collision-reachable tile screens the Thug from its original witnesses behind a building');
+  return null;
 }
 
 export function followToSeclusion(p, target) {
@@ -70,27 +70,31 @@ export function followToSeclusion(p, target) {
   const originalWitnesses = [...World.npcs].filter(npc => isWitness(p, target, npc));
   const startingNpcTile = [target.level, target.x, target.z];
   const destinations = [];
-  let { destination, route } = secludedDestination(p, target, originalWitnesses, destinations);
-  destinations.push(destination);
-  let routeLength = route.length;
-  walkRoute(p, route);
+  let destination = null, routeLength = 0;
 
   let ticks = 0;
   for (; ticks < nativeFollowWaitTicks; ticks++) {
+    const arrived = destination && p.level === destination.level &&
+      p.x === destination.x && p.z === destination.z;
+    if (!destination || (arrived && (!target.hasWaypoints() ||
+      projectedWitnesses(p, target, p.x, p.z).length ||
+      !occludedOriginalWitness(p, originalWitnesses, p.x, p.z)))) {
+      // Wait for a currently admissible route, and let a moving follower finish.
+      // Route admission and actual movement share the original 512-turn budget.
+      const next = secludedDestination(p, target, originalWitnesses, destinations);
+      if (next) {
+        destination = next.destination;
+        destinations.push(destination);
+        routeLength += next.route.length;
+        walkRoute(p, next.route);
+      }
+    }
     worldTick();
-    if (p.level === destination.level && p.x === destination.x && p.z === destination.z &&
+    if (destination && p.level === destination.level && p.x === destination.x && p.z === destination.z &&
       !hasWitness(p, target) && p.inOperableDistance(target) &&
       occludedOriginalWitness(target, originalWitnesses, target.x, target.z) &&
       projectedWitnesses(p, target, p.x, p.z).length === 0 &&
       occludedOriginalWitness(p, originalWitnesses, p.x, p.z)) break;
-    if (p.level === destination.level && p.x === destination.x && p.z === destination.z) {
-      // A wandering witness or a blocked follower corner can invalidate this stand.
-      // Continue ordinary walking within the same total native-turn budget.
-      ({ destination, route } = secludedDestination(p, target, originalWitnesses, destinations));
-      destinations.push(destination);
-      routeLength += route.length;
-      walkRoute(p, route);
-    }
   }
   assert(ticks < nativeFollowWaitTicks, `native player movement and NPC follow reach the screened destination: ${JSON.stringify({
     tick: World.currentTick, destination, player: [p.level, p.x, p.z],
