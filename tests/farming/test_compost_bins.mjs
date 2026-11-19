@@ -317,6 +317,8 @@ try {
     'potato', 'cabbage', 'onion', 'tomato', 'strawberry', 'sweetcorn',
     'guam_leaf', 'marentill', 'tarromin', 'harralander', 'eadgar_goutweed_herb',
     'ranarr_weed', 'irit_leaf', 'cooking_apple', 'banana', 'orange', 'curry_leaf',
+    'unidentified_guam', 'unidentified_marentill', 'unidentified_tarromin',
+    'unidentified_harralander', 'unidentified_ranarr', 'unidentified_irit',
   ];
   const superIngredients = [
     'oak_roots', 'willow_roots', 'maple_roots', 'yew_roots', 'magic_roots',
@@ -324,36 +326,61 @@ try {
     'poisonivy_berries', 'jangerberries', 'white_berries',
     'avantoe', 'kwuarm', 'snapdragon', 'cadantine', 'lantadyme',
     'dwarf_weed', 'torstol', 'toadflax',
+    'unidentified_avantoe', 'unidentified_kwuarm', 'unidentified_snapdragon',
+    'unidentified_cadantine', 'unidentified_lantadyme', 'unidentified_dwarf_weed',
+    'unidentified_torstol', 'unidentified_toadflax',
+    'calquat_fruit', 'coconut_shell', 'garden_white_tree_fruit',
+  ];
+  const unidentifiedHerbPairs = [
+    ['unidentified_guam', 'guam_leaf'],
+    ['unidentified_marentill', 'marentill'],
+    ['unidentified_tarromin', 'tarromin'],
+    ['unidentified_harralander', 'harralander'],
+    ['unidentified_ranarr', 'ranarr_weed'],
+    ['unidentified_irit', 'irit_leaf'],
+    ['unidentified_avantoe', 'avantoe'],
+    ['unidentified_kwuarm', 'kwuarm'],
+    ['unidentified_snapdragon', 'snapdragon'],
+    ['unidentified_cadantine', 'cadantine'],
+    ['unidentified_lantadyme', 'lantadyme'],
+    ['unidentified_dwarf_weed', 'dwarf_weed'],
+    ['unidentified_torstol', 'torstol'],
+    ['unidentified_toadflax', 'toadflax'],
   ];
   const expectedIngredients = new Map();
   for (const name of normalIngredients) expectedIngredients.set(id('ObjType', name), name === 'tomato' ? 3 : 1);
   for (const name of superIngredients) expectedIngredients.set(id('ObjType', name), 2);
 
-  test('the compiled ingredient enum contains exactly all 54 named cache objects and source classes', () => {
+  test('the compiled ingredient enum contains exactly all 71 named cache objects and source classes', () => {
     const ingredientEnum = types.EnumType.getByName('farming_compost_ingredients');
     assert(ingredientEnum, 'compiled farming_compost_ingredients enum');
     assert.equal(ingredientEnum.inputtype, ScriptVarType.OBJ);
     assert.equal(ingredientEnum.outputtype, ScriptVarType.INT);
     assert.equal(ingredientEnum.defaultInt, 0, 'unlisted object kinds are refused by default');
-    assert.equal(normalIngredients.length, 33);
-    assert.equal(superIngredients.length, 21);
-    assert.equal(expectedIngredients.size, 54);
-    assert.equal(ingredientEnum.values.size, 54, 'enum has no missing or extra object values');
+    assert.equal(normalIngredients.length, 39);
+    assert.equal(superIngredients.length, 32);
+    assert.equal(expectedIngredients.size, 71);
+    assert.equal(ingredientEnum.values.size, 71, 'enum has no missing or extra object values');
     const expected = [...expectedIngredients.entries()].sort((a, b) => a[0] - b[0]);
     const actual = [...ingredientEnum.values.entries()].sort((a, b) => a[0] - b[0]);
     assert.deepEqual(actual, expected, 'each exact cache object has its contract value');
+    for (const [unidentified, identified] of unidentifiedHerbPairs) {
+      assert.equal(ingredientEnum.values.get(id('ObjType', unidentified)),
+        ingredientEnum.values.get(id('ObjType', identified)),
+        `${unidentified} has the same class as ${identified}`);
+    }
   });
 
   const refusedIngredients = [
     'cert_guam_leaf', 'cert_marentill', 'cert_tomato', 'cert_pineapple',
-    'unidentified_guam', 'unidentified_marentill', 'unidentified_tarromin',
-    'unidentified_harralander', 'unidentified_ranarr', 'unidentified_irit',
-    'unidentified_avantoe', 'unidentified_kwuarm', 'unidentified_cadantine',
-    'unidentified_dwarf_weed', 'unidentified_torstol',
+    'cert_unidentified_guam', 'cert_calquat_fruit', 'cert_coconut_shell',
+    'unidentified_powder', 'unidentified_liquid', 'unidentified_snake_weed',
+    'unidentified_ardrigal', 'unidentified_sito_foil',
+    'unidentified_volencia_moss', 'unidentified_rogues_purse', 'coconut_half',
     'tomato_seed', 'flowers_waterfall_quest', 'cooked_chicken_undead',
     'bucket_empty', 'bucket_compost', 'bucket_supercompost', 'rotten_tomato',
   ];
-  test('certificates, unidentified herbs, seeds, unrelated flowers, foods, and outputs default to refused', () => {
+  test('certificates, non-Farming unidentified items, seeds, unrelated flowers, foods, and outputs default to refused', () => {
     const ingredientEnum = types.EnumType.getByName('farming_compost_ingredients');
     for (const name of refusedIngredients) {
       const object = id('ObjType', name);
@@ -362,9 +389,15 @@ try {
     }
   });
 
-  test('native item-on-bin dispatch refuses certificates and unidentified herbs without side effects', () => {
+  test('native item-on-bin dispatch refuses certificates and non-Farming unidentified items without side effects', () => {
     const bin = bins[0];
-    for (const item of ['cert_guam_leaf', 'unidentified_guam', 'bucket_empty', 'tomato_seed']) {
+    for (const item of [
+      'cert_guam_leaf', 'cert_unidentified_guam', 'cert_coconut_shell',
+      'unidentified_powder', 'unidentified_liquid', 'unidentified_snake_weed',
+      'unidentified_ardrigal', 'unidentified_sito_foil',
+      'unidentified_volencia_moss', 'unidentified_rogues_purse',
+      'coconut_half', 'bucket_empty', 'tomato_seed',
+    ]) {
       const p = fixture(bin);
       const audits = [];
       const audit = watchVarp511(p, audits);
@@ -383,6 +416,35 @@ try {
         assert.equal(count(p, item), before.itemCount);
         assert.equal(farmingXp(p), before.xp, `${item} grants no XP`);
         assert.equal(audit.writes.length, before.writes, `${item} refusal does not write varp511`);
+        assertSafeVarp511Writes(audits);
+      } finally {
+        audit.close();
+        discard(p);
+      }
+    }
+  });
+
+  test('native item-on-bin dispatch accepts all fourteen unidentified herbs and three added super inputs', () => {
+    const bin = bins[0];
+    const ingredients = [
+      ...unidentifiedHerbPairs.map(([unidentified]) => unidentified),
+      'calquat_fruit', 'coconut_shell', 'garden_white_tree_fruit',
+    ];
+    for (const item of ingredients) {
+      const p = fixture(bin);
+      const audits = [];
+      const audit = watchVarp511(p, audits);
+      try {
+        add(p, item, 2);
+        const beforeXp = farmingXp(p);
+        const expectedStates = stateVector(p);
+        const kind = expectedIngredients.get(id('ObjType', item)) === 2 ? 'super' : 'normal';
+        expectedStates[bin.index] = inputState(kind, 1);
+        nativeUse(p, bin, item);
+        assertStateVector(p, expectedStates, `${item} starts its mapped batch class`);
+        assert.equal(count(p, item), 1, `${item} consumes exactly one input`);
+        assert.equal(farmingXp(p), beforeXp, `${item} input grants no XP`);
+        assert.equal(audit.writes.length, 1, `${item} changes only its bin slice once`);
         assertSafeVarp511Writes(audits);
       } finally {
         audit.close();

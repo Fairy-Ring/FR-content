@@ -8,9 +8,10 @@ val=farming_compost_bin_2,1
 val=farming_compost_bin_3,2
 val=farming_compost_bin_4,3
 
-// CANDIDATE complete ingredient classification: Jagex KB 1875, 29 April 2007.
-// Period availability checked against Tip.It, 28 April 2006. Identified leaves
-// are the named objects; certificates, seeds and processed forms are not inputs.
+// CANDIDATE classes: Jagex KB 1875, 29 April 2007; Farming wiki, 20 February 2007.
+// The 2014 Compost Bin history names identified and unidentified herbs.
+// Original 377 herb forms mirror their identified class; certificates stay refused.
+// The 2007 wiki adds calquat fruit, coconut shells and white tree fruit.
 // UNKNOWN encoding: refused 0, normal 1, super 2, tomato-only 3.
 [farming_compost_ingredients]
 inputtype=obj
@@ -45,6 +46,12 @@ val=harralander,1
 val=eadgar_goutweed_herb,1
 val=ranarr_weed,1
 val=irit_leaf,1
+val=unidentified_guam,1
+val=unidentified_marentill,1
+val=unidentified_tarromin,1
+val=unidentified_harralander,1
+val=unidentified_ranarr,1
+val=unidentified_irit,1
 val=cooking_apple,1
 val=banana,1
 val=orange,1
@@ -58,6 +65,9 @@ val=pineapple,2
 val=watermelon,2
 val=coconut,2
 val=papaya,2
+val=calquat_fruit,2
+val=coconut_shell,2
+val=garden_white_tree_fruit,2
 val=bittercap_mushroom,2
 val=poisonivy_berries,2
 val=jangerberries,2
@@ -70,3 +80,11 @@ val=lantadyme,2
 val=dwarf_weed,2
 val=torstol,2
 val=toadflax,2
+val=unidentified_avantoe,2
+val=unidentified_kwuarm,2
+val=unidentified_snapdragon,2
+val=unidentified_cadantine,2
+val=unidentified_lantadyme,2
+val=unidentified_dwarf_weed,2
+val=unidentified_torstol,2
+val=unidentified_toadflax,2
