@@ -68640,23 +68640,6 @@ recol2d=11556
 ambient=30
 length=2
 
-[elid_bankbooth]
-name=Bank booth
-desc=The bank teller will serve you from here.
-model=ahoy_bankbooth
-recol1s=10598
-recol1d=13605
-recol2s=8484
-recol2d=12548
-recol3s=6370
-recol3d=10434
-recol4s=3235
-recol4d=8320
-op1=Use
-op2=Use-quickly
-blockrange=no
-ambient=30
-
 [elid_bankboothclosed]
 name=Closed bank booth
 desc=This booth is closed.
@@ -80714,13 +80697,6 @@ recol4d=12548
 recol5s=4256
 recol5d=11523
 
-[bank_booth]
-name=Bank booth
-desc=The bank teller will serve you from here.
-model=fever_bankbooth
-op1=Use
-op2=Use-quickly
-blockrange=no
 
 [fountain_11759]
 name=Fountain
