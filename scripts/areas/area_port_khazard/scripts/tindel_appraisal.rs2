@@ -85,8 +85,7 @@ if ($roll < 20) {
     $result = black_longsword;
     $description = "a black longsword";
 } else if ($roll = 98) {
-    // UNKNOWN engineering choice: uniform draw within the sourced 1500..1999 range.
-    $antique = calc(^tindel_antique_min + random(^tindel_antique_range));
+    $antique = calc(^tindel_antique_min + random(^tindel_antique_range)); // UNKNOWN engineering choice: uniform within sourced 1500..1999.
 }
 // No suspension between debits and reward. The unstackable input frees a slot.
 // inv_add retains the engine's ground overflow for a maximum-size coin stack.
@@ -103,8 +102,7 @@ if ($result ! null) {
     ~mesbox("Tindel gives you <$description>.");
 } else if ($antique > 0) {
     ~chatnpc("<p,neutral>Wow! The item you gave me was a very rare antique...no real use...but hey, it's worth some money!");
-    // UNKNOWN engineering choice: plain digits for the transcript's [number].
-    ~mesbox("Tindel gives you <tostring($antique)> coins.");
+    ~mesbox("Tindel gives you <tostring($antique)> coins."); // UNKNOWN engineering choice: plain digits for the transcript's [number].
     ~chatnpc("<p,neutral>That's a fair price for the item! I'll add it to my collection!");
 } else {
     ~chatnpc("<p,neutral>Sorry my friend, but the item wasn't worth anything. I've disposed of it for you.");
