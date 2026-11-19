@@ -165,7 +165,7 @@ for (const trigger of ['OPNPC1', 'OPNPC3', 'OPNPCU']) for (const [key, seed] of 
   assert.equal(outcome(run(trigger, { ...fixture, full: true })), key, 'full backpack replacement always fits freed rusty-sword slot');
   assert.equal(outcome(run(trigger, { ...fixture, items: { digsitesword: 1, coins: 100 } }), { rusty: 1, coins: 100 }), key, 'exact fee and last sword');
 }
-for (const stage of [0, 17, 18, 19, 20, 21, 22, 23, 24, 100]) for (const trigger of ['OPNPC3', 'OPNPCU']) outcome(run(trigger, { stage, items: { digsitesword: 2, coins: 1000 } }));
+for (let stage = 0; stage <= 100; stage++) for (const trigger of ['OPNPC3', 'OPNPCU']) outcome(run(trigger, { stage, items: { digsitesword: 2, coins: 1000 } }));
 const packedMap = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
 World.gameMap.init();
 const approach = JSON.parse(fs.readFileSync(path.join(content, 'tests/tindel-appraisal/approach.json'), 'utf8'));
