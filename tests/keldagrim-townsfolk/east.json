@@ -1,0 +1,312 @@
+{
+  "slice": "east",
+  "scenarios": [
+    {
+      "npc": "dwarf_city_rowdy_dwarf",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Get OUT of my WAY!"], "player": [], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Get OUT of my WAY!"], "player": [], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-rowdy-transcript", "src.keldagrim-townsfolk-east-rowdy-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_rowdy_dwarf",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Get OUT of my WAY!"], "player": [], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Get OUT of my WAY!"], "player": [], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-rowdy-transcript", "src.keldagrim-townsfolk-east-rowdy-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_old_dwarf3",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Oh, leave an old dwarf in peace will you?", "Ninenty years down in the mines, and this is all I got out of it. All my life wasted away.", "A crummy old house in East, that's all my life amounts to."], "player": ["Why, what's wrong?", "You've still got a nice house, don't you?", "I'll leave you alone then."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Oh, leave an old dwarf in peace will you?", "Ninenty years down in the mines, and this is all I got out of it. All my life wasted away.", "A crummy old house in East, that's all my life amounts to."], "player": ["Why, what's wrong?", "You've still got a nice house, don't you?", "I'll leave you alone then."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-runvastr-transcript", "src.keldagrim-townsfolk-east-runvastr-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_old_dwarf3",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Oh, leave an old dwarf in peace will you?", "Ninenty years down in the mines, and this is all I got out of it. All my life wasted away.", "A crummy old house in East, that's all my life amounts to."], "player": ["Why, what's wrong?", "You've still got a nice house, don't you?", "I'll leave you alone then."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Oh, leave an old dwarf in peace will you?", "Ninenty years down in the mines, and this is all I got out of it. All my life wasted away.", "A crummy old house in East, that's all my life amounts to."], "player": ["Why, what's wrong?", "You've still got a nice house, don't you?", "I'll leave you alone then."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-runvastr-transcript", "src.keldagrim-townsfolk-east-runvastr-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man1",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Sorry, I'm busy!"], "player": [], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Sorry, I'm busy!"], "player": [], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-sune-transcript", "src.keldagrim-townsfolk-east-sune-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man1",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Sorry, I'm busy!"], "player": [], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Sorry, I'm busy!"], "player": [], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-sune-transcript", "src.keldagrim-townsfolk-east-sune-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man2",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Do you mind? You're in my home.", "Very funny, human.", "We can't all live in plush houses, you know. But that doesn't mean us mining dwarves don't work hard.", "Normally the coal mine to the north. We need a lot of coal to keep our steam engines going, you know.", "I'm not sure, but as long as no one notices I don't think anyone is going to care."], "player": ["I'm sorry, should I have knocked?", "Where do you do your mining?", "Can I do a bit of mining there as well?"], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Do you mind? You're in my home.", "Very funny, human.", "We can't all live in plush houses, you know. But that doesn't mean us mining dwarves don't work hard.", "Normally the coal mine to the north. We need a lot of coal to keep our steam engines going, you know.", "I'm not sure, but as long as no one notices I don't think anyone is going to care."], "player": ["I'm sorry, should I have knocked?", "Where do you do your mining?", "Can I do a bit of mining there as well?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-bentamir-transcript", "src.keldagrim-townsfolk-east-bentamir-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man2",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Do you mind? You're in my home.", "Very funny, human.", "We can't all live in plush houses, you know. But that doesn't mean us mining dwarves don't work hard.", "Normally the coal mine to the north. We need a lot of coal to keep our steam engines going, you know.", "I'm not sure, but as long as no one notices I don't think anyone is going to care."], "player": ["I'm sorry, should I have knocked?", "Where do you do your mining?", "Can I do a bit of mining there as well?"], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Do you mind? You're in my home.", "Very funny, human.", "We can't all live in plush houses, you know. But that doesn't mean us mining dwarves don't work hard.", "Normally the coal mine to the north. We need a lot of coal to keep our steam engines going, you know.", "I'm not sure, but as long as no one notices I don't think anyone is going to care."], "player": ["I'm sorry, should I have knocked?", "Where do you do your mining?", "Can I do a bit of mining there as well?"], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-bentamir-transcript", "src.keldagrim-townsfolk-east-bentamir-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man3",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Say, aren't you the human who got arrested here the other day, by the boat?", "Right, right."], "player": ["Yes, but we cleared up the whole situation."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Say, aren't you the human who got arrested here the other day, by the boat?", "Right, right."], "player": ["Yes, but we cleared up the whole situation."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-ulifed-transcript", "src.keldagrim-townsfolk-east-ulifed-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man3",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Say, aren't you the human who got arrested here the other day, by the boat?", "Right, right."], "player": ["Yes, but we cleared up the whole situation."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Say, aren't you the human who got arrested here the other day, by the boat?", "Right, right."], "player": ["Yes, but we cleared up the whole situation."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-ulifed-transcript", "src.keldagrim-townsfolk-east-ulifed-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man4",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Welcome to my home. Is there anything you wanted?", "No, I'm just a factory worker. Don't do tours.", "This is my home. I'm off-duty."], "player": ["Nothing in particular. Got any sightseeing tips?", "This doesn't look like a factory."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Welcome to my home. Is there anything you wanted?", "No, I'm just a factory worker. Don't do tours.", "This is my home. I'm off-duty."], "player": ["Nothing in particular. Got any sightseeing tips?", "This doesn't look like a factory."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-reinald-transcript", "src.keldagrim-townsfolk-east-reinald-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man4",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Welcome to my home. Is there anything you wanted?", "No, I'm just a factory worker. Don't do tours.", "This is my home. I'm off-duty."], "player": ["Nothing in particular. Got any sightseeing tips?", "This doesn't look like a factory."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Welcome to my home. Is there anything you wanted?", "No, I'm just a factory worker. Don't do tours.", "This is my home. I'm off-duty."], "player": ["Nothing in particular. Got any sightseeing tips?", "This doesn't look like a factory."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-reinald-transcript", "src.keldagrim-townsfolk-east-reinald-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man5",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Hello there, human! Come in, come in!", "Tell me, what brings you here?", "A boat! Fascinating, go on!", "Not the Black Guard!", "Such an interesting tale!", "Now how did you come to be in Keldagrim again?"], "player": ["Hi, nice to see you!", "Well, first I came to this city just for the adventure and excitement, but then I knocked over this statue, you see. Well, I didn't really knock it over myself, I was on this boat.", "Yes, well, this boatman was a bit rubbish, or there was something wrong with the ship, I don't know. And then I got arrested by the Black Guard.", "Yes, and they took me to this Veldaban person, who pretended to be really angry but actually he was really nice and he asked me for my help.", "So here I am, helping to rebuild the statue.", "Never mind."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Hello there, human! Come in, come in!", "Tell me, what brings you here?", "A boat! Fascinating, go on!", "Not the Black Guard!", "Such an interesting tale!", "Now how did you come to be in Keldagrim again?"], "player": ["Hi, nice to see you!", "Well, first I came to this city just for the adventure and excitement, but then I knocked over this statue, you see. Well, I didn't really knock it over myself, I was on this boat.", "Yes, well, this boatman was a bit rubbish, or there was something wrong with the ship, I don't know. And then I got arrested by the Black Guard.", "Yes, and they took me to this Veldaban person, who pretended to be really angry but actually he was really nice and he asked me for my help.", "So here I am, helping to rebuild the statue.", "Never mind."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-karl-transcript", "src.keldagrim-townsfolk-east-karl-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man5",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Hello there, human! Come in, come in!", "Tell me, what brings you here?", "A boat! Fascinating, go on!", "Not the Black Guard!", "Such an interesting tale!", "Now how did you come to be in Keldagrim again?"], "player": ["Hi, nice to see you!", "Well, first I came to this city just for the adventure and excitement, but then I knocked over this statue, you see. Well, I didn't really knock it over myself, I was on this boat.", "Yes, well, this boatman was a bit rubbish, or there was something wrong with the ship, I don't know. And then I got arrested by the Black Guard.", "Yes, and they took me to this Veldaban person, who pretended to be really angry but actually he was really nice and he asked me for my help.", "So here I am, helping to rebuild the statue.", "Never mind."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Hello there, human! Come in, come in!", "Tell me, what brings you here?", "A boat! Fascinating, go on!", "Not the Black Guard!", "Such an interesting tale!", "Now how did you come to be in Keldagrim again?"], "player": ["Hi, nice to see you!", "Well, first I came to this city just for the adventure and excitement, but then I knocked over this statue, you see. Well, I didn't really knock it over myself, I was on this boat.", "Yes, well, this boatman was a bit rubbish, or there was something wrong with the ship, I don't know. And then I got arrested by the Black Guard.", "Yes, and they took me to this Veldaban person, who pretended to be really angry but actually he was really nice and he asked me for my help.", "So here I am, helping to rebuild the statue.", "Never mind."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-karl-transcript", "src.keldagrim-townsfolk-east-karl-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man8",
+      "state": "giantdwarf-1-one-coin",
+      "vars": {"giantdwarf_quest": 1},
+      "items": {"coins": 1},
+      "allowed": {"npc": ["Kebabs! Get your kebabs here! One gold each!", "Yes? Are you going to give me that one gold coin then?", "The bank is Keldagrim-West. Hurry back!", "Just go out in the streets, they can't be hard to find!", "That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.", "He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.", "Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.", "I think he was back here quite recently, so I doubt he'll be back any time soon.", "Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!"], "player": ["Sure, one kebab please.", "Sorry, I don't seem to have any money on me.", "I'm looking for a drunken dwarf.", "No, a specific drunken dwarf, he keeps harassing me.", "I don't think that's who I mean.", "Do you think I'll have any chance of catching him here?", "Do you have any quests?"], "options": ["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"], "game": []},
+      "branches": [
+        {"choices": ["Sure, one kebab please."], "npc": ["Kebabs! Get your kebabs here! One gold each!"], "player": ["Sure, one kebab please."], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 0, "kebab": 1}},
+        {"choices": ["I'm looking for a drunken dwarf."], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Just go out in the streets, they can't be hard to find!", "That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.", "He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.", "Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.", "I think he was back here quite recently, so I doubt he'll be back any time soon."], "player": ["I'm looking for a drunken dwarf.", "No, a specific drunken dwarf, he keeps harassing me.", "I don't think that's who I mean.", "Do you think I'll have any chance of catching him here?"], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 1, "kebab": 0}},
+        {"choices": ["Do you have any quests?"], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!"], "player": ["Do you have any quests?"], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 1, "kebab": 0}}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-kjut-transcript", "src.keldagrim-townsfolk-east-kjut-article", "src.content-unpack-obj", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man8",
+      "state": "giantdwarf-1-no-coins",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Kebabs! Get your kebabs here! One gold each!", "Yes? Are you going to give me that one gold coin then?", "The bank is Keldagrim-West. Hurry back!", "Just go out in the streets, they can't be hard to find!", "That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.", "He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.", "Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.", "I think he was back here quite recently, so I doubt he'll be back any time soon.", "Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!"], "player": ["Sure, one kebab please.", "Sorry, I don't seem to have any money on me.", "I'm looking for a drunken dwarf.", "No, a specific drunken dwarf, he keeps harassing me.", "I don't think that's who I mean.", "Do you think I'll have any chance of catching him here?", "Do you have any quests?"], "options": ["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"], "game": []},
+      "branches": [
+        {"choices": ["Sure, one kebab please."], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Yes? Are you going to give me that one gold coin then?", "The bank is Keldagrim-West. Hurry back!"], "player": ["Sure, one kebab please.", "Sorry, I don't seem to have any money on me."], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 0, "kebab": 0}},
+        {"choices": ["I'm looking for a drunken dwarf."], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Just go out in the streets, they can't be hard to find!", "That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.", "He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.", "Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.", "I think he was back here quite recently, so I doubt he'll be back any time soon."], "player": ["I'm looking for a drunken dwarf.", "No, a specific drunken dwarf, he keeps harassing me.", "I don't think that's who I mean.", "Do you think I'll have any chance of catching him here?"], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 0, "kebab": 0}},
+        {"choices": ["Do you have any quests?"], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!"], "player": ["Do you have any quests?"], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 0, "kebab": 0}}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-kjut-transcript", "src.keldagrim-townsfolk-east-kjut-article", "src.content-unpack-obj", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man8",
+      "state": "giantdwarf-2-one-coin",
+      "vars": {"giantdwarf_quest": 2},
+      "items": {"coins": 1},
+      "allowed": {"npc": ["Kebabs! Get your kebabs here! One gold each!", "Yes? Are you going to give me that one gold coin then?", "The bank is Keldagrim-West. Hurry back!", "Just go out in the streets, they can't be hard to find!", "That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.", "He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.", "Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.", "I think he was back here quite recently, so I doubt he'll be back any time soon.", "Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!"], "player": ["Sure, one kebab please.", "Sorry, I don't seem to have any money on me.", "I'm looking for a drunken dwarf.", "No, a specific drunken dwarf, he keeps harassing me.", "I don't think that's who I mean.", "Do you think I'll have any chance of catching him here?", "Do you have any quests?"], "options": ["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"], "game": []},
+      "branches": [
+        {"choices": ["Sure, one kebab please."], "npc": ["Kebabs! Get your kebabs here! One gold each!"], "player": ["Sure, one kebab please."], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 0, "kebab": 1}},
+        {"choices": ["I'm looking for a drunken dwarf."], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Just go out in the streets, they can't be hard to find!", "That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.", "He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.", "Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.", "I think he was back here quite recently, so I doubt he'll be back any time soon."], "player": ["I'm looking for a drunken dwarf.", "No, a specific drunken dwarf, he keeps harassing me.", "I don't think that's who I mean.", "Do you think I'll have any chance of catching him here?"], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 1, "kebab": 0}},
+        {"choices": ["Do you have any quests?"], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!"], "player": ["Do you have any quests?"], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 1, "kebab": 0}}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-kjut-transcript", "src.keldagrim-townsfolk-east-kjut-article", "src.content-unpack-obj", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_dwarf_man8",
+      "state": "giantdwarf-2-no-coins",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Kebabs! Get your kebabs here! One gold each!", "Yes? Are you going to give me that one gold coin then?", "The bank is Keldagrim-West. Hurry back!", "Just go out in the streets, they can't be hard to find!", "That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.", "He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.", "Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.", "I think he was back here quite recently, so I doubt he'll be back any time soon.", "Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!"], "player": ["Sure, one kebab please.", "Sorry, I don't seem to have any money on me.", "I'm looking for a drunken dwarf.", "No, a specific drunken dwarf, he keeps harassing me.", "I don't think that's who I mean.", "Do you think I'll have any chance of catching him here?", "Do you have any quests?"], "options": ["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"], "game": []},
+      "branches": [
+        {"choices": ["Sure, one kebab please."], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Yes? Are you going to give me that one gold coin then?", "The bank is Keldagrim-West. Hurry back!"], "player": ["Sure, one kebab please.", "Sorry, I don't seem to have any money on me."], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 0, "kebab": 0}},
+        {"choices": ["I'm looking for a drunken dwarf."], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Just go out in the streets, they can't be hard to find!", "That's still not very helpful. But let me see. There is one particularly drunken dwarf just to the northeast of here.", "He's scaring away my customers, he says there's something wrong with my kebabs. Quite annoying fellow.", "Well, he does have a relative who wanders all over Gielinor. Comes back from time to time to buy more kebabs. Don't see him very often though.", "I think he was back here quite recently, so I doubt he'll be back any time soon."], "player": ["I'm looking for a drunken dwarf.", "No, a specific drunken dwarf, he keeps harassing me.", "I don't think that's who I mean.", "Do you think I'll have any chance of catching him here?"], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 0, "kebab": 0}},
+        {"choices": ["Do you have any quests?"], "npc": ["Kebabs! Get your kebabs here! One gold each!", "Not really! I have a steady supply of meat coming in through the carts and I don't really need anything else!"], "player": ["Do you have any quests?"], "menus": [["Sure, one kebab please.", "I'm looking for a drunken dwarf.", "Do you have any quests?"]], "afterItems": {"coins": 0, "kebab": 0}}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-kjut-transcript", "src.keldagrim-townsfolk-east-kjut-article", "src.content-unpack-obj", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_drunken_dwarf",
+      "placedNpc": "dwarf_city_drunken_dwarf_multi",
+      "state": "giantdwarf-1-initial",
+      "vars": {"giantdwarf_quest": 1, "ordinary_dialogue_bits": 0},
+      "allowed": {"npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "Hey, you look vaguely familiar... haven't I seen you somewhere before?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "Hey, you look vaguely familiar... haven't I seen you somewhere before?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "menus": [], "afterVars": {"ordinary_dialogue_bits": 1}}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-east-drunken-dwarf-article", "src.keldagrim-townsfolk-drunk-quest-check", "src.keldagrim-townsfolk-first-greeting-precedent", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_drunken_dwarf",
+      "placedNpc": "dwarf_city_drunken_dwarf_multi",
+      "state": "giantdwarf-1-subsequent",
+      "vars": {"giantdwarf_quest": 1, "ordinary_dialogue_bits": 1},
+      "allowed": {"npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "What are you doing here anyway?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "What are you doing here anyway?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-east-drunken-dwarf-article", "src.keldagrim-townsfolk-drunk-quest-check", "src.keldagrim-townsfolk-first-greeting-precedent", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_drunken_dwarf",
+      "placedNpc": "dwarf_city_drunken_dwarf_multi",
+      "state": "giantdwarf-2-initial",
+      "vars": {"giantdwarf_quest": 2, "ordinary_dialogue_bits": 0},
+      "allowed": {"npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "Hey, you look vaguely familiar... haven't I seen you somewhere before?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "Hey, you look vaguely familiar... haven't I seen you somewhere before?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "menus": [], "afterVars": {"ordinary_dialogue_bits": 1}}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-east-drunken-dwarf-article", "src.keldagrim-townsfolk-drunk-quest-check", "src.keldagrim-townsfolk-first-greeting-precedent", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_drunken_dwarf",
+      "placedNpc": "dwarf_city_drunken_dwarf_multi",
+      "state": "giantdwarf-2-subsequent",
+      "vars": {"giantdwarf_quest": 2, "ordinary_dialogue_bits": 1},
+      "allowed": {"npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "What are you doing here anyway?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "What are you doing here anyway?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-east-drunken-dwarf-article", "src.keldagrim-townsfolk-drunk-quest-check", "src.keldagrim-townsfolk-first-greeting-precedent", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_drunken_kebab",
+      "placedNpc": "dwarf_city_drunken_dwarf_multi",
+      "state": "giantdwarf-1-initial",
+      "vars": {"giantdwarf_quest": 1, "ordinary_dialogue_bits": 0},
+      "allowed": {"npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "Hey, you look vaguely familiar... haven't I seen you somewhere before?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "Hey, you look vaguely familiar... haven't I seen you somewhere before?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "menus": [], "afterVars": {"ordinary_dialogue_bits": 1}}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-east-drunken-dwarf-article", "src.keldagrim-townsfolk-drunk-quest-check", "src.keldagrim-townsfolk-first-greeting-precedent", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_drunken_kebab",
+      "placedNpc": "dwarf_city_drunken_dwarf_multi",
+      "state": "giantdwarf-1-subsequent",
+      "vars": {"giantdwarf_quest": 1, "ordinary_dialogue_bits": 1},
+      "allowed": {"npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "What are you doing here anyway?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "What are you doing here anyway?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-east-drunken-dwarf-article", "src.keldagrim-townsfolk-drunk-quest-check", "src.keldagrim-townsfolk-first-greeting-precedent", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_drunken_kebab",
+      "placedNpc": "dwarf_city_drunken_dwarf_multi",
+      "state": "giantdwarf-2-initial",
+      "vars": {"giantdwarf_quest": 2, "ordinary_dialogue_bits": 0},
+      "allowed": {"npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "Hey, you look vaguely familiar... haven't I seen you somewhere before?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "Hey, you look vaguely familiar... haven't I seen you somewhere before?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "menus": [], "afterVars": {"ordinary_dialogue_bits": 1}}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-east-drunken-dwarf-article", "src.keldagrim-townsfolk-drunk-quest-check", "src.keldagrim-townsfolk-first-greeting-precedent", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "dwarf_city_drunken_kebab",
+      "placedNpc": "dwarf_city_drunken_dwarf_multi",
+      "state": "giantdwarf-2-subsequent",
+      "vars": {"giantdwarf_quest": 2, "ordinary_dialogue_bits": 1},
+      "allowed": {"npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "That'sh not likely... I've been here for eh...", "I've been here for...", "Yearsh!", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "What are you doing here anyway?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "options": [], "game": []},
+      "branches": [
+        {"choices": [], "npc": ["Of courshe! Why why why *hic* why shouldn't I be?", "I've been looking after thish houshe for my... my coushin? Or wash it my brother? A family member anyway.", "All over, all over... he shaish he went off to wander all over Gielinor. Don't remember why.", "He comesh back sometimesh... saysh he needsh more kebabsh.", "Or ish that jusht a dream? Sometimesh I dream kebabsh invade Keldi... Keldu... Keldashomething.", "When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!", "THE KEBABSH WILL COME FOR YOU!"], "player": ["Hello there! Are you alright?", "What are you doing here anyway?", "And where is this... family member of yours?", "Hmm... I wonder, I may have met him...", "Er, yes, well, I think I should be off now."], "menus": []}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-east-drunken-dwarf-article", "src.keldagrim-townsfolk-drunk-quest-check", "src.keldagrim-townsfolk-first-greeting-precedent", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest"]
+    },
+    {
+      "npc": "vc_smokin_joe",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": [], "player": ["Hello!", "Hello?", "Hey!"], "options": [], "game": ["Smokin' Joe ignores you."]},
+      "branches": [
+        {"choices": [], "npc": [], "player": ["Hello!", "Hello?", "Hey!"], "menus": [], "game": ["Smokin' Joe ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-smokin-joe-transcript", "src.keldagrim-townsfolk-east-smokin-joe-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-ratcatchers-launch"]
+    },
+    {
+      "npc": "vc_smokin_joe",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": [], "player": ["Hello!", "Hello?", "Hey!"], "options": [], "game": ["Smokin' Joe ignores you."]},
+      "branches": [
+        {"choices": [], "npc": [], "player": ["Hello!", "Hello?", "Hey!"], "menus": [], "game": ["Smokin' Joe ignores you."]}
+      ],
+      "sourceIds": ["src.keldagrim-townsfolk-east-smokin-joe-transcript", "src.keldagrim-townsfolk-east-smokin-joe-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-ratcatchers-launch"]
+    }
+  ],
+  "deferred": [
+    {"npc": "dwarf_city_rowdy_dwarf", "content": "Keldagrim tasks and Forgettable Tale request/reward branches", "reason": "Task and later-quest systems are not published in the checked-out tree.", "sourceIds": ["src.keldagrim-townsfolk-east-rowdy-transcript", "src.keldagrim-townsfolk-east-rowdy-article"]},
+    {"npc": "dwarf_city_dwarf_man1", "content": "At-home Talk line and overhead chores errands", "reason": "The assigned map placement is the chores state; the home and overhead routines are not the selected ordinary Talk scenario.", "sourceIds": ["src.keldagrim-townsfolk-east-sune-transcript", "src.keldagrim-townsfolk-crowds-npc-cache"]},
+    {"npc": "dwarf_city_dwarf_man5", "content": "After The Giant Dwarf rebuilt-statue reply", "reason": "Published stages 1 and 2 are both during the unfinished quest. Neither writes completion or rebuilds the statue; both use the sourced During line.", "sourceIds": ["src.keldagrim-townsfolk-east-karl-transcript", "src.keldagrim-townsfolk-published-quest"]},
+    {"npc": "dwarf_city_dwarf_man8", "content": "Completed-Forgettable-Tale reply and item use on fireplaces or sink", "reason": "The completed quest state and item-use service branches are outside the published ordinary Talk scope.", "sourceIds": ["src.keldagrim-townsfolk-east-kjut-transcript", "src.keldagrim-townsfolk-east-kjut-article"]},
+    {"npc": "dwarf_city_drunken_dwarf_multi", "content": "Forgettable Tale quest exchanges and Treasure Trails puzzle-box dialogue", "reason": "The quest and clue-scroll service branches are not in the ordinary Talk scope.", "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-drunk-quest-check"]},
+    {"npc": "vc_the_beast", "content": "All Talk-to dialogue", "reason": "Whole Talk deferral pending Main handoff to the Ratcatchers unit. Revision 14792777 distinguishes pre-Ratcatchers “Hello cat” / glower / “Friendly aren't you?” from a post-completion greeting; revision 15012884 removes the prequest dialogue and marks that section incomplete. The current article says talking before permission only causes a glower. No dated game change explaining the change in documentation was identified; Ratcatchers/Rat Pits is absent from this tree.", "sourceIds": ["src.keldagrim-townsfolk-east-beast-transcript", "src.keldagrim-townsfolk-east-beast-article", "src.keldagrim-townsfolk-ratcatchers-launch"]},
+    {"npc": "vc_smokin_joe", "content": "Post-Ratcatchers quest and Rat Pits information/service dialogue", "reason": "Ratcatchers and the Rat Pits service are not published in the checked-out tree; the pre-Ratcatchers Talk branch is implemented separately.", "sourceIds": ["src.keldagrim-townsfolk-east-smokin-joe-transcript", "src.keldagrim-townsfolk-east-smokin-joe-article", "src.keldagrim-townsfolk-ratcatchers-launch"]}
+  ]
+}

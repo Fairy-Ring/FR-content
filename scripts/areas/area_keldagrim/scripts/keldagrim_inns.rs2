@@ -1,0 +1,88 @@
+// CANDIDATE: Transcript:Inn Keeper, unchanged retained 2023 transcript.
+[opnpc1,dwarf_city_inn_keeper_rich]
+~chatnpc("<p,neutral>Welcome to the King's Axe inn! What can I help you with?");
+~chatplayer("<p,neutral>Can I have some beer please?");
+~chatnpc("<p,neutral>Go to the bar downstairs. I only deal with residents.");
+~chatplayer("<p,neutral>Residents? People live here?");
+~chatnpc("<p,neutral>No, just guests that stay the night.");
+
+// CANDIDATE: Transcript:Barman (King's Axe Inn), revision 14289077 (2022).
+// Preserve sir/madam wording before the later transcript's friend wording.
+[opnpc1,dwarf_city_barman_rich]
+if (inv_total(inv, coins) > ^keldagrim_barman_rich_coins) {
+    ~chatnpc("<p,neutral>And what will it be for you, fine <text_gender(\"sir\", \"madam\")>?");
+} else {
+    ~chatnpc("<p,neutral>Yes? Can I help you with something?");
+}
+def_int $choice = ~p_choice4("A beer please.", 1, "A dwarven stout please.", 2, "A fine wine please.", 3, "Nothing, thanks.", 4);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>A beer please.");
+    ~chatnpc("<p,neutral>That'll be 1 gold coin please.");
+    ~keldagrim_barman_buy(beer, ^keldagrim_barman_beer_price, "<p,neutral>Here you go. One delicious pint of beer.");
+} else if ($choice = 2) {
+    ~chatplayer("<p,neutral>A dwarven stout please.");
+    ~chatnpc("<p,neutral>It'll be yours for just 2 gold coins!");
+    ~keldagrim_barman_buy(dwarven_stout, ^keldagrim_barman_stout_price, "<p,neutral>One dwarven stout, best in all of Keldagrim!");
+} else if ($choice = 3) {
+    ~chatplayer("<p,neutral>A fine wine please.");
+    ~chatnpc("<p,neutral>Ah, <text_gender(\"sir\", \"madam\")> has taste! A jug of wine will cost you 10 gold coins.");
+    ~keldagrim_barman_buy(wine, ^keldagrim_barman_wine_price, "<p,neutral>I hope <text_gender(\"sir\", \"madam\")> will enjoy it!");
+} else {
+    ~chatplayer("<p,neutral>Nothing, thanks.");
+}
+
+[proc,keldagrim_barman_buy](obj $drink, int $price, string $acknowledgement)
+if (~p_choice2("Pay.", 1, "Don't pay.", 2) = 2) {
+    ~chatplayer("<p,neutral>Sorry, I changed my mind.");
+    return;
+}
+if (inv_total(inv, coins) < $price) {
+    ~chatplayer("<p,neutral>I'm sorry, I seem to have run out of money.");
+    return;
+}
+// Existing pub purchase mechanism: rustyanchor_bartender_beer.
+inv_del(inv, coins, $price);
+inv_add(inv, $drink, 1);
+~chatnpc($acknowledgement);
+
+// CANDIDATE: Transcript:Barmaid. The published Forgettable Tale reaches only
+// its start, not the later Kelda-stout conversation or replacement service.
+[opnpc1,dwarf_city_barmaid_poor]
+~chatnpc("<p,neutral>Welcome to the Laughing Miner pub, human traveller.");
+def_int $choice = ~p_choice4("Who is that man walking around outside?", 1, "I'd like a beer please.", 2, "I'd like some food please.", 3, "I have to go.", 4);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Who is that man walking around outside?");
+    ~chatnpc("<p,neutral>What man?");
+    ~chatplayer("<p,neutral>I mean the dwarf, the one with the sign.");
+    ~chatnpc("<p,neutral>Oh, him. Yes, we employ him to advertise our pub, he's the cheapest labour we could find. We don't have a lot of money to spare you know, we pay him in beer.");
+    ~chatplayer("<p,neutral>But what's wrong with him?");
+    ~chatnpc("<p,neutral>Well, he's drunk isn't he?");
+    ~chatnpc("<p,neutral>I told you, he's cheap. He couldn't get any other work since the Red Axe fired him. Been drinking ever since.");
+    ~chatplayer("<p,neutral>How did that happen?");
+    ~chatnpc("<p,neutral>I'm not quite sure, I think he kept wearing the wrong coloured cap all the time. They don't much like it if you don't wear your red uniform into work.");
+    ~chatplayer("<p,neutral>They fired him for that??");
+    ~chatnpc("<p,neutral>The Red Axe will fire you for just about anything if they want to.");
+} else if ($choice = 2) {
+    ~chatplayer("<p,neutral>I'd like a beer please.");
+    ~chatnpc("<p,neutral>That'll be 2 gold coins.");
+    ~keldagrim_barmaid_buy(beer, ^keldagrim_barmaid_beer_price, "<p,neutral>Sorry, I don't have 2 coins on me.");
+} else if ($choice = 3) {
+    ~chatplayer("<p,neutral>I'd like some food please.");
+    ~chatnpc("<p,neutral>I can make you a stew for 20 gold coins.");
+    ~keldagrim_barmaid_buy(stew, ^keldagrim_barmaid_stew_price, "<p,neutral>Sorry, I don't have 20 coins on me.");
+} else {
+    ~chatplayer("<p,neutral>I have to go.");
+}
+
+[proc,keldagrim_barmaid_buy](obj $food, int $price, string $insufficient)
+if (~p_choice2("Pay.", 1, "Don't pay.", 2) = 2) {
+    ~chatplayer("<p,neutral>Sorry, I changed my mind.");
+    return;
+}
+if (inv_total(inv, coins) < $price) {
+    ~chatplayer($insufficient);
+    return;
+}
+inv_del(inv, coins, $price);
+inv_add(inv, $food, 1);
+~chatnpc("<p,neutral>Thanks for your custom.");

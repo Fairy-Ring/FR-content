@@ -286,6 +286,7 @@ jobs:
           run_test tests/wyvern/test_wyvern.mjs node --import tsx ../content/tests/wyvern/test_wyvern.mjs
           run_test tests/giant-mole/test_giant_mole.mjs node --import tsx ../content/tests/giant-mole/test_giant_mole.mjs
           run_test tests/soulbane/test_soulbane.mjs node --import tsx ../content/tests/soulbane/test_soulbane.mjs
+          run_test tests/keldagrim-townsfolk/test_keldagrim_townsfolk.mjs node --import tsx ../content/tests/keldagrim-townsfolk/test_keldagrim_townsfolk.mjs
           exit "$failed"
 
       - name: Write job summary

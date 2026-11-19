@@ -1,0 +1,417 @@
+// CANDIDATE: Ordinary West Talk follows the retained OSRS Wiki transcript histories.
+// The transcripts do not establish revision-377 wording; quest branches absent from the current world state stay excluded.
+// UNKNOWN: Gauss mixed inventory priority is the explicitly authorized beer > stout > wine interpretation.
+// UNKNOWN: The shared boatmen first-talk flag uses bit 1 of ordinary_dialogue_bits and is written before the first page.
+// KNOWN LIMIT: The five Between a Rock questions are deferred until a source-backed menu grouping is known.
+
+[opnpc1,dwarf_city_black_guard_supreme_leader]
+~chatnpc("<p,neutral>I hear you are the human that Veldaban has employed to help rebuild the statue. How is that going?");
+~chatplayer("<p,neutral>How did you know about that?");
+~chatnpc("<p,neutral>Veldaban is in my employ.");
+@keldagrim_west_supreme_menu;
+
+[label,keldagrim_west_supreme_menu]
+def_int $choice = ~p_choice3("Who are you?", 1, "What news have you?", 2, "I must go now.", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Who are you?");
+    ~chatnpc("<p,neutral>I am Bisi. I am the Supreme Commander of the Black Guard.");
+    ~chatplayer("<p,neutral>I thought Veldaban was in command?");
+    ~chatnpc("<p,neutral>Only of our regiment in Keldagrim, and a most honourable position it is as well.");
+    ~chatnpc("<p,neutral>But the Black Guard has many regiments across the dwarven realm. All the Commanders of those regiments report to me.");
+    if (%mcannon = ^mcannon_complete) {
+        ~chatplayer("<p,neutral>Oh yes, I helped Commander Lawgof once, in his fight against the goblins.");
+        ~chatnpc("<p,neutral>That's good to hear.");
+    }
+    @keldagrim_west_supreme_menu;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>What news have you?");
+    ~chatnpc("<p,neutral>Apart from the statue of King Alvis falling down, you mean? I don't know. There is something suspicious about the whole case.");
+    ~chatplayer("<p,neutral>How do you mean?");
+    ~chatnpc("<p,neutral>We've had several incidents recently. For a while we even closed off the city. And now this.");
+    @keldagrim_west_supreme_menu;
+}
+~chatplayer("<p,neutral>I must go now.");
+~chatnpc("<p,neutral>Then I bid you farewell, human.");
+
+[opnpc1,dwarf_city_shop_ship_mechanic]
+~chatnpc("<p,neutral>What can I interest you in? Need any pipes? I make very sturdy pipes.");
+~chatplayer("<p,neutral>No, not really... what kind of shop is this anyway?");
+~chatnpc("<p,neutral>Why, it's Wemund's Wrench Warehouse. Wemund, that's me.");
+~chatnpc("<p,neutral>I don't really sell just wrenches, you know, I sell anything related to the maintenance of dwarven steam machines.");
+~chatnpc("<p,neutral>Sometimes I do repair work as well. Or I send my assistant.");
+~chatplayer("<p,neutral>Who's he then?");
+~chatnpc("<p,neutral>Oh, he's right over there... used to work in the mines to the south, poor lad. Made a bit of a mess of things I believe.");
+~chatnpc("<p,neutral>So what'll it be then? Got any ship engines to repair?");
+~chatplayer("<p,neutral>Thanks, but I don't think your services are required.");
+
+[opnpc1,dwarf_city_excentric_dwarf]
+~chatnpc("<p,angry>Get out of my house!");
+~chatplayer("<p,neutral>Alright, alright, I was just leaving!");
+
+[opnpc1,dwarf_city_gardener_dwarf]
+~chatnpc("<p,neutral>Come to visit my garden then, have you, human?");
+def_int $garden = ~p_choice2("This is your garden?", 1, "Not really, no.", 2);
+if ($garden = 1) {
+    ~chatplayer("<p,neutral>This is your garden?");
+    ~chatnpc("<p,neutral>No no, not quite. But I do look after it. It's the palace garden, you see. I keep it tidy, keep it living.");
+    ~chatnpc("<p,neutral>It's hard to grow much on these hard rocks deep beneath these mountains, you know.");
+    ~chatplayer("<p,neutral>I can imagine. Where do you get all your food from? Or even the soil for this garden?");
+    ~chatnpc("<p,neutral>We can grow a little food underground, but most of it comes from the extensive steamcart network that runs beneath the earth.");
+    ~chatnpc("<p,neutral>In the Era of Kings, many centuries ago, it was harder of course. Our steam technology was not developed as far yet and getting fresh supplies of food was always a problem.");
+    ~chatnpc("<p,neutral>Oh, I'm not boring you, am I?");
+    def_int $interest = ~p_choice2("Not at all!", 1, "A little, yes.", 2);
+    if ($interest = 1) {
+        ~chatplayer("<p,neutral>Not at all! Please, go on!");
+        ~chatnpc("<p,neutral>Oh yes, as I was saying, it was difficult to make a decent living here. I'm afraid this garden was rather neglected during that time.");
+        ~chatplayer("<p,neutral>Why did you dwarves stay so deep under ground, then? Why not simply go above ground?");
+        ~chatnpc("<p,neutral>What, with the wars raging up there?");
+        ~chatnpc("<p,neutral>We dwarves went underground a long time ago, see. For a while the city of Keldagrim was completely cut off from the rest of Gielinor simply waiting out the wars of the humans and the gods.");
+        ~chatnpc("<p,neutral>This made it hard, though, to determine when the wars above the ground were over. Perhaps Keldagrim had remained hidden for far too long.");
+        ~chatnpc("<p,neutral>Only when King Alvis heroically defended the city against an invasion of trolls did we dare to venture out and see how much the world had changed.");
+        ~chatnpc("<p,neutral>Of course, after that...");
+        ~chatnpc("<p,neutral>Ah well, enough history lessons I should say. I must really get back to my gardening.");
+        ~chatplayer("<p,neutral>Thanks for the info!");
+        return;
+    }
+    ~chatplayer("<p,neutral>A little, yes. I don't really know what all this has to do with anything.");
+    ~chatnpc("<p,neutral>I suppose it doesn't, really, it's just the mumblings of an old dwarf.");
+    return;
+}
+~chatplayer("<p,neutral>Not really, no.");
+~chatnpc("<p,neutral>Oh, alright then.");
+
+[opnpc1,dwarf_city_old_dwarf1]
+~chatplayer("<p,neutral>Hello, can I ask you a question?");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>Oh yes, young fellow? Yes, what do you want?");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,neutral>Who's that you're talking to Hegir?");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>Let me see, he appears to be a human of some sort.");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>What was your name again, human?");
+~chatplayer("<p,neutral><displayname>.");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>It's <displayname>!");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,neutral>Well ask him what he wants then!");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>What do you want, human?");
+~chatplayer("<p,neutral>Errr... I don't know... A quest, maybe?");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>He says he's looking for his quest!");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,neutral>What makes him think he lost his quest in here?");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>What makes you think you lost your quest in here?");
+~chatplayer("<p,neutral>No no, I mean, do you have a task of some sort for me?");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>Now he says he wants a task!");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,angry>Stop talking to that human and get back in here before I have a task for you!");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>No need to talk to me like that, Haera.");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,angry>I'll talk to you in whatever way I like!");
+~chatplayer("<p,neutral>I think I hear someone calling my name in the distance...");
+
+[opnpc1,dwarf_city_old_dwarf2]
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,neutral>What are you doing in our home?");
+~chatplayer("<p,neutral>I just came to ask you a question.");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,angry>Hegir, why did you let this human into our home?");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>I didn't let him in, he let himself in!");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,angry>Now what do you want, human? Speak up, speak up!");
+~chatplayer("<p,neutral>I ehm, just wanted some information.");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,angry>Well go ask someone else instead of barging into people's homes!");
+~chatnpc_specific("Hegir", dwarf_city_old_dwarf1, "<p,neutral>There's no need to be rude to the human, Haera dear.");
+~chatnpc_specific("Haera", dwarf_city_old_dwarf2, "<p,angry>Now don't you dear me. I'll do whatever I please.");
+~chatplayer("<p,neutral>I think this is my cue to leave...");
+
+[opnpc1,dwarf_city_dwarf_man6]
+~chatnpc("<p,neutral>I say, I say, a toast to this fine human!");
+~chatplayer("<p,neutral>What? I mean, err... why?");
+~chatnpc("<p,neutral>Why not!");
+if (inv_total(inv, beer) > 0) {
+    ~chatplayer("<p,happy>Why not indeed! Cheers!");
+    ~chatnpc("<p,happy>Cheers!");
+    anim(human_clink_beerglass, 0);
+    npc_anim(dwarf_clink_beerglass, 0);
+    inv_del(inv, beer, 1);
+    inv_add(inv, beer_glass, 1);
+    return;
+}
+if (inv_total(inv, dwarven_stout) > 0) {
+    ~chatplayer("<p,happy>Why not indeed! Cheers!");
+    ~chatnpc("<p,happy>Cheers!");
+    anim(human_clink_beerglass, 0);
+    npc_anim(dwarf_clink_beerglass, 0);
+    inv_del(inv, dwarven_stout, 1);
+    inv_add(inv, beer_glass, 1);
+    return;
+}
+if (inv_total(inv, wine) > 0) {
+    ~chatplayer("<p,neutral>Well, I have this jug of wine...");
+    ~chatnpc("<p,neutral>No no, get a pint of beer, jugs of wine aren't good to toast with! Wine stains are terribly hard to wash out of a beard.");
+    return;
+}
+~chatplayer("<p,neutral>I don't have anything suitable to toast with.");
+~chatnpc("<p,neutral>Then go get something from the bar!");
+
+[opnpc1,dwarf_city_dwarf_man7]
+~chatnpc("<p,neutral>Hello there, human.");
+@keldagrim_west_myndill_menu;
+
+[label,keldagrim_west_myndill_menu]
+def_int $choice = ~p_choice3("Do you have any news?", 1, "Do you have any quests?", 2, "See you later!", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>Do you have any news?");
+    ~chatnpc("<p,neutral>Well, I heard some human knocked over the statue of King Alvis recently. You know anything about that?");
+    ~chatplayer("<p,neutral>Hey, it wasn't my fault! I was just travelling on the boat!");
+    @keldagrim_west_myndill_menu;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>Do you have any quests?");
+    if (%giantdwarf_quest = 1 | %giantdwarf_quest = 2) {
+        ~chatnpc("<p,neutral>Weren't you on a quest yourself right now? Something to do with... knocking over a statue?");
+        ~chatplayer("<p,neutral>Oh yes, you're right...");
+    } else {
+        ~chatnpc("<p,neutral>Let me think for a moment...");
+        ~chatnpc("<p,neutral>No, I have nothing that I could possible want doing. Try the shops or the market instead.");
+    }
+    @keldagrim_west_myndill_menu;
+}
+~chatplayer("<p,neutral>See you later!");
+~chatnpc("<p,neutral>Perhaps!");
+
+[opnpc1,dwarf_city_dwarf_man9]
+~chatplayer("<p,neutral>Say, aren't you a bit tall for a dwarf?");
+~chatnpc("<p,neutral>Was there anything in particular you wanted?");
+def_int $choice = ~p_choice2("I'd like a quest please.", 1, "No, I just like talking to strangers.", 2);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>I'd like a quest please.");
+    ~chatnpc("<p,neutral>I have nothing to do for you, I'm afraid. Ask around town, though, there are always people who need some work done around here.");
+    return;
+}
+~chatplayer("<p,neutral>No, I just like talking to strangers.");
+~chatnpc("<p,neutral>Well I don't.");
+
+[opnpc1,dwarf_city_dwarf_man10]
+~chatnpc("<p,neutral>What to buy? What to buy?");
+~chatnpc("<p,neutral>Oh, hello human.");
+~chatplayer("<p,neutral>Anything I can help you with?");
+~chatnpc("<p,neutral>Only if you can help me make a suggestion on what to buy.");
+~chatplayer("<p,neutral>I smell a quest!");
+~chatnpc("<p,neutral>No, not really. I just need some advice on what to buy, that's all.");
+def_int $choice = ~p_choice5("New clothes.", 1, "A warhammer.", 2, "A piece of rope.", 3, "An oversized hat.", 4, "Nothing.", 5);
+if ($choice = 1) {
+    ~chatplayer("<p,neutral>You should buy some new clothes. You can't go around town wearing what you're wearing.");
+    ~chatnpc("<p,neutral>You're right, this is a little drab. I shouldn't really go around Keldagrim-West wearing this, should I?");
+    ~chatnpc("<p,neutral>Of course I still don't know what colour I should get. I don't want to accidentally offend the wrong company of course.");
+    ~chatplayer("<p,neutral>Never mind.");
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,neutral>You should get yourself a big mighty warhammer.");
+    ~chatnpc("<p,neutral>I don't think so. The warhammer shop is run by the Red Axe. I'd rather stay out of there.");
+    ~chatplayer("<p,neutral>You don't like the Red Axe?");
+    ~chatnpc("<p,neutral>They're all a lot of bullies if you ask me.");
+    return;
+}
+if ($choice = 3) {
+    ~chatplayer("<p,neutral>Get yourself a long piece of rope.");
+    ~chatnpc("<p,neutral>What would I do with a rope?");
+    ~chatplayer("<p,neutral>I don't know. I generally find a rope useful while adventuring.");
+    ~chatnpc("<p,neutral>I don't do a lot of adventuring to be honest.");
+    return;
+}
+if ($choice = 4) {
+    ~chatplayer("<p,neutral>An oversized hat. In a ridiculous colour.");
+    ~chatnpc("<p,neutral>No one is selling hats here, that's not a very helpful suggestion at all.");
+    return;
+}
+~chatplayer("<p,neutral>Nothing. You should buy absolutely nothing.");
+~chatnpc("<p,neutral>Now that's the best idea I've heard all day.");
+~chatplayer("<p,neutral>I thought so! Now why don't you give me some of the money I saved you?");
+~chatnpc("<p,neutral>No, I don't think so. I think I'd rather buy something with my money after all.");
+
+[opnpc1,dwarf_city_dwarf_man11]
+~chatnpc("<p,neutral>Oh, don't bother me human.");
+~chatplayer("<p,neutral>Why not? What's wrong?");
+~chatnpc("<p,neutral>You are wrong, human. Your attire is outrageous. Your presence is obnoxious.");
+~chatplayer("<p,neutral>What? What are you saying?");
+~chatnpc("<p,neutral>I'm saying you're in my way.");
+
+[opnpc1,dwarfrock_boatman_bruv1]
+~keldagrim_west_boatmen_talk();
+
+[opnpc1,dwarfrock_boatman_bruv2]
+~keldagrim_west_boatmen_talk();
+
+[opnpc1,dwarfrock_boatman_bruv3]
+~keldagrim_west_boatmen_talk();
+
+[proc,keldagrim_west_boatmen_talk]
+def_int $menu_stage = %giantdwarf_quest;
+def_int $choice = 0;
+if (testbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked) = ^false) {
+    %ordinary_dialogue_bits = setbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked);
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Oh look, a human!");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>A human? Can we eat it?");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>No, you rock brain! Humans are our friends!");
+    ~chatplayer("<p,neutral>Hello, excuse me...");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Not sure if I would call them our friends... Not enemies either, of course.");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Not like the trolls. We hate trolls.");
+    ~chatplayer("<p,neutral>Excuse me, I just want to-");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Nothing's worse than a troll.");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Except discovering that your pickaxe's gone blunt just as you-");
+    ~chatplayer("<p,neutral>Excuse me!!!");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Why, hello, yes, what is it?");
+    ~chatplayer("<p,neutral>I er... well, who are you?");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>I'm Derni.");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>I'm Dernu.");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>And I'm Miodvetnir. These are my brothers. And who might you be?");
+    ~chatplayer("<p,neutral>My name is <displayname>.");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Pleased to meet you, <displayname>!");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>I say, we don't get to see a hummon down here very often!");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>It's a human, you metal head! You should pay more attention!");
+    ~chatplayer("<p,neutral>So, can I ask you dwarves a few questions?");
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Of course, we love answering questions!");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>We're very good at answering questions!");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Fire away!");
+} else {
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Hello again, <displayname>!");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Are you lost down here?");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Or were you just stopping by for a chat?");
+    ~chatplayer("<p,neutral>Just stopping by for a chat.");
+}
+@keldagrim_west_boatmen_menu;
+
+[label,keldagrim_west_boatmen_menu]
+$choice = 0;
+if ($menu_stage = 0) {
+    if (%forget_quest = 1) {
+        $choice = ~p_choice5("What's down this river?", 1, "Any good spots to fish around here?", 2, "What are these mines used for?", 3, "Do you know about this drunken dwarf...?", 4, "I must be off now.", 5);
+    } else {
+        $choice = ~p_choice4("What's down this river?", 1, "Any good spots to fish around here?", 2, "What are these mines used for?", 3, "I must be off now.", 4);
+    }
+    if ($choice = 1) {
+        ~chatplayer("<p,neutral>What's down this river?");
+        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Oh, you don't know?");
+        ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral><text_gender(\"He\", \"She\")> doesn't know?");
+        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral><text_gender(\"He\", \"She\")> doesn't know!");
+        ~chatplayer("<p,neutral>Can't you just tell me?");
+        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>It is our glorious city!");
+        ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>The grand city of the dwarves!");
+        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Sparkling jewel of the mountain!");
+        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Keldagrim, our home!");
+        ~chatplayer("<p,neutral>Can you take me there?");
+        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Oh no, we can't do that.");
+        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>We're far too busy.");
+        ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>You have to keep busy, you see.");
+        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Always keep busy, is what our good father used to say.");
+        ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Besides, there's been some weird going ons in the city.");
+        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Don't tell <text_gender(\"him\", \"her\")> that! None of <text_gender(\"his\", \"her\")> business!");
+        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Only fair if <text_gender(\"he\", \"she\")> wants to go into the city.");
+        ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Oh yes, they only just cleaned up the mess from the last little incident.");
+        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>So watch out if you ever do manage to travel to the city! Weird things could happen!");
+        @keldagrim_west_boatmen_menu;
+    }
+    if ($choice = 2) {
+        @keldagrim_west_boatmen_fishing;
+    }
+    if ($choice = 3) {
+        @keldagrim_west_boatmen_mines;
+    }
+    if ($choice = 4 & %forget_quest = 1) {
+        @keldagrim_west_boatmen_drunk;
+    }
+    if ($choice = 4 & %forget_quest = 0) {
+        @keldagrim_west_boatmen_goodbye;
+    }
+    if ($choice = 5) {
+        @keldagrim_west_boatmen_goodbye;
+    }
+}
+if ($menu_stage = 1 | $menu_stage = 2) {
+    if (%forget_quest = 1) {
+        $choice = ~p_choice5("Any good spots to fish around here?", 1, "What are these mines used for?", 2, "I need some help with this statue...", 3, "Do you know about this drunken dwarf...?", 4, "I must be off now.", 5);
+    } else {
+        $choice = ~p_choice4("Any good spots to fish around here?", 1, "What are these mines used for?", 2, "I need some help with this statue...", 3, "I must be off now.", 4);
+    }
+    if ($choice = 1) {
+        @keldagrim_west_boatmen_fishing;
+    }
+    if ($choice = 2) {
+        @keldagrim_west_boatmen_mines;
+    }
+    if ($choice = 3) {
+        ~chatplayer("<p,neutral>I need some help with this statue... King Alvis' statue, to be precise.");
+        ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Oh yes, what's the problem then?");
+        ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>It was knocked down, remember? Parts of it nearly landed on our heads?");
+        ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>A terrible noise it made too!");
+        ~chatplayer("<p,neutral>Never mind.");
+        @keldagrim_west_boatmen_menu;
+    }
+    if ($choice = 4 & %forget_quest = 1) {
+        @keldagrim_west_boatmen_drunk;
+    }
+    if ($choice = 4 & %forget_quest = 0) {
+        @keldagrim_west_boatmen_goodbye;
+    }
+    if ($choice = 5) {
+        @keldagrim_west_boatmen_goodbye;
+    }
+}
+
+[label,keldagrim_west_boatmen_goodbye]
+~chatplayer("<p,neutral>I must be off now, thanks for the chat.");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>No problem!");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Glad to be of service!");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Come back any time!");
+return;
+[label,keldagrim_west_boatmen_fishing]
+~chatplayer("<p,neutral>Any good spots to fish around here?");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Fish?");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Fish?");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>What are fish?");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>No fish around here.");
+if (%fishingcompo = ^fishingcompo_complete) {
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Say, you're the Fishing Champion, aren't you?");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>That must be why you were talking about fish then...");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>What are fish?");
+}
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>But this water here, you see, it comes dripping down from above.");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Molten snow, you see.");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>What are fish?");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Oh, they're these small wriggly things that live in the water.");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>But they're not all small! Some can be large!");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>And they don't breathe air.");
+if (%fishingcompo = ^fishingcompo_complete) {
+    ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>But <displayname> could tell you all about it! After all, <text_gender(\"he's\", \"she's\")> the Fishing Champion!");
+    ~chatplayer("<p,neutral>Maybe later...");
+}
+@keldagrim_west_boatmen_menu;
+
+[label,keldagrim_west_boatmen_mines]
+~chatplayer("<p,neutral>What are these mines used for?");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>What does it look like they're used for?");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Isn't it obvious?");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>For mining of course!");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>These mines are actually the territory of one of the eight major companies of the mining Consortium.");
+if (%giantdwarf_quest = 0) {
+    ~chatplayer("<p,neutral>Mining companies? Where are they at then?");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Oh, they all have their headquarters in the city.");
+    ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>First floor of the palace.");
+    ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>No need to give <text_gender(\"him\", \"her\")> directions.");
+}
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>We haul all our goods to the city by ship, you see.");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Since the mine carts don't come here.");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>But because the river goes right to the city, this is just as easy.");
+@keldagrim_west_boatmen_menu;
+
+[label,keldagrim_west_boatmen_drunk]
+~chatplayer("<p,neutral>Do you know about this drunken dwarf...?");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Drunken dwarf?");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Yeah, we know a drunken dwarf!");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>In fact we know plenty!");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>There's this one really annoying dwarf though, he sometimes throws rocks at me for no reason.");
+~chatplayer("<p,neutral>Yeah, tell me about it.");
+~chatplayer("<p,neutral>The one I mean is his relative, living in the northeast of Keldagrim. I wonder if you could help me with him.");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Ah yes, him.");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Such a sad case, poor fellow.");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Who is he?");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,angry>Don't you know anything?");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Now now, there's no reason to get angry.");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>I suppose you're right. Well, he's a drunk dwarf that talks about kebabs a lot.");
+~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Has some pretty odd tales to tell too.");
+~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>And I understand he's the relative of that dwarf I mentioned earlier.");
+~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>I hope that helped, <displayname>?");
+~chatplayer("<p,neutral>Never mind.");
+@keldagrim_west_boatmen_menu;

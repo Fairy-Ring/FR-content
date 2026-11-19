@@ -1,0 +1,4 @@
+// UNKNOWN operator-authorized engineering state, assigned original slot 191.
+// Ordinary first-talk flags only; no client reader or transmission. Bits 1-31 remain free.
+[ordinary_dialogue_bits]
+scope=perm
