@@ -611,11 +611,20 @@ test('a second native action updates the timer deadline before the earlier deadl
   const target = lure(p);
   const oldDeadline = target.getVar(deadlineVar);
   const tracked = new Set([target]);
-  boundedTicksThrough(tracked, oldDeadline - nativeSetupWaitTicks - 3);
-  if (!p.inOperableDistance(target)) {
-    walkIntoNativeRange(p, target, () => countedWorldTick(tracked), oldDeadline - 3);
+  const setupDeadline = oldDeadline - 3;
+  boundedTicksThrough(tracked, setupDeadline - nativeSetupWaitTicks);
+  // Doormen continue their native wandering during the long Lure interval.
+  // Re-establish seclusion by ordinary owner movement, inside the original
+  // 512-turn setup budget; never move/freeze an NPC or postpone the late input.
+  while (World.currentTick < setupDeadline) {
+    if (hasWitness(p, target)) {
+      followToSeclusion(p, target, () => countedWorldTick(tracked), setupDeadline);
+    } else if (!p.inOperableDistance(target)) {
+      walkIntoNativeRange(p, target, () => countedWorldTick(tracked), setupDeadline);
+    } else {
+      countedWorldTick(tracked);
+    }
   }
-  boundedTicksThrough(tracked, oldDeadline - 3);
   assert.equal(World.currentTick, oldDeadline - 3);
   assert(p.inOperableDistance(target), `the actual late input is in native operation range: ${JSON.stringify({
     player: [p.level, p.x, p.z], npc: [target.level, target.x, target.z],

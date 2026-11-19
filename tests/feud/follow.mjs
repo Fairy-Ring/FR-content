@@ -61,7 +61,7 @@ function secludedDestination(p, target, witnesses, visited) {
   return null;
 }
 
-export function followToSeclusion(p, target) {
+export function followToSeclusion(p, target, advance = worldTick, stopTick = World.currentTick + nativeFollowWaitTicks) {
   assert(target.isActive, 'the original packed NPC is active');
   assert.equal(target.level, p.level, 'the lured NPC and player share a collision plane');
   assert.equal(target.target, p, 'native Lure assigned the owning player as the follow target');
@@ -74,8 +74,8 @@ export function followToSeclusion(p, target) {
   let remainingWaypoints = [];
   let previousPositions = null;
 
-  let ticks = 0;
-  for (; ticks < nativeFollowWaitTicks; ticks++) {
+  let ticks = 0, reached = false;
+  for (; ticks < nativeFollowWaitTicks && World.currentTick < stopTick; ticks++) {
     const positions = [p.x, p.z, target.x, target.z];
     const stationary = previousPositions?.every((value, index) => value === positions[index]);
     previousPositions = positions;
@@ -102,14 +102,17 @@ export function followToSeclusion(p, target) {
       // Do not lead a naive follower around the next corner until it catches up.
       if (remainingWaypoints.length) walkRoute(p, [remainingWaypoints.shift()]);
     }
-    worldTick();
+    advance();
     if (destination && p.level === destination.level && p.x === destination.x && p.z === destination.z &&
       !hasWitness(p, target) && p.inOperableDistance(target) &&
       occludedOriginalWitness(target, originalWitnesses, target.x, target.z) &&
       projectedWitnesses(p, target, p.x, p.z).length === 0 &&
-      occludedOriginalWitness(p, originalWitnesses, p.x, p.z)) break;
+      occludedOriginalWitness(p, originalWitnesses, p.x, p.z)) {
+      reached = true;
+      break;
+    }
   }
-  assert(ticks < nativeFollowWaitTicks, `native player movement and NPC follow reach the screened destination: ${JSON.stringify({
+  assert(reached, `native player movement and NPC follow reach the screened destination: ${JSON.stringify({
     tick: World.currentTick, destination, player: [p.level, p.x, p.z],
     destinations,
     npc: [target.level, target.x, target.z], followMode: target.targetOp,
