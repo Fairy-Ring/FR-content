@@ -244,7 +244,11 @@ function attackableTarget(p, name, requireNoWitness = false) {
 function assertAttackableQueueBound(npc) {
   const requests = [...npc.queue.all()];
   const timeoutRequests = requests.filter(request => request.queueId === ServerTriggerType.AI_QUEUE19);
-  assert.equal(requests.length, timeoutRequests.length, 'the repeat target has no unrelated native queue requests');
+  assert.equal(requests.length, timeoutRequests.length,
+    'the repeat target has no unrelated native queue requests: ' + JSON.stringify({
+      hp: npc.levels[NpcStat.HITPOINTS], poison: npc.getVar(poisonVar),
+      requests: requests.map(({ queueId, lastInt }) => ({ queueId, lastInt }))
+    }));
   const followCount = timeoutRequests.filter(request => request.lastInt === 0).length;
   const koCount = timeoutRequests.filter(request => request.lastInt === 1).length;
   assert(followCount <= 1, 'at most one follow timeout request is pending');
@@ -299,6 +303,7 @@ function observeNativeCallbacks(targets, action, observeCallback = null) {
   let currentTick = null;
   let callbacksThisTick = 0;
   let maxCallbacksInOneTick = 0;
+  let observationError = null;
   Npc.prototype.executeScript = function (script) {
     if (!targets.has(this)) return original.call(this, script);
     const tick = World.currentTick;
@@ -314,13 +319,20 @@ function observeNativeCallbacks(targets, action, observeCallback = null) {
     }
     const before = npcSnapshot(this);
     const result = original.call(this, script);
-    observeCallback?.({
-      npc: this, tick, before, after: npcSnapshot(this)
-    });
+    try {
+      observeCallback?.({
+        npc: this, tick, before, after: npcSnapshot(this)
+      });
+    } catch (error) {
+      // Native turn processing catches script errors. Re-throw the assertion
+      // outside that catch so an observer failure cannot become a logged pass.
+      observationError ??= error;
+    }
     return result;
   };
   try {
-    action();
+    try { action(); } catch (error) { throw observationError ?? error; }
+    if (observationError) throw observationError;
     return { callbacks, maxCallbacksInOneTick };
   } finally {
     Npc.prototype.executeScript = original;
@@ -721,8 +733,8 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     wield(p, 'bronze_dagger_p');
     execute('[proc,player_combat_stat]', p);
 
-    const target = attackableTarget(p, name);
-    assert(target, `an original ${name} placement is available`);
+    const target = attackableTarget(p, name, true);
+    assert(target, `an original unwitnessed ${name} placement is available`);
     assert.equal(target.baseType, id('NpcType', name));
     assert.equal(target.levels[NpcStat.HITPOINTS], initialHp);
     assert.equal(target.getVar(stateVar), 0);
@@ -1030,4 +1042,15 @@ test('four real attackable Lure/KO cycles survive ordinary logout with bounded q
   assert.equal([...target.queue.all()].length, 0, 'the final stale follow callback drains without rearming');
   assert(maxCallbacksInOneTick <= MAX_NPC_CALLBACKS_PER_TICK);
   assert(maxQueueDepth <= 2);
+});
+
+test('a native callback observer assertion cannot be swallowed by script error handling', () => {
+  const p = trialFixture();
+  const target = reachDistraction(p);
+  const original = Npc.prototype.executeScript;
+  const failure = new Error('deliberate native observer regression');
+  assert.throws(() => countedWorldTick(new Set([target]), null, () => { throw failure; }),
+    error => error === failure);
+  assert.equal(Npc.prototype.executeScript, original, 'the native executor is restored after an observer failure');
+  boundedTicksThrough(new Set([target]), target.getVar(deadlineVar) + 1);
 });
