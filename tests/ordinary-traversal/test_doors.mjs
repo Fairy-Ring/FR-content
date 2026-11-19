@@ -203,7 +203,10 @@ function dispatch(row) {
 }
 
 function passageEdges(bases, angle) {
-    const [dx, dz] = openDelta(bases[0].shape, angle);
+    let [dx, dz] = openDelta(bases[0].shape, angle);
+    // Shape 9 clips a ground square, not a straight-wall edge. Its leaf moves
+    // along openDelta; test crossing the vacated square perpendicular to it.
+    if (bases[0].shape === 9) [dx, dz] = [-dz, dx];
     const tangent = [-dz, dx];
     const edges = new Map();
     for (const base of bases) {
