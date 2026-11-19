@@ -168,6 +168,7 @@ jobs:
           run_test tests/farming/test_seed_sources.mjs node --import tsx ../content/tests/farming/test_seed_sources.mjs
           run_test 'tests/farming/test_master_farmer.mjs + tests/farming/test_general_seed_table.mjs' node --import tsx --test ../content/tests/farming/test_master_farmer.mjs ../content/tests/farming/test_general_seed_table.mjs
           run_test tests/farming/test_tools.mjs node --import tsx ../content/tests/farming/test_tools.mjs
+          run_test tests/farming/test_inspect.mjs node --import tsx ../content/tests/farming/test_inspect.mjs
           run_test tests/pickpocketing/test_pickpocketing.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/pickpocketing/test_pickpocketing.mjs
           run_test tests/thieving-stalls/test_stalls.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --random-seed=377 --import tsx ../content/tests/thieving-stalls/test_stalls.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
