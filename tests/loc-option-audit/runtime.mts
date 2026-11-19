@@ -19,6 +19,7 @@ function runWitnesses(witnesses: Option[]): number {
     setState(player, root, witness.form.states[0]);
     const loc = new Loc(1, 8, 8, root.width, root.length, EntityLifeCycle.FOREVER, root.id, 10, 0);
     const packets: unknown[] = [];
+    loc.isActive = true;
     player.write = packet => { packets.push(packet); };
     const original = World.getLoc;
     try {

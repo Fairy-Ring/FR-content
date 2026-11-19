@@ -164,6 +164,7 @@ export function probe(root: LocType, form: Form, client: Map<number, LocType>): 
   player.level = 1;
   player.write = () => {};
   const loc = new Loc(1, 8, 8, root.width, root.length, EntityLifeCycle.FOREVER, root.id, 10, 0);
+  loc.isActive = true;
   const original = World.getLoc;
   const options: Option[] = [];
   try {
