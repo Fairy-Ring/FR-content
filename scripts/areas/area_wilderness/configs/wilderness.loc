@@ -4434,6 +4434,8 @@ recol6d=5184
 active=yes
 op1=Open
 raiseobject=no
+category=door_closed
+param=next_loc_stage,wild_door_open
 
 [wild_door_open]
 name=Door
@@ -4454,6 +4456,8 @@ recol6d=5184
 active=yes
 op1=Close
 raiseobject=no
+category=door_opened
+param=next_loc_stage,wild_door
 
 [wild_doubledoor_l]
 name=Door
@@ -4473,6 +4477,8 @@ recol6s=11458
 recol6d=5184
 op1=Open
 raiseobject=no
+category=door_left_closed
+param=next_loc_stage,wild_doubledoor_open_l
 
 [wild_doubledoor_r]
 name=Door
@@ -4493,6 +4499,8 @@ recol6d=5184
 op1=Open
 mirror=yes
 raiseobject=no
+category=door_right_closed
+param=next_loc_stage,wild_doubledoor_open_r
 
 [wild_doubledoor_open_l]
 name=Door
@@ -4512,6 +4520,8 @@ recol6s=11458
 recol6d=5184
 op1=Close
 raiseobject=no
+category=door_left_opened
+param=next_loc_stage,wild_doubledoor_l
 
 [wild_doubledoor_open_r]
 name=Door
@@ -4532,6 +4542,8 @@ recol6d=5184
 op1=Close
 mirror=yes
 raiseobject=no
+category=door_right_opened
+param=next_loc_stage,wild_doubledoor_r
 
 [wild_banner]
 name=Banner
