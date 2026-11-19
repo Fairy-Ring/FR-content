@@ -1,3 +1,3 @@
-// UNKNOWN engineering landing: the northwest ground ladder is absent.
-// The three mapped fortress bases use z+1 at angle 0 and z-1 at angle 2.
+// UNKNOWN engineering landing beside wild_ladder_broken at L0 3022,3638, angle 2.
+// Like the northeast base, angle 2 gives z-1; return through doors to the northeast ascent.
 ^ordinary_wild_northwest_ground = 0_47_56_14_53

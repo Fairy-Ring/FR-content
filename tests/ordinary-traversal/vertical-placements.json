@@ -261,22 +261,9 @@
       2947,
       3363
     ],
-    "destination": [
-      1,
-      2947,
-      3363
-    ],
-    "target": {
-      "name": "ladder_11741",
-      "level": 1,
-      "x": 2946,
-      "z": 3363,
-      "shape": 10,
-      "angle": 1,
-      "coord": "1_46_52_2_35"
-    },
+    "built": false,
     "label": "UNKNOWN",
-    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+    "basis": "Left, owner none: unreachable in the original map. Falador bank back room has no entrance; review packed collision component is 20 tiles at L0. Both placements of this pair are unjoined."
   },
   {
     "name": "ladder_11739",
@@ -1284,22 +1271,9 @@
       2947,
       3363
     ],
-    "destination": [
-      0,
-      2947,
-      3363
-    ],
-    "target": {
-      "name": "ladder_11739",
-      "level": 0,
-      "x": 2946,
-      "z": 3363,
-      "shape": 10,
-      "angle": 1,
-      "coord": "0_46_52_2_35"
-    },
+    "built": false,
     "label": "UNKNOWN",
-    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+    "basis": "Left, owner none: unreachable in the original map. Falador bank upper room has no entrance; review packed collision component is 19 tiles at L1. The native reach check accepts only the blocked ladder square. Both placements of this pair are unjoined."
   },
   {
     "name": "ladder_11741",
@@ -1756,7 +1730,7 @@
     ],
     "target": null,
     "label": "UNKNOWN",
-    "basis": "Facing-relative landing relation of the three mapped fortress bases: angle 0 -> z+1; angle 2 -> z-1. No ground ladder at this corner; walk to another corner to ascend."
+    "basis": "Landing beside the original wild_ladder_broken at L0 3022,3638, angle 2: z-1 as at the northeast base. Return through original doors to the northeast ascent; no climb option is added to the broken base."
   },
   {
     "name": "wild_ladder_middle",

@@ -14,7 +14,9 @@ const ScriptRunner = await load('engine/script/ScriptRunner.ts');
 const ScriptState = await load('engine/script/ScriptState.ts');
 const OpLocHandler = await load('network/game/client/handler/OpLocHandler.ts');
 const OpLoc = await load('network/game/client/model/OpLoc.ts');
-const links = JSON.parse(readFileSync(new URL('./vertical-placements.json', import.meta.url), 'utf8'));
+const inventory = JSON.parse(readFileSync(new URL('./vertical-placements.json', import.meta.url), 'utf8'));
+const links = inventory.filter(row => row.built !== false);
+const left = inventory.filter(row => row.built === false);
 const source = readFileSync(path.join(content, 'scripts/ladders+stairs/scripts/ordinary_377.rs2'), 'utf8');
 const boundNames = new Set([...source.matchAll(/^\[oploc[1-5],([^\]]+)\]/gm)].map(m => m[1]));
 const packNames = new Map(readFileSync(path.join(content, 'pack/loc.pack'), 'utf8').trim().split('\n').map(line => {
@@ -41,9 +43,9 @@ for (const name of readdirSync(path.join(content, 'maps')).filter(n => /^m\d+_\d
     if (packNames.get(id) === 'wild_door') nativeDoors.push({ name: packNames.get(id), level, x, z, shape, angle });
   }
 }
-assert.deepEqual([...new Set(links.map(key))].sort(), native.map(key).sort(), 'every native placement of every bound ordinary loc is inventoried');
-assert.equal(new Set(links.map(r => `${key(r)}:${r.direction}`)).size, links.length, 'one expectation per placement and direction');
-for (const row of links) {
+assert.deepEqual([...new Set(inventory.map(key))].sort(), native.map(key).sort(), 'every native placement of every bound ordinary loc is inventoried, including explicit left placements');
+assert.equal(new Set(inventory.map(r => `${key(r)}:${r.direction}`)).size, inventory.length, 'one expectation per placement and direction');
+for (const row of inventory) {
   const original = native.find(n => key(n) === key(row));
   assert.deepEqual([row.shape, row.angle], [original.shape, original.angle], `${key(row)} keeps original geometry`);
 }
@@ -103,29 +105,30 @@ function routeEnd(start, accepts, radius = 10) {
   }
   return null;
 }
-function returnApproach(at, row) {
-  if (row.name === 'ladder_11741' && row.level === 1 && row.x === 2946 && row.z === 3363) {
-    return at[0] === 1 && at[1] === 2947 && at[2] === 3363;
-  }
-  return reachable(at, row);
-}
 const openedName = new Map([
   ['vampire_trap1', 'vampire_trap2'],
 ]);
 let directions = 0;
 let menus = 0;
 let returns = 0;
+assert.equal(left.length, 2, 'both unreachable Falador bank-room placements are left');
+for (const row of left) {
+  const p = playerAt(row.start);
+  const before = [...p.stats];
+  const result = executeNative(p, row, 1);
+  assert.deepEqual(result.destination, row.start, `${key(row)}: no destination case executes`);
+  assert.deepEqual([...p.stats], before, 'unjoined ladder gives no XP');
+  assert.equal(p.getApTrigger(), null, 'no special approach binding remains');
+}
+const broken = { name: 'wild_ladder_broken', level: 0, x: 3022, z: 3638, shape: 10, angle: 2 };
+locFor(broken);
+assert.ok(types.LocType.get(types.LocType.getId(broken.name)).op.every(option => option === null), 'broken ground ladder offers no action option; cache refusal sentence is examine text');
+const brokenPlayer = playerAt([0, 3022, 3637]);
+brokenPlayer.originX = brokenPlayer.x; brokenPlayer.originZ = brokenPlayer.z;
+assert.equal(new OpLocHandler().handle(new OpLoc(1, broken.x, broken.z, types.LocType.getId(broken.name)), brokenPlayer), false, 'no climb/refusal handler is invented for the broken base');
 for (const row of links) {
   walkable(row.start);
-  const specialApproach = row.name === 'ladder_11741' && row.level === 1 && row.x === 2946 && row.z === 3363;
-  if (specialApproach) {
-    assert.equal(reachable(row.start, row), false, 'the original Falador reach check rejects its eastern floor');
-    assert.equal(reachable([row.level, row.x, row.z], row), true, 'the original reach check accepts the loc square');
-    assert.equal(map.isMapBlocked(row.x, row.z, row.level), true, 'that accepted loc square is blocked');
-    for (const [dx, dz] of [[-1, 0], [0, -1], [1, 0], [0, 1]]) {
-      assert.equal(reachable([row.level, row.x + dx, row.z + dz], row), false, 'the original reach check rejects every adjacent approach');
-    }
-  } else assert.ok(reachable(row.start, row), `${key(row)}: source is a reachable native approach`);
+  assert.ok(reachable(row.start, row), `${key(row)}: source is a reachable native approach`);
   const isTrap = openedName.has(row.name);
   const operations = row.name === 'wild_ladder_middle'
     ? [[1, row.direction === 'up' ? 1 : 2], [row.direction === 'up' ? 2 : 3, null]]
@@ -138,22 +141,21 @@ for (const row of links) {
       visible = { ...row, name: openedName.get(row.name) };
       locFor(visible);
     }
-    const result = executeNative(p, visible, slot, choice, specialApproach ? 'AP' : 'OP');
+    const result = executeNative(p, visible, slot, choice);
     assert.deepEqual(result.destination, row.destination, `${key(row)}: ${row.direction} destination`);
     assert.equal(result.pauses, choice === null ? 0 : 1, 'menu is offered only by the original Climb option');
     walkable(result.destination);
     directions++; menus += result.pauses;
     if (row.target) {
-      const targetAt = routeEnd(result.destination, at => returnApproach(at, row.target));
+      const targetAt = routeEnd(result.destination, at => reachable(at, row.target));
       assert.ok(targetAt, `${key(row)}: player can walk from landing to its native return partner`);
       const reverse = links.find(r => key(r) === key(row.target) && r.direction !== row.direction)
         ?? (row.target.name === 'ladder_1755' ? { ...row.target, direction: 'up' } : null);
       if (reverse && !openedName.has(reverse.name)) {
         [p.level, p.x, p.z] = targetAt;
-        const ap = reverse.name === 'ladder_11741' && reverse.x === 2946 && reverse.z === 3363;
-        const back = executeNative(p, reverse, reverse.name === 'wild_ladder_middle' ? (reverse.direction === 'up' ? 2 : 3) : 1, null, ap ? 'AP' : 'OP');
+        const back = executeNative(p, reverse, reverse.name === 'wild_ladder_middle' ? (reverse.direction === 'up' ? 2 : 3) : 1);
         walkable(back.destination);
-        assert.ok(routeEnd(back.destination, at => returnApproach(at, row)), `${key(row)}: return reaches the starting approach`);
+        assert.ok(routeEnd(back.destination, at => reachable(at, row)), `${key(row)}: return reaches the starting approach`);
         returns++;
       }
     } else {
@@ -175,7 +177,7 @@ for (const row of links) {
         opened.push(key(next.door));
         alternate = findAscent([p.level, p.x, p.z]);
       }
-      assert.ok(alternate, 'the corner without a ground ladder can open reachable native doors and walk to another original ascent');
+      assert.ok(alternate, 'the corner with a broken ground ladder can open reachable native doors and walk to another original ascent');
       [p.level, p.x, p.z] = alternate.at;
       const back = executeNative(p, alternate.row, 1);
       assert.deepEqual(back.destination, alternate.row.destination, 'the alternate original ascent actually returns upstairs');
@@ -185,9 +187,9 @@ for (const row of links) {
     }
   }
 }
-assert.equal(directions, 87, 'all original direct and menu ladder directions are executed');
+assert.equal(directions, 85, 'all retained original direct and menu ladder directions are executed');
 assert.equal(menus, 16, 'both choices of each original middle-ladder menu are executed');
-console.log(`RESULT PASS ordinary vertical: ${links.length} mapped directions, ${directions} native operations, ${menus} menu choices, ${returns} collision-checked returns`);
+console.log(`RESULT PASS ordinary vertical: ${links.length} mapped directions, ${directions} native operations, ${menus} menu choices, ${returns} collision-checked returns; ${left.length} unreachable placements dispatch nothing`);
 assert.equal(hamNative.length, 2, 'both HAM locs have exactly one original native placement');
 const hamRoot = hamNative.find(r => r.name === 'ham_multi_trapdoor');
 const hamLadder = hamNative.find(r => r.name === 'osf_ham_ladder');

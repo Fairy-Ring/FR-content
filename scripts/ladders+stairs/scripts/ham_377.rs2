@@ -1,6 +1,9 @@
 // Original 377 multiloc and varbit; period RuneHQ 24 April 2006 requires picklocking.
 // CANDIDATE rates, 4 XP and one-level failure drain: retained OSRS trapdoor revisions.
 // The older revision consistently says 4 XP; the latest prose still says 4, but its table says 3.8.
+// ordinary_ham_attempt_duration: UNKNOWN engineering, 0 ticks by transfer from
+// skill_thieving/scripts/doors/locked_door.rs2:118-175 (no attempt animation or delay).
+// Later OSRS "saving up to 5 ticks" is a lead that real attempts took time, not this value's source.
 [oploc5,osf_trapdoor_closed]
 p_arrivedelay;
 if (map_members = ^false) {
