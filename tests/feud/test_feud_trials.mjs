@@ -7,7 +7,7 @@ import {
 import { player } from './player.mjs';
 import {
   activeLoc, actors, assertKnockoutCycle, begin, bit, buyReceipts, deliver, displayNpcType, drink, hasWitness, locs,
-  nativeNpcTriggerName, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, tickThrough, wield
+  nativeNpcTriggerName, openOriginalVillagerCurtain, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, tickThrough, wield
 } from './fixture.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -187,6 +187,7 @@ test('native Feud trials allow the opening at level 29, gate the first theft at 
   assert.equal(repeatHp - p.levels[PlayerStat.HITPOINTS], 2, 'being caught preserves the sourced attack consequence');
 
   const beforeDistraction = count(p, 'coins');
+  openOriginalVillagerCurtain(p); // Ordinary Open makes the enclosed original target reachable before reservation.
   talk(p, 'feud_street_urchin');
   assert.equal(count(p, 'coins'), beforeDistraction, 'the player pays only after accepting the later distraction fee');
   assert.equal(stage(p), 8);
