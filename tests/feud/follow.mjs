@@ -32,7 +32,8 @@ function exactRoute(level, startX, startZ, endX, endZ) {
 }
 
 function secludedDestination(p, target, witnesses) {
-  for (let radius = 1; radius <= seclusionSearchRadius; radius++) {
+  // An adjacent destination can screen the player without moving a native follower.
+  for (let radius = 2; radius <= seclusionSearchRadius; radius++) {
     for (let x = target.x - radius; x <= target.x + radius; x++) {
       for (let z = target.z - radius; z <= target.z + radius; z++) {
         if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||

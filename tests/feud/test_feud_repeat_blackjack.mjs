@@ -229,9 +229,12 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   assert.equal(target.getVar(ownerVar), -1);
   assert.equal(target.getVar(deadlineVar), 0);
 
+  assert.equal(findTarget(p, 'feud_villager_multi_2', npc => npc === target && !hasWitness(p, npc)), target,
+    'the same original villager is naturally secluded before the wake-boundary KO');
   const relured = operate(p, target, 4);
   assert.equal(relured.trigger, nativeNpcTriggerName(p, target, 4));
   withRandom(0, () => operate(p, target, 5));
+  assert.equal(target.getVar(stateVar), 3, 'the wake-boundary attempt really knocks out the secluded villager');
   const wakeDeadline = target.getVar(deadlineVar);
   const beforeWakePick = { coins: count(p, 'coins'), xp: xp(p) };
   assert(wakeDeadline > World.currentTick);
