@@ -1,16 +1,22 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
 import './timeout-safety.mjs';
 import {
-  Packet, PlayerLoading, PlayerStat, World, count, engineModule, id, inv, inventory, obj, seed
+  Packet, PlayerLoading, PlayerStat, ScriptState, ServerTriggerType, World, button, contentRoot, count,
+  dialoguePage, engineModule, id, inv, inventory, map, obj, resumeDialogue, seed, types
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  bit, displayNpcType, hasWitness, operate, operationStand, read, stage, talk, tickThrough, wield, worldTick
+  actors, bit, displayNpcType, hasWitness, operate, operationStand, read, stage, stand, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const moveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
+const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const slotVar = id('VarPlayerType', 'feud_trial_villager');
 const stateVar = id('VarNpcType', 'feud_villager_state');
 const ownerVar = id('VarNpcType', 'feud_villager_owner');
@@ -20,6 +26,10 @@ const villagers = () => [...World.npcs].filter(npc => npc.isActive && villagerTy
 const owned = p => villagers().filter(npc => npc.getVar(stateVar) !== 0 && (npc.getVar(ownerVar) >>> 0) === p.uid);
 const xp = p => p.stats[PlayerStat.THIEVING];
 const nativeSetupWaitTicks = 512; // Existing native-geometry bound from follow.mjs, not a gameplay timeout.
+const shortStateTicks = Number(/^\^feud_villager_short_state_ticks\s*=\s*(\d+)$/m.exec(
+  readFileSync(path.join(contentRoot, 'scripts/quests/quest_feud/configs/feud_blackjack.constant'), 'utf8'))?.[1]);
+assert(Number.isInteger(shortStateTicks) && shortStateTicks > 0, 'the checked-out tree names its transient window');
+const trialResult = p => ({ stage: stage(p), coins: count(p, 'coins'), xp: xp(p), inventory: inventory(p) });
 
 function nativeLogoutAndReload(p) {
   const oldPid = p.pid, oldSlot = p.slot, username = p.username;
@@ -80,6 +90,45 @@ function reachDistraction(p) {
   assert.equal(owned(p).length, 1);
   assert.equal(p.getVar(slotVar), owned(p)[0].uid);
   return owned(p)[0];
+}
+
+function reachDistractionPage(p) {
+  if (stage(p) === 6) {
+    const first = villagers().find(npc => npc.getVar(stateVar) === 0 && operationStand(p, npc));
+    assert(first, 'an original placed villager can earn the first theft');
+    operate(p, first, 3);
+    assert.equal(stage(p), 7);
+  }
+  assert([7, 8].includes(stage(p)), 'the final page is reached only through an earned waiting checkpoint');
+  const urchin = actors('feud_street_urchin').find(npc => operationStand(p, npc));
+  assert(urchin, 'an original Street urchin has a reachable talk stand');
+  stand(p, urchin);
+  p.clearInteraction();
+  p.dialogueMark = p.packets.length;
+  assert(p.setInteraction(1, urchin, ServerTriggerType.APNPC1), 'native Talk is accepted');
+  p.processInteraction();
+  for (let page = 0; page < 240 && p.activeScript; page++) {
+    assert.equal(p.activeScript.execution, ScriptState.PAUSEBUTTON, 'the real urchin conversation pauses');
+    if (dialoguePage(p).some(text => text === 'Okay, I see them. Here I go!')) {
+      const [target] = owned(p);
+      assert(target, 'the product has reserved its original villager before the final page');
+      assert.equal(owned(p).length, 1, 'the conversation holds only one target');
+      assert.equal(p.getVar(slotVar), target.uid);
+      assert.equal(p.modalChat, id('Component', 'npcchat1'), 'the short final page uses the registered close root');
+      return target;
+    }
+    resumeDialogue(p);
+  }
+  assert.fail('the bounded native conversation reaches its final paused page');
+}
+
+function assertReleased(p, target) {
+  assert.equal(target.getVar(stateVar), 0);
+  assert.equal(target.getVar(ownerVar), -1);
+  assert.equal(target.getVar(deadlineVar), 0);
+  assert.equal(target.timerInterval, 0);
+  assert.equal([...target.queue.all()].length, 0);
+  assert.equal(p.getVar(slotVar), -1);
 }
 
 function secludedTarget(p) {
@@ -147,6 +196,100 @@ function completeThirdTheft(p, target) {
   assert.equal(xp(p), before.xp, 'the third theft does not repeat knock-out XP');
   assert.equal(count(p, 'coins') - before.coins, 3);
 }
+
+test('the distraction window starts only after the final native Continue, however long that page is held', () => {
+  const p = trialFixture(), target = reachDistractionPage(p);
+  const before = trialResult(p), page = p.activeScript;
+  for (let held = 0; held <= shortStateTicks * 2; held++) {
+    assert.equal(target.getVar(stateVar), 1, 'the pending reservation survives every paused turn');
+    assert.equal(target.getVar(ownerVar), p.uid);
+    assert.equal(target.getVar(deadlineVar), 0, 'a paused page has no active theft deadline');
+    assert.equal(target.timerInterval, 1, 'one existing native timer owns cleanup');
+    assert.equal([...target.queue.all()].length, 0, 'holding the page never appends a callback');
+    assert.equal(p.activeScript, page, 'native turns preserve the same paused continuation');
+    if (held < shortStateTicks * 2) worldTick();
+  }
+  assert.deepEqual(trialResult(p), before, 'reading the page changes no checkpoint, money, item or XP');
+  resumeDialogue(p);
+  assert.equal(stage(p), 8);
+  assert.equal(target.getVar(deadlineVar), World.currentTick + shortStateTicks,
+    'Continue arms the complete checked-out-tree window on its own turn');
+  const coins = count(p, 'coins'), beforeXp = xp(p), hp = p.levels[PlayerStat.HITPOINTS];
+  operate(p, target, 3);
+  assert.equal(stage(p), 9, 'the genuinely continued distraction can earn its second theft');
+  assert.equal(count(p, 'coins') - coins, 3);
+  assert.equal(xp(p) - beforeXp, 80);
+  assert.equal(p.levels[PlayerStat.HITPOINTS], hp);
+  assertReleased(p, target);
+});
+
+test('an ordinary native walking click interrupts the pending page and releases it like expiry', () => {
+  const p = trialFixture(), target = reachDistractionPage(p);
+  const before = trialResult(p);
+  const destination = [[p.x + 1, p.z], [p.x - 1, p.z], [p.x, p.z + 1], [p.x, p.z - 1]]
+    .find(([x, z]) => !map.isMapBlocked(x, z, p.level) &&
+      [...map.findPath(p.level, p.x, p.z, x, z)].at(-1) === CoordGrid.packCoord(p.level, x, z));
+  assert(destination, 'the original map supplies an ordinary adjacent walking destination');
+  assert(moveClickHandler.handle(new MoveClick([{ x: destination[0], z: destination[1] }], 0, false), p),
+    'the production non-operation walking packet is accepted');
+  assert.equal(p.activeScript, null, 'the interrupted dialogue cannot resume its old continuation');
+  assertReleased(p, target);
+  assert.deepEqual(trialResult(p), before);
+  talk(p, 'feud_street_urchin');
+  assert.equal(stage(p), 8, 'ordinary re-distraction is still available without a stage rewrite');
+  assert.equal(count(p, 'coins'), before.coins, 're-distraction charges no additional fee');
+});
+
+for (const checkpoint of [7, 8]) {
+  test(`the native logout tab releases a pending final page at earned stage ${checkpoint} and permits retry`, () => {
+    let p = trialFixture();
+    if (checkpoint === 8) {
+      const previous = reachDistraction(p);
+      tickThrough(previous.getVar(deadlineVar));
+      assert.equal(stage(p), 8, 'ordinary expiry preserves the earned waiting checkpoint');
+    }
+    const target = reachDistractionPage(p), before = trialResult(p);
+    // Match normal logout-tab visibility; the generic fixture opens only inventory and worn tabs.
+    p.tabs[10] = types.Component.get(id('Component', 'logout:try_logout')).rootLayer;
+    assert(button(p, 'logout:try_logout'), 'the real logout-tab button is accepted');
+    assert(p.requestLogout, 'the compiled logout-tab script requests ordinary logout');
+    assertReleased(p, target);
+    assert.deepEqual(trialResult(p), before);
+    p = nativeLogoutAndReload(p);
+    assert.equal(stage(p), checkpoint, 'logout does not award or remove an earned waiting checkpoint');
+    talk(p, 'feud_street_urchin');
+    assert.equal(stage(p), 8, 'the saved account can obtain a new ordinary distraction');
+    assert.equal(count(p, 'coins'), before.coins);
+  });
+}
+
+test('a disconnected owner cannot leave the pending final page reserved indefinitely', () => {
+  const p = trialFixture(), target = reachDistractionPage(p);
+  const before = trialResult(p);
+  // Model a lost in-memory session without invoking the content logout hook.
+  p.clearInteraction(); p.unlink(); p.isActive = false;
+  World.players[p.pid] = null;
+  worldTick();
+  assert.equal(target.getVar(stateVar), 0, 'the one NPC timer independently releases an absent owner');
+  assert.equal(target.getVar(ownerVar), -1);
+  assert.equal(target.getVar(deadlineVar), 0);
+  assert.equal(target.timerInterval, 0);
+  assert.equal([...target.queue.all()].length, 0);
+  assert.deepEqual(trialResult(p), before);
+});
+
+test('a continued distraction still expires into the visible two-damage refusal', () => {
+  const p = trialFixture(), target = reachDistractionPage(p);
+  resumeDialogue(p);
+  assert.equal(stage(p), 8);
+  tickThrough(target.getVar(deadlineVar));
+  assertReleased(p, target);
+  const before = trialResult(p), hp = p.levels[PlayerStat.HITPOINTS];
+  operate(p, target, 3);
+  assert.equal(target.sayMessage, "You won't get my purse.", 'the native NPC overhead carries the refusal');
+  assert.equal(hp - p.levels[PlayerStat.HITPOINTS], 2);
+  assert.deepEqual(trialResult(p), before, 'expiry consumes no item, checkpoint, money or XP');
+});
 
 for (const number of [1, 2, 3]) for (const checkpoint of [7, 8]) {
   test(`original villager ${number} early Lure at earned stage ${checkpoint} preserves trials and recovers through real logout`, () => {

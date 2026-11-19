@@ -43,6 +43,12 @@ if (%feud_villager_state = ^feud_villager_state_idle) {
     npc_settimer(0);
     return;
 }
+// UNKNOWN: a zero distraction deadline reserves the final chat page, not a theft window.
+// The owner is deliberately busy on that page, so use the non-protecting existence lookup.
+if (%feud_villager_state = ^feud_villager_state_distracted & %feud_villager_deadline = 0) {
+    if (finduid(%feud_villager_owner) = false) ~feud_villager_reset;
+    return;
+}
 if (p_finduid(%feud_villager_owner) = false) {
     ~feud_villager_reset;
     return;

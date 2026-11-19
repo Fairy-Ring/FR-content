@@ -63,7 +63,8 @@ if (%feud_villager_state ! ^feud_villager_state_idle) {
 %feud_trial_villager = $v;
 %feud_villager_state = ^feud_villager_state_distracted;
 %feud_villager_owner = uid;
-%feud_villager_deadline = calc(map_clock + ^feud_villager_short_state_ticks);
+// UNKNOWN: reserve the target now, but start no theft window while its owner is paused.
+%feud_villager_deadline = 0;
 npc_setmode(null);
 npc_settimer(1);
 if (npc_finduid($u) = false) {
@@ -77,8 +78,17 @@ if (%feud_var = ^feud_first_pick) %feud_distracted = 1;
 if (%feud_var = ^feud_first_pick) %feud_var = ^feud_distraction_active;
 npc_say("Hey you, camel features! Come here.");
 if (npc_finduid($v) = true) {
+    %feud_villager_deadline = calc(map_clock + ^feud_villager_short_state_ticks);
     npc_say("Excuse me?");
 }
+
+// The final short NPC page uses this existing root. Ordinary interruption closes it;
+// successful Continue has already armed a nonzero deadline before the chat closes.
+[if_close,npcchat1]
+if (%feud_trial_villager = null) return;
+if (npc_finduid(%feud_trial_villager) = false) return;
+if (%feud_villager_state ! ^feud_villager_state_distracted | %feud_villager_deadline ! 0) return;
+~feud_trial_release;
 
 [proc,feud_urchin_no_villager](npc_uid $u)
 if (npc_finduid($u) = false) { return; }
