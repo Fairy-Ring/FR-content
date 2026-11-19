@@ -32,6 +32,9 @@ const actors = name => {
   return found;
 };
 const witnessRadius = 5; // ^feud_villager_witness_radius in the native Feud constants.
+const shortStateTicks = Number(/^\^feud_villager_short_state_ticks\s*=\s*(\d+)$/m.exec(
+  readFileSync(path.join(contentRoot, 'scripts/quests/quest_feud/configs/feud_blackjack.constant'), 'utf8'))?.[1]);
+assert(Number.isInteger(shortStateTicks) && shortStateTicks > 0, 'the checked-out tree names its transient window');
 const animalTypes = new Set(['feud_camel', 'feud_charmers_snake', 'feud_desert_snake', 'magic_carpet_monkey']
   .map(name => id('NpcType', name)));
 function displayNpcType(p, npc) {
@@ -123,6 +126,16 @@ function operateLoc(p, placement, { option = 1, item = null, position = null, ch
     p.processInteraction();
   }
   return { text: finish(p, choices), position: tile(p) };
+}
+
+function openOriginalVillagerCurtain(p) {
+  const curtain = locs('curtain_1528').find(loc => loc.level === 0 && loc.x === 3345 && loc.z === 2955);
+  assert(curtain, 'the original map retains the curtain beside the enclosed type-two villager');
+  if (activeLoc(curtain).type === id('LocType', 'curtain_1528')) {
+    operateLoc(p, curtain, { position: [curtain.level, curtain.x, curtain.z] });
+  }
+  assert.equal(activeLoc(curtain).type, id('LocType', 'curtain_1529'),
+    'the ordinary compiled Open prepares the route before the distraction');
 }
 
 function operationStand(p, n) {
@@ -373,6 +386,6 @@ function relog(p, session = p) {
 
 export {
   activeLoc, actors, begin, bit, buyBeers, buyReceipts, deliver, displayNpcType, drink, finish, gangMask, hasWitness,
-  isWitness, locs, nativeNpcTriggerName, operate, operateHere, operateLoc, operationOffsets, operationStand, read, relog,
-  stage, stand, talk, wield
+  isWitness, locs, nativeNpcTriggerName, openOriginalVillagerCurtain, operate, operateHere, operateLoc,
+  operationOffsets, operationStand, read, relog, shortStateTicks, stage, stand, talk, wield
 };

@@ -1,21 +1,26 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
 import test from 'node:test';
 import './timeout-safety.mjs';
 import {
-  Packet, PlayerLoading, PlayerStat, ScriptState, ServerTriggerType, World, button, contentRoot, count,
+  Packet, PlayerLoading, PlayerStat, ScriptState, ServerTriggerType, World, button, count,
   dialoguePage, engineModule, id, inv, inventory, map, obj, resumeDialogue, seed, types
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  actors, bit, displayNpcType, hasWitness, operate, operationStand, read, stage, stand, talk, tickThrough, wield, worldTick
+  actors, bit, displayNpcType, hasWitness, openOriginalVillagerCurtain, operate, operationStand, read,
+  shortStateTicks, stage, stand, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const moveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
+const HintArrow = (await engineModule('network/game/server/model/HintArrow.ts')).default;
+const hints = p => p.packets.filter(packet => packet instanceof HintArrow);
+const assertHint = (p, target) => {
+  assert.equal(hints(p).at(-1)?.type, 1, 'the acting player receives the native NPC hint arrow');
+  assert.equal(hints(p).at(-1)?.nid, target.nid, 'the hint marks the selected original villager');
+};
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const slotVar = id('VarPlayerType', 'feud_trial_villager');
 const stateVar = id('VarNpcType', 'feud_villager_state');
@@ -26,9 +31,6 @@ const villagers = () => [...World.npcs].filter(npc => npc.isActive && villagerTy
 const owned = p => villagers().filter(npc => npc.getVar(stateVar) !== 0 && (npc.getVar(ownerVar) >>> 0) === p.uid);
 const xp = p => p.stats[PlayerStat.THIEVING];
 const nativeSetupWaitTicks = 512; // Existing native-geometry bound from follow.mjs, not a gameplay timeout.
-const shortStateTicks = Number(/^\^feud_villager_short_state_ticks\s*=\s*(\d+)$/m.exec(
-  readFileSync(path.join(contentRoot, 'scripts/quests/quest_feud/configs/feud_blackjack.constant'), 'utf8'))?.[1]);
-assert(Number.isInteger(shortStateTicks) && shortStateTicks > 0, 'the checked-out tree names its transient window');
 const trialResult = p => ({ stage: stage(p), coins: count(p, 'coins'), xp: xp(p), inventory: inventory(p) });
 
 function nativeLogoutAndReload(p) {
@@ -37,10 +39,12 @@ function nativeLogoutAndReload(p) {
   for (let tick = 0; tick < 128 && World.currentTick < p.preventLogoutUntil; tick++) worldTick();
   assert(World.currentTick >= p.preventLogoutUntil, 'ordinary logout cooldown expires without bypass');
   const before = { stage: stage(p), coins: count(p, 'coins'), xp: xp(p), inventory: inventory(p) };
+  const hintedTarget = hints(p).at(-1)?.type === 1;
   p.requestLogout = true;
   p.lastResponse = World.currentTick;
   worldTick();
   assert(![...World.playerLoop.all()].includes(p), 'production logout removes the old session');
+  if (hintedTarget) assert.equal(hints(p).at(-1)?.type, -1, 'ordinary logout clears the acting player hint');
   const request = World.logoutRequests.get(username);
   assert(request?.save, 'production logout supplies its genuine saved player bytes');
   World.logoutRequests.delete(username); // Model the successful login-server save acknowledgement.
@@ -85,9 +89,11 @@ function reachDistraction(p) {
   operate(p, target, 3);
   assert.equal(stage(p), 7);
   assert.equal(read(p, 'feud_npc_multi'), 1, 'the first theft exposes the original second client form');
+  openOriginalVillagerCurtain(p);
   talk(p, 'feud_street_urchin');
   assert.equal(stage(p), 8);
   assert.equal(owned(p).length, 1);
+  assertHint(p, owned(p)[0]);
   assert.equal(p.getVar(slotVar), owned(p)[0].uid);
   return owned(p)[0];
 }
@@ -100,6 +106,7 @@ function reachDistractionPage(p) {
     assert.equal(stage(p), 7);
   }
   assert([7, 8].includes(stage(p)), 'the final page is reached only through an earned waiting checkpoint');
+  openOriginalVillagerCurtain(p);
   const urchin = actors('feud_street_urchin').find(npc => operationStand(p, npc));
   assert(urchin, 'an original Street urchin has a reachable talk stand');
   stand(p, urchin);
@@ -129,6 +136,7 @@ function assertReleased(p, target) {
   assert.equal(target.timerInterval, 0);
   assert.equal([...target.queue.all()].length, 0);
   assert.equal(p.getVar(slotVar), -1);
+  assert.equal(hints(p).at(-1)?.type, -1, 'release clears this player’s distraction arrow');
 }
 
 function secludedTarget(p) {
@@ -185,6 +193,7 @@ function reachLure(p) {
   assert.equal(stage(p), 9);
   assert.equal(read(p, 'feud_npc_multi'), 2, 'the second theft exposes the original third client form');
   assert.equal(owned(p).length, 0);
+  assert.equal(hints(p).at(-1)?.type, -1, 'the theft clears its cue before the lure and knockout path');
   return lure(p);
 }
 
@@ -198,8 +207,9 @@ function completeThirdTheft(p, target) {
 }
 
 test('the distraction window starts only after the final native Continue, however long that page is held', () => {
-  const p = trialFixture(), target = reachDistractionPage(p);
+  const observer = trialFixture(), p = trialFixture(), target = reachDistractionPage(p);
   const before = trialResult(p), page = p.activeScript;
+  assert.equal(hints(p).length, 0, 'the reserved page does not show an active-distraction cue');
   for (let held = 0; held <= shortStateTicks * 2; held++) {
     assert.equal(target.getVar(stateVar), 1, 'the pending reservation survives every paused turn');
     assert.equal(target.getVar(ownerVar), p.uid);
@@ -214,6 +224,8 @@ test('the distraction window starts only after the final native Continue, howeve
   assert.equal(stage(p), 8);
   assert.equal(target.getVar(deadlineVar), World.currentTick + shortStateTicks,
     'Continue arms the complete checked-out-tree window on its own turn');
+  assertHint(p, target);
+  assert.equal(hints(observer).length, 0, 'another player receives neither the target hint nor its changes');
   const coins = count(p, 'coins'), beforeXp = xp(p), hp = p.levels[PlayerStat.HITPOINTS];
   operate(p, target, 3);
   assert.equal(stage(p), 9, 'the genuinely continued distraction can earn its second theft');
@@ -221,6 +233,7 @@ test('the distraction window starts only after the final native Continue, howeve
   assert.equal(xp(p) - beforeXp, 80);
   assert.equal(p.levels[PlayerStat.HITPOINTS], hp);
   assertReleased(p, target);
+  assert.equal(hints(observer).length, 0, 'the acting player’s theft does not clear another player’s hint');
 });
 
 test('an ordinary native walking click interrupts the pending page and releases it like expiry', () => {
@@ -291,6 +304,19 @@ test('a continued distraction still expires into the visible two-damage refusal'
   assert.deepEqual(trialResult(p), before, 'expiry consumes no item, checkpoint, money or XP');
 });
 
+test('a pickpocket at the deadline clears the arrow through the compiled refusal before the NPC timer runs', () => {
+  const p = trialFixture(), target = reachDistractionPage(p);
+  resumeDialogue(p);
+  assertHint(p, target);
+  World.currentTick = target.getVar(deadlineVar);
+  const before = trialResult(p), hp = p.levels[PlayerStat.HITPOINTS];
+  operate(p, target, 3);
+  assertReleased(p, target);
+  assert.equal(target.sayMessage, "You won't get my purse.");
+  assert.equal(hp - p.levels[PlayerStat.HITPOINTS], 2);
+  assert.deepEqual(trialResult(p), before, 'the refused attempt changes no saved progress or rewards');
+});
+
 for (const number of [1, 2, 3]) for (const checkpoint of [7, 8]) {
   test(`original villager ${number} early Lure at earned stage ${checkpoint} preserves trials and recovers through real logout`, () => {
     let p = trialFixture();
@@ -333,6 +359,7 @@ for (const number of [1, 2, 3]) for (const checkpoint of [7, 8]) {
     assert.equal(target.getVar(ownerVar), -1);
     assert.equal(target.getVar(deadlineVar), 0);
     assert.equal(owned(p).length, 0);
+    openOriginalVillagerCurtain(p);
     talk(p, 'feud_street_urchin');
     assert.equal(stage(p), 8, 'the player must still obtain the actual distraction');
     const distracted = owned(p)[0];
