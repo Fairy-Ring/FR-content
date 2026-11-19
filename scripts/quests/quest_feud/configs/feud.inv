@@ -1,12 +1,18 @@
-// Beer availability is VERIFIED by the period Feud guides.
-// Stock size and restock rate are UNKNOWN named engineering constants.
+// CANDIDATE pre-2021 Old School pub table, revision 14116698.
+// All six drinks appear in the earliest retained 2013 page. The later
+// account-type stock split is not imported. Capacity is UNKNOWN engineering.
 [feud_alispub]
 scope=shared
 size=^feud_shop_capacity
 restock=yes
 stackall=yes
 allstock=no
-stock1=beer,^feud_pub_beer_stock,^feud_pub_beer_restock
+stock1=beer,83,10
+stock2=whisky,10,100
+stock3=jug_wine,13,150
+stock4=vodka,5,5
+stock5=brandy,4,1500
+stock6=grog,12,2500
 
 // CANDIDATE Old School store table, revisions 214374 and 15351865.
 // The later jug and bucket packs are excluded. All retained objects exist in 377.

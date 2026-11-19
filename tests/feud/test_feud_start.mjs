@@ -91,6 +91,14 @@ function buyBeers(p) {
   p.invAdd(inv, obj('coins'), 100);
   talk(p, 'feud_ali_the_barman', ["Yes, I'd like a drink please."]);
   assert.equal(p.modalMain, id('Component', 'shop_template'), 'the drink option opens the real shop');
+  const config = types.InvType.get(id('InvType', 'feud_alispub'));
+  const expected = [
+    ['beer', 83, 10], ['whisky', 10, 100], ['jug_wine', 13, 150],
+    ['vodka', 5, 5], ['brandy', 4, 1500], ['grog', 12, 2500]
+  ];
+  assert.deepEqual(Array.from(config.stockobj), expected.map(([name]) => obj(name)), 'the pre-2021 six-drink stock is retained');
+  assert.deepEqual(Array.from(config.stockcount), expected.map(([, quantity]) => quantity));
+  assert.deepEqual(Array.from(config.stockrate), expected.map(([, , rate]) => rate));
   const component = id('Component', 'shop_template:inv');
   const listener = p.invListeners.find(entry => entry.com === component);
   assert(listener, 'the shop inventory is transmitted to the player');
@@ -103,7 +111,7 @@ function buyBeers(p) {
       'the production inventory packet buys beer');
     assert.equal(count(p, 'beer'), n, 'beer is purchased, not seeded');
     assert.equal(stock.getItemCount(obj('beer')), available - 1, 'a real shared-stock item is sold');
-    assert.equal(money - count(p, 'coins'), 2, 'the chosen pub policy charges two coins, not the unscaled shop default');
+    assert.equal(money - count(p, 'coins'), 2, 'the candidate pub policy charges two coins, not the unscaled shop default');
   }
   p.closeModal();
 }

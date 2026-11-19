@@ -77,9 +77,10 @@ head1=npc_1862_head
 head2=idk_man_jaw_pointy_head
 head3=obj_pickpocket_guide_farmer
 param=owned_shop,feud_alispub
-param=shop_sell_multiplier,^feud_pub_shop_sell
-param=shop_buy_multiplier,^feud_pub_shop_buy
-param=shop_delta,^feud_pub_shop_delta
+param=shop_sell_multiplier,1000
+param=shop_buy_multiplier,550
+param=shop_delta,10
+param=shop_title,The Asp & Snake Bar.
 
 [feud_kebabman]
 name=Ali the Kebab seller

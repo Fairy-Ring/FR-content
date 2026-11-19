@@ -29,13 +29,8 @@
 // CANDIDATE period pair offer; conflicting Tip.It wording is recorded in the facts.
 ^feud_camel_pair_price = 500
 
-// UNKNOWN engineering stock settings, using the existing Burthorpe pub precedent.
+// UNKNOWN engineering capacity, matching the existing ordinary shop layout.
 ^feud_shop_capacity = 40
-^feud_pub_beer_stock = 12
-^feud_pub_beer_restock = 10
-^feud_pub_shop_sell = 1000
-^feud_pub_shop_buy = 0
-^feud_pub_shop_delta = 10
 
 // UNKNOWN engineering marker after the sourced traitor-drink explanation.
 ^feud_report_drink_reported = 1
