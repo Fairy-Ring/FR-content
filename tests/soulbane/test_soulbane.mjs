@@ -3299,7 +3299,8 @@ function testConfusionIllusion(p, fake) {
     }
     const xpAfterEight = xpSnapshot(p), hpAfterEight = p.levels[PlayerStat.HITPOINTS];
     p.clearInteraction();
-    assert(OpNpcHandler.handle(new OpNpc(2, fake.nid), p), 'a ninth Attack packet targets the still-visible illusion');
+    assert.equal(OpNpcHandler.handle(new OpNpc(2, fake.nid), p), false,
+      'the ninth Attack packet is rejected by native suspended-NPC admission before combat dispatch');
     p.processInteraction();
     assert.deepEqual(xpSnapshot(p), xpAfterEight, 'the rejected ninth attack grants no XP');
     assert.equal(fake.vars[CONFUSION_HITS], 8, 'the rejected ninth attack produces no extra hit');
