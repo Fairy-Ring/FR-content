@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Native rift, Rage, Fear, Confusion, and Hope progression regression coverage.
+// Native rift, four rooms, bridge, Tolna and completion regression coverage.
 // Every progression step uses the registered engine dispatch and cleanup paths.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -13,7 +13,8 @@ import {
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const InstanceZone = (await engineModule('engine/zone/InstanceZone.ts')).default;
-const { CollisionType } = await engineModule('engine/routefinder/flags.ts');
+const { CollisionType, CollisionFlag } = await engineModule('engine/routefinder/flags.ts');
+const routeFinder = (await engineModule('engine/routefinder/index.ts')).default;
 const RebuildRegion = (await engineModule('network/game/server/model/RebuildRegion.ts')).default;
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const MoveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
@@ -30,6 +31,7 @@ const OpNpcUHandler = new (await engineModule('network/game/client/handler/OpNpc
 const OpNpcT = (await engineModule('network/game/client/model/OpNpcT.ts')).default;
 const OpNpcTHandler = new (await engineModule('network/game/client/handler/OpNpcTHandler.ts')).default();
 const NpcStat = (await engineModule('engine/entity/NpcStat.ts')).NpcStat;
+const resolveNpcType = (await engineModule('engine/entity/resolveNpcType.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const { PlayerInfoProt } = await engineModule('network/rsbuf/prot.ts');
@@ -39,6 +41,7 @@ const MidiSong = (await engineModule('network/game/server/model/MidiSong.ts')).d
 const DbTableIndex = (await engineModule('cache/config/DbTableIndex.ts')).default;
 const CamReset = (await engineModule('network/game/server/model/CamReset.ts')).default;
 const ScriptRunner = (await engineModule('engine/script/ScriptRunner.ts')).default;
+const { ActiveRegion } = await engineModule('engine/script/ScriptPointer.ts');
 const ServerTriggerType = (await engineModule('engine/script/ServerTriggerType.ts')).default;
 const roomCameraPackets = new WeakMap();
 const sceneRebuildPackets = new WeakMap();
@@ -117,6 +120,51 @@ const STAGE_VARP = types.VarBitType.get(STAGE_VARBIT).basevar;
 const INSTANCE_VARP = requiredId('VarPlayerType', 'soulbane_instance');
 const METER_VARBIT = requiredId('VarBitType', 'soulbane_anger_damagedealt');
 const WEAPON_VARBIT = requiredId('VarBitType', 'soulbane_anger_weaponmulti');
+const NPC_ACTION_DELAY = requiredId('VarNpcType', 'npc_action_delay');
+const ATTACK_RATE_PARAM = requiredId('ParamType', 'attackrate');
+const DAMAGE_TYPE_PARAM = requiredId('ParamType', 'damagetype');
+const POISON_SEVERITY_PARAM = requiredId('ParamType', 'poison_severity');
+const TOLNA_INTRO_STAGE = questConstant('soulbane_tolna_intro');
+const TOLNA_ACTIVE_STAGE = questConstant('soulbane_tolna_active');
+const TOLNA_CLEAR_STAGE = questConstant('soulbane_tolna_clear');
+const TOLNA_COMPLETE_STAGE = configConstant('scripts/general/configs/quest.constant', 'soulbane_complete');
+const TOLNA_PROFILE_TABLE = types.DbTableType.get(requiredId('DbTableType', 'soulbane_tolna_heads'));
+const TOLNA_HEADS = [
+  {
+    type: 'soulbane_final_tolna1', row: 'soulbane_tolna_south', stand: 'soulbane_tolna_south',
+    melee: 'soulbane_tolna_south_melee_ticks', ranged: 'soulbane_tolna_south_ranged_ticks',
+    meleeCount: 8, damageType: 'slash_style'
+  },
+  {
+    type: 'soulbane_final_tolna2', row: 'soulbane_tolna_east', stand: 'soulbane_tolna_east',
+    melee: 'soulbane_tolna_no_melee', ranged: 'soulbane_tolna_east_ranged_ticks',
+    meleeCount: 6, damageType: null
+  },
+  {
+    type: 'soulbane_final_tolna3', row: 'soulbane_tolna_north', stand: 'soulbane_tolna_north',
+    melee: 'soulbane_tolna_north_melee_ticks', ranged: 'soulbane_tolna_north_ranged_ticks',
+    meleeCount: 9, damageType: 'stab_style'
+  }
+].map(head => ({
+  ...head,
+  id: requiredId('NpcType', head.type),
+  rowId: requiredId('DbRowType', head.row),
+  meleeTicks: questConstant(head.melee),
+  rangedTicks: questConstant(head.ranged),
+  standCoord: sourceCoordForName(head.stand)
+}));
+assert.deepEqual(TOLNA_HEADS.map(head => [head.meleeTicks, head.rangedTicks]), [[8, 7], [0, 5], [3, 20]],
+  'retained South, ranged-only East, and North source profiles keep their exact attack intervals');
+const TOLNA_HEAD_IDS = new Set(TOLNA_HEADS.map(head => head.id));
+const TOLNA_BRANA = requiredId('NpcType', 'soulbane_brana');
+const TOLNA_HUMAN = requiredId('NpcType', 'soulbane_tolna_top');
+const TOLNA_ACTOR_IDS = new Set([...TOLNA_HEAD_IDS, TOLNA_BRANA, TOLNA_HUMAN]);
+const TOLNA_DEATH_BITS = [
+  'soulbane_final_tol1dead', 'soulbane_final_tol2dead', 'soulbane_final_tol3dead'
+];
+const TOLNA_WINDOW = { minX: 19, maxX: 51, minZ: 14, maxZ: 44 };
+assert.deepEqual(TOLNA_HEADS.map(head => head.meleeCount), [8, 6, 9],
+  'candidate geometry records the selected south/east/north native melee counts');
 
 function requiredId(kind, name) {
   const value = id(kind, name);
@@ -303,6 +351,12 @@ function questConstant(name) {
     .find(line => line.startsWith(`^${name} = `));
   assert(row, `source declares ^${name}`);
   return Number(row.slice(row.indexOf('=') + 1).trim());
+}
+function configConstant(relativePath, name) {
+  const text = fs.readFileSync(path.join(contentRoot, relativePath), 'utf8');
+  const match = new RegExp(`^\\^${name}\\s*=\\s*(-?\\d+)\\s*$`, 'm').exec(text);
+  assert(match, `${relativePath} declares ^${name}`);
+  return Number(match[1]);
 }
 function questCoordinateDeclarations() {
   const found = new Map();
@@ -3397,6 +3451,45 @@ function awaitPlayerActionReady(p, label) {
   for (let tick = 0; tick < 16 && p.delayed; tick++) worldTick();
   assert.equal(p.delayed, false, `${label}: ordinary action delay has settled`);
 }
+function testHopeNativeRangedDelay() {
+  const label = 'Hope native ranged action delay';
+  const p = laterRoomFixture(HOPE_STAGE, `${label}: disclosed active-stage fixture`);
+  writeVar(p, 'option_nodef', 1);
+  const target = [...hopeNpcsFor(p)].sort((a, b) =>
+    Math.abs(a.x - p.x) + Math.abs(a.z - p.z) - Math.abs(b.x - p.x) - Math.abs(b.z - p.z))[0];
+  assert(target, `${label}: one product-spawned Hope creature is present`);
+  assert.equal(target.type, requiredId('NpcType', HOPE_TYPES[0]),
+    `${label}: the observed first life is the authored ranged attacker`);
+  const attackRate = types.NpcType.get(target.type).params.get(ATTACK_RATE_PARAM);
+  assert(Number.isInteger(attackRate) && attackRate > 0,
+    `${label}: packed native attackrate is a positive integer`);
+  const previousDelay = target.vars[NPC_ACTION_DELAY];
+  const startTick = World.currentTick;
+  withCombatRandom(0.5, () => runNativeAttack(p, target, `${label}: real player starts native combat`, 120, true));
+  assert.equal(waitForHopeAggressor(p, label), target,
+    `${label}: the actual Hope aggressor remains the ranged-delay subject`);
+  for (let tick = 0; tick < 64
+    && !(Number.isInteger(target.vars[NPC_ACTION_DELAY])
+      && target.vars[NPC_ACTION_DELAY] > startTick
+      && target.vars[NPC_ACTION_DELAY] !== previousDelay); tick++) worldTick();
+  const scheduled = target.vars[NPC_ACTION_DELAY];
+  assert(Number.isInteger(scheduled) && scheduled > startTick,
+    `${label}: native ranged action writes a future npc_action_delay`);
+  assert.notEqual(scheduled, previousDelay,
+    `${label}: real combat schedules a new ranged action rather than reusing spawn delay`);
+  const rangedAt = scheduled - attackRate;
+  assert(rangedAt >= startTick && rangedAt <= World.currentTick,
+    `${label}: stored delay decodes to an observed ranged-action tick`);
+  assert.equal(scheduled, rangedAt + attackRate,
+    `${label}: cooldown is exactly the source NPC's packed attackrate`);
+  assert.equal(target.type, requiredId('NpcType', HOPE_TYPES[0]),
+    `${label}: action remains the ranged first life rather than a later melee-wait form`);
+  console.log(`Hope ranged delay ${JSON.stringify({ attackRate, rangedAt, scheduled })}`);
+  leaveQuestRoom(p, `${label} native cleanup`);
+  p.requestLogout = true;
+  worldTick();
+}
+
 function testHopeFoodDispatch(p) {
   const label = 'Hope native food dispatch';
   const spawned = hopeNpcsFor(p);
@@ -3829,6 +3922,1076 @@ function testConfusionHopeProgression(p) {
   return p;
 }
 
+function tolnaActorsFor(p) {
+  const uid = instanceUid(p);
+  return [...World.npcs].filter(npc => npc?.isActive
+    && (TOLNA_ACTOR_IDS.has(npc.type) || TOLNA_ACTOR_IDS.has(npc.baseType))
+    && npc.vars[NPC_INSTANCE] === uid && (npc.vars[NPC_OWNER] >>> 0) === p.uid);
+}
+function tolnaActorsWithOwner(owner) {
+  return [...World.npcs].filter(npc => npc?.isActive
+    && (TOLNA_ACTOR_IDS.has(npc.type) || TOLNA_ACTOR_IDS.has(npc.baseType))
+    && (npc.vars[NPC_OWNER] >>> 0) === (owner >>> 0));
+}
+function tolnaHeadsFor(p) {
+  const actors = tolnaActorsFor(p);
+  const heads = TOLNA_HEADS.map(spec => {
+    const matches = actors.filter(npc => npc.type === spec.id || npc.baseType === spec.id);
+    assert.equal(matches.length, 1, `${spec.type}: exactly one product-spawned owner-copy head exists`);
+    return { spec, npc: matches[0] };
+  });
+  return heads;
+}
+function assertOwnedTolnaActors(p, expectedHeads, expectHuman, label) {
+  const actors = tolnaActorsFor(p);
+  const heads = actors.filter(npc => TOLNA_HEAD_IDS.has(npc.type) || TOLNA_HEAD_IDS.has(npc.baseType));
+  assert.equal(heads.length, expectedHeads, `${label}: exact product-spawned head count`);
+  assert.equal(actors.filter(npc => npc.type === TOLNA_BRANA || npc.baseType === TOLNA_BRANA).length, 1,
+    `${label}: one owned Brana occupies the private arena`);
+  assert.equal(actors.filter(npc => npc.type === TOLNA_HUMAN || npc.baseType === TOLNA_HUMAN).length,
+    Number(expectHuman), `${label}: human Tolna appears only after the three-head clear`);
+  for (const npc of actors) {
+    assert.equal(npc.vars[NPC_INSTANCE], instanceUid(p), `${label}: every Tolna actor belongs to the current copy`);
+    assert.equal(npc.vars[NPC_OWNER] >>> 0, p.uid, `${label}: every Tolna actor belongs to the current player`);
+  }
+  return actors;
+}
+function tolnaHeadRow(p, npc, spec, label) {
+  const rowId = runProcInt('soulbane_tolna_headrow', p, [], npc);
+  assert.equal(rowId, spec.rowId, `${label}: stateless native NPC switch selects ${spec.row}`);
+  const row = types.DbRowType.get(rowId);
+  assert(row, `${label}: selected profile resolves to a packed dbrow`);
+  assert.equal(dbField(row, TOLNA_PROFILE_TABLE, 'head')?.[0], spec.id,
+    `${label}: selected dbrow names the actual head type`);
+  const rowStand = dbField(row, TOLNA_PROFILE_TABLE, 'stand')?.[0];
+  assert.deepEqual(unpackWorld(rowStand), spec.standCoord, `${label}: selected dbrow uses its declared stand`);
+  assert.equal(dbField(row, TOLNA_PROFILE_TABLE, 'melee_ticks')?.[0], spec.meleeTicks,
+    `${label}: profile uses its authored melee interval`);
+  assert.equal(dbField(row, TOLNA_PROFILE_TABLE, 'ranged_ticks')?.[0], spec.rangedTicks,
+    `${label}: profile uses its authored ranged interval`);
+  const type = types.NpcType.get(npc.type);
+  assert.equal(type.size, 3, `${label}: original head occupies its full 3x3 footprint`);
+  assert.deepEqual([
+    npc.baseLevels[NpcStat.HITPOINTS], npc.baseLevels[NpcStat.ATTACK],
+    npc.baseLevels[NpcStat.STRENGTH], npc.baseLevels[NpcStat.DEFENCE],
+    npc.baseLevels[NpcStat.MAGIC], npc.baseLevels[NpcStat.RANGED]
+  ], [37, 42, 41, 40, 1, 1], `${label}: original head combat levels are preserved`);
+  assert.equal(type.params.get(ATTACK_RATE_PARAM), spec.damageType ? spec.meleeTicks : spec.rangedTicks,
+    `${label}: packed attackrate uses the same available source-profile interval`);
+  assert.equal(type.params.get(POISON_SEVERITY_PARAM), questConstant('soulbane_tolna_poison_severity'),
+    `${label}: head uses the declared native poison severity`);
+  if (spec.damageType) {
+    assert.equal(type.params.get(DAMAGE_TYPE_PARAM),
+      configConstant('scripts/skill_combat/configs/combat_damagetypes.constant', spec.damageType),
+      `${label}: original melee damage style is ${spec.damageType}`);
+  } else {
+    assert.equal(type.params.get(DAMAGE_TYPE_PARAM), undefined,
+      `${label}: ranged-only East has no melee damage type`);
+  }
+  return rowId;
+}
+function tolnaCoordInCopy(p, source, label) {
+  const template = CoordGrid.packCoord(source.level, source.x, source.z);
+  const expected = templateCoord(p, template);
+  // This internal proc inherits its caller's region; reproduce native ownership admission.
+  const owned = runProc('soulbane_owned', p);
+  assert.equal(owned.popInt(), 1, `${label}: native ownership admission selects the active copy`);
+  const script = ScriptProvider.getByName('[proc,soulbane_tolna_coord]');
+  assert(script, `${label}: compiled coordinate proc exists`);
+  const state = ScriptRunner.init(script, p, null, [template]);
+  // Before execution there is no current opcode operand to select primary/secondary accessors.
+  state._activeRegion = owned._activeRegion;
+  state._activeRegionUid = owned._activeRegionUid;
+  state.pointerAdd(ActiveRegion[0]);
+  assert.equal(p.runScript(state, true, true), ScriptState.FINISHED,
+    `${label}: compiled coordinate proc finishes with its required native region pointer`);
+  const actual = unpackWorld(state.popInt());
+  assert.deepEqual(actual, expected, `${label}: compiled arena coordinate agrees with assigned InstanceZone metadata`);
+  return actual;
+}
+function tolnaSourceMapper(p) {
+  const instance = instanceForOwner(p, 'Tolna source-to-copy geometry');
+  const zones = new Map(assignedInstanceZones(instance).map(zone => [
+    `${zone.source.level}:${zone.source.x}:${zone.source.z}`, zone
+  ]));
+  return source => {
+    const key = sourceZoneKey(source);
+    const zone = zones.get(key);
+    assert(zone, `private arena maps source zone ${key}`);
+    return {
+      level: zone.level,
+      x: (zone.x << 3) + (source.x & 7),
+      z: (zone.z << 3) + (source.z & 7)
+    };
+  };
+}
+function tolnaFootprintOpen(point, size, label) {
+  for (let dx = 0; dx < size; dx++) {
+    for (let dz = 0; dz < size; dz++) {
+      const x = point.x + dx;
+      const z = point.z + dz;
+      const flags = routeFinder.collisionFlags.get(x, z, point.level) >>> 0;
+      assert.equal(map.isMapBlocked(x, z, point.level), (flags & CollisionFlag.WALK_BLOCKED) !== 0,
+        `${label}: native routefinder and GameMap agree on collision at ${point.level}_${x}_${z}`);
+      assert(map.isZoneAllocated(point.level, x, z),
+        `${label}: original/private geometry has an allocated zone at ${point.level}_${x}_${z}`);
+      assert.equal((flags & CollisionFlag.WALK_BLOCKED) !== 0, false,
+        `${label}: complete actor footprint is collision-open at ${point.level}_${x}_${z}`);
+    }
+  }
+}
+function tolnaExactPath(from, to) {
+  if (from.level === to.level && from.x === to.x && from.z === to.z) return [];
+  const route = [...map.findPath(from.level, from.x, from.z, to.x, to.z)];
+  if (route.length === 0) return null;
+  const end = unpackWorld(route.at(-1));
+  return end.level === to.level && end.x === to.x && end.z === to.z ? route : null;
+}
+function tolnaNativeMeleeReference(point, head, size) {
+  const reached = map.reachedEntity(head.level, head.x, head.z, point.x, point.z, 1, 1, size);
+  let edge = null;
+  if (point.z >= head.z && point.z < head.z + size) {
+    if (point.x === head.x - 1) edge = { x: head.x, z: point.z };
+    else if (point.x === head.x + size) edge = { x: head.x + size - 1, z: point.z };
+  }
+  if (point.x >= head.x && point.x < head.x + size) {
+    if (point.z === head.z - 1) edge = { x: point.x, z: head.z };
+    else if (point.z === head.z + size) edge = { x: point.x, z: head.z + size - 1 };
+  }
+  const edgeLine = edge !== null
+    && map.isLineOfWalk(point.level, point.x, point.z, edge.x, edge.z);
+  return { reached, edgeLine, result: reached && edgeLine };
+}
+function testTolnaArenaGeometry(p, label) {
+  const sourceBase = sourceCoordForName('soulbane_tolna_source');
+  const sourceEntry = sourceCoordForName('soulbane_tolna_entry');
+  const copyOf = tolnaSourceMapper(p);
+  const copyEntry = tolnaCoordInCopy(p, sourceEntry, `${label} entry`);
+  const headPairs = tolnaHeadsFor(p);
+  assertOwnedTolnaActors(p, 3, false, `${label} fixed geometry`);
+  assert.equal(types.ParamType.getId('soulbane_tolna_profile'), -1,
+    'head profiles use supported stateless native row lookup, not an NPC dbrow parameter');
+
+  const fixedStands = [
+    ['soulbane_tolna_entry', 1],
+    ['soulbane_tolna_player', 1],
+    ['soulbane_tolna_camera', 1],
+    ['soulbane_tolna_brana', types.NpcType.get(TOLNA_BRANA).size],
+    ['soulbane_tolna_human', types.NpcType.get(TOLNA_HUMAN).size],
+    ...TOLNA_HEADS.map(head => [head.stand, types.NpcType.get(head.id).size])
+  ];
+  for (const [name, size] of fixedStands) {
+    const source = sourceCoordForName(name);
+    const copy = tolnaCoordInCopy(p, source, `${label} ${name}`);
+    tolnaFootprintOpen(source, size, `${label} source ${name}`);
+    tolnaFootprintOpen(copy, size, `${label} private ${name}`);
+    const sourcePath = tolnaExactPath(sourceEntry, source);
+    const copyPath = tolnaExactPath(copyEntry, copy);
+    assert(sourcePath, `${label} source stand ${name} is reachable by the original pathfinder`);
+    assert(copyPath, `${label} private stand ${name} is reachable by the actual copied pathfinder`);
+  }
+  for (let first = 0; first < TOLNA_HEADS.length; first++) {
+    const a = TOLNA_HEADS[first].standCoord;
+    for (let second = first + 1; second < TOLNA_HEADS.length; second++) {
+      const b = TOLNA_HEADS[second].standCoord;
+      assert(a.x >= b.x + 3 || b.x >= a.x + 3 || a.z >= b.z + 3 || b.z >= a.z + 3,
+        `${label}: fixed 3x3 head footprints remain disjoint`);
+    }
+  }
+
+  // The private copy has live actors; occupancy is not part of the packed terrain.
+  const occupancyFlags = CollisionFlag.NPC_OCC | CollisionFlag.PLAYER_OCC;
+  let copiedCollisionTiles = 0;
+  const reachable = [];
+  for (let localX = TOLNA_WINDOW.minX; localX <= TOLNA_WINDOW.maxX; localX++) {
+    for (let localZ = TOLNA_WINDOW.minZ; localZ <= TOLNA_WINDOW.maxZ; localZ++) {
+      const source = { level: sourceBase.level, x: sourceBase.x + localX, z: sourceBase.z + localZ };
+      const copy = copyOf(source);
+      const sourceFlags = routeFinder.collisionFlags.get(source.x, source.z, source.level) >>> 0;
+      const copyFlags = routeFinder.collisionFlags.get(copy.x, copy.z, copy.level) >>> 0;
+      assert.equal(map.isMapBlocked(source.x, source.z, source.level),
+        (sourceFlags & CollisionFlag.WALK_BLOCKED) !== 0,
+        `${label}: original flags agree at ${source.level}_${source.x}_${source.z}`);
+      assert.equal(map.isMapBlocked(copy.x, copy.z, copy.level),
+        (copyFlags & CollisionFlag.WALK_BLOCKED) !== 0,
+        `${label}: private flags agree at ${copy.level}_${copy.x}_${copy.z}`);
+      assert.equal(copyFlags & ~occupancyFlags, sourceFlags & ~occupancyFlags,
+        `${label}: all packed source/private terrain flags match at local ${localX}_${localZ}`);
+      copiedCollisionTiles++;
+      if (!map.isZoneAllocated(source.level, source.x, source.z)
+        || (sourceFlags & CollisionFlag.WALK_BLOCKED) !== 0) continue;
+      const route = tolnaExactPath(sourceEntry, source);
+      if (!route) continue;
+      const privateRoute = tolnaExactPath(copyEntry, copy);
+      assert(privateRoute, `${label}: corresponding private floor point remains exactly reachable`);
+      reachable.push({ source, copy, route, privateRoute });
+    }
+  }
+  assert.equal(copiedCollisionTiles, 33 * 31,
+    `${label}: source/private collision equality covers the complete authored probe window`);
+  assert.equal(reachable.length, 186,
+    `${label}: the original entry has exactly 186 reachable floor points in the source window`);
+  const underHead = point => TOLNA_HEADS.some(head => {
+    const stand = head.standCoord;
+    return point.x >= stand.x && point.x < stand.x + 3 && point.z >= stand.z && point.z < stand.z + 3;
+  });
+  assert.equal(reachable.filter(point => underHead(point.source)).length, 27,
+    `${label}: the 186-point comparison retains all 27 tiles beneath the three heads`);
+
+  const sourceCounts = Array(TOLNA_HEADS.length).fill(0);
+  const copyCounts = Array(TOLNA_HEADS.length).fill(0);
+  const sourceTripleMelee = [];
+  const copyTripleMelee = [];
+  let sourceComparisons = 0;
+  let copyComparisons = 0;
+  const sourceHeadCoords = TOLNA_HEADS.map(head => head.standCoord);
+  const copyHeadCoords = TOLNA_HEADS.map(head =>
+    tolnaCoordInCopy(p, head.standCoord, `${label} private ${head.type}`));
+  const oldPlayer = { level: p.level, x: p.x, z: p.z };
+  const oldHeads = headPairs.map(({ npc }) => ({ npc, level: npc.level, x: npc.x, z: npc.z }));
+  const compareGeometry = (point, geometry, coords, counts, triples) => {
+    p.level = point.level; p.x = point.x; p.z = point.z;
+    const results = headPairs.map(({ npc }, index) => {
+      const target = coords[index];
+      npc.level = target.level; npc.x = target.x; npc.z = target.z;
+      const expected = tolnaNativeMeleeReference(point, target, 3);
+      const actual = runProcInt('soulbane_tolna_melee_range', p, [], npc) !== 0;
+      assert.equal(actual, expected.result,
+        `${label}: compiled melee predicate matches native reachedEntity plus edge line-of-walk (${geometry}, head ${index + 1}, ${point.level}_${point.x}_${point.z})`);
+      if (actual) counts[index]++;
+      return actual;
+    });
+    if (results.every(Boolean)) triples.push(`${point.level}_${point.x}_${point.z}`);
+  };
+  try {
+    for (const point of reachable) {
+      compareGeometry(point.source, 'source', sourceHeadCoords, sourceCounts, sourceTripleMelee);
+      sourceComparisons += TOLNA_HEADS.length;
+      compareGeometry(point.copy, 'private', copyHeadCoords, copyCounts, copyTripleMelee);
+      copyComparisons += TOLNA_HEADS.length;
+    }
+  } finally {
+    p.level = oldPlayer.level; p.x = oldPlayer.x; p.z = oldPlayer.z;
+    for (const saved of oldHeads) {
+      saved.npc.level = saved.level; saved.npc.x = saved.x; saved.npc.z = saved.z;
+    }
+  }
+  assert.equal(sourceComparisons, 558, `${label}: original compiled predicate covers all 558 head/tile pairs`);
+  assert.equal(copyComparisons, 558, `${label}: private compiled predicate covers all 558 head/tile pairs`);
+  assert.deepEqual(sourceCounts, [8, 6, 9], `${label}: actual original compiled melee counts are South 8/East 6/North 9`);
+  assert.deepEqual(copyCounts, sourceCounts, `${label}: actual private compiled melee counts equal original counts`);
+  assert.equal(sourceTripleMelee.length, 0, `${label}: no original floor point melees all three heads`);
+  assert.equal(copyTripleMelee.length, 0, `${label}: no private floor point melees all three heads`);
+  for (const { spec, npc } of headPairs) tolnaHeadRow(p, npc, spec, `${label} ${spec.row} profile binding`);
+  return {
+    reachableTiles: reachable.length, underHeadTiles: 27, sourceComparisons, copyComparisons,
+    sourceMeleeCounts: sourceCounts, privateMeleeCounts: copyCounts,
+    sourceTripleMelee: sourceTripleMelee.length, privateTripleMelee: copyTripleMelee.length
+  };
+}
+
+function tolnaPassageLoc(p) {
+  const matches = nearbyLocs(p, /^soul_bane_hwall_void_exit$/);
+  assert.equal(matches.length, 1, 'stage 9 has exactly one packed forward hole into Tolna');
+  return matches[0];
+}
+function tolnaFinalExitLoc(p) {
+  const matches = nearbyLocs(p, /^soul_bane_tolna_void_small$/);
+  assert.equal(matches.length, 1, 'the final chamber has exactly one packed surface Exit');
+  return matches[0];
+}
+function assertTolnaNativeGates(p, npc, admitted, label) {
+  const expected = Number(admitted);
+  assert.equal(runProcInt('soulbane_tolna_attackable', p, [], npc), expected,
+    `${label}: compiled finale owner/stage gate`);
+  assert.equal(runProcInt('npc_is_attackable', p, [], npc), expected,
+    `${label}: native melee gate reaches the finale owner/stage policy`);
+  assert.equal(runProcInt('npc_is_attackable_opt', p, [], npc), expected,
+    `${label}: native ranged/cast gate reaches the finale owner/stage policy`);
+  for (const spell of [0, 1]) {
+    assert.equal(runProcInt('npc_max_dealt', p, [100, spell], npc), admitted ? 100 : 0,
+      `${label}: ${spell ? 'spell' : 'melee/ranged'} damage policy runs before XP`);
+  }
+}
+function tolnaIntroPages(p, label) {
+  const pages = [];
+  const overheads = new Set();
+  const cameraMark = p.packets.length;
+  const observeOverheads = () => {
+    const brana = tolnaActorsFor(p).find(npc => npc.type === TOLNA_BRANA || npc.baseType === TOLNA_BRANA);
+    if (typeof brana?.sayMessage === 'string' && brana.sayMessage) overheads.add(brana.sayMessage);
+  };
+  for (let tick = 0; tick < 1200; tick++) {
+    observeOverheads();
+    if (p.activeScript?.execution === ScriptState.PAUSEBUTTON) {
+      pages.push(...dialoguePage(p));
+      resumeDialogue(p);
+      continue;
+    }
+    worldTick(observeOverheads);
+    if (stage(p) === TOLNA_ACTIVE_STAGE && p.queue.head() === null
+      && (!p.activeScript || p.activeScript.execution === ScriptState.FINISHED)) break;
+  }
+  assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: the native intro continuation alone writes stage 11`);
+  assert.equal(readVar(p, 'soulbane_final_seencut'), 1, `${label}: completed intro records its real cutscene boundary`);
+  assert.equal(p.queue.head(), null, `${label}: native intro queue drains`);
+  assert(p.packets.slice(cameraMark).some(packet => packet instanceof CamReset),
+    `${label}: native intro resets its camera before starting the fight`);
+  assert(pages.join(' ').includes('Why should I speak to you?'),
+    `${label}: the actual Tolna intro displays its compiled response`);
+  assert.deepEqual([...overheads], [
+    'Son! Is that you?', 'Please speak to me! Tolna?', 'What do you mean?',
+    "You'll always be my son!", 'There must be a way.', "Don't give up so easily!",
+    'Sorry, but your mother and I...', 'tried so hard to find you!'
+  ], `${label}: all eight authored Brana overheads are observed before native tick cleanup`);
+  return { pages, overheads: [...overheads] };
+}
+function enterTolnaFinalRoom(p, label, checkGeometry = true) {
+  assert.equal(stage(p), HOPE_CLEAR_STAGE, `${label}: stage 9 is the completed-Hope prerequisite`);
+  assert.notEqual(instanceUid(p), 0, `${label}: the native stage-9 copy is live before the forward hole`);
+  const oldUid = instanceUid(p);
+  const passage = tolnaPassageLoc(p);
+  goToStand(p, passage, `${label}: walk to the original forward hole`);
+  const entered = operateLoc(p, passage, 1, [], `${label}: native forward-hole passage`);
+  assert.equal(entered.trigger.name, '[oploc1,soul_bane_hwall_void_exit]',
+    `${label}: the compiled original forward-hole handler starts Tolna`);
+  assert.equal(stage(p), TOLNA_INTRO_STAGE, `${label}: passage begins the stage-10 intro boundary`);
+  assert.notEqual(instanceUid(p), oldUid, `${label}: final room owns a new private instance`);
+  assert.equal(World.instances.findInstanceByUid(oldUid - 1), null,
+    `${label}: forward passage releases the old completed-Hope instance`);
+  assert.deepEqual({ level: p.level, x: p.x, z: p.z },
+    tolnaCoordInCopy(p, sourceCoordForName('soulbane_tolna_player'), `${label} intro stand`),
+    `${label}: native entry places the player at the authored intro stand`);
+  const heads = tolnaHeadsFor(p);
+  assertOwnedTolnaActors(p, 3, false, `${label} stage-10 actors`);
+  assert.deepEqual(heads.map(({ npc }) => npc.levels[HP_STAT]), [37, 37, 37],
+    `${label}: all three product-spawned heads retain their authored fresh HP`);
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [0, 0, 0],
+    `${label}: no finale credit is seeded at entry`);
+  assert.equal(readVar(p, 'soulbane_tolna_pres'), 0, `${label}: human-presence is not set by combat entry`);
+  assert.equal(readVar(p, 'soulbane_launa_pres'), 0, `${label}: parent-presence is not set by combat entry`);
+  for (const { npc } of heads) assertTolnaNativeGates(p, npc, false, `${label} intro gate`);
+  const geometry = checkGeometry ? testTolnaArenaGeometry(p, `${label} stage-10 geometry`) : null;
+  return { heads, oldUid, geometry };
+}
+function withTolnaCombatRandom(values, run) {
+  let index = 0;
+  const next = () => values[index++ % values.length];
+  const previousMathRandom = Math.random;
+  const previousJavaRandom = JavaRandom.nextDouble;
+  Math.random = next;
+  JavaRandom.nextDouble = next;
+  try { return run(); }
+  finally {
+    Math.random = previousMathRandom;
+    JavaRandom.nextDouble = previousJavaRandom;
+  }
+}
+function castTolnaWindStrike(p, npc, label) {
+  const windStrike = requiredId('Component', 'magic:wind_strike');
+  for (const rune of ['airrune', 'mindrune']) {
+    const need = 1 - count(p, rune);
+    if (need > 0) assert.equal(p.invAdd(inv, obj(rune), need), need, `${label}: seed only the real spell's ordinary ${rune}`);
+  }
+  assert(p.isComponentVisible(types.Component.get(windStrike)), `${label}: native Wind Strike control is visible`);
+  const hpBefore = npc.levels[HP_STAT];
+  const xpBefore = xpSnapshot(p);
+  const mark = p.packets.length;
+  p.clearInteraction();
+  World.processInfo();
+  rsbuf.npcInfo(0, p.slot, 0, 0, true);
+  assert(rsbuf.hasNpc(p.slot, npc.nid), `${label}: the owner sees the actual finale target`);
+  if (!p.inOperableDistance(npc)) {
+    const route = [...map.findPathToEntity(p.level, p.x, p.z, npc.x, npc.z, p.width, npc.width, npc.length)]
+      .map(value => unpackWorld(value));
+    assert(route.length > 0, `${label}: native pathfinder finds a cast approach`);
+    assert(MoveClickHandler.handle(new MoveClick(route.map(({ x, z }) => ({ x, z })), 0, true), p),
+      `${label}: native paired spell-click movement is accepted`);
+  }
+  assert(OpNpcTHandler.handle(new OpNpcT(npc.nid, windStrike), p),
+    `${label}: native APNPCT accepts the eligible owner's finale cast`);
+  assert.match(p.getApTrigger()?.name ?? '', /^\[apnpct,/i,
+    `${label}: owner cast reaches the native APNPCT route`);
+  p.processInteraction();
+  for (let tick = 0; tick < 64; tick++) worldTick();
+  assert(npc.levels[HP_STAT] < hpBefore, `${label}: real native spell queue damages the head`);
+  assert(xpSnapshot(p).some((value, skill) => value > xpBefore[skill]),
+    `${label}: the native spell awards its ordinary XP`);
+  assert.equal(count(p, 'airrune'), 0, `${label}: actual Wind Strike consumes one air rune`);
+  assert.equal(count(p, 'mindrune'), 0, `${label}: actual Wind Strike consumes one mind rune`);
+  assert(p.packets.slice(mark).length > 0, `${label}: native cast emits ordinary player packets`);
+}
+
+function tolnaPointDistance(point, npc, size) {
+  const dx = Math.max(0, npc.x - (point.x + 1), point.x - (npc.x + size - 1));
+  const dz = Math.max(0, npc.z - (point.z + 1), point.z - (npc.z + size - 1));
+  return Math.max(dx, dz);
+}
+function tolnaPlayerStand(p, npc, mode, label) {
+  const size = types.NpcType.get(npc.type).size;
+  const range = questConstant('soulbane_tolna_attackrange');
+  const from = { level: p.level, x: p.x, z: p.z };
+  const candidates = [];
+  for (let x = npc.x - range; x <= npc.x + size + range; x++) {
+    for (let z = npc.z - range; z <= npc.z + size + range; z++) {
+      const point = { level: npc.level, x, z };
+      if (point.level !== from.level || map.isMapBlocked(x, z, point.level)) continue;
+      const melee = tolnaNativeMeleeReference(point, npc, size).result;
+      const distance = tolnaPointDistance(point, npc, size);
+      if (mode === 'adjacent' && !melee) continue;
+      if (mode === 'ranged' && (melee || distance === 0 || distance > range)) continue;
+      const route = tolnaExactPath(from, point);
+      if (!route) continue;
+      candidates.push({ point, distance, routeLength: route.length });
+    }
+  }
+  candidates.sort((a, b) => a.routeLength - b.routeLength || a.distance - b.distance
+    || a.point.x - b.point.x || a.point.z - b.point.z);
+  assert(candidates.length > 0, `${label}: native map pathfinder finds the requested ${mode} stand`);
+  return candidates[0].point;
+}
+function tolnaActorPositions(heads) {
+  return heads.map(({ npc }) => [npc.level, npc.x, npc.z]);
+}
+function setTolnaHeadsReady(heads, delay) {
+  for (const { npc } of heads) {
+    npc.vars[NPC_ACTION_DELAY] = delay;
+  }
+}
+function testTolnaNativeAttackIntervals(p, heads, label) {
+  const east = heads.find(({ spec }) => spec.row === 'soulbane_tolna_east');
+  assert(east, `${label}: the ranged-only East head is present`);
+  const eastStand = tolnaPlayerStand(p, east.npc, 'adjacent', `${label} East Attack target`);
+  moveToTile(p, eastStand, `${label}: approach East without moving a head`);
+  assert(p.inOperableDistance(east.npc), `${label}: ordinary APNPC2 can target East at the adjacent stand`);
+  const playerStand = tile(p);
+  const initialPositions = tolnaActorPositions(heads);
+  withCombatRandom(0.999999999999, () =>
+    runNativeAttack(p, east.npc, `${label}: ordinary native APNPC2 starts combat`, 120, true));
+  assert.deepEqual(tile(p), playerStand, `${label}: APNPC2 starts East combat without moving the player`);
+  assert.deepEqual(tolnaActorPositions(heads), initialPositions,
+    `${label}: native APNPC2 and its queue do not move any head`);
+
+  const aggressivePlayer = requiredId('VarNpcType', 'npc_aggressive_player');
+  for (const { spec, npc } of heads) {
+    assert.equal(npc.vars[aggressivePlayer] >>> 0, p.uid,
+      `${label}: ${spec.type} has the owner as its native AP target`);
+  }
+  const simultaneousStart = World.currentTick;
+  setTolnaHeadsReady(heads, simultaneousStart);
+  withCombatRandom(0.999999999999, () => worldTick());
+  for (const { spec, npc } of heads) {
+    assert.equal(npc.vars[NPC_ACTION_DELAY], simultaneousStart + spec.rangedTicks,
+      `${label}: simultaneous native AP target ${spec.type} uses its Ranged interval ${spec.rangedTicks}`);
+  }
+  assert.deepEqual(tolnaActorPositions(heads), initialPositions,
+    `${label}: all three simultaneous native AP targets remain on their exact product stands`);
+
+  for (const { spec, npc } of heads) npc.vars[NPC_ACTION_DELAY] = World.currentTick + 2048;
+  const intervalCases = [];
+  for (const { spec, npc } of heads) {
+    const stand = tolnaPlayerStand(p, npc, 'adjacent', `${label} ${spec.type} interval`);
+    moveToTile(p, stand, `${label}: reach ${spec.type}'s compiled edge boundary`);
+    assert(p.inOperableDistance(npc), `${label}: native AP target is within one-tile operation range`);
+    const before = tolnaActorPositions(heads);
+    const start = World.currentTick;
+    npc.vars[NPC_ACTION_DELAY] = start;
+    withCombatRandom(0.999999999999, () =>
+      runProc('soulbane_tolna_npc_attack', p, [], npc));
+    const expected = spec.meleeTicks > 0 ? spec.meleeTicks : spec.rangedTicks;
+    assert.equal(npc.vars[NPC_ACTION_DELAY], start + expected,
+      `${label}: ${spec.type} dispatches its native ${spec.meleeTicks > 0 ? 'melee' : 'Ranged'} interval ${expected}`);
+    assert.deepEqual(tolnaActorPositions(heads), before,
+      `${label}: ${spec.type} attack leaves all three 3x3 heads on their fixed stands`);
+    intervalCases.push({ type: spec.type, delay: expected });
+    for (const { npc: actor } of heads) actor.vars[NPC_ACTION_DELAY] = World.currentTick + 2048;
+  }
+  return intervalCases;
+}
+function testTolnaRangedDefence(p, heads, label) {
+  const east = heads.find(({ spec }) => spec.row === 'soulbane_tolna_east').npc;
+  const rangedStyle = configConstant('scripts/skill_combat/configs/combat_damagetypes.constant', 'ranged_style');
+  const magicStyle = configConstant('scripts/skill_combat/configs/combat_damagetypes.constant', 'magic_style');
+  const poisonHitmark = configConstant('scripts/skill_combat/configs/hitmark.constant', 'hitmark_poison');
+  const beforePositions = tolnaActorPositions(heads);
+  const previousRetaliate = readVar(p, 'option_nodef');
+  writeVar(p, 'option_nodef', configConstant('scripts/interface_controls/configs/player_controls.constant',
+    'player_auto_retaliate_off'));
+  p.clearInteraction();
+  const launch = (rangedDef, magicDef, magicPrayer, rangedPrayer, expectDamage, caseLabel) => {
+    assert(east.isActive && east.levels[HP_STAT] > 0,
+      `${caseLabel}: the actual East head is alive before this independent defence case`);
+    writeVar(p, 'com_rangedef', rangedDef);
+    writeVar(p, 'com_magicdef', magicDef);
+    writeVar(p, 'prayer12', magicPrayer);
+    writeVar(p, 'prayer13', rangedPrayer);
+    writeVar(p, 'poison', 0);
+    const hits = [];
+    const observeHits = () => {
+      if (p.masks & PlayerInfoProt.DAMAGE) {
+        hits.push({ tick: World.currentTick, damage: p.hitmarkDamage, type: p.hitmarkType });
+      }
+      if (p.masks & PlayerInfoProt.DAMAGE2) {
+        hits.push({ tick: World.currentTick, damage: p.hitmark2Damage, type: p.hitmark2Type });
+      }
+    };
+    const start = World.currentTick;
+    east.vars[NPC_ACTION_DELAY] = start;
+    withCombatRandom(0.999999999999, () =>
+      runProc('soulbane_tolna_npc_attack', p, [], east));
+    assert.equal(east.vars[NPC_ACTION_DELAY], start + TOLNA_HEADS.find(head => head.id === east.type).rangedTicks,
+      `${caseLabel}: East reached its native Ranged attack branch`);
+    east.vars[NPC_ACTION_DELAY] = World.currentTick + 2048;
+    for (let tick = 0; tick < 128; tick++) worldTick(observeHits);
+    const rangedHits = hits.filter(hit => hit.type !== poisonHitmark);
+    assert(rangedHits.length > 0, `${caseLabel}: the real incoming projectile emits its native hitmark`);
+    const rangedDamage = rangedHits.reduce((total, hit) => total + hit.damage, 0);
+    const poisonDamage = hits.filter(hit => hit.type === poisonHitmark)
+      .reduce((total, hit) => total + hit.damage, 0);
+    assert.equal(rangedDamage > 0, expectDamage,
+      `${caseLabel}: actual ranged hitmarks follow Ranged defence/protection independently of later poison`);
+    console.log('Tolna Ranged defence', JSON.stringify({ caseLabel, rangedDamage, poisonDamage, hits }));
+    assert.deepEqual(tolnaActorPositions(heads), beforePositions,
+      `${caseLabel}: ranged resolution does not move the product-spawned heads`);
+    assert(east.isActive && east.levels[HP_STAT] > 0,
+      `${caseLabel}: observing incoming damage does not retaliate against and kill the fixture target`);
+    return rangedDamage;
+  };
+  writeVar(p, 'prayer12', 0);
+  writeVar(p, 'prayer13', 0);
+  writeVar(p, 'com_rangedef', 1000000);
+  writeVar(p, 'com_magicdef', 0);
+  assert(runProcInt('player_defence_roll_specific', p, [rangedStyle], east) >
+    runProcInt('player_defence_roll_specific', p, [magicStyle], east),
+  `${label}: native Ranged defence is independently distinct from Magic defence`);
+  const rangedMiss = launch(1000000, 0, 0, 0, false, `${label} high Ranged defence`);
+  const magicPrayerHit = launch(0, 1000000, 1, 0, true, `${label} Protect from Magic only`);
+  const missilePrayerBlock = launch(0, 1000000, 0, 1, false, `${label} Protect from Missiles`);
+  assert.equal(rangedMiss, 0, `${label}: high Ranged defence rejects the shot`);
+  assert(magicPrayerHit > 0, `${label}: Protect from Magic does not block the Ranged attack`);
+  assert.equal(missilePrayerBlock, 0, `${label}: Protect from Missiles prevents ranged damage`);
+  writeVar(p, 'prayer12', 0);
+  writeVar(p, 'prayer13', 1);
+  writeVar(p, 'option_nodef', previousRetaliate);
+}
+
+function tolnaSurfaceSpeaker(p, label) {
+  const multiId = requiredId('NpcType', 'soulbane_tolna_multi');
+  const topId = requiredId('NpcType', 'soulbane_tolna_top');
+  const multi = types.NpcType.get(multiId);
+  assert.equal(multi.multivarbit, requiredId('VarBitType', 'soulbane_tolna_pres'),
+    `${label}: original surface multi selects on Tolna's presence bit`);
+  assert.deepEqual(Array.from(multi.multinpc), [-1, topId],
+    `${label}: original cache hides Tolna at presence zero and selects the top form at presence one`);
+  for (const typeId of [multiId, topId]) {
+    const type = types.NpcType.get(typeId);
+    const trigger = ScriptProvider.getByTrigger(ServerTriggerType.OPNPC1, typeId, type.category);
+    assert(trigger, `${label}: packed ${type.debugname} has a native Talk-to selector`);
+  }
+  const npc = activeNpc('soulbane_tolna_multi');
+  assert.equal(npc.level, 0, `${label}: selected Talk-to target is the original surface NPC`);
+  assert.equal(resolveNpcType(types.NpcType.get(npc.type), p).id, topId,
+    `${label}: the native per-player cache selector displays Tolna after reunion`);
+  return npc;
+}
+function assertTolnaCompletionScroll(p, label) {
+  // The offline Player omits NetworkPlayer.encodeOut; inspect the actual queued modal,
+  // not an IfOpenMain packet that only a connected NetworkPlayer emits.
+  assert.equal(p.modalMain, requiredId('Component', 'questscroll_death'),
+    `${label}: native completion selects the actual reward-scroll main modal`);
+  assert.equal(p.refreshModal, true, `${label}: native completion queues that modal for network output`);
+  const textPackets = p.packets.filter(packet => packet.constructor.name === 'IfSetText');
+  const questPointLine = textPackets.find(packet =>
+    packet.component === requiredId('Component', 'questscroll_death:com_9'));
+  assert(questPointLine, `${label}: native reward scroll writes its quest-point line`);
+  assert.match(questPointLine.text, /\b1\b/, `${label}: completion scroll states the single quest point`);
+  assert.match(questPointLine.text, /Quest Point/i, `${label}: completion scroll labels its quest-point amount`);
+  const rewards = textPackets.filter(packet => [10, 11, 12, 13, 14].some(index =>
+    packet.component === requiredId('Component', `questscroll_death:com_${index}`)))
+    .map(packet => packet.text).join(' ');
+  assert.match(rewards, /\b500\b.*Defence XP/i, `${label}: completion UI reports 500 Defence XP`);
+  assert.match(rewards, /\b500\b.*Hitpoints XP/i, `${label}: completion UI reports 500 Hitpoints XP`);
+  assert.match(rewards, /\b500\b.*Coins/i, `${label}: completion UI reports 500 Coins`);
+}
+function leaveTolnaCopy(p, label, choices = []) {
+  const oldUid = instanceUid(p);
+  const exit = tolnaFinalExitLoc(p);
+  goToStand(p, exit, `${label}: walk to the original final-room Exit`);
+  const result = operateLoc(p, exit, 1, choices, `${label}: native final-room exit`);
+  assert.equal(result.trigger.name, '[oploc1,soul_bane_tolna_void_small]',
+    `${label}: final-room departure uses the original packed Exit`);
+  assert.equal(instanceUid(p), 0, `${label}: native departure releases the temporary instance`);
+  assert.equal(World.instances.findInstanceByUid(oldUid - 1), null,
+    `${label}: native departure deletes the entire private copy`);
+  assert.equal(remainingNpcsWithInstance(oldUid).length, 0,
+    `${label}: native departure removes live, queued and inert instance actors`);
+  return oldUid;
+}
+function testTolnaCompletionProgression(p, label = 'native Tolna completion progression') {
+  const { heads, geometry } = enterTolnaFinalRoom(p, label);
+  const intro = tolnaIntroPages(p, label);
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [0, 0, 0],
+    `${label}: the intro continuation does not fabricate head deaths`);
+  assertOwnedTolnaActors(p, 3, false, `${label} stage-11 combat group`);
+  for (const { spec, npc } of heads) {
+    assertTolnaNativeGates(p, npc, true, `${label} owner ${spec.type} combat gate`);
+  }
+  testForeignLaterRoomPackets(p, heads.map(({ npc }) => npc), `${label} foreign owner gates`);
+  assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: foreign packets cannot advance the owner's stage`);
+  writeVar(p, 'prayer13', 1);
+  writeVar(p, 'prayer14', 1);
+  const intervals = testTolnaNativeAttackIntervals(p, heads, label);
+  testTolnaRangedDefence(p, heads, label);
+  const south = heads.find(({ spec }) => spec.row === 'soulbane_tolna_south');
+  stableHitRandom(() => castTolnaWindStrike(p, south.npc, `${label} owner APNPCT cast`));
+  assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: a real cast cannot substitute for the three deaths`);
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [0, 0, 0],
+    `${label}: cast damage alone earns no head-death credit`);
+  const meleeKills = [
+    killTolnaHeadByMelee(p, heads, south, `${label} ordinary South death`),
+    killTolnaHeadByMelee(p, heads, heads.find(({ spec }) => spec.row === 'soulbane_tolna_north'),
+      `${label} ordinary North death`)
+  ];
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [1, 0, 1],
+    `${label}: two ordinary native deaths set only their own unique credit bits`);
+  assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: two deaths cannot advance to stage 12`);
+  assertOwnedTolnaActors(p, 1, false, `${label} before final poison death`);
+  const east = heads.find(({ spec }) => spec.row === 'soulbane_tolna_east');
+  poisonKillTolnaEast(p, heads, east, `${label} final East poison death`);
+  for (const { spec, npc } of heads) {
+    assertTolnaNativeGates(p, npc, false, `${label} completed stage-12 gate ${spec.type}`);
+  }
+  assert.equal(readVar(p, 'soulbane_tolna_pres'), 0,
+    `${label}: stage 12 alone does not set human-presence`);
+  assert.equal(readVar(p, 'soulbane_launa_pres'), 0,
+    `${label}: stage 12 alone does not set parent-presence`);
+
+  const stage12Uid = leaveTolnaCopy(p, `${label} stage-12 incomplete reunion leave`);
+  assert.equal(stage(p), TOLNA_CLEAR_STAGE, `${label}: leaving after combat preserves stage 12`);
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [1, 1, 1],
+    `${label}: complete head credit persists through ordinary exit`);
+  enterTolnaByRift(p, `${label} stage-12 rift re-entry`);
+  assert.equal(stage(p), TOLNA_CLEAR_STAGE, `${label}: rift re-entry preserves the genuine stage-12 clear`);
+  const reentryUid = instanceUid(p);
+  const reentryActors = assertOwnedTolnaActors(p, 0, true, `${label} stage-12 re-entry actors`);
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [1, 1, 1],
+    `${label}: re-entry does not reset complete head credit`);
+  assert.equal(readVar(p, 'soulbane_tolna_pres'), 0,
+    `${label}: stage-12 re-entry still precedes human return`);
+  assert.equal(readVar(p, 'soulbane_launa_pres'), 0,
+    `${label}: stage-12 re-entry still precedes parent return`);
+  const human = reentryActors.find(npc => npc.type === TOLNA_HUMAN || npc.baseType === TOLNA_HUMAN);
+  assert(human, `${label}: actual product-spawned Tolna is available for the reunion`);
+  goToStand(p, human, `${label}: walk to the actual private Tolna reunion target`);
+  const reunion = operateNpc(p, human, 1, [], `${label} actual private Tolna reunion`);
+  assert.match(reunion.trigger.name, /^\[opnpc1,soulbane_tolna_(?:top|multi)\]$/,
+    `${label}: owner conversation dispatches through the native Tolna selector`);
+  assert(reunion.text.includes('Tolna?') && reunion.text.includes("I'm just glad I could help."),
+    `${label}: the complete compiled human reunion runs through its real dialogue pages`);
+  assert.equal(stage(p), TOLNA_CLEAR_STAGE, `${label}: human reunion sets presence without claiming the quest`);
+  assert.equal(readVar(p, 'soulbane_tolna_pres'), 1, `${label}: human-presence is written only by the reunion`);
+  assert.equal(readVar(p, 'soulbane_launa_pres'), 1, `${label}: parent-presence follows the completed reunion`);
+  assert.equal(instanceUid(p), 0, `${label}: reunion uses the native leave and cleanup path`);
+  assert.equal(World.instances.findInstanceByUid(reentryUid - 1), null,
+    `${label}: reunion deletes the re-entered private region`);
+  assert.equal(remainingNpcsWithInstance(reentryUid).length, 0,
+    `${label}: reunion cleanup removes every re-entered actor and inert corpse`);
+  assert.equal(remainingNpcsWithInstance(stage12Uid).length, 0,
+    `${label}: reunion cleanup removes every old head, Brana and inert corpse`);
+
+  const surfaceTolna = tolnaSurfaceSpeaker(p, label);
+  goToStand(p, surfaceTolna, `${label}: walk to the actual surface Tolna reward target`);
+  fillTolnaInventory(p, `${label} reward overflow`);
+  const xpBeforeReward = xpSnapshot(p);
+  const qpBeforeReward = readVar(p, 'qp');
+  const coinsBeforeReward = count(p, 'coins');
+  const rewardMark = p.packets.length;
+  const reward = operateNpc(p, surfaceTolna, 1, [], `${label} actual surface Tolna reward`);
+  assert.match(reward.trigger.name, /^\[opnpc1,soulbane_tolna_(?:top|multi)\]$/,
+    `${label}: surface reward dispatches from Tolna, never Launa`);
+  assert.equal(stage(p), TOLNA_COMPLETE_STAGE, `${label}: actual surface conversation alone writes stage 13`);
+  assert.equal(TOLNA_COMPLETE_STAGE, 13, `${label}: global Soulbane completion stage is 13`);
+  assert.equal(readVar(p, 'soulbane_tolna_pres'), 1, `${label}: completed surface reward preserves human-presence`);
+  assert.equal(readVar(p, 'soulbane_launa_pres'), 1, `${label}: completed surface reward preserves parent-presence`);
+  const xpAfterReward = xpSnapshot(p);
+  for (let skill = 0; skill < xpAfterReward.length; skill++) {
+    const expected = skill === PlayerStat.DEFENCE || skill === PlayerStat.HITPOINTS ? 5000 : 0;
+    assert.equal(xpAfterReward[skill] - xpBeforeReward[skill], expected,
+      `${label}: surface reward grants exactly ${expected} native tenths to stat ${skill}`);
+  }
+  assert.equal(readVar(p, 'qp'), qpBeforeReward + 1,
+    `${label}: surface reward awards exactly one quest point`);
+  assert.equal(configConstant('scripts/general/configs/quest.constant', 'soulbane_questpoints'), 1,
+    `${label}: the source quest-point constant is one`);
+  assert.equal(count(p, 'coins'), coinsBeforeReward,
+    `${label}: the full inventory leaves the native coin award on the ground`);
+  const groundCoins = World.getObj(p.x, p.z, p.level, obj('coins'), p.hash64);
+  assert(groundCoins, `${label}: full-bag inv_add creates the ordinary owner-bound ground overflow`);
+  assert.equal(groundCoins.count, questConstant('soulbane_reward_coins'),
+    `${label}: the owned ground stack contains all 500 native reward coins`);
+  assert.equal(groundCoins.receiver64, p.hash64,
+    `${label}: only the quest owner receives the overflow ground stack`);
+  assertTolnaCompletionScroll(p, `${label} native completion UI`);
+  assert(CloseModalHandler.handle(new CloseModal(), p), `${label}: native completion-scroll Close is admitted`);
+  worldTick();
+  assert.equal(p.modalMain, -1, `${label}: native Close clears the completed reward scroll`);
+  const rewardPackets = p.packets.slice(rewardMark);
+  assert(rewardPackets.some(packet => packet.constructor.name === 'IfSetColour'
+    && packet.component === QUEST_ROW), `${label}: native quest progress updates the actual Soulbane row`);
+  const inventoryAfterReward = normalInventory(p);
+  const qpAfterReward = readVar(p, 'qp');
+  const coinsAfterReward = count(p, 'coins');
+  p.packets.length = 0;
+  const repeatNpc = tolnaSurfaceSpeaker(p, `${label} repeat selector`);
+  const repeat = operateNpc(p, repeatNpc, 1, [], `${label} surface repeat conversation`);
+  assert.match(repeat.trigger.name, /^\[opnpc1,soulbane_tolna_(?:top|multi)\]$/,
+    `${label}: repeat remains on the actual surface Tolna dispatch`);
+  assert.equal(stage(p), TOLNA_COMPLETE_STAGE, `${label}: repeat conversation cannot change completion`);
+  assert.deepEqual(xpSnapshot(p), xpAfterReward, `${label}: repeat awards no duplicate Defence or Hitpoints XP`);
+  assert.equal(readVar(p, 'qp'), qpAfterReward, `${label}: repeat awards no duplicate quest point`);
+  assert.equal(count(p, 'coins'), coinsAfterReward, `${label}: repeat awards no duplicate inventory coins`);
+  assert.deepEqual(normalInventory(p), inventoryAfterReward, `${label}: repeat leaves the full ordinary bag intact`);
+  assert.equal(p.modalMain, -1, `${label}: repeat opens no second reward scroll`);
+  const repeatGroundCoins = World.getObj(p.x, p.z, p.level, obj('coins'), p.hash64);
+  assert.equal(repeatGroundCoins?.count ?? 0, groundCoins.count,
+    `${label}: repeat creates no duplicate owner-bound ground reward`);
+  assert.equal(inventory(p).filter(Boolean).length, types.InvType.get(inv).size,
+    `${label}: all ordinary inventory slots remain occupied through the repeat`);
+
+  assert.equal(World.instances.findInstanceByUid(reentryUid - 1), null,
+    `${label}: completed relog keeps no Tolna copy from the stage-12 reunion`);
+  assert.equal(remainingNpcsWithInstance(reentryUid).length, 0,
+    `${label}: completed relog keeps no former head, Brana, human or corpse`);
+  const reloaded = nativeLogoutAndReload(p, `${label} completed stage-13 relog`);
+  assert.equal(stage(reloaded), TOLNA_COMPLETE_STAGE, `${label}: completed stage 13 persists through native relog`);
+  assert.equal(instanceUid(reloaded), 0, `${label}: completed relog has no temporary instance`);
+  assert.deepEqual(xpSnapshot(reloaded), xpAfterReward, `${label}: relog preserves exactly one completion XP award`);
+  assert.equal(readVar(reloaded, 'qp'), qpAfterReward, `${label}: relog preserves exactly one quest point`);
+  assert.deepEqual(normalInventory(reloaded), inventoryAfterReward,
+    `${label}: relog preserves all ordinary bag contents`);
+  assert.equal(World.instances.findInstanceByUid(reentryUid - 1), null,
+    `${label}: completed relog retains no old private copy`);
+  assert.equal(remainingNpcsWithInstance(reentryUid).length, 0,
+    `${label}: completed relog retains no old-room NPC or inert corpse`);
+  reloaded.packets.length = 0;
+  const reloadedTolna = tolnaSurfaceSpeaker(reloaded, `${label} relog selector`);
+  operateNpc(reloaded, reloadedTolna, 1, [], `${label} post-relog repeat`);
+  assert.equal(stage(reloaded), TOLNA_COMPLETE_STAGE, `${label}: relog repeat cannot open postquest progression`);
+  assert.deepEqual(xpSnapshot(reloaded), xpAfterReward, `${label}: relog repeat grants no second XP award`);
+  assert.equal(readVar(reloaded, 'qp'), qpAfterReward, `${label}: relog repeat grants no second quest point`);
+  assert.equal(reloaded.modalMain, -1, `${label}: relog repeat opens no completion scroll`);
+  const relogGround = World.getObj(reloaded.x, reloaded.z, reloaded.level, obj('coins'), reloaded.hash64);
+  assert((relogGround?.count ?? 0) <= groundCoins.count,
+    `${label}: completed relog cannot create another ground coin award`);
+  const rift = riftLoc();
+  goToStand(reloaded, rift, `${label}: attempt postquest rift access`);
+  const oldSurface = tile(reloaded);
+  const denied = operateLoc(reloaded, rift, 1, [], `${label}: completed-state rift admission`);
+  assert.match(denied.trigger.name, /^\[oploc1,soulbane_falloff2_rope(?:_multi)?\]$/,
+    `${label}: rift still uses its original native handler after completion`);
+  assert.equal(stage(reloaded), TOLNA_COMPLETE_STAGE, `${label}: stage-13 rift use does not reopen the quest`);
+  assert.equal(instanceUid(reloaded), 0, `${label}: completed account cannot create a postquest instance`);
+  assert.equal(tolnaActorsFor(reloaded).length, 0, `${label}: no postquest final actors are accessible`);
+  assert.deepEqual(tile(reloaded), oldSurface,
+    `${label}: refused postquest access leaves the account at its surface tile`);
+  console.log(`Tolna native finale ${JSON.stringify({ geometry, introOverheads: intro.overheads.length, intervals, ordinaryMeleeKills: meleeKills, stage: stage(reloaded), rewardXp: 5000, coins: groundCoins.count })}`);
+  return reloaded;
+}
+
+function testTolnaCompletionCase() {
+  const label = 'native Tolna completion progression';
+  const p = tolnaPrerequisiteFixture(`${label}: stage-9 prerequisite`);
+  const completed = testTolnaCompletionProgression(p, label);
+  cleanupTolnaFixturePlayer(completed, label);
+}
+
+function enterTolnaByRift(p, label) {
+  assert.equal(instanceUid(p), 0, `${label}: an ordinary surface account has no active copy`);
+  const rift = riftLoc();
+  goToStand(p, rift, `${label}: walk to the original rift`);
+  const entered = operateLoc(p, rift, 1, [], `${label}: native rift re-entry`);
+  assert.match(entered.trigger.name, /^\[oploc1,soulbane_falloff2_rope(?:_multi)?\]$/,
+    `${label}: rift admission uses the original Climb-down loc`);
+  assert.notEqual(instanceUid(p), 0, `${label}: native rift admission creates the private copy`);
+  return entered;
+}
+function killTolnaHeadByMelee(p, heads, head, label) {
+  const { spec, npc } = head;
+  const stand = tolnaPlayerStand(p, npc, 'adjacent', `${label} melee stand`);
+  moveToTile(p, stand, `${label}: native walk to ${spec.type}`);
+  assert(p.inOperableDistance(npc), `${label}: ordinary player melee can reach the 3x3 head`);
+  setTolnaHeadsReady(heads, World.currentTick + 2048);
+  const creditsBefore = TOLNA_DEATH_BITS.reduce((sum, name) => sum + readVar(p, name), 0);
+  let attempts = 0;
+  while (npc.levels[HP_STAT] > 0 && attempts < 16) {
+    awaitPlayerActionReady(p, `${label} native player cooldown`);
+    const hpBefore = npc.levels[HP_STAT];
+    withCombatRandom(0.999999999999, () =>
+      runNativeAttack(p, npc, `${label}: actual player melee`, 120, true));
+    assert(npc.levels[HP_STAT] < hpBefore, `${label}: ordinary queued melee damage lands`);
+    attempts++;
+  }
+  assert.equal(npc.levels[HP_STAT], 0, `${label}: ordinary native damage kills ${spec.type}`);
+  const bit = TOLNA_DEATH_BITS[TOLNA_HEADS.indexOf(spec)];
+  for (let tick = 0; tick < 32 && readVar(p, bit) === 0; tick++) worldTick();
+  assert.equal(readVar(p, bit), 1, `${label}: native AI_QUEUE3 and owner credit set exactly one head bit`);
+  assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: fewer than three head deaths cannot clear the room`);
+  assert.equal(readVar(p, 'soulbane_final_tol1dead') + readVar(p, 'soulbane_final_tol2dead')
+    + readVar(p, 'soulbane_final_tol3dead'), creditsBefore + 1,
+  `${label}: a native death earns one boolean credit without duplicates`);
+  return attempts;
+}
+function equipTolnaPoisonWeapon(p, label) {
+  if (count(p, 'rune_scimitar', types.InvType.getId('worn')) > 0) {
+    assert(remove(p, 'rune_scimitar'), `${label}: native Wield removal unequips the ordinary scimitar`);
+  }
+  if (count(p, 'iron_dagger_p') === 0) {
+    assert.equal(p.invAdd(inv, obj('iron_dagger_p'), 1), 1,
+      `${label}: seed one actual packed poison weapon`);
+  }
+  assert(held(p, 'iron_dagger_p', 2), `${label}: native Wield equips the actual poisoned dagger`);
+  p.setLevel(PlayerStat.STRENGTH, 1);
+  p.combatLevel = p.getCombatLevel();
+  const severity = types.ObjType.get(obj('iron_dagger_p')).params.get(POISON_SEVERITY_PARAM);
+  assert(severity > 0, `${label}: the selected packed dagger declares native poison severity`);
+  return severity;
+}
+function poisonKillTolnaEast(p, heads, east, label) {
+  const severity = equipTolnaPoisonWeapon(p, label);
+  const living = heads.filter(({ npc }) => npc.levels[HP_STAT] > 0);
+  assert.deepEqual(living.map(({ spec }) => spec.row), ['soulbane_tolna_east'],
+    `${label}: only East remains eligible for shared actual player poison`);
+  const stand = tolnaPlayerStand(p, east.npc, 'adjacent', `${label} poisoned melee stand`);
+  moveToTile(p, stand, `${label}: reach the surviving East head on foot`);
+  setTolnaHeadsReady(heads, World.currentTick + 2048);
+  const sequences = [
+    [0.999999999999, 0, 0.999999999999, 0],
+    [0, 0.999999999999, 0, 0.999999999999],
+    [0.999999999999, 0.999999999999, 0, 0],
+    [0, 0, 0.999999999999, 0.999999999999]
+  ];
+  for (let attempt = 0; attempt < 8 && east.npc.vars[NPC_POISON] === 0; attempt++) {
+    awaitPlayerActionReady(p, `${label} poison weapon cooldown`);
+    const hpBefore = east.npc.levels[HP_STAT];
+    withTolnaCombatRandom(sequences[attempt % sequences.length], () =>
+      runNativeAttack(p, east.npc, `${label}: native poisoned melee hit ${attempt + 1}`, 120, true));
+    assert(east.npc.levels[HP_STAT] < hpBefore,
+      `${label}: actual player melee damage reaches East through the native queue`);
+  }
+  assert.equal(east.npc.vars[NPC_POISON], severity,
+    `${label}: an actual weapon proc applies its cache-declared poison severity to East`);
+  const hitHp = east.npc.levels[HP_STAT];
+  const eastBit = TOLNA_DEATH_BITS[TOLNA_HEADS.indexOf(east.spec)];
+  assert.equal(readVar(p, eastBit), 0, `${label}: poison application is not head-death credit`);
+  assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: poison application alone cannot clear stage 11`);
+  let sawNativePoisonDamage = false;
+  for (let tick = 0; tick < 2048 && stage(p) !== TOLNA_CLEAR_STAGE; tick++) {
+    const hpBefore = east.npc.levels[HP_STAT];
+    worldTick();
+    if (east.npc.levels[HP_STAT] < hpBefore) sawNativePoisonDamage = true;
+    if (stage(p) === TOLNA_CLEAR_STAGE) {
+      assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [1, 1, 1],
+        `${label}: the final credit is admitted only after all three real head deaths`);
+    } else {
+      assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: no early stage-12 transition occurs`);
+    }
+  }
+  assert(sawNativePoisonDamage, `${label}: the native NPC poison timer, not another player hit, damages East`);
+  assert.equal(hitHp > 0, true, `${label}: the real weapon hit does not fake a poisoned death`);
+  assert.equal(east.npc.levels[HP_STAT], 0, `${label}: native poison eventually kills the final head`);
+  assert.equal(readVar(p, eastBit), 1, `${label}: native poison death reaches ordinary AI_QUEUE3 credit`);
+  assert.equal(stage(p), TOLNA_CLEAR_STAGE, `${label}: three distinct native deaths produce stage 12`);
+  for (let tick = 0; tick < 8; tick++) worldTick();
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [1, 1, 1],
+    `${label}: later corpse ticks cannot duplicate any death credit`);
+  const actors = tolnaActorsFor(p);
+  assert.equal(actors.filter(npc => TOLNA_HEAD_IDS.has(npc.type) || TOLNA_HEAD_IDS.has(npc.baseType)).length, 0,
+    `${label}: native death cleanup removes all three head actors before reunion`);
+  assert.equal(actors.filter(npc => npc.type === TOLNA_HUMAN || npc.baseType === TOLNA_HUMAN).length, 1,
+    `${label}: the human appears only after all three credits`);
+}
+function fillTolnaInventory(p, label) {
+  assert.equal(count(p, 'coins'), 0, `${label}: the full-bag fixture begins without a stackable coin slot`);
+  const inventorySize = types.InvType.get(inv).size;
+  let occupied = inventory(p).filter(Boolean).length;
+  const fillerNames = [];
+  for (let itemId = 0; itemId < types.ObjType.count && occupied < inventorySize; itemId++) {
+    const item = types.ObjType.get(itemId);
+    if (!item?.debugname || item.debugname === 'null' || item.stackable || item.dummyitem !== 0
+      || WEAPON_IDS.has(itemId) || count(p, item.debugname) > 0) continue;
+    if (p.invAdd(inv, itemId, 1) === 1) {
+      fillerNames.push(item.debugname);
+      occupied++;
+    }
+  }
+  assert.equal(occupied, inventorySize, `${label}: ordinary cache items fill every inventory slot`);
+  assert.equal(inventory(p).filter(Boolean).length, inventorySize,
+    `${label}: the native inventory reports a genuinely full bag`);
+  return fillerNames;
+}
+
+function tolnaPrerequisiteFixture(label) {
+  // stage 9 seeded as a prerequisite; not a progression proof.
+  return laterRoomFixture(HOPE_CLEAR_STAGE, label);
+}
+function tolnaLiveHeadSet(p, label) {
+  const heads = tolnaHeadsFor(p);
+  assertOwnedTolnaActors(p, 3, false, `${label} live stage-11 actors`);
+  assert.deepEqual(heads.map(({ npc }) => npc.levels[HP_STAT]), [37, 37, 37],
+    `${label}: fresh product heads keep their authored HP`);
+  return heads;
+}
+function cleanupTolnaFixturePlayer(p, label) {
+  p.clearInteraction();
+  for (let tick = 0; tick < 128 && World.currentTick < p.preventLogoutUntil; tick++) worldTick();
+  assert(World.currentTick >= p.preventLogoutUntil,
+    `${label}: actual logout cooldown expires without bypass`);
+  p.requestLogout = true;
+  p.lastResponse = World.currentTick;
+  worldTick();
+  assert(![...World.playerLoop.all()].includes(p), `${label}: isolated account leaves through native logout`);
+}
+function testTolnaSharedPoison() {
+  const label = 'Tolna shared native poison';
+  const p = tolnaPrerequisiteFixture(`${label}: stage-9 prerequisite`);
+  const { heads } = enterTolnaFinalRoom(p, label, false);
+  tolnaIntroPages(p, label);
+  assertOwnedTolnaActors(p, 3, false, `${label} before poison`);
+  const severity = equipTolnaPoisonWeapon(p, label);
+  const south = heads.find(({ spec }) => spec.row === 'soulbane_tolna_south');
+  const stand = tolnaPlayerStand(p, south.npc, 'adjacent', `${label} player poison attack`);
+  moveToTile(p, stand, `${label}: native path to the South head`);
+  setTolnaHeadsReady(heads, World.currentTick + 2048);
+  const sequences = [
+    [0.999999999999, 0, 0.999999999999, 0],
+    [0, 0.999999999999, 0, 0.999999999999],
+    [0.999999999999, 0.999999999999, 0, 0],
+    [0, 0, 0.999999999999, 0.999999999999]
+  ];
+  for (let attempt = 0; attempt < 8 && south.npc.vars[NPC_POISON] === 0; attempt++) {
+    awaitPlayerActionReady(p, `${label} poison weapon cooldown`);
+    const hpBefore = south.npc.levels[HP_STAT];
+    withTolnaCombatRandom(sequences[attempt % sequences.length], () =>
+      runNativeAttack(p, south.npc, `${label}: real poisoned weapon hit ${attempt + 1}`, 120, true));
+    assert(south.npc.levels[HP_STAT] < hpBefore,
+      `${label}: native player melee queue lands on the South head`);
+  }
+  assert.deepEqual(heads.map(({ npc }) => npc.vars[NPC_POISON]), [severity, severity, severity],
+    `${label}: native owner context shares actual player weapon poison to all three live UIDs`);
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [0, 0, 0],
+    `${label}: shared poison is not a seeded corpse or death credit`);
+  assert.equal(stage(p), TOLNA_ACTIVE_STAGE,
+    `${label}: sharing real player poison does not skip the three death queues`);
+  const poisonDamage = new Set();
+  const deathActors = new Set();
+  for (let tick = 0; tick < 2048 && stage(p) !== TOLNA_CLEAR_STAGE; tick++) {
+    const hpBefore = heads.map(({ npc }) => npc.levels[HP_STAT]);
+    worldTick();
+    heads.forEach(({ spec, npc }, index) => {
+      if (npc.levels[HP_STAT] < hpBefore[index]) poisonDamage.add(spec.row);
+      if (npc.levels[HP_STAT] === 0) deathActors.add(spec.row);
+    });
+    if (stage(p) === TOLNA_CLEAR_STAGE) {
+      assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [1, 1, 1],
+        `${label}: shared native poison can clear only after all native death credits`);
+    } else {
+      assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: no early stage-12 transition occurs`);
+    }
+  }
+  assert.equal(stage(p), TOLNA_CLEAR_STAGE, `${label}: native poison deaths complete the real three-head queue`);
+  assert.deepEqual([...poisonDamage].sort(), TOLNA_HEADS.map(head => head.row).sort(),
+    `${label}: the native poison timer damages every shared head`);
+  assert.deepEqual([...deathActors].sort(), TOLNA_HEADS.map(head => head.row).sort(),
+    `${label}: each real poisoned head reaches zero HP`);
+  assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [1, 1, 1],
+    `${label}: three actual poisoned deaths earn three distinct credit bits`);
+  assertOwnedTolnaActors(p, 0, true, `${label} post-poison completion`);
+  assert.equal(readVar(p, 'soulbane_tolna_pres'), 0,
+    `${label}: native poison completion does not set reunion presence`);
+  const uid = leaveTolnaCopy(p, `${label} stage-12 cleanup`);
+  assert.equal(remainingNpcsWithInstance(uid).length, 0,
+    `${label}: native cleanup removes all three corpses, Brana and human`);
+  cleanupTolnaFixturePlayer(p, label);
+  console.log(`Tolna shared poison ${JSON.stringify({ severity, sharedHeads: heads.length, poisonDeaths: deathActors.size })}`);
+}
+function testTolnaIncompleteLifecycle() {
+  for (const mode of ['leave', 'logout', 'death']) {
+    const label = `Tolna incomplete ${mode}`;
+    const p = tolnaPrerequisiteFixture(`${label}: stage-9 prerequisite`);
+    const { heads } = enterTolnaFinalRoom(p, label, false);
+    tolnaIntroPages(p, label);
+    const south = heads.find(({ spec }) => spec.row === 'soulbane_tolna_south');
+    killTolnaHeadByMelee(p, heads, south, `${label} one produced native death`);
+    assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [1, 0, 0],
+      `${label}: one real death precedes the selected cleanup path`);
+    assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: one death remains an incomplete stage-11 fight`);
+    const earnedXp = xpSnapshot(p);
+    const earnedQuestPoints = readVar(p, 'qp');
+    const oldUid = instanceUid(p);
+    if (mode === 'leave') {
+      leaveTolnaCopy(p, `${label} ordinary Exit`, [1]);
+    } else if (mode === 'logout') {
+      setTolnaHeadsReady(heads, World.currentTick + 2048);
+      const reloaded = nativeLogoutAndReload(p, `${label} actual logout/relogin`);
+      assert.equal(stage(reloaded), TOLNA_ACTIVE_STAGE, `${label}: relog preserves incomplete stage 11`);
+      assert.equal(instanceUid(reloaded), 0, `${label}: relog clears the temporary instance handle`);
+      assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(reloaded, name)), [0, 0, 0],
+        `${label}: login reset clears every unfinished head credit`);
+      assert.deepEqual(xpSnapshot(reloaded), earnedXp,
+        `${label}: relog preserves only native combat XP from the one produced death`);
+      assert.equal(readVar(reloaded, 'qp'), earnedQuestPoints,
+        `${label}: incomplete relog awards no quest point`);
+      assert.equal(World.instances.findInstanceByUid(oldUid - 1), null,
+        `${label}: logout deletes the old private region`);
+      assert.equal(remainingNpcsWithInstance(oldUid).length, 0,
+        `${label}: logout removes live and inert old-room actors`);
+      enterTolnaByRift(reloaded, `${label} fresh rift re-entry`);
+      assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(reloaded, name)), [0, 0, 0],
+        `${label}: fresh re-entry preserves only the reset incomplete boundary`);
+      assert.equal(tolnaLiveHeadSet(reloaded, `${label} fresh re-entry`).length, 3,
+        `${label}: incomplete logout restarts all three product heads`);
+      assert.deepEqual(xpSnapshot(reloaded), earnedXp,
+        `${label}: fresh re-entry awards no XP beyond the native kill`);
+      assert.equal(readVar(reloaded, 'qp'), earnedQuestPoints,
+        `${label}: fresh re-entry awards no quest point`);
+      leaveTolnaCopy(reloaded, `${label} re-entry cleanup`, [1]);
+      cleanupTolnaFixturePlayer(reloaded, label);
+      continue;
+    } else {
+      p.levels[PlayerStat.HITPOINTS] = 0;
+      runProc('player_die', p);
+      for (let tick = 0; tick < 80 && (p.activeScript || p.queue.head() !== null); tick++) worldTick();
+      assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED,
+        `${label}: ordinary death queue and animation settle natively`);
+      for (let tick = 0; tick < 3; tick++) worldTick();
+      const surface = surfaceTile();
+      safeTeleport(p, { level: surface[0], x: surface[1], z: surface[2] },
+        `${label}: return to the actual rift after ordinary death`);
+    }
+    assert.equal(stage(p), TOLNA_ACTIVE_STAGE, `${label}: cleanup preserves incomplete stage 11`);
+    assert.equal(instanceUid(p), 0, `${label}: cleanup releases the old temporary UID`);
+    assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [0, 0, 0],
+      `${label}: cleanup resets all partial head credits`);
+    assert.deepEqual(xpSnapshot(p), earnedXp,
+      `${label}: cleanup awards no quest-completion XP beyond the real kill`);
+    assert.equal(readVar(p, 'qp'), earnedQuestPoints,
+      `${label}: cleanup cannot award a quest point`);
+    assert.equal(World.instances.findInstanceByUid(oldUid - 1), null,
+      `${label}: cleanup deletes the former region`);
+    assert.equal(remainingNpcsWithInstance(oldUid).length, 0,
+      `${label}: cleanup removes former heads and inert corpses`);
+    enterTolnaByRift(p, `${label} fresh rift re-entry`);
+    assert.deepEqual(TOLNA_DEATH_BITS.map(name => readVar(p, name)), [0, 0, 0],
+      `${label}: fresh re-entry cannot restore partial kill credit`);
+    assert.equal(tolnaLiveHeadSet(p, `${label} fresh re-entry`).length, 3,
+      `${label}: fresh re-entry creates exactly three full-HP product heads`);
+    assert.deepEqual(xpSnapshot(p), earnedXp, `${label}: re-entry awards no duplicate quest XP`);
+    assert.equal(readVar(p, 'qp'), earnedQuestPoints, `${label}: re-entry awards no quest point`);
+    leaveTolnaCopy(p, `${label} fresh instance cleanup`, [1]);
+    cleanupTolnaFixturePlayer(p, label);
+  }
+}
+
 function testPrivateCopyAccess() {
   const p = playerFixture();
   seedStageOneOwner(p, 'R1 private-copy access boundary');
@@ -4241,6 +5404,10 @@ function run() {
   const r1Cases = new Map([
     ['later-partial', testLaterPartialLifecycle],
     ['hope-concurrent', testHopeConcurrentCreditsAndFood],
+    ['hope-ranged-delay', testHopeNativeRangedDelay],
+    ['tolna-progression', testTolnaCompletionCase],
+    ['tolna-shared-poison', testTolnaSharedPoison],
+    ['tolna-lifecycle', testTolnaIncompleteLifecycle],
     ['hope-bridge', () => {
       const p = laterRoomFixture(HOPE_STAGE, 'disclosed Hope bridge native-combat fixture');
       let mark = null;
@@ -4297,7 +5464,11 @@ function run() {
   testDropEscapeRoute();
   testRoomExitRemovesAngerWeapon();
   testManualRoomMusicEntries();
-  console.log('PASS Soulbane compiled regression: Rage, Fear, Confusion and Hope progression; native combat and food; Launa/journal boundary reports; 64-west bridge; saved boundaries, lifecycle and escape routes');
+  testHopeNativeRangedDelay();
+  testTolnaCompletionCase();
+  testTolnaSharedPoison();
+  testTolnaIncompleteLifecycle();
+  console.log('PASS Soulbane compiled regression: Rage, Fear, Confusion, Hope and Tolna progression; native combat, food and poison; Launa/journal boundary reports; 64-west bridge; saved boundaries, lifecycle and escape routes');
   console.log(JSON.stringify({ stageTwoColor: main.stageTwoColor, stageThreeColor: main.stageThreeColor, attackXp: main.reward }));
 }
 
