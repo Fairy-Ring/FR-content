@@ -30,14 +30,14 @@ switch_obj ($seed) {
     case default : return(null);
 }
 
-// CANDIDATE shared legacy care: seed/mature immunity, one-cycle water,
-// disease blocks growth and becomes death on the next uncured cycle.
-[proc,farming_hops_advance](int $stage, int $steps)(int)
+// CANDIDATE shared legacy care: seed/mature immunity and one-cycle water.
+// Disease blocks growth. UNKNOWN next-tier death timing is in farming_growth.
+[proc,farming_hops_advance](int $stage, int $steps, int $window)(int)
 def_dbrow $crop = ~farming_hops_crop($stage);
 if ($crop = null) return($stage);
-return(~farming_crop_advance($stage, $steps, db_getfield($crop, farming_hops:first, 0), db_getfield($crop, farming_hops:mature, 0), true));
+return(~farming_crop_advance($stage, $steps, db_getfield($crop, farming_hops:first, 0), db_getfield($crop, farming_hops:mature, 0), true, farming_growth_hops, $window));
 
-[proc,farming_hops_advance_all](int $steps)
+[proc,farming_hops_advance_all](int $steps, int $window)
 def_int $word = %farming_hops_varp;
 def_int $bit = 0;
 while ($bit < 32) {
@@ -53,7 +53,7 @@ while ($bit < 32) {
             if ($before >= $mature & $before < ^farming_watered_offset) $stage = $before;
         }
     } else {
-        $stage = ~farming_hops_advance($before, $steps);
+        $stage = ~farming_hops_advance($before, $steps, $window);
     }
     $word = setbit_range_toint($word, $stage, $bit, $end);
     $bit = add($bit, 8);
