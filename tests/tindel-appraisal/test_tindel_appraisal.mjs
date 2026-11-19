@@ -70,7 +70,8 @@ function run(trigger, fixture = {}) {
       assert.equal(state.execution, ScriptState.PAUSEBUTTON, 'only native dialogue suspension');
       const menu = Component.get(player.modalChat)?.comName;
       if (/^multi[2-5]$/.test(menu)) {
-        const choice = fixture.choices?.[choices.length] ?? (trigger === 'OPNPC3' ? 4 : 1);
+        assert(!['OPNPC3', 'OPNPCU'].includes(trigger), `${trigger}: direct identification must not open an offer menu`);
+        const choice = fixture.choices?.[choices.length] ?? 1;
         choices.push(choice);
         const component = Component.getId(`${menu}:com_${choice}`);
         assert(player.resumeButtons.includes(component), `valid menu choice ${choice}`);
@@ -165,7 +166,11 @@ for (const trigger of ['OPNPC1', 'OPNPC3', 'OPNPCU']) for (const [key, seed] of 
   assert.equal(outcome(run(trigger, { ...fixture, full: true })), key, 'full backpack replacement always fits freed rusty-sword slot');
   assert.equal(outcome(run(trigger, { ...fixture, items: { digsitesword: 1, coins: 100 } }), { rusty: 1, coins: 100 }), key, 'exact fee and last sword');
 }
-for (let stage = 0; stage <= 100; stage++) for (const trigger of ['OPNPC3', 'OPNPCU']) outcome(run(trigger, { stage, items: { digsitesword: 2, coins: 1000 } }));
+for (let stage = 0; stage <= 100; stage++) for (const trigger of ['OPNPC3', 'OPNPCU']) {
+  outcome(run(trigger, { stage, items: { digsitesword: 2, coins: 1000 } }));
+  refusal(run(trigger, { stage }), "Sorry my friend, but you don't seem to have any swords that need to be identified.");
+  for (const coins of [0, 99]) refusal(run(trigger, { stage, items: { digsitesword: 1, coins } }), "Sorry my friend, but you don't seem to have enough money to cover my fee!");
+}
 const packedMap = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
 World.gameMap.init();
 const approach = JSON.parse(fs.readFileSync(path.join(content, 'tests/tindel-appraisal/approach.json'), 'utf8'));
@@ -176,5 +181,5 @@ const startX = 2678 + approach.start_offset[0], startZ = 3153 + approach.start_o
 assert(!packedMap.isMapBlocked(startX, startZ, 0), 'headed walk start is not floor/loc blocked');
 assert(packedMap.isLineOfWalk(0, startX, startZ, x, z), 'headed native walk has a clear approach segment');
 console.log(`APPROACH tindel_marchant 0,${x},${z}`);
-console.log(`PASS tindel-appraisal: native Talk/Sword give/item use; no-sword/no-coins; 12 outcomes; 10000-seed odds; atomic single fee/sword; full backpack replacement; ${questResults.length} quest dialogue controls; frequencies=${JSON.stringify(Object.fromEntries(frequencies))}`);
+console.log(`PASS tindel-appraisal: native Talk/Sword give/item use; direct identification without menu at stages 0..100; no-sword/no-coins; 12 outcomes; 10000-seed odds; atomic single fee/sword; full backpack replacement; ${questResults.length} quest dialogue controls; frequencies=${JSON.stringify(Object.fromEntries(frequencies))}`);
 process.exit(0);
