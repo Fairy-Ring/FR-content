@@ -134,6 +134,10 @@ if ($stage = -1) {
     ~displaymessage(^dm_default);
     return;
 }
+if (last_useitem = bucket_compost | last_useitem = bucket_supercompost) {
+    ~farming_soil_apply($stage);
+    return;
+}
 if (last_useitem = rake & (($stage >= 0 & $stage < ^farming_veg_weeded) | ($stage >= 33 & $stage < 36))) {
     ~farming_rake_step(false);
     return;

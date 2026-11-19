@@ -2,3 +2,5 @@
 column=experience,int
 column=disease_divisor,int
 column=lives,int
+column=application_message,string
+default=application_message,You treat the {type} with {compost type}.

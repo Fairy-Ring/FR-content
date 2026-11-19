@@ -183,6 +183,10 @@ if (~farming_veg_is_parent = false) {
     ~displaymessage(^dm_default);
     return;
 }
+if (last_useitem = bucket_compost | last_useitem = bucket_supercompost) {
+    ~farming_soil_apply(~farming_veg_stage);
+    return;
+}
 if (~farming_veg_stage ! ^farming_veg_weeded) {
     ~displaymessage(^dm_farming_patch_weeding);
     return;

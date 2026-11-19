@@ -61,3 +61,40 @@ return(true);
 [proc,farming_soil_clear](int $index)
 ~farming_soil_set_treatment($index, 0);
 ~farming_soil_set_extra($index, 0);
+
+// VERIFIED period order and XP; CANDIDATE pre-2016 empty, untreated gate.
+// Callers admit only the two original filled buckets on a known patch parent.
+[proc,farming_soil_apply](int $stage)
+if ($stage ! ^farming_veg_weeded) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $index = ~farming_soil_index;
+if (~farming_soil_treatment($index) ! 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $treatment = 1;
+if (last_useitem = bucket_supercompost) $treatment = 2;
+def_dbrow $row = ~farming_soil_row($treatment);
+// UNKNOWN exchange: replace the used container, including a full inventory.
+inv_setslot(inv, last_useslot, bucket_empty, ^farming_soil_returned_buckets);
+~farming_soil_set_treatment($index, $treatment);
+stat_advance(farming, db_getfield($row, farming_soil:experience, 0));
+mes(~farming_soil_application_message($index, $treatment));
+
+// CANDIDATE: the operator's template and allotment correction, 19 November 2026.
+// Fill two names in the single authored database string; allotment has no "patch".
+[proc,farming_soil_application_message](int $index, int $treatment)(string)
+def_string $patch = "allotment";
+if ($index >= 16) $patch = "herb patch";
+else if ($index >= 12) $patch = "flower patch";
+else if ($index >= 8) $patch = "hops patch";
+def_string $compost = "compost";
+if ($treatment = 2) $compost = "supercompost";
+def_string $message = db_getfield(~farming_soil_row($treatment), farming_soil:application_message, 0);
+def_int $type_start = string_indexof_string("{type}", $message);
+def_int $type_end = add($type_start, string_length("{type}"));
+def_int $compost_start = string_indexof_string("{compost type}", $message);
+def_int $compost_end = add($compost_start, string_length("{compost type}"));
+return("<substring($message, 0, $type_start)><$patch><substring($message, $type_end, $compost_start)><$compost><substring($message, $compost_end, string_length($message))>");
