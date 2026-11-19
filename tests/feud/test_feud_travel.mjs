@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import test from 'node:test';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { finish } from './fixture.mjs';
@@ -263,16 +264,18 @@ function exercisePair(pair, feudStage = FEUD_STAGE_UNSTARTED) {
   return { up, down };
 }
 
-for (const pair of [...ladderPairs, ...stairPairs]) exercisePair(pair, FEUD_STAGE_UNSTARTED);
-for (const pair of stairPairs) exercisePair(pair, FEUD_STAGE_BURGLARY);
+test('original Feud routes dispatch natively while other ladders remain generic', () => {
+  for (const pair of [...ladderPairs, ...stairPairs]) exercisePair(pair, FEUD_STAGE_UNSTARTED);
+  for (const pair of stairPairs) exercisePair(pair, FEUD_STAGE_BURGLARY);
 
-// A generic cache ladder in the Lumbridge town region must retain the shared handler, not Feud travel.
-const otherRegion = readMap('m50_50.jm2');
-const otherLadder = otherRegion.rows.find(row => row.name === 'ladder' && row.level === 0 && row.localX === 29 && row.localZ === 13);
-assert(otherLadder, 'original Lumbridge generic ladder placement outside Pollnivneach');
-const otherResult = dispatch(otherLadder, otherRegion.floors);
-assert.equal(otherResult.trigger, '[oploc1,ladder]', 'another region keeps the shared exact-type ladder handler');
-// Published ladders.rs2 calls climb_ladder(movecoord(coord(), 0, 1, 0), true): coord() is the player's approach tile.
-assert.deepEqual(otherResult.destination, [otherResult.source[0] + 1, otherResult.source[1], otherResult.source[2]], 'the generic ladder follows its published source-relative destination');
+  // A generic cache ladder in the Lumbridge town region must retain the shared handler, not Feud travel.
+  const otherRegion = readMap('m50_50.jm2');
+  const otherLadder = otherRegion.rows.find(row => row.name === 'ladder' && row.level === 0 && row.localX === 29 && row.localZ === 13);
+  assert(otherLadder, 'original Lumbridge generic ladder placement outside Pollnivneach');
+  const otherResult = dispatch(otherLadder, otherRegion.floors);
+  assert.equal(otherResult.trigger, '[oploc1,ladder]', 'another region keeps the shared exact-type ladder handler');
+  // Published ladders.rs2 calls climb_ladder(movecoord(coord(), 0, 1, 0), true): coord() is the player's approach tile.
+  assert.deepEqual(otherResult.destination, [otherResult.source[0] + 1, otherResult.source[1], otherResult.source[2]], 'the generic ladder follows its published source-relative destination');
 
-console.log(`RESULT PASS feud-travel: ${ladderPairs.length} original ladder pairs and ${stairPairs.length} stair pairs round-tripped through native OPLOC dispatch; mayor-house interior position was a test fixture, not a door proof; other-region generic ladder stayed generic`);
+  console.log(`RESULT PASS feud-travel: ${ladderPairs.length} original ladder pairs and ${stairPairs.length} stair pairs round-tripped through native OPLOC dispatch; mayor-house interior position was a test fixture, not a door proof; other-region generic ladder stayed generic`);
+});
