@@ -1,0 +1,5 @@
+[
+  { "npc": "bonzo", "offset": [0, -1] },
+  { "npc": "feud_camel", "offset": [0, -1] },
+  { "npc": "ali_leaflet_dropper", "offset": [0, 1] }
+]

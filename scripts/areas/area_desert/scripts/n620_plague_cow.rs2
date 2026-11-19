@@ -1,0 +1,17 @@
+// CANDIDATE: Transcript:Plague cow, Petting the Plague cow (revision 14903555).
+// Ordinary player-only flavour: no Icthlarin's Little Helper stage or reward.
+[opnpc1,ics_little_plague_cow1]
+~n620_plague_cow_pet;
+
+[opnpc1,ics_little_plague_cow2]
+~n620_plague_cow_pet;
+
+[opnpc1,ics_little_plague_cow3]
+~n620_plague_cow_pet;
+
+[proc,n620_plague_cow_pet]
+if (random(^n620_plague_cow_reactions) = 0) {
+    ~chatplayer("<p,neutral>Awww, look at the poor sick cow. We'd never make a burger out of you.");
+} else {
+    ~chatplayer("<p,neutral>Don't worry cow, I'm sure somebody will find a cure for this plague soon.");
+}
