@@ -4,3 +4,17 @@
 ^farming_compost_rot_steps = 9
 ^farming_compost_countdown_first = 64
 ^farming_compost_rotted_first = 91
+
+// VERIFIED period batch size and XP, Tip.It Farming Guide, 28 April 2006.
+^farming_compost_batch_size = 15
+^farming_compost_normal_xp = 45
+^farming_compost_super_xp = 85
+^farming_compost_tomato_xp = 85
+
+// UNKNOWN class/state encoding and single-action transfer count.
+^farming_compost_normal = 1
+^farming_compost_super = 2
+^farming_compost_tomato = 3
+^farming_compost_super_base = 32
+^farming_compost_tomato_base = 128
+^farming_compost_transfer_count = 1

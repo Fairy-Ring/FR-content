@@ -1,0 +1,169 @@
+// Native dispatch selects a visible child; loc_type retains the map parent.
+[oplocu,farming_compost_bin_1] @farming_compost_use;
+[oplocu,farming_compost_bin_2] @farming_compost_use;
+[oplocu,farming_compost_bin_3] @farming_compost_use;
+[oplocu,farming_compost_bin_4] @farming_compost_use;
+[oplocu,compost_bin_empty] @farming_compost_use;
+[oplocu,compost_bin_compostable] @farming_compost_use;
+[oplocu,compost_bin_compostable_ready] @farming_compost_use;
+[oplocu,compost_bin_supercompostable] @farming_compost_use;
+[oplocu,compost_bin_supercompostable_ready] @farming_compost_use;
+[oplocu,compost_bin_closed] @farming_compost_use;
+[oplocu,compost_bin_compost] @farming_compost_use;
+[oplocu,compost_bin_compost_ready] @farming_compost_use;
+[oplocu,compost_bin_supercompost] @farming_compost_use;
+[oplocu,compost_bin_supercompost_ready] @farming_compost_use;
+[oplocu,compost_bin_tomatoes] @farming_compost_use;
+[oplocu,compost_bin_tomatoes_ready] @farming_compost_use;
+[oplocu,compost_bin_rottentomatoes] @farming_compost_use;
+[oplocu,compost_bin_rottentomatoes_ready] @farming_compost_use;
+[oplocu,compost_bin_dark_empty] @farming_compost_use;
+[oplocu,compost_bin_dark_compostable] @farming_compost_use;
+[oplocu,compost_bin_dark_compostable_ready] @farming_compost_use;
+[oplocu,compost_bin_dark_supercompostable] @farming_compost_use;
+[oplocu,compost_bin_dark_supercompostable_ready] @farming_compost_use;
+[oplocu,compost_bin_dark_closed] @farming_compost_use;
+[oplocu,compost_bin_dark_compost] @farming_compost_use;
+[oplocu,compost_bin_dark_compost_ready] @farming_compost_use;
+[oplocu,compost_bin_dark_supercompost] @farming_compost_use;
+[oplocu,compost_bin_dark_supercompost_ready] @farming_compost_use;
+[oplocu,compost_bin_dark_tomatoes] @farming_compost_use;
+[oplocu,compost_bin_dark_tomatoes_ready] @farming_compost_use;
+[oplocu,compost_bin_dark_rottentomatoes] @farming_compost_use;
+[oplocu,compost_bin_dark_rottentomatoes_ready] @farming_compost_use;
+
+// The cache puts Close, Open and Take-tomato in option one on these forms.
+[oploc1,farming_compost_bin_1] @farming_compost_operate;
+[oploc1,farming_compost_bin_2] @farming_compost_operate;
+[oploc1,farming_compost_bin_3] @farming_compost_operate;
+[oploc1,farming_compost_bin_4] @farming_compost_operate;
+[oploc1,compost_bin_compostable_ready] @farming_compost_operate;
+[oploc1,compost_bin_supercompostable_ready] @farming_compost_operate;
+[oploc1,compost_bin_tomatoes_ready] @farming_compost_operate;
+[oploc1,compost_bin_closed] @farming_compost_operate;
+[oploc1,compost_bin_rottentomatoes] @farming_compost_operate;
+[oploc1,compost_bin_rottentomatoes_ready] @farming_compost_operate;
+[oploc1,compost_bin_dark_compostable_ready] @farming_compost_operate;
+[oploc1,compost_bin_dark_supercompostable_ready] @farming_compost_operate;
+[oploc1,compost_bin_dark_tomatoes_ready] @farming_compost_operate;
+[oploc1,compost_bin_dark_closed] @farming_compost_operate;
+[oploc1,compost_bin_dark_rottentomatoes] @farming_compost_operate;
+[oploc1,compost_bin_dark_rottentomatoes_ready] @farming_compost_operate;
+
+[proc,farming_compost_stage](int $index)(int)
+def_int $bit = multiply($index, 8);
+return(getbit_range(%varp511_bits, $bit, add($bit, 7)));
+
+[proc,farming_compost_set_stage](int $index, int $stage)
+def_int $bit = multiply($index, 8);
+%varp511_bits = setbit_range_toint(%varp511_bits, $stage, $bit, add($bit, 7));
+
+[proc,farming_compost_base](int $kind)(int)
+switch_int ($kind) {
+    case ^farming_compost_normal : return(0);
+    case ^farming_compost_super : return(^farming_compost_super_base);
+    case ^farming_compost_tomato : return(^farming_compost_tomato_base);
+}
+return(-1);
+
+[proc,farming_compost_input_kind](int $stage)(int)
+if ($stage > 0 & $stage <= ^farming_compost_batch_size) return(^farming_compost_normal);
+if ($stage > ^farming_compost_super_base & $stage <= add(^farming_compost_super_base, ^farming_compost_batch_size)) return(^farming_compost_super);
+if ($stage > ^farming_compost_tomato_base & $stage <= add(^farming_compost_tomato_base, ^farming_compost_batch_size)) return(^farming_compost_tomato);
+return(0);
+
+[label,farming_compost_use]
+def_int $index = enum(loc, int, farming_compost_patch, loc_type);
+if ($index = -1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~farming_compost_stage($index);
+if (last_useitem = bucket_empty) {
+    def_namedobj $output;
+    def_int $xp;
+    def_int $first;
+    if ($stage > ^farming_compost_batch_size & $stage <= multiply(^farming_compost_batch_size, 2)) {
+        $output = bucket_compost;
+        $xp = ^farming_compost_normal_xp;
+        $first = add(^farming_compost_batch_size, 1);
+    } else if ($stage > add(^farming_compost_super_base, ^farming_compost_batch_size) & $stage <= add(^farming_compost_super_base, multiply(^farming_compost_batch_size, 2))) {
+        $output = bucket_supercompost;
+        $xp = ^farming_compost_super_xp;
+        $first = add(add(^farming_compost_super_base, ^farming_compost_batch_size), 1);
+    } else {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    // UNKNOWN manual one-bucket transfer. Full inventory must refuse before
+    // consuming a bucket, even though exchanging it would otherwise free a slot.
+    if (inv_total(inv, bucket_empty) < 1 | inv_freespace(inv) < 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_del(inv, bucket_empty, ^farming_compost_transfer_count);
+    inv_add(inv, $output, ^farming_compost_transfer_count);
+    stat_advance(farming, $xp);
+    if ($stage = $first) ~farming_compost_set_stage($index, 0);
+    else ~farming_compost_set_stage($index, sub($stage, ^farming_compost_transfer_count));
+    return;
+}
+def_int $ingredient = enum(obj, int, farming_compost_ingredients, last_useitem);
+if ($ingredient = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $kind = $ingredient;
+def_int $count = 0;
+if ($stage ! 0) {
+    $kind = ~farming_compost_input_kind($stage);
+    if ($kind = 0) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    $count = sub($stage, ~farming_compost_base($kind));
+    if ($count >= ^farming_compost_batch_size) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    // CANDIDATE: only an all-super or all-tomato batch keeps that class.
+    if ($kind ! $ingredient) $kind = ^farming_compost_normal;
+}
+if (inv_total(inv, last_useitem) < 1) return;
+inv_del(inv, last_useitem, ^farming_compost_transfer_count);
+~farming_compost_set_stage($index, add(~farming_compost_base($kind), add($count, ^farming_compost_transfer_count)));
+
+[label,farming_compost_operate]
+// Reconcile the existing global clock before Close/Open. This saved minute is
+// also the headed witness's exact server-time authority, not its host clock.
+~farming_reconcile(false);
+def_int $index = enum(loc, int, farming_compost_patch, loc_type);
+if ($index = -1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $stage = ~farming_compost_stage($index);
+def_int $kind = ~farming_compost_input_kind($stage);
+if ($kind ! 0 & sub($stage, ~farming_compost_base($kind)) = ^farming_compost_batch_size) {
+    ~farming_compost_set_stage($index, add(^farming_compost_countdown_first, multiply(sub($kind, 1), ^farming_compost_rot_steps)));
+    return;
+}
+if ($stage >= ^farming_compost_rotted_first & $stage < add(^farming_compost_rotted_first, 3)) {
+    $kind = add(sub($stage, ^farming_compost_rotted_first), 1);
+    ~farming_compost_set_stage($index, add(~farming_compost_base($kind), multiply(^farming_compost_batch_size, 2)));
+    return;
+}
+def_int $tomato_first = add(add(^farming_compost_tomato_base, ^farming_compost_batch_size), 1);
+if ($stage >= $tomato_first & $stage <= add(^farming_compost_tomato_base, multiply(^farming_compost_batch_size, 2))) {
+    if (inv_freespace(inv) < 1) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    inv_add(inv, rotten_tomato, ^farming_compost_transfer_count);
+    stat_advance(farming, ^farming_compost_tomato_xp);
+    if ($stage = $tomato_first) ~farming_compost_set_stage($index, 0);
+    else ~farming_compost_set_stage($index, sub($stage, ^farming_compost_transfer_count));
+    return;
+}
+// No source-backed partial closing, early opening or new refusal wording.
+~displaymessage(^dm_default);
