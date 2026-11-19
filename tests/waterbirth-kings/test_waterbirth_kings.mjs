@@ -44,7 +44,7 @@ const constant = (relative, name) => {
 };
 const styles = Object.fromEntries(['stab', 'slash', 'crush', 'ranged', 'magic'].map(name => [name,
   constant('scripts/skill_combat/configs/combat_damagetypes.constant', `${name}_style`)]));
-const checks = { definitions: 0, styleCases: 0, attacks: 0, hunts: 0, lootCases: 0, lifecycleCases: 0 };
+const checks = { definitions: 0, styleCases: 0, weaknessCases: 0, attacks: 0, hunts: 0, lootCases: 0, lifecycleCases: 0 };
 const same = (actual, expected, message) => { assert.deepEqual(actual, expected, message); checks.definitions++; };
 const originalRandom = JavaRandom.nextDouble;
 let serial = 0;
@@ -105,16 +105,17 @@ function observe(target, method, records) {
   return () => { if (had) target[method] = original; else delete target[method]; };
 }
 
-// CANDIDATE exact-variant profiles, not inferred from the server's old defaults.
-// The 2017 Supreme ranged-defence increase and 2025 Earth weakness are excluded.
+// Independent numeric oracle: waterbirth-monsters.kings-candidate-combat-vectors-and-cycles.
+// Defences are Stab/Slash/Crush/Magic/Ranged, not values read from the NPC config.
+// The dated 2017 Supreme Ranged increase is undone; 2025 Earth weakness is excluded.
 const kings = [
-  { name: 'dagcave_ranged_boss', display: 'Dagannoth Supreme', npcId: 2881, own: 'ranged', permitted: 'melee',
+  { name: 'dagcave_ranged_boss', display: 'Dagannoth Supreme', npcId: 2881, effective: 'melee',
     stats: [255, 255, 255, 128, 255, 255], defence: [10, 10, 10, 255, 255], style: 'ranged', max: 30,
     animation: 'dagannoth_meganoth_attack_range', mode: 'APPLAYER2', hunt: 'aggressive_ranged', range: 8, huntRadius: 8 },
-  { name: 'dagcave_magic_boss', display: 'Dagannoth Prime', npcId: 2882, own: 'magic', permitted: 'ranged',
+  { name: 'dagcave_magic_boss', display: 'Dagannoth Prime', npcId: 2882, effective: 'ranged',
     stats: [255, 255, 255, 255, 255, 0], defence: [255, 255, 255, 255, 10], style: 'magic', max: 50,
     animation: 'dagannoth_meganoth_attack_mage', mode: 'APPLAYER2', hunt: 'aggressive_ranged', range: 8, huntRadius: 8 },
-  { name: 'dagcave_melee_boss', display: 'Dagannoth Rex', npcId: 2883, own: 'melee', permitted: 'magic',
+  { name: 'dagcave_melee_boss', display: 'Dagannoth Rex', npcId: 2883, effective: 'magic',
     stats: [332, 255, 255, 255, 0, 255], defence: [255, 255, 255, 10, 255], style: 'slash', max: 26,
     animation: 'dagannoth_meganoth_attack_melee', mode: 'OPPLAYER2', hunt: 'aggressive_melee', range: 1, huntRadius: 5 },
 ];
@@ -144,50 +145,84 @@ for (const king of kings) {
     const f = fixture(king.name);
     try {
       f.player.setVar(id(VarPlayerType, 'damagetype'), style);
-      const permitted = (name === 'ranged' || name === 'magic' ? name : 'melee') === king.permitted;
-      // All ordinary and special-attack callers meet this real pre-XP hook.
-      const cap = run('[proc,npc_max_dealt]', f, [23, 0], true);
-      same(cap.intStack.slice(0, cap.isp), [permitted ? 23 : 0], `${king.name}: ${name} cap`);
-      const spell = run('[proc,npc_max_dealt]', f, [23, 1], true);
-      same(spell.intStack.slice(0, spell.isp), [king.permitted === 'magic' ? 23 : 0], `${king.name}: spell overrides physical style`);
+      const control = fixture('cow');
+      try {
+        control.player.setVar(id(VarPlayerType, 'damagetype'), style);
+        // Every ordinary/special caller uses the unchanged published pre-XP seam.
+        for (const spell of [0, 1]) {
+          const cap = run('[proc,npc_max_dealt]', f, [23, spell], true);
+          const baseline = run('[proc,npc_max_dealt]', control, [23, spell], true);
+          same(cap.intStack.slice(0, cap.isp), baseline.intStack.slice(0, baseline.isp), `${king.name}: ${name}, spell ${spell}: published control cap`);
+          same(cap.intStack.slice(0, cap.isp), [23], `${king.name}: no style-specific cap`);
+        }
+      } finally { dispose(control); }
       checks.styleCases++;
     } finally { dispose(f); }
   }
 
-  // Exercise native player presentation, damage queues and XP, not only a helper.
+  // Exercise native presentation, damage queues and XP against a control NPC.
   for (const style of ['melee', 'ranged', 'magic']) {
-    const f = fixture(king.name), { player, npc } = f;
+    const outcomes = [];
+    for (const name of [king.name, 'cow']) {
+      const f = fixture(name), { player, npc } = f;
+      try {
+        // Equal base/current HP avoids the control cow's cap and overstat decay.
+        npc.baseLevels[NpcStat.HITPOINTS] = npc.levels[NpcStat.HITPOINTS] = king.stats[0];
+        player.stats.fill(0);
+        player.setVar(id(VarPlayerType, 'tutorial'), 1000);
+        npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
+        player.setVar(id(VarPlayerType, 'damagestyle'), style === 'ranged' ? 4 : 0);
+        player.setVar(id(VarPlayerType, 'damagetype'), styles[style === 'melee' ? 'stab' : style]);
+        for (const key of ['com_stabattack', 'com_rangeattack', 'com_magicattack']) player.setVar(id(VarPlayerType, key), 1000000);
+        player.setVar(id(VarPlayerType, 'com_maxhit'), 10);
+        const before = npc.levels[NpcStat.HITPOINTS];
+        if (style === 'melee') {
+          random([0.999999, 0, 0.999999], () => run('[label,player_melee_attack]', f));
+          same(player.stats[PlayerStat.ATTACK], 400, `${name}: real melee damage XP`);
+        } else if (style === 'ranged') {
+          player.getInventory(id(InvType, 'worn')).set(3, { id: id(ObjType, 'bronze_dart'), count: 10 });
+          random([0.999999, 0, 0.999999, 0], () => run('[label,player_ranged_attack]', f));
+          same(player.stats[PlayerStat.RANGED], 400, `${name}: real ranged damage XP`);
+        } else {
+          player.getInventory(id(InvType, 'inv')).set(0, { id: id(ObjType, 'airrune'), count: 100 });
+          player.getInventory(id(InvType, 'inv')).set(1, { id: id(ObjType, 'mindrune'), count: 100 });
+          random([0.999999, 0, 0.999999], () => run('[apnpct,magic:wind_strike]', f));
+          same(player.stats[PlayerStat.MAGIC], 95, `${name}: real Magic base plus damage XP`);
+        }
+        same(player.stats[PlayerStat.HITPOINTS], style === 'magic' ? 26 : 133, `${name}: real damage-derived Hitpoints XP`);
+        for (let tick = 0; tick < 8; tick++) { World.currentTick++; npc.turn(); }
+        const damage = before - npc.levels[NpcStat.HITPOINTS];
+        same(damage, style === 'magic' ? 2 : 10, `${name}: native ${style} hit reaches NPC`);
+        outcomes.push({ damage, xp: [...player.stats] });
+      } finally { dispose(f); }
+    }
+    same(outcomes[0], outcomes[1], `${king.name}: successful ${style} matches published control with identical rolls`);
+    checks.styleCases++;
+  }
+
+  // Fixed attacker: level 99, no Prayer, zero equipment bonus, +9 effective levels.
+  // Published roll procs supply A/D for randominc(A) > randominc(D).
+  // The exact discrete chance is compared by direction, not a pinned percentage.
+  {
+    const f = fixture(king.name), chances = {};
     try {
-      player.stats.fill(0);
-      player.setVar(id(VarPlayerType, 'tutorial'), 1000);
-      npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
-      player.setVar(id(VarPlayerType, 'damagestyle'), style === 'ranged' ? 4 : 0);
-      player.setVar(id(VarPlayerType, 'damagetype'), styles[style === 'melee' ? 'stab' : style]);
-      for (const name of ['com_stabattack', 'com_rangeattack', 'com_magicattack']) player.setVar(id(VarPlayerType, name), 1000000);
-      player.setVar(id(VarPlayerType, 'com_maxhit'), 10);
-      const positive = style === king.permitted;
-      if (style === 'melee') {
-        random([0.999999, 0, 0.999999], () => run('[label,player_melee_attack]', f));
-        same(player.stats[PlayerStat.ATTACK], positive ? 400 : 0, `${king.name}: real melee damage XP`);
-      } else if (style === 'ranged') {
-        player.getInventory(id(InvType, 'worn')).set(3, { id: id(ObjType, 'bronze_dart'), count: 10 });
-        random([0.999999, 0, 0.999999, 0], () => run('[label,player_ranged_attack]', f));
-        same(player.stats[PlayerStat.RANGED], positive ? 400 : 0, `${king.name}: real ranged damage XP`);
-      } else {
-        player.getInventory(id(InvType, 'inv')).set(0, { id: id(ObjType, 'airrune'), count: 100 });
-        player.getInventory(id(InvType, 'inv')).set(1, { id: id(ObjType, 'mindrune'), count: 100 });
-        random([0.999999, 0, 0.999999], () => run('[apnpct,magic:wind_strike]', f));
-        // Native spell base-cast XP remains; only damage-derived XP is blocked.
-        same(player.stats[PlayerStat.MAGIC], positive ? 95 : 55, `${king.name}: real Magic base plus damage XP`);
+      const effective = run('[proc,combat_effective_stat]', f, [99, 100], true).intStack[0] + 9;
+      const attack = run('[proc,combat_stat]', f, [effective, 0], true).intStack[0];
+      for (const name of ['com_stabattack', 'com_rangeattack', 'com_magicattack']) f.player.setVar(id(VarPlayerType, name), attack);
+      for (const style of ['melee', 'ranged', 'magic']) {
+        const kind = styles[style === 'melee' ? 'stab' : style];
+        const a = run('[proc,player_attack_roll_specific]', f, [kind], true).intStack[0];
+        const d = run('[proc,npc_defence_roll_specific]', f, [kind], true).intStack[0];
+        chances[style] = a <= d ? a / (2 * (d + 1)) : 1 - (d + 2) / (2 * (a + 1));
       }
-      same(player.stats[PlayerStat.HITPOINTS], positive ? (style === 'magic' ? 26 : 133) : 0, `${king.name}: real damage-derived Hitpoints XP`);
-      for (let tick = 0; tick < 8; tick++) { World.currentTick++; npc.turn(); }
-      same(npc.levels[NpcStat.HITPOINTS], king.stats[0] - (positive ? (style === 'magic' ? 2 : 10) : 0), `${king.name}: native ${style} hit reaches NPC`);
-      checks.styleCases++;
+      for (const style of ['melee', 'ranged', 'magic'].filter(style => style !== king.effective)) {
+        assert(chances[king.effective] > chances[style], `${king.name}: ${king.effective} accuracy exceeds ${style}: ${JSON.stringify(chances)}`);
+        checks.weaknessCases++;
+      }
     } finally { dispose(f); }
   }
 
-  // A native melee special shares the style rule before its own XP/damage.
+  // A native melee special retains published damage and XP for every King.
   {
     const f = fixture(king.name);
     try {
@@ -200,7 +235,7 @@ for (const king of kings) {
       f.player.getInventory(id(InvType, 'worn')).set(constant('scripts/player/configs/equip.constant', 'wearpos_rhand'), { id: id(ObjType, 'dragon_dagger'), count: 1 });
       f.npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
       random([0.999999, 0, 0.999999], () => run('[proc,pvm_dragon_dagger_spec_hit]', f));
-      same(f.player.stats[PlayerStat.ATTACK], king.permitted === 'melee' ? 440 : 0, `${king.name}: native dagger special follows melee row`);
+      same(f.player.stats[PlayerStat.ATTACK], 440, `${king.name}: native dagger special has no King-specific cap`);
       checks.styleCases++;
     } finally { dispose(f); }
   }
@@ -250,9 +285,8 @@ for (const king of kings) {
   }
 }
 
-// UNKNOWN period semantics: do not extend a style-attack sentence to native
-// poison or recoil. A zero attack cannot initiate poison; a permitted positive
-// poisoned-melee hit can, and that timer bypasses normal-hit style calculation.
+// Preserve native poison/recoil controls without a King-specific style rule.
+// Positive poisoned melee may poison; an ordinary zero roll cannot start poison.
 {
   const f = fixture('dagcave_ranged_boss');
   try {
@@ -265,7 +299,7 @@ for (const king of kings) {
     f.npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
     f.player.getInventory(id(InvType, 'worn')).set(3, { id: id(ObjType, 'dragon_dagger_p'), count: 1 });
     random([0.999999, 0, 0.999999, 0], () => run('[label,player_melee_attack]', f));
-    const severity = f.npc.getVar(id(VarNpcType, 'npc_poison')); assert(severity > 0, 'permitted positive melee can start native poison');
+    const severity = f.npc.getVar(id(VarNpcType, 'npc_poison')); assert(severity > 0, 'positive melee can start native poison');
     f.player.setVar(id(VarPlayerType, 'damagetype'), styles.ranged);
     const before = f.npc.levels[NpcStat.HITPOINTS]; run('[proc,npc_poison_timer]', f);
     same(before - f.npc.levels[NpcStat.HITPOINTS], Math.floor((severity + 3) / 5), 'native poison timer still damages Supreme after ranged style selected');
@@ -280,8 +314,8 @@ for (const king of kings) {
     f.player.setVar(id(VarPlayerType, 'com_stabattack'), 1000000);
     f.player.setVar(id(VarPlayerType, 'com_maxhit'), 10);
     f.player.getInventory(id(InvType, 'worn')).set(3, { id: id(ObjType, 'dragon_dagger_p'), count: 1 });
-    random([0.999999, 0, 0.999999], () => run('[label,player_melee_attack]', f));
-    same(f.npc.getVar(id(VarNpcType, 'npc_poison')), 0, 'non-permitted zero melee hit cannot start native poison');
+    random([0.999999, 0, 0], () => run('[label,player_melee_attack]', f));
+    same(f.npc.getVar(id(VarNpcType, 'npc_poison')), 0, 'native zero damage roll cannot start poison');
   } finally { dispose(f); }
 }
 {
@@ -293,7 +327,7 @@ for (const king of kings) {
     f.player.setVar(id(VarPlayerType, 'damagetype'), styles.ranged);
     run('[queue,combat_damage_player]', f, [20], true);
     for (let tick = 0; tick < 3; tick++) { f.npc.turn(); World.currentTick++; }
-    same(f.npc.levels[NpcStat.HITPOINTS], 252, 'native recoil damages Supreme by three independently of blocked Ranged attacks');
+    same(f.npc.levels[NpcStat.HITPOINTS], 252, 'native recoil damages Supreme by three independently of selected Ranged style');
     same(f.player.levels[PlayerStat.HITPOINTS], 79, 'native incoming hit still damages recoil wearer');
   } finally { dispose(f); }
 }
