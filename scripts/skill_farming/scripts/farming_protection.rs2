@@ -184,6 +184,8 @@ if ($confirm = 2) {
 ~chatplayer("Okay, it's a deal.");
 if (~farming_protection_hire($patch) = true) {
     ~chatnpc("That'll do nicely, <text_gender("sir", "madam")>. Leave it with me - I'll make sure that patch grows for you.");
+} else {
+    ~displaymessage(^dm_default);
 }
 
 // Nouns expand the transcript's [number] [item] template with the period charges.
