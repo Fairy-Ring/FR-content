@@ -80,7 +80,7 @@ try {
       assert.equal(steps(boundary, boundary - 1, period), 0, 'clock rollback grants no advance');
       assert.equal(steps(0, boundary, period), 0, 'first deployment initializes normally');
     });
-    test(`${period}-minute family: offline only complete windows after saved checkpoint`, () => {
+    test(`${period}-minute family: offline inferred ticks retain the saved phase`, () => {
       const boundary = period * 1000;
       assert.equal(steps(boundary - 1, boundary + 4, period, true), 0);
       assert.equal(steps(boundary - 1, boundary + 5, period, true), 1);
@@ -106,12 +106,12 @@ try {
     assert.equal(timer(p), undefined);
     const loaded = player(p.save());
     minute = 612; proc(loaded, 'farming_login');
-    assert.equal(stage(loaded), 6, 'open window is not completed offline');
+    assert.equal(stage(loaded), 6, 'the inferred 614 tick follows the 612 login');
     tick(loaded, 617); assert.equal(stage(loaded), 6, 'reset tick fell outside 610..615');
     tick(loaded, 622); assert.equal(stage(loaded), 7);
     assert.equal(loaded.getVar(clock), 622);
   });
-  test('actual save/load catches completed offline windows once, restores timer and stops at mature', () => {
+  test('actual save/load catches inferred offline ticks once, restores timer and stops at mature', () => {
     const p = fresh(605); setStage(p, 6);
     minute = 609; proc(p, 'farming_logout');
     const saved = p.save();
@@ -119,7 +119,7 @@ try {
     assert.equal(loaded.timers.size, 0, 'engine does not serialize timers');
     assert.equal(loaded.getVar(clock), 609);
     minute = 635; proc(loaded, 'farming_login');
-    assert.equal(stage(loaded), 9, '610,620,630 windows completed offline');
+    assert.equal(stage(loaded), 9, 'inferred 614,624,634 ticks qualify in their active windows');
     assert.equal(loaded.getVar(clock), 635);
     assert.equal(timer(loaded).interval, 500);
     proc(loaded, 'farming_reconcile', 1); assert.equal(stage(loaded), 9, 'same-minute idempotence');

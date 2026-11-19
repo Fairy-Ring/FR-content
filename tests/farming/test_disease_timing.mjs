@@ -148,7 +148,7 @@ try {
         }
       }
     });
-    test(`${family.name}: logout/save/load preserves disease until the completed slow window`, () => {
+    test(`${family.name}: logout/save/load preserves disease until an inferred slow tick precedes login`, () => {
       const crop = crops(family)[0];
       const p = fixture(family, crop.diseased, 640);
       minute = 641; proc(p, 'farming_logout');
@@ -157,8 +157,8 @@ try {
       minute = 640 + family.period + 5; proc(loaded, 'farming_login');
       assert.equal(stage(loaded, family), crop.diseased, 'healthy-only offline window does not kill');
       const again = player(loaded.save());
-      minute = 640 + family.diseasePeriod + 4; proc(again, 'farming_login');
-      assert.equal(stage(again, family), crop.diseased, 'an open offline window is not replayed early');
+      minute = 640 + family.diseasePeriod; proc(again, 'farming_login');
+      assert.equal(stage(again, family), crop.diseased, 'same-minute inferred tick is not replayed early');
       reconcile(again, 640 + family.diseasePeriod + family.period);
       assert.equal(stage(again, family), crop.diseased, 'missing a slow window does not turn the next healthy window into a death step');
       reconcile(again, 640 + family.diseasePeriod * 2);
@@ -185,7 +185,7 @@ try {
         p.unlink();
       }
     });
-    test(`${family.name}: exhaustive start-minute and end-minute sweep agrees with online completed windows`, () => {
+    test(`${family.name}: exhaustive minute sweep agrees with the restarted online tick stream`, () => {
       const crop = crops(family).reduce((a, b) => a.mature - a.first >= b.mature - b.first ? a : b);
       const initial = [crop.first, crop.first + 1, crop.diseased];
       if (family.waterable) initial.push(crop.first + 65);
@@ -196,11 +196,13 @@ try {
         for (const value of initial) for (const seed of [0, diseaseSeed, healthySeed]) {
           set(online, family, value); online.setVar(clock, start); JavaRandom.setSeed(seed);
           const states = [value], ends = [];
-          // Enumerate window starts independently, without copying the product
-          // divide/subtract formula. Each oracle step runs production online.
-          for (let at = start + 1; at <= start + horizon; at++) if (at % family.period === 0) {
-            reconcile(online, at + 4);
-            states.push(stage(online, family)); ends.push(at + 5);
+          // Independently enumerate the restarted five-minute stream. An
+          // inferred tick counts only in a strictly earlier minute than login.
+          for (let at = start + 5; at <= start + horizon; at += 5) {
+            reconcile(online, at);
+            if (at % family.period < 5) {
+              states.push(stage(online, family)); ends.push(at + 1);
+            }
           }
           for (let elapsed = 0; elapsed <= horizon; elapsed++) {
             const now = start + elapsed;
@@ -208,7 +210,7 @@ try {
             set(offline, family, value); offline.setVar(clock, start); JavaRandom.setSeed(seed);
             reconcile(offline, now, true);
             assert.equal(stage(offline, family), states[seen],
-              `${family.name} start=${start} now=${now} initial=${value} seed=${seed} completed=${seen}`);
+              `${family.name} start=${start} now=${now} initial=${value} seed=${seed} inferred=${seen}`);
             assert.equal(proc(offline, 'farming_growth_steps', start, now, family.period, 1).popInt(), seen);
             reconcile(offline, now, true);
             assert.equal(stage(offline, family), states[seen], 'same checkpoint is idempotent');

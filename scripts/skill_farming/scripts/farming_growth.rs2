@@ -1,14 +1,14 @@
-// CANDIDATE: pre-rework OSRS Farming revision 5658331 (26 January 2018).
-// Global UTC windows last five minutes. Each player's 500-game-tick timer
-// resets at login/logout and can miss a window. No post-2018 offset or fix.
+// CANDIDATE: the legacy Farming description's restarted 500-tick stream.
+// Preserved original fault: login, logout and world changes can lose growth ticks.
+// See docs/research/period-faults.md; no post-2018 offset or repair.
 
 [proc,farming_growth_steps](int $last, int $now, int $period, boolean $offline)(int)
 if ($last = 0 | $now <= $last) return(0);
 if ($offline = true) {
-    // UNKNOWN engineering catch-up arithmetic: the source confirms offline
-    // growth and reset on logout, but gives no saved-time calculation.
-    // Count only complete windows whose start follows the saved checkpoint.
-    return(max(0, sub(divide(sub($now, ^farming_growth_window_minutes), $period), divide($last, $period))));
+    // UNKNOWN save arithmetic: infer ticks at L+5, L+10, ... strictly before N.
+    // Saved time is minute-resolved; the tie rule excludes the login minute.
+    // Retain the saved L mod 5 phase, with no multiplier or artificial bound.
+    return(max(0, sub(divide(sub(sub($now, 1), modulo($last, ^farming_growth_window_minutes)), $period), divide($last, $period))));
 }
 // Online timers do not replay missed windows or grant multiple stages.
 if (modulo($now, $period) < ^farming_growth_window_minutes
