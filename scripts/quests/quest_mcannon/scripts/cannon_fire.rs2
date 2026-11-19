@@ -116,7 +116,6 @@ def_int $duration = ~npc_projectile(movecoord(%ownedmcannon, 1, 0, 1), npc_uid, 
 def_int $damage = 0;
 if (~player_npc_hit_roll(%damagetype) = true) {
     $damage = randominc(min(30, npc_param(max_dealt)));
-    $damage = calc($damage * enum(npc, int, waterbirth_king_ranged_damage, npc_type));
     def_int $damage_capped = min($damage, npc_stat(hitpoints));
     stat_advance(ranged, multiply(scale(%npc_combat_xp_multiplier, 1000, scale(200, 100, $damage_capped)), 10));
     npc_heropoints($damage_capped);
