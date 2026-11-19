@@ -114,7 +114,7 @@ function readPage(p, output) {
   return options;
 }
 
-function run(scenario, branch, existing = null) {
+function run(scenario, branch, existing = null, interruptAt = null) {
   const rows = nativeNpcRows(scenario.placedNpc ?? scenario.npc);
   assert.ok(rows.length, `${scenario.npc}: original target map placement exists`);
   const row = rows.find(row => ['44,158', '44,159', '45,159'].includes(`${row.mx},${row.mz}`));
@@ -159,14 +159,24 @@ function run(scenario, branch, existing = null) {
     assert.equal(script.name, `[opnpc1,${scenario.npc}]`, 'exact visible-form handler, not a category fallback');
     const state = ScriptRunner.init(script, p, npc);
     p.executeScript(state, true);
-    if (branch.afterVars?.ordinary_dialogue_bits !== undefined) {
-      assert.equal(p.getVar(id('VarPlayerType', 'ordinary_dialogue_bits')), branch.afterVars.ordinary_dialogue_bits,
-        'the saved first-talk write occurs before the first displayed page');
+    const ownMask = ordinaryMasks.get(scenario.npc) ?? 0;
+    if (ownMask && !(ordinaryBefore & ownMask)) {
+      assert.equal(p.getVar(id('VarPlayerType', 'ordinary_dialogue_bits')), ordinaryBefore,
+        'an initial conversation is not remembered before its first page completes');
     }
     for (let step = 0; state.execution !== ScriptState.FINISHED && step < 400; step++) {
       if (toastFrames) toastFrames.push([p.animId, p.animDelay, npc.animId, npc.animDelay]);
       assert.notEqual(state.execution, ScriptState.ABORTED, 'compiled conversation does not abort');
       const menu = readPage(p, output);
+      if (interruptAt && (interruptAt === 'first' || [...output.npc, ...output.player].includes(normal(interruptAt, p)))) {
+        assert.equal(state.execution, ScriptState.PAUSEBUTTON, 'interrupt a displayed native dialogue page');
+        assert.equal(p.getVar(id('VarPlayerType', 'ordinary_dialogue_bits')), ordinaryBefore,
+          'closing any initial page before completion leaves the shared first-talk state unchanged');
+        p.closeModal();
+        assert.equal(p.activeScript, null, 'native modal close cancels the suspended conversation');
+        assert.equal(p.modalChat, -1, 'native modal close removes the dialogue');
+        return p;
+      }
       if (state.execution === ScriptState.PAUSEBUTTON) {
         let component = 0;
         if (menu) {
@@ -185,6 +195,7 @@ function run(scenario, branch, existing = null) {
     if (toastFrames) toastFrames.push([p.animId, p.animDelay, npc.animId, npc.animDelay]);
     readPage(p, output);
     assert.equal(state.execution, ScriptState.FINISHED, 'whole conversation completes within its fixed bound');
+    assert.equal(interruptAt, null, 'the requested interruption page must be reached');
     assert.deepEqual(choices, [], 'every source path choice is consumed');
     assert.deepEqual(random, [], 'every pinned random outcome is consumed');
     assert.deepEqual(output.menus, branch.menus.map(menu => menu.map(line => normal(line, p))), 'all menus match the independent transcript');
@@ -197,7 +208,6 @@ function run(scenario, branch, existing = null) {
     for (const menu of branch.menus) for (const line of menu) assert.ok(scenario.allowed.options.includes(line), 'every menu caption is retained in source allowlist');
     assert.deepEqual(['giantdwarf_quest', 'forget_quest', 'dwarfrock_quest'].map(name => p.getVarBit(id('VarBitType', name))), before, 'ordinary dialogue writes no quest stage');
     const ordinaryAfter = p.getVar(id('VarPlayerType', 'ordinary_dialogue_bits'));
-    const ownMask = ordinaryMasks.get(scenario.npc) ?? 0;
     assert.equal(ordinaryAfter & ~ownMask, ordinaryBefore & ~ownMask, 'each conversation preserves every ordinary bit except its own assigned first-talk bit');
     const inventory = p.getInventory(id('InvType', 'inv'));
     for (const [name, count] of Object.entries(branch.afterItems ?? {})) assert.equal(inventory.getItemCount(id('ObjType', name)), count, `real pub transaction ${name}`);
@@ -253,8 +263,10 @@ for (const line of readFileSync(new URL('../../pack/script.pack', import.meta.ur
 assert.equal(ordinaryReaders.size, 2, 'one shared reader for each authorized first-talk conversation');
 assert.deepEqual(ordinaryWriters, ordinaryReaders, 'the two shared first-talk labels own their respective writes');
 for (const family of [
-  { name: 'town dwarf', slice: 'east', forms: Array(3).fill('dwarf_city_drunken_dwarf'), stage: 2, mask: 1, reservedBits: 0xda5a5a5a | 0 },
-  { name: 'shared boatmen', slice: 'west', forms: boatmenForms, stage: 0, mask: 2, reservedBits: 0xda5a5a59 | 0 }
+  { name: 'town dwarf', slice: 'east', forms: Array(3).fill('dwarf_city_drunken_dwarf'), stage: 2, mask: 1, reservedBits: 0xda5a5a5a | 0,
+    penultimate: 'Er, yes, well, I think I should be off now.', last: 'THE KEBABSH WILL COME FOR YOU!' },
+  { name: 'shared boatmen', slice: 'west', forms: boatmenForms, stage: 0, mask: 2, reservedBits: 0xda5a5a59 | 0,
+    penultimate: "We're very good at answering questions!", last: 'Fire away!' }
 ]) {
   const scenarios = slices.find(slice => slice.slice === family.slice).scenarios;
   let initial = scenarios.find(scenario => scenario.npc === family.forms[0] && scenario.vars.giantdwarf_quest === family.stage
@@ -275,6 +287,16 @@ for (const family of [
     firstBranch.menus = later[0].branches[0].menus;
   }
   const talkedBits = family.reservedBits | family.mask;
+  for (const interruptAt of ['first', family.penultimate, family.last]) {
+    const interrupted = run(initial, { ...firstBranch, vars: { ...firstBranch.vars, ordinary_dialogue_bits: family.reservedBits } }, null, interruptAt);
+    const reloaded = PlayerLoading.load(interrupted.username, new Packet(interrupted.save()), null);
+    reloaded.slot = interrupted.slot; reloaded.pid = interrupted.pid; reloaded.uid = interrupted.uid;
+    packets.set(reloaded, []); reloaded.write = packet => packets.get(reloaded).push(packet);
+    assert.equal(reloaded.getVar(firstTalkVarp.id), family.reservedBits, `${family.name}: an interrupted initial conversation stays unspent across logout`);
+    run(initial, { ...firstBranch, afterVars: { ...firstBranch.afterVars, ordinary_dialogue_bits: talkedBits } }, reloaded);
+    passed += 2;
+    console.log(`PASS ${family.name}: interruption at ${interruptAt}, actual saved-player reload, then full initial replay`);
+  }
   const player = run(initial, { ...firstBranch, vars: { ...firstBranch.vars, ordinary_dialogue_bits: family.reservedBits },
     afterVars: { ...firstBranch.afterVars, ordinary_dialogue_bits: talkedBits } });
   assert.equal(player.getVar(firstTalkVarp.id), talkedBits, `${family.name}: preserve the other assigned bit and every reserved bit, including the sign bit`);

@@ -283,30 +283,30 @@
       "npc": "vc_smokin_joe",
       "state": "giantdwarf-1",
       "vars": {"giantdwarf_quest": 1},
-      "allowed": {"npc": [], "player": ["Hello!", "Hello?", "Hey!"], "options": [], "game": ["Smokin' Joe ignores you."]},
+      "allowed": {"npc": [], "player": ["Hello!", "Hey!", "Yo, shortstuff!"], "options": [], "game": ["Despite your wild articulations and gesticulations you fail to catch Joe's attention."]},
       "branches": [
-        {"choices": [], "npc": [], "player": ["Hello!", "Hello?", "Hey!"], "menus": [], "game": ["Smokin' Joe ignores you."]}
+        {"choices": [], "npc": [], "player": ["Hello!", "Hey!", "Yo, shortstuff!"], "menus": [], "game": ["Despite your wild articulations and gesticulations you fail to catch Joe's attention."]}
       ],
-      "sourceIds": ["src.keldagrim-townsfolk-east-smokin-joe-transcript", "src.keldagrim-townsfolk-east-smokin-joe-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-ratcatchers-launch"]
+      "sourceIds": ["src.keldagrim-townsfolk-east-smokin-joe-pre-ratcatchers-history", "src.keldagrim-townsfolk-ratcatchers-dialogue-rewrite-note-2024", "src.keldagrim-townsfolk-east-smokin-joe-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-ratcatchers-launch"]
     },
     {
       "npc": "vc_smokin_joe",
       "state": "giantdwarf-2",
       "vars": {"giantdwarf_quest": 2},
-      "allowed": {"npc": [], "player": ["Hello!", "Hello?", "Hey!"], "options": [], "game": ["Smokin' Joe ignores you."]},
+      "allowed": {"npc": [], "player": ["Hello!", "Hey!", "Yo, shortstuff!"], "options": [], "game": ["Despite your wild articulations and gesticulations you fail to catch Joe's attention."]},
       "branches": [
-        {"choices": [], "npc": [], "player": ["Hello!", "Hello?", "Hey!"], "menus": [], "game": ["Smokin' Joe ignores you."]}
+        {"choices": [], "npc": [], "player": ["Hello!", "Hey!", "Yo, shortstuff!"], "menus": [], "game": ["Despite your wild articulations and gesticulations you fail to catch Joe's attention."]}
       ],
-      "sourceIds": ["src.keldagrim-townsfolk-east-smokin-joe-transcript", "src.keldagrim-townsfolk-east-smokin-joe-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-ratcatchers-launch"]
+      "sourceIds": ["src.keldagrim-townsfolk-east-smokin-joe-pre-ratcatchers-history", "src.keldagrim-townsfolk-ratcatchers-dialogue-rewrite-note-2024", "src.keldagrim-townsfolk-east-smokin-joe-article", "src.keldagrim-townsfolk-crowds-npc-cache", "src.keldagrim-townsfolk-parent-maps", "src.keldagrim-townsfolk-published-quest", "src.keldagrim-townsfolk-ratcatchers-launch"]
     }
   ],
   "deferred": [
     {"npc": "dwarf_city_rowdy_dwarf", "content": "Keldagrim tasks and Forgettable Tale request/reward branches", "reason": "Task and later-quest systems are not published in the checked-out tree.", "sourceIds": ["src.keldagrim-townsfolk-east-rowdy-transcript", "src.keldagrim-townsfolk-east-rowdy-article"]},
-    {"npc": "dwarf_city_dwarf_man1", "content": "At-home Talk line and overhead chores errands", "reason": "The assigned map placement is the chores state; the home and overhead routines are not the selected ordinary Talk scenario.", "sourceIds": ["src.keldagrim-townsfolk-east-sune-transcript", "src.keldagrim-townsfolk-crowds-npc-cache"]},
+    {"npc": "dwarf_city_dwarf_man1", "content": "At-home Talk line and overhead chores errands", "reason": "UNKNOWN engineering selects the sourced chores variant at this placement, rather than the separately CANDIDATE at-home variant; no period selector is known.", "sourceIds": ["src.keldagrim-townsfolk-east-sune-transcript", "src.keldagrim-townsfolk-crowds-npc-cache"]},
     {"npc": "dwarf_city_dwarf_man5", "content": "After The Giant Dwarf rebuilt-statue reply", "reason": "Published stages 1 and 2 are both during the unfinished quest. Neither writes completion or rebuilds the statue; both use the sourced During line.", "sourceIds": ["src.keldagrim-townsfolk-east-karl-transcript", "src.keldagrim-townsfolk-published-quest"]},
     {"npc": "dwarf_city_dwarf_man8", "content": "Completed-Forgettable-Tale reply and item use on fireplaces or sink", "reason": "The completed quest state and item-use service branches are outside the published ordinary Talk scope.", "sourceIds": ["src.keldagrim-townsfolk-east-kjut-transcript", "src.keldagrim-townsfolk-east-kjut-article"]},
     {"npc": "dwarf_city_drunken_dwarf_multi", "content": "Forgettable Tale quest exchanges and Treasure Trails puzzle-box dialogue", "reason": "The quest and clue-scroll service branches are not in the ordinary Talk scope.", "sourceIds": ["src.keldagrim-townsfolk-east-drunken-dwarf-transcript", "src.keldagrim-townsfolk-drunk-quest-check"]},
-    {"npc": "vc_the_beast", "content": "All Talk-to dialogue", "reason": "Whole Talk deferral pending Main handoff to the Ratcatchers unit. Revision 14792777 distinguishes pre-Ratcatchers “Hello cat” / glower / “Friendly aren't you?” from a post-completion greeting; revision 15012884 removes the prequest dialogue and marks that section incomplete. The current article says talking before permission only causes a glower. No dated game change explaining the change in documentation was identified; Ratcatchers/Rat Pits is absent from this tree.", "sourceIds": ["src.keldagrim-townsfolk-east-beast-transcript", "src.keldagrim-townsfolk-east-beast-article", "src.keldagrim-townsfolk-ratcatchers-launch"]},
+    {"npc": "vc_the_beast", "content": "All Talk-to dialogue", "reason": "Whole Talk deferral remains with Ratcatchers by Main's decision. The 2020-2024 transcript revisions retain a stable older Standard dialogue: Player Hello cat.; message ~The cat glowers back at you.; Player Friendly aren't you?. The Ratcatchers change note dated 26 June 2024 records a dialogue/text rewrite and explains the later disagreement. The older conversation is a CANDIDATE source for that quest unit; this unit prints nothing for The Beast.", "sourceIds": ["src.keldagrim-townsfolk-east-beast-transcript", "src.keldagrim-townsfolk-east-beast-article", "src.keldagrim-townsfolk-ratcatchers-dialogue-rewrite-note-2024", "src.keldagrim-townsfolk-ratcatchers-launch"]},
     {"npc": "vc_smokin_joe", "content": "Post-Ratcatchers quest and Rat Pits information/service dialogue", "reason": "Ratcatchers and the Rat Pits service are not published in the checked-out tree; the pre-Ratcatchers Talk branch is implemented separately.", "sourceIds": ["src.keldagrim-townsfolk-east-smokin-joe-transcript", "src.keldagrim-townsfolk-east-smokin-joe-article", "src.keldagrim-townsfolk-ratcatchers-launch"]}
   ]
 }

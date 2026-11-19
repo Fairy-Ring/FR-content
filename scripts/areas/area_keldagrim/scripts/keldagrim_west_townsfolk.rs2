@@ -242,7 +242,6 @@ if ($choice = 4) {
 
 [proc,keldagrim_west_boatmen_talk]
 if (testbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked) = ^false) {
-    %ordinary_dialogue_bits = setbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked);
     ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Oh look, a human!");
     ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>A human? Can we eat it?");
     ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>No, you rock brain! Humans are our friends!");
@@ -266,6 +265,8 @@ if (testbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked) = ^false) {
     ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Of course, we love answering questions!");
     ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>We're very good at answering questions!");
     ~chatnpc_specific("Derni", dwarfrock_boatman_bruv3, "<p,neutral>Fire away!");
+    %ordinary_dialogue_bits = setbit(%ordinary_dialogue_bits, ^keldagrim_boatmen_talked);
+    // UNKNOWN engineering: remember only a completed initial conversation, so closing it cannot lose it.
 } else {
     ~chatnpc_specific("Miodvetnir", dwarfrock_boatman_bruv1, "<p,neutral>Hello again, <displayname>!");
     ~chatnpc_specific("Dernu", dwarfrock_boatman_bruv2, "<p,neutral>Are you lost down here?");

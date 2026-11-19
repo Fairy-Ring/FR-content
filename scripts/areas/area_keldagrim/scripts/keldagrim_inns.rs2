@@ -45,11 +45,16 @@ inv_del(inv, coins, $price);
 inv_add(inv, $drink, 1);
 ~chatnpc($acknowledgement);
 
-// CANDIDATE: Transcript:Barmaid. The published Forgettable Tale reaches only
-// its start, not the later Kelda-stout conversation or replacement service.
+// CANDIDATE: Transcript:Barmaid. Published Forgettable Tale stage 1 reaches
+// only the words-only Kelda refusal: no stout has been collected from the vat.
 [opnpc1,dwarf_city_barmaid_poor]
 ~chatnpc("<p,neutral>Welcome to the Laughing Miner pub, human traveller.");
-def_int $choice = ~p_choice4("Who is that man walking around outside?", 1, "I'd like a beer please.", 2, "I'd like some food please.", 3, "I have to go.", 4);
+def_int $choice = 0;
+if (%forget_quest = 1) {
+    $choice = ~p_choice5("Who is that man walking around outside?", 1, "I'd like a beer please.", 2, "I'd like some food please.", 3, "I'd like a Kelda stout please.", 4, "I have to go.", 5);
+} else {
+    $choice = ~p_choice4("Who is that man walking around outside?", 1, "I'd like a beer please.", 2, "I'd like some food please.", 3, "I have to go.", 5);
+}
 if ($choice = 1) {
     ~chatplayer("<p,neutral>Who is that man walking around outside?");
     ~chatnpc("<p,neutral>What man?");
@@ -70,6 +75,10 @@ if ($choice = 1) {
     ~chatplayer("<p,neutral>I'd like some food please.");
     ~chatnpc("<p,neutral>I can make you a stew for 20 gold coins.");
     ~keldagrim_barmaid_buy(stew, ^keldagrim_barmaid_stew_price, "<p,neutral>Sorry, I don't have 20 coins on me.");
+} else if ($choice = 4) {
+    ~chatplayer("<p,neutral>I'd like a Kelda stout please.");
+    ~chatnpc("<p,neutral>Sorry, we've stopped serving those. The seeds were too hard to get.");
+    ~chatplayer("<p,neutral>Yeah, tell me about it.");
 } else {
     ~chatplayer("<p,neutral>I have to go.");
 }
