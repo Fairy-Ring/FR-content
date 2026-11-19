@@ -45,27 +45,37 @@ switch_obj (last_useitem)
 
 [proc,craft_spinning](obj $spinning_obj)
 def_struct $struct = oc_param($spinning_obj, crafting_spinning_struct);
+if (~craft_spinning_check($struct) = false) return;
+~craft_spinning_start;
+~craft_spinning_finish($struct);
+p_delay(3);
+
+// Shared undelayed phases; item-use retains its original ordering and delay.
+[proc,craft_spinning_check](struct $struct)(boolean)
 // check if we have the required level
 def_int $level = struct_param($struct, levelrequire);
 if (stat(crafting) < $level) {
     ~mesbox("You need level <tostring($level)> Crafting to make that.");
-    return;
+    return(false);
 }
 // macro event
 if (afk_event = ^true) {
     ~macro_event_general_spawn(~macro_event_set_random);
-    return;
+    return(false);
 }
+return(true);
+
+[proc,craft_spinning_start]
 // play human animation
 anim(human_spinningwheel, 0);
 loc_anim(spinningwheel);
 sound_synth(spinning, 1, 0);
+
+[proc,craft_spinning_finish](struct $struct)
 inv_del(inv, struct_param($struct, ingredient), 1);
 inv_add(inv, struct_param($struct, product), 1);
 mes(struct_param($struct, processmessage));
 stat_advance(crafting, struct_param($struct, productexp));
-p_delay(3);
-//weakqueue(crafting_spinning, 2, $struct);
 
 /**
 //May have not used weakqueue for this back then https://youtu.be/eQEYx8hwA_I?t=410

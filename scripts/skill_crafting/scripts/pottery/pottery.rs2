@@ -170,16 +170,22 @@ if ($last_obj = potlid_unfired) {
 } else {
     $struct = oc_param($last_obj, crafting_pottery_struct);
 }
+~fire_pottery_start($struct);
+p_delay(2);
+~fire_pottery_harden($struct);
+p_delay(2);
+~fire_pottery_finish($last_obj, $struct);
+
+// Shared undelayed phases; item-use retains both original three-tick waits.
+[proc,fire_pottery_start](struct $struct)
 mes("You put the <oc_name(struct_param($struct, product))> in the oven.");
 sound_synth(furnace, 1, 0);
 anim(human_furnace, 0);
 
-p_delay(2);
-
+[proc,fire_pottery_harden](struct $struct)
 mes("The <oc_name(struct_param($struct, product))> hardens in the oven.");
 
-p_delay(2);
-
+[proc,fire_pottery_finish](obj $last_obj, struct $struct)
 def_namedobj $product = struct_param($struct, product);
 // delete unfired item
 inv_del(inv, $last_obj, 1);
