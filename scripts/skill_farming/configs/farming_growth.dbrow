@@ -35,3 +35,9 @@ table=farming_growth
 data=period,10
 data=handler,4
 data=disease_period,20
+
+// UNKNOWN nine-step countdown on the unchanged shared five-minute clock.
+[farming_growth_compost]
+table=farming_growth
+data=period,5
+data=handler,5

@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  World, Runner, ScriptOpcode, PlayerStat, JavaRandom,
+  World, Runner, ScriptOpcode, PlayerStat, JavaRandom, Scripts, PlayerTimerType,
   types, id, player, proc, add, count, use, click, load
 } from './runtime.mjs';
 
@@ -662,6 +662,53 @@ try {
         if (loaded) discard(loaded);
       }
     }
+  });
+
+  test('partly harvested treated allotments never refill extra lives on a shared growth tick', () => {
+    const group = groupSpecs.find(candidate => candidate.family === 'allotment');
+    const clock = id('VarPlayerType', 'farming_growth_minute');
+    const timerScript = Scripts.getByName('[timer,farming_growth]');
+    assert(timerScript, 'compiled shared Farming timer');
+    let checked = 0;
+    for (const patchName of group.patchNames) for (const crop of cropRows.allotment) for (const mode of treatmentModes) {
+      const index = stageIndex(patchName);
+      const p = fixture(patchName, 3);
+      try {
+        add(p, mode.bucket);
+        assert(useBucket(p, patchName, mode.bucket));
+        growToMaturity(p, group, patchName, crop);
+        assert.equal(extra(p, index), mode.extraLives, 'maturity initializes the sourced extra lives');
+        add(p, 'spade');
+        World.currentTick += 2;
+        JavaRandom.setSeed(witness(256, 0));
+        assert(clickPatch(p, patchName), 'native partial harvest spends one extra life');
+        assert.equal(itemCount(p, itemName(crop.produce)), 1);
+        assert.equal(getStage(p, patchName), crop.mature, 'extra life keeps the partially harvested crop at maturity');
+        assert.equal(extra(p, index), mode.extraLives - 1);
+        const livesAfterHarvest = allExtras(p);
+        const xpAfterHarvest = farmingXp(p);
+
+        const period = periodFor(group);
+        minute = period * 100;
+        p.setVar(clock, minute);
+        proc(p, 'farming_login');
+        assert.deepEqual(allExtras(p), livesAfterHarvest, 'same-minute login does not restore spent lives');
+        const timer = p.timers.get(timerScript.id);
+        assert(timer && timer.interval > 0, 'the actual NORMAL timer is installed');
+        minute += period;
+        World.currentTick += timer.interval;
+        p.processTimers(PlayerTimerType.NORMAL);
+        assert.equal(p.getVar(clock), minute, 'the shared timer consumed the next online opportunity');
+        assert.equal(getStage(p, patchName), crop.mature, 'the shared growth tick leaves the mature crop unchanged');
+        assert.deepEqual(allExtras(p), livesAfterHarvest,
+          `${patchName}/${cropLabel.allotment(crop)}/${mode.code}: a mature growth tick must not re-grant lives`);
+        assert.equal(treatment(p, index), mode.code);
+        assert.equal(itemCount(p, itemName(crop.produce)), 1, 'growth adds no harvested produce');
+        assert.equal(farmingXp(p), xpAfterHarvest, 'growth awards no additional harvest XP');
+        checked++;
+      } finally { discard(p); }
+    }
+    console.log(`Checked ${checked} native partial harvests followed by actual NORMAL growth ticks.`);
   });
 
   test('flower treatment keeps its fixed yield, has no extra lives, and clears on harvest', () => {
