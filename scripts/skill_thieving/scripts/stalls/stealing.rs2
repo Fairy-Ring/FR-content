@@ -90,6 +90,9 @@ while (npc_findnext = true) {
 }
 
 [proc,stealing_check_for_owner](dbrow $data)(boolean)
+if (db_getfieldcount($data, stealing:owner) = 0) {
+    return(false);
+}
 def_npc $owner = db_getfield($data, stealing:owner, 0);
 if (npc_find(coord, $owner, 5, 0) = true & lineofsight(npc_coord, coord) = true) {
     npc_say("Hey! Get your hands off there!");
