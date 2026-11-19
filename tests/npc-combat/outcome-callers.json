@@ -37,6 +37,7 @@
       "[proc,dt_damis_hit]",
       "[proc,dt_dessous_attack]",
       "[proc,dt_kamil_attack]",
+      "[proc,feud_champion_attack]",
       "[proc,invrigar_attack]",
       "[proc,necro_attack]",
       "[proc,sarawiz_melee_attack]",

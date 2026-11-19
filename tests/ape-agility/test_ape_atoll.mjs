@@ -1068,6 +1068,10 @@ assert(fs.existsSync(HUMAN_DEATH_BASELINE_PATH), 'capture the published human-de
 const humanDeathBaseline = JSON.parse(fs.readFileSync(HUMAN_DEATH_BASELINE_PATH, 'utf8'));
 assert.equal(humanDeathBaseline.marker, HUMAN_DEATH_BASELINE_MARKER, 'human death fixture is a marked real pack capture');
 assert.match(humanDeathBaseline.deathSourceSha256, /^[0-9a-f]{64}$/, 'source digest is retained as provenance, not an admission lock');
+// Slot 196 is adopted as `feud_trial_villager` (pack/varp.pack:197; quest_feud.varp:10-12), type NPC_UID (ScriptVarType.ts:22); Player.ts:442-449 initializes non-INT varps to -1.
+// It retains TEMP/non-transmitted defaults (VarPlayerType.ts:83-86; Player.ts:78-80), is excluded from saves (Player.ts:219-233) and login varps (Player.ts:521-527), and PlayerLoading.ts:29-36,96-106 applies only saved entries after constructing defaults. Published saves omit this slot, preserving all saved state.
+assert.equal(humanDeathBaseline.observation.player.vars[196], 0, 'published oracle retains the old integer default at slot 196');
+humanDeathBaseline.observation.player.vars[196] = -1;
 assertHumanDeathObservation(humanDeathRun.observation, humanDeathBaseline.observation);
 assert.deepEqual(humanDeathRun.effects, JSON.parse(fs.readFileSync(HUMAN_DEATH_EFFECTS_PATH, 'utf8')),
   'human death preserves commands and arguments in order, and actual ground drops');

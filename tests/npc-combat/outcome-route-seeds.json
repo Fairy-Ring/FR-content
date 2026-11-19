@@ -1434,6 +1434,38 @@
       }
     },
     {
+      "script": "[ai_opplayer2,feud_bandit_toughguy]",
+      "npc": "feud_bandit_toughguy",
+      "playerVars": {
+        "feud_var": 25
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target",
+        "npc_int": 1
+      },
+      "seeds": {
+        "hit": 3224,
+        "miss": 33828,
+        "zero": 3482
+      }
+    },
+    {
+      "script": "[ai_opplayer2,feud_menap_toughguy]",
+      "npc": "feud_menap_toughguy",
+      "playerVars": {
+        "feud_var": 24
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target",
+        "npc_int": 1
+      },
+      "seeds": {
+        "hit": 3224,
+        "miss": 33828,
+        "zero": 3482
+      }
+    },
+    {
       "script": "[ai_applayer2,dagannoth_water_creature_1x13]",
       "npc": "dagannoth_water_creature_1x13",
       "seeds": {
