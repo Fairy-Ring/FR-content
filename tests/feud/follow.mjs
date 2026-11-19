@@ -1,0 +1,107 @@
+import assert from 'node:assert/strict';
+import { engineModule, map, World } from '../swamp-caves/runtime.mjs';
+import { hasWitness, isWitness } from './fixture.mjs';
+
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const MoveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
+const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
+const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const witnessRadius = 5; // Matches the predicate in fixture.mjs.
+const seclusionSearchRadius = 32; // UNKNOWN test-fixture geometry bound, not a gameplay distance.
+const nativeFollowWaitTicks = 512; // UNKNOWN test-fixture wait bound, not the NPC timeout.
+
+export function worldTick() {
+  for (const p of World.playerLoop.all()) {
+    if (p?.isActive) p.lastResponse = p.lastConnected = World.currentTick;
+  }
+  for (const phase of [
+    'processWorld', 'processNpcEventQueue', 'processNpcs', 'processPlayers',
+    'processLogouts', 'processLogins', 'processZones', 'processInfo', 'processCleanup'
+  ]) {
+    assert.equal(typeof World[phase], 'function', `native World.${phase} phase is available`);
+    World[phase]();
+  }
+  World.currentTick++;
+}
+
+export function tickThrough(deadline) {
+  assert(Number.isInteger(deadline), 'the native NPC deadline is an integer tick');
+  assert(deadline >= World.currentTick, 'the native NPC deadline has not already passed');
+  while (World.currentTick <= deadline) worldTick();
+  assert.equal(World.currentTick, deadline + 1, 'native world phases ran once through the exact deadline');
+}
+
+function projectedWitnesses(target, x, z) {
+  const projected = { uid: target.uid, level: target.level, x, z };
+  return [...World.npcs].filter(npc => isWitness(projected, npc));
+}
+
+function occludedOriginalWitness(target, witnesses, x, z) {
+  return witnesses.some(npc => npc.isActive && npc.level === target.level &&
+    npc.targetOp !== NpcMode.OPPLAYER2 &&
+    CoordGrid.distanceToSW({ x, z }, npc) <= witnessRadius &&
+    !map.isLineOfSight(target.level, npc.x, npc.z, x, z));
+}
+
+function exactRoute(level, startX, startZ, endX, endZ) {
+  const route = [...map.findPath(level, startX, startZ, endX, endZ)];
+  if (!route.length) return null;
+  const end = CoordGrid.unpackCoord(route.at(-1));
+  if (end.level !== level || end.x !== endX || end.z !== endZ) return null;
+  return route;
+}
+
+function secludedDestination(p, target, witnesses) {
+  for (let radius = 1; radius <= seclusionSearchRadius; radius++) {
+    for (let x = target.x - radius; x <= target.x + radius; x++) {
+      for (let z = target.z - radius; z <= target.z + radius; z++) {
+        if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
+          map.isMapBlocked(x, z, target.level)) continue;
+        if (projectedWitnesses(target, x, z).length || !occludedOriginalWitness(target, witnesses, x, z)) continue;
+        const route = exactRoute(p.level, p.x, p.z, x, z);
+        if (!route) continue;
+        return { destination: { level: target.level, x, z }, route };
+      }
+    }
+  }
+  assert.fail('no native collision-reachable tile screens the Thug from its original witnesses behind a building');
+}
+
+export function followToSeclusion(p, target) {
+  assert(target.isActive, 'the original packed NPC is active');
+  assert.equal(target.level, p.level, 'the lured NPC and player share a collision plane');
+  assert.equal(target.target, p, 'native Lure assigned the owning player as the follow target');
+  assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW, 'native Lure selected PLAYERFOLLOW');
+  assert(hasWitness(target), 'the original NPC begins visible to a nearby witness');
+  const originalWitnesses = [...World.npcs].filter(npc => isWitness(target, npc));
+  const startingNpcTile = [target.level, target.x, target.z];
+  const { destination, route } = secludedDestination(p, target, originalWitnesses);
+  const clickPath = route.map(value => {
+    const point = CoordGrid.unpackCoord(value);
+    return { x: point.x, z: point.z };
+  });
+  assert(MoveClickHandler.handle(new MoveClick(clickPath, 0, false), p),
+    'native MoveClick accepts the collision-found route behind the building');
+
+  let ticks = 0;
+  for (; ticks < nativeFollowWaitTicks; ticks++) {
+    worldTick();
+    if (p.level === destination.level && p.x === destination.x && p.z === destination.z &&
+      !hasWitness(target) && p.inOperableDistance(target)) break;
+  }
+  assert(ticks < nativeFollowWaitTicks, 'native player movement and NPC follow reach the screened destination');
+  assert.deepEqual([p.level, p.x, p.z], [destination.level, destination.x, destination.z],
+    'the player reaches the exact MoveClick destination');
+  assert.notDeepEqual([target.level, target.x, target.z], startingNpcTile,
+    'native NPC follow moves the original Thug from its starting tile');
+  assert.equal(target.target, p, 'the NPC remains attached to the actual native player target');
+  assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW, 'the NPC remains in native PLAYERFOLLOW mode');
+  assert(!hasWitness(target), 'the naturally-followed NPC is out of every witness line of sight');
+  assert(originalWitnesses.some(npc => occludedOriginalWitness(target, [npc], target.x, target.z)),
+    'an original nearby witness is screened by the intervening building');
+  assert.equal(projectedWitnesses(target, p.x, p.z).length, 0,
+    'the player is also outside every witness line of sight');
+  assert(originalWitnesses.some(npc => occludedOriginalWitness(p, [npc], p.x, p.z)),
+    'the player and the Thug are screened from an original nearby witness');
+  return { destination, routeLength: route.length, ticks: ticks + 1 };
+}

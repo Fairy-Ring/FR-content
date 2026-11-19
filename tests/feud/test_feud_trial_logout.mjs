@@ -5,6 +5,7 @@ import {
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import { bit, hasWitness, operate, operationStand, read, stage, talk, wield } from './fixture.mjs';
+import { tickThrough, worldTick } from './follow.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -16,17 +17,6 @@ const villagerTypes = new Set([1, 2, 3].map(number => id('NpcType', `feud_villag
 const villagers = () => [...World.npcs].filter(npc => npc.isActive && villagerTypes.has(npc.baseType));
 const owned = p => villagers().filter(npc => npc.getVar(stateVar) !== 0 && (npc.getVar(ownerVar) >>> 0) === p.uid);
 const xp = p => p.stats[PlayerStat.THIEVING];
-
-function worldTick() {
-  for (const p of World.playerLoop.all()) {
-    if (p?.isActive) p.lastResponse = p.lastConnected = World.currentTick;
-  }
-  for (const phase of [
-    'processWorld', 'processNpcEventQueue', 'processNpcs', 'processPlayers',
-    'processLogouts', 'processLogins', 'processZones', 'processInfo', 'processCleanup'
-  ]) World[phase]();
-  World.currentTick++;
-}
 
 function nativeLogoutAndReload(p) {
   const oldPid = p.pid, oldSlot = p.slot, username = p.username;
@@ -266,9 +256,8 @@ test('the NPC queue independently expires a held lure and permits a non-rewardin
   const target = reachLure(p);
   const deadline = target.getVar(deadlineVar), beforeXp = xp(p), beforeCoins = count(p, 'coins');
   assert(deadline > World.currentTick);
-  // Advance only the test clock to the scheduled deadline; the production NPC queue performs cleanup.
-  World.currentTick = deadline;
-  worldTick();
+  // Run every native world phase through the scheduled deadline; the queue counts processed ticks.
+  tickThrough(deadline);
   assert.equal(target.getVar(stateVar), 0);
   assert.equal(target.getVar(ownerVar), -1);
   assert.equal(p.getVar(slotVar), -1);
@@ -286,8 +275,7 @@ test('an orphaned villager cleans up on its own queued deadline without running 
   // Deliberately model loss of an in-memory session without invoking [logout,_].
   p.clearInteraction(); p.unlink(); p.isActive = false;
   World.players[p.pid] = null;
-  World.currentTick = deadline;
-  worldTick();
+  tickThrough(deadline);
   assert.equal(target.getVar(stateVar), 0, 'the NPC-side queue is an independent cleanup path');
   assert.equal(target.getVar(ownerVar), -1);
   assert.equal(target.getVar(deadlineVar), 0);

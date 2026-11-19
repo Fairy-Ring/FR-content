@@ -12,6 +12,7 @@ import {
   actors, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
   nativeNpcTriggerName, operate, operationStand, read, stand, stage, talk, wield
 } from './fixture.mjs';
+import { followToSeclusion, tickThrough } from './follow.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
@@ -44,28 +45,22 @@ function withRandom(value, action) {
   try { return action(); } finally { JavaRandom.nextDouble = previous; }
 }
 
-function worldTick() {
-  for (const p of World.playerLoop.all()) {
-    if (p?.isActive) p.lastResponse = p.lastConnected = World.currentTick;
-  }
-  for (const phase of [
-    'processWorld', 'processNpcEventQueue', 'processNpcs', 'processPlayers',
-    'processLogouts', 'processLogins', 'processZones', 'processInfo', 'processCleanup'
-  ]) World[phase]();
-  World.currentTick++;
-}
-
-function startOperation(p, npc, option) {
+function startOperation(p, npc, option, { standPlayer = true } = {}) {
   p.clearInteraction();
-  stand(p, npc);
+  if (standPlayer) stand(p, npc);
   assert(p.setInteraction(1, npc, ServerTriggerType.APNPC1 + option - 1),
     'ordinary engine interaction is accepted');
-  assert(p.inOperableDistance(npc), 'the player can operate from the path-checked stand');
+  assert(p.inOperableDistance(npc), 'the player can operate from the current native position');
   const trigger = p.getOpTrigger();
   assert(trigger, 'production visible-form dispatcher finds a compiled handler');
   p.dialogueMark = p.packets.length;
   p.processInteraction();
   return trigger.name;
+}
+
+function operateHere(p, npc, option, choices = []) {
+  const trigger = startOperation(p, npc, option, { standPlayer: false });
+  return { text: finish(p, choices), trigger };
 }
 
 function npcConfigBlock(text, name) {
@@ -224,8 +219,7 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   }
   const deadline = target.getVar(deadlineVar);
   assert(deadline > World.currentTick);
-  World.currentTick = deadline;
-  worldTick();
+  tickThrough(deadline);
   assert.equal(target.getVar(stateVar), 0, 'the shared NPC queue wakes the unconscious target');
   assert.equal(target.getVar(ownerVar), -1);
   assert.equal(target.getVar(deadlineVar), 0);
@@ -316,31 +310,33 @@ test('the purchased willow is usable and the Thug applies its period level and K
   operate(p, actors('feud_black_jack_seller_multi')[0], 3, ["I'll take it."]);
   wield(p, 'blackjack_willow');
 
-  const thug = isolatedTarget(p, 'feud_egyptian_doorman_multi');
-  assert(thug, 'a real placed Menaphite Thug has no candidate under the native witness predicate');
+  const thug = actors('feud_egyptian_doorman_multi').find(npc =>
+    npc.getVar(stateVar) === 0 && operationStand(p, npc));
+  assert(thug, 'an original Menaphite Thug has a path-checked native operation stand');
+  assert(hasWitness(thug), 'the original Thug begins visible to a nearby person');
   const lure = operate(p, thug, 4);
   assert.equal(lure.trigger, nativeNpcTriggerName(p, thug, 4));
   assert.equal(thug.getVar(stateVar), 2);
+  followToSeclusion(p, thug);
   const beforeGate = xp(p);
-  operate(p, thug, 5);
+  operateHere(p, thug, 5);
   assert.equal(thug.getVar(stateVar), 2, 'level 64 cannot knock out the level-65 Thug');
   assert.equal(xp(p), beforeGate);
   p.setLevel(PlayerStat.THIEVING, 65);
   const beforeKo = xp(p);
-  withRandom(0, () => operate(p, thug, 5));
+  withRandom(0, () => operateHere(p, thug, 5));
   assert.equal(thug.getVar(stateVar), 3);
   assert.equal(xp(p) - beforeKo, 200, 'the successful Thug KO awards period 20 XP');
 
   const beforePick = { coins: count(p, 'coins'), xp: xp(p) };
   for (let attempt = 1; attempt <= 2; attempt++) {
-    withRandom(0, () => operate(p, thug, 3));
+    withRandom(0, () => operateHere(p, thug, 3));
     assert.equal(count(p, 'coins') - beforePick.coins, 50 * attempt);
     assert.equal(xp(p) - beforePick.xp, 1375 * attempt, 'Thug normal-pick XP is retained while unconscious');
   }
   const deadline = thug.getVar(deadlineVar);
   assert(deadline > World.currentTick);
-  World.currentTick = deadline;
-  worldTick();
+  tickThrough(deadline);
   assert.equal(thug.getVar(stateVar), 0, 'the real Thug also wakes through the shared bounded queue');
   assert.equal(stage(p), 28);
 });
@@ -373,8 +369,7 @@ test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outco
   }
   const deadline = target.getVar(deadlineVar);
   assert(deadline > World.currentTick);
-  World.currentTick = deadline;
-  worldTick();
+  tickThrough(deadline);
   assert.equal(target.getVar(stateVar), 0, 'the Bandit wakes through the bounded NPC queue');
 
   const relure = operate(p, target, 4);
