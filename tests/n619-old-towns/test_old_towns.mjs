@@ -214,6 +214,7 @@ function run(form, seed, choices, seenLabels) {
     assert.equal(state.execution, ScriptState.PAUSEBUTTON, `${form.name}: expected real dialogue pause`);
     const menu = Component.get(player.modalChat)?.comName;
     if (/^multi[2-5]$/.test(menu)) {
+      const count = Number(menu.slice(5));
       if (choice === choices.length) return finish({ done: false, count, pages: pages(packets) });
       const index = choices[choice++]; assert(index >= 1 && index <= count);
       selectedOptions.push(normalize(pages(packets).filter(page => page.kind === 'menu').at(-1).options[index - 1]));
