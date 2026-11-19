@@ -62,6 +62,7 @@ function startOperation(p, npc, option, atCurrentPosition = false) {
   const trigger = p.getOpTrigger();
   assert(trigger, 'production visible-form dispatcher finds a compiled handler');
   p.dialogueMark = p.packets.length;
+  assert(p.canAccess(), `the native operation has player access (tick=${World.currentTick}, protect=${p.protect}, delayed=${p.delayed}, modal=${p.containsModalInterface()})`);
   p.processInteraction();
   return trigger.name;
 }
@@ -397,7 +398,7 @@ test('witnessed Bandit KO applies the period 4 HP, stun and attack outcome', () 
     id('NpcType', 'feud_arabian_guard_multi'), id('NpcType', 'feud_arabian_guard2_multi')
   ]);
   const p = seed(completePlayer(56), ['blackjack_oak']);
-  const target = actors('feud_arabian_guard_multi').find(npc => npc.getVar(stateVar) === 0 &&
+  const target = findTarget(p, 'feud_arabian_guard_multi', npc =>
     [...World.npcs].some(other => nearbyBanditTypes.has(other.baseType) && isWitness(p, npc, other)));
   assert(target, 'an original Bandit placement has a nearby Bandit satisfying the native witness predicate');
   wield(p, 'blackjack_oak');
