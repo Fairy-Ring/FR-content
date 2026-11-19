@@ -19,6 +19,7 @@ const villagerTypes = new Set([1, 2, 3].map(number => id('NpcType', `feud_villag
 const villagers = () => [...World.npcs].filter(npc => npc.isActive && villagerTypes.has(npc.baseType));
 const owned = p => villagers().filter(npc => npc.getVar(stateVar) !== 0 && (npc.getVar(ownerVar) >>> 0) === p.uid);
 const xp = p => p.stats[PlayerStat.THIEVING];
+const nativeSetupWaitTicks = 512; // Existing native-geometry bound from follow.mjs, not a gameplay timeout.
 
 function nativeLogoutAndReload(p) {
   const oldPid = p.pid, oldSlot = p.slot, username = p.username;
@@ -112,7 +113,24 @@ function knockOut(p, target) {
 }
 
 function reachLure(p) {
-  const distracted = reachDistraction(p);
+  const admissionDeadline = World.currentTick + nativeSetupWaitTicks;
+  let distracted = reachDistraction(p);
+  while (distracted.getVar(stateVar) !== 1 || !operationStand(p, distracted)) {
+    assert(World.currentTick < admissionDeadline,
+      'a genuinely distracted original Villager becomes reachable within the existing native-geometry setup bound');
+    if (distracted.getVar(stateVar) === 1) {
+      worldTick();
+    } else {
+      // Native wandering may leave the selected target without a reachable operation stand.
+      // Let the earned distraction expire, then use the actual offered repeat conversation.
+      const before = { stage: stage(p), xp: xp(p), coins: count(p, 'coins') };
+      talk(p, 'feud_street_urchin');
+      assert.deepEqual({ stage: stage(p), xp: xp(p), coins: count(p, 'coins') }, before,
+        'repeating an expired distraction does not manufacture progress or rewards');
+      [distracted] = owned(p);
+      assert(distracted, 'the repeated compiled urchin action earns another original target');
+    }
+  }
   operate(p, distracted, 3);
   assert.equal(stage(p), 9);
   assert.equal(read(p, 'feud_npc_multi'), 2, 'the second theft exposes the original third client form');

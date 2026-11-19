@@ -30,6 +30,7 @@ const villagerFormNames = [
 ];
 const villagerTypes = new Set([1, 2, 3].map(number => id('NpcType', `feud_villager_multi_${number}`)));
 const MAX_NPC_CALLBACKS_PER_TICK = 4;
+const nativeSetupWaitTicks = 512; // Existing native-geometry bound from follow.mjs, not a gameplay timeout.
 
 const villagers = () => [...World.npcs].filter(npc => npc.isActive && villagerTypes.has(npc.baseType));
 const owned = p => villagers().filter(npc => npc.getVar(stateVar) !== 0 && (npc.getVar(ownerVar) >>> 0) === p.uid);
@@ -132,8 +133,12 @@ function dispatchSynchronousKnockOut(p, target) {
 }
 
 function attackableTarget(p, name, requireNoWitness = false) {
-  return actors(name).find(npc => npc.getVar(stateVar) === 0 && [...npc.queue.all()].length === 0 &&
-    npc.timerInterval <= 0 && (!requireNoWitness || !hasWitness(p, npc)) && operationStand(p, npc));
+  for (let ticks = 0; ticks <= nativeSetupWaitTicks; ticks++) {
+    const target = actors(name).find(npc => npc.getVar(stateVar) === 0 && [...npc.queue.all()].length === 0 &&
+      npc.timerInterval <= 0 && (!requireNoWitness || !hasWitness(p, npc)) && operationStand(p, npc));
+    if (target) return target;
+    if (ticks < nativeSetupWaitTicks) worldTick();
+  }
 }
 
 function assertAttackableQueueBound(npc) {
