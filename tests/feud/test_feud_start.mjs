@@ -25,8 +25,9 @@ function stand(p, n) {
     candidates.push(tile(p));
   }
   assert(candidates.length, `packed collision permits an ordinary stand beside NPC ${n.baseType}`);
-  const destination = candidates.find(point => point[1] === n.x - 1 && point[2] === n.z);
-  assert(destination, 'the headed cell uses this same walkable west-side stand');
+  const side = n.baseType === id('NpcType', 'feud_ali_m') ? 1 : -1;
+  const destination = candidates.find(point => point[1] === n.x + side && point[2] === n.z);
+  assert(destination, 'the headed cell uses this same map-checked operation stand');
   // Verify an actual map route, not just a guessed adjacent coordinate.
   let route = null;
   for (const [dx, dz] of [[4, 0], [-4, 0], [0, 4], [0, -4]]) {
