@@ -64,7 +64,7 @@ const healthySeed = (() => {
 })();
 function advance(p, value, steps = 1, draw = 127) {
   JavaRandom.setSeed(draw === 127 && steps > 1 ? healthySeed : draws.get(draw));
-  return proc(p, 'farming_allotment_advance', value, steps, proc(p, 'farming_allotment_crop', value).popInt()).popInt();
+  return proc(p, 'farming_allotment_advance', value, steps, proc(p, 'farming_allotment_crop', value).popInt(), 0).popInt();
 }
 let cases = 0, failed = 0;
 function test(name, run) {
@@ -122,7 +122,7 @@ for (const [name, first, mature, last, level, plantXp, harvestXp] of crops) {
     for (const value of [first, first + 64, first + 129, first + 193, mature, last]) {
       set(p, value); const loaded = player(p.save()); assert.equal(stage(loaded), value);
     }
-    for (const value of [first + 64, first + 129, first + 193]) { set(p, value); proc(p, 'farming_potato_advance_all', 1); assert.equal(stage(p), advance(p, value)); }
+    for (const value of [first + 64, first + 129, first + 193]) { set(p, value); proc(p, 'farming_potato_advance_all', 1, 0); assert.equal(stage(p), advance(p, value)); }
   });
   test(`${name}: harvest lives, XP per item, inventory/tool gates and replant`, () => {
     const p = fixture(level); set(p, mature);
