@@ -4,7 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import {
-  PlayerStat, ServerTriggerType, World, contentRoot, count, engineModule, id,
+  PlayerStat, ScriptProvider, ServerTriggerType, World, contentRoot, count, engineModule, id,
   inv, obj, seed, types
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
@@ -16,6 +16,7 @@ import { followToSeclusion } from './follow.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
+const { NpcStat } = await engineModule('engine/entity/NpcStat.ts');
 const stateVar = id('VarNpcType', 'feud_villager_state');
 const ownerVar = id('VarNpcType', 'feud_villager_owner');
 const deadlineVar = id('VarNpcType', 'feud_villager_deadline');
@@ -73,6 +74,39 @@ function npcConfigBlock(text, name) {
   const start = text.indexOf(marker);
   assert.notEqual(start, -1, `Feud NPC config contains ${name}`);
   return text.slice(start + marker.length).split('\n[')[0];
+}
+
+// CANDIDATE published form stats, not original server data authenticated by the client cache.
+const combatServerFields = [
+  'stats', 'params', 'category', 'regenrate', 'wanderrange', 'maxrange', 'huntrange',
+  'timer', 'respawnrate', 'moverestrict', 'attackrange', 'huntmode', 'defaultmode',
+  'members', 'blockwalk', 'patrolCoord', 'patrolDelay', 'givechase'
+];
+for (const [baseName, formNames] of [
+  ['feud_arabian_guard_multi', ['feud_arabian_guard1_1', 'feud_arabian_guard1_2']],
+  ['feud_arabian_guard2_multi', ['feud_arabian_guard2_1', 'feud_arabian_guard2_2']],
+  ['feud_egyptian_doorman_multi', ['feud_egyptian_doorman_1', 'feud_egyptian_doorman_2']]
+]) {
+  test(`${baseName} carries the agreed compiled server combat fields of both forms`, () => {
+    const base = types.NpcType.get(id('NpcType', baseName));
+    const forms = formNames.map(name => types.NpcType.get(id('NpcType', name)));
+    assert(forms[0].stats[NpcStat.HITPOINTS] > 1, 'the source forms have real combat hitpoints');
+    for (const field of combatServerFields) {
+      assert.deepEqual(forms[0][field], forms[1][field], `${baseName}: both forms agree on ${field}`);
+      assert.deepEqual(base[field], forms[0][field], `${baseName}: base ${field} matches its forms`);
+    }
+    for (const trigger of [
+      ServerTriggerType.AI_QUEUE1, ServerTriggerType.AI_QUEUE2, ServerTriggerType.AI_QUEUE3,
+      ServerTriggerType.AI_OPPLAYER2, ServerTriggerType.AI_APPLAYER2, ServerTriggerType.AI_TIMER
+    ]) {
+      const expected = ScriptProvider.getByTrigger(trigger, forms[0].id, forms[0].category);
+      if (trigger === ServerTriggerType.AI_QUEUE3) assert(expected, 'the native death handler exists');
+      for (const type of [base, forms[1]]) {
+        assert.equal(ScriptProvider.getByTrigger(trigger, type.id, type.category)?.id, expected?.id,
+          `${baseName}: base and both forms use the same native combat/death/timer dispatch`);
+      }
+    }
+  });
 }
 
 // Period XP is represented in tenths. Later Thieving_training rev15400774 is
