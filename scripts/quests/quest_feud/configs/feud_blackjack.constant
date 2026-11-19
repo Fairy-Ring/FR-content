@@ -22,7 +22,7 @@
 
 // UNKNOWN FEUD-DISTRACTION-WINDOW-01: the theft window is a separate engineering
 // choice, not an authenticated duration or the rule for an unconscious NPC.
-^feud_villager_distraction_ticks = 8
+^feud_villager_distraction_ticks = 12
 
 // UNKNOWN FEUD-TIMEOUT-REARM-01: native same-pass-safe queue delay, not a game duration.
 // Main approved remaining=1 using this minimum, making cleanup at most one tick late.
