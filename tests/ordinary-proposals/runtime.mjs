@@ -11,7 +11,9 @@ export const Runner = (await load('engine/script/ScriptRunner')).default;
 export const State = (await load('engine/script/ScriptState')).default;
 export const Provider = (await load('engine/script/ScriptProvider')).default;
 export const Trigger = (await load('engine/script/ServerTriggerType')).default;
-export const Player = (await load('engine/entity/Player')).default;
+const playerModule = await load('engine/entity/Player');
+export const Player = playerModule.default;
+export const { getExpByLevel } = playerModule;
 export const Loc = (await load('engine/entity/Loc')).default;
 export const { EntityLifeCycle } = await load('engine/entity/EntityLifeCycle');
 export const JavaRandom = (await load('util/JavaRandom')).default;
@@ -22,6 +24,8 @@ export const IfButton = (await load('network/game/client/model/IfButton')).defau
 export const IfButtonHandler = (await load('network/game/client/handler/IfButtonHandler')).default;
 export const ResumePCountDialog = (await load('network/game/client/model/ResumePCountDialog')).default;
 export const ResumePCountDialogHandler = (await load('network/game/client/handler/ResumePCountDialogHandler')).default;
+export const MoveClick = (await load('network/game/client/model/MoveClick')).default;
+export const MoveClickHandler = (await load('network/game/client/handler/MoveClickHandler')).default;
 export const map = await load('engine/GameMap');
 export const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType', 'ObjType', 'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType', 'SeqType', 'SpotanimType', 'MesanimType', 'DbTableType', 'DbRowType', 'HuntType', 'Component', 'FontType']) {
@@ -54,7 +58,7 @@ export function fixture(name, placement = null) {
     assert(loc, `loaded original loc: ${name}`);
     const p = new Player(`proposal${++serial}`, BigInt(serial), BigInt(serial));
     p.uid = BigInt(serial); p.pid = p.slot = serial;
-    p.vars.fill(0); p.baseLevels.fill(99); p.levels.fill(99); p.stats.fill(0);
+    p.vars.fill(0); p.baseLevels.fill(99); p.levels.fill(99); p.stats.fill(getExpByLevel(99));
     p.setVar(id('VarPlayerType', 'tutorial'), 1000);
     p.setVar(id('VarPlayerType', 'viking'), 10);
     p.level = row.level;
@@ -106,16 +110,22 @@ export function execute(f, script, args = []) {
     f.p.executeScript(state, true, true);
     return state;
 }
+// Match World: client input precedes delayed-state clearing and player queues.
+export function step(f, input = () => {}) {
+    World.currentTick++;
+    input();
+    if (World.currentTick >= f.p.delayedUntil) f.p.delayed = false;
+    if (!f.p.delayed && f.p.activeScript?.execution === State.SUSPENDED) f.p.executeScript(f.p.activeScript, true, true);
+    f.p.processQueues();
+    return snapshot(f);
+}
 export function settle(f, bound = 128) {
+    f.p.processQueues(); // Remainder of the input's current player tick.
     const trace = [snapshot(f)];
     for (let tick = 0; tick < bound; tick++) {
         const execution = f.p.activeScript?.execution;
-        if (execution === State.PAUSEBUTTON || execution === State.COUNTDIALOG || execution === State.FINISHED || (!f.p.activeScript && !f.p.delayed && !f.p.weakQueue.head())) return trace;
-        World.currentTick++;
-        if (World.currentTick >= f.p.delayedUntil) f.p.delayed = false;
-        if (!f.p.delayed && f.p.activeScript?.execution === State.SUSPENDED) f.p.executeScript(f.p.activeScript, true, true);
-        f.p.processQueues();
-        trace.push(snapshot(f));
+        if (execution === State.PAUSEBUTTON || execution === State.COUNTDIALOG || ((!f.p.activeScript || execution === State.FINISHED) && !f.p.delayed && !f.p.weakQueue.head() && !f.p.queue.head())) return trace;
+        trace.push(step(f));
     }
     assert.fail('native action exceeds its fixture bound');
 }

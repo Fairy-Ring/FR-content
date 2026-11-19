@@ -1,5 +1,5 @@
-// CANDIDATE: finished Lost City 274 spinning/pottery choosers. Research: ordinary-scenery.
-// Each selected item repeats the published single-item action, including its delays.
+// CANDIDATE: finished Lost City 274 spinning/pottery choosers and weak-queue batches.
+// Shared published phases own every item exchange, XP award and result message.
 [oploc2,spinningwheel] @ordinary_spin_chooser;
 [oploc2,elf_village_spinning_wheel] @ordinary_spin_chooser;
 
@@ -31,20 +31,29 @@ if ($held = 0) {
     mes("You'll need <lowercase(oc_name($item))> to make that.");
     return;
 }
-while ($remaining > 0 & $held > 0) {
-    // UNKNOWN original timing: retain the published spinning delay argument 3.
-    ~craft_spinning($item);
-    def_int $left = inv_total(inv, $item);
-    // The shared level or random-event gate can return without spinning an item.
-    if ($left = $held) {
-        return;
-    }
-    $held = $left;
-    $remaining = sub($remaining, 1);
-}
-if ($remaining > 0) {
+@ordinary_spin_start($item, $remaining, loc_type, loc_coord, coord, 4);
+
+// UNKNOWN batch timing: first finish at tick 4, then every 4 ticks.
+// The initial input queues before processQueues; a queued finish queues after it.
+// CANDIDATE shape: finished 274 spinning.rs2:84-111, cleared by walking.
+[label,ordinary_spin_start](namedobj $item, int $remaining, loc $station, coord $tile, coord $origin, int $delay)
+def_struct $recipe = oc_param($item, crafting_spinning_struct);
+if (~craft_spinning_check($recipe) = false) return;
+if (coord ! $origin) return;
+if (loc_find($tile, $station) = false) return;
+~craft_spinning_start;
+weakqueue*(ordinary_spin_finish, $delay)($item, $recipe, $remaining, $station, $tile, $origin);
+
+[queue,ordinary_spin_finish](namedobj $item, struct $recipe, int $remaining, loc $station, coord $tile, coord $origin)
+if (~ordinary_station_present($station, $tile, $origin) = false) return;
+~craft_spinning_finish($recipe);
+$remaining = sub($remaining, 1);
+if ($remaining < 1) return;
+if (inv_total(inv, $item) = 0) {
     mes("You have run out of <lowercase(oc_name($item))>.");
+    return;
 }
+@ordinary_spin_start($item, $remaining, $station, $tile, $origin, 3);
 
 [oploc1,potteryoven] @ordinary_fire_chooser;
 [oploc1,fai_barbarian_pottery_oven] @ordinary_fire_chooser;
@@ -79,17 +88,40 @@ if (inv_total(inv, $item) = 0) {
     ~mesbox("You don't have any <$plural> which need firing.");
     return;
 }
-while ($remaining > 0 & inv_total(inv, $item) > 0) {
-    ~fire_pottery(~inv_getslot(inv, $item));
-    $remaining = sub($remaining, 1);
-}
-if ($remaining > 0) {
+@ordinary_fire_start($item, $remaining, $plural, loc_type, loc_coord, coord, 3);
+
+// UNKNOWN batch timing: harden at tick 3, finish at tick 6; repeat every 6 ticks.
+// CANDIDATE staged weak-queue shape: finished 274 pottery.rs2:122-154.
+// Delays are 3 from input and 2 from a queue, so no stage can run this tick.
+[label,ordinary_fire_start](namedobj $item, int $remaining, string $plural, loc $station, coord $tile, coord $origin, int $delay)
+if (~ordinary_station_present($station, $tile, $origin) = false) return;
+def_struct $recipe = oc_param($item, crafting_pottery_struct);
+~fire_pottery_start($recipe);
+weakqueue*(ordinary_fire_harden, $delay)($item, $recipe, $remaining, $plural, $station, $tile, $origin);
+
+[queue,ordinary_fire_harden](namedobj $item, struct $recipe, int $remaining, string $plural, loc $station, coord $tile, coord $origin)
+if (~ordinary_station_present($station, $tile, $origin) = false) return;
+~fire_pottery_harden($recipe);
+weakqueue*(ordinary_fire_finish, 2)($item, $recipe, $remaining, $plural, $station, $tile, $origin);
+
+[queue,ordinary_fire_finish](namedobj $item, struct $recipe, int $remaining, string $plural, loc $station, coord $tile, coord $origin)
+if (~ordinary_station_present($station, $tile, $origin) = false) return;
+~fire_pottery_finish($item, $recipe);
+$remaining = sub($remaining, 1);
+if ($remaining < 1) return;
+if (inv_total(inv, $item) = 0) {
     mes("You don't have any more <$plural> which need firing.");
+    return;
 }
+@ordinary_fire_start($item, $remaining, $plural, $station, $tile, $origin, 2);
+
+// UNKNOWN engineering guard: a raw teleport must not finish a remote station item.
+[proc,ordinary_station_present](loc $station, coord $tile, coord $origin)(boolean)
+if (coord ! $origin) return(false);
+return(loc_find($tile, $station));
 
 // CANDIDATE: both original 377 copies offer Fill-bucket and are water sources.
 [oploc1,blast_furnace_sink]
-p_arrivedelay;
 if (inv_total(inv, bucket_empty) = 0) {
     ~displaymessage(^dm_default);
     return;
