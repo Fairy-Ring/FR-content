@@ -2,11 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   Packet, PlayerLoading, PlayerStat, ScriptProvider, ScriptState, ServerTriggerType, World, count, engineModule,
-  execute, id, inv, inventory, map, obj, seed, types
+  execute, id, inv, inventory, map, obj, seed, types, weakCount
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  actors, bit, displayNpcType, hasWitness, operate, operateHere, operationStand, read, stage, talk, wield, worldTick
+  actors, bit, displayNpcType, hasWitness, isWitness, openOriginalVillagerCurtain, operate, operateHere,
+  operationStand, read, shortStateTicks, stage, talk, wield, worldTick
 } from './fixture.mjs';
 import { followToSeclusion } from './follow.mjs';
 
@@ -17,6 +18,9 @@ const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const moveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
+const OpNpc = (await engineModule('network/game/client/model/OpNpc.ts')).default;
+const OpNpcHandler = (await engineModule('network/game/client/handler/OpNpcHandler.ts')).default;
+const opNpcHandler = new OpNpcHandler();
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const slotVar = id('VarPlayerType', 'feud_trial_villager');
 const stateVar = id('VarNpcType', 'feud_villager_state');
@@ -25,6 +29,8 @@ const deadlineVar = id('VarNpcType', 'feud_villager_deadline');
 const poisonVar = id('VarNpcType', 'npc_poison');
 const repeatFollowVar = id('VarNpcType', 'feud_repeat_follow_deadline');
 const repeatKoVar = id('VarNpcType', 'feud_repeat_ko_deadline');
+const autoRetaliateVar = id('VarPlayerType', 'option_nodef');
+const poisonTimerTicks = 30;
 const villagerFormNames = [
   'feud_villager_multi_1', 'feud_villager_multi_2', 'feud_villager_multi_3',
   'feud_villager_1_1', 'feud_villager_1_2', 'feud_villager_1_3',
@@ -73,6 +79,7 @@ function reachDistraction(p) {
   operate(p, first, 3);
   assert.equal(stage(p), 7);
   assert.equal(read(p, 'feud_npc_multi'), 1);
+  openOriginalVillagerCurtain(p);
   talk(p, 'feud_street_urchin');
   assert.equal(stage(p), 8);
   const [target] = owned(p);
@@ -106,6 +113,77 @@ function withRandom(value, action) {
   const previous = JavaRandom.nextDouble;
   JavaRandom.nextDouble = () => value;
   try { return action(); } finally { JavaRandom.nextDouble = previous; }
+}
+
+function withRandomSequence(values, action) {
+  const previous = JavaRandom.nextDouble;
+  const draws = [];
+  JavaRandom.nextDouble = () => {
+    assert(draws.length < values.length, 'native Attack uses only the declared deterministic RNG draws');
+    const value = values[draws.length];
+    draws.push(value);
+    return value;
+  };
+  try { action(); }
+  finally { JavaRandom.nextDouble = previous; }
+  return { draws, restored: JavaRandom.nextDouble === previous };
+}
+
+function showNpcForNativeClick(p, npc) {
+  rsbuf.addPlayer(p.slot);
+  rsbuf.addNpc(npc.nid, npc.type);
+  const appearance = p.generateAppearance();
+  rsbuf.computePlayer(p.x, p.level, p.z, p.originX, p.originZ, p.slot, p.tele, p.jump,
+    p.runDir, p.walkDir, p.visibility, p.isActive, p.masks, appearance, p.lastAppearance,
+    p.faceEntity, p.faceSquareX, p.faceSquareZ, p.faceAngleX, p.faceAngleZ,
+    p.hitmarkDamage, p.hitmarkType, p.hitmark2Damage, p.hitmark2Type,
+    p.levels[PlayerStat.HITPOINTS], p.baseLevels[PlayerStat.HITPOINTS], p.animId, p.animDelay,
+    p.sayMessage, p.chatMessage, p.chatColour ?? -1, p.chatEffect ?? -1, p.chatRights ?? 0,
+    p.spotanimId, p.spotanimHeight, p.spotanimTime);
+  rsbuf.computeNpc(npc.x, npc.level, npc.z, npc.nid, npc.type, npc.tele, npc.jump,
+    npc.runDir, npc.walkDir, npc.isActive, npc.masks, npc.faceEntity,
+    npc.faceSquareX, npc.faceSquareZ, npc.faceAngleX, npc.faceAngleZ,
+    npc.hitmarkDamage, npc.hitmarkType, npc.hitmark2Damage, npc.hitmark2Type,
+    npc.levels[NpcStat.HITPOINTS], npc.baseLevels[NpcStat.HITPOINTS], npc.animId,
+    npc.animDelay, npc.sayMessage, npc.spotanimId, npc.spotanimHeight, npc.spotanimTime);
+  rsbuf.npcInfo(0, p.slot, 0, 0, true);
+  assert(rsbuf.hasNpc(p.slot, npc.nid), 'the production visibility encoder includes the original NPC');
+}
+
+function selectVisibleNpc(p, npc, option, expectedTrigger) {
+  showNpcForNativeClick(p, npc);
+  assert(p.inOperableDistance(npc), 'the player is at an ordinary collision-reachable operation stand');
+  assert(opNpcHandler.handle(new OpNpc(option, npc.nid), p), `native OPNPC${option} accepts the visible target`);
+  assert.equal(p.target, npc);
+  assert.equal(p.targetOp, ServerTriggerType.APNPC1 + option - 1);
+  assert.equal(p.getOpTrigger()?.name, expectedTrigger, 'native dispatch selects the packed visible-form action');
+}
+
+function processSelectedInteraction(p) {
+  p.processInteraction();
+  assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED,
+    'the native player interaction finishes synchronously');
+}
+
+function ordinaryPoisonedAttack(p, npc, visibleForm) {
+  const stand = operationStand(p, npc);
+  assert(stand, 'the original NPC has a collision-reachable operation stand');
+  [p.level, p.x, p.z] = stand;
+  p.originX = p.x;
+  p.originZ = p.z;
+  const visible = displayNpcType(p, npc);
+  assert.equal(visible.debugname, visibleForm);
+  assert.equal(visible.op?.[1], 'Attack');
+  assert.equal(count(p, 'bronze_dagger_p', id('InvType', 'worn')), 1,
+    'the ordinary poisoned dagger is worn before the native Attack input');
+  assert.equal(types.ObjType.get(obj('bronze_dagger_p')).params?.get(id('ParamType', 'poison_severity')), 20,
+    'the worn item has its published poison severity');
+  assert(p.inOperableDistance(npc));
+  selectVisibleNpc(p, npc, 2, '[opnpc2,_]');
+  const rng = withRandomSequence([0.999999, 0, 0.999999, 0], () => processSelectedInteraction(p));
+  assert.equal(rng.restored, true);
+  assert.deepEqual(rng.draws, [0.999999, 0, 0.999999, 0],
+    'the draws select a successful hit, positive damage, and the native one-in-four poison branch');
 }
 
 function knockOutHere(p, target) {
@@ -388,9 +466,10 @@ test('the original distracted Villager turn returns at clock 109 with deadline 1
     operate(account, first, 3);
     assert.equal(stage(account), 7);
   }
+  openOriginalVillagerCurtain(p);
   // Test-only clock anchor. Two real account actions expose a stale queued timeout
   // without injecting requests: the old implementation kept the first owner's queue.
-  World.currentTick = 99;
+  World.currentTick = 107 - shortStateTicks;
   const tracked = new Set();
   let target;
   countedWorldTick(tracked, () => {
@@ -399,15 +478,15 @@ test('the original distracted Villager turn returns at clock 109 with deadline 1
     assert(target);
     tracked.add(target);
   });
-  assert.equal(World.currentTick, 100);
+  assert.equal(World.currentTick, 108 - shortStateTicks);
   nativeLogout(previousOwner, () => countedWorldTick(tracked));
-  assert.equal(World.currentTick, 101);
+  assert.equal(World.currentTick, 109 - shortStateTicks);
   assert.equal(target.getVar(stateVar), 0, 'ordinary logout releases the first earned distraction');
   countedWorldTick(tracked, () => {
     talk(p, 'feud_street_urchin');
     assert.equal(owned(p)[0], target, 'the second real conversation selects the same original placement');
   });
-  assert.equal(World.currentTick, 102);
+  assert.equal(World.currentTick, 110 - shortStateTicks);
   assert.equal(stage(p), 8);
   assert.equal(target.getVar(stateVar), 1);
   assert.equal(target.getVar(deadlineVar), 110);
@@ -422,22 +501,22 @@ test('the original distracted Villager turn returns at clock 109 with deadline 1
   assert.equal([...target.queue.all()].length, 0);
 });
 
-test('a native KO input at clock 102 returns at clock 109 with deadline 110 instead of spinning', () => {
+test(`a native KO input at clock ${110 - shortStateTicks} returns at clock 109 with deadline 110 instead of spinning`, () => {
   const p = repeatFixture();
   const target = attackableTarget(p, 'feud_arabian_guard2_multi', true);
   assert(target, 'an original unwitnessed Bandit41 placement is available');
   // Test-only clock anchor; the following Lure and real input create all NPC state.
-  World.currentTick = 101;
+  World.currentTick = 109 - shortStateTicks;
   const tracked = new Set([target]);
   const initialTimer = target.timerInterval;
   attackableLure(p, target);
-  assert.equal(World.currentTick, 101);
+  assert.equal(World.currentTick, 109 - shortStateTicks);
 
   let deadline;
   countedWorldTick(tracked, () => { deadline = dispatchSynchronousKnockOut(p, target); },
     ({ npc }) => assertAttackableQueueBound(npc));
-  assert.equal(World.currentTick, 102, 'the real synchronous input runs before the native NPC phase at 102');
-  assert.equal(deadline, 110, 'the compiled eight-tick KO timeout is anchored at 102');
+  assert.equal(World.currentTick, 110 - shortStateTicks, 'the real synchronous input precedes its native NPC phase');
+  assert.equal(deadline, 110, 'the compiled shared KO window is anchored at its real input');
   const expected = resultSnapshot(p);
 
   let callbacksAt109 = null;
@@ -621,89 +700,235 @@ test('an earned Villager form change preserves the new timer through the old dis
   assertReleased(p, target, expected);
 });
 
-test('native poison keeps its 30-tick cadence while both attackable Feud states are active', {
-  skip: 'ENGINE LIMIT: NPC_HASOP reads the base multi type, so native poison start refuses original Bandit/Thug placements; this is not a Feud quest step.'
-}, () => {
-  for (const name of ['feud_arabian_guard2_multi', 'feud_egyptian_doorman_multi']) {
+test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lure/KO', () => {
+  assert(shortStateTicks <= 20, 'the shared duration remains within the approved timing bound');
+  for (const [name, initialHp, visibleForm] of [
+    ['feud_arabian_guard2_multi', 30, 'feud_arabian_guard2_2'],
+    ['feud_egyptian_doorman_multi', 60, 'feud_egyptian_doorman_2']
+  ]) {
+    const originalRandom = JavaRandom.nextDouble;
     const p = repeatFixture();
+    // Disclosed own-player fixture state only: low Strength preserves the original
+    // target, and auto-retaliation is disabled so NPC retaliation cannot create a
+    // second player Attack. No NPC HP, poison, timer, or queue state is seeded.
+    assert.equal(p.getVar(autoRetaliateVar), 0, 'the player fixture begins with auto-retaliation on');
+    p.setVar(autoRetaliateVar, 1);
+    p.invAdd(inv, obj('bronze_dagger_p'), 1);
+    p.baseLevels[PlayerStat.STRENGTH] = 1;
+    p.levels[PlayerStat.STRENGTH] = 1;
+    p.baseLevels[PlayerStat.ATTACK] = 99;
+    p.levels[PlayerStat.ATTACK] = 99;
+    wield(p, 'bronze_dagger_p');
+    execute('[proc,player_combat_stat]', p);
+
     const target = attackableTarget(p, name);
     assert(target, `an original ${name} placement is available`);
+    assert.equal(target.baseType, id('NpcType', name));
+    assert.equal(target.levels[NpcStat.HITPOINTS], initialHp);
+    assert.equal(target.getVar(stateVar), 0);
+    assert.equal(target.getVar(poisonVar), 0, 'poison is not seeded');
+    assert.equal([...target.queue.all()].length, 0, 'the NPC queue is not seeded');
+    assert(target.timerInterval <= 0, 'the NPC timer is not seeded');
     const poisonTimer = ScriptProvider.getByTrigger(ServerTriggerType.AI_TIMER, target.type,
       types.NpcType.get(target.type).category);
-    assert.equal(poisonTimer?.name, '[ai_timer,_]', `${name} keeps the generic native poison timer`);
-    const initialTimer = target.timerInterval;
-    attackableLure(p, target);
-    assert.equal(target.timerInterval, initialTimer, 'the repeat timeout does not replace an unrelated timer');
-    execute('[proc,npc_poison_start]', p, [20], { target });
-    assert.equal(target.getVar(poisonVar), 20);
-    assert.equal(target.timerInterval, 30, 'the real poison start arms its published timer interval');
+    assert.equal(poisonTimer?.name, '[ai_timer,_]', 'the original form resolves the generic native poison timer');
 
+    const weaponSeverity = types.ObjType.get(obj('bronze_dagger_p')).params?.get(id('ParamType', 'poison_severity'));
+    assert.equal(weaponSeverity, 20);
+    assert.equal(count(p, 'bronze_dagger_p', id('InvType', 'worn')), 1);
+    const attackHpBefore = target.levels[NpcStat.HITPOINTS];
+    ordinaryPoisonedAttack(p, target, visibleForm);
+    assert.equal(target.getVar(poisonVar), weaponSeverity,
+      'ordinary player_melee_attack reads poison severity from the worn weapon');
+    assert.equal(target.timerInterval, poisonTimerTicks, 'native npc_poison_start arms the 30-tick timer');
+    assert.equal(target.getVar(stateVar), 0, 'normal Attack does not fabricate a Feud state');
+    const attackQueue = [...target.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE2);
+    assert.equal(attackQueue.length, 1, 'the real melee hit queues one native damage callback');
+    const attackDamage = attackQueue[0].lastInt;
+    assert(attackDamage > 0);
+
+    // Use normal Wear and Player.stopAction, then let the ordinary retaliation and
+    // damage queues resolve before the Feud interaction. The test player cannot
+    // auto-retaliate into a second poisoned-weapon Attack.
+    wield(p, 'blackjack_oak');
+    p.stopAction();
+    assert.notEqual(p.getOpTrigger()?.name, '[opnpc2,_]');
     const tracked = new Set([target]);
-    const events = [];
-    if (hasWitness(p, target)) {
-      const startTick = World.currentTick;
-      const route = observeNativeCallbacks(tracked, () => followToSeclusion(p, target),
-        event => events.push(event));
-      assert(route.maxCallbacksInOneTick <= MAX_NPC_CALLBACKS_PER_TICK);
-      assert(World.currentTick > startTick, 'following uses native ticks while the NPC is poisoned');
-    }
-    assert.equal(target.getVar(stateVar), 2, 'the original compiled Lure remains active while following');
-    assert.equal(target.getVar(poisonVar) > 0, true);
-    const firstPoisonTick = nextNpcTimerTick(target);
-    boundedTicksThrough(tracked, firstPoisonTick, null, event => events.push(event));
-    const firstHit = events.find(event => event.tick === firstPoisonTick &&
-      event.before.poison > event.after.poison && event.before.state === 2 && event.after.state === 2);
-    assert(firstHit, 'the first due poison timer executes while following');
-    assert.equal(firstHit.before.poison - firstHit.after.poison, 1);
-    assert.equal(firstHit.before.hp - firstHit.after.hp, 4);
+    countedWorldTick(tracked);
+    assert.equal(target.levels[NpcStat.HITPOINTS], attackHpBefore - attackDamage,
+      'the queued ordinary Attack damage lands exactly once');
+    assert(target.levels[NpcStat.HITPOINTS] > 0, 'the Strength-1 hit leaves the original placement alive');
+    assert.equal(target.getVar(poisonVar), weaponSeverity);
+    assert.equal(target.timerInterval, poisonTimerTicks);
+    assertAttackableQueueBound(target);
+    assert.equal([...target.queue.all()].length, 0, 'ordinary attack and retaliation queues have resolved');
 
+    selectVisibleNpc(p, target, 4, `[opnpc4,${visibleForm}]`);
+    processSelectedInteraction(p);
+    assert.equal(target.getVar(stateVar), 2, 'ordinary completed-Feud Lure starts following');
+    assert.equal(target.getVar(ownerVar), p.uid);
+    assert.equal(target.target, p);
+    assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
+    assert.equal(p.getVar(slotVar), -1, 'repeat Lure does not acquire the trial-only player reference');
+    const expectedStage = stage(p);
+    assert.equal(expectedStage, 28, 'the completed-Feud stage remains 28');
+    assertAttackableQueueBound(target);
+    assert.equal([...target.queue.all()].length, 1, 'Lure owns exactly one native follow timeout request');
+
+    const events = [];
+    const observeQueueAndPoison = event => {
+      assertAttackableQueueBound(event.npc);
+      events.push(event);
+    };
     if (hasWitness(p, target)) {
       const startTick = World.currentTick;
-      const route = observeNativeCallbacks(tracked, () => followToSeclusion(p, target),
-        event => events.push(event));
+      const route = observeNativeCallbacks(tracked, () => followToSeclusion(p, target), observeQueueAndPoison);
       assert(route.maxCallbacksInOneTick <= MAX_NPC_CALLBACKS_PER_TICK);
-      assert(World.currentTick > startTick, 'following reaches seclusion using native ticks while poisoned');
+      assert(World.currentTick > startTick, 'native following advances while the original NPC is poisoned');
     }
-    const followingHits = events.filter(event => event.before.poison > event.after.poison &&
-      event.before.state === 2 && event.after.state === 2);
-    const followingHit = followingHits.at(-1);
-    const nextPoisonTick = nextNpcTimerTick(target);
-    assert.equal(nextPoisonTick - followingHit.tick, 30, 'the next native poison callback remains exactly 30 ticks later');
-    const koInputTick = nextPoisonTick - 8;
-    boundedTicksThrough(tracked, koInputTick - 1, null, event => events.push(event));
     assert.equal(target.getVar(stateVar), 2);
-    assert.equal(target.timerClock, 21, 'the KO input is placed eight native ticks before the next poison event');
+    assert(target.getVar(poisonVar) > 0);
+    assert(!hasWitness(p, target), 'the original witness predicate permits ordinary Knock-Out');
+    assert(p.inOperableDistance(target));
+
+    let followingHit = events.filter(event => event.before.poison > event.after.poison &&
+      event.before.state === 2 && event.after.state === 2).at(-1);
+    if (!followingHit) {
+      const firstPoisonTick = nextNpcTimerTick(target);
+      boundedTicksThrough(tracked, firstPoisonTick, null, observeQueueAndPoison);
+      followingHit = events.find(event => event.tick === firstPoisonTick &&
+        event.before.poison > event.after.poison && event.before.state === 2 && event.after.state === 2);
+    }
+    assert(followingHit, 'a native poison callback damages the original NPC while Lure is active');
+    assert.equal(followingHit.before.poison - followingHit.after.poison, 1);
+    assert.equal(followingHit.before.hp - followingHit.after.hp, 4);
+
+    let nextPoisonTick = nextNpcTimerTick(target);
+    while (nextPoisonTick - World.currentTick <= shortStateTicks) {
+      boundedTicksThrough(tracked, nextPoisonTick, null, observeQueueAndPoison);
+      const nextHit = events.find(event => event.tick === nextPoisonTick &&
+        event.before.poison > event.after.poison && event.before.state === 2 && event.after.state === 2);
+      assert(nextHit, 'the next native poison callback lands during ordinary Lure');
+      assert.equal(nextHit.tick - followingHit.tick, poisonTimerTicks);
+      followingHit = nextHit;
+      nextPoisonTick = nextNpcTimerTick(target);
+    }
+    assert.equal(nextPoisonTick - followingHit.tick, poisonTimerTicks,
+      'the next native poison callback remains exactly 30 ticks after the preceding hit');
+
+    const koInputTick = nextPoisonTick - shortStateTicks;
+    assert(koInputTick > World.currentTick);
+    boundedTicksThrough(tracked, koInputTick - 1, null, observeQueueAndPoison);
+    assert.equal(target.getVar(stateVar), 2);
+    assert.equal(target.timerClock, poisonTimerTicks - shortStateTicks - 1);
 
     let koDeadline;
-    countedWorldTick(tracked, () => { koDeadline = attackableKnockOut(p, target); },
-      ({ npc }) => assertAttackableQueueBound(npc));
+    countedWorldTick(tracked, () => {
+      withRandom(0, () => {
+        selectVisibleNpc(p, target, 5, `[opnpc5,${visibleForm}]`);
+        processSelectedInteraction(p);
+      });
+      koDeadline = target.getVar(deadlineVar);
+    }, ({ npc }) => assertAttackableQueueBound(npc));
+    assert.equal(JavaRandom.nextDouble, originalRandom, 'native Knock-Out restores the process RNG');
     assert.equal(World.currentTick, koInputTick);
-    assert.equal(koDeadline, nextPoisonTick, 'the real KO deadline aligns to the next poison tick');
-    assert.equal(target.timerClock, 22);
     assert.equal(target.getVar(stateVar), 3);
-    assert.equal(target.getVar(poisonVar), followingHit.after.poison);
+    assert.equal(target.getVar(ownerVar), p.uid);
+    assert.equal(p.getVar(slotVar), -1);
+    assertAttackableQueueBound(target);
+    assert.equal(koDeadline, nextPoisonTick,
+      'the checked-out Feud duration aligns the KO deadline with the next native poison tick');
+    assert.equal(target.timerClock, poisonTimerTicks - shortStateTicks);
+    assert.equal(target.getVar(poisonVar), followingHit.after.poison,
+      'Lure and Knock-Out do not reseed native poison');
 
-    boundedTicksThrough(tracked, koDeadline, null, event => events.push(event));
-    const koPoisonHit = events.find(event => event.tick === koDeadline &&
-      event.before.poison > event.after.poison);
-    assert(koPoisonHit, 'the published poison callback still runs on the KO deadline');
-    assert.equal(koPoisonHit.before.state, 3, 'poison damage executes while the NPC is unconscious');
-    assert.equal(koPoisonHit.after.state, 3, 'poison does not replace the KO timeout state');
+    boundedTicksThrough(tracked, koDeadline, null, observeQueueAndPoison);
+    const koPoisonHit = events.find(event => event.tick === koDeadline && event.before.poison > event.after.poison);
+    assert(koPoisonHit, 'native poison runs on the completed-Feud KO deadline');
+    assert.equal(koPoisonHit.before.state, 3);
+    assert.equal(koPoisonHit.after.state, 3);
     assert.equal(koPoisonHit.before.poison - koPoisonHit.after.poison, 1);
     assert.equal(koPoisonHit.before.hp - koPoisonHit.after.hp, 4);
-    assert.equal(koPoisonHit.tick - followingHit.tick, 30, 'poison cadence is unchanged across both Feud states');
-    assert.equal(target.getVar(stateVar), 0, 'the real KO timeout still cleans up on its deadline');
+    assert.equal(koPoisonHit.tick - followingHit.tick, poisonTimerTicks,
+      'the following and KO-overlap poison hits remain exactly 30 native ticks apart');
+    assert.equal(target.getVar(stateVar), 3, 'the same-pass-safe Feud timeout remains queued at the deadline');
+    assert.equal(target.getVar(ownerVar), p.uid);
+    assert.equal(target.getVar(deadlineVar), koDeadline);
+    assertAttackableQueueBound(target);
+
+    // FEUD-TIMEOUT-REARM-01 documents cleanup no later than one tick after the
+    // stored deadline; the poison callback above is still exactly on that deadline.
+    boundedTicksThrough(tracked, koDeadline + 1, null, observeQueueAndPoison);
+    assert.equal(target.getVar(stateVar), 0);
     assert.equal(target.getVar(ownerVar), -1);
     assert.equal(target.getVar(deadlineVar), 0);
-    assert.equal(target.timerInterval, 30, 'Feud reset preserves the independent poison timer');
+    assert.equal(target.timerInterval, poisonTimerTicks, 'Feud reset preserves the independent poison timer');
+    assertAttackableQueueBound(target);
 
     execute('[proc,npc_poison_clear]', p, [], { target });
     assert.equal(target.getVar(poisonVar), 0);
-    assert.equal(target.timerInterval, 0, 'the compiled poison cleanup clears its timer');
+    assert.equal(target.timerInterval, 0);
     drainTargetQueues(tracked);
     assertAttackableQueueBound(target);
+    assert.equal([...target.queue.all()].length, 0, 'the original NPC has no leaked native queue jobs');
+    assert.equal(JavaRandom.nextDouble, originalRandom, 'all deterministic RNG substitutions are restored');
+    assert.equal(stage(p), expectedStage);
+    assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED);
+    assert.equal(weakCount(p), 0, 'the fixture player has no leaked weak-queue jobs');
   }
 });
+
+function walkRepeatToSeclusion(p, target, tick) {
+  const setupStart = World.currentTick;
+  const searchRadius = 32; // UNKNOWN test geometry bound, reused from follow.mjs, not a gameplay distance.
+  const destinations = [];
+  let destination = null;
+  for (; World.currentTick - setupStart < nativeSetupWaitTicks;) {
+    if (!hasWitness(p, target) && p.inOperableDistance(target) &&
+      (!destination || (p.x === destination.x && p.z === destination.z))) return;
+    if (!destination || (p.x === destination.x && p.z === destination.z)) {
+      // Five witness tiles plus the follower's one-tile finishing neighborhood.
+      const nearby = [...World.npcs].filter(npc => npc.isActive && npc.level === target.level &&
+        CoordGrid.distanceToSW(target, npc) <= searchRadius + 6);
+      let route = null;
+      search: for (let radius = 2; radius <= searchRadius; radius++) {
+        for (let x = target.x - radius; x <= target.x + radius; x++) {
+          candidateTile: for (let z = target.z - radius; z <= target.z + radius; z++) {
+            if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
+              map.isMapBlocked(x, z, target.level) ||
+              destinations.some(tile => tile.x === x && tile.z === z)) continue;
+            for (let dx = -1; dx <= 1; dx++) {
+              for (let dz = -1; dz <= 1; dz++) {
+                const projected = { uid: target.uid, level: target.level, x: x + dx, z: z + dz };
+                if (!map.isMapBlocked(projected.x, projected.z, projected.level) &&
+                  nearby.some(npc => isWitness(p, projected, npc))) continue candidateTile;
+              }
+            }
+            const candidate = [...map.findPath(p.level, p.x, p.z, x, z)];
+            if (!candidate.length) continue;
+            const end = CoordGrid.unpackCoord(candidate.at(-1));
+            if (end.level !== p.level || end.x !== x || end.z !== z) continue;
+            destination = { x, z };
+            route = candidate.map(value => {
+              const point = CoordGrid.unpackCoord(value);
+              return { x: point.x, z: point.z };
+            });
+            break search;
+          }
+        }
+      }
+      assert(route, 'native collision provides another unwitnessed destination within the existing search bound');
+      destinations.push(destination);
+      assert(moveClickHandler.handle(new MoveClick(route, 0, false), p),
+        'ordinary MoveClick accepts the native seclusion route');
+    }
+    tick();
+  }
+  assert(!hasWitness(p, target) && p.inOperableDistance(target),
+    'native follow and wandering witnesses permit the actual KO within the existing setup bound: ' +
+    JSON.stringify({ player: [p.x, p.z, p.level], target: [target.x, target.z, target.level],
+      destinations, witnessed: hasWitness(p, target), operable: p.inOperableDistance(target) }));
+}
 
 test('four real attackable Lure/KO cycles survive ordinary logout with bounded queues over 1,200 ticks', () => {
   let p = repeatFixture();
@@ -731,12 +956,8 @@ test('four real attackable Lure/KO cycles survive ordinary logout with bounded q
     assert.equal(target.getVar(stateVar), 0, 'each cycle begins after the prior real KO timeout');
     const cycleStart = World.currentTick;
     attackableLure(p, target);
-    // This queue soak needs a real unwitnessed KO, not the separate Thug wall-screening proof.
-    // Stay at the earned Lure stand while native follow and witnesses continue to move.
-    for (let setupTicks = 0; setupTicks < nativeSetupWaitTicks &&
-      (hasWitness(p, target) || !p.inOperableDistance(target)); setupTicks++) tick();
-    assert(!hasWitness(p, target) && p.inOperableDistance(target),
-      'native follow and wandering witnesses permit the actual KO within the existing setup bound');
+    // Continue walking if a new witness enters a destination during the real follow.
+    walkRepeatToSeclusion(p, target, tick);
     const wakeDeadline = attackableKnockOut(p, target);
     const ownerUid = p.uid;
     const receipt = nativeLogout(p, tick);
