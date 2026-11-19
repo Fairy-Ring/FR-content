@@ -122,7 +122,7 @@ for (const row of left) {
 }
 const broken = { name: 'wild_ladder_broken', level: 0, x: 3022, z: 3638, shape: 10, angle: 2 };
 locFor(broken);
-assert.ok(types.LocType.get(types.LocType.getId(broken.name)).op.every(option => option === null), 'broken ground ladder offers no action option; cache refusal sentence is examine text');
+assert.equal(types.LocType.get(types.LocType.getId(broken.name)).op, null, 'broken ground ladder offers no action option; cache refusal sentence is examine text');
 const brokenPlayer = playerAt([0, 3022, 3637]);
 brokenPlayer.originX = brokenPlayer.x; brokenPlayer.originZ = brokenPlayer.z;
 assert.equal(new OpLocHandler().handle(new OpLoc(1, broken.x, broken.z, types.LocType.getId(broken.name)), brokenPlayer), false, 'no climb/refusal handler is invented for the broken base');
