@@ -7,9 +7,8 @@ import {
 import { player } from './player.mjs';
 import {
   activeLoc, actors, begin, bit, buyReceipts, deliver, displayNpcType, drink, hasWitness, locs,
-  nativeNpcTriggerName, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, wield
+  nativeNpcTriggerName, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, tickThrough, wield
 } from './fixture.mjs';
-import { tickThrough } from './follow.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
@@ -109,7 +108,7 @@ test('a real lured villager can be knocked out inside its original house with bo
   const south = locs('curtain_1529').find(loc => loc.level === 0 && loc.x === 3350 && loc.z === 2952);
   const north = locs('curtain_1528').find(loc => loc.level === 0 && loc.x === 3350 && loc.z === 2957);
   assert(south && north, 'both original house curtains are identified from the map');
-  assert.equal(types.LocType.get(activeLoc(south).type).ops[0], 'Close');
+  assert.equal(types.LocType.get(activeLoc(south).type).op[0], 'Close');
   operateLoc(p, south, { position: [0, 3350, 2953] });
   assert.equal(activeLoc(south).type, id('LocType', 'curtain_1528'), 'the real Close action shuts the southern entrance');
   assert.equal(activeLoc(north).type, id('LocType', 'curtain_1528'), 'the northern entrance remains closed');

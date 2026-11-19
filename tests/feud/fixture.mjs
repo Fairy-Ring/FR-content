@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   Packet, PlayerLoading, ScriptState, ServerTriggerType, World, contentRoot, count, dialoguePage,
-  engineModule, held, id, inv, invButton, map, obj, resumeDialogue, tick, tile, types, useLoc, worn
+  engineModule, held, id, inv, invButton, map, obj, resumeDialogue, tile, types, useLoc, worn
 } from '../swamp-caves/runtime.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
@@ -95,10 +95,7 @@ function operateLoc(p, placement, { option = 1, item = null, position = null, ch
     assert(loc.isChanged() && loc.lifecycleTick > 0,
       'a temporary changed loc has its published restoration countdown');
     const remaining = loc.lifecycleTick;
-    for (let step = 0; step < remaining; step++) {
-      tick(p);
-      World.processZones();
-    }
+    for (let step = 0; step < remaining; step++) worldTick();
     loc = activeLoc(placement);
     assert.equal(loc.type, placement.type, 'the native zone lifecycle restores the original loc before its next click');
   }
@@ -165,6 +162,26 @@ function stand(p, n) {
   return destination;
 }
 
+export function worldTick() {
+  for (const p of World.playerLoop.all()) {
+    if (p?.isActive) p.lastResponse = p.lastConnected = World.currentTick;
+  }
+  for (const phase of [
+    'processWorld', 'processNpcEventQueue', 'processNpcs', 'processPlayers',
+    'processLogouts', 'processLogins', 'processZones', 'processInfo', 'processCleanup'
+  ]) {
+    assert.equal(typeof World[phase], 'function', `native World.${phase} phase is available`);
+    World[phase]();
+  }
+  World.currentTick++;
+}
+
+export function tickThrough(deadline) {
+  assert(Number.isInteger(deadline), 'the native NPC deadline is an integer tick');
+  assert(deadline >= World.currentTick, 'the native NPC deadline has not already passed');
+  while (World.currentTick <= deadline) worldTick();
+  assert.equal(World.currentTick, deadline + 1, 'native world phases ran once through the exact deadline');
+}
 function finish(p, choices = []) {
   const options = [...choices], pages = [];
   for (let step = 0; step < 240 && p.activeScript; step++) {
@@ -183,7 +200,7 @@ function finish(p, choices = []) {
         assert(selected, `offered dialogue choice ${choice}`);
         resumeDialogue(p, selected);
       } else resumeDialogue(p);
-    } else if (state.execution === ScriptState.SUSPENDED) tick(p);
+    } else if (state.execution === ScriptState.SUSPENDED) worldTick();
     else assert.fail(`unexpected compiled dialogue state ${state.execution}`);
   }
   assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED, 'dialogue finishes within its bound');
@@ -289,8 +306,8 @@ function deliver(p, banditsFirst = false, coward = false) {
   assert.equal(stage(p), 5, 'both distinct hand-ins reach the sourced delivery checkpoint');
 }
 
-function relog(p) {
-  const saved = p.save(), slot = p.slot, pid = p.pid;
+function relog(p, session = p) {
+  const saved = p.save(), { slot, pid } = session;
   p.unlink(); World.players[slot] = null;
   const loaded = PlayerLoading.load(p.username, new Packet(saved), null);
   loaded.varsString ??= [];

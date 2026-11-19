@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { engineModule, map, World } from '../swamp-caves/runtime.mjs';
-import { hasWitness, isWitness } from './fixture.mjs';
+import { hasWitness, isWitness, worldTick } from './fixture.mjs';
 
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const MoveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
@@ -10,26 +10,6 @@ const witnessRadius = 5; // Matches the predicate in fixture.mjs.
 const seclusionSearchRadius = 32; // UNKNOWN test-fixture geometry bound, not a gameplay distance.
 const nativeFollowWaitTicks = 512; // UNKNOWN test-fixture wait bound, not the NPC timeout.
 
-export function worldTick() {
-  for (const p of World.playerLoop.all()) {
-    if (p?.isActive) p.lastResponse = p.lastConnected = World.currentTick;
-  }
-  for (const phase of [
-    'processWorld', 'processNpcEventQueue', 'processNpcs', 'processPlayers',
-    'processLogouts', 'processLogins', 'processZones', 'processInfo', 'processCleanup'
-  ]) {
-    assert.equal(typeof World[phase], 'function', `native World.${phase} phase is available`);
-    World[phase]();
-  }
-  World.currentTick++;
-}
-
-export function tickThrough(deadline) {
-  assert(Number.isInteger(deadline), 'the native NPC deadline is an integer tick');
-  assert(deadline >= World.currentTick, 'the native NPC deadline has not already passed');
-  while (World.currentTick <= deadline) worldTick();
-  assert.equal(World.currentTick, deadline + 1, 'native world phases ran once through the exact deadline');
-}
 
 function projectedWitnesses(p, target, x, z) {
   const projected = { uid: target.uid, level: target.level, x, z };

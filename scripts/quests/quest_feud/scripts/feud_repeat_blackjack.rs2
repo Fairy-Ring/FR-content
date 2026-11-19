@@ -85,6 +85,7 @@ npc_queue(19, 0, ^feud_villager_follow_timeout);
 return(true);
 
 [proc,feud_repeat_villager_ko]
+if (inv_total(worn, blackjack_oak) < 1 & inv_total(worn, blackjack_willow) < 1) { return; }
 ~feud_repeat_blackjack_ko(^feud_villager_ko_xp, true);
 return;
 

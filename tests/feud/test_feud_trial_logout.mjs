@@ -4,8 +4,9 @@ import {
   Packet, PlayerLoading, PlayerStat, World, count, engineModule, id, inv, inventory, obj, seed
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
-import { bit, hasWitness, operate, operationStand, read, stage, talk, wield } from './fixture.mjs';
-import { tickThrough, worldTick } from './follow.mjs';
+import {
+  bit, displayNpcType, hasWitness, operate, operationStand, read, stage, talk, tickThrough, wield, worldTick
+} from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -133,8 +134,7 @@ for (const number of [1, 2, 3]) for (const checkpoint of [7, 8]) {
     if (checkpoint === 8) {
       const distracted = reachDistraction(p);
       // Let the real NPC queue expire this earned distraction, without rewriting its checkpoint.
-      World.currentTick = distracted.getVar(deadlineVar);
-      worldTick();
+      tickThrough(distracted.getVar(deadlineVar));
       assert.equal(distracted.getVar(stateVar), 0);
       assert.equal(p.getVar(slotVar), -1);
     } else {
@@ -150,7 +150,7 @@ for (const number of [1, 2, 3]) for (const checkpoint of [7, 8]) {
     assert(target, `an original idle villager ${number} exposes its middle form`);
     const before = { coins: count(p, 'coins'), xp: xp(p) };
     lure(p, target);
-    assert.equal(target.type, id('NpcType', `feud_villager_${number}_2`),
+    assert.equal(displayNpcType(p, target).id, id('NpcType', `feud_villager_${number}_2`),
       'native dispatch uses the original middle form, not the later blackjack form');
     const second = villagers().find(npc => npc !== target && npc.getVar(stateVar) === 0 && operationStand(p, npc));
     assert(second, 'a second real target is available to prove the reservation rejection');

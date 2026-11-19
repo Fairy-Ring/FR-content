@@ -16,10 +16,10 @@ if (npc_find(loc_coord, feud_camel, ^feud_camel_trough_range, 0) = false) {
     return;
 }
 if (loc_find(loc_coord, feud_ugthanki_pooh) = true) {
-    loc_del(0);
+    loc_del(1);
 }
 if (loc_find(loc_coord, feud_ugthanki_pooh_poisoned) = true) {
-    loc_del(0);
+    loc_del(1);
 }
 anim(feud_hot_sauce_poisoning, 0);
 npc_anim(camel_eats_from_trough, 0);
@@ -57,7 +57,7 @@ if ($used ! bucket_empty) {
 mes("You scoop up some camel dung into the bucket");
 inv_del(inv, bucket_empty, 1);
 inv_add(inv, feud_camel_pooh_bucket, 1);
-loc_del(0);
+loc_del(1);
 return;
 
 [oplocu,feud_ugthanki_pooh_poisoned]

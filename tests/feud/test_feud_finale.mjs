@@ -5,7 +5,7 @@ import {
   map, obj, resumeDialogue, seed
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
-import { actors, bit, finish, operate, read, relog, stage, stand, talk, wield } from './fixture.mjs';
+import { actors, bit, finish, operate, read, relog, stage, stand, talk, wield, worldTick } from './fixture.mjs';
 
 const { default: Environment } = await engineModule('util/Environment.ts');
 const points = p => p.getVar(id('VarPlayerType', 'qp'));
@@ -17,17 +17,6 @@ const rsbuf = await engineModule('network/rsbuf/index.ts');
 const ownerVar = id('VarNpcType', 'npc_attacking_uid');
 const ownedChampions = (p, name) => [...World.npcs].filter(n => n.isActive
   && n.baseType === id('NpcType', name) && (n.vars[ownerVar] >>> 0) === p.uid);
-
-function worldTick() {
-  for (const p of World.playerLoop.all()) {
-    if (p?.isActive) p.lastResponse = p.lastConnected = World.currentTick;
-  }
-  for (const phase of [
-    'processWorld', 'processNpcEventQueue', 'processNpcs', 'processPlayers',
-    'processLogouts', 'processLogins', 'processZones', 'processInfo', 'processCleanup'
-  ]) World[phase]();
-  World.currentTick++;
-}
 
 function combatFixture() {
   const p = player();
@@ -220,11 +209,12 @@ test('leaving and rejoining preserves summon progress but a stale owned opponent
   talk(p, 'feud_menap_boss');
   const old = ownedChampions(p, 'feud_menap_toughguy')[0];
   const oldUid = p.uid;
+  const session = { slot: p.slot, pid: p.pid };
   p.isActive = false;
   World.players[p.slot] = null;
   for (let step = 0; step < 4; step++) worldTick();
   assert(!old.isActive, 'the real NPC timer removes an opponent while its owner is logged out');
-  p = relog(p);
+  p = relog(p, session);
   rsbuf.addPlayer(p.slot);
   assert.equal(p.uid, oldUid, 'the isolated save/load fixture deliberately retains its original UID');
   assert.equal(stage(p), 24);

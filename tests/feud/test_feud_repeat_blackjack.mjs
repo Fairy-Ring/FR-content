@@ -10,9 +10,9 @@ import {
 import { player } from './player.mjs';
 import {
   actors, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
-  nativeNpcTriggerName, operate, operateHere, operationStand, read, stand, stage, talk, wield
+  nativeNpcTriggerName, operate, operateHere, operationStand, read, stand, stage, talk, tickThrough, wield
 } from './fixture.mjs';
-import { followToSeclusion, tickThrough } from './follow.mjs';
+import { followToSeclusion } from './follow.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
@@ -226,7 +226,7 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   const wakeDeadline = target.getVar(deadlineVar);
   const beforeWakePick = { coins: count(p, 'coins'), xp: xp(p) };
   assert(wakeDeadline > World.currentTick);
-  World.currentTick = wakeDeadline;
+  tickThrough(wakeDeadline - 1);
   const woke = operate(p, target, 3);
   assert.equal(woke.trigger, nativeNpcTriggerName(p, target, 3));
   assert.equal(target.getVar(stateVar), 0);
