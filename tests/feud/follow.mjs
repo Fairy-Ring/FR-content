@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { engineModule, map, World } from '../swamp-caves/runtime.mjs';
-import { hasWitness, isWitness, worldTick } from './fixture.mjs';
+import { hasWitness, isWitness, operationStand, worldTick } from './fixture.mjs';
 
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const MoveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
@@ -71,23 +71,36 @@ export function followToSeclusion(p, target) {
   const startingNpcTile = [target.level, target.x, target.z];
   const destinations = [];
   let destination = null, routeLength = 0;
+  let remainingWaypoints = [];
+  let previousPositions = null;
 
   let ticks = 0;
   for (; ticks < nativeFollowWaitTicks; ticks++) {
-    const arrived = destination && p.level === destination.level &&
-      p.x === destination.x && p.z === destination.z;
-    if (!destination || (arrived && (!target.hasWaypoints() ||
-      projectedWitnesses(p, target, p.x, p.z).length ||
-      !occludedOriginalWitness(p, originalWitnesses, p.x, p.z)))) {
-      // Wait for a currently admissible route, and let a moving follower finish.
-      // Route admission and actual movement share the original 512-turn budget.
-      const next = secludedDestination(p, target, originalWitnesses, destinations);
-      if (next) {
-        destination = next.destination;
-        destinations.push(destination);
-        routeLength += next.route.length;
-        walkRoute(p, next.route);
+    const positions = [p.x, p.z, target.x, target.z];
+    const stationary = previousPositions?.every((value, index) => value === positions[index]);
+    previousPositions = positions;
+    if (stationary && !p.hasWaypoints() && !p.inOperableDistance(target)) {
+      const stand = operationStand(p, target);
+      const approach = stand && exactRoute(p.level, p.x, p.z, stand[1], stand[2]);
+      if (approach) {
+        walkRoute(p, approach);
+        destination = null;
+        remainingWaypoints = [];
       }
+    }
+    if (!p.hasWaypoints() && p.inOperableDistance(target)) {
+      if (!remainingWaypoints.length) {
+        // Admission and native movement share the original 512-turn budget.
+        const next = secludedDestination(p, target, originalWitnesses, destinations);
+        if (next) {
+          destination = next.destination;
+          destinations.push(destination);
+          routeLength += next.route.length;
+          remainingWaypoints = next.route;
+        }
+      }
+      // Do not lead a naive follower around the next corner until it catches up.
+      if (remainingWaypoints.length) walkRoute(p, [remainingWaypoints.shift()]);
     }
     worldTick();
     if (destination && p.level === destination.level && p.x === destination.x && p.z === destination.z &&
