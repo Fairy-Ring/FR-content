@@ -822,8 +822,12 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assert.equal(target.getVar(stateVar), 2);
     assert.equal(target.timerClock, poisonTimerTicks - knockoutTicks - 1);
 
-    let koDeadline;
+    let koDeadline, koInput;
     countedWorldTick(tracked, () => {
+      koInput = { tick: World.currentTick, name, player: [p.level, p.x, p.z],
+        target: [target.level, target.x, target.z], hp: target.levels[NpcStat.HITPOINTS],
+        witnesses: [...World.npcs].filter(npc => isWitness(p, target, npc))
+          .map(npc => [npc.uid, npc.x, npc.z]) };
       withRandom(0, () => {
         selectVisibleNpc(p, target, 5, `[opnpc5,${visibleForm}]`);
         processSelectedInteraction(p);
@@ -832,7 +836,11 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     }, ({ npc }) => assertAttackableQueueBound(npc));
     assert.equal(JavaRandom.nextDouble, originalRandom, 'native Knock-Out restores the process RNG');
     assert.equal(World.currentTick, koInputTick);
-    assert.equal(target.getVar(stateVar), 3);
+    assert.equal(target.getVar(stateVar), 3, 'the native KO succeeds: ' + JSON.stringify({
+      koInput, state: target.getVar(stateVar), overhead: target.sayMessage,
+      targetMode: target.targetOp, hp: target.levels[NpcStat.HITPOINTS],
+      witnesses: [...World.npcs].filter(npc => isWitness(p, target, npc))
+        .map(npc => [npc.uid, npc.x, npc.z]), messages: p.messages }));
     assert.equal(target.getVar(ownerVar), p.uid);
     assert.equal(p.getVar(slotVar), -1);
     assertAttackableQueueBound(target);

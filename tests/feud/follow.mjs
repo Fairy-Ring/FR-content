@@ -31,14 +31,32 @@ function exactRoute(level, startX, startZ, endX, endZ) {
   return route;
 }
 
-function secludedDestination(p, target, witnesses) {
-  // An adjacent destination can screen the player without moving a native follower.
+function walkRoute(p, route) {
+  const clickPath = route.map(value => {
+    const point = CoordGrid.unpackCoord(value);
+    return { x: point.x, z: point.z };
+  });
+  assert(MoveClickHandler.handle(new MoveClick(clickPath, 0, false), p),
+    'native MoveClick accepts the collision-found route behind the building');
+}
+
+function secludedDestination(p, target, witnesses, visited) {
+  const nearby = [...World.npcs].filter(npc => npc.isActive && npc.level === target.level &&
+    CoordGrid.distanceToSW(target, npc) <= seclusionSearchRadius + witnessRadius + 1);
+  // Include the follower's finishing neighborhood, not only the player's tile.
   for (let radius = 2; radius <= seclusionSearchRadius; radius++) {
     for (let x = target.x - radius; x <= target.x + radius; x++) {
-      for (let z = target.z - radius; z <= target.z + radius; z++) {
+      candidateTile: for (let z = target.z - radius; z <= target.z + radius; z++) {
         if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
-          map.isMapBlocked(x, z, target.level)) continue;
-        if (projectedWitnesses(p, target, x, z).length || !occludedOriginalWitness(target, witnesses, x, z)) continue;
+          map.isMapBlocked(x, z, target.level) || visited.some(tile => tile.x === x && tile.z === z)) continue;
+        if (!occludedOriginalWitness(target, witnesses, x, z)) continue;
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dz = -1; dz <= 1; dz++) {
+            const projected = { uid: target.uid, level: target.level, x: x + dx, z: z + dz };
+            if (!map.isMapBlocked(projected.x, projected.z, projected.level) &&
+              nearby.some(npc => isWitness(p, projected, npc))) continue candidateTile;
+          }
+        }
         const route = exactRoute(p.level, p.x, p.z, x, z);
         if (!route) continue;
         return { destination: { level: target.level, x, z }, route };
@@ -56,13 +74,11 @@ export function followToSeclusion(p, target) {
   assert(hasWitness(p, target), 'the original NPC begins visible to a nearby witness');
   const originalWitnesses = [...World.npcs].filter(npc => isWitness(p, target, npc));
   const startingNpcTile = [target.level, target.x, target.z];
-  const { destination, route } = secludedDestination(p, target, originalWitnesses);
-  const clickPath = route.map(value => {
-    const point = CoordGrid.unpackCoord(value);
-    return { x: point.x, z: point.z };
-  });
-  assert(MoveClickHandler.handle(new MoveClick(clickPath, 0, false), p),
-    'native MoveClick accepts the collision-found route behind the building');
+  const destinations = [];
+  let { destination, route } = secludedDestination(p, target, originalWitnesses, destinations);
+  destinations.push(destination);
+  let routeLength = route.length;
+  walkRoute(p, route);
 
   let ticks = 0;
   for (; ticks < nativeFollowWaitTicks; ticks++) {
@@ -72,9 +88,18 @@ export function followToSeclusion(p, target) {
       occludedOriginalWitness(target, originalWitnesses, target.x, target.z) &&
       projectedWitnesses(p, target, p.x, p.z).length === 0 &&
       occludedOriginalWitness(p, originalWitnesses, p.x, p.z)) break;
+    if (p.level === destination.level && p.x === destination.x && p.z === destination.z) {
+      // A wandering witness or a blocked follower corner can invalidate this stand.
+      // Continue ordinary walking within the same total native-turn budget.
+      ({ destination, route } = secludedDestination(p, target, originalWitnesses, destinations));
+      destinations.push(destination);
+      routeLength += route.length;
+      walkRoute(p, route);
+    }
   }
   assert(ticks < nativeFollowWaitTicks, `native player movement and NPC follow reach the screened destination: ${JSON.stringify({
     tick: World.currentTick, destination, player: [p.level, p.x, p.z],
+    destinations,
     npc: [target.level, target.x, target.z], followMode: target.targetOp,
     followsOwner: target.target === p, operable: p.inOperableDistance(target),
     npcWitnesses: projectedWitnesses(p, target, target.x, target.z).map(npc => [npc.uid, npc.x, npc.z]),
@@ -98,5 +123,5 @@ export function followToSeclusion(p, target) {
     'the player is also outside every witness line of sight');
   assert(originalWitnesses.some(npc => occludedOriginalWitness(p, [npc], p.x, p.z)),
     'the player and the Thug are screened from an original nearby witness');
-  return { destination, routeLength: route.length, ticks: ticks + 1 };
+  return { destination, routeLength, ticks: ticks + 1 };
 }
