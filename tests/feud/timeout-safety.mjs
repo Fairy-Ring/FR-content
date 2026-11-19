@@ -198,7 +198,7 @@ function knockOutHere(p, target) {
   return target.getVar(deadlineVar);
 }
 
-function walkIntoNativeRange(p, target, tracked, deadline) {
+function walkIntoNativeRange(p, target, tick, deadline) {
   const destination = operationStand(p, target);
   assert(destination, 'the original follower has a collision-reachable operation stand');
   const route = [...map.findPath(p.level, p.x, p.z, destination[1], destination[2])];
@@ -212,7 +212,7 @@ function walkIntoNativeRange(p, target, tracked, deadline) {
   assert(moveClickHandler.handle(new MoveClick(path, 0, false), p), 'native MoveClick accepts the owner approach');
   const arrived = () => p.level === destination[0] && p.x === destination[1] && p.z === destination[2];
   for (let ticks = 0; ticks < nativeSetupWaitTicks && World.currentTick < deadline &&
-    (!arrived() || !p.inOperableDistance(target)); ticks++) countedWorldTick(tracked);
+    (!arrived() || !p.inOperableDistance(target)); ticks++) tick();
   assert(arrived() && p.inOperableDistance(target),
     'the owner walks into actual operation range without extending the original deadline or relocating an actor');
 }
@@ -612,7 +612,9 @@ test('a second native action updates the timer deadline before the earlier deadl
   const oldDeadline = target.getVar(deadlineVar);
   const tracked = new Set([target]);
   boundedTicksThrough(tracked, oldDeadline - nativeSetupWaitTicks - 3);
-  if (!p.inOperableDistance(target)) walkIntoNativeRange(p, target, tracked, oldDeadline - 3);
+  if (!p.inOperableDistance(target)) {
+    walkIntoNativeRange(p, target, () => countedWorldTick(tracked), oldDeadline - 3);
+  }
   boundedTicksThrough(tracked, oldDeadline - 3);
   assert.equal(World.currentTick, oldDeadline - 3);
   assert(p.inOperableDistance(target), `the actual late input is in native operation range: ${JSON.stringify({
@@ -929,7 +931,18 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
   const destinations = [];
   let destination = null;
   let remainingWaypoints = [];
+  let previousPositions = null;
   for (; World.currentTick < setupDeadline;) {
+    const positions = [p.x, p.z, target.x, target.z];
+    const stationary = previousPositions?.every((value, index) => value === positions[index]);
+    previousPositions = positions;
+    if (stationary && !p.hasWaypoints() && !p.inOperableDistance(target)) {
+      // A naive follower can stop diagonally across a wall. Walk the owner to
+      // an actual operation stand instead of waiting forever for it to path.
+      walkIntoNativeRange(p, target, tick, setupDeadline);
+      destination = null;
+      remainingWaypoints = [];
+    }
     if (!hasWitness(p, target) && p.inOperableDistance(target) &&
       (!destination || (p.x === destination.x && p.z === destination.z))) return;
     if (!destination || ((p.x === destination.x && p.z === destination.z) &&
