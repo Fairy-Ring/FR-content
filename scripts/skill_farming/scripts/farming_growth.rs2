@@ -24,18 +24,23 @@ if ($now < $last) return;
 db_listall(farming_growth);
 def_dbrow $row = db_findnext;
 while ($row ! null) {
-    def_int $steps = ~farming_growth_steps($last, $now, db_getfield($row, farming_growth:period, 0), $offline);
-    ~farming_growth_dispatch(db_getfield($row, farming_growth:handler, 0), $steps);
+    def_int $period = db_getfield($row, farming_growth:period, 0);
+    def_int $steps = ~farming_growth_steps($last, $now, $period, $offline);
+    // Retain the actual first window, not just its count: disease must not
+    // borrow a slower window that preceded the step which caused disease.
+    def_int $window = multiply(divide($now, $period), $period);
+    if ($offline = true) $window = multiply(add(divide($last, $period), 1), $period);
+    ~farming_growth_dispatch(db_getfield($row, farming_growth:handler, 0), $steps, $window);
     $row = db_findnext;
 }
 
-[proc,farming_growth_dispatch](int $handler, int $steps)
+[proc,farming_growth_dispatch](int $handler, int $steps, int $window)
 if ($steps = 0) return;
 switch_int ($handler) {
-    case ^farming_handler_potato : ~farming_potato_advance_all($steps);
-    case ^farming_handler_herb : ~farming_herb_advance_all($steps);
-    case ^farming_handler_flower : ~farming_flower_advance_all($steps);
-    case ^farming_handler_hops : ~farming_hops_advance_all($steps);
+    case ^farming_handler_potato : ~farming_potato_advance_all($steps, $window);
+    case ^farming_handler_herb : ~farming_herb_advance_all($steps, $window);
+    case ^farming_handler_flower : ~farming_flower_advance_all($steps, $window);
+    case ^farming_handler_hops : ~farming_hops_advance_all($steps, $window);
 }
 
 [proc,farming_login]

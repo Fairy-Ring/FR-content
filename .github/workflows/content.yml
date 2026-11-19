@@ -158,6 +158,7 @@ jobs:
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
           run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
           run_test tests/farming/test_farming.mjs node --import tsx ../content/tests/farming/test_farming.mjs
+          run_test tests/farming/test_disease_timing.mjs node --import tsx ../content/tests/farming/test_disease_timing.mjs
           run_test tests/farming/test_allotments.mjs node --import tsx ../content/tests/farming/test_allotments.mjs
           run_test tests/farming/test_herbs.mjs node --import tsx ../content/tests/farming/test_herbs.mjs
           run_test tests/farming/test_tool_actions.mjs node --import tsx ../content/tests/farming/test_tool_actions.mjs

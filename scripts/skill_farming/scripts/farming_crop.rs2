@@ -1,11 +1,16 @@
 // CANDIDATE Old School crop care. Families translate cache bytes at their
 // boundary; only this helper owns the disease/watering state walk.
-[proc,farming_crop_advance](int $stage, int $steps, int $first, int $mature, boolean $waterable)(int)
-// Finite lifetime, including disease on the final growing stage.
-$steps = min($steps, add(sub($mature, $first), 1));
+[proc,farming_crop_advance](int $stage, int $steps, int $first, int $mature, boolean $waterable, dbrow $growth, int $window)(int)
+// Healthy growth is finite. Disease resolves the remaining range in one check.
+def_int $period = db_getfield($growth, farming_growth:period, 0);
+def_int $diseaseperiod = db_getfield($growth, farming_growth:disease_period, 0);
 while ($steps > 0) {
     if ($stage > add($first, ^farming_diseased_offset) & $stage < add($mature, ^farming_diseased_offset)) {
-        return(add($stage, sub(^farming_dead_offset, ^farming_diseased_offset)));
+        // UNKNOWN operator-adopted next tier. Never use a slower window from
+        // before disease began, even when several healthy steps were caught up.
+        def_int $until = modulo(sub($diseaseperiod, modulo($window, $diseaseperiod)), $diseaseperiod);
+        if ($steps > divide($until, $period)) return(add($stage, sub(^farming_dead_offset, ^farming_diseased_offset)));
+        return($stage);
     }
     def_int $chance = ^farming_allotment_disease_dry;
     if ($waterable = true & $stage >= add($first, ^farming_watered_offset) & $stage < add($mature, ^farming_watered_offset)) {
@@ -23,6 +28,7 @@ while ($steps > 0) {
         }
     }
     $steps = sub($steps, 1);
+    $window = add($window, $period);
 }
 return($stage);
 
