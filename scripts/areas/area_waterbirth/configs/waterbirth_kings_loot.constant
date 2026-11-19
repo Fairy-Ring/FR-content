@@ -249,7 +249,7 @@
 ^wbk_uncut_emerald_end = 48
 ^wbk_uncut_ruby_end = 56
 
-// Conditional native wbmon_rare_seed herb-only weights, normalized over 758.
+// Conditional native wbmon_rare_seed herb-only weights, normalized over 658.
 // toadflax_seed: native weight 216.
 ^wbk_herb_seed_end_toadflax_seed = 216
 // irit_seed: native weight 148.

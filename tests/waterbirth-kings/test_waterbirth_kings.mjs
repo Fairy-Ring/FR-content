@@ -21,6 +21,7 @@ const Npc = (await load('src/engine/entity/Npc.ts')).default;
 const { EntityLifeCycle } = await load('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
 const { NpcStat } = await load('src/engine/entity/NpcStat.ts');
+const { CoordGrid } = await load('src/engine/CoordGrid.ts');
 const { NpcModeMap } = await load('src/engine/entity/NpcMode.ts');
 const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
 const Environment = (await load('src/util/Environment.ts')).default;
@@ -44,7 +45,7 @@ const constant = (relative, name) => {
 };
 const styles = Object.fromEntries(['stab', 'slash', 'crush', 'ranged', 'magic'].map(name => [name,
   constant('scripts/skill_combat/configs/combat_damagetypes.constant', `${name}_style`)]));
-const checks = { definitions: 0, styleCases: 0, attacks: 0, hunts: 0, lootCases: 0, lifecycleCases: 0 };
+const checks = { definitions: 0, styleCases: 0, cannonCases: 0, attacks: 0, hunts: 0, lootCases: 0, lifecycleCases: 0 };
 const same = (actual, expected, message) => { assert.deepEqual(actual, expected, message); checks.definitions++; };
 const originalRandom = JavaRandom.nextDouble;
 let serial = 0;
@@ -204,6 +205,37 @@ for (const king of kings) {
       checks.styleCases++;
     } finally { dispose(f); }
   }
+}
+
+// The cannon's incoming style is Ranged even when its owner selected Melee or
+// Magic. Exercise the real pre-XP/hero path, delayed hitmark and ammunition use.
+for (const king of kings) for (const ownerStyle of ['stab', 'ranged', 'magic']) for (const roll of ['hit', 'zero', 'miss']) {
+  const f = fixture(king.name, 3), { player, npc } = f, hits = [], messages = [];
+  const restoreDamage = observe(npc, 'applyDamage', hits);
+  try {
+    player.stats.fill(0);
+    player.messageGame = text => messages.push(String(text));
+    player.setVar(id(VarPlayerType, 'tutorial'), 1000);
+    player.setVar(id(VarPlayerType, 'rockthrower'), 10);
+    player.setVar(id(VarPlayerType, 'ownedmcannon'), CoordGrid.packCoord(0, player.x - 1, player.z - 1));
+    player.setVar(id(VarPlayerType, 'damagetype'), styles[ownerStyle]);
+    for (const name of ['com_stabattack', 'com_rangeattack', 'com_magicattack']) player.setVar(id(VarPlayerType, name), 1000000);
+    npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
+    const damage = king.permitted === 'ranged' && roll === 'hit' ? 30 : 0;
+    const label = `${king.name}: cannon ${roll}, owner ${ownerStyle}`;
+    random(roll === 'miss' ? [0, 0.999999] : [0.999999, 0, roll === 'hit' ? 0.999999 : 0],
+      () => run('[proc,cannon_fire]', f, [], true));
+    same(player.stats[PlayerStat.RANGED], damage * 20, `${label}: Ranged XP`);
+    same(player.stats[PlayerStat.HITPOINTS], 0, `${label}: no Hitpoints XP`);
+    same(npc.heroPoints.findHero(), damage ? player.hash64 : -1n, `${label}: hero credit`);
+    same(npc.heroPoints.find(hero => hero.hash64 === player.hash64)?.points ?? 0, damage, `${label}: hero points`);
+    same(player.getVar(id(VarPlayerType, 'rockthrower')), 9, `${label}: ball consumed`);
+    for (let tick = 0; tick < 8; tick++) { World.currentTick++; npc.turn(); }
+    same(npc.levels[NpcStat.HITPOINTS], king.stats[0] - damage, `${label}: native delayed damage`);
+    same(hits.map(hit => hit.args[0]), [damage], `${label}: one native hitmark including zero`);
+    same(messages, [], `${label}: no new message`);
+    checks.cannonCases++;
+  } finally { restoreDamage(); dispose(f); }
 }
 
 for (const king of kings) {
