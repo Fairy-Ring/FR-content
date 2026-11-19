@@ -300,5 +300,41 @@ for (const name of ['troll_stronghold_top_exit_left', 'troll_stronghold_top_exit
 assert.equal(r.map.isMapBlocked(2840, 3690, 0), false, 'published surface landing is standable');
 assert(r.map.isLineOfWalk(0, 2840, 3690, 2841, 3690), 'published landing has an ordinary walking exit');
 
-console.log(`ORDINARY_PROPOSALS_PASS built=10 original-placements=${placementCount} native-dispatch=true published-action-parity=true`);
+// Exact sourced stateless reactions dispatch from their original 377 placements.
+const signText = 'Mudskipper Point.|WARNING!|BEWARE OF THE MUDSKIPPERS!';
+const cowText = "Hmm, interesting, there appears to be a human trying to talk to me. Is it aware that cows can't talk I wonder? Maybe if I just ignore it, it might go away.";
+for (const name of ['mudskipper_sign', 'fairy_fat_cow']) {
+    const rows = r.placements.filter(row => row.type === r.id('LocType', name));
+    assert.equal(rows.length, 1, `${name}: original placement count`);
+    for (const row of rows) {
+        const f = r.fixture(name, row);
+        if (name === 'mudskipper_sign') f.p.x = f.p.originX = 2998;
+        const before = { vars: [...f.p.vars], inv: r.snapshot(f).inventory, xp: [...f.p.stats], coord: [f.p.level, f.p.x, f.p.z], loc: [f.loc.type, f.loc.x, f.loc.z, f.loc.level] };
+        const trace = run(f, 1);
+        for (let resumes = 0; f.p.activeScript?.execution === r.State.PAUSEBUTTON; resumes++) {
+            assert(resumes < 4, 'bounded stateless dialogue');
+            assert(new r.ResumePauseButtonHandler().handle(new r.ResumePauseButton(0), f.p), 'native Continue packet');
+            trace.push(...r.settle(f));
+        }
+        assert(!f.p.activeScript || f.p.activeScript.execution === r.State.FINISHED, 'reaction completes normally');
+        const events = trace.flatMap(t => t.events);
+        const body = events.filter(event => event[1] === 'interface').map(event => event[2][1]);
+        if (name === 'mudskipper_sign') {
+            assert.deepEqual(events.filter(event => event[1] === 'interface').map(event => event[2]), signText.split('|').map((line, index) => [`message3:com_${index}`, line]), 'published sign message-box channel and exact three sourced lines');
+            assert.equal(events.filter(event => event[1] === 'game').length, 0, 'Read does not substitute a game-message channel');
+            assert.equal(r.map.isMapBlocked(2998, 3130, 0), false, 'headed sign approach is standable');
+            assert(r.map.isLineOfWalk(0, 2999, 3130, 2998, 3130), 'headed sign approach has a real walking step');
+            const type = r.types.LocType.get(row.type);
+            assert(r.map.reachedLoc(0, 2998, 3130, row.x, row.z, type.width, type.length, 1, row.angle, row.shape, type.forceapproach), 'headed sign approach reaches the original sign');
+        } else {
+            assert(body.includes('Cow'), 'NPC-specific dialogue keeps the sourced speaker');
+            assert(body.join(' ').replace(/<[^>]*>/g, '').replaceAll('|', ' ').replace(/\s+/g, ' ').includes(cowText), 'sourced Cow speech uses the NPC-specific dialogue channel');
+            assert.deepEqual(events.filter(event => event[1] === 'game').map(event => event[2]), ['The cow is studiously ignoring you.'], 'exact sourced final game message');
+        }
+        assert.deepEqual({ vars: [...f.p.vars], inv: r.snapshot(f).inventory, xp: [...f.p.stats], coord: [f.p.level, f.p.x, f.p.z], loc: [f.loc.type, f.loc.x, f.loc.z, f.loc.level] }, before, 'reaction changes no state, items, XP, position or scenery');
+        placementCount++;
+    }
+}
+
+console.log(`ORDINARY_PROPOSALS_PASS built=12 original-placements=${placementCount} native-dispatch=true published-action-parity=true counted-items-and-interruptions=true sourced-reactions=true`);
 process.exit(0);
