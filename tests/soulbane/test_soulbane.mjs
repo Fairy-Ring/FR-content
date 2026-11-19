@@ -5030,7 +5030,8 @@ function testTolnaArenaMusic() {
       writeVar(p, 'soulbane_riftrope_pres', 1);
       seedFearCombatFixture(p, label);
       enterTolnaByRift(p, label, mode);
-      if (initialStage === TOLNA_INTRO_STAGE) tolnaIntroPages(p, label);
+      assert.equal(stage(p), initialStage === TOLNA_INTRO_STAGE ? TOLNA_ACTIVE_STAGE : initialStage,
+        `${label}: native rift handler completes only the queued stage-10 intro`);
       leaveTolnaCopy(p, `${label} surface restoration`, initialStage === TOLNA_CLEAR_STAGE ? [] : [1]);
       cleanupTolnaFixturePlayer(p, label);
     }
