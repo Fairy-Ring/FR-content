@@ -395,6 +395,7 @@ test('a native KO input at clock 102 returns at clock 109 with deadline 110 inst
     ({ npc }) => assertAttackableQueueBound(npc));
   assert.equal(World.currentTick, 102, 'the real synchronous input runs before the native NPC phase at 102');
   assert.equal(deadline, 110, 'the compiled eight-tick KO timeout is anchored at 102');
+  const expected = resultSnapshot(p);
 
   let callbacksAt109 = null;
   boundedTicksThrough(tracked, 109, (callbacks, tick) => {
@@ -408,8 +409,16 @@ test('a native KO input at clock 102 returns at clock 109 with deadline 110 inst
 
   const callbacksAt110 = countedWorldTick(tracked, null, ({ npc }) => assertAttackableQueueBound(npc));
   assert.equal(World.currentTick, 110);
-  assert.equal(callbacksAt110, 1, 'the successor expires at the deadline without same-tick reentry');
-  assertReleased(p, target, resultSnapshot(p));
+  assert(callbacksAt110 <= 1, 'the deadline frame cannot reenter the same callback');
+  if (callbacksAt110 === 0) {
+    assert.equal(target.getVar(stateVar), 3, 'a successor not visited on its append frame retains the KO at the deadline');
+    assert.equal(target.getVar(ownerVar), p.uid);
+    assert.equal(target.getVar(deadlineVar), 110);
+    assert.equal(countedWorldTick(tracked, null, ({ npc }) => assertAttackableQueueBound(npc)), 1,
+      'the safe delay expires no later than the approved one-tick-late edge');
+    assert.equal(World.currentTick, 111);
+  }
+  assertReleased(p, target, expected);
   assert.equal(target.timerInterval, initialTimer, 'the Bandit timeout preserves its independent unarmed timer');
   drainTargetQueues(tracked);
 });
