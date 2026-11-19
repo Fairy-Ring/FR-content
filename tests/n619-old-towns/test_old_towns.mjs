@@ -142,7 +142,9 @@ function run(form, seed, choices, seenLabels) {
   player.executeScript(state, true);
   let choice = 0;
   for (let steps = 0; steps < 300; steps++) {
-    for (const current of [state.script, ...state.frames.slice(0, state.fp).map(frame => frame.script)]) seenLabels.add(current.name);
+    // The VM clears ordinary call frames on GOTO; its debug frames retain those real transitions.
+    seenLabels.add(state.script.name);
+    for (let frame = 0; frame < state.debugFp; frame++) seenLabels.add(state.debugFrames[frame].script.name);
     assert.notEqual(state.execution, ScriptState.ABORTED, `${form.name}: conversation aborted`);
     if (state.execution === ScriptState.FINISHED) {
       assert.equal(choice, choices.length, 'all requested choices consumed');
