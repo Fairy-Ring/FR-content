@@ -60,19 +60,6 @@
 [oploc1,wild_laddertop_dungeon]
 @ordinary_ladder_down;
 
-// UNKNOWN engineering: original west-side approach is blocked at this mapped pair.
-// Precedent: quest_mdaughter/scripts/mdaughter_travel.rs2:130-135.
-[aploc1,ladder_11741]
-if (loc_coord ! 1_46_52_2_35) {
-    p_aprange(0);
-    return;
-}
-if (distance(coord, loc_coord) > 1) {
-    p_aprange(1);
-    return;
-}
-@ordinary_ladder_down;
-
 [label,ordinary_ladder_up]
 p_arrivedelay;
 switch_coord (loc_coord) {
@@ -82,7 +69,6 @@ switch_coord (loc_coord) {
     case 0_45_51_35_59 : ~climb_ladder(1_45_51_36_59, true);
     case 0_46_50_4_13 : ~climb_ladder(1_46_50_5_13, true);
     case 0_46_52_10_61 : ~climb_ladder(1_46_52_10_60, true);
-    case 0_46_52_2_35 : ~climb_ladder(1_46_52_3_35, true);
     case 0_46_52_2_50 : ~climb_ladder(1_46_52_2_49, true);
     case 0_47_49_2_48 : ~climb_ladder(1_47_49_3_48, true);
     case 0_47_52_19_25 : ~climb_ladder(1_47_52_19_24, true);
@@ -124,7 +110,6 @@ switch_coord (loc_coord) {
     case 1_45_51_35_59 : ~climb_ladder(0_45_51_36_59, false);
     case 1_46_50_4_13 : ~climb_ladder(0_46_50_5_13, false);
     case 1_46_52_10_61 : ~climb_ladder(0_46_52_10_62, false);
-    case 1_46_52_2_35 : ~climb_ladder(0_46_52_3_35, false);
     case 1_46_52_2_50 : ~climb_ladder(0_46_52_2_51, false);
     case 1_47_49_2_48 : ~climb_ladder(0_47_49_3_48, false);
     case 1_47_52_19_25 : ~climb_ladder(0_47_52_19_26, false);
