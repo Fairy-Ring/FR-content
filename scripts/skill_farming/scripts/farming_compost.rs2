@@ -133,9 +133,6 @@ inv_del(inv, last_useitem, ^farming_compost_transfer_count);
 ~farming_compost_set_stage($index, add(~farming_compost_base($kind), add($count, ^farming_compost_transfer_count)));
 
 [label,farming_compost_operate]
-// Reconcile the existing global clock before Close/Open. This saved minute is
-// also the headed witness's exact server-time authority, not its host clock.
-~farming_reconcile(false);
 def_int $index = enum(loc, int, farming_compost_patch, loc_type);
 if ($index = -1) {
     ~displaymessage(^dm_default);

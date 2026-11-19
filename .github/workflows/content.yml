@@ -168,6 +168,7 @@ jobs:
           run_test tests/farming/test_compost_bins.mjs node --import tsx ../content/tests/farming/test_compost_bins.mjs
           run_test tests/farming/test_gardeners.mjs node --import tsx ../content/tests/farming/test_gardeners.mjs
           run_test tests/farming/test_suspension.mjs node --import tsx ../content/tests/farming/test_suspension.mjs
+          run_test tests/farming/test_clock_m.mjs node --import tsx ../content/tests/farming/test_clock_m.mjs
           run_test tests/farming/test_seed_stall.mjs node --import tsx ../content/tests/farming/test_seed_stall.mjs
           run_test tests/farming/test_seed_sources.mjs node --import tsx ../content/tests/farming/test_seed_sources.mjs
           run_test 'tests/farming/test_master_farmer.mjs + tests/farming/test_general_seed_table.mjs' node --import tsx --test ../content/tests/farming/test_master_farmer.mjs ../content/tests/farming/test_general_seed_table.mjs
