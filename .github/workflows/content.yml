@@ -261,6 +261,7 @@ jobs:
           run_test tests/multinpc-triggers/runtime.mts bash ../content/tests/multinpc-triggers/runtime.sh "$PWD"
           run_test tests/lumbridge-advisers/test_advisers.mjs node --import tsx ../content/tests/lumbridge-advisers/test_advisers.mjs
           run_test tests/npc-talk-audit/runtime.mts bash ../content/tests/npc-talk-audit/runtime.sh "$PWD"
+          run_test tests/loc-option-audit/runtime.mts bash ../content/tests/loc-option-audit/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
           run_test tests/skill-menus/runtime.mts bash ../content/tests/skill-menus/runtime.sh "$PWD"
           run_test tests/skill-guides/test_skill_guides.mjs node --import tsx ../content/tests/skill-guides/test_skill_guides.mjs
