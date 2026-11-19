@@ -15,7 +15,6 @@ const built = [
   ['pest_bankbooth', 4, [0, -1], false]
 ];
 const left = [
-  ['fever_bankbooth', 'fever_bankbooth', null, [1, 2]],
   ['burgh_bank_booth_multiloc', 'burgh_bankbooth_repaired', 1, [1, 2]],
   ['burgh_bank_booth_multiloc', 'burgh_bankbooth_damaged', 0, [1]],
   ['hundred_goodchest', 'hundred_goodchest_base', 3, [1, 2, 3]],
@@ -123,6 +122,24 @@ for (const placement of ghostBooths) {
 }
 console.log('PASS Phasmatys: service built; the route to the place is not built: unhandled town barrier; both options match the published ghost banker for absent/carried/worn amulet');
 console.log('PASS Pest: service built; the route to the place is not built: missing Port Sarim Squire island-arrival flow');
+const pirateBooths = natural('fever_bankbooth');
+assert.equal(pirateBooths.length, 3, 'original Mos Le Harmless booth placements');
+assert.deepEqual(types.LocType.get(id('LocType', 'fever_bankbooth')).op.slice(0, 2), ['Use', 'Use-quickly']);
+for (const placement of pirateBooths) {
+  const loc = locAt(placement);
+  for (const option of [1, 2]) {
+    const p = fixture(placement, [-1, 0]);
+    assert(!map.isMapBlocked(p.x, p.z, p.level), 'Mos Le Harmless public counter stand is walkable');
+    arm(p, loc, option);
+    const script = p.getOpTrigger();
+    assert(script, `fever_bankbooth option ${option} reaches its exact handler`);
+    finish(p, script, loc, option === 1 ? [1] : []);
+    bank(p);
+    const greeting = p.packets.some(packet => packet.constructor.name === 'IfSetText' && packet.text.includes('Aye? Ye got some stuff te stash?'));
+    assert.equal(greeting, option === 1, 'Use reuses the published pirate conversation; quick-bank does not speak');
+  }
+}
+console.log("PASS Mos Le Harmless: service built; the route to the island is not built: missing Cabin Fever voyage and island arrival; three natural booths reuse published pirate bank paths");
 // Transaction checks use the actual bank interface packet handler and its listeners.
 const transactionLoc = locAt(natural('elid_bankbooth')[0]);
 const transaction = fixture(natural('elid_bankbooth')[0], [1, 0]);
