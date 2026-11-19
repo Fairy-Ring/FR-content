@@ -89,8 +89,8 @@ for (const [name, expected, stand, teller = true] of built) {
       const dwarf = name === 'dwarf_keldagrim_bankbooth';
       finish(p, script, loc, option === 1 && teller ? [dwarf ? 4 : 1] : []);
       bank(p);
-      const greeting = p.packets.some(packet => packet.constructor.name === 'IfSetText' &&
-        packet.text.includes(dwarf ? 'Welcome to the Keldagrim bank! Anything I can help you with?' : 'Good day, how may I help you?'));
+      const text = p.packets.filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text).join(' ').replace(/\s+/g, ' ');
+      const greeting = text.includes(dwarf ? 'Welcome to the Keldagrim bank! Anything I can help you with?' : 'Good day, how may I help you?');
       assert.equal(greeting, option === 1 && teller, `${name} option ${option} uses the published regional conversation/fallback path`);
       if (dwarf) {
         assert(!p.packets.some(packet => packet.constructor.name === 'IfSetText' && packet.text.includes("Didn't you used to be called the Bank of Varrock?")),
