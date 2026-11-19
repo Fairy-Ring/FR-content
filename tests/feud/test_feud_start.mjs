@@ -10,6 +10,12 @@ const bit = name => id('VarBitType', name);
 const read = (p, name) => p.getVarBit(bit(name));
 const stage = p => read(p, 'feud_var');
 const gangMask = p => read(p, 'feud_var_comp_gangs');
+const operationOffsets = {
+  feud_ali_m: [1, 0],
+  feud_drunken_ali: [1, 0],
+  feud_egyptian_doorman_multi: [0, -1],
+  feud_egyptian_minder: [1, 0]
+};
 const actors = name => {
   const type = id('NpcType', name);
   const found = [...World.npcs].filter(n => n.isActive && (n.baseType === type || n.type === type));
@@ -25,8 +31,8 @@ function stand(p, n) {
     candidates.push(tile(p));
   }
   assert(candidates.length, `packed collision permits an ordinary stand beside NPC ${n.baseType}`);
-  const side = n.baseType === id('NpcType', 'feud_ali_m') ? 1 : -1;
-  const destination = candidates.find(point => point[1] === n.x + side && point[2] === n.z);
+  const [dx, dz] = operationOffsets[types.NpcType.get(n.baseType).debugname] ?? [-1, 0];
+  const destination = candidates.find(point => point[1] === n.x + dx && point[2] === n.z + dz);
   assert(destination, 'the headed cell uses this same map-checked operation stand');
   // Verify an actual map route, not just a guessed adjacent coordinate.
   let route = null;

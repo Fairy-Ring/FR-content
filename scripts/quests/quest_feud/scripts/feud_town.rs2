@@ -62,7 +62,7 @@ jump(feud_barman_menu);
 ~chatnpc("<p,neutral>Well then, what do you want it for?");
 ~chatplayer("<p,neutral>I don't know, but I think I could have a bit of fun with it.");
 ~chatnpc("<p,neutral>You're not going to put it in drunken Ali's drink now, are you? That's what happened the last time I gave someone the sauce.");
-~chatplayer("<p,neutral>No, that would be a bit cliché. I think I'll come up with something more original.");
+~chatplayer("<p,neutral>No, that would be a bit cliche. I think I'll come up with something more original.");
 ~chatnpc("<p,neutral>Just be careful with it, it's potent enough to give a camel the runs.");
 ~chatplayer("<p,neutral>Thank you very much.");
 inv_add(inv, superhot_kebab_sauce, 1);
