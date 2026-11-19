@@ -2,10 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  PlayerStat, World, count, engineModule, held, id, inv, obj, player, remove, seed
+  PlayerStat, World, count, engineModule, id, inv, obj, player, remove, seed
 } from '../swamp-caves/runtime.mjs';
 import {
-  actors, begin, bit, buyReceipts, deliver, drink, operate, read, relog, stage, talk
+  actors, begin, bit, buyReceipts, deliver, drink, hasWitness, nativeNpcTriggerName, operate,
+  read, relog, stage, talk, wield
 } from './fixture.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -20,12 +21,8 @@ const villagerForms = new Set([
 ].map(name => id('NpcType', name)));
 const feudVillagers = () => [...World.npcs].filter(npc => npc.isActive &&
   (villagerForms.has(npc.baseType) || villagerForms.has(npc.type)));
-const within = (a, b, radius) => a.level === b.level &&
-  Math.max(Math.abs(a.x - b.x), Math.abs(a.z - b.z)) <= radius;
 function isolatedVillager(excluded) {
-  const all = [...World.npcs].filter(npc => npc.isActive);
-  return feudVillagers().find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 &&
-    all.every(other => other === npc || !within(npc, other, 5)));
+  return feudVillagers().find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 && !hasWitness(npc));
 }
 
 test('native Feud trials allow the opening at level 29, gate the first theft at 30, and preserve trial consequences', () => {
@@ -112,12 +109,12 @@ test('native Feud trials allow the opening at level 29, gate the first theft at 
   const blackjack = talk(p, 'feud_egyptian_minder', [1]);
   assert.match(blackjack.text, /cunning and a bit of brute force/);
   assert.equal(count(p, 'blackjack_oak'), 1);
-  assert(held(p, 'blackjack_oak', 2), 'the sourced blackjack Wear option equips the knockout tool');
+  wield(p, 'blackjack_oak');
   assert.equal(count(p, 'blackjack_oak'), 0);
   assert.equal(stage(p), 9);
 
   const secluded = isolatedVillager(new Set([distracted]));
-  assert(secluded, 'an original packed villager placement has no other active NPC within the UNKNOWN witness radius');
+  assert(secluded, 'an original packed villager has no candidate under the native witness predicate');
   operate(p, secluded, 4);
   assert.equal(stage(p), 10);
   assert.equal(read(p, 'feud_npc_multi'), 2, 'the second theft exposes the original blackjack interaction form');
@@ -127,26 +124,26 @@ test('native Feud trials allow the opening at level 29, gate the first theft at 
   other.setVarBit(bit('feud_var'), 10);
   other.setVarBit(bit('feud_npc_multi'), 2);
   const ownerState = secluded.getVar(stateVar), owner = secluded.getVar(ownerVar);
-  assert(held(other, 'blackjack_oak', 2));
+  wield(other, 'blackjack_oak');
   const wrongOwnerResult = operate(other, secluded, 5);
   assert.equal(stage(other), 10);
   assert.equal(secluded.getVar(stateVar), ownerState);
   assert.equal(secluded.getVar(ownerVar), owner);
   assert.equal(owner, p.uid, 'knock-out remains scoped to the player who lured the target');
   assert.equal(other.stats[PlayerStat.THIEVING], otherXp, 'a wrong-owner knock-out awards no XP');
-  assert.equal(wrongOwnerResult.trigger, 'feud_ko', 'the rejection is reached through the visible opnpc5 dispatcher');
+  assert.equal(wrongOwnerResult.trigger, nativeNpcTriggerName(secluded, 5), 'the rejection is reached through the visible opnpc5 dispatcher');
 
   const koXp = p.stats[PlayerStat.THIEVING];
   remove(p, 'blackjack_oak');
   assert.equal(count(p, 'blackjack_oak'), 1, 'the native worn-item action returns the blackjack to inventory');
   const inventoryOnly = operate(p, secluded, 5);
-  assert.equal(inventoryOnly.trigger, 'feud_ko');
+  assert.equal(inventoryOnly.trigger, nativeNpcTriggerName(secluded, 5));
   assert.equal(stage(p), 10, 'an unwielded blackjack cannot knock out a villager');
   assert.equal(secluded.getVar(stateVar), 2);
   assert.equal(secluded.getVar(ownerVar), p.uid);
   assert.equal(secluded.getVar(attackVar), p.uid);
   assert.equal(p.stats[PlayerStat.THIEVING], koXp);
-  assert(held(p, 'blackjack_oak', 2));
+  wield(p, 'blackjack_oak');
   const originalDraw = JavaRandom.nextDouble;
   try {
     JavaRandom.nextDouble = () => 0.999;

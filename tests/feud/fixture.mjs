@@ -3,10 +3,11 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   Packet, PlayerLoading, ScriptState, ServerTriggerType, World, contentRoot, count, dialoguePage,
-  engineModule, id, inv, invButton, map, obj, resumeDialogue, tick, tile, types, useLoc
+  engineModule, held, id, inv, invButton, map, obj, resumeDialogue, tick, tile, types, useLoc, worn
 } from '../swamp-caves/runtime.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
 const { default: OpLoc } = await engineModule('network/game/client/model/OpLoc.ts');
 const { default: OpLocHandler } = await engineModule('network/game/client/handler/OpLocHandler.ts');
 const locActionHandler = new OpLocHandler();
@@ -17,9 +18,11 @@ const stage = p => read(p, 'feud_var');
 const gangMask = p => read(p, 'feud_var_comp_gangs');
 const operationOffsets = {
   feud_ali_m: [1, 0],
+  feud_arabian_guard2_multi: [0, -1],
   feud_drunken_ali: [1, 0],
   feud_egyptian_doorman_multi: [0, -1],
-  feud_egyptian_minder: [1, 0]
+  feud_egyptian_minder: [1, 0],
+  feud_kebabman: [1, 0]
 };
 const actors = name => {
   const type = id('NpcType', name);
@@ -27,6 +30,19 @@ const actors = name => {
   assert(found.length, `original packed NPC placement ${name}`);
   return found;
 };
+const witnessRadius = 5; // ^feud_villager_witness_radius in the native Feud constants.
+function isWitness(target, npc) {
+  return npc.isActive && npc.uid !== target.uid && npc.level === target.level &&
+    CoordGrid.distanceToSW({ x: target.x, z: target.z }, npc) <= witnessRadius &&
+    npc.targetOp !== NpcMode.OPPLAYER2 &&
+    map.isLineOfSight(target.level, npc.x, npc.z, target.x, target.z);
+}
+function hasWitness(target) {
+  for (const npc of World.npcs) if (isWitness(target, npc)) return true;
+  return false;
+}
+const nativeNpcTriggerName = (npc, option) =>
+  `[opnpc${option},${types.NpcType.get(npc.type).debugname}]`;
 
 function locs(name) {
   if (!sourceLocRows) {
@@ -50,11 +66,19 @@ function locs(name) {
   assert(found.length, `original packed loc placement ${name}`);
   return found;
 }
+function activeLoc(placement) {
+  const zone = World.gameMap.getZone(placement.x, placement.z, placement.level);
+  const coord = CoordGrid.packZoneCoord(placement.x, placement.z);
+  const matches = [...zone.getLocsSafe(coord)].filter(loc => loc.x === placement.x &&
+    loc.z === placement.z && loc.level === placement.level &&
+    loc.shape === placement.shape && loc.angle === placement.angle);
+  assert.equal(matches.length, 1, `one current loc form remains at original placement ${placement.name}`);
+  return matches[0];
+}
 
 function operateLoc(p, placement, { option = 1, item = null, position = null, choices = [] } = {}) {
-  const loc = World.getLoc(placement.x, placement.z, placement.level, placement.type);
-  assert(loc, `active original loc ${placement.name}`);
-  const config = types.LocType.get(placement.type);
+  const loc = activeLoc(placement);
+  const config = types.LocType.get(loc.type);
   const width = loc.angle % 2 ? config.length : config.width;
   const length = loc.angle % 2 ? config.width : config.length;
   const candidates = [];
@@ -71,7 +95,7 @@ function operateLoc(p, placement, { option = 1, item = null, position = null, ch
   p.dialogueMark = p.packets.length;
   if (item) assert(useLoc(p, item, loc), 'production item-on-loc packet is accepted');
   else {
-    assert(locActionHandler.handle(new OpLoc(option, loc.x, loc.z, placement.type), p),
+    assert(locActionHandler.handle(new OpLoc(option, loc.x, loc.z, loc.type), p),
       'production loc-option packet is accepted');
     assert(p.inOperableDistance(loc), 'the selected loc is in native operation range');
     p.processInteraction();
@@ -87,20 +111,27 @@ function stand(p, n) {
     candidates.push(tile(p));
   }
   assert(candidates.length, `packed collision permits an ordinary stand beside NPC ${n.baseType}`);
-  const [dx, dz] = operationOffsets[types.NpcType.get(n.baseType).debugname] ?? [-1, 0];
-  const destination = candidates.find(point => point[1] === n.x + dx && point[2] === n.z + dz);
-  assert(destination, 'the headed cell uses this same map-checked operation stand');
-  // Verify an actual map route, not just a guessed adjacent coordinate.
-  let route = null;
-  for (const [dx, dz] of [[4, 0], [-4, 0], [0, 4], [0, -4]]) {
-    const x = destination[1] + dx, z = destination[2] + dz;
-    if (map.isMapBlocked(x, z, destination[0])) continue;
-    const found = [...map.findPath(destination[0], x, z, destination[1], destination[2])];
-    if (!found.length) continue;
-    const last = CoordGrid.unpackCoord(found.at(-1));
-    if (last.x === destination[1] && last.z === destination[2]) { route = found; break; }
-  }
-  assert(route, `pathfinder reaches the real operation stand ${destination}`);
+  const name = types.NpcType.get(n.baseType).debugname;
+  const explicitOffset = operationOffsets[name];
+  const [dx, dz] = explicitOffset ?? [-1, 0];
+  const preferred = candidates.find(point => point[1] === n.x + dx && point[2] === n.z + dz);
+  const reaches = destination => {
+    for (let dx = -4; dx <= 4; dx++) for (let dz = -4; dz <= 4; dz++) {
+      if (Math.max(Math.abs(dx), Math.abs(dz)) !== 4) continue;
+      const x = destination[1] + dx, z = destination[2] + dz;
+      if (map.isMapBlocked(x, z, destination[0])) continue;
+      const route = [...map.findPath(destination[0], x, z, destination[1], destination[2])];
+      if (!route.length) continue;
+      const last = CoordGrid.unpackCoord(route.at(-1));
+      if (last.level === destination[0] && last.x === destination[1] && last.z === destination[2]) return true;
+    }
+    return false;
+  };
+  const destination = preferred && reaches(preferred) ? preferred
+    : explicitOffset ? null : candidates.find(reaches);
+  assert(destination, explicitOffset
+    ? `pathfinder reaches the configured operation stand for NPC ${n.baseType}`
+    : `pathfinder reaches a real operation stand beside NPC ${n.baseType}`);
   [p.level, p.x, p.z] = destination;
   p.originX = p.x; p.originZ = p.z;
   return destination;
@@ -130,6 +161,11 @@ function finish(p, choices = []) {
   assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED, 'dialogue finishes within its bound');
   assert.equal(options.length, 0, 'every selected option was offered');
   return pages.join(' ');
+}
+function wield(p, name) {
+  assert(held(p, name, 2), `native Wear accepts ${name}`);
+  finish(p);
+  assert.equal(count(p, name, worn), 1, `${name} is actually equipped`);
 }
 
 function operate(p, n, option = 1, choices = [], item = null) {
@@ -232,10 +268,14 @@ function relog(p) {
   loaded.messageGame = text => loaded.messages.push(String(text));
   loaded.wrappedMessageGame = loaded.messageGame;
   World.players[slot] = loaded; World.playerLoop.add(loaded.hash64, loaded);
+  // This synthetic save/load preserves the UID; nativeLogoutAndReload proves real logout.
+  loaded.onLogin();
+  loaded.processEngineQueue();
   return loaded;
 }
 
 export {
-  actors, begin, bit, buyBeers, buyReceipts, deliver, drink, finish, gangMask, locs, operate,
-  operateLoc, operationOffsets, read, relog, stage, stand, talk
+  actors, begin, bit, buyBeers, buyReceipts, deliver, drink, finish, gangMask, hasWitness,
+  isWitness, locs, nativeNpcTriggerName, operate, operateLoc, operationOffsets, read, relog,
+  stage, stand, talk, wield
 };

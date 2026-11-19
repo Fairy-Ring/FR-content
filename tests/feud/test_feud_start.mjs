@@ -263,11 +263,11 @@ test('lost purchase-state camel receipts are replaced free without another sale 
   assert.equal(count(p, 'feud_camel_receipt'), 0, 'insufficient space cannot lose one replacement');
   assert.equal(count(p, 'coins'), money);
   assert.equal(stage(p), 4);
-  p.invDel(inv, obj('bucket_empty'), 1);
+  p.invDel(inv, obj('bucket_empty'), 2);
   talk(p, 'feud_ali_the_discount_camel_seller', [1]);
   assert.equal(count(p, 'feud_camel_receipt'), 2, 'exactly enough space accepts both replacements');
   assert.equal(count(p, 'coins'), money, 'neither replacement route charges again');
-  p.invDel(inv, obj('bucket_empty'), 26);
+  p.invDel(inv, obj('bucket_empty'), 25);
   deliver(p);
   const disposed = talk(p, 'feud_ali_the_discount_camel_seller', [4, 1]);
   assert.match(disposed.text, /Not Sandy and Lumps!/);

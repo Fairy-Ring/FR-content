@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  PlayerStat, ScriptState, ServerTriggerType, World, count, dialoguePage, engineModule, held, id,
+  PlayerStat, ScriptState, ServerTriggerType, World, count, dialoguePage, engineModule, id,
   map, obj, player, resumeDialogue, seed
 } from '../swamp-caves/runtime.mjs';
-import { actors, bit, finish, operate, read, relog, stage, stand, talk } from './fixture.mjs';
+import { actors, bit, finish, operate, read, relog, stage, stand, talk, wield } from './fixture.mjs';
 
 const { default: Environment } = await engineModule('util/Environment.ts');
 const points = p => p.getVar(id('VarPlayerType', 'qp'));
@@ -34,7 +34,7 @@ function combatFixture() {
   p.setVarBit(bit('feud_var'), 24);
   p.setVarBit(bit('feud_boss_vis'), 1);
   seed(p, ['rune_scimitar']);
-  assert(held(p, 'rune_scimitar', 2));
+  wield(p, 'rune_scimitar');
   rsbuf.addPlayer(p.slot);
   return p;
 }

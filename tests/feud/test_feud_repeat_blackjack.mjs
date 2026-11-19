@@ -4,11 +4,12 @@ import path from 'node:path';
 import test from 'node:test';
 
 import {
-  PlayerStat, ServerTriggerType, World, contentRoot, count, engineModule, held, id,
+  PlayerStat, ServerTriggerType, World, contentRoot, count, engineModule, id,
   inv, obj, player, seed, types
 } from '../swamp-caves/runtime.mjs';
 import {
-  actors, begin, bit, buyReceipts, deliver, drink, finish, operate, read, stand, stage, talk
+  actors, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
+  nativeNpcTriggerName, operate, read, stand, stage, talk, wield
 } from './fixture.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -22,8 +23,6 @@ const stunnedVar = id('VarPlayerType', 'stunned');
 const feudConfigPath = path.join(contentRoot, 'scripts/quests/quest_feud/configs/feud.npc');
 
 const xp = p => p.stats[PlayerStat.THIEVING];
-const within = (a, b, radius) => a.level === b.level &&
-  Math.max(Math.abs(a.x - b.x), Math.abs(a.z - b.z)) <= radius;
 function completePlayer(level = 1) {
   const p = player();
   p.setVarBit(bit('feud_var'), 28);
@@ -34,9 +33,7 @@ function completePlayer(level = 1) {
 }
 
 function isolatedTarget(name, excluded = new Set()) {
-  const all = [...World.npcs].filter(npc => npc.isActive);
-  return actors(name).find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 &&
-    all.every(other => other === npc || !within(npc, other, 5)));
+  return actors(name).find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 && !hasWitness(npc));
 }
 
 function withRandom(value, action) {
@@ -87,7 +84,7 @@ test('pre-Feud gates preserve the native first trial and its one-time rewards', 
   assert(bandit, 'the original placed Bandit41 is available');
   const before = { coins: count(blocked, 'coins'), xp: xp(blocked), hp: blocked.levels[PlayerStat.HITPOINTS] };
   const blockedPick = operate(blocked, bandit, 3);
-  assert.equal(blockedPick.trigger, 'feud_repeat_blackjack');
+  assert.equal(blockedPick.trigger, nativeNpcTriggerName(bandit, 3));
   assert.equal(stage(blocked), 27, 'Bandit theft remains locked until the complete checkpoint');
   assert.equal(count(blocked, 'coins'), before.coins);
   assert.equal(xp(blocked), before.xp);
@@ -109,7 +106,7 @@ test('pre-Feud gates preserve the native first trial and its one-time rewards', 
   const villager = actors('feud_villager_multi_1')[0];
   const refused = { coins: count(p, 'coins'), xp: xp(p), hp: p.levels[PlayerStat.HITPOINTS] };
   const refusal = operate(p, villager, 3);
-  assert.equal(refusal.trigger, 'feud_pickpocket');
+  assert.equal(refusal.trigger, nativeNpcTriggerName(villager, 3));
   assert.match(refusal.text, /level 30 thieving/i);
   assert.equal(stage(p), 6);
   assert.equal(read(p, 'feud_npc_multi'), 0);
@@ -136,7 +133,7 @@ test('post-Feud normal pickpocket uses the period Bandit and Thug rows', () => {
   const bandit41 = actors('feud_arabian_guard2_multi')[0];
   const refused41 = { coins: count(p, 'coins'), xp: xp(p), hp: p.levels[PlayerStat.HITPOINTS] };
   const low41 = operate(p, bandit41, 3);
-  assert.equal(low41.trigger, 'feud_repeat_blackjack');
+  assert.equal(low41.trigger, nativeNpcTriggerName(bandit41, 3));
   assert.match(low41.text, /level 45 thieving/i);
   assert.equal(count(p, 'coins'), refused41.coins);
   assert.equal(xp(p), refused41.xp);
@@ -187,15 +184,15 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   assert(awake, 'an original placed villager is idle');
   const caught = { coins: count(p, 'coins'), xp: xp(p), hp: p.levels[PlayerStat.HITPOINTS] };
   const awakePick = operate(p, awake, 3);
-  assert.equal(awakePick.trigger, 'feud_pickpocket');
+  assert.equal(awakePick.trigger, nativeNpcTriggerName(awake, 3));
   assert.equal(count(p, 'coins'), caught.coins);
   assert.equal(xp(p), caught.xp);
   assert.equal(caught.hp - p.levels[PlayerStat.HITPOINTS], 2, 'awake villagers use the period caught damage');
 
   const target = isolatedTarget('feud_villager_multi_2', new Set([awake]));
-  assert(target, 'a real placed villager is isolated from witnesses by the UNKNOWN radius');
+  assert(target, 'a real placed villager has no candidate under the native witness predicate');
   const lure = operate(p, target, 4);
-  assert.equal(lure.trigger, 'feud_lure');
+  assert.equal(lure.trigger, nativeNpcTriggerName(target, 4));
   assert.equal(target.getVar(stateVar), 2);
   assert.equal(target.getVar(ownerVar), p.uid);
   assert.equal(target.getVar(attackVar), p.uid);
@@ -204,10 +201,10 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
 
   const noWeaponXp = xp(p);
   const inventoryOnly = operate(p, target, 5);
-  assert.equal(inventoryOnly.trigger, 'feud_ko');
+  assert.equal(inventoryOnly.trigger, nativeNpcTriggerName(target, 5));
   assert.equal(target.getVar(stateVar), 2, 'an inventory-only blackjack cannot knock out a villager');
   assert.equal(xp(p), noWeaponXp);
-  assert(held(p, 'blackjack_oak', 2));
+  wield(p, 'blackjack_oak');
   const koXp = xp(p), coins = count(p, 'coins');
   withRandom(0, () => operate(p, target, 5));
   assert.equal(target.getVar(stateVar), 3);
@@ -218,7 +215,7 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   const unconsciousXp = xp(p);
   for (let attempt = 1; attempt <= 3; attempt++) {
     const result = operate(p, target, 3);
-    assert.equal(result.trigger, 'feud_pickpocket');
+    assert.equal(result.trigger, nativeNpcTriggerName(target, 3));
     assert.equal(count(p, 'coins') - coins, 3 * attempt, 'unconscious villagers give a few coins');
     assert.equal(xp(p), unconsciousXp, 'an unconscious villager pick grants no XP');
     assert.equal(stage(p), 28);
@@ -232,14 +229,14 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   assert.equal(target.getVar(deadlineVar), 0);
 
   const relured = operate(p, target, 4);
-  assert.equal(relured.trigger, 'feud_lure');
+  assert.equal(relured.trigger, nativeNpcTriggerName(target, 4));
   withRandom(0, () => operate(p, target, 5));
   const wakeDeadline = target.getVar(deadlineVar);
   const beforeWakePick = { coins: count(p, 'coins'), xp: xp(p) };
   assert(wakeDeadline > World.currentTick);
   World.currentTick = wakeDeadline;
   const woke = operate(p, target, 3);
-  assert.equal(woke.trigger, 'feud_pickpocket');
+  assert.equal(woke.trigger, nativeNpcTriggerName(target, 3));
   assert.equal(target.getVar(stateVar), 0);
   assert.equal(target.getVar(aggressiveVar), p.uid, 'picking as the villager wakes schedules its attack');
   assert.equal(count(p, 'coins'), beforeWakePick.coins, 'a waking interruption grants no coins');
@@ -261,7 +258,7 @@ test('the original Trade option sells the period willow through the retained con
   assert(kebab, 'the kebab seller is the adjacent mapped reference point');
   const purchase = (p, choice = "I'll take it.") => {
     const result = operate(p, seller, 3, [choice]);
-    assert.equal(result.trigger, 'feud_bjseller');
+    assert.equal(result.trigger, nativeNpcTriggerName(seller, 3));
     assert.notEqual(p.modalMain, id('Component', 'shop_template'), 'Trade opens a conversation, not a shop');
     assert.match(result.text, /I've only got one model in stock at the moment\./);
     assert.match(result.text, /willow black jack which I'd be willing to let go for 600 coins\./);
@@ -315,12 +312,12 @@ test('the purchased willow is usable and the Thug applies its period level and K
   const p = completePlayer(64);
   p.invAdd(inv, obj('coins'), 600);
   operate(p, actors('feud_black_jack_seller_multi')[0], 3, ["I'll take it."]);
-  assert(held(p, 'blackjack_willow', 2), 'the purchased willow blackjack can be wielded');
+  wield(p, 'blackjack_willow');
 
   const thug = isolatedTarget('feud_egyptian_doorman_multi');
-  assert(thug, 'a real placed Menaphite Thug is isolated from the UNKNOWN witness radius');
+  assert(thug, 'a real placed Menaphite Thug has no candidate under the native witness predicate');
   const lure = operate(p, thug, 4);
-  assert.equal(lure.trigger, 'feud_repeat_blackjack');
+  assert.equal(lure.trigger, nativeNpcTriggerName(thug, 4));
   assert.equal(thug.getVar(stateVar), 2);
   const beforeGate = xp(p);
   operate(p, thug, 5);
@@ -349,9 +346,9 @@ test('the purchased willow is usable and the Thug applies its period level and K
 test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outcomes, and awards 10 XP', () => {
   const p = seed(completePlayer(45), ['blackjack_oak']);
   const target = isolatedTarget('feud_arabian_guard2_multi');
-  assert(target, 'an original Bandit41 placement is outside the UNKNOWN witness radius');
+  assert(target, 'an original Bandit41 placement has no candidate under the native witness predicate');
   const lure = operate(p, target, 4);
-  assert.equal(lure.trigger, 'feud_repeat_blackjack');
+  assert.equal(lure.trigger, nativeNpcTriggerName(target, 4));
   assert.equal(target.getVar(stateVar), 2);
   assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
   assert.equal(target.target, p);
@@ -360,7 +357,7 @@ test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outco
   operate(p, target, 5);
   assert.equal(target.getVar(stateVar), 2, 'an inventory-only blackjack is refused');
   assert.equal(xp(p), inventoryOnlyXp);
-  assert(held(p, 'blackjack_oak', 2));
+  wield(p, 'blackjack_oak');
 
   const beforeKo = xp(p);
   withRandom(0, () => operate(p, target, 5));
@@ -379,7 +376,7 @@ test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outco
   assert.equal(target.getVar(stateVar), 0, 'the Bandit wakes through the bounded NPC queue');
 
   const relure = operate(p, target, 4);
-  assert.equal(relure.trigger, 'feud_repeat_blackjack');
+  assert.equal(relure.trigger, nativeNpcTriggerName(target, 4));
   const beforeFailure = {
     hp: p.levels[PlayerStat.HITPOINTS], xp: xp(p), coins: count(p, 'coins'),
     stunned: p.getVar(stunnedVar)
@@ -399,17 +396,17 @@ test('witnessed Bandit KO applies the period 4 HP, stun and attack outcome', () 
     id('NpcType', 'feud_arabian_guard_multi'), id('NpcType', 'feud_arabian_guard2_multi')
   ]);
   const target = actors('feud_arabian_guard_multi').find(npc => npc.getVar(stateVar) === 0 &&
-    [...World.npcs].some(other => other.isActive && other !== npc && nearbyBanditTypes.has(other.baseType) && within(npc, other, 5)));
-  assert(target, 'an original Bandit placement has another active Bandit within the sourced witness check range');
+    [...World.npcs].some(other => nearbyBanditTypes.has(other.baseType) && isWitness(npc, other)));
+  assert(target, 'an original Bandit placement has a nearby Bandit satisfying the native witness predicate');
   const p = seed(completePlayer(56), ['blackjack_oak']);
-  assert(held(p, 'blackjack_oak', 2));
+  wield(p, 'blackjack_oak');
   const beforeXp = xp(p), beforeCoins = count(p, 'coins');
   const lure = operate(p, target, 4);
-  assert.equal(lure.trigger, 'feud_repeat_blackjack');
+  assert.equal(lure.trigger, nativeNpcTriggerName(target, 4));
   assert.equal(target.getVar(stateVar), 2);
   const hp = p.levels[PlayerStat.HITPOINTS], startTick = World.currentTick;
   const trigger = withRandom(0, () => startOperation(p, target, 5));
-  assert.equal(trigger, 'feud_repeat_blackjack');
+  assert.equal(trigger, nativeNpcTriggerName(target, 5));
   assert.equal(target.getVar(stateVar), 0, 'a witnessed attempt releases the lure before retaliation');
   assert.equal(hp - p.levels[PlayerStat.HITPOINTS], 4, 'witnessed Bandit KO costs the period 4 HP');
   assert(p.getVar(stunnedVar) > startTick, 'the player receives a bounded stun before the queued attack');

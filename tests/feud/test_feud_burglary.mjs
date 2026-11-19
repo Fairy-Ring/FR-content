@@ -133,6 +133,7 @@ test('a wrong first digit fails only at the sixth entry, and the correct sequenc
   assert.equal(entries(p), 0);
   assert.equal(prefix(p), 0);
   assert.equal(stage(p), 14);
+  openSafe(p);
   combination(p);
   assert.equal(stage(p), 15, 'a correct attempt immediately after failure still unlocks the safe');
   assert.equal(count(p, 'feud_mayors_jewels'), 1);

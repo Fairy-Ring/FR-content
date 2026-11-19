@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  Packet, PlayerLoading, PlayerStat, World, count, engineModule, held, id, inv, inventory,
-  obj, player, seed
+  Packet, PlayerLoading, PlayerStat, World, count, engineModule, id, inv, inventory, obj, player,
+  seed
 } from '../swamp-caves/runtime.mjs';
-import { bit, operate, read, stage, talk } from './fixture.mjs';
+import { bit, hasWitness, operate, read, stage, talk, wield } from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -71,7 +71,7 @@ function trialFixture() {
   p.setVarBit(bit('feud_var'), 6);
   p.setVar(slotVar, -1); // Undo the generic runtime fixture's vars.fill(0), not production initialization.
   p.invAdd(inv, obj('coins'), 100);
-  assert(held(p, 'blackjack_oak', 2));
+  wield(p, 'blackjack_oak');
   rsbuf.addPlayer(p.slot);
   return p;
 }
@@ -90,10 +90,8 @@ function reachDistraction(p) {
 }
 
 function secludedTarget() {
-  const all = [...World.npcs].filter(npc => npc.isActive);
-  const target = villagers().find(npc => npc.getVar(stateVar) === 0 && all.every(other =>
-    other === npc || other.level !== npc.level || Math.max(Math.abs(other.x - npc.x), Math.abs(other.z - npc.z)) > 5));
-  assert(target, 'a real packed villager can be lured outside the named UNKNOWN witness radius');
+  const target = villagers().find(npc => npc.getVar(stateVar) === 0 && !hasWitness(npc));
+  assert(target, 'a real packed villager has no candidate under the native witness predicate');
   return target;
 }
 
