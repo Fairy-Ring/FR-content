@@ -15,7 +15,6 @@ const built = [
   ['pest_bankbooth', 4, [0, -1], false]
 ];
 const left = [
-  ['ahoy_bankbooth', 'ahoy_bankbooth', null, [1, 2]],
   ['fever_bankbooth', 'fever_bankbooth', null, [1, 2]],
   ['burgh_bank_booth_multiloc', 'burgh_bankbooth_repaired', 1, [1, 2]],
   ['burgh_bank_booth_multiloc', 'burgh_bankbooth_damaged', 0, [1]],
@@ -94,6 +93,36 @@ for (const [name, expected, stand, teller = true] of built) {
   }
   console.log(`PASS ${name}: ${expected} natural placements, both client options reach the published bank service`);
 }
+// Service built; the route to the place is not built: Port Phasmatys town barrier.
+const ghostBooths = natural('ahoy_bankbooth');
+assert.equal(ghostBooths.length, 4, 'original Port Phasmatys booth placements');
+for (const placement of ghostBooths) {
+  const loc = locAt(placement);
+  for (const amulet of ['absent', 'carried', 'worn']) {
+    for (const option of [1, 2]) {
+      const p = fixture(placement, [0, 1]);
+      assert(!map.isMapBlocked(p.x, p.z, p.level), 'Phasmatys public counter stand is walkable');
+      if (amulet !== 'absent') p.invAdd(id('InvType', amulet === 'worn' ? 'worn' : 'inv'), id('ObjType', 'amulet_of_ghostspeak'), 1);
+      arm(p, loc, option);
+      const script = p.getOpTrigger();
+      assert(script, `ahoy_bankbooth option ${option} resolves through production dispatch`);
+      const translated = amulet === 'worn';
+      finish(p, script, loc, option === 1 && translated ? [1] : []);
+      const text = p.packets.filter(packet => packet.constructor.name === 'IfSetText').map(packet => packet.text).join(' ');
+      if (option === 1 && !translated) {
+        assert.equal(p.modalMain, -1, 'untranslated Use does not open a bank');
+        assert(text.includes('Woooo wooo wooooo woooo'), 'Use reuses the published ghost refusal');
+        assert(!text.includes('Good day'), 'untranslated ghost does not speak human words');
+      } else {
+        bank(p);
+        if (option === 1) assert(text.includes('Good day, how may I help you?'));
+      }
+      if (option === 2) assert.equal(p.messages.some(message => message.includes('You can still quick-bank')), !translated, 'quick banking reuses the published amulet-dependent message');
+    }
+  }
+}
+console.log('PASS Phasmatys: service built; the route to the place is not built: unhandled town barrier; both options match the published ghost banker for absent/carried/worn amulet');
+console.log('PASS Pest: service built; the route to the place is not built: missing Port Sarim Squire island-arrival flow');
 // Transaction checks use the actual bank interface packet handler and its listeners.
 const transactionLoc = locAt(natural('elid_bankbooth')[0]);
 const transaction = fixture(natural('elid_bankbooth')[0], [1, 0]);

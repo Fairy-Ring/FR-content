@@ -16,3 +16,11 @@ if (npc_findcat(loc_coord, bank_teller, 2, 0) = true) {
 @openbank;
 
 [oploc2,_bank_booth] @openbank;
+
+// CANDIDATE: the published ghost banker owns the same speech/quick-bank rules.
+[oploc1,ahoy_bankbooth]
+if (npc_find(loc_coord, ahoy_ghost_banker, 2, 0) = true) {
+    @special_ghost_banker_talk;
+}
+
+[oploc2,ahoy_bankbooth] @special_ghost_banker_quickbank;
