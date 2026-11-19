@@ -1,0 +1,3 @@
+[farming_inspect_patch]
+column=patch,loc,LIST,INDEXED,REQUIRED
+column=family,int

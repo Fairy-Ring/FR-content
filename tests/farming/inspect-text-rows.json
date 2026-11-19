@@ -1,0 +1,6232 @@
+{
+  "format": "N036 confirmed wording workbook, operator decision 19 November 2026",
+  "key": [
+    "patchFamily",
+    "soilTreatment",
+    "state"
+  ],
+  "soilKeysAre": "engineering labels, not recovered server values",
+  "sourceContext": {
+    "source": "src.farming-patch-inspect-scarecrow-talk-20120329",
+    "revision": 5436595,
+    "date": "2012-03-29T23:26:46Z",
+    "observedCrop": "watermelons",
+    "observedLocation": "North Ardougne",
+    "reportedNearbyScarecrow": true,
+    "protectionMechanismEstablished": true,
+    "limits": "CANDIDATE later player quotation plus operator confirmation. Published scarecrow protection applies to sweetcorn, not the quoted watermelon."
+  },
+  "families": [
+    {
+      "patchFamily": "allotment",
+      "plantableInParent": true,
+      "states": [
+        "weeds",
+        "empty",
+        "growing",
+        "mature",
+        "watered",
+        "diseased",
+        "dead"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "plantableInParent": true,
+      "states": [
+        "weeds",
+        "empty",
+        "growing",
+        "mature",
+        "scarecrowWeeds",
+        "scarecrowEmpty",
+        "watered",
+        "diseased",
+        "dead"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "plantableInParent": true,
+      "states": [
+        "weeds",
+        "empty",
+        "growing",
+        "mature",
+        "diseased",
+        "dead"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "plantableInParent": true,
+      "states": [
+        "weeds",
+        "empty",
+        "growing",
+        "mature",
+        "watered",
+        "diseased",
+        "dead"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "plantableInParent": false,
+      "states": [
+        "weeds",
+        "empty"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "plantableInParent": false,
+      "states": [
+        "weeds",
+        "empty"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "plantableInParent": false,
+      "states": [
+        "weeds",
+        "empty"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "plantableInParent": false,
+      "states": [
+        "weeds",
+        "empty"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "plantableInParent": false,
+      "states": [
+        "weeds",
+        "empty"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "plantableInParent": false,
+      "states": [
+        "weeds",
+        "empty"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "plantableInParent": false,
+      "states": [
+        "weeds",
+        "empty"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "plantableInParent": false,
+      "states": [
+        "weeds",
+        "empty"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "protection",
+      "order": 3,
+      "condition": "healthy growing sweetcorn; neighbouring flower selector33..36; farming_flower_protects=true",
+      "text": "Your scarecrow is protecting these crops from disease.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is an allotment.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "allotment",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "scarecrowWeeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "scarecrowWeeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "scarecrowWeeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "scarecrowEmpty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "scarecrowEmpty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "scarecrowEmpty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "scarecrowWeeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "scarecrowWeeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "scarecrowWeeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "scarecrowEmpty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "scarecrowEmpty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "scarecrowEmpty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "scarecrowWeeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "scarecrowWeeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "scarecrowWeeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "scarecrowEmpty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "scarecrowEmpty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "scarecrowEmpty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a flower patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "flower",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a herb patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "herb",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "untreated",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "compost",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "growing",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "mature",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is fully grown.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "watered",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch has something growing in it.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "diseased",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a hops patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-patch-inspect-scarecrow-talk-20120329",
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "hops",
+      "soilTreatment": "supercompost",
+      "state": "dead",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "",
+      "status": "UNKNOWN wording",
+      "source": null,
+      "approvedFor377": false
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a bush patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a bush patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a bush patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a bush patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a bush patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a bush patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "bush",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a fruit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a fruit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a fruit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a fruit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a fruit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a fruit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "fruit_tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a cactus patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a cactus patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a cactus patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a cactus patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a cactus patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a cactus patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "cactus",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a belladonna patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a belladonna patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a belladonna patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a belladonna patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a belladonna patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a belladonna patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "belladonna",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a mushroom patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a mushroom patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a mushroom patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a mushroom patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a mushroom patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a mushroom patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "mushroom",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a calquat patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a calquat patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a calquat patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a calquat patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a calquat patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a calquat patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "calquat",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a spirit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "untreated",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a spirit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has not been treated.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "untreated",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a spirit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "compost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a spirit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with compost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "compost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a spirit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "supercompost",
+      "state": "weeds",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch needs weeding.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "patch-type",
+      "order": 0,
+      "condition": null,
+      "text": "This is a spirit tree patch.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "soil-treatment",
+      "order": 1,
+      "condition": null,
+      "text": "The soil has been treated with supercompost.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    },
+    {
+      "patchFamily": "spirit_tree",
+      "soilTreatment": "supercompost",
+      "state": "empty",
+      "lineRole": "growth-state",
+      "order": 2,
+      "condition": null,
+      "text": "The patch is empty.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-operator-20261119",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-operator-20261119"
+      ]
+    }
+  ],
+  "currentSoilReader": "Only untreated is reachable. No published compost application or soil-treatment state exists for the four plantable families. Other treatment rows are wording only. Other eight families bind native weed/empty selectors0..3; only0 is currently reachable.",
+  "outputRule": "One game chat message joins patch type, soil and known state with spaces. Diseased/dead omit the unknown state sentence. Watered adds no sentence. A separate scarecrow message requires healthy growing sweetcorn and the published neighbouring flower protection state."
+}

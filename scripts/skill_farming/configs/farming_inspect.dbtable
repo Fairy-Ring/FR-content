@@ -1,0 +1,4 @@
+[farming_inspect]
+// UNKNOWN engineering lookup: family * 256 + unchanged native selector.
+column=state,int,LIST,INDEXED,REQUIRED
+column=line,string,REQUIRED
