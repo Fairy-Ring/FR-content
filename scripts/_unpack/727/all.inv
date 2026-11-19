@@ -3367,6 +3367,8 @@ size=18
 size=9
 
 [smithing_guild_ore_seller]
+// UNKNOWN ORDAN_RESTOCK_TICKS=200: inherited authored server rate, not cache data.
+// Period Tip.it describes dwarf deliveries; visible deliveries are not implemented.
 scope=shared
 size=40
 restock=yes
@@ -3382,6 +3384,7 @@ stock7=coal,100,200
 
 [smithing_guild_buyer]
 // https://web.archive.org/web/20051104234945/http://www.tip.it/runescape/?page=blast_furnace.htm
+// UNKNOWN JORZIK_STOCK_DECAY_TICKS=500: inherited authored server rate, not cache data.
 scope=shared
 size=40
 restock=yes

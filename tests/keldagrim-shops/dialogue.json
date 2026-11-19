@@ -1,0 +1,405 @@
+[
+  {
+    "npc": "smithing_guild_buyer",
+    "source": "src.keldagrim-shop-dialogue-jorzik",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "What are you selling?",
+          "Let's have a look then."
+        ],
+        "lines": [
+          "Do you want to trade?",
+          "What are you selling?",
+          "The finest smiths from all over Gielinor come here to work, and I buy the fruit of their craft. Armour made from the higher metals!",
+          "Let's have a look then."
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "What are you selling?",
+          "No thanks."
+        ],
+        "lines": [
+          "Do you want to trade?",
+          "What are you selling?",
+          "The finest smiths from all over Gielinor come here to work, and I buy the fruit of their craft. Armour made from the higher metals!",
+          "No thanks.",
+          "You just don't appreciate the beauty of fine metalwork."
+        ],
+        "opens": false
+      },
+      {
+        "choices": [
+          "No thanks."
+        ],
+        "lines": [
+          "Do you want to trade?",
+          "No thanks.",
+          "You just don't appreciate the beauty of fine metalwork."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_warhammer",
+    "source": "src.keldagrim-shop-dialogue-vigr",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Of course I can."
+        ],
+        "lines": [
+          "What do you want, human?",
+          "Ehm, anything on offer?",
+          "Can you wield a warhammer? If not, then go away.",
+          "Of course I can."
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "I can, but I won't."
+        ],
+        "lines": [
+          "What do you want, human?",
+          "Ehm, anything on offer?",
+          "Can you wield a warhammer? If not, then go away.",
+          "I can, but I won't.",
+          "Yeah, right."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_weapons",
+    "source": "src.keldagrim-shop-dialogue-santiri",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Yes, I'm looking for some weapons."
+        ],
+        "lines": [
+          "Welcome, human, to the Quality Weapons Shop! Can I interest you in a purchase?",
+          "Yes, I'm looking for some weapons."
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "No thanks."
+        ],
+        "lines": [
+          "Welcome, human, to the Quality Weapons Shop! Can I interest you in a purchase?",
+          "No thanks."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_armour",
+    "source": "src.keldagrim-shop-dialogue-saro",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Yes, I'm looking for some armour."
+        ],
+        "lines": [
+          "Welcome to my store, human! Are you interested in buying anything?",
+          "Yes, I'm looking for some armour."
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "No thanks."
+        ],
+        "lines": [
+          "Welcome to my store, human! Are you interested in buying anything?",
+          "No thanks."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_general_store",
+    "source": "src.keldagrim-shop-dialogue-gunslik",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Oh good!"
+        ],
+        "lines": [
+          "What can I interest you in? We have something of everything here!",
+          "Oh good!"
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "Nothing, thanks."
+        ],
+        "lines": [
+          "What can I interest you in? We have something of everything here!",
+          "Nothing, thanks."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_bakery",
+    "source": "src.keldagrim-shop-dialogue-randivor",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Sounds delicious!"
+        ],
+        "lines": [
+          "Welcome to my stall! Come and buy some tasty bread, freshly baked just 2 months ago!",
+          "Sounds delicious!"
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "I think I'll pass."
+        ],
+        "lines": [
+          "Welcome to my stall! Come and buy some tasty bread, freshly baked just 2 months ago!",
+          "I think I'll pass."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_gems",
+    "source": "src.keldagrim-shop-dialogue-hervi",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Show me the wares!"
+        ],
+        "lines": [
+          "Greetings, human... can I interest you in some fine gems?",
+          "Show me the wares!"
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "No thanks."
+        ],
+        "lines": [
+          "Greetings, human... can I interest you in some fine gems?",
+          "No thanks."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_craft",
+    "source": "src.keldagrim-shop-dialogue-nolar",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Yes please!"
+        ],
+        "lines": [
+          "I have a wide variety of crafting tools on offer, care to take a look?",
+          "Yes please!"
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "No thanks."
+        ],
+        "lines": [
+          "I have a wide variety of crafting tools on offer, care to take a look?",
+          "No thanks."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_silver",
+    "source": "src.keldagrim-shop-dialogue-gulldamar",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Right, what do you have?"
+        ],
+        "lines": [
+          "Finest silver in all of Keldagrim, come and see!",
+          "Right, what do you have?",
+          "Silver, what else!"
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "Not interested, thanks."
+        ],
+        "lines": [
+          "Finest silver in all of Keldagrim, come and see!",
+          "No thanks."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_pickaxe",
+    "source": "src.keldagrim-shop-dialogue-tati",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Do you have any pickaxes?"
+        ],
+        "lines": [
+          "What'you want?",
+          "Do you-",
+          "What? Speak up, I can't hear you!",
+          "Uhm... I'm just looking for some pickaxes! Do you have any?",
+          "Do I have any pickaxes? Do I? Of course I do, this is a pickaxe shop, isn't it!"
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "Do you have any quests?"
+        ],
+        "lines": [
+          "What'you want?",
+          "Do you-",
+          "What? Stop mumbling!",
+          "I want a quest!",
+          "I don't have any lousy quests... I've got someone who's helping me already!",
+          "Well, I say helping... he takes his merry time to do his chores, my son does.",
+          "Then perhaps I can help in some way?",
+          "Pfft, I doubt it... maybe when my son fouls up again, but not now."
+        ],
+        "opens": false
+      },
+      {
+        "choices": [
+          "Nothing really."
+        ],
+        "lines": [
+          "What'you want?",
+          "Nothing really.",
+          "Then clear off!"
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_cloth",
+    "source": "src.keldagrim-shop-dialogue-agmundi",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Who makes these clothes then?"
+        ],
+        "lines": [
+          "Oh no, not another human... what do you want then?",
+          "Oh, do you get humans here often?",
+          "Not that often, no, but sometimes.",
+          "Of course, since you people are too big for dwarven clothes, they typically don't stay very long.",
+          "Why don't you make bigger clothes then?",
+          "What'd be the point? Besides, I don't make these clothes myself.",
+          "Who makes these clothes then?",
+          "Oh, my sister, she lives in Keldagrim-East. Has a little stall on the other side of the Kelda.",
+          "If she only worked a little harder, like me, she wouldn't have to live in the sewers of the city. Shame really.",
+          "The sewers? Your sister lives in the sewers?",
+          "Keldagrim-East, such a ghastly place. Not civil, polite and clean like we are in the West.",
+          "Uh-huh."
+        ],
+        "opens": false
+      },
+      {
+        "choices": [
+          "I still want to buy your clothes."
+        ],
+        "lines": [
+          "Oh no, not another human... what do you want then?",
+          "Oh, do you get humans here often?",
+          "Not that often, no, but sometimes.",
+          "Of course, since you people are too big for dwarven clothes, they typically don't stay very long.",
+          "Why don't you make bigger clothes then?",
+          "What'd be the point? Besides, I don't make these clothes myself.",
+          "I still want to buy your clothes."
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "So do you have any quests for me?"
+        ],
+        "lines": [
+          "Oh no, not another human... what do you want then?",
+          "Oh, do you get humans here often?",
+          "Not that often, no, but sometimes.",
+          "Of course, since you people are too big for dwarven clothes, they typically don't stay very long.",
+          "Why don't you make bigger clothes then?",
+          "What'd be the point? Besides, I don't make these clothes myself.",
+          "So do you have any quests for me?",
+          "Quests? Why would I have any quests?",
+          "Oh, just anything to do would be fine.",
+          "No, not right now... maybe I'll have something for you to do later, but nothing at the moment."
+        ],
+        "opens": false
+      }
+    ]
+  },
+  {
+    "npc": "dwarf_city_shop_cloth_poor",
+    "source": "src.keldagrim-shop-dialogue-vermundi",
+    "label": "CANDIDATE",
+    "paths": [
+      {
+        "choices": [
+          "Yes, what clothes do you have in stock?"
+        ],
+        "lines": [
+          "Welcome to my clothes stall, can I help you with anything?",
+          "Yes, what clothes do you have in stock?",
+          "Not a lot, I'm afraid, most of what I produce goes to my sister. Her shop is in Keldagrim-West.",
+          "Well, show me what you do have then."
+        ],
+        "opens": true
+      },
+      {
+        "choices": [
+          "No, I'm just browsing."
+        ],
+        "lines": [
+          "Welcome to my clothes stall, can I help you with anything?",
+          "No, I'm just browsing."
+        ],
+        "opens": false
+      }
+    ]
+  }
+]
