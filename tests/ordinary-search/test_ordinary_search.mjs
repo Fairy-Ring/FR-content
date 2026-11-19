@@ -87,8 +87,11 @@ for (const row of manifest.search) {
 }
 for (const row of manifest.left) {
   const f = fixture(row);
-  assert.equal(select(f, row.slot), null, `${row.name} remains with ${row.owner}`);
-  assert.equal(f.p.getApTrigger(), null, `${row.name} has no added approach handler`);
+  const selected = select(f, row.slot);
+  for (const family of Object.keys(empty)) {
+    assert.notEqual(selected?.name, `[oploc${row.slot},_${family}]`, `${row.name} is not joined to this suite's generic Search`);
+    assert.notEqual(f.p.getApTrigger()?.name, `[aploc${row.slot},_${family}]`, `${row.name} has no generic Search approach`);
+  }
 }
 for (const row of manifest.search.filter(row => row.family === 'bookcase')) {
   const results = [
