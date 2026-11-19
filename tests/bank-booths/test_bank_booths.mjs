@@ -5,6 +5,7 @@ const { readPlacements } = await import('../loc-option-audit/audit.mts');
 const ScriptRunner = (await engineModule('engine/script/ScriptRunner.ts')).default;
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
 const OpLocHandler = (await engineModule('network/game/client/handler/OpLocHandler.ts')).default;
+const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
 const { placements } = readPlacements();
 
 // VERIFIED original cache placements; these are not spawned test scenery.
@@ -132,6 +133,13 @@ console.log('PASS Pest: service built; the route to the place is not built: miss
 const pirateBooths = natural('fever_bankbooth');
 assert.equal(pirateBooths.length, 3, 'original Mos Le Harmless booth placements');
 assert.deepEqual(types.LocType.get(id('LocType', 'fever_bankbooth')).op.slice(0, 2), ['Use', 'Use-quickly']);
+const firstPirateBankers = [...World.npcs].filter(npc => npc.type === id('NpcType', 'fever_banker_01'));
+assert.equal(firstPirateBankers.length, 2, 'two original first-form pirate bankers cover the three booths');
+for (const placement of pirateBooths) {
+  assert(firstPirateBankers.some(npc => npc.level === placement.level &&
+    (npc.x - placement.x) ** 2 + (npc.z - placement.z) ** 2 <= 4),
+  'each original booth already finds a first-form banker within two tiles');
+}
 for (const placement of pirateBooths) {
   const loc = locAt(placement);
   for (const option of [1, 2]) {
@@ -140,6 +148,8 @@ for (const placement of pirateBooths) {
     arm(p, loc, option);
     const script = p.getOpTrigger();
     assert(script, `fever_bankbooth option ${option} reaches its exact handler`);
+    assert.equal(script.opcodes.filter(opcode => opcode === ScriptOpcode.NPC_FIND).length, option === 1 ? 1 : 0,
+      'compiled booth Use has only the reachable first-form finder; no dead second-form fallback');
     finish(p, script, loc, option === 1 ? [1] : []);
     bank(p);
     const greeting = p.packets.some(packet => packet.constructor.name === 'IfSetText' && packet.text.includes('Aye? Ye got some stuff te stash?'));

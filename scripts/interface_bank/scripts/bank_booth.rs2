@@ -33,8 +33,5 @@ if (npc_find(loc_coord, ahoy_ghost_banker, 2, 0) = true) {
 if (npc_find(loc_coord, fever_banker_01, 2, 0) = true) {
     @beta_pirate_banker;
 }
-if (npc_find(loc_coord, fever_banker_02, 2, 0) = true) {
-    @beta_pirate_banker;
-}
 
 [oploc2,fever_bankbooth] @openbank;
