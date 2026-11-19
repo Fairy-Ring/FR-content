@@ -20,8 +20,6 @@ const ResumePauseButton = await load('network/game/client/model/ResumePauseButto
 const IfSetText = await load('network/game/server/model/IfSetText.ts');
 const { EntityLifeCycle } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/EntityLifeCycle.ts')).href);
 const { BlockWalk } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/BlockWalk.ts')).href);
-const IfOpenMain = await load('network/game/server/model/IfOpenMain.ts');
-const IfOpenMainSide = await load('network/game/server/model/IfOpenMainSide.ts');
 const { NpcModeMap } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NpcMode.ts')).href);
 const cfg = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'ParamType', 'NpcType', 'LocType', 'SeqType', 'InvType', 'ObjType', 'FontType', 'Component', 'DbRowType', 'DbTableType', 'EnumType', 'CategoryType', 'StructType', 'MesanimType']) {
@@ -49,14 +47,18 @@ for (const file of fs.readdirSync(path.join(content, 'maps')).filter(x => /^m\d+
   }
 }
 function serviceResult(packets, player) {
-  const opens = packets.filter(packet => packet instanceof IfOpenMain || packet instanceof IfOpenMainSide);
-  if (!opens.length) return null;
-  assert.equal(opens.length, 1, 'one existing service interface per conversation');
-  const name = Component.get(opens[0].component ?? opens[0].main)?.comName;
+  if (player.modalMain === -1) return null;
+  const name = Component.get(player.modalMain)?.comName;
   assert(['tanner', 'shop_template'].includes(name), `unexpected service interface ${name}`);
+  const sideName = name === 'shop_template' ? 'shop_template_side' : undefined;
+  assert.equal(player.modalMain, Component.getId(name), 'exact native main interface');
+  assert.equal(player.modalSide, sideName ? Component.getId(sideName) : -1, 'exact native side interface');
+  assert.equal(player.refreshModal, true, 'native interface open awaits the network output phase');
+  // Base Player has no network output phase. Prove native modal state and VM widget
+  // packets here against unchanged Trade; the open packet itself needs the headed receipt.
   const updates = packets.filter(packet => {
     const component = Component.get(packet.component ?? packet.main)?.comName;
-    return component === name || component?.startsWith(`${name}:`);
+    return component === name || component?.startsWith(`${name}:`) || (sideName && (component === sideName || component?.startsWith(`${sideName}:`)));
   }).map(packet => ({ type: packet.constructor.name, ...packet }));
   const variables = {};
   if (name === 'shop_template') for (const key of ['shop', 'shop_buy', 'shop_sell', 'shop_haggle']) {
@@ -64,7 +66,7 @@ function serviceResult(packets, player) {
     assert.equal(VarPlayerType.get(id).scope, VarPlayerType.SCOPE_TEMP, `${key}: only session state`);
     variables[key] = player.vars[id];
   }
-  return { name, updates, variables };
+  return { name, modalMain: player.modalMain, modalSide: player.modalSide, refreshModal: player.refreshModal, updates, variables };
 }
 function pages(packets) {
   const result = [];
