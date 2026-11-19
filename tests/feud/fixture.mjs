@@ -41,8 +41,14 @@ function hasWitness(target) {
   for (const npc of World.npcs) if (isWitness(target, npc)) return true;
   return false;
 }
-const nativeNpcTriggerName = (npc, option) =>
-  `[opnpc${option},${types.NpcType.get(npc.type).debugname}]`;
+const nativeNpcTriggerName = (p, npc, option) => {
+  const base = types.NpcType.get(npc.type);
+  const state = base.multivarp !== -1 ? p.getVar(base.multivarp)
+    : base.multivarbit !== -1 ? p.getVarBit(base.multivarbit) : -1;
+  const form = state >= 0 && state < base.multinpc.length ? base.multinpc[state] : -1;
+  const visible = form === -1 ? base : types.NpcType.get(form);
+  return `[opnpc${option},${visible.debugname}]`;
+};
 
 function locs(name) {
   if (!sourceLocRows) {

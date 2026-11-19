@@ -132,13 +132,13 @@ test('native Feud trials allow the opening at level 29, gate the first theft at 
   assert.equal(secluded.getVar(ownerVar), owner);
   assert.equal(owner, p.uid, 'knock-out remains scoped to the player who lured the target');
   assert.equal(other.stats[PlayerStat.THIEVING], otherXp, 'a wrong-owner knock-out awards no XP');
-  assert.equal(wrongOwnerResult.trigger, nativeNpcTriggerName(secluded, 5), 'the rejection is reached through the visible opnpc5 dispatcher');
+  assert.equal(wrongOwnerResult.trigger, nativeNpcTriggerName(other, secluded, 5), 'the rejection is reached through the visible opnpc5 dispatcher');
 
   const koXp = p.stats[PlayerStat.THIEVING];
   remove(p, 'blackjack_oak');
   assert.equal(count(p, 'blackjack_oak'), 1, 'the native worn-item action returns the blackjack to inventory');
   const inventoryOnly = operate(p, secluded, 5);
-  assert.equal(inventoryOnly.trigger, nativeNpcTriggerName(secluded, 5));
+  assert.equal(inventoryOnly.trigger, nativeNpcTriggerName(p, secluded, 5));
   assert.equal(stage(p), 10, 'an unwielded blackjack cannot knock out a villager');
   assert.equal(secluded.getVar(stateVar), 2);
   assert.equal(secluded.getVar(ownerVar), p.uid);

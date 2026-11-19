@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import test, { before } from 'node:test';
 
-import { World, count, id, inv, obj, types } from '../swamp-caves/runtime.mjs';
+import { World, count, engineModule, id, inv, map, obj, types } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
-import { stage, talk } from './fixture.mjs';
+import { locs, operateLoc, stage, talk } from './fixture.mjs';
+
+const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 
 // CANDIDATE recipes and fee: retained Ali the Dyer article 218592 and ordinary
 // transcript 14342931/14342948; these names are the original 377 cache items.
@@ -20,6 +22,17 @@ const customer = (questStage = 0) => {
 };
 const make = (p, recipe) => talk(p, 'feud_dye_lady', [1, recipe.option, 1]);
 const carried = p => p.getInventory(inv).items.filter(Boolean).length;
+
+before(() => {
+  const entrance = locs('curtain_1528').find(loc => loc.level === 0 && loc.x === 3364 && loc.z === 2999);
+  assert(entrance, 'the dyer shop has its original mapped curtain');
+  const p = player();
+  operateLoc(p, entrance, { position: [0, 3364, 2999] });
+  const route = [...map.findPath(0, 3364, 2998, 3364, 3000)];
+  assert(route.length, 'the native curtain operation permits a path from outside');
+  assert.deepEqual(CoordGrid.unpackCoord(route.at(-1)), { level: 0, x: 3364, z: 3000 },
+    'the path crosses the opened original curtain to an operable dyer stand');
+});
 
 for (const questStage of [0, 1, 13, 28]) {
   test(`ordinary dye service exchanges all three recipes at Feud checkpoint ${questStage}`, () => {
