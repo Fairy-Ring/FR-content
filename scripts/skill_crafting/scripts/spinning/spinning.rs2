@@ -13,13 +13,16 @@ if (%viking < ^viking_complete) {
 [label,spinning_wheel_use]
 switch_obj (last_useitem)
 {
-    case wool : @craft_spinning(last_useitem);
+    case wool :
+        ~craft_spinning(last_useitem);
+        return;
     case flax :
         if (map_members = ^false) {
             mes(^mes_members_feature);
             return;
         }
-        @craft_spinning(last_useitem);
+        ~craft_spinning(last_useitem);
+        return;
     // 274: delay path, not weakqueue (not until after 2007). May 2006 = p_delay.
     case viking_golden_fleece :
         if (map_members = ^false) {
@@ -40,7 +43,7 @@ switch_obj (last_useitem)
     case default : ~displaymessage(^dm_default);
 };
 
-[label,craft_spinning](obj $spinning_obj)
+[proc,craft_spinning](obj $spinning_obj)
 def_struct $struct = oc_param($spinning_obj, crafting_spinning_struct);
 // check if we have the required level
 def_int $level = struct_param($struct, levelrequire);
