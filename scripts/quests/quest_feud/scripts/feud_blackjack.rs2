@@ -74,7 +74,7 @@ if (%feud_villager_state = ^feud_villager_state_unconscious) {
 }
 // Hints need no protected player access, including expiry while the owner is busy.
 if (%feud_villager_state = ^feud_villager_state_distracted) {
-    if (finduid($owner) = true) hint_stop;
+    if (.finduid($owner) = true) .hint_stop;
 }
 %feud_villager_state = ^feud_villager_state_idle;
 %feud_villager_owner = null;
