@@ -31006,17 +31006,6 @@ recol1d=10535
 sharelight=yes
 active=no
 
-[slayertower_door]
-name=Door
-desc=A big wooden door.
-model=loc_4487
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Open
-
 [slayertower_door_arch]
 model=loc_4488
 hillskew=yes
@@ -31037,41 +31026,6 @@ op1=Open
 blockwalk=no
 mirror=yes
 active=no
-
-[slayertower_door_mirror]
-name=Door
-desc=A big wooden door.
-model=loc_4487
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-mirror=yes
-op1=Open
-
-[slayertower_door_open]
-name=Door
-desc=A big wooden door.
-model=loc_4487
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Close
-
-[slayertower_door_open_mirror]
-name=Door
-desc=A big wooden door.
-model=loc_4487
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-mirror=yes
-op1=Close
 
 [slayer_dungeon_entrance]
 name=Cave Entrance
@@ -34982,17 +34936,6 @@ width=2
 blockrange=no
 blockwalk=no
 
-[door_5126]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Open
-
 [danger_sign]
 name=Danger sign
 desc=Danger!
@@ -35004,17 +34947,6 @@ recol2d=20011
 recol3s=13571
 recol3d=11592
 op1=Read
-
-[door_5128]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Close
 
 [scenery_5129]
 model=loc_5129
@@ -68713,51 +68645,6 @@ hillskew=yes
 ambient=15
 mirror=yes
 
-[door_10527]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Open
-
-[door_10528]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Close
-
-[door_10529]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Open
-mirror=yes
-
-[door_10530]
-name=Door
-desc=A tall wooden door.
-model=loc_5126
-hillskew=yes
-ambient=20
-resizez=128
-resizex=128
-resizey=192
-op1=Close
-mirror=yes
 
 [champions_wall]
 model=rd_falador_dungeon_wall
@@ -79189,45 +79076,6 @@ recol4d=12547
 length=2
 blockrange=no
 
-[fai_barbarian_large_doubledoor_r]
-name=Longhall door
-desc=The entrance to the barbarians' longhall.
-model=lefayeunopenabledoorl
-recol1s=15717
-recol1d=15718
-recol2s=14626
-recol2d=14661
-recol3s=13602
-recol3d=13604
-recol4s=13569
-recol4d=12547
-recol5s=12515
-recol5d=11490
-recol6s=11458
-recol6d=10433
-op1=Open
-mirror=yes
-raiseobject=no
-
-[fai_barbarian_large_doubledoor_l]
-name=Longhall door
-desc=The entrance to the barbarians' longhall.
-model=lefayeunopenabledoorl
-recol1s=15717
-recol1d=15718
-recol2s=14626
-recol2d=14661
-recol3s=13602
-recol3d=13604
-recol4s=13569
-recol4d=12547
-recol5s=12515
-recol5d=11490
-recol6s=11458
-recol6d=10433
-op1=Open
-raiseobject=no
-
 [fai_barbarian_large_doubledoor_r_inactive]
 model=lefayeunopenabledoorl
 recol1s=15717
@@ -79262,45 +79110,6 @@ recol6s=11458
 recol6d=10433
 raiseobject=no
 active=no
-
-[fai_barbarian_open_large_doubledoor_r]
-name=Longhall door
-desc=The entrance to the barbarians' longhall.
-model=lefayeunopenabledoorl
-recol1s=15717
-recol1d=15718
-recol2s=14626
-recol2d=14661
-recol3s=13602
-recol3d=13604
-recol4s=13569
-recol4d=12547
-recol5s=12515
-recol5d=11490
-recol6s=11458
-recol6d=10433
-op1=Close
-mirror=yes
-raiseobject=no
-
-[fai_barbarian_open_large_doubledoor_l]
-name=Longhall door
-desc=The entrance to the barbarians' longhall.
-model=lefayeunopenabledoorl
-recol1s=15717
-recol1d=15718
-recol2s=14626
-recol2d=14661
-recol3s=13602
-recol3d=13604
-recol4s=13569
-recol4d=12547
-recol5s=12515
-recol5d=11490
-recol6s=11458
-recol6d=10433
-op1=Close
-raiseobject=no
 
 [fai_barbarian_counter]
 name=Counter
@@ -80208,92 +80017,6 @@ resizey=152
 ambient=20
 category=double_door_open_and_close_left
 param=next_loc_stage,castle_door_11718
-
-[castle_door_11717]
-name=Castle door
-desc=A grand door.
-model=loc_11717
-recol1s=15717
-recol1d=17865
-recol2s=14626
-recol2d=16808
-recol3s=13602
-recol3d=15751
-recol4s=13569
-recol4d=14694
-recol5s=12515
-recol5d=13637
-recol6s=11458
-recol6d=12580
-op1=Open
-raiseobject=no
-resizey=152
-ambient=20
-mirror=yes
-
-[castle_door_11718]
-name=Castle door
-desc=A grand door.
-model=loc_11718
-recol1s=15717
-recol1d=17865
-recol2s=14626
-recol2d=16808
-recol3s=13602
-recol3d=15751
-recol4s=13569
-recol4d=14694
-recol5s=12515
-recol5d=13637
-recol6s=11458
-recol6d=12580
-op1=Close
-raiseobject=no
-resizey=152
-ambient=20
-mirror=yes
-
-[castle_door_11719]
-name=Castle door
-desc=A grand door.
-model=loc_11717
-recol1s=15717
-recol1d=17865
-recol2s=14626
-recol2d=16808
-recol3s=13602
-recol3d=15751
-recol4s=13569
-recol4d=14694
-recol5s=12515
-recol5d=13637
-recol6s=11458
-recol6d=12580
-op1=Open
-raiseobject=no
-resizey=152
-ambient=20
-
-[castle_door_11720]
-name=Castle door
-desc=A grand door.
-model=loc_11718
-recol1s=15717
-recol1d=17865
-recol2s=14626
-recol2d=16808
-recol3s=13602
-recol3d=15751
-recol4s=13569
-recol4d=14694
-recol5s=12515
-recol5d=13637
-recol6s=11458
-recol6d=12580
-op1=Close
-raiseobject=no
-resizey=152
-ambient=20
 
 [castle_door_11721]
 name=Castle door
