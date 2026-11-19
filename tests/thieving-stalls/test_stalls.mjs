@@ -313,6 +313,42 @@ for (const spec of [
     }
   });
 }
+for (const [kind, key, ownerName] of [
+  ['viking_fur', 'viking_fur_market', 'viking_fur_monger'],
+  ['viking_fish', 'viking_fish_market', 'viking_fish_monger'],
+  ['dwarf_gem', 'dwarf_market_gems', 'dwarf_city_shop_gems'],
+  ['dwarf_silver', 'dwarf_market_silver', 'dwarf_city_shop_silver'],
+  ['dwarf_bakery', 'dwarf_market_bakery', 'dwarf_city_shop_bakery'],
+  ['wine', 'rag_market_stall', 'rag_wine_merchant'],
+  ['dwarf_crafting', 'dwarf_market_crafting', 'dwarf_city_shop_craft']
+]) {
+  test(`${key}: the original local owner remains a catcher outside Ape Atoll`, () => {
+    const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+    const owner = id('NpcType', ownerName), locs = placements.filter(loc => loc.type === id('LocType', key));
+    assert.deepEqual(row.getValue(1, 0), [owner]);
+    assert([...World.npcs].some(npc => npc.type === owner && locs.some(loc => npc.startLevel === loc.level &&
+      approaches(loc).some(point => Math.max(Math.abs(npc.startX - point.x), Math.abs(npc.startZ - point.z)) <= 5 &&
+        map.isLineOfSight(loc.level, npc.startX, npc.startZ, point.x, point.z)))),
+    'the unchanged original owner placement can see an original legal interaction side');
+  });
+}
+test('dwarf_market_crafting: Nolar alone notices theft without a guard attack', () => {
+  const row = types.DbRowType.getByName('stealing_dwarf_crafting_stall');
+  const original = id('LocType', 'dwarf_market_crafting'), owner = id('NpcType', 'dwarf_city_shop_craft');
+  assert.deepEqual(Array.from({ length: row.columnValues[2].length }, (_, index) => row.getValue(2, index)[0]),
+    [1, 2, 3, 4].map(index => id('NpcType', `dwarf_city_black_guard${index}`)));
+  const { p, loc, xp: before } = fixture(row, placements.filter(loc => loc.type === original), 5, true,
+    watching => watching.every(npc => npc.type === owner));
+  const watching = catchers(row, p, p.level);
+  assert(watching.length && watching.every(npc => npc.type === owner));
+  execute(p, loc);
+  assert.equal(p.stats[PlayerStat.THIEVING], before);
+  assert.equal(snapshot(p).filter(Boolean).length, 0);
+  assert.equal(loc.type, original);
+  assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), 0);
+  assert(watching.every(npc => npc.getVar(id('VarNpcType', 'npc_aggressive_player')) !== p.uid),
+    'the non-combat owner path does not make Nolar retaliate');
+});
 for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profiles) {
   const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
   assert(row, `missing compiled ${kind} row`);

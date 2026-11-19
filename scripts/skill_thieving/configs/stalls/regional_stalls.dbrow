@@ -96,6 +96,9 @@ data=empty,dwarf_market_empty_stall
 [stealing_dwarf_crafting_stall]
 table=stealing
 data=loc,dwarf_market_crafting
+// CANDIDATE: operator, 19 November 2026: all except Ape Atoll should have owners.
+// Period Tip.It names only "Monkey Archers, Black Guards"; the owner is not VERIFIED.
+data=owner,dwarf_city_shop_craft
 data=guard,dwarf_city_black_guard1
 data=guard,dwarf_city_black_guard2
 data=guard,dwarf_city_black_guard3
@@ -112,7 +115,7 @@ data=empty,dwarf_market_empty_stall
 
 // VERIFIED catcher kinds: period Tip.It's per-stall "NPCs to elude" column.
 // Ape Crafting/General/Magic/Scimitar name Monkey Archers; Food names None.
-// Keldagrim Crafting names Black Guards, not the shop owner.
+// Keldagrim's candidate owner is retained separately above by operator decision.
 // CANDIDATE quantities/odds and bamboo-desk empty form: checked OSRS history.
 [stealing_monkey_crafting_stall]
 table=stealing
