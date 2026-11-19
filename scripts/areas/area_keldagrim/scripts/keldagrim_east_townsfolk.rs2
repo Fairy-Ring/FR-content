@@ -13,6 +13,7 @@
 ~chatplayer("<p,neutral>I'll leave you alone then.");
 
 [opnpc1,dwarf_city_dwarf_man1]
+// UNKNOWN engineering: select the sourced chores variant, not the sourced at-home variant.
 ~chatnpc("<p,neutral>Sorry, I'm busy!");
 
 [opnpc1,dwarf_city_dwarf_man2]
@@ -89,7 +90,6 @@ if ($choice = 2) {
 
 [proc,keldagrim_drunken_dwarf_talk]
 if (testbit(%ordinary_dialogue_bits, ^keldagrim_drunken_dwarf_talked) = ^false) {
-    %ordinary_dialogue_bits = setbit(%ordinary_dialogue_bits, ^keldagrim_drunken_dwarf_talked);
     ~chatplayer("<p,neutral>Hello there! Are you alright?");
     ~chatnpc("<p,neutral>Of courshe! Why why why *hic* why shouldn't I be?");
     ~chatplayer("<p,neutral>Hey, you look vaguely familiar... haven't I seen you somewhere before?");
@@ -105,6 +105,8 @@ if (testbit(%ordinary_dialogue_bits, ^keldagrim_drunken_dwarf_talked) = ^false) 
     ~chatnpc("<p,neutral>When you eatsh them, they take over your mind, they do! An army of mindlesh kebab eating dwarvesh!");
     ~chatplayer("<p,neutral>Er, yes, well, I think I should be off now.");
     ~chatnpc("<p,neutral>THE KEBABSH WILL COME FOR YOU!");
+    %ordinary_dialogue_bits = setbit(%ordinary_dialogue_bits, ^keldagrim_drunken_dwarf_talked);
+    // UNKNOWN engineering: remember only a completed initial conversation, so closing it cannot lose it.
 }
 else {
     ~chatplayer("<p,neutral>Hello there! Are you alright?");
@@ -121,8 +123,9 @@ else {
     ~chatnpc("<p,neutral>THE KEBABSH WILL COME FOR YOU!");
 }
 
+// CANDIDATE: Transcript:Smokin' Joe 14429469, before the 26 June 2024 Ratcatchers rewrite.
 [opnpc1,vc_smokin_joe]
 ~chatplayer("<p,neutral>Hello!");
-~chatplayer("<p,neutral>Hello?");
 ~chatplayer("<p,neutral>Hey!");
-~mesbox("Smokin' Joe ignores you.");
+~chatplayer("<p,neutral>Yo, shortstuff!");
+~mesbox("Despite your wild articulations and gesticulations you fail to catch Joe's attention.");
