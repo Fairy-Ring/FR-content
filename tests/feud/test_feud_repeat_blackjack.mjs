@@ -380,6 +380,8 @@ test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outco
   tickThrough(deadline);
   assert.equal(target.getVar(stateVar), 0, 'the Bandit wakes through the bounded NPC queue');
 
+  assert.equal(findTarget(p, 'feud_arabian_guard2_multi', npc => npc === target && !hasWitness(p, npc)), target,
+    'the same original Bandit is naturally unwitnessed before testing random KO failure');
   const relure = operate(p, target, 4);
   assert.equal(relure.trigger, nativeNpcTriggerName(p, target, 4));
   const beforeFailure = {
