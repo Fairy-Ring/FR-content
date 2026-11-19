@@ -32,9 +32,11 @@ const actors = name => {
   return found;
 };
 const witnessRadius = 5; // ^feud_villager_witness_radius in the native Feud constants.
-const shortStateTicks = Number(/^\^feud_villager_short_state_ticks\s*=\s*(\d+)$/m.exec(
-  readFileSync(path.join(contentRoot, 'scripts/quests/quest_feud/configs/feud_blackjack.constant'), 'utf8'))?.[1]);
-assert(Number.isInteger(shortStateTicks) && shortStateTicks > 0, 'the checked-out tree names its transient window');
+const transientConstants = readFileSync(path.join(contentRoot, 'scripts/quests/quest_feud/configs/feud_blackjack.constant'), 'utf8');
+const distractionTicks = Number(/^\^feud_villager_distraction_ticks\s*=\s*(\d+)$/m.exec(transientConstants)?.[1]);
+const knockoutTicks = Number(/^\^feud_villager_knockout_ticks\s*=\s*(\d+)$/m.exec(transientConstants)?.[1]);
+assert(Number.isInteger(distractionTicks) && distractionTicks > 0, 'the checked-out tree names its distraction window');
+assert(Number.isInteger(knockoutTicks) && knockoutTicks > 0, 'the checked-out tree names its knockout window');
 const animalTypes = new Set(['feud_camel', 'feud_charmers_snake', 'feud_desert_snake', 'magic_carpet_monkey']
   .map(name => id('NpcType', name)));
 function displayNpcType(p, npc) {
@@ -387,5 +389,5 @@ function relog(p, session = p) {
 export {
   activeLoc, actors, begin, bit, buyBeers, buyReceipts, deliver, displayNpcType, drink, finish, gangMask, hasWitness,
   isWitness, locs, nativeNpcTriggerName, openOriginalVillagerCurtain, operate, operateHere, operateLoc,
-  operationOffsets, operationStand, read, relog, shortStateTicks, stage, stand, talk, wield
+  distractionTicks, knockoutTicks, operationOffsets, operationStand, read, relog, stage, stand, talk, wield
 };

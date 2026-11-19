@@ -7,7 +7,7 @@ import {
 import { player } from './player.mjs';
 import {
   actors, bit, displayNpcType, hasWitness, isWitness, openOriginalVillagerCurtain, operate, operateHere,
-  operationStand, read, shortStateTicks, stage, talk, wield, worldTick
+  distractionTicks, knockoutTicks, operationStand, read, stage, talk, wield, worldTick
 } from './fixture.mjs';
 import { followToSeclusion } from './follow.mjs';
 
@@ -469,7 +469,7 @@ test('the original distracted Villager turn returns at clock 109 with deadline 1
   openOriginalVillagerCurtain(p);
   // Test-only clock anchor. Two real account actions expose a stale queued timeout
   // without injecting requests: the old implementation kept the first owner's queue.
-  World.currentTick = 107 - shortStateTicks;
+  World.currentTick = 107 - distractionTicks;
   const tracked = new Set();
   let target;
   countedWorldTick(tracked, () => {
@@ -478,15 +478,15 @@ test('the original distracted Villager turn returns at clock 109 with deadline 1
     assert(target);
     tracked.add(target);
   });
-  assert.equal(World.currentTick, 108 - shortStateTicks);
+  assert.equal(World.currentTick, 108 - distractionTicks);
   nativeLogout(previousOwner, () => countedWorldTick(tracked));
-  assert.equal(World.currentTick, 109 - shortStateTicks);
+  assert.equal(World.currentTick, 109 - distractionTicks);
   assert.equal(target.getVar(stateVar), 0, 'ordinary logout releases the first earned distraction');
   countedWorldTick(tracked, () => {
     talk(p, 'feud_street_urchin');
     assert.equal(owned(p)[0], target, 'the second real conversation selects the same original placement');
   });
-  assert.equal(World.currentTick, 110 - shortStateTicks);
+  assert.equal(World.currentTick, 110 - distractionTicks);
   assert.equal(stage(p), 8);
   assert.equal(target.getVar(stateVar), 1);
   assert.equal(target.getVar(deadlineVar), 110);
@@ -501,22 +501,22 @@ test('the original distracted Villager turn returns at clock 109 with deadline 1
   assert.equal([...target.queue.all()].length, 0);
 });
 
-test(`a native KO input at clock ${110 - shortStateTicks} returns at clock 109 with deadline 110 instead of spinning`, () => {
+test(`a native KO input at clock ${110 - knockoutTicks} returns at clock 109 with deadline 110 instead of spinning`, () => {
   const p = repeatFixture();
   const target = attackableTarget(p, 'feud_arabian_guard2_multi', true);
   assert(target, 'an original unwitnessed Bandit41 placement is available');
   // Test-only clock anchor; the following Lure and real input create all NPC state.
-  World.currentTick = 109 - shortStateTicks;
+  World.currentTick = 109 - knockoutTicks;
   const tracked = new Set([target]);
   const initialTimer = target.timerInterval;
   attackableLure(p, target);
-  assert.equal(World.currentTick, 109 - shortStateTicks);
+  assert.equal(World.currentTick, 109 - knockoutTicks);
 
   let deadline;
   countedWorldTick(tracked, () => { deadline = dispatchSynchronousKnockOut(p, target); },
     ({ npc }) => assertAttackableQueueBound(npc));
-  assert.equal(World.currentTick, 110 - shortStateTicks, 'the real synchronous input precedes its native NPC phase');
-  assert.equal(deadline, 110, 'the compiled shared KO window is anchored at its real input');
+  assert.equal(World.currentTick, 110 - knockoutTicks, 'the real synchronous input precedes its native NPC phase');
+  assert.equal(deadline, 110, 'the compiled independent KO window is anchored at its real input');
   const expected = resultSnapshot(p);
 
   let callbacksAt109 = null;
@@ -701,7 +701,7 @@ test('an earned Villager form change preserves the new timer through the old dis
 });
 
 test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lure/KO', () => {
-  assert(shortStateTicks <= 20, 'the shared duration remains within the approved timing bound');
+  assert.equal(knockoutTicks, 8, 'the independent knockout duration remains unchanged');
   for (const [name, initialHp, visibleForm] of [
     ['feud_arabian_guard2_multi', 30, 'feud_arabian_guard2_2'],
     ['feud_egyptian_doorman_multi', 60, 'feud_egyptian_doorman_2']
@@ -804,7 +804,7 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assert.equal(followingHit.before.hp - followingHit.after.hp, 4);
 
     let nextPoisonTick = nextNpcTimerTick(target);
-    while (nextPoisonTick - World.currentTick <= shortStateTicks) {
+    while (nextPoisonTick - World.currentTick <= knockoutTicks) {
       boundedTicksThrough(tracked, nextPoisonTick, null, observeQueueAndPoison);
       const nextHit = events.find(event => event.tick === nextPoisonTick &&
         event.before.poison > event.after.poison && event.before.state === 2 && event.after.state === 2);
@@ -816,11 +816,11 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assert.equal(nextPoisonTick - followingHit.tick, poisonTimerTicks,
       'the next native poison callback remains exactly 30 ticks after the preceding hit');
 
-    const koInputTick = nextPoisonTick - shortStateTicks;
+    const koInputTick = nextPoisonTick - knockoutTicks;
     assert(koInputTick > World.currentTick);
     boundedTicksThrough(tracked, koInputTick - 1, null, observeQueueAndPoison);
     assert.equal(target.getVar(stateVar), 2);
-    assert.equal(target.timerClock, poisonTimerTicks - shortStateTicks - 1);
+    assert.equal(target.timerClock, poisonTimerTicks - knockoutTicks - 1);
 
     let koDeadline;
     countedWorldTick(tracked, () => {
@@ -838,7 +838,7 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assertAttackableQueueBound(target);
     assert.equal(koDeadline, nextPoisonTick,
       'the checked-out Feud duration aligns the KO deadline with the next native poison tick');
-    assert.equal(target.timerClock, poisonTimerTicks - shortStateTicks);
+    assert.equal(target.timerClock, poisonTimerTicks - knockoutTicks);
     assert.equal(target.getVar(poisonVar), followingHit.after.poison,
       'Lure and Knock-Out do not reseed native poison');
 

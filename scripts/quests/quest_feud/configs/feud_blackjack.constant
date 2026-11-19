@@ -16,9 +16,13 @@
 ^feud_villager_ko_success_low = 180
 ^feud_villager_ko_success_high = 240
 
-// UNKNOWN engineering choice: the closest available transient NPC action window is the
-// ordinary-man pickpocket stun (8 ticks), not a Feud distraction or unconscious duration.
-^feud_villager_short_state_ticks = 8
+// UNKNOWN FEUD-KNOCKOUT-WINDOW-01: the ordinary-man player stun supplies an
+// eight-tick engineering precedent, not an authenticated Feud NPC wake duration.
+^feud_villager_knockout_ticks = 8
+
+// UNKNOWN FEUD-DISTRACTION-WINDOW-01: the theft window is a separate engineering
+// choice, not an authenticated duration or the rule for an unconscious NPC.
+^feud_villager_distraction_ticks = 8
 
 // UNKNOWN FEUD-TIMEOUT-REARM-01: native same-pass-safe queue delay, not a game duration.
 // Main approved remaining=1 using this minimum, making cleanup at most one tick late.

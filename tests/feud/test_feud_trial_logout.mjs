@@ -7,8 +7,8 @@ import {
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  actors, bit, displayNpcType, hasWitness, openOriginalVillagerCurtain, operate, operationStand, read,
-  shortStateTicks, stage, stand, talk, tickThrough, wield, worldTick
+  actors, bit, distractionTicks, displayNpcType, hasWitness, knockoutTicks, openOriginalVillagerCurtain,
+  operate, operationStand, read, stage, stand, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
@@ -163,6 +163,9 @@ function knockOut(p, target) {
   JavaRandom.nextDouble = () => 0;
   try { operate(p, target, 5); } finally { JavaRandom.nextDouble = previous; }
   assert.equal(stage(p), 11);
+  assert.equal(knockoutTicks, 8, 'the constant split preserves the original eight-tick engineering knockout');
+  assert.equal(target.getVar(deadlineVar), World.currentTick + knockoutTicks,
+    'the compiled villager knockout uses its own unchanged window');
   assert.equal(target.getVar(stateVar), 3);
   assert.equal(owned(p).length, 1);
   assert.equal(count(p, 'coins'), before.coins);
@@ -210,19 +213,19 @@ test('the distraction window starts only after the final native Continue, howeve
   const observer = trialFixture(), p = trialFixture(), target = reachDistractionPage(p);
   const before = trialResult(p), page = p.activeScript;
   assert.equal(hints(p).length, 0, 'the reserved page does not show an active-distraction cue');
-  for (let held = 0; held <= shortStateTicks * 2; held++) {
+  for (let held = 0; held <= distractionTicks * 2; held++) {
     assert.equal(target.getVar(stateVar), 1, 'the pending reservation survives every paused turn');
     assert.equal(target.getVar(ownerVar), p.uid);
     assert.equal(target.getVar(deadlineVar), 0, 'a paused page has no active theft deadline');
     assert.equal(target.timerInterval, 1, 'one existing native timer owns cleanup');
     assert.equal([...target.queue.all()].length, 0, 'holding the page never appends a callback');
     assert.equal(p.activeScript, page, 'native turns preserve the same paused continuation');
-    if (held < shortStateTicks * 2) worldTick();
+    if (held < distractionTicks * 2) worldTick();
   }
   assert.deepEqual(trialResult(p), before, 'reading the page changes no checkpoint, money, item or XP');
   resumeDialogue(p);
   assert.equal(stage(p), 8);
-  assert.equal(target.getVar(deadlineVar), World.currentTick + shortStateTicks,
+  assert.equal(target.getVar(deadlineVar), World.currentTick + distractionTicks,
     'Continue arms the complete checked-out-tree window on its own turn');
   assertHint(p, target);
   assert.equal(hints(observer).length, 0, 'another player receives neither the target hint nor its changes');

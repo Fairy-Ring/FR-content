@@ -48,7 +48,7 @@ if (stat_random(thieving, ^feud_villager_ko_success_low, ^feud_villager_ko_succe
 }
 %feud_villager_state = ^feud_villager_state_unconscious;
 %feud_villager_owner = uid;
-%feud_villager_deadline = calc(map_clock + ^feud_villager_short_state_ticks);
+%feud_villager_deadline = calc(map_clock + ^feud_villager_knockout_ticks);
 %npc_attacking_uid = null;
 npc_walk(npc_coord);
 npc_setmode(none);
