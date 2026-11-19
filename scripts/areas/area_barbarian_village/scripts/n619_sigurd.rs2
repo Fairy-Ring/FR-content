@@ -25,7 +25,7 @@
 
 [label,n619_sigurd_teach]
 ~chatplayer("<p,neutral>Can you teach me about canoes?");
-if (stat_base(woodcutting) < 12) {
+if (stat(woodcutting) < 12) {
     ~chatnpc("<p,neutral>Well, you don't look like you have the skill to make a canoe.");
     ~chatnpc("<p,neutral>You need to have at least level 12 woodcutting.");
     ~chatnpc("<p,neutral>Once you are able to make a canoe it makes travel along the river much quicker!");
@@ -33,12 +33,12 @@ if (stat_base(woodcutting) < 12) {
 }
 ~chatnpc("<p,neutral>It's really quite simple. Just walk down to that tree on the bank and chop it down.");
 ~chatnpc("<p,neutral>Then take your axe to it and shape it how you like!");
-if (stat_base(woodcutting) < 27) {
+if (stat(woodcutting) < 27) {
     ~chatnpc("<p,neutral>You can make a log canoe like mine! It'll get you 1 stop down the river.");
     ~chatnpc("<p,neutral>There's some snooty fella down near the Champions Guild who reckons his canoes are better than mine. He's never said it to my face though.");
-} else if (stat_base(woodcutting) < 42) {
+} else if (stat(woodcutting) < 42) {
     ~chatnpc("<p,neutral>You could make a Dugout canoe with your woodcutting skill, but I don't see why you would want to.");
-} else if (stat_base(woodcutting) < 57) {
+} else if (stat(woodcutting) < 57) {
     ~chatnpc("<p,neutral>Well, you're pretty handy with an axe!");
     ~chatnpc("<p,neutral>You could make Stable Dugout canoes, like that snooty fella Tarquin.");
     ~chatnpc("<p,neutral>He reckons his canoes are better than mine. He's never said it to my face though.");

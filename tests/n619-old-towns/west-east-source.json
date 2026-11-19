@@ -16,9 +16,12 @@
     { "name": "master_crafter_3" },
     { "name": "falador_gardener" },
     { "name": "salesman_ranging" },
-    { "name": "rimmington_hengel" },
+    { "name": "rimmington_hengel", "nearbyNpcs": ["rimmington_anja"], "overheadWhen": "I've come to kill you.", "overheads": { "Hengel": "Aaaarrgh!", "Anja": "Eeeek!" } },
     {
       "name": "rimmington_anja",
+      "nearbyNpcs": ["rimmington_hengel"],
+      "overheadWhen": "I've come to kill you.",
+      "overheads": { "Hengel": "Aaaarrgh!", "Anja": "Eeeek!" },
       "randomReplies": 16,
       "randomRoute": [2],
       "rewards": [
@@ -35,6 +38,14 @@
     { "name": "canoeing_tarquin", "woodcutting": 56 },
     { "name": "canoeing_tarquin", "woodcutting": 57 },
     { "name": "canoeing_tarquin", "woodcutting": 99 },
+    { "name": "canoeing_tarquin", "woodcutting": 11, "currentWoodcutting": 12, "advice": "Unfortunately, you don't have the skill to create anything more than one of those logs." },
+    { "name": "canoeing_tarquin", "woodcutting": 26, "currentWoodcutting": 27, "advice": "I'm sure you can build a Dugout canoe." },
+    { "name": "canoeing_tarquin", "woodcutting": 41, "currentWoodcutting": 42, "advice": "You can make a Stable Dugout canoe!" },
+    { "name": "canoeing_tarquin", "woodcutting": 56, "currentWoodcutting": 57, "advice": "You seem to be able to make a Waka!" },
+    { "name": "canoeing_tarquin", "woodcutting": 12, "currentWoodcutting": 11, "advice": "You need to have at least level 12 woodcutting." },
+    { "name": "canoeing_tarquin", "woodcutting": 27, "currentWoodcutting": 26, "advice": "Unfortunately, you don't have the skill to create anything more than one of those logs." },
+    { "name": "canoeing_tarquin", "woodcutting": 42, "currentWoodcutting": 41, "advice": "I'm sure you can build a Dugout canoe." },
+    { "name": "canoeing_tarquin", "woodcutting": 57, "currentWoodcutting": 56, "advice": "You can make a Stable Dugout canoe!" },
     { "name": "vc_pox" },
     { "name": "vc_hooknosed_jack" }
   ],
@@ -185,9 +196,15 @@
     "Yes",
     "No"
   ],
-  "npcSpeakers": {
-    "Aaaarrgh!": "Hengel",
-    "Eeeek!": "Anja"
+  "presentations": {
+    "Aaaarrgh!": { "kind": "overhead", "speaker": "npc", "name": "Hengel" },
+    "Eeeek!": { "kind": "overhead", "speaker": "npc", "name": "Anja" }
+  },
+  "expressions": {
+    "Welcome to the Mining Guild. Can I help you with anything?": "happy",
+    "Yeah?": "confused",
+    "Whassup?": "confused",
+    "Dude, do I look like I wanna talk to you?": "confused"
   },
   "labels": [
     "n619_mguild_guard",
@@ -197,7 +214,7 @@
     "n619_tarquin_teach",
     "tan_leather_choices"
   ],
-  "expectedConversations": 133,
+  "expectedConversations": 157,
   "expectedShopOpens": 1,
   "expectedTannerOpens": 4,
   "shopTitles": ["Brian's Archery Supplies."]

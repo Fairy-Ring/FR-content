@@ -51,5 +51,10 @@
     "n619_alkharid_ugthanki",
     "n619_alkharid_magic_carpet_monkey"
   ],
+  "presentations": {
+    "The camel tries to stamp on your foot, but you pull it back quickly.": { "kind": "message", "speaker": "game" },
+    "The camel turns its head and glares at you.": { "kind": "message", "speaker": "game" },
+    "The camel spits at you, and you jump back hurriedly.": { "kind": "message", "speaker": "game" }
+  },
   "expectedConversations": 49
 }

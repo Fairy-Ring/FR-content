@@ -15,8 +15,9 @@ if ($option = 1) {
     ~chatnpc("<p,angry>No, I jolly well wouldn't! Get out of my house!");
     ~chatplayer("<p,angry>Meanie!");
 } else {
-    ~chatnpc("<p,shock>Aaaarrgh!");
-    ~chatnpc_specific("Anja", rimmington_anja, "<p,shock>Eeeek!");
+    npc_say("Aaaarrgh!");
+    // UNKNOWN engineering search radius, following lady_keli.rs2's nearby-speaker pattern.
+    if (npc_find(coord, rimmington_anja, 7, 0) = true) npc_say("Eeeek!");
 }
 
 [opnpc1,rimmington_anja]
@@ -38,7 +39,7 @@ if ($option = 1) {
     }
 } else if ($option = 2) {
     ~chatplayer("<p,neutral>I was hoping you'd give me some free stuff.");
-    def_int $reply = random(4);
+    def_int $reply = random(4); // UNKNOWN engineering uniform reply weights.
     if ($reply = 0) {
         ~chatnpc("<p,quiz>Do you REALLY need it?");
     } else if ($reply = 1) {
@@ -48,7 +49,7 @@ if ($option = 1) {
     } else {
         ~chatnpc("<p,quiz>I don't know...");
     }
-    def_int $plea = random(4);
+    def_int $plea = random(4); // UNKNOWN engineering independent uniform plea weights.
     if ($plea = 0) {
         ~chatplayer("<p,happy>(beg beg beg beg beg beg)");
     } else if ($plea = 1) {
@@ -59,8 +60,9 @@ if ($option = 1) {
         ~chatplayer("<p,happy>Pwetty pleathe wiv thugar on top!");
     }
     ~chatnpc("<p,happy>Oh, alright. Here you go.");
-    inv_add(inv, coins, calc(random(3) + 1));
+    inv_add(inv, coins, calc(random(3) + 1)); // UNKNOWN engineering uniform weights within the sourced 1-3 range.
 } else {
-    ~chatnpc("<p,shock>Eeeek!");
-    ~chatnpc_specific("Hengel", rimmington_hengel, "<p,shock>Aaaarrgh!");
+    npc_say("Eeeek!");
+    // UNKNOWN engineering search radius, following lady_keli.rs2's nearby-speaker pattern.
+    if (npc_find(coord, rimmington_hengel, 7, 0) = true) npc_say("Aaaarrgh!");
 }

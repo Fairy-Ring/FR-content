@@ -18,6 +18,8 @@ const JavaRandom = await load('util/JavaRandom.ts');
 const ResumePauseButtonHandler = await load('network/game/client/handler/ResumePauseButtonHandler.ts');
 const ResumePauseButton = await load('network/game/client/model/ResumePauseButton.ts');
 const IfSetText = await load('network/game/server/model/IfSetText.ts');
+const MessageGame = await load('network/game/server/model/MessageGame.ts');
+const IfSetAnim = await load('network/game/server/model/IfSetAnim.ts');
 const { EntityLifeCycle } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/EntityLifeCycle.ts')).href);
 const { BlockWalk } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/BlockWalk.ts')).href);
 const { NpcModeMap } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NpcMode.ts')).href);
@@ -70,16 +72,22 @@ function serviceResult(packets, player) {
 }
 function pages(packets) {
   const result = [];
-  let current;
+  let current, animation;
   const finish = () => { if (current) result.push(current); current = null; };
   for (const packet of packets) {
+    if (packet instanceof MessageGame) {
+      finish(); result.push({ kind: 'message', speaker: 'game', lines: [packet.msg] }); continue;
+    }
+    if (packet instanceof IfSetAnim && /^(npcchat|chat)[1-4]:com_0$/.test(Component.get(packet.component)?.comName)) {
+      animation = packet.seq; continue;
+    }
     if (!(packet instanceof IfSetText)) continue;
     const component = Component.get(packet.component)?.comName;
     if (component?.startsWith('tanner:') || component?.startsWith('shop_template:')) continue;
     let match = /^(npcchat|chat)([1-4]):com_([1-5])$/.exec(component);
     if (match) {
       if (+match[3] === 1) {
-        finish(); current = { kind: 'speech', speaker: match[1] === 'npcchat' ? 'npc' : 'player', name: packet.text, lines: [] };
+        finish(); current = { kind: 'speech', speaker: match[1] === 'npcchat' ? 'npc' : 'player', name: packet.text, animation, lines: [] };
       } else {
         assert.equal(current?.kind, 'speech', `speech without header: ${component}`);
         current.lines.push(packet.text);
@@ -117,6 +125,7 @@ function run(form, seed, choices, seenLabels) {
   if (form.woodcutting !== undefined) player.baseLevels[8] = player.levels[8] = form.woodcutting;
   if (form.mining !== undefined) player.baseLevels[14] = player.levels[14] = form.mining;
   if (form.crafting !== undefined) player.baseLevels[12] = player.levels[12] = form.crafting;
+  if (form.currentWoodcutting !== undefined) player.levels[8] = form.currentWoodcutting;
   if (form.gender !== undefined) player.gender = form.gender;
   for (const [name, value] of Object.entries(form.vars ?? {})) {
     const id = VarPlayerType.getId(name); assert(id >= 0, `missing varp ${name}`); player.setVar(id, value);
@@ -135,6 +144,28 @@ function run(form, seed, choices, seenLabels) {
   const op = form.op ?? 1;
   const option = op === 3 ? 'trade' : 'talk';
   assert(type.op[op - 1]?.toLowerCase().startsWith(option), `${form.name}: original ${option} option ${op}`);
+  const nearby = (form.nearbyNpcs ?? []).map((name, index) => {
+    const type = NpcType.getByName(name), tile = placements.get(type.id)?.[0];
+    assert(tile, `${name}: nearby speaker retains its map placement`);
+    const other = new Npc(tile.level, tile.x, tile.z, type.size, type.size, EntityLifeCycle.RESPAWN, index + 2, type.id, BlockWalk.NONE);
+    other.isActive = true; other.lastMovement = -100;
+    World.gameMap.getZone(tile.x, tile.z, tile.level).enter(other);
+    return other;
+  });
+  const finish = result => {
+    for (const speaker of [npc, ...nearby]) if (speaker.sayMessage) {
+      result.pages.push({ kind: 'overhead', speaker: 'npc', name: NpcType.get(speaker.type).name, lines: [speaker.sayMessage] });
+    }
+    for (const other of nearby) World.gameMap.getZone(other.x, other.z, other.level).leave(other);
+    if (result.done && selectedOptions.includes(form.overheadWhen)) {
+      const overheads = Object.fromEntries(result.pages.filter(page => page.kind === 'overhead').map(page => [page.name, page.lines.join(' ')]));
+      assert.deepEqual(overheads, form.overheads, `${form.name}: both sourced cries are native overhead speech`);
+    }
+    if (result.done && form.advice && result.pages.some(page => page.speaker === 'player' && /teach me about canoes\?/.test(normalize(page.lines.join(' '))))) {
+      assert(result.pages.some(page => normalize(page.lines?.join(' ') ?? '').includes(normalize(form.advice))), `${form.name}: advice follows current, not base, Woodcutting`);
+    }
+    return result;
+  };
   player.target = npc; player.targetOp = Trigger[`OPNPC${op}`] - 7;
   const script = player.getOpTrigger();
   assert(script, `${form.name}: visible form must dispatch through Player.getOpTrigger`);
@@ -174,7 +205,7 @@ function run(form, seed, choices, seenLabels) {
       }
       assert.deepEqual(heldAfter, expectedHeld, `${form.name}: only selected sourced item transfers change inventory`);
       assert.deepEqual(inventorySnapshot(player, 'worn'), wornBefore, 'conversation does not change equipment');
-      return { done: true, pages: pages(packets), service, rewards, consumed };
+      return finish({ done: true, pages: pages(packets), service, rewards, consumed });
     }
     if (state.execution === ScriptState.SUSPENDED) {
       World.currentTick = Math.max(World.currentTick + 1, player.delayedUntil);
@@ -183,8 +214,7 @@ function run(form, seed, choices, seenLabels) {
     assert.equal(state.execution, ScriptState.PAUSEBUTTON, `${form.name}: expected real dialogue pause`);
     const menu = Component.get(player.modalChat)?.comName;
     if (/^multi[2-5]$/.test(menu)) {
-      const count = Number(menu.slice(5));
-      if (choice === choices.length) return { done: false, count, pages: pages(packets) };
+      if (choice === choices.length) return finish({ done: false, count, pages: pages(packets) });
       const index = choices[choice++]; assert(index >= 1 && index <= count);
       selectedOptions.push(normalize(pages(packets).filter(page => page.kind === 'menu').at(-1).options[index - 1]));
       const component = Component.getId(`${menu}:com_${index}`);
@@ -213,10 +243,16 @@ for (const file of ['barbarian-draynor-source.json', 'alkharid-source.json', 'we
       } else {
         const text = normalize(page.lines.join(' '));
         assert(speech.some(line => line.includes(text)), `${file}: unsourced speech ${JSON.stringify(text)}`);
-        const expectedSpeaker = oracle.npcSpeakers?.[text];
-        if (expectedSpeaker) {
-          assert.equal(page.speaker, 'npc', `${file}: retained NPC speaker for ${text}`);
-          assert.equal(normalize(page.name), expectedSpeaker, `${file}: retained NPC name for ${text}`);
+        const presentation = oracle.presentations?.[text];
+        if (presentation) {
+          assert.equal(page.kind, presentation.kind, `${file}: retained output medium for ${text}`);
+          assert.equal(page.speaker, presentation.speaker, `${file}: retained speaker for ${text}`);
+          if (presentation.name) assert.equal(normalize(page.name), presentation.name, `${file}: retained NPC name for ${text}`);
+        }
+        const expression = oracle.expressions?.[text];
+        if (expression) {
+          const id = cfg.MesanimType.getId(expression); assert(id >= 0);
+          assert.equal(page.animation, cfg.MesanimType.get(id).len[page.lines.length - 1], `${file}: retained ${expression} expression for ${text}`);
         }
         emitted.push(text);
       }
@@ -250,15 +286,15 @@ for (const file of ['barbarian-draynor-source.json', 'alkharid-source.json', 'we
           conversations++;
           if (result.service) {
             const shop = result.service.name === 'shop_template';
-            assert.equal(form.name, shop ? 'salesman_ranging' : 'tanner', 'only the approved existing service caller');
-            const control = run({ name: shop ? 'salesman_ranging' : 'ellis_tanner', op: 3, inventory: form.inventory, expectedScript: shop ? '[opnpc3,_shop_keeper]' : '[opnpc3,ellis_tanner]' }, seed, [], new Set());
+            assert(shop ? ['salesman_ranging', 'seed_merchant'].includes(form.name) : form.name === 'tanner', 'only the approved existing service callers');
+            const control = run({ name: shop ? form.name : 'ellis_tanner', op: 3, inventory: form.inventory, expectedScript: shop ? '[opnpc3,_shop_keeper]' : '[opnpc3,ellis_tanner]' }, seed, [], new Set());
             assert(control.done && control.service, 'existing Trade service control opens');
             assert.deepEqual(result.service, control.service, 'new entry point emits the unchanged supported interface and session state');
             if (shop) {
               shopOpens++;
-              assert.equal(result.service.variables.shop, cfg.InvType.getId('salesman_ranging'));
+              assert.equal(result.service.variables.shop, cfg.InvType.getId(form.name === 'seed_merchant' ? 'seed_stall' : 'salesman_ranging'));
               const title = result.service.updates.find(packet => packet.component === Component.getId('shop_template:com_76'))?.text;
-              assert(oracle.shopTitles?.includes(title), 'retained Brian shop title');
+              assert(oracle.shopTitles?.includes(title), 'retained existing shop title');
             } else tannerOpens++;
           }
         }

@@ -16,7 +16,7 @@ if ($choice = 1) {
     return;
 }
 if ($choice = 2) {
-    def_int $insult = random(3);
+    def_int $insult = random(3); // UNKNOWN engineering uniform insult weights.
     if ($insult = 0) ~chatplayer("<p,neutral>If I go near that camel, it'll probably bite my hand off.");
     if ($insult = 1) ~chatplayer("<p,neutral>Mmm... looks like that camel would make a nice kebab.");
     if ($insult = 2) ~chatplayer("<p,neutral>I wonder if that camel has fleas...");
@@ -25,15 +25,15 @@ if ($choice = 2) {
 return;
 
 [label,n619_alkharid_ugthanki]
-def_int $insult = random(3);
+def_int $insult = random(3); // UNKNOWN engineering uniform insult weights.
 if ($insult = 0) ~chatplayer("<p,neutral>Mmm... looks like that camel would make a nice kebab.");
 if ($insult = 1) ~chatplayer("<p,neutral>If I go near that camel, it'll probably bite my hand off.");
 if ($insult = 2) ~chatplayer("<p,neutral>I wonder if that camel has fleas...");
 
-def_int $reaction = random(3);
-if ($reaction = 0) ~mesbox("The camel tries to stamp on your foot, but you pull it back quickly.");
-if ($reaction = 1) ~mesbox("The camel turns its head and glares at you.");
-if ($reaction = 2) ~mesbox("The camel spits at you, and you jump back hurriedly.");
+def_int $reaction = random(3); // UNKNOWN engineering independent uniform reaction weights.
+if ($reaction = 0) mes("The camel tries to stamp on your foot, but you pull it back quickly.");
+if ($reaction = 1) mes("The camel turns its head and glares at you.");
+if ($reaction = 2) mes("The camel spits at you, and you jump back hurriedly.");
 return;
 
 [label,n619_alkharid_magic_carpet_monkey]

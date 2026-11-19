@@ -4,7 +4,8 @@
     "Transcript:Hunding r14328533",
     "Transcript:Sigurd r14306126",
     "Transcript:Miss Schism r15095896",
-    "Transcript:Jail guard r15095892"
+    "Transcript:Jail guard r15095892",
+    "Transcript:Olivia r11220974 through r15124527"
   ],
   "forms": [
     {
@@ -163,6 +164,15 @@
       "op": 1,
       "woodcutting": 99
     },
+    { "name": "canoeing_sigurd", "woodcutting": 11, "currentWoodcutting": 12, "advice": "You can make a log canoe like mine!" },
+    { "name": "canoeing_sigurd", "woodcutting": 26, "currentWoodcutting": 27, "advice": "You could make a Dugout canoe with your woodcutting skill" },
+    { "name": "canoeing_sigurd", "woodcutting": 41, "currentWoodcutting": 42, "advice": "You could make Stable Dugout canoes" },
+    { "name": "canoeing_sigurd", "woodcutting": 56, "currentWoodcutting": 57, "advice": "you can make a Waka canoe." },
+    { "name": "canoeing_sigurd", "woodcutting": 12, "currentWoodcutting": 11, "advice": "You need to have at least level 12 woodcutting." },
+    { "name": "canoeing_sigurd", "woodcutting": 27, "currentWoodcutting": 26, "advice": "You can make a log canoe like mine!" },
+    { "name": "canoeing_sigurd", "woodcutting": 42, "currentWoodcutting": 41, "advice": "You could make a Dugout canoe with your woodcutting skill" },
+    { "name": "canoeing_sigurd", "woodcutting": 57, "currentWoodcutting": 56, "advice": "You could make Stable Dugout canoes" },
+    { "name": "seed_merchant" },
     {
       "name": "jailguard",
       "op": 1
@@ -185,6 +195,10 @@
     }
   ],
   "speech": [
+    "Would you like to trade in seeds?",
+    "No, thanks.",
+    "Where do I get rarer seeds from?",
+    "The Master Farmers usually carry a few rare seeds around with them, although I don't know if they'd want to part with them for any price to be honest.",
     "Wanna fight?",
     "Ah, you come for fight, ja?",
     "You look funny.",
@@ -271,6 +285,7 @@
     "Thanks, I appreciate that. Talking on duty can be punishable by having your mouth stitched up. These are tough people, no mistake."
   ],
   "options": [
+    "Where do I get rarer seeds from?",
     "Nothing much.",
     "I'm exploring.",
     "I came to kill you all!",
@@ -306,5 +321,7 @@
     "n619_schism_identity_options",
     "n619_schism_leave"
   ],
-  "expectedConversations": 149
+  "expectedConversations": 176,
+  "expectedShopOpens": 1,
+  "shopTitles": ["Draynor Seed Market."]
 }
