@@ -1,0 +1,19 @@
+// CANDIDATE: Transcript:Bookcase_(Wizards'_Tower), revision 14722281.
+// The source marks game message boxes, not a player/NPC speaker or a choice menu.
+[oploc1,fai_wiztower_bookcase] @ordinary_wizard_bookcase;
+[oploc1,fai_wiztower_bookcase_wall] @ordinary_wizard_bookcase;
+
+[label,ordinary_wizard_bookcase]
+p_arrivedelay;
+~mesbox("There's a large selection of books, the majority of which look fairly old. Some very strange names... You pick one at random :");
+switch_int (random(^ordinary_wizard_book_choices)) {
+    case 0 : ~mesbox("'The Dark Arts of Magical Wands'");
+    case 1 : ~mesbox("'So you think you're a Mage? Volume 28'");
+    case 2 : ~mesbox("'Living with a Wizard Husband - a Housewife's Story'");
+    case 3 : ~mesbox("'The Life & Times of a Thingummywut by Traiborn the Wizard'");
+    case 4 : ~mesbox("'Fire, Earth and Water - What's it all about?'");
+    case 5 : ~mesbox("'How to become the Ultimate Wizard of the Universe'");
+    case 6 : ~mesbox("'101 Ways to Impress Your Mates with Magic'");
+    case 7 : ~mesbox("'Wind Strike for Beginners'");
+}
+~mesbox("Interesting...");

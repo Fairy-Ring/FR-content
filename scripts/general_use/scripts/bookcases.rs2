@@ -8,6 +8,10 @@ switch_coord (loc_coord) {
     case default : @search_bookcase;
 }
 
+[oploc2,_bookcase]
+p_arrivedelay;
+@search_bookcase;
+
 [label,search_bookcase]
 mes("You search the bookcase...");
 p_delay(1);

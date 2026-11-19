@@ -36773,24 +36773,6 @@ recol3d=6340
 hillskew=yes
 active=no
 
-[ahoy_boxes_1]
-name=Boxes
-desc=A pile of boxes for storage.
-model=ahoy_boxes1
-recol1s=13639
-recol1d=5313
-recol2s=10468
-recol2d=8484
-recol3s=9411
-recol3d=7427
-recol4s=8354
-recol4d=6370
-recol5s=12582
-recol5d=4256
-recol6s=11525
-recol6d=4256
-blockrange=no
-op1=Search
 
 [ahoy_plant_1]
 name=Plant
@@ -61277,12 +61259,6 @@ model=sarim_anchor
 blockrange=no
 ambient=25
 
-[sarim_bookcase2]
-name=Bookcase
-desc=A case. With books.
-model=sarim_bookcase2
-op1=Search
-forceapproach=east
 
 [sarim_ship_chain]
 name=Chain
@@ -62128,35 +62104,8 @@ resizex=64
 resizey=64
 resizez=64
 
-[sarim_bookcase2_offset]
-name=Bookcase
-desc=A case. With books.
-model=sarim_bookcase2
-op1=Search
-forceapproach=east
-offsetx=0
-offsety=0
-offsetz=-16
 
-[sarim_bookcase2_offset_northfacing]
-name=Bookcase
-desc=A case. With books.
-model=sarim_bookcase2
-op1=Search
-forceapproach=east
-offsetx=0
-offsety=0
-offsetz=16
 
-[sarim_bookcase2_offset_westfacing]
-name=Bookcase
-desc=A case. With books.
-model=sarim_bookcase2
-op1=Search
-forceapproach=east
-offsetx=-16
-offsety=0
-offsetz=0
 
 [rimmington_artist_easil]
 name=Easel
@@ -62164,13 +62113,6 @@ desc=An artist's easel.
 model=rimmington_artist_easil
 ambient=20
 
-[bookcase_polybooks]
-name=Bookcase
-desc=A good source of books!
-model=bookcase_polybooks
-length=2
-op1=Search
-forceapproach=east
 
 [rimmington_makeovermage_bed]
 name=Bed
@@ -67163,44 +67105,7 @@ length=2
 ambient=15
 forceapproach=west
 
-[elid_crate]
-name=Crate
-desc=Cheaper than using a chest for storage.
-model=rd_large_crate
-recol1s=14695
-recol1d=13605
-recol2s=12615
-recol2d=12548
-recol3s=12581
-recol3d=11491
-recol4s=11524
-recol4d=10434
-recol5s=10467
-recol5d=9377
-recol6s=9410
-recol6d=8320
-blockrange=no
-ambient=60
-op1=Search
 
-[elid_crates]
-name=Crates
-desc=Produced by the Karamja Box Company.
-model=rd_large_crates
-recol1s=14695
-recol1d=13605
-recol2s=12615
-recol2d=12548
-recol3s=12581
-recol3d=11491
-recol4s=11524
-recol4d=10434
-recol5s=10467
-recol5d=9377
-recol6s=9410
-recol6d=8320
-ambient=60
-op1=Search
 
 [elid_boxes]
 name=Boxes
@@ -80229,47 +80134,7 @@ blockrange=no
 width=2
 blockrange=no
 
-[boxes_11744]
-name=Boxes
-desc=Small wooden boxes.
-model=ahoy_boxes1
-recol1s=13639
-recol1d=17865
-recol2s=12582
-recol2d=16808
-recol3s=11525
-recol3d=15751
-recol4s=10468
-recol4d=14694
-recol5s=9411
-recol5d=13637
-recol6s=8354
-recol6d=12580
-ambient=10
-op1=Search
 
-[crates_11745]
-name=Crates
-desc=Wooden crates.
-model=rd_small_crates
-recol1s=14695
-recol1d=17865
-recol2s=12615
-recol2d=16808
-recol3s=12581
-recol3d=15751
-recol4s=11524
-recol4d=14694
-recol5s=10467
-recol5d=13637
-recol6s=9410
-recol6d=12580
-ambient=10
-blockrange=no
-offsetx=-30
-offsety=0
-offsetz=0
-op1=Search
 
 [stool_11746]
 name=Stool
@@ -83947,24 +83812,6 @@ model=fairy_range
 length=2
 forceapproach=east
 
-[fairy_crates_small]
-name=Crate
-desc=For storage.
-model=rd_small_crates
-recol1s=14695
-recol1d=6272
-recol2s=12615
-recol2d=7329
-recol3s=12581
-recol3d=8386
-recol4s=11524
-recol4d=9443
-recol5s=10467
-recol5d=10500
-recol6s=9410
-recol6d=11557
-op1=Search
-ambient=15
 
 [fairy_crate_2]
 name=Crates
