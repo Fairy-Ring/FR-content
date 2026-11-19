@@ -9,7 +9,7 @@ import {
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  actors, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
+  actors, assertKnockoutCycle, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
   nativeNpcTriggerName, operate, operateHere, operationStand, read, stand, stage, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 import { followToSeclusion } from './follow.mjs';
@@ -224,8 +224,8 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   }
   const deadline = target.getVar(deadlineVar);
   assert(deadline > World.currentTick);
-  tickThrough(deadline);
-  assert.equal(target.getVar(stateVar), 0, 'the shared NPC queue wakes the unconscious target');
+  assertKnockoutCycle(target);
+  assert.equal(target.getVar(stateVar), 0, 'the NPC timer wakes the unconscious target');
   assert.equal(target.getVar(ownerVar), -1);
   assert.equal(target.getVar(deadlineVar), 0);
 
@@ -335,16 +335,18 @@ test('the purchased willow is usable and the Thug applies its period level and K
   withRandom(0, () => operateHere(p, thug, 5));
   assert.equal(thug.getVar(stateVar), 3);
   assert.equal(xp(p) - beforeKo, 200, 'the successful Thug KO awards period 20 XP');
+  const knockoutPosition = [thug.level, thug.x, thug.z];
 
   const beforePick = { coins: count(p, 'coins'), xp: xp(p) };
   for (let attempt = 1; attempt <= 2; attempt++) {
     withRandom(0, () => operateHere(p, thug, 3));
     assert.equal(count(p, 'coins') - beforePick.coins, 50 * attempt);
     assert.equal(xp(p) - beforePick.xp, 1375 * attempt, 'Thug normal-pick XP is retained while unconscious');
+    assert.deepEqual([thug.level, thug.x, thug.z], knockoutPosition, 'the Thug stays at its knockout tile during native picks');
   }
   const deadline = thug.getVar(deadlineVar);
   assert(deadline > World.currentTick);
-  tickThrough(deadline);
+  assertKnockoutCycle(thug);
   assert.equal(thug.getVar(stateVar), 0, 'the real Thug also wakes through the shared bounded queue');
   assert.equal(stage(p), 28);
 });
@@ -369,15 +371,17 @@ test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outco
   withRandom(0, () => operate(p, target, 5));
   assert.equal(target.getVar(stateVar), 3);
   assert.equal(xp(p) - beforeKo, 100, 'Bandit KO adds period 10 XP');
+  const knockoutPosition = [target.level, target.x, target.z];
   const beforePicks = { coins: count(p, 'coins'), xp: xp(p) };
   for (let attempt = 1; attempt <= 2; attempt++) {
     withRandom(0, () => operate(p, target, 3));
     assert.equal(count(p, 'coins') - beforePicks.coins, 40 * attempt);
     assert.equal(xp(p) - beforePicks.xp, 650 * attempt, 'each normal Bandit41 pick retains its period XP');
+    assert.deepEqual([target.level, target.x, target.z], knockoutPosition, 'the Bandit stays at its knockout tile during native picks');
   }
   const deadline = target.getVar(deadlineVar);
   assert(deadline > World.currentTick);
-  tickThrough(deadline);
+  assertKnockoutCycle(target);
   assert.equal(target.getVar(stateVar), 0, 'the Bandit wakes through the bounded NPC queue');
 
   assert.equal(findTarget(p, 'feud_arabian_guard2_multi', npc => npc === target && !hasWitness(p, npc)), target,

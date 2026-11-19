@@ -187,6 +187,28 @@ export function tickThrough(deadline) {
   assert.equal(World.currentTick, deadline, 'native world phases ran once through the exact deadline');
 }
 
+export function assertKnockoutCycle(npc) {
+  const state = id('VarNpcType', 'feud_villager_state');
+  const deadline = npc.getVar(id('VarNpcType', 'feud_villager_deadline'));
+  const position = tile(npc);
+  assert.equal(npc.getVar(state), 3, 'the native knockout produced the unconscious condition');
+  assert.equal(npc.targetOp, NpcMode.NONE, 'an unconscious NPC uses the published stationary mode');
+  while (World.currentTick + 1 < deadline) {
+    worldTick();
+    assert.equal(npc.getVar(state), 3, 'the NPC stays unconscious before its deadline');
+    assert.equal(npc.targetOp, NpcMode.NONE, 'native turns preserve stationary mode until wake');
+    assert.deepEqual(tile(npc), position, 'the unconscious NPC does not move on any native turn');
+  }
+  tickThrough(deadline);
+  assert.equal(npc.getVar(state), 0, 'the native wake callback runs even in stationary mode');
+  assert.equal(npc.targetOp, NpcMode.WANDER, 'wake restores the original wandering mode');
+  const wakePosition = tile(npc);
+  const movementWaitTicks = 512; // UNKNOWN fixture observation bound, not a gameplay timer.
+  let ticks = 0;
+  while (ticks++ < movementWaitTicks && tile(npc).every((value, index) => value === wakePosition[index])) worldTick();
+  assert.notDeepEqual(tile(npc), wakePosition, 'the original NPC resumes native movement after waking');
+}
+
 afterEach(() => {
   const stateVar = id('VarNpcType', 'feud_villager_state');
   const deadlineVar = id('VarNpcType', 'feud_villager_deadline');

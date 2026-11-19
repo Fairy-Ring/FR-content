@@ -6,7 +6,7 @@ import {
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  activeLoc, actors, begin, bit, buyReceipts, deliver, displayNpcType, drink, hasWitness, locs,
+  activeLoc, actors, assertKnockoutCycle, begin, bit, buyReceipts, deliver, displayNpcType, drink, hasWitness, locs,
   nativeNpcTriggerName, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, tickThrough, wield
 } from './fixture.mjs';
 
@@ -140,7 +140,7 @@ test('a real lured villager can be knocked out inside its original house with bo
   assert.equal(target.getVar(ownerVar), p.uid);
   assert.equal(p.stats[PlayerStat.THIEVING] - beforeXp, 80, 'the real success awards the one-time eight XP');
   assert.deepEqual(tile(p), beforeLurePosition, 'the KO also uses the actual unchanged interior position');
-  tickThrough(target.getVar(id('VarNpcType', 'feud_villager_deadline')));
+  assertKnockoutCycle(target);
   assert.equal(target.getVar(stateVar), 0, 'native wake cleanup releases the original villager for later cases');
 });
 
