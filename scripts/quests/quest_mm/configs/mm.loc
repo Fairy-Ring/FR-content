@@ -809,7 +809,6 @@ desc=Bamboo strips have been lashed together to make this rickety desk.
 model=table_bamboo
 
 [mm_bookcase]
-category=bookcase
 name=Bamboo Bookcase
 desc=It's a bookcase made out of bamboo.
 model=shelves_bamboo
