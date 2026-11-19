@@ -206,6 +206,18 @@ function discard(p) {
   delete World.players[p.pid];
 }
 
+function restore(saved) {
+  const p = player(saved);
+  // PlayerLoading derives a real name hash; the anonymous fixture's serial-only
+  // UID cannot resolve a loaded player's inventory listener through World.
+  const oldUid = p.uid;
+  p.uid = ((Number(p.username37 & 0x1fffffn) << 11) | p.pid) >>> 0;
+  for (const listener of p.invListeners) {
+    if (listener.source === oldUid) listener.source = p.uid;
+  }
+  return p;
+}
+
 const treatmentModes = [
   { bucket: 'bucket_compost', code: 1, xp: 180, diseaseDivisor: 2, extraLives: 1 },
   { bucket: 'bucket_supercompost', code: 2, xp: 260, diseaseDivisor: 5, extraLives: 2 },
@@ -236,20 +248,21 @@ test('bonus harvest lives use saved server-only varp state', () => {
   assert.equal(type.transmit, false);
 });
 
+const applicationMessages = {
+  allotment: ['You treat the allotment with compost.', 'You treat the allotment with supercompost.'],
+  flower: ['You treat the flower patch with compost.', 'You treat the flower patch with supercompost.'],
+  herb: ['You treat the herb patch with compost.', 'You treat the herb patch with supercompost.'],
+  hops: ['You treat the hops patch with compost.', 'You treat the hops patch with supercompost.'],
+};
+
 test('one operator-recalled template renders both treatments for all 20 patch fields', () => {
   // CANDIDATE: both verbatim operator answers are retained on 19 November 2026.
-  const messages = {
-    allotment: ['You treat the allotment with compost.', 'You treat the allotment with supercompost.'],
-    flower: ['You treat the flower patch with compost.', 'You treat the flower patch with supercompost.'],
-    herb: ['You treat the herb patch with compost.', 'You treat the herb patch with supercompost.'],
-    hops: ['You treat the hops patch with compost.', 'You treat the hops patch with supercompost.'],
-  };
   const p = fixture(groupSpecs[0].patchNames[0]);
   try {
     for (const group of groupSpecs) for (const patchName of group.patchNames) {
       for (const [modeIndex, mode] of treatmentModes.entries()) {
         assert.equal(proc(p, 'farming_soil_application_message', stageIndex(patchName), mode.code).popString(),
-          messages[group.family][modeIndex], `${patchName}/${mode.bucket} exact sourced wording`);
+          applicationMessages[group.family][modeIndex], `${patchName}/${mode.bucket} exact sourced wording`);
       }
     }
   } finally { discard(p); }
@@ -269,12 +282,15 @@ try {
       assertTreatmentState(p, EMPTY_TREATMENTS);
       const expected = EMPTY_TREATMENTS.slice();
       const inputCounts = new Map(treatmentModes.map(mode => [mode.bucket, 10]));
-      for (const patchName of allPatchNames) {
+      for (const group of groupSpecs) for (const patchName of group.patchNames) {
         const index = stageIndex(patchName);
         const mode = treatmentModes[index % treatmentModes.length];
         const beforeXp = farmingXp(p);
         const beforeEmpty = itemCount(p, 'bucket_empty');
+        const beforeMessages = p.messages.length;
         assert(useBucket(p, patchName, mode.bucket), `${patchName} accepts native item-on-loc compost`);
+        assert.deepEqual(p.messages.slice(beforeMessages), [applicationMessages[group.family][mode.code - 1]],
+          `${patchName} invokes exactly one recalled native game message`);
         assert.equal(getStage(p, patchName), 3, `${patchName} remains weeded`);
         inputCounts.set(mode.bucket, inputCounts.get(mode.bucket) - 1);
         assert.equal(itemCount(p, mode.bucket), inputCounts.get(mode.bucket), `${patchName} consumes one bucket`);
@@ -291,7 +307,7 @@ try {
       const expectedXp = 10 * treatmentModes.reduce((sum, mode) => sum + mode.xp, 0);
       assert.equal(farmingXp(p), expectedXp);
       const startXp = p.farmingStartXp;
-      loaded = player(p.save());
+      loaded = restore(p.save());
       loaded.farmingStartXp = startXp;
       assertTreatmentState(loaded, expected);
       for (const patchName of allPatchNames) assert.equal(getStage(loaded, patchName), 3);
@@ -455,7 +471,7 @@ try {
             minute = period + 5;
             p.setVar(id('VarPlayerType', 'farming_growth_minute'), period - 1);
             JavaRandom.setSeed(witness(128, draw));
-            proc(p, 'farming_reconcile', true);
+            proc(p, 'farming_reconcile', 1); // RuneScript booleans are integer arguments.
             const diseased = draw < threshold;
             const expectedStage = diseased
               ? group.family === 'herb' ? crop.diseased : crop.first + 1 + 128
@@ -491,7 +507,7 @@ try {
           const checkpoint = period - 1;
           assert(checkpoint > 0, 'offline catch-up starts from a positive saved checkpoint');
           p.setVar(id('VarPlayerType', 'farming_growth_minute'), checkpoint);
-          loaded = player(p.save());
+          loaded = restore(p.save());
           loaded.farmingStartXp = p.farmingStartXp;
           minute = period * 2 + 5;
           const threshold = Math.floor(20 / mode.divisor);
@@ -570,7 +586,7 @@ try {
         assert.equal(extra(p, index), mode.extraLives - 1, 'the failed life roll consumes one added life first');
         expectedExtras[index] = mode.extraLives - 1;
         assert.deepEqual(allExtras(p), expectedExtras, 'one added life is spent before base harvest life');
-        loaded = player(p.save());
+        loaded = restore(p.save());
         loaded.farmingStartXp = startXp;
         setPosition(loaded, patches.get(patchName));
         assert.equal(treatment(loaded, index), mode.code, 'treatment identity survives save/load');
@@ -660,7 +676,9 @@ try {
           assert(clickPatch(p, patchName), `${group.family} ${cropLabel[group.family](crop)} native harvest`);
           assert.equal(itemCount(p, itemName(crop.produce)), group.family === 'flower' ? crop.yield : 1);
           assert.equal(farmingXp(p), crop.harvest_xp);
-          const expectedStage = group.family === 'flower' ? 3 : crop.mature;
+          // The published potato path spends a base life deterministically.
+          const expectedStage = group.family === 'flower' ? 3
+            : crop.produce === id('ObjType', 'potato') ? crop.mature + 1 : crop.mature;
           assert.equal(getStage(p, patchName), expectedStage);
           assert.equal(treatment(p, stageIndex(patchName)), 0);
           assert.equal(extra(p, stageIndex(patchName)), 0);
