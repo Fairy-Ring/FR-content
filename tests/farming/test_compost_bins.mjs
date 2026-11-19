@@ -477,6 +477,37 @@ try {
     },
   ];
 
+  for (const batch of batches) {
+    test(`${batch.label}: a sixteenth input leaves the full bin and inventory unchanged`, () => {
+      const bin = batch.bin;
+      const p = fixture(bin);
+      const audits = [];
+      const audit = watchVarp511(p, audits);
+      try {
+        for (const [index, item] of batch.inputs.entries()) {
+          addAndUse(p, bin, item, inputState(batch.kind, index + 1), audits);
+        }
+        assert.equal(binState(p, bin), batchState(batch.kind).full);
+        const item = batch.inputs[0];
+        add(p, item);
+        const before = {
+          states: stateVector(p), inventory: inventoryIds(p), itemCount: count(p, item),
+          xp: farmingXp(p), writes: audit.writes.length,
+        };
+        nativeUse(p, bin, item);
+        assertStateVector(p, before.states, `${batch.label} sixteenth input preserves every bin byte`);
+        assert.deepEqual(inventoryIds(p), before.inventory, 'no item is exchanged');
+        assert.equal(count(p, item), before.itemCount, 'the extra ingredient is not consumed');
+        assert.equal(farmingXp(p), before.xp, 'the refused input grants no XP');
+        assert.equal(audit.writes.length, before.writes, 'the full bin is not written');
+        assertSafeVarp511Writes(audits);
+      } finally {
+        audit.close();
+        discard(p);
+      }
+    });
+  }
+
   function runFullBatch(batch, baseMinute) {
     const bin = batch.bin;
     const state = batchState(batch.kind);
