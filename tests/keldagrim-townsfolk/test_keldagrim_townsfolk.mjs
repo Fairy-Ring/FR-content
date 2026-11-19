@@ -9,6 +9,7 @@ import {
 } from '../regicide-travel/runtime.mjs';
 
 const JavaRandom = (await import(pathToFileURL(resolve(engine, 'src/util/JavaRandom.ts')).href)).default;
+const resolveNpcType = (await import(pathToFileURL(resolve(engine, 'src/engine/entity/resolveNpcType.ts')).href)).default;
 const { PlayerLoading } = await import(pathToFileURL(resolve(engine, 'src/engine/entity/PlayerLoading.ts')).href);
 const Packet = (await import(pathToFileURL(resolve(engine, 'src/io/Packet.ts')).href)).default;
 const ScriptProvider = (await import(pathToFileURL(resolve(engine, 'src/engine/script/ScriptProvider.ts')).href)).default;
@@ -82,7 +83,11 @@ function actor(row, scenario, branch) {
 
 function readPage(p, output) {
   const text = packets.get(p).filter(packet => packet instanceof IfSetText);
-  const rows = text.map(packet => ({ name: types.Component.get(packet.component).debugname, text: normal(packet.text, p), component: packet.component }));
+  const rows = text.map(packet => {
+    const name = types.Component.get(packet.component).comName;
+    assert.equal(typeof name, 'string', `mapped dialogue component ${packet.component}`);
+    return { name, text: normal(packet.text, p), component: packet.component };
+  });
   let npcName;
   const npcWords = output.npcTurns ? [] : null;
   for (const row of rows) {
@@ -127,6 +132,10 @@ function run(scenario, branch, existing = null) {
   npc.isActive = true; npc.lastMovement = -100;
   const p = existing ?? actor(row, scenario, branch);
   World.players[p.slot] = p;
+  const placedType = types.NpcType.get(row.id);
+  if (placedType.multivarp !== -1 || placedType.multivarbit !== -1) {
+    assert.equal(resolveNpcType(placedType, p).id, type.id, 'the original placed NPC exposes this visible form in the tested account state');
+  }
   const before = ['giantdwarf_quest', 'forget_quest', 'dwarfrock_quest'].map(name => p.getVarBit(id('VarBitType', name)));
   const ordinaryBefore = p.getVar(id('VarPlayerType', 'ordinary_dialogue_bits'));
   const toastInventory = scenario.npc === 'dwarf_city_dwarf_man6' ? p.getInventory(id('InvType', 'inv')) : null;

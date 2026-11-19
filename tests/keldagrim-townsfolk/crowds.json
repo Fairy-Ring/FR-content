@@ -136,6 +136,7 @@
     },
     {
       "npc": "dwarf_city_gnome_emissary",
+      "placedNpc": "dwarf_city_gnome_emissary_multi",
       "state": "giantdwarf-1",
       "vars": {"giantdwarf_quest": 1},
       "allowed": {
@@ -150,6 +151,7 @@
     },
     {
       "npc": "dwarf_city_gnome_male_emissary",
+      "placedNpc": "dwarf_city_gnome_male_emissary_multi",
       "state": "giantdwarf-1",
       "vars": {"giantdwarf_quest": 1},
       "allowed": {
@@ -164,6 +166,7 @@
     },
     {
       "npc": "dwarf_city_gnome_female_emissary",
+      "placedNpc": "dwarf_city_gnome_female_emissary_multi",
       "state": "giantdwarf-1",
       "vars": {"giantdwarf_quest": 1},
       "allowed": {
@@ -472,6 +475,7 @@
     },
     {
       "npc": "dwarf_city_gnome_emissary",
+      "placedNpc": "dwarf_city_gnome_emissary_multi",
       "state": "giantdwarf-2",
       "vars": {"giantdwarf_quest": 2},
       "allowed": {
@@ -486,6 +490,7 @@
     },
     {
       "npc": "dwarf_city_gnome_male_emissary",
+      "placedNpc": "dwarf_city_gnome_male_emissary_multi",
       "state": "giantdwarf-2",
       "vars": {"giantdwarf_quest": 2},
       "allowed": {
@@ -500,6 +505,7 @@
     },
     {
       "npc": "dwarf_city_gnome_female_emissary",
+      "placedNpc": "dwarf_city_gnome_female_emissary_multi",
       "state": "giantdwarf-2",
       "vars": {"giantdwarf_quest": 2},
       "allowed": {
