@@ -4,8 +4,9 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { finish } from './fixture.mjs';
 import {
-  CollisionType, ScriptState, World, contentRoot, engineModule, id, map, player, tile, types
+  CollisionType, ScriptState, World, contentRoot, engineModule, id, map, tile, types
 } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const { default: OpLoc } = await engineModule('network/game/client/model/OpLoc.ts');

@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { button, count, held, id, inv, obj, player, remove, seed, use, worn } from '../swamp-caves/runtime.mjs';
+import { button, count, held, id, inv, obj, remove, seed, use, worn } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 import { bit, finish, locs, operateLoc, read, relog, stage } from './fixture.mjs';
 
 const set = (p, name, value) => p.setVarBit(bit(name), value);

@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  PlayerStat, World, count, engineModule, id, inv, obj, player, remove, seed
+  PlayerStat, World, count, engineModule, id, inv, obj, remove, seed
 } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 import {
   actors, begin, bit, buyReceipts, deliver, drink, hasWitness, nativeNpcTriggerName, operate,
   read, relog, stage, talk, wield

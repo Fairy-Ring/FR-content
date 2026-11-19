@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { World, count, id, inv, obj, player, types } from '../swamp-caves/runtime.mjs';
+import { World, count, id, inv, obj, types } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 import { stage, talk } from './fixture.mjs';
 
 // CANDIDATE recipes and fee: retained Ali the Dyer article 218592 and ordinary

@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   PlayerStat, ScriptState, ServerTriggerType, World, count, dialoguePage, engineModule, id,
-  map, obj, player, resumeDialogue, seed
+  map, obj, resumeDialogue, seed
 } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 import { actors, bit, finish, operate, read, relog, stage, stand, talk, wield } from './fixture.mjs';
 
 const { default: Environment } = await engineModule('util/Environment.ts');

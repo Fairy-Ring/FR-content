@@ -2,8 +2,9 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  World, count, engineModule, id, inv, obj, player, types
+  World, count, engineModule, id, inv, obj, types
 } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 import {
   actors, bit, locs, operate, operateLoc, read, relog, stage, talk
 } from './fixture.mjs';

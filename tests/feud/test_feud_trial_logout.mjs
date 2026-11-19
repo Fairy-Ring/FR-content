@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-  Packet, PlayerLoading, PlayerStat, World, count, engineModule, id, inv, inventory, obj, player,
-  seed
+  Packet, PlayerLoading, PlayerStat, World, count, engineModule, id, inv, inventory, obj, seed
 } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 import { bit, hasWitness, operate, read, stage, talk, wield } from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');

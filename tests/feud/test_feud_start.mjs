@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { count, id, inv, invButton, obj, player, seed, types } from '../swamp-caves/runtime.mjs';
+import { count, id, inv, invButton, obj, seed, types } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 import {
   actors, begin, buyReceipts, deliver, drink, gangMask, operate, read, relog, stage, talk
 } from './fixture.mjs';

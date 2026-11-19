@@ -5,8 +5,9 @@ import test from 'node:test';
 
 import {
   PlayerStat, ServerTriggerType, World, contentRoot, count, engineModule, id,
-  inv, obj, player, seed, types
+  inv, obj, seed, types
 } from '../swamp-caves/runtime.mjs';
+import { player } from './player.mjs';
 import {
   actors, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
   nativeNpcTriggerName, operate, read, stand, stage, talk, wield
