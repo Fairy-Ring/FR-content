@@ -60,7 +60,7 @@ function repeatFixture() {
 }
 
 function availableIdle(npc) {
-  return npc.getVar(stateVar) === 0 && npc.queue.all().length === 0 && npc.timerInterval === 0;
+  return npc.getVar(stateVar) === 0 && npc.queue.all().length === 0 && npc.timerInterval <= 0;
 }
 
 function reachDistraction(p) {
@@ -133,7 +133,7 @@ function dispatchSynchronousKnockOut(p, target) {
 
 function attackableTarget(p, name, requireNoWitness = false) {
   return actors(name).find(npc => npc.getVar(stateVar) === 0 && npc.queue.all().length === 0 &&
-    npc.timerInterval === 0 && (!requireNoWitness || !hasWitness(p, npc)) && operationStand(p, npc));
+    npc.timerInterval <= 0 && (!requireNoWitness || !hasWitness(p, npc)) && operationStand(p, npc));
 }
 
 function assertAttackableQueueBound(npc) {
@@ -263,7 +263,9 @@ function assertReleased(p, target, expectedResults) {
   assert.equal(target.getVar(stateVar), 0);
   assert.equal(target.getVar(ownerVar), -1);
   assert.equal(target.getVar(deadlineVar), 0);
-  assert.equal(target.timerInterval, 0, 'the Villager-only timer is cleared with its condition');
+  if (villagerTypes.has(target.baseType)) {
+    assert.equal(target.timerInterval, 0, 'the Villager-only timer is cleared with its condition');
+  }
   if (p) assert.equal(p.getVar(slotVar), -1);
   assert.deepEqual(resultSnapshot(p), expectedResults);
 }
@@ -358,11 +360,12 @@ test('all twelve original Villager forms own an unset, type-specific timer and c
   const placed = villagers();
   assert(placed.length, 'the original placed Villagers are loaded');
   for (const npc of placed) {
-    assert.equal(npc.timerInterval, 0, 'an original placed Villager starts with no armed timer');
+    const initialTimer = types.NpcType.get(npc.baseType).timer;
+    assert.equal(npc.timerInterval, initialTimer, 'an original placed Villager retains its unarmed config timer');
     assert.equal(npc.queue.all().length, 0, 'an original placed Villager starts without a timeout queue');
     execute('[proc,npc_poison_start]', p, [20], { target: npc });
     assert.equal(npc.getVar(poisonVar), 0, 'the native poison guard refuses a non-attackable Villager');
-    assert.equal(npc.timerInterval, 0, 'refused poison does not arm the global poison timer');
+    assert.equal(npc.timerInterval, initialTimer, 'refused poison does not arm or change the global poison timer');
   }
 });
 
@@ -373,6 +376,7 @@ test('a native KO input at clock 102 returns at clock 109 with deadline 110 inst
   // Test-only clock anchor; the following Lure and real input create all NPC state.
   World.currentTick = 101;
   const tracked = new Set([target]);
+  const initialTimer = target.timerInterval;
   attackableLure(p, target);
   assert.equal(World.currentTick, 101);
 
@@ -396,6 +400,7 @@ test('a native KO input at clock 102 returns at clock 109 with deadline 110 inst
   assert.equal(World.currentTick, 110);
   assert.equal(callbacksAt110, 1, 'the successor expires at the deadline without same-tick reentry');
   assertReleased(p, target, resultSnapshot(p));
+  assert.equal(target.timerInterval, initialTimer, 'the Bandit timeout preserves its independent unarmed timer');
   drainTargetQueues(tracked);
 });
 
@@ -561,8 +566,9 @@ test('native poison keeps its 30-tick cadence while both attackable Feud states 
     const poisonTimer = ScriptProvider.getByTrigger(ServerTriggerType.AI_TIMER, target.type,
       types.NpcType.get(target.type).category);
     assert.equal(poisonTimer?.name, '[ai_timer,_]', `${name} keeps the generic native poison timer`);
+    const initialTimer = target.timerInterval;
     attackableLure(p, target);
-    assert.equal(target.timerInterval, 0, 'the repeat timeout does not replace an unrelated timer');
+    assert.equal(target.timerInterval, initialTimer, 'the repeat timeout does not replace an unrelated timer');
     execute('[proc,npc_poison_start]', p, [20], { target });
     assert.equal(target.getVar(poisonVar), 20);
     assert.equal(target.timerInterval, 30, 'the real poison start arms its published timer interval');
