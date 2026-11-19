@@ -85,12 +85,18 @@ for (const row of manifest.search) {
   assert.deepEqual([...inv.items], before, `${row.name}: empty search gives no item`);
   console.log(`PASS generic Search ${row.name} -> ${selected.name}`);
 }
+// These checked-out files implement this suite's generic and specific searches.
+// Packed ScriptFile.fileName identifies ownership without generated script ids.
+const ownSearchFiles = new Set(['crates.rs2', 'bookcases.rs2', 'wizard_bookcases.rs2', 'chests.rs2']);
+for (const file of ownSearchFiles) {
+  assert(readFileSync(path.join(content, 'scripts/general_use/scripts', file), 'utf8').length > 0, `checked-out search source ${file}`);
+}
 for (const row of manifest.left) {
   const f = fixture(row);
   const selected = select(f, row.slot);
-  for (const family of Object.keys(empty)) {
-    assert.notEqual(selected?.name, `[oploc${row.slot},_${family}]`, `${row.name} is not joined to this suite's generic Search`);
-    assert.notEqual(f.p.getApTrigger()?.name, `[aploc${row.slot},_${family}]`, `${row.name} has no generic Search approach`);
+  for (const [kind, handler] of [['operation', selected], ['approach', f.p.getApTrigger()]]) {
+    if (handler === null) continue; // LEAVE rows have no handler by default.
+    assert(!ownSearchFiles.has(handler.fileName), `${row.name}:${row.slot} has no ${kind} handler owned by ordinary-search (${handler.fileName})`);
   }
 }
 for (const row of manifest.search.filter(row => row.family === 'bookcase')) {
