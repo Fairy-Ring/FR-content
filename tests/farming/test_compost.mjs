@@ -114,11 +114,12 @@ const growthTable = types.DbTableType.getByName('farming_growth');
 assert(growthTable, 'compiled farming_growth table');
 const growthHandlerColumn = column(growthTable, 'handler');
 const growthPeriodColumn = column(growthTable, 'period');
+const growthDiseasePeriodColumn = column(growthTable, 'disease_period');
 const growthRows = types.DbRowType.getInTable(growthTable.id);
-function periodFor(group) {
+function periodFor(group, disease = false) {
   const row = growthRows.find(candidate => candidate.getValue(growthHandlerColumn, 0)[0] === group.handler);
   assert(row, `one growth row for ${group.family}`);
-  return row.getValue(growthPeriodColumn, 0)[0];
+  return row.getValue(disease ? growthDiseasePeriodColumn : growthPeriodColumn, 0)[0];
 }
 
 const stageIndex = patchName => {
@@ -428,7 +429,7 @@ try {
               const inputStage = crop.first + 1 + (watered ? 64 : 0);
               setStage(p, patchName, inputStage);
               JavaRandom.setSeed(witness(128, draw));
-              proc(p, group.advanceAll, 1);
+              proc(p, group.advanceAll, 1, 0);
               const diseased = draw < threshold;
               const expectedStage = diseased
                 ? group.family === 'herb' ? crop.diseased : crop.first + 1 + 128
@@ -436,15 +437,65 @@ try {
               assert.equal(getStage(p, patchName), expectedStage,
                 `${group.family}/${mode.code}/${watered ? 'watered' : 'dry'} draw ${draw}`);
               if (diseased) {
-                JavaRandom.setSeed(0);
-                proc(p, group.advanceAll, 1);
+                const seed = witness(128, 127);
+                JavaRandom.setSeed(seed);
+                const nextDraw = JavaRandom.nextDouble();
+                JavaRandom.setSeed(seed);
+                proc(p, group.advanceAll, 1, periodFor(group));
+                assert.equal(getStage(p, patchName), expectedStage,
+                  `${group.family}/${mode.code} disease survives the healthy-only window`);
+                assert.equal(JavaRandom.nextDouble(), nextDraw, 'disease does not roll the soil-adjusted healthy risk');
+                JavaRandom.setSeed(seed);
+                proc(p, group.advanceAll, 1, periodFor(group, true));
                 const deadStage = group.family === 'herb' ? 170 : crop.first + 1 + 192;
-                assert.equal(getStage(p, patchName), deadStage, `${group.family} uncured disease becomes dead`);
+                assert.equal(getStage(p, patchName), deadStage,
+                  `${group.family}/${mode.code} untreated and treated disease die at the same slower window`);
+                assert.equal(JavaRandom.nextDouble(), nextDraw, 'certain death does not consume a disease draw');
               }
             } finally { discard(p); }
           }
         }
       }
+    }
+  });
+
+  test('treated and untreated disease share exact slower windows through online reconciliation and saved offline login', () => {
+    const modes = [{ code: 0, bucket: null }, ...treatmentModes];
+    for (const group of groupSpecs) for (const mode of modes) for (const offline of [false, true]) {
+      const patchName = group.patchNames[0];
+      const crop = cropRows[group.family][0];
+      const diseased = group.family === 'herb' ? crop.diseased : crop.first + 1 + 128;
+      const dead = group.family === 'herb' ? 170 : crop.first + 1 + 192;
+      const period = periodFor(group), slow = periodFor(group, true);
+      let p = fixture(patchName, 3);
+      try {
+        if (mode.bucket) {
+          add(p, mode.bucket);
+          assert(useBucket(p, patchName, mode.bucket));
+        }
+        setStage(p, patchName, diseased);
+        p.setVar(id('VarPlayerType', 'farming_growth_minute'), slow);
+        const offlineStart = offline ? p.save() : null;
+        const seed = witness(128, 127);
+        JavaRandom.setSeed(seed);
+        const nextDraw = JavaRandom.nextDouble();
+        for (const [window, expected] of [[slow + period, diseased], [slow * 2, dead]]) {
+          if (offline) {
+            // Independent absences: a previous login inside the next flower
+            // window would itself consume that window in the published clock.
+            discard(p);
+            p = restore(offlineStart);
+          }
+          minute = window + (offline ? 5 : 0);
+          JavaRandom.setSeed(seed);
+          if (offline) proc(p, 'farming_login');
+          else proc(p, 'farming_reconcile', 0);
+          assert.equal(getStage(p, patchName), expected,
+            `${group.family}/${mode.code}/${offline ? 'offline' : 'online'} at window ${window}`);
+          assert.equal(JavaRandom.nextDouble(), nextDraw, 'existing disease consumes no healthy risk draw');
+          assert.equal(treatment(p, stageIndex(patchName)), mode.code);
+        }
+      } finally { discard(p); }
     }
   });
 
@@ -515,7 +566,7 @@ try {
           proc(loaded, 'farming_login');
           const deadStage = group.family === 'herb' ? 170 : crop.first + 1 + 192;
           assert.equal(getStage(loaded, patchName), deadStage,
-            `${group.family}/${mode.code} crop dies after two offline growth steps`);
+            `${group.family}/${mode.code} crop dies at the slower offline window`);
           assert.equal(loaded.getVar(id('VarPlayerType', 'farming_growth_minute')), minute);
           assert.equal(treatment(loaded, index), mode.code, 'treatment remains until dead crop is cleared');
           assert.deepEqual(allExtras(loaded), Array(20).fill(0), 'dead crop has no saved harvest lives');
@@ -548,7 +599,7 @@ try {
     const steps = crop.mature - crop.first;
     assert(steps > 1, `${group.family} has growth after its seed stage`);
     JavaRandom.setSeed(sequenceWitness(128, 20, steps - 1));
-    proc(p, group.advanceAll, steps);
+    proc(p, group.advanceAll, steps, 0);
     assert.equal(getStage(p, patchName), crop.mature, `${group.family} reaches sourced cache maturity`);
     const expected = EMPTY_TREATMENTS.slice(); expected[index] = code;
     assertTreatmentState(p, expected);

@@ -112,7 +112,7 @@ for (const [name, first, mature, last, payment, quantity] of crops) {
     try {
       for (const value of [first, first + 1, first + 64, mature, last]) {
         setStage(p, patch, value); p.setVar(care, 1 << patch);
-        proc(p, patch < 8 ? 'farming_potato_advance_all' : 'farming_hops_advance_all', 30);
+        proc(p, patch < 8 ? 'farming_potato_advance_all' : 'farming_hops_advance_all', 30, 0);
         assert.equal(stage(p, patch), value >= mature && value < 64 ? value : mature);
         assert.equal(watched(p, patch), 1, 'maturity retains the current planting flag');
       }

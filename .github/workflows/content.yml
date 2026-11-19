@@ -158,6 +158,7 @@ jobs:
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
           run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
           run_test tests/farming/test_farming.mjs node --import tsx ../content/tests/farming/test_farming.mjs
+          run_test tests/farming/test_disease_timing.mjs node --import tsx ../content/tests/farming/test_disease_timing.mjs
           run_test tests/farming/test_allotments.mjs node --import tsx ../content/tests/farming/test_allotments.mjs
           run_test tests/farming/test_herbs.mjs node --import tsx ../content/tests/farming/test_herbs.mjs
           run_test tests/farming/test_tool_actions.mjs node --import tsx ../content/tests/farming/test_tool_actions.mjs
@@ -169,6 +170,7 @@ jobs:
           run_test tests/farming/test_seed_sources.mjs node --import tsx ../content/tests/farming/test_seed_sources.mjs
           run_test 'tests/farming/test_master_farmer.mjs + tests/farming/test_general_seed_table.mjs' node --import tsx --test ../content/tests/farming/test_master_farmer.mjs ../content/tests/farming/test_general_seed_table.mjs
           run_test tests/farming/test_tools.mjs node --import tsx ../content/tests/farming/test_tools.mjs
+          run_test tests/farming/test_inspect.mjs node --import tsx ../content/tests/farming/test_inspect.mjs
           run_test tests/pickpocketing/test_pickpocketing.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/pickpocketing/test_pickpocketing.mjs
           run_test tests/thieving-stalls/test_stalls.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --random-seed=377 --import tsx ../content/tests/thieving-stalls/test_stalls.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
@@ -271,6 +273,7 @@ jobs:
           run_test tests/n619-old-towns/test_old_towns.mjs node --import tsx ../content/tests/n619-old-towns/test_old_towns.mjs
           run_test tests/npc-talk-audit/runtime.mts bash ../content/tests/npc-talk-audit/runtime.sh "$PWD"
           run_test tests/npc-other-options/test_npc_other_options.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/npc-other-options/test_npc_other_options.mjs
+          run_test tests/tindel-appraisal/test_tindel_appraisal.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/tindel-appraisal/test_tindel_appraisal.mjs
           run_test tests/loc-option-audit/runtime.mts bash ../content/tests/loc-option-audit/runtime.sh "$PWD"
           run_test tests/fletching-choice/runtime.mts bash ../content/tests/fletching-choice/runtime.sh "$PWD"
           run_test tests/skill-menus/runtime.mts bash ../content/tests/skill-menus/runtime.sh "$PWD"

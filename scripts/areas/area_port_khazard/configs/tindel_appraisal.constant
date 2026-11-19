@@ -1,0 +1,5 @@
+// CANDIDATE: checked OSRS Rusty sword Tindel table; not the POH repair table.
+^tindel_appraisal_fee = 100
+^tindel_appraisal_outcomes = 100
+^tindel_antique_min = 1500
+^tindel_antique_range = 500

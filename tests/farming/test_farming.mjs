@@ -49,7 +49,7 @@ function seedForDraw(draw) {
 const draws = new Map([0, 9, 10, 19, 20, 127].map(draw => [draw, seedForDraw(draw)]));
 function advance(value, n, draw = 127) {
   JavaRandom.setSeed(draws.get(draw));
-  return proc(player(), 'farming_potato_advance', value, n, 0).popInt();
+  return proc(player(), 'farming_potato_advance', value, n, 0, 0).popInt();
 }
 try {
   test('clock is original permanent slot 500, server-only; all patch bytes are permanent', () => {
@@ -146,7 +146,7 @@ try {
     assert.equal(count(p, 'potato_seed'), 0);
     assert.equal(p.stats[PlayerStat.FARMING], 200, 'three weeds at 4 XP plus potato planting at 8 XP');
   });
-  test('seed immunity, mature immunity, disease stasis and next-cycle death use real compiled paths', () => {
+  test('seed immunity, mature immunity, disease stasis and slow-window death use real compiled paths', () => {
     assert.equal(advance(6, 1, 0), 7);
     assert.equal(advance(70, 1, 0), 7, 'seed water consumed without a disease draw');
     for (const value of [7, 8, 9]) {
@@ -183,8 +183,10 @@ try {
     const loaded = player(p.save());
     assert.equal(stage(loaded), 135); assert.equal(stage(loaded, 1), 71);
     minute = 615; proc(loaded, 'farming_login');
-    assert.equal(stage(loaded), 199); assert.equal(stage(loaded, 1), 8);
-    const again = player(loaded.save()); assert.equal(stage(again), 199);
+    assert.equal(stage(loaded), 135); assert.equal(stage(loaded, 1), 8);
+    const again = player(loaded.save()); assert.equal(stage(again), 135);
+    minute = 625; proc(again, 'farming_reconcile', 1);
+    assert.equal(stage(again), 199, 'the first completed slower window kills the saved diseased crop');
   });
   test('native spade clears dead crop without XP; same patch can be planted and harvested again', () => {
     const p = fresh(605); setStage(p, 199); add(p, 'spade'); add(p, 'dibber'); add(p, 'potato_seed', 3);
@@ -206,9 +208,10 @@ try {
     values.forEach((value, index) => setStage(p, value, index));
     const unrelated = id('VarPlayerType', 'option_music'); p.setVar(unrelated, 3);
     tick(p, 610);
-    assert.deepEqual(bits.map(bit => p.getVarBit(bit)), [7, 7, 199, 199, 63, 74, 198, 255]);
+    assert.deepEqual(bits.map(bit => p.getVarBit(bit)), [7, 7, 135, 199, 63, 74, 198, 255]);
     assert.equal(p.getVar(unrelated), 3);
-    const saved = player(p.save()); assert.deepEqual(bits.map(bit => saved.getVarBit(bit)), [7, 7, 199, 199, 63, 74, 198, 255]);
+    const saved = player(p.save()); assert.deepEqual(bits.map(bit => saved.getVarBit(bit)), [7, 7, 135, 199, 63, 74, 198, 255]);
+    tick(p, 620); assert.equal(stage(p, 2), 199, 'the next slower window kills the independently saved diseased byte');
   });
 } finally {
   Runner.HANDLERS[ScriptOpcode.DATE_MINUTES] = dateHandler;
