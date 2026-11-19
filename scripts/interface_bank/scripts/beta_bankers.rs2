@@ -47,7 +47,9 @@ switch_int ($option) {
         }
 }
 
-[apnpc1,dwarf_city_banker1]
+[apnpc1,dwarf_city_banker1] @beta_dwarf_banker;
+
+[label,beta_dwarf_banker]
 if (npc_range(coord) > 2) {
     p_aprange(2);
     return;

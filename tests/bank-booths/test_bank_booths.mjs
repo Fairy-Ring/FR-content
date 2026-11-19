@@ -83,11 +83,18 @@ for (const [name, expected, stand, teller = true] of built) {
       arm(p, loc, option);
       const script = p.getOpTrigger();
       assert(script, `${name} option ${option} dispatches through Player.getOpTrigger`);
-      // Use follows the published nearby-teller conversation or its no-teller fallback.
-      finish(p, script, loc, option === 1 && teller ? [1] : []);
+      // Keldagrim Use must select its published four-option dwarf conversation,
+      // not the generic teller menu whose old bank option was 1.
+      const dwarf = name === 'dwarf_keldagrim_bankbooth';
+      finish(p, script, loc, option === 1 && teller ? [dwarf ? 4 : 1] : []);
       bank(p);
-      const greeting = p.packets.some(packet => packet.constructor.name === 'IfSetText' && packet.text.includes('Good day, how may I help you?'));
-      assert.equal(greeting, option === 1 && teller, `${name} option ${option} uses the published conversation/fallback path`);
+      const greeting = p.packets.some(packet => packet.constructor.name === 'IfSetText' &&
+        packet.text.includes(dwarf ? 'Welcome to the Keldagrim bank! Anything I can help you with?' : 'Good day, how may I help you?'));
+      assert.equal(greeting, option === 1 && teller, `${name} option ${option} uses the published regional conversation/fallback path`);
+      if (dwarf) {
+        assert(!p.packets.some(packet => packet.constructor.name === 'IfSetText' && packet.text.includes("Didn't you used to be called the Bank of Varrock?")),
+          'Keldagrim booths do not expose the unrelated generic banker conversation');
+      }
     }
   }
   console.log(`PASS ${name}: ${expected} natural placements, both client options reach the published bank service`);

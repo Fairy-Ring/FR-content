@@ -11,6 +11,9 @@ if (npc_findcat(loc_coord, bank_teller, 2, 0) = true) {
 // Only ordinary booths with no unbuilt service prerequisite join this category.
 [oploc1,_bank_booth]
 if (npc_findcat(loc_coord, bank_teller, 2, 0) = true) {
+    if (npc_type = dwarf_city_banker1 | npc_type = dwarf_city_banker2) {
+        @beta_dwarf_banker;
+    }
     @talk_to_banker;
 }
 @openbank;
