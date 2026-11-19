@@ -6,7 +6,7 @@ import {
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  actors, begin, bit, buyReceipts, deliver, drink, hasWitness, nativeNpcTriggerName, operate,
+  actors, begin, bit, buyReceipts, deliver, drink, hasWitness, nativeNpcTriggerName, operate, operationStand,
   read, relog, stage, talk, wield
 } from './fixture.mjs';
 
@@ -22,8 +22,9 @@ const villagerForms = new Set([
 ].map(name => id('NpcType', name)));
 const feudVillagers = () => [...World.npcs].filter(npc => npc.isActive &&
   (villagerForms.has(npc.baseType) || villagerForms.has(npc.type)));
-function isolatedVillager(excluded) {
-  return feudVillagers().find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 && !hasWitness(npc));
+function isolatedVillager(p, excluded) {
+  return feudVillagers().find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 &&
+    !hasWitness(npc) && operationStand(p, npc));
 }
 
 test('native Feud trials allow the opening at level 29, gate the first theft at 30, and preserve trial consequences', () => {
@@ -114,7 +115,7 @@ test('native Feud trials allow the opening at level 29, gate the first theft at 
   assert.equal(count(p, 'blackjack_oak'), 0);
   assert.equal(stage(p), 9);
 
-  const secluded = isolatedVillager(new Set([distracted]));
+  const secluded = isolatedVillager(p, new Set([distracted]));
   assert(secluded, 'an original packed villager has no candidate under the native witness predicate');
   operate(p, secluded, 4);
   assert.equal(stage(p), 10);

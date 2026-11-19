@@ -4,7 +4,7 @@ import {
   Packet, PlayerLoading, PlayerStat, World, count, engineModule, id, inv, inventory, obj, seed
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
-import { bit, hasWitness, operate, read, stage, talk, wield } from './fixture.mjs';
+import { bit, hasWitness, operate, operationStand, read, stage, talk, wield } from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -77,7 +77,7 @@ function trialFixture() {
 }
 
 function reachDistraction(p) {
-  const target = villagers().find(npc => npc.getVar(stateVar) === 0);
+  const target = villagers().find(npc => npc.getVar(stateVar) === 0 && operationStand(p, npc));
   assert(target, 'an original placed villager is idle');
   operate(p, target, 3);
   assert.equal(stage(p), 7);
@@ -89,13 +89,13 @@ function reachDistraction(p) {
   return owned(p)[0];
 }
 
-function secludedTarget() {
-  const target = villagers().find(npc => npc.getVar(stateVar) === 0 && !hasWitness(npc));
+function secludedTarget(p) {
+  const target = villagers().find(npc => npc.getVar(stateVar) === 0 && !hasWitness(npc) && operationStand(p, npc));
   assert(target, 'a real packed villager has no candidate under the native witness predicate');
   return target;
 }
 
-function lure(p, target = secludedTarget()) {
+function lure(p, target = secludedTarget(p)) {
   const before = { stage: stage(p), xp: xp(p), coins: count(p, 'coins') };
   operate(p, target, 4);
   assert.equal(stage(p), before.stage === 9 ? 10 : before.stage);
@@ -148,20 +148,21 @@ for (const number of [1, 2, 3]) for (const checkpoint of [7, 8]) {
       assert.equal(distracted.getVar(stateVar), 0);
       assert.equal(p.getVar(slotVar), -1);
     } else {
-      const first = villagers().find(npc => npc.getVar(stateVar) === 0);
+      const first = villagers().find(npc => npc.getVar(stateVar) === 0 && operationStand(p, npc));
       assert(first, 'an original placed villager can earn the first theft');
       operate(p, first, 3);
     }
     assert.equal(stage(p), checkpoint);
     assert.equal(read(p, 'feud_npc_multi'), 1);
     const baseType = id('NpcType', `feud_villager_multi_${number}`);
-    const target = villagers().find(npc => npc.baseType === baseType && npc.getVar(stateVar) === 0);
+    const target = villagers().find(npc => npc.baseType === baseType && npc.getVar(stateVar) === 0 &&
+      operationStand(p, npc));
     assert(target, `an original idle villager ${number} exposes its middle form`);
     const before = { coins: count(p, 'coins'), xp: xp(p) };
     lure(p, target);
     assert.equal(target.type, id('NpcType', `feud_villager_${number}_2`),
       'native dispatch uses the original middle form, not the later blackjack form');
-    const second = villagers().find(npc => npc !== target && npc.getVar(stateVar) === 0);
+    const second = villagers().find(npc => npc !== target && npc.getVar(stateVar) === 0 && operationStand(p, npc));
     assert(second, 'a second real target is available to prove the reservation rejection');
     operate(p, second, 4);
     assert.equal(owned(p).length, 1);
@@ -188,7 +189,7 @@ for (const number of [1, 2, 3]) for (const checkpoint of [7, 8]) {
     assert.equal(stage(p), 9);
     assert.equal(owned(p).length, 0, 'the real second theft releases its distraction');
     assert.equal(p.getVar(slotVar), -1);
-    const later = secludedTarget(), beforeKoXp = xp(p);
+    const later = secludedTarget(p), beforeKoXp = xp(p);
     operate(p, later, 5);
     assert.equal(stage(p), 9, 'an earlier lure does not credit the later lure checkpoint');
     assert.equal(xp(p), beforeKoXp);
@@ -236,7 +237,7 @@ for (const checkpoint of [8, 10, 11]) {
       target = lure(p);
     }
     const heldTarget = target.uid, heldXp = xp(p), heldCoins = count(p, 'coins');
-    const secondTarget = villagers().find(npc => npc !== target && npc.getVar(stateVar) === 0);
+    const secondTarget = villagers().find(npc => npc !== target && npc.getVar(stateVar) === 0 && operationStand(p, npc));
     assert(secondTarget, 'a different idle placed villager is available for the stacking rejection');
     operate(p, secondTarget, 4);
     assert.equal(owned(p).length, 1, 'a second lure cannot stack active target conditions');

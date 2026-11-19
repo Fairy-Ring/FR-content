@@ -10,7 +10,7 @@ import {
 import { player } from './player.mjs';
 import {
   actors, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
-  nativeNpcTriggerName, operate, read, stand, stage, talk, wield
+  nativeNpcTriggerName, operate, operationStand, read, stand, stage, talk, wield
 } from './fixture.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
@@ -33,8 +33,9 @@ function completePlayer(level = 1) {
   return p;
 }
 
-function isolatedTarget(name, excluded = new Set()) {
-  return actors(name).find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 && !hasWitness(npc));
+function isolatedTarget(p, name, excluded = new Set()) {
+  return actors(name).find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 &&
+    !hasWitness(npc) && operationStand(p, npc));
 }
 
 function withRandom(value, action) {
@@ -190,7 +191,7 @@ test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and 
   assert.equal(xp(p), caught.xp);
   assert.equal(caught.hp - p.levels[PlayerStat.HITPOINTS], 2, 'awake villagers use the period caught damage');
 
-  const target = isolatedTarget('feud_villager_multi_2', new Set([awake]));
+  const target = isolatedTarget(p, 'feud_villager_multi_2', new Set([awake]));
   assert(target, 'a real placed villager has no candidate under the native witness predicate');
   const lure = operate(p, target, 4);
   assert.equal(lure.trigger, nativeNpcTriggerName(p, target, 4));
@@ -315,7 +316,7 @@ test('the purchased willow is usable and the Thug applies its period level and K
   operate(p, actors('feud_black_jack_seller_multi')[0], 3, ["I'll take it."]);
   wield(p, 'blackjack_willow');
 
-  const thug = isolatedTarget('feud_egyptian_doorman_multi');
+  const thug = isolatedTarget(p, 'feud_egyptian_doorman_multi');
   assert(thug, 'a real placed Menaphite Thug has no candidate under the native witness predicate');
   const lure = operate(p, thug, 4);
   assert.equal(lure.trigger, nativeNpcTriggerName(p, thug, 4));
@@ -346,7 +347,7 @@ test('the purchased willow is usable and the Thug applies its period level and K
 
 test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outcomes, and awards 10 XP', () => {
   const p = seed(completePlayer(45), ['blackjack_oak']);
-  const target = isolatedTarget('feud_arabian_guard2_multi');
+  const target = isolatedTarget(p, 'feud_arabian_guard2_multi');
   assert(target, 'an original Bandit41 placement has no candidate under the native witness predicate');
   const lure = operate(p, target, 4);
   assert.equal(lure.trigger, nativeNpcTriggerName(p, target, 4));

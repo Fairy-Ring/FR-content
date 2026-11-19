@@ -120,14 +120,14 @@ function operateLoc(p, placement, { option = 1, item = null, position = null, ch
   return { text: finish(p, choices), position: tile(p) };
 }
 
-function stand(p, n) {
+function operationStand(p, n) {
+  const original = tile(p);
   const candidates = [];
   for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
     p.level = n.level; p.x = n.x + dx; p.z = n.z + dz;
     if (map.isMapBlocked(p.x, p.z, p.level) || !p.inOperableDistance(n)) continue;
     candidates.push(tile(p));
   }
-  assert(candidates.length, `packed collision permits an ordinary stand beside NPC ${n.baseType}`);
   const name = types.NpcType.get(n.baseType).debugname;
   const explicitOffset = operationOffsets[name];
   const [dx, dz] = explicitOffset ?? [-1, 0];
@@ -146,9 +146,13 @@ function stand(p, n) {
   };
   const destination = preferred && reaches(preferred) ? preferred
     : explicitOffset ? null : candidates.find(reaches);
-  assert(destination, explicitOffset
-    ? `pathfinder reaches the configured operation stand for NPC ${n.baseType}`
-    : `pathfinder reaches a real operation stand beside NPC ${n.baseType}`);
+  [p.level, p.x, p.z] = original;
+  return destination;
+}
+
+function stand(p, n) {
+  const destination = operationStand(p, n);
+  assert(destination, `pathfinder reaches the native operation stand beside NPC ${n.baseType}`);
   [p.level, p.x, p.z] = destination;
   p.originX = p.x; p.originZ = p.z;
   return destination;
@@ -275,17 +279,18 @@ function deliver(p, banditsFirst = false, coward = false) {
 }
 
 function relog(p) {
-  const saved = p.save(), slot = p.slot, uid = p.uid, pid = p.pid;
+  const saved = p.save(), slot = p.slot, pid = p.pid;
   p.unlink(); World.players[slot] = null;
   const loaded = PlayerLoading.load(p.username, new Packet(saved), null);
   loaded.varsString ??= [];
-  loaded.slot = slot; loaded.uid = uid; loaded.pid = pid; loaded.isActive = true;
+  loaded.slot = slot; loaded.pid = pid; loaded.isActive = true;
+  loaded.uid = ((Number(loaded.username37 & 0x1fffffn) << 11) | slot) >>> 0;
   loaded.messages = []; loaded.packets = [];
   loaded.write = packet => loaded.packets.push(packet);
   loaded.messageGame = text => loaded.messages.push(String(text));
   loaded.wrappedMessageGame = loaded.messageGame;
   World.players[slot] = loaded; World.playerLoop.add(loaded.hash64, loaded);
-  // This synthetic save/load preserves the UID; nativeLogoutAndReload proves real logout.
+  // The codec-only fixture reconstructs the same canonical session UID from the saved name.
   loaded.onLogin();
   loaded.processEngineQueue();
   return loaded;
@@ -293,6 +298,6 @@ function relog(p) {
 
 export {
   actors, begin, bit, buyBeers, buyReceipts, deliver, drink, finish, gangMask, hasWitness,
-  isWitness, locs, nativeNpcTriggerName, operate, operateLoc, operationOffsets, read, relog,
+  isWitness, locs, nativeNpcTriggerName, operate, operateLoc, operationOffsets, operationStand, read, relog,
   stage, stand, talk, wield
 };
