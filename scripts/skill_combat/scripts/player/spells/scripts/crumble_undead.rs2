@@ -20,7 +20,7 @@ if (~check_spell_requirements($spell_data) = false) {
 if (~player_in_combat_check2 = false) {
     return;
 }
-if (npc_hasop(2) = false) {
+if (~npc_combat_hasop = false) {
     mes("You can't attack this npc.");
     return;
 }

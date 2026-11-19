@@ -28,7 +28,7 @@ return(false);
 // Named exclusions first (even if undead flag is set). Then attackable undead flag,
 // then named extras that lack the Crumble flag. Explicit npc_type cases only.
 [proc,npc_salve_eligible]()(boolean)
-if (npc_hasop(2) = false) {
+if (~npc_combat_hasop = false) {
     return(false);
 }
 switch_npc(npc_type) {

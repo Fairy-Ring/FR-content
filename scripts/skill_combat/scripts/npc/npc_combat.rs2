@@ -148,7 +148,15 @@ if (randominc($attack_roll) > randominc($defence_roll)) {
 }
 return(false);
 
-// allows any npc with op2 defined to be attacked
+// Preserve the published noncombat multi-base exclusions before visible op2 lookup.
+// NPC_PARAM reads the shared base, unlike player-resolved NPC_TYPE.
+[proc,npc_combat_hasop]()(boolean)
+if (npc_param(npc_noncombat_multi) = ^true) {
+    return(false);
+}
+return(npc_hasop(2));
+
+// Existing op2 truthiness policy, except for the named noncombat multi bases.
 [proc,npc_is_attackable]()(boolean)
 if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
 if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
@@ -260,7 +268,7 @@ if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded
 
 if (~dt_dessous_attackable = false) return(false);
 if (npc_type = firediamond_firewarrior & ~dt_fareed_attackable = false) return(false);
-if (npc_hasop(2) = true) {
+if (~npc_combat_hasop = true) {
     return (true);
 }
 return (false);
@@ -358,7 +366,7 @@ if ((npc_type = hauntedmine_boss_ghost | npc_type = hauntedmine_boss_ghost_faded
 
 if (~dt_dessous_attackable = false) return(false);
 if (npc_type = firediamond_firewarrior & ~dt_fareed_attackable = false) return(false);
-if (npc_hasop(2) = true) {
+if (~npc_combat_hasop = true) {
     return (true);
 }
 mes("You can't attack this npc.");
@@ -404,7 +412,7 @@ error("style of <tostring($style)> not defined in switch for npc_combat_defenceb
 
 //  this should be strong queued. Some damage is queued, some isnt
 [queue,combat_damage_player](int $damage)
-if (inv_getobj(worn, ^wearpos_ring) = ring_of_recoil & map_members = ^true & npc_finduid(%aggressive_npc) = true & npc_hasop(2) = true & %npc_attacking_uid = uid & $damage > 0 & stat(hitpoints) > 0) {
+if (inv_getobj(worn, ^wearpos_ring) = ring_of_recoil & map_members = ^true & npc_finduid(%aggressive_npc) = true & ~npc_combat_hasop = true & %npc_attacking_uid = uid & $damage > 0 & stat(hitpoints) > 0) {
     // https://oldschool.runescape.wiki/w/Update:Clue_Scroll_Step_Counter
     // - "Recoil damage will now always target the entity that caused the initial damage, rather than the most recent entity to deal damage."
     def_int $recoil_damage = add(scale(10, 100, $damage), 1);
