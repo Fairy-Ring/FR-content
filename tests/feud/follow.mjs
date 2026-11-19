@@ -40,18 +40,37 @@ function walkRoute(p, route) {
     'native MoveClick accepts the collision-found route behind the building');
 }
 
+function screenedTile(p, target, witnesses, nearby, x, z) {
+  const projected = { uid: target.uid, level: target.level, x, z };
+  return !nearby.some(npc => isWitness(p, projected, npc)) &&
+    occludedOriginalWitness(target, witnesses, x, z);
+}
+
+function screenedFollowerStands(p, target, witnesses, nearby, x, z) {
+  let stands = 0;
+  for (let nx = x - target.width; nx <= x + p.width; nx++) {
+    for (let nz = z - target.length; nz <= z + p.length; nz++) {
+      if (map.isMapBlocked(nx, nz, target.level) ||
+          !map.reachedEntity(target.level, x, z, nx, nz, target.width, target.length, p.width)) continue;
+      stands++;
+      if (!screenedTile(p, target, witnesses, nearby, nx, nz)) return false;
+    }
+  }
+  return stands > 0;
+}
+
 function secludedDestination(p, target, witnesses, visited) {
   const nearby = [...World.npcs].filter(npc => npc.isActive && npc.level === target.level &&
     CoordGrid.distanceToSW(target, npc) <= seclusionSearchRadius + witnessRadius);
-  // The exact native follower stand is checked after movement, not guessed here.
+  // Admit room for every collision-valid follower stand, not only the player.
+  // The actual native stand and both witnesses are still checked after movement.
   for (let radius = 2; radius <= seclusionSearchRadius; radius++) {
     for (let x = target.x - radius; x <= target.x + radius; x++) {
       for (let z = target.z - radius; z <= target.z + radius; z++) {
         if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
           map.isMapBlocked(x, z, target.level) || visited.some(tile => tile.x === x && tile.z === z)) continue;
-        const projected = { uid: target.uid, level: target.level, x, z };
-        if (nearby.some(npc => isWitness(p, projected, npc)) ||
-          !occludedOriginalWitness(target, witnesses, x, z)) continue;
+        if (!screenedTile(p, target, witnesses, nearby, x, z) ||
+            !screenedFollowerStands(p, target, witnesses, nearby, x, z)) continue;
         const route = exactRoute(p.level, p.x, p.z, x, z);
         if (!route) continue;
         return { destination: { level: target.level, x, z }, route };
