@@ -134,6 +134,7 @@ if (testbit(%thieving_stall_timer, ^spice_stall_index) = ^true) {
 if (testbit(%thieving_stall_timer, ^gem_stall_index) = ^true) {
     longqueue(stolen_from_stall_gem, ^gem_stall_timer, ^discard, 0);
 }
+~regional_stall_timers_login;
 
 // these are longqueues in osrs - they affect movement when p_delay'd
 
@@ -160,7 +161,7 @@ if (testbit(%thieving_stall_timer, ^gem_stall_index) = ^true) {
 
 // Fremennik Trials — Rellekka stalls (from 274)
 [queue,stolen_from_stall_vikingfur]
-// timer holder
+%thieving_stall_timer = clearbit(%thieving_stall_timer, ^vikingfur_stall_index);
 
 [queue,stolen_from_stall_vikingfish]
-// timer holder
+%thieving_stall_timer = clearbit(%thieving_stall_timer, ^vikingfish_stall_index);
