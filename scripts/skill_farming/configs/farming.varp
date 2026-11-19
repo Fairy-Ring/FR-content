@@ -1,6 +1,8 @@
 // Original unused 377 slot 500. Server checkpoint, not a client selector.
 [farming_growth_minute]
 scope=perm
+// UNKNOWN operator-selected access: the SOFT growth check writes this state.
+protect=no
 
 // Original unused 377 slot 519, assigned by Main. Server-only saved care flags.
 // UNKNOWN engineering layout: 0–7 allotments, 8–11 hops, 12–15 bushes reserved,
@@ -16,3 +18,5 @@ scope=perm
 // Flowers retain their fixed yield; no client varbit is added.
 [farming_soil_lives]
 scope=perm
+// UNKNOWN operator-selected access: the SOFT growth check writes harvest lives.
+protect=no

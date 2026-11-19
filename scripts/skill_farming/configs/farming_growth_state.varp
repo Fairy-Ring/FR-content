@@ -1,0 +1,41 @@
+// Original slot 504. Fields retained from the 377 unpack.
+// UNKNOWN operator-selected access: SOFT growth writes while the player is busy.
+[farming_allotment_varp_1]
+transmit=yes
+scope=perm
+protect=no
+
+// Original slot 505. Fields retained from the 377 unpack.
+// UNKNOWN operator-selected access: SOFT growth writes while the player is busy.
+[farming_allotment_varp_2]
+transmit=yes
+scope=perm
+protect=no
+
+// Original slot 506. Fields retained from the 377 unpack.
+// UNKNOWN operator-selected access: SOFT growth writes while the player is busy.
+[farming_hops_varp]
+transmit=yes
+scope=perm
+protect=no
+
+// Original slot 508. Fields retained from the 377 unpack.
+// UNKNOWN operator-selected access: SOFT growth writes while the player is busy.
+[farming_flower_varp]
+transmit=yes
+scope=perm
+protect=no
+
+// Original slot 511. Fields retained from the 377 unpack.
+// UNKNOWN operator-selected access: SOFT growth writes the compost countdown.
+[varp511_bits]
+transmit=yes
+scope=perm
+protect=no
+
+// Original slot 515. Fields retained from the 377 unpack.
+// UNKNOWN operator-selected access: SOFT growth writes the herb patch bytes.
+[varp515_bits]
+transmit=yes
+scope=perm
+protect=no
