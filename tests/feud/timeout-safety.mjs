@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   Packet, PlayerLoading, PlayerStat, ScriptProvider, ScriptState, ServerTriggerType, World, count, engineModule,
-  execute, id, inv, inventory, obj, seed, types
+  execute, id, inv, inventory, map, obj, seed, types
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
@@ -15,6 +15,9 @@ const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { NpcStat } = await engineModule('engine/entity/NpcStat.ts');
 const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
 const rsbuf = await engineModule('network/rsbuf/index.ts');
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const moveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
+const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const slotVar = id('VarPlayerType', 'feud_trial_villager');
 const stateVar = id('VarNpcType', 'feud_villager_state');
 const ownerVar = id('VarNpcType', 'feud_villager_owner');
@@ -115,6 +118,25 @@ function knockOutHere(p, target) {
   assert.equal(target.getVar(ownerVar), p.uid);
   assert.equal(p.getVar(slotVar), target.uid);
   return target.getVar(deadlineVar);
+}
+
+function walkIntoNativeRange(p, target, tracked, deadline) {
+  const destination = operationStand(p, target);
+  assert(destination, 'the original follower has a collision-reachable operation stand');
+  const route = [...map.findPath(p.level, p.x, p.z, destination[1], destination[2])];
+  assert(route.length, 'the owner has a real walking route to the original follower');
+  const end = CoordGrid.unpackCoord(route.at(-1));
+  assert.deepEqual([end.level, end.x, end.z], destination, 'the native route reaches that exact stand');
+  const path = route.map(coord => {
+    const point = CoordGrid.unpackCoord(coord);
+    return { x: point.x, z: point.z };
+  });
+  assert(moveClickHandler.handle(new MoveClick(path, 0, false), p), 'native MoveClick accepts the owner approach');
+  const arrived = () => p.level === destination[0] && p.x === destination[1] && p.z === destination[2];
+  for (let ticks = 0; ticks < nativeSetupWaitTicks && World.currentTick < deadline &&
+    (!arrived() || !p.inOperableDistance(target)); ticks++) countedWorldTick(tracked);
+  assert(arrived() && p.inOperableDistance(target),
+    'the owner walks into actual operation range without extending the original deadline or relocating an actor');
 }
 
 function dispatchSynchronousKnockOut(p, target) {
@@ -497,9 +519,15 @@ test('a second native action updates the timer deadline before the earlier deadl
   assert.equal(stage(p), 9);
   const target = lure(p);
   const oldDeadline = target.getVar(deadlineVar);
-  boundedTicksThrough(new Set([target]), oldDeadline - 3);
+  const tracked = new Set([target]);
+  boundedTicksThrough(tracked, oldDeadline - nativeSetupWaitTicks - 3);
+  if (!p.inOperableDistance(target)) walkIntoNativeRange(p, target, tracked, oldDeadline - 3);
+  boundedTicksThrough(tracked, oldDeadline - 3);
   assert.equal(World.currentTick, oldDeadline - 3);
-  assert(p.inOperableDistance(target), 'the lured Villager reaches the stationary owner through native following');
+  assert(p.inOperableDistance(target), `the actual late input is in native operation range: ${JSON.stringify({
+    player: [p.level, p.x, p.z], npc: [target.level, target.x, target.z],
+    mode: target.targetOp, followsOwner: target.target === p, state: target.getVar(stateVar)
+  })}`);
   assert(!hasWitness(p, target));
   const beforePosition = [p.level, p.x, p.z];
   const inputTickCallbacks = countedWorldTick(new Set([target]), () => dispatchSynchronousKnockOut(p, target));
