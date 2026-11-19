@@ -1,6 +1,6 @@
 // UNKNOWN engineering meanings inside the original closed-form selector band.
-// Nine existing five-minute opportunities give 40-45 minutes continuously online.
-// The unchanged shared logout/reset clock can delay completion beyond that range.
+// Nine steps measure 40.01-49.99 minutes continuously online on the shared clock.
+// Repeated short sessions can delay rotting without an upper bound.
 ^farming_compost_rot_steps = 9
 ^farming_compost_countdown_first = 64
 ^farming_compost_rotted_first = 91
