@@ -159,7 +159,7 @@ const soilFields = {
   flower: { varp: 'varp513_bits', bit: 24 },
   herb: { varp: 'varp516_bits', bit: 24 },
 };
-const treatedCaseCount = 2 * expected.families.filter(family => family.built).reduce((total, family) =>
+const treatedCaseCount = 2 * expected.families.filter(family => soilFields[family.key]).reduce((total, family) =>
   total + family.parents.length * family.states.reduce((count, { from, to }) => count + to - from + 1, 0), 0);
 {
   for (const family of expected.families) {
@@ -188,7 +188,7 @@ const treatedCaseCount = 2 * expected.families.filter(family => family.built).re
         }
         assert(script, `${name}/${stage}/${visible.debugname}: actual visible-form dispatch exists`);
         assert(script.name.startsWith('[oploc2,'), 'only the requested option is bound');
-        const soils = family.built ? ['untreated', 'compost', 'supercompost'] : ['untreated'];
+        const soils = soilFields[family.key] ? ['untreated', 'compost', 'supercompost'] : ['untreated'];
         for (const [treatment, soil] of soils.entries()) {
           p.vars.fill(0);
           p.setVarBit(root.multivarbit, stage);
