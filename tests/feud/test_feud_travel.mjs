@@ -11,6 +11,10 @@ const { default: OpLoc } = await engineModule('network/game/client/model/OpLoc.t
 const { default: OpLocHandler } = await engineModule('network/game/client/handler/OpLocHandler.ts');
 const locActionHandler = new OpLocHandler();
 const regionX = 52, regionZ = 46;
+// Stage values come from ^feud_not_started and ^feud_burglary in feud.constant.
+const feudStageVar = id('VarBitType', 'feud_var');
+const FEUD_STAGE_UNSTARTED = 0;
+const FEUD_STAGE_BURGLARY = 13;
 const tileKey = (level, x, z) => `${level}:${x}:${z}`;
 const typeNames = new Map(readFileSync(path.join(contentRoot, 'pack/loc.pack'), 'utf8').trim().split('\n').map(line => {
   const split = line.indexOf('=');
@@ -207,10 +211,13 @@ function walkFixtureToStand(p, plan, floors) {
   assert.deepEqual(tile(p), [plan.stand.level, plan.stand.x, plan.stand.z]);
 }
 
-function dispatch(row, floors, from = null) {
+function dispatch(row, floors, from = null, feudStage = FEUD_STAGE_UNSTARTED) {
   const plan = operationRoute(row, floors, from);
   const p = player();
+  p.setVarBit(feudStageVar, feudStage);
+  assert.equal(p.getVarBit(feudStageVar), feudStage, 'fixture sets the requested Feud stage');
   walkFixtureToStand(p, plan, floors);
+  const source = tile(p);
   const { typeId, loc } = locFor(row);
   assert(p.inOperableDistance(loc), `the source stand is in native interaction range for ${row.name}`);
   p.clearInteraction();
@@ -222,7 +229,7 @@ function dispatch(row, floors, from = null) {
   finish(p);
   assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED, 'native travel script finishes');
   assert.equal(p.messages.some(message => /unhandled (?:stairs|ladder)/i.test(message)), false, `${row.name} never falls through to an unhandled travel path`);
-  return { p, destination: tile(p), trigger: trigger.name };
+  return { p, destination: tile(p), trigger: trigger.name, source };
 }
 
 function verifyLanding(pairName, destination, counterpart, floors) {
@@ -239,24 +246,25 @@ function verifyLanding(pairName, destination, counterpart, floors) {
   assert(escaped, `${pairName}: collision-aware pathfinding can leave the landing tile`);
 }
 
-function exercisePair(pair) {
+function exercisePair(pair, feudStage = FEUD_STAGE_UNSTARTED) {
   if (pair.insideFixture) {
     // Test-only own-position fixture begins inside the mayor's house to exercise these stairs.
     // It does not invoke or bypass the house door predicate; the parent whole-quest test proves entry.
     assert.equal(pair.lower.name, 'feud_insidestairs_base');
     assert.equal(pair.upper.name, 'feud_insidestairs_top');
   }
-  const up = dispatch(pair.lower, region.floors);
+  const up = dispatch(pair.lower, region.floors, null, feudStage);
   assert.deepEqual(up.destination, [pair.up.level, pair.up.x, pair.up.z], `${pair.name}: climb-up destination is exact`);
   verifyLanding(`${pair.name} up`, up.destination, pair.upper, region.floors);
 
-  const down = dispatch(pair.upper, region.floors, pair.up);
+  const down = dispatch(pair.upper, region.floors, pair.up, feudStage);
   assert.deepEqual(down.destination, [pair.down.level, pair.down.x, pair.down.z], `${pair.name}: climb-down destination is exact`);
   verifyLanding(`${pair.name} down`, down.destination, pair.lower, region.floors);
   return { up, down };
 }
 
-for (const pair of [...ladderPairs, ...stairPairs]) exercisePair(pair);
+for (const pair of [...ladderPairs, ...stairPairs]) exercisePair(pair, FEUD_STAGE_UNSTARTED);
+for (const pair of stairPairs) exercisePair(pair, FEUD_STAGE_BURGLARY);
 
 // A generic cache ladder in the Lumbridge town region must retain the shared handler, not Feud travel.
 const otherRegion = readMap('m50_50.jm2');
@@ -264,6 +272,7 @@ const otherLadder = otherRegion.rows.find(row => row.name === 'ladder' && row.le
 assert(otherLadder, 'original Lumbridge generic ladder placement outside Pollnivneach');
 const otherResult = dispatch(otherLadder, otherRegion.floors);
 assert.equal(otherResult.trigger, '[oploc1,ladder]', 'another region keeps the shared exact-type ladder handler');
-assert.deepEqual(otherResult.destination, [otherLadder.level + 1, otherLadder.x, otherLadder.z], 'the generic ladder is not captured by Feud destinations');
+// Published ladders.rs2 calls climb_ladder(movecoord(coord(), 0, 1, 0), true): coord() is the player's approach tile.
+assert.deepEqual(otherResult.destination, [otherResult.source[0] + 1, otherResult.source[1], otherResult.source[2]], 'the generic ladder follows its published source-relative destination');
 
 console.log(`RESULT PASS feud-travel: ${ladderPairs.length} original ladder pairs and ${stairPairs.length} stair pairs round-tripped through native OPLOC dispatch; mayor-house interior position was a test fixture, not a door proof; other-region generic ladder stayed generic`);
