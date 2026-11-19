@@ -158,5 +158,71 @@ for (const row of manifest.specific ?? []) {
     assert.deepEqual([...f.p.vars], vars, 'the ordinary lore shelf writes no quest state');
   }
 }
+const { CollisionType } = await load('engine/routefinder/flags');
+const inheritedChestRestoreTicks = 300; // UNKNOWN historical timing: unchanged published chest-family duration.
+for (const pair of manifest.pairs) {
+  const closed = LocType.getByName(pair.closed), opened = LocType.getByName(pair.opened);
+  const partnerParam = id(configs.ParamType, 'chest_other');
+  assert.equal(closed.params.get(partnerParam), opened.id, 'closed form names its exact cache partner');
+  assert.equal(opened.params.get(partnerParam), closed.id, 'open form names its exact cache partner');
+  assert.equal(closed.op[pair.openSlot - 1], 'Open');
+  assert.equal(opened.op[pair.searchSlot - 1], 'Search');
+  assert.equal(opened.op[pair.closeSlot - 1], 'Shut', 'retain the original client spelling and slot');
+  const arrival = pair.publicArrival, reachable = new Set([`${arrival.x},${arrival.z}`]), pending = [[arrival.x, arrival.z]];
+  assert(!map.isMapBlocked(arrival.x, arrival.z, arrival.level), 'published Zanaris arrival is walkable');
+  for (let index = 0; index < pending.length; index++) {
+    const [x, z] = pending[index];
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nx = x + dx, nz = z + dz, key = `${nx},${nz}`;
+      if (nx < 2368 || nx > 2495 || nz < 4416 || nz > 4479 || reachable.has(key)) continue;
+      if (map.canTravel(arrival.level, x, z, dx, dz, 1, 0, CollisionType.NORMAL)) {
+        reachable.add(key); pending.push([nx, nz]);
+      }
+    }
+  }
+  for (const row of pair.placements) {
+    const originalType = LocType.getByName(row.name);
+    const native = World.getLoc(row.x, row.z, row.level, originalType.id);
+    assert(native, `${row.name} uses an original native placement`);
+    const approaches = [];
+    for (let x = row.x - 2; x <= row.x + 2; x++) for (let z = row.z - 2; z <= row.z + 2; z++) {
+      if (reachable.has(`${x},${z}`) && !map.isMapBlocked(x, z, row.level)
+          && map.reachedLoc(row.level, x, z, row.x, row.z, originalType.width, originalType.length, 1, row.angle, row.shape, originalType.forceapproach)) approaches.push([x, z]);
+    }
+    assert(approaches.length, `${row.name}@${row.x},${row.z} has an original-map route from the published public arrival`);
+    const f = fixture(row); f.loc = native; [f.p.x, f.p.z] = approaches[0];
+    const act = (type, slot, family) => {
+      f.type = type; f.messages.length = 0;
+      const script = select(f, slot);
+      assert.equal(script?.name, `[oploc${slot},_${family}]`, `${row.name} selects the published ${family} operation`);
+      execute(f, script);
+      assert.strictEqual(World.getLoc(row.x, row.z, row.level, native.type), native, 'native map stores the changed form');
+      assert.deepEqual([native.x, native.z, native.level, native.shape, native.angle], [row.x, row.z, row.level, row.shape, row.angle], 'swap preserves native placement geometry');
+    };
+    if (native.type === closed.id) act(closed, pair.openSlot, 'chest_closed');
+    assert.equal(native.type, opened.id);
+    const inventory = [...f.p.getInventory(id(InvType, 'inv')).items];
+    act(opened, pair.searchSlot, 'chest_open');
+    assert.deepEqual(f.messages, ['You find nothing.'], 'the chest uses the existing, explicitly guessed generic wording');
+    assert.deepEqual([...f.p.getInventory(id(InvType, 'inv')).items], inventory);
+    f.messages.length = 0;
+    execute(f, select(f, pair.searchSlot), 0, () => {});
+    assert.equal(f.p.invTotal(id(InvType, 'inv'), id(ObjType, 'leather_gloves')), 1, 'the chest retains the inherited random-junk item branch');
+    act(opened, pair.closeSlot, 'chest_open');
+    assert.equal(native.type, closed.id);
+    if (originalType.id === opened.id) act(closed, pair.openSlot, 'chest_closed');
+    assert.equal(native.type, originalType.id, 'Open/Shut round trip restores each original closed or placed-open form');
+    assert(!native.isChanged());
+    act(originalType, originalType.id === closed.id ? pair.openSlot : pair.closeSlot, originalType.id === closed.id ? 'chest_closed' : 'chest_open');
+    assert.equal(native.lifecycleTick, inheritedChestRestoreTicks, 'use the unchanged family restoration duration');
+    for (let tick = 1; tick <= inheritedChestRestoreTicks; tick++) {
+      World.currentTick++; World.processZones();
+      assert.equal(native.type === originalType.id, tick === inheritedChestRestoreTicks, 'native lifecycle restores at the inherited bound, not earlier');
+      for (const zone of World.zonesTracking) zone.reset();
+    }
+    assert(!native.isChanged(), 'native lifecycle restores the original cache form');
+    console.log(`PASS generic chest pair ${row.name}@${row.x},${row.z}: Open/Search/Shut, junk and native restoration`);
+  }
+}
 console.log(`ORDINARY_SEARCH_PASS search=${manifest.search.length} specific=${manifest.specific.length} titles=${wizardTitles.length} left=${manifest.left.length} pairs=${manifest.pairs.length}`);
 process.exit(0);

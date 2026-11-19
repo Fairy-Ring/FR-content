@@ -84010,44 +84010,7 @@ hillskew=yes
 active=no
 blockwalk=no
 
-[fairy_chest_closed]
-name=Closed chest
-desc=I wonder what's inside.
-model=ahoy_chest_closed
-recol1s=14695
-recol1d=6272
-recol2s=12615
-recol2d=7329
-recol3s=6370
-recol3d=8386
-recol4s=6373
-recol4d=9443
-recol5s=8484
-recol5d=10500
-recol6s=9543
-recol6d=11557
-op1=Open
-forceapproach=north
 
-[fairy_chest_open]
-name=Open chest
-desc=Perhaps I should search it.
-model=ahoy_chest_open
-recol1s=14695
-recol1d=6272
-recol2s=4256
-recol2d=7329
-recol3s=6370
-recol3d=8386
-recol4s=6373
-recol4d=9443
-recol5s=8484
-recol5d=10500
-recol6s=9543
-recol6d=11557
-op2=Search
-op3=Shut
-forceapproach=north
 
 [fairy_trough]
 name=Water Trough

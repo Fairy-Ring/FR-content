@@ -377,9 +377,6 @@
     {"name":"fever_gunpowder_barrel","slot":1,"x":1822,"z":4831,"level":1,"shape":10,"angle":1},
     {"name":"fever_gunpowder_barrel_exploded","slot":1,"x":1822,"z":4831,"level":1,"shape":10,"angle":1},
     {"name":"fever_your_gunpowder_barrel","slot":1,"x":1817,"z":4832,"level":1,"shape":10,"angle":0},
-    {"name":"fairy_chest_closed","slot":1,"x":2380,"z":4456,"level":0,"shape":10,"angle":1},
-    {"name":"fairy_chest_open","slot":2,"x":2380,"z":4459,"level":0,"shape":10,"angle":1},
-    {"name":"fairy_chest_open","slot":3,"x":2380,"z":4459,"level":0,"shape":10,"angle":1},
     {"name":"chickenquest_vanilla_plant","slot":1,"x":2816,"z":2895,"level":0,"shape":10,"angle":0},
     {"name":"hundred_goodchest_base","slot":1,"x":3219,"z":9623,"level":0,"shape":10,"angle":1},
     {"name":"hundred_goodchest_base","slot":2,"x":3219,"z":9623,"level":0,"shape":10,"angle":1},
@@ -408,5 +405,35 @@
     {"name":"barrel_14964","slot":1,"x":2320,"z":3671,"level":0,"shape":10,"angle":2},
     {"name":"hermans_desk","slot":1,"x":2353,"z":3682,"level":0,"shape":10,"angle":2}
   ],
-  "pairs": []
+  "pairs": [
+    {
+      "closed": "fairy_chest_closed",
+      "opened": "fairy_chest_open",
+      "openSlot": 1,
+      "searchSlot": 2,
+      "closeSlot": 3,
+      "placements": [
+        {"name":"fairy_chest_closed","x":2380,"z":4456,"level":0,"shape":10,"angle":1},
+        {"name":"fairy_chest_closed","x":2380,"z":4457,"level":0,"shape":10,"angle":1},
+        {"name":"fairy_chest_closed","x":2380,"z":4458,"level":0,"shape":10,"angle":1},
+        {"name":"fairy_chest_closed","x":2380,"z":4460,"level":0,"shape":10,"angle":1},
+        {"name":"fairy_chest_closed","x":2381,"z":4455,"level":0,"shape":10,"angle":1},
+        {"name":"fairy_chest_closed","x":2381,"z":4461,"level":0,"shape":10,"angle":1},
+        {"name":"fairy_chest_open","x":2380,"z":4459,"level":0,"shape":10,"angle":1},
+        {"name":"fairy_chest_open","x":2383,"z":4454,"level":0,"shape":10,"angle":0}
+      ],
+      "publicArrival": {"x":2452,"z":4471,"level":0}
+    }
+  ],
+  "livePair": {
+    "closed": "fairy_chest_closed",
+    "opened": "fairy_chest_open",
+    "near": {"x":2380,"z":4456},
+    "closeOption": "Shut",
+    "start": {"x":2381,"z":4456,"level":0}
+  },
+  "livePairSearches": [
+    {"name":"fairy_chest_open","near":{"x":2380,"z":4459},"start":{"x":2381,"z":4459,"level":0}},
+    {"name":"fairy_chest_open","near":{"x":2383,"z":4454},"start":{"x":2383,"z":4455,"level":0}}
+  ]
 }
