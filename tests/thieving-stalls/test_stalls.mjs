@@ -380,7 +380,8 @@ for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profile
   });
   test(`${key}: native steal, published lockout bit, empty and automatic return`, () => {
     const { p, loc, xp: before } = fixture(row, locs, level);
-    const duration = Math.trunc(ticks * (4000 - Math.min(World.getTotalPlayers() + 1, 2000)) / 4000);
+    // player() already registers the fixture player in World.players.
+    const duration = Math.trunc(ticks * (4000 - Math.min(World.getTotalPlayers(), 2000)) / 4000);
     execute(p, loc);
     assert.equal(p.stats[PlayerStat.THIEVING] - before, xp);
     const produced = snapshot(p).filter(Boolean);
