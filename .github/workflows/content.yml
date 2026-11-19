@@ -192,6 +192,12 @@ jobs:
           run_test tests/wanted/savant.mjs node --import tsx ../content/tests/wanted/savant.mjs
           run_test tests/wanted/records.mjs node --import tsx ../content/tests/wanted/records.mjs
           run_test tests/feud/test_feud_start.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_start.mjs
+          run_test tests/feud/test_feud_trials.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_trials.mjs
+          run_test tests/feud/test_feud_burglary.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_burglary.mjs
+          run_test tests/feud/test_feud_travel.mjs node --import tsx ../content/tests/feud/test_feud_travel.mjs
+          run_test tests/feud/test_feud_poison.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_poison.mjs
+          run_test tests/feud/test_feud_finale.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_finale.mjs
+          run_test tests/feud/test_feud_repeat_blackjack.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_repeat_blackjack.mjs
           run_test tests/drop-tables/test_kalphite_queen.mjs node --import tsx ../content/tests/drop-tables/test_kalphite_queen.mjs
           run_test tests/waterbirth-monsters/test_waterbirth_monsters.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_monsters.mjs
           run_test tests/waterbirth-monsters/test_waterbirth_eggs.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/waterbirth-monsters/test_waterbirth_eggs.mjs

@@ -1,14 +1,60 @@
-// The Feud — Mayor's Landscape picture Search (dump mes only). New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Searching the Mayor's
-// Landscape, dump §12.6 first line only). Loc feud_mayors_picture 6276 @
-// 3374,2974 L1, name Landscape, op1=Search. Mes (split <80):
-// "On the wall hangs a rather nondescript picture." /
-// "On closer inspection you notice that it's covering something: a safe."
-// NO safe IF / combo / jewels this hop (no leftover IF bind — later). No
-// if_open*. Stage/count stay. No 28. No dest / p_tele. No && / ||.
-// Cite feud-config-unit-first-377.md §5 · osrs-wiki-changes-crawl-377.md.
-
+// VERIFIED route and combination: Tip.It 28 Apr 2006; RuneHQ 24 Apr 2006.
+// Original 377 interface 265 is the nine-number safe dial.
+// CANDIDATE narrative: Transcript:The Feud, RuneScape revision 18411641.
+// Missing failure/reset/capacity text: CANDIDATE Old School transcript 15325427.
+// VERIFIED cache range: varbit 325 (feud_safe_digit) has four bits, holding 0..15.
+// CANDIDATE counter meaning: transcript 15325427, entry-count note at line 937.
+// UNKNOWN six-entry evaluation boundary: see feud_burglary.constant.
 [oploc1,feud_mayors_picture]
-mes("On the wall hangs a rather nondescript picture.");
-mes("On closer inspection you notice that it's covering something: a safe.");
-return;
+if (%feud_var < ^feud_staked_out | %feud_var > ^feud_jewels_taken) return;
+if (%feud_var_mayorsdoor = 0 | ~feud_burglary_disguised = false) return;
+~mesbox("On the wall hangs a rather nondescript picture. On closer inspection you notice that it's covering something: a safe.");
+%if1 = 0;
+%if2 = ^feud_safe_reset_prefix;
+%feud_safe_digit = ^feud_safe_reset_prefix;
+if_openmain(inter_265);
+
+[if_button,inter_265:com_4] @feud_safe_digit(1);
+[if_button,inter_265:com_5] @feud_safe_digit(2);
+[if_button,inter_265:com_6] @feud_safe_digit(3);
+[if_button,inter_265:com_7] @feud_safe_digit(4);
+[if_button,inter_265:com_8] @feud_safe_digit(5);
+[if_button,inter_265:com_9] @feud_safe_digit(6);
+[if_button,inter_265:com_10] @feud_safe_digit(7);
+[if_button,inter_265:com_11] @feud_safe_digit(8);
+[if_button,inter_265:com_12] @feud_safe_digit(9);
+
+[if_button,inter_265:com_13]
+%if1 = 0;
+%if2 = ^feud_safe_reset_prefix;
+%feud_safe_digit = ^feud_safe_reset_prefix;
+mes("Clank!! That must be the safe resetting itself.");
+
+[if_close,inter_265]
+if (p_finduid(uid) = false) return;
+%if1 = 0;
+%if2 = ^feud_safe_reset_prefix;
+%feud_safe_digit = ^feud_safe_reset_prefix;
+
+[label,feud_safe_digit](int $digit)
+%if1 = $digit;
+%if2 = calc(%if2 * 10 + $digit);
+%feud_safe_digit = calc(%feud_safe_digit + 1);
+if (%feud_safe_digit < ^feud_safe_digit_count) return;
+def_int $attempt = %if2;
+%if2 = ^feud_safe_reset_prefix;
+%feud_safe_digit = ^feud_safe_reset_prefix;
+if ($attempt ! ^feud_safe_combination) {
+    ~mesbox("A rather loud clank reverberates from the safe. It sounds as if you've gotten the combination wrong. You wonder how many more attempts you have before the safe permanently locks itself.");
+    return;
+}
+if (inv_total(inv, feud_mayors_jewels) = 0) {
+    if (inv_freespace(inv) < 1) {
+        ~mesbox("The mayor's jewels are contained within the safe, however you have no room in your inventory to take them.");
+        return;
+    }
+    inv_add(inv, feud_mayors_jewels, 1);
+}
+%feud_var = ^feud_jewels_taken;
+if_close;
+~mesbox("You remove the jewels from the safe.");

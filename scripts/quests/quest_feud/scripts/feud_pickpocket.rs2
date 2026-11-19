@@ -1,96 +1,134 @@
-// Three distinct pickpocket trials: VERIFIED period quest guides.
-// Wording and ordinary villager loot are CANDIDATE from later sources.
+// Feud villager theft trials. Quest progress is stage-based; NPC state is per target and owner.
 
 [opnpc3,feud_villager_1_1]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [opnpc3,feud_villager_1_2]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [opnpc3,feud_villager_1_3]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [opnpc3,feud_villager_2_1]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [opnpc3,feud_villager_2_2]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [opnpc3,feud_villager_2_3]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [opnpc3,feud_villager_3_1]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [opnpc3,feud_villager_3_2]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [opnpc3,feud_villager_3_3]
-if (%feud_var < 1) { return; }
-if (%feud_var_drink < 3) { return; }
-if (%feud_var_comp_gangs ! 3) { return; }
+if (%feud_var = ^feud_complete) {
+    ~feud_repeat_villager_pickpocket;
+    return;
+}
+if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [label,feud_villager_pick]
-if (%feud_var < ^feud_recruited) {
-    return;
-}
-if (%feud_talk_villager = 2 & %feud_npc_multi = 2) {
-    mes("You pick the villager's pocket.");
-    inv_add(inv, coins, 5); // CANDIDATE loot — OSRS Villager table (no dbrow skill proc)
-    stat_advance(thieving, 80); // CANDIDATE xp — OSRS Villager table (man row 80 = 8.0)
-    %feud_talk_villager = 3;
-    return;
-}
-if (%feud_talk_villager = 1 & %feud_distracted = 1) {
-    mes("You pick the villager's pocket.");
-    inv_add(inv, coins, 5); // CANDIDATE loot — OSRS Villager table (no dbrow skill proc)
-    stat_advance(thieving, 80); // CANDIDATE xp — OSRS Villager table (man row 80 = 8.0)
-    %feud_talk_villager = 2;
-    %feud_distracted = 0; // CANDIDATE — 3rd pick needs the oak KO vis (count = 2 & npc_multi = 2)
-    return;
-}
-if (%feud_talk_villager >= 1) {
-    if (%feud_talk_villager >= 2) {
-        if (inv_total(inv, blackjack_oak) >= 1 | inv_total(worn, blackjack_oak) >= 1) {
-            if (%feud_npc_multi >= 1) {
-                %feud_npc_multi = 2; // CANDIDATE — opens KO (vis 2); same flip pattern as Lure (0->1)
-            } else {
-                %feud_npc_multi = 1; // CANDIDATE — opens Lure (vis 1) after the oak award; engine rejects op4/op5 at lower vis
-            }
-        }
+if (%feud_var = ^feud_recruited) {
+    // VERIFIED 30 Thieving minimum; this follows the normal pickpocket refusal pattern.
+    if (stat(thieving) < ^feud_trial_thieving_level) {
+        ~mesbox("You need level <tostring(^feud_trial_thieving_level)> thieving to pick the villager's pocket.");
+        return;
     }
-    ~chatnpc("<p,angry>I know your tricks, thief.");
-    ~chatnpc("<p,angry>You won't get my purse.");
-    ~damage_self(2); // dump: villager hits the player for 2 damage. Stun skipped (no opcode).
+    if (%feud_villager_state ! ^feud_villager_state_idle) {
+        @feud_villager_caught;
+    }
+    inv_add(inv, coins, ^feud_villager_pickpocket_coins);
+    stat_advance(thieving, ^feud_villager_pickpocket_xp);
+    %feud_npc_multi = 1;
+    %feud_var = ^feud_first_pick;
     return;
 }
-mes("You pick the villager's pocket.");
-inv_add(inv, coins, 5); // CANDIDATE loot — OSRS Villager table (no dbrow skill proc)
-stat_advance(thieving, 80); // CANDIDATE xp — OSRS Villager table (man row 80 = 8.0)
-%feud_talk_villager = 1;
+if (%feud_var = ^feud_distraction_active) {
+    if (%feud_villager_state ! ^feud_villager_state_distracted | %feud_villager_owner ! uid) {
+        @feud_villager_caught;
+    }
+    if (map_clock >= %feud_villager_deadline) {
+        ~feud_villager_reset;
+        @feud_villager_caught;
+    }
+    inv_add(inv, coins, ^feud_villager_pickpocket_coins);
+    stat_advance(thieving, ^feud_villager_pickpocket_xp);
+    %feud_npc_multi = 2;
+    %feud_var = ^feud_second_pick;
+    ~feud_villager_reset;
+    return;
+}
+if (%feud_var = ^feud_villager_lured) {
+    @feud_villager_caught;
+}
+if (%feud_var = ^feud_villager_knocked_out) {
+    if (%feud_villager_state ! ^feud_villager_state_unconscious) {
+        @feud_villager_caught;
+    }
+    if (%feud_villager_owner ! uid) { return; }
+    if (map_clock >= %feud_villager_deadline) {
+        ~feud_villager_reset;
+        ~npc_retaliate(0);
+        return;
+    }
+    inv_add(inv, coins, ^feud_villager_pickpocket_coins);
+    %feud_var = ^feud_third_pick;
+    return;
+}
+@feud_villager_caught;
+
+[label,feud_villager_caught]
+~feud_villager_pickpocket_fail;
 return;
+
+[proc,feud_villager_pickpocket_fail]
+npc_say("I know your tricks, thief.");
+npc_say("You won't get my purse.");
+~damage_self(^feud_villager_pickpocket_fail_damage);
+return;
+

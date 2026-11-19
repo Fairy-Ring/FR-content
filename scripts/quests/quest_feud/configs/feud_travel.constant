@@ -1,0 +1,15 @@
+// UNKNOWN original server landing tiles. These engineering values follow the
+// paired original loc's footprint and forced-approach side on the 377 map.
+// A native pathfinding pass proves current reachability, not historical values.
+^feud_ladder_22_19_up = 1_52_46_21_19
+^feud_ladder_22_19_down = 0_52_46_21_19
+^feud_ladder_36_59_up = 1_52_46_36_58
+^feud_ladder_36_59_down = 0_52_46_36_58
+^feud_ladder_41_47_up = 1_52_46_40_47
+^feud_ladder_41_47_down = 0_52_46_40_47
+^feud_ladder_28_37_up = 2_52_46_28_38
+^feud_ladder_28_37_down = 1_52_46_28_38
+^feud_outside_stairs_up = 1_52_46_26_14
+^feud_outside_stairs_down = 0_52_46_25_17
+^feud_mayor_stairs_up = 1_52_46_46_34
+^feud_mayor_stairs_down = 0_52_46_45_33

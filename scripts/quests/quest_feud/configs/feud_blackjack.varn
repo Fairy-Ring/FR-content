@@ -1,0 +1,8 @@
+[feud_villager_state]
+type=int
+
+[feud_villager_owner]
+type=player_uid
+
+[feud_villager_deadline]
+type=int

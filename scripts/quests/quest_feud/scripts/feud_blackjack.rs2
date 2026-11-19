@@ -1,0 +1,95 @@
+// Server-only Feud villager state cleanup for distraction, lure, and knock-out.
+
+[ai_queue19,feud_villager_multi_1]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_multi_2]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_multi_3]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_1_1]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_1_2]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_1_3]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_2_1]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_2_2]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_2_3]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_3_1]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_3_2]
+~feud_villager_timeout;
+
+[ai_queue19,feud_villager_3_3]
+~feud_villager_timeout;
+
+[proc,feud_villager_timeout]
+if (%feud_villager_state = ^feud_villager_state_idle) { return; }
+if (p_finduid(%feud_villager_owner) = false) {
+    ~feud_villager_reset;
+    return;
+}
+if (map_clock < %feud_villager_deadline) {
+    def_int $remaining = calc(%feud_villager_deadline - map_clock);
+    npc_queue(19, 0, $remaining);
+    return;
+}
+~feud_villager_reset;
+
+[proc,feud_villager_reset]
+def_player_uid $owner = %feud_villager_owner;
+def_npc_uid $target = npc_uid;
+if (%feud_villager_state = ^feud_villager_state_unconscious) {
+    npc_anim(human_ready, 0);
+}
+%feud_villager_state = ^feud_villager_state_idle;
+%feud_villager_owner = null;
+%feud_villager_deadline = 0;
+if (npc_getmode ! opplayer2) {
+    %npc_attacking_uid = null;
+    npc_setmode(wander);
+}
+if (p_finduid($owner) = true) {
+    if (%feud_trial_villager = $target) %feud_trial_villager = null;
+}
+
+// UNKNOWN FEUD-TRIAL-REPLAY-01: replay only after the earlier condition has ended.
+// Original slot 196 prevents a second active target without adding a follow-distance rule.
+// The callers preserve the saved waiting checkpoint; replay gives no coins, items or XP.
+[proc,feud_trial_target_ready]()(boolean)
+if (%feud_trial_villager = null) return(true);
+def_npc_uid $actor = npc_uid;
+if (npc_finduid(%feud_trial_villager) = true) {
+    if (%feud_villager_owner = uid & %feud_villager_state ! ^feud_villager_state_idle) {
+        if (map_clock < %feud_villager_deadline) {
+            if (npc_finduid($actor) = false) return(false);
+            return(false);
+        }
+        ~feud_villager_reset;
+    }
+}
+%feud_trial_villager = null;
+if (npc_finduid($actor) = false) return(false);
+return(true);
+
+// Safe for ordinary logout, including every player without an active trial target.
+// The NPC's own bounded queue remains the independent orphan/expiry cleanup path.
+[proc,feud_trial_release]
+if (%feud_trial_villager = null) return;
+if (npc_finduid(%feud_trial_villager) = true) {
+    if (%feud_villager_owner = uid) ~feud_villager_reset;
+}
+%feud_trial_villager = null;

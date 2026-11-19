@@ -188,6 +188,7 @@ model=obj_strength4
 2dxan=84
 members=yes
 weight=200g
+tradeable=no
 
 [snake_flute]
 name=Snake charm

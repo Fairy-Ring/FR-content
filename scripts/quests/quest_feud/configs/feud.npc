@@ -24,6 +24,12 @@ alwaysontop=yes
 head1=npc_1862_head
 head2=npc_1862_headi2
 head3=obj_leather_cowl_manhead2
+// CANDIDATE server stock and pricing; original client fields above are unchanged.
+param=owned_shop,feud_morrisanes
+param=shop_sell_multiplier,1000
+param=shop_buy_multiplier,550
+param=shop_delta,10
+param=shop_title,Ali's Discount Wares.
 
 [feud_drunken_ali]
 name=Drunken Ali
@@ -263,6 +269,8 @@ readyanim=snakecharmer_charming
 op1=Talk-to
 vislevel=hide
 turnspeed=0
+// UNKNOWN engineering movement policy for the original seated visual form.
+// These three server-only values are not recovered original server settings.
 wanderrange=0
 moverestrict=nomove
 defaultmode=none
@@ -505,6 +513,11 @@ defence=50
 head1=idk_man_jaw_moustache_head
 head2=npc_1862_head
 head3=obj_pickpocket_guide_man
+// CANDIDATE server bonuses/style: Old School champion history 2233817.
+// Existing attackrate and presentation defaults are not changed.
+param=damagetype,^slash_style
+param=attackbonus,9
+param=strengthbonus,9
 
 [feud_arabian_guard_coward]
 name=Cowardly Bandit
@@ -931,6 +944,10 @@ defence=50
 head1=npc_1901_head
 head2=obj_pickpocket_guide_man
 head3=idk_man_jaw_pointy_head
+// CANDIDATE server bonuses: Old School Tough Guy history 2232858.
+// Existing crush style, attackrate and presentation defaults are not changed.
+param=attackbonus,9
+param=strengthbonus,9
 
 [feud_bjseller]
 name=Blackjack seller

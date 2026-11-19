@@ -1,0 +1,74 @@
+// The Feud — red sauce on the original Pollnivneach camel trough.
+// CANDIDATE current OSRS Dung scenery history: 2/25 green, 23/25 brown.
+// RuneHQ says the camel drops dung a few seconds after it eats; the delay and
+// 200-cycle temporary-loc lifetime are named UNKNOWN engineering values.
+// Brown dung alone accepts bucket_empty; green remains uncollectable, so use
+// the reusable sauce again. Dry dung has no sourced drying mechanic.
+// The existing trough, camels, dung locs, and animation sequences are reused.
+// UNKNOWN FEUD-DUNG-REFUSAL-01: equal weights among each listed refusal set.
+
+[oplocu,feud_foodtrough]
+def_obj $used = last_useitem;
+if ($used ! superhot_kebab_sauce) {
+    return;
+}
+if (npc_find(loc_coord, feud_camel, ^feud_camel_trough_range, 0) = false) {
+    return;
+}
+if (loc_find(loc_coord, feud_ugthanki_pooh) = true) {
+    loc_del(0);
+}
+if (loc_find(loc_coord, feud_ugthanki_pooh_poisoned) = true) {
+    loc_del(0);
+}
+anim(feud_hot_sauce_poisoning, 0);
+npc_anim(camel_eats_from_trough, 0);
+p_delay(^feud_dung_spawn_delay);
+npc_anim(camel_eat_from_trough, 0);
+def_int $roll = random(100);
+if ($roll < ^feud_dung_green_chance) {
+    loc_add(loc_coord, feud_ugthanki_pooh_poisoned, 0, grounddecor, ^feud_dung_lifetime);
+} else {
+    loc_add(loc_coord, feud_ugthanki_pooh, 0, grounddecor, ^feud_dung_lifetime);
+}
+return;
+
+[oploc1,feud_ugthanki_pooh] @feud_dung_refuse_pickup;
+[oploc1,feud_ugthanki_pooh_poisoned] @feud_dung_refuse_pickup;
+
+[label,feud_dung_refuse_pickup]
+switch_int (random(4)) {
+    case 0 : mes("You're kidding me! I'm not picking that up.");
+        return;
+    case 1 : mes("Yuck! Im not touching that.");
+        return;
+    case 2 : mes("I wouldn't pick that up for all the runes in Gielinor.");
+        return;
+    case 3 : mes("I would rather wrestle a black dragon bare-handed.");
+        return;
+}
+return;
+
+[oplocu,feud_ugthanki_pooh]
+def_obj $used = last_useitem;
+if ($used ! bucket_empty) {
+    return;
+}
+mes("You scoop up some camel dung into the bucket");
+inv_del(inv, bucket_empty, 1);
+inv_add(inv, feud_camel_pooh_bucket, 1);
+loc_del(0);
+return;
+
+[oplocu,feud_ugthanki_pooh_poisoned]
+def_obj $used = last_useitem;
+if ($used ! bucket_empty) {
+    return;
+}
+switch_int (random(2)) {
+    case 0 : ~chatplayer("<p,neutral>I'm not going near that - it's just far too stinky!");
+        return;
+    case 1 : ~chatplayer("<p,neutral>Good gravy, that's some repulsively stinky stuff! I'm not going to go near that.");
+        return;
+}
+return;

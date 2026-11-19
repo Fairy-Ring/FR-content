@@ -1,27 +1,45 @@
-// The Feud — Cactus Hide-behind (stake-out). New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud § Hiding behind the Cactus,
-// dump §11.2). Loc feud_cactus_row 6277 @ 3363,2967 L0, op1=Hide-behind.
-// Dump: not wearing leather gloves -> "I need something to cover my hands
-// before I stake out the house. I might leave fingerprints."; not wearing
-// the desert disguise -> "I need something to disguise my head before I
-// stake out the house. Somebody might spot me."; otherwise player "I better
-// be careful, this cactus is prickly!" + mes "The coast is clear, nobody's
-// home." Dump lines only — stage/count stay, no mayor invis / safe write
-// (later hops), no 28, no dest / p_tele. No && / ||.
-// Cite feud-config-unit-first-377.md §3 · first-slice loc stands ·
-// osrs-wiki-changes-crawl-377.md.
-
+// VERIFIED: the 28 Apr 2006 Tip.It guide requires gloves, disguise and a stakeout.
+// CANDIDATE wording: pre-2022 RuneScape transcript 18411641; missing failure
+// states and the explicit vambrace rejection: Old School transcript 15325427.
 [oploc1,feud_cactus_row]
-if (inv_total(worn, leather_gloves) < 1) {
-    mes("I need something to cover my hands before I stake out the house.");
-    mes("I might leave fingerprints.");
+if (%feud_var < ^feud_burglary | %feud_var > ^feud_staked_out) {
+    ~mesbox("I'd feel a little silly crouching down behind these prickly shrubs for no apparent reason.");
     return;
 }
-if (inv_total(worn, feud_desert_disguise) < 1) {
-    mes("I need something to disguise my head before I stake out the house.");
-    mes("Somebody might spot me.");
+if (~feud_burglary_gloves = false) {
+    ~mesbox("I need something to cover my hands before I stake out the house. I might leave fingerprints.");
     return;
 }
-~chatplayer("<p,neutral>I better be careful, this cactus is prickly!");
-mes("The coast is clear, nobody's home.");
-return;
+if (inv_total(worn, feud_desert_disguise) = 0) {
+    ~mesbox("I need something to disguise my head before I stake out the house. Somebody might spot me.");
+    return;
+}
+mes("I had better be careful, this cactus is prickly!");
+~mesbox("The coast is clear, there appears to be nobody home.");
+%feud_mayor_invis = 1;
+if (%feud_var = ^feud_burglary) %feud_var = ^feud_staked_out;
+
+// The period guides require gloves. These original named gloves/gauntlets
+// cover the fingers; a worn hand item alone is insufficient (notably vambraces).
+[proc,feud_burglary_disguised]()(boolean)
+if (~feud_burglary_gloves = false) return(false);
+if (inv_total(worn, feud_desert_disguise) < 1) return(false);
+return(true);
+
+[proc,feud_burglary_gloves]()(boolean)
+switch_obj (inv_getobj(worn, ^wearpos_hands)) {
+    case gauntlets_of_cooking, gauntlets_of_goldsmithing, gauntlets_of_chaos, steel_gauntlets, leather_gloves, klanks_gauntlets, ice_gloves :
+        return(true);
+    case wolfengloves_grey, wolfengloves_crimson, wolfengloves_tangerine, wolfengloves_ocean, wolfengloves_purple, splitbark_gauntlets, vikinggloves :
+        return(true);
+    case mystic_gloves, mystic_gloves_dark, mystic_gloves_light, ham_gloves, roguesden_gloves, mourning_mourner_gloves :
+        return(true);
+    case dagganoth_range_gloves, dagganoth_melee_gloves, dagganoth_mage_gloves, white_gloves, slayerguide_slayer_gloves, magictraining_infinitygloves :
+        return(true);
+    case hundred_gauntlets_level_1, hundred_gauntlets_level_2, hundred_gauntlets_level_3, hundred_gauntlets_level_4, hundred_gauntlets_level_5, hundred_gauntlets_level_6, hundred_gauntlets_level_7, hundred_gauntlets_level_8, hundred_gauntlets_level_9, hundred_gauntlets_level_10 :
+        return(true);
+    case macro_mime_gloves, macro_digger_gloves, secret_ghost_gloves :
+        return(true);
+    case default :
+        return(false);
+}

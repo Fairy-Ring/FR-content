@@ -1,0 +1,55 @@
+// Pollnivneach travel links follow the original 377 placements in m52_46.jm2.
+// UNKNOWN original server landings: named engineering values use the paired
+// loc's forced side and footprint. Native tests prove current reachability only.
+// `feud_ladder` forceapproach=south rotates west/south/north at angles 1/0/2.
+
+[oploc1,feud_ladder]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_52_46_22_19 : ~climb_ladder(^feud_ladder_22_19_up, true);
+    case 0_52_46_36_59 : ~climb_ladder(^feud_ladder_36_59_up, true);
+    case 0_52_46_41_47 : ~climb_ladder(^feud_ladder_41_47_up, true);
+    case 1_52_46_28_37 : ~climb_ladder(^feud_ladder_28_37_up, true);
+    case default : @unhandled_ladder(loc_coord);
+}
+
+[oploc1,feud_laddertop_norim]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 1_52_46_22_19 : ~climb_ladder(^feud_ladder_22_19_down, false);
+    case 1_52_46_36_59 : ~climb_ladder(^feud_ladder_36_59_down, false);
+    case 1_52_46_41_47 : ~climb_ladder(^feud_ladder_41_47_down, false);
+    case 2_52_46_28_37 : ~climb_ladder(^feud_ladder_28_37_down, false);
+    case default : @unhandled_ladder(loc_coord);
+}
+
+// Existing stairs.loc footprints and forced-approach declarations are used as-is.
+// Named UNKNOWN landings use the forced-approach tile on the paired stairs.
+[oploc1,feud_outsidestairs_base]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_52_46_25_14 : p_telejump(^feud_outside_stairs_up);
+    case default : @unhandled_stairs(loc_coord);
+}
+
+[oploc1,feud_outsidestairs_top]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 1_52_46_25_14 : p_telejump(^feud_outside_stairs_down);
+    case default : @unhandled_stairs(loc_coord);
+}
+
+// The top's west approach rotates to east at angle 2, so L1 lands east.
+[oploc1,feud_insidestairs_base]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 0_52_46_45_34 : p_telejump(^feud_mayor_stairs_up);
+    case default : @unhandled_stairs(loc_coord);
+}
+
+[oploc1,feud_insidestairs_top]
+p_arrivedelay;
+switch_coord (loc_coord) {
+    case 1_52_46_45_34 : p_telejump(^feud_mayor_stairs_down);
+    case default : @unhandled_stairs(loc_coord);
+}

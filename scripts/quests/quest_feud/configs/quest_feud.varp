@@ -5,3 +5,8 @@ transmit=yes
 [feud_var_multi]
 scope=perm
 
+// UNKNOWN engineering reservation in original slot 196, allocated for this unit.
+// Scope and transmission remain at their session-only, non-transmitted defaults.
+[feud_trial_villager]
+type=npc_uid
+protect=no

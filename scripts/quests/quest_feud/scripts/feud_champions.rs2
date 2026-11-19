@@ -1,0 +1,110 @@
+// CANDIDATE quest fights: retained pre-2022 transcript 18411641 and period guides.
+// Ownership/cleanup follows the existing Dessous and Soul's Bane combat paths.
+// Ordinary combat timing and damage calculation are unchanged.
+[proc,feud_champion_spawn](npc $type)
+def_coord $spawn = npc_coord;
+npc_findall(coord, $type, ^feud_champion_search_range, 0);
+while (npc_findnext = true) {
+    if (%npc_attacking_uid = uid) return;
+}
+npc_add($spawn, $type, ^feud_champion_lifetime);
+%npc_attacking_uid = uid;
+%npc_int = 1;
+npc_say("Grrr");
+npc_setmode(opplayer2);
+npc_settimer(1);
+
+[proc,feud_champion_attackable]()(boolean)
+if (%npc_attacking_uid ! uid | %npc_int ! 1) return(false);
+if (npc_type = feud_menap_toughguy) {
+    if (%feud_var = ^feud_leader_summons) return(true);
+    return(false);
+}
+if (%feud_var = ^feud_menaphites_defeated) return(true);
+return(false);
+
+[opnpc2,feud_menap_toughguy]
+if (~feud_champion_attackable = false) return;
+@player_combat_start;
+[apnpc2,feud_menap_toughguy]
+if (~feud_champion_attackable = false) return;
+@player_combat_start_ap;
+[opnpc2,feud_bandit_toughguy]
+if (~feud_champion_attackable = false) return;
+@player_combat_start;
+[apnpc2,feud_bandit_toughguy]
+if (~feud_champion_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_timer,feud_menap_toughguy] ~feud_champion_timer;
+[ai_timer,feud_bandit_toughguy] ~feud_champion_timer;
+[proc,feud_champion_timer]
+if (npc_stat(hitpoints) = 0) return;
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (%death = ^true | ~feud_champion_attackable = false) npc_del;
+
+[ai_queue1,feud_menap_toughguy] ~feud_champion_retaliate;
+[ai_queue1,feud_bandit_toughguy] ~feud_champion_retaliate;
+[proc,feud_champion_retaliate]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~feud_champion_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_retaliate;
+
+[ai_opplayer2,feud_menap_toughguy] ~feud_champion_attack;
+[ai_opplayer2,feud_bandit_toughguy] ~feud_champion_attack;
+[proc,feud_champion_attack]
+if (~feud_champion_attackable = false) {
+    npc_setmode(none);
+    return;
+}
+%npc_aggressive_player = uid;
+~npc_default_attack;
+
+[ai_queue2,feud_menap_toughguy] ~feud_champion_damage;
+[ai_queue2,feud_bandit_toughguy] ~feud_champion_damage;
+[proc,feud_champion_damage]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~feud_champion_attackable = false) return;
+~npc_default_damage(last_int);
+
+[ai_queue3,feud_menap_toughguy] ~feud_champion_death;
+[ai_queue3,feud_bandit_toughguy] ~feud_champion_death;
+[proc,feud_champion_death]
+if (npc_stat(hitpoints) ! 0 | %npc_int ! 1) return;
+if (npc_findhero = ^true) {
+    if (~feud_champion_attackable = true) {
+        // Consume the live encounter before its delayed death animation.
+        %npc_int = 0;
+        obj_add(npc_coord, bones, 1, ^lootdrop_duration);
+        if (npc_type = feud_menap_toughguy) obj_add(npc_coord, blackjack_willow, 1, ^lootdrop_duration);
+        else obj_add(npc_coord, adamant_scimitar, 1, ^lootdrop_duration);
+        queue*(feud_champion_defeated, 0)(npc_type);
+    }
+}
+if (.npc_finduid(npc_uid) = true) ~npc_death;
+
+[queue,feud_champion_defeated](npc $type)
+if ($type = feud_menap_toughguy) {
+    if (%feud_var ! ^feud_leader_summons) return;
+    %feud_var = ^feud_menaphites_defeated;
+    %feud_boss_vis = 0;
+    %feud_boss_vis2 = 1;
+    npc_findall(coord, feud_menap_boss2, ^feud_champion_search_range, 0);
+    if (npc_findnext = true) npc_say("You haven't seen the last of me!");
+    p_delay(^feud_leader_departure_delay);
+    %feud_boss_vis2 = 0;
+    ~chatplayer("<p,neutral>No doubt I haven't seen the last of you... but what about Ali's nephew?");
+    ~chatplayer("<p,neutral>Maybe the villagers will feel more talkative now that I've rid them of these evil Menaphites. Who knows, they might even give me a reward!");
+    return;
+}
+if (%feud_var ! ^feud_menaphites_defeated) return;
+%feud_var = ^feud_bandits_defeated;
+%feud_mayor_invis = 1;
+~chatplayer("<p,neutral>I have defeated your champion, now get out of town.");
+~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,neutral>Adventurer... I have underestimated you. Perhaps we can come to an agreement. How about if I work for you? Think of the riches you would make.");
+~chatplayer("<p,neutral>Don't try my patience, pack your things and get out of town.");
+~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,neutral>The people's champion, you are so naive. They won't even thank you for this you know.");
+~chatplayer("<p,neutral>Sure they will. I think I'll go talk to a villager now, just to prove you wrong. Now get out of town before I really get angry with you.");

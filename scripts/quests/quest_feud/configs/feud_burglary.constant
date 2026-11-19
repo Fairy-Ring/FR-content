@@ -1,0 +1,10 @@
+// VERIFIED: Tip.It 28 Apr 2006, RuneHQ 24 Apr 2006, Sal's 29 Apr 2006.
+^feud_safe_combination = 112358
+
+// UNKNOWN attempt boundary: compare after six entries, including wrong ones.
+// Fits "seems to count up with each number entered" and "gotten the combination wrong".
+^feud_safe_digit_count = 6
+
+// UNKNOWN empty input: a failed attempt, Reset and Close clear the input.
+// Original interface 265 displays only the selected digit, not entered history.
+^feud_safe_reset_prefix = 0

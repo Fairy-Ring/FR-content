@@ -1,62 +1,19 @@
-// The Feud — Bandit Leader after the Menaphites are gone (§20.2). New file.
-// CANDIDATE 2007-base (OSRS Transcript:The Feud §20.2 Talking to the Bandit
-// Leader; no 27 Apr 2022 BCS lines). NPC multi base feud_bandit_boss 1877
-// @ 3353,3002 L0; vis face feud_bandit_boss_vis 1878 "Bandit Leader"
-// op1=Talk-to while %feud_bandit_boss_vis 1 (OpNpcHandler resolves the
-// multi vis — bind the vis name, not the multi base). Stand 3352,3002 W of
-// the pin. Not on the NPC.
-// Gate: %feud_var_menaboss >= 1 (Tough Guy killed, §18.5 PASS feudtsy35b22 —
-// Leader gone, menaboss flag) else return. §20.2 verbatim, chat only:
-// "Come here my friend, so I may embrace you..." -> "Don't jump to
-// conclusions, I didn't do it for you." -> "Regardless, I am still very
-// grateful. Now I have the town at my mercy." -> "That's what I'm here to
-// talk to you about." -> "Do you want a reward? A fee? I will not begrudge
-// you that." -> "No, I'm here to give you an ultimatum..." -> "How the worm
-// has turned..." -> "Pollnivneach is mine..." -> "Start packing your bags!"
-// then the champion spawn: npc_add(npc_coord, feud_bandit_toughguy 1885,
-// 500 CANDIDATE duration) + npc_setmode(opplayer2). No stage write — no 28.
-// [ai_queue3,feud_bandit_toughguy] gosub(npc_death) then 100% drops
-// CANDIDATE 2007-base (OSRS The Feud rewards / tip.it: bones + adamant
-// scimitar 1331). Willow blackjack 4600 is the Tough Guy drop, not this
-// face. Then dumps §20.4 verbatim
-// (defeated your champion / work for you / Ali? Which Ali? / You've been
-// had! / precious townspeople) then %feud_var_banditboss = 1 (varp 323,
-// CANDIDATE leftover flag). Leader stays — no vis write, no dest / p_tele.
-// No && / ||.
-// Cite copy-agent-opener-377.md · feud-varbit-map-377.md §5 §7 ·
-// Transcript:The Feud.
-
+// CANDIDATE: pre-2022 RuneScape transcript 18411641, lines 395–409.
+// Repeat summon and original varbit transitions: Old School transcript 15325427.
 [opnpc1,feud_bandit_boss_vis]
-if (%feud_var_menaboss < 1) { return; }
+if (%feud_var ! ^feud_menaphites_defeated) return;
+if (%feud_var_banditboss = 1) {
+    npc_say("Ali, come here!");
+    ~feud_champion_spawn(feud_bandit_toughguy);
+    return;
+}
 ~chatnpc("<p,neutral>Come here my friend, so I may embrace you. You have done us a great turn by disposing of those Menaphites.");
 ~chatplayer("<p,neutral>Don't jump to conclusions, I didn't do it for you.");
 ~chatnpc("<p,neutral>Regardless, I am still very grateful. Now I have the town at my mercy.");
 ~chatplayer("<p,neutral>That's what I'm here to talk to you about.");
 ~chatnpc("<p,neutral>Do you want a reward? A fee? I will not begrudge you that.");
 ~chatplayer("<p,neutral>No, I'm here to give you an ultimatum: either leave the town of your own free will or I will make you.");
-~chatnpc("<p,neutral>How the worm has turned. This no-name adventurer who was robbing, looting and poisoning not too long ago is now taking the moral high ground! Or are you trying to keep the whole town for yourself?");
-~chatnpc("<p,neutral>Pollnivneach is mine. You won't run me out without a fight. If you want us gone, you must defeat our strongest warrior in battle.");
+~chatnpc("<p,neutral>How the worm has turned. You who was robbing, looting and poisoning not too long ago are now taking the moral high ground! Or are you trying to keep the whole town for yourself? I will not be run out of my own town without a fight. If you defeat my best warrior I will leave town.");
+%feud_var_banditboss = 1;
 ~chatplayer("<p,neutral>Start packing your bags!");
-npc_add(npc_coord, feud_bandit_toughguy, 500); // CANDIDATE duration — arena uses 500
-npc_setmode(opplayer2);
-return;
-
-[ai_queue3,feud_bandit_toughguy]
-gosub(npc_death);
-if (npc_findhero = ^true) {
-    obj_add(npc_coord, bones, 1, ^lootdrop_duration);
-    obj_add(npc_coord, adamant_scimitar, 1, ^lootdrop_duration);
-}
-if (p_finduid(%npc_aggressive_player) = true) {
-    ~chatplayer("<p,neutral>I have defeated your champion, now get out of town.");
-    ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,neutral>Adventurer... I have underestimated you. Perhaps we can come to an agreement. How about I work for you? Think of the riches you would make.");
-    ~chatplayer("<p,angry>Don't try my patience. Tell me where Ali is, and then get out of here?");
-    ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,quiz>Ali? Which Ali?");
-    ~chatplayer("<p,angry>Ali Morrisane's nephew! I know you gangs had something to do with his disappearance, so tell me where he is!");
-    ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,shock>Ali Morrisane?! You fool. You've been had!");
-    ~chatplayer("<p,neutral>What do you mean?");
-    ~chatnpc_specific("Bandit Leader", feud_bandit_boss_vis, "<p,neutral>Go have a chat with these precious townspeople of yours. You'll soon learn the truth.");
-    ~chatplayer("<p,angry>I'll go talk to a villager now, just to prove you wrong. Now get out of here before I really get angry with you!");
-    %feud_var_banditboss = 1; // CANDIDATE leftover flag (varp 323)
-}
-return;
+~feud_champion_spawn(feud_bandit_toughguy);

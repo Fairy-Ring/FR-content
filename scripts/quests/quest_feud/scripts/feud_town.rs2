@@ -2,7 +2,6 @@
 // revisions 15325427 (OSRS) and 18411641 (RS3); the sauce retrieval mechanic
 // is VERIFIED by Sal's Realm's 29 Apr 2006 quest guide. Full source manifest
 // and capture digests are in the task evidence directory.
-// The report-drink value is UNKNOWN engineering state, named in feud.constant.
 
 [opnpc1,feud_ali_the_barman]
 jump(feud_barman_menu);
@@ -32,11 +31,7 @@ if ($choice = 2) {
 if ($choice = 3) {
     ~chatplayer("<p,neutral>I'm looking for Traitorous Ali.");
     ~chatnpc("<p,neutral>He is here, actually he was here! He's just nipped out to go to the toilet a few minutes ago. His drink is over there on the table by those barrels. The only problem is that no one has ever actually seen a toilet in RuneScape so he may take a little while. Is there anything else I can help you with?");
-    if (%feud_found_trait >= 1) {
-        if (%feud_report_drink = 0) {
-            %feud_report_drink = ^feud_report_drink_reported;
-        }
-    }
+    %feud_var_drink_found = 1;
     jump(feud_barman_followup);
 }
 return;
@@ -56,6 +51,61 @@ jump(feud_barman_menu);
 [opnpc1,feud_kebabman]
 ~chatplayer("<p,neutral>Hello.");
 ~chatnpc("<p,neutral>Hello. What can I do for you?");
+~chatplayer("<p,quiz>I don't know, what can you do for me?");
+~chatnpc("<p,neutral>Well, that depends.");
+~chatplayer("<p,quiz>Depends on what?");
+~chatnpc("<p,neutral>It depends on whether you like kebabs or not.");
+~chatplayer("<p,quiz>Why is that?");
+~chatnpc("<p,neutral>Seeing as I'm in the kebab construction industry, I mainly help people who have want of a kebab.");
+~chatplayer("<p,quiz>Well then, what kind of kebabs do you, erm, construct?");
+~chatnpc("<p,neutral>I offer two different types of kebabs: the standard run-of-the-mill kebab seen throughout Runescape and enjoyed by many an intoxicated dwarf, and my specialty, the extra-hot kebab. So which shall it be? Or are my services even required?");
+~chatplayer("<p,neutral>Yes, thanks.");
+@feud_kebab_menu;
+
+[label,feud_kebab_menu]
+def_int $choice = 0;
+if (calc(inv_total(inv, superhot_kebab_sauce) + inv_total(bank, superhot_kebab_sauce)) = 0) {
+    $choice = ~p_choice5("I want a kebab, please.", 1, "Could I have an extra-hot kebab please?", 2, "Would you sell me that bottle of special kebab sauce?", 3, "What is the difference between the standard and the extra-hot kebab?", 4, "I need some information.", 5);
+} else {
+    $choice = ~p_choice4("I want a kebab, please.", 1, "Could I have an extra-hot kebab please?", 2, "What is the difference between the standard and the extra-hot kebab?", 4, "I need some information.", 5);
+}
+if ($choice = 1) @feud_kebab_standard;
+if ($choice = 2) @feud_kebab_hot;
+if ($choice = 3) @feud_kebab_sauce;
+if ($choice = 4) @feud_kebab_difference;
+~chatplayer("<p,neutral>I need some information.");
+~chatnpc("<p,neutral>If information is what you need, there are many better people to ask than myself who could help you. One of the town's street urchins or perhaps the local drunk. I may be many things to many different people, but a");
+~chatnpc("<p,neutral>gossip I am not.");
+@feud_kebab_followup;
+
+[label,feud_kebab_standard]
+~chatplayer("<p,neutral>I want a kebab, please.");
+~chatnpc("<p,neutral>That will be three gold coins.");
+if (inv_total(inv, coins) < ^feud_standard_kebab_price) {
+    ~chatplayer("<p,neutral>I seem to be short on coins. Sorry.");
+    @feud_kebab_followup;
+}
+inv_del(inv, coins, ^feud_standard_kebab_price);
+inv_add(inv, kebab, 1);
+~chatnpc("<p,neutral>Here you go.");
+~chatplayer("<p,neutral>Thanks.");
+@feud_kebab_followup;
+
+[label,feud_kebab_hot]
+~chatplayer("<p,neutral>Could I have one of those crazy hot kebabs of yours?");
+~chatnpc("<p,neutral>One super kebab coming up! Be careful, they really are as hot as they're made out to be.");
+~chatplayer("<p,neutral>Sure, sure.");
+if (inv_total(inv, coins) < ^feud_super_kebab_price) {
+    ~chatplayer("<p,neutral>I seem to be short on coins. Sorry.");
+    @feud_kebab_followup;
+}
+inv_del(inv, coins, ^feud_super_kebab_price);
+inv_add(inv, super_kebab, 1);
+~chatnpc("<p,neutral>Here you go.");
+~chatplayer("<p,neutral>Thanks.");
+@feud_kebab_followup;
+
+[label,feud_kebab_sauce]
 ~chatplayer("<p,neutral>Would you sell me that bottle of special kebab sauce?");
 ~chatnpc("<p,neutral>Well, that depends on what you have in mind.");
 ~chatplayer("<p,neutral>Set yourself at ease, I have no intention of setting up a rival kebab shop.");
@@ -63,7 +113,36 @@ jump(feud_barman_menu);
 ~chatplayer("<p,neutral>I don't know, but I think I could have a bit of fun with it.");
 ~chatnpc("<p,neutral>You're not going to put it in drunken Ali's drink now, are you? That's what happened the last time I gave someone the sauce.");
 ~chatplayer("<p,neutral>No, that would be a bit cliche. I think I'll come up with something more original.");
+if (inv_freespace(inv) = 0) {
+    ~chatplayer("<p,neutral>Actually, I might get back to you on the sauce. I'm a bit overburdened as it is.");
+    @feud_kebab_followup;
+}
+inv_add(inv, superhot_kebab_sauce, 1);
 ~chatnpc("<p,neutral>Just be careful with it, it's potent enough to give a camel the runs.");
 ~chatplayer("<p,neutral>Thank you very much.");
-inv_add(inv, superhot_kebab_sauce, 1);
+@feud_kebab_followup;
+
+[label,feud_kebab_difference]
+~chatplayer("<p,quiz>What is the difference between the standard and the extra-hot kebab?");
+~chatnpc("<p,neutral>If I told you that I would have to kill you. Kebab construction is a cut-throat industry. The extra-hot kebab gives me my competitive edge and if I were to divulge my secrets to every passing adventurer, I'd");
+~chatnpc("<p,neutral>soon be out of business.");
+~chatplayer("<p,quiz>So there's no difference except the sauce you use?");
+~chatnpc("<p,neutral>Shh! Keep your voice down. You should have told me you were from the union.");
+def_int $choice = 0;
+if (calc(inv_total(inv, superhot_kebab_sauce) + inv_total(bank, superhot_kebab_sauce)) = 0) {
+    $choice = ~p_choice4("I want a kebab, please.", 1, "Could I have an extra-hot kebab please?", 2, "Would you sell me that bottle of special kebab sauce?", 3, "Listen I've got to run. I'll catch you later.", 4);
+} else {
+    $choice = ~p_choice3("I want a kebab, please.", 1, "Could I have an extra-hot kebab please?", 2, "Listen I've got to run. I'll catch you later.", 4);
+}
+if ($choice = 1) @feud_kebab_standard;
+if ($choice = 2) @feud_kebab_hot;
+if ($choice = 3) @feud_kebab_sauce;
+~chatplayer("<p,neutral>Listen, I've got to run. I'll catch you later.");
+return;
+
+[label,feud_kebab_followup]
+~chatnpc("<p,neutral>Is there anything else I can do for you?");
+if (~p_choice2("Yes, actually.", 1, "No thanks, I'm good.", 2) = 1) @feud_kebab_menu;
+~chatplayer("<p,neutral>No thanks, I'm good.");
+~chatnpc("<p,neutral>Come back soon, I could do with a few more customers.");
 return;
