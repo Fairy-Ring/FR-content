@@ -6,3 +6,13 @@ if (npc_findcat(loc_coord, bank_teller, 2, 0) = true) {
 
 [oploc2,bankbooth] @openbank;
 [oploc2,bank_booth] @openbank;
+
+// CANDIDATE: use the published booth conversation and quick-bank paths.
+// Only ordinary booths with no unbuilt service prerequisite join this category.
+[oploc1,_bank_booth]
+if (npc_findcat(loc_coord, bank_teller, 2, 0) = true) {
+    @talk_to_banker;
+}
+@openbank;
+
+[oploc2,_bank_booth] @openbank;

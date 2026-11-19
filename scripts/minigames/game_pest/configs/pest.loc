@@ -1782,6 +1782,7 @@ blockrange=no
 ambient=25
 
 [pest_bankbooth]
+category=bank_booth
 name=Bank booth
 desc=The bank teller will serve you from here.
 model=ahoy_bankbooth
