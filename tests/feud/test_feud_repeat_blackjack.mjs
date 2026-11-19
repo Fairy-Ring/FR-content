@@ -244,8 +244,8 @@ test('the original Trade option sells the period willow through the retained con
   assert.match(sellerForm, /^name=Blackjack seller$/m);
   assert.match(sellerForm, /^op1=Talk-to$/m);
   assert.match(sellerForm, /^op3=Trade$/m);
-  const seller = actors('feud_black_jack_seller_multi').find(npc => npc.x === 3351 && npc.z === 2971);
-  const kebab = actors('feud_kebabman').find(npc => npc.x === 3352 && npc.z === 2974);
+  const seller = actors('feud_black_jack_seller_multi').find(npc => npc.startX === 3351 && npc.startZ === 2971);
+  const kebab = actors('feud_kebabman').find(npc => npc.startX === 3352 && npc.startZ === 2974);
   assert(seller, 'the named blackjack seller is at the original map placement');
   assert(kebab, 'the kebab seller is the adjacent mapped reference point');
   const purchase = (p, choice = "I'll take it.") => {

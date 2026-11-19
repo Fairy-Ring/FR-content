@@ -149,7 +149,7 @@ function operationStand(p, n) {
     return false;
   };
   const destination = preferred && reaches(preferred) ? preferred
-    : explicitOffset ? null : candidates.find(reaches);
+    : candidates.find(reaches);
   [p.level, p.x, p.z] = original;
   return destination;
 }

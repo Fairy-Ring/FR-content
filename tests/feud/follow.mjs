@@ -67,7 +67,10 @@ export function followToSeclusion(p, target) {
   for (; ticks < nativeFollowWaitTicks; ticks++) {
     worldTick();
     if (p.level === destination.level && p.x === destination.x && p.z === destination.z &&
-      !hasWitness(p, target) && p.inOperableDistance(target)) break;
+      !hasWitness(p, target) && p.inOperableDistance(target) &&
+      occludedOriginalWitness(target, originalWitnesses, target.x, target.z) &&
+      projectedWitnesses(p, target, p.x, p.z).length === 0 &&
+      occludedOriginalWitness(p, originalWitnesses, p.x, p.z)) break;
   }
   assert(ticks < nativeFollowWaitTicks, 'native player movement and NPC follow reach the screened destination');
   assert.deepEqual([p.level, p.x, p.z], [destination.level, destination.x, destination.z],

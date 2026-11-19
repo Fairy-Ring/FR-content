@@ -211,6 +211,7 @@ test('the trough feeds when both original camels occupy their farthest reachable
       const farthest = reachable.reduce((best, point) => distance(point) > distance(best) ? point : best);
       assert(distance(farthest) > 2, 'this reachable boundary is outside the defective two-tile search');
       // Disclosed compiled boundary-position input, not a change to either original map placement.
+      camel.clearWaypoints();
       camel.teleport(farthest.x, farthest.z, camel.startLevel);
       camel.turn();
       assert.equal(camel.x, farthest.x); assert.equal(camel.z, farthest.z);
@@ -235,6 +236,7 @@ test('the trough feeds when both original camels occupy their farthest reachable
   } finally {
     for (const { camel, x, z, level, playAnimation } of original) {
       camel.playAnimation = playAnimation;
+      camel.clearWaypoints();
       camel.teleport(x, z, level);
       camel.turn();
     }
