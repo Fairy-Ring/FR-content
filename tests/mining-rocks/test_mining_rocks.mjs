@@ -58,9 +58,9 @@ function native(name) {
   const type = id('LocType', name);
   for (const row of placements.get(type) ?? []) {
     const loc = World.getLoc(row.x, row.z, row.level, type);
-    if (loc) return loc;
+    if (loc && approach(loc)) return loc;
   }
-  assert.fail(`${name}: native packed loc must exist`);
+  assert.fail(`${name}: native packed loc with a walkable approach must exist`);
 }
 function approach(loc) {
   const type = types.LocType.get(loc.type);
@@ -73,7 +73,7 @@ function approach(loc) {
       }
     }
   }
-  assert.fail(`${type.debugname}: walkable native approach`);
+  return null;
 }
 let serial = 0;
 function player(loc) {
@@ -83,7 +83,9 @@ function player(loc) {
   p.baseLevels.fill(99); p.levels.fill(99); p.stats.fill(100000);
   p.setVar(id('VarPlayerType', 'tutorial'), 1000);
   p.level = loc.level;
-  [p.x, p.z] = approach(loc);
+  const stand = approach(loc);
+  assert(stand, `${types.LocType.get(loc.type).debugname}: walkable native approach`);
+  [p.x, p.z] = stand;
   p.originX = p.x; p.originZ = p.z;
   p.messages = [];
   p.messageGame = text => p.messages.push(String(text));
