@@ -778,10 +778,23 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     const events = [];
     const preparationDeadline = World.currentTick + nativeSetupWaitTicks;
     let previousPoisonTick = null;
+    let poisonHits = 0;
     const observeQueueAndPoison = event => {
       assertAttackableQueueBound(event.npc);
       if (event.before.poison > event.after.poison) {
-        assert.equal(event.before.poison - event.after.poison, 1);
+        const severityBefore = event.before.poison;
+        // The weapon starts at 20 and each native hit decrements once. This
+        // positive-hit proof ends before the published terminal clear at one.
+        assert(Number.isInteger(severityBefore) && severityBefore >= 2 && severityBefore <= weaponSeverity,
+          'a positive poison tick reads a severity in the weapon-produced range 2..20');
+        assert.equal(severityBefore, weaponSeverity - poisonHits,
+          'no weapon-produced severity was skipped or reseeded before this tick');
+        const expectedDamage = Math.floor((severityBefore + 3) / 5);
+        assert(expectedDamage > 0);
+        assert.equal(event.before.hp - event.after.hp, expectedDamage,
+          'every native poison hit matches the published decrement-then-damage formula exactly');
+        assert.equal(event.after.poison, severityBefore - 1);
+        poisonHits++;
         if (previousPoisonTick !== null) {
           assert.equal(event.tick - previousPoisonTick, poisonTimerTicks,
             'every observed native poison hit remains thirty ticks apart during preparation');
@@ -811,7 +824,6 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     }
     assert(followingHit, 'a native poison callback damages the original NPC while Lure is active');
     assert.equal(followingHit.before.poison - followingHit.after.poison, 1);
-    assert.equal(followingHit.before.hp - followingHit.after.hp, 4);
 
     let nextPoisonTick, koInputTick, koDeadline, koInput;
     while (koDeadline === undefined) {
@@ -871,7 +883,6 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assert.equal(koPoisonHit.before.state, 3);
     assert.equal(koPoisonHit.after.state, 3);
     assert.equal(koPoisonHit.before.poison - koPoisonHit.after.poison, 1);
-    assert.equal(koPoisonHit.before.hp - koPoisonHit.after.hp, 4);
     assert.equal(koPoisonHit.tick - followingHit.tick, poisonTimerTicks,
       'the following and KO-overlap poison hits remain exactly 30 native ticks apart');
     assert.equal(target.getVar(stateVar), 3, 'the same-pass-safe Feud timeout remains queued at the deadline');
@@ -905,11 +916,12 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
   const searchRadius = 32; // UNKNOWN test geometry bound, reused from follow.mjs, not a gameplay distance.
   const destinations = [];
   let destination = null;
+  let remainingWaypoints = [];
   for (; World.currentTick < setupDeadline;) {
     if (!hasWitness(p, target) && p.inOperableDistance(target) &&
       (!destination || (p.x === destination.x && p.z === destination.z))) return;
     if (!destination || ((p.x === destination.x && p.z === destination.z) &&
-      (!target.hasWaypoints() || hasWitness(p, { uid: target.uid, level: p.level, x: p.x, z: p.z })))) {
+      !remainingWaypoints.length && p.inOperableDistance(target))) {
       // Five witness tiles plus the follower's one-tile finishing neighborhood.
       const nearby = [...World.npcs].filter(npc => npc.isActive && npc.level === target.level &&
         CoordGrid.distanceToSW(target, npc) <= searchRadius + 6);
@@ -942,8 +954,13 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
       }
       assert(route, 'native collision provides another unwitnessed destination within the existing search bound');
       destinations.push(destination);
-      assert(moveClickHandler.handle(new MoveClick(route, 0, false), p),
-        'ordinary MoveClick accepts the native seclusion route');
+      remainingWaypoints = route;
+    }
+    // PLAYERFOLLOW is naive; finish each ordinary A* turning point with the
+    // follower still operable before leading it around the next corner.
+    if (remainingWaypoints.length && !p.hasWaypoints() && p.inOperableDistance(target)) {
+      assert(moveClickHandler.handle(new MoveClick([remainingWaypoints.shift()], 0, false), p),
+        'ordinary MoveClick accepts the next paced native seclusion waypoint');
     }
     tick();
   }
