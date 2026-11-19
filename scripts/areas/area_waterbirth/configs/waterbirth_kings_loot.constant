@@ -1,0 +1,269 @@
+// UNKNOWN complete King loot weight set; no weight is an authentic period rarity.
+// Transfer later same-item probabilities to 1/128 units, round to the nearest integer,
+// retain a minimum weight of 1; prefer the same King, then another King, else use 1.
+// This support-preserving quantization and final normalization are engineering choices.
+// Generic gems: round(10 * 58 / 128) = 5; half keys: round((8 * 40 + 10 * 2) / 128) = 3.
+// The outer 8/128 and 10/128 later slots and native conditional groups are donors only.
+// Prime herb-seed slot uses the later 7/128 weight; its native conditional table below
+// excludes non-herb seeds. Integer lists/ranges use native uniform selection, UNKNOWN.
+// Missing quantities select one item, also UNKNOWN rather than an unstated source fact.
+^wbk_unstated_loot_quantity = 1
+
+// rex: cumulative ends; each comment is the selected UNKNOWN row weight.
+// dragon_axe: weight 1.
+^wbk_rex_loot_end_dragon_axe = 1
+// mud_battlestaff: weight 1.
+^wbk_rex_loot_end_mud_battlestaff = 2
+// dragon_spear: weight 1.
+^wbk_rex_loot_end_dragon_spear = 3
+// mithril_axe: weight 1.
+^wbk_rex_loot_end_mithril_axe = 4
+// mithril_pickaxe: weight 3.
+^wbk_rex_loot_end_mithril_pickaxe = 7
+// mithril_warhammer: weight 11.
+^wbk_rex_loot_end_mithril_warhammer = 18
+// adamant_axe: weight 7.
+^wbk_rex_loot_end_adamant_axe = 25
+// rune_axe: weight 1.
+^wbk_rex_loot_end_rune_axe = 26
+// rune_javelin: weight 1.
+^wbk_rex_loot_end_rune_javelin = 27
+// viking_sword: weight 2.
+^wbk_rex_loot_end_viking_sword = 29
+// daganoth_cave_magic_shortbow: weight 1.
+^wbk_rex_loot_end_daganoth_cave_magic_shortbow = 30
+// dragon_med_helm: weight 1.
+^wbk_rex_loot_end_dragon_med_helm = 31
+// dagganoth_melee_legs: weight 1.
+^wbk_rex_loot_end_dagganoth_melee_legs = 32
+// dagganoth_melee_body: weight 1.
+^wbk_rex_loot_end_dagganoth_melee_body = 33
+// adamant_platebody: weight 2.
+^wbk_rex_loot_end_adamant_platebody = 35
+// steel_kiteshield: weight 17.
+^wbk_rex_loot_end_steel_kiteshield = 52
+// steel_platebody: weight 4.
+^wbk_rex_loot_end_steel_platebody = 56
+// viking_helmet: weight 1.
+^wbk_rex_loot_end_viking_helmet = 57
+// viking_shield: weight 1.
+^wbk_rex_loot_end_viking_shield = 58
+// steel_arrow: weight 1.
+^wbk_rex_loot_end_steel_arrow = 59
+// naturerune: weight 1.
+^wbk_rex_loot_end_naturerune = 60
+// unidentified_ranarr: weight 7.
+^wbk_rex_loot_end_unidentified_ranarr = 67
+// cert_mithril_ore: weight 10.
+^wbk_rex_loot_end_cert_mithril_ore = 77
+// cert_coal: weight 2.
+^wbk_rex_loot_end_cert_coal = 79
+// cert_iron_ore: weight 1.
+^wbk_rex_loot_end_cert_iron_ore = 80
+// adamantite_bar: weight 3.
+^wbk_rex_loot_end_adamantite_bar = 83
+// cert_steel_bar: weight 1.
+^wbk_rex_loot_end_cert_steel_bar = 84
+// willow_logs: weight 1.
+^wbk_rex_loot_end_willow_logs = 85
+// cert_maple_logs: weight 3.
+^wbk_rex_loot_end_cert_maple_logs = 88
+// cert_yew_logs: weight 5.
+^wbk_rex_loot_end_cert_yew_logs = 93
+// bass: weight 7.
+^wbk_rex_loot_end_bass = 100
+// swordfish: weight 4.
+^wbk_rex_loot_end_swordfish = 104
+// shark: weight 1.
+^wbk_rex_loot_end_shark = 105
+// 2dosepotionofzamorak: weight 1.
+^wbk_rex_loot_end_2dosepotionofzamorak = 106
+// 2doseprayerrestore: weight 1.
+^wbk_rex_loot_end_2doseprayerrestore = 107
+// 2dose2attack: weight 1.
+^wbk_rex_loot_end_2dose2attack = 108
+// 2dose2defense: weight 1.
+^wbk_rex_loot_end_2dose2defense = 109
+// 2dose1antidragon: weight 1.
+^wbk_rex_loot_end_2dose1antidragon = 110
+// 2dose2strength: weight 1.
+^wbk_rex_loot_end_2dose2strength = 111
+// warrior_ring: weight 1.
+^wbk_rex_loot_end_warrior_ring = 112
+// berzerker_ring: weight 1.
+^wbk_rex_loot_end_berzerker_ring = 113
+// gems: weight 5.
+^wbk_rex_loot_end_gems = 118
+// keys: weight 3.
+^wbk_rex_loot_end_keys = 121
+// dragonshield_a: weight 1.
+^wbk_rex_loot_end_dragonshield_a = 122
+// coins: weight 10.
+^wbk_rex_loot_end_coins = 132
+// Hard clue: weight 3, inside the same main roll, never an additional roll.
+^wbk_rex_loot_total_weight = 135
+
+// prime: cumulative ends; each comment is the selected UNKNOWN row weight.
+// dragon_axe: weight 1.
+^wbk_prime_loot_end_dragon_axe = 1
+// mud_battlestaff: weight 1.
+^wbk_prime_loot_end_mud_battlestaff = 2
+// staff_of_air: weight 1.
+^wbk_prime_loot_end_staff_of_air = 3
+// staff_of_earth: weight 1.
+^wbk_prime_loot_end_staff_of_earth = 4
+// water_battlestaff: weight 5.
+^wbk_prime_loot_end_water_battlestaff = 9
+// air_battlestaff: weight 4.
+^wbk_prime_loot_end_air_battlestaff = 13
+// earth_battlestaff: weight 10.
+^wbk_prime_loot_end_earth_battlestaff = 23
+// cert_battlestaff: weight 1.
+^wbk_prime_loot_end_cert_battlestaff = 24
+// dragon_spear: weight 1.
+^wbk_prime_loot_end_dragon_spear = 25
+// daganoth_cave_magic_shortbow: weight 1.
+^wbk_prime_loot_end_daganoth_cave_magic_shortbow = 26
+// steel_kiteshield: weight 17.
+^wbk_prime_loot_end_steel_kiteshield = 43
+// dagganoth_mage_body: weight 1.
+^wbk_prime_loot_end_dagganoth_mage_body = 44
+// dagganoth_mage_legs: weight 1.
+^wbk_prime_loot_end_dagganoth_mage_legs = 45
+// rune_kiteshield: weight 1.
+^wbk_prime_loot_end_rune_kiteshield = 46
+// dragon_med_helm: weight 1.
+^wbk_prime_loot_end_dragon_med_helm = 47
+// airrune: weight 6.
+^wbk_prime_loot_end_airrune = 53
+// earthrune: weight 5.
+^wbk_prime_loot_end_earthrune = 58
+// deathrune: weight 2.
+^wbk_prime_loot_end_deathrune = 60
+// naturerune: weight 2.
+^wbk_prime_loot_end_naturerune = 62
+// bloodrune: weight 2.
+^wbk_prime_loot_end_bloodrune = 64
+// mudrune: weight 2.
+^wbk_prime_loot_end_mudrune = 66
+// unidentified_ranarr: weight 5.
+^wbk_prime_loot_end_unidentified_ranarr = 71
+// seeds: weight 7.
+^wbk_prime_loot_end_seeds = 78
+// cert_blankrune_high: weight 5.
+^wbk_prime_loot_end_cert_blankrune_high = 83
+// bigoysterpearls: weight 5.
+^wbk_prime_loot_end_bigoysterpearls = 88
+// cert_air_talisman: weight 7.
+^wbk_prime_loot_end_cert_air_talisman = 95
+// cert_earth_talisman: weight 10.
+^wbk_prime_loot_end_cert_earth_talisman = 105
+// cert_water_talisman: weight 7.
+^wbk_prime_loot_end_cert_water_talisman = 112
+// shark: weight 10.
+^wbk_prime_loot_end_shark = 122
+// gems: weight 5.
+^wbk_prime_loot_end_gems = 127
+// keys: weight 3.
+^wbk_prime_loot_end_keys = 130
+// dragonshield_a: weight 1.
+^wbk_prime_loot_end_dragonshield_a = 131
+// seer_ring: weight 1.
+^wbk_prime_loot_end_seer_ring = 132
+// coins: weight 3.
+^wbk_prime_loot_end_coins = 135
+// Hard clue: weight 3, inside the same main roll, never an additional roll.
+^wbk_prime_loot_total_weight = 138
+
+// supreme: cumulative ends; each comment is the selected UNKNOWN row weight.
+// dragon_axe: weight 1.
+^wbk_supreme_loot_end_dragon_axe = 1
+// daganoth_cave_magic_shortbow: weight 1.
+^wbk_supreme_loot_end_daganoth_cave_magic_shortbow = 2
+// rune_2h_sword: weight 1.
+^wbk_supreme_loot_end_rune_2h_sword = 3
+// rune_battleaxe: weight 1.
+^wbk_supreme_loot_end_rune_battleaxe = 4
+// iron_knife: weight 5.
+^wbk_supreme_loot_end_iron_knife = 9
+// steel_knife: weight 5.
+^wbk_supreme_loot_end_steel_knife = 14
+// mithril_knife: weight 10.
+^wbk_supreme_loot_end_mithril_knife = 24
+// rune_thrownaxe: weight 5.
+^wbk_supreme_loot_end_rune_thrownaxe = 29
+// rune_javelin: weight 1.
+^wbk_supreme_loot_end_rune_javelin = 30
+// viking_sword: weight 1.
+^wbk_supreme_loot_end_viking_sword = 31
+// red_dragon_vambraces: weight 7.
+^wbk_supreme_loot_end_red_dragon_vambraces = 38
+// dagganoth_ranged_body: weight 1.
+^wbk_supreme_loot_end_dagganoth_ranged_body = 39
+// dagganoth_ranged_legs: weight 1.
+^wbk_supreme_loot_end_dagganoth_ranged_legs = 40
+// dragon_med_helm: weight 1.
+^wbk_supreme_loot_end_dragon_med_helm = 41
+// viking_shield: weight 1.
+^wbk_supreme_loot_end_viking_shield = 42
+// lawrune: weight 1.
+^wbk_supreme_loot_end_lawrune = 43
+// iron_arrow: weight 4.
+^wbk_supreme_loot_end_iron_arrow = 47
+// steel_arrow: weight 5.
+^wbk_supreme_loot_end_steel_arrow = 52
+// adamant_dart: weight 5.
+^wbk_supreme_loot_end_adamant_dart = 57
+// unidentified_ranarr: weight 5.
+^wbk_supreme_loot_end_unidentified_ranarr = 62
+// ranger_ring: weight 1.
+^wbk_supreme_loot_end_ranger_ring = 63
+// nature_talisman: weight 1.
+^wbk_supreme_loot_end_nature_talisman = 64
+// ring_of_life: weight 1.
+^wbk_supreme_loot_end_ring_of_life = 65
+// cert_yew_logs: weight 5.
+^wbk_supreme_loot_end_cert_yew_logs = 70
+// cert_maple_logs: weight 3.
+^wbk_supreme_loot_end_cert_maple_logs = 73
+// shark: weight 5.
+^wbk_supreme_loot_end_shark = 78
+// bigoysterpearls: weight 6.
+^wbk_supreme_loot_end_bigoysterpearls = 84
+// opal_bolttips: weight 5.
+^wbk_supreme_loot_end_opal_bolttips = 89
+// gems: weight 5.
+^wbk_supreme_loot_end_gems = 94
+// keys: weight 3.
+^wbk_supreme_loot_end_keys = 97
+// dragonshield_a: weight 1.
+^wbk_supreme_loot_end_dragonshield_a = 98
+// coins: weight 10.
+^wbk_supreme_loot_end_coins = 108
+// Hard clue: weight 3, inside the same main roll, never an additional roll.
+^wbk_supreme_loot_total_weight = 111
+
+// Conditional native randomjewel gem weights 32/16/8/2, with every non-gem excluded.
+^wbk_uncut_gem_total_weight = 58
+^wbk_uncut_sapphire_end = 32
+^wbk_uncut_emerald_end = 48
+^wbk_uncut_ruby_end = 56
+
+// Conditional native wbmon_rare_seed herb-only weights, normalized over 758.
+// toadflax_seed: native weight 216.
+^wbk_herb_seed_end_toadflax_seed = 216
+// irit_seed: native weight 148.
+^wbk_herb_seed_end_irit_seed = 364
+// avantoe_seed: native weight 101.
+^wbk_herb_seed_end_avantoe_seed = 465
+// kwuarm_seed: native weight 69.
+^wbk_herb_seed_end_kwuarm_seed = 534
+// snapdragon_seed: native weight 46.
+^wbk_herb_seed_end_snapdragon_seed = 580
+// cadantine_seed: native weight 32.
+^wbk_herb_seed_end_cadantine_seed = 612
+// lantadyme_seed: native weight 23.
+^wbk_herb_seed_end_lantadyme_seed = 635
+// dwarf_weed_seed: native weight 14.
+^wbk_herb_seed_end_dwarf_weed_seed = 649
+^wbk_herb_seed_total_weight = 658

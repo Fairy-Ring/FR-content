@@ -113,6 +113,7 @@ async function run() {
   const { NpcMode } = await load('src/engine/entity/NpcMode.ts');
   const { Interaction } = await load('src/engine/entity/Interaction.ts');
   const { isLineOfSight, isLineOfWalk, isMapBlocked, reachedEntity } = await load('src/engine/GameMap.ts');
+  const { CoordGrid } = await load('src/engine/CoordGrid.ts');
   const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
   const Environment = (await load('src/util/Environment.ts')).default;
   const { ParamHelper } = await load('src/cache/config/ParamHelper.ts');
@@ -206,9 +207,13 @@ async function run() {
   assert.equal(param(lobster, 'death_drop'), id(configs.ObjType, 'raw_lobster'));
   assert.equal(hiddenRock.vislevel, 0, 'Rock disguise hides its combat level until the native approach trigger');
   const approach = configs.HuntType.get(hiddenRock.huntmode);
-  assert(approach, 'hidden-form approach hunt compiles');
-  assert.equal(approach.findNewMode, NpcMode.OPPLAYER2, 'native hunt selects the approaching player as the operation target');
-  assert(exact(ServerTriggerType.AI_OPPLAYER2, hiddenRock), 'hidden Rock has a native type-change operation trigger');
+  assert(approach, 'hidden Rock proximity hunt compiles');
+  assert.equal(approach.findNewMode, NpcMode.QUEUE4, 'native proximity hunt queues the wake without melee-contact reach');
+  const approachRadius = readConstant('scripts/areas/area_waterbirth/configs/waterbirth_other_monsters.constant', 'waterbirth_other_rock_approach_radius');
+  assert.equal(approachRadius, 2, 'UNKNOWN radius covers all 12 neighboring tiles from a 2x2 Rock southwest origin');
+  assert.equal(hiddenRock.huntrange, approachRadius, 'native hidden-Rock hunt uses the named approach radius');
+  assert.equal(readConstant('scripts/areas/area_waterbirth/configs/waterbirth_other_monsters.constant', 'waterbirth_other_rock_no_return_ticks'), 2147483647, 'UNKNOWN no-return policy preserves the existing maximum type-change delay');
+  assert(exact(ServerTriggerType.AI_QUEUE4, hiddenRock), 'hidden Rock has a native proximity type-change queue trigger');
   assert.strictEqual(ScriptProvider.getByTrigger(ServerTriggerType.AI_OPPLAYER2, lobster.id, lobster.category), generic(ServerTriggerType.AI_OPPLAYER2, lobster), 'active Rock lobster retains native melee attack dispatch');
   assert.equal(param(lobster, 'death_anim'), id(configs.SeqType, 'dagannoth_rock_lobster_death'));
 
@@ -298,6 +303,30 @@ async function run() {
       }
     }
     return null;
+  }
+  function rockNeighborSites(npc) {
+    const west = npc.x - 1, east = npc.x + npc.width;
+    const south = npc.z - 1, north = npc.z + npc.length;
+    return [
+      { name: 'southwest corner', x: west, z: south },
+      { name: 'southwest edge', x: west + 1, z: south },
+      { name: 'southeast edge', x: east - 1, z: south },
+      { name: 'southeast corner', x: east, z: south },
+      { name: 'west-south edge', x: west, z: south + 1 },
+      { name: 'west-north edge', x: west, z: north - 1 },
+      { name: 'east-south edge', x: east, z: south + 1 },
+      { name: 'east-north edge', x: east, z: north - 1 },
+      { name: 'northwest corner', x: west, z: north },
+      { name: 'northwest edge', x: west + 1, z: north },
+      { name: 'northeast edge', x: east - 1, z: north },
+      { name: 'northeast corner', x: east, z: north }
+    ].map(site => ({ ...site, level: npc.level }));
+  }
+  function rockNeighborRoute(npc, site) {
+    // Proximity includes corners; melee entity-contact reach deliberately does not.
+    return !isMapBlocked(site.x, site.z, site.level) &&
+      directions.some(({ dx, dz }) => isLineOfWalk(site.level, site.x + dx, site.z + dz, site.x, site.z)) &&
+      isLineOfSight(site.level, site.x, site.z, npc.x, npc.z);
   }
   function waterPlayerSite(npc, minDistance, maxDistance) {
     // Water NPCs need sight to walkable land, not a walking path out of their blocked water tile.
@@ -440,14 +469,32 @@ async function run() {
     assert.deepEqual(Array.from(actor.stats), fledgeXpBefore, 'native player_melee_attack gives no combat or Slayer XP');
     firstFledge.queue.clear();
 
-    const rock = [...World.npcs].find(npc => npc.isActive && npc.type === hiddenRock.id);
-    assert(rock, 'map provides a placed hidden Rock lobster');
-    const rockSite = playerSite(rock, 1);
-    assert(rockSite, 'native collision map provides a reachable hidden-Rock approach');
-    movePlayer(rockSite);
-    stepNpc(rock);
-    assert.equal(rock.type, lobster.id, 'native hidden-Rock OPPLAYER2 proximity changes to its active form');
-    assert.equal(rock.baseType, hiddenRock.id, 'Rock lobster form keeps the original hidden cache type as its base for native reset');
+    const rock = [...World.npcs].find(npc =>
+      npc.isActive && npc.type === hiddenRock.id &&
+      rockNeighborSites(npc).every(site => rockNeighborRoute(npc, site))
+    );
+    assert(rock, 'map provides a placed hidden 2x2 Rock with all 12 collision-reachable neighbor tiles');
+    const rockSites = rockNeighborSites(rock);
+    assert.equal(rockSites.length, 12, '2x2 Rock has twelve unique neighboring tiles');
+    assert.equal(new Set(rockSites.map(({ x, z }) => `${x},${z}`)).size, 12);
+    assert.equal(Math.max(...rockSites.map(site => CoordGrid.distanceToSW(rock, site))), approachRadius,
+      'outer 2x2 neighbor tiles use native southwest-origin distance 2');
+    for (const site of rockSites) {
+      assert(rockNeighborRoute(rock, site), `${site.name}: native collision map permits approach and sight`);
+      const distance = CoordGrid.distanceToSW(rock, site);
+      assert(distance <= approachRadius, `${site.name}: native southwest-origin distance ${distance} is within ${approachRadius}`);
+      if (rock.type !== hiddenRock.id) rock.resetEntity(true);
+      assert.equal(rock.type, hiddenRock.id, `${site.name}: native reset restores the placed disguise for this case`);
+      movePlayer(site);
+      assert.equal(CoordGrid.distanceToSW(rock, actor), distance, `${site.name}: native player hunt sees the measured southwest-origin distance`);
+      assert.equal(rock.huntMode, hiddenRock.huntmode, `${site.name}: the placed disguise keeps its native approach hunt`);
+      stepNpc(rock);
+      assert.equal(rock.type, lobster.id, `${site.name}: native hunt wakes the Rock lobster from this adjacent tile`);
+      assert.equal(rock.baseType, hiddenRock.id, `${site.name}: waking retains the hidden cache type as the base`);
+    }
+    const rockAttackSite = playerSite(rock, 1);
+    assert(rockAttackSite, 'native collision map provides an adjacent active Rock lobster attack tile');
+    movePlayer(rockAttackSite);
     assert.equal(rock.lifecycle, EntityLifeCycle.RESPAWN);
     const rockHp = actorHp();
     connect(rock, NpcMode.OPPLAYER2);
@@ -543,38 +590,37 @@ async function run() {
       submergeAndReemerge(npc, visibleName, hiddenName);
     }
 
-    const hiddenIds = new Set(hiddenNames.map(name => types.get(name).id));
-    // The placed water tiles have no native adjacent land reach. Probe the sourced melee mechanic
-    // with an explicit offline NPC fixture on land; the untouched map forms below prove autonomous emergence.
-    const meleeType = types.get(hiddenNames[0]);
     let meleeNid = 1;
-    while (World.npcs.get(meleeNid)) meleeNid++;
-    const meleeWater = new Npc(fledgeSite.level, fledgeSite.x, fledgeSite.z, meleeType.size, meleeType.size, EntityLifeCycle.DESPAWN, meleeNid, meleeType.id, meleeType.blockwalk);
-    World.addNpc(meleeWater, -1);
-    try {
-      World.processNpcEventQueue();
-      const meleeSite = playerSite(meleeWater, 1);
-      assert(meleeSite, 'the explicit offline melee fixture has a native reachable adjacent land tile');
-      movePlayer(meleeSite);
-      actor.levels[PlayerStat.HITPOINTS] = 99;
-      actor.setVar(poisonVar, 0);
-      const maxhitScript = ScriptProvider.getByName('[proc,npc_melee_maxhit]');
-      assert(maxhitScript, 'packed native melee maximum is available');
-      const maxhitState = ScriptRunner.init(maxhitScript, meleeWater, null, []);
-      ScriptRunner.execute(maxhitState);
-      assert.equal(maxhitState.execution, ScriptState.FINISHED);
-      const hiddenMaxhit = maxhitState.popInt();
-      assert(hiddenMaxhit > 0, 'the native hidden-melee positive control has a positive calculated maximum');
-      const hiddenHp = actorHp();
-      withRandomTape([0.999999, 0, 0.999999], () => stepNpc(meleeWater));
-      for (let tick = 0; tick < 4 && actorHp() === hiddenHp; tick++) stepNpc(meleeWater);
-      assert.equal(hiddenHp - actorHp(), hiddenMaxhit, 'native adjacent hidden melee lands its calculated maximum');
-      assert(hiddenIds.has(meleeWater.type), 'player adjacency does not cause hidden-water emergence');
-    } finally {
-      if (meleeWater.isActive) World.removeNpc(meleeWater, -1);
-      if (World.npcs.get(meleeNid) === meleeWater) {
-        World.npcs.remove(meleeNid);
-        meleeWater.cleanup();
+    for (const hiddenName of hiddenNames) {
+      const meleeType = types.get(hiddenName);
+      while (World.npcs.get(meleeNid)) meleeNid++;
+      const meleeWater = new Npc(fledgeSite.level, fledgeSite.x, fledgeSite.z, meleeType.size, meleeType.size, EntityLifeCycle.DESPAWN, meleeNid++, meleeType.id, meleeType.blockwalk);
+      World.addNpc(meleeWater, -1);
+      try {
+        World.processNpcEventQueue();
+        const meleeSite = playerSite(meleeWater, 1);
+        assert(meleeSite, `${hiddenName}: native collision map provides a reachable adjacent land tile`);
+        movePlayer(meleeSite);
+        actor.levels[PlayerStat.HITPOINTS] = 99;
+        actor.setVar(poisonVar, 0);
+        const maxhitScript = ScriptProvider.getByName('[proc,npc_melee_maxhit]');
+        assert(maxhitScript, 'packed native melee maximum is available');
+        const maxhitState = ScriptRunner.init(maxhitScript, meleeWater, null, []);
+        ScriptRunner.execute(maxhitState);
+        assert.equal(maxhitState.execution, ScriptState.FINISHED);
+        const hiddenMaxhit = maxhitState.popInt();
+        assert(hiddenMaxhit > 0, `${hiddenName}: native hidden-melee positive control has a positive calculated maximum`);
+        const hiddenHp = actorHp();
+        withRandomTape([0.999999, 0, 0.999999], () => stepNpc(meleeWater));
+        for (let tick = 0; tick < 4 && actorHp() === hiddenHp; tick++) stepNpc(meleeWater);
+        assert.equal(hiddenHp - actorHp(), hiddenMaxhit, `${hiddenName}: native adjacent hidden melee lands its calculated maximum`);
+        assert.equal(meleeWater.type, meleeType.id, `${hiddenName}: player adjacency does not cause hidden-water emergence`);
+      } finally {
+        if (meleeWater.isActive) World.removeNpc(meleeWater, -1);
+        if (World.npcs.get(meleeNid - 1) === meleeWater) {
+          World.npcs.remove(meleeNid - 1);
+          meleeWater.cleanup();
+        }
       }
     }
 

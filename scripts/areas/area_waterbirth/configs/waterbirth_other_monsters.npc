@@ -98,8 +98,8 @@ minimap=no
 wanderrange=0
 moverestrict=nomove
 defaultmode=none
-huntmode=waterbirth_other_approach
-// UNKNOWN one-tile approach activation and respawn policy.
+huntmode=waterbirth_other_rock_approach
+// UNKNOWN southwest-origin proximity radius and respawn policy.
 huntrange=^waterbirth_other_rock_approach_radius
 respawnrate=^waterbirth_other_rock_respawn_ticks
 

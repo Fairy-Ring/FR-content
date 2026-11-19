@@ -1,6 +1,6 @@
-// A hidden Rock is not clickable. Native player hunting turns it into the matching attackable type.
-[ai_opplayer2,dagannoth_rock_lobster_2x2_loc]
-npc_changetype(dagannoth_rock_lobster_2x2, ^max_32bit_int);
+// Native proximity hunting queues the wake; melee OP contact excludes corner tiles.
+[ai_queue4,dagannoth_rock_lobster_2x2_loc]
+npc_changetype(dagannoth_rock_lobster_2x2, ^waterbirth_other_rock_no_return_ticks);
 npc_anim(dagannoth_rock_lobster_spring_up, 0);
 npc_setmode(null);
 

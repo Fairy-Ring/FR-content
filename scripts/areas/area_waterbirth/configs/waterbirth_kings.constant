@@ -1,0 +1,43 @@
+// UNKNOWN numeric ranges: no retained period or exact-variant source gives tiles.
+// Eight-tile distance attacks are an engineering choice; melee stays adjacent.
+^wbk_distance_attack_range = 8
+^wbk_distance_hunt_radius = 8
+^wbk_melee_hunt_radius = 5
+^wbk_wander_radius = 5
+^wbk_pursuit_radius = 16
+
+// UNKNOWN projectile geometry: native npc_rangeattack donor convention, not 377 data.
+^wbk_projectile_start_height = 40
+^wbk_projectile_end_height = 36
+^wbk_projectile_delay = 32
+^wbk_projectile_angle = 15
+^wbk_projectile_flight_length = 0
+^wbk_projectile_offset = 11
+^wbk_projectile_distance_step = 5
+
+// CANDIDATE exact Old School profiles; Supreme's 2017 ranged-defence change undone.
+^wbk_supreme_maxhit = 30
+^wbk_prime_maxhit = 50
+^wbk_rex_maxhit = 26
+^wbk_attack_ticks = 4
+^wbk_respawn_ticks = 150
+
+// UNKNOWN presentation bindings. The assets themselves exist in the 377 cache;
+// their names are not a record of a server-side King-to-asset binding.
+^wbk_supreme_attack_anim = dagannoth_meganoth_attack_range
+^wbk_prime_attack_anim = dagannoth_meganoth_attack_mage
+^wbk_rex_attack_anim = dagannoth_meganoth_attack_melee
+^wbk_defend_anim = dagannoth_meganoth_defend
+^wbk_death_anim = dagannoth_meganoth_death
+^wbk_supreme_projectile = dagannoth_arrow_spotanim_travel
+^wbk_supreme_impact = dagannoth_arrow_spotanim_hit
+^wbk_prime_projectile = waterwave_travel
+^wbk_prime_impact = dagannoth_whirlpool
+// UNKNOWN target-effect height: ground-level presentation, not recovered King data.
+^wbk_impact_height = 0
+^wbk_supreme_attack_sound = meganoth_spines
+^wbk_prime_attack_sound = dagganoth_whirlpool
+^wbk_prime_impact_sound = dagganoth_splash
+^wbk_rex_attack_sound = meganoth_melee_attack
+^wbk_defend_sound = meganoth_hit
+^wbk_death_sound = meganoth_death

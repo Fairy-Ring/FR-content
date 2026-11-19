@@ -94,6 +94,10 @@ return(~npc_meleeattack_outcome($maxhit, $defence_policy, $protected_roll));
 if (npc_type = fairy_tanglefoot) return(~ft1_tanglefoot_max_dealt($maxhit, $spell));
 if (~soulbane_rage_npc = true) return(~soulbane_rage_max(min($maxhit, npc_param(max_dealt)), $spell));
 if (npc_type = soulbane_fear_reaper & ~soulbane_fear_attackable = false) return(0);
+// Waterbirth Kings: source-local per-style cap, before normal/special damage XP.
+if (npc_type = dagcave_ranged_boss | npc_type = dagcave_magic_boss | npc_type = dagcave_melee_boss) {
+    return(~waterbirth_kings_max_dealt($maxhit, $spell));
+}
 if (npc_type = rd_combat_npc_room_3 & gender() = 0) {
     return(0);
 }

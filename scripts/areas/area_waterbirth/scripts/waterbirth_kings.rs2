@@ -1,0 +1,70 @@
+// Sal 29 Apr 2006: use melee against Supreme, ranged against Prime, magic
+// against Rex. The per-style data records the stricter line-195 reading.
+// Normal and special attacks use this cap before damage-derived XP. A blocked
+// attack still follows its ordinary accuracy, presentation and zero-hit path.
+// Poison and recoil remain native; the guide does not discuss either mechanism.
+[proc,waterbirth_kings_max_dealt](int $maxhit, int $spell)(int)
+def_int $allowed;
+if ($spell > 0 | %damagetype = ^magic_style) {
+    $allowed = enum(npc, int, waterbirth_king_magic_damage, npc_type);
+} else if (%damagetype = ^ranged_style) {
+    $allowed = enum(npc, int, waterbirth_king_ranged_damage, npc_type);
+} else {
+    $allowed = enum(npc, int, waterbirth_king_melee_damage, npc_type);
+}
+return(calc(min($maxhit, npc_param(max_dealt)) * $allowed));
+
+// Native aggression and retaliation select one player. No sourced special
+// target-selection rule is available, so neither target rotation nor a
+// multi-target attack is invented here.
+[ai_queue1,dagcave_ranged_boss] ~npc_default_retaliate_ap;
+[ai_opplayer2,dagcave_ranged_boss] npc_setmode(applayer2);
+[ai_applayer2,dagcave_ranged_boss] ~waterbirth_supreme_attack;
+[ai_queue1,dagcave_magic_boss] ~npc_default_retaliate_ap;
+[ai_opplayer2,dagcave_magic_boss] npc_setmode(applayer2);
+[ai_applayer2,dagcave_magic_boss] ~waterbirth_prime_attack;
+
+[proc,waterbirth_supreme_attack]
+if (%npc_action_delay > map_clock) {
+    npc_setmode(applayer2);
+    return;
+}
+if (~npc_check_notcombat = false) {
+    npc_setmode(null);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+def_int $attack_roll = ~npc_ranged_attack_roll;
+def_int $defence_roll = ~player_defence_roll_specific(^ranged_style);
+npc_anim(npc_param(attack_anim), 0);
+~.sound_area(^wbk_supreme_attack_sound, 0, npc_coord, 10);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration = ~waterbirth_king_projectile;
+~npc_rangeattack_resolve($attack_roll, $defence_roll, ^wbk_supreme_maxhit, 0, $duration);
+spotanim_pl(^wbk_supreme_impact, ^wbk_impact_height, $duration);
+anim(%com_defendanim, $duration);
+
+[proc,waterbirth_prime_attack]
+if (~npc_combat_spell_checks = false) return;
+npc_anim(npc_param(magicattack_anim), 0);
+~.sound_area(^wbk_prime_attack_sound, 0, npc_coord, 10);
+%npc_action_delay = add(map_clock, npc_param(attackrate));
+def_int $duration = ~waterbirth_king_projectile;
+// Native Magic accuracy, protection, magnitude and delayed damage; only the
+// presentation binding is King-local. There is no Water Wave freeze/debuff.
+if (~npc_player_hit_roll(^magic_style) = true) {
+    def_int $damage = ~npc_spell_magnitude(^wbk_prime_maxhit);
+    queue(combat_damage_player, calc($duration / 30), $damage);
+    spotanim_pl(^wbk_prime_impact, ^wbk_impact_height, $duration);
+    sound_synth(^wbk_prime_impact_sound, 0, $duration);
+    queue*(playerhit_n_retaliate, calc($duration / 30))(npc_uid);
+} else {
+    ~npc_spell_fail(~get_spell_data(^water_wave), $duration);
+}
+~npc_set_attack_vars;
+
+[proc,waterbirth_king_projectile]()(int)
+return(~player_projectile(npc_coord, coord, uid, npc_param(proj_travel),
+    ^wbk_projectile_start_height, ^wbk_projectile_end_height, ^wbk_projectile_delay,
+    ^wbk_projectile_angle, ^wbk_projectile_flight_length, ^wbk_projectile_offset,
+    ^wbk_projectile_distance_step));
