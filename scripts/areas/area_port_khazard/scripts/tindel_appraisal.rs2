@@ -1,0 +1,110 @@
+// Ordinary appraisal, separate from One Small Favour. Research: ordinary-npc-options.
+// CANDIDATE: checked OSRS Tindel/Rusty sword/transcript, nearer 2007-base witness.
+// Retain the 377 Sword give spelling and pre-2010 iron-long result wording.
+[opnpc3,tindel_marchant]
+// The original direct operation's entry is unresolved: use the sourced offer.
+@tindel_appraisal_offer;
+
+[opnpcu,tindel_marchant]
+if (last_useitem = digsitesword) {
+    @tindel_appraise;
+}
+~displaymessage(^dm_default);
+
+[label,tindel_appraisal_talk]
+~chatnpc("<p,neutral>Hello there! Welcome to my special antiques boutique.");
+@tindel_appraisal_offer;
+
+[label,tindel_appraisal_offer]
+switch_int(~p_choice5("What do you do here?", 1, "What's involved?", 2, "What do I get from this?", 3, "Ok, I'll give it a go!", 4, "Ok, thanks.", 5)) {
+    case 1 :
+        ~chatplayer("<p,neutral>What do you do here?");
+        ~chatnpc("<p,neutral>I'm a specialist at identifying rare and antique weapons, specifically swords, but I plan to branch out. If you have any old and rusty weapons that you want me to check out, just show them to me, pay me 100 Gold and");
+        ~chatnpc("<p,neutral>I'll see if you have an antique on your hands.");
+        ~chatnpc("<p,neutral>I can also repair some antique weapons and armours, just show me the item and I'll let you know if I can repair it and for how much.");
+    case 2 :
+        ~chatplayer("<p,neutral>What's involved?");
+        ~chatnpc("<p,neutral>Well, pay me 100 Gold and I'll see if any rusty swords that you've found are actually worth anything. Some of them might be worth some money! If it's an antique item though, I reserve the right to purchase it");
+        ~chatnpc("<p,neutral>immediately for adding to my own personal collection. I'll give you fair price for it.");
+    case 3 :
+        ~chatplayer("<p,neutral>What do I get from this?");
+        ~chatnpc("<p,neutral>If I can reclaim the sword with my own specialist skills, I'll return it to you in peak condition. If it's an antique, I'll just give you what I think it's worth and I generally pay quite well. However, if it's just a piece of junk, I'll");
+        ~chatnpc("<p,neutral>simply give you the bad news and get rid of the item for you.");
+    case 4 :
+        ~chatplayer("<p,neutral>Ok, I'll give it a go!");
+        @tindel_appraise;
+    case 5 :
+        ~chatplayer("<p,neutral>Ok, thanks.");
+        return;
+}
+@tindel_appraisal_offer;
+
+[label,tindel_appraise]
+if (inv_total(inv, digsitesword) = 0) {
+    ~chatnpc("<p,neutral>Sorry my friend, but you don't seem to have any swords that need to be identified.");
+    return;
+}
+if (inv_total(inv, coins) < ^tindel_appraisal_fee) {
+    ~chatnpc("<p,neutral>Sorry my friend, but you don't seem to have enough money to cover my fee!");
+    return;
+}
+// CANDIDATE OSRS Tindel table, denominator 100: 20,37,17,7,6,4,1,1,3,2,1,1.
+// The last two outcomes are an antique purchase and worthless junk, not POH repair.
+def_int $roll = random(^tindel_appraisal_outcomes);
+def_namedobj $result = null;
+def_string $description = "";
+def_int $antique = 0;
+if ($roll < 20) {
+    $result = iron_sword;
+    $description = "an iron shortsword";
+} else if ($roll < 57) {
+    $result = iron_longsword;
+    $description = "a long sword";
+} else if ($roll < 74) {
+    $result = bronze_sword;
+    $description = "a bronze shortsword";
+} else if ($roll < 81) {
+    $result = bronze_longsword;
+    $description = "a bronze long sword";
+} else if ($roll < 87) {
+    $result = steel_sword;
+    $description = "a steel shortsword";
+} else if ($roll < 91) {
+    $result = steel_longsword;
+    $description = "a steel long sword";
+} else if ($roll < 92) {
+    $result = mithril_sword;
+    $description = "a mithril shortsword";
+} else if ($roll < 93) {
+    $result = mithril_longsword;
+    $description = "a mithril long sword";
+} else if ($roll < 96) {
+    $result = black_sword;
+    $description = "a black shortsword";
+} else if ($roll < 98) {
+    $result = black_longsword;
+    $description = "a black longsword";
+} else if ($roll = 98) {
+    $antique = calc(^tindel_antique_min + random(^tindel_antique_range));
+}
+// No suspension between debits and reward. The unstackable input frees a slot.
+// inv_add retains the engine's ground overflow for a maximum-size coin stack.
+inv_del(inv, coins, ^tindel_appraisal_fee);
+inv_del(inv, digsitesword, 1);
+if ($result ! null) {
+    inv_add(inv, $result, 1);
+} else if ($antique > 0) {
+    inv_add(inv, coins, $antique);
+}
+~mesbox("You hand Tindel 100 coins plus the rusty sword.");
+if ($result ! null) {
+    ~chatnpc("<p,neutral>There you go my friend, it turned out to be <$description>.");
+    ~mesbox("Tindel gives you <$description>.");
+} else if ($antique > 0) {
+    ~chatnpc("<p,neutral>Wow! The item you gave me was a very rare antique...no real use...but hey, it's worth some money!");
+    ~mesbox("Tindel gives you <tostring($antique)> coins.");
+    ~chatnpc("<p,neutral>That's a fair price for the item! I'll add it to my collection!");
+} else {
+    ~chatnpc("<p,neutral>Sorry my friend, but the item wasn't worth anything. I've disposed of it for you.");
+}
+return;
