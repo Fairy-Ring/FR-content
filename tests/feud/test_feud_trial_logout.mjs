@@ -16,6 +16,8 @@ const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
 const moveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
 const HintArrow = (await engineModule('network/game/server/model/HintArrow.ts')).default;
+const Npc = (await engineModule('engine/entity/Npc.ts')).default;
+const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
 const hints = p => p.packets.filter(packet => packet instanceof HintArrow);
 const assertHint = (p, target) => {
   assert.equal(hints(p).at(-1)?.type, 1, 'the acting player receives the native NPC hint arrow');
@@ -137,6 +139,151 @@ function assertReleased(p, target) {
   assert.equal([...target.queue.all()].length, 0);
   assert.equal(p.getVar(slotVar), -1);
   assert.equal(hints(p).at(-1)?.type, -1, 'release clears this player’s distraction arrow');
+}
+
+const distractionExitKinds = ['theft', 'refusal', 'expiry', 'page-interruption', 'page-logout', 'window-logout', 'orphaned-page'];
+const npcTile = npc => [npc.level, npc.x, npc.z];
+
+for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of distractionExitKinds) {
+  test(`stationary distraction seed ${seedNumber}: ${exit} releases the original villager to native wandering`, () => {
+    const p = trialFixture();
+    let selected, selectedPosition, selectionWalks = 0, freshWanderChoices = 0, randomState = seedNumber;
+    const ownsQueueWaypoint = Object.hasOwn(Npc.prototype, 'queueWaypoint');
+    const queueWaypoint = Npc.prototype.queueWaypoint, wander = Npc.prototype.wander, wanderMode = Npc.prototype.wanderMode;
+    const random = () => {
+      randomState ^= randomState << 13;
+      randomState ^= randomState >>> 17;
+      randomState ^= randomState << 5;
+      return (randomState >>> 0) / 0x100000000;
+    };
+    // Observe the compiled current-tile walk at selection, without writing NPC state.
+    Npc.prototype.queueWaypoint = function (x, z) {
+      if (this.getVar(stateVar) === 1 && (this.getVar(ownerVar) >>> 0) === p.uid &&
+          p.getVar(slotVar) === this.uid) {
+        selectionWalks++;
+        assert.equal(x, this.x, 'selection replaces any residual destination with the current tile');
+        assert.equal(z, this.z);
+        selected = this;
+        selectedPosition ??= npcTile(this);
+      }
+      return queueWaypoint.call(this, x, z);
+    };
+    Npc.prototype.wander = function (range) {
+      if (this === selected && this.getVar(stateVar) === 1) freshWanderChoices++;
+      return wander.call(this, range);
+    };
+    // Reproducible native wander outcomes for this actor only; no actor is moved,
+    // frozen or replaced by the fixture, and other NPC random streams are untouched.
+    Npc.prototype.wanderMode = function () {
+      if (this !== selected) return wanderMode.call(this);
+      const previous = Math.random;
+      Math.random = random;
+      try { return wanderMode.call(this); }
+      finally { Math.random = previous; }
+    };
+    try {
+      const target = reachDistractionPage(p);
+      assert(selected === target, 'the compiled reservation performs the published current-tile hold on its selected NPC');
+      const heldResult = trialResult(p), paused = p.activeScript;
+      const assertHeld = () => {
+        assert.deepEqual(npcTile(target), selectedPosition, 'no drift occurs after selection');
+        assert.equal(target.targetOp, NpcMode.NONE, 'the selected villager stays in stationary mode');
+        assert.equal(target.getVar(stateVar), 1);
+        assert.equal(target.getVar(ownerVar) >>> 0, p.uid);
+        assert.equal(target.timerInterval, 1, 'the existing single NPC timer remains armed');
+        assert.equal([...target.queue.all()].length, 0, 'holding never appends a callback');
+        assert.equal(selectionWalks, 1, 'there is no replacement path while held');
+        assert.equal(freshWanderChoices, 0, 'the former fresh wander choices are now zero');
+      };
+      // The diagnostic's 128-turn page produced 26 fresh paths on the old code.
+      for (let held = 0; held <= 128; held++) {
+        assertHeld();
+        assert.equal(target.getVar(deadlineVar), 0);
+        assert.equal(p.activeScript, paused);
+        assert.equal(p.modalChat, id('Component', 'npcchat1'));
+        if (held < 128) worldTick();
+      }
+      assert.deepEqual(trialResult(p), heldResult);
+      const timed = ['theft', 'refusal', 'expiry', 'window-logout'].includes(exit);
+      if (timed) {
+        resumeDialogue(p);
+        assert.equal(stage(p), 8);
+        assertHint(p, target);
+        const deadline = target.getVar(deadlineVar);
+        assert.equal(deadline, World.currentTick + distractionTicks);
+        while (World.currentTick + 1 < deadline) {
+          assertHeld();
+          worldTick();
+        }
+        assertHeld();
+      }
+      const beforeExit = trialResult(p), hp = p.levels[PlayerStat.HITPOINTS];
+      if (exit === 'theft') {
+        operate(p, target, 3);
+        assert.equal(stage(p), 9);
+        assert.equal(count(p, 'coins') - beforeExit.coins, 3);
+        assert.equal(xp(p) - beforeExit.xp, 80);
+        assert.equal(p.levels[PlayerStat.HITPOINTS], hp);
+      } else if (exit === 'refusal') {
+        worldTick(() => {
+          assert.equal(World.currentTick, target.getVar(deadlineVar));
+          assertHeld();
+          operate(p, target, 3);
+        });
+        assert.equal(target.sayMessage, "You won't get my purse.");
+        assert.equal(hp - p.levels[PlayerStat.HITPOINTS], 2);
+        assert.deepEqual(trialResult(p), beforeExit);
+      } else if (exit === 'expiry') {
+        worldTick();
+        assert.deepEqual(trialResult(p), beforeExit);
+      } else if (exit === 'page-interruption') {
+        const destination = [[p.x + 1, p.z], [p.x - 1, p.z], [p.x, p.z + 1], [p.x, p.z - 1]]
+          .find(([x, z]) => !map.isMapBlocked(x, z, p.level) &&
+            [...map.findPath(p.level, p.x, p.z, x, z)].at(-1) === CoordGrid.packCoord(p.level, x, z));
+        assert(destination, 'the original map admits an ordinary walking interruption');
+        assert(moveClickHandler.handle(new MoveClick([{ x: destination[0], z: destination[1] }], 0, false), p));
+        assert.equal(p.activeScript, null);
+        assert.deepEqual(trialResult(p), beforeExit);
+      } else if (exit === 'page-logout' || exit === 'window-logout') {
+        p.tabs[10] = types.Component.get(id('Component', 'logout:try_logout')).rootLayer;
+        assert(button(p, 'logout:try_logout'), 'the real logout-tab action is accepted');
+        assert(p.requestLogout);
+        assert.deepEqual(trialResult(p), beforeExit);
+      } else {
+        // Independent orphan timer path, with no content logout hook.
+        p.clearInteraction(); p.unlink(); p.isActive = false;
+        World.players[p.pid] = null;
+        worldTick();
+        assert.deepEqual(trialResult(p), beforeExit);
+      }
+      if (exit !== 'refusal' && exit !== 'expiry' && exit !== 'orphaned-page') {
+        assert.deepEqual(npcTile(target), selectedPosition, 'the release action itself does not move its target');
+      }
+      if (exit !== 'orphaned-page') assertReleased(p, target);
+      else {
+        assert.equal(target.getVar(stateVar), 0);
+        assert.equal(target.getVar(ownerVar), -1);
+        assert.equal(target.getVar(deadlineVar), 0);
+        assert.equal(target.timerInterval, 0);
+        assert.equal([...target.queue.all()].length, 0);
+      }
+      assert.equal(freshWanderChoices, 0);
+      assert.equal(selectionWalks, 1);
+      assert.equal(target.targetOp, NpcMode.WANDER, 'every exit restores ordinary wandering');
+      const releasedPosition = npcTile(target);
+      for (let waited = 0; waited < nativeSetupWaitTicks &&
+          npcTile(target).every((value, index) => value === releasedPosition[index]); waited++) worldTick();
+      assert.notDeepEqual(npcTile(target), releasedPosition, 'the released original actor actually walks again within the unchanged native observation bound');
+      assert.equal(target.getVar(stateVar), 0);
+      assert.equal(target.timerInterval, 0);
+      assert.equal([...target.queue.all()].length, 0);
+    } finally {
+      if (ownsQueueWaypoint) Npc.prototype.queueWaypoint = queueWaypoint;
+      else delete Npc.prototype.queueWaypoint;
+      Npc.prototype.wander = wander;
+      Npc.prototype.wanderMode = wanderMode;
+    }
+  });
 }
 
 function secludedTarget(p) {
