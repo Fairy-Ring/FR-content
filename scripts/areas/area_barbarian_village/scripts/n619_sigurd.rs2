@@ -1,0 +1,51 @@
+// CANDIDATE: Transcript:Sigurd r14306126. Excludes 2026 axe storage.
+[opnpc1,canoeing_sigurd]
+~chatplayer("<p,neutral>Hello there.");
+~chatnpc("<p,neutral>Ha Ha! Hello!");
+@multi2("Who are you?", n619_sigurd_identity, "Can you teach me about Canoeing?", n619_sigurd_teach);
+
+[label,n619_sigurd_identity]
+~chatplayer("<p,neutral>Who are you?");
+~chatnpc("<p,neutral>I'm Sigurd the Great and Brainy.");
+~chatplayer("<p,neutral>Why do they call you the Great and Brainy?");
+~chatnpc("<p,neutral>Because I invented the Log Canoe!");
+~chatplayer("<p,neutral>Log Canoe?");
+~chatnpc("<p,neutral>Yeash! Me and my cousins were having a great party by the river when we decided to have a game of 'Smack The Tree'");
+~chatplayer("<p,neutral>Smack the Tree?");
+~chatnpc("<p,neutral>It's a game were you take it in turnsh shmacking a tree. First one to uproot the tree winsh!");
+~chatnpc("<p,neutral>Anyway, I won the game with a flying tackle. The tree came loose and down the river bank I went, still holding the tree.");
+~chatnpc("<p,neutral>I woke up a few hours later and found myself several miles down river. And thatsh how I invented the log canoe!");
+~chatplayer("<p,neutral>So you invented the 'Log Canoe' by falling into a river hugging a tree?");
+~chatnpc("<p,neutral>Well I refined the design from the original you know!");
+~chatnpc("<p,neutral>I cut all the branches off to make it more comfortable. I could tell you how to if you like?");
+@multi2("Yes", n619_sigurd_teach, "No", n619_sigurd_no);
+
+[label,n619_sigurd_no]
+~chatplayer("<p,neutral>No thanks, not right now.");
+
+[label,n619_sigurd_teach]
+~chatplayer("<p,neutral>Can you teach me about canoes?");
+if (stat_base(woodcutting) < 12) {
+    ~chatnpc("<p,neutral>Well, you don't look like you have the skill to make a canoe.");
+    ~chatnpc("<p,neutral>You need to have at least level 12 woodcutting.");
+    ~chatnpc("<p,neutral>Once you are able to make a canoe it makes travel along the river much quicker!");
+    return;
+}
+~chatnpc("<p,neutral>It's really quite simple. Just walk down to that tree on the bank and chop it down.");
+~chatnpc("<p,neutral>Then take your axe to it and shape it how you like!");
+if (stat_base(woodcutting) < 27) {
+    ~chatnpc("<p,neutral>You can make a log canoe like mine! It'll get you 1 stop down the river.");
+    ~chatnpc("<p,neutral>There's some snooty fella down near the Champions Guild who reckons his canoes are better than mine. He's never said it to my face though.");
+} else if (stat_base(woodcutting) < 42) {
+    ~chatnpc("<p,neutral>You could make a Dugout canoe with your woodcutting skill, but I don't see why you would want to.");
+} else if (stat_base(woodcutting) < 57) {
+    ~chatnpc("<p,neutral>Well, you're pretty handy with an axe!");
+    ~chatnpc("<p,neutral>You could make Stable Dugout canoes, like that snooty fella Tarquin.");
+    ~chatnpc("<p,neutral>He reckons his canoes are better than mine. He's never said it to my face though.");
+} else {
+    ~chatnpc("<p,neutral>You look like you know your way around a tree, you can make a Waka canoe.");
+    ~chatplayer("<p,neutral>What's a Waka?");
+    ~chatnpc("<p,neutral>I've only ever seen Hari using them. People say he's found a way to canoe the river underground and into the Wilderness");
+    ~chatnpc("<p,neutral>Hari hangs around up near Edgeville");
+    ~chatnpc("<p,neutral>He's a nice bloke.");
+}

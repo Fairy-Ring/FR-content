@@ -1,0 +1,70 @@
+// CANDIDATE: retained Old School Barbarian transcript; excludes the 2007 inn form.
+// Exact wrappers keep unassigned Outpost and historical forms unchanged.
+[opnpc1,fai_barbarian_1]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_2]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_3]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_4]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_5]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_6]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_7]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_8]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_10]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_11]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_12]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_13]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_14]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_female_1]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_female_2]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_female_3]
+@n619_barbarian;
+
+[opnpc1,fai_barbarian_female_4]
+@n619_barbarian;
+
+[label,n619_barbarian]
+// UNKNOWN engineering: six replies are equally weighted; no source gives weights.
+switch_int(random(6)) {
+    case 0 :
+    ~chatnpc("<p,angry>Wanna fight?");
+    case 1 :
+    ~chatnpc("<p,angry>Ah, you come for fight, ja?");
+    case 2 :
+    ~chatnpc("<p,angry>You look funny.");
+    case 3 :
+    ~chatnpc("<p,angry>Grrr!");
+    case 4 :
+    ~chatnpc("<p,angry>What you want?");
+    case 5 :
+    ~chatnpc("<p,angry>Go Away!");
+}
+npc_setmode(opplayer2);

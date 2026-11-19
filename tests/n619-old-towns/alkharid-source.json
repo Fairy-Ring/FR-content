@@ -1,0 +1,55 @@
+{
+  "forms": [
+    { "name": "al_the_camel", "op": 1, "seeds": [0, 2, 3] },
+    { "name": "elly_the_camel", "op": 1, "seeds": [0, 2, 3] },
+    { "name": "ollie_the_camel", "op": 1, "seeds": [0, 2, 3] },
+    { "name": "cam_the_camel", "op": 1, "seeds": [0, 2, 3] },
+    { "name": "ugthanki", "op": 1, "randomReplies": 9 },
+    { "name": "magic_carpet_monkey", "op": 1 },
+    { "name": "magic_carpet_monkey", "op": 1, "worn": ["mm_amulet_of_monkey_speak"] },
+    {
+      "name": "magic_carpet_monkey",
+      "op": 1,
+      "worn": ["mm_amulet_of_monkey_speak"],
+      "inventory": { "banana": 1 },
+      "consumes": [{ "item": "banana", "count": 1, "when": "Give the monkey a banana." }]
+    }
+  ],
+  "speech": [
+    "I'm sorry to bother you, but could you spare me a little dung?",
+    "The camel didn't seem to appreciate that question.",
+    "If I go near that camel, it'll probably bite my hand off.",
+    "Mmm... looks like that camel would make a nice kebab.",
+    "I wonder if that camel has fleas...",
+    "The camel tries to stamp on your foot, but you pull it back quickly.",
+    "The camel turns its head and glares at you.",
+    "The camel spits at you, and you jump back hurriedly.",
+    "Who's a cute little monkey?",
+    "Ukkuk oook! Eeek aka, ahh aka gonk.",
+    "Who's an ugly human? Give me a banana!",
+    "What's up with you?",
+    "Stupid human! Give monkey a banana!",
+    "Sorry monkey, I don't have any bananas.",
+    "Aghhh. You're a rubbish human, get monkey a banana now.",
+    "Ha ha! Smelly human gave monkey a banana.",
+    "Wow you're one nasty piece of work. Have you ever heard of gratitude?",
+    "Hey baldy, give monkey another banana!",
+    "Just because I'm not covered in fur doesn't make me bald, you cheeky monkey.",
+    "Monkey wants another banana now! Give me, give me!",
+    "Look I've had it with you, you little degenerate.",
+    "I'll not give you a banana until you learn manners."
+  ],
+  "options": [
+    "Ask the camel about its dung.",
+    "Say something unpleasant.",
+    "Neither - I'm a polite person.",
+    "Give the monkey a banana.",
+    "Don't give it a banana."
+  ],
+  "labels": [
+    "n619_alkharid_camel",
+    "n619_alkharid_ugthanki",
+    "n619_alkharid_magic_carpet_monkey"
+  ],
+  "expectedConversations": 49
+}

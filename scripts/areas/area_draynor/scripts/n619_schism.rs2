@@ -1,0 +1,34 @@
+// CANDIDATE: Transcript:Miss_Schism r15095896, before watching the recording.
+// The recording activity is absent; no invented watched-state marker is added.
+[opnpc1,wom_gossip]
+~chatnpc("<p,neutral>Oooh, my dear, have you heard the news?");
+@n619_schism_options;
+
+[label,n619_schism_options]
+@multi3("Ok, tell me about the news.", n619_schism_news, "Who are you?", n619_schism_identity, "I'm not talking to you, you horrible woman.", n619_schism_leave);
+
+[label,n619_schism_news]
+~chatplayer("<p,neutral>Okay, tell me about the news.");
+~chatnpc("<p,neutral>It's terrible, absolutely terrible! Those poor people!");
+~chatplayer("<p,neutral>Okay, yeah.");
+~chatnpc("<p,neutral>And who'd have ever thought such a sweet old gentleman would do such a thing?");
+~chatplayer("<p,neutral>I really don't know what you're talking about.");
+~chatnpc("<p,neutral>Oooh, my dear, had you not heard?");
+~chatplayer("<p,neutral>At this rate I don't think I want to know...");
+~chatnpc("<p,neutral>Oh, you must quickly go and speak to the bank guard outside the bank. He'll tell you all about it, oooh, such a shock it was...");
+~chatplayer("<p,neutral>...");
+
+[label,n619_schism_identity]
+~chatplayer("<p,neutral>Who are you?");
+~chatnpc("<p,neutral>I, my dear, am a concerned citizen of Draynor Village. Ever since the Council allowed those farmers to set up their stalls here, we've had a constant flow of thieves and murderers through our fair village, and I decided");
+~chatnpc("<p,neutral>that someone HAD to stand up and keep an eye on the situation.");
+~chatnpc("<p,neutral>I also do voluntary work for the Draynor Manor Restoration Fund. We're campaigning to have Draynor Manor turned into a museum before the wet-rot destroys it completely.");
+~chatplayer("<p,neutral>Right...");
+@n619_schism_identity_options;
+
+[label,n619_schism_identity_options]
+@multi2("Ok, tell me about the news.", n619_schism_news, "I'm not talking to you, you horrible woman.", n619_schism_leave);
+
+[label,n619_schism_leave]
+~chatplayer("<p,neutral>I'm not talking to you, you horrible woman.");
+~chatnpc("<p,neutral>Oooh.");
