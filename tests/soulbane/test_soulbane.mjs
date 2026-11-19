@@ -3288,8 +3288,9 @@ function testConfusionIllusion(p, fake) {
     const removalTicks = questConstant('soulbane_confusion_removal_ticks');
     assert.equal(removalTicks, Number(deathDelay[1]), 'illusion removal uses the published NPC death delay');
     assert.equal(fake.delayed, true, 'the eighth-hit illusion is suspended until its final update is delivered');
-    assert.equal(fake.delayedUntil - visibleHits.at(-1).tick, removalTicks,
-      'only removal is deferred by the named engineering interval');
+    // Native NPC_DELAY resumes at currentTick + 1 + its script operand.
+    assert.equal(fake.delayedUntil - visibleHits.at(-1).tick, removalTicks + 1,
+      'removal follows the published delay through the native NPC clock conversion');
     assert.equal(fake.vars[NPC_INSTANCE], 0, 'the eighth hit consumes admission before the delivery delay');
     assert.equal(removals, 0, 'the eighth-hit update precedes the one native removal');
     assert.equal(disappearanceMessages().length, 0, 'the message still follows removal rather than the eighth hit');
@@ -3302,7 +3303,16 @@ function testConfusionIllusion(p, fake) {
     p.processInteraction();
     assert.deepEqual(xpSnapshot(p), xpAfterEight, 'the rejected ninth attack grants no XP');
     assert.equal(fake.vars[CONFUSION_HITS], 8, 'the rejected ninth attack produces no extra hit');
-    for (let tick = 0; tick < removalTicks; tick++) worldTick(null, observeNpcInfo);
+    for (let tick = 0; tick < removalTicks; tick++) {
+      worldTick(null, observeNpcInfo);
+      assert(fake.isActive && fake.delayed, 'the native delay retains a suspended, visible illusion');
+      assert.equal(fake.vars[CONFUSION_HITS], 8, 'the delayed illusion cannot count another hit');
+      assert.equal(p.levels[PlayerStat.HITPOINTS], hpAfterEight, 'the illusion does not attack during the held tick');
+      assert.deepEqual(xpSnapshot(p), xpAfterEight, 'the held tick awards no additional combat XP');
+      assert.equal(removals, 0, 'native removal does not precede the full published delay');
+      assert.equal(disappearanceMessages().length, 0, 'the message does not precede native removal');
+    }
+    worldTick(null, observeNpcInfo);
     assert.equal(fake.isActive, false, 'native resume removes the illusion after the final-hit delivery interval');
     assert.equal(p.levels[PlayerStat.HITPOINTS], hpAfterEight, 'the suspended illusion never attacks during its delay');
     assert.equal(removals, 1, 'the illusion is removed exactly once');
