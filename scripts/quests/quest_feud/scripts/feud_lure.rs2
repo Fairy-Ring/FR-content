@@ -1,5 +1,19 @@
 // Feud villager lure; transcript dialogue is CANDIDATE.
 
+// VERIFIED original middle-form Lure options; CANDIDATE earlier following from
+// the period guide's unconditional Lure rule. No earlier stage or reward write.
+[opnpc4,feud_villager_1_2]
+if (%feud_var = ^feud_first_pick | %feud_var = ^feud_distraction_active) @feud_villager_lure;
+return;
+
+[opnpc4,feud_villager_2_2]
+if (%feud_var = ^feud_first_pick | %feud_var = ^feud_distraction_active) @feud_villager_lure;
+return;
+
+[opnpc4,feud_villager_3_2]
+if (%feud_var = ^feud_first_pick | %feud_var = ^feud_distraction_active) @feud_villager_lure;
+return;
+
 [opnpc4,feud_villager_1_3]
 if (%feud_var = ^feud_complete) {
     ~feud_repeat_start_lure;

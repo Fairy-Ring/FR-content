@@ -137,6 +137,71 @@ function completeThirdTheft(p, target) {
   assert.equal(count(p, 'coins') - before.coins, 3);
 }
 
+for (const number of [1, 2, 3]) for (const checkpoint of [7, 8]) {
+  test(`original villager ${number} early Lure at earned stage ${checkpoint} preserves trials and recovers through real logout`, () => {
+    let p = trialFixture();
+    if (checkpoint === 8) {
+      const distracted = reachDistraction(p);
+      // Let the real NPC queue expire this earned distraction, without rewriting its checkpoint.
+      World.currentTick = distracted.getVar(deadlineVar);
+      worldTick();
+      assert.equal(distracted.getVar(stateVar), 0);
+      assert.equal(p.getVar(slotVar), -1);
+    } else {
+      const first = villagers().find(npc => npc.getVar(stateVar) === 0);
+      assert(first, 'an original placed villager can earn the first theft');
+      operate(p, first, 3);
+    }
+    assert.equal(stage(p), checkpoint);
+    assert.equal(read(p, 'feud_npc_multi'), 1);
+    const baseType = id('NpcType', `feud_villager_multi_${number}`);
+    const target = villagers().find(npc => npc.baseType === baseType && npc.getVar(stateVar) === 0);
+    assert(target, `an original idle villager ${number} exposes its middle form`);
+    const before = { coins: count(p, 'coins'), xp: xp(p) };
+    lure(p, target);
+    assert.equal(target.type, id('NpcType', `feud_villager_${number}_2`),
+      'native dispatch uses the original middle form, not the later blackjack form');
+    const second = villagers().find(npc => npc !== target && npc.getVar(stateVar) === 0);
+    assert(second, 'a second real target is available to prove the reservation rejection');
+    operate(p, second, 4);
+    assert.equal(owned(p).length, 1);
+    assert.equal(p.getVar(slotVar), target.uid, 'an early lure cannot stack another target');
+    talk(p, 'feud_street_urchin');
+    assert.equal(stage(p), checkpoint, 'the active early lure cannot become an urchin distraction');
+    operate(p, target, 3);
+    assert.equal(stage(p), checkpoint, 'following cannot substitute for the required distracted theft');
+    assert.equal(count(p, 'coins'), before.coins);
+    assert.equal(xp(p), before.xp);
+    assert(World.currentTick + 1 < target.getVar(deadlineVar),
+      'production logout, not expiry, must release this early lure');
+    p = nativeLogoutAndReload(p);
+    assert.equal(target.getVar(stateVar), 0);
+    assert.equal(target.getVar(ownerVar), -1);
+    assert.equal(target.getVar(deadlineVar), 0);
+    assert.equal(owned(p).length, 0);
+    talk(p, 'feud_street_urchin');
+    assert.equal(stage(p), 8, 'the player must still obtain the actual distraction');
+    const distracted = owned(p)[0];
+    assert(distracted);
+    assert.equal(distracted.getVar(stateVar), 1);
+    operate(p, distracted, 3);
+    assert.equal(stage(p), 9);
+    assert.equal(owned(p).length, 0, 'the real second theft releases its distraction');
+    assert.equal(p.getVar(slotVar), -1);
+    const later = secludedTarget(), beforeKoXp = xp(p);
+    operate(p, later, 5);
+    assert.equal(stage(p), 9, 'an earlier lure does not credit the later lure checkpoint');
+    assert.equal(xp(p), beforeKoXp);
+    lure(p, later);
+    assert.equal(stage(p), 10, 'a fresh stage-nine Lure is still required');
+    knockOut(p, later);
+    completeThirdTheft(p, later);
+    p = nativeLogoutAndReload(p);
+    assert.equal(stage(p), 12);
+    assert.equal(owned(p).length, 0);
+  });
+}
+
 for (const checkpoint of [8, 10, 11]) {
   test(`native logout at earned trial stage ${checkpoint} releases its villager and the player can finish stage 12`, () => {
     let p = trialFixture();
