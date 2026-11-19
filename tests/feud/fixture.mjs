@@ -22,7 +22,7 @@ const operationOffsets = {
   feud_drunken_ali: [1, 0],
   feud_egyptian_doorman_multi: [0, -1],
   feud_egyptian_minder: [1, 0],
-  feud_kebabman: [1, 0]
+  feud_kebabman: [0, 1]
 };
 const actors = name => {
   const type = id('NpcType', name);
@@ -77,7 +77,18 @@ function activeLoc(placement) {
 }
 
 function operateLoc(p, placement, { option = 1, item = null, position = null, choices = [] } = {}) {
-  const loc = activeLoc(placement);
+  let loc = activeLoc(placement);
+  if (loc.type !== placement.type) {
+    assert(loc.isChanged() && loc.lifecycleTick > 0,
+      'a temporary changed loc has its published restoration countdown');
+    const remaining = loc.lifecycleTick;
+    for (let step = 0; step < remaining; step++) {
+      tick(p);
+      World.processZones();
+    }
+    loc = activeLoc(placement);
+    assert.equal(loc.type, placement.type, 'the native zone lifecycle restores the original loc before its next click');
+  }
   const config = types.LocType.get(loc.type);
   const width = loc.angle % 2 ? config.length : config.width;
   const length = loc.angle % 2 ? config.width : config.length;
