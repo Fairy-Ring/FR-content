@@ -355,6 +355,10 @@ multivar=feud_npc_multi
 multinpc=0,feud_arabian_guard1_1
 multinpc=1,feud_arabian_guard1_1
 multinpc=2,feud_arabian_guard1_2
+hitpoints=30
+attack=59
+strength=70
+defence=30
 
 [feud_arabian_guard1_1]
 name=Bandit
@@ -422,6 +426,10 @@ multivar=feud_npc_multi
 multinpc=0,feud_arabian_guard2_1
 multinpc=1,feud_arabian_guard2_1
 multinpc=2,feud_arabian_guard2_2
+hitpoints=30
+attack=40
+strength=50
+defence=20
 
 [feud_arabian_guard2_1]
 name=Bandit
@@ -853,6 +861,10 @@ multivar=feud_npc_multi
 multinpc=0,feud_egyptian_doorman_1
 multinpc=1,feud_egyptian_doorman_1
 multinpc=2,feud_egyptian_doorman_2
+hitpoints=60
+attack=60
+strength=50
+defence=20
 
 [feud_egyptian_doorman_1]
 name=Menaphite Thug
