@@ -33,6 +33,8 @@ const typeName = (id: number) => LocType.get(id).debugname ?? String(id);
 const tile = (p: Placement) => `${p.x},${p.z},L${p.level}`;
 const trigger = (phase: 'AP' | 'OP', slot: number) => (ServerTriggerType as unknown as Record<string, number>)[`${phase}LOC${slot}`] as ServerTriggerType;
 const HIDDEN_KIND = 'not shown by the client (hidden)';
+const INACTIVE_KIND = 'not shown by the client (inactive root)';
+const notShown = (kind: string) => kind === HIDDEN_KIND || kind === INACTIVE_KIND;
 // Java LocType.java:470-472 drops this sentinel with equalsIgnoreCase.
 const isHidden = (text: string | null | undefined) => text?.toLowerCase() === 'hidden';
 const isShown = (text: string | null | undefined) => text !== null && text !== undefined && !isHidden(text);
@@ -56,6 +58,7 @@ export function loadPack(pack = 'data/pack'): Map<number, LocType> {
     config.decodeType(dat);
     assert.equal(dat.pos - start, length, `client loc record length: ${id}`);
     config.postDecode();
+    assert.equal(config.active, LocType.get(id).active, `client/server activity: ${id}`);
     assert.deepEqual(config.op, LocType.get(id).op, `client/server options: ${id}`);
     assert.deepEqual(config.multiloc, LocType.get(id).multiloc, `client/server multiloc: ${id}`);
     assert.equal(config.multivarp, LocType.get(id).multivarp);
@@ -172,7 +175,7 @@ export function probe(root: LocType, form: Form, client: Map<number, LocType>): 
   const original = World.getLoc;
   const options: Option[] = [];
   try {
-    // An inactive root has no entity in GameMap. Probe hypothetical routing, but classify it as inactive below.
+    // Non-menu contexts retain hypothetical trigger lookup, without claiming a client click exists.
     World.getLoc = (() => loc) as typeof World.getLoc;
     for (let index = 0; index < 5; index++) {
       const text = client.get(form.type)!.op?.[index];
@@ -181,8 +184,7 @@ export function probe(root: LocType, form: Form, client: Map<number, LocType>): 
       let selected: Option | null = null;
       for (const state of form.states) {
         setState(player, root, state);
-        if (hidden) {
-          // No client menu click exists. Inspect script-trigger dispatch separately from packet validation.
+        if (hidden || !root.active) {
           assert(player.setInteraction(Interaction.ENGINE, loc, trigger('AP', index + 1)));
         } else {
           assert.equal(new OpLocHandler().handle(new OpLoc(index + 1, 8, 8, root.id), player), true, `OpLocHandler rejected ${typeName(form.type)} slot ${index + 1}`);
@@ -191,7 +193,7 @@ export function probe(root: LocType, form: Form, client: Map<number, LocType>): 
         const ap = actualRoute(root.id, form.type, 'AP', index + 1, player.getApTrigger());
         const op = actualRoute(root.id, form.type, 'OP', index + 1, player.getOpTrigger());
         const scripts = [ap.script, op.script].filter((s): s is ScriptFile => s !== null);
-        const kind = hidden ? HIDDEN_KIND : !root.active ? 'inactive type' : !scripts.length ? 'no handler' : scripts.every(onlyReturns) ? 'handler that only returns' : 'handled';
+        const kind = hidden ? HIDDEN_KIND : !root.active ? INACTIVE_KIND : !scripts.length ? 'no handler' : scripts.every(onlyReturns) ? 'handler that only returns' : 'handled';
         const current = { root: root.id, form, slot: index + 1, text, ap, op, kind };
         if (selected) assert.deepEqual([ap.script, op.script, kind], [selected.ap.script, selected.op.script, selected.kind], 'equivalent visible states must dispatch equally');
         selected = current;
@@ -223,6 +225,19 @@ function scriptDescription(route: Route): string {
   return `${route.rule}: ${script.info.scriptName}${onlyReturns(script) ? ' (only RETURN)' : ''}${calls.size ? ` -> ${[...calls].sort(compare).join('; ')}` : ''}`;
 }
 
+function optionRows(options: Option[], byRoot: Map<number, Placement[]>): Gap[] {
+  const rows = new Map<string, Gap>();
+  for (const option of options) {
+    const key = JSON.stringify([option.form.type, option.slot, option.text, option.kind]);
+    const row = rows.get(key) ?? { type: option.form.type, slot: option.slot, text: option.text, kind: option.kind, roots: new Set(), placements: new Map(), options: [] };
+    row.roots.add(option.root);
+    for (const p of byRoot.get(option.root)!) row.placements.set(p.key, p);
+    row.options.push(option);
+    rows.set(key, row);
+  }
+  return [...rows.values()].sort((a, b) => a.type - b.type || a.slot - b.slot || compare(a.kind, b.kind));
+}
+
 export function scan(placements: Placement[], client: Map<number, LocType>): { options: Option[]; gaps: Gap[]; limits: string[] } {
   const byRoot = new Map<number, Placement[]>();
   for (const p of placements) {
@@ -231,24 +246,14 @@ export function scan(placements: Placement[], client: Map<number, LocType>): { o
     byRoot.set(p.type, rows);
   }
   const options: Option[] = [];
-  const missing = new Map<string, Gap>();
   const limits = new Set<string>();
   for (const rootId of [...byRoot.keys()].sort((a, b) => a - b)) {
     const root = LocType.get(rootId);
     for (const form of forms(root, client, limits)) {
-      for (const option of probe(root, form, client)) {
-        options.push(option);
-        if (option.kind === 'handled' || option.kind === HIDDEN_KIND) continue;
-        const key = JSON.stringify([form.type, option.slot, option.text, option.kind]);
-        const gap = missing.get(key) ?? { type: form.type, slot: option.slot, text: option.text, kind: option.kind, roots: new Set(), placements: new Map(), options: [] };
-        gap.roots.add(rootId);
-        for (const p of byRoot.get(rootId)!) gap.placements.set(p.key, p);
-        gap.options.push(option);
-        missing.set(key, gap);
-      }
+      options.push(...probe(root, form, client));
     }
   }
-  return { options, gaps: [...missing.values()].sort((a, b) => a.type - b.type || a.slot - b.slot || compare(a.kind, b.kind)), limits: [...limits].sort(compare) };
+  return { options, gaps: optionRows(options.filter(o => o.kind !== 'handled' && !notShown(o.kind)), byRoot), limits: [...limits].sort(compare) };
 }
 
 function cell(value: unknown): string {
@@ -278,19 +283,40 @@ function nearbyLabel(p: Placement, names: Label[]): [string, string] {
   const sorted = names.map(n => ({ ...n, distance: Math.hypot(n.x - p.x, n.z - p.z) })).filter(n => n.distance <= 100).sort((a, b) => a.distance - b.distance || compare(a.name, b.name));
   return sorted.length ? [sorted[0].name, sorted[0].distance.toFixed(1)] : ['', ''];
 }
+function farmingPatch(gap: Gap): boolean {
+  return [...gap.roots].some(id => /^farming_.*_patch(?:_|$)/.test(typeName(id)));
+}
+
 function lead(gap: Gap): string {
-  const text = `${typeName(gap.type)} ${gap.text}`.toLowerCase();
-  if (/door|gate/.test(text)) return 'doors and gates';
-  if (/ladder|stair|steps/.test(text)) return 'ladders and stairs';
-  if (/chest|crate|cupboard|drawer|bookcase|barrel|search|sack/.test(text)) return 'containers and searchable scenery';
-  if (/tree|rock|ore|mine|chop|fish|harvest|pick|plant|herb|flax/.test(text)) return 'resources';
-  if (/boat|canoe|ship|cart|travel|sail|ride|transport|board/.test(text)) return 'transport';
-  if (/quest|soulbane|soul_bane|dt_|mourning|mep_|regicide|myreque|deserttreasure|rfd_|recipe|fremennik|viking/.test(text)) return 'quest scenery';
+  const name = typeName(gap.type).toLowerCase();
+  const option = gap.text.toLowerCase();
+  if (farmingPatch(gap)) return 'resources';
+  if (/ladder|stairs?|steps|trap_?door|hatch/.test(name)) return 'ladders and stairs';
+  if (/door|gate/.test(name)) return 'doors and gates';
+  if (/chest|crate|cupboard|drawer|bookcase|barrel|sack|floorboard/.test(name) || option === 'search') return 'containers and searchable scenery';
+  if (/tree|rock|mineral_vein|(?:^|_)ore(?:_|\\d|$)|herb|flax|crops?/.test(name) || /^(mine|prospect|chop(?:-down)?|fish|harvest|pick(?:-from)?|plant|rake|prune|check-health)$/.test(option)) return 'resources';
+  if (/boat|canoe|(?:^|_)ship(?:_|$)|(?:^|_)cart(?:_|\\d|$)|carpet|glider/.test(name) || /^(board|travel|sail|ride|paddle|charter|sail-to|travel-to)$/.test(option)) return 'transport';
+  if (/quest|soulbane|soul_bane|^dt_|mourning|^mep_|regicide|myreque|deserttreasure|^rfd_|recipe|fremennik|viking|fever/.test(name)) return 'quest scenery';
   return 'unclassified';
 }
 function sample(gap: Gap): Placement { return gap.placements.values().next().value!; }
 function maps(gap: Gap): string { return [...new Set([...gap.placements.values()].map(p => p.map))].sort(compare).join(';'); }
 const descriptions = (gap: Gap, phase: 'ap' | 'op') => [...new Set(gap.options.map(o => scriptDescription(o[phase])).filter(Boolean))].sort(compare).join(' | ');
+
+function priorityRows(gaps: Gap[]) {
+  const groups = new Map<string, Gap[]>();
+  for (const gap of gaps) {
+    const key = farmingPatch(gap) ? `farming:${gap.text}` : `${gap.type}:${gap.slot}:${gap.kind}`;
+    const group = groups.get(key) ?? [];
+    group.push(gap);
+    groups.set(key, group);
+  }
+  return [...groups.values()].map(rows => {
+    const placements = new Map<string, Placement>();
+    for (const row of rows) for (const [key, p] of row.placements) placements.set(key, p);
+    return { name: farmingPatch(rows[0]) ? 'Farming patch forms (collapsed)' : typeName(rows[0].type), text: rows[0].text, slots: [...new Set(rows.map(g => g.slot))].sort().join(';'), rows: rows.length, placements, lead: lead(rows[0]) };
+  }).sort((a, b) => b.placements.size - a.placements.size || compare(a.name, b.name) || compare(a.text, b.text));
+}
 
 export function selfChecks(client: Map<number, LocType>, placements: Placement[], output?: string): string[] {
   const results: string[] = [];
@@ -298,13 +324,13 @@ export function selfChecks(client: Map<number, LocType>, placements: Placement[]
   const originalLookup = provider.scriptLookup;
   const originalLength = LocType.configs.length;
   const ids: number[] = [];
-  for (let id = 0; id < 16384 && ids.length < 3; id++) if (!LocType.get(id)) ids.push(id);
-  assert.equal(ids.length, 3, 'three unallocated in-memory loc ids are required for self-checks');
+  for (let id = 0; id < 16384 && ids.length < 6; id++) if (!LocType.get(id)) ids.push(id);
+  assert.equal(ids.length, 6, 'six unallocated in-memory loc ids are required for self-checks');
   const synthetic = new Map(client);
   try {
     provider.scriptLookup = new Map(originalLookup);
-    for (const phase of ['AP', 'OP'] as const) provider.scriptLookup.delete(trigger(phase, 1));
-    const fixture = ids.map((id, i): Placement => {
+    for (const phase of ['AP', 'OP'] as const) for (let slot = 1; slot <= 5; slot++) provider.scriptLookup.delete(trigger(phase, slot));
+    const fixture = ids.slice(0, 3).map((id, i): Placement => {
       const config = new LocType(id);
       config.debugname = `locaudit_fixture_${i}`;
       config.active = 1;
@@ -356,8 +382,34 @@ export function selfChecks(client: Map<number, LocType>, placements: Placement[]
     results.push('PASS global and category handlers count as handlers, without speech analysis');
     fixture[0].type = ids[1];
     LocType.get(ids[1]).active = 0;
-    assert.equal(scan([fixture[0]], synthetic).gaps[0]?.kind, 'inactive type', 'inactive placement overrides an existing handler');
-    results.push('PASS inactive mapped type is a gap even with a handler');
+    const inactive = scan([fixture[0]], synthetic);
+    assert.equal(inactive.gaps.length, 0, 'an inactive root must not enter missing rows');
+    assert.equal(inactive.options[0]?.kind, INACTIVE_KIND);
+    assert.equal(inactive.options[0]?.op.script, handled, 'inactive-root hypothetical trigger is retained');
+    results.push('PASS inactive roots are not menu gaps, even when a trigger exists');
+    for (const id of ids.slice(3)) {
+      const config = new LocType(id);
+      config.debugname = `locaudit_multiloc_${id - ids[3]}`;
+      config.active = 1;
+      LocType.configs[id] = config;
+      synthetic.set(id, config);
+    }
+    const controller = [...client.values()].find(c => c.multivarp !== -1)?.multivarp;
+    assert(controller !== undefined, 'a current integer multiloc controller is required');
+    const root = LocType.get(ids[3]);
+    root.multivarp = controller;
+    root.multiloc = [ids[4], ids[5], -1];
+    LocType.get(ids[4]).op = ['Child unanswered', 'Child fallback', null, null, null];
+    LocType.get(ids[5]).op = ['Child handled', null, null, null, null];
+    LocType.get(ids[5]).active = 0;
+    provider.scriptLookup.set(trigger('OP', 2) | (2 << 8) | (root.id << 10), handled);
+    provider.scriptLookup.set(trigger('OP', 1) | (2 << 8) | (ids[5] << 10), handled);
+    const multi = scan([{ ...fixture[0], type: root.id }], synthetic);
+    assert.deepEqual(multi.options.map(o => [o.form.type, o.slot, o.text]), [[ids[4], 1, 'Child unanswered'], [ids[4], 2, 'Child fallback'], [ids[5], 1, 'Child handled']], 'synthetic multiloc reads child options, not root options, and omits the -1 state');
+    assert.deepEqual(multi.gaps.map(g => [g.type, g.slot]), [[ids[4], 1]], 'only the unanswered visible child option is missing');
+    assert.equal(multi.options[1].op.rule, 'base-fallback:exact');
+    assert.equal(multi.options[2].kind, 'handled', 'an inactive child of an active root remains clickable');
+    results.push('PASS synthetic multiloc uses child options, omits -1, preserves base fallback and permits an inactive child of an active root');
   } finally {
     provider.scriptLookup = originalLookup;
     for (const id of ids) delete LocType.configs[id];
@@ -381,13 +433,18 @@ export function runAudit(content: string, output: string): void {
   const names = labels(content);
   const byRoot = new Map<number, Placement[]>();
   for (const p of inventory.placements) { const rows = byRoot.get(p.type) ?? []; rows.push(p); byRoot.set(p.type, rows); }
+  const inactiveOptions = audit.options.filter(o => o.kind === INACTIVE_KIND);
+  const inactiveRows = optionRows(inactiveOptions, byRoot);
+  const priority = priorityRows(audit.gaps);
+  const priorityCells = (row: typeof priority[number]) => [row.name, row.text, row.slots, row.rows, row.placements.size, [...new Set([...row.placements.values()].map(p => p.map))].sort(compare).join(';'), tile(row.placements.values().next().value!), row.lead];
+  csv(path.join(output, 'loc-options-priority.csv'), ['config_or_group', 'option_text', 'slots', 'gap_rows', 'distinct_placements', 'map_squares', 'sample_tile', 'mechanism_lead'], priority.map(priorityCells));
   const gapRow = (g: Gap) => {
     const p = sample(g);
     return [g.type, typeName(g.type), LocType.get(g.type).name, g.slot, g.text, g.kind, g.placements.size, maps(g), tile(p), ...nearbyLabel(p, names), [...g.roots].map(typeName).sort(compare).join(';'), g.options.some(o => o.ap.category || o.op.category), g.options.some(o => o.ap.global || o.op.global), descriptions(g, 'ap'), descriptions(g, 'op'), lead(g)];
   };
   const gapHeader = ['loc_type', 'config_name', 'display_name', 'option_slot', 'option_text', 'kind', 'placement_count', 'map_squares', 'sample_tile', 'near_surface_label', 'label_distance_tiles', 'placed_roots', 'category_handler_exists', 'global_handler_exists', 'ap_handler', 'op_handler', 'mechanism_lead'];
   csv(path.join(output, 'loc-options-missing.csv'), gapHeader, audit.gaps.map(gapRow));
-  csv(path.join(output, 'loc-options-inactive.csv'), gapHeader, audit.gaps.filter(g => g.kind === 'inactive type').map(gapRow));
+  csv(path.join(output, 'loc-options-inactive.csv'), gapHeader, inactiveRows.map(gapRow));
   csv(path.join(output, 'loc-placements.csv'), ['placement_key', 'placed_type', 'config_name', 'map_square', 'x', 'z', 'client_plane', 'shape', 'angle', 'server_entity_active'], inventory.placements.map(p => [p.key, p.type, typeName(p.type), p.map, p.x, p.z, p.level, p.shape, p.angle, LocType.get(p.type).active]));
   csv(path.join(output, 'loc-options-all.csv'), ['placed_root', 'visible_type', 'config_name', 'states', 'slot', 'text', 'kind', 'root_placement_count', 'ap_handler', 'op_handler'], audit.options.map(o => [typeName(o.root), o.form.type, typeName(o.form.type), o.form.states.map(s => s === null ? 'base' : s).join(';'), o.slot, o.text, o.kind, byRoot.get(o.root)!.length, scriptDescription(o.ap), scriptDescription(o.op)]));
   const aggregate = (keyFor: (g: Gap, p: Placement) => string) => {
@@ -403,21 +460,23 @@ export function runAudit(content: string, output: string): void {
   };
   const optionTotals = aggregate(g => g.text);
   const mapTotals = aggregate((_g, p) => p.map);
-  const groupHeader = ['key', 'gap_rows', 'distinct_placements', 'placement_option_form_associations', 'no_handler_associations', 'return_only_associations', 'inactive_associations'];
-  const groupRows = (groups: ReturnType<typeof aggregate>) => groups.map(([key, g]) => [key, g.rows.size, g.placements.size, g.associations, g.kinds.get('no handler') ?? 0, g.kinds.get('handler that only returns') ?? 0, g.kinds.get('inactive type') ?? 0]);
+  const groupHeader = ['key', 'gap_rows', 'distinct_placements', 'placement_option_form_associations', 'no_handler_associations', 'return_only_associations'];
+  const groupRows = (groups: ReturnType<typeof aggregate>) => groups.map(([key, g]) => [key, g.rows.size, g.placements.size, g.associations, g.kinds.get('no handler') ?? 0, g.kinds.get('handler that only returns') ?? 0]);
   csv(path.join(output, 'loc-options-by-option.csv'), ['option_text', ...groupHeader.slice(1)], groupRows(optionTotals));
   csv(path.join(output, 'loc-options-by-mapsquare.csv'), ['map_square', ...groupHeader.slice(1)], groupRows(mapTotals));
   csv(path.join(output, 'loc-options-by-mechanism.csv'), ['mechanism_lead', ...groupHeader.slice(1)], groupRows(aggregate(g => lead(g))));
   const inactiveConfigs = [...client.values()].filter(c => !LocType.get(c.id).active && c.op?.some(isShown));
   csv(path.join(output, 'inactive-loc-types.csv'), ['loc_type', 'config_name', 'options', 'direct_placements'], inactiveConfigs.map(c => [c.id, typeName(c.id), c.op?.map((o, i) => o === null ? '' : `${i + 1}:${o}`).filter(Boolean).join(';'), byRoot.get(c.id)?.length ?? 0]));
   const gapPlacements = new Set(audit.gaps.flatMap(g => [...g.placements.keys()]));
-  const kinds = Object.fromEntries(['no handler', 'handler that only returns', 'inactive type'].map(kind => {
+  const kinds = Object.fromEntries(['no handler', 'handler that only returns'].map(kind => {
     const rows = audit.gaps.filter(g => g.kind === kind);
     return [kind, { rows: rows.length, forms: new Set(rows.map(g => g.type)).size, placements: new Set(rows.flatMap(g => [...g.placements.keys()])).size, associations: rows.reduce((n, g) => n + g.placements.size, 0) }];
   }));
   const hiddenOptions = audit.options.filter(o => o.kind === HIDDEN_KIND);
-  const hidden = { kind: HIDDEN_KIND, rootFormSlots: hiddenOptions.length, formSlots: new Set(hiddenOptions.map(o => `${o.form.type}:${o.slot}`)).size, withHandler: hiddenOptions.filter(o => o.ap.script || o.op.script).length, associations: hiddenOptions.reduce((n, o) => n + byRoot.get(o.root)!.length, 0) };
-  const summary = { maps: inventory.maps, placements: inventory.placements.length, placedTypes: byRoot.size, clientLocTypes: client.size, enumeratedRootFormOptions: audit.options.length, visibleOptionForms: new Set(audit.options.filter(o => o.kind !== HIDDEN_KIND).map(o => o.form.type)).size, gapRows: audit.gaps.length, gapForms: new Set(audit.gaps.map(g => g.type)).size, gapPlacements: gapPlacements.size, gapAssociations: audit.gaps.reduce((n, g) => n + g.placements.size, 0), kinds, hidden, inactiveConfigs: inactiveConfigs.length, inactivePlacedConfigs: inactiveConfigs.filter(c => byRoot.has(c.id)).length, limits: audit.limits };
+  const contextTotals = (options: Option[]) => ({ rootFormSlots: options.length, formSlots: new Set(options.map(o => `${o.form.type}:${o.slot}`)).size, roots: new Set(options.map(o => o.root)).size, placements: new Set(options.flatMap(o => byRoot.get(o.root)!.map(p => p.key))).size, withHandler: options.filter(o => o.ap.script || o.op.script).length, associations: options.reduce((n, o) => n + byRoot.get(o.root)!.length, 0) });
+  const hidden = { kind: HIDDEN_KIND, ...contextTotals(hiddenOptions), byText: [...new Set(hiddenOptions.map(o => o.text))].sort(compare).map(text => ({ text, ...contextTotals(hiddenOptions.filter(o => o.text === text)) })) };
+  const inactive = { kind: INACTIVE_KIND, rows: inactiveRows.length, forms: new Set(inactiveRows.map(g => g.type)).size, ...contextTotals(inactiveOptions) };
+  const summary = { maps: inventory.maps, placements: inventory.placements.length, placedTypes: byRoot.size, clientLocTypes: client.size, enumeratedRootFormOptions: audit.options.length, visibleOptionForms: new Set(audit.options.filter(o => !notShown(o.kind)).map(o => o.form.type)).size, gapRows: audit.gaps.length, gapForms: new Set(audit.gaps.map(g => g.type)).size, gapPlacements: gapPlacements.size, gapAssociations: audit.gaps.reduce((n, g) => n + g.placements.size, 0), kinds, hidden, inactive, inactiveConfigs: inactiveConfigs.length, inactivePlacedConfigs: inactiveConfigs.filter(c => byRoot.has(c.id)).length, limits: audit.limits };
   fs.writeFileSync(path.join(output, 'loc-summary.json'), JSON.stringify(summary, null, 2) + '\n');
   fs.writeFileSync(path.join(output, 'self-checks.log'), checks.join('\n') + '\n');
   const md = (s: unknown) => String(s).replaceAll('|', '\\|').replaceAll('\n', ' ');
@@ -436,9 +495,12 @@ export function runAudit(content: string, output: string): void {
     'Exact, category and global lookup are retained, including production base fallback only when both child phases are absent.',
     'A category/global default message is a handler. No speech analysis is attempted. Handler names and immediate constant call targets are reported.',
     'Only a nonempty bytecode body containing exclusively RETURN instructions is called return-only. Conditional silence and indirect no-ops remain handled.',
-    'Inactive means the placed ROOT has active=0 after LocType.postDecode. GameMap.loadLocations creates no server loc for it.',
-    'Inactive options are gaps even when hypothetical dispatch has a handler. A child form active=0 does not remove an active root entity.',
-    'The inactive CSV gives every option-bearing inactive placed form. inactive-loc-types.csv also lists unplaced inactive client types.',
+    'An inactive placed ROOT is not pickable: Java dash3d/World.java:120-123 and 796-799 set the sign bit from its activity flag. Model.java:1571 gates picking on a positive bitset; 1643 passes that flag to the picker.',
+    'The client activity flag is decoded at config/LocType.java:444-447, inferred only when absent at 386-395. Engine tools/pack/config/LocConfig.ts:236-239 writes it into client opcode 19.',
+    'These options are not shown by the client (inactive root), not gaps. GameMap.loadLocations:347-348 also creates no server entity. Their own totals and loc-options-inactive.csv retain hypothetical dispatch.',
+    'An inactive CHILD does not disable an active root: ClientLocAnim.java:118-124 selects the child model without its active flag; Client.java:4133-4140 selects its menu type without an active check. A rendered child remains pickable through the root bitset.',
+    'An active, rendered loc with no options remains pickable and offers Examine (Client.java:4174-4179), plus applicable selected-item/spell targeting. No absent op1-op5 string is a gap.',
+    'inactive-loc-types.csv also lists unplaced inactive types with option strings. The E-INSTCOL inactive-option follow-up leads are withdrawn for ordinary client clicking.',
     'Multiloc -1 entries and out-of-range controller values show no client loc and are not counted as visible base forms.',
     'This enumerates config states, not quest reachability. Dynamic loc_add/loc_change forms, instance copies and nested client morphs are not exhaustively enumerated.',
     'Placements retain raw map/client planes, before the loader bridge adjustment. Membership is not a pathfinding or reachability test.',
@@ -452,15 +514,43 @@ export function runAudit(content: string, output: string): void {
     const label = nearbyLabel(sample(g), names);
     lines.push(`| ${[typeName(g.type), g.slot, g.text, g.kind, g.placements.size, maps(g), tile(sample(g)), label[0] ? `${label[0]} (${label[1]} tiles)` : 'none within 100 tiles'].map(md).join(' | ')} |`);
   }
+  const appendPriority = (title: string, rows: typeof priority, limit: number) => {
+    lines.push('', title, '', '| Config or group | Option | Slots | Gap rows | Distinct placements | Map squares | Sample tile | Lead only |', '|---|---|---|---:|---:|---|---|---|');
+    for (const row of rows.slice(0, limit)) lines.push(`| ${priorityCells(row).map(md).join(' | ')} |`);
+  };
+  lines.push('', 'The next work list unions physical placement keys across all Farming patch forms for each option. Other forms remain separate. It does not rank quest accessibility.');
+  appendPriority('## Fifty largest gaps by distinct placements, Farming collapsed', priority, 50);
+  lines.push('', '## Hidden sentinel letter case', '', 'Both spellings below are removed by Java equalsIgnoreCase. The engine packet handler rejects only lowercase hidden; uppercase variants are not 377 menu entries even if another client sends them.', '', '| Raw text | Root/form/slot contexts | Distinct form/slots | Placed roots | Placement associations | Contexts with a handler |', '|---|---:|---:|---:|---:|---:|');
+  for (const row of hidden.byText) lines.push(`| ${row.text} | ${row.rootFormSlots} | ${row.formSlots} | ${row.roots} | ${row.associations} | ${row.withHandler} |`);
   lines.push('', '## Option texts ranked', '', '| Option text | Gap rows | Distinct placements | Form-option associations |', '|---|---:|---:|---:|');
   for (const [text, g] of optionTotals) lines.push(`| ${md(text)} | ${g.rows.size} | ${g.placements.size} | ${g.associations} |`);
-  lines.push('', '## Inactive types with client options', '', '| Config | Client options | Direct map placements |', '|---|---|---:|');
+  lines.push('', '## Inactive roots: options never shown by the client', '', '| Config | Config option strings, not menu entries | Direct map placements |', '|---|---|---:|');
   for (const c of inactiveConfigs) lines.push(`| ${typeName(c.id)} | ${md(c.op?.map((o, i) => o === null ? '' : `${i + 1}: ${o}`).filter(Boolean).join('; '))} | ${byRoot.get(c.id)?.length ?? 0} |`);
-  lines.push('', 'All their placed option rows and placements are in loc-options-inactive.csv and loc-placements.csv.', '', '## Mechanism leads', '', '| Lead only | Gap rows | Distinct placements | Form-option associations |', '|---|---:|---:|---:|');
+  lines.push('', 'These are not missing options. Their non-menu rows and placements are in loc-options-inactive.csv and loc-placements.csv.', '', '## Mechanism leads', '', '| Lead only | Gap rows | Distinct placements | Form-option associations |', '|---|---:|---:|---:|');
   for (const [name, g] of aggregate(g => lead(g))) lines.push(`| ${name} | ${g.rows.size} | ${g.placements.size} | ${g.associations} |`);
-  for (const group of ['doors and gates', 'ladders and stairs', 'containers and searchable scenery', 'resources', 'transport', 'quest scenery']) {
-    const examples = audit.gaps.filter(g => lead(g) === group).sort((a, b) => b.placements.size - a.placements.size || a.type - b.type).slice(0, 8);
-    lines.push('', `${group}: ${examples.length ? examples.map(g => `${typeName(g.type)} (${g.text})`).join(', ') : 'no rows matched the heuristic'}.`);
+  lines.push('', 'Lead rules use only config names and option strings. Farming patch roots count as resources. Hatch/trapdoor names count as access leads. Transport requires a vehicle name or a whole transport option, not board inside notice_board or floorboard. Ore is token-bounded, and shiphull_leak is not a transport name.');
+  for (const group of ['doors and gates', 'ladders and stairs', 'containers and searchable scenery', 'resources', 'transport', 'quest scenery', 'unclassified']) {
+    appendPriority(`### ${group}: twenty largest leads`, priority.filter(row => row.lead === group), 20);
+  }
+  lines.push('', "## Reviewer's ten most plainly blocking leads", '', "This is the independent reviewer's list (review.md:154-165), not a new reachability or gameplay verdict. Each table joins that named lead to the current census. A completed lead can have no remaining rows.");
+  const reviewerLeads: [string, string[]][] = [
+    ['bank_booth Use', ['bank_booth']],
+    ['ahoy_bankbooth Use / Use-quickly', ['ahoy_bankbooth']],
+    ['elid_bankbooth Use / Use-quickly', ['elid_bankbooth']],
+    ['dwarf_keldagrim_bankbooth Use / Use-quickly', ['dwarf_keldagrim_bankbooth']],
+    ['fever_bankbooth Use / Use-quickly', ['fever_bankbooth']],
+    ['pest_bankbooth Use / Use-quickly', ['pest_bankbooth']],
+    ['ham_multi_trapdoor forms and osf_ham_ladder exit', ['osf_trapdoor_closed', 'osf_trapdoor_open', 'osf_ham_ladder']],
+    ['ladder_11739 / ladder_11741', ['ladder_11739', 'ladder_11741']],
+    ['wild_door and wild ladders', ['wild_door', 'wild_ladder', 'wild_ladder_middle', 'wild_laddertop']],
+    ['castle_door_11717 / castle_door_11719', ['castle_door_11717', 'castle_door_11719']],
+  ];
+  for (let i = 0; i < reviewerLeads.length; i++) {
+    const [title, configs] = reviewerLeads[i];
+    const rows = audit.gaps.filter(g => configs.includes(typeName(g.type)));
+    lines.push('', `### ${i + 1}. ${title}`, '', '| Census form | Slot | Option | Kind | Distinct placements | Map squares | Sample tile | Placed roots |', '|---|---:|---|---|---:|---|---|---|');
+    for (const g of rows) lines.push(`| ${[typeName(g.type), g.slot, g.text, g.kind, g.placements.size, maps(g), tile(sample(g)), [...g.roots].map(typeName).sort(compare).join(';')].map(md).join(' | ')} |`);
+    if (!rows.length) lines.push('No current missing rows match this reviewer lead.');
   }
   lines.push('', '## Enumeration exceptions', '', ...(audit.limits.length ? audit.limits : ['None in the current built pack.']), '', '## Self-checks', '', ...checks.map(c => `- ${c}`), '', 'No headed run is requested or performed. Execution receipts and exact heads are recorded by the operator of this tool.', '');
   fs.writeFileSync(path.join(output, 'report.md'), lines.join('\n'));
