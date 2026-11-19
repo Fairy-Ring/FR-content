@@ -72167,32 +72167,6 @@ offsety=-512
 [scenery_10943]
 model=loc_10943
 
-[rocks_10946]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=18820
-recol2s=6342
-recol2d=16706
-op1=Mine
-op2=Prospect
-op3=hidden
-hillskew=yes
-
-[rocks_10947]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=19912
-recol2s=6342
-recol2d=18821
-op1=Mine
-op2=Prospect
-op3=hidden
-hillskew=yes
-
 [enakh_temple_sand_pile]
 name=Sand pile
 desc=Looks sturdy enough to climb!
