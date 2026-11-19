@@ -95,3 +95,8 @@ if (inv_total(inv, bucket_empty) = 0) {
     return;
 }
 @fill_container_water(bucket_empty);
+
+// CANDIDATE: finished Lost City 274 assigns all three top exits to one action.
+// These two original forms join the published middle exit; no entrance gate changes.
+[oploc1,troll_stronghold_top_exit_left] @troll_stronghold_top_exit;
+[oploc1,troll_stronghold_top_exit_right] @troll_stronghold_top_exit;

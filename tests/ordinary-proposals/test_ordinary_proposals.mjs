@@ -173,5 +173,30 @@ for (const [x, z] of publicTiles) {
         assert.equal(control.loc.type, r.id('LocType', 'spookywardrobe'));
     }
 }
-console.log(`ORDINARY_PROPOSALS_PASS built=8 original-placements=${placementCount} native-dispatch=true published-action-parity=true`);
+const exitStages = [0, 10, 20, 30, 40, 50]; // Checked-out quest_troll.constant.
+for (const name of ['troll_stronghold_top_exit_left', 'troll_stronghold_top_exit_right']) {
+    const type = r.types.LocType.get(r.id('LocType', name));
+    const rows = r.placements.filter(row => row.type === type.id);
+    assert.equal(rows.length, 1, `${name} original interior copy`);
+    const row = rows[0];
+    assert.equal(row.level, 2, 'the added exit exists only inside, not on the surface');
+    assert.equal(r.map.isMapBlocked(row.x - 1, row.z, row.level), false);
+    assert(r.map.reachedLoc(row.level, row.x - 1, row.z, row.x, row.z, type.width, type.length, 1, row.angle, row.shape, type.forceapproach), 'original interior approach reaches exit');
+    placementCount++;
+    for (const stage of exitStages) {
+        const expected = r.fixture('troll_stronghold_top_exit_mid');
+        const actual = r.fixture(name, row);
+        expected.p.setVar(r.id('VarPlayerType', 'troll_quest'), stage);
+        actual.p.setVar(r.id('VarPlayerType', 'troll_quest'), stage);
+        const before = [...actual.p.vars];
+        assert.deepEqual(run(actual, 1), run(expected, 1), `${name} repeats the published middle action at quest stage ${stage}`);
+        assert.deepEqual([actual.p.level, actual.p.x, actual.p.z], [0, 2840, 3690], 'finished-274 shared landing');
+        assert.deepEqual([actual.p.level, actual.p.x, actual.p.z], [expected.p.level, expected.p.x, expected.p.z]);
+        assert.deepEqual([...actual.p.vars], before, 'exit changes no quest state');
+    }
+}
+assert.equal(r.map.isMapBlocked(2840, 3690, 0), false, 'published surface landing is standable');
+assert(r.map.isLineOfWalk(0, 2840, 3690, 2841, 3690), 'published landing has an ordinary walking exit');
+
+console.log(`ORDINARY_PROPOSALS_PASS built=10 original-placements=${placementCount} native-dispatch=true published-action-parity=true`);
 process.exit(0);
