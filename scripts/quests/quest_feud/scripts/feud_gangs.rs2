@@ -1,11 +1,19 @@
 // Gang inquiries and separate camel hand-ins: VERIFIED period quest guides.
-// Wording is CANDIDATE from RuneScape transcript revision 18411641, before 2022.
+// Wording: CANDIDATE pre-2022 RuneScape transcript 18411641; restored state
+// branches and quest-stage notes: CANDIDATE Old School transcript 15325427.
+// Pre-quest greeting: CANDIDATE RuneScape NPC transcript histories retained in
+// gang-npc-transcripts-history-r1.json (latest revisions dated April 2024).
+// Inquiry/receipt bits retain the published server encoding: Menaphites 1,
+// Bandits 2. Only the combined value 3 follows the Old School notes literally.
 
 [opnpc1,feud_arabian_guard1_1]
-if (%feud_var < 1) { return; }
+if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
-if (%feud_var_menaboss >= 1) {
+if (%feud_var >= ^feud_menaphites_defeated) {
     @feud_bandit_celebrate;
+}
+if (%feud_var >= ^feud_recruited) {
+    @feud_bandit_recruited;
 }
 if (%feud_var_comp_gangs = 3) {
     @feud_bandit_after;
@@ -19,10 +27,13 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 @feud_bandit_talk;
 
 [opnpc1,feud_arabian_guard1_2]
-if (%feud_var < 1) { return; }
+if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
-if (%feud_var_menaboss >= 1) {
+if (%feud_var >= ^feud_menaphites_defeated) {
     @feud_bandit_celebrate;
+}
+if (%feud_var >= ^feud_recruited) {
+    @feud_bandit_recruited;
 }
 if (%feud_var_comp_gangs = 3) {
     @feud_bandit_after;
@@ -36,10 +47,13 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 @feud_bandit_talk;
 
 [opnpc1,feud_arabian_guard2_1]
-if (%feud_var < 1) { return; }
+if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
-if (%feud_var_menaboss >= 1) {
+if (%feud_var >= ^feud_menaphites_defeated) {
     @feud_bandit_celebrate;
+}
+if (%feud_var >= ^feud_recruited) {
+    @feud_bandit_recruited;
 }
 if (%feud_var_comp_gangs = 3) {
     @feud_bandit_after;
@@ -53,10 +67,13 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 @feud_bandit_talk;
 
 [opnpc1,feud_arabian_guard2_2]
-if (%feud_var < 1) { return; }
+if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
-if (%feud_var_menaboss >= 1) {
+if (%feud_var >= ^feud_menaphites_defeated) {
     @feud_bandit_celebrate;
+}
+if (%feud_var >= ^feud_recruited) {
+    @feud_bandit_recruited;
 }
 if (%feud_var_comp_gangs = 3) {
     @feud_bandit_after;
@@ -68,6 +85,13 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
     @feud_bandit_give;
 }
 @feud_bandit_talk;
+
+[label,feud_gang_before]
+~chatplayer("<p,neutral>Hello.");
+~chatnpc("<p,neutral>What do you want?");
+~chatplayer("<p,neutral>Well nothing really, I'm new to town and wanted to get to know the locals.");
+~chatnpc("<p,neutral>I'm too busy for chitchat. Come back if you have some business to discuss with us.");
+return;
 
 [label,feud_bandit_give]
 ~chatplayer("<p,neutral>Good news, the Menaphites have agreed to give you a camel in order to restore peace.");
@@ -82,7 +106,10 @@ if (%feud_var_comp_gangs = 3 & %feud_var < ^feud_camels_delivered) {
     %feud_var = ^feud_camels_delivered;
 }
 ~chatnpc("<p,neutral>Really? I knew they were cowards. Tell them that we have changed our minds and demand 10 camels in return for our mercy.");
-~chatplayer("<p,neutral>Ahhh why do I bother! This approach doesn't seem to be working, perhaps I should be more direct and try join one of the gangs.");
+~chatplayer("<p,neutral>Ahhh why do I bother!");
+if (%feud_var_comp_gangs = 3) {
+    ~chatplayer("<p,neutral>This approach doesn't seem to be working, perhaps I should be more direct and try join one of the gangs.");
+}
 return;
 
 [label,feud_bandit_after]
@@ -102,6 +129,11 @@ return;
 ~chatplayer("<p,neutral>I don't know.");
 return;
 
+[label,feud_bandit_recruited]
+~chatplayer("<p,neutral>Good day.");
+~chatnpc("<p,neutral>Get out of here, you Menaphite dog!");
+return;
+
 [label,feud_bandit_talk]
 ~chatplayer("<p,neutral>Hello.");
 ~chatnpc("<p,neutral>What do you want?");
@@ -113,19 +145,26 @@ return;
 ~chatnpc("<p,neutral>Those Menaphites would never do that. They have no sense of honour.");
 ~chatplayer("<p,neutral>But if they did?");
 ~chatnpc("<p,neutral>Well I suppose so.");
-~chatplayer("<p,neutral>Maybe if I got both gangs a camel, I could use the mutual goodwill to find out what happened to Ali's nephew.");
+// The musing follows both distinct inquiries, not the first conversation.
 if (%feud_var_talk_gangs = 0) {
     %feud_var_talk_gangs = 2;
 } else if (%feud_var_talk_gangs = 1) {
     %feud_var_talk_gangs = 3;
 }
+if (%feud_var_talk_gangs = 3) {
+    if (%feud_var < ^feud_camel_offer) %feud_var = ^feud_camel_offer;
+    ~chatplayer("<p,neutral>Maybe if I got both gangs a camel, I could use the mutual goodwill to find out what happened to Ali's nephew.");
+}
 return;
 
 [opnpc1,feud_arabian_guard_coward]
-if (%feud_var < 1) { return; }
+if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
-if (%feud_var_menaboss >= 1) {
+if (%feud_var >= ^feud_menaphites_defeated) {
     @feud_coward_celebrate;
+}
+if (%feud_var >= ^feud_recruited) {
+    @feud_coward_recruited;
 }
 if (%feud_var_comp_gangs = 2) {
     @feud_coward_talk;
@@ -140,6 +179,7 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 
 [label,feud_coward_give]
 ~chatplayer("<p,neutral>Good news, the Menaphites have agreed to give you a camel in order to restore peace.");
+mes("You hand the guard a sales receipt for the camel.");
 inv_del(inv, feud_camel_receipt, 1);
 if (%feud_var_comp_gangs = 0) {
     %feud_var_comp_gangs = 2;
@@ -151,6 +191,9 @@ if (%feud_var_comp_gangs = 3 & %feud_var < ^feud_camels_delivered) {
 }
 ~chatnpc("<p,neutral>Really? I knew they were cowards. Tell them that we have changed our minds and demand 10 camels in return for our mercy.");
 ~chatplayer("<p,neutral>Ahhh why do I bother!");
+if (%feud_var_comp_gangs = 3) {
+    ~chatplayer("<p,neutral>This approach doesn't seem to be working, perhaps I should be more direct and try join one of the gangs.");
+}
 return;
 
 [label,feud_coward_celebrate]
@@ -158,32 +201,47 @@ return;
 ~chatnpc("<p,neutral>Welcome. Our leader would be pleased to congratulate you on your disposal of the Menaphites who plagued this town.");
 return;
 
+[label,feud_coward_recruited]
+~chatplayer("<p,neutral>Good day.");
+~chatnpc("<p,neutral>Get out of here, you Menaphite dog!");
+~chatplayer("<p,neutral>What was that? Are you looking for a fight.");
+~chatnpc("<p,neutral>Me? No, no, I was just, er, complimenting your, that is - don't kill me, please!");
+~chatplayer("<p,neutral>I wouldn't waste my time.");
+return;
+
 [label,feud_coward_talk]
 ~chatplayer("<p,neutral>Hello.");
 ~chatnpc("<p,neutral>What do you want?");
 ~chatplayer("<p,neutral>I am trying to figure out the feud that exists between you and the Menaphites.");
 ~chatnpc("<p,neutral>What's it to you?");
-~chatplayer("<p,neutral>Nothing much, I'm trying to understand why thieves of your repute would stoop to the level of the Menaphites.");
-~chatnpc("<p,neutral>Well if memory serves me correctly. I think my granddad mentioned that they robbed one of our camels. A heinous crime.");
+~chatplayer("<p,neutral>Nothing much I'm just trying to understand why thieves of your repute would stoop to the level of the Menaphites.");
+~chatnpc("<p,neutral>Well if memory serves me correctly, I think my granddad mentioned that they robbed one of our camels. A heinous crime.");
 ~chatplayer("<p,neutral>So if they offered a camel as a gesture of goodwill would you and the rest of the bandits cease your hostilities?");
 ~chatnpc("<p,neutral>Those Menaphites would never do that. They have no sense of honour.");
 ~chatplayer("<p,neutral>But if they did?");
-~chatnpc("<p,neutral>I suppose so.");
+~chatnpc("<p,neutral>Well I suppose so.");
 if (%feud_var_talk_gangs = 0) {
     %feud_var_talk_gangs = 2;
 } else if (%feud_var_talk_gangs = 1) {
     %feud_var_talk_gangs = 3;
 }
+if (%feud_var_talk_gangs = 3) {
+    if (%feud_var < ^feud_camel_offer) %feud_var = ^feud_camel_offer;
+    ~chatplayer("<p,neutral>Maybe if I got both gangs a camel, I could use the mutual goodwill to find out what happened to Ali's nephew.");
+}
 return;
 
 [opnpc1,feud_egyptian_doorman_1]
-if (%feud_var < 1) { return; }
+if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
-if (%feud_var_menaboss >= 1) {
+if (%feud_var >= ^feud_menaphites_defeated) {
     @feud_thug_avenge;
 }
 if (%feud_given_jewels >= 1) {
     @feud_thug_traitor;
+}
+if (%feud_var >= ^feud_recruited) {
+    @feud_thug_recruited;
 }
 if (%feud_var_comp_gangs = 3) {
     @feud_thug_after;
@@ -197,13 +255,16 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 @feud_thug_talk;
 
 [opnpc1,feud_egyptian_doorman_2]
-if (%feud_var < 1) { return; }
+if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
-if (%feud_var_menaboss >= 1) {
+if (%feud_var >= ^feud_menaphites_defeated) {
     @feud_thug_avenge;
 }
 if (%feud_given_jewels >= 1) {
     @feud_thug_traitor;
+}
+if (%feud_var >= ^feud_recruited) {
+    @feud_thug_recruited;
 }
 if (%feud_var_comp_gangs = 3) {
     @feud_thug_after;
@@ -230,6 +291,9 @@ if (%feud_var_comp_gangs = 3 & %feud_var < ^feud_camels_delivered) {
 }
 ~chatnpc("<p,neutral>Really? I knew they were cowards. Tell them that we have changed our minds and demand 10 camels in return for our mercy.");
 ~chatplayer("<p,neutral>Ahhh why do I bother!");
+if (%feud_var_comp_gangs = 3) {
+    ~chatplayer("<p,neutral>This approach doesn't seem to be working, perhaps I should be more direct and try join one of the gangs.");
+}
 return;
 
 [label,feud_thug_after]
@@ -237,6 +301,13 @@ return;
 ~chatplayer("<p,quiz>Really? Which one?");
 ~chatnpc("<p,neutral>Ali, our Chief of Operations. He should be somewhere nearby the tent.");
 ~chatplayer("<p,neutral>Thanks.");
+return;
+
+[label,feud_thug_recruited]
+~chatplayer("<p,neutral>Hi.");
+~chatnpc("<p,neutral>Tumeken be praised, you have seen the error of your ways. May Elidinis the river goddess bless your lands.");
+~chatplayer("<p,neutral>I was wondering if I could ask you about something.");
+~chatnpc("<p,neutral>You're better off asking Ali the Operator. He's the brains behind the whole operation.");
 return;
 
 [label,feud_thug_talk]
@@ -261,6 +332,10 @@ if (%feud_var_talk_gangs = 0) {
 } else if (%feud_var_talk_gangs = 2) {
     %feud_var_talk_gangs = 3;
 }
+if (%feud_var_talk_gangs = 3) {
+    if (%feud_var < ^feud_camel_offer) %feud_var = ^feud_camel_offer;
+    ~chatplayer("<p,neutral>Maybe if I got both gangs a camel, I could use the mutual goodwill to find out what happened to Ali's nephew.");
+}
 return;
 
 [label,feud_thug_traitor]
@@ -278,6 +353,7 @@ return;
 ~chatnpc("<p,neutral>Positive, he was turned by the offer of a set of waterproofs and a ride on a camel.");
 ~chatplayer("<p,neutral>I see he drives a hard bargain.");
 ~chatnpc("<p,neutral>Well what can I say? We don't call him 'Ali of the Good Decisions', do we?");
+%feud_found_trait = 1;
 return;
 
 [label,feud_thug_avenge]

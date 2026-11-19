@@ -1,41 +1,79 @@
-// Opening actions: VERIFIED period quest guides; wording: CANDIDATE transcript.
-// Stage integers are UNKNOWN engineering checkpoints, not original server values.
+// Actions and rewards: VERIFIED period quest guides.
+// Opening and final-report wording: CANDIDATE pre-2022 transcript 18411641.
+// Missing refusal/repeat branches and saved reward flag: CANDIDATE transcript 15325427.
+// The disputed forced junk sale is deferred; no coins or item move on refusal.
 
 [opnpc1,feud_ali_m]
-if (%feud_var_banditboss >= 1) {
+if (%feud_var = ^feud_mayor_reveal) {
     @feud_ali_m_report;
 }
-~chatnpc("<p,neutral>Good day and welcome back to Al Kharid.");
+if (%feud_var >= ^feud_complete) {
+    ~openshop_activenpc;
+    return;
+}
 if (%feud_var > ^feud_not_started) {
-    return;
+    ~chatnpc("<p,neutral>I sent you to learn the whereabouts of my nephew, Ali. Is there any word of him in Pollnivneach?");
+    ~chatplayer("<p,neutral>Not yet, I'm afraid.");
+    ~chatnpc("<p,neutral>That's not really the news I was hoping for.");
+    ~chatnpc("<p,neutral>But since you've been gone trade has gotten even busier. Will you have a look at my wares?");
+    @feud_ali_m_wares;
 }
+~chatnpc("<p,neutral>Good day and welcome back to Al Kharid.");
+~chatplayer("<p,neutral>Hello to you too.");
 ~chatnpc("<p,neutral>My name is Ali Morrisane - the greatest salesman in the world.");
-~chatnpc("<p,neutral>A nephew of mine lives not too far from here in a little town called Pollnivneach.");
-def_int $go = ~p_choice2("I'll find your nephew.", 1, "I'm too busy to help.", 2);
-if ($go = 2) {
-    ~chatplayer("<p,neutral>I'm too busy to help.");
-    ~chatnpc("<p,neutral>No problem my friend, perhaps another time.");
+def_int $interest = ~p_choice2("If you are, then why are you still selling goods from a stall?", 1, "So, what are you selling?", 2);
+if ($interest = 2) {
+    ~openshop_activenpc;
     return;
 }
-~chatplayer("<p,happy>I'll find your nephew.");
-~chatnpc("<p,neutral>Tell him his uncle Ali M needs his help up in Al Kharid.");
+~chatplayer("<p,quiz>If you are, then why are you still selling goods from a stall?");
+~chatnpc("<p,neutral>Well one can only do and sell so much. If I had more staff I'd be able to sell more, rather than waste my time on menial things I could get on with selling sand to the Bedabin and useless tourist trinkets to everyone.");
+def_int $help = ~p_choice2("I'm far too busy - adventuring is a full time job you know.", 1, "I'd like to help you but......", 2);
+if ($help = 1) {
+    ~chatplayer("<p,neutral>I'm far too busy - adventuring is a full time job you know.");
+    @feud_ali_m_refuse;
+}
+~chatplayer("<p,neutral>I'd like to help you but......");
+~chatnpc("<p,neutral>Yes I know, I know - the life of a shop keeper isn't slaying dragons and wooing damsels but it has its charms.");
+~chatnpc("<p,neutral>Although you can help me in another way, a nephew of mine lives not too far from here in a little town called Pollnivneach. If you could fetch him here I'll give you the first month of his salary!");
+def_int $go = ~p_choice2("I'm far too busy to carry out errands for shopkeepers - maybe later.", 1, "I'll find you your help. But you had better become the biggest merchant in RuneScape once I succeed!", 2);
+if ($go = 1) {
+    ~chatplayer("<p,neutral>I'm far too busy to carry out errands for shopkeepers - maybe later.");
+    @feud_ali_m_refuse;
+}
+~chatplayer("<p,happy>I'll find you your help. But you had better become the biggest merchant in RuneScape once I succeed!");
 %feud_var = ^feud_started;
+~chatnpc("<p,neutral>Ah, many thanks, my friend. My nephew's name is 'Ali' and he lives to the south in a town called 'Pollnivneach'. Tell him uncle Ali M needs his help up in Al Kharid. Now have a look at my wares.");
+@feud_ali_m_wares;
+
+[label,feud_ali_m_refuse]
+~chatnpc("<p,neutral>No problem my friend, perhaps another time.");
+~chatnpc("<p,neutral>Anyway, have a look at my wares.");
+@feud_ali_m_wares;
+
+[label,feud_ali_m_wares]
+if (~p_choice2("No, I'm really too busy.", 1, "Okay.", 2) = 2) {
+    ~openshop_activenpc;
+}
+return;
 
 [label,feud_ali_m_report]
-~chatnpc("<p,neutral>Hello again my friend. I have heard nothing from my troublesome nephew. Have you any news of his whereabouts?");
-~chatplayer("<p,neutral>Indeed I do. I was able to eventually learn of his fortunes, although it was a little bit more challenging than I originally thought.");
-~chatnpc("<p,neutral>Well then please, tell me what has become of him. Nothing bad I hope.");
+~chatnpc("<p,neutral>Hello again my friend. I see you have not found my troublesome nephew. Have you any news of his whereabouts?");
+~chatplayer("<p,neutral>Indeed I do. I was able to eventually learn of his whereabouts, although it was a little bit more challenging than I originally thought.");
+~chatnpc("<p,neutral>Well then tell me what has become of him. Nothing bad I hope.");
 ~chatplayer("<p,neutral>I was able to discover that he is quite the salesman. Perhaps too good. He has roughly forty people working under him.");
 ~chatplayer("<p,neutral>Unfortunately a number of people didn't approve of his sales techniques and as a result he is in hiding.");
 ~chatnpc("<p,happy>You make an old man very happy. I'm so proud of young Baba.");
-~chatplayer("<p,neutral>But he's considered a thief!");
-~chatnpc("<p,neutral>Yes, by people with too much money and not enough sense. All willingly parted with their money and received what they purchased.");
-~chatnpc("<p,neutral>Well, it seems I still am in need of an assistant...");
-~chatnpc("<p,neutral>..but take the reward anyway.");
-inv_add(inv, coins, 500);
-~objbox(coins, "Ali Morrisane gives you 500 coins.", 250, 0, 0);
-%feud_ali_money = 1;
-~chatplayer("<p,neutral>I've just been thinking Ali, there seems to be a few parallels between yourself and your nephew. Both of you are unscrupulous salesmen, both of you come from the same town and both of you no longer trade there.");
+~chatplayer("<p,neutral>But he's thought a thief.");
+~chatnpc("<p,neutral>Yes, but by people with too much money and not enough sense. All willingly parted with their money and received what they purchased.");
+~chatnpc("<p,neutral>Well I still am in need of an assistant...");
+~chatnpc("<p,neutral>but take the reward anyway.");
+if (%feud_ali_money = 0) {
+    %feud_ali_money = 1;
+    inv_add(inv, coins, ^feud_report_reward_coins);
+    ~objbox(coins, "Ali Morrisane gives you 500 coins.", 250, 0, 0);
+}
+~chatplayer("<p,neutral>I've just been thinking, Ali, there seem to be a few parallels between yourself and your nephew. Both of you are unscrupulous salesmen, both come from the same town and both of you no longer trade there.");
 ~chatplayer("<p,neutral>Were you sent into exile too?");
 ~chatnpc("<p,neutral>I have my reasons.");
 ~chatplayer("<p,neutral>No, now hang on, this seems to me like one of the strangest quests I have ever been involved with. I do not believe that a businessman like you would not know of a competitor, particularly a competitor as talented as");
@@ -43,11 +81,20 @@ inv_add(inv, coins, 500);
 ~chatplayer("<p,neutral>So what was your motive to get me to visit Pollnivneach? Was it concern for the towns people? Hmm. I don't think so, I'd say you would probably sell your grandmother if you could get a good price for");
 ~chatplayer("<p,neutral>her. What was the reason?");
 ~chatnpc("<p,neutral>My my, you surprise me, you're not as dumb as you look.");
-~chatplayer("<p,neutral>Surely you didn't do all this to sell me a fake beard and headpiece.");
+~chatplayer("<p,neutral>No, this couldn't have just been a sales pitch to get me to buy a fake beard and headpiece, was it?");
 ~chatnpc("<p,neutral>Ah, once again you underestimate me. I sold you far more than that.");
-~chatplayer("<p,neutral>Really? Well I did buy some other odds and ends off you.... no hang on! I get it now, you're in league with Ali the Camel seller, the Kebab seller and the mayor aren't you.");
+~chatplayer("<p,neutral>Really? Well I did buy some other odds and ends off you... no hang on! I get it now, you're in league with Ali the Camel seller, the Kebab seller, and the mayor aren't you.");
 ~chatnpc("<p,neutral>I like the word 'tourism'. Did you not enjoy your stay in Pollnivneach? Was there not action, intrigue and fun to be had, and did you not notice all the other tourists there too?");
-~chatplayer("<p,neutral>I must apologise for ever doubting you. You really are the greatest salesman in all of Gielinor.");
+~chatplayer("<p,neutral>I must apologise for ever doubting you and your claims to be the best salesman in all of RuneScape.");
 ~chatnpc("<p,quiz>Now that we both agree on that, may I show you my wares?");
-~p_choice2("No, I'm really too busy.", 1, "Okay.", 2);
-return;
+def_int $wares = ~p_choice2("No, I'm really too busy.", 1, "Okay.", 2);
+%feud_var = ^feud_complete;
+stat_advance(thieving, ^feud_thieving_reward_units);
+session_log(^log_adventure, "Quest complete: The Feud");
+if ($wares = 1) {
+    ~send_quest_complete(questlist:feud, blackjack_oak, 250, ^feud_questpoints, "You have completed 'The Feud'", "15,000 Thieving XP|Blackjack|Desert disguise.");
+} else {
+    ~update_questpoints;
+    ~openshop_activenpc;
+}
+~update_questlist;

@@ -1,0 +1,241 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import {
+  Packet, PlayerLoading, ScriptState, ServerTriggerType, World, contentRoot, count, dialoguePage,
+  engineModule, id, inv, invButton, map, obj, resumeDialogue, tick, tile, types, useLoc
+} from '../swamp-caves/runtime.mjs';
+
+const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const { default: OpLoc } = await engineModule('network/game/client/model/OpLoc.ts');
+const { default: OpLocHandler } = await engineModule('network/game/client/handler/OpLocHandler.ts');
+const locActionHandler = new OpLocHandler();
+let sourceLocRows;
+const bit = name => id('VarBitType', name);
+const read = (p, name) => p.getVarBit(bit(name));
+const stage = p => read(p, 'feud_var');
+const gangMask = p => read(p, 'feud_var_comp_gangs');
+const operationOffsets = {
+  feud_ali_m: [1, 0],
+  feud_drunken_ali: [1, 0],
+  feud_egyptian_doorman_multi: [0, -1],
+  feud_egyptian_minder: [1, 0]
+};
+const actors = name => {
+  const type = id('NpcType', name);
+  const found = [...World.npcs].filter(n => n.isActive && (n.baseType === type || n.type === type));
+  assert(found.length, `original packed NPC placement ${name}`);
+  return found;
+};
+
+function locs(name) {
+  if (!sourceLocRows) {
+    const names = new Map(readFileSync(path.join(contentRoot, 'pack/loc.pack'), 'utf8').trim().split('\n').map(line => {
+      const split = line.indexOf('=');
+      return [Number(line.slice(0, split)), line.slice(split + 1)];
+    }));
+    sourceLocRows = [];
+    let section = '';
+    for (const line of readFileSync(path.join(contentRoot, 'maps/m52_46.jm2'), 'utf8').split(/\r?\n/)) {
+      if (line.startsWith('====')) { section = line.slice(5).split(' ')[0]; continue; }
+      if (section !== 'LOC') continue;
+      const row = /^([0-3]) (\d+) (\d+): (.*)$/.exec(line);
+      if (!row) continue;
+      const [type, shape = 10, angle = 0] = row[4].split(' ').map(Number);
+      sourceLocRows.push({ name: names.get(type), type, shape, angle, level: Number(row[1]),
+        x: 52 * 64 + Number(row[2]), z: 46 * 64 + Number(row[3]) });
+    }
+  }
+  const found = sourceLocRows.filter(row => row.name === name);
+  assert(found.length, `original packed loc placement ${name}`);
+  return found;
+}
+
+function operateLoc(p, placement, { option = 1, item = null, position = null, choices = [] } = {}) {
+  const loc = World.getLoc(placement.x, placement.z, placement.level, placement.type);
+  assert(loc, `active original loc ${placement.name}`);
+  const config = types.LocType.get(placement.type);
+  const width = loc.angle % 2 ? config.length : config.width;
+  const length = loc.angle % 2 ? config.width : config.length;
+  const candidates = [];
+  p.clearInteraction();
+  for (let x = loc.x - 1; x <= loc.x + width; x++) for (let z = loc.z - 1; z <= loc.z + length; z++) {
+    [p.level, p.x, p.z] = [loc.level, x, z];
+    if (!map.isMapBlocked(x, z, loc.level) && p.inOperableDistance(loc)) candidates.push(tile(p));
+  }
+  const stand = position ?? candidates[0];
+  assert(stand && candidates.some(point => point.every((value, index) => value === stand[index])),
+    `collision-passable native operation stand for ${placement.name}`);
+  [p.level, p.x, p.z] = stand;
+  p.originX = p.x; p.originZ = p.z;
+  p.dialogueMark = p.packets.length;
+  if (item) assert(useLoc(p, item, loc), 'production item-on-loc packet is accepted');
+  else {
+    assert(locActionHandler.handle(new OpLoc(option, loc.x, loc.z, placement.type), p),
+      'production loc-option packet is accepted');
+    assert(p.inOperableDistance(loc), 'the selected loc is in native operation range');
+    p.processInteraction();
+  }
+  return { text: finish(p, choices), position: tile(p) };
+}
+
+function stand(p, n) {
+  const candidates = [];
+  for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
+    p.level = n.level; p.x = n.x + dx; p.z = n.z + dz;
+    if (map.isMapBlocked(p.x, p.z, p.level) || !p.inOperableDistance(n)) continue;
+    candidates.push(tile(p));
+  }
+  assert(candidates.length, `packed collision permits an ordinary stand beside NPC ${n.baseType}`);
+  const [dx, dz] = operationOffsets[types.NpcType.get(n.baseType).debugname] ?? [-1, 0];
+  const destination = candidates.find(point => point[1] === n.x + dx && point[2] === n.z + dz);
+  assert(destination, 'the headed cell uses this same map-checked operation stand');
+  // Verify an actual map route, not just a guessed adjacent coordinate.
+  let route = null;
+  for (const [dx, dz] of [[4, 0], [-4, 0], [0, 4], [0, -4]]) {
+    const x = destination[1] + dx, z = destination[2] + dz;
+    if (map.isMapBlocked(x, z, destination[0])) continue;
+    const found = [...map.findPath(destination[0], x, z, destination[1], destination[2])];
+    if (!found.length) continue;
+    const last = CoordGrid.unpackCoord(found.at(-1));
+    if (last.x === destination[1] && last.z === destination[2]) { route = found; break; }
+  }
+  assert(route, `pathfinder reaches the real operation stand ${destination}`);
+  [p.level, p.x, p.z] = destination;
+  p.originX = p.x; p.originZ = p.z;
+  return destination;
+}
+
+function finish(p, choices = []) {
+  const options = [...choices], pages = [];
+  for (let step = 0; step < 240 && p.activeScript; step++) {
+    const state = p.activeScript;
+    assert.notEqual(state.execution, ScriptState.ABORTED, 'compiled dialogue does not abort');
+    if (state.execution === ScriptState.FINISHED) break;
+    if (state.execution === ScriptState.PAUSEBUTTON) {
+      pages.push(...dialoguePage(p));
+      const root = types.Component.get(p.modalChat).comName;
+      if (/^multi[2-5]$/.test(root)) {
+        assert(options.length, `unanswered choice ${root}: ${pages.at(-1)}`);
+        const choice = options.shift();
+        const selected = typeof choice === 'number' ? choice : Array.from({ length: Number(root.at(-1)) }, (_, i) => i + 1)
+          .find(option => p.packets.slice(p.dialogueMark).some(packet => packet.constructor.name === 'IfSetText'
+            && packet.component === id('Component', `${root}:com_${option}`) && packet.text === choice));
+        assert(selected, `offered dialogue choice ${choice}`);
+        resumeDialogue(p, selected);
+      } else resumeDialogue(p);
+    } else if (state.execution === ScriptState.SUSPENDED) tick(p);
+    else assert.fail(`unexpected compiled dialogue state ${state.execution}`);
+  }
+  assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED, 'dialogue finishes within its bound');
+  assert.equal(options.length, 0, 'every selected option was offered');
+  return pages.join(' ');
+}
+
+function operate(p, n, option = 1, choices = [], item = null) {
+  p.clearInteraction(); stand(p, n);
+  if (item) { p.lastUseItem = obj(item); p.lastUseSlot = p.getInventory(inv).items.findIndex(entry => entry?.id === obj(item)); }
+  const operation = item ? ServerTriggerType.APNPCU : ServerTriggerType.APNPC1 + option - 1;
+  assert(p.setInteraction(1, n, operation), 'ordinary engine interaction is accepted');
+  assert(p.inOperableDistance(n), 'the player can operate from the path-checked stand');
+  const trigger = p.getOpTrigger();
+  assert(trigger, 'production visible-form dispatcher finds a compiled handler');
+  p.dialogueMark = p.packets.length;
+  p.processInteraction();
+  return { text: finish(p, choices), trigger: trigger.name };
+}
+const talk = (p, name, choices = []) => operate(p, actors(name)[0], 1, choices);
+function begin(p) {
+  assert.equal(stage(p), 0);
+  talk(p, 'feud_ali_m', [1, 2, 2, 1]);
+  assert.equal(stage(p), 1, 'accepting Morrisane starts the compatible published stage');
+}
+function buyBeers(p) {
+  p.invAdd(inv, obj('coins'), 100);
+  talk(p, 'feud_ali_the_barman', ["Yes, I'd like a drink please."]);
+  assert.equal(p.modalMain, id('Component', 'shop_template'), 'the drink option opens the real shop');
+  const config = types.InvType.get(id('InvType', 'feud_alispub'));
+  const expected = [
+    ['beer', 83, 10], ['whisky', 10, 100], ['jug_wine', 13, 150],
+    ['vodka', 5, 5], ['brandy', 4, 1500], ['grog', 12, 2500]
+  ];
+  assert.deepEqual(Array.from(config.stockobj), expected.map(([name]) => obj(name)), 'the pre-2021 six-drink stock is retained');
+  assert.deepEqual(Array.from(config.stockcount), expected.map(([, quantity]) => quantity));
+  assert.deepEqual(Array.from(config.stockrate), expected.map(([, , rate]) => rate));
+  const component = id('Component', 'shop_template:inv');
+  const listener = p.invListeners.find(entry => entry.com === component);
+  assert(listener, 'the shop inventory is transmitted to the player');
+  const stock = p.getInventoryFromListener(listener);
+  const option = types.Component.get(component).iop.findIndex(text => /buy[^\d]*1\b/i.test(text ?? '')) + 1;
+  assert(option > 0, 'the original shop component offers Buy 1');
+  for (let n = 1; n <= 3; n++) {
+    const money = count(p, 'coins'), available = stock.getItemCount(obj('beer'));
+    assert(invButton(p, 'shop_template:inv', 'beer', option, stock.getItemIndex(obj('beer'))),
+      'the production inventory packet buys beer');
+    assert.equal(count(p, 'beer'), n, 'beer is purchased, not seeded');
+    assert.equal(stock.getItemCount(obj('beer')), available - 1, 'a real shared-stock item is sold');
+    assert.equal(money - count(p, 'coins'), 2, 'the candidate pub policy charges two coins, not the unscaled shop default');
+  }
+  p.closeModal();
+}
+function drink(p) {
+  buyBeers(p);
+  const drunk = actors('feud_drunken_ali')[0];
+  for (let n = 1; n <= 3; n++) {
+    operate(p, drunk, 1, [], 'beer');
+    assert.equal(read(p, 'feud_var_drink'), n, `beer ${n} is recorded by the quest`);
+    assert.equal(count(p, 'beer'), 3 - n, `beer ${n} is consumed once`);
+    assert.equal(stage(p), n === 3 ? 2 : 1, 'the third beer reaches the sourced gang-inquiry checkpoint');
+  }
+}
+function buyReceipts(p, generous = false) {
+  const price = generous ? 1000 : 500;
+  p.invAdd(inv, obj('coins'), price);
+  const before = count(p, 'coins');
+  const result = talk(p, 'feud_ali_the_discount_camel_seller', [4, 2, generous ? 4 : 3, 5]);
+  assert.equal(count(p, 'feud_camel_receipt'), 2, 'one purchase produces two original camel receipts');
+  assert.equal(before - count(p, 'coins'), price, 'the charged constant matches the printed offer and receipt amount');
+  assert.match(result.text, new RegExp(`Would ${price} gold coins for the pair of them do\\?`), 'the spoken offer matches the amount charged');
+  assert.match(result.text, new RegExp(`return for ${price} gold coins`), 'the receipt message box states the amount actually charged');
+  if (!generous) assert.match(result.text, /I suppose I can silence my moral objections for that\./);
+  assert.equal(stage(p), 4, 'buying the camels reaches the sourced purchase checkpoint');
+}
+function deliver(p, banditsFirst = false, coward = false) {
+  const bandit = coward ? 'feud_arabian_guard_coward' : 'feud_arabian_guard_multi';
+  const first = banditsFirst ? bandit : 'feud_egyptian_doorman_multi';
+  const second = banditsFirst ? 'feud_egyptian_doorman_multi' : bandit;
+  const firstMask = banditsFirst ? 2 : 1;
+  const result = talk(p, first);
+  assert.match(p.messages.join(' '), /You hand the (?:guard|doorman) a sales receipt for the camel\./);
+  assert.equal(gangMask(p), firstMask, 'the first gang accepts only its own receipt');
+  assert.equal(count(p, 'feud_camel_receipt'), 1);
+  assert.equal(stage(p), 4, 'one receipt cannot reach the both-gangs checkpoint');
+  assert.doesNotMatch(result.text, /try join one of the gangs/, 'the joining musing follows the second distinct hand-in');
+  talk(p, first);
+  assert.equal(gangMask(p), firstMask, 'a repeated hand-in cannot substitute for the other gang');
+  assert.equal(count(p, 'feud_camel_receipt'), 1, 'a repeated hand-in consumes nothing');
+  assert.equal(stage(p), 4, 'repeating the first gang cannot reach the both-gangs checkpoint');
+  talk(p, second);
+  assert.equal(gangMask(p), 3);
+  assert.equal(count(p, 'feud_camel_receipt'), 0);
+  assert.equal(stage(p), 5, 'both distinct hand-ins reach the sourced delivery checkpoint');
+}
+
+function relog(p) {
+  const saved = p.save(), slot = p.slot, uid = p.uid, pid = p.pid;
+  p.unlink(); World.players[slot] = null;
+  const loaded = PlayerLoading.load(p.username, new Packet(saved), null);
+  loaded.varsString ??= [];
+  loaded.slot = slot; loaded.uid = uid; loaded.pid = pid; loaded.isActive = true;
+  loaded.messages = []; loaded.packets = [];
+  loaded.write = packet => loaded.packets.push(packet);
+  loaded.messageGame = text => loaded.messages.push(String(text));
+  loaded.wrappedMessageGame = loaded.messageGame;
+  World.players[slot] = loaded; World.playerLoop.add(loaded.hash64, loaded);
+  return loaded;
+}
+
+export {
+  actors, begin, bit, buyBeers, buyReceipts, deliver, drink, finish, gangMask, locs, operate,
+  operateLoc, operationOffsets, read, relog, stage, stand, talk
+};

@@ -1,170 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+
+import { count, id, inv, invButton, obj, player, seed, types } from '../swamp-caves/runtime.mjs';
 import {
-  Packet, PlayerLoading, ScriptState, ServerTriggerType, World, count, dialoguePage,
-  engineModule, id, inv, invButton, map, obj, player, resumeDialogue, seed, tick, tile, types
-} from '../swamp-caves/runtime.mjs';
-
-const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
-const bit = name => id('VarBitType', name);
-const read = (p, name) => p.getVarBit(bit(name));
-const stage = p => read(p, 'feud_var');
-const gangMask = p => read(p, 'feud_var_comp_gangs');
-const operationOffsets = {
-  feud_ali_m: [1, 0],
-  feud_drunken_ali: [1, 0],
-  feud_egyptian_doorman_multi: [0, -1],
-  feud_egyptian_minder: [1, 0]
-};
-const actors = name => {
-  const type = id('NpcType', name);
-  const found = [...World.npcs].filter(n => n.isActive && (n.baseType === type || n.type === type));
-  assert(found.length, `original packed NPC placement ${name}`);
-  return found;
-};
-
-function stand(p, n) {
-  const candidates = [];
-  for (let dx = -2; dx <= 2; dx++) for (let dz = -2; dz <= 2; dz++) {
-    p.level = n.level; p.x = n.x + dx; p.z = n.z + dz;
-    if (map.isMapBlocked(p.x, p.z, p.level) || !p.inOperableDistance(n)) continue;
-    candidates.push(tile(p));
-  }
-  assert(candidates.length, `packed collision permits an ordinary stand beside NPC ${n.baseType}`);
-  const [dx, dz] = operationOffsets[types.NpcType.get(n.baseType).debugname] ?? [-1, 0];
-  const destination = candidates.find(point => point[1] === n.x + dx && point[2] === n.z + dz);
-  assert(destination, 'the headed cell uses this same map-checked operation stand');
-  // Verify an actual map route, not just a guessed adjacent coordinate.
-  let route = null;
-  for (const [dx, dz] of [[4, 0], [-4, 0], [0, 4], [0, -4]]) {
-    const x = destination[1] + dx, z = destination[2] + dz;
-    if (map.isMapBlocked(x, z, destination[0])) continue;
-    const found = [...map.findPath(destination[0], x, z, destination[1], destination[2])];
-    if (!found.length) continue;
-    const last = CoordGrid.unpackCoord(found.at(-1));
-    if (last.x === destination[1] && last.z === destination[2]) { route = found; break; }
-  }
-  assert(route, `pathfinder reaches the real operation stand ${destination}`);
-  [p.level, p.x, p.z] = destination;
-  p.originX = p.x; p.originZ = p.z;
-  return destination;
-}
-
-function finish(p, choices = []) {
-  const options = [...choices], pages = [];
-  for (let step = 0; step < 240 && p.activeScript; step++) {
-    const state = p.activeScript;
-    assert.notEqual(state.execution, ScriptState.ABORTED, 'compiled dialogue does not abort');
-    if (state.execution === ScriptState.FINISHED) break;
-    if (state.execution === ScriptState.PAUSEBUTTON) {
-      pages.push(...dialoguePage(p));
-      const root = types.Component.get(p.modalChat).comName;
-      if (/^multi[2-5]$/.test(root)) {
-        assert(options.length, `unanswered choice ${root}: ${pages.at(-1)}`);
-        const choice = options.shift();
-        const selected = typeof choice === 'number' ? choice : Array.from({ length: Number(root.at(-1)) }, (_, i) => i + 1)
-          .find(option => p.packets.slice(p.dialogueMark).some(packet => packet.constructor.name === 'IfSetText'
-            && packet.component === id('Component', `${root}:com_${option}`) && packet.text === choice));
-        assert(selected, `offered dialogue choice ${choice}`);
-        resumeDialogue(p, selected);
-      } else resumeDialogue(p);
-    } else if (state.execution === ScriptState.SUSPENDED) tick(p);
-    else assert.fail(`unexpected compiled dialogue state ${state.execution}`);
-  }
-  assert(!p.activeScript || p.activeScript.execution === ScriptState.FINISHED, 'dialogue finishes within its bound');
-  assert.equal(options.length, 0, 'every selected option was offered');
-  return pages.join(' ');
-}
-
-function operate(p, n, option = 1, choices = [], item = null) {
-  p.clearInteraction(); stand(p, n);
-  if (item) { p.lastUseItem = obj(item); p.lastUseSlot = p.getInventory(inv).items.findIndex(entry => entry?.id === obj(item)); }
-  const operation = item ? ServerTriggerType.APNPCU : ServerTriggerType.APNPC1 + option - 1;
-  assert(p.setInteraction(1, n, operation), 'ordinary engine interaction is accepted');
-  assert(p.inOperableDistance(n), 'the player can operate from the path-checked stand');
-  const trigger = p.getOpTrigger();
-  assert(trigger, 'production visible-form dispatcher finds a compiled handler');
-  p.dialogueMark = p.packets.length;
-  p.processInteraction();
-  return { text: finish(p, choices), trigger: trigger.name };
-}
-const talk = (p, name, choices = []) => operate(p, actors(name)[0], 1, choices);
-function begin(p) {
-  assert.equal(stage(p), 0);
-  talk(p, 'feud_ali_m', [1]);
-  assert.equal(stage(p), 1, 'accepting Morrisane starts the compatible published stage');
-}
-function buyBeers(p) {
-  p.invAdd(inv, obj('coins'), 100);
-  talk(p, 'feud_ali_the_barman', ["Yes, I'd like a drink please."]);
-  assert.equal(p.modalMain, id('Component', 'shop_template'), 'the drink option opens the real shop');
-  const config = types.InvType.get(id('InvType', 'feud_alispub'));
-  const expected = [
-    ['beer', 83, 10], ['whisky', 10, 100], ['jug_wine', 13, 150],
-    ['vodka', 5, 5], ['brandy', 4, 1500], ['grog', 12, 2500]
-  ];
-  assert.deepEqual(Array.from(config.stockobj), expected.map(([name]) => obj(name)), 'the pre-2021 six-drink stock is retained');
-  assert.deepEqual(Array.from(config.stockcount), expected.map(([, quantity]) => quantity));
-  assert.deepEqual(Array.from(config.stockrate), expected.map(([, , rate]) => rate));
-  const component = id('Component', 'shop_template:inv');
-  const listener = p.invListeners.find(entry => entry.com === component);
-  assert(listener, 'the shop inventory is transmitted to the player');
-  const stock = p.getInventoryFromListener(listener);
-  const option = types.Component.get(component).iop.findIndex(text => /buy[^\d]*1\b/i.test(text ?? '')) + 1;
-  assert(option > 0, 'the original shop component offers Buy 1');
-  for (let n = 1; n <= 3; n++) {
-    const money = count(p, 'coins'), available = stock.getItemCount(obj('beer'));
-    assert(invButton(p, 'shop_template:inv', 'beer', option, stock.getItemIndex(obj('beer'))),
-      'the production inventory packet buys beer');
-    assert.equal(count(p, 'beer'), n, 'beer is purchased, not seeded');
-    assert.equal(stock.getItemCount(obj('beer')), available - 1, 'a real shared-stock item is sold');
-    assert.equal(money - count(p, 'coins'), 2, 'the candidate pub policy charges two coins, not the unscaled shop default');
-  }
-  p.closeModal();
-}
-function drink(p) {
-  buyBeers(p);
-  const drunk = actors('feud_drunken_ali')[0];
-  for (let n = 1; n <= 3; n++) {
-    operate(p, drunk, 1, [], 'beer');
-    assert.equal(read(p, 'feud_var_drink'), n, `beer ${n} is recorded by the quest`);
-    assert.equal(count(p, 'beer'), 3 - n, `beer ${n} is consumed once`);
-    assert.equal(stage(p), 1, 'beer count does not overwrite stage bits');
-  }
-}
-function buyReceipts(p) {
-  p.invAdd(inv, obj('coins'), 500);
-  const before = count(p, 'coins');
-  talk(p, 'feud_ali_the_discount_camel_seller', [4, 2, 3, 5]);
-  assert.equal(count(p, 'feud_camel_receipt'), 2, 'one purchase produces two original camel receipts');
-  assert.equal(before - count(p, 'coins'), 500, 'candidate transcript pair offer is charged once');
-}
-function deliver(p) {
-  talk(p, 'feud_egyptian_doorman_multi');
-  assert.equal(gangMask(p), 1, 'the Menaphites accept only their receipt');
-  assert.equal(count(p, 'feud_camel_receipt'), 1);
-  talk(p, 'feud_egyptian_doorman_multi');
-  assert.equal(gangMask(p), 1, 'a repeated hand-in cannot substitute for the other gang');
-  assert.equal(count(p, 'feud_camel_receipt'), 1, 'a repeated hand-in consumes nothing');
-  talk(p, 'feud_arabian_guard_multi');
-  assert.equal(gangMask(p), 3);
-  assert.equal(count(p, 'feud_camel_receipt'), 0);
-  assert.equal(stage(p), 2, 'both distinct hand-ins reach the next named checkpoint');
-}
-
-function relog(p) {
-  const saved = p.save(), slot = p.slot, uid = p.uid, pid = p.pid;
-  p.unlink(); World.players[slot] = null;
-  const loaded = PlayerLoading.load(p.username, new Packet(saved), null);
-  loaded.varsString ??= [];
-  loaded.slot = slot; loaded.uid = uid; loaded.pid = pid; loaded.isActive = true;
-  loaded.messages = []; loaded.packets = [];
-  loaded.write = packet => loaded.packets.push(packet);
-  loaded.messageGame = text => loaded.messages.push(String(text));
-  loaded.wrappedMessageGame = loaded.messageGame;
-  World.players[slot] = loaded; World.playerLoop.add(loaded.hash64, loaded);
-  return loaded;
-}
+  actors, begin, buyReceipts, deliver, drink, gangMask, operate, read, relog, stage, talk
+} from './fixture.mjs';
 
 test('the original market Trade option supplies both required disguise items before the quest', () => {
   const p = player();
@@ -210,6 +50,43 @@ test('the original market Trade option supplies both required disguise items bef
   p.closeModal();
 });
 
+test('Morrisane opens the candidate thirteen-entry shop through dialogue without a later Trade option or forced sale', () => {
+  const p = player();
+  p.invAdd(inv, obj('coins'), 100);
+  talk(p, 'feud_ali_m', [2]);
+  assert.equal(stage(p), 0);
+  assert.equal(p.modalMain, id('Component', 'shop_template'));
+  assert.equal(count(p, 'coins'), 100, 'the disputed forced sale never takes coins');
+  const expected = [
+    ['pot_empty', 3, 100], ['jug_empty', 2, 100], ['water_skin3', 10, 300],
+    ['desert_shirt', 3, 12], ['desert_boots', 2, 100], ['bucket_empty', 19, 400],
+    ['feud_karidian_fakebeard', 11, 10], ['feud_karidian_turban', 12, 10],
+    ['papyrus', 50, 10], ['knife', 5, 100], ['tinderbox', 11, 100],
+    ['bronze_pickaxe', 23, 100], ['raw_chicken', 15, 100]
+  ];
+  const shop = id('InvType', 'feud_morrisanes'), config = types.InvType.get(shop);
+  assert.deepEqual(Array.from(config.stockobj), expected.map(([name]) => obj(name)));
+  assert.deepEqual(Array.from(config.stockcount), expected.map(([, quantity]) => quantity));
+  assert.deepEqual(Array.from(config.stockrate), expected.map(([, , rate]) => rate));
+  assert.equal(p.getVar(id('VarPlayerType', 'shop')), shop);
+  assert.deepEqual(types.NpcType.get(id('NpcType', 'feud_ali_m')).op.filter(Boolean), ['Talk-to'],
+    'the dated 2021 Trade option is not imported into the original client definition');
+  const component = id('Component', 'shop_template:inv');
+  const stock = p.getInventoryFromListener(p.invListeners.find(entry => entry.com === component));
+  const buy = types.Component.get(component).iop.findIndex(text => /buy[^\d]*1\b/i.test(text ?? '')) + 1;
+  for (const name of ['feud_karidian_fakebeard', 'feud_karidian_turban']) {
+    assert(invButton(p, 'shop_template:inv', name, buy, stock.getItemIndex(obj(name))));
+    assert.equal(count(p, name), 1, 'the period-guide disguise can be bought from Morrisane');
+  }
+  p.closeModal();
+  const money = count(p, 'coins');
+  const refusal = talk(p, 'feud_ali_m', [1, 2, 1, 1]);
+  assert.match(refusal.text, /I'm far too busy to carry out errands for shopkeepers - maybe later\./);
+  assert.doesNotMatch(refusal.text, /manages to sell you some junk/);
+  assert.equal(stage(p), 0);
+  assert.equal(count(p, 'coins'), money, 'declining the errand does not trigger the disputed mechanism');
+});
+
 test('barman small-talk remains available without producing quest progress', () => {
   const p = player(), result = talk(p, 'feud_ali_the_barman', [2, 1]);
   assert.match(result.text, /Nothing much really\. About what you'd expect from a sleepy little town like ours\./);
@@ -221,7 +98,7 @@ test('barman small-talk remains available without producing quest progress', () 
 
 test('start refusal, early item use, and compatible acceptance use native dispatch', () => {
   const p = seed(player(), ['beer']);
-  talk(p, 'feud_ali_m', [2]);
+  talk(p, 'feud_ali_m', [1, 1, 1]);
   assert.equal(stage(p), 0);
   operate(p, actors('feud_drunken_ali')[0], 1, [], 'beer');
   assert.equal(count(p, 'beer'), 1, 'no beer is consumed before the quest starts');
@@ -232,14 +109,14 @@ test('start refusal, early item use, and compatible acceptance use native dispat
 test('the first boundary is played from zero, saved, recruited and never reset', () => {
   let p = player(); begin(p); drink(p);
   p = relog(p);
-  assert.equal(stage(p), 1, 'start stage survives the real save codec');
+  assert.equal(stage(p), 2, 'the sourced inquiry checkpoint survives the real save codec');
   assert.equal(read(p, 'feud_var_drink'), 3, 'three-beer progress survives the real save codec');
   talk(p, 'feud_egyptian_doorman_multi');
   talk(p, 'feud_arabian_guard_multi');
   assert.equal(read(p, 'feud_var_talk_gangs'), 3, 'both distinct gang inquiries are remembered');
   buyReceipts(p); deliver(p);
   p = relog(p);
-  assert.equal(stage(p), 2);
+  assert.equal(stage(p), 5);
   assert.equal(gangMask(p), 3, 'distinct receipt progress survives logout');
   const villager = actors('feud_villager_multi_1')[0];
   const coinsBefore = count(p, 'coins');
@@ -247,34 +124,200 @@ test('the first boundary is played from zero, saved, recruited and never reset',
   assert.equal(read(p, 'feud_talk_villager'), 0, 'the trial cannot start before Operator acceptance');
   assert.equal(count(p, 'coins'), coinsBefore, 'early pickpocket cannot award trial loot');
   talk(p, 'feud_egyptian_minder', [2, 2]);
-  assert.equal(stage(p), 2, 'declining recruitment preserves the hand-ins');
+  assert.equal(stage(p), 5, 'declining recruitment preserves the hand-ins');
   talk(p, 'feud_egyptian_minder', [1, 2]);
-  assert.equal(stage(p), 3, 'accepting the sourced trial briefing records recruitment');
-  talk(p, 'feud_ali_m');
-  assert.equal(stage(p), 3, 'Morrisane never restarts an active quest');
+  assert.equal(stage(p), 6, 'accepting the sourced trial briefing records recruitment');
+  talk(p, 'feud_ali_m', [1]);
+  assert.equal(stage(p), 6, 'Morrisane never restarts an active quest');
   p = relog(p);
-  assert.equal(stage(p), 3, 'recruitment survives the real save codec');
+  assert.equal(stage(p), 6, 'recruitment survives the real save codec');
   talk(p, 'feud_egyptian_minder', [2, 2]);
-  assert.equal(stage(p), 3, 'the repeat Operator path cannot reset recruitment');
+  assert.equal(stage(p), 6, 'the repeat Operator path cannot reset recruitment');
 });
 
-test('a published stage-one save keeps its completed hand-ins and trial progress', () => {
+test('a published stage-one save retains its start meaning without migration', () => {
+  let p = player(); begin(p);
+  p = relog(p);
+  assert.equal(stage(p), 1);
+  assert.equal(read(p, 'feud_var_drink'), 0);
+  assert.equal(read(p, 'feud_var_talk_gangs'), 0);
+  assert.equal(gangMask(p), 0);
+  talk(p, 'feud_ali_m', [1]);
+  assert.equal(stage(p), 1, 'the original accepted-start value is unchanged');
+  drink(p);
+  assert.equal(stage(p), 2, 'the saved start continues through ordinary beer actions');
+});
+
+test('sourced pre-start gang greetings preserve progress and the early camel reply remains available after starting', () => {
+  const p = player();
+  for (const name of ['feud_drunken_ali', 'feud_ali_the_discount_camel_seller']) {
+    assert.equal(talk(p, name).text, '', `${name} has no sourced pre-start dialogue`);
+  }
+  for (const name of ['feud_egyptian_doorman_multi', 'feud_arabian_guard_multi', 'feud_arabian_guard_coward']) {
+    const greeting = talk(p, name);
+    assert.match(greeting.text, /I'm new to town and wanted to get to know the locals\./);
+    assert.match(greeting.text, /Come back if you have some business to discuss with us\./);
+    assert.equal(stage(p), 0);
+    assert.equal(read(p, 'feud_var_talk_gangs'), 0, 'a pre-start greeting is not a gang inquiry');
+  }
+  begin(p);
+  assert.match(talk(p, 'feud_drunken_ali').text, /Ahh, a kind stranger\./);
+  for (const name of ['feud_egyptian_doorman_multi', 'feud_arabian_guard_multi', 'feud_arabian_guard_coward']) {
+    assert.equal(talk(p, name).text, '', `${name} has no retained post-start dialogue before the beers`);
+  }
+  const early = talk(p, 'feud_ali_the_discount_camel_seller', [4, 2]);
+  assert.match(early.text, /Those two camels around the side are already sold\./);
+  assert.match(early.text, /Come back later if you're still interested\./);
+  assert.equal(count(p, 'feud_camel_receipt'), 0);
+  assert.equal(stage(p), 1);
+});
+
+for (const [banditsFirst, coward] of [[false, false], [true, false], [true, true]]) {
+  test(`saved inquiries gate the sale, and distinct receipts work ${banditsFirst ? 'Bandits' : 'Menaphites'} first${coward ? ' with the Cowardly Bandit' : ''}`, () => {
+    let p = player(); begin(p); drink(p);
+    p.invAdd(inv, obj('coins'), 1000);
+    const first = banditsFirst ? (coward ? 'feud_arabian_guard_coward' : 'feud_arabian_guard_multi') : 'feud_egyptian_doorman_multi';
+    const second = banditsFirst ? 'feud_egyptian_doorman_multi' : 'feud_arabian_guard_multi';
+    const assertNoSale = () => {
+      const before = count(p, 'coins');
+      const result = talk(p, 'feud_ali_the_discount_camel_seller', [4, 2]);
+      assert.match(result.text, /Come back later if you're still interested\./);
+      assert.equal(count(p, 'coins'), before, 'an early visit charges nothing');
+      assert.equal(count(p, 'feud_camel_receipt'), 0, 'coins alone cannot skip the gang inquiries');
+      assert.equal(stage(p), 2);
+    };
+    assertNoSale();
+    const inquiry = talk(p, first);
+    assert.doesNotMatch(inquiry.text, /Maybe if I got both gangs a camel/, 'the first gang alone does not cause the joint-plan musing');
+    assert.equal(read(p, 'feud_var_talk_gangs'), banditsFirst ? 2 : 1);
+    p = relog(p);
+    assertNoSale();
+    talk(p, first);
+    assert.equal(read(p, 'feud_var_talk_gangs'), banditsFirst ? 2 : 1, 'one repeated inquiry is not both gangs');
+    assertNoSale();
+    assert.match(talk(p, second).text, /Maybe if I got both gangs a camel/);
+    assert.equal(read(p, 'feud_var_talk_gangs'), 3);
+    assert.equal(stage(p), 3, 'the second distinct inquiry advances the sourced checkpoint');
+    p = relog(p);
+    assert.equal(read(p, 'feud_var_talk_gangs'), 3, 'the purchase reads both inquiries from the real saved state');
+    buyReceipts(p, banditsFirst);
+    deliver(p, banditsFirst, coward);
+    p = relog(p);
+    assert.equal(stage(p), 5);
+    assert.equal(gangMask(p), 3);
+    talk(p, 'feud_egyptian_minder', [1, 2]);
+    assert.equal(stage(p), 6);
+    assert.match(talk(p, 'feud_arabian_guard_multi').text, /Get out of here, you Menaphite dog!/);
+    assert.match(talk(p, 'feud_arabian_guard_coward').text, /don't kill me, please!/);
+    assert.match(talk(p, 'feud_egyptian_doorman_multi').text, /You're better off asking Ali the Operator\./);
+  });
+}
+
+for (const generous of [false, true]) {
+  test(`the ${generous ? 1000 : 500}-coin offer preserves money and progress on sourced refusals`, () => {
+    const p = player(); begin(p); drink(p);
+    talk(p, 'feud_egyptian_doorman_multi');
+    talk(p, 'feud_arabian_guard_multi');
+    p.invDel(inv, obj('coins'), count(p, 'coins'));
+    const offer = generous ? 4 : 3;
+    const poor = talk(p, 'feud_ali_the_discount_camel_seller', [4, 2, offer]);
+    assert.match(poor.text, /money|afford|gold|coins/i, 'the sourced insufficient-money reply is shown');
+    assert.equal(count(p, 'feud_camel_receipt'), 0);
+    assert.equal(stage(p), 3);
+    p.invAdd(inv, obj('coins'), 1000);
+    p.invAdd(inv, obj('bucket_empty'), 27);
+    const before = count(p, 'coins');
+    assert.match(talk(p, 'feud_ali_the_discount_camel_seller', [4, 2, offer]).text, /inventory - full at the moment/);
+    assert.equal(count(p, 'coins'), before);
+    assert.equal(count(p, 'feud_camel_receipt'), 0, 'a full inventory never drops or loses a receipt');
+    assert.equal(stage(p), 3);
+    p.invDel(inv, obj('bucket_empty'), 27);
+    buyReceipts(p, generous);
+  });
+}
+
+test('lost purchase-state camel receipts are replaced free without another sale or progress write', () => {
   let p = player(); begin(p); drink(p);
   talk(p, 'feud_egyptian_doorman_multi');
   talk(p, 'feud_arabian_guard_multi');
-  buyReceipts(p); deliver(p);
-  // Legacy fixture: the published scripts kept stage 1 after both hand-ins.
-  p.setVarBit(bit('feud_var'), 1);
+  buyReceipts(p);
+  const money = count(p, 'coins');
+  assert.equal(types.ObjType.get(obj('feud_camel_receipt')).iop[4], 'Drop',
+    'the original receipt can normally be lost through its visible Drop operation');
+  assert.match(talk(p, 'feud_ali_the_discount_camel_seller', [1]).text, /trying to con me/);
+  assert.equal(count(p, 'feud_camel_receipt'), 2, 'asking with both receipts produces no extra copy');
+
+  // Own-inventory loss fixture; replacement itself uses the visible native Talk route.
+  p.invDel(inv, obj('feud_camel_receipt'), 1);
   p = relog(p);
-  talk(p, 'feud_egyptian_minder', [1, 2]);
-  assert.equal(stage(p), 3, 'the old hand-in state can accept recruitment without buying again');
-  assert.equal(gangMask(p), 3);
-  assert.equal(count(p, 'feud_camel_receipt'), 0);
-  // Legacy fixture: the published first pick also retained stage 1.
-  p.setVarBit(bit('feud_var'), 1);
-  p.setVarBit(bit('feud_talk_villager'), 1);
+  assert.match(talk(p, 'feud_ali_the_discount_camel_seller', [1]).text, /No problem, There you go\./);
+  assert.equal(count(p, 'feud_camel_receipt'), 2, 'one missing receipt is replaced');
+  assert.equal(count(p, 'coins'), money);
+  assert.equal(stage(p), 4);
+  assert.equal(gangMask(p), 0, 'replacement never substitutes for a hand-in');
+
+  p.invDel(inv, obj('feud_camel_receipt'), 2);
+  p.invAdd(inv, obj('bucket_empty'), 27);
+  const full = talk(p, 'feud_ali_the_discount_camel_seller', [1]);
+  assert.match(full.text, /Come back to me when you're not so burdened\./);
+  assert.equal(count(p, 'feud_camel_receipt'), 0, 'insufficient space cannot lose one replacement');
+  assert.equal(count(p, 'coins'), money);
+  assert.equal(stage(p), 4);
+  p.invDel(inv, obj('bucket_empty'), 1);
+  talk(p, 'feud_ali_the_discount_camel_seller', [1]);
+  assert.equal(count(p, 'feud_camel_receipt'), 2, 'exactly enough space accepts both replacements');
+  assert.equal(count(p, 'coins'), money, 'neither replacement route charges again');
+  p.invDel(inv, obj('bucket_empty'), 26);
+  deliver(p);
+  const disposed = talk(p, 'feud_ali_the_discount_camel_seller', [4, 1]);
+  assert.match(disposed.text, /Not Sandy and Lumps!/);
+  assert.doesNotMatch(disposed.text, /Would (?:500|1000) gold coins/);
+  assert.equal(count(p, 'feud_camel_receipt'), 0, 'after both hand-ins the source menu no longer offers recovery');
+  assert.equal(stage(p), 5);
+});
+
+test('the ordinary kebab service sells both sourced foods before the quest without changing progress', () => {
+  const p = player();
+  p.invAdd(inv, obj('coins'), 8);
+  assert.match(talk(p, 'feud_kebabman', [1, 2]).text, /That will be three gold coins\./);
+  assert.equal(count(p, 'kebab'), 1);
+  assert.equal(count(p, 'coins'), 5);
+  assert.match(talk(p, 'feud_kebabman', [2, 2]).text, /One super kebab coming up!/);
+  assert.equal(count(p, 'super_kebab'), 1);
+  assert.equal(count(p, 'coins'), 0);
+  assert.equal(stage(p), 0, 'ordinary purchases do not start or advance The Feud');
+});
+
+test('kebab refusals and both non-sale conversations leave inventory and progress unchanged', () => {
+  const p = player();
+  p.invAdd(inv, obj('coins'), 2);
+  for (const option of [1, 2]) {
+    assert.match(talk(p, 'feud_kebabman', [option, 2]).text, /I seem to be short on coins\. Sorry\./);
+    assert.equal(count(p, 'coins'), 2);
+    assert.equal(count(p, 'kebab') + count(p, 'super_kebab'), 0);
+  }
+  assert.match(talk(p, 'feud_kebabman', [5, 2]).text, /gossip I am not/);
+  assert.match(talk(p, 'feud_kebabman', [4, 4]).text, /You should have told me you were from the union/);
+  assert.equal(stage(p), 0);
+  assert.equal(count(p, 'coins'), 2);
+});
+
+test('free reusable sauce is capacity-safe and unavailable while another bottle is held or banked', () => {
+  let p = player();
+  p.invAdd(inv, obj('bucket_empty'), 28);
+  assert.match(talk(p, 'feud_kebabman', [3, 2]).text, /I'm a bit overburdened as it is/);
+  assert.equal(count(p, 'superhot_kebab_sauce'), 0);
+  p.invDel(inv, obj('bucket_empty'), 1);
+  assert.match(talk(p, 'feud_kebabman', [3, 2]).text, /potent enough to give a camel the runs/);
+  assert.equal(count(p, 'superhot_kebab_sauce'), 1, 'exactly one free slot receives the bottle');
+  assert.equal(stage(p), 0, 'the supported ordinary service has no invented Feud-stage gate');
+  assert.match(talk(p, 'feud_kebabman', [3, 3]).text, /Kebab construction is a cut-throat industry/);
+  assert.equal(count(p, 'superhot_kebab_sauce'), 1, 'the unavailable sauce choice is not offered with a bottle held');
+  p.invDel(inv, obj('superhot_kebab_sauce'), 1);
+  p.invAdd(id('InvType', 'bank'), obj('superhot_kebab_sauce'), 1);
   p = relog(p);
-  talk(p, 'feud_egyptian_minder', [2, 2]);
-  assert.equal(stage(p), 3, 'existing trial progress proves prior recruitment');
-  assert.equal(read(p, 'feud_talk_villager'), 1, 'migration does not repeat or discard the first pick');
+  assert.match(talk(p, 'feud_kebabman', [4, 2]).text, /gossip I am not/);
+  assert.equal(count(p, 'superhot_kebab_sauce'), 0, 'a banked bottle also excludes the sauce choice');
+  assert.equal(p.invTotal(id('InvType', 'bank'), obj('superhot_kebab_sauce')), 1);
+  assert.equal(stage(p), 0);
 });

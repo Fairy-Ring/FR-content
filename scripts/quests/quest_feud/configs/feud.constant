@@ -1,36 +1,76 @@
-// UNKNOWN engineering checkpoints. Original 377 varbit feud_var is retained.
-// Stage 1 remains the published start. These numbers are not period claims.
+// CANDIDATE positive stage values: Old School Transcript:The Feud, revision 15325427.
+// Each reference is a line of the retained transcript-feud-20260830.wiki.
+// Original 377 varbit 334 and the published stage-one start are unchanged.
+// UNKNOWN initial checkpoint, retaining the published zero-initialized state.
 ^feud_not_started = 0
+// The prior value at the third-beer transition (line 339) is 1.
 ^feud_started = 1
-^feud_camels_delivered = 2
-^feud_recruited = 3
-^feud_first_pick = 4
-^feud_second_pick = 5
-^feud_blackjack_training = 6
-^feud_third_pick = 7
-^feud_burglary = 8
-^feud_staked_out = 9
-^feud_jewels_taken = 10
-^feud_traitor_inquiry = 11
-^feud_traitor_identified = 12
-^feud_poison_task = 13
-^feud_poisoned_drink = 19
-^feud_leader_summons = 20
-^feud_toughguy_fight = 21
-^feud_menaphites_defeated = 22
-^feud_bandits_challenged = 23
-^feud_champion_fight = 24
-^feud_bandits_defeated = 25
-^feud_villager_reveal = 26
+// Third beer: line 339.
+^feud_gang_inquiries = 2
+// Both saved inquiries: line 385.
+^feud_camel_offer = 3
+// Camel purchase: lines 445 and 460.
+^feud_camels_purchased = 4
+// Both receipts handed in: line 538.
+^feud_camels_delivered = 5
+// Accepted recruitment: line 594.
+^feud_recruited = 6
+// Normal pick: line 671; distraction starts: line 711; distracted pick: line 715.
+^feud_first_pick = 7
+^feud_distraction_active = 8
+^feud_second_pick = 9
+// Lure: line 816 (the recorder expresses uncertainty at line 817).
+^feud_villager_lured = 10
+// Knock-out: line 820; unconscious pick: line 822; keys received: line 843.
+^feud_villager_knocked_out = 11
+^feud_third_pick = 12
+^feud_burglary = 13
+// Stakeout: line 888; jewels taken: line 948; jewels handed in: line 975.
+^feud_staked_out = 14
+^feud_jewels_taken = 15
+^feud_traitor_inquiry = 16
+// Identifying the traitor sets found_trait, not a separate stage (line 1004).
+// Operator report: line 1014; snake handed in: line 1102; poison: line 1127.
+^feud_poison_task = 17
+^feud_snake_delivered = 18
+^feud_poison_obtained = 22
+// Drink poisoned: line 1153; Operator report: line 1178.
+^feud_poisoned_drink = 23
+^feud_leader_summons = 24
+// Tough Guy defeated: line 1226; champion defeated: line 1350.
+^feud_menaphites_defeated = 25
+^feud_bandits_defeated = 26
+// Villager conversations use the existing talk_villager bits (line 1394).
+// Mayor's account: line 1411; completion: line 1524.
 ^feud_mayor_reveal = 27
-// Completion uses the existing ^feud_complete (28) registry constant.
-// The 377 cache independently makes the blackjack seller visible at 28.
+// ^feud_complete (28) is retained in the existing quest registry.
+// The 377 blackjack-seller morph independently reads 28.
+
+// VERIFIED level: Sal's 29 Apr 2006 and RuneHQ 24 Apr 2006.
+// UNKNOWN enforcement point: first trial theft; no start-refusal wording survives.
+// The later 27 Oct 2024 start-required annotation is recorded in the research facts.
+^feud_trial_thieving_level = 30
 
 // CANDIDATE period pair offer; conflicting Tip.It wording is recorded in the facts.
 ^feud_camel_pair_price = 500
 
+// VERIFIED rewards: Sal's 29 Apr 2006 and RuneHQ 24 Apr 2006.
+^feud_report_reward_coins = 500
+// 15,000 Thieving XP expressed in the engine's tenths-of-XP units.
+^feud_thieving_reward_units = 150000
+
+// CANDIDATE prices: Ali the Kebab seller, earliest Old School page 214362.
+^feud_standard_kebab_price = 3
+^feud_super_kebab_price = 5
+
 // UNKNOWN engineering capacity, matching the existing ordinary shop layout.
 ^feud_shop_capacity = 40
 
-// UNKNOWN engineering marker after the sourced traitor-drink explanation.
-^feud_report_drink_reported = 1
+// UNKNOWN reconstruction bounds: lifetime follows Fight Arena's summoned fights;
+// search covers the nearby mapped leaders, and departure uses one tick.
+^feud_champion_lifetime = 500
+^feud_champion_search_range = 32
+^feud_leader_departure_delay = 1
+
+// CANDIDATE fourteen recorded greetings; equal selection weights are UNKNOWN.
+^feud_villager_greeting_count = 14

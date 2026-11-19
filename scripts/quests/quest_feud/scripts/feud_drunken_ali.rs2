@@ -1,5 +1,5 @@
-// Three beers: VERIFIED period guides. Wording: CANDIDATE RuneScape transcript
-// revision 18411641, before the dated Old School lore rewrite.
+// Three beers: VERIFIED period guides. Principal wording: CANDIDATE RuneScape
+// transcript 18411641; separate repeat states: Old School transcript 15325427.
 
 [opnpc1,feud_drunken_ali]
 if (%feud_var < 1) {
@@ -7,10 +7,12 @@ if (%feud_var < 1) {
 }
 if (%feud_var_drink = 0) {
     ~chatnpc("<p,neutral>Ahh, a kind stranger. Get this old man a drink, so that he may wet his throat and tell you of strange happenings in this town.");
-} else if (%feud_var_drink < 3) {
-    ~chatnpc("<p,neutral>It's yourself again, isn't it? Get this old man another drink so that he may wet his lips and continue.");
+} else if (%feud_var_drink = 1) {
+    ~chatnpc("<p,neutral>Get this poor, thirsty old man another drink so that he may wet his lips and continue.");
+} else if (%feud_var_drink = 2) {
+    ~chatnpc("<p,neutral>Alas, my throat has dried up, and I cannot speak... perhaps another drink would help?");
 } else {
-    ~chatnpc("<p,neutral>It's yourself again, isn't it?");
+    ~chatnpc("<p,neutral>What were we talking about again? Yes yes, when I was a boy... no, that's not it.");
 }
 return;
 
@@ -20,6 +22,10 @@ if (%feud_var < 1) {
 }
 def_obj $used = last_useitem;
 if ($used = beer) {
+    if (%feud_var_drink >= 3) {
+        ~chatnpc("<p,neutral>What were we talking about again? Yes yes, when I was a boy... no, that's not it.");
+        return;
+    }
     inv_del(inv, beer, 1);
     if (%feud_var_drink = 0) {
         ~chatnpc("<p,neutral>I happen to know that you are looking for somebody.");
@@ -54,6 +60,7 @@ if ($used = beer) {
     ~chatnpc("<p,neutral>I don't know exactly, he disappeared last week, either those Bandits or Menaphites have something to do with it. Perhaps their feuding has something to do with it, perhaps if you were to solve that problem... Anyway is there any chance of another beer?");
     ~chatplayer("<p,quiz>What do you think?");
     %feud_var_drink = 3;
+    if (%feud_var < ^feud_gang_inquiries) %feud_var = ^feud_gang_inquiries;
     return;
 }
 ~chatnpc("<p,neutral>Eh? What's this? I don't want that, get me a beer.");
