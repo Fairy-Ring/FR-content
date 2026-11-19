@@ -23,6 +23,7 @@ const packNames = new Map(readFileSync(path.join(content, 'pack/loc.pack'), 'utf
 const floors = new Set();
 const native = [];
 const hamNative = [];
+const nativeDoors = [];
 const key = r => `${r.name}@${r.level},${r.x},${r.z}`;
 for (const name of readdirSync(path.join(content, 'maps')).filter(n => /^m\d+_\d+\.jm2$/.test(n))) {
   const [, mx, mz] = /^m(\d+)_(\d+)\.jm2$/.exec(name).map(Number);
@@ -37,6 +38,7 @@ for (const name of readdirSync(path.join(content, 'maps')).filter(n => /^m\d+_\d
     const [id, shape = 10, angle = 0] = match[4].split(' ').map(Number);
     if (boundNames.has(packNames.get(id))) native.push({ name: packNames.get(id), level, x, z, shape, angle });
     if (['ham_multi_trapdoor', 'osf_ham_ladder'].includes(packNames.get(id))) hamNative.push({ name: packNames.get(id), level, x, z, shape, angle });
+    if (packNames.get(id) === 'wild_door') nativeDoors.push({ name: packNames.get(id), level, x, z, shape, angle });
   }
 }
 assert.deepEqual([...new Set(links.map(key))].sort(), native.map(key).sort(), 'every native placement of every bound ordinary loc is inventoried');
@@ -157,9 +159,29 @@ for (const row of links) {
     } else {
       assert.equal(row.label, 'UNKNOWN');
       const alternatives = links.filter(r => r.name === 'wild_ladder' && r.direction === 'up');
-      const alternate = alternatives.map(r => ({ row: r, at: routeEnd(result.destination, at => reachable(at, r), 40) })).find(r => r.at);
-      assert.ok(alternate, 'the corner without a ground ladder has a walkable route to another original ascent');
-      console.log(`UNKNOWN northwest descent returns through ${key(alternate.row)}`);
+      const findAscent = start => alternatives.map(r => ({ row: r, at: routeEnd(start, at => reachable(at, r), 40) })).find(r => r.at);
+      let alternate = findAscent(result.destination);
+      const pendingDoors = nativeDoors.filter(r => r.level === row.level - 1
+        && Math.max(Math.abs(r.x - row.x), Math.abs(r.z - row.z)) <= 40
+        && World.getLoc(r.x, r.z, r.level, types.LocType.getId(r.name)));
+      const opened = [];
+      while (!alternate && pendingDoors.length) {
+        const start = [p.level, p.x, p.z];
+        const next = pendingDoors.map(door => ({ door, at: routeEnd(start, at => reachable(at, door), 40) })).find(r => r.at);
+        if (!next) break;
+        pendingDoors.splice(pendingDoors.indexOf(next.door), 1);
+        [p.level, p.x, p.z] = next.at;
+        executeNative(p, next.door, 1);
+        opened.push(key(next.door));
+        alternate = findAscent([p.level, p.x, p.z]);
+      }
+      assert.ok(alternate, 'the corner without a ground ladder can open reachable native doors and walk to another original ascent');
+      [p.level, p.x, p.z] = alternate.at;
+      const back = executeNative(p, alternate.row, 1);
+      assert.deepEqual(back.destination, alternate.row.destination, 'the alternate original ascent actually returns upstairs');
+      walkable(back.destination);
+      returns++;
+      console.log(`UNKNOWN northwest descent returns through ${key(alternate.row)}; native doors opened: ${opened.join(', ') || 'already open'}`);
     }
   }
 }
