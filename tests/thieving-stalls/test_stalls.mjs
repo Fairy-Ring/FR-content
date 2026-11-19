@@ -6,18 +6,25 @@ import { fileURLToPath } from 'node:url';
 import { World, State, PlayerStat, JavaRandom, types, id, inv, player, proc, count, click, load } from '../farming/runtime.mjs';
 
 const map = await load('engine/GameMap.ts');
+const { NpcMode } = await load('engine/entity/NpcMode.ts');
 const content = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 // Published native outcomes are the compatibility oracle, except the period gem-XP correction.
 const published = [
   ['bakery', 'bakers_stall_stealing', 5, 160, 8, [['cake', 13], ['bread', 5], ['chocolate_slice', 2]], 1],
-  ['tea', 'tea_stall', 5, 160, 16, [['cup_of_tea', 128]], 7],
-  ['silk', 'silk_stall_stealing', 20, 240, 16, [['silk', 128]], 2],
-  ['fur', 'fur_stall_stealing', 35, 360, 32, [['grey_wolf_fur', 128]], 3],
-  ['silver', 'silver_stall_stealing', 50, 540, 100, [['silver_ore', 128]], 4],
-  ['spice', 'spice_stall_stealing', 65, 810, 166, [['spicespot', 128]], 5],
-  ['gem', 'gem_stall_stealing', 75, 160, 600, [['uncut_sapphire', 105], ['uncut_emerald', 17], ['uncut_ruby', 5], ['uncut_diamond', 1]], 6]
+  ['tea', 'tea_stall', 5, 160, 16, [['cup_of_tea', 128]], 2],
+  ['silk', 'silk_stall_stealing', 20, 240, 16, [['silk', 128]], 3],
+  ['fur', 'fur_stall_stealing', 35, 360, 32, [['grey_wolf_fur', 128]], 4],
+  ['silver', 'silver_stall_stealing', 50, 540, 100, [['silver_ore', 128]], 5],
+  ['spice', 'spice_stall_stealing', 65, 810, 166, [['spicespot', 128]], 6],
+  ['gem', 'gem_stall_stealing', 75, 160, 600, [['uncut_sapphire', 105], ['uncut_emerald', 17], ['uncut_ruby', 5], ['uncut_diamond', 1]], 7]
 ];
-const selectedIds = new Set(published.map(([, key]) => id('LocType', key)));
+const regional = [
+  ['viking_fur', 'viking_fur_market', 35, 360, 32, [['grey_wolf_fur', 128]], 8, 'viking_market'],
+  ['dwarf_gem', 'dwarf_market_gems', 75, 160, 600, [['uncut_sapphire', 105], ['uncut_emerald', 17], ['uncut_ruby', 5], ['uncut_diamond', 1]], 0, 'dwarf_market_empty_stall'],
+  ['dwarf_silver', 'dwarf_market_silver', 50, 540, 100, [['silver_ore', 128]], 0, 'dwarf_market_empty_stall']
+];
+const profiles = [...published, ...regional];
+const selectedIds = new Set(profiles.map(([, key]) => id('LocType', key)));
 const placements = [];
 for (const filename of fs.readdirSync(path.join(content, 'maps')).filter(name => /^m\d+_\d+\.jm2$/.test(name))) {
   const [, mx, mz] = /^m(\d+)_(\d+)\.jm2$/.exec(filename).map(Number);
@@ -48,8 +55,10 @@ function approaches(loc) {
   return points;
 }
 function catchers(row, point, level) {
-  const ids = new Set([row.getValue(1, 0)[0], ...Array.from({ length: row.columnValues[2]?.length ?? 0 }, (_, index) => row.getValue(2, index)[0])]);
-  return [...World.npcs].filter(npc => npc.isActive && npc.level === level && ids.has(npc.type) &&
+  const owner = row.getValue(1, 0)[0];
+  const guards = new Set(Array.from({ length: row.columnValues[2]?.length ?? 0 }, (_, index) => row.getValue(2, index)[0]));
+  return [...World.npcs].filter(npc => npc.isActive && npc.level === level &&
+    (npc.type === owner || (guards.has(npc.type) && npc.targetOp !== NpcMode.OPPLAYER2)) &&
     Math.max(Math.abs(npc.x - point.x), Math.abs(npc.z - point.z)) <= 5 &&
     map.isLineOfSight(level, npc.x, npc.z, point.x, point.z));
 }
@@ -68,13 +77,20 @@ function reachable(loc, point) {
   });
 }
 function fixture(row, locs, level, caught = false) {
-  for (const loc of locs) {
-    const point = approaches(loc).find(point => Boolean(catchers(row, point, loc.level).length) === caught && reachable(loc, point));
-    if (!point) continue;
-    const p = player();
-    p.x = point.x; p.z = point.z; p.level = loc.level;
-    p.setLevel(PlayerStat.THIEVING, level);
-    return { p, loc, xp: p.stats[PlayerStat.THIEVING] };
+  // Guards genuinely wander. Advance native NPC turns rather than removing or moving a catcher.
+  for (let turn = 0; turn <= 100; turn++) {
+    for (const loc of locs) {
+      const point = approaches(loc).find(point => Boolean(catchers(row, point, loc.level).length) === caught && reachable(loc, point));
+      if (!point) continue;
+      const p = player();
+      p.x = point.x; p.z = point.z; p.level = loc.level;
+      p.setLevel(PlayerStat.THIEVING, level);
+      p.setVar(id('VarPlayerType', 'viking'), 10); // Seed: prerequisite quest, not written by theft.
+      return { p, loc, xp: p.stats[PlayerStat.THIEVING] };
+    }
+    World.currentTick++;
+    World.processNpcs();
+    World.processZones();
   }
   assert.fail(`${row.debugname} has an original reachable ${caught ? 'observed' : 'unobserved'} interaction side`);
 }
@@ -104,20 +120,21 @@ function expectedReward(seed, loot) {
   JavaRandom.setSeed(seed);
   let remaining = loot.reduce((sum, [, weight]) => sum + weight, 0);
   for (let index = loot.length - 1; index >= 0; index--) {
-    JavaRandom.nextIntBound(1); // The published selector first draws the fixed quantity.
-    if (JavaRandom.nextIntBound(remaining) < loot[index][1]) return index;
+    JavaRandom.nextDouble(); // The published selector first draws the fixed quantity.
+    const roll = Math.floor(JavaRandom.nextDouble() * remaining);
     remaining -= loot[index][1];
+    if (roll >= remaining) return index;
   }
   assert.fail('complete loot table has no empty outcome');
 }
 let cases = 0;
 function test(name, action) { action(); cases++; console.log(`PASS ${name}`); }
-for (const [kind, key, level, xp, ticks, loot, bit] of published) {
+for (const [kind, key, level, xp, ticks, loot, bit, empty = 'market'] of profiles) {
   const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
   assert(row, `missing compiled ${kind} row`);
   const original = id('LocType', key), locs = placements.filter(loc => loc.type === original);
   assert(locs.length, `${key} has original packed map placements`);
-  test(`${key}: published table, XP, timer and complete loot`, () => {
+  test(`${key}: source/published table, XP, timer and complete loot`, () => {
     assert.deepEqual(row.getValue(0, 0), [original]);
     assert.deepEqual(row.getValue(3, 0), [level]);
     assert.deepEqual(row.getValue(4, 0), [xp]);
@@ -150,9 +167,9 @@ for (const [kind, key, level, xp, ticks, loot, bit] of published) {
     assert.equal(produced.length, 1);
     assert.equal(produced[0][1], 1);
     assert(loot.some(([name]) => id('ObjType', name) === produced[0][0]));
-    assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), 1 << bit);
+    assert.equal(p.getVar(id('VarPlayerType', 'thieving_stall_timer')), bit ? 1 << bit : 0);
     assert.equal(loc.lifecycleTick, duration);
-    restore(loc, 'market', original);
+    restore(loc, empty, original);
   });
   test(`${key}: below-level native attempt has no reward, XP or depletion`, () => {
     const { p, loc, xp: before } = fixture(row, locs, level - 1);

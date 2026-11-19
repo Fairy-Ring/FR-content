@@ -1,0 +1,53 @@
+// CANDIDATE kinds: period town rows and matching 377 goods models.
+// Level, XP and loot identities: Tip.It, 27 April 2006. Weights/timers reuse the published kind.
+[stealing_viking_fur_stall]
+table=stealing
+data=loc,viking_fur_market
+data=owner,viking_fur_monger
+data=guard,viking_guard
+data=level,35
+data=experience,360
+data=respawn_ticks,32
+data=loot,grey_wolf_fur,1,1,128,a piece of fur
+data=loot_total,128
+data=stall,fur stall
+data=stall,some fur
+data=empty,viking_market
+
+[stealing_dwarf_gem_stall]
+table=stealing
+data=loc,dwarf_market_gems
+data=owner,dwarf_city_shop_gems
+data=guard,dwarf_city_black_guard1
+data=guard,dwarf_city_black_guard2
+data=guard,dwarf_city_black_guard3
+data=guard,dwarf_city_black_guard4
+data=level,75
+// VERIFIED: 16 XP in both April 2006 guides; the tenfold increase is dated 29 May 2014.
+data=experience,160
+data=respawn_ticks,600
+data=loot,uncut_sapphire,1,1,105,an uncut sapphire
+data=loot,uncut_emerald,1,1,17,an uncut emerald
+data=loot,uncut_ruby,1,1,5,an uncut ruby
+data=loot,uncut_diamond,1,1,1,an uncut diamond
+data=loot_total,128
+data=stall,gem stall
+data=stall,a gem
+data=empty,dwarf_market_empty_stall
+
+[stealing_dwarf_silver_stall]
+table=stealing
+data=loc,dwarf_market_silver
+data=owner,dwarf_city_shop_silver
+data=guard,dwarf_city_black_guard1
+data=guard,dwarf_city_black_guard2
+data=guard,dwarf_city_black_guard3
+data=guard,dwarf_city_black_guard4
+data=level,50
+data=experience,540
+data=respawn_ticks,100
+data=loot,silver_ore,1,1,128,some silver
+data=loot_total,128
+data=stall,silver stall
+data=stall,some silver
+data=empty,dwarf_market_empty_stall

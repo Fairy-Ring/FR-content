@@ -92,6 +92,7 @@ switch_loc (loc_type) {
 }
 ~stealing_check_for_reward($data);
 stat_advance(thieving, $experience);
+~regional_stall_stolen;
 // Temp note: dur does not need updated
 def_loc $empty = db_getfield($data, stealing:empty, 0);
 if ($empty = null) {
