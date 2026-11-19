@@ -13,6 +13,7 @@ const ScriptState = await load('engine/script/ScriptState.ts');
 const ScriptProvider = await load('engine/script/ScriptProvider.ts');
 const OpLoc = await load('network/game/client/model/OpLoc.ts');
 const OpLocHandler = await load('network/game/client/handler/OpLocHandler.ts');
+const JavaRandom = await load('util/JavaRandom.ts');
 const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
 const map = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
 const types = {};
@@ -149,14 +150,9 @@ for (const spec of expected.built) {
   p.messages.length = 0;
   p.setVar(actionDelay, World.currentTick);
   const xp = p.stats[PlayerStat.MINING];
-  const originalRandom = Math.random;
-  try {
-    // Fixture roll: no gem, successful ordinary ore roll. Production RNG code is unchanged.
-    Math.random = () => 0.01;
-    execute(p, loc, 1, `[oploc1,_${spec.category}]`);
-  } finally {
-    Math.random = originalRandom;
-  }
+  // Fixture seed 3 gives native non-gem roll 187 and ore roll 18. Production RNG is unchanged.
+  JavaRandom.setSeed(3);
+  execute(p, loc, 1, `[oploc1,_${spec.category}]`);
   assert.equal(p.invTotal(inv, id('ObjType', ore.output)), 1, `${spec.name}: native ore reward`);
   assert.equal(p.stats[PlayerStat.MINING] - xp, ore.xp, `${spec.name}: unchanged ore XP`);
   assert.equal(loc.type, empty, `${spec.name}: native depletion changes visible form`);
