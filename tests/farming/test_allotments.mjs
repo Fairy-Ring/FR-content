@@ -64,7 +64,7 @@ const healthySeed = (() => {
 })();
 function advance(p, value, steps = 1, draw = 127) {
   JavaRandom.setSeed(draw === 127 && steps > 1 ? healthySeed : draws.get(draw));
-  return proc(p, 'farming_allotment_advance', value, steps, proc(p, 'farming_allotment_crop', value).popInt()).popInt();
+  return proc(p, 'farming_allotment_advance', value, steps, proc(p, 'farming_allotment_crop', value).popInt(), 0).popInt();
 }
 let cases = 0, failed = 0;
 function test(name, run) {

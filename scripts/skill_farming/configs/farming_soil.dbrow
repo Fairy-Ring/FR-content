@@ -1,0 +1,20 @@
+// VERIFIED period Tip.It: applying compost gives 18 XP, supercompost 26 XP.
+// CANDIDATE Old School: disease risks are divided by two/five, rounded down;
+// compost adds one harvest life and supercompost adds two. See Farming facts.
+[farming_soil_none]
+table=farming_soil
+data=experience,0
+data=disease_divisor,1
+data=lives,0
+
+[farming_soil_compost]
+table=farming_soil
+data=experience,180
+data=disease_divisor,2
+data=lives,1
+
+[farming_soil_supercompost]
+table=farming_soil
+data=experience,260
+data=disease_divisor,5
+data=lives,2

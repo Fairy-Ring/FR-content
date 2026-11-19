@@ -9,6 +9,7 @@ switch_loc (loc_type) {
 }
 
 [proc,farming_flower_set_stage](int $stage)
+if ($stage = ^farming_veg_weeded & ~farming_flower_crop(~farming_flower_stage) ! null) ~farming_soil_clear(~farming_soil_index);
 switch_loc (loc_type) {
     case farming_flower_patch_1 : %farming_flower_varp_0_7 = $stage;
     case farming_flower_patch_2 : %farming_flower_varp_8_15 = $stage;

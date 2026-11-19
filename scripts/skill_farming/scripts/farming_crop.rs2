@@ -1,6 +1,6 @@
 // CANDIDATE Old School crop care. Families translate cache bytes at their
 // boundary; only this helper owns the disease/watering state walk.
-[proc,farming_crop_advance](int $stage, int $steps, int $first, int $mature, boolean $waterable)(int)
+[proc,farming_crop_advance](int $stage, int $steps, int $first, int $mature, boolean $waterable, int $treatment)(int)
 // Finite lifetime, including disease on the final growing stage.
 $steps = min($steps, add(sub($mature, $first), 1));
 while ($steps > 0) {
@@ -16,6 +16,7 @@ while ($steps > 0) {
     if ($stage = $first) {
         $stage = add($stage, 1);
     } else {
+        if ($treatment ! 0) $chance = ~farming_soil_disease($chance, $treatment);
         if (random(^farming_disease_denominator) < $chance) {
             $stage = add($stage, ^farming_diseased_offset);
         } else {

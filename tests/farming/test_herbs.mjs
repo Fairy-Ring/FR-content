@@ -230,33 +230,33 @@ try {
     const herb = herbs[0];
     for (const draw of [0, 19]) {
       JavaRandom.setSeed(draws128.get(draw));
-      assert.equal(proc(probe, 'farming_herb_advance', herb.first + 1, 1).popInt(), herb.diseased);
+      assert.equal(proc(probe, 'farming_herb_advance', herb.first + 1, 1, 0).popInt(), herb.diseased);
     }
     for (const draw of [20, 127]) {
       JavaRandom.setSeed(draws128.get(draw));
-      assert.equal(proc(probe, 'farming_herb_advance', herb.first + 1, 1).popInt(), herb.first + 2);
+      assert.equal(proc(probe, 'farming_herb_advance', herb.first + 1, 1, 0).popInt(), herb.first + 2);
     }
     JavaRandom.setSeed(draws128.get(0));
-    assert.equal(proc(probe, 'farming_herb_advance', herb.first, 1).popInt(), herb.first + 1,
+    assert.equal(proc(probe, 'farming_herb_advance', herb.first, 1, 0).popInt(), herb.first + 1,
       'the seed stage advances without a disease roll');
-    assert.equal(proc(probe, 'farming_herb_advance', herb.mature, 1000).popInt(), herb.mature,
+    assert.equal(proc(probe, 'farming_herb_advance', herb.mature, 1000, 0).popInt(), herb.mature,
       'mature herbs stop advancing');
 
     for (const crop of herbs) {
       for (let offset = 0; offset < 3; offset++) {
         JavaRandom.setSeed(draws128.get(0));
-        assert.equal(proc(probe, 'farming_herb_advance', crop.first + 1 + offset, 1).popInt(), crop.diseased + offset,
+        assert.equal(proc(probe, 'farming_herb_advance', crop.first + 1 + offset, 1, 0).popInt(), crop.diseased + offset,
           `${crop.name} growth maps to compressed disease byte ${crop.diseased + offset}`);
         JavaRandom.setSeed(draws128.get(127));
-        assert.equal(proc(probe, 'farming_herb_advance', crop.diseased + offset, 1).popInt(), 170 + offset,
+        assert.equal(proc(probe, 'farming_herb_advance', crop.diseased + offset, 1, 0).popInt(), 170 + offset,
           `${crop.name} disease advances to shared dead byte ${170 + offset}`);
       }
       JavaRandom.setSeed(draws128.get(0));
-      assert.equal(proc(probe, 'farming_herb_advance', crop.first, 1).popInt(), crop.first + 1);
-      assert.equal(proc(probe, 'farming_herb_advance', crop.mature, 1000).popInt(), crop.mature);
+      assert.equal(proc(probe, 'farming_herb_advance', crop.first, 1, 0).popInt(), crop.first + 1);
+      assert.equal(proc(probe, 'farming_herb_advance', crop.mature, 1000, 0).popInt(), crop.mature);
       for (let offset = 1; offset <= 3; offset++) {
         JavaRandom.setSeed(draws128.get(127));
-        assert.equal(proc(probe, 'farming_herb_advance', crop.first + offset, 1).popInt(), crop.first + offset + 1,
+        assert.equal(proc(probe, 'farming_herb_advance', crop.first + offset, 1, 0).popInt(), crop.first + offset + 1,
           `${crop.name} healthy growing stage ${offset} advances without crossing its band`);
       }
     }
@@ -419,10 +419,10 @@ try {
     const p = player();
     for (const herb of herbs) {
       JavaRandom.setSeed(draws128.get(0));
-      assert.equal(proc(p, 'farming_herb_advance', herb.first + 3, 1000000).popInt(), 172,
+      assert.equal(proc(p, 'farming_herb_advance', herb.first + 3, 1000000, 0).popInt(), 172,
         `${herb.name} last growing stage can disease and die during long catch-up`);
       for (let life = herb.mature; life <= herb.last; life++) {
-        assert.equal(proc(p, 'farming_herb_advance', life, 1000000).popInt(), life,
+        assert.equal(proc(p, 'farming_herb_advance', life, 1000000, 0).popInt(), life,
           `${herb.name} catch-up never consumes a harvest life`);
       }
     }

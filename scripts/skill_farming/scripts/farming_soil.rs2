@@ -1,0 +1,63 @@
+// UNKNOWN engineering mapping: original fields, not reconstructed 377 ownership.
+// The enum is the single patch-to-field table. No new client varbit is needed.
+[proc,farming_soil_index]()(int)
+return(enum(loc, int, farming_soil_patch, loc_type));
+
+[proc,farming_soil_treatment](int $index)(int)
+def_int $bit = multiply($index, 2);
+if ($index < 16) return(getbit_range(%varp513_bits, $bit, add($bit, 1)));
+$bit = sub($bit, 8);
+return(getbit_range(%varp516_bits, $bit, add($bit, 1)));
+
+[proc,farming_soil_set_treatment](int $index, int $treatment)
+if (~farming_soil_treatment($index) = $treatment) return;
+def_int $bit = multiply($index, 2);
+if ($index < 16) {
+    %varp513_bits = setbit_range_toint(%varp513_bits, $treatment, $bit, add($bit, 1));
+} else {
+    $bit = sub($bit, 8);
+    %varp516_bits = setbit_range_toint(%varp516_bits, $treatment, $bit, add($bit, 1));
+}
+
+[proc,farming_soil_extra](int $index)(int)
+// Flowers have their existing fixed yield, not harvest lives.
+if ($index >= 12 & $index < 16) return(0);
+if ($index >= 16) $index = sub($index, 4);
+def_int $bit = multiply($index, 2);
+return(getbit_range(%farming_soil_lives, $bit, add($bit, 1)));
+
+[proc,farming_soil_set_extra](int $index, int $lives)
+if (~farming_soil_extra($index) = $lives) return;
+if ($index >= 16) $index = sub($index, 4);
+def_int $bit = multiply($index, 2);
+%farming_soil_lives = setbit_range_toint(%farming_soil_lives, $lives, $bit, add($bit, 1));
+
+// Direct rows preserve the shared growth loop's db_findnext cursor.
+[proc,farming_soil_row](int $treatment)(dbrow)
+switch_int ($treatment) {
+    case 1 : return(farming_soil_compost);
+    case 2 : return(farming_soil_supercompost);
+    case default : return(farming_soil_none);
+}
+
+[proc,farming_soil_disease](int $chance, int $treatment)(int)
+return(divide($chance, db_getfield(~farming_soil_row($treatment), farming_soil:disease_divisor, 0)));
+
+// Initialize once at the growing-to-harvestable boundary, including catch-up.
+[proc,farming_soil_mature](int $index, int $before, int $after, int $mature)
+if ($before = $after | $after ! $mature) return;
+def_int $treatment = ~farming_soil_treatment($index);
+if ($treatment = 0) return;
+~farming_soil_set_extra($index, db_getfield(~farming_soil_row($treatment), farming_soil:lives, 0));
+
+// UNKNOWN storage order: spend added lives before the cache's base lives.
+// The same life-loss roll is preserved; treatment identity remains until empty.
+[proc,farming_soil_consume](int $index)(boolean)
+def_int $extra = ~farming_soil_extra($index);
+if ($extra = 0) return(false);
+~farming_soil_set_extra($index, sub($extra, 1));
+return(true);
+
+[proc,farming_soil_clear](int $index)
+~farming_soil_set_treatment($index, 0);
+~farming_soil_set_extra($index, 0);

@@ -23,6 +23,7 @@ switch_loc (loc_type) {
 [proc,farming_veg_set_stage](int $stage)
 // CANDIDATE one payment covers one planting, ending when the patch is cleared.
 if ($stage = ^farming_veg_weeded) ~farming_protection_clear(~farming_protection_loc_bit);
+if ($stage = ^farming_veg_weeded & ~farming_allotment_crop(~farming_veg_stage) ! null) ~farming_soil_clear(~farming_soil_index);
 switch_loc (loc_type) {
     case farming_veg_patch_1 : %farming_allotment_varp_1_0_7 = $stage;
     case farming_veg_patch_2 : %farming_allotment_varp_1_8_15 = $stage;
@@ -252,9 +253,11 @@ anim(picking_low, 0);
 inv_add(inv, potato, 1);
 // VERIFIED period Tip.It harvest XP.
 stat_advance(farming, ^farming_potato_harvest_xp);
-$stage = add($stage, 1);
-if ($stage > ^farming_potato_harvest_last) $stage = ^farming_veg_weeded;
-~farming_veg_set_stage($stage);
+if (~farming_soil_consume(~farming_soil_index) = false) {
+    $stage = add($stage, 1);
+    if ($stage > ^farming_potato_harvest_last) $stage = ^farming_veg_weeded;
+    ~farming_veg_set_stage($stage);
+}
 %action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
 if ($stage >= ^farming_potato_fullygrown) p_oploc(3);
 mes("You harvest a potato from the allotment.");

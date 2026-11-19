@@ -1,0 +1,4 @@
+[farming_soil]
+column=experience,int
+column=disease_divisor,int
+column=lives,int

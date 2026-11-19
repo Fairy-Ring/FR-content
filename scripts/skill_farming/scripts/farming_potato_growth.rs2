@@ -3,9 +3,9 @@
 // including offline. Cache bands preserve the stage across watering and cure.
 
 
-[proc,farming_potato_advance](int $stage, int $steps)(int)
+[proc,farming_potato_advance](int $stage, int $steps, int $treatment)(int)
 // Preserve the inherited potato catch-up cap and its compiled contract.
-return(~farming_allotment_advance($stage, min($steps, sub(^farming_potato_fullygrown, ^farming_potato_seed)), farming_allotment_potato));
+return(~farming_allotment_advance($stage, min($steps, sub(^farming_potato_fullygrown, ^farming_potato_seed)), farming_allotment_potato, $treatment));
 
 [proc,farming_potato_advance_word](int $word, int $steps, int $flowerbit)(int)
 def_int $bit = 0;
@@ -17,14 +17,18 @@ while ($bit < 32) {
     def_int $flower = getbit_range(%farming_flower_varp, $flowerstart, add($flowerstart, 7));
     def_int $stage;
     def_int $watchbit = add(divide($flowerbit, 4), divide($bit, 8));
+    def_int $treatment = ~farming_soil_treatment($watchbit);
     if ($crop ! null & (~farming_protection_watched($watchbit) = true | ~farming_flower_protects($flower, $before) = true)) {
         def_int $protectedsteps = $steps;
         if ($crop = farming_allotment_potato) $protectedsteps = min($steps, sub(^farming_potato_fullygrown, ^farming_potato_seed));
         $stage = ~farming_flower_advance_protected($before, $protectedsteps, $crop);
     } else if (modulo($before, ^farming_watered_offset) >= ^farming_potato_seed & modulo($before, ^farming_watered_offset) <= ^farming_potato_harvest_last) {
-        $stage = ~farming_potato_advance($before, $steps);
+        $stage = ~farming_potato_advance($before, $steps, $treatment);
     } else {
-        $stage = ~farming_allotment_advance($before, $steps, $crop);
+        $stage = ~farming_allotment_advance($before, $steps, $crop, $treatment);
+    }
+    if ($crop ! null & $treatment ! 0) {
+        ~farming_soil_mature($watchbit, $before, $stage, db_getfield($crop, farming_allotment:mature, 0));
     }
     $word = setbit_range_toint($word, $stage, $bit, $end);
     $bit = add($bit, 8);

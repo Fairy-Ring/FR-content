@@ -13,11 +13,11 @@ return(null);
 
 // CANDIDATE Old School: seed/mature immunity, disease consumes a cycle,
 // untreated disease dies next cycle, water expires after one cycle.
-[proc,farming_allotment_advance](int $stage, int $steps, dbrow $crop)(int)
+[proc,farming_allotment_advance](int $stage, int $steps, dbrow $crop, int $treatment)(int)
 if ($crop = null) return($stage);
 def_int $first = db_getfield($crop, farming_allotment:first, 0);
 def_int $mature = db_getfield($crop, farming_allotment:mature, 0);
-return(~farming_crop_advance($stage, $steps, $first, $mature, true));
+return(~farming_crop_advance($stage, $steps, $first, $mature, true, $treatment));
 
 [proc,farming_allotment_seed](obj $seed)(dbrow)
 switch_obj ($seed) {
@@ -67,12 +67,14 @@ inv_add(inv, db_getfield($crop, farming_allotment:produce, 0), 1);
 // VERIFIED period Tip.It per-item harvest XP.
 stat_advance(farming, db_getfield($crop, farming_allotment:harvest_xp, 0));
 if (random(^farming_harvest_denominator) < ~farming_allotment_life_loss) {
-    if ($stage < $last) {
-        $stage = add($stage, 1);
-    } else {
-        $stage = ^farming_veg_weeded;
+    if (~farming_soil_consume(~farming_soil_index) = false) {
+        if ($stage < $last) {
+            $stage = add($stage, 1);
+        } else {
+            $stage = ^farming_veg_weeded;
+        }
+        ~farming_veg_set_stage($stage);
     }
-    ~farming_veg_set_stage($stage);
 }
 %action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
 if ($stage >= $mature) p_oploc(3);
