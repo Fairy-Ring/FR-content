@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { World, Runner, Scripts, State, PlayerStat, JavaRandom, types, id, inv, player, proc, count, click, load } from '../farming/runtime.mjs';
+import { World, Runner, Scripts, State, PlayerStat, JavaRandom, types, id, inv, player, proc, run, count, click, load } from '../farming/runtime.mjs';
 
 const map = await load('engine/GameMap.ts');
 const { NpcMode } = await load('engine/entity/NpcMode.ts');
@@ -387,8 +387,9 @@ const lockouts = [
   ['fur', 'fur', 4, 1000], ['silver', 'silver', 5, 1000], ['spice', 'spice', 6, 600],
   ['gem', 'gem', 7, 1000], ['viking_fur', 'vikingfur', 8, 1000], ['viking_fish', 'vikingfish', 9, 1500]
 ];
+const stallQueues = p => [...p.queue.all()].filter(entry => entry.script.name.startsWith('[queue,stolen_from_stall_'));
 for (const [kind, queueName, bit, timer] of lockouts) {
-  test(`${kind}: native theft save/load restores the complete lockout and native expiry clears it`, () => {
+  test(`${kind}: an online autosave reloads through full login and native expiry clears the restored lockout`, () => {
     const [, key, level, , , , , empty = 'market'] = profiles.find(([name]) => name === kind);
     const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
     const original = id('LocType', key);
@@ -412,8 +413,8 @@ for (const [kind, queueName, bit, timer] of lockouts) {
     assert.equal(joined.getVar(id('VarPlayerType', 'thieving_stall_timer')), 1 << bit);
     assert.deepEqual(snapshot(joined), snapshot(p));
     assert.equal([...joined.queue.all()].length, 0, 'the save contains permanent state, not an old live queue');
-    proc(joined, 'thieving_stall_timers_login');
-    const restored = [...joined.queue.all()];
+    run(joined, '[login,_]');
+    const restored = stallQueues(joined);
     assert.equal(restored.length, 1);
     assert.equal(restored[0].script.name, initial[0].script.name);
     assert.equal(restored[0].type, PlayerQueueType.LONG);
@@ -427,9 +428,41 @@ for (const [kind, queueName, bit, timer] of lockouts) {
     World.currentTick++;
     joined.processQueues();
     assert.equal(joined.getVar(id('VarPlayerType', 'thieving_stall_timer')), 0);
-    assert.equal([...joined.queue.all()].length, 0);
+    assert.equal(stallQueues(joined).length, 0);
   });
 }
+test('an online autosave with both regional bits restarts both timers through full login and expires them independently', () => {
+  let p;
+  for (const kind of ['viking_fur', 'viking_fish']) {
+    const [, key, level, , , , , empty] = profiles.find(([name]) => name === kind);
+    const row = types.DbRowType.getByName(`stealing_${kind}_stall`);
+    const original = id('LocType', key);
+    const next = fixture(row, placements.filter(loc => loc.type === original), level);
+    if (!p) p = next.p;
+    else { p.x = next.p.x; p.z = next.p.z; p.level = next.p.level; }
+    p.setLevel(PlayerStat.THIEVING, 99);
+    World.currentTick = Math.max(World.currentTick + 1, p.delayedUntil);
+    execute(p, next.loc);
+    restore(next.loc, empty, original);
+  }
+  const mask = id('VarPlayerType', 'thieving_stall_timer');
+  assert.equal(p.getVar(mask), (1 << 8) | (1 << 9), 'both bits come from actual native thefts, not a seed');
+  const joined = player(p.save());
+  assert.equal(joined.getVar(mask), (1 << 8) | (1 << 9));
+  assert.equal([...joined.queue.all()].length, 0);
+  run(joined, '[login,_]');
+  assert.deepEqual(stallQueues(joined).map(entry => [entry.script.name, entry.delay]), [
+    ['[queue,stolen_from_stall_vikingfur]', 1000],
+    ['[queue,stolen_from_stall_vikingfish]', 1500]
+  ]);
+  for (let turn = 1; turn <= 1501; turn++) {
+    World.currentTick++;
+    joined.processQueues();
+    const expected = turn <= 1000 ? (1 << 8) | (1 << 9) : turn <= 1500 ? 1 << 9 : 0;
+    assert.equal(joined.getVar(mask), expected, `independent expiry after native queue turn ${turn}`);
+  }
+  assert.equal(stallQueues(joined).length, 0);
+});
 test('a save without a stall lockout gains no regional state or queue at login', () => {
   const original = player();
   const joined = player(original.save());
