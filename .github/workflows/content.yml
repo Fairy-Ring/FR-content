@@ -227,6 +227,7 @@ jobs:
           run_test tests/misc-services/test_misc_services.mjs node --import tsx ../content/tests/misc-services/test_misc_services.mjs
           run_test tests/wilderness-shops/test_wilderness_shops.mjs node --import tsx ../content/tests/wilderness-shops/test_wilderness_shops.mjs
           run_test tests/beta-bankers/test_bankers.mjs node --import tsx ../content/tests/beta-bankers/test_bankers.mjs
+          run_test tests/bank-booths/test_bank_booths.mjs node --import tsx ../content/tests/bank-booths/test_bank_booths.mjs
           run_test 'tests/tai-bwo-cleanup/test_cleanup.mjs + tests/tai-bwo-cleanup/test_fence.mjs' node --import tsx --test --test-concurrency=1 ../content/tests/tai-bwo-cleanup/test_cleanup.mjs ../content/tests/tai-bwo-cleanup/test_fence.mjs
           run_test tests/regicide-travel/test_regicide_travel.mjs node --import tsx ../content/tests/regicide-travel/test_regicide_travel.mjs
           run_test tests/dwarven-transport/test_dwarven_transport.mjs node --import tsx ../content/tests/dwarven-transport/test_dwarven_transport.mjs

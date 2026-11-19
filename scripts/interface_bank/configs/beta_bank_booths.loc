@@ -1,0 +1,28 @@
+// Original 377 client fields are unchanged; category is server-only.
+[bank_booth]
+name=Bank booth
+desc=The bank teller will serve you from here.
+model=fever_bankbooth
+op1=Use
+op2=Use-quickly
+blockrange=no
+category=bank_booth
+
+[elid_bankbooth]
+name=Bank booth
+desc=The bank teller will serve you from here.
+model=ahoy_bankbooth
+recol1s=10598
+recol1d=13605
+recol2s=8484
+recol2d=12548
+recol3s=6370
+recol3d=10434
+recol4s=3235
+recol4d=8320
+op1=Use
+op2=Use-quickly
+blockrange=no
+ambient=30
+category=bank_booth
+
