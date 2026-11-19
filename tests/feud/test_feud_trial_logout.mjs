@@ -211,7 +211,9 @@ for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of dist
         assertHint(p, target);
         const deadline = target.getVar(deadlineVar);
         assert.equal(deadline, World.currentTick + distractionTicks);
-        while (World.currentTick + 1 < deadline) {
+        // Logout is completed by the next native turn, before the expiry timer.
+        const inputTick = deadline - (exit === 'window-logout' ? 2 : 1);
+        while (World.currentTick < inputTick) {
           assertHeld();
           worldTick();
         }
@@ -229,9 +231,10 @@ for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of dist
           assert.equal(World.currentTick, target.getVar(deadlineVar));
           assertHeld();
           operate(p, target, 3);
+          assert.equal(target.sayMessage, "You won't get my purse.",
+            'inspect the native overhead before the same turn broadcasts and clears it');
+          assert.equal(hp - p.levels[PlayerStat.HITPOINTS], 2);
         });
-        assert.equal(target.sayMessage, "You won't get my purse.");
-        assert.equal(hp - p.levels[PlayerStat.HITPOINTS], 2);
         assert.deepEqual(trialResult(p), beforeExit);
       } else if (exit === 'expiry') {
         worldTick();
@@ -249,6 +252,13 @@ for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of dist
         assert(button(p, 'logout:try_logout'), 'the real logout-tab action is accepted');
         assert(p.requestLogout);
         assert.deepEqual(trialResult(p), beforeExit);
+        if (exit === 'window-logout') {
+          const deadline = target.getVar(deadlineVar);
+          worldTick();
+          assert.equal(World.currentTick, deadline - 1, 'production logout runs before ordinary expiry');
+          assert(![...World.playerLoop.all()].includes(p), 'production logout removes the old session');
+          assert.deepEqual(trialResult(p), beforeExit);
+        }
       } else {
         // Independent orphan timer path, with no content logout hook.
         p.clearInteraction(); p.unlink(); p.isActive = false;
@@ -362,7 +372,7 @@ test('the distraction window starts only after the final native Continue, howeve
   assert.equal(hints(p).length, 0, 'the reserved page does not show an active-distraction cue');
   for (let held = 0; held <= distractionTicks * 2; held++) {
     assert.equal(target.getVar(stateVar), 1, 'the pending reservation survives every paused turn');
-    assert.equal(target.getVar(ownerVar), p.uid);
+    assert.equal(target.getVar(ownerVar) >>> 0, p.uid);
     assert.equal(target.getVar(deadlineVar), 0, 'a paused page has no active theft deadline');
     assert.equal(target.timerInterval, 1, 'one existing native timer owns cleanup');
     assert.equal([...target.queue.all()].length, 0, 'holding the page never appends a callback');
