@@ -124,8 +124,9 @@ switch_int ($ordinal) {
     case 5 : %soulbane_confu_door5pres = 1;
 }
 ~soulbane_clear_room_npcs;
+// CANDIDATE transcript: "Killing the last confusion beast each time", game message.
+mes("Those other monsters were just hallucinations!");
 if ($ordinal = ^soulbane_confusion_real_kills) {
-    mes("Those other monsters were just hallucinations!");
     queue(soulbane_confusion_complete, 0, 0);
     return;
 }

@@ -270,6 +270,9 @@ function assertRoomMusicObservation(p, observed, label) {
   const expectedTracks = observed.mode === 1 ? [observed.song.track] : [];
   assert.deepEqual(musicTracksSince(p, observed.mark), expectedTracks,
     `${label}: compiled entry obeys ${observed.mode === 1 ? 'Auto' : 'Manual'} music mode`);
+  assertRoomMusicState(p, observed, label);
+}
+function assertRoomMusicState(p, observed, label) {
   assert.equal(readVar(p, 'currentsong'),
     observed.mode === 1 ? observed.song.track : observed.previousTrack,
   `${label}: current song follows the mode without changing Manual playback`);
@@ -3296,6 +3299,8 @@ function testConfusionIllusion(p, fake) {
   assertConfusionNativeGates(p, real, 'real Confusion beast');
   assertConfusionNativeGates(p, fake, 'Confusion illusion', true);
   const creditsBefore = confusionKillCount(p), messageMark = p.messages.length;
+  const hallucinationMessages = () => p.messages.slice(messageMark)
+    .filter(text => text === 'Those other monsters were just hallucinations!');
   const visibleHits = [];
   const disappearanceMessages = () => p.messages.slice(messageMark)
     .filter(text => text === 'Does this creature really exist?' || text === "That monster wasn't even real!");
@@ -3383,6 +3388,8 @@ function testConfusionIllusion(p, fake) {
     assert.equal(disappearanceMessages().length, 1, 'later native processing cannot repeat its message');
     assert.deepEqual(xpSnapshot(p), xpAfterEight, 'the removal interval awards no further combat XP');
     assert.equal(confusionKillCount(p), creditsBefore, 'delayed removal still earns no real-kill credit');
+    assert.equal(hallucinationMessages().length, 0,
+      'an illusion vanishing never emits the real-kill hallucination message');
   } finally {
     World.removeNpc = removeNpc;
   }
@@ -3392,6 +3399,7 @@ function killConfusionReal(p, npc, ordinal) {
     `real Confusion kill ${ordinal} targets the only genuine creature`);
   assert.equal(npc.vars[NPC_OWNER] >>> 0, p.uid, `real Confusion kill ${ordinal} remains owner-bound`);
   assert.equal(npc.vars[NPC_INSTANCE], instanceUid(p), `real Confusion kill ${ordinal} remains copy-bound`);
+  const messageMark = p.messages.length;
   let hits = 0;
   while (npc.isActive && npc.levels[HP_STAT] > 0) {
     assert(hits < 48, `real Confusion kill ${ordinal} can finish the 28-HP beast`);
@@ -3407,6 +3415,8 @@ function killConfusionReal(p, npc, ordinal) {
   assertConfusionKillFlags(p, ordinal, `real Confusion kill ${ordinal}`);
   for (let tick = 0; tick < 16; tick++) worldTick();
   assert.equal(confusionKillCount(p), ordinal, `real Confusion kill ${ordinal} cannot duplicate after queues settle`);
+  assert.equal(p.messages.slice(messageMark).filter(text => text === 'Those other monsters were just hallucinations!').length, 1,
+    `real Confusion kill ${ordinal} emits the sourced game message exactly once`);
   if (ordinal < questConstant('soulbane_confusion_real_kills')) {
     let actors = confusionNpcsFor(p);
     for (let tick = 0; tick < 32 && actors.length !== 5; tick++) {
@@ -4253,9 +4263,11 @@ function enterTolnaFinalRoom(p, label, checkGeometry = true) {
   const oldUid = instanceUid(p);
   const passage = tolnaPassageLoc(p);
   goToStand(p, passage, `${label}: walk to the original forward hole`);
+  const music = beginRoomMusicObservation(p, RAGE_SONG, readVar(p, 'musicplay'), label);
   const entered = operateLoc(p, passage, 1, [], `${label}: native forward-hole passage`);
   assert.equal(entered.trigger.name, '[oploc1,soul_bane_hwall_void_exit]',
     `${label}: the compiled original forward-hole handler starts Tolna`);
+  assertRoomMusicState(p, music, `${label}: first Tolna arena entry`);
   assert.equal(stage(p), TOLNA_INTRO_STAGE, `${label}: passage begins the stage-10 intro boundary`);
   assert.notEqual(instanceUid(p), oldUid, `${label}: final room owns a new private instance`);
   assert.equal(World.instances.findInstanceByUid(oldUid - 1), null,
@@ -4518,6 +4530,8 @@ function leaveTolnaCopy(p, label, choices = []) {
   const oldUid = instanceUid(p);
   const exit = tolnaFinalExitLoc(p);
   goToStand(p, exit, `${label}: walk to the original final-room Exit`);
+  writeVar(p, 'musicplay', 1);
+  const previousSong = readVar(p, 'currentsong');
   const result = operateLoc(p, exit, 1, choices, `${label}: native final-room exit`);
   assert.equal(result.trigger.name, '[oploc1,soul_bane_tolna_void_small]',
     `${label}: final-room departure uses the original packed Exit`);
@@ -4526,6 +4540,14 @@ function leaveTolnaCopy(p, label, choices = []) {
     `${label}: native departure deletes the entire private copy`);
   assert.equal(remainingNpcsWithInstance(oldUid).length, 0,
     `${label}: native departure removes live, queued and inert instance actors`);
+  assert.equal(readVar(p, 'currentsong'), previousSong,
+    `${label}: arena exit leaves music selection to the ordinary mapzone phase`);
+  const unlocks = musicUnlockSnapshot(p);
+  worldTick();
+  const song = musicRegionSongAt(p.level, p.x, p.z);
+  assert.equal(readVar(p, 'currentsong'), song.track,
+    `${label}: ordinary surface mapzone restores its published region song`);
+  assertMusicUnlockTransition(p, unlocks, song, `${label}: ordinary surface music`);
   return oldUid;
 }
 function testTolnaCompletionProgression(p, label = 'native Tolna completion progression') {
@@ -4706,14 +4728,17 @@ function testTolnaCompletionCase() {
   cleanupTolnaFixturePlayer(completed, label);
 }
 
-function enterTolnaByRift(p, label) {
+function enterTolnaByRift(p, label, musicMode = 1) {
   assert.equal(instanceUid(p), 0, `${label}: an ordinary surface account has no active copy`);
   const rift = riftLoc();
   goToStand(p, rift, `${label}: walk to the original rift`);
+  const music = beginRoomMusicObservation(p, RAGE_SONG, musicMode, label,
+    { previousTrack: MANUAL_PREVIOUS_SONG.track });
   const entered = operateLoc(p, rift, 1, [], `${label}: native rift re-entry`);
   assert.match(entered.trigger.name, /^\[oploc1,soulbane_falloff2_rope(?:_multi)?\]$/,
     `${label}: rift admission uses the original Climb-down loc`);
   assert.notEqual(instanceUid(p), 0, `${label}: native rift admission creates the private copy`);
+  assertRoomMusicState(p, music, `${label}: stage-${stage(p)} Tolna arena re-entry`);
   return entered;
 }
 function killTolnaHeadByMelee(p, heads, head, label) {
@@ -4991,6 +5016,26 @@ function testTolnaIncompleteLifecycle() {
     leaveTolnaCopy(p, `${label} fresh instance cleanup`, [1]);
     cleanupTolnaFixturePlayer(p, label);
   }
+}
+
+function testTolnaArenaMusic() {
+  assert.equal(musicRegionSongAt(1, 46 << 6, 81 << 6).track, RAGE_SONG.track,
+    'Tolna music matches the published source-square musicregion row');
+  for (const initialStage of [TOLNA_INTRO_STAGE, TOLNA_ACTIVE_STAGE, TOLNA_CLEAR_STAGE]) {
+    for (const mode of [1, 0]) {
+      const label = `Tolna stage-${initialStage} ${mode === 1 ? 'Auto' : 'Manual'} music`;
+      // Disclosed saved-entry boundary only; this is not a progression proof.
+      const p = playerFixture();
+      writeVar(p, 'soulbane_prog', initialStage);
+      writeVar(p, 'soulbane_riftrope_pres', 1);
+      seedFearCombatFixture(p, label);
+      enterTolnaByRift(p, label, mode);
+      if (initialStage === TOLNA_INTRO_STAGE) tolnaIntroPages(p, label);
+      leaveTolnaCopy(p, `${label} surface restoration`, initialStage === TOLNA_CLEAR_STAGE ? [] : [1]);
+      cleanupTolnaFixturePlayer(p, label);
+    }
+  }
+  console.log('PASS Tolna arena native music state: source-square track, stages 10/11/12, Auto/Manual, surface restoration');
 }
 
 function testPrivateCopyAccess() {
@@ -5493,6 +5538,7 @@ function run() {
     ['tolna-progression', testTolnaCompletionCase],
     ['tolna-shared-poison', testTolnaSharedPoison],
     ['tolna-lifecycle', testTolnaIncompleteLifecycle],
+    ['tolna-music', testTolnaArenaMusic],
     ['hope-bridge', () => {
       const p = laterRoomFixture(HOPE_STAGE, 'disclosed Hope bridge native-combat fixture');
       let mark = null;
@@ -5554,6 +5600,7 @@ function run() {
   testTolnaCompletionCase();
   testTolnaSharedPoison();
   testTolnaIncompleteLifecycle();
+  testTolnaArenaMusic();
   console.log('PASS Soulbane compiled regression: Rage, Fear, Confusion, Hope and Tolna progression; native combat, food and poison; Launa/journal boundary reports; 64-west bridge; saved boundaries, lifecycle and escape routes');
   console.log(JSON.stringify({ stageTwoColor: main.stageTwoColor, stageThreeColor: main.stageThreeColor, attackXp: main.reward }));
 }

@@ -460,7 +460,7 @@ head2=npc_harlow_head
 moverestrict=nomove
 wanderrange=^soulbane_encounter_wander
 
-// Original head blocks, including their existing server base stats, unchanged.
+// Original client head fields retained; magic=1 and ranged=1 added from r15392739.
 // CANDIDATE r15392739 profile; UNKNOWN stand, native range and art bindings.
 [soulbane_final_tolna1]
 name=Tolna
