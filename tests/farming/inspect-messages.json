@@ -32,13 +32,13 @@
         "farming_veg_patch_8"
       ],
       "messages": {
-        "weeds": "This is an allotment. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is an allotment. The soil has not been treated. The patch is empty.",
-        "growing": "This is an allotment. The soil has not been treated. The patch has something growing in it.",
-        "mature": "This is an allotment. The soil has not been treated. The patch is fully grown.",
-        "watered": "This is an allotment. The soil has not been treated. The patch has something growing in it.",
-        "diseased": "This is an allotment. The soil has not been treated.",
-        "dead": "This is an allotment. The soil has not been treated."
+        "weeds": ["This is an allotment.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is an allotment.","The soil has not been treated.","The patch is empty."],
+        "growing": ["This is an allotment.","The soil has not been treated.","The patch has something growing in it."],
+        "mature": ["This is an allotment.","The soil has not been treated.","The patch is fully grown."],
+        "watered": ["This is an allotment.","The soil has not been treated.","The patch has something growing in it."],
+        "diseased": ["This is an allotment.","The soil has not been treated."],
+        "dead": ["This is an allotment.","The soil has not been treated."]
       },
       "states": [
         {
@@ -239,15 +239,15 @@
       ],
       "owner": "N031-unreachable-mature-dead",
       "messages": {
-        "weeds": "This is a flower patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a flower patch. The soil has not been treated. The patch is empty.",
-        "growing": "This is a flower patch. The soil has not been treated. The patch has something growing in it.",
-        "mature": "This is a flower patch. The soil has not been treated. The patch is fully grown.",
-        "scarecrowWeeds": "This is a flower patch. The soil has not been treated. The patch needs weeding.",
-        "scarecrowEmpty": "This is a flower patch. The soil has not been treated. The patch is empty.",
-        "watered": "This is a flower patch. The soil has not been treated. The patch has something growing in it.",
-        "diseased": "This is a flower patch. The soil has not been treated.",
-        "dead": "This is a flower patch. The soil has not been treated."
+        "weeds": ["This is a flower patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a flower patch.","The soil has not been treated.","The patch is empty."],
+        "growing": ["This is a flower patch.","The soil has not been treated.","The patch has something growing in it."],
+        "mature": ["This is a flower patch.","The soil has not been treated.","The patch is fully grown."],
+        "scarecrowWeeds": ["This is a flower patch.","The soil has not been treated.","The patch needs weeding."],
+        "scarecrowEmpty": ["This is a flower patch.","The soil has not been treated.","The patch is empty."],
+        "watered": ["This is a flower patch.","The soil has not been treated.","The patch has something growing in it."],
+        "diseased": ["This is a flower patch.","The soil has not been treated."],
+        "dead": ["This is a flower patch.","The soil has not been treated."]
       },
       "states": [
         {
@@ -408,12 +408,12 @@
       ],
       "owner": "N034-goutweed",
       "messages": {
-        "weeds": "This is a herb patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a herb patch. The soil has not been treated. The patch is empty.",
-        "growing": "This is a herb patch. The soil has not been treated. The patch has something growing in it.",
-        "mature": "This is a herb patch. The soil has not been treated. The patch is fully grown.",
-        "diseased": "This is a herb patch. The soil has not been treated.",
-        "dead": "This is a herb patch. The soil has not been treated."
+        "weeds": ["This is a herb patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a herb patch.","The soil has not been treated.","The patch is empty."],
+        "growing": ["This is a herb patch.","The soil has not been treated.","The patch has something growing in it."],
+        "mature": ["This is a herb patch.","The soil has not been treated.","The patch is fully grown."],
+        "diseased": ["This is a herb patch.","The soil has not been treated."],
+        "dead": ["This is a herb patch.","The soil has not been treated."]
       },
       "states": [
         {
@@ -588,13 +588,13 @@
         "farming_hops_patch_4"
       ],
       "messages": {
-        "weeds": "This is a hops patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a hops patch. The soil has not been treated. The patch is empty.",
-        "growing": "This is a hops patch. The soil has not been treated. The patch has something growing in it.",
-        "mature": "This is a hops patch. The soil has not been treated. The patch is fully grown.",
-        "watered": "This is a hops patch. The soil has not been treated. The patch has something growing in it.",
-        "diseased": "This is a hops patch. The soil has not been treated.",
-        "dead": "This is a hops patch. The soil has not been treated."
+        "weeds": ["This is a hops patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a hops patch.","The soil has not been treated.","The patch is empty."],
+        "growing": ["This is a hops patch.","The soil has not been treated.","The patch has something growing in it."],
+        "mature": ["This is a hops patch.","The soil has not been treated.","The patch is fully grown."],
+        "watered": ["This is a hops patch.","The soil has not been treated.","The patch has something growing in it."],
+        "diseased": ["This is a hops patch.","The soil has not been treated."],
+        "dead": ["This is a hops patch.","The soil has not been treated."]
       },
       "states": [
         {
@@ -795,8 +795,8 @@
       ],
       "owner": "N026",
       "messages": {
-        "weeds": "This is a bush patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a bush patch. The soil has not been treated. The patch is empty."
+        "weeds": ["This is a bush patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a bush patch.","The soil has not been treated.","The patch is empty."]
       },
       "states": [
         {
@@ -822,8 +822,8 @@
       ],
       "owner": "N044",
       "messages": {
-        "weeds": "This is a tree patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a tree patch. The soil has not been treated. The patch is empty."
+        "weeds": ["This is a tree patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a tree patch.","The soil has not been treated.","The patch is empty."]
       },
       "states": [
         {
@@ -849,8 +849,8 @@
       ],
       "owner": "N032",
       "messages": {
-        "weeds": "This is a fruit tree patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a fruit tree patch. The soil has not been treated. The patch is empty."
+        "weeds": ["This is a fruit tree patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a fruit tree patch.","The soil has not been treated.","The patch is empty."]
       },
       "states": [
         {
@@ -873,8 +873,8 @@
       ],
       "owner": "N027",
       "messages": {
-        "weeds": "This is a cactus patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a cactus patch. The soil has not been treated. The patch is empty."
+        "weeds": ["This is a cactus patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a cactus patch.","The soil has not been treated.","The patch is empty."]
       },
       "states": [
         {
@@ -897,8 +897,8 @@
       ],
       "owner": "N025",
       "messages": {
-        "weeds": "This is a belladonna patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a belladonna patch. The soil has not been treated. The patch is empty."
+        "weeds": ["This is a belladonna patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a belladonna patch.","The soil has not been treated.","The patch is empty."]
       },
       "states": [
         {
@@ -921,8 +921,8 @@
       ],
       "owner": "N038",
       "messages": {
-        "weeds": "This is a mushroom patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a mushroom patch. The soil has not been treated. The patch is empty."
+        "weeds": ["This is a mushroom patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a mushroom patch.","The soil has not been treated.","The patch is empty."]
       },
       "states": [
         {
@@ -945,8 +945,8 @@
       ],
       "owner": "N028",
       "messages": {
-        "weeds": "This is a calquat patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a calquat patch. The soil has not been treated. The patch is empty."
+        "weeds": ["This is a calquat patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a calquat patch.","The soil has not been treated.","The patch is empty."]
       },
       "states": [
         {
@@ -971,8 +971,8 @@
       ],
       "owner": "N043",
       "messages": {
-        "weeds": "This is a spirit tree patch. The soil has not been treated. The patch needs weeding.",
-        "empty": "This is a spirit tree patch. The soil has not been treated. The patch is empty."
+        "weeds": ["This is a spirit tree patch.","The soil has not been treated.","The patch needs weeding."],
+        "empty": ["This is a spirit tree patch.","The soil has not been treated.","The patch is empty."]
       },
       "states": [
         {
@@ -1004,28 +1004,36 @@
       "state": 0,
       "kind": "weeds",
       "messages": [
-        "This is an allotment. The soil has not been treated. The patch needs weeding."
+        "This is an allotment.",
+        "The soil has not been treated.",
+        "The patch needs weeding."
       ]
     },
     {
       "state": 3,
       "kind": "empty",
       "messages": [
-        "This is an allotment. The soil has not been treated. The patch is empty."
+        "This is an allotment.",
+        "The soil has not been treated.",
+        "The patch is empty."
       ]
     },
     {
       "state": 6,
       "kind": "growing",
       "messages": [
-        "This is an allotment. The soil has not been treated. The patch has something growing in it."
+        "This is an allotment.",
+        "The soil has not been treated.",
+        "The patch has something growing in it."
       ]
     },
     {
       "state": 10,
       "kind": "mature",
       "messages": [
-        "This is an allotment. The soil has not been treated. The patch is fully grown."
+        "This is an allotment.",
+        "The soil has not been treated.",
+        "The patch is fully grown."
       ]
     }
   ],

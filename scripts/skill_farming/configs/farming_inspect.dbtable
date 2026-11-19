@@ -1,4 +1,5 @@
 [farming_inspect]
 // UNKNOWN engineering lookup: family * 256 + unchanged native selector.
+// Static sentences use non-family keys; family keys start at 256.
 column=state,int,LIST,INDEXED,REQUIRED
 column=line,string,REQUIRED

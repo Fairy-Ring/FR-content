@@ -10,6 +10,7 @@ data=patch,farming_veg_patch_6
 data=patch,farming_veg_patch_7
 data=patch,farming_veg_patch_8
 data=family,1
+data=line,"This is an allotment."
 
 [farming_inspect_patch_flower]
 table=farming_inspect_patch
@@ -18,6 +19,7 @@ data=patch,farming_flower_patch_2
 data=patch,farming_flower_patch_3
 data=patch,farming_flower_patch_4
 data=family,2
+data=line,"This is a flower patch."
 
 [farming_inspect_patch_herb]
 table=farming_inspect_patch
@@ -26,6 +28,7 @@ data=patch,farming_herb_patch_2
 data=patch,farming_herb_patch_3
 data=patch,farming_herb_patch_4
 data=family,3
+data=line,"This is a herb patch."
 
 [farming_inspect_patch_hops]
 table=farming_inspect_patch
@@ -34,6 +37,7 @@ data=patch,farming_hops_patch_2
 data=patch,farming_hops_patch_3
 data=patch,farming_hops_patch_4
 data=family,4
+data=line,"This is a hops patch."
 
 [farming_inspect_patch_bush]
 table=farming_inspect_patch
@@ -42,6 +46,7 @@ data=patch,farming_bush_patch_2
 data=patch,farming_bush_patch_3
 data=patch,farming_bush_patch_4
 data=family,5
+data=line,"This is a bush patch."
 
 [farming_inspect_patch_tree]
 table=farming_inspect_patch
@@ -50,6 +55,7 @@ data=patch,farming_tree_patch_2
 data=patch,farming_tree_patch_3
 data=patch,farming_tree_patch_4
 data=family,6
+data=line,"This is a tree patch."
 
 [farming_inspect_patch_fruit_tree]
 table=farming_inspect_patch
@@ -58,26 +64,31 @@ data=patch,farming_fruit_tree_patch_2
 data=patch,farming_fruit_tree_patch_3
 data=patch,farming_fruit_tree_patch_4
 data=family,7
+data=line,"This is a fruit tree patch."
 
 [farming_inspect_patch_cactus]
 table=farming_inspect_patch
 data=patch,farming_cactus_patch
 data=family,8
+data=line,"This is a cactus patch."
 
 [farming_inspect_patch_belladonna]
 table=farming_inspect_patch
 data=patch,farming_belladonna_patch
 data=family,9
+data=line,"This is a belladonna patch."
 
 [farming_inspect_patch_mushroom]
 table=farming_inspect_patch
 data=patch,farming_mushroom_patch
 data=family,10
+data=line,"This is a mushroom patch."
 
 [farming_inspect_patch_calquat]
 table=farming_inspect_patch
 data=patch,farming_calquat_tree_patch
 data=family,11
+data=line,"This is a calquat patch."
 
 [farming_inspect_patch_spirit_tree]
 table=farming_inspect_patch
@@ -85,3 +96,4 @@ data=patch,farming_spirit_tree_patch_1
 data=patch,farming_spirit_tree_patch_2
 data=patch,farming_spirit_tree_patch_3
 data=family,12
+data=line,"This is a spirit tree patch."

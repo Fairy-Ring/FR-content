@@ -50,10 +50,37 @@ const confirmed = [
   'This is a cactus patch.', 'This is a belladonna patch.', 'This is a mushroom patch.',
   'This is a calquat patch.', 'This is a spirit tree patch.',
 ];
+
+// Read p12_full from this tree's built client/title, not retained metrics.
+// FontType applies the same edge-column/space advances as PixFont.
+// 377 draws type-0 text at x=4 and clips glyph columns at x >= 462.
+const font = types.FontType.get(1);
+assert(font?.charMaskWidth[65] > 0, 'the built p12_full font is loaded');
+const measuredMessages = new Map();
+function rightPixel(text) {
+  let x = 4, end = x;
+  for (const character of text) {
+    const code = character.charCodeAt(0);
+    assert(code < 256, 'Inspect text uses supported font characters');
+    if (character !== ' ') end = x + font.charOffsetX[code] + font.charMaskWidth[code];
+    x += font.charAdvance[code];
+  }
+  return end;
+}
+assert.equal(rightPixel('The patch has something growing in it.'), 216, 'reviewer metric calibration: growing sentence');
+assert.equal(rightPixel(expected.scarecrow), 316, 'reviewer metric calibration: scarecrow sentence');
+function assertFits(message) {
+  const end = rightPixel(message);
+  assert(end <= 462, `Inspect message fits the 377 chat line: end=${end}, limit=462: ${message}`);
+  measuredMessages.set(message, end);
+}
+for (const sentence of confirmed) assertFits(sentence);
 function assertConfirmed(messages) {
   for (const message of messages) {
     const sentences = message.match(/[^.!?]+[.!?]/g)?.map(line => line.trim()) ?? [];
     assert.equal(sentences.join(' '), message, 'no unparsed or placeholder text');
+    assert.equal(sentences.length, 1, 'exactly one sentence per game message');
+    assertFits(message);
     for (const sentence of sentences) assert(confirmed.includes(sentence), 'sentence is on independently confirmed allowlist: ' + sentence);
   }
 }
@@ -138,7 +165,7 @@ function snapshot() {
         const visible = types.LocType.get(visibleId);
         if (visible.op?.[1] !== 'Inspect') continue;
         const state = family.states.find(state => stage >= state.from && stage <= state.to);
-        const lines = state ? [family.messages[state.kind]] : null;
+        const lines = state ? family.messages[state.kind] : null;
         const script = Scripts.getByTrigger(Trigger.OPLOC2, visibleId, visible.category);
         if (!lines) {
           if (supportedVisible.has(visible.debugname)) continue; // Original alias to another family's normal empty form.
@@ -172,8 +199,7 @@ function snapshot() {
         assert.equal(p.delayed, false, 'Inspect adds no player delay');
         assert.equal(p.hasInteraction(), false, 'Inspect leaves no repeating action');
         assertConfirmed(p.messages);
-        const sentenceCount = p.messages[0].match(/[^.!?]+[.!?]/g)?.length;
-        assert.equal(sentenceCount, ['diseased', 'dead'].includes(state.kind) ? 2 : 3, 'unknown state wording is absent');
+        assert.equal(p.messages.length, ['diseased', 'dead'].includes(state.kind) ? 2 : 3, 'unknown state wording is absent');
         forms.add(visible.debugname);
         cases++;
       }
@@ -206,7 +232,7 @@ for (const [patchIndex, name] of expected.families[0].parents.entries()) {
       assert.equal(handler.handle(new OpLoc(2, loc.x, loc.z, root.id), p), true);
       p.processInteraction(); observeWrites = false;
       const protectedCrop = flower >= 33 && flower <= 36 && stage < 128 && stage % 64 >= 34 && stage % 64 < 40;
-      assert.deepEqual(p.messages, [expected.families[0].messages[kind], ...(protectedCrop ? [expected.scarecrow] : [])], name + '/' + stage + '/flower' + flower);
+      assert.deepEqual(p.messages, [...expected.families[0].messages[kind], ...(protectedCrop ? [expected.scarecrow] : [])], name + '/' + stage + '/flower' + flower);
       assertConfirmed(p.messages); assert.deepEqual(writes, []); assert.deepEqual(snapshot(), before);
       protectionCases++;
     }
@@ -224,6 +250,7 @@ for (const [, option, name] of bindings) {
   assert.equal(option, '2'); assert(forms.has(name), `${name}: no unrelated dispatch binding`);
 }
 console.log(`PASS Inspect: ${cases} native root/state cases, ${forms.size} visible forms, exact sourced message order and no state writes`);
+console.log(`PASS Inspect width: ${measuredMessages.size} sentences measured from built p12_full; max_end=${Math.max(...measuredMessages.values())}; limit=462`);
 for (const [owner, entries] of left) console.log(`LEFT ${owner}: ${entries.size} unplantable crop forms`);
 console.log('RESULT PASS Farming Inspect');
 process.exit(0);

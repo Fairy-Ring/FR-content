@@ -444,8 +444,16 @@ def_int $family = db_getfield($patch, farming_inspect_patch:family, 0);
 def_int $state = ~farming_inspect_state(loc_type);
 db_find(farming_inspect:state, calc($family * ^farming_inspect_state_stride + $state));
 def_dbrow $row = db_findnext;
-mes(db_getfield($row, farming_inspect:line, 0));
-// CANDIDATE quotation: protection is a separate paragraph/message.
+// UNKNOWN channel and grouping: Main's choice for the client line limit,
+// preserving the quotation's type, soil, state, then protection order.
+mes(db_getfield($patch, farming_inspect_patch:line, 0));
+// Compost application adds its soil reader at this one lookup.
+mes(db_getfield(farming_inspect_soil_untreated, farming_inspect:line, 0));
+def_string $state_line = db_getfield($row, farming_inspect:line, 0);
+if (string_length($state_line) > 0) {
+    mes($state_line);
+}
+// CANDIDATE scarecrow wording: the 2012 quotation alone, not the operator.
 // Read the same neighbouring-flower pairing used by published growth.
 // Only healthy growing sweetcorn is actually protected by a scarecrow.
 if ($family = 1 & $state < ^farming_diseased_offset) {
