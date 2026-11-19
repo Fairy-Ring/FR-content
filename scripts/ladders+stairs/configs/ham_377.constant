@@ -1,0 +1,13 @@
+// CANDIDATE: retained OSRS trapdoor chart, no failure-streak bonus (Mod Ash, 8 November 2025).
+^ordinary_ham_hand_low = 10
+^ordinary_ham_hand_high = 250
+^ordinary_ham_lockpick_low = 60
+^ordinary_ham_lockpick_high = 254
+// UNKNOWN engineering frequency for the sourced occasional 1 XP on a failed attempt.
+// The closest published picklock door uses an explicitly arbitrary 50% roll:
+// skill_thieving/scripts/doors/locked_door.rs2:160-163. This is not an authentic rate.
+^ordinary_ham_failure_xp_denominator = 2
+// UNKNOWN engineering arrivals: stand on the collision-checked approach of the original paired loc.
+// Period RuneHQ gives the entrance and destination hideout, not the exact standing tiles.
+^ordinary_ham_hideout_arrival = 0_49_150_12_53
+^ordinary_ham_surface_arrival = 0_49_50_29_52

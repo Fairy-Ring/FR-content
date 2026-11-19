@@ -1,0 +1,2195 @@
+[
+  {
+    "name": "elid_ladder_up",
+    "level": 0,
+    "x": 3403,
+    "z": 2927,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_53_45_11_47",
+    "direction": "up",
+    "start": [
+      0,
+      3403,
+      2926
+    ],
+    "destination": [
+      1,
+      3403,
+      2926
+    ],
+    "target": {
+      "name": "elid_laddertop",
+      "level": 1,
+      "x": 3403,
+      "z": 2927,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_53_45_11_47"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_ladder_up",
+    "level": 0,
+    "x": 3409,
+    "z": 2933,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_53_45_17_53",
+    "direction": "up",
+    "start": [
+      0,
+      3409,
+      2932
+    ],
+    "destination": [
+      1,
+      3409,
+      2932
+    ],
+    "target": {
+      "name": "elid_laddertop",
+      "level": 1,
+      "x": 3409,
+      "z": 2933,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_53_45_17_53"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_ladder_up",
+    "level": 0,
+    "x": 3416,
+    "z": 2905,
+    "shape": 10,
+    "angle": 3,
+    "coord": "0_53_45_24_25",
+    "direction": "up",
+    "start": [
+      0,
+      3417,
+      2905
+    ],
+    "destination": [
+      1,
+      3417,
+      2905
+    ],
+    "target": {
+      "name": "elid_laddertop",
+      "level": 1,
+      "x": 3416,
+      "z": 2905,
+      "shape": 10,
+      "angle": 3,
+      "coord": "1_53_45_24_25"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_ladder_up",
+    "level": 0,
+    "x": 3425,
+    "z": 2901,
+    "shape": 10,
+    "angle": 3,
+    "coord": "0_53_45_33_21",
+    "direction": "up",
+    "start": [
+      0,
+      3426,
+      2901
+    ],
+    "destination": [
+      1,
+      3426,
+      2901
+    ],
+    "target": {
+      "name": "elid_laddertop",
+      "level": 1,
+      "x": 3425,
+      "z": 2901,
+      "shape": 10,
+      "angle": 3,
+      "coord": "1_53_45_33_21"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_ladder_up",
+    "level": 0,
+    "x": 3429,
+    "z": 2906,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_53_45_37_26",
+    "direction": "up",
+    "start": [
+      0,
+      3429,
+      2905
+    ],
+    "destination": [
+      1,
+      3429,
+      2905
+    ],
+    "target": {
+      "name": "elid_laddertop",
+      "level": 1,
+      "x": 3429,
+      "z": 2906,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_53_45_37_26"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_ladder_up",
+    "level": 0,
+    "x": 3440,
+    "z": 2892,
+    "shape": 10,
+    "angle": 1,
+    "coord": "0_53_45_48_12",
+    "direction": "up",
+    "start": [
+      0,
+      3439,
+      2892
+    ],
+    "destination": [
+      1,
+      3439,
+      2892
+    ],
+    "target": {
+      "name": "elid_laddertop",
+      "level": 1,
+      "x": 3440,
+      "z": 2892,
+      "shape": 10,
+      "angle": 1,
+      "coord": "1_53_45_48_12"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_ladder_up",
+    "level": 0,
+    "x": 3449,
+    "z": 2899,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_53_45_57_19",
+    "direction": "up",
+    "start": [
+      0,
+      3449,
+      2898
+    ],
+    "destination": [
+      1,
+      3449,
+      2898
+    ],
+    "target": {
+      "name": "elid_laddertop",
+      "level": 1,
+      "x": 3449,
+      "z": 2899,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_53_45_57_19"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "fairy_ladder_wind_up",
+    "level": 0,
+    "x": 2403,
+    "z": 4458,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_37_69_35_42",
+    "direction": "up",
+    "start": [
+      0,
+      2403,
+      4457
+    ],
+    "destination": [
+      1,
+      2403,
+      4457
+    ],
+    "target": {
+      "name": "fairy_ladder_wind_down",
+      "level": 1,
+      "x": 2403,
+      "z": 4458,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_37_69_35_42"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11739",
+    "level": 0,
+    "x": 2946,
+    "z": 3363,
+    "shape": 10,
+    "angle": 1,
+    "coord": "0_46_52_2_35",
+    "direction": "up",
+    "start": [
+      0,
+      2947,
+      3363
+    ],
+    "destination": [
+      1,
+      2947,
+      3363
+    ],
+    "target": {
+      "name": "ladder_11741",
+      "level": 1,
+      "x": 2946,
+      "z": 3363,
+      "shape": 10,
+      "angle": 1,
+      "coord": "1_46_52_2_35"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11739",
+    "level": 0,
+    "x": 2946,
+    "z": 3378,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_46_52_2_50",
+    "direction": "up",
+    "start": [
+      0,
+      2946,
+      3379
+    ],
+    "destination": [
+      1,
+      2946,
+      3377
+    ],
+    "target": {
+      "name": "ladder_11741",
+      "level": 1,
+      "x": 2946,
+      "z": 3378,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_46_52_2_50"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11739",
+    "level": 0,
+    "x": 3027,
+    "z": 3353,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_47_52_19_25",
+    "direction": "up",
+    "start": [
+      0,
+      3027,
+      3354
+    ],
+    "destination": [
+      1,
+      3027,
+      3352
+    ],
+    "target": {
+      "name": "ladder_11741",
+      "level": 1,
+      "x": 3027,
+      "z": 3353,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_47_52_19_25"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11739",
+    "level": 0,
+    "x": 3035,
+    "z": 3344,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_47_52_27_16",
+    "direction": "up",
+    "start": [
+      0,
+      3035,
+      3345
+    ],
+    "destination": [
+      1,
+      3035,
+      3345
+    ],
+    "target": {
+      "name": "ladder_11742",
+      "level": 1,
+      "x": 3035,
+      "z": 3344,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_47_52_27_16"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11739",
+    "level": 1,
+    "x": 2954,
+    "z": 3390,
+    "shape": 10,
+    "angle": 1,
+    "coord": "1_46_52_10_62",
+    "direction": "up",
+    "start": [
+      1,
+      2955,
+      3390
+    ],
+    "destination": [
+      2,
+      2953,
+      3390
+    ],
+    "target": {
+      "name": "ladder_11741",
+      "level": 2,
+      "x": 2954,
+      "z": 3390,
+      "shape": 10,
+      "angle": 1,
+      "coord": "2_46_52_10_62"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11739",
+    "level": 1,
+    "x": 3050,
+    "z": 3355,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_47_52_42_27",
+    "direction": "up",
+    "start": [
+      1,
+      3050,
+      3356
+    ],
+    "destination": [
+      2,
+      3050,
+      3354
+    ],
+    "target": {
+      "name": "ladder_11741",
+      "level": 2,
+      "x": 3050,
+      "z": 3355,
+      "shape": 10,
+      "angle": 0,
+      "coord": "2_47_52_42_27"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11739",
+    "level": 2,
+    "x": 2954,
+    "z": 3389,
+    "shape": 10,
+    "angle": 2,
+    "coord": "2_46_52_10_61",
+    "direction": "up",
+    "start": [
+      2,
+      2954,
+      3388
+    ],
+    "destination": [
+      3,
+      2954,
+      3390
+    ],
+    "target": {
+      "name": "ladder_11741",
+      "level": 3,
+      "x": 2954,
+      "z": 3389,
+      "shape": 10,
+      "angle": 2,
+      "coord": "3_46_52_10_61"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11740",
+    "level": 0,
+    "x": 2954,
+    "z": 3389,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_46_52_10_61",
+    "direction": "up",
+    "start": [
+      0,
+      2954,
+      3390
+    ],
+    "destination": [
+      1,
+      2954,
+      3388
+    ],
+    "target": {
+      "name": "ladder_11741",
+      "level": 1,
+      "x": 2954,
+      "z": 3389,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_46_52_10_61"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "prison_ladder_up",
+    "level": 0,
+    "x": 2915,
+    "z": 3323,
+    "shape": 10,
+    "angle": 1,
+    "coord": "0_45_51_35_59",
+    "direction": "up",
+    "start": [
+      0,
+      2916,
+      3323
+    ],
+    "destination": [
+      1,
+      2916,
+      3323
+    ],
+    "target": {
+      "name": "prison_laddertop",
+      "level": 1,
+      "x": 2915,
+      "z": 3323,
+      "shape": 10,
+      "angle": 1,
+      "coord": "1_45_51_35_59"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "prison_ladder_up",
+    "level": 0,
+    "x": 2948,
+    "z": 3213,
+    "shape": 10,
+    "angle": 1,
+    "coord": "0_46_50_4_13",
+    "direction": "up",
+    "start": [
+      0,
+      2949,
+      3213
+    ],
+    "destination": [
+      1,
+      2949,
+      3213
+    ],
+    "target": {
+      "name": "prison_laddertop",
+      "level": 1,
+      "x": 2948,
+      "z": 3213,
+      "shape": 10,
+      "angle": 1,
+      "coord": "1_46_50_4_13"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "prison_ladder_up",
+    "level": 0,
+    "x": 3010,
+    "z": 3184,
+    "shape": 10,
+    "angle": 1,
+    "coord": "0_47_49_2_48",
+    "direction": "up",
+    "start": [
+      0,
+      3011,
+      3184
+    ],
+    "destination": [
+      1,
+      3011,
+      3184
+    ],
+    "target": {
+      "name": "prison_laddertop",
+      "level": 1,
+      "x": 3010,
+      "z": 3184,
+      "shape": 10,
+      "angle": 1,
+      "coord": "1_47_49_2_48"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "prison_ladder_up",
+    "level": 1,
+    "x": 3013,
+    "z": 3179,
+    "shape": 10,
+    "angle": 1,
+    "coord": "1_47_49_5_43",
+    "direction": "up",
+    "start": [
+      1,
+      3014,
+      3179
+    ],
+    "destination": [
+      2,
+      3014,
+      3179
+    ],
+    "target": {
+      "name": "prison_trapdoor",
+      "level": 2,
+      "x": 3013,
+      "z": 3179,
+      "shape": 10,
+      "angle": 3,
+      "coord": "2_47_49_5_43"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ship_ladder_no_approach",
+    "level": 0,
+    "x": 2682,
+    "z": 3267,
+    "shape": 10,
+    "angle": 1,
+    "coord": "0_41_51_58_3",
+    "direction": "up",
+    "start": [
+      0,
+      2681,
+      3267
+    ],
+    "destination": [
+      1,
+      2681,
+      3267
+    ],
+    "target": {
+      "name": "ship_laddertop_no_approach",
+      "level": 1,
+      "x": 2682,
+      "z": 3267,
+      "shape": 10,
+      "angle": 1,
+      "coord": "1_41_51_58_3"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ship_ladder_no_approach",
+    "level": 0,
+    "x": 2776,
+    "z": 3234,
+    "shape": 10,
+    "angle": 2,
+    "coord": "0_43_50_24_34",
+    "direction": "up",
+    "start": [
+      0,
+      2776,
+      3235
+    ],
+    "destination": [
+      1,
+      2775,
+      3234
+    ],
+    "target": {
+      "name": "ship_laddertop_no_approach",
+      "level": 1,
+      "x": 2776,
+      "z": 3234,
+      "shape": 10,
+      "angle": 2,
+      "coord": "1_43_50_24_34"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder",
+    "level": 0,
+    "x": 3022,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_47_56_14_41",
+    "direction": "up",
+    "start": [
+      0,
+      3022,
+      3626
+    ],
+    "destination": [
+      1,
+      3022,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 1,
+      "x": 3022,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_47_56_14_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder",
+    "level": 0,
+    "x": 3036,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_47_56_28_41",
+    "direction": "up",
+    "start": [
+      0,
+      3036,
+      3626
+    ],
+    "destination": [
+      1,
+      3036,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 1,
+      "x": 3036,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_47_56_28_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder",
+    "level": 0,
+    "x": 3036,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "0_47_56_28_54",
+    "direction": "up",
+    "start": [
+      0,
+      3036,
+      3637
+    ],
+    "destination": [
+      1,
+      3036,
+      3637
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 1,
+      "x": 3036,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "1_47_56_28_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 1,
+    "x": 3022,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_47_56_14_41",
+    "direction": "up",
+    "start": [
+      1,
+      3022,
+      3626
+    ],
+    "destination": [
+      2,
+      3022,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 2,
+      "x": 3022,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "2_47_56_14_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 1,
+    "x": 3022,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "1_47_56_14_54",
+    "direction": "up",
+    "start": [
+      1,
+      3022,
+      3637
+    ],
+    "destination": [
+      2,
+      3022,
+      3637
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 2,
+      "x": 3022,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "2_47_56_14_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 1,
+    "x": 3036,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_47_56_28_41",
+    "direction": "up",
+    "start": [
+      1,
+      3036,
+      3626
+    ],
+    "destination": [
+      2,
+      3036,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 2,
+      "x": 3036,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "2_47_56_28_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 1,
+    "x": 3036,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "1_47_56_28_54",
+    "direction": "up",
+    "start": [
+      1,
+      3036,
+      3637
+    ],
+    "destination": [
+      2,
+      3036,
+      3637
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 2,
+      "x": 3036,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "2_47_56_28_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 2,
+    "x": 3022,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "2_47_56_14_41",
+    "direction": "up",
+    "start": [
+      2,
+      3022,
+      3626
+    ],
+    "destination": [
+      3,
+      3022,
+      3626
+    ],
+    "target": {
+      "name": "wild_laddertop",
+      "level": 3,
+      "x": 3022,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "3_47_56_14_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 2,
+    "x": 3022,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "2_47_56_14_54",
+    "direction": "up",
+    "start": [
+      2,
+      3022,
+      3637
+    ],
+    "destination": [
+      3,
+      3022,
+      3637
+    ],
+    "target": {
+      "name": "wild_laddertop",
+      "level": 3,
+      "x": 3022,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "3_47_56_14_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 2,
+    "x": 3036,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "2_47_56_28_41",
+    "direction": "up",
+    "start": [
+      2,
+      3036,
+      3626
+    ],
+    "destination": [
+      3,
+      3036,
+      3626
+    ],
+    "target": {
+      "name": "wild_laddertop",
+      "level": 3,
+      "x": 3036,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "3_47_56_28_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 2,
+    "x": 3036,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "2_47_56_28_54",
+    "direction": "up",
+    "start": [
+      2,
+      3036,
+      3637
+    ],
+    "destination": [
+      3,
+      3036,
+      3637
+    ],
+    "target": {
+      "name": "wild_laddertop",
+      "level": 3,
+      "x": 3036,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "3_47_56_28_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_laddertop",
+    "level": 1,
+    "x": 3403,
+    "z": 2927,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_53_45_11_47",
+    "direction": "down",
+    "start": [
+      1,
+      3403,
+      2926
+    ],
+    "destination": [
+      0,
+      3403,
+      2926
+    ],
+    "target": {
+      "name": "elid_ladder_up",
+      "level": 0,
+      "x": 3403,
+      "z": 2927,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_53_45_11_47"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_laddertop",
+    "level": 1,
+    "x": 3409,
+    "z": 2933,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_53_45_17_53",
+    "direction": "down",
+    "start": [
+      1,
+      3409,
+      2932
+    ],
+    "destination": [
+      0,
+      3409,
+      2932
+    ],
+    "target": {
+      "name": "elid_ladder_up",
+      "level": 0,
+      "x": 3409,
+      "z": 2933,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_53_45_17_53"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_laddertop",
+    "level": 1,
+    "x": 3416,
+    "z": 2905,
+    "shape": 10,
+    "angle": 3,
+    "coord": "1_53_45_24_25",
+    "direction": "down",
+    "start": [
+      1,
+      3417,
+      2905
+    ],
+    "destination": [
+      0,
+      3417,
+      2905
+    ],
+    "target": {
+      "name": "elid_ladder_up",
+      "level": 0,
+      "x": 3416,
+      "z": 2905,
+      "shape": 10,
+      "angle": 3,
+      "coord": "0_53_45_24_25"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_laddertop",
+    "level": 1,
+    "x": 3425,
+    "z": 2901,
+    "shape": 10,
+    "angle": 3,
+    "coord": "1_53_45_33_21",
+    "direction": "down",
+    "start": [
+      1,
+      3426,
+      2901
+    ],
+    "destination": [
+      0,
+      3426,
+      2901
+    ],
+    "target": {
+      "name": "elid_ladder_up",
+      "level": 0,
+      "x": 3425,
+      "z": 2901,
+      "shape": 10,
+      "angle": 3,
+      "coord": "0_53_45_33_21"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_laddertop",
+    "level": 1,
+    "x": 3429,
+    "z": 2906,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_53_45_37_26",
+    "direction": "down",
+    "start": [
+      1,
+      3429,
+      2905
+    ],
+    "destination": [
+      0,
+      3429,
+      2905
+    ],
+    "target": {
+      "name": "elid_ladder_up",
+      "level": 0,
+      "x": 3429,
+      "z": 2906,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_53_45_37_26"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_laddertop",
+    "level": 1,
+    "x": 3440,
+    "z": 2892,
+    "shape": 10,
+    "angle": 1,
+    "coord": "1_53_45_48_12",
+    "direction": "down",
+    "start": [
+      1,
+      3439,
+      2892
+    ],
+    "destination": [
+      0,
+      3439,
+      2892
+    ],
+    "target": {
+      "name": "elid_ladder_up",
+      "level": 0,
+      "x": 3440,
+      "z": 2892,
+      "shape": 10,
+      "angle": 1,
+      "coord": "0_53_45_48_12"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "elid_laddertop",
+    "level": 1,
+    "x": 3449,
+    "z": 2899,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_53_45_57_19",
+    "direction": "down",
+    "start": [
+      1,
+      3449,
+      2898
+    ],
+    "destination": [
+      0,
+      3449,
+      2898
+    ],
+    "target": {
+      "name": "elid_ladder_up",
+      "level": 0,
+      "x": 3449,
+      "z": 2899,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_53_45_57_19"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "fairy_ladder_wind_down",
+    "level": 1,
+    "x": 2403,
+    "z": 4458,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_37_69_35_42",
+    "direction": "down",
+    "start": [
+      1,
+      2403,
+      4457
+    ],
+    "destination": [
+      0,
+      2403,
+      4457
+    ],
+    "target": {
+      "name": "fairy_ladder_wind_up",
+      "level": 0,
+      "x": 2403,
+      "z": 4458,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_37_69_35_42"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11741",
+    "level": 1,
+    "x": 2946,
+    "z": 3363,
+    "shape": 10,
+    "angle": 1,
+    "coord": "1_46_52_2_35",
+    "direction": "down",
+    "start": [
+      1,
+      2947,
+      3363
+    ],
+    "destination": [
+      0,
+      2947,
+      3363
+    ],
+    "target": {
+      "name": "ladder_11739",
+      "level": 0,
+      "x": 2946,
+      "z": 3363,
+      "shape": 10,
+      "angle": 1,
+      "coord": "0_46_52_2_35"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11741",
+    "level": 1,
+    "x": 2946,
+    "z": 3378,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_46_52_2_50",
+    "direction": "down",
+    "start": [
+      1,
+      2946,
+      3377
+    ],
+    "destination": [
+      0,
+      2946,
+      3379
+    ],
+    "target": {
+      "name": "ladder_11739",
+      "level": 0,
+      "x": 2946,
+      "z": 3378,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_46_52_2_50"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11741",
+    "level": 1,
+    "x": 2954,
+    "z": 3389,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_46_52_10_61",
+    "direction": "down",
+    "start": [
+      1,
+      2954,
+      3388
+    ],
+    "destination": [
+      0,
+      2954,
+      3390
+    ],
+    "target": {
+      "name": "ladder_11740",
+      "level": 0,
+      "x": 2954,
+      "z": 3389,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_46_52_10_61"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11741",
+    "level": 1,
+    "x": 3027,
+    "z": 3353,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_47_52_19_25",
+    "direction": "down",
+    "start": [
+      1,
+      3027,
+      3352
+    ],
+    "destination": [
+      0,
+      3027,
+      3354
+    ],
+    "target": {
+      "name": "ladder_11739",
+      "level": 0,
+      "x": 3027,
+      "z": 3353,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_47_52_19_25"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11741",
+    "level": 2,
+    "x": 2954,
+    "z": 3390,
+    "shape": 10,
+    "angle": 1,
+    "coord": "2_46_52_10_62",
+    "direction": "down",
+    "start": [
+      2,
+      2953,
+      3390
+    ],
+    "destination": [
+      1,
+      2955,
+      3390
+    ],
+    "target": {
+      "name": "ladder_11739",
+      "level": 1,
+      "x": 2954,
+      "z": 3390,
+      "shape": 10,
+      "angle": 1,
+      "coord": "1_46_52_10_62"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11741",
+    "level": 2,
+    "x": 3050,
+    "z": 3355,
+    "shape": 10,
+    "angle": 0,
+    "coord": "2_47_52_42_27",
+    "direction": "down",
+    "start": [
+      2,
+      3050,
+      3354
+    ],
+    "destination": [
+      1,
+      3050,
+      3356
+    ],
+    "target": {
+      "name": "ladder_11739",
+      "level": 1,
+      "x": 3050,
+      "z": 3355,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_47_52_42_27"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11741",
+    "level": 3,
+    "x": 2954,
+    "z": 3389,
+    "shape": 10,
+    "angle": 2,
+    "coord": "3_46_52_10_61",
+    "direction": "down",
+    "start": [
+      3,
+      2954,
+      3390
+    ],
+    "destination": [
+      2,
+      2954,
+      3388
+    ],
+    "target": {
+      "name": "ladder_11739",
+      "level": 2,
+      "x": 2954,
+      "z": 3389,
+      "shape": 10,
+      "angle": 2,
+      "coord": "2_46_52_10_61"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ladder_11742",
+    "level": 1,
+    "x": 3035,
+    "z": 3344,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_47_52_27_16",
+    "direction": "down",
+    "start": [
+      1,
+      3035,
+      3345
+    ],
+    "destination": [
+      0,
+      3035,
+      3345
+    ],
+    "target": {
+      "name": "ladder_11739",
+      "level": 0,
+      "x": 3035,
+      "z": 3344,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_47_52_27_16"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "prison_laddertop",
+    "level": 1,
+    "x": 2915,
+    "z": 3323,
+    "shape": 10,
+    "angle": 1,
+    "coord": "1_45_51_35_59",
+    "direction": "down",
+    "start": [
+      1,
+      2916,
+      3323
+    ],
+    "destination": [
+      0,
+      2916,
+      3323
+    ],
+    "target": {
+      "name": "prison_ladder_up",
+      "level": 0,
+      "x": 2915,
+      "z": 3323,
+      "shape": 10,
+      "angle": 1,
+      "coord": "0_45_51_35_59"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "prison_laddertop",
+    "level": 1,
+    "x": 2948,
+    "z": 3213,
+    "shape": 10,
+    "angle": 1,
+    "coord": "1_46_50_4_13",
+    "direction": "down",
+    "start": [
+      1,
+      2949,
+      3213
+    ],
+    "destination": [
+      0,
+      2949,
+      3213
+    ],
+    "target": {
+      "name": "prison_ladder_up",
+      "level": 0,
+      "x": 2948,
+      "z": 3213,
+      "shape": 10,
+      "angle": 1,
+      "coord": "0_46_50_4_13"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "prison_laddertop",
+    "level": 1,
+    "x": 3010,
+    "z": 3184,
+    "shape": 10,
+    "angle": 1,
+    "coord": "1_47_49_2_48",
+    "direction": "down",
+    "start": [
+      1,
+      3011,
+      3184
+    ],
+    "destination": [
+      0,
+      3011,
+      3184
+    ],
+    "target": {
+      "name": "prison_ladder_up",
+      "level": 0,
+      "x": 3010,
+      "z": 3184,
+      "shape": 10,
+      "angle": 1,
+      "coord": "0_47_49_2_48"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "prison_trapdoor",
+    "level": 2,
+    "x": 3013,
+    "z": 3179,
+    "shape": 10,
+    "angle": 3,
+    "coord": "2_47_49_5_43",
+    "direction": "down",
+    "start": [
+      2,
+      3014,
+      3179
+    ],
+    "destination": [
+      1,
+      3014,
+      3179
+    ],
+    "target": {
+      "name": "prison_ladder_up",
+      "level": 1,
+      "x": 3013,
+      "z": 3179,
+      "shape": 10,
+      "angle": 1,
+      "coord": "1_47_49_5_43"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ship_laddertop_no_approach",
+    "level": 1,
+    "x": 2682,
+    "z": 3267,
+    "shape": 10,
+    "angle": 1,
+    "coord": "1_41_51_58_3",
+    "direction": "down",
+    "start": [
+      1,
+      2681,
+      3267
+    ],
+    "destination": [
+      0,
+      2681,
+      3267
+    ],
+    "target": {
+      "name": "ship_ladder_no_approach",
+      "level": 0,
+      "x": 2682,
+      "z": 3267,
+      "shape": 10,
+      "angle": 1,
+      "coord": "0_41_51_58_3"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "ship_laddertop_no_approach",
+    "level": 1,
+    "x": 2776,
+    "z": 3234,
+    "shape": 10,
+    "angle": 2,
+    "coord": "1_43_50_24_34",
+    "direction": "down",
+    "start": [
+      1,
+      2775,
+      3234
+    ],
+    "destination": [
+      0,
+      2776,
+      3235
+    ],
+    "target": {
+      "name": "ship_ladder_no_approach",
+      "level": 0,
+      "x": 2776,
+      "z": 3234,
+      "shape": 10,
+      "angle": 2,
+      "coord": "0_43_50_24_34"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 1,
+    "x": 3022,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_47_56_14_41",
+    "direction": "down",
+    "start": [
+      1,
+      3022,
+      3626
+    ],
+    "destination": [
+      0,
+      3022,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder",
+      "level": 0,
+      "x": 3022,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_47_56_14_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 1,
+    "x": 3022,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "1_47_56_14_54",
+    "direction": "down",
+    "start": [
+      1,
+      3022,
+      3637
+    ],
+    "destination": [
+      0,
+      3022,
+      3637
+    ],
+    "target": null,
+    "label": "UNKNOWN",
+    "basis": "Facing-relative landing relation of the three mapped fortress bases: angle 0 -> z+1; angle 2 -> z-1. No ground ladder at this corner; walk to another corner to ascend."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 1,
+    "x": 3036,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "1_47_56_28_41",
+    "direction": "down",
+    "start": [
+      1,
+      3036,
+      3626
+    ],
+    "destination": [
+      0,
+      3036,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder",
+      "level": 0,
+      "x": 3036,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_47_56_28_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 1,
+    "x": 3036,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "1_47_56_28_54",
+    "direction": "down",
+    "start": [
+      1,
+      3036,
+      3637
+    ],
+    "destination": [
+      0,
+      3036,
+      3637
+    ],
+    "target": {
+      "name": "wild_ladder",
+      "level": 0,
+      "x": 3036,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "0_47_56_28_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 2,
+    "x": 3022,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "2_47_56_14_41",
+    "direction": "down",
+    "start": [
+      2,
+      3022,
+      3626
+    ],
+    "destination": [
+      1,
+      3022,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 1,
+      "x": 3022,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_47_56_14_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 2,
+    "x": 3022,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "2_47_56_14_54",
+    "direction": "down",
+    "start": [
+      2,
+      3022,
+      3637
+    ],
+    "destination": [
+      1,
+      3022,
+      3637
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 1,
+      "x": 3022,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "1_47_56_14_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 2,
+    "x": 3036,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "2_47_56_28_41",
+    "direction": "down",
+    "start": [
+      2,
+      3036,
+      3626
+    ],
+    "destination": [
+      1,
+      3036,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 1,
+      "x": 3036,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "1_47_56_28_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_ladder_middle",
+    "level": 2,
+    "x": 3036,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "2_47_56_28_54",
+    "direction": "down",
+    "start": [
+      2,
+      3036,
+      3637
+    ],
+    "destination": [
+      1,
+      3036,
+      3637
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 1,
+      "x": 3036,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "1_47_56_28_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_laddertop",
+    "level": 3,
+    "x": 3022,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "3_47_56_14_41",
+    "direction": "down",
+    "start": [
+      3,
+      3022,
+      3626
+    ],
+    "destination": [
+      2,
+      3022,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 2,
+      "x": 3022,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "2_47_56_14_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_laddertop",
+    "level": 3,
+    "x": 3022,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "3_47_56_14_54",
+    "direction": "down",
+    "start": [
+      3,
+      3022,
+      3637
+    ],
+    "destination": [
+      2,
+      3022,
+      3637
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 2,
+      "x": 3022,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "2_47_56_14_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_laddertop",
+    "level": 3,
+    "x": 3036,
+    "z": 3625,
+    "shape": 10,
+    "angle": 0,
+    "coord": "3_47_56_28_41",
+    "direction": "down",
+    "start": [
+      3,
+      3036,
+      3626
+    ],
+    "destination": [
+      2,
+      3036,
+      3626
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 2,
+      "x": 3036,
+      "z": 3625,
+      "shape": 10,
+      "angle": 0,
+      "coord": "2_47_56_28_41"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_laddertop",
+    "level": 3,
+    "x": 3036,
+    "z": 3638,
+    "shape": 10,
+    "angle": 2,
+    "coord": "3_47_56_28_54",
+    "direction": "down",
+    "start": [
+      3,
+      3036,
+      3637
+    ],
+    "destination": [
+      2,
+      3036,
+      3637
+    ],
+    "target": {
+      "name": "wild_ladder_middle",
+      "level": 2,
+      "x": 3036,
+      "z": 3638,
+      "shape": 10,
+      "angle": 2,
+      "coord": "2_47_56_28_54"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "vampire_trap1",
+    "level": 0,
+    "x": 3118,
+    "z": 3244,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_48_50_46_44",
+    "direction": "down",
+    "start": [
+      0,
+      3117,
+      3244
+    ],
+    "destination": [
+      0,
+      3117,
+      9643
+    ],
+    "target": {
+      "name": "vampire_ladder",
+      "level": 0,
+      "x": 3118,
+      "z": 9643,
+      "shape": 10,
+      "angle": 2,
+      "coord": "0_48_150_46_43"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "vampire_ladder",
+    "level": 0,
+    "x": 3118,
+    "z": 9643,
+    "shape": 10,
+    "angle": 2,
+    "coord": "0_48_150_46_43",
+    "direction": "up",
+    "start": [
+      0,
+      3117,
+      9643
+    ],
+    "destination": [
+      0,
+      3117,
+      3244
+    ],
+    "target": {
+      "name": "vampire_trap1",
+      "level": 0,
+      "x": 3118,
+      "z": 3244,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_48_50_46_44"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "vampire_trap1",
+    "level": 0,
+    "x": 3084,
+    "z": 3272,
+    "shape": 10,
+    "angle": 0,
+    "coord": "0_48_51_12_8",
+    "direction": "down",
+    "start": [
+      0,
+      3083,
+      3272
+    ],
+    "destination": [
+      0,
+      3083,
+      9672
+    ],
+    "target": {
+      "name": "ladder_1755",
+      "level": 0,
+      "x": 3084,
+      "z": 9672,
+      "shape": 10,
+      "angle": 1,
+      "coord": "0_48_151_12_8"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  },
+  {
+    "name": "wild_laddertop_dungeon",
+    "level": 0,
+    "x": 3005,
+    "z": 3963,
+    "shape": 10,
+    "angle": 1,
+    "coord": "0_46_61_61_59",
+    "direction": "down",
+    "start": [
+      0,
+      3005,
+      3962
+    ],
+    "destination": [
+      0,
+      3004,
+      10363
+    ],
+    "target": {
+      "name": "ladder_1755",
+      "level": 0,
+      "x": 3005,
+      "z": 10363,
+      "shape": 10,
+      "angle": 0,
+      "coord": "0_46_161_61_59"
+    },
+    "label": "UNKNOWN",
+    "basis": "Engineering landing at the collision-checked approach of the original mapped partner; not a recovered server destination."
+  }
+]
