@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { World, types, id, inv, actionDelay, native, player, execute, restore, runProc, JavaRandom, PlayerStat, ScriptState, param } from './runtime.mjs';
+import { World, types, id, inv, actionDelay, native, player, execute, continueMining, restore, runProc, JavaRandom, PlayerStat, ScriptState, param } from './runtime.mjs';
 
 // Independent expectations from the retained cache and checked source tables.
 // Requirements/XP/low-high/respawn are CANDIDATE except the period granite level;
@@ -75,9 +75,9 @@ for (const stone of stones) {
     const before = p.stats[PlayerStat.MINING];
     p.setVar(actionDelay, World.currentTick);
     const rolls = [...Array(index).fill(0.999999), 0];
-    const result = random(rolls, () => execute(p, loc, index === 0 ? 3 : 1));
+    const result = random(rolls, () => execute(p, loc, 1));
     assert.equal(result.execution, ScriptState.FINISHED);
-    assert.equal(result.script.name, `[oploc${index === 0 ? 3 : 1},${stone.rock}]`);
+    assert.equal(result.script.name, `[oploc1,${stone.rock}]`);
     for (const product of products) assert.equal(p.invTotal(inv, product), product === id('ObjType', name) ? 1 : 0, `${name}: exactly the selected sourced size`);
     for (const gem of gems) assert.equal(p.invTotal(inv, gem), 0, 'quarry does not roll gems');
     assert.equal(p.stats[PlayerStat.MINING] - before, xp, `${name}: size-specific XP in tenths`);
@@ -94,6 +94,15 @@ for (const stone of stones) {
     p.setVar(actionDelay, World.currentTick);
     random(Array(stone.blocks.length).fill(0.999999), () => execute(p, loc, 1));
     noReward(p, xp, loc, full);
+    World.currentTick++;
+    random([], () => continueMining(p, loc));
+    noReward(p, xp, loc, full);
+    World.currentTick = p.getVar(actionDelay);
+    const continued = random([0], () => continueMining(p, loc));
+    assert.equal(continued.script.name, `[oploc3,${stone.rock}]`, 'hidden continuation comes from the server, never a forged client option');
+    assert.equal(p.invTotal(inv, id('ObjType', stone.blocks[0][0])), 1);
+    assert.equal(p.stats[PlayerStat.MINING] - xp, stone.blocks[0][1]);
+    restore(loc);
   }
   {
     const p = player(loc, stone.level);
@@ -104,7 +113,7 @@ for (const stone of stones) {
     assert.equal(p.getVar(actionDelay), due, 'published pickaxe cadence arms the first swing');
     noReward(p, xp, loc, full);
     World.currentTick = due;
-    random([0], () => execute(p, loc, 1));
+    random([0], () => continueMining(p, loc));
     assert.equal(p.invTotal(inv, id('ObjType', stone.blocks[0][0])), 1, 'first reward is due at the published swing clock');
     restore(loc);
   }

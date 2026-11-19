@@ -93,8 +93,14 @@ export function dispatch(p, loc, option) {
   return p.getOpTrigger();
 }
 export function execute(p, loc, option) {
-  const script = dispatch(p, loc, option);
-  assert(script, `${types.LocType.get(loc.type).debugname}: native option ${option} dispatch`);
+  return executeScript(dispatch(p, loc, option), p, loc);
+}
+export function continueMining(p, loc) {
+  assert.equal(p.target, loc, 'published p_oploc retains the native target');
+  return executeScript(p.getOpTrigger(), p, loc);
+}
+function executeScript(script, p, loc) {
+  assert(script, `${types.LocType.get(loc.type).debugname}: native loc trigger dispatch`);
   const state = ScriptRunner.init(script, p, loc);
   let execution = p.runScript(state, true, true);
   for (let boundary = 0; execution === ScriptState.SUSPENDED && boundary < 8; boundary++) {
