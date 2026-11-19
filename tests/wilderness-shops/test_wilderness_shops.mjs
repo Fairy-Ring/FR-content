@@ -246,6 +246,42 @@ check('bartender Trade sells the sourced drink through dialogue without opening 
   assert.equal(full.invTotal(inv, coins), 650); assert.equal(full.invTotal(inv, brew), 0);
 });
 
+check('paid brew records the purchase before its closing page, while only the diamond conversation records the rumour', () => {
+  const npc = nativeNpc(nativeNpcRows('fourdiamonds_bartender')[0]);
+  const stage = id('VarBitType', 'deserttreasure'), brew = id('ObjType', 'bandit_brew');
+  for (const option of [1, 3]) {
+    const p = fixture(npc, 650); p.setVarBit(stage, 5);
+    p.target = npc; p.targetOp = ServerTriggerType.OPNPC1 + option - 1 - 7;
+    const state = ScriptRunner.init(p.getOpTrigger(), p, npc);
+    p.executeScript(state, true);
+    for (let step = 0; p.invTotal(inv, brew) === 0 && step < 12; step++) {
+      assert.equal(state.execution, ScriptState.PAUSEBUTTON, 'purchase reaches a real dialogue pause');
+      const menu = /^\[proc,p_choice([2345])(?:_header)?\]$/.exec(state.script.name);
+      const com = menu ? id('Component', `multi${menu[1]}:com_1`) : 0;
+      p.lastCom = com;
+      assert(pause.handle(new ResumePauseButton(com), p));
+    }
+    assert.equal(p.invTotal(inv, coins), 0);
+    assert.equal(p.invTotal(inv, brew), 1);
+    assert.equal(state.execution, ScriptState.PAUSEBUTTON, 'closing purchase speech is still visible');
+    assert(transcript(p).includes("There you go. Now get out, we don't like your sort around here."));
+    assert.equal(p.getVarBit(stage), 6, 'the payment, brew and purchase stage are one uninterrupted step');
+    p.closeModal();
+    assert.equal(p.getVarBit(stage), 6, 'walking away cannot lose a paid purchase');
+    op(p, npc, 1, [2]);
+    assert.equal(p.getVarBit(stage), 7, 'only asking about the four diamonds advances the rumour stage');
+    assert.equal(p.invTotal(inv, brew), 1, 'no second purchase is needed');
+  }
+  const ask = fixture(npc, 650); ask.setVarBit(stage, 5);
+  op(ask, npc, 1, [2]);
+  assert(transcript(ask).includes('Ask about Desert Treasure'), 'use the source option with the later quest rename removed');
+  assert(!transcript(ask).includes('Nothing thanks.'), 'remove the unsourced menu caption');
+  assert(transcript(ask).includes("Look around pal. Does it looks like there's any treasure near here?"));
+  assert.equal(ask.getVarBit(stage), 5, 'the pre-purchase treasure question does not buy a drink or reveal the diamonds');
+  assert.equal(ask.invTotal(inv, coins), 650);
+  assert.equal(ask.invTotal(inv, brew), 0);
+});
+
 check('bartender refuses unstarted accounts and exposes the sourced bar only after genuine quest completion', () => {
   const npc = nativeNpc(nativeNpcRows('fourdiamonds_bartender')[0]), stage = id('VarBitType', 'deserttreasure');
   for (const [option, line] of [[1, 'Get out of here. I have nothing to say to the likes of you.'], [3, "Get out of here, we don't like your sort in these parts."]]) {
