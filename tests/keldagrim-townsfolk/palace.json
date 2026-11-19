@@ -1,0 +1,2376 @@
+{
+  "slice": "palace",
+  "scenarios": [
+    {
+      "npc": "dwarf_city_director_purple_pewter",
+      "state": "giantdwarf-1-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Purple Pewter.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Purple Pewter."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_purple_pewter",
+      "state": "giantdwarf-2-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Purple Pewter.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Purple Pewter."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_blue_opal",
+      "state": "giantdwarf-1-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Blue Opal.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Blue Opal."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_blue_opal",
+      "state": "giantdwarf-2-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Blue Opal.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Blue Opal."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_yellow_fortune",
+      "state": "giantdwarf-1-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Yellow Fortune.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Yellow Fortune."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_yellow_fortune",
+      "state": "giantdwarf-2-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Yellow Fortune.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Yellow Fortune."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_green_gemstone",
+      "state": "giantdwarf-1-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Green Gemstone.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Green Gemstone."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_green_gemstone",
+      "state": "giantdwarf-2-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Green Gemstone.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Green Gemstone."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_white_chisel",
+      "state": "giantdwarf-1-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the White Chisel.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the White Chisel."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_white_chisel",
+      "state": "giantdwarf-2-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the White Chisel.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the White Chisel."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_silver_cog",
+      "state": "giantdwarf-1-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Silver Cog.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Silver Cog."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_silver_cog",
+      "state": "giantdwarf-2-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Silver Cog.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Silver Cog."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_brown_engine",
+      "state": "giantdwarf-1-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Brown Engine.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Brown Engine."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_brown_engine",
+      "state": "giantdwarf-2-no-tasks",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "How did you get in here? I don't have time to talk to you!",
+          "Talk to my secretary, I don't have time to deal with you.",
+          "My secretary will deal with any inquiries you have about the Brown Engine.",
+          "I'm busy, please leave.",
+          "I'm too important to talk to the likes of you, leave.",
+          "I can't help you, go and see my secretary.",
+          "Do you mind? You're blocking my view.",
+          "Today is not a good day, can you come back tomorrow?",
+          "My secretary is sitting just over there, thank you.",
+          "If you're looking for the market, it's downstairs."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "How did you get in here? I don't have time to talk to you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.05
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Talk to my secretary, I don't have time to deal with you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.15
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary will deal with any inquiries you have about the Brown Engine."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.25
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm busy, please leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.35
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I'm too important to talk to the likes of you, leave."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.45
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you, go and see my secretary."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.55
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Do you mind? You're blocking my view."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.65
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Today is not a good day, can you come back tomorrow?"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.75
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "My secretary is sitting just over there, thank you."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.85
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "If you're looking for the market, it's downstairs."
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.95
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_red_axe",
+      "placedNpc": "dwarf_city_director_red_axe_multi",
+      "state": "giantdwarf-1",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "I am conducting a meeting here, begone!"
+        ],
+        "game": [],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "I am conducting a meeting here, begone!"
+          ],
+          "game": [],
+          "player": [],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-red-axe-director"
+      ]
+    },
+    {
+      "npc": "dwarf_city_trader_referee",
+      "placedNpc": "dwarf_city_trader_referee",
+      "state": "giantdwarf-1",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "Talk to the secretaries, not to me!",
+          "Clear out!",
+          "Stay out of the octagon center!",
+          "I can't help you!",
+          "Can't talk to you, too busy!"
+        ],
+        "game": [],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "Talk to the secretaries, not to me!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.1
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Clear out!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.3
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Stay out of the octagon center!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.5
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.7
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Can't talk to you, too busy!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.9
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-trade-referee"
+      ]
+    },
+    {
+      "npc": "dwarf_city_evil_cat",
+      "placedNpc": "dwarf_city_evil_cat_multi",
+      "state": "giantdwarf-1",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [],
+        "game": [
+          "The cat appears to be sleeping, you'd better leave it alone."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [],
+          "game": [
+            "The cat appears to be sleeping, you'd better leave it alone."
+          ],
+          "player": [],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-red-axe-cat"
+      ]
+    },
+    {
+      "npc": "dwarf_city_guarding_cat",
+      "placedNpc": "dwarf_city_guarding_cat",
+      "state": "giantdwarf-1",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "Meow!"
+        ],
+        "game": [],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "Meow!"
+          ],
+          "game": [],
+          "player": [],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-dromunds-cat"
+      ]
+    },
+    {
+      "npc": "dwarf_city_shop_sculpture_model",
+      "placedNpc": "dwarf_city_shop_sculpture_model_multi",
+      "state": "giantdwarf-1",
+      "vars": {
+        "giantdwarf_quest": 1
+      },
+      "allowed": {
+        "npc": [
+          "Talk... to Blasidar.",
+          "Talk... to Blasidar."
+        ],
+        "game": [],
+        "player": [
+          "Hello there, can you help me?",
+          "What? No, I was wondering if you could help me.",
+          "Alright, alright."
+        ],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "Talk... to Blasidar.",
+            "Talk... to Blasidar."
+          ],
+          "game": [],
+          "player": [
+            "Hello there, can you help me?",
+            "What? No, I was wondering if you could help me.",
+            "Alright, alright."
+          ],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_director_red_axe",
+      "placedNpc": "dwarf_city_director_red_axe_multi",
+      "state": "giantdwarf-2",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "I am conducting a meeting here, begone!"
+        ],
+        "game": [],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "I am conducting a meeting here, begone!"
+          ],
+          "game": [],
+          "player": [],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-red-axe-director"
+      ]
+    },
+    {
+      "npc": "dwarf_city_trader_referee",
+      "placedNpc": "dwarf_city_trader_referee",
+      "state": "giantdwarf-2",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "Talk to the secretaries, not to me!",
+          "Clear out!",
+          "Stay out of the octagon center!",
+          "I can't help you!",
+          "Can't talk to you, too busy!"
+        ],
+        "game": [],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "Talk to the secretaries, not to me!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.1
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Clear out!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.3
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Stay out of the octagon center!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.5
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "I can't help you!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.7
+          ]
+        },
+        {
+          "choices": [],
+          "npc": [
+            "Can't talk to you, too busy!"
+          ],
+          "player": [],
+          "menus": [],
+          "random": [
+            0.9
+          ]
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-trade-referee"
+      ]
+    },
+    {
+      "npc": "dwarf_city_evil_cat",
+      "placedNpc": "dwarf_city_evil_cat_multi",
+      "state": "giantdwarf-2",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [],
+        "game": [
+          "The cat appears to be sleeping, you'd better leave it alone."
+        ],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [],
+          "game": [
+            "The cat appears to be sleeping, you'd better leave it alone."
+          ],
+          "player": [],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-red-axe-cat"
+      ]
+    },
+    {
+      "npc": "dwarf_city_guarding_cat",
+      "placedNpc": "dwarf_city_guarding_cat",
+      "state": "giantdwarf-2",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "Meow!"
+        ],
+        "game": [],
+        "player": [],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "Meow!"
+          ],
+          "game": [],
+          "player": [],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-dromunds-cat"
+      ]
+    },
+    {
+      "npc": "dwarf_city_shop_sculpture_model",
+      "placedNpc": "dwarf_city_shop_sculpture_model_multi",
+      "state": "giantdwarf-2",
+      "vars": {
+        "giantdwarf_quest": 2
+      },
+      "allowed": {
+        "npc": [
+          "Talk... to Blasidar.",
+          "Talk... to Blasidar."
+        ],
+        "game": [],
+        "player": [
+          "Hello there, can you help me?",
+          "What? No, I was wondering if you could help me.",
+          "Alright, alright."
+        ],
+        "options": []
+      },
+      "branches": [
+        {
+          "choices": [],
+          "npc": [
+            "Talk... to Blasidar.",
+            "Talk... to Blasidar."
+          ],
+          "game": [],
+          "player": [
+            "Hello there, can you help me?",
+            "What? No, I was wondering if you could help me.",
+            "Alright, alright."
+          ],
+          "menus": []
+        }
+      ],
+      "sourceIds": [
+        "src.keldagrim-townsfolk-palace-giantdwarf"
+      ]
+    },
+    {
+      "npc": "dwarf_city_secretary_red_axe",
+      "placedNpc": "dwarf_city_secretary_red_axe_multi",
+      "state": "giantdwarf-1",
+      "vars": {"giantdwarf_quest": 1},
+      "allowed": {"npc": ["Don't bother me!"], "player": [], "options": []},
+      "branches": [{"choices": [], "npc": ["Don't bother me!"], "player": [], "menus": []}],
+      "sourceIds": ["src.keldagrim-townsfolk-palace-giantdwarf"]
+    },
+    {
+      "npc": "dwarf_city_secretary_red_axe",
+      "placedNpc": "dwarf_city_secretary_red_axe_multi",
+      "state": "giantdwarf-2",
+      "vars": {"giantdwarf_quest": 2},
+      "allowed": {"npc": ["Don't bother me!"], "player": [], "options": []},
+      "branches": [{"choices": [], "npc": ["Don't bother me!"], "player": [], "menus": []}],
+      "sourceIds": ["src.keldagrim-townsfolk-palace-giantdwarf"]
+    }
+  ],
+  "deferred": []
+}

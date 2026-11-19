@@ -1,0 +1,64 @@
+// CANDIDATE: Transcript:The Giant Dwarf, before enough secretary tasks.
+// No normal account can reach the unpublished company-selection/task states.
+[opnpc1,dwarf_city_director_purple_pewter]
+~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Purple Pewter.");
+[opnpc1,dwarf_city_director_blue_opal]
+~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Blue Opal.");
+[opnpc1,dwarf_city_director_yellow_fortune]
+~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Yellow Fortune.");
+[opnpc1,dwarf_city_director_green_gemstone]
+~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Green Gemstone.");
+[opnpc1,dwarf_city_director_white_chisel]
+~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the White Chisel.");
+[opnpc1,dwarf_city_director_silver_cog]
+~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Silver Cog.");
+[opnpc1,dwarf_city_director_brown_engine]
+~keldagrim_director("<p,neutral>My secretary will deal with any inquiries you have about the Brown Engine.");
+
+[proc,keldagrim_director](string $company_inquiry)
+switch_int (random(^keldagrim_director_greetings)) {
+    case 0 : ~chatnpc("<p,neutral>How did you get in here? I don't have time to talk to you!");
+    case 1 : ~chatnpc("<p,neutral>Talk to my secretary, I don't have time to deal with you.");
+    case 2 : ~chatnpc($company_inquiry);
+    case 3 : ~chatnpc("<p,neutral>I'm busy, please leave.");
+    case 4 : ~chatnpc("<p,neutral>I'm too important to talk to the likes of you, leave.");
+    case 5 : ~chatnpc("<p,neutral>I can't help you, go and see my secretary.");
+    case 6 : ~chatnpc("<p,neutral>Do you mind? You're blocking my view.");
+    case 7 : ~chatnpc("<p,neutral>Today is not a good day, can you come back tomorrow?");
+    case 8 : ~chatnpc("<p,neutral>My secretary is sitting just over there, thank you.");
+    case 9 : ~chatnpc("<p,neutral>If you're looking for the market, it's downstairs.");
+}
+
+[opnpc1,dwarf_city_director_red_axe]
+~chatnpc("<p,neutral>I am conducting a meeting here, begone!");
+
+[opnpc1,dwarf_city_secretary_red_axe]
+~chatnpc("<p,neutral>Don't bother me!");
+
+// CANDIDATE: Transcript:Trade Referee. Only Talk-to is in this unit.
+[opnpc1,dwarf_city_trader_referee]
+switch_int (random(^keldagrim_referee_greetings)) {
+    case 0 : ~chatnpc("<p,neutral>Talk to the secretaries, not to me!");
+    case 1 : ~chatnpc("<p,neutral>Clear out!");
+    case 2 : ~chatnpc("<p,neutral>Stay out of the octagon center!");
+    case 3 : ~chatnpc("<p,neutral>I can't help you!");
+    case 4 : ~chatnpc("<p,neutral>Can't talk to you, too busy!");
+}
+
+// CANDIDATE: Transcript:Red Axe Cat. Keep the target cache's Talk-to option.
+[opnpc1,dwarf_city_evil_cat]
+~mesbox("The cat appears to be sleeping, you'd better leave it alone.");
+
+// CANDIDATE: Transcript:Dromund's cat, without a catspeak amulet.
+// The published build cannot award that amulet or reach the boot-theft state.
+[opnpc1,dwarf_city_guarding_cat]
+~chatnpc("<p,neutral>Meow!");
+
+// CANDIDATE: Transcript:The Giant Dwarf, before agreeing to help Blasidar.
+// His item-collection states and all other model forms remain quest-owned.
+[opnpc1,dwarf_city_shop_sculpture_model]
+~chatplayer("<p,neutral>Hello there, can you help me?");
+~chatnpc("<p,neutral>Talk... to Blasidar.");
+~chatplayer("<p,neutral>What? No, I was wondering if you could help me.");
+~chatnpc("<p,neutral>Talk... to Blasidar.");
+~chatplayer("<p,neutral>Alright, alright.");
