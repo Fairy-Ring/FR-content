@@ -188,6 +188,53 @@ try {
   });
   let regionMapEntries;
   const loadedRegionMaps = new Set();
+  function advanceHopeLives(f, route, instance) {
+    assert.equal(route.prelude, 'soulbane-hope-lives', 'known native route prelude');
+    const types = ['soulbane_hope_monst3', 'soulbane_hope_monst2', 'soulbane_hope_monst1'].map(name => rt.id(NpcType, name));
+    const wanted = types.indexOf(f.npc.type);
+    assert(wanted > 0, `${route.script}: the prelude requires a later Hope life`);
+    const owner = rt.id(VarNpcType, 'npc_attacking_uid');
+    const marker = rt.id(VarNpcType, 'npc_int');
+    const regionHandle = f.player.getVar(rt.id(VarPlayerType, 'soulbane_instance'));
+    assert.equal(regionHandle, instance.uid + 1, 'native entry retains the quest one-based region handle');
+    const tally = rt.id(rt.configs.VarBitType, 'soulbane_hope_killedtally');
+    const actionDelay = rt.id(VarNpcType, 'npc_action_delay');
+    const npc = [...rt.World.npcs].find(npc => npc.type === types[0]
+      && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
+    assert(npc, `${route.script}: entry creates a real first-life Hope creature`);
+    assert.equal(npc.getVar(owner) >>> 0, f.player.uid, 'native Hope creature belongs to this player');
+    assert.equal(npc.getVar(marker), regionHandle, 'native Hope creature belongs to this private region');
+    f.npc = npc;
+    const started = rt.run('[ai_opplayer2,soulbane_hope_monst3]', f);
+    assert.equal(started.state.execution, rt.State.FINISHED, 'native Hope attack establishes its combat target');
+    const Trigger = createRequire(path.join(engine, 'package.json'))('./src/engine/script/ServerTriggerType.ts').default;
+    const tick = () => {
+      rt.World.processNpcEventQueue();
+      npc.turn();
+      f.player.processQueues();
+      rt.World.currentTick++;
+    };
+    for (let life = 0; life < wanted; life++) {
+      assert.equal(npc.type, types[life], 'Hope prelude starts on the preceding native life');
+      assert.equal(npc.levels[3], 21, 'native Hope life starts with its packed full HP');
+      // Disclosed damage inputs use the same native AI_QUEUE2 entry as the
+      // Soulbane queued-hit regression; no HP, form or quest variable is seeded.
+      npc.enqueueScript(Trigger.AI_QUEUE2, 0, 7);
+      tick();
+      assert.equal(npc.levels[3], 14, 'native damage actually removes seven HP before the death input');
+      npc.enqueueScript(Trigger.AI_QUEUE2, 0, npc.levels[3]);
+      for (let boundary = 0; boundary < 256 && npc.isActive && (npc.type === types[life] || npc.delayed); boundary++) tick();
+      assert(npc.isActive, 'a native nonfinal death retains the same Hope creature');
+      assert.equal(npc.type, types[life + 1], 'only native death produces the required next Hope life');
+      assert.equal(npc.levels[3], 21, 'native death restores the next life to full HP');
+      assert.equal(f.player.getVarBit(tally), 0, 'nonfinal native deaths earn no final-life credit');
+    }
+    for (let boundary = 0; boundary < 16 && (npc.delayed || npc.getVar(actionDelay) > rt.World.currentTick); boundary++) tick();
+    assert(!npc.delayed && npc.getVar(actionDelay) <= rt.World.currentTick, 'native Hope attack delay expires without resetting it');
+    assert.equal(npc.type, types[wanted], `${route.script}: the requested form exists through native deaths`);
+    assert.equal(npc.getVar(owner) >>> 0, f.player.uid, 'native life changes retain their owner');
+    assert.equal(npc.getVar(marker), regionHandle, 'native life changes retain their private region');
+  }
   function configureRoute(f, route) {
     for (const stat of [1, 6]) { f.player.levels[stat] = 20; f.player.baseLevels[stat] = 20; }
     if (route.equipment) f.player.invAdd(rt.id(rt.configs.InvType, 'worn'), rt.id(rt.configs.ObjType, route.equipment), 1);
@@ -226,6 +273,7 @@ try {
           const spawned = rt.run(route.privateRegion.spawn, f);
           assert.equal(spawned.state.execution, rt.State.FINISHED, `${route.privateRegion.spawn} creates the native encounter`);
         }
+        if (route.prelude) advanceHopeLives(f, route, instance);
         f.npc = [...rt.World.npcs].find(npc => npc.type === f.npc.type && rt.World.instances.findInstanceByCoord(npc)?.uid === instance.uid);
         assert(f.npc, `${enter} spawns the route's native NPC`);
         const tile = (f.npc.level << 28) | ((f.npc.x - 1) << 14) | f.npc.z;

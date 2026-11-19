@@ -37,6 +37,8 @@
       "[proc,invrigar_attack]",
       "[proc,necro_attack]",
       "[proc,sarawiz_melee_attack]",
+      "[proc,soulbane_confusion_npc_attack]",
+      "[proc,soulbane_hope_npc_attack]",
       "[proc,soulbane_rage_npc_attack]",
       "[proc,vampire_attack]"
     ],
@@ -120,6 +122,7 @@
     "playerhit_n_ranged": [
       "[ai_applayer2,_snail]",
       "[ai_applayer2,_troll_thrower]",
+      "[proc,soulbane_hope_ranged]",
       "[proc,wyvern_breath]",
       "[proc,wyvern_ranged]",
       "[proc,zygomite_attack]"
