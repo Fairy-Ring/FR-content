@@ -1,0 +1,57 @@
+// VERIFIED period three-life encounter and bridge; later counts and voices CANDIDATE.
+// UNKNOWN original stages, private-copy binding and fixed reconstruction stands.
+[proc,soulbane_hope_enter]
+if (%soulbane_instance = 0 | %soulbane_prog < ^soulbane_confusion_clear | %soulbane_prog > ^soulbane_hope_clear) return;
+if (add(region_uid, 1) ! %soulbane_instance) return;
+def_boolean $first = false;
+if (%soulbane_prog = ^soulbane_confusion_clear) {
+    $first = true;
+    %soulbane_prog = ^soulbane_hope_active;
+    ~send_quest_progress(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
+}
+~soulbane_clear_room_npcs;
+~soulbane_hope_reset;
+// CANDIDATE: the retained No Way Out endpoints name the Hopelessness room.
+~music_playbyrow(music_No_Way_Out);
+if (%soulbane_prog = ^soulbane_hope_clear) {
+    p_teleport(~soulbane_room_coord(^soulbane_hope_bridged_entry));
+    return;
+}
+p_teleport(~soulbane_room_coord(^soulbane_hope_entry));
+~soulbane_hope_spawn;
+if ($first = true) {
+    mes("What's the point? No-one will ever help me.");
+    mes("I'm not worth anything. Will anyone ever combat my HOPELESSNESS?");
+}
+
+[proc,soulbane_hope_spawn]
+if (~soulbane_owned = false | %soulbane_prog ! ^soulbane_hope_active) return;
+~soulbane_rage_add(soulbane_hope_monst3, ^soulbane_hope_spawn1);
+~soulbane_rage_add(soulbane_hope_monst3, ^soulbane_hope_spawn2);
+~soulbane_rage_add(soulbane_hope_monst3, ^soulbane_hope_spawn3);
+~soulbane_rage_add(soulbane_hope_monst3, ^soulbane_hope_spawn4);
+~soulbane_rage_add(soulbane_hope_monst3, ^soulbane_hope_spawn5);
+
+[proc,soulbane_hope_reset]
+%soulbane_hope_monmes = 0;
+if (%soulbane_prog = ^soulbane_hope_active) {
+    %soulbane_hope_killedtally = 0;
+    %soulbane_hope_bridgepres = 0;
+}
+
+// Mapping bounds, not a new player/NPC placement.
+[proc,soulbane_hope_room](coord $point, boolean $bridged)(boolean)
+def_coord $sw = ~soulbane_room_coord(^soulbane_hope_source);
+if ($bridged = true) $sw = movecoord($sw, sub(0, ^soulbane_hope_copy_offset), 0, 0);
+return(inzone($sw, movecoord($sw, sub(^soulbane_room_tiles, 1), 0, sub(^soulbane_room_tiles, 1)), $point));
+
+[label,soulbane_hope_exit]
+if (~soulbane_owned = false) return;
+if (%soulbane_prog = ^soulbane_hope_active) {
+    if (~soulbane_hope_room(loc_coord, false) = false) return;
+} else if (%soulbane_prog = ^soulbane_hope_clear) {
+    if (~soulbane_hope_room(loc_coord, true) = false) return;
+} else {
+    return;
+}
+@soulbane_exit;

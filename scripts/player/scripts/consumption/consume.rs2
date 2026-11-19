@@ -137,6 +137,7 @@ if ($skill_delay ! null) {
     %action_delay = calc(%action_delay + $skill_delay);
 }
 
+~soulbane_hope_food($obj);
 // consume effect
 jump($consume_effect);
 

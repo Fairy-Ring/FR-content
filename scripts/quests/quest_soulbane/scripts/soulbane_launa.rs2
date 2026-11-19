@@ -33,6 +33,29 @@ switch_int (%soulbane_prog) {
         ~chatnpc("<p,neutral>What can you see?");
         ~chatplayer("<p,neutral>Erm, I haven't actually ventured through yet.");
         ~chatnpc("<p,neutral>What are you waiting for? He must be so afraid in that place.");
+    case ^soulbane_confusion_active :
+        ~chatplayer("<p,neutral>Hi, I've journeyed through to a third room. Your son's voice spoke as I entered.");
+        ~chatnpc("<p,neutral>Really? What did he say?");
+        ~chatplayer("<p,neutral>Simply, 'Where am I? How long have I been here? Am I still the person I once was? I hate my CONFUSION'.");
+        ~chatnpc("<p,neutral>You have to help him overcome his confusion!");
+    case ^soulbane_confusion_clear :
+        ~chatplayer("<p,neutral>Hi. I have prevailed over a third room.");
+        ~chatnpc("<p,neutral>Are you any closer to finding my son?");
+        ~chatplayer("<p,neutral>I think I may be getting closer.");
+        ~chatnpc("<p,neutral>Please don't waste any time.");
+    case ^soulbane_hope_active :
+        ~chatplayer("<p,neutral>I have travelled through to a fourth room. As I entered your son's voice spoke to me!");
+        ~chatnpc("<p,neutral>Oh my! What did he say?");
+        ~chatplayer("<p,neutral>He said, 'What's the point? Why do I defy such HOPELESSNESS? No-one will ever help me'.");
+        ~chatnpc("<p,neutral>You must fight to give him back his hope!");
+        ~chatplayer("<p,neutral>Can I succeed?");
+        ~chatnpc("<p,neutral>Of course you can!");
+    case ^soulbane_hope_clear :
+        ~chatplayer("<p,neutral>I have endured against hopelessness to finish the fourth room.");
+        ~chatnpc("<p,neutral>Any sight of my son?");
+        ~chatplayer("<p,neutral>Only his voice. So far he has said to me, 'Why should I, Tolna, be trapped in such a wretched place? Feel my ANGER!', 'It's so quiet and dark. I FEAR I may never escape this horrid place. Mum, help me!', 'Where am I? How long have I been here? Am I still the person I once was? I hate my CONFUSION' and 'What's the point? Why do I defy such HOPELESSNESS? No-one will ever help me'.");
+        ~chatnpc("<p,neutral>You must find him and bring him back to me. Please, I beg you.");
+        ~chatplayer("<p,neutral>Don't worry, I will find him!");
 }
 
 [label,soulbane_launa_start]

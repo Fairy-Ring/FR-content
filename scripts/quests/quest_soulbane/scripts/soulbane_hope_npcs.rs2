@@ -1,0 +1,146 @@
+// VERIFIED period three lives, 21 HP and harmless blue balls.
+// CANDIDATE later first-form ranged, later melee/ranged, poison reset and retreat.
+[proc,soulbane_hope_npc]()(boolean)
+if (npc_type = soulbane_hope_monst3 | npc_type = soulbane_hope_monst2 | npc_type = soulbane_hope_monst1) return(true);
+return(false);
+
+[proc,soulbane_hope_attackable]()(boolean)
+if (%soulbane_prog ! ^soulbane_hope_active | %soulbane_hope_killedtally >= ^soulbane_hope_creatures) return(false);
+return(~soulbane_npc_owned);
+
+[ai_spawn,soulbane_hope_monst3] ~soulbane_hope_npc_spawn;
+[ai_spawn,soulbane_hope_monst2] ~soulbane_hope_npc_spawn;
+[ai_spawn,soulbane_hope_monst1] ~soulbane_hope_npc_spawn;
+[proc,soulbane_hope_npc_spawn]
+%npc_combat_xp_multiplier = npc_param(combat_xp_multiplier);
+%npc_start_coord = npc_coord;
+%soulbane_hope_melee_until = add(map_clock, ^soulbane_hope_melee_wait_ticks);
+
+[opnpc2,soulbane_hope_monst3] @soulbane_hope_attack;
+[opnpc2,soulbane_hope_monst2] @soulbane_hope_attack;
+[opnpc2,soulbane_hope_monst1] @soulbane_hope_attack;
+[label,soulbane_hope_attack]
+if (~soulbane_hope_attackable = false) return;
+@player_combat_start;
+
+[apnpc2,soulbane_hope_monst3] @soulbane_hope_attack_ap;
+[apnpc2,soulbane_hope_monst2] @soulbane_hope_attack_ap;
+[apnpc2,soulbane_hope_monst1] @soulbane_hope_attack_ap;
+[label,soulbane_hope_attack_ap]
+if (~soulbane_hope_attackable = false) return;
+@player_combat_start_ap;
+
+[ai_queue1,soulbane_hope_monst3] ~soulbane_hope_retaliate;
+[ai_queue1,soulbane_hope_monst2] ~soulbane_hope_retaliate;
+[ai_queue1,soulbane_hope_monst1] ~soulbane_hope_retaliate;
+[proc,soulbane_hope_retaliate]
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_hope_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_retaliate_ap;
+
+[ai_opplayer2,soulbane_hope_monst3] ~soulbane_hope_npc_attack;
+[ai_opplayer2,soulbane_hope_monst2] ~soulbane_hope_npc_attack;
+[ai_opplayer2,soulbane_hope_monst1] ~soulbane_hope_npc_attack;
+[ai_applayer2,soulbane_hope_monst3] ~soulbane_hope_npc_attack;
+[ai_applayer2,soulbane_hope_monst2] ~soulbane_hope_npc_attack;
+[ai_applayer2,soulbane_hope_monst1] ~soulbane_hope_npc_attack;
+[proc,soulbane_hope_npc_attack]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_setmode(none);
+    return;
+}
+if (~soulbane_hope_attackable = false | %death = ^true) {
+    npc_setmode(none);
+    return;
+}
+%npc_aggressive_player = uid;
+if (npc_type ! soulbane_hope_monst3) {
+    if (npc_range(coord) <= 1) {
+        %soulbane_hope_melee_until = add(map_clock, ^soulbane_hope_melee_wait_ticks);
+        npc_walk(npc_coord);
+        npc_setmode(applayer2);
+        ~npc_default_attack;
+        return;
+    }
+    if (map_clock < %soulbane_hope_melee_until) {
+        // Native walking retains the AP interaction; try melee before falling back.
+        npc_walk(coord);
+        npc_setmode(applayer2);
+        return;
+    }
+}
+npc_walk(npc_coord);
+~soulbane_hope_ranged;
+
+[proc,soulbane_hope_ranged]
+if (%npc_action_delay > map_clock) return;
+if (~npc_check_notcombat = false) {
+    npc_setmode(none);
+    return;
+}
+if (~npc_check_notcombat_self = false) return;
+// Original cache assets; exact animation/projectile bindings remain UNKNOWN.
+npc_anim(lesspoisen, 0);
+spotanim_npc(soulbane_hope_launch, ^soulbane_hope_projectile_height, 0);
+def_int $duration = ~player_projectile(npc_coord, coord, uid, soulbane_hope_travel, ^soulbane_hope_projectile_height, ^soulbane_hope_projectile_endheight, ^soulbane_hope_projectile_delay, ^soulbane_hope_projectile_angle, 0, ^soulbane_hope_projectile_offset, ^soulbane_hope_projectile_step);
+spotanim_pl(soulbane_hope_impact, ^soulbane_hope_projectile_endheight, $duration);
+def_int $ticks = ~playerhit_n_ranged(^soulbane_hope_ranged_damage, $duration, npc_param(attackrate));
+npc_setmode(applayer2);
+
+[ai_queue2,soulbane_hope_monst3] ~soulbane_hope_damage(last_int);
+[ai_queue2,soulbane_hope_monst2] ~soulbane_hope_damage(last_int);
+[ai_queue2,soulbane_hope_monst1] ~soulbane_hope_damage(last_int);
+[proc,soulbane_hope_damage](int $damage)
+if (finduid(%npc_attacking_uid) = false) return;
+if (~soulbane_hope_attackable = false | %npc_aggressive_player ! uid) return;
+~npc_default_damage($damage);
+
+[ai_queue3,soulbane_hope_monst3] ~soulbane_hope_death;
+[ai_queue3,soulbane_hope_monst2] ~soulbane_hope_death;
+[ai_queue3,soulbane_hope_monst1] ~soulbane_hope_death;
+[proc,soulbane_hope_death]
+if (finduid(%npc_attacking_uid) = false) {
+    npc_del;
+    return;
+}
+if (~soulbane_hope_attackable = false) {
+    npc_del;
+    return;
+}
+// An already-restored life must not consume a second queued death notification.
+if (npc_stat(hitpoints) ! 0) return;
+if (npc_type ! soulbane_hope_monst1) {
+    def_npc_uid $old_uid = npc_uid;
+    if (npc_type = soulbane_hope_monst3) npc_changetype_keepall(soulbane_hope_monst2, ^soulbane_npc_lifetime);
+    else npc_changetype_keepall(soulbane_hope_monst1, ^soulbane_npc_lifetime);
+    // keepall changes the native UID. Preserve this same combat opponent only.
+    if (%aggressive_npc = $old_uid) %aggressive_npc = npc_uid;
+    ~npc_poison_clear;
+    // keepall deliberately keeps zero HP and the owner's vars; restore this life.
+    npc_statadd(hitpoints, npc_basestat(hitpoints), 0);
+    %soulbane_hope_melee_until = add(map_clock, add(^soulbane_hope_retreat_ticks, ^soulbane_hope_melee_wait_ticks));
+    npc_setmode(playerescape);
+    npc_delay(^soulbane_hope_retreat_ticks);
+    if (finduid(%npc_attacking_uid) = false) return;
+    if (~soulbane_hope_attackable = false) return;
+    npc_setmode(applayer2);
+    return;
+}
+// Consume this NPC's credit once before queuing it. Do not snapshot an ordinal:
+// several different creatures can die in one tick and each must count once.
+%npc_int = 0;
+queue*(soulbane_hope_credit, 0)(%soulbane_instance);
+~npc_death;
+
+[queue,soulbane_hope_credit](int $instance)
+if (~soulbane_owned = false | %soulbane_instance ! $instance | %soulbane_prog ! ^soulbane_hope_active) return;
+if (%soulbane_hope_killedtally >= ^soulbane_hope_creatures) return;
+%soulbane_hope_killedtally = add(%soulbane_hope_killedtally, 1);
+%soulbane_hope_monmes = %soulbane_hope_killedtally;
+switch_int (%soulbane_hope_killedtally) {
+    case 1 : say("Is there any end to killing these monsters?");
+    case 2 : say("This is hard work!");
+    case 3 : say("I've almost killed them all now!");
+    case 4 : say("Maybe if I kill one more?");
+    case ^soulbane_hope_creatures : queue(soulbane_hope_complete, 0, 0);
+}
