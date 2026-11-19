@@ -117,8 +117,12 @@ for (const row of links) {
   walkable(row.start);
   const specialApproach = row.name === 'ladder_11741' && row.level === 1 && row.x === 2946 && row.z === 3363;
   if (specialApproach) {
-    assert.equal(reachable(row.start, row), false, 'the original Falador force-approach rejects its eastern floor');
-    assert.equal(map.isMapBlocked(row.x - 1, row.z, row.level), true, 'the original west approach is blocked');
+    assert.equal(reachable(row.start, row), false, 'the original Falador reach check rejects its eastern floor');
+    assert.equal(reachable([row.level, row.x, row.z], row), true, 'the original reach check accepts the loc square');
+    assert.equal(map.isMapBlocked(row.x, row.z, row.level), true, 'that accepted loc square is blocked');
+    for (const [dx, dz] of [[-1, 0], [0, -1], [1, 0], [0, 1]]) {
+      assert.equal(reachable([row.level, row.x + dx, row.z + dz], row), false, 'the original reach check rejects every adjacent approach');
+    }
   } else assert.ok(reachable(row.start, row), `${key(row)}: source is a reachable native approach`);
   const isTrap = openedName.has(row.name);
   const operations = row.name === 'wild_ladder_middle'
