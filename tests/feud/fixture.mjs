@@ -157,7 +157,7 @@ function operationStand(p, n) {
 
 function stand(p, n) {
   const destination = operationStand(p, n);
-  assert(destination, `pathfinder reaches the native operation stand beside NPC ${n.baseType}`);
+  assert(destination, `pathfinder reaches the native operation stand beside NPC ${n.baseType} at ${tile(n).join(',')}`);
   [p.level, p.x, p.z] = destination;
   p.originX = p.x; p.originZ = p.z;
   return destination;
