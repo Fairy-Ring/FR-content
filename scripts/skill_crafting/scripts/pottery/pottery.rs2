@@ -15,11 +15,14 @@ switch_obj (last_useitem)
 [label,use_pottery_oven](obj $item)
 switch_obj ($item)
 {
-    case bowl_unfired, piedish_unfired, pot_unfired : @fire_pottery(last_useslot);
+    case bowl_unfired, piedish_unfired, pot_unfired :
+        ~fire_pottery(last_useslot);
+        return;
     case potlid_unfired :
         // OSF potlid craft after teach 35. Research: subject one-small-favour.
         if (%onesmallfavour >= 35) {
-            @fire_pottery(last_useslot);
+            ~fire_pottery(last_useslot);
+            return;
         }
         ~displaymessage(^dm_default);
     case default : ~displaymessage(^dm_default);
@@ -159,7 +162,7 @@ stat_advance(crafting, struct_param($struct, processexp));
 mes("You make the clay into a <substring($name, 8, string_length($name))>.");
 
 // No level req for some reason (does have a success chance though)
-[label,fire_pottery](int $last)
+[proc,fire_pottery](int $last)
 def_obj $last_obj = inv_getobj(inv, $last);
 def_struct $struct;
 if ($last_obj = potlid_unfired) {
