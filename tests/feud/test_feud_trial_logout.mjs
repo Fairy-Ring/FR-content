@@ -80,7 +80,7 @@ function reachDistraction(p) {
 }
 
 function secludedTarget(p) {
-  const target = villagers().find(npc => npc.getVar(stateVar) === 0 && !hasWitness(npc) && operationStand(p, npc));
+  const target = villagers().find(npc => npc.getVar(stateVar) === 0 && !hasWitness(p, npc) && operationStand(p, npc));
   assert(target, 'a real packed villager has no candidate under the native witness predicate');
   return target;
 }

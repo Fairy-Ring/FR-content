@@ -31,9 +31,9 @@ export function tickThrough(deadline) {
   assert.equal(World.currentTick, deadline + 1, 'native world phases ran once through the exact deadline');
 }
 
-function projectedWitnesses(target, x, z) {
+function projectedWitnesses(p, target, x, z) {
   const projected = { uid: target.uid, level: target.level, x, z };
-  return [...World.npcs].filter(npc => isWitness(projected, npc));
+  return [...World.npcs].filter(npc => isWitness(p, projected, npc));
 }
 
 function occludedOriginalWitness(target, witnesses, x, z) {
@@ -57,7 +57,7 @@ function secludedDestination(p, target, witnesses) {
       for (let z = target.z - radius; z <= target.z + radius; z++) {
         if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
           map.isMapBlocked(x, z, target.level)) continue;
-        if (projectedWitnesses(target, x, z).length || !occludedOriginalWitness(target, witnesses, x, z)) continue;
+        if (projectedWitnesses(p, target, x, z).length || !occludedOriginalWitness(target, witnesses, x, z)) continue;
         const route = exactRoute(p.level, p.x, p.z, x, z);
         if (!route) continue;
         return { destination: { level: target.level, x, z }, route };
@@ -72,8 +72,8 @@ export function followToSeclusion(p, target) {
   assert.equal(target.level, p.level, 'the lured NPC and player share a collision plane');
   assert.equal(target.target, p, 'native Lure assigned the owning player as the follow target');
   assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW, 'native Lure selected PLAYERFOLLOW');
-  assert(hasWitness(target), 'the original NPC begins visible to a nearby witness');
-  const originalWitnesses = [...World.npcs].filter(npc => isWitness(target, npc));
+  assert(hasWitness(p, target), 'the original NPC begins visible to a nearby witness');
+  const originalWitnesses = [...World.npcs].filter(npc => isWitness(p, target, npc));
   const startingNpcTile = [target.level, target.x, target.z];
   const { destination, route } = secludedDestination(p, target, originalWitnesses);
   const clickPath = route.map(value => {
@@ -87,7 +87,7 @@ export function followToSeclusion(p, target) {
   for (; ticks < nativeFollowWaitTicks; ticks++) {
     worldTick();
     if (p.level === destination.level && p.x === destination.x && p.z === destination.z &&
-      !hasWitness(target) && p.inOperableDistance(target)) break;
+      !hasWitness(p, target) && p.inOperableDistance(target)) break;
   }
   assert(ticks < nativeFollowWaitTicks, 'native player movement and NPC follow reach the screened destination');
   assert.deepEqual([p.level, p.x, p.z], [destination.level, destination.x, destination.z],
@@ -96,10 +96,10 @@ export function followToSeclusion(p, target) {
     'native NPC follow moves the original Thug from its starting tile');
   assert.equal(target.target, p, 'the NPC remains attached to the actual native player target');
   assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW, 'the NPC remains in native PLAYERFOLLOW mode');
-  assert(!hasWitness(target), 'the naturally-followed NPC is out of every witness line of sight');
+  assert(!hasWitness(p, target), 'the naturally-followed NPC is out of every witness line of sight');
   assert(originalWitnesses.some(npc => occludedOriginalWitness(target, [npc], target.x, target.z)),
     'an original nearby witness is screened by the intervening building');
-  assert.equal(projectedWitnesses(target, p.x, p.z).length, 0,
+  assert.equal(projectedWitnesses(p, target, p.x, p.z).length, 0,
     'the player is also outside every witness line of sight');
   assert(originalWitnesses.some(npc => occludedOriginalWitness(p, [npc], p.x, p.z)),
     'the player and the Thug are screened from an original nearby witness');

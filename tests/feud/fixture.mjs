@@ -31,23 +31,30 @@ const actors = name => {
   return found;
 };
 const witnessRadius = 5; // ^feud_villager_witness_radius in the native Feud constants.
-function isWitness(target, npc) {
-  return npc.isActive && npc.uid !== target.uid && npc.level === target.level &&
-    CoordGrid.distanceToSW({ x: target.x, z: target.z }, npc) <= witnessRadius &&
-    npc.targetOp !== NpcMode.OPPLAYER2 &&
-    map.isLineOfSight(target.level, npc.x, npc.z, target.x, target.z);
-}
-function hasWitness(target) {
-  for (const npc of World.npcs) if (isWitness(target, npc)) return true;
-  return false;
-}
-const nativeNpcTriggerName = (p, npc, option) => {
+const animalTypes = new Set(['feud_camel', 'feud_charmers_snake', 'feud_desert_snake', 'magic_carpet_monkey']
+  .map(name => id('NpcType', name)));
+function displayNpcType(p, npc) {
   const base = types.NpcType.get(npc.type);
   const state = base.multivarp !== -1 ? p.getVar(base.multivarp)
     : base.multivarbit !== -1 ? p.getVarBit(base.multivarbit) : -1;
   const form = state >= 0 && state < base.multinpc.length ? base.multinpc[state] : -1;
-  const visible = form === -1 ? base : types.NpcType.get(form);
-  return `[opnpc${option},${visible.debugname}]`;
+  return form === -1 ? base : types.NpcType.get(form);
+}
+function isWitness(p, target, npc) {
+  // Independent original-town oracle: visible models, minus its four animal types.
+  // This does not read the production feud_witness_people enum.
+  return npc.isActive && npc.uid !== target.uid && npc.level === target.level &&
+    !animalTypes.has(npc.baseType) && Boolean(displayNpcType(p, npc).models?.length) &&
+    CoordGrid.distanceToSW({ x: target.x, z: target.z }, npc) <= witnessRadius &&
+    npc.targetOp !== NpcMode.OPPLAYER2 &&
+    map.isLineOfSight(target.level, npc.x, npc.z, target.x, target.z);
+}
+function hasWitness(p, target) {
+  for (const npc of World.npcs) if (isWitness(p, target, npc)) return true;
+  return false;
+}
+const nativeNpcTriggerName = (p, npc, option) => {
+  return `[opnpc${option},${displayNpcType(p, npc).debugname}]`;
 };
 
 function locs(name) {
@@ -189,8 +196,8 @@ function wield(p, name) {
   assert.equal(count(p, name, worn), 1, `${name} is actually equipped`);
 }
 
-function operate(p, n, option = 1, choices = [], item = null) {
-  p.clearInteraction(); stand(p, n);
+function operateHere(p, n, option = 1, choices = [], item = null) {
+  p.clearInteraction();
   if (item) { p.lastUseItem = obj(item); p.lastUseSlot = p.getInventory(inv).items.findIndex(entry => entry?.id === obj(item)); }
   const operation = item ? ServerTriggerType.APNPCU : ServerTriggerType.APNPC1 + option - 1;
   assert(p.setInteraction(1, n, operation), 'ordinary engine interaction is accepted');
@@ -200,6 +207,10 @@ function operate(p, n, option = 1, choices = [], item = null) {
   p.dialogueMark = p.packets.length;
   p.processInteraction();
   return { text: finish(p, choices), trigger: trigger.name };
+}
+function operate(p, n, option = 1, choices = [], item = null) {
+  stand(p, n);
+  return operateHere(p, n, option, choices, item);
 }
 const talk = (p, name, choices = []) => operate(p, actors(name)[0], 1, choices);
 function begin(p) {
@@ -297,7 +308,7 @@ function relog(p) {
 }
 
 export {
-  actors, begin, bit, buyBeers, buyReceipts, deliver, drink, finish, gangMask, hasWitness,
-  isWitness, locs, nativeNpcTriggerName, operate, operateLoc, operationOffsets, operationStand, read, relog,
+  activeLoc, actors, begin, bit, buyBeers, buyReceipts, deliver, displayNpcType, drink, finish, gangMask, hasWitness,
+  isWitness, locs, nativeNpcTriggerName, operate, operateHere, operateLoc, operationOffsets, operationStand, read, relog,
   stage, stand, talk, wield
 };

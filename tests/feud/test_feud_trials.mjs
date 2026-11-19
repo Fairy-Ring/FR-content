@@ -2,15 +2,17 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
-  PlayerStat, World, count, engineModule, id, inv, obj, remove, seed
+  PlayerStat, World, count, engineModule, execute, id, inv, map, obj, remove, seed, tile, types
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  actors, begin, bit, buyReceipts, deliver, drink, hasWitness, nativeNpcTriggerName, operate, operationStand,
-  read, relog, stage, talk, wield
+  activeLoc, actors, begin, bit, buyReceipts, deliver, displayNpcType, drink, hasWitness, locs,
+  nativeNpcTriggerName, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, wield
 } from './fixture.mjs';
+import { tickThrough } from './follow.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
+const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const stateVar = id('VarNpcType', 'feud_villager_state');
 const ownerVar = id('VarNpcType', 'feud_villager_owner');
 const attackVar = id('VarNpcType', 'npc_attacking_uid');
@@ -24,8 +26,124 @@ const feudVillagers = () => [...World.npcs].filter(npc => npc.isActive &&
   (villagerForms.has(npc.baseType) || villagerForms.has(npc.type)));
 function isolatedVillager(p, excluded) {
   return feudVillagers().find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 &&
-    !hasWitness(npc) && operationStand(p, npc));
+    !hasWitness(p, npc) && operationStand(p, npc));
 }
+
+test('compiled witness data and original-map probes distinguish visible people, animals and hidden forms', t => {
+  const p = player();
+  // Reachable post-quest display state; this is a predicate/data fixture, not earned quest progress.
+  p.setVarBit(bit('feud_var'), 28);
+  p.setVarBit(bit('feud_npc_multi'), 2);
+  const animals = new Set(['feud_camel', 'feud_charmers_snake', 'feud_desert_snake', 'magic_carpet_monkey']
+    .map(name => id('NpcType', name)));
+  const local = [...World.npcs].filter(npc => npc.isActive && npc.level === 0 &&
+    npc.x >= 52 * 64 && npc.x < 53 * 64 && npc.z >= 46 * 64 && npc.z < 47 * 64);
+  const people = types.EnumType.get(id('EnumType', 'feud_witness_people'));
+  const target = actors('feud_villager_multi_2').find(npc => !hasWitness(p, npc));
+  assert(target, 'an original villager supplies the real self-exclusion UID');
+  for (const npc of local) {
+    const visible = displayNpcType(p, npc);
+    const expected = Number(!animals.has(npc.baseType) && Boolean(visible.models?.length));
+    assert.equal(people.values.get(visible.id) ?? people.defaultInt, expected,
+      `compiled eligibility agrees with the independent original-cache classification: ${visible.debugname}`);
+  }
+  const near = (point, npc) => npc !== target && npc.isActive && npc.level === point.level &&
+    CoordGrid.distanceToSW(point, npc) <= 5 &&
+    map.isLineOfSight(point.level, npc.x, npc.z, point.x, point.z);
+  const points = [];
+  const seen = new Set();
+  for (const npc of local) for (let dx = -6; dx <= 6; dx++) for (let dz = -6; dz <= 6; dz++) {
+    const point = { level: npc.level, x: npc.x + dx, z: npc.z + dz, uid: target.uid };
+    const key = `${point.level}:${point.x}:${point.z}`;
+    if (seen.has(key) || map.isMapBlocked(point.x, point.z, point.level)) continue;
+    seen.add(key); points.push(point);
+  }
+  const choose = (description, predicate) => {
+    const point = points.find(predicate);
+    assert(point, `the unchanged original map supplies ${description}`);
+    return point;
+  };
+  const empty = choose('a probe tile with no other nearby NPC in sight',
+    point => !local.some(npc => near(point, npc)));
+  const person = choose('a visible-person probe',
+    point => hasWitness(p, point));
+  const animal = choose('a visible-animal-only probe',
+    point => !hasWitness(p, point) &&
+      local.some(npc => animals.has(npc.baseType) && near(point, npc) &&
+        Boolean(displayNpcType(p, npc).models?.length)));
+  const hidden = choose('a hidden-form-only probe',
+    point => !hasWitness(p, point) &&
+      local.some(npc => near(point, npc) && types.NpcType.get(npc.type).multinpc.length > 0 &&
+        !displayNpcType(p, npc).models?.length));
+  for (const [kind, present, expected] of [
+    ['visible person', person, 1], ['visible animal', animal, 0], ['hidden form', hidden, 0]
+  ]) {
+    for (const [presence, point, result] of [['present', present, expected], ['absent', empty, 0]]) {
+      const before = World.currentTick;
+      const state = execute('[proc,feud_villager_has_witness]', p,
+        [CoordGrid.packCoord(point.level, point.x, point.z), target.uid], { target });
+      assert.equal(state.popInt(), result, `${kind} ${presence}: compiled original-map witness result`);
+      assert.equal(World.currentTick, before, 'the witness scan completes without a delayed fixture clock jump');
+      if (result) assert.equal(state.activeNpc, target, 'a positive scan restores the victim, not the witness');
+      t.diagnostic(JSON.stringify({ kind, presence, at: [point.level, point.x, point.z], result }));
+    }
+  }
+});
+
+test('a real lured villager can be knocked out inside its original house with both curtains closed', () => {
+  const p = seed(player(), ['blackjack_oak']);
+  // Isolated reachable pre-lure state; the full headed quest earns this checkpoint.
+  p.setVarBit(bit('feud_var'), 9);
+  p.setVarBit(bit('feud_npc_multi'), 2);
+  p.setVar(id('VarPlayerType', 'feud_trial_villager'), -1);
+  wield(p, 'blackjack_oak');
+  const target = actors('feud_villager_multi_3').find(npc => npc.x === 3349 && npc.z === 2954);
+  assert(target, 'the original map places this villager inside the house');
+  assert.equal(target.getVar(stateVar), 0, 'the fixture does not create the tested lure state');
+  const inside = operationStand(p, target);
+  assert(inside, 'the original open entrance makes the interior operation stand reachable');
+  const route = [...map.findPath(0, 3350, 2951, inside[1], inside[2])];
+  assert(route.length, 'the player can enter from outside through the original open curtain');
+  const end = CoordGrid.unpackCoord(route.at(-1));
+  assert.deepEqual([end.level, end.x, end.z], inside, 'the entrance route reaches the interior stand exactly');
+  const south = locs('curtain_1529').find(loc => loc.level === 0 && loc.x === 3350 && loc.z === 2952);
+  const north = locs('curtain_1528').find(loc => loc.level === 0 && loc.x === 3350 && loc.z === 2957);
+  assert(south && north, 'both original house curtains are identified from the map');
+  assert.equal(types.LocType.get(activeLoc(south).type).ops[0], 'Close');
+  operateLoc(p, south, { position: [0, 3350, 2953] });
+  assert.equal(activeLoc(south).type, id('LocType', 'curtain_1528'), 'the real Close action shuts the southern entrance');
+  assert.equal(activeLoc(north).type, id('LocType', 'curtain_1528'), 'the northern entrance remains closed');
+  // Own-position fixture input before Lure, on the exact proven interior route.
+  [p.level, p.x, p.z] = inside;
+  p.originX = p.x; p.originZ = p.z;
+  const beforeLurePosition = tile(p);
+  operateHere(p, target, 4);
+  assert.equal(stage(p), 10, 'native Lure earns the tested checkpoint');
+  assert.equal(target.getVar(stateVar), 2);
+  assert.equal(target.getVar(ownerVar), p.uid);
+  assert.deepEqual(tile(p), beforeLurePosition, 'no player relocation occurs after Lure');
+  assert(!hasWitness(p, target), 'the closed house screens every visible person');
+  const outside = actors('feud_egyptian_doorman_multi').find(npc =>
+    CoordGrid.distanceToSW(target, npc) <= 5 &&
+    Boolean(displayNpcType(p, npc).models?.length) &&
+    !map.isLineOfSight(target.level, npc.x, npc.z, target.x, target.z));
+  assert(outside, 'an original nearby person is actually occluded by the house');
+  const beforeXp = p.stats[PlayerStat.THIEVING];
+  const originalDraw = JavaRandom.nextDouble;
+  try {
+    JavaRandom.nextDouble = () => 0;
+    operateHere(p, target, 5);
+  } finally {
+    JavaRandom.nextDouble = originalDraw;
+  }
+  assert.equal(stage(p), 11, 'closed-house KO advances through the native operation');
+  assert.equal(target.getVar(stateVar), 3);
+  assert.equal(target.getVar(ownerVar), p.uid);
+  assert.equal(p.stats[PlayerStat.THIEVING] - beforeXp, 80, 'the real success awards the one-time eight XP');
+  assert.deepEqual(tile(p), beforeLurePosition, 'the KO also uses the actual unchanged interior position');
+  tickThrough(target.getVar(id('VarNpcType', 'feud_villager_deadline')));
+  assert.equal(target.getVar(stateVar), 0, 'native wake cleanup releases the original villager for later cases');
+});
 
 test('native Feud trials allow the opening at level 29, gate the first theft at 30, and preserve trial consequences', () => {
   let p = player();
@@ -238,7 +356,8 @@ test('native Feud trials allow the opening at level 29, gate the first theft at 
   const unarmed = player();
   unarmed.setVarBit(bit('feud_var'), 9);
   unarmed.setVarBit(bit('feud_npc_multi'), 2);
-  const unarmedTarget = feudVillagers().find(npc => npc !== secluded && npc.getVar(stateVar) === 0);
+  const unarmedTarget = feudVillagers().find(npc => npc !== secluded && npc.getVar(stateVar) === 0 &&
+    operationStand(unarmed, npc));
   assert(unarmedTarget, 'an original idle villager placement remains available for a real lure');
   operate(unarmed, unarmedTarget, 4);
   assert.equal(stage(unarmed), 10, 'the sourced Lure action does not require an unsourced weapon gate');

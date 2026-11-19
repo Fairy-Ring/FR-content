@@ -60,10 +60,31 @@ if (%feud_var = ^feud_villager_lured) {
 return;
 
 [proc,feud_villager_has_witness](coord $spot, npc_uid $target)(boolean)
-npc_huntall($spot, ^feud_villager_witness_radius, 0);
-while (npc_findnext = true) {
-    if (npc_uid ! $target & npc_getmode ! opplayer2 & lineofsight(npc_coord, $spot) = true) {
-        return(true);
+// npc_huntall excludes non-attackable types, including the original citizens.
+// FEUD-WITNESS-PERSON-01 is the single data rule for visible-person eligibility.
+def_int $x = coordx($spot);
+def_int $z = coordz($spot);
+def_int $zone_x = calc(($x - ^feud_villager_witness_radius) / 8 * 8);
+def_int $first_zone_z = calc(($z - ^feud_villager_witness_radius) / 8 * 8);
+def_int $last_x = calc($x + ^feud_villager_witness_radius);
+def_int $last_z = calc($z + ^feud_villager_witness_radius);
+while ($zone_x <= $last_x) {
+    def_int $x_offset = calc($zone_x - $x);
+    def_int $zone_z = $first_zone_z;
+    while ($zone_z <= $last_z) {
+        npc_findallzone(movecoord($spot, $x_offset, 0, calc($zone_z - $z)));
+        while (npc_findnext = true) {
+            def_coord $candidate = npc_coord;
+            if (npc_uid ! $target & npc_getmode ! opplayer2 &
+                enum(npc, int, feud_witness_people, npc_type) = 1 &
+                distance($candidate, $spot) <= ^feud_villager_witness_radius &
+                lineofsight($candidate, $spot) = true) {
+                // The iterator made the witness active; consequences belong to the victim.
+                return(npc_finduid($target));
+            }
+        }
+        $zone_z = calc($zone_z + 8);
     }
+    $zone_x = calc($zone_x + 8);
 }
 return(false);

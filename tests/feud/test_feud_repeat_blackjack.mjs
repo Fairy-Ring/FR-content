@@ -10,7 +10,7 @@ import {
 import { player } from './player.mjs';
 import {
   actors, begin, bit, buyReceipts, deliver, drink, finish, hasWitness, isWitness,
-  nativeNpcTriggerName, operate, operationStand, read, stand, stage, talk, wield
+  nativeNpcTriggerName, operate, operateHere, operationStand, read, stand, stage, talk, wield
 } from './fixture.mjs';
 import { followToSeclusion, tickThrough } from './follow.mjs';
 
@@ -36,7 +36,7 @@ function completePlayer(level = 1) {
 
 function isolatedTarget(p, name, excluded = new Set()) {
   return actors(name).find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 &&
-    !hasWitness(npc) && operationStand(p, npc));
+    !hasWitness(p, npc) && operationStand(p, npc));
 }
 
 function withRandom(value, action) {
@@ -45,9 +45,9 @@ function withRandom(value, action) {
   try { return action(); } finally { JavaRandom.nextDouble = previous; }
 }
 
-function startOperation(p, npc, option, { standPlayer = true } = {}) {
+function startOperation(p, npc, option) {
   p.clearInteraction();
-  if (standPlayer) stand(p, npc);
+  stand(p, npc);
   assert(p.setInteraction(1, npc, ServerTriggerType.APNPC1 + option - 1),
     'ordinary engine interaction is accepted');
   assert(p.inOperableDistance(npc), 'the player can operate from the current native position');
@@ -58,10 +58,6 @@ function startOperation(p, npc, option, { standPlayer = true } = {}) {
   return trigger.name;
 }
 
-function operateHere(p, npc, option, choices = []) {
-  const trigger = startOperation(p, npc, option, { standPlayer: false });
-  return { text: finish(p, choices), trigger };
-}
 
 function npcConfigBlock(text, name) {
   const marker = `[${name}]`;
@@ -313,7 +309,7 @@ test('the purchased willow is usable and the Thug applies its period level and K
   const thug = actors('feud_egyptian_doorman_multi').find(npc =>
     npc.getVar(stateVar) === 0 && operationStand(p, npc));
   assert(thug, 'an original Menaphite Thug has a path-checked native operation stand');
-  assert(hasWitness(thug), 'the original Thug begins visible to a nearby person');
+  assert(hasWitness(p, thug), 'the original Thug begins visible to a nearby person');
   const lure = operate(p, thug, 4);
   assert.equal(lure.trigger, nativeNpcTriggerName(p, thug, 4));
   assert.equal(thug.getVar(stateVar), 2);
@@ -392,10 +388,10 @@ test('witnessed Bandit KO applies the period 4 HP, stun and attack outcome', () 
   const nearbyBanditTypes = new Set([
     id('NpcType', 'feud_arabian_guard_multi'), id('NpcType', 'feud_arabian_guard2_multi')
   ]);
-  const target = actors('feud_arabian_guard_multi').find(npc => npc.getVar(stateVar) === 0 &&
-    [...World.npcs].some(other => nearbyBanditTypes.has(other.baseType) && isWitness(npc, other)));
-  assert(target, 'an original Bandit placement has a nearby Bandit satisfying the native witness predicate');
   const p = seed(completePlayer(56), ['blackjack_oak']);
+  const target = actors('feud_arabian_guard_multi').find(npc => npc.getVar(stateVar) === 0 &&
+    [...World.npcs].some(other => nearbyBanditTypes.has(other.baseType) && isWitness(p, npc, other)));
+  assert(target, 'an original Bandit placement has a nearby Bandit satisfying the native witness predicate');
   wield(p, 'blackjack_oak');
   const beforeXp = xp(p), beforeCoins = count(p, 'coins');
   const lure = operate(p, target, 4);
