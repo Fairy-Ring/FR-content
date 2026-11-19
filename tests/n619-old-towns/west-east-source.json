@@ -185,6 +185,10 @@
     "Yes",
     "No"
   ],
+  "npcSpeakers": {
+    "Aaaarrgh!": "Hengel",
+    "Eeeek!": "Anja"
+  },
   "labels": [
     "n619_mguild_guard",
     "n619_mguild_menu",

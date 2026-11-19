@@ -16,7 +16,7 @@ if ($option = 1) {
     ~chatplayer("<p,angry>Meanie!");
 } else {
     ~chatnpc("<p,shock>Aaaarrgh!");
-    ~chatnpc("<p,shock>Eeeek!");
+    ~chatnpc_specific("Anja", rimmington_anja, "<p,shock>Eeeek!");
 }
 
 [opnpc1,rimmington_anja]
@@ -62,5 +62,5 @@ if ($option = 1) {
     inv_add(inv, coins, calc(random(3) + 1));
 } else {
     ~chatnpc("<p,shock>Eeeek!");
-    ~chatnpc("<p,shock>Aaaarrgh!");
+    ~chatnpc_specific("Hengel", rimmington_hengel, "<p,shock>Aaaarrgh!");
 }

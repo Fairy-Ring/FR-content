@@ -77,7 +77,7 @@ function pages(packets) {
     let match = /^(npcchat|chat)([1-4]):com_([1-5])$/.exec(component);
     if (match) {
       if (+match[3] === 1) {
-        finish(); current = { kind: 'speech', speaker: match[1] === 'npcchat' ? 'npc' : 'player', lines: [] };
+        finish(); current = { kind: 'speech', speaker: match[1] === 'npcchat' ? 'npc' : 'player', name: packet.text, lines: [] };
       } else {
         assert.equal(current?.kind, 'speech', `speech without header: ${component}`);
         current.lines.push(packet.text);
@@ -211,6 +211,11 @@ for (const file of ['barbarian-draynor-source.json', 'alkharid-source.json', 'we
       } else {
         const text = normalize(page.lines.join(' '));
         assert(speech.some(line => line.includes(text)), `${file}: unsourced speech ${JSON.stringify(text)}`);
+        const expectedSpeaker = oracle.npcSpeakers?.[text];
+        if (expectedSpeaker) {
+          assert.equal(page.speaker, 'npc', `${file}: retained NPC speaker for ${text}`);
+          assert.equal(normalize(page.name), expectedSpeaker, `${file}: retained NPC name for ${text}`);
+        }
         emitted.push(text);
       }
     }
