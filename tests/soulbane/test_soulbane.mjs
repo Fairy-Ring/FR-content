@@ -33,6 +33,7 @@ const OpNpcTHandler = new (await engineModule('network/game/client/handler/OpNpc
 const NpcStat = (await engineModule('engine/entity/NpcStat.ts')).NpcStat;
 const resolveNpcType = (await engineModule('engine/entity/resolveNpcType.ts')).default;
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
+const { getExpByLevel } = await engineModule('engine/entity/Player.ts');
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const { PlayerInfoProt } = await engineModule('network/rsbuf/prot.ts');
 const OpPlayer = (await engineModule('network/game/client/model/OpPlayer.ts')).default;
@@ -5209,6 +5210,89 @@ function testRoomExitRemovesAngerWeapon() {
   console.log('R1 ordinary room exit removes the weapon and private copy (expected old-head pass)');
 }
 
+function testFreshRelogLaunaStart() {
+  const label = 'fresh empty-save/relogin Launa start';
+  // Reserve only a unique offline slot; none of makePlayer's seeded vars or
+  // level-99 defaults enter the actual empty-save player.
+  const reservation = makePlayer();
+  reservation.unlink();
+  let p = PlayerLoading.load(reservation.username, new Packet(new Uint8Array(0)), null);
+  p.pid = reservation.pid;
+  p.slot = reservation.slot;
+  p.uid = ((Number(p.username37 & 0x1fffffn) << 11) | p.slot) >>> 0;
+  p.isActive = true;
+  p.packets = [];
+  p.messages = [];
+  p.write = packet => p.packets.push(packet);
+  p.messageGame = text => p.messages.push(String(text));
+  p.wrappedMessageGame = p.messageGame;
+  World.players[p.pid] = p;
+  World.playerLoop.add(p.hash64, p);
+  rsbuf.addPlayer(p.slot);
+  World.gameMap.getZone(p.x, p.z, p.level).enter(p);
+  World.instances.playerEntered({ level: p.level, x: p.x, z: p.z });
+  const handleId = id('VarPlayerType', 'soulbane_instance');
+  const handleAtConstruction = p.vars[handleId];
+  assert.equal(stage(p), 0, `${label}: native empty-save quest stage is zero`);
+  assert.equal(runProcInt('soulbane_owned', p), 0,
+    `${label}: native constructor defaults do not own a private region`);
+  p.onLogin();
+  p.processEngineQueue();
+
+  // The live mainland fixture seeds only tutorial completion and its own
+  // mainland position before the first genuine logout/save/relogin.
+  writeVar(p, 'tutorial', 1000);
+  runProc('p_telejump_safe', p, [CoordGrid.packCoord(0, 3220, 3220)]);
+  finishInteraction(p, [], `${label}: first login dialogue`);
+  assert(CloseModalHandler.handle(new CloseModal(), p), `${label}: native Close dismisses first-login onboarding`);
+  worldTick();
+  for (let tick = 0; tick < 128 && (!p.canAccess() || p.engineQueue.head() !== null || p.queue.head() !== null); tick++) {
+    worldTick();
+  }
+  assert(p.canAccess() && p.engineQueue.head() === null && p.queue.head() === null,
+    `${label}: native first-login work settles before the real logout request`);
+  p = nativeLogoutAndReload(p, `${label}: ordinary mainland relog`);
+  assert.equal(stage(p), 0, `${label}: real save/relogin keeps stage zero`);
+  assert.equal(instanceUid(p), 0, `${label}: relog has no region handle`);
+  assert.equal(runProcInt('soulbane_owned', p), 0,
+    `${label}: ownership lookup finishes false after the real login hook`);
+  const handleAfterRelog = p.vars[handleId];
+
+  // Disclosed ordinary kit/stat seeds match the live account after relog.
+  for (const stat of [PlayerStat.ATTACK, PlayerStat.STRENGTH, PlayerStat.DEFENCE, PlayerStat.HITPOINTS]) {
+    p.baseLevels[stat] = 99;
+    p.levels[stat] = 99;
+    p.stats[stat] = getExpByLevel(99);
+  }
+  seed(p, ['rune_chainbody', 'rune_platelegs']);
+  for (const armor of ['rune_chainbody', 'rune_platelegs']) {
+    assert(held(p, armor, 2), `${label}: native Wear accepts the ordinary ${armor}`);
+  }
+  assert.equal(p.invAdd(inv, obj('coins'), 15), 15, `${label}: seed only the rope purchase cost`);
+  runProc('p_telejump_safe', p, [CoordGrid.packCoord(0, 3100, 3258)]);
+  const ned = nedNpc();
+  goToStand(p, ned, `${label}: native walk to Ned`);
+  operateNpc(p, ned, 1, [1, 1], `${label}: actual rope purchase`);
+  assert.equal(count(p, 'rope'), 1, `${label}: Ned, not a seed, produces the rope`);
+  assert.equal(stage(p), 0, `${label}: ordinary preparation never seeds a quest stage`);
+
+  runProc('p_telejump_safe', p, [CoordGrid.packCoord(0, 3310, 3455)]);
+  const launa = outerLauna();
+  goToStand(p, launa, `${label}: native walk into Launa operation distance`);
+  const accepted = operateNpc(p, launa, 1, [1], `${label}: stage-zero native Talk-to`);
+  assert.match(accepted.trigger.name, /^\[opnpc1,soulbane_launa(?:_multi)?\]$/);
+  assert.match(accepted.text, /Hi there\./, `${label}: the native opening player page is emitted`);
+  assert.match(accepted.text, /Hello\./, `${label}: the native opening Launa page is emitted`);
+  assert.match(accepted.text, /Would you like me to go down to look for your husband and son\?/,
+    `${label}: the sourced quest-start choice is reached and answered`);
+  assert.equal(stage(p), 1, `${label}: only the real conversation writes stage one`);
+  assert.equal(instanceUid(p), 0, `${label}: the opening never creates a private region`);
+  console.log(`Launa fresh relog ${JSON.stringify({ handleId, handleAtConstruction, handleAfterRelog, trigger: accepted.trigger.name, stage: stage(p), opening: accepted.text })}`);
+  p.requestLogout = true;
+  worldTick();
+  assert(![...World.playerLoop.all()].includes(p), `${label}: native logout removes the fixture`);
+}
+
 function testMainPath() {
   const p = playerFixture({ level: 0, x: 3100, z: 3257 });
   const start = { level: p.level, x: p.x, z: p.z };
@@ -5402,6 +5486,7 @@ function run() {
     return;
   }
   const r1Cases = new Map([
+    ['launa-fresh-relog', testFreshRelogLaunaStart],
     ['later-partial', testLaterPartialLifecycle],
     ['hope-concurrent', testHopeConcurrentCreditsAndFood],
     ['hope-ranged-delay', testHopeNativeRangedDelay],
@@ -5446,6 +5531,7 @@ function run() {
 
   testMemoryInputHold();
   testMemoryTeleportAdmission();
+  testFreshRelogLaunaStart();
   testConfusionIllusionXp();
   testLaterPartialLifecycle();
   testHopeConcurrentCreditsAndFood();
