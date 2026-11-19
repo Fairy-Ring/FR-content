@@ -1,0 +1,13 @@
+// CANDIDATE: Transcript:Olivia r11220974 through r15124527, standard dialogue.
+// Theft-event overheads and refusal state remain with the Draynor seed-stall activity.
+[opnpc1,seed_merchant]
+~chatnpc("<p,quiz>Would you like to trade in seeds?");
+def_int $option = ~p_choice3("Yes", 1, "No", 2, "Where do I get rarer seeds from?", 3);
+if ($option = 1) {
+    ~openshop_activenpc;
+} else if ($option = 2) {
+    ~chatplayer("<p,neutral>No, thanks.");
+} else {
+    ~chatplayer("<p,quiz>Where do I get rarer seeds from?");
+    ~chatnpc("<p,neutral>The Master Farmers usually carry a few rare seeds around with them, although I don't know if they'd want to part with them for any price to be honest.");
+}
