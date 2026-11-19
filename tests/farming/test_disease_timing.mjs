@@ -280,7 +280,7 @@ try {
             for (let step = 0; step < crop.mature - crop.first; step++) {
               const args = [value, 1];
               if (family.name === 'allotment') args.push(crop.row);
-              if (!legacy) args.push(640 + step * family.period);
+              if (!legacy) args.push(0, 640 + step * family.period);
               value = proc(p, family.advance, ...args).popInt();
               bytes.push(value);
               if (value >= 128 || value >= crop.mature && value < 64) break;

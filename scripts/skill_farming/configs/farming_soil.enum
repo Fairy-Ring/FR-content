@@ -1,0 +1,29 @@
+// UNKNOWN engineering ownership of VERIFIED original two-bit fields.
+// Index 0-15 selects varp 513 bits 2*index..2*index+1.
+// Index 16-19 selects varp 516 bits 24+2*(index-16)..25+2*(index-16).
+// Harvest counters in original slot 538 use 2*index, except herbs use
+// 2*(index-4); flowers have their period fixed yield and no counter.
+[farming_soil_patch]
+inputtype=loc
+outputtype=int
+default=-1
+val=farming_veg_patch_1,0
+val=farming_veg_patch_2,1
+val=farming_veg_patch_3,2
+val=farming_veg_patch_4,3
+val=farming_veg_patch_5,4
+val=farming_veg_patch_6,5
+val=farming_veg_patch_7,6
+val=farming_veg_patch_8,7
+val=farming_hops_patch_1,8
+val=farming_hops_patch_2,9
+val=farming_hops_patch_3,10
+val=farming_hops_patch_4,11
+val=farming_flower_patch_1,12
+val=farming_flower_patch_2,13
+val=farming_flower_patch_3,14
+val=farming_flower_patch_4,15
+val=farming_herb_patch_1,16
+val=farming_herb_patch_2,17
+val=farming_herb_patch_3,18
+val=farming_herb_patch_4,19

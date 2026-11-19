@@ -447,8 +447,14 @@ def_dbrow $row = db_findnext;
 // UNKNOWN channel and grouping: Main's choice for the client line limit,
 // preserving the quotation's type, soil, state, then protection order.
 mes(db_getfield($patch, farming_inspect_patch:line, 0));
-// Compost application adds its soil reader at this one lookup.
-mes(db_getfield(farming_inspect_soil_untreated, farming_inspect:line, 0));
+def_dbrow $soil = farming_inspect_soil_untreated;
+def_int $index = ~farming_soil_index;
+if ($index ! -1) {
+    def_int $treatment = ~farming_soil_treatment($index);
+    if ($treatment = 1) $soil = farming_inspect_soil_compost;
+    else if ($treatment = 2) $soil = farming_inspect_soil_supercompost;
+}
+mes(db_getfield($soil, farming_inspect:line, 0));
 def_string $state_line = db_getfield($row, farming_inspect:line, 0);
 if (string_length($state_line) > 0) {
     mes($state_line);

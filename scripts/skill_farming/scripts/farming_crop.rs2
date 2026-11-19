@@ -1,6 +1,6 @@
 // CANDIDATE Old School crop care. Families translate cache bytes at their
 // boundary; only this helper owns the disease/watering state walk.
-[proc,farming_crop_advance](int $stage, int $steps, int $first, int $mature, boolean $waterable, dbrow $growth, int $window)(int)
+[proc,farming_crop_advance](int $stage, int $steps, int $first, int $mature, boolean $waterable, int $treatment, dbrow $growth, int $window)(int)
 // Healthy growth is finite. Disease resolves the remaining range in one check.
 def_int $period = db_getfield($growth, farming_growth:period, 0);
 def_int $diseaseperiod = db_getfield($growth, farming_growth:disease_period, 0);
@@ -21,6 +21,7 @@ while ($steps > 0) {
     if ($stage = $first) {
         $stage = add($stage, 1);
     } else {
+        if ($treatment ! 0) $chance = ~farming_soil_disease($chance, $treatment);
         if (random(^farming_disease_denominator) < $chance) {
             $stage = add($stage, ^farming_diseased_offset);
         } else {

@@ -28,17 +28,17 @@ switch_obj ($seed) {
     case default : return(null);
 }
 
-[proc,farming_flower_advance](int $stage, int $steps, int $window)(int)
+[proc,farming_flower_advance](int $stage, int $steps, int $treatment, int $window)(int)
 def_dbrow $crop = ~farming_flower_crop($stage);
 if ($crop = null) return($stage);
-return(~farming_crop_advance($stage, $steps, db_getfield($crop, farming_flower:first, 0), db_getfield($crop, farming_flower:mature, 0), true, farming_growth_flower, $window));
+return(~farming_crop_advance($stage, $steps, db_getfield($crop, farming_flower:first, 0), db_getfield($crop, farming_flower:mature, 0), true, $treatment, farming_growth_flower, $window));
 
 [proc,farming_flower_advance_all](int $steps, int $window)
 def_int $word = %farming_flower_varp;
 def_int $bit = 0;
 while ($bit < 32) {
     def_int $end = add($bit, 7);
-    def_int $stage = ~farming_flower_advance(getbit_range($word, $bit, $end), $steps, $window);
+    def_int $stage = ~farming_flower_advance(getbit_range($word, $bit, $end), $steps, ~farming_soil_treatment(add(12, divide($bit, 8))), $window);
     $word = setbit_range_toint($word, $stage, $bit, $end);
     $bit = add($bit, 8);
 }
@@ -68,4 +68,4 @@ if ($stage >= add($first, ^farming_watered_offset) & $stage < add($mature, ^farm
     $stage = sub($stage, ^farming_watered_offset);
 }
 if ($stage >= $first & $stage < $mature) return(min($mature, add($stage, max(0, $steps))));
-return(~farming_crop_advance($stage, $steps, $first, $mature, true, farming_growth_potato, $window));
+return(~farming_crop_advance($stage, $steps, $first, $mature, true, 0, farming_growth_potato, $window));

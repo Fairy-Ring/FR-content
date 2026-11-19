@@ -49,7 +49,7 @@ function seedForDraw(draw) {
 const draws = new Map([0, 9, 10, 19, 20, 127].map(draw => [draw, seedForDraw(draw)]));
 function advance(value, n, draw = 127) {
   JavaRandom.setSeed(draws.get(draw));
-  return proc(player(), 'farming_potato_advance', value, n, 0).popInt();
+  return proc(player(), 'farming_potato_advance', value, n, 0, 0).popInt();
 }
 try {
   test('clock is original permanent slot 500, server-only; all patch bytes are permanent', () => {

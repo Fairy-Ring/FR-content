@@ -26,6 +26,7 @@ const expected = JSON.parse(fs.readFileSync(new URL('./inspect-messages.json', i
 const left = new Map();
 const deadForms = new Set();
 let cases = 0;
+let treatedCases = 0;
 const supportedVisible = new Set();
 for (const family of expected.families) {
   for (const name of family.parents) {
@@ -102,7 +103,7 @@ for (const row of workbook.rows) {
   assert.equal(row.approvedFor377, Boolean(text), key);
   if (text) assert(confirmed.includes(text), key);
 }
-// All three wording treatments exist, but only untreated is reachable today.
+// All three retained wording treatments now have native dispatch coverage.
 assert.deepEqual(Object.keys(expected.soils).sort(), ['compost', 'supercompost', 'untreated']);
 for (const family of expected.families.filter(family => family.built)) {
   const kinds = new Set(family.states.map(state => state.kind));
@@ -152,9 +153,17 @@ function snapshot() {
     animation: p.animId, delay: p.delayedUntil,
   };
 }
+const soilFields = {
+  allotment: { varp: 'varp513_bits', bit: 0 },
+  hops: { varp: 'varp513_bits', bit: 16 },
+  flower: { varp: 'varp513_bits', bit: 24 },
+  herb: { varp: 'varp516_bits', bit: 24 },
+};
+const treatedCaseCount = 2 * expected.families.filter(family => soilFields[family.key]).reduce((total, family) =>
+  total + family.parents.length * family.states.reduce((count, { from, to }) => count + to - from + 1, 0), 0);
 {
   for (const family of expected.families) {
-    for (const name of family.parents) {
+    for (const [patchIndex, name] of family.parents.entries()) {
       const root = types.LocType.get(id('LocType', name));
       const selector = types.VarBitType.get(root.multivarbit);
       assert(selector || family.states.length === 0, `${name}: original packed selector`);
@@ -179,35 +188,46 @@ function snapshot() {
         }
         assert(script, `${name}/${stage}/${visible.debugname}: actual visible-form dispatch exists`);
         assert(script.name.startsWith('[oploc2,'), 'only the requested option is bound');
-        p.vars.fill(0);
-        p.setVarBit(root.multivarbit, stage);
-        p.messages.length = 0;
-        const { loc, x, z } = stand;
-        p.x = p.originX = x; p.z = p.originZ = z; p.level = loc.level;
-        p.clearInteraction();
-        const before = snapshot();
-        writes.length = 0;
-        observeWrites = true;
-        assert.equal(handler.handle(new OpLoc(2, loc.x, loc.z, root.id), p), true, `${name}/${stage}: native packet admitted`);
-        assert.equal(p.getApTrigger(), null, 'Inspect has no added approach script');
-        assert.equal(p.getOpTrigger(), script, 'engine dispatch agrees with the visible-form lookup');
-        p.processInteraction();
-        observeWrites = false;
-        assert.deepEqual(writes, [], 'Inspect calls no variable writer or animation command');
-        assert.deepEqual(p.messages, lines, `${name}/${stage}/${visible.debugname}: retained source lines in exact order`);
-        assert.deepEqual(snapshot(), before, `${name}/${stage}: no state, item, XP, animation or delay write`);
-        assert.equal(p.activeScript, null, 'Inspect never suspends');
-        assert.equal(p.delayed, false, 'Inspect adds no player delay');
-        assert.equal(p.hasInteraction(), false, 'Inspect leaves no repeating action');
-        assertConfirmed(p.messages);
-        assert.equal(p.messages.length, state.kind === 'dead' ? 2 : 3, 'only dead state wording is absent');
-        forms.add(visible.debugname);
-        cases++;
+        const soils = soilFields[family.key] ? ['untreated', 'compost', 'supercompost'] : ['untreated'];
+        for (const [treatment, soil] of soils.entries()) {
+          p.vars.fill(0);
+          p.setVarBit(root.multivarbit, stage);
+          if (treatment !== 0) {
+            const field = soilFields[family.key];
+            p.setVar(id('VarPlayerType', field.varp), (treatment * 2 ** (field.bit + patchIndex * 2)) | 0);
+          }
+          p.messages.length = 0;
+          const { loc, x, z } = stand;
+          p.x = p.originX = x; p.z = p.originZ = z; p.level = loc.level;
+          p.clearInteraction();
+          const before = snapshot();
+          writes.length = 0;
+          observeWrites = true;
+          assert.equal(handler.handle(new OpLoc(2, loc.x, loc.z, root.id), p), true, `${name}/${stage}: native packet admitted`);
+          assert.equal(p.getApTrigger(), null, 'Inspect has no added approach script');
+          assert.equal(p.getOpTrigger(), script, 'engine dispatch agrees with the visible-form lookup');
+          p.processInteraction();
+          observeWrites = false;
+          assert.deepEqual(writes, [], 'Inspect calls no variable writer or animation command');
+          const soilLines = lines.map(line => line === expected.soils.untreated ? expected.soils[soil] : line);
+          assert.deepEqual(p.messages, soilLines, `${name}/${stage}/${visible.debugname}/${soil}: retained source lines in exact order`);
+          assert.deepEqual(snapshot(), before, `${name}/${stage}: no state, item, XP, animation or delay write`);
+          assert.equal(p.activeScript, null, 'Inspect never suspends');
+          assert.equal(p.delayed, false, 'Inspect adds no player delay');
+          assert.equal(p.hasInteraction(), false, 'Inspect leaves no repeating action');
+          assertConfirmed(p.messages);
+          assert.equal(p.messages.length, state.kind === 'dead' ? 2 : 3, 'only dead state wording is absent');
+          forms.add(visible.debugname);
+          if (treatment === 0) cases++;
+          else treatedCases++;
+        }
       }
     }
   }
 }
 assert.equal(cases, expected.nativeCases, 'every supported root/state reaches native dispatch');
+assert.equal(treatedCases, treatedCaseCount, 'every built root/state has both treated soil message lists');
+console.log('PASS Inspect treated soil: ' + treatedCases + ' native root/state/treatment cases; untreated matrix unchanged');
 assert.equal(forms.size, expected.supportedForms, 'complete supported visible-form census');
 for (const [owner, count] of Object.entries(expected.leftForms)) {
   assert.equal(left.get(owner)?.size ?? 0, count, `${owner}: explicit remaining form count`);

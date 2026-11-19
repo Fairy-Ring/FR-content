@@ -623,6 +623,18 @@ table=farming_inspect
 data=state,-1
 data=line,"The soil has not been treated."
 
+// CANDIDATE operator confirmation; static keys continue untreated's -1.
+[farming_inspect_soil_compost]
+table=farming_inspect
+data=state,-2
+data=line,"The soil has been treated with compost."
+
+// CANDIDATE 2012 player quotation and operator confirmation.
+[farming_inspect_soil_supercompost]
+table=farming_inspect
+data=state,-3
+data=line,"The soil has been treated with supercompost."
+
 [farming_inspect_scarecrow]
 table=farming_inspect
 data=state,0

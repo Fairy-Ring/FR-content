@@ -2,9 +2,9 @@
 // Disease prevents advancement. UNKNOWN next-tier death timing is configured
 // in farming_growth; cache bands preserve the stage across watering and cure.
 
-[proc,farming_potato_advance](int $stage, int $steps, int $window)(int)
+[proc,farming_potato_advance](int $stage, int $steps, int $treatment, int $window)(int)
 // Do not truncate elapsed windows before the shared helper resolves disease.
-return(~farming_allotment_advance($stage, $steps, farming_allotment_potato, $window));
+return(~farming_allotment_advance($stage, $steps, farming_allotment_potato, $treatment, $window));
 
 [proc,farming_potato_advance_word](int $word, int $steps, int $flowerbit, int $window)(int)
 def_int $bit = 0;
@@ -16,12 +16,16 @@ while ($bit < 32) {
     def_int $flower = getbit_range(%farming_flower_varp, $flowerstart, add($flowerstart, 7));
     def_int $stage;
     def_int $watchbit = add(divide($flowerbit, 4), divide($bit, 8));
+    def_int $treatment = ~farming_soil_treatment($watchbit);
     if ($crop ! null & (~farming_protection_watched($watchbit) = true | ~farming_flower_protects($flower, $before) = true)) {
         $stage = ~farming_flower_advance_protected($before, $steps, $crop, $window);
     } else if (modulo($before, ^farming_watered_offset) >= ^farming_potato_seed & modulo($before, ^farming_watered_offset) <= ^farming_potato_harvest_last) {
-        $stage = ~farming_potato_advance($before, $steps, $window);
+        $stage = ~farming_potato_advance($before, $steps, $treatment, $window);
     } else {
-        $stage = ~farming_allotment_advance($before, $steps, $crop, $window);
+        $stage = ~farming_allotment_advance($before, $steps, $crop, $treatment, $window);
+    }
+    if ($crop ! null & $treatment ! 0) {
+        ~farming_soil_mature($watchbit, $before, $stage, db_getfield($crop, farming_allotment:mature, 0));
     }
     $word = setbit_range_toint($word, $stage, $bit, $end);
     $bit = add($bit, 8);
