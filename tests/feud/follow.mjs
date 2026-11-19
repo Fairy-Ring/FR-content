@@ -42,21 +42,16 @@ function walkRoute(p, route) {
 
 function secludedDestination(p, target, witnesses, visited) {
   const nearby = [...World.npcs].filter(npc => npc.isActive && npc.level === target.level &&
-    CoordGrid.distanceToSW(target, npc) <= seclusionSearchRadius + witnessRadius + 1);
-  // Include the follower's finishing neighborhood, not only the player's tile.
+    CoordGrid.distanceToSW(target, npc) <= seclusionSearchRadius + witnessRadius);
+  // The exact native follower stand is checked after movement, not guessed here.
   for (let radius = 2; radius <= seclusionSearchRadius; radius++) {
     for (let x = target.x - radius; x <= target.x + radius; x++) {
-      candidateTile: for (let z = target.z - radius; z <= target.z + radius; z++) {
+      for (let z = target.z - radius; z <= target.z + radius; z++) {
         if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
           map.isMapBlocked(x, z, target.level) || visited.some(tile => tile.x === x && tile.z === z)) continue;
-        if (!occludedOriginalWitness(target, witnesses, x, z)) continue;
-        for (let dx = -1; dx <= 1; dx++) {
-          for (let dz = -1; dz <= 1; dz++) {
-            const projected = { uid: target.uid, level: target.level, x: x + dx, z: z + dz };
-            if (!map.isMapBlocked(projected.x, projected.z, projected.level) &&
-              nearby.some(npc => isWitness(p, projected, npc))) continue candidateTile;
-          }
-        }
+        const projected = { uid: target.uid, level: target.level, x, z };
+        if (nearby.some(npc => isWitness(p, projected, npc)) ||
+          !occludedOriginalWitness(target, witnesses, x, z)) continue;
         const route = exactRoute(p.level, p.x, p.z, x, z);
         if (!route) continue;
         return { destination: { level: target.level, x, z }, route };
