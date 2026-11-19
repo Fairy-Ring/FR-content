@@ -1,0 +1,13 @@
+// CANDIDATE: retained Wardrobe (skeleton, tidy) locations and original 377 map.
+// The barracks and robbery-scene copies belong to their event/cutscene owners.
+[oploc1,draynor_wardrobe]
+switch_coord (loc_coord) {
+    case 0_47_50_8_56, 0_47_50_8_61, 0_48_50_12_56, 0_48_50_15_61 :
+        @open_wardrobe(draynor_wardrobe_open, null);
+    case default : ~displaymessage(^dm_default);
+}
+
+// The published plain Search wording and its pre-removal junk branch are unchanged.
+// UNKNOWN: the inherited plain Search junk chance is 1/10, not a sourced original rate.
+[oploc2,draynor_wardrobe_open] @search_wardrobe;
+[oploc3,draynor_wardrobe_open] @close_wardrobe(draynor_wardrobe);

@@ -1,0 +1,97 @@
+// CANDIDATE: finished Lost City 274 spinning/pottery choosers. Research: ordinary-scenery.
+// Each selected item repeats the published single-item action, including its delays.
+[oploc2,spinningwheel] @ordinary_spin_chooser;
+[oploc2,elf_village_spinning_wheel] @ordinary_spin_chooser;
+
+[oploc2,viking_spinningwheel]
+if (%viking < ^viking_complete) {
+    ~mesbox("Only Fremenniks may use this spinning wheel.");
+    return;
+}
+@ordinary_spin_chooser;
+
+[label,ordinary_spin_chooser]
+def_namedobj $item;
+def_int $remaining;
+$item, $remaining = ~skill_multi2_header(
+    "What would you like to spin?",
+    wool, 0, -2, 200, "\\n\\n\\n\\nWool",
+    flax, 0, -3, 200, "\\n\\n\\n\\nFlax"
+);
+if_close;
+if ($item = null | $remaining < 1) {
+    return;
+}
+if ($item = flax & map_members = ^false) {
+    mes(^mes_members_feature);
+    return;
+}
+def_int $held = inv_total(inv, $item);
+if ($held = 0) {
+    mes("You'll need <lowercase(oc_name($item))> to make that.");
+    return;
+}
+while ($remaining > 0 & $held > 0) {
+    // UNKNOWN original timing: retain the published spinning delay argument 3.
+    ~craft_spinning($item);
+    def_int $left = inv_total(inv, $item);
+    // The shared level or random-event gate can return without spinning an item.
+    if ($left = $held) {
+        return;
+    }
+    $held = $left;
+    $remaining = sub($remaining, 1);
+}
+if ($remaining > 0) {
+    mes("You have run out of <lowercase(oc_name($item))>.");
+}
+
+[oploc1,potteryoven] @ordinary_fire_chooser;
+[oploc1,fai_barbarian_pottery_oven] @ordinary_fire_chooser;
+
+[oploc1,viking_potteryoven]
+if (%viking < ^viking_complete) {
+    mes("Only Fremenniks may use this pottery oven.");
+    return;
+}
+@ordinary_fire_chooser;
+
+[label,ordinary_fire_chooser]
+def_namedobj $item;
+def_int $remaining;
+$item, $remaining = ~skill_multi3(
+    pot_unfired, 0, 2, 185, "\\n\\n\\n\\nPot",
+    piedish_unfired, 0, -4, 190, "\\n\\n\\n\\nPie Dish",
+    bowl_unfired, 0, 0, 200, "\\n\\n\\n\\nBowl"
+);
+if_close;
+if ($item = null | $remaining < 1) {
+    return;
+}
+// CANDIDATE: finished 274 pottery.struct supplies these existing chooser names.
+def_string $plural = "pots";
+if ($item = piedish_unfired) {
+    $plural = "pie dishes";
+} else if ($item = bowl_unfired) {
+    $plural = "bowls";
+}
+if (inv_total(inv, $item) = 0) {
+    ~mesbox("You don't have any <$plural> which need firing.");
+    return;
+}
+while ($remaining > 0 & inv_total(inv, $item) > 0) {
+    ~fire_pottery(~inv_getslot(inv, $item));
+    $remaining = sub($remaining, 1);
+}
+if ($remaining > 0) {
+    mes("You don't have any more <$plural> which need firing.");
+}
+
+// CANDIDATE: both original 377 copies offer Fill-bucket and are water sources.
+[oploc1,blast_furnace_sink]
+p_arrivedelay;
+if (inv_total(inv, bucket_empty) = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+@fill_container_water(bucket_empty);
