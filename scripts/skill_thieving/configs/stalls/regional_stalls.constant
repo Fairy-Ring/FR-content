@@ -1,7 +1,6 @@
 // UNKNOWN: raw ticks, not period respawn measurements. Use the published silver
 // stall's 100 raw ticks / period 30-second average, round up, and retain the
 // shared player-count scaling. Period averages: Tip.It, 27 April 2006.
-^regional_fish_respawn_ticks = 50
 ^regional_general_respawn_ticks = 34
 ^regional_crafting_respawn_ticks = 34
 ^regional_food_respawn_ticks = 34
