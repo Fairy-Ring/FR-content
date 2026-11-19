@@ -131,6 +131,7 @@ function reachLure(p) {
       assert(distracted, 'the repeated compiled urchin action earns another original target');
     }
   }
+  assert(World.currentTick <= admissionDeadline, 'earned distraction admission does not extend the setup bound');
   operate(p, distracted, 3);
   assert.equal(stage(p), 9);
   assert.equal(read(p, 'feud_npc_multi'), 2, 'the second theft exposes the original third client form');

@@ -703,12 +703,12 @@ test('four real attackable Lure/KO cycles survive ordinary logout with bounded q
     assert.equal(target.getVar(stateVar), 0, 'each cycle begins after the prior real KO timeout');
     const cycleStart = World.currentTick;
     attackableLure(p, target);
-    if (hasWitness(p, target)) {
-      const follow = observeNativeCallbacks(tracked, () => followToSeclusion(p, target), observeCallback);
-      totalCallbacks += follow.callbacks;
-      maxCallbacksInOneTick = Math.max(maxCallbacksInOneTick, follow.maxCallbacksInOneTick);
-      maxQueueDepth = Math.max(maxQueueDepth, assertAttackableQueueBound(target));
-    }
+    // This queue soak needs a real unwitnessed KO, not the separate Thug wall-screening proof.
+    // Stay at the earned Lure stand while native follow and witnesses continue to move.
+    for (let setupTicks = 0; setupTicks < nativeSetupWaitTicks &&
+      (hasWitness(p, target) || !p.inOperableDistance(target)); setupTicks++) tick();
+    assert(!hasWitness(p, target) && p.inOperableDistance(target),
+      'native follow and wandering witnesses permit the actual KO within the existing setup bound');
     const wakeDeadline = attackableKnockOut(p, target);
     const ownerUid = p.uid;
     const receipt = nativeLogout(p, tick);
