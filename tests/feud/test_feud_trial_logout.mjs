@@ -225,8 +225,8 @@ test('the distraction window starts only after the final native Continue, howeve
   assert.deepEqual(trialResult(p), before, 'reading the page changes no checkpoint, money, item or XP');
   resumeDialogue(p);
   assert.equal(stage(p), 8);
-  assert.equal(target.getVar(deadlineVar), World.currentTick + distractionTicks,
-    'Continue arms the complete checked-out-tree window on its own turn');
+  assert.equal(target.getVar(deadlineVar), World.currentTick + 12,
+    'Continue arms the authorized twelve-tick distraction, not the eight-tick knockout');
   assertHint(p, target);
   assert.equal(hints(observer).length, 0, 'another player receives neither the target hint nor its changes');
   const coins = count(p, 'coins'), beforeXp = xp(p), hp = p.levels[PlayerStat.HITPOINTS];
