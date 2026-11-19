@@ -159,6 +159,10 @@ try {
       const again = player(loaded.save());
       minute = 640 + family.diseasePeriod + 4; proc(again, 'farming_login');
       assert.equal(stage(again, family), crop.diseased, 'an open offline window is not replayed early');
+      reconcile(again, 640 + family.diseasePeriod + family.period);
+      assert.equal(stage(again, family), crop.diseased, 'missing a slow window does not turn the next healthy window into a death step');
+      reconcile(again, 640 + family.diseasePeriod * 2);
+      assert.equal(stage(again, family), crop.dead, 'a missed slow window delays death only until the next processed slow window');
       // A fresh save checkpoint is still before that slow window. Login does
       // not reconstruct time already consumed by a different online session.
       const completed = player(p.save());
