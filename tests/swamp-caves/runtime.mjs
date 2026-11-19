@@ -49,6 +49,7 @@ const moveHandler = new (await defaultExport('network/game/client/handler/MoveCl
 const InvButtonD = await defaultExport('network/game/client/model/InvButtonD.ts');
 const dragHandler = new (await defaultExport('network/game/client/handler/InvButtonDHandler.ts'))();
 const { CoordGrid } = await load('engine/CoordGrid.ts');
+const { toBase37 } = await load('util/JString.ts');
 export function id(kind, name) {
   const value = types[kind].getId(name);
   assert(value >= 0, `missing packed ${kind} ${name}`);
@@ -62,10 +63,11 @@ export const wornCom = id('Component', 'wornitems:worn');
 let serial = 0;
 export function player(firemaking = 99) {
   const slot = ++serial;
-  const hash = BigInt(slot);
-  const p = new Player(`swamp${slot}`, hash, hash);
+  const username = `swamp${slot}`;
+  const hash = toBase37(username);
+  const p = new Player(username, hash, hash);
   p.pid = slot; p.slot = slot;
-  p.uid = ((slot << 11) | slot) >>> 0;
+  p.uid = ((Number(hash & 0x1fffffn) << 11) | slot) >>> 0;
   p.level = 0; p.x = 3170; p.z = 3173;
   p.isActive = true;
   p.vars.fill(0); p.baseLevels.fill(99); p.levels.fill(99); p.stats.fill(123456);
