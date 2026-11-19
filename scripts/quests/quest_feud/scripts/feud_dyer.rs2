@@ -77,7 +77,7 @@ return;
 ~chatnpc("<p,neutral>Fair enough, I still think that the price is fairly reasonable considering that I'm the only source of dye this side of the Shantay pass.");
 return;
 
-[label,feud_dyer_make](obj $ingredient, int $needed, obj $dye, string $missing, string $request)
+[label,feud_dyer_make](obj $ingredient, int $needed, namedobj $dye, string $missing, string $request)
 if (inv_total(inv, $ingredient) < $needed) {
     ~mesbox($missing);
     return;
