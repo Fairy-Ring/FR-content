@@ -34,9 +34,17 @@ function completePlayer(level = 1) {
   return p;
 }
 
+const nativeSetupWaitTicks = 512; // Same bounded native-geometry wait as follow.mjs, not a gameplay timeout.
+function findTarget(p, name, predicate) {
+  for (let ticks = 0; ticks <= nativeSetupWaitTicks; ticks++) {
+    const target = actors(name).find(npc => npc.getVar(stateVar) === 0 &&
+      predicate(npc) && operationStand(p, npc));
+    if (target) return target;
+    if (ticks < nativeSetupWaitTicks) worldTick();
+  }
+}
 function isolatedTarget(p, name, excluded = new Set()) {
-  return actors(name).find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 &&
-    !hasWitness(p, npc) && operationStand(p, npc));
+  return findTarget(p, name, npc => !excluded.has(npc) && !hasWitness(p, npc));
 }
 
 function withRandom(value, action) {
@@ -171,9 +179,9 @@ test('post-Feud normal pickpocket uses the period Bandit and Thug rows', () => {
   assert.equal(stage(p), 28, 'repeat thefts do not write quest progress');
 });
 
-test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and wake on their NPC queue', () => {
+test('post-Feud villagers use a wielded blackjack, award no repeat-pick XP, and wake on their NPC timer', () => {
   const p = seed(completePlayer(30), ['blackjack_oak']);
-  const awake = actors('feud_villager_multi_1').find(npc => npc.getVar(stateVar) === 0);
+  const awake = findTarget(p, 'feud_villager_multi_1', () => true);
   assert(awake, 'an original placed villager is idle');
   const caught = { coins: count(p, 'coins'), xp: xp(p), hp: p.levels[PlayerStat.HITPOINTS] };
   const awakePick = operate(p, awake, 3);
@@ -307,8 +315,7 @@ test('the purchased willow is usable and the Thug applies its period level and K
   operate(p, actors('feud_black_jack_seller_multi')[0], 3, ["I'll take it."]);
   wield(p, 'blackjack_willow');
 
-  const thug = actors('feud_egyptian_doorman_multi').find(npc =>
-    npc.getVar(stateVar) === 0 && operationStand(p, npc));
+  const thug = findTarget(p, 'feud_egyptian_doorman_multi', npc => hasWitness(p, npc));
   assert(thug, 'an original Menaphite Thug has a path-checked native operation stand');
   assert(hasWitness(p, thug), 'the original Thug begins visible to a nearby person');
   const lure = operate(p, thug, 4);

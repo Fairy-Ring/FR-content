@@ -250,7 +250,11 @@ function operate(p, n, option = 1, choices = [], item = null) {
   stand(p, n);
   return operateHere(p, n, option, choices, item);
 }
-const talk = (p, name, choices = []) => operate(p, actors(name)[0], 1, choices);
+const talk = (p, name, choices = []) => {
+  const target = actors(name).find(npc => operationStand(p, npc));
+  assert(target, `an original ${name} has a path-checked operation stand`);
+  return operate(p, target, 1, choices);
+};
 function begin(p) {
   assert.equal(stage(p), 0);
   talk(p, 'feud_ali_m', [1, 2, 2, 1]);
