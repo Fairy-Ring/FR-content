@@ -44,8 +44,9 @@ const confirmed = [
   'This is an allotment.', 'This is a herb patch.', 'This is a flower patch.', 'This is a hops patch.',
   'The soil has not been treated.', 'The soil has been treated with compost.',
   'The soil has been treated with supercompost.', 'The patch needs weeding.',
-  'The patch is empty.', 'The patch has something growing in it.',
+  'The patch is empty and weeded.', 'The patch has something growing in it.',
   'The patch is fully grown.', 'Your scarecrow is protecting these crops from disease.',
+  'The patch is diseased and needs attending to.',
   'This is a bush patch.', 'This is a tree patch.', 'This is a fruit tree patch.',
   'This is a cactus patch.', 'This is a belladonna patch.', 'This is a mushroom patch.',
   'This is a calquat patch.', 'This is a spirit tree patch.',
@@ -199,7 +200,7 @@ function snapshot() {
         assert.equal(p.delayed, false, 'Inspect adds no player delay');
         assert.equal(p.hasInteraction(), false, 'Inspect leaves no repeating action');
         assertConfirmed(p.messages);
-        assert.equal(p.messages.length, ['diseased', 'dead'].includes(state.kind) ? 2 : 3, 'unknown state wording is absent');
+        assert.equal(p.messages.length, state.kind === 'dead' ? 2 : 3, 'only dead state wording is absent');
         forms.add(visible.debugname);
         cases++;
       }

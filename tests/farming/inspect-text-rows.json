@@ -13,9 +13,64 @@
     "observedCrop": "watermelons",
     "observedLocation": "North Ardougne",
     "reportedNearbyScarecrow": true,
-    "protectionMechanismEstablished": true,
-    "limits": "CANDIDATE later player quotation plus operator confirmation. Published scarecrow protection applies to sweetcorn, not the quoted watermelon."
+    "protectionMechanismEstablished": false,
+    "limits": "CANDIDATE later player quotation only. The operator did not confirm the scarecrow sentence. The quotation's nearby-scarecrow context does not establish a protection mechanism, and published period protection names sweetcorn rather than the quoted watermelons."
   },
+  "laterSourceEvidence": [
+    {
+      "sentence": "The patch is empty and weeded.",
+      "label": "CANDIDATE",
+      "operatorAnswer": "2. Empty and weeded, yes",
+      "operatorSource": "src.farming-inspect-operator-20261119",
+      "appliesTo": "Every workbook row with state empty or scarecrowEmpty, including flower scarecrow stage 36; applying these later-source sentences to other patch families is the operator's engineering choice.",
+      "sources": [
+        {
+          "source": "src.farming-inspect-osrs-tithe-farm-20251103",
+          "revision": 15014565,
+          "timestamp": "2025-11-03T21:11:02Z",
+          "locator": "Talk:Tithe Farm feedback"
+        },
+        {
+          "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+          "revision": 37184156,
+          "timestamp": "2026-09-23T03:21:43Z",
+          "locator": "Cleared/Untreated"
+        }
+      ],
+      "note": "The operator selected the later wording for the current output. These later sources do not establish revision-377 wording."
+    },
+    {
+      "sentence": "The patch is diseased and needs attending to.",
+      "label": "CANDIDATE",
+      "provisional": true,
+      "operatorAnswer": "3. Provisionally yes, I can't find a source for that specific wording",
+      "operatorSource": "src.farming-inspect-operator-20261119",
+      "appliesTo": "All plantable-family diseased rows across the workbook's soil-treatment variants; this decision is provisional.",
+      "sources": [
+        {
+          "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+          "revision": 37184156,
+          "timestamp": "2026-09-23T03:21:43Z",
+          "locator": "Planted/Diseased/Untreated"
+        }
+      ],
+      "note": "The operator provisionally selected this later RS3 wording. It does not establish revision-377 wording. Dead wording remains UNKNOWN."
+    }
+  ],
+  "unknownMappings": [
+    {
+      "state": "flower patch holds a scarecrow",
+      "stages": [33, 34, 35],
+      "sentence": "The patch needs weeding.",
+      "label": "UNKNOWN"
+    },
+    {
+      "state": "flower patch holds a scarecrow",
+      "stages": [36],
+      "sentence": "The patch is empty and weeded.",
+      "label": "UNKNOWN"
+    }
+  ],
   "families": [
     {
       "patchFamily": "allotment",
@@ -220,12 +275,24 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
         "src.farming-inspect-operator-20261119"
+      ],
+      "conflicts": [
+        {
+          "sentence": "The patch is empty and weeded.",
+          "source": "src.farming-inspect-osrs-tithe-farm-20251103",
+          "revision": 15014565
+        },
+        {
+          "sentence": "The patch is empty and weeded.",
+          "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+          "revision": 37184156
+        }
       ]
     },
     {
@@ -406,10 +473,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "allotment",
@@ -538,7 +610,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -724,10 +796,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "allotment",
@@ -858,7 +935,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -1064,10 +1141,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "allotment",
@@ -1195,7 +1277,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -1376,7 +1458,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -1467,10 +1549,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "flower",
@@ -1596,7 +1683,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -1777,7 +1864,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -1868,10 +1955,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "flower",
@@ -1999,7 +2091,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -2184,7 +2276,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -2277,10 +2369,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "flower",
@@ -2407,7 +2504,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -2543,10 +2640,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "herb",
@@ -2672,7 +2774,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -2808,10 +2910,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "herb",
@@ -2939,7 +3046,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -3078,10 +3185,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "herb",
@@ -3208,7 +3320,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -3390,10 +3502,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "hops",
@@ -3519,7 +3636,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -3701,10 +3818,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "hops",
@@ -3832,7 +3954,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4018,10 +4140,15 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "",
-      "status": "UNKNOWN wording",
-      "source": null,
-      "approvedFor377": false
+      "text": "The patch is diseased and needs attending to.",
+      "status": "CANDIDATE",
+      "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
+      "approvedFor377": true,
+      "sources": [
+        "src.farming-inspect-rs3-allotment-transcript-20260923",
+        "src.farming-inspect-operator-20261119"
+      ],
+      "provisional": true
     },
     {
       "patchFamily": "hops",
@@ -4148,7 +4275,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4238,7 +4365,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4328,7 +4455,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4418,7 +4545,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4508,7 +4635,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4598,7 +4725,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4688,7 +4815,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4778,7 +4905,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4868,7 +4995,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -4958,7 +5085,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5048,7 +5175,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5138,7 +5265,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5228,7 +5355,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5318,7 +5445,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5408,7 +5535,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5498,7 +5625,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5588,7 +5715,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5678,7 +5805,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5768,7 +5895,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5858,7 +5985,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -5948,7 +6075,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -6038,7 +6165,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -6128,7 +6255,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -6218,7 +6345,7 @@
       "lineRole": "growth-state",
       "order": 2,
       "condition": null,
-      "text": "The patch is empty.",
+      "text": "The patch is empty and weeded.",
       "status": "CANDIDATE",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
@@ -6228,5 +6355,5 @@
     }
   ],
   "currentSoilReader": "Only untreated is reachable. No published compost application or soil-treatment state exists for the four plantable families. Other treatment rows are wording only. Other eight families bind native weed/empty selectors0..3; only0 is currently reachable.",
-  "outputRule": "One game chat message joins patch type, soil and known state with spaces. Diseased/dead omit the unknown state sentence. Watered adds no sentence. A separate scarecrow message requires healthy growing sweetcorn and the published neighbouring flower protection state."
+  "outputRule": "UNKNOWN historical presentation. Main's current output decision sends one game chat message per sentence: patch type, soil, then known state, followed by the scarecrow sentence when emitted. This follows the 377 client line limit and 2012 quotation order; it does not establish original network boundaries. Empty and diseased state wording is CANDIDATE, with the diseased line provisional. Dead remains UNKNOWN. Watered adds no sentence."
 }
