@@ -106,7 +106,7 @@ const healthySeed = (() => {
   }
   assert.fail('no native sixteen-cycle healthy witness');
 })();
-const growthTimer = Scripts.getByName('[timer,farming_growth]');
+const growthTimer = Scripts.getByName('[softtimer,farming_growth]');
 assert(growthTimer, 'shared compiled farming growth timer is required');
 const flowerTable = types.DbTableType.getByName('farming_flower');
 assert(flowerTable, 'compiled farming_flower table is required');
@@ -393,12 +393,12 @@ try {
     flowers.slice(0, 4).forEach((flower, index) => setStage(p, flower.first, index));
     proc(p, 'farming_login');
     assert.equal(p.timers.get(growthTimer.id).interval, 500);
-    assert.equal(p.timers.get(growthTimer.id).type, PlayerTimerType.NORMAL);
+    assert.equal(p.timers.get(growthTimer.id).type, PlayerTimerType.SOFT);
     for (let step = 1; step <= 4; step++) {
       minute = 605 + step * 5;
       JavaRandom.setSeed(healthySeed);
       World.currentTick += 500;
-      p.processTimers(PlayerTimerType.NORMAL);
+      p.processTimers(PlayerTimerType.SOFT);
       flowers.slice(0, 4).forEach((flower, index) => {
         assert.equal(stage(p, index), Math.min(flower.mature, flower.first + step),
           `${flower.name} advances once through shared timer window ${step}`);

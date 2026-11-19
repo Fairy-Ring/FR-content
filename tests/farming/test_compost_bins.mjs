@@ -236,22 +236,22 @@ function batchState(kind) {
   return { full: 143, closed: 82, rotted: 93, output: 158 };
 }
 
-const growthTimerScript = Scripts.getByName('[timer,farming_growth]');
-assert(growthTimerScript, 'compiled [timer,farming_growth] timer');
+const growthTimerScript = Scripts.getByName('[softtimer,farming_growth]');
+assert(growthTimerScript, 'compiled [softtimer,farming_growth] timer');
 function loginGrowthTimer(p, atMinute) {
   minute = atMinute;
   proc(p, 'farming_login');
   assert.equal(p.getVar(varpBin), atMinute, 'login saves a positive shared growth checkpoint');
   const timer = p.timers.get(growthTimerScript.id);
-  assert(timer && timer.interval > 0, 'farming_login installs the real NORMAL growth timer');
+  assert(timer && timer.interval > 0, 'farming_login installs the real SOFT growth timer');
   return timer.interval;
 }
 
 function pulseGrowthTimer(p, interval, atMinute) {
   minute = atMinute;
   World.currentTick += interval;
-  p.processTimers(PlayerTimerType.NORMAL);
-  assert.equal(p.getVar(varpBin), atMinute, 'real NORMAL timer reconciles the shared clock');
+  p.processTimers(PlayerTimerType.SOFT);
+  assert.equal(p.getVar(varpBin), atMinute, 'real SOFT timer reconciles the shared clock');
 }
 
 const oldDateHandler = Runner.HANDLERS[ScriptOpcode.DATE_MINUTES];

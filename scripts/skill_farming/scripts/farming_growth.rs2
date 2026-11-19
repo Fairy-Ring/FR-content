@@ -47,12 +47,13 @@ switch_int ($handler) {
 [proc,farming_login]
 ~farming_reconcile(true);
 // Keep the player's phase even with no planted crop. Planting never resets it.
-settimer(farming_growth, ^farming_growth_poll_ticks);
+// UNKNOWN favourable access policy: an open interface or delay does not stop growth.
+softtimer(farming_growth, ^farming_growth_poll_ticks);
 
 [proc,farming_logout]
 def_int $now = date_minutes;
 if ($now >= %farming_growth_minute) %farming_growth_minute = $now;
-cleartimer(farming_growth);
+clearsofttimer(farming_growth);
 
-[timer,farming_growth]
+[softtimer,farming_growth]
 ~farming_reconcile(false);

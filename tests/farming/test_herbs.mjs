@@ -99,7 +99,7 @@ function witness(range, draw) {
 const draws128 = new Map([0, 19, 20, 127].map(draw => [draw, witness(128, draw)]));
 const draws256 = new Map([0, 174, 175, 190, 191, 255].map(draw => [draw, witness(256, draw)]));
 const clock = id('VarPlayerType', 'farming_growth_minute');
-const growthTimer = Scripts.getByName('[timer,farming_growth]');
+const growthTimer = Scripts.getByName('[softtimer,farming_growth]');
 assert(growthTimer, 'shared compiled farming growth timer is required');
 
 let cases = 0, failures = 0;
@@ -214,13 +214,13 @@ try {
     const p = fixture({ level: 99, stage: herb.first });
     minute = 605; proc(p, 'farming_login');
     assert.equal(p.timers.get(growthTimer.id).interval, 500);
-    assert.equal(p.timers.get(growthTimer.id).type, PlayerTimerType.NORMAL);
+    assert.equal(p.timers.get(growthTimer.id).type, PlayerTimerType.SOFT);
     for (const [at, expected] of [[610, herb.first], [620, herb.first + 1], [640, herb.first + 2],
       [660, herb.first + 3], [680, herb.mature]]) {
       minute = at;
       JavaRandom.setSeed(draws128.get(127));
       World.currentTick += 500;
-      p.processTimers(PlayerTimerType.NORMAL);
+      p.processTimers(PlayerTimerType.SOFT);
       assert.equal(stage(p), expected, `herb advances at shared clock minute ${at}`);
     }
   });
