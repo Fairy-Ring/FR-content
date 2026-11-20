@@ -5,7 +5,7 @@ import path from 'node:path';
 import test from 'node:test';
 
 import {
-  PlayerStat, ScriptProvider, ServerTriggerType, World, contentRoot, count, engineModule, id,
+  PlayerStat, ScriptProvider, ServerTriggerType, World, contentRoot, count, engineModule, id, map,
   inv, obj, seed, types
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
@@ -18,6 +18,9 @@ import { followToSeclusion } from './follow.mjs';
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
 const { NpcStat } = await engineModule('engine/entity/NpcStat.ts');
+const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const MoveClick = (await engineModule('network/game/client/model/MoveClick.ts')).default;
+const moveClickHandler = new (await engineModule('network/game/client/handler/MoveClickHandler.ts')).default();
 const stateVar = id('VarNpcType', 'feud_villager_state');
 const ownerVar = id('VarNpcType', 'feud_villager_owner');
 const deadlineVar = id('VarNpcType', 'feud_villager_deadline');
@@ -428,7 +431,9 @@ test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outco
     stunned: p.getVar(stunnedVar)
   };
   withRandom(0.999, () => operate(p, target, 5));
-  assert.equal(target.getVar(stateVar), 2, 'a failed KO keeps the lured target available');
+  assert.equal(target.getVar(stateVar), 0, 'a failed KO ends the follow through the shared release');
+  assert.equal(target.getVar(ownerVar), -1);
+  assert.equal(target.getVar(deadlineVar), 0);
   assert.equal(target.getVar(aggressiveVar), p.uid, 'CANDIDATE failed-KO consequence queues ordinary retaliation');
   assert.equal(p.levels[PlayerStat.HITPOINTS], beforeFailure.hp, 'the unwitnessed failure adds no unsourced HP damage');
   assert.equal(p.getVar(stunnedVar), beforeFailure.stunned, 'the unwitnessed failure adds no unsourced stun');
@@ -436,6 +441,91 @@ test('Bandit41 repeat KO accepts wielded oak, applies only sourced failure outco
   assert.equal(count(p, 'coins'), beforeFailure.coins);
   assert.equal(stage(p), 28, 'repeat KO cannot duplicate trial progress or rewards');
 });
+
+test('failed Bandit KO releases in the same tick, refuses combat Lure, and permits a new Lure after ordinary escape', () => {
+  const p = seed(completePlayer(65), ['blackjack_willow']);
+  wield(p, 'blackjack_willow');
+  const target = isolatedTarget(p, 'feud_arabian_guard2_multi');
+  assert(target, 'an original unwitnessed Bandit41 is available without NPC state or position setup');
+  operate(p, target, 4);
+  assert.equal(target.getVar(stateVar), 2);
+  const oldDeadline = target.getVar(deadlineVar), failureTick = World.currentTick;
+  const pendingFollowVar = id('VarNpcType', 'feud_repeat_follow_deadline');
+  assert.equal(target.getVar(pendingFollowVar), oldDeadline);
+  const before = { xp: xp(p), coins: count(p, 'coins'), hp: p.levels[PlayerStat.HITPOINTS] };
+  withRandom(0.999, () => operate(p, target, 5));
+  assert.equal(World.currentTick, failureTick, 'failure releases the condition before any further world turn');
+  assert.equal(target.getVar(stateVar), 0);
+  assert.equal(target.getVar(ownerVar), -1);
+  assert.equal(target.getVar(deadlineVar), 0);
+  assert.equal(target.getVar(pendingFollowVar), oldDeadline, 'the existing pending callback retains its sole ownership');
+  assert.equal(target.getVar(aggressiveVar), p.uid, 'the same compiled failure queues ordinary retaliation');
+  assert.equal(xp(p), before.xp);
+  assert.equal(count(p, 'coins'), before.coins);
+  assert.equal(p.levels[PlayerStat.HITPOINTS], before.hp, 'the unwitnessed failure adds no separate damage');
+
+  worldTick();
+  assert.equal(target.targetOp, NpcMode.OPPLAYER2, 'the production NPC queue starts its ordinary fight');
+  const messageMark = p.messages.length;
+  operate(p, target, 4);
+  assert.deepEqual(p.messages.slice(messageMark), ['Nothing interesting happens.']);
+  assert.equal(target.getVar(stateVar), 0, 'combat Lure does not reclaim the released condition');
+  assert.equal(target.getVar(ownerVar), -1);
+  assert.equal(target.targetOp, NpcMode.OPPLAYER2, 'the refused Lure does not cancel combat');
+
+  function walk(x, z) {
+    const route = [...map.findPath(p.level, p.x, p.z, x, z)].map(value => CoordGrid.unpackCoord(value));
+    assert(route.length && route.at(-1).x === x && route.at(-1).z === z,
+      'the native collision map supplies an exact ordinary escape route');
+    assert(moveClickHandler.handle(new MoveClick(route.map(point => ({ x: point.x, z: point.z })), 0, false), p));
+    for (let ticks = 0; ticks < 128; ticks++) {
+      worldTick();
+      if (p.x === x && p.z === z && !p.hasWaypoints()) return;
+    }
+    assert.fail('the ordinary escape walk did not reach its exact destination');
+  }
+  walk(3352, 3000);
+  walk(3338, 3005);
+  assert.equal(target.targetOp, NpcMode.WANDER, 'ordinary movement ends the fight through native home-range handling');
+  assert.equal(target.getVar(stateVar), 0);
+  assert(World.currentTick < oldDeadline, 'recovery is checked before the old follow timeout, not after waiting it out');
+  const relure = operate(p, target, 4);
+  assert.equal(relure.trigger, nativeNpcTriggerName(p, target, 4));
+  assert.equal(target.getVar(stateVar), 2, 'the first fresh Lure after the fight is accepted');
+  assert.equal(target.getVar(ownerVar), p.uid);
+  assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
+  assert.equal(target.target, p);
+  assert(target.getVar(deadlineVar) > oldDeadline, 'the fresh follow has its own later expiry');
+  assert.equal(xp(p), before.xp, 'failure, escape and relure produce no KO or pickpocket XP');
+  assert.equal(count(p, 'coins'), before.coins);
+});
+
+for (const name of ['feud_villager_multi_1', 'feud_arabian_guard2_multi']) {
+  test(`${name} Lure answers with the published default while owned or unconscious`, () => {
+    const p = seed(completePlayer(65), ['blackjack_willow']), other = completePlayer(65);
+    wield(p, 'blackjack_willow');
+    const target = isolatedTarget(p, name);
+    assert(target, 'an original unwitnessed target is available');
+    operate(p, target, 4);
+    const owner = target.getVar(ownerVar), deadline = target.getVar(deadlineVar);
+    for (const actor of [p, other]) {
+      const mark = actor.messages.length;
+      operate(actor, target, 4);
+      assert.deepEqual(actor.messages.slice(mark), ['Nothing interesting happens.']);
+      assert.equal(target.getVar(stateVar), 2);
+      assert.equal(target.getVar(ownerVar), owner, 'a refused Lure preserves the single owner');
+      assert.equal(target.getVar(deadlineVar), deadline);
+    }
+    withRandom(0, () => operate(p, target, 5));
+    assert.equal(target.getVar(stateVar), 3);
+    const knockoutDeadline = target.getVar(deadlineVar), mark = p.messages.length;
+    operate(p, target, 4);
+    assert.deepEqual(p.messages.slice(mark), ['Nothing interesting happens.']);
+    assert.equal(target.getVar(stateVar), 3);
+    assert.equal(target.getVar(ownerVar), owner);
+    assert.equal(target.getVar(deadlineVar), knockoutDeadline, 'a refused Lure does not wake the unconscious target');
+  });
+}
 
 test('witnessed Bandit KO applies the period 4 HP, stun and attack outcome', () => {
   const nearbyBanditTypes = new Set([

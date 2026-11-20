@@ -75,7 +75,7 @@ inv_add(inv, coins, ^feud_villager_pickpocket_coins);
 return;
 
 [proc,feud_repeat_start_lure]()(boolean)
-if (%feud_villager_state ! ^feud_villager_state_idle) { return(false); }
+if (~feud_lure_available = false) { return(false); }
 %feud_villager_state = ^feud_villager_state_following;
 %feud_villager_owner = uid;
 %feud_villager_deadline = calc(map_clock + ^feud_villager_follow_timeout);
@@ -110,6 +110,8 @@ if (npc_finduid($target) = false) { return(false); }
 if (stat_random(thieving, ^feud_villager_ko_success_low, ^feud_villager_ko_success_high) = false) {
     // VERIFIED for villagers; CANDIDATE for Bandits/Thugs: failure starts ordinary combat.
     // No unwitnessed Bandit/Thug damage or stun is supplied by the period source.
+    // UNKNOWN: failure ends this follow through the same release as every other exit.
+    ~feud_villager_reset;
     ~npc_retaliate(0);
     return(false);
 }

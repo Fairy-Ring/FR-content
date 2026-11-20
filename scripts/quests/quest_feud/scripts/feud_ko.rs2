@@ -43,6 +43,8 @@ if (~feud_villager_has_witness($spot, $target) = true) {
 }
 if (npc_finduid($target) = false) { return; }
 if (stat_random(thieving, ^feud_villager_ko_success_low, ^feud_villager_ko_success_high) = false) {
+    // UNKNOWN: failure ends this follow through the same release as every other exit.
+    ~feud_villager_reset;
     ~npc_retaliate(0);
     return;
 }

@@ -7,14 +7,18 @@ import {
 import { player } from './player.mjs';
 import {
   activeLoc, actors, assertKnockoutCycle, begin, bit, buyReceipts, deliver, displayNpcType, drink, hasWitness, locs,
-  nativeNpcTriggerName, openOriginalVillagerCurtain, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, tickThrough, wield
+  nativeNpcTriggerName, openOriginalVillagerCurtain, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const { NpcMode } = await engineModule('engine/entity/NpcMode.ts');
 const stateVar = id('VarNpcType', 'feud_villager_state');
 const ownerVar = id('VarNpcType', 'feud_villager_owner');
 const attackVar = id('VarNpcType', 'npc_attacking_uid');
+const aggressiveVar = id('VarNpcType', 'npc_aggressive_player');
+const deadlineVar = id('VarNpcType', 'feud_villager_deadline');
+const slotVar = id('VarPlayerType', 'feud_trial_villager');
 const villagerForms = new Set([
   'feud_villager_multi_1', 'feud_villager_multi_2', 'feud_villager_multi_3',
   'feud_villager_1_1', 'feud_villager_1_2', 'feud_villager_1_3',
@@ -27,6 +31,45 @@ function isolatedVillager(p, excluded) {
   return feudVillagers().find(npc => !excluded.has(npc) && npc.getVar(stateVar) === 0 &&
     !hasWitness(p, npc) && operationStand(p, npc));
 }
+
+test('failed trial KO releases its follow and trial UID in the same tick without losing the earned checkpoint', () => {
+  const p = seed(player(), ['blackjack_oak']);
+  // Disclosed pre-third-trial player fixture; Lure creates every NPC condition and the real trial UID.
+  p.setVarBit(bit('feud_var'), 9);
+  p.setVarBit(bit('feud_npc_multi'), 2);
+  p.setVar(slotVar, -1);
+  wield(p, 'blackjack_oak');
+  const target = isolatedVillager(p, new Set());
+  assert(target, 'an original unwitnessed villager is available without NPC setup');
+  operate(p, target, 4);
+  assert.equal(stage(p), 10);
+  assert.equal(p.getVar(slotVar), target.uid);
+  const failureTick = World.currentTick, beforeXp = p.stats[PlayerStat.THIEVING];
+  const beforeHp = p.levels[PlayerStat.HITPOINTS], originalDraw = JavaRandom.nextDouble;
+  try {
+    JavaRandom.nextDouble = () => 0.999;
+    operate(p, target, 5);
+  } finally {
+    JavaRandom.nextDouble = originalDraw;
+  }
+  assert.equal(World.currentTick, failureTick);
+  assert.equal(stage(p), 10, 'failure preserves the earned waiting checkpoint');
+  assert.equal(target.getVar(stateVar), 0, 'failure ends the trial follow before another turn');
+  assert.equal(target.getVar(ownerVar), -1);
+  assert.equal(target.getVar(deadlineVar), 0);
+  assert.equal(p.getVar(slotVar), -1, 'the same release clears the acting player reservation');
+  assert.equal(target.getVar(aggressiveVar), p.uid, 'the failure still queues ordinary retaliation');
+  assert.equal(p.stats[PlayerStat.THIEVING], beforeXp);
+  assert.equal(p.levels[PlayerStat.HITPOINTS], beforeHp, 'the roll failure adds no separate damage');
+  worldTick();
+  assert.equal(target.targetOp, NpcMode.OPPLAYER2);
+  const mark = p.messages.length;
+  operate(p, target, 4);
+  assert.deepEqual(p.messages.slice(mark), ['Nothing interesting happens.']);
+  assert.equal(target.getVar(stateVar), 0, 'a fighting villager cannot be reclaimed by Lure');
+  assert.equal(p.getVar(slotVar), -1);
+  assert.equal(stage(p), 10);
+});
 
 test('compiled witness data and original-map probes distinguish visible people, animals and hidden forms', t => {
   const p = player();
@@ -264,18 +307,6 @@ test('native Feud trials allow the opening at level 29, gate the first theft at 
   assert.equal(secluded.getVar(attackVar), p.uid);
   assert.equal(p.stats[PlayerStat.THIEVING], koXp);
   wield(p, 'blackjack_oak');
-  const originalDraw = JavaRandom.nextDouble;
-  try {
-    JavaRandom.nextDouble = () => 0.999;
-    operate(p, secluded, 5);
-  } finally {
-    JavaRandom.nextDouble = originalDraw;
-  }
-  assert.equal(stage(p), 10, 'a failed blackjack roll does not advance the quest');
-  assert.equal(secluded.getVar(stateVar), 2, 'a failed attempt leaves the lured target available');
-  assert.equal(secluded.getVar(ownerVar), p.uid);
-  assert.equal(secluded.getVar(attackVar), p.uid, 'a failed attempt retains the NPC attack consequence');
-  assert.equal(p.stats[PlayerStat.THIEVING], koXp, 'a failed attempt awards no Thieving XP');
 
   JavaRandom.setSeed(1234);
   operate(p, secluded, 5);

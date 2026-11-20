@@ -4,14 +4,17 @@
 // the period guide's unconditional Lure rule. No earlier stage or reward write.
 [opnpc4,feud_villager_1_2]
 if (%feud_var = ^feud_first_pick | %feud_var = ^feud_distraction_active) @feud_villager_lure;
+~displaymessage(^dm_default);
 return;
 
 [opnpc4,feud_villager_2_2]
 if (%feud_var = ^feud_first_pick | %feud_var = ^feud_distraction_active) @feud_villager_lure;
+~displaymessage(^dm_default);
 return;
 
 [opnpc4,feud_villager_3_2]
 if (%feud_var = ^feud_first_pick | %feud_var = ^feud_distraction_active) @feud_villager_lure;
+~displaymessage(^dm_default);
 return;
 
 [opnpc4,feud_villager_1_3]
@@ -19,7 +22,10 @@ if (%feud_var = ^feud_complete) {
     ~feud_repeat_start_lure;
     return;
 }
-if (%feud_var < ^feud_second_pick | %feud_var > ^feud_villager_knocked_out) return;
+if (%feud_var < ^feud_second_pick | %feud_var > ^feud_villager_knocked_out) {
+    ~displaymessage(^dm_default);
+    return;
+}
 @feud_villager_lure;
 
 [opnpc4,feud_villager_2_3]
@@ -27,7 +33,10 @@ if (%feud_var = ^feud_complete) {
     ~feud_repeat_start_lure;
     return;
 }
-if (%feud_var < ^feud_second_pick | %feud_var > ^feud_villager_knocked_out) return;
+if (%feud_var < ^feud_second_pick | %feud_var > ^feud_villager_knocked_out) {
+    ~displaymessage(^dm_default);
+    return;
+}
 @feud_villager_lure;
 
 [opnpc4,feud_villager_3_3]
@@ -35,15 +44,22 @@ if (%feud_var = ^feud_complete) {
     ~feud_repeat_start_lure;
     return;
 }
-if (%feud_var < ^feud_second_pick | %feud_var > ^feud_villager_knocked_out) return;
+if (%feud_var < ^feud_second_pick | %feud_var > ^feud_villager_knocked_out) {
+    ~displaymessage(^dm_default);
+    return;
+}
 @feud_villager_lure;
 
 [label,feud_villager_lure]
-if (~feud_trial_target_ready = false) return;
-if (%feud_villager_state ! ^feud_villager_state_idle) { return; }
+if (~feud_trial_target_ready = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (~feud_lure_available = false) return;
 ~chatplayer("<p,neutral>Psst. Come here, I want to show you something");
 ~chatnpc("<p,neutral>What is it?");
 ~chatplayer("<p,neutral>It's a surprise! Follow me.");
+if (~feud_lure_available = false) return;
 %feud_trial_villager = npc_uid;
 %feud_villager_state = ^feud_villager_state_following;
 %feud_villager_owner = uid;
@@ -53,3 +69,12 @@ npc_setmode(playerfollow);
 npc_settimer(1);
 if (%feud_var = ^feud_second_pick) %feud_var = ^feud_villager_lured;
 return;
+
+// UNKNOWN: an unavailable Lure uses the published default, not invented Feud wording.
+[proc,feud_lure_available]()(boolean)
+if (%feud_villager_state ! ^feud_villager_state_idle |
+    npc_getmode = opplayer2 | npc_getmode = applayer2 | npc_getmode = playerescape) {
+    ~displaymessage(^dm_default);
+    return(false);
+}
+return(true);
