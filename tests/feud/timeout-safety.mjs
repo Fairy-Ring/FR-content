@@ -905,18 +905,6 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assertAttackableQueueBound(target);
     assert.equal([...target.queue.all()].length, 0, 'ordinary attack and retaliation queues have resolved');
 
-    selectVisibleNpc(p, target, 4, `[opnpc4,${visibleForm}]`);
-    processSelectedInteraction(p);
-    assert.equal(target.getVar(stateVar), 2, 'ordinary completed-Feud Lure starts following');
-    assert.equal(target.getVar(ownerVar), p.uid);
-    assert.equal(target.target, p);
-    assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
-    assert.equal(p.getVar(slotVar), -1, 'repeat Lure does not acquire the trial-only player reference');
-    const expectedStage = stage(p);
-    assert.equal(expectedStage, 28, 'the completed-Feud stage remains 28');
-    assertAttackableQueueBound(target);
-    assert.equal([...target.queue.all()].length, 1, 'Lure owns exactly one native follow timeout request');
-
     const events = [];
     const preparationDeadline = World.currentTick + nativeSetupWaitTicks;
     let previousPoisonTick = null;
@@ -945,6 +933,58 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
       }
       events.push(event);
     };
+    assert.equal(target.targetOp, NpcMode.OPPLAYER2, 'the real poisoned attack has started ordinary retaliation');
+    const refusedMark = p.messages.length, poisonClock = target.timerClock;
+    selectVisibleNpc(p, target, 4, `[opnpc4,${visibleForm}]`);
+    processSelectedInteraction(p);
+    assert.deepEqual(p.messages.slice(refusedMark), ['Nothing interesting happens.']);
+    assert.equal(target.getVar(stateVar), 0, 'Lure cannot cancel the existing poison-fixture fight');
+    assert.equal(target.timerClock, poisonClock, 'the refusal does not restart the poison timer');
+
+    // End the real fight by ordinary movement before Lure. No NPC mode, position,
+    // HP, poison, timer or callback is changed by the fixture.
+    const searchRadius = 32; // Existing native-geometry bound from follow.mjs.
+    const homeRange = types.NpcType.get(target.type).maxrange + target.width + p.width;
+    let escape = null;
+    for (let radius = 1; radius <= searchRadius && !escape; radius++) {
+      for (let x = p.x - radius; x <= p.x + radius && !escape; x++) {
+        for (let z = p.z - radius; z <= p.z + radius; z++) {
+          if (Math.max(Math.abs(x - p.x), Math.abs(z - p.z)) !== radius ||
+              Math.max(Math.abs(x - target.startX), Math.abs(z - target.startZ)) <= homeRange ||
+              map.isMapBlocked(x, z, p.level)) continue;
+          const route = [...map.findPath(p.level, p.x, p.z, x, z)].map(value => CoordGrid.unpackCoord(value));
+          if (route.length && route.at(-1).x === x && route.at(-1).z === z) {
+            escape = { x, z, route };
+            break;
+          }
+        }
+      }
+    }
+    assert(escape, 'the native map provides an exact ordinary escape outside the target home range');
+    assert(moveClickHandler.handle(new MoveClick(escape.route.map(({ x, z }) => ({ x, z })), 0, false), p));
+    while (World.currentTick < preparationDeadline &&
+      (p.x !== escape.x || p.z !== escape.z || target.targetOp !== NpcMode.WANDER)) {
+      countedWorldTick(tracked, null, observeQueueAndPoison);
+    }
+    assert.equal(p.x, escape.x);
+    assert.equal(p.z, escape.z);
+    assert.equal(target.targetOp, NpcMode.WANDER, 'ordinary native escape ends the fight before the new Lure');
+    showNpcForNativeClick(p, target);
+    assert(opNpcHandler.handle(new OpNpc(4, target.nid), p), 'native Lure input starts an ordinary approach to the same target');
+    assert.equal(p.getOpTrigger()?.name, `[opnpc4,${visibleForm}]`);
+    while (World.currentTick < preparationDeadline && target.getVar(stateVar) === 0) {
+      countedWorldTick(tracked, null, observeQueueAndPoison);
+    }
+    assert.equal(target.getVar(stateVar), 2, 'ordinary completed-Feud Lure starts following');
+    assert.equal(target.getVar(ownerVar), p.uid);
+    assert.equal(target.target, p);
+    assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
+    assert.equal(p.getVar(slotVar), -1, 'repeat Lure does not acquire the trial-only player reference');
+    const expectedStage = stage(p);
+    assert.equal(expectedStage, 28, 'the completed-Feud stage remains 28');
+    assertAttackableQueueBound(target);
+    assert.equal([...target.queue.all()].length, 1, 'Lure owns exactly one native follow timeout request');
+
     if (hasWitness(p, target)) {
       const startTick = World.currentTick;
       const route = observeNativeCallbacks(tracked, () => followToSeclusion(p, target), observeQueueAndPoison);
