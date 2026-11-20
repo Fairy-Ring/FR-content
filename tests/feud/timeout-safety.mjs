@@ -217,6 +217,69 @@ function walkIntoNativeRange(p, target, tick, deadline) {
     'the owner walks into actual operation range without extending the original deadline or relocating an actor');
 }
 
+function prepareLateInput(p, target, tracked, deadline) {
+  const searchRadius = 32; // UNKNOWN fixture geometry bound, as in follow.mjs.
+  const margin = 5 + Math.max(target.width, target.length, p.width); // Native witness radius plus every follower stand.
+  const distance = (x, z, bounds) => Math.max(
+    Math.max(bounds.minX - x, x - bounds.maxX, 0),
+    Math.max(bounds.minZ - z, z - bounds.maxZ, 0));
+  const footprints = [];
+  for (const npc of World.npcs) {
+    if (!npc.isActive || npc.level !== target.level || npc.uid === target.uid) continue;
+    const range = types.NpcType.get(npc.type).wanderrange;
+    // Native wander chooses destinations around startX/startZ. Include the
+    // current tile too, so its entire return path and reset-to-home are covered.
+    const bounds = {
+      minX: Math.min(npc.x, npc.startX - range), maxX: Math.max(npc.x, npc.startX + range),
+      minZ: Math.min(npc.z, npc.startZ - range), maxZ: Math.max(npc.z, npc.startZ + range)
+    };
+    if (distance(target.x, target.z, bounds) > searchRadius + margin) continue;
+    assert([NpcMode.NONE, NpcMode.WANDER].includes(npc.targetOp),
+      'nearby fixture actors have normal stationary or home-bounded native wandering');
+    // Including animals and invisible forms is conservative: neither can make
+    // a nominally safe holding tile depend on a later visible form or RNG draw.
+    footprints.push(bounds);
+  }
+  let destination = null, route = null;
+  for (let radius = 1; radius <= searchRadius && !destination; radius++) {
+    for (let x = target.x - radius; x <= target.x + radius && !destination; x++) {
+      for (let z = target.z - radius; z <= target.z + radius; z++) {
+        if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
+            map.isMapBlocked(x, z, target.level) ||
+            footprints.some(bounds => distance(x, z, bounds) <= margin)) continue;
+        const path = [...map.findPath(p.level, p.x, p.z, x, z)];
+        if (!path.length) continue;
+        const end = CoordGrid.unpackCoord(path.at(-1));
+        if (end.level !== target.level || end.x !== x || end.z !== z) continue;
+        destination = { level: end.level, x, z };
+        route = path.map(coord => CoordGrid.unpackCoord(coord));
+        break;
+      }
+    }
+  }
+  assert(destination, 'an exact native walking route reaches a holding point outside every nearby NPC wander footprint');
+  const startingNpcTile = [target.level, target.x, target.z];
+  let waypoint = 0;
+  for (let turns = 0; turns < nativeSetupWaitTicks && World.currentTick < deadline; turns++) {
+    while (waypoint < route.length && p.x === route[waypoint].x && p.z === route[waypoint].z) waypoint++;
+    if (!p.hasWaypoints() && p.inOperableDistance(target) && waypoint < route.length) {
+      const point = route[waypoint];
+      // A compressed path may span several tiles. Lead one actual tile at a
+      // time and let PLAYERFOLLOW catch up before rounding the next corner.
+      const next = { x: p.x + Math.sign(point.x - p.x), z: p.z + Math.sign(point.z - p.z) };
+      assert(moveClickHandler.handle(new MoveClick([next], 0, false), p),
+        'native MoveClick accepts the next collision-found owner step');
+    }
+    countedWorldTick(tracked);
+  }
+  assert.deepEqual([p.level, p.x, p.z], [destination.level, destination.x, destination.z],
+    'ordinary owner walking reaches the wander-independent holding point inside the original setup budget');
+  assert.notDeepEqual([target.level, target.x, target.z], startingNpcTile,
+    'native PLAYERFOLLOW moves the original Villager, not a fixture relocation');
+  assert.equal(target.target, p);
+  assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
+}
+
 function dispatchSynchronousKnockOut(p, target) {
   assert(p.inOperableDistance(target), 'the lured NPC naturally follows into operation range');
   assert(!hasWitness(p, target), 'the original witness predicate permits this real knock-out');
@@ -613,18 +676,10 @@ test('a second native action updates the timer deadline before the earlier deadl
   const tracked = new Set([target]);
   const setupDeadline = oldDeadline - 3;
   boundedTicksThrough(tracked, setupDeadline - nativeSetupWaitTicks);
-  // Doormen continue their native wandering during the long Lure interval.
-  // Re-establish seclusion by ordinary owner movement, inside the original
-  // 512-turn setup budget; never move/freeze an NPC or postpone the late input.
-  while (World.currentTick < setupDeadline) {
-    if (hasWitness(p, target)) {
-      followToSeclusion(p, target, () => countedWorldTick(tracked), setupDeadline);
-    } else if (!p.inOperableDistance(target)) {
-      walkIntoNativeRange(p, target, () => countedWorldTick(tracked), setupDeadline);
-    } else {
-      countedWorldTick(tracked);
-    }
-  }
+  // A nearby witness can wander back into view on the final preparation tick.
+  // Use real owner movement to a point beyond every nearby home-wander footprint,
+  // retaining the original 512-turn budget and exact late-input schedule.
+  prepareLateInput(p, target, tracked, setupDeadline);
   assert.equal(World.currentTick, oldDeadline - 3);
   assert(p.inOperableDistance(target), `the actual late input is in native operation range: ${JSON.stringify({
     player: [p.level, p.x, p.z], npc: [target.level, target.x, target.z],

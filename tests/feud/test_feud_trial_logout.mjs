@@ -1,3 +1,4 @@
+import { seededWander } from './deterministic-wander.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import './timeout-safety.mjs';
@@ -147,15 +148,10 @@ const npcTile = npc => [npc.level, npc.x, npc.z];
 for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of distractionExitKinds) {
   test(`stationary distraction seed ${seedNumber}: ${exit} releases the original villager to native wandering`, () => {
     const p = trialFixture();
-    let selected, selectedPosition, selectionWalks = 0, freshWanderChoices = 0, randomState = seedNumber;
+    let selected, selectedPosition, selectionWalks = 0, freshWanderChoices = 0;
     const ownsQueueWaypoint = Object.hasOwn(Npc.prototype, 'queueWaypoint');
     const queueWaypoint = Npc.prototype.queueWaypoint, wander = Npc.prototype.wander, wanderMode = Npc.prototype.wanderMode;
-    const random = () => {
-      randomState ^= randomState << 13;
-      randomState ^= randomState >>> 17;
-      randomState ^= randomState << 5;
-      return (randomState >>> 0) / 0x100000000;
-    };
+    const random = seededWander(seedNumber);
     // Observe the compiled current-tile walk at selection, without writing NPC state.
     Npc.prototype.queueWaypoint = function (x, z) {
       if (this.getVar(stateVar) === 1 && (this.getVar(ownerVar) >>> 0) === p.uid &&
@@ -173,7 +169,7 @@ for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of dist
       return wander.call(this, range);
     };
     // Reproducible native wander outcomes for this actor only; no actor is moved,
-    // frozen or replaced by the fixture, and other NPC random streams are untouched.
+    // frozen or replaced, and other NPCs retain the suite's fixed random stream.
     Npc.prototype.wanderMode = function () {
       if (this !== selected) return wanderMode.call(this);
       const previous = Math.random;
