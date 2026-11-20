@@ -202,6 +202,7 @@ jobs:
           run_test tests/feud/test_feud_burglary.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_burglary.mjs
           run_test tests/feud/test_feud_travel.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_travel.mjs
           run_test tests/feud/test_feud_poison.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_poison.mjs
+          run_test tests/feud/test_feud_dung.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_dung.mjs
           run_test tests/feud/test_feud_finale.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_finale.mjs
           run_test tests/feud/test_feud_repeat_blackjack.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_repeat_blackjack.mjs
           run_test tests/feud/test_feud_trial_logout.mjs node --import tsx --test --test-force-exit ../content/tests/feud/test_feud_trial_logout.mjs

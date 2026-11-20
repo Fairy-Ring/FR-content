@@ -18,3 +18,6 @@
 
 // UNKNOWN: ordinary ground-drop precedent is 200 cycles.
 ^feud_dung_lifetime = 200
+
+// UNKNOWN FEUD-DUNG-PLACEMENT-01: camel tile, N, NE, E, SE, S, SW, W, NW.
+^feud_dung_candidate_count = 9

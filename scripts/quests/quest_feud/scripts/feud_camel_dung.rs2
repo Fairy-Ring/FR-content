@@ -4,7 +4,7 @@
 // 200-cycle temporary-loc lifetime are named UNKNOWN engineering values.
 // Brown dung alone accepts bucket_empty; green remains uncollectable, so use
 // the reusable sauce again. Dry dung has no sourced drying mechanic.
-// The existing trough, camels, dung locs, and animation sequences are reused.
+// VERIFIED cache: feud_ugthanki_pooh_8 exists as centrepiece_straight only.
 // UNKNOWN FEUD-DUNG-REFUSAL-01: equal weights among each listed refusal set.
 
 [oplocu,feud_foodtrough]
@@ -12,26 +12,61 @@ def_obj $used = last_useitem;
 if ($used ! superhot_kebab_sauce) {
     return;
 }
-if (npc_find(loc_coord, feud_camel, ^feud_camel_trough_range, 0) = false) {
+def_coord $trough = loc_coord;
+if (npc_find($trough, feud_camel, ^feud_camel_trough_range, 0) = false) {
     return;
-}
-if (loc_find(loc_coord, feud_ugthanki_pooh) = true) {
-    loc_del(1);
-}
-if (loc_find(loc_coord, feud_ugthanki_pooh_poisoned) = true) {
-    loc_del(1);
 }
 anim(feud_hot_sauce_poisoning, 0);
 npc_anim(camel_eats_from_trough, 0);
 p_delay(^feud_dung_spawn_delay);
 npc_anim(camel_eat_from_trough, 0);
+def_coord $spawn = ~feud_dung_spawn_tile(npc_coord, coord, $trough);
+if ($spawn = null) {
+    // Published default wording, not a new Feud line. Sauce remains reusable.
+    ~displaymessage(^dm_default);
+    return;
+}
 def_int $roll = random(100);
 if ($roll < ^feud_dung_green_chance) {
-    loc_add(loc_coord, feud_ugthanki_pooh_poisoned, 0, grounddecor, ^feud_dung_lifetime);
+    loc_add($spawn, feud_ugthanki_pooh_poisoned, 0, centrepiece_straight, ^feud_dung_lifetime);
 } else {
-    loc_add(loc_coord, feud_ugthanki_pooh, 0, grounddecor, ^feud_dung_lifetime);
+    loc_add($spawn, feud_ugthanki_pooh, 0, centrepiece_straight, ^feud_dung_lifetime);
 }
 return;
+
+// UNKNOWN FEUD-DUNG-PLACEMENT-01: sources give no tile. Use the eating camel's
+// tile at spawn time, then N, NE, E, SE, S, SW, W, NW, never the trough tile.
+// Require a standable tile and a clear line of walk from the trough-use side.
+// Never replace any centrepiece-layer loc, including another player's pile.
+[proc,feud_dung_spawn_tile](coord $camel, coord $access, coord $trough)(coord)
+def_int $index = 0;
+while ($index < ^feud_dung_candidate_count) {
+    def_coord $candidate = $camel;
+    switch_int ($index) {
+        case 1 : $candidate = movecoord($camel, 0, 0, 1);
+        case 2 : $candidate = movecoord($camel, 1, 0, 1);
+        case 3 : $candidate = movecoord($camel, 1, 0, 0);
+        case 4 : $candidate = movecoord($camel, 1, 0, -1);
+        case 5 : $candidate = movecoord($camel, 0, 0, -1);
+        case 6 : $candidate = movecoord($camel, -1, 0, -1);
+        case 7 : $candidate = movecoord($camel, -1, 0, 0);
+        case 8 : $candidate = movecoord($camel, -1, 0, 1);
+    }
+    if ($candidate ! $trough & map_blocked($candidate) = false) {
+        def_boolean $occupied = false;
+        loc_findallzone($candidate);
+        while ($occupied = false & loc_findnext = true) {
+            if (loc_coord = $candidate & loc_shape >= wall_diagonal & loc_shape < grounddecor) {
+                $occupied = true;
+            }
+        }
+        if ($occupied = false & lineofwalk($access, $candidate) = true) {
+            return($candidate);
+        }
+    }
+    $index = calc($index + 1);
+}
+return(null);
 
 [oploc1,feud_ugthanki_pooh] @feud_dung_refuse_pickup;
 [oploc1,feud_ugthanki_pooh_poisoned] @feud_dung_refuse_pickup;

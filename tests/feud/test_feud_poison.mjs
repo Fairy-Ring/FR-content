@@ -25,12 +25,20 @@ function withDraw(value, action) {
   }
 }
 
-function dungPlacement(base, name) {
-  return { ...base, name, type: id('LocType', name), shape: 22, angle: 0 };
+function dungNear(base, name) {
+  const type = id('LocType', name);
+  for (const dx of [-8, 0, 8]) for (const dz of [-8, 0, 8]) {
+    const zone = World.gameMap.getZoneIfExists(base.x + dx, base.z + dz, base.level);
+    const found = [...(zone?.getAllLocsSafe() ?? [])].find(loc => loc.type === type);
+    if (found) return found;
+  }
+  return null;
 }
 
-function placedAt(base, name) {
-  return World.getLoc(base.x, base.z, base.level, id('LocType', name));
+function dungPlacement(base, name) {
+  const loc = dungNear(base, name);
+  assert(loc, `the real trough use created ${name} in the original camel pen`);
+  return { name, type: loc.type, shape: loc.shape, angle: loc.angle, level: loc.level, x: loc.x, z: loc.z };
 }
 
 test('the snake-charmer charges one coin and only supplies kit items that fit', () => {
@@ -103,9 +111,8 @@ test('Feud poison preparation advances through snake, dung, Hag recovery, and th
 
   withDraw(0.079, () => operateLoc(p, originalTrough, { item: 'superhot_kebab_sauce' }));
   const green = dungPlacement(originalTrough, 'feud_ugthanki_pooh_poisoned');
-  const brown = dungPlacement(originalTrough, 'feud_ugthanki_pooh');
-  assert(placedAt(originalTrough, green.name), 'the lower-probability green dung uses the existing poisoned form');
-  assert(!placedAt(originalTrough, brown.name));
+  assert(dungNear(originalTrough, green.name), 'the lower-probability green dung uses the existing poisoned form');
+  assert(!dungNear(originalTrough, 'feud_ugthanki_pooh'));
 
   let from = p.messages.length;
   withDraw(0.079, () => operateLoc(p, green));
@@ -115,8 +122,9 @@ test('Feud poison preparation advances through snake, dung, Hag recovery, and th
   assert.equal(count(p, 'bucket_empty'), 1, 'green dung cannot be collected with a bucket');
 
   withDraw(0.08, () => operateLoc(p, originalTrough, { item: 'superhot_kebab_sauce' }));
-  assert(!placedAt(originalTrough, green.name), 'using sauce again replaces the green dung');
-  assert(placedAt(originalTrough, brown.name), 'the complementary 92% result is brown dung');
+  const brown = dungPlacement(originalTrough, 'feud_ugthanki_pooh');
+  assert(dungNear(originalTrough, green.name), 'using sauce again never replaces an earlier world pile');
+  assert(dungNear(originalTrough, brown.name), 'the complementary 92% result is brown dung');
   from = p.messages.length;
   withDraw(0.079, () => operateLoc(p, brown));
   assert.match(p.messages.slice(from).join(' '), /You're kidding me! I'm not picking that up/);
@@ -125,7 +133,7 @@ test('Feud poison preparation advances through snake, dung, Hag recovery, and th
   assert.match(p.messages.slice(from).join(' '), /You scoop up some camel dung into the bucket/);
   assert.equal(count(p, 'bucket_empty'), 0);
   assert.equal(count(p, 'feud_camel_pooh_bucket'), 1);
-  assert(!placedAt(originalTrough, brown.name), 'collecting brown dung removes the temporary loc');
+  assert(!dungNear(originalTrough, brown.name), 'collecting brown dung removes the temporary loc');
 
   talk(p, 'feud_hag');
   assert.equal(stage(p), 22);
@@ -225,7 +233,7 @@ test('the trough feeds when both original camels occupy their farthest reachable
     }
     const before = World.currentTick;
     withDraw(0.08, () => operateLoc(feeder, originalTrough, { item: 'superhot_kebab_sauce' }));
-    assert(placedAt(originalTrough, 'feud_ugthanki_pooh'), 'the real item-on-trough action creates brown dung at the trough');
+    assert(dungNear(originalTrough, 'feud_ugthanki_pooh'), 'the real item-on-trough action creates brown dung in the original camel pen');
     assert.deepEqual(animations.map(event => event.seq), [
       id('SeqType', 'camel_eats_from_trough'), id('SeqType', 'camel_eat_from_trough')
     ], 'one original camel performs both native eating reactions');
