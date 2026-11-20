@@ -1,6 +1,6 @@
 import './deterministic-wander.mjs';
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { lifecycleTest as test } from './completion.mjs';
 import { World, count, engineModule, execute, id, inv, obj, seed, types } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import { actors, bit, openOriginalVillagerCurtain, operate, operationStand, read, stand, talk } from './fixture.mjs';
