@@ -957,23 +957,7 @@ scope=perm
 transmit=yes
 scope=perm
 
-[farming_allotment_varp_1]
-transmit=yes
-scope=perm
-
-[farming_allotment_varp_2]
-transmit=yes
-scope=perm
-
-[farming_hops_varp]
-transmit=yes
-scope=perm
-
 [farming_special_tree_varp]
-transmit=yes
-scope=perm
-
-[farming_flower_varp]
 transmit=yes
 scope=perm
 
@@ -984,10 +968,6 @@ scope=perm
 [farming_varp_9]
 transmit=yes
 
-[varp511_bits]
-transmit=yes
-scope=perm
-
 [cactus_compost_varbit_basevar]
 transmit=yes
 scope=perm
@@ -996,10 +976,6 @@ scope=perm
 scope=perm
 
 [spirit_tree_sarim_compost_varbit_basevar]
-scope=perm
-
-[varp515_bits]
-transmit=yes
 scope=perm
 
 [varp516_bits]

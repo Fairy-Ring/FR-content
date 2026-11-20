@@ -10,7 +10,7 @@ import { World, Runner, Scripts, ScriptOpcode, PlayerTimerType, PlayerStat, Java
 const clock = id('VarPlayerType', 'farming_growth_minute');
 const bits = [0, 1].flatMap(word => [0, 8, 16, 24].map(start =>
   id('VarBitType', `farming_allotment_varp_${word + 1}_${start}_${start + 7}`)));
-const growth = Scripts.getByName('[timer,farming_growth]');
+const growth = Scripts.getByName('[softtimer,farming_growth]');
 assert(growth, 'shared compiled growth timer must exist (old code fails here)');
 assert(!Scripts.getByName('[timer,farming_potato_grow]'), 'obsolete planting-reset timer is removed');
 const patch = World.getLoc(3050, 3307, 0, id('LocType', 'farming_veg_patch_1'));
@@ -37,7 +37,7 @@ function fresh(at = 600) {
 function tick(p, at, elapsed = 500) {
   minute = at;
   World.currentTick += elapsed;
-  p.processTimers(PlayerTimerType.NORMAL);
+  p.processTimers(PlayerTimerType.SOFT);
 }
 function seedForDraw(draw) {
   for (let seed = 0; seed < 200000; seed++) {
@@ -80,7 +80,7 @@ try {
       assert.equal(steps(boundary, boundary - 1, period), 0, 'clock rollback grants no advance');
       assert.equal(steps(0, boundary, period), 0, 'first deployment initializes normally');
     });
-    test(`${period}-minute family: offline only complete windows after saved checkpoint`, () => {
+    test(`${period}-minute family: offline inferred ticks retain the saved phase`, () => {
       const boundary = period * 1000;
       assert.equal(steps(boundary - 1, boundary + 4, period, true), 0);
       assert.equal(steps(boundary - 1, boundary + 5, period, true), 1);
@@ -88,10 +88,10 @@ try {
       assert.equal(steps(boundary - 1, boundary + period * 3 + 5, period, true), 4);
     });
   }
-  test('real NORMAL timer waits 500 game ticks, keeps phase with no crops, and survives planting', () => {
+  test('real SOFT timer waits 500 game ticks, keeps phase with no crops, and survives planting', () => {
     const p = fresh(605);
     assert.equal(timer(p).interval, 500);
-    assert.equal(timer(p).type, PlayerTimerType.NORMAL);
+    assert.equal(timer(p).type, PlayerTimerType.SOFT);
     const arm = timer(p).clock;
     setStage(p, 6);
     tick(p, 610, 499); assert.equal(stage(p), 6);
@@ -106,12 +106,12 @@ try {
     assert.equal(timer(p), undefined);
     const loaded = player(p.save());
     minute = 612; proc(loaded, 'farming_login');
-    assert.equal(stage(loaded), 6, 'open window is not completed offline');
+    assert.equal(stage(loaded), 6, 'the inferred 614 tick follows the 612 login');
     tick(loaded, 617); assert.equal(stage(loaded), 6, 'reset tick fell outside 610..615');
     tick(loaded, 622); assert.equal(stage(loaded), 7);
     assert.equal(loaded.getVar(clock), 622);
   });
-  test('actual save/load catches completed offline windows once, restores timer and stops at mature', () => {
+  test('actual save/load catches inferred offline ticks once, restores timer and stops at mature', () => {
     const p = fresh(605); setStage(p, 6);
     minute = 609; proc(p, 'farming_logout');
     const saved = p.save();
@@ -119,18 +119,18 @@ try {
     assert.equal(loaded.timers.size, 0, 'engine does not serialize timers');
     assert.equal(loaded.getVar(clock), 609);
     minute = 635; proc(loaded, 'farming_login');
-    assert.equal(stage(loaded), 9, '610,620,630 windows completed offline');
+    assert.equal(stage(loaded), 9, 'inferred 614,624,634 ticks qualify in their active windows');
     assert.equal(loaded.getVar(clock), 635);
     assert.equal(timer(loaded).interval, 500);
     proc(loaded, 'farming_reconcile', 1); assert.equal(stage(loaded), 9, 'same-minute idempotence');
     minute = 10000000; proc(loaded, 'farming_reconcile', 1);
     assert.equal(stage(loaded), 10, 'large absence has a bounded finite path');
   });
-  test('NORMAL access stall loses expired window, rather than replaying elapsed online growth', () => {
+  test('SOFT timer advances through delay without replaying another online step', () => {
     const p = fresh(605); setStage(p, 6); p.delayed = true;
-    tick(p, 610); assert.equal(stage(p), 6);
-    p.delayed = false; tick(p, 616, 1); assert.equal(stage(p), 6);
-    tick(p, 621); assert.equal(stage(p), 7);
+    tick(p, 610); assert.equal(stage(p), 7);
+    p.delayed = false; tick(p, 616, 1); assert.equal(stage(p), 7);
+    tick(p, 621); assert.equal(stage(p), 8);
   });
   test('a second planting does not reset another allotment or its timer phase', () => {
     const p = fresh(605); setStage(p, 6, 1);

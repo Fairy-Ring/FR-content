@@ -667,7 +667,7 @@ try {
   test('partly harvested treated allotments never refill extra lives on a shared growth tick', () => {
     const group = groupSpecs.find(candidate => candidate.family === 'allotment');
     const clock = id('VarPlayerType', 'farming_growth_minute');
-    const timerScript = Scripts.getByName('[timer,farming_growth]');
+    const timerScript = Scripts.getByName('[softtimer,farming_growth]');
     assert(timerScript, 'compiled shared Farming timer');
     let checked = 0;
     for (const patchName of group.patchNames) for (const crop of cropRows.allotment) for (const mode of treatmentModes) {
@@ -694,10 +694,10 @@ try {
         proc(p, 'farming_login');
         assert.deepEqual(allExtras(p), livesAfterHarvest, 'same-minute login does not restore spent lives');
         const timer = p.timers.get(timerScript.id);
-        assert(timer && timer.interval > 0, 'the actual NORMAL timer is installed');
+        assert(timer && timer.interval > 0, 'the actual SOFT timer is installed');
         minute += period;
         World.currentTick += timer.interval;
-        p.processTimers(PlayerTimerType.NORMAL);
+        p.processTimers(PlayerTimerType.SOFT);
         assert.equal(p.getVar(clock), minute, 'the shared timer consumed the next online opportunity');
         assert.equal(getStage(p, patchName), crop.mature, 'the shared growth tick leaves the mature crop unchanged');
         assert.deepEqual(allExtras(p), livesAfterHarvest,
@@ -708,7 +708,7 @@ try {
         checked++;
       } finally { discard(p); }
     }
-    console.log(`Checked ${checked} native partial harvests followed by actual NORMAL growth ticks.`);
+    console.log(`Checked ${checked} native partial harvests followed by actual SOFT growth ticks.`);
   });
 
   test('flower treatment keeps its fixed yield, has no extra lives, and clears on harvest', () => {

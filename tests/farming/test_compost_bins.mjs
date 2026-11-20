@@ -236,22 +236,22 @@ function batchState(kind) {
   return { full: 143, closed: 82, rotted: 93, output: 158 };
 }
 
-const growthTimerScript = Scripts.getByName('[timer,farming_growth]');
-assert(growthTimerScript, 'compiled [timer,farming_growth] timer');
+const growthTimerScript = Scripts.getByName('[softtimer,farming_growth]');
+assert(growthTimerScript, 'compiled [softtimer,farming_growth] timer');
 function loginGrowthTimer(p, atMinute) {
   minute = atMinute;
   proc(p, 'farming_login');
   assert.equal(p.getVar(varpBin), atMinute, 'login saves a positive shared growth checkpoint');
   const timer = p.timers.get(growthTimerScript.id);
-  assert(timer && timer.interval > 0, 'farming_login installs the real NORMAL growth timer');
+  assert(timer && timer.interval > 0, 'farming_login installs the real SOFT growth timer');
   return timer.interval;
 }
 
 function pulseGrowthTimer(p, interval, atMinute) {
   minute = atMinute;
   World.currentTick += interval;
-  p.processTimers(PlayerTimerType.NORMAL);
-  assert.equal(p.getVar(varpBin), atMinute, 'real NORMAL timer reconciles the shared clock');
+  p.processTimers(PlayerTimerType.SOFT);
+  assert.equal(p.getVar(varpBin), atMinute, 'real SOFT timer reconciles the shared clock');
 }
 
 const oldDateHandler = Runner.HANDLERS[ScriptOpcode.DATE_MINUTES];
@@ -613,7 +613,7 @@ try {
       assert(audit.writes.length > beforeCloseWrites, 'Close writes the native bin slice');
 
       // Save the closed stage with a positive checkpoint. A reload uses the real
-      // farming_login and NORMAL timer; no bin state is seeded for these steps.
+      // farming_login and SOFT timer; no bin state is seeded for these steps.
       minute = baseMinute;
       proc(p, 'farming_login');
       assert.equal(p.getVar(varpBin), baseMinute);
@@ -640,7 +640,7 @@ try {
       for (let step = 1; step <= 9; step++) {
         pulseGrowthTimer(p, timerInterval, baseMinute + step * 5);
         const expected = step < 9 ? state.closed + step : state.rotted;
-        assert.equal(binState(p, bin), expected, `shared NORMAL timer step ${step}`);
+        assert.equal(binState(p, bin), expected, `shared SOFT timer step ${step}`);
         assert.equal(farmingXp(p), beforeClockXp, `growth step ${step} grants no XP`);
         if (step === 8) {
           const beforeWrites = audit.writes.length;
@@ -818,7 +818,7 @@ try {
     }
   });
 
-  test('positive saved offline checkpoint advances all four slices on login and finishes on NORMAL timers', () => {
+  test('positive saved offline checkpoint advances all four slices on login and finishes on SOFT timers', () => {
     const initial = [64, 73, 82, 64];
     const expectedRotted = [91, 92, 93, 91];
     const p0 = fixture(bins[0]);
@@ -847,7 +847,7 @@ try {
         const completedSteps = 2 + step;
         const expected = initial.map((start, index) => completedSteps < 9
           ? start + completedSteps : expectedRotted[index]);
-        assert.deepEqual(stateVector(p), expected, `shared NORMAL timer reaches step ${completedSteps}`);
+        assert.deepEqual(stateVector(p), expected, `shared SOFT timer reaches step ${completedSteps}`);
         assert.equal(farmingXp(p), beforeXp, 'shared growth grants no XP');
       }
       assert.deepEqual(stateVector(p), expectedRotted, 'each bin class completes nine shared steps');
@@ -928,7 +928,7 @@ try {
       for (let step = 1; step <= 9; step++) {
         pulseGrowthTimer(p, interval, closeAt + 9 + step * 5);
         const expected = step < 9 ? 64 + step : 91;
-        assert.equal(binState(p, bin), expected, `logout-delay NORMAL timer step ${step}`);
+        assert.equal(binState(p, bin), expected, `logout-delay SOFT timer step ${step}`);
         assert.equal(farmingXp(p), beforeXp, 'clock reconciliation grants no XP');
       }
       const elapsedMinutes = minute - closeAt;

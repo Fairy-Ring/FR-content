@@ -207,10 +207,10 @@ test('all twelve paid plantings survive save/load and the real online/offline sc
     }
     assert.equal(p.getVar(care), 0xfff);
     proc(p, 'farming_login');
-    const timer = Scripts.getByName('[timer,farming_growth]');
+    const timer = Scripts.getByName('[softtimer,farming_growth]');
     assert.equal(p.timers.get(timer.id).interval, 500);
     minute = 610; World.currentTick += 500;
-    p.processTimers(PlayerTimerType.NORMAL);
+    p.processTimers(PlayerTimerType.SOFT);
     for (let patch = 0; patch < 12; patch++) assert.equal(stage(p, patch), patch < 8 ? 7 : 5);
     q = player(p.save());
     assert.equal(q.getVar(care), 0xfff);
