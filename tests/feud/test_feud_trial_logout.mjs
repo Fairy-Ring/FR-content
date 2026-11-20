@@ -1,6 +1,6 @@
 import { seededWander } from './deterministic-wander.mjs';
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { assertCompletion, lifecycleTest as test, sealLifecycle } from './completion.mjs';
 import './timeout-safety.mjs';
 import { reconciliationTests } from './reconciliation.mjs';
 import {
@@ -643,3 +643,20 @@ test('an orphaned villager cleans up on its own queued deadline without running 
 });
 
 reconciliationTests();
+
+test('lifecycle completion rejects a declared case that did not complete', () => {
+  assert.throws(() => assertCompletion({ declared: 2, completed: 1, passed: 1, sealed: true }),
+    /every declared lifecycle case must complete/);
+});
+
+test('lifecycle completion rejects a completed case that failed', () => {
+  assert.throws(() => assertCompletion({ declared: 2, completed: 2, passed: 1, sealed: true }),
+    /every declared lifecycle case must pass/);
+});
+
+test('lifecycle completion rejects unfinished case registration', () => {
+  assert.throws(() => assertCompletion({ declared: 2, completed: 2, passed: 2, sealed: false }),
+    /lifecycle case registration must finish/);
+});
+
+sealLifecycle();
