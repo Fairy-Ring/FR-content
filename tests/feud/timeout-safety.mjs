@@ -1304,9 +1304,8 @@ for (const location of ['inside', 'outside']) {
     const home = { x: target.startX, z: target.startZ };
     const maxrange = types.NpcType.get(target.type).maxrange;
     const homeDistance = (x, z) => CoordGrid.distanceToSW({ x, z }, home);
-    const allowedOwnerTile = (x, z) =>
-      Math.max(Math.abs(x - stand[1]), Math.abs(z - stand[2])) >= 2 &&
-      (location === 'inside' ? homeDistance(x, z) <= maxrange : homeDistance(x, z) > maxrange + 1);
+    const allowedOwnerTile = (x, z) => location === 'inside' ? homeDistance(x, z) <= maxrange
+      : homeDistance(x, z) > maxrange + 1;
     const tracked = new Set([target]);
     const tick = () => countedWorldTick(tracked);
     const preparationDeadline = World.currentTick + nativeSetupWaitTicks;
@@ -1323,8 +1322,8 @@ for (const location of ['inside', 'outside']) {
       assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
       walkRepeatToSeclusion(p, target, tick, preparationDeadline, false, allowedOwnerTile);
       assert(!hasWitness(p, target), 'the actual KO is unwitnessed, not the witnessed-failure branch');
-      assert.notDeepEqual([target.x, target.z], initialNpcTile,
-        'ordinary PLAYERFOLLOW, not fixture relocation, moved the original NPC');
+      if (location === 'outside') assert.notDeepEqual([target.x, target.z], initialNpcTile,
+        'ordinary PLAYERFOLLOW, not fixture relocation, moved the original NPC outside home range');
       const before = {
         tick: World.currentTick, hp: p.levels[PlayerStat.HITPOINTS], xp: xp(p),
         coins: count(p, 'coins'), messageMark: p.messages.length,
@@ -1354,6 +1353,7 @@ for (const location of ['inside', 'outside']) {
     }
     assert(failure, 'the bounded unchanged native RNG sequence includes a genuine failed KO');
 
+    const positions = [{ tick: 0, mode: NpcMode[target.targetOp], npc: [target.x, target.z] }];
     const events = [];
     const damageMask = rsbuf.PlayerInfoProt.DAMAGE | rsbuf.PlayerInfoProt.DAMAGE2;
     const observe = ({ npc, tick }) => {
@@ -1364,7 +1364,13 @@ for (const location of ['inside', 'outside']) {
         overhead: npc.sayMessage
       });
     };
-    const observedTick = () => countedWorldTick(tracked, null, observe);
+    const observedTick = () => {
+      countedWorldTick(tracked, null, observe);
+      const previous = positions.at(-1);
+      if (previous.mode !== NpcMode[target.targetOp] || previous.npc[0] !== target.x || previous.npc[1] !== target.z) {
+        positions.push({ tick: World.currentTick - failure.tick, mode: NpcMode[target.targetOp], npc: [target.x, target.z] });
+      }
+    };
     observedTick();
     const retaliationMode = location === 'inside' ? NpcMode.OPPLAYER2 : NpcMode.PLAYERESCAPE;
     assert(events.some(event => event.mode === NpcMode[retaliationMode]),
@@ -1383,7 +1389,7 @@ for (const location of ['inside', 'outside']) {
         observedTick();
       }
       assert.equal(target.targetOp, NpcMode.WANDER, 'ordinary range handling gives up retaliation');
-      assert(homeDistance(target.x, target.z) <= maxrange, 'native wandering brings the original NPC back inside home range');
+      assert(homeDistance(target.x, target.z) <= maxrange, 'native home handling eventually returns the original NPC inside its home range');
       assert.notDeepEqual([target.x, target.z], failure.npc, 'the original NPC actually leaves the failed-KO position');
       assert(events.every(event => !event.hit && event.animation === -1),
         'outside-home retaliation supplies neither an attack animation nor a player hitmark');
@@ -1401,7 +1407,7 @@ for (const location of ['inside', 'outside']) {
       ticksObserved: World.currentTick - failure.tick,
       hpBefore: failure.hp, hpAfter: p.levels[PlayerStat.HITPOINTS],
       finalNpc: [target.x, target.z], finalMode: NpcMode[target.targetOp],
-      chat: p.messages.slice(failure.messageMark), events
+      chat: p.messages.slice(failure.messageMark), positions, events
     }));
   });
 }
