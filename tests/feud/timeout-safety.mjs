@@ -6,7 +6,7 @@ import {
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  actors, bit, displayNpcType, hasWitness, isWitness, openOriginalVillagerCurtain, operate, operateHere,
+  actors, bit, displayNpcType, hasWitness, isWitness, locs, openOriginalVillagerCurtain, operate, operateHere,
   distractionTicks, knockoutTicks, operationStand, read, stage, talk, wield, worldTick
 } from './fixture.mjs';
 import { followToSeclusion } from './follow.mjs';
@@ -21,6 +21,8 @@ const moveClickHandler = new (await engineModule('network/game/client/handler/Mo
 const OpNpc = (await engineModule('network/game/client/model/OpNpc.ts')).default;
 const OpNpcHandler = (await engineModule('network/game/client/handler/OpNpcHandler.ts')).default;
 const opNpcHandler = new OpNpcHandler();
+const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
+const opLocHandler = new (await engineModule('network/game/client/handler/OpLocHandler.ts')).default();
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
 const slotVar = id('VarPlayerType', 'feud_trial_villager');
 const stateVar = id('VarNpcType', 'feud_villager_state');
@@ -219,6 +221,55 @@ function walkIntoNativeRange(p, target, tick, deadline) {
 
 function prepareLateInput(p, target, tracked, deadline) {
   const searchRadius = 32; // UNKNOWN fixture geometry bound, as in follow.mjs.
+  const travelBudget = deadline - World.currentTick;
+  assert.equal(travelBudget, nativeSetupWaitTicks, 'late-input preparation retains exactly its original 512 turns');
+  // The original curtain automatically restores after 200 native turns. The
+  // long Lure wait must not leave this ordinary exit closed during preparation.
+  const closedType = id('LocType', 'curtain_1528'), openType = id('LocType', 'curtain_1529');
+  const curtains = locs('curtain_1528').filter(row => row.level === p.level &&
+    CoordGrid.distanceToSW(p, row) <= searchRadius).sort((a, b) =>
+    CoordGrid.distanceToSW(p, a) - CoordGrid.distanceToSW(p, b));
+  let closed = null, curtainPath = null;
+  for (const row of curtains) {
+    const candidate = World.getLoc(row.x, row.z, row.level, closedType);
+    if (!candidate) continue;
+    const force = types.LocType.get(candidate.type).forceapproach;
+    const path = [...map.findPathToLoc(p.level, p.x, p.z, candidate.x, candidate.z, p.width,
+      candidate.width, candidate.length, candidate.angle, candidate.shape, force)];
+    const end = path.length ? CoordGrid.unpackCoord(path.at(-1)) : p;
+    if (!map.reachedLoc(p.level, end.x, end.z, candidate.x, candidate.z,
+      candidate.width, candidate.length, p.width, candidate.angle, candidate.shape, force)) continue;
+    closed = candidate;
+    curtainPath = path;
+    break;
+  }
+  if (closed) {
+    const before = [p.level, p.x, p.z], tick = World.currentTick;
+    const curtain = closed;
+    if (!p.inOperableDistance(closed)) {
+      assert(curtainPath.length, 'native loc routing reaches an Open stand beside this original curtain');
+      const steps = curtainPath.map(coord => {
+        const point = CoordGrid.unpackCoord(coord);
+        return { x: point.x, z: point.z };
+      });
+      assert(moveClickHandler.handle(new MoveClick(steps, 0, false), p),
+        'native MoveClick supplies the ordinary curtain-approach path before OPLOC1');
+      while (World.currentTick < deadline && !p.inOperableDistance(closed)) countedWorldTick(tracked);
+      assert(p.inOperableDistance(closed), `the owner really walks into curtain operation range within the original setup budget: ${JSON.stringify({
+        before, player: [p.level, p.x, p.z], curtain: [closed.level, closed.x, closed.z], path: steps
+      })}`);
+    }
+    assert(opLocHandler.handle(new OpLoc(1, curtain.x, curtain.z, closedType), p),
+      'native OPLOC1 accepts Open on the naturally restored original curtain');
+    while (World.currentTick < deadline && World.getLoc(curtain.x, curtain.z, curtain.level, closedType)) {
+      countedWorldTick(tracked);
+    }
+    assert(World.getLoc(curtain.x, curtain.z, curtain.level, openType),
+      'ordinary player walking and the compiled Open expose the original exit within the same setup budget');
+    console.log(JSON.stringify({ kind: 'late-input-native-curtain', before, after: [p.level, p.x, p.z],
+      ticks: World.currentTick - tick, remaining: deadline - World.currentTick }));
+  }
+  const remainingTravel = deadline - World.currentTick;
   const margin = 5 + Math.max(target.width, target.length, p.width); // Native witness radius plus every follower stand.
   const distance = (x, z, bounds) => Math.max(
     Math.max(bounds.minX - x, x - bounds.maxX, 0),
@@ -227,11 +278,16 @@ function prepareLateInput(p, target, tracked, deadline) {
   for (const npc of World.npcs) {
     if (!npc.isActive || npc.level !== target.level || npc.uid === target.uid) continue;
     const range = types.NpcType.get(npc.type).wanderrange;
-    // Native wander chooses destinations around startX/startZ. Include the
-    // current tile too, so its entire return path and reset-to-home are covered.
+    // Native NPC movement is WALK (one tile per turn). Intersect home-wander
+    // destinations with what can be reached during this unchanged preparation
+    // window, also covering the native reset-to-home. A distant pet's enormous
+    // configured range does not let it cross the world in one turn.
     const bounds = {
-      minX: Math.min(npc.x, npc.startX - range), maxX: Math.max(npc.x, npc.startX + range),
-      minZ: Math.min(npc.z, npc.startZ - range), maxZ: Math.max(npc.z, npc.startZ + range)
+      minX: Math.max(Math.min(npc.x, npc.startX - range), Math.min(npc.x, npc.startX) - remainingTravel),
+      maxX: Math.min(Math.max(npc.x, npc.startX + range), Math.max(npc.x, npc.startX) + remainingTravel),
+      minZ: Math.max(Math.min(npc.z, npc.startZ - range), Math.min(npc.z, npc.startZ) - remainingTravel),
+      maxZ: Math.min(Math.max(npc.z, npc.startZ + range), Math.max(npc.z, npc.startZ) + remainingTravel),
+      name: types.NpcType.get(npc.type).debugname, current: [npc.x, npc.z], home: [npc.startX, npc.startZ], range
     };
     if (distance(target.x, target.z, bounds) > searchRadius + margin) continue;
     assert([NpcMode.NONE, NpcMode.WANDER].includes(npc.targetOp),
@@ -240,13 +296,14 @@ function prepareLateInput(p, target, tracked, deadline) {
     // a nominally safe holding tile depend on a later visible form or RNG draw.
     footprints.push(bounds);
   }
-  let destination = null, route = null;
+  let destination = null, route = null, safeTiles = 0;
   for (let radius = 1; radius <= searchRadius && !destination; radius++) {
     for (let x = target.x - radius; x <= target.x + radius && !destination; x++) {
       for (let z = target.z - radius; z <= target.z + radius; z++) {
         if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
             map.isMapBlocked(x, z, target.level) ||
             footprints.some(bounds => distance(x, z, bounds) <= margin)) continue;
+        safeTiles++;
         const path = [...map.findPath(p.level, p.x, p.z, x, z)];
         if (!path.length) continue;
         const end = CoordGrid.unpackCoord(path.at(-1));
@@ -257,12 +314,17 @@ function prepareLateInput(p, target, tracked, deadline) {
       }
     }
   }
-  assert(destination, 'an exact native walking route reaches a holding point outside every nearby NPC wander footprint');
+  assert(destination, `an exact native walking route reaches a holding point outside every nearby NPC wander footprint: ${JSON.stringify({
+    tick: World.currentTick, player: [p.level, p.x, p.z], npc: [target.level, target.x, target.z], safeTiles, footprints
+  })}`);
   const startingNpcTile = [target.level, target.x, target.z];
   let waypoint = 0;
   for (let turns = 0; turns < nativeSetupWaitTicks && World.currentTick < deadline; turns++) {
     while (waypoint < route.length && p.x === route[waypoint].x && p.z === route[waypoint].z) waypoint++;
-    if (!p.hasWaypoints() && p.inOperableDistance(target) && waypoint < route.length) {
+    // Naive following can stop at diagonal adjacency even when a corner
+    // blocks operation range. Let the owner lead from that adjacent tile;
+    // the actual later input still requires native operation range.
+    if (!p.hasWaypoints() && CoordGrid.distanceTo(p, target) <= 1 && waypoint < route.length) {
       const point = route[waypoint];
       // A compressed path may span several tiles. Lead one actual tile at a
       // time and let PLAYERFOLLOW catch up before rounding the next corner.
@@ -273,7 +335,9 @@ function prepareLateInput(p, target, tracked, deadline) {
     countedWorldTick(tracked);
   }
   assert.deepEqual([p.level, p.x, p.z], [destination.level, destination.x, destination.z],
-    'ordinary owner walking reaches the wander-independent holding point inside the original setup budget');
+    `ordinary owner walking reaches the wander-independent holding point inside the original setup budget: ${JSON.stringify({
+      target: [target.level, target.x, target.z], mode: target.targetOp, waypoint, route
+    })}`);
   assert.notDeepEqual([target.level, target.x, target.z], startingNpcTile,
     'native PLAYERFOLLOW moves the original Villager, not a fixture relocation');
   assert.equal(target.target, p);
