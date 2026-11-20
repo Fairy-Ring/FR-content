@@ -1320,7 +1320,19 @@ for (const location of ['inside', 'outside']) {
       processSelectedInteraction(p);
       assert.equal(target.getVar(stateVar), 2);
       assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
-      walkRepeatToSeclusion(p, target, tick, preparationDeadline, location === 'outside', allowedOwnerTile);
+      if (location === 'outside') {
+        walkRepeatToSeclusion(p, target, tick, preparationDeadline, true, allowedOwnerTile);
+      } else {
+        // The home-range case need not prove an empty 3x3 destination area.
+        // Let the real follower settle and actual witnesses wander instead.
+        while (World.currentTick < preparationDeadline &&
+          (hasWitness(p, target) || !p.inOperableDistance(target))) {
+          if (!p.inOperableDistance(target)) walkIntoNativeRange(p, target, tick, preparationDeadline);
+          else tick();
+        }
+        assert(allowedOwnerTile(p.x, p.z), 'the actual inside-home owner stand remains inside the native bound');
+        assert(p.inOperableDistance(target), 'the naturally lured Bandit is in actual operation range');
+      }
       assert(!hasWitness(p, target), 'the actual KO is unwitnessed, not the witnessed-failure branch');
       if (location === 'outside') assert.notDeepEqual([target.x, target.z], initialNpcTile,
         'ordinary PLAYERFOLLOW, not fixture relocation, moved the original NPC outside home range');
