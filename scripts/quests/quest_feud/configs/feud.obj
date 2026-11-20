@@ -1,3 +1,4 @@
+// CANDIDATE: explicit tradeability overrides follow exact-ID Old School item-page histories.
 [feud_mayors_house_keys]
 name=Keys
 desc=Keys to the Mayor's house.
@@ -9,6 +10,7 @@ model=obj_ikov_shinykey
 2dyan=20
 2dxan=328
 weight=10g
+tradeable=no
 
 [feud_mayors_jewels]
 name=Jewels
@@ -23,6 +25,7 @@ model=obj_amulet_of_accuracy
 2dxan=196
 members=yes
 weight=10g
+tradeable=no
 
 [feud_karidian_turban]
 name=Karidian headpiece
@@ -84,6 +87,7 @@ model=obj_nulodions_notes
 members=yes
 iop1=Read
 weight=20g
+tradeable=no
 
 [feud_nos_note]
 name=Note
@@ -99,6 +103,7 @@ model=obj_nulodions_notes
 iop1=Read
 members=yes
 weight=20g
+tradeable=no
 
 [blackjack_oak]
 name=Oak-blackjack
@@ -116,6 +121,7 @@ members=yes
 weight=1kg
 wearpos=righthand
 weight=4lb
+tradeable=no
 
 [blackjack_willow]
 name=Willow-blackjack
@@ -149,6 +155,7 @@ members=yes
 2dxan=204
 iop4=Empty
 weight=400g
+tradeable=no
 
 [feud_camel_poison_pooh_bucket]
 name=Ugthanki dung
@@ -161,6 +168,7 @@ members=yes
 2dxan=204
 iop4=Empty
 weight=400g
+tradeable=no
 
 [feud_camel_receipt]
 name=Receipt
@@ -175,6 +183,7 @@ model=obj_nulodions_notes
 2dxan=380
 members=yes
 weight=20g
+tradeable=no
 
 [poison_from_hag]
 name=Hag's poison
@@ -205,6 +214,7 @@ members=yes
 wearpos=righthand
 wearpos2=lefthand
 weight=100g
+tradeable=no
 
 [basket_for_snake]
 name=Snake basket
@@ -214,6 +224,7 @@ members=yes
 2dzoom=1420
 2dxan=12
 weight=500g
+tradeable=no
 
 [basket_with_snake]
 name=Snake basket full
@@ -225,6 +236,7 @@ members=yes
 2dzoom=1560
 2dyan=1964
 weight=1kg
+tradeable=no
 
 [super_kebab]
 name=Super kebab
@@ -257,6 +269,7 @@ model=obj_superhot_kebab_sauce
 2dxan=48
 members=yes
 weight=100g
+tradeable=no
 
 [feud_desert_disguise]
 name=Desert disguise
@@ -282,6 +295,7 @@ wearpos=hat
 wearpos2=head
 wearpos3=jaw
 weight=40g
+tradeable=no
 
 [cert_blackjack_willow]
 certlink=blackjack_willow

@@ -3,9 +3,26 @@ import test from 'node:test';
 
 import { count, id, inv, invButton, obj, seed, types } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
+import { feudItems, observeItem } from './tradeability.mjs';
 import {
   actors, begin, buyReceipts, deliver, drink, gangMask, operate, read, relog, stage, talk
 } from './fixture.mjs';
+
+test('all Feud item flags and real transfer routes match the item-history audit', () => {
+  const untradeable = new Set([
+    'feud_mayors_house_keys', 'feud_mayors_jewels', 'feud_fib_hint', 'feud_nos_note',
+    'feud_camel_pooh_bucket', 'feud_camel_poison_pooh_bucket', 'feud_camel_receipt',
+    'poison_from_hag', 'snake_flute', 'basket_for_snake', 'basket_with_snake',
+    'superhot_kebab_sauce', 'blackjack_oak', 'feud_desert_disguise'
+  ]);
+  for (const name of feudItems) {
+    assert.equal(types.ObjType.get(obj(name)).tradeable, !untradeable.has(name),
+      `${name}: the packed server-only flag follows the CANDIDATE item-history table`);
+    const result = observeItem(name);
+    assert.equal(result.offered, untradeable.has(name) ? 0 : 1, `${name}: real trade offer`);
+    assert.equal(result.otherPickup, !untradeable.has(name), `${name}: real ground pickup`);
+  }
+});
 
 test('the original market Trade option supplies both required disguise items before the quest', () => {
   const p = player();
