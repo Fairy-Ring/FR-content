@@ -9,7 +9,7 @@ import {
 import { player } from './player.mjs';
 import {
   actors, bit, distractionTicks, displayNpcType, hasWitness, knockoutTicks, openOriginalVillagerCurtain,
-  operate, operationStand, read, stage, stand, talk, tickThrough, wield, worldTick
+  operate, operateHere, operationStand, read, stage, stand, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
@@ -209,6 +209,28 @@ for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of dist
         assert.equal(deadline, World.currentTick + distractionTicks);
         // Logout is completed by the next native turn, before the expiry timer.
         const inputTick = deadline - (exit === 'window-logout' ? 2 : 1);
+        if ((exit === 'theft' || exit === 'refusal') && !p.inOperableDistance(target)) {
+          // Reach the held Villager while the original curtain is still open,
+          // then retain the exact original late input turn. Waiting outside
+          // until that turn can leave an otherwise reachable target enclosed.
+          const destination = operationStand(p, target);
+          assert(destination, 'the held Villager has a native operation stand before the curtain restores');
+          const route = [...map.findPath(p.level, p.x, p.z, destination[1], destination[2])];
+          assert(route.length, 'the owner has a real route to the held Villager');
+          const end = CoordGrid.unpackCoord(route.at(-1));
+          assert.deepEqual([end.level, end.x, end.z], destination);
+          const path = route.map(coord => {
+            const point = CoordGrid.unpackCoord(coord);
+            return { x: point.x, z: point.z };
+          });
+          assert(moveClickHandler.handle(new MoveClick(path, 0, false), p),
+            'native MoveClick accepts the owner approach during the original theft window');
+          while (World.currentTick < inputTick && !p.inOperableDistance(target)) {
+            assertHeld();
+            worldTick();
+          }
+          assert(p.inOperableDistance(target), 'ordinary owner walking reaches the held Villager before the fixed input turn');
+        }
         while (World.currentTick < inputTick) {
           assertHeld();
           worldTick();
@@ -217,7 +239,7 @@ for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of dist
       }
       const beforeExit = trialResult(p), hp = p.levels[PlayerStat.HITPOINTS];
       if (exit === 'theft') {
-        operate(p, target, 3);
+        operateHere(p, target, 3);
         assert.equal(stage(p), 9);
         assert.equal(count(p, 'coins') - beforeExit.coins, 3);
         assert.equal(xp(p) - beforeExit.xp, 80);
@@ -226,7 +248,7 @@ for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of dist
         worldTick(() => {
           assert.equal(World.currentTick, target.getVar(deadlineVar));
           assertHeld();
-          operate(p, target, 3);
+          operateHere(p, target, 3);
           assert.equal(target.sayMessage, "You won't get my purse.",
             'inspect the native overhead before the same turn broadcasts and clears it');
           assert.equal(hp - p.levels[PlayerStat.HITPOINTS], 2);
