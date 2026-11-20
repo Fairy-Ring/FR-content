@@ -8,8 +8,8 @@ import {
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  actors, bit, distractionTicks, displayNpcType, hasWitness, knockoutTicks, openOriginalVillagerCurtain,
-  operate, operateHere, operationStand, read, stage, stand, talk, tickThrough, wield, worldTick
+  activeLoc, actors, bit, distractionTicks, displayNpcType, hasWitness, knockoutTicks, locs, openOriginalVillagerCurtain,
+  operate, operateHere, operateLoc, operationStand, read, stage, stand, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 
 const rsbuf = await engineModule('network/rsbuf/index.ts');
@@ -83,6 +83,16 @@ function trialFixture() {
   p.invAdd(inv, obj('coins'), 100);
   wield(p, 'blackjack_oak');
   rsbuf.addPlayer(p.slot);
+  // Disclosed ambient setup: a prior case may leave this original curtain
+  // open with little lifetime left. Close it through the compiled action so
+  // the existing pre-conversation Open always starts its normal full lifetime.
+  const curtain = locs('curtain_1528').find(loc => loc.level === 0 && loc.x === 3345 && loc.z === 2955);
+  assert(curtain, 'the original Villager-house curtain remains placed');
+  if (activeLoc(curtain).type === id('LocType', 'curtain_1529')) {
+    operateLoc(p, { ...curtain, name: 'curtain_1529', type: id('LocType', 'curtain_1529') },
+      { position: [curtain.level, curtain.x, curtain.z] });
+    assert.equal(activeLoc(curtain).type, id('LocType', 'curtain_1528'));
+  }
   return p;
 }
 
@@ -209,28 +219,10 @@ for (let seedNumber = 1; seedNumber <= 16; seedNumber++) for (const exit of dist
         assert.equal(deadline, World.currentTick + distractionTicks);
         // Logout is completed by the next native turn, before the expiry timer.
         const inputTick = deadline - (exit === 'window-logout' ? 2 : 1);
-        if ((exit === 'theft' || exit === 'refusal') && !p.inOperableDistance(target)) {
-          // Reach the held Villager while the original curtain is still open,
-          // then retain the exact original late input turn. Waiting outside
-          // until that turn can leave an otherwise reachable target enclosed.
-          const destination = operationStand(p, target);
-          assert(destination, 'the held Villager has a native operation stand before the curtain restores');
-          const route = [...map.findPath(p.level, p.x, p.z, destination[1], destination[2])];
-          assert(route.length, 'the owner has a real route to the held Villager');
-          const end = CoordGrid.unpackCoord(route.at(-1));
-          assert.deepEqual([end.level, end.x, end.z], destination);
-          const path = route.map(coord => {
-            const point = CoordGrid.unpackCoord(coord);
-            return { x: point.x, z: point.z };
-          });
-          assert(moveClickHandler.handle(new MoveClick(path, 0, false), p),
-            'native MoveClick accepts the owner approach during the original theft window');
-          while (World.currentTick < inputTick && !p.inOperableDistance(target)) {
-            assertHeld();
-            worldTick();
-          }
-          assert(p.inOperableDistance(target), 'ordinary owner walking reaches the held Villager before the fixed input turn');
-        }
+        // Prepare the owner's existing path-checked fixture stand now, while
+        // the freshly opened curtain is still open, not at the late input.
+        // Only the owner is positioned; the held NPC and its timer are untouched.
+        if (exit === 'theft' || exit === 'refusal') stand(p, target);
         while (World.currentTick < inputTick) {
           assertHeld();
           worldTick();
