@@ -237,6 +237,24 @@ for (const generous of [false, true]) {
   });
 }
 
+test('traded camel receipts cannot bypass the purchase checkpoint', () => {
+  const p = player(); begin(p); drink(p);
+  const receipt = obj('feud_camel_receipt');
+  // Test-only setup represents two receipts obtained by trading at stage two.
+  p.invAdd(inv, receipt, 2);
+  assert.equal(stage(p), 2);
+  for (const name of ['feud_egyptian_doorman_multi', 'feud_arabian_guard_multi', 'feud_arabian_guard_coward']) {
+    const messages = p.messages.length;
+    talk(p, name);
+    assert.equal(p.messages.length, messages + 1, `${name} sends the default refusal`);
+    assert.equal(p.messages.at(-1), 'Nothing interesting happens.', `${name} refuses before exchanging a receipt`);
+    assert.equal(count(p, 'feud_camel_receipt'), 2, 'both receipts remain in the inventory');
+    assert.equal(stage(p), 2, 'a receipt cannot advance the purchase checkpoint');
+    assert.equal(gangMask(p), 0, 'a receipt cannot mark either gang as paid');
+    assert.equal(read(p, 'feud_var_talk_gangs'), 0, 'a hand-in is not a gang inquiry');
+  }
+});
+
 test('lost purchase-state camel receipts are replaced free without another sale or progress write', () => {
   let p = player(); begin(p); drink(p);
   talk(p, 'feud_egyptian_doorman_multi');
@@ -247,6 +265,20 @@ test('lost purchase-state camel receipts are replaced free without another sale 
     'the original receipt can normally be lost through its visible Drop operation');
   assert.match(talk(p, 'feud_ali_the_discount_camel_seller', [1]).text, /trying to con me/);
   assert.equal(count(p, 'feud_camel_receipt'), 2, 'asking with both receipts produces no extra copy');
+  // Banked receipts also suppress free replacement after a relog.
+  const bank = id('InvType', 'bank'), receipt = obj('feud_camel_receipt');
+  p.invDel(inv, receipt, 2);
+  p.invAdd(bank, receipt, 2);
+  p = relog(p);
+  assert.equal(p.invTotal(bank, receipt), 2);
+  assert.match(talk(p, 'feud_ali_the_discount_camel_seller', [1]).text, /trying to con me/);
+  assert.equal(count(p, 'feud_camel_receipt'), 0);
+  assert.equal(p.invTotal(bank, receipt), 2, 'the refusal preserves banked receipts');
+  assert.equal(count(p, 'coins'), money);
+  assert.equal(stage(p), 4);
+  p.invDel(bank, receipt, 2);
+  p.invAdd(inv, receipt, 2);
+
 
   // Own-inventory loss fixture; replacement itself uses the visible native Talk route.
   p.invDel(inv, obj('feud_camel_receipt'), 1);

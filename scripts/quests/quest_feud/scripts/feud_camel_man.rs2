@@ -211,7 +211,7 @@ return;
 // CANDIDATE: the later transcript's purchase-state replacement branch.
 [label,feud_camel_receipts]
 ~chatplayer("<p,neutral>About those camels. I've lost the receipt, can I have another?");
-def_int $missing = calc(2 - inv_total(inv, feud_camel_receipt));
+def_int $missing = calc(2 - inv_total(inv, feud_camel_receipt) - inv_total(bank, feud_camel_receipt));
 if ($missing <= 0) {
     ~chatnpc("<p,neutral>I think you're trying to con me into giving you an extra receipt.");
     return;
