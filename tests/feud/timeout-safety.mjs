@@ -1035,20 +1035,33 @@ test('TEST-ONLY seeded poison preserves cadence and callback bounds through natu
     assert(target.timerInterval <= 0);
     const weaponSeverity = types.ObjType.get(obj('bronze_dagger_p')).params?.get(id('ParamType', 'poison_severity'));
     assert.equal(weaponSeverity, 20);
-    // TEST-ONLY NPC SEED, explicitly authorized by Main. A normal account cannot
-    // reach this state on the present engine: ending poison combat resets its
-    // timer. Engine follow-up: NPC poison timer on resetDefaults (owned by Main).
-    // Retain the otherwise-natural Lure/KO collision proof if that behaviour
-    // changes: poison and a Feud deadline must not multiply pending callbacks.
-    target.setVar(poisonVar, weaponSeverity);
-    target.setTimer(poisonTimerTicks);
-    target.timerClock = 0; // Part of the same explicitly labelled test-only timer seed.
-    assert.equal(target.timerClock, 0);
     const destination = operationStand(p, target);
     assert(destination);
     [p.level, p.x, p.z] = destination; // Disclosed own-player starting position.
     p.originX = p.x; p.originZ = p.z;
     const tracked = new Set([target]), preparationDeadline = World.currentTick + nativeSetupWaitTicks;
+    // Prepare with no poison or NPC HP seed. Ordinary following takes this same
+    // original actor beyond the town NPCs' complete native wandering envelopes.
+    // Otherwise a fresh witness during the 22-tick phase wait can repeatedly
+    // postpone KO until poison kills the 30-HP Bandit before the overlap proof.
+    selectVisibleNpc(p, target, 4, `[opnpc4,${visibleForm}]`);
+    processSelectedInteraction(p);
+    walkRepeatToSeclusion(p, target, () => countedWorldTick(tracked), preparationDeadline, true);
+    const preparationKoDeadline = dispatchSynchronousKnockOut(p, target);
+    boundedTicksThrough(tracked, preparationKoDeadline + 1);
+    assert.equal(target.getVar(stateVar), 0, 'ordinary KO expiry releases the unpoisoned preparation');
+    assert.equal(target.levels[NpcStat.HITPOINTS], initialHp, 'natural preparation does not alter original NPC HP');
+    assert(p.inOperableDistance(target), 'the released original actor remains operable');
+    assert(!hasWitness(p, target), 'the prepared original actor is still unwitnessed');
+    // TEST-ONLY NPC SEED, explicitly authorized by Main. A normal account cannot
+    // reach this state on the present engine: ending poison combat resets its
+    // timer. Engine follow-up: NPC poison timer on resetDefaults (owned by Main).
+    // Retain the otherwise-natural fresh Lure/KO collision proof if that behaviour
+    // changes: poison and a Feud deadline must not multiply pending callbacks.
+    target.setVar(poisonVar, weaponSeverity);
+    target.setTimer(poisonTimerTicks);
+    target.timerClock = 0; // Part of the same explicitly labelled test-only timer seed.
+    assert.equal(target.timerClock, 0);
     const { events, observeQueueAndPoison } = nativePoisonTrace(weaponSeverity);
     selectVisibleNpc(p, target, 4, `[opnpc4,${visibleForm}]`);
     processSelectedInteraction(p);
@@ -1171,8 +1184,29 @@ test('TEST-ONLY seeded poison preserves cadence and callback bounds through natu
   }
 });
 
-function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTick + nativeSetupWaitTicks) {
+function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTick + nativeSetupWaitTicks,
+  excludeWanderers = false) {
   const searchRadius = 32; // UNKNOWN test geometry bound, reused from follow.mjs, not a gameplay distance.
+  // Npc.wander selects destinations inside start +/- the config wanderrange.
+  // Include current positions too, and the existing five witness tiles plus
+  // the follower's one-tile finishing neighborhood. This stricter geometry is
+  // used only before the poison seed; it changes no witness or damage predicate.
+  const wanderBounds = excludeWanderers ? [...World.npcs]
+    .filter(npc => npc.isActive && npc.uid !== target.uid && npc.level === target.level &&
+      displayNpcType(p, npc).models?.length)
+    .map(npc => {
+      const range = types.NpcType.get(npc.type).wanderrange;
+      return {
+        minX: Math.min(npc.x, npc.startX - range) - 6,
+        maxX: Math.max(npc.x, npc.startX + range) + 6,
+        minZ: Math.min(npc.z, npc.startZ - range) - 6,
+        maxZ: Math.max(npc.z, npc.startZ + range) + 6
+      };
+    })
+    .filter(bounds => bounds.minX <= target.x + searchRadius && bounds.maxX >= target.x - searchRadius &&
+      bounds.minZ <= target.z + searchRadius && bounds.maxZ >= target.z - searchRadius) : [];
+  const outsideWanderers = (x, z) => wanderBounds.every(bounds =>
+    x < bounds.minX || x > bounds.maxX || z < bounds.minZ || z > bounds.maxZ);
   const destinations = [];
   let destination = null;
   let remainingWaypoints = [];
@@ -1188,7 +1222,7 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
       destination = null;
       remainingWaypoints = [];
     }
-    if (!hasWitness(p, target) && p.inOperableDistance(target) &&
+    if (!hasWitness(p, target) && p.inOperableDistance(target) && outsideWanderers(p.x, p.z) &&
       (!destination || (p.x === destination.x && p.z === destination.z))) return;
     if (!destination || ((p.x === destination.x && p.z === destination.z) &&
       !remainingWaypoints.length && p.inOperableDistance(target))) {
@@ -1200,7 +1234,7 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
         for (let x = target.x - radius; x <= target.x + radius; x++) {
           candidateTile: for (let z = target.z - radius; z <= target.z + radius; z++) {
             if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
-              map.isMapBlocked(x, z, target.level) ||
+              map.isMapBlocked(x, z, target.level) || !outsideWanderers(x, z) ||
               destinations.some(tile => tile.x === x && tile.z === z)) continue;
             for (let dx = -1; dx <= 1; dx++) {
               for (let dz = -1; dz <= 1; dz++) {
@@ -1234,7 +1268,7 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
     }
     tick();
   }
-  assert(!hasWitness(p, target) && p.inOperableDistance(target),
+  assert(!hasWitness(p, target) && p.inOperableDistance(target) && outsideWanderers(p.x, p.z),
     'native follow and wandering witnesses permit the actual KO within the existing setup bound: ' +
     JSON.stringify({ player: [p.x, p.z, p.level], target: [target.x, target.z, target.level],
       destinations, witnessed: hasWitness(p, target), operable: p.inOperableDistance(target) }));
