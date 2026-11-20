@@ -842,107 +842,119 @@ test('an earned Villager form change preserves the new timer through the old dis
   assertReleased(p, target, expected);
 });
 
-test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lure/KO', () => {
-  assert.equal(knockoutTicks, 8, 'the independent knockout duration remains unchanged');
+function nativePoisonTrace(weaponSeverity) {
+  const events = [];
+  let previousPoisonTick = null, poisonHits = 0;
+  const observeQueueAndPoison = event => {
+    assertAttackableQueueBound(event.npc);
+    if (event.before.poison > event.after.poison) {
+      const severityBefore = event.before.poison;
+      assert(Number.isInteger(severityBefore) && severityBefore >= 2 && severityBefore <= weaponSeverity,
+        'a positive poison tick reads a severity in the declared range 2..20');
+      assert.equal(severityBefore, weaponSeverity - poisonHits,
+        'no declared severity was skipped or reseeded before this tick');
+      const expectedDamage = Math.floor((severityBefore + 3) / 5);
+      assert(expectedDamage > 0);
+      assert.equal(event.before.hp - event.after.hp, expectedDamage,
+        'every native poison hit matches the published decrement-then-damage formula exactly');
+      assert.equal(event.after.poison, severityBefore - 1);
+      poisonHits++;
+      if (previousPoisonTick !== null) {
+        assert.equal(event.tick - previousPoisonTick, poisonTimerTicks,
+          'every observed native poison hit remains thirty ticks apart during preparation');
+      }
+      previousPoisonTick = event.tick;
+    }
+    events.push(event);
+  };
+  return { events, observeQueueAndPoison };
+}
+
+function naturalWeaponPoisonFixture(name, initialHp, visibleForm) {
+  const p = repeatFixture();
+  // Own-player fixture state only. The original NPC's HP, poison, timer, mode,
+  // position and callbacks are produced by ordinary native Attack, not seeded.
+  assert.equal(p.getVar(autoRetaliateVar), 0);
+  p.setVar(autoRetaliateVar, 1);
+  p.invAdd(inv, obj('bronze_dagger_p'), 1);
+  p.baseLevels[PlayerStat.STRENGTH] = p.levels[PlayerStat.STRENGTH] = 1;
+  p.baseLevels[PlayerStat.ATTACK] = p.levels[PlayerStat.ATTACK] = 99;
+  wield(p, 'bronze_dagger_p');
+  execute('[proc,player_combat_stat]', p);
+  const target = attackableTarget(p, name, true);
+  assert(target, `an original unwitnessed ${name} placement is available`);
+  assert.equal(target.baseType, id('NpcType', name));
+  assert.equal(target.levels[NpcStat.HITPOINTS], initialHp);
+  assert.equal(target.getVar(stateVar), 0);
+  assert.equal(target.getVar(poisonVar), 0, 'poison is not seeded');
+  assert.equal([...target.queue.all()].length, 0, 'the NPC queue is not seeded');
+  assert(target.timerInterval <= 0, 'the NPC timer is not seeded');
+  assert.equal(ScriptProvider.getByTrigger(ServerTriggerType.AI_TIMER, target.type,
+    types.NpcType.get(target.type).category)?.name, '[ai_timer,_]');
+  const weaponSeverity = types.ObjType.get(obj('bronze_dagger_p')).params?.get(id('ParamType', 'poison_severity'));
+  assert.equal(weaponSeverity, 20);
+  const attackHpBefore = target.levels[NpcStat.HITPOINTS];
+  ordinaryPoisonedAttack(p, target, visibleForm);
+  assert.equal(target.getVar(poisonVar), weaponSeverity,
+    'ordinary player_melee_attack reads poison severity from the worn weapon');
+  assert.equal(target.timerInterval, poisonTimerTicks, 'native npc_poison_start arms the 30-tick timer');
+  assert.equal(target.getVar(stateVar), 0, 'normal Attack does not fabricate a Feud state');
+  const attackQueue = [...target.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE2);
+  assert.equal(attackQueue.length, 1, 'the real melee hit queues one native damage callback');
+  const attackDamage = attackQueue[0].lastInt;
+  assert(attackDamage > 0);
+  wield(p, 'blackjack_oak');
+  p.stopAction();
+  assert.notEqual(p.getOpTrigger()?.name, '[opnpc2,_]');
+  countedWorldTick(new Set([target]));
+  assert.equal(target.levels[NpcStat.HITPOINTS], attackHpBefore - attackDamage,
+    'the queued ordinary Attack damage lands exactly once');
+  assert(target.levels[NpcStat.HITPOINTS] > 0);
+  assert.equal(target.getVar(poisonVar), weaponSeverity);
+  assert.equal(target.timerInterval, poisonTimerTicks);
+  assert.equal(target.targetOp, NpcMode.OPPLAYER2, 'the real poisoned attack starts ordinary retaliation');
+  assertAttackableQueueBound(target);
+  assert.equal([...target.queue.all()].length, 0, 'ordinary damage and retaliation queues have resolved');
+  return { p, target, weaponSeverity };
+}
+
+test('native weapon poison keeps its 30-tick cadence, severity and exact damage during ordinary combat', () => {
   for (const [name, initialHp, visibleForm] of [
     ['feud_arabian_guard2_multi', 30, 'feud_arabian_guard2_2'],
     ['feud_egyptian_doorman_multi', 60, 'feud_egyptian_doorman_2']
   ]) {
-    const originalRandom = JavaRandom.nextDouble;
-    const p = repeatFixture();
-    // Disclosed own-player fixture state only: low Strength preserves the original
-    // target, and auto-retaliation is disabled so NPC retaliation cannot create a
-    // second player Attack. No NPC HP, poison, timer, or queue state is seeded.
-    assert.equal(p.getVar(autoRetaliateVar), 0, 'the player fixture begins with auto-retaliation on');
-    p.setVar(autoRetaliateVar, 1);
-    p.invAdd(inv, obj('bronze_dagger_p'), 1);
-    p.baseLevels[PlayerStat.STRENGTH] = 1;
-    p.levels[PlayerStat.STRENGTH] = 1;
-    p.baseLevels[PlayerStat.ATTACK] = 99;
-    p.levels[PlayerStat.ATTACK] = 99;
-    wield(p, 'bronze_dagger_p');
-    execute('[proc,player_combat_stat]', p);
-
-    const target = attackableTarget(p, name, true);
-    assert(target, `an original unwitnessed ${name} placement is available`);
-    assert.equal(target.baseType, id('NpcType', name));
-    assert.equal(target.levels[NpcStat.HITPOINTS], initialHp);
-    assert.equal(target.getVar(stateVar), 0);
-    assert.equal(target.getVar(poisonVar), 0, 'poison is not seeded');
-    assert.equal([...target.queue.all()].length, 0, 'the NPC queue is not seeded');
-    assert(target.timerInterval <= 0, 'the NPC timer is not seeded');
-    const poisonTimer = ScriptProvider.getByTrigger(ServerTriggerType.AI_TIMER, target.type,
-      types.NpcType.get(target.type).category);
-    assert.equal(poisonTimer?.name, '[ai_timer,_]', 'the original form resolves the generic native poison timer');
-
-    const weaponSeverity = types.ObjType.get(obj('bronze_dagger_p')).params?.get(id('ParamType', 'poison_severity'));
-    assert.equal(weaponSeverity, 20);
-    assert.equal(count(p, 'bronze_dagger_p', id('InvType', 'worn')), 1);
-    const attackHpBefore = target.levels[NpcStat.HITPOINTS];
-    ordinaryPoisonedAttack(p, target, visibleForm);
-    assert.equal(target.getVar(poisonVar), weaponSeverity,
-      'ordinary player_melee_attack reads poison severity from the worn weapon');
-    assert.equal(target.timerInterval, poisonTimerTicks, 'native npc_poison_start arms the 30-tick timer');
-    assert.equal(target.getVar(stateVar), 0, 'normal Attack does not fabricate a Feud state');
-    const attackQueue = [...target.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE2);
-    assert.equal(attackQueue.length, 1, 'the real melee hit queues one native damage callback');
-    const attackDamage = attackQueue[0].lastInt;
-    assert(attackDamage > 0);
-
-    // Use normal Wear and Player.stopAction, then let the ordinary retaliation and
-    // damage queues resolve before the Feud interaction. The test player cannot
-    // auto-retaliate into a second poisoned-weapon Attack.
-    wield(p, 'blackjack_oak');
-    p.stopAction();
-    assert.notEqual(p.getOpTrigger()?.name, '[opnpc2,_]');
-    const tracked = new Set([target]);
-    countedWorldTick(tracked);
-    assert.equal(target.levels[NpcStat.HITPOINTS], attackHpBefore - attackDamage,
-      'the queued ordinary Attack damage lands exactly once');
-    assert(target.levels[NpcStat.HITPOINTS] > 0, 'the Strength-1 hit leaves the original placement alive');
-    assert.equal(target.getVar(poisonVar), weaponSeverity);
+    const { p, target, weaponSeverity } = naturalWeaponPoisonFixture(name, initialHp, visibleForm);
+    const tracked = new Set([target]), { events, observeQueueAndPoison } = nativePoisonTrace(weaponSeverity);
+    for (let hit = 0; hit < 3; hit++) {
+      boundedTicksThrough(tracked, nextNpcTimerTick(target), null, observeQueueAndPoison);
+      assert.equal(target.targetOp, NpcMode.OPPLAYER2, 'ordinary combat continues throughout the poison proof');
+    }
+    assert.equal(events.filter(event => event.before.poison > event.after.poison).length, 3);
+    assert.equal(target.getVar(poisonVar), weaponSeverity - 3);
     assert.equal(target.timerInterval, poisonTimerTicks);
-    assertAttackableQueueBound(target);
-    assert.equal([...target.queue.all()].length, 0, 'ordinary attack and retaliation queues have resolved');
+    assert.equal(target.getVar(stateVar), 0, 'the natural poison proof does not fabricate a Feud condition');
+    execute('[proc,npc_poison_clear]', p, [], { target });
+    assert.equal(target.getVar(poisonVar), 0);
+    assert.equal(target.timerInterval, 0);
+  }
+});
 
-    const events = [];
-    const preparationDeadline = World.currentTick + nativeSetupWaitTicks;
-    let previousPoisonTick = null;
-    let poisonHits = 0;
-    const observeQueueAndPoison = event => {
-      assertAttackableQueueBound(event.npc);
-      if (event.before.poison > event.after.poison) {
-        const severityBefore = event.before.poison;
-        // The weapon starts at 20 and each native hit decrements once. This
-        // positive-hit proof ends before the published terminal clear at one.
-        assert(Number.isInteger(severityBefore) && severityBefore >= 2 && severityBefore <= weaponSeverity,
-          'a positive poison tick reads a severity in the weapon-produced range 2..20');
-        assert.equal(severityBefore, weaponSeverity - poisonHits,
-          'no weapon-produced severity was skipped or reseeded before this tick');
-        const expectedDamage = Math.floor((severityBefore + 3) / 5);
-        assert(expectedDamage > 0);
-        assert.equal(event.before.hp - event.after.hp, expectedDamage,
-          'every native poison hit matches the published decrement-then-damage formula exactly');
-        assert.equal(event.after.poison, severityBefore - 1);
-        poisonHits++;
-        if (previousPoisonTick !== null) {
-          assert.equal(event.tick - previousPoisonTick, poisonTimerTicks,
-            'every observed native poison hit remains thirty ticks apart during preparation');
-        }
-        previousPoisonTick = event.tick;
-      }
-      events.push(event);
-    };
-    assert.equal(target.targetOp, NpcMode.OPPLAYER2, 'the real poisoned attack has started ordinary retaliation');
-    const refusedMark = p.messages.length, poisonClock = target.timerClock;
+test('ordinary poisoned-combat escape records the engine reset and permits native Lure after the fight', () => {
+  for (const [name, initialHp, visibleForm] of [
+    ['feud_arabian_guard2_multi', 30, 'feud_arabian_guard2_2'],
+    ['feud_egyptian_doorman_multi', 60, 'feud_egyptian_doorman_2']
+  ]) {
+    const { p, target } = naturalWeaponPoisonFixture(name, initialHp, visibleForm);
+    const tracked = new Set([target]), preparationDeadline = World.currentTick + nativeSetupWaitTicks;
+    const observation = () => ({ tick: World.currentTick, poison: target.getVar(poisonVar),
+      timerInterval: target.timerInterval, timerClock: target.timerClock, mode: target.targetOp,
+      player: [p.level, p.x, p.z], npc: [target.level, target.x, target.z] });
+    const beforeReset = observation(), mark = p.messages.length;
     selectVisibleNpc(p, target, 4, `[opnpc4,${visibleForm}]`);
     processSelectedInteraction(p);
-    assert.deepEqual(p.messages.slice(refusedMark), ['Nothing interesting happens.']);
-    assert.equal(target.getVar(stateVar), 0, 'Lure cannot cancel the existing poison-fixture fight');
-    assert.equal(target.timerClock, poisonClock, 'the refusal does not restart the poison timer');
-
-    // End the real fight by ordinary movement before Lure. No NPC mode, position,
-    // HP, poison, timer or callback is changed by the fixture.
+    assert.deepEqual(p.messages.slice(mark), ['Nothing interesting happens.']);
+    assert.equal(target.getVar(stateVar), 0, 'Lure cannot cancel the existing fight');
+    assert.equal(target.timerClock, beforeReset.timerClock, 'the refusal does not restart the poison timer');
     const searchRadius = 32; // Existing native-geometry bound from follow.mjs.
     const homeRange = types.NpcType.get(target.type).maxrange + target.width + p.width;
     let escape = null;
@@ -963,18 +975,69 @@ test('native poison keeps its 30-tick cadence through ordinary completed-Feud Lu
     assert(escape, 'the native map provides an exact ordinary escape outside the target home range');
     assert(moveClickHandler.handle(new MoveClick(escape.route.map(({ x, z }) => ({ x, z })), 0, false), p));
     while (World.currentTick < preparationDeadline &&
-      (p.x !== escape.x || p.z !== escape.z || target.targetOp !== NpcMode.WANDER)) {
-      countedWorldTick(tracked, null, observeQueueAndPoison);
-    }
+      (p.x !== escape.x || p.z !== escape.z || target.targetOp !== NpcMode.WANDER)) countedWorldTick(tracked);
     assert.equal(p.x, escape.x);
     assert.equal(p.z, escape.z);
     assert.equal(target.targetOp, NpcMode.WANDER, 'ordinary native escape ends the fight before the new Lure');
-    showNpcForNativeClick(p, target);
-    assert(opNpcHandler.handle(new OpNpc(4, target.nid), p), 'native Lure input starts an ordinary approach to the same target');
-    assert.equal(p.getOpTrigger()?.name, `[opnpc4,${visibleForm}]`);
-    while (World.currentTick < preparationDeadline && target.getVar(stateVar) === 0) {
-      countedWorldTick(tracked, null, observeQueueAndPoison);
+    // Main's engine follow-up: NPC poison timer on resetDefaults. Observe both
+    // values without requiring either timer loss or persistence across this reset.
+    console.log(JSON.stringify({ kind: 'engine-poison-reset-observation', name, beforeReset, afterReset: observation() }));
+    while (World.currentTick < preparationDeadline && !p.inOperableDistance(target)) {
+      if (!p.hasWaypoints()) {
+        const destination = operationStand(p, target);
+        assert(destination, 'the original NPC has a native operation stand');
+        const route = [...map.findPath(p.level, p.x, p.z, destination[1], destination[2])]
+          .map(value => CoordGrid.unpackCoord(value));
+        assert(route.length && route.at(-1).x === destination[1] && route.at(-1).z === destination[2],
+          'ordinary native MoveClick supplies the smart approach route, not an unaccompanied OPNPC');
+        assert(moveClickHandler.handle(new MoveClick(route.map(({ x, z }) => ({ x, z })), 0, false), p));
+      }
+      countedWorldTick(tracked);
     }
+    assert(p.inOperableDistance(target), 'ordinary walking reaches the same NPC within the unchanged 512-turn budget');
+    selectVisibleNpc(p, target, 4, `[opnpc4,${visibleForm}]`);
+    processSelectedInteraction(p);
+    assert.equal(target.getVar(stateVar), 2, 'the first native Lure after the fight is accepted');
+    assert.equal(target.getVar(ownerVar), p.uid);
+    assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
+    execute('[proc,npc_poison_clear]', p, [], { target });
+    drainTargetQueues(tracked);
+    assert.equal([...target.queue.all()].length, 0);
+  }
+});
+
+test('TEST-ONLY seeded poison preserves cadence and callback bounds through natural completed-Feud Lure/KO', () => {
+  assert.equal(knockoutTicks, 8, 'the independent knockout duration remains unchanged');
+  for (const [name, initialHp, visibleForm] of [
+    ['feud_arabian_guard2_multi', 30, 'feud_arabian_guard2_2'],
+    ['feud_egyptian_doorman_multi', 60, 'feud_egyptian_doorman_2']
+  ]) {
+    const originalRandom = JavaRandom.nextDouble, p = repeatFixture();
+    const target = attackableTarget(p, name, true);
+    assert(target, `an original unwitnessed ${name} placement is available`);
+    assert.equal(target.levels[NpcStat.HITPOINTS], initialHp);
+    assert.equal(target.getVar(stateVar), 0);
+    assert.equal(target.getVar(poisonVar), 0);
+    assert.equal([...target.queue.all()].length, 0);
+    assert(target.timerInterval <= 0);
+    const weaponSeverity = types.ObjType.get(obj('bronze_dagger_p')).params?.get(id('ParamType', 'poison_severity'));
+    assert.equal(weaponSeverity, 20);
+    // TEST-ONLY NPC SEED, explicitly authorized by Main. A normal account cannot
+    // reach this state on the present engine: ending poison combat resets its
+    // timer. Engine follow-up: NPC poison timer on resetDefaults (owned by Main).
+    // Retain the otherwise-natural Lure/KO collision proof if that behaviour
+    // changes: poison and a Feud deadline must not multiply pending callbacks.
+    target.setVar(poisonVar, weaponSeverity);
+    target.setTimer(poisonTimerTicks);
+    assert.equal(target.timerClock, 0);
+    const destination = operationStand(p, target);
+    assert(destination);
+    [p.level, p.x, p.z] = destination; // Disclosed own-player starting position.
+    p.originX = p.x; p.originZ = p.z;
+    const tracked = new Set([target]), preparationDeadline = World.currentTick + nativeSetupWaitTicks;
+    const { events, observeQueueAndPoison } = nativePoisonTrace(weaponSeverity);
+    selectVisibleNpc(p, target, 4, `[opnpc4,${visibleForm}]`);
+    processSelectedInteraction(p);
     assert.equal(target.getVar(stateVar), 2, 'ordinary completed-Feud Lure starts following');
     assert.equal(target.getVar(ownerVar), p.uid);
     assert.equal(target.target, p);
