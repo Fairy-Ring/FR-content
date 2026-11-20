@@ -201,22 +201,31 @@ function knockOutHere(p, target) {
 }
 
 function walkIntoNativeRange(p, target, tick, deadline) {
-  const destination = operationStand(p, target);
-  assert(destination, 'the original follower has a collision-reachable operation stand');
-  const route = [...map.findPath(p.level, p.x, p.z, destination[1], destination[2])];
-  assert(route.length, 'the owner has a real walking route to the original follower');
-  const end = CoordGrid.unpackCoord(route.at(-1));
-  assert.deepEqual([end.level, end.x, end.z], destination, 'the native route reaches that exact stand');
-  const path = route.map(coord => {
-    const point = CoordGrid.unpackCoord(coord);
-    return { x: point.x, z: point.z };
-  });
-  assert(moveClickHandler.handle(new MoveClick(path, 0, false), p), 'native MoveClick accepts the owner approach');
-  const arrived = () => p.level === destination[0] && p.x === destination[1] && p.z === destination[2];
-  for (let ticks = 0; ticks < nativeSetupWaitTicks && World.currentTick < deadline &&
-    (!arrived() || !p.inOperableDistance(target)); ticks++) tick();
+  let destination = null;
+  const arrived = () => destination && p.level === destination[0] &&
+    p.x === destination[1] && p.z === destination[2];
+  for (let ticks = 0; ticks < nativeSetupWaitTicks && World.currentTick < deadline; ticks++) {
+    if (arrived() && p.inOperableDistance(target)) break;
+    if (!p.hasWaypoints()) {
+      // The native follower can move around a wall while the owner approaches.
+      // Replan from current native actor positions, never wait at its now-stale stand.
+      destination = operationStand(p, target);
+      assert(destination, 'the original follower has a collision-reachable operation stand');
+      const route = [...map.findPath(p.level, p.x, p.z, destination[1], destination[2])];
+      assert(route.length, 'the owner has a real walking route to the original follower');
+      const end = CoordGrid.unpackCoord(route.at(-1));
+      assert.deepEqual([end.level, end.x, end.z], destination, 'the native route reaches that exact stand');
+      const path = route.map(coord => {
+        const point = CoordGrid.unpackCoord(coord);
+        return { x: point.x, z: point.z };
+      });
+      assert(moveClickHandler.handle(new MoveClick(path, 0, false), p), 'native MoveClick accepts the owner approach');
+    }
+    tick();
+  }
   assert(arrived() && p.inOperableDistance(target),
-    'the owner walks into actual operation range without extending the original deadline or relocating an actor');
+    'the owner walks into actual operation range without extending the original deadline or relocating an actor: ' +
+    JSON.stringify({ player: [p.x, p.z], target: [target.x, target.z], destination, deadline, tick: World.currentTick }));
 }
 
 function prepareLateInput(p, target, tracked, deadline) {
@@ -1193,10 +1202,11 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
   // used only before the poison seed; it changes no witness or damage predicate.
   const wanderBounds = excludeWanderers ? [...World.npcs]
     .filter(npc => npc.isActive && npc.uid !== target.uid && npc.level === target.level &&
-      displayNpcType(p, npc).models?.length)
+      CoordGrid.distanceToSW(target, npc) <= searchRadius + 6 && displayNpcType(p, npc).models?.length)
     .map(npc => {
       const range = types.NpcType.get(npc.type).wanderrange;
       return {
+        name: types.NpcType.get(npc.type).debugname,
         minX: Math.min(npc.x, npc.startX - range) - 6,
         maxX: Math.max(npc.x, npc.startX + range) + 6,
         minZ: Math.min(npc.z, npc.startZ - range) - 6,
@@ -1256,7 +1266,8 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
           }
         }
       }
-      assert(route, 'native collision provides another unwitnessed destination within the existing search bound');
+      assert(route, 'native collision provides another unwitnessed destination within the existing search bound: ' +
+        JSON.stringify({ target: [target.x, target.z], excludeWanderers, wanderBounds }));
       destinations.push(destination);
       remainingWaypoints = route;
     }
