@@ -1,3 +1,4 @@
+import './deterministic-wander.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
@@ -6,7 +7,7 @@ import {
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import {
-  activeLoc, actors, assertKnockoutCycle, begin, bit, buyReceipts, deliver, displayNpcType, drink, hasWitness, locs,
+  activeLoc, actors, assertKnockoutCycle, begin, bit, buyReceipts, deliver, displayNpcType, drink, hasWitness, isWitness, locs,
   nativeNpcTriggerName, openOriginalVillagerCurtain, operate, operateHere, operateLoc, operationStand, read, relog, stage, talk, tickThrough, wield, worldTick
 } from './fixture.mjs';
 
@@ -132,6 +133,47 @@ test('compiled witness data and original-map probes distinguish visible people, 
   }
 });
 
+test('a witnessed native trial Knock-Out costs five HP without releasing the lured villager', () => {
+  const p = seed(player(), ['blackjack_oak']);
+  p.setVarBit(bit('feud_var'), 9);
+  p.setVarBit(bit('feud_npc_multi'), 2);
+  p.setVar(slotVar, -1);
+  wield(p, 'blackjack_oak');
+
+  const target = actors('feud_villager_multi_3').find(npc =>
+    npc.getVar(stateVar) === 0 && hasWitness(p, npc) && operationStand(p, npc));
+  assert(target, 'an original trial villager has a visible person in range and a reachable native operation stand');
+  const lure = operate(p, target, 4);
+  assert.equal(lure.trigger, nativeNpcTriggerName(p, target, 4));
+  assert.equal(stage(p), 10);
+  assert.equal(target.getVar(stateVar), 2);
+  assert.equal(target.getVar(ownerVar), p.uid);
+  assert.equal(p.getVar(slotVar), target.uid);
+  assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
+  assert.equal(target.target, p);
+
+  const witness = [...World.npcs].find(npc => isWitness(p, target, npc));
+  assert(witness, 'the original map still supplies a visible person in range for the native Knock-Out');
+  const before = {
+    hp: p.levels[PlayerStat.HITPOINTS],
+    xp: p.stats[PlayerStat.THIEVING],
+    stage: stage(p),
+    deadline: target.getVar(deadlineVar)
+  };
+  const knockout = operate(p, target, 5);
+  assert.equal(knockout.trigger, nativeNpcTriggerName(p, target, 5));
+  assert(isWitness(p, target, witness), 'the same visible person remains in range through the operation');
+  assert.equal(before.hp - p.levels[PlayerStat.HITPOINTS], 5, 'the witnessed trial attempt costs exactly five HP');
+  assert.equal(p.stats[PlayerStat.THIEVING], before.xp, 'a witnessed attempt grants no Knock-Out XP');
+  assert.equal(stage(p), before.stage, 'a witnessed attempt leaves the trial checkpoint unchanged');
+  assert.equal(target.getVar(stateVar), 2, 'the witnessed attempt retains the follow');
+  assert.equal(target.getVar(ownerVar), p.uid);
+  assert.equal(target.getVar(deadlineVar), before.deadline, 'the witness does not restart or release the follow');
+  assert.equal(p.getVar(slotVar), target.uid);
+  assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
+  assert.equal(target.target, p);
+});
+
 test('a real lured villager can be knocked out inside its original house with both curtains closed', () => {
   const p = seed(player(), ['blackjack_oak']);
   // Isolated reachable pre-lure state; the full headed quest earns this checkpoint.
@@ -139,7 +181,7 @@ test('a real lured villager can be knocked out inside its original house with bo
   p.setVarBit(bit('feud_npc_multi'), 2);
   p.setVar(id('VarPlayerType', 'feud_trial_villager'), -1);
   wield(p, 'blackjack_oak');
-  const target = actors('feud_villager_multi_3').find(npc => npc.x === 3349 && npc.z === 2954);
+  const target = actors('feud_villager_multi_3').find(npc => npc.startX === 3349 && npc.startZ === 2954);
   assert(target, 'the original map places this villager inside the house');
   assert.equal(target.getVar(stateVar), 0, 'the fixture does not create the tested lure state');
   const inside = operationStand(p, target);
