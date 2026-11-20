@@ -10,7 +10,7 @@ if (%feud_var < ^feud_started) return;
 [label,feud_camel_menu]
 def_int $m = 0;
 if (%feud_var = ^feud_camels_purchased) {
-    $m = ~p_choice4("About those camels. I've lost the receipt. Can I have another?", 1, "Tell me about this town.", 2, "Lovely day isn't it?", 3, "I'm looking for Ali from Pollnivneach.", 5);
+    $m = ~p_choice3("About those camels. I've lost the receipt. Can I have another?", 1, "Tell me about this town.", 2, "Lovely day isn't it?", 3);
     if ($m = 1) @feud_camel_receipts;
 } else if (%feud_var >= ^feud_camels_delivered) {
     $m = ~p_choice4("A discount camel store?", 1, "Tell me about this town.", 2, "Lovely day isn't it?", 3, "I'm looking for Ali from Pollnivneach.", 5);

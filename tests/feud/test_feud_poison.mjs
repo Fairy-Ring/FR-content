@@ -170,7 +170,7 @@ test('Feud poison preparation advances through snake, dung, Hag recovery, and th
   assert.equal(p.messages.length, from, 'table use is blocked until the source-named Barman report bit is set');
   assert.equal(stage(p), 22);
   assert.equal(count(p, 'poison_from_hag'), 1);
-  const barmanReport = talk(p, 'feud_ali_the_barman', [3, 1]);
+  const barmanReport = talk(p, 'feud_ali_the_barman', ["I'm looking for Traitorous Ali.", 1]);
   assert.match(barmanReport.text, /His drink is over there on the table/);
   assert.equal(read(p, 'feud_var_drink_found'), 1, 'the native Barman conversation identifies the drink');
   from = p.messages.length;

@@ -11,9 +11,9 @@ def_int $choice = 0;
 ~chatplayer("<p,neutral>Hello there.");
 ~chatnpc("<p,neutral>Good day. Can I help you with anything?");
 if (%feud_found_trait >= 1) {
-    $choice = ~p_choice3("Yes, I'd like a drink please.", 1, "What's going on in town?", 2, "I'm looking for Traitorous Ali.", 3);
+    $choice = ~p_choice5("Yes, I'd like a drink please.", 1, "What's going on in town?", 2, "I'm looking for Ali from Pollnivneach.", 3, "The 'Asp and Snake'? What a strange name for a bar.", 4, "I'm looking for Traitorous Ali.", 5);
 } else {
-    $choice = ~p_choice2("Yes, I'd like a drink please.", 1, "What's going on in town?", 2);
+    $choice = ~p_choice4("Yes, I'd like a drink please.", 1, "What's going on in town?", 2, "I'm looking for Ali from Pollnivneach.", 3, "The 'Asp and Snake'? What a strange name for a bar.", 4);
 }
 if ($choice = 1) {
     ~chatplayer("<p,neutral>Yes, I'd like a drink please.");
@@ -28,10 +28,30 @@ if ($choice = 2) {
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     jump(feud_barman_followup);
 }
-if ($choice = 3) {
+if ($choice = 5) {
     ~chatplayer("<p,neutral>I'm looking for Traitorous Ali.");
     ~chatnpc("<p,neutral>He is here, actually he was here! He's just nipped out to go to the toilet a few minutes ago. His drink is over there on the table by those barrels. The only problem is that no one has ever actually seen a toilet in RuneScape so he may take a little while. Is there anything else I can help you with?");
     %feud_var_drink_found = 1;
+    jump(feud_barman_followup);
+}
+if ($choice = 3) {
+    ~chatplayer("<p,neutral>I'm looking for Ali from Pollnivneach.");
+    ~chatnpc("<p,neutral>Well, I'm called Ali and from here. Do you want me?");
+    ~chatplayer("<p,neutral>Do you have an uncle called Ali?");
+    ~chatnpc("<p,neutral>Actually all my uncles are called Ali!");
+    ~chatplayer("<p,neutral>Oh dear, well do any of them have a stall in the Bazaar in Al Kharid?");
+    ~chatnpc("<p,neutral>Um... no.");
+    ~chatplayer("<p,neutral>Well do you know if anyone here does?");
+    ~chatnpc("<p,neutral>That's a difficult question to answer. Everyone in the town have uncles called Ali.");
+    ~chatnpc("<p,neutral>Is there anything else I can help you with?");
+    jump(feud_barman_followup);
+}
+if ($choice = 4) {
+    ~chatplayer("<p,neutral>The 'Asp and Snake'? What a strange name for a bar.");
+    ~chatnpc("<p,neutral>I admit it appears so, seeing as everybody and every other establishment in this town has the name 'Ali' in it.");
+    ~chatnpc("<p,neutral>If you don't like the name I could rename it 'Ali's' but then it may be confused with the Camel shop and Kebab house.");
+    ~chatplayer("<p,neutral>Err yes I get your point. I quite like the name.");
+    ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     jump(feud_barman_followup);
 }
 return;

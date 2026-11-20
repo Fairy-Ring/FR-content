@@ -113,6 +113,16 @@ test('barman small-talk remains available without producing quest progress', () 
   assert.equal(stage(p), 0);
   assert.equal(read(p, 'feud_report_drink'), 0, 'ordinary small-talk cannot identify the traitor drink');
   assert.notEqual(p.modalMain, id('Component', 'shop_template'), 'the non-trading branch opens no shop');
+  for (const [choice, reply] of [
+    ["I'm looking for Ali from Pollnivneach.", "Everyone in the town have uncles called Ali."],
+    ["The 'Asp and Snake'? What a strange name for a bar.", "I admit it appears so, seeing as everybody and every other establishment in this town has the name 'Ali' in it."]
+  ]) {
+    const ordinary = player(), response = talk(ordinary, 'feud_ali_the_barman', [choice, 1]);
+    assert(response.text.includes(reply), 'the older ordinary Barman branch remains available');
+    assert.equal(stage(ordinary), 0);
+    assert.equal(read(ordinary, 'feud_report_drink'), 0, 'older ordinary topics cannot identify the traitor drink');
+    assert.notEqual(ordinary.modalMain, id('Component', 'shop_template'), 'ordinary topics open no shop');
+  }
 });
 
 test('start refusal, early item use, and compatible acceptance use native dispatch', () => {
