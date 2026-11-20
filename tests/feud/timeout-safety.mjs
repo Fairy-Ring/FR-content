@@ -1194,7 +1194,7 @@ test('TEST-ONLY seeded poison preserves cadence and callback bounds through natu
 });
 
 function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTick + nativeSetupWaitTicks,
-  excludeWanderers = false) {
+  excludeWanderers = false, allowedOwnerTile = () => true) {
   const searchRadius = 32; // UNKNOWN test geometry bound, reused from follow.mjs, not a gameplay distance.
   // Npc.wander selects destinations inside start +/- the config wanderrange.
   // Include current positions too, and the existing five witness tiles plus
@@ -1233,6 +1233,7 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
       remainingWaypoints = [];
     }
     if (!hasWitness(p, target) && p.inOperableDistance(target) && outsideWanderers(p.x, p.z) &&
+      allowedOwnerTile(p.x, p.z) &&
       (!destination || (p.x === destination.x && p.z === destination.z))) return;
     if (!destination || ((p.x === destination.x && p.z === destination.z) &&
       !remainingWaypoints.length && p.inOperableDistance(target))) {
@@ -1244,7 +1245,7 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
         for (let x = target.x - radius; x <= target.x + radius; x++) {
           candidateTile: for (let z = target.z - radius; z <= target.z + radius; z++) {
             if (Math.max(Math.abs(x - target.x), Math.abs(z - target.z)) !== radius ||
-              map.isMapBlocked(x, z, target.level) || !outsideWanderers(x, z) ||
+              map.isMapBlocked(x, z, target.level) || !outsideWanderers(x, z) || !allowedOwnerTile(x, z) ||
               destinations.some(tile => tile.x === x && tile.z === z)) continue;
             for (let dx = -1; dx <= 1; dx++) {
               for (let dz = -1; dz <= 1; dz++) {
@@ -1279,10 +1280,130 @@ function walkRepeatToSeclusion(p, target, tick, setupDeadline = World.currentTic
     }
     tick();
   }
-  assert(!hasWitness(p, target) && p.inOperableDistance(target) && outsideWanderers(p.x, p.z),
+  assert(!hasWitness(p, target) && p.inOperableDistance(target) && outsideWanderers(p.x, p.z) &&
+    allowedOwnerTile(p.x, p.z),
     'native follow and wandering witnesses permit the actual KO within the existing setup bound: ' +
     JSON.stringify({ player: [p.x, p.z, p.level], target: [target.x, target.z, target.level],
       destinations, witnessed: hasWitness(p, target), operable: p.inOperableDistance(target) }));
+}
+
+for (const location of ['inside', 'outside']) {
+  test(`a natural failed Bandit KO ${location} its native home range records the actual retaliation`, t => {
+    const p = repeatFixture();
+    // Disclosed own-player setup only: completed Feud, 65 Thieving, 99 HP,
+    // one Defence and auto-retaliate off. No NPC state or RNG is changed.
+    p.setLevel(PlayerStat.DEFENCE, 1);
+    p.setVar(autoRetaliateVar, 1);
+    execute('[proc,player_combat_stat]', p);
+    const target = attackableTarget(p, 'feud_arabian_guard2_multi', true);
+    assert(target, 'an original unwitnessed Bandit41 is available without NPC setup');
+    const initialNpcTile = [target.x, target.z];
+    const stand = operationStand(p, target);
+    [p.level, p.x, p.z] = stand;
+    p.originX = p.x; p.originZ = p.z;
+    const home = { x: target.startX, z: target.startZ };
+    const maxrange = types.NpcType.get(target.type).maxrange;
+    const homeDistance = (x, z) => CoordGrid.distanceToSW({ x, z }, home);
+    const allowedOwnerTile = (x, z) =>
+      Math.max(Math.abs(x - stand[1]), Math.abs(z - stand[2])) >= 2 &&
+      (location === 'inside' ? homeDistance(x, z) <= maxrange : homeDistance(x, z) > maxrange + 1);
+    const tracked = new Set([target]);
+    const tick = () => countedWorldTick(tracked);
+    const preparationDeadline = World.currentTick + nativeSetupWaitTicks;
+    const nativeRandom = JavaRandom.nextDouble;
+    let failure = null;
+    let successfulPreparations = 0;
+
+    for (let attempt = 1; attempt <= 64 && World.currentTick < preparationDeadline; attempt++) {
+      if (!p.inOperableDistance(target)) walkIntoNativeRange(p, target, tick, preparationDeadline);
+      assert.equal(target.getVar(stateVar), 0, 'a fresh Lure follows only an expired natural KO');
+      selectVisibleNpc(p, target, 4, '[opnpc4,feud_arabian_guard2_2]');
+      processSelectedInteraction(p);
+      assert.equal(target.getVar(stateVar), 2);
+      assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
+      walkRepeatToSeclusion(p, target, tick, preparationDeadline, false, allowedOwnerTile);
+      assert(!hasWitness(p, target), 'the actual KO is unwitnessed, not the witnessed-failure branch');
+      assert.notDeepEqual([target.x, target.z], initialNpcTile,
+        'ordinary PLAYERFOLLOW, not fixture relocation, moved the original NPC');
+      const before = {
+        tick: World.currentTick, hp: p.levels[PlayerStat.HITPOINTS], xp: xp(p),
+        coins: count(p, 'coins'), messageMark: p.messages.length,
+        player: [p.x, p.z], npc: [target.x, target.z], distance: homeDistance(p.x, p.z)
+      };
+      selectVisibleNpc(p, target, 5, '[opnpc5,feud_arabian_guard2_2]');
+      processSelectedInteraction(p);
+      assert.equal(JavaRandom.nextDouble, nativeRandom, 'the production random generator remains unmodified');
+      if (target.getVar(stateVar) === 3) {
+        successfulPreparations++;
+        assert.equal(xp(p) - before.xp, 100, 'a naturally successful preparation is not called a failed roll');
+        boundedTicksThrough(tracked, target.getVar(deadlineVar));
+        continue;
+      }
+      assert.equal(target.getVar(stateVar), 0);
+      assert.equal(target.getVar(ownerVar), -1);
+      assert.equal(target.getVar(deadlineVar), 0);
+      assert.equal(target.getVar(id('VarNpcType', 'npc_aggressive_player')), p.uid);
+      assert.equal([...target.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE1).length, 1,
+        'the natural failed roll queues the real ordinary retaliation');
+      assert.equal(xp(p), before.xp);
+      assert.equal(count(p, 'coins'), before.coins);
+      assert.equal(p.levels[PlayerStat.HITPOINTS], before.hp, 'the failed input itself adds no separate damage');
+      assert.deepEqual(p.messages.slice(before.messageMark), [], 'the failed input adds no invented chat line');
+      failure = { ...before, attempt };
+      break;
+    }
+    assert(failure, 'the bounded unchanged native RNG sequence includes a genuine failed KO');
+
+    const events = [];
+    const damageMask = rsbuf.PlayerInfoProt.DAMAGE | rsbuf.PlayerInfoProt.DAMAGE2;
+    const observe = ({ npc, tick }) => {
+      events.push({
+        tick: tick - failure.tick, mode: NpcMode[npc.targetOp], npc: [npc.x, npc.z],
+        animation: npc.animId, hp: p.levels[PlayerStat.HITPOINTS],
+        hit: Boolean(p.masks & damageMask), damage: p.hitmarkDamage,
+        overhead: npc.sayMessage
+      });
+    };
+    const observedTick = () => countedWorldTick(tracked, null, observe);
+    observedTick();
+    const retaliationMode = location === 'inside' ? NpcMode.OPPLAYER2 : NpcMode.PLAYERESCAPE;
+    assert(events.some(event => event.mode === NpcMode[retaliationMode]),
+      'the actual compiled retaliation callback chooses its native range-dependent mode');
+    if (location === 'inside') {
+      assert.equal(target.targetOp, NpcMode.OPPLAYER2);
+      for (let ticks = 0; ticks < 48 && !events.some(event => event.hit && event.damage > 0); ticks++) observedTick();
+      assert(events.some(event => event.animation !== -1), 'native combat emits an NPC attack animation');
+      assert(events.some(event => event.hit && event.damage > 0),
+        'the player receives an ordinary visible positive-damage hitmark, not only an aggression variable');
+      assert(p.levels[PlayerStat.HITPOINTS] < failure.hp, 'ordinary retaliation actually reduces player HP');
+    } else {
+      for (let ticks = 1; ticks < nativeSetupWaitTicks; ticks++) {
+        if (ticks >= 20 && target.targetOp === NpcMode.WANDER &&
+          homeDistance(target.x, target.z) <= maxrange) break;
+        observedTick();
+      }
+      assert.equal(target.targetOp, NpcMode.WANDER, 'ordinary range handling gives up retaliation');
+      assert(homeDistance(target.x, target.z) <= maxrange, 'native wandering brings the original NPC back inside home range');
+      assert.notDeepEqual([target.x, target.z], failure.npc, 'the original NPC actually leaves the failed-KO position');
+      assert(events.every(event => !event.hit && event.animation === -1),
+        'outside-home retaliation supplies neither an attack animation nor a player hitmark');
+      assert.equal(p.levels[PlayerStat.HITPOINTS], failure.hp, 'no damage is dealt on the controlled outside-home clock');
+    }
+    assert.equal(xp(p), failure.xp);
+    assert.equal(count(p, 'coins'), failure.coins);
+    assert.deepEqual(p.messages.slice(failure.messageMark), [], 'ordinary retaliation adds no game chat line');
+    assert(events.every(event => !event.overhead), 'ordinary retaliation adds no NPC overhead line');
+    assert.equal(stage(p), 28);
+    t.diagnostic(JSON.stringify({
+      location, home, maxrange, opHomeBound: maxrange + 1,
+      attempts: failure.attempt, successfulPreparations,
+      failedInput: { player: failure.player, npc: failure.npc, ownerHomeDistance: failure.distance },
+      ticksObserved: World.currentTick - failure.tick,
+      hpBefore: failure.hp, hpAfter: p.levels[PlayerStat.HITPOINTS],
+      finalNpc: [target.x, target.z], finalMode: NpcMode[target.targetOp],
+      chat: p.messages.slice(failure.messageMark), events
+    }));
+  });
 }
 
 test('four real attackable Lure/KO cycles survive ordinary logout with bounded queues over 1,200 ticks', () => {
