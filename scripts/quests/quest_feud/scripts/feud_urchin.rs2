@@ -56,6 +56,7 @@ if (npc_finduid($v) = false) {
     ~feud_urchin_no_villager($u);
     return;
 }
+~feud_villager_reconcile;
 if (%feud_villager_state ! ^feud_villager_state_idle) {
     ~feud_urchin_no_villager($u);
     return;
@@ -92,6 +93,7 @@ if (npc_finduid($v) = true) {
 [if_close,npcchat1]
 if (%feud_trial_villager = null) return;
 if (npc_finduid(%feud_trial_villager) = false) return;
+~feud_villager_reconcile;
 if (%feud_villager_state ! ^feud_villager_state_distracted | %feud_villager_deadline ! 0) return;
 ~feud_trial_release;
 

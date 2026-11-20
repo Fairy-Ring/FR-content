@@ -28,13 +28,10 @@ if (inv_total(worn, blackjack_oak) < 1) { return; }
 @feud_villager_ko;
 
 [label,feud_villager_ko]
+~feud_villager_reconcile;
 if (%feud_villager_state ! ^feud_villager_state_following) { return; }
 if (%feud_villager_owner ! uid) { return; }
 if (%feud_trial_villager ! npc_uid) return;
-if (map_clock >= %feud_villager_deadline) {
-    ~feud_villager_reset;
-    return;
-}
 def_coord $spot = npc_coord;
 def_npc_uid $target = npc_uid;
 if (~feud_villager_has_witness($spot, $target) = true) {

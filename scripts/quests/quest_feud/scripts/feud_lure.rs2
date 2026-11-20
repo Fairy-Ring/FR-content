@@ -72,6 +72,7 @@ return;
 
 // UNKNOWN: an unavailable Lure uses the published default, not invented Feud wording.
 [proc,feud_lure_available]()(boolean)
+~feud_villager_reconcile;
 if (%feud_villager_state ! ^feud_villager_state_idle |
     npc_getmode = opplayer2 | npc_getmode = applayer2 | npc_getmode = playerescape) {
     ~displaymessage(^dm_default);

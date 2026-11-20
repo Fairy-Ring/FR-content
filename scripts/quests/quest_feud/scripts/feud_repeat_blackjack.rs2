@@ -49,27 +49,22 @@ if (inv_total(worn, blackjack_oak) < 1 & inv_total(worn, blackjack_willow) < 1) 
 ~feud_repeat_blackjack_ko(^feud_repeat_thug_ko_xp, false);
 
 [label,feud_repeat_pickpocket]
+~feud_villager_reconcile;
 if (%feud_villager_state ! ^feud_villager_state_idle) {
     if (%feud_villager_owner ! uid) { return; }
-    if (%feud_villager_state = ^feud_villager_state_unconscious & map_clock >= %feud_villager_deadline) {
-        ~feud_villager_reset;
-        ~npc_retaliate(0);
-        return;
-    }
 }
 @attempt_pick_pocket(npc_type);
 
 [proc,feud_repeat_villager_pickpocket]
+if (~feud_villager_reconcile = uid) {
+    ~npc_retaliate(0);
+    return;
+}
 if (%feud_villager_state ! ^feud_villager_state_unconscious) {
     ~feud_villager_pickpocket_fail;
     return;
 }
 if (%feud_villager_owner ! uid) { return; }
-if (map_clock >= %feud_villager_deadline) {
-    ~feud_villager_reset;
-    ~npc_retaliate(0);
-    return;
-}
 // VERIFIED: villagers give a few coins, not Thieving XP, when picked after a KO.
 inv_add(inv, coins, ^feud_villager_pickpocket_coins);
 return;
@@ -90,12 +85,9 @@ if (inv_total(worn, blackjack_oak) < 1 & inv_total(worn, blackjack_willow) < 1) 
 return;
 
 [proc,feud_repeat_blackjack_ko](int $experience, boolean $villager)(boolean)
+~feud_villager_reconcile;
 if (%feud_villager_state ! ^feud_villager_state_following) { return(false); }
 if (%feud_villager_owner ! uid) { return(false); }
-if (map_clock >= %feud_villager_deadline) {
-    ~feud_villager_reset;
-    return(false);
-}
 def_coord $spot = npc_coord;
 def_npc_uid $target = npc_uid;
 if (~feud_villager_has_witness($spot, $target) = true) {
@@ -168,6 +160,7 @@ if ($remaining < ^feud_repeat_timeout_min_delay) $remaining = ^feud_repeat_timeo
 npc_queue(19, $kind, $remaining);
 
 [proc,feud_repeat_timeout]
+~feud_villager_reconcile;
 def_int $kind = last_int;
 def_int $deadline;
 def_int $condition;
@@ -182,7 +175,7 @@ if ($kind = 0) {
 }
 // An obsolete condition ends without requeueing or changing the newer condition.
 if (%feud_villager_state ! $condition) return;
-if (p_finduid(%feud_villager_owner) = false | map_clock >= $deadline) {
+if (.finduid(%feud_villager_owner) = false | map_clock >= $deadline) {
     ~feud_villager_reset;
     return;
 }

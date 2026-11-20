@@ -674,6 +674,10 @@ test(`a native KO input at clock ${110 - knockoutTicks} returns at clock 109 wit
     if (tick === 109) callbacksAt109 = callbacks;
   }, ({ npc }) => assertAttackableQueueBound(npc));
   assert.equal(callbacksAt109, 1, 'the remaining-one timeout callback returns once and safely rearms for delay 2');
+  const tail = [...target.queue.all()].filter(request =>
+    request.queueId === ServerTriggerType.AI_QUEUE19 && request.lastInt === 1);
+  assert.equal(tail.length, 1, 'the lone KO tail remains queued at clock 109');
+  assert.equal(tail[0].delay, 2, 'even an unvisited lone tail rearms with the same-pass-safe minimum delay');
   assert.equal(target.getVar(stateVar), 3, 'the KO remains active one tick before its exact deadline');
   assert.equal(target.getVar(ownerVar), p.uid);
   assert.equal(target.getVar(deadlineVar), 110);

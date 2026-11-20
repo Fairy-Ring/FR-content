@@ -73,6 +73,7 @@ if (%feud_var < ^feud_recruited) { return; }
 @feud_villager_pick;
 
 [label,feud_villager_pick]
+~feud_villager_reconcile;
 if (%feud_var = ^feud_recruited) {
     // VERIFIED 30 Thieving minimum; this follows the normal pickpocket refusal pattern.
     if (stat(thieving) < ^feud_trial_thieving_level) {
@@ -92,10 +93,6 @@ if (%feud_var = ^feud_distraction_active) {
     if (%feud_villager_state ! ^feud_villager_state_distracted | %feud_villager_owner ! uid) {
         @feud_villager_caught;
     }
-    if (map_clock >= %feud_villager_deadline) {
-        ~feud_villager_reset;
-        @feud_villager_caught;
-    }
     inv_add(inv, coins, ^feud_villager_pickpocket_coins);
     stat_advance(thieving, ^feud_villager_pickpocket_xp);
     %feud_npc_multi = 2;
@@ -111,11 +108,6 @@ if (%feud_var = ^feud_villager_knocked_out) {
         @feud_villager_caught;
     }
     if (%feud_villager_owner ! uid) { return; }
-    if (map_clock >= %feud_villager_deadline) {
-        ~feud_villager_reset;
-        ~npc_retaliate(0);
-        return;
-    }
     inv_add(inv, coins, ^feud_villager_pickpocket_coins);
     %feud_var = ^feud_third_pick;
     return;

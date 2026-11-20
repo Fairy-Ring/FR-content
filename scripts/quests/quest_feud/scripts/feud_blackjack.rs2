@@ -39,22 +39,36 @@
 ~feud_villager_timeout;
 
 [proc,feud_villager_timeout]
+~feud_villager_reconcile;
 if (%feud_villager_state = ^feud_villager_state_idle) {
     npc_settimer(0);
     return;
 }
-// UNKNOWN: a zero distraction deadline reserves the final chat page, not a theft window.
-// The owner is deliberately busy on that page, so use the non-protecting existence lookup.
-if (%feud_villager_state = ^feud_villager_state_distracted & %feud_villager_deadline = 0) {
-    if (finduid(%feud_villager_owner) = false) ~feud_villager_reset;
-    return;
-}
-if (p_finduid(%feud_villager_owner) = false) {
+
+// UNKNOWN: recover a timed condition even if an engine reset discarded its callback.
+// Look up the owner without protected access: a modal/delayed owner is still present.
+// Secondary access must not replace the player whose action is reclaiming this NPC.
+// Return an expired KO's owner so a pick exactly as it wakes keeps its existing retaliation.
+// Timers and other readers discard that result.
+[proc,feud_villager_reconcile]()(player_uid)
+if (%feud_villager_state = ^feud_villager_state_idle) return(null);
+if (.finduid(%feud_villager_owner) = false) {
     ~feud_villager_reset;
-    return;
+    return(null);
 }
-if (map_clock < %feud_villager_deadline) return;
-~feud_villager_reset;
+// Zero reserves the distraction's last chat page; it is not an expired window.
+if (%feud_villager_deadline ! 0 & map_clock >= %feud_villager_deadline) {
+    def_player_uid $waking = null;
+    if (%feud_villager_state = ^feud_villager_state_unconscious) $waking = %feud_villager_owner;
+    ~feud_villager_reset;
+    return($waking);
+}
+if (%feud_villager_state = ^feud_villager_state_following) {
+    if (npc_getmode ! playerfollow | %npc_attacking_uid ! %feud_villager_owner) ~feud_villager_reset;
+} else {
+    if (npc_getmode ! none) ~feud_villager_reset;
+}
+return(null);
 
 [proc,feud_villager_uses_timer]()(boolean)
 def_npc $kind = npc_type;
@@ -72,9 +86,10 @@ if (~feud_villager_uses_timer = true) npc_settimer(0);
 if (%feud_villager_state = ^feud_villager_state_unconscious) {
     npc_anim(human_ready, 0);
 }
-// Hints need no protected player access, including expiry while the owner is busy.
-if (%feud_villager_state = ^feud_villager_state_distracted) {
-    if (.finduid($owner) = true) .hint_stop;
+// Session slot 196 is unprotected, so clear it even while the present owner is busy.
+if (.finduid($owner) = true) {
+    if (%feud_villager_state = ^feud_villager_state_distracted) .hint_stop;
+    if (.%feud_trial_villager = $target) .%feud_trial_villager = null;
 }
 %feud_villager_state = ^feud_villager_state_idle;
 %feud_villager_owner = null;
@@ -82,9 +97,6 @@ if (%feud_villager_state = ^feud_villager_state_distracted) {
 if (npc_getmode ! opplayer2) {
     %npc_attacking_uid = null;
     npc_setmode(wander);
-}
-if (p_finduid($owner) = true) {
-    if (%feud_trial_villager = $target) %feud_trial_villager = null;
 }
 
 // UNKNOWN FEUD-TRIAL-REPLAY-01: replay only after the earlier condition has ended.
@@ -94,12 +106,10 @@ if (p_finduid($owner) = true) {
 if (%feud_trial_villager = null) return(true);
 def_npc_uid $actor = npc_uid;
 if (npc_finduid(%feud_trial_villager) = true) {
+    ~feud_villager_reconcile;
     if (%feud_villager_owner = uid & %feud_villager_state ! ^feud_villager_state_idle) {
-        if (map_clock < %feud_villager_deadline) {
-            if (npc_finduid($actor) = false) return(false);
-            return(false);
-        }
-        ~feud_villager_reset;
+        if (npc_finduid($actor) = false) return(false);
+        return(false);
     }
 }
 %feud_trial_villager = null;
@@ -107,10 +117,11 @@ if (npc_finduid($actor) = false) return(false);
 return(true);
 
 // Safe for ordinary logout, including every player without an active trial target.
-// The NPC's timer remains the independent orphan/expiry cleanup path.
+// Readers reconcile too: the NPC's timer can be lost during an engine reset.
 [proc,feud_trial_release]
 if (%feud_trial_villager = null) return;
 if (npc_finduid(%feud_trial_villager) = true) {
+    ~feud_villager_reconcile;
     if (%feud_villager_owner = uid) ~feud_villager_reset;
 }
 %feud_trial_villager = null;

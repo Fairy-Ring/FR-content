@@ -2,6 +2,7 @@ import { seededWander } from './deterministic-wander.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import './timeout-safety.mjs';
+import { reconciliationTests } from './reconciliation.mjs';
 import {
   Packet, PlayerLoading, PlayerStat, ScriptState, ServerTriggerType, World, button, count,
   dialoguePage, engineModule, id, inv, inventory, map, obj, resumeDialogue, seed, types
@@ -640,3 +641,5 @@ test('an orphaned villager cleans up on its own queued deadline without running 
   assert.equal(target.getVar(ownerVar), -1);
   assert.equal(target.getVar(deadlineVar), 0);
 });
+
+reconciliationTests();
