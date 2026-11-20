@@ -5,6 +5,7 @@ import { count, id, inv, invButton, obj, seed, types } from '../swamp-caves/runt
 import { player } from './player.mjs';
 import { feudItems, observeItem, tradeAndDrop, transferPair } from './tradeability.mjs';
 import { receiptOtherRoutes } from './receipt-routes.mjs';
+import { assertOlderDialogueCutover } from './dialogue-audit.mjs';
 import {
   actors, begin, buyReceipts, deliver, drink, gangMask, operate, read, relog, stage, talk
 } from './fixture.mjs';
@@ -123,6 +124,10 @@ test('barman small-talk remains available without producing quest progress', () 
     assert.equal(read(ordinary, 'feud_report_drink'), 0, 'older ordinary topics cannot identify the traitor drink');
     assert.notEqual(ordinary.modalMain, id('Component', 'shop_template'), 'ordinary topics open no shop');
   }
+});
+
+test('removed optional chatter and later lore do not remain in the compiled Feud unit', () => {
+  assertOlderDialogueCutover();
 });
 
 test('start refusal, early item use, and compatible acceptance use native dispatch', () => {
