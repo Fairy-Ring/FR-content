@@ -56,8 +56,14 @@ while ($index < ^feud_dung_candidate_count) {
         def_boolean $occupied = false;
         loc_findallzone($candidate);
         while ($occupied = false & loc_findnext = true) {
-            if (loc_coord = $candidate & loc_shape >= wall_diagonal & loc_shape < grounddecor) {
-                $occupied = true;
+            if (loc_coord = $candidate) {
+                switch_locshape (loc_shape) {
+                    case wall_diagonal, centrepiece_straight, centrepiece_diagonal,
+                         roof_straight, roof_diagonal_with_roofedge, roof_diagonal,
+                         roof_l_concave, roof_l_convex, roof_flat, roofedge_straight,
+                         roofedge_diagonalcorner, roofedge_l, roofedge_squarecorner :
+                        $occupied = true;
+                }
             }
         }
         if ($occupied = false & lineofwalk($access, $candidate) = true) {
