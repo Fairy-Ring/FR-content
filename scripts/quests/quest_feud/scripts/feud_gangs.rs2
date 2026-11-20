@@ -94,10 +94,6 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 return;
 
 [label,feud_bandit_give]
-if (%feud_var < ^feud_camels_purchased) {
-    ~displaymessage(^dm_default);
-    return;
-}
 ~chatplayer("<p,neutral>Good news, the Menaphites have agreed to give you a camel in order to restore peace.");
 mes("You hand the guard a sales receipt for the camel.");
 inv_del(inv, feud_camel_receipt, 1);
@@ -182,10 +178,6 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 @feud_coward_talk;
 
 [label,feud_coward_give]
-if (%feud_var < ^feud_camels_purchased) {
-    ~displaymessage(^dm_default);
-    return;
-}
 ~chatplayer("<p,neutral>Good news, the Menaphites have agreed to give you a camel in order to restore peace.");
 mes("You hand the guard a sales receipt for the camel.");
 inv_del(inv, feud_camel_receipt, 1);
@@ -286,10 +278,6 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 @feud_thug_talk;
 
 [label,feud_thug_give]
-if (%feud_var < ^feud_camels_purchased) {
-    ~displaymessage(^dm_default);
-    return;
-}
 ~chatplayer("<p,neutral>Good news, the bandits have agreed to give you a camel in order to restore peace.");
 mes("You hand the doorman a sales receipt for the camel.");
 inv_del(inv, feud_camel_receipt, 1);

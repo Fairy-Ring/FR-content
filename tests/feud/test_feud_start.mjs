@@ -3,7 +3,8 @@ import test from 'node:test';
 
 import { count, id, inv, invButton, obj, seed, types } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
-import { feudItems, observeItem } from './tradeability.mjs';
+import { feudItems, observeItem, tradeAndDrop, transferPair } from './tradeability.mjs';
+import { receiptOtherRoutes } from './receipt-routes.mjs';
 import {
   actors, begin, buyReceipts, deliver, drink, gangMask, operate, read, relog, stage, talk
 } from './fixture.mjs';
@@ -254,22 +255,36 @@ for (const generous of [false, true]) {
   });
 }
 
-test('traded camel receipts cannot bypass the purchase checkpoint', () => {
-  const p = player(); begin(p); drink(p);
-  const receipt = obj('feud_camel_receipt');
-  // Test-only setup represents two receipts obtained by trading at stage two.
-  p.invAdd(inv, receipt, 2);
-  assert.equal(stage(p), 2);
-  for (const name of ['feud_egyptian_doorman_multi', 'feud_arabian_guard_multi', 'feud_arabian_guard_coward']) {
-    const messages = p.messages.length;
-    talk(p, name);
-    assert.equal(p.messages.length, messages + 1, `${name} sends the default refusal`);
-    assert.equal(p.messages.at(-1), 'Nothing interesting happens.', `${name} refuses before exchanging a receipt`);
-    assert.equal(count(p, 'feud_camel_receipt'), 2, 'both receipts remain in the inventory');
-    assert.equal(stage(p), 2, 'a receipt cannot advance the purchase checkpoint');
-    assert.equal(gangMask(p), 0, 'a receipt cannot mark either gang as paid');
-    assert.equal(read(p, 'feud_var_talk_gangs'), 0, 'a hand-in is not a gang inquiry');
-  }
+test('a second account cannot obtain the buyer receipts through actual trade or ground pickup', () => {
+  const p = player(), q = player(); begin(p); drink(p);
+  talk(p, 'feud_egyptian_doorman_multi');
+  talk(p, 'feud_arabian_guard_multi');
+  buyReceipts(p);
+  begin(q); drink(q);
+  transferPair(p, q);
+  const result = tradeAndDrop(p, q, 'feud_camel_receipt');
+  assert.equal(result.offered, 0);
+  assert.equal(result.transferred, 0);
+  assert.equal(result.otherVisibleAtReveal, false);
+  assert.equal(result.otherPickup, false);
+  assert.equal(count(p, 'feud_camel_receipt'), 2, 'only the actual buyer can recover the private drop');
+  assert.equal(count(q, 'feud_camel_receipt'), 0, 'no foreign receipt was seeded or acquired');
+  assert.equal(stage(p), 4, 'transfers cannot replace the buyer hand-ins');
+  assert.equal(stage(q), 2, 'failed transfers do not advance the other account');
+  assert.equal(gangMask(q), 0);
+  assert.equal(read(q, 'feud_var_talk_gangs'), 0);
+});
+
+test('shop, duel, death and telegrab cannot transfer the buyer camel receipts', () => {
+  const p = player(), q = player(); begin(p); drink(p);
+  talk(p, 'feud_egyptian_doorman_multi');
+  talk(p, 'feud_arabian_guard_multi');
+  buyReceipts(p);
+  begin(q); drink(q);
+  assert.deepEqual(receiptOtherRoutes(p, q, () => operate(p, actors('feud_marketseller')[0], 3)),
+    { shop: false, duelStake: false, npcDeath: false, pvpDeath: false, telegrab: false });
+  assert.equal(stage(p), 4);
+  assert.equal(stage(q), 2);
 });
 
 test('lost purchase-state camel receipts are replaced free without another sale or progress write', () => {
