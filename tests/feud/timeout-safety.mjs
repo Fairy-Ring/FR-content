@@ -1295,7 +1295,10 @@ for (const location of ['inside', 'outside']) {
     p.setLevel(PlayerStat.DEFENCE, 1);
     p.setVar(autoRetaliateVar, 1);
     execute('[proc,player_combat_stat]', p);
-    const target = attackableTarget(p, 'feud_arabian_guard2_multi', true);
+    // The inside comparison uses the same original cache placement as the
+    // headed case, not an inherited follower left beside another town wall.
+    const target = attackableTarget(p, 'feud_arabian_guard2_multi', true, npc =>
+      location === 'outside' || (npc.startX === 3356 && npc.startZ === 2994));
     assert(target, 'an original unwitnessed Bandit41 is available without NPC setup');
     const initialNpcTile = [target.x, target.z];
     const stand = operationStand(p, target);
