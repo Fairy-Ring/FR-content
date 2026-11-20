@@ -10,7 +10,7 @@
 if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var >= ^feud_menaphites_defeated) {
-    @feud_bandit_celebrate;
+    @feud_gang_ordinary;
 }
 if (%feud_var >= ^feud_recruited) {
     @feud_bandit_recruited;
@@ -30,7 +30,7 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var >= ^feud_menaphites_defeated) {
-    @feud_bandit_celebrate;
+    @feud_gang_ordinary;
 }
 if (%feud_var >= ^feud_recruited) {
     @feud_bandit_recruited;
@@ -50,7 +50,7 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var >= ^feud_menaphites_defeated) {
-    @feud_bandit_celebrate;
+    @feud_gang_ordinary;
 }
 if (%feud_var >= ^feud_recruited) {
     @feud_bandit_recruited;
@@ -70,7 +70,7 @@ if (inv_total(inv, feud_camel_receipt) >= 1) {
 if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var >= ^feud_menaphites_defeated) {
-    @feud_bandit_celebrate;
+    @feud_gang_ordinary;
 }
 if (%feud_var >= ^feud_recruited) {
     @feud_bandit_recruited;
@@ -119,14 +119,9 @@ return;
 ~chatnpc("<p,neutral>We can talk once you bring back the Menaphites' full peace offering.");
 return;
 
-[label,feud_bandit_celebrate]
+[label,feud_gang_ordinary]
 ~chatplayer("<p,neutral>Hello.");
-~chatnpc("<p,neutral>Welcome! Your actions surprise me.");
-~chatplayer("<p,neutral>What do you mean?");
-~chatnpc("<p,neutral>It was brilliant the way you got rid of the Menaphite leader.");
-~chatplayer("<p,neutral>Er... yes. Thank you.");
-~chatnpc("<p,neutral>So will you run the rest of them out of town now?");
-~chatplayer("<p,neutral>I don't know.");
+~chatnpc("<p,neutral>What do you want?");
 return;
 
 [label,feud_bandit_recruited]
@@ -161,7 +156,7 @@ return;
 if (%feud_var < ^feud_started) { @feud_gang_before; }
 if (%feud_var_drink < 3) { return; }
 if (%feud_var >= ^feud_menaphites_defeated) {
-    @feud_coward_celebrate;
+    @feud_gang_ordinary;
 }
 if (%feud_var >= ^feud_recruited) {
     @feud_coward_recruited;
@@ -196,10 +191,6 @@ if (%feud_var_comp_gangs = 3) {
 }
 return;
 
-[label,feud_coward_celebrate]
-~chatplayer("<p,neutral>Hello.");
-~chatnpc("<p,neutral>Welcome. Our leader would be pleased to congratulate you on your disposal of the Menaphites who plagued this town.");
-return;
 
 [label,feud_coward_recruited]
 ~chatplayer("<p,neutral>Good day.");

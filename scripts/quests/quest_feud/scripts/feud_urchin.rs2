@@ -3,7 +3,8 @@
 
 [opnpc1,feud_street_urchin]
 if (%feud_var >= ^feud_menaphites_defeated) {
-    @feud_urchin_celebrate;
+    ~chatnpc("<p,quiz>What do you want?");
+    return;
 }
 if (%feud_var < ^feud_first_pick) {
     @feud_urchin_information;
@@ -200,7 +201,7 @@ if ($info = 2) {
     @feud_urchin_info_end;
 }
 ~chatplayer("<p,neutral>Yes tell me about...");
-def_int $topic = ~p_choice5("The Menaphites", 1, "The bandits", 2, "The Mayor", 3, "Ali Morrisane's nephew", 4, "The town", 5);
+def_int $topic = ~p_choice4("The Menaphites", 1, "The bandits", 2, "The Mayor", 3, "Ali Morrisane's nephew", 4);
 if ($topic = 1) {
     ~chatplayer("<p,neutral>Tell me about the Menaphites.");
     ~chatnpc("<p,neutral>They're a bad bunch, always starting fights down in the Asp and Snake. Word on the street is that they're led by some deranged priest. Nobody's ever seen them though - they do all their deals through Ali 'the Operator'. I reckon they're up to something, but they're such a close knit group that little ever slips out.");
@@ -223,9 +224,7 @@ if ($topic = 4) {
     ~chatnpc("<p,neutral>He disappeared a little while ago. All I know is it had something to do with the gangs. Probably he scammed them. You'd have to gain their trust to find out more, m'afraid - if I get too close, they might disappear me too!");
     @feud_urchin_info_menu;
 }
-~chatplayer("<p,neutral>Tell me about the town.");
-~chatnpc("<p,neutral>It's boring! We're not as big as Menaphos or as powerful as Al Kharid, and we've got a really nasty crime problem. It's no wonder so many grown-ups have left.");
-@feud_urchin_info_menu;
+return;
 
 [label,feud_urchin_info_end]
 ~chatplayer("<p,neutral>No thanks.");
@@ -233,10 +232,3 @@ if ($topic = 4) {
 ~chatplayer("<p,neutral>I will do thanks.");
 return;
 
-[label,feud_urchin_celebrate]
-~chatplayer("<p,neutral>Hey there!");
-~chatnpc("<p,quiz>Hi! Do you want to go rob some more people? I could do with some more money.");
-~chatplayer("<p,neutral>I think I need to try a different tactic. Sorry, kid!");
-~chatnpc("<p,quiz>Well do you need any information then?");
-~chatplayer("<p,neutral>No thanks, I think I have a fair idea of what is going on in the town now.");
-return;
