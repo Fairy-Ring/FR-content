@@ -359,10 +359,11 @@ function dispatchSynchronousKnockOut(p, target) {
   return target.getVar(deadlineVar);
 }
 
-function attackableTarget(p, name, requireNoWitness = false) {
+function attackableTarget(p, name, requireNoWitness = false, eligible = () => true) {
   for (let ticks = 0; ticks <= nativeSetupWaitTicks; ticks++) {
     const target = actors(name).find(npc => npc.getVar(stateVar) === 0 && [...npc.queue.all()].length === 0 &&
-      npc.timerInterval <= 0 && (!requireNoWitness || !hasWitness(p, npc)) && operationStand(p, npc));
+      npc.timerInterval <= 0 && ![NpcMode.OPPLAYER2, NpcMode.APPLAYER2, NpcMode.PLAYERESCAPE].includes(npc.targetOp) &&
+      eligible(npc) && (!requireNoWitness || !hasWitness(p, npc)) && operationStand(p, npc));
     if (target) return target;
     if (ticks < nativeSetupWaitTicks) worldTick();
   }
@@ -874,6 +875,11 @@ function naturalWeaponPoisonFixture(name, initialHp, visibleForm) {
   const p = repeatFixture();
   // Own-player fixture state only. The original NPC's HP, poison, timer, mode,
   // position and callbacks are produced by ordinary native Attack, not seeded.
+  // Disclosed own-player Protect from Melee input. The fixture's ordinary 99
+  // Prayer points cover this short combat observation; NPC attacks and poison
+  // keep their native scripts and RNG, without a lethal bare-armour distraction.
+  assert.equal(p.levels[PlayerStat.PRAYER], 99);
+  p.setVar(id('VarPlayerType', 'prayer14'), 1);
   assert.equal(p.getVar(autoRetaliateVar), 0);
   p.setVar(autoRetaliateVar, 1);
   p.invAdd(inv, obj('bronze_dagger_p'), 1);
@@ -881,7 +887,7 @@ function naturalWeaponPoisonFixture(name, initialHp, visibleForm) {
   p.baseLevels[PlayerStat.ATTACK] = p.levels[PlayerStat.ATTACK] = 99;
   wield(p, 'bronze_dagger_p');
   execute('[proc,player_combat_stat]', p);
-  const target = attackableTarget(p, name, true);
+  const target = attackableTarget(p, name, true, npc => npc.levels[NpcStat.HITPOINTS] === initialHp);
   assert(target, `an original unwitnessed ${name} placement is available`);
   assert.equal(target.baseType, id('NpcType', name));
   assert.equal(target.levels[NpcStat.HITPOINTS], initialHp);
@@ -927,7 +933,14 @@ test('native weapon poison keeps its 30-tick cadence, severity and exact damage 
     const tracked = new Set([target]), { events, observeQueueAndPoison } = nativePoisonTrace(weaponSeverity);
     for (let hit = 0; hit < 3; hit++) {
       boundedTicksThrough(tracked, nextNpcTimerTick(target), null, observeQueueAndPoison);
-      assert.equal(target.targetOp, NpcMode.OPPLAYER2, 'ordinary combat continues throughout the poison proof');
+      assert.equal(target.targetOp, NpcMode.OPPLAYER2,
+        'ordinary combat continues throughout the poison proof: ' + JSON.stringify({
+          name, tick: World.currentTick, hit, poison: target.getVar(poisonVar),
+          timerInterval: target.timerInterval, timerClock: target.timerClock,
+          npc: [target.x, target.z], home: [target.startX, target.startZ],
+          range: types.NpcType.get(target.type).maxrange, npcHp: target.levels[NpcStat.HITPOINTS],
+          player: [p.x, p.z], playerHp: p.levels[PlayerStat.HITPOINTS], active: p.isActive,
+          messages: p.messages }));
     }
     assert.equal(events.filter(event => event.before.poison > event.after.poison).length, 3);
     assert.equal(target.getVar(poisonVar), weaponSeverity - 3);
@@ -1013,7 +1026,7 @@ test('TEST-ONLY seeded poison preserves cadence and callback bounds through natu
     ['feud_egyptian_doorman_multi', 60, 'feud_egyptian_doorman_2']
   ]) {
     const originalRandom = JavaRandom.nextDouble, p = repeatFixture();
-    const target = attackableTarget(p, name, true);
+    const target = attackableTarget(p, name, true, npc => npc.levels[NpcStat.HITPOINTS] === initialHp);
     assert(target, `an original unwitnessed ${name} placement is available`);
     assert.equal(target.levels[NpcStat.HITPOINTS], initialHp);
     assert.equal(target.getVar(stateVar), 0);
@@ -1029,6 +1042,7 @@ test('TEST-ONLY seeded poison preserves cadence and callback bounds through natu
     // changes: poison and a Feud deadline must not multiply pending callbacks.
     target.setVar(poisonVar, weaponSeverity);
     target.setTimer(poisonTimerTicks);
+    target.timerClock = 0; // Part of the same explicitly labelled test-only timer seed.
     assert.equal(target.timerClock, 0);
     const destination = operationStand(p, target);
     assert(destination);
