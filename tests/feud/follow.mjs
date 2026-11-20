@@ -122,7 +122,9 @@ export function followToSeclusion(p, target, advance = worldTick, stopTick = Wor
       if (remainingWaypoints.length) walkRoute(p, [remainingWaypoints.shift()]);
     }
     advance();
+    // A screened endpoint alone does not prove that the NPC has followed.
     if (destination && p.level === destination.level && p.x === destination.x && p.z === destination.z &&
+      (target.level !== startingNpcTile[0] || target.x !== startingNpcTile[1] || target.z !== startingNpcTile[2]) &&
       !hasWitness(p, target) && p.inOperableDistance(target) &&
       occludedOriginalWitness(target, originalWitnesses, target.x, target.z) &&
       projectedWitnesses(p, target, p.x, p.z).length === 0 &&
