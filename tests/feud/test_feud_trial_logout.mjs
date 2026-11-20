@@ -130,7 +130,7 @@ function reachDistractionPage(p) {
   p.processInteraction();
   for (let page = 0; page < 240 && p.activeScript; page++) {
     assert.equal(p.activeScript.execution, ScriptState.PAUSEBUTTON, 'the real urchin conversation pauses');
-    if (dialoguePage(p).some(text => text === 'Okay, I see them. Here I go!')) {
+    if (dialoguePage(p).some(text => text === 'Ya, I see them. Give me a sec.')) {
       const [target] = owned(p);
       assert(target, 'the product has reserved its original villager before the final page');
       assert.equal(owned(p).length, 1, 'the conversation holds only one target');
