@@ -66,6 +66,8 @@ function collision() {
 function feeder() {
   const p = player();
   p.setVarBit(bit('feud_var'), 18); // Disclosed compiled-fixture prerequisite, never the headed account.
+  p.setVarBit(bit('feud_found_trait'), 1);
+  p.setVarBit(bit('feud_hag_list'), 2);
   p.invAdd(inv, obj('superhot_kebab_sauce'), 1);
   p.invAdd(inv, obj('bucket_empty'), 1);
   p.invAdd(inv, obj('coins'), 7);
