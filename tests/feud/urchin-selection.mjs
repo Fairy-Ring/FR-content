@@ -62,7 +62,7 @@ for (const condition of ['held', 'led']) {
     const expected = expectedSelection(next);
     assert(expected && expected !== occupied, 'a different original free villager remains in range');
     const result = talk(next, 'feud_street_urchin');
-    assert.match(result.text, /Okay, I see them/);
+    assert.match(result.text, /Ya, I see them\. Give me a sec\./);
     assert.equal(next.getVar(slotVar), expected.uid);
     assert.equal(expected.getVar(stateVar), 1);
     assert.equal(expected.getVar(ownerVar) >>> 0, next.uid);

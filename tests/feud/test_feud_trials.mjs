@@ -425,7 +425,9 @@ test('native Feud trials allow the opening at level 29, gate the first theft at 
   p.setVarBit(bit('feud_var'), 25);
   const defeatReport = talk(p, 'feud_egyptian_minder', [1]);
   assert.match(defeatReport.text, /Why did you have to go and ruin everything/);
-  assert.match(talk(p, 'feud_street_urchin').text, /go rob some more people/);
+  const postDefeatUrchin = talk(p, 'feud_street_urchin');
+  assert.match(postDefeatUrchin.text, /What do you want\?/);
+  assert.doesNotMatch(postDefeatUrchin.text, /go rob some more people/);
   assert.equal(stage(p), 25);
   const unarmed = player();
   unarmed.setVarBit(bit('feud_var'), 9);
