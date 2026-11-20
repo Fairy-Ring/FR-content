@@ -339,7 +339,7 @@ function buyReceipts(p, generous = false) {
   const price = generous ? 1000 : 500;
   p.invAdd(inv, obj('coins'), price);
   const before = count(p, 'coins');
-  const result = talk(p, 'feud_ali_the_discount_camel_seller', [4, 2, generous ? 4 : 3, 1]);
+  const result = talk(p, 'feud_ali_the_discount_camel_seller', [4, generous ? 4 : 3, 1]);
   assert.equal(count(p, 'feud_camel_receipt'), 2, 'one purchase produces two original camel receipts');
   assert.equal(before - count(p, 'coins'), price, 'the charged constant matches the printed offer and receipt amount');
   assert.match(result.text, new RegExp(`Would ${price} gold coins for the pair of them do\\?`), 'the spoken offer matches the amount charged');

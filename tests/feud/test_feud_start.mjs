@@ -109,8 +109,8 @@ test('Morrisane opens the candidate thirteen-entry shop through dialogue without
 
 test('barman small-talk remains available without producing quest progress', () => {
   const p = player(), result = talk(p, 'feud_ali_the_barman', [2, 1]);
-  assert.match(result.text, /Nothing much really\. About what you'd expect from a sleepy little town like ours\./);
-  assert.match(result.text, /They're paying customers, so I won't rock the boat if you don't mind\./);
+  assert.match(result.text, /Nothing much really, the same as you would expect of any border town on the edge of the desert\./);
+  assert.match(result.text, /Nothing much to say really about them\. They're all paying customers so I won't rock the boat if you don't mind\./);
   assert.equal(stage(p), 0);
   assert.equal(read(p, 'feud_report_drink'), 0, 'ordinary small-talk cannot identify the traitor drink');
   assert.notEqual(p.modalMain, id('Component', 'shop_template'), 'the non-trading branch opens no shop');
@@ -254,14 +254,14 @@ for (const generous of [false, true]) {
     talk(p, 'feud_arabian_guard_multi');
     p.invDel(inv, obj('coins'), count(p, 'coins'));
     const offer = generous ? 4 : 3;
-    const poor = talk(p, 'feud_ali_the_discount_camel_seller', [4, 2, offer]);
+    const poor = talk(p, 'feud_ali_the_discount_camel_seller', [4, offer]);
     assert.match(poor.text, /money|afford|gold|coins/i, 'the sourced insufficient-money reply is shown');
     assert.equal(count(p, 'feud_camel_receipt'), 0);
     assert.equal(stage(p), 3);
     p.invAdd(inv, obj('coins'), 1000);
     p.invAdd(inv, obj('bucket_empty'), 27);
     const before = count(p, 'coins');
-    assert.match(talk(p, 'feud_ali_the_discount_camel_seller', [4, 2, offer]).text, /inventory - full at the moment/);
+    assert.match(talk(p, 'feud_ali_the_discount_camel_seller', [4, offer]).text, /inventory - full at the moment/);
     assert.equal(count(p, 'coins'), before);
     assert.equal(count(p, 'feud_camel_receipt'), 0, 'a full inventory never drops or loses a receipt');
     assert.equal(stage(p), 3);
@@ -349,9 +349,10 @@ test('lost purchase-state camel receipts are replaced free without another sale 
   assert.equal(count(p, 'coins'), money, 'neither replacement route charges again');
   p.invDel(inv, obj('bucket_empty'), 25);
   deliver(p);
-  const disposed = talk(p, 'feud_ali_the_discount_camel_seller', [4, 1]);
-  assert.match(disposed.text, /Not Sandy and Lumps!/);
-  assert.doesNotMatch(disposed.text, /Would (?:500|1000) gold coins/);
+  const ordinary = talk(p, 'feud_ali_the_discount_camel_seller', ["I'm looking for Ali from Pollnivneach."]);
+  assert.doesNotMatch(ordinary.text, /Not Sandy and Lumps!/);
+  assert.doesNotMatch(ordinary.text, /About those camels\. I've lost the receipt/);
+  assert.doesNotMatch(ordinary.text, /Would (?:500|1000) gold coins/);
   assert.equal(count(p, 'feud_camel_receipt'), 0, 'after both hand-ins the source menu no longer offers recovery');
   assert.equal(stage(p), 5);
 });
