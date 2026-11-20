@@ -8,11 +8,11 @@ if (%feud_var < 1) {
 if (%feud_var_drink = 0) {
     ~chatnpc("<p,neutral>Ahh, a kind stranger. Get this old man a drink, so that he may wet his throat and tell you of strange happenings in this town.");
 } else if (%feud_var_drink = 1) {
-    ~chatnpc("<p,neutral>Get this poor, thirsty old man another drink so that he may wet his lips and continue.");
+    ~chatnpc("<p,neutral>It's yourself again, isn't it? Get this old man another drink so that he may wet his lips and continue.");
 } else if (%feud_var_drink = 2) {
     ~chatnpc("<p,neutral>Alas, my throat has dried up, and I cannot speak... perhaps another drink would help?");
 } else {
-    ~chatnpc("<p,neutral>What were we talking about again? Yes yes, when I was a boy... no, that's not it.");
+    ~chatnpc("<p,neutral>What were we talking about again? Yes yes, when I was a boy..... no that's not it.");
 }
 return;
 
@@ -23,7 +23,7 @@ if (%feud_var < 1) {
 def_obj $used = last_useitem;
 if ($used = beer) {
     if (%feud_var_drink >= 3) {
-        ~chatnpc("<p,neutral>What were we talking about again? Yes yes, when I was a boy... no, that's not it.");
+        ~chatnpc("<p,neutral>What were we talking about again? Yes yes, when I was a boy..... no that's not it.");
         return;
     }
     inv_del(inv, beer, 1);

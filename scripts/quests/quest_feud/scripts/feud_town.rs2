@@ -22,9 +22,9 @@ if ($choice = 1) {
 }
 if ($choice = 2) {
     ~chatplayer("<p,neutral>What's going on in town?");
-    ~chatnpc("<p,neutral>Nothing much really. About what you'd expect from a sleepy little town like ours.");
-    ~chatplayer("<p,neutral>What about those two gangs? That seems exciting.");
-    ~chatnpc("<p,neutral>They're paying customers, so I won't rock the boat if you don't mind.");
+    ~chatnpc("<p,neutral>Nothing much really, the same as you would expect of any border town on the edge of the desert.");
+    ~chatplayer("<p,neutral>So can you tell me anything about those two gangs in the town?");
+    ~chatnpc("<p,neutral>Nothing much to say really about them. They're all paying customers so I won't rock the boat if you don't mind.");
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     jump(feud_barman_followup);
 }
@@ -37,9 +37,9 @@ if ($choice = 3) {
 return;
 
 [label,feud_barman_followup]
-def_int $followup = ~p_choice2("No thanks, I'm ok.", 1, "Yes, I'd like to talk about something else.", 2);
+def_int $followup = ~p_choice2("No thanks I'm ok. Thanks for your time.", 1, "Yes, I'd like to talk about something else.", 2);
 if ($followup = 1) {
-    ~chatplayer("<p,neutral>No thanks, I'm ok. Thanks for your time.");
+    ~chatplayer("<p,neutral>No thanks I'm ok. Thanks for your time.");
     return;
 }
 ~chatplayer("<p,neutral>Yes, I'd like to talk about something else.");

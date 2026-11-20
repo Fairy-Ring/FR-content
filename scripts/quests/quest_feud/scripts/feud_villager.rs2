@@ -87,7 +87,7 @@ if (~p_choice2("What do you mean by fix the mess I created?", 1, "Ok I'll get to
     ~chatnpc("<p,neutral>Just run the bandits out of town. Incidentally, I spotted their leader to the north-west just a few minutes ago.");
     return;
 }
-~chatplayer("<p,neutral>Okay, I'll get to it.");
+~chatplayer("<p,neutral>Ok I'll get to it.");
 return;
 
 [label,feud_villager_after]

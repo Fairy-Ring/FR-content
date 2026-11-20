@@ -340,19 +340,19 @@ return;
 
 [label,feud_thug_traitor]
 ~chatplayer("<p,neutral>I was wondering if you could help me?");
-~chatnpc("<p,neutral>Tell me what your problem is and I'll see what I can do.");
-~chatplayer("<p,neutral>I've heard there's a traitor among the Menaphites. What do you know about it?");
-~chatnpc("<p,neutral>It wasn't me, I swear!");
-~chatplayer("<p,neutral>Really? So what do you know?");
+~chatnpc("<p,neutral>Tell me what your problem is and I'll know if I can.");
+~chatplayer("<p,neutral>I'm investigating the possibility of a betrayal in the Menaphites, do you know anything about this?");
+~chatnpc("<p,neutral>It wasn't me, I honestly swear.");
+~chatplayer("<p,neutral>Really? So do you know anything about this?");
 ~chatnpc("<p,neutral>I just can't believe one of my friends could be a traitor.");
-~chatnpc("<p,neutral>Well, I suppose there is Traitorous Ali.");
-~chatplayer("<p,quiz>'Traitorous Ali'?");
-~chatnpc("<p,neutral>Oh yes. The most untrustworthy, backstabbing little rat to scamper across Tumeken's fair desert. He'd sell his own mother to slavers if he hadn't already betrayed her and had her locked up for the last job he pulled.");
-~chatplayer("<p,neutral>I suppose the name is a bit of a giveaway.");
+~chatnpc("<p,neutral>Well there is Traitorous Ali.");
+~chatplayer("<p,quiz>Who is he then?");
+~chatnpc("<p,neutral>Possibly the most untrustworthy backstabbing fiend to ever walk Tumeken's fair desert. He'd sell his mother to slavers if he hadn't already betrayed her and had her locked up for the last job he pulled.");
+~chatplayer("<p,neutral>I suppose the name is a bit of a give-away then.");
 ~chatplayer("<p,neutral>That was a little too simple, are you sure it was him?");
 ~chatnpc("<p,neutral>Positive, he was turned by the offer of a set of waterproofs and a ride on a camel.");
 ~chatplayer("<p,neutral>I see he drives a hard bargain.");
-~chatnpc("<p,neutral>Well what can I say? We don't call him 'Ali of the Good Decisions', do we?");
+~chatnpc("<p,neutral>Well what can I say, he doesn't have that name for being loyal!");
 %feud_found_trait = 1;
 return;
 

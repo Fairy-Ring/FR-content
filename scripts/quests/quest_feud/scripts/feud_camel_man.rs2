@@ -33,35 +33,35 @@ if ($m = 4) {
 
 [label,feud_camel_store]
 ~chatplayer("<p,quiz>A discount camel store?");
-~chatnpc("<p,neutral>Yes - it's my great idea - selling camels at discounted prices so that the common man can experience the joys of owning a camel of their very own! They're not just a source of kebab meat you know!");
-def_int $s = ~p_choice5("So can I buy a camel then? I'm hungry!", 1, "Yes, camels are beautiful creatures.", 2, "Why would I want a camel? All they do is spit and...", 3, "Actually, I think I was a camel in a previous life.", 4, "So is the discount camel business good then?", 5);
+~chatnpc("<p,neutral>Yes - a great idea - selling camels at discounted prices so that the common man can experience the joys of owning a camel too. They're not just a source of kebab meat you know!");
+def_int $s = ~p_choice5("So can I buy a camel then? I'm hungry!", 1, "Yes camels are beautiful creatures.", 2, "Filthy animals all they do is spit and ....", 3, "Actually I think I was a camel in a previous existence.", 4, "So is business good then?", 5);
 if ($s = 1) {
     ~chatplayer("<p,happy>So can I buy a camel then? I'm hungry!");
-    ~chatnpc("<p,angry>I would never sell one to the likes of you! They are beautiful, majestic creatures, not food! Get out of my shop.");
+    ~chatnpc("<p,angry>I would never sell one to the likes of you, they are beautiful majestic creatures not sandwich fillers! Get out of my shop.");
     return;
 }
 if ($s = 2) {
-    ~chatplayer("<p,neutral>Yes, camels are beautiful creatures.");
-    ~chatnpc("<p,happy>Ah, wondrous camels! Best of all Saradomin's creations. Ships of the desert, far more useful than any horse or donkey. Truly, they are a man's best friend.");
+    ~chatplayer("<p,neutral>Yes camels are beautiful creatures.");
+    ~chatnpc("<p,happy>Ah wondrous creatures, ships of the desert, far more useful than any horse or donkey. A man's best friend.");
     ~chatnpc("<p,neutral>Perhaps you'd like a camel of your own? You're in the right place, if so...");
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     @feud_camel_menu;
 }
 if ($s = 3) {
-    ~chatplayer("<p,neutral>Why would I want a camel? All they do is spit and...");
-    ~chatnpc("<p,angry>Pah! I've seen mummies with more brains than you! If you treat camels badly then of course they're going to spit at you. May your robes never be clean again!");
+    ~chatplayer("<p,neutral>Filthy animals all they do is spit and ....");
+    ~chatnpc("<p,angry>Pah! You just do not know how to treat them. If you abuse them and treat them badly of course they're going to spit and bite.");
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     @feud_camel_menu;
 }
 if ($s = 4) {
-    ~chatplayer("<p,neutral>Actually, I think I was a camel in a previous life.");
+    ~chatplayer("<p,neutral>Actually I think I was a camel in a previous existence.");
     ~chatnpc("<p,neutral>You're teasing me now! You rogue!");
-    ~chatnpc("<p,neutral>Everyone laughs at the poor Discount Camel Seller.");
+    ~chatnpc("<p,neutral>Everyone has a laugh at my expense, I'm just more enlightened than you!");
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     @feud_camel_menu;
 }
-~chatplayer("<p,quiz>So is the discount camel business good then?");
-~chatnpc("<p,happy>Business is booming! Pollnivneach has never seen this number of visitors.");
+~chatplayer("<p,quiz>So is business good then?");
+~chatnpc("<p,happy>Business is booming, Pollnivneach has never seen this number of visitors.");
 ~chatnpc("<p,neutral>In fact I'm thinking of expanding and trying to break into the camel hire market.");
 ~chatnpc("<p,neutral>If only I could figure out how to get people to return the camels...");
 ~chatnpc("<p,neutral>Is there anything else I can help you with?");
@@ -69,51 +69,51 @@ if ($s = 4) {
 
 [label,feud_camel_town]
 ~chatplayer("<p,neutral>Tell me about this town.");
-~chatnpc("<p,neutral>Well, Pollnivneach is a funny little place. It's a small town and you'd think it'd be nice and quiet.");
-~chatnpc("<p,neutral>But those Menaphites and bandits are making the place quite unbearable.");
+~chatnpc("<p,neutral>Well Pollnivneach is a funny little place. It's a small town and you'd think it would be a quiet place.");
+~chatnpc("<p,neutral>But those Menaphites and bandits are making this place quite unbearable.");
 def_int $t = ~p_choice3("In what way?", 1, "Well the weak will always be trodden on. Why not stand up to them?", 2, "Perhaps I could help.", 3);
 if ($t = 1) {
     ~chatplayer("<p,quiz>In what way?");
-    ~chatnpc("<p,neutral>Well, one group is as bad as the other! They steal, they fight, they cause trouble with us locals. Just yesterday one of those bandits came looking for protection money!");
+    ~chatnpc("<p,neutral>Well one group is as bad as the other, stealing from each other and the locals, fighting, and just the last day one of the bandits came looking for protection money");
     ~chatplayer("<p,neutral>Why don't the authorities stop this?");
-    ~chatnpc("<p,neutral>We're a small town. We don't have the resources to keep the gangs off our backs! Menaphos and Al Kharid are no help either.");
-    ~chatnpc("<p,neutral>To tell the truth we live in hope that an outsider, someone with no ties to either group, could broker a deal to halt the hostilities between them.");
-    ~chatplayer("<p,neutral>Hmm...");
+    ~chatnpc("<p,neutral>If you haven't noticed this is a remote town, half way between Menaphos and Al Kharid, a place where neither exert any power.");
+    ~chatnpc("<p,neutral>To tell the truth we live in hope that an objective outsider could broker a deal to halt the hostilities between them.");
+    ~chatplayer("<p,neutral>Perhaps I will.");
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     @feud_camel_menu;
 }
 if ($t = 2) {
     ~chatplayer("<p,neutral>Well the weak will always be trodden on. Why not stand up to them?");
-    ~chatnpc("<p,neutral>That's a little unfair, my friend. We can't all be brave adventurers. If we were, where would you purchase quality camels at discounted prices?");
-    ~chatnpc("<p,neutral>You might think about that. Anyway, isn't it the job of the brave adventurer to protect the weak and innocent from evil and harm?");
+    ~chatnpc("<p,neutral>That's a little unfair my friend. We can't all be brave adventurers. If we were, where would you go to get camels at discounted prices?");
+    ~chatnpc("<p,neutral>You might think about that. Anyway isn't it the job of the brave adventurer to deliver the weak and innocent from evil and harm?");
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     @feud_camel_menu;
 }
 ~chatplayer("<p,neutral>Perhaps I could help.");
-~chatnpc("<p,neutral>Yes, perhaps you could.");
-~chatplayer("<p,quiz>You know the politics better than I do. What do you recommend?");
-~chatnpc("<p,neutral>Me?! I am but a humble discount camel seller. You're the adventurer, don't you know what to do?");
-def_int $t2 = ~p_choice2("Of course I know what to do! I was just testing you!", 1, "Perhaps I should know, but offered advice should never be shunned.", 2);
+~chatnpc("<p,neutral>Yes perhaps you could.");
+~chatplayer("<p,quiz>You know the politics better than I do. What would you recommend I do?");
+~chatnpc("<p,neutral>That may be so, but you are also the brave adventurer and you should know!");
+def_int $t2 = ~p_choice2("Indeed I should know, and indeed I do! I was just testing you!", 1, "Perhaps I should know, but offered advice should never be shunned.", 2);
 if ($t2 = 1) {
-    ~chatplayer("<p,happy>Of course I know what to do! I was just testing you!");
+    ~chatplayer("<p,happy>Indeed I should know, and indeed I do! I was just testing you!");
     ~chatnpc("<p,neutral>That is reassuring to hear. Too often one meets brainless adventurers whose solution to every problem is to hack, maim and murder.");
-    ~chatnpc("<p,neutral>I'm glad to know you're not of that ilk.");
+    ~chatnpc("<p,neutral>Glad to know you're not of that ilk.");
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
     @feud_camel_menu;
 }
 ~chatplayer("<p,neutral>Perhaps I should know, but offered advice should never be shunned.");
-~chatnpc("<p,neutral>The state of adventurers today. They need everything spelled out for them.");
+~chatnpc("<p,neutral>The state of adventurers today. They need everything spelt out for them.");
 ~chatnpc("<p,neutral>What, you want me to put a little note in your quest journal?");
-~chatnpc("<p,neutral>But fine, I'll give you a hint. Try and see if you can get the gangs to agree to a truce by offering them each a token gift as an act of reconciliation.");
-~chatnpc("<p,neutral>If that fails to work, you must consider trying to influence the gangs from within.");
+~chatnpc("<p,neutral>Well, ok I will help. Try and see if you can get the groups to agree to a truce by perhaps each offering a token gift as an act of reconciliation.");
+~chatnpc("<p,neutral>If that fails to work, I would consider trying to influence the groups from within.");
 ~chatnpc("<p,neutral>Is there anything else I can help you with?");
 @feud_camel_menu;
 
 [label,feud_camel_lovely]
 ~chatplayer("<p,neutral>Lovely day isn't it?");
-~chatnpc("<p,neutral>It's a beautiful day today, but word has it that it will rain tomorrow.");
+~chatnpc("<p,neutral>It's a beautiful day today but word has it that it will rain tomorrow.");
 ~chatplayer("<p,quiz>Really?");
-~chatnpc("<p,neutral>No! When have you ever known it to rain here in Gielinor?");
+~chatnpc("<p,neutral>No don't worry I'm only joking!");
 ~chatplayer("<p,neutral>Oh. Anyway...");
 ~chatnpc("<p,neutral>Is there anything else I can help you with?");
 @feud_camel_menu;
@@ -125,7 +125,7 @@ if (%feud_var_talk_gangs ! 3 | %feud_var < ^feud_camel_offer) {
     ~chatnpc("<p,neutral>Those two camels around the side are already sold.");
     ~chatnpc("<p,neutral>I've got new stock coming very soon though. Come back later if you're still interested.");
     ~chatnpc("<p,neutral>Is there anything else I can help you with?");
-    if (~p_choice2("Well yes, actually I would like to ask about something else.", 1, "No, but thanks for your time.", 2) = 1) @feud_camel_menu;
+    if (~p_choice2("Well yes actually I'd like to ask you about something else.", 1, "No, but thanks for your time.", 2) = 1) @feud_camel_menu;
     ~chatplayer("<p,neutral>No, but thanks for your time.");
     return;
 }
@@ -199,11 +199,11 @@ if (%feud_var < ^feud_camels_purchased) %feud_var = ^feud_camels_purchased;
 
 [label,feud_camel_ali]
 ~chatplayer("<p,neutral>I'm looking for Ali from Pollnivneach.");
-~chatnpc("<p,neutral>Well, you've found your man.");
-~chatplayer("<p,quiz>Really? Do you have an uncle called Ali?");
+~chatnpc("<p,neutral>Well you've found your man.");
+~chatplayer("<p,quiz>Really do you have an uncle called Ali?");
 ~chatnpc("<p,happy>Why yes - all my uncles are called Ali!");
 ~chatplayer("<p,neutral>Oh dear! Do any of them own a stall in the Al Kharid Bazaar?");
-~chatnpc("<p,neutral>Well no, but one of them owns a moderately successful camel hire franchise.");
+~chatnpc("<p,neutral>Well no, but one of them owns a camel hire franchise.");
 ~chatnpc("<p,neutral>Have you considered hiring a camel? Or perhaps purchasing one of your own? I can get you a discount.");
 ~chatplayer("<p,neutral>Never mind.");
 return;
