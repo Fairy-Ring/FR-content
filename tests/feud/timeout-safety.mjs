@@ -1320,7 +1320,7 @@ for (const location of ['inside', 'outside']) {
       processSelectedInteraction(p);
       assert.equal(target.getVar(stateVar), 2);
       assert.equal(target.targetOp, NpcMode.PLAYERFOLLOW);
-      walkRepeatToSeclusion(p, target, tick, preparationDeadline, false, allowedOwnerTile);
+      walkRepeatToSeclusion(p, target, tick, preparationDeadline, location === 'outside', allowedOwnerTile);
       assert(!hasWitness(p, target), 'the actual KO is unwitnessed, not the witnessed-failure branch');
       if (location === 'outside') assert.notDeepEqual([target.x, target.z], initialNpcTile,
         'ordinary PLAYERFOLLOW, not fixture relocation, moved the original NPC outside home range');
@@ -1355,6 +1355,7 @@ for (const location of ['inside', 'outside']) {
 
     const positions = [{ tick: 0, mode: NpcMode[target.targetOp], npc: [target.x, target.z] }];
     const events = [];
+    const hits = [];
     const damageMask = rsbuf.PlayerInfoProt.DAMAGE | rsbuf.PlayerInfoProt.DAMAGE2;
     const observe = ({ npc, tick }) => {
       events.push({
@@ -1365,7 +1366,18 @@ for (const location of ['inside', 'outside']) {
       });
     };
     const observedTick = () => {
-      countedWorldTick(tracked, null, observe);
+      // Player damage queues run after the NPC phase. Observe the real method
+      // at that point, before native cleanup clears its visible hitmark mask.
+      const applyDamage = p.applyDamage;
+      p.applyDamage = function (damage, type) {
+        const result = applyDamage.call(this, damage, type);
+        hits.push({
+          tick: World.currentTick - failure.tick, damage, type,
+          hp: this.levels[PlayerStat.HITPOINTS], visible: Boolean(this.masks & damageMask)
+        });
+        return result;
+      };
+      try { countedWorldTick(tracked, null, observe); } finally { p.applyDamage = applyDamage; }
       const previous = positions.at(-1);
       if (previous.mode !== NpcMode[target.targetOp] || previous.npc[0] !== target.x || previous.npc[1] !== target.z) {
         positions.push({ tick: World.currentTick - failure.tick, mode: NpcMode[target.targetOp], npc: [target.x, target.z] });
@@ -1377,9 +1389,9 @@ for (const location of ['inside', 'outside']) {
       'the actual compiled retaliation callback chooses its native range-dependent mode');
     if (location === 'inside') {
       assert.equal(target.targetOp, NpcMode.OPPLAYER2);
-      for (let ticks = 0; ticks < 48 && !events.some(event => event.hit && event.damage > 0); ticks++) observedTick();
+      for (let ticks = 0; ticks < 48 && !hits.some(hit => hit.visible && hit.damage > 0); ticks++) observedTick();
       assert(events.some(event => event.animation !== -1), 'native combat emits an NPC attack animation');
-      assert(events.some(event => event.hit && event.damage > 0),
+      assert(hits.some(hit => hit.visible && hit.damage > 0),
         'the player receives an ordinary visible positive-damage hitmark, not only an aggression variable');
       assert(p.levels[PlayerStat.HITPOINTS] < failure.hp, 'ordinary retaliation actually reduces player HP');
     } else {
@@ -1393,6 +1405,7 @@ for (const location of ['inside', 'outside']) {
       assert.notDeepEqual([target.x, target.z], failure.npc, 'the original NPC actually leaves the failed-KO position');
       assert(events.every(event => !event.hit && event.animation === -1),
         'outside-home retaliation supplies neither an attack animation nor a player hitmark');
+      assert.deepEqual(hits, [], 'the native player damage method receives no outside-home hit');
       assert.equal(p.levels[PlayerStat.HITPOINTS], failure.hp, 'no damage is dealt on the controlled outside-home clock');
     }
     assert.equal(xp(p), failure.xp);
@@ -1407,7 +1420,7 @@ for (const location of ['inside', 'outside']) {
       ticksObserved: World.currentTick - failure.tick,
       hpBefore: failure.hp, hpAfter: p.levels[PlayerStat.HITPOINTS],
       finalNpc: [target.x, target.z], finalMode: NpcMode[target.targetOp],
-      chat: p.messages.slice(failure.messageMark), positions, events
+      chat: p.messages.slice(failure.messageMark), positions, hits, events
     }));
   });
 }
