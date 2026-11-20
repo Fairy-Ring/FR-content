@@ -2,7 +2,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { gunzipSync } from 'node:zlib';
-import { afterEach, test } from 'node:test';
+import { afterEach } from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 
 import {
   CollisionType, Packet, World, contentRoot, count, engineModule, id, inv, invCom, map, obj, slotOf, types
@@ -264,3 +265,4 @@ test('fixed placement order never replaces an earlier pile and congestion is vis
   assert.equal(count(p, 'superhot_kebab_sauce'), 1);
   assert.equal(count(p, 'coins'), 7);
 }));
+sealLifecycle();

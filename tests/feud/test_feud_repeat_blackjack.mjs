@@ -2,7 +2,7 @@ import './deterministic-wander.mjs';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import test from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 
 import {
   PlayerStat, ScriptProvider, ServerTriggerType, World, contentRoot, count, engineModule, id, map,
@@ -553,3 +553,4 @@ test('witnessed Bandit KO applies the period 4 HP, stun and attack outcome', () 
   assert.equal(count(p, 'coins'), beforeCoins);
   assert.equal(stage(p), 28);
 });
+sealLifecycle();

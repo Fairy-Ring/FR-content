@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { finish } from './fixture.mjs';
@@ -280,3 +280,4 @@ test('original Feud routes dispatch natively while other ladders remain generic'
 
   console.log(`RESULT PASS feud-travel: ${ladderPairs.length} original ladder pairs and ${stairPairs.length} stair pairs round-tripped through native OPLOC dispatch; mayor-house interior position was a test fixture, not a door proof; other-region generic ladder stayed generic`);
 });
+sealLifecycle();

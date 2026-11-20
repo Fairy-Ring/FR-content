@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 
 import { button, count, held, id, inv, obj, remove, seed, use, worn } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
@@ -215,3 +215,4 @@ test('both original clue searches and Read options disclose the sourced Fibonacc
     assert.equal(count(p, note), 1, 'repeat Search does not duplicate a carried hint');
   }
 });
+sealLifecycle();

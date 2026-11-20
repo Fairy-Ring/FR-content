@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 
 import {
   CollisionType, World, count, engineModule, id, inv, map, obj, types
@@ -251,3 +251,4 @@ test('the trough feeds when both original camels occupy their farthest reachable
     Math.random = previousRandom;
   }
 });
+sealLifecycle();

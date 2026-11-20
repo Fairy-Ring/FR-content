@@ -1,7 +1,7 @@
 import './deterministic-wander.mjs';
 import { urchinSelectionTests } from './urchin-selection.mjs';
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 
 import {
   PlayerStat, World, count, engineModule, execute, id, inv, map, obj, remove, seed, tile, types
@@ -469,3 +469,4 @@ test('urchin refusal and double payment persist without consuming Morrisane fina
 });
 
 urchinSelectionTests();
+sealLifecycle();

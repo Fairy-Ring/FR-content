@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import test, { before } from 'node:test';
+import { before } from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 
 import { World, count, engineModule, id, inv, map, obj, types } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
@@ -141,3 +142,4 @@ test('the complete ordinary conversation keeps its business, directions and decl
   for (const recipe of recipes) assert.equal(count(p, recipe.dye), 0);
   assert.equal(stage(p), 0);
 });
+sealLifecycle();

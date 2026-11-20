@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 import {
   PlayerStat, ScriptState, ServerTriggerType, World, count, dialoguePage, engineModule, id,
   map, obj, resumeDialogue, seed
@@ -277,3 +277,4 @@ test('all original villager families expose the fourteen complete ordinary excha
     JavaRandom.nextDouble = oldRandom;
   }
 });
+sealLifecycle();

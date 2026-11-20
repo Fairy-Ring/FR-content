@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import test from 'node:test';
+import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 
 import { count, id, inv, invButton, obj, seed, types } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
@@ -386,3 +386,4 @@ test('free reusable sauce is capacity-safe and unavailable while another bottle 
   assert.equal(p.invTotal(id('InvType', 'bank'), obj('superhot_kebab_sauce')), 1);
   assert.equal(stage(p), 0);
 });
+sealLifecycle();
