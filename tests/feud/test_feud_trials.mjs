@@ -1,4 +1,5 @@
 import './deterministic-wander.mjs';
+import { urchinSelectionTests } from './urchin-selection.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
@@ -466,3 +467,5 @@ test('urchin refusal and double payment persist without consuming Morrisane fina
   assert.equal(count(p, 'coins'), 580, 'the final reward still pays its separate 500 coins');
   p.closeModal();
 });
+
+urchinSelectionTests();

@@ -33,23 +33,42 @@ if (%feud_var = ^feud_first_pick) %feud_urchin_again = 1;
 ~chatplayer("<p,neutral>Do you see that villager over there? If you could distract him for a bit I'll give you 10 gold coins.");
 ~chatnpc("<p,quiz>Is that it?");
 ~chatplayer("<p,neutral>That's it!");
-if (npc_find(coord, feud_villager_multi_2, 10, 0) = true) {
-    def_npc_uid $villager = npc_uid;
-    ~feud_urchin_do_distract($urchin, $villager);
-    return;
-}
-if (npc_find(coord, feud_villager_multi_3, 10, 0) = true) {
-    def_npc_uid $villager = npc_uid;
-    ~feud_urchin_do_distract($urchin, $villager);
-    return;
-}
-if (npc_find(coord, feud_villager_multi_1, 10, 0) = true) {
-    def_npc_uid $villager = npc_uid;
+def_npc_uid $villager = ~feud_urchin_find_villager;
+if ($villager ! null) {
     ~feud_urchin_do_distract($urchin, $villager);
     return;
 }
 ~feud_urchin_no_villager($urchin);
 return;
+
+// Keep npc_find's type priority, radius, squared-distance ordering and last-iterator tie.
+// Reconcile before excluding another player's active hold or follow.
+[proc,feud_urchin_find_villager]()(npc_uid)
+def_npc_uid $villager = ~feud_urchin_find_free(feud_villager_multi_2);
+if ($villager ! null) return($villager);
+$villager = ~feud_urchin_find_free(feud_villager_multi_3);
+if ($villager ! null) return($villager);
+return(~feud_urchin_find_free(feud_villager_multi_1));
+
+[proc,feud_urchin_find_free](npc $kind)(npc_uid)
+def_int $x = coordx(coord);
+def_int $z = coordz(coord);
+def_npc_uid $closest = null;
+def_int $distance = 0;
+npc_findall(coord, $kind, 10, 0);
+while (npc_findnext = true) {
+    ~feud_villager_reconcile;
+    if (%feud_villager_state = ^feud_villager_state_idle) {
+        def_int $dx = calc(coordx(npc_coord) - $x);
+        def_int $dz = calc(coordz(npc_coord) - $z);
+        def_int $square = calc($dx * $dx + $dz * $dz);
+        if ($closest = null | $square <= $distance) {
+            $closest = npc_uid;
+            $distance = $square;
+        }
+    }
+}
+return($closest);
 
 [proc,feud_urchin_do_distract](npc_uid $u, npc_uid $v)
 if (npc_finduid($v) = false) {
@@ -123,7 +142,7 @@ if (inv_total(inv, coins) < ^feud_urchin_payment_coins) { return; }
 inv_del(inv, coins, ^feud_urchin_payment_coins);
 %feud_var_urchin = 1;
 ~chatplayer("<p,neutral>Here you go, thanks.");
-~chatnpc("<p,neutral>Thanks sir, I didn't think you would hold up your side of the deal. There's not much honour amongst thieves, you know.");
+~chatnpc("<p,neutral>Thanks <text_gender("sir", "ma'am")>, I didn't think you would hold up your side of the deal. There's not much honour amongst thieves, you know.");
 ~chatnpc("<p,quiz>Well do you need any other information then?");
 @feud_urchin_info_choices;
 
@@ -144,16 +163,8 @@ def_npc_uid $urchin = npc_uid;
 ~chatplayer("<p,neutral>Hey there!");
 ~chatnpc("<p,quiz>Hi! Do you want to go rob some more people? I could do with some more money.");
 ~chatplayer("<p,neutral>Okay, let's do it again.");
-if (npc_find(coord, feud_villager_multi_2, 10, 0) = true) {
-    def_npc_uid $villager = npc_uid;
-    @feud_urchin_repeat_target($urchin, $villager);
-}
-if (npc_find(coord, feud_villager_multi_3, 10, 0) = true) {
-    def_npc_uid $villager = npc_uid;
-    @feud_urchin_repeat_target($urchin, $villager);
-}
-if (npc_find(coord, feud_villager_multi_1, 10, 0) = true) {
-    def_npc_uid $villager = npc_uid;
+def_npc_uid $villager = ~feud_urchin_find_villager;
+if ($villager ! null) {
     @feud_urchin_repeat_target($urchin, $villager);
 }
 if (npc_finduid($urchin) = true) {

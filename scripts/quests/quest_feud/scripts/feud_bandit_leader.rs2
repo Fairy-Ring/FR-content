@@ -7,7 +7,7 @@ if (%feud_var_banditboss = 1) {
     ~feud_champion_spawn(feud_bandit_toughguy);
     return;
 }
-~chatnpc("<p,neutral>Come here my friend, so I may embrace you. You have done us a great turn by disposing of those Menaphites.");
+~chatnpc("<p,neutral>Come here my friend, so I may embrace you. You have done us a great urn by disposing of those Menaphites.");
 ~chatplayer("<p,neutral>Don't jump to conclusions, I didn't do it for you.");
 ~chatnpc("<p,neutral>Regardless, I am still very grateful. Now I have the town at my mercy.");
 ~chatplayer("<p,neutral>That's what I'm here to talk to you about.");

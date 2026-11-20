@@ -355,6 +355,7 @@ multivar=feud_npc_multi
 multinpc=0,feud_arabian_guard1_1
 multinpc=1,feud_arabian_guard1_1
 multinpc=2,feud_arabian_guard1_2
+// CANDIDATE: combat stats copied from this base's own visible forms.
 hitpoints=30
 attack=59
 strength=70
@@ -426,6 +427,7 @@ multivar=feud_npc_multi
 multinpc=0,feud_arabian_guard2_1
 multinpc=1,feud_arabian_guard2_1
 multinpc=2,feud_arabian_guard2_2
+// CANDIDATE: combat stats copied from this base's own visible forms.
 hitpoints=30
 attack=40
 strength=50
@@ -861,6 +863,7 @@ multivar=feud_npc_multi
 multinpc=0,feud_egyptian_doorman_1
 multinpc=1,feud_egyptian_doorman_1
 multinpc=2,feud_egyptian_doorman_2
+// CANDIDATE: combat stats copied from this base's own visible forms.
 hitpoints=60
 attack=60
 strength=50
