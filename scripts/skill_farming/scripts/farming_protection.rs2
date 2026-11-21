@@ -185,6 +185,7 @@ if ($confirm = 2) {
 if (~farming_protection_hire($patch) = true) {
     ~chatnpc("That'll do nicely, <text_gender("sir", "madam")>. Leave it with me - I'll make sure that patch grows for you.");
 } else {
+    // UNKNOWN engineering fallback: the crop can cease to be hireable while confirmation is open.
     ~displaymessage(^dm_default);
 }
 
