@@ -60,3 +60,12 @@
 ^skeleton_mage_attack = 100
 ^nezikchened_mage_attack = 101
 ^saradomin_strike_npc = 104
+// Ancient Magicks
+^smoke_rush = 200
+^shadow_rush = 201
+^blood_rush = 202
+^ice_rush = 203
+^smoke_blitz = 204
+^shadow_blitz = 205
+^blood_blitz = 206
+^ice_blitz = 207

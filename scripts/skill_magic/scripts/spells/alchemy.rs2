@@ -77,7 +77,9 @@ def_namedobj $rune2;
 def_int $rune_count2;
 def_namedobj $rune3;
 def_int $rune_count3;
-$rune1, $rune_count1, $rune2, $rune_count2, $rune3, $rune_count3 = ~staff_runes($spell_data);
+def_namedobj $rune4;
+def_int $rune_count4;
+$rune1, $rune_count1, $rune2, $rune_count2, $rune3, $rune_count3, $rune4, $rune_count4 = ~staff_runes($spell_data);
 // Reserve only an object that can pay Fire on this world. On a free world,
 // a Steam target is not Fire credit: five plain Fire still pay High Alchemy.
 if ($item = firerune | (map_members = ^true & ($item = steamrune | $item = smokerune | $item = lavarune))) {
