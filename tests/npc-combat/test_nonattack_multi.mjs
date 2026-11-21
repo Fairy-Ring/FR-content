@@ -153,8 +153,12 @@ function addCrumbleRunes(player) {
   assert(values.length > 0 && values.length % 2 === 0, 'Crumble Undead has packed rune/count pairs');
   const inventory = player.getInventory(inventoryId);
   for (let index = 0; index < values.length; index += 2) {
-    const rune = namedReference(ObjType, values[index], 'Crumble Undead rune');
+    const runeId = values[index];
     const count = Number(values[index + 1]);
+    // Packed RuneScript null is -1; a half-absent pair is malformed.
+    assert.equal(runeId === -1, count === -1, 'Crumble Undead rune/count must be null together');
+    if (runeId === -1) continue;
+    const rune = namedReference(ObjType, runeId, 'Crumble Undead rune');
     assert(Number.isInteger(count) && count > 0, `${rune.debugname} has a positive packed requirement`);
     assert.equal(inventory.add(id(ObjType, rune.debugname), count), count, `${rune.debugname} fixture runes added`);
   }
@@ -191,6 +195,19 @@ function dispatchedOp2(f) {
 let checkedForms = 0;
 let feudMode = null;
 try {
+  const crumbleFixture = rt.fixture('skeletonmage');
+  try {
+    assert.equal(rt.param(NpcType.get(crumbleFixture.npc.type), 'undead'), 1, 'positive Crumble fixture is an original undead NPC');
+    addCrumbleRunes(crumbleFixture.player);
+    const names = ['chaosrune', 'airrune', 'earthrune'];
+    const before = names.map(name => crumbleFixture.player.invTotal(inventoryId, id(ObjType, name)));
+    observe('[proc,pvm_crumble_undead]', crumbleFixture);
+    assert.deepEqual(names.map((name, index) => [name, before[index] - crumbleFixture.player.invTotal(inventoryId, id(ObjType, name))]),
+      [['chaosrune', 1], ['airrune', 2], ['earthrune', 2]], 'Crumble Undead still pays exactly its three sourced runes and counts');
+  } finally {
+    rt.dispose();
+  }
+
   for (const baseName of noncombatBases) {
     const base = named(NpcType, baseName);
     assert.equal(rt.param(base, 'npc_noncombat_multi'), 1, `${baseName} carries the packed noncombat marker`);
