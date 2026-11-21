@@ -222,7 +222,9 @@ if (%damagestyle = ^style_melee_defensive) { // check varp directly
     $damagestyle = ^style_magic_defensive; // casting a spell with defensive on gives mage + def xp
 }
 // play spell cast sound
-sound_synth(db_getfield($spell_data, magic_spell_table:sound_cast, 0), 0, 0);
+if (db_getfield($spell_data, magic_spell_table:sound_cast, 0) ! null) {
+    sound_synth(db_getfield($spell_data, magic_spell_table:sound_cast, 0), 0, 0);
+}
 // roll 0-maxhit (npc_max_dealt before XP; pass spell for Leye/future caps)
 def_int $spell_for_cap = db_getfield($spell_data, magic_spell_table:spell, 0);
 def_int $damage = randominc(~npc_max_dealt($maxhit, $spell_for_cap));
@@ -270,7 +272,9 @@ spotanim_npc(db_getfield($spell_data, magic_spell_table:spotanim_target, 0), $du
 
 [proc,pvm_spell_fail](dbrow $spell_data, int $duration)
 // splash
-sound_synth(db_getfield($spell_data, magic_spell_table:sound_cast, 0), 0, 0);
+if (db_getfield($spell_data, magic_spell_table:sound_cast, 0) ! null) {
+    sound_synth(db_getfield($spell_data, magic_spell_table:sound_cast, 0), 0, 0);
+}
 sound_synth(spellfail, 1, $duration);
 spotanim_npc(failedspell_impact, 92, $duration);
 // splashing in osrs causes insta auto retal
