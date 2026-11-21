@@ -19,5 +19,10 @@
     "name": "Shade tombs",
     "bound": "CANNON-AREA-SHADE-TOMBS-01",
     "boxes": [[0, 3456, 9664, 0, 3519, 9727]]
+  },
+  {
+    "name": "Mort Myre Swamp",
+    "bound": "CANNON-AREA-MORT-MYRE-01",
+    "boxes": [[0, 3392, 3264, 0, 3455, 3455], [0, 3456, 3328, 0, 3519, 3455], [0, 3520, 3392, 0, 3583, 3455]]
   }
 ]
