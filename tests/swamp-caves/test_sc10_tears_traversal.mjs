@@ -375,13 +375,21 @@ try {
   });
   test('running and a full inventory keep the same safe endpoint and one presentation', () => {
     const p = fixture(stand, ['tog_sapphire_lantern_lit', ...Array(27).fill('hammer')]);
-    p.setVar(id('VarPlayerType', 'run'), 1); const before = stable(p);
+    p.tabs[8] = types.Component.get(id('Component', 'controls:com_5')).rootLayer;
+    assert(button(p, 'controls:com_5'));
+    assert.equal(p.getVar(id('VarPlayerType', 'option_run')), 1);
+    const before = stable(p);
     completeFerry(p); unchanged(p, before); silent(p); finish(p);
   });
   for (let elapsed = 0; elapsed < 6; elapsed++) {
     test(`disconnect after ${elapsed} ticks waits for unlock and saves only the safe ledge`, () => {
-      const p = fixture(); assert(useCreature(p)); ticks(p, elapsed);
+      const p = fixture();
+      // runtime.player() zeroes every int; -1 is the ordinary no-antifire state.
+      p.setVar(id('VarPlayerType', 'dragonresist'), -1);
+      assert(useCreature(p)); ticks(p, elapsed);
       const before = stable(p, { durableOnly: true });
+      // The real logout writes its timestamp, independently of this crossing.
+      before.vars.last_logout = World.currentTick + 6 - elapsed;
       p.lastResponse = World.currentTick - World.TIMEOUT_NO_RESPONSE;
       for (let remaining = elapsed; remaining < 6; remaining++) {
         World.processLogouts(); assert.equal(World.getPlayerByUid(p.uid), p);
