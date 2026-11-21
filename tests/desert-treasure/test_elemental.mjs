@@ -23,6 +23,7 @@ const { ScriptOpcodeNameMap } = await load('src/engine/script/ScriptOpcode.ts');
 const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
 const { EntityLifeCycle } = await load('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
+const { NpcStat } = await load('src/engine/entity/NpcStat.ts');
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType',
   'ObjType', 'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType',
@@ -182,6 +183,7 @@ function outcome(type, attack, seed, { original = false, successOnly = false, mi
       set(p, 'rockthrower', 30);
       set(p, 'ownedmcannon', (p.level << 28) | (p.x << 14) | p.z);
     }
+    if (attack.kind === 'cannon' && attack.style !== undefined) cannonStyle(p, attack.style);
     if (miss) set(p, 'com_magicattack', 0);
     JavaRandom.setSeed(seed);
     const beforeXp = Array.from(p.stats);
@@ -352,8 +354,16 @@ for (const type of unrelated) {
   console.log(`PASS unrelated ${type.id} ${type.debugname}: every spell and ammunition class at three real RNG seeds; melee`);
   checkCannon(type.id);
 }
+function cannonStyle(p, style) {
+  set(p, 'damagetype', style);
+  // Disclosed style-sensitive fixture: only the selected style can hit.
+  for (const [index, name] of ['com_stabattack', 'com_slashattack', 'com_crushattack', 'com_rangeattack', 'com_magicattack'].entries()) {
+    set(p, name, index === style ? 20000 : 0);
+  }
+}
+
 function checkCannon(type) {
-  const attack = { kind: 'cannon', row: [] }, seeds = [1, 2, 3, 7, 99, 6543];
+  const seeds = [1, 2, 3, 7, 99, 6543];
   const cannon = script('[proc,cannon_fire]'), cap = script('[proc,npc_max_dealt]');
   const maxDealt = id('ParamType', 'max_dealt');
   // Derive the former direct-cap control from this pack, not stored bytecode.
@@ -368,6 +378,28 @@ function checkCannon(type) {
   const saved = Object.fromEntries(fields.map(name => [name, cap[name]]));
   const callOpcode = [...ScriptOpcodeNameMap].find(([, name]) => name === 'GOSUB_WITH_PARAMS')[0];
   const nativeCall = ScriptRunner.HANDLERS[callOpcode];
+  function expected(seed) {
+    const { p, n } = fixture(type, ['Rune scimitar']);
+    cannonStyle(p, seed % 5);
+    const draws = [], nativeDouble = JavaRandom.nextDouble;
+    JavaRandom.setSeed(seed);
+    JavaRandom.nextDouble = function () { const value = nativeDouble.call(this); draws.push(value); return value; };
+    try {
+      // Independent of cannon_fire: native current-style accuracy, followed
+      // only on success by the inclusive ordinary cap's one damage draw.
+      const hit = run(p, n, '[proc,player_npc_hit_roll]', [seed % 5]).intStack[0];
+      const maximum = Math.min(30, types.NpcType.get(type).params.get(maxDealt) ?? types.ParamType.get(maxDealt).defaultInt);
+      const damage = hit ? Math.floor(JavaRandom.nextDouble() * (maximum + 1)) : 0;
+      const capped = Math.min(damage, n.levels[NpcStat.HITPOINTS]);
+      const multiplier = n.getVar(id('VarNpcType', 'npc_combat_xp_multiplier'));
+      const xp = Math.trunc(multiplier * (2 * capped) / 1000) * 10;
+      return { damage, xp, draws, nextRandom: JavaRandom.nextInt(1000000),
+        hero: capped > 0 ? [{ hash64: String(p.hash64), points: capped }] : [] };
+    } finally {
+      JavaRandom.nextDouble = nativeDouble;
+      World.removeNpc(n, 0); World.players[1] = null; p.unlink();
+    }
+  }
   function execute(seed, direct = false) {
     const draws = [], calls = [];
     const nativeSeed = JavaRandom.setSeed, nativeDouble = JavaRandom.nextDouble;
@@ -385,7 +417,7 @@ function checkCannon(type) {
     };
     try {
       // This path never invokes withPublished or its other attack fixtures.
-      const { commands: _commands, ...result } = outcome(type, attack, seed);
+      const { commands: _commands, ...result } = outcome(type, { kind: 'cannon', row: [], style: seed % 5 }, seed);
       return { result, draws, calls };
     } finally {
       Object.assign(cap, saved);
@@ -395,7 +427,14 @@ function checkCannon(type) {
   }
   let positives = 0;
   for (const seed of seeds) {
-    const before = execute(seed, true), after = execute(seed);
+    const independent = expected(seed), before = execute(seed, true), after = execute(seed);
+    assert.equal(after.result.damage, independent.damage, `${type} seed ${seed}: independent native damage`);
+    assert.deepEqual(after.draws, independent.draws, `${type} seed ${seed}: independent native draw values and order`);
+    assert.equal(after.result.nextRandom, independent.nextRandom, `${type} seed ${seed}: independent RNG continuation`);
+    assert.deepEqual(after.result.xp, Array.from({ length: after.result.xp.length }, (_, skill) =>
+      skill === PlayerStat.RANGED ? independent.xp : 0), `${type} seed ${seed}: independent damage-derived XP`);
+    assert.deepEqual(after.result.hero.filter(hero => hero.points > 0), independent.hero,
+      `${type} seed ${seed}: independent owner hero credit`);
     // All former observable comparisons remain, including admission, queued
     // and applied damage, XP, hero credit, variables, packets and next RNG.
     assert.deepEqual(after.result, before.result, `${type} cannon outcomes unchanged at seed ${seed}`);
