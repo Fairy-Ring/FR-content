@@ -46,7 +46,7 @@ export function elementalOracle({ p, n, attack, seed, successOnly, miss, types, 
   const playerVisual = [p.animId, p.animDelay, p.spotanimId, p.spotanimHeight, p.spotanimTime];
   const npcVisual = [n.animId, n.animDelay, n.spotanimId, n.spotanimHeight, n.spotanimTime];
   const effects = [], messages = [], ammoLoss = [];
-  let hero = 0, poisoned = false, refused = false;
+  let hero = 0, poisoned = false, refused = false, unfilteredDamage = 0;
   const effect = (command, ...ints) => effects.push({ command, ints });
   const sound = (sound, count, delay) => { if (sound !== -1) effect('SOUND_SYNTH', sound, count, delay); };
   const animate = (animation, delay = 0) => { playerVisual[0] = animation; playerVisual[1] = delay; effect('ANIM', animation, delay); };
@@ -147,6 +147,7 @@ export function elementalOracle({ p, n, attack, seed, successOnly, miss, types, 
       if (hit) {
         const maximum = attack.row[2];
         let damage = random.roll(cap(maximum));
+        unfilteredDamage = damage;
         const permit = n.type !== 1977 && n.type !== 1913 || (n.type === 1977 ? [1, 5, 9, 13] : [3, 7, 11, 15]).includes(attack.row[1]);
         if (!permit) damage = 0;
         if (!successOnly && ['claws_of_guthix', 'flames_of_zamorak'].includes(name)) {
@@ -181,6 +182,7 @@ export function elementalOracle({ p, n, attack, seed, successOnly, miss, types, 
       const hit = () => {
         const accurateHit = long || accurate(pv('damagetype'), short);
         let damage = accurateHit ? random.roll(cap(kind === 'ranged' && name === 'holy water' ? 0 : maximum)) : 0;
+        unfilteredDamage = Math.max(unfilteredDamage, damage);
         damage = elementalAmmo(damage);
         if (accurateHit) experience(damage);
         poison(damage, special);
@@ -226,6 +228,7 @@ export function elementalOracle({ p, n, attack, seed, successOnly, miss, types, 
     assert.equal(kind, 'melee');
     const hit = accurate(pv('damagetype'));
     const damage = hit ? random.roll(cap(pv('com_maxhit'))) : 0;
+    unfilteredDamage = damage;
     if (hit) experience(damage);
     animate(pv('com_attackanim')); sound(pv('com_attacksound'), 0, 0);
     retaliate(0); enqueue(damage, 0); defend(20); sound(param(target, 'defend_sound'), 0, 20);
@@ -237,7 +240,7 @@ export function elementalOracle({ p, n, attack, seed, successOnly, miss, types, 
   return { random, nextRandom: random.suffix(), inventory, playerVars, npcVars, npcLevels, xp, queue,
     hero: hero > 0 ? [{ hash64: String(p.hash64), points: hero }] : [], playerVisual, npcVisual, effects, messages, ammoLoss,
     damage: damageHits[0] ?? null, hitmark: damageHits.length ? { damage: Math.min(damageHits[0], n.levels[NpcStat.HITPOINTS]), type: damageHits[0] > 0 ? 1 : 0 } : undefined,
-    poisoned, refused };
+    poisoned, refused, unfilteredDamage };
 }
 
 export function assertElementalOutcome(actual, expected, label) {

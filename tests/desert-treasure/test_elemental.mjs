@@ -142,6 +142,8 @@ const rangedSpecials = [
   ['magic_longbow', 'Magic longbow', 'Rune arrow(p)'], ['rune_thrownaxe', 'Rune thrownaxe']
 ];
 const poisonWitnesses = new Set();
+const damageWitnesses = new Map();
+const attackCase = (type, attack) => JSON.stringify([type, attack.kind, attack.row]);
 function outcome(type, attack, seed, { successOnly = false, miss = false } = {}) {
   const equipment = attack.kind === 'magic' ? attack.row[3] ?? [] : ['melee', 'cannon'].includes(attack.kind) ? ['Rune scimitar'] : attack.row.slice(1);
   const { p, n } = fixture(type, equipment);
@@ -193,6 +195,7 @@ function outcome(type, attack, seed, { successOnly = false, miss = false } = {})
     if (expected) {
       assertElementalOutcome(result, expected, `${type} ${attack.kind}/${attack.row[0] ?? 'melee'} seed ${seed}${successOnly ? ' direct-success' : ''}${miss ? ' forced-miss' : ''}`);
       if (expected.poisoned) poisonWitnesses.add(attack.kind);
+      if (expected.unfilteredDamage > 0) damageWitnesses.set(attackCase(type, attack), seed);
     }
     return result;
   } finally {
@@ -224,6 +227,18 @@ function checkAttacks(type) {
   for (const seed of elementalSeeds) outcome(type.id, { kind: 'melee', row: [] }, seed);
   outcome(type.id, { kind: 'melee', row: [] }, 1, { miss: true });
   console.log(`PASS ${type.debugname}: independent fixed-seed damage, draws, XP, credit, payments, effects and admission`);
+  if (bosses.includes(type)) {
+    const cases = [
+      ...magic.map(row => ({ kind: 'magic', row })),
+      ...ranged.filter(row => !['poison javelins', 'holy water'].includes(row[0])).map(row => ({ kind: 'ranged', row })),
+      ...rangedSpecials.map(row => ({ kind: 'special', row })),
+      { kind: 'melee', row: [] }
+    ];
+    for (const attack of cases) {
+      assert(damageWitnesses.has(attackCase(type.id, attack)), `${type.debugname} ${attack.kind}/${attack.row.join(' ')} has a positive pre-immunity damage witness`);
+    }
+    console.log(`PASS ${type.debugname}: every required boss attack case has a positive pre-immunity damage witness`);
+  }
 }
 for (const type of [...bosses, ...unrelated]) {
   if (bosses.includes(type)) {
@@ -231,6 +246,20 @@ for (const type of [...bosses, ...unrelated]) {
     assert.equal(type.params.get(ammoParam) ?? -1, type.id === 1977 ? 78 : -1);
   }
   checkAttacks(type);
+  if (bosses.includes(type)) {
+    const attack = { kind: 'magic', row: type.id === 1977 ? magic[5] : magic[7] };
+    const seed = damageWitnesses.get(attackCase(type.id, attack));
+    const permitted = type.params.get(magicParam);
+    try {
+      type.params.set(magicParam, type.id === 1977 ? 3 : 1);
+      assert.throws(() => outcome(type.id, attack, seed), {
+        name: 'AssertionError', message: /independent damage/
+      }, `${type.debugname} wrong-element-param mutant must fail on damage`);
+    } finally {
+      type.params.set(magicParam, permitted);
+    }
+    console.log(`PASS wrong-element-param mutant ${type.debugname}: rejected by independent damage`);
+  }
   checkCannon(type.id);
 }
 assert.deepEqual([...poisonWitnesses].sort(), ['ranged', 'special'], 'fixed seeds exercise successful poison in both ordinary and special attacks');
