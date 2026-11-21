@@ -2,8 +2,8 @@
  * Deterministic compiled production-handler proof for the Ape Atoll course unit.
  * Run after the full content pack is built, from the sibling engine directory:
  *   node --import tsx ../content/tests/ape-agility/test_ape_atoll.mjs
- * Ordinary death uses independent keep/drop, stat-reset, respawn, tab and form
- * contracts. No recorded packets, command trace or compiled script is loaded.
+ * Ordinary death uses independent keep/drop, stat-reset, respawn, tab, form,
+ * modal, jingle, prayer-icon and worn-appearance contracts, not recordings.
  * It starts no server and writes its JSON receipt beneath RUNNER_TEMP.
  */
 import assert from 'node:assert/strict';
@@ -26,6 +26,7 @@ const { Inventory } = await eng('src/engine/Inventory.ts');
 const { default: Loc } = await eng('src/engine/entity/Loc.ts');
 const { EntityLifeCycle } = await eng('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStatMap } = await eng('src/engine/entity/PlayerStat.ts');
+const { PlayerInfoProt } = await eng('src/network/rsbuf/prot.ts');
 const { default: CategoryType } = await eng('src/cache/config/CategoryType.ts');
 const { default: Component } = await eng('src/cache/config/Component.ts');
 const { default: DbTableType } = await eng('src/cache/config/DbTableType.ts');
@@ -860,6 +861,16 @@ const inventoryItems = (player, inventory) => (player.invs.get(inventory)?.items
   .filter(Boolean).map(({ id, count }) => ({ id, count }));
 const byObjectId = (left, right) => left.id - right.id;
 
+function appearanceRightHand(appearance) {
+  // 377 appearance starts with gender and the two head-icon bytes.
+  let offset = 3;
+  for (let slot = 0; slot <= RIGHT_HAND; slot++) {
+    const high = appearance[offset++];
+    const value = high === 0 ? 0 : (high << 8) | appearance[offset++];
+    if (slot === RIGHT_HAND) return value;
+  }
+}
+
 function respawnSquare() {
   // Default Lumbridge anchor 0_50_50_21_18, radius 2. Sample zero selects
   // the first reachable tile in coordinate order, using the current collision map.
@@ -918,6 +929,13 @@ function assertOrdinaryDeath(player, death, expected) {
   assert.deepEqual(Array.from(player.stats), expected.stats, 'ordinary death preserves every skill XP value');
   assert.deepEqual(player.body, expected.body, 'ordinary death preserves body choices');
   assert.deepEqual(player.colors, expected.colors, 'ordinary death preserves appearance colours');
+  assert.equal(player.modalMain, -1, 'ordinary death closes the open main interface');
+  assert.equal(player.headicons, 0, 'ordinary death clears the active prayer head icon');
+  assert.equal(player.appearanceInv, WORN_INVENTORY, 'ordinary death uses worn equipment for its appearance');
+  assert(player.masks & PlayerInfoProt.APPEARANCE, 'ordinary death marks its post-drop appearance for transmission');
+  const appearance = player.generateAppearance();
+  assert.equal(appearanceRightHand(appearance), 0, 'ordinary death transmits no dropped right-hand object');
+  assert.equal(appearance[2], 0xff, 'ordinary death transmits no prayer head icon');
   assert.equal(player.runenergy, 10000, 'ordinary death fully restores run energy');
   for (const name of ['death', 'pk_skull', 'poison', 'prayer_drain_effect', 'prayer_drain_counter',
     ...Array.from({ length: 15 }, (_, index) => `prayer${index}`)]) {
@@ -941,7 +959,9 @@ function assertOrdinaryDeath(player, death, expected) {
   assert.equal(World.currentTick, expected.endTick, 'ordinary death settles both native delays');
   assert(death.events.some(event => event.kind === 'playAnimation' && event.animation === packId('seq', 'human_death')),
     'ordinary death actually plays the human death animation');
-  assert(player.packets.some(packet => packet.constructor.name === 'MidiJingle'), 'ordinary death actually transmits its death jingle');
+  const jingle = player.packets.filter(packet => packet.constructor.name === 'MidiJingle').at(-1);
+  assert(jingle, 'ordinary death actually transmits its death jingle');
+  assert.equal(jingle.id, packId('midi', 'death2'), 'ordinary death transmits the named death2 jingle');
   assert(![...player.timers.values()].some(timer =>
     [greegreeTimerScript.name, '[timer,prayer_drain]', '[softtimer,pk_skull_timer]'].includes(timer.script.name)),
   'ordinary death clears form, prayer and skull timers');
@@ -1010,6 +1030,17 @@ for (const skulled of [false, true]) for (const protectItem of [false, true]) {
     .map(name => packId('obj', name));
   player.invSet(WORN_INVENTORY, objects[0], 1, RIGHT_HAND);
   objects.slice(1).forEach((id, slot) => player.invSet(MAIN_INVENTORY, id, 1, slot));
+  player.openMainModal(packId('interface', 'welcome_screen'));
+  assert.notEqual(player.modalMain, -1, 'interface closure starts with an open main interface');
+  player.headicons = 1 << 5; // 377 protection-from-magic appearance bit, matching prayer12.
+  player.buildAppearance(WORN_INVENTORY);
+  const appearanceBefore = player.generateAppearance();
+  assert.equal(appearanceRightHand(appearanceBefore), 0x200 + objects[0],
+    'the pre-death appearance actually displays the worn sword');
+  assert.notEqual(appearanceBefore[2], 0xff, 'prayer-icon clearing starts with a visible protection icon');
+  player.masks &= ~PlayerInfoProt.APPEARANCE;
+  assert.equal(player.masks & PlayerInfoProt.APPEARANCE, 0,
+    'the pre-death appearance has no pending appearance update');
   const expectedKeepCount = (skulled ? 0 : 3) + (protectItem ? 1 : 0);
   assert(player.levels.every((level, stat) => level !== player.baseLevels[stat]),
     'every stat reset has a non-base witness before death');
