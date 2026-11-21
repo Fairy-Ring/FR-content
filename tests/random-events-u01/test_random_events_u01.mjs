@@ -75,43 +75,73 @@ function reload(directory) {
   DbTableIndex.init();
   assert(ScriptProvider.load(directory) > 0);
 }
-// The saved comparison is produced by executing the published pack, not by
-// projecting expected RuneScript or hashing bytecode. Default-only added varps
-// are absent; every changed varp, packet, queue, tile and inventory stays pinned.
-// Actor identities are checked within each run only, never pinned across publishes.
+// U01's no-event contract: ordinary login, death and teleport still work, while
+// event hooks cannot start an encounter or disturb a player with no active event.
+// Compare inert hooks with their own pre-state, not an unrelated login recording.
 const roots = ['[login,_]', '[queue,macro_event_login]', '[timer,general_macro_events]', '[proc,p_telejump_safe]', '[queue,player_death_default]', '[if_button,magic:lumbridge_teleport]'];
-function effects(root) {
+const eventVars = ['macro_event', 'macro_event_uid', 'macro_event_origin_coord', 'macro_event_target_coord', 'macro_transmit'];
+const contents = inventory => inventory.filter(Boolean).sort(([a], [b]) => a.localeCompare(b));
+function normalTabs(p) {
+  for (const [tab, name] of [[3, 'inventory'], [4, 'wornitems'], [6, 'magic'], [10, 'logout']]) {
+    assert.equal(p.tabs[tab], requiredId(types.Component, name), `ordinary ${name} tab remains available`);
+  }
+}
+function noEventEffects(root) {
   const p = player();
   if (root.includes('death')) for (const item of ['bronze_pickaxe', 'airrune', 'lawrune']) give(p, item);
   if (root.includes('if_button')) for (const [item, quantity] of [['lawrune', 1], ['airrune', 3], ['earthrune', 1]]) give(p, item, quantity);
-  const random = Math.random;
+  const before = snapshot(p);
+  const beforeEvent = eventVars.map(name => p.getVar(v(name)));
+  const random = Math.random, nextDouble = JavaRandom.nextDouble, enabled = Environment.NODE_RANDOM_EVENTS;
   Math.random = () => 0.5;
-  // A fixed clock makes the new permanent Farming checkpoint reproducible.
+  JavaRandom.nextDouble = () => 0.2;
+  Environment.NODE_RANDOM_EVENTS = false;
+  p.afkEventReady = true; // A ready roll must still be inert with the engine flag off.
   const dateMinutes = ScriptRunner.HANDLERS[op.DATE_MINUTES];
-  ScriptRunner.HANDLERS[op.DATE_MINUTES] = state => state.pushInt(30000000);
+  ScriptRunner.HANDLERS[op.DATE_MINUTES] = state => state.pushInt(30000000); // Labelled deterministic fixture clock.
   try {
-    const beforeActors = actorInventory();
     run(p, root, root.includes('p_telejump_safe') ? [D] : []);
     const after = snapshot(p);
-    assert.deepEqual(after.actors, beforeActors, `${root} must not change actor inventory`);
-    assert.equal(p.getVar(v('macro_event')), 0);
-    delete after.actors;
+    assert.deepEqual(after.actors, before.actors, `${root} must not change actor inventory`);
+    assert.deepEqual(eventVars.map(name => p.getVar(v(name))), beforeEvent, `${root} must not write encounter state`);
+    const eventQueues = after.queues.flat().filter(([name]) => name.includes('macro_event'));
+    assert.deepEqual(eventQueues, root === '[login,_]' ? [['[queue,macro_event_login]', 0, 0, [0]]] : [],
+      `${root} cannot schedule a new event or a later event effect`);
+    if (root === '[queue,macro_event_login]' || root === '[timer,general_macro_events]') {
+      assert.deepEqual(after, before, `${root} is completely inert without an active event`);
+    } else if (root === '[login,_]') {
+      assert.deepEqual(after.tile, before.tile, 'ordinary login does not move the player');
+      assert.deepEqual(after.inventory, before.inventory, 'ordinary login does not give or take items');
+      assert(p.messages.some(packet => packet.msg === 'Welcome to RuneScape.'));
+      normalTabs(p);
+    } else if (root === '[proc,p_telejump_safe]') {
+      assert.deepEqual(after.tile, [0, 3213, 3424], 'ordinary safe teleport reaches its exact destination');
+      for (const key of ['vars', 'inventory', 'tabs', 'modals']) assert.deepEqual(after[key], before[key], `safe teleport preserves ${key}`);
+      assert.deepEqual(p.messages.filter(packet => packet.msg), [], 'safe teleport emits no event message');
+    } else {
+      assert.equal(p.level, 0);
+      assert(Math.abs(p.x - 3221) <= 2 && Math.abs(p.z - 3218) <= 2, 'ordinary Lumbridge arrival is within its two-tile radius');
+      if (root.includes('death')) {
+        assert.deepEqual(contents(after.inventory), contents(before.inventory), 'ordinary death retains the three protected fixture items');
+        assert(p.messages.some(packet => packet.msg === 'Oh dear you are dead!'));
+        normalTabs(p);
+      } else {
+        assert.deepEqual(contents(after.inventory), [], 'ordinary Lumbridge spell consumes its runes and gives no event reward');
+        assert.deepEqual(after.tabs, before.tabs, 'ordinary spell does not hide tabs');
+        assert.deepEqual(after.modals, before.modals, 'ordinary spell leaves no event modal');
+        assert.deepEqual(p.messages.filter(packet => packet.msg), [], 'ordinary spell emits no event message');
+      }
+    }
     return after;
   } finally {
     Math.random = random;
+    JavaRandom.nextDouble = nextDouble;
+    Environment.NODE_RANDOM_EVENTS = enabled;
     ScriptRunner.HANDLERS[op.DATE_MINUTES] = dateMinutes;
   }
 }
-if (process.env.U01_CAPTURE_BASELINE) {
-  if (process.env.U01_PUBLISHED_PACK) reload(process.env.U01_PUBLISHED_PACK);
-  console.log(`PUBLISHED_EFFECTS ${JSON.stringify(Object.fromEntries(roots.map(root => [root, effects(root)])))}`);
-  process.exit(0);
-}
-const baseline = JSON.parse(readFileSync(new URL('./inert-effects.json', import.meta.url), 'utf8'));
-// With events off the published timer is inert, like the no-event login queue.
-// Published-pack mode also executes that timer to reproduce this saved projection.
-baseline.effects['[timer,general_macro_events]'] = baseline.effects['[queue,macro_event_login]'];
-for (const root of roots) check(`no-event effects match published pack ${root}`, () => assert.deepEqual(effects(root), baseline.effects[root]));
+const noEventResults = new Map();
+for (const root of roots) check(`event-off ordinary behavior ${root}`, () => noEventResults.set(root, noEventEffects(root)));
 check('event-off login keeps Farming growth and restores a saved stall lockout', () => {
   const p = player();
   const actorShapes = () => actors().map(([, name, level, x, z]) => [name, level, x, z])
@@ -149,21 +179,20 @@ check('event-off login keeps Farming growth and restores a saved stall lockout',
 if (process.env.U01_PUBLISHED_PACK) {
   reload(process.env.U01_PUBLISHED_PACK);
   try {
-    for (const root of roots) check(`saved effects are reproduced by published pack ${root}`, () => assert.deepEqual(effects(root), baseline.effects[root]));
+    for (const root of roots) check(`published-pack event-off ordinary behavior ${root}`, () => noEventEffects(root));
   } finally { reload(pack); }
 }
-check('negative control: a changed no-event teleport tile fails the effect predicate', () => {
-  const root = '[proc,p_telejump_safe]';
-  const expected = baseline.effects[root];
+check('negative control: a changed no-event teleport tile fails the behavior predicate', () => {
   const original = ScriptRunner.HANDLERS[op.P_TELEJUMP];
+  let changedTile;
   ScriptRunner.HANDLERS[op.P_TELEJUMP] = state => {
     original(state);
     state.activePlayer.x++;
+    changedTile = [state.activePlayer.level, state.activePlayer.x, state.activePlayer.z];
   };
   try {
-    const changed = effects(root);
-    assert.equal(changed.tile[1], expected.tile[1] + 1, 'the control changes the actual destination');
-    assert.throws(() => assert.deepEqual(changed, expected), assert.AssertionError);
+    assert.throws(() => noEventEffects('[proc,p_telejump_safe]'), /ordinary safe teleport reaches its exact destination/);
+    assert.deepEqual(changedTile, [0, 3214, 3424], 'the control changes the actual destination');
   } finally { ScriptRunner.HANDLERS[op.P_TELEJUMP] = original; }
 });
 check('static packed identities and client configs match the published pack', () => {
@@ -177,7 +206,8 @@ check('static packed identities and client configs match the published pack', ()
   assert.equal(origin.scope, types.VarPlayerType.SCOPE_PERM);
   assert.equal(origin.transmit, false);
   for (const name of ['macro_event', 'macro_event_target_coord']) assert.equal(types.VarPlayerType.get(v(name)).scope, types.VarPlayerType.SCOPE_PERM);
-  for (const [file, expected] of Object.entries(baseline.clientConfigs)) assert.equal(createHash('sha256').update(readFileSync(`${pack}/client/${file}`)).digest('hex'), expected, file);
+  const clientConfigs = JSON.parse(readFileSync(new URL('./client-configs.json', import.meta.url), 'utf8'));
+  for (const [file, expected] of Object.entries(clientConfigs)) assert.equal(createHash('sha256').update(readFileSync(`${pack}/client/${file}`)).digest('hex'), expected, file);
 });
 function genie(p) {
   run(p, '[proc,macro_event_general_spawn]', [2], { protect: false });
@@ -452,7 +482,7 @@ check('task death keeps normal location/items and cannot complete after reconnec
   assert.equal(p.getVar(v('macro_transmit')), 0, 'Lost and Found death clears its generated client progress');
   for (const tab of [3, 4, 6]) assert(p.tabs[tab] >= 0, 'normal interfaces return at death');
   assert.equal(plane, 0); assert(Math.abs(x - 3221) <= 2 && Math.abs(z - 3218) <= 2);
-  assert.deepEqual(snapshot(p).inventory, baseline.effects['[queue,player_death_default]'].inventory);
+  assert.deepEqual(contents(snapshot(p).inventory), contents(noEventResults.get('[queue,player_death_default]').inventory));
   run(p, '[queue,macro_event_login]');
   const before = snapshot(p); run(p, '[proc,macro_laf_complete]');
   assert.deepEqual(snapshot(p), before);
