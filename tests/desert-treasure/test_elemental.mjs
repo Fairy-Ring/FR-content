@@ -23,6 +23,7 @@ const { ScriptOpcodeNameMap } = await load('src/engine/script/ScriptOpcode.ts');
 const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
 const { EntityLifeCycle } = await load('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
+const { NpcStat } = await load('src/engine/entity/NpcStat.ts');
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType',
   'ObjType', 'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType',
@@ -70,12 +71,10 @@ function run(p, n, name, args = []) {
 }
 const published = JSON.parse(fs.readFileSync(new URL('./elemental-published.json', import.meta.url)));
 const publishedSpecials = JSON.parse(fs.readFileSync(new URL('./elemental-specials-published.json', import.meta.url)));
-const publishedCannon = JSON.parse(fs.readFileSync(new URL('./elemental-cannon-published.json', import.meta.url)));
 const paramIdentities = JSON.parse(fs.readFileSync(new URL('./elemental-published-params.json', import.meta.url)));
 const originalScripts = [
   ...published.scripts.map(record => [record, paramIdentities.published]),
-  ...publishedSpecials.scripts.map(record => [record, paramIdentities.specials]),
-  ...publishedCannon.scripts.map(record => [record, paramIdentities.specials])
+  ...publishedSpecials.scripts.map(record => [record, paramIdentities.specials])
 ];
 assert.equal(published.publishedContent, 'ccdca1101a225a38d2583e56ce1023ab028c8b75');
 assert.equal(published.publishedEngine, 'ef96f86623697dc0d5367cc0a889c4c56eb091d3');
@@ -184,6 +183,7 @@ function outcome(type, attack, seed, { original = false, successOnly = false, mi
       set(p, 'rockthrower', 30);
       set(p, 'ownedmcannon', (p.level << 28) | (p.x << 14) | p.z);
     }
+    if (attack.kind === 'cannon' && attack.style !== undefined) cannonStyle(p, attack.style);
     if (miss) set(p, 'com_magicattack', 0);
     JavaRandom.setSeed(seed);
     const beforeXp = Array.from(p.stats);
@@ -230,7 +230,7 @@ function outcome(type, attack, seed, { original = false, successOnly = false, mi
   return original ? withPublished(action) : action();
 }
 function withoutGuard(commands) {
-  // Published ranged/cannon overrides lack the new guard before native type
+  // Published ranged overrides lack the new guard before native type
   // checks. Melee shares its guard in both controls, followed by P_STOPACTION.
   const emptyType = c => c?.command === 'NPC_TYPE' && c.ints.length === 0 && c.strings.length === 0;
   const leadingGuard = emptyType(commands[0]) && emptyType(commands[1]);
@@ -354,15 +354,129 @@ for (const type of unrelated) {
   console.log(`PASS unrelated ${type.id} ${type.debugname}: every spell and ammunition class at three real RNG seeds; melee`);
   checkCannon(type.id);
 }
+function cannonStyle(p, style) {
+  set(p, 'damagetype', style);
+  // Disclosed style-sensitive fixture: only the selected style can hit.
+  for (const [index, name] of ['com_stabattack', 'com_slashattack', 'com_crushattack', 'com_rangeattack', 'com_magicattack'].entries()) {
+    set(p, name, index === style ? 20000 : 0);
+  }
+}
+
 function checkCannon(type) {
-  const attack = { kind: 'cannon', row: [] }, seed = positiveSeed(type, attack);
-  assert(seed !== null, `${type} cannon positive published witness`);
-  const before = outcome(type, attack, seed, { original: true }), after = outcome(type, attack, seed);
-  assert.equal(before.playerVars[id('VarPlayerType', 'rockthrower')], 29, 'native cannon spends one loaded ball');
-  assert.deepEqual(after.playerVars, before.playerVars, 'native cannon ammo counter and all player vars unchanged');
-  assert.deepEqual(after.inventory, before.inventory, 'no substitute cannonball/ashes inventory path');
-  assertIdentical(after, before, `${type} cannon unchanged from the published pack`);
-  console.log(`PASS ${type} packed cannon: published result, commands, credit and consumption`);
+  const seeds = [1, 2, 3, 7, 99, 6543];
+  const cannon = script('[proc,cannon_fire]'), cap = script('[proc,npc_max_dealt]');
+  const maxDealt = id('ParamType', 'max_dealt');
+  // Derive the former direct-cap control from this pack, not stored bytecode.
+  // The shared procedure's terminal expression is min(maxhit, NPC_PARAM).
+  const expression = ['PUSH_INT_LOCAL', 'PUSH_CONSTANT_INT', 'NPC_PARAM', 'MIN', 'RETURN'];
+  const starts = cap.opcodes.flatMap((_, pc) => expression.every((name, offset) =>
+    ScriptOpcodeNameMap.get(cap.opcodes[pc + offset]) === name) &&
+    cap.intOperands[pc] === 0 && cap.intOperands[pc + 1] === maxDealt ? [pc] : []);
+  assert(starts.length > 0, 'native default-cap expression exists in the built shared procedure');
+  const start = starts.at(-1);
+  const fields = ['opcodes', 'intOperands', 'stringOperands'];
+  const saved = Object.fromEntries(fields.map(name => [name, cap[name]]));
+  const callOpcode = [...ScriptOpcodeNameMap].find(([, name]) => name === 'GOSUB_WITH_PARAMS')[0];
+  const nativeCall = ScriptRunner.HANDLERS[callOpcode];
+  function expected(seed) {
+    const { p, n } = fixture(type, ['Rune scimitar']);
+    cannonStyle(p, seed % 5);
+    const draws = [], nativeDouble = JavaRandom.nextDouble;
+    JavaRandom.setSeed(seed);
+    JavaRandom.nextDouble = function () { const value = nativeDouble.call(this); draws.push(value); return value; };
+    try {
+      // Independent of cannon_fire: native current-style accuracy, followed
+      // only on success by the inclusive ordinary cap's one damage draw.
+      const hit = run(p, n, '[proc,player_npc_hit_roll]', [seed % 5]).intStack[0];
+      const maximum = Math.min(30, types.NpcType.get(type).params.get(maxDealt) ?? types.ParamType.get(maxDealt).defaultInt);
+      const damage = hit ? Math.floor(JavaRandom.nextDouble() * (maximum + 1)) : 0;
+      const capped = Math.min(damage, n.levels[NpcStat.HITPOINTS]);
+      const multiplier = n.getVar(id('VarNpcType', 'npc_combat_xp_multiplier'));
+      const xp = Math.trunc(multiplier * (2 * capped) / 1000) * 10;
+      return { damage, xp, draws, nextRandom: JavaRandom.nextInt(1000000),
+        hero: capped > 0 ? [{ hash64: String(p.hash64), points: capped }] : [] };
+    } finally {
+      JavaRandom.nextDouble = nativeDouble;
+      World.removeNpc(n, 0); World.players[1] = null; p.unlink();
+    }
+  }
+  function execute(seed, direct = false, target = type) {
+    const draws = [], calls = [];
+    const nativeSeed = JavaRandom.setSeed, nativeDouble = JavaRandom.nextDouble;
+    let recording = false;
+    if (direct) for (const field of fields) cap[field] = saved[field].slice(start, start + expression.length);
+    JavaRandom.setSeed = function (value) { nativeSeed.call(this, value); recording = true; };
+    JavaRandom.nextDouble = function () {
+      const value = nativeDouble.call(this);
+      if (recording) draws.push(value);
+      return value;
+    };
+    ScriptRunner.HANDLERS[callOpcode] = state => {
+      if (state.script === cannon && state.intOperand === cap.id) calls.push(state.intStack.slice(state.isp - 2, state.isp));
+      nativeCall(state);
+    };
+    try {
+      // This path never invokes withPublished or its other attack fixtures.
+      const { commands: _commands, ...result } = outcome(target, { kind: 'cannon', row: [], style: seed % 5 }, seed);
+      return { result, draws, calls };
+    } finally {
+      Object.assign(cap, saved);
+      ScriptRunner.HANDLERS[callOpcode] = nativeCall;
+      JavaRandom.setSeed = nativeSeed; JavaRandom.nextDouble = nativeDouble;
+    }
+  }
+  let positives = 0;
+  for (const seed of seeds) {
+    const independent = expected(seed), before = execute(seed, true), after = execute(seed);
+    assert.equal(after.result.damage, independent.damage, `${type} seed ${seed}: independent native damage`);
+    assert.deepEqual(after.draws, independent.draws, `${type} seed ${seed}: independent native draw values and order`);
+    assert.equal(after.result.nextRandom, independent.nextRandom, `${type} seed ${seed}: independent RNG continuation`);
+    assert.deepEqual(after.result.xp, Array.from({ length: after.result.xp.length }, (_, skill) =>
+      skill === PlayerStat.RANGED ? independent.xp : 0), `${type} seed ${seed}: independent damage-derived XP`);
+    assert.deepEqual(after.result.hero.filter(hero => hero.points > 0), independent.hero,
+      `${type} seed ${seed}: independent owner hero credit`);
+    // All former observable comparisons remain, including admission, queued
+    // and applied damage, XP, hero credit, variables, packets and next RNG.
+    assert.deepEqual(after.result, before.result, `${type} cannon outcomes unchanged at seed ${seed}`);
+    assert.deepEqual(after.draws, before.draws, `${type} cannon native draw count and order unchanged at seed ${seed}`);
+    assert(after.draws.length === 2 || after.draws.length === 3, 'two accuracy draws and a damage draw only on success');
+    assert.deepEqual(after.calls, after.draws.length === 3 ? [[30, 0]] : [], `${type} successful cannon obtains its cap through the shared procedure`);
+    assert.equal(after.result.playerVars[id('VarPlayerType', 'rockthrower')], 29, 'native cannon spends one loaded ball');
+    assert(after.result.queue.some(q => q.id === 2), 'ordinary and DT cannon hits remain admitted, including misses');
+    assert(after.result.damage >= 0 && after.result.damage <= 30, 'cannon maximum remains 30 independently of the control');
+    positives += Number(after.result.damage > 0);
+  }
+  assert(positives > 0, `${type} fixed seeds contain a positive native cannon witness`);
+  if (type === bosses[0].id) {
+    const harpie = id('NpcType', 'slayer_harpiebugswarm');
+    let gatedWitness = false;
+    for (const seed of seeds) {
+      const direct = execute(seed, true, harpie);
+      if (direct.result.damage === 0) continue;
+      const product = execute(seed, false, harpie);
+      assert.equal(product.result.damage, 0, 'bare harpie is gated in the product');
+      assert(product.result.xp.every(xp => xp === 0), 'bare harpie product awards no damage XP');
+      assert.deepEqual(product.draws, direct.draws, 'harpie control changes the cap, not the RNG stream');
+      assert.deepEqual(product.calls, [[30, 0]], 'harpie product reaches the shared cap');
+      gatedWitness = true;
+      console.log(`PASS bare harpie seed ${seed}: direct control damage ${direct.result.damage}, gated product damage 0`);
+      break;
+    }
+    assert(gatedWitness, 'in-memory direct control differs from the product on a gated harpie');
+  }
+  // A disclosed fixture cap proves the outcome comparison cannot hide both
+  // paths ignoring the same boss cap. This changes no product configuration.
+  const target = types.NpcType.get(type), hadCap = target.params.has(maxDealt), previousCap = target.params.get(maxDealt);
+  target.params.set(maxDealt, 3);
+  try {
+    for (const seed of seeds) {
+      const bounded = execute(seed);
+      assert(bounded.result.damage >= 0 && bounded.result.damage <= 3, `${type} cannon respects fixture NPC cap 3`);
+    }
+  } finally {
+    if (hadCap) target.params.set(maxDealt, previousCap); else target.params.delete(maxDealt);
+  }
+  console.log(`PASS ${type} packed cannon: current-pack direct-cap control, fixed-seed outcomes/draw order, shared call and bounded damage`);
 }
 const ice = object('Ice arrows');
 assert.equal(ice.id, 78); assert.equal(ice.debugname, 'ice_arrow');
