@@ -178,6 +178,8 @@ jobs:
           run_test tests/thieving-stalls/test_stalls.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --random-seed=377 --import tsx ../content/tests/thieving-stalls/test_stalls.mjs
           run_test tests/slayer-selector/test_slayer_selector.mjs node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --artifact-dir "$RUNNER_TEMP/slayer-selector"
           run_test tests/slayer-selector/test_proportional.mjs node --import tsx ../content/tests/slayer-selector/test_proportional.mjs --artifact-dir "$RUNNER_TEMP/slayer-proportional"
+          run_test tests/login/test_follower_login.mjs node --import tsx ../content/tests/login/test_follower_login.mjs
+          run_test tests/login/test_settings_login.mjs node --import tsx ../content/tests/login/test_settings_login.mjs
           run_test tests/skippy/test_skippy.mjs node --import tsx ../content/tests/skippy/test_skippy.mjs
           run_test tests/mogre/test_mogre.mjs node --import tsx ../content/tests/mogre/test_mogre.mjs
           run_test tests/empty-lord/test_empty_lord.mjs node --import tsx ../content/tests/empty-lord/test_empty_lord.mjs
