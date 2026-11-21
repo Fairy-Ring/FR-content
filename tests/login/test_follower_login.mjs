@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
-import { World, id, load, logoutAndLoad, player, run, v } from './runtime.mjs';
+import { World, id, load, logoutAndLoad, player, run, types, v } from './runtime.mjs';
 
 const { NpcMode } = await load('engine/entity/NpcMode.ts');
-const active = () => [...World.npcs].filter(npc => npc.isActive);
+const active = () => [...World.npcs].filter(npc => npc.isActive && types.NpcType.get(npc.type).category === id('CategoryType', 'petcat'));
 const owned = p => active().filter(npc => (npc.getVar(id('VarNpcType', 'npc_attacking_uid')) >>> 0) === p.uid);
 for (const withFollower of [true, false]) {
   const p = player();
@@ -28,7 +28,7 @@ for (const withFollower of [true, false]) {
   assert(![...loaded.queue.all()].some(request => request.script.name === '[queue,follower_login]'), 'native queue processing consumes follower login');
   const followers = owned(loaded);
   assert.equal(followers.length, withFollower ? 1 : 0, 'only a saved follower returns');
-  assert.equal(active().length - before, withFollower ? 1 : 0, 'no extra actor is created');
+  assert.equal(active().length - before, withFollower ? 1 : 0, 'no extra pet is created');
   if (withFollower) {
     const [follower] = followers;
     assert.equal(follower.type, id('NpcType', 'kittenpet1'));

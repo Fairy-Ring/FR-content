@@ -36,6 +36,24 @@ for (const column of [0, 1]) {
   console.log(`PASS compiled saved settings login: layout=${column}, settings=${declared('option_').length}`);
 }
 
+// Zero brightness selects the compiled first-login defaults, even when the
+// saved volume settings were nonzero. Observe both the server writes and wire.
+{
+  const p = player();
+  const defaults = { option_brightness: 2, option_music: 2, option_sounds: 2 };
+  for (const [name, value] of Object.entries({ option_brightness: 0, option_music: 4, option_sounds: 1 })) p.setVar(v(name), value);
+  const loaded = logoutAndLoad(p);
+  assert.equal(loaded.getVar(v('option_brightness')), 0, 'zero brightness survives actual save/load');
+  loaded.onLogin();
+  for (const [name, expected] of Object.entries(defaults)) {
+    assert.equal(loaded.getVar(v(name)), expected, `${name}: compiled zero-brightness branch writes default 2`);
+    const received = packets(loaded).filter(packet => packet.varp === v(name));
+    assert(received.length > 0, `${name}: login transmits the default`);
+    assert.equal(received.at(-1).value, expected, `${name}: final login update carries default 2`);
+  }
+  console.log('PASS compiled zero-brightness login defaults and transmission');
+}
+
 const bankNames = declared('bankpin_').map(type => type.debugname);
 assert(bankNames.includes('bankpin_delay_days') && bankNames.includes('bankpin_state'));
 for (const fixture of [
