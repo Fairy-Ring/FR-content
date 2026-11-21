@@ -40,6 +40,46 @@ const xp = [0, 300, 600, 1200];
 const bits = stationNames.map(name => types.VarBitType.getId(`canoestation_state_${name}`));
 const startBit = types.VarBitType.getId('canoe_startfrom');
 assert.ok(bits.every(id => id >= 0) && startBit >= 0, 'native 377 canoe state must exist');
+const modelIds = new Map(readFileSync(path.join(content, 'pack/model.pack'), 'utf8').trim().split('\n')
+  .map(line => [line.slice(line.indexOf('=') + 1), Number(line.slice(0, line.indexOf('=')))]));
+const hullModels = [[11, 'com_i711'], [7, 'com_i710'], [4, 'com_i709'], [15, 'com_i712']];
+const mapModels = [[3, 'com_i716'], [22, 'com_i708'], [23, 'com_i717'], [56, 'com_i720']];
+const destinationLayers = [13, 15, 17, 40, 33];
+const destinationModels = [14, 16, 18, 19, 32];
+const originLayers = [52, 49, 46, 38];
+const originModels = [53, 50, 47, 45];
+const component = (root, number) => types.Component.get(types.Component.getId(`${root}:com_${number}`));
+function assertNativeModel(root, number, model) {
+  const com = component(root, number);
+  assert.equal(com.comType, types.Component.TYPE_MODEL, `${root}:${number} is a native type-6 model, not a sprite`);
+  assert.equal(com.model, modelIds.get(model), `${root}:${number} has its own cache model without a server setter`);
+  assert.ok(com.zoom > 0, `${root}:${number} retains its native view`);
+  const asset = readFileSync(path.join(content, 'models/com', `${model}.ob2`));
+  assert.ok(asset.readUInt16BE(asset.length - 18) > 0, `${model} has vertices`);
+  assert.ok(asset.readUInt16BE(asset.length - 16) > 0, `${model} has faces`);
+}
+function assertPictures(p, packetStart, root, requiredModels) {
+  const packets = p.packets.slice(packetStart);
+  const rootId = types.Component.getId(root);
+  assert.ok(packets.some(packet => packet.constructor.name === 'IfOpenMain' && packet.component === rootId),
+    `${root} is actually opened by the compiled station handler`);
+  const hidden = new Map(packets.filter(packet => packet.constructor.name === 'IfSetHide')
+    .map(packet => [packet.component, packet.hidden]));
+  const visible = new Set();
+  function visit(id) {
+    const com = types.Component.get(id);
+    if (hidden.get(id) ?? com.hide) return;
+    visible.add(id);
+    for (const child of com.childId ?? []) visit(child);
+  }
+  visit(rootId);
+  for (const number of requiredModels) assert.ok(visible.has(component(root, number).id),
+    `${root}:${number} is reachable through visible native layers`);
+  assert.ok(!packets.some(packet => ['IfSetModel', 'IfSetObject', 'IfSetPosition'].includes(packet.constructor.name)
+    && types.Component.get(packet.component)?.rootLayer === rootId),
+  `${root} does not replace its already bound cache assets or layout`);
+  return hidden;
+}
 const locs = origins.map(([x, z], i) => World.getLoc(x, z, 0, types.LocType.getId(`canoeing_canoestation_${stationNames[i]}`)));
 assert.ok(locs.every(Boolean), 'all four original cache placements exist');
 for (const [x, z] of landings) {
@@ -55,7 +95,8 @@ function fixture(level = 99, axe = 'bronze_axe', equipped = false) {
   p.baseLevels.fill(1); p.levels.fill(1); p.vars.fill(0);
   p.baseLevels[wc] = level; p.levels[wc] = level;
   p.x = 3243; p.z = 3235; p.level = 0;
-  p.write = () => {};
+  p.packets = [];
+  p.write = packet => p.packets.push(packet);
   if (axe) p.invSet(equipped ? worn : inv, types.ObjType.getId(axe), 1, equipped ? 3 : 0);
   return p;
 }
@@ -85,6 +126,13 @@ function shape(p, hull) { run(p, `[if_button,canoeing:com_${hullButtons[hull - 1
 function trip(p, destination) { run(p, `[if_button,canoe_map:com_${destinationButtons[destination - 1]}]`); }
 let cases = 0;
 function check(name, fn) { fn(); cases++; console.log(`PASS ${name}`); }
+
+check('native pictures already bind nonempty cache models, without invented sprites or layout', () => {
+  for (const [number, model] of hullModels) assertNativeModel('canoeing', number, model);
+  for (const [number, model] of mapModels) assertNativeModel('canoe_map', number, model);
+  for (let d = 0; d < 5; d++) assertNativeModel('canoe_map', destinationModels[d], d === 4 ? 'com_i718' : 'com_i710');
+  for (const number of originModels) assertNativeModel('canoe_map', number, 'com_i719');
+});
 
 check('free worlds cannot start canoe construction', () => {
   Environment.NODE_MEMBERS = false;
@@ -118,7 +166,9 @@ for (let s = 0; s < 4; s++) {
       station(p, s);
       assert.equal(p.getVarBit(bits[s]), 10, 'tree becomes fallen only through its handler');
       assert.equal(p.getVarBit(startBit), s + 1);
+      let packetStart = p.packets.length;
       station(p, s);
+      assertPictures(p, packetStart, 'canoeing', hullModels.map(([number]) => number));
       p.levels[wc] = levels[h - 1] - 1;
       const before = p.stats[wc];
       shape(p, h);
@@ -133,8 +183,18 @@ for (let s = 0; s < 4; s++) {
       station(p, s);
       assert.equal(p.getVarBit(bits[s]), h + 4, 'float transforms only this station');
       for (let other = 0; other < 4; other++) if (other !== s) assert.equal(p.getVarBit(bits[other]), 0);
+      packetStart = p.packets.length;
       station(p, s);
       assert.equal(p.getVarBit(types.VarBitType.getId('canoe_type')), h, 'map hull comes from actual station');
+      const reachable = Array.from({ length: 5 }, (_, i) => i + 1)
+        .map(d => d !== s + 1 && (d === 5 ? h === 4 : Math.abs(d - (s + 1)) <= h));
+      const hidden = assertPictures(p, packetStart, 'canoe_map',
+        [...mapModels.map(([number]) => number), originModels[s],
+          ...destinationModels.filter((_, d) => reachable[d])]);
+      for (let d = 0; d < 5; d++) assert.equal(hidden.get(component('canoe_map', destinationLayers[d]).id),
+        !reachable[d], `map state station ${s + 1}, hull ${h}: destination ${d + 1} visibility command`);
+      for (let origin = 0; origin < 4; origin++) assert.equal(hidden.get(component('canoe_map', originLayers[origin]).id),
+        origin !== s, `map state station ${s + 1}, hull ${h}: origin ${origin + 1} visibility command`);
       for (let d = 1; d <= 5; d++) {
         const expected = d !== s + 1 && (d === 5 ? h === 4 : Math.abs(d - (s + 1)) <= h);
         const state = run(p, '[proc,canoe_can_travel]', null, [h, s + 1, d]);
