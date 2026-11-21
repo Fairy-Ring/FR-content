@@ -83,7 +83,7 @@ inv_setslot(inv, last_useslot, bucket_empty, ^farming_soil_returned_buckets);
 stat_advance(farming, db_getfield($row, farming_soil:experience, 0));
 mes(~farming_soil_application_message($index, $treatment));
 
-// CANDIDATE: the operator's template and allotment correction, 19 November 2026.
+// UNKNOWN: farming.compost-application-operator-wording records the recollection.
 // Fill two names in the single authored database string; allotment has no "patch".
 [proc,farming_soil_application_message](int $index, int $treatment)(string)
 def_string $patch = "allotment";

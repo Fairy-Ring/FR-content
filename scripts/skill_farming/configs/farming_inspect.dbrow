@@ -410,7 +410,7 @@ data=state,1086
 data=state,1087
 data=line,"The patch is fully grown."
 
-// CANDIDATE provisional disease: Allotment transcript rev37184156.
+// UNKNOWN provisional disease: later RS3 Allotment transcript rev37184156.
 // Operator: "Provisionally yes, I can't find a source for that specific wording".
 [farming_inspect_state_diseased]
 table=farming_inspect

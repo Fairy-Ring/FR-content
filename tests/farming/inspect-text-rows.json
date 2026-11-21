@@ -41,7 +41,7 @@
     },
     {
       "sentence": "The patch is diseased and needs attending to.",
-      "label": "CANDIDATE",
+      "label": "UNKNOWN",
       "provisional": true,
       "operatorAnswer": "3. Provisionally yes, I can't find a source for that specific wording",
       "operatorSource": "src.farming-inspect-operator-20261119",
@@ -215,7 +215,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -230,7 +230,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -261,7 +261,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -276,7 +276,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -319,7 +319,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -366,7 +366,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -381,7 +381,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -412,7 +412,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -459,7 +459,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -474,7 +474,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -507,7 +507,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -550,7 +550,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -565,7 +565,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -596,7 +596,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -611,7 +611,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -642,7 +642,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -689,7 +689,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -704,7 +704,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -735,7 +735,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -782,7 +782,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -797,7 +797,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -830,7 +830,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -889,7 +889,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -936,7 +936,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1047,7 +1047,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1142,7 +1142,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -1203,7 +1203,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1218,7 +1218,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1233,7 +1233,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1248,7 +1248,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1263,7 +1263,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1278,7 +1278,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1293,7 +1293,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1308,7 +1308,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1339,7 +1339,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1354,7 +1354,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1369,7 +1369,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1384,7 +1384,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1399,7 +1399,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1414,7 +1414,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1429,7 +1429,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1444,7 +1444,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1459,7 +1459,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1474,7 +1474,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1489,7 +1489,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1520,7 +1520,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1535,7 +1535,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1550,7 +1550,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -1567,7 +1567,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1582,7 +1582,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1609,7 +1609,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1624,7 +1624,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1639,7 +1639,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1654,7 +1654,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1669,7 +1669,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1684,7 +1684,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1699,7 +1699,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1714,7 +1714,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1745,7 +1745,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1760,7 +1760,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1775,7 +1775,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1790,7 +1790,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1805,7 +1805,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1820,7 +1820,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1835,7 +1835,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1850,7 +1850,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1865,7 +1865,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1880,7 +1880,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1895,7 +1895,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1926,7 +1926,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1941,7 +1941,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1956,7 +1956,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -1973,7 +1973,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -1988,7 +1988,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2015,7 +2015,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2046,7 +2046,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2061,7 +2061,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2092,7 +2092,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2107,7 +2107,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2154,7 +2154,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2185,7 +2185,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2200,7 +2200,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2231,7 +2231,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2246,7 +2246,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2277,7 +2277,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2292,7 +2292,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2339,7 +2339,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2370,7 +2370,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -2387,7 +2387,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a flower patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2430,7 +2430,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2445,7 +2445,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2460,7 +2460,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2475,7 +2475,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2490,7 +2490,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2505,7 +2505,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2520,7 +2520,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2535,7 +2535,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2566,7 +2566,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2581,7 +2581,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2596,7 +2596,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2611,7 +2611,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2626,7 +2626,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2641,7 +2641,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -2658,7 +2658,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2673,7 +2673,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2700,7 +2700,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2715,7 +2715,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2730,7 +2730,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2745,7 +2745,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2760,7 +2760,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2775,7 +2775,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2790,7 +2790,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2805,7 +2805,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2836,7 +2836,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2851,7 +2851,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2866,7 +2866,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2881,7 +2881,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2896,7 +2896,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2911,7 +2911,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -2928,7 +2928,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2943,7 +2943,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -2970,7 +2970,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3001,7 +3001,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3016,7 +3016,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3047,7 +3047,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3062,7 +3062,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3109,7 +3109,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3140,7 +3140,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3155,7 +3155,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3186,7 +3186,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -3203,7 +3203,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a herb patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3246,7 +3246,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3261,7 +3261,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3276,7 +3276,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3291,7 +3291,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3306,7 +3306,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3321,7 +3321,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3336,7 +3336,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3351,7 +3351,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3382,7 +3382,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3397,7 +3397,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3412,7 +3412,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3427,7 +3427,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3442,7 +3442,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3473,7 +3473,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3488,7 +3488,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3503,7 +3503,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -3520,7 +3520,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3535,7 +3535,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3562,7 +3562,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3577,7 +3577,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3592,7 +3592,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3607,7 +3607,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3622,7 +3622,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3637,7 +3637,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3652,7 +3652,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3667,7 +3667,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3698,7 +3698,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3713,7 +3713,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3728,7 +3728,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3743,7 +3743,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3758,7 +3758,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3789,7 +3789,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3804,7 +3804,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3819,7 +3819,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -3836,7 +3836,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3851,7 +3851,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3878,7 +3878,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3909,7 +3909,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3924,7 +3924,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3955,7 +3955,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -3970,7 +3970,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4017,7 +4017,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4048,7 +4048,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is fully grown.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4063,7 +4063,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4110,7 +4110,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4141,7 +4141,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is diseased and needs attending to.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-rs3-allotment-transcript-20260923",
       "approvedFor377": true,
       "sources": [
@@ -4158,7 +4158,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a hops patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4201,7 +4201,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a bush patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4216,7 +4216,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4231,7 +4231,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4246,7 +4246,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a bush patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4261,7 +4261,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4276,7 +4276,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4291,7 +4291,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a bush patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4306,7 +4306,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4321,7 +4321,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4336,7 +4336,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a bush patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4351,7 +4351,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4366,7 +4366,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4381,7 +4381,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a bush patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4396,7 +4396,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4411,7 +4411,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4426,7 +4426,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a bush patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4441,7 +4441,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4456,7 +4456,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4471,7 +4471,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4486,7 +4486,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4501,7 +4501,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4516,7 +4516,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4531,7 +4531,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4546,7 +4546,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4561,7 +4561,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4576,7 +4576,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4591,7 +4591,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4606,7 +4606,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4621,7 +4621,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4636,7 +4636,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4651,7 +4651,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4666,7 +4666,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4681,7 +4681,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4696,7 +4696,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4711,7 +4711,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4726,7 +4726,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4741,7 +4741,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a fruit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4756,7 +4756,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4771,7 +4771,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4786,7 +4786,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a fruit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4801,7 +4801,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4816,7 +4816,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4831,7 +4831,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a fruit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4846,7 +4846,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4861,7 +4861,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4876,7 +4876,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a fruit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4891,7 +4891,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4906,7 +4906,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4921,7 +4921,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a fruit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4936,7 +4936,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4951,7 +4951,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4966,7 +4966,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a fruit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4981,7 +4981,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -4996,7 +4996,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5011,7 +5011,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a cactus patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5026,7 +5026,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5041,7 +5041,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5056,7 +5056,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a cactus patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5071,7 +5071,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5086,7 +5086,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5101,7 +5101,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a cactus patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5116,7 +5116,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5131,7 +5131,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5146,7 +5146,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a cactus patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5161,7 +5161,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5176,7 +5176,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5191,7 +5191,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a cactus patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5206,7 +5206,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5221,7 +5221,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5236,7 +5236,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a cactus patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5251,7 +5251,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5266,7 +5266,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5281,7 +5281,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a belladonna patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5296,7 +5296,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5311,7 +5311,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5326,7 +5326,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a belladonna patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5341,7 +5341,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5356,7 +5356,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5371,7 +5371,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a belladonna patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5386,7 +5386,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5401,7 +5401,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5416,7 +5416,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a belladonna patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5431,7 +5431,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5446,7 +5446,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5461,7 +5461,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a belladonna patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5476,7 +5476,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5491,7 +5491,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5506,7 +5506,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a belladonna patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5521,7 +5521,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5536,7 +5536,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5551,7 +5551,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a mushroom patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5566,7 +5566,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5581,7 +5581,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5596,7 +5596,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a mushroom patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5611,7 +5611,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5626,7 +5626,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5641,7 +5641,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a mushroom patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5656,7 +5656,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5671,7 +5671,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5686,7 +5686,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a mushroom patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5701,7 +5701,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5716,7 +5716,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5731,7 +5731,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a mushroom patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5746,7 +5746,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5761,7 +5761,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5776,7 +5776,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a mushroom patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5791,7 +5791,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5806,7 +5806,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5821,7 +5821,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a calquat patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5836,7 +5836,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5851,7 +5851,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5866,7 +5866,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a calquat patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5881,7 +5881,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5896,7 +5896,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5911,7 +5911,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a calquat patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5926,7 +5926,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5941,7 +5941,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5956,7 +5956,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a calquat patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5971,7 +5971,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -5986,7 +5986,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6001,7 +6001,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a calquat patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6016,7 +6016,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6031,7 +6031,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6046,7 +6046,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a calquat patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6061,7 +6061,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6076,7 +6076,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6091,7 +6091,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a spirit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6106,7 +6106,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6121,7 +6121,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6136,7 +6136,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a spirit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6151,7 +6151,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has not been treated.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6166,7 +6166,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6181,7 +6181,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a spirit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6196,7 +6196,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6211,7 +6211,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6226,7 +6226,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a spirit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6241,7 +6241,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with compost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6256,7 +6256,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6271,7 +6271,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a spirit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6286,7 +6286,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6301,7 +6301,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch needs weeding.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6316,7 +6316,7 @@
       "order": 0,
       "condition": null,
       "text": "This is a spirit tree patch.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6331,7 +6331,7 @@
       "order": 1,
       "condition": null,
       "text": "The soil has been treated with supercompost.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [
@@ -6346,7 +6346,7 @@
       "order": 2,
       "condition": null,
       "text": "The patch is empty and weeded.",
-      "status": "CANDIDATE",
+      "status": "UNKNOWN",
       "source": "src.farming-inspect-operator-20261119",
       "approvedFor377": true,
       "sources": [

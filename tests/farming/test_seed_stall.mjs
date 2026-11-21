@@ -195,7 +195,7 @@ test('a real original owner or market guard seeing the thief prevents the reward
 });
 test('the kept published catcher model has one owner and does not make Master Farmer a guard', () => {
   // The period table's Master Farmer conflicts with the published row. Keep the
-  // operator's owner-plus-guards decision; farming.seed-stall-catcher-disagreement records it.
+  // UNKNOWN operator policy; farming.seed-stall-owner-plus-guards-policy records it.
   assert.equal(row.columnValues[1].length, 1);
   assert.equal(row.columnValues[2].length, 1);
   assert(!types.NpcType.get(id('NpcType', 'master_farmer_1')).op[1],

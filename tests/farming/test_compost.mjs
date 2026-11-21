@@ -257,7 +257,7 @@ const applicationMessages = {
 };
 
 test('one operator-recalled template renders both treatments for all 20 patch fields', () => {
-  // CANDIDATE: both verbatim operator answers are retained on 19 November 2026.
+  // UNKNOWN: farming.compost-application-operator-wording retains both operator answers.
   const p = fixture(groupSpecs[0].patchNames[0]);
   try {
     for (const group of groupSpecs) for (const patchName of group.patchNames) {
