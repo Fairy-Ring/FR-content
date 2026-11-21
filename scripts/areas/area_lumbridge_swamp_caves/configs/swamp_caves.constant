@@ -71,4 +71,12 @@
 ^tog_ledge = 2_50_148_38_26
 ^tog_ledge_juna = 2_50_148_40_26
 ^tog_slope_half_ticks = 2
+
+// TOG-FERRY-PRESENTATION-01: UNKNOWN engineering use of VERIFIED NPC 2022.
+// Keep the published three-tick halves and ledge destination. Centre the size-3
+// carrier under the size-1 rider. Its seven-tick lifetime also cleans up an
+// abandoned script, after the six-tick transfer's final player phase.
 ^tog_ferry_half_ticks = 3
+^tog_ferry_carrier_ticks = 7
+^tog_ferry_centre_offset = -1
+^tog_ferry_anim_delay = 0
