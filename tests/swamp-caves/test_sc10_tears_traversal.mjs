@@ -43,7 +43,15 @@ function test(name, run) {
   try { JavaRandom.setSeed(0); run(); console.log(`PASS ${name}`); }
   catch (error) { failures++; console.error(`FAIL ${name}: ${error.stack ?? error}`); }
 }
-function ticks(p, count) { for (let i = 0; i < count; i++) environmentTick(p); }
+const carryingType = id('NpcType', 'tog_light_creature_carrying');
+const carriers = () => [...World.npcs].filter(n => n.baseType === carryingType);
+function ticks(p, count) {
+  for (let i = 0; i < count; i++) {
+    // The carrier has no AI script. Run its native lifetime before player phases.
+    for (const n of carriers()) { n.resetEntity(false); n.turn(); }
+    environmentTick(p);
+  }
+}
 function owner(p, expected) {
   assert.equal(p.getVarBit(flag), Number(expected));
   assert.equal(p.timers.has(controller.id), expected);
@@ -136,12 +144,23 @@ function walk(p, destination, op = false) {
   return moveHandler.handle(new MoveClick(route, 0, op), p);
 }
 function completeFerry(p) {
+  assert.equal(carriers().length, 0);
   assert(useCreature(p)); assert(p.delayed); const start = World.currentTick;
-  ticks(p, 2); assert.deepEqual(tile(p), stand); owner(p, true);
+  const [carrier] = carriers(); assert(carrier, 'the VERIFIED carrying asset is actually used');
+  assert.equal(carrier.width, 3);
+  assert.deepEqual([carrier.level, carrier.x, carrier.z], [stand[0], stand[1] - 1, stand[2] - 1]);
+  assert.equal(p.animId, id('SeqType', 'tog_player_float_up'));
+  ticks(p, 2); assert.deepEqual(tile(p), stand); owner(p, true); assert.equal(carriers().length, 1);
   ticks(p, 1); assert.deepEqual(tile(p), ledge); owner(p, false);
+  assert.deepEqual([carrier.level, carrier.x, carrier.z], [ledge[0], ledge[1] - 1, ledge[2] - 1]);
+  assert.equal(p.animId, id('SeqType', 'tog_player_float_down'));
   assert.equal(p.moves.at(-1).tick, start + 3); assert.equal(p.moves.at(-1).owner, 0);
   assert.equal(p.moves.at(-1).overlay, -1, 'release happens BEFORE the landing teleport');
-  ticks(p, 2); assert(p.delayed); ticks(p, 1); assert(!p.delayed); assert(!p.activeScript);
+  ticks(p, 1); assert(p.delayed);
+  ticks(p, 1); assert(p.delayed);
+  assert.equal(carriers().length, 1, 'carrier remains present through tick 5 before unlock');
+  ticks(p, 1); assert(!p.delayed); assert(!p.activeScript);
+  assert.equal(p.animId, -1); assert.deepEqual(carriers(), [], 'carrier is deleted at unlock');
 }
 function load(p) {
   const bytes = p.save(); assert(PlayerLoading.verify(new Packet(bytes)));
@@ -176,6 +195,12 @@ try {
     const p = fixture(); assert(visible(p));
     for (let option = 1; option <= 5; option++) assert.equal(npcHandler.handle(new OpNpc(option, creature.nid), p), false);
     assert.deepEqual(creatures.map(n => n.type), Array(9).fill(type.id)); finish(p);
+  });
+  test('carrying form keeps its original size-three cache identity and no player menu', () => {
+    const type = types.NpcType.get(carryingType);
+    assert.deepEqual([...type.models], [6541]); assert.equal(type.size, 3);
+    assert.equal(type.readyanim, id('SeqType', 'light_creature_ready'));
+    assert.equal(type.walkanim, type.readyanim); assert.equal(type.op, null);
   });
   test('full entry, ledge and Juna floods admit only 52 entry-pocket firing tiles; each creature is isolated', () => {
     const bounded = (x, z) => x > 3175 && x < 3285 && z > 9450 && z < 9560;
@@ -339,6 +364,61 @@ try {
     assert.equal(p.requestLogout, false); assert.equal(p.activeScript, state);
     ticks(p, 6); assert.deepEqual(tile(p), ledge); assert.equal(p.moves.length, 1); unchanged(p, before); finish(p);
   });
+  test('two native uses in one input tick start one carrier and never requeue the crossing', () => {
+    const p = fixture(), before = stable(p);
+    assert(useCreature(p, 'tog_sapphire_lantern_lit', creature, false));
+    assert(useCreature(p, 'tog_sapphire_lantern_lit', creature, false));
+    p.processInteraction(); const state = p.activeScript;
+    assert(p.delayed); assert.equal(carriers().length, 1);
+    assert.equal(useCreature(p), false); p.processInteraction();
+    assert.equal(p.activeScript, state); assert.equal(carriers().length, 1);
+    assert.equal([...p.queue.all(), ...p.weakQueue.all()].filter(q => q.script === ferry).length, 0);
+    ticks(p, 12); assert.deepEqual(tile(p), ledge); assert.equal(p.moves.length, 1);
+    assert.deepEqual(carriers(), []); unchanged(p, before); silent(p); finish(p);
+  });
+  test('running and a full inventory keep the same safe endpoint and one presentation', () => {
+    const p = fixture(stand, ['tog_sapphire_lantern_lit', ...Array(27).fill('hammer')]);
+    p.tabs[8] = types.Component.get(id('Component', 'controls:com_5')).rootLayer;
+    assert(button(p, 'controls:com_5'));
+    assert.equal(p.getVar(id('VarPlayerType', 'option_run')), 1);
+    const before = stable(p);
+    completeFerry(p); unchanged(p, before); silent(p); finish(p);
+  });
+  for (let elapsed = 0; elapsed < 6; elapsed++) {
+    test(`disconnect after ${elapsed} ticks waits for unlock and saves only the safe ledge`, () => {
+      const p = fixture();
+      // runtime.player() zeroes every int; -1 is the ordinary no-antifire state.
+      p.setVar(id('VarPlayerType', 'dragonresist'), -1);
+      assert(useCreature(p)); ticks(p, elapsed);
+      const before = stable(p, { durableOnly: true });
+      // The real logout writes its timestamp, independently of this crossing.
+      before.vars.last_logout = World.currentTick + 6 - elapsed;
+      p.lastResponse = World.currentTick - World.TIMEOUT_NO_RESPONSE;
+      for (let remaining = elapsed; remaining < 6; remaining++) {
+        World.processLogouts(); assert.equal(World.getPlayerByUid(p.uid), p);
+        assert(p.loggingOut); assert.equal(p.canAccess(), false);
+        assert(!map.isMapBlocked(p.x, p.z, p.level));
+        assert.deepEqual(tile(p), remaining < 3 ? stand : ledge);
+        ticks(p, 1);
+      }
+      World.processLogouts(); assert.equal(World.getPlayerByUid(p.uid), null);
+      assert.deepEqual(tile(p), ledge); assert.deepEqual(carriers(), []);
+      World.logoutRequests.delete(p.username);
+      const q = load(p); execute('[login,_]', q); ticks(q, 2);
+      assert.deepEqual(tile(q), ledge); assert.equal(q.animId, -1);
+      owner(q, false); unchanged(q, before, { durableOnly: true }); finish(q);
+    });
+    test(`save/reload after ${elapsed} ticks discards motion on a safe bank and expires the orphan carrier`, () => {
+      const p = fixture(); assert(useCreature(p)); ticks(p, elapsed);
+      const expected = elapsed < 3 ? stand : ledge;
+      const before = stable(p, { durableOnly: true }), q = load(p);
+      p.activeScript = null; p.delayed = false; p.clearInteraction();
+      execute('[login,_]', q); ticks(q, 8);
+      assert.deepEqual(tile(q), expected); assert(!map.isMapBlocked(q.x, q.z, q.level));
+      assert.equal(q.animId, -1); assert(!q.activeScript); assert.deepEqual(carriers(), []);
+      owner(q, elapsed < 3); unchanged(q, before, { durableOnly: true }); finish(q);
+    });
+  }
   test('after unlock a ledge-side repeat cannot ferry again or create cave ownership', () => {
     const p = fixture(); completeFerry(p); const before = stable(p), mark = p.moves.length;
     // That creature is outside the ledge client's visibility. Native input refuses it.
