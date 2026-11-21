@@ -135,6 +135,8 @@ test('interrupting after the coin box preserves its payment flag without losing 
 
 test('accepting the final wares offer opens the real shop and still commits all completion rewards once', () => {
   const p = completionFixture(), before = xp(p);
+  const junkCount = () => ['bronze_pickaxe', 'bucket_empty', 'knife', 'raw_chicken', 'tinderbox']
+    .reduce((total, name) => total + count(p, name), 0);
   talk(p, 'feud_ali_m', [2]);
   assert.equal(stage(p), 28);
   assert.equal(read(p, 'feud_ali_money'), 1);
@@ -144,11 +146,15 @@ test('accepting the final wares offer opens the real shop and still commits all 
   assert.equal(p.modalMain, id('Component', 'shop_template'));
   assert.equal(p.getVar(id('VarPlayerType', 'shop')), id('InvType', 'feud_morrisanes'));
   p.closeModal();
+  assert.equal(count(p, 'coins'), 490, 'closing the completed-quest stock charges ten, not another quest payment');
+  assert.equal(junkCount(), 1, 'the first close gives one junk item alongside the charge');
   talk(p, 'feud_ali_m');
-  assert.equal(count(p, 'coins'), 500);
+  assert.equal(count(p, 'coins'), 490, 'the next conversation does not repeat the quest payment or sell before close');
   assert.equal(points(p), 1);
   assert.equal(xp(p), before + expectedXp);
   p.closeModal();
+  assert.equal(count(p, 'coins'), 480, 'the second eligible stock close charges exactly once again');
+  assert.equal(junkCount(), 2);
 });
 
 test('native owned champion fights, villager forms and the mayor carry the final chain without kill-bit shortcuts', () => {
