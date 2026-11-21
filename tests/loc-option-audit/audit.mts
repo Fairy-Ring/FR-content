@@ -147,6 +147,74 @@ export function readPlacements(pack = 'data/pack'): { maps: number; placements: 
   return { maps: maps.length, placements };
 }
 
+type ShapeAngleCoverage = {
+  shape: number;
+  angle: number;
+  placementCount: number;
+  typeIds: number[];
+  mapSquares: string[];
+  activePlacements: number;
+  inactivePlacements: number;
+  sample: Placement;
+  routingSupport: 'UNKNOWN';
+  collisionSupport: 'UNKNOWN';
+};
+
+function comparePlacements(left: Placement, right: Placement): number {
+  return compare(left.map, right.map)
+    || left.level - right.level
+    || left.x - right.x
+    || left.z - right.z
+    || left.type - right.type
+    || compare(left.key, right.key);
+}
+
+function groupPlacementsByShapeAngle(placements: Placement[]): ShapeAngleCoverage[] {
+  const groups = new Map<string, {
+    shape: number;
+    angle: number;
+    placements: Placement[];
+    typeIds: Set<number>;
+    mapSquares: Set<string>;
+    activePlacements: number;
+    inactivePlacements: number;
+  }>();
+  for (const placement of placements) {
+    const key = `${placement.shape}:${placement.angle}`;
+    let group = groups.get(key);
+    if (!group) {
+      group = {
+        shape: placement.shape,
+        angle: placement.angle,
+        placements: [],
+        typeIds: new Set(),
+        mapSquares: new Set(),
+        activePlacements: 0,
+        inactivePlacements: 0,
+      };
+      groups.set(key, group);
+    }
+    group.placements.push(placement);
+    group.typeIds.add(placement.type);
+    group.mapSquares.add(placement.map);
+    if (LocType.get(placement.type).active) group.activePlacements++;
+    else group.inactivePlacements++;
+  }
+  return [...groups.values()].map(group => ({
+    shape: group.shape,
+    angle: group.angle,
+    placementCount: group.placements.length,
+    typeIds: [...group.typeIds].sort((left, right) => left - right),
+    mapSquares: [...group.mapSquares].sort(compare),
+    activePlacements: group.activePlacements,
+    inactivePlacements: group.inactivePlacements,
+    sample: group.placements.slice().sort(comparePlacements)[0],
+    routingSupport: 'UNKNOWN',
+    collisionSupport: 'UNKNOWN',
+  })).sort((left, right) => left.shape - right.shape || left.angle - right.angle);
+}
+
+
 export function forms(root: LocType, client: Map<number, LocType>, limits: Set<string>): Form[] {
   const config = client.get(root.id);
   assert(config, `missing client loc ${root.id}`);
@@ -408,6 +476,32 @@ export function selfChecks(client: Map<number, LocType>, placements: Placement[]
     assert.equal(sourceDeadLocOptionFor(5159, 1, 'Cross'), SOURCE_DEAD_LOC_OPTIONS[1]);
     assert.equal(sourceDeadLocOptionFor(ids[0], 1, 'Synthetic odd Spelling'), undefined,
       'unrelated missing handler stays in the raw gaps');
+    const originalActive = LocType.get(ids[2]).active;
+    let shapeCoverage: ShapeAngleCoverage[];
+    try {
+      LocType.get(ids[2]).active = 0;
+      shapeCoverage = groupPlacementsByShapeAngle([
+        { ...fixture[0], key: 'shape-0-0-a', map: 'm1_0', shape: 0, angle: 0 },
+        { ...fixture[1], key: 'shape-0-0-b', map: 'm1_1', shape: 0, angle: 0 },
+        { ...fixture[0], key: 'shape-0-1', map: 'm1_2', shape: 0, angle: 1 },
+        { ...fixture[1], key: 'shape-10-0', map: 'm2_0', shape: 10, angle: 0 },
+        { ...fixture[2], key: 'shape-10-1', map: 'm2_1', shape: 10, angle: 1 },
+      ]);
+    } finally {
+      LocType.get(ids[2]).active = originalActive;
+    }
+    assert.deepEqual(shapeCoverage.map(group => [
+      group.shape, group.angle, group.placementCount, group.typeIds, group.mapSquares,
+      group.activePlacements, group.inactivePlacements,
+    ]), [
+      [0, 0, 2, [ids[0], ids[1]], ['m1_0', 'm1_1'], 2, 0],
+      [0, 1, 1, [ids[0]], ['m1_2'], 1, 0],
+      [10, 0, 1, [ids[1]], ['m2_0'], 1, 0],
+      [10, 1, 1, [ids[2]], ['m2_1'], 0, 1],
+    ], 'shape+angle grouping retains deterministic counts, distinct types, map squares and active-state split');
+    assert.equal(shapeCoverage[0].sample.key, 'shape-0-0-a', 'sample placement uses stable map/tile/type/key order');
+    assert(shapeCoverage.every(group => group.routingSupport === 'UNKNOWN' && group.collisionSupport === 'UNKNOWN'),
+      'shape support stays unknown unless a per-shape route/collision proof exists');
     if (output) {
       const file = path.join(output, 'self-check-fixtures.csv');
       csv(file, ['config_name', 'option_slot', 'option_text', 'kind', 'placement_count'], test.gaps.map(g => [typeName(g.type), g.slot, g.text, g.kind, g.placements.size]));
@@ -420,6 +514,7 @@ export function selfChecks(client: Map<number, LocType>, placements: Placement[]
     results.push('PASS synthetic placed option with a handler is absent from gaps');
     results.push('PASS bare RETURN handler is a separate gap kind');
     results.push('PASS hidden, HIDDEN and HiDdEn are not menu gaps, and a hidden-slot trigger remains recorded');
+    results.push('PASS two-shape/two-angle fixture groups placements deterministically with type, map, active split, sample and UNKNOWN support');
     provider.scriptLookup.set(trigger('OP', 1), handled);
     const globalRoute = scan([fixture[0]], synthetic);
     assert.equal(globalRoute.gaps.length, 0, 'a global handler is not a missing route');
@@ -479,6 +574,7 @@ export function runAudit(content: string, output: string): void {
   const inventory = readPlacements();
   const checks = selfChecks(client, inventory.placements, output);
   const audit = scan(inventory.placements, client);
+  const shapeGroups = groupPlacementsByShapeAngle(inventory.placements);
   const sourceDeadGaps = audit.gaps.filter(g => sourceDeadLocOptionFor(g.type, g.slot, g.text));
   const unknownGaps = audit.gaps.filter(g => !sourceDeadLocOptionFor(g.type, g.slot, g.text));
   const names = labels(content);
@@ -499,6 +595,30 @@ export function runAudit(content: string, output: string): void {
   csv(path.join(output, 'loc-options-inactive.csv'), gapHeader, inactiveRows.map(gapRow));
   csv(path.join(output, 'loc-options-dead-by-source.csv'), gapHeader, sourceDeadGaps.map(gapRow));
   csv(path.join(output, 'loc-placements.csv'), ['placement_key', 'placed_type', 'config_name', 'map_square', 'x', 'z', 'client_plane', 'shape', 'angle', 'server_entity_active'], inventory.placements.map(p => [p.key, p.type, typeName(p.type), p.map, p.x, p.z, p.level, p.shape, p.angle, LocType.get(p.type).active]));
+  csv(path.join(output, 'loc-placements-by-shape-angle.csv'), [
+    'shape', 'angle', 'placement_count', 'distinct_type_count', 'loc_types', 'map_square_count', 'map_squares',
+    'active_placements', 'inactive_placements', 'sample_placement_key', 'sample_type_id', 'sample_type_name',
+    'sample_map_square', 'sample_plane', 'sample_x', 'sample_z', 'routing_support', 'collision_support',
+  ], shapeGroups.map(group => [
+    group.shape,
+    group.angle,
+    group.placementCount,
+    group.typeIds.length,
+    group.typeIds.map(id => `${id}:${typeName(id)}`).join('; '),
+    group.mapSquares.length,
+    group.mapSquares.join('; '),
+    group.activePlacements,
+    group.inactivePlacements,
+    group.sample.key,
+    group.sample.type,
+    typeName(group.sample.type),
+    group.sample.map,
+    group.sample.level,
+    group.sample.x,
+    group.sample.z,
+    group.routingSupport,
+    group.collisionSupport,
+  ]));
   csv(path.join(output, 'loc-options-all.csv'), ['placed_root', 'visible_type', 'config_name', 'states', 'slot', 'text', 'kind', 'root_placement_count', 'ap_handler', 'op_handler'], audit.options.map(o => [typeName(o.root), o.form.type, typeName(o.form.type), o.form.states.map(s => s === null ? 'base' : s).join(';'), o.slot, o.text, o.kind, byRoot.get(o.root)!.length, scriptDescription(o.ap), scriptDescription(o.op)]));
   const aggregate = (keyFor: (g: Gap, p: Placement) => string) => {
     const groups = new Map<string, { rows: Set<Gap>; placements: Set<string>; associations: number; kinds: Map<string, number> }>();
@@ -567,6 +687,8 @@ export function runAudit(content: string, output: string): void {
     'A placement is deduplicated within each row. Distinct placements are physical map entries. Association totals count every potential form and option separately.',
     'Place means map square and sample tile. Optional labels use actual coordinates within 100 tiles, with distance. No underground projection or distant label is used.',
     'Mechanism groups are UNKNOWN engineering leads from option text and config name only. Groups are mutually exclusive in the listed order, not authenticated mechanisms.', '',
+    'Per-shape routing/collision support is not inferred from no-option rows. OpLocHandler.ts:37-62 validates and dispatches the visible loc option slot without a shape branch. GameMap.ts:338-348 forwards shape and angle to changeLocCollision only when the config blocks walking, and creates a static loc only when the config is active. These observations do not establish per-shape support, so both output categories remain UNKNOWN.',
+    'loc-placements-by-shape-angle.csv groups the same decoded placements by shape and angle, with deterministic counts, types, squares, active split and one stable sample.',
     '## Totals', '', '```json', JSON.stringify(summary, null, 2), '```', '',
     '## Dead by source', '',
     'Only the two exact revision-377 bridge `Cross` options already classified DEAD in locprop are listed here. No UNSOURCED proposal is admitted. The raw missing-option inventory and its gap totals still include these exact rows; the added disposition fields and sidecar CSV distinguish them from residual unknown gaps.',
@@ -575,6 +697,25 @@ export function runAudit(content: string, output: string): void {
     '|---|---:|---|---:|---|---|',
     ...sourceDeadGaps.map(g => `| ${[typeName(g.type), g.slot, g.text, g.placements.size, maps(g), sourceDeadLocOptionFor(g.type, g.slot, g.text)?.sourceIdentity ?? ''].map(md).join(' | ')} |`),
     '',
+    '## Placement shape/orientation coverage', '',
+    'Routing support and collision support are UNKNOWN per shape. The engine/client reads above do not prove every shape-specific interaction or collision case; no missing option is treated as an unsupported shape.',
+    '',
+    '| Shape | Angle | Placements | Distinct types | Map squares | Active | Inactive | Sample placement | Routing | Collision |',
+    '|---:|---:|---:|---:|---|---:|---:|---|---|---|',
+    ...shapeGroups.map(group => `| ${[
+      group.shape,
+      group.angle,
+      group.placementCount,
+      group.typeIds.map(id => `${id}:${typeName(id)}`).join('; '),
+      group.mapSquares.join('; '),
+      group.activePlacements,
+      group.inactivePlacements,
+      `${group.sample.key} ${group.sample.map} ${group.sample.type}:${typeName(group.sample.type)} ${tile(group.sample)}`,
+      group.routingSupport,
+      group.collisionSupport,
+    ].map(md).join(' | ')} |`),
+    '',
+
     '## Fifty most-placed gaps', '',
     '| Config | Slot | Option | Kind | Placements | Map squares | Sample tile | Nearby surface label |', '|---|---:|---|---|---:|---|---|---|'];
   for (const g of [...audit.gaps].sort((a, b) => b.placements.size - a.placements.size || a.type - b.type || a.slot - b.slot).slice(0, 50)) {
