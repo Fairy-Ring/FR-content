@@ -1687,7 +1687,7 @@ function testCurrentTeachingSuccess() {
     assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: teaching fixture combat mismatch`);
     const npc = makeNpc(IDS.masters.turael);
     assert.equal(eligibleMaster(player, npc, IDS.masters.turael), true, 'Turael should admit first teaching fixture');
-    const forced = streamForFirstEligible(master, fixture);
+    const forced = forcedStreamForRow(master, fixture);
     const acceptance = buildActualValidatorCache(player, npc, fixture, [forced.row.target], `${fixture.key}:teaching`);
     sentinelTask(player, 0, 0);
     const trace = traceWrites(player);
@@ -1727,7 +1727,7 @@ function testS8ProtectedReaders() {
     return { baselineCommit: S8_PROTECTED_BASELINE.commit, fingerprints };
 }
 
-function forcedStreamForRow(master, fixture, sourceName) {
+function forcedStreamForRow(master, fixture, sourceName = eligibleRows(master, fixture)[0]?.sourceName) {
     const index = master.rows.findIndex(row => row.sourceName === sourceName);
     assert(index >= 0, `${master.key}: missing selected source row ${sourceName}`);
     const row = master.rows[index];
@@ -1821,7 +1821,7 @@ function runS8CountZeroAssignment(masterKey, fixture, {
     } else {
         selected = sourceName
             ? forcedStreamForRow(master, fixture, sourceName)
-            : streamForFirstEligible(master, fixture);
+            : forcedStreamForRow(master, fixture);
         randomValues = selected.values;
         if (warningExpected) choices.push(1);
         choices.push(2);
@@ -2021,7 +2021,7 @@ function testS8DialogueCases(scriptPack, configs = scriptPack) {
     assert.equal(runInt(nonmemberConsentPlayer, '[proc,has_turael_task]').value, 0, 'earth warriors remain outside Turael categories');
     seedExistingGem(nonmemberConsentPlayer);
     const nonmemberConsentPrior = taskSnapshot(nonmemberConsentPlayer);
-    const nonmemberForced = streamForFirstEligible(turael, turaelHigh);
+    const nonmemberForced = forcedStreamForRow(turael, turaelHigh);
     const nonmemberConsent = runTrackedDialogue(nonmemberConsentPlayer, turaelNpc, '[opnpc1,_slayer_master]', [1, 1, 2], nonmemberForced.values, taskProcedures);
     assertS8SuccessfulAssignment(nonmemberConsentPlayer, turaelNpc, turaelHigh, nonmemberForced.row, nonmemberConsentPrior, nonmemberConsent, 'positive-count nonmember consent through Turael');
     assert.match(nonmemberConsent.pages.join(' '), /tougher assignment|new assignment if you.d like/i, 'Turael positive-count consent prompt missing');
