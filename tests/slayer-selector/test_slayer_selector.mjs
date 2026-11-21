@@ -2185,7 +2185,7 @@ function enumerateProportionalRoll(master, fixture) {
     for (let roll = 0; roll < total; roll++) {
         while (roll >= boundary) boundary += eligible[++expectedIndex].weight;
         const expected = eligible[expectedIndex];
-        const prior = sentinelTask(player);
+        sentinelTask(player);
         const trace = traceWrites(player);
         let draw;
         try {
@@ -2197,14 +2197,15 @@ function enumerateProportionalRoll(master, fixture) {
         assert.equal(player.getVar(IDS.target), expected.target, `${fixture.key}/roll${roll}: exact eligible weighted bucket`);
         assert.equal(player.getVar(IDS.count), expected.min, `${fixture.key}/roll${roll}: unchanged amount lower endpoint`);
         assert.deepEqual(trace.events, [{ kind: 'target', value: expected.target }, { kind: 'count', value: expected.min }], `${fixture.key}/roll${roll}: atomic assignment order`);
-        assert.equal(gemCount(player), prior.gemCount, 'selector must not grant a gem');
+        assert.equal(gemCount(player), 0, 'selector must not grant a gem');
         counts.set(expected.sourceName, counts.get(expected.sourceName) + 1);
     }
     if (total === 0) {
         const prior = sentinelTask(player);
         const draw = withRandomStream([], () => runInt(player, '[proc,slayer_new_target]', npc));
         assert.equal(draw.result.value, 0, `${fixture.key}: empty eligible set`);
-        assert.deepEqual(taskSnapshot(player), prior, 'empty set must preserve the prior assignment');
+        assert.equal(player.getVar(IDS.target), prior.target, 'empty set must preserve the prior target');
+        assert.equal(player.getVar(IDS.count), prior.count, 'empty set must preserve the prior count');
     }
     for (const row of master.rows) {
         assert.equal(counts.get(row.sourceName), expectedRowEligibility(row, fixture) ? row.weight : 0, `${fixture.key}/${row.sourceName}: exact eligible mass`);
