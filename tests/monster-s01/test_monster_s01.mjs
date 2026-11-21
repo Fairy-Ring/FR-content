@@ -124,8 +124,22 @@ function openPaths(names) {
       player.setVar(id(VarPlayerType, 'com_rangeattack'), 1000000);
       npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
       random([0.999999, 0, 0.999999], () => run('[proc,cannon_fire]', player, npc));
-      check(`${name} cannon without required equipment`, [...npc.queue.all()].map(q => q.lastInt), [0, 30]);
-      check(`${name} cannon damage-derived Ranged XP`, player.stats[PlayerStat.RANGED], Math.min(30, npc.levels[NpcStat.HITPOINTS]) * 20);
+      const maximum = name === 'slayer_harpiebugswarm' ? 0 : 30;
+      check(`${name} cannon without required equipment`, [...npc.queue.all()].map(q => q.lastInt), [0, maximum]);
+      check(`${name} cannon damage-derived Ranged XP`, player.stats[PlayerStat.RANGED], Math.min(maximum, npc.levels[NpcStat.HITPOINTS]) * 20);
+    }
+    if (name === 'slayer_harpiebugswarm') {
+      const { player, npc } = fixture(name);
+      wear(player, 5, 'slayer_buglan_on');
+      player.setVar(id(VarPlayerType, 'tutorial'), 1000);
+      player.setVar(id(VarPlayerType, 'rockthrower'), 10);
+      player.setVar(id(VarPlayerType, 'ownedmcannon'), ((player.x - 2) << 14) | player.z);
+      player.setVar(id(VarPlayerType, 'damagetype'), 3);
+      player.setVar(id(VarPlayerType, 'com_rangeattack'), 1000000);
+      npc.setVar(id(VarNpcType, 'npc_combat_xp_multiplier'), 1000);
+      random([0.999999, 0, 0.999999], () => run('[proc,cannon_fire]', player, npc));
+      check('harpie cannon with worn lit lantern', [...npc.queue.all()].map(q => q.lastInt), [0, 30]);
+      check('harpie lit-lantern cannon damage-derived XP', player.stats[PlayerStat.RANGED], Math.min(30, npc.levels[NpcStat.HITPOINTS]) * 20);
     }
     {
       const { player, npc } = fixture(name);
