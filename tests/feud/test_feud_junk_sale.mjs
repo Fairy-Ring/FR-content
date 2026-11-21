@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { lifecycleTest as test, sealLifecycle } from './completion.mjs';
 import {
-  Packet, PlayerLoading, World, count, engineModule, execute, id, inv, inventory, obj
+  Packet, PlayerLoading, ScriptProvider, World, contentRoot, count, engineModule, execute, id, inv, inventory, obj
 } from '../swamp-caves/runtime.mjs';
 import { player } from './player.mjs';
 import { actors, bit, operate, stage, talk, worldTick } from './fixture.mjs';
@@ -10,6 +11,7 @@ const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
 const closeHandler = new (await engineModule('network/game/client/handler/CloseModalHandler.ts')).default();
 const rsbuf = await engineModule('network/rsbuf/index.ts');
+const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
 const junk = ['bronze_pickaxe', 'bucket_empty', 'knife', 'raw_chicken', 'tinderbox'];
 const message = 'Despite your best efforts Ali Morrisane, the greatest salesman in the world, still manages to sell you some junk.';
 const shopRoot = id('Component', 'shop_template');
@@ -97,6 +99,42 @@ test('eligibility is checked at close and never spends the final coin slot as fr
   open(p); p.invDel(inv, obj('knife'), 1); close(p);
   assert.equal(count(p, 'coins'), 0, 'freeing a slot before close permits the transaction');
   assert.equal(totalJunk(p), 27);
+});
+
+test('a price above the threshold requires the whole charge before giving junk', () => {
+  const sale = ScriptProvider.getByName('[proc,feud_morrisane_junk_sale]');
+  assert(sale);
+  const lines = readFileSync(`${contentRoot}/scripts/quests/quest_feud/scripts/feud_morrisane_junk.rs2`, 'utf8').split('\n');
+  const operands = sale.intOperands;
+  // Vary only this compiled constant's loads, identified by current source/debug
+  // lines rather than stored bytecode offsets. The real close handler still runs.
+  sale.intOperands = [...operands];
+  let priceLoads = 0;
+  for (let pc = 0; pc < sale.opcodes.length; pc++) {
+    if (sale.opcodes[pc] === ScriptOpcode.PUSH_CONSTANT_INT && operands[pc] === 10 &&
+        lines[sale.lineNumber(pc) - 1]?.includes('^feud_junk_price')) {
+      sale.intOperands[pc] = 11; // UNKNOWN regression fixture, not the product price.
+      priceLoads++;
+    }
+  }
+  try {
+    assert(priceLoads > 0, 'the fixture varies the compiled price, not the threshold');
+    for (const money of [10, 11, 12]) {
+      const p = player(); p.invAdd(inv, obj('coins'), money); open(p);
+      const before = inventory(p), messages = p.messages.length;
+      close(p);
+      if (money < 11) {
+        assert.deepEqual(inventory(p), before, 'meeting the threshold cannot permit an underpaid sale');
+        assert.deepEqual(p.messages.slice(messages), []);
+      } else {
+        assert.equal(count(p, 'coins'), money - 11);
+        assert.equal(totalJunk(p), 1);
+        assert.deepEqual(p.messages.slice(messages), [message]);
+      }
+    }
+  } finally {
+    sale.intOperands = operands;
+  }
 });
 
 test('refusal, another shop and other interface closes cannot invoke Morrisane sales', () => {

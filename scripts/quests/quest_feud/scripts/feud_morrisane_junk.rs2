@@ -5,7 +5,9 @@
 [proc,feud_morrisane_junk_sale]
 def_boolean $on_close = ^feud_junk_sale_on_close;
 if ($on_close = false) return;
-if (inv_total(inv, coins) < ^feud_junk_min_coins | inv_freespace(inv) = 0) return;
+def_int $coins = inv_total(inv, coins);
+if ($coins < ^feud_junk_min_coins | inv_freespace(inv) = 0) return;
+if ($coins < ^feud_junk_price) return;
 def_int $roll = random(^feud_junk_choices);
 def_namedobj $junk = bronze_pickaxe;
 if ($roll = 1) $junk = bucket_empty;
