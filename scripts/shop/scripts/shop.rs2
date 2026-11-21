@@ -23,7 +23,6 @@ if_openmain_side(shop_template, shop_template_side);
 [if_close,shop_template]
 inv_stoptransmit(shop_template_side:inv);
 inv_stoptransmit(shop_template:inv);
-if (%shop = feud_morrisanes) ~feud_morrisane_junk_sale;
 
 // CANDIDATE: leftover village_trade_sticks is Tai Bwo currency (Update 9 Aug 2005).
 // Gabooty leftover invs pay in sticks; other shops stay coins.

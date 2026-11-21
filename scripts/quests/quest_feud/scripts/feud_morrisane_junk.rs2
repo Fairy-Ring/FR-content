@@ -1,11 +1,8 @@
 // CANDIDATE message: pre-2022 transcripts 9602124 and 18411641.
 // CANDIDATE eligibility and equal item mix: src.feud-morrisane-store-15355193.
-// UNKNOWN charge and every-close timing: feud_junk.constant.
-// Like party_drop_chest and trawler_catch, this close callback performs only
-// synchronous inventory work. It opens no interface and schedules no script.
+// UNKNOWN price: feud_junk.constant. An ineligible refusal simply ends, with no
+// source for an alternative reply; do not invent one.
 [proc,feud_morrisane_junk_sale]
-def_boolean $on_close = ^feud_junk_sale_on_close;
-if ($on_close = false) return;
 def_int $coins = inv_total(inv, coins);
 if ($coins < ^feud_junk_min_coins | inv_freespace(inv) = 0) return;
 if ($coins < ^feud_junk_price) return;

@@ -1,7 +1,7 @@
 // Actions and rewards: VERIFIED period quest guides.
 // Opening and final-report wording: CANDIDATE pre-2022 transcript 18411641.
 // Missing refusal/repeat branches and saved reward flag: CANDIDATE transcript 15325427.
-// Junk eligibility is CANDIDATE; the close callback timing is UNKNOWN engineering.
+// Junk sale: CANDIDATE final wares refusal and message, transcripts 9602124/18411641.
 
 [opnpc1,feud_ali_m]
 if (%feud_var = ^feud_mayor_reveal) {
@@ -54,6 +54,8 @@ if ($go = 1) {
 [label,feud_ali_m_wares]
 if (~p_choice2("No, I'm really too busy.", 1, "Okay.", 2) = 2) {
     ~openshop_activenpc;
+} else {
+    ~feud_morrisane_junk_sale;
 }
 return;
 
