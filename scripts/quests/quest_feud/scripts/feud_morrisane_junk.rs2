@@ -1,0 +1,17 @@
+// CANDIDATE eligibility, equal item mix and message: src.feud-morrisane-store-15355193.
+// UNKNOWN charge and every-close timing: feud_junk.constant.
+// Like party_drop_chest and trawler_catch, this close callback performs only
+// synchronous inventory work. It opens no interface and schedules no script.
+[proc,feud_morrisane_junk_sale]
+def_boolean $on_close = ^feud_junk_sale_on_close;
+if ($on_close = false) return;
+if (inv_total(inv, coins) < ^feud_junk_min_coins | inv_freespace(inv) = 0) return;
+def_int $roll = random(^feud_junk_choices);
+def_namedobj $junk = bronze_pickaxe;
+if ($roll = 1) $junk = bucket_empty;
+else if ($roll = 2) $junk = knife;
+else if ($roll = 3) $junk = raw_chicken;
+else if ($roll = 4) $junk = tinderbox;
+inv_del(inv, coins, ^feud_junk_price);
+inv_add(inv, $junk, 1);
+mes("Despite your best efforts Ali Morrisane, the greatest salesman in the world, still manages to sell you some junk.");

@@ -1,0 +1,10 @@
+// CANDIDATE threshold and five equal alternatives: src.feud-morrisane-store-15355193, Junk.
+^feud_junk_min_coins = 10
+^feud_junk_choices = 5
+
+// FEUD-JUNK-PRICE-01: UNKNOWN engineering value, no source states the charge.
+^feud_junk_price = 10
+// FEUD-JUNK-CLOSE-01: UNKNOWN engineering reading of "after viewing", no source
+// gives the moment or repetition rule. Every basic-stock close sells again,
+// including logout and interruption closes; there is no one-time saved flag.
+^feud_junk_sale_on_close = 1

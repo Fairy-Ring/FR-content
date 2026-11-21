@@ -1,7 +1,7 @@
 // Actions and rewards: VERIFIED period quest guides.
 // Opening and final-report wording: CANDIDATE pre-2022 transcript 18411641.
 // Missing refusal/repeat branches and saved reward flag: CANDIDATE transcript 15325427.
-// The disputed forced junk sale is deferred; no coins or item move on refusal.
+// Junk eligibility is CANDIDATE; the close callback timing is UNKNOWN engineering.
 
 [opnpc1,feud_ali_m]
 if (%feud_var = ^feud_mayor_reveal) {
