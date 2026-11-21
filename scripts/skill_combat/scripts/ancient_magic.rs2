@@ -1,0 +1,83 @@
+// B-ANCIENTS1. Main's named defaults are pending on the operator decision sheet.
+[proc,combat_spellbook_allowed](dbrow $spell_data)(boolean)
+if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) ! null) {
+    if (%deserttreasure = ^dt_stage_complete & %alternate_spells = ^dt_spellbook_ancient) return(true);
+    return(false);
+}
+if (%alternate_spells = ^dt_spellbook_standard) return(true);
+return(false);
+
+[proc,combat_spell_cooldown](dbrow $spell_data)(int)
+if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) ! null) return(^ancient_cast_cooldown);
+return(5);
+
+// UNKNOWN ANCIENT_EFFECT_GATE_PHASE: successful accuracy, including rolled zero.
+// NPC effects share the NPC damage queue's delay and survive a caster's next action.
+[proc,ancient_npc_effect_queue](dbrow $spell_data, int $rolled_damage, int $delay)
+def_int $family = db_getfield($spell_data, magic_spell_table:ancient_effect, 0);
+if ($family = null) return;
+if ($family = 3) {
+    // CANDIDATE ANCIENT_BLOOD_DAMAGE_BASIS: roll before remaining-HP clipping.
+    // Player queues count down after testing delay, NPC queues before testing it.
+    queue(ancient_blood_heal, sub($delay, 1), $rolled_damage);
+    return;
+}
+if ($family = 1) {
+    if (random(^ancient_smoke_proc) ! 0) return;
+}
+npc_queue(9, db_getfield($spell_data, magic_spell_table:spell, 0), $delay);
+
+[ai_queue9,_]
+def_dbrow $spell_data = ~get_spell_data(last_int);
+switch_int(db_getfield($spell_data, magic_spell_table:ancient_effect, 0)) {
+    case 1 :
+        if (npc_type ! mudskipper_ogre) ~npc_poison_apply(db_getfield($spell_data, magic_spell_table:poison_severity, 0));
+    case 2 :
+        if (npc_category ! castlewars_barricade) {
+            // ANCIENT_SHADOW_DRAIN_RULE: a floor, never a stacking subtraction.
+            def_int $floor = sub(npc_basestat(attack), scale(^ancient_shadow_drain_rule, ^ancient_shadow_rounding, npc_basestat(attack)));
+            if (npc_stat(attack) > $floor) npc_statsub(attack, sub(npc_stat(attack), $floor), 0);
+        }
+    case 4 :
+        // UNKNOWN ANCIENT_ICE_CONSUMPTION_POLICY: movement only, no food/drink hook.
+        if (npc_category ! castlewars_barricade & add(%npc_stunned, ^ancient_ice_immunity_policy) <= map_clock) {
+            ~pvm_freeze_effect($spell_data);
+        }
+}
+
+[proc,ancient_player_effect_queue](dbrow $spell_data, int $rolled_damage, int $delay)
+def_int $family = db_getfield($spell_data, magic_spell_table:ancient_effect, 0);
+if ($family = null) return;
+if ($family = 3) {
+    queue(ancient_blood_heal, $delay, $rolled_damage);
+    return;
+}
+if ($family = 1) {
+    if (random(^ancient_smoke_proc) ! 0) return;
+}
+.queue*(ancient_player_impact, $delay)($spell_data, uid);
+
+// UNKNOWN ANCIENT_BLOOD_HEAL_RULE: favourable ceil once, through base-capped heal.
+[queue,ancient_blood_heal](int $rolled_damage)
+stat_heal(hitpoints, divide(add($rolled_damage, sub(^ancient_blood_heal_rule, 1)), ^ancient_blood_heal_rule), 0);
+
+[queue,ancient_player_impact](dbrow $spell_data, player_uid $caster)
+switch_int(db_getfield($spell_data, magic_spell_table:ancient_effect, 0)) {
+    case 1 : ~poison_player_apply(db_getfield($spell_data, magic_spell_table:poison_severity, 0));
+    case 2 :
+        def_int $floor = sub(stat_base(attack), scale(^ancient_shadow_drain_rule, ^ancient_shadow_rounding, stat_base(attack)));
+        if (stat(attack) > $floor) {
+            stat_sub(attack, sub(stat(attack), $floor), 0);
+            ~player_combat_stat;
+        }
+    case 4 :
+        // UNKNOWN ANCIENT_ICE_IMMUNITY_POLICY: Standard immunity, half protection,
+        // distance release and no-movement duel exclusion, applied only to the effect.
+        if (add(%frozen, ^ancient_ice_immunity_policy) <= map_clock & getwalktrigger() ! duel_arena_no_move) {
+            def_int $duration = db_getfield($spell_data, magic_spell_table:freeze_time, 0);
+            if (~check_protect_prayer(^magic_style) = true) $duration = divide($duration, 2);
+            p_walk(coord);
+            %pk_binder = $caster;
+            ~freeze_player($duration);
+        }
+}

@@ -1,0 +1,13 @@
+// Main's 21 November defaults, pending the operator decision sheet.
+// CANDIDATE later Old School chance, not a recovered period probability.
+^ancient_smoke_proc = 8
+// VERIFIED period-guide percentage. Non-stacking base threshold is CANDIDATE.
+^ancient_shadow_drain_rule = 10
+// UNKNOWN ANCIENT_SHADOW_ROUNDING: truncate base percentage, as stat_sub does.
+^ancient_shadow_rounding = 100
+// UNKNOWN ANCIENT_BLOOD_HEAL_RULE: ceil one quarter once per cast, base-HP cap.
+^ancient_blood_heal_rule = 4
+// UNKNOWN ANCIENT_ICE_IMMUNITY_POLICY: reuse Standard's post-freeze interval.
+^ancient_ice_immunity_policy = 5
+// CANDIDATE Standard and later Old School cast interval.
+^ancient_cast_cooldown = 5
