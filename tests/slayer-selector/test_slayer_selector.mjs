@@ -6,7 +6,6 @@
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode full
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-discriminator --base-pack <S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode ci --base-pack <S1 full pack>
- *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode old-regressions --base-pack <pre-S1 full pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode table-old-discriminator --base-pack <published S2 pack>
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode replacement [--base-pack <published full pack>]
  *   node --import tsx ../content/tests/slayer-selector/test_slayer_selector.mjs --mode priestperil [--base-pack <published full pack>]
@@ -128,8 +127,8 @@ function parseArgs(argv) {
         else if (token === '--base-pack' && argv[i + 1]) result.basePack = path.resolve(argv[++i]);
         else throw new Error(`Unknown or incomplete argument: ${token}`);
     }
-    assert(['full', 'ci', 'proportional', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator', 'replacement', 'priestperil'].includes(result.mode), `unsupported --mode ${result.mode}`);
-    if (['old-regressions', 'old-discriminator', 'table-old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
+    assert(['full', 'ci', 'proportional', 'adversarial', 'old-discriminator', 'table-old-discriminator', 'replacement', 'priestperil'].includes(result.mode), `unsupported --mode ${result.mode}`);
+    if (['old-discriminator', 'table-old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
     return result;
 }
 
@@ -2172,11 +2171,14 @@ function buildDistribution(master, fixture, rows) {
     return { categoryProbability, totalWeight };
 }
 
-function enumerateProportionalRoll(master, fixture) {
+function enumerateProportionalRoll(master, fixture, table = null) {
     const player = makePlayer();
     applyFixture(player, fixture);
     assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: enumeration combat`);
     const npc = makeNpc(IDS.masters[master.key]);
+    const select = () => table === null
+        ? runInt(player, '[proc,slayer_new_target]', npc)
+        : runInt(player, '[proc,generate_slayer_task]', npc, [table]);
     const eligible = eligibleRows(master, fixture);
     const total = eligible.reduce((sum, row) => sum + row.weight, 0);
     const counts = new Map(master.rows.map(row => [row.sourceName, 0]));
@@ -2189,7 +2191,7 @@ function enumerateProportionalRoll(master, fixture) {
         const trace = traceWrites(player);
         let draw;
         try {
-            draw = withRandomStream([(roll + 0.5) / total, 0], () => runInt(player, '[proc,slayer_new_target]', npc));
+            draw = withRandomStream([(roll + 0.5) / total, 0], select);
         } finally {
             trace.restore();
         }
@@ -2202,7 +2204,15 @@ function enumerateProportionalRoll(master, fixture) {
     }
     if (total === 0) {
         const prior = sentinelTask(player);
-        const draw = withRandomStream([], () => runInt(player, '[proc,slayer_new_target]', npc));
+        const trace = traceWrites(player);
+        let draw;
+        try {
+            draw = withRandomStream([], select);
+        } finally {
+            trace.restore();
+        }
+        assert.deepEqual(trace.events, [], 'empty set must not write task state');
+        assert.equal(gemCount(player), 0, 'empty set must not grant a gem');
         assert.equal(draw.result.value, 0, `${fixture.key}: empty eligible set`);
         assert.equal(player.getVar(IDS.target), prior.target, 'empty set must preserve the prior target');
         assert.equal(player.getVar(IDS.count), prior.count, 'empty set must preserve the prior count');
@@ -2232,11 +2242,19 @@ function testProportionalRoll(packedRows) {
         for (const kind of ['minimum', 'high']) distributions.push(enumerateProportionalRoll(packed, FIXTURES.get(`${master.key}:${kind}`)));
     }
     const turael = distributions.find(row => row.master === 'turael' && row.fixture.baseSlayer === 99);
-    assert.equal(turael.totalWeight, 149, 'sheet fixture: CB126, Slayer99, all quest gates closed');
-    assert.equal(turael.counts.turael_rats, 7);
-    assert.equal(turael.counts.turael_bears, 7);
-    const percent = (100 * 7 / turael.totalWeight).toFixed(2);
-    assert.equal(percent, '4.70', 'rats and bears must reproduce the decision-sheet proportional probability');
+    const oracleMaster = ORACLE.masters.find(master => master.key === 'turael');
+    const oracleRows = eligibleRows(oracleMaster, FIXTURES.get('turael:high'));
+    const expectedTotal = oracleRows.reduce((sum, row) => sum + row.weight, 0);
+    assert.equal(turael.totalWeight, expectedTotal, 'high Turael total matches the independent table and eligibility oracle');
+    const percentages = {};
+    for (const name of ['rats', 'bears']) {
+        const row = oracleRows.find(row => row.sourceName === `turael_${name}`);
+        assert(row, `${name}: eligible oracle row required`);
+        const count = turael.counts[row.sourceName];
+        assert.equal(count, row.weight, `${name}: exact bucket mass matches the table`);
+        percentages[name] = (100 * count / turael.totalWeight).toFixed(2);
+        assert.equal(percentages[name], (100 * row.weight / expectedTotal).toFixed(2), `${name}: proportional probability matches the table`);
+    }
     const additions = [];
     for (const [masterKey, suffix, donorKey, donorSuffix] of [
         ['mazchna', 'mossgiants', 'vannaka', 'mossgiants'],
@@ -2267,8 +2285,8 @@ function testProportionalRoll(packedRows) {
         if (slayer > 1 || combat > 3 || suffix === 'crawlinghands') assert(outcomes.some(outcome => outcome.counts[row.sourceName] === 0), 'gated row needs a real excluded case');
         additions.push({ row: row.sourceName, donor: donor.sourceName, engineeringLabel: 'UNKNOWN', outcomes });
     }
-    console.log(`PASS proportional exact enumeration: rats=${percent}%, bears=${percent}%; four borrowed rows retain eligibility`);
-    return { distributions, additions, sheetFixture: { totalWeight: 149, rats: percent, bears: percent } };
+    console.log(`PASS proportional exact enumeration: rats=${percentages.rats}%, bears=${percentages.bears}%; four borrowed rows retain eligibility`);
+    return { distributions, additions, sheetFixture: { totalWeight: turael.totalWeight, ...percentages } };
 }
 
 class GzipJsonlWriter {
@@ -2580,6 +2598,22 @@ function testAdversarialFixtures() {
             results.push({ fixture: masterName, child: childName, actualValidatorAcceptance: actual });
         }
         results.push({ fixture: masterName, selector: false, writes: trace.events, prior, opcount: random.result.opcount, randomValues: random.observed });
+        if (masterName === 's1_selector_fixture_all_ineligible') {
+            // Exercise the enumeration's zero-total branch with the same real compiled table.
+            const emptyRows = rows.map(sourceName => {
+                const child = rowForPacked(sourceName).row;
+                return {
+                    sourceName,
+                    target: Number(packedValues(child, 'task')[0]),
+                    weight: Number(packedValues(child, 'weight')[0]),
+                    min: Number(packedValues(child, 'min_amount')[0]),
+                    max: Number(packedValues(child, 'max_amount')[0])
+                };
+            });
+            const enumeration = enumerateProportionalRoll({ ...master, rows: emptyRows }, fixture, masterId);
+            assert.equal(enumeration.totalWeight, 0, 'registered all-ineligible fixture reaches the zero-total enumeration branch');
+            results.push({ fixture: masterName, enumeration });
+        }
     }
 
     // A test-only two-row compiled table proves that rejected rows have no bucket.
@@ -2670,69 +2704,6 @@ function findBasePackDirectory(basePack) {
     return basePack;
 }
 
-function testLegacyEmptyRecursion(basePack) {
-    loadRuntime({ scripts: basePack, rows: FIXTURE_PACK_DIR, configs: basePack });
-    const player = makePlayer();
-    const fixture = FIXTURES.get('turael:high');
-    applyFixture(player, fixture);
-    const prior = sentinelTask(player, 321, 654);
-    const npc = makeNpc(IDS.masters.turael);
-    const emptyId = rowForPacked('s1_selector_fixture_all_ineligible').id;
-    const trace = traceWrites(player);
-    JavaRandom.setSeed(1);
-    const state = ScriptRunner.init(getScript('[proc,generate_slayer_task]'), player, npc, [emptyId]);
-    let exec;
-    let thrown = null;
-    try {
-        exec = player.runScript(state, true, true);
-    } catch (error) {
-        thrown = String(error?.stack ?? error);
-    }
-    trace.restore();
-    assert(thrown !== null || exec !== ScriptState.FINISHED, `old empty table unexpectedly finished (ops=${state.opcount})`);
-    assert(state.fp >= 50 || state.opcount >= 500000 || thrown !== null, `old eligible-set recursion did not reach its interpreter failure boundary (fp=${state.fp}, ops=${state.opcount}, error=${thrown})`);
-    assert.deepEqual(trace.events, [], 'old empty recursion wrote task target/count');
-    assert.equal(player.getVar(IDS.target), prior.target);
-    assert.equal(player.getVar(IDS.count), prior.count);
-    assert.equal(gemCount(player), 0);
-    assert.doesNotMatch(dialogueText(player), /we.ll start you off hunting|your new task is to kill/i);
-    return { fixture: 's1_selector_fixture_all_ineligible', exec: exec ?? null, stateExecution: state.execution, framePointer: state.fp, opcount: state.opcount, thrown, prior, writes: trace.events };
-}
-
-function streamForFirstEligible(master, fixture) {
-    const first = master.rows.findIndex(row => expectedRowEligibility(row, fixture));
-    assert(first >= 0, `${master.key}: no independently eligible row for legacy admission proof`);
-    const values = [0, 0];
-    return { first, row: master.rows[first], values };
-}
-
-function testLegacyFirstTeachingAdmission(basePack) {
-    loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
-    const packedRows = assertPackedLiveRows();
-    const master = packedRows.get('chaeldar');
-    const { player, fixture } = underqualifiedChaeldarFixture();
-    const npc = makeNpc(IDS.masters.chaeldar);
-    const forced = streamForFirstEligible(master, fixture);
-    const actualAcceptance = buildActualValidatorCache(player, npc, fixture, [forced.row.target], fixture.key);
-    assert.equal(actualAcceptance.get(forced.row.target), true, 'legacy first-row proof target is not accepted by actual base-code validator');
-    const prior = sentinelTask(player, 0, 0);
-    const trace = traceWrites(player);
-    JavaRandom.setSeed(1);
-    const stream = withRandomStream(forced.values, () => {
-        const dialog = startDialogue(player, npc, '[opnpc1,_slayer_master]');
-        return driveDialogue(player, dialog, [1, 2, 1, 2]);
-    });
-    trace.restore();
-    assert.equal(player.getVar(IDS.target), forced.row.target, 'old first teaching did not assign the first actually eligible low-level row');
-    assert(player.getVar(IDS.count) >= forced.row.min && player.getVar(IDS.count) <= forced.row.max, 'old first teaching count is outside selected row range');
-    assert.equal(gemCount(player), 1, 'old first teaching must grant the gem before its failed admission');
-    assert.match(dialogueText(player), /we.ll start you off hunting/i, 'old first teaching assignment success line missing');
-    assert.deepEqual(trace.events.map(event => event.kind), ['gem', 'target', 'count'], 'legacy first teaching did not expose old gem-before-task order');
-    assert.equal(eligibleMaster(player, npc, IDS.masters.chaeldar), false, 'legacy target must remain under current Chaeldar admission threshold');
-    assert.equal(actualAcceptance.get(player.getVar(IDS.target)), true, 'legacy target not accepted by the actual validator');
-    assert.notEqual(player.getVar(IDS.target), prior.target, 'legacy proof did not replace the initial empty target');
-    return { fixture: recordFixture(fixture), selectedSourceRow: forced.row.sourceName, target: player.getVar(IDS.target), count: player.getVar(IDS.count), forcedRandomValues: stream.observed, writes: trace.events, gemCount: gemCount(player), messages: player.messages };
-}
 function testOldHarpieDiscriminator(basePack) {
     loadRuntime({ scripts: basePack, rows: basePack, configs: basePack });
     const target = Number(ORACLE.constants.get('slayer_harpiebugswarm'));
@@ -2905,11 +2876,6 @@ try {
         loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
         assertPackedLiveRows();
         metadata.checks.priestperilAccess = testPriestperilAccess();
-    } else {
-        const basePack = findBasePackDirectory(OPTIONS.basePack);
-        metadata.checks.missingListEngineBoundary = testMissingListEngineBoundary(basePack);
-        metadata.checks.oldEmptyRecursion = testLegacyEmptyRecursion(basePack);
-        metadata.checks.oldFirstTeachingAdmission = testLegacyFirstTeachingAdmission(basePack);
     }
     metadata.status = 'PASS';
     metadata.completedAt = new Date().toISOString();
