@@ -160,9 +160,9 @@ data=loot_total,3
 data=stall,general stall
 data=empty,mm_desk
 
-// CANDIDATE interpretation: Tip.It's comma-separated items are alternatives,
-// each x1, as in its other loot rows. Sal's additionally lists Law runes.
-// UNKNOWN odds: equal weights, the nearest three-item General/Crafting precedent.
+// VERIFIED period listing: Sal's 5 April 2006 guide names elemental and law runes.
+// CANDIDATE: implement one rune per alternative, including one law rune.
+// UNKNOWN odds APE-MAGIC-RUNE-01: equal weights are an engineering default, not a sourced probability.
 [stealing_monkey_magic_stall]
 table=stealing
 data=loc,mm_stall_magic
@@ -175,7 +175,8 @@ data=respawn_ticks,^regional_magic_respawn_ticks
 data=loot,earthrune,1,1,1,an earth rune
 data=loot,firerune,1,1,1,a fire rune
 data=loot,waterrune,1,1,1,a water rune
-data=loot_total,3
+data=loot,lawrune,1,1,1,a law rune
+data=loot_total,4
 data=stall,magic stall
 data=empty,mm_desk
 

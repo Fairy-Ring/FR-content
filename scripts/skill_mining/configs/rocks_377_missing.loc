@@ -642,7 +642,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9724
+param=next_loc_stage_mining,rocks_11556
 category=mining_rock_normal
 
 [rocks_11947]
@@ -659,7 +659,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9725
+param=next_loc_stage_mining,rocks_11557
 category=mining_rock_normal
 
 [rocks_11948]
@@ -676,7 +676,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9723
+param=next_loc_stage_mining,rocks_11555
 category=mining_rock_normal
 
 [rocks_11949]
@@ -693,7 +693,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9724
+param=next_loc_stage_mining,rocks_11556
 category=mining_rock_normal
 
 [rocks_11950]
@@ -710,7 +710,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9725
+param=next_loc_stage_mining,rocks_11557
 category=mining_rock_normal
 
 [rocks_11951]
@@ -727,7 +727,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9723
+param=next_loc_stage_mining,rocks_11555
 category=mining_rock_normal
 
 [rocks_11952]
@@ -744,7 +744,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9724
+param=next_loc_stage_mining,rocks_11556
 category=mining_rock_normal
 
 [rocks_11953]
@@ -761,7 +761,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9725
+param=next_loc_stage_mining,rocks_11557
 category=mining_rock_normal
 
 [rocks_11954]
@@ -778,7 +778,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9723
+param=next_loc_stage_mining,rocks_11555
 category=mining_rock_fast
 
 [rocks_11955]
@@ -795,7 +795,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9724
+param=next_loc_stage_mining,rocks_11556
 category=mining_rock_fast
 
 [rocks_11956]
@@ -812,7 +812,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9725
+param=next_loc_stage_mining,rocks_11557
 category=mining_rock_fast
 
 [rocks_11957]
@@ -829,7 +829,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9723
+param=next_loc_stage_mining,rocks_11555
 category=mining_rock_normal
 
 [rocks_11958]
@@ -846,7 +846,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9724
+param=next_loc_stage_mining,rocks_11556
 category=mining_rock_normal
 
 [rocks_11959]
@@ -863,7 +863,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9725
+param=next_loc_stage_mining,rocks_11557
 category=mining_rock_normal
 
 [rocks_11960]
@@ -880,7 +880,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9723
+param=next_loc_stage_mining,rocks_11555
 category=mining_rock_normal
 
 [rocks_11962]
@@ -897,7 +897,7 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9725
+param=next_loc_stage_mining,rocks_11557
 category=mining_rock_normal
 
 [rocks_11963]
@@ -914,7 +914,7 @@ op3=hidden
 mapscene=24
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9723
+param=next_loc_stage_mining,rocks_11555
 category=mining_rock_normal
 
 [rocks_11964]
@@ -931,8 +931,62 @@ op3=hidden
 mapscene=25
 blockrange=no
 ambient=10
-param=next_loc_stage_mining,rocks_9724
+param=next_loc_stage_mining,rocks_11556
 category=mining_rock_normal
+// UNKNOWN mapping MINING-EMPTY-FORM-01: these same-model/body depleted-form links have no period source.
+[rocks_11555]
+name=Rocks
+desc=A rocky outcrop.
+model=loc_4027
+recol1s=15854
+recol1d=7329
+recol2s=6342
+recol2d=7329
+op1=Mine
+op2=Prospect
+op3=hidden
+mapscene=24
+blockrange=no
+ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_9723
+param=mining_rock_empty,1
+
+[rocks_11556]
+name=Rocks
+desc=A rocky outcrop.
+model=loc_4028
+recol1s=9513
+recol1d=7329
+recol2s=6342
+recol2d=7329
+op1=Mine
+op2=Prospect
+op3=hidden
+mapscene=25
+blockrange=no
+ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_9724
+param=mining_rock_empty,1
+
+[rocks_11557]
+name=Rocks
+desc=A rocky outcrop.
+model=loc_2110
+recol1s=9513
+recol1d=7329
+recol2s=6342
+recol2d=7329
+op1=Mine
+op2=Prospect
+op3=hidden
+mapscene=25
+blockrange=no
+ambient=10
+category=mining_rock_normal
+param=next_loc_stage_mining,rocks_9725
+param=mining_rock_empty,1
 
 [mineral_vein_12941]
 name=Mineral vein

@@ -23,6 +23,7 @@ const ScriptRunner = (await load('src/engine/script/ScriptRunner.ts')).default;
 const ScriptState = (await load('src/engine/script/ScriptState.ts')).default;
 const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
 const Environment = (await load('src/util/Environment.ts')).default;
+const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
 const types = {};
 for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'ParamType',
   'ObjType', 'LocType', 'NpcType', 'InvType', 'CategoryType', 'EnumType', 'StructType',
@@ -61,6 +62,7 @@ function numericConstant(file, name) {
 }
 const configDir = path.join(content, 'scripts/general/configs');
 const questConstants = path.join(content, 'scripts/quests/quest_deserttreasure/configs/quest_deserttreasure.constant');
+const pyramidConstants = path.join(content, 'scripts/quests/quest_deserttreasure/configs/dt_pyramid.constant');
 const stageInside = numericConstant(questConstants, 'dt_stage_inside_pyramid');
 const stageFourColumns = numericConstant(questConstants, 'dt_stage_four_columns');
 const stagePending = numericConstant(questConstants, 'dt_stage_reward_pending');
@@ -206,13 +208,86 @@ for (const [level, x, z] of [[3, 2913, 4952], [2, 2845, 4963], [1, 2782, 4972], 
   assert.equal(p.timers.has(hazard.id), false, 'outside arrival clears the hazard clock');
 }
 {
-  const p = player(), random = Math.random;
+  const p = player(), nextDouble = JavaRandom.nextDouble;
   p.level = 0; p.x = 3233; p.z = 9317;
   try {
-    Math.random = () => { throw new Error('the dialogue chamber must not roll hazards'); };
+    JavaRandom.nextDouble = () => { throw new Error('the dialogue chamber must not roll hazards'); };
     runPlayer(p, '[timer,dt_pyramid_hazards]');
-  } finally { Math.random = random; }
+  } finally { JavaRandom.nextDouble = nextDouble; }
 }
+{
+  const hazardRolls = numericConstant(pyramidConstants, 'dt_pyramid_hazard_rolls');
+  const pitfallRoll = numericConstant(pyramidConstants, 'dt_pyramid_trap_roll');
+  const scarabFirst = numericConstant(pyramidConstants, 'dt_pyramid_scarab_roll');
+  const scarabLast = numericConstant(pyramidConstants, 'dt_pyramid_scarab_roll_last');
+  assert.equal(hazardRolls, 64, 'the existing hazard check uses 64 outcomes');
+  assert.equal(pitfallRoll, 0, 'the pitfall uses one outcome');
+  assert.equal(scarabLast - scarabFirst + 1, 4, 'four outcomes retain the 1-in-16 scarab rate');
+  const scarabType = id('NpcType', 'scarab_swarm');
+  const scarabCount = () => [...World.npcs].filter(npc => npc.isActive && npc.type === scarabType).length;
+  const baseScarabCount = scarabCount(), nextDouble = JavaRandom.nextDouble;
+  let hazardTick = World.currentTick;
+  let pitfalls = 0, scarabs = 0, quiet = 0;
+  const runHazard = p => {
+    const state = ScriptRunner.init(hazard, p);
+    let status = p.runScript(state, true, true);
+    const suspended = status === ScriptState.SUSPENDED;
+    if (suspended) {
+      const resumeTick = p.delayedUntil;
+      assert.equal(resumeTick, World.currentTick + 3, 'the existing two-tick hazard delay is preserved');
+      World.currentTick = resumeTick;
+      status = p.runScript(state, true, true);
+    }
+    assert.equal(status, ScriptState.FINISHED, 'hazard timer finishes after any delay');
+    p.encodeOut();
+    return suspended;
+  };
+  try {
+    for (let roll = 0; roll < hazardRolls; roll++) {
+      const p = player();
+      World.currentTick = hazardTick;
+      p.level = 1;
+      p.x = 43 * 64 + (roll % 8) * 9;
+      p.z = 77 * 64 + Math.floor(roll / 8) * 9;
+      const before = scarabCount();
+      let drewControlledRoll = false;
+      JavaRandom.nextDouble = () => {
+        if (!drewControlledRoll) {
+          drewControlledRoll = true;
+          return roll / hazardRolls;
+        }
+        return nextDouble();
+      };
+      const suspended = runHazard(p);
+      assert.equal(suspended, roll === pitfallRoll || (roll >= scarabFirst && roll <= scarabLast),
+        `outcome ${roll} retains only its existing delayed branch`);
+      assert(drewControlledRoll, `hazard outcome ${roll} consumes one deterministic draw`);
+      hazardTick = World.currentTick;
+      const after = scarabCount();
+      if (roll === pitfallRoll) {
+        assert.equal(p.level, 0, `outcome ${roll} returns outside through a pitfall`);
+        assert.equal(after, before, `outcome ${roll} does not spawn a scarab`);
+        pitfalls++;
+      } else if (roll >= scarabFirst && roll <= scarabLast) {
+        assert.equal(p.level, 1, `outcome ${roll} does not trigger a pitfall`);
+        assert.equal(after, before + 1, `outcome ${roll} spawns one scarab`);
+        scarabs++;
+      } else {
+        assert.equal(p.level, 1, `outcome ${roll} does not trigger a pitfall`);
+        assert.equal(after, before, `outcome ${roll} spawns no scarab`);
+        quiet++;
+      }
+    }
+  } finally {
+    JavaRandom.nextDouble = nextDouble;
+    World.currentTick = hazardTick;
+  }
+  assert.equal(pitfalls, 1, 'exactly one pitfall outcome among 64');
+  assert.equal(scarabs, 4, 'exactly four scarab outcomes among 64');
+  assert.equal(quiet, 59, 'the other 59 outcomes are quiet');
+  assert.equal(scarabCount() - baseScarabCount, 4, 'the compiled timer spawned exactly four swarms');
+}
+
 
 for (const stage of [0, stageFourColumns, stageInside]) rejectsCompletionOutsidePendingStages(stage);
 
@@ -277,5 +352,5 @@ assert.equal(getVar(hero, 'alternate_spells'), ancientBook, 'replay leaves the A
 assertMainFieldsPreserved(hero, preserved, 'completion replay');
 assertNoRewardPackets(hero, 'completion replay');
 
-console.log('PASS compiled Desert Treasure S7 pending transition, stage-gated 20,000 Magic XP/3 QP reward, preserved varp440 fields, Ancient tab/scroll packets, and once-only replay');
+console.log('PASS compiled Desert Treasure S7 rewards, preserved state, 1/64 pitfall and 1/16 scarab hazard outcomes, and once-only replay');
 process.exit(0);

@@ -377,145 +377,145 @@
       "name": "rocks_11946",
       "ore": "mithril",
       "category": "mining_rock_normal",
-      "empty": "rocks_9724",
+      "empty": "rocks_11556",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11947",
       "ore": "mithril",
       "category": "mining_rock_normal",
-      "empty": "rocks_9725",
+      "empty": "rocks_11557",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11948",
       "ore": "silver",
       "category": "mining_rock_normal",
-      "empty": "rocks_9723",
+      "empty": "rocks_11555",
       "oreLabel": "CANDIDATE",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11949",
       "ore": "silver",
       "category": "mining_rock_normal",
-      "empty": "rocks_9724",
+      "empty": "rocks_11556",
       "oreLabel": "CANDIDATE",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11950",
       "ore": "silver",
       "category": "mining_rock_normal",
-      "empty": "rocks_9725",
+      "empty": "rocks_11557",
       "oreLabel": "CANDIDATE",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11951",
       "ore": "gold",
       "category": "mining_rock_normal",
-      "empty": "rocks_9723",
+      "empty": "rocks_11555",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11952",
       "ore": "gold",
       "category": "mining_rock_normal",
-      "empty": "rocks_9724",
+      "empty": "rocks_11556",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11953",
       "ore": "gold",
       "category": "mining_rock_normal",
-      "empty": "rocks_9725",
+      "empty": "rocks_11557",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11954",
       "ore": "iron",
       "category": "mining_rock_fast",
-      "empty": "rocks_9723",
+      "empty": "rocks_11555",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11955",
       "ore": "iron",
       "category": "mining_rock_fast",
-      "empty": "rocks_9724",
+      "empty": "rocks_11556",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11956",
       "ore": "iron",
       "category": "mining_rock_fast",
-      "empty": "rocks_9725",
+      "empty": "rocks_11557",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11957",
       "ore": "tin",
       "category": "mining_rock_normal",
-      "empty": "rocks_9723",
+      "empty": "rocks_11555",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11958",
       "ore": "tin",
       "category": "mining_rock_normal",
-      "empty": "rocks_9724",
+      "empty": "rocks_11556",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11959",
       "ore": "tin",
       "category": "mining_rock_normal",
-      "empty": "rocks_9725",
+      "empty": "rocks_11557",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11960",
       "ore": "copper",
       "category": "mining_rock_normal",
-      "empty": "rocks_9723",
+      "empty": "rocks_11555",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11962",
       "ore": "copper",
       "category": "mining_rock_normal",
-      "empty": "rocks_9725",
+      "empty": "rocks_11557",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11963",
       "ore": "coal",
       "category": "mining_rock_normal",
-      "empty": "rocks_9723",
+      "empty": "rocks_11555",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "rocks_11964",
       "ore": "coal",
       "category": "mining_rock_normal",
-      "empty": "rocks_9724",
+      "empty": "rocks_11556",
       "oreLabel": "VERIFIED in kind",
-      "depletionLabel": "CANDIDATE"
+      "depletionLabel": "UNKNOWN"
     },
     {
       "name": "mineral_vein_12941",

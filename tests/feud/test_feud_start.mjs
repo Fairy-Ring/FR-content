@@ -70,13 +70,13 @@ test('the original market Trade option supplies both required disguise items bef
   p.closeModal();
 });
 
-test('Morrisane opens the candidate thirteen-entry shop through dialogue without a later Trade option or forced sale', () => {
+test('Morrisane opens the candidate thirteen-entry shop through dialogue without a later Trade option', () => {
   const p = player();
   p.invAdd(inv, obj('coins'), 100);
   talk(p, 'feud_ali_m', [2]);
   assert.equal(stage(p), 0);
   assert.equal(p.modalMain, id('Component', 'shop_template'));
-  assert.equal(count(p, 'coins'), 100, 'the disputed forced sale never takes coins');
+  assert.equal(count(p, 'coins'), 100, 'opening stock is not the final wares-refusal trigger');
   const expected = [
     ['pot_empty', 3, 100], ['jug_empty', 2, 100], ['water_skin3', 10, 300],
     ['desert_shirt', 3, 12], ['desert_boots', 2, 100], ['bucket_empty', 19, 400],
@@ -102,9 +102,9 @@ test('Morrisane opens the candidate thirteen-entry shop through dialogue without
   const money = count(p, 'coins');
   const refusal = talk(p, 'feud_ali_m', [1, 2, 1, 1]);
   assert.match(refusal.text, /I'm far too busy to carry out errands for shopkeepers - maybe later\./);
-  assert.doesNotMatch(refusal.text, /manages to sell you some junk/);
+  assert(p.messages.includes('Despite your best efforts Ali M still manages to sell you some junk.'));
   assert.equal(stage(p), 0);
-  assert.equal(count(p, 'coins'), money, 'declining the errand does not trigger the disputed mechanism');
+  assert.equal(count(p, 'coins'), money - 10, 'the final wares refusal sells one junk item');
 });
 
 test('barman small-talk remains available without producing quest progress', () => {

@@ -77011,53 +77011,6 @@ blockrange=no
 ambient=10
 param=next_loc_stage_mining,rocks_9725
 
-[rocks_11555]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4027
-recol1s=15854
-recol1d=7329
-recol2s=6342
-recol2d=7329
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=24
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9723
-
-[rocks_11556]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_4028
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=7329
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9724
-
-[rocks_11557]
-name=Rocks
-desc=A rocky outcrop.
-model=loc_2110
-recol1s=9513
-recol1d=7329
-recol2s=6342
-recol2d=7329
-op1=Mine
-op2=Prospect
-op3=hidden
-mapscene=25
-blockrange=no
-ambient=10
-param=next_loc_stage_mining,rocks_9725
 
 [fai_barbarian_abode_wall]
 model=viking_abode_wall

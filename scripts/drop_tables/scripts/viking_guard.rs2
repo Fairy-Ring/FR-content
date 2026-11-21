@@ -37,6 +37,7 @@ if ($random < 6) {
 } else if ($random < 72) {
      obj_add(npc_coord, coins, 17, ^lootdrop_duration);
 } else if ($random < 75) {
+     // UNKNOWN engineering data row, no source: ELF-FREMENNIK-BANDS-01 keeps 27 coins at 3/128.
      obj_add(npc_coord, coins, 27, ^lootdrop_duration);
 } else if ($random < 79) {
      obj_add(npc_coord, keg_of_beer, 1, ^lootdrop_duration);
