@@ -1,5 +1,5 @@
-// CANDIDATE wording: operator, 19 November 2026; the scarecrow sentence
-// rests on Talk:Scarecrow revision5436595 alone, not operator confirmation.
+// UNKNOWN operator-only wording, 19 November 2026. Allotment, growing,
+// supercompost and scarecrow sentences are CANDIDATE on the 2012 quotation.
 // UNKNOWN channel and grouping: Main chose one game message per sentence
 // for the client line limit, in the quotation's type, soil, state order.
 // Soil is untreated: no published compost-application state exists here.
@@ -623,7 +623,7 @@ table=farming_inspect
 data=state,-1
 data=line,"The soil has not been treated."
 
-// CANDIDATE operator confirmation; static keys continue untreated's -1.
+// UNKNOWN operator recollection; static keys continue untreated's -1.
 [farming_inspect_soil_compost]
 table=farming_inspect
 data=state,-2
