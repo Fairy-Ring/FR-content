@@ -27,3 +27,10 @@
 ^regicide_pikeman_charged_crystal_limit = 108 // ELF-CAMP-CHARGED-01: roll 107, 1/128; listing VERIFIED (RuneHQ/Tip.It 2005-2006), rate UNKNOWN.
 ^regicide_archer_lobster_limit = 110 // ELF-LOBSTER-01: roll 109, 1/128; membership CANDIDATE (Old School Elf warrior 136165), rate UNKNOWN.
 ^regicide_pikeman_lobster_limit = 109 // ELF-LOBSTER-01: roll 108, 1/128; membership CANDIDATE (Old School Elf warrior 136165), rate UNKNOWN.
+
+// LLETYA-CRYSTAL-01: UNKNOWN engineering rate, recorded only. Lletya combat is not built.
+^regicide_lletya_crystal_denominator = 5
+// ELF-HERB-SEED-01: UNKNOWN engineering rate, one empty main-table slot in 128 per camp type.
+^regicide_herb_seed_slots = 1
+// ELF-HERB-MIX-01: UNKNOWN engineering weights, six ordinary species at two tickets each, snapdragon at one.
+^regicide_herb_seed_common_weight = 2

@@ -52,6 +52,7 @@ else if (npc_type = regicide_darkelf) {
     else if ($random < 108) obj_add(npc_coord, belladonna_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
     else if ($random < ^regicide_archer_tiny_crystal_limit) obj_add(npc_coord, elf_crystal_tiny, 1, ^lootdrop_duration);
     else if ($random < ^regicide_archer_lobster_limit) obj_add(npc_coord, lobster, 1, ^lootdrop_duration);
+    else if ($random < calc(^regicide_archer_lobster_limit + ^regicide_herb_seed_slots)) obj_add(npc_coord, ~regicide_herb_seed, 1, ^lootdrop_duration);
 }
 else if (npc_type = regicide_darkelf2) {
     if ($random < 103) obj_add(npc_coord, rune_med_helm, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
@@ -61,4 +62,19 @@ else if (npc_type = regicide_darkelf2) {
     else if ($random < ^regicide_pikeman_tiny_crystal_limit) obj_add(npc_coord, elf_crystal_tiny, 1, ^lootdrop_duration);
     else if ($random < ^regicide_pikeman_charged_crystal_limit) obj_add(npc_coord, mourning_teleport_crystal_1, 1, ^lootdrop_duration);
     else if ($random < ^regicide_pikeman_lobster_limit) obj_add(npc_coord, lobster, 1, ^lootdrop_duration);
+    else if ($random < calc(^regicide_pikeman_lobster_limit + ^regicide_herb_seed_slots)) obj_add(npc_coord, ~regicide_herb_seed, 1, ^lootdrop_duration);
+}
+
+// VERIFIED generic seed listing: Tip.It 293/294 (2005-2006).
+// CANDIDATE species: early Old School Elf warrior 136165, restricted to native 377 seeds.
+// ELF-HERB-MIX-01 is an UNKNOWN engineering distribution, not a recovered period table.
+[proc,regicide_herb_seed]()(namedobj)
+switch_int (calc(random(calc(6 * ^regicide_herb_seed_common_weight + 1)) / ^regicide_herb_seed_common_weight)) {
+    case 0 : return(irit_seed);
+    case 1 : return(kwuarm_seed);
+    case 2 : return(avantoe_seed);
+    case 3 : return(toadflax_seed);
+    case 4 : return(cadantine_seed);
+    case 5 : return(dwarf_weed_seed);
+    case default : return(snapdragon_seed);
 }
