@@ -1,0 +1,15 @@
+[cannon_restricted_zones]
+table=coord_pair_table
+// VERIFIED ban: Tip.It Slayer guide, 27 April 2006 (also 6 May 2006).
+// UNKNOWN CANNON-AREA-FREMENNIK-01: engineering envelope of the cave's m42_156 and m43_156 maps, plane 0.
+data=coord_pair,0_42_156_0_0,0_43_156_63_63
+// VERIFIED ban: the same 27 April 2006 Tip.It guide names the Slayer Tower.
+// UNKNOWN CANNON-AREA-TOWER-01: engineering envelope of m53_55's tower walls on the three accessible floors.
+data=coord_pair,0_53_55_12_10,2_53_55_61_60
+// CANDIDATE bans: RuneScape wiki Dwarf multicannon, 22 December 2007, names Zogre burial grounds and Shade tombs.
+// UNKNOWN CANNON-AREA-ZOGRE-01: engineering map envelope around the native Zogre burial grounds.
+data=coord_pair,0_38_47_0_0,0_38_47_63_63
+data=coord_pair,0_38_147_0_0,0_38_147_63_63
+data=coord_pair,2_38_147_0_0,2_38_147_63_63
+// UNKNOWN CANNON-AREA-SHADE-TOMBS-01: engineering map envelope containing the existing Mort'ton tomb entrance destination.
+data=coord_pair,0_54_151_0_0,0_54_151_63_63

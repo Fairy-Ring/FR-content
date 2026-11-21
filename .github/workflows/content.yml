@@ -316,6 +316,7 @@ jobs:
           run_test 'tests/hm-salve-runtime.mts + tests/hm-salve-runtime-body.mts' bash -c 'mkdir -p .tmp && cp ../content/tests/hm-salve-runtime.mts ../content/tests/hm-salve-runtime-body.mts .tmp/ && ./node_modules/.bin/tsx .tmp/hm-salve-runtime.mts'
           run_test tests/monster-s01/test_monster_s01.mjs node --import tsx ../content/tests/monster-s01/test_monster_s01.mjs
           run_test tests/cannon-gates/test_cannon_gates.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/cannon-gates/test_cannon_gates.mjs
+          run_test tests/cannon-areas/test_cannon_areas.mjs env NODE_MEMBERS=true NODE_XPRATE=1 node --import tsx ../content/tests/cannon-areas/test_cannon_areas.mjs
           run_test tests/monster-s02/test_monster_s02.mjs node --import tsx ../content/tests/monster-s02/test_monster_s02.mjs
           run_test tests/monster-a7/test_monster_a7.mjs node --import tsx ../content/tests/monster-a7/test_monster_a7.mjs
           run_test tests/zygomite/test_zygomite.mjs node --import tsx ../content/tests/zygomite/test_zygomite.mjs

@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Fremennik Slayer Dungeon",
+    "bound": "CANNON-AREA-FREMENNIK-01",
+    "boxes": [[0, 2688, 9984, 0, 2815, 10047]],
+    "witness": { "inside": [0, 2808, 10002], "outside": [0, 2794, 3612] }
+  },
+  {
+    "name": "Slayer Tower",
+    "bound": "CANNON-AREA-TOWER-01",
+    "boxes": [[0, 3404, 3530, 2, 3453, 3580]]
+  },
+  {
+    "name": "Zogre burial grounds",
+    "bound": "CANNON-AREA-ZOGRE-01",
+    "boxes": [[0, 2432, 3008, 0, 2495, 3071], [0, 2432, 9408, 0, 2495, 9471], [2, 2432, 9408, 2, 2495, 9471]]
+  },
+  {
+    "name": "Shade tombs",
+    "bound": "CANNON-AREA-SHADE-TOMBS-01",
+    "boxes": [[0, 3456, 9664, 0, 3519, 9727]]
+  }
+]
