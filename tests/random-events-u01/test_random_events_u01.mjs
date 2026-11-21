@@ -78,7 +78,7 @@ function reload(directory) {
 // The saved comparison is produced by executing the published pack, not by
 // projecting expected RuneScript or hashing bytecode. Default-only added varps
 // are absent; every changed varp, packet, queue, tile and inventory stays pinned.
-// Actor inventory must not change across a root, independent of static-map updates.
+// Actor identities are checked within each run only, never pinned across publishes.
 const roots = ['[login,_]', '[queue,macro_event_login]', '[timer,general_macro_events]', '[proc,p_telejump_safe]', '[queue,player_death_default]', '[if_button,magic:lumbridge_teleport]'];
 function effects(root) {
   const p = player();
@@ -112,20 +112,59 @@ const baseline = JSON.parse(readFileSync(new URL('./inert-effects.json', import.
 // Published-pack mode also executes that timer to reproduce this saved projection.
 baseline.effects['[timer,general_macro_events]'] = baseline.effects['[queue,macro_event_login]'];
 for (const root of roots) check(`no-event effects match published pack ${root}`, () => assert.deepEqual(effects(root), baseline.effects[root]));
+check('event-off login keeps Farming growth and restores a saved stall lockout', () => {
+  const p = player();
+  const actorShapes = () => actors().map(([, name, level, x, z]) => [name, level, x, z])
+    .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+  const beforeActors = actorShapes();
+  const stallVar = v('thieving_stall_timer');
+  const stallMask = 1 << 1; // Published baker stall bit.
+  p.setVar(stallVar, stallMask);
+  const random = Math.random;
+  Math.random = () => 0.5;
+  const dateMinutes = ScriptRunner.HANDLERS[op.DATE_MINUTES];
+  ScriptRunner.HANDLERS[op.DATE_MINUTES] = state => state.pushInt(30000000);
+  try { run(p, '[login,_]'); }
+  finally {
+    Math.random = random;
+    ScriptRunner.HANDLERS[op.DATE_MINUTES] = dateMinutes;
+  }
+  assert.equal(p.getVar(v('farming_growth_minute')), 30000000);
+  const growth = ScriptProvider.getByName('[softtimer,farming_growth]');
+  assert(growth, 'compiled Farming growth soft timer');
+  const growthTimer = p.timers.get(growth.id);
+  assert(growthTimer && growthTimer.interval > 0, 'login installs the Farming growth timer');
+  const stalls = [...p.queue.all()].filter(q => q.script.name.startsWith('[queue,stolen_from_stall_'));
+  assert.equal(stalls.length, 1);
+  assert.equal(stalls[0].script.name, '[queue,stolen_from_stall_baker]');
+  assert.equal(stalls[0].delay, 1500);
+  assert.deepEqual(stalls[0].args, [0, 1]);
+  assert.equal(p.getVar(stallVar), stallMask);
+  assert.equal(p.getVar(v('macro_event')), 0);
+  assert.deepEqual(actorShapes(), beforeActors, 'event-off login creates no actor');
+  run(p, '[queue,macro_event_login]');
+  assert.equal(p.getVar(v('macro_event')), 0, 'event-off login queue remains inert');
+  assert.deepEqual(actorShapes(), beforeActors, 'event-off login queue creates no actor');
+});
 if (process.env.U01_PUBLISHED_PACK) {
   reload(process.env.U01_PUBLISHED_PACK);
   try {
     for (const root of roots) check(`saved effects are reproduced by published pack ${root}`, () => assert.deepEqual(effects(root), baseline.effects[root]));
   } finally { reload(pack); }
 }
-check('an altered no-event result is rejected by the effects predicate', () => {
+check('negative control: a changed no-event teleport tile fails the effect predicate', () => {
+  const root = '[proc,p_telejump_safe]';
+  const expected = baseline.effects[root];
   const original = ScriptRunner.HANDLERS[op.P_TELEJUMP];
   ScriptRunner.HANDLERS[op.P_TELEJUMP] = state => {
     original(state);
     state.activePlayer.x++;
   };
-  try { assert.throws(() => assert.deepEqual(effects('[proc,p_telejump_safe]'), baseline.effects['[proc,p_telejump_safe]']), assert.AssertionError); }
-  finally { ScriptRunner.HANDLERS[op.P_TELEJUMP] = original; }
+  try {
+    const changed = effects(root);
+    assert.equal(changed.tile[1], expected.tile[1] + 1, 'the control changes the actual destination');
+    assert.throws(() => assert.deepEqual(changed, expected), assert.AssertionError);
+  } finally { ScriptRunner.HANDLERS[op.P_TELEJUMP] = original; }
 });
 check('static packed identities and client configs match the published pack', () => {
   const genie = types.NpcType.get(requiredId(types.NpcType, 'macro_geni'));

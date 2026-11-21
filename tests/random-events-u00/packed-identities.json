@@ -1,0 +1,11 @@
+{
+  "identities": {
+    "genie": { "id": 409, "models": [231, 241, 252, 315, 173, 176, 264, 270], "ops": ["Talk-to", null, null, null, null] },
+    "bronzePickaxe": 1265,
+    "pickaxeHandle": 466,
+    "bronzeHead": 480,
+    "rock": 2090,
+    "lumbridgeButton": 1167,
+    "appendages": [8994, 8995, 8996, 8997]
+  }
+}
