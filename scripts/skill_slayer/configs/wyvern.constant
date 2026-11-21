@@ -25,3 +25,9 @@
 // UNKNOWN engineering: common-table weights. Membership and quantities use the
 // pre-18-June-2007 wiki list, before both documented drop-value boosts.
 ^wyvern_drop_slots = 128
+// UNKNOWN engineering: centre tile south of the mapped exit's 3x2 footprint
+// (3055,9556, angle 0), facing that mouth; original server landing is unrecovered.
+^wyvern_entry_landing = 0_47_149_48_19
+// UNKNOWN engineering: centre tile north of the mapped entrance's 3x2 footprint
+// (3055,9560, angle 2), facing that mouth; z9561 is inside its blocked footprint.
+^wyvern_exit_landing = 0_47_149_48_26

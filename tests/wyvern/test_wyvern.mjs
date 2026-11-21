@@ -17,7 +17,6 @@ const ScriptState = (await load('src/engine/script/ScriptState.ts')).default;
 const ServerTriggerType = (await load('src/engine/script/ServerTriggerType.ts')).default;
 const Player = (await load('src/engine/entity/Player.ts')).default;
 const Npc = (await load('src/engine/entity/Npc.ts')).default;
-const Loc = (await load('src/engine/entity/Loc.ts')).default;
 const { EntityLifeCycle } = await load('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
 const { NpcStat } = await load('src/engine/entity/NpcStat.ts');
@@ -402,20 +401,21 @@ for (const form of FORMS) {
   check(`${form.name} death does not drop a draconic visage`, visage >= 0 && drops.some(drop => drop.id === visage), false);
 }
 
-// Both real packed location handlers work at Slayer 0 and land on the sourced opposite-mouth
-// tiles. Their scripts do not share the monster damage requirement.
+// Both real packed location handlers work at Slayer 0 and use UNKNOWN engineering
+// opposite-mouth landings. Packed collision and connectivity have a separate test.
 function runLoc(name, x, z, destination) {
   const player = makePlayer({ slayer: 0, position: { x, z } });
   const type = LocType.getByName(name);
   assert(type, `packed location ${name}`);
-  const loc = new Loc(0, x, z, type.width, type.length, EntityLifeCycle.RESPAWN, type.id, 10, 0);
+  const loc = World.getLoc(x, z, 0, type.id);
+  assert(loc, `native packed location ${name}`);
   const trigger = requiredTrigger(ServerTriggerType.OPLOC1, type.id, type.category, `${name} oploc1`);
   check(`${name} uses its named packed handler`, trigger.name, `[oploc1,${name}]`);
   expectFinished(run(trigger, player, loc), `${name} traversal`);
   check(`${name} teleports at Slayer 0`, [player.level, player.x, player.z], destination);
 }
 runLoc('wyvern_snow_cave_entrance', 3055, 9560, [0, 3056, 9555]);
-runLoc('wyvern_snow_cave_exit', 3055, 9556, [0, 3056, 9561]);
+runLoc('wyvern_snow_cave_exit', 3055, 9556, [0, 3056, 9562]);
 
 console.log(`PASS wyvern ${assertions} assertions`);
 process.exit(0);

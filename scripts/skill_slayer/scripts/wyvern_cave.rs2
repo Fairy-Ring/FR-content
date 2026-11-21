@@ -1,8 +1,10 @@
-// N101. Both mouths exist in the 377 map: entrance3055,9560, exit3055,9556.
-// UNKNOWN engineering: land on the adjacent open tile beyond the other mouth.
+// N101: paired mouths in the ice dungeon, not on the surface (m47_149).
+// UNKNOWN engineering landings are named and derived in wyvern.constant.
 // No Slayer entry gate: the sourced requirement applies to harming the monster.
 [oploc1,wyvern_snow_cave_entrance]
-p_telejump(0_47_149_48_19);
+p_telejump(^wyvern_entry_landing);
+facesquare(movecoord(^wyvern_entry_landing, 0, 0, 1));
 
 [oploc1,wyvern_snow_cave_exit]
-p_telejump(0_47_149_48_25);
+p_telejump(^wyvern_exit_landing);
+facesquare(movecoord(^wyvern_exit_landing, 0, 0, -1));
