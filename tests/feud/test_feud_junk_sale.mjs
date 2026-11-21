@@ -13,7 +13,7 @@ const closeHandler = new (await engineModule('network/game/client/handler/CloseM
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
 const junk = ['bronze_pickaxe', 'bucket_empty', 'knife', 'raw_chicken', 'tinderbox'];
-const message = 'Despite your best efforts Ali Morrisane, the greatest salesman in the world, still manages to sell you some junk.';
+const message = 'Despite your best efforts Ali M still manages to sell you some junk.';
 const shopRoot = id('Component', 'shop_template');
 
 function open(p) {

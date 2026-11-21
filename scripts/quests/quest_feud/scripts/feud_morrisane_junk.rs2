@@ -1,4 +1,5 @@
-// CANDIDATE eligibility, equal item mix and message: src.feud-morrisane-store-15355193.
+// CANDIDATE message: pre-2022 transcripts 9602124 and 18411641.
+// CANDIDATE eligibility and equal item mix: src.feud-morrisane-store-15355193.
 // UNKNOWN charge and every-close timing: feud_junk.constant.
 // Like party_drop_chest and trawler_catch, this close callback performs only
 // synchronous inventory work. It opens no interface and schedules no script.
@@ -16,4 +17,4 @@ else if ($roll = 3) $junk = raw_chicken;
 else if ($roll = 4) $junk = tinderbox;
 inv_del(inv, coins, ^feud_junk_price);
 inv_add(inv, $junk, 1);
-mes("Despite your best efforts Ali Morrisane, the greatest salesman in the world, still manages to sell you some junk.");
+mes("Despite your best efforts Ali M still manages to sell you some junk.");
