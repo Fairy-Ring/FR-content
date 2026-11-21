@@ -90,8 +90,8 @@ const SOURCED_SLAYER_THRESHOLDS = [
     ['slayer_abyssaldemon', 85],
     ['slayer_darkbeast', 90]
 ];
-// Fixed row census: accepted tables plus the operator-authorized D1 bear activation.
-// Bear weight 7 matches the saved 2020 Lua; all amounts/order remain authored values.
+// Fixed row census includes D1 bears and the four B-SLAYERROLL memberships.
+// New pair numbers are UNKNOWN engineering rows borrowed from named same-creature rows.
 const MASTER_TABLES_FILE = path.join(TEST_DIR, 'master_tables.json');
 const MASTER_TABLES = JSON.parse(fs.readFileSync(MASTER_TABLES_FILE, 'utf8'));
 const FAMILY_B = 3800;
@@ -128,7 +128,7 @@ function parseArgs(argv) {
         else if (token === '--base-pack' && argv[i + 1]) result.basePack = path.resolve(argv[++i]);
         else throw new Error(`Unknown or incomplete argument: ${token}`);
     }
-    assert(['full', 'ci', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator', 'replacement', 'priestperil'].includes(result.mode), `unsupported --mode ${result.mode}`);
+    assert(['full', 'ci', 'proportional', 'adversarial', 'old-regressions', 'old-discriminator', 'table-old-discriminator', 'replacement', 'priestperil'].includes(result.mode), `unsupported --mode ${result.mode}`);
     if (['old-regressions', 'old-discriminator', 'table-old-discriminator'].includes(result.mode)) assert(result.basePack, `--mode ${result.mode} requires --base-pack <directory containing server/>`);
     return result;
 }
@@ -616,7 +616,7 @@ function compileFixturePack(fixtureMode = 'standard') {
     return result;
 }
 
-const FIXTURE_PACK_RESULT = ['replacement', 'priestperil'].includes(OPTIONS.mode) ? null : compileFixturePack();
+const FIXTURE_PACK_RESULT = ['replacement', 'priestperil', 'proportional'].includes(OPTIONS.mode) ? null : compileFixturePack();
 const FIXTURE_PACK_DIR = FIXTURE_PACK_RESULT?.directory ?? null;
 
 async function importEngine(relative) {
@@ -1030,7 +1030,8 @@ function drawLiveRowEndpoints(masterKey, suffix, fixture) {
         const trace = traceWrites(player);
         let random;
         try {
-            const stream = [...Array(index).fill(1 - Number.EPSILON), 0, side === 'min' ? 0 : 1 - Number.EPSILON];
+            const stream = forcedStreamForRow(master, fixture, `${masterKey}_${suffix}`).values;
+            stream[1] = side === 'min' ? 0 : 1 - Number.EPSILON;
             random = withRandomStream(stream, () => runInt(player, '[proc,generate_slayer_task]', npc, [rowForPacked(master.table).id]));
         } finally { trace.restore(); }
         const count = side === 'min' ? min : max;
@@ -1058,8 +1059,7 @@ function testD1Bears() {
         assert.equal(combatLevel(player), combat, 'D1 exact bear combat boundary');
         assert.equal(validatorAccepts(player, npc, bear), combat >= 13, 'D1 bear keeps the published combat-13 gate with no extra Slayer/quest gate');
         const selectedIndex = combat >= 13 ? bearIndex : goblinIndex;
-        const stream = [...Array(selectedIndex).fill(1 - Number.EPSILON), 0, 0];
-        stream[bearIndex] = 0; // Below the gate, a successful bear roll must still be skipped.
+        const stream = forcedStreamForRow(master, fixture, master.rows[selectedIndex].sourceName).values;
         const prior = sentinelTask(player);
         const trace = traceWrites(player);
         let result;
@@ -1158,8 +1158,8 @@ function testDuradelTables() {
         return { axis: fixture.axis, fixture: recordFixture(fixture), accepted, recommended };
     });
     const dragonEndpoints = MASTER_TABLES.duradel.filter(([, category]) => category.endsWith('dragon')).flatMap(([suffix]) => drawLiveRowEndpoints('duradel', suffix, FIXTURES.get('duradel:high')));
-    assert.equal(dragonEndpoints.length, 8, 'four retained Duradel dragon rows, both inclusive endpoints');
-    return { historicalNumbers: 'UNKNOWN: keeps the Lost City value; no inferred minimum130', boundaries, dragonEndpoints };
+    assert.equal(dragonEndpoints.length, 10, 'five Duradel dragon rows, both inclusive endpoints');
+    return { historicalNumbers: 'UNKNOWN: retained Lost City rows and disclosed borrowed bronze row; no inferred minimum130', boundaries, dragonEndpoints };
 }
 
 
@@ -1478,9 +1478,7 @@ function testPriestperilAccess() {
             const fallback = master.rows.findIndex(row => !targets.has(row.target) && expectedRowEligibility(row, fixture));
             assert(fallback >= 0, `${master.key}: below-gate control needs an eligible non-Priest-in-Peril row`);
             const selected = stage === 61 ? index : fallback;
-            // Below the gate, offer the forbidden row a successful roll, then assign a control on the next pass.
-            const stream = stage === 61 ? [] : master.rows.map((_, rowIndex) => rowIndex === index ? 0 : 1 - Number.EPSILON);
-            stream.push(...Array(selected).fill(1 - Number.EPSILON), 0, 0);
+            const stream = forcedStreamForRow(master, fixture, master.rows[selected].sourceName).values;
             const trace = traceWrites(player);
             let draw;
             try {
@@ -1521,9 +1519,7 @@ function testSkippyAccess() {
             const fallback = master.rows.findIndex(row => row.target !== target && expectedRowEligibility(row, fixture));
             assert(fallback >= 0, `${master.key}: below-gate control needs an eligible non-mogre row`);
             const selected = expected ? index : fallback;
-            // Offer the forbidden mogre row a winning roll before assigning a control on the next pass.
-            const stream = expected ? [] : master.rows.map((_, rowIndex) => rowIndex === index ? 0 : 1 - Number.EPSILON);
-            stream.push(...Array(selected).fill(1 - Number.EPSILON), 0, 0);
+            const stream = forcedStreamForRow(master, fixture, master.rows[selected].sourceName).values;
             const trace = traceWrites(player);
             let draw;
             try {
@@ -1737,12 +1733,10 @@ function forcedStreamForRow(master, fixture, sourceName) {
     assert(index >= 0, `${master.key}: missing selected source row ${sourceName}`);
     const row = master.rows[index];
     assert.equal(expectedRowEligibility(row, fixture), true, `${sourceName}: selected S8 row must pass the source oracle`);
-    const values = [];
-    for (const preceding of master.rows.slice(0, index)) {
-        assert(preceding.weight > 0, `${preceding.sourceName}: cannot force through a nonpositive row`);
-        values.push(1 - Number.EPSILON);
-    }
-    values.push(0, 0);
+    const eligible = eligibleRows(master, fixture);
+    const total = eligible.reduce((sum, entry) => sum + entry.weight, 0);
+    const before = eligible.slice(0, eligible.indexOf(row)).reduce((sum, entry) => sum + entry.weight, 0);
+    const values = [(before + row.weight / 2) / total, 0];
     return { row, index, values };
 }
 
@@ -2168,24 +2162,113 @@ function testS8DialogueCases(scriptPack, configs = scriptPack) {
 }
 
 function buildDistribution(master, fixture, rows) {
-    let survival = 1;
-    const occurrenceWeights = [];
-    let passSuccess = 0;
-    for (const row of rows) {
-        const probability = expectedRowEligibility(row, fixture) ? 1 / row.weight : 0;
-        const perPass = probability * survival;
-        occurrenceWeights.push({ row, probability, perPass });
-        passSuccess += perPass;
-        survival *= 1 - probability;
-    }
-    assert(passSuccess > 0, `${master.key}/${fixture.key}: no eligible ordered-pass probability`);
+    const eligible = rows.filter(row => expectedRowEligibility(row, fixture));
+    const totalWeight = eligible.reduce((sum, row) => sum + row.weight, 0);
+    assert(totalWeight > 0, `${master.key}/${fixture.key}: no eligible proportional weight`);
     const categoryProbability = new Map();
-    for (const occurrence of occurrenceWeights) {
-        if (occurrence.perPass === 0) continue;
-        const probability = occurrence.perPass / passSuccess;
-        categoryProbability.set(occurrence.row.target, (categoryProbability.get(occurrence.row.target) ?? 0) + probability);
+    for (const row of eligible) {
+        categoryProbability.set(row.target, (categoryProbability.get(row.target) ?? 0) + row.weight / totalWeight);
     }
-    return { occurrenceWeights, categoryProbability, passSuccess };
+    return { categoryProbability, totalWeight };
+}
+
+function enumerateProportionalRoll(master, fixture) {
+    const player = makePlayer();
+    applyFixture(player, fixture);
+    assert.equal(combatLevel(player), fixture.combat, `${fixture.key}: enumeration combat`);
+    const npc = makeNpc(IDS.masters[master.key]);
+    const eligible = eligibleRows(master, fixture);
+    const total = eligible.reduce((sum, row) => sum + row.weight, 0);
+    const counts = new Map(master.rows.map(row => [row.sourceName, 0]));
+    let expectedIndex = 0;
+    let boundary = eligible[0]?.weight ?? 0;
+    for (let roll = 0; roll < total; roll++) {
+        while (roll >= boundary) boundary += eligible[++expectedIndex].weight;
+        const expected = eligible[expectedIndex];
+        sentinelTask(player);
+        const trace = traceWrites(player);
+        let draw;
+        try {
+            draw = withRandomStream([(roll + 0.5) / total, 0], () => runInt(player, '[proc,slayer_new_target]', npc));
+        } finally {
+            trace.restore();
+        }
+        assert.equal(draw.result.value, 1, `${fixture.key}/roll${roll}: nonempty eligible set`);
+        assert.equal(player.getVar(IDS.target), expected.target, `${fixture.key}/roll${roll}: exact eligible weighted bucket`);
+        assert.equal(player.getVar(IDS.count), expected.min, `${fixture.key}/roll${roll}: unchanged amount lower endpoint`);
+        assert.deepEqual(trace.events, [{ kind: 'target', value: expected.target }, { kind: 'count', value: expected.min }], `${fixture.key}/roll${roll}: atomic assignment order`);
+        assert.equal(gemCount(player), 0, 'selector must not grant a gem');
+        counts.set(expected.sourceName, counts.get(expected.sourceName) + 1);
+    }
+    if (total === 0) {
+        const prior = sentinelTask(player);
+        const draw = withRandomStream([], () => runInt(player, '[proc,slayer_new_target]', npc));
+        assert.equal(draw.result.value, 0, `${fixture.key}: empty eligible set`);
+        assert.equal(player.getVar(IDS.target), prior.target, 'empty set must preserve the prior target');
+        assert.equal(player.getVar(IDS.count), prior.count, 'empty set must preserve the prior count');
+    }
+    for (const row of master.rows) {
+        assert.equal(counts.get(row.sourceName), expectedRowEligibility(row, fixture) ? row.weight : 0, `${fixture.key}/${row.sourceName}: exact eligible mass`);
+    }
+    return { master: master.key, fixture: recordFixture(fixture), totalWeight: total, counts: Object.fromEntries(counts) };
+}
+
+function exactCombatFixture(fixture, combat) {
+    // Fixture only: find ordinary equal combat stats plus Prayer for the exact boundary.
+    for (let level = 1; level <= 99; level++) {
+        for (let prayer = 1; prayer <= 99; prayer++) {
+            const base = 10 * (2 * level + Math.floor(prayer / 2));
+            const actual = Math.floor((base + Math.max(26 * level, 13 * Math.floor(3 * level / 2))) / 40);
+            if (actual === combat) return { ...fixture, combat, level, baseCombatSkills: { [PlayerStat.PRAYER]: prayer } };
+        }
+    }
+    throw new Error(`unreachable combat fixture ${combat}`);
+}
+
+function testProportionalRoll(packedRows) {
+    const distributions = [];
+    for (const master of ORACLE.masters) {
+        const packed = packedRows.get(master.key);
+        for (const kind of ['minimum', 'high']) distributions.push(enumerateProportionalRoll(packed, FIXTURES.get(`${master.key}:${kind}`)));
+    }
+    const turael = distributions.find(row => row.master === 'turael' && row.fixture.baseSlayer === 99);
+    assert.equal(turael.totalWeight, 149, 'sheet fixture: CB126, Slayer99, all quest gates closed');
+    assert.equal(turael.counts.turael_rats, 7);
+    assert.equal(turael.counts.turael_bears, 7);
+    const percent = (100 * 7 / turael.totalWeight).toFixed(2);
+    assert.equal(percent, '4.70', 'rats and bears must reproduce the decision-sheet proportional probability');
+    const additions = [];
+    for (const [masterKey, suffix, donorKey, donorSuffix] of [
+        ['mazchna', 'mossgiants', 'vannaka', 'mossgiants'],
+        ['chaeldar', 'crawlinghands', 'vannaka', 'crawlinghands'],
+        ['duradel', 'bronzedragons', 'chaeldar', 'bronzedragons'],
+        ['duradel', 'turoths', 'chaeldar', 'turoths']
+    ]) {
+        const master = packedRows.get(masterKey);
+        const row = master.rows.find(entry => entry.sourceName === `${masterKey}_${suffix}`);
+        const donor = packedRows.get(donorKey).rows.find(entry => entry.sourceName === `${donorKey}_${donorSuffix}`);
+        assert(row && donor, `${masterKey}_${suffix}: real membership and donor required`);
+        assert.deepEqual([row.target, row.weight, row.min, row.max], [donor.target, donor.weight, donor.min, donor.max], 'UNKNOWN engineering row must retain the disclosed donor values');
+        const high = { ...FIXTURES.get(`${masterKey}:high`), questValues: completedQuestValues() };
+        const cases = [{ ...high, key: `${row.sourceName}_eligible` }];
+        const slayer = ORACLE.slayerReq.get(row.target) ?? 0;
+        if (slayer > 1) {
+            for (const baseSlayer of [slayer - 1, slayer]) cases.push({ ...high, key: `${row.sourceName}_slayer${baseSlayer}`, baseSlayer, currentSlayer: 1 });
+        }
+        const combat = ORACLE.combatReq.get(row.target) ?? 0;
+        if (combat > 3) {
+            for (const level of [combat - 1, combat]) cases.push({ ...exactCombatFixture(high, level), key: `${row.sourceName}_cb${level}` });
+        }
+        if (suffix === 'crawlinghands') {
+            for (const priestperil of [60, 61]) cases.push({ ...high, key: `${row.sourceName}_priestperil${priestperil}`, questValues: { ...high.questValues, priestperil } });
+        }
+        const outcomes = cases.map(fixture => enumerateProportionalRoll(master, fixture));
+        assert(outcomes.some(outcome => outcome.counts[row.sourceName] === row.weight), 'new row needs a real eligible assignment');
+        if (slayer > 1 || combat > 3 || suffix === 'crawlinghands') assert(outcomes.some(outcome => outcome.counts[row.sourceName] === 0), 'gated row needs a real excluded case');
+        additions.push({ row: row.sourceName, donor: donor.sourceName, engineeringLabel: 'UNKNOWN', outcomes });
+    }
+    console.log(`PASS proportional exact enumeration: rats=${percent}%, bears=${percent}%; four borrowed rows retain eligibility`);
+    return { distributions, additions, sheetFixture: { totalWeight: 149, rats: percent, bears: percent } };
 }
 
 class GzipJsonlWriter {
@@ -2232,22 +2315,11 @@ function makeCountMap() {
 }
 
 function locateOccurrence(master, fixture, target, count, randomCalls, acceptance) {
-    const positive = master.rows.filter(row => row.weight > 0);
-    const weightCount = positive.length;
-    assert(weightCount > 0, `${master.key}: no positive weights`);
-    const amountCalls = 1;
-    for (let index = 0; index < positive.length; index++) {
-        const row = positive[index];
-        if (row.target !== target || !expectedRowEligibility(row, fixture)) continue;
-        const rowPosition = index + 1;
-        const remainder = randomCalls - amountCalls - rowPosition;
-        if (remainder < 0 || remainder % weightCount !== 0) continue;
-        const retries = remainder / weightCount;
-        assert.equal(acceptance.get(target), true, `${master.key}/${fixture.key}: selected target lacks actual validator acceptance`);
-        assert(count >= row.min && count <= row.max, `${master.key}/${fixture.key}: count ${count} outside selected occurrence ${row.sourceName} [${row.min},${row.max}]`);
-        return { row, retries, rowPosition, weightCount };
-    }
-    throw new Error(`${master.key}/${fixture.key}: cannot reconcile ${randomCalls} RNG calls with selected target ${target}; positiveRows=${weightCount}`);
+    assert.equal(randomCalls, 2, `${master.key}/${fixture.key}: one category draw and one unchanged amount draw required`);
+    const row = master.rows.find(entry => entry.target === target && expectedRowEligibility(entry, fixture) && count >= entry.min && count <= entry.max);
+    assert(row, `${master.key}/${fixture.key}: selected target/count lacks an eligible occurrence`);
+    assert.equal(acceptance.get(target), true, `${master.key}/${fixture.key}: selected target lacks actual validator acceptance`);
+    return { row, retries: 0 };
 }
 
 async function runDistribution(master, fixture, packedRows, acceptance, drawsPerSeed = DRAWS_PER_SEED) {
@@ -2350,8 +2422,8 @@ async function runDistribution(master, fixture, packedRows, acceptance, drawsPer
         outputPath,
         outputSha256: digestFile(outputPath),
         categoryCount: 76,
-        passSuccessProbability: model.passSuccess,
-        positiveRowsPerPass: positiveWeights,
+        eligibleWeight: model.totalWeight,
+        positiveRows: positiveWeights,
         fixture: recordFixture(fixture)
     };
 }
@@ -2510,8 +2582,7 @@ function testAdversarialFixtures() {
         results.push({ fixture: masterName, selector: false, writes: trace.events, prior, opcount: random.result.opcount, randomValues: random.observed });
     }
 
-    // A test-only two-row compiled table proves that validator rejection consumes
-    // its weight roll and continues through the same pass to the valid row.
+    // A test-only two-row compiled table proves that rejected rows have no bucket.
     const mixedId = rowForPacked('s1_selector_fixture_rejected_then_valid').id;
     const mixed = rowForPacked('s1_selector_fixture_rejected_then_valid');
     const mixedChildIds = packedValues(mixed.row, 'task');
@@ -2523,12 +2594,12 @@ function testAdversarialFixtures() {
     sentinelTask(player, 23, 45);
     const trace = traceWrites(player);
     JavaRandom.setSeed(1);
-    const mixedRun = withRandomStream([0, 0, 0], () => runInt(player, selector, npc, [mixedId]));
+    const mixedRun = withRandomStream([0, 0], () => runInt(player, selector, npc, [mixedId]));
     trace.restore();
-    assert.equal(mixedRun.result.value, 1, 'mixed selector must succeed after a rejected row');
-    assert.equal(player.getVar(IDS.target), acceptedTarget, 'mixed selector must continue within the same pass');
+    assert.equal(mixedRun.result.value, 1, 'mixed selector must succeed with its sole eligible bucket');
+    assert.equal(player.getVar(IDS.target), acceptedTarget, 'mixed selector must exclude the rejected bucket');
     assert.equal(player.getVar(IDS.count), 1, 'mixed fixture inclusive amount lower endpoint mismatch');
-    assert.deepEqual(mixedRun.observed, [0, 0, 0], 'rejected and accepted rows plus amount must use exactly three random opcode calls');
+    assert.deepEqual(mixedRun.observed, [0, 0], 'eligible category and amount must use exactly two random opcode calls');
     assert.deepEqual(trace.events.map(event => event.kind), ['target', 'count'], 'mixed selector must write target then count');
     assert.equal(gemCount(player), 0, 'selector-only mixed fixture must not grant gem');
     results.push({ fixture: 's1_selector_fixture_rejected_then_valid', rejectedTarget, acceptedTarget, success: true, randomValues: mixedRun.observed, writes: trace.events, opcount: mixedRun.result.opcount });
@@ -2631,13 +2702,7 @@ function testLegacyEmptyRecursion(basePack) {
 function streamForFirstEligible(master, fixture) {
     const first = master.rows.findIndex(row => expectedRowEligibility(row, fixture));
     assert(first >= 0, `${master.key}: no independently eligible row for legacy admission proof`);
-    const values = [];
-    for (let index = 0; index < first; index++) {
-        const row = master.rows[index];
-        assert(row.weight > 0, `${row.sourceName}: old packed code cannot safely roll nonpositive table weight`);
-        values.push(1 - Number.EPSILON);
-    }
-    values.push(0, 0);
+    const values = [0, 0];
     return { first, row: master.rows[first], values };
 }
 
@@ -2819,6 +2884,11 @@ try {
         }, null, 2)}\n`);
         metadata.checks.distributions = distributions;
         metadata.checks.binFile = { path: binPath, sha256: digestFile(binPath), binCount: allBins.length };
+    } else if (OPTIONS.mode === 'proportional') {
+        loadRuntime({ scripts: ACTIVE_PACK_DIR, rows: ACTIVE_PACK_DIR });
+        const packedRows = assertPackedLiveRows();
+        testMasterSnapshots();
+        metadata.checks.proportional = testProportionalRoll(packedRows);
     } else if (OPTIONS.mode === 'adversarial') {
         loadRuntime({ scripts: FIXTURE_PACK_DIR, rows: FIXTURE_PACK_DIR });
         metadata.checks.adversarial = testAdversarialFixtures();

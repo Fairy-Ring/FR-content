@@ -356,6 +356,15 @@ data=weight,6
 data=min_amount,10
 data=max_amount,20
 
+// SLAYER-MISSING-TASKS-01.mazchna_mossgiants: UNKNOWN engineering row.
+// Weight and amount borrowed from vannaka_mossgiants, not same-master evidence.
+[mazchna_mossgiants]
+table=slayer_master_task
+data=task,^slayer_mossgiant
+data=weight,7
+data=min_amount,60
+data=max_amount,120
+
 [vannaka_aberrantspecters]
 table=slayer_master_task
 data=task,^slayer_aberrantspecter
@@ -875,6 +884,15 @@ data=weight,7
 data=min_amount,10
 data=max_amount,20
 
+// SLAYER-MISSING-TASKS-01.chaeldar_crawlinghands: UNKNOWN engineering row.
+// Weight and amount borrowed from vannaka_crawlinghands, not same-master evidence.
+[chaeldar_crawlinghands]
+table=slayer_master_task
+data=task,^slayer_crawlinghand
+data=weight,6
+data=min_amount,60
+data=max_amount,120
+
 [chaeldar_caveslimes]
 table=slayer_master_task
 data=task,^slayer_caveslime
@@ -1149,3 +1167,21 @@ data=task,^slayer_mutatedzygomite
 data=weight,2
 data=min_amount,20
 data=max_amount,30
+
+// SLAYER-MISSING-TASKS-01.duradel_bronzedragons: UNKNOWN engineering row.
+// Weight and amount borrowed from chaeldar_bronzedragons, not same-master evidence.
+[duradel_bronzedragons]
+table=slayer_master_task
+data=task,^slayer_bronzedragon
+data=weight,11
+data=min_amount,10
+data=max_amount,20
+
+// SLAYER-MISSING-TASKS-01.duradel_turoths: UNKNOWN engineering row.
+// Weight and amount borrowed from chaeldar_turoths, not same-master evidence.
+[duradel_turoths]
+table=slayer_master_task
+data=task,^slayer_turoth
+data=weight,10
+data=min_amount,110
+data=max_amount,170
