@@ -11,7 +11,7 @@ return (false);
 [proc,generate_slayer_task](dbrow $master)(boolean)
 def_int $i = 0;
 def_int $task_count = db_getfieldcount($master, slayer_task_table:task);
-def_boolean $eligible = false;
+def_int $total_weight = 0;
 def_int $weight;
 def_int $slayer_target;
 def_int $slayer_count;
@@ -30,30 +30,34 @@ while ($i < $task_count) {
         return (false);
     }
     if (~validate_slayer_target($slayer_target) = true) {
-        $eligible = true;
+        $total_weight = add($total_weight, $weight);
     }
     $i = add($i, 1);
 }
 
-// Preserve the ordered reciprocal draw, including rolls for ineligible rows.
-while ($eligible = true) {
-    $i = 0;
-    while ($i < $task_count) {
-        $task_data = db_getfield($master, slayer_task_table:task, $i);
+// CANDIDATE: Slayer task revision 353405 (10 September 2015), Task weighting.
+// Later Old School weight / eligible total, not proof of the 2006 selection law.
+if ($total_weight = 0) {
+    return (false);
+}
+def_int $roll = random($total_weight);
+$i = 0;
+while ($i < $task_count) {
+    $task_data = db_getfield($master, slayer_task_table:task, $i);
+    $slayer_target = db_getfield($task_data, slayer_master_task:task, 0);
+    if (~validate_slayer_target($slayer_target) = true) {
         $weight = db_getfield($task_data, slayer_master_task:weight, 0);
-        if (random($weight) = 0) {
-            $slayer_target = db_getfield($task_data, slayer_master_task:task, 0);
-            if (~validate_slayer_target($slayer_target) = true) {
-                $min = db_getfield($task_data, slayer_master_task:min_amount, 0);
-                $max = db_getfield($task_data, slayer_master_task:max_amount, 0);
-                $slayer_count = ~random_range($min, $max);
-                %slayer_target = $slayer_target;
-                %slayer_count = $slayer_count;
-                return (true);
-            }
+        if ($roll < $weight) {
+            $min = db_getfield($task_data, slayer_master_task:min_amount, 0);
+            $max = db_getfield($task_data, slayer_master_task:max_amount, 0);
+            $slayer_count = ~random_range($min, $max);
+            %slayer_target = $slayer_target;
+            %slayer_count = $slayer_count;
+            return (true);
         }
-        $i = add($i, 1);
+        $roll = sub($roll, $weight);
     }
+    $i = add($i, 1);
 }
 return (false);
 
