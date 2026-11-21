@@ -27,6 +27,34 @@ type Route = { script: ScriptFile | null; rule: string; category: boolean; globa
 export type Option = { root: number; form: Form; slot: number; text: string; ap: Route; op: Route; kind: string };
 type Gap = { type: number; slot: number; text: string; kind: string; roots: Set<number>; placements: Map<string, Placement>; options: Option[] };
 type Label = { name: string; x: number; z: number };
+type SourceDeadLocOption = {
+  typeId: number;
+  configName: string;
+  optionSlot: number;
+  optionText: string;
+  sourceIdentity: string;
+  basis: string;
+};
+
+const SOURCE_DEAD_LOC_OPTIONS: SourceDeadLocOption[] = [
+  {
+    typeId: 5160,
+    configName: 'fenk_bridgebroken',
+    optionSlot: 1,
+    optionText: 'Cross',
+    sourceIdentity: 'locprop/review.md:123; locprop/proposals.json key fenk_bridgebroken:1; revision-377 all.loc:34920-34935',
+    basis: 'VERIFIED cache examine text says there is no way to cross this bridge; the later 2025 repair is excluded.',
+  },
+  {
+    typeId: 5159,
+    configName: 'fenk_bridgesurface',
+    optionSlot: 1,
+    optionText: 'Cross',
+    sourceIdentity: 'locprop/review.md:123; locprop/proposals.json key fenk_bridgesurface:1; revision-377 all.loc:34903-34918',
+    basis: 'VERIFIED cache examine text says there is no way to cross this bridge; the later 2025 repair is excluded.',
+  },
+];
+
 
 const compare = (a: string, b: string) => a < b ? -1 : a > b ? 1 : 0;
 const typeName = (id: number) => LocType.get(id).debugname ?? String(id);
@@ -38,6 +66,22 @@ const notShown = (kind: string) => kind === HIDDEN_KIND || kind === INACTIVE_KIN
 // Java LocType.java:470-472 drops this sentinel with equalsIgnoreCase.
 const isHidden = (text: string | null | undefined) => text?.toLowerCase() === 'hidden';
 const isShown = (text: string | null | undefined) => text !== null && text !== undefined && !isHidden(text);
+function sourceDeadLocOptionFor(typeId: number, optionSlot: number, optionText: string): SourceDeadLocOption | undefined {
+  return SOURCE_DEAD_LOC_OPTIONS.find(exception => exception.typeId === typeId
+    && exception.optionSlot === optionSlot
+    && exception.optionText === optionText);
+}
+
+function assertSourceDeadLocOptions(client: Map<number, LocType>): void {
+  for (const exception of SOURCE_DEAD_LOC_OPTIONS) {
+    const config = client.get(exception.typeId);
+    assert(config, `source-dead loc exception type ${exception.typeId} no longer exists`);
+    assert.equal(typeName(exception.typeId), exception.configName, `source-dead loc exception ${exception.typeId} changed identity`);
+    assert.equal(config.op?.[exception.optionSlot - 1], exception.optionText,
+      `source-dead loc exception ${exception.configName}/${exception.optionSlot} no longer has option ${exception.optionText}`);
+  }
+}
+
 
 export function loadPack(pack = 'data/pack'): Map<number, LocType> {
   for (const config of [VarPlayerType, VarBitType, CategoryType, LocType]) config.load(pack);
@@ -320,6 +364,7 @@ function priorityRows(gaps: Gap[]) {
 
 export function selfChecks(client: Map<number, LocType>, placements: Placement[], output?: string): string[] {
   const results: string[] = [];
+  assertSourceDeadLocOptions(client);
   const provider = ScriptProvider as unknown as { scriptLookup: Map<number, ScriptFile> };
   const originalLookup = provider.scriptLookup;
   const originalLength = LocType.configs.length;
@@ -359,6 +404,10 @@ export function selfChecks(client: Map<number, LocType>, placements: Placement[]
     assert.equal(test.options.filter(o => o.kind === HIDDEN_KIND).length, 3, 'hidden is case-insensitive');
     assert(!test.gaps.some(g => g.type === ids[0] && g.slot !== 1), 'hidden slots never become gaps');
     assert.equal(test.options.find(o => o.root === ids[0] && o.slot === 2)?.op.script, hiddenHandler, 'hidden script dispatch is still recorded');
+    assert.equal(sourceDeadLocOptionFor(5160, 1, 'Cross'), SOURCE_DEAD_LOC_OPTIONS[0]);
+    assert.equal(sourceDeadLocOptionFor(5159, 1, 'Cross'), SOURCE_DEAD_LOC_OPTIONS[1]);
+    assert.equal(sourceDeadLocOptionFor(ids[0], 1, 'Synthetic odd Spelling'), undefined,
+      'unrelated missing handler stays in the raw gaps');
     if (output) {
       const file = path.join(output, 'self-check-fixtures.csv');
       csv(file, ['config_name', 'option_slot', 'option_text', 'kind', 'placement_count'], test.gaps.map(g => [typeName(g.type), g.slot, g.text, g.kind, g.placements.size]));
@@ -430,6 +479,8 @@ export function runAudit(content: string, output: string): void {
   const inventory = readPlacements();
   const checks = selfChecks(client, inventory.placements, output);
   const audit = scan(inventory.placements, client);
+  const sourceDeadGaps = audit.gaps.filter(g => sourceDeadLocOptionFor(g.type, g.slot, g.text));
+  const unknownGaps = audit.gaps.filter(g => !sourceDeadLocOptionFor(g.type, g.slot, g.text));
   const names = labels(content);
   const byRoot = new Map<number, Placement[]>();
   for (const p of inventory.placements) { const rows = byRoot.get(p.type) ?? []; rows.push(p); byRoot.set(p.type, rows); }
@@ -440,11 +491,13 @@ export function runAudit(content: string, output: string): void {
   csv(path.join(output, 'loc-options-priority.csv'), ['config_or_group', 'option_text', 'slots', 'gap_rows', 'distinct_placements', 'map_squares', 'sample_tile', 'mechanism_lead'], priority.map(priorityCells));
   const gapRow = (g: Gap) => {
     const p = sample(g);
-    return [g.type, typeName(g.type), LocType.get(g.type).name, g.slot, g.text, g.kind, g.placements.size, maps(g), tile(p), ...nearbyLabel(p, names), [...g.roots].map(typeName).sort(compare).join(';'), g.options.some(o => o.ap.category || o.op.category), g.options.some(o => o.ap.global || o.op.global), descriptions(g, 'ap'), descriptions(g, 'op'), lead(g)];
+    const sourceDead = sourceDeadLocOptionFor(g.type, g.slot, g.text);
+    return [g.type, typeName(g.type), LocType.get(g.type).name, g.slot, g.text, g.kind, g.placements.size, maps(g), tile(p), ...nearbyLabel(p, names), [...g.roots].map(typeName).sort(compare).join(';'), g.options.some(o => o.ap.category || o.op.category), g.options.some(o => o.ap.global || o.op.global), descriptions(g, 'ap'), descriptions(g, 'op'), lead(g), sourceDead ? 'dead by source' : 'unknown gap', sourceDead?.sourceIdentity ?? '', sourceDead?.basis ?? ''];
   };
-  const gapHeader = ['loc_type', 'config_name', 'display_name', 'option_slot', 'option_text', 'kind', 'placement_count', 'map_squares', 'sample_tile', 'near_surface_label', 'label_distance_tiles', 'placed_roots', 'category_handler_exists', 'global_handler_exists', 'ap_handler', 'op_handler', 'mechanism_lead'];
+  const gapHeader = ['loc_type', 'config_name', 'display_name', 'option_slot', 'option_text', 'kind', 'placement_count', 'map_squares', 'sample_tile', 'near_surface_label', 'label_distance_tiles', 'placed_roots', 'category_handler_exists', 'global_handler_exists', 'ap_handler', 'op_handler', 'mechanism_lead', 'source_disposition', 'source_identity', 'source_basis'];
   csv(path.join(output, 'loc-options-missing.csv'), gapHeader, audit.gaps.map(gapRow));
   csv(path.join(output, 'loc-options-inactive.csv'), gapHeader, inactiveRows.map(gapRow));
+  csv(path.join(output, 'loc-options-dead-by-source.csv'), gapHeader, sourceDeadGaps.map(gapRow));
   csv(path.join(output, 'loc-placements.csv'), ['placement_key', 'placed_type', 'config_name', 'map_square', 'x', 'z', 'client_plane', 'shape', 'angle', 'server_entity_active'], inventory.placements.map(p => [p.key, p.type, typeName(p.type), p.map, p.x, p.z, p.level, p.shape, p.angle, LocType.get(p.type).active]));
   csv(path.join(output, 'loc-options-all.csv'), ['placed_root', 'visible_type', 'config_name', 'states', 'slot', 'text', 'kind', 'root_placement_count', 'ap_handler', 'op_handler'], audit.options.map(o => [typeName(o.root), o.form.type, typeName(o.form.type), o.form.states.map(s => s === null ? 'base' : s).join(';'), o.slot, o.text, o.kind, byRoot.get(o.root)!.length, scriptDescription(o.ap), scriptDescription(o.op)]));
   const aggregate = (keyFor: (g: Gap, p: Placement) => string) => {
@@ -476,7 +529,13 @@ export function runAudit(content: string, output: string): void {
   const contextTotals = (options: Option[]) => ({ rootFormSlots: options.length, formSlots: new Set(options.map(o => `${o.form.type}:${o.slot}`)).size, roots: new Set(options.map(o => o.root)).size, placements: new Set(options.flatMap(o => byRoot.get(o.root)!.map(p => p.key))).size, withHandler: options.filter(o => o.ap.script || o.op.script).length, associations: options.reduce((n, o) => n + byRoot.get(o.root)!.length, 0) });
   const hidden = { kind: HIDDEN_KIND, ...contextTotals(hiddenOptions), byText: [...new Set(hiddenOptions.map(o => o.text))].sort(compare).map(text => ({ text, ...contextTotals(hiddenOptions.filter(o => o.text === text)) })) };
   const inactive = { kind: INACTIVE_KIND, rows: inactiveRows.length, forms: new Set(inactiveRows.map(g => g.type)).size, ...contextTotals(inactiveOptions) };
-  const summary = { maps: inventory.maps, placements: inventory.placements.length, placedTypes: byRoot.size, clientLocTypes: client.size, enumeratedRootFormOptions: audit.options.length, visibleOptionForms: new Set(audit.options.filter(o => !notShown(o.kind)).map(o => o.form.type)).size, gapRows: audit.gaps.length, gapForms: new Set(audit.gaps.map(g => g.type)).size, gapPlacements: gapPlacements.size, gapAssociations: audit.gaps.reduce((n, g) => n + g.placements.size, 0), kinds, hidden, inactive, inactiveConfigs: inactiveConfigs.length, inactivePlacedConfigs: inactiveConfigs.filter(c => byRoot.has(c.id)).length, limits: audit.limits };
+  const dispositionTotals = (rows: Gap[]) => ({
+    rows: rows.length,
+    forms: new Set(rows.map(g => g.type)).size,
+    placements: new Set(rows.flatMap(g => [...g.placements.keys()])).size,
+    associations: rows.reduce((n, g) => n + g.placements.size, 0),
+  });
+  const summary = { maps: inventory.maps, placements: inventory.placements.length, placedTypes: byRoot.size, clientLocTypes: client.size, enumeratedRootFormOptions: audit.options.length, visibleOptionForms: new Set(audit.options.filter(o => !notShown(o.kind)).map(o => o.form.type)).size, gapRows: audit.gaps.length, gapForms: new Set(audit.gaps.map(g => g.type)).size, gapPlacements: gapPlacements.size, gapAssociations: audit.gaps.reduce((n, g) => n + g.placements.size, 0), kinds, hidden, inactive, inactiveConfigs: inactiveConfigs.length, inactivePlacedConfigs: inactiveConfigs.filter(c => byRoot.has(c.id)).length, sourceDead: dispositionTotals(sourceDeadGaps), unknownGaps: dispositionTotals(unknownGaps), limits: audit.limits };
   fs.writeFileSync(path.join(output, 'loc-summary.json'), JSON.stringify(summary, null, 2) + '\n');
   fs.writeFileSync(path.join(output, 'self-checks.log'), checks.join('\n') + '\n');
   const md = (s: unknown) => String(s).replaceAll('|', '\\|').replaceAll('\n', ' ');
@@ -508,7 +567,15 @@ export function runAudit(content: string, output: string): void {
     'A placement is deduplicated within each row. Distinct placements are physical map entries. Association totals count every potential form and option separately.',
     'Place means map square and sample tile. Optional labels use actual coordinates within 100 tiles, with distance. No underground projection or distant label is used.',
     'Mechanism groups are UNKNOWN engineering leads from option text and config name only. Groups are mutually exclusive in the listed order, not authenticated mechanisms.', '',
-    '## Totals', '', '```json', JSON.stringify(summary, null, 2), '```', '', '## Fifty most-placed gaps', '',
+    '## Totals', '', '```json', JSON.stringify(summary, null, 2), '```', '',
+    '## Dead by source', '',
+    'Only the two exact revision-377 bridge `Cross` options already classified DEAD in locprop are listed here. No UNSOURCED proposal is admitted. The raw missing-option inventory and its gap totals still include these exact rows; the added disposition fields and sidecar CSV distinguish them from residual unknown gaps.',
+    '',
+    '| Loc type | Slot | Option | Placements | Map squares | Source identity |',
+    '|---|---:|---|---:|---|---|',
+    ...sourceDeadGaps.map(g => `| ${[typeName(g.type), g.slot, g.text, g.placements.size, maps(g), sourceDeadLocOptionFor(g.type, g.slot, g.text)?.sourceIdentity ?? ''].map(md).join(' | ')} |`),
+    '',
+    '## Fifty most-placed gaps', '',
     '| Config | Slot | Option | Kind | Placements | Map squares | Sample tile | Nearby surface label |', '|---|---:|---|---|---:|---|---|---|'];
   for (const g of [...audit.gaps].sort((a, b) => b.placements.size - a.placements.size || a.type - b.type || a.slot - b.slot).slice(0, 50)) {
     const label = nearbyLabel(sample(g), names);

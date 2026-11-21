@@ -12,12 +12,17 @@ import OpNpc from '#/network/game/client/model/OpNpc.js';
 import * as rsbuf from '#/network/rsbuf/index.js';
 import { findNoRouteTalkWitnesses, isTalkOption, loadPackedConfigs, type NoRouteTalkWitness } from './audit.mts';
 
-function runWitness(witness: NoRouteTalkWitness, ordinal: number): void {
+function runWitness(witness: NoRouteTalkWitness, ordinal: number, expectedOption?: string): void {
   const visibleTypeId = witness.visibleTypeId;
   const slot = witness.talkSlot;
   const type = NpcType.get(visibleTypeId);
   assert(type, `visible NPC config ${visibleTypeId} is not loaded`);
-  assert(isTalkOption(type.op?.[slot - 1]), `NPC ${visibleTypeId} no longer has a talk option in slot ${slot}`);
+  const option = type.op?.[slot - 1];
+  if (expectedOption === undefined) {
+    assert(isTalkOption(option), `NPC ${visibleTypeId} slot ${slot} is no longer a Talk-to option`);
+  } else {
+    assert.equal(option, expectedOption, `NPC ${visibleTypeId} slot ${slot} no longer has expected option ${expectedOption}`);
+  }
   const player = new Player('talkaudit', 1n, 1n);
   player.pid = 1;
   player.uid = 1;
@@ -64,7 +69,7 @@ function runWitness(witness: NoRouteTalkWitness, ordinal: number): void {
     assert.equal(rsbuf.hasNpc(player.slot, npc.nid), true, `NPC ${visibleTypeId} is not visible to the client`);
 
     const accepted = new OpNpcHandler().handle(new OpNpc(slot, npc.nid), player);
-    assert.equal(accepted, true, `production OpNpcHandler rejected Talk-to slot ${slot} on NPC ${visibleTypeId}`);
+    assert.equal(accepted, true, `production OpNpcHandler rejected NPC option slot ${slot} on NPC ${visibleTypeId}`);
     assert.equal(player.getApTrigger(), null, `census no-route NPC ${visibleTypeId} acquired an AP script`);
     assert.equal(player.getOpTrigger(), null, `census no-route NPC ${visibleTypeId} acquired an OP script`);
 
@@ -93,5 +98,10 @@ const witnesses = findNoRouteTalkWitnesses(contentRootInput, 10);
 assert.equal(runWitnessBatch([]), 0, 'an empty current gap set is valid');
 assert(witnesses.length <= 10, 'runtime witness selection exceeds its bound');
 const count = runWitnessBatch(witnesses);
+const sourceDeadWitness = { placedTypeId: 1867, visibleTypeId: 1867, talkSlot: 3 };
+assert.equal(NpcType.get(sourceDeadWitness.visibleTypeId)?.op?.[sourceDeadWitness.talkSlot - 1], 'Trade',
+  'source-dead witness requires the exact NPC 1867 option 3 Trade');
+runWitness(sourceDeadWitness, count + 1, 'Trade');
+console.log('TALK_AUDIT_RUNTIME_SOURCE_DEAD=1 fallback=Nothing interesting happens.');
 if (count === 0) console.log('SKIP: no unanswered mapped talk options remain');
 console.log(`TALK_AUDIT_RUNTIME_WITNESSES=${count} fallback=Nothing interesting happens.`);

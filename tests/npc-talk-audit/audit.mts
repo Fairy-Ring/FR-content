@@ -117,6 +117,24 @@ type ScriptAnalysis = {
   deferredCalls: string[];
 };
 
+type SourceDeadNpcOption = {
+  visibleTypeId: number;
+  optionSlot: number;
+  optionText: string;
+  sourceIdentity: string;
+  basis: string;
+};
+
+const SOURCE_DEAD_NPC_OPTIONS: SourceDeadNpcOption[] = [
+  {
+    visibleTypeId: 1867,
+    optionSlot: 3,
+    optionText: 'Trade',
+    sourceIdentity: 'Old School RuneScape Wiki: Ali the Camel Man, revisions 214367 and 15196390; original revision-377 NPC 1867 option 3; retained U-BETA-1117/q075/camel-man-osrs-complete-history-20261119.json',
+    basis: 'CANDIDATE: revision 214367 says the Trade option does nothing; revision 15196390 says it reports “nothing interesting happens” during and after the quest. The complete retained article history and change notes date Trade to 15 August 2005 and the later renamed form to 9 November 2022.',
+  },
+];
+
 const configs = [
   VarPlayerType,
   VarBitType,
@@ -684,9 +702,25 @@ export function isTalkOption(option: string | null | undefined): boolean {
   const key = option?.toLowerCase().replace(/\s+/g, '-');
   return key === 'talk' || key === 'talk-to';
 }
+function sourceDeadNpcOptionFor(visibleTypeId: number, optionSlot: number, optionText: string): SourceDeadNpcOption | undefined {
+  return SOURCE_DEAD_NPC_OPTIONS.find(exception => exception.visibleTypeId === visibleTypeId
+    && exception.optionSlot === optionSlot
+    && exception.optionText === optionText);
+}
+
+function assertSourceDeadNpcOptions(): void {
+  for (const exception of SOURCE_DEAD_NPC_OPTIONS) {
+    const config = NpcType.get(exception.visibleTypeId);
+    assert(config, `source-dead NPC exception type ${exception.visibleTypeId} no longer exists`);
+    assert.equal(config.op?.[exception.optionSlot - 1], exception.optionText,
+      `source-dead NPC exception ${exception.visibleTypeId}/${exception.optionSlot} no longer has option ${exception.optionText}`);
+  }
+}
+
 
 export function findNoRouteTalkWitnesses(contentRoot: string, count: number): NoRouteTalkWitness[] {
   assert(Number.isInteger(count) && count > 0, `invalid witness count ${count}`);
+  assertSourceDeadNpcOptions();
   const rootIds = new Set(readMapNpcPlacements(contentRoot).placements.map(placement => placement.npcId));
   const candidates = new Map<string, NoRouteTalkWitness>();
   let nextNpcId = 1;
@@ -752,6 +786,13 @@ function selfTestMissingOptions(outDir: string): void {
   }
   const form: FormReport = { root: visible, visible, states: new Set(['synthetic']), dispatches };
   const rows = missingOptionsForForm(form).map(row => ({ optionSlot: row.slot, optionText: row.option }));
+  const unrelated = rows[0];
+  assert.equal(sourceDeadNpcOptionFor(visible.id, unrelated.optionSlot, unrelated.optionText), undefined,
+    'an unrelated missing handler must remain an unknown gap');
+  assert.equal(sourceDeadNpcOptionFor(1867, 3, 'Trade'), SOURCE_DEAD_NPC_OPTIONS[0]);
+  assert.equal(sourceDeadNpcOptionFor(1867, 2, 'Trade'), undefined);
+  assert.equal(sourceDeadNpcOptionFor(1868, 3, 'Trade'), undefined);
+  assert.equal(sourceDeadNpcOptionFor(1867, 3, 'Talk-to'), undefined);
   const name = `audit-options-selftest-${process.pid}.csv`;
   const file = path.join(outDir, name);
   assert(!fs.existsSync(file), 'refusing to overwrite a pre-existing self-test file');
@@ -1058,6 +1099,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   assert(fs.existsSync('data/pack/server/npc.dat'), 'missing built engine data/pack; run the final engine build first');
   fs.mkdirSync(outDir, { recursive: true });
   loadPackedConfigs('data/pack');
+  assertSourceDeadNpcOptions();
   selfTestMissingOptions(outDir);
   const op1Spellings = new Map<string, number>();
   for (const type of NpcType.configs) {
@@ -1271,6 +1313,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     const root = NpcType.get(entry.rootId);
     const servicePriority = priorityForOptions(entry.form.visible.op ?? []);
     const optionPriority = servicePriority ?? priorityForOption(entry.option, entry.slot);
+    const sourceDead = sourceDeadNpcOptionFor(entry.form.visible.id, entry.slot, entry.option);
     const triggers = [enumTrigger(`APNPC${entry.slot}`), enumTrigger(`OPNPC${entry.slot}`)];
     const categories = [...new Set([root.category, entry.form.visible.category])].filter(category => category !== -1);
     const categoryHandlerExists = categories.some(category => triggers.some(trigger => Boolean(ScriptProvider.getByTriggerSpecific(trigger, -1, category))));
@@ -1304,6 +1347,9 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       priorityEvidence: optionPriority.basis,
       serviceOption: servicePriority?.option ?? '',
       serviceOptionSlot: servicePriority?.slot ?? '',
+      sourceDisposition: sourceDead ? 'dead by source' : 'unknown gap',
+      sourceIdentity: sourceDead?.sourceIdentity ?? '',
+      sourceBasis: sourceDead?.basis ?? '',
     };
   });
 
@@ -1423,6 +1469,8 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     || String(left.area).localeCompare(String(right.area))
     || Number(right.placementCount) - Number(left.placementCount)
     || Number(left.visibleTypeId) - Number(right.visibleTypeId));
+  const sourceDeadOptionRows = missingOptionRows.filter(row => row.sourceDisposition === 'dead by source');
+  const unknownMissingOptionRows = missingOptionRows.filter(row => row.sourceDisposition !== 'dead by source');
 
   const namesByPlacements = (rows: Record<string, unknown>[]): Record<string, unknown>[] => {
     const nameGroups = new Map<string, {
@@ -1552,6 +1600,8 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     silentQuestStageFormPlacements: summary.talkRows.filter(row => String(row.classification).startsWith('silent in some quest stages')).reduce((sum, row) => sum + Number(row.placementCount), 0),
     ordinaryDialogueFormPlacements: summary.talkRows.filter(row => /^(?:ordinary dialogue|generic only)/.test(String(row.classification))).reduce((sum, row) => sum + Number(row.placementCount), 0),
     missingOptionFormPlacements: summary.missingOptions.reduce((sum, row) => sum + Number(row.placementCount), 0),
+    sourceDeadOptionFormPlacements: summary.missingOptions.filter(row => row.sourceDisposition === 'dead by source').reduce((sum, row) => sum + Number(row.placementCount), 0),
+    unknownMissingOptionFormPlacements: summary.missingOptions.filter(row => row.sourceDisposition !== 'dead by source').reduce((sum, row) => sum + Number(row.placementCount), 0),
     unresolvedContinuationFormPlacements: summary.talkRows.filter(row => Boolean(row.unresolvedContinuationEdges)).reduce((sum, row) => sum + Number(row.placementCount), 0),
   })).sort((left, right) => String(left.area).localeCompare(String(right.area))
     || Number(right.spawnCount) - Number(left.spawnCount));
@@ -1564,7 +1614,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   }));
 
   const topServiceGaps = missingOptionRows
-    .filter(row => Number(row.priorityRank) === 0)
+    .filter(row => Number(row.priorityRank) === 0 && row.sourceDisposition !== 'dead by source')
     .map(row => ({
       ...row,
       missingRoute: `op${row.optionSlot} (no AP/OP handler)`,
@@ -1595,8 +1645,12 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     'visibleStates', 'categoryId', 'categoryName', 'optionSlot', 'optionText', 'ops', 'operationDispatch', 'approachDispatch',
     'categoryHandlerExists', 'globalHandlerExists', 'categoryOrGlobalHandlerExists',
     'placementCount', 'area', 'mapSquaresInArea', 'allMapSquaresForPlacedType', 'sampleTile', 'priorityRank',
-    'priorityBucket', 'priorityEvidence',
+    'priorityBucket', 'priorityEvidence', 'sourceDisposition', 'sourceIdentity', 'sourceBasis',
   ], missingOptionRows);
+  writeCsv(outDir, 'audit-npc-options-dead-by-source.csv', [
+    'placedTypeId', 'placedInternalName', 'visibleTypeId', 'visibleDisplayName', 'optionSlot', 'optionText',
+    'placementCount', 'area', 'mapSquaresInArea', 'sampleTile', 'sourceIdentity', 'sourceBasis',
+  ], sourceDeadOptionRows);
   writeCsv(outDir, 'audit-npc-area-summary.csv', [
     'area', 'mapSquares', 'spawnCount', 'placedNpcTypeCount', 'talkFormAreaRows', 'noTalkHandlerFormPlacements',
     'genericOnlyFormPlacements', 'silentQuestStageFormPlacements', 'ordinaryDialogueFormPlacements', 'missingOptionFormPlacements',
@@ -1652,10 +1706,23 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       missingOptionFormPlacements: missingOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0),
       missingNonTalkOp1Forms: new Set(missingOptionRows.filter(row => Number(row.optionSlot) === 1 && !isTalkOption(String(row.optionText))).map(row => `${row.placedTypeId}:${row.visibleTypeId}`)).size,
       missingNonTalkOp1FormPlacements: missingOptionRows.filter(row => Number(row.optionSlot) === 1 && !isTalkOption(String(row.optionText))).reduce((sum, row) => sum + Number(row.placementCount), 0),
+      sourceDeadOptionRows: sourceDeadOptionRows.length,
+      sourceDeadOptionFormPlacements: sourceDeadOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0),
+      unknownMissingOptionRows: unknownMissingOptionRows.length,
+      unknownMissingOptionFormPlacements: unknownMissingOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0),
       unresolvedNpcConfigIds: missingConfigsRows,
       malformedMapNpcRows: scan.malformedRows,
       dispatchRuleConflicts: dispatchErrors,
       scriptCompilerVersion: ScriptProvider.COMPILER_VERSION,
+    },
+    optionDispositions: {
+      sourceDeadExceptions: SOURCE_DEAD_NPC_OPTIONS,
+      rawMissingOptionRows: missingOptionRows.length,
+      rawMissingOptionFormPlacements: missingOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0),
+      sourceDeadRows: sourceDeadOptionRows.length,
+      sourceDeadOptionFormPlacements: sourceDeadOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0),
+      unknownGapRows: unknownMissingOptionRows.length,
+      unknownGapOptionFormPlacements: unknownMissingOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0),
     },
     classifications: countsByClassification,
     dispatch: {
@@ -1705,6 +1772,7 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
       'audit-npc-handlers.csv',
       'audit-npc-defaults.csv',
       'audit-npc-unresolved.csv',
+      'audit-npc-options-dead-by-source.csv',
       'audit-npc-talk.json',
       'audit-npc-talk.md',
     ],
@@ -1723,6 +1791,9 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
   const serviceLines = topServiceGaps.length
     ? topServiceGaps.map(row => `- ${row.area}: ${row.visibleDisplayName || row.placedInternalName} (${row.visibleTypeId}), missing ${row.missingOption}; service op${row.serviceOptionSlot} '${row.serviceOption}', ${row.placementCount} form placements; ${row.priorityEvidence}.`).join('\n')
     : '- No missing non-Attack option with an explicit packed service option was found.';
+  const sourceDeadLines = sourceDeadOptionRows.length
+    ? sourceDeadOptionRows.map(row => `- ${String(row.visibleDisplayName)} (${String(row.visibleTypeId)}), slot ${String(row.optionSlot)} ${String(row.optionText)}: ${String(row.sourceBasis)} Source: ${String(row.sourceIdentity)}.`).join('\n')
+    : '- No source-dead options matched the current census.';
   const globalLines = defaultRows.map(row => `- ${row.trigger}: ${row.registeredGlobalScript}; ${row.classification}; ${row.exampleResponse || 'no literal response recorded'}`).join('\n');
   const report = [
     '# Compiled NPC Talk-to audit',
@@ -1742,6 +1813,14 @@ export async function runAudit(contentRootInput: string, outDirInput: string): P
     '## Talk classifications',
     '',
     classificationLines || '- No placed Talk-to forms.',
+    '',
+    '## Dead by source',
+    '',
+    'This separate classification covers only exact registered type/slot/text matches. The complete raw no-handler inventory remains in `audit-npc-options-missing.csv`; its original missing-option totals are unchanged, with source-dead rows distinguished from the residual unknown gaps by `sourceDisposition`. The source-dead subset is also written to `audit-npc-options-dead-by-source.csv`.',
+    '',
+    `Raw missing-option rows/form placements: ${missingOptionRows.length}/${missingOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0)}. Source-dead: ${sourceDeadOptionRows.length}/${sourceDeadOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0)}. Residual unknown gaps: ${unknownMissingOptionRows.length}/${unknownMissingOptionRows.reduce((sum, row) => sum + Number(row.placementCount), 0)}.`,
+    '',
+    sourceDeadLines,
     '',
     'The runtime fallback for a missing operation handler is `Nothing interesting happens.` from `Player.defaultOp`; the no-approach-handler phase itself produces no chat. Compiled global AP/OP handlers and these engine fallbacks are listed in `audit-npc-defaults.csv`.',
     '',
