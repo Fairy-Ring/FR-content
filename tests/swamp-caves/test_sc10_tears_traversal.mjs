@@ -156,7 +156,10 @@ function completeFerry(p) {
   assert.equal(p.animId, id('SeqType', 'tog_player_float_down'));
   assert.equal(p.moves.at(-1).tick, start + 3); assert.equal(p.moves.at(-1).owner, 0);
   assert.equal(p.moves.at(-1).overlay, -1, 'release happens BEFORE the landing teleport');
-  ticks(p, 2); assert(p.delayed); ticks(p, 1); assert(!p.delayed); assert(!p.activeScript);
+  ticks(p, 1); assert(p.delayed);
+  ticks(p, 1); assert(p.delayed);
+  assert.equal(carriers().length, 1, 'carrier remains present through tick 5 before unlock');
+  ticks(p, 1); assert(!p.delayed); assert(!p.activeScript);
   assert.equal(p.animId, -1); assert.deepEqual(carriers(), [], 'carrier is deleted at unlock');
 }
 function load(p) {
