@@ -10,7 +10,7 @@ const engine = process.env.HARNESS_ENGINE_DIR ?? path.resolve(content, '../engin
 const pack = path.join(engine, 'data/pack');
 const load = async rel => (await import(pathToFileURL(path.join(engine, 'src', rel)).href)).default;
 const World = await load('engine/World.ts');
-const Player = await load('engine/entity/Player.ts');
+const { NetworkPlayer } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NetworkPlayer.ts')).href);
 const ScriptProvider = await load('engine/script/ScriptProvider.ts');
 const ScriptRunner = await load('engine/script/ScriptRunner.ts');
 const ScriptState = await load('engine/script/ScriptState.ts');
@@ -59,6 +59,7 @@ function assertNativeModel(root, number, model) {
   assert.ok(asset.readUInt16BE(asset.length - 16) > 0, `${model} has faces`);
 }
 function assertPictures(p, packetStart, root, requiredModels) {
+  p.encodeOut(); // Main interface opens flush at the production network output phase.
   const packets = p.packets.slice(packetStart);
   const rootId = types.Component.getId(root);
   assert.ok(packets.some(packet => packet.constructor.name === 'IfOpenMain' && packet.component === rootId),
@@ -90,7 +91,7 @@ for (const [x, z] of landings) {
 let serial = 0;
 function fixture(level = 99, axe = 'bronze_axe', equipped = false) {
   const n = ++serial;
-  const p = new Player(`canoe_${n}`, BigInt(n), BigInt(n));
+  const p = new NetworkPlayer(`canoe_${n}`, BigInt(n), BigInt(n), { uuid: `offline-canoe-${n}` });
   p.slot = n; p.pid = n; p.uid = n;
   p.baseLevels.fill(1); p.levels.fill(1); p.vars.fill(0);
   p.baseLevels[wc] = level; p.levels[wc] = level;
