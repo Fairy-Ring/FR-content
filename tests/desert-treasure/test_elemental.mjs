@@ -1,10 +1,11 @@
 #!/usr/bin/env node
-/** Native packed attacks, published-bytecode differential controls and isolated rule mutants. */
+/** Native packed attacks, independent fixed-seed outcome contracts and rule mutants. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { elementalSeeds, elementalOracle, assertElementalOutcome } from './elemental-oracle.mjs';
 
 process.on('uncaughtException', error => { console.error(error); process.exit(1); });
 process.on('unhandledRejection', error => { console.error(error); process.exit(1); });
@@ -32,6 +33,11 @@ for (const name of ['VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType'
   types[name].load(pack);
 }
 (await load('src/cache/config/DbTableIndex.ts')).default.init();
+const synthNames = new Map(fs.readFileSync(path.join(content, 'pack/synth.pack'), 'utf8').trim().split('\n').map(line => {
+  const [number, name] = line.split('='); return [name, Number(number)];
+}));
+types.SynthType = { getId: name => synthNames.get(name) ?? -1 };
+const { isMapBlocked } = await load('src/engine/GameMap.ts');
 const scriptCount = ScriptProvider.load(pack);
 assert(scriptCount > 0, 'build the sibling production pack first');
 const ScriptVarType = (await load('src/cache/config/ScriptVarType.ts')).default;
@@ -69,46 +75,6 @@ function run(p, n, name, args = []) {
   assert.equal(p.runScript(state, true, true), ScriptState.FINISHED, `${name} finishes`);
   return state;
 }
-const published = JSON.parse(fs.readFileSync(new URL('./elemental-published.json', import.meta.url)));
-const publishedSpecials = JSON.parse(fs.readFileSync(new URL('./elemental-specials-published.json', import.meta.url)));
-const paramIdentities = JSON.parse(fs.readFileSync(new URL('./elemental-published-params.json', import.meta.url)));
-const originalScripts = [
-  ...published.scripts.map(record => [record, paramIdentities.published]),
-  ...publishedSpecials.scripts.map(record => [record, paramIdentities.specials])
-];
-assert.equal(published.publishedContent, 'ccdca1101a225a38d2583e56ce1023ab028c8b75');
-assert.equal(published.publishedEngine, 'ef96f86623697dc0d5367cc0a889c4c56eb091d3');
-const bytecodeFields = ['intLocalCount', 'stringLocalCount', 'intArgCount', 'stringArgCount', 'switchTables', 'opcodes', 'intOperands', 'stringOperands'];
-function withPublished(fn) {
-  const saved = [];
-  for (const [original, paramNames] of originalScripts) {
-    const current = script(original.info.scriptName);
-    saved.push([current, Object.fromEntries(bytecodeFields.map(k => [k, current[k]]))]);
-    for (const field of bytecodeFields) current[field] = structuredClone(original[field]);
-    // Procedure ids can move when the production compiler adds scripts. Resolve recorded callees by identity.
-    for (const [pc, name] of Object.entries(original.callees)) current.intOperands[pc] = script(name).id;
-    // A clean pack regenerates server-only param ids. Restore each literal by its recorded name.
-    for (let pc = 1; pc < original.opcodes.length; pc++) {
-      if (!['NPC_PARAM', 'OC_PARAM'].includes(ScriptOpcodeNameMap.get(original.opcodes[pc]))) continue;
-      assert.equal(ScriptOpcodeNameMap.get(original.opcodes[pc - 1]), 'PUSH_CONSTANT_INT');
-      const name = paramNames[original.intOperands[pc - 1]];
-      assert(name, `${original.info.scriptName}:${pc} has a recorded parameter identity`);
-      current.intOperands[pc - 1] = id('ParamType', name);
-    }
-    // These recorded DB reads all belong to magic_spell_table. Resolve its
-    // identity, not the old generated table id; rows are supplied by the live
-    // get_spell_data lookup and therefore already have current identities.
-    for (let pc = 0; pc < original.opcodes.length; pc++) {
-      const opcode = ScriptOpcodeNameMap.get(original.opcodes[pc]);
-      if (!['DB_GETFIELD', 'DB_GETFIELDCOUNT'].includes(opcode)) continue;
-      assert.equal(original.info.scriptName, '[proc,pvm_spell_success]', 'record the table name for any additional published DB user');
-      const operand = pc - (opcode === 'DB_GETFIELD' ? 2 : 1);
-      assert.equal(ScriptOpcodeNameMap.get(original.opcodes[operand]), 'PUSH_CONSTANT_INT');
-      current.intOperands[operand] = (id('DbTableType', 'magic_spell_table') << 12) | (original.intOperands[operand] & 0xfff);
-    }
-  }
-  try { return fn(); } finally { for (const [current, fields] of saved) Object.assign(current, fields); }
-}
 let trace = null;
 for (const [opcode, original] of Object.entries(ScriptRunner.HANDLERS)) {
   if (Number(opcode) <= 100) continue;
@@ -137,7 +103,7 @@ function fixture(type, equipment = []) {
     const item = object(name);
     p.invSet(worn, item.id, item.stackable ? 100 : 1, item.wearpos);
   }
-  run(p, null, '[proc,player_combat_stat]');
+  run(p, null, '[proc,update_all]', [p.invs.get(worn)?.items[3]?.id ?? -1]);
   const t = types.NpcType.get(type);
   const n = new Npc(0, p.x + 1, p.z, t.size, t.size, EntityLifeCycle.DESPAWN, 1, type, t.blockwalk);
   World.addNpc(n, 1000);
@@ -175,185 +141,99 @@ const rangedSpecials = [
   ['magic_longbow', 'Magic longbow', 'Bronze arrow'], ['magic_longbow', 'Magic longbow', 'Ice arrows'],
   ['magic_longbow', 'Magic longbow', 'Rune arrow(p)'], ['rune_thrownaxe', 'Rune thrownaxe']
 ];
-function outcome(type, attack, seed, { original = false, successOnly = false, miss = false } = {}) {
-  const action = () => {
-    const equipment = attack.kind === 'magic' ? attack.row[3] ?? [] : ['melee', 'cannon'].includes(attack.kind) ? ['Rune scimitar'] : attack.row.slice(1);
-    const { p, n } = fixture(type, equipment);
-    if (attack.kind === 'cannon') {
-      set(p, 'rockthrower', 30);
-      set(p, 'ownedmcannon', (p.level << 28) | (p.x << 14) | p.z);
-    }
-    if (attack.kind === 'cannon' && attack.style !== undefined) cannonStyle(p, attack.style);
-    if (miss) set(p, 'com_magicattack', 0);
-    JavaRandom.setSeed(seed);
-    const beforeXp = Array.from(p.stats);
-    const beforeInv = p.invs.get(inv).items.map(item => item && { id: item.id, count: item.count });
-    trace = [];
-    try {
-      if (attack.kind === 'magic') {
-        const [name, spellId, maxHit] = attack.row;
-        if (successOnly) {
-          const row = run(p, n, '[proc,get_spell_data]', [spellId]).intStack[0];
-          run(p, n, '[proc,pvm_spell_cast]', [row]);
-          run(p, n, '[proc,pvm_spell_success]', [row, maxHit, 64]);
-        } else run(p, n, `[apnpct,magic:${name}]`);
-      } else if (attack.kind === 'special') run(p, n, `[label,pvm_${attack.row[0]}_sa]`);
-      else if (attack.kind === 'cannon') run(p, n, '[proc,cannon_fire]');
-      else run(p, n, attack.kind === 'ranged' ? '[label,player_ranged_attack]' : '[label,player_melee_attack]');
-      const commands = trace;
-      trace = null;
-      const queue = [...n.queue.all()].map(q => ({ id: q.queueId - ServerTriggerType.AI_QUEUE1 + 1, damage: q.lastInt, delay: q.delay }));
-      const hit = queue.find(q => q.id === 2);
-      const result = {
-        damage: hit?.damage ?? null, queue, xp: Array.from(p.stats, (v, i) => v - beforeXp[i]),
-        beforeInv, inventory: canonical([...p.invs.entries()].map(([id, value]) => [id, value.items])),
-        playerVars: Array.from(p.vars), npcVars: Array.from(n.vars), npcLevels: Array.from(n.levels),
-        hero: canonical(n.heroPoints), packets: p.packets, commands,
-        playerVisual: [p.animId, p.animDelay, p.spotanimId, p.spotanimHeight, p.spotanimTime],
-        npcVisual: [n.animId, n.animDelay, n.spotanimId, n.spotanimHeight, n.spotanimTime],
-        nextRandom: JavaRandom.nextInt(1000000),
-        combat: { attack: p.getVar(id('VarPlayerType', 'com_rangeattack')), max: p.getVar(id('VarPlayerType', 'com_maxhit')) }
-      };
-      // Execute the actual generic queue2 damage handler, not applyDamage directly.
-      if (hit) {
-        const damageScript = ScriptProvider.getByName('[ai_queue2,_]');
-        const state = ScriptRunner.init(damageScript, n); state.lastInt = hit.damage;
-        n.executeScript(state); assert.equal(state.execution, ScriptState.FINISHED);
-        result.hitmark = { damage: n.hitmarkDamage, type: n.hitmarkType };
-      }
-      return result;
-    } finally {
-      trace = null;
-      World.removeNpc(n, 0); World.players[1] = null; p.unlink();
-    }
-  };
-  return original ? withPublished(action) : action();
-}
-function withoutGuard(commands) {
-  // Published ranged overrides lack the new guard before native type
-  // checks. Melee shares its guard in both controls, followed by P_STOPACTION.
-  const emptyType = c => c?.command === 'NPC_TYPE' && c.ints.length === 0 && c.strings.length === 0;
-  const leadingGuard = emptyType(commands[0]) && emptyType(commands[1]);
-  return commands.filter((c, i) => !(leadingGuard && i === 0) &&
-    !(c.command === 'NPC_PARAM' && [magicParam, ammoParam].includes(c.ints.at(-1))));
-}
-function assertIdentical(current, original, label) {
-  const normalized = { ...current, commands: withoutGuard(current.commands) };
-  assert.deepEqual(normalized, original, `${label}: all original engine commands/arguments, RNG continuation, queues, XP, hero, inventories, poison vars, packets/messages, stats and visuals identical`);
-}
-function positiveSeed(type, attack, options = {}) {
-  for (let seed = 1; seed <= 128; seed++) {
-    if (outcome(type, attack, seed, { ...options, original: true }).damage > 0) return seed;
+const poisonWitnesses = new Set();
+function outcome(type, attack, seed, { successOnly = false, miss = false } = {}) {
+  const equipment = attack.kind === 'magic' ? attack.row[3] ?? [] : ['melee', 'cannon'].includes(attack.kind) ? ['Rune scimitar'] : attack.row.slice(1);
+  const { p, n } = fixture(type, equipment);
+  if (attack.kind === 'cannon') {
+    set(p, 'rockthrower', 30);
+    set(p, 'ownedmcannon', (p.level << 28) | (p.x << 14) | p.z);
   }
-  return null;
-}
-function allowed(type, row) { return (type === 1977 ? [1, 5, 9, 13] : [3, 7, 11, 15]).includes(row[1]); }
-function checkMagic(type, row) {
-  const attack = { kind: 'magic', row };
-  const successOnly = row[0] === 'crumble_undead';
-  if (successOnly) assertIdentical(outcome(type, attack, 1), outcome(type, attack, 1, { original: true }), `${type} native undead refusal`);
-  const seed = positiveSeed(type, attack, { successOnly });
-  assert(seed !== null, `${type} ${row[0]} has a positive published damage witness`);
-  const before = outcome(type, attack, seed, { original: true, successOnly });
-  const after = outcome(type, attack, seed, { successOnly });
-  assert.equal(after.damage, allowed(type, row) ? before.damage : 0, `${type} ${row[0]} elemental damage`);
-  assert.deepEqual(after.inventory, before.inventory, `${row[0]} rune and staff-charge inventory payment unchanged`);
-  assert.equal(after.playerVars[id('VarPlayerType', 'iban_staff_charges')], before.playerVars[id('VarPlayerType', 'iban_staff_charges')]);
-  assert.deepEqual(after.npcLevels, before.npcLevels, `${row[0]} secondary stat effects unchanged`);
-  assert.deepEqual(after.npcVars, before.npcVars, `${row[0]} freeze/poison/retaliation vars unchanged`);
-  assert.deepEqual(after.npcVisual, before.npcVisual, `${row[0]} normal impact unchanged`);
-  if (allowed(type, row)) {
-    const a = { ...after, commands: withoutGuard(after.commands) };
-    // The quest-local resolver reads no engine state; only the single param command differs.
-    assert.deepEqual(a, before, `${row[0]} has no elemental bonus or other changed result`);
-  } else {
-    assert.equal(after.xp[PlayerStat.HITPOINTS], 0, `${row[0]} no damage HP XP`);
-    assert(after.xp[PlayerStat.MAGIC] > 0, `${row[0]} keeps base spell XP`);
-    assert.deepEqual(after.hitmark, { damage: 0, type: 0 }, `${row[0]} blue-zero native damage handler`);
-    assert(after.hero.every(h => h.points === 0), `${row[0]} no zero-damage hero credit`);
+  if (attack.kind === 'cannon' && attack.style !== undefined) cannonStyle(p, attack.style);
+  const expected = attack.kind === 'cannon' ? null : elementalOracle({ p, n, attack, seed, successOnly, miss, types, id, PlayerStat, NpcStat, canonical });
+  if (miss) set(p, attack.kind === 'magic' ? 'com_magicattack' : ['com_stabattack', 'com_slashattack', 'com_crushattack', 'com_rangeattack', 'com_magicattack'][p.getVar(id('VarPlayerType', 'damagetype'))], 0);
+  JavaRandom.setSeed(seed);
+  const beforeXp = Array.from(p.stats);
+  const beforeInv = p.invs.get(inv).items.map(item => item && { id: item.id, count: item.count });
+  const draws = [], nativeDouble = JavaRandom.nextDouble;
+  JavaRandom.nextDouble = function () { const value = nativeDouble.call(this); draws.push(value); return value; };
+  trace = [];
+  try {
+    if (attack.kind === 'magic') {
+      const [name, spellId, maxHit] = attack.row;
+      if (successOnly) {
+        const row = run(p, n, '[proc,get_spell_data]', [spellId]).intStack[0];
+        run(p, n, '[proc,pvm_spell_cast]', [row]);
+        run(p, n, '[proc,pvm_spell_success]', [row, maxHit, 64]);
+      } else run(p, n, `[apnpct,magic:${name}]`);
+    } else if (attack.kind === 'special') run(p, n, `[label,pvm_${attack.row[0]}_sa]`);
+    else if (attack.kind === 'cannon') run(p, n, '[proc,cannon_fire]');
+    else run(p, n, attack.kind === 'ranged' ? '[label,player_ranged_attack]' : '[label,player_melee_attack]');
+    const commands = trace;
+    trace = null;
+    const queue = [...n.queue.all()].map(q => ({ id: q.queueId - ServerTriggerType.AI_QUEUE1 + 1, damage: q.lastInt, delay: q.delay }));
+    const hit = queue.find(q => q.id === 2);
+    const result = {
+      damage: hit?.damage ?? null, queue, xp: Array.from(p.stats, (v, i) => v - beforeXp[i]),
+      beforeInv, inventory: canonical([...p.invs.entries()].map(([id, value]) => [id, value.items])),
+      playerVars: Array.from(p.vars), npcVars: Array.from(n.vars), npcLevels: Array.from(n.levels),
+      hero: canonical(n.heroPoints), packets: p.packets, commands, draws, worn, blocked: isMapBlocked(n.level, n.x, n.z),
+      playerVisual: [p.animId, p.animDelay, p.spotanimId, p.spotanimHeight, p.spotanimTime],
+      npcVisual: [n.animId, n.animDelay, n.spotanimId, n.spotanimHeight, n.spotanimTime],
+      nextRandom: JavaRandom.nextInt(1000000),
+      combat: { attack: p.getVar(id('VarPlayerType', 'com_rangeattack')), max: p.getVar(id('VarPlayerType', 'com_maxhit')) }
+    };
+    // Execute the actual generic queue2 damage handler, not applyDamage directly.
+    if (hit) {
+      const damageScript = ScriptProvider.getByName('[ai_queue2,_]');
+      const state = ScriptRunner.init(damageScript, n); state.lastInt = hit.damage;
+      n.executeScript(state); assert.equal(state.execution, ScriptState.FINISHED);
+      result.hitmark = { damage: n.hitmarkDamage, type: n.hitmarkType };
+    }
+    if (expected) {
+      assertElementalOutcome(result, expected, `${type} ${attack.kind}/${attack.row[0] ?? 'melee'} seed ${seed}${successOnly ? ' direct-success' : ''}${miss ? ' forced-miss' : ''}`);
+      if (expected.poisoned) poisonWitnesses.add(attack.kind);
+    }
+    return result;
+  } finally {
+    trace = null;
+    JavaRandom.nextDouble = nativeDouble;
+    World.removeNpc(n, 0); World.players[1] = null; p.unlink();
   }
 }
 const bosses = Array.from({ length: types.NpcType.count }, (_, i) => types.NpcType.get(i)).filter(t => ['Fareed', 'Kamil'].includes(t.name));
 assert.deepEqual(bosses.map(t => [t.id, t.debugname]), [[1913, 'icediamond_icewarrior'], [1977, 'firediamond_firewarrior']]);
-for (const type of bosses) {
-  assert.equal(type.params.get(magicParam), type.id === 1977 ? 1 : 3);
-  assert.equal(type.params.get(ammoParam) ?? -1, type.id === 1977 ? 78 : -1);
-  for (const row of magic) checkMagic(type.id, row);
-  const miss = { kind: 'magic', row: magic[7] };
-  assertIdentical(outcome(type.id, miss, 1, { miss: true }), outcome(type.id, miss, 1, { original: true, miss: true }), `${type.name} native splash`);
-  for (const row of ranged) {
-    const attack = { kind: 'ranged', row };
-    const seed = positiveSeed(type.id, attack);
-    if (seed === null) {
-      assert(['poison javelins', 'holy water'].includes(row[0]), `${type.name} ${row[0]} must have a positive published witness`);
-      const a = outcome(type.id, attack, 1), b = outcome(type.id, attack, 1, { original: true });
-      assertIdentical(a, b, `${type.name} ${row[0]} existing refusal/zero`);
-      console.log(`PASS existing Ranged admission/zero ${type.name} ${row[0]}`);
-      continue;
-    }
-    const before = outcome(type.id, attack, seed, { original: true }), after = outcome(type.id, attack, seed);
-    const permit = type.id === 1913 || row[0] === 'ice arrows';
-    assert.equal(after.damage, permit ? before.damage : 0, `${type.name} ${row[0]} damage`);
-    assert.deepEqual(after.inventory, before.inventory, `${row[0]} ordinary ammunition spent identically`);
-    const ammoCommands = r => r.commands.filter(c => /INV_(DEL|DROPITEM_DELAYED)|MAP_BLOCKED/.test(c.command));
-    assert.deepEqual(ammoCommands(after), ammoCommands(before), `${row[0]} exact ordinary drop/loss commands`);
-    if (permit) assertIdentical(after, before, `${type.name} ${row[0]} unchanged`);
-    else {
-      assert(after.xp.every(v => v === 0), `${row[0]} zero damage gives zero XP`);
-      assert.equal(after.npcVars[id('VarNpcType', 'npc_poison')], 0, 'zero projectile cannot poison');
-      assert(after.hero.every(h => h.points === 0), `${row[0]} no zero-damage hero credit`);
-    }
-  }
-  const melee = { kind: 'melee', row: [] }, seed = positiveSeed(type.id, melee);
-  for (const row of rangedSpecials) {
-    const attack = { kind: 'special', row }, seed = positiveSeed(type.id, attack);
-    assert(seed !== null, `${type.name} ${row[0]} positive published special witness`);
-    const before = outcome(type.id, attack, seed, { original: true }), after = outcome(type.id, attack, seed);
-    const permit = type.id === 1913 || row[2] === 'Ice arrows';
-    if (permit) assertIdentical(after, before, `${type.name} ${row.join(' ')} special unchanged`);
-    else {
-      assert(after.queue.filter(q => q.id === 2).every(q => q.damage === 0), `${row[0]} every special hit is zero`);
-      assert(after.xp.every(v => v === 0), `${row[0]} no special damage XP`);
-      assert.equal(after.npcVars[id('VarNpcType', 'npc_poison')], 0, `${row[0]} zero special cannot poison`);
-      assert.deepEqual(after.inventory, before.inventory, `${row[0]} special ammunition spent identically`);
-      assert(after.hero.every(h => h.points === 0), `${row[0]} no zero-damage hero credit`);
-    }
-  }
-  assert(seed !== null, `${type.name} native melee positive control`);
-  assertIdentical(outcome(type.id, melee, seed), outcome(type.id, melee, seed, { original: true }), `${type.name} melee`);
-  // Isolated data mutant: no source/pack edit, restored even when the assertion catches it.
-  const expected = type.params.get(magicParam);
-  type.params.set(magicParam, type.id === 1977 ? 3 : 1);
-  let caught = false;
-  try { checkMagic(type.id, type.id === 1977 ? magic[7] : magic[5]); }
-  catch (error) { if (!(error instanceof assert.AssertionError)) throw error; caught = /elemental damage/.test(error.message); }
-  finally { type.params.set(magicParam, expected); }
-  assert(caught, `${type.name} isolated wrong-element mutant caught by the same assertion`);
-  console.log(`PASS ${type.name}: ${magic.length} spells, ${ranged.length} ammunition classes, ${rangedSpecials.length} Ranged-special cases, native splash, melee, payment and isolated mutant`);
-  checkCannon(type.id);
-}
 const unrelated = ['Rat', 'Cow', 'Goblin', 'Zombie', 'Skeleton', 'Ghost'].map(name => {
   const type = Array.from({ length: types.NpcType.count }, (_, i) => types.NpcType.get(i)).find(t => t.name === name && t.op?.[1] === 'Attack');
   assert(type, name); assert(!type.params.has(magicParam) && !type.params.has(ammoParam)); return type;
 });
-for (const type of unrelated) {
+function checkAttacks(type) {
   for (const row of magic) {
     const attack = { kind: 'magic', row };
-    for (const seed of [1, 2, 3]) assertIdentical(outcome(type.id, attack, seed), outcome(type.id, attack, seed, { original: true }), `${type.debugname} ${row[0]}`);
+    for (const seed of elementalSeeds) outcome(type.id, attack, seed);
+    outcome(type.id, attack, 1, { miss: true });
+    // Non-undead admission remains tested above. Direct success also covers
+    // Crumble Undead's guarded resolver on both elemental bosses.
+    if (row[0] === 'crumble_undead') for (const seed of elementalSeeds) outcome(type.id, attack, seed, { successOnly: true });
   }
-  for (const row of ranged) {
-    const attack = { kind: 'ranged', row };
-    for (const seed of [1, 2, 3]) assertIdentical(outcome(type.id, attack, seed), outcome(type.id, attack, seed, { original: true }), `${type.debugname} ${row[0]}`);
+  for (const kind of ['ranged', 'special']) for (const row of kind === 'ranged' ? ranged : rangedSpecials) {
+    const attack = { kind, row };
+    for (const seed of elementalSeeds) outcome(type.id, attack, seed);
+    outcome(type.id, attack, 1, { miss: true });
   }
-  const melee = { kind: 'melee', row: [] };
-  assertIdentical(outcome(type.id, melee, 1), outcome(type.id, melee, 1, { original: true }), `${type.debugname} melee`);
-  for (const row of rangedSpecials) {
-    const attack = { kind: 'special', row };
-    for (const seed of [1, 2, 3]) assertIdentical(outcome(type.id, attack, seed), outcome(type.id, attack, seed, { original: true }), `${type.debugname} ${row.join(' ')} special`);
+  for (const seed of elementalSeeds) outcome(type.id, { kind: 'melee', row: [] }, seed);
+  outcome(type.id, { kind: 'melee', row: [] }, 1, { miss: true });
+  console.log(`PASS ${type.debugname}: independent fixed-seed damage, draws, XP, credit, payments, effects and admission`);
+}
+for (const type of [...bosses, ...unrelated]) {
+  if (bosses.includes(type)) {
+    assert.equal(type.params.get(magicParam), type.id === 1977 ? 1 : 3);
+    assert.equal(type.params.get(ammoParam) ?? -1, type.id === 1977 ? 78 : -1);
   }
-  console.log(`PASS unrelated ${type.id} ${type.debugname}: every spell and ammunition class at three real RNG seeds; melee`);
+  checkAttacks(type);
   checkCannon(type.id);
 }
+assert.deepEqual([...poisonWitnesses].sort(), ['ranged', 'special'], 'fixed seeds exercise successful poison in both ordinary and special attacks');
 function cannonStyle(p, style) {
   set(p, 'damagetype', style);
   // Disclosed style-sensitive fixture: only the selected style can hit.
@@ -416,7 +296,7 @@ function checkCannon(type) {
       nativeCall(state);
     };
     try {
-      // This path never invokes withPublished or its other attack fixtures.
+      // Cannon keeps its separate independent oracle and current-pack cap control.
       const { commands: _commands, ...result } = outcome(target, { kind: 'cannon', row: [], style: seed % 5 }, seed);
       return { result, draws, calls };
     } finally {
@@ -483,7 +363,7 @@ assert.equal(ice.id, 78); assert.equal(ice.debugname, 'ice_arrow');
 const bows = objects.filter(t => t.category === id('CategoryType', 'weapon_bow') && t.params.get(id('ParamType', 'levelrequire')) >= ice.params.get(id('ParamType', 'levelrequire')) && !t.dummyitem);
 assert.deepEqual(bows.map(t => t.debugname), ['yew_longbow', 'yew_shortbow', 'magic_longbow', 'magic_shortbow']);
 console.log('PASS original ice-arrow compatible bows', bows.map(t => `${t.id}:${t.debugname}`).join(','));
-const probe = outcome(1977, { kind: 'ranged', row: ranged[0] }, 1, { original: true });
+const probe = outcome(1977, { kind: 'ranged', row: ranged[0] }, 1);
 const defence = (135 + 9) * 64;
 const accuracy = 1 - (defence + 2) / (2 * (probe.combat.attack + 1));
 const positive = accuracy * probe.combat.max / (probe.combat.max + 1);
@@ -491,5 +371,5 @@ assert(positive >= 0.6, 'live sixteen-shot conservative probability bound');
 console.log('PASS live bronze-arrow probability witness', { ...probe.combat, defence, accuracy, positive, sixteenZeros: (1 - positive) ** 16 });
 const ancientTriggers = Array.from({ length: scriptCount }, (_, i) => ScriptProvider.get(i)?.name).filter(name => name && /^\[(apnpct|opnpct),magic:(smoke|shadow|blood|ice)_(rush|burst|blitz|barrage)\]$/.test(name));
 assert.deepEqual(ancientTriggers, [], 'published Ancient combat is absent; this unit adds no spell implementation');
-console.log('PASS compiled elemental differential suite');
+console.log('PASS compiled elemental independent-outcome suite');
 process.exit(0);
