@@ -119,8 +119,8 @@ for (const area of areas) for (const [index, box] of area.boxes.entries()) {
 }
 attempt('existing bank refusal', [0, 3253, 3420], true);
 attempt('ordinary Wilderness is not blanket-banned', [0, 3100, 3700], false);
-// N010 is settled by placement only while every checked-out native-map
-// Kurask/Turoth spawn remains inside the refused Fremennik dungeon.
+// Every native Kurask/Turoth spawn must remain inside the refused dungeon.
+// This is placement coverage, not a historical equipment or immunity rule.
 const fremennik = areas.find(area => area.name === 'Fremennik Slayer Dungeon');
 assert(fremennik, 'explicit Fremennik area oracle');
 const species = new Map();
@@ -138,12 +138,12 @@ for (const file of readdirSync(path.join(content, 'maps'))) {
     if (!spawn || !species.has(Number(spawn[4]))) continue;
     const tile = [Number(spawn[1]), Number(square[1]) * 64 + Number(spawn[2]), Number(square[2]) * 64 + Number(spawn[3])];
     const name = species.get(Number(spawn[4]));
-    assert(fremennik.boxes.some(box => inside(tile, box)), `${name} outside Fremennik at ${tile}: N010 no longer settled`);
+    assert(fremennik.boxes.some(box => inside(tile, box)), `${name} outside the refused Fremennik dungeon at ${tile}`);
     attempt(`${name} native spawn ${tile}`, tile, true);
     spawns.push({ name, tile });
   }
 }
 for (const name of ['Kurask', 'Turoth']) assert(spawns.some(spawn => spawn.name === name), `non-vacuous ${name} coverage`);
-console.log('N010 native spawns:', JSON.stringify(spawns));
+console.log('Kurask/Turoth native spawns:', JSON.stringify(spawns));
 console.log(`PASS cannon areas: ${refused} refused, ${allowed} full native setups outside; all floors, edges, inventory and ownership`);
 process.exit(0);
