@@ -36,5 +36,18 @@
     "bound": "CANNON-AREA-MORT-MYRE-01",
     "boxes": [[0, 3398, 3264, 0, 3455, 3455], [0, 3456, 3328, 0, 3519, 3455], [0, 3520, 3392, 0, 3555, 3455], [0, 3556, 3414, 0, 3583, 3455]],
     "cases": [{ "name": "Dessous graveyard remains allowed", "tile": [0, 3568, 3405], "refused": false }, { "name": "River Salve far bank remains allowed", "tile": [0, 3395, 3390], "refused": false }]
+  },
+  {
+    "name": "Barrows crypt and surface controls",
+    "boxes": [],
+    "cases": [
+      { "name": "Ahrim crypt remains allowed", "tile": [3, 3557, 9703], "refused": false },
+      { "name": "Dharok crypt remains allowed", "tile": [3, 3556, 9718], "refused": false },
+      { "name": "Guthan crypt remains allowed", "tile": [3, 3535, 9705], "refused": false },
+      { "name": "Karil crypt remains allowed", "tile": [3, 3547, 9685], "refused": false },
+      { "name": "Torag crypt remains allowed", "tile": [3, 3565, 9684], "refused": false },
+      { "name": "Verac crypt remains allowed", "tile": [3, 3577, 9703], "refused": false },
+      { "name": "Ahrim surface mound remains allowed", "tile": [0, 3565, 3289], "refused": false }
+    ]
   }
 ]
