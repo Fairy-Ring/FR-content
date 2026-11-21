@@ -1,4 +1,4 @@
-// Main's 21 November defaults, pending the operator decision sheet.
+// Main's explicit U1 defaults of 21 November; not recovered period algorithms.
 // CANDIDATE later Old School chance, not a recovered period probability.
 ^ancient_smoke_proc = 8
 // VERIFIED period-guide percentage. Non-stacking base threshold is CANDIDATE.

@@ -11,7 +11,7 @@ const pack = path.join(engine, 'data/pack');
 const load = async file => (await import(pathToFileURL(path.join(engine, file)).href)).default;
 const selectedCase = process.argv.includes('--case') ? process.argv[process.argv.indexOf('--case') + 1] : 'all';
 assert(['all', 'smoke', 'shadow', 'blood', 'ice', 'cap'].includes(selectedCase), 'known named mutation case');
-const selectedSpells = spells.filter(s => selectedCase === 'all' || selectedCase === 'cap' || s.family === ['smoke', 'shadow', 'blood', 'ice'].indexOf(selectedCase) + 1);
+const selectedSpells = spells.filter(s => selectedCase === 'cap' ? s.name === 'ice_blitz' : selectedCase === 'all' || s.family === ['smoke', 'shadow', 'blood', 'ice'].indexOf(selectedCase) + 1);
 const World = await load('src/engine/World.ts');
 const Player = await load('src/engine/entity/Player.ts'), Npc = await load('src/engine/entity/Npc.ts');
 const Provider = await load('src/engine/script/ScriptProvider.ts'), Runner = await load('src/engine/script/ScriptRunner.ts');
@@ -29,7 +29,12 @@ const table = types.DbTableType.getByName('magic_spell_table');
 const row = name => types.DbRowType.getByName(`magic_spell_${name}`);
 const values = (r, key) => r.getValue(table.columnNames.indexOf(key), 0);
 const field = (r, key) => values(r, key)[0];
-const variable = (p, key, value) => value === undefined ? p.getVar(id('VarPlayerType', key)) : p.setVar(id('VarPlayerType', key), value);
+const variable = (p, key, value) => {
+  const index = types.VarPlayerType.getId(key);
+  if (index >= 0) return value === undefined ? p.getVar(index) : p.setVar(index, value);
+  const bit = id('VarBitType', key);
+  return value === undefined ? p.getVarBit(bit) : p.setVarBit(bit, value);
+};
 const nv = (n, key, value) => value === undefined ? n.getVar(id('VarNpcType', key)) : n.setVar(id('VarNpcType', key), value);
 const invId = id('InvType', 'inv'), wornId = id('InvType', 'worn');
 const allRunes = ['airrune', 'waterrune', 'earthrune', 'firerune', 'mindrune', 'chaosrune', 'deathrune', 'bloodrune', 'soulrune', 'naturerune'];
@@ -39,7 +44,7 @@ function player(slot) {
   p.levels.fill(99); p.baseLevels.fill(99); p.stats.fill(130344310); p.write = () => {};
   p.messages = []; p.messageGame = p.wrappedMessageGame = text => p.messages.push(String(text));
   p.getInventory(invId); p.getInventory(wornId); World.players[slot] = p; World.playerLoop.add(p.hash64, p);
-  variable(p, 'tutorial', 1000); variable(p, 'deserttreasure', 10); variable(p, 'alternate_spells', 1);
+  variable(p, 'tutorial', 1000); variable(p, 'deserttreasure', 15); variable(p, 'alternate_spells', 1);
   variable(p, 'com_magicattack', 100000); variable(p, 'com_magicdef', 1000);
   for (const name of allRunes) p.invAdd(invId, id('ObjType', name), 100);
   p.levels[3] = 50;
@@ -55,7 +60,7 @@ function fixture({ npcName = 'Cow', npcType, pvp = false, defensive = false, pro
   } else {
     const config = npcType ? types.NpcType.getByName(npcType) : Array.from({ length: types.NpcType.count }, (_, i) => types.NpcType.get(i)).find(t => t.name === npcName && t.op?.[1] === 'Attack');
     assert(config, `combat NPC ${npcName}`);
-    target = new Npc(0, p.x + 1, p.z, config.size, config.size, EntityLifeCycle.RESPAWN, 1, config.id, config.blockwalk);
+    target = new Npc(0, p.x + 1, p.z, config.size, config.size, EntityLifeCycle.DESPAWN, 1, config.id, config.blockwalk);
     World.addNpc(target, -1); target.levels[3] = target.baseLevels[3] = 200; target.levels[0] = target.baseLevels[0] = 83;
     nv(target, 'npc_combat_xp_multiplier', 1000); nv(target, 'npc_aggressive_player', p.uid);
   }
@@ -123,7 +128,7 @@ function cast(f, spell, seed) {
 for (const spell of selectedSpells) {
   const r = row(spell.name); assert(r, spell.name);
   assert.equal(field(r, 'levelrequired'), spell.level); assert.equal(field(r, 'experience'), spell.xp * 10);
-  assert.equal(field(r, 'maxhit'), spell.maximum); assert.equal(field(r, 'ancient_effect'), spell.family);
+  assert.equal(field(r, 'maxhit'), spell.maximum, `${spell.name} compiled maximum`); assert.equal(field(r, 'ancient_effect'), spell.family);
   assert.equal(field(r, 'continue_by_autocast'), 0, 'no Ancient autocast in U1');
   const vector = values(r, 'runesrequired');
   assert.equal(vector.length, 8, 'shared four-rune tuple');
@@ -131,9 +136,13 @@ for (const spell of selectedSpells) {
   const witnesses = new Set();
   for (const pvp of [false, true]) for (const defensive of [false, true]) for (const seed of seeds) {
     const f = fixture({ pvp, defensive });
-    try { const expected = cast(f, spell, seed); if (expected.damage > 0) witnesses.add(pvp); } finally { dispose(f); }
+    try {
+      const expected = cast(f, spell, seed);
+      if (expected.damage > 0) witnesses.add(pvp);
+      if (expected.accurate && expected.damage === 0) witnesses.add(`zero-${pvp}`);
+    } finally { dispose(f); }
   }
-  assert.equal(witnesses.size, 2, `${spell.name} positive NPC and PvP witnesses`);
+  assert.deepEqual([...witnesses].sort(), [false, true, 'zero-false', 'zero-true'].sort(), `${spell.name} positive and accurate-zero NPC/PvP witnesses`);
   const protectedFixture = fixture({ pvp: true, protectedMagic: true });
   try { cast(protectedFixture, spell, 377); } finally { dispose(protectedFixture); }
 }
@@ -172,6 +181,26 @@ if (selectedCase === 'all') for (const pvp of [false, true]) for (const family o
 }
 // Additional fixed inputs cover exact edges without searching random live hits.
 if (selectedCase === 'all') {
+  for (const payment of [
+    { name: 'fourth-pair air staff', spell: 'smoke_rush', staff: 'staff_of_air', held: [['chaosrune', 2], ['deathrune', 2], ['firerune', 1]] },
+    { name: 'one smoke rune co-credits third and fourth pair', spell: 'smoke_rush', held: [['chaosrune', 2], ['deathrune', 2], ['smokerune', 1]] },
+    { name: 'fourth-pair mist substitution with plain fire', spell: 'smoke_rush', held: [['chaosrune', 2], ['deathrune', 2], ['firerune', 1], ['mistrune', 1]] },
+    { name: 'Blitz four-type combination payment', spell: 'smoke_blitz', held: [['deathrune', 2], ['bloodrune', 2], ['smokerune', 2]] }
+  ]) {
+    const f = fixture();
+    try {
+      f.p.getInventory(invId).removeAll();
+      for (const [name, count] of payment.held) f.p.invAdd(invId, id('ObjType', name), count);
+      if (payment.staff) {
+        const staff = types.ObjType.getByName(payment.staff); assert(staff);
+        f.p.invSet(wornId, staff.id, 1, staff.wearpos);
+      }
+      const r = row(payment.spell);
+      assert.equal(run(f, '[proc,check_spell_requirements]', [r.id]).popInt(), 1, payment.name);
+      run(f, '[proc,delete_spell_runes]', [r.id]);
+      assert.equal(f.p.getInventory(invId).itemsFiltered.length, 0, `${payment.name}: exact one shared payment`);
+    } finally { dispose(f); }
+  }
   const settle = (f, count = 6) => { for (let i = 0; i < count; i++) tick(f); };
   const enqueue = (f, spell, rolled = 0) => {
     JavaRandom.setSeed(65535);
@@ -235,6 +264,23 @@ if (selectedCase === 'all') {
       run(f, pvp ? '[proc,pvp_default_spell]' : '[proc,pvm_default_spell]', [field(row('wind_strike'), 'spell')]);
       assert.deepEqual(inventory(f.p), beforeInv); assert.deepEqual(xp(f.p), beforeXp);
     } finally { dispose(f); }
+    const standard = fixture({ pvp });
+    try {
+      variable(standard.p, 'alternate_spells', 0);
+      const bind = row('bind');
+      if (pvp) variable(standard.target, 'frozen', 1020); else nv(standard.target, 'npc_stunned', 1020);
+      const allowed = pvp ? '[proc,pvp_freeze_allowed]' : '[proc,pvm_freeze_allowed]';
+      assert.equal(run(standard, allowed, [bind.id]).popInt(), 0, 'Standard Bind still rejects an active hold');
+      if (pvp) variable(standard.target, 'frozen', 998); else nv(standard.target, 'npc_stunned', 998);
+      assert.equal(run(standard, allowed, [bind.id]).popInt(), 0, 'Standard Bind still rejects post-freeze immunity');
+      if (pvp) variable(standard.target, 'frozen', 995); else nv(standard.target, 'npc_stunned', 995);
+      assert.equal(run(standard, allowed, [bind.id]).popInt(), 1, 'Standard Bind still accepts its original boundary');
+      const before = xp(standard.p);
+      JavaRandom.setSeed(0);
+      run(standard, pvp ? '[applayert,magic:wind_strike]' : '[apnpct,magic:wind_strike]');
+      assert.equal(variable(standard.p, 'action_delay'), 1005, 'Standard cooldown unchanged');
+      assert.deepEqual(xp(standard.p).map((value, i) => value - before[i]), pvp ? [77, 0, 14] : [75, 0, 13], 'Standard Wind Strike exact damage and base XP unchanged');
+    } finally { dispose(standard); }
   }
   const blood = spells.find(s => s.name === 'blood_rush');
   for (const pvp of [false, true]) {
@@ -261,3 +307,4 @@ if (selectedCase === 'all') {
   } finally { dispose(capped); }
 }
 console.log('PASS Ancient U1: eight rows/widgets, fixed-seed NPC/PvP damage, draw order, XP, payments, protection, queued effects and atomic failures');
+process.exit(0); // World imports own maintenance timers; this offline process owns no live server.
