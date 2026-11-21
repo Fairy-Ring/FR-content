@@ -78,6 +78,7 @@ async function run() {
       'mithril_kiteshield', 'adamant_full_helm', 'rune_dagger', 'waterrune', 'naturerune',
       'lawrune', 'firerune', 'unidentified_guam', 'bass', 'shark', 'adamantite_ore',
       'uncut_sapphire', 'trail_clue_hard_map001', 'trail_clue_medium_map001',
+      'elf_crystal_tiny', 'mourning_teleport_crystal_1', 'lobster',
       'iron_warhammer', 'bronze_warhammer', 'steel_warhammer', 'black_warhammer',
       'viking_sword', 'viking_shield', 'viking_helmet', 'keg_of_beer', 'cake', 'iron_ore',
       'copper_ore', 'bucket_water', 'fur', 'tin_ore', 'raw_sardine', 'beer', 'ring_mould'],
@@ -220,19 +221,30 @@ async function run() {
       ]
     }
   ];
-  // Original published bands remain the oracle for every previously occupied slot.
+  // Published bands remain the oracle except the selected pikeman coin amount.
   const publishedTables = tables.map(table => ({ ...table, rows: [...table.rows] }));
   const additions = [
-    { key: 'archer', names: ['regicide_darkelf'], emptyFrom: 108, emptyTail: 20,
-      rows: [[102, 103, 'dragon_vambraces', 1], [103, 105, 'airrune', 10],
-        [105, 106, 'poisonivy_bush_seed', 1], [106, 107, 'cactus_seed', 1], [107, 108, 'belladonna_seed', 1]] },
-    { key: 'pikeman', names: ['regicide_darkelf2'], emptyFrom: 106, emptyTail: 22,
-      rows: [[102, 103, 'rune_med_helm', 1], [103, 104, 'poisonivy_bush_seed', 1],
-        [104, 105, 'cactus_seed', 1], [105, 106, 'belladonna_seed', 1]] }
+    { key: 'archer', names: ['regicide_darkelf'], emptyFrom: 110, emptyTail: 18, highCoinAward: 180,
+      rows: [
+        [102, 103, 'dragon_vambraces', 1], [103, 105, 'airrune', 10],
+        [105, 106, 'poisonivy_bush_seed', 1], [106, 107, 'cactus_seed', 1], [107, 108, 'belladonna_seed', 1],
+        [108, 109, 'elf_crystal_tiny', 1], [109, 110, 'lobster', 1]
+      ] },
+    { key: 'pikeman', names: ['regicide_darkelf2'], emptyFrom: 109, emptyTail: 19, highCoinAward: 220,
+      rows: [
+        [102, 103, 'rune_med_helm', 1], [103, 104, 'poisonivy_bush_seed', 1],
+        [104, 105, 'cactus_seed', 1], [105, 106, 'belladonna_seed', 1],
+        [106, 107, 'elf_crystal_tiny', 1], [107, 108, 'mourning_teleport_crystal_1', 1],
+        [108, 109, 'lobster', 1]
+      ] }
   ];
   const elfTable = tables.shift();
-  tables.unshift(...additions.map(addition => ({ ...elfTable, ...addition,
-    rows: [...elfTable.rows, ...addition.rows] })));
+  tables.unshift(...additions.map(({ highCoinAward, ...addition }) => {
+    const inheritedRows = elfTable.rows.map(row => row[2] === 'coins' && row[3] === 180
+      ? [row[0], row[1], row[2], highCoinAward]
+      : row);
+    return { ...elfTable, ...addition, rows: [...inheritedRows, ...addition.rows] };
+  }));
   tables[2] = { ...tables[2], emptyFrom: 96, emptyTail: 32,
     rows: [...tables[2].rows, [95, 96, 'steel_bar', 1]] };
   for (const table of tables) {
@@ -535,7 +547,12 @@ async function run() {
           const oldTable = publishedTables.find(row => row.names.includes(npcName));
           if (published.size) {
             const old = published.get(`${npcName}:${roll}`);
-            if (roll < oldTable.emptyFrom || roll >= table.emptyFrom) {
+            if (npcName === 'regicide_darkelf2' && roll >= 75 && roll < 85) {
+              assert.deepEqual(old.filter(item => item.name !== 'bones'), [{ name: 'coins', count: 180 }],
+                `${npcName}:${roll}: published high-coin award`);
+              assert.deepEqual(actual.filter(item => item.name !== 'bones'), [{ name: 'coins', count: 220 }],
+                `${npcName}:${roll}: selected high-coin award`);
+            } else if (roll < oldTable.emptyFrom || roll >= table.emptyFrom) {
               assert.deepEqual(actual, old, `${npcName}:${roll}: differs from published pack`);
             } else {
               assert.deepEqual(old, [{ name: 'bones', count: 1 }],
@@ -551,9 +568,11 @@ async function run() {
           rollChecks++;
         }
         const expectedTotals = table.key === 'archer'
-          ? { dragon_vambraces: 1, airrune: 20, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1 }
+          ? { dragon_vambraces: 1, airrune: 20, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1,
+            elf_crystal_tiny: 1, lobster: 1 }
           : table.key === 'pikeman'
-            ? { rune_med_helm: 1, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1 }
+            ? { rune_med_helm: 1, poisonivy_bush_seed: 1, cactus_seed: 1, belladonna_seed: 1,
+              elf_crystal_tiny: 1, mourning_teleport_crystal_1: 1, lobster: 1 }
             : { steel_bar: 1 };
         assert.deepEqual(Object.fromEntries(totals), expectedTotals, `${npcName}: added item totals`);
         console.log(`PASS ${npcName}: ${table.emptyFrom} allocated/${table.emptyTail} empty; additions ${JSON.stringify(expectedTotals)}`);
@@ -567,7 +586,7 @@ async function run() {
       }
     }
     assert.equal(rollChecks, 4 * 128, 'every roll for both target types in both tables');
-    assert.equal(emptyTailHits, 20 + 22 + 2 * 32, 'exact remaining empty allocations');
+    assert.equal(emptyTailHits, 18 + 19 + 2 * 32, 'exact remaining empty allocations');
 
     for (const npcName of guardNpcNames) {
       for (const state of [vikingNotStarted, vikingStarted]) {

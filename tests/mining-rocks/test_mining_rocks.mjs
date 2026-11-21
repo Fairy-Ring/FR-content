@@ -26,6 +26,14 @@ assert(ScriptProvider.load(path.join(engine, 'data/pack')) > 0);
 World.currentTick = 100;
 World.gameMap.init();
 const expected = JSON.parse(readFileSync(new URL('./rocks.json', import.meta.url), 'utf8'));
+const betaRockNames = new Set([
+  'rocks_11946', 'rocks_11947', 'rocks_11948', 'rocks_11949', 'rocks_11950', 'rocks_11951',
+  'rocks_11952', 'rocks_11953', 'rocks_11954', 'rocks_11955', 'rocks_11956', 'rocks_11957',
+  'rocks_11958', 'rocks_11959', 'rocks_11960', 'rocks_11962', 'rocks_11963', 'rocks_11964'
+]);
+const betaEmptyTypes = new Set(['rocks_11555', 'rocks_11556', 'rocks_11557']);
+assert.equal(betaRockNames.size, 18);
+assert.equal(expected.built.filter(spec => betaRockNames.has(spec.name)).length, 18, 'all eighteen Falador/Evil Chicken forms are tested');
 const id = (kind, name) => {
   const value = types[kind].getId(name);
   assert(value >= 0, `packed ${kind}: ${name}`);
@@ -132,8 +140,18 @@ for (const spec of expected.built) {
   assert.equal(matches[0].debugname, ore.row);
   assert.equal(type.category, id('CategoryType', spec.category));
   const empty = id('LocType', spec.empty);
+  const emptyType = types.LocType.get(empty);
   assert.equal(param(type, 'next_loc_stage_mining'), empty, `${spec.name}: depleted stage`);
-  assert.equal(param(types.LocType.get(empty), 'mining_rock_empty'), 1);
+  assert.equal(param(emptyType, 'mining_rock_empty'), 1);
+  if (betaRockNames.has(spec.name)) {
+    assert.equal(spec.depletionLabel, 'UNKNOWN', `${spec.name}: form pairing stays UNKNOWN`);
+    assert(betaEmptyTypes.has(spec.empty), `${spec.name}: uses one of the three selected empty forms`);
+    assert.equal(emptyType.category, id('CategoryType', 'mining_rock_normal'), `${spec.name}: empty form uses normal mining dispatch`);
+    assert(type.models && emptyType.models, `${spec.name}: full and empty forms have models`);
+    assert.deepEqual(emptyType.models, type.models, `${spec.name}: empty form has the same model`);
+    assert.deepEqual(emptyType.recol_s, type.recol_s, `${spec.name}: empty form preserves the body recolour source`);
+    assert.equal(emptyType.recol_d?.[0], type.recol_d?.[0], `${spec.name}: empty form preserves the body recolour destination`);
+  }
   if (spec.name.startsWith('mineral_vein')) {
     assert(type.models, `${spec.name}: native vein model`);
     const counterparts = expected.veinEmpty.filter(name => {

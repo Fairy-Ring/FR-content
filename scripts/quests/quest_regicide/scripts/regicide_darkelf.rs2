@@ -28,26 +28,37 @@ else if ($random < 12) obj_add(npc_coord, rune_dagger, 1, ^lootdrop_duration);
 else if ($random < 20) obj_add(npc_coord, waterrune, 70, ^lootdrop_duration);
 else if ($random < 25) obj_add(npc_coord, naturerune, 12, ^lootdrop_duration);
 else if ($random < 28) obj_add(npc_coord, lawrune, 2, ^lootdrop_duration);
-else if ($random < 31) obj_add(npc_coord, firerune, 37, ^lootdrop_duration);
+else if ($random < 31) obj_add(npc_coord, firerune, 37, ^lootdrop_duration); // UNKNOWN engineering data row, no source: ELF-FREMENNIK-BANDS-01 keeps 37 fire runes at 3/128.
 else if ($random < 46) obj_add(npc_coord, ~randomherb, ^lootdrop_duration);
 else if ($random < 75) obj_add(npc_coord, coins, 44, ^lootdrop_duration);
-else if ($random < 85) obj_add(npc_coord, coins, 180, ^lootdrop_duration);
+else if ($random < 85) {
+    if (npc_type = regicide_darkelf2) {
+        obj_add(npc_coord, coins, ^regicide_pikeman_high_coins, ^lootdrop_duration); // UNKNOWN engineering: ELF-PIKE-HIGH-01.
+    } else {
+        obj_add(npc_coord, coins, 180, ^lootdrop_duration); // Archer award remains 180.
+    }
+}
 else if ($random < 90) obj_add(npc_coord, coins, 20, ^lootdrop_duration);
 else if ($random < 93) obj_add(npc_coord, bass, 1, ^lootdrop_duration);
 else if ($random < 96) obj_add(npc_coord, shark, 1, ^lootdrop_duration);
-else if ($random < 97) obj_add(npc_coord, adamantite_ore, 1, ^lootdrop_duration);
+else if ($random < 97) obj_add(npc_coord, adamantite_ore, 1, ^lootdrop_duration); // UNKNOWN engineering data row, no source: ELF-FREMENNIK-BANDS-01 keeps ore at 1/128.
 else if ($random < 102) obj_add(npc_coord, ~randomjewel, ^lootdrop_duration);
-// U-ELFDROPS2: period-listed additions use only the donor's empty tail.
+// Drop additions use only previously empty tail outcomes.
 else if (npc_type = regicide_darkelf) {
     if ($random < 103) obj_add(npc_coord, dragon_vambraces, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
     else if ($random < 105) obj_add(npc_coord, airrune, 10, ^lootdrop_duration); // UNKNOWN engineering: 2/128.
     else if ($random < 106) obj_add(npc_coord, poisonivy_bush_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
     else if ($random < 107) obj_add(npc_coord, cactus_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
     else if ($random < 108) obj_add(npc_coord, belladonna_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+    else if ($random < ^regicide_archer_tiny_crystal_limit) obj_add(npc_coord, elf_crystal_tiny, 1, ^lootdrop_duration);
+    else if ($random < ^regicide_archer_lobster_limit) obj_add(npc_coord, lobster, 1, ^lootdrop_duration);
 }
 else if (npc_type = regicide_darkelf2) {
     if ($random < 103) obj_add(npc_coord, rune_med_helm, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
     else if ($random < 104) obj_add(npc_coord, poisonivy_bush_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
     else if ($random < 105) obj_add(npc_coord, cactus_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
     else if ($random < 106) obj_add(npc_coord, belladonna_seed, 1, ^lootdrop_duration); // UNKNOWN engineering: 1/128.
+    else if ($random < ^regicide_pikeman_tiny_crystal_limit) obj_add(npc_coord, elf_crystal_tiny, 1, ^lootdrop_duration);
+    else if ($random < ^regicide_pikeman_charged_crystal_limit) obj_add(npc_coord, mourning_teleport_crystal_1, 1, ^lootdrop_duration);
+    else if ($random < ^regicide_pikeman_lobster_limit) obj_add(npc_coord, lobster, 1, ^lootdrop_duration);
 }

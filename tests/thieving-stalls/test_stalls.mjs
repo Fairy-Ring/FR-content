@@ -30,7 +30,7 @@ const regional = [
   ['monkey_crafting', 'mm_stall_crafting', 5, 160, 34, [['chisel', 1], ['necklace_mould', 1], ['ring_mould', 1]], 0, 'mm_desk'],
   ['monkey_food', 'mm_stall_food', 5, 160, 34, [['banana', 1]], 0, 'mm_desk'],
   ['monkey_general', 'mm_stall_general', 5, 160, 34, [['hammer', 1], ['pot_empty', 1], ['tinderbox', 1]], 0, 'mm_desk'],
-  ['monkey_magic', 'mm_stall_magic', 65, 1000, 200, [['earthrune', 1], ['firerune', 1], ['waterrune', 1]], 0, 'mm_desk'],
+  ['monkey_magic', 'mm_stall_magic', 65, 1000, 200, [['earthrune', 1], ['firerune', 1], ['waterrune', 1], ['lawrune', 1]], 0, 'mm_desk'],
   ['monkey_scimitar', 'mm_stall_scimitar', 65, 1600, 200, [['iron_scimitar', 1]], 0, 'mm_desk'],
   ['wine', 'rag_market_stall', 22, 270, 34, [['rag_bottle_wine', 11], ['grapes', 17], ['jug_empty', 39], ['jug_water', 20], ['jug_wine', 13]], 0, 'rag_market_stall_empty']
 ];

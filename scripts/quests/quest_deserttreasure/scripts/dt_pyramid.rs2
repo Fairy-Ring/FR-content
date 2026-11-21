@@ -74,7 +74,7 @@ if ($roll = ^dt_pyramid_trap_roll & coordy(coord) > 0) {
     p_delay(^dt_pyramid_climb_delay);
     p_teleport(^dt_pyramid_fall_exit);
     cleartimer(dt_pyramid_hazards);
-} else if ($roll = ^dt_pyramid_scarab_roll) {
+} else if ($roll >= ^dt_pyramid_scarab_roll & $roll <= ^dt_pyramid_scarab_roll_last) {
     // One short-lived swarm per nearby player, never an unbounded spawn pile.
     npc_findall(coord, scarab_swarm, 8, 0);
     if (npc_findnext = true) return;
