@@ -2,16 +2,9 @@
  * Deterministic compiled production-handler proof for the Ape Atoll course unit.
  * Run after the full content pack is built, from the sibling engine directory:
  *   node --import tsx ../content/tests/ape-agility/test_ape_atoll.mjs
- * Recapture after reviewing an intentional change to ordinary human death:
- * build any published tree's full pack, then run the same command with
- * --capture-human-death-baseline > capture.log. No old source or git history is needed.
- * Parse the JSON after APE_ATOLL_HUMAN_DEATH_BASELINE_V1 and save its observation
- * to fixtures/human-death-published.json (retain marker and deathSourceSha256).
- * Save its effects to fixtures/human-death-effects.json. Review both diffs.
- * Generated enum and database-column references use kind/name records resolved
- * through the built pack tables. Keep every command and every game value.
- * The source hash is provenance only. Appended varps must retain type defaults.
- * It starts no server and writes its JSON receipt beneath RUNNER_TEMP (or the OS temp directory).
+ * Ordinary death uses independent keep/drop, stat-reset, respawn, tab, form,
+ * modal, jingle, prayer-icon and worn-appearance contracts, not recordings.
+ * It starts no server and writes its JSON receipt beneath RUNNER_TEMP.
  */
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
@@ -33,6 +26,7 @@ const { Inventory } = await eng('src/engine/Inventory.ts');
 const { default: Loc } = await eng('src/engine/entity/Loc.ts');
 const { EntityLifeCycle } = await eng('src/engine/entity/EntityLifeCycle.ts');
 const { PlayerStatMap } = await eng('src/engine/entity/PlayerStat.ts');
+const { PlayerInfoProt } = await eng('src/network/rsbuf/prot.ts');
 const { default: CategoryType } = await eng('src/cache/config/CategoryType.ts');
 const { default: Component } = await eng('src/cache/config/Component.ts');
 const { default: DbTableType } = await eng('src/cache/config/DbTableType.ts');
@@ -57,6 +51,7 @@ const { default: JavaRandom } = await eng('src/util/JavaRandom.ts');
 const { default: ServerTriggerType } = await eng('src/engine/script/ServerTriggerType.ts');
 const { ScriptOpcode, ScriptOpcodeNameMap } = await eng('src/engine/script/ScriptOpcode.ts');
 const { default: routefinder, CollisionFlag } = await eng('src/engine/routefinder/index.ts');
+const { isMapBlocked, isLineOfWalk } = await eng('src/engine/GameMap.ts');
 const { unzipSync } = createRequire(path.join(ENGINE_DIR, 'package.json'))('fflate');
 
 for (const config of [
@@ -275,20 +270,10 @@ const greegreeTimerScript = ScriptProvider.getByName('[timer,mm_greegree_timer]'
 const greegreeWieldScript = ScriptProvider.getByName('[opheld2,_mm_greegree]');
 const MAIN_INVENTORY = packId('inv', 'inv');
 const greegreeObjectIds = new Set(ninjaForms.map(form => packId('obj', form.object)));
-const deathSourceSha256 = crypto.createHash('sha256')
-  .update(fs.readFileSync(path.join(CONTENT_DIR, 'scripts/player/scripts/death.rs2'))).digest('hex');
-const HUMAN_DEATH_BASELINE_MARKER = 'APE_ATOLL_HUMAN_DEATH_BASELINE_V1';
-const HUMAN_DEATH_BASELINE_PATH = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'fixtures',
-  'human-death-published.json'
-);
-const HUMAN_DEATH_EFFECTS_PATH = path.join(path.dirname(HUMAN_DEATH_BASELINE_PATH), 'human-death-effects.json');
 const DEATH_TEST_START_TICK = 100;
 // The real MAP_FINDSQUARE opcode samples Math.random, not JavaRandom.
 const DEATH_RESPAWN_RANDOM = 0;
 let nextDeathTestTick = DEATH_TEST_START_TICK;
-const captureHumanDeathBaseline = process.argv.includes('--capture-human-death-baseline');
 function transform(player, form) {
   const objectId = packId('obj', form.object);
   player.invSet(WORN_INVENTORY, objectId, 1, RIGHT_HAND);
@@ -408,50 +393,6 @@ function inventorySnapshot(player) {
     }));
 }
 
-function queuedScriptSnapshot(queue) {
-  return [...queue.all()].map(request => ({
-    type: request.type,
-    script: request.script.name,
-    args: canonicalJsonValue(request.args),
-    delay: request.delay,
-    lastInt: request.lastInt
-  }));
-}
-
-function deathSnapshot(player, packets) {
-  return {
-    ...snapshot(player),
-    identity: {
-      username: player.username,
-      username37: String(player.username37),
-      slot: player.slot,
-      pid: player.pid,
-      uid: player.uid,
-      hash64: String(player.hash64)
-    },
-    bas: Object.fromEntries(BAS_FIELDS.map(field => [field, player[field]])),
-    lastStats: Array.from(player.lastStats),
-    lastLevels: Array.from(player.lastLevels),
-    tabs: [...player.tabs],
-    inventories: inventorySnapshot(player),
-    timers: [...player.timers.values()]
-      .map(timer => ({
-        type: timer.type,
-        script: timer.script.name,
-        args: canonicalJsonValue(timer.args),
-        interval: timer.interval,
-        clock: timer.clock
-      }))
-      .sort((left, right) => left.script.localeCompare(right.script)),
-    queues: {
-      normal: queuedScriptSnapshot(player.queue),
-      weak: queuedScriptSnapshot(player.weakQueue),
-      engine: queuedScriptSnapshot(player.engineQueue)
-    },
-    worldTick: World.currentTick,
-    packets
-  };
-}
 
 function persistentEffects(player) {
   const state = snapshot(player);
@@ -903,106 +844,145 @@ function startDeathTestTick() {
   nextDeathTestTick = World.currentTick + 100;
 }
 
-// Void engine commands are effects. Pure getters/branches are intentionally excluded:
-// a guarded form read must not change the ordinary human-death contract.
-const commandSignatures = new Map();
-for (const line of fs.readFileSync(path.join(CONTENT_DIR, 'scripts/engine.rs2'), 'utf8').split(/\r?\n/)) {
-  const match = line.match(/^\[command,([.\w]+)\](?:\/\*)?(?:\(([^)]*)\))?(.*)$/);
-  if (!match || /^\s*\(/.test(match[3])) continue;
-  const name = match[1].replace(/^\./, '').toUpperCase();
-  const types = [...(match[2] ?? '').matchAll(/(\w+)\s+\$/g)].map(m => m[1]);
-  commandSignatures.set(name, types);
-}
-// ENUM has a dynamic signature documented in a comment, not parsed above.
-commandSignatures.set('ENUM', ['type', 'type', 'enum']);
-const namedPacks = new Map();
-function namedArgument(type, value) {
-  const kind = ({ namedobj: 'obj', timer: 'script', softtimer: 'script', queue: 'script', proc: 'script' })[type] ?? type;
-  if (value < 0) return value;
-  if (kind === 'dbcolumn') {
-    return {
-      kind,
-      name: namedArgument('dbtable', (value >> 12) & 0xffff),
-      column: (value >> 4) & 0x7f,
-      tuple: (value & 15) - 1
-    };
-  }
-  const file = path.join(CONTENT_DIR, `pack/${kind}.pack`);
-  if (!fs.existsSync(file)) return value;
-  if (!namedPacks.has(kind)) {
-    namedPacks.set(kind, new Map(fs.readFileSync(file, 'utf8').trim().split(/\r?\n/).map(line => {
-      const equal = line.indexOf('=');
-      return [Number(line.slice(0, equal)), line.slice(equal + 1)];
-    })));
-  }
-  const name = namedPacks.get(kind).get(value);
-  if (kind === 'enum' || kind === 'dbtable') assert(name, `${kind}.pack is missing id ${value}`);
-  return name ?? value;
-}
-function withDeathEffects(player, callback) {
-  const commands = [];
-  const drops = [];
-  const handlers = new Map();
-  const originalAddObj = World.addObj;
-  World.addObj = function (object, owner, duration) {
-    drops.push({ tile: tileOf(object), id: object.type, count: object.count, owner: String(owner), duration });
-    return originalAddObj.apply(this, arguments);
-  };
-  for (const [opcode, name] of ScriptOpcodeNameMap) {
-    const variable = ['POP_VARP', 'POP_VARS', 'POP_VARBIT'].includes(name);
-    if ((!commandSignatures.has(name) || opcode < 1000) && !variable) continue;
-    const original = ScriptRunner.HANDLERS[opcode];
-    if (typeof original !== 'function') continue;
-    handlers.set(opcode, original);
-    ScriptRunner.HANDLERS[opcode] = state => {
-      const ints = [];
-      const strings = [];
-      const popInt = state.popInt;
-      const popString = state.popString;
-      state.popInt = function () { const value = popInt.call(this); ints.unshift(value); return value; };
-      state.popString = function () { const value = popString.call(this); strings.unshift(value); return value; };
-      const command = { name, pointer: state.intOperand };
-      commands.push(command);
-      try { return original(state); } finally {
-        state.popInt = popInt;
-        state.popString = popString;
-        const types = (commandSignatures.get(name) ?? []).filter(type => type !== 'string');
-        command.ints = ints.map((value, index) => {
-          const argument = namedArgument(types[index], value);
-          return name === 'ENUM' && index === 2 ? { kind: 'enum', name: argument } : argument;
-        });
-        command.strings = strings;
-        if (variable) command.pointer = namedArgument(name === 'POP_VARBIT' ? 'varbit' : 'varp', state.intOperand);
-      }
-    };
-  }
-  try { return { result: callback(), effects: { commands, drops } }; } finally {
-    World.addObj = originalAddObj;
-    for (const [opcode, handler] of handlers) ScriptRunner.HANDLERS[opcode] = handler;
+// Contract values are names and equations, not observations of a death run.
+const HUMAN_BAS = [
+  'human_ready', 'human_turnonspot', 'human_walk_f', 'human_walk_b',
+  'human_walk_l', 'human_walk_r', 'human_running'
+].map(name => packId('seq', name));
+const HUMAN_TABS = new Map([
+  [0, 'combat_unarmed'], [1, 'stats'], [2, 'questlist'], [3, 'inventory'],
+  [4, 'wornitems'], [5, 'prayer'], [6, 'magic'], [8, 'friends'],
+  [9, 'ignore'], [10, 'logout'], [11, 'options'], [12, 'controls'], [13, 'music']
+].map(([tab, name]) => [tab, packId('interface', name)]));
+const varId = name => packId('varp', name);
+const getVar = (player, name) => player.getVar(varId(name));
+const setVar = (player, name, value) => player.setVar(varId(name), value);
+const inventoryItems = (player, inventory) => (player.invs.get(inventory)?.items ?? [])
+  .filter(Boolean).map(({ id, count }) => ({ id, count }));
+const byObjectId = (left, right) => left.id - right.id;
+
+function appearanceRightHand(appearance) {
+  // 377 appearance starts with gender and the two head-icon bytes.
+  let offset = 3;
+  for (let slot = 0; slot <= RIGHT_HAND; slot++) {
+    const high = appearance[offset++];
+    const value = high === 0 ? 0 : (high << 8) | appearance[offset++];
+    if (slot === RIGHT_HAND) return value;
   }
 }
 
-function assertHumanDeathObservation(actual, baseline) {
-  const comparison = structuredClone(actual);
-  for (const [key, defaultValue] of [['vars', 0], ['varsString', { $undefined: true }]]) {
-    const old = baseline.player[key];
-    const current = comparison.player[key];
-    assert(current.length >= old.length, `${key} retains all baseline entries`);
-    for (const value of current.slice(old.length)) {
-      assert.deepEqual(value, defaultValue, `appended ${key} entry retains its type default`);
+function respawnSquare() {
+  // Default Lumbridge anchor 0_50_50_21_18, radius 2. Sample zero selects
+  // the first reachable tile in coordinate order, using the current collision map.
+  const anchor = { level: 0, x: 50 * 64 + 21, z: 50 * 64 + 18 };
+  const candidates = [];
+  for (let x = anchor.x - 2; x <= anchor.x + 2; x++) {
+    for (let z = anchor.z - 2; z <= anchor.z + 2; z++) {
+      if (!Environment.NODE_MEMBERS && !World.gameMap.isFreeToPlay(x, z)) continue;
+      if (!isMapBlocked(x, z, 0) && isLineOfWalk(0, x, z, anchor.x, anchor.z)) {
+        candidates.push({ level: 0, x, z });
+      }
     }
-    comparison.player[key] = current.slice(0, old.length);
   }
-  assert.deepEqual(comparison, baseline, 'human death preserves packets, messages, inventories, respawn and reset stats');
+  assert(candidates.length > 0, 'the independent respawn oracle has a reachable square');
+  return candidates[Math.floor(DEATH_RESPAWN_RANDOM * candidates.length)];
 }
+
+function deathExpectation(player) {
+  const carried = [
+    ...inventoryItems(player, MAIN_INVENTORY),
+    ...inventoryItems(player, WORN_INVENTORY)
+  ];
+  const destroyOnDeath = ParamType.getId('destroy_death');
+  const eligible = carried.filter(item =>
+    ObjType.get(item.id).cost > 0 && ObjType.get(item.id).params.get(destroyOnDeath) !== 1
+  ).sort((left, right) => ObjType.get(right.id).cost - ObjType.get(left.id).cost);
+  // All death fixtures use distinct, nonstackable, single-count objects.
+  assert(carried.every(item => item.count === 1 && !ObjType.get(item.id).stackable));
+  assert.equal(new Set(carried.map(item => item.id)).size, carried.length);
+  const keepCount = (getVar(player, 'pk_skull') > 0 ? 0 : 3) + (getVar(player, 'prayer8') === 1 ? 1 : 0);
+  const kept = eligible.slice(0, keepCount);
+  const keptIds = new Set(kept.map(item => item.id));
+  return {
+    kept: kept.sort(byObjectId),
+    drops: [...carried.filter(item => !keptIds.has(item.id)), { id: packId('obj', 'bones'), count: 1 }]
+      .map(item => ({ ...item, tile: tileOf(player), owner: '-1', duration: 200 }))
+      .sort(byObjectId),
+    tile: respawnSquare(),
+    stats: Array.from(player.stats),
+    levels: Array.from(player.baseLevels),
+    body: [...player.body],
+    colors: [...player.colors],
+    endTick: World.currentTick + (1 + 1) + (3 + 1)
+  };
+}
+
+function assertOrdinaryDeath(player, death, expected) {
+  assert.deepEqual(tileOf(player), expected.tile, 'ordinary death uses the independent Lumbridge respawn square');
+  assert.deepEqual(inventoryItems(player, MAIN_INVENTORY).sort(byObjectId), expected.kept,
+    'ordinary death independently keeps the priciest eligible items');
+  assert.deepEqual(inventoryItems(player, WORN_INVENTORY), [], 'ordinary death empties worn equipment');
+  assert.deepEqual(inventoryItems(player, packId('inv', 'deathkeep')), [], 'ordinary death empties its temporary kept-item inventory');
+  assert.deepEqual(death.drops.sort(byObjectId), expected.drops, 'ordinary death drops the remaining items and bones at the death tile');
+  assert.deepEqual(Array.from(player.levels), expected.levels, 'ordinary death resets every current stat to its base');
+  assert.deepEqual(Array.from(player.baseLevels), expected.levels, 'ordinary death preserves every base level');
+  assert.deepEqual(Array.from(player.stats), expected.stats, 'ordinary death preserves every skill XP value');
+  assert.deepEqual(player.body, expected.body, 'ordinary death preserves body choices');
+  assert.deepEqual(player.colors, expected.colors, 'ordinary death preserves appearance colours');
+  assert.equal(player.modalMain, -1, 'ordinary death closes the open main interface');
+  assert.equal(player.headicons, 0, 'ordinary death clears the active prayer head icon');
+  assert.equal(player.appearanceInv, WORN_INVENTORY, 'ordinary death uses worn equipment for its appearance');
+  assert(player.masks & PlayerInfoProt.APPEARANCE, 'ordinary death marks its post-drop appearance for transmission');
+  const appearance = player.generateAppearance();
+  assert.equal(appearanceRightHand(appearance), 0, 'ordinary death transmits no dropped right-hand object');
+  assert.equal(appearance[2], 0xff, 'ordinary death transmits no prayer head icon');
+  assert.equal(player.runenergy, 10000, 'ordinary death fully restores run energy');
+  for (const name of ['death', 'pk_skull', 'poison', 'prayer_drain_effect', 'prayer_drain_counter',
+    ...Array.from({ length: 15 }, (_, index) => `prayer${index}`)]) {
+    assert.equal(getVar(player, name), 0, `ordinary death clears ${name}`);
+  }
+  assert.equal(player.npcId, -1, 'ordinary death clears the getter form');
+  assert.equal(player.animProtect, 0, 'ordinary death clears form animation protection');
+  assert.deepEqual(BAS_FIELDS.map(field => player[field]), HUMAN_BAS, 'ordinary death derives all seven human BAS values by name');
+  for (const [tab, component] of HUMAN_TABS) {
+    assert.equal(player.tabs[tab], component, `ordinary death restores tab ${tab}`);
+    const packet = player.packets.filter(packet => packet.constructor.name === 'IfSetTab' && packet.tab === tab).at(-1);
+    assert(packet, `ordinary death transmits restored tab ${tab}`);
+    assert.equal(packet.component, component, `ordinary death transmits the expected component for tab ${tab}`);
+  }
+  assert.deepEqual(player.messages, ['Oh dear you are dead!'], 'ordinary death emits its death message without extra form text');
+  assert.equal(player.animId, -1, 'ordinary death clears its death animation');
+  assert.equal(player.spotanimId, -1, 'ordinary death has no revert spot animation');
+  assert.equal(player.activeScript, null, 'ordinary death leaves no suspended script');
+  assert.equal(player.protect, false, 'ordinary death releases player protection');
+  assert.equal(player.delayed, false, 'ordinary death releases the delay');
+  assert.equal(World.currentTick, expected.endTick, 'ordinary death settles both native delays');
+  assert(death.events.some(event => event.kind === 'playAnimation' && event.animation === packId('seq', 'human_death')),
+    'ordinary death actually plays the human death animation');
+  const jingle = player.packets.filter(packet => packet.constructor.name === 'MidiJingle').at(-1);
+  assert(jingle, 'ordinary death actually transmits its death jingle');
+  assert.equal(jingle.id, packId('midi', 'death2'), 'ordinary death transmits the named death2 jingle');
+  assert(![...player.timers.values()].some(timer =>
+    [greegreeTimerScript.name, '[timer,prayer_drain]', '[softtimer,pk_skull_timer]'].includes(timer.script.name)),
+  'ordinary death clears form, prayer and skull timers');
+  assert(![...player.queue.all()].some(request => request.script.id === deathQueue.id),
+    'ordinary death clears its pending death queue');
+}
+let ordinaryDeathCases = 0;
 function runDeathQueue(player) {
-  const packetsBeforeDeath = player.packets.map(canonicalJsonValue);
+  const expected = deathExpectation(player);
   const originalRandom = Math.random;
+  const originalAddObj = World.addObj;
+  const drops = [];
   let randomCalls = 0;
   let trace;
   Math.random = () => {
     assert.equal(++randomCalls, 1, 'ordinary death consumes only its one real respawn-square random sample');
     return DEATH_RESPAWN_RANDOM;
+  };
+  World.addObj = function (object, owner, duration) {
+    drops.push({ tile: tileOf(object), id: object.type, count: object.count, owner: String(owner), duration });
+    return originalAddObj.apply(this, arguments);
   };
   try {
     trace = withPlayerTrace(player, () => {
@@ -1016,78 +996,66 @@ function runDeathQueue(player) {
     });
   } finally {
     Math.random = originalRandom;
+    World.addObj = originalAddObj;
   }
   assert.equal(randomCalls, 1, 'ordinary death executes the production respawn-square sampler');
-  const packetWrites = trace.events.filter(event => event.kind === 'packet').map(event => event.packet);
-  assert.equal(
-    packetWrites.length,
-    player.packets.length - packetsBeforeDeath.length,
-    'the death trace retains every real outgoing packet write'
-  );
-  return {
-    events: trace.events,
-    snapshot: deathSnapshot(player, [...packetsBeforeDeath, ...packetWrites])
-  };
+  const death = { events: trace.events, drops, inventories: inventorySnapshot(player) };
+  assertOrdinaryDeath(player, death, expected);
+  ordinaryDeathCases++;
+  return death;
 }
 
-function runHumanDeath() {
-  startDeathTestTick();
-  const player = makePlayer(48, null, STAGES[0].start);
-  player.invSet(WORN_INVENTORY, packId('obj', 'bronze_sword'), 1, RIGHT_HAND);
-  const traced = withDeathEffects(player, () => runDeathQueue(player));
-  const death = traced.result;
-  return {
-    player,
-    events: death.events,
-    effects: canonicalJsonValue(traced.effects),
-    observation: canonicalJsonValue({
-      worldTick: World.currentTick,
-      player: death.snapshot
-    })
-  };
-}
-if (captureHumanDeathBaseline) {
-  // Capture the built tree as it exists, including after this repair is published.
-  const humanDeathRun = runHumanDeath();
-  const baseline = {
-    marker: HUMAN_DEATH_BASELINE_MARKER,
-    deathSourceSha256,
-    observation: humanDeathRun.observation,
-    effects: humanDeathRun.effects
-  };
-  fs.writeFileSync(process.stdout.fd, `${HUMAN_DEATH_BASELINE_MARKER} ${JSON.stringify(baseline)}\n`);
-  process.exit(0);
-}
-
-let humanDeathBaselineCases = 0;
+let humanDeathCases = 0;
 let monkeyDeathRepairCases = 0;
 let greegreeReequipCases = 0;
 let unmatchedGreegreeDeathControlCases = 0;
-const humanDeathRun = runHumanDeath();
-assert(fs.existsSync(HUMAN_DEATH_BASELINE_PATH), 'capture the published human-death baseline from a full pack');
-const humanDeathBaseline = JSON.parse(fs.readFileSync(HUMAN_DEATH_BASELINE_PATH, 'utf8'));
-assert.equal(humanDeathBaseline.marker, HUMAN_DEATH_BASELINE_MARKER, 'human death fixture is a marked real pack capture');
-assert.match(humanDeathBaseline.deathSourceSha256, /^[0-9a-f]{64}$/, 'source digest is retained as provenance, not an admission lock');
-// Slot 196 is adopted as `feud_trial_villager` (pack/varp.pack:197; quest_feud.varp:10-12), type NPC_UID (ScriptVarType.ts:22); Player.ts:442-449 initializes non-INT varps to -1.
-// It retains TEMP/non-transmitted defaults (VarPlayerType.ts:83-86; Player.ts:78-80), is excluded from saves (Player.ts:219-233) and login varps (Player.ts:521-527), and PlayerLoading.ts:29-36,96-106 applies only saved entries after constructing defaults. Published saves omit this slot, preserving all saved state.
-assert.equal(humanDeathBaseline.observation.player.vars[196], 0, 'published oracle retains the old integer default at slot 196');
-humanDeathBaseline.observation.player.vars[196] = -1;
-assertHumanDeathObservation(humanDeathRun.observation, humanDeathBaseline.observation);
-assert.deepEqual(humanDeathRun.effects, JSON.parse(fs.readFileSync(HUMAN_DEATH_EFFECTS_PATH, 'utf8')),
-  'human death preserves commands and arguments in order, and actual ground drops');
-// Exercise the append-only rule without requiring an unrelated product varp edit.
-const appendedDefault = structuredClone(humanDeathRun.observation);
-appendedDefault.player.vars.push(0);
-appendedDefault.player.varsString.push({ $undefined: true });
-assertHumanDeathObservation(appendedDefault, humanDeathBaseline.observation);
-appendedDefault.player.vars[appendedDefault.player.vars.length - 1] = 1;
-assert.throws(() => assertHumanDeathObservation(appendedDefault, humanDeathBaseline.observation), /type default/);
-assert.equal(
-  humanDeathRun.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length,
-  0,
-  'ordinary human death does not invoke the greegree Remove reset'
-);
-humanDeathBaselineCases++;
+const keepWitnesses = new Set();
+for (const skulled of [false, true]) for (const protectItem of [false, true]) {
+  startDeathTestTick();
+  const player = makePlayer(48, null, STAGES[0].start);
+  for (let stat = 0; stat < player.levels.length; stat++) {
+    player.setLevel(stat, 30 + stat);
+    player.levels[stat] = stat % 2 ? 1 : player.baseLevels[stat] + 5;
+  }
+  player.levels[HITPOINTS] = 0;
+  player.runenergy = 1234;
+  setVar(player, 'poison', 6);
+  setVar(player, 'pk_skull', skulled ? World.currentTick + 100 : 0);
+  setVar(player, 'prayer8', protectItem ? 1 : 0);
+  setVar(player, 'prayer0', 1);
+  setVar(player, 'prayer12', 1);
+  setVar(player, 'prayer_drain_effect', 50);
+  setVar(player, 'prayer_drain_counter', 20);
+  const objects = ['bronze_sword', 'iron_sword', 'steel_sword', 'mithril_sword', 'adamant_sword']
+    .map(name => packId('obj', name));
+  player.invSet(WORN_INVENTORY, objects[0], 1, RIGHT_HAND);
+  objects.slice(1).forEach((id, slot) => player.invSet(MAIN_INVENTORY, id, 1, slot));
+  player.openMainModal(packId('interface', 'welcome_screen'));
+  assert.notEqual(player.modalMain, -1, 'interface closure starts with an open main interface');
+  player.headicons = 1 << 5; // 377 protection-from-magic appearance bit, matching prayer12.
+  player.buildAppearance(WORN_INVENTORY);
+  const appearanceBefore = player.generateAppearance();
+  assert.equal(appearanceRightHand(appearanceBefore), 0x200 + objects[0],
+    'the pre-death appearance actually displays the worn sword');
+  assert.notEqual(appearanceBefore[2], 0xff, 'prayer-icon clearing starts with a visible protection icon');
+  player.masks &= ~PlayerInfoProt.APPEARANCE;
+  assert.equal(player.masks & PlayerInfoProt.APPEARANCE, 0,
+    'the pre-death appearance has no pending appearance update');
+  const expectedKeepCount = (skulled ? 0 : 3) + (protectItem ? 1 : 0);
+  assert(player.levels.every((level, stat) => level !== player.baseLevels[stat]),
+    'every stat reset has a non-base witness before death');
+  assert(new Set(objects.map(id => ObjType.get(id).cost)).size === objects.length,
+    'item selection has distinct-price witnesses');
+  const death = runDeathQueue(player);
+  assert.equal(inventoryItems(player, MAIN_INVENTORY).length, expectedKeepCount, 'the keep-policy fixture exercises its required retained count');
+  assert.equal(death.drops.length, objects.length - expectedKeepCount + 1, 'the keep-policy fixture exercises actual losses plus bones');
+  keepWitnesses.add(expectedKeepCount);
+  assert.equal(death.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length, 0,
+    'ordinary human death does not invoke the greegree Remove reset');
+  humanDeathCases++;
+}
+assert.deepEqual([...keepWitnesses].sort((a, b) => a - b), [0, 1, 3, 4],
+  'ordinary human death actually exercises every skull/protect-item keep policy');
 
 for (const form of ninjaForms) {
   const objectId = packId('obj', form.object);
@@ -1154,7 +1122,7 @@ for (const form of ninjaForms) {
   );
   assert(resetState, `${form.label} records the actual completed silent reset`);
   assert.equal(resetState.tick, death.events[removalIndex].tick, `${form.label} actual form reset shares the item-move tick`);
-  assert.equal(resetState.npcId, humanDeathBaseline.observation.player.npcId, `${form.label} getter form is clear when silent reset returns`);
+  assert.equal(resetState.npcId, -1, `${form.label} getter form is clear when silent reset returns`);
   assert.equal(resetState.animProtect, 0, `${form.label} silent reset clears protection in the item-move tick`);
   assert(!resetState.timers.includes(greegreeTimerScript.name), `${form.label} Remove clears its timer in the item-move tick`);
   const basState = death.events.find(event =>
@@ -1164,14 +1132,14 @@ for (const form of ninjaForms) {
   assert.equal(basState.tick, death.events[removalIndex].tick, `${form.label} all BAS fields restore in the item-move tick`);
   assert.deepEqual(
     basState.bas,
-    BAS_FIELDS.map(field => humanDeathBaseline.observation.player.bas[field]),
+    HUMAN_BAS,
     `${form.label} item-move tick derives all seven human BAS values`
   );
 
-  assert.equal(player.npcId, humanDeathBaseline.observation.player.npcId, `${form.label} death clears the actual getter form`);
+  assert.equal(player.npcId, -1, `${form.label} death clears the actual getter form`);
   assert.deepEqual(
     BAS_FIELDS.map(field => player[field]),
-    BAS_FIELDS.map(field => humanDeathBaseline.observation.player.bas[field]),
+    HUMAN_BAS,
     `${form.label} death restores all seven human BAS values`
   );
   assert.equal(player.animProtect, 0, `${form.label} death clears Remove-owned animation protection`);
@@ -1179,7 +1147,6 @@ for (const form of ninjaForms) {
     ![...player.timers.values()].some(timer => timer.script.name === greegreeTimerScript.name),
     `${form.label} death clears the real Remove-owned greegree timer`
   );
-  assert.deepEqual(player.tabs, humanDeathBaseline.observation.player.tabs, `${form.label} death restores ordinary human tab state`);
   const restoredTabPacket = player.packets
     .slice(transformPacketStart)
     .filter(packet => packet.constructor.name === 'IfSetTab' && packet.tab === transformedTabPacket.tab)
@@ -1192,13 +1159,13 @@ for (const form of ninjaForms) {
     `${form.label} tab restoration packet matches the final player tab state`
   );
   assert.deepEqual(
-    death.snapshot.inventories,
-    unmatchedDeath.snapshot.inventories,
+    death.inventories,
+    unmatchedDeath.inventories,
     `${form.label} death preserves the ordinary kept-item allocation`
   );
   assert.deepEqual(
     player.messages,
-    humanDeathBaseline.observation.player.messages,
+    ['Oh dear you are dead!'],
     `${form.label} death adds no player-visible text`
   );
   assert.equal(death.events.filter(event => event.kind === 'call' && event.name === '[proc,on_unequip]').length, 0,
@@ -1233,25 +1200,32 @@ for (const form of ninjaForms) {
   greegreeReequipCases++;
   const unequip = ScriptProvider.getByName('[proc,unequip]');
   assert(unequip, 'ordinary Remove is packed');
-  const removeEffects = withDeathEffects(player, () => withPlayerTrace(player, () => {
+  const removePacketStart = player.packets.length;
+  const remove = withPlayerTrace(player, () => {
     assert.equal(player.runScript(ScriptRunner.init(unequip, player, null, [RIGHT_HAND]), true, true),
       ScriptState.FINISHED, `${form.label} real Remove finishes`);
-  }));
-  const remove = removeEffects.result;
-  const clearAt = removeEffects.effects.commands.findIndex(command => command.name === 'P_TRANSMOGRIFY');
-  assert(clearAt >= 0, `${form.label} Remove executes its form-clear command`);
-  assert.deepEqual(removeEffects.effects.commands.slice(clearAt, clearAt + 6), [
-    { name: 'P_TRANSMOGRIFY', pointer: 0, ints: [-1], strings: [] },
-    { name: 'CLEARTIMER', pointer: 0, ints: ['[timer,mm_greegree_timer]'], strings: [] },
-    { name: 'P_ANIMPROTECT', pointer: 0, ints: [0], strings: [] },
-    { name: 'SPOTANIM_PL', pointer: 0, ints: ['windwave_impact', 124, 0], strings: [] },
-    { name: 'SOUND_SYNTH', pointer: 0, ints: [form.accepted ? 'smallmonkey_into_human' : 'monkey_into_human', 0, 0], strings: [] },
-    { name: 'IF_SETTAB', pointer: 0, ints: ['magic', 6], strings: [] }
-  ], `${form.label} compiled Remove keeps the published command arguments and order`);
+  });
+  const cleared = remove.events.find(event =>
+    event.kind === 'stateAfterProcedure' && event.name === '[proc,greegree_clearform_silent]');
+  assert(cleared, `${form.label} Remove actually executes the shared reset`);
+  assert.equal(cleared.npcId, -1, `${form.label} Remove clears form before its visible effects`);
+  assert.equal(cleared.animProtect, 0, `${form.label} Remove clears animation protection`);
+  assert(!cleared.timers.includes(greegreeTimerScript.name), `${form.label} Remove clears its timer`);
+  assert.deepEqual(BAS_FIELDS.map(field => player[field]), HUMAN_BAS, `${form.label} Remove restores human BAS`);
+  assert.equal(player.tabs[6], HUMAN_TABS.get(6), `${form.label} Remove restores the magic tab`);
+  const tabPacket = player.packets.slice(removePacketStart).find(packet =>
+    packet.constructor.name === 'IfSetTab' && packet.tab === 6);
+  assert.equal(tabPacket?.component, HUMAN_TABS.get(6), `${form.label} Remove transmits the restored magic tab`);
   assert.equal(player.npcId, -1, `${form.label} Remove still clears form`);
   assert.equal(player.spotanimId, packId('spotanim', 'windwave_impact'), `${form.label} Remove retains its published spot animation`);
+  assert.equal(player.spotanimHeight, 124, `${form.label} Remove retains its spot-animation height`);
+  assert.equal(player.spotanimTime, 0, `${form.label} Remove starts its spot animation without delay`);
   const sounds = remove.events.filter(event => event.kind === 'packet' && event.packet.$type === 'SynthSound');
   assert.equal(sounds.length, 1, `${form.label} Remove retains its one published revert sound`);
+  assert.deepEqual(sounds[0].packet.fields, {
+    synth: packId('synth', form.accepted ? 'smallmonkey_into_human' : 'monkey_into_human'),
+    loops: 0, delay: 0
+  }, `${form.label} Remove emits the expected native revert sound`);
 }
 
 // The donor policy covers any NPC form, not only a matching worn greegree.
@@ -1260,7 +1234,9 @@ otherForm.npcId = packId('npc', 'imp');
 runDeathQueue(otherForm);
 assert.equal(otherForm.npcId, -1, 'ordinary death clears a non-greegree NPC form too');
 
-assert.equal(humanDeathBaselineCases, 1, 'one complete published human-death fixture is compared');
+assert.equal(humanDeathCases, 4, 'every skull/protect-item human death case is exercised');
+assert.equal(ordinaryDeathCases, humanDeathCases + 2 * ninjaForms.length + 1,
+  'all human, transformed, unmatched-greegree and unrelated-form deaths satisfy the independent contract');
 assert.equal(monkeyDeathRepairCases, ninjaForms.length, 'all three configured greegree forms clear on ordinary death');
 assert.equal(greegreeReequipCases, ninjaForms.length, 'all three configured greegree forms restore through real Wield/Hold');
 assert.equal(unmatchedGreegreeDeathControlCases, ninjaForms.length, 'all three untransformed greegree controls avoid the death reset');
@@ -1544,7 +1520,8 @@ const result = {
   repeatedLapXpTenths: 5800,
   failureCases,
   bypassCases,
-  humanDeathBaselineCases,
+  humanDeathCases,
+  ordinaryDeathCases,
   monkeyDeathRepairCases,
   greegreeReequipCases,
   unmatchedGreegreeDeathControlCases,
