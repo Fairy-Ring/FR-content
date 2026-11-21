@@ -27,9 +27,9 @@ function close(p) {
   assert(closeHandler.handle(new CloseModal(), p), 'native close packet is accepted');
   assert.equal(p.modalMain, shopRoot, 'the native request is deferred to player queues');
   p.processQueues();
-  assert.equal(p.modalMain, -1, 'the close callback leaves the shop closed');
-  assert.equal(p.activeScript, null, 'the callback never suspends a script');
-  assert.equal([...p.queue.all()].length, 0, 'the callback schedules no queue work');
+  assert.equal(p.modalMain, -1, 'the native close request leaves the shop closed');
+  assert.equal(p.activeScript, null, 'closing the shop never suspends a script');
+  assert.equal([...p.queue.all()].length, 0, 'closing the shop schedules no queue work');
   assert.equal([...p.weakQueue.all()].length, 0);
   assert.equal([...p.engineQueue.all()].length, 0);
 }
