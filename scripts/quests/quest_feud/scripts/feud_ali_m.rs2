@@ -51,6 +51,8 @@ if ($go = 1) {
 ~chatnpc("<p,neutral>Anyway, have a look at my wares.");
 @feud_ali_m_wares;
 
+// FEUD-JUNK-REFUSAL-SCOPE-01: UNKNOWN engineering scope, no source establishes
+// every existing caller or the silent ineligible ending. Finale remains separate.
 [label,feud_ali_m_wares]
 if (~p_choice2("No, I'm really too busy.", 1, "Okay.", 2) = 2) {
     ~openshop_activenpc;
