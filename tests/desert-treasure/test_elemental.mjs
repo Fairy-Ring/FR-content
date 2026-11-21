@@ -400,7 +400,7 @@ function checkCannon(type) {
       World.removeNpc(n, 0); World.players[1] = null; p.unlink();
     }
   }
-  function execute(seed, direct = false) {
+  function execute(seed, direct = false, target = type) {
     const draws = [], calls = [];
     const nativeSeed = JavaRandom.setSeed, nativeDouble = JavaRandom.nextDouble;
     let recording = false;
@@ -417,7 +417,7 @@ function checkCannon(type) {
     };
     try {
       // This path never invokes withPublished or its other attack fixtures.
-      const { commands: _commands, ...result } = outcome(type, { kind: 'cannon', row: [], style: seed % 5 }, seed);
+      const { commands: _commands, ...result } = outcome(target, { kind: 'cannon', row: [], style: seed % 5 }, seed);
       return { result, draws, calls };
     } finally {
       Object.assign(cap, saved);
@@ -447,6 +447,23 @@ function checkCannon(type) {
     positives += Number(after.result.damage > 0);
   }
   assert(positives > 0, `${type} fixed seeds contain a positive native cannon witness`);
+  if (type === bosses[0].id) {
+    const harpie = id('NpcType', 'slayer_harpiebugswarm');
+    let gatedWitness = false;
+    for (const seed of seeds) {
+      const direct = execute(seed, true, harpie);
+      if (direct.result.damage === 0) continue;
+      const product = execute(seed, false, harpie);
+      assert.equal(product.result.damage, 0, 'bare harpie is gated in the product');
+      assert(product.result.xp.every(xp => xp === 0), 'bare harpie product awards no damage XP');
+      assert.deepEqual(product.draws, direct.draws, 'harpie control changes the cap, not the RNG stream');
+      assert.deepEqual(product.calls, [[30, 0]], 'harpie product reaches the shared cap');
+      gatedWitness = true;
+      console.log(`PASS bare harpie seed ${seed}: direct control damage ${direct.result.damage}, gated product damage 0`);
+      break;
+    }
+    assert(gatedWitness, 'in-memory direct control differs from the product on a gated harpie');
+  }
   // A disclosed fixture cap proves the outcome comparison cannot hide both
   // paths ignoring the same boss cap. This changes no product configuration.
   const target = types.NpcType.get(type), hadCap = target.params.has(maxDealt), previousCap = target.params.get(maxDealt);
