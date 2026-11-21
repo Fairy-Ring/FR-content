@@ -14,7 +14,8 @@ data=coord_pair,2_38_147_0_0,2_38_147_63_63
 // UNKNOWN CANNON-AREA-SHADE-TOMBS-01: engineering map envelope containing the existing Mort'ton tomb entrance destination.
 data=coord_pair,0_54_151_0_0,0_54_151_63_63
 // CANDIDATE ban: the same 22 December 2007 list names Mort Myre Swamp.
-// UNKNOWN CANNON-AREA-MORT-MYRE-01: engineering union of the six native swamp-snail map squares, excluding Mort'ton.
+// UNKNOWN CANNON-AREA-MORT-MYRE-01: engineering union of the six native swamp-snail map squares, excluding Mort'ton and the Dessous graveyard.
 data=coord_pair,0_53_51_0_0,0_53_53_63_63
 data=coord_pair,0_54_52_0_0,0_54_53_63_63
-data=coord_pair,0_55_53_0_0,0_55_53_63_63
+data=coord_pair,0_55_53_0_0,0_55_53_35_63
+data=coord_pair,0_55_53_36_22,0_55_53_63_63

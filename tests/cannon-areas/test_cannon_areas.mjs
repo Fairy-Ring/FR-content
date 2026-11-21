@@ -100,6 +100,7 @@ function attempt(label, tile, expected) {
   }
   p.unlink(); World.players[p.slot] = null;
 }
+for (const area of areas) for (const { name, tile, refused } of area.cases ?? []) attempt(`${area.name}: ${name}`, tile, refused);
 for (const area of areas) for (const [index, box] of area.boxes.entries()) {
   const [low, west, south, high, east, north] = box;
   const midX = (west + east) >> 1, midZ = (south + north) >> 1;
