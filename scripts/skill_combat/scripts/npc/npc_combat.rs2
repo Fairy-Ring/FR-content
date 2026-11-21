@@ -103,7 +103,7 @@ if (~soulbane_tolna_npc = true & ~soulbane_tolna_attackable = false) return(0);
 if (npc_type = rd_combat_npc_room_3 & gender() = 0) {
     return(0);
 }
-// CANDIDATE slayer.s01-harpie-unlit-damage-cap.
+// CANDIDATE slayer.harpie-shared-damage-cap.
 // Keep the equipment rule local to this NPC type, before damage XP.
 if (npc_type = slayer_harpiebugswarm & inv_total(worn, slayer_buglan_on) = 0) {
     return(0);
