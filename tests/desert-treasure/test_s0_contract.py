@@ -6,12 +6,14 @@ from __future__ import annotations
 from pathlib import Path
 import os
 import re
-import subprocess
+import tarfile
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 ROOT = Path(os.environ.get("DT_S0_CONTENT_ROOT", REPO_ROOT)).resolve()
-BASELINE_COMMIT = "208a5b7f734f8f2e2bd24fcde6a4abb237bb59a1"
+# Byte-exact source files from 208a5b7f734f8f2e2bd24fcde6a4abb237bb59a1.
+# Keep the baseline in the checkout so the same contract runs in shallow CI clones.
+BASELINE = Path(__file__).with_name("s0-baseline.tar.gz")
 UNPACK = ROOT / "scripts" / "_unpack" / "377"
 VARP = UNPACK / "all.varp"
 VARP_PACK = ROOT / "pack" / "varp.pack"
@@ -53,18 +55,10 @@ def baseline_text(relative_path: str) -> str:
             return ""
         return path.read_text(encoding="utf-8")
 
-    result = subprocess.run(
-        ["git", "show", f"{BASELINE_COMMIT}:{relative_path}"],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        check=False,
-        text=True,
-        encoding="utf-8",
-    )
-    if result.returncode != 0:
-        require(False, f"cannot read baseline {BASELINE_COMMIT}:{relative_path}: {result.stderr.strip()}")
-        return ""
-    return result.stdout
+    with tarfile.open(BASELINE, "r:gz") as archive:
+        source = archive.extractfile(relative_path)
+        assert source is not None, f"baseline file is missing: {relative_path}"
+        return source.read().decode("utf-8")
 
 
 def section_names(text: str) -> list[str]:
