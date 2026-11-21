@@ -15,6 +15,7 @@ const ScriptProvider = (await load('src/engine/script/ScriptProvider.ts')).defau
 const ScriptRunner = (await load('src/engine/script/ScriptRunner.ts')).default;
 const ScriptState = (await load('src/engine/script/ScriptState.ts')).default;
 const ScriptPointer = (await load('src/engine/script/ScriptPointer.ts')).default;
+const { ScriptOpcodeNameMap } = await load('src/engine/script/ScriptOpcode.ts');
 const Npc = (await load('src/engine/entity/Npc.ts')).default;
 const Player = (await load('src/engine/entity/Player.ts')).default;
 const { EntityLifeCycle } = await load('src/engine/entity/EntityLifeCycle.ts');
@@ -117,9 +118,17 @@ function maximumCase(label, type, expected, setup = () => {}, admitted = true, s
 // The complete cannon must consume exactly that stream and leave the next draw
 // unchanged. No baseline bytecode, recorded trace or generated script ID is used.
 const nativeDouble = JavaRandom.nextDouble;
-for (const style of [0, 1, 2, 3, 4]) {
+function styleStream(style) {
+  let hits = 0, misses = 0;
+  const styleFixture = () => {
+    const result = fixture('lesser_demon', style);
+    for (const [index, name] of ['com_stabattack', 'com_slashattack', 'com_crushattack', 'com_rangeattack', 'com_magicattack'].entries()) {
+      pv(result.player, name, index === style ? 10000 : 0);
+    }
+    return result;
+  };
   for (const seed of [1, 7, 31, 377, 65535, 987654321]) {
-    const control = fixture('lesser_demon', style);
+    const control = styleFixture();
     JavaRandom.setSeed(seed);
     const expectedDraws = [];
     JavaRandom.nextDouble = () => { const value = nativeDouble.call(JavaRandom); expectedDraws.push(value); return value; };
@@ -130,7 +139,8 @@ for (const style of [0, 1, 2, 3, 4]) {
       suffix = nativeDouble.call(JavaRandom);
     } finally { JavaRandom.nextDouble = nativeDouble; }
     check('accuracy consumes two draws, successful damage consumes one', expectedDraws.length, hit ? 3 : 2);
-    const actual = fixture('lesser_demon', style);
+    if (hit) hits++; else misses++;
+    const actual = styleFixture();
     JavaRandom.setSeed(seed);
     const actualDraws = [];
     JavaRandom.nextDouble = () => { const value = nativeDouble.call(JavaRandom); actualDraws.push(value); return value; };
@@ -140,6 +150,26 @@ for (const style of [0, 1, 2, 3, 4]) {
     check(`style ${style} seed ${seed}: unchanged native RNG suffix`, nativeDouble.call(JavaRandom), suffix);
     check(`style ${style} seed ${seed}: unchanged damage`, [...actual.npc.queue.all()].map(q => q.lastInt), [0, damage]);
   }
+  check(`style ${style}: fixed seeds include a hit`, hits > 0, true);
+  check(`style ${style}: fixed seeds include a miss`, misses > 0, true);
+}
+for (const style of [0, 1, 2, 3, 4]) styleStream(style);
+
+// Isolated wrong-style mutant at the cannon's native accuracy call. No source
+// or pack file is changed; the real callee still executes its normal handler.
+{
+  const cannon = ScriptProvider.getByName('[proc,cannon_fire]');
+  const hitRoll = ScriptProvider.getByName('[proc,player_npc_hit_roll]');
+  const callOpcode = [...ScriptOpcodeNameMap].find(([, name]) => name === 'GOSUB_WITH_PARAMS')[0];
+  const nativeCall = ScriptRunner.HANDLERS[callOpcode];
+  ScriptRunner.HANDLERS[callOpcode] = state => {
+    if (state.script === cannon && state.intOperand === hitRoll.id) state.intStack[state.isp - 1] = 3;
+    nativeCall(state);
+  };
+  try {
+    assert.throws(() => styleStream(0), /style 0 seed .*: unchanged (draw order|damage)/,
+      'fixed-Ranged-style mutant must fail the current-style oracle');
+  } finally { ScriptRunner.HANDLERS[callOpcode] = nativeCall; }
 }
 for (let damage = 0; damage <= 30; damage++) {
   const { player, npc } = fixture();
