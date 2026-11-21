@@ -56,8 +56,14 @@ def baseline_text(relative_path: str) -> str:
         return path.read_text(encoding="utf-8")
 
     with tarfile.open(BASELINE, "r:gz") as archive:
-        source = archive.extractfile(relative_path)
-        assert source is not None, f"baseline file is missing: {relative_path}"
+        try:
+            source = archive.extractfile(relative_path)
+        except KeyError:
+            require(False, f"baseline file is missing: {relative_path}")
+            return ""
+        if source is None:
+            require(False, f"baseline file is missing: {relative_path}")
+            return ""
         return source.read().decode("utf-8")
 
 
