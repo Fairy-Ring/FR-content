@@ -13,7 +13,18 @@
   {
     "name": "Zogre burial grounds",
     "bound": "CANNON-AREA-ZOGRE-01",
-    "boxes": [[0, 2432, 3008, 0, 2495, 3071]]
+    "boxes": [[0, 2456, 3037, 0, 2491, 3055]],
+    "cases": [
+      { "name": "west barricade approach 2454 remains allowed", "tile": [0, 2454, 3048], "refused": false },
+      { "name": "west barricade approach 2455 remains allowed", "tile": [0, 2455, 3048], "refused": false },
+      { "name": "inside the outer barricade", "tile": [0, 2457, 3048], "refused": true },
+      { "name": "inside the inner barricade", "tile": [0, 2459, 3048], "refused": true },
+      { "name": "southern enclosed floor", "tile": [0, 2482, 3037], "refused": true },
+      { "name": "northern enclosed floor", "tile": [0, 2482, 3055], "refused": true },
+      { "name": "Uglug Nar camp remains allowed", "tile": [0, 2442, 3049], "refused": false },
+      { "name": "strip south of Castle Wars lobby remains allowed", "tile": [0, 2440, 3070], "refused": false },
+      { "name": "Feldip ravine remains allowed", "tile": [0, 2479, 3018], "refused": false }
+    ]
   },
   {
     "name": "Shade tombs",
