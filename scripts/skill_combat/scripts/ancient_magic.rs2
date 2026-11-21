@@ -1,4 +1,4 @@
-// B-ANCIENTS1. Main's named defaults are pending on the operator decision sheet.
+// B-ANCIENTS1: the named non-period defaults are Main's explicit U1 decisions.
 [proc,combat_spellbook_allowed](dbrow $spell_data)(boolean)
 if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) ! null) {
     if (%deserttreasure = ^dt_stage_complete & %alternate_spells = ^dt_spellbook_ancient) return(true);
