@@ -30,3 +30,19 @@ param=magicdefence,15
 param=rangedefence,0
 param=strengthbonus,50
 param=prayerbonus,-1
+// CANDIDATE: nearest 0.6-second tick count to Zybez's 2.5 seconds, not a measurement.
+// Research: desert-treasure.ancient-staff-melee-rate.
+param=attackrate,4
+// UNKNOWN: no source read gives this staff's animations or sounds.
+// It is a staff, so Main's engineering row uses the plain staff's named assets.
+// Research: desert-treasure.ancient-staff-presentation-row.
+param=ready_baseanim,human_staffready
+param=crushattack_anim,human_staff_pummel
+param=defend_anim,human_staff_block
+param=crush_sound,staff_hit
+param=walk_f_baseanim,human_halberdwalk_f
+param=walk_b_baseanim,human_halberdwalk_b
+param=walk_l_baseanim,human_halberdwalk_l
+param=walk_r_baseanim,human_halberdwalk_r
+param=running_baseanim,human_halberdrunning
+param=turnonspot_baseanim,human_halberdturnonspot

@@ -67,6 +67,9 @@ export const zarosStaffCombat = {
   },
 };
 
+// CANDIDATE nearest tick count to Zybez's rounded 2.5 seconds; UNKNOWN sound row.
+export const zarosStaffMelee = { ticks: 4, sound: 'staff_hit' };
+
 
 // Observatory's completion message and reward model are the existing 377 quest
 // queue inputs and cache model, not generated pack identifiers.

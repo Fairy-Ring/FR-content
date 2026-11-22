@@ -13,6 +13,7 @@ import {
   standardProbe,
   zarosStaffClient,
   zarosStaffCombat,
+  zarosStaffMelee,
 } from './oracle.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -41,6 +42,7 @@ const IfButton = (await load('src/network/game/client/model/IfButton.ts')).defau
 const IfButtonHandler = (await load('src/network/game/client/handler/IfButtonHandler.ts')).default;
 const IfSetModel = (await load('src/network/game/server/model/IfSetModel.ts')).default;
 const IfSetText = (await load('src/network/game/server/model/IfSetText.ts')).default;
+const SynthSound = (await load('src/network/game/server/model/SynthSound.ts')).default;
 
 const types = {};
 for (const name of [
@@ -570,6 +572,48 @@ function testStandardFallback() {
   }
 }
 
+function testStaffMelee() {
+  const player = makePlayer();
+  const staff = equip(player, 'staff_of_zaros');
+  assert.equal(variable(player, 'autocast_spell'), 0, 'melee starts without an autocast selection');
+  const synthIds = new Map(fs.readFileSync(path.join(content, 'pack', 'synth.pack'), 'utf8').trim().split('\n')
+    .map(line => [line.slice(line.indexOf('=') + 1), Number(line.slice(0, line.indexOf('=')))]));
+  const sound = synthIds.get(zarosStaffMelee.sound);
+  assert(Number.isInteger(sound), 'the named staff sound exists in this pack');
+  assert.equal(staff.params.get(id('ParamType', 'crush_sound')), sound, 'staff uses its named sound row');
+  assert.equal(staff.params.get(id('ParamType', 'attackrate')), zarosStaffMelee.ticks);
+  const swings = () => player.packets.filter(packet => packet instanceof SynthSound
+    && packet.synth === sound && packet.delay === 0).length;
+  const npc = addNpc(player, player.x + 1, player.z, { aggressive: true });
+  const priorRunes = runeVector(player);
+  const priorMagicXp = player.stats[6];
+  const priorMeleeXp = player.stats[0] + player.stats[1] + player.stats[2];
+  const previousRandom = JavaRandom.nextDouble;
+  JavaRandom.nextDouble = function () { return 0.5; };
+  try {
+    const firstTick = World.currentTick;
+    dispatchAttack(player, npc);
+    assert.equal(swings(), 1, 'ordinary Attack emits the staff sound without aborting');
+    assert.equal(variable(player, 'action_delay'), firstTick + zarosStaffMelee.ticks);
+    for (let step = 0; step < zarosStaffMelee.ticks; step++) {
+      tickWorld();
+      assert.equal(swings(), 1, `no early second staff swing at tick ${step}`);
+    }
+    tickWorld();
+    assert.equal(swings(), 2, 'the next staff swing occurs exactly four ticks later');
+    assert.equal(variable(player, 'action_delay'), firstTick + 2 * zarosStaffMelee.ticks);
+    assert(player.stats[0] + player.stats[1] + player.stats[2] > priorMeleeXp,
+      'the completed staff swings award melee XP');
+    assert.equal(player.stats[6], priorMagicXp, 'unselected staff melee gives no Magic XP');
+    assert.deepEqual(runeVector(player), priorRunes, 'unselected staff melee spends no runes');
+    assert(!player.messages.some(message => message.includes('script error')), 'staff melee has no script error');
+  } finally {
+    JavaRandom.nextDouble = previousRandom;
+    World.removeNpc(npc, 0);
+    disposePlayer(player);
+  }
+}
+
 function testObservatoryReward() {
   const player = makePlayer();
   const originalQuestPoints = 37;
@@ -599,6 +643,7 @@ const selectedCase = process.argv.includes('--case')
 const cases = {
   all() {
     testStaffClientFields();
+    testStaffMelee();
     testPicker();
     testLifecycle();
     testAttackContinuation();
@@ -615,6 +660,7 @@ const cases = {
     testStandardFallback();
   },
   reward: testObservatoryReward,
+  melee: testStaffMelee,
 };
 assert(cases[selectedCase], `unknown case selector ${selectedCase}`);
 cases[selectedCase]();
