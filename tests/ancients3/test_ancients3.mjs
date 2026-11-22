@@ -347,8 +347,8 @@ function testPicker() {
     selectAncient(candidate, pickerButtons[0]);
     click(candidate, 'combat_staff_2:auto_choose');
     const priorSpell = variable(candidate, 'autocast_spell');
-    const priorRunes = runeVector(candidate);
     mutate(candidate);
+    const priorRunes = runeVector(candidate);
     click(candidate, `questscroll_itgronigen:com_${targetButton.widget}`);
     assert.equal(variable(candidate, 'autocast_spell'), priorSpell, `${label} does not replace the saved spell`);
     assert.deepEqual(runeVector(candidate), priorRunes, `${label} does not spend runes`);
