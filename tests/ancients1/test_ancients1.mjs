@@ -172,7 +172,7 @@ for (const spell of selectedSpells) {
   const r = row(spell.name); assert(r, spell.name);
   assert.equal(field(r, 'levelrequired'), spell.level); assert.equal(field(r, 'experience'), spell.xp * 10);
   assert.equal(field(r, 'maxhit'), spell.maximum, `${spell.name} compiled maximum`); assert.equal(field(r, 'ancient_effect'), spell.family);
-  assert.equal(field(r, 'continue_by_autocast'), 0, 'no Ancient autocast in U1');
+  assert.equal(field(r, 'continue_by_autocast'), 1, 'U3 enables Ancient autocast continuation');
   const vector = values(r, 'runesrequired');
   assert.equal(vector.length, 8, 'shared four-rune tuple');
   assert.deepEqual(vector.flatMap((n, i) => i % 2 === 0 && n >= 0 ? [[types.ObjType.get(n).debugname, vector[i + 1]]] : []), spell.runes);

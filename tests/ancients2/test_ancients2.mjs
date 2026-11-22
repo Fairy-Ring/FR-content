@@ -465,7 +465,7 @@ function assertSpellRow(spell) {
   assert.equal(field(r, 'maxhit'), spell.maximum, `${spell.name} maximum`);
   assert.equal(field(r, 'ancient_effect'), spell.family, `${spell.name} effect family`);
   assert.equal(field(r, 'members'), 1, `${spell.name} is members-only`);
-  assert.equal(field(r, 'continue_by_autocast'), 0, `${spell.name} does not add U3 autocast`);
+  assert.equal(field(r, 'continue_by_autocast'), 1, `${spell.name} supports U3 autocast continuation`);
   const areaValues = values(r, 'ancient_area');
   if (spell.area) assert.deepEqual(areaValues, [1], `${spell.name} has explicit area=true`);
   else assert(!areaValues || areaValues.length === 0 || areaValues[0] === null || areaValues[0] === undefined || areaValues[0] === 0 || areaValues[0] === false, `${spell.name} single-target row treats missing area as false`);
