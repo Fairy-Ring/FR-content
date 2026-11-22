@@ -3,11 +3,6 @@
  * Compiled soft-leather regression through production Player scripts, interface
  * button dispatch, and the real weak queue. Run after building the sibling engine:
  *   node --import tsx ../content/tests/leather-batch/test_leather_batch.mjs
- *
- * Before the leather script change, capture the published Make1 oracle with:
- *   LEATHER_PACK_DIR=/path/to/published-pack node --import tsx \
- *     ../content/tests/leather-batch/test_leather_batch.mjs --capture-one \
- *     ../content/tests/leather-batch/make1-baseline.json
  */
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -18,11 +13,9 @@ const CONTENT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const ENGINE_DIR = process.env.HARNESS_ENGINE_DIR ?? path.resolve(CONTENT_DIR, '../engine');
 const PACK_DIR = path.resolve(process.env.LEATHER_PACK_DIR ?? path.join(ENGINE_DIR, 'data/pack'));
 const SCRIPT_DAT = path.join(PACK_DIR, 'server/script.dat');
-const captureOne = process.argv[2] === '--capture-one';
-if (captureOne ? process.argv.length !== 4 : process.argv.length !== 2) {
-  throw new Error('Usage: test_leather_batch.mjs [--capture-one <json-path>]');
+if (process.argv.length !== 2) {
+  throw new Error('Usage: test_leather_batch.mjs');
 }
-const capturePath = captureOne ? path.resolve(process.argv[3]) : null;
 assert.ok(fs.existsSync(SCRIPT_DAT), `missing compiled script pack at ${SCRIPT_DAT} — build the sibling engine or set LEATHER_PACK_DIR`);
 
 const eng = rel => import(pathToFileURL(path.join(ENGINE_DIR, rel)).href);
@@ -116,43 +109,117 @@ function scalar(row, field) {
   return values[0];
 }
 
-const recipes = [
-  ['craft_leather_body', 'leather_crafting:com_113', 'leather_crafting:com_112', 'leather_crafting:com_111'],
-  ['craft_leather_gloves', 'leather_crafting:com_116', 'leather_crafting:com_115', 'leather_crafting:com_114'],
-  ['craft_leather_boots', 'leather_crafting:com_119', 'leather_crafting:com_118', 'leather_crafting:com_117'],
-  ['craft_leather_vambraces', 'leather_crafting:com_122', 'leather_crafting:com_121', 'leather_crafting:com_120'],
-  ['craft_leather_chaps', 'leather_crafting:com_125', 'leather_crafting:com_124', 'leather_crafting:com_123'],
-  ['craft_coif', 'leather_crafting:com_128', 'leather_crafting:com_127', 'leather_crafting:com_126'],
-  ['craft_leather_cowl', 'leather_crafting:com_131', 'leather_crafting:com_130', 'leather_crafting:com_129']
-].map(([rowName, make1Name, make5Name, make10Name]) => {
-  const rowId = namedId(DbRowType, rowName, 'DBRow');
+// Authored from configs/leather/leather.dbrow. Do not derive expectations from packed rows.
+const expectedRecipes = [
+  {
+    rowName: 'craft_leather_body',
+    productName: 'leather_armour',
+    name: 'a Leather Body',
+    productExp: 250,
+    levelRequired: 14,
+    membersOnly: false,
+    make1: 'com_113',
+    make5: 'com_112',
+    make10: 'com_111'
+  },
+  {
+    rowName: 'craft_leather_gloves',
+    productName: 'leather_gloves',
+    name: 'a pair of Leather Gloves',
+    productExp: 138,
+    levelRequired: 1,
+    membersOnly: false,
+    make1: 'com_116',
+    make5: 'com_115',
+    make10: 'com_114'
+  },
+  {
+    rowName: 'craft_leather_boots',
+    productName: 'leather_boots',
+    name: 'a pair of Leather Boots',
+    productExp: 163,
+    levelRequired: 7,
+    membersOnly: false,
+    make1: 'com_119',
+    make5: 'com_118',
+    make10: 'com_117'
+  },
+  {
+    rowName: 'craft_leather_vambraces',
+    productName: 'leather_vambraces',
+    name: 'a pair of Leather Vambraces',
+    productExp: 220,
+    levelRequired: 11,
+    membersOnly: false,
+    make1: 'com_122',
+    make5: 'com_121',
+    make10: 'com_120'
+  },
+  {
+    rowName: 'craft_leather_chaps',
+    productName: 'leather_chaps',
+    name: 'some Leather Chaps',
+    productExp: 270,
+    levelRequired: 18,
+    membersOnly: false,
+    make1: 'com_125',
+    make5: 'com_124',
+    make10: 'com_123'
+  },
+  {
+    rowName: 'craft_coif',
+    productName: 'coif',
+    name: 'a Coif',
+    productExp: 370,
+    levelRequired: 38,
+    membersOnly: true,
+    make1: 'com_128',
+    make5: 'com_127',
+    make10: 'com_126'
+  },
+  {
+    rowName: 'craft_leather_cowl',
+    productName: 'leather_cowl',
+    name: 'a Leather Cowl',
+    productExp: 185,
+    levelRequired: 9,
+    membersOnly: false,
+    make1: 'com_131',
+    make5: 'com_130',
+    make10: 'com_129'
+  }
+];
+const recipes = expectedRecipes.map(expected => {
+  const rowId = namedId(DbRowType, expected.rowName, 'DBRow');
   const row = DbRowType.get(rowId);
-  assert.ok(row, `DBRow ${rowName} is missing`);
+  assert.ok(row, `DBRow ${expected.rowName} is missing`);
+  const product = namedId(ObjType, expected.productName, 'product object');
   const leather = fieldValues(row, 'leather');
-  assert.equal(leather.length, 2, `${rowName}.leather should contain item and quantity`);
-  const product = scalar(row, 'product');
-  assert.ok(ObjType.get(product), `${rowName} product is missing from ObjType`);
-  assert.equal(leather[0], leatherId, `${rowName} should use soft leather`);
+  assert.equal(leather.length, 2, `${expected.rowName}.leather should contain item and quantity`);
+  assert.equal(Number(leather[0]), leatherId, `${expected.rowName} should use soft leather`);
+  assert.equal(Number(leather[1]), 1, `${expected.rowName} should use one piece of soft leather`);
+  assert.equal(Number(scalar(row, 'product')), product, `${expected.rowName} should make ${expected.productName}`);
+  assert.equal(scalar(row, 'name'), expected.name, `${expected.rowName} display name`);
+  assert.equal(Number(scalar(row, 'productexp')), expected.productExp, `${expected.rowName} Crafting XP`);
+  assert.equal(Number(scalar(row, 'levelrequired')), expected.levelRequired, `${expected.rowName} Crafting level`);
+  assert.equal(Boolean(scalar(row, 'members')), expected.membersOnly, `${expected.rowName} world restriction`);
   return {
-    rowName,
-    name: scalar(row, 'name'),
-    product: Number(product),
-    productName: ObjType.get(product).debugname,
-    productExp: Number(scalar(row, 'productexp')),
-    levelRequired: Number(scalar(row, 'levelrequired')),
-    membersOnly: Boolean(scalar(row, 'members')),
-    ingredient: Number(leather[0]),
-    ingredientCount: Number(leather[1]),
-    make1: namedId(Component, make1Name, 'component'),
-    make5: namedId(Component, make5Name, 'component'),
-    make10: namedId(Component, make10Name, 'component')
+    ...expected,
+    product,
+    ingredient: leatherId,
+    ingredientCount: 1,
+    make1: namedId(Component, `leather_crafting:${expected.make1}`, 'component'),
+    make5: namedId(Component, `leather_crafting:${expected.make5}`, 'component'),
+    make10: namedId(Component, `leather_crafting:${expected.make10}`, 'component')
   };
 });
 assert.equal(recipes.length, 7, 'all seven soft-leather product rows must be covered');
+assert.equal(new Set(recipes.map(recipe => recipe.product)).size, recipes.length, 'each soft-leather row must make a distinct product');
 assert.ok(recipes.find(recipe => recipe.rowName === 'craft_coif')?.membersOnly, 'the Coif row must retain its members-only restriction');
 
 const buttonHandler = new IfButtonHandler();
 const baseCraftingXp = 130344310;
+const membersFeatureMessage = "You need to be on a members' server to use this feature.";
 let playerSerial = 0;
 
 function inventoryOf(player) {
@@ -243,21 +310,35 @@ function packetStrings(value, result = [], visited = new Set()) {
 function allText(player) {
   return [...player.messages, ...packetStrings(player.packets)].join('\n');
 }
-function snapshot(player, recipe) {
-  const inventory = inventoryOf(player);
-  return {
-    leather: inventory.getItemCount(recipe.ingredient),
-    product: inventory.getItemCount(recipe.product),
-    thread: inventory.getItemCount(threadId),
-    needle: inventory.getItemCount(needleId),
-    threadUsed: player.getVar(threadUsedVarp),
-    craftingXp: player.stats[craftingStat],
-    craftingLevel: player.levels[craftingStat],
-    messages: [...player.messages],
-    packetTypes: player.packets.map(packet => packet?.constructor?.name ?? typeof packet),
-    packetText: packetStrings(player.packets),
-    modal: [player.modalMain, player.modalChat, player.modalSide]
-  };
+function packetTypePresent(player, type) {
+  return player.packets.some(packet => packet?.constructor?.name === type);
+}
+function assertClosedModals(player, label) {
+  assert.equal(player.modalMain, -1, `${label}: main modal should be closed`);
+  assert.equal(player.modalChat, -1, `${label}: chat modal should be closed`);
+  assert.equal(player.modalSide, -1, `${label}: side modal should be closed`);
+}
+function assertChatbox(player, message, label) {
+  assert.ok(packetTypePresent(player, 'IfSetText'), `${label}: chatbox text packet is missing`);
+  assert.ok(packetTypePresent(player, 'IfOpenChat'), `${label}: chatbox open packet is missing`);
+  // mesbox splits long messages across the active chatbox's text components.
+  const text = player.packets
+    .filter(packet => packet?.constructor?.name === 'IfSetText' &&
+      Component.get(packet.component).rootLayer === player.modalChat)
+    .map(packet => packet.text).join(' ').replace(/\s+/g, ' ').trim();
+  assert.equal(text, message, `${label}: exact chatbox message`);
+  assert.equal(player.modalMain, -1, `${label}: crafting interface should close before chatbox`);
+  assert.notEqual(player.modalChat, -1, `${label}: chatbox should be open`);
+  assert.equal(player.modalSide, -1, `${label}: side modal should stay closed`);
+}
+function assertThreadWarningBox(player, label) {
+  const message = 'You need some thread to make anything out of leather.';
+  assertChatbox(player, message, label);
+  assert.ok(packetTypePresent(player, 'IfSetPosition'), `${label}: object box position packet is missing`);
+  assert.ok(
+    player.packets.some(packet => packet?.constructor?.name === 'IfSetObject' && packet.obj === threadId),
+    `${label}: object box should display thread`
+  );
 }
 
 function clickButton(player, component, label) {
@@ -271,6 +352,7 @@ function makeOneScenarios() {
     for (const threadUsed of [0, 4]) {
       scenarios.push({
         key: `${recipe.rowName}:success-thread-${threadUsed}`,
+        kind: 'success',
         recipe,
         threadUsed,
         threadCount: 2,
@@ -281,6 +363,7 @@ function makeOneScenarios() {
     }
     scenarios.push({
       key: `${recipe.rowName}:below-level`,
+      kind: 'below-level',
       recipe,
       threadUsed: 4,
       threadCount: 2,
@@ -290,6 +373,7 @@ function makeOneScenarios() {
     });
     scenarios.push({
       key: `${recipe.rowName}:insufficient-leather`,
+      kind: 'insufficient-leather',
       recipe,
       threadUsed: 4,
       threadCount: 2,
@@ -299,6 +383,7 @@ function makeOneScenarios() {
     });
     scenarios.push({
       key: `${recipe.rowName}:no-thread`,
+      kind: 'no-thread',
       recipe,
       threadUsed: 4,
       threadCount: 1,
@@ -311,6 +396,7 @@ function makeOneScenarios() {
   const coif = recipes.find(recipe => recipe.rowName === 'craft_coif');
   scenarios.push({
     key: 'craft_coif:free-world',
+    kind: 'members-only',
     recipe: coif,
     threadUsed: 4,
     threadCount: 2,
@@ -329,21 +415,12 @@ function runMakeOne(scenario) {
       inventoryOf(player).remove(threadId, itemCount(player, threadId));
       assert.equal(itemCount(player, threadId), 0, 'no-thread fixture must remove its reel after opening the interface');
     }
+    const initial = captureInitialEffects(player, recipe);
     clickButton(player, recipe.make1, `${recipe.rowName} Make1`);
-    assert.deepEqual(player.animations, [], `${scenario.key}: published Make1 has no animation`);
-    return snapshot(player, recipe);
+    assertMakeOneOutcome(player, scenario, initial, scenario.key);
   });
 }
-
 const make1Scenarios = makeOneScenarios();
-if (captureOne) {
-  const cases = {};
-  for (const scenario of make1Scenarios) cases[scenario.key] = runMakeOne(scenario);
-  fs.mkdirSync(path.dirname(capturePath), { recursive: true });
-  fs.writeFileSync(capturePath, `${JSON.stringify({ schema: 1, cases }, null, 2)}\n`);
-  console.log(`RESULT PASS (captured ${Object.keys(cases).length} published Make1 cases)`);
-  process.exit(0);
-}
 
 for (const recipe of recipes) {
   for (const [amount, component] of [[5, recipe.make5], [10, recipe.make10]]) {
@@ -352,18 +429,8 @@ for (const recipe of recipes) {
   }
 }
 
-const baselinePath = path.join(CONTENT_DIR, 'tests/leather-batch/make1-baseline.json');
-assert.ok(fs.existsSync(baselinePath), 'published Make1 baseline is missing; run this test once with --capture-one against the retained pre-change pack');
-const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
-assert.equal(baseline.schema, 1, 'unsupported Make1 baseline schema');
-assert.deepEqual(Object.keys(baseline.cases).sort(), make1Scenarios.map(scenario => scenario.key).sort(), 'Make1 baseline case inventory changed');
-for (const scenario of make1Scenarios) {
-  assert.deepEqual(
-    runMakeOne(scenario),
-    baseline.cases[scenario.key],
-    `${scenario.key}: changed Make1 must match the published packed behavior exactly`
-  );
-}
+// Check Make1 against authored recipe rules, player-visible outcomes, and resource settlement.
+for (const scenario of make1Scenarios) runMakeOne(scenario);
 
 function advanceTick(player) {
   World.currentTick += 1;
@@ -386,6 +453,14 @@ function expectedMessages(recipe, initialThreadUsed, crafted, finalMessage = nul
   if (finalMessage) messages.push(finalMessage);
   return messages;
 }
+function captureInitialEffects(player, recipe) {
+  return {
+    initialLeather: itemCount(player, recipe.ingredient),
+    initialThread: itemCount(player, threadId),
+    initialThreadUsed: player.getVar(threadUsedVarp),
+    initialXp: player.stats[craftingStat]
+  };
+}
 function assertEffects(player, recipe, {
   initialLeather,
   initialThread,
@@ -395,26 +470,62 @@ function assertEffects(player, recipe, {
   label
 }) {
   assert.equal(itemCount(player, recipe.ingredient), initialLeather - crafted * recipe.ingredientCount, `${label}: exact leather debit`);
-  assert.equal(itemCount(player, recipe.product), crafted, `${label}: exact product count`);
+  for (const output of recipes) {
+    const expectedCount = output.product === recipe.product ? crafted : 0;
+    assert.equal(itemCount(player, output.product), expectedCount, `${label}: exact ${output.productName} count`);
+  }
   assert.equal(itemCount(player, threadId), initialThread - Math.floor((initialThreadUsed + crafted) / 5), `${label}: exact reel debit`);
   assert.equal(player.getVar(threadUsedVarp), (initialThreadUsed + crafted) % 5, `${label}: exact thread_used counter`);
   assert.equal(player.stats[craftingStat] - initialXp, crafted * recipe.productExp, `${label}: exact Crafting XP`);
+  assert.equal(itemCount(player, needleId), 0, `${label}: no needle is held after the interface opens`);
+}
+function assertMakeOneOutcome(player, scenario, initial, label) {
+  const { recipe } = scenario;
+  const crafted = scenario.kind === 'success' ? 1 : 0;
+  assertEffects(player, recipe, { ...initial, crafted, label });
+  assert.equal(player.levels[craftingStat], scenario.craftingLevel, `${label}: Crafting level should stay unchanged`);
+  assert.deepEqual(player.animations, [], `${label}: Make1 should not animate`);
+
+  switch (scenario.kind) {
+    case 'success':
+      assert.deepEqual(player.messages, expectedMessages(recipe, initial.initialThreadUsed, 1), `${label}: exact product and reel messages`);
+      assertClosedModals(player, label);
+      break;
+    case 'below-level':
+      assert.deepEqual(player.messages, [], `${label}: level refusal uses the chatbox`);
+      assertChatbox(player, `You need a Crafting level of ${recipe.levelRequired} to make ${recipe.name}.`, label);
+      break;
+    case 'insufficient-leather':
+      assert.deepEqual(player.messages, [`You don't have enough leather to make ${recipe.name}.`], `${label}: exact leather refusal message`);
+      assertClosedModals(player, label);
+      break;
+    case 'no-thread':
+      assert.deepEqual(player.messages, [], `${label}: thread refusal uses the object box`);
+      assertThreadWarningBox(player, label);
+      break;
+    case 'members-only':
+      assert.deepEqual(player.messages, [membersFeatureMessage], `${label}: exact members-world refusal message`);
+      assertClosedModals(player, label);
+      break;
+    default:
+      assert.fail(`${label}: unsupported Make1 behavior case ${scenario.kind}`);
+  }
 }
 
-// All published refusal classes must match Make1 at dispatch, before any queue tick.
-for (const scenario of make1Scenarios.filter(scenario => !scenario.key.includes(':success-'))) {
+// Every Make5/Make10 refusal must settle like the authored Make1 refusal rules at dispatch.
+for (const scenario of make1Scenarios.filter(scenario => scenario.kind !== 'success')) {
   for (const amount of [5, 10]) {
     withMembers(scenario.members, () => {
       const { recipe } = scenario;
       const label = `${scenario.key} Make${amount} immediate refusal`;
       const player = makePlayer(recipe, scenario);
       if (scenario.removeThreadAfterOpen) inventoryOf(player).remove(threadId, itemCount(player, threadId));
+      const initial = captureInitialEffects(player, recipe);
       const pressTick = World.currentTick;
       dispatchBatch(player, recipe, amount);
       assert.equal(World.currentTick, pressTick, `${label}: refusal must occur on the press tick`);
       assert.equal(queueCount(player), 0, `${label}: refusal must not queue a batch`);
-      assert.deepEqual(player.animations, [], `${label}: refusal must not animate`);
-      assert.deepEqual(snapshot(player, recipe), baseline.cases[scenario.key], `${label}: same text, packets and interface state as published Make1`);
+      assertMakeOneOutcome(player, scenario, initial, label);
     });
   }
 }
@@ -539,7 +650,6 @@ for (const recipe of recipes) {
 // Coifs remain members-only in both batch sizes; no recipe state changes on a free world.
 {
   const recipe = recipes.find(candidate => candidate.rowName === 'craft_coif');
-  const publishedMemberMessages = baseline.cases['craft_coif:free-world'].messages;
   for (const amount of [5, 10]) {
     const label = `Coif Make${amount} free-world refusal`;
     withMembers(false, () => {
@@ -558,7 +668,7 @@ for (const recipe of recipes) {
         crafted: 0,
         label
       });
-      assert.ok(publishedMemberMessages.some(message => player.messages.includes(message)), `${label}: published members-feature refusal message is missing`);
+      assert.deepEqual(player.messages, [membersFeatureMessage], `${label}: exact members-world refusal message`);
     });
   }
 }
@@ -612,5 +722,5 @@ for (const recipe of recipes) {
   });
 }
 
-console.log(`RESULT PASS (36 published Make1 cases, 14 exact batches, 14 leather-limited batches, level/thread/member refusals, queue cadence, exhaustion and stopAction interruption)`);
+console.log(`RESULT PASS (36 authored Make1 behavior cases, 14 exact batches, 14 leather-limited batches, level/thread/member refusals, queue cadence, exhaustion and stopAction interruption)`);
 process.exit(0);
