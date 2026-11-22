@@ -44,10 +44,10 @@ const IfSetText = (await load('src/network/game/server/model/IfSetText.ts')).def
 
 const types = {};
 for (const name of [
-  'Component', 'DbRowType', 'DbTableType', 'DbTableIndex', 'InvType', 'LocType',
-  'CategoryType', 'EnumType', 'NpcType', 'ObjType', 'ParamType', 'VarBitType', 'VarNpcType', 'VarPlayerType',
+  'VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'NpcType', 'LocType', 'SeqType',
+  'SpotanimType', 'InvType', 'ObjType', 'FontType', 'Component', 'DbRowType', 'DbTableType',
+  'EnumType', 'ParamType', 'CategoryType', 'StructType', 'MesanimType',
 ]) {
-  if (name === 'DbTableIndex') continue;
   types[name] = (await load(`src/cache/config/${name}.ts`)).default;
   types[name].load(pack);
 }
