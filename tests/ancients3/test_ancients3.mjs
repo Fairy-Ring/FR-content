@@ -372,7 +372,7 @@ function testPicker() {
   });
 
   const regularStaff = makePlayer();
-  equip(regularStaff, 'staff');
+  equip(regularStaff, 'plainstaff');
   variable(regularStaff, 'deserttreasure', desertTreasure.complete);
   variable(regularStaff, 'alternate_spells', book.ancient);
   click(regularStaff, 'combat_staff_2:auto_choose');
@@ -386,7 +386,7 @@ function testPicker() {
   selectAncient(stalePicker, pickerButtons[0]);
   click(stalePicker, 'combat_staff_2:auto_choose');
   const saved = variable(stalePicker, 'autocast_spell');
-  const plainStaff = types.ObjType.getByName('staff');
+  const plainStaff = types.ObjType.getByName('plainstaff');
   assert(plainStaff && plainStaff.category === zaros.category, 'fixture staff shares the weapon_staff category');
   stalePicker.invSet(wornId, plainStaff.id, 1, plainStaff.wearpos);
   click(stalePicker, `questscroll_itgronigen:com_${pickerButtons[3].widget}`);
@@ -394,7 +394,7 @@ function testPicker() {
     'a stale Ancient button cannot select for an ordinary staff');
   disposePlayer(stalePicker);
 
-  for (const weaponName of ['staff_of_zaros', 'staff']) {
+  for (const weaponName of ['staff_of_zaros', 'plainstaff']) {
     const standard = makePlayer();
     equip(standard, weaponName);
     variable(standard, 'alternate_spells', book.standard);
@@ -444,7 +444,7 @@ function testLifecycle() {
   assert(player.tabs.includes(id('Component', 'inter_267')), 'login restores the Ancient spellbook tab');
 
   const zaros = types.ObjType.getByName('staff_of_zaros');
-  const plainStaff = types.ObjType.getByName('staff');
+  const plainStaff = types.ObjType.getByName('plainstaff');
   assert(zaros && plainStaff && zaros.category === plainStaff.category);
   player.invSet(wornId, plainStaff.id, 1, plainStaff.wearpos);
   run(player, '[proc,update_weapon_category]', [zaros.id]);
