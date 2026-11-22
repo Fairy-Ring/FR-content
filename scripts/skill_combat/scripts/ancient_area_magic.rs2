@@ -57,14 +57,14 @@ if ($rolled_damage ! null) {
 }
 if (map_multiway(coord) = true & map_multiway($centre) = true) {
     huntall($centre, ^ancient_area_radius, ^vis_off);
-    // Use the primary iterator pointer, then restore the caster before protected
-    // secondary acquisition. .huntnext would retain the previous target's
-    // ProtectedActivePlayer2 flag and make .p_finduid take its same-UID fast path.
+    // Main's UNKNOWN default: busy secondary players are hit like primaries.
+    // Restore the caster after huntnext, then use an unprotected secondary
+    // pointer so an open modal or a delay does not become an area-spell shield.
     while (huntnext = true) {
         def_player_uid $victim = uid;
         def_boolean $casting_player_found = finduid($caster);
         if ($victim ! $caster & $victim ! $primary) {
-            if (.p_finduid($victim) = true) {
+            if (.finduid($victim) = true) {
                 if (~ancient_area_contains($centre, .coord) = true & map_multiway(.coord) = true & .%death = ^false) {
                     if (~pvp_is_attackable_opt_quiet = true) {
                         ~set_pk_vars;

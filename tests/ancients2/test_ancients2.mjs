@@ -64,10 +64,10 @@ const actorsBySlot = new Map();
 
 function packedCollisionPreflight() {
   const { unzipSync } = createRequire(path.join(engine, 'package.json'))('fflate');
-  const names = new Set(['m44_155', 'l44_155', 'm46_54', 'l46_54']);
+  const names = new Set(['m44_155', 'l44_155', 'm46_54', 'l46_54', 'm50_50', 'l50_50']);
   const maps = unzipSync(fs.readFileSync(path.join(pack, '.cache/maps-server.zip')), { filter: entry => names.has(entry.name) });
   const beforeNpcs = World.getTotalNpcs();
-  for (const [mx, mz] of [[44, 155], [46, 54]]) {
+  for (const [mx, mz] of [[44, 155], [46, 54], [50, 50]]) {
     const m = maps[`m${mx}_${mz}`];
     const l = maps[`l${mx}_${mz}`];
     assert(m && l, `packed terrain/location archives m${mx}_${mz}/l${mx}_${mz}`);
@@ -124,14 +124,14 @@ function player(f, slot, x, z, level = 0, label = `player-${slot}`) {
   return p;
 }
 
-function npc(f, { typeName = 'Cow', x, z, level = 0, size, label = typeName } = {}) {
+function npc(f, { typeName = 'Cow', x, z, level = 0, size, label = typeName, lifecycle = EntityLifeCycle.DESPAWN } = {}) {
   const named = types.NpcType.getByName(typeName);
   const config = named?.op?.[1] === 'Attack'
     ? named
     : Array.from({ length: types.NpcType.count }, (_, index) => types.NpcType.get(index)).find(type => type.name === typeName && type.op?.[1] === 'Attack') ?? named;
   assert(config?.op?.[1] === 'Attack', `attackable NPC type ${typeName}`);
   const footprint = size ?? config.size;
-  const n = new Npc(level, x, z, footprint, footprint, EntityLifeCycle.DESPAWN, World.getNextNid(), config.id, config.blockwalk);
+  const n = new Npc(level, x, z, footprint, footprint, lifecycle, World.getNextNid(), config.id, config.blockwalk);
   n._ancientAreaLabel = label;
   n._ancientAreaTypeName = typeName;
   World.addNpc(n, -1);
@@ -237,7 +237,7 @@ function playerVictims(f) {
   const centre = { x: primary.x, z: primary.z, level: primary.level };
   if (!isMulti(f.p) || !isMulti(primary)) return [primary];
   const native = [...new PlayerHuntAllCommandIterator(World.currentTick, centre.level, centre.x, centre.z, 1, 0)];
-  return [primary, ...native.filter(p => p !== f.p && p !== primary && p.isActive && areaMember(centre, p) && isMulti(p) && !p.protect && !p.delayed && (p.modalState & 3) === 0)];
+  return [primary, ...native.filter(p => p !== f.p && p !== primary && p.isActive && areaMember(centre, p) && isMulti(p))];
 }
 function npcParam(n, name) {
   const type = types.NpcType.get(n.type);
@@ -417,6 +417,20 @@ function tickAll(f) {
   for (const n of f.npcs) if (n.isActive) n.processQueue();
   for (const p of f.players) p.processQueues();
 }
+function tickDeathFlight(f, dyingNpc = null) {
+  World.currentTick++;
+  for (const n of f.npcs) {
+    if (n === dyingNpc) n.turn();
+    else if (n.isActive) n.processQueue();
+  }
+  for (const p of f.players) {
+    if (p.delayed && World.currentTick >= p.delayedUntil) p.delayed = false;
+    if (!p.delayed && p.activeScript && p.activeScript.execution === State.SUSPENDED) {
+      p.executeScript(p.activeScript, true, true);
+    }
+    p.processQueues();
+  }
+}
 function settleArea(f, spell, result) {
   const impact = 1000 + result.impactDelay + Number(f.pvp);
   while (World.currentTick < impact + 2) tickAll(f);
@@ -595,7 +609,7 @@ for (const pvp of [false, true]) for (const missingMulti of ['caster', 'primary'
   } finally { dispose(f); }
 }
 
-// PvP secondaries keep independent protection and access checks. Inaccessible players are silent.
+// Busy secondaries are hit like primaries; combat protection still reduces only its own victim.
 {
   const f = fixture({ pvp: true, label: 'player-secondary-admission' });
   try {
@@ -608,23 +622,32 @@ for (const pvp of [false, true]) for (const missingMulti of ['caster', 'primary'
     busy.delayed = true;
     modal.modalState = 1;
     protectedAccess.protect = true;
+    f.target.protect = true;
     setMultiFor(f, [f.p, f.target, valid, protectedMagic, busy, modal, protectedAccess, crossKind], true);
     const nativePlayers = [...new PlayerHuntAllCommandIterator(World.currentTick, f.target.level, f.target.x, f.target.z, 1, 0)];
-    for (const blocked of [busy, modal, protectedAccess]) assert(nativePlayers.includes(blocked), `${blocked._ancientAreaLabel} is present in the native iterator`);
-    const victims = playerVictims(f);
-    assert.deepEqual(actorLabels(victims), actorLabels([f.target, ...nativePlayers.filter(player => player === valid || player === protectedMagic)]), 'busy, modal and protected players fail P_FINDUID quietly, preserving native order');
+    const secondaries = [valid, protectedMagic, busy, modal, protectedAccess];
+    for (const secondary of secondaries) assert(nativePlayers.includes(secondary), `${secondary._ancientAreaLabel} is present in the native iterator`);
+    const victims = [f.target, ...nativePlayers.filter(player => secondaries.includes(player))];
+    assert.deepEqual(actorLabels(playerVictims(f)), actorLabels(victims), 'all same-kind in-area players are expected independently of access state');
     const spell = areaSpells.find(entry => entry.name === 'shadow_burst');
     const result = castArea(f, spell, 0, victims);
     const protectedResult = result.expected.results[victims.indexOf(protectedMagic)];
     assert.equal(protectedResult.maximum, Math.trunc(spell.maximum * 6 / 10), 'Protect from Magic reduces only that secondary maximum');
-    for (const blocked of [busy, modal, protectedAccess]) {
-      assert.equal(queueHits(f, blocked).length, 0, `${blocked._ancientAreaLabel} is not admitted`);
-      assert.equal(queueRetaliations(f, blocked).length, 0, `${blocked._ancientAreaLabel} gets no retaliation`);
-      assert.deepEqual(blocked.messages, [], `${blocked._ancientAreaLabel} refusal is silent`);
+    for (const secondary of [busy, modal, protectedAccess]) {
+      const expected = result.expected.results[victims.indexOf(secondary)];
+      assert.equal(expected.accurate, true, `${secondary._ancientAreaLabel} oracle roll hits`);
+      assert.equal(queueHits(f, secondary).length, 1, `${secondary._ancientAreaLabel} receives damage despite being busy`);
+      assert.equal(queueRetaliations(f, secondary).length, 1, `${secondary._ancientAreaLabel} receives normal retaliation`);
+      assert.deepEqual(secondary.messages, [], `${secondary._ancientAreaLabel} gets no invented access refusal`);
     }
     assert.equal(queueNpcHits(crossKind).length, 0, 'player scan does not hit NPCs');
     assert.equal(queueHits(f, f.p).length, 0, 'player scan excludes its caster');
-    assert.equal(protectedAccess.protect, true, 'failed P_FINDUID preserves the unrelated access guard');
+    assert.equal(protectedAccess.protect, true, 'secondary targeting preserves its existing protected access');
+    assert.equal(f.target.protect, true, 'restoring the primary does not clear another script protected-access flag');
+    busy.delayed = false;
+    modal.modalState = 0;
+    protectedAccess.protect = false;
+    f.target.protect = false;
     settleArea(f, spell, result);
   } finally { dispose(f); }
 }
@@ -821,6 +844,71 @@ for (const pvp of [false, true]) {
     assert.equal(survivor.levels[3], result.before.hps.get(survivor) - result.expected.results[survivorIndex].damage, 'remaining victim impact still settles');
     assert.equal(f.p.levels[3], 50 + bloodHeal(result.expected).amount, 'caster heal does not dereference the departed victim');
     assert.equal([...f.p.queue.all()].filter(q => q.script.name === '[queue,ancient_blood_heal]').length, 0, 'caster heal settles once after victim removal');
+  } finally { dispose(f); }
+}
+
+// A secondary killed by an independent source is clean after real death/respawn.
+// Main's UNKNOWN default keeps the one caster-owned Blood heal from both rolls.
+for (const pvp of [false, true]) for (const name of ['smoke_burst', 'shadow_burst', 'blood_burst', 'ice_burst']) {
+  const f = fixture({ pvp, label: `secondary-death-${name}-${pvp ? 'player' : 'npc'}` });
+  try {
+    const secondary = pvp
+      ? addPlayer(f, { x: f.target.x + 1, z: f.target.z, label: 'dying-secondary' })
+      : addNpc(f, { x: f.target.x + 1, z: f.target.z, label: 'dying-secondary', lifecycle: EntityLifeCycle.RESPAWN });
+    secondary.levels[3] = 1;
+    if (pvp) {
+      secondary.getInventory(invId).removeAll();
+      secondary.getInventory(wornId).removeAll();
+    }
+    const source = pvp
+      ? addPlayer(f, { x: f.target.x + 4, z: f.target.z + 4, label: 'independent-damage-source' })
+      : null;
+    setMultiFor(f, [f.p, f.target, secondary, ...(source ? [source] : [])], true);
+    const spell = areaSpells.find(entry => entry.name === name);
+    const victims = pvp ? playerVictims(f) : npcVictims(f);
+    assert.deepEqual(actorLabels(victims), actorLabels([f.target, secondary]), 'the dying actor is a secondary, not the primary');
+    const models = victims.map(victim => victimModel(f, victim));
+    const seed = Array.from({ length: 128 }, (_, value) => value).find(value => {
+      const rolled = rollArea(value, spell, models);
+      return rolled.results.every(entry => entry.accurate && entry.rolled > 0)
+        && (spell.family !== 1 || rolled.results[1].poison)
+        && (spell.family !== 3 || bloodHeal(rolled).amount > Math.ceil(rolled.results[0].rolled / 4));
+    });
+    assert.notEqual(seed, undefined, `${name} independent oracle supplies the death-flight witness`);
+    const result = castArea(f, spell, seed, victims);
+    const impactTick = World.currentTick + result.impactDelay + Number(pvp);
+    const start = [secondary.x, secondary.z];
+    assert.equal(queueHits(f, secondary).length, 1, `${name} secondary damage is pending`);
+    if (spell.family !== 3) assert.equal(queueEffects(f, spell, secondary).length, 1, `${name} secondary effect is pending`);
+    if (pvp) run({ p: source, target: secondary }, '[proc,.pvp_damage]', [0, 1]);
+    else secondary.enqueueScript(Trigger.AI_QUEUE2, 0, secondary.baseLevels[3]);
+    let ticks = 0;
+    while (secondary.levels[3] > 0 && ticks++ < 20) tickDeathFlight(f, pvp ? null : secondary);
+    assert.equal(secondary.levels[3], 0, `${name} independent damage kills the secondary`);
+    assert(World.currentTick < impactTick, `${name} secondary dies before Ancient impact`);
+    if (pvp) {
+      for (ticks = 0; (secondary.levels[3] === 0 || secondary.delayed || secondary.activeScript) && ticks < 20; ticks++) tickDeathFlight(f);
+      assert.equal(secondary.levels[3], secondary.baseLevels[3], `${name} real player death restores Hitpoints`);
+      assert.equal(secondary.delayed, false, `${name} real player death delay finishes`);
+      assert.equal(secondary.activeScript, null, `${name} compiled player death finishes`);
+      assert.notDeepEqual([secondary.x, secondary.z], start, `${name} real player death teleports to respawn`);
+    } else {
+      for (ticks = 0; secondary.isActive && ticks < 40; ticks++) tickDeathFlight(f, secondary);
+      assert.equal(secondary.isActive, false, `${name} real NPC death removes the secondary`);
+      for (ticks = 0; !secondary.isActive && ticks < 2000; ticks++) tickDeathFlight(f, secondary);
+      assert.equal(secondary.isActive, true, `${name} native NPC lifecycle respawns the secondary`);
+      assert.equal(secondary.levels[3], types.NpcType.get(secondary.type).stats[3], `${name} NPC respawn restores configured Hitpoints`);
+    }
+    while (World.currentTick < impactTick + 4) tickDeathFlight(f, pvp ? null : secondary);
+    assert.equal(pvp ? variable(secondary, 'poison') : nv(secondary, 'npc_poison'), 0, `${name} no poison survives respawn`);
+    assert.equal(secondary.levels[0], pvp ? secondary.baseLevels[0] : types.NpcType.get(secondary.type).stats[0], `${name} no Attack drain survives respawn`);
+    assert.equal(pvp ? variable(secondary, 'frozen') : nv(secondary, 'npc_stunned'), 0, `${name} no freeze survives respawn`);
+    assert.equal(queueHits(f, secondary).length, 0, `${name} no Ancient damage survives respawn`);
+    assert.equal(queueEffects(f, spell, secondary).length, 0, `${name} no Ancient effect survives respawn`);
+    if (spell.family === 3) {
+      assert.equal(f.p.levels[3], result.before.casterHp + bloodHeal(result.expected).amount, 'the single aggregate Blood heal includes the dead secondary roll');
+      assert.equal([...f.p.queue.all()].filter(q => q.script.name === '[queue,ancient_blood_heal]').length, 0, 'the aggregate Blood heal is consumed once');
+    }
   } finally { dispose(f); }
 }
 
