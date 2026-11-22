@@ -413,11 +413,17 @@ function makeAltar(player) {
   const shape = type.shapes?.[0] ?? 10;
   const altar = new Loc(player.level, player.x + 1, player.z, type.width, type.length,
     EntityLifeCycle.DESPAWN, typeId, shape, 0);
-  player.setInteraction(Interaction.ENGINE, altar, Trigger.OPLOC1);
-  const script = player.getOpTrigger();
-  assert(script, 'production Player OPLOC1 trigger resolves');
-  assert.equal(script.name, '[oploc1,dt_zaros_altar]', 'altar interaction selects its real OPLOC1 script');
-  run(player, script.name, [], altar);
+  World.addLoc(altar, -1);
+  try {
+    assert.equal(player.setInteraction(Interaction.ENGINE, altar, Trigger.APLOC1), true,
+      'the real altar fixture is an active interaction target');
+    const script = player.getOpTrigger();
+    assert(script, 'production Player OPLOC1 trigger resolves');
+    assert.equal(script.name, '[oploc1,dt_zaros_altar]', 'altar interaction selects its real OPLOC1 script');
+    run(player, script.name, [], altar);
+  } finally {
+    World.removeLoc(altar, 0);
+  }
 }
 
 function testLifecycle() {
