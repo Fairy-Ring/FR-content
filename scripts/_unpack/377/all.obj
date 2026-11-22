@@ -55867,22 +55867,6 @@ model=obj_fd_sword_cross
 cost=250
 weight=10g
 
-[staff_of_zaros]
-name=Ancient staff
-desc=A magical staff of ancient origin...
-members=yes
-model=obj_staff_of_zaros
-2dxof=-5
-2dyof=2
-2dzoom=1490
-2dyan=1400
-2dxan=148
-iop2=Wield
-manwear=obj_staff_of_zaros_manwear,0
-womanwear=obj_staff_of_zaros_manwear,6
-cost=100000
-wearpos=righthand
-weight=5lb
 
 [cert_staff_of_zaros]
 certlink=staff_of_zaros

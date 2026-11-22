@@ -1,7 +1,22 @@
-// ANCIENT_STAFF_COMBAT_ROW: server-only overlay for staff_of_zaros (4675).
+// ANCIENT_STAFF_COMBAT_ROW: original staff_of_zaros (4675) fields kept below.
 // VERIFIED bonuses: desert-treasure.ancient-staff-combat-row.
 // category routes through the existing weapon_staff combat-style table.
 [staff_of_zaros]
+name=Ancient staff
+desc=A magical staff of ancient origin...
+members=yes
+model=obj_staff_of_zaros
+2dxof=-5
+2dyof=2
+2dzoom=1490
+2dyan=1400
+2dxan=148
+iop2=Wield
+manwear=obj_staff_of_zaros_manwear,0
+womanwear=obj_staff_of_zaros_manwear,6
+cost=100000
+wearpos=righthand
+weight=5lb
 category=weapon_staff
 param=stabattack,10
 param=slashattack,-1
