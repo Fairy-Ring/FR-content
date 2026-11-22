@@ -8,6 +8,12 @@ import { World, PlayerLoading, Packet, ScriptProvider, ServerTriggerType,
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
 const ScriptVarType = (await engineModule('cache/config/ScriptVarType.ts')).default;
 const { CoordGrid } = await engineModule('engine/CoordGrid.ts');
+const ScriptRunner = (await engineModule('engine/script/ScriptRunner.ts')).default;
+const { ScriptOpcode } = await engineModule('engine/script/ScriptOpcode.ts');
+const originalDateMinutes = ScriptRunner.HANDLERS[ScriptOpcode.DATE_MINUTES];
+// Login reconciles farming_growth_minute from this clock. Hold it still so the
+// complete durable-state comparison tests traversal, even across a real minute.
+ScriptRunner.HANDLERS[ScriptOpcode.DATE_MINUTES] = state => state.pushInt(30_000_000);
 const rsbuf = await engineModule('network/rsbuf/index.ts');
 const OpNpcU = (await engineModule('network/game/client/model/OpNpcU.ts')).default;
 const npcUseHandler = new ((await engineModule('network/game/client/handler/OpNpcUHandler.ts')).default)();
@@ -463,6 +469,9 @@ try {
     assert(useCreature(p)); ticks(p, 5); assert.equal(hp(p), 2); assert(p.delayed);
     ticks(p, 2); assert.deepEqual(tile(p), ledge); assert.equal(hp(p), 0); ticks(p, 20); assert(hp(p) > 0); owner(p, false); finish(p);
   });
-} finally { Math.random = originalRandom; }
+} finally {
+  Math.random = originalRandom;
+  ScriptRunner.HANDLERS[ScriptOpcode.DATE_MINUTES] = originalDateMinutes;
+}
 console.log(`${cases - failures}/${cases} SC-10 Tears traversal cases passed`);
 process.exit(failures ? 1 : 0);
