@@ -44,6 +44,7 @@ def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
 if ($weapon = null | oc_category($weapon) ! weapon_staff) return;
 %autocast_set = 0;
 if (%alternate_spells = ^dt_spellbook_ancient) {
+    // UNKNOWN engineering rule: an ineligible staff silently opens no picker.
     if ($weapon = staff_of_zaros & %deserttreasure = ^dt_stage_complete) {
         if_settab(questscroll_itgronigen, 0);
     }
@@ -95,6 +96,7 @@ if ($book ! ^dt_spellbook_standard) return(false);
 if ($weapon = staff_of_zaros) return(^ancient_staff_standard_autocast);
 return(true);
 
+// UNKNOWN engineering rule: discard an incompatible selection on validation.
 [proc,player_autocast_validate]
 if (%autocast_spell <= 0) return;
 if (~player_autocast_allowed(%autocast_spell, inv_getobj(worn, ^wearpos_rhand), %alternate_spells, %deserttreasure) = false) {
