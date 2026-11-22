@@ -1,9 +1,10 @@
 // Cache-derived picker button numbers are kept separate from runtime handlers.
 // Spell rows reuse the independent U1/U2 level, rune, XP and effect vectors.
-import { spells as singleTargetSpells } from '../ancients1/oracle.mjs';
-import { areaSpells } from '../ancients2/oracle.mjs';
+import { spells as singleTargetSpells, outcome as singleTargetOutcome } from '../ancients1/oracle.mjs';
+import { areaSpells, rollArea, areaExperience } from '../ancients2/oracle.mjs';
 
 export const ancientSpells = [...singleTargetSpells, ...areaSpells];
+export { singleTargetOutcome, rollArea, areaExperience };
 
 // Revision-377 questscroll_itgronigen IF_BUTTON widgets, read from the cache .if.
 export const pickerButtons = [
@@ -27,7 +28,7 @@ export const pickerButtons = [
 
 // Named-source selector values used only to seed the compiled player fixture.
 export const book = { standard: 0, ancient: 1 };
-export const desertTreasure = { incomplete: 0, complete: 15 };
+export const desertTreasure = { incomplete: 0, insidePyramid: 13, complete: 15 };
 export const autoRetaliateOff = 1; // player_controls.constant; isolate the autocast loop.
 export const standardProbe = { component: 'staff_spells:ssb0', spell: 'wind_strike' };
 // The original 377 client row and separately sourced combat overlay.
@@ -68,7 +69,7 @@ export const zarosStaffCombat = {
   },
 };
 
-// CANDIDATE nearest tick count to Zybez's rounded 2.5 seconds; UNKNOWN sound row.
+// UNKNOWN: attackrate,4 is Main's player-favourable default, not a recovered period timer.
 export const zarosStaffMelee = { ticks: 4, sound: 'staff_hit' };
 
 
