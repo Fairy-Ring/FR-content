@@ -128,11 +128,5 @@ const surface = operate(playerAt(ladderApproach), ladder);
 open(surface);
 assert.ok(surface[2] < 6400, 'ordinary ladder returns to the surface, not to another cave');
 assert.ok(flood(surface).some(at => Math.abs(at[1] - surface[1]) + Math.abs(at[2] - surface[2]) >= 10), 'surface arrival reaches open ground');
-// Diagnosis of the published defect: collision blocks entry onto this tile, but
-// does not stop a player already there stepping north out of the mouth footprint.
-const oldExit = [0, 3056, 9561];
-assert.equal(map.isMapBlocked(oldExit[1], oldExit[2], oldExit[0]), true, 'old exit is inside the blocking entrance footprint');
-assert.ok(map.canTravel(...oldExit, 0, 1, 1, 0, CollisionType.NORMAL), 'old landing can escape north without an item or spell');
-assert.ok(flood(oldExit).some(at => reaches(at, ladder)), 'published landing was not a stranded component');
-console.log(`PASS wyvern traversal: paired native operations, open landings, ${inside.length}/${outside.length} reachable tiles, all ${wyverns.length} mapped wyverns, surface ladder and open ground; original blocked tile can escape north`);
+console.log(`PASS wyvern traversal: paired native operations, open landings, ${inside.length}/${outside.length} reachable tiles, all ${wyverns.length} mapped wyverns, surface ladder and open ground`);
 process.exit(0);

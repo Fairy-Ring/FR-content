@@ -5,7 +5,7 @@
 ^wyvern_shield_maxhit = 10
 ^wyvern_magic_prayer_maxhit = 20
 ^wyvern_granite_roll = 512
-// CANDIDATE: modern icy breath freezes for 6.6 seconds (eleven ticks).
+// UNKNOWN engineering: eleven ticks; no registered source states a duration.
 ^wyvern_freeze_ticks = 11
 // UNKNOWN engineering: original attack mix, freeze chance and stat-loss amounts.
 ^wyvern_melee_style = 0

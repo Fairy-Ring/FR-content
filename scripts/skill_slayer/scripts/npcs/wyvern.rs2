@@ -77,8 +77,8 @@ if (inv_total(worn, elemental_shield) > 0) {
 // partial blocking. The shield takes precedence over Magic-prayer mitigation.
 if (~check_protect_prayer(^melee_style) = true) $maxhit = 0;
 def_int $ticks = ~playerhit_n_ranged(randominc($maxhit), $duration, npc_param(attackrate));
-// CANDIDATE: breath can freeze even through an elemental shield. The chance
-// is UNKNOWN engineering; the existing freeze queue enforces walking refusal.
+// UNKNOWN engineering: freezing through an elemental shield and its chance.
+// The existing freeze queue enforces walking refusal, not an attack block.
 if (%frozen < map_clock & random(^wyvern_freeze_roll) = 0) {
     queue(npc_freeze_player, $ticks, sub(^wyvern_freeze_ticks, 1));
 }
