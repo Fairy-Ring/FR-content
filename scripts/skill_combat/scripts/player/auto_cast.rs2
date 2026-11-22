@@ -85,7 +85,7 @@ return(false);
 [proc,player_autocast_allowed](int $spell, obj $weapon, int $book, int $quest)(boolean)
 if ($spell <= 0) return(true);
 if ($weapon = null | oc_category($weapon) ! weapon_staff) return(false);
-if (map_members = false & oc_members($weapon) = true) return(false);
+if (map_members = ^false & oc_members($weapon) = true) return(false);
 def_dbrow $spell_data = ~get_spell_data($spell);
 if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) ! null) {
     if ($weapon = staff_of_zaros & $book = ^dt_spellbook_ancient & $quest = ^dt_stage_complete) return(true);

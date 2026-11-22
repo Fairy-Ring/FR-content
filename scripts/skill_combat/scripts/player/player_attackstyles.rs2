@@ -77,12 +77,12 @@
 
 [if_button,combat_staff_2:auto_toggle]
 if_close;
-~player_autocast_validate;
-if (%autocast_spell = 0) {
-    mes("You need to choose a spell first."); // https://youtu.be/Mo6AcO4rg4A?t=69
-    return;
-}
 if (p_finduid(uid) = true) {
+    ~player_autocast_validate;
+    if (%autocast_spell = 0) {
+        mes("You need to choose a spell first."); // https://youtu.be/Mo6AcO4rg4A?t=69
+        return;
+    }
     p_clearpendingaction; // https://www.youtube.com/watch?v=P_QzMzpaA04&t=12s
     %autocast_set = togglebit(%autocast_set, 0);
     return;

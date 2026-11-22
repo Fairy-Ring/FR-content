@@ -19,3 +19,7 @@
 
 // VERIFIED 3x3 guide width; UNKNOWN ANCIENT_AREA_POLICY centre and tile membership.
 ^ancient_area_radius = 1
+
+// UNKNOWN: retained period guides do not decide Standard autocast support.
+// Main's default allow, not a source-backed historical restriction.
+^ancient_staff_standard_autocast = true
