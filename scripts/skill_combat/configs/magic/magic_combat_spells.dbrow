@@ -634,7 +634,7 @@ data=name,Ice Rush
 data=members,true
 data=levelrequired,58
 data=runesrequired,chaosrune,2,deathrune,2,waterrune,2,null,null
-// VERIFIED guide conflict: RuneHQ gives 34 XP, Zybez 36; the chosen 34 is not verified.
+// UNKNOWN choice between period guides: RuneHQ (newer) 34, Zybez 36; 34 is the orchestrator's default, not verified.
 data=experience,340
 data=maxhit,18
 data=ancient_effect,4
