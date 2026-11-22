@@ -75,7 +75,7 @@ switch_int(db_getfield($spell_data, magic_spell_table:ancient_effect, 0)) {
         // distance release and no-movement duel exclusion, applied only to the effect.
         if (add(%frozen, ^ancient_ice_immunity_policy) <= map_clock & getwalktrigger() ! duel_arena_no_move) {
             def_int $duration = db_getfield($spell_data, magic_spell_table:freeze_time, 0);
-            if (~check_protect_prayer(^magic_style) = true) $duration = divide($duration, 2);
+            if (~check_protect_prayer(^magic_style) = true) $duration = divide($duration, ^ancient_ice_protection_divisor);
             p_walk(coord);
             %pk_binder = $caster;
             ~freeze_player($duration);

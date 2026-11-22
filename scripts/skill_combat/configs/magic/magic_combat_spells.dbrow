@@ -581,6 +581,7 @@ data=runesrequired,chaosrune,2,deathrune,2,firerune,1,airrune,1
 data=experience,300
 data=maxhit,15
 data=ancient_effect,1
+// UNKNOWN ANCIENT_SMOKE_SEVERITY: internal encoding for the guide's starting 2 damage.
 data=poison_severity,10
 data=anim,zaros_casting
 data=spotanim_proj,smoke_rush_travel,43,31,51,16,-5,64,10
@@ -600,7 +601,6 @@ data=runesrequired,chaosrune,2,deathrune,2,airrune,1,soulrune,1
 data=experience,310
 data=maxhit,16
 data=ancient_effect,2
-data=stat_change,attack,0,-10
 data=anim,zaros_casting
 data=spotanim_proj,shadow_rush_travel,43,31,51,16,-5,64,10
 data=spotanim_target,shadow_rush_impact,124
@@ -634,9 +634,11 @@ data=name,Ice Rush
 data=members,true
 data=levelrequired,58
 data=runesrequired,chaosrune,2,deathrune,2,waterrune,2,null,null
+// VERIFIED guide conflict: RuneHQ gives 34 XP, Zybez 36; the chosen 34 is not verified.
 data=experience,340
 data=maxhit,18
 data=ancient_effect,4
+// CANDIDATE ANCIENT_ICE_FREEZE_TICKS: 2023 Old School conversion of guide seconds.
 data=freeze_time,8
 data=anim,zaros_casting
 data=spotanim_proj,ice_rush_travel,43,31,51,16,-5,64,10
@@ -656,6 +658,7 @@ data=runesrequired,deathrune,2,bloodrune,2,firerune,2,airrune,2
 data=experience,420
 data=maxhit,23
 data=ancient_effect,1
+// UNKNOWN ANCIENT_SMOKE_SEVERITY: internal encoding for the guide's starting 4 damage.
 data=poison_severity,20
 data=anim,zaros_casting
 data=spotanim_proj,smoke_blitz_travel,43,31,51,16,-5,64,10
@@ -675,7 +678,6 @@ data=runesrequired,deathrune,2,bloodrune,2,airrune,2,soulrune,2
 data=experience,430
 data=maxhit,24
 data=ancient_effect,2
-data=stat_change,attack,0,-10
 data=anim,zaros_casting
 data=spotanim_proj,shadow_blitz_travel,43,31,51,16,-5,64,10
 data=spotanim_target,shadow_blitz_impact,124
@@ -712,6 +714,7 @@ data=runesrequired,deathrune,2,bloodrune,2,waterrune,3,null,null
 data=experience,460
 data=maxhit,26
 data=ancient_effect,4
+// CANDIDATE ANCIENT_ICE_FREEZE_TICKS: 2023 Old School conversion of guide seconds.
 data=freeze_time,24
 data=anim,zaros_casting
 data=spotanim_proj,ice_blitz_travel,43,31,51,16,-5,64,10
