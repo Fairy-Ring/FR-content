@@ -105,7 +105,6 @@ return(true);
 
 // Area scans call this only after map_multiway admits the secondary target tile.
 [proc,player_in_combat_check_quiet]()(boolean)
-if (~waterbirth_support_side_quiet = false) return(false);
 if (~swamp_cave_can_attack = false) return(false);
 if (~player_in_combat_check_macro_refused = true) return(false);
 if (~player_in_combat_check_slayer_refused = true) return(false);
