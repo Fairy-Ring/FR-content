@@ -10,3 +10,5 @@ The default `all` case covers packed staff fields and combat parameters, the fou
 Auto Retaliate is off in the fixture so NPC retaliation cannot hide a broken autocast continuation.
 
 `HARNESS_ENGINE_DIR` and `HARNESS_PACK_DIR` may select an isolated engine checkout and its pack root. The pack root contains `server/script.dat`; the symbolic client models are read from the checked-out content tree's `pack/model.pack`.
+
+The Desert Treasure S0 structural test also checks the relocated staff: exactly one definition, its original pack identity, all fifteen original fields in order, and only the enumerated staff category and server-field additions. The certificate and every other S0 row keep their original checks.

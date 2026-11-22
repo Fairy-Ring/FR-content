@@ -244,12 +244,18 @@ def check_original_entity_configs() -> None:
         require(not base_duplicates, f"duplicate baseline {filename} sections: {base_duplicates[:3]}")
         names = [name for name in section_names(base_text) if DT_ENTITY.fullmatch(name)]
         require(bool(names), f"{filename} must contain the original Desert Treasure family")
+        unmoved_names = [
+            name for name in names
+            if filename != "all.obj" or name != "staff_of_zaros"
+        ]
         require(
-            [name for name in section_names(text) if name in names] == names,
+            [name for name in section_names(text) if name in unmoved_names] == unmoved_names,
             f"{filename} must preserve Desert Treasure section identities/order",
         )
         if filename in ("all.loc", "all.obj"):
             for name in names:
+                if filename == "all.obj" and name == "staff_of_zaros":
+                    continue
                 require(sections.get(name) == base_sections[name],
                         f"[{name}] must preserve original definitions and operations")
         configs[filename] = sections
@@ -260,9 +266,68 @@ def check_original_entity_configs() -> None:
         def identities(text: str) -> dict[int, str]:
             return {int(slot): name for slot, name in re.findall(r"(?m)^(\d+)=([^\r\n]+)$", text)
                     if DT_ENTITY.fullmatch(name)}
+        current_identities = identities((ROOT / relative_path).read_text(encoding="utf-8"))
         require(
-            identities((ROOT / relative_path).read_text(encoding="utf-8")) == identities(baseline_text(relative_path)),
+            current_identities == identities(baseline_text(relative_path)),
             f"{pack_name} must preserve Desert Treasure numeric identities",
+        )
+        if pack_name == "obj.pack":
+            require(current_identities.get(4675) == "staff_of_zaros",
+                    "[staff_of_zaros] must retain its original built-pack identity 4675")
+
+    # B-ANCIENTS3 relocates only this original row. Its ordered cache fields stay
+    # frozen; only the explicit staff category and server fields below are added.
+    staff_definitions: list[dict[str, list[str]]] = []
+    for path in sorted((ROOT / "scripts").rglob("*.obj")):
+        text = path.read_text(encoding="utf-8")
+        count = section_names(text).count("staff_of_zaros")
+        if count:
+            sections, _ = parse_sections_text(text, str(path))
+            staff_definitions.extend([sections["staff_of_zaros"]] * count)
+    require(len(staff_definitions) == 1,
+            "[staff_of_zaros] must have exactly one definition across all .obj files")
+    original_staff = [
+        (key, value)
+        for key, values in base_configs["all.obj"]["staff_of_zaros"].items()
+        for value in values
+    ]
+    require(len(original_staff) == 15, "[staff_of_zaros] baseline must contain fifteen original fields")
+    # VERIFIED bonuses; CANDIDATE four-tick melee rate; UNKNOWN presentation row.
+    staff_additions = [
+        ("category", "weapon_staff"),
+        ("param", "stabattack,10"),
+        ("param", "slashattack,-1"),
+        ("param", "crushattack,40"),
+        ("param", "magicattack,15"),
+        ("param", "rangeattack,0"),
+        ("param", "stabdefence,2"),
+        ("param", "slashdefence,3"),
+        ("param", "crushdefence,1"),
+        ("param", "magicdefence,15"),
+        ("param", "rangedefence,0"),
+        ("param", "strengthbonus,50"),
+        ("param", "prayerbonus,-1"),
+        ("param", "attackrate,4"),
+        ("param", "ready_baseanim,human_staffready"),
+        ("param", "crushattack_anim,human_staff_pummel"),
+        ("param", "defend_anim,human_staff_block"),
+        ("param", "crush_sound,staff_hit"),
+        ("param", "walk_f_baseanim,human_halberdwalk_f"),
+        ("param", "walk_b_baseanim,human_halberdwalk_b"),
+        ("param", "walk_l_baseanim,human_halberdwalk_l"),
+        ("param", "walk_r_baseanim,human_halberdwalk_r"),
+        ("param", "running_baseanim,human_halberdrunning"),
+        ("param", "turnonspot_baseanim,human_halberdturnonspot"),
+    ]
+    if len(staff_definitions) == 1:
+        staff_fields = [
+            (key, value)
+            for key, values in staff_definitions[0].items()
+            for value in values
+        ]
+        require(
+            staff_fields == original_staff + staff_additions,
+            "[staff_of_zaros] must preserve the fifteen original fields in order and add only its approved server fields",
         )
 
     npcs = configs["all.npc"]
