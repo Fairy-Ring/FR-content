@@ -312,7 +312,7 @@ if(npc_type = gorad & (~obj_gettotal(ogretooth) > 0 | getbit_range(%itwatchtower
 if(npc_type = desertminingcaptain) {
     return (~mercenary_capt_attack(true));
 } 
-if(npc_type = ikov_firewarrior) { // can't attack with magic
+if (~npc_is_attackable_opt_ikov_firewarrior = true) { // can't attack with magic
     ~chatnpc("<p,angry>Your puny weapons do nothing against me human! Come back when you can give me a real fight!");
     return (false);
 }
@@ -372,6 +372,24 @@ if (~npc_combat_hasop = true) {
 mes("You can't attack this npc.");
 return (false);
 
+// Area scans call this only after multiway admits the secondary NPC tile.
+// Dialogue-specific refusal branches are absent because their maps are single-combat.
+[proc,npc_is_attackable_opt_quiet]()(boolean)
+if (~soulbane_rage_npc = true) return(~soulbane_rage_attackable);
+if (npc_type = soulbane_fear_reaper) return(~soulbane_fear_attackable);
+if (~soulbane_confusion_npc = true) return(~soulbane_confusion_attackable);
+if (~soulbane_hope_npc = true) return(~soulbane_hope_attackable);
+if (~soulbane_tolna_npc = true) return(~soulbane_tolna_attackable);
+if (npc_type = mudskipper_ogre) return(~slayer_skippy_unlocked);
+if (npc_type = fd_damis_normal | npc_type = fd_damis_tougher) return(~dt_damis_attackable);
+if (npc_type = icediamond_icewarrior) return(~dt_kamil_attackable);
+if (~npc_is_attackable_opt_ikov_firewarrior = true) return(false);
+if (~npc_combat_hasop = true) return(true);
+return(false);
+
+[proc,npc_is_attackable_opt_ikov_firewarrior]()(boolean)
+if (npc_type = ikov_firewarrior) return(true);
+return(false);
 
 [proc,npc_retal_ready]()(boolean)
 if ((add(%npc_action_delay, 8) < map_clock) | (npc_getmode ! applayer2 & npc_getmode ! opplayer2 & npc_getmode ! playerescape)) {

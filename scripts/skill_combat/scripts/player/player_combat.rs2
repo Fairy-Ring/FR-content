@@ -91,17 +91,33 @@ if (map_multiway(npc_coord) = false & nc_param(npc_type, npc_forcemulti) = ^fals
         return(false);
     }
 }
-if (%npc_macro_event_target ! null & %npc_macro_event_target ! uid) {
+if (~player_in_combat_check_macro_refused = true) {
     mes("It's not after you."); // https://youtu.be/y58EFTJNIH8
     return(false);
 }
-if (stat(slayer) < enum(int, int, slayer_req, npc_param(slayer_category))) {
+if (~player_in_combat_check_slayer_refused = true) {
     // OSRS prevents attacking but this should actually just cap damage to 0 (early OSRS behaviour)
     // so move this to the damage cap procs that exist in 295 when converting
     mes("You need a higher Slayer level to know how to wound this monster.");
     return(false);
 }
 return(true);
+
+// Area scans call this only after map_multiway admits the secondary target tile.
+[proc,player_in_combat_check_quiet]()(boolean)
+if (~waterbirth_support_side_quiet = false) return(false);
+if (~swamp_cave_can_attack = false) return(false);
+if (~player_in_combat_check_macro_refused = true) return(false);
+if (~player_in_combat_check_slayer_refused = true) return(false);
+return(true);
+
+[proc,player_in_combat_check_macro_refused]()(boolean)
+if (%npc_macro_event_target ! null & %npc_macro_event_target ! uid) return(true);
+return(false);
+
+[proc,player_in_combat_check_slayer_refused]()(boolean)
+if (stat(slayer) < enum(int, int, slayer_req, npc_param(slayer_category))) return(true);
+return(false);
 
 // mage arena and crumble undead use this for no discenerable reason
 [proc,player_in_combat_check2]()(boolean)

@@ -5,11 +5,17 @@
 if (npc_type = dagannoth_weak_door_south | npc_type = dagannoth_weak_door_west | npc_type = dagannoth_weak_door_north) return(true);
 return(false);
 
-[proc,waterbirth_support_side]()(boolean)
+[proc,waterbirth_support_side_quiet]()(boolean)
 if (~waterbirth_is_support = false) return(true);
 if ((npc_type = dagannoth_weak_door_south & coordz(coord) < coordz(npc_coord)) |
     (npc_type = dagannoth_weak_door_west & coordx(coord) < coordx(npc_coord)) |
     (npc_type = dagannoth_weak_door_north & coordz(coord) > coordz(npc_coord))) {
+    return(false);
+}
+return(true);
+
+[proc,waterbirth_support_side]()(boolean)
+if (~waterbirth_support_side_quiet = false) {
     mes("This door does not seem to be openable from this side..."); // CANDIDATE Old School wording.
     return(false);
 }
