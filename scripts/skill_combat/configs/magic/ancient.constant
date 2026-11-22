@@ -2,7 +2,9 @@
 // CANDIDATE ANCIENT_SMOKE_PROC: 2020/2025 Old School wiki, no Jagex source for Smoke.
 // Period guides state poison without a chance; continuity to 2006 is not established.
 ^ancient_smoke_proc = 8
-// VERIFIED period-guide percentage. Non-stacking base threshold is CANDIDATE.
+// VERIFIED RuneHQ (updated 7 April 2006): 10% for all four Shadow spells.
+// Tip.It (updated 4 September 2005): 15% for Barrage only; the operator question is open.
+// METHOD Conflicts selects the newest period value, 10%. Non-stacking threshold is CANDIDATE.
 ^ancient_shadow_drain_rule = 10
 // UNKNOWN ANCIENT_SHADOW_ROUNDING: truncate base percentage, as stat_sub does.
 ^ancient_shadow_rounding = 100
