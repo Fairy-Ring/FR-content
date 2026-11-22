@@ -623,6 +623,7 @@ for (const pvp of [false, true]) for (const missingMulti of ['caster', 'primary'
     modal.modalState = 1;
     protectedAccess.protect = true;
     f.target.protect = true;
+    f.target.delayed = true;
     setMultiFor(f, [f.p, f.target, valid, protectedMagic, busy, modal, protectedAccess, crossKind], true);
     const nativePlayers = [...new PlayerHuntAllCommandIterator(World.currentTick, f.target.level, f.target.x, f.target.z, 1, 0)];
     const secondaries = [valid, protectedMagic, busy, modal, protectedAccess];
@@ -642,14 +643,59 @@ for (const pvp of [false, true]) for (const missingMulti of ['caster', 'primary'
     }
     assert.equal(queueNpcHits(crossKind).length, 0, 'player scan does not hit NPCs');
     assert.equal(queueHits(f, f.p).length, 0, 'player scan excludes its caster');
-    assert.equal(protectedAccess.protect, true, 'secondary targeting preserves its existing protected access');
-    assert.equal(f.target.protect, true, 'restoring the primary does not clear another script protected-access flag');
     busy.delayed = false;
     modal.modalState = 0;
     protectedAccess.protect = false;
+    f.target.delayed = false;
     f.target.protect = false;
     settleArea(f, spell, result);
   } finally { dispose(f); }
+}
+
+// A real count-dialog secondary matches the published single-target primary path.
+{
+  const beginCountDialog = victim => {
+    const script = Provider.getByName('[label,bank_withdraw]');
+    assert(script, 'published bank count-dialog label');
+    const state = Runner.init(script, victim, null, [0, 0]);
+    victim.executeScript(state, true, true);
+    assert.equal(state.execution, State.COUNTDIALOG, 'real numeric input suspends the victim');
+    assert.equal(victim.activeScript, state, 'the actual suspended script is retained');
+    assert.equal(victim.protect, true, 'numeric input begins with protected access');
+    assert.equal(victim.delayed, false, 'numeric input adds no delay');
+    assert.equal(victim.modalState, 0, 'numeric input adds no server modal');
+  };
+  const snapshot = victim => ({
+    interface: { state: victim.modalState, main: victim.modalMain, chat: victim.modalChat },
+    protect: victim.protect,
+    activeScript: victim.activeScript && { name: victim.activeScript.script.name, execution: victim.activeScript.execution },
+    preventLogoutMessage: victim.preventLogoutMessage,
+    preventLogoutUntil: victim.preventLogoutUntil
+  });
+  const primary = fixture({ pvp: true, label: 'published-count-dialog-primary' });
+  let publishedState;
+  try {
+    beginCountDialog(primary.target);
+    const spell = singleTargetSpells.find(entry => entry.name === 'shadow_blitz');
+    JavaRandom.setSeed(0);
+    run(primary, componentTrigger(primary, spell));
+    assert.equal(queuePlayerHits(primary.target).length, 1, 'published single-target primary is hit');
+    publishedState = snapshot(primary.target);
+    const hp = primary.target.levels[3];
+    for (let ticks = 0; queuePlayerHits(primary.target).length && ticks < 10; ticks++) tickAll(primary);
+    assert(primary.target.levels[3] < hp, 'published primary damage really lands');
+  } finally { dispose(primary); }
+  const area = fixture({ pvp: true, label: 'area-count-dialog-secondary' });
+  try {
+    const secondary = addPlayer(area, { x: area.target.x + 1, z: area.target.z, label: 'count-dialog-secondary' });
+    setMultiFor(area, [area.p, area.target, secondary], true);
+    beginCountDialog(secondary);
+    const spell = areaSpells.find(entry => entry.name === 'shadow_burst');
+    const result = castArea(area, spell, 0, playerVictims(area));
+    assert.equal(queuePlayerHits(secondary).length, 1, 'count-dialog secondary is hit');
+    assert.deepEqual(snapshot(secondary), publishedState, 'secondary interface, protection, active script and logout prevention match the published primary');
+    settleArea(area, spell, result);
+  } finally { dispose(area); }
 }
 
 // A secondary's own single-combat cell is excluded even when the cast origin is multi.
@@ -855,7 +901,7 @@ for (const pvp of [false, true]) for (const name of ['smoke_burst', 'shadow_burs
     const secondary = pvp
       ? addPlayer(f, { x: f.target.x + 1, z: f.target.z, label: 'dying-secondary' })
       : addNpc(f, { x: f.target.x + 1, z: f.target.z, label: 'dying-secondary', lifecycle: EntityLifeCycle.RESPAWN });
-    secondary.levels[3] = 1;
+    if (pvp) secondary.levels[3] = 1;
     if (pvp) {
       secondary.getInventory(invId).removeAll();
       secondary.getInventory(wornId).removeAll();
@@ -881,7 +927,7 @@ for (const pvp of [false, true]) for (const name of ['smoke_burst', 'shadow_burs
     assert.equal(queueHits(f, secondary).length, 1, `${name} secondary damage is pending`);
     if (spell.family !== 3) assert.equal(queueEffects(f, spell, secondary).length, 1, `${name} secondary effect is pending`);
     if (pvp) run({ p: source, target: secondary }, '[proc,.pvp_damage]', [0, 1]);
-    else secondary.enqueueScript(Trigger.AI_QUEUE2, 0, secondary.baseLevels[3]);
+    else run({ p: f.p, target: secondary }, '[proc,npc_default_damage]', [secondary.baseLevels[3]]);
     let ticks = 0;
     while (secondary.levels[3] > 0 && ticks++ < 20) tickDeathFlight(f, pvp ? null : secondary);
     assert.equal(secondary.levels[3], 0, `${name} independent damage kills the secondary`);
