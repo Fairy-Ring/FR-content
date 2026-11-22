@@ -216,6 +216,10 @@ return($duration);
 
 
 [proc,pvm_spell_success](dbrow $spell_data, int $maxhit, int $duration)
+def_int $rolled_damage = ~pvm_spell_impact($spell_data, $maxhit, $duration);
+
+// The shared victim resolver returns the published pre-HP-clipping Blood basis.
+[proc,pvm_spell_impact](dbrow $spell_data, int $maxhit, int $duration)(int)
 def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
 def_int $damagestyle = ^style_magic_normal;
 if (%damagestyle = ^style_melee_defensive) { // check varp directly
@@ -268,6 +272,7 @@ if (db_getfieldcount($spell_data, magic_spell_table:sound_hit) > 0) {
     sound_synth(db_getfield($spell_data, magic_spell_table:sound_hit, 0), 0, $duration);
 }
 spotanim_npc(db_getfield($spell_data, magic_spell_table:spotanim_target, 0), $duration);
+return($rolled_damage);
 
 
 [proc,pvm_spell_fail](dbrow $spell_data, int $duration)
