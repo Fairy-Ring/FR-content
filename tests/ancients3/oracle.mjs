@@ -28,6 +28,7 @@ export const pickerButtons = [
 // Named-source selector values used only to seed the compiled player fixture.
 export const book = { standard: 0, ancient: 1 };
 export const desertTreasure = { incomplete: 0, complete: 15 };
+export const autoRetaliateOff = 1; // player_controls.constant; isolate the autocast loop.
 export const standardProbe = { component: 'staff_spells:ssb0', spell: 'wind_strike' };
 // The original 377 client row and separately sourced combat overlay.
 export const zarosStaffClient = {

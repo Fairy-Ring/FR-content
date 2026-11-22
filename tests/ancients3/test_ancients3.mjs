@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   ancientSpells,
+  autoRetaliateOff,
   book,
   desertTreasure,
   observatoryReward,
@@ -134,6 +135,7 @@ function makePlayer() {
   World.players[slot] = player;
   World.playerLoop.add(player.hash64, player);
   variable(player, 'tutorial', 1000);
+  variable(player, 'option_nodef', autoRetaliateOff);
   variable(player, 'deserttreasure', desertTreasure.incomplete);
   variable(player, 'alternate_spells', book.ancient);
   variable(player, 'com_magicattack', 100000);
