@@ -16,13 +16,44 @@
 [if_button,staff_spells:ssb14] @set_autocast_spell(^earth_wave);
 [if_button,staff_spells:ssb15] @set_autocast_spell(^fire_wave);
 
+// Root 1689 is the revision-377 Ancient picker despite its inherited alias.
+[if_button,questscroll_itgronigen:com_7] @set_autocast_spell(^ice_rush);
+[if_button,questscroll_itgronigen:com_18] @set_autocast_spell(^ice_blitz);
+[if_button,questscroll_itgronigen:com_29] @set_autocast_spell(^ice_burst);
+[if_button,questscroll_itgronigen:com_40] @set_autocast_spell(^ice_barrage);
+[if_button,questscroll_itgronigen:com_51] @set_autocast_spell(^blood_rush);
+[if_button,questscroll_itgronigen:com_62] @set_autocast_spell(^blood_blitz);
+[if_button,questscroll_itgronigen:com_71] @set_autocast_spell(^blood_burst);
+[if_button,questscroll_itgronigen:com_82] @set_autocast_spell(^blood_barrage);
+[if_button,questscroll_itgronigen:com_93] @set_autocast_spell(^smoke_rush);
+[if_button,questscroll_itgronigen:com_106] @set_autocast_spell(^smoke_blitz);
+[if_button,questscroll_itgronigen:com_119] @set_autocast_spell(^smoke_burst);
+[if_button,questscroll_itgronigen:com_132] @set_autocast_spell(^smoke_barrage);
+[if_button,questscroll_itgronigen:com_145] @set_autocast_spell(^shadow_rush);
+[if_button,questscroll_itgronigen:com_158] @set_autocast_spell(^shadow_blitz);
+[if_button,questscroll_itgronigen:com_171] @set_autocast_spell(^shadow_burst);
+[if_button,questscroll_itgronigen:com_184] @set_autocast_spell(^shadow_barrage);
+
 [label,open_autocast_interface]
 if_close;
 if (p_finduid(uid) = false) { // cant open autocast interface if delayed
     return;
 }
+~player_autocast_validate;
+def_obj $weapon = inv_getobj(worn, ^wearpos_rhand);
+if ($weapon = null | oc_category($weapon) ! weapon_staff) return;
 %autocast_set = 0;
-if_settab(staff_spells, 0);
+if (%alternate_spells = ^dt_spellbook_ancient) {
+    if ($weapon = staff_of_zaros & %deserttreasure = ^dt_stage_complete) {
+        if_settab(questscroll_itgronigen, 0);
+    }
+} else {
+    if_settab(staff_spells, 0);
+}
+
+[if_button,questscroll_itgronigen:com_6]
+if_close;
+~initalltabs;
 
 [if_button,staff_spells:cancelspell]
 if_close;
@@ -33,6 +64,7 @@ if_close;
 if_close;
 if (p_finduid(uid) = true) {
     def_dbrow $spell_data = ~get_spell_data($spell);
+    if (~player_autocast_allowed($spell, inv_getobj(worn, ^wearpos_rhand), %alternate_spells, %deserttreasure) = false) return;
     if (~check_spell_requirements($spell_data) = false) {
         return;
     }
@@ -48,6 +80,32 @@ if (testbit(%autocast_set, 0) = ^true & %autocast_spell > 0) {
     return(true);
 }
 return(false);
+
+// Selection compatibility only. Per-cast level/rune checks stay in the resolver.
+[proc,player_autocast_allowed](int $spell, obj $weapon, int $book, int $quest)(boolean)
+if ($spell <= 0) return(true);
+if ($weapon = null | oc_category($weapon) ! weapon_staff) return(false);
+if (map_members = false & oc_members($weapon) = true) return(false);
+def_dbrow $spell_data = ~get_spell_data($spell);
+if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) ! null) {
+    if ($weapon = staff_of_zaros & $book = ^dt_spellbook_ancient & $quest = ^dt_stage_complete) return(true);
+    return(false);
+}
+if ($book ! ^dt_spellbook_standard) return(false);
+if ($weapon = staff_of_zaros) return(^ancient_staff_standard_autocast);
+return(true);
+
+[proc,player_autocast_validate]
+if (%autocast_spell <= 0) return;
+if (~player_autocast_allowed(%autocast_spell, inv_getobj(worn, ^wearpos_rhand), %alternate_spells, %deserttreasure) = false) {
+    ~player_autocast_reset;
+}
+
+[proc,.player_autocast_validate]
+if (.%autocast_spell <= 0) return;
+if (~player_autocast_allowed(.%autocast_spell, .inv_getobj(worn, ^wearpos_rhand), .%alternate_spells, .%deserttreasure) = false) {
+    ~.player_autocast_reset;
+}
 
 [proc,player_autocast_reset]
 %autocast_set = 0;

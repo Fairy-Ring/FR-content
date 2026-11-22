@@ -588,7 +588,7 @@ data=spotanim_proj,smoke_rush_travel,43,31,51,16,-5,64,10
 data=spotanim_target,smoke_rush_impact,124
 data=sound_cast,null
 data=sound_hit,smoke_rush_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_shadow_rush]
 table=magic_spell_table
@@ -606,7 +606,7 @@ data=spotanim_proj,shadow_rush_travel,43,31,51,16,-5,64,10
 data=spotanim_target,shadow_rush_impact,124
 data=sound_cast,null
 data=sound_hit,shadow_rush_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_blood_rush]
 table=magic_spell_table
@@ -624,7 +624,7 @@ data=spotanim_proj,blood_rush_travel,43,31,51,16,-5,64,10
 data=spotanim_target,blood_rush_impact,124
 data=sound_cast,null
 data=sound_hit,blood_rush_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_ice_rush]
 table=magic_spell_table
@@ -645,7 +645,7 @@ data=spotanim_proj,ice_rush_travel,43,31,51,16,-5,64,10
 data=spotanim_target,ice_rush_impact,124
 data=sound_cast,null
 data=sound_hit,ice_rush_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_smoke_blitz]
 table=magic_spell_table
@@ -665,7 +665,7 @@ data=spotanim_proj,smoke_blitz_travel,43,31,51,16,-5,64,10
 data=spotanim_target,smoke_blitz_impact,124
 data=sound_cast,null
 data=sound_hit,smoke_blitz_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_shadow_blitz]
 table=magic_spell_table
@@ -683,7 +683,7 @@ data=spotanim_proj,shadow_blitz_travel,43,31,51,16,-5,64,10
 data=spotanim_target,shadow_blitz_impact,124
 data=sound_cast,null
 data=sound_hit,shadow_blitz_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_blood_blitz]
 table=magic_spell_table
@@ -701,7 +701,7 @@ data=spotanim_proj,blood_blitz_travel,43,31,51,16,-5,64,10
 data=spotanim_target,blood_blitz_impact,124
 data=sound_cast,null
 data=sound_hit,blood_blitz_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_ice_blitz]
 table=magic_spell_table
@@ -721,7 +721,7 @@ data=spotanim_proj,ice_blitz_travel,43,31,51,16,-5,64,10
 data=spotanim_target,ice_blitz_impact,124
 data=sound_cast,null
 data=sound_hit,ice_blitz_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 // UNKNOWN ANCIENT_VISUAL_AUDIO_ROW: chosen cache candidates do not establish original 377 bindings.
 // UNKNOWN ANCIENT_AREA_POLICY subfields and the CANDIDATE multi-only rule are recorded in the vault facts.
@@ -744,7 +744,7 @@ data=spotanim_proj,smoke_burst_travel,43,31,51,16,-5,64,10
 data=spotanim_target,smoke_burst_impact,124
 data=sound_cast,null
 data=sound_hit,smoke_burst_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_shadow_burst]
 table=magic_spell_table
@@ -762,7 +762,7 @@ data=anim,zaros_casting
 data=spotanim_target,shadow_burst_impact,124
 data=sound_cast,null
 data=sound_hit,shadow_burst_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_blood_burst]
 table=magic_spell_table
@@ -780,7 +780,7 @@ data=anim,zaros_casting
 data=spotanim_target,spell_blood_burst_impact,124
 data=sound_cast,null
 data=sound_hit,blood_burst_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_ice_burst]
 table=magic_spell_table
@@ -801,7 +801,7 @@ data=spotanim_proj,ice_burst_travel,43,31,51,16,-5,64,10
 data=spotanim_target,ice_burst_impact,124
 data=sound_cast,null
 data=sound_hit,ice_burst_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_smoke_barrage]
 table=magic_spell_table
@@ -822,7 +822,7 @@ data=spotanim_proj,smoke_barrage_travel,43,31,51,16,-5,64,10
 data=spotanim_target,smoke_barrage_impact,124
 data=sound_cast,null
 data=sound_hit,smoke_barrage_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_shadow_barrage]
 table=magic_spell_table
@@ -840,7 +840,7 @@ data=anim,zaros_casting
 data=spotanim_target,shadow_barrage_impact,124
 data=sound_cast,null
 data=sound_hit,shadow_barrage_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_blood_barrage]
 table=magic_spell_table
@@ -858,7 +858,7 @@ data=anim,zaros_casting
 data=spotanim_target,spell_blood_barrage_impact,124
 data=sound_cast,null
 data=sound_hit,blood_barrage_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true
 
 [magic_spell_ice_barrage]
 table=magic_spell_table
@@ -879,4 +879,4 @@ data=spotanim_proj,ice_barrage_travel,43,31,51,16,-5,64,10
 data=spotanim_target,ice_barrage_impact,124
 data=sound_cast,null
 data=sound_hit,ice_barrage_impact
-data=continue_by_autocast,false
+data=continue_by_autocast,true

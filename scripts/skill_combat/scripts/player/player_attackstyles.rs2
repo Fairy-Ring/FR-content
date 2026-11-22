@@ -77,6 +77,7 @@
 
 [if_button,combat_staff_2:auto_toggle]
 if_close;
+~player_autocast_validate;
 if (%autocast_spell = 0) {
     mes("You need to choose a spell first."); // https://youtu.be/Mo6AcO4rg4A?t=69
     return;
@@ -110,6 +111,7 @@ if ($previous = null | $obj = null | oc_category($previous) ! oc_category($obj))
     // osrs keeps track of selected per category
     ~player_autocast_reset;
 }
+~player_autocast_validate;
 if (~inzone_coord_pair_table(gnomeball_zones, coord) = true) {
     if_settab(gnomeball, 0);
     return;
@@ -179,6 +181,7 @@ if ($previous = null | $obj = null | oc_category($previous) ! oc_category($obj))
     // osrs keeps track of selected per category
     ~.player_autocast_reset;
 }
+~.player_autocast_validate;
 if (~.inzone_coord_pair_table(gnomeball_zones, .coord) = true) {
     .if_settab(gnomeball, 0);
     return;
