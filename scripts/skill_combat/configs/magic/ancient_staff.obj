@@ -1,6 +1,6 @@
 // ANCIENT_STAFF_COMBAT_ROW: original staff_of_zaros (4675) fields kept below.
 // VERIFIED bonuses: desert-treasure.ancient-staff-combat-row.
-// category routes through the existing weapon_staff combat-style table.
+// CANDIDATE: existing weapon_staff combat-style route, not a recovered item field.
 [staff_of_zaros]
 name=Ancient staff
 desc=A magical staff of ancient origin...
@@ -30,8 +30,8 @@ param=magicdefence,15
 param=rangedefence,0
 param=strengthbonus,50
 param=prayerbonus,-1
-// CANDIDATE: nearest 0.6-second tick count to Zybez's 2.5 seconds, not a measurement.
-// Research: desert-treasure.ancient-staff-melee-rate.
+// UNKNOWN: Zybez gives plain/Iban/Ancient the same 2.5-second label; it cannot choose 4 or 5 ticks.
+// Main's player-favourable default; research: desert-treasure.ancient-staff-melee-rate-1122.
 param=attackrate,4
 // UNKNOWN: no source read gives this staff's animations or sounds.
 // It is a staff, so Main's engineering row uses the plain staff's named assets.
