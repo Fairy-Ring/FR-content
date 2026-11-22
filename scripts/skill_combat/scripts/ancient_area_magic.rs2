@@ -1,6 +1,7 @@
-// ANCIENT_AREA_POLICY: the period guide states an unlimited-entity 3x3 grid.
-// UNKNOWN defaults: snapshot primary tile, same-plane southwest-tile membership,
-// caster/primary/secondary multiway, primary first, native order and same kind.
+// VERIFIED period-guide geometry: a 3x3 grid.
+// UNKNOWN defaults: no entity cap, snapshot primary tile and same-plane
+// southwest-tile membership; caster/primary/secondary multiway,
+// primary first, native order and same kind.
 [proc,ancient_area_contains](coord $centre, coord $victim)(boolean)
 if (coordy($centre) = coordy($victim) & abs(sub(coordx($centre), coordx($victim))) <= ^ancient_area_radius & abs(sub(coordz($centre), coordz($victim))) <= ^ancient_area_radius) return(true);
 return(false);
