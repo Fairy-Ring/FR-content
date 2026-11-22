@@ -1,0 +1,16 @@
+// Main's explicit U1 defaults of 21 November; not recovered period algorithms.
+// CANDIDATE ANCIENT_SMOKE_PROC: 2020/2025 Old School wiki, no Jagex source for Smoke.
+// Period guides state poison without a chance; continuity to 2006 is not established.
+^ancient_smoke_proc = 8
+// VERIFIED period-guide percentage. Non-stacking base threshold is CANDIDATE.
+^ancient_shadow_drain_rule = 10
+// UNKNOWN ANCIENT_SHADOW_ROUNDING: truncate base percentage, as stat_sub does.
+^ancient_shadow_rounding = 100
+// UNKNOWN ANCIENT_BLOOD_HEAL_RULE: ceil one quarter once per cast, base-HP cap.
+^ancient_blood_heal_rule = 4
+// UNKNOWN ANCIENT_ICE_IMMUNITY_POLICY: reuse Standard's post-freeze interval.
+^ancient_ice_immunity_policy = 5
+// UNKNOWN ANCIENT_ICE_IMMUNITY_POLICY: reuse Standard's protection divisor.
+^ancient_ice_protection_divisor = 2
+// CANDIDATE Standard and later Old School cast interval.
+^ancient_cast_cooldown = 5

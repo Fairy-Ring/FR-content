@@ -230,10 +230,10 @@ try {
       if (equipment === null) continue;
       seed(inventory, equipment);
       const before = snapshot(inv);
-      // The current schema has three pairs; AND separate real resolver calls covers
-      // every cache requirement, including four-type Ancient spells absent from the pack.
+      // The schema has four pairs. Separate resolver calls isolate each cache
+      // requirement, including four-type Ancient spells.
       const serverAnswers = button.requirements.map(req => {
-        probe.columnValues[runeColumn] = [req.rune, req.count, -1, -1, -1, -1];
+        probe.columnValues[runeColumn] = [req.rune, req.count, -1, -1, -1, -1, -1, -1];
         return check(probe);
       });
       const server = serverAnswers.every(Boolean);

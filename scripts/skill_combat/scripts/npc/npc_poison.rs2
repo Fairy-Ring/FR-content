@@ -35,6 +35,11 @@ if (~npc_is_attackable() = false) {
 if (map_members = ^false) {
     return;
 }
+~npc_poison_apply($severity);
+
+// The damaging cast already checked attackability. Its queued impact has no player pointer.
+[proc,npc_poison_apply](int $severity)
+if (map_members = ^false) return;
 
 if ($severity > %npc_poison) {
     npc_settimer(30);
