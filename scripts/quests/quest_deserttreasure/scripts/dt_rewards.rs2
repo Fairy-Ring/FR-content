@@ -4,6 +4,7 @@
 // s8-altar-messages and desert-treasure.dlg.eblis-ancient-staff.
 
 [proc,dt_restore_spellbook]
+~player_autocast_validate;
 if (%deserttreasure = ^dt_stage_complete & %alternate_spells = ^dt_spellbook_ancient) {
     if_settab(inter_267, ^tab_magic);
 } else {
