@@ -69,3 +69,13 @@
 ^shadow_blitz = 205
 ^blood_blitz = 206
 ^ice_blitz = 207
+
+// Ancient Burst and Barrage spells
+^smoke_burst = 208
+^shadow_burst = 209
+^blood_burst = 210
+^ice_burst = 211
+^smoke_barrage = 212
+^shadow_barrage = 213
+^blood_barrage = 214
+^ice_barrage = 215

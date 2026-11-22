@@ -19,6 +19,7 @@ column=additional_reqmessage,string
 column=specificobj_reqmessage,obj,string
 column=stat_change,stat,int,int,LIST
 column=ancient_effect,int
+column=ancient_area,boolean
 column=poison_severity,int
 column=freeze_time,int
 column=anim,seq
