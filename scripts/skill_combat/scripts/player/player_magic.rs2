@@ -75,6 +75,15 @@ if (npc_type = ungadulu_good) {
 [apnpct,inter_267:com_55] ~pvm_default_spell(^blood_blitz);
 [apnpct,inter_267:com_15] ~pvm_default_spell(^ice_blitz);
 
+[apnpct,inter_267:com_107] ~ancient_npc_area_spell(^smoke_burst);
+[apnpct,inter_267:com_155] ~ancient_npc_area_spell(^shadow_burst);
+[apnpct,inter_267:com_63] ~ancient_npc_area_spell(^blood_burst);
+[apnpct,inter_267:com_25] ~ancient_npc_area_spell(^ice_burst);
+[apnpct,inter_267:com_119] ~ancient_npc_area_spell(^smoke_barrage);
+[apnpct,inter_267:com_167] ~ancient_npc_area_spell(^shadow_barrage);
+[apnpct,inter_267:com_73] ~ancient_npc_area_spell(^blood_barrage);
+[apnpct,inter_267:com_35] ~ancient_npc_area_spell(^ice_barrage);
+
 [proc,pvm_default_spell](int $spell)
 def_dbrow $spell_data = ~get_spell_data($spell);
 if (~pvm_combat_spell_checks($spell_data) = false) {
@@ -85,7 +94,10 @@ if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) = null) {
     if (~pvm_debuff_allowed($spell_data) = false) return;
 }
 def_int $duration = ~pvm_spell_cast($spell_data);
-// if player DOESNT splash:
+def_int $rolled_damage = ~pvm_spell_victim($spell_data, $spell, $duration);
+
+// A splash returns null; successful rolled zero still admits the Ancient effect.
+[proc,pvm_spell_victim](dbrow $spell_data, int $spell, int $duration)(int)
 if (~player_npc_hit_roll(^magic_style) = true) {
     def_int $maxhit = ~magic_spell_maxhit($spell_data);
     if (npc_type = count_draynor & inv_total(inv, garlic) > 0) {
@@ -93,15 +105,17 @@ if (~player_npc_hit_roll(^magic_style) = true) {
     }
     if((npc_param(slayer_category) = ^slayer_kurask | npc_param(slayer_category) = ^slayer_turoth) & $spell ! ^magic_dart) {
         $maxhit = 0;
-    }    
-    ~pvm_spell_success($spell_data, $maxhit, $duration);
+    }
+    def_int $rolled_damage = ~pvm_spell_impact($spell_data, $maxhit, $duration);
     if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) = null) {
         ~pvm_stat_change_effect($spell_data);
         ~pvm_freeze_effect($spell_data);
     }
+    return($rolled_damage);
 } else {
     ~pvm_spell_fail($spell_data, $duration);
 }
+return(null);
 
 // no 0 hp check for magic: you can attack slayer npcs when they're at 0 hp
 [proc,pvm_combat_spell_checks](dbrow $spell_data)(boolean)

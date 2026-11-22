@@ -17,6 +17,8 @@ return(5);
 def_int $family = db_getfield($spell_data, magic_spell_table:ancient_effect, 0);
 if ($family = null) return;
 if ($family = 3) {
+    // Area Blood heals once after summing all successful victims, including rolled zero.
+    if (db_getfield($spell_data, magic_spell_table:ancient_area, 0) = true) return;
     // CANDIDATE ANCIENT_BLOOD_DAMAGE_BASIS: roll before remaining-HP clipping.
     // Player queues count down after testing delay, NPC queues before testing it.
     queue(ancient_blood_heal, sub($delay, 1), $rolled_damage);
@@ -49,6 +51,7 @@ switch_int(db_getfield($spell_data, magic_spell_table:ancient_effect, 0)) {
 def_int $family = db_getfield($spell_data, magic_spell_table:ancient_effect, 0);
 if ($family = null) return;
 if ($family = 3) {
+    if (db_getfield($spell_data, magic_spell_table:ancient_area, 0) = true) return;
     queue(ancient_blood_heal, $delay, $rolled_damage);
     return;
 }

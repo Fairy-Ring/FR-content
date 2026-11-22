@@ -44,6 +44,15 @@ p_opplayert(db_getfield($spell_data, magic_spell_table:spellcom, 0));
 [applayert,inter_267:com_55] ~pvp_default_spell(^blood_blitz);
 [applayert,inter_267:com_15] ~pvp_default_spell(^ice_blitz);
 
+[applayert,inter_267:com_107] ~ancient_player_area_spell(^smoke_burst);
+[applayert,inter_267:com_155] ~ancient_player_area_spell(^shadow_burst);
+[applayert,inter_267:com_63] ~ancient_player_area_spell(^blood_burst);
+[applayert,inter_267:com_25] ~ancient_player_area_spell(^ice_burst);
+[applayert,inter_267:com_119] ~ancient_player_area_spell(^smoke_barrage);
+[applayert,inter_267:com_167] ~ancient_player_area_spell(^shadow_barrage);
+[applayert,inter_267:com_73] ~ancient_player_area_spell(^blood_barrage);
+[applayert,inter_267:com_35] ~ancient_player_area_spell(^ice_barrage);
+
 [proc,pvp_default_spell](int $spell)
 def_dbrow $spell_data = ~get_spell_data($spell);
 if (~pvp_combat_spell_checks($spell_data) = false) {
@@ -56,16 +65,21 @@ if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) = null) {
 
 def_int $duration = ~pvp_spell_cast($spell_data);
 
-// spell hit
+def_int $rolled_damage = ~pvp_spell_victim($spell_data, $duration);
+
+// Keep the default and area paths on one accuracy/protection/effect resolver.
+[proc,pvp_spell_victim](dbrow $spell_data, int $duration)(int)
 if (~pvp_hit_roll(^magic_style) = true) {
-    ~pvp_spell_success($spell_data, ~magic_spell_maxhit($spell_data), $duration);
+    def_int $rolled_damage = ~pvp_spell_impact($spell_data, ~magic_spell_maxhit($spell_data), $duration);
     if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) = null) {
         ~pvp_stat_change_effect($spell_data);
         ~pvp_freeze_effect($spell_data);
     }
+    return($rolled_damage);
 } else {
     ~pvp_spell_fail($spell_data, $duration);
 }
+return(null);
 
 [proc,pvp_combat_spell_checks](dbrow $spell_data)(boolean)
 if_close;

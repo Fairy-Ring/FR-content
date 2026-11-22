@@ -1,0 +1,85 @@
+// ANCIENT_AREA_POLICY: the period guide states an unlimited-entity 3x3 grid.
+// UNKNOWN defaults: snapshot primary tile, same-plane southwest-tile membership,
+// caster/primary/secondary multiway, primary first, native order and same kind.
+[proc,ancient_area_contains](coord $centre, coord $victim)(boolean)
+if (coordy($centre) = coordy($victim) & abs(sub(coordx($centre), coordx($victim))) <= ^ancient_area_radius & abs(sub(coordz($centre), coordz($victim))) <= ^ancient_area_radius) return(true);
+return(false);
+
+[proc,ancient_npc_area_spell](int $spell)
+def_dbrow $spell_data = ~get_spell_data($spell);
+if (~pvm_combat_spell_checks($spell_data) = false) return;
+def_npc_uid $primary = npc_uid;
+def_coord $centre = npc_coord;
+def_int $duration = ~pvm_spell_cast($spell_data);
+def_int $blood_damage = 0;
+def_boolean $landed = false;
+def_int $rolled_damage = ~pvm_spell_victim($spell_data, $spell, $duration);
+if ($rolled_damage ! null) {
+    $blood_damage = $rolled_damage;
+    $landed = true;
+}
+if (map_multiway(coord) = true & map_multiway($centre) = true) {
+    // Drain the native iterator in this tick; it yields each NPC once, not nine tiles.
+    npc_findallany($centre, ^ancient_area_radius, ^vis_off);
+    while (npc_findnext = true) {
+        if (npc_uid ! $primary & ~ancient_area_contains($centre, npc_coord) = true & map_multiway(npc_coord) = true) {
+            if (~player_in_combat_check_quiet = true & ~npc_is_attackable_opt_quiet = true) {
+                if (npc_type = slayer_killerwatt_ball) ~killerwatt_wake;
+                $rolled_damage = ~pvm_spell_victim($spell_data, $spell, $duration);
+                if ($rolled_damage ! null) {
+                    $blood_damage = add($blood_damage, $rolled_damage);
+                    $landed = true;
+                }
+            }
+        }
+    }
+    def_boolean $primary_restored = npc_finduid($primary);
+}
+if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) = 3 & $landed = true) {
+    // UNKNOWN ANCIENT_BLOOD_HEAL_RULE: sum rolls and round once in the existing heal.
+    queue(ancient_blood_heal, calc($duration / 30), $blood_damage);
+}
+
+[proc,ancient_player_area_spell](int $spell)
+def_dbrow $spell_data = ~get_spell_data($spell);
+if (~pvp_combat_spell_checks($spell_data) = false) return;
+def_player_uid $caster = uid;
+def_player_uid $primary = .uid;
+def_coord $centre = .coord;
+def_int $duration = ~pvp_spell_cast($spell_data);
+def_int $blood_damage = 0;
+def_boolean $landed = false;
+def_int $rolled_damage = ~pvp_spell_victim($spell_data, $duration);
+if ($rolled_damage ! null) {
+    $blood_damage = $rolled_damage;
+    $landed = true;
+}
+if (map_multiway(coord) = true & map_multiway($centre) = true) {
+    huntall($centre, ^ancient_area_radius, ^vis_off);
+    // Use the primary iterator pointer, then restore the caster before protected
+    // secondary acquisition. .huntnext would retain the previous target's
+    // ProtectedActivePlayer2 flag and make .p_finduid take its same-UID fast path.
+    while (huntnext = true) {
+        def_player_uid $victim = uid;
+        def_boolean $casting_player_found = finduid($caster);
+        if ($victim ! $caster & $victim ! $primary) {
+            if (.p_finduid($victim) = true) {
+                if (~ancient_area_contains($centre, .coord) = true & map_multiway(.coord) = true & .%death = ^false) {
+                    if (~pvp_is_attackable_opt_quiet = true) {
+                        ~set_pk_vars;
+                        $rolled_damage = ~pvp_spell_victim($spell_data, $duration);
+                        if ($rolled_damage ! null) {
+                            $blood_damage = add($blood_damage, $rolled_damage);
+                            $landed = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    def_boolean $primary_player_restored = finduid($caster);
+    def_boolean $secondary_player_restored = .finduid($primary);
+}
+if (db_getfield($spell_data, magic_spell_table:ancient_effect, 0) = 3 & $landed = true) {
+    queue(ancient_blood_heal, calc($duration / 30 + 1), $blood_damage);
+}
