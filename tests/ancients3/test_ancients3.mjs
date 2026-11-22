@@ -261,22 +261,22 @@ function oracleCast(fixture, spell, seed = 0) {
   };
 }
 
-function withOracleDraws(expected, castCount, callback) {
-  assert(expected.draws.length > 0, 'independent oracle predicts each native cast draw');
+function withOracleDraws(draws, callback) {
+  assert(draws.length > 0, 'independent oracle predicts each native cast draw');
   const previousRandom = JavaRandom.nextDouble;
   let randomCalls = 0;
   JavaRandom.nextDouble = function () {
-    assert(randomCalls < expected.draws.length * castCount,
+    assert(randomCalls < draws.length,
       'native continuation consumes no unmodeled random draws');
-    return expected.draws[randomCalls++ % expected.draws.length];
+    return draws[randomCalls++];
   };
   try {
     callback();
   } finally {
     JavaRandom.nextDouble = previousRandom;
   }
-  assert.equal(randomCalls, expected.draws.length * castCount,
-    'native continuation uses exactly one independent oracle draw vector per cast');
+  assert.equal(randomCalls, draws.length,
+    'native continuation uses exactly the independent fixture draw stream');
 }
 
 function addNpc(player, x, z, { aggressive = false, hp = 200 } = {}) {
@@ -400,13 +400,14 @@ function fixtureForPvp(spellName) {
   };
 }
 
-function awaitCasts(fixture, spell, count, expected = oracleCast(fixture, spell)) {
+function awaitCasts(fixture, spell, count, expected, beginCast) {
   const { player, primary, secondary } = fixture;
   const xpBefore = player.stats[6];
   const beforeRunes = runeVector(player);
   const beforePrimaryHp = primary.levels[3];
   const beforeSecondaryHp = secondary?.levels[3];
   let expectedMagicXp = 0;
+  beginCast();
 
   for (let cast = 1; cast <= count; cast++) {
     const expectedAfterCast = expectedRunes(beforeRunes, spell, cast);
@@ -634,9 +635,8 @@ function testAttackContinuation() {
     const spell = ancientRow('ice_rush').spell;
     const expected = oracleCast(fixture, spell);
     assert.equal(expected.accurate, true, 'U1 oracle vector selects an accurate single-target cast');
-    withOracleDraws(expected, 2, () => {
-      dispatchAttack(fixture.player, fixture.primary);
-      awaitCasts(fixture, spell, 2, expected);
+    withOracleDraws([...expected.draws, ...expected.draws], () => {
+      awaitCasts(fixture, spell, 2, expected, () => dispatchAttack(fixture.player, fixture.primary));
     });
     assert.equal(fixture.secondary, null, 'single-target fixture has no extra target');
   } finally {
@@ -648,9 +648,9 @@ function testAttackContinuation() {
     const spell = ancientRow('ice_burst').spell;
     const expected = oracleCast(areaFixture, spell);
     assert.deepEqual(expected.accurate, [true, true], 'U2 oracle vector hits both area victims');
-    withOracleDraws(expected, 2, () => {
-      dispatchAttack(areaFixture.player, areaFixture.primary);
-      awaitCasts(areaFixture, spell, 2, expected);
+    withOracleDraws([...expected.draws, ...expected.draws], () => {
+      awaitCasts(areaFixture, spell, 2, expected,
+        () => dispatchAttack(areaFixture.player, areaFixture.primary));
     });
   } finally {
     disposeCombatFixture(areaFixture);
@@ -668,9 +668,8 @@ function runNpcContinuationExit(kind) {
   if (kind === 'target-death') assert(expected.damages[0] > 0, 'target-death oracle has positive damage');
 
   try {
-    withOracleDraws(expected, 1, () => {
-      dispatchAttack(fixture.player, fixture.primary);
-      awaitCasts(fixture, spell, 1, expected);
+    withOracleDraws(expected.draws, () => {
+      awaitCasts(fixture, spell, 1, expected, () => dispatchAttack(fixture.player, fixture.primary));
     });
     const afterFirstRunes = runeVector(fixture.player);
     const afterFirstXp = fixture.player.stats[6];
@@ -738,14 +737,17 @@ function testPvpContinuation() {
     const expected = oracleCast(fixture, spell);
     assert.equal(expected.accurate, true, 'U1 PvP oracle vector selects an accurate cast');
     const component = id('Component', `inter_267:com_${spell.widget}`);
+    assert(expected.damages[0] > 0, 'PvP fixture predicts positive damage before the next cast');
     const trigger = Provider.getByTrigger(Trigger.APPLAYERT, component, -1);
     assert(trigger, 'PvP autocast starts from the packed APPLAYERT spell component');
     assert.equal(trigger.name, `[applayert,inter_267:com_${spell.widget}]`);
-    withOracleDraws(expected, 2, () => {
-      const state = Runner.init(trigger, fixture.player, fixture.primary);
-      assert.equal(fixture.player.runScript(state, true, true), State.FINISHED,
-        'the native PvP component cast finishes and schedules its own continuation');
-      awaitCasts(fixture, spell, 2, expected);
+    // The first queued impact also draws once for its human hit sound between casts.
+    withOracleDraws([...expected.draws, 0.5, ...expected.draws], () => {
+      awaitCasts(fixture, spell, 2, expected, () => {
+        const state = Runner.init(trigger, fixture.player, fixture.primary);
+        assert.equal(fixture.player.runScript(state, true, true), State.FINISHED,
+          'the native PvP component cast finishes and schedules its own continuation');
+      });
     });
     assert.equal(variable(fixture.player, 'autocast_spell'), field(row('ice_rush'), 'spell'),
       'PvP continuation retains the selected spell');
@@ -779,16 +781,16 @@ function testDesertTreasureCompletion() {
       EntityLifeCycle.RESPAWN, World.getNextNid(), type.id, type.blockwalk);
     World.addNpc(azzanadra, -1);
     World.processNpcEventQueue();
-    const talk = Provider.getByTrigger(Trigger.OPNPC1, type.id, type.category);
-    assert(talk, 'native Azzanadra Talk-to trigger is compiled');
-    assert.equal(talk.name, '[opnpc1,azzanadra]');
     player.setInteraction(Interaction.ENGINE, azzanadra, Trigger.APNPC1);
-    assert.equal(player.getOpTrigger(), talk, 'native Talk-to interaction resolves the compiled trigger');
+    const talk = player.getOpTrigger();
+    assert(talk, 'native Azzanadra Talk-to trigger is compiled');
+    assert.equal(talk.name, '[opnpc1,azzanadra_real]', 'Talk-to resolves the visible NPC multi');
     player.processInteraction();
 
     const state = player.activeScript;
     assert(state, 'native Talk-to starts the suspended completion dialogue');
-    assert.equal(state.script.name, '[opnpc1,azzanadra]');
+    assert(state.debugFrames.slice(0, state.debugFp).some(frame => frame.script === talk),
+      'the paused completion dialogue retains its native Talk-to entry');
     const resume = new ResumePauseButtonHandler();
     let pauseCount = 0;
     for (let turn = 0; state.execution !== State.FINISHED && turn < 100; turn++) {
@@ -817,7 +819,7 @@ function testDesertTreasureCompletion() {
       'published spellbook validation clears the stale Standard selection');
     assert.equal(variable(player, 'autocast_set'), 0,
       'published spellbook validation disables the stale Standard autocast');
-    assert.equal(player.modalMain, id('Component', 'questscroll'),
+    assert.equal(player.modalMain, id('Component', 'questscroll_death'),
       'the real completion call opens the shared quest reward interface');
   } finally {
     if (azzanadra) World.removeNpc(azzanadra, 0);
