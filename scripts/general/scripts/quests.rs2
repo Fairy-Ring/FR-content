@@ -25,8 +25,15 @@ if ($random < 32) {       // The least common music that plays when completing a
 // Send Quest Scroll. CANDIDATE: Fluffs uses the generic reward scroll below;
 // its inherited custom interface id 2302 is the Rogues' Den puzzle in 377.
 switch_component ($component) {
-    case questlist:itgronigen ://Obveratory: Updates QP before quest scroll is queued & uses custom quest scroll
-        if_openmain(questscroll_itgronigen);
+    case questlist:itgronigen : // Observatory already awards its quest points.
+        // CANDIDATE: 289 Observatory scroll text/model, on the 377 generic scroll.
+        // origin/289 scripts/quests/interfaces/questscroll_itgronigen.if:36-56,105-126.
+        if_settext(questscroll:com_3, $questmessage);
+        if_settext(questscroll:com_9, tostring($questpoints));
+        if_settext(questscroll:com_10, "Quest points.");
+        // 377 telescope_8 = 1174, the 289 furniture_telescope model.
+        if_setmodel(questscroll:com_4, 1174);
+        if_openmain(questscroll);
     case questlist:tbwt : // Tai Bwo Wannai Trio (custom scroll) — port 289
         if_settext(questscroll_tbwt:com_3, $questmessage);
         if_settext(questscroll_tbwt:com_8, tostring($questpoints));
