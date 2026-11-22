@@ -1,6 +1,6 @@
 // ANCIENT_STAFF_COMBAT_ROW: original staff_of_zaros (4675) fields kept below.
 // VERIFIED bonuses: desert-treasure.ancient-staff-combat-row.
-// CANDIDATE: existing weapon_staff combat-style route, not a recovered item field.
+// UNKNOWN engineering: existing weapon_staff combat-style route, not a recovered item field.
 [staff_of_zaros]
 name=Ancient staff
 desc=A magical staff of ancient origin...
