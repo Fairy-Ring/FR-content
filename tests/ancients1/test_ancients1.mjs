@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Full production pack, no server. Expected values come from oracle.mjs, not a replay.
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spells, seeds, outcome } from './oracle.mjs';
@@ -10,7 +12,7 @@ const engine = process.env.HARNESS_ENGINE_DIR ?? path.resolve(content, '../engin
 const pack = path.join(engine, 'data/pack');
 const load = async file => (await import(pathToFileURL(path.join(engine, file)).href)).default;
 const selectedCase = process.argv.includes('--case') ? process.argv[process.argv.indexOf('--case') + 1] : 'all';
-assert(['all', 'smoke', 'shadow', 'blood', 'ice', 'cap'].includes(selectedCase), 'known named mutation case');
+assert(['all', 'smoke', 'shadow', 'blood', 'ice', 'cap', 'death'].includes(selectedCase), 'known named mutation case');
 const selectedSpells = spells.filter(s => selectedCase === 'cap' ? s.name === 'ice_blitz' : selectedCase === 'all' || s.family === ['smoke', 'shadow', 'blood', 'ice'].indexOf(selectedCase) + 1);
 const World = await load('src/engine/World.ts');
 const Player = await load('src/engine/entity/Player.ts'), Npc = await load('src/engine/entity/Npc.ts');
@@ -50,7 +52,7 @@ function player(slot) {
   p.levels[3] = 50;
   return p;
 }
-function fixture({ npcName = 'Cow', npcType, pvp = false, defensive = false, protectedMagic = false } = {}) {
+function fixture({ npcName = 'Cow', npcType, npcLifecycle = EntityLifeCycle.DESPAWN, pvp = false, defensive = false, protectedMagic = false } = {}) {
   World.currentTick = 1000;
   const p = player(1); variable(p, 'damagestyle', defensive ? 2 : 0);
   let target;
@@ -60,7 +62,7 @@ function fixture({ npcName = 'Cow', npcType, pvp = false, defensive = false, pro
   } else {
     const config = npcType ? types.NpcType.getByName(npcType) : Array.from({ length: types.NpcType.count }, (_, i) => types.NpcType.get(i)).find(t => t.name === npcName && t.op?.[1] === 'Attack');
     assert(config, `combat NPC ${npcName}`);
-    target = new Npc(0, p.x + 1, p.z, config.size, config.size, EntityLifeCycle.DESPAWN, 1, config.id, config.blockwalk);
+    target = new Npc(0, p.x + 1, p.z, config.size, config.size, npcLifecycle, 1, config.id, config.blockwalk);
     World.addNpc(target, -1); target.levels[3] = target.baseLevels[3] = 200; target.levels[0] = target.baseLevels[0] = 83;
     nv(target, 'npc_combat_xp_multiplier', 1000); nv(target, 'npc_aggressive_player', p.uid);
   }
@@ -73,7 +75,13 @@ function run(f, name, args = []) {
   return state;
 }
 function dispose(f) {
-  if (!f.pvp) World.removeNpc(f.target, 0);
+  if (!f.pvp) {
+    World.removeNpc(f.target, 0);
+    if (f.target.lifecycle === EntityLifeCycle.RESPAWN) {
+      World.npcs.remove(f.target.nid);
+      f.target.cleanup();
+    }
+  }
   for (const p of f.pvp ? [f.p, f.target] : [f.p]) { World.players[p.slot] = null; p.unlink(); }
 }
 const inventory = p => [...p.getInventory(invId).items].map(item => item && [item.id, item.count]);
@@ -83,14 +91,27 @@ function tick(f) {
   if (!f.pvp) f.target.processQueue();
   f.p.processQueues(); if (f.pvp) f.target.processQueues();
 }
-function cast(f, spell, seed) {
-  const r = row(spell.name); assert(r, spell.name);
+function deathTick(...actors) {
+  World.currentTick++;
+  for (const actor of actors) {
+    if (actor.delayed && World.currentTick >= actor.delayedUntil) actor.delayed = false;
+    if (!actor.delayed && actor.activeScript && actor.activeScript.execution === State.SUSPENDED) {
+      actor.executeScript(actor.activeScript, true, true);
+    }
+    actor.processQueues();
+  }
+}
+function expectedOutcome(f, spell, seed) {
   const npcType = f.pvp ? null : types.NpcType.get(f.target.type);
-  const param = name => { const t = types.ParamType.getByName(name); return npcType.params?.get(t.id) ?? t.defaultInt; };
-  const expected = outcome({ seed, attack: variable(f.p, 'com_magicattack'),
+  const param = name => { const t = types.ParamType.getByName(name); return npcType?.params?.get(t.id) ?? t.defaultInt; };
+  return outcome({ seed, attack: variable(f.p, 'com_magicattack'),
     defence: f.pvp ? variable(f.target, 'com_magicdef') : (f.target.levels[4] + 9) * (64 + param('magicdefence')),
     spell, cap: f.pvp ? spell.maximum : param('max_dealt'), protectedMagic: f.protectedMagic,
     hp: f.target.levels[3], defensive: f.defensive, multiplier: f.pvp ? 1125 : 1000, pvp: f.pvp });
+}
+function cast(f, spell, seed) {
+  const r = row(spell.name); assert(r, spell.name);
+  const expected = expectedOutcome(f, spell, seed);
   const before = { xp: xp(f.p), inv: inventory(f.p), attack: f.target.levels[0], hp: f.p.levels[3] };
   const component = id('Component', `inter_267:com_${spell.widget}`);
   const trigger = Provider.getByTrigger(f.pvp ? Trigger.APPLAYERT : Trigger.APNPCT, component, -1);
@@ -124,6 +145,28 @@ function cast(f, spell, seed) {
   }
   if (expected.accurate && spell.family === 1) assert.equal(f.pvp ? variable(f.target, 'poison') : nv(f.target, 'npc_poison'), expected.poison ? spell.poison : 0, 'Smoke chance/severity');
   return expected;
+}
+function launchFlight(f, spell, seed) {
+  const expected = expectedOutcome(f, spell, seed);
+  assert(expected.accurate, `${spell.name} death-flight seed is accurate`);
+  if (spell.family === 1) assert(expected.poison, `${spell.name} death-flight seed queues Smoke`);
+  const component = id('Component', `inter_267:com_${spell.widget}`);
+  const trigger = Provider.getByTrigger(f.pvp ? Trigger.APPLAYERT : Trigger.APNPCT, component, -1);
+  assert(trigger, `${spell.name} real component dispatch`);
+  assert.equal(trigger.name, `[${f.pvp ? 'applayert' : 'apnpct'},inter_267:com_${spell.widget}]`);
+  JavaRandom.setSeed(seed);
+  const draws = [], native = JavaRandom.nextDouble;
+  JavaRandom.nextDouble = function () { const result = native.call(this); draws.push(result); return result; };
+  try { run(f, trigger.name); } finally { JavaRandom.nextDouble = native; }
+  assert.deepEqual(draws, expected.draws, `${spell.name} death-flight fixed-seed draw order`);
+  assert.equal(JavaRandom.nextInt(1000000), expected.nextRandom, `${spell.name} death-flight RNG suffix`);
+  const pending = [...f.target.queue.all()];
+  const hits = f.pvp
+    ? pending.filter(q => q.script.name === '[queue,pvp_damage]')
+    : pending.filter(q => q.queueId === Trigger.AI_QUEUE2);
+  assert.equal(hits.length, 1, `${spell.name} real queued damage flight`);
+  assert(hits[0].delay > 1, `${spell.name} leaves time for an independent pre-impact kill`);
+  return { expected, hit: hits[0], impactTick: World.currentTick + hits[0].delay + Number(f.pvp) };
 }
 for (const spell of selectedSpells) {
   const r = row(spell.name); assert(r, spell.name);
@@ -306,5 +349,137 @@ if (selectedCase === 'all') {
     settle(capped, 1); assert.equal(capped.p.levels[3], 51, 'Blood shares the existing capped roll');
   } finally { dispose(capped); }
 }
-console.log('PASS Ancient U1: eight rows/widgets, fixed-seed NPC/PvP damage, draw order, XP, payments, protection, queued effects and atomic failures');
+if (selectedCase === 'all' || selectedCase === 'death') {
+  // Load the real respawn collision: native teleports reject unallocated zones.
+  const { unzipSync } = createRequire(path.join(engine, 'package.json'))('fflate');
+  const mapNames = new Set(['m50_50', 'l50_50']);
+  const maps = unzipSync(fs.readFileSync(path.join(pack, '.cache/maps-server.zip')), { filter: e => mapNames.has(e.name) });
+  assert(maps.m50_50 && maps.l50_50, 'packed Lumbridge respawn map is present');
+  World.gameMap.loadPackedMapsquare({ m: maps.m50_50, l: maps.l50_50, n: new Uint8Array(), o: new Uint8Array() }, 50 * 64, 50 * 64);
+  const deathFlights = [
+    { spell: spells.find(s => s.name === 'smoke_blitz'), seed: 6 },
+    { spell: spells.find(s => s.name === 'shadow_blitz'), seed: 0 },
+    { spell: spells.find(s => s.name === 'ice_blitz'), seed: 0 },
+    { spell: spells.find(s => s.name === 'blood_rush'), seed: 6 }
+  ];
+  function advancePlayerDeath(f, source, flight, start) {
+    let ticks = 0;
+    while ((f.target.levels[3] === 0 || f.target.delayed || f.target.activeScript) && ticks < 20) {
+      deathTick(f.p, f.target, source);
+      ticks++;
+    }
+    assert.equal(f.target.levels[3], f.target.baseLevels[3], 'actual player death path restores target Hitpoints');
+    assert.equal(f.target.delayed, false, 'player death delay completes before respawn assertions');
+    assert.equal(f.target.activeScript, null, 'compiled player death script finishes');
+    assert.notDeepEqual([f.target.x, f.target.z], [start.x, start.z], 'compiled player death path teleports the target to respawn');
+    const afterImpact = Math.max(flight.impactTick + 1, World.currentTick + 1);
+    while (World.currentTick < afterImpact) deathTick(f.p, f.target, source);
+  }
+  function turnNpc(npc) {
+    World.currentTick = Math.max(World.currentTick + 1, npc.delayed ? npc.delayedUntil : World.currentTick + 1);
+    npc.turn();
+  }
+  for (const { spell, seed } of deathFlights) {
+    assert(spell, 'death-flight spell is in the independent oracle');
+    const f = fixture({ pvp: true });
+    const source = player(3);
+    try {
+      f.p.levels[3] = 50;
+      f.target.getInventory(invId).removeAll();
+      f.target.levels[3] = 1;
+      const start = { x: f.target.x, z: f.target.z };
+      const flight = launchFlight(f, spell, seed);
+      assert.equal(flight.expected.damage, 1, `${spell.name} is clipped to the one-HP target`);
+      const targetImpacts = [...f.target.queue.all()].filter(q => q.script.name === '[queue,ancient_player_impact]');
+      const bloodHeals = [...f.p.queue.all()].filter(q => q.script.name === '[queue,ancient_blood_heal]');
+      if (spell.family === 3) {
+        assert.equal(targetImpacts.length, 0, 'Blood remains caster-owned; no target-owned Ancient queue is fabricated');
+        assert.equal(bloodHeals.length, 1, 'Blood owns one caster heal queue');
+        assert.equal(bloodHeals[0].delay, flight.hit.delay, 'Blood retains its normal caster-heal tick');
+      } else {
+        assert.equal(targetImpacts.length, 1, `${spell.name} is queued on the real PvP target during flight`);
+      }
+      const casterBefore = f.p.levels[3];
+      run({ p: source, target: f.target }, '[proc,.pvp_damage]', [0, 1]);
+      assert.equal([...f.target.queue.all()].filter(q => q.script.name === '[queue,pvp_damage]').length, 2,
+        `${spell.name} has both the Ancient flight and separate-source damage queued`);
+      deathTick(f.p, f.target, source);
+      assert.equal(f.target.levels[3], 0, `${spell.name} separate-source hit kills the target during flight`);
+      assert(World.currentTick < flight.impactTick, `${spell.name} target dies before the Ancient impact tick`);
+      let bloodAfterImpact = null;
+      if (spell.family === 3) {
+        while (World.currentTick < flight.impactTick - 1) deathTick(f.p, f.target, source);
+        assert.equal(f.p.levels[3], casterBefore, 'Blood caster is not healed before its normal queue tick');
+        deathTick(f.p, f.target, source);
+        assert.equal(World.currentTick, flight.impactTick, 'Blood queue resolves at its normal impact tick');
+        bloodAfterImpact = Math.min(f.p.baseLevels[3], casterBefore + Math.ceil(flight.expected.rolled / 4));
+        assert.equal(f.p.levels[3], bloodAfterImpact, 'Blood heals the caster once at its normal tick after the target died');
+        assert.equal([...f.p.queue.all()].filter(q => q.script.name === '[queue,ancient_blood_heal]').length, 0,
+          'Blood heal queue is consumed once');
+        for (let i = 0; i < 3; i++) deathTick(f.p, f.target, source);
+        assert.equal(f.p.levels[3], bloodAfterImpact, 'Blood does not heal the caster again after its normal tick');
+      }
+      advancePlayerDeath(f, source, flight, start);
+      assert.equal(f.target.levels[3], f.target.baseLevels[3], `${spell.name} target reached respawn after the real death script`);
+      assert.equal([...f.target.queue.all()].filter(q => q.script.name === '[queue,ancient_player_impact]').length, 0,
+        `${spell.name} Ancient impact queue is gone after respawn`);
+      if (spell.family === 1) {
+        assert.equal(variable(f.target, 'poison'), 0, `${spell.name} Smoke poison does not land after respawn`);
+      } else if (spell.family === 2) {
+        assert.equal(f.target.levels[0], f.target.baseLevels[0], `${spell.name} Shadow drain does not land after respawn`);
+      } else if (spell.family === 4) {
+        assert.equal(variable(f.target, 'frozen'), 0, `${spell.name} Ice freeze does not land after respawn`);
+      } else {
+        assert.equal(f.p.levels[3], bloodAfterImpact, 'Blood has no later caster heal after target respawn');
+        assert.equal([...f.p.queue.all()].filter(q => q.script.name === '[queue,ancient_blood_heal]').length, 0,
+          'Blood leaves no later caster heal queued after target respawn');
+      }
+    } finally {
+      dispose(f);
+      if (World.players[source.slot] === source) { World.players[source.slot] = null; source.unlink(); }
+    }
+  }
+  for (const { spell, seed } of deathFlights.filter(({ spell }) => spell.family !== 3)) for (const mode of ['death', 'despawn']) {
+    const f = fixture({ npcLifecycle: EntityLifeCycle.RESPAWN });
+    try {
+      const npc = f.target;
+      npc.levels[3] = 1;
+      npc.lastMovement = -100;
+      nv(npc, 'npc_poison', 0); nv(npc, 'npc_stunned', 0);
+      const type = types.NpcType.get(npc.type);
+      const death = Provider.getByTrigger(Trigger.AI_QUEUE3, type.id, type.category);
+      assert(death, `${spell.name} NPC lifecycle has a compiled death queue`);
+      const flight = launchFlight(f, spell, seed);
+      assert.equal(flight.expected.damage, 1, `${spell.name} is clipped to the one-HP NPC`);
+      assert.equal([...npc.queue.all()].filter(q => q.queueId === Trigger.AI_QUEUE9).length, 1,
+        `${spell.name} family effect is queued on the real NPC`);
+      let ticks = 0;
+      if (mode === 'death') {
+        // A new NPC can regenerate before its first queue pass; use a lethal independent hit.
+        npc.enqueueScript(Trigger.AI_QUEUE2, 0, npc.baseLevels[3]);
+        while (npc.levels[3] > 0 && ticks < 20) { turnNpc(npc); ticks++; }
+        assert.equal(npc.levels[3], 0, `${spell.name} independent queued NPC damage kills during Ancient flight`);
+        assert(World.currentTick < flight.impactTick, `${spell.name} NPC dies before Ancient impact`);
+        assert.equal([...npc.queue.all()].filter(q => q.queueId === Trigger.AI_QUEUE9).length, 1,
+          `${spell.name} effect is still pending when the separate hit kills the NPC`);
+        for (ticks = 0; npc.isActive && ticks < 40; ticks++) turnNpc(npc);
+      } else {
+        World.removeNpc(npc, 1);
+        assert.equal([...npc.queue.all()].filter(q => q.queueId === Trigger.AI_QUEUE9).length, 1,
+          `${spell.name} effect stays queued while the NPC is inactive`);
+      }
+      assert.equal(npc.isActive, false, `${spell.name} ${mode} removes the NPC before respawn`);
+      for (ticks = 0; !npc.isActive && ticks < 2000; ticks++) turnNpc(npc);
+      assert.equal(npc.isActive, true, `${spell.name} real NPC lifecycle respawns through Npc.turn`);
+      assert.equal(npc.levels[3], type.stats[3], `${spell.name} respawn restores NPC Hitpoints from its config`);
+      assert.equal([...npc.queue.all()].length, 0, `${spell.name} NPC reset clears queued Ancient damage and effects`);
+      if (spell.family === 1) assert.equal(nv(npc, 'npc_poison'), 0, `${spell.name} poison does not survive NPC respawn`);
+      else if (spell.family === 2) assert.equal(npc.levels[0], type.stats[0], `${spell.name} Attack drain does not survive NPC respawn`);
+      else assert.equal(nv(npc, 'npc_stunned'), 0, `${spell.name} freeze does not survive NPC respawn`);
+    } finally { dispose(f); }
+  }
+}
+console.log(selectedCase === 'death'
+  ? 'PASS Ancient U1 death-flight: actual player death and NPC respawn queue lifecycle'
+  : 'PASS Ancient U1: eight rows/widgets, fixed-seed NPC/PvP damage, draw order, XP, payments, protection, queued effects and atomic failures');
 process.exit(0); // World imports own maintenance timers; this offline process owns no live server.
