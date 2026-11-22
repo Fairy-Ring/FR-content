@@ -736,17 +736,18 @@ function testPvpContinuation() {
     const spell = ancientRow('ice_rush').spell;
     const expected = oracleCast(fixture, spell);
     assert.equal(expected.accurate, true, 'U1 PvP oracle vector selects an accurate cast');
-    const component = id('Component', `inter_267:com_${spell.widget}`);
     assert(expected.damages[0] > 0, 'PvP fixture predicts positive damage before the next cast');
-    const trigger = Provider.getByTrigger(Trigger.APPLAYERT, component, -1);
-    assert(trigger, 'PvP autocast starts from the packed APPLAYERT spell component');
-    assert.equal(trigger.name, `[applayert,inter_267:com_${spell.widget}]`);
     // The first queued impact also draws once for its human hit sound between casts.
     withOracleDraws([...expected.draws, 0.5, ...expected.draws], () => {
       awaitCasts(fixture, spell, 2, expected, () => {
-        const state = Runner.init(trigger, fixture.player, fixture.primary);
-        assert.equal(fixture.player.runScript(state, true, true), State.FINISHED,
-          'the native PvP component cast finishes and schedules its own continuation');
+        assert.equal(fixture.player.setInteraction(
+          Interaction.ENGINE, fixture.primary, Trigger.APPLAYER2), true,
+          'the player Attack option establishes its native interaction');
+        const trigger = fixture.player.getOpTrigger();
+        assert(trigger, 'the native PvP Attack trigger resolves');
+        assert.equal(trigger.name, '[opplayer2,_]',
+          'Attack uses the engine-dispatched packed OPPLAYER2 handler');
+        fixture.player.processInteraction();
       });
     });
     assert.equal(variable(fixture.player, 'autocast_spell'), field(row('ice_rush'), 'spell'),
