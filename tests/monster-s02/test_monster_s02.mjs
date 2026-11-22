@@ -12,7 +12,7 @@ const content = path.resolve(here, '../..');
 const cannonComplete = /^\^mcannon_complete\s*=\s*(\d+)\s*$/m.exec(
   readFileSync(path.join(content, 'scripts/general/configs/quest.constant'), 'utf8'));
 assert(cannonComplete, 'checked-out Dwarf Cannon completion constant');
-const slayerRefusal = /if \(stat\(slayer\)[^\n]+\) \{[\s\S]*?\bmes\("([^"]+)"\);/.exec(
+const slayerRefusal = /if \(~player_in_combat_check_slayer_refused = true\) \{[\s\S]*?\bmes\("(You need a higher Slayer level to know how to wound this monster\.)"\);/.exec(
   readFileSync(path.join(content, 'scripts/skill_combat/scripts/player/player_combat.rs2'), 'utf8'));
 assert(slayerRefusal, 'checked-out Slayer admission refusal');
 const load = async relative => import(pathToFileURL(path.join(engine, relative)).href);
