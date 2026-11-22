@@ -507,13 +507,15 @@ for (const spell of areaSpells) {
 }
 
 // Single-combat expansion requires both the caster and the primary target to be in multi.
-for (const missingMulti of ['caster', 'primary']) {
-  const f = fixture({ casterAt: [3095, 3800, 0], primaryAt: [3096, 3800, 0], label: `single-${missingMulti}` });
+for (const pvp of [false, true]) for (const missingMulti of ['caster', 'primary']) {
+  const f = fixture({ pvp, casterAt: [3095, 3800, 0], primaryAt: [3096, 3800, 0], label: `single-${pvp ? 'player' : 'npc'}-${missingMulti}` });
   try {
-    const secondary = addNpc(f, { x: f.target.x + 1, z: f.target.z, label: 'single-combat-secondary' });
+    const secondary = pvp
+      ? addPlayer(f, { x: f.target.x + 1, z: f.target.z, label: 'single-combat-secondary' })
+      : addNpc(f, { x: f.target.x + 1, z: f.target.z, label: 'single-combat-secondary' });
     setMultiFor(f, [f.p, f.target, secondary], true);
     setMulti(f, missingMulti === 'caster' ? f.p : f.target, false);
-    const victims = npcVictims(f);
+    const victims = pvp ? playerVictims(f) : npcVictims(f);
     assert.deepEqual(actorLabels(victims), actorLabels([f.target]), `${missingMulti} single-combat gate keeps the primary only`);
     const result = castArea(f, areaSpells.find(spell => spell.name === 'shadow_burst'), 0, victims);
     assert.equal(queueHits(f, secondary).length, 0, 'single-combat secondary receives no damage queue');
@@ -678,13 +680,15 @@ for (const pvp of [false, true]) {
     low.levels[3] = low.baseLevels[3] = 10;
     const dead = addPlayer(f, { x: f.target.x, z: f.target.z + 1, label: 'dead-secondary' });
     variable(dead, 'death', 1);
-    setMultiFor(f, [f.p, f.target, valid, low, dead], true);
+    const outside = addPlayer(f, { x: f.target.x + 2, z: f.target.z, label: 'distance-two-secondary' });
+    const otherPlane = addPlayer(f, { x: f.target.x, z: f.target.z + 1, level: 1, label: 'other-plane-secondary' });
+    setMultiFor(f, [f.p, f.target, valid, low, dead, outside, otherPlane], true);
     const spell = areaSpells.find(entry => entry.name === 'shadow_burst');
     const result = castArea(f, spell, 0, [f.target, valid]);
-    for (const skipped of [low, dead]) {
-      assert.equal(queueHits(f, skipped).length, 0, 'illegal player receives no damage admission');
-      assert.equal(queueRetaliations(f, skipped).length, 0, 'illegal player receives no retaliation admission');
-      assert.deepEqual(skipped.messages, [], 'illegal player secondary refusal is silent');
+    for (const skipped of [low, dead, outside, otherPlane]) {
+      assert.equal(queueHits(f, skipped).length, 0, 'illegal or out-of-area player receives no damage admission');
+      assert.equal(queueRetaliations(f, skipped).length, 0, 'illegal or out-of-area player receives no retaliation admission');
+      assert.deepEqual(skipped.messages, [], 'illegal or out-of-area player secondary refusal is silent');
     }
     assert.deepEqual(f.p.messages, [], 'secondary legality adds no caster dialogue');
     settleArea(f, spell, result);
