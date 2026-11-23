@@ -51872,1303 +51872,251 @@ weight=18oz
 certlink=roving_crystal_book
 certtemplate=template_for_cert
 
-[wilderness_cape_1]
-name=Team-1 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=1
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_1]
 certlink=wilderness_cape_1
 certtemplate=template_for_cert
 
-[wilderness_cape_2]
-name=Team-2 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=2
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_2]
 certlink=wilderness_cape_2
 certtemplate=template_for_cert
 
-[wilderness_cape_3]
-name=Team-3 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=3
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_3]
 certlink=wilderness_cape_3
 certtemplate=template_for_cert
 
-[wilderness_cape_4]
-name=Team-4 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=4
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_4]
 certlink=wilderness_cape_4
 certtemplate=template_for_cert
 
-[wilderness_cape_5]
-name=Team-5 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=5
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_5]
 certlink=wilderness_cape_5
 certtemplate=template_for_cert
 
-[wilderness_cape_6]
-name=Team-6 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=6
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_6]
 certlink=wilderness_cape_6
 certtemplate=template_for_cert
 
-[wilderness_cape_7]
-name=Team-7 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=7
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_7]
 certlink=wilderness_cape_7
 certtemplate=template_for_cert
 
-[wilderness_cape_8]
-name=Team-8 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=8
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_8]
 certlink=wilderness_cape_8
 certtemplate=template_for_cert
 
-[wilderness_cape_9]
-name=Team-9 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=9
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_9]
 certlink=wilderness_cape_9
 certtemplate=template_for_cert
 
-[wilderness_cape_10]
-name=Team-10 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31448
-recol2s=15715
-recol2d=15528
-cost=50
-team=10
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_10]
 certlink=wilderness_cape_10
 certtemplate=template_for_cert
 
-[wilderness_cape_11]
-name=Team-11 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=11
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_11]
 certlink=wilderness_cape_11
 certtemplate=template_for_cert
 
-[wilderness_cape_12]
-name=Team-12 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=12
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_12]
 certlink=wilderness_cape_12
 certtemplate=template_for_cert
 
-[wilderness_cape_13]
-name=Team-13 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=13
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_13]
 certlink=wilderness_cape_13
 certtemplate=template_for_cert
 
-[wilderness_cape_14]
-name=Team-14 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=14
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_14]
 certlink=wilderness_cape_14
 certtemplate=template_for_cert
 
-[wilderness_cape_15]
-name=Team-15 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=15
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_15]
 certlink=wilderness_cape_15
 certtemplate=template_for_cert
 
-[wilderness_cape_16]
-name=Team-16 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=16
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_16]
 certlink=wilderness_cape_16
 certtemplate=template_for_cert
 
-[wilderness_cape_17]
-name=Team-17 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=17
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_17]
 certlink=wilderness_cape_17
 certtemplate=template_for_cert
 
-[wilderness_cape_18]
-name=Team-18 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=18
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_18]
 certlink=wilderness_cape_18
 certtemplate=template_for_cert
 
-[wilderness_cape_19]
-name=Team-19 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=19
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_19]
 certlink=wilderness_cape_19
 certtemplate=template_for_cert
 
-[wilderness_cape_20]
-name=Team-20 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=31533
-recol2s=15715
-recol2d=24035
-cost=50
-team=20
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_20]
 certlink=wilderness_cape_20
 certtemplate=template_for_cert
 
-[wilderness_cape_21]
-name=Team-21 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=21
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_21]
 certlink=wilderness_cape_21
 certtemplate=template_for_cert
 
-[wilderness_cape_22]
-name=Team-22 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=22
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_22]
 certlink=wilderness_cape_22
 certtemplate=template_for_cert
 
-[wilderness_cape_23]
-name=Team-23 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=23
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_23]
 certlink=wilderness_cape_23
 certtemplate=template_for_cert
 
-[wilderness_cape_24]
-name=Team-24 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=24
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_24]
 certlink=wilderness_cape_24
 certtemplate=template_for_cert
 
-[wilderness_cape_25]
-name=Team-25 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=25
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_25]
 certlink=wilderness_cape_25
 certtemplate=template_for_cert
 
-[wilderness_cape_26]
-name=Team-26 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-recol3s=14693
-recol3d=8525
-cost=50
-team=26
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_26]
 certlink=wilderness_cape_26
 certtemplate=template_for_cert
 
-[wilderness_cape_27]
-name=Team-27 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=27
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_27]
 certlink=wilderness_cape_27
 certtemplate=template_for_cert
 
-[wilderness_cape_28]
-name=Team-28 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=28
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_28]
 certlink=wilderness_cape_28
 certtemplate=template_for_cert
 
-[wilderness_cape_29]
-name=Team-29 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=29
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_29]
 certlink=wilderness_cape_29
 certtemplate=template_for_cert
 
-[wilderness_cape_30]
-name=Team-30 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=20223
-recol2s=15715
-recol2d=5428
-cost=50
-team=30
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_30]
 certlink=wilderness_cape_30
 certtemplate=template_for_cert
 
-[wilderness_cape_31]
-name=Team-31 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=31
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_31]
 certlink=wilderness_cape_31
 certtemplate=template_for_cert
 
-[wilderness_cape_32]
-name=Team-32 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=32
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_32]
 certlink=wilderness_cape_32
 certtemplate=template_for_cert
 
-[wilderness_cape_33]
-name=Team-33 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=33
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_33]
 certlink=wilderness_cape_33
 certtemplate=template_for_cert
 
-[wilderness_cape_34]
-name=Team-34 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=34
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_34]
 certlink=wilderness_cape_34
 certtemplate=template_for_cert
 
-[wilderness_cape_35]
-name=Team-35 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=35
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_35]
 certlink=wilderness_cape_35
 certtemplate=template_for_cert
 
-[wilderness_cape_36]
-name=Team-36 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=36
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_36]
 certlink=wilderness_cape_36
 certtemplate=template_for_cert
 
-[wilderness_cape_37]
-name=Team-37 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=37
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_37]
 certlink=wilderness_cape_37
 certtemplate=template_for_cert
 
-[wilderness_cape_38]
-name=Team-38 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=38
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_38]
 certlink=wilderness_cape_38
 certtemplate=template_for_cert
 
-[wilderness_cape_39]
-name=Team-39 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=39
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_39]
 certlink=wilderness_cape_39
 certtemplate=template_for_cert
 
-[wilderness_cape_40]
-name=Team-40 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=7525
-recol2s=15715
-recol2d=20303
-cost=50
-team=40
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_40]
 certlink=wilderness_cape_40
 certtemplate=template_for_cert
 
-[wilderness_cape_41]
-name=Team-41 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=41
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_1
-manwear=obj_wilderness_cape_1_manwear,0
-womanwear=obj_wilderness_cape_1_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_41]
 certlink=wilderness_cape_41
 certtemplate=template_for_cert
 
-[wilderness_cape_42]
-name=Team-42 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=42
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_2
-manwear=obj_wilderness_cape_2_manwear,0
-womanwear=obj_wilderness_cape_2_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_42]
 certlink=wilderness_cape_42
 certtemplate=template_for_cert
 
-[wilderness_cape_43]
-name=Team-43 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=43
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_3
-manwear=obj_wilderness_cape_3_manwear,0
-womanwear=obj_wilderness_cape_3_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_43]
 certlink=wilderness_cape_43
 certtemplate=template_for_cert
 
-[wilderness_cape_44]
-name=Team-44 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=44
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_4
-manwear=obj_wilderness_cape_4_manwear,0
-womanwear=obj_wilderness_cape_4_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_44]
 certlink=wilderness_cape_44
 certtemplate=template_for_cert
 
-[wilderness_cape_45]
-name=Team-45 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=45
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_5
-manwear=obj_wilderness_cape_5_manwear,0
-womanwear=obj_wilderness_cape_5_womanwear,0
-2dxof=3
-2dyof=12
-2dzoom=2130
-2dyan=992
-2dxan=364
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_45]
 certlink=wilderness_cape_45
 certtemplate=template_for_cert
 
-[wilderness_cape_46]
-name=Team-46 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=46
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_6
-manwear=obj_wilderness_cape_6_manwear,0
-womanwear=obj_wilderness_cape_6_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_46]
 certlink=wilderness_cape_46
 certtemplate=template_for_cert
 
-[wilderness_cape_47]
-name=Team-47 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=47
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_7
-manwear=obj_wilderness_cape_7_manwear,0
-womanwear=obj_wilderness_cape_7_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_47]
 certlink=wilderness_cape_47
 certtemplate=template_for_cert
 
-[wilderness_cape_48]
-name=Team-48 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=48
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_8
-manwear=obj_wilderness_cape_8_manwear,0
-womanwear=obj_wilderness_cape_8_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_48]
 certlink=wilderness_cape_48
 certtemplate=template_for_cert
 
-[wilderness_cape_49]
-name=Team-49 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=49
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_9
-manwear=obj_wilderness_cape_9_manwear,0
-womanwear=obj_wilderness_cape_9_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_49]
 certlink=wilderness_cape_49
 certtemplate=template_for_cert
 
-[wilderness_cape_50]
-name=Team-50 cape
-desc=Ooohhh look at the pretty colours...
-recol1s=26284
-recol1d=6243
-recol2s=15715
-recol2d=17538
-cost=50
-team=50
-iop2=Wear
-members=yes
-model=obj_wilderness_cape_10
-manwear=obj_wilderness_cape_10_manwear,0
-womanwear=obj_wilderness_cape_10_womanwear,0
-2dxof=-5
-2dyof=4
-2dzoom=1770
-2dyan=996
-2dxan=304
-wearpos=back
-weight=1lb
 
 [cert_wilderness_cape_50]
 certlink=wilderness_cape_50
