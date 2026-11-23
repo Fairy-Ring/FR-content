@@ -30,8 +30,8 @@ if (npc_param(defend_anim) ! null) npc_anim(npc_param(defend_anim), 20);
 def_npc_uid $primary = npc_uid;
 ~pvm_dragon_halberd_spec_hit(100);
 if(nc_size(npc_type) > 1) {
-    // CANDIDATE: Sweep's second large-target hit. 289 uses full accuracy for both.
-    ~pvm_dragon_halberd_spec_hit(100);
+    // CANDIDATE large-target second hit; UNKNOWN full accuracy (uncited 289 default).
+    ~pvm_dragon_halberd_spec_hit(^dragon_halberd_large_accuracy);
     return;
 }
 def_coord $npc_center = npc_coord;
