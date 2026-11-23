@@ -128,7 +128,7 @@ for (const row of cases) {
 }
 console.log(`EQUIPMENT_ROWS ${cases.length} PASS ${cases.length - failures} FAIL ${failures}`);
 // Report only: out-of-scope missing handlers do not weaken the behavioral assertions above.
-const report = ungatedWearReport(CONTENT_ROOT, ObjType, ScriptProvider, ServerTriggerType);
+const report = ungatedWearReport(ObjType, ScriptProvider, ServerTriggerType);
 console.log(`UNGATED_WEAR_REPORT ${JSON.stringify(report)}`);
 console.log(failures ? 'RESULT FAIL' : 'RESULT PASS (19 packed equipment gates; helper exercised by granite shield)');
 // World owns background workers; no server was started.
