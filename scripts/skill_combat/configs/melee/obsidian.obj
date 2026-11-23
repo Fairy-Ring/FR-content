@@ -106,10 +106,13 @@ param=slashattack,-4
 param=crushattack,62
 param=strengthbonus,56
 param=attackrate,5
-param=slashattack_anim,human_blunt_pound
+// UNKNOWN engineering: use the authored pound animation for the corrected crush route.
+param=crushattack_anim,human_blunt_pound
 param=defend_anim,human_blunt_block
-param=slash_sound,mace_crush
-category=weapon_crush
+// UNKNOWN engineering: use the authored mace sound for the corrected crush route.
+param=crush_sound,mace_crush
+// CANDIDATE: early Old School revision 130801 says crush-only, not a spiked mace.
+category=weapon_blunt
 
 [tzhaar_maul]
 name=Tzhaar-ket-om
@@ -135,4 +138,5 @@ param=strengthbonus,85
 param=crushattack_anim,human_blunt_pound
 param=defend_anim,human_dhsword_block
 param=crush_sound,2H_crush
-category=weapon_crush
+// CANDIDATE: Old School blunt maul styles; reuse the existing blunt family.
+category=weapon_blunt
