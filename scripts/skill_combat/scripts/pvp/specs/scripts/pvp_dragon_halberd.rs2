@@ -1,5 +1,6 @@
 // Port of Lost City 289 457c8943b5c1, same path. Labels: weapon-combat research.
 [label,pvp_dragon_halberd_sa]
+// VERIFIED: Sweep costs 30% special energy (2006 Special attacks wiki, revision 3803).
 ~set_sa_vars(oc_param(inv_getobj(worn, ^wearpos_rhand), sa_energy));
 ~set_pk_vars;
 def_player_uid $caster = uid;
@@ -43,6 +44,7 @@ if ($dir = ^exact_north | $dir = ^exact_south) {
     $side1 = movecoord($center, 0, 0, 1);
     $side2 = movecoord($center, 0, 0, -1);
 }
+// VERIFIED: Sweep hits several enemies in multi-combat; side-tile geometry is CANDIDATE.
 // Same-kind eligibility and pointer restoration follow published area spells.
 // Keep 289's stricter line-of-sight hunt and two side tiles.
 if (map_multiway(coord) = true & map_multiway($center) = true) {

@@ -173,7 +173,20 @@ test('large NPC gets two full hits and no side-target hunt', () => {
         attack(f, n); consumed(f);
         assert.equal(npcHits(n).length, 2, 'large-target second hit exists');
         assert.deepEqual(damage(n), [22, 22], 'both large-target hits retain full accuracy');
+        assert.equal(f.p.stats[2] - level99Experience, 1760, '44 damage awards 44 x 4 x 10 Strength XP tenths');
         assert.equal(npcHits(side).length, 0, 'large primary ends without a neighbour sweep');
+    } finally { dispose(f); }
+});
+
+test('large NPC overkill awards experience only for its remaining hitpoints', () => {
+    const f = fixture();
+    try {
+        const n = npc(f, largeType);
+        n.levels[3] = n.baseLevels[3] = 8;
+        attack(f, n); consumed(f);
+        assert.deepEqual(damage(n), [22, 22], 'both rolled hits are queued unchanged');
+        // Aggressive style: 8 hitpoints x 4 XP per damage x 10 internal tenths.
+        assert.equal(f.p.stats[2] - level99Experience, 320, 'same-tick hits award XP for exactly the 8 hitpoints available');
     } finally { dispose(f); }
 });
 
@@ -264,9 +277,13 @@ test('native PvP attack, side pair, no cross-kind damage and pointer restoration
         const primary = player(f, f.p.x + 1, f.p.z), north = player(f, primary.x, primary.z + 1), south = player(f, primary.x, primary.z - 1);
         const wrong = player(f, primary.x + 1, primary.z), otherKind = npc(f, smallType, primary.x, primary.z + 1);
         for (const e of [f.p, primary, north, south, wrong, otherKind]) multi(f, e);
+        const victimXp = [primary, north, south, wrong].map(p => [...p.stats]);
         const executions = pvpAttack(f, primary); consumed(f);
         for (const victim of [primary, north, south]) assert.equal(playerHits(victim).length, 1, `eligible player victim ${victim.slot} uses published damage queue`);
         assert.equal(playerHits(wrong).length, 0); assert.equal(npcHits(otherKind).length, 0);
+        // Each level-126 victim: 22 damage x 4 XP x 10 tenths x 1125/1000 = 990.
+        assert.equal(f.p.stats[2] - level99Experience, 2970, 'caster gains Strength XP for all three eligible victims');
+        [primary, north, south, wrong].forEach((p, i) => assert.deepEqual([...p.stats], victimXp[i], 'bystander experience is unchanged'));
         assert(executions.some(s => s._activePlayer === f.p && s._activePlayer2 === primary), 'caster and primary pointers restore');
     } finally { dispose(f); }
 });
