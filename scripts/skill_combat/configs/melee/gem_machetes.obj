@@ -32,7 +32,7 @@ param=rangedefence,0
 param=strengthbonus,4
 param=prayerbonus,0
 category=weapon_slash
-// CANDIDATE: earliest numeric item speed, converted from the old speed-bar scale.
+// CANDIDATE: same raw item-page speed as the published plain machete (5 ticks).
 param=attackrate,5
 // CANDIDATE: published plain machete and scimitar combat route.
 // human_machette_chop is used for jungle chopping; combat follows the published family.
@@ -76,7 +76,7 @@ param=rangedefence,0
 param=strengthbonus,6
 param=prayerbonus,0
 category=weapon_slash
-// CANDIDATE: earliest numeric item speed, converted from the old speed-bar scale.
+// CANDIDATE: same raw item-page speed as the published plain machete (5 ticks).
 param=attackrate,5
 // CANDIDATE: published plain machete and scimitar combat route.
 // human_machette_chop is used for jungle chopping; combat follows the published family.
@@ -120,7 +120,7 @@ param=rangedefence,1
 param=strengthbonus,10
 param=prayerbonus,0
 category=weapon_slash
-// CANDIDATE: earliest numeric item speed, converted from the old speed-bar scale.
+// CANDIDATE: raw speed matches published rune dagger and scimitar (4 ticks).
 param=attackrate,4
 // CANDIDATE: published plain machete and scimitar combat route.
 // human_machette_chop is used for jungle chopping; combat follows the published family.
