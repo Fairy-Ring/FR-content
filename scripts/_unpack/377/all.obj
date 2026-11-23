@@ -48840,273 +48840,51 @@ certtemplate=template_for_cert
 certlink=mystic_boots
 certtemplate=template_for_cert
 
-[mystic_hat_dark]
-name=Mystic hat
-desc=A dark magical hat.
-recol1s=21243
-recol1d=14336
-recol2s=11839
-recol2d=6276
-recol3s=8599
-recol3d=0
-recol4s=23359
-recol4d=14336
-recol5s=30653
-recol5d=14336
-cost=15000
-model=obj_mystic_hat
-iop2=Wear
-manwear=obj_mystic_hat_manwear,0
-womanwear=obj_mystic_hat_womanwear,0
-manhead=obj_mystic_hat_manhead
-womanhead=obj_mystic_hat_womanhead
-members=yes
-2dyof=-18
-2dzoom=980
-2dyan=220
-2dxan=208
-wearpos=hat
-weight=1lb
 
 [cert_mystic_hat_dark]
 certlink=mystic_hat_dark
 certtemplate=template_for_cert
 
-[mystic_robe_top_dark]
-name=Mystic robe top
-desc=The upper half of a dark magical robe.
-recol1s=11839
-recol1d=6276
-recol2s=8599
-recol2d=0
-recol3s=23359
-recol3d=14336
-cost=120000
-model=obj_mystic_robe_top
-iop2=Wear
-manwear=obj_mystic_robe_top_manwear,0
-womanwear=obj_mystic_robe_top_womanwear,0
-manwear2=obj_mystic_robe_top_manwear2
-womanwear2=obj_mystic_robe_top_womanwear2
-members=yes
-2dzoom=1870
-2dyan=176
-2dxan=376
-wearpos=torso
-wearpos2=arms
-weight=6lb
 
 [cert_mystic_robe_top_dark]
 certlink=mystic_robe_top_dark
 certtemplate=template_for_cert
 
-[mystic_robe_bottom_dark]
-name=Mystic robe bottom
-desc=The lower half of a dark magical robe.
-recol1s=21243
-recol1d=14336
-recol2s=11839
-recol2d=6276
-recol3s=8599
-recol3d=0
-recol4s=30653
-recol4d=14336
-recol5s=4367
-recol5d=0
-cost=80000
-model=obj_mystic_robe_bottom
-iop2=Wear
-manwear=obj_mystic_robe_bottom_manwear,0
-womanwear=obj_mystic_robe_bottom_womanwear,0
-members=yes
-2dxof=5
-2dyof=7
-2dzoom=1690
-2dyan=2024
-2dxan=408
-wearpos=legs
-weight=4lb
 
 [cert_mystic_robe_bottom_dark]
 certlink=mystic_robe_bottom_dark
 certtemplate=template_for_cert
 
-[mystic_gloves_dark]
-name=Mystic gloves
-desc=Dark magical gloves.
-recol1s=21243
-recol1d=14336
-recol2s=11839
-recol2d=0
-cost=10000
-model=obj_mystic_gloves
-iop2=Wear
-manwear=obj_mystic_gloves_manwear,0
-womanwear=obj_mystic_gloves_womanwear,0
-members=yes
-2dyof=3
-2dzoom=830
-2dxan=536
-wearpos=hands
-weight=1lb
 
 [cert_mystic_gloves_dark]
 certlink=mystic_gloves_dark
 certtemplate=template_for_cert
 
-[mystic_boots_dark]
-name=Mystic boots
-desc=Dark magical boots.
-recol1s=4367
-recol1d=0
-cost=10000
-model=obj_mystic_boots
-iop2=Wear
-manwear=obj_mystic_boots_manwear,0
-womanwear=obj_mystic_boots_womanwear,0
-members=yes
-2dyof=-4
-2dzoom=770
-2dyan=1988
-2dxan=188
-wearpos=feet
-weight=1lb
 
 [cert_mystic_boots_dark]
 certlink=mystic_boots_dark
 certtemplate=template_for_cert
 
-[mystic_hat_light]
-name=Mystic hat
-desc=A bright magical hat.
-recol1s=21243
-recol1d=31430
-recol2s=11839
-recol2d=26425
-recol3s=8599
-recol3d=32767
-recol4s=23359
-recol4d=31430
-recol5s=30653
-recol5d=31430
-cost=15000
-model=obj_mystic_hat
-iop2=Wear
-manwear=obj_mystic_hat_manwear,0
-womanwear=obj_mystic_hat_womanwear,0
-manhead=obj_mystic_hat_manhead
-womanhead=obj_mystic_hat_womanhead
-members=yes
-2dyof=-18
-2dzoom=980
-2dyan=220
-2dxan=208
-wearpos=hat
-weight=1lb
 
 [cert_mystic_hat_light]
 certlink=mystic_hat_light
 certtemplate=template_for_cert
 
-[mystic_robe_top_light]
-name=Mystic robe top
-desc=The upper half of a bright magical robe.
-recol1s=11839
-recol1d=26425
-recol2s=8599
-recol2d=32767
-recol3s=23359
-recol3d=31430
-cost=120000
-model=obj_mystic_robe_top
-iop2=Wear
-manwear=obj_mystic_robe_top_manwear,0
-womanwear=obj_mystic_robe_top_womanwear,0
-manwear2=obj_mystic_robe_top_manwear2
-womanwear2=obj_mystic_robe_top_womanwear2
-members=yes
-2dzoom=1870
-2dyan=176
-2dxan=376
-wearpos=torso
-wearpos2=arms
-weight=6lb
 
 [cert_mystic_robe_top_light]
 certlink=mystic_robe_top_light
 certtemplate=template_for_cert
 
-[mystic_robe_bottom_light]
-name=Mystic robe bottom
-desc=The lower half of a bright magical robe.
-recol1s=21243
-recol1d=31430
-recol2s=11839
-recol2d=26425
-recol3s=8599
-recol3d=32767
-recol4s=30653
-recol4d=31430
-recol5s=4367
-recol5d=32767
-cost=80000
-model=obj_mystic_robe_bottom
-iop2=Wear
-manwear=obj_mystic_robe_bottom_manwear,0
-womanwear=obj_mystic_robe_bottom_womanwear,0
-members=yes
-2dxof=5
-2dyof=7
-2dzoom=1690
-2dyan=2024
-2dxan=408
-wearpos=legs
-weight=4lb
 
 [cert_mystic_robe_bottom_light]
 certlink=mystic_robe_bottom_light
 certtemplate=template_for_cert
 
-[mystic_gloves_light]
-name=Mystic gloves
-desc=Bright magical gloves.
-recol1s=21243
-recol1d=31430
-recol2s=11839
-recol2d=26425
-cost=10000
-model=obj_mystic_gloves
-iop2=Wear
-manwear=obj_mystic_gloves_manwear,0
-womanwear=obj_mystic_gloves_womanwear,0
-members=yes
-2dyof=3
-2dzoom=830
-2dxan=536
-wearpos=hands
-weight=1lb
 
 [cert_mystic_gloves_light]
 certlink=mystic_gloves_light
 certtemplate=template_for_cert
 
-[mystic_boots_light]
-name=Mystic boots
-desc=Bright magical boots.
-recol1s=4367
-recol1d=32767
-cost=10000
-model=obj_mystic_boots
-iop2=Wear
-manwear=obj_mystic_boots_manwear,0
-womanwear=obj_mystic_boots_womanwear,0
-members=yes
-2dyof=-4
-2dzoom=770
-2dyan=1988
-2dxan=188
-wearpos=feet
-weight=1lb
 
 [cert_mystic_boots_light]
 certlink=mystic_boots_light
