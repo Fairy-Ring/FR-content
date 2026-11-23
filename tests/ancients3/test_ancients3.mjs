@@ -50,6 +50,10 @@ const SynthSound = (await load('src/network/game/server/model/SynthSound.ts')).d
 const ResumePauseButtonHandler = (await load('src/network/game/client/handler/ResumePauseButtonHandler.ts')).default;
 const ResumePauseButton = (await load('src/network/game/client/model/ResumePauseButton.ts')).default;
 
+const rsbuf = await import(pathToFileURL(path.join(engine, 'src/network/rsbuf/index.ts')).href);
+const { PlayerInfoProt } = await load('src/network/rsbuf/prot.ts');
+const OpPlayer = (await load('src/network/game/client/model/OpPlayer.ts')).default;
+const OpPlayerHandler = (await load('src/network/game/client/handler/OpPlayerHandler.ts')).default;
 const types = {};
 for (const name of [
   'VarPlayerType', 'VarBitType', 'VarNpcType', 'VarSharedType', 'NpcType', 'LocType', 'SeqType',
@@ -94,6 +98,7 @@ const runeNames = [
 const wornId = id('InvType', 'worn');
 const inventoryId = id('InvType', 'inv');
 const buttonHandler = new IfButtonHandler();
+const playerHandler = new OpPlayerHandler();
 const spellByName = new Map(ancientSpells.map(spell => [spell.name, spell]));
 const ancientRoot = id('Component', 'questscroll_itgronigen');
 const standardRoot = id('Component', 'staff_spells');
@@ -733,6 +738,18 @@ function testContinuationExits() {
 function testPvpContinuation() {
   const fixture = fixtureForPvp('ice_rush');
   try {
+    rsbuf.addPlayer(fixture.player.slot);
+    rsbuf.addPlayer(fixture.primary.slot);
+    fixture.player.masks |= PlayerInfoProt.APPEARANCE;
+    fixture.primary.masks |= PlayerInfoProt.APPEARANCE;
+    World.processInfo();
+    rsbuf.playerInfo(0, fixture.player.slot, 0, 0, true);
+    rsbuf.playerInfo(0, fixture.primary.slot, 0, 0, true);
+    assert(rsbuf.hasPlayer(fixture.player.slot, fixture.primary.slot),
+      'PvP target is visible to the attacking player before OPPLAYER2');
+    fixture.player.resetEntity(false);
+    fixture.primary.resetEntity(false);
+
     const spell = ancientRow('ice_rush').spell;
     const expected = oracleCast(fixture, spell);
     assert.equal(expected.accurate, true, 'U1 PvP oracle vector selects an accurate cast');
@@ -740,9 +757,11 @@ function testPvpContinuation() {
     // The first queued impact also draws once for its human hit sound between casts.
     withOracleDraws([...expected.draws, 0.5, ...expected.draws], () => {
       awaitCasts(fixture, spell, 2, expected, () => {
-        assert.equal(fixture.player.setInteraction(
-          Interaction.ENGINE, fixture.primary, Trigger.APPLAYER2), true,
-          'the player Attack option establishes its native interaction');
+        assert.equal(playerHandler.handle(new OpPlayer(2, fixture.primary.slot), fixture.player), true,
+          'the production OPPLAYER2 handler accepts its visible PvP target');
+        assert.equal(fixture.player.target, fixture.primary, 'OPPLAYER2 selects the requested PvP target');
+        assert.equal(fixture.player.targetOp, Trigger.APPLAYER2, 'OPPLAYER2 establishes the APPLAYER2 interaction');
+        assert.equal(fixture.player.hasInteraction(), true, 'OPPLAYER2 establishes the native player interaction');
         const trigger = fixture.player.getOpTrigger();
         assert(trigger, 'the native PvP Attack trigger resolves');
         assert.equal(trigger.name, '[opplayer2,_]',
@@ -755,6 +774,9 @@ function testPvpContinuation() {
     assert.equal(variable(fixture.player, 'autocast_set') & 1, 1,
       'PvP continuation remains enabled after two native casts');
   } finally {
+    rsbuf.removePlayer(fixture.player.slot);
+    rsbuf.removePlayer(fixture.primary.slot);
+    rsbuf.cleanup();
     disposeCombatFixture(fixture);
   }
 }
