@@ -10395,35 +10395,6 @@ param=sa_energy,350
 certlink=magic_longbow
 certtemplate=template_for_cert
 
-[magic_shortbow]
-name=Magic shortbow
-desc=Short and magical, but still effective.
-recol1s=7330
-recol1d=1451
-members=yes
-cost=1600
-model=obj_shortbow
-2dxof=7
-2dyof=2
-2dzoom=1200
-2dyan=124
-2dxan=508
-iop2=Wield
-wearpos=righthand
-wearpos2=lefthand
-manwear=obj_shortbow_manwear,0
-womanwear=obj_shortbow_manwear,6
-category=weapon_bow
-weight=3lb
-param=rangeattack,69
-param=levelrequire,50
-param=attackrange,7
-param=rangeattack_anim,human_bow
-param=defend_anim,human_unarmedblock
-param=rangeattack_sound,arrowlaunch2
-param=damagetype,^ranged_style
-param=specwep,^true
-param=sa_energy,350
 
 [cert_magic_shortbow]
 certlink=magic_shortbow

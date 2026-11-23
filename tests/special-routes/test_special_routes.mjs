@@ -68,7 +68,7 @@ const itemName = item => itemNames.get(item.id) ?? item.name ?? `object_${item.i
 const level99Experience = 130344310;
 const damageType = { stab: 0, slash: 1, crush: 2, ranged: 3 };
 const expectedCost = new Map([
-    ['excalibur', 1000], ['rune_thrownaxe', 100], ['magic_longbow', 350], ['magic_shortbow', 350],
+    ['excalibur', 1000], ['rune_thrownaxe', 100], ['magic_longbow', 350], ['magic_shortbow', 550],
     ['dragon_dagger', 250], ['dragon_dagger_p', 250], ['dragon_spear', 250], ['dragon_spear_p', 250],
     ['dragon_longsword', 250], ['dragon_battleaxe', 1000], ['dragon_mace', 250], ['rune_claws', 250],
     ['tbwt_dragon_spear_kp', 250], ['dragon_halberd', 300], ['abyssal_whip', 500],
