@@ -76533,39 +76533,6 @@ model=obj_asgarnian_ale
 2dxan=140
 weight=550g
 
-[mud_battlestaff]
-name=Mud battlestaff
-desc=It's a slightly magical stick.
-cost=17000
-model=obj_mud_battlestaff
-2dxof=-2
-2dyof=-3
-2dzoom=1950
-2dyan=560
-2dxan=1816
-iop2=Wield
-manwear=obj_mud_battlestaff_manwear,0
-womanwear=obj_mud_battlestaff_manwear,6
-members=yes
-wearpos=righthand
-weight=5lb
-
-[mystic_mud_staff]
-name=Mystic mud staff
-desc=It's a slightly magical stick.
-cost=45000
-model=obj_mud_battlestaff
-2dxof=-2
-2dyof=-3
-2dzoom=1950
-2dyan=560
-2dxan=1816
-iop2=Wield
-manwear=obj_mud_battlestaff_manwear,0
-womanwear=obj_mud_battlestaff_manwear,6
-members=yes
-wearpos=righthand
-weight=5lb
 
 [invis_ring6]
 name=Onyx ring
