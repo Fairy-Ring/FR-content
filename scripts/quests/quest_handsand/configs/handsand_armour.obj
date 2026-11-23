@@ -1,0 +1,27 @@
+[handsand_pink_cape]
+name=Cape
+desc=It's a bit pink.
+recol1s=8386
+recol1d=23055
+recol2s=31649
+recol2d=30257
+recol3s=8320
+recol3d=23055
+recol4s=15360
+recol4d=14632
+model=obj_red_cape
+2dxof=3
+2dyof=6
+2dzoom=2140
+2dyan=948
+2dxan=400
+iop2=Wear
+manwear=obj_red_cape_manwear,0
+womanwear=obj_red_cape_manwear,0
+members=yes
+wearpos=back
+weight=1lb
+// CANDIDATE: Old School Cape (pink) revision 552801 (2015-10-24), before later rebalances.
+param=slashdefence,1
+param=crushdefence,1
+param=rangedefence,2

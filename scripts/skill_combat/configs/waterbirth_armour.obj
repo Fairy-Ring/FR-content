@@ -1,0 +1,479 @@
+// CANDIDATE: earliest populated Old School per-item vectors for Waterbirth armour. The Sal guide establishes release and acquisition only.
+
+[dagganoth_melee_helm]
+name=Rock-shell helm
+desc=Protective headwear made from crabs. Better than that sounds.
+cost=35200
+model=obj_dagganoth_melee_helm
+iop2=Wear
+manwear=obj_feud_desert_disguise_manwear,0
+manwear2=obj_dagganoth_melee_helm_manwear2
+womanwear=obj_feud_desert_disguise_womanwear,0
+womanwear2=obj_dagganoth_melee_helm_womanwear2
+manhead=obj_dagganoth_melee_helm_manhead
+womanhead=obj_dagganoth_melee_helm_womanhead
+members=yes
+2dzoom=620
+2dxan=60
+wearpos=hat
+wearpos2=head
+weight=6lb
+// CANDIDATE: earliest populated Old School revision 170663 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,-6
+param=rangeattack,-2
+param=stabdefence,30
+param=slashdefence,32
+param=crushdefence,27
+param=magicdefence,-1
+param=rangedefence,30
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_melee_body]
+name=Rock-shell plate
+desc=A sturdy body armour made from rock crab pieces.
+cost=65000
+model=obj_dagganoth_melee_body
+iop2=Wear
+manwear=obj_dagganoth_melee_body_manwear,0
+womanwear=obj_dagganoth_melee_body_womanwear,0
+members=yes
+2dzoom=1190
+2dxan=476
+wearpos=torso
+wearpos2=arms
+weight=22lb
+// CANDIDATE: earliest populated Old School revision 161333 (2013-07-29); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,-30
+param=rangeattack,-10
+param=stabdefence,82
+param=slashdefence,80
+param=crushdefence,72
+param=magicdefence,-6
+param=rangedefence,80
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_melee_legs]
+name=Rock-shell legs
+desc=Some tough leggings made from rock crab parts.
+cost=64000
+model=obj_dagganoth_melee_legs
+iop2=Wear
+manwear=obj_dagganoth_melee_legs_manwear,0
+womanwear=obj_dagganoth_melee_legs_womanwear,0
+members=yes
+2dyof=6
+2dzoom=1720
+2dxan=528
+wearpos=legs
+weight=20lb
+// CANDIDATE: earliest populated Old School revision 150451 (2013-06-05); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,-21
+param=rangeattack,-7
+param=stabdefence,51
+param=slashdefence,49
+param=crushdefence,47
+param=magicdefence,-4
+param=rangedefence,49
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_ranged_helm]
+name=Spined helm
+desc=A helm fit for any Fremennik ranger.
+cost=60000
+model=obj_dagganoth_ranged_helm
+2dxof=3
+2dyof=-4
+2dzoom=810
+2dyan=156
+2dxan=44
+iop2=Wear
+manwear=obj_viking_helmet_manwear,0
+manwear2=obj_dagganoth_ranged_helm_manwear2
+womanwear=obj_viking_helmet_womanwear,0
+womanwear2=obj_dagganoth_ranged_helm_womanwear2
+manhead=obj_dagganoth_ranged_helm_manhead
+womanhead=obj_dagganoth_ranged_helm_womanhead
+members=yes
+wearpos=hat
+wearpos2=head
+weight=6lb
+// CANDIDATE: earliest populated Old School revision 170676 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,-6
+param=slashattack,-6
+param=crushattack,-6
+param=magicattack,-6
+param=rangeattack,6
+param=stabdefence,6
+param=slashdefence,6
+param=crushdefence,6
+param=magicdefence,6
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_ranged_body]
+name=Spined body
+desc=A constant reminder that I'm above a Dagannoth in the food chain.
+cost=7800
+model=obj_dagganoth_ranged_body
+2dxof=-1
+2dyof=4
+2dzoom=1140
+2dxan=460
+iop2=Wear
+manwear=obj_dagganoth_ranged_body_manwear,0
+womanwear=obj_dagganoth_ranged_body_womanwear,0
+members=yes
+wearpos=torso
+wearpos2=arms
+weight=15lb
+// CANDIDATE: earliest populated Old School revision 170671 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,-15
+param=rangeattack,15
+param=stabdefence,40
+param=slashdefence,32
+param=crushdefence,45
+param=magicdefence,20
+param=rangedefence,40
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_ranged_legs]
+name=Spined chaps
+desc=Stylish leg armour for rangers with a lingering smell of raw fish...
+cost=3900
+model=obj_dagganoth_ranged_legs
+2dxof=7
+2dyof=5
+2dzoom=1720
+2dzan=224
+2dxan=488
+iop2=Wear
+manwear=obj_dagganoth_ranged_legs_manwear,0
+womanwear=obj_dagganoth_ranged_legs_womanwear,0
+members=yes
+wearpos=legs
+weight=12lb
+// CANDIDATE: earliest populated Old School revision 170667 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,-10
+param=rangeattack,8
+param=stabdefence,22
+param=slashdefence,16
+param=crushdefence,24
+param=magicdefence,8
+param=rangedefence,22
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_mage_helm]
+name=Skeletal helm
+desc=Make your foes cower by wearing a skull as a helmet!
+cost=10000
+model=obj_dagganoth_mage_helm
+iop2=Wear
+manwear=obj_viking_helmet_manwear,0
+manwear2=obj_dagganoth_mage_helm_manwear2
+womanwear=obj_viking_helmet_womanwear,0
+womanwear2=obj_dagganoth_mage_helm_womanwear2
+manhead=obj_dagganoth_mage_helm_manhead
+womanhead=obj_dagganoth_mage_helm_manhead
+members=yes
+2dyof=-46
+2dzoom=800
+2dyan=1004
+2dxan=228
+ambient=30
+contrast=30
+wearpos=hat
+wearpos2=head
+weight=3lb
+// CANDIDATE: earliest populated Old School revision 170693 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,2
+param=rangeattack,-2
+param=stabdefence,10
+param=slashdefence,9
+param=crushdefence,11
+param=magicdefence,3
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_mage_body]
+name=Skeletal top
+desc=The bones in this armour seem to vibrate with a magical quality...
+cost=45000
+model=obj_dagganoth_mage_body
+iop2=Wear
+manwear=obj_dagganoth_mage_body_manwear,0
+womanwear=obj_dagganoth_mage_body_womanwear,0
+members=yes
+2dzoom=1190
+2dxan=544
+wearpos=torso
+wearpos2=arms
+weight=11lb
+// CANDIDATE: earliest populated Old School revision 170687 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,8
+param=rangeattack,-10
+param=stabdefence,35
+param=slashdefence,25
+param=crushdefence,42
+param=magicdefence,15
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_mage_legs]
+name=Skeletal bottoms
+desc=A superior set of strengthened slacks for any self respecting seer.
+cost=40000
+model=obj_dagganoth_mage_legs
+iop2=Wear
+manwear=obj_dagganoth_mage_legs_manwear,0
+womanwear=obj_dagganoth_mage_legs_womanwear,0
+members=yes
+2dyof=6
+2dzoom=1710
+2dxan=536
+wearpos=legs
+weight=9lb
+// CANDIDATE: earliest populated Old School revision 170701 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,6
+param=rangeattack,-7
+param=stabdefence,22
+param=slashdefence,20
+param=crushdefence,24
+param=magicdefence,10
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_range_feet]
+name=Spined boots
+desc=Some finely crafted Fremennik boots, made from spined dagannoth hide.
+cost=650
+model=obj_dagganoth_range_feet
+2dxof=2
+2dyof=-2
+2dzoom=660
+2dyan=104
+2dxan=96
+members=yes
+iop2=Wear
+manwear=obj_dagganoth_range_feet_manwear,0
+womanwear=obj_dagganoth_range_feet_womanwear,0
+weight=7lb
+wearpos=feet
+// CANDIDATE: earliest populated Old School revision 170739 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,1
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_melee_feet]
+name=Rock-shell boots
+desc=Some Fremennik boots, made from the shards of a rock crabs' shell.
+recol1s=11626
+recol1d=7398
+recol2s=8455
+recol2d=6341
+recol3s=8389
+recol3d=6341
+cost=650
+model=obj_dagganoth_range_feet
+2dxof=2
+2dyof=-2
+2dzoom=660
+2dyan=104
+2dxan=96
+members=yes
+iop2=Wear
+manwear=obj_dagganoth_range_feet_manwear,0
+womanwear=obj_dagganoth_range_feet_womanwear,0
+weight=7lb
+wearpos=feet
+// CANDIDATE: Old School r286743 (2015-04-05); chosen because the VERIFIED Sal Waterbirth set totals (2006-04-29) exclude 1/2/0.
+// The period source prints set totals, not this per-piece split.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,1
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_mage_feet]
+name=Skeletal boots
+desc=Some finely crafted Fremennik boots, made from the bones of a wallasalki.
+recol1s=11626
+recol1d=28405
+recol2s=8455
+recol2d=6341
+recol3s=8389
+recol3d=6341
+cost=650
+model=obj_dagganoth_range_feet
+2dxof=2
+2dyof=-2
+2dzoom=660
+2dyan=104
+2dxan=96
+members=yes
+iop2=Wear
+manwear=obj_dagganoth_range_feet_manwear,0
+womanwear=obj_dagganoth_range_feet_womanwear,0
+weight=7lb
+wearpos=feet
+// CANDIDATE: earliest populated Old School revision 170737 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,1
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_range_gloves]
+name=Spined gloves
+desc=Fremennik gloves stitched together from spined dagannoth hide.
+cost=650
+model=obj_dagganoth_range_gloves
+2dxof=2
+2dyof=-14
+2dzoom=710
+2dyan=2000
+2dxan=332
+members=yes
+iop2=Wear
+manwear=obj_dagganoth_range_gloves_manwear,0
+womanwear=obj_dagganoth_range_gloves_womanwear,0
+weight=7lb
+wearpos=hands
+// CANDIDATE: earliest populated Old School Spined gloves revision 170741 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,2
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_melee_gloves]
+name=Rock-shell gloves
+desc=Fremennik gloves stitched together from rock crab shell shards.
+recol1s=11626
+recol1d=7398
+recol2s=8455
+recol2d=6341
+cost=650
+model=obj_dagganoth_range_gloves
+2dxof=2
+2dyof=-14
+2dzoom=710
+2dyan=2000
+2dxan=332
+members=yes
+iop2=Wear
+manwear=obj_dagganoth_range_gloves_manwear,0
+womanwear=obj_dagganoth_range_gloves_womanwear,0
+weight=7lb
+wearpos=hands
+// CANDIDATE: earliest populated Old School revision 170750 (2013-10-03); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,2
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+
+[dagganoth_mage_gloves]
+name=Skeletal gloves
+desc=Fremennik gloves stitched together from wallasalki bones fragments.
+recol1s=11626
+recol1d=28405
+recol2s=8455
+recol2d=6341
+recol3s=8389
+recol3d=6341
+cost=650
+model=obj_dagganoth_range_gloves
+2dxof=2
+2dyof=-14
+2dzoom=710
+2dyan=2000
+2dxan=332
+members=yes
+iop2=Wear
+manwear=obj_dagganoth_range_gloves_manwear,0
+womanwear=obj_dagganoth_range_gloves_womanwear,0
+weight=7lb
+wearpos=hands
+// CANDIDATE: earliest populated Old School revision 187667 (2014-01-04); per-item value, not a period numeric source.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,2
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0

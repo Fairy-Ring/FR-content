@@ -1,0 +1,21 @@
+[granite_legs]
+name=Granite legs
+desc=These look pretty heavy.
+cost=66000
+model=obj_granite_legs
+iop2=Wear
+manwear=obj_granite_legs_manwear,0
+womanwear=obj_granite_legs_womanwear,0
+members=yes
+2dzoom=1620
+2dyan=1960
+2dxan=276
+wearpos=legs
+weight=35lb
+// VERIFIED: Tip.It Combat, captured 1 May 2006.
+param=rangeattack,-8
+param=stabdefence,43
+param=slashdefence,45
+param=crushdefence,41
+param=magicdefence,-4
+param=rangedefence,68

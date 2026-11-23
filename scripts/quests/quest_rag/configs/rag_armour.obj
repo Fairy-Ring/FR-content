@@ -1,0 +1,49 @@
+[rag_ram_helm]
+name=Ram skull helm
+desc=Makes me feel baaad to the bone.
+cost=1
+model=obj_rag_ram_helm
+2dzoom=848
+2dyan=228
+2dxan=1982
+iop2=Wear
+members=yes
+manwear=obj_rag_ram_helm_manwear,0
+womanwear=obj_rag_ram_helm_womanwear,0
+manhead=obj_rag_ram_helm_manhead
+womanhead=obj_rag_ram_helm_womanhead
+weight=3g
+wearpos=hat
+weight=7lb
+// VERIFIED defences: RuneHQ Rag and Bone Man guide, captured 24 April 2006.
+// CANDIDATE other bonuses: Old School Ram skull helm revision 145589 (2013-05-21).
+param=rangeattack,-2
+param=stabdefence,19
+param=slashdefence,21
+param=crushdefence,16
+param=rangedefence,19
+
+[rag_bonesack]
+name=Bonesack
+desc=The Bonesack is a little old item that protects like leather.
+members=yes
+iop2=Wear
+model=obj_rag_bonesack
+2dxof=7
+2dyof=-10
+2dzoom=1616
+2dyan=1271
+2dxan=135
+iop2=Wear
+manwear=obj_rag_bonesack_manwear,0
+womanwear=obj_rag_bonesack_womanwear,0
+cost=1
+weight=3g
+wearpos=back
+// VERIFIED defences: RuneHQ Rag and Bone Man guide, captured 24 April 2006.
+// CANDIDATE other bonuses: Old School Bonesack revision 155096 (2013-07-06).
+param=stabdefence,4
+param=slashdefence,4
+param=crushdefence,4
+param=magicdefence,4
+param=rangedefence,4
