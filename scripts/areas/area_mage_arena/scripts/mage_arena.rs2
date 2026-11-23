@@ -21,6 +21,30 @@ mes("You pull the lever...");
 p_delay(0);
 ~player_teleport_normal(0_48_61_18_52);
 
+// UNKNOWN access: either lever works at every stage (favourable default).
+// UNKNOWN presentation: reuse the working cellar levers, including their message.
+[oploc1,magearena_lever_in]
+p_arrivedelay;
+anim(human_leverdown, 0);
+sound_synth(lever, 1, 0);
+loc_change(hauntedleverdown, 7);
+if_close;
+p_delay(1);
+mes("You pull the lever...");
+p_delay(0);
+~player_teleport_normal(^mage_arena_lever_in_coord);
+
+[oploc1,magearena_lever_out]
+p_arrivedelay;
+anim(human_leverdown, 0);
+sound_synth(lever, 1, 0);
+loc_change(hauntedleverdown, 7);
+if_close;
+p_delay(1);
+mes("You pull the lever...");
+p_delay(0);
+~player_teleport_normal(^mage_arena_lever_out_coord);
+
 [oploc1,magearena_waterportal1] @jump_in_sparkling_pool(^sparkling_pool_chamber_coord);
 [oploc1,magearena_waterportal2] @jump_in_sparkling_pool(^sparkling_pool_return_coord);
 
