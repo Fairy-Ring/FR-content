@@ -1,4 +1,0 @@
-// CANDIDATE: per-item Old School requirements; equipment-data records retain history checks.
-[opheld2,dwarf_goldrock_helmet] @levelrequire_defence(30, last_slot);
-[opheld2,granite_legs] @levelrequire_defence_and_strength(50, last_slot);
-[opheld2,rag_ram_helm] @levelrequire_defence(30, last_slot);
