@@ -43,6 +43,8 @@ try {
   const { BlockWalk } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/BlockWalk.ts')).href);
   const map = await import(pathToFileURL(path.join(engine, 'src/engine/GameMap.ts')).href);
   const { CollisionType } = await import(pathToFileURL(path.join(engine, 'src/engine/routefinder/index.ts')).href);
+  const { PlayerStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/PlayerStat.ts')).href);
+  const { NpcStat } = await import(pathToFileURL(path.join(engine, 'src/engine/entity/NpcStat.ts')).href);
 
   const types = {};
   for (const name of [
@@ -223,6 +225,33 @@ try {
   assert.ok(reachedLoc(incoming, exit), 'the exit lever is operable from the inward arrival');
   assert.ok(reachedLoc(outgoing, entrance), 'the entrance lever is operable from the outward arrival');
 
+  // The exit is outside the arena, not outside its web-closed entrance room.
+  const exitRoom = collisionComponent(outgoing);
+  assert.equal(exitRoom.size, 7, 'the exit landing has the seven-tile closed walking component of the original map');
+  const webId = requireId(types.LocType, 'bigweb_slashable', 'loc type');
+  const borderingWebs = new Map();
+  for (const key of exitRoom) {
+    const [level, x, z] = key.split(',').map(Number);
+    for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+      const web = World.getLoc(x + dx, z + dz, level, webId);
+      if (web) borderingWebs.set(`${web.x},${web.z}`, web);
+    }
+  }
+  assert.deepEqual([...borderingWebs.keys()].sort(), ['3105,3958', '3106,3958'], 'two native webs close the lever-room doorway');
+  for (const [x, z] of [[3095, 3957], [3093, 3957]]) {
+    assert.ok(World.getLoc(x, z, 0, webId), `the further cellar-approach web exists at ${x},${z}`);
+  }
+  const cellarId = requireId(types.LocType, 'magearena_lever_to_cellar', 'loc type');
+  const cellar = World.getLoc(3090, 3956, 0, cellarId);
+  assert.ok(cellar, 'the original cellar lever is loaded');
+  const cellarType = types.LocType.get(cellarId);
+  assert.equal([...exitRoom].some(key => {
+    const [level, x, z] = key.split(',').map(Number);
+    return map.reachedLoc(level, x, z, cellar.x, cellar.z, cellarType.width, cellarType.length,
+      1, cellar.angle, cellar.shape, cellarType.forceapproach);
+  }), false, 'the closed exit room cannot operate the cellar lever');
+  console.log('PASS packed web-room limit: seven closed tiles, two doorway webs, two further cellar-approach webs');
+
   const stageConstants = [
     'mage_arena_started', 'mage_arena_ogre', 'mage_arena_arachnid', 'mage_arena_ethereal',
     'mage_arena_demon', 'mage_arena_complete', 'mage_arena_prayed_at_statue', 'mage_arena_staff_given'
@@ -263,6 +292,7 @@ try {
     // Capture transport only; Player dispatch, ScriptRunner, packets and map collision stay production code.
     player.write = message => packets.push(message);
     World.players[slot] = player;
+    World.playerLoop.add(player.hash64, player);
     fixturePlayers.add(player);
     for (const item of gear) player.invSet(wornId, item.id, 1, item.slot);
     assert.equal(player.invGetSlot(wornId, gear[0].slot)?.id, gear[0].id, 'the low-level fixture wears a weapon');
@@ -277,6 +307,7 @@ try {
     player.delayed = false;
     player.protect = false;
     player.target = null;
+    player.unlink();
     if (World.players[player.slot] === player) delete World.players[player.slot];
     fixturePlayers.delete(player);
   }
@@ -484,6 +515,91 @@ try {
     clearPlayer(player);
   }
 
+  function attackable(player, npc) {
+    const script = ScriptProvider.getByName('[proc,npc_is_attackable_opt]');
+    assert.ok(script, 'the production NPC attackability procedure is packed');
+    const state = ScriptRunner.init(script, player, npc);
+    ScriptRunner.execute(state);
+    assert.equal(state.execution, ScriptState.FINISHED, 'the real form attackability check finishes');
+    assert.ok(state.isp > 0, 'the attackability procedure returns a stack value');
+    const result = state.intStack[state.isp - 1];
+    assert.ok(result === 0 || result === 1, 'the returned attackability value is boolean');
+    return result;
+  }
+
+  // Later forms already reject non-matching stages before a cast can earn credit.
+  for (const [formStage, typeId] of bossTypeByStage) {
+    if (formStage === integerConstant('mage_arena_started')) continue;
+    const npc = addNpcFixture(types.NpcType.get(typeId).debugname, arenaStart);
+    const player = playerAt(incoming);
+    for (const stage of stages) {
+      player.setVar(stageVarp, stage);
+      assert.equal(attackable(player, npc), Number(stage === formStage),
+        `form ${formStage} accepts only its matching stage, not stage ${stage}`);
+    }
+    World.removeNpc(npc, 0);
+    clearPlayer(player);
+  }
+
+  function finishDeath(state) {
+    for (let step = 0; state.execution !== ScriptState.FINISHED && step < 128; step++) {
+      assert.notEqual(state.execution, ScriptState.ABORTED, 'human kill-credit script does not abort');
+      if (state.execution === ScriptState.NPC_SUSPENDED) {
+        const actor = state.activeNpc;
+        World.currentTick = Math.max(World.currentTick + 1, actor.delayedUntil);
+        actor.delayed = false;
+        actor.executeScript(state);
+      } else if (state.execution === ScriptState.SUSPENDED) {
+        const actor = state.activePlayer;
+        World.currentTick = Math.max(World.currentTick + 1, actor.delayedUntil);
+        actor.delayed = false;
+        actor.executeScript(state, true, true);
+      } else {
+        assert.fail(`unexpected human kill-credit suspension ${state.execution}`);
+      }
+    }
+    assert.equal(state.execution, ScriptState.FINISHED, 'the human kill-credit branch completes');
+  }
+
+  function humanCreditCase(stage, magic, credit = true) {
+    const player = playerAt(outgoing);
+    player.baseLevels[PlayerStat.MAGIC] = magic;
+    player.levels[PlayerStat.MAGIC] = magic;
+    player.setVar(stageVarp, stage);
+    runLever(player, entrance, incoming, `human-credit stage ${stage} Magic ${magic} entrance`);
+    const beforeObjects = new Set([...World.npcs].filter(Boolean));
+    const human = addNpcFixture('kolhuman', arenaStart);
+    human.setVar(varNpcLastCombat, 0);
+    assert.equal(attackable(player, human), 1, 'the unchanged enum still permits the human attack at stages zero and one');
+    if (credit) human.heroPoints.addHero(player.hash64, 30);
+    assert.equal(World.getPlayerByHash64(player.hash64), player, 'native hero lookup sees the fixture player');
+    const type = types.NpcType.get(human.type);
+    const script = ScriptProvider.getByTrigger(ServerTriggerType.AI_QUEUE3, human.type, type.category);
+    assert.ok(script, 'the human death trigger resolves through packed dispatch');
+    assert.equal(script.name, '[ai_queue3,kolhuman]', 'the actual human-form death queue is selected');
+    human.applyDamage(human.levels[NpcStat.HITPOINTS], 1);
+    const state = ScriptRunner.init(script, human);
+    human.executeScript(state);
+    finishDeath(state);
+    const advances = credit && stage === integerConstant('mage_arena_started');
+    assert.equal(player.getVar(stageVarp), advances ? integerConstant('mage_arena_ogre') : stage,
+      `credited human death at stage ${stage}, Magic ${magic}, credit=${credit} preserves the challenge gate`);
+    assert.equal(human.isActive, false, 'the human form dies, including the no-credit branch');
+    const successors = activeArenaBosses().filter(npc => !beforeObjects.has(npc));
+    assert.equal(successors.length, advances ? 1 : 0, 'only a started challenger receives a successor form');
+    if (advances) {
+      assert.equal(successors[0].type, bossTypeByStage.get(integerConstant('mage_arena_ogre')),
+        'the legitimate stage-one kill still creates the original ogre form');
+    }
+    removeAddedNpcs(beforeObjects);
+    clearPlayer(player);
+  }
+
+  for (let magic = 1; magic <= 99; magic++) humanCreditCase(0, magic);
+  humanCreditCase(integerConstant('mage_arena_started'), 60);
+  humanCreditCase(integerConstant('mage_arena_started'), 60, false);
+  console.log('PASS human kill credit: stage zero unchanged at every Magic level 1–99; stage one advances with the original ogre; no-hero death unchanged; later forms reject all non-matching stages');
+
   console.log(`RESULT PASS Mage Arena levers: ${stages.length} states round-trip through both native locs; packed collision sides, Wilderness arrivals, dispatch, delays, messages and Kolodion restarts verified`);
   // player_teleport_normal has no checked-out Tele Block gameplay state/gate;
   // the fixture therefore uses real Wilderness coordinates rather than inventing a status varp.
@@ -532,6 +648,7 @@ try {
       player.activeScript = null;
       player.delayed = false;
       player.protect = false;
+      player.unlink();
       if (World.players[player.slot] === player) delete World.players[player.slot];
     } catch (error) {
       console.error(`failed to remove fixture player ${player.slot}:`, error);

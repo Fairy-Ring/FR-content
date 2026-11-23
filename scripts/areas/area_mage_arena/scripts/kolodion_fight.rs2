@@ -21,7 +21,8 @@
 // Older vids use npc_del and npc_add the whole way?: https://youtu.be/mQmeH32PdNk?list=PLn23LiLYLb1Y4vxMPWXM-CVEvOUfuAP_o
 
 [ai_queue3,kolhuman]
-if (npc_findhero = ^false) {
+// UNKNOWN engineering: only a player who has started Kolodion's challenge can advance on the human form (closes stage-0 lever entry); alternative: the late Old School started-miniquest lever gate.
+if (npc_findhero = ^false | %magearena ! ^mage_arena_started) {
     // in osrs, if you dont have kill credit the npc dies and you dont advance
     // with the exception of the last stage, demon
     gosub(npc_death);
