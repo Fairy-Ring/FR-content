@@ -1,0 +1,4 @@
+// CANDIDATE: later developer statement, 2 September 2017; no recorded accuracy change.
+^dragon_scimitar_accuracy = 125
+// UNKNOWN engineering: eight ticks (4.8 seconds), nearest to the period description's five seconds.
+^dragon_scimitar_prayer_ticks = 8

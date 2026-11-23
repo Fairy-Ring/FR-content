@@ -1,3 +1,5 @@
+// VERIFIED: 50% cost and 10% opponent-energy transfer (2006 Special attacks, revision 3803).
+// CANDIDATE: current-energy basis and 125% slash accuracy follow the later Old School description.
 [label,pvp_abyssal_whip_sa]
 ~set_sa_vars(oc_param(inv_getobj(worn, ^wearpos_rhand), sa_energy));
 ~set_pk_vars;
@@ -20,7 +22,7 @@ if (randominc($attack_roll) > randominc($defence_roll)) {
 anim(slayer_abyssal_whip_attack, 0);
 sound_synth(energydrain, 1, 0);
 .spotanim_pl(sp_attack_abyssal_whip, 96, 0);
-.anim(.%com_defendanim, 20);
+if (.%com_defendanim ! null) .anim(.%com_defendanim, 20);
 .sound_synth(cleave, 1, 0);
 .queue*(pvp_retaliate, 0)(uid);
 ~.pvp_damage(0, $damage);
