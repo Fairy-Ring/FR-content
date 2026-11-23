@@ -90,10 +90,6 @@ if ($choice = 1) {
 [label,arenamage1_lets_fight]
 ~chatplayer("<p,happy>Okay, let's fight.");
 ~chatnpc("<p,neutral>I must first check that you are up to scratch.");
-if (~can_enter_mage_arena = false) {
-    ~mesbox("You cannot enter the arena while carrying weapons or armour."); // rsc, might be mes
-    return;
-}
 ~chatplayer("<p,happy>You don't need to worry about that.");
 ~chatnpc("<p,neutral>Not just any magician can enter, only the most|powerful, the most feared. Before you can use the|power of this arena, you must prove yourself against|me.");
 %magearena = 1;
@@ -103,10 +99,6 @@ if (~can_enter_mage_arena = false) {
 [label,arenamage1_return]
 ~chatplayer("<p,happy>Hi.");
 ~chatnpc("<p,neutral>You return, young conjurer. You obviously have a|taste for the dark side of magic.");
-if (~can_enter_mage_arena = false) {
-    ~mesbox("You cannot enter the arena while carrying weapons or armour."); // rsc, might be mes
-    return;
-}
 // https://youtu.be/gxLEK64MAU8?list=PLn23LiLYLb1Y4vxMPWXM-CVEvOUfuAP_o&t=16
 
 @arenamage1_teleport;
