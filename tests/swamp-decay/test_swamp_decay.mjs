@@ -133,6 +133,34 @@ for (const [mx, mz] of [[53, 52], [53, 53], [54, 52], [54, 53]]) {
 }
 console.log('PASS four mapzone entries, duplicate suppression, controlled expiry and bounded damage');
 
+// These packed-map components can be reached without entering the swamp.
+for (const [label, x, z] of [
+  ['Salve west bank', 3392, 3420],
+  ['southern west-bank tip', 3392, 3328],
+  ['Mortton northern tip', 3440, 3328],
+  ['Mortton eastern bank', 3518, 3370],
+]) {
+  const p = player(3380, 3420);
+  p.teleport(x, z, 0); tick(p);
+  assert.equal(p.getVar(stateVar), 0, `${label}: map-square entry does not activate decay`);
+  assert.equal(timer(p), undefined, `${label}: no timer outside the swamp`);
+  tick(p, interval);
+  assert(!p.messages.includes(decayLine), `${label}: no decay`);
+}
+for (const [label, x, z] of [
+  ['first gate-side map-square tile', 3443, 3455],
+  ['Myreque hideout arrival', 3509, 3449],
+  ['Mortton boat arrival', 3498, 3380],
+  ['southern western approach', 3428, 3328],
+  ['southern eastern approach', 3500, 3328],
+  ['eastern swamp edge', 3519, 3375],
+]) {
+  const p = player();
+  enter(p, x, z);
+  assert(timer(p), `${label}: included in the shared area definition`);
+}
+console.log('PASS external banks excluded and gate, route arrivals and all four area rectangles included');
+
 const random = JavaRandom.nextDouble;
 try {
   for (const [sample, expected] of [[0, minDamage], [1 - Number.EPSILON, maxDamage]]) {
@@ -155,22 +183,33 @@ for (const [x, z] of [[3434, 3330], [3448, 3344], [3440, 3338], [3434, 9730], [3
 }
 console.log('PASS carried and worn sickle, both inclusive protected rectangles, silent full intervals');
 
-const p = player(); enter(p, 3412, 3400);
-p.teleport(3412, 3456, 0); tick(p); expiry(p);
+const p = player(); enter(p, 3412, 3400); expiry(p);
+assert(p.messages.includes(decayLine), 'player has already decayed before leaving');
+p.messages.length = 0;
+p.teleport(3392, 3420, 0); tick(p);
+assert(!p.messages.includes(endLine), 'west-bank exit is reported at the next interval, not immediately');
+expiry(p);
 assert.equal(p.getVar(stateVar), 0);
 assert.equal(timer(p), undefined);
 assert.equal(p.messages.filter(text => text === endLine).length, 1);
 tick(p, interval * 2);
 assert.equal(p.messages.filter(text => text === endLine).length, 1, 'end line occurs once');
+// Return by an actual map-square entry, as the gate and route arrivals do.
+p.teleport(3443, 3456, 0); tick(p);
 enter(p, 3412, 3400);
 assert.equal(p.getVar(stateVar), 1, 'return starts again');
 
 // Use real walking across an allocated map-square border, without teleporting the tested step.
-const walker = player(3440, 3456);
-walker.queueWaypoint(3440, 3455);
-tick(walker, 2);
-assert.equal(walker.z, 3455, 'walk crosses the northern border');
-assert(timer(walker), 'walking starts decay');
+const walker = player(3443, 3457);
+assert.equal(timer(walker), undefined, 'post-gate row 3457 remains outside the inherited extent');
+walker.queueWaypoint(3443, 3455);
+tick(walker);
+assert.equal(walker.z, 3456);
+assert.equal(timer(walker), undefined, 'post-gate row 3456 remains outside the inherited extent');
+tick(walker);
+assert.equal(walker.z, 3455, 'walk crosses onto the first decay-bound tile');
+tick(walker); // World drains the queued mapzone trigger before the following movement phase.
+assert(timer(walker), 'walking across the map-square border starts decay');
 
 // Save/load and initial-login notification are production methods; transient state is not seeded.
 const saved = p.save();

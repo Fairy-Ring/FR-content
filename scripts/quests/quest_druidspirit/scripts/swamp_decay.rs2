@@ -1,6 +1,17 @@
-// CANDIDATE: Lost City 289's four map squares, following Old School areas.
+// UNKNOWN engineering bounds from the 377 collision map. Exclude both river banks
+// and Mort'ton's northern tip, without omitting swamp-side arrival components.
+// One definition serves map-square entry and the timer's leaving check.
+[proc,in_swamp_decay_area]()(boolean)
+if(inzone(0_53_52_8_2, 0_54_53_56_63, coord) = true |
+   inzone(0_53_52_35_0, 0_53_52_43_1, coord) = true |
+   inzone(0_54_52_40_0, 0_54_52_50_1, coord) = true |
+   inzone(0_54_52_57_47, 0_54_53_63_63, coord) = true) {
+    return(true);
+}
+return(false);
+
 [proc,start_swampdecay_timer]
-if(inzone(0_53_52_0_0, 0_54_53_63_63, coord) = false | %mortmyre = ^true) { // don't start another timer if already in mort myre
+if(%mortmyre = ^true | ~in_swamp_decay_area = false) { // don't start another timer if already in mort myre
     return;
 }
 %mortmyre = ^true;
@@ -13,7 +24,7 @@ settimer(swamp_decay, ^swamp_decay_interval);
 if(inzone(0_53_52_42_2, 0_53_52_56_16, coord) = true | inzone(0_53_152_42_2, 0_53_152_56_16, coord) = true) {
     return;
 }
-if(inzone(0_53_52_0_0, 0_54_53_63_63, coord) = false) {
+if(~in_swamp_decay_area = false) {
     %mortmyre = ^false;
     cleartimer(swamp_decay);
     // CANDIDATE: Old School Swamp decay, revision 14222486 (30 December 2021).
