@@ -23,3 +23,10 @@
 
 ^druidspirit_nature_stone = 0
 ^druidspirit_spirit_stone = 1
+
+// CANDIDATE: Old School Swamp decay, revision 14222398 (30 December 2021).
+// Two minutes at 600 ms per tick. The 2007 account says "at random times".
+^swamp_decay_interval = 200
+// CANDIDATE: same source, "between one and three damage".
+^swamp_decay_damage_min = 1
+^swamp_decay_damage_max = 3

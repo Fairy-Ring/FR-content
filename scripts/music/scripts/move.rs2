@@ -229,16 +229,24 @@
 [mapzone,0_53_49] @music_playbyregion(coord);
 [mapzone,0_53_50] @music_playbyregion(coord);
 [mapzone,0_53_51] @music_playbyregion(coord);
-[mapzone,0_53_52] @music_playbyregion(coord);
-[mapzone,0_53_53] @music_playbyregion(coord);
+[mapzone,0_53_52]
+~start_swampdecay_timer; // CANDIDATE: Lost City 289 port gap (no historical cite).
+@music_playbyregion(coord);
+[mapzone,0_53_53]
+~start_swampdecay_timer; // CANDIDATE: Lost City 289 port gap (no historical cite).
+@music_playbyregion(coord);
 [mapzone,0_53_54] @music_playbyregion(coord);
 [mapzone,0_53_55] @music_playbyregion(coord);
 [mapzone,0_54_48] @music_playbyregion(coord);
 [mapzone,0_54_49] @music_playbyregion(coord);
 [mapzone,0_54_50] @music_playbyregion(coord);
 [mapzone,0_54_51] @music_playbyregion(coord);
-[mapzone,0_54_52] @music_playbyregion(coord);
-[mapzone,0_54_53] @music_playbyregion(coord);
+[mapzone,0_54_52]
+~start_swampdecay_timer; // CANDIDATE: Lost City 289 port gap (no historical cite).
+@music_playbyregion(coord);
+[mapzone,0_54_53]
+~start_swampdecay_timer; // CANDIDATE: Lost City 289 port gap (no historical cite).
+@music_playbyregion(coord);
 [mapzone,0_54_54]
 ~wanted_canifis_entry;
 @music_playbyregion(coord);
