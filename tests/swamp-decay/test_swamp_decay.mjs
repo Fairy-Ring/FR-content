@@ -161,6 +161,88 @@ for (const [label, x, z] of [
 }
 console.log('PASS external banks excluded and gate, route arrivals and all four area rectangles included');
 
+// Classify collision components independently of the authored decay predicate.
+// Closing every walking step into the inside components models closed swamp
+// entrances without excluding the bound itself (which would hide added tiles).
+{
+  const map = await load('engine/GameMap.ts');
+  const { CollisionType } = await load('engine/routefinder/index.ts');
+  const inSquares = (x, z) => x >= 53 * 64 && x < 55 * 64 && z >= 52 * 64 && z < 54 * 64;
+  const inSurvey = (x, z) => x >= 3200 && x <= 3711 && z >= 3072 && z <= 3647;
+  const key = (x, z) => x * 65536 + z;
+  const free = (x, z) => map.isZoneAllocated(0, x, z) && !map.isMapBlocked(x, z, 0);
+  const directions = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+  const outsideStarts = [
+    ['gate north', 3444, 3462], ['Canifis', 3490, 3480],
+    ['temple east', 3410, 3470], ['temple west', 3380, 3485],
+    ['Salve west bank', 3385, 3400], ['west bank within the squares', 3393, 3410],
+    ['Mortton', 3486, 3288], ['Mortton rowboat', 3522, 3284],
+    ['south of the bridge', 3429, 3326], ['Burgh de Rott', 3495, 3250],
+    ['east side', 3545, 3450], ['Barrows', 3565, 3289],
+  ];
+  const insideStarts = [
+    ['inside the gate', 3443, 3457], ['first decay tile', 3443, 3455],
+    ['Mortton boat arrival', 3498, 3380], ['Myreque arrival', 3509, 3449],
+  ];
+  for (const [label, x, z] of [...outsideStarts, ...insideStarts]) {
+    assert(inSurvey(x, z) && free(x, z), `${label}: flood start is allocated and walkable`);
+  }
+  for (const x of [3443, 3444]) {
+    assert.equal(map.canTravel(0, x, 3457, 0, 1, 1, 0, CollisionType.NORMAL), false, 'packed north gate stays closed');
+    assert.equal(map.canTravel(0, x, 3458, 0, -1, 1, 0, CollisionType.NORMAL), false, 'packed south gate stays closed');
+  }
+  function flood(starts, allowed) {
+    const seen = new Set(), tiles = [];
+    for (const [label, x, z] of starts) {
+      assert(allowed(x, z), `${label}: flood starts on its declared side of the entrances`);
+      if (!seen.has(key(x, z))) { seen.add(key(x, z)); tiles.push([x, z]); }
+    }
+    for (let at = 0; at < tiles.length; at++) {
+      const [x, z] = tiles[at];
+      for (const [dx, dz] of directions) {
+        const nx = x + dx, nz = z + dz, next = key(nx, nz);
+        if (!inSurvey(nx, nz) || !allowed(nx, nz) || seen.has(next) || !free(nx, nz) ||
+            !map.canTravel(0, x, z, dx, dz, 1, 0, CollisionType.NORMAL)) continue;
+        seen.add(next); tiles.push([nx, nz]);
+      }
+    }
+    return { seen, tiles };
+  }
+  // These components depend on the packed map and arrival tiles, never on the
+  // area proc. Both adding an outside tile and omitting an inside tile stay visible.
+  const core = flood(insideStarts.filter(([, x, z]) => inSquares(x, z)), inSquares);
+  const outside = flood(outsideStarts, (x, z) => !core.seen.has(key(x, z)));
+  const inside = flood(insideStarts, (x, z) => !outside.seen.has(key(x, z)));
+  const areaScript = ScriptProvider.getByName('[proc,in_swamp_decay_area]');
+  assert(areaScript, 'packed shared decay predicate');
+  const probe = player();
+  function executeAt(script, x, z) {
+    probe.x = x; probe.z = z;
+    const state = ScriptRunner.init(script, probe, null, []);
+    assert.equal(probe.runScript(state, true, true), ScriptState.FINISHED, 'compiled boundary probe finishes synchronously');
+    return state;
+  }
+  const inArea = (x, z) => executeAt(areaScript, x, z).popInt() === 1;
+  function protectedGrotto(x, z) {
+    // Ask the compiled timer, not a copied pair of rectangles. With no sickle,
+    // only its grotto branch silently preserves the active flag outside the area.
+    probe.setVar(stateVar, 1);
+    probe.messages.length = 0;
+    probe.spotanimId = -1;
+    const hp = probe.levels[PlayerStat.HITPOINTS];
+    executeAt(timerScript, x, z);
+    return probe.getVar(stateVar) === 1 && probe.messages.length === 0 &&
+      probe.levels[PlayerStat.HITPOINTS] === hp && probe.spotanimId === -1;
+  }
+  assert.equal(probe.invTotal(id('InvType', 'inv'), id('ObjType', 'silver_sickle_blessed')), 0);
+  assert.equal(probe.invTotal(id('InvType', 'worn'), id('ObjType', 'silver_sickle_blessed')), 0);
+  assert.deepEqual(outside.tiles.filter(([x, z]) => inArea(x, z)), [],
+    'no outside-reachable tile is inside the compiled decay bound');
+  assert.deepEqual(inside.tiles.filter(([x, z]) => inSquares(x, z) && !inArea(x, z) && !protectedGrotto(x, z)), [],
+    'no swamp-reachable tile of the four squares is outside the compiled bound and grotto protection');
+  console.log('PASS packed collision floods: outside inclusion and inside omission sets are empty; every start is walkable');
+}
+
 const random = JavaRandom.nextDouble;
 try {
   for (const [sample, expected] of [[0, minDamage], [1 - Number.EPSILON, maxDamage]]) {
