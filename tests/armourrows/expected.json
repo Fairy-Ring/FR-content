@@ -1,0 +1,3324 @@
+[
+  {
+    "name": "death_spikedboots",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 2,
+      "crushdefence": 2,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 2,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-spiked-boots#oldest_populated"
+    ],
+    "wiki_revision": 170993,
+    "wiki_date": "2013-10-06T02:09:09Z",
+    "label": "CANDIDATE",
+    "position": [
+      2846,
+      3722,
+      0
+    ]
+  },
+  {
+    "name": "mdaughter_bear_helmet",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -3,
+      "rangeattack": -3,
+      "stabdefence": 12,
+      "slashdefence": 14,
+      "crushdefence": 10,
+      "magicdefence": 7,
+      "rangedefence": 9,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-bearhead#oldest_populated"
+    ],
+    "wiki_revision": 123931,
+    "wiki_date": "2013-03-09T15:12:35Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "dwarf_goldrock_helmet",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 10,
+      "crushdefence": 20,
+      "magicdefence": 0,
+      "rangedefence": 10,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-gold-helmet#oldest_populated"
+    ],
+    "wiki_revision": 166126,
+    "wiki_date": "2013-09-01T20:15:44Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "dragon_plateskirt",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -21,
+      "rangeattack": -7,
+      "stabdefence": 68,
+      "slashdefence": 66,
+      "crushdefence": 63,
+      "magicdefence": -4,
+      "rangedefence": 65,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 60
+    },
+    "quests": {},
+    "source_ids": [
+      "src.equipgates-tipit-combat-20060501160122#lines 918-932"
+    ],
+    "wiki_revision": 103308,
+    "wiki_date": "2006-08-02T22:09:26Z",
+    "label": "VERIFIED"
+  },
+  {
+    "name": "granite_legs",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": -8,
+      "stabdefence": 43,
+      "slashdefence": 45,
+      "crushdefence": 41,
+      "magicdefence": -4,
+      "rangedefence": 68,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.equipgates-tipit-combat-20060501160122#lines 1046-1069,1100-1107",
+      "src.armourrows-osrs-granite-legs#current_query requirements"
+    ],
+    "wiki_revision": 173965,
+    "wiki_date": "2013-10-31T03:27:03Z",
+    "label": "VERIFIED"
+  },
+  {
+    "name": "handsand_pink_cape",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-cape-pink#oldest_populated"
+    ],
+    "wiki_revision": 552801,
+    "wiki_date": "2015-10-24T06:28:28Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "studded_body_trim_gold",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -4,
+      "rangeattack": 8,
+      "stabdefence": 18,
+      "slashdefence": 25,
+      "crushdefence": 22,
+      "magicdefence": 8,
+      "rangedefence": 25,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-studded-body-g#oldest_populated"
+    ],
+    "wiki_revision": 210375,
+    "wiki_date": "2014-03-31T23:14:58Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "studded_body_trim_fur",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -4,
+      "rangeattack": 8,
+      "stabdefence": 18,
+      "slashdefence": 25,
+      "crushdefence": 22,
+      "magicdefence": 8,
+      "rangedefence": 25,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-studded-body-t#oldest_populated"
+    ],
+    "wiki_revision": 210519,
+    "wiki_date": "2014-04-01T23:29:54Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "studded_chaps_trim_gold",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -5,
+      "rangeattack": 6,
+      "stabdefence": 15,
+      "slashdefence": 16,
+      "crushdefence": 17,
+      "magicdefence": 6,
+      "rangedefence": 16,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-studded-chaps-g#oldest_populated"
+    ],
+    "wiki_revision": 133428,
+    "wiki_date": "2013-04-01T21:10:26Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "studded_chaps_trim_fur",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -5,
+      "rangeattack": 6,
+      "stabdefence": 15,
+      "slashdefence": 16,
+      "crushdefence": 17,
+      "magicdefence": 6,
+      "rangedefence": 16,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-studded-chaps-t#oldest_populated"
+    ],
+    "wiki_revision": 210520,
+    "wiki_date": "2014-04-01T23:31:35Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "dragonhide_body_trim_gold",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -15,
+      "rangeattack": 15,
+      "stabdefence": 40,
+      "slashdefence": 32,
+      "crushdefence": 45,
+      "magicdefence": 20,
+      "rangedefence": 40,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-green-d-hide-body-g#oldest_populated"
+    ],
+    "wiki_revision": 210161,
+    "wiki_date": "2014-03-30T19:24:05Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "dragonhide_body_trim",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -15,
+      "rangeattack": 15,
+      "stabdefence": 40,
+      "slashdefence": 32,
+      "crushdefence": 45,
+      "magicdefence": 20,
+      "rangedefence": 40,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-green-d-hide-body-t#oldest_populated"
+    ],
+    "wiki_revision": 210162,
+    "wiki_date": "2014-03-30T19:25:53Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "blue_dragonhide_body_trim_gold",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -15,
+      "rangeattack": 20,
+      "stabdefence": 45,
+      "slashdefence": 37,
+      "crushdefence": 50,
+      "magicdefence": 30,
+      "rangedefence": 45,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-blue-d-hide-body-g#oldest_populated"
+    ],
+    "wiki_revision": 198758,
+    "wiki_date": "2014-02-21T22:30:23Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "blue_dragonhide_body_trim",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -15,
+      "rangeattack": 20,
+      "stabdefence": 45,
+      "slashdefence": 37,
+      "crushdefence": 50,
+      "magicdefence": 30,
+      "rangedefence": 45,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-blue-d-hide-body-t#oldest_populated"
+    ],
+    "wiki_revision": 210154,
+    "wiki_date": "2014-03-30T18:55:55Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "dragonhide_chaps_trim_gold",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -10,
+      "rangeattack": 8,
+      "stabdefence": 22,
+      "slashdefence": 16,
+      "crushdefence": 24,
+      "magicdefence": 8,
+      "rangedefence": 22,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-green-d-hide-chaps-g#oldest_populated"
+    ],
+    "wiki_revision": 210160,
+    "wiki_date": "2014-03-30T19:22:17Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "dragonhide_chaps_trim",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -10,
+      "rangeattack": 8,
+      "stabdefence": 22,
+      "slashdefence": 16,
+      "crushdefence": 24,
+      "magicdefence": 8,
+      "rangedefence": 22,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-green-d-hide-chaps-t#oldest_populated"
+    ],
+    "wiki_revision": 210163,
+    "wiki_date": "2014-03-30T19:27:05Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "blue_dragonhide_chaps_trim_gold",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -10,
+      "rangeattack": 11,
+      "stabdefence": 25,
+      "slashdefence": 19,
+      "crushdefence": 27,
+      "magicdefence": 14,
+      "rangedefence": 25,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-blue-d-hide-chaps-g#oldest_populated"
+    ],
+    "wiki_revision": 198761,
+    "wiki_date": "2014-02-21T22:33:55Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "blue_dragonhide_chaps_trim",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -10,
+      "rangeattack": 11,
+      "stabdefence": 25,
+      "slashdefence": 19,
+      "crushdefence": 27,
+      "magicdefence": 14,
+      "rangedefence": 25,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-blue-d-hide-chaps-t#oldest_populated"
+    ],
+    "wiki_revision": 210156,
+    "wiki_date": "2014-03-30T18:57:12Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wizards_robe_trim_gold",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 3,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-wizard-robe-g#oldest_populated"
+    ],
+    "wiki_revision": 228504,
+    "wiki_date": "2014-06-13T20:25:30Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wizards_robe_trim",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 3,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-wizard-robe-t#oldest_populated"
+    ],
+    "wiki_revision": 191114,
+    "wiki_date": "2014-01-22T00:47:33Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "rag_ram_helm",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": -2,
+      "stabdefence": 19,
+      "slashdefence": 21,
+      "crushdefence": 16,
+      "magicdefence": 0,
+      "rangedefence": 19,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-ram-skull-helm#oldest_populated"
+    ],
+    "wiki_revision": 145589,
+    "wiki_date": "2013-05-21T02:21:59Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "rag_bonesack",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 4,
+      "slashdefence": 4,
+      "crushdefence": 4,
+      "magicdefence": 4,
+      "rangedefence": 4,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-bonesack#oldest_populated"
+    ],
+    "wiki_revision": 155096,
+    "wiki_date": "2013-07-06T21:43:24Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_1",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 51875-51895"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_2",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 51901-51921"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_3",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 51927-51947"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_4",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 51953-51973"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_5",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 51979-51999"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_6",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52005-52025"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_7",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52031-52051"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_8",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52057-52077"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_9",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52083-52103"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_10",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52109-52129"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_11",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52135-52155"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_12",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52161-52181"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_13",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52187-52207"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_14",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52213-52233"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_15",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52239-52259"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_16",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52265-52285"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_17",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52291-52311"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_18",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52317-52337"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_19",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52343-52363"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_20",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52369-52389"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_21",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52395-52415"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_22",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52421-52441"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_23",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52447-52467"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_24",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52473-52493"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_25",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52499-52519"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_26",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52525-52547"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_27",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52553-52573"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_28",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52579-52599"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_29",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52605-52625"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_30",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52631-52651"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_31",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52657-52677"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_32",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52683-52703"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_33",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52709-52729"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_34",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52735-52755"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_35",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52761-52781"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_36",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52787-52807"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_37",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52813-52833"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_38",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52839-52859"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_39",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52865-52885"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_40",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52891-52911"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_41",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52917-52937"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_42",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52943-52963"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_43",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52969-52989"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_44",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 52995-53015"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_45",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 53021-53041"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_46",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 53047-53067"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_47",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 53073-53093"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_48",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 53099-53119"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_49",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 53125-53145"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wilderness_cape_50",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-team-cape#oldest_populated_116315",
+      "src.n618w-capes-change-check#Team_cape_revision_15352308",
+      "src.n618w-capes-introduction#2005-02-22",
+      "src.n618w-cache-objects#wilderness_cape_1_through_50",
+      "src.content-unpack-obj#lines 53151-53171"
+    ],
+    "wiki_revision": 116315,
+    "wiki_date": "2013-02-27T14:25:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "ham_shirt",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 2,
+      "slashdefence": 2,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-ham-robes#revision_195853",
+      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.content-unpack-obj#lines 51673-51691"
+    ],
+    "wiki_revision": 195853,
+    "wiki_date": "2014-02-14T21:28:57Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "ham_robe",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 2,
+      "slashdefence": 2,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-ham-robes#revision_195853",
+      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.content-unpack-obj#lines 51697-51712"
+    ],
+    "wiki_revision": 195853,
+    "wiki_date": "2014-02-14T21:28:57Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "ham_hood",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 1,
+      "slashdefence": 2,
+      "crushdefence": 0,
+      "magicdefence": 1,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-ham-robes#revision_195853",
+      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.content-unpack-obj#lines 51718-51739"
+    ],
+    "wiki_revision": 195853,
+    "wiki_date": "2014-02-14T21:28:57Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "ham_cloak",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 1,
+      "slashdefence": 1,
+      "crushdefence": 0,
+      "magicdefence": 2,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-ham-robes#revision_195853",
+      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.content-unpack-obj#lines 51745-51770"
+    ],
+    "wiki_revision": 195853,
+    "wiki_date": "2014-02-14T21:28:57Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "ham_gloves",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 1,
+      "slashdefence": 2,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-ham-robes#revision_195853",
+      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.content-unpack-obj#lines 51797-51816"
+    ],
+    "wiki_revision": 195853,
+    "wiki_date": "2014-02-14T21:28:57Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "ham_boots",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 1,
+      "slashdefence": 1,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-ham-robes#revision_195853",
+      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.content-unpack-obj#lines 51822-51839"
+    ],
+    "wiki_revision": 195853,
+    "wiki_date": "2014-02-14T21:28:57Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "basic_tk_helm",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -6,
+      "rangeattack": -2,
+      "stabdefence": 13,
+      "slashdefence": 14,
+      "crushdefence": 11,
+      "magicdefence": -1,
+      "rangedefence": 13,
+      "strengthbonus": 0,
+      "prayerbonus": 3
+    },
+    "requirements": {
+      "defence": 20
+    },
+    "quests": {
+      "rd_main": 2
+    },
+    "source_ids": [
+      "src.armourrows-osrs-initiate-sallet#oldest_populated_116147",
+      "src.armourrows-osrs-initiate-sallet#requirements_133102",
+      "src.armourrows-osrs-initiate-sallet#history_change_15227380",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.equipgates-sal-defence-20060418030115#lines_198-199",
+      "src.report-rd-initiate-wear#Requirement-to-evidence",
+      "src.content-obj-pack#5574-5576",
+      "src.content-unpack-obj#lines 67166-67189"
+    ],
+    "wiki_revision": 116147,
+    "wiki_date": "2013-02-26T22:31:39Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "basic_tk_body",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -30,
+      "rangeattack": -10,
+      "stabdefence": 46,
+      "slashdefence": 44,
+      "crushdefence": 38,
+      "magicdefence": -6,
+      "rangedefence": 44,
+      "strengthbonus": 0,
+      "prayerbonus": 6
+    },
+    "requirements": {
+      "defence": 20
+    },
+    "quests": {
+      "rd_main": 2
+    },
+    "source_ids": [
+      "src.armourrows-osrs-initiate-hauberk#oldest_populated_116271",
+      "src.armourrows-osrs-initiate-hauberk#requirements_133106",
+      "src.armourrows-osrs-initiate-hauberk#history_change_15183080",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.equipgates-sal-defence-20060418030115#lines_198-199",
+      "src.report-rd-initiate-wear#Requirement-to-evidence",
+      "src.content-obj-pack#5574-5576",
+      "src.content-unpack-obj#lines 67191-67213"
+    ],
+    "wiki_revision": 116271,
+    "wiki_date": "2013-02-27T09:32:17Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "basic_tk_legs",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -21,
+      "rangeattack": -7,
+      "stabdefence": 24,
+      "slashdefence": 22,
+      "crushdefence": 20,
+      "magicdefence": -4,
+      "rangedefence": 22,
+      "strengthbonus": 0,
+      "prayerbonus": 5
+    },
+    "requirements": {
+      "defence": 20
+    },
+    "quests": {
+      "rd_main": 2
+    },
+    "source_ids": [
+      "src.armourrows-osrs-initiate-cuisse#oldest_populated_116273",
+      "src.armourrows-osrs-initiate-cuisse#requirements_133112",
+      "src.armourrows-osrs-initiate-cuisse#history_change_15227381",
+      "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
+      "src.equipgates-sal-defence-20060418030115#lines_198-199",
+      "src.report-rd-initiate-wear#Requirement-to-evidence",
+      "src.content-obj-pack#5574-5576",
+      "src.content-unpack-obj#lines 67215-67234"
+    ],
+    "wiki_revision": 116273,
+    "wiki_date": "2013-02-27T09:43:51Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "slayer_mirror_shield",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 10,
+      "slashdefence": 15,
+      "crushdefence": 5,
+      "magicdefence": 5,
+      "rangedefence": 10,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "slayer": 25,
+      "defence": 20
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mirror-shield#oldest_populated_118369",
+      "src.armourrows-osrs-mirror-shield#history_check_15183131",
+      "src.slayer-zybez-guide-20060220#Mirror Shield lines 262-263",
+      "src.content-unpack-obj#lines 49642-49657"
+    ],
+    "wiki_revision": 118369,
+    "wiki_date": "2013-03-02T16:26:42Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "wallbeast_spike_helmet",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -6,
+      "rangeattack": -2,
+      "stabdefence": 9,
+      "slashdefence": 10,
+      "crushdefence": 7,
+      "magicdefence": -1,
+      "rangedefence": 9,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "defence": 5
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-spiny-helmet#oldest_populated_123224",
+      "src.armourrows-osrs-spiny-helmet#history_check_15183236",
+      "src.slayer-zybez-guide-20060220#Spiny Helmet lines 232-233",
+      "src.content-unpack-obj#lines 54435-54454"
+    ],
+    "wiki_revision": 123224,
+    "wiki_date": "2013-03-07T01:37:19Z",
+    "label": "CANDIDATE",
+    "normal_minimum_skills": {
+      "slayer": 1
+    }
+  },
+  {
+    "name": "dagganoth_melee_helm",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -6,
+      "rangeattack": -2,
+      "stabdefence": 30,
+      "slashdefence": 32,
+      "crushdefence": 27,
+      "magicdefence": -1,
+      "rangedefence": 30,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-melee-helm#oldest_populated_170663",
+      "src.armourrows-osrs-waterbirth-melee-helm-current#revision_15183185",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 170663,
+    "wiki_date": "2013-10-03T04:38:58Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_melee_body",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -30,
+      "rangeattack": -10,
+      "stabdefence": 82,
+      "slashdefence": 80,
+      "crushdefence": 72,
+      "magicdefence": -6,
+      "rangedefence": 80,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-melee-body#oldest_populated_161333",
+      "src.armourrows-osrs-waterbirth-melee-body-current#revision_15183187",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 161333,
+    "wiki_date": "2013-07-29T05:31:42Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_melee_legs",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -21,
+      "rangeattack": -7,
+      "stabdefence": 51,
+      "slashdefence": 49,
+      "crushdefence": 47,
+      "magicdefence": -4,
+      "rangedefence": 49,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-melee-legs#oldest_populated_150451",
+      "src.armourrows-osrs-waterbirth-melee-legs-current#revision_15183186",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 150451,
+    "wiki_date": "2013-06-05T22:13:58Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_melee_feet",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 1,
+      "slashdefence": 2,
+      "crushdefence": 0,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-melee-feet#oldest_populated_170732",
+      "src.armourrows-osrs-waterbirth-melee-feet-current#revision_15184398",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160",
+      "src.armourrows-osrs-waterbirth-melee-feet-history-286743#revision_286743"
+    ],
+    "wiki_revision": 170732,
+    "wiki_date": "2013-10-03T22:32:27Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_melee_gloves",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 2,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-melee-gloves#oldest_populated_170750",
+      "src.armourrows-osrs-waterbirth-melee-gloves-current#revision_15184401",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 170750,
+    "wiki_date": "2013-10-03T23:55:37Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_ranged_helm",
+    "bonuses": {
+      "stabattack": -6,
+      "slashattack": -6,
+      "crushattack": -6,
+      "magicattack": -6,
+      "rangeattack": 6,
+      "stabdefence": 6,
+      "slashdefence": 6,
+      "crushdefence": 6,
+      "magicdefence": 6,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-ranged-helm#oldest_populated_170676",
+      "src.armourrows-osrs-waterbirth-ranged-helm-current#revision_15184394",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 166-176"
+    ],
+    "wiki_revision": 170676,
+    "wiki_date": "2013-10-03T06:59:59Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_ranged_body",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -15,
+      "rangeattack": 15,
+      "stabdefence": 40,
+      "slashdefence": 32,
+      "crushdefence": 45,
+      "magicdefence": 20,
+      "rangedefence": 40,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-ranged-body#oldest_populated_170671",
+      "src.armourrows-osrs-waterbirth-ranged-body-current#revision_15183233",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 166-176"
+    ],
+    "wiki_revision": 170671,
+    "wiki_date": "2013-10-03T06:25:32Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_ranged_legs",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": -10,
+      "rangeattack": 8,
+      "stabdefence": 22,
+      "slashdefence": 16,
+      "crushdefence": 24,
+      "magicdefence": 8,
+      "rangedefence": 22,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-ranged-legs#oldest_populated_170667",
+      "src.armourrows-osrs-waterbirth-ranged-legs-current#revision_15322358",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 166-176",
+      "src.armourrows-osrs-waterbirth-ranged-legs-history-170669#revision_170669"
+    ],
+    "wiki_revision": 170667,
+    "wiki_date": "2013-10-03T06:07:33Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_range_feet",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-range-feet#oldest_populated_170739",
+      "src.armourrows-osrs-waterbirth-range-feet-current#revision_15240629",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 166-176"
+    ],
+    "wiki_revision": 170739,
+    "wiki_date": "2013-10-03T22:52:42Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_range_gloves",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 2,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-range-gloves#oldest_populated_170748",
+      "src.armourrows-osrs-waterbirth-range-gloves-current#revision_15240650",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 166-176",
+      "src.armourrows-osrs-waterbirth-range-gloves-current#requirements"
+    ],
+    "wiki_revision": 170748,
+    "wiki_date": "2013-10-03T23:54:34Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_mage_helm",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 2,
+      "rangeattack": -2,
+      "stabdefence": 10,
+      "slashdefence": 9,
+      "crushdefence": 11,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-mage-helm#oldest_populated_170693",
+      "src.armourrows-osrs-waterbirth-mage-helm-current#revision_15184396",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 170693,
+    "wiki_date": "2013-10-03T07:43:26Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_mage_body",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 8,
+      "rangeattack": -10,
+      "stabdefence": 35,
+      "slashdefence": 25,
+      "crushdefence": 42,
+      "magicdefence": 15,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-mage-body#oldest_populated_170687",
+      "src.armourrows-osrs-waterbirth-mage-body-current#revision_15184395",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 170687,
+    "wiki_date": "2013-10-03T07:23:35Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_mage_legs",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 6,
+      "rangeattack": -7,
+      "stabdefence": 22,
+      "slashdefence": 20,
+      "crushdefence": 24,
+      "magicdefence": 10,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-mage-legs#oldest_populated_170701",
+      "src.armourrows-osrs-waterbirth-mage-legs-current#revision_15184397",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 170701,
+    "wiki_date": "2013-10-03T08:42:39Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_mage_feet",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-mage-feet#oldest_populated_170737",
+      "src.armourrows-osrs-waterbirth-mage-feet-current#revision_15184399",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 170737,
+    "wiki_date": "2013-10-03T22:45:57Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "dagganoth_mage_gloves",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 0,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 2,
+      "magicdefence": 0,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {},
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-waterbirth-mage-gloves#oldest_populated_187667",
+      "src.armourrows-osrs-waterbirth-mage-gloves-current#revision_15234035",
+      "src.content-unpack-obj#original_row",
+      "src.waterbirth-sal-island-20060429#lines 149-160"
+    ],
+    "wiki_revision": 187667,
+    "wiki_date": "2014-01-04T03:59:17Z",
+    "label": "CANDIDATE",
+    "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
+  },
+  {
+    "name": "mystic_hat_dark",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 4,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 4,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-hat-dark#oldest_populated_181672",
+      "src.armourrows-osrs-mystic-mystic-hat-dark-current#revision_15322508",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-hat-dark#release"
+    ],
+    "wiki_revision": 181672,
+    "wiki_date": "2013-12-06T21:53:20Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_robe_top_dark",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 20,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 20,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-robe-top-dark#oldest_populated_1267288",
+      "src.armourrows-osrs-mystic-mystic-robe-top-dark-current#revision_15322464",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-robe-top-dark#release"
+    ],
+    "wiki_revision": 1267288,
+    "wiki_date": "2016-02-16T19:38:26Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_robe_bottom_dark",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 15,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 15,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-robe-bottom-dark#oldest_populated_185362",
+      "src.armourrows-osrs-mystic-mystic-robe-bottom-dark-current#revision_15322454",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-robe-bottom-dark#release"
+    ],
+    "wiki_revision": 185362,
+    "wiki_date": "2013-12-23T22:38:55Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_gloves_dark",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 3,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-gloves-dark#oldest_populated_1267382",
+      "src.armourrows-osrs-mystic-mystic-gloves-dark-current#revision_15322511",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-gloves-dark#release"
+    ],
+    "wiki_revision": 1267382,
+    "wiki_date": "2016-02-16T19:43:31Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_boots_dark",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 3,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-boots-dark#oldest_populated_179249",
+      "src.armourrows-osrs-mystic-mystic-boots-dark-current#revision_15186321",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-boots-dark#release",
+      "src.armourrows-osrs-mystic-mystic-boots-dark-history-179250#revision_179250"
+    ],
+    "wiki_revision": 179249,
+    "wiki_date": "2013-11-26T15:17:10Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_hat_light",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 4,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 4,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-hat-light#oldest_populated_1267281",
+      "src.armourrows-osrs-mystic-mystic-hat-light-current#revision_15322508",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-hat-light#release"
+    ],
+    "wiki_revision": 1267281,
+    "wiki_date": "2016-02-16T19:38:19Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_robe_top_light",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 20,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 20,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-robe-top-light#oldest_populated_1267285",
+      "src.armourrows-osrs-mystic-mystic-robe-top-light-current#revision_15322464",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-robe-top-light#release"
+    ],
+    "wiki_revision": 1267285,
+    "wiki_date": "2016-02-16T19:38:23Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_robe_bottom_light",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 15,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 15,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-robe-bottom-light#oldest_populated_1267290",
+      "src.armourrows-osrs-mystic-mystic-robe-bottom-light-current#revision_15322454",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-robe-bottom-light#release"
+    ],
+    "wiki_revision": 1267290,
+    "wiki_date": "2016-02-16T19:38:29Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_gloves_light",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 3,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-gloves-light#oldest_populated_1267383",
+      "src.armourrows-osrs-mystic-mystic-gloves-light-current#revision_15322511",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-gloves-light#release"
+    ],
+    "wiki_revision": 1267383,
+    "wiki_date": "2016-02-16T19:43:31Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_boots_light",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 3,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.armourrows-osrs-mystic-mystic-boots-light#oldest_populated_1267509",
+      "src.armourrows-osrs-mystic-mystic-boots-light-current#revision_15186321",
+      "src.content-unpack-obj#original_row",
+      "src.armourrows-osrs-mystic-mystic-boots-light#release"
+    ],
+    "wiki_revision": 1267509,
+    "wiki_date": "2016-02-16T19:49:37Z",
+    "label": "CANDIDATE"
+  },
+  {
+    "name": "mystic_hat",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 4,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 4,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.equipgates-sal-magic-20060424160218#Clothing & Shields row mystic_hat",
+      "src.armourrows-osrs-blue-mystic-hat#oldest_populated_1267279",
+      "src.armourrows-osrs-blue-mystic-hat-current#revision_15322508",
+      "src.content-unpack-obj#original_row"
+    ],
+    "wiki_revision": 1267279,
+    "wiki_date": "2016-02-16T19:38:17Z",
+    "label": "CANDIDATE",
+    "bonus_labels": {
+      "stabattack": "CANDIDATE",
+      "slashattack": "CANDIDATE",
+      "crushattack": "CANDIDATE",
+      "magicattack": "VERIFIED",
+      "rangeattack": "CANDIDATE",
+      "stabdefence": "CANDIDATE",
+      "slashdefence": "CANDIDATE",
+      "crushdefence": "CANDIDATE",
+      "magicdefence": "VERIFIED",
+      "rangedefence": "CANDIDATE",
+      "strengthbonus": "CANDIDATE",
+      "prayerbonus": "CANDIDATE"
+    }
+  },
+  {
+    "name": "mystic_robe_top",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 20,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 20,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.equipgates-sal-magic-20060424160218#Clothing & Shields row mystic_robe_top",
+      "src.armourrows-osrs-blue-mystic-robe-top#oldest_populated_211956",
+      "src.armourrows-osrs-blue-mystic-robe-top-current#revision_15322464",
+      "src.content-unpack-obj#original_row"
+    ],
+    "wiki_revision": 211956,
+    "wiki_date": "2014-04-12T14:59:27Z",
+    "label": "CANDIDATE",
+    "bonus_labels": {
+      "stabattack": "CANDIDATE",
+      "slashattack": "CANDIDATE",
+      "crushattack": "CANDIDATE",
+      "magicattack": "VERIFIED",
+      "rangeattack": "CANDIDATE",
+      "stabdefence": "CANDIDATE",
+      "slashdefence": "CANDIDATE",
+      "crushdefence": "CANDIDATE",
+      "magicdefence": "VERIFIED",
+      "rangedefence": "CANDIDATE",
+      "strengthbonus": "CANDIDATE",
+      "prayerbonus": "CANDIDATE"
+    }
+  },
+  {
+    "name": "mystic_robe_bottom",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 15,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 15,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.equipgates-sal-magic-20060424160218#Clothing & Shields row mystic_robe_bottom",
+      "src.armourrows-osrs-blue-mystic-robe-bottom#oldest_populated_1267289",
+      "src.armourrows-osrs-blue-mystic-robe-bottom-current#revision_15322454",
+      "src.content-unpack-obj#original_row"
+    ],
+    "wiki_revision": 1267289,
+    "wiki_date": "2016-02-16T19:38:27Z",
+    "label": "CANDIDATE",
+    "bonus_labels": {
+      "stabattack": "CANDIDATE",
+      "slashattack": "CANDIDATE",
+      "crushattack": "CANDIDATE",
+      "magicattack": "VERIFIED",
+      "rangeattack": "CANDIDATE",
+      "stabdefence": "CANDIDATE",
+      "slashdefence": "CANDIDATE",
+      "crushdefence": "CANDIDATE",
+      "magicdefence": "VERIFIED",
+      "rangedefence": "CANDIDATE",
+      "strengthbonus": "CANDIDATE",
+      "prayerbonus": "CANDIDATE"
+    }
+  },
+  {
+    "name": "mystic_gloves",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 3,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.equipgates-sal-magic-20060424160218#Clothing & Shields row mystic_gloves",
+      "src.armourrows-osrs-blue-mystic-gloves#oldest_populated_1267380",
+      "src.armourrows-osrs-blue-mystic-gloves-current#revision_15322511",
+      "src.content-unpack-obj#original_row"
+    ],
+    "wiki_revision": 1267380,
+    "wiki_date": "2016-02-16T19:43:28Z",
+    "label": "CANDIDATE",
+    "bonus_labels": {
+      "stabattack": "CANDIDATE",
+      "slashattack": "CANDIDATE",
+      "crushattack": "CANDIDATE",
+      "magicattack": "VERIFIED",
+      "rangeattack": "CANDIDATE",
+      "stabdefence": "CANDIDATE",
+      "slashdefence": "CANDIDATE",
+      "crushdefence": "CANDIDATE",
+      "magicdefence": "VERIFIED",
+      "rangedefence": "CANDIDATE",
+      "strengthbonus": "CANDIDATE",
+      "prayerbonus": "CANDIDATE"
+    }
+  },
+  {
+    "name": "mystic_boots",
+    "bonuses": {
+      "stabattack": 0,
+      "slashattack": 0,
+      "crushattack": 0,
+      "magicattack": 3,
+      "rangeattack": 0,
+      "stabdefence": 0,
+      "slashdefence": 0,
+      "crushdefence": 0,
+      "magicdefence": 3,
+      "rangedefence": 0,
+      "strengthbonus": 0,
+      "prayerbonus": 0
+    },
+    "requirements": {
+      "DEFENCE": 20,
+      "MAGIC": 40
+    },
+    "quests": {},
+    "source_ids": [
+      "src.equipgates-sal-magic-20060424160218#Clothing & Shields row mystic_boots",
+      "src.armourrows-osrs-blue-mystic-boots#oldest_populated_1267514",
+      "src.armourrows-osrs-blue-mystic-boots-current#revision_15186321",
+      "src.content-unpack-obj#original_row"
+    ],
+    "wiki_revision": 1267514,
+    "wiki_date": "2016-02-16T19:49:44Z",
+    "label": "CANDIDATE",
+    "bonus_labels": {
+      "stabattack": "CANDIDATE",
+      "slashattack": "CANDIDATE",
+      "crushattack": "CANDIDATE",
+      "magicattack": "VERIFIED",
+      "rangeattack": "CANDIDATE",
+      "stabdefence": "CANDIDATE",
+      "slashdefence": "CANDIDATE",
+      "crushdefence": "CANDIDATE",
+      "magicdefence": "VERIFIED",
+      "rangedefence": "CANDIDATE",
+      "strengthbonus": "CANDIDATE",
+      "prayerbonus": "CANDIDATE"
+    }
+  }
+]
