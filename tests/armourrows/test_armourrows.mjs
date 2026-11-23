@@ -41,7 +41,7 @@ function attempt(row, base = row.requirements, quests = row.quests, boosted = fa
   const id = ObjType.getId(row.name);
   assert(id >= 0, `${row.name}: packed identity`);
   const type = ObjType.get(id);
-  assert.equal(type.iop[1], 'Wear', `${row.name}: real inventory option two`);
+  assert.equal(type.iop[1], row.inventory_option ?? 'Wear', `${row.name}: real inventory option two`);
   const player = new Player('armourrowtest', 0n, 0n);
   player.uid = 1;
   player.pid = 1;

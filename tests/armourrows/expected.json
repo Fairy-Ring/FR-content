@@ -2195,7 +2195,7 @@
       "defence": 20
     },
     "quests": {
-      "rd_main": 2
+      "recruitmentdrive": 2
     },
     "source_ids": [
       "src.armourrows-osrs-initiate-sallet#oldest_populated_116147",
@@ -2231,7 +2231,7 @@
       "defence": 20
     },
     "quests": {
-      "rd_main": 2
+      "recruitmentdrive": 2
     },
     "source_ids": [
       "src.armourrows-osrs-initiate-hauberk#oldest_populated_116271",
@@ -2267,7 +2267,7 @@
       "defence": 20
     },
     "quests": {
-      "rd_main": 2
+      "recruitmentdrive": 2
     },
     "source_ids": [
       "src.armourrows-osrs-initiate-cuisse#oldest_populated_116273",
@@ -2285,6 +2285,7 @@
   },
   {
     "name": "slayer_mirror_shield",
+    "inventory_option": "Wield",
     "bonuses": {
       "stabattack": 0,
       "slashattack": 0,
