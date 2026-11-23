@@ -202,14 +202,43 @@ assert.equal(p.getVar(stateVar), 1, 'return starts again');
 // Use real walking across an allocated map-square border, without teleporting the tested step.
 const walker = player(3443, 3457);
 assert.equal(timer(walker), undefined, 'post-gate row 3457 remains outside the inherited extent');
+const walkingEvents = [];
+const walkingMessage = walker.messageGame;
+walker.messageGame = text => {
+  walkingEvents.push({ kind: 'message', text, tick: World.currentTick });
+  return walkingMessage(text);
+};
+const walkingDamage = walker.applyDamage.bind(walker);
+walker.applyDamage = (damage, type) => {
+  walkingEvents.push({ kind: 'hit', tick: World.currentTick });
+  return walkingDamage(damage, type);
+};
 walker.queueWaypoint(3443, 3455);
 tick(walker);
 assert.equal(walker.z, 3456);
 assert.equal(timer(walker), undefined, 'post-gate row 3456 remains outside the inherited extent');
 tick(walker);
 assert.equal(walker.z, 3455, 'walk crosses onto the first decay-bound tile');
+const crossingTick = World.currentTick;
 tick(walker); // World drains the queued mapzone trigger before the following movement phase.
 assert(timer(walker), 'walking across the map-square border starts decay');
+assert.equal(timer(walker).clock, crossingTick + 1, 'walking queues the mapzone trigger for the next player phase');
+tick(walker, interval - 1);
+assert.deepEqual(walkingEvents, [], 'no decay before the full interval measured from timer creation');
+tick(walker);
+assert.deepEqual(walkingEvents.map(event => event.kind), ['message', 'hit'], 'the timer prints before synchronous damage_self');
+const [walkingLine, walkingHit] = walkingEvents;
+assert.equal(walkingLine.text, decayLine);
+assert.equal(walkingLine.tick, crossingTick + interval + 1, 'timer expires exactly at its controlled clock plus interval');
+assert.equal(walkingHit.tick, walkingLine.tick, 'damage is immediate in the same server cycle, not queued');
+// NetworkPlayer.writeInner sends the message before World.processClientsOut sends
+// PLAYER_INFO. cell.mjs counts completed PLAYER_INFO packets: the message sees
+// the preceding counter, while the hit in the following packet sees the new one.
+const receivedLineTick = walkingLine.tick - 1;
+const receivedHitTick = walkingHit.tick;
+assert.equal(receivedLineTick - crossingTick, interval, 'received line minus crossing is exactly the named interval');
+assert.equal(receivedHitTick - receivedLineTick, 1, 'received hit minus line is exactly one PLAYER_INFO counter boundary');
+console.log('PASS exact received-clock projection: decay line at interval, same-cycle hit one counter boundary later');
 
 // Save/load and initial-login notification are production methods; transient state is not seeded.
 const saved = p.save();
