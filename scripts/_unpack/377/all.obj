@@ -49639,22 +49639,6 @@ members=yes
 iop1=Activate
 weight=2g
 
-[slayer_mirror_shield]
-name=Mirror shield
-desc=I can just about see things in this shield's reflection.
-cost=1000
-model=obj_slayer_mirror_shield
-2dxof=1
-2dzoom=1910
-2dyan=400
-2dxan=480
-iop2=Wield
-wearpos=lefthand
-weight=5lb
-manwear=obj_slayer_mirror_shield_manwear,0
-womanwear=obj_slayer_mirror_shield_manwear,6
-members=yes
-cost=5000
 
 [cert_slayer_mirror_shield]
 certlink=slayer_mirror_shield
@@ -53259,26 +53243,6 @@ weight=3lb
 category=light_source_lit
 param=next_obj_stage,bullseye_lantern_unlit
 
-[wallbeast_spike_helmet]
-name=Spiny helmet
-desc=You don't want to wear it inside-out.
-cost=650
-manwear=obj_wallbeast_spike_helmet_manwear,0
-womanwear=obj_wallbeast_spike_helmet_womanwear,0
-manhead=obj_wallbeast_spike_helmet_manhead
-womanhead=obj_wallbeast_spike_helmet_womanhead
-model=obj_wallbeast_spike_helmet
-2dxof=5
-2dyof=-3
-2dzoom=660
-2dyan=440
-2dxan=444
-members=yes
-iop2=Wear
-wearpos=hat
-wearpos2=head
-wearpos3=jaw
-weight=5lb
 
 [cert_wallbeast_spike_helmet]
 certlink=wallbeast_spike_helmet

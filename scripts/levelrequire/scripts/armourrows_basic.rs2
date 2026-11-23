@@ -1,0 +1,14 @@
+// VERIFIED: 20 February 2006 Slayer guide requirements.
+[opheld2,wallbeast_spike_helmet]
+if (stat_base(defence) < 5) {
+    mes("You are not a high enough level to use this item.");
+    return;
+}
+~equip(last_slot);
+
+[opheld2,slayer_mirror_shield]
+if (stat_base(slayer) < 25 | stat_base(defence) < 20) {
+    mes("You are not a high enough level to use this item.");
+    return;
+}
+~equip(last_slot);
