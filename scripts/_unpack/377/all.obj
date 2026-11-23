@@ -83272,23 +83272,6 @@ cost=30
 iop1=Drink
 weight=2lb
 
-[dragon_2h_sword]
-name=Dragon 2h sword
-desc=A two-handed Dragon Sword.
-cost=220000
-model=obj_dragon_2h_sword
-iop2=Wield
-manwear=obj_dragon_2h_sword_manwear,0
-womanwear=obj_dragon_2h_sword_manwear,6
-members=yes
-2dyof=3
-2dzoom=2022
-2dyan=1065
-2dzan=124
-2dxan=636
-wearpos=righthand
-wearpos2=lefthand
-weight=8lb
 
 [slayer_boots]
 name=Slayer boots
