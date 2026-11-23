@@ -2,6 +2,8 @@
 /**
  * Exercise compiled NPC and PvP Attack dispatch at packed melee reach.
  * The fixture walks real map collision and witnesses the native hit queues.
+ * Greegree retaliation preserves the native next-phase knock-off timing,
+ * the first refusal, normal human retaliation, and the owner-scoped full-inventory drop.
  */
 import assert from 'node:assert/strict';
 import path from 'node:path';
@@ -20,6 +22,7 @@ const ScriptPointer = (await load('src/engine/script/ScriptPointer.ts')).default
 const Npc = (await load('src/engine/entity/Npc.ts')).default;
 const Player = (await load('src/engine/entity/Player.ts')).default;
 const { EntityLifeCycle } = await load('src/engine/entity/EntityLifeCycle.ts');
+const { NpcMode } = await load('src/engine/entity/NpcMode.ts');
 const { Interaction } = await load('src/engine/entity/Interaction.ts');
 const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
 const ServerTriggerType = (await load('src/engine/script/ServerTriggerType.ts')).default;
@@ -356,6 +359,142 @@ function exerciseGreegree() {
             console.log(`PASS greegree Attack ${test.label}: start=${start.x},${start.z} end=${player.x},${player.z} hits=${hits.length}`);
         } finally {
             if (target) World.removeNpc(target, -1);
+            cleanupPlayer(player);
+        }
+    }
+    for (const { label, hold, full } of [
+        { label: 'ordinary human hit', hold: false, full: false },
+        { label: 'monkey hit', hold: true, full: false },
+        { label: 'full-inventory monkey hit', hold: true, full: true }
+    ]) {
+        const player = createPlayer('greegree-retaliation', apeCorridor);
+        let attacker;
+        let dropped;
+        try {
+            prepareAttacker(player, bronzeDagger);
+            if (hold) {
+                player.invAdd(inventory, greegree.id, 1);
+                player.lastSlot = player.getInventory(inventory).getItemIndex(greegree.id);
+                player.lastItem = greegree.id;
+                const script = ScriptProvider.getByTrigger(ServerTriggerType.OPHELD2, greegree.id, greegree.category);
+                assert.equal(script?.name, '[opheld2,_mm_greegree]', `${label}: native Hold handler`);
+                const state = ScriptRunner.init(script, player, null);
+                player.executeScript(state, true, true);
+                assert.equal(state.execution, ScriptState.FINISHED, `${label}: ordinary Hold finishes`);
+                assert.equal(player.npcId, id(NpcType, 'mm_transmogrification_normal_monkey'),
+                    `${label}: ordinary Hold creates the form`);
+            }
+            if (full) {
+                assert.equal(player.invTotal(inventory, bronzeDagger.id), 1,
+                    `${label}: Hold returned the ordinary weapon to inventory`);
+                player.invAdd(inventory, bronzeDagger.id, InvType.get(inventory).size - 1);
+                assert.equal(player.invTotal(inventory, bronzeDagger.id), InvType.get(inventory).size,
+                    `${label}: unstackable daggers fill every inventory slot`);
+            }
+            attacker = new Npc(0, apeCorridor.x + 1, apeCorridor.z, manType.size, manType.size,
+                EntityLifeCycle.DESPAWN, World.getNextNid(), manType.id, manType.blockwalk);
+            World.addNpc(attacker, -1);
+            attacker.setInteraction(Interaction.SCRIPT, player, NpcMode.OPPLAYER2);
+            assert.strictEqual(attacker.target, player, `${label}: native NPC attack targets the player`);
+            const incomingHit = () => {
+                const beforeHealth = player.levels[PlayerStat.HITPOINTS];
+                const originalRandom = JavaRandom.nextDouble;
+                let draw = 0;
+                const tape = [0.999999, 0, 0.999999];
+                JavaRandom.nextDouble = () => tape[Math.min(draw++, tape.length - 1)];
+                try {
+                    attacker.turn();
+                    World.processNpcEventQueue();
+                    assert([...player.queue.all()].some(request => request.script.name === '[queue,playerhit_n_retaliate]'),
+                        `${label}: native NPC hit schedules retaliation at tick ${World.currentTick}`);
+                    player.processQueues();
+                } finally {
+                    JavaRandom.nextDouble = originalRandom;
+                }
+                assertHealthy(player, label);
+                assert(player.levels[PlayerStat.HITPOINTS] < beforeHealth,
+                    `${label}: real incoming damage lands at tick ${World.currentTick}`);
+            };
+            const refusalCount = () => player.testMessages.filter(packet =>
+                packet.text === 'You cannot attack as a monkey.').length;
+            player.testMessages.length = 0;
+            const hitTick = ++World.currentTick;
+            incomingHit();
+            assert.equal(World.currentTick, hitTick, `${label}: one player queue phase in hit tick ${hitTick}`);
+            assert.equal(player.npcId, hold ? id(NpcType, 'mm_transmogrification_normal_monkey') : -1,
+                `${label}: form is unchanged in hit tick ${hitTick}`);
+            const pending = [...player.queue.all()].filter(request =>
+                request.script.name === '[queue,force_unequip_greegree]');
+            assert.equal(pending.length, hold ? 1 : 0,
+                `${label}: exact knock-off queue count in hit tick ${hitTick}`);
+            player.processInteraction();
+            console.log(`OBSERVE ${label}: hitTick=${hitTick} firstHitRefusalBoxes=${refusalCount()}`);
+            assert.equal(refusalCount(), hold ? 1 : 0,
+                `${label}: first hit's retaliation refusal count at tick ${hitTick}`);
+            if (hold) {
+                assert.equal(player.getInventory(worn).get(rightHand)?.id, greegree.id,
+                    `${label}: still worn at tick ${hitTick}`);
+                assert.equal(player.invTotal(inventory, greegree.id), 0,
+                    `${label}: not yet returned at tick ${hitTick}`);
+                World.currentTick++;
+                player.processQueues();
+                assert.equal(World.currentTick, hitTick + 1,
+                    `${label}: following queue phase is exactly tick ${hitTick + 1}`);
+                assert.equal(player.npcId, -1, `${label}: human form at tick ${hitTick + 1}`);
+                assert.equal(player.getInventory(worn).get(rightHand), null,
+                    `${label}: greegree leaves the worn slot at tick ${hitTick + 1}`);
+                assert.equal(player.invTotal(inventory, greegree.id), full ? 0 : 1,
+                    `${label}: inventory result at tick ${hitTick + 1}`);
+                assert(![...player.queue.all()].some(request =>
+                    request.script.name === '[queue,force_unequip_greegree]'),
+                    `${label}: knock-off queue consumed at tick ${hitTick + 1}`);
+                assert.equal(player.testMessages.filter(packet =>
+                    packet.text?.startsWith('The Monkey Greegree wrenches itself')).length,
+                    1, `${label}: one inherited knock-off message`);
+                assert(player.testMessages.map(packet => packet.text ?? '').join(' ').includes(
+                    'The Monkey Greegree wrenches itself from your hand as its power begins to fade...'),
+                    `${label}: inherited knock-off text spans its rendered lines`);
+                if (full) {
+                    const zone = World.gameMap.getZone(player.x, player.z, player.level);
+                    dropped = zone.getObj(player.x, player.z, greegree.id, player.hash64);
+                    assert(dropped?.isValid(), `${label}: owner can see the dropped greegree`);
+                    assert.equal(dropped.count, 1, `${label}: one greegree on the floor`);
+                    assert.equal(dropped.receiver64, player.hash64, `${label}: drop belongs to the player`);
+                    assert.equal(zone.getObj(player.x, player.z, greegree.id, -1n), null,
+                        `${label}: not initially visible to another receiver`);
+                    assert.equal(dropped.lifecycleTick, 300,
+                        `${label}: ordinary floor lifetime is 300 ticks`);
+                }
+                player.processInteraction();
+                assert.equal(refusalCount(), 1, `${label}: following phase adds no refusal`);
+                assert.equal([...attacker.queue.all()].filter(request =>
+                    request.queueId === ServerTriggerType.AI_QUEUE2).length, 0,
+                    `${label}: the refused first retaliation queues no hit`);
+                player.testMessages.length = 0;
+                World.currentTick = Math.max(World.currentTick + 1,
+                    attacker.getVar(id(VarNpcType, 'npc_action_delay')));
+                const nextHitTick = World.currentTick;
+                incomingHit();
+                player.processInteraction();
+                World.currentTick = Math.max(World.currentTick, player.getVar(id(VarPlayerType, 'action_delay')));
+                player.processInteraction();
+                assert.equal(refusalCount(), 0, `${label}: next incoming hit retaliates without a refusal box`);
+                console.log(`PASS greegree knock-off ${label}: hitTick=${hitTick} unequipTick=${hitTick + 1} ` +
+                    `nextHitTick=${nextHitTick} counterHitTick=${World.currentTick} firstHitRefusalBoxes=1 nextHitRefusalBoxes=0 ` +
+                    `greegreeDestination=${full ? 'owner floor, 300 ticks' : 'inventory'}`);
+            } else {
+                assert.equal(player.getInventory(worn).get(rightHand)?.id, bronzeDagger.id,
+                    `${label}: ordinary equipment unchanged`);
+                World.currentTick = Math.max(World.currentTick, player.getVar(id(VarPlayerType, 'action_delay')));
+                player.processInteraction();
+            }
+            assertHealthy(player, `${label} retaliation`);
+            assert.equal([...attacker.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE2).length,
+                1, `${label}: native human retaliation queues a hit`);
+            console.log(`PASS greegree retaliation ${label}`);
+        } finally {
+            if (dropped) World.removeObj(dropped, -1);
+            if (attacker) World.removeNpc(attacker, -1);
             cleanupPlayer(player);
         }
     }
