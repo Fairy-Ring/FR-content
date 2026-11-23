@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Exercise every packed right-hand combat style through native Attack dispatch.
- * Couplings: silent greegree/fungicide styles witness the guards; every Wield/Wear
- * right-hand weapon must attack Man normally. New legitimate exceptions need review.
+ * Couplings: held greegrees refuse NPC Attack; an attack-capable silent guard
+ * item witnesses null-sound handling. Every Wield/Wear weapon must attack Man normally.
  */
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -102,6 +102,7 @@ assert(weapons.length > 0, 'packed item configs include right-hand Wield/Wear op
 // Greegrees expose Hold, not Wield/Wear: add them as the separate guard-class witness.
 const heldGuards = ObjType.configs.filter(type => type && type.wearpos === rightHand
     && /greegree/i.test(itemName(type)) && (type.iop ?? []).some(option => option?.toLowerCase() === 'hold'));
+const heldGuardIds = new Set(heldGuards.map(type => type.id));
 const attackItems = [...new Map([...weapons, ...heldGuards].map(type => [type.id, type])).values()];
 const synthIds = new Map(readFileSync(path.resolve(here, '../../pack/synth.pack'), 'utf8')
     .trim().split(/\r?\n/).map(line => {
@@ -291,6 +292,7 @@ function assertNativeAttack(type, style) {
     assert.deepEqual(currentStyle(), style, `${context} uses its discovered packed style`);
     resetTarget();
     const targetHitpoints = target.levels[NpcStat.HITPOINTS];
+    const actionDelayBefore = player.getVar(varIds.actionDelay);
     const firstTick = World.currentTick + 1;
     assert(player.canAccess(), `${context} fixture player is not busy or protected`);
     assert(target.isValid(), `${context} fixture target is valid`);
@@ -306,6 +308,21 @@ function assertNativeAttack(type, style) {
         player.processInteraction();
         assertHealthy(`${context} first swing`);
         const firstQueue = queuedAttacks();
+        if (heldGuardIds.has(type.id)) {
+            assert.deepEqual(player.testMessages.slice(firstSoundStart)
+                .filter(message => typeof message?.text === 'string').map(message => message.text),
+            ['You cannot attack as a monkey.'], `${context} gives the exact inherited NPC refusal`);
+            assert.equal(firstQueue.length, 0, `${context} queues no refused NPC hit`);
+            assert.equal(player.testMessages.slice(firstSoundStart)
+                .filter(message => message instanceof SynthSound).length, 0,
+            `${context} emits no refused attack sound`);
+            assert.equal(player.getVar(varIds.actionDelay), actionDelayBefore,
+                `${context} consumes no action delay on refusal`);
+            assert.equal(target.levels[NpcStat.HITPOINTS], targetHitpoints,
+                `${context} leaves the refused target unharmed`);
+            console.log(`PASS ${context}: exact NPC refusal, no hit, no sound, no action delay`);
+            return;
+        }
         assert.equal(firstQueue.length, 1, `${context} queues the first native NPC hit; chat=${player.testMessages.filter(message => message?.text).map(message => message.text).join(' | ')}`);
         assert(firstQueue[0].lastInt >= 0, `${context} queues a non-negative hit`);
         if (repairedItems.has(type.id)) assert(firstQueue[0].lastInt > 0, `${context} queues positive repaired-weapon damage`);
@@ -454,6 +471,9 @@ for (const type of attackItems) {
     }
 }
 assert(attackedStyles > 0, 'native Attack covered every discovered packed style');
+const silentNpc = silentGuardStyles.find(({ type }) => !heldGuardIds.has(type.id));
+assert(silentNpc, 'an attack-capable silent guard item retains native NPC null-sound coverage');
+console.log(`PASS ${itemName(silentNpc.type)}: native NPC attack and reattack omit the null sound without script errors`);
 const silentMelee = silentGuardStyles.find(({ row }) => row.damageType !== damageType.ranged);
 assert(silentMelee, 'a packed silent right-hand melee item witnesses the PvP guard');
 assertSilentNativePvpAttack(silentMelee);
