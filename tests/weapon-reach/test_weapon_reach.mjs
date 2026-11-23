@@ -25,7 +25,7 @@ const { PlayerStat } = await load('src/engine/entity/PlayerStat.ts');
 const ServerTriggerType = (await load('src/engine/script/ServerTriggerType.ts')).default;
 const JavaRandom = (await load('src/util/JavaRandom.ts')).default;
 const Environment = (await load('src/util/Environment.ts')).default;
-const { CollisionFlag, CollisionType } = await load('src/engine/routefinder/index.ts');
+const { CollisionFlag, CollisionType, isFlagged } = await load('src/engine/routefinder/index.ts');
 Environment.NODE_PRODUCTION = true;
 Environment.NODE_DEBUG_PROFILE = false;
 
@@ -361,11 +361,57 @@ function exerciseGreegree() {
     }
 }
 
+function observeHalberdWall() {
+    let start;
+    for (let x = 3190; x <= 3230 && !start; x++) {
+        for (let z = 3190; z <= 3230; z++) {
+            if (isFlagged(x, z, 0, CollisionFlag.WALL_EAST) &&
+                [0, 1, 2].every(offset => World.gameMap.hasZone(x + offset, z, 0) &&
+                    !GameMap.isMapBlocked(x + offset, z, 0))) {
+                start = { level: 0, x, z };
+                break;
+            }
+        }
+    }
+    assert(start, 'find a real packed wall between three walkable floor tiles');
+    const targetPosition = { ...start, x: start.x + 2 };
+    assert.equal(lineOfWalkToTarget(start, targetPosition), false, 'packed wall blocks the initial two-tile line');
+    const player = createPlayer('wall', start);
+    let target;
+    try {
+        prepareAttacker(player, runeHalberd);
+        target = new Npc(0, targetPosition.x, targetPosition.z, manType.size, manType.size,
+            EntityLifeCycle.DESPAWN, World.getNextNid(), manType.id, manType.blockwalk);
+        World.addNpc(target, -1);
+        target.lastMovement = -100;
+        target.setVar(npcAggressivePlayer, player.uid);
+        assert(player.setInteraction(Interaction.ENGINE, target, ServerTriggerType.APNPC2), 'wall case selects native Attack');
+        assert.equal(player.getOpTrigger()?.name, '[opnpc2,_]');
+        assert.equal(player.getApTrigger()?.name, '[apnpc2,_]');
+        player.processInteraction();
+        assertHealthy(player, 'halberd wall observation');
+        const hits = [...target.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE2);
+        const finalLineOfWalk = lineOfWalkToTarget(player, targetPosition);
+        assert.deepEqual([player.x, player.z], [start.x, start.z], 'blocked halberd does not move through the wall');
+        assert.equal(finalLineOfWalk, false, 'the wall still separates attacker and target');
+        assert.equal(hits.length, 0, 'the existing native path queues no hit through this packed wall');
+        console.log(`HALBERD_WALL ${JSON.stringify({
+            start, target: targetPosition, end: { level: player.level, x: player.x, z: player.z },
+            initialLineOfWalk: false, finalLineOfWalk, hits: hits.map(hit => hit.lastInt),
+            attackThroughWall: !finalLineOfWalk && hits.length > 0
+        })}`);
+    } finally {
+        if (target) World.removeNpc(target, -1);
+        cleanupPlayer(player);
+    }
+}
+
 for (const test of reachCases) {
     exerciseNpc(test);
     exercisePvp(test);
 }
 exerciseGreegree();
+observeHalberdWall();
 
 console.log('PASS weapon-reach: compiled NPC and PvP Attack dispatch uses packed reach and collision-aware approach');
 process.exit(0);
