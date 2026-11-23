@@ -88174,275 +88174,61 @@ param=defend_anim,human_shield_defence
 certlink=rune_heraldic_kiteshield5
 certtemplate=template_for_cert
 
-[studded_body_trim_gold]
-name=Studded body (g)
-desc=Those studs should provide a bit more protection, nice trim too!
-recol1s=6342
-recol1d=31366
-cost=850
-model=obj_studded_body_trim_gold
-2dzoom=910
-2dxan=580
-iop2=Wear
-manwear=obj_studded_body_trim_gold_manwear,0
-womanwear=obj_studded_body_trim_gold_womanwear,0
-wearpos=torso
-weight=12lb
 
 [cert_studded_body_trim_gold]
 certlink=studded_body_trim_gold
 certtemplate=template_for_cert
 
-[studded_body_trim_fur]
-name=Studded body (t)
-desc=Those studs should provide a bit more protection, nice trim too!
-recol1s=6342
-recol1d=2080
-cost=850
-model=obj_studded_body_trim_gold
-2dzoom=910
-2dxan=580
-iop2=Wear
-manwear=obj_studded_body_trim_gold_manwear,0
-womanwear=obj_studded_body_trim_gold_womanwear,0
-wearpos=torso
-weight=12lb
 
 [cert_studded_body_trim_fur]
 certlink=studded_body_trim_fur
 certtemplate=template_for_cert
 
-[studded_chaps_trim_gold]
-name=Studded chaps (g)
-desc=Those studs should provide a bit more protection. Nice trim too!
-recol1s=6342
-recol1d=31366
-cost=750
-model=obj_studded_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_studded_chaps_trim_gold_manwear,0
-womanwear=obj_studded_chaps_trim_gold_womanwear,0
-wearpos=legs
-weight=10lb
 
 [cert_studded_chaps_trim_gold]
 certlink=studded_chaps_trim_gold
 certtemplate=template_for_cert
 
-[studded_chaps_trim_fur]
-name=Studded chaps (t)
-desc=Those studs should provide a bit more protection. Nice trim too!
-recol1s=6342
-recol1d=2080
-cost=750
-model=obj_studded_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_studded_chaps_trim_gold_manwear,0
-womanwear=obj_studded_chaps_trim_gold_womanwear,0
-wearpos=legs
-weight=10lb
 
 [cert_studded_chaps_trim_fur]
 certlink=studded_chaps_trim_fur
 certtemplate=template_for_cert
 
-[dragonhide_body_trim_gold]
-name=D-hide body(g)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=6342
-recol1d=31366
-cost=7800
-model=obj_dragonhide_body_trim_gold
-2dyof=-4
-2dzoom=1030
-2dxan=548
-iop2=Wear
-manwear=obj_dragonhide_body_trim_gold_manwear,0
-womanwear=obj_dragonhide_body_trim_gold_womanwear,0
-wearpos=torso
-weight=15lb
 
 [cert_dragonhide_body_trim_gold]
 certlink=dragonhide_body_trim_gold
 certtemplate=template_for_cert
 
-[dragonhide_body_trim]
-name=D-hide body (t)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=6342
-recol1d=15054
-cost=7800
-model=obj_dragonhide_body_trim_gold
-2dyof=-4
-2dzoom=1030
-2dxan=548
-iop2=Wear
-manwear=obj_dragonhide_body_trim_gold_manwear,0
-womanwear=obj_dragonhide_body_trim_gold_womanwear,0
-wearpos=torso
-weight=15lb
 
 [cert_dragonhide_body_trim]
 certlink=dragonhide_body_trim
 certtemplate=template_for_cert
 
-[blue_dragonhide_body_trim_gold]
-name=D-hide body (g)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=256
-recol1d=4232
-recol2s=384
-recol2d=8460
-recol3s=6342
-recol3d=31366
-cost=9360
-model=obj_dragonhide_body_trim_gold
-2dyof=-4
-2dzoom=1030
-2dxan=548
-iop2=Wear
-manwear=obj_dragonhide_body_trim_gold_manwear,0
-womanwear=obj_dragonhide_body_trim_gold_womanwear,0
-members=yes
-wearpos=torso
-weight=15lb
 
 [cert_blue_dragonhide_body_trim_gold]
 certlink=blue_dragonhide_body_trim_gold
 certtemplate=template_for_cert
 
-[blue_dragonhide_body_trim]
-name=D-hide body (t)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=256
-recol1d=4232
-recol2s=384
-recol2d=8460
-recol3s=6342
-recol3d=19030
-cost=9360
-model=obj_dragonhide_body_trim_gold
-2dyof=-4
-2dzoom=1030
-2dxan=548
-iop2=Wear
-manwear=obj_dragonhide_body_trim_gold_manwear,0
-womanwear=obj_dragonhide_body_trim_gold_womanwear,0
-members=yes
-wearpos=torso
-weight=15lb
 
 [cert_blue_dragonhide_body_trim]
 certlink=blue_dragonhide_body_trim
 certtemplate=template_for_cert
 
-[dragonhide_chaps_trim_gold]
-name=D-hide chaps (g)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=6342
-recol1d=31365
-recol2s=5250
-recol2d=31365
-cost=3900
-model=obj_dragonhide_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dragonhide_chaps_trim_gold_manwear,0
-womanwear=obj_dragonhide_chaps_trim_gold_womanwear,0
-wearpos=legs
-weight=12lb
 
 [cert_dragonhide_chaps_trim_gold]
 certlink=dragonhide_chaps_trim_gold
 certtemplate=template_for_cert
 
-[dragonhide_chaps_trim]
-name=D-hide chaps (t)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=6342
-recol1d=15054
-cost=3900
-model=obj_dragonhide_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dragonhide_chaps_trim_gold_manwear,0
-womanwear=obj_dragonhide_chaps_trim_gold_womanwear,0
-wearpos=legs
-weight=12lb
 
 [cert_dragonhide_chaps_trim]
 certlink=dragonhide_chaps_trim
 certtemplate=template_for_cert
 
-[blue_dragonhide_chaps_trim_gold]
-name=D-hide chaps (g)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=256
-recol1d=4232
-recol2s=384
-recol2d=8460
-recol3s=6342
-recol3d=31366
-recol4s=5250
-recol4d=31366
-cost=4320
-model=obj_dragonhide_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dragonhide_chaps_trim_gold_manwear,0
-womanwear=obj_dragonhide_chaps_trim_gold_womanwear,0
-members=yes
-wearpos=legs
-weight=12lb
 
 [cert_blue_dragonhide_chaps_trim_gold]
 certlink=blue_dragonhide_chaps_trim_gold
 certtemplate=template_for_cert
 
-[blue_dragonhide_chaps_trim]
-name=D-hide chaps (t)
-desc=Made from 100% real dragonhide. With colourful trim!
-recol1s=256
-recol1d=4232
-recol2s=384
-recol2d=8460
-recol3s=6342
-recol3d=19030
-cost=4320
-model=obj_dragonhide_chaps_trim_gold
-2dxof=7
-2dyof=5
-2dzoom=1720
-2dzan=224
-2dxan=488
-iop2=Wear
-manwear=obj_dragonhide_chaps_trim_gold_manwear,0
-womanwear=obj_dragonhide_chaps_trim_gold_womanwear,0
-members=yes
-wearpos=legs
-weight=12lb
 
 [cert_blue_dragonhide_chaps_trim]
 certlink=blue_dragonhide_chaps_trim
@@ -88492,51 +88278,11 @@ weight=2lb
 certlink=blue_skirt_trim
 certtemplate=template_for_cert
 
-[wizards_robe_trim_gold]
-name=Wizard robe (g)
-desc=I can do magic better in this.
-recol1s=14724
-recol1d=239
-recol2s=6342
-recol2d=31366
-cost=15
-model=obj_wizards_robe_trim_gold
-2dyof=7
-2dzoom=1370
-2dxan=536
-iop2=Wear
-manwear=obj_wizards_robe_trim_gold_manwear,0
-womanwear=obj_wizards_robe_trim_gold_womanwear,0
-manwear2=obj_wizards_robe_trim_gold_manwear2
-womanwear2=obj_wizards_robe_trim_gold_womanwear2
-wearpos=torso
-wearpos2=arms
-weight=2lb
 
 [cert_wizards_robe_trim_gold]
 certlink=wizards_robe_trim_gold
 certtemplate=template_for_cert
 
-[wizards_robe_trim]
-name=Wizard robe (t)
-desc=I can do magic better in this.
-recol1s=14724
-recol1d=239
-recol2s=6342
-recol2d=1057
-cost=15
-model=obj_wizards_robe_trim_gold
-2dyof=7
-2dzoom=1370
-2dxan=536
-iop2=Wear
-manwear=obj_wizards_robe_trim_gold_manwear,0
-womanwear=obj_wizards_robe_trim_gold_womanwear,0
-manwear2=obj_wizards_robe_trim_gold_manwear2
-womanwear2=obj_wizards_robe_trim_gold_womanwear2
-wearpos=torso
-wearpos2=arms
-weight=2lb
 
 [cert_wizards_robe_trim]
 certlink=wizards_robe_trim
