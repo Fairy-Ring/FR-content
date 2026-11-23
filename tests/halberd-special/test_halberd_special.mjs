@@ -46,10 +46,11 @@ const variable = (p, name, value) => value === undefined ? p.getVar(id('VarPlaye
 const worn = id('InvType', 'worn'), inv = id('InvType', 'inv');
 const halberd = types.ObjType.getByName('dragon_halberd');
 assert(halberd, 'dragon halberd exists');
-const cowType = types.NpcType.configs.find(t => t?.name === 'Cow' && t.size === 1 && t.op?.[1] === 'Attack');
+const smallType = types.NpcType.configs.find(t => t?.name === 'Goblin' && t.size === 1 && t.op?.[1] === 'Attack');
 const largeType = types.NpcType.configs.find(t => t?.name === 'Hill giant' && t.size > 1 && t.op?.[1] === 'Attack');
-assert(cowType && largeType, 'one-tile and large native NPC fixtures exist');
+assert(smallType && largeType, 'one-tile and large native NPC fixtures exist');
 const param = (t, name) => { const p = types.ParamType.getByName(name); assert(p, name); return t.params?.get(p.id) ?? p.defaultInt; };
+const level99Experience = 130344310; // Internal XP tenths, matching the real level-99 threshold.
 assert.equal(param(halberd, 'sa_energy'), 300, 'authored 30% Sweep cost');
 assert.equal(param(halberd, 'specwep'), 1, 'halberd exposes its special bar');
 let serial = 0, watching = false, states = [];
@@ -70,7 +71,7 @@ function player(f, x = 3100, z = 3800) {
     const p = new Player(`halberd${slot}`, BigInt(slot), BigInt(slot));
     p.slot = p.pid = slot; p.uid = (slot << 11) | slot; p.isActive = true;
     p.x = p.originX = x; p.z = p.originZ = z; p.level = 0;
-    p.levels.fill(99); p.baseLevels.fill(99); p.stats.fill(0);
+    p.levels.fill(99); p.baseLevels.fill(99); p.stats.fill(level99Experience);
     p.messages = []; p.packets = [];
     p.messageGame = p.wrappedMessageGame = text => p.messages.push(String(text));
     p.write = packet => p.packets.push(packet);
@@ -81,7 +82,7 @@ function player(f, x = 3100, z = 3800) {
     f.players.push({ p, zone });
     return p;
 }
-function npc(f, type = cowType, x = f.p.x + 1, z = f.p.z) {
+function npc(f, type = smallType, x = f.p.x + 1, z = f.p.z) {
     const n = new Npc(0, x, z, type.size, type.size, EntityLifeCycle.RESPAWN, World.getNextNid(), type.id, type.blockwalk);
     World.addNpc(n, -1); World.processNpcEventQueue(); n.lastMovement = -100;
     n.levels.fill(1); n.baseLevels.fill(1); n.levels[3] = n.baseLevels[3] = 255;
@@ -160,14 +161,14 @@ test('one-tile NPC gets one 110% hit with XP and one cost', () => {
         attack(f, n); consumed(f);
         assert.equal(npcHits(n).length, 1);
         assert.deepEqual(damage(n), [22], 'authored maxhit 20 scales to 22');
-        assert(f.p.stats[2] > 0, 'selected aggressive style awards Strength XP');
+        assert(f.p.stats[2] > level99Experience, 'selected aggressive style awards Strength XP');
     } finally { dispose(f); }
 });
 
 test('large NPC gets two full hits and no side-target hunt', () => {
     const f = fixture();
     try {
-        const n = npc(f, largeType), side = npc(f, cowType, n.x, n.z + 1);
+        const n = npc(f, largeType), side = npc(f, smallType, n.x, n.z + 1);
         multi(f, f.p); multi(f, n); multi(f, side);
         attack(f, n); consumed(f);
         assert.equal(npcHits(n).length, 2, 'large-target second hit exists');
@@ -179,8 +180,8 @@ test('large NPC gets two full hits and no side-target hunt', () => {
 test('multiway sweep hits only eligible side tiles and restores the primary NPC', () => {
     const f = fixture();
     try {
-        const n = npc(f), north = npc(f, cowType, n.x, n.z + 1), south = npc(f, cowType, n.x, n.z - 1);
-        const behind = npc(f, cowType, n.x + 1, n.z), otherKind = player(f, n.x, n.z + 1);
+        const n = npc(f), north = npc(f, smallType, n.x, n.z + 1), south = npc(f, smallType, n.x, n.z - 1);
+        const behind = npc(f, smallType, n.x + 1, n.z), otherKind = player(f, n.x, n.z + 1);
         for (const e of [f.p, ...f.npcs, otherKind]) multi(f, e);
         const executions = attack(f, n); consumed(f);
         for (const victim of [n, north, south]) assert.equal(npcHits(victim).length, 1, 'primary and side pair each receive one hit');
@@ -193,7 +194,7 @@ test('multiway sweep hits only eligible side tiles and restores the primary NPC'
 test('single-combat and Slayer-ineligible neighbours are not swept', () => {
     const f = fixture();
     try {
-        const n = npc(f), single = npc(f, cowType, n.x, n.z - 1);
+        const n = npc(f), single = npc(f, smallType, n.x, n.z - 1);
         const kurask = types.NpcType.configs.find(t => t?.name === 'Kurask' && t.op?.[1] === 'Attack'); assert(kurask);
         const gated = npc(f, kurask, n.x, n.z + 1);
         multi(f, f.p); multi(f, n); multi(f, gated); multi(f, single, false);
@@ -224,7 +225,7 @@ test('leaf-bladed weapon gate prevents halberd damage before XP', () => {
         const n = npc(f, t); attack(f, n); consumed(f);
         assert(npcHits(n).length > 0);
         assert(damage(n).every(value => value === 0), 'required weapon gate caps every special hit');
-        assert.equal(f.p.stats[2], 0, 'forbidden damage awards no Strength XP');
+        assert.equal(f.p.stats[2], level99Experience, 'forbidden damage awards no Strength XP');
     } finally { dispose(f); }
 });
 
@@ -261,10 +262,10 @@ test('native PvP attack, side pair, no cross-kind damage and pointer restoration
     const f = fixture();
     try {
         const primary = player(f, f.p.x + 1, f.p.z), north = player(f, primary.x, primary.z + 1), south = player(f, primary.x, primary.z - 1);
-        const wrong = player(f, primary.x + 1, primary.z), otherKind = npc(f, cowType, primary.x, primary.z + 1);
+        const wrong = player(f, primary.x + 1, primary.z), otherKind = npc(f, smallType, primary.x, primary.z + 1);
         for (const e of [f.p, primary, north, south, wrong, otherKind]) multi(f, e);
         const executions = pvpAttack(f, primary); consumed(f);
-        for (const victim of [primary, north, south]) assert.equal(playerHits(victim).length, 1, 'eligible player victim uses published damage queue');
+        for (const victim of [primary, north, south]) assert.equal(playerHits(victim).length, 1, `eligible player victim ${victim.slot} uses published damage queue`);
         assert.equal(playerHits(wrong).length, 0); assert.equal(npcHits(otherKind).length, 0);
         assert(executions.some(s => s._activePlayer === f.p && s._activePlayer2 === primary), 'caster and primary pointers restore');
     } finally { dispose(f); }
@@ -294,3 +295,4 @@ test('Mage Arena refuses a halberd special against NPCs and players', () => {
 });
 
 console.log('halberd-special: all compiled contracts passed');
+process.exit(0); // World imports own maintenance timers; this offline process owns no live server.
