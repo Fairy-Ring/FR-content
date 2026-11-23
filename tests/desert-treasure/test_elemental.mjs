@@ -390,7 +390,7 @@ function checkCannon(type) {
 const ice = object('Ice arrows');
 assert.equal(ice.id, 78); assert.equal(ice.debugname, 'ice_arrow');
 const bows = objects.filter(t => t.category === id('CategoryType', 'weapon_bow') && t.params.get(id('ParamType', 'levelrequire')) >= ice.params.get(id('ParamType', 'levelrequire')) && !t.dummyitem);
-assert.deepEqual(bows.map(t => t.debugname), ['yew_longbow', 'yew_shortbow', 'magic_longbow', 'magic_shortbow']);
+assert.deepEqual(bows.map(t => t.debugname), ['yew_longbow', 'yew_shortbow', 'magic_longbow', 'magic_shortbow', 'daganoth_cave_magic_shortbow']);
 console.log('PASS original ice-arrow compatible bows', bows.map(t => `${t.id}:${t.debugname}`).join(','));
 const probe = outcome(1977, { kind: 'ranged', row: ranged[0] }, 1);
 const defence = (135 + 9) * 64;
