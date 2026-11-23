@@ -73624,76 +73624,16 @@ weight=200g
 certlink=village_rare_tuber
 certtemplate=template_for_cert
 
-[machette_opal]
-name=Opal machete
-desc=A jungle specific slashing device.
-recol1s=23254
-recol1d=29587
-recol2s=17969
-recol2d=12684
-cost=500
-model=obj_machette
-2dxof=-2
-2dyof=-12
-2dzoom=770
-2dyan=88
-2dxan=200
-iop2=Wield
-manwear=obj_machette_manwear,0
-womanwear=obj_machette_manwear,6
-members=yes
-wearpos=righthand
-weight=3lb
 
 [cert_machette_opal]
 certlink=machette_opal
 certtemplate=template_for_cert
 
-[machette_jade]
-name=Jade machete
-desc=A jungle specific slashing device.
-recol1s=23254
-recol1d=22512
-recol2s=17969
-recol2d=12684
-cost=1000
-model=obj_machette
-2dxof=-2
-2dyof=-12
-2dzoom=770
-2dyan=88
-2dxan=200
-iop2=Wield
-manwear=obj_machette_manwear,0
-womanwear=obj_machette_manwear,6
-members=yes
-wearpos=righthand
-weight=3lb
 
 [cert_machette_jade]
 certlink=machette_jade
 certtemplate=template_for_cert
 
-[machette_redtopaz]
-name=Red topaz machete
-desc=A jungle specific slashing device.
-recol1s=23254
-recol1d=30765
-recol2s=17969
-recol2d=12684
-cost=2000
-model=obj_machette
-2dxof=-2
-2dyof=-12
-2dzoom=770
-2dyan=88
-2dxan=200
-iop2=Wield
-manwear=obj_machette_manwear,0
-womanwear=obj_machette_manwear,6
-members=yes
-wearpos=righthand
-weight=3lb
 
 [cert_machette_redtopaz]
 certlink=machette_redtopaz
