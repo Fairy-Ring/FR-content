@@ -47,7 +47,7 @@ if ($weapon ! null) {
 
 //mes("attackstyle: <tostring(%attackstyle)>, damagestyle: <tostring(%damagestyle)>, damage: <tostring($damage)>, damagetype: <tostring(%damagetype)>");
 anim(%com_attackanim, 0);
-sound_synth(%com_attacksound, 0, 0);
+if (%com_attacksound ! null) sound_synth(%com_attacksound, 0, 0);
 ~npc_retaliate(0);
 npc_queue(2, $damage, 0);
 npc_anim(npc_param(defend_anim), 20); 

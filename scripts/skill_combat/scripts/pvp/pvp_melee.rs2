@@ -37,8 +37,10 @@ if (~pvp_hit_roll(%damagetype) = true) {
 }
 
 anim(%com_attackanim, 0);
-sound_synth(%com_attacksound, 0, 0);
-.sound_synth(%com_attacksound, 0, 0);
+if (%com_attacksound ! null) {
+    sound_synth(%com_attacksound, 0, 0);
+    .sound_synth(%com_attacksound, 0, 0);
+}
 
 .queue*(pvp_retaliate, 0)(uid);
 ~.pvp_damage(0, $damage);
