@@ -174,7 +174,8 @@ data=damagetype,^slash_style
 data=damagetype,^slash_style
 data=damagetype,^slash_style
 
-// CANDIDATE: Lost City 289 and early Old School polearm styles; the 377 tab agrees.
+// VERIFIED labels: the 377 polearm interface.
+// CANDIDATE server types/stances: interface inference, uncited 289 table and current Old School.
 [weapon_polearm_table]
 table=combat_style_table
 data=damagestyle,^style_melee_controlled

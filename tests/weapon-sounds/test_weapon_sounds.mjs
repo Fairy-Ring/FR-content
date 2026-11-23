@@ -1,6 +1,11 @@
 #!/usr/bin/env node
-/** Exercise every packed right-hand combat style through the native player/NPC attack path. */
+/**
+ * Exercise every packed right-hand combat style through native Attack dispatch.
+ * Couplings: silent greegree/fungicide styles witness the guards; every Wield/Wear
+ * right-hand weapon must attack Man normally. New legitimate exceptions need review.
+ */
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -76,11 +81,6 @@ assert.equal(manType.op?.[1]?.toLowerCase(), 'attack', 'Man exposes the native A
 // These are script constants, not generated pack ids.
 const damageType = { stab: 0, slash: 1, crush: 2, ranged: 3 };
 const damageStyle = { accurate: 0, aggressive: 1, defensive: 2, controlled: 3, rangedRapid: 5 };
-const attackParams = {
-    [damageType.stab]: ['stabattack_anim', 'stab_sound'],
-    [damageType.slash]: ['slashattack_anim', 'slash_sound'],
-    [damageType.crush]: ['crushattack_anim', 'crush_sound']
-};
 const categoryIds = {
     polearm: id(CategoryType, 'weapon_polearm'),
     blunt: id(CategoryType, 'weapon_blunt'),
@@ -103,6 +103,11 @@ assert(weapons.length > 0, 'packed item configs include right-hand Wield/Wear op
 const heldGuards = ObjType.configs.filter(type => type && type.wearpos === rightHand
     && /greegree/i.test(itemName(type)) && (type.iop ?? []).some(option => option?.toLowerCase() === 'hold'));
 const attackItems = [...new Map([...weapons, ...heldGuards].map(type => [type.id, type])).values()];
+const synthIds = new Map(readFileSync(path.resolve(here, '../../pack/synth.pack'), 'utf8')
+    .trim().split(/\r?\n/).map(line => {
+        const separator = line.indexOf('=');
+        return [line.slice(separator + 1), Number(line.slice(0, separator))];
+    }));
 
 function ammoFor(type) {
     if (type.category !== categoryIds.bow && type.category !== categoryIds.crossbow) return null;
@@ -160,11 +165,11 @@ function currentStyle() {
     };
 }
 
-function assertHealthy(context) {
-    const errors = player.testMessages.filter(message =>
+function assertHealthy(context, actor = player) {
+    const errors = actor.testMessages.filter(message =>
         typeof message?.text === 'string' && /script error/i.test(message.text));
     assert.equal(errors.length, 0, `${context} produced no script error`);
-    assert.equal(player.logoutCalls, 0, `${context} did not log out the player`);
+    assert.equal(actor.logoutCalls, 0, `${context} did not log out the player`);
 }
 
 function runScript(name, args = []) {
@@ -254,14 +259,11 @@ function verifyStyleTab(spec, type, rows) {
         runScript(`[if_button,${spec.tab}:${expected.button}]`);
         assert.deepEqual(currentStyle(), row, `${spec.item} ${expected.name} button selects its packed style`);
 
-        const params = attackParams[row.damageType];
-        assert(params, `${spec.item} ${expected.name} has a melee animation/sound parameter family`);
-        assert.equal(row.attackAnim, intParam(type, param(params[0])),
-            `${spec.item} ${expected.name} selects its attack animation`);
-        assert.equal(row.attackSound, intParam(type, param(params[1])),
-            `${spec.item} ${expected.name} selects its attack sound`);
-        assert.notEqual(row.attackAnim, -1, `${spec.item} ${expected.name} has a packed attack animation`);
-        assert.notEqual(row.attackSound, -1, `${spec.item} ${expected.name} has a packed attack sound`);
+        assert.equal(row.attackAnim, id(configs.SeqType, expected.attackAnim),
+            `${spec.item} ${expected.name} selects authored animation ${expected.attackAnim}`);
+        assert(synthIds.has(expected.attackSound), `missing packed sound ${expected.attackSound}`);
+        assert.equal(row.attackSound, synthIds.get(expected.attackSound),
+            `${spec.item} ${expected.name} selects authored sound ${expected.attackSound}`);
     }
 }
 
@@ -332,6 +334,59 @@ function assertNativeAttack(type, style) {
     }
 }
 
+function assertSilentNativePvpAttack({ type, row }) {
+    const context = `${itemName(type)} silent native PvP melee swing`;
+    resetPlayer(type, row.mode);
+    runScript('[proc,player_combat_stat]');
+    assert.notEqual(currentStyle().damageType, damageType.ranged, `${context} is melee`);
+    assert.equal(currentStyle().attackSound, -1, `${context} has no attack sound`);
+    player.x = 3200;
+    player.z = 3600;
+    const opponent = new Player('weapon-sounds-opponent', 1002n, 100002n);
+    opponent.slot = opponent.pid = 2;
+    opponent.uid = (1002 << 11) | opponent.slot;
+    opponent.x = player.x + 1;
+    opponent.z = player.z;
+    opponent.level = player.level;
+    opponent.isActive = true;
+    opponent.baseLevels.fill(99);
+    opponent.levels.fill(99);
+    opponent.getInventory(worn);
+    opponent.getInventory(inventory);
+    opponent.testMessages = [];
+    opponent.logoutCalls = 0;
+    opponent.write = packet => opponent.testMessages.push(packet);
+    opponent.messageGame = text => opponent.testMessages.push({ text: String(text) });
+    opponent.wrappedMessageGame = opponent.messageGame;
+    opponent.logout = () => { opponent.logoutCalls++; };
+    World.players[opponent.slot] = opponent;
+    World.playerLoop.add(opponent.hash64, opponent);
+    try {
+        assert(player.canAccess() && opponent.canAccess(), `${context} fixture players are available`);
+        assert(opponent.isValid(), `${context} fixture opponent is valid`);
+        assert(player.inOperableDistance(opponent), `${context} has native operable adjacency`);
+        World.currentTick++;
+        player.setInteraction(Interaction.ENGINE, opponent, ServerTriggerType.APPLAYER2);
+        assert.equal(player.getOpTrigger()?.name, '[opplayer2,_]', `${context} selects native Attack`);
+        player.processInteraction();
+        assertHealthy(context);
+        assertHealthy(`${context} opponent`, opponent);
+        const hits = [...opponent.queue.all()].filter(request => request.script.name === '[queue,pvp_damage]');
+        assert.equal(hits.length, 1, `${context} queues a native player hit`);
+        assert(Number.isInteger(hits[0].args[0]) && hits[0].args[0] >= 0,
+            `${context} queues non-negative damage`);
+        assert.equal(player.testMessages.filter(message => message instanceof SynthSound).length, 0,
+            `${context} omits the attacker's null sound`);
+        assert.equal(opponent.testMessages.filter(message => message instanceof SynthSound).length, 0,
+            `${context} omits the opponent's null sound`);
+    } finally {
+        player.clearInteraction();
+        World.players[opponent.slot] = null;
+        opponent.unlink();
+        opponent.cleanup();
+    }
+}
+
 const styleRows = new Map();
 const silentGuardStyles = [];
 for (const type of attackItems) {
@@ -348,13 +403,16 @@ assert(silentGuardStyles.length > 0, 'a packed greegree or fungicide right-hand 
 const polearmStyles = [
     { mode: 0, button: 'polearm0', nameComponent: 'com_11', name: 'Jab', stanceComponent: 'com_14',
         stance: '(Controlled)', damageComponent: 'com_17', damage: '(Stab)',
-        damageType: damageType.stab, damageStyle: damageStyle.controlled },
+        damageType: damageType.stab, damageStyle: damageStyle.controlled,
+        attackAnim: 'human_spear_spike', attackSound: 'staff_stab' },
     { mode: 1, button: 'polearm1', nameComponent: 'com_12', name: 'Swipe', stanceComponent: 'com_16',
         stance: '(Aggressive)', damageComponent: 'com_18', damage: '(Slash)',
-        damageType: damageType.slash, damageStyle: damageStyle.aggressive },
+        damageType: damageType.slash, damageStyle: damageStyle.aggressive,
+        attackAnim: 'human_scythe_sweep', attackSound: 'scythe_slash' },
     { mode: 2, button: 'polearm2', nameComponent: 'com_13', name: 'Fend', stanceComponent: 'com_15',
         stance: '(Defensive)', damageComponent: 'com_19', damage: '(Stab)',
-        damageType: damageType.stab, damageStyle: damageStyle.defensive }
+        damageType: damageType.stab, damageStyle: damageStyle.defensive,
+        attackAnim: 'human_spear_spike', attackSound: 'staff_stab' }
 ];
 const polearmItems = [
     'bronze_halberd', 'iron_halberd', 'steel_halberd', 'black_halberd', 'white_halberd',
@@ -378,11 +436,11 @@ const bluntStyles = [
         stance: '(Defensive)', damageComponent: 'com_19', damage: '(Crush)',
         damageType: damageType.crush, damageStyle: damageStyle.defensive }
 ];
-for (const item of ['tzhaar_mace', 'tzhaar_maul']) {
+for (const [item, attackSound] of [['tzhaar_mace', 'mace_crush'], ['tzhaar_maul', '2H_crush']]) {
     const type = ObjType.getByName(item);
     assert(type, `missing packed ${item}`);
-    verifyStyleTab({ item, tab: 'combat_blunt', category: categoryIds.blunt, styles: bluntStyles },
-        type, styleRows.get(type.id));
+    const styles = bluntStyles.map(style => ({ ...style, attackAnim: 'human_blunt_pound', attackSound }));
+    verifyStyleTab({ item, tab: 'combat_blunt', category: categoryIds.blunt, styles }, type, styleRows.get(type.id));
 }
 
 // A legitimate zero hit (including holy water against a human) is still a queued attack.
@@ -396,6 +454,9 @@ for (const type of attackItems) {
     }
 }
 assert(attackedStyles > 0, 'native Attack covered every discovered packed style');
+const silentMelee = silentGuardStyles.find(({ row }) => row.damageType !== damageType.ranged);
+assert(silentMelee, 'a packed silent right-hand melee item witnesses the PvP guard');
+assertSilentNativePvpAttack(silentMelee);
 
 World.removeNpc(target, -1);
 World.players[player.slot] = null;

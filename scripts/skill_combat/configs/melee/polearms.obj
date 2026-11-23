@@ -1,5 +1,7 @@
 // Original 377 fields retained. Lost City 289 polearms supply the shared family parameters.
-// CANDIDATE styles/rate: early Old School halberds; see weapon-combat research.
+// VERIFIED labels: the 377 interface; CANDIDATE server types/stances: interface inference,
+// corroborated by the uncited 289 table and current Old School.
+// Existing 377 rates retained; white's added rate is CANDIDATE (weapon-combat research).
 
 [bronze_halberd]
 name=Bronze halberd

@@ -135,6 +135,7 @@ wearpos2=lefthand
 weight=8lb
 param=crushattack,80
 param=strengthbonus,85
+// UNKNOWN: inherited four-tick attack interval; existing default retained.
 param=crushattack_anim,human_blunt_pound
 param=defend_anim,human_dhsword_block
 param=crush_sound,2H_crush
