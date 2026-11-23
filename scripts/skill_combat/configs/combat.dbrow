@@ -173,3 +173,13 @@ data=damagestyle,^style_melee_defensive
 data=damagetype,^slash_style
 data=damagetype,^slash_style
 data=damagetype,^slash_style
+
+// CANDIDATE: Lost City 289 and early Old School polearm styles; the 377 tab agrees.
+[weapon_polearm_table]
+table=combat_style_table
+data=damagestyle,^style_melee_controlled
+data=damagestyle,^style_melee_aggressive
+data=damagestyle,^style_melee_defensive
+data=damagetype,^stab_style
+data=damagetype,^slash_style
+data=damagetype,^stab_style
