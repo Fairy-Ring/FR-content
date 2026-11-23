@@ -296,10 +296,76 @@ function exercisePvp(test) {
     }
 }
 
+function exerciseGreegree() {
+    let apeCorridor;
+    for (let x = 2700; x < 2750 && !apeCorridor; x++) {
+        for (let z = 2700; z < 2750; z++) {
+            if (clearStraightCorridor(x, z, 1, 0, 3)) {
+                apeCorridor = { level: 0, x, z };
+                break;
+            }
+        }
+    }
+    assert(apeCorridor, 'find a clear packed corridor inside the greegree zone');
+    const greegree = ObjType.getByName('mm_monkey_greegree_for_normal_monkey');
+    assert(greegree, 'packed normally obtainable monkey greegree');
+    for (const test of [
+        { label: 'far worn', distance: 3, hold: true },
+        { label: 'adjacent worn', distance: 1, hold: true },
+        { label: 'carried only', distance: 2, hold: false }
+    ]) {
+        const start = { ...apeCorridor, x: apeCorridor.x + 3 - test.distance };
+        const player = createPlayer('greegree', start);
+        let target;
+        try {
+            prepareAttacker(player, bronzeDagger);
+            player.invAdd(inventory, greegree.id, 1);
+            if (test.hold) {
+                player.lastSlot = player.getInventory(inventory).getItemIndex(greegree.id);
+                player.lastItem = greegree.id;
+                const hold = ScriptProvider.getByTrigger(ServerTriggerType.OPHELD2, greegree.id, greegree.category);
+                assert.equal(hold?.name, '[opheld2,_mm_greegree]', 'native inventory lookup selects Hold');
+                const state = ScriptRunner.init(hold, player, null);
+                player.executeScript(state, true, true);
+                assert.equal(state.execution, ScriptState.FINISHED, 'ordinary Hold finishes');
+                assert.equal(player.getInventory(worn).get(rightHand)?.id, greegree.id, 'ordinary Hold equips the greegree');
+                assert.equal(player.npcId, id(NpcType, 'mm_transmogrification_normal_monkey'), 'ordinary Hold creates monkey form');
+            }
+            target = new Npc(0, apeCorridor.x + 3, apeCorridor.z, manType.size, manType.size,
+                EntityLifeCycle.DESPAWN, World.getNextNid(), manType.id, manType.blockwalk);
+            World.addNpc(target, -1);
+            target.lastMovement = -100;
+            target.setVar(npcAggressivePlayer, player.uid);
+            player.testMessages.length = 0;
+            assert(player.setInteraction(Interaction.ENGINE, target, ServerTriggerType.APNPC2), `${test.label}: native Attack`);
+            assert.equal(player.getOpTrigger()?.name, '[opnpc2,_]');
+            assert.equal(player.getApTrigger()?.name, '[apnpc2,_]');
+            player.processInteraction();
+            assertHealthy(player, test.label);
+            const hits = [...target.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE2);
+            const text = player.testMessages.map(packet => packet.text ?? '').join(' ');
+            if (test.hold) {
+                assert(text.includes('You cannot attack as a monkey.'), `${test.label}: exact inherited refusal`);
+                assert.deepEqual([player.x, player.z], [start.x, start.z], `${test.label}: refusal precedes movement`);
+                assert.equal(hits.length, 0, `${test.label}: no hit queued`);
+            } else {
+                assert(!text.includes('You cannot attack as a monkey.'), 'carrying alone is not refused');
+                assert.equal(hits.length, 1, 'carrying alone reaches native melee delivery');
+                assert.equal(player.x, target.x - 1, 'carrying alone approaches to adjacent range');
+            }
+            console.log(`PASS greegree Attack ${test.label}: start=${start.x},${start.z} end=${player.x},${player.z} hits=${hits.length}`);
+        } finally {
+            if (target) World.removeNpc(target, -1);
+            cleanupPlayer(player);
+        }
+    }
+}
+
 for (const test of reachCases) {
     exerciseNpc(test);
     exercisePvp(test);
 }
+exerciseGreegree();
 
 console.log('PASS weapon-reach: compiled NPC and PvP Attack dispatch uses packed reach and collision-aware approach');
 process.exit(0);

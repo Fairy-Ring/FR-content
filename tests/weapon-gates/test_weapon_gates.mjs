@@ -232,6 +232,11 @@ for (const gate of gates) {
   }
   exercise(gate, null, null);
 }
+// Sal's period guide permits weapon-making materials, not a finished bow.
+exercise(gates[0], 'shortbow', 'inventory');
+exercise({ ...gates[0], permitsGear: true }, 'unstrung_shortbow', 'inventory');
+// UNKNOWN favourable default: no retained period source explicitly refuses arrows.
+exercise({ ...gates[0], permitsGear: true }, 'bronze_arrow', 'inventory');
 exercise({ ...gates[1], name: 'Mage Arena barrier without permission',
   setup: p => variable(p, 'magearena', 0), denied: true,
   refusal: 'You cannot enter without the permission of Kolodion.' }, 'rune_halberd', 'worn');

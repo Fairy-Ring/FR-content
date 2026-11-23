@@ -2,6 +2,10 @@
 [apnpc2,_] @player_combat_start_ap;
 
 [label,player_combat_start_ap]
+if (~mm_wearing_greegree = true) { // checks before attackrange
+    ~mesbox("You cannot attack as a monkey.");
+    return;
+}
 def_int $attackrange = ~player_attackrange(inv_getobj(worn, ^wearpos_rhand));
 if (($attackrange <= 1 & ~player_in_combat_check = false) | npc_range(coord) > $attackrange) {
     p_aprange($attackrange);
@@ -68,6 +72,10 @@ switch_int ($damagetype) {
 }
 
 [proc,player_in_combat_check]()(boolean)
+if (~mm_wearing_greegree = true) {
+    ~mesbox("You cannot attack as a monkey.");
+    return(false);
+}
 if (~waterbirth_support_side = false) return(false);
 if (~swamp_cave_can_attack = false) return(false);
 // npc_forcemulti: treat as multi even outside multiway (274 player_combat; Draugen etc.)
