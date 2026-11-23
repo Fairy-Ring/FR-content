@@ -184,8 +184,12 @@ for (const row of expected) {
         }
 
         assert.equal(type.category, id(types.CategoryType, row.category), `${row.name}: weapon category`);
+        assert(type.params.has(id(types.ParamType, 'attackrate')), `${row.name}: explicit authored attack rate`);
         assert.equal(intParam(type, 'attackrate'), row.attackrate, `${row.name}: attack rate`);
         assert.equal(intParam(type, 'attackrange'), row.attackrange, `${row.name}: attack range`);
+        if (row.attackrange > 0) {
+            assert(type.params.has(id(types.ParamType, 'attackrange')), `${row.name}: explicit authored attack range`);
+        }
         const defendSequence = types.SeqType.getId(row.defend_anim);
         assert(defendSequence >= 0, `${row.name}: packed defend sequence ${row.defend_anim}`);
         assert.equal(intParam(type, 'defend_anim'), defendSequence, `${row.name}: defend animation`);
@@ -374,6 +378,10 @@ function assertNativePvMSpecial(name, expectedCost) {
 
 const shortbow = types.ObjType.get(id(types.ObjType, 'magic_shortbow'));
 const longbow = types.ObjType.get(id(types.ObjType, 'magic_longbow'));
+assert(shortbow.params.has(id(types.ParamType, 'attackrate')), 'magic shortbow explicit authored attack rate');
+assert.equal(intParam(shortbow, 'attackrate'), 4, 'magic shortbow preserves the published default rate');
+assert(shortbow.params.has(id(types.ParamType, 'attackrange')), 'magic shortbow explicit authored attack range');
+assert.equal(intParam(shortbow, 'attackrange'), 7, 'magic shortbow preserves the published range');
 assert.equal(intParam(shortbow, 'sa_energy'), 550, 'magic shortbow authored special cost');
 assert.equal(intParam(longbow, 'sa_energy'), 350, 'magic longbow special cost remains unchanged');
 assert.equal(intParam(shortbow, 'specwep'), 1, 'magic shortbow is special-enabled');
