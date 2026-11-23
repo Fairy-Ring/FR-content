@@ -20,7 +20,7 @@ category=weapon_bow
 weight=3lb
 param=rangeattack,69
 param=levelrequire,50
-// Preserve the published attackrate default explicitly; no timing change.
+// Preserved engine default: attackrate 4; this explicit parameter changes no timing.
 param=attackrate,4
 param=attackrange,7
 param=rangeattack_anim,human_bow

@@ -76,8 +76,8 @@ param=rangedefence,0
 param=strengthbonus,6
 param=prayerbonus,0
 category=weapon_slash
-// CANDIDATE: same raw item-page speed as the published plain machete (5 ticks).
-param=attackrate,5
+// CANDIDATE: corrected jade raw speed 6 matches dagger/scimitar (4 ticks); equipment-data records the seven-minute 5.
+param=attackrate,4
 // CANDIDATE: published plain machete and scimitar combat route.
 // human_machette_chop is used for jungle chopping; combat follows the published family.
 param=slashattack_anim,human_sword_slash

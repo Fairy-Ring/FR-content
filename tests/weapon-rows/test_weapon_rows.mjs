@@ -88,6 +88,15 @@ const expected = JSON.parse(fs.readFileSync(new URL('./expected.json', import.me
 assert(Array.isArray(expected) && expected.length > 0, 'source-derived weapon rows');
 assert.equal(new Set(expected.map(row => row.name)).size, expected.length, 'unique source cases');
 
+const arrowCategory = id(types.CategoryType, 'arrows');
+let highestArrowTier = -Infinity;
+for (let objectId = 0; objectId < types.ObjType.count; objectId++) {
+    const type = types.ObjType.get(objectId);
+    if (type.category === arrowCategory) {
+        highestArrowTier = Math.max(highestArrowTier, intParam(type, 'levelrequire'));
+    }
+}
+
 function runScript(player, name, args = []) {
     const script = ScriptProvider.getByName(name);
     assert(script, `packed script ${name}`);
@@ -189,6 +198,12 @@ for (const row of expected) {
         assert.equal(intParam(type, 'attackrange'), row.attackrange, `${row.name}: attack range`);
         if (row.attackrange > 0) {
             assert(type.params.has(id(types.ParamType, 'attackrange')), `${row.name}: explicit authored attack range`);
+        }
+        if (row.name === 'daganoth_cave_magic_shortbow') {
+            const arrowTier = intParam(type, 'levelrequire');
+            assert(type.params.has(id(types.ParamType, 'levelrequire')) && arrowTier === 60 && arrowTier >= highestArrowTier,
+                `${row.name}: ammunition tier must be explicit 60 and cover all packed arrows (maximum ${highestArrowTier}); got ${arrowTier}`);
+            console.log(`PASS Seercull ammunition tier ${arrowTier} covers all packed arrows (maximum ${highestArrowTier})`);
         }
         const defendSequence = types.SeqType.getId(row.defend_anim);
         assert(defendSequence >= 0, `${row.name}: packed defend sequence ${row.defend_anim}`);

@@ -557,7 +557,7 @@
       "rangebonus": 0
     },
     "category": "weapon_slash",
-    "attackrate": 5,
+    "attackrate": 4,
     "attackrange": 0,
     "defend_anim": "human_sword_def",
     "styles": [
