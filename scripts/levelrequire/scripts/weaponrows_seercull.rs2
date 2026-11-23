@@ -1,0 +1,2 @@
+// VERIFIED: Sal Ranging, captured 27 April 2006: Seercull 69 ranged attack, level 60.
+[opheld2,daganoth_cave_magic_shortbow] @levelrequire_ranged(60, last_slot);

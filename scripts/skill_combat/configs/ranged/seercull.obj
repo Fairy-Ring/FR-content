@@ -1,0 +1,43 @@
+[daganoth_cave_magic_shortbow]
+name=Seercull
+desc=An ancient Fremennik bow that was once used to battle the Moon Clan.
+recol1s=7330
+recol1d=15617
+members=yes
+cost=8000
+model=obj_daganoth_cave_magic_shortbow
+2dxof=-5
+2dyof=5
+2dzoom=1650
+2dyan=20
+2dxan=384
+iop2=Wield
+manwear=obj_daganoth_cave_magic_shortbow_manwear,0
+womanwear=obj_daganoth_cave_magic_shortbow_manwear,6
+wearpos=righthand
+wearpos2=lefthand
+weight=3lb
+// VERIFIED: Sal Ranging, captured 27 April 2006, Seercull ranged attack 69.
+param=rangeattack,69
+// CANDIDATE: own item page 11051, revision 135584, 10 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,0
+param=prayerbonus,0
+category=weapon_bow
+param=attackrate,5
+param=attackrange,8
+// VERIFIED: the same period row gives Ranged 60; also controls permitted arrow tiers.
+param=levelrequire,60
+// CANDIDATE: published shortbow and longbow presentation route; no special attack.
+param=rangeattack_anim,human_bow
+param=defend_anim,human_unarmedblock
+param=rangeattack_sound,arrowlaunch2
+param=damagetype,^ranged_style

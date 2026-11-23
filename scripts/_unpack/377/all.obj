@@ -78500,25 +78500,6 @@ weight=1kg
 certlink=fishbowl_empty
 certtemplate=template_for_cert
 
-[daganoth_cave_magic_shortbow]
-name=Seercull
-desc=An ancient Fremennik bow that was once used to battle the Moon Clan.
-recol1s=7330
-recol1d=15617
-members=yes
-cost=8000
-model=obj_daganoth_cave_magic_shortbow
-2dxof=-5
-2dyof=5
-2dzoom=1650
-2dyan=20
-2dxan=384
-iop2=Wield
-manwear=obj_daganoth_cave_magic_shortbow_manwear,0
-womanwear=obj_daganoth_cave_magic_shortbow_manwear,6
-wearpos=righthand
-wearpos2=lefthand
-weight=3lb
 
 [cert_daganoth_cave_magic_shortbow]
 certlink=daganoth_cave_magic_shortbow
