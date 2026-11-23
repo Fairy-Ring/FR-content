@@ -80,7 +80,7 @@ if ($choice = 1) {
 ~chatplayer("<p,happy>Yes indeedy.");
 ~chatnpc("<p,happy>Good, good, you have a healthy sense of competition.");
 ~chatnpc("<p,neutral>Remember traveller, in my arena hand to hand combat|is useless. Your strength will diminish as you enter the|arena, but the spells you can learn are amongst the most powerful in RuneScape.");
-~chatnpc("<p,neutral>Before I can accept you in, we must duel.|You may not take armour or weapons into the arena."); // second sentence is rsc
+~chatnpc("<p,neutral>Before I can accept you in, we must duel.");
 @multi2("Ok, let's fight.", arenamage1_lets_fight, "No thanks.", exit);
 
 [label,arenamage1_no_i_dont]
