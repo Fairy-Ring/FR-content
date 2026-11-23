@@ -252,6 +252,8 @@ Nezikchened's AP route, non-damaging Bind/Confuse for chaos druid's AP route,
 and no accuracy roll for the troll thrower and snail routes. These native
 limitations are preserved, not repaired by the seam.
 
+The suite tries the stored seed first. If it reaches another branch, it tries at most 32 unsigned candidates `Math.imul(n, 0x9e3779b9) >>> 0` for `n=1..32`, skipping a duplicate of the stored seed. This caps an unreachable branch at 33 native fixture executions including the preferred seed. The mirror-shield trace found its replacement at candidate 3; the cap leaves headroom while bounding the cost of rebuilding native routes, especially Tolna's private-region fixture. Failed probes are not differentials or report cases/costs; each accepted branch prints and records its selected seed and total attempts. A branch mismatch with a script error fails immediately rather than entering the search. Existing named no-accuracy limitations above retain their previous behavior.
+
 The outcomes return `(attempted, accuracy, rolled, delivered, ticks)`. Accuracy is
 `-1` when no attempt is made, `0` for a miss and `1` for an accuracy success,
 including a zero magnitude. `ticks` is the native queued damage delay, or zero

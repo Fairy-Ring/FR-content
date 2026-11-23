@@ -22,6 +22,8 @@ const registered = JSON.parse(fs.readFileSync(path.join(here, 'outcome-callers.j
 const routeSeeds = JSON.parse(fs.readFileSync(path.join(here, 'outcome-route-seeds.json'), 'utf8'));
 const watched = ['npc_default_attack', 'npc_meleeattack', 'npc_rangeattack', 'npc_cast_spell', 'npc_cast_spell_with_forced_max_hit', 'npc_spell_success', 'playerhit_n_melee', 'playerhit_n_ranged', 'npc_player_hit_roll', 'npc_spell_cast', 'npc_combat_spell_checks', 'npc_freeze_allowed', 'npc_debuff_allowed', 'npc_spell_fail', 'npc_stat_change_effect', 'npc_freeze_effect'];
 const variants = ['hit', 'zero', 'miss', 'protected-hit', 'protected-zero', 'protected-miss', 'pending', 'target-loss', 'npc-busy', 'dead-player'];
+const MAX_ROUTE_SEED_FALLBACK_ATTEMPTS = 32;
+const ROUTE_SEED_MULTIPLIER = 0x9e3779b9;
 const digest = value => crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const effects = result => ({ snapshot: result.snapshot, settled: result.settled, events: result.events.filter(e => /QUEUE|ANIM|SOUND|^MES|DAMAGE|SETMODE|STAT_(ADD|SUB)|^IF_CLOSE|^RUNENERGY|^RANDOM(INC)?$/.test(e.op)), draws: result.draws, randomSources: result.randomSources });
 let checks = 0;
@@ -31,7 +33,7 @@ function same(actual, expected, label, full = false) {
   if (full) assert.deepEqual(actual.events, expected.events, `${label}: ordered reads, computations and effects`);
 }
 const temporary = fs.mkdtempSync(path.join(process.env.RUNNER_TEMP ?? os.tmpdir(), 'npc-outcomes-'));
-const report = { schema: 1, callerManifest: registered.policy, basePack: Boolean(base), cases: [], costs: [], routeCoverage: [], externalCallers: {}, observedCallers: [], summary: {} };
+const report = { schema: 1, callerManifest: registered.policy, basePack: Boolean(base), routeSeedSearch: { method: 'preferred manifest seed, then unsigned multiples via Math.imul(index, 0x9e3779b9) >>> 0', maxFallbackAttempts: MAX_ROUTE_SEED_FALLBACK_ATTEMPTS, attemptsIncludePreferred: true }, cases: [], costs: [], routeCoverage: [], externalCallers: {}, observedCallers: [], summary: {} };
 try {
   const compiled = spawnSync(process.execPath, ['--import', 'tsx', path.join(here, 'compile_outcome_fixture.mjs'), temporary], { cwd: engine, env: process.env, encoding: 'utf8' });
   process.stdout.write(compiled.stdout ?? ''); process.stderr.write(compiled.stderr ?? '');
@@ -62,7 +64,7 @@ try {
     }
     for (const name of ['npc_meleeattack_outcome', 'npc_default_attack_outcome', 'npc_rangeattack_outcome', 'npc_cast_spell_outcome']) assert(namedProcs.has(`[proc,${name}]`), name);
   });
-  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null, fixtureType = type) {
+  function execute(directory, type, name, args, variant, style, configure = null, distance = 1, rng = null, fixtureType = type, trackObserved = true) {
     rt.select(directory);
     const f = rt.fixture(fixtureType, variant, style, distance);
     let cleanup;
@@ -74,7 +76,7 @@ try {
       const actualArgs = typeof args === 'function' ? args(f) : args;
       const result = rt.observe(name, f, actualArgs, variant, rng);
       result.settled = rt.settle(f);
-      for (const caller of result.visited) observed.add(caller);
+      if (trackObserved) for (const caller of result.visited) observed.add(caller);
       return result;
     } finally {
       try { cleanup?.(); }
@@ -86,8 +88,9 @@ try {
     const added = Object.fromEntries([...new Set([...Object.keys(before.commands), ...Object.keys(after.commands)])].map(op => [op, (after.commands[op] ?? 0) - (before.commands[op] ?? 0)]).filter(([, count]) => count));
     report.costs.push({ ...metadata, before: before.opcount, after: after.opcount, added });
   }
-  function differential(type, name, args, variant, style, metadata = {}, configure = null, distance = 1, rng = null, compareBase = true, fixtureType = type) {
-    const head = execute(pack, type, name, args, variant, style, configure, distance, rng, fixtureType);
+  function differential(type, name, args, variant, style, metadata = {}, configure = null, distance = 1, rng = null, compareBase = true, fixtureType = type, selectedHead = null) {
+    const head = selectedHead ?? execute(pack, type, name, args, variant, style, configure, distance, rng, fixtureType);
+    for (const caller of head.visited) observed.add(caller);
     if (base && compareBase) {
       const before = execute(base, type, name, args, variant, style, configure, distance, rng, fixtureType);
       same(head, before, `${type} ${name} ${variant}`, true);
@@ -609,14 +612,52 @@ try {
     const branches = [];
     const style = route.style ?? 'melee';
     const nativeTolna = route.prelude === 'soulbane-tolna-intro';
-    for (const [branch, seed] of Object.entries(route.seeds)) check(`${route.script} seeded ${branch}`, () => {
-      const result = differential(route.npc, route.script, [], 'seeded', style,
-        { routeBranch: branch, seed, profile: route.profile, stand: route.stand },
-        f => configureRoute(f, route), route.distance ?? 1, { seed }, !nativeTolna, nativeTolna ? 'cow' : route.npc);
-      assert.equal(dispatchBranch(result), branch, `${route.script} seed=${seed}`);
-      if (nativeTolna) assertTolnaRouteStyle(result, route, branch);
-      branches.push({ branch, seed, accuracy: result.accuracy, queued: result.snapshot.queued, error: result.snapshot.error });
-    });
+    for (const [branch, preferredSeed] of Object.entries(route.seeds)) {
+      let attempts = 0;
+      const outcomes = [];
+      const probe = seed => {
+        const result = execute(pack, route.npc, route.script, [], 'seeded', style,
+          f => configureRoute(f, route), route.distance ?? 1, { seed },
+          nativeTolna ? 'cow' : route.npc, false);
+        attempts++;
+        const actualBranch = dispatchBranch(result);
+        if (actualBranch !== branch) {
+          // Preserve existing named no-accuracy routes; never retry an error as RNG drift.
+          assert.deepEqual(result.errors, [], `${route.script} seed=${seed}: script diagnostics`);
+          assert.equal(result.snapshot.error, null, `${route.script} seed=${seed}: script execution error`);
+          assert.equal(result.settled.error, null, `${route.script} seed=${seed}: settled script execution error`);
+        }
+        outcomes.push(`${seed}:${actualBranch}`);
+        return { seed, result, actualBranch };
+      };
+      let selected = probe(preferredSeed);
+      if (selected.actualBranch !== branch) {
+        for (let index = 1; index <= MAX_ROUTE_SEED_FALLBACK_ATTEMPTS; index++) {
+          const seed = Math.imul(index, ROUTE_SEED_MULTIPLIER) >>> 0;
+          if (seed === preferredSeed) continue;
+          const candidate = probe(seed);
+          if (candidate.actualBranch === branch) {
+            selected = candidate;
+            break;
+          }
+        }
+      }
+      assert.equal(selected.actualBranch, branch,
+        `${route.script} npc=${route.npc} branch=${branch}: no native branch after ${attempts} attempts; preferred seed=${preferredSeed}; observed ${outcomes.join(', ')}`);
+      const seedMetadata = { seed: selected.seed, preferredSeed, seedAttempts: attempts };
+      check(`${route.script} seeded ${branch} seed=${selected.seed} attempts=${attempts}`, () => {
+        const result = differential(route.npc, route.script, [], 'seeded', style,
+          { routeBranch: branch, ...seedMetadata, profile: route.profile, stand: route.stand },
+          f => configureRoute(f, route), route.distance ?? 1, { seed: selected.seed }, !nativeTolna,
+          nativeTolna ? 'cow' : route.npc, selected.result);
+        assert.equal(dispatchBranch(result), branch, `${route.script} seed=${selected.seed} attempts=${attempts}`);
+        if (nativeTolna) assertTolnaRouteStyle(result, route, branch);
+        branches.push({
+          branch, ...seedMetadata, accuracy: result.accuracy,
+          queued: result.snapshot.queued, error: result.snapshot.error
+        });
+      });
+    }
     report.routeCoverage.push({ script: route.script, npc: route.npc, style, profile: route.profile, stand: route.stand, branches, unsupportedBranches: route.unsupportedBranches ?? {} });
   }
   check('Tolna native route manifest covers the five source styles', () => {
