@@ -211,13 +211,13 @@ for (const row of expected) {
             assert(style, `${row.name}: no unexpected combat route at mode ${mode}`);
             assert.equal(player.getVar(varIds.damageType), style.type, `${row.name} mode ${mode}: damage type`);
             assert.equal(player.getVar(varIds.damageStyle), style.stance, `${row.name} mode ${mode}: stance`);
-            assert.equal(typeof style.animation, 'string' && style.animation.length > 0, true,
+            assert.equal(typeof style.animation === 'string' && style.animation.length > 0, true,
                 `${row.name} mode ${mode}: expected animation identity`);
             const animation = types.SeqType.getId(style.animation);
             assert(animation >= 0, `${row.name} mode ${mode}: packed animation ${style.animation}`);
             assert.equal(player.getVar(varIds.attackAnim), animation,
                 `${row.name} mode ${mode}: compiled attack animation`);
-            assert.equal(typeof style.sound, 'string' && style.sound.length > 0, true,
+            assert.equal(typeof style.sound === 'string' && style.sound.length > 0, true,
                 `${row.name} mode ${mode}: expected sound identity`);
             assert(synthIds.has(style.sound), `${row.name} mode ${mode}: packed sound ${style.sound}`);
             const sound = synthIds.get(style.sound);

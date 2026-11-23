@@ -35,7 +35,7 @@ category=weapon_slash
 // CANDIDATE: earliest numeric item speed, converted from the old speed-bar scale.
 param=attackrate,5
 // CANDIDATE: published plain machete and scimitar combat route.
-// human_machette_chop and machete_slash belong to jungle chopping, not this combat route.
+// human_machette_chop is used for jungle chopping; combat follows the published family.
 param=slashattack_anim,human_sword_slash
 param=stabattack_anim,human_sword_stab
 param=defend_anim,human_sword_def
@@ -79,7 +79,7 @@ category=weapon_slash
 // CANDIDATE: earliest numeric item speed, converted from the old speed-bar scale.
 param=attackrate,5
 // CANDIDATE: published plain machete and scimitar combat route.
-// human_machette_chop and machete_slash belong to jungle chopping, not this combat route.
+// human_machette_chop is used for jungle chopping; combat follows the published family.
 param=slashattack_anim,human_sword_slash
 param=stabattack_anim,human_sword_stab
 param=defend_anim,human_sword_def
@@ -123,7 +123,7 @@ category=weapon_slash
 // CANDIDATE: earliest numeric item speed, converted from the old speed-bar scale.
 param=attackrate,4
 // CANDIDATE: published plain machete and scimitar combat route.
-// human_machette_chop and machete_slash belong to jungle chopping, not this combat route.
+// human_machette_chop is used for jungle chopping; combat follows the published family.
 param=slashattack_anim,human_sword_slash
 param=stabattack_anim,human_sword_stab
 param=defend_anim,human_sword_def
