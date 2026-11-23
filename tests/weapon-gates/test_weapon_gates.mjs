@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Native dispatch for every consumer of the four no-weapon predicates.
+// Native dispatch for three no-weapon predicates and the dated Mage Arena equipment rule.
 import assert from 'node:assert/strict';
 import {
   World, ScriptProvider, ScriptState, ServerTriggerType as Trigger, engineModule,
@@ -22,12 +22,13 @@ const refusal = {
 const gates = [
   { name: 'Entrana monk', npc: 'shipmonk', at: [0, 3046, 3235], trigger: Trigger.APNPC1,
     script: '[opnpc1,shipmonk]', choices: [2], refusal: refusal.entrana, destination: [1, 2834, 3331] },
+  // Official 30 August 2005 news permits armour and weapons, not non-magical combat.
   { name: 'Mage Arena barrier', loc: 'magearena_scan', at: [0, 3100, 3950], stand: [0, 3100, 3951],
-    trigger: Trigger.APLOC1, script: '[oploc1,magearena_scan]', refusal: refusal.arena,
+    trigger: Trigger.APLOC1, script: '[oploc1,magearena_scan]', refusal: refusal.arena, permitsGear: true,
     setup: p => variable(p, 'magearena', 6), destination: [0, 3100, 3950] },
   ...[1, 2].map(stage => ({ name: `Kolodion ${stage === 1 ? 'first duel' : 'return'}`, npc: 'arenamage1',
     at: [0, 2538, 4714], trigger: Trigger.APNPC1, script: '[opnpc1,arenamage1]', refusal: refusal.arena,
-    setup: p => variable(p, 'magearena', stage), destination: [0, 3105, 3934] })),
+    permitsGear: true, setup: p => variable(p, 'magearena', stage), destination: [0, 3105, 3934] })),
   { name: "Glarial's tomb", loc: 'glarials_tombstone_waterfall_quest', at: [0, 2558, 3445],
     trigger: Trigger.APLOCU, script: '[oplocu,glarials_tombstone_waterfall_quest]', refusal: refusal.waterfall,
     setup: p => { p.invAdd(inv, obj('glarials_pebble_waterfall_quest'), 1); p.lastUseItem = obj('glarials_pebble_waterfall_quest'); },
@@ -103,11 +104,11 @@ function exercise(gate, weapon, location) {
     finish(p, state, [...(gate.choices ?? [])]);
     const text = [...p.messages, ...p.packets.filter(packet => packet.constructor.name === 'IfSetText')
       .map(packet => packet.text)].join(' ').replaceAll('|', ' ').replace(/\s+/g, ' ');
-    if (weapon) {
+    if (gate.denied || (weapon && !gate.permitsGear)) {
       assert(text.includes(gate.refusal), `${context}: existing refusal is shown; got ${text}`);
       assert.deepEqual(tile(p), start, `${context}: refused player does not enter`);
     } else {
-      assert(!text.includes(gate.refusal), `${context}: no weapon refusal`);
+      assert(!text.includes(gate.refusal), `${context}: no equipment refusal`);
       assert.deepEqual(tile(p), gate.destination, `${context}: admitted player arrives`);
     }
     console.log(`PASS ${context}`);
@@ -118,11 +119,52 @@ function exercise(gate, weapon, location) {
   }
 }
 
+function arenaMeleeRefused() {
+  const p = player();
+  const npcsBefore = new Set([...World.npcs]);
+  try {
+    [p.level, p.x, p.z] = [0, 3105, 3934];
+    p.originX = p.x; p.originZ = p.z;
+    variable(p, 'magearena', 6);
+    for (const name of ['rune_halberd', 'bronze_platebody']) {
+      const item = types.ObjType.getByName(name);
+      assert(item, `packed equipment ${name}`);
+      p.invSet(worn, item.id, 1, item.wearpos);
+    }
+    const target = spawn('kolhuman', [0, 3106, 3934]);
+    assert.equal(types.NpcType.getByName('kolhuman').op[1], 'Attack', 'Kolodion exposes Attack');
+    target.setVar(id('VarNpcType', 'npc_aggressive_player'), p.uid);
+    const before = tile(p);
+    assert(p.setInteraction(Interaction.ENGINE, target, Trigger.APNPC2), 'native armed Attack interaction');
+    const script = p.getOpTrigger();
+    assert.equal(script?.name, '[opnpc2,_]', 'native NPC Attack handler');
+    const state = Runner.init(script, p, target);
+    p.executeScript(state, true, true);
+    finish(p, state, []);
+    assert(p.messages.includes('Kolodion allows only magical combat within the arena.'),
+      'armed melee Attack is refused with the existing magic-only message');
+    assert.deepEqual(tile(p), before, 'refused Attack does not move the player');
+    assert.equal([...target.queue.all()].filter(request => request.queueId === Trigger.AI_QUEUE2).length, 0,
+      'refused melee Attack queues no damage');
+    console.log('PASS Mage Arena: armed melee Attack is refused');
+  } finally {
+    for (const npc of World.npcs) if (npc && !npcsBefore.has(npc)) World.removeNpc(npc, -1);
+    World.players[p.slot] = null;
+    p.unlink(); p.cleanup();
+  }
+}
+
 for (const gate of gates) {
-  for (const weapon of ['rune_halberd', 'abyssal_whip', 'rune_claws']) {
-    for (const location of ['inventory', 'worn']) exercise(gate, weapon, location);
+  const equipment = ['rune_halberd', 'abyssal_whip', 'rune_claws'];
+  if (gate.permitsGear) equipment.push('bronze_platebody');
+  for (const item of equipment) {
+    for (const location of ['inventory', 'worn']) exercise(gate, item, location);
   }
   exercise(gate, null, null);
 }
-console.log('PASS weapon-gates: every changed predicate consumer refuses carried/worn halberds, whips and claws; unarmed passage remains open');
+exercise({ ...gates[1], name: 'Mage Arena barrier without permission',
+  setup: p => variable(p, 'magearena', 0), denied: true,
+  refusal: 'You cannot enter without the permission of Kolodion.' }, 'rune_halberd', 'worn');
+arenaMeleeRefused();
+console.log('PASS weapon-gates: three weapon bans, unrestricted Mage Arena equipment, Kolodion permission and magic-only combat');
 process.exit(0);
