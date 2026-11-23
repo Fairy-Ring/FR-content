@@ -5,6 +5,7 @@
 def_int $damage = 0;
 def_int $maxhit = %com_maxhit;
 // CANDIDATE: later developer statement gives 125% accuracy against slash defence.
+// UNKNOWN engineering: ordinary maximum damage, as no source gives a damage boost.
 def_int $attack_roll = scale(^dragon_scimitar_accuracy, 100, ~player_attack_roll_specific(%damagetype));
 def_int $defence_roll = ~.player_defence_roll_specific(^slash_style);
 if (randominc($attack_roll) > randominc($defence_roll)) {
@@ -14,7 +15,7 @@ if (randominc($attack_roll) > randominc($defence_roll)) {
     $damage = min(randominc($maxhit), .stat(hitpoints));
     ~give_combat_experience_pvp(%damagestyle, $damage, ~pvp_xp_multiplier(~.player_combat_level));
     both_heropoints($damage);
-    // A successful accuracy roll counts even when the damage roll is zero.
+    // CANDIDATE: a successful accuracy roll counts even with zero damage (29 May 2017 developer statement).
     ~dragon_scimitar_sever;
 }
 // VERIFIED 377 resource identities; UNKNOWN original binding, height and delays.
