@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // Native dispatch for three no-weapon predicates and the dated Mage Arena equipment rule.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import {
   World, ScriptProvider, ScriptState, ServerTriggerType as Trigger, engineModule,
-  types, id, obj, inv, worn, player, resumeDialogue, tile,
+  types, id, obj, inv, worn, player, resumeDialogue, tile, execute, held, inventory,
 } from '../swamp-caves/runtime.mjs';
 
 const Runner = (await engineModule('engine/script/ScriptRunner.ts')).default;
@@ -11,6 +12,15 @@ const Npc = (await engineModule('engine/entity/Npc.ts')).default;
 const Loc = (await engineModule('engine/entity/Loc.ts')).default;
 const { EntityLifeCycle } = await engineModule('engine/entity/EntityLifeCycle.ts');
 const { Interaction } = await engineModule('engine/entity/Interaction.ts');
+const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
+const constant = (file, name) => {
+  const source = readFileSync(new URL(`../../scripts/${file}`, import.meta.url), 'utf8');
+  const match = new RegExp(`^\\^${name}\\s*=\\s*(\\d+)\\s*$`, 'm').exec(source);
+  assert(match, `missing checked-out constant ${name}`);
+  return Number(match[1]);
+};
+const windStrike = constant('skill_combat/configs/magic/spells.constant', 'wind_strike');
+const cannonComplete = constant('general/configs/quest.constant', 'mcannon_complete');
 const variable = (p, name, value) => p.setVar(id('VarPlayerType', name), value);
 const refusal = {
   entrana: "NO WEAPONS OR ARMOUR are permitted on holy Entrana AT ALL. We will not allow you to travel there in breach of mighty Saradomin's edict.",
@@ -154,6 +164,66 @@ function arenaMeleeRefused() {
   }
 }
 
+function cannonFireCase(label, ownerAt, targetAt, fires) {
+  const p = player();
+  const originalRandom = JavaRandom.nextDouble;
+  let target;
+  try {
+    [p.level, p.x, p.z] = ownerAt;
+    p.originX = p.x; p.originZ = p.z;
+    variable(p, 'magearena', 1);
+    const staff = types.ObjType.getByName('staff_of_air');
+    assert(staff, 'packed autocast staff');
+    p.invSet(worn, staff.id, 1, staff.wearpos);
+    p.setVarBit(id('VarBitType', 'autocast_spell'), windStrike);
+    p.setVarBit(id('VarBitType', 'autocast_set'), 1);
+    variable(p, 'rockthrower', 5);
+    variable(p, 'ownedmcannon', (p.level << 28) | ((p.x - 2) << 14) | p.z);
+    target = spawn('kolhuman', targetAt);
+    target.setVar(id('VarNpcType', 'npc_aggressive_player'), p.uid);
+    // Deterministic accurate roll, as in the existing cannon-gate fixture.
+    JavaRandom.nextDouble = () => 0.0001;
+    execute('[proc,cannon_fire]', p, [], { target });
+    assert.equal(p.getVar(id('VarPlayerType', 'rockthrower')), fires ? 4 : 5,
+      `${label}: ${fires ? 'one cannonball spent' : 'no cannonball spent'}`);
+    assert.equal([...target.queue.all()].filter(request => request.queueId === Trigger.AI_QUEUE2).length,
+      fires ? 1 : 0, `${label}: ${fires ? 'one cannon hit queued' : 'no cannon hit queued'}`);
+    assert.deepEqual(p.messages, [], `${label}: cannon firing/refusal is silent`);
+    console.log(`PASS Mage Arena cannon: ${label}`);
+  } finally {
+    JavaRandom.nextDouble = originalRandom;
+    if (target) World.removeNpc(target, -1);
+    World.players[p.slot] = null;
+    p.unlink(); p.cleanup();
+  }
+}
+
+function arenaCannonSetupRefused() {
+  const p = player();
+  try {
+    [p.level, p.x, p.z] = [0, 3105, 3934];
+    p.originX = p.x; p.originZ = p.z;
+    variable(p, 'mcannon', cannonComplete);
+    variable(p, 'ownedmcannon', -1);
+    for (const name of ['twpart1', 'twpart2', 'twpart3', 'twpart4']) p.invAdd(inv, obj(name), 1);
+    const before = inventory(p);
+    assert(held(p, 'twpart1', 1), 'native cannon Set-up inventory operation is accepted');
+    assert.equal(p.activeScript, null, 'refused cannon setup finishes without delay');
+    assert.deepEqual(p.messages, ["You can't set up a cannon here."], 'existing generic setup refusal');
+    assert.deepEqual(inventory(p), before, 'refused setup retains every cannon part');
+    assert.equal(p.getVar(id('VarPlayerType', 'ownedmcannon')), -1, 'no cannon ownership created');
+    assert.equal(p.getVar(id('VarPlayerType', 'dropcannon')), 0, 'no assembly stage written');
+    assert.equal(p.getVar(id('VarPlayerType', 'rockthrower')), 0, 'no loaded ammunition written');
+    assert(![...World.gameMap.getZone(p.x - 1, p.z - 1, p.level).getAllLocsSafe()]
+      .some(loc => loc.x === p.x - 1 && loc.z === p.z - 1 && loc.type === id('LocType', 'multicannon_base')),
+    'refused setup creates no cannon base');
+    console.log('PASS Mage Arena cannon: native Set-up is refused');
+  } finally {
+    World.players[p.slot] = null;
+    p.unlink(); p.cleanup();
+  }
+}
+
 for (const gate of gates) {
   const equipment = ['rune_halberd', 'abyssal_whip', 'rune_claws'];
   if (gate.permitsGear) equipment.push('bronze_platebody');
@@ -166,5 +236,9 @@ exercise({ ...gates[1], name: 'Mage Arena barrier without permission',
   setup: p => variable(p, 'magearena', 0), denied: true,
   refusal: 'You cannot enter without the permission of Kolodion.' }, 'rune_halberd', 'worn');
 arenaMeleeRefused();
-console.log('PASS weapon-gates: three weapon bans, unrestricted Mage Arena equipment, Kolodion permission and magic-only combat');
+cannonFireCase('autocast owner inside', [0, 3105, 3934], [0, 3108, 3934], false);
+cannonFireCase('autocast owner outside, target inside', [0, 3105, 3910], [0, 3108, 3915], false);
+cannonFireCase('outside control still fires', [0, 3220, 3220], [0, 3223, 3220], true);
+arenaCannonSetupRefused();
+console.log('PASS weapon-gates: three weapon bans, unrestricted Mage Arena equipment, Kolodion permission, magic-only combat and cannon refusal');
 process.exit(0);

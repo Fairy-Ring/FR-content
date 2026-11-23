@@ -102,6 +102,11 @@ if(npc_type = ikov_firewarrior) { // separate from attackable check
 if(npc_type = priestperilguarddog) {
     return;
 }
+// CANDIDATE inference from src.got-update-20050830: only magical combat is permitted in the arena; a cannon is ranged.
+// UNKNOWN engineering: refuse silently because this proc fires on a timer.
+if (~inzone_coord_pair_table(mage_arena, npc_coord) = true) {
+    return;
+}
 if (~npc_is_attackable = false) {
     return;
 }
