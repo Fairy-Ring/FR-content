@@ -105,7 +105,7 @@ jobs:
       # tests/fletching-choice/: CI — runtime.sh executes packed scripts/handlers without a world server.
       # tests/skill-menus/: CI — packed trigger, menu packet, reset and button tests; no world server.
       # tests/silver-casting/: CI — compiled furnace handler fills each Silver Casting slot; no engine is started.
-      # tests/leather-batch/: CI — published Make1 baseline plus packed Make5/10 handlers and weak-queue processing; no server.
+      # tests/leather-batch/: CI — authored Make1 outcomes plus packed Make5/10 handlers and weak-queue processing; no server.
       # tests/teleother/: CI — compiled Player triggers and button handlers cover all three offers, settlement and recipient lifecycle; no server is started.
       # tests/giantdwarf-intro/: CI — compiled runtime/save-load checks; no engine is started.
       # tests/content-gaps/: CI — packed configuration/trigger integration, no server.
@@ -119,7 +119,7 @@ jobs:
       # tests/brim-dungeon/: CI — packed entrance, obstacle, lock and collision checks; no server.
       # tests/splitbark-service/: CI — packed wizard dialogue, labeled five-piece selector and inventory purchases; no server.
       # tests/ana-barrel/: CI — packed departures, barrel ordering and unchanged refusal controls; no server.
-      # tests/tan-snake/: CI — packed eight-tile tanning, exact inventory settlement and published comparisons by product; no server.
+      # tests/tan-snake/: CI — packed eight-tile tanning, authored product settlement and wrong-hide self-checks; no server.
       # tests/random-events-u00/: CI — real packed staff caller, genuine targets, refusal snapshots and two scratch mutants; no server.
       - name: Run offline content tests
         id: content_tests

@@ -174,6 +174,26 @@ for (const town of towns) {
   }
   console.log(`PASS ${town.name}: eight ordered captions/costs/pictures, both snake settlements, Tan 1/5/X/All, caps, refusals, full inventory`);
 }
+// Self-check the authored settlement oracle, not a recorded execution.
+// Each button must consume its own hide; a wrong-hide operand must be rejected.
+for (let tile = 0; tile < 2; tile++) {
+  const script = ScriptProvider.getByName(`[if_button,tanner:com_${146 + snakeTiles[tile]}]`);
+  assert(script, 'packed Tan-1 button exists');
+  const operand = script.intOperands.indexOf(hides[tile]);
+  assert(operand >= 0, 'packed button contains its own hide operand');
+  const saved = script.intOperands[operand];
+  try {
+    script.intOperands[operand] = hides[1 - tile];
+    assert.throws(() => check(towns[0], tile, 'one', 1, 100, 1),
+      error => error.code === 'ERR_ASSERTION' && error.message.includes('exact settlement from'),
+      'the authored settlement oracle rejects the wrong hide');
+  } finally {
+    script.intOperands[operand] = saved;
+  }
+  check(towns[0], tile, 'one', 1, 100, 1);
+  console.log(`PASS tile ${snakeTiles[tile] + 1} authored wrong-hide self-check rejects the fault; restored button passes`);
+}
+
 // Authored from tanning's one-hide/one-leather rule and the six original
 // products/prices. These are expectations, not recordings from a published pack.
 const products = [

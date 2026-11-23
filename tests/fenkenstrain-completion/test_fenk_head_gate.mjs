@@ -72,6 +72,7 @@ function dig(p, outcome, x = 3608, z = 3491) {
     const heads = items.getItemCount(I.head), xp = [...p.stats], vars = [...p.vars];
     const tick = World.currentTick;
     p.messages = [];
+    p.animId = -1; // Each Dig case starts without a previous animation.
     const loc = new Loc(0, x, z, 1, 1, EntityLifeCycle.RESPAWN, I.grave, 10, 0);
     run(p, '[oploc2,fenk_grave_poor]', loc);
     assert.equal(items.getItemCount(I.head), heads + Number(outcome === 'found'));
@@ -86,9 +87,13 @@ function dig(p, outcome, x = 3608, z = 3491) {
         found: '...and you find a decapitated head.', full: "You don't have enough inventory space." }[outcome];
     assert(result, 'named authored outcome');
     assert.deepEqual(p.messages, outcome === 'locked' ? [result] : ['You start digging...', result]);
-    if (outcome !== 'locked') {
-        assert.equal(p.animId, I.dig, 'eligible Dig plays its digging animation');
-        assert(World.currentTick > tick, 'eligible Dig suspends before its result');
+    if (outcome === 'locked') {
+        assert.equal(p.animId, -1, 'locked Dig plays no animation');
+        assert.equal(World.currentTick, tick, 'locked Dig does not delay');
+    } else {
+        assert.equal(p.animId, I.dig, 'eligible Dig plays the authored digging animation');
+        // P_DELAY resumes at the current tick + one scheduling tick + its argument.
+        assert.equal(World.currentTick - tick - 1, 1, 'eligible Dig delays exactly one tick');
     }
 }
 let p = player();
