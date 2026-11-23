@@ -1,4 +1,5 @@
 [proc,combat_clearqueue]
+cleartimer(dragon_scimitar_prayer_lock);
 clearqueue(playerhit_n_retaliate);
 clearqueue(combat_damage_player);
 clearqueue(pvp_damage);

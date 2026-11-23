@@ -1,5 +1,6 @@
 [proc,prayer_checks](dbrow $data)(boolean)
 if (~champions_prayer_check = false) return(false);
+if (~dragon_scimitar_prayer_check($data) = false) return(false);
 if (stat(prayer) < 1) {
     // osrs
     if (stat_base(prayer) >= db_getfield($data, prayers:level, 0)) {
