@@ -122,6 +122,28 @@ weight=1kg
 wearpos=righthand
 weight=4lb
 tradeable=no
+// VERIFIED: Tip.It Thieving, captured 27 April 2006, prints +2 strength.
+param=strengthbonus,2
+// CANDIDATE: Oak blackjack item page 15534, revision 135426, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=prayerbonus,0
+category=weapon_blunt
+// CANDIDATE: the item's Old School speed and existing blunt-family route.
+param=attackrate,4
+// UNKNOWN engineering: the blunt family's named combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
 
 [blackjack_willow]
 name=Willow-blackjack
@@ -141,6 +163,28 @@ cost=600
 weight=1kg
 wearpos=righthand
 weight=4lb
+// VERIFIED: Tip.It Thieving, captured 27 April 2006, prints +8 strength.
+param=strengthbonus,8
+// CANDIDATE: Willow blackjack item page 15539, revision 135434, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=prayerbonus,0
+category=weapon_blunt
+// CANDIDATE: the item's Old School speed and existing blunt-family route.
+param=attackrate,4
+// UNKNOWN engineering: the blunt family's named combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
 
 [feud_camel_pooh_bucket]
 name=Ugthanki dung

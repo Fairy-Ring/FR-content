@@ -74755,158 +74755,36 @@ weight=5g
 certlink=roguetrader_menaphite_legs_red2
 certtemplate=template_for_cert
 
-[roguetrader_bj_assault_oak]
-name=Oak blackjack(a)
-desc=An assault blackjack.
-model=obj_roguetrader_bj_assault_oak
-manwear=obj_roguetrader_bj_assault_oak_manwear,0
-womanwear=obj_roguetrader_bj_assault_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=400
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_assault_oak]
 certlink=roguetrader_bj_assault_oak
 certtemplate=template_for_cert
 
-[roguetrader_bj_defend_oak]
-name=Oak blackjack(d)
-desc=A defensive blackjack.
-model=obj_roguetrader_bj_defend_oak
-manwear=obj_roguetrader_bj_defend_oak_manwear,0
-womanwear=obj_roguetrader_bj_defend_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=400
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_defend_oak]
 certlink=roguetrader_bj_defend_oak
 certtemplate=template_for_cert
 
-[roguetrader_bj_assault_willow]
-name=Willow blackjack(a)
-desc=An assault blackjack.
-recol1s=23009
-recol1d=17793
-model=obj_roguetrader_bj_assault_oak
-manwear=obj_roguetrader_bj_assault_oak_manwear,0
-womanwear=obj_roguetrader_bj_assault_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=800
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_assault_willow]
 certlink=roguetrader_bj_assault_willow
 certtemplate=template_for_cert
 
-[roguetrader_bj_defend_willow]
-name=Willow blackjack(d)
-desc=A defensive blackjack.
-recol1s=23009
-recol1d=17793
-model=obj_roguetrader_bj_defend_oak
-manwear=obj_roguetrader_bj_defend_oak_manwear,0
-womanwear=obj_roguetrader_bj_defend_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=800
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_defend_willow]
 certlink=roguetrader_bj_defend_willow
 certtemplate=template_for_cert
 
-[roguetrader_bj_maple]
-name=Maple blackjack
-desc=A solid bit of maple.
-recol1s=23009
-recol1d=29223
-model=obj_blackjack_oak
-manwear=obj_blackjack_oak_manwear,0
-womanwear=obj_blackjack_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=1200
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_maple]
 certlink=roguetrader_bj_maple
 certtemplate=template_for_cert
 
-[roguetrader_bj_assault_maple]
-name=Maple blackjack(a)
-desc=An assault blackjack.
-recol1s=23009
-recol1d=29223
-model=obj_roguetrader_bj_assault_oak
-manwear=obj_roguetrader_bj_assault_oak_manwear,0
-womanwear=obj_roguetrader_bj_assault_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=1600
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_assault_maple]
 certlink=roguetrader_bj_assault_maple
 certtemplate=template_for_cert
 
-[roguetrader_bj_defend_maple]
-name=Maple blackjack(d)
-desc=A defensive blackjack.
-recol1s=23009
-recol1d=29223
-model=obj_roguetrader_bj_defend_oak
-manwear=obj_roguetrader_bj_defend_oak_manwear,0
-womanwear=obj_roguetrader_bj_defend_oak_manwear,6
-iop2=Wield
-2dxof=6
-2dzoom=700
-2dyan=468
-2dxan=372
-members=yes
-cost=1600
-wearpos=righthand
-weight=1kg
-weight=4lb
 
 [cert_roguetrader_bj_defend_maple]
 certlink=roguetrader_bj_defend_maple

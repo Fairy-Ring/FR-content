@@ -1,0 +1,268 @@
+[roguetrader_bj_assault_oak]
+name=Oak blackjack(a)
+desc=An assault blackjack.
+model=obj_roguetrader_bj_assault_oak
+manwear=obj_roguetrader_bj_assault_oak_manwear,0
+womanwear=obj_roguetrader_bj_assault_oak_manwear,6
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+cost=400
+wearpos=righthand
+weight=1kg
+weight=4lb
+// CANDIDATE: own Old School item page, revision 135428, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,4
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,4
+param=prayerbonus,0
+category=weapon_blunt
+param=attackrate,4
+// UNKNOWN engineering: existing blunt-family combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
+
+[roguetrader_bj_defend_oak]
+name=Oak blackjack(d)
+desc=A defensive blackjack.
+model=obj_roguetrader_bj_defend_oak
+manwear=obj_roguetrader_bj_defend_oak_manwear,0
+womanwear=obj_roguetrader_bj_defend_oak_manwear,6
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+cost=400
+wearpos=righthand
+weight=1kg
+weight=4lb
+// CANDIDATE: own Old School item page, revision 135432, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,4
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,4
+param=prayerbonus,0
+category=weapon_blunt
+param=attackrate,4
+// UNKNOWN engineering: existing blunt-family combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
+
+[roguetrader_bj_assault_willow]
+name=Willow blackjack(a)
+desc=An assault blackjack.
+recol1s=23009
+recol1d=17793
+model=obj_roguetrader_bj_assault_oak
+manwear=obj_roguetrader_bj_assault_oak_manwear,0
+womanwear=obj_roguetrader_bj_assault_oak_manwear,6
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+cost=800
+wearpos=righthand
+weight=1kg
+weight=4lb
+// CANDIDATE: own Old School item page, revision 135430, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,8
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,8
+param=prayerbonus,0
+category=weapon_blunt
+param=attackrate,4
+// UNKNOWN engineering: existing blunt-family combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
+
+[roguetrader_bj_defend_willow]
+name=Willow blackjack(d)
+desc=A defensive blackjack.
+recol1s=23009
+recol1d=17793
+model=obj_roguetrader_bj_defend_oak
+manwear=obj_roguetrader_bj_defend_oak_manwear,0
+womanwear=obj_roguetrader_bj_defend_oak_manwear,6
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+cost=800
+wearpos=righthand
+weight=1kg
+weight=4lb
+// CANDIDATE: own Old School item page, revision 135440, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,8
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,8
+param=prayerbonus,0
+category=weapon_blunt
+param=attackrate,4
+// UNKNOWN engineering: existing blunt-family combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
+
+[roguetrader_bj_maple]
+name=Maple blackjack
+desc=A solid bit of maple.
+recol1s=23009
+recol1d=29223
+model=obj_blackjack_oak
+manwear=obj_blackjack_oak_manwear,0
+womanwear=obj_blackjack_oak_manwear,6
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+cost=1200
+wearpos=righthand
+weight=1kg
+weight=4lb
+// CANDIDATE: own Old School item page, revision 135435, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,20
+param=prayerbonus,0
+category=weapon_blunt
+param=attackrate,4
+// UNKNOWN engineering: existing blunt-family combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
+
+[roguetrader_bj_assault_maple]
+name=Maple blackjack(a)
+desc=An assault blackjack.
+recol1s=23009
+recol1d=29223
+model=obj_roguetrader_bj_assault_oak
+manwear=obj_roguetrader_bj_assault_oak_manwear,0
+womanwear=obj_roguetrader_bj_assault_oak_manwear,6
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+cost=1600
+wearpos=righthand
+weight=1kg
+weight=4lb
+// CANDIDATE: own Old School item page, revision 135431, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,24
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,0
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,20
+param=prayerbonus,0
+category=weapon_blunt
+param=attackrate,4
+// UNKNOWN engineering: existing blunt-family combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
+
+[roguetrader_bj_defend_maple]
+name=Maple blackjack(d)
+desc=A defensive blackjack.
+recol1s=23009
+recol1d=29223
+model=obj_roguetrader_bj_defend_oak
+manwear=obj_roguetrader_bj_defend_oak_manwear,0
+womanwear=obj_roguetrader_bj_defend_oak_manwear,6
+iop2=Wield
+2dxof=6
+2dzoom=700
+2dyan=468
+2dxan=372
+members=yes
+cost=1600
+wearpos=righthand
+weight=1kg
+weight=4lb
+// CANDIDATE: own Old School item page, revision 135421, 9 April 2013.
+param=stabattack,0
+param=slashattack,0
+param=crushattack,0
+param=magicattack,0
+param=rangeattack,0
+param=stabdefence,0
+param=slashdefence,0
+param=crushdefence,24
+param=magicdefence,0
+param=rangedefence,0
+param=strengthbonus,20
+param=prayerbonus,0
+category=weapon_blunt
+param=attackrate,4
+// UNKNOWN engineering: existing blunt-family combat animations.
+param=crushattack_anim,human_blunt_pound
+param=defend_anim,human_blunt_block
+// CANDIDATE: the 377 cache names this blackjack sound.
+param=crush_sound,blackjack_crush
