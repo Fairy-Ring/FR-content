@@ -102,8 +102,14 @@ assert(weapons.length > 0, 'packed item configs include right-hand Wield/Wear op
 // Greegrees expose Hold, not Wield/Wear: add them as the separate guard-class witness.
 const heldGuards = ObjType.configs.filter(type => type && type.wearpos === rightHand
     && /greegree/i.test(itemName(type)) && (type.iop ?? []).some(option => option?.toLowerCase() === 'hold'));
-const heldGuardIds = new Set(heldGuards.map(type => type.id));
-const attackItems = [...new Map([...weapons, ...heldGuards].map(type => [type.id, type])).values()];
+// The compiled refusal tests the mm_greegree category, not the object's name.
+const greegreeCategory = id(CategoryType, 'mm_greegree');
+const fungicideGuard = ObjType.getByName('slayer_spray_pump_10');
+assert(fungicideGuard?.wearpos === rightHand
+    && fungicideGuard.category === id(CategoryType, 'slayer_fungicide_spray'),
+    'a charged fungicide spray is a packed right-hand null-sound guard witness');
+const attackItems = [...new Map([...weapons, ...heldGuards, fungicideGuard]
+    .map(type => [type.id, type])).values()];
 const synthIds = new Map(readFileSync(path.resolve(here, '../../pack/synth.pack'), 'utf8')
     .trim().split(/\r?\n/).map(line => {
         const separator = line.indexOf('=');
@@ -185,6 +191,7 @@ function runScript(name, args = []) {
 }
 
 function resetPlayer(type, mode = 0) {
+    player.closeModal();
     player.clearInteraction();
     player.vars.set(playerVarDefaults);
     player.stats.fill(0);
@@ -308,7 +315,7 @@ function assertNativeAttack(type, style) {
         player.processInteraction();
         assertHealthy(`${context} first swing`);
         const firstQueue = queuedAttacks();
-        if (heldGuardIds.has(type.id)) {
+        if (type.category === greegreeCategory) {
             assert.deepEqual(player.testMessages.slice(firstSoundStart)
                 .filter(message => typeof message?.text === 'string').map(message => message.text),
             ['You cannot attack as a monkey.'], `${context} gives the exact inherited NPC refusal`);
@@ -409,7 +416,7 @@ const silentGuardStyles = [];
 for (const type of attackItems) {
     const rows = discoverStyles(type);
     styleRows.set(type.id, rows);
-    if (/greegree|fungicide/i.test(itemName(type))) {
+    if (/greegree|fungicide/i.test(itemName(type)) || type.id === fungicideGuard.id) {
         for (const row of rows) {
             if (row.attackSound === -1) silentGuardStyles.push({ type, row });
         }
@@ -471,7 +478,7 @@ for (const type of attackItems) {
     }
 }
 assert(attackedStyles > 0, 'native Attack covered every discovered packed style');
-const silentNpc = silentGuardStyles.find(({ type }) => !heldGuardIds.has(type.id));
+const silentNpc = silentGuardStyles.find(({ type }) => type.category !== greegreeCategory);
 assert(silentNpc, 'an attack-capable silent guard item retains native NPC null-sound coverage');
 console.log(`PASS ${itemName(silentNpc.type)}: native NPC attack and reattack omit the null sound without script errors`);
 const silentMelee = silentGuardStyles.find(({ row }) => row.damageType !== damageType.ranged);
@@ -482,5 +489,5 @@ World.removeNpc(target, -1);
 World.players[player.slot] = null;
 player.unlink();
 player.cleanup();
-console.log(`PASS weapon-sounds: ${weapons.length} packed Wield/Wear right-hand items, ${attackItems.length - weapons.length} Hold guard items, ${attackedStyles} native styles, ${silentGuardStyles.length} null-sound guard styles`);
+console.log(`PASS weapon-sounds: ${weapons.length} packed Wield/Wear right-hand items, ${heldGuards.length} Hold guard items, 1 fungicide guard item, ${attackedStyles} native styles, ${silentGuardStyles.length} null-sound guard styles`);
 process.exit(0);
