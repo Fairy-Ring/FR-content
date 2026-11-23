@@ -200,6 +200,7 @@ jobs:
           run_test tests/npc-combat/test_outcomes.mjs node --import tsx ../content/tests/npc-combat/test_outcomes.mjs
           run_test tests/npc-combat/test_nonattack_multi.mjs node --import tsx ../content/tests/npc-combat/test_nonattack_multi.mjs
           run_test tests/weapon-sounds/test_weapon_sounds.mjs node --import tsx ../content/tests/weapon-sounds/test_weapon_sounds.mjs
+          run_test tests/weapon-rows/test_weapon_rows.mjs node --import tsx ../content/tests/weapon-rows/test_weapon_rows.mjs
           run_test tests/halberd-special/test_halberd_special.mjs node --import tsx ../content/tests/halberd-special/test_halberd_special.mjs
           run_test tests/special-routes/test_special_routes.mjs node --import tsx ../content/tests/special-routes/test_special_routes.mjs
           run_test tests/weapon-gates/test_weapon_gates.mjs env NODE_MEMBERS=true node --import tsx ../content/tests/weapon-gates/test_weapon_gates.mjs
