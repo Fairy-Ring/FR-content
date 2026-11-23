@@ -54107,26 +54107,6 @@ wearpos=righthand
 certlink=mdaughter_polevault
 certtemplate=template_for_cert
 
-[mdaughter_bear_helmet]
-name=Bearhead
-desc=Quite ferocious looking.
-recol1s=15855
-recol1d=6346
-model=obj_mdaughter_bear_helmet
-cost=0
-2dxof=4
-2dzoom=690
-2dyan=1996
-2dxan=64
-iop2=Wear
-manwear=obj_mdaughter_bear_helmet_manwear,0
-womanwear=obj_mdaughter_bear_helmet_womanwear,0
-manhead=obj_mdaughter_bear_helmet_manhead
-womanhead=obj_mdaughter_bear_helmet_womanhead
-members=yes
-wearpos=hat
-wearpos2=head
-weight=1lb
 
 [giant_frog_legs]
 name=Giant frog legs
@@ -54672,26 +54652,6 @@ womanwear=obj_rubber_chicken_manwear,6
 wearpos=righthand
 weight=1lb
 
-[dwarf_goldrock_helmet]
-name=Gold helmet
-desc=Made of gold and white gold.
-model=obj_dwarf_goldrock_helmet
-2dxof=1
-2dyof=-4
-2dzoom=590
-2dyan=104
-2dxan=80
-iop2=Wear
-manwear=obj_dwarf_goldrock_helmet_manwear,0
-womanwear=obj_dwarf_goldrock_helmet_womanwear,0
-manhead=obj_leather_cowl_manhead2
-manhead2=obj_dwarf_goldrock_helmet_manhead2
-womanhead=obj_leather_cowl_womanhead2
-womanhead2=obj_dwarf_goldrock_helmet_manhead2
-members=yes
-wearpos=hat
-wearpos2=head
-weight=70lb
 
 [dwarf_rock_book]
 name=Dwarven lore
@@ -81845,20 +81805,6 @@ members=yes
 ambient=10
 weight=1g
 
-[granite_legs]
-name=Granite legs
-desc=These look pretty heavy.
-cost=66000
-model=obj_granite_legs
-iop2=Wear
-manwear=obj_granite_legs_manwear,0
-womanwear=obj_granite_legs_womanwear,0
-members=yes
-2dzoom=1620
-2dyan=1960
-2dxan=276
-wearpos=legs
-weight=35lb
 
 [pot_bonemeal_wyvern]
 name=Bonemeal
@@ -83723,29 +83669,6 @@ members=yes
 iop5=Destroy
 weight=1g
 
-[handsand_pink_cape]
-name=Cape
-desc=It's a bit pink.
-recol1s=8386
-recol1d=23055
-recol2s=31649
-recol2d=30257
-recol3s=8320
-recol3d=23055
-recol4s=15360
-recol4d=14632
-model=obj_red_cape
-2dxof=3
-2dyof=6
-2dzoom=2140
-2dyan=948
-2dxan=400
-iop2=Wear
-manwear=obj_red_cape_manwear,0
-womanwear=obj_red_cape_manwear,0
-members=yes
-wearpos=back
-weight=1lb
 
 [cert_handsand_pink_cape]
 certlink=handsand_pink_cape
@@ -94732,41 +94655,7 @@ members=yes
 weight=3g
 weight=2lb
 
-[rag_ram_helm]
-name=Ram skull helm
-desc=Makes me feel baaad to the bone.
-cost=1
-model=obj_rag_ram_helm
-2dzoom=848
-2dyan=228
-2dxan=1982
-iop2=Wear
-members=yes
-manwear=obj_rag_ram_helm_manwear,0
-womanwear=obj_rag_ram_helm_womanwear,0
-manhead=obj_rag_ram_helm_manhead
-womanhead=obj_rag_ram_helm_womanhead
-weight=3g
-wearpos=hat
-weight=7lb
 
-[rag_bonesack]
-name=Bonesack
-desc=The Bonesack is a little old item that protects like leather.
-members=yes
-iop2=Wear
-model=obj_rag_bonesack
-2dxof=7
-2dyof=-10
-2dzoom=1616
-2dyan=1271
-2dxan=135
-iop2=Wear
-manwear=obj_rag_bonesack_manwear,0
-womanwear=obj_rag_bonesack_womanwear,0
-cost=1
-weight=3g
-wearpos=back
 
 [rag_bottle_wine]
 name=Bottle of wine

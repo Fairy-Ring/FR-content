@@ -94,6 +94,10 @@ womanwear=obj_death_spikedboots_womanwear,0
 members=yes
 wearpos=feet
 weight=12oz
+// CANDIDATE: Old School Spiked boots revision 170993 (6 October 2013); no later bonus change noted.
+param=slashdefence,2
+param=crushdefence,2
+param=strengthbonus,2
 
 [cert_death_spikedboots]
 certlink=death_spikedboots
