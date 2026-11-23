@@ -327,15 +327,16 @@ manwear=obj_dagganoth_range_feet_manwear,0
 womanwear=obj_dagganoth_range_feet_womanwear,0
 weight=7lb
 wearpos=feet
-// CANDIDATE: earliest populated Old School revision 170732 (2013-10-03); per-item value, not a period numeric source.
+// CANDIDATE: Old School r286743 (2015-04-05); chosen because the VERIFIED Sal Waterbirth set totals (2006-04-29) exclude 1/2/0.
+// The period source prints set totals, not this per-piece split.
 param=stabattack,0
 param=slashattack,0
 param=crushattack,0
 param=magicattack,0
 param=rangeattack,0
-param=stabdefence,1
-param=slashdefence,2
-param=crushdefence,0
+param=stabdefence,0
+param=slashdefence,1
+param=crushdefence,1
 param=magicdefence,0
 param=rangedefence,0
 param=strengthbonus,0
@@ -393,7 +394,7 @@ manwear=obj_dagganoth_range_gloves_manwear,0
 womanwear=obj_dagganoth_range_gloves_womanwear,0
 weight=7lb
 wearpos=hands
-// CANDIDATE: earliest populated Old School revision 170748 (2013-10-03); per-item value, not a period numeric source.
+// CANDIDATE: earliest populated Old School Spined gloves revision 170741 (2013-10-03); per-item value, not a period numeric source.
 param=stabattack,0
 param=slashattack,0
 param=crushattack,0

@@ -2015,9 +2015,9 @@
       "crushattack": 0,
       "magicattack": 0,
       "rangeattack": 0,
-      "stabdefence": 2,
+      "stabdefence": 0,
       "slashdefence": 2,
-      "crushdefence": 0,
+      "crushdefence": 2,
       "magicdefence": 0,
       "rangedefence": 0,
       "strengthbonus": 0,
@@ -2026,13 +2026,12 @@
     "requirements": {},
     "quests": {},
     "source_ids": [
-      "src.armourrows-osrs-ham-robes#revision_195853",
-      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.armourrows-osrs-ham-item-pages#revision_147927",
       "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
       "src.content-unpack-obj#lines 51673-51691"
     ],
-    "wiki_revision": 195853,
-    "wiki_date": "2014-02-14T21:28:57Z",
+    "wiki_revision": 147927,
+    "wiki_date": "2013-05-31T16:59:29Z",
     "label": "CANDIDATE"
   },
   {
@@ -2043,9 +2042,9 @@
       "crushattack": 0,
       "magicattack": 0,
       "rangeattack": 0,
-      "stabdefence": 2,
+      "stabdefence": 0,
       "slashdefence": 2,
-      "crushdefence": 0,
+      "crushdefence": 2,
       "magicdefence": 0,
       "rangedefence": 0,
       "strengthbonus": 0,
@@ -2054,13 +2053,12 @@
     "requirements": {},
     "quests": {},
     "source_ids": [
-      "src.armourrows-osrs-ham-robes#revision_195853",
-      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.armourrows-osrs-ham-item-pages#revision_147939",
       "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
       "src.content-unpack-obj#lines 51697-51712"
     ],
-    "wiki_revision": 195853,
-    "wiki_date": "2014-02-14T21:28:57Z",
+    "wiki_revision": 147939,
+    "wiki_date": "2013-05-31T17:20:29Z",
     "label": "CANDIDATE"
   },
   {
@@ -2071,24 +2069,23 @@
       "crushattack": 0,
       "magicattack": 0,
       "rangeattack": 0,
-      "stabdefence": 1,
-      "slashdefence": 2,
-      "crushdefence": 0,
-      "magicdefence": 1,
-      "rangedefence": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 2,
+      "magicdefence": 0,
+      "rangedefence": 1,
       "strengthbonus": 0,
       "prayerbonus": 0
     },
     "requirements": {},
     "quests": {},
     "source_ids": [
-      "src.armourrows-osrs-ham-robes#revision_195853",
-      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.armourrows-osrs-ham-item-pages#revision_147952",
       "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
       "src.content-unpack-obj#lines 51718-51739"
     ],
-    "wiki_revision": 195853,
-    "wiki_date": "2014-02-14T21:28:57Z",
+    "wiki_revision": 147952,
+    "wiki_date": "2013-05-31T17:32:22Z",
     "label": "CANDIDATE"
   },
   {
@@ -2099,24 +2096,23 @@
       "crushattack": 0,
       "magicattack": 0,
       "rangeattack": 0,
-      "stabdefence": 1,
+      "stabdefence": 0,
       "slashdefence": 1,
-      "crushdefence": 0,
-      "magicdefence": 2,
-      "rangedefence": 0,
+      "crushdefence": 1,
+      "magicdefence": 0,
+      "rangedefence": 2,
       "strengthbonus": 0,
       "prayerbonus": 0
     },
     "requirements": {},
     "quests": {},
     "source_ids": [
-      "src.armourrows-osrs-ham-robes#revision_195853",
-      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.armourrows-osrs-ham-item-pages#revision_147926",
       "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
       "src.content-unpack-obj#lines 51745-51770"
     ],
-    "wiki_revision": 195853,
-    "wiki_date": "2014-02-14T21:28:57Z",
+    "wiki_revision": 147926,
+    "wiki_date": "2013-05-31T16:52:50Z",
     "label": "CANDIDATE"
   },
   {
@@ -2127,9 +2123,9 @@
       "crushattack": 0,
       "magicattack": 0,
       "rangeattack": 0,
-      "stabdefence": 1,
-      "slashdefence": 2,
-      "crushdefence": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 2,
       "magicdefence": 0,
       "rangedefence": 0,
       "strengthbonus": 0,
@@ -2138,13 +2134,12 @@
     "requirements": {},
     "quests": {},
     "source_ids": [
-      "src.armourrows-osrs-ham-robes#revision_195853",
-      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.armourrows-osrs-ham-item-pages#revision_187792",
       "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
       "src.content-unpack-obj#lines 51797-51816"
     ],
-    "wiki_revision": 195853,
-    "wiki_date": "2014-02-14T21:28:57Z",
+    "wiki_revision": 187792,
+    "wiki_date": "2014-01-05T00:46:46Z",
     "label": "CANDIDATE"
   },
   {
@@ -2155,9 +2150,9 @@
       "crushattack": 0,
       "magicattack": 0,
       "rangeattack": 0,
-      "stabdefence": 1,
+      "stabdefence": 0,
       "slashdefence": 1,
-      "crushdefence": 0,
+      "crushdefence": 1,
       "magicdefence": 0,
       "rangedefence": 0,
       "strengthbonus": 0,
@@ -2166,13 +2161,12 @@
     "requirements": {},
     "quests": {},
     "source_ids": [
-      "src.armourrows-osrs-ham-robes#revision_195853",
-      "src.armourrows-osrs-ham-robes-current#revision_15359189",
+      "src.armourrows-osrs-ham-item-pages#revision_147960",
       "src.equipgates-rhq-item-1364-20060427154351#Items_line_357",
       "src.content-unpack-obj#lines 51822-51839"
     ],
-    "wiki_revision": 195853,
-    "wiki_date": "2014-02-14T21:28:57Z",
+    "wiki_revision": 147960,
+    "wiki_date": "2013-05-31T17:42:08Z",
     "label": "CANDIDATE"
   },
   {
@@ -2443,9 +2437,9 @@
       "crushattack": 0,
       "magicattack": 0,
       "rangeattack": 0,
-      "stabdefence": 1,
-      "slashdefence": 2,
-      "crushdefence": 0,
+      "stabdefence": 0,
+      "slashdefence": 1,
+      "crushdefence": 1,
       "magicdefence": 0,
       "rangedefence": 0,
       "strengthbonus": 0,
@@ -2454,14 +2448,13 @@
     "requirements": {},
     "quests": {},
     "source_ids": [
-      "src.armourrows-osrs-waterbirth-melee-feet#oldest_populated_170732",
+      "src.armourrows-osrs-waterbirth-melee-feet-history-286743#revision_286743",
       "src.armourrows-osrs-waterbirth-melee-feet-current#revision_15184398",
       "src.content-unpack-obj#original_row",
-      "src.waterbirth-sal-island-20060429#lines 149-160",
-      "src.armourrows-osrs-waterbirth-melee-feet-history-286743#revision_286743"
+      "src.waterbirth-sal-island-20060429#lines 202-214"
     ],
-    "wiki_revision": 170732,
-    "wiki_date": "2013-10-03T22:32:27Z",
+    "wiki_revision": 286743,
+    "wiki_date": "2015-04-05T19:07:57Z",
     "label": "CANDIDATE",
     "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
   },
@@ -2630,14 +2623,14 @@
     "requirements": {},
     "quests": {},
     "source_ids": [
-      "src.armourrows-osrs-waterbirth-range-gloves#oldest_populated_170748",
+      "src.armourrows-osrs-waterbirth-range-gloves#oldest_populated_170741",
       "src.armourrows-osrs-waterbirth-range-gloves-current#revision_15240650",
       "src.content-unpack-obj#original_row",
       "src.waterbirth-sal-island-20060429#lines 166-176",
       "src.armourrows-osrs-waterbirth-range-gloves-current#requirements"
     ],
-    "wiki_revision": 170748,
-    "wiki_date": "2013-10-03T23:54:34Z",
+    "wiki_revision": 170741,
+    "wiki_date": "2013-10-03T23:04:01Z",
     "label": "CANDIDATE",
     "requirement_decision": "Later-only Old School requirements recorded, not built (Main ruling 5)."
   },
