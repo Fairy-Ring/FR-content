@@ -65990,75 +65990,8 @@ model=obj_priest_robe
 2dzoom=1940
 2dxan=572
 
-[basic_tk_helm]
-name=Initiate helm
-desc=An initiate Temple Knight's helm.
-recol1s=15855
-recol1d=25368
-recol2s=15360
-recol2d=31366
-cost=3000
-model=obj_iron_full_helm
-2dxof=-1
-2dyof=6
-2dzoom=800
-2dyan=152
-2dxan=160
-iop2=Wear
-manwear=obj_iron_full_helm_manwear,0
-womanwear=obj_iron_full_helm_womanwear,0
-manhead=obj_iron_full_helm_manhead
-womanhead=obj_iron_full_helm_womanhead
-members=yes
-wearpos=hat
-wearpos2=head
-wearpos3=jaw
-weight=5lb
 
-[basic_tk_body]
-name=Initiate platemail
-desc=An initiate Temple Knight's Armour.
-recol1s=6342
-recol1d=31366
-recol2s=15855
-recol2d=25368
-recol3s=10570
-recol3d=21140
-cost=10000
-model=obj_black_platebody_trim
-2dxof=-1
-2dzoom=1250
-2dxan=488
-iop2=Wear
-manwear=obj_black_platebody_trim_manwear,0
-manwear2=obj_iron_platebody_manwear2
-womanwear=obj_black_platebody_trim_womanwear,0
-womanwear2=obj_iron_platebody_womanwear2
-members=yes
-wearpos=torso
-wearpos2=arms
-weight=19lb
 
-[basic_tk_legs]
-name=Initiate platelegs
-desc=An initiate Temple Knight's leg armour.
-recol1s=15855
-recol1d=25368
-recol2s=10570
-recol2d=21140
-recol3s=14798
-recol3d=31366
-cost=5000
-model=obj_iron_platelegs
-2dyof=-8
-2dzoom=1740
-2dxan=444
-iop2=Wear
-manwear=obj_iron_platelegs_manwear,0
-womanwear=obj_iron_platelegs_womanwear,0
-members=yes
-wearpos=legs
-weight=17lb
 
 [rd_cupric_sulphate]
 name=Cupric sulfate
