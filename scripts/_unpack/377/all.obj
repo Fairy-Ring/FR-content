@@ -75965,25 +75965,6 @@ members=yes
 weight=1g
 weight=1kg
 
-[tzhaar_throwingring]
-name=Toktz-xil-ul
-desc=A razor sharp ring of obsidian.
-members=yes
-stackable=yes
-iop2=Wield
-model=obj_tzhaar_throwingring
-2dxof=3
-2dyof=-4
-2dzoom=890
-2dyan=28
-2dxan=408
-contrast=35
-ambient=15
-manwear=obj_tzhaar_throwingring_manwear,0
-womanwear=obj_tzhaar_throwingring_manwear,6
-cost=250
-wearpos=righthand
-weight=12oz
 
 [tzhaar_staff]
 name=Toktz-mej-tal
