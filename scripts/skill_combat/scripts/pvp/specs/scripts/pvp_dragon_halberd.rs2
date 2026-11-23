@@ -1,0 +1,87 @@
+// Port of Lost City 289 457c8943b5c1, same path. Labels: weapon-combat research.
+[label,pvp_dragon_halberd_sa]
+~set_sa_vars(oc_param(inv_getobj(worn, ^wearpos_rhand), sa_energy));
+~set_pk_vars;
+def_player_uid $caster = uid;
+def_player_uid $primary = .uid;
+def_spotanim $spot;
+def_int $dir;
+def_coord $spot_coord;
+// VERIFIED 377 effect identities. Direction and height are uncited 289 defaults (UNKNOWN).
+if(coordz(coord) > coordz(.coord)) {
+    $spot = spotanim_282;
+    $spot_coord = movecoord(coord, 0, 0, -1);
+    $dir = ^exact_south;
+} else if(coordz(coord) < coordz(.coord)) {
+    $spot = spotanim_283;
+    $spot_coord = movecoord(coord, 0, 0, 1);
+    $dir = ^exact_north;
+} else if(coordx(coord) < coordx(.coord)) {
+    $spot = spotanim_284;
+    $spot_coord = movecoord(coord, 1, 0, 0);
+    $dir = ^exact_east;
+} else {
+    $spot = spotanim_285;
+    $spot_coord = movecoord(coord, -1, 0, 0);
+    $dir = ^exact_west;
+}
+anim(dragon_halberd_special_attack, 0);
+sound_synth(halberd_swipe, 1, 0);
+spotanim_map($spot, $spot_coord, 92, 0);
+if (.%com_defendanim ! null) .anim(.%com_defendanim, 20);
+.sound_synth(halberd_swipe, 1, 0);
+
+~pvp_dragon_halberd_spec_hit(100);
+
+def_coord $center = .coord;
+def_coord $side1;
+def_coord $side2;
+if ($dir = ^exact_north | $dir = ^exact_south) {
+    $side1 = movecoord($center, 1, 0, 0);
+    $side2 = movecoord($center, -1, 0, 0);
+} else {
+    $side1 = movecoord($center, 0, 0, 1);
+    $side2 = movecoord($center, 0, 0, -1);
+}
+// Same-kind eligibility and pointer restoration follow published area spells.
+// Keep 289's stricter line-of-sight hunt and two side tiles.
+if (map_multiway(coord) = true & map_multiway($center) = true) {
+    huntall($center, 1, ^vis_lineofsight);
+    while (huntnext = true) {
+        def_player_uid $victim = uid;
+        def_boolean $caster_restored = finduid($caster);
+        if ($victim ! $caster & $victim ! $primary) {
+            if (.finduid($victim) = true) {
+                if (map_multiway(.coord) = true & (.coord = $side1 | .coord = $side2) & .%death = ^false) {
+                    if (~pvp_is_attackable_opt_quiet = true) {
+                        ~set_pk_vars;
+                        // UNKNOWN: uncited 289 neighbour accuracy default.
+                        ~pvp_dragon_halberd_spec_hit(75);
+                    }
+                }
+            }
+        }
+    }
+    def_boolean $primary_player_restored = finduid($caster);
+    def_boolean $secondary_player_restored = .finduid($primary);
+}
+
+[proc,pvp_dragon_halberd_spec_hit](int $scale)
+if (stat(hitpoints) = 0 | .stat(hitpoints) = 0) {
+    return;
+}
+def_int $damage = 0;
+// CANDIDATE: Sweep's 110% maximum hit; published PvP prayer and damage path.
+def_int $maxhit = scale(110, 100, %com_maxhit);
+def_int $attack_roll = scale($scale, 100, ~player_attack_roll_specific(%damagetype));
+def_int $defence_roll = ~.player_defence_roll_specific(^slash_style);
+if (randominc($attack_roll) > randominc($defence_roll)) {
+    if (~.check_protect_prayer(^melee_style) = true) {
+        $maxhit = scale(6, 10, $maxhit);
+    }
+    $damage = min(randominc($maxhit), .stat(hitpoints));
+    ~give_combat_experience_pvp(%damagestyle, $damage, ~pvp_xp_multiplier(~.player_combat_level));
+    both_heropoints($damage);
+}
+.queue*(pvp_retaliate, 0)(uid);
+~.pvp_damage(0, $damage);

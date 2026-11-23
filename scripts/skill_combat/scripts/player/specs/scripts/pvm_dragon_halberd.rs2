@@ -1,0 +1,87 @@
+// Port of Lost City 289 457c8943b5c1, same path. Labels: weapon-combat research.
+[label,pvm_dragon_halberd_sa]
+~set_sa_vars(oc_param(inv_getobj(worn, ^wearpos_rhand), sa_energy));
+def_spotanim $spot;
+def_int $dir;
+def_coord $spot_coord;
+// VERIFIED 377 effect identities. Direction and height are uncited 289 defaults (UNKNOWN).
+if(coordz(coord) > coordz(npc_coord)) {
+    $spot = spotanim_282;
+    $spot_coord = movecoord(coord, 0, 0, -1);
+    $dir = ^exact_south;
+} else if(coordz(coord) < coordz(npc_coord)) {
+    $spot = spotanim_283;
+    $spot_coord = movecoord(coord, 0, 0, 1);
+    $dir = ^exact_north;
+} else if(coordx(coord) < coordx(npc_coord)) {
+    $spot = spotanim_284;
+    $spot_coord = movecoord(coord, 1, 0, 0);
+    $dir = ^exact_east;
+} else {
+    $spot = spotanim_285;
+    $spot_coord = movecoord(coord, -1, 0, 0);
+    $dir = ^exact_west;
+}
+anim(dragon_halberd_special_attack, 0);
+sound_synth(halberd_swipe, 1, 0);
+spotanim_map($spot, $spot_coord, 92, 0);
+if (npc_param(defend_anim) ! null) npc_anim(npc_param(defend_anim), 20);
+
+def_npc_uid $primary = npc_uid;
+~pvm_dragon_halberd_spec_hit(100);
+if(nc_size(npc_type) > 1) {
+    // CANDIDATE: Sweep's second large-target hit. 289 uses full accuracy for both.
+    ~pvm_dragon_halberd_spec_hit(100);
+    return;
+}
+def_coord $npc_center = npc_coord;
+def_coord $side1;
+def_coord $side2;
+if ($dir = ^exact_north | $dir = ^exact_south) {
+    $side1 = movecoord($npc_center, 1, 0, 0);
+    $side2 = movecoord($npc_center, -1, 0, 0);
+} else {
+    $side1 = movecoord($npc_center, 0, 0, 1);
+    $side2 = movecoord($npc_center, 0, 0, -1);
+}
+// Same-kind, three multiway cells and quiet eligibility match published area spells.
+// Keep 289's stricter line-of-sight hunt and two side tiles, never a 3x3 attack.
+if (map_multiway(coord) = true & map_multiway($npc_center) = true) {
+    npc_huntall($npc_center, 1, ^vis_lineofsight);
+    while (npc_findnext = true) {
+        if (npc_uid ! $primary & map_multiway(npc_coord) = true & (npc_coord = $side1 | npc_coord = $side2)) {
+            if (~player_in_combat_check_quiet = true & ~npc_is_attackable_opt_quiet = true) {
+                // UNKNOWN: uncited 289 neighbour accuracy default.
+                ~pvm_dragon_halberd_spec_hit(75);
+            }
+        }
+    }
+    def_boolean $primary_restored = npc_finduid($primary);
+}
+
+[proc,pvm_dragon_halberd_spec_hit](int $scale)
+if (npc_stat(hitpoints) = 0) {
+    return;
+}
+def_int $damage = 0;
+// CANDIDATE: Sweep's 110% maximum hit. Salve follows published melee specials.
+def_int $maxhit = scale(110, 100, ~player_npc_salve_scale(%com_maxhit));
+def_int $attackroll = scale($scale, 100, ~player_npc_salve_scale(~player_attack_roll_specific(%damagetype)));
+def_int $defenceroll = ~npc_defence_roll_specific(^slash_style);
+if(npc_type = tbwt_beast) $attackroll = 0;
+if (randominc($attackroll) > randominc($defenceroll)) {
+    if (npc_type = count_draynor & inv_total(inv, garlic) > 0) {
+        $maxhit = add($maxhit, 1);
+    }
+    // The halberd cannot bypass ordinary melee's required leaf-bladed weapon.
+    if (npc_param(slayer_category) = ^slayer_kurask | npc_param(slayer_category) = ^slayer_turoth) {
+        $maxhit = 0;
+    }
+    $damage = randominc(~npc_max_dealt($maxhit, 0));
+    $damage = ~soulbane_rage_hit($damage, false);
+    def_int $damage_capped = min($damage, npc_stat(hitpoints));
+    ~give_combat_experience(%damagestyle, $damage_capped, %npc_combat_xp_multiplier);
+    npc_heropoints($damage_capped);
+}
+~npc_retaliate(0);
+npc_queue(2, $damage, 0);
