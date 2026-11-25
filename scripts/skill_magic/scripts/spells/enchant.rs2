@@ -5,6 +5,7 @@
 [opheldt,magic:enchant_lvl5]@magic_spell_enchant(^enchant_lvl5, last_slot);
 
 [label,magic_spell_enchant](int $spell, int $slot)
+if (~mta_enchant($spell, $slot) = true) { return; }
 if_settabactive(^tab_magic);
 def_obj $initial_obj = inv_getobj(inv, $slot);
 if (inv_total(inv, $initial_obj) < 1) {
