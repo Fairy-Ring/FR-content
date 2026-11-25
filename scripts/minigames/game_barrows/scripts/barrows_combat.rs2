@@ -39,6 +39,32 @@ if ($change = -1) {
     healenergy($change);
 }
 
+// VERIFIED Infestation existence; CANDIDATE Q3: only delivered damage heals.
+[ai_opplayer2,barrows_guthan] gosub(barrows_guthan_attack);
+
+[proc,barrows_guthan_attack]
+if (npc_stat(hitpoints) = 0) return;
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $delivery_ticks;
+$attempted, $accuracy, $rolled, $delivered, $delivery_ticks = ~npc_default_attack_outcome(npc_param(barrows_maxhit), 0, true);
+if ($attempted = true & $accuracy = ^barrows_special_success_policy) {
+    if (random(^barrows_guthan_proc_denominator) = 0) {
+        queue*(barrows_guthan_infestation, ^barrows_special_delivery_order)(npc_uid, $delivered);
+    }
+}
+
+[queue,barrows_guthan_infestation](npc_uid $source, int $damage)
+// Fatal damage runs first; this effect cannot heal more than the player lost.
+if (%death = ^true | stat(hitpoints) = 0) return;
+if (npc_finduid($source) = false) return;
+if (npc_stat(hitpoints) = 0 | %npc_attacking_uid ! uid) return;
+if ($damage <= 0 | npc_stat(hitpoints) >= npc_basestat(hitpoints)) return;
+// Native NpcOps.ts:300-301 clears heroes at base HP; brief ruling 1 keeps it.
+npc_statheal(hitpoints, $damage, 0);
+
 // Huntless defaults never initiate against a stranger. The native owner guard
 // ends pursuit; the timer latches release on WANDER without changing retaliation.
 [proc,barrows_owned_tunnel_guard]

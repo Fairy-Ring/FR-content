@@ -5712,6 +5712,62 @@
           }
         }
       }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_guthan",
+        "id": 2027
+      },
+      "unit": "BC04",
+      "evidence": {
+        "facts": [
+          "barrows.bc-guthan-skills",
+          "barrows.bc-guthan-bonuses",
+          "barrows.bc-guthan-attack",
+          "barrows.bc-guthan-maxhit"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "d5ab6cf0c0e90a8658b22c0369cdcccd9098732f",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": { "value": 100 },
+        "strength": { "value": 100 },
+        "defence": { "value": 100 },
+        "magic": { "value": 1 },
+        "ranged": { "value": 1 },
+        "param:attackrate": { "value": 5 },
+        "param:damagetype": { "value": 2 },
+        "param:attackbonus": { "value": 0 },
+        "param:strengthbonus": { "value": 75 },
+        "param:magicattack": { "value": -50 },
+        "param:rangeattack": { "value": -19 },
+        "param:rangebonus": { "value": 0 },
+        "param:stabdefence": { "value": 259 },
+        "param:slashdefence": { "value": 257 },
+        "param:crushdefence": { "value": 241 },
+        "param:magicdefence": { "value": -11 },
+        "param:rangedefence": { "value": 250 },
+        "param:barrows_maxhit": { "value": 24 },
+        "regenrate": {
+          "value": 16,
+          "evidence": {
+            "facts": [ "barrows.bc-regen-clock" ],
+            "label": "UNKNOWN",
+            "researchCommit": "d5ab6cf0c0e90a8658b22c0369cdcccd9098732f",
+            "sources": []
+          }
+        }
+      }
     }
   ]
 }

@@ -152,3 +152,6 @@
 ^barrows_special_rng_order = "native_accuracy_magnitude_then_proc"
 // UNKNOWN engineering barrows.bc-special-rng-order: append after native melee queues.
 ^barrows_special_delivery_order = 0
+
+// CANDIDATE barrows.bc-guthan-proc-chance: one draw after an accuracy hit.
+^barrows_guthan_proc_denominator = 4

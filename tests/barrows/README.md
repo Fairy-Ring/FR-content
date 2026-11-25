@@ -75,6 +75,29 @@ without changing the shared handler. At current energy 1 through 5, it adds 1
 then subtracts 2; the addition cannot reach the 10000-unit clamp. Every other
 change, including zero, uses one ordinary `healenergy` call.
 
+## Guthan combat (BC-04)
+
+```sh
+node --import tsx ../content/tests/barrows/test_combat_guthan.mjs
+```
+
+Guthan uses Crush, five ticks, an explicit CANDIDATE maximum 24 and unchanged
+100 Hitpoints. Infestation's existence is VERIFIED. The operator-selected
+CANDIDATE rule heals the same hit's post-protection damage on a one-in-four
+accuracy success. The native damage queue runs before the bounded NPC heal.
+A protected or rolled zero heals nothing. A fatal hit, including exact remaining
+Hitpoints, kills the player before the effect and therefore heals nothing.
+Full-health Guthan still consumes the proc draw. No special presentation is added.
+The native regeneration rate 16 is UNKNOWN engineering and moves every stat.
+
+The compiled suite uses the real runner, queues and native RNG. It covers the
+complete field group, single-hit/draw order, wounded/full/capped healing, prayer,
+lethal damage, real second-player retargeting, two-Guthan isolation, all-stat
+regeneration, and credit after a full heal. Native full healing clears hero points.
+Ordinary subsequent attacks record the owner again. The contrived pre-heal-impact
+and poison/recoil-only finish retains the native no-credit consequence. After
+removal an uncredited brother can be raised again without resetting the visit.
+
 ## Durable core (S01)
 
 Build the sibling engine packs, then run:

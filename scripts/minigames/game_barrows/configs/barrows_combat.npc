@@ -55,6 +55,25 @@ hitpoints=100
 attack=100
 strength=100
 defence=100
+// CANDIDATE barrows.bc-guthan-skills, bonuses and attack: corrected Old School vector.
+magic=1
+ranged=1
+// UNKNOWN engineering barrows.bc-regen-clock: Q8 selects 16 for every native stat.
+regenrate=16
+param=attackrate,5
+param=damagetype,^crush_style
+param=attackbonus,0
+param=strengthbonus,75
+param=magicattack,-50
+param=rangeattack,-19
+param=rangebonus,0
+param=stabdefence,259
+param=slashdefence,257
+param=crushdefence,241
+param=magicdefence,-11
+param=rangedefence,250
+// CANDIDATE barrows.bc-guthan-maxhit: explicit cap, not fitted Strength.
+param=barrows_maxhit,24
 
 [barrows_karil]
 name=Karil the Tainted
