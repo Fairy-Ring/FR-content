@@ -1,0 +1,242 @@
+// VERIFIED visible 377 forms. Never dispatch only on the map parent.
+[oplocu,farming_belladonna_patch] @farming_special_use;
+[oplocu,belladonna_patch_weeded] @farming_special_use;
+[oplocu,belladonna_patch_weeds_1] @farming_special_use;
+[oplocu,belladonna_patch_weeds_2] @farming_special_use;
+[oplocu,belladonna_patch_weeds_3] @farming_special_use;
+[oploc3,belladonna_patch_weeds_1] @farming_rake_continue;
+[oploc3,belladonna_patch_weeds_2] @farming_rake_continue;
+[oploc3,belladonna_patch_weeds_3] @farming_rake_continue;
+[oplocu,belladonna_seedling] @farming_special_use;
+[oploc2,belladonna_seedling] @farming_inspect;
+[oplocu,belladonna_1] @farming_special_use;
+[oploc2,belladonna_1] @farming_inspect;
+[oplocu,belladonna_2] @farming_special_use;
+[oploc2,belladonna_2] @farming_inspect;
+[oplocu,belladonna_3] @farming_special_use;
+[oploc2,belladonna_3] @farming_inspect;
+[oplocu,belladonna_fullygrown] @farming_special_use;
+[oploc2,belladonna_fullygrown] @farming_inspect;
+[oplocu,belladonna_1_diseased] @farming_special_use;
+[oploc2,belladonna_1_diseased] @farming_inspect;
+[oplocu,belladonna_1_dead] @farming_special_use;
+[oploc2,belladonna_1_dead] @farming_inspect;
+[oplocu,belladonna_2_diseased] @farming_special_use;
+[oploc2,belladonna_2_diseased] @farming_inspect;
+[oplocu,belladonna_2_dead] @farming_special_use;
+[oploc2,belladonna_2_dead] @farming_inspect;
+[oplocu,belladonna_3_diseased] @farming_special_use;
+[oploc2,belladonna_3_diseased] @farming_inspect;
+[oplocu,belladonna_3_dead] @farming_special_use;
+[oploc2,belladonna_3_dead] @farming_inspect;
+[oploc1,belladonna_fullygrown] @farming_special_harvest(false);
+[oploc3,belladonna_fullygrown] @farming_special_harvest(true);
+
+[oplocu,farming_cactus_patch] @farming_special_use;
+[oplocu,cactus_patch_weeded] @farming_special_use;
+[oplocu,cactus_patch_weeds_1] @farming_special_use;
+[oplocu,cactus_patch_weeds_2] @farming_special_use;
+[oplocu,cactus_patch_weeds_3] @farming_special_use;
+[oploc3,cactus_patch_weeds_1] @farming_rake_continue;
+[oploc3,cactus_patch_weeds_2] @farming_rake_continue;
+[oploc3,cactus_patch_weeds_3] @farming_rake_continue;
+[oplocu,cactus_seedling] @farming_special_use;
+[oploc2,cactus_seedling] @farming_inspect;
+[oplocu,cactus_1] @farming_special_use;
+[oploc2,cactus_1] @farming_inspect;
+[oplocu,cactus_1_diseased] @farming_special_use;
+[oploc2,cactus_1_diseased] @farming_inspect;
+[oplocu,cactus_1_dead] @farming_special_use;
+[oploc2,cactus_1_dead] @farming_inspect;
+[oplocu,cactus_2] @farming_special_use;
+[oploc2,cactus_2] @farming_inspect;
+[oplocu,cactus_2_diseased] @farming_special_use;
+[oploc2,cactus_2_diseased] @farming_inspect;
+[oplocu,cactus_2_dead] @farming_special_use;
+[oploc2,cactus_2_dead] @farming_inspect;
+[oplocu,cactus_3] @farming_special_use;
+[oploc2,cactus_3] @farming_inspect;
+[oplocu,cactus_3_diseased] @farming_special_use;
+[oploc2,cactus_3_diseased] @farming_inspect;
+[oplocu,cactus_3_dead] @farming_special_use;
+[oploc2,cactus_3_dead] @farming_inspect;
+[oplocu,cactus_4] @farming_special_use;
+[oploc2,cactus_4] @farming_inspect;
+[oplocu,cactus_4_diseased] @farming_special_use;
+[oploc2,cactus_4_diseased] @farming_inspect;
+[oplocu,cactus_4_dead] @farming_special_use;
+[oploc2,cactus_4_dead] @farming_inspect;
+[oplocu,cactus_5] @farming_special_use;
+[oploc2,cactus_5] @farming_inspect;
+[oplocu,cactus_5_diseased] @farming_special_use;
+[oploc2,cactus_5_diseased] @farming_inspect;
+[oplocu,cactus_5_dead] @farming_special_use;
+[oploc2,cactus_5_dead] @farming_inspect;
+[oplocu,cactus_6] @farming_special_use;
+[oploc2,cactus_6] @farming_inspect;
+[oplocu,cactus_6_diseased] @farming_special_use;
+[oploc2,cactus_6_diseased] @farming_inspect;
+[oplocu,cactus_6_dead] @farming_special_use;
+[oploc2,cactus_6_dead] @farming_inspect;
+[oplocu,cactus_fullygrown] @farming_special_use;
+[oploc2,cactus_fullygrown] @farming_inspect;
+[oplocu,cactus_spines_1] @farming_special_use;
+[oploc2,cactus_spines_1] @farming_inspect;
+[oplocu,cactus_spines_2] @farming_special_use;
+[oploc2,cactus_spines_2] @farming_inspect;
+[oplocu,cactus_spines_3] @farming_special_use;
+[oploc2,cactus_spines_3] @farming_inspect;
+[oplocu,cactus_claimxp] @farming_special_use;
+[oploc2,cactus_claimxp] @farming_inspect;
+[oploc1,cactus_spines_1] @farming_special_harvest(false);
+[oploc3,cactus_spines_1] @farming_special_harvest(true);
+[oploc1,cactus_spines_2] @farming_special_harvest(false);
+[oploc3,cactus_spines_2] @farming_special_harvest(true);
+[oploc1,cactus_spines_3] @farming_special_harvest(false);
+[oploc3,cactus_spines_3] @farming_special_harvest(true);
+[oploc1,cactus_claimxp] @farming_special_harvest(false);
+[oploc3,cactus_claimxp] @farming_special_harvest(true);
+
+[oplocu,farming_mushroom_patch] @farming_special_use;
+[oplocu,bittercap_patch_weeded] @farming_special_use;
+[oplocu,bittercap_patch_weeds_1] @farming_special_use;
+[oplocu,bittercap_patch_weeds_2] @farming_special_use;
+[oplocu,bittercap_patch_weeds_3] @farming_special_use;
+[oploc3,bittercap_patch_weeds_1] @farming_rake_continue;
+[oploc3,bittercap_patch_weeds_2] @farming_rake_continue;
+[oploc3,bittercap_patch_weeds_3] @farming_rake_continue;
+[oplocu,bittercap_seed] @farming_special_use;
+[oploc2,bittercap_seed] @farming_inspect;
+[oplocu,bittercap_1] @farming_special_use;
+[oploc2,bittercap_1] @farming_inspect;
+[oplocu,bittercap_1_diseased] @farming_special_use;
+[oploc2,bittercap_1_diseased] @farming_inspect;
+[oplocu,bittercap_1_dead] @farming_special_use;
+[oploc2,bittercap_1_dead] @farming_inspect;
+[oplocu,bittercap_2] @farming_special_use;
+[oploc2,bittercap_2] @farming_inspect;
+[oplocu,bittercap_2_diseased] @farming_special_use;
+[oploc2,bittercap_2_diseased] @farming_inspect;
+[oplocu,bittercap_2_dead] @farming_special_use;
+[oploc2,bittercap_2_dead] @farming_inspect;
+[oplocu,bittercap_3] @farming_special_use;
+[oploc2,bittercap_3] @farming_inspect;
+[oplocu,bittercap_3_diseased] @farming_special_use;
+[oploc2,bittercap_3_diseased] @farming_inspect;
+[oplocu,bittercap_3_dead] @farming_special_use;
+[oploc2,bittercap_3_dead] @farming_inspect;
+[oplocu,bittercap_4] @farming_special_use;
+[oploc2,bittercap_4] @farming_inspect;
+[oplocu,bittercap_4_diseased] @farming_special_use;
+[oploc2,bittercap_4_diseased] @farming_inspect;
+[oplocu,bittercap_4_dead] @farming_special_use;
+[oploc2,bittercap_4_dead] @farming_inspect;
+[oplocu,bittercap_5] @farming_special_use;
+[oploc2,bittercap_5] @farming_inspect;
+[oplocu,bittercap_5_diseased] @farming_special_use;
+[oploc2,bittercap_5_diseased] @farming_inspect;
+[oplocu,bittercap_5_dead] @farming_special_use;
+[oploc2,bittercap_5_dead] @farming_inspect;
+[oplocu,bittercap_fullygrown_1] @farming_special_use;
+[oploc2,bittercap_fullygrown_1] @farming_inspect;
+[oplocu,bittercap_fullygrown_2] @farming_special_use;
+[oploc2,bittercap_fullygrown_2] @farming_inspect;
+[oplocu,bittercap_fullygrown_3] @farming_special_use;
+[oploc2,bittercap_fullygrown_3] @farming_inspect;
+[oplocu,bittercap_fullygrown_4] @farming_special_use;
+[oploc2,bittercap_fullygrown_4] @farming_inspect;
+[oplocu,bittercap_fullygrown_5] @farming_special_use;
+[oploc2,bittercap_fullygrown_5] @farming_inspect;
+[oplocu,bittercap_fullygrown_6] @farming_special_use;
+[oploc2,bittercap_fullygrown_6] @farming_inspect;
+[oploc1,bittercap_fullygrown_1] @farming_special_harvest(false);
+[oploc3,bittercap_fullygrown_1] @farming_special_harvest(true);
+[oploc1,bittercap_fullygrown_2] @farming_special_harvest(false);
+[oploc3,bittercap_fullygrown_2] @farming_special_harvest(true);
+[oploc1,bittercap_fullygrown_3] @farming_special_harvest(false);
+[oploc3,bittercap_fullygrown_3] @farming_special_harvest(true);
+[oploc1,bittercap_fullygrown_4] @farming_special_harvest(false);
+[oploc3,bittercap_fullygrown_4] @farming_special_harvest(true);
+[oploc1,bittercap_fullygrown_5] @farming_special_harvest(false);
+[oploc3,bittercap_fullygrown_5] @farming_special_harvest(true);
+[oploc1,bittercap_fullygrown_6] @farming_special_harvest(false);
+[oploc3,bittercap_fullygrown_6] @farming_special_harvest(true);
+
+[label,farming_special_use]
+if (~farming_pots_fill_on_patch = true) return;
+def_dbrow $crop = ~farming_special_crop(loc_type);
+if ($crop = null) return;
+def_int $stage = ~farming_special_stage;
+if (last_useitem = rake & $stage >= 0 & $stage < ^farming_veg_weeded) {
+    ~farming_rake_step(false);
+    return;
+}
+if (last_useitem = bucket_compost | last_useitem = bucket_supercompost) {
+    ~farming_soil_apply($stage);
+    return;
+}
+if ($stage = ^farming_veg_weeded & last_useitem = db_getfield($crop, farming_special:seed, 0)) {
+    if (inv_total(inv, dibber) < 1) {
+        ~displaymessage(^dm_farming_dibber);
+        return;
+    }
+    def_int $level = db_getfield($crop, farming_special:level, 0);
+    if (stat_base(farming) < $level) {
+        // UNKNOWN functional wording, not a retained period transcript.
+        mes("You need a Farming level of <tostring($level)> to plant this crop.");
+        return;
+    }
+    anim(farming_seed_dibbing, 0);
+    inv_del(inv, last_useitem, 1);
+    ~farming_special_set_stage(db_getfield($crop, farming_special:first, 0));
+    stat_advance(farming, db_getfield($crop, farming_special:plant_xp, 0));
+    return;
+}
+if (last_useitem = spade & $stage > ^farming_veg_weeded) {
+    anim(human_dig, 0);
+    ~farming_special_set_stage(^farming_veg_weeded);
+    return;
+}
+def_int $normal = ~farming_special_decode($crop, $stage);
+def_int $after = ~farming_crop_care($normal, db_getfield($crop, farming_special:first, 0), db_getfield($crop, farming_special:mature, 0), "crop", false);
+if ($after ! $normal) ~farming_special_set_stage(~farming_special_encode($crop, $after));
+
+[label,farming_special_harvest](boolean $automatic)
+def_dbrow $crop = ~farming_special_crop(loc_type);
+if ($crop = null) return;
+def_int $stage = ~farming_special_stage;
+if ($crop = farming_special_cactus & $stage = 31) {
+    ~farming_special_set_stage(18);
+    stat_advance(farming, db_getfield($crop, farming_special:check_xp, 0));
+    return;
+}
+def_int $mature = db_getfield($crop, farming_special:mature, 0);
+if ($stage < $mature | $stage > db_getfield($crop, farming_special:last, 0)) return;
+if ($crop = farming_special_cactus & $stage = $mature) return;
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+if (~farming_harvest_ready($automatic) = false) return;
+if ($crop = farming_special_belladonna & inv_getobj(worn, ^wearpos_hands) = null) {
+    // CANDIDATE OSRS poison hitsplat, not persistent poison. UNKNOWN broad
+    // glove eligibility: any worn hand item is the favourable period default.
+    damage(uid, ^hitmark_poison, ^farming_belladonna_sting_damage);
+    if (stat(hitpoints) = 0) ~player_die;
+    return;
+}
+// UNKNOWN binding: use the existing Farming picking animation and cadence.
+anim(picking_low, 0);
+inv_add(inv, db_getfield($crop, farming_special:produce, 0), 1);
+stat_advance(farming, db_getfield($crop, farming_special:harvest_xp, 0));
+if ($crop = farming_special_cactus) {
+    // VERIFIED period guide: no specialty regrowth. Bare cactus stays until dug.
+    $stage = sub($stage, 1);
+} else if ($crop = farming_special_mushroom & $stage < db_getfield($crop, farming_special:last, 0)) {
+    $stage = add($stage, 1);
+} else {
+    $stage = ^farming_veg_weeded;
+}
+~farming_special_set_stage($stage);
+%action_delay = calc(map_clock + ^farming_harvest_auto_ticks);
+if (($crop = farming_special_cactus & $stage > $mature) | ($crop = farming_special_mushroom & $stage >= $mature)) p_oploc(3);

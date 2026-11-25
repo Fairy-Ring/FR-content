@@ -1,0 +1,143 @@
+// VERIFIED 377 cache bands. Bush disease/death encodings differ from the shared crop helper.
+[proc,farming_bush_regular_band](int $stage, dbrow $crop)(boolean)
+def_int $first = db_getfield($crop, farming_bush:first, 0);
+def_int $mature = db_getfield($crop, farming_bush:mature, 0);
+def_int $last = db_getfield($crop, farming_bush:last, 0);
+if ($stage >= $first & $stage <= $last) return(true);
+def_int $disease_first = add($first, ^farming_bush_disease_offset);
+def_int $disease_last = add($mature, ^farming_bush_disease_offset);
+if ($stage > $disease_first & $stage <= $disease_last) return(true);
+def_int $dead_first = add($first, ^farming_bush_dead_offset);
+def_int $dead_last = add($mature, ^farming_bush_dead_offset);
+if ($stage > $dead_first & $stage <= $dead_last) return(true);
+return(false);
+
+[proc,farming_bush_crop](int $stage)(dbrow)
+switch_int ($stage) {
+    case 250 : return(farming_bush_redberry);
+    case 251 : return(farming_bush_cadavaberry);
+    case 252 : return(farming_bush_dwellberry);
+    case 253 : return(farming_bush_jangerberry);
+    case 254 : return(farming_bush_whiteberry);
+    case 255 : return(farming_bush_poison_ivy);
+}
+if (~farming_bush_regular_band($stage, farming_bush_redberry) = true) return(farming_bush_redberry);
+if (~farming_bush_regular_band($stage, farming_bush_cadavaberry) = true) return(farming_bush_cadavaberry);
+if (~farming_bush_regular_band($stage, farming_bush_dwellberry) = true) return(farming_bush_dwellberry);
+if (~farming_bush_regular_band($stage, farming_bush_jangerberry) = true) return(farming_bush_jangerberry);
+if (~farming_bush_regular_band($stage, farming_bush_whiteberry) = true) return(farming_bush_whiteberry);
+// UNKNOWN assigned default: poison ivy follows the requested disease immunity.
+def_dbrow $poison = farming_bush_poison_ivy;
+def_int $first = db_getfield($poison, farming_bush:first, 0);
+def_int $mature = db_getfield($poison, farming_bush:mature, 0);
+def_int $last = db_getfield($poison, farming_bush:last, 0);
+if ($stage >= $first & $stage <= $last) return($poison);
+def_int $disease_first = add($first, ^farming_poisonivy_disease_offset);
+def_int $disease_last = add($mature, ^farming_poisonivy_disease_offset);
+if ($stage > $disease_first & $stage < $disease_last) return($poison);
+if ($stage = ^farming_poisonivy_mature_diseased) return($poison);
+def_int $dead_first = add($first, ^farming_poisonivy_dead_offset);
+def_int $dead_last = add($mature, ^farming_poisonivy_dead_offset);
+if ($stage > $dead_first & $stage <= $dead_last) return($poison);
+return(null);
+
+[proc,farming_bush_seed](obj $seed)(dbrow)
+switch_obj ($seed) {
+    case redberry_bush_seed, redberry_seed_2, redberry_seed_3, redberry_seed_4, redberry_seed_5 : return(farming_bush_redberry);
+    case cadavaberry_bush_seed, cadavaberry_seed_2, cadavaberry_seed_3, cadavaberry_seed_4, cadavaberry_seed_5 : return(farming_bush_cadavaberry);
+    case dwellberry_bush_seed, dwellberry_seed_2, dwellberry_seed_3, dwellberry_seed_4, dwellberry_seed_5 : return(farming_bush_dwellberry);
+    case jangerberry_bush_seed, jangerberry_seed_2, jangerberry_seed_3, jangerberry_seed_4, jangerberry_seed_5 : return(farming_bush_jangerberry);
+    case whiteberry_bush_seed, whiteberry_seed_2, whiteberry_seed_3, whiteberry_seed_4, whiteberry_seed_5 : return(farming_bush_whiteberry);
+    case poisonivy_bush_seed : return(farming_bush_poison_ivy);
+    case default : return(null);
+}
+
+[proc,farming_bush_is_diseased](int $stage)(boolean)
+def_dbrow $crop = ~farming_bush_crop($stage);
+if ($crop = null) return(false);
+def_int $first = db_getfield($crop, farming_bush:first, 0);
+def_int $mature = db_getfield($crop, farming_bush:mature, 0);
+if ($crop = farming_bush_poison_ivy) {
+    def_int $disease_first = add($first, ^farming_poisonivy_disease_offset);
+    def_int $disease_last = add($mature, ^farming_poisonivy_disease_offset);
+    if ($stage > $disease_first & $stage < $disease_last) return(true);
+    if ($stage = ^farming_poisonivy_mature_diseased) return(true);
+    return(false);
+}
+def_int $disease_first = add($first, ^farming_bush_disease_offset);
+def_int $disease_last = add($mature, ^farming_bush_disease_offset);
+if ($stage > $disease_first & $stage <= $disease_last) return(true);
+return(false);
+
+[proc,farming_bush_is_dead](int $stage)(boolean)
+def_dbrow $crop = ~farming_bush_crop($stage);
+if ($crop = null) return(false);
+def_int $first = db_getfield($crop, farming_bush:first, 0);
+def_int $mature = db_getfield($crop, farming_bush:mature, 0);
+def_int $dead_offset = ^farming_bush_dead_offset;
+if ($crop = farming_bush_poison_ivy) $dead_offset = ^farming_poisonivy_dead_offset;
+def_int $dead_first = add($first, $dead_offset);
+def_int $dead_last = add($mature, $dead_offset);
+if ($stage > $dead_first & $stage <= $dead_last) return(true);
+return(false);
+
+// CANDIDATE shared growth behavior. The 20-minute family period and 40-minute
+// diseased hold are supplied by the parent-owned farming_growth_bush row.
+[proc,farming_bush_advance](int $stage, int $steps, int $treatment, int $window)(int)
+if ($steps <= 0) return($stage);
+def_dbrow $crop = ~farming_bush_crop($stage);
+if ($crop = null) return($stage);
+def_int $first = db_getfield($crop, farming_bush:first, 0);
+def_int $mature = db_getfield($crop, farming_bush:mature, 0);
+def_int $last = db_getfield($crop, farming_bush:last, 0);
+if ($crop = farming_bush_poison_ivy) {
+    // UNKNOWN assigned default: poison ivy grows without disease rolls.
+    if ($stage >= $first & $stage < $mature) return(min($mature, add($stage, $steps)));
+    if ($stage >= $mature & $stage < $last) return(min($last, add($stage, $steps)));
+    return($stage);
+}
+if ($stage >= $mature & $stage < $last) return(min($last, add($stage, $steps)));
+def_int $shift = sub(^farming_diseased_offset, ^farming_bush_disease_offset);
+def_int $engine_stage = $stage;
+if (~farming_bush_is_diseased($stage) = true) {
+    if ($stage = add($mature, ^farming_bush_disease_offset)) return($stage);
+    $engine_stage = add($stage, $shift);
+} else if ($stage < $first | $stage >= $mature) {
+    return($stage);
+}
+def_int $after = ~farming_crop_advance($engine_stage, $steps, $first, $mature, false, $treatment, farming_growth_bush, $window);
+if ($after > add($first, ^farming_diseased_offset) & $after <= add($mature, ^farming_diseased_offset)) return(sub($after, $shift));
+if ($after > add($first, ^farming_dead_offset) & $after <= add($mature, ^farming_dead_offset)) return(sub($after, $shift));
+return($after);
+
+// One transmitted varp, four original byte selectors; no cursor-based DB search.
+[proc,farming_bush_advance_all](int $steps, int $window)
+def_int $word = %farming_bush_varp;
+def_int $bit = 0;
+while ($bit < 32) {
+    def_int $end = add($bit, 7);
+    def_int $before = getbit_range($word, $bit, $end);
+    def_int $stage = $before;
+    def_int $patch = add(12, divide($bit, 8));
+    def_int $index = add(20, divide($bit, 8));
+    def_int $treatment = ~farming_soil_treatment($index);
+    def_dbrow $crop = ~farming_bush_crop($before);
+    if ($crop ! null) {
+        def_int $first = db_getfield($crop, farming_bush:first, 0);
+        def_int $mature = db_getfield($crop, farming_bush:mature, 0);
+        if (~farming_protection_watched($patch) = true & $steps > 0
+            & $before >= $first & $before < $mature
+            & ~farming_bush_is_diseased($before) = false & ~farming_bush_is_dead($before) = false) {
+            $stage = min($mature, add($before, $steps));
+        } else {
+            $stage = ~farming_bush_advance($before, $steps, $treatment, $window);
+        }
+        if ($stage = $mature & $before < $mature) {
+            if ($treatment ! 0) ~farming_soil_mature($index, $before, $stage, $mature);
+            $stage = db_getfield($crop, farming_bush:claim, 0);
+        }
+    }
+    $word = setbit_range_toint($word, $stage, $bit, $end);
+    $bit = add($bit, 8);
+}
+%farming_bush_varp = $word;

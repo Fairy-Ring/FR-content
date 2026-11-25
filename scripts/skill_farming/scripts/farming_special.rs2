@@ -1,0 +1,80 @@
+// VERIFIED original 377 selectors. Direct rows preserve growth's DB cursor.
+[proc,farming_special_crop](loc $patch)(dbrow)
+switch_loc ($patch) {
+    case farming_cactus_patch : return(farming_special_cactus);
+    case farming_belladonna_patch : return(farming_special_belladonna);
+    case farming_mushroom_patch : return(farming_special_mushroom);
+    case default : return(null);
+}
+
+[proc,farming_special_stage]()(int)
+switch_loc (loc_type) {
+    case farming_cactus_patch : return(%cactus_compost_varbit_basevar_0_5);
+    case farming_belladonna_patch : return(%cactus_compost_varbit_basevar_16_21);
+    case farming_mushroom_patch : return(%cactus_compost_varbit_basevar_8_13);
+    case default : return(-1);
+}
+
+[proc,farming_special_set_stage](int $stage)
+if ($stage = ^farming_veg_weeded & ~farming_special_stage > ^farming_veg_weeded) ~farming_soil_clear(~farming_soil_index);
+switch_loc (loc_type) {
+    case farming_cactus_patch : %cactus_compost_varbit_basevar_0_5 = $stage;
+    case farming_belladonna_patch : %cactus_compost_varbit_basevar_16_21 = $stage;
+    case farming_mushroom_patch : %cactus_compost_varbit_basevar_8_13 = $stage;
+}
+
+// Translate compact six-bit cache bands to the shared crop care convention.
+[proc,farming_special_decode](dbrow $crop, int $stage)(int)
+def_int $first = db_getfield($crop, farming_special:first, 0);
+def_int $mature = db_getfield($crop, farming_special:mature, 0);
+def_int $disease = db_getfield($crop, farming_special:diseased, 0);
+def_int $dead = db_getfield($crop, farming_special:dead, 0);
+def_int $count = sub(sub($mature, $first), 1);
+if ($stage >= $disease & $stage < add($disease, $count)) return(calc($stage - $disease + $first + 1 + ^farming_diseased_offset));
+if ($stage >= $dead & $stage < add($dead, $count)) return(calc($stage - $dead + $first + 1 + ^farming_dead_offset));
+return($stage);
+
+[proc,farming_special_encode](dbrow $crop, int $stage)(int)
+def_int $first = db_getfield($crop, farming_special:first, 0);
+if ($stage >= ^farming_dead_offset) return(calc($stage - ^farming_dead_offset - $first - 1 + db_getfield($crop, farming_special:dead, 0)));
+if ($stage >= ^farming_diseased_offset) return(calc($stage - ^farming_diseased_offset - $first - 1 + db_getfield($crop, farming_special:diseased, 0)));
+return($stage);
+
+[proc,farming_special_advance](dbrow $crop, int $stage, int $steps, int $window)(int)
+def_int $mature = db_getfield($crop, farming_special:mature, 0);
+// Unchecked cactus health is distinct from all depleted-spine forms.
+if ($crop = farming_special_cactus & $stage = 31) return($stage);
+if ($stage >= $mature & $stage <= db_getfield($crop, farming_special:last, 0)) return($stage);
+def_int $normal = ~farming_special_decode($crop, $stage);
+def_int $after = ~farming_crop_advance($normal, $steps, db_getfield($crop, farming_special:first, 0), $mature, false, ~farming_soil_treatment(db_getfield($crop, farming_special:soil, 0)), db_getfield($crop, farming_special:growth, 0), $window);
+if ($crop = farming_special_cactus & $after = $mature & $normal ! $after) return(31);
+return(~farming_special_encode($crop, $after));
+
+[proc,farming_special_advance_all](dbrow $crop, int $steps, int $window)
+if ($crop = farming_special_cactus) %cactus_compost_varbit_basevar_0_5 = ~farming_special_advance($crop, %cactus_compost_varbit_basevar_0_5, $steps, $window);
+if ($crop = farming_special_belladonna) %cactus_compost_varbit_basevar_16_21 = ~farming_special_advance($crop, %cactus_compost_varbit_basevar_16_21, $steps, $window);
+if ($crop = farming_special_mushroom) %cactus_compost_varbit_basevar_8_13 = ~farming_special_advance($crop, %cactus_compost_varbit_basevar_8_13, $steps, $window);
+
+// Reuse the published rake cadence and interruption rules for new selectors.
+[proc,farming_special_rake](boolean $repeat, boolean $bush)
+def_int $stage = ~farming_special_stage;
+if ($bush = true) $stage = ~farming_bush_stage;
+if ($stage < 0 | $stage >= ^farming_veg_weeded | inv_total(inv, rake) < 1) return;
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+if ($repeat = true & %action_delay > map_clock) {
+    p_oploc(3);
+    return;
+}
+anim(farming_raking, 0);
+inv_add(inv, weeds, 1);
+stat_advance(farming, ^farming_weed_xp);
+$stage = add($stage, 1);
+if ($bush = true) ~farming_bush_set_stage($stage);
+else ~farming_special_set_stage($stage);
+if ($stage < ^farming_veg_weeded) {
+    %action_delay = calc(map_clock + ^farming_rake_step_ticks);
+    p_oploc(3);
+}

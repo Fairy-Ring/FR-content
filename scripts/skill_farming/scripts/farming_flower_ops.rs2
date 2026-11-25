@@ -129,6 +129,7 @@ switch_loc (loc_type) {
 [oploc1,limpwurt_fullygrown] @farming_flower_pick;
 
 [label,farming_flower_use]
+if (~farming_pots_fill_on_patch = true) return;
 def_int $stage = ~farming_flower_stage;
 if ($stage = -1) {
     ~displaymessage(^dm_default);

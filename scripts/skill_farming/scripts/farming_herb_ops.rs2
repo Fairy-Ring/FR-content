@@ -48,6 +48,7 @@ switch_loc (loc_type) {
 [oplocu,herb_3_dead] @farming_herb_use;
 
 [label,farming_herb_use]
+if (~farming_pots_fill_on_patch = true) return;
 def_int $stage = ~farming_herb_stage;
 if ($stage = -1) {
     ~displaymessage(^dm_default);

@@ -1,0 +1,3 @@
+// CANDIDATE Old School Belladonna: an ungloved attempt deals two poison-hit HP.
+// This is not continuing poison. No later yield, stackability or glove list.
+^farming_belladonna_sting_damage = 2

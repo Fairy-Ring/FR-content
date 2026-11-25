@@ -1,0 +1,13 @@
+// UNKNOWN engineering use of spare bits in original Farming scratch word 529.
+// Preserve its original 0..7 varbit; no original script reads the raw word.
+// Bush treatments use uncovered bits 8..15 and survive logout with planting.
+[farming_state_temp_3]
+scope=perm
+// UNKNOWN favourable access policy: shared SOFT growth can write these fields.
+protect=no
+
+// Original transmitted selector word; preserve its existing scope and identity.
+[cactus_compost_varbit_basevar]
+transmit=yes
+scope=perm
+protect=no

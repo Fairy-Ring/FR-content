@@ -1,0 +1,515 @@
+// UNKNOWN functional action wording below; no period bush-action transcript retained.
+// The patch parent keeps the original 256-stage selector; handlers attach to visible children.
+[proc,farming_bush_stage]()(int)
+switch_loc (loc_type) {
+    case farming_bush_patch_1 : return(%farming_bush_varp_0_7);
+    case farming_bush_patch_2 : return(%farming_bush_varp_8_15);
+    case farming_bush_patch_3 : return(%farming_bush_varp_16_23);
+    case farming_bush_patch_4 : return(%farming_bush_varp_24_31);
+    case default : return(-1);
+}
+
+[proc,farming_bush_set_stage](int $stage)
+def_int $before = ~farming_bush_stage;
+if ($stage = ^farming_veg_weeded) {
+    if (~farming_bush_crop($before) ! null) ~farming_soil_clear(~farming_soil_index);
+    ~farming_protection_clear(~farming_protection_loc_bit);
+}
+switch_loc (loc_type) {
+    case farming_bush_patch_1 : %farming_bush_varp_0_7 = $stage;
+    case farming_bush_patch_2 : %farming_bush_varp_8_15 = $stage;
+    case farming_bush_patch_3 : %farming_bush_varp_16_23 = $stage;
+    case farming_bush_patch_4 : %farming_bush_varp_24_31 = $stage;
+}
+
+[oplocu,farming_bush_patch_1] @farming_bush_use;
+[oplocu,farming_bush_patch_2] @farming_bush_use;
+[oplocu,farming_bush_patch_3] @farming_bush_use;
+[oplocu,farming_bush_patch_4] @farming_bush_use;
+[oplocu,bush_patch_weeds_3] @farming_bush_use;
+[oplocu,bush_patch_weeds_2] @farming_bush_use;
+[oplocu,bush_patch_weeds_1] @farming_bush_use;
+[oplocu,bush_patch_weeded] @farming_bush_use;
+[oploc3,bush_patch_weeds_3] @farming_rake_continue;
+[oploc3,bush_patch_weeds_2] @farming_rake_continue;
+[oploc3,bush_patch_weeds_1] @farming_rake_continue;
+
+[oplocu,redberry_bush_seedling] @farming_bush_use;
+[oploc2,redberry_bush_seedling] @farming_inspect;
+[oplocu,redberry_bush_1] @farming_bush_use;
+[oploc2,redberry_bush_1] @farming_inspect;
+[oplocu,redberry_bush_2] @farming_bush_use;
+[oploc2,redberry_bush_2] @farming_inspect;
+[oplocu,redberry_bush_3] @farming_bush_use;
+[oploc2,redberry_bush_3] @farming_inspect;
+[oplocu,redberry_bush_4] @farming_bush_use;
+[oploc2,redberry_bush_4] @farming_inspect;
+[oplocu,redberry_bush_fullygrown] @farming_bush_use;
+[oploc2,redberry_bush_fullygrown] @farming_inspect;
+[oplocu,redberry_bush_berry_1] @farming_bush_use;
+[oploc2,redberry_bush_berry_1] @farming_inspect;
+[oploc1,redberry_bush_berry_1] @farming_bush_harvest;
+[oplocu,redberry_bush_berry_2] @farming_bush_use;
+[oploc2,redberry_bush_berry_2] @farming_inspect;
+[oploc1,redberry_bush_berry_2] @farming_bush_harvest;
+[oplocu,redberry_bush_berry_3] @farming_bush_use;
+[oploc2,redberry_bush_berry_3] @farming_inspect;
+[oploc1,redberry_bush_berry_3] @farming_bush_harvest;
+[oplocu,redberry_bush_berry_4] @farming_bush_use;
+[oploc2,redberry_bush_berry_4] @farming_inspect;
+[oploc1,redberry_bush_berry_4] @farming_bush_harvest;
+[oplocu,redberry_bush_claim_xp] @farming_bush_use;
+[oploc2,redberry_bush_claim_xp] @farming_inspect;
+[oploc1,redberry_bush_claim_xp] @farming_bush_check_health;
+[oplocu,redberry_bush_1_diseased] @farming_bush_use;
+[oploc2,redberry_bush_1_diseased] @farming_inspect;
+[oplocu,redberry_bush_2_diseased] @farming_bush_use;
+[oploc2,redberry_bush_2_diseased] @farming_inspect;
+[oplocu,redberry_bush_3_diseased] @farming_bush_use;
+[oploc2,redberry_bush_3_diseased] @farming_inspect;
+[oplocu,redberry_bush_4_diseased] @farming_bush_use;
+[oploc2,redberry_bush_4_diseased] @farming_inspect;
+[oplocu,redberry_bush_fullygrown_diseased] @farming_bush_use;
+[oploc2,redberry_bush_fullygrown_diseased] @farming_inspect;
+[oplocu,redberry_bush_1_dead] @farming_bush_use;
+[oploc2,redberry_bush_1_dead] @farming_inspect;
+[oplocu,redberry_bush_2_dead] @farming_bush_use;
+[oploc2,redberry_bush_2_dead] @farming_inspect;
+[oplocu,redberry_bush_3_dead] @farming_bush_use;
+[oploc2,redberry_bush_3_dead] @farming_inspect;
+[oplocu,redberry_bush_4_dead] @farming_bush_use;
+[oploc2,redberry_bush_4_dead] @farming_inspect;
+[oplocu,redberry_bush_fullygrown_dead] @farming_bush_use;
+[oploc2,redberry_bush_fullygrown_dead] @farming_inspect;
+
+[oplocu,cadavaberry_bush_seedling] @farming_bush_use;
+[oploc2,cadavaberry_bush_seedling] @farming_inspect;
+[oplocu,cadavaberry_bush_1] @farming_bush_use;
+[oploc2,cadavaberry_bush_1] @farming_inspect;
+[oplocu,cadavaberry_bush_2] @farming_bush_use;
+[oploc2,cadavaberry_bush_2] @farming_inspect;
+[oplocu,cadavaberry_bush_3] @farming_bush_use;
+[oploc2,cadavaberry_bush_3] @farming_inspect;
+[oplocu,cadavaberry_bush_4] @farming_bush_use;
+[oploc2,cadavaberry_bush_4] @farming_inspect;
+[oplocu,cadavaberry_bush_5] @farming_bush_use;
+[oploc2,cadavaberry_bush_5] @farming_inspect;
+[oplocu,cadavaberry_bush_fullygrown] @farming_bush_use;
+[oploc2,cadavaberry_bush_fullygrown] @farming_inspect;
+[oplocu,cadavaberry_bush_berry_1] @farming_bush_use;
+[oploc2,cadavaberry_bush_berry_1] @farming_inspect;
+[oploc1,cadavaberry_bush_berry_1] @farming_bush_harvest;
+[oplocu,cadavaberry_bush_berry_2] @farming_bush_use;
+[oploc2,cadavaberry_bush_berry_2] @farming_inspect;
+[oploc1,cadavaberry_bush_berry_2] @farming_bush_harvest;
+[oplocu,cadavaberry_bush_berry_3] @farming_bush_use;
+[oploc2,cadavaberry_bush_berry_3] @farming_inspect;
+[oploc1,cadavaberry_bush_berry_3] @farming_bush_harvest;
+[oplocu,cadavaberry_bush_berry_4] @farming_bush_use;
+[oploc2,cadavaberry_bush_berry_4] @farming_inspect;
+[oploc1,cadavaberry_bush_berry_4] @farming_bush_harvest;
+[oplocu,cadavaberry_bush_claim_xp] @farming_bush_use;
+[oploc2,cadavaberry_bush_claim_xp] @farming_inspect;
+[oploc1,cadavaberry_bush_claim_xp] @farming_bush_check_health;
+[oplocu,cadavaberry_bush_1_diseased] @farming_bush_use;
+[oploc2,cadavaberry_bush_1_diseased] @farming_inspect;
+[oplocu,cadavaberry_bush_2_diseased] @farming_bush_use;
+[oploc2,cadavaberry_bush_2_diseased] @farming_inspect;
+[oplocu,cadavaberry_bush_3_diseased] @farming_bush_use;
+[oploc2,cadavaberry_bush_3_diseased] @farming_inspect;
+[oplocu,cadavaberry_bush_4_diseased] @farming_bush_use;
+[oploc2,cadavaberry_bush_4_diseased] @farming_inspect;
+[oplocu,cadavaberry_bush_5_diseased] @farming_bush_use;
+[oploc2,cadavaberry_bush_5_diseased] @farming_inspect;
+[oplocu,cadavaberry_bush_fullygrown_diseased] @farming_bush_use;
+[oploc2,cadavaberry_bush_fullygrown_diseased] @farming_inspect;
+[oplocu,cadavaberry_bush_1_dead] @farming_bush_use;
+[oploc2,cadavaberry_bush_1_dead] @farming_inspect;
+[oplocu,cadavaberry_bush_2_dead] @farming_bush_use;
+[oploc2,cadavaberry_bush_2_dead] @farming_inspect;
+[oplocu,cadavaberry_bush_3_dead] @farming_bush_use;
+[oploc2,cadavaberry_bush_3_dead] @farming_inspect;
+[oplocu,cadavaberry_bush_4_dead] @farming_bush_use;
+[oploc2,cadavaberry_bush_4_dead] @farming_inspect;
+[oplocu,cadavaberry_bush_5_dead] @farming_bush_use;
+[oploc2,cadavaberry_bush_5_dead] @farming_inspect;
+[oplocu,cadavaberry_bush_fullygrown_dead] @farming_bush_use;
+[oploc2,cadavaberry_bush_fullygrown_dead] @farming_inspect;
+
+[oplocu,dwellberry_bush_seedling] @farming_bush_use;
+[oploc2,dwellberry_bush_seedling] @farming_inspect;
+[oplocu,dwellberry_bush_1] @farming_bush_use;
+[oploc2,dwellberry_bush_1] @farming_inspect;
+[oplocu,dwellberry_bush_2] @farming_bush_use;
+[oploc2,dwellberry_bush_2] @farming_inspect;
+[oplocu,dwellberry_bush_3] @farming_bush_use;
+[oploc2,dwellberry_bush_3] @farming_inspect;
+[oplocu,dwellberry_bush_4] @farming_bush_use;
+[oploc2,dwellberry_bush_4] @farming_inspect;
+[oplocu,dwellberry_bush_5] @farming_bush_use;
+[oploc2,dwellberry_bush_5] @farming_inspect;
+[oplocu,dwellberry_bush_6] @farming_bush_use;
+[oploc2,dwellberry_bush_6] @farming_inspect;
+[oplocu,dwellberry_bush_fullygrown] @farming_bush_use;
+[oploc2,dwellberry_bush_fullygrown] @farming_inspect;
+[oplocu,dwellberry_bush_berry_1] @farming_bush_use;
+[oploc2,dwellberry_bush_berry_1] @farming_inspect;
+[oploc1,dwellberry_bush_berry_1] @farming_bush_harvest;
+[oplocu,dwellberry_bush_berry_2] @farming_bush_use;
+[oploc2,dwellberry_bush_berry_2] @farming_inspect;
+[oploc1,dwellberry_bush_berry_2] @farming_bush_harvest;
+[oplocu,dwellberry_bush_berry_3] @farming_bush_use;
+[oploc2,dwellberry_bush_berry_3] @farming_inspect;
+[oploc1,dwellberry_bush_berry_3] @farming_bush_harvest;
+[oplocu,dwellberry_bush_berry_4] @farming_bush_use;
+[oploc2,dwellberry_bush_berry_4] @farming_inspect;
+[oploc1,dwellberry_bush_berry_4] @farming_bush_harvest;
+[oplocu,dwellberry_bush_claim_xp] @farming_bush_use;
+[oploc2,dwellberry_bush_claim_xp] @farming_inspect;
+[oploc1,dwellberry_bush_claim_xp] @farming_bush_check_health;
+[oplocu,dwellberry_bush_1_diseased] @farming_bush_use;
+[oploc2,dwellberry_bush_1_diseased] @farming_inspect;
+[oplocu,dwellberry_bush_2_diseased] @farming_bush_use;
+[oploc2,dwellberry_bush_2_diseased] @farming_inspect;
+[oplocu,dwellberry_bush_3_diseased] @farming_bush_use;
+[oploc2,dwellberry_bush_3_diseased] @farming_inspect;
+[oplocu,dwellberry_bush_4_diseased] @farming_bush_use;
+[oploc2,dwellberry_bush_4_diseased] @farming_inspect;
+[oplocu,dwellberry_bush_5_diseased] @farming_bush_use;
+[oploc2,dwellberry_bush_5_diseased] @farming_inspect;
+[oplocu,dwellberry_bush_6_diseased] @farming_bush_use;
+[oploc2,dwellberry_bush_6_diseased] @farming_inspect;
+[oplocu,dwellberry_bush_fullygrown_diseased] @farming_bush_use;
+[oploc2,dwellberry_bush_fullygrown_diseased] @farming_inspect;
+[oplocu,dwellberry_bush_1_dead] @farming_bush_use;
+[oploc2,dwellberry_bush_1_dead] @farming_inspect;
+[oplocu,dwellberry_bush_2_dead] @farming_bush_use;
+[oploc2,dwellberry_bush_2_dead] @farming_inspect;
+[oplocu,dwellberry_bush_3_dead] @farming_bush_use;
+[oploc2,dwellberry_bush_3_dead] @farming_inspect;
+[oplocu,dwellberry_bush_4_dead] @farming_bush_use;
+[oploc2,dwellberry_bush_4_dead] @farming_inspect;
+[oplocu,dwellberry_bush_5_dead] @farming_bush_use;
+[oploc2,dwellberry_bush_5_dead] @farming_inspect;
+[oplocu,dwellberry_bush_6_dead] @farming_bush_use;
+[oploc2,dwellberry_bush_6_dead] @farming_inspect;
+[oplocu,dwellberry_bush_fullygrown_dead] @farming_bush_use;
+[oploc2,dwellberry_bush_fullygrown_dead] @farming_inspect;
+
+[oplocu,jangerberry_bush_seedling] @farming_bush_use;
+[oploc2,jangerberry_bush_seedling] @farming_inspect;
+[oplocu,jangerberry_bush_1] @farming_bush_use;
+[oploc2,jangerberry_bush_1] @farming_inspect;
+[oplocu,jangerberry_bush_2] @farming_bush_use;
+[oploc2,jangerberry_bush_2] @farming_inspect;
+[oplocu,jangerberry_bush_3] @farming_bush_use;
+[oploc2,jangerberry_bush_3] @farming_inspect;
+[oplocu,jangerberry_bush_4] @farming_bush_use;
+[oploc2,jangerberry_bush_4] @farming_inspect;
+[oplocu,jangerberry_bush_5] @farming_bush_use;
+[oploc2,jangerberry_bush_5] @farming_inspect;
+[oplocu,jangerberry_bush_6] @farming_bush_use;
+[oploc2,jangerberry_bush_6] @farming_inspect;
+[oplocu,jangerberry_bush_7] @farming_bush_use;
+[oploc2,jangerberry_bush_7] @farming_inspect;
+[oplocu,jangerberry_bush_fullygrown] @farming_bush_use;
+[oploc2,jangerberry_bush_fullygrown] @farming_inspect;
+[oplocu,jangerberry_bush_berry_1] @farming_bush_use;
+[oploc2,jangerberry_bush_berry_1] @farming_inspect;
+[oploc1,jangerberry_bush_berry_1] @farming_bush_harvest;
+[oplocu,jangerberry_bush_berry_2] @farming_bush_use;
+[oploc2,jangerberry_bush_berry_2] @farming_inspect;
+[oploc1,jangerberry_bush_berry_2] @farming_bush_harvest;
+[oplocu,jangerberry_bush_berry_3] @farming_bush_use;
+[oploc2,jangerberry_bush_berry_3] @farming_inspect;
+[oploc1,jangerberry_bush_berry_3] @farming_bush_harvest;
+[oplocu,jangerberry_bush_berry_4] @farming_bush_use;
+[oploc2,jangerberry_bush_berry_4] @farming_inspect;
+[oploc1,jangerberry_bush_berry_4] @farming_bush_harvest;
+[oplocu,jangerberry_bush_claim_xp] @farming_bush_use;
+[oploc2,jangerberry_bush_claim_xp] @farming_inspect;
+[oploc1,jangerberry_bush_claim_xp] @farming_bush_check_health;
+[oplocu,jangerberry_bush_1_diseased] @farming_bush_use;
+[oploc2,jangerberry_bush_1_diseased] @farming_inspect;
+[oplocu,jangerberry_bush_2_diseased] @farming_bush_use;
+[oploc2,jangerberry_bush_2_diseased] @farming_inspect;
+[oplocu,jangerberry_bush_3_diseased] @farming_bush_use;
+[oploc2,jangerberry_bush_3_diseased] @farming_inspect;
+[oplocu,jangerberry_bush_4_diseased] @farming_bush_use;
+[oploc2,jangerberry_bush_4_diseased] @farming_inspect;
+[oplocu,jangerberry_bush_5_diseased] @farming_bush_use;
+[oploc2,jangerberry_bush_5_diseased] @farming_inspect;
+[oplocu,jangerberry_bush_6_diseased] @farming_bush_use;
+[oploc2,jangerberry_bush_6_diseased] @farming_inspect;
+[oplocu,jangerberry_bush_7_diseased] @farming_bush_use;
+[oploc2,jangerberry_bush_7_diseased] @farming_inspect;
+[oplocu,jangerberry_bush_fullygrown_diseased] @farming_bush_use;
+[oploc2,jangerberry_bush_fullygrown_diseased] @farming_inspect;
+[oplocu,jangerberry_bush_1_dead] @farming_bush_use;
+[oploc2,jangerberry_bush_1_dead] @farming_inspect;
+[oplocu,jangerberry_bush_2_dead] @farming_bush_use;
+[oploc2,jangerberry_bush_2_dead] @farming_inspect;
+[oplocu,jangerberry_bush_3_dead] @farming_bush_use;
+[oploc2,jangerberry_bush_3_dead] @farming_inspect;
+[oplocu,jangerberry_bush_4_dead] @farming_bush_use;
+[oploc2,jangerberry_bush_4_dead] @farming_inspect;
+[oplocu,jangerberry_bush_5_dead] @farming_bush_use;
+[oploc2,jangerberry_bush_5_dead] @farming_inspect;
+[oplocu,jangerberry_bush_6_dead] @farming_bush_use;
+[oploc2,jangerberry_bush_6_dead] @farming_inspect;
+[oplocu,jangerberry_bush_7_dead] @farming_bush_use;
+[oploc2,jangerberry_bush_7_dead] @farming_inspect;
+[oplocu,jangerberry_bush_fullygrown_dead] @farming_bush_use;
+[oploc2,jangerberry_bush_fullygrown_dead] @farming_inspect;
+
+[oplocu,whiteberry_bush_seedling] @farming_bush_use;
+[oploc2,whiteberry_bush_seedling] @farming_inspect;
+[oplocu,whiteberry_bush_1] @farming_bush_use;
+[oploc2,whiteberry_bush_1] @farming_inspect;
+[oplocu,whiteberry_bush_2] @farming_bush_use;
+[oploc2,whiteberry_bush_2] @farming_inspect;
+[oplocu,whiteberry_bush_3] @farming_bush_use;
+[oploc2,whiteberry_bush_3] @farming_inspect;
+[oplocu,whiteberry_bush_4] @farming_bush_use;
+[oploc2,whiteberry_bush_4] @farming_inspect;
+[oplocu,whiteberry_bush_5] @farming_bush_use;
+[oploc2,whiteberry_bush_5] @farming_inspect;
+[oplocu,whiteberry_bush_6] @farming_bush_use;
+[oploc2,whiteberry_bush_6] @farming_inspect;
+[oplocu,whiteberry_bush_7] @farming_bush_use;
+[oploc2,whiteberry_bush_7] @farming_inspect;
+[oplocu,whiteberry_bush_fullygrown] @farming_bush_use;
+[oploc2,whiteberry_bush_fullygrown] @farming_inspect;
+[oplocu,whiteberry_bush_berry_1] @farming_bush_use;
+[oploc2,whiteberry_bush_berry_1] @farming_inspect;
+[oploc1,whiteberry_bush_berry_1] @farming_bush_harvest;
+[oplocu,whiteberry_bush_berry_2] @farming_bush_use;
+[oploc2,whiteberry_bush_berry_2] @farming_inspect;
+[oploc1,whiteberry_bush_berry_2] @farming_bush_harvest;
+[oplocu,whiteberry_bush_berry_3] @farming_bush_use;
+[oploc2,whiteberry_bush_berry_3] @farming_inspect;
+[oploc1,whiteberry_bush_berry_3] @farming_bush_harvest;
+[oplocu,whiteberry_bush_berry_4] @farming_bush_use;
+[oploc2,whiteberry_bush_berry_4] @farming_inspect;
+[oploc1,whiteberry_bush_berry_4] @farming_bush_harvest;
+[oplocu,whiteberry_bush_claim_xp] @farming_bush_use;
+[oploc2,whiteberry_bush_claim_xp] @farming_inspect;
+[oploc1,whiteberry_bush_claim_xp] @farming_bush_check_health;
+[oplocu,whiteberry_bush_1_diseased] @farming_bush_use;
+[oploc2,whiteberry_bush_1_diseased] @farming_inspect;
+[oplocu,whiteberry_bush_2_diseased] @farming_bush_use;
+[oploc2,whiteberry_bush_2_diseased] @farming_inspect;
+[oplocu,whiteberry_bush_3_diseased] @farming_bush_use;
+[oploc2,whiteberry_bush_3_diseased] @farming_inspect;
+[oplocu,whiteberry_bush_4_diseased] @farming_bush_use;
+[oploc2,whiteberry_bush_4_diseased] @farming_inspect;
+[oplocu,whiteberry_bush_5_diseased] @farming_bush_use;
+[oploc2,whiteberry_bush_5_diseased] @farming_inspect;
+[oplocu,whiteberry_bush_6_diseased] @farming_bush_use;
+[oploc2,whiteberry_bush_6_diseased] @farming_inspect;
+[oplocu,whiteberry_bush_7_diseased] @farming_bush_use;
+[oploc2,whiteberry_bush_7_diseased] @farming_inspect;
+[oplocu,whiteberry_bush_fullygrown_diseased] @farming_bush_use;
+[oploc2,whiteberry_bush_fullygrown_diseased] @farming_inspect;
+[oplocu,whiteberry_bush_1_dead] @farming_bush_use;
+[oploc2,whiteberry_bush_1_dead] @farming_inspect;
+[oplocu,whiteberry_bush_2_dead] @farming_bush_use;
+[oploc2,whiteberry_bush_2_dead] @farming_inspect;
+[oplocu,whiteberry_bush_3_dead] @farming_bush_use;
+[oploc2,whiteberry_bush_3_dead] @farming_inspect;
+[oplocu,whiteberry_bush_4_dead] @farming_bush_use;
+[oploc2,whiteberry_bush_4_dead] @farming_inspect;
+[oplocu,whiteberry_bush_5_dead] @farming_bush_use;
+[oploc2,whiteberry_bush_5_dead] @farming_inspect;
+[oplocu,whiteberry_bush_6_dead] @farming_bush_use;
+[oploc2,whiteberry_bush_6_dead] @farming_inspect;
+[oplocu,whiteberry_bush_7_dead] @farming_bush_use;
+[oploc2,whiteberry_bush_7_dead] @farming_inspect;
+[oplocu,whiteberry_bush_fullygrown_dead] @farming_bush_use;
+[oploc2,whiteberry_bush_fullygrown_dead] @farming_inspect;
+
+[oplocu,poisonivy_bush_seedling] @farming_bush_use;
+[oploc2,poisonivy_bush_seedling] @farming_inspect;
+[oplocu,poisonivy_bush_1] @farming_bush_use;
+[oploc2,poisonivy_bush_1] @farming_inspect;
+[oplocu,poisonivy_bush_2] @farming_bush_use;
+[oploc2,poisonivy_bush_2] @farming_inspect;
+[oplocu,poisonivy_bush_3] @farming_bush_use;
+[oploc2,poisonivy_bush_3] @farming_inspect;
+[oplocu,poisonivy_bush_4] @farming_bush_use;
+[oploc2,poisonivy_bush_4] @farming_inspect;
+[oplocu,poisonivy_bush_5] @farming_bush_use;
+[oploc2,poisonivy_bush_5] @farming_inspect;
+[oplocu,poisonivy_bush_6] @farming_bush_use;
+[oploc2,poisonivy_bush_6] @farming_inspect;
+[oplocu,poisonivy_bush_7] @farming_bush_use;
+[oploc2,poisonivy_bush_7] @farming_inspect;
+[oplocu,poisonivy_bush_fullygrown] @farming_bush_use;
+[oploc2,poisonivy_bush_fullygrown] @farming_inspect;
+[oplocu,poisonivy_bush_berry_1] @farming_bush_use;
+[oploc2,poisonivy_bush_berry_1] @farming_inspect;
+[oploc1,poisonivy_bush_berry_1] @farming_bush_harvest;
+[oplocu,poisonivy_bush_berry_2] @farming_bush_use;
+[oploc2,poisonivy_bush_berry_2] @farming_inspect;
+[oploc1,poisonivy_bush_berry_2] @farming_bush_harvest;
+[oplocu,poisonivy_bush_berry_3] @farming_bush_use;
+[oploc2,poisonivy_bush_berry_3] @farming_inspect;
+[oploc1,poisonivy_bush_berry_3] @farming_bush_harvest;
+[oplocu,poisonivy_bush_berry_4] @farming_bush_use;
+[oploc2,poisonivy_bush_berry_4] @farming_inspect;
+[oploc1,poisonivy_bush_berry_4] @farming_bush_harvest;
+[oplocu,poisonivy_bush_claim_xp] @farming_bush_use;
+[oploc2,poisonivy_bush_claim_xp] @farming_inspect;
+[oploc1,poisonivy_bush_claim_xp] @farming_bush_check_health;
+[oplocu,poisonivy_bush_1_diseased] @farming_bush_use;
+[oploc2,poisonivy_bush_1_diseased] @farming_inspect;
+[oplocu,poisonivy_bush_2_diseased] @farming_bush_use;
+[oploc2,poisonivy_bush_2_diseased] @farming_inspect;
+[oplocu,poisonivy_bush_3_diseased] @farming_bush_use;
+[oploc2,poisonivy_bush_3_diseased] @farming_inspect;
+[oplocu,poisonivy_bush_4_diseased] @farming_bush_use;
+[oploc2,poisonivy_bush_4_diseased] @farming_inspect;
+[oplocu,poisonivy_bush_5_diseased] @farming_bush_use;
+[oploc2,poisonivy_bush_5_diseased] @farming_inspect;
+[oplocu,poisonivy_bush_6_diseased] @farming_bush_use;
+[oploc2,poisonivy_bush_6_diseased] @farming_inspect;
+[oplocu,poisonivy_bush_7_diseased] @farming_bush_use;
+[oploc2,poisonivy_bush_7_diseased] @farming_inspect;
+[oplocu,poisonivy_bush_fullygrown_diseased] @farming_bush_use;
+[oploc2,poisonivy_bush_fullygrown_diseased] @farming_inspect;
+[oplocu,poisonivy_bush_1_dead] @farming_bush_use;
+[oploc2,poisonivy_bush_1_dead] @farming_inspect;
+[oplocu,poisonivy_bush_2_dead] @farming_bush_use;
+[oploc2,poisonivy_bush_2_dead] @farming_inspect;
+[oplocu,poisonivy_bush_3_dead] @farming_bush_use;
+[oploc2,poisonivy_bush_3_dead] @farming_inspect;
+[oplocu,poisonivy_bush_4_dead] @farming_bush_use;
+[oploc2,poisonivy_bush_4_dead] @farming_inspect;
+[oplocu,poisonivy_bush_5_dead] @farming_bush_use;
+[oploc2,poisonivy_bush_5_dead] @farming_inspect;
+[oplocu,poisonivy_bush_6_dead] @farming_bush_use;
+[oploc2,poisonivy_bush_6_dead] @farming_inspect;
+[oplocu,poisonivy_bush_7_dead] @farming_bush_use;
+[oploc2,poisonivy_bush_7_dead] @farming_inspect;
+[oplocu,poisonivy_bush_fullygrown_dead] @farming_bush_use;
+[oploc2,poisonivy_bush_fullygrown_dead] @farming_inspect;
+
+[label,farming_bush_use]
+if (~farming_pots_fill_on_patch = true) return;
+def_int $stage = ~farming_bush_stage;
+if ($stage = -1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (last_useitem = bucket_compost | last_useitem = bucket_supercompost) {
+    ~farming_soil_apply($stage);
+    return;
+}
+if (last_useitem = rake & $stage >= 0 & $stage < ^farming_veg_weeded) {
+    ~farming_rake_step(false);
+    return;
+}
+if ($stage = ^farming_veg_weeded) {
+    def_dbrow $crop = ~farming_bush_seed(last_useitem);
+    if ($crop = null) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if (inv_total(inv, dibber) < 1) {
+        ~displaymessage(^dm_farming_dibber);
+        return;
+    }
+    def_obj $seed = db_getfield($crop, farming_bush:seed, 0);
+    def_int $seeds = db_getfield($crop, farming_bush:seed_count, 0);
+    if (inv_total(inv, $seed) < $seeds) {
+        // UNKNOWN: the selected one-seed planting default follows the task brief.
+        mes("You need <tostring($seeds)> seeds to plant this patch.");
+        return;
+    }
+    def_int $level = db_getfield($crop, farming_bush:level, 0);
+    if (stat_base(farming) < $level) {
+        mes("You need a Farming level of <tostring($level)> to plant this crop.");
+        return;
+    }
+    anim(farming_seed_dibbing, 0);
+    inv_del(inv, $seed, $seeds);
+    ~farming_bush_set_stage(db_getfield($crop, farming_bush:first, 0));
+    stat_advance(farming, db_getfield($crop, farming_bush:plant_xp, 0));
+    mes("You plant the seed in the bush patch.");
+    return;
+}
+def_dbrow $crop = ~farming_bush_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// VERIFIED period tool role: secateurs prune diseased bushes. Plant cure is
+// an UNKNOWN favourable alternative; pruning retains the tool.
+if ((last_useitem = plant_cure | last_useitem = secateurs | last_useitem = fairy_enchanted_secateurs) & ~farming_bush_is_diseased($stage) = true) {
+    if (last_useitem = plant_cure) {
+        anim(farming_plant_cure, 0);
+        inv_setslot(inv, last_useslot, vial_empty, 1);
+    } else {
+        // UNKNOWN binding: reuse the original general pruning animation.
+        anim(pruning_all, 0);
+    }
+    def_int $after = sub($stage, ^farming_bush_disease_offset);
+    if ($crop = farming_bush_poison_ivy) {
+        if ($stage = ^farming_poisonivy_mature_diseased) $after = db_getfield($crop, farming_bush:mature, 0);
+        else $after = sub($stage, ^farming_poisonivy_disease_offset);
+    }
+    ~farming_bush_set_stage($after);
+    mes("You cure the bush.");
+    return;
+}
+if (last_useitem = spade) {
+    anim(human_dig, 0);
+    ~farming_bush_set_stage(^farming_veg_weeded);
+    if (~farming_bush_is_dead($stage) = true) mes("You dig up the dead bush.");
+    else mes("You dig up the bush.");
+    return;
+}
+if (last_useitem = rake) {
+    ~displaymessage(^dm_farming_patch_planted);
+    return;
+}
+~displaymessage(^dm_default);
+
+[label,farming_bush_check_health]
+def_int $stage = ~farming_bush_stage;
+def_dbrow $crop = ~farming_bush_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+if ($stage ! db_getfield($crop, farming_bush:claim, 0)) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+stat_advance(farming, db_getfield($crop, farming_bush:check_xp, 0));
+~farming_bush_set_stage(db_getfield($crop, farming_bush:last, 0));
+mes("You check the health of the bush.");
+
+[label,farming_bush_harvest]
+def_int $stage = ~farming_bush_stage;
+def_dbrow $crop = ~farming_bush_crop($stage);
+if ($crop = null) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+def_int $mature = db_getfield($crop, farming_bush:mature, 0);
+def_int $last = db_getfield($crop, farming_bush:last, 0);
+if ($stage <= $mature | $stage > $last) {
+    ~displaymessage(^dm_farming_patch_no_crops);
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You don't have enough inventory space.");
+    return;
+}
+anim(picking_low, 0);
+inv_add(inv, db_getfield($crop, farming_bush:produce, 0), 1);
+stat_advance(farming, db_getfield($crop, farming_bush:harvest_xp, 0));
+~farming_bush_set_stage(sub($stage, 1));
+def_string $plural = db_getfield($crop, farming_bush:plural, 0);
+mes("You pick some <$plural> from the bush.");

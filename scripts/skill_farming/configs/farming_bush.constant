@@ -1,0 +1,8 @@
+// VERIFIED 377 cache offsets for the five ordinary berry bushes.
+^farming_bush_disease_offset = 64
+^farming_bush_dead_offset = 128
+
+// VERIFIED 377 poison-ivy bands use distinct intermediate offsets.
+^farming_poisonivy_disease_offset = 12
+^farming_poisonivy_dead_offset = 19
+^farming_poisonivy_mature_diseased = 225

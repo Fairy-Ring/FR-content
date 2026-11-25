@@ -202,6 +202,7 @@ switch_loc (loc_type) {
 [oploc3,jute_fullygrown] @farming_hops_harvest(true);
 
 [label,farming_hops_use]
+if (~farming_pots_fill_on_patch = true) return;
 def_int $stage = ~farming_hops_stage;
 if ($stage = -1) {
     ~displaymessage(^dm_default);

@@ -10,6 +10,7 @@
 [oplocu,potato_3_dead] @farming_potato_use;
 
 [label,farming_potato_use]
+if (~farming_pots_fill_on_patch = true) return;
 if (~farming_veg_is_parent = false) {
     ~displaymessage(^dm_default);
     return;

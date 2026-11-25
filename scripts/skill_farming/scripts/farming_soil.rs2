@@ -4,6 +4,13 @@
 return(enum(loc, int, farming_soil_patch, loc_type));
 
 [proc,farming_soil_treatment](int $index)(int)
+if ($index >= 20 & $index < 24) {
+    def_int $bushbit = add(8, multiply(sub($index, 20), 2));
+    return(getbit_range(%farming_state_temp_3, $bushbit, add($bushbit, 1)));
+}
+if ($index = 24) return(%cactus_compost_varbit);
+if ($index = 25) return(%belladonna_compost_varbit);
+if ($index = 26) return(%mushroom_compost_varbit);
 def_int $bit = multiply($index, 2);
 if ($index < 16) return(getbit_range(%varp513_bits, $bit, add($bit, 1)));
 $bit = sub($bit, 8);
@@ -11,6 +18,16 @@ return(getbit_range(%varp516_bits, $bit, add($bit, 1)));
 
 [proc,farming_soil_set_treatment](int $index, int $treatment)
 if (~farming_soil_treatment($index) = $treatment) return;
+if ($index >= 20) {
+    if ($index < 24) {
+        def_int $bushbit = add(8, multiply(sub($index, 20), 2));
+        %farming_state_temp_3 = setbit_range_toint(%farming_state_temp_3, $treatment, $bushbit, add($bushbit, 1));
+    }
+    if ($index = 24) %cactus_compost_varbit = $treatment;
+    if ($index = 25) %belladonna_compost_varbit = $treatment;
+    if ($index = 26) %mushroom_compost_varbit = $treatment;
+    return;
+}
 def_int $bit = multiply($index, 2);
 if ($index < 16) {
     %varp513_bits = setbit_range_toint(%varp513_bits, $treatment, $bit, add($bit, 1));
@@ -20,6 +37,8 @@ if ($index < 16) {
 }
 
 [proc,farming_soil_extra](int $index)(int)
+// Period fixed yields: specialty compost reduces disease, not pick count.
+if ($index >= 20) return(0);
 // Flowers have their existing fixed yield, not harvest lives.
 if ($index >= 12 & $index < 16) return(0);
 if ($index >= 16) $index = sub($index, 4);
@@ -27,6 +46,7 @@ def_int $bit = multiply($index, 2);
 return(getbit_range(%farming_soil_lives, $bit, add($bit, 1)));
 
 [proc,farming_soil_set_extra](int $index, int $lives)
+if ($index >= 20) return;
 if (~farming_soil_extra($index) = $lives) return;
 if ($index >= 16) $index = sub($index, 4);
 def_int $bit = multiply($index, 2);
@@ -87,7 +107,11 @@ mes(~farming_soil_application_message($index, $treatment));
 // Fill two names in the single authored database string; allotment has no "patch".
 [proc,farming_soil_application_message](int $index, int $treatment)(string)
 def_string $patch = "allotment";
-if ($index >= 16) $patch = "herb patch";
+if ($index >= 20 & $index < 24) $patch = "bush patch";
+else if ($index = 24) $patch = "cactus patch";
+else if ($index = 25) $patch = "belladonna patch";
+else if ($index = 26) $patch = "mushroom patch";
+else if ($index >= 16) $patch = "herb patch";
 else if ($index >= 12) $patch = "flower patch";
 else if ($index >= 8) $patch = "hops patch";
 def_string $compost = "compost";
