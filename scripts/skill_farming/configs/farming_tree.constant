@@ -1,0 +1,5 @@
+// VERIFIED original 377 wood-tree cache bands.
+^farming_tree_diseased_offset = 64
+^farming_tree_dead_offset = 128
+// The shared crop helper encodes both failure bands 64 above these cache bytes.
+^farming_tree_shared_state_offset = 64

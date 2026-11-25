@@ -388,7 +388,7 @@ def_int $patch = ~farming_tree_patch_number;
 def_int $stage = ~farming_tree_patch_stage($patch);
 if ((last_useitem = secateurs | last_useitem = fairy_enchanted_secateurs) & ~farming_tree_is_diseased($stage) = true) {
     anim(pruning_all, 0);
-    ~farming_tree_patch_set($patch, sub($stage, ^farming_diseased_offset));
+    ~farming_tree_patch_set($patch, sub($stage, ^farming_tree_diseased_offset));
     // UNKNOWN functional wording; cache guidance specifies pruning, not this line.
     mes("You prune the tree.");
     return;

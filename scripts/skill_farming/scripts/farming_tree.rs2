@@ -35,19 +35,19 @@ return(null);
 
 [proc,farming_tree_crop](int $stage)(dbrow)
 if ($stage < 0 | $stage > 255) return(null);
-if ($stage >= ^farming_dead_offset) return(~farming_tree_crop_lookup(sub($stage, ^farming_dead_offset), true));
-if ($stage >= ^farming_diseased_offset) return(~farming_tree_crop_lookup(sub($stage, ^farming_diseased_offset), true));
+if ($stage >= ^farming_tree_dead_offset) return(~farming_tree_crop_lookup(sub($stage, ^farming_tree_dead_offset), true));
+if ($stage >= ^farming_tree_diseased_offset) return(~farming_tree_crop_lookup(sub($stage, ^farming_tree_diseased_offset), true));
 return(~farming_tree_crop_lookup($stage, false));
 
 [proc,farming_tree_is_diseased](int $stage)(boolean)
-if ($stage < ^farming_diseased_offset | $stage >= ^farming_dead_offset) return(false);
-def_dbrow $crop = ~farming_tree_crop_lookup(sub($stage, ^farming_diseased_offset), true);
+if ($stage < ^farming_tree_diseased_offset | $stage >= ^farming_tree_dead_offset) return(false);
+def_dbrow $crop = ~farming_tree_crop_lookup(sub($stage, ^farming_tree_diseased_offset), true);
 if ($crop = null) return(false);
 return(true);
 
 [proc,farming_tree_is_dead](int $stage)(boolean)
-if ($stage < ^farming_dead_offset | $stage > 255) return(false);
-def_dbrow $crop = ~farming_tree_crop_lookup(sub($stage, ^farming_dead_offset), true);
+if ($stage < ^farming_tree_dead_offset | $stage > 255) return(false);
+def_dbrow $crop = ~farming_tree_crop_lookup(sub($stage, ^farming_tree_dead_offset), true);
 if ($crop = null) return(false);
 return(true);
 
@@ -129,13 +129,17 @@ def_int $stump = db_getfield($crop, farming_tree:stump, 0);
 // UNKNOWN offline fallback: a saved stump recovers at the next family window.
 if ($stage = $stump) return($claim);
 def_dbrow $growth = db_getfield($crop, farming_tree:growth, 0);
+def_int $after;
 if (~farming_tree_is_diseased($stage) = true) {
-    def_int $after_disease = ~farming_crop_advance($stage, $steps, $first, add($claim, 1), false, $treatment, $growth, $window);
-    if ($after_disease = add($claim, 1)) return($claim);
-    return($after_disease);
+    // Translate the original tree byte to the shared helper's failure bands.
+    $after = ~farming_crop_advance(add($stage, ^farming_tree_shared_state_offset), $steps, $first, add($claim, 1), false, $treatment, $growth, $window);
+    if ($after = add($claim, 1)) return($claim);
+} else {
+    if ($stage >= $mature) return($stage);
+    $after = ~farming_crop_advance($stage, $steps, $first, $mature, false, $treatment, $growth, $window);
 }
-if ($stage >= $mature) return($stage);
-return(~farming_crop_advance($stage, $steps, $first, $mature, false, $treatment, $growth, $window));
+if ($after >= ^farming_diseased_offset) return(sub($after, ^farming_tree_shared_state_offset));
+return($after);
 
 [proc,farming_tree_advance_all](int $steps, int $window)
 if ($steps <= 0) return;
