@@ -1,7 +1,7 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
-    "farming_tree_soil": "UNKNOWN engineering storage: assigned original slot 246 stores twelve permanent two-bit tree-patch compost treatments in bits 0..23 and four fruit-tree health-checked flags in bits 24..27 across logout and offline growth.",
+    "farming_tree_soil": "UNKNOWN engineering storage: assigned original slot 246 stores twelve permanent two-bit tree-patch compost treatments in bits 0..23, four fruit-tree health-checked flags in bits 24..27, and the calquat health-checked flag in bit 28 across logout and offline growth.",
     "farming_tree_varp": "Original transmitted permanent tree selector; protect=no permits the existing SOFT Farming clock to advance the player's planted wood trees.",
     "farming_fruit_tree_varp": "Original transmitted permanent fruit-tree selector; protect=no permits the existing SOFT Farming clock to advance fruit trees and regrow picked fruit.",
     "farming_special_tree_varp": "Original transmitted permanent spirit/calquat selector; protect=no permits the existing SOFT Farming clock to advance these specialty trees.",
