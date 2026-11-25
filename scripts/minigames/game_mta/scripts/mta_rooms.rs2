@@ -1,28 +1,108 @@
-// Leftover pizazz_* HUDs. Official Update: Mage Training Arena 4 Jan 2006.
-// Hunt 289? no. Dummy leftover 9999/999 stay chrome. Hat / Magic floors later.
-// Dest tiles: next to leftover Exit Teleport on that room map (CANDIDATE).
+// VERIFIED cache destinations and hat access: mage-training-arena.period-progress-hat-role.
+[proc,mta_room]()(int)
+return(~mta_room_at(coord));
+
+[proc,mta_room_at](coord $tile)(int)
+if (coordx($tile) < 3328 | coordx($tile) > 3391) return(0);
+if (coordy($tile) <= 2 & coordz($tile) >= 9664 & coordz($tile) <= 9727) return(1);
+if (coordz($tile) < 9600 | coordz($tile) > 9663) return(0);
+switch_int(coordy($tile)) {
+    case 2 : return(2);
+    case 0 : return(3);
+    case 1 : return(4);
+}
+return(0);
+
+[proc,mta_entry_check](int $level)(boolean)
+if (map_members = ^false) { mes("You need to be on a members' server to use this feature."); return(false); }
+if (~mta_has_hat = false) {
+    // UNKNOWN functional access wording.
+    mes("You need a Progress hat from the Entrance Guardian.");
+    return(false);
+}
+if (stat(magic) < $level) { mes("Your Magic level is not high enough."); return(false); }
+return(true);
+
+[oploc1,magictraining_temple_door]
+p_arrivedelay;
+// UNKNOWN functional doorway landing, on the original hall's walkable axis.
+if (coordz(coord) < 3300) { p_telejump(0_52_51_35_37); } else { p_telejump(0_52_51_35_33); }
 
 [oploc1,telekinetic_teleport]
+if (~mta_entry_check(33) = false) return;
 p_arrivedelay;
 p_teleport(0_52_151_8_54);
 if_openoverlay(pizazz_telekinetic);
+~mta_telekinetic_enter;
+~mta_hud;
 
 [oploc1,enchanters_teleport]
+if (~mta_entry_check(7) = false) return;
 p_arrivedelay;
 p_teleport(0_52_150_36_50);
 if_openoverlay(pizazz_enchantment);
+~mta_enchantment_enter;
+~mta_hud;
 
 [oploc1,alchemists_teleport]
+if (~mta_entry_check(21) = false) return;
 p_arrivedelay;
 p_teleport(2_52_150_35_24);
 if_openoverlay(pizazz_alchemy);
+~mta_alchemy_enter;
+~mta_hud;
 
 [oploc1,graveyard_teleport]
+if (~mta_entry_check(15) = false) return;
 p_arrivedelay;
 p_teleport(1_52_150_35_41);
 if_openoverlay(pizazz_graveyard);
+~mta_graveyard_enter;
+~mta_hud;
 
 [oploc1,exit_teleport]
 p_arrivedelay;
+// VERIFIED exit warning: 15 April 2006 KB 2334. UNKNOWN plain functional warning/choice wording.
+if (~mta_room = 2 & inv_total(inv, coins) > 0) {
+    if (~p_choice2_header("Leave without depositing.", 1, "Stay here.", 2, "You will lose your undeclared coins and their rewards.") = 2) return;
+}
+~mta_leave;
+
+[proc,mta_cleanup](int $room)
+switch_int($room) {
+    case 1 : ~mta_telekinetic_cleanup;
+    case 2 : ~mta_alchemy_cleanup;
+    case 3 : ~mta_enchantment_cleanup;
+    case 4 : ~mta_graveyard_cleanup;
+}
 if_openoverlay(null);
+
+[proc,mta_leave]
+~mta_cleanup(~mta_room);
 p_teleport(0_52_51_35_50);
+
+[proc,mta_teleport_release](coord $destination)
+def_int $room = ~mta_room;
+if ($room = 0) return;
+if (~mta_room_at($destination) = $room) return;
+~mta_cleanup($room);
+
+[proc,mta_hud]
+switch_int(~mta_room) {
+    case 1 :
+        if_settext(pizazz_telekinetic:com_3, "<tostring(%mta_telekinetic_points)>");
+        ~mta_telekinetic_hud;
+    case 2 :
+        if_settext(pizazz_alchemy:com_3, "<tostring(%mta_alchemy_points)>");
+        ~mta_alchemy_hud;
+    case 3 :
+        if_settext(pizazz_enchantment:com_3, "<tostring(%mta_enchantment_points)>");
+        ~mta_enchantment_hud;
+    case 4 :
+        if_settext(pizazz_graveyard:com_3, "<tostring(%mta_graveyard_points)>");
+        ~mta_graveyard_hud;
+}
+
+[proc,mta_login]
+// VERIFIED 15 April 2006 official guide: logout returns to the entrance and removes room-only items.
+if (~mta_room > 0) ~mta_leave;

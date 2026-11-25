@@ -73,6 +73,7 @@ if (~champions_current > 0 | ~champions_scroll_escrow = 1 | ~champions_in_arena 
 ~thieving_stall_timers_login;
 ~farming_login;
 ~rag_login;
+~mta_login;
 ~stat_boost_login; // f2p boost reset
 ~sa_login; // start timer if low sa energy
 
