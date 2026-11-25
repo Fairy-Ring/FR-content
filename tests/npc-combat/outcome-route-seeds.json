@@ -3,6 +3,31 @@
   "rng": "xorshift32",
   "routes": [
     {
+      "script": "[ai_opplayer2,_dwarfrock_avatar]",
+      "npc": "dwarf_rock_avatar_warrior",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 535203586
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target"
+      }
+    },
+    {
+      "script": "[ai_applayer2,_dwarfrock_avatar]",
+      "npc": "dwarf_rock_avatar_warrior",
+      "style": "magic",
+      "seeds": {
+        "miss": 2654435769,
+        "hit": 3668340011,
+        "zero": 3485492613
+      },
+      "npcVars": {
+        "npc_attacking_uid": "target"
+      }
+    },
+    {
       "script": "[ai_opplayer2,barrows_dharok]",
       "npc": "barrows_dharok",
       "seeds": {

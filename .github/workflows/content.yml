@@ -155,6 +155,7 @@ jobs:
           run_test tests/wild-warn/test_wild_warn.mjs node --import tsx ../content/tests/wild-warn/test_wild_warn.mjs
           run_test tests/quest-points/test_quest_points.mjs node --import tsx ../content/tests/quest-points/test_quest_points.mjs
           run_test tests/mountain-daughter/test_mountain_daughter.mjs node --import tsx ../content/tests/mountain-daughter/test_mountain_daughter.mjs
+          run_test tests/between-a-rock/test_between_a_rock.mjs node --import tsx ../content/tests/between-a-rock/test_between_a_rock.mjs
           run_test tests/equip-gates/test_equip_gates.mjs node --import tsx ../content/tests/equip-gates/test_equip_gates.mjs
           run_test tests/armourrows/test_armourrows.mjs node --import tsx ../content/tests/armourrows/test_armourrows.mjs
           run_test tests/combo-runes/test-combo-runes.mjs node --import tsx ../content/tests/combo-runes/test-combo-runes.mjs
