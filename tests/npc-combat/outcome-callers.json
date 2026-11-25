@@ -4,7 +4,6 @@
   "externalCallers": {
     "npc_default_attack": [
       "[ai_applayer2,_macro_event_rock_golem]",
-      "[ai_applayer2,deal_evil_spirit]",
       "[ai_applayer2,regicide_darkelf2]",
       "[ai_applayer2,regicide_old_camp_guard]",
       "[ai_applayer2,regicide_tyras_camp_guard]",
