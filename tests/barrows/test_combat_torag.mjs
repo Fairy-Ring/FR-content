@@ -19,6 +19,7 @@ await run(async () => {
   const attack = Provider.getByTrigger(Trigger.AI_OPPLAYER2, type.id, type.category);
   const damage = result => result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]');
   const corruption = result => result.snapshot.queued.filter(q => q.script === '[queue,barrows_torag_corruption]');
+  const presentation = events => events.filter(event => /ANIM|SOUND_SYNTH/.test(event.op));
   let checks = 0;
   const check = (label, body) => { body(); checks++; console.log(`PASS BC-03 ${label}`); };
   const fixture = (variant = 'hit') => { rt.dispose(); return rt.fixture('barrows_torag', variant); };

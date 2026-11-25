@@ -50,6 +50,8 @@ await run(async () => {
     p.messageGame = message => p.messages.push(message);
     p.wrappedMessageGame = message => p.messages.push(message);
     p.isActive = true;
+    p.baseLevels.fill(80);
+    p.levels.fill(80);
     World.players[p.slot] = p;
     World.playerLoop.add(0x70000000n + BigInt(serial), p);
     assert.equal(World.getPlayerByHash64(p.hash64), p, 'normal killer attribution resolves the registered owner');
