@@ -384,6 +384,9 @@ if (%wanted_main = ^wanted_complete) {
 if (~rag_stage >= ^rag_complete) {
     $questpoints = add($questpoints, ^rag_questpoints);
 }
+if (%roving_elves_quest >= ^roving_complete) {
+    $questpoints = add($questpoints, ^roving_questpoints);
+}
 return ($questpoints);
 
 [proc,update_questlist]
@@ -483,6 +486,7 @@ if (testbit(%ibanmulti, ^upass_started_bit) = ^true & %upass ! ^upass_complete) 
 ~send_quest_progress_colour(questlist:soulbane, %soulbane_prog, ^soulbane_complete);
 ~send_quest_progress_colour(questlist:dwarfrock, %dwarfrock_quest, ^dwarfrock_complete);
 ~send_quest_progress_colour(questlist:devious, %devious_main, ^devious_complete);
+~send_quest_progress_colour(questlist:roving_elves, %roving_elves_quest, ^roving_complete);
 if_settab(questlist, ^tab_quest_journal);
 
 if (%drunkmonkquest >= ^drunkmonk_spoken_to_omad) {
