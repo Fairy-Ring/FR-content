@@ -1025,16 +1025,10 @@ switch_coord (loc_coord) {
 }
 
 [oploc1,deal_stairs_bottom]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~deal_stairs(true);
 
 [oploc1,deal_stairs_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~deal_stairs(false);
 
 [oploc1,vc_keldagrim_stairs_lower]
 // arrive delay?
