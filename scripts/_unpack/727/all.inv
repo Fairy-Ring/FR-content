@@ -3628,42 +3628,6 @@ stock2=cake,3
 stock3=chocolate_slice,6
 stock4=chocolate_bar,9
 
-[magictraining_inventory]
-scope=shared
-size=40
-restock=yes
-stackall=yes
-allstock=no
-stock1=magictraining_wand_beg,100,100
-stock2=magictraining_wand_appr,100,100
-stock3=magictraining_wand_teach,100,100
-stock4=magictraining_wand_master,100,100
-stock5=magictraining_infinitytop,100,100
-stock6=magictraining_infinityhat,100,100
-stock7=magictraining_infinityboots,100,100
-stock8=magictraining_infinitygloves,100,100
-stock9=magictraining_infinitybottom,100,100
-stock10=magictraining_bookofmagic,100,100
-stock11=magictraining_peachspell,100,100
-stock12=battlestaff,100,100
-stock13=mistrune,100,10
-stock14=dustrune,100,10
-stock15=mudrune,100,10
-stock16=smokerune,100,10
-stock17=steamrune,100,10
-stock18=lavarune,100,10
-stock19=cosmicrune,100,10
-stock20=chaosrune,100,10
-stock21=naturerune,100,10
-stock22=deathrune,100,10
-stock23=lawrune,100,10
-stock24=soulrune,100,10
-stock25=bloodrune,100,10
-stock26=magictraining_arenalorebook,100,100
-// restock times are guesses
-// If you are interested in finding out the restock times,
-// you can probably check them on the rs3 side because it has not been updated.
-// https://www.youtube.com/watch?v=InmUEXQHlEk
 
 [smithsshop]
 scope=shared

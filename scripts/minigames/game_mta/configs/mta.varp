@@ -1,0 +1,23 @@
+// UNKNOWN engineering storage: original unused 377 slots reserved for MTA.
+// VERIFIED caps and four-currency names: mage-training-arena.period-point-caps.
+[mta_telekinetic_points]
+scope=perm
+
+[mta_alchemy_points]
+scope=perm
+
+[mta_enchantment_points]
+scope=perm
+
+[mta_graveyard_points]
+scope=perm
+
+// Original 629 block was empty. Preserve its identity and seven original varbits.
+// CANDIDATE persistent spell entitlement: mage-training-arena.period-peaches-entitlement.
+[magictraining6]
+scope=perm
+
+// VERIFIED saved completion streak: 15 April 2006 KB 2334, maze-reward paragraph.
+// UNKNOWN storage mapping; preserve the original 625 identity and generic bit views.
+[varp625_bits]
+scope=perm
