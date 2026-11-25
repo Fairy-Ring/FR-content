@@ -1630,6 +1630,602 @@
         "walkanim_r": -1,
         "wanderrange": 5
       }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_bloodworm",
+        "id": 2031
+      },
+      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 80,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 35,
+        "desc": "Think I should keep my distance...",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 45,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6632
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Bloodworm",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "bloodworm_ready"
+        },
+        "recol_d": [
+          9899,
+          8099,
+          7070,
+          5012,
+          22404
+        ],
+        "recol_s": [
+          4940,
+          2756,
+          2749,
+          1837,
+          3980
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 20,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 52,
+        "walkanim": {
+          "ref": "seq",
+          "name": "bloodworm_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_rat",
+        "id": 2032
+      },
+      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 70,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 20,
+        "desc": "A nasty little rodent.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 35,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": false,
+        "models": [
+          2927
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Crypt rat",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "param:slayer_category": 3,
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "rat_ready"
+        },
+        "recol_d": [
+          21679,
+          13501
+        ],
+        "recol_s": [
+          61,
+          2512
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 20,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 43,
+        "walkanim": {
+          "ref": "seq",
+          "name": "rat_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_giantrat",
+        "id": 2033
+      },
+      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 80,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 65,
+        "desc": "A nasty overgrown rodent.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 70,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          2959
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Giant crypt rat",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "param:slayer_category": 3,
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "giantrat_ready"
+        },
+        "recol_d": [
+          21652,
+          8367,
+          16673,
+          17180,
+          10413
+        ],
+        "recol_s": [
+          43299,
+          187,
+          189,
+          935,
+          61
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 2,
+        "strength": 50,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 76,
+        "walkanim": {
+          "ref": "seq",
+          "name": "giantrat_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_spider",
+        "id": 2034
+      },
+      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 45,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 45,
+        "desc": "Incey wincey.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 60,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          2996
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Crypt spider",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": -1,
+        "recol_d": [
+          12574
+        ],
+        "recol_s": [
+          7591
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 47,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 56,
+        "walkanim": {
+          "ref": "seq",
+          "name": "spider_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_giantspider",
+        "id": 2035
+      },
+      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 65,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 65,
+        "desc": "Not very incey wincey...",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 80,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          2884
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Giant crypt spider",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "giantspider_ready"
+        },
+        "recol_d": [
+          17930,
+          13074,
+          16846
+        ],
+        "recol_s": [
+          10258,
+          8128,
+          127
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 67,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 79,
+        "walkanim": {
+          "ref": "seq",
+          "name": "giantspider_walk"
+        },
+        "walkanim_b": -1,
+        "walkanim_l": -1,
+        "walkanim_r": -1,
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_skeleton_unarmed",
+        "id": 2036
+      },
+      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 72,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 72,
+        "desc": "Could do with gaining a few pounds.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 51,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6744,
+          6647,
+          6680,
+          6650
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Skeleton",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "human_ready"
+        },
+        "recol_d": [
+          10423
+        ],
+        "recol_s": [
+          5231
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 72,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 77,
+        "walkanim": {
+          "ref": "seq",
+          "name": "human_walk_f"
+        },
+        "walkanim_b": {
+          "ref": "seq",
+          "name": "human_walk_b"
+        },
+        "walkanim_l": {
+          "ref": "seq",
+          "name": "human_walk_r"
+        },
+        "walkanim_r": {
+          "ref": "seq",
+          "name": "human_walk_l"
+        },
+        "wanderrange": 5
+      }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_skeleton_armed",
+        "id": 2037
+      },
+      "contentCommit": "a4d813372e57d2ad065ffda9710340ef9c64023e",
+      "fields": {
+        "active": true,
+        "alwaysontop": false,
+        "ambient": 0,
+        "attack": 72,
+        "attackrange": 0,
+        "blockwalk": 1,
+        "category": -1,
+        "contrast": 0,
+        "defaultmode": 1,
+        "defence": 72,
+        "desc": "Could do with gaining a few pounds.",
+        "givechase": true,
+        "headicon": -1,
+        "heads": null,
+        "hitpoints": 51,
+        "huntmode": -1,
+        "huntrange": 0,
+        "magic": 1,
+        "maxrange": 7,
+        "members": false,
+        "minimap": true,
+        "models": [
+          6744,
+          6648,
+          6680
+        ],
+        "moverestrict": 0,
+        "multinpc": [],
+        "multivarbit": -1,
+        "multivarp": -1,
+        "name": "Skeleton",
+        "op": [
+          null,
+          "Attack",
+          null,
+          null,
+          null
+        ],
+        "patrolCoord": [],
+        "patrolDelay": [],
+        "ranged": 1,
+        "readyanim": {
+          "ref": "seq",
+          "name": "human_ready"
+        },
+        "recol_d": [
+          12471,
+          11817,
+          10405,
+          10902
+        ],
+        "recol_s": [
+          5231,
+          9152,
+          68,
+          7054
+        ],
+        "regenrate": 100,
+        "resizeh": 128,
+        "resizev": 128,
+        "resizex": -1,
+        "resizey": -1,
+        "resizez": -1,
+        "respawnrate": 100,
+        "size": 1,
+        "strength": 72,
+        "timer": -1,
+        "turnspeed": 32,
+        "vislevel": 77,
+        "walkanim": {
+          "ref": "seq",
+          "name": "human_walk_f"
+        },
+        "walkanim_b": {
+          "ref": "seq",
+          "name": "human_walk_b"
+        },
+        "walkanim_l": {
+          "ref": "seq",
+          "name": "human_walk_r"
+        },
+        "walkanim_r": {
+          "ref": "seq",
+          "name": "human_walk_l"
+        },
+        "wanderrange": 5
+      }
     }
   ]
 }
