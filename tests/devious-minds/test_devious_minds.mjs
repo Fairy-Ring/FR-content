@@ -570,6 +570,15 @@ startUseOnItem(p, 'devious_glowingorb', 'rcu_pouch_large', '[opheldu,rcu_pouch_l
 assert.equal(count(p, 'devious_glowingorb'), 0);
 assert.equal(count(p, 'rcu_pouch_large'), 0);
 assert.equal(count(p, 'devious_glowingpouch'), 1);
+{
+  positionAt(p, 'shipMonk');
+  const before = [p.level, p.x, p.z], start = p.packets.length, messageStart = p.messages.length;
+  finish(p, startNpc(p, 'shipMonk', '[opnpc1,shipmonk]'), [2]);
+  assert(packetText(p, start, messageStart).includes("What's this pouch?"), 'Ship Monk also refuses the glowing pouch');
+  assert.deepEqual([p.level, p.x, p.z], before, 'the glowing-pouch carrier is not transported');
+  assert.equal(count(p, 'devious_glowingpouch'), 1, 'the ferry refusal keeps the glowing pouch');
+  assert.equal(stage(p), 10);
+}
 const pouchState = [count(p, 'devious_glowingpouch'), count(p, 'devious_glowingorb'), count(p, 'rcu_pouch_large')];
 startItemOption(p, 'devious_glowingpouch', 1);
 assert.deepEqual([count(p, 'devious_glowingpouch'), count(p, 'devious_glowingorb'), count(p, 'rcu_pouch_large')], pouchState,
