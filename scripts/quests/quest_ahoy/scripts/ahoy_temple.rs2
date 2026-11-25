@@ -1,0 +1,57 @@
+// CANDIDATE locations from original maps. UNKNOWN adjacent landing tiles.
+[oploc1,ahoy_trapdoor]
+loc_change(ahoy_trapdoor_open, 500);
+
+[oploc1,ahoy_trapdoor_open]
+p_telejump(3_57_154_21_31);
+
+[oploc2,ahoy_trapdoor_open]
+loc_change(ahoy_trapdoor, 500);
+
+[oploc1,ahoy_ladder_from_cellar]
+p_telejump(0_57_54_5_62);
+
+[proc,ahoy_cavern_up]
+if (coordy(loc_coord) = 0) p_telejump(1_57_154_35_31);
+else if (coordy(loc_coord) = 1) p_telejump(2_57_154_23_31);
+else p_telejump(3_57_154_44_31);
+
+[proc,ahoy_cavern_down]
+if (coordy(loc_coord) = 3) p_telejump(2_57_154_40_31);
+else if (coordy(loc_coord) = 2) p_telejump(1_57_154_27_31);
+else p_telejump(0_57_154_35_31);
+
+[oploc1,ahoy_harbour_door]
+// Only the upstairs tomb door needs the bone key; all other port doors stay ordinary.
+if (loc_coord = 1_57_54_8_58 & %ahoy_templedoor_unlocked = 0) {
+    if (inv_total(inv, ahoy_bone_key) = 0) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    %ahoy_templedoor_unlocked = 1;
+}
+~open_door(500);
+
+[oploc1,ahoy_harbour_door_open]
+~close_door(500);
+
+[oplocu,ahoy_harbour_door]
+if (last_useitem = ahoy_bone_key & loc_coord = 1_57_54_8_58) {
+    %ahoy_templedoor_unlocked = 1;
+    ~open_door(500);
+} else ~displaymessage(^dm_default);
+
+[oploc1,ahoy_coffin]
+loc_change(ahoy_coffin_open, 500);
+
+[oploc1,ahoy_coffin_open]
+if (%ahoy_questvar >= 5 & %ahoy_given_robes = 0 & inv_total(inv, ahoy_robes_of_necrovarus) = 0 & inv_total(bank, ahoy_robes_of_necrovarus) = 0) {
+    if (inv_freespace(inv) < 1) {
+        mes("You don't have enough inventory space.");
+        return;
+    }
+    inv_add(inv, ahoy_robes_of_necrovarus, 1);
+}
+
+[oploc2,ahoy_coffin_open]
+loc_change(ahoy_coffin, 500);

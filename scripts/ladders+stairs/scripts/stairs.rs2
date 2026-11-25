@@ -771,28 +771,18 @@ switch_coord (loc_coord) {
 }
 
 [oploc1,ahoy_cavern_stairs]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~ahoy_cavern_up;
 
 [oploc1,ahoy_cavern_stairs_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+~ahoy_cavern_down;
 
 [oploc1,ahoy_tower_stairs_lv1]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+p_arrivedelay;
+p_telejump(1_57_55_18_2);
 
 [oploc1,ahoy_tower_stairs_lv1_top]
-// arrive delay?
-switch_coord (loc_coord) {
-    case default : @unhandled_stairs(loc_coord);
-}
+p_arrivedelay;
+p_telejump(0_57_54_18_61);
 
 [oploc1,dwarf_keldagrim_stairs_lower]
 // arrive delay?

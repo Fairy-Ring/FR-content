@@ -1,24 +1,22 @@
-// Ghosts Ahoy mid — Old crone first Talk-To after licensed Velorina return.
-// CANDIDATE last-resort 2007-base: OSRS Talking to the Old crone minus
-// porcelain / milk / enchant / Netty / Overview. Hunt 289? no.
-// Stay %ahoy_questvar 3. No dest / ectophial / tea cook.
-// Cite ahoy-crone-first-slice-377.md.
+// CANDIDATE speech: retained Ghosts Ahoy transcript. Stage allocation UNKNOWN.
+// Stages 4-5 collect independent materials, 6 enchanted, 7 freed, 8 complete.
 
 [opnpc1,ahoy_crone]
 if (%ahoy_questvar < 3) {
     ~displaymessage(^dm_default);
     return;
 }
-// Porcelain give leftover (ahoy-porcelain-cup-next-377.md). Milk / enlightenment STOP.
+if (%ahoy_questvar >= 4) {
+    @ahoy_crone_materials;
+}
 if (inv_total(inv, chinacup_of_nettletea) > 0) {
     // CANDIDATE last-resort 2007-base (OSRS crone unmilked porcelain). Stay 3.
     ~chatplayer("<p,happy>Here's a lovely cup of tea for you, in your own special cup.");
     ~chatnpc("<p,sad>Oh no, it hasn't got milk in it. I only drink tea with milk, I'm afraid.");
     return;
 }
-if (inv_total(inv, bowl_nettletea_milky) > 0 | inv_total(inv, chinacup_of_nettletea_milky) > 0) {
-    ~displaymessage(^dm_default);
-    return;
+if (inv_total(inv, chinacup_of_nettletea_milky) > 0) {
+    @ahoy_crone_enlightenment;
 }
 if (inv_total(inv, chinacup_empty) > 0) {
     ~displaymessage(^dm_default);

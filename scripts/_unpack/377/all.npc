@@ -41498,20 +41498,6 @@ strength=1
 defence=1
 param=slayer_category,^slayer_bird
 
-[giant_lobster]
-name=Giant Lobster
-desc=An extremely vicious lobster.
-model1=npc_1693
-size=2
-walkanim=scorpion_walk
-readyanim=scorpion_ready
-op2=Attack
-vislevel=32
-hitpoints=32
-attack=18
-strength=26
-defence=40
-
 [ahoy_robin]
 name=Robin
 desc=A master bowman.

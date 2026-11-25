@@ -1,0 +1,334 @@
+// Ghosts Ahoy — model boat, wreck traversal, chests and the guarded lobster.
+// CANDIDATE: Tip.It 30 Apr 2006 establishes the boat, 25-Agility jumps,
+// approximate 5% run-energy cost and three map pieces. Cache-authored locs,
+// item options and NPC 1693 remain unchanged.
+// UNKNOWN: favourable boat flag colours are top red, bottom blue, skull yellow.
+// UNKNOWN: wind bit 0=low/1=high, initial phase low, and 100-tick cadence are
+// engineering choices; the sourced cycle timing is unknown.
+// Jump-fall probability/damage are unsourced; no fall roll is invented.
+// Parent mapzone entry/exit hooks call ~ahoy_wind_start and ~ahoy_wind_stop.
+
+[mapzoneexit,0_56_55]
+~ahoy_wind_stop;
+
+[proc,ahoy_update_windspeed]
+if (%ahoy_windspeed = 0) if_settext(ahoy_windspeed:com_2, "low");
+else if_settext(ahoy_windspeed:com_2, "high");
+
+[proc,ahoy_wind_start]
+clearsofttimer(ahoy_wind_cycle);
+%ahoy_windspeed = 0;
+def_int $period = 100;
+~ahoy_update_windspeed;
+if_openoverlay(ahoy_windspeed);
+softtimer(ahoy_wind_cycle, $period, $period);
+
+[proc,ahoy_wind_stop]
+clearsofttimer(ahoy_wind_cycle);
+if_openoverlay(null);
+
+[softtimer,ahoy_wind_cycle](int $period)
+def_boolean $inside = inzone(0_56_55_0_0, 0_56_55_63_63, coord);
+if (inzone(1_56_55_0_0, 1_56_55_63_63, coord) = true) $inside = true;
+if (inzone(2_56_55_0_0, 2_56_55_63_63, coord) = true) $inside = true;
+if ($inside = false) {
+    clearsofttimer(ahoy_wind_cycle);
+    if_openoverlay(null);
+    return;
+}
+if (p_finduid(uid) = false) return;
+if (%ahoy_windspeed = 0) %ahoy_windspeed = 1;
+else %ahoy_windspeed = 0;
+~ahoy_update_windspeed;
+softtimer(ahoy_wind_cycle, $period, $period);
+
+[oploc1,ahoy_mast]
+~ahoy_update_windspeed;
+if (%ahoy_windspeed ! 0) return;
+def_int $state = setbit_range_toint(%ahoy_puzzle_state, 1, 9, 9);
+%ahoy_puzzle_state = $state;
+// UNKNOWN functional flag key: disclose the selected three colours on Search.
+mes("Top half: red.");
+mes("Bottom half: blue.");
+mes("Skull emblem: yellow.");
+
+// The Repair option and silk-on-boat both use the period-attested materials.
+[opheld1,ahoy_toy_boat]
+~ahoy_repair_toyboat;
+
+[opheldu,ahoy_toy_boat]
+if (last_useitem = silk) {
+    ~ahoy_repair_toyboat;
+    return;
+}
+~displaymessage(^dm_default);
+
+[proc,ahoy_repair_toyboat]
+if (%ahoy_subquest_toyboat ! 1) return;
+if (inv_total(inv, ahoy_toy_boat) = 0) return;
+if (inv_total(inv, silk) = 0) return;
+if (inv_total(inv, needle) = 0) return;
+if (inv_total(inv, thread) = 0) return;
+if (inv_total(inv, knife) = 0) return;
+inv_del(inv, silk, 1);
+inv_del(inv, ahoy_toy_boat, 1);
+inv_add(inv, ahoy_toy_boat_repaired, 1);
+
+// The colour fields use only puzzle-state bits 0-8; bit 9 records inspection.
+[opheld2,ahoy_toy_boat_repaired]
+def_int $top = getbit_range(%ahoy_puzzle_state, 0, 2);
+def_int $bottom = getbit_range(%ahoy_puzzle_state, 3, 5);
+def_int $skull = getbit_range(%ahoy_puzzle_state, 6, 8);
+if ($top = 0) mes("Top half: not dyed.");
+else if ($top = 1) mes("Top half: red.");
+else if ($top = 2) mes("Top half: blue.");
+else if ($top = 3) mes("Top half: yellow.");
+else if ($top = 4) mes("Top half: orange.");
+else if ($top = 5) mes("Top half: purple.");
+else if ($top = 6) mes("Top half: green.");
+if ($bottom = 0) mes("Bottom half: not dyed.");
+else if ($bottom = 1) mes("Bottom half: red.");
+else if ($bottom = 2) mes("Bottom half: blue.");
+else if ($bottom = 3) mes("Bottom half: yellow.");
+else if ($bottom = 4) mes("Bottom half: orange.");
+else if ($bottom = 5) mes("Bottom half: purple.");
+else if ($bottom = 6) mes("Bottom half: green.");
+if ($skull = 0) mes("Skull emblem: not dyed.");
+else if ($skull = 1) mes("Skull emblem: red.");
+else if ($skull = 2) mes("Skull emblem: blue.");
+else if ($skull = 3) mes("Skull emblem: yellow.");
+else if ($skull = 4) mes("Skull emblem: orange.");
+else if ($skull = 5) mes("Skull emblem: purple.");
+else if ($skull = 6) mes("Skull emblem: green.");
+
+[opheldu,ahoy_toy_boat_repaired]
+~ahoy_dye_repaired_boat(last_useitem);
+
+// The parent-owned reverse dye hook passes its target colour to this boat proc.
+[proc,ahoy_dye_repaired_boat](obj $dye)
+def_int $colour = 0;
+if ($dye = reddye) $colour = 1;
+else if ($dye = bluedye) $colour = 2;
+else if ($dye = yellowdye) $colour = 3;
+else if ($dye = orangedye) $colour = 4;
+else if ($dye = purpledye) $colour = 5;
+else if ($dye = greendye) $colour = 6;
+if ($colour = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_int $section = ~p_choice3("Top half", 1, "Bottom half", 2, "Skull emblem", 3);
+def_int $state = %ahoy_puzzle_state;
+if ($section = 1) $state = setbit_range_toint($state, $colour, 0, 2);
+else if ($section = 2) $state = setbit_range_toint($state, $colour, 3, 5);
+else if ($section = 3) $state = setbit_range_toint($state, $colour, 6, 8);
+else return;
+%ahoy_puzzle_state = $state;
+inv_del(inv, $dye, 1);
+// CANDIDATE dialogue: retained Old man transcript and exact menu order.
+[opnpc1,ahoy_oldman]
+if (%ahoy_subquest_toyboat = 2) {
+    ~chatplayer("<p,quiz>How is it going?");
+    ~chatnpc("<p,happy>Wonderful, wonderful! Mother's coming to get me!");
+    return;
+}
+def_int $choice = ~p_choice3("What is your name?", 1, "Can I have the key to the chest?", 2, "Is this your toy boat?", 3);
+if ($choice = 1) {
+    ~chatplayer("<p,quiz>What is your name?");
+    ~chatnpc("<p,neutral>I don't remember. Everyone around here just calls me 'boy'.");
+    ~chatplayer("<p,quiz>You're the cabin boy?!?");
+    ~chatnpc("<p,neutral>Yes, and proud of it.");
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("<p,quiz>Can I have the key to the chest?");
+    ~chatnpc("<p,neutral>Hang on, let me ask the Captain ...");
+    mes("The old man cocks an ear towards the Pirate Captain's skeleton.");
+    ~chatnpc("<p,neutral>The Captain says no.");
+    return;
+}
+if ($choice ! 3) return;
+if ((inv_total(inv, ahoy_toy_boat) > 0) | (inv_total(inv, ahoy_toy_boat_repaired) > 0)) mes("The old man inspects the toy boat.");
+if ((%ahoy_subquest_toyboat ! 1) | (inv_total(inv, ahoy_toy_boat_repaired) = 0)) {
+    ~chatnpc("<p,neutral>No - I made a toy boat a long while ago, but that one had a flag.");
+    return;
+}
+def_int $top = getbit_range(%ahoy_puzzle_state, 0, 2);
+def_int $bottom = getbit_range(%ahoy_puzzle_state, 3, 5);
+def_int $skull = getbit_range(%ahoy_puzzle_state, 6, 8);
+if ((getbit_range(%ahoy_puzzle_state, 9, 9) ! 1) | ($top ! 1) | ($bottom ! 2) | ($skull ! 3)) {
+    ~chatnpc("<p,neutral>No - I made a toy boat a long while ago, but the colours on the flag were different.");
+    return;
+}
+~chatnpc("<p,happy>My word - so it is!!! I never thought I would see it again!! Where did you get it from?");
+~chatplayer("<p,neutral>Your mother gave it to me to pass on to you.");
+~chatnpc("<p,neutral>My mother? She still lives?");
+~chatplayer("<p,neutral>Yes, in a shack to the west of here.");
+~chatnpc("<p,neutral>After all these years ...");
+~chatplayer("<p,quiz>Can I have the key to the chest, then?");
+~chatnpc("<p,neutral>Hang on, let me ask the Captain ...");
+mes("The old man cocks an ear towards the skeleton of the Pirate Captain.");
+~chatnpc("<p,neutral>The Captain says yes.");
+mes("The old man gives you the chest key.");
+inv_del(inv, ahoy_toy_boat_repaired, 1);
+inv_add(inv, ahoy_chest_key, 1);
+%ahoy_subquest_toyboat = 2;
+// UNKNOWN crossing motion: jump across the blocked gangplank to clear landings.
+[oploc1,ahoy_gangplank_shipwreck_on]
+p_telejump(0_56_55_21_28);
+
+[oploc1,ahoy_gangplank_shipwreck_off]
+p_telejump(1_56_55_21_25);
+
+// M56_55 ladder pairs share anchors; UNKNOWN landings use adjacent clear tiles.
+[oploc1,ahoy_ghostship_ladder]
+if (loc_coord = 0_56_55_25_23) p_telejump(1_56_55_25_22);
+else if (loc_coord = 0_56_55_29_23) p_telejump(1_56_55_29_22);
+else if (loc_coord = 1_56_55_31_21) p_telejump(2_56_55_31_22);
+else if (loc_coord = 1_56_55_31_25) p_telejump(2_56_55_31_24);
+else ~displaymessage(^dm_default);
+
+[oploc1,ahoy_ghostship_laddertop]
+if (loc_coord = 1_56_55_25_23) p_telejump(0_56_55_25_22);
+else if (loc_coord = 1_56_55_29_23) p_telejump(0_56_55_29_22);
+else if (loc_coord = 2_56_55_31_21) p_telejump(1_56_55_31_22);
+else if (loc_coord = 2_56_55_31_25) p_telejump(1_56_55_31_24);
+else ~displaymessage(^dm_default);
+
+// UNKNOWN fall chance/damage are not simulated: Tip.It gives the agility gate
+// and approximate energy cost, but not a roll or damage value.
+[oploc1,ahoy_rock_invisible]
+~ahoy_rock_jump;
+
+[aploc1,ahoy_rock_invisible]
+~ahoy_rock_jump;
+
+[proc,ahoy_rock_jump]
+if (stat(agility) < 25) return;
+// UNKNOWN endpoint motion: repeating the endpoint rock reaches its bank.
+if (coord = loc_coord & loc_coord = 0_56_55_20_30) {
+    healenergy(-5);
+    p_telejump(0_56_55_21_30);
+    return;
+}
+if (coord = loc_coord & loc_coord = 0_56_55_17_44) {
+    healenergy(-5);
+    p_telejump(0_56_55_22_45);
+    return;
+}
+if (distance(coord, loc_coord) > 6) {
+    p_aprange(6);
+    return;
+}
+// Each accepted pair is one step on the mapped chain; the island/beach
+// endpoints are included so reverse jumps also land on the clicked rock.
+def_boolean $valid = false;
+if (distance(coord, 0_56_55_21_30) <= 3 & coordx(coord) >= 3605 & loc_coord = 0_56_55_20_30) $valid = true;
+if ((coord = 0_56_55_20_30 & loc_coord = 0_56_55_18_30) | (coord = 0_56_55_18_30 & loc_coord = 0_56_55_20_30)) $valid = true;
+if ((coord = 0_56_55_18_30 & loc_coord = 0_56_55_15_32) | (coord = 0_56_55_15_32 & loc_coord = 0_56_55_18_30)) $valid = true;
+if ((coord = 0_56_55_15_32 & loc_coord = 0_56_55_13_32) | (coord = 0_56_55_13_32 & loc_coord = 0_56_55_15_32)) $valid = true;
+if ((coord = 0_56_55_13_32 & loc_coord = 0_56_55_11_34) | (coord = 0_56_55_11_34 & loc_coord = 0_56_55_13_32)) $valid = true;
+if ((coord = 0_56_55_11_34 & loc_coord = 0_56_55_11_36) | (coord = 0_56_55_11_36 & loc_coord = 0_56_55_11_34)) $valid = true;
+if ((coord = 0_56_55_11_36 & loc_coord = 0_56_55_13_39) | (coord = 0_56_55_13_39 & loc_coord = 0_56_55_11_36)) $valid = true;
+if ((coord = 0_56_55_13_39 & loc_coord = 0_56_55_13_41) | (coord = 0_56_55_13_41 & loc_coord = 0_56_55_13_39)) $valid = true;
+if ((coord = 0_56_55_13_41 & loc_coord = 0_56_55_15_44) | (coord = 0_56_55_15_44 & loc_coord = 0_56_55_13_41)) $valid = true;
+if ((coord = 0_56_55_15_44 & loc_coord = 0_56_55_17_44) | (coord = 0_56_55_17_44 & loc_coord = 0_56_55_15_44)) $valid = true;
+if ((coord = 0_56_55_17_44 & loc_coord = 0_56_55_22_45) | (coord = 0_56_55_22_45 & loc_coord = 0_56_55_17_44)) $valid = true;
+if (distance(coord, 0_56_55_22_45) <= 2 & coordx(coord) >= 3604 & loc_coord = 0_56_55_17_44) $valid = true;
+if ($valid = false) {
+    ~displaymessage(^dm_default);
+    return;
+}
+healenergy(-5);
+p_telejump(loc_coord);
+if (loc_coord = 0_56_55_20_30 | loc_coord = 0_56_55_17_44) mes("Jump from this rock again to reach the shore.");
+
+// Open the three source-mapped chests; Search then yields the piece or starts combat.
+[oploc1,ahoy_chest_locked]
+if (loc_coord ! 1_56_55_35_25) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, ahoy_chest_key) > 0) {
+    inv_del(inv, ahoy_chest_key, 1);
+    %ahoy_subquest_toyboat = 2;
+    loc_change(ahoy_chest_open, 50);
+    return;
+}
+if (%ahoy_subquest_toyboat = 2) loc_change(ahoy_chest_open, 50);
+else ~displaymessage(^dm_default);
+
+[oploc1,ahoy_chest_closed]
+if ((loc_coord = 0_56_55_22_44) | (loc_coord = 2_56_55_36_21)) {
+    loc_change(ahoy_chest_open, 50);
+    return;
+}
+~displaymessage(^dm_default);
+
+[oploc1,ahoy_chest_open]
+if (loc_coord = 1_56_55_35_25) {
+    if (%ahoy_subquest_toyboat = 2) ~ahoy_give_map_scrap(ahoy_map_scrap_1);
+    return;
+}
+if (loc_coord = 0_56_55_22_44) {
+    ~ahoy_give_map_scrap(ahoy_map_scrap_2);
+    return;
+}
+// UNKNOWN engineering anchor selected by parent: southeast L2 chest (3620,3541).
+if (loc_coord = 2_56_55_36_21) {
+    if (%ahoy_killed_lobster = 1) {
+        ~ahoy_give_map_scrap(ahoy_map_scrap_3);
+        return;
+    }
+    if (~ahoy_lobster_active = true) return;
+    npc_add(2_56_55_33_22, giant_lobster, ^max_32bit_int);
+    %npc_aggressive_player = uid;
+    npc_setmode(opplayer2);
+    return;
+}
+~displaymessage(^dm_default);
+
+[proc,ahoy_give_map_scrap](namedobj $scrap)
+if (inv_total(inv, $scrap) > 0) return;
+if (inv_total(inv, ahoy_map_complete) > 0) return;
+if (inv_total(inv, ahoy_book_of_haricanto) > 0) return;
+if (inv_freespace(inv) = 0) return;
+inv_add(inv, $scrap, 1);
+
+[proc,ahoy_lobster_active]()(boolean)
+npc_findall(2_56_55_33_22, giant_lobster, 10, 0);
+while (npc_findnext = true) {
+    if (%npc_aggressive_player = uid) return(true);
+}
+return(false);
+
+[opnpc2,giant_lobster]
+if (%npc_aggressive_player ! uid) return;
+@player_combat_start;
+
+[apnpc2,giant_lobster]
+if (%npc_aggressive_player ! uid) return;
+@player_combat_start_ap;
+
+[ai_queue1,giant_lobster]
+if (finduid(%npc_attacking_uid) = false) return;
+if (%npc_aggressive_player ! uid) {
+    npc_setmode(none);
+    return;
+}
+~npc_default_retaliate;
+
+[ai_opplayer2,giant_lobster]
+if (%npc_aggressive_player ! uid) {
+    npc_setmode(none);
+    return;
+}
+~npc_default_attack;
+
+[ai_queue3,giant_lobster]
+gosub(npc_death);
+if (npc_findhero = ^false) return;
+if (%npc_aggressive_player = uid) queue*(ahoy_lobster_credit, 0)();
+
+[queue,ahoy_lobster_credit]
+%ahoy_killed_lobster = 1;

@@ -35642,6 +35642,8 @@ recol4s=7330
 recol4d=4256
 active=yes
 op1=Open
+param=next_loc_stage,ahoy_harbour_door_open
+param=open_sound,door_open
 
 [ahoy_harbour_door_open]
 name=Door
@@ -35657,6 +35659,8 @@ recol4s=7330
 recol4d=4256
 active=yes
 op1=Close
+param=next_loc_stage,ahoy_harbour_door
+param=close_sound,door_close
 
 [normal_bed]
 name=Bed

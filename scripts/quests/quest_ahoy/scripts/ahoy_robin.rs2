@@ -1,0 +1,258 @@
+// Ghosts Ahoy N378 Rune-Draw and Robin's signed-bow branch.
+// CANDIDATE: dialogue and four-win bow exchange follow the retained transcript and Tip.It.
+// UNKNOWN favourable defaults: the player must carry 25 coins to start, but pays no stake.
+// Robin draws one rune after each player draw and holds only when 6 points ahead.
+// Ties go to the player. A win adds one to ahoy_subquest_bow, up to four.
+// UNKNOWN: per-win debt is an engineering interpolation of the verified 100-coin total.
+// Rune names beyond air and nature are CANDIDATE labels for the ten-rune bag.
+// The original score reader is varp413_bits: scores 0-5 and 6-11.
+// UNKNOWN round state uses its unreferenced bits: bag 12-21 and held 30-31.
+// An empty bag marks an inactive game; final scores remain until close.
+
+[opnpc1,ahoy_robin]
+if (%ahoy_questvar < 4) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, ahoy_bedsheet) > 0 | inv_total(worn, ahoy_bedsheet) > 0) {
+    ~chatplayer("I've brought you a clean bedsheet, Robin.");
+    ~chatnpc("Well it's about time. Run along now, I need some Robin time.");
+    return;
+}
+if (%ahoy_subquest_bow = 5) {
+    ~chatplayer("So, still here then?");
+    ~chatnpc("Do you want another game of Runedraw?");
+    ~chatplayer("No!");
+    return;
+}
+if (%ahoy_subquest_bow >= 4) {
+    if (inv_total(inv, oak_longbow) > 0) {
+        @ahoy_robin_sign_bow_dialog;
+    }
+    // UNKNOWN functional reminder when the player has not brought an oak longbow.
+    ~chatplayer("I've won four games. Robin owes me 100 gold coins. I need an oak longbow for him to sign.");
+    ~chatnpc("Bring an oak longbow and I will sign it.");
+    return;
+}
+
+~chatnpc("Hey you, why don't you have a game of Runedraw with me? If you've got 25 gold pieces I've got a bag of runes we can use.");
+if (inv_total(inv, coins) < 25) {
+    ~chatplayer("I don't have enough money on me for a game of Runedraw at the moment.");
+    return;
+}
+def_int $choice = ~p_choice3("Yes, I'll give you a game.", 1, "How do you play Runedraw?", 2, "No, that doesn't sound fun.", 3);
+if ($choice = 3) {
+    ~chatplayer("No, that doesn't sound fun.");
+    return;
+}
+if ($choice = 2) {
+    ~chatplayer("How do you play Runedraw?");
+    ~chatnpc("Two players take turns to draw a rune from a bag, which contains ten runes in total. Each rune has a different value: an air rune is worth one point, up to a Nature rune which is worth nine points.");
+    ~chatnpc("If a player draws the Death rune then the game is over, and they have lost.");
+    ~chatnpc("A player can choose to hold if they wish and not draw any more runes, but this runs the risk of the other player drawing more runes until they have a greater points total and win.");
+    def_int $play = ~p_choice2("Yes, I'll give you a game.", 1, "No, that doesn't sound fun.", 2);
+    if ($play = 2) {
+        ~chatplayer("No, that doesn't sound fun.");
+        return;
+    }
+}
+@ahoy_runedraw_start;
+
+[label,ahoy_robin_sign_bow_dialog]
+~chatplayer("I've had enough of you not paying up - you owe me 100 gold coins. I'm going to tell the ghosts what you're doing.");
+~chatnpc("Please don't do that!!! They will suck the life from my bones!!!");
+~chatplayer("How about you signing my longbow then?");
+~chatnpc("Yes, anything!!!");
+~ahoy_robin_sign_bow();
+mes("Robin signs the oak longbow for you.");
+return;
+
+[proc,ahoy_robin_sign_bow]()
+inv_del(inv, oak_longbow, 1);
+inv_add(inv, oak_longbow_signed, 1);
+%ahoy_subquest_bow = 5;
+
+[label,ahoy_runedraw_start]
+// UNKNOWN favourable default: the player takes the first turn.
+%varp413_bits = setbit_range_toint(0, 1023, 12, 21);
+if_settext(ahoy_runedraw:com_28, "%1");
+if_settext(ahoy_runedraw:com_30, "%1");
+if_settext(ahoy_runedraw:com_29, "Draw a rune or hold.");
+if_settext(ahoy_runedraw:com_31, "Robin takes a turn after you draw.");
+if_openmain(ahoy_runedraw);
+
+[if_button,ahoy_runedraw:com_6]
+if (getbit_range(%varp413_bits, 12, 21) = 0 | getbit_range(%varp413_bits, 31, 31) = 1) return;
+def_int $rune = ~ahoy_runedraw_draw(0);
+if ($rune < 0) {
+    @ahoy_runedraw_resolve;
+    return;
+}
+~ahoy_runedraw_show_rune(0, $rune);
+if ($rune = 9) {
+    if_settext(ahoy_runedraw:com_29, "Death rune! You lose.");
+    if_settext(ahoy_runedraw:com_31, "Robin wins.");
+    @ahoy_runedraw_loss;
+    return;
+}
+if (getbit_range(%varp413_bits, 12, 21) = 0) {
+    @ahoy_runedraw_resolve;
+    return;
+}
+if (getbit_range(%varp413_bits, 30, 30) = 0) {
+    $rune = ~ahoy_runedraw_draw(1);
+    if ($rune < 0) {
+        @ahoy_runedraw_resolve;
+        return;
+    }
+    ~ahoy_runedraw_show_rune(1, $rune);
+    if ($rune = 9) {
+        if_settext(ahoy_runedraw:com_31, "Death rune! Robin loses.");
+        if_settext(ahoy_runedraw:com_29, "You win this game.");
+        @ahoy_runedraw_win;
+        return;
+    }
+    if (getbit_range(%varp413_bits, 6, 11) >= add(getbit_range(%varp413_bits, 0, 5), 6)) {
+        %varp413_bits = setbit_range_toint(%varp413_bits, 1, 30, 30);
+        if_settext(ahoy_runedraw:com_31, "Robin holds.");
+    }
+}
+if (getbit_range(%varp413_bits, 12, 21) = 0) @ahoy_runedraw_resolve;
+
+[if_button,ahoy_runedraw:com_7]
+if (getbit_range(%varp413_bits, 12, 21) = 0 | getbit_range(%varp413_bits, 31, 31) = 1) return;
+%varp413_bits = setbit_range_toint(%varp413_bits, 1, 31, 31);
+if_settext(ahoy_runedraw:com_29, "You hold.");
+def_int $bag = getbit_range(%varp413_bits, 12, 21);
+while ($bag > 0 & getbit_range(%varp413_bits, 30, 30) = 0) {
+    def_int $rune = ~ahoy_runedraw_draw(1);
+    if ($rune < 0) {
+        $bag = 0;
+    } else {
+        ~ahoy_runedraw_show_rune(1, $rune);
+        if ($rune = 9) {
+            if_settext(ahoy_runedraw:com_31, "Death rune! Robin loses.");
+            if_settext(ahoy_runedraw:com_29, "You win this game.");
+            @ahoy_runedraw_win;
+            return;
+        }
+        if (getbit_range(%varp413_bits, 6, 11) >= add(getbit_range(%varp413_bits, 0, 5), 6)) {
+            %varp413_bits = setbit_range_toint(%varp413_bits, 1, 30, 30);
+            if_settext(ahoy_runedraw:com_31, "Robin holds.");
+        }
+        $bag = getbit_range(%varp413_bits, 12, 21);
+    }
+}
+@ahoy_runedraw_resolve;
+
+[if_close,ahoy_runedraw]
+if (p_finduid(uid) = false) return;
+%varp413_bits = 0;
+
+[proc,ahoy_runedraw_draw](int $side)(int)
+def_int $state = %varp413_bits;
+def_int $bag = getbit_range($state, 12, 21);
+def_int $remaining = 0;
+def_int $i = 0;
+while ($i < 10) {
+    if (getbit_range($bag, $i, $i) = 1) $remaining = add($remaining, 1);
+    $i = add($i, 1);
+}
+if ($remaining = 0) return(-1);
+def_int $pick = random($remaining);
+def_int $rune = -1;
+$i = 0;
+while ($i < 10 & $rune = -1) {
+    if (getbit_range($bag, $i, $i) = 1) {
+        if ($pick = 0) {
+            $rune = $i;
+        } else {
+            $pick = sub($pick, 1);
+        }
+    }
+    $i = add($i, 1);
+}
+if ($rune < 0) return(-1);
+$bag = setbit_range_toint($bag, 0, $rune, $rune);
+$state = setbit_range_toint($state, $bag, 12, 21);
+if ($rune < 9) {
+    if ($side = 0) {
+        $state = setbit_range_toint($state, add(getbit_range($state, 0, 5), add($rune, 1)), 0, 5);
+    } else {
+        $state = setbit_range_toint($state, add(getbit_range($state, 6, 11), add($rune, 1)), 6, 11);
+    }
+}
+%varp413_bits = $state;
+return($rune);
+
+[proc,ahoy_runedraw_show_rune](int $side, int $rune)
+if ($side = 0) {
+    if ($rune = 9) if_settext(ahoy_runedraw:com_28, "DEATH");
+    switch_int($rune) {
+        case 0 : if_settext(ahoy_runedraw:com_29, "Air rune.");
+        case 1 : if_settext(ahoy_runedraw:com_29, "Mind rune.");
+        case 2 : if_settext(ahoy_runedraw:com_29, "Water rune.");
+        case 3 : if_settext(ahoy_runedraw:com_29, "Earth rune.");
+        case 4 : if_settext(ahoy_runedraw:com_29, "Fire rune.");
+        case 5 : if_settext(ahoy_runedraw:com_29, "Body rune.");
+        case 6 : if_settext(ahoy_runedraw:com_29, "Cosmic rune.");
+        case 7 : if_settext(ahoy_runedraw:com_29, "Chaos rune.");
+        case 8 : if_settext(ahoy_runedraw:com_29, "Nature rune.");
+        case 9 : if_settext(ahoy_runedraw:com_29, "Death rune.");
+    }
+} else {
+    if ($rune = 9) if_settext(ahoy_runedraw:com_30, "DEATH");
+    switch_int($rune) {
+        case 0 : if_settext(ahoy_runedraw:com_31, "Air rune.");
+        case 1 : if_settext(ahoy_runedraw:com_31, "Mind rune.");
+        case 2 : if_settext(ahoy_runedraw:com_31, "Water rune.");
+        case 3 : if_settext(ahoy_runedraw:com_31, "Earth rune.");
+        case 4 : if_settext(ahoy_runedraw:com_31, "Fire rune.");
+        case 5 : if_settext(ahoy_runedraw:com_31, "Body rune.");
+        case 6 : if_settext(ahoy_runedraw:com_31, "Cosmic rune.");
+        case 7 : if_settext(ahoy_runedraw:com_31, "Chaos rune.");
+        case 8 : if_settext(ahoy_runedraw:com_31, "Nature rune.");
+        case 9 : if_settext(ahoy_runedraw:com_31, "Death rune.");
+    }
+}
+
+[label,ahoy_runedraw_resolve]
+if (getbit_range(%varp413_bits, 0, 5) >= getbit_range(%varp413_bits, 6, 11)) {
+    @ahoy_runedraw_win;
+}
+@ahoy_runedraw_loss;
+
+[label,ahoy_runedraw_win]
+def_int $wins = %ahoy_subquest_bow;
+if ($wins < 4) {
+    $wins = add($wins, 1);
+    %ahoy_subquest_bow = $wins;
+}
+if ($wins >= 4) {
+    if (inv_total(inv, oak_longbow) > 0) {
+        ~ahoy_robin_sign_bow();
+        if_settext(ahoy_runedraw:com_29, "Robin signs your oak longbow.");
+        if_settext(ahoy_runedraw:com_31, "Four wins. Debt paid by the signed bow.");
+    } else {
+        if_settext(ahoy_runedraw:com_29, "You have won four games.");
+        if_settext(ahoy_runedraw:com_31, "Robin owes 100 gold coins. Bring an oak longbow.");
+    }
+} else {
+    def_int $debt = calc($wins * 25);
+    if_settext(ahoy_runedraw:com_29, "You win this game.");
+    if_settext(ahoy_runedraw:com_31, "Robin owes <tostring($debt)> gold coins.");
+}
+%varp413_bits = getbit_range(%varp413_bits, 0, 11);
+return;
+
+[label,ahoy_runedraw_loss]
+def_int $wins = %ahoy_subquest_bow;
+def_int $debt = calc($wins * 25);
+if_settext(ahoy_runedraw:com_29, "You lose this game.");
+if ($wins > 0) {
+    if_settext(ahoy_runedraw:com_31, "Robin still owes <tostring($debt)> gold coins.");
+} else {
+    if_settext(ahoy_runedraw:com_31, "No debt changes hands.");
+}
+%varp413_bits = getbit_range(%varp413_bits, 0, 11);
+return;

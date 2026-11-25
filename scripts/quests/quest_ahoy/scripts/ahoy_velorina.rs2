@@ -1,14 +1,19 @@
-// Ghosts Ahoy start — Velorina (ahoy_velorina 1683) @ 3678,3510.
-// CANDIDATE last-resort 2007-base: OSRS Transcript Talking to Velorina
-// minus Overview overlay. Hunt 289? no. No Necrovarus / ectophial / stairs.
-// Accept: %ahoy_questvar 0→1. After Necro refuse (>=2): another-way
-// briefing 2→3. No dest / crone / ectophial. Cite nettle-tea leftover.
+// CANDIDATE dialogue: retained Ghosts Ahoy transcript; reward amounts VERIFIED.
 
 [opnpc1,ahoy_velorina]
-if (inv_total(worn, amulet_of_ghostspeak) = 0) {
+if (~ahoy_can_speak = false) {
     ~chatnpc("<p,shock>Woooo wooo wooooo woooo");
     ~mesbox("You cannot understand the ghost.");
     return;
+}
+if (%ahoy_questvar >= ^ahoy_complete) {
+    @ahoy_velorina_postquest;
+}
+if (%ahoy_questvar = 7) {
+    @ahoy_velorina_reward;
+}
+if (%ahoy_questvar >= 4) {
+    @ahoy_velorina_materials;
 }
 if (%ahoy_questvar >= 3) {
     @ahoy_velorina_after_necro_nag;
@@ -74,6 +79,7 @@ if ($y = 2) {
 ~chatnpc("<p,neutral>If he declines, there may yet be another way.");
 if (%ahoy_questvar = 0) {
     %ahoy_questvar = 1;
+    ~send_quest_progress(questlist:ahoy, %ahoy_questvar, ^ahoy_complete);
 }
 return;
 

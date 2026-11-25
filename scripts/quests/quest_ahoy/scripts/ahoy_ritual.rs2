@@ -1,0 +1,95 @@
+// VERIFIED period token loop. UNKNOWN encoding: low six bits store grinder bone.
+[oplocu,ahoy_grinder_loader] @ahoy_grinder_load;
+[oplocu,ahoy_grinder] @ahoy_grinder_load;
+[label,ahoy_grinder_load]
+if (%ahoy_grinder_status ! 0) return;
+def_int $bone = 0;
+switch_obj(last_useitem) {
+    case bones : $bone = 1;
+    case bat_bones : $bone = 2;
+    case bones_burnt : $bone = 3;
+    case big_bones : $bone = 4;
+    case babydragon_bones : $bone = 5;
+    case dragon_bones : $bone = 6;
+}
+if ($bone = 0) { ~displaymessage(^dm_default); return; }
+inv_del(inv, last_useitem, 1);
+%ahoy_varbits_1_0_5 = $bone;
+%ahoy_grinder_status = 1;
+return;
+
+[oploc1,ahoy_grinder_handle] @ahoy_grind;
+[oploc1,ahoy_grinder] @ahoy_grind;
+[label,ahoy_grind]
+if (%ahoy_grinder_status = 1) {
+    anim(ahoy_bone_grind, 0);
+    %ahoy_grinder_status = 2;
+}
+return;
+
+[oploc1,ahoy_grinder_chute] @ahoy_grinder_empty;
+[oploc2,ahoy_grinder] @ahoy_grinder_empty;
+[oplocu,ahoy_grinder_chute]
+if (last_useitem = pot_empty) @ahoy_grinder_empty;
+~displaymessage(^dm_default);
+[label,ahoy_grinder_empty]
+if (%ahoy_grinder_status ! 2 | inv_total(inv, pot_empty) = 0) return;
+def_namedobj $meal = pot_bonemeal;
+switch_int(%ahoy_varbits_1_0_5) {
+    case 2 : $meal = pot_bonemeal_bat;
+    case 3 : $meal = pot_bonemeal_burnt;
+    case 4 : $meal = pot_bonemeal_big;
+    case 5 : $meal = pot_bonemeal_babydragon;
+    case 6 : $meal = pot_bonemeal_dragon;
+}
+inv_del(inv, pot_empty, 1);
+inv_add(inv, $meal, 1);
+%ahoy_grinder_status = 0;
+%ahoy_varbits_1_0_5 = 0;
+return;
+
+[oploc2,ahoy_grinder_handle] @ahoy_grinder_status;
+[oploc3,ahoy_grinder] @ahoy_grinder_status;
+[label,ahoy_grinder_status]
+// UNKNOWN functional status wording.
+mes("Grinder status: <tostring(%ahoy_grinder_status)>");
+return;
+
+[oplocu,green_gloop] @ahoy_fill_slime;
+[oplocu,green_gloop2] @ahoy_fill_slime;
+[oplocu,green_gloop3] @ahoy_fill_slime;
+[oplocu,green_gloop_flat] @ahoy_fill_slime;
+[oplocu,green_gloop_two] @ahoy_fill_slime;
+[oplocu,green_gloop_three] @ahoy_fill_slime;
+[oplocu,green_gloop_four] @ahoy_fill_slime;
+[oplocu,green_gloop_five] @ahoy_fill_slime;
+[oplocu,green_gloop_six] @ahoy_fill_slime;
+[oplocu,green_gloop_q] @ahoy_fill_slime;
+[oplocu,green_gloop_w] @ahoy_fill_slime;
+[oplocu,green_gloop_e] @ahoy_fill_slime;
+[oplocu,green_gloop_r] @ahoy_fill_slime;
+[oplocu,green_gloop_t] @ahoy_fill_slime;
+[label,ahoy_fill_slime]
+if (last_useitem ! bucket_empty) { ~displaymessage(^dm_default); return; }
+inv_del(inv, bucket_empty, 1);
+inv_add(inv, bucket_ectoplasm, 1);
+return;
+
+[opnpc1,ahoy_disciple]
+if (~ahoy_can_speak = false) {
+    ~chatnpc("<p,shock>Woooo wooo wooooo woooo");
+    ~mesbox("You cannot understand the ghost.");
+    return;
+}
+def_int $pending = getbit_range(%ahoy_puzzle_state, 24, 27);
+if ($pending > 0) {
+    if (inv_freespace(inv) = 0 & inv_total(inv, ectotoken) = 0) {
+        mes("You don't have enough inventory space.");
+        return;
+    }
+    inv_add(inv, ectotoken, multiply($pending, 5));
+    %ahoy_puzzle_state = setbit_range_toint(%ahoy_puzzle_state, 0, 24, 27);
+    return;
+}
+// UNKNOWN functional instructions, rather than unsourced dialogue.
+mes("Grind bones, collect the bonemeal in a pot, and worship with a bucket of slime. Then return for ecto-tokens.");
