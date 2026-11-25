@@ -301,6 +301,15 @@ vislevel=hide
 op2=Attack
 head1=npc_1850_head
 category=dwarfrock_avatar
+// UNKNOWN: Base and coloured forms share the same product-owned combat wiring.
+defaultmode=none
+wanderrange=0
+maxrange=32
+timer=1
+param=damagetype,^crush_style
+param=attack_anim,rock_avatar_attack
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
 
 [dwarf_rock_avatar_warrior_green]
 name=Arzinian Avatar of Strength
@@ -377,6 +386,20 @@ vislevel=hide
 op2=Attack
 head1=npc_1850_head
 category=dwarfrock_avatar
+// UNKNOWN: Base and coloured forms share the same product-owned combat wiring.
+defaultmode=none
+wanderrange=0
+maxrange=32
+attackrange=5
+timer=1
+param=damagetype,^ranged_style
+param=attack_anim,rock_avatar_archer_attack
+// UNKNOWN: Reuse the packed 377 arrow presentation; no Avatar binding is sourced.
+param=rangeattack_sound,arrowlaunch2
+param=proj_launch,iron_arrow_launch
+param=proj_travel,iron_arrow_travel
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
 
 [dwarf_rock_avatar_archer_green]
 name=Arzinian Avatar of Ranging
@@ -415,6 +438,7 @@ param=attack_anim,rock_avatar_archer_attack
 param=rangeattack,0
 param=rangebonus,0
 // UNKNOWN: No packed avatar projectile binding is recorded; use packed 377 arrow effects.
+param=rangeattack_sound,arrowlaunch2
 param=proj_launch,iron_arrow_launch
 param=proj_travel,iron_arrow_travel
 param=defend_anim,rock_avatar_block
@@ -457,6 +481,7 @@ param=attack_anim,rock_avatar_archer_attack
 param=rangeattack,0
 param=rangebonus,0
 // UNKNOWN: No packed avatar projectile binding is recorded; use packed 377 arrow effects.
+param=rangeattack_sound,arrowlaunch2
 param=proj_launch,iron_arrow_launch
 param=proj_travel,iron_arrow_travel
 param=defend_anim,rock_avatar_block
@@ -473,6 +498,15 @@ vislevel=hide
 op2=Attack
 head1=npc_1850_head
 category=dwarfrock_avatar
+// UNKNOWN: Base and coloured forms share the same product-owned combat wiring.
+defaultmode=none
+wanderrange=0
+maxrange=32
+timer=1
+param=damagetype,^magic_style
+param=magicattack_anim,rock_avatar_mage_attack
+param=defend_anim,rock_avatar_block
+param=death_anim,rock_avatar_death
 
 [dwarf_rock_avatar_mage_green]
 name=Arzinian Avatar of Magic
