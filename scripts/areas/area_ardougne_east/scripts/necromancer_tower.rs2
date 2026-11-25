@@ -30,7 +30,8 @@ if ($attack_type < 12) {
     } else if(stat_base(strength) <= stat(strength)) {
         ~npc_cast_spell(^weaken, 4);
     } else if(stat_base(defence) <= stat(defence)) {
-        ~npc_cast_spell(^defence, 4);
+        // Repair an inherited software fault: the stat constant selected Water Bolt.
+        ~npc_cast_spell(^curse, 4);
     } else {
         ~npc_default_attack;
     }

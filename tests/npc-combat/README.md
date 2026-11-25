@@ -266,6 +266,9 @@ landed/failed rot plus each below-base stat guard. Standard Confuse, Weaken,
 Curse and rot queue no damage hit and draw no hitmark, even on success.
 Failed rot uses the standard curse splash. These are compiled proofs, not
 evidence of natural map access or historical presentation bindings.
+Native Invrigar and necromancer OP/AP cases start with Attack and Strength
+drained and Defence at base. They require a Defence drain without Water Bolt
+damage. This repairs an inherited software fault, not a claimed period fault.
 
 The outcomes return `(attempted, accuracy, rolled, delivered, ticks)`. Accuracy is
 `-1` when no attempt is made, `0` for a miss and `1` for an accuracy success,

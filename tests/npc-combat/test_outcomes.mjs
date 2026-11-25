@@ -685,6 +685,31 @@ try {
       assert(result.visited.includes(`[proc,npc_spell_${variant === 'hit' ? 'success' : 'fail'}]`));
     });
   }
+  for (const npc of ['invrigar_the_necromancer', 'necromancer']) {
+    for (const trigger of ['ai_opplayer2', 'ai_applayer2']) {
+      const script = `[${trigger},${npc}]`;
+      check(`${script} curses Defence after Attack and Strength are drained`, () => {
+        const route = routeSeeds.routes.find(route => route.script === script);
+        let before;
+        const result = differential(npc, script, [], 'seeded', 'magic', {}, f => {
+          configureRoute(f, route);
+          f.player.levels[0]--;
+          f.player.levels[2]--;
+          before = [...f.player.levels];
+        }, 1, { draws: [0.25, 0.999999, 0] }, false);
+        assert.equal(result.snapshot.execution, rt.State.FINISHED);
+        assert.deepEqual(result.errors, []);
+        assert(result.visited.includes('[proc,npc_stat_change_effect]'), 'native curse drains');
+        assert.equal(result.snapshot.levels[0], before[0], 'Attack stays drained');
+        assert.equal(result.snapshot.levels[2], before[2], 'Strength stays drained');
+        assert(result.snapshot.levels[1] < before[1], 'Defence drains from base');
+        assert.deepEqual(result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]'), [],
+          'Curse queues no Water Bolt damage');
+        assert.equal(result.settled.levels[3], before[3]);
+        assert(!result.settled.events.some(event => event.op === 'DAMAGE'), 'no damage hitmark');
+      });
+    }
+  }
   const rotRoute = routeSeeds.routes.find(route => route.npc === 'skeletonmage');
   for (const [branch, seed] of Object.entries(rotRoute.rotSeeds)) {
     check(`skeletonmage native rot ${branch}`, () => {
