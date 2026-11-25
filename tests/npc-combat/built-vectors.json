@@ -5961,6 +5961,101 @@
           }
         }
       }
+    },
+    {
+      "identity": {
+        "debugname": "barrows_ahrim",
+        "id": 2025
+      },
+      "unit": "BC08",
+      "evidence": {
+        "facts": [
+          "barrows.bc-ahrim-skills",
+          "barrows.bc-ahrim-bonuses",
+          "barrows.bc-ahrim-attack"
+        ],
+        "label": "CANDIDATE",
+        "researchCommit": "13980ffa0051b6105eb4b4d17809c1df48fe71f2",
+        "sources": [
+          {
+            "id": "src.barrows-bc-osrs-history",
+            "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce"
+          },
+          {
+            "id": "src.barrows-bc-oldschool-base-special-history",
+            "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908"
+          }
+        ]
+      },
+      "fields": {
+        "attack": { "value": 1 },
+        "strength": { "value": 1 },
+        "defence": { "value": 100 },
+        "magic": { "value": 100 },
+        "ranged": { "value": 1 },
+        "hitpoints": {
+          "value": 100,
+          "evidence": {
+            "facts": ["barrows.bc-ahrim-hitpoints"],
+            "label": "CANDIDATE",
+            "researchCommit": "13980ffa0051b6105eb4b4d17809c1df48fe71f2",
+            "sources": [
+              {
+                "id": "src.barrows-bc-period-bestiaries",
+                "sha256": "72715a21e70b382949bbb7b6a7919844e65de5cf841a1ba42d1d1bf40565905c"
+              }
+            ]
+          }
+        },
+        "param:attackrate": { "value": 6 },
+        "param:damagetype": { "value": 4 },
+        "param:attackbonus": { "value": 0 },
+        "param:strengthbonus": { "value": 68 },
+        "param:magicattack": { "value": 73 },
+        "param:rangeattack": { "value": -19 },
+        "param:rangebonus": { "value": 0 },
+        "param:stabdefence": { "value": 103 },
+        "param:slashdefence": { "value": 85 },
+        "param:crushdefence": { "value": 117 },
+        "param:magicdefence": { "value": 73 },
+        "param:rangedefence": { "value": 0 },
+        "param:barrows_maxhit": {
+          "value": 20,
+          "evidence": {
+            "facts": ["barrows.bc-ahrim-maxhit"],
+            "label": "VERIFIED",
+            "researchCommit": "13980ffa0051b6105eb4b4d17809c1df48fe71f2",
+            "sources": [
+              {
+                "id": "src.barrows-tipit-20060427",
+                "sha256": "c8a5e9a801df470502ad1f698cfcb0cef8654b7761cb0aaaa6d8305ea320bc56"
+              },
+              {
+                "id": "src.barrows-bc-r1-conflicts",
+                "sha256": "9d013327e4487bde32867115a6bf289d4c25c15962e88792e59cc0dc29e4c71f"
+              }
+            ]
+          }
+        },
+        "regenrate": {
+          "value": 16,
+          "evidence": {
+            "facts": ["barrows.bc-regen-clock"],
+            "label": "UNKNOWN",
+            "researchCommit": "13980ffa0051b6105eb4b4d17809c1df48fe71f2",
+            "sources": []
+          }
+        },
+        "attackrange": {
+          "value": 10,
+          "evidence": {
+            "facts": ["barrows.bc-reach-tiles"],
+            "label": "UNKNOWN",
+            "researchCommit": "13980ffa0051b6105eb4b4d17809c1df48fe71f2",
+            "sources": []
+          }
+        }
+      }
     }
   ]
 }

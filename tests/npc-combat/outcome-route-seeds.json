@@ -1817,6 +1817,16 @@
         "miss": 2415085441,
         "zero": 1309757500
       }
+    },
+    {
+      "script": "[ai_applayer2,barrows_ahrim]",
+      "npc": "barrows_ahrim",
+      "style": "magic",
+      "seeds": {
+        "hit": 2654435769,
+        "miss": 2415085441,
+        "zero": 683130215
+      }
     }
   ]
 }
