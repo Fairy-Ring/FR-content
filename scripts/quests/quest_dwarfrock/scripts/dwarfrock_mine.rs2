@@ -89,8 +89,10 @@ if (finduid(%npc_attacking_uid) = false) { npc_del; return; }
 if (%dwarfrock_quest ! 60 | ~dwarfrock_in_mine = false | inv_total(worn, dwarf_goldrock_helmet) = 0) { npc_del; return; }
 def_npc $type = ~dwarfrock_avatar_type(inv_total(inv, gold_ore));
 if (npc_type ! $type) {
-    npc_changetype_keepall($type, 800);
+    npc_changetype($type, 800);
     if (npc_stat(hitpoints) > npc_basestat(hitpoints)) npc_statsub(hitpoints, sub(npc_stat(hitpoints), npc_basestat(hitpoints)), 0);
+    // A smaller form can exhaust the remaining HP; use the ordinary owned death queue.
+    if (npc_stat(hitpoints) = 0) npc_queue(3, 0, 0);
 }
 
 [ai_queue1,_dwarfrock_avatar]
