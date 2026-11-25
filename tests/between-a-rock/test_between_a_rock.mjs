@@ -388,6 +388,14 @@ function avatarFor(p) {
 function assertAvatarType(npc, name, label) {
   assert.equal(npc.type, id('NpcType', name), label);
 }
+function assertAvatarStats(npc, hpDamage, defenceDrain, label) {
+  const stats = [NpcStat.HITPOINTS, NpcStat.DEFENCE];
+  const expected = stats.map(stat => types.NpcType.get(npc.type).stats[stat]);
+  assert.deepEqual(stats.map(stat => npc.baseLevels[stat]), expected, `${label}: new form supplies HP and Defence maxima`);
+  assert.deepEqual(stats.map(stat => npc.levels[stat]),
+    [Math.max(expected[0] - hpDamage, 0), Math.max(expected[1] - defenceDrain, 0)],
+    `${label}: new form preserves damage and Defence drain without exceeding its maxima`);
+}
 function spawnAvatar(p, center, label) {
   const { trigger } = nativeLoc(p, center, 2, [], label);
   assert.match(trigger.name, /^\[oploc2,dwarf_firewall_centre_/,
@@ -419,9 +427,11 @@ function activeStyle(style) {
   addItem(p, 'gold_ore', 6);
   advanceNpc(npc);
   assertAvatarType(npc, `${style.base}_green`, `${style.name} Avatar changes to green at six carried gold ore`);
+  assertAvatarStats(npc, 0, 0, `${style.name} base to green`);
   addItem(p, 'gold_ore', 9);
   advanceNpc(npc);
   assertAvatarType(npc, `${style.base}_yellow`, `${style.name} Avatar changes to yellow at fifteen carried gold ore`);
+  assertAvatarStats(npc, 0, 0, `${style.name} green to yellow`);
   assert.equal(count(p, 'gold_ore'), 15, `${style.name} Avatar tiers do not consume gold ore`);
   closePlayer(p);
   advanceNpc(npc, 4);
@@ -791,13 +801,45 @@ try {
   damageNpc(mainAvatar, 7);
   assert.equal(mainAvatar.levels[NpcStat.HITPOINTS], baseHp, 'an Avatar cannot be damaged below six carried gold ore');
   assert.equal(count(p, 'gold_ore'), 3, 'blocked combat does not consume the carried gold');
-  addItem(p, 'gold_ore', 3);
+  for (let ore = 3; ore < 5; ore++) nativeLoc(p, goldVeins[0], 1, [], 'mine towards the six-ore combat boundary');
+  assert.equal(count(p, 'gold_ore'), 5, 'exact five-ore boundary fixture');
+  damageNpc(mainAvatar, 7);
+  assert.equal(mainAvatar.levels[NpcStat.HITPOINTS], baseHp, 'five ore still blocks damage');
+  nativeLoc(p, goldVeins[0], 1, [], 'mine the exact sixth gold ore');
+  assert.equal(count(p, 'gold_ore'), 6, 'exact six-ore boundary fixture');
+  mainAvatar.regenClock = 0; // Isolate morph preservation from the independent native regeneration clock.
   advanceNpc(mainAvatar);
   assertAvatarType(mainAvatar, 'dwarf_rock_avatar_mage_green', 'Mage counter form changes at six gold ore');
-  addItem(p, 'gold_ore', 9);
+  assertAvatarStats(mainAvatar, 0, 0, 'three to six earned ore');
+  const greenHp = mainAvatar.levels[NpcStat.HITPOINTS];
+  damageNpc(mainAvatar, 7);
+  assert.equal(mainAvatar.levels[NpcStat.HITPOINTS], greenHp - 7, 'exactly six ore permits damage');
+  mainAvatar.levels[NpcStat.DEFENCE] -= 9; // Isolated prior stat-drain fixture, not quest progression.
+  for (let ore = 6; ore < 15; ore++) nativeLoc(p, goldVeins[0], 1, [], 'mine towards the weaker Avatar form');
+  mainAvatar.regenClock = 0;
   advanceNpc(mainAvatar);
   assertAvatarType(mainAvatar, 'dwarf_rock_avatar_mage_yellow', 'Mage counter form changes at fifteen gold ore');
+  assertAvatarStats(mainAvatar, 7, 9, 'six to fifteen earned ore');
   assert.equal(count(p, 'gold_ore'), 15, 'Avatar form changes preserve all carried ore');
+
+  // A normal damaged green form can have less HP than the yellow form's reduction.
+  const depleted = makePlayer(['dwarf_goldrock_helmet']);
+  writeVar(depleted, 'dwarfrock_quest', 60); // Independent reachable morph-death fixture.
+  wearHelmet(depleted);
+  addItem(depleted, 'gold_ore', 6);
+  const depletedAvatar = spawnAvatar(depleted, centerDiagonal, 'damaged green Avatar morph fixture');
+  depletedAvatar.setVar(id('VarNpcType', 'npc_aggressive_player'), depleted.uid);
+  const depletedHp = depletedAvatar.levels[NpcStat.HITPOINTS];
+  depletedAvatar.heroPoints.addHero(depleted.hash64, depletedHp - 1);
+  damageNpc(depletedAvatar, depletedHp - 1);
+  assert.equal(depletedAvatar.levels[NpcStat.HITPOINTS], 1, 'green form survives the prior native hit');
+  addItem(depleted, 'gold_ore', 9);
+  depletedAvatar.regenClock = 0;
+  advanceNpc(depletedAvatar, 20);
+  settleCombat(depleted);
+  assert.equal(stage(depleted), 100, 'zero-HP form change takes the native owned death path instead of stranding the fight');
+  closeNpc(depletedAvatar);
+  closePlayer(depleted);
   const stranger = makePlayer(['dwarf_goldrock_helmet']);
   writeVar(stranger, 'dwarfrock_quest', 60); // Isolated hostile-damage fixture; not quest progression.
   at(stranger, centerStraight.stand);
@@ -828,7 +870,7 @@ try {
   damageNpc(finalAvatar, finalHp);
   settleCombat(p);
   assert.equal(stage(p), 100, 'the owner-only Avatar AI_QUEUE3 queue advances to stage 100');
-  assert.equal(count(p, 'runite_ore'), 0, 'Avatar death alone does not award the completion reward');
+  assert.equal(count(p, 'rune_pickaxe'), 0, 'Avatar death alone does not award the completion reward');
   assert.deepEqual([p.stats[PlayerStat.DEFENCE], p.stats[PlayerStat.MINING], p.stats[PlayerStat.SMITHING]],
     xpBeforeAvatarDeath, 'Avatar death alone does not award skill XP');
 
@@ -840,20 +882,36 @@ try {
     p.stats[PlayerStat.DEFENCE] - rewardXp[0],
     p.stats[PlayerStat.MINING] - rewardXp[1],
     p.stats[PlayerStat.SMITHING] - rewardXp[2]
-  ], [50000, 50000, 50000], 'completion grants the candidate 5,000 XP in each named skill');
-  assert.equal(count(p, 'runite_ore'), 2, 'completion grants two runite ore once');
+  ], [50000, 50000, 50000], 'completion grants the verified 5,000 XP in each named skill');
+  assert.equal(count(p, 'rune_pickaxe'), 1, 'completion grants one period rune pickaxe once');
+  assert(p.packets.some(packet => packet.constructor.name === 'IfSetText' && packet.text === 'Rune pickaxe'),
+    'completion scroll names the period rune pickaxe reward');
   assert.equal(questPoints(p) - qpBeforeReward, expectedQuestPoints, 'completion grants exactly the packed Quest Points constant');
   const completed = {
     xp: [p.stats[PlayerStat.DEFENCE], p.stats[PlayerStat.MINING], p.stats[PlayerStat.SMITHING]],
-    runite: count(p, 'runite_ore'), points: questPoints(p)
+    pickaxe: count(p, 'rune_pickaxe'), points: questPoints(p)
   };
   nativeNpc(p, dondakan, 1, [2], 'repeat completed Dondakan dialogue without re-claiming rewards');
   assert.equal(stage(p), completeStage, 'repeat postquest dialogue preserves the terminal stage');
   assert.deepEqual([p.stats[PlayerStat.DEFENCE], p.stats[PlayerStat.MINING], p.stats[PlayerStat.SMITHING]], completed.xp,
     'repeat dialogue grants no duplicate experience');
-  assert.equal(count(p, 'runite_ore'), completed.runite, 'repeat dialogue grants no duplicate runite ore');
+  assert.equal(count(p, 'rune_pickaxe'), completed.pickaxe, 'repeat dialogue grants no duplicate rune pickaxe');
   assert.equal(questPoints(p), completed.points, 'repeat dialogue grants no duplicate Quest Points');
   assert.equal(completed.points - questpointBaseline, expectedQuestPoints, 'net account Quest Points equal the Between a Rock... reward');
+
+  const fullReward = makePlayer();
+  writeVar(fullReward, 'dwarfrock_quest', 100); // Independent full-inventory completion fixture.
+  while (fullReward.invFreeSpace(inv)) addItem(fullReward, 'knife');
+  nativeNpc(fullReward, dondakan, 1, [], 'claim period reward with a full inventory');
+  assert.equal(stage(fullReward), completeStage, 'a full inventory does not prevent completion');
+  assert.equal(count(fullReward, 'rune_pickaxe'), 0, 'the rune pickaxe cannot enter a full inventory');
+  const groundPickaxe = World.getObj(fullReward.x, fullReward.z, fullReward.level, obj('rune_pickaxe'), fullReward.hash64);
+  assert(groundPickaxe, 'a full inventory places the rune pickaxe at the player');
+  assert.equal(groundPickaxe.count, 1, 'full-inventory completion drops exactly one rune pickaxe');
+  nativeNpc(fullReward, dondakan, 1, [2], 'repeat full-inventory completed dialogue');
+  assert.equal(World.getObj(fullReward.x, fullReward.z, fullReward.level, obj('rune_pickaxe'), fullReward.hash64)?.count, 1,
+    'repeat full-inventory dialogue grants no duplicate ground reward');
+  closePlayer(fullReward);
 
   // Stage 110 re-entry is Talk-to only; Fire remains excluded, and helmet loss expires a live mine session.
   const fireAfterQuest = nativeLoc(p, dondakanCannon, 1, [], 'postquest cannon Fire is not a re-entry shortcut');

@@ -1,5 +1,5 @@
 // CANDIDATE dialogue: Transcript:Between a Rock..., Finding the schematics / Finishing up.
-// UNKNOWN engineering stage writes and replacement policy. No later pickaxe reward or Fire shortcut.
+// UNKNOWN engineering stage writes and replacement policy. No later Fire shortcut.
 [proc,dwarfrock_give_item](namedobj $item)
 if (inv_total(inv, $item) > 0 | inv_total(bank, $item) > 0) return;
 if (inv_freespace(inv) > 0) inv_add(inv, $item, 1);
@@ -50,16 +50,16 @@ if (~p_choice2("Can you shoot me into the rock again?", 1, "That's great, but I 
 ~chatplayer("<p,neutral>Well, I killed its avatar. I'm not sure what happened to the demon itself.");
 ~chatnpc("<p,neutral>Probably banished it to some hellish realm or other.");
 ~chatnpc("<p,happy>Of course, of course! Whenever you want to go back in there, let me know... just don't forget to bring your helmet!");
-// CANDIDATE XP amounts; runite ore and 2 QP are the unit's explicit reward contract.
+// VERIFIED between-a-rock.period-rewards: period Tip.It reward list.
 // Commit the stage with the rewards, before opening the interruptible completion scroll.
 if (%dwarfrock_quest ! 100) return;
 %dwarfrock_quest = ^dwarfrock_complete;
 stat_advance(defence, 50000);
 stat_advance(mining, 50000);
 stat_advance(smithing, 50000);
-if (inv_freespace(inv) >= 2) inv_add(inv, runite_ore, 2);
-else obj_add(coord, runite_ore, 2, ^lootdrop_duration);
-~send_quest_complete(questlist:dwarfrock, dwarf_goldrock_helmet, 200, ^dwarfrock_questpoints, "You have completed Between a Rock...!", "5,000 Defence XP|5,000 Mining XP|5,000 Smithing XP|2 Runite ore|Access to the gold mine");
+if (inv_freespace(inv) >= 1) inv_add(inv, rune_pickaxe, 1);
+else obj_add(coord, rune_pickaxe, 1, ^lootdrop_duration);
+~send_quest_complete(questlist:dwarfrock, dwarf_goldrock_helmet, 200, ^dwarfrock_questpoints, "You have completed Between a Rock...!", "5,000 Defence XP|5,000 Mining XP|5,000 Smithing XP|Rune pickaxe|Access to the gold mine");
 
 [label,dwarfrock_engineer_schematic]
 ~chatplayer("<p,quiz>Do you have any schematics related to the dwarven multicannon?");
