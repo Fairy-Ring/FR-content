@@ -13,6 +13,8 @@ switch_int (%wanted_main) {
     case ^wanted_no_crisis : @wanted_amik_no_crisis;
     case ^wanted_crisis_reported : @wanted_amik_crisis;
     case ^wanted_deputised : @wanted_amik_reminder;
+    case ^wanted_solus_defeated : ~wanted_amik_finish;
+    case ^wanted_complete : @wanted_amik_welcome;
 }
 return;
 
@@ -167,4 +169,55 @@ return;
 ~chatplayer("<p,quiz>Any hints on where he might be?");
 ~chatnpc("<p,neutral>We have no idea where he might be now... His magic is too powerful for us, I do not know how to stop him...");
 ~chatplayer("<p,quiz>Hum. I wonder if Sir Tiffy might be able to help?");
+return;
+
+// Candidate wording: wanted.dlg.amik-finish. The rewards and rank thresholds
+// are the period values in wanted.rewards and wanted.white-knight-ranks.
+[proc,wanted_amik_finish]
+if (%wanted_main ! ^wanted_solus_defeated) {
+    return;
+}
+~chatplayer("<p,neutral>Hello, Sir Amik.");
+~chatnpc("<p,neutral>Hello, friend.");
+~chatnpc("<p,neutral>You are supposed to be looking for Solus Dellagar!");
+~chatnpc("<p,neutral>The insane magician who is loose once more upon these lands? Remember?");
+~chatplayer("<p,neutral>But...I've already done that!");
+~chatnpc("<p,neutral>You have??? Then you must have some proof of your encounter!");
+~chatnpc("<p,neutral>A weapon perhaps, or an item of clothing?");
+if (inv_total(inv, wanted_solus_trophy) > 0) {
+    ~chatplayer("<p,neutral>Well of course I do! I have it right here!");
+    ~chatnpc("<p,neutral>Well hand it over then, and let's see it!");
+} else if (inv_total(bank, wanted_solus_trophy) > 0) {
+    ~chatplayer("<p,neutral>Well of course I do! I just happened to think it would be a good idea to leave it in the bank for safe keeping.");
+    ~chatnpc("<p,neutral>Well bring it here so that I can authenticate your claim and make you a White Knight!");
+    return;
+} else {
+    ~chatplayer("<p,neutral>Well of course I do! I mean I did...Look, I lost it okay? Stop hassling me!");
+    ~chatnpc("<p,sad>Look, I am very sorry <displayname>, but if you have no proof of your encounter, I can hardly promote you to be a full White Knight, now can I?");
+    ~chatplayer("<p,sad>Oh man...I think I've messed up...Maybe Savant can help me out somehow? I'd better speak to her.");
+    return;
+}
+// Revalidate after the dialogue before consuming the held proof.
+if (%wanted_main ! ^wanted_solus_defeated | inv_total(inv, wanted_solus_trophy) < 1) {
+    return;
+}
+inv_del(inv, wanted_solus_trophy, 1);
+%wanted_main = ^wanted_complete;
+%wanted_white_knight_kills = 0;
+~wanted_update_progress;
+// stat_advance uses tenths of XP; 50,000 is 5,000 Slayer XP.
+stat_advance(slayer, ^wanted_reward_slayer_xp_tenths);
+session_log(^log_adventure, "Quest complete: Wanted!");
+// The helper updates QP and opens questscroll_death; keep it last so the scroll stays open.
+~send_quest_complete(questlist:wanted, null, 250, ^wanted_questpoints, "You have completed the\\nWanted! Quest!", "5,000 Slayer XP|White Knight Armoury access");
+return;
+
+[label,wanted_amik_welcome]
+~chatnpc("<p,neutral>Now that you are a White Knight I should perhaps explain a little about how our system works.");
+~chatnpc("<p,neutral>Sadly we are not as rich as we once were, and there are many White Knights who foolishly lose their combat equipment.");
+~chatnpc("<p,neutral>We do not think it fair to make a profit from our brethren, so we will sell you equipment at cost, and rebuy it at the same cost, but we will only sell equipment to those we consider responsible enough to wield it correctly.");
+~chatnpc("<p,neutral>By killing Black Knights, you will increase your reputation with us, by killing White Knights we will obviously think less of you.");
+~chatnpc("<p,neutral>Sir Vyvin can be found in Falador Castle, and he will sell you any equipment appropriate to your reputation level.");
+~chatnpc("<p,happy>Have fun, and go kill some Black Knights for me!");
+~chatplayer("<p,neutral>Okay Amik, thanks for explaining!");
 return;

@@ -1,6 +1,7 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
+    "wanted_white_knight_kills": "UNKNOWN engineering storage: original unused slot 242 stores persistent White Knight reputation after Wanted completion. It is server-only, permanent and has no client reader or new varbits.",
     "farming_state_temp_3": "UNKNOWN engineering storage: original word 529 bits 8..15 hold four durable bush soil treatments. Retain those preparations across logout and offline crop growth while preserving the original low-byte varbit.",
     "macro_event_origin_coord": "U01 lifecycle departure O reuses unused original slot 59; no client reader or varbit base. Kept separately from intended destination D across reconnect."
   },
@@ -970,7 +971,7 @@
     "varp239_unused": "temp",
     "varp240_unused": "temp",
     "varp241_unused": "temp",
-    "varp242_unused": "temp",
+    "wanted_white_knight_kills": "perm",
     "varp244_unused": "temp",
     "varp245_unused": "temp",
     "varp246_unused": "temp",
@@ -1158,6 +1159,7 @@
     "zq_rash_timer": "temp"
   },
   "declarationReasons": {
+    "wanted_white_knight_kills": "UNKNOWN engineering storage: retained White Knight Black Knight kill reputation must survive logout. Original unused server-only slot 242 was reserved for this purpose.",
     "barrows_state": "Selected crypt, run phase and durable puzzle state survive pre-loot logout and departure; paid departure resets them through the Barrows core.",
     "barrows_generation": "Saved run generation rejects stale owned actors and queued credit across logout, reset and the next run.",
     "barrows_countdowns": "Saved Prayer and paid-collapse remainders resume after login without charging offline time or rearming a fresh interval.",

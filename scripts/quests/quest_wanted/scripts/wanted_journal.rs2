@@ -25,7 +25,7 @@ switch_int (%wanted_main) {
     case ^wanted_intelligence_open :
         $text = "@dbl@Savant briefed me on Solus Dellagar. I should speak to @dre@Lord Daquarius@dbl@, then find the Zamorakian mage for the second clue.";
     case ^wanted_chase :
-        $text = "@dbl@Savant explained that I can use my @dre@CommOrb@dbl@ to scan for Solus in @dre@Canifis@dbl@.";
+        $text = "@dbl@I should follow the clues Solus left behind and scan for him with my @dre@CommOrb@dbl@.";
     case ^wanted_solus_defeated :
         $text = "@dbl@I have defeated Solus Dellagar. I should take his hat to @dre@Sir Amik Varze@dbl@ in @dre@Falador Castle@dbl@.";
     case ^wanted_complete :

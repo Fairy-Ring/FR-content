@@ -12,3 +12,17 @@
 ^wanted_intelligence_open = 8
 ^wanted_chase = 9
 ^wanted_solus_defeated = 10
+
+// VERIFIED: period Wanted! rewards and rank thresholds; XP uses tenths.
+^wanted_reward_slayer_xp_tenths = 50000
+^wanted_rank_novice = 0
+^wanted_rank_peon = 1
+^wanted_rank_page = 2
+^wanted_rank_noble = 3
+^wanted_rank_adept = 4
+^wanted_rank_master = 5
+^wanted_rank_peon_kills = 100
+^wanted_rank_page_kills = 200
+^wanted_rank_noble_kills = 400
+^wanted_rank_adept_kills = 800
+^wanted_rank_master_kills = 1600

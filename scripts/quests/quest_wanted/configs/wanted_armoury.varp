@@ -1,0 +1,4 @@
+// Original 377 varp 242; permanent server-only rank count, no client reader.
+[wanted_white_knight_kills]
+scope=perm
+transmit=no

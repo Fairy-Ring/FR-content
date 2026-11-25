@@ -1,0 +1,56 @@
+// Verified 2005-2006 rank thresholds: wanted.white-knight-ranks.
+// Sir Amik's period-backed result is Novice; no client rank-spam flags are changed.
+
+[proc,wanted_armoury_rank]()(int)
+if (%wanted_white_knight_kills >= ^wanted_rank_master_kills) {
+    return (^wanted_rank_master);
+}
+if (%wanted_white_knight_kills >= ^wanted_rank_adept_kills) {
+    return (^wanted_rank_adept);
+}
+if (%wanted_white_knight_kills >= ^wanted_rank_noble_kills) {
+    return (^wanted_rank_noble);
+}
+if (%wanted_white_knight_kills >= ^wanted_rank_page_kills) {
+    return (^wanted_rank_page);
+}
+if (%wanted_white_knight_kills >= ^wanted_rank_peon_kills) {
+    return (^wanted_rank_peon);
+}
+return (^wanted_rank_novice);
+
+[proc,wanted_armoury_open]
+if (%wanted_main ! ^wanted_complete) {
+    return;
+}
+def_int $rank = ~wanted_armoury_rank;
+// CANDIDATE: the retained completion dialogue says Sir Vyvin trades at cost.
+// Equal 100% multipliers and no stock haggle preserve each cache item's cost.
+switch_int ($rank) {
+    case ^wanted_rank_novice : ~openshop(wanted_armoury_novice, 1000, 1000, 0, "White Knight Armoury");
+    case ^wanted_rank_peon : ~openshop(wanted_armoury_peon, 1000, 1000, 0, "White Knight Armoury");
+    case ^wanted_rank_page : ~openshop(wanted_armoury_page, 1000, 1000, 0, "White Knight Armoury");
+    case ^wanted_rank_noble : ~openshop(wanted_armoury_noble, 1000, 1000, 0, "White Knight Armoury");
+    case ^wanted_rank_adept : ~openshop(wanted_armoury_adept, 1000, 1000, 0, "White Knight Armoury");
+    case ^wanted_rank_master : ~openshop(wanted_armoury_master, 1000, 1000, 0, "White Knight Armoury");
+}
+return;
+
+// Called only from the attributed ordinary Black Knight death queue.
+[proc,wanted_armoury_record_black_knight_kill]
+if (%wanted_main ! ^wanted_complete) {
+    return;
+}
+%wanted_white_knight_kills = calc(%wanted_white_knight_kills + 1);
+return;
+
+// CANDIDATE: a White Knight kill lowers reputation (wanted.amik-finish-dialogue).
+// UNKNOWN engineering penalty: subtract one attributed kill, floored at Novice.
+[proc,wanted_armoury_record_white_knight_kill]
+if (%wanted_main ! ^wanted_complete) {
+    return;
+}
+if (%wanted_white_knight_kills > 0) {
+    %wanted_white_knight_kills = calc(%wanted_white_knight_kills - 1);
+}
+return;
