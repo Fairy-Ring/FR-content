@@ -18,7 +18,7 @@ anim(deal_smite_control, 0);
 mes("You raise your wrench on high and smite the controls mightily!");
 // UNKNOWN engineering spawn/lease: mapped clear brewery floor, 300 seconds.
 // Size-2 footprint and approach are checked against the packed collision map.
-npc_add(1_33_79_28_42, deal_evil_spirit, ^deal_spirit_lease_ticks);
+npc_add(^deal_spirit_spawn, deal_evil_spirit, ^deal_spirit_lease_ticks);
 %npc_attacking_uid = uid;
 %npc_macro_event_target = uid; // Existing shared combat owner gate, including magic.
 %npc_action_delay = map_clock;
@@ -27,7 +27,7 @@ npc_settimer(1);
 mes("The Evil Spirit is forced from the controls!");
 
 [proc,deal_spirit_find]()(boolean)
-npc_findall(1_33_79_28_42, deal_evil_spirit, ^deal_spirit_leash_tiles, 0);
+npc_findall(^deal_spirit_spawn, deal_evil_spirit, ^deal_spirit_leash_tiles, 0);
 while (npc_findnext = true) {
     if (%npc_attacking_uid = uid) return(true);
 }
@@ -38,7 +38,7 @@ if (finduid(%npc_attacking_uid) = false) {
     npc_del;
     return;
 }
-if (%death = ^true | %deal_quest ! 9 | distance(1_33_79_28_42, coord) > ^deal_spirit_leash_tiles) npc_del;
+if (%death = ^true | %deal_quest ! 9 | distance(^deal_spirit_spawn, coord) > ^deal_spirit_leash_tiles) npc_del;
 [ai_queue1,deal_evil_spirit]
 if (%npc_aggressive_player ! %npc_attacking_uid) return;
 if (finduid(%npc_attacking_uid) = false | ~npc_retal_ready = false) return;

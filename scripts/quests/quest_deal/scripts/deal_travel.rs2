@@ -20,10 +20,6 @@ p_arrivedelay;
 p_arrivedelay;
 ~climb_ladder(movecoord(loc_coord, -1, -1, 0), false);
 
-[oploc1,deal_support_ladder]
-p_arrivedelay;
-~climb_ladder(1_33_79_49_59, true);
-
 // Hooks from the shared stair dispatcher, restricted to this unit's existing locs.
 [proc,deal_stairs](boolean $up)
 p_arrivedelay;

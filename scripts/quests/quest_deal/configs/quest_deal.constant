@@ -6,5 +6,6 @@
 ^deal_disease_severity = 10
 ^deal_disease_pulse_ticks = 30
 ^deal_disease_drain = 1
+^deal_spirit_spawn = 1_33_79_31_42
 ^deal_spirit_lease_ticks = 500
 ^deal_spirit_leash_tiles = 25
