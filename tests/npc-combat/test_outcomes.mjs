@@ -673,6 +673,18 @@ try {
     }
     report.routeCoverage.push({ script: route.script, npc: route.npc, style, profile: route.profile, stand: route.stand, branches, unsupportedBranches: route.unsupportedBranches ?? {} });
   }
+  for (const name of ['confuse', 'weaken', 'curse']) for (const variant of ['hit', 'miss']) {
+    check(`standard NPC ${name} ${variant} has no damage hitmark`, () => {
+      const row = rt.spell(name);
+      assert.equal(rt.field(row, 'maxhit'), -1, 'absent maximum is null');
+      const result = execute(pack, 'bearded_dark_wizard', '[proc,npc_cast_spell]',
+        [spellId(row), 4], variant, 'magic');
+      assert.equal(result.snapshot.execution, rt.State.FINISHED);
+      assert.deepEqual(result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]'), []);
+      assert(!result.settled.events.some(event => event.op === 'DAMAGE'), 'no hitmark opcode');
+      assert(result.visited.includes(`[proc,npc_spell_${variant === 'hit' ? 'success' : 'fail'}]`));
+    });
+  }
   const rotRoute = routeSeeds.routes.find(route => route.npc === 'skeletonmage');
   for (const [branch, seed] of Object.entries(rotRoute.rotSeeds)) {
     check(`skeletonmage native rot ${branch}`, () => {
@@ -690,6 +702,15 @@ try {
         assert.equal(result.snapshot.levels[stat], before[stat] - (branch === 'landed' ? 4 : 0));
       }
       assert.equal(result.settled.levels[3], before[3], 'rot deals no damage');
+      assert.deepEqual(result.snapshot.queued.filter(q => q.script === '[queue,combat_damage_player]'), [],
+        'rot queues no damage hit, including a zero hit');
+      assert(!result.settled.events.some(event => event.op === 'DAMAGE'), 'rot draws no hitmark');
+      if (branch === 'failed') {
+        assert(result.visited.includes('[proc,npc_spell_fail]'), 'standard curse failure path');
+        const splash = result.events.filter(event => event.op === 'SPOTANIM_PL');
+        assert.equal(splash.length, 1, 'one failure splash');
+        assert(splash[0].in.includes(rt.id(rt.configs.SpotanimType, 'failedspell_impact')));
+      }
       assert.equal(result.snapshot.npcVars[rt.id(VarNpcType, 'npc_action_delay')], clock + 4);
     });
   }

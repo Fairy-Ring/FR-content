@@ -3,7 +3,6 @@ table=magic_spell_table
 data=spell,^skeleton_mage_attack
 // CANDIDATE: Old School revision 4001342 describes four levels from all three
 // stats, with Weaken's projectile and Curse's impact; no rot damage is stated.
-data=maxhit,0
 data=stat_change,attack,-4,0
 data=stat_change,strength,-4,0
 data=stat_change,defence,-4,0

@@ -262,8 +262,10 @@ replayed for all other packed types sharing that trigger. It asserts zero
 script errors and reports types whose dispatch reaches no watched shared
 attack segment as excluded. Dedicated native cases prove Nezikchened's
 distance-two magic hit, zero, miss and protection, and the skeleton mage's
-landed/failed rot plus each below-base stat guard. These are compiled proofs,
-not evidence of natural map access or historical presentation bindings.
+landed/failed rot plus each below-base stat guard. Standard Confuse, Weaken,
+Curse and rot queue no damage hit and draw no hitmark, even on success.
+Failed rot uses the standard curse splash. These are compiled proofs, not
+evidence of natural map access or historical presentation bindings.
 
 The outcomes return `(attempted, accuracy, rolled, delivered, ticks)`. Accuracy is
 `-1` when no attempt is made, `0` for a miss and `1` for an accuracy success,
