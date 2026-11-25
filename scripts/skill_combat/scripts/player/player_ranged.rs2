@@ -81,6 +81,7 @@ if (npc_param(defend_sound) ! null) {
 }
 
 [proc,player_ranged_check_ammo](obj $rhand)(obj)
+if (~roving_crystal_bow_is($rhand) = true) return($rhand);
 def_category $weapon_cat = oc_category($rhand);
 if ($weapon_cat ! weapon_bow & $weapon_cat ! weapon_crossbow) {
     return($rhand); // in this case, the rhand is the ammo.
@@ -109,6 +110,7 @@ if (oc_param($ammo, levelrequire) > oc_param($rhand, levelrequire)) { //todo con
 return($ammo);
 
 [proc,player_ranged_use_weapon](obj $rhand, obj $ammo)(int)
+if (~roving_crystal_bow_is($rhand) = true) return(~roving_crystal_bow_npc($rhand));
 if ($ammo = ogre_arrow) spotanim_pl(oc_param($ammo, proj_launch), 50, 0);
 else spotanim_pl(oc_param($ammo, proj_launch), 96, 0);
 def_int $delay = 30;
