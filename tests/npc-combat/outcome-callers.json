@@ -130,6 +130,7 @@
     "playerhit_n_melee": [
       "[ai_opplayer2,slayer_dustdevil]",
       "[proc,killerwatt_attack]",
+      "[proc,roving_guardian_attack]",
       "[proc,wyvern_melee]",
       "[proc,zygomite_attack]"
     ],
@@ -149,6 +150,7 @@
       "[proc,killerwatt_attack]",
       "[proc,npc_druid_entangle]",
       "[proc,npc_zap_attack]",
+      "[proc,roving_guardian_attack]",
       "[proc,waterbirth_prime_attack]"
     ],
     "npc_spell_cast": [
