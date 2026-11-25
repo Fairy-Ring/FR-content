@@ -1,13 +1,5 @@
-// Devious Minds — hooded Monk bow-sword handover (talk + inv trade).
-// Official day 19 Dec 2005. CANDIDATE 2007-base (OSRS Transcript:Devious
-// Minds § Bringing the Monk the Bow-sword, local dump spine-2; Colossal
-// pouch sentence SUBTRACT — post-377 / GotR). Dispatch from devious_monk.rs2
-// [opnpc1,devious_monk_hooded_visable] when inv devious_bowsword 6818 >= 1.
-// Dump tree verbatim: greeting + 3 opts (yes / teach / not-yet);
-// teach-child Not yet = dump tmissing -> CANDIDATE main-menu loop. Yes:
-// consume 6818 + devious_glowingorb 6821 (name Orb). Stay %devious_main 1.
-// No dest. No %devious_monk. No && / ||.
-// Cite devious-monk-bowsword-leftover-377.md · Transcript:Devious Minds.
+// CANDIDATE dialogue: devious-minds.dlg.bow-sword-handover.
+// UNKNOWN nested teaching refusal: return to the recorded handover menu.
 
 [label,devious_monk_bowsword]
 ~chatnpc("<p,neutral>Have you brought the weapon for me?");
@@ -30,6 +22,7 @@ if ($b = 2) {
 @devious_monk_bowsword_menu; // top-level Not yet, sorry. = tact above
 
 [label,devious_monk_bowsword_yes]
+if (%devious_main ! ^devious_crafting | inv_total(inv, devious_bowsword) = 0) return;
 ~chatplayer("<p,neutral>Yep, got it right here for you.");
 ~chatnpc("<p,neutral>Ah excellent, this won't be forgotten. You've been a great help, though I wonder if you could do me one final favour.");
 ~chatplayer("<p,neutral>Wait... this sounds familiar...");
@@ -40,4 +33,5 @@ if ($b = 2) {
 ~chatnpc("<p,neutral>Yes that's the one. Now take this orb and put it in one of the large pouches from there, don't want it getting damaged.");
 inv_del(inv, devious_bowsword, 1);
 inv_add(inv, devious_glowingorb, 1);
+%devious_main = ^devious_delivery;
 return;

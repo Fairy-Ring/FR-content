@@ -1,13 +1,4 @@
-// Devious Minds — orb into large pouch (inv Use).
-// Official day 19 Dec 2005. CANDIDATE 2007-base (Research: subject
-// devious-minds — 0 dump Use mes; mes CANDIDATE from
-// dump walk *hide the orb*). Use devious_glowingorb 6821 (Orb) on
-// rcu_pouch_large 5512 (Large pouch) or the reverse -> devious_glowingpouch
-// 6819 (name Large pouch). Consume 6821 + 5512. Stay %devious_main 1.
-// No degrade 5513, no Colossal, no RC Fill/Empty/Check rewrite, no dest,
-// no %devious_monk, no 1->2. No && / ||.
-// Research: subject devious-minds · _unpack/377/all.obj.
-
+// CANDIDATE action: devious-minds.orb-pouch-build; healthy large pouch only.
 [opheldu,rcu_pouch_large]
 if (last_useitem ! devious_glowingorb) {
     ~displaymessage(^dm_default);
@@ -23,7 +14,44 @@ if (last_useitem ! rcu_pouch_large) {
 @devious_orb_pouch;
 
 [label,devious_orb_pouch]
+if (%devious_main ! ^devious_delivery | inv_total(inv, devious_glowingorb) = 0 | inv_total(inv, rcu_pouch_large) = 0) {
+    ~displaymessage(^dm_default);
+    return;
+}
+// UNKNOWN functional refusals; preserve any stored essence instead of losing it.
+if (stat_base(runecraft) < ^devious_runecraft_level) {
+    mes("You need 50 Runecrafting to use the large pouch.");
+    return;
+}
+if (%large_essence_pouch > 0) {
+    mes("Empty the essence from your large pouch first.");
+    return;
+}
 inv_del(inv, devious_glowingorb, 1);
 inv_del(inv, rcu_pouch_large, 1);
-mes("You hide the orb in the large pouch."); // CANDIDATE dump walk
 inv_add(inv, devious_glowingpouch, 1);
+mes("You hide the orb in the large pouch."); // UNKNOWN functional wording.
+
+// UNKNOWN favourable engineering behaviour for the cache's Fill/Empty/Check ops.
+// Empty is reversible and preserves both items; never consume an item on refusal.
+[opheld1,devious_glowingpouch] @devious_pouch_check;
+[opheld3,devious_glowingpouch] @devious_pouch_check;
+
+[label,devious_pouch_check]
+mes("The pouch contains the monk's orb.");
+
+[opheld2,devious_glowingpouch]
+if (inv_freespace(inv) = 0) {
+    mes("You need a free inventory space to remove the orb.");
+    return;
+}
+inv_del(inv, devious_glowingpouch, 1);
+inv_add(inv, rcu_pouch_large, 1);
+inv_add(inv, devious_glowingorb, 1);
+
+[proc,devious_ferry_refuse]()(boolean)
+if (inv_total(inv, devious_glowingpouch) = 0 & inv_total(inv, devious_glowingorb) = 0) return(false);
+// CANDIDATE dialogue: devious-minds.dlg.entrana-monk-caught.
+~chatnpc("<p,quiz>What's this pouch?");
+~chatplayer("<p,neutral>Err...nothing... I'll be going now.");
+return(true);

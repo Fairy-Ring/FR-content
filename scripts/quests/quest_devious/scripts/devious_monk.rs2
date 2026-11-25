@@ -1,23 +1,62 @@
-// Devious Minds — hooded Monk (Paterdomus) start Talk-to.
-// CANDIDATE lines (OSRS Transcript:Devious Minds minus overlay / skill-toast).
-// First write %devious_main 0 -> 1. Chat + write only — no Entrana dest,
-// no orb, no Tiffy splice. Never write %devious_monk (1 = dead monk).
-// Review: Yes ~chatplayer. Bind visable 3075, not multi 3074.
-// Cite red-19-start-impl-377.md §13.
-
+// CANDIDATE dialogue: devious-minds.dlg.start-monk and .dlg.orb-loss.
 [opnpc1,devious_monk_hooded_visable]
-if (inv_total(inv, devious_bowsword) >= 1) {
-    @devious_monk_bowsword; // bow-sword handover (devious_monk_bowsword.rs2)
+if (%devious_main = ^devious_delivery) {
+    ~chatnpc("<p,neutral>You need to hurry or you'll miss the ceremony.");
+    if (inv_total(inv, devious_glowingorb) = 0 & inv_total(bank, devious_glowingorb) = 0 & inv_total(inv, devious_glowingpouch) = 0 & inv_total(bank, devious_glowingpouch) = 0) {
+        ~chatplayer("<p,neutral>Er... I lost the orb...");
+        ~chatnpc("<p,neutral>You what? Ah well, good thing I have a spare, be more careful this time.");
+        // UNKNOWN engineering: leave recovery available when the inventory is full.
+        if (inv_freespace(inv) = 0) {
+            mes("You need a free inventory space for the orb.");
+            return;
+        }
+        inv_add(inv, devious_glowingorb, 1);
+    }
     return;
 }
+if (%devious_main = ^devious_crafting) {
+    if (inv_total(inv, devious_bowsword) > 0) {
+        @devious_monk_bowsword;
+    }
+    ~devious_weapon_instructions;
+    return;
+}
+if (%devious_main ! 0) return;
+if (~devious_requirements = false) return;
 ~chatnpc("<p,neutral>Good day to you, adventurer.");
 ~chatplayer("<p,neutral>And to you. What brings you all the way out here?");
-~chatnpc("<p,neutral>I am on my return journey from the dark lands of Morytania.");
+~chatnpc("<p,neutral>I am on my return journey from the dark lands of Morytania. It would be remiss of me not to stop and take in the glory of Paterdomus before my return to Entrana.");
+~chatplayer("<p,neutral>Morytania? That's quite a dangerous place for a monk.");
+~chatnpc("<p,neutral>Indeed, but as a faithful servant of Saradomin, it is my duty to confront the taint of Zamorak, wherever it may be found. Violence is to be abhorred, but at times it is an unfortunate necessity.");
+~chatplayer("<p,neutral>I see. Well I'd better leave you to it.");
 ~chatnpc("<p,neutral>Before you depart, adventurer, I was wondering if you might be interested in helping me with something?");
 def_int $go = ~p_choice2("Of course. What do you need?", 1, "Sorry, but I'm busy right now.", 2);
 if ($go = 2) {
     ~chatplayer("<p,neutral>Sorry, but I'm busy right now.");
+    ~chatnpc("<p,neutral>Ah, well do come and see me if you change your mind.");
     return;
 }
 ~chatplayer("<p,neutral>Of course. What do you need?");
-%devious_main = 1;
+~chatnpc("<p,neutral>On my travels in Morytania, I encountered an individual from the lands to the far east. He spoke of a weapon from his homeland that I think would be very valuable in our fight against the darkness.");
+~chatnpc("<p,neutral>If you could help me build one of these weapons, you would be highly rewarded by the Church of Saradomin.");
+~chatplayer("<p,neutral>A new weapon? Interesting!");
+~devious_weapon_instructions;
+%devious_main = ^devious_crafting;
+~send_quest_progress(questlist:devious, %devious_main, ^devious_complete);
+
+[proc,devious_weapon_instructions]
+~chatnpc("<p,neutral>Yes, now pay attention. I need you to take a two- handed mithril sword and grind it down to a slender blade. I know of a dwarf living north of Falador whose whetstone is unmatchable. It will be perfect for this task.");
+~chatnpc("<p,neutral>Once the blade is flexible enough, you should then be able to string it with a normal bow string. That is all you need to do.");
+~chatplayer("<p,neutral>Alright, I'll be back once I have this weapon.");
+
+[proc,devious_requirements]()(boolean)
+// CANDIDATE requirements: retained article. UNKNOWN functional refusal wording.
+if (%wanted_main < ^wanted_complete | %troll_quest < ^troll_complete | %doricquest < ^doric_complete | %abyssal_miniquest < ^miniquest_abyssal_complete) {
+    mes("You must complete Wanted!, Troll Stronghold, Doric's Quest and Enter the Abyss before starting Devious Minds.");
+    return(false);
+}
+if (stat(smithing) < ^devious_smithing_level | stat(fletching) < ^devious_fletching_level | stat_base(runecraft) < ^devious_runecraft_level) {
+    mes("You need 65 Smithing, 50 Fletching and 50 Runecrafting to help the monk.");
+    return(false);
+}
+return(true);

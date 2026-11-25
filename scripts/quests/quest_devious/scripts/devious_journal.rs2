@@ -1,0 +1,14 @@
+// UNKNOWN functional journal wording, summarising the retained walkthrough.
+[if_button,questlist:devious]
+def_string $text;
+switch_int (%devious_main) {
+    case 0 : $text = "@dbl@Speak to the @dre@Monk@dbl@ outside @dre@Paterdomus@dbl@.|Requirements: Wanted!, Troll Stronghold, Doric's Quest, Enter the Abyss, 65 Smithing, 50 Fletching and 50 Runecrafting.";
+    case ^devious_crafting : $text = "@dbl@Use a @dre@mithril two-handed sword@dbl@ on @dre@Doric's whetstone@dbl@ north of Falador.|Attach a bow string to the slender blade and return the bow-sword to the Monk.|If I lose the blade or bow-sword, I can make another.";
+    case ^devious_delivery : $text = "@dbl@Put the Monk's orb in an empty, non-degraded @dre@large pouch@dbl@.|Enter the @dre@Law rift@dbl@ in the Abyss, leave the Law Altar and use the pouch on @dre@Entrana's church altar@dbl@.|If I lose the orb, the Monk can replace it.";
+    case ^devious_altar_used : $text = "@dbl@An assassin stole Entrana's relic! I should speak to the @dre@High Priest@dbl@.";
+    case ^devious_investigate : $text = "@dbl@The High Priest told me to investigate the @dre@Monk at Paterdomus@dbl@.";
+    case ^devious_body_searched : $text = "@dbl@I found a dead monk. I should return to the @dre@High Priest of Entrana@dbl@.";
+    case ^devious_tiffy_debrief : $text = "@dbl@I must report the theft to @dre@Sir Tiffy Cashien@dbl@ in @dre@Falador Park@dbl@.";
+    case default : $text = "@str@I reported the theft to Sir Tiffy.||@red@QUEST COMPLETE!";
+}
+~quest_journal("Devious Minds", $text);
