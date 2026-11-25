@@ -225,6 +225,15 @@ await run(async () => {
       for (let stat = 0; stat < 6; stat++) npc.levels[stat] = npc.baseLevels[stat] + 1;
       for (let tick = 0; tick < 16; tick++) npc.processRegen(); assert.deepEqual([...npc.levels], [...npc.baseLevels]);
     });
+    check('ordinary incoming player damage has no later flat-armour adjustment', () => {
+      const f = fixture(); owned(f); f.npc.teleport(f.player.x + 1, f.player.z, f.player.level);
+      for (const [name, value] of Object.entries({ tutorial: 1000, action_delay: 0, damagetype: 0, damagestyle: 0, com_stabattack: 100000, com_maxhit: 1 })) f.player.setVar(pv(name), value);
+      const result = observe(f, { draws: [0.999999, 0, 0.999999] }, '[label,player_melee_attack]');
+      assert.equal(random(result).at(-1).in[0], 1, 'one native inclusive 0–1 player magnitude');
+      assert.equal(f.npc.levels[3], 100, 'player attack queues rather than directly applies damage');
+      World.currentTick++; f.npc.turn(); f.player.processQueues();
+      assert.equal(f.npc.levels[3], 99, 'one rolled damage stays one damage; no later flat armour −2');
+    });
     check('ordinary owned player killing hit preserves Karil credit and second-player isolation', () => {
       const f = fixture(), other = otherPlayer(); owned(f); f.npc.teleport(f.player.x + 1, f.player.z, f.player.level);
       try {
