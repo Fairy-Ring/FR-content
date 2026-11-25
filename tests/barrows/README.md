@@ -119,6 +119,27 @@ a real second player's isolation, dead/lost targets, all-stat regeneration and
 owned kill credit. The manifest preserves every unlisted field and client byte;
 the NPC census admits Verac's native dispatch.
 
+## Dharok combat (BC-06)
+
+```sh
+node --import tsx ../content/tests/barrows/test_combat_dharok.mjs
+```
+
+Dharok keeps VERIFIED 100 Hitpoints. His later CANDIDATE fields use Slash,
+seven ticks and base maximum 29. Wretched Strength's existence is VERIFIED.
+The later CANDIDATE passive scales on every attack without a chance draw.
+The maximum reads current HP once and uses `floor((29*(200-HP)+50)/100)`.
+The final half-up rounding and living-only terminal rule are UNKNOWN engineering.
+It yields 29 at 100 HP, 30 at 98, 44 at 50 and the selected 58 at one HP.
+Ordinary Slash accuracy, protection, single-hit delivery and presentation remain.
+Regeneration 16 is UNKNOWN engineering and affects every native stat.
+
+The real-runner proof observes the magnitude bound at all 100 living HP values,
+checks protection at each, and compares seeded cursors with the ordinary seam.
+It covers wrong protection prayers, zero, miss, dead/lost targets, real second
+player isolation, regeneration's effect on scaling and ordinary owned kill credit.
+The vector gate preserves every unlisted field and all client bytes.
+
 ## Durable core (S01)
 
 Build the sibling engine packs, then run:

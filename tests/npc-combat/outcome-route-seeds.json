@@ -3,6 +3,15 @@
   "rng": "xorshift32",
   "routes": [
     {
+      "script": "[ai_opplayer2,barrows_dharok]",
+      "npc": "barrows_dharok",
+      "seeds": {
+        "miss": 2415085441,
+        "hit": 2654435769,
+        "zero": 1992887715
+      }
+    },
+    {
       "script": "[ai_opplayer2,barrows_verac]",
       "npc": "barrows_verac",
       "seeds": {

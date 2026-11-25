@@ -162,3 +162,8 @@
 // UNKNOWN engineering BARROWS_VERAC_UNCONDITIONAL_ACCURACY=SKIP_ACCURACY_DRAWS.
 // BC-00 policy 2 implements the selected BARROWS_VERAC_DEFENCE_POLICY directly.
 ^barrows_verac_unconditional_accuracy = 2
+
+// UNKNOWN engineering barrows.bc-dharok-rounding-order: ONE_FINAL_ROUND_HALF_UP.
+^barrows_dharok_round_half_up = 50
+// UNKNOWN engineering DHAROK_TERMINAL_POLICY=LIVING_HP_ONLY.
+^barrows_dharok_living_hp_min = 1

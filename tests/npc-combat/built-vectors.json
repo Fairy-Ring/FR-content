@@ -5812,6 +5812,48 @@
           }
         }
       }
+    },
+    {
+      "identity": { "debugname": "barrows_dharok", "id": 2026 },
+      "unit": "BC06",
+      "evidence": {
+        "facts": ["barrows.bc-dharok-skills", "barrows.bc-dharok-bonuses", "barrows.bc-dharok-attack", "barrows.bc-dharok-maxhit"],
+        "label": "CANDIDATE",
+        "researchCommit": "7ed369996b82ace4fe2062c5ef9875ed5e27af09",
+        "sources": [
+          { "id": "src.barrows-bc-osrs-history", "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce" },
+          { "id": "src.barrows-bc-oldschool-base-special-history", "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908" }
+        ]
+      },
+      "fields": {
+        "attack": { "value": 100 },
+        "strength": { "value": 100 },
+        "defence": { "value": 100 },
+        "magic": { "value": 1 },
+        "ranged": { "value": 1 },
+        "param:attackrate": { "value": 7 },
+        "param:damagetype": { "value": 1 },
+        "param:attackbonus": { "value": 0 },
+        "param:strengthbonus": { "value": 105 },
+        "param:magicattack": { "value": -58 },
+        "param:rangeattack": { "value": -18 },
+        "param:rangebonus": { "value": 0 },
+        "param:stabdefence": { "value": 252 },
+        "param:slashdefence": { "value": 250 },
+        "param:crushdefence": { "value": 244 },
+        "param:magicdefence": { "value": -11 },
+        "param:rangedefence": { "value": 249 },
+        "param:barrows_maxhit": { "value": 29 },
+        "regenrate": {
+          "value": 16,
+          "evidence": {
+            "facts": ["barrows.bc-regen-clock"],
+            "label": "UNKNOWN",
+            "researchCommit": "7ed369996b82ace4fe2062c5ef9875ed5e27af09",
+            "sources": []
+          }
+        }
+      }
     }
   ]
 }

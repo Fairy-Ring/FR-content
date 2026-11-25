@@ -81,6 +81,17 @@ if (random(^barrows_verac_proc_denominator) = 0) {
 // Policy 2 skips accuracy and protection. Roll 0..15, never clamp a 0..23 roll.
 ~npc_meleeattack_outcome($maxhit, $defence_policy, false);
 
+// VERIFIED Wretched Strength existence; CANDIDATE always-on missing-HP scaling.
+[ai_opplayer2,barrows_dharok] gosub(barrows_dharok_attack);
+
+[proc,barrows_dharok_attack]
+// Read current HP once. No chance draw, temporary stat change or second hit.
+def_int $hitpoints = npc_stat(hitpoints);
+if ($hitpoints < ^barrows_dharok_living_hp_min) return;
+if (~npc_default_attack_ready = false) return;
+def_int $maxhit = calc((npc_param(barrows_maxhit) * (200 - $hitpoints) + ^barrows_dharok_round_half_up) / 100);
+~npc_meleeattack_outcome($maxhit, 0, false);
+
 // Huntless defaults never initiate against a stranger. The native owner guard
 // ends pursuit; the timer latches release on WANDER without changing retaliation.
 [proc,barrows_owned_tunnel_guard]

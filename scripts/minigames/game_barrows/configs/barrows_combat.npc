@@ -30,10 +30,30 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=115
+// VERIFIED barrows.bc-dharok-hitpoints: period bestiary, unchanged 100 HP.
 hitpoints=100
 attack=100
 strength=100
 defence=100
+// CANDIDATE barrows.bc-dharok-skills, bonuses and attack: corrected Old School fields.
+magic=1
+ranged=1
+// UNKNOWN engineering barrows.bc-regen-clock: Q8 selects the native all-stat rate.
+regenrate=16
+param=attackrate,7
+param=damagetype,^slash_style
+param=attackbonus,0
+param=strengthbonus,105
+param=magicattack,-58
+param=rangeattack,-18
+param=rangebonus,0
+param=stabdefence,252
+param=slashdefence,250
+param=crushdefence,244
+param=magicdefence,-11
+param=rangedefence,249
+// CANDIDATE barrows.bc-dharok-maxhit: unscaled maximum, independent of Strength.
+param=barrows_maxhit,29
 
 [barrows_guthan]
 name=Guthan the Infested
