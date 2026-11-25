@@ -65,6 +65,22 @@ if ($damage <= 0 | npc_stat(hitpoints) >= npc_basestat(hitpoints)) return;
 // Native NpcOps.ts:300-301 clears heroes at base HP; brief ruling 1 keeps it.
 npc_statheal(hitpoints, $damage, 0);
 
+// VERIFIED armour bypass; CANDIDATE Q1 prayer bypass and one chance in four.
+[ai_opplayer2,barrows_verac] gosub(barrows_verac_attack);
+
+[proc,barrows_verac_attack]
+if (npc_stat(hitpoints) = 0) return;
+if (~npc_default_attack_ready = false) return;
+def_int $defence_policy = 0;
+def_int $maxhit = npc_param(barrows_maxhit);
+// UNKNOWN engineering order: one draw before accuracy, only on a ready attack.
+if (random(^barrows_verac_proc_denominator) = 0) {
+    $defence_policy = ^barrows_verac_unconditional_accuracy;
+    if (~check_protect_prayer(^melee_style) = true) $maxhit = ^barrows_verac_protected_maxhit;
+}
+// Policy 2 skips accuracy and protection. Roll 0..15, never clamp a 0..23 roll.
+~npc_meleeattack_outcome($maxhit, $defence_policy, false);
+
 // Huntless defaults never initiate against a stranger. The native owner guard
 // ends pursuit; the timer latches release on WANDER without changing retaliation.
 [proc,barrows_owned_tunnel_guard]

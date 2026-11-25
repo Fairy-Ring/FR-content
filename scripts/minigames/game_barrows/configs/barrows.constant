@@ -155,3 +155,10 @@
 
 // CANDIDATE barrows.bc-guthan-proc-chance: one draw after an accuracy hit.
 ^barrows_guthan_proc_denominator = 4
+
+// CANDIDATE barrows.bc-verac-proc-chance and bc-verac-later-protected-cap.
+^barrows_verac_proc_denominator = 4
+^barrows_verac_protected_maxhit = 15
+// UNKNOWN engineering BARROWS_VERAC_UNCONDITIONAL_ACCURACY=SKIP_ACCURACY_DRAWS.
+// BC-00 policy 2 implements the selected BARROWS_VERAC_DEFENCE_POLICY directly.
+^barrows_verac_unconditional_accuracy = 2

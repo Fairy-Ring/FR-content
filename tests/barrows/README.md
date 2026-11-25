@@ -98,6 +98,27 @@ Ordinary subsequent attacks record the owner again. The contrived pre-heal-impac
 and poison/recoil-only finish retains the native no-credit consequence. After
 removal an uncredited brother can be raised again without resetting the visit.
 
+## Verac combat (BC-05)
+
+```sh
+node --import tsx ../content/tests/barrows/test_combat_verac.mjs
+```
+
+Verac retains 100 Hitpoints and all authored presentation. His later CANDIDATE
+field group uses Stab, five ticks and an explicit maximum 23. Defiler draws once
+in four before accuracy. The operator-selected CANDIDATE effect ignores Defence,
+armour and prayer; native policy 2 skips both accuracy draws. Its magnitude is
+its own inclusive 0..15 roll under Protect from Melee, otherwise 0..23.
+Ordinary attacks use Stab accuracy and prayer blocks them entirely.
+The pre-draw order and unconditional-accuracy policy are UNKNOWN engineering.
+Native regeneration 16 applies to every stat. No effect asset or message is added.
+
+The real-runner suite checks the exact kept and removed params, RNG boundaries
+and cursors, all four prayer/effect cases, high Stab defence, one delivered hit,
+a real second player's isolation, dead/lost targets, all-stat regeneration and
+owned kill credit. The manifest preserves every unlisted field and client byte;
+the NPC census admits Verac's native dispatch.
+
 ## Durable core (S01)
 
 Build the sibling engine packs, then run:

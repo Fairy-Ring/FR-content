@@ -5768,6 +5768,50 @@
           }
         }
       }
+    },
+    {
+      "identity": { "debugname": "barrows_verac", "id": 2030 },
+      "unit": "BC05",
+      "evidence": {
+        "facts": ["barrows.bc-verac-skills", "barrows.bc-verac-bonuses", "barrows.bc-verac-attack", "barrows.bc-verac-maxhit"],
+        "label": "CANDIDATE",
+        "researchCommit": "fffa1066a8243f7101cb9f3de26842f6224e8f73",
+        "sources": [
+          { "id": "src.barrows-bc-osrs-history", "sha256": "8db8bca2fbebebaf20a33323026325a1b681757034c2876c4928f998874910ce" },
+          { "id": "src.barrows-bc-oldschool-base-special-history", "sha256": "398343dd72b89c34e36203e8a32799ef7f5d3ec85965165291e872c5e9434908" }
+        ]
+      },
+      "fields": {
+        "attack": { "value": 100 },
+        "strength": { "value": 100 },
+        "defence": { "value": 100 },
+        "magic": { "value": 1 },
+        "ranged": { "value": 1 },
+        "param:attackrate": { "value": 5 },
+        "param:damagetype": { "value": 0 },
+        "param:attackbonus": { "value": 0 },
+        "param:strengthbonus": { "value": 72 },
+        "param:magicattack": { "value": -42 },
+        "param:rangeattack": { "value": -14 },
+        "param:rangebonus": { "value": 0 },
+        "param:stabdefence": { "value": 227 },
+        "param:slashdefence": { "value": 230 },
+        "param:crushdefence": { "value": 221 },
+        "param:magicdefence": { "value": 0 },
+        "param:rangedefence": { "value": 225 },
+        "param:barrows_maxhit": { "value": 23 },
+        "param:stabattack": { "value": 0 },
+        "param:crushattack": { "value": 0 },
+        "regenrate": {
+          "value": 16,
+          "evidence": {
+            "facts": ["barrows.bc-regen-clock"],
+            "label": "UNKNOWN",
+            "researchCommit": "fffa1066a8243f7101cb9f3de26842f6224e8f73",
+            "sources": []
+          }
+        }
+      }
     }
   ]
 }

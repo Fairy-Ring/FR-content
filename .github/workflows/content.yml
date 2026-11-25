@@ -193,6 +193,7 @@ jobs:
           run_test tests/barrows/test_combat_tunnels.mjs node --import tsx ../content/tests/barrows/test_combat_tunnels.mjs
           run_test tests/barrows/test_combat_torag.mjs node --import tsx ../content/tests/barrows/test_combat_torag.mjs
           run_test tests/barrows/test_combat_guthan.mjs node --import tsx ../content/tests/barrows/test_combat_guthan.mjs
+          run_test tests/barrows/test_combat_verac.mjs node --import tsx ../content/tests/barrows/test_combat_verac.mjs
           run_test tests/barrows/test_core.mjs node --import tsx ../content/tests/barrows/test_core.mjs
           run_test tests/barrows/test_entry.mjs node --import tsx ../content/tests/barrows/test_entry.mjs
           run_test tests/barrows/test_owned.mjs node --import tsx ../content/tests/barrows/test_owned.mjs

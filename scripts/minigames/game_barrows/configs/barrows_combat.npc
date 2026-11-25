@@ -143,15 +143,19 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=115
+// CANDIDATE operator Q2: keep later/current HP; period 98 remains a conflict.
 hitpoints=100
 attack=100
 strength=100
 defence=100
+// CANDIDATE barrows.bc-verac-skills, bc-verac-bonuses and bc-verac-attack.
 magic=1
 ranged=1
+// UNKNOWN engineering barrows.bc-regen-clock; Q8 selects the native all-stat rate.
+regenrate=16
 param=attackrate,5
-param=stabattack,68
-param=crushattack,82
+param=attackbonus,0
+param=rangebonus,0
 param=magicattack,-42
 param=rangeattack,-14
 param=stabdefence,227
@@ -160,7 +164,9 @@ param=crushdefence,221
 param=magicdefence,0
 param=rangedefence,225
 param=strengthbonus,72
-param=damagetype,^crush_style
+param=damagetype,^stab_style
+// CANDIDATE barrows.bc-verac-maxhit: explicit cap, independent of Strength.
+param=barrows_maxhit,23
 param=attack_anim,barrow_dharok_crush
 param=defend_anim,human_axe_block
 param=attack_sound,verac_attack
