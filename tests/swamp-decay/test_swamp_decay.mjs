@@ -240,6 +240,12 @@ console.log('PASS external banks excluded and gate, route arrivals and all four 
     'no outside-reachable tile is inside the compiled decay bound');
   assert.deepEqual(inside.tiles.filter(([x, z]) => inSquares(x, z) && !inArea(x, z) && !protectedGrotto(x, z)), [],
     'no swamp-reachable tile of the four squares is outside the compiled bound and grotto protection');
+  const gateStart = insideStarts.find(([label]) => label === 'inside the gate');
+  assert(gateStart, 'gate-side flood start is present');
+  const gateToBoat = flood([gateStart], (x, z) => inside.seen.has(key(x, z)));
+  assert(gateToBoat.seen.has(key(3498, 3380)),
+    'gate-side swamp component reaches Mortton boat arrival on foot');
+  console.log(`PASS packed gate-to-boat flood: ${gateToBoat.tiles.length} walkable swamp tiles`);
   console.log('PASS packed collision floods: outside inclusion and inside omission sets are empty; every start is walkable');
 }
 
