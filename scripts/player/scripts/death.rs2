@@ -84,6 +84,7 @@ p_stopaction;
 healenergy(10000);
 ~clear_pk_skull;
 ~clear_poison;
+~deal_disease_clear;
 ~update_all($prev_wep);
 ~initalltabs;
 ~player_end_poison;

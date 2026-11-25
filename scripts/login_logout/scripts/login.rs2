@@ -67,6 +67,7 @@ if (~champions_current > 0 | ~champions_scroll_escrow = 1 | ~champions_in_arena 
 // logging out when posioned would continue to poison you after logging back in in 2006
 // https://forum.tip.it/topic/76167-poison-effect-on-f2p/
 ~set_poison_login;
+~deal_status_login;
 // update weight-reduction equipment (in the case where you switch from f2p <-> p2p)
 ~update_weight_equipment;
 ~ferment_wines_login;
