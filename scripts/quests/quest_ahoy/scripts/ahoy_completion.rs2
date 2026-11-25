@@ -174,5 +174,5 @@ if (%ahoy_questvar = 0) {
 } else if (%ahoy_questvar = 7) {
     ~quest_journal("Ghosts Ahoy", "Necrovarus freed the ghosts. I should return to Velorina.");
 } else {
-    ~quest_journal("Ghosts Ahoy", "@gre@QUEST COMPLETE!<br>I freed the ghosts and received an Ectophial, 2 Quest Points and 2,400 Prayer experience.");
+    ~quest_journal("Ghosts Ahoy", "@gre@QUEST COMPLETE! I freed the ghosts and received an Ectophial, 2 Quest Points and 2,400 Prayer experience.");
 }

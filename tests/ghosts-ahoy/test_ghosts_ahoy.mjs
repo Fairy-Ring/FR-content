@@ -17,6 +17,7 @@ const { NpcStat } = await engineModule('engine/entity/NpcStat.ts');
 const Environment = (await engineModule('util/Environment.ts')).default;
 assert.equal(Environment.NODE_XPRATE, 1, 'exact reward XP requires NODE_XPRATE=1');
 const JavaRandom = (await engineModule('util/JavaRandom.ts')).default;
+const IfSetText = (await engineModule('network/game/server/model/IfSetText.ts')).default;
 const CloseModal = (await engineModule('network/game/client/model/CloseModal.ts')).default;
 const closeHandler = new (await engineModule('network/game/client/handler/CloseModalHandler.ts')).default();
 const OpLoc = (await engineModule('network/game/client/model/OpLoc.ts')).default;
@@ -272,6 +273,9 @@ for (const [level, x] of [[0, 3684], [1, 3672], [2, 3689]]) {
   assert.equal(q.stats[PlayerStat.PRAYER], completedXp);
   button(q, 'questlist:ahoy'); finish(q);
   assert.notEqual(q.modalMain, -1, 'completed quest journal opens through the real button');
+  const journalText = q.packets.filter(packet => packet instanceof IfSetText && types.Component.get(packet.component).rootLayer === id('Component', 'questjournal')).map(packet => packet.text).join(' ');
+  assert.match(journalText, /QUEST COMPLETE!/, 'completed journal retains its completion heading');
+  assert.doesNotMatch(journalText, /<br>/, 'legacy journal text contains no literal HTML line-break marker');
 }
 // Four naturally played wins produce the signed bow, rather than a seeded debt.
 JavaRandom.setSeed(1);
