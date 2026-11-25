@@ -140,6 +140,32 @@ It covers wrong protection prayers, zero, miss, dead/lost targets, real second
 player isolation, regeneration's effect on scaling and ordinary owned kill credit.
 The vector gate preserves every unlisted field and all client bytes.
 
+## Karil combat (BC-07)
+
+```sh
+node --import tsx ../content/tests/barrows/test_combat_karil.mjs
+```
+
+Karil uses the native NPC ranged route at every distance, including adjacency.
+His CANDIDATE later fields use a 4-tick attack, maximum 20 and reach 8. The reach
+is the operator-approved Old School player crossbow range, not a period NPC
+measurement. His 100 Hitpoints remain the operator's CANDIDATE choice.
+The native projectile lasts `32 + 5 * distance` client cycles; damage,
+retaliation and Tainted Shot share `floor(duration / 30)` delivery ticks.
+
+Protect from Missiles blocks all damage. An accuracy hit, including a rolled
+zero or prayer-blocked hit, still gets one CANDIDATE 1-in-4 special draw.
+Tainted Shot uses the native base-level drain: subtract `floor(base Agility / 5)`
+from current Agility, clamped at zero. It follows the native damage and
+retaliation queues, with no message or effect asset. Regeneration 16 remains
+UNKNOWN engineering and restores all native NPC stats.
+
+The config-derived start-mode helper selects AP for ranged or magic and OP
+otherwise. Crypt, door and chest encounters share it; the existing four melee
+brothers and ordinary tunnel types retain their modes. BC-08 needs only Ahrim's
+magic style, attack/AP bridge and own native AP retaliation binding.
+The original client bytes, owned timer/death and kill credit remain unchanged.
+
 ## Durable core (S01)
 
 Build the sibling engine packs, then run:

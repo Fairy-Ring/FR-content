@@ -106,10 +106,40 @@ ambient=50
 contrast=50
 alwaysontop=yes
 vislevel=98
+// CANDIDATE operator Q2: retain 100 HP despite the period-guide conflict.
 hitpoints=100
 attack=1
 strength=1
 defence=100
+// CANDIDATE barrows.bc-karil-skills/bonuses/attack: later Old School fields.
+magic=1
+ranged=100
+// UNKNOWN engineering BARROWS_BROTHER_REGEN_TICKS=16; Q8 applies to every stat.
+regenrate=16
+// CANDIDATE operator Q5: Old School player crossbow range, without longrange +2.
+attackrange=^barrows_karil_reach_tiles
+param=attackrate,4
+param=damagetype,^ranged_style
+param=attackbonus,0
+param=strengthbonus,0
+param=magicattack,-26
+param=rangeattack,134
+param=rangebonus,55
+param=stabdefence,79
+param=slashdefence,71
+param=crushdefence,90
+param=magicdefence,106
+param=rangedefence,100
+// CANDIDATE barrows.bc-karil-maxhit: explicit later maximum, not fitted Strength.
+param=barrows_maxhit,20
+// CANDIDATE operator presentation choice: compatible period repeating-crossbow seq.
+param=attack_anim,barrows_repeating_crossbow_fire
+// CANDIDATE operator presentation choice: period brother-named launch synth.
+param=rangeattack_sound,karil_attack
+// CANDIDATE operator presentation choice: generic bolt launch, not rack-specific.
+param=proj_launch,crossbowbolt_launch
+// CANDIDATE operator presentation choice: generic bolt travel, not rack-specific.
+param=proj_travel,crossbowbolt_travel
 
 [barrows_torag]
 name=Torag the Corrupted

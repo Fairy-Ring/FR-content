@@ -167,3 +167,10 @@
 ^barrows_dharok_round_half_up = 50
 // UNKNOWN engineering DHAROK_TERMINAL_POLICY=LIVING_HP_ONLY.
 ^barrows_dharok_living_hp_min = 1
+
+// CANDIDATE operator Q5: Old School player crossbow range, not a period NPC measure.
+^barrows_karil_reach_tiles = 8
+// CANDIDATE barrows.bc-karil-proc-chance: one draw after an accuracy hit.
+^barrows_karil_proc_denominator = 4
+// VERIFIED period Tainted Shot amount; native stat_sub uses the base level.
+^barrows_karil_agility_percent = 20

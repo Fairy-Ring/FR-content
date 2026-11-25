@@ -100,6 +100,32 @@ if (~npc_default_attack_ready = false) return;
 def_int $maxhit = calc((npc_param(barrows_maxhit) * (200 - $hitpoints) + ^barrows_dharok_round_half_up) / 100);
 ~npc_meleeattack_outcome($maxhit, 0, false);
 
+// VERIFIED Tainted Shot existence/amount; CANDIDATE protected-zero and 1-in-4.
+[ai_opplayer2,barrows_karil] npc_setmode(applayer2);
+[ai_applayer2,barrows_karil] gosub(barrows_karil_attack);
+[ai_queue1,barrows_karil] ~npc_default_retaliate_ap;
+
+[proc,barrows_karil_attack]
+if (npc_stat(hitpoints) = 0 | %death = ^true) return;
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $delivery_ticks;
+$attempted, $accuracy, $rolled, $delivered, $delivery_ticks = ~npc_rangeattack_outcome(npc_param(barrows_maxhit), true, false);
+if ($attempted = true & $accuracy = ^barrows_special_success_policy) {
+    if (random(^barrows_karil_proc_denominator) = 0) {
+        // Append after the native damage and retaliation at their delivery tick.
+        queue*(barrows_karil_tainted_shot, $delivery_ticks)(npc_uid);
+    }
+}
+
+[queue,barrows_karil_tainted_shot](npc_uid $source)
+if (%death = ^true | stat(hitpoints) = 0) return;
+if (npc_finduid($source) = false) return;
+if (npc_stat(hitpoints) = 0 | %npc_attacking_uid ! uid) return;
+stat_sub(agility, 0, ^barrows_karil_agility_percent);
+
 // Huntless defaults never initiate against a stranger. The native owner guard
 // ends pursuit; the timer latches release on WANDER without changing retaliation.
 [proc,barrows_owned_tunnel_guard]
