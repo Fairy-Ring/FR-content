@@ -83,7 +83,9 @@ await check('all original portal dispatchers enforce hat and level gates, then n
     const target=World.getLoc(x,z,0,id('LocType',name));assert(target,`original ${name} map target`);
     const p=player({x,z:z-1});finish(p,R.trigger(p,'OPLOC1',target));assert.equal(p.z,z-1,'no hat: no entry');
     give(p,'magictraining_proghat_dull');p.levels[6]=level-1;finish(p,R.trigger(p,'OPLOC1',target));assert.equal(p.z,z-1,'insufficient Magic: no entry');
-    p.levels[6]=99;finish(p,R.trigger(p,'OPLOC1',target));let state=run(p,'[proc,mta_room]');assert.equal(state.intStack[state.isp-1],room);
+    p.levels[6]=99;if(room===1)p.setVar(id('VarPlayerType','varp625_bits'),3);
+    finish(p,R.trigger(p,'OPLOC1',target));let state=run(p,'[proc,mta_room]');assert.equal(state.intStack[state.isp-1],room);
+    if(room===1)assert.equal(p.packets.filter(packet=>packet?.component===id('Component','pizazz_telekinetic:com_5')&&packet.constructor?.name==='IfSetText').at(-1)?.text,'3','native Telekinetic entry shows the saved streak instead of the cache placeholder');
     const exit=World.getLoc(ex,ez,el,id('LocType','exit_teleport'));assert(exit,`original room ${room} exit`);
     finish(p,R.trigger(p,'OPLOC1',exit));assert.deepEqual([p.x,p.z,p.level],[3363,3314,0]);assert.deepEqual(balances(p),[0,0,0,0]);
   }

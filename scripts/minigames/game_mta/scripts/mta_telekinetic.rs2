@@ -117,7 +117,11 @@ if (getbit_range(%varp624_bits, 18, 18) = 1) {
 %varp624_bits = 0;
 
 [proc,mta_telekinetic_hud]
-if (~mta_room() = 1) if_settext(pizazz_telekinetic:com_3, "<tostring(%mta_telekinetic_points)>");
+if (~mta_room() = 1) {
+    if_settext(pizazz_telekinetic:com_3, "<tostring(%mta_telekinetic_points)>");
+    // UNKNOWN engineering: show the saved five-maze streak; lifetime-counter semantics are not sourced.
+    if_settext(pizazz_telekinetic:com_5, "<tostring(getbit_range(%varp625_bits, 0, 2))>");
+}
 
 // The original Telekinetic Grab handler calls this before ordinary pickup logic.
 [proc,mta_telekinetic_cast]()(boolean)

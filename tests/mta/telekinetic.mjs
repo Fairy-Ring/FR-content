@@ -22,6 +22,8 @@ export default async function testTelekinetic(R) {
   ];
   const wallet=p=>p.getVar(teleWallet);
   const streak=p=>p.getVar(streakVarp)&7;
+  const solvedComponent=id('Component','pizazz_telekinetic:com_5');
+  const solvedText=p=>p.packets.filter(packet=>packet?.component===solvedComponent&&packet.constructor?.name==='IfSetText').at(-1)?.text??null;
   let scenarios=0;
 
   function finish(p,state){
@@ -174,6 +176,7 @@ export default async function testTelekinetic(R) {
       castFrom(p,route.standpoints[i]);
       if(same(expected,route.goal)){
         assert.equal(p.getVarBit(mazeSolved),1,'only the goal landing completes the maze');
+        assert.equal(solvedText(p),String(streak(p)),'solving a maze refreshes the displayed saved streak, including the fifth-maze reset');
         assert.equal(wallet(p),before+reward,'a completed maze awards its base points and any streak bonus');
         assert.equal(statueAt(p,from),null,'solving removes the player-owned statue');
         assert.equal(intResult(p,'[proc,mta_telekinetic_layout]'),route.layout,'a successful cast does not auto-advance the layout');
