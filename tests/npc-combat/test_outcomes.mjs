@@ -70,7 +70,7 @@ try {
   const namedProcs = new Set(inventory.scripts.map(s => s.name));
   check('no published caller opts into outcomes', () => {
     for (const [caller, targets] of inventory.edges) for (const target of targets) {
-      if (target.endsWith('_outcome]')) assert((caller.startsWith('[proc,npc_') && inventory.scripts.find(s => s.name === caller).info.sourceFilePath.startsWith('scripts/skill_combat/scripts/npc/')) || caller === '[proc,barrows_skeleton_attack]' || caller === '[proc,barrows_torag_attack]' || caller === '[proc,barrows_guthan_attack]' || caller === '[proc,barrows_verac_attack]' || caller === '[proc,barrows_dharok_attack]', caller);
+      if (target.endsWith('_outcome]')) assert((caller.startsWith('[proc,npc_') && inventory.scripts.find(s => s.name === caller).info.sourceFilePath.startsWith('scripts/skill_combat/scripts/npc/')) || caller === '[proc,barrows_skeleton_attack]' || caller === '[proc,barrows_torag_attack]' || caller === '[proc,barrows_guthan_attack]' || caller === '[proc,barrows_verac_attack]' || caller === '[proc,barrows_dharok_attack]' || caller === '[proc,barrows_karil_attack]', caller);
     }
     for (const name of ['npc_meleeattack_outcome', 'npc_default_attack_outcome', 'npc_rangeattack_outcome', 'npc_cast_spell_outcome']) assert(namedProcs.has(`[proc,${name}]`), name);
   });
