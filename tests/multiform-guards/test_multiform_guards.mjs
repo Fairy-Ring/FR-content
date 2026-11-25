@@ -34,9 +34,10 @@ const specs = [
   { name: 'rift-roped', parent: 'soulbane_falloff2_rope_multi', child: 'soulbane_falloff2_rope', state: 1, stage: 1 },
   { name: 'plinth-placed', parent: 'elid_statuette_multiloc', child: 'elid_statuette_placed', state: 60, item: 'elid_statuette', refused: true },
   ...[0, 10, 20, 25, 27, 30, 35, 40, 50, 55].map(state => ({ name: `plinth-base-${state}`, parent: 'elid_statuette_multiloc', child: 'elid_statuette_base', state, item: 'elid_statuette', gated: state < 50, nextState: 60 })),
-  { name: 'altar-pouch', parent: 'devious_altar', child: 'devious_altar_pouch', state: 1, item: 'devious_glowingpouch', refused: true },
-  { name: 'altar-scorched', parent: 'devious_altar', child: 'devious_altar_scorched', state: 2, item: 'devious_glowingpouch', refused: true },
-  { name: 'altar-empty', parent: 'devious_altar', child: 'altar', state: 0, item: 'devious_glowingpouch', nextState: 1 }
+  // Devious fixtures are unstarted-stage refusals; its quest test covers delivery.
+  { name: 'altar-pouch', parent: 'devious_altar', child: 'devious_altar_pouch', state: 1, item: 'devious_glowingpouch', refused: true, handler: '[oplocu,devious_altar_pouch]' },
+  { name: 'altar-scorched', parent: 'devious_altar', child: 'devious_altar_scorched', state: 2, item: 'devious_glowingpouch', refused: true, handler: '[oplocu,devious_altar_scorched]' },
+  { name: 'altar-empty', parent: 'devious_altar', child: 'altar', state: 0, item: 'devious_glowingpouch', refused: true, handler: '[oplocu,altar]' }
 ];
 assert(!selectedCase || [...specs.map(s => s.name), ...extraCases].includes(selectedCase), 'unknown case');
 for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) {
@@ -92,10 +93,11 @@ for (const spec of specs.filter(s => !selectedCase || s.name === selectedCase)) 
   assert.equal(p.target, entity);
   assert(p.validateTarget());
   const selected = p.getOpTrigger()?.name ?? null;
-  // The published engine selects no handler for refused forms. The repaired
-  // engine selects the guarded parent. Assert identical player outcomes below.
+  // Unimplemented children may use the guarded parent; implemented children
+  // declare their own visible-form handler in the fixture.
   if (!spec.refused) assert(selected, 'working child-bound handler');
   if (spec.refused && spec.stage === 0) assert.equal(selected, '[oploc1,soulbane_falloff2_rope]', 'unstarted quest reaches the native roped-rift gate');
+  else if (spec.handler) assert.equal(selected, spec.handler, 'visible-form guarded handler selected');
   else if (spec.refused) dispatchPath(selected, `[${spec.item ? 'oplocu' : 'oploc1'},${spec.parent}]`);
   let reached = false;
   for (let i = 0; i < 3 && !reached; i++) reached = p.tryInteract(true);
