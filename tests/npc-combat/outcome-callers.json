@@ -9,6 +9,7 @@
       "[ai_applayer2,regicide_tyras_camp_guard]",
       "[ai_applayer2,regicide_tyras_guard]",
       "[ai_opplayer2,_dagannoth_mother]",
+      "[ai_opplayer2,_dwarfrock_avatar]",
       "[ai_opplayer2,_slayer_basilisk]",
       "[ai_opplayer2,chaos_druid]",
       "[ai_opplayer2,chaosmonk1]",
@@ -61,6 +62,7 @@
     ],
     "npc_rangeattack": [
       "[ai_applayer2,_death_archer]",
+      "[ai_applayer2,_dwarfrock_avatar]",
       "[ai_applayer2,ardougne_archer]",
       "[ai_applayer2,browclothedgnome]",
       "[ai_applayer2,d_skingnomeknight]",
@@ -111,6 +113,7 @@
       "[proc,necro_attack]"
     ],
     "npc_cast_spell_with_forced_max_hit": [
+      "[ai_applayer2,_dwarfrock_avatar]",
       "[ai_applayer2,_slayer_infernalmage]",
       "[ai_applayer2,dungeon_dagganoth_magic_monster]",
       "[ai_applayer2,dungeon_dagganoth_magic_monster_deeper]",

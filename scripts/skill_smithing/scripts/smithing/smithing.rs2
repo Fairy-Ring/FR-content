@@ -56,6 +56,13 @@ if (%tutorial < ^tutorial_complete) {
     }
 }
 
+if (last_useitem = gold_bar & %dwarfrock_quest >= 40) {
+    if (%legendsquest >= ^legends_asked_gujuo_holy_water) {
+        // UNKNOWN functional choice: neither quest recipe pre-empts the other.
+        if (~p_choice2("Gold helmet", 1, "Golden bowl", 2) = 2) @make_golden_bowl;
+    }
+    @dwarfrock_smith_helmet;
+}
 if (last_useitem = gold_bar & %legendsquest >= ^legends_asked_gujuo_holy_water) @make_golden_bowl;
 else if (oc_category(last_useitem) = category_151) @smithing_anvil_interface(last_useitem);
 else if (last_useitem = dragonshield_a | last_useitem = dragonshield_b) @make_dragon_sq;
