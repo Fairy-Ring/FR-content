@@ -1,0 +1,37 @@
+// VERIFIED Tip.It 2 May 2006: wind clears furnace, fire melts fountain,
+// Crumble Undead frees the Boneguard. Numeric stages/messages are UNKNOWN.
+[proc,enakh_puzzle_spell](int $spell)(boolean)
+// Unrelated NPCs must retain the entire existing combat path.
+if (npc_type ! enakh_dummy_fountain & npc_type ! enakh_dummy_furnace & npc_type ! enakh_boneguard) return(false);
+if (%enakh_quest < 10) return(true);
+if (map_clock < %action_delay) return(true);
+def_boolean $matches = false;
+if (npc_type = enakh_dummy_fountain) {
+    if ($spell = ^fire_strike | $spell = ^fire_bolt | $spell = ^fire_blast | $spell = ^fire_wave) $matches = true;
+} else if (npc_type = enakh_dummy_furnace) {
+    if ($spell = ^wind_strike | $spell = ^wind_bolt | $spell = ^wind_blast | $spell = ^wind_wave) $matches = true;
+} else {
+    if ($spell = ^crumble_undead & %enakh_quest >= 30 & %enakh_quest < 50) $matches = true;
+}
+if ($matches = false) { mes("That spell does not affect this obstacle."); return(true); }
+def_dbrow $data = ~get_spell_data($spell);
+if (~combat_spellbook_allowed($data) = false) return(true);
+if (~check_spell_requirements($data) = false) return(true);
+p_stopaction;
+def_int $duration = ~pvm_spell_cast($data);
+spotanim_npc(db_getfield($data, magic_spell_table:spotanim_target, 0), $duration);
+if (npc_type = enakh_dummy_fountain) {
+    %enakh_ice_room = 1;
+    mes("The ice melts and the fountain flows again.");
+    ~enakh_barrier_progress;
+} else if (npc_type = enakh_dummy_furnace) {
+    %enakh_smoke_room = 1;
+    mes("The wind clears the blocked furnace.");
+    ~enakh_barrier_progress;
+} else {
+    // Original cached multi selects a bone pile at 50, not at 40.
+    %enakh_quest = 50;
+    %enakh_player_seen_boneguard = 1;
+    mes("The boneguard crumbles, releasing the trapped spirit.");
+}
+return(true);

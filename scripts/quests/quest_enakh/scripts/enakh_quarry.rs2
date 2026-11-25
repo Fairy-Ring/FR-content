@@ -1,0 +1,73 @@
+// Enakhra quarry tools and granite carving.
+// VERIFIED cache: original loc 11097 is enakh_mining_stone, with Take-axe.
+// The published mining dispatcher owns rocks_10946-10949. Do not bind them here.
+// UNKNOWN head-choice mapping: values 0-3 select Lazim, Zamorak, Icthlarin, camel.
+// VERIFIED period process: chisel the selected granite head; temple camel head uses 5 kg.
+
+[oploc1,enakh_mining_stone]
+if (%enakh_quest ! 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, bronze_pickaxe) > 0 | inv_getobj(worn, ^wearpos_rhand) = bronze_pickaxe) {
+    mes("You already have a bronze pickaxe.");
+    return;
+}
+if (inv_freespace(inv) < 1) {
+    mes("You need inventory space to take the pickaxe.");
+    return;
+}
+inv_add(inv, bronze_pickaxe, 1);
+mes("You take the bronze pickaxe from the rock.");
+return;
+
+// Bind stone item targets, not [opheldu,chisel], so gem cutting stays unchanged.
+[opheldu,enakh_granite_tiny] @enakh_granite_chisel(enakh_granite_tiny);
+[opheldu,enakh_granite_small] @enakh_granite_chisel(enakh_granite_small);
+[opheldu,enakh_granite_medium] @enakh_granite_chisel(enakh_granite_medium);
+
+[label,enakh_granite_chisel](obj $granite)
+if (last_useitem ! chisel & last_useitem ! enakh_chisel) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, last_useitem) < 1 | inv_total(inv, $granite) < 1) {
+    return;
+}
+
+// Carrying the mould selects its temple recipe before the surface-head recipe.
+if (inv_total(inv, enakh_camel_mould_positive) > 0) {
+    if (%enakh_quest ! 10) {
+        ~displaymessage(^dm_default);
+        return;
+    }
+    if ($granite ! enakh_granite_medium) {
+        mes("The mould needs a 5 kg piece of granite.");
+        return;
+    }
+    anim(enakh_player_chisel, 0);
+    sound_synth(chisel, 1, 0);
+    inv_del(inv, $granite, 1);
+    inv_add(inv, enakh_stone_head_akthanakos, 1);
+    mes("You chisel a camel head from the granite.");
+    return;
+}
+
+if (%enakh_quest ! 1 | %enakh_statue_multivar ! 3) {
+    ~displaymessage(^dm_default);
+    return;
+}
+def_namedobj $head = enakh_statue_head_lazim;
+if (%enakh_choose_statue_head = 1) {
+    $head = enakh_statue_head_zamorak;
+} else if (%enakh_choose_statue_head = 2) {
+    $head = enakh_statue_head_icthlarin;
+} else if (%enakh_choose_statue_head = 3) {
+    $head = enakh_statue_head_camel;
+}
+anim(enakh_player_chisel, 0);
+sound_synth(chisel, 1, 0);
+inv_del(inv, $granite, 1);
+inv_add(inv, $head, 1);
+mes("You chisel the granite into the head chosen for the statue.");
+return;
