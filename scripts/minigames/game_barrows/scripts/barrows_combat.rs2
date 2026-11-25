@@ -6,6 +6,39 @@
 [proc,barrows_skeleton_attack]
 ~npc_default_attack_outcome(npc_param(barrows_maxhit), 0, false);
 
+// VERIFIED barrows.bc-torag-special-existence; CANDIDATE protected-zero and 1-in-4.
+[ai_opplayer2,barrows_torag] gosub(barrows_torag_attack);
+
+[proc,barrows_torag_attack]
+if (npc_stat(hitpoints) = 0) return;
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $delivery_ticks;
+$attempted, $accuracy, $rolled, $delivered, $delivery_ticks = ~npc_default_attack_outcome(npc_param(barrows_maxhit), 0, true);
+if ($attempted = true & $accuracy = ^barrows_special_success_policy) {
+    if (random(^barrows_torag_proc_denominator) = 0) {
+        queue*(barrows_torag_corruption, ^barrows_special_delivery_order)(npc_uid);
+    }
+}
+
+[queue,barrows_torag_corruption](npc_uid $source)
+if (%death = ^true | stat(hitpoints) = 0) return;
+if (npc_finduid($source) = false) return;
+if (npc_stat(hitpoints) = 0 | %npc_attacking_uid ! uid) return;
+def_int $energy = runenergy;
+~barrows_torag_energy_change(calc($energy * ^barrows_torag_energy_remainder_percent / 100 - $energy));
+
+[proc,barrows_torag_energy_change](int $change)
+// PlayerOps.ts:1162 rejects script null -1. Only energy 1..5 needs it; +1 cannot clamp.
+if ($change = -1) {
+    healenergy(1);
+    healenergy(-2);
+} else {
+    healenergy($change);
+}
+
 // Huntless defaults never initiate against a stranger. The native owner guard
 // ends pursuit; the timer latches release on WANDER without changing retaliation.
 [proc,barrows_owned_tunnel_guard]

@@ -50,6 +50,31 @@ Acceptance only: `--base-pack BASE_PACK` compares the two named owned lifetimes 
 
 Combat animations and sounds follow the operator's rule of 16 November: a compatible published donor first (witchrat's rat_death, giantrat, spider and giantspider1; dragonslayer_skeleton shares the tunnel skeletons' first model and supplies sounds only), otherwise the type's own family (the bloodworm's sequences and the crypt rat's attack/block and remaining sounds). These server bindings are Lost City reconstructions, not original cache metadata. The config suite checks each binding, its donor or own-family prefix, the frame base against the type's walk/ready, and the model's moved labels. Skeleton_* sequences do not share the tunnel skeletons' human base; no published type supplies a bloodworm donor; human defaults move labels the crypt rat lacks. Client config bytes remain unchanged.
 
+## Torag combat (BC-03)
+
+```sh
+node --import tsx ../content/tests/barrows/test_combat_torag.mjs
+```
+
+Torag uses the published native outcome seam, Crush, five ticks and an explicit
+CANDIDATE maximum 25 independent of Strength 100 and bonus 72. Corruption's
+existence is VERIFIED. Its later CANDIDATE rule is one chance in four on accuracy
+success, including protected zero. Rolled-zero admission and queue/integer orders
+are UNKNOWN engineering. The effect follows the single native melee delivery and
+keeps floor(current engine energy × 80 / 100), with no message or special asset.
+The operator's selected `regenrate=16` is UNKNOWN engineering and affects every
+stat through the native clock. No Hitpoints or client-cache field changes.
+
+The compiled suite covers exact fields, native RNG cursors, proc boundaries,
+miss/zero/protection, engine-unit edge cases, queue order, target loss and death,
+another-player isolation, all-stat regeneration and genuine owned kill credit.
+The full NPC census separately includes Torag's dispatch at each distance class.
+
+The local energy-change proc handles the engine's reserved null amount `-1`
+without changing the shared handler. At current energy 1 through 5, it adds 1
+then subtracts 2; the addition cannot reach the 10000-unit clamp. Every other
+change, including zero, uses one ordinary `healenergy` call.
+
 ## Durable core (S01)
 
 Build the sibling engine packs, then run:

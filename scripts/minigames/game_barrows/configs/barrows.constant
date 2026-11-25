@@ -140,3 +140,15 @@
 ^barrows_collapse_shake_random = 5
 ^barrows_collapse_shake_amplitude = 0
 ^barrows_collapse_shake_rate = 0
+
+// CANDIDATE barrows.bc-torag-proc-chance and bc-torag-energy-r4-selection.
+^barrows_torag_proc_denominator = 4
+^barrows_torag_energy_remainder_percent = 80
+// UNKNOWN engineering barrows.bc-special-miss-rolled-zero-gate: includes rolled zero.
+^barrows_special_success_policy = 1
+// UNKNOWN engineering barrows.bc-drain-integer-order: current energy, one final floor.
+^torag_drain_order = "current_energy_floor_final_remainder"
+// UNKNOWN engineering barrows.bc-special-rng-order: native accuracy/magnitude, then proc.
+^barrows_special_rng_order = "native_accuracy_magnitude_then_proc"
+// UNKNOWN engineering barrows.bc-special-rng-order: append after native melee queues.
+^barrows_special_delivery_order = 0

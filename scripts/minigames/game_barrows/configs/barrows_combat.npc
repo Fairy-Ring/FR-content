@@ -92,6 +92,25 @@ hitpoints=100
 attack=100
 strength=100
 defence=100
+// CANDIDATE barrows.bc-torag-skills/bonuses/attack: corrected Old School fields.
+magic=1
+ranged=1
+// UNKNOWN engineering BARROWS_BROTHER_REGEN_TICKS=16; Q8 applies to every stat.
+regenrate=16
+param=attackrate,5
+param=damagetype,^crush_style
+param=attackbonus,0
+param=strengthbonus,72
+param=magicattack,-33
+param=rangeattack,-11
+param=rangebonus,0
+param=stabdefence,221
+param=slashdefence,235
+param=crushdefence,222
+param=magicdefence,0
+param=rangedefence,221
+// CANDIDATE barrows.bc-torag-maxhit: stated RuneScape 2007 cap, not fitted Strength.
+param=barrows_maxhit,25
 
 [barrows_verac]
 name=Verac the Defiled
