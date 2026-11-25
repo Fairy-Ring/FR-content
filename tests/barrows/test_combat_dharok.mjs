@@ -47,14 +47,18 @@ await run(async () => {
     World.players[2] = other; World.playerLoop.add(other.hash64, other); return other;
   };
   try {
-    check('packed fields, exact params, original presentation defaults and lifecycle bindings', () => {
+    check('packed fields, exact params, selected presentation and lifecycle bindings', () => {
       assert.equal(type.id, 2026); assert.equal(type.vislevel, 115);
       assert.deepEqual([...type.stats], [100, 100, 100, 100, 1, 1]); assert.equal(type.regenrate, 16);
       for (const [field, value] of Object.entries({ attackrange: 0, huntmode: -1, huntrange: 0, wanderrange: 5, maxrange: 7, timer: -1 })) assert.equal(type[field], value, field);
       const selected = { attackrate: 7, damagetype: 1, attackbonus: 0, strengthbonus: 105, magicattack: -58, rangeattack: -18, rangebonus: 0,
-        stabdefence: 252, slashdefence: 250, crushdefence: 244, magicdefence: -11, rangedefence: 249, barrows_maxhit: 29 };
+        stabdefence: 252, slashdefence: 250, crushdefence: 244, magicdefence: -11, rangedefence: 249, barrows_maxhit: 29,
+        attack_anim: rt.id(rt.configs.SeqType, 'barrow_dharok_slash'),
+        defend_anim: rt.id(rt.configs.SeqType, 'human_axe_block'),
+        attack_sound: 1073, defend_sound: 1071, death_sound: 1072 };
       for (const [name, value] of Object.entries(selected)) {
-        assert(type.params.has(rt.id(ParamType, name)), `present ${name}`); assert.equal(rt.param(type, name), value, name);
+        assert(type.params.has(rt.id(ParamType, name)), `present ${name}`);
+        assert.equal(rt.param(type, name), value, name);
       }
       assert.equal(type.params.size, Object.keys(selected).length);
       assert.equal(attack.name, '[ai_opplayer2,barrows_dharok]');

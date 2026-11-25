@@ -99,7 +99,8 @@ await run(async () => {
       const selected = { attackrate: 4, damagetype: 3, attackbonus: 0, strengthbonus: 0, magicattack: -26, rangeattack: 134, rangebonus: 55,
         stabdefence: 79, slashdefence: 71, crushdefence: 90, magicdefence: 106, rangedefence: 100, barrows_maxhit: 20,
         attack_anim: rt.id(SeqType, 'barrows_repeating_crossbow_fire'), rangeattack_sound: 1075,
-        proj_launch: rt.id(SpotanimType, 'crossbowbolt_launch'), proj_travel: rt.id(SpotanimType, 'crossbowbolt_travel') };
+        proj_launch: rt.id(SpotanimType, 'crossbowbolt_launch'), proj_travel: rt.id(SpotanimType, 'crossbowbolt_travel'),
+        defend_sound: 1071, death_sound: 1072 };
       for (const [name, value] of Object.entries(selected)) {
         assert(type.params.has(rt.id(ParamType, name)), `explicit ${name}`); assert.equal(rt.param(type, name), value, name);
       }

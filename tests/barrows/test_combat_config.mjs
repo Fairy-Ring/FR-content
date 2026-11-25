@@ -146,6 +146,14 @@ await run(async () => {
       assert(Number.isInteger(expected), `${name} supported authored server parameter ${param}`);
       assert.equal(npc.params.get(paramId), expected, `${name} source/packed parameter ${param}`);
     }
+    if (name === 'barrows_ahrim') {
+      assert.deepEqual([...npc.stats], [1, 100, 1, 100, 1, 100], 'Ahrim native Magic vector');
+      assert.equal(npc.attackrange, 10, 'Ahrim player-standard-spell reach');
+      assert.equal(npc.regenrate, 16, 'Ahrim all-stat regeneration');
+      assert.equal(npc.params.get(ParamType.getId('damagetype')), 4, 'Ahrim Magic style activates all three AP spawn sites');
+      assert.equal(npc.params.get(ParamType.getId('attackrate')), 6);
+      assert.equal(npc.params.get(ParamType.getId('barrows_maxhit')), 20);
+    }
     const expected = TUNNELS[name];
     if (expected) {
       for (const [field, stat] of Object.entries(stats)) {

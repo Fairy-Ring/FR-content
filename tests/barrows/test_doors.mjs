@@ -625,7 +625,7 @@ await run(async () => {
       'barrows_giantspider', 'barrows_skeleton_unarmed', 'barrows_skeleton_armed'
     ];
     for (const name of [...BROTHERS.map(([name]) => name), ...ordinaryTypes]) {
-      const expectedMode = name === 'barrows_karil' ? NpcMode.APPLAYER2 : NpcMode.OPPLAYER2;
+      const expectedMode = ['barrows_ahrim', 'barrows_karil'].includes(name) ? NpcMode.APPLAYER2 : NpcMode.OPPLAYER2;
       const result = withDraws([], () => procInt(modeProbe, 'barrows_combat_start_mode', [npcId(name)]), `${name} pure start mode`);
       assert.equal(result.value, expectedMode, `${name}: config selects its native start mode without a draw`);
     }
@@ -937,7 +937,7 @@ await run(async () => {
       const actors = spawnDelta(before);
       assert.equal(actors.length, 1, `${name}: real traversal creates exactly one selected actor`);
       const actor = actors[0];
-      const expectedMode = name === 'barrows_karil' ? NpcMode.APPLAYER2 : NpcMode.OPPLAYER2;
+      const expectedMode = ['barrows_ahrim', 'barrows_karil'].includes(name) ? NpcMode.APPLAYER2 : NpcMode.OPPLAYER2;
       assert.equal(actor.type, npcId(name), `${name}: real door selects the exact NPC type`);
       assert.equal(actor.targetOp, expectedMode, `${name}: door spawn starts its native player-attack mode`);
       assert.equal(actor.target, modeOwner, `${name}: door spawn targets the traversing owner`);

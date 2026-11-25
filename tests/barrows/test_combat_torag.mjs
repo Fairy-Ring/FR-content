@@ -44,9 +44,13 @@ await run(async () => {
       assert.equal(type.regenrate, 16);
       for (const [field, value] of Object.entries({ attackrange: 0, huntmode: -1, huntrange: 0, wanderrange: 5, maxrange: 7, timer: -1 })) assert.equal(type[field], value, field);
       const selected = { attackrate: 5, damagetype: 2, attackbonus: 0, strengthbonus: 72, magicattack: -33, rangeattack: -11, rangebonus: 0,
-        stabdefence: 221, slashdefence: 235, crushdefence: 222, magicdefence: 0, rangedefence: 221, barrows_maxhit: 25 };
-      for (const [name, value] of Object.entries(selected)) assert.equal(rt.param(type, name), value, name);
-      assert.equal(type.params.size, Object.keys(selected).length, 'no unused magicdamage or presentation binding');
+        stabdefence: 221, slashdefence: 235, crushdefence: 222, magicdefence: 0, rangedefence: 221, barrows_maxhit: 25,
+        attack_anim: rt.id(rt.configs.SeqType, 'barrow_torag_crush'), attack_sound: 1076, defend_sound: 1071, death_sound: 1072 };
+      for (const [name, value] of Object.entries(selected)) {
+        assert(type.params.has(rt.id(rt.configs.ParamType, name)), `present ${name}`);
+        assert.equal(rt.param(type, name), value, name);
+      }
+      assert.equal(type.params.size, Object.keys(selected).length, 'no unselected combat or presentation params');
       assert.equal(attack.name, '[ai_opplayer2,barrows_torag]');
       for (const [trigger, name] of [[Trigger.AI_TIMER, '[ai_timer,barrows_torag]'], [Trigger.AI_QUEUE3, '[ai_queue3,barrows_torag]'], [Trigger.AI_QUEUE1, '[ai_queue1,_]']]) assert.equal(Provider.getByTrigger(trigger, type.id, type.category).name, name);
     });
@@ -77,8 +81,16 @@ await run(async () => {
       const noProc = observe(ordinary, [0.999999, 0, 0.999999, 0.25]);
       assert.equal(corruption(noProc).length, 0);
       const ordinaryDelivered = settle(ordinary);
-      const presentation = events => events.filter(e => /ANIM|SOUND|SYNTH/.test(e.op));
-      assert.deepEqual(presentation([...result.events, ...delivered.events]), presentation([...noProc.events, ...ordinaryDelivered.events]), 'Corruption adds no presentation to the native hit');
+      const procPresentation = presentation([...result.events, ...delivered.events]);
+      const noProcPresentation = presentation([...noProc.events, ...ordinaryDelivered.events]);
+      const effectGraphic = event => event.op === 'SPOTANIM_PL' && event.in.at(-1) === 399;
+      const effectSound = event => event.op === 'SOUND_SYNTH' && event.in.at(-1) === 1062;
+      assert.deepEqual(procPresentation.filter(effectGraphic).map(event => event.in), [[0, 0, 399]]);
+      assert.deepEqual(procPresentation.filter(effectSound).map(event => event.in), [[0, 0, 1062]]);
+      assert.equal(noProcPresentation.filter(effectGraphic).length, 0);
+      assert.equal(noProcPresentation.filter(effectSound).length, 0);
+      assert.deepEqual(procPresentation.filter(event => !effectGraphic(event) && !effectSound(event)), noProcPresentation,
+        'Corruption adds only its player effect and weapon-named sound');
     });
     for (const [procDraw, procs] of [[0, true], [0.249999, true], [0.25, false], [0.5, false], [0.999999, false]]) check(`one-in-four boundary draw ${procDraw}`, () => {
       const f = fixture(); const result = observe(f, [0.999999, 0, 0.999999, procDraw]);

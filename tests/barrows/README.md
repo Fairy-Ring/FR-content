@@ -140,6 +140,28 @@ It covers wrong protection prayers, zero, miss, dead/lost targets, real second
 player isolation, regeneration's effect on scaling and ordinary owned kill credit.
 The vector gate preserves every unlisted field and all client bytes.
 
+## Ahrim combat and brother presentation (BC-08 / BC-M2)
+
+```sh
+node --import tsx ../content/tests/barrows/test_combat_ahrim.mjs
+```
+
+Ahrim uses native Magic, including at adjacency, at a six-tick interval.
+His selected maximum is 20 and his unchanged Hitpoints are 100.
+The selected reach 10 matches standard player autocasting.
+One UNKNOWN uniform draw chooses Fire Wave, Confuse, Weaken or Curse.
+Native filtering excludes a curse while its target stat is below base.
+Accurate stat spells land through Protect from Magic with their normal impact
+and inherited message. Protected Fire Wave cannot trigger Blighted Aura.
+The CANDIDATE aura has one 20% draw per successful hit and subtracts a flat
+five Strength, separately from Weaken. Regeneration 16 restores every NPC stat.
+
+BC-M2 applies the approved server-only attack, block, hit and death bindings.
+Set-effect graphics attach to the player when their effect triggers.
+Weapon-named effect sounds and Ahrim's aura sound use the approved cache names.
+Karil's client-visible ready and walk animations stay unchanged.
+The presentation test runs with Ahrim's registered command.
+
 ## Karil combat (BC-07)
 
 ```sh

@@ -1,0 +1,54 @@
+// CANDIDATE Q4/Q5: standard Magic at player-spell reach, never a contact punch.
+// Queue3 stays bound to barrows_npc_death in barrows_death.rs2.
+[ai_opplayer2,barrows_ahrim] npc_setmode(applayer2);
+[ai_applayer2,barrows_ahrim] gosub(barrows_ahrim_attack);
+[ai_queue1,barrows_ahrim] ~npc_default_retaliate_ap;
+
+[proc,barrows_ahrim_attack]
+if (npc_stat(hitpoints) = 0 | %death = ^true) return;
+if (~npc_combat_spell_checks = false) return;
+// UNKNOWN engineering AHRIM_SPELL_WEIGHTS=[1,1,1,1]: one uniform eligible draw.
+// Native repeat filtering is shared with the standard spell resolver.
+def_boolean $confuse = ~npc_debuff_allowed(~get_spell_data(^confuse));
+def_boolean $weaken = ~npc_debuff_allowed(~get_spell_data(^weaken));
+def_boolean $curse = ~npc_debuff_allowed(~get_spell_data(^curse));
+def_int $eligible = 1;
+if ($confuse = true) $eligible = add($eligible, 1);
+if ($weaken = true) $eligible = add($eligible, 1);
+if ($curse = true) $eligible = add($eligible, 1);
+def_int $choice = random($eligible);
+def_int $spell = ^fire_wave;
+if ($choice > 0) {
+    if ($confuse = true) {
+        $choice = sub($choice, 1);
+        if ($choice = 0) $spell = ^confuse;
+    }
+    if ($choice > 0 & $weaken = true) {
+        $choice = sub($choice, 1);
+        if ($choice = 0) $spell = ^weaken;
+    }
+    if ($choice > 0 & $curse = true) $spell = ^curse;
+}
+def_int $maxhit = null;
+def_boolean $stat_spell = true;
+if ($spell = ^fire_wave) {
+    $maxhit = npc_param(barrows_maxhit);
+    $stat_spell = false;
+}
+def_boolean $attempted;
+def_int $accuracy;
+def_int $rolled;
+def_int $delivered;
+def_int $delivery_ticks;
+// CANDIDATE operator 15 Nov addenda: accurate stat spells land through prayer.
+// Fire Wave uses ordinary protection, so a blocked wave cannot roll the aura.
+$attempted, $accuracy, $rolled, $delivered, $delivery_ticks = ~npc_cast_spell_outcome($spell, npc_param(attackrate), $maxhit, false, $stat_spell);
+if ($attempted = true & $accuracy = ^barrows_special_success_policy) {
+    if (random(^barrows_ahrim_proc_denominator) = 0) {
+        // CANDIDATE flat five, distinct from Weaken's standard percentage drain.
+        stat_sub(strength, ^barrows_ahrim_strength_drain, 0);
+        // CANDIDATE BC-M2 player attachment at trigger. UNKNOWN engineering height 0.
+        spotanim_pl(barrows_ahirm_blighted_aura, ^barrows_effect_height, 0);
+        sound_synth(ahrims_aura, 0, 0);
+    }
+}

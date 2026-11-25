@@ -65,8 +65,14 @@ await run(async () => {
       assert.deepEqual([...type.stats], [100, 100, 100, 100, 1, 1]); assert.equal(type.regenrate, 16);
       for (const [field, value] of Object.entries({ attackrange: 0, huntmode: -1, huntrange: 0, wanderrange: 5, maxrange: 7, timer: -1 })) assert.equal(type[field], value, field);
       const selected = { attackrate: 5, damagetype: 2, attackbonus: 0, strengthbonus: 75, magicattack: -50, rangeattack: -19, rangebonus: 0,
-        stabdefence: 259, slashdefence: 257, crushdefence: 241, magicdefence: -11, rangedefence: 250, barrows_maxhit: 24 };
-      for (const [name, value] of Object.entries(selected)) assert.equal(rt.param(type, name), value, name);
+        stabdefence: 259, slashdefence: 257, crushdefence: 241, magicdefence: -11, rangedefence: 250, barrows_maxhit: 24,
+        attack_anim: rt.id(rt.configs.SeqType, 'barrows_war_spear_crush'),
+        defend_anim: rt.id(rt.configs.SeqType, 'human_spear_block'),
+        attack_sound: 1074, defend_sound: 1071, death_sound: 1072 };
+      for (const [name, value] of Object.entries(selected)) {
+        assert(type.params.has(rt.id(rt.configs.ParamType, name)), `present ${name}`);
+        assert.equal(rt.param(type, name), value, name);
+      }
       assert.equal(type.params.size, Object.keys(selected).length);
       assert.equal(attack.name, '[ai_opplayer2,barrows_guthan]');
       for (const [trigger, name] of [[Trigger.AI_TIMER, '[ai_timer,barrows_guthan]'], [Trigger.AI_QUEUE3, '[ai_queue3,barrows_guthan]'], [Trigger.AI_QUEUE1, '[ai_queue1,_]']]) assert.equal(Provider.getByTrigger(trigger, type.id, type.category).name, name);

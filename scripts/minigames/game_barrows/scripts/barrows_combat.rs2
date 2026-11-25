@@ -37,6 +37,10 @@ if (npc_finduid($source) = false) return;
 if (npc_stat(hitpoints) = 0 | %npc_attacking_uid ! uid) return;
 def_int $energy = runenergy;
 ~barrows_torag_energy_change(calc($energy * ^barrows_torag_energy_remainder_percent / 100 - $energy));
+// CANDIDATE BC-M2: Torag's rising effect starts at the player base.
+// UNKNOWN height: the study gives only a model-origin hint, not a packet value.
+spotanim_pl(barrows_torag_effect, ^barrows_effect_height, 0);
+sound_synth(torag_crush, 0, 0);
 
 [proc,barrows_torag_energy_change](int $change)
 // PlayerOps.ts:1162 rejects script null -1. Only energy 1..5 needs it; +1 cannot clamp.
@@ -72,6 +76,9 @@ if (npc_stat(hitpoints) = 0 | %npc_attacking_uid ! uid) return;
 if ($damage <= 0 | npc_stat(hitpoints) >= npc_basestat(hitpoints)) return;
 // Native NpcOps.ts:300-301 clears heroes at base HP; brief ruling 1 keeps it.
 npc_statheal(hitpoints, $damage, 0);
+// CANDIDATE BC-M2: play the rising effect only when Guthan heals.
+// UNKNOWN height: the study gives only a model-origin hint, not a packet value.
+spotanim_pl(barrows_guthan_effect, ^barrows_effect_height, 0);
 
 // VERIFIED armour bypass; CANDIDATE Q1 prayer bypass and one chance in four.
 [ai_opplayer2,barrows_verac] gosub(barrows_verac_attack);
@@ -83,6 +90,8 @@ def_int $defence_policy = 0;
 def_int $maxhit = npc_param(barrows_maxhit);
 // UNKNOWN engineering order: one draw before accuracy, only on a ready attack.
 if (random(^barrows_verac_proc_denominator) = 0) {
+    // CANDIDATE BC-M2: the selected Stab effect uses its weapon-named synth.
+    sound_synth(flail_stab, 0, 0);
     $defence_policy = ^barrows_verac_unconditional_accuracy;
     if (~check_protect_prayer(^melee_style) = true) $maxhit = ^barrows_verac_protected_maxhit;
 }
@@ -125,6 +134,8 @@ if (%death = ^true | stat(hitpoints) = 0) return;
 if (npc_finduid($source) = false) return;
 if (npc_stat(hitpoints) = 0 | %npc_attacking_uid ! uid) return;
 stat_sub(agility, 0, ^barrows_karil_agility_percent);
+// CANDIDATE BC-M2 player attachment at trigger; packet height is UNKNOWN.
+spotanim_pl(barrows_karil_tainted_shot, ^barrows_effect_height, 0);
 
 // Huntless defaults never initiate against a stranger. The native owner guard
 // ends pursuit; the timer latches release on WANDER without changing retaliation.

@@ -13,6 +13,30 @@ hitpoints=100
 attack=1
 strength=1
 defence=100
+magic=100
+ranged=1
+// UNKNOWN engineering barrows.bc-regen-clock: Q8 selects 16 for every native stat.
+regenrate=16
+// CANDIDATE operator Q5: Ahrim uses the reach of standard player spells.
+attackrange=^barrows_ahrim_reach_tiles
+// CANDIDATE BC-08: selected Ahrim combat vector.
+param=attackrate,6
+param=damagetype,^magic_style
+param=attackbonus,0
+param=strengthbonus,68
+param=magicattack,73
+param=rangeattack,-19
+param=rangebonus,0
+param=stabdefence,103
+param=slashdefence,85
+param=crushdefence,117
+param=magicdefence,73
+param=rangedefence,0
+param=barrows_maxhit,20
+// CANDIDATE operator BC-M2: Ahrim uses his compatible quarterstaff defence.
+param=defend_anim,barrows_quarterstaff_defend
+param=defend_sound,wight_hit
+param=death_sound,wight_death
 
 [barrows_dharok]
 name=Dharok the Wretched
@@ -54,6 +78,12 @@ param=magicdefence,-11
 param=rangedefence,249
 // CANDIDATE barrows.bc-dharok-maxhit: unscaled maximum, independent of Strength.
 param=barrows_maxhit,29
+// CANDIDATE operator BC-M2: compatible Slash animation and brother attack sound.
+param=attack_anim,barrow_dharok_slash
+param=defend_anim,human_axe_block
+param=attack_sound,dharok_attack
+param=defend_sound,wight_hit
+param=death_sound,wight_death
 
 [barrows_guthan]
 name=Guthan the Infested
@@ -94,6 +124,12 @@ param=magicdefence,-11
 param=rangedefence,250
 // CANDIDATE barrows.bc-guthan-maxhit: explicit cap, not fitted Strength.
 param=barrows_maxhit,24
+// CANDIDATE operator BC-M2: compatible Crush animation and brother attack sound.
+param=attack_anim,barrows_war_spear_crush
+param=defend_anim,human_spear_block
+param=attack_sound,guthan_attack
+param=defend_sound,wight_hit
+param=death_sound,wight_death
 
 [barrows_karil]
 name=Karil the Tainted
@@ -141,6 +177,10 @@ param=proj_launch,crossbowbolt_launch
 // CANDIDATE operator presentation choice: generic bolt travel, not rack-specific.
 param=proj_travel,crossbowbolt_travel
 
+// CANDIDATE operator BC-M2: shared wight hit and death sounds.
+param=defend_sound,wight_hit
+param=death_sound,wight_death
+
 [barrows_torag]
 name=Torag the Corrupted
 desc=A vengeful spirit corrupted by dark magic.
@@ -180,6 +220,11 @@ param=magicdefence,0
 param=rangedefence,221
 // CANDIDATE barrows.bc-torag-maxhit: stated RuneScape 2007 cap, not fitted Strength.
 param=barrows_maxhit,25
+// CANDIDATE operator BC-M2: compatible Crush animation and brother attack sound.
+param=attack_anim,barrow_torag_crush
+param=attack_sound,torag_attack
+param=defend_sound,wight_hit
+param=death_sound,wight_death
 
 [barrows_verac]
 name=Verac the Defiled
@@ -220,7 +265,8 @@ param=barrows_maxhit,23
 param=attack_anim,barrow_dharok_crush
 param=defend_anim,human_axe_block
 param=attack_sound,verac_attack
-//param=defend_sound,sound_0  dont have osrs to test sound and cant find good vid with sound effect on
+param=defend_sound,wight_hit
+param=death_sound,wight_death
 
 [barrows_bloodworm]
 name=Bloodworm

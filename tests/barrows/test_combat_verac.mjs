@@ -49,17 +49,16 @@ await run(async () => {
       assert.deepEqual([...type.stats], [100, 100, 100, 100, 1, 1]); assert.equal(type.regenrate, 16);
       for (const [field, value] of Object.entries({ attackrange: 0, huntmode: -1, huntrange: 0, wanderrange: 5, maxrange: 7, timer: -1 })) assert.equal(type[field], value, field);
       const selected = { attackrate: 5, damagetype: 0, attackbonus: 0, strengthbonus: 72, magicattack: -42, rangeattack: -14, rangebonus: 0,
-        stabdefence: 227, slashdefence: 230, crushdefence: 221, magicdefence: 0, rangedefence: 225, barrows_maxhit: 23 };
+        stabdefence: 227, slashdefence: 230, crushdefence: 221, magicdefence: 0, rangedefence: 225, barrows_maxhit: 23,
+        attack_anim: rt.id(rt.configs.SeqType, 'barrow_dharok_crush'),
+        defend_anim: rt.id(rt.configs.SeqType, 'human_axe_block'),
+        attack_sound: 1077, defend_sound: 1071, death_sound: 1072 };
       for (const [name, value] of Object.entries(selected)) {
-        assert(type.params.has(rt.id(ParamType, name)), `present ${name}`); assert.equal(rt.param(type, name), value, name);
+        assert(type.params.has(rt.id(ParamType, name)), `present ${name}`);
+        assert.equal(rt.param(type, name), value, name);
       }
       for (const name of ['stabattack', 'crushattack']) assert.equal(type.params.has(rt.id(ParamType, name)), false, `removed ${name}`);
-      for (const [name, config, expected] of [['attack_anim', 'SeqType', 'barrow_dharok_crush'], ['defend_anim', 'SeqType', 'human_axe_block'], ['attack_sound', 'SynthType', 'verac_attack']]) {
-        // Synth IDs share the packed name map used by all server sound params.
-        if (config === 'SeqType') assert.equal(rt.param(type, name), rt.id(rt.configs[config], expected));
-        else assert(type.params.has(rt.id(ParamType, name)), `kept ${name}`);
-      }
-      assert.equal(type.params.size, Object.keys(selected).length + 3);
+      assert.equal(type.params.size, Object.keys(selected).length);
       assert.equal(attack.name, '[ai_opplayer2,barrows_verac]');
       for (const [trigger, name] of [[Trigger.AI_TIMER, '[ai_timer,barrows_verac]'], [Trigger.AI_QUEUE3, '[ai_queue3,barrows_verac]'], [Trigger.AI_QUEUE1, '[ai_queue1,_]']]) assert.equal(Provider.getByTrigger(trigger, type.id, type.category).name, name);
     });
@@ -118,14 +117,22 @@ await run(async () => {
         settle(f); assert.equal(f.player.levels[3], 255); assert.equal(other.levels[3], 80); assert.equal([...other.queue.all()].length, 0);
       } finally { World.players[2] = null; other.unlink(); }
     });
-    check('effect retains ordinary attack presentation, with no extra animation, graphic or sound', () => {
+    check('only the selected Verac Stab effect adds its weapon-named sound', () => {
       const presentations = [];
       for (const draw of [0, 0.999999]) {
         const f = fixture(); const result = observe(f, [draw, 0.999999, 0, 0.999999]);
         const delivered = assertDelivery(f, result, 23);
         presentations.push([...result.events, ...delivered.events].filter(e => /ANIM|SPOTANIM|SOUND/.test(e.op)));
       }
-      assert.deepEqual(presentations[0], presentations[1]);
+      const [proc, ordinary] = presentations;
+      const effectSound = event => event.op === 'SOUND_SYNTH' && event.in.at(-1) === 1060;
+      const effectGraphic = event => event.op === 'SPOTANIM_PL';
+      assert.equal(proc.filter(effectSound).length, 1);
+      assert.equal(ordinary.filter(effectSound).length, 0);
+      assert.equal(proc.filter(effectGraphic).length, 0);
+      assert.equal(ordinary.filter(effectGraphic).length, 0);
+      assert.deepEqual(proc.filter(event => !effectSound(event)), ordinary,
+        'the ordinary attack presentation stays unchanged');
     });
     check('256 native seeds: high Stab defence, exact pre-draw order and delivered four-case outcomes', () => {
       const seen = new Set(); let ordinaryMisses = 0, ordinaryHits = 0, effectHits = 0;

@@ -174,3 +174,13 @@
 ^barrows_karil_proc_denominator = 4
 // VERIFIED period Tainted Shot amount; native stat_sub uses the base level.
 ^barrows_karil_agility_percent = 20
+
+// CANDIDATE Q5: native player_attackrange returns 10 for standard autocasting.
+// This is the selected player-spell reach, not a recovered original NPC distance.
+^barrows_ahrim_reach_tiles = 10
+// CANDIDATE barrows.bc-ahrim-proc-chance and bc-ahrim-strength-amount.
+^barrows_ahrim_proc_denominator = 5
+^barrows_ahrim_strength_drain = 5
+
+// UNKNOWN engineering: compatible effect meshes supply no original packet height.
+^barrows_effect_height = 0

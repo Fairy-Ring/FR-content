@@ -569,7 +569,7 @@ await run(async () => {
       assert.equal(actor.getVar(npcGenerationVar), generation, `${label}: actor captures the exact run generation`);
       assert.equal(actor.sayMessage, 'You dare steal from us!', `${label}: actor carries the CANDIDATE overhead line`);
       assert.equal(actor.target, player, `${label}: actor targets its owner, not a bystander`);
-      const expectedMode = identity === 4 ? NpcMode.APPLAYER2 : NpcMode.OPPLAYER2;
+      const expectedMode = [1, 4].includes(identity) ? NpcMode.APPLAYER2 : NpcMode.OPPLAYER2;
       assert.equal(procInt(player, 'barrows_combat_start_mode', [brotherId(identity)]), expectedMode, `${label}: config selects the native start mode`);
       assert.equal(actor.targetOp, expectedMode, `${label}: actor starts its native player-attack mode`);
       assert.equal(actor.level, 0, `${label}: final encounter stays in tunnels`);
