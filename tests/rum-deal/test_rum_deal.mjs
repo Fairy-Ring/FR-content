@@ -400,7 +400,9 @@ function useItemOnNpc(player, itemName, actor, expectedName) {
 }
 function drink(player, itemName) {
   const itemId = obj(itemName), slot = itemSlot(player, itemName);
-  const expectedName = `[opheld1,${itemName}]`;
+  const type = types.ObjType.get(itemId);
+  const expectedName = ScriptProvider.getByTrigger(ServerTriggerType.OPHELD1, type.id, type.category)?.name;
+  assert(expectedName, `${itemName} Drink resolves a real packed held-item handler`);
   const executions = [];
   const original = player.executeScript;
   player.executeScript = function(state, ...args) {
@@ -422,7 +424,9 @@ function pickGround(player, ground, itemName) {
   assert(option > 0, `${itemName} has a packed ground Take option`);
   assert(objHandler.handle(new OpObj(option, ground.x, ground.z, ground.type), player), 'production Take packet accepts the real ground item');
   assert.equal(player.target, ground);
-  player.processInteraction();
+  const trigger = player.getOpTrigger();
+  assert.equal(trigger?.name, '[opobj3,_]', 'the visible Take option selects the shared packed pickup handler');
+  runInteraction(player, trigger.name, [], () => player.processInteraction());
   assert.equal(count(player, itemName), 1, 'production ground-item interaction places the dropped item in inventory');
 }
 function runPacked(name, self, target = null, args = []) {
