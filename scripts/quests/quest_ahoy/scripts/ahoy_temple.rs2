@@ -12,7 +12,7 @@ loc_change(ahoy_trapdoor, 500);
 p_telejump(0_57_54_5_62);
 
 [proc,ahoy_cavern_up]
-if (coordy(loc_coord) = 0) p_telejump(1_57_154_35_31);
+if (coordy(loc_coord) = 0) p_telejump(1_57_154_39_31);
 else if (coordy(loc_coord) = 1) p_telejump(2_57_154_23_31);
 else p_telejump(3_57_154_44_31);
 
