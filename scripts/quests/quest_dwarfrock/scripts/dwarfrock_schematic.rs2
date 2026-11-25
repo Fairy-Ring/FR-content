@@ -1,0 +1,106 @@
+// CANDIDATE: four schematics, three selectable/showable/movable/rotatable overlays.
+// UNKNOWN original join geometry: each drawing starts one step down/right and one
+// quarter-turn from the base. The original 377 models, sequences and controls render it.
+// Slot 237 packs three bytes (x:3, y:3, rotation:2), selection:2 and visibility:3.
+[opheld1,dwarf_rock_base_schematic] @dwarfrock_open_schematic;
+[opheld1,dwarf_rock_schematic1] @dwarfrock_open_schematic;
+[opheld1,dwarf_rock_schematic2] @dwarfrock_open_schematic;
+[opheld1,dwarf_rock_schematic3] @dwarfrock_open_schematic;
+
+[label,dwarfrock_open_schematic]
+if (%dwarfrock_quest < 40 | %dwarfrock_quest >= 50) return;
+if (~dwarfrock_has_schematics = false) {
+    mes("You need all four schematics before you can assemble them."); // UNKNOWN functional text.
+    return;
+}
+%dwarfrock_puzzle = 0;
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, 73, 0, 7);
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, 73, 8, 15);
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, 73, 16, 23);
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, 7, 26, 28);
+if_openmain_side(inter_255, schematic);
+if_sethide(inter_255:com_17, true);
+~dwarfrock_render_schematics;
+
+[proc,dwarfrock_has_schematics]()(boolean)
+if (inv_total(inv, dwarf_rock_base_schematic) > 0 & inv_total(inv, dwarf_rock_schematic1) > 0 & inv_total(inv, dwarf_rock_schematic2) > 0 & inv_total(inv, dwarf_rock_schematic3) > 0) return(true);
+return(false);
+
+[if_button,schematic:com_22] ~dwarfrock_select_schematic(0);
+[if_button,schematic:com_23] ~dwarfrock_select_schematic(1);
+[if_button,schematic:com_24] ~dwarfrock_select_schematic(2);
+[if_button,schematic:com_25] ~dwarfrock_show_schematic(0);
+[if_button,schematic:com_26] ~dwarfrock_show_schematic(1);
+[if_button,schematic:com_27] ~dwarfrock_show_schematic(2);
+[if_button,schematic:com_28] ~dwarfrock_move_schematic(0, 0, 1);
+[if_button,schematic:com_29] ~dwarfrock_move_schematic(0, -1, 0);
+[if_button,schematic:com_30] ~dwarfrock_move_schematic(1, 0, 0);
+[if_button,schematic:com_31] ~dwarfrock_move_schematic(-1, 0, 0);
+[if_button,schematic:com_32] ~dwarfrock_move_schematic(0, 1, 0);
+[if_button,inter_255:com_10] if_close;
+
+[proc,dwarfrock_select_schematic](int $selected)
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, $selected, 24, 25);
+~dwarfrock_render_schematics;
+
+[proc,dwarfrock_show_schematic](int $selected)
+def_int $bit = add(26, $selected);
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, sub(1, getbit_range(%dwarfrock_puzzle, $bit, $bit)), $bit, $bit);
+~dwarfrock_render_schematics;
+
+[proc,dwarfrock_move_schematic](int $dx, int $dy, int $dr)
+if (%dwarfrock_quest < 40 | %dwarfrock_quest >= 50 | ~dwarfrock_has_schematics = false) return;
+def_int $shift = multiply(getbit_range(%dwarfrock_puzzle, 24, 25), 8);
+def_int $x = getbit_range(%dwarfrock_puzzle, $shift, add($shift, 2));
+def_int $y = getbit_range(%dwarfrock_puzzle, add($shift, 3), add($shift, 5));
+def_int $rot = getbit_range(%dwarfrock_puzzle, add($shift, 6), add($shift, 7));
+$x = min(6, max(0, add($x, $dx)));
+$y = min(6, max(0, add($y, $dy)));
+$rot = modulo(add($rot, $dr), 4);
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, $x, $shift, add($shift, 2));
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, $y, add($shift, 3), add($shift, 5));
+%dwarfrock_puzzle = setbit_range_toint(%dwarfrock_puzzle, $rot, add($shift, 6), add($shift, 7));
+~dwarfrock_render_schematics;
+if (getbit_range(%dwarfrock_puzzle, 0, 23) ! 0) return;
+inv_del(inv, dwarf_rock_base_schematic, 1);
+inv_del(inv, dwarf_rock_schematic1, 1);
+inv_del(inv, dwarf_rock_schematic2, 1);
+inv_del(inv, dwarf_rock_schematic3, 1);
+inv_add(inv, dwarf_rock_schematic_assembled, 1);
+%dwarfrock_schematics_solved = 1;
+if_sethide(inter_255:com_17, false);
+
+[proc,dwarfrock_render_schematics]
+%if1 = 0;
+%if2 = 0;
+%if3 = 0;
+def_int $selected = getbit_range(%dwarfrock_puzzle, 24, 25);
+if ($selected = 0) %if1 = 1;
+if ($selected = 1) %if2 = 1;
+if ($selected = 2) %if3 = 1;
+%if4 = getbit_range(%dwarfrock_puzzle, 26, 26);
+%if5 = getbit_range(%dwarfrock_puzzle, 27, 27);
+%if6 = getbit_range(%dwarfrock_puzzle, 28, 28);
+~dwarfrock_render_schematic(inter_255:com_3, inter_255:com_4, inter_255:com_11, inter_255:com_12, 0, dwarf_rock_schematic1_rot1, dwarf_rock_schematic1_rot2, dwarf_rock_schematic1_rot3, dwarf_rock_schematic1_rot4);
+~dwarfrock_render_schematic(inter_255:com_5, inter_255:com_6, inter_255:com_13, inter_255:com_14, 1, dwarf_rock_schematic2_rot1, dwarf_rock_schematic2_rot2, dwarf_rock_schematic2_rot3, dwarf_rock_schematic2_rot4);
+~dwarfrock_render_schematic(inter_255:com_7, inter_255:com_8, inter_255:com_15, inter_255:com_16, 2, dwarf_rock_schematic3_rot1, dwarf_rock_schematic3_rot2, dwarf_rock_schematic3_rot3, dwarf_rock_schematic3_rot4);
+
+[proc,dwarfrock_render_schematic](component $layer, component $model, component $highlight, component $highlight_model, int $index, seq $rot1, seq $rot2, seq $rot3, seq $rot4)
+def_int $shift = multiply($index, 8);
+def_int $x = multiply(getbit_range(%dwarfrock_puzzle, $shift, add($shift, 2)), 16);
+def_int $y = multiply(getbit_range(%dwarfrock_puzzle, add($shift, 3), add($shift, 5)), 16);
+def_int $rot = getbit_range(%dwarfrock_puzzle, add($shift, 6), add($shift, 7));
+if_setposition($layer, $x, $y);
+if_setposition($highlight, $x, $y);
+if_sethide($layer, true);
+if_sethide($highlight, true);
+if (getbit_range(%dwarfrock_puzzle, add(26, $index), add(26, $index)) = 1) {
+    if (getbit_range(%dwarfrock_puzzle, 24, 25) = $index) if_sethide($highlight, false);
+    else if_sethide($layer, false);
+}
+def_seq $anim = $rot1;
+if ($rot = 1) $anim = $rot2;
+if ($rot = 2) $anim = $rot3;
+if ($rot = 3) $anim = $rot4;
+if_setanim($model, $anim);
+if_setanim($highlight_model, $anim);

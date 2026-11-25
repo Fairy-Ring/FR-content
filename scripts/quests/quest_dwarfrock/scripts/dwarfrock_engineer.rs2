@@ -1,9 +1,10 @@
 // Between a Rock — Dwarven Engineer first Talk-to after Dondakan 0→10.
 // CANDIDATE last-resort 2007-base (OSRS Transcript minus Overview / dest).
-// Stay dwarfrock_quest 10. Never 110. No dest / schematic give.
+// The later schematic branch retains the same engineer identity.
 // Cite bar-engineer-first-talk-377.md.
 
 [opnpc1,dwarfrock_engineer1]
+if (%dwarfrock_quest >= 40 & %dwarfrock_quest < 50) @dwarfrock_engineer_schematic;
 if (%dwarfrock_quest < 10) {
     ~displaymessage(^dm_default);
     return;

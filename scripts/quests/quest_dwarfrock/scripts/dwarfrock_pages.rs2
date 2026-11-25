@@ -1,17 +1,6 @@
-// Between a Rock — Mine cart Search after Rolad. Dwarven Mine.
-// CANDIDATE last-resort 2007-base (OSRS Transcript cart page)
-// minus spawn rate / which-cart invent / dest. Hunt 289? no.
-// Stay dwarfrock_quest 10. Never 110. Cite bar-pages-leftover-377.md.
-
+// CANDIDATE page origins. UNKNOWN favourable engineering rate: first eligible action.
 [oploc1,dwarfrock_book_cart]
-if (%dwarfrock_quest < 10) {
-    ~displaymessage(^dm_default);
-    return;
-}
-if (%dwarfrock_quest = 110) {
-    ~displaymessage(^dm_default);
-    return;
-}
+if (%dwarfrock_quest ! 10 | %dwarfrock_rolad_schematics_heardof = 0) return;
 if (inv_total(inv, dwarf_rock_page2) > 0 | inv_total(inv, dwarf_rock_pagex2) > 0 | inv_total(inv, dwarf_rock_pagex3) > 0) {
     return;
 }
@@ -21,3 +10,22 @@ if (inv_itemspace(inv, dwarf_rock_page2, 1, inv_size(inv)) = false) {
 inv_add(inv, dwarf_rock_page2, 1);
 mes("At the bottom of the cart you find a missing page of Rolad's book!");
 return;
+
+[proc,dwarfrock_mined_page](namedobj $ore)
+if (%dwarfrock_quest ! 10 | %dwarfrock_rolad_schematics_heardof = 0) return;
+if (inzone(0_47_152_0_0, 0_47_153_63_63, coord) = false) return;
+if ($ore ! clay & $ore ! copper_ore & $ore ! tin_ore & $ore ! iron_ore) return;
+if (inv_total(inv, dwarf_rock_page3) > 0 | inv_total(inv, dwarf_rock_pagex3) > 0) return;
+~dwarfrock_give_item(dwarf_rock_page3);
+mes("You see something lying just behind the rock you just mined... it's a missing page of Rolad's book!");
+
+[ai_queue3,scorpion]
+if (npc_findhero = ^true) queue(dwarfrock_scorpion_page, 0, 0);
+~npc_default_death;
+
+[queue,dwarfrock_scorpion_page]
+if (%dwarfrock_quest ! 10 | %dwarfrock_rolad_schematics_heardof = 0) return;
+if (inzone(0_47_152_0_0, 0_47_153_63_63, coord) = false) return;
+if (inv_total(inv, dwarf_rock_page1) > 0 | inv_total(inv, dwarf_rock_pagex3) > 0) return;
+~dwarfrock_give_item(dwarf_rock_page1);
+mes("You turn over the corpse of the scorpion and find a missing page of Rolad's book!");

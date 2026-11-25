@@ -1,0 +1,152 @@
+// UNKNOWN: Tradeability is not sourced; these quest-specific items are untradeable by policy.
+
+[dwarf_rock_book]
+name=Dwarven lore
+desc=The book is almost falling apart, you'll have to handle it quite carefully.
+recol1s=13472
+recol1d=7424
+model=obj_mcannonbook
+2dxof=1
+2dyof=-21
+2dzoom=830
+2dyan=116
+2dxan=244
+members=yes
+iop1=Read
+weight=80g
+tradeable=no
+
+[dwarf_rock_page1]
+name=Book page 1
+desc=A missing page from Rolad's book! It seems to be the first one.
+model=obj_dwarf_rock_page1
+2dzoom=790
+2dxan=384
+members=yes
+weight=2g
+tradeable=no
+
+[dwarf_rock_page2]
+name=Book page 2
+desc=A missing page from Rolad's book! It seems to be the second one.
+model=obj_dwarf_rock_page1
+2dzoom=790
+2dxan=384
+members=yes
+weight=2g
+tradeable=no
+
+[dwarf_rock_page3]
+name=Book page 3
+desc=A missing page from Rolad's book! It seems to be the third one.
+model=obj_dwarf_rock_page1
+2dzoom=790
+2dxan=384
+members=yes
+weight=2g
+tradeable=no
+
+[dwarf_rock_pagex2]
+name=Pages
+desc=Missing pages!
+model=obj_dwarf_rock_pagex2
+2dxof=-3
+2dyof=-1
+2dzoom=880
+2dyan=2000
+2dzan=2044
+2dxan=560
+members=yes
+weight=2g
+tradeable=no
+
+[dwarf_rock_pagex3]
+name=Pages
+desc=A collection of missing pages from Rolad's book!
+model=obj_dwarf_rock_pagex3
+2dxof=3
+2dyof=-1
+2dzoom=970
+2dyan=24
+2dzan=136
+2dxan=512
+members=yes
+weight=2g
+tradeable=no
+
+[dwarf_rock_base_schematic]
+name=Base schematics
+desc=These are the base schematics of a dwarven multicannon
+model=obj_dwarf_rock_page1
+2dzoom=790
+2dxan=384
+members=yes
+iop1=Assemble
+weight=2g
+tradeable=no
+
+[dwarf_rock_schematic1]
+name=Schematic
+desc=A transparent overlay - details of something?
+model=obj_dwarf_rock_schematic1
+2dxof=-1
+2dzoom=1080
+2dxan=516
+members=yes
+iop1=Assemble
+weight=4g
+tradeable=no
+
+[dwarf_rock_schematic2]
+name=Schematics
+desc=Transparent overlays - details of something?
+model=obj_dwarf_rock_schematic1
+2dxof=-7
+2dyof=-7
+2dzoom=1310
+2dyan=1996
+2dzan=128
+2dxan=488
+members=yes
+iop1=Assemble
+weight=4g
+tradeable=no
+
+[dwarf_rock_schematic3]
+name=Schematics
+desc=Transparent overlays - details of something?
+model=obj_dwarf_rock_schematic1
+2dxof=-9
+2dyof=-2
+2dzoom=1460
+2dxan=552
+members=yes
+iop1=Assemble
+weight=4g
+tradeable=no
+
+[dwarf_rock_schematic_assembled]
+name=Schematic
+desc=The assembled schematic for modifying the dwarven multicannon.
+model=obj_dwarf_rock_schematic_assembled
+2dxof=-1
+2dzoom=1100
+2dxan=516
+members=yes
+weight=14g
+tradeable=no
+
+[dwarf_rock_cannonball_gold]
+name=Cannon ball
+desc=A heavy gold metal sphere.
+recol1s=15855
+recol1d=31393
+model=obj_dwarf_rock_cannonball_gold
+2dxof=1
+2dyof=1
+2dzoom=550
+2dyan=32
+2dxan=1960
+members=yes
+weight=20kg
+tradeable=no

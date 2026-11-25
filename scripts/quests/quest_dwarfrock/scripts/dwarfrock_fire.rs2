@@ -1,18 +1,46 @@
-// Dwarf Cannon — Fire the cannon with a gold shot -> Arzinian gold mine.
-// Gate %dwarfrock_quest >= 10 + %dwarfrock_gold_cannonball = 1. Dest CANDIDATE
-// 2306,4952 L0 (walkable next to gold vein 5991 @ 2305,4952 L0). Stay 10 —
-// never 110. CANDIDATE lines (2007-base minus Changes).
-// Cite spine-17-remaining-impl-377.md §4 + dest-from-our-maps-remaining-377.md.
-
+// The later (2024) postquest Fire shortcut is deliberately excluded.
 [oploc1,dwarf_rock_multicannon1]
-if (%dwarfrock_quest < 10) {
-    ~displaymessage(^dm_default);
+if (%dwarfrock_quest < 50 | %dwarfrock_quest >= 100) {
+    mes("You should speak to Dondakan first."); // UNKNOWN functional refusal.
     return;
 }
-if (%dwarfrock_gold_cannonball = 0) {
-    mes("The cannon isn't loaded with a gold shot.");
+@dwarfrock_launch;
+
+[label,dwarfrock_launch]
+if (%dwarfrock_quest < 50 | %dwarfrock_quest = 100) return;
+if (inv_total(worn, dwarf_goldrock_helmet) = 0) {
+    mes("Not without wearing your golden helmet you're not!");
     return;
 }
-mes("You fire the cannon.");
-mes("The golden cannonball slams into the rock.");
-p_telejump(0_36_77_2_24); // 2306,4952 L0 — walkable next to gold vein 5991
+// UNKNOWN map-derived landing, not a recovered historical destination.
+anim(dwarfrock_cannon_incannon, 0);
+~mesbox("Dondakan fires the cannon.");
+p_telejump(0_36_77_2_24);
+anim(dwarfrock_cannon_fly_getup, 0);
+if (%dwarfrock_quest < 100) %dwarfrock_quest = 60;
+%dwarfrock_inside_visited = 1;
+%dwarfrock_inside_timeleft = 800; // CANDIDATE eight minutes, 2007-base transcript.
+settimer(dwarfrock_inside, 1);
+mes("Your helmet starts to feel heavier and heavier!");
+
+[timer,dwarfrock_inside]
+if (~dwarfrock_in_mine = false) return;
+if (inv_total(worn, dwarf_goldrock_helmet) = 0 | %dwarfrock_inside_timeleft = 0) {
+    queue(dwarfrock_leave_mine, 0, 0);
+    return;
+}
+%dwarfrock_inside_timeleft = sub(%dwarfrock_inside_timeleft, 1);
+settimer(dwarfrock_inside, 1);
+
+[proc,dwarfrock_in_mine]()(boolean)
+return(inzone(0_36_77_0_0, 3_39_77_63_63, coord));
+
+[queue,dwarfrock_leave_mine]
+if (~dwarfrock_in_mine = false) return;
+~dwarfrock_exit;
+
+[proc,dwarfrock_exit]
+%dwarfrock_inside_timeleft = 0;
+// UNKNOWN favourable default: preserve carried gold; no invented item-loss rule.
+p_telejump(0_44_158_8_55);
+mes("The world turns black and you feel as if you're being sucked out of the rock.");

@@ -1,16 +1,19 @@
-// Between a Rock — first Read of Dwarven lore after Rolad pages return.
-// CANDIDATE last-resort after-read mes. Book body / IF 837 chrome later.
-// Never 12082 / 4574 / dest / 110. Hunt 289? no.
-// Stay dwarfrock_quest 10. Cite bar-book-read-377.md.
-
+// CANDIDATE Read and tear-out wording: retained transcript.
+// UNKNOWN engineering Read gate and schematic-search bit join.
 [opheld1,dwarf_rock_book]
-if (%dwarfrock_quest < 10) {
-    ~displaymessage(^dm_default);
+if (%dwarfrock_quest < 10) { ~displaymessage(^dm_default); return; }
+if (%dwarfrock_quest = 10) {
+    %dwarfrock_quest = 20;
+    mes("That certainly was an interesting read! You now have enough info for Dondakan.");
     return;
 }
-if (%dwarfrock_quest = 110) {
-    ~displaymessage(^dm_default);
+if (%dwarfrock_quest >= 40 & %dwarfrock_quest < 50 & %dwarfrock_rolad_schematics_lookingfor = 1) {
+    mes("As you finish reading the book, you notice the last page has a very peculiar picture drawn on it.");
+    if (~p_choice2("Tear out the page.", 1, "Leave it alone.", 2) = 2) return;
+    if (inv_total(inv, dwarf_rock_book) = 0) return;
+    inv_del(inv, dwarf_rock_book, 1);
+    ~dwarfrock_give_item(dwarf_rock_base_schematic);
+    mes("You tear out the page and find what appears to be one of the schematics you've been looking for!");
     return;
 }
 mes("That certainly was an interesting read! You now have enough info for Dondakan.");
-return;

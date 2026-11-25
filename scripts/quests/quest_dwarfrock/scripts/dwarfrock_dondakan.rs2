@@ -1,16 +1,16 @@
-// Between a Rock… start-gate — Dondakan the Dwarf (dwarfrock_dondakan 1837).
-// CANDIDATE last-resort 2007-base: OSRS Transcript minus Overview / overlay.
-// Hunt 289? no. Bind the child, not the multi parent.
-// Accept: %dwarfrock_quest 0→10 only. Pointer may set dwarfrock_lookingforinfo.
-// Never schematic / gold CB / inside / complete. Cite between-a-rock-start-talk-377.md §4.
+// CANDIDATE dialogue: retained 2007-base transcript, minus later skip/pickaxe rewards.
+// UNKNOWN engineering stages use the original visible 0,10,...,110 multi keys.
+[opnpc1,dwarfrock_dondakan] @dwarfrock_dondakan_talk;
+[opnpc1,dwarfrock_dondakan_noaxe] @dwarfrock_dondakan_talk;
 
-[opnpc1,dwarfrock_dondakan]
-if (%dwarfrock_quest >= 10 & inv_total(inv, dwarf_rock_book) > 0) {
-    @dwarfrock_dondakan_after_book;
-}
-if (%dwarfrock_quest >= 10) {
-    @dwarfrock_dondakan_started;
-}
+[label,dwarfrock_dondakan_talk]
+if (%dwarfrock_quest = 100) @dwarfrock_complete;
+if (%dwarfrock_quest >= 110) @dwarfrock_dondakan_postquest;
+if (%dwarfrock_quest >= 50) @dwarfrock_dondakan_ready;
+if (%dwarfrock_quest >= 40) @dwarfrock_dondakan_schematics;
+if (%dwarfrock_quest >= 30) @dwarfrock_dondakan_proposal;
+if (%dwarfrock_quest >= 20) @dwarfrock_dondakan_after_book;
+if (%dwarfrock_quest >= 10) @dwarfrock_dondakan_started;
 @dwarfrock_dondakan_hello;
 
 [label,dwarfrock_dondakan_hello]
@@ -105,6 +105,7 @@ if ($yes = 2) {
 if (%dwarfrock_quest = 0) {
     %dwarfrock_quest = 10;
 }
+~send_quest_progress(questlist:dwarfrock, %dwarfrock_quest, ^dwarfrock_complete);
 return;
 
 [label,dwarfrock_dondakan_started]

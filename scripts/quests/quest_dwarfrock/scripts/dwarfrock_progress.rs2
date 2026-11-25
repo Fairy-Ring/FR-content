@@ -1,0 +1,121 @@
+// CANDIDATE dialogue: Transcript:Between a Rock..., Finding the schematics / Finishing up.
+// UNKNOWN engineering stage writes and replacement policy. No later Fire shortcut.
+[proc,dwarfrock_give_item](namedobj $item)
+if (inv_total(inv, $item) > 0 | inv_total(bank, $item) > 0) return;
+if (inv_freespace(inv) > 0) inv_add(inv, $item, 1);
+else obj_add(coord, $item, 1, ^lootdrop_duration);
+
+[label,dwarfrock_dondakan_proposal]
+~chatnpc("<p,neutral>Why, I'll just shoot you through it so you can have a look, won't I?");
+~chatplayer("<p,quiz>Shoot me... through it? Errr... what exactly do you mean?");
+~chatnpc("<p,neutral>Very simple. I'll have to make a few modifications to my cannon so that it can fire a human, and you'll need a golden helmet of course.");
+if (~p_choice2("I can't argue with that, shoot me in!", 1, "Find someone else for your bizarre experiment!", 2) = 2) return;
+~chatnpc("<p,neutral>If I had the right schematics for it, I could probably work with that. But I don't.");
+~chatnpc("<p,neutral>That's it, yes! Here, I have one part of the schematics, sent to me by some prankster dwarf, I don't even remember his name. You'll have to find the rest on your own.");
+%dwarfrock_quest = 40;
+%dwarfrock_dondakan_inside_heardof = 1;
+~dwarfrock_give_item(dwarf_rock_schematic1);
+~send_quest_progress(questlist:dwarfrock, %dwarfrock_quest, ^dwarfrock_complete);
+
+[label,dwarfrock_dondakan_schematics]
+if (inv_total(inv, dwarf_rock_schematic_assembled) > 0) {
+    ~chatplayer("<p,happy>I've got your schematics all assembled, and I have that golden helmet as well!");
+    if (inv_total(worn, dwarf_goldrock_helmet) = 0) {
+        ~chatnpc("<p,neutral>Well, go ahead and wear your helmet! Won't protect your head if it's not on your head!");
+        return;
+    }
+    inv_del(inv, dwarf_rock_schematic_assembled, 1);
+    %dwarfrock_quest = 50;
+    @dwarfrock_dondakan_ready;
+}
+~chatnpc("<p,neutral>I still need those schematics to modify my cannon. It doesn't normally fire humans, you know.");
+~chatnpc("<p,neutral>It's probably best to ask any dwarven engineers that you might know.");
+~dwarfrock_give_item(dwarf_rock_schematic1);
+
+[label,dwarfrock_dondakan_ready]
+~chatnpc("<p,happy>Wonderful! These schematics look simple enough... are you ready for your quick trip through the rock then?");
+if (~p_choice3("You may fire when ready!", 1, "Ready as I'll ever be.", 2, "Err... maybe another time.", 3) = 3) return;
+@dwarfrock_launch;
+
+[label,dwarfrock_dondakan_postquest]
+~chatplayer("<p,happy>How are you doing, Dondakan?");
+~chatnpc("<p,happy>Oh, just fine, just fine! This gold is certainly creating a steady flow of income for me! After the company takes some of the cut, of course.");
+if (~p_choice2("Can you shoot me into the rock again?", 1, "That's great, but I have to go.", 2) = 2) return;
+@dwarfrock_launch;
+
+[label,dwarfrock_complete]
+~chatnpc("<p,shock>The whole cave was shaking! What happened in there?");
+~chatplayer("<p,neutral>I think I killed the Arzinian demon thing.");
+~chatnpc("<p,shock>What, you actually killed him?");
+~chatplayer("<p,neutral>Well, I killed its avatar. I'm not sure what happened to the demon itself.");
+~chatnpc("<p,neutral>Probably banished it to some hellish realm or other.");
+~chatnpc("<p,happy>Of course, of course! Whenever you want to go back in there, let me know... just don't forget to bring your helmet!");
+// VERIFIED between-a-rock.period-rewards: period Tip.It reward list.
+// Commit the stage with the rewards, before opening the interruptible completion scroll.
+if (%dwarfrock_quest ! 100) return;
+%dwarfrock_quest = ^dwarfrock_complete;
+stat_advance(defence, 50000);
+stat_advance(mining, 50000);
+stat_advance(smithing, 50000);
+if (inv_freespace(inv) >= 1) inv_add(inv, rune_pickaxe, 1);
+else obj_add(coord, rune_pickaxe, 1, ^lootdrop_duration);
+~send_quest_complete(questlist:dwarfrock, dwarf_goldrock_helmet, 200, ^dwarfrock_questpoints, "You have completed Between a Rock...!", "5,000 Defence XP|5,000 Mining XP|5,000 Smithing XP|Rune pickaxe|Access to the gold mine");
+
+[label,dwarfrock_engineer_schematic]
+~chatplayer("<p,quiz>Do you have any schematics related to the dwarven multicannon?");
+~chatnpc("<p,neutral>Here, take this. Khorvak sent it to me from White Wolf Mountain, kind of as a joke. It's incomplete, of course, doesn't mean anything without other parts.");
+~dwarfrock_give_item(dwarf_rock_schematic2);
+
+[label,dwarfrock_rolad_schematic]
+~chatplayer("<p,quiz>But can you help me with the schematics? Dondakan needs to know what he needs to modify.");
+~chatnpc("<p,neutral>No, all I have are the base schematics of the cannon. I was on the multicannon project once, you know?");
+~chatnpc("<p,sad>Oh dear, I seem to have lost the schematics.");
+%dwarfrock_rolad_schematics_lookingfor = 1;
+if (inv_total(inv, dwarf_rock_schematic_assembled) = 0 & inv_total(bank, dwarf_rock_schematic_assembled) = 0 & inv_total(inv, dwarf_rock_base_schematic) = 0 & inv_total(bank, dwarf_rock_base_schematic) = 0) ~dwarfrock_give_item(dwarf_rock_book);
+
+[opnpc1,dwarfrock_engineer2]
+if (%dwarfrock_quest < 40 | %dwarfrock_quest >= 50) { ~displaymessage(^dm_default); return; }
+~chatplayer("<p,quiz>I'm looking for schematics to modify the dwarven multicannon to fire a human. Can you help?");
+~chatnpc("<p,laugh>Haha, yesh, I have jusht the shing!");
+~chatnpc("<p,neutral>Just give me a drink and I'll gladly help you.");
+if (~p_choice2("No, I've had enough of buying drinks for people!", 1, "Oh, alright, what do you want to drink?", 2) = 2) {
+    ~chatnpc("<p,neutral>Oooh, jusht a glash of dwarven shtout over there...");
+    return;
+}
+~chatplayer("<p,angry>No, I've had enough of buying drinks for people!");
+~chatnpc("<p,sad>Here, have the shtupid schematic, I've gone right off my drink now.");
+~dwarfrock_give_item(dwarf_rock_schematic3);
+
+[opnpcu,dwarfrock_engineer2]
+if (%dwarfrock_quest < 40 | %dwarfrock_quest >= 50 | last_useitem ! dwarven_stout) { ~displaymessage(^dm_default); return; }
+~chatnpc("<p,happy>That'sh wonderful! You're a good human, you are. Here, have thish schematic and have fun with it!");
+inv_del(inv, dwarven_stout, 1);
+inv_add(inv, beer_glass, 1);
+~dwarfrock_give_item(dwarf_rock_schematic3);
+
+[oplocu,dwarf_keldagrim_anvil]
+if (last_useitem = gold_bar & %dwarfrock_quest >= 40) @dwarfrock_smith_helmet;
+~displaymessage(^dm_default);
+
+[label,dwarfrock_smith_helmet]
+// CANDIDATE recipe and XP: facts gold-helmet-candidate-gates (50 Smithing, three bars, hammer, 30 XP).
+if (stat(smithing) < 50) { mes("You need a Smithing level of 50 to make a gold helmet."); return; }
+if (inv_total(inv, hammer) = 0) { mes("You need a hammer to work the metal with."); return; }
+if (inv_total(inv, gold_bar) < 3) { mes("You need three gold bars to make a gold helmet."); return; }
+anim(human_smithing, 0);
+sound_synth(anvil_4, 1, 0);
+inv_del(inv, gold_bar, 3);
+inv_add(inv, dwarf_goldrock_helmet, 1);
+stat_advance(smithing, 300);
+mes("You make a gold helmet."); // UNKNOWN functional result text; historical smithing line not retained.
+
+[if_button,questlist:dwarfrock]
+def_string $text = "I should speak to Dondakan by his cannon in the mines south of Keldagrim.";
+if (%dwarfrock_quest >= 10) $text = "Dondakan needs information about his rock. The librarian and engineer in Keldagrim may help. Rolad at Ice Mountain needs three missing pages from the Dwarven Mine.";
+if (%dwarfrock_quest >= 20) $text = "I read Rolad's book. I should tell Dondakan about the gold and try a golden cannonball.";
+if (%dwarfrock_quest >= 40) $text = "I need the four schematics: Dondakan's, the Keldagrim engineer's, Khorvak's and Rolad's base drawing. I should read the book again after asking Rolad. I also need a gold helmet: three gold bars and a hammer at an anvil, with 50 Smithing.";
+if (%dwarfrock_quest >= 50) $text = "Dondakan can fire me into the rock when I wear my gold helmet. I need a pickaxe and combat equipment. Gold ore weakens the Arzinian Avatar.";
+if (%dwarfrock_quest = 100) $text = "I defeated the Arzinian Avatar. I should return to Dondakan.";
+if (%dwarfrock_quest >= 110) $text = "<col=000080>QUEST COMPLETE!|Dondakan can fire me back into the gold mine when I wear my gold helmet.";
+// UNKNOWN functional journal wording, not a recovered original journal.
+~quest_journal("Between a Rock...", $text);
