@@ -1,0 +1,13 @@
+[farming_bush]
+column=seed,obj,REQUIRED
+column=produce,namedobj,REQUIRED
+column=first,int,REQUIRED
+column=mature,int,REQUIRED
+column=last,int,REQUIRED
+column=claim,int,REQUIRED
+column=level,int,REQUIRED
+column=seed_count,int,REQUIRED
+column=plant_xp,int,REQUIRED
+column=check_xp,int,REQUIRED
+column=harvest_xp,int,REQUIRED
+column=plural,string,REQUIRED

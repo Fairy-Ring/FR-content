@@ -1,0 +1,15 @@
+[farming_special]
+column=patch,loc,REQUIRED
+column=seed,obj,REQUIRED
+column=produce,namedobj,REQUIRED
+column=first,int,REQUIRED
+column=mature,int,REQUIRED
+column=last,int,REQUIRED
+column=diseased,int,REQUIRED
+column=dead,int,REQUIRED
+column=level,int,REQUIRED
+column=plant_xp,int,REQUIRED
+column=check_xp,int,REQUIRED
+column=harvest_xp,int,REQUIRED
+column=growth,dbrow,REQUIRED
+column=soil,int,REQUIRED

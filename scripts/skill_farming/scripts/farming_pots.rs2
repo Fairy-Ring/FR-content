@@ -1,0 +1,162 @@
+// Original 377 plant-pot forms; see farming_pots rows for each seed family.
+// Counted cache forms are render variants, not inventory item identities.
+[proc,farming_pots_seed](obj $seed)(dbrow)
+switch_obj ($seed) {
+    case acorn : return(farming_pots_oak);
+    case willow_seed : return(farming_pots_willow);
+    case maple_seed : return(farming_pots_maple);
+    case yew_seed : return(farming_pots_yew);
+    case magic_tree_seed : return(farming_pots_magic);
+    case spirit_tree_seed : return(farming_pots_spirit);
+    case apple_tree_seed : return(farming_pots_apple);
+    case banana_tree_seed : return(farming_pots_banana);
+    case orange_tree_seed : return(farming_pots_orange);
+    case curry_tree_seed : return(farming_pots_curry);
+    case pineapple_tree_seed : return(farming_pots_pineapple);
+    case papaya_tree_seed : return(farming_pots_papaya);
+    case palm_tree_seed : return(farming_pots_palm);
+    case calquat_tree_seed : return(farming_pots_calquat);
+}
+return(null);
+
+[proc,farming_pots_seedling](obj $item)(dbrow)
+switch_obj ($item) {
+    case plantpot_acorn, plantpot_acorn_watered : return(farming_pots_oak);
+    case plantpot_willow_seed, plantpot_willow_seed_watered : return(farming_pots_willow);
+    case plantpot_maple_seed, plantpot_maple_seed_watered : return(farming_pots_maple);
+    case plantpot_yew_seed, plantpot_yew_seed_watered : return(farming_pots_yew);
+    case plantpot_magic_tree_seed, plantpot_magic_tree_seed_watered : return(farming_pots_magic);
+    case plantpot_spirit_tree_seed, plantpot_spirit_tree_seed_watered : return(farming_pots_spirit);
+    case plantpot_apple_seed, plantpot_apple_seed_watered : return(farming_pots_apple);
+    case plantpot_banana_seed, plantpot_banana_seed_watered : return(farming_pots_banana);
+    case plantpot_orange_seed, plantpot_orange_seed_watered : return(farming_pots_orange);
+    case plantpot_curry_seed, plantpot_curry_seed_watered : return(farming_pots_curry);
+    case plantpot_pineapple_seed, plantpot_pineapple_seed_watered : return(farming_pots_pineapple);
+    case plantpot_papaya_seed, plantpot_papaya_seed_watered : return(farming_pots_papaya);
+    case plantpot_palm_seed, plantpot_palm_seed_watered : return(farming_pots_palm);
+    case plantpot_calquat_seed, plantpot_calquat_seed_watered : return(farming_pots_calquat);
+}
+return(null);
+
+// This proc is the only patch-dispatch dependency for filling a pot. Every
+// Farming [oplocu] handler should call it before its crop-specific branches.
+// UNKNOWN operator-directed input: an empty pot used on any patch takes soil.
+[proc,farming_pots_fill_on_patch]()(boolean)
+if (last_useitem ! plantpot_empty) return(false);
+if (inv_total(inv, gardening_trowel) < 1) {
+    ~displaymessage(^dm_farming_trowel);
+    return(true);
+}
+anim(farming_trowel_digging, 0);
+inv_setslot(inv, last_useslot, plantpot_compost, 1);
+return(true);
+
+// Exact crop handlers call the proc above; other original patch forms use
+// their existing category. No cache field or map placement is changed.
+[oplocu,_farming_patch_guide]
+if (~farming_pots_fill_on_patch = true) return;
+~displaymessage(^dm_default);
+
+
+// The cache already groups all watering-can doses under watering_can.
+[opheldu,_watering_can] @farming_pots_item_use;
+[opheldu,plantpot_compost] @farming_pots_item_use;
+
+// Native item-use packets retain the seed's base inventory identity.
+[opheldu,acorn] @farming_pots_item_use;
+[opheldu,willow_seed] @farming_pots_item_use;
+[opheldu,maple_seed] @farming_pots_item_use;
+[opheldu,yew_seed] @farming_pots_item_use;
+[opheldu,magic_tree_seed] @farming_pots_item_use;
+[opheldu,spirit_tree_seed] @farming_pots_item_use;
+[opheldu,apple_tree_seed] @farming_pots_item_use;
+[opheldu,banana_tree_seed] @farming_pots_item_use;
+[opheldu,orange_tree_seed] @farming_pots_item_use;
+[opheldu,curry_tree_seed] @farming_pots_item_use;
+[opheldu,pineapple_tree_seed] @farming_pots_item_use;
+[opheldu,papaya_tree_seed] @farming_pots_item_use;
+[opheldu,palm_tree_seed] @farming_pots_item_use;
+[opheldu,calquat_tree_seed] @farming_pots_item_use;
+
+// Water-can-on-seedling interactions use each cached potted-seedling target.
+[opheldu,plantpot_acorn] @farming_pots_item_use;
+[opheldu,plantpot_willow_seed] @farming_pots_item_use;
+[opheldu,plantpot_maple_seed] @farming_pots_item_use;
+[opheldu,plantpot_yew_seed] @farming_pots_item_use;
+[opheldu,plantpot_magic_tree_seed] @farming_pots_item_use;
+[opheldu,plantpot_spirit_tree_seed] @farming_pots_item_use;
+[opheldu,plantpot_apple_seed] @farming_pots_item_use;
+[opheldu,plantpot_banana_seed] @farming_pots_item_use;
+[opheldu,plantpot_orange_seed] @farming_pots_item_use;
+[opheldu,plantpot_curry_seed] @farming_pots_item_use;
+[opheldu,plantpot_pineapple_seed] @farming_pots_item_use;
+[opheldu,plantpot_papaya_seed] @farming_pots_item_use;
+[opheldu,plantpot_palm_seed] @farming_pots_item_use;
+[opheldu,plantpot_calquat_seed] @farming_pots_item_use;
+
+[label,farming_pots_item_use]
+// Water in either item-use direction. A watering can spends exactly one dose.
+def_dbrow $seedling = ~farming_pots_seedling(last_item);
+def_int $seedling_slot = last_slot;
+def_obj $can = last_useitem;
+def_int $can_slot = last_useslot;
+if ($seedling = null) {
+    $seedling = ~farming_pots_seedling(last_useitem);
+    $seedling_slot = last_useslot;
+    $can = last_item;
+    $can_slot = last_slot;
+}
+if ($seedling ! null) {
+    if (inv_getobj(inv, $seedling_slot) = db_getfield($seedling, farming_pots:seedling, 0)
+        & oc_category($can) = watering_can & $can ! watering_can_0) {
+        def_namedobj $next_can = oc_param($can, next_obj_stage);
+        if ($next_can ! null) {
+            anim(farming_watering, 0);
+            inv_setslot(inv, $seedling_slot, db_getfield($seedling, farming_pots:watered, 0), 1);
+            inv_setslot(inv, $can_slot, $next_can, 1);
+            return;
+        }
+    }
+}
+
+// Plant one cache seed into one soil-filled plant pot; the trowel is reusable.
+def_obj $seed = last_useitem;
+def_dbrow $crop = ~farming_pots_seed($seed);
+def_int $seed_slot = last_useslot;
+def_int $pot_slot = last_slot;
+if ($crop = null) {
+    $seed = last_item;
+    $crop = ~farming_pots_seed($seed);
+    $seed_slot = last_slot;
+    $pot_slot = last_useslot;
+}
+if ($crop = null) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_getobj(inv, $pot_slot) ! plantpot_compost) {
+    ~displaymessage(^dm_default);
+    return;
+}
+if (inv_total(inv, gardening_trowel) < 1) {
+    ~displaymessage(^dm_default);
+    return;
+}
+inv_del(inv, $seed, 1);
+inv_setslot(inv, $pot_slot, db_getfield($crop, farming_pots:seedling, 0), 1);
+
+// UNKNOWN favourable-to-player timing: any watered seedling matures after its
+// first eligible shared five-minute window. Inventory object state is saved.
+[proc,farming_pots_growth](int $steps)
+if ($steps < ^farming_pots_mature_steps) return;
+def_int $slot = 0;
+while ($slot < inv_size(inv)) {
+    def_obj $item = inv_getobj(inv, $slot);
+    def_dbrow $crop = ~farming_pots_seedling($item);
+    if ($crop ! null) {
+        if ($item = db_getfield($crop, farming_pots:watered, 0)) {
+            inv_setslot(inv, $slot, db_getfield($crop, farming_pots:sapling, 0), 1);
+        }
+    }
+    $slot = add($slot, 1);
+}

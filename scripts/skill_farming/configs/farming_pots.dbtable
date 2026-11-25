@@ -1,0 +1,5 @@
+[farming_pots]
+column=seed,obj,REQUIRED
+column=seedling,namedobj,REQUIRED
+column=watered,namedobj,REQUIRED
+column=sapling,namedobj,REQUIRED

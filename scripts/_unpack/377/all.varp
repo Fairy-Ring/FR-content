@@ -961,16 +961,8 @@ scope=perm
 transmit=yes
 scope=perm
 
-[farming_bush_varp]
-transmit=yes
-scope=perm
-
 [farming_varp_9]
 transmit=yes
-
-[cactus_compost_varbit_basevar]
-transmit=yes
-scope=perm
 
 [varp513_bits]
 scope=perm
@@ -1005,7 +997,6 @@ transmit=yes
 
 [varp528_bits]
 
-[farming_state_temp_3]
 
 [varp530_bits]
 

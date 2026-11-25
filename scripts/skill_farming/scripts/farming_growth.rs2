@@ -42,6 +42,11 @@ switch_int ($handler) {
     case ^farming_handler_flower : ~farming_flower_advance_all($steps, $window);
     case ^farming_handler_hops : ~farming_hops_advance_all($steps, $window);
     case ^farming_handler_compost : ~farming_compost_growth($steps);
+    case ^farming_handler_bush : ~farming_bush_advance_all($steps, $window);
+    case ^farming_handler_cactus : ~farming_special_advance_all(farming_special_cactus, $steps, $window);
+    case ^farming_handler_belladonna : ~farming_special_advance_all(farming_special_belladonna, $steps, $window);
+    case ^farming_handler_mushroom : ~farming_special_advance_all(farming_special_mushroom, $steps, $window);
+    case ^farming_handler_pots : ~farming_pots_growth($steps);
 }
 
 [proc,farming_login]

@@ -41,3 +41,34 @@ data=disease_period,20
 table=farming_growth
 data=period,5
 data=handler,5
+
+// CANDIDATE family periods from the retained Old School growth table.
+// UNKNOWN disease periods: reuse the published next-slowest-tier convention.
+[farming_growth_bush]
+table=farming_growth
+data=period,20
+data=handler,6
+data=disease_period,40
+
+[farming_growth_cactus]
+table=farming_growth
+data=period,80
+data=handler,7
+data=disease_period,160
+
+[farming_growth_belladonna]
+table=farming_growth
+data=period,80
+data=handler,8
+data=disease_period,160
+
+[farming_growth_mushroom]
+table=farming_growth
+data=period,40
+data=handler,9
+data=disease_period,80
+
+[farming_growth_pots]
+table=farming_growth
+data=period,5
+data=handler,10

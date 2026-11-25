@@ -1,0 +1,5 @@
+// Original cache word. UNKNOWN operator-selected access: SOFT growth writes patch state.
+[farming_bush_varp]
+transmit=yes
+scope=perm
+protect=no

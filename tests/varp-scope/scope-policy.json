@@ -1,6 +1,7 @@
 {
   "referenceCommit": "457c8943b5c1c3ebe338a12a9b12418c6c96c325",
   "permanentDecisions": {
+    "farming_state_temp_3": "UNKNOWN engineering storage: original word 529 bits 8..15 hold four durable bush soil treatments. Retain those preparations across logout and offline crop growth while preserving the original low-byte varbit.",
     "macro_event_origin_coord": "U01 lifecycle departure O reuses unused original slot 59; no client reader or varbit base. Kept separately from intended destination D across reconnect."
   },
   "inheritedPermanent": [
@@ -565,7 +566,7 @@
     "farming_protection": "perm",
     "farming_soil_lives": "perm",
     "farming_special_tree_varp": "perm",
-    "farming_state_temp_3": "temp",
+    "farming_state_temp_3": "perm",
     "farming_tools": "perm",
     "farming_tree_varp": "perm",
     "farming_varp_9": "temp",

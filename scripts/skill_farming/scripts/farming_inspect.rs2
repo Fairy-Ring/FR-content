@@ -455,9 +455,9 @@ if ($index ! -1) {
     else if ($treatment = 2) $soil = farming_inspect_soil_supercompost;
 }
 mes(db_getfield($soil, farming_inspect:line, 0));
-def_string $state_line = db_getfield($row, farming_inspect:line, 0);
-if (string_length($state_line) > 0) {
-    mes($state_line);
+if ($row ! null) {
+    def_string $state_line = db_getfield($row, farming_inspect:line, 0);
+    if (string_length($state_line) > 0) mes($state_line);
 }
 // CANDIDATE scarecrow wording: the 2012 quotation alone, not the operator.
 // Read the same neighbouring-flower pairing used by published growth.
@@ -473,7 +473,7 @@ if ($family = 1 & $state < ^farming_diseased_offset) {
     }
 }
 
-// VERIFIED original 377 selectors. Eight unplanted families bind only0..3.
+// VERIFIED original 377 selectors, including the newly plantable families.
 [proc,farming_inspect_state](loc $patch)(int)
 switch_loc ($patch) {
     case farming_veg_patch_1 : return(%farming_allotment_varp_1_0_7);

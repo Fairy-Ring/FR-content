@@ -79,6 +79,7 @@ switch_loc (loc_type) {
 [oplocu,farming_veg_patch_8] @farming_parent_use;
 
 [label,farming_rake_use]
+if (~farming_pots_fill_on_patch = true) return;
 if (last_useitem ! rake) {
     ~displaymessage(^dm_default);
     return;
@@ -106,6 +107,14 @@ if (~farming_allotment_seed(last_useitem) ! null) {
 // UNKNOWN ordinary continuation: operator's recollection of Old School.
 // The pending interaction uses the engine's normal movement/interruption rules.
 [proc,farming_rake_step](boolean $repeat)
+if (~farming_bush_stage ! -1) {
+    ~farming_special_rake($repeat, true);
+    return;
+}
+if (~farming_special_stage ! -1) {
+    ~farming_special_rake($repeat, false);
+    return;
+}
 def_int $stage = ~farming_herb_stage;
 def_boolean $herb = true;
 def_boolean $flower = false;
@@ -179,6 +188,7 @@ if ($stage < ^farming_veg_weeded) {
 @farming_plant_use;
 
 [label,farming_plant_use]
+if (~farming_pots_fill_on_patch = true) return;
 if (~farming_veg_is_parent = false) {
     ~displaymessage(^dm_default);
     return;
