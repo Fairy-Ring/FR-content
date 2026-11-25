@@ -3,7 +3,7 @@
 [proc,enakh_puzzle_spell](int $spell)(boolean)
 // Unrelated NPCs must retain the entire existing combat path.
 if (npc_type ! enakh_dummy_fountain & npc_type ! enakh_dummy_furnace & npc_type ! enakh_boneguard) return(false);
-if (%enakh_quest < 10) return(true);
+if (%enakh_quest < 10) return(false);
 if (map_clock < %action_delay) return(true);
 def_boolean $matches = false;
 if (npc_type = enakh_dummy_fountain) {
