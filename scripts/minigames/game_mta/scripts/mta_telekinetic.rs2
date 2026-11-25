@@ -1,0 +1,214 @@
+// VERIFIED: 15 April 2006 Jagex Knowledge Base article 2334 awards 2 points per maze; every fifth consecutive maze adds 8 points, 1000 Magic XP and 10 law runes. The streak survives leaving and logging out.
+// VERIFIED: the solved statue becomes a Maze Guardian; talking to him advances to the next maze. A cast never advances automatically.
+// UNKNOWN favourable-player defaults: uniform selection; fixed interior starts/goals requiring 3–8 pulls on the original ten mazes; full-inventory bonus-rune drop; camera bounds and height. Original floor mats mark player entries, not statue goals.
+
+[proc,mta_telekinetic_goal](int $layout)(coord)
+switch_int($layout) {
+    case 0 : return(0_52_151_19_41);
+    case 1 : return(0_52_151_10_20);
+    case 2 : return(0_52_151_50_9);
+    case 3 : return(0_52_151_47_56);
+    case 4 : return(1_52_151_27_16);
+    case 5 : return(1_52_151_13_44);
+    case 6 : return(1_52_151_46_49);
+    case 7 : return(1_52_151_57_13);
+    case 8 : return(2_52_151_24_45);
+    case 9 : return(2_52_151_11_19);
+}
+return(null);
+
+[proc,mta_telekinetic_layout]()(int)
+return(getbit_range(%varp624_bits, 14, 17));
+
+[proc,mta_telekinetic_position]() (coord)
+return(movecoord(0_52_151_0_0,
+    getbit_range(%varp624_bits, 0, 5),
+    getbit_range(%varp624_bits, 12, 13),
+    getbit_range(%varp624_bits, 6, 11)));
+
+[proc,mta_telekinetic_store_position](coord $position)
+%varp624_bits = setbit_range_toint(%varp624_bits, sub(coordx($position), 3328), 0, 5);
+%varp624_bits = setbit_range_toint(%varp624_bits, sub(coordz($position), 9664), 6, 11);
+%varp624_bits = setbit_range_toint(%varp624_bits, coordy($position), 12, 13);
+
+
+// Slide one tile at a time over the real packed maze collision; stop immediately before a blocked tile or the map edge.
+[proc,mta_telekinetic_slide](int $level, int $x, int $z, int $dx, int $dz)(coord)
+def_coord $position = movecoord(0_52_151_0_0, $x, $level, $z);
+def_int $steps = 0;
+while ($steps < 64) {
+    def_coord $next = movecoord($position, $dx, 0, $dz);
+    if (coordx($next) < 3328 | coordx($next) > 3391 | coordz($next) < 9664 | coordz($next) > 9727) return($position);
+    if (map_blocked($next) = true | lineofwalk($position, $next) = false) return($position);
+    $position = $next;
+    $steps = add($steps, 1);
+}
+return($position);
+
+// UNKNOWN fixed statue starts inside the cache's ten 10-by-10 maze interiors.
+[proc,mta_telekinetic_start_position](int $layout)(coord)
+switch_int($layout) {
+    case 0 : return(0_52_151_17_47);
+    case 1 : return(0_52_151_11_11);
+    case 2 : return(0_52_151_44_17);
+    case 3 : return(0_52_151_38_47);
+    case 4 : return(1_52_151_18_25);
+    case 5 : return(1_52_151_22_45);
+    case 6 : return(1_52_151_48_55);
+    case 7 : return(1_52_151_53_22);
+    case 8 : return(2_52_151_17_47);
+    case 9 : return(2_52_151_18_19);
+}
+return(null);
+
+// VERIFIED 377 cache positions of the exterior entry mats.
+[proc,mta_telekinetic_entry](int $layout)(coord)
+switch_int($layout) {
+    case 0 : return(0_52_151_8_54);
+    case 1 : return(0_52_151_26_26);
+    case 2 : return(0_52_151_46_32);
+    case 3 : return(0_52_151_51_52);
+    case 4 : return(1_52_151_27_29);
+    case 5 : return(1_52_151_34_49);
+    case 6 : return(1_52_151_50_42);
+    case 7 : return(1_52_151_54_34);
+    case 8 : return(2_52_151_31_37);
+    case 9 : return(2_52_151_40_16);
+}
+return(null);
+
+[proc,mta_telekinetic_start](int $layout)(boolean)
+if ($layout < 0 | $layout > 9 | ~mta_room() ! 1) return(false);
+~mta_telekinetic_cleanup;
+def_coord $goal = ~mta_telekinetic_goal($layout);
+def_coord $statue = ~mta_telekinetic_start_position($layout);
+def_coord $stand = ~mta_telekinetic_entry($layout);
+%varp624_bits = setbit_range_toint(%varp624_bits, $layout, 14, 17);
+%varp624_bits = setbit_range_toint(%varp624_bits, 1, 18, 18);
+%varp624_bits = setbit_range_toint(%varp624_bits, 0, 20, 31);
+~mta_telekinetic_store_position($statue);
+%magictraining_mazesolved = 0;
+%magictraining_tele_camstat = 0;
+// UNKNOWN goal placement, shown with the original coloured mat; one shared marker per layout.
+if (loc_find($goal, magictraining_mini_mat2) = false) loc_add($goal, magictraining_mini_mat2, 0, grounddecor, ^max_32bit_int);
+obj_add($statue, magictraining_guardianstatue, 1, ^max_32bit_int);
+p_teleport($stand);
+return(true);
+
+
+[proc,mta_telekinetic_enter]
+if (~mta_room() ! 1) return;
+~mta_telekinetic_start(random(10));
+
+[proc,mta_telekinetic_camera_off]
+cleartimer(mta_telekinetic_camera_watch);
+if (%magictraining_tele_camstat = 1) cam_reset;
+%magictraining_tele_camstat = 0;
+
+[proc,mta_telekinetic_cleanup]
+cleartimer(mta_telekinetic_camera_watch);
+if (%magictraining_tele_camstat = 1) cam_reset;
+%magictraining_tele_camstat = 0;
+if (getbit_range(%varp624_bits, 18, 18) = 1) {
+    def_coord $position = ~mta_telekinetic_position;
+    if (%magictraining_mazesolved = 0 & obj_find($position, magictraining_guardianstatue) = true) obj_del();
+}
+%magictraining_mazesolved = 0;
+%varp624_bits = 0;
+
+[proc,mta_telekinetic_hud]
+if (~mta_room() = 1) if_settext(pizazz_telekinetic:com_3, "<tostring(%mta_telekinetic_points)>");
+
+// The original Telekinetic Grab handler calls this before ordinary pickup logic.
+[proc,mta_telekinetic_cast]()(boolean)
+if (~mta_room() ! 1 | obj_type ! magictraining_guardianstatue) return(false);
+if (getbit_range(%varp624_bits, 18, 18) = 0 | %magictraining_mazesolved = 1) return(true);
+def_coord $from = obj_coord;
+if ($from ! ~mta_telekinetic_position) return(true);
+def_int $dx = 0;
+def_int $dz = 0;
+if (coordx(coord) = coordx($from) & coordz(coord) ! coordz($from)) {
+    if (coordz(coord) > coordz($from)) $dz = 1;
+    else $dz = -1;
+} else if (coordz(coord) = coordz($from) & coordx(coord) ! coordx($from)) {
+    if (coordx(coord) > coordx($from)) $dx = 1;
+    else $dx = -1;
+} else {
+    return(true);
+}
+def_dbrow $spell_data = ~get_spell_data(^telekinetic_grab);
+if (~check_spell_requirements($spell_data) = false) return(true);
+if (afk_event = ^true) { ~macro_event_general_spawn(~macro_event_set_random); return(true); }
+if (oc_param(obj_type, telegrab_disabled) = true) { mes("You can't cast this spell on that object."); return(true); }
+def_coord $to = ~mta_telekinetic_slide(coordy($from), sub(coordx($from), 3328), sub(coordz($from), 9664), $dx, $dz);
+anim(human_casttelegrab, 0);
+sound_synth(telegrab_all, 1, 0);
+spotanim_pl(telegrab_casting, 92, 0);
+~delete_spell_runes($spell_data);
+def_int $duration = ~coord_projectile(coord, $from, telegrab_travel, 35, 0, 48, 16, -2, 64, 10);
+spotanim_map(telegrab_impact, $from, 0, $duration);
+p_stopaction;
+p_delay(2);
+~give_spell_xp($spell_data);
+obj_del();
+if ($to = ~mta_telekinetic_goal(~mta_telekinetic_layout)) {
+    ~mta_telekinetic_complete;
+} else {
+    obj_add($to, magictraining_guardianstatue, 1, ^max_32bit_int);
+    ~mta_telekinetic_store_position($to);
+}
+p_delay(1);
+return(true);
+
+[proc,mta_telekinetic_complete]
+%magictraining_mazesolved = 1;
+def_coord $goal = ~mta_telekinetic_goal(~mta_telekinetic_layout);
+if (npc_findexact($goal, magictraining_guard_maze) = false) npc_add($goal, magictraining_guard_maze, ^max_32bit_int);
+def_int $streak = getbit_range(%varp625_bits, 0, 2);
+if ($streak > 4) $streak = 0;
+def_int $points = 2;
+if ($streak = 4) {
+    $streak = 0;
+    $points = 10;
+    stat_advance(magic, 10000);
+def_int $overflow = inv_itemspace2(inv, lawrune, 10, inv_size(inv));
+def_int $added = sub(10, $overflow);
+if ($added > 0) inv_add(inv, lawrune, $added);
+if ($overflow > 0) obj_add(coord, lawrune, $overflow, ^max_32bit_int);
+} else {
+    $streak = add($streak, 1);
+}
+%varp625_bits = setbit_range_toint(%varp625_bits, $streak, 0, 2);
+~mta_award(1, $points);
+
+[opobj3,magictraining_guardianstatue]
+if (~mta_room() ! 1 | getbit_range(%varp624_bits, 18, 18) = 0 | %magictraining_mazesolved = 1) return;
+if (%magictraining_tele_camstat = 1) {
+    ~mta_telekinetic_camera_off;
+    return;
+}
+def_coord $goal = ~mta_telekinetic_goal(~mta_telekinetic_layout);
+def_coord $position = ~mta_telekinetic_position;
+%varp624_bits = setbit_range_toint(%varp624_bits, sub(coordx(coord), 3328), 20, 25);
+%varp624_bits = setbit_range_toint(%varp624_bits, sub(coordz(coord), 9664), 26, 31);
+cam_moveto($position, 1200, 4, 4);
+cam_lookat($goal, 0, 4, 4);
+%magictraining_tele_camstat = 1;
+settimer(mta_telekinetic_camera_watch, 5, ~mta_telekinetic_layout);
+
+[timer,mta_telekinetic_camera_watch](int $layout)
+if (~mta_room() ! 1 | %magictraining_tele_camstat = 0 | getbit_range(%varp624_bits, 18, 18) = 0 | $layout ! ~mta_telekinetic_layout) return;
+def_coord $origin = movecoord(0_52_151_0_0, getbit_range(%varp624_bits, 20, 25), coordy(coord), getbit_range(%varp624_bits, 26, 31));
+if (distance(coord, $origin) > 12) { ~mta_telekinetic_camera_off; return; }
+settimer(mta_telekinetic_camera_watch, 5, $layout);
+
+[opobj4,magictraining_guardianstatue]
+if (~mta_room() ! 1 | getbit_range(%varp624_bits, 18, 18) = 0 | %magictraining_mazesolved = 1) return;
+~mta_telekinetic_start(~mta_telekinetic_layout);
+
+[opnpc1,magictraining_guard_maze] @mta_telekinetic_next;
+[apnpc1,magictraining_guard_maze] @mta_telekinetic_next;
+
+[label,mta_telekinetic_next]
+if (~mta_room() ! 1 | getbit_range(%varp624_bits, 18, 18) = 0 | %magictraining_mazesolved = 0 | npc_coord ! ~mta_telekinetic_goal(~mta_telekinetic_layout)) return;
+~mta_telekinetic_start(random(10));

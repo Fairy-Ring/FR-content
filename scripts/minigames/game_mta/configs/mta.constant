@@ -1,0 +1,10 @@
+// UNKNOWN favourable-player engineering interval; the 2007 guide gives damage but no cadence.
+^mta_graveyard_fall_ticks = 50
+
+// UNKNOWN favourable-player floor-spawn defaults; only floor spawning itself is period-verified.
+^mta_dragonstone_spawn_interval = 50
+^mta_dragonstone_spawn_count = 5
+^mta_dragonstone_lifetime = 600
+
+// UNKNOWN favourable-player percentage: the 2007 guide says reduced XP but gives no amount.
+^mta_enchantment_xp_percent = 90

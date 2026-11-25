@@ -3,7 +3,8 @@
   "permanentDecisions": {
     "macro_event_origin_coord": "U01 lifecycle departure O reuses unused original slot 59; no client reader or varbit base. Kept separately from intended destination D across reconnect.",
     "magictraining6": "Original MTA bit bank includes the permanent Bones to Peaches spell entitlement; room counters are reset on entry and exit.",
-    "varp625_bits": "MTA completed-maze streak survives leaving and logout, as the 15 April 2006 official guide requires."
+    "varp625_bits": "MTA completed-maze streak survives leaving and logout, as the 15 April 2006 official guide requires.",
+    "varp626_bits": "MTA deposited-coin bank rewards remain owed until leaving or login recovery; transient cupboard rotation fields are reset on entry and cleanup."
   },
   "inheritedPermanent": [
     "bunny_ears_unlocked",
@@ -274,7 +275,6 @@
     "prayer14": "Whether this prayer is active in the current session.",
     "qp": "Quest-point total derived again from saved quest completion on login.",
     "varp624_bits": "MTA private maze coordinates are reconstructed on room entry, not durable rewards.",
-    "varp626_bits": "MTA cupboard rotation and deposited-coin remainder are room-session state.",
     "varp627_bits": "MTA bonus shape and enchantment session counters are rebuilt on entry.",
     "varp628_bits": "MTA falling-bone timer and fruit-deposit remainder are room-session state.",
     "stunned": "World tick until the current stun expires.",
@@ -1082,7 +1082,7 @@
     "varp621_unused": "temp",
     "varp624_bits": "temp",
     "varp625_bits": "perm",
-    "varp626_bits": "temp",
+    "varp626_bits": "perm",
     "varp627_bits": "temp",
     "varp628_bits": "temp",
     "varp630_unused": "temp",

@@ -1,0 +1,286 @@
+// VERIFIED 377 loc options; official 15 April 2006 KB requires an empty
+// bones/banana/peach inventory on entry and four bones before a pile changes.
+[oploc1,magictraining_bones_pile1] ~mta_graveyard_pick(1);
+[oploc1,magictraining_bones_pile2] ~mta_graveyard_pick(2);
+[oploc1,magictraining_bones_pile3] ~mta_graveyard_pick(3);
+[oploc1,magictraining_bones_pile4] ~mta_graveyard_pick(4);
+[oploc1,magictraining_grave_foodshute] ~mta_graveyard_deposit;
+
+// The spellbook contains the Bones to Peaches button, but 377 has no server row.
+[if_button,magic:com_559]
+if (p_finduid(uid) = true) ~mta_bones(true);
+
+[proc,mta_graveyard_enter]
+if (~mta_room ! 4) return;
+cleartimer(mta_graveyard_fall);
+def_int $generation = add(getbit_range(%varp628_bits, 24, 27), 1);
+if ($generation >= 16) $generation = 0;
+// varp628: fruit remainder 0-3; pile type/count pairs 4-17;
+// timer active 18; generation 24-27. Keep other original bits untouched.
+%varp628_bits = setbit_range_toint(%varp628_bits, 0, 0, 23);
+%varp628_bits = setbit_range_toint(%varp628_bits, $generation, 24, 27);
+%magictraining_grave_bone4count = 0;
+if (inv_total(inv, bones) > 0 | inv_total(inv, magictraining_bones1) > 0 | inv_total(inv, magictraining_bones2) > 0 | inv_total(inv, magictraining_bones3) > 0 | inv_total(inv, magictraining_bones4) > 0 | inv_total(inv, banana) > 0 | inv_total(inv, peach) > 0) {
+    // VERIFIED functional rule from the 15 April 2006 Jagex Knowledge Base.
+    if_openoverlay(null);
+    p_teleport(0_52_51_35_50);
+    mes("You can't have any bones, bananas or peaches in your inventory before you enter.");
+    return;
+}
+// UNKNOWN sequence default: piles begin at tiers 1-4, then cycle in order.
+%varp628_bits = setbit_range_toint(%varp628_bits, 0, 4, 5);
+%varp628_bits = setbit_range_toint(%varp628_bits, 0, 6, 7);
+%varp628_bits = setbit_range_toint(%varp628_bits, 1, 8, 9);
+%varp628_bits = setbit_range_toint(%varp628_bits, 0, 10, 11);
+%varp628_bits = setbit_range_toint(%varp628_bits, 2, 12, 13);
+%varp628_bits = setbit_range_toint(%varp628_bits, 0, 14, 15);
+%varp628_bits = setbit_range_toint(%varp628_bits, 3, 16, 17);
+%varp628_bits = setbit_range_toint(%varp628_bits, 1, 18, 18);
+// CANDIDATE: 2007 guide says falling bones cause 2 damage; interval is unknown.
+// UNKNOWN favourable-player engineering interval: one hit every 50 server ticks.
+settimer(mta_graveyard_fall, ^mta_graveyard_fall_ticks, $generation);
+~mta_hud;
+
+[proc,mta_graveyard_cleanup]
+cleartimer(mta_graveyard_fall);
+%varp628_bits = setbit_range_toint(%varp628_bits, 0, 0, 23);
+%magictraining_grave_bone4count = 0;
+if (inv_total(inv, magictraining_bones1) > 0) inv_del(inv, magictraining_bones1, inv_total(inv, magictraining_bones1));
+if (inv_total(inv, magictraining_bones2) > 0) inv_del(inv, magictraining_bones2, inv_total(inv, magictraining_bones2));
+if (inv_total(inv, magictraining_bones3) > 0) inv_del(inv, magictraining_bones3, inv_total(inv, magictraining_bones3));
+if (inv_total(inv, magictraining_bones4) > 0) inv_del(inv, magictraining_bones4, inv_total(inv, magictraining_bones4));
+// VERIFIED 2007 guide: fruit in the inventory is lost on leaving/logging out.
+if (inv_total(inv, banana) > 0) inv_del(inv, banana, inv_total(inv, banana));
+if (inv_total(inv, peach) > 0) inv_del(inv, peach, inv_total(inv, peach));
+
+[proc,mta_graveyard_hud]
+if (~mta_room ! 4) return;
+if_settext(pizazz_graveyard:com_3, "<tostring(%mta_graveyard_points)>");
+
+[proc,mta_graveyard_pick](int $pile)
+if (~mta_room ! 4) return;
+if ($pile < 1 | $pile > 4) return;
+def_int $type;
+def_int $count;
+if ($pile = 1) {
+    $type = getbit_range(%varp628_bits, 4, 5);
+    $count = getbit_range(%varp628_bits, 6, 7);
+} else if ($pile = 2) {
+    $type = getbit_range(%varp628_bits, 8, 9);
+    $count = getbit_range(%varp628_bits, 10, 11);
+} else if ($pile = 3) {
+    $type = getbit_range(%varp628_bits, 12, 13);
+    $count = getbit_range(%varp628_bits, 14, 15);
+} else {
+    $type = getbit_range(%varp628_bits, 16, 17);
+    $count = %magictraining_grave_bone4count;
+}
+def_namedobj $bone;
+switch_int($type) {
+    case 0 : $bone = magictraining_bones1;
+    case 1 : $bone = magictraining_bones2;
+    case 2 : $bone = magictraining_bones3;
+    case 3 : $bone = magictraining_bones4;
+}
+if (inv_itemspace(inv, $bone, 1, inv_size(inv)) = false) {
+    // UNKNOWN functional refusal wording.
+    mes("You don't have enough inventory space.");
+    return;
+}
+inv_add(inv, $bone, 1);
+$count = add($count, 1);
+if ($count >= 4) {
+    $count = 0;
+    $type = add($type, 1);
+    if ($type >= 4) $type = 0;
+    // UNKNOWN: the cache has no per-player pile-state visual.
+    mes("The pile changes to a different type of bone.");
+}
+if ($pile = 1) {
+    %varp628_bits = setbit_range_toint(%varp628_bits, $type, 4, 5);
+    %varp628_bits = setbit_range_toint(%varp628_bits, $count, 6, 7);
+} else if ($pile = 2) {
+    %varp628_bits = setbit_range_toint(%varp628_bits, $type, 8, 9);
+    %varp628_bits = setbit_range_toint(%varp628_bits, $count, 10, 11);
+} else if ($pile = 3) {
+    %varp628_bits = setbit_range_toint(%varp628_bits, $type, 12, 13);
+    %varp628_bits = setbit_range_toint(%varp628_bits, $count, 14, 15);
+} else {
+    %varp628_bits = setbit_range_toint(%varp628_bits, $type, 16, 17);
+    %magictraining_grave_bone4count = $count;
+}
+
+[proc,mta_bones](boolean $peaches)(boolean)
+// The shared spell hook must leave all non-Graveyard casts to normal magic.
+if (~mta_room ! 4) return(false);
+if ($peaches = true) {
+    if (%magictraining_bonespeaches ! 1) {
+        // UNKNOWN functional refusal wording; the purchase unlock is VERIFIED.
+        mes("You need to learn Bones to Peaches first.");
+        return(true);
+    }
+    if (stat(magic) < 60) {
+        mes("You need a Magic level of 60 to cast Bones to Peaches.");
+        return(true);
+    }
+}
+def_int $bones1 = inv_total(inv, magictraining_bones1);
+def_int $bones2 = inv_total(inv, magictraining_bones2);
+def_int $bones3 = inv_total(inv, magictraining_bones3);
+def_int $bones4 = inv_total(inv, magictraining_bones4);
+def_int $total_bones = add($bones1, add($bones2, add($bones3, $bones4)));
+if ($total_bones < 1) {
+    // UNKNOWN functional refusal wording.
+    mes("You aren't holding any bones.");
+    return(true);
+}
+def_dbrow $spell_data = ~get_spell_data(^bones_to_bananas);
+if ($peaches = false & ~check_spell_requirements($spell_data) = false) return(true);
+if ($peaches = true & ~mta_bone_peach_runes(false) = false) {
+    // UNKNOWN functional refusal wording.
+    mes("You don't have the runes required for Bones to Peaches.");
+    return(true);
+}
+if (afk_event = ^true) {
+    ~macro_event_general_spawn(~macro_event_set_random);
+    return(true);
+}
+// CANDIDATE yields from the retained Sal guide; the official KB confirms four
+// pile rows and different fruit yields but the old image table is not textual.
+def_int $fruits1 = calc($bones1 * 2);
+def_int $fruits2 = calc($bones2 * 3);
+def_int $fruits3 = $bones3;
+def_int $fruits4 = calc($bones4 * 4);
+def_int $fruit_count = add($fruits1, add($fruits2, add($fruits3, $fruits4)));
+def_namedobj $fruit = banana;
+if ($peaches = true) $fruit = peach;
+if ($bones1 > 0) inv_del(inv, magictraining_bones1, $bones1);
+if ($bones2 > 0) inv_del(inv, magictraining_bones2, $bones2);
+if ($bones3 > 0) inv_del(inv, magictraining_bones3, $bones3);
+if ($bones4 > 0) inv_del(inv, magictraining_bones4, $bones4);
+if (inv_itemspace(inv, $fruit, $fruit_count, inv_size(inv)) = false) {
+    if ($bones1 > 0) inv_add(inv, magictraining_bones1, $bones1);
+    if ($bones2 > 0) inv_add(inv, magictraining_bones2, $bones2);
+    if ($bones3 > 0) inv_add(inv, magictraining_bones3, $bones3);
+    if ($bones4 > 0) inv_add(inv, magictraining_bones4, $bones4);
+    // UNKNOWN functional refusal wording.
+    mes("You don't have enough inventory space for the fruit.");
+    return(true);
+}
+if ($peaches = true & ~mta_bone_peach_runes(true) = false) {
+    if ($bones1 > 0) inv_add(inv, magictraining_bones1, $bones1);
+    if ($bones2 > 0) inv_add(inv, magictraining_bones2, $bones2);
+    if ($bones3 > 0) inv_add(inv, magictraining_bones3, $bones3);
+    if ($bones4 > 0) inv_add(inv, magictraining_bones4, $bones4);
+    return(true);
+}
+inv_add(inv, $fruit, $fruit_count);
+if ($peaches = false) ~delete_spell_runes($spell_data);
+~give_spell_xp($spell_data);
+def_namedobj $visual_product;
+def_seq $anim;
+def_spotanim $spotanim;
+def_synth $sound;
+$visual_product, $anim, $spotanim, $sound = ~magic_spell_search_convertobj($spell_data, null);
+if ($anim ! null) anim($anim, 0);
+if ($spotanim ! null) spotanim_pl($spotanim, 92, 0);
+if ($sound ! null) sound_synth($sound, 0, 0);
+// UNKNOWN favourable-player default: Bones to Peaches reuses the compiled
+// Bones to Bananas XP because revision 377 has no Bones to Peaches spell row.
+if ($peaches = true) mes("The bones turn into peaches."); else mes("The bones turn into bananas.");
+p_delay(2);
+return(true);
+
+[proc,mta_bone_peach_runes](boolean $apply)(boolean)
+def_dbrow $spell_data = ~get_spell_data(^bones_to_bananas);
+def_namedobj $earth_rune;
+def_int $base_earth;
+def_namedobj $water_rune;
+def_int $base_water;
+def_namedobj $nature_rune;
+def_int $base_nature;
+def_namedobj $rune4;
+def_int $base_count4;
+$earth_rune, $base_earth, $water_rune, $base_water, $nature_rune, $base_nature, $rune4, $base_count4 = ~staff_runes($spell_data);
+def_int $earth_count = 4;
+def_int $water_count = 4;
+def_int $nature_count = 2;
+if ($base_earth = null) $earth_count = 0;
+if ($base_water = null) $water_count = 0;
+if ($base_nature = null) $nature_count = 0;
+def_int $cost;
+def_int $combos;
+def_int $steam;
+def_int $smoke;
+def_int $mist;
+def_int $dust;
+def_int $lava;
+def_int $mud;
+$cost, $combos, $steam, $smoke, $mist, $dust, $lava, $mud = ~spell_rune_plan($earth_rune, $earth_count, $water_rune, $water_count, $nature_rune, $nature_count, null, 0, null, 0, $apply);
+if ($cost < 0) return(false);
+return(true);
+
+[proc,mta_graveyard_deposit]
+if (~mta_room ! 4) return;
+def_int $fruit = add(inv_total(inv, banana), inv_total(inv, peach));
+if ($fruit < 1) {
+    // UNKNOWN functional refusal wording.
+    mes("You don't have any fruit to deposit.");
+    return;
+}
+def_int $total = add($fruit, getbit_range(%varp628_bits, 0, 3));
+def_int $points = divide($total, 16);
+def_int $remainder = sub($total, calc($points * 16));
+if (inv_total(inv, banana) > 0) inv_del(inv, banana, inv_total(inv, banana));
+if (inv_total(inv, peach) > 0) inv_del(inv, peach, inv_total(inv, peach));
+%varp628_bits = setbit_range_toint(%varp628_bits, $remainder, 0, 3);
+if ($points > 0) {
+    // VERIFIED 15 April 2006 Jagex KB: 1 point, 25 Magic XP and one rune per 16.
+    ~mta_award(4, $points);
+    stat_advance(magic, calc($points * 250));
+    def_int $i = 0;
+    while ($i < $points) {
+        // UNKNOWN distribution: choose uniformly from the four evidenced runes.
+        switch_int(random(4)) {
+            case 0 : inv_add(inv, waterrune, 1);
+            case 1 : inv_add(inv, naturerune, 1);
+            case 2 : inv_add(inv, deathrune, 1);
+            case 3 : inv_add(inv, bloodrune, 1);
+        }
+        $i = add($i, 1);
+    }
+    // UNKNOWN functional wording.
+    mes("You gain <tostring($points)> Graveyard Pizazz point(s).");
+} else {
+    mes("The food chute takes the fruit.");
+}
+
+[timer,mta_graveyard_fall](int $generation)
+if (getbit_range(%varp628_bits, 18, 18) ! 1 | getbit_range(%varp628_bits, 24, 27) ! $generation) return;
+if (~mta_room ! 4) {
+    ~mta_graveyard_cleanup;
+    return;
+}
+// CANDIDATE: each fall deals 2 damage (2007 guide and Main ruling).
+if (stat(hitpoints) <= 2) {
+    ~mta_graveyard_death;
+    return;
+}
+stat_sub(hitpoints, 2, 0);
+// UNKNOWN functional damage wording.
+mes("A falling bone hits you for 2 damage.");
+// UNKNOWN favourable-player engineering interval: 50 server ticks.
+settimer(mta_graveyard_fall, ^mta_graveyard_fall_ticks, $generation);
+
+[proc,mta_graveyard_death]
+def_int $penalty = min(10, %mta_graveyard_points);
+%mta_graveyard_points = sub(%mta_graveyard_points, $penalty);
+~mta_hat_colour;
+~mta_hud;
+~mta_graveyard_cleanup;
+if_openoverlay(null);
+p_teleport(0_52_51_35_50);
+stat_heal(hitpoints, 99, 0);
+// CANDIDATE: safe hall ejection, ten-point penalty, and retained equipment.
+// This deliberately bypasses native death and its item-loss path.
+mes("The falling bones knock you out. You wake up in the entrance hall.");

@@ -21,3 +21,8 @@ scope=perm
 // UNKNOWN storage mapping; preserve the original 625 identity and generic bit views.
 [varp625_bits]
 scope=perm
+
+// VERIFIED deposited-coin rewards are paid on leaving; UNKNOWN private storage mapping.
+// Preserve unpaid bank coins through logout; room rotation is reset on entry/cleanup.
+[varp626_bits]
+scope=perm

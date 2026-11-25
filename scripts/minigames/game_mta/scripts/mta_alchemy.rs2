@@ -1,0 +1,277 @@
+// CANDIDATE (2007 guide): cupboard contents and values rotate clockwise about every 30 seconds.
+// UNKNOWN favourable engineering default: one 50-tick phase moves each item one cupboard clockwise;
+// phases 0..39 cover the 8-slot position and 5-value cycles before repeating.
+// UNKNOWN favourable initial mapping: first cupboard 10783 yields a free 30-coin Rune longsword.
+// Item/value/free mappings below are deterministic defaults, not recovered historical mappings.
+
+[oploc1,cupboard_10783]
+~mta_alchemy_search(0);
+
+[oploc1,cupboard_10797]
+~mta_alchemy_search(1);
+
+[oploc1,cupboard_10795]
+~mta_alchemy_search(2);
+
+[oploc1,cupboard_10793]
+~mta_alchemy_search(3);
+
+[oploc1,cupboard_10791]
+~mta_alchemy_search(4);
+
+[oploc1,cupboard_10789]
+~mta_alchemy_search(5);
+
+[oploc1,cupboard_10787]
+~mta_alchemy_search(6);
+
+[oploc1,cupboard_10785]
+~mta_alchemy_search(7);
+
+[oploc1,magictraining_coin_collector]
+~mta_alchemy_deposit;
+
+// These original iop2 actions are retained in the 377 object config; room items are never wearable.
+[opheld2,magictraining_leather_boots]
+return;
+
+[opheld2,magictraining_adamant_kiteshield]
+return;
+
+[opheld2,magictraining_adamant_med_helm]
+return;
+
+[opheld2,magictraining_rune_longsword]
+return;
+
+[proc,mta_alchemy_enter]
+if (~mta_room ! 2) return;
+cleartimer(mta_alchemy_rotate);
+// VERIFIED 15-Apr-2006 Knowledge Base: coins cannot be brought into this room.
+// Refuse after the portal hook, preserving the player's ordinary coins and closing the room overlay.
+if (inv_total(inv, coins) > 0) {
+    if_openoverlay(null);
+    p_teleport(0_52_51_35_50);
+    return;
+}
+// Do not discard an unpaid bank reward on re-entry; settle what fits before starting a new phase.
+~mta_alchemy_pay_pending;
+// A pending reward paid into inventory is still ordinary carried cash, so it also prevents entry.
+if (inv_total(inv, coins) > 0) {
+    if_openoverlay(null);
+    p_teleport(0_52_51_35_50);
+    return;
+}
+%varp626_bits = setbit_range_toint(%varp626_bits, 0, 0, 5);
+// CANDIDATE 2007 guide: about 30 seconds; 50 server ticks at 0.6 seconds per tick.
+settimer(mta_alchemy_rotate, 50);
+~mta_alchemy_hud;
+
+[proc,mta_alchemy_cleanup]
+if (~mta_room ! 2) return;
+cleartimer(mta_alchemy_rotate);
+~mta_alchemy_remove(magictraining_leather_boots);
+~mta_alchemy_remove(magictraining_adamant_kiteshield);
+~mta_alchemy_remove(magictraining_adamant_med_helm);
+~mta_alchemy_remove(magictraining_emerald);
+~mta_alchemy_remove(magictraining_rune_longsword);
+// Coins not deposited before leaving are lost; only deposited coins accrue the bank reward.
+def_int $coins = inv_total(inv, coins);
+if ($coins > 0) inv_del(inv, coins, $coins);
+~mta_alchemy_pay_pending;
+%varp626_bits = setbit_range_toint(%varp626_bits, 0, 0, 5);
+
+[proc,mta_alchemy_remove](obj $item)
+def_int $count = inv_total(inv, $item);
+if ($count > 0) inv_del(inv, $item, $count);
+
+[proc,mta_alchemy_advance]
+if (~mta_room ! 2) {
+    cleartimer(mta_alchemy_rotate);
+    return;
+}
+def_int $phase = add(~mta_alchemy_phase, 1);
+if ($phase >= 40) $phase = 0;
+%varp626_bits = setbit_range_toint(%varp626_bits, $phase, 0, 5);
+~mta_alchemy_hud;
+
+[timer,mta_alchemy_rotate]
+~mta_alchemy_advance;
+
+[proc,mta_alchemy_phase]()(int)
+return(getbit_range(%varp626_bits, 0, 5));
+
+[proc,mta_alchemy_item](int $index)(namedobj)
+switch_int($index) {
+    case 0 : return(magictraining_rune_longsword);
+    case 1 : return(magictraining_emerald);
+    case 2 : return(magictraining_adamant_med_helm);
+    case 3 : return(magictraining_adamant_kiteshield);
+    case 4 : return(magictraining_leather_boots);
+}
+return(null);
+
+[proc,mta_alchemy_item_index](obj $item)(int)
+switch_obj($item) {
+    case magictraining_rune_longsword : return(0);
+    case magictraining_emerald : return(1);
+    case magictraining_adamant_med_helm : return(2);
+    case magictraining_adamant_kiteshield : return(3);
+    case magictraining_leather_boots : return(4);
+}
+return(-1);
+
+[proc,mta_alchemy_value](obj $item)(int)
+def_int $index = ~mta_alchemy_item_index($item);
+if ($index < 0) return(0);
+// VERIFIED 15-Apr-2006 Knowledge Base: 1, 5, 8, 15 or 30 coins; high/low alchemy pay equally.
+def_int $value_index = modulo(add($index, ~mta_alchemy_phase), 5);
+switch_int($value_index) {
+    case 0 : return(30);
+    case 1 : return(15);
+    case 2 : return(8);
+    case 3 : return(5);
+    case 4 : return(1);
+}
+return(0);
+
+[proc,mta_alchemy_free](obj $item)(boolean)
+def_int $index = ~mta_alchemy_item_index($item);
+if ($index < 0) return(false);
+// UNKNOWN favourable choice: the current 30-coin item is the no-rune item each phase.
+// Its type rotates deterministically; the source gives no item-to-arrow schedule.
+if ($index = modulo(sub(5, modulo(~mta_alchemy_phase, 5)), 5)) return(true);
+return(false);
+
+[proc,mta_alchemy_search](int $slot)
+if (~mta_room ! 2 | $slot < 0 | $slot > 7) return;
+def_int $position_phase = modulo(~mta_alchemy_phase, 8);
+def_int $item_index = modulo(add(sub($slot, $position_phase), 8), 8);
+if ($item_index >= 5) return;
+def_namedobj $item = ~mta_alchemy_item($item_index);
+if ($item = null) return;
+if (inv_itemspace(inv, $item, 1, inv_size(inv)) = false) return;
+inv_add(inv, $item, 1);
+
+[proc,mta_alchemy_hud]
+if (~mta_room ! 2) return;
+def_int $boots = ~mta_alchemy_value(magictraining_leather_boots);
+if (~mta_alchemy_free(magictraining_leather_boots) = true) {
+    if_settext(pizazz_alchemy:com_9, "<tostring($boots)> (Free)");
+} else {
+    if_settext(pizazz_alchemy:com_9, "<tostring($boots)>");
+}
+def_int $shield = ~mta_alchemy_value(magictraining_adamant_kiteshield);
+if (~mta_alchemy_free(magictraining_adamant_kiteshield) = true) {
+    if_settext(pizazz_alchemy:com_10, "<tostring($shield)> (Free)");
+} else {
+    if_settext(pizazz_alchemy:com_10, "<tostring($shield)>");
+}
+def_int $helm = ~mta_alchemy_value(magictraining_adamant_med_helm);
+if (~mta_alchemy_free(magictraining_adamant_med_helm) = true) {
+    if_settext(pizazz_alchemy:com_11, "<tostring($helm)> (Free)");
+} else {
+    if_settext(pizazz_alchemy:com_11, "<tostring($helm)>");
+}
+def_int $emerald = ~mta_alchemy_value(magictraining_emerald);
+if (~mta_alchemy_free(magictraining_emerald) = true) {
+    if_settext(pizazz_alchemy:com_12, "<tostring($emerald)> (Free)");
+} else {
+    if_settext(pizazz_alchemy:com_12, "<tostring($emerald)>");
+}
+def_int $sword = ~mta_alchemy_value(magictraining_rune_longsword);
+if (~mta_alchemy_free(magictraining_rune_longsword) = true) {
+    if_settext(pizazz_alchemy:com_13, "<tostring($sword)> (Free)");
+} else {
+    if_settext(pizazz_alchemy:com_13, "<tostring($sword)>");
+}
+
+[proc,mta_alchemy](int $spell, obj $item)(boolean)
+// Parent-owned spell dispatch calls this before the standard requirements.
+if (~mta_room ! 2) return(false);
+if_settabactive(^tab_magic);
+if_close;
+// VERIFIED 15-Apr-2006 Knowledge Base: items brought into the room cannot be alched.
+// Inside this room, handle and refuse every non-MTA target so ordinary alchemy cannot fall through.
+def_int $item_index = ~mta_alchemy_item_index($item);
+if ($item_index < 0) return(true);
+if (inv_total(inv, $item) < 1) return(true);
+if ($spell ! ^highlvl_alchemy & $spell ! ^lowlvl_alchemy) return(true);
+def_dbrow $spell_data = ~get_spell_data($spell);
+def_boolean $free = ~mta_alchemy_free($item);
+if ($free = true) {
+    // The 2006 KB says this item's alchemy costs no runes; preserve the normal members/level gates.
+    if (db_getfield($spell_data, magic_spell_table:members, 0) = true & map_members = ^false) {
+        mes("You need to be on a members' server to use this spell.");
+        return(true);
+    }
+    if (stat(magic) < db_getfield($spell_data, magic_spell_table:levelrequired, 0)) {
+        mes("Your Magic level is not high enough for this spell.");
+        return(true);
+    }
+} else {
+    if (~check_spell_requirements($spell_data) = false) return(true);
+    if (~is_alchable($item, $spell_data) = false) return(true);
+}
+if ($spell = ^highlvl_alchemy) {
+    sound_synth(high_alchemy, 1, 0);
+    anim(human_casthighlvlalchemy, 0);
+    spotanim_pl(highlvlalchemy_casting, 92, 0);
+} else {
+    sound_synth(low_alchemy, 1, 0);
+    anim(human_castlowlvlalchemy, 0);
+    spotanim_pl(lowlvlalchemy_casting, 92, 0);
+}
+inv_del(inv, $item, 1);
+if ($free = false) ~delete_spell_runes($spell_data);
+~give_spell_xp($spell_data);
+// CANDIDATE (2007 guide): High Alchemy yields 115 Magic XP per item; the 377 spell row gives 65.
+if ($spell = ^highlvl_alchemy) stat_advance(magic, 500);
+inv_add(inv, coins, ~mta_alchemy_value($item));
+if ($spell = ^highlvl_alchemy) {
+    if (afk_event = ^true) ~macro_event_general_spawn(~macro_event_set_random);
+    p_delay(3);
+} else {
+    if (afk_event = ^true) ~macro_event_general_spawn(~macro_event_set_random);
+    p_delay(1);
+}
+return(true);
+
+[proc,mta_alchemy_pending]()(int)
+def_int $high = getbit_range(%varp626_bits, 6, 30);
+return(add(multiply($high, 1024), %magictraining_alchem_coinreward));
+
+[proc,mta_alchemy_pending_add](int $amount)
+if ($amount < 1) return;
+def_int $pending = add(~mta_alchemy_pending, $amount);
+def_int $high = divide($pending, 1024);
+def_int $low = modulo($pending, 1024);
+%varp626_bits = setbit_range_toint(%varp626_bits, $high, 6, 30);
+%magictraining_alchem_coinreward = $low;
+
+[proc,mta_alchemy_pay_pending]
+def_int $pending = ~mta_alchemy_pending;
+if ($pending < 1) return;
+// The original 10-bit varbit holds the low part; permanent varp626 bits 6..30 retain the full amount.
+// Favorable UNKNOWN fallback: if the bank has no room, pay into inventory when possible; otherwise retain it.
+if (inv_itemspace(bank, coins, $pending, inv_size(bank)) = true) {
+    inv_add(bank, coins, $pending);
+} else if (inv_itemspace(inv, coins, $pending, inv_size(inv)) = true) {
+    inv_add(inv, coins, $pending);
+} else {
+    return;
+}
+%varp626_bits = setbit_range_toint(%varp626_bits, 0, 6, 30);
+%magictraining_alchem_coinreward = 0;
+
+[proc,mta_alchemy_deposit]
+if (~mta_room ! 2) return;
+def_int $coins = inv_total(inv, coins);
+if ($coins < 1) return;
+// CANDIDATE 2007 guide recommends whole hundreds; the 2006 KB pays 1% points and 2 XP per deposited coin.
+def_int $points = divide($coins, 100);
+def_int $cash_reward = divide($coins, 10);
+inv_del(inv, coins, $coins);
+stat_advance(magic, multiply($coins, 20));
+~mta_alchemy_pending_add($cash_reward);
+if ($points > 0) ~mta_award(2, $points);
