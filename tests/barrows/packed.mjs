@@ -55,7 +55,7 @@ export async function loadPackedRuntime(options = {}) {
   const eng = relative => import(pathToFileURL(path.join(roots.engineRoot, relative)).href);
   const loadDefault = async relative => (await eng(relative)).default;
   const [World, Player, Npc, Loc, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType, VarBitType,
-    VarNpcType, LocType, NpcType, EnumType, DbRowType, DbTableType, DbTableIndex, InvType, ObjType, FontType, ParamType, SeqType, Component, JavaRandom,
+    VarNpcType, LocType, NpcType, EnumType, DbRowType, DbTableType, DbTableIndex, InvType, ObjType, FontType, ParamType, SeqType, SpotanimType, Component, JavaRandom,
     { EntityLifeCycle }, { NpcMode }, { BlockWalk }, { CoordGrid }, { allocateIfAbsent }] = await Promise.all([
     loadDefault('src/engine/World.ts'),
     loadDefault('src/engine/entity/Player.ts'),
@@ -78,6 +78,7 @@ export async function loadPackedRuntime(options = {}) {
     loadDefault('src/cache/config/FontType.ts'),
     loadDefault('src/cache/config/ParamType.ts'),
     loadDefault('src/cache/config/SeqType.ts'),
+    loadDefault('src/cache/config/SpotanimType.ts'),
     loadDefault('src/cache/config/Component.ts'),
     loadDefault('src/util/JavaRandom.ts'),
     eng('src/engine/entity/EntityLifeCycle.js'),
@@ -86,12 +87,12 @@ export async function loadPackedRuntime(options = {}) {
     eng('src/engine/CoordGrid.ts'),
     eng('src/engine/routefinder/index.ts')
   ]);
-  for (const config of [VarPlayerType, VarBitType, VarNpcType, LocType, NpcType, EnumType, DbRowType, DbTableType, InvType, ObjType, FontType, ParamType, SeqType, Component]) config.load(roots.packDir);
+  for (const config of [VarPlayerType, VarBitType, VarNpcType, LocType, NpcType, EnumType, DbRowType, DbTableType, InvType, ObjType, FontType, ParamType, SeqType, SpotanimType, Component]) config.load(roots.packDir);
   DbTableIndex.init();
   assert(FontType.get(3), `FontType q8_full is missing in ${roots.packDir}`);
   assert(ScriptProvider.load(roots.packDir) > 0, `ScriptProvider.load found no compiled scripts in ${roots.packDir}`);
   return { ...roots, World, Player, Npc, Loc, ScriptProvider, ScriptRunner, ScriptState, VarPlayerType,
-    VarBitType, VarNpcType, LocType, NpcType, EnumType, InvType, ObjType, FontType, ParamType, SeqType, Component, JavaRandom,
+    VarBitType, VarNpcType, LocType, NpcType, EnumType, InvType, ObjType, FontType, ParamType, SeqType, SpotanimType, Component, JavaRandom,
     EntityLifeCycle, NpcMode, BlockWalk, CoordGrid, allocateIfAbsent };
 }
 
