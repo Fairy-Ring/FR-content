@@ -168,10 +168,13 @@ assert.equal(stage(ritual, 'ahoy_grinder_status'), 2);
 operate(ritual, locAt('ahoy_grinder_chute', 1, 3658, 3525));
 assert.equal(count(ritual, 'pot_bonemeal'), 1);
 assert.equal(stage(ritual, 'ahoy_grinder_status'), 0);
-let slime;
-for (let x = 3650; x < 3690 && !slime; x++) for (let z = 9850; z < 9890 && !slime; z++) slime = World.getLoc(x, z, 0, id('LocType', 'green_gloop'));
-assert(slime, 'real packed underground slime pool exists');
-move(ritual, slime.level, slime.x, slime.z);
+const slime = locAt('green_gloop_e', 0, 3680, 9881);
+move(ritual, 0, 3680, 9880);
+checkLanding(ritual, 'original southern slime-pool approach');
+const slimeType = types.LocType.get(slime.type);
+assert(map.reachedLoc(ritual.level, ritual.x, ritual.z, slime.x, slime.z,
+  slimeType.width, slimeType.length, 1, slime.angle, slime.shape, slimeType.forceapproach),
+  'original southern slime-pool edge is reachable from its clear bank');
 assert(useLoc(ritual, 'bucket_empty', slime)); finish(ritual);
 assert.equal(count(ritual, 'bucket_ectoplasm'), 1);
 move(ritual, 0, 3659, 3522);
