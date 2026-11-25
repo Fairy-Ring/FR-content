@@ -1,0 +1,28 @@
+[magic_spell_skeleton_mage_rot]
+table=magic_spell_table
+data=spell,^skeleton_mage_attack
+// CANDIDATE: Old School revision 4001342 describes four levels from all three
+// stats, with Weaken's projectile and Curse's impact; no rot damage is stated.
+data=maxhit,0
+data=stat_change,attack,-4,0
+data=stat_change,strength,-4,0
+data=stat_change,defence,-4,0
+data=spotanim_proj,weaken_travel,36,31,51,16,-5,64,10
+data=spotanim_target,curse_impact,124
+// UNKNOWN engineering: standard Weaken casting animation, launch timing and
+// mandatory cast synth; the 2017 sound change does not identify the old sound.
+data=anim,human_castweaken
+data=sound_cast,confuse_cast_and_fire
+
+[magic_spell_nezikchened]
+table=magic_spell_table
+data=spell,^nezikchened_mage_attack
+// CANDIDATE: Old School Nezikchened lists a magic maximum of 18.
+data=maxhit,18
+// UNKNOWN engineering binding: named 377 demon/flamestrike assets, standard
+// projectile timing and Earth Strike synths; no period source binds them.
+data=anim,demon_casting
+data=spotanim_origin,nezik_flamestrike_casting
+data=spotanim_proj,nezik_flamestrike_travel,43,31,51,16,-5,64,10
+data=spotanim_target,nezik_flamestrike_impact,124
+data=sound_cast,earthstrike_cast_and_fire

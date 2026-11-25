@@ -500,49 +500,212 @@ function exerciseGreegree() {
     }
 }
 
-function observeHalberdWall() {
-    let start;
-    for (let x = 3190; x <= 3230 && !start; x++) {
+const wallFlagEntries = Object.entries(CollisionFlag).filter(([name]) => name.startsWith('WALL_'));
+const diagonalWallFlags = new Set([
+    'WALL_NORTH_WEST', 'WALL_NORTH_EAST', 'WALL_SOUTH_EAST', 'WALL_SOUTH_WEST'
+]);
+
+function packedFloorTile(x, z) {
+    return World.gameMap.hasZone(x, z, 0) && !GameMap.isMapBlocked(x, z, 0);
+}
+
+function wallFlagsAt(x, z) {
+    return wallFlagEntries.filter(([, flag]) => isFlagged(x, z, 0, flag)).map(([name]) => name);
+}
+
+function wallFlagsFor(tiles) {
+    return tiles.flatMap(tile => {
+        const flags = wallFlagsAt(tile.x, tile.z);
+        return flags.length === 0 ? [] : [{ label: tile.label, x: tile.x, z: tile.z, flags }];
+    });
+}
+
+function findHalberdTargetEdge(startToExclude) {
+    const approaches = [
+        { dx: 2, dz: 0, targetEdge: 'WALL_WEST' },
+        { dx: -2, dz: 0, targetEdge: 'WALL_EAST' },
+        { dx: 0, dz: 2, targetEdge: 'WALL_SOUTH' },
+        { dx: 0, dz: -2, targetEdge: 'WALL_NORTH' }
+    ];
+    for (let x = 3190; x <= 3230; x++) {
         for (let z = 3190; z <= 3230; z++) {
-            if (isFlagged(x, z, 0, CollisionFlag.WALL_EAST) &&
-                [0, 1, 2].every(offset => World.gameMap.hasZone(x + offset, z, 0) &&
-                    !GameMap.isMapBlocked(x + offset, z, 0))) {
-                start = { level: 0, x, z };
-                break;
+            if (x === startToExclude.x && z === startToExclude.z) continue;
+            for (const { dx, dz, targetEdge } of approaches) {
+                const start = { level: 0, x, z };
+                const target = { level: 0, x: x + dx, z: z + dz };
+                const lineTiles = [0, 1, 2].map(step => ({
+                    x: x + Math.sign(dx) * step,
+                    z: z + Math.sign(dz) * step
+                }));
+                if (!lineTiles.every(tile => packedFloorTile(tile.x, tile.z))) continue;
+                const targetFlags = wallFlagsAt(target.x, target.z);
+                if (!targetFlags.includes(targetEdge) ||
+                    !targetFlags.includes(`${targetEdge}_PROJ_BLOCKER`)) continue;
+                if (GameMap.isLineOfWalk(0, start.x, start.z, target.x, target.z) ||
+                    GameMap.isLineOfSight(0, start.x, start.z, target.x, target.z)) continue;
+                return {
+                    start,
+                    target,
+                    requiredWallFlag: targetEdge,
+                    wallTiles: lineTiles.map((tile, index) => ({
+                        label: index === 0 ? 'attacker' : index === 2 ? 'target' : 'between',
+                        ...tile
+                    }))
+                };
             }
         }
     }
-    assert(start, 'find a real packed wall between three walkable floor tiles');
-    const targetPosition = { ...start, x: start.x + 2 };
-    assert.equal(lineOfWalkToTarget(start, targetPosition), false, 'packed wall blocks the initial two-tile line');
-    const player = createPlayer('wall', start);
+    return null;
+}
+
+function findHalberdDiagonalCorner(startToExclude) {
+    const diagonals = [[2, 2], [2, -2], [-2, 2], [-2, -2]];
+    for (let x = 3190; x <= 3230; x++) {
+        for (let z = 3190; z <= 3230; z++) {
+            if (x === startToExclude.x && z === startToExclude.z) continue;
+            for (const [dx, dz] of diagonals) {
+                const start = { level: 0, x, z };
+                const target = { level: 0, x: x + dx, z: z + dz };
+                const corner = { x: x + dx / 2, z: z + dz / 2 };
+                const minX = Math.min(start.x, target.x);
+                const maxX = Math.max(start.x, target.x);
+                const minZ = Math.min(start.z, target.z);
+                const maxZ = Math.max(start.z, target.z);
+                const gridTiles = [];
+                let walkable = true;
+                for (let tileX = minX; tileX <= maxX; tileX++) {
+                    for (let tileZ = minZ; tileZ <= maxZ; tileZ++) {
+                        if (!packedFloorTile(tileX, tileZ)) walkable = false;
+                        gridTiles.push({
+                            label: tileX === start.x && tileZ === start.z ? 'attacker' :
+                                tileX === target.x && tileZ === target.z ? 'target' :
+                                    tileX === corner.x && tileZ === corner.z ? 'corner' : 'between',
+                            x: tileX,
+                            z: tileZ
+                        });
+                    }
+                }
+                if (!walkable) continue;
+                const cornerFlag = wallFlagsAt(corner.x, corner.z)
+                    .find(flag => diagonalWallFlags.has(flag));
+                if (!cornerFlag) continue;
+                if (GameMap.isLineOfWalk(0, start.x, start.z, target.x, target.z) ||
+                    GameMap.isLineOfSight(0, start.x, start.z, target.x, target.z)) continue;
+                return { start, target, requiredWallFlag: cornerFlag, wallTiles: gridTiles };
+            }
+        }
+    }
+    return null;
+}
+
+function observeHalberdWallCase(test) {
+    let player;
     let target;
     try {
+        player = createPlayer(`wall-${test.label}`, test.start);
         prepareAttacker(player, runeHalberd);
-        target = new Npc(0, targetPosition.x, targetPosition.z, manType.size, manType.size,
+        target = new Npc(0, test.target.x, test.target.z, manType.size, manType.size,
             EntityLifeCycle.DESPAWN, World.getNextNid(), manType.id, manType.blockwalk);
         World.addNpc(target, -1);
         target.lastMovement = -100;
         target.setVar(npcAggressivePlayer, player.uid);
-        assert(player.setInteraction(Interaction.ENGINE, target, ServerTriggerType.APNPC2), 'wall case selects native Attack');
-        assert.equal(player.getOpTrigger()?.name, '[opnpc2,_]');
-        assert.equal(player.getApTrigger()?.name, '[apnpc2,_]');
+
+        const initialLineOfWalk = lineOfWalkToTarget(test.start, test.target);
+        const initialLineOfSight = GameMap.isLineOfSight(
+            test.start.level, test.start.x, test.start.z, test.target.x, test.target.z
+        );
+        const wallFlags = wallFlagsFor(test.wallTiles);
+        const interactionSelected =
+            player.setInteraction(Interaction.ENGINE, target, ServerTriggerType.APNPC2);
+        const nativeAttackSelected = interactionSelected &&
+            player.getOpTrigger()?.name === '[opnpc2,_]' &&
+            player.getApTrigger()?.name === '[apnpc2,_]';
+        assert(nativeAttackSelected, `halberd wall ${test.label} selects native Attack dispatch`);
         player.processInteraction();
-        assertHealthy(player, 'halberd wall observation');
+        assertHealthy(player, `halberd wall ${test.label}`);
+
         const hits = [...target.queue.all()].filter(request => request.queueId === ServerTriggerType.AI_QUEUE2);
-        const finalLineOfWalk = lineOfWalkToTarget(player, targetPosition);
-        assert.deepEqual([player.x, player.z], [start.x, start.z], 'blocked halberd does not move through the wall');
-        assert.equal(finalLineOfWalk, false, 'the wall still separates attacker and target');
-        assert.equal(hits.length, 0, 'the existing native path queues no hit through this packed wall');
+        const queuedDamage = hits.map(hit => hit.lastInt);
+        const finalLineOfWalk = lineOfWalkToTarget(player, test.target);
+        const finalLineOfSight = GameMap.isLineOfSight(
+            player.level, player.x, player.z, test.target.x, test.target.z
+        );
+        const finalDistance = Math.max(Math.abs(player.x - test.target.x), Math.abs(player.z - test.target.z));
+        const attackThroughWall = !finalLineOfWalk && queuedDamage.length > 0;
+        const assertions = {
+            packedWallFlagPresent: wallFlags.some(tile => tile.flags.includes(test.requiredWallFlag)),
+            initialLineOfWalkBlocked: !initialLineOfWalk,
+            initialLineOfSightBlocked: !initialLineOfSight,
+            nativeAttackSelected,
+            finalLineOfWalkBlocked: !finalLineOfWalk,
+            finalLineOfSightBlocked: !finalLineOfSight,
+            expectedApproach: test.approaches ? finalDistance === 1 :
+                player.x === test.start.x && player.z === test.start.z,
+            noQueuedHit: queuedDamage.length === 0
+        };
+        for (const [name, passed] of Object.entries(assertions)) {
+            assert.equal(passed, true, `halberd wall ${test.label}: ${name}`);
+        }
         console.log(`HALBERD_WALL ${JSON.stringify({
-            start, target: targetPosition, end: { level: player.level, x: player.x, z: player.z },
-            initialLineOfWalk: false, finalLineOfWalk, hits: hits.map(hit => hit.lastInt),
-            attackThroughWall: !finalLineOfWalk && hits.length > 0
+            case: test.label,
+            start: test.start,
+            target: test.target,
+            end: { level: player.level, x: player.x, z: player.z },
+            wallFlags,
+            initialLineOfWalk,
+            finalLineOfWalk,
+            initialLineOfSight,
+            finalLineOfSight,
+            queuedDamage,
+            attackThroughWall,
+            assertions
         })}`);
+
     } finally {
         if (target) World.removeNpc(target, -1);
         cleanupPlayer(player);
     }
+}
+
+function observeHalberdWall() {
+    let attackerEdge;
+    for (let x = 3190; x <= 3230 && !attackerEdge; x++) {
+        for (let z = 3190; z <= 3230; z++) {
+            if (isFlagged(x, z, 0, CollisionFlag.WALL_EAST) &&
+                [0, 1, 2].every(offset => packedFloorTile(x + offset, z))) {
+                attackerEdge = { level: 0, x, z };
+                break;
+            }
+        }
+    }
+    assert(attackerEdge, 'find a real packed attacker-edge wall and three walkable floor tiles');
+    const attackerEdgeTarget = { ...attackerEdge, x: attackerEdge.x + 2 };
+    assert.equal(lineOfWalkToTarget(attackerEdge, attackerEdgeTarget), false,
+        'packed attacker-edge wall blocks the initial two-tile line');
+
+    const targetEdge = findHalberdTargetEdge(attackerEdge);
+    assert(targetEdge, 'find a real packed wall on the target edge with walk and projectile collision');
+    const diagonalCorner = findHalberdDiagonalCorner(attackerEdge);
+    assert(diagonalCorner, 'find a real packed diagonal wall corner between two-tile-reach endpoints');
+
+    observeHalberdWallCase({
+        label: 'attacker-edge',
+        start: attackerEdge,
+        target: attackerEdgeTarget,
+        requiredWallFlag: 'WALL_EAST',
+        wallTiles: [{ label: 'attacker', x: attackerEdge.x, z: attackerEdge.z }],
+        approaches: false
+    });
+    observeHalberdWallCase({
+        ...targetEdge,
+        label: 'target-edge',
+        approaches: true
+    });
+    observeHalberdWallCase({
+        ...diagonalCorner,
+        label: 'diagonal-corner',
+        approaches: true
+    });
 }
 
 for (const test of reachCases) {
