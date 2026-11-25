@@ -1,30 +1,79 @@
-// Devious Minds — glowing pouch on church altar (Use on loc).
-// Official day 19 Dec 2005. CANDIDATE 2007-base (Research: subject
-// devious-minds — 0 dump Use mes; %devious_altar 1 =
-// pouch face, pack-cited varbit 1466). Use devious_glowingpouch 6819 on the
-// church altar (multi devious_altar 10638 @ 2853,3348, multivar
-// devious_altar, face altar bit 0) -> consume 6819 + %devious_altar = 1.
-// Both binds pin-gated (not worldwide altar) + last_useitem else dm_default.
-// [oploc1,_prayer_altar] Pray-at stays. Stay %devious_main 1. No dest.
-// No cutscene. No 2. No && / ||.
-// Research: subject devious-minds · varbit.pack 1466.
-
+// CANDIDATE scene: retained article "Surprise!"; cache supplies all actors,
+// relic models, altar forms and teleport effects. No invented spoken dialogue.
 [oplocu,devious_altar] @devious_altar_pouch_use;
 [oplocu,altar] @devious_altar_pouch_use;
+[oplocu,devious_altar_pouch] @devious_altar_pouch_use;
+[oplocu,devious_altar_scorched] @devious_altar_pouch_use;
 
 [label,devious_altar_pouch_use]
-// Preserve the pouch-present and scorched forms' published refusal.
-if (%devious_altar ! 0) {
+if (%devious_main ! ^devious_delivery | last_useitem ! devious_glowingpouch | inv_total(inv, devious_glowingpouch) = 0
+    | coordx(loc_coord) ! 2853 | coordz(loc_coord) ! 3348 | coordy(loc_coord) ! 0) {
     ~displaymessage(^dm_default);
     return;
 }
-if (last_useitem ! devious_glowingpouch) {
-    ~displaymessage(^dm_default);
-    return;
-}
-if (coordx(loc_coord) ! 2853 | coordz(loc_coord) ! 3348) {
-    ~displaymessage(^dm_default);
-    return;
-}
-inv_del(inv, devious_glowingpouch, 1);
+// UNKNOWN staging: a private scenery copy keeps the ceremony independent of
+// other players. The pouch is retained until the scene finishes, so interruption
+// cannot strand the player. region_setexitcoord covers logout during the scene.
+if_close;
+p_stopaction;
+def_coord $scene = region_create(1, 2, 2);
+region_setexitcoord(0_44_52_37_19);
+region_set(0, 0, 0, 0_44_52_32_16, 0);
+region_set(0, 1, 0, 0_44_52_40_16, 0);
+region_set(0, 0, 1, 0_44_52_32_24, 0);
+region_set(0, 1, 1, 0_44_52_40_24, 0);
+p_telejump(region_getcoord(0, 4, 3));
 %devious_altar = 1;
+walktrigger(devious_scene_cancel);
+cam_moveto(region_getcoord(0, 5, 0), 500, 232, 232);
+cam_lookat(region_getcoord(0, 5, 4), 100, 232, 232);
+npc_add(region_getcoord(0, 4, 1), devious_cutscene_monk, ^devious_scene_lifetime);
+npc_setmode(none);
+def_npc_uid $first = npc_uid;
+npc_walk(region_getcoord(0, 4, 3));
+npc_add(region_getcoord(0, 5, 1), devious_cutscene_monk_relic, ^devious_scene_lifetime);
+npc_setmode(none);
+def_npc_uid $relic = npc_uid;
+npc_walk(region_getcoord(0, 5, 3));
+npc_add(region_getcoord(0, 6, 1), devious_cutscene_monk, ^devious_scene_lifetime);
+npc_setmode(none);
+def_npc_uid $second = npc_uid;
+npc_walk(region_getcoord(0, 6, 3));
+p_delay(^devious_scene_beat);
+npc_add(region_getcoord(0, 7, 3), devious_cutscene_assassin, ^devious_scene_lifetime);
+npc_setmode(none);
+npc_facesquare(region_getcoord(0, 5, 3));
+spotanim_npc(devious_assassin_teleport_spotanim, 0, 0);
+def_npc_uid $assassin = npc_uid;
+p_delay(^devious_scene_beat);
+if (npc_finduid($first) = true) npc_anim(devious_dead, 0);
+if (npc_finduid($second) = true) npc_anim(devious_dead, 0);
+if (npc_finduid($relic) = true) {
+    // The relic disappears from the bearer's model when it is stolen.
+    npc_changetype(devious_cutscene_monk, ^devious_scene_lifetime);
+    $relic = npc_uid;
+    npc_anim(devious_dead, 0);
+}
+%devious_altar = 2;
+spotanim_map(devious_explosion, region_getcoord(0, 5, 4), 0, 0);
+p_delay(^devious_scene_beat);
+if (npc_finduid($assassin) = true) spotanim_npc(devious_assassin_teleportreverse_spotanim, 0, 0);
+p_delay(^devious_scene_beat);
+if (npc_finduid($assassin) = true) npc_del;
+if (npc_finduid($first) = true) npc_del;
+if (npc_finduid($second) = true) npc_del;
+if (npc_finduid($relic) = true) npc_del;
+cam_reset;
+walktrigger(null);
+p_telejump(0_44_52_37_19);
+inv_del(inv, devious_glowingpouch, 1);
+%devious_main = ^devious_altar_used;
+
+[walktrigger,devious_scene_cancel]
+// UNKNOWN favourable interruption policy: return with the delivery intact.
+cam_reset;
+walktrigger(null);
+if (%devious_main = ^devious_delivery) {
+    %devious_altar = 0;
+    p_telejump(0_44_52_37_19);
+}

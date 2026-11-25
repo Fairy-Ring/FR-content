@@ -1,0 +1,20 @@
+// UNKNOWN engineering stage layout after the CANDIDATE 0 -> 1 start.
+// The original varbits and the shared completion constant remain unchanged.
+^devious_crafting = 1
+^devious_delivery = 10
+^devious_altar_used = 20
+^devious_investigate = 30
+^devious_body_searched = 40
+^devious_tiffy_debrief = 50
+
+// CANDIDATE: retained Devious Minds article, Requirements and Rewards.
+^devious_smithing_level = 65
+^devious_fletching_level = 50
+^devious_runecraft_level = 50
+^devious_smithing_xp = 65000
+^devious_fletching_xp = 50000
+^devious_runecraft_xp = 50000
+
+// UNKNOWN engineering scene timing and actor lifetime, in server ticks.
+^devious_scene_lifetime = 40
+^devious_scene_beat = 3
